@@ -1,18 +1,20 @@
 This is a checkout of the the sourceforge.net source code repository of VPLG.
 
 
-   -------------------------------------------------------------------------------
+   ---------------------------------------------------------------------------------
                                !!!!! WARNING !!!!!
 
-    Atm this repository does NOT contain the latest version of the code!
+    Atm this repository does NOT contain the latest version of the development code!
+
+    The code for a certain release is always included in the src/ directory.
 
     Do NOT send me patches against the version in this repo! If you are interested
     in VPLG development, contact me via email.
 
-   -------------------------------------------------------------------------------
+   ---------------------------------------------------------------------------------
 
 Note that both the 'splitpdb' and the 'plcc' directories contain not only the
-source code but the full Netbeans 7 project, so you should be able to open
+source code but the full Netbeans projects, so you should be able to open
 them directly if you use the Netbeans IDE.
 
 TS
