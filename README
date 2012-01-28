@@ -17,5 +17,7 @@ Note that both the 'splitpdb' and the 'plcc' directories contain not only the
 source code but the full Netbeans projects, so you should be able to open
 them directly if you use the Netbeans IDE.
 
+VPLG is free software and comes WITHOUT ANY WARRANTY. See the LICENSE file for details.
+
 TS
 
