@@ -11,7 +11,9 @@ package plcc;
 
 /**
  * This is an abstract SSEGraph. Both the ProtGraph and the FoldingGraph classes extend this
- * class and are non-abstract.
+ * class and are non-abstract. It will be used to separate PGs from FGs later.
+ * 
+ * NOT USED YET.
  * 
  * @author spirit
  */

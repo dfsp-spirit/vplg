@@ -10,6 +10,11 @@ package plcc;
 
 import java.util.*;
 
+/** 
+ * Simple comparator which allows comparison of the SSEs by their sequential position in the AA sequence of their chain.
+ * 
+ * @author ts
+ */
 public class SSEComparator implements Comparator<SSE> {
 
     @Override public int compare(SSE o1, SSE o2) {

@@ -13,8 +13,14 @@ package plcc;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.io.*;
+import java.util.Scanner;
 
 
+/**
+ * A file parser, used to extract information from PDB and DSSP files.
+ * 
+ * @author ts
+ */
 public class FileParser {
 
     // declare class vars
@@ -95,7 +101,7 @@ public class FileParser {
         else {
             System.err.println("ERROR: Could not parse dssp and pdb data.");
             dataInitDone = false;
-            System.exit(-1);
+            System.exit(1);
             return(false);          // for the IDE ;)
         }
     }
@@ -226,7 +232,7 @@ public class FileParser {
 
         if(s_models.size() > 1) {
             System.out.println("ERROR: Found > 1 model (" + s_models.size() + " to be precise) models in the parsed PDB file lines, something went wrong. Exiting.");
-            System.exit(-1);
+            System.exit(1);
         }
 
         System.out.println("  Creating all Chains...");
@@ -326,26 +332,30 @@ public class FileParser {
         } catch(Exception e) {
             System.err.println("ERROR: Hit MODEL line at PDB line number " + curLinePDB + " but parsing the line failed.");
             e.printStackTrace();
-            System.exit(-1);
+            System.exit(1);
         }
 
         curModelID = mID;
         return(true);
     }
 
-    // Handle PDB ATOM and HETATM lines.
-    // Currently this function creates all the atoms. It tracks chains etc via global variables. It would be better if this was 
-    // turned into a function createAllAtomsFromPdbData() that works like the createAll* functions.
-
+    /**
+     * Handle PDB ATOM and HETATM lines. Currently this function creates all the atoms. It tracks chains etc via global variables. It would be better if this was 
+     * turned into a function createAllAtomsFromPdbData() that works like the createAll* functions.
+     * @return true if the line could be parsed, false otherwise
+     */
     private static boolean handlePdbLineANYATOM() {
 
 
-        Integer atomSerialNumber, resNumPDB, resNumDSSP, coordX, coordY, coordZ;
+        Integer atomSerialNumber, resNumPDB, resNumDSSP;
+        Integer coordX, coordY, coordZ;
         atomSerialNumber = resNumPDB = resNumDSSP = coordX = coordY = coordZ = 0;
         String atomRecordName, atomName, resNamePDB, chainID, chemSym, altLoc, iCode;
         atomRecordName = atomName = resNamePDB = chainID = chemSym = altLoc = iCode = "";
-        Float oCoordX, oCoordY, oCoordZ;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
-        oCoordX = oCoordY = oCoordZ = .0f;
+        Double oCoordX, oCoordY, oCoordZ;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
+        oCoordX = oCoordY = oCoordZ = 0.0;
+        Float oCoordXf, oCoordYf, oCoordZf;
+        oCoordXf = oCoordYf = oCoordZf = 0.0f;
 
         try {
             atomRecordName = curLinePDB.substring(0, 6).trim();
@@ -359,12 +369,42 @@ public class FileParser {
             resNumPDB = Integer.valueOf((curLinePDB.substring(22, 26)).trim());
             iCode = curLinePDB.substring(26, 27);       // don't trim this!
             // 27 - 29 are ignored: blanks
-            oCoordX = Float.valueOf((curLinePDB.substring(30, 38)).trim());
-            oCoordY = Float.valueOf((curLinePDB.substring(38, 46)).trim());
-            oCoordZ = Float.valueOf((curLinePDB.substring(46, 54)).trim());
-            coordX = Integer.valueOf(Math.round(oCoordX)) * 10;
-            coordY = Integer.valueOf(Math.round(oCoordY)) * 10;
-            coordZ = Integer.valueOf(Math.round(oCoordZ)) * 10;
+            
+            
+            
+            if(Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {                            
+                // PTGL style: always round them down, i.e., simply ignore the last 2 digits
+                oCoordX = Double.valueOf((curLinePDB.substring(30, 38)).trim()) * 10.0;
+                oCoordY = Double.valueOf((curLinePDB.substring(38, 46)).trim()) * 10.0;
+                oCoordZ = Double.valueOf((curLinePDB.substring(46, 54)).trim()) * 10.0;
+                
+                // now, an example PDB file value of "8.796" was transformed into -87.96f                
+                
+                coordX = oCoordX.intValue();
+                coordY = oCoordY.intValue();
+                coordZ = oCoordZ.intValue();                                
+                
+                //System.out.println("[atom#" + atomSerialNumber + "] oCoords=(" + oCoordX + "," + oCoordY + "," + oCoordZ + "), Coords=(" + coordX + "," + coordY + "," + coordZ + ")");
+                
+            }
+            else {
+                
+                
+                // PLCC style: round the coordinates
+                oCoordXf = Float.valueOf((curLinePDB.substring(30, 38)).trim()) * 10;
+                oCoordYf = Float.valueOf((curLinePDB.substring(38, 46)).trim()) * 10;
+                oCoordZf = Float.valueOf((curLinePDB.substring(46, 54)).trim()) * 10;
+   
+                coordX = Integer.valueOf(Math.round(oCoordXf));
+                coordY = Integer.valueOf(Math.round(oCoordYf));
+                coordZ = Integer.valueOf(Math.round(oCoordZf));
+                
+                // now, is has become 88
+                
+                //System.out.println("[atom#" + atomSerialNumber + "] oCoords=(" + oCoordXf + "," + oCoordYf + "," + oCoordZf + "), Coords=(" + coordX + "," + coordY + "," + coordZ + ")");
+            }                        
+    
+            
             // 54 - 59 are ignored: occupancy
             // 60 - 65 are ignored: temp factor
             // 66 - 72 are ignored: blanks
@@ -374,7 +414,7 @@ public class FileParser {
         } catch(Exception e) {
             System.err.println("ERROR: Hit ATOM/HETATM line at PDB line number " + curLineNumPDB + " but parsing the line failed (length " + curLinePDB.length() + ").");
             e.printStackTrace();
-            System.exit(-1);
+            System.exit(1);
         }
 
         // Ignore alternate location identifiers (only use the 1st one. It is identified by an altLoc field that is empty, "A" or "1").
@@ -465,8 +505,14 @@ public class FileParser {
     }
 
     
-    // DEPRECATED: Use the function with iCode support below instead
-    private static Residue getResidueFromListOld(Integer resNum, String cID) {
+    /**
+     * DEPRECATED: Gets the Residue with the requested PDB properties from the residue list, but does not support PDB insertion code. So use the function with iCode support below instead.
+     * 
+     * @param resNum PDB residue number
+     * @param cID chain ID
+     * @return the Residue with the requested properties
+     */
+    @Deprecated private static Residue getResidueFromListOld(Integer resNum, String cID) {
         
         System.err.println("WARNING: getResidueFromList(Integer, String): DEPRECATED: Use the function with iCode support instead!");
 
@@ -512,10 +558,8 @@ public class FileParser {
                     
                     if(r.getiCode().equals(iCode)) {
                         return(r);
-                    }
-                    
+                    }                    
                 }
-
             }
         }
 
@@ -540,7 +584,7 @@ public class FileParser {
         } catch (Exception e) {
             System.err.println("ERROR: Hit TER line at PDB line number " + curLineNumPDB + " but parsing the line failed.");
             e.printStackTrace();
-            System.exit(-1);
+            System.exit(1);
         }
 
         System.out.println("    PDB: Found C Terminus of chain " + cID + " at PDB line " + curLineNumPDB + ", PDB residue number " + cTerminusResNumPDB + ".");
@@ -575,7 +619,7 @@ public class FileParser {
 
                 if(curLineNumDSSP >= dsspLines.size() - 1) {        // this may already be the last line if the DSSP file is broken, we shouldn't go to the next line in that case ;)
                     System.err.println("ERROR: DSSP file '" + dsspFile + "' ends after last header line (line " + curLineNumDSSP + ".");
-                    System.exit(-1);
+                    System.exit(1);
                 }
                 else {                                          // yay, data found!
                     curLineNumDSSP++;
@@ -602,13 +646,13 @@ public class FileParser {
     
 
     /**
-     * DEPRECATED: use getResByPdbFields() instead.
+     * DEPRECATED: use getResByPdbFields() instead, this ignores chain ID and iCode, the returned residue is not unique.
      */
 
-    public static Residue getResByPdbNum(Integer p) {
+    @Deprecated public static Residue getResByPdbNum(Integer p) {
         
         System.err.println("WARNING: getResByPdbNum(): This function is deprecated because it does not support chains and iCode (use getResByPdbFields()).");
-        System.exit(-1);
+        System.exit(1);
 
         for(Integer i = 0; i < s_residues.size(); i++) {
             if((s_residues.get(i).getPdbResNum()).equals(p)) {
@@ -666,7 +710,7 @@ public class FileParser {
     /**
      * DEPRECATED. Use getDsspResNumForPdbFields() instead.
      */
-    public static Integer getDsspResNumForPdbResNum(Integer prn) {
+    @Deprecated public static Integer getDsspResNumForPdbResNum(Integer prn) {
         Integer foundDsspResNum = null;
         Integer foundPdbResNum = null;
         Integer resultDsspResNum = null;
@@ -1618,14 +1662,63 @@ public class FileParser {
     
     
     /**
-     * Parses contact data from a file in <PDBID>.geo format (or <PDBID>.geolig if isGeoLig is true). Files in this
-     * format can be generated by this program itself or by the PTGL program geom_neo.c
+     * 
+     * Debug function for PTGL compatibility. Parses residue contact data from a file in <PDBID>.geo format (or <PDBID>.geolig if isGeoLig is true). Files in this
+     * format can be generated by this program itself or by the PTGL program 'geom_neo.c'.
+     * 
+     * Call './geom_neo <PDBID>' to generate the input file.
+     * 
+     * The <pdbid.geo> file format:
+     * 
+     * All of the following fields are separated by a single space ' '.
+     * 
+     * 
+     * 1      1 2   16 23 12 42  38   0 0    23  2 1    0  0 0    0  0 0    0  0 0   8
+     * 1438 413 414  3 33 13 52  37   0 0    24  2 1    0  0 0   32  2 8    0  0 0   8
+     * -----------------------------------------------------------------------------------
+     * contact number (left justified, length 4)
+     *        dssp residue number of 1st residue (right justified, length 3)
+     *          dssp residue number of 2nd residue (left justified, length 3)
+     *              AA code (as a number, internal geom_neo representation, see num() function) of 1st residue (right justified, lenth 2)
+     *                 center sphere radius (around C alpha) of 1st residue, truncated to 99 if it was larger (left justified, lenth 2)
+     *                    AA code (as a number, internal geom_neo representation, see num() function) of 2nd residue (right justified, lenth 2)
+     *                       center sphere radius (around C alpha) of 1st residue, truncated to 99 if it was larger (left justified, lenth 2)
+     *                           C alpha distance of these two residues, set to 999 if it was larger (right justified, length 3)
+     * 
+     *                                possible H bridge no. 1 contact distance (right justified, length 3)
+     *                                  possible H bridge no. 2 contact distance (left justified, length 3)
+     * 
+     *                                       possible backbone-backbone contact atom distance; 0 if no BB contact (right justified, length 3)
+     *                                           atom index* of the backbone atom of 1st residue that forms this BB contact, internal geom_neo number representation (right justified, length 2)
+     *                                             atom index* of the backbone atom of the 2nd residue that forms this BB contact, internal geom_neo number representation (left justified, length 2)
+     * 
+     *                                                  possible chain-backbone contact atom distance; 0 if no CB contact (right justified, length 3)
+     *                                                     atom index* of sidechain atom of 1st residue (right justified, length 2)
+     *                                                       atom index* of backbone atom of 2nd residue (left justified, length 2)
+     * 
+     *                                                            possible backbone-chain contact atom distance; 0 if no BC contact (right justified, length 3)
+     *                                                               atom index* of backbone atom of 1st residue (right justified, length 2)
+     *                                                                 atom index* of sidechain atom of 2nd residue (left justified, length 2)
+     * 
+     *                                                                      possible chain-chain contact atom distance; 0 if no CC contact (right justified, length 3)
+     *                                                                         atom index* of sidechain atom of 1st residue (right justified, length 2)
+     *                                                                           atom index* of sidechain atom of 2nd residue (left justified, length 2)
+     * 
+     *                                                                               number of contacts for this residue pair (right justified, length 2)
+     * -----------------------------------------------------------------------------------* 
+     * 1      1 2   16 23 12 42  38   0 0    23  2 1    0  0 0    0  0 0    0  0 0   8
+     * 1438 413 414  3 33 13 52  37   0 0    24  2 1    0  0 0   32  2 8    0  0 0   8
+     * 
+     * 
+     * NOTE: atom indices of geom_neo start at '1', not at '0'!
+     * 
+     * 
      * @param filePath the path to the PDBID.geo or .geolig file
      * @param isGeoLig whether the file is in geo (false) or geolig (true) format
      * @param ourContacts an ArrayList containing the contact data computed by this application
-     * @return  a list of ResContactInfo objects, each representing a line in the parsed file
+     * 
      */
-    public static void compareResContactsWithGeoFile(String filePath, Boolean isGeoLig, ArrayList<ResContactInfo> ourContacts) {
+    public static void compareResContactsWithPdbidDotGeoFile(String filePath, Boolean isGeoLig, ArrayList<ResContactInfo> ourContacts) {
         
         Integer radDif1, radDif2, maxRadDif, distDif, maxDistDif, sumDif, sumDifAbs, common;  // difference logging
         
@@ -1657,24 +1750,42 @@ public class FileParser {
         CBdist = CBatomResAIndex = CBatomResBIndex = BCdist = BCatomResAIndex = BCatomResBIndex = CCdist = CCatomResAIndex = CCatomResBIndex = totalCont = undef;
         
         
-        Integer numParsed = 0;
-        
+        Integer numParsed = 0;      // number of lines successfully parsed from the pdbid.geo file (geom_neo)
+        Integer numIgnored = 0;     // number of lines that could not be parsed from the pdbid.geo file (geom_neo)
+        Integer numGeomNeoContactsMissingInPlcc = 0;
+        Integer numPlccContactsMissingInGeomNeo = 0;
+        Integer numLigContactsIgnored = 0;
         
         radDif1 = radDif2 = maxRadDif = distDif = maxDistDif = sumDif = sumDifAbs = common = 0;
+        
+        // stuff for comparing the other way around
+        Integer numRes = s_residues.size();
+        System.out.println("Assuming that " + numRes + " residues exist, preparing matrix.");
+        Integer numResDSSP = numRes + 1;       // since DSSP residue numbers start with 1, not 0
+        Integer [][] geom_neo_contact_exists = new Integer[numResDSSP][numResDSSP];
+        for(Integer i = 0; i < numResDSSP; i++) {
+            for(Integer j = 0; j < numResDSSP; j++) {
+                geom_neo_contact_exists[i][j] = 0;
+            }
+        }
+        
         
         for(Integer i = 0; i < lines.size(); i++) {
             
             line = lines.get(i);
             
+            
+            /**
             if(line.length() != expLineLength) {
                 System.err.println("WARNING: Skipping geo line " + (i + 1) + " of file " + filePath + ": length " + line.length() + ", expected length " + expLineLength + ".");
+                numIgnored++;
                 continue;
             }
             
             
             // ----------------------------------- parse data -------------------------------
-            try {
-                
+            
+            try {                
                 // residue properties
                 contNum = Integer.parseInt(line.substring(0, 4).trim());
                 resADsspNum = Integer.parseInt(line.substring(5, 8).trim());
@@ -1710,14 +1821,64 @@ public class FileParser {
                 
             } catch(Exception e) {
                 System.err.println("ERROR: Hit malformed contact line in residue contact file '" + filePath + "'. Skipping line " + (i + 1) + ".");
+                numIgnored++;
                 continue;
             }
+             */
+            
+            Scanner scanner = new Scanner(line);
+            
+            try {                
+                // residue properties
+                contNum = scanner.nextInt();
+                resADsspNum = scanner.nextInt();
+                resBDsspNum = scanner.nextInt();
+                resAInternalCode = scanner.nextInt();
+                resAColSphereRadius = scanner.nextInt();
+                resBInternalCode = scanner.nextInt();
+                resBColSphereRadius = scanner.nextInt();
+                
+                // contacts and distances
+                resDist = scanner.nextInt();
+                
+                hb1Dist = scanner.nextInt();
+                hb2Dist = scanner.nextInt();
+                
+                BBdist = scanner.nextInt();
+                BBatomResAIndex = scanner.nextInt();
+                BBatomResBIndex = scanner.nextInt();
+                
+                CBdist = scanner.nextInt();
+                CBatomResAIndex = scanner.nextInt();
+                CBatomResBIndex = scanner.nextInt();
+                
+                BCdist = scanner.nextInt();
+                BCatomResAIndex = scanner.nextInt();
+                BCatomResBIndex = scanner.nextInt();
+                
+                CCdist = scanner.nextInt();
+                CCatomResAIndex = scanner.nextInt();
+                CCatomResBIndex = scanner.nextInt();
+                
+                totalCont = scanner.nextInt();
+                
+            } catch(Exception e) {
+                System.err.println("WARNING: Hit malformed contact line in residue contact file '" + filePath + "'. Skipping line " + (i + 1) + ".");
+                numIgnored++;
+                continue;
+            }
+                    //scanner.nextInt();
+
+            
             
             numParsed++;
+            geom_neo_contact_exists[resADsspNum][resBDsspNum] = 1;
+            
+            // ---------------------------------------------
             
             System.out.println("Comparing external ResContact #" + contNum + ": DSSP pair " + resADsspNum + ", " + resBDsspNum + " with radii " + resAColSphereRadius + "," + resBColSphereRadius +  " in CA dist " + resDist + " ...");
                                     
-            // compare with our data
+            // compare with our data, i.e., check the number of geom_neo contacts which were not accepted by plcc
             
             Boolean found = false;
             radDif1 = radDif2 = distDif = 0;
@@ -1752,26 +1913,206 @@ public class FileParser {
                     // ourContacts are ordered...
                     if(rc.getDsspResNumResA() > resADsspNum) {
                         // ...so checking the rest is useless.
+                        found = false;
+                        numGeomNeoContactsMissingInPlcc++;
                         break;
                     }
+                    
                 }
             }
             if(!found) {
-                System.out.println("  NOT found. DSSP contact pair " + resADsspNum + ", " + resBDsspNum + " not in our contact list.");
-            }
+                System.out.println("  NOT found by plcc: DSSP contact pair " + resADsspNum + ", " + resBDsspNum + " not in plcc internal contact list.");
+            }                                 
+        }
+        
+        // We should also check for contacts which occur in our data but not in the comparison file, i.e.,
+        //  the number of plcc contacts which were not accepted by geom_neo 
+        Integer dsspResA, dsspResB;
+        for(ResContactInfo rc : ourContacts) {
+            dsspResA = rc.getDsspResNumResA();
+            dsspResB = rc.getDsspResNumResB();
             
-            // TODO: we should also check for contacts which occur in our data but not in the comparison file
+            // We need to skip the ligand contacts, of course! They are not computed by geom_neo and they
+            // would lead to an array out of bounds exception because they are not included in num_res_DSSP, the 
+            // number of DSSP residues that determines the matrix size.
+            if(rc.getResA().isLigand() || rc.getResB().isLigand()) {
+                numLigContactsIgnored++;
+                continue;
+            }
+
+            if(geom_neo_contact_exists[dsspResA][dsspResB] != 1) {
+                numPlccContactsMissingInGeomNeo++;
+                System.out.println("  NOT found by geom_neo: DSSP contact pair " + dsspResA + ", " + dsspResB + " not in geom_neo contact list file.");
+
+            }
         }
         
         Integer avgDif, avgDifAbs;
         avgDif = sumDif / common;
         avgDifAbs = sumDifAbs / common;
         
-        System.out.println("Parsed " + numParsed + " of " + lines.size() + " lines of file '" + filePath + "'.");
-        System.out.println("File contains " + numParsed + " residue contacts, we found " + ourContacts.size() + ".");
+        System.out.println("Parsed " + numParsed + " of " + lines.size() + " lines of file '" + filePath + "', ignored " + numIgnored + " (1st line is always empty so 1 is expected here).");
+        System.out.println("File contains " + numParsed + " residue contacts, we found " + (ourContacts.size() - numLigContactsIgnored) + " (and " + numLigContactsIgnored + " ligand contacts).");
         System.out.println("Maximum differences: residue collision sphere radius=" + maxRadDif + ", distance=" + maxDistDif + ". (sumDif=" + sumDif + ", sumDifAbs=" + sumDifAbs + ", avgDif=" + avgDif + ", avgDifAbs=" + avgDifAbs + ")");
+        System.out.println("Number of geom_neo contacts which were not detected by plcc: " + numGeomNeoContactsMissingInPlcc + ".");
+        System.out.println("Number of plcc contacts which were not detected by geom_neo: " + numPlccContactsMissingInGeomNeo + ".");
+        System.out.println("Number of ligand contacts ignored in plcc list: " + numLigContactsIgnored + ".");
+    }
+    
+    
+    
+    /**
+     * Debug function for PTGL compatibility. Parses SSE contact data from a file in geo.dat format. Files in this
+     * format can be generated by the PTGL program 'bet_neo.c'.
+     * 
+     * Call './bet_neo <PDBID><CHAINID>' to generate the input file.
+     * 
+     * A geo.dat line consists of 9 fields separated by spaces:
+     * <pdbid><chain> <SSE#1> <SSE#2> <int1> <int2> <int3> <int4> <spatial_relation> <double_difference>
+     * 
+     * The fields are:
+     * 
+     * <pdbid><chain>      : the PDBID and CHAIN of the protein (e.g.: 8icdA)
+     * <SSE#1>             : sequential number of the 1st contact SSE
+     * <SSE#2>             : sequential number of the 2nd contact SSE
+     * <int1>              : number of BB contacts (between residues of both SSEs, counting max 1 contact per residue contact pair)
+     * <int2>              : number of CB contacts ...
+     * <int3>              : number of BC contacts ...
+     * <int4>              : number of CC contacts ...
+     * <spatial_relation>  : the spatial relation between the 2 SSEs: p=parallel, a=antiparallel, m=mixed
+     * <double_difference> : the double difference value that was computed to determine <spatial_relation>
+     * 
+     * Example line:
+     * 3kmfA 1 4 0 5 0 3 m -4
+     * 
+     * @param compareSSEContactsFile the input file to parse (the geo.dat output file of geom_neo)
+     * @param pg the current protein graph. Its contacts should be compared to those in the input file
+     */
+    public static void compareSSEContactsWithGeoDatFile(String compareSSEContactsFile, ProtGraph pg) {
         
+        ArrayList<String> lines = slurpFile(compareSSEContactsFile);        
+        String line;
         
+            
+        // ------------------------------------ contact arrays init done, init line vars -------------------------------
+        Integer undef = -1;
+        Integer sseANum, sseAIndex, sseBNum, sseBIndex, numBB, numCB, numBC, numCC, doubleDif;
+        String pdbidAndChain, chain, pdbid, spatRel;
+        pdbidAndChain = chain = pdbid = spatRel = "?";
+        sseANum = sseAIndex = sseBNum = sseBIndex = numBB = numCB = numBC = numCC = doubleDif = -1;
+        
+        Integer numParsed = 0;      // number of lines successfully parsed from the geo.dat file
+        Integer numIgnored = 0;     // number of lines that could not be parsed from the geo.dat file
+        Integer numBetNeoContactsMissingInPlcc = 0;
+        Integer numPlccContactsMissingInBetNeo = 0;
+        Integer numLigContactsIgnored = 0;
+        Integer common = 0;
+        Boolean found = false;
+              
+        // stuff for comparing the other way around
+        Integer numSSEs = pg.numVertices();
+                
+        Integer numSSEIDs = numSSEs + 1; // the +1 is required because SSE IDs start with 1 (not 0) in the file
+        //System.out.println("DEBUG: Assuming that " + numSSEs + " SSEs exist, preparing matrix.");
+        Integer [][] bet_neo_contact_exists = new Integer[numSSEIDs][numSSEIDs];    
+        for(Integer i = 0; i < numSSEIDs; i++) {
+            for(Integer j = 0; j < numSSEIDs; j++) {
+                bet_neo_contact_exists[i][j] = 0;
+            }
+        }        
+        
+        for(Integer i = 0; i < lines.size(); i++) {
+            
+            line = lines.get(i);                               
+            found = false;
+            
+            Scanner scanner = new Scanner(line);
+            
+            try {                
+                // scan SSE properties from the line
+                pdbidAndChain = scanner.next();
+                pdbid = pdbidAndChain.substring(0, 4);
+                chain = pdbidAndChain.substring(4, 5);
+                sseANum = scanner.nextInt();
+                sseAIndex = sseANum - 1;
+                sseBNum = scanner.nextInt();
+                sseBIndex = sseBNum - 1;
+                numBB = scanner.nextInt();
+                numCB = scanner.nextInt();
+                numBC = scanner.nextInt();
+                numCC = scanner.nextInt();
+                spatRel = scanner.next();
+                //spatRel = scanner.findInLine("[mapl]");         // 'm' or 'a' or 'p' or 'l' for the spatial SSE contact types
+                doubleDif = scanner.nextInt();
+                
+            } catch(Exception e) {
+                System.err.println("WARNING: Hit malformed SSE contact line in SSE contact file '" + compareSSEContactsFile + "'. Skipping line " + (i + 1) + ".");
+                //System.err.println("WARNING: Parsed data (pdbidchain, sseA, sseB, numBB, numCB, numBC, numCC, sr, dd): " + pdbidAndChain + ", " + sseA + ", " + sseB + ", " + numBB + ", " + numBC + ", " + numCB + ", " + numCC + ", " + spatRel + ", " + doubleDif + ".");
+                numIgnored++;
+                continue;
+            }
+            
+            //System.out.println("INFO:    Parsed data (pdbidchain, sseA, sseB, numBB, numCB, numBC, numCC, sr, dd): " + pdbidAndChain + ", " + sseA + ", " + sseB + ", " + numBB + ", " + numBC + ", " + numCB + ", " + numCC + ", " + spatRel + ", " + doubleDif + ".");
+            
+            // abort this function if the input file we are parsing is not for the correct chain or PDB ID
+            if((! pdbid.equals(pg.getPdbid())) || (! chain.equals(pg.getChainid()))) {
+                System.out.println("Skipping SSE comparison for this chain, internal data is for chain '" + pg.getChainid() + "' of pdbid '" + pg.getPdbid() + "', file data for '" + chain + "' of '" + pdbid + "'.");
+                return;
+            }
+
+            
+            
+            numParsed++;
+            bet_neo_contact_exists[sseANum][sseBNum] = 1;     // the -1 is required because plcc starts indices at 0, not 1
+            //bet_neo_contact_exists[sseB - 1][sseA - 1] = 1;       // Don't do this, they are ordered in there and i<j holds for each contact pair (i, j)
+            
+            // -----------------------------------------------
+            
+            if(pg.sseContactExistsPos(sseAIndex, sseBIndex)) {
+                found = true;
+                common++;
+            }
+            else {
+                found = false;
+                System.out.println("  NOT found by plcc: potential SSE contact num pair (" + sseANum + ", " + sseBNum + ") not in internal accepted contact list.");
+                numBetNeoContactsMissingInPlcc++;                
+            }
+        }
+        
+        // check the other way around
+        
+        for(Integer i = 0; i < pg.numVertices(); i++) {         // i and j are now SSE indices, not SSE numbers
+            for(Integer j = i + 1; j < pg.numVertices(); j++) {
+                
+                sseAIndex = i;
+                sseBIndex = j;
+                sseANum = i + 1;
+                sseBNum = j + 1;
+                
+                if(pg.getSSEByPosition(sseAIndex).isLigandSSE() || pg.getSSEByPosition(sseAIndex).isOtherSSE() || pg.getSSEByPosition(sseBIndex).isLigandSSE() || pg.getSSEByPosition(sseBIndex).isOtherSSE()) {
+                    numLigContactsIgnored++;
+                    continue;
+                }
+                
+                // If plcc list a contact here...
+                if(pg.sseContactExistsPos(sseAIndex, sseBIndex)) {
+                    
+                    // ...check whether it also exists in bet_neo
+                    if(bet_neo_contact_exists[sseANum][sseBNum] != 1) {
+                        numPlccContactsMissingInBetNeo++;
+                        System.out.println("  NOT found by bet_neo: SSE contact number pair (" + sseANum + ", " + sseBNum + ") not in bet_neo contact list file.");
+                    }
+                }                
+            }
+        }
+        
+        // print results
+        System.out.println("Parsed " + numParsed + " of " + lines.size() + " lines of file '" + compareSSEContactsFile + "', ignored " + numIgnored + " (1st line is always empty so 1 is expected here).");
+        System.out.println("File contains " + numParsed + " potential SSE contacts, we found " + (pg.numSSEContacts() - numLigContactsIgnored) + " accepted contacts (and " + numLigContactsIgnored + " ligand contacts).");
+        System.out.println("Note that the geom_neo list contains all potential SSE contacts (not filtered by rule set yet), while the plcc list contains only accepted contacts.");
+        System.out.println("Number of bet_neo contacts which were not detected by plcc: " + numBetNeoContactsMissingInPlcc + " (but read above).");
+        System.out.println("Number of plcc contacts which were not detected by bet_neo: " + numPlccContactsMissingInBetNeo + ".");
+        System.out.println("Number of ligand contacts ignored in plcc list: " + numLigContactsIgnored + ".");                
     }
 
 }

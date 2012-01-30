@@ -12,7 +12,7 @@ package plcc;
 import java.util.ArrayList;
 
 /**
- *
+ * Represents a protein chain in a PDB file.
  * @author ts
  */
 public class Chain implements java.io.Serializable {

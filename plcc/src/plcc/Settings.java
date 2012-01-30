@@ -19,7 +19,6 @@ import java.util.Set;
  * saving them to a text file in 'key = value' format.
  *
  */
-
 public class Settings {
     
     /** The settings which are currently in use. */
@@ -126,6 +125,10 @@ public class Settings {
 
         // Output and performance
         defSet("plcc_I_debug_level", "0", "Debug level");
+        defSet("plcc_B_debug_compareSSEContacts", "false", "Whether to compare the computed SSE level contacts to those in the geom_neo output file that is supplied.");
+        defSet("plcc_S_debug_compareSSEContactsFile", "geo.dat_ptgl", "The path to the geo.dat file to use for SSE level contact comparison.");                
+        defSet("plcc_B_contact_debug_dysfunct", "false", "Atom level contact debugging mode. WARNING: When this is true, plcc will abort after the first few residues and produce wrong overall results!");
+        
         defSet("plcc_B_print_contacts", "false", "Whether the residue contacts are printed to stdout (slower)");
         defSet("plcc_B_write_lig_geolig", "true", "Determines whether ligand contacts are included in the <pdbid>.geolig file.");
         defSet("plcc_B_graphimg_header", "true", "Determines whether the graph images contain a header line with info on the graph type, PDBID and chain.");        
@@ -133,6 +136,8 @@ public class Settings {
         defSet("plcc_B_ptgl_text_output", "false", "Whether the PTGL text files (e.g., those required by the bet_neo) are written. Not writing them is faster but this program cannot replace the PTGL tool 'geom_neo' anymore if this is deactivated.");
         defSet("plcc_B_ptgl_geodat_output", "false", "Whether the PTGL text files geo.dat for SSE level contacts is written to a text file.");
         defSet("plcc_B_ramachandran_plot", "false", "Whether a Ramachandran plot is drawn to a file for each chain (slower).");
+        defSet("plcc_B_strict_ptgl_behaviour", "true", "Whether plcc should try to strictly mimick the PTGL, including questionable stuff.");
+        
         
         defSet("plcc_S_img_output_format", "SVG", "image output format (valid options: 'PNG', 'SVG')");
         defSet("plcc_S_img_output_fileext", ".svg", "file extension of output images (should fit plcc_S_img_output_format more or less, e.g. '.png', '.svg')");

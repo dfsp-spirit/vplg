@@ -11,7 +11,8 @@ package plcc;
 // imports
 
 /**
- *
+ * Represents an Atom, based on information in a PDB file.
+ * 
  * @author ts
  */
 public class Atom implements java.io.Serializable {
@@ -40,27 +41,72 @@ public class Atom implements java.io.Serializable {
     public Boolean isProteinAtom() { return(residue.getType() == 0); }
     public Boolean isOtherAtom() { return(residue.getType() == 2); }
 
+    
+    
     /**
      * Returns the distance from this atom to atom 'a'. It uses the atom centers to calculate
      * the distance, so you have to take care of the collision sphere size yourself.
+     * @param a the other Atom
+     * @return the euclidian distance, rounded to an Integer
      */
     public Integer distToAtom(Atom a) {
+        Double dd = 0.0;
+        Integer di, dx, dy, dz = 0;
+
+        dx = this.getCoordX() - a.getCoordX();
+        dd = dd + dx * dx;
+        dy = this.getCoordY() - a.getCoordY();
+        dd = dd + dy * dy;
+        dz = this.getCoordZ() - a.getCoordZ();
+        dd = dd + dz * dz;
+
+        di = (int)Math.sqrt(dd);
+        
+        if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
+            if(this.isCalphaAtom() && a.isCalphaAtom()) {
+                System.out.println("Distance between C-alpha atoms " + this.pdbAtomNumber + " of " + this.getPdbResNum() + " and " + a.pdbAtomNumber + " of " + a.getPdbResNum() + " is " + di + " (" + dd + " before sqrt).");
+                System.out.println(this.getCoordString() + "/" + a.getCoordString());
+            }            
+        }
+        
+        return(di);
+    }
+    
+    
+    /**
+     * Returns the distance from this atom to atom 'a'. It uses the atom centers to calculate
+     * the distance, so you have to take care of the collision sphere size yourself.
+     * @param a the other Atom
+     * @return the euclidian distance, rounded to an Integer
+     */
+    @Deprecated public Integer distToAtomOld(Atom a) {
         Double distDouble = .0;
-        Integer distInt, dx, dy, dz = 0;
+        Integer distInt, dx, dy, dz, dd = 0;
 
         dx = this.getCoordX() - a.getCoordX();
         dy = this.getCoordY() - a.getCoordY();
         dz = this.getCoordZ() - a.getCoordZ();
 
-        distDouble = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        dd = dx * dx + dy * dy + dz * dz;
+        distDouble = Math.sqrt(dd);
         distInt = Integer.valueOf((int)Math.round(distDouble));
-
-        // TODO: remove this
-        //System.out.println("  Distance between atoms " + this.pdbAtomNumber + this.getCoordString() + " and " + a.getPdbAtomNum() + a.getCoordString() + " is " + distInt + ".");
-        //if(this.name.equals(" CA ") && a.name.equals(" CA "))
-        //System.out.println("  Distance between atoms " + this + " and " + a + " is " + distInt + ".");
+        
+        if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
+            if(this.isCalphaAtom() && a.isCalphaAtom()) {
+                System.out.println("Distance between C-alpha atoms " + this.pdbAtomNumber + " of " + this.getPdbResNum() + " and " + a.pdbAtomNumber + " of " + a.getPdbResNum() + " is " + distInt + " (" + dd + " before sqrt, " + distDouble + " as Double).");
+            }            
+        }
         
         return(distInt);
+    }
+    
+    
+    /**
+     * Determines whether this is a C alpha atom. This is determined from the ATOM NAME entry of the PDB file.
+     * @return true if this is a C alpha atom, false otherwise.
+     */
+    public boolean isCalphaAtom() {
+        return(this.isProteinAtom() && this.name.equals(" CA "));
     }
 
 
@@ -100,10 +146,10 @@ public class Atom implements java.io.Serializable {
 
         //if(dist < 0) {
         //    System.err.println("ERROR: Distance of atoms " + this.getPdbAtomNum() + " and " + a.getPdbAtomNum() + " is " + dist + ", but should be > 0.");
-        //    System.exit(-1);
+        //    System.exit(1);
         //}
 
-        if( dist <= maxDist) {
+        if( dist < maxDist) {
             // Contact!
             //System.out.println("        ++++ CONTACT between atoms " + this.pdbAtomNumber + " and " + a.getPdbAtomNum() + " in dist " + dist + " (maxDist is " + maxDist + ").");
             return(true);
@@ -117,6 +163,15 @@ public class Atom implements java.io.Serializable {
 
     @Override public String toString() {
         return("[Atom] #" + this.pdbAtomNumber + " NAME=" + this.name + " CS=" + this.chemSym + " Type=" + this.type + " Chain=" + this.chainID + " ResDssp=" + this.getResidue().getDsspResNum() + " ResPDB=" + this.getResidue().getUniquePDBName() + " Coords=" + getCoordString() + "");
+    }
+
+    /**
+     * Compares two Atoms via their PDB atom number.
+     * @param other the other atom
+     * @return  true if they are the same, false otherwise
+     */
+    public Boolean equalsAtom(Atom other) {
+        return(this.pdbAtomNumber == other.pdbAtomNumber);
     }
 
     // getters

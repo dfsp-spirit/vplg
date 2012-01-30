@@ -9,6 +9,10 @@
 package plcc;
 
 
+/**
+ * This class implements a residue level contact, i.e., all information required about the contact between a pair (a, b) of Residue objects.
+ * @author spirit
+ */
 public class ResContactInfo {
 
     // declare class vars
@@ -58,7 +62,19 @@ public class ResContactInfo {
     
 
 
-    // constructor
+    /**
+     * Constructor for a residue pair contact between the residues (a, b).
+     * 
+     * @param npcs array holding the number of atom contacts of all different types (e.g., BB, BC, CB, ...) of this residue pair.
+     * @param mcds array holding the minimum contact distances of all different types (BB, ...)
+     * @param can_a array holding the atom indices of the contact atoms of the different types (BB, ...) in Residue a
+     * @param can_b array holding the atom indices of the contact atoms of the different types (BB, ...) in Residue b
+     * @param a the first Residue of (a, b)
+     * @param b the second Residue of (a, b)
+     * @param d the distance of this residue pair (residue center to residue center)
+     * @param nlc the number of total ligand contacts of this residue pair 
+     */
+    
     public ResContactInfo(Integer[] npcs, Integer[] mcds, Integer[] can_a, Integer[] can_b, Residue a, Residue b, Integer d, Integer nlc) {
 
         numPairContacts = npcs;

@@ -9,7 +9,12 @@
 package plcc;
 
 
-
+/**
+ * A spatial relation which describes the relative orientation of an SSE contact 
+ * pair.
+ * 
+ * @author ts
+ */
 public class SpatRel {
 
 

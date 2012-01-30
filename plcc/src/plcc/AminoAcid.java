@@ -8,7 +8,12 @@
 
 package plcc;
 
-
+/**
+ * A helper class which converts various representations and names of amino acids. You can use it to convert the
+ * 3-letter-code to the 1-letter-code and stuff like that.
+ * 
+ * @author ts
+ */
 public class AminoAcid {
 
     // declare class vars

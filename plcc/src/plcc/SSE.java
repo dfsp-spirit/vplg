@@ -13,7 +13,8 @@ package plcc;
 import java.util.ArrayList;
 
 /**
- *
+ * Represents a secondary structure element (SSE), e.g., an alpha-helix or a beta-strand.
+ * 
  * @author spirit
  */
 public class SSE implements java.io.Serializable {

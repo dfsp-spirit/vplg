@@ -12,7 +12,11 @@ package plcc;
 import java.util.ArrayList;
 
 
-
+/**
+ * Represents a Residue. Based on information in the PDB and DSSP file.
+ * 
+ * @author ts
+ */
 public class Residue implements java.io.Serializable {
 
     // declare class vars
@@ -127,7 +131,7 @@ public class Residue implements java.io.Serializable {
 
             for(Integer i = 0; i < atoms.size(); i++) {
                 a = atoms.get(i);
-                if((a.getAtomName()).equals(" CA ")) {
+                if(a.isCalphaAtom()) {
                     center = a;
                     break;
                 }
@@ -138,7 +142,7 @@ public class Residue implements java.io.Serializable {
 
                 // Dying may be too harsh -- maybe use the ligand version if this residue has no C alpha atom?
                 //System.err.println("ERROR: Could not determine C alpha atom of PDB residue " + this.pdbResNum + ", PDB file broken.");
-                //System.exit(-1);
+                //System.exit(1);
 
                 System.out.println("WARNING: PDB residue " + this.pdbResNum + " has no C alpha atom, PDB file broken. Using 1st atom as center.");
                 center = atoms.get(0);
@@ -151,6 +155,11 @@ public class Residue implements java.io.Serializable {
             for(Integer j = 0; j < this.atoms.size(); j++) {
 
                 b = this.atoms.get(j);
+                
+                if(a.equalsAtom(b)) {
+                   continue; 
+                }
+                
                 dist = center.distToAtom(b);
 
                 if(dist > maxDistForAtom) {
@@ -246,7 +255,7 @@ public class Residue implements java.io.Serializable {
 
 
     /**
-     * This function determins whether we need to look at the atoms to check for contacts betweens
+     * This function determines whether we need to look at the atoms to check for contacts betweens
      * this residue and a 2nd one. If the center spheres don't overlap, there cannot exist any atom contacts.
      */
     public Boolean contactPossibleWithResidue(Residue r) {
@@ -280,10 +289,16 @@ public class Residue implements java.io.Serializable {
         }
     }
 
+    
     @Override public String toString() {
         return("[Residue] PDB# " + pdbResNum + ", DSSP# " + dsspResNum + ", Type " + type + ", AA1 " + AAName1 + ", AA3 " + resName3 + ", Chain " + chainID + ", Model " + modelID + ", # of Atoms " + atoms.size());
     }
 
+    
+    /**
+     * Returns a string representation of the Atoms of this Residue.
+     * @return the string representation
+     */ 
     public String getAtomsString() {
 
         Atom a;
@@ -373,4 +388,19 @@ public class Residue implements java.io.Serializable {
     public void setLigSynonyms(String s) { ligSynonyms = s; }
     public void setPhi(Float f) { phi = f; }
     public void setPsi(Float f) { psi = f; }
+    
+    
+    /**
+     * Returns information on all atoms of this residue (used for debugging only).
+     * @return a multi-line String which contains info on all atoms of this residue
+     */
+    public String atomInfo() {
+        String info = "    *Residue DSSP# " + this.getDsspResNum() + " has " + this.getAtoms().size() + " (non-ignored) atoms:\n";
+        Integer num = 0;
+        for(Atom a : this.getAtoms()) {
+            num++;
+            info += "     #" + num + ":" + a.toString() + "\n";
+        }        
+        return(info);        
+    }
 }

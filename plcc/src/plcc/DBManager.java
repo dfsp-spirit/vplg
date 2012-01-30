@@ -11,7 +11,11 @@ package plcc;
 import java.sql.*;
 import java.util.*;
 
-
+/**
+ * A database manager class that is used to create and maintain a connection to a PostgreSQL database server.
+ * 
+ * @author ts
+ */
 public class DBManager {
 
    static String dbName;

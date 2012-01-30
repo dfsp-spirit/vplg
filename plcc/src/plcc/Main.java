@@ -81,7 +81,7 @@ public class Main {
     //  Main.calculateAllContacts().
     static Integer globalMaxSeqNeighborResDist;
     
-    static final String version = "0.4";
+    static final String version = "0.5";
 
 
 
@@ -155,6 +155,8 @@ public class Main {
         
         Boolean compareResContacts = false;
         String compareResContactsFile = "";
+        Boolean compareSSEContacts = false;
+        String compareSSEContactsFile = "";                
 
 
         ArrayList<ResContactInfo> cInfo;
@@ -229,6 +231,16 @@ public class Main {
                         }
                     }
                     
+                    if(s.equals("-X") || s.equals("--check-ssects")) {
+                        if(args.length <= i+1 ) {
+                            syntaxError();
+                        }
+                        else {
+                            Settings.set("plcc_B_debug_compareSSEContacts", "true");
+                            Settings.set("plcc_S_debug_compareSSEContactsFile", args[i+1]);
+                        }
+                    }                                        
+                    
                     
                     if(s.equals("-y") || s.equals("--write-geodat")) {
                         Settings.set("plcc_B_ptgl_geodat_output", "true");
@@ -287,6 +299,11 @@ public class Main {
                     if(s.equals("-c") || s.equals("--dont-calc-graphs")) {
                         Settings.set("plcc_B_calc_draw_graphs", "false");
                     }
+                    
+                    if(s.equals("--no-ptgl")) {
+                        Settings.set("plcc_B_strict_ptgl_behaviour", "false");
+                    }
+                    
 
                     if(s.equals("-u") || s.equals("--use-database")) {
                         Settings.set("plcc_B_useDB", "true");
@@ -317,6 +334,12 @@ public class Main {
                             }                            
                         }
                     }
+                    
+                    
+                    if(s.equals("--contact-level-debugging")) {                                                                        
+                        Settings.set("plcc_B_contact_debug_dysfunct", "true");
+                    }
+                    
                     
 
                     if(s.equals("-n") || s.equals("--textfiles")) {
@@ -415,6 +438,19 @@ public class Main {
                             Settings.set("plcc_I_debug_level", args[i+1]);
                         }
                     }
+                    
+                    if(s.equals("--force-chain") || s.equals("-e")) {
+                        if(args.length <= i+1 ) {
+                            syntaxError();
+                        }
+                        else {
+                            Settings.set("plcc_B_force_chain", "true");
+                            Settings.set("plcc_S_forced_chain_id", args[i+1]);                            
+                        }
+                    }
+                    
+                    
+                    
 
                     if(s.equals("-t") || s.equals("--draw-tgf-graph")) {
                         if(args.length <= i+1 ) {
@@ -469,11 +505,16 @@ public class Main {
         //  model) and renames, e.g. "2kos_1.pdb" for model 1 of protein 2kos. It is therefore disabaled atm.
         //if(pdbid.length() != 4) {
         //    System.err.println("ERROR: pdbid '" + pdbid + "' should be 4 characters long (but is " + pdbid.length() + ").");
-        //    System.exit(-1);
+        //    System.exit(1);
         //}
 
         // ****************************************************    test for required files    **********************************************************
 
+        if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
+            print_debug_malfunction_warning();            
+        }
+        
+        
         System.out.println("  Debug level set to " + Settings.getInteger("plcc_I_debug_level") + ".");
         System.out.println("  Using PDB file '" + pdbFile + "', dssp file '" + dsspFile + "', output directory '" + outputDir + "'.");
         
@@ -588,14 +629,22 @@ public class Main {
         //    System.out.println("  " + SSEs.get(i));
         //}
 
-        // All residues exist, we can now calculate their maximal center sphere radius
-        globalMaxCenterSphereRadius = getGlobalMaxCenterSphereRadius(residues);
-        System.out.println("  Maximal center sphere radius for all residues is " + globalMaxCenterSphereRadius + ".");
+        
+        if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
+            // Use fake values to disable residue skipping and prevent contact calculations before the
+            //  residue level contact function is called for all residues (less cluttered debug output).
+            globalMaxCenterSphereRadius = 1000;
+            globalMaxSeqNeighborResDist = 1000;
+        }
+        else {
+            // All residues exist, we can now calculate their maximal center sphere radius
+            globalMaxCenterSphereRadius = getGlobalMaxCenterSphereRadius(residues);
+            System.out.println("  Maximal center sphere radius for all residues is " + globalMaxCenterSphereRadius + ".");
 
-        // ... and the maximal distance between neighbors in the AA sequence
-        globalMaxSeqNeighborResDist = getGlobalMaxSeqNeighborResDist(residues);        
-        System.out.println("  Maximal distance between residues that are sequence neighbors is " + globalMaxSeqNeighborResDist + ".");
-
+            // ... and the maximal distance between neighbors in the AA sequence
+            globalMaxSeqNeighborResDist = getGlobalMaxSeqNeighborResDist(residues);        
+            System.out.println("  Maximal distance between residues that are sequence neighbors is " + globalMaxSeqNeighborResDist + ".");
+        }
         // ... and fill in the frequencies of all AAs in this protein.
         getAADistribution(residues);
 
@@ -612,7 +661,7 @@ public class Main {
         // DEBUG: compare computed contacts with those from a geom_neo file
         if(compareResContacts) {
             System.out.println("DEBUG: Comparing calculated residue contacts with those in the file '" + compareResContactsFile + "'.");
-            FileParser.compareResContactsWithGeoFile(compareResContactsFile, false, cInfo);
+            FileParser.compareResContactsWithPdbidDotGeoFile(compareResContactsFile, false, cInfo);
         }
         
 
@@ -694,13 +743,41 @@ public class Main {
         else {
             System.out.println("  Not writing any interim results to text files as requested (geom_neo compatibility mode off).");
         }
+        
+        if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
+            print_debug_malfunction_warning();
+            System.out.println("WARNING: ABORTING execution here due to DEBUG settings, results incomplete.");
+            System.exit(1);
+        }
+        
+        ArrayList<Chain> handleChains = new ArrayList<Chain>();
+        if(Settings.getBoolean("plcc_B_force_chain")) {
+        
+            System.out.println(" Forced handling of the chain with chain ID '" + Settings.get("plcc_S_forced_chain_id") + "' only.");
+            
+            for(Chain c : chains) {
+                if(c.getPdbChainID().equals(Settings.get("plcc_S_forced_chain_id"))) {
+                    handleChains.add(c);
+                }
+            }
+            
+        }
+        else {
+            handleChains = chains;
+        }
+        
+        if(handleChains.size() < 1) {
+            System.err.println("WARNING: No chains to handle found in input data (" + chains.size() + " chains total).");
+            System.exit(1);
+        }
+        
 
         // *************************************** ramachandran plots for chains  *********************************//
         
         Boolean drawRPlots = Settings.getBoolean("plcc_B_ramachandran_plot");
         String plotPath, label;
         if(drawRPlots) {
-            for(Chain c : chains) {
+            for(Chain c : handleChains) {
                 plotPath = outputDir + fs + pdbid + "_" + c.getPdbChainID() + "_plot";
                 label = "Ramachandran plot of PDB entry " + pdbid + ", chain " + c.getPdbChainID() + "";
                 drawRamachandranPlot(plotPath, c.getResidues(), label);
@@ -712,7 +789,7 @@ public class Main {
 
         if(Settings.getBoolean("plcc_B_calc_draw_graphs")) {
             System.out.println("  Calculating SSE graphs.");
-            calculateSSEGraphsForChains(chains, residues, cInfo, pdbid, outputDir);
+            calculateSSEGraphsForChains(handleChains, residues, cInfo, pdbid, outputDir);
         }
         else {
             System.out.println("  Not calculating SSEs and not drawing graphs as requested.");
@@ -722,6 +799,11 @@ public class Main {
         //dbTesting();        //DEBUG
 
         // ****************************************************    all done    **********************************************************
+        
+        if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
+            print_debug_malfunction_warning();            
+        }
+        
         System.out.println("All done, exiting.");
         System.exit(0);
 
@@ -985,6 +1067,17 @@ public class Main {
                 ProtGraph pg = calcGraphType(gt, allChainSSEs, c, resContacts, pdbid);
                 pg.setInfo(pdbid, c.getPdbChainID(), gt);
                 
+                
+                if(Settings.getBoolean("plcc_B_debug_compareSSEContacts")) {
+                    if(gt.equals("albe")) {
+                        System.out.println("Comparing calculated SSE contacts with those in the file '" + Settings.get("plcc_S_debug_compareSSEContactsFile") + "'...");
+                        FileParser.compareSSEContactsWithGeoDatFile(Settings.get("plcc_S_debug_compareSSEContactsFile"), pg);
+                    }        
+                    else {
+                        System.out.println("INFO: SSE contact comparison request ignored since this is not an albe graph.");
+                    }
+                }
+                
                 // DEBUG: calculate distance matrix of the graph
                 //pg.calculateDistancesWithinGraph();
                 //pg.printDistMatrix();
@@ -1152,7 +1245,7 @@ public class Main {
      * @param c the chain
      * @param resContacts a list of residue contacts (between residues of c)
      * @param pdbid the PDBID of the protein the chain c belongs to
-     * @return 
+     * @return the resulting protein graph
      */
     public static ProtGraph calcGraphType(String graphType, ArrayList<SSE> allChainSSEs, Chain c, ArrayList<ResContactInfo> resContacts, String pdbid) {
 
@@ -1194,7 +1287,7 @@ public class Main {
         }
         else {
             System.err.println("ERROR: calcGraphType(): Graph type '" + graphType + "' invalid.");
-            System.exit(-1);
+            System.exit(1);
         }
 
         // Filters have been configured, now do the actual filtering.
@@ -1224,7 +1317,7 @@ public class Main {
         if(Settings.getBoolean("plcc_B_ptgl_geodat_output")) {
             String gdf = Settings.get("plcc_S_output_dir") + System.getProperty("file.separator") + pdbid + "_" + c.getPdbChainID() + "_" + graphType + ".geodat";            
             if(writeStringToFile(gdf, chainCM.toGeodatFormat(false, true))) {
-                System.out.println("  Wrote SSE level contacts in geo.dat format to file '" + gdf + "'.");
+                System.out.println("  Wrote SSE level contacts for chain " + chainCM.getChain() + " in geo.dat format to file '" + gdf + "'.");
             }
             else {
                 System.err.println("WARNING: Failed to write SSE level contacts in geo.dat format to file '" + gdf + "'. Check permissions.");
@@ -1308,12 +1401,14 @@ public class Main {
      */
     public static ArrayList<ResContactInfo> calculateAllContacts(ArrayList<Residue> res) {
         
-        
-        //System.out.println("######################################################################");
-
+                
         Residue a, b;
         Integer rs = res.size();
-        //Integer rs = 30;          // DEBUG: just check the first few residues
+        
+        if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
+            rs = 2;
+            System.out.println("DEBUG: Limiting residue contact computation to the first " + rs + " residues.");            
+        }        
 
         Integer numResContactsChecked, numResContactsPossible, numResContactsImpossible, numCmpSkipped;
         numResContactsChecked = numResContactsPossible = numResContactsImpossible = numCmpSkipped = 0;
@@ -1342,16 +1437,14 @@ public class Main {
 
                 b = res.get(j);
                 
-                // DEBUG TODO remove this
-                //if(a.getPdbResNum() > 72 || b.getPdbResNum() > 72) {
-                //    System.exit(1);
-                //}
-
-                //DEBUG
-                //System.out.println("  Checking DSSP pair " + a.getDsspResNum() + "/" + b.getDsspResNum() + "...");
-                //System.out.println("    " + a.getAtomsString());
-                //System.out.println("    " + b.getAtomsString());
-
+                // DEBUG
+                if(Settings.getInteger("plcc_I_debug_level") >= 1) {
+                    System.out.println("  Checking DSSP pair " + a.getDsspResNum() + "/" + b.getDsspResNum() + "...");
+                    //System.out.println("    " + a.getAtomsString());
+                    //System.out.println(a.atomInfo());
+                    //System.out.println("    " + b.getAtomsString());
+                    //System.out.println(b.atomInfo());
+                }                
 
                 numResContactsChecked++;
 
@@ -2624,27 +2717,29 @@ public class Main {
         System.out.println("USAGE: java -jar plcc.jar <pdbid> [OPTIONS]");
         System.out.println("       java -jar plcc.jar --help");
         System.out.println("valid OPTIONS are: ");
-        System.out.println("-a | --include-coils       : convert the SSE type of all ignored residues to C (coil) and include coils in the graphs");
+        System.out.println("-a | --include-coils       : convert the SSE type of all ignored residues to C (coil) and include coils in the graphs [EXPERIMENTAL]");
         System.out.println("-b | --draw-plcc-fgs <f>   : read graph in plcc format from file <f> and draw it and all its folding graphs, then exit (pdbid will be ignored)");        
-        System.out.println("-c | --dont-calc-graphs    : do not calculate SSEs contact graphs");
-        System.out.println("-D | --debug <level>       : set debug level (0: off, 1: normal debug output. >=2: detailed debug output)");
+        System.out.println("-c | --dont-calc-graphs    : do not calculate SSEs contact graphs, stop after residue level contact computation");
+        System.out.println("-D | --debug <level>       : set debug level (0: off, 1: normal debug output. >=2: detailed debug output)  [DEBUG]");
         System.out.println("-d | --dsspfile <dsspfile> : use DSSP file <dsspfile> (instead of '<pdbid>.dssp')");
-        System.out.println("-f | --folding-graphs      : also handle foldings graphs [req. -c]");
+        System.out.println("-e | --force-chain <c>     : only handle the chain with chain ID <c>.");
+        System.out.println("-f | --folding-graphs      : also handle foldings graphs");
         System.out.println("-g | --sse-graphtypes <l>  : compute only the SSE graphs in list <l>, e.g. 'abcdef' = alpha, beta, alhpabeta, alphalig, betalig and alphabetalig.");
         System.out.println("-h | --help                : show this help message and exit");
-        System.out.println("-i | --ignoreligands       : ignore ligand contacts, do NOT print them to the output file");
-        System.out.println("-l | --draw-plcc-graph <f> : read graph in plcc format from file <f> and draw it to <f>.png, then exit (pdbid will be ignored)");        
+        System.out.println("-i | --ignoreligands       : ignore ligand contacts, do NOT print them to the residue level output file  [DEBUG]");
+        System.out.println("-l | --draw-plcc-graph <f> : read graph in plcc format from file <f> and draw it to <f>.png, then exit (<pdbid> will be ignored)");        
         System.out.println("-n | --textfiles           : write meta data, debug info and interim results like residue contacts to text files (slower)");
         System.out.println("-m | --image-format <f>    : write output images in format <f>, which can be 'PNG' for PNG bitmap format or 'SVG' for SVG vector format.");
         System.out.println("-o | --outputdir <dir>     : write output files to directory <dir> (instead of '.', the current directory)");
         System.out.println("-p | --pdbfile <pdbfile>   : use PDB file <pdbfile> (instead of '<pdbid>.pdb')");
         System.out.println("-q | --fg-notations <list> : draw only the folding graph notations in <list>, e.g. 'kars' = KEY, ADJ, RED and SEQ.");
         System.out.println("-r | --recreate-tables     : drop and recreate DB statistics tables, then exit (see -u).");
-        System.out.println("-s | --showonscreen        : show an overview of the residue contact results on stdout (slower)");
+        System.out.println("-s | --showonscreen        : show an overview of the residue contact results on STDOUT during compuation  [DEBUG]");
         System.out.println("-t | --draw-tgf-graph <f>  : read graph in TGF format from file <f> and draw it to <f>.png, then exit (pdbid will be ignored)");
-        System.out.println("-u | --use-database        : write SSE contact data to database [req. -c and credentials in cfg file]");                       
-        System.out.println("-w | --dont-write-images   : don not draw the SSE graphs and write them to PNG files");                             
-        System.out.println("-x | --check-rescts <f>    : compare the computed residue level contacts to those in <pdbid>.geo format file <f> and print differences");
+        System.out.println("-u | --use-database        : write SSE contact data to database [requires DB credentials in cfg file]");                       
+        System.out.println("-w | --dont-write-images   : do not draw the SSE graphs and write them to image files [DEBUG]");                             
+        System.out.println("-x | --check-rescts <f>    : compare the computed residue level contacts to those in geom_neo format file <f> and print differences");
+        System.out.println("-X | --check-ssects <f>    : compare the computed SSE level contacts to those in bet_neo format file <f> and print differences");
         System.out.println("-y | --write-geodat        : write the computed SSE level contacts in geo.dat format to a file (file name: <pdbid>_<chain>.geodat)");        
         System.out.println("-z | --ramaplot            : draw a ramachandran plot of each chain to the file '<pdbid>_<chain>_plot.svg'");        
         System.out.println("");
@@ -3465,6 +3560,18 @@ public class Main {
         }
 
         return(true);        
+    }
+    
+    
+    /**
+     * Informs the user that the currently selected DEBUG settings brake the output of this program, e.g. because
+     * important computations are aborted after the first few residues.
+     */
+    public static void print_debug_malfunction_warning() {
+        System.out.println("###################################################################################");
+        System.out.println("# WARNING: Contact debug mode ACTIVE. Will abort after the first few residues.    #");
+        System.out.println("# WARNING: This mode will produce no or WRONG SSE level results! Do NOT use them. #");
+        System.out.println("###################################################################################");
     }
     
 

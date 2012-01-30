@@ -15,7 +15,9 @@ import java.net.*;
 //import org.jgrapht.graph.*;
 
 /**
- *
+ * Represents an SSE level contact matrix for a protein chain. Includes information on all SSE types, i.e., it is not
+ * specific for a certain graph type.
+ * 
  * @author spirit
  */
 public class ContactMatrix {
@@ -88,8 +90,8 @@ public class ContactMatrix {
     public void fillFromContactList(ArrayList<ResContactInfo> contList, ArrayList<String> keepSSEs) {
 
         ResContactInfo rc;
-        Residue a, b;
-        a = b = null;
+        Residue resA, resB;
+        resA = resB = null;
         Integer aSSEPos, bSSEPos, contNumIgnored, contNumConsidered;
         aSSEPos = bSSEPos = null;
         contNumIgnored = contNumConsidered = 0;
@@ -98,18 +100,18 @@ public class ContactMatrix {
                 
         for(Integer i = 0; i < contList.size(); i++) {
             rc = contList.get(i);
-            a = rc.getResA();
-            b = rc.getResB();
+            resA = rc.getResA();
+            resB = rc.getResB();
 
             // Only handle this contact if both residues belong to the chain we are interested in (or if we are interested in all chains)
-            if( (a.getChainID().equals(this.handleChain) && b.getChainID().equals(this.handleChain)) || this.handleChain.equals("ALL") ) {
+            if( (resA.getChainID().equals(this.handleChain) && resB.getChainID().equals(this.handleChain)) || this.handleChain.equals("ALL") ) {
                 
                 
 
                 // We need to get the SSEs for the residues now. Note that they may not be part of any SSE
                 //  in our list (they may be part of an SSE of another chain or no valid SSE, e.g. a coil).
-                aSSEPos = getSSEPosOfDsspResidue(a.getDsspResNum());
-                bSSEPos = getSSEPosOfDsspResidue(b.getDsspResNum());
+                aSSEPos = getSSEPosOfDsspResidue(resA.getDsspResNum());
+                bSSEPos = getSSEPosOfDsspResidue(resB.getDsspResNum());
                
                 if(aSSEPos < 0 || bSSEPos < 0) {
                     // At least one of these residues is not part of one of the SEEs. This can happen if it is part
@@ -130,11 +132,7 @@ public class ContactMatrix {
                     this.resContSSE[aSSEPos][bSSEPos]++;
                     this.resContSSE[bSSEPos][aSSEPos]++;
                     
-                    // TODO: I think each contact type (B/C, B/B, ...) that a pair of residues has should only be
-                    //       counted ONCE below. So if a pair has 3 B/B cotacts and 2 C/B contacts, it should 
-                    //       be counted as 1 B/B and 1 C/B. This is because the number of contacts is not even
-                    //       stored in the <PDBID>.geo file of the PTGL -- only the distance of the shortest contact
-                    //       for each contact type is stored.
+                    // This information is kept in the chain-specific geo.dat file of bet_neo in the PTGL.
                     
                     Integer mpt = Settings.getInteger("plcc_I_max_contacts_per_type");   
                                        // See comment above, the maximum number of contacts of a certain type that
@@ -143,62 +141,99 @@ public class ContactMatrix {
                                        // The PTGL uses a setting of 1.
                     
                     Integer numc;   // just a temp var for current number of contacts
+                    Integer contDist;
                     
-                    // All checks done, these are valid contacts.
-                    numc = rc.getNumContactsBB();
-                    this.addContacts("BB", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
-                    
-                    numc = rc.getNumContactsBC();
-                    this.addContacts("BC", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
-                    
-                    numc = rc.getNumContactsCB();
-                    this.addContacts("CB", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
-                    
-                    numc = rc.getNumContactsCC();
-                    this.addContacts("CC", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
-                    
-                    numc = rc.getNumContactsLB();
-                    this.addContacts("LB", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
-                    
-                    numc = rc.getNumContactsBL();
-                    this.addContacts("BL", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
-                    
-                    numc = rc.getNumContactsLC();
-                    this.addContacts("LC", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
-                    
-                    numc = rc.getNumContactsCL();
-                    this.addContacts("CL", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
-                    
-                    numc = rc.getNumContactsLL();
-                    this.addContacts("LL", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+                    if(Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {
+                        
+                        contDist = rc.getBBContactDist();
+                        if(contDist > 0) { this.addContacts("BB", aSSEPos, bSSEPos, 1); }
+                        
+                        contDist = rc.getBCContactDist();
+                        if(contDist > 0) { this.addContacts("BC", aSSEPos, bSSEPos, 1); }
+                        
+                        contDist = rc.getCBContactDist();
+                        if(contDist > 0) { this.addContacts("CB", aSSEPos, bSSEPos, 1); }
+                        
+                        contDist = rc.getCCContactDist();
+                        if(contDist > 0) { this.addContacts("CC", aSSEPos, bSSEPos, 1); }
+                        
+                        contDist = rc.getLBContactDist();
+                        if(contDist > 0) { this.addContacts("LB", aSSEPos, bSSEPos, 1); }
+                        
+                        contDist = rc.getBLContactDist();
+                        if(contDist > 0) { this.addContacts("BL", aSSEPos, bSSEPos, 1); }
+                        
+                        contDist = rc.getLCContactDist();
+                        if(contDist > 0) { this.addContacts("LC", aSSEPos, bSSEPos, 1); }
+                        
+                        contDist = rc.getCLContactDist();
+                        if(contDist > 0) { this.addContacts("CL", aSSEPos, bSSEPos, 1); }
+                        
+                        contDist = rc.getLLContactDist();
+                        if(contDist > 0) { this.addContacts("LL", aSSEPos, bSSEPos, 1); }
+                    }
+                    else {
+                        // All checks done, these are valid contacts.
+                        numc = rc.getNumContactsBB();
+                        this.addContacts("BB", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
 
-                    // Fill the other half of the matrix [ (y/x) instead of (x/y) ]          
-                    numc = rc.getNumContactsBB();
-                    this.addContacts("BB", bSSEPos, aSSEPos, rc.getNumContactsBB());
-                    
-                    numc = rc.getNumContactsBC();
-                    this.addContacts("BC", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-                    
-                    numc = rc.getNumContactsCB();
-                    this.addContacts("CB", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-                    
-                    numc = rc.getNumContactsCC();
-                    this.addContacts("CC", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-                    
-                    numc = rc.getNumContactsLB();
-                    this.addContacts("LB", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-                    
-                    numc = rc.getNumContactsBL();
-                    this.addContacts("BL", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-                    
-                    numc = rc.getNumContactsLC();
-                    this.addContacts("LC", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-                    
-                    numc = rc.getNumContactsCL();
-                    this.addContacts("CL", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
-                    
-                    numc = rc.getNumContactsLL();
-                    this.addContacts("LL", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
+                        numc = rc.getNumContactsBC();
+                        this.addContacts("BC", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+
+                        numc = rc.getNumContactsCB();
+                        this.addContacts("CB", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+
+                        numc = rc.getNumContactsCC();
+                        this.addContacts("CC", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+
+                        numc = rc.getNumContactsLB();
+                        this.addContacts("LB", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+
+                        numc = rc.getNumContactsBL();
+                        this.addContacts("BL", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+
+                        numc = rc.getNumContactsLC();
+                        this.addContacts("LC", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+
+                        numc = rc.getNumContactsCL();
+                        this.addContacts("CL", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+
+                        numc = rc.getNumContactsLL();
+                        this.addContacts("LL", aSSEPos, bSSEPos, (numc > mpt ? mpt : numc));
+
+                        // ***** Fill the other half of the matrix [ (y/x) instead of (x/y) ] *****
+                        // We should not do this! If a residue A has a BC contact to a residue B, it does NOT mean that
+                        // B has a BC contact to A if we differentiate between BC and CB contacts!
+                        /*
+                        numc = rc.getNumContactsBB();
+                        this.addContacts("BB", bSSEPos, aSSEPos, rc.getNumContactsBB());
+
+                        numc = rc.getNumContactsBC();
+                        this.addContacts("BC", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
+
+                        numc = rc.getNumContactsCB();
+                        this.addContacts("CB", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
+
+                        numc = rc.getNumContactsCC();
+                        this.addContacts("CC", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
+
+                        numc = rc.getNumContactsLB();
+                        this.addContacts("LB", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
+
+                        numc = rc.getNumContactsBL();
+                        this.addContacts("BL", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
+
+                        numc = rc.getNumContactsLC();
+                        this.addContacts("LC", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
+
+                        numc = rc.getNumContactsCL();
+                        this.addContacts("CL", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
+
+                        numc = rc.getNumContactsLL();
+                        this.addContacts("LL", bSSEPos, aSSEPos, (numc > mpt ? mpt : numc));
+                         * 
+                         */
+                    }
                     
                     contNumConsidered++;
                 }                                
@@ -375,7 +410,7 @@ public class ContactMatrix {
     public SSE getSSEByPosition(Integer position) {
         if(position >= this.size) {
             System.err.println("ERROR: getSSE(): Index " + position + " out of range, matrix size is " + this.size + ".");
-            System.exit(-1);
+            System.exit(1);
         }
         return(sseList.get(position));
     }
@@ -445,38 +480,47 @@ public class ContactMatrix {
 
         if(x >= size || y >= size) {
             System.err.println("ERROR: getContacts(): Index (" + x + "/" + y + ") out of range, matrix size is " + size + ".");
-            System.exit(-1);
+            System.exit(1);
         }
 
         if(type.equals("BB")) {
             return(contBB[x][y]);
         }
-        else if(type.equals("BC") || type.equals("CB")) {
+        else if(type.equals("BC")) {
             return(contBC[x][y]);
+        }
+        else if(type.equals("CB")) {
+            return(contCB[x][y]);
         }
         else if(type.equals("CC")) {
             return(contCC[x][y]);
         }
-        else if(type.equals("LB") || type.equals("BL")) {
+        else if(type.equals("LB")) {
             return(contLB[x][y]);
         }
-        else if(type.equals("LC") || type.equals("CL")) {
+        else if(type.equals("BL")) {
+            return(contBL[x][y]);
+        }
+        else if(type.equals("LC")) {
             return(contLC[x][y]);
+        }
+        else if(type.equals("CL")) {
+            return(contCL[x][y]);
         }
         else if(type.equals("LL")) {
             return(contLL[x][y]);
         }
         else if(type.equals("TT")) {
             // total number of contacts
-            return(contBB[x][y] + contBC[x][y] + contCC[x][y] + contLB[x][y] + contLC[x][y] + contLL[x][y]);
+            return(contBB[x][y] + contBC[x][y]  + contCB[x][y]+ contCC[x][y] + contLB[x][y] + contBL[x][y] + contLC[x][y] + contCL[x][y] + contLL[x][y]);
         }
         else if(type.equals("TP")) {
             // total number of protein contacts (all non-ligand contacts)
-            return(contBB[x][y] + contBC[x][y] + contCC[x][y]);
+            return(contBB[x][y] + contBC[x][y] + contCB[x][y] + contCC[x][y]);
         }
         else if(type.equals("TL")) {
             // total number of ligand contacts
-            return(contLB[x][y] + contLC[x][y] + contLL[x][y]);
+            return(contLB[x][y] + contBL[x][y]  + contLC[x][y] + contCL[x][y] + contLL[x][y]);
         }
         else {
             System.err.println("ERROR: getContacts(): Contact type '" + type + "' is not a valid contact type.");
@@ -507,17 +551,26 @@ public class ContactMatrix {
         if(type.equals("BB")) {
             contBB[x][y] += num;
         }
-        else if(type.equals("BC") || type.equals("CB")) {   // Adding both BC and CB should not make a difference because one of the two should be empty, depending on which residue was hit first (only the one which gets hit first, i.e. the one with the lower DSSP residue number, counts).
+        else if(type.equals("BC")) {
             contBC[x][y] += num;
+        }
+        else if(type.equals("CB")) {
+            contCB[x][y] += num;
         }
         else if(type.equals("CC")) {
             contCC[x][y] += num;
         }
-        else if(type.equals("LB") || type.equals("BL")) {
+        else if(type.equals("LB")) {
             contLB[x][y] += num;
         }
-        else if(type.equals("LC") || type.equals("CL")) {
+        else if(type.equals("BL")) {
+            contBL[x][y] += num;
+        }
+        else if(type.equals("LC")) {
             contLC[x][y] += num;
+        }
+        else if(type.equals("CL")) {
+            contCL[x][y] += num;
         }
         else if(type.equals("LL")) {
             contLL[x][y] += num;
@@ -611,7 +664,8 @@ public class ContactMatrix {
                     }
                     // HE ----- Helix - Sheet contacts
                     else if( (a.isHelix() && b.isBetaStrand()) || (b.isHelix() && a.isBetaStrand())  ) {
-                        if( ( (contBB[i][j] > 1) && (contBC[i][j] + contCB[i][j] > 3) ) || (contCC[i][j] > 3)) {
+                        //if( ( (contBB[i][j] > 1) && (contBC[i][j] + contCB[i][j] > 3) ) || (contCC[i][j] > 3)) {
+                        if( (contBB[i][j] > 1) || (contBC[i][j] + contCB[i][j] > 3) || (contCC[i][j] > 3)) {
                             contSSE[i][j] = 1;
                             contSSE[j][i] = 1;
                         }
@@ -702,7 +756,7 @@ public class ContactMatrix {
      * @param contList a list of residue level contacts that are used to determine SSE contacts
      * @param computeAll whether the spatial relation of SSE pairs which have too few residue level contacts 
      *        to be counted as an SSE contact (according to the definitions of this program) should also be computed.
-     *        This is only useful for debugging geodat issues (see the '-y' command line option of plcc) and 
+     *        This is only useful for debugging geo.dat issues (see the '-y' command line option of plcc) and 
      *        slows the process down, therefore it should be set to 'false' if in doubt.
      * 
      */
@@ -983,6 +1037,14 @@ public class ContactMatrix {
 
     }
     
+    /**
+     * Returns the chain ID that is handled by the CM.
+     * @return the PDB chain ID
+     */
+    public String getChain() {
+        return(this.handleChain);
+    }
+    
     
     /**
      * Returns a string that represents this contact matrix in PTGL geo.dat (or geolig.dat) format.
@@ -1019,7 +1081,7 @@ public class ContactMatrix {
 
                 if(this.sseContactExistsPos(i, j) || printAllContacts) { 
                     
-                    // skip this entry if it has no contacts at all
+                    // skip this entry (SSE pair) if it has no contacts at all
                     if(makeItGeoligdat) {
                         // we consider ligands, so check all contacts including ligand contacts
                         if(this.getContacts("TT", i, j) <= 0) {
@@ -1037,12 +1099,13 @@ public class ContactMatrix {
                     if(makeItGeoligdat) {
                         // TODO: add lig fields
                         System.err.println("ERROR: toGeodatFormat(): Geolig.dat format not implemented yet.");
-                        System. exit(1);
+                        System.exit(1);
                         line = "ERROR: GEOLIG.DAT FORMAT NOT IMPLEMENTED YET\n";
                     }
                     else {
                         line = pdbid + handleChain + " " + (i+1) + " " + (j+1) + " " + contBB[i][j] + " " + contCB[i][j] + " " + contBC[i][j]  + " " + contCC[i][j] + " " + SpatRel.getString(spatialSSE[i][j]) + " " + dblDif[i][j] + "\n";
-                    }                                        
+                    }      
+                    
                     
                     lines += line;
                 }

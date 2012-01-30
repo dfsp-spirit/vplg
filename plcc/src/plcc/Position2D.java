@@ -10,7 +10,7 @@
 package plcc;
 
 /**
- *
+ * Very simle helper class, implements a 2D position (x, y). You can think of this as a Point.
  * @author ts
  */
 public class Position2D {

@@ -60,7 +60,11 @@ import org.w3c.dom.DOMImplementation;
 //import org.w3c.dom.Document;
 //import org.w3c.dom.DOMImplementation;
 
-
+/**
+ * A protein graph. Contains information on the SSEs and contacts between them. Represents a specific graph type, e.g., an albe graph. This
+ * means it may only contain a subset of the SSEs of the chain.
+ * @author ts
+ */
 public class ProtGraph implements java.io.Serializable {
 
 
@@ -459,6 +463,8 @@ public class ProtGraph implements java.io.Serializable {
 
     /**
      * Determines the distance from vertex #x to vertex #y in the graph.
+     * @param x the index if the first SSE in the SSE list
+     * @param y the index if the second SSE in the SSE list
      * @return The length of the shortest path between the vertices at indices x and y.
      */
     public Integer distPath(Integer x, Integer y) {
@@ -470,6 +476,8 @@ public class ProtGraph implements java.io.Serializable {
     
     /**
      * Returns whether an edge exists between vertices x and y.
+     * @param x the index if the first SSE in the SSE list
+     * @param y the index if the second SSE in the SSE list
      */
     public Boolean containsEdge(Integer x, Integer y) {
         return(sseContactExistsPos(x, y));
@@ -477,8 +485,17 @@ public class ProtGraph implements java.io.Serializable {
 
     /**
      * Returns whether an edge between vertices x and y exists.
+     * @param x the index if the first SSE in the SSE list
+     * @param y the index if the second SSE in the SSE list
+     * @return true if a contact exists, false if not (or if the SSEs don't exist)
      */
     public Boolean sseContactExistsPos(Integer x, Integer y) {
+        
+        if(x < 0 || y < 0 || x > this.size - 1 || y > this.size - 1) {
+            System.err.println("WARNING: sseContactExistsPos(): SSE index out of bounds in PG (x=" + x + ", y=" + y + ").");
+            return(false);
+        }
+        
         if(matrix[x][y] > 0) {
             return(true);
         }
@@ -489,6 +506,7 @@ public class ProtGraph implements java.io.Serializable {
 
     /**
      * Returns the number of vertices of this graph.
+     * @return the number of vertices
      */
     public Integer numVertices() {
         return(this.size);
@@ -497,6 +515,7 @@ public class ProtGraph implements java.io.Serializable {
 
     /**
      * Serializes this graph and writes it to a (binary) file that can be read by the ProtGraphs.fromFile() method to restore the ProtGraph object.
+     * @return true if it worked out, false otherwise
      */
     public Boolean toFileSerialized(String filePath) {
 
