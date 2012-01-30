@@ -1,0 +1,13 @@
+This is the VPLG release log.
+=============================
+
+
+Updates from version 2012-01-24 to 2012-01-30:
+================================================
+* Default rule set for atom and residue contacts is now PTGL compatible
+* SSE contact rules changed for (H, E) contact pairs
+* Javadoc fixes, old functions marked as deprecated
+* Added lots of debug code and some new debug options
+* It is now possible to restrict computations to a specific chain on the command line
+
+
