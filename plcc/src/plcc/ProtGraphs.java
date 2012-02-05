@@ -21,6 +21,45 @@ import java.util.*;
 public class ProtGraphs {
     
     private static ObjectInputStream objectIn;
+    
+    public static final Integer GRAPHTYPE_ALPHA = 1;
+    public static final Integer GRAPHTYPE_BETA = 2;
+    public static final Integer GRAPHTYPE_ALBE = 3;
+    public static final Integer GRAPHTYPE_ALPHALIG = 4;
+    public static final Integer GRAPHTYPE_BETALIG = 5;
+    public static final Integer GRAPHTYPE_ALBELIG = 6;
+    
+    public static Integer getGraphTypeCode(String gt) {
+        if(gt.equals("alpha")) { return(GRAPHTYPE_ALPHA); }
+        else if(gt.equals("beta")) { return(GRAPHTYPE_BETA); }
+        else if(gt.equals("albe")) { return(GRAPHTYPE_ALBE); }
+        else if(gt.equals("alphalig")) { return(GRAPHTYPE_ALPHALIG); }
+        else if(gt.equals("betalig")) { return(GRAPHTYPE_BETALIG); }
+        else if(gt.equals("albelig")) { return(GRAPHTYPE_ALBELIG); }
+        else {
+            System.err.println("WARNING: ProtGraphs.getGraphTypeCode(): Graph string '" + gt + "' invalid.");
+            return(-1);
+        }
+    }
+    
+    /**
+     * Returns the graph string (e.g., "albe") for the given graph code number. This is used in the database,
+     * where graph_type is stored as an Integer.
+     * @param codeNum the internal code number used for the graph type, e.g., '1'
+     * @return the common name of the graph type, e.g., "albe"
+     */
+    public static String getGraphTypeString(Integer codeNum) {
+        if(codeNum == GRAPHTYPE_ALPHA) { return("alpha"); }
+        else if(codeNum == GRAPHTYPE_BETA) { return("beta"); }
+        else if(codeNum == GRAPHTYPE_ALBE) { return("albe"); }
+        else if(codeNum == GRAPHTYPE_ALPHALIG) { return("alphalig"); }
+        else if(codeNum == GRAPHTYPE_BETALIG) { return("betalig"); }
+        else if(codeNum == GRAPHTYPE_ALBELIG) { return("albelig"); }
+        else {
+            System.err.println("WARNING: ProtGraphs.getGraphTypeString(): Graph code '" + codeNum + "' invalid.");
+            return("invalid_graph_type");
+        }
+    }
 
     /**
      * Reads a file that has to contain a serialized ProtGraph object in binary form (as written by ProtGraph.toFile()).
@@ -186,20 +225,20 @@ public class ProtGraphs {
     
     
     /**
-     * Parses the plcc format graph file 'file' for meta data and returns it in a HashMap. Everyline in the file that is in the correct format ("> key > value") is parsed and the resulting (key, value) pair
+     * Parses the plcc format string for meta data and returns it in a HashMap. Everyline in the string that is in the correct format ("> key > value") is parsed and the resulting (key, value) pair
      * is added to the returned HashMap. This function guarantees that the HashMap contains at least one key: format_version. If it is not found in the file,
      * it is set to '1' because version 1 is the only version which did NOT have this field.
      * 
-     * @param file the path of the plcc graph file to scan
+     * @param graphString the graph string to scan
      * @return the meta data in a HashMap.
      */
-    public static HashMap<String, String> getMetaData(String file) {
+    public static HashMap<String, String> getMetaData(String graphString) {
         
         HashMap md = new HashMap<String, String>();
         
         md.put("format_version", "1");      // will be overwritten later if it occurs in the file. If it does NOT occur, this is the correct value.
         
-        ArrayList<String> lines = FileParser.slurpFile(file);
+        ArrayList<String> lines = multiLineStringToStringList(graphString);
         
         // other vars
         String l = null;            // a line!
@@ -257,13 +296,13 @@ public class ProtGraphs {
     
     /**
      * Debug function, prints the meta data contained in the plcc file 'file'.
-     * @param file the plcc input graph file
+     * @param graphString the plcc input graph string
      */ 
-    public static void printPlccMetaData(String file) {
+    public static void printPlccMetaData(String graphString) {
         
-        HashMap<String, String> md = getMetaData(file);
+        HashMap<String, String> md = getMetaData(graphString);
         
-        System.out.println("Meta data for plcc graph file '" + file + "' follows:");
+        System.out.println("Meta data for plcc graph follows:");
         
         for(String key : md.keySet()) {
             System.out.println(" " + key + " = " + (String)md.get(key) );
@@ -276,18 +315,18 @@ public class ProtGraphs {
     /**
      * Determines the file format version of the plcc format graph file 'file'. This information can be used to call the proper parsing function for the
      * file format version.
-     * @param file the plcc format file to parse
-     * @return the 'format_version' meta data value found in the file as an Integer
+     * @param graphString the graph string
+     * @return the 'format_version' meta data value found in the string as an Integer
      */
-    public static Integer getPlccFileVersion(String file) {
+    public static Integer getPlccFileVersion(String graphString) {
         
         Integer v = 1;
-        HashMap<String, String> md = getMetaData(file);
+        HashMap<String, String> md = getMetaData(graphString);
                 
         try {
             v = Integer.parseInt(md.get("format_version"));            
         } catch(Exception e) {
-            System.err.println("ERROR: getPlccFileVersion(): format_version is not an Integer in plcc graph file '" + file + "', file broken.");
+            System.err.println("ERROR: getPlccFileVersion(): format_version is not an Integer in plcc graph string, input data broken.");
             System.exit(1);
         }
         
@@ -295,228 +334,47 @@ public class ProtGraphs {
     }
     
     
-    public static ProtGraph fromPlccGraphFormat(String file) {
-        Integer v = getPlccFileVersion(file);
+    /**
+     * Creates a PG from the given String.
+     * @param graphString the string
+     * @return the resulting graph
+     */
+    public static ProtGraph fromPlccGraphFormatString(String graphString) {
+        Integer v = getPlccFileVersion(graphString);
         
-        if(v == 1) {
-            System.err.println("WARNING: Graph file '" + file + "' in deprecated version '" + v + "': not all operations are supported.");
-            return(fromPlccGraphFormatv1(file));
-        }
-        else if(v == 2) {
-            return(fromPlccGraphFormatv2(file));
+        if(v == 2) {
+            return(fromPlccGraphFormatStringV2(graphString));
         }
         else {
-            System.err.println("ERROR: Could not determine file format version of graph file '" + file + "'.");
+            System.err.println("ERROR: Invalid file format version of graph string: '" + v + "'.");
             return null;
         }
     }
     
     
-    /**
-     * Reads a file that has to contain a graph in PLCC graph format version 1 and turns it into a protein graph. Note that this can be used for drawing a protein graph
-     * from a file, but it does NOT restore the complete graph because information on the atoms and residues is not contained in the graph file.
-     * 
-     * This function and the associated file version is deprecated because it does not store the sequential position of an SSE in the primary sequence.
-     *
-     * @param file the plcc format graph file to parse
-     */
-    @Deprecated public static ProtGraph fromPlccGraphFormatv1(String file) {
-
-        ProtGraph pg = null;
-        Boolean inVertices = true;
-
-        ArrayList<String> lines = FileParser.slurpFile(file);
-        ArrayList<SSE> sses = new ArrayList<SSE>();
+    
+    
+    
+    public static ArrayList<String> multiLineStringToStringList(String s) {
         
-        // tmp vars for vertex lines
-        String pdbid, chain, graphType, sseType, pdbStartRes, pdbEndRes, sequence;
-        pdbid = chain = graphType = sseType = pdbStartRes = pdbEndRes = sequence = null;
-        Integer sseID, dsspStartRes, dsspEndRes, seqSSENum;
-        sseID = dsspStartRes = dsspEndRes = seqSSENum = 0;
+        String lines[] = s.split("\\r?\\n");
         
-        // tmp vars for edge lines
-        String spatRel = null;
-        Integer sseID1, sseID2; 
-        sseID1 = sseID2 = 0;
-        
-        // other vars
-        String l = null;            // a line!
-        String empty = null;
-        String [] words;
-        SSE sse = null;
-        Residue r = null;
-        Boolean error = false;
-
-        Integer curLine = 0;
-        Integer numContactsAdded = 0;
-        
-        // Get all vertices so we can create the graph.
-        for(Integer i = 0; i < lines.size(); i++) {
-
-            curLine++;            
-            
-            // remove all whitespace from the line, it is not needed and will make splitting way easier later
-            l = lines.get(i).replaceAll("\\s*","");
-                                    
-            if(l.startsWith("|")) {
-                
-                //System.out.println("[SSE] * Handling line #" + curLine + " of the " + lines.size() + " lines.");
-                //System.out.println("[SSE]   Line: '" + l + "'");
-                
-                try {
-                    words = l.split("\\|");
-                    
-                    Integer numExpected = 11;
-                    
-                    if(words.length != numExpected) {
-                        System.err.println("ERROR: PLCC_FORMAT: Hit vertex line containing " + words.length + " fields at line #" + curLine + " (expected " + numExpected + ").");
-                        error = true;
-                    }
-                    
-                    empty = words[0];           // the empty string, leftmost field
-                    pdbid = words[1];
-                    chain = words[2];
-                    graphType = words[3];
-                    sseID = Integer.valueOf(words[4]);
-                    sseType = words[5];
-                    dsspStartRes = Integer.valueOf(words[6]);
-                    dsspEndRes = Integer.valueOf(words[7]);
-                    pdbStartRes = words[8];
-                    pdbEndRes = words[9];
-                    sequence = words[10];
-                    
-                } catch(Exception e) {
-                    System.err.println("ERROR: PLCC_FORMAT: Broken vertex line encountered at line #" + curLine + ". Ignoring.");
-                    error = false;              // may have been set before exception!
-                    continue;
-                }
-                
-                if(error) {
-                    System.err.println("ERROR: PLCC_FORMAT: Broken vertex line encountered at line #" + curLine + ", wrong number of fields. Ignoring.");
-                    error = false;
-                    continue;
-                }
-                
-                // We can now create the vertex object (a fake SSE)
-                sse = new SSE(sseType);
-                
-                // add the residues
-                Integer numRes = dsspEndRes - dsspStartRes + 1;
-                
-                // Note that we cannot restore the correct AA sequences because the DSSP residue numbers include chain brake extra residues, thus the
-                //  length of the sequence string does NOT equal the number of residues.
-                //if(sequence.length() != numRes) {
-                //    System.err.println("ERROR: PLCC_FORMAT: Broken vertex line encountered at line #" + curLine + ". Sequence length should be " + numRes + " but is " + sequence.length() + ". Ignoring.");
-                //    continue;
-                //}
-                
-                
-                //Integer sequenceStringIndex = 0;      // unused, see comment on AA sequence above
-                for(Integer j = dsspStartRes; j <= dsspEndRes; j++) {
-                    r = new Residue(j, j);        // Make sure the SSE has a start/end residue, just put fake values for the PDB numbers, there is no way to determine them unless you have a complete list because they are not necessarily sequential.
-                    //r.setAAName1(sequence.substring(sequenceStringIndex, sequenceStringIndex + 1));       // unused, see comment on AA sequence above
-                    r.setAAName1("?");                                                                      // see comment on AA sequence above
-                    r.setChainID(chain);
-                    r.setiCode(" ");
-                    
-                    sse.addResidue(r);
-                    //sequenceStringIndex++;        // unused, see comment on AA sequence above
-                }                               
-                
-                // set other SSE info
-                sse.setSeqSseChainNum(sseID);   // This is not correct, but we have no choice because we dont know it in this format version! :| Acutally, this is the reason why this format version is now deprecated.
-                sses.add(sse);                
-            }
-        }
-        
-        // All vertices have been parsed, create the graph.
-        
-        if(sses.size() <= 0) {
-            System.err.println("ERROR: PLCC_FORMAT: Graph file did not contain any valid SSE lines, vertex set empty. Exiting.");
-            System.exit(1);
-        }
-        else {
-            System.out.println("  Parsed " + sses.size() + " SSEs from input file in plcc graph format.");
-        }
-        
-        pg = new ProtGraph(sses);
-        pg.setInfo(pdbid, chain, graphType);
-        
-        // Now create all edges
-        curLine = 0;
-        for(Integer i = 0; i < lines.size(); i++) {
-
-            curLine++;                        
-            
-            // remove all whitespace from the line, it is not needed and will make splitting way easier later
-            l = lines.get(i).replaceAll("\\s*","");
-            
-            if(l.startsWith("=")) {
-                
-                //System.out.println("[Contact] * Handling line #" + curLine + " of the " + lines.size() + " lines.");
-                //System.out.println("[Contact]   Line: '" + l + "'");
-                
-                try {
-                    words = l.split("=");
-                    
-                    if(words.length != 4) {
-                        System.err.println("ERROR: PLCC_FORMAT: Hit edge line containing " + words.length + " fields at line #" + curLine + " (expected 4). Ignoring.");
-                        error = true;
-                    }
-                    
-                    empty = words[0];
-                    sseID1 = Integer.valueOf(words[1]);
-                    spatRel = words[2];
-                    sseID2 = Integer.valueOf(words[3]);
-                            
-                    
-                } catch(Exception e) {
-                    System.err.println("ERROR: PLCC_FORMAT: Broken edge line encountered at line #" + curLine + ". Ignoring.");
-                    error = false;                  // may have been set before exception!
-                    continue;
-                }
-                
-                if(error) {
-                    System.err.println("ERROR: PLCC_FORMAT: Broken edge line encountered at line #" + curLine + ", wrong number of fields. Ignoring.");
-                    error = false;
-                    continue;
-                }
-                
-                // everything seems fine, add the contact
-                pg.addContact(sseID1 - 1, sseID2 - 1, SpatRel.stringToInt(spatRel));
-                numContactsAdded++;
-                
-            }
-        }
-                                
-        // Done.  
-        System.out.println("  Parsed " + numContactsAdded + " contacts from input file in plcc graph format.");
-            
-        if(pg == null) {
-            System.err.println("ERROR: Parsing graph from plcc format graph file '" + file + "' failed, returning empty graph.");
-            return(new ProtGraph(new ArrayList<SSE>()));
-        }
-        
-        pg.setMetaData(getMetaData(file));
-
-        return(pg);
-
+        return(new ArrayList<String>(Arrays.asList(lines)));
     }
-    
-    
     
     
     /**
      * Reads a file that has to contain a graph in PLCC graph format version 2 and turns it into a protein graph. Note that this can be used for drawing a protein graph
      * from a file, but it does NOT restore the complete graph because information on the atoms and residues is not contained in the graph file.
      *
-     * @param file the plcc format graph file to parse
+     * @param graphString a string in VPLG format representing the graph
+     * @return the created graph
      */
-    public static ProtGraph fromPlccGraphFormatv2(String file) {
+    public static ProtGraph fromPlccGraphFormatStringV2(String graphString) {
 
         ProtGraph pg = null;
 
-        ArrayList<String> lines = FileParser.slurpFile(file);
+        ArrayList<String> lines = multiLineStringToStringList(graphString);
         ArrayList<SSE> sses = new ArrayList<SSE>();
         
         // tmp vars for vertex lines
@@ -685,12 +543,12 @@ public class ProtGraphs {
         System.out.println("  Parsed " + numContactsAdded + " contacts from input file in plcc graph format.");
             
         if(pg == null) {
-            System.err.println("ERROR: Parsing graph from plcc format graph file '" + file + "' failed, returning empty graph.");
+            System.err.println("ERROR: Parsing graph from plcc format graph string failed, returning empty graph.");
             return(new ProtGraph(new ArrayList<SSE>()));
         }
 
         
-        pg.setMetaData(getMetaData(file));
+        pg.setMetaData(getMetaData(graphString));
         return(pg);
 
     }

@@ -108,7 +108,9 @@ public class FileParser {
 
 
     /**
+     * Reads the target text file and returns the data in it.
      * @param file Path to a readable text file. Does NOT test whether it exist, do that earlier.
+     * @return all lines of the file as an ArrayList
      */
     public static ArrayList<String> slurpFile(String file) {
 
@@ -126,6 +128,32 @@ public class FileParser {
             System.err.println("ERROR: Could not read text file '" + file + "'.");
             e.printStackTrace();
             System.exit(-1);
+	}
+
+        return(lines);
+    }
+    
+    /**
+     * Reads the target text file and returns the data in it.
+     * @param file Path to a readable text file. Does NOT test whether it exist, do that earlier.
+     * @return the data as a multi line string 
+     */
+    public static String slurpFileSingString(String file) {
+
+        String lines = "";
+        Integer numLines = 0;
+
+        try {
+            BufferedReader in = new BufferedReader(new FileReader(file));
+            String line = null;
+            while ((line = in.readLine()) != null) {
+                numLines++;
+                lines += line + "\n";
+            }
+	} catch (IOException e) {
+            System.err.println("ERROR: Could not read text file '" + file + "'.");
+            e.printStackTrace();
+            System.exit(1);
 	}
 
         return(lines);

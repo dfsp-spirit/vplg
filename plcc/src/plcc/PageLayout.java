@@ -38,6 +38,7 @@ public class PageLayout {
     
     public Integer minPageWidth;
     public Integer minPageHeight;
+    public Integer textLineHeight;
     
     // must not be changed after constructor
     private Integer numVerts;
@@ -60,6 +61,8 @@ public class PageLayout {
         this.headerStart = new Position2D(marginLeft,  marginTop);        
         this.headerHeight = Settings.getInteger("plcc_I_img_header_height");
         this.footerHeight = Settings.getInteger("plcc_I_img_footer_height");
+        
+        this.textLineHeight = Settings.getInteger("plcc_I_img_text_line_height");
         
         this.imgStart = new Position2D(headerStart.x,  headerStart.y + headerHeight);
         
@@ -157,7 +160,15 @@ public class PageLayout {
      */
     public Font getStandardFont() {
         return(new Font(Settings.get("plcc_S_img_default_font"), Font.PLAIN, Settings.getInteger("plcc_I_img_default_font_size")));
-    }                
+    }
+    
+    /**
+     * Returns the smaller font used in the image legend.
+     * @return the font as java.awt.Font.
+     */
+    public Font getLegendFont() {
+        return(new Font(Settings.get("plcc_S_img_default_font"), Font.PLAIN, Settings.getInteger("plcc_I_img_legend_font_size")));
+    }
     
         
     /**

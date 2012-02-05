@@ -30,16 +30,31 @@ public class Settings {
     /** The documentation for the settings. */
     static private Properties doc;
     
-    static private String defaultFile = System.getProperty("user.home") + System.getProperty("file.separator") + ".plcc_settings";
+    static private final String defaultFile = System.getProperty("user.home") + System.getProperty("file.separator") + ".plcc_settings";
+    //static private final String defaultFile = "cfg" + System.getProperty("file.separator") + "plcc_settings.cfg";
     static private String configFile;
     
-    
+    /**
+     * Resets all properties.
+     */
     public static void init() {
         cfg = new Properties();
         def = new Properties();
         doc = new Properties();
         
         setDefaults();
+    }
+    
+    
+   
+    
+    /**
+     * Returns the default config file location. Note that this may or may not be in use atm. Use getConfigFile() instead if you
+     * need the file that is currently in use.
+     * @return the path as a String
+     */
+    public static String getDefaultConfigFilePath() {
+        return(defaultFile);
     }
 
     /**
@@ -132,6 +147,8 @@ public class Settings {
         defSet("plcc_B_print_contacts", "false", "Whether the residue contacts are printed to stdout (slower)");
         defSet("plcc_B_write_lig_geolig", "true", "Determines whether ligand contacts are included in the <pdbid>.geolig file.");
         defSet("plcc_B_graphimg_header", "true", "Determines whether the graph images contain a header line with info on the graph type, PDBID and chain.");        
+        defSet("plcc_B_graphimg_footer", "true", "Determines whether the graph images contain a footer line with info on the SSEs.");        
+        defSet("plcc_B_graphimg_legend", "true", "Determines whether the graph images contain a legend that explains the color codes and SSE symbols. This is part of the footer.");        
         defSet("plcc_I_min_fgraph_size_draw", "2", "The minimum size a folding graph must have in order to be drawn. Settings this to 1 or 0 draws all of them, including isolated vertices.");
         defSet("plcc_B_ptgl_text_output", "false", "Whether the PTGL text files (e.g., those required by the bet_neo) are written. Not writing them is faster but this program cannot replace the PTGL tool 'geom_neo' anymore if this is deactivated.");
         defSet("plcc_B_ptgl_geodat_output", "false", "Whether the PTGL text files geo.dat for SSE level contacts is written to a text file.");
@@ -149,9 +166,12 @@ public class Settings {
         defSet("plcc_I_img_vert_dist", "50", "The distance between two consecutive vertices in the output image, in pixels");
         defSet("plcc_I_img_vert_radius", "10", "The radius of a vertex in the output image, in pixels");
         defSet("plcc_I_img_header_height", "40", "The height of the header area in the output image, in pixels");
-        defSet("plcc_I_img_footer_height", "80", "The height of the footer area in the output image, in pixels");
+        defSet("plcc_I_img_footer_height", "120", "The height of the footer area in the output image, in pixels");
         defSet("plcc_S_img_default_font", "TimesRoman", "The default font used in output image labels. This has to be a valid font name, of course.");
         defSet("plcc_I_img_default_font_size", "18", "The default font size used in output images.");
+        defSet("plcc_I_img_legend_font_size", "18", "The legend font size used in output images.");        
+        defSet("plcc_I_img_text_line_height", "40", "The vertical distance between two lines of text in the image, e.g., in the footer.");
+        
         defSet("plcc_I_img_minPageWidth", "640", "The minimum image width in pixels, used in output images.");                                        
         defSet("plcc_I_img_minPageHeight", "480", "The minimum image height in pixels, used in output images.");
 
@@ -176,10 +196,10 @@ public class Settings {
 
         // Database stuff
         defSet("plcc_B_useDB", "false", "Whether to write statistics to the PostgreSQL database");
-        defSet("plcc_S_db_name", "ptgl", "Database name");
+        defSet("plcc_S_db_name", "ts", "Database name");
         defSet("plcc_S_db_host", "127.0.0.1", "Hostname or IP of the DB server");
         defSet("plcc_I_db_port", "5432", "DB server port");
-        defSet("plcc_S_db_username", "ptgl", "DB username");
+        defSet("plcc_S_db_username", "ts", "DB username");
         defSet("plcc_S_db_password", "", "DB password (empty if local is TRUST for this user)");
 
 

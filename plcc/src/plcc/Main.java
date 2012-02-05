@@ -34,6 +34,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.*;
 import java.io.*;
 
+import java.sql.SQLException;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.w3c.dom.Document;
@@ -110,7 +111,7 @@ public class Main {
             System.err.println("WARNING: Was this program executed from its installation directory? If intentionally not, you need to copy the library directory here as well.");
         }
 
-        if(Settings.load("")) {             // Empty string means that the default file is used (it is "$HOME/.plcc_settings")
+        if(Settings.load("")) {             // Empty string means that the default file of the Settings class is used
             //System.out.println("  Settings loaded from properties file.");
         }
         else {
@@ -220,6 +221,32 @@ public class Main {
                             pdbFile = args[i+1];
                         }
                     }
+                    
+                    
+                    if(s.equals("-j") || s.equals("--ddb")) {
+                        if(args.length <= i+4 ) {
+                            syntaxError();
+                        }
+                        else {
+                            Settings.set("plcc_B_useDB", "true");
+                            String a_pdbid = args[i+1];
+                            String a_chain = args[i+2];
+                            String a_gt = args[i+3];
+                            String a_outFile = args[i+4];
+                                                        
+                            System.out.println("Retrieving " + a_gt + " graph of PDB entry " + a_pdbid + ", chain " + a_chain + " from database.");
+                            
+                            if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"))) {
+                                drawPlccGraphFromDB(a_pdbid, a_chain, a_gt, a_outFile + Settings.get("plcc_S_img_output_fileext"), false);
+                                System.out.println("Handled " + a_gt + " graph of PDB entry " + a_pdbid + ", chain " + a_chain + ", exiting.");
+                                System.exit(0);
+                            }
+                            else {
+                                System.exit(1);
+                            }                                                                                    
+                        }
+                    }
+                    
                     
                     if(s.equals("-x") || s.equals("--check-rescts")) {
                         if(args.length <= i+1 ) {
@@ -471,7 +498,7 @@ public class Main {
                         }
                         else {
                             System.out.println("Drawing protein graph in plcc format from file '" + args[i+1] + "'.");
-                            drawPlccGraph(args[i+1], args[i+1] + Settings.get("plcc_S_img_output_fileext"), false);
+                            drawPlccGraphFromFile(args[i+1], args[i+1] + Settings.get("plcc_S_img_output_fileext"), false);
                             System.out.println("Handled plcc graph file '" + args[i+1] + "', exiting.");
                             System.exit(1);
                         }
@@ -485,7 +512,7 @@ public class Main {
                             Settings.set("plcc_B_folding_graphs", "true");
                             Settings.set("plcc_B_draw_graphs", "true");                            
                             System.out.println("Drawing protein graph and folding graphs in plcc format from file '" + args[i+1] + "'.");
-                            drawPlccGraph(args[i+1], args[i+1] + Settings.get("plcc_S_img_output_fileext"), true);
+                            drawPlccGraphFromFile(args[i+1], args[i+1] + Settings.get("plcc_S_img_output_fileext"), true);
                             System.out.println("Handled plcc graph file '" + args[i+1] + " and folding graphs', exiting.");
                             System.exit(1);
                         }
@@ -832,15 +859,17 @@ public class Main {
      * @param plccGraphFile the input file in plcc format
      * @param img the path where to write the output image (including the file extension)
      */
-    public static void drawPlccGraph(String plccGraphFile, String img, Boolean drawFoldingGraphsAsWell) {
+    public static void drawPlccGraphFromFile(String plccGraphFile, String img, Boolean drawFoldingGraphsAsWell) {
 
         //System.out.println("Testing plcc graph reading implementation using file '" + plccGraphFile + "'.");
 
+        String graphString = FileParser.slurpFileSingString(plccGraphFile);
+        
         if(Settings.getInteger("plcc_I_debug_level") > 0) {
-            ProtGraphs.printPlccMetaData(plccGraphFile);
+            ProtGraphs.printPlccMetaData(graphString);
         }
                 
-        ProtGraph pg = ProtGraphs.fromPlccGraphFormat(plccGraphFile);
+        ProtGraph pg = ProtGraphs.fromPlccGraphFormatString(graphString);
         System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to file '" + img + "'.");
         if(pg.drawProteinGraph(img, false)) {
             System.out.println("  Protein graph image written to file '" + img + "'.");
@@ -851,6 +880,32 @@ public class Main {
         }
         else {
             System.err.println("ERROR: Drawing of graph failed.");
+        }       
+    }
+    
+    
+    /**
+     * Draws the image of a graph from the file 'plccGraphFile' (which is expected to contain a graph in PLCC format) and writes it to the PNG file 'img'.
+     * @param plccGraphFile the input file in plcc format
+     * @param img the path where to write the output image (including the file extension)
+     */
+    public static void drawPlccGraphFromDB(String g_pdbid, String g_chainid, String g_graphtype, String outputimg, Boolean drawFoldingGraphsAsWell) {
+
+        String graphString = null;
+        try { graphString = DBManager.getGraph(g_pdbid, g_chainid, g_graphtype); }
+        catch (SQLException e) { System.err.println("ERROR: Drawing of graph from DB failed."); return; }
+        
+        ProtGraph pg = ProtGraphs.fromPlccGraphFormatString(graphString);
+        System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to file '" + outputimg + "'.");
+        if(pg.drawProteinGraph(outputimg, false)) {
+            System.out.println("  Protein graph image written to file '" + outputimg + "'.");
+            
+            if(drawFoldingGraphsAsWell) {
+                calculateFoldingGraphsForSSEGraph(pg, Settings.get("plcc_S_output_dir"));
+            }
+        }
+        else {
+            System.err.println("ERROR: Drawing of graph from DB failed.");
         }       
     }
 
@@ -987,7 +1042,7 @@ public class Main {
 
             if(Settings.getBoolean("plcc_B_useDB")) {
                 if(DBManager.writeChainToDB(c.getPdbChainID(), pdbid, pmi.getMolName(), pmi.getOrgScientific(), pmi.getOrgCommon())) {
-                    System.out.println("  Info on chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
+                    System.out.println("    Info on chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
                 }
                 else {
                     System.err.println("WARNING: Could not write info on chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' to DB.");
@@ -1106,6 +1161,19 @@ public class Main {
                 else {
                     System.out.println("      Image and graph output disabled, not drawing and writing protein graph files.");
                 }
+                
+                // But we may need to write the graph to the database
+                //TODO: the graph string will need escaping!
+                if(Settings.getBoolean("plcc_B_useDB")) {
+                    try { 
+                        DBManager.writeGraphToDB(pdbid, c.getPdbChainID(), ProtGraphs.getGraphTypeCode(gt), pg.toPlccGraphFormatString()); 
+                        System.out.println("      Inserted '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + c.getPdbChainID() + "' into DB.");
+                    }
+                    catch(SQLException e) { 
+                        System.err.println("ERROR: Failed to insert '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + c.getPdbChainID() + "' into DB."); 
+                    }
+                }
+                
 
                 /* ----------------------------------------------- Folding graphs ---------------------------------------------- */
 
@@ -1136,8 +1204,8 @@ public class Main {
      */
     public static void calculateFoldingGraphsForSSEGraph(ProtGraph pg, String outputDir) {
         //System.out.println("Searching connected components in " + graphType + " graph of chain " + c.getPdbChainID() + ".");
-        ArrayList<ProtGraph> ccs = pg.getConnectedComponents();
-        ProtGraph fg;           // A connected component of a protein graph is a folding graph
+        ArrayList<FoldingGraph> ccs = pg.getConnectedComponents();
+        FoldingGraph fg;           // A connected component of a protein graph is a folding graph
         String fgFile = null;
 
         //System.out.println("Found " + ccs.size() + " connected components in " + graphType + " graph of chain " + c.getPdbChainID() + ".");
@@ -2718,24 +2786,25 @@ public class Main {
         System.out.println("       java -jar plcc.jar --help");
         System.out.println("valid OPTIONS are: ");
         System.out.println("-a | --include-coils       : convert the SSE type of all ignored residues to C (coil) and include coils in the graphs [EXPERIMENTAL]");
-        System.out.println("-b | --draw-plcc-fgs <f>   : read graph in plcc format from file <f> and draw it and all its folding graphs, then exit (pdbid will be ignored)");        
+        System.out.println("-b | --draw-plcc-fgs <f>   : read graph in plcc format from file <f> and draw it and all its folding graphs, then exit (pdbid will be ignored)*");        
         System.out.println("-c | --dont-calc-graphs    : do not calculate SSEs contact graphs, stop after residue level contact computation");
         System.out.println("-D | --debug <level>       : set debug level (0: off, 1: normal debug output. >=2: detailed debug output)  [DEBUG]");
-        System.out.println("-d | --dsspfile <dsspfile> : use DSSP file <dsspfile> (instead of '<pdbid>.dssp')");
+        System.out.println("-d | --dsspfile <dsspfile> : use input DSSP file <dsspfile> (instead of assuming '<pdbid>.dssp')");
         System.out.println("-e | --force-chain <c>     : only handle the chain with chain ID <c>.");
-        System.out.println("-f | --folding-graphs      : also handle foldings graphs");
+        System.out.println("-f | --folding-graphs      : also handle foldings graphs (connected components of the protein graph)");
         System.out.println("-g | --sse-graphtypes <l>  : compute only the SSE graphs in list <l>, e.g. 'abcdef' = alpha, beta, alhpabeta, alphalig, betalig and alphabetalig.");
         System.out.println("-h | --help                : show this help message and exit");
-        System.out.println("-i | --ignoreligands       : ignore ligand contacts, do NOT print them to the residue level output file  [DEBUG]");
-        System.out.println("-l | --draw-plcc-graph <f> : read graph in plcc format from file <f> and draw it to <f>.png, then exit (<pdbid> will be ignored)");        
+        System.out.println("-i | --ignoreligands       : ignore ligand contacts in geom_neo format output files [DEBUG]");
+        System.out.println("-j | --ddb <p> <c> <gt> <f>: get the graph type <gt> of chain <c> of pdbid <p> from the DB and draw it to file <f> (omit the file extension)*");
+        System.out.println("-l | --draw-plcc-graph <f> : read graph in plcc format from file <f> and draw it to <f>.png, then exit (<pdbid> will be ignored)*");        
         System.out.println("-n | --textfiles           : write meta data, debug info and interim results like residue contacts to text files (slower)");
         System.out.println("-m | --image-format <f>    : write output images in format <f>, which can be 'PNG' for PNG bitmap format or 'SVG' for SVG vector format.");
         System.out.println("-o | --outputdir <dir>     : write output files to directory <dir> (instead of '.', the current directory)");
-        System.out.println("-p | --pdbfile <pdbfile>   : use PDB file <pdbfile> (instead of '<pdbid>.pdb')");
+        System.out.println("-p | --pdbfile <pdbfile>   : use input PDB file <pdbfile> (instead of assuming '<pdbid>.pdb')");
         System.out.println("-q | --fg-notations <list> : draw only the folding graph notations in <list>, e.g. 'kars' = KEY, ADJ, RED and SEQ.");
-        System.out.println("-r | --recreate-tables     : drop and recreate DB statistics tables, then exit (see -u).");
+        System.out.println("-r | --recreate-tables     : drop and recreate DB statistics tables, then exit (see -u)*");
         System.out.println("-s | --showonscreen        : show an overview of the residue contact results on STDOUT during compuation  [DEBUG]");
-        System.out.println("-t | --draw-tgf-graph <f>  : read graph in TGF format from file <f> and draw it to <f>.png, then exit (pdbid will be ignored)");
+        System.out.println("-t | --draw-tgf-graph <f>  : read graph in TGF format from file <f> and draw it to <f>.png, then exit (pdbid will be ignored)*");
         System.out.println("-u | --use-database        : write SSE contact data to database [requires DB credentials in cfg file]");                       
         System.out.println("-w | --dont-write-images   : do not draw the SSE graphs and write them to image files [DEBUG]");                             
         System.out.println("-x | --check-rescts <f>    : compare the computed residue level contacts to those in geom_neo format file <f> and print differences");
@@ -2746,17 +2815,18 @@ public class Main {
         System.out.println("EXAMPLES: java -jar plcc.jar 8icd");
         System.out.println("          java -jar plcc.jar 8icd -D 2 -d /tmp/dssp/8icd.dssp -p /tmp/pdb/8icd.pdb");
         System.out.println("          java -jar plcc.jar 8icd -o /tmp");
-        System.out.println("          java -jar plcc.jar IGNORED -l prot_graph_3kmf_A.plg");
+        System.out.println("          java -jar plcc.jar none -l prot_graph_3kmf_A.plg");
+        System.out.println("          java -jar plcc.jar none -m PNG -ddb 8icd A albelig ~/img/protein_graph");        
         System.out.println("");
         System.out.println("REQUIRED INPUT FILES: This program requires the PDB file and the DSSP file of a protein.");
-        System.out.println("                      This does not apply to options that don't use it (-l, -t, -r), of course.");
-        System.out.println("                      A PDBID still has to be given as first argument, it will be ignored though.");
+        System.out.println("                      This does not apply to options that don't use it (marked with * above), of course.");
+        System.out.println("                      A PDBID still has to be given as first argument, it will be ignored though (use 'none').");
         System.out.println("");
         System.out.println("NOTES: ");
         System.out.println("       -The DSSP program assumes that the input PDB file only has a single model.");
         System.out.println("        You have to split PDB files with multiple models up BEFORE running DSSP (use 'splitpdb').");
         System.out.println("        If you don't do this, the broken DSSP file will get this program into trouble.");
-        System.out.println("       -See the config file '.plcc_settings' in your userhome to set advanced options.");
+        System.out.println("       -See the config file '" + Settings.getConfigFile() + "' in your userhome to set advanced options.");
         System.out.println("       -If all the parameters above scare you try 'java -jar plcc.jar <PDBID>' for a start.");
     }
 
@@ -3220,7 +3290,7 @@ public class Main {
                         if(Settings.getBoolean("plcc_B_merge_helices")) {
                             
                             // we only merge SSEs if they are roughly adjacent, i.e., if their distance in the AA sequence is smaller than a certain threshold
-                            if(curSSE.getPrimarySeqDistanceTo(nextSSE) <= Settings.getInteger("plcc_I_merge_helices_max_dist")) {
+                            if(curSSE.getPrimarySeqDistanceInAminoAcidsTo(nextSSE) <= Settings.getInteger("plcc_I_merge_helices_max_dist")) {
                                 // To merge, we add all residues of the next SSE to this one and skip the next one.
                                 // System.out.println("    Merging SSEs #" + i + " of type " + cst +  " and #" + (i + 1) + " of type " + nextSSE.getSseType()  + ".");
                                 curSSE.addResidues(nextSSE.getResidues());

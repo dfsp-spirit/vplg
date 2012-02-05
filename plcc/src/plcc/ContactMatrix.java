@@ -996,6 +996,7 @@ public class ContactMatrix {
     
     /**
      * Creates a ProtGraph object from the SSE objects and the SSE-level contacts stored in this matrix.
+     * @return the resulting ProtGraph
      */
     public ProtGraph toProtGraph() {
         // add vertices

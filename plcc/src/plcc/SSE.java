@@ -317,11 +317,12 @@ public class SSE implements java.io.Serializable {
     
     
     /**
-     * Determines the distance of the SSE to the SSE s in the primary structure. This means it returns the number of residues between the SSEs in the AA sequence. This is based on DSSP residue numbers.
+     * Determines the distance of the SSE to the SSE s in the primary structure. This means it returns
+     * the number of residues between the SSEs in the AA sequence. This is based on DSSP residue numbers.
      * @param s the other SSE
      * @return the distance in residues (difference in DSSP residue numbers)
      */
-    public Integer getPrimarySeqDistanceTo(SSE s) {
+    public Integer getPrimarySeqDistanceInAminoAcidsTo(SSE s) {
         
         Integer d = -100000;    // ignored anyways, just for the System.exit() cases to calm the IDE
         
@@ -343,12 +344,9 @@ public class SSE implements java.io.Serializable {
             d = s.getStartDsspNum() - this.getEndDsspNum() - 1;
         }
         else {
-            System.err.println("ERROR: getPrimarySeqDistanceTo(): The compared SSEs overlap.");
+            System.err.println("ERROR: getPrimarySeqDistanceInAminoAcidsTo(): The compared SSEs overlap.");
             System.exit(1);
         }
-            
-            
-        
         
         return(d);
     }
