@@ -34,6 +34,11 @@ public class DBManager {
     static String tbl_protein = "plcc_protein";
     static String tbl_chain = "plcc_chain";
     static String tbl_sse = "plcc_sse";
+    
+    static String tbl_ssetypes = "plcc_ssetypes";
+    static String tbl_contacttypes = "plcc_contacttypes";
+    static String tbl_graphtypes = "plcc_graphtypes";
+    
     static String tbl_contact = "plcc_contact";
     static String view_ssecontacts = "plcc_ssetype_contacts";
     static String view_graphs = "plcc_graphs";
@@ -126,6 +131,7 @@ public class DBManager {
 
     /**
      * Executes the SQL insert query 'query' and returns the number of inserted rows if it succeeds, -1 otherwise.
+     * WARNING: This does not do any checks on the input so do not expose this to user input.
      * @return The number of inserted rows if it succeeds, -1 otherwise.
      */
     public static int doInsertQuery(String query) {
@@ -152,6 +158,7 @@ public class DBManager {
 
     /**
      * Executes the SQL update query 'query' and returns the number of updated rows if it succeeds, -1 otherwise.
+     * WARNING: This does not do any checks on the input so do not expose this to user input.
      * @return The number of updated rows if it succeeds, -1 otherwise.
      */
     public static int doUpdateQuery(String query) {
@@ -178,6 +185,7 @@ public class DBManager {
 
     /**
      * Executes the SQL delete query 'query' and returns the number of updated rows if it succeeds, -1 otherwise.
+     * WARNING: This does not do any checks on the input so do not expose this to user input.
      * @return The number of deleted rows if it succeeds, -1 otherwise.
      */
     public static int doDeleteQuery(String query) {
@@ -203,7 +211,7 @@ public class DBManager {
     }
 
     /**
-     * Executes a select query.
+     * Executes a select query. WARNING: This does not do any checks on the input so do not expose this to user input.
      * @param query the SQL query
      * @return the data as 2D matrix of Strings.
      */
@@ -307,6 +315,10 @@ public class DBManager {
             doDeleteQuery("DROP TABLE " + tbl_sse + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_contact + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_graph + " CASCADE;");
+            
+            doDeleteQuery("DROP TABLE " + tbl_graphtypes + ";");
+            doDeleteQuery("DROP TABLE " + tbl_contacttypes + ";");
+            doDeleteQuery("DROP TABLE " + tbl_ssetypes + ";");
 
             // The indices get dropped with the tables.
             //doDeleteQuery("DROP INDEX plcc_idx_chain_insert;");
@@ -349,6 +361,10 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references plcc_chain ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence varchar(2000) not null, sse_type int not null, lig_name varchar(5));");
             doInsertQuery("CREATE TABLE " + tbl_contact + " (contact_id serial primary key, sse1 int not null references plcc_sse ON DELETE CASCADE, sse2 int not null references plcc_sse ON DELETE CASCADE, contact_type int not null, check (sse1 < sse2));");
             doInsertQuery("CREATE TABLE " + tbl_graph + " (graph_id serial primary key, chain_id int not null references plcc_chain ON DELETE CASCADE, graph_type int not null, graph_string text not null);");
+            
+            doInsertQuery("CREATE TABLE " + tbl_ssetypes + " (ssetype_id int not null primary key,  ssetype_text text not null);");
+            doInsertQuery("CREATE TABLE " + tbl_contacttypes + " (contacttype_id int not null primary key,  contacttype_text text not null);");
+            doInsertQuery("CREATE TABLE " + tbl_graphtypes + " (graphtype_id int not null primary key,  graphtype_text text not null);");
 
             // set constraints
             doInsertQuery("ALTER TABLE " + tbl_protein + " ADD CONSTRAINT constr_protein_uniq UNIQUE (pdb_id);");
@@ -359,8 +375,8 @@ public class DBManager {
             
             // create views
             //doInsertQuery("CREATE VIEW " + view_ssecontacts + " as select contact_id, least(sse1_type, sse2_type) sse1_type, greatest(sse1_type, sse2_type) sse2_type from (select k.contact_id, sse1.sse_type as sse1_type, sse2.sse_type as sse2_type from plcc_contact k left join plcc_sse sse1 on k.sse1=sse1.sse_id left join plcc_sse sse2 on k.sse2=sse2.sse_id) foo;");
-            doInsertQuery("CREATE VIEW " + view_ssecontacts + " as select contact_id, least(sse1_type, sse2_type) sse1_type, greatest(sse1_type, sse2_type) sse2_type, sse1_lig_name, sse2_lig_name  from (select k.contact_id, sse1.sse_type as sse1_type, sse2.sse_type as sse2_type, sse1.lig_name as sse1_lig_name, sse2.lig_name as sse2_lig_name from plcc_contact k left join plcc_sse sse1 on k.sse1=sse1.sse_id left join plcc_sse sse2 on k.sse2=sse2.sse_id) foo;");
-            doInsertQuery("CREATE VIEW " + view_graphs + " as select graph_id, pdb_id, chain_name, graph_type, graph_string from (select k.graph_id, k.graph_type, k.graph_string, chain.chain_name as chain_name, chain.pdb_id as pdb_id from plcc_graph k left join plcc_chain chain on k.chain_id=chain.chain_id) foo;");
+            doInsertQuery("CREATE VIEW " + view_ssecontacts + " AS SELECT contact_id, least(sse1_type, sse2_type) sse1_type, greatest(sse1_type, sse2_type) sse2_type, sse1_lig_name, sse2_lig_name  FROM (SELECT k.contact_id, sse1.sse_type AS sse1_type, sse2.sse_type AS sse2_type, sse1.lig_name AS sse1_lig_name, sse2.lig_name AS sse2_lig_name FROM " + tbl_contact + " k LEFT JOIN " + tbl_sse + " sse1 ON k.sse1=sse1.sse_id LEFT JOIN " + tbl_sse + " sse2 ON k.sse2=sse2.sse_id) foo;");
+            doInsertQuery("CREATE VIEW " + view_graphs + " AS SELECT graph_id, pdb_id, chain_name, graph_type, graph_string FROM (SELECT k.graph_id, k.graph_type, k.graph_string, chain.chain_name AS chain_name, chain.pdb_id AS pdb_id FROM plcc_graph k LEFT JOIN " + tbl_chain + " chain ON k.chain_id=chain.chain_id) foo;");
 
             // add comments for tables
             doInsertQuery("COMMENT ON TABLE " + tbl_protein + " IS 'Stores information on a whole PDB file.';");
@@ -386,6 +402,24 @@ public class DBManager {
             doInsertQuery("CREATE INDEX plcc_idx_graph_fk ON " + tbl_graph + " (chain_id);");                       // FK
 
             // indices on PKs get created automatically
+            
+            // fill the type tables
+            doInsertQuery("INSERT INTO " + tbl_graphtypes + " (graphtype_id, graphtype_text) VALUES (1, 'alpha');");
+            doInsertQuery("INSERT INTO " + tbl_graphtypes + " (graphtype_id, graphtype_text) VALUES (2, 'beta');");
+            doInsertQuery("INSERT INTO " + tbl_graphtypes + " (graphtype_id, graphtype_text) VALUES (3, 'albe');");
+            doInsertQuery("INSERT INTO " + tbl_graphtypes + " (graphtype_id, graphtype_text) VALUES (4, 'alphalig');");
+            doInsertQuery("INSERT INTO " + tbl_graphtypes + " (graphtype_id, graphtype_text) VALUES (5, 'betalig');");
+            doInsertQuery("INSERT INTO " + tbl_graphtypes + " (graphtype_id, graphtype_text) VALUES (6, 'albelig');");
+            
+            doInsertQuery("INSERT INTO " + tbl_ssetypes + " (ssetype_id, ssetype_text) VALUES (1, 'helix');");
+            doInsertQuery("INSERT INTO " + tbl_ssetypes + " (ssetype_id, ssetype_text) VALUES (2, 'beta strand');");
+            doInsertQuery("INSERT INTO " + tbl_ssetypes + " (ssetype_id, ssetype_text) VALUES (3, 'ligand');");
+            doInsertQuery("INSERT INTO " + tbl_ssetypes + " (ssetype_id, ssetype_text) VALUES (4, 'other');");
+            
+            doInsertQuery("INSERT INTO " + tbl_contacttypes + " (contacttype_id, contacttype_text) VALUES (1, 'mixed');");
+            doInsertQuery("INSERT INTO " + tbl_contacttypes + " (contacttype_id, contacttype_text) VALUES (2, 'parallel');");
+            doInsertQuery("INSERT INTO " + tbl_contacttypes + " (contacttype_id, contacttype_text) VALUES (3, 'antiparallel');");
+            doInsertQuery("INSERT INTO " + tbl_contacttypes + " (contacttype_id, contacttype_text) VALUES (4, 'ligand');");
 
 
             res = true;      // Not really, need to check all of them.
@@ -397,90 +431,136 @@ public class DBManager {
         return (res);
     }
 
+    
+    
     /**
-     * Writes information on a SSE to the database. Note that the chain has to exist in the database already.
+     * Writes information on a SSE to the database. Note that the protein + chain have to exist in the database already.
      */
-    public static Boolean writeSSEToDB(String pdb_id, String chain_name, Integer dssp_start, Integer dssp_end, String pdb_start, String pdb_end, String sequence, Integer sse_type, String lig_name) {
+    public static Boolean writeSSEToDB(String pdb_id, String chain_name, Integer dssp_start, Integer dssp_end, String pdb_start, String pdb_end, String sequence, Integer sse_type, String lig_name) throws SQLException {
 
-        // TODO: rewrite this using prepared statements
-        Integer numRows = null;
         Integer chain_id = getDBChainID(pdb_id, chain_name);
 
         if (chain_id < 0) {
-            System.err.println("ERROR: writeSSEToDB(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert SSE.");
+            System.err.println("ERROR: writeSSEToDB: Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert SSE.");
             return (false);
         }
+      
+        Boolean result = false;
 
-        // The lig_name value is NULL for non-ligand SSEs (the string in the arguments list of this function is empty "" for them.)
-        String query = null;
-
+        PreparedStatement statement = null;
+ 
+        /*
         if (lig_name.length() >= 1) {
             query = "INSERT INTO " + tbl_sse + " (chain_id, dssp_start, dssp_end, pdb_start, pdb_end, sequence, sse_type, lig_name) VALUES (" + chain_id + ", " + dssp_start + ", " + dssp_end + ", '" + pdb_start + "', '" + pdb_end + "', '" + sequence + "', " + sse_type + ", '" + lig_name + "');";
         } else {
             query = "INSERT INTO " + tbl_sse + " (chain_id, dssp_start, dssp_end, pdb_start, pdb_end, sequence, sse_type) VALUES (" + chain_id + ", " + dssp_start + ", " + dssp_end + ", '" + pdb_start + "', '" + pdb_end + "', '" + sequence + "', " + sse_type + ");";
         }
+         * 
+         */
 
-        numRows = doInsertQuery(query);
+        String query = "INSERT INTO " + tbl_sse + " (chain_id, dssp_start, dssp_end, pdb_start, pdb_end, sequence, sse_type, lig_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+                // chain_id + ", " + dssp_start + ", " + dssp_end + ", '" + pdb_start + "', '" + pdb_end + "', '" + sequence + "', " + sse_type + ", '" + lig_name + "');";
+                
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
 
-        if (numRows < 0) {
-            System.err.println("ERROR: writeSSEToDB(): Could not write data on an SSE of protein '" + pdb_id + "' and chain '" + chain_name + "' to DB.");
-            return (false);
-        } else {
-            return (true);
+            statement.setInt(1, chain_id);
+            statement.setInt(2, dssp_start);
+            statement.setInt(3, dssp_end);
+            statement.setString(4, pdb_start);
+            statement.setString(5, pdb_end);
+            statement.setString(6, sequence);
+            statement.setInt(7, sse_type);
+            statement.setString(8, lig_name);
+                                
+            statement.executeUpdate();
+            dbc.commit();
+            result = true;
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: writeSSEToDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: writeSSEToDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: writeSSEToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+            result = false;
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
         }
+        return(result);       
     }
     
+        
     
     /**
-     * Writes information on a protein graph to the database. This function is deprecated because it does
-     * not use prepared statements. Use writeGraphToDB() instead.
+     * Writes data on a protein to the database
+     * @param pdb_id the PDB id of the protein
+     * @param title the PDB title field
+     * @param header the PDB header field
+     * @param keywords the PDB keywords field
+     * @param experiment the PDB experiment field
+     * @param resolution the resolution of the structure, from the PDB headers
+     * @return true if the protein was written to the DB, false otherwise
+     * @throws SQLException if the DB could not be reset or closed properly
      */
-    @Deprecated public static Boolean writeGraphToDBOld(String pdb_id, String chain_name, Integer graph_type, String graph_string) {
-
-        Integer numRows = null;
-        Integer chain_id = getDBChainID(pdb_id, chain_name);
-
-        if (chain_id < 0) {
-            System.err.println("ERROR: writeGraphToDB(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert SSE.");
-            return (false);
-        }
-
-        // The lig_name value is NULL for non-ligand SSEs (the string in the arguments list of this function is empty "" for them.)
-        String query = null;
+    public static Boolean writeProteinToDB(String pdb_id, String title, String header, String keywords, String experiment, Double resolution) throws SQLException {
         
-        // (graph_id serial primary key, chain_id int not null references plcc_chain ON DELETE CASCADE, graph_type int not null, graph_string text not null)
-        query = "INSERT INTO " + tbl_graph + " (chain_id, graph_type, graph_string) VALUES (" + chain_id + ", " + graph_type + ", " + graph_string + ");";
-        
-        numRows = doInsertQuery(query);
-
-        if (numRows < 0) {
-            System.err.println("ERROR: writeGraphToDB(): Could not write data on the protein graph of type '" + ProtGraphs.getGraphTypeString(graph_type) + "' of protein '" + pdb_id + "' and chain '" + chain_name + "' to DB.");
-            return (false);
-        } else {
-            return (true);
+        if(proteinExistsInDB(pdb_id)) {
+            try {
+                deletePdbidFromDB(pdb_id);
+            } catch (Exception e) {
+                System.err.println("WARNING: DB: writeProteinToDB: Protein '" + pdb_id + "' already in DB and deleting it failed.");
+            }                        
         }
+        
+        Boolean result = false;
+
+        PreparedStatement statement = null;
+
+        String query = "INSERT INTO " + tbl_protein + " (pdb_id, title, header, keywords, experiment, resolution) VALUES (?, ?, ?, ?, ?, ?);";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setString(1, pdb_id);
+            statement.setString(2, title);
+            statement.setString(3, header);
+            statement.setString(4, keywords);
+            statement.setString(5, experiment);
+            statement.setDouble(6, resolution);
+                                
+            statement.executeUpdate();
+            dbc.commit();
+            result = true;
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: writeProteinToDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: writeProteinToDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: writeProteinToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+            result = false;
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        }
+        return(result);
+
     }
     
-
-    /**
-     * Writes information on a protein to the database.
-     */
-    public static Boolean writeProteinToDB(String pdb_id, String title, String header, String keywords, String experiment, Double resolution) {
-
-        // TODO: rewrite this using prepared statements
-        Integer numRows = null;
-
-        String query = "INSERT INTO " + tbl_protein + " (pdb_id, title, header, keywords, experiment, resolution) VALUES ('" + pdb_id + "', '" + title + "', '" + header + "', '" + keywords + "', '" + experiment + "', " + resolution + ");";
-
-        numRows = doInsertQuery(query);
-
-        if (numRows < 0) {
-            System.err.println("ERROR: writeProteinToDB(): Could not write data on protein '" + pdb_id + "' to DB.");
-            return (false);
-        } else {
-            return (true);
-        }
-    }
 
     /**
      * Deletes all entries related to the PDB ID 'pdb_id' from the plcc database tables.
@@ -488,37 +568,100 @@ public class DBManager {
      */
     public static Integer deletePdbidFromDB(String pdb_id) {
 
-        // TODO: rewrite this using prepared statements
-        Integer numRows = null;
+        PreparedStatement statement = null;        
+        ResultSetMetaData md;
+        int count = 0;        
+        ResultSet rs = null;
+        
+        
+        String query = "DELETE FROM " + tbl_protein + " WHERE pdb_id = ?;";
+        
+        
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
 
-        String query = "DELETE FROM " + tbl_protein + " WHERE pdb_id = '" + pdb_id + "';";
-
-        numRows = doDeleteQuery(query);
-
+            statement.setString(1, pdb_id);
+                                
+            statement.executeUpdate();
+            dbc.commit();
+            
+            //md = rs.getMetaData();
+            //count = md.getColumnCount();
+            
+            
+        } catch (SQLException e) {
+            System.err.println("ERROR: SQL: deletePdbidFromDB: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                dbc.setAutoCommit(true);
+            } catch(Exception e) { System.err.println("WARNING: DB: deletePdbidFromDB: Could not close statement and reset autocommit."); }
+        }
+        
         // The other tables are handled automatically via the ON DELETE CASCADE constraint.
 
-        return (numRows);
+        return (count);
     }
 
+    
+    
     /**
-     * Writes information on a chain to the database.
+     * Writes data on a protein chain to the database
+     * @param chain_name the chain name
+     * @param pdb_id the PDB id of the protein this chain belongs to. The protein has to exist in the DB already.
+     * @param molName the molName record of the respective PDB header field
+     * @param orgScientific the orgScientific record of the respective PDB header field
+     * @param orgCommon the orgCommon record of the respective PDB header field
+     * @return
+     * @throws SQLException if the DB could not be reset or closed properly
      */
-    public static Boolean writeChainToDB(String chain_name, String pdb_id, String molName, String orgScientific, String orgCommon) {
-
-        // TODO: rewrite this using prepared statements
+    public static Boolean writeChainToDB(String chain_name, String pdb_id, String molName, String orgScientific, String orgCommon) throws SQLException {
         
-        Integer numRows = null;
-
-        String query = "INSERT INTO " + tbl_chain + " (chain_name, pdb_id, mol_name, organism_scientific, organism_common) VALUES ('" + chain_name + "', '" + pdb_id + "', '" + molName + "', '" + orgScientific + "', '" + orgCommon + "');";
-
-        numRows = doInsertQuery(query);
-
-        if (numRows < 0) {
-            System.err.println("ERROR: writeChainToDB(): Could not write data on chain '" + chain_name + "' of protein '" + pdb_id + "' to DB.");
-            return (false);
-        } else {
-            return (true);
+        if(! proteinExistsInDB(pdb_id)) {
+            return(false);
         }
+        
+        Boolean result = false;
+
+        PreparedStatement statement = null;
+
+        String query = "INSERT INTO " + tbl_chain + " (chain_name, pdb_id, mol_name, organism_scientific, organism_common) VALUES (?, ?, ?, ?, ?);";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setString(1, chain_name);
+            statement.setString(2, pdb_id);
+            statement.setString(3, molName);
+            statement.setString(4, orgScientific);
+            statement.setString(5, orgCommon);
+                                
+            statement.executeUpdate();
+            dbc.commit();
+            result = true;
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: writeChainToDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: writeChainToDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: writeChainToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+            result = false;
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        }
+        return(result);
+
     }
     
     
@@ -539,7 +682,7 @@ public class DBManager {
         Boolean result = false;
 
         if (chain_db_id < 0) {
-            System.err.println("ERROR: writeGraphToDB(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert SSE.");
+            System.err.println("ERROR: writeGraphToDB: Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert SSE.");
             return (false);
         }
 
@@ -559,13 +702,13 @@ public class DBManager {
             dbc.commit();
             result = true;
         } catch (SQLException e ) {
-            System.err.println("ERROR: SQL: '" + e.getMessage() + "'.");
+            System.err.println("ERROR: SQL: writeGraphToDB: '" + e.getMessage() + "'.");
             if (dbc != null) {
                 try {
-                    System.err.print("ERROR: SQL: Transaction is being rolled back.");
+                    System.err.print("ERROR: SQL: writeGraphToDB: Transaction is being rolled back.");
                     dbc.rollback();
                 } catch(SQLException excep) {
-                    System.err.println("ERROR: SQL: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                    System.err.println("ERROR: SQL: writeGraphToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
                 }
             }
             result = false;
@@ -582,8 +725,7 @@ public class DBManager {
     /**
      * Writes information on a SSE contact to the database.
      */
-    public static Boolean writeContactToDB(String pdb_id, String chain_name, Integer sse1_dssp_start, Integer sse2_dssp_start, Integer contact_type) {
-        // TODO: rewrite this using prepared statements
+    public static Boolean writeContactToDB(String pdb_id, String chain_name, Integer sse1_dssp_start, Integer sse2_dssp_start, Integer contact_type) throws SQLException {
 
         // Just abort if this is not a valid contact type. Note that 0 is CONTACT_NONE.
         if (contact_type <= 0) {
@@ -593,11 +735,9 @@ public class DBManager {
         Integer chain_id = getDBChainID(pdb_id, chain_name);
 
         if (chain_id < 0) {
-            System.err.println("ERROR: writeContactToDB(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert SSE.");
+            System.err.println("ERROR: DB: writeContactToDB(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert SSE.");
             return (false);
         }
-
-        Integer numRows = null;
 
         Integer sse1_id = getDBSseID(sse1_dssp_start, chain_id);
         Integer sse2_id = getDBSseID(sse2_dssp_start, chain_id);
@@ -610,21 +750,48 @@ public class DBManager {
             sse1_id = tmp;
         }
 
-        String query = "INSERT INTO " + tbl_contact + " (sse1, sse2, contact_type) VALUES (" + sse1_id + ", " + sse2_id + "," + contact_type + ");";
+        Boolean result = false;
+        PreparedStatement statement = null;
 
-        numRows = doInsertQuery(query);
+        String query = "INSERT INTO " + tbl_contact + " (sse1, sse2, contact_type) VALUES (?, ?, ?);";
 
-        if (numRows < 0) {
-            System.err.println("ERROR: writeChainToDB(): Could not write data on chain '" + chain_name + "' of protein '" + pdb_id + "' to DB.");
-            return (false);
-        } else {
-            return (true);
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setInt(1, sse1_id);
+            statement.setInt(2, sse2_id);
+            statement.setInt(3, contact_type);
+                                
+            statement.executeUpdate();
+            dbc.commit();
+            result = true;
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: writeContactToDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: writeContactToDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: writeContactToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+            result = false;
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
         }
+                
+        return(result);
     }
 
     
     /**
      * Retrieves the internal database SSE ID of a SSE from the DB.
+     * @param dssp_start the DSSP start residue number of the SSE
+     * @param chain_id the DB chain ID of the chain the SSE is part of
      * @return The ID if it was found, -1 otherwise.
      */
     private static Integer getDBSseID(Integer dssp_start, Integer chain_id) {
@@ -644,8 +811,7 @@ public class DBManager {
     }
 
     
-    
-    
+   
     
     /**
      * Retrieves the internal database chain ID of a chain (it's PK) from the DB. The chain is identified by (pdb_id, chain_name).
@@ -654,26 +820,6 @@ public class DBManager {
      * @return the internal database chain id (its primary key, e.g. '2352365175365'). This is NOT the pdb chain name.
      */
     public static Integer getDBChainID(String pdb_id, String chain_name) {
-        
-        /*
-         * These checks are not needed anymore, now using prepared statements.
-         * 
-        if(pdb_id.length() != 4 || chain_name.length() != 1) {
-            System.err.println("ERROR: SQL: Format of requested PDB ID '" + pdb_id + "' and chain '" + chain_name + "' invalid (wrong length).");
-            return(-1);
-        }
-        
-        Pattern p = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
-        Matcher m_pdb_id = p.matcher(pdb_id);
-        Matcher m_chain_name = p.matcher(chain_name);
-        Boolean found_pdb_id = m_pdb_id.find();
-        Boolean found_chain_name = m_chain_name.find();
-        if (found_pdb_id ||found_chain_name) {
-            System.err.println("ERROR: SQL: Requested PDB ID '" + pdb_id + "' and chain '" + chain_name + "' contain invalid characters.");
-            return(-1);
-        } 
-         * 
-         */
         
         ResultSetMetaData md;
         ArrayList<String> columnHeaders;
@@ -715,7 +861,7 @@ public class DBManager {
             }
             
         } catch (SQLException e ) {
-            System.err.println("ERROR: SQL: '" + e.getMessage() + "'.");
+            System.err.println("ERROR: SQL: getDBChainID: '" + e.getMessage() + "'.");
         } finally {
             try {
                 if (statement != null) {
@@ -742,6 +888,79 @@ public class DBManager {
     
     
     /**
+     * Retrieves the internal database chain ID of a chain (it's PK) from the DB. The chain is identified by (pdb_id, chain_name).
+     * @param pdb_id the PDB ID of the chain
+     * @param chain_name the PDB chain name
+     * @return the internal database chain id (its primary key, e.g. '2352365175365'). This is NOT the pdb chain name.
+     */
+    public static Boolean proteinExistsInDB(String pdb_id) {
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT pdb_id FROM " + tbl_protein + " WHERE (pdb_id = ?);";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setString(1, pdb_id);
+                                
+            rs = statement.executeQuery();
+            dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: proteinExistsInDB:'" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                dbc.setAutoCommit(true);
+            } catch(Exception e) { System.err.println("WARNING: DB: Could not close statement and reset autocommit."); }
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        if(tableData.size() >= 1) {
+            if(tableData.get(0).size() >= 1) {
+                return(true);
+            }
+            else {
+                System.err.println("WARNING: DB: Protein with PDB ID '" + pdb_id + "' not in DB.");
+                return(false);
+            }
+        }
+        else {
+            return(false);
+        }        
+    }
+    
+    
+    /**
      * Retrieves the VPLG format graph string for the requested graph from the database. The graph is identified by the
      * unique triplet (pdbid, chain_name, graph_type).
      * @param pdbid the requested pdb ID, e.g. "1a0s"
@@ -763,7 +982,7 @@ public class DBManager {
         
 
         if (chain_db_id < 0) {
-            System.err.println("ERROR: writeGraphToDB(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert SSE.");
+            System.err.println("WARNING: getGraph(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
             return(null);
         }
 
@@ -802,7 +1021,7 @@ public class DBManager {
             
             result = true;
         } catch (SQLException e ) {
-            System.err.println("ERROR: SQL: '" + e.getMessage() + "'.");
+            System.err.println("ERROR: SQL: getGraph: '" + e.getMessage() + "'.");
             result = false;
         } finally {
             if (statement != null) {

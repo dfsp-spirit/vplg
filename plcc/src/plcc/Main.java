@@ -34,6 +34,8 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.*;
 import java.io.*;
 
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.sql.SQLException;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.dom.GenericDOMImplementation;
@@ -82,7 +84,9 @@ public class Main {
     //  Main.calculateAllContacts().
     static Integer globalMaxSeqNeighborResDist;
     
-    static final String version = "0.5";
+    static final String version = "0.51";
+    
+    static ArrayList<File> deleteFilesOnExit;
 
 
 
@@ -108,7 +112,9 @@ public class Main {
         File libDir = new File("lib");
         if( ! libDir.exists()) {
             System.err.println("WARNING: Library directory '" + libDir.toString() + "' not found. Libraries missing, will crash if functionality of them is required during this run.");
-            System.err.println("WARNING: Was this program executed from its installation directory? If intentionally not, you need to copy the library directory here as well.");
+            System.err.println("WARNING: Was this program executed from its installation directory? If not you need to copy the lib/ directory to the working directory.");
+            System.err.println("INFO: The Java library path is set to: '" + System.getProperty("java.library.path") + "'.");
+            System.err.println("INFO: The Java classloader path is set to: '" + System.getProperty("java.class.path") + "'.");
         }
 
         if(Settings.load("")) {             // Empty string means that the default file of the Settings class is used
@@ -140,6 +146,7 @@ public class Main {
         ArrayList<SSE> dsspSSEs = new ArrayList<SSE>();
         ArrayList<SSE> ptglSSEs = new ArrayList<SSE>();
         ArrayList<String> allModelsIDsOfWholePDBFile = new ArrayList<String>();
+        deleteFilesOnExit = new ArrayList<File>();
         
         String pdbid = "";
         String dsspFile = "";
@@ -210,6 +217,55 @@ public class Main {
                         }
                         else {
                             dsspFile = args[i+1];
+                        }
+                    }
+                    
+                    if(s.equals("--gz-dsspfile")) {
+                        if(args.length <= i+1 ) {
+                            syntaxError();
+                        }
+                        else {
+                            String dsspFilenameGZ = args[i+1];
+                            File dsspFileGZ = new File(dsspFilenameGZ);                            
+                            File dsspFileUnpacked = null;
+                            try {
+                                // gunzip the file
+                                //String tmpDir = dsspFileGZ.getAbsoluteFile().getParent();
+                                String tmpDir = Settings.get("plcc_S_temp_dir");                                
+                                dsspFileUnpacked = IO.unGzip(dsspFileGZ, new File(tmpDir));
+                                deleteFilesOnExit.add(dsspFileUnpacked);
+                                dsspFile = dsspFileUnpacked.toString();
+                            }
+                            catch(Exception e) {
+                                System.err.println("ERROR: Could not extract input DSSP file in gz format at '" + dsspFilenameGZ + "'.");
+                                //System.err.println("ERROR: The message was '" + e.getMessage() + "'.");                                
+                                System.exit(1);
+                            }
+                        }
+                    }
+                    
+                    if(s.equals("--gz-pdbfile")) {
+                        if(args.length <= i+1 ) {
+                            syntaxError();
+                        }
+                        else {
+                            String pdbFilenameGZ = args[i+1];
+                            File pdbFileGZ = new File(pdbFilenameGZ);
+                            File pdbFileUnpacked = null;                                                        
+                            try {
+                                //String tmpDir = pdbFileGZ.getAbsoluteFile().getParent();
+                                String tmpDir = Settings.get("plcc_S_temp_dir");
+                                //System.out.println("sourcedir='" + sourceDir + "'");
+                                // gunzip the file
+                                pdbFileUnpacked = IO.unGzip(pdbFileGZ, new File(tmpDir));
+                                deleteFilesOnExit.add(pdbFileUnpacked);
+                                pdbFile = pdbFileUnpacked.toString();
+                            }
+                            catch(Exception e) {
+                                System.err.println("ERROR: Could not extract input PDB file in gz format at '" + pdbFilenameGZ + "'.");
+                                //System.err.println("ERROR: The message was '" + e.getMessage() + "'.");
+                                System.exit(1);
+                            }
                         }
                     }
 
@@ -340,6 +396,12 @@ public class Main {
                         Settings.set("plcc_B_folding_graphs", "true");
                     }
                     
+                    if(s.equals("-k") || s.equals("--img-dir-tree")) {
+                        Settings.set("plcc_B_output_images_dir_tree", "true");
+                    }
+                    
+                    
+                    
                     if(s.equals("-m") || s.equals("--image-format")) {
                         if(args.length <= i+1 ) {
                             syntaxError();
@@ -354,6 +416,14 @@ public class Main {
                             else if((format.equals("PNG"))) {
                                 Settings.set("plcc_S_img_output_format", "PNG");
                                 Settings.set("plcc_S_img_output_fileext", ".png");
+                            }
+                            else if((format.equals("JPG"))) {
+                                Settings.set("plcc_S_img_output_format", "JPG");
+                                Settings.set("plcc_S_img_output_fileext", ".jpg");
+                            }
+                            else if((format.equals("TIF"))) {
+                                Settings.set("plcc_S_img_output_format", "TIF");
+                                Settings.set("plcc_S_img_output_fileext", ".tif");
                             }
                             else {
                                 System.err.println("ERROR: Requested image output format '" + format + "' invalid. Use 'PNG' or 'SVG' for bitmap or vector output.");
@@ -831,6 +901,11 @@ public class Main {
             print_debug_malfunction_warning();            
         }
         
+        if(deleteFilesOnExit.size() > 0) {
+            System.out.print("Deleting " + deleteFilesOnExit.size() + " temporary files... ");
+            Integer numDel = IO.deleteFiles(deleteFilesOnExit);
+            System.out.print(numDel + " ok.\n");
+        }
         System.out.println("All done, exiting.");
         System.exit(0);
 
@@ -891,9 +966,16 @@ public class Main {
      */
     public static void drawPlccGraphFromDB(String g_pdbid, String g_chainid, String g_graphtype, String outputimg, Boolean drawFoldingGraphsAsWell) {
 
+        System.out.println("Retrieving " + g_graphtype + " graph for PDB entry " + g_pdbid + " chain " + g_chainid + " from DB.");
+        
         String graphString = null;
         try { graphString = DBManager.getGraph(g_pdbid, g_chainid, g_graphtype); }
-        catch (SQLException e) { System.err.println("ERROR: Drawing of graph from DB failed."); return; }
+        catch (SQLException e) { System.err.println("ERROR: SQL: Drawing of graph from DB failed."); return; }
+        
+        if(graphString == null) {
+            System.err.println("ERROR: No such graph in the database, exiting.");
+            System.exit(1);
+        }
         
         ProtGraph pg = ProtGraphs.fromPlccGraphFormatString(graphString);
         System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to file '" + outputimg + "'.");
@@ -1023,10 +1105,10 @@ public class Main {
         if(Settings.getBoolean("plcc_B_useDB")) {
             // Try to delete the protein from the DB in case it is already in there. This won't hurt if it is not.
             DBManager.deletePdbidFromDB(pdbid);
-            if(DBManager.writeProteinToDB(pdbid, md.get("title"), md.get("header"), md.get("keywords"), md.get("experiment"), res)) {
+            try {
+                DBManager.writeProteinToDB(pdbid, md.get("title"), md.get("header"), md.get("keywords"), md.get("experiment"), res);
                 System.out.println("  Info on protein '" + pdbid + "' written to DB.");
-            }
-            else {
+            }catch (Exception e) {
                 System.err.println("WARNING: Could not write info on protein '" + pdbid + "' to DB.");
             }
         }
@@ -1041,11 +1123,16 @@ public class Main {
             //pmi.print();
 
             if(Settings.getBoolean("plcc_B_useDB")) {
-                if(DBManager.writeChainToDB(c.getPdbChainID(), pdbid, pmi.getMolName(), pmi.getOrgScientific(), pmi.getOrgCommon())) {
-                    System.out.println("    Info on chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
+                try {
+                    if(DBManager.writeChainToDB(c.getPdbChainID(), pdbid, pmi.getMolName(), pmi.getOrgScientific(), pmi.getOrgCommon())) {
+                        System.out.println("    Info on chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
+                    }
+                    else {
+                        System.err.println("WARNING: Could not write info on chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' to DB.");
+                    }
                 }
-                else {
-                    System.err.println("WARNING: Could not write info on chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' to DB.");
+                catch(Exception e) {
+                    System.err.println("WARNING: DB: Could not reset DB connection.");
                 }
             }
 
@@ -1079,10 +1166,11 @@ public class Main {
                 allChainSSEs.get(j).setSseIDPtgl(getPtglSseIDForNum(j));
 
                 if(Settings.getBoolean("plcc_B_useDB")) {
-                    if(DBManager.writeSSEToDB(pdbid, c.getPdbChainID(), allChainSSEs.get(j).getStartDsspNum(), allChainSSEs.get(j).getEndDsspNum(), allChainSSEs.get(j).getStartPdbResID(), allChainSSEs.get(j).getEndPdbResID(), allChainSSEs.get(j).getAASequence(), allChainSSEs.get(j).getSSETypeInt(), allChainSSEs.get(j).getLigandName3())) {
-                        //System.out.println("  Info on SSE #" + (j + 1) + " of chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
+                    try {
+                       DBManager.writeSSEToDB(pdbid, c.getPdbChainID(), allChainSSEs.get(j).getStartDsspNum(), allChainSSEs.get(j).getEndDsspNum(), allChainSSEs.get(j).getStartPdbResID(), allChainSSEs.get(j).getEndPdbResID(), allChainSSEs.get(j).getAASequence(), allChainSSEs.get(j).getSSETypeInt(), allChainSSEs.get(j).getLigandName3()); 
+                       //System.out.println("  Info on SSE #" + (j + 1) + " of chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
                     }
-                    else {
+                    catch(Exception e) {
                         System.err.println("WARNING: Could not write info on SSE # " + j + " of chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' to DB.");
                     }
                 }
@@ -1110,9 +1198,12 @@ public class Main {
             if(Settings.getBoolean("plcc_B_graphtype_betalig")) { graphTypes.add("betalig"); }
             
             
-            String file = null;
+            String fileNameWithExtension = null;
+            String fileNameWithoutExtension = null;
+            String filePath = null;
             String imgFile = null;
             String plccGraphFile = null;
+            String fs = System.getProperty("file.separator");
 
 
             for(String gt : graphTypes) {
@@ -1139,11 +1230,37 @@ public class Main {
 
                 // draw the protein graph image
 
-                file = outputDir + System.getProperty("file.separator") + pdbid + "_" + c.getPdbChainID() + "_" + gt;
+                filePath = outputDir;
+                fileNameWithoutExtension = pdbid + "_" + c.getPdbChainID() + "_" + gt + "_PG";
+                fileNameWithExtension = fileNameWithoutExtension + Settings.get("plcc_S_img_output_fileext");
                 
                 //pg.toFile(file + ".ptg");
                 //pg.print();
-                imgFile = file + "_PG" + Settings.get("plcc_S_img_output_fileext");
+                
+                
+                // Create the file in a subdir tree based on the protein meta data if requested
+                if(Settings.getBoolean("plcc_B_output_images_dir_tree")) {
+                   
+                    if(! (pdbid.length() == 4)) {
+                        System.err.println("ERROR: PDB ID of length 4 required to output images in directory tree.");
+                        System.exit(1);
+                    }
+                    
+                    String mid2Chars = pdbid.substring(1, 3);                    
+                    String dirStructure = outputDir + fs + "vplg_graphs" + fs + mid2Chars + fs + pdbid;
+                    
+                    try {
+                        new File(dirStructure).mkdirs();
+                        filePath = dirStructure;    
+                    }catch(Exception e) {
+                        System.err.println("ERROR: Could not create required directory structure to output images under '" + outputDir + "', aborting.");
+                        System.err.println("ERROR: The error was '" + e.getMessage() + "'.");
+                        System.exit(1);
+                    }
+                }
+                
+                imgFile = filePath + fs + fileNameWithExtension;
+                
 
                 if(Settings.getBoolean("plcc_B_draw_graphs")) {
                     if(pg.drawProteinGraph(imgFile, false)) {
@@ -1151,7 +1268,7 @@ public class Main {
                     }
 
                     // write the SSE info text file for the image (plcc graph format file)
-                    plccGraphFile = file + "_PG" + ".plg";
+                    plccGraphFile = filePath + fs + fileNameWithoutExtension + ".plg";
                     if(writeStringToFile(plccGraphFile, (pg.toPlccGraphFormatString()))) {
                         System.out.println("      Plcc format graph file written to '" + plccGraphFile + "'.");
                     } else {
@@ -1189,9 +1306,12 @@ public class Main {
                 //ArrayList<Set<Integer>> mcs = pg.getMaximalCliques();
                 //for(Set s : mcs) {
                 //    System.out.println("  Found maximal clique of size " + s.size() + ".");
-                //}                                                        
+                //}            
+                
             }
-        }        
+            System.out.println("  +++++ All " + graphTypes.size() + " protein graphs of chain " + c.getPdbChainID() + " handled. +++++");
+        }
+        System.out.println("All " + allChains.size() + " chains done.");
     }
     
     
@@ -2790,17 +2910,20 @@ public class Main {
         System.out.println("-c | --dont-calc-graphs    : do not calculate SSEs contact graphs, stop after residue level contact computation");
         System.out.println("-D | --debug <level>       : set debug level (0: off, 1: normal debug output. >=2: detailed debug output)  [DEBUG]");
         System.out.println("-d | --dsspfile <dsspfile> : use input DSSP file <dsspfile> (instead of assuming '<pdbid>.dssp')");
+        System.out.println("     --gz-dsspfile <f>     : use gzipped input DSSP file <f>.");
         System.out.println("-e | --force-chain <c>     : only handle the chain with chain ID <c>.");
         System.out.println("-f | --folding-graphs      : also handle foldings graphs (connected components of the protein graph)");
         System.out.println("-g | --sse-graphtypes <l>  : compute only the SSE graphs in list <l>, e.g. 'abcdef' = alpha, beta, alhpabeta, alphalig, betalig and alphabetalig.");
         System.out.println("-h | --help                : show this help message and exit");
         System.out.println("-i | --ignoreligands       : ignore ligand contacts in geom_neo format output files [DEBUG]");
         System.out.println("-j | --ddb <p> <c> <gt> <f>: get the graph type <gt> of chain <c> of pdbid <p> from the DB and draw it to file <f> (omit the file extension)*");
+        System.out.println("-k | --img-dir-tree        : do write the output images to a sudbir tree of the output dir instead of directly in there");
         System.out.println("-l | --draw-plcc-graph <f> : read graph in plcc format from file <f> and draw it to <f>.png, then exit (<pdbid> will be ignored)*");        
         System.out.println("-n | --textfiles           : write meta data, debug info and interim results like residue contacts to text files (slower)");
         System.out.println("-m | --image-format <f>    : write output images in format <f>, which can be 'PNG' for PNG bitmap format or 'SVG' for SVG vector format.");
         System.out.println("-o | --outputdir <dir>     : write output files to directory <dir> (instead of '.', the current directory)");
         System.out.println("-p | --pdbfile <pdbfile>   : use input PDB file <pdbfile> (instead of assuming '<pdbid>.pdb')");
+        System.out.println("     --gz-pdbfile <f>      : use gzipped input PDB file <f>.");
         System.out.println("-q | --fg-notations <list> : draw only the folding graph notations in <list>, e.g. 'kars' = KEY, ADJ, RED and SEQ.");
         System.out.println("-r | --recreate-tables     : drop and recreate DB statistics tables, then exit (see -u)*");
         System.out.println("-s | --showonscreen        : show an overview of the residue contact results on STDOUT during compuation  [DEBUG]");

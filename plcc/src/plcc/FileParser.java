@@ -1571,7 +1571,7 @@ public class FileParser {
         String mol_id = pmi.setYourMolID(pdbLines);
 
         if(pmi.isReady()) {
-            System.out.println("    Extracted MOL_ID '" + mol_id + "' for chain '" + chainid + "' from PDB header.");
+            //System.out.println("    Extracted MOL_ID '" + mol_id + "' for chain '" + chainid + "' from PDB header.");
             if(pmi.getAllMetaData(pdbLines)) {
                 System.out.println("    Retrieved all meta data for chain '" + chainid + "' from PDB header.");
             }

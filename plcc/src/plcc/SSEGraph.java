@@ -15,6 +15,7 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
@@ -33,6 +34,8 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
 
+import org.apache.batik.apps.rasterizer.DestinationType;
+import org.apache.batik.apps.rasterizer.SVGConverter;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.transcoder.image.PNGTranscoder;
@@ -371,6 +374,8 @@ public abstract class SSEGraph {
      */
     public Integer drawLegend(SVGGraphics2D ig2, Position2D startPos, PageLayout pl) {
         
+        Boolean drawAll = Settings.getBoolean("plcc_B_graphimg_legend_always_all");
+        
         // prepare stuff
         ig2.setFont(pl.getLegendFont());
         FontMetrics fontMetrics = ig2.getFontMetrics();
@@ -384,70 +389,98 @@ public abstract class SSEGraph {
         String label;
         
         // Edges label
-        label = "[Edges: ";
-        ig2.setPaint(Color.BLACK);
-        ig2.drawString(label, pixelPosX, startPos.y);
-        pixelPosX += fontMetrics.stringWidth(label) + spacer;        
+        if(this.numEdges() > 0) {
+            label = "[Edges: ";
+            ig2.setPaint(Color.BLACK);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;        
+        }
         
         // now go through relative orientation texts and colors        
-        label = "parallel";
-        ig2.setPaint(Color.RED);
-        ig2.drawString(label, pixelPosX, startPos.y);
-        pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        if(this.containsContactTypeParallel() || drawAll) {
+            label = "parallel";
+            ig2.setPaint(Color.RED);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
         
-        label = "antiparallel";
-        ig2.setPaint(Color.BLUE);
-        ig2.drawString(label, pixelPosX, startPos.y);
-        pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        if(this.containsContactTypeAntiparallel() || drawAll) {
+            label = "antiparallel";
+            ig2.setPaint(Color.BLUE);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
         
-        label = "mixed";
-        ig2.setPaint(Color.GREEN);
-        ig2.drawString(label, pixelPosX, startPos.y);
-        pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        if(this.containsContactTypeMixed() || drawAll) {
+            label = "mixed";
+            ig2.setPaint(Color.GREEN);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
         
-        label = "ligand";
-        ig2.setPaint(Color.MAGENTA);
-        ig2.drawString(label, pixelPosX, startPos.y);
-        pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        if(this.containsContactTypeLigand() || drawAll) {
+            label = "ligand";
+            ig2.setPaint(Color.MAGENTA);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
                
+        // End of edges label
+        if(this.numEdges() > 0) {
+            label = "]";
+            ig2.setPaint(Color.BLACK);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
         
         // Vertices label
-        label = "]   [Vertices: ";
-        ig2.setPaint(Color.BLACK);
-        ig2.drawString(label, pixelPosX, startPos.y);
-        pixelPosX += fontMetrics.stringWidth(label) + spacer;        
-
+        if(this.numVertices() > 0) {
+            label = " [Vertices: ";
+            ig2.setPaint(Color.BLACK);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;        
+        }
         
-        // ok, now draw the SSE symbols                   
-        this.drawSymbolAlphaHelix(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
-        pixelPosX += vertWidth + spacer;
-        label = "helix";
-        ig2.drawString(label, pixelPosX, startPos.y);
-        pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        // ok, now draw the SSE symbols     
+        if(this.containsSSETypeHelix() || drawAll) {
+            this.drawSymbolAlphaHelix(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+            pixelPosX += vertWidth + spacer;
+            label = "helix";
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
         
-        this.drawSymbolBetaStrand(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
-        pixelPosX += vertWidth + spacer;
-        label = "strand";
-        ig2.drawString(label, pixelPosX, startPos.y);
-        pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        if(this.containsSSETypeBetaStrand() || drawAll) {
+            this.drawSymbolBetaStrand(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+            pixelPosX += vertWidth + spacer;
+            label = "strand";
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
         
-        this.drawSymbolLigand(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
-        pixelPosX += vertWidth + spacer;
-        label = "ligand";
-        ig2.drawString(label, pixelPosX, startPos.y);
-        pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        if(this.containsSSETypeLigand() || drawAll) {
+            this.drawSymbolLigand(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+            pixelPosX += vertWidth + spacer;
+            label = "ligand";
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
         
-        this.drawSymbolOtherSSE(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
-        pixelPosX += vertWidth + spacer;
-        label = "other";
-        ig2.drawString(label, pixelPosX, startPos.y);
-        pixelPosX += fontMetrics.stringWidth(label) + spacer;        
+        if(this.containsSSETypeOther() || drawAll) {
+            this.drawSymbolOtherSSE(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+            pixelPosX += vertWidth + spacer;
+            label = "other";
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;        
+        }
         
         // end label
-        label = "]";
-        ig2.setPaint(Color.BLACK);
-        ig2.drawString(label, pixelPosX, startPos.y);
-        pixelPosX += fontMetrics.stringWidth(label) + spacer;    
+        if(this.numVertices() > 0) {
+            label = "]";
+            ig2.setPaint(Color.BLACK);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;    
+        }
         
         return(pixelPosX);
     }
@@ -1823,6 +1856,7 @@ public abstract class SSEGraph {
                 Document document = domImpl.createDocument(svgNS, "svg", null);
                 // Create an instance of the SVG Generator.
                 ig2 = new SVGGraphics2D(document);
+                //ig2.getRoot(document.getDocumentElement());
            // }
             //else {
             //    ig2 = (SVGGraphics2D)bi.createGraphics();
@@ -1991,14 +2025,58 @@ public abstract class SSEGraph {
             
             // all done, write the image to disk
             //if(Settings.get("plcc_S_img_output_format").equals("SVG")) {
-                ig2.stream(new FileWriter(filePath),false);                
-            //}
-                
+            
+            //boolean useCSS = true;
+            //FileOutputStream fos = new FileOutputStream(new File("/tmp/mySVG.svg"));
+            //Writer out = new OutputStreamWriter(fos, "UTF-8");
+            //ig2.stream(out, useCSS); 
+            
+            Rectangle2D aoi = new Rectangle2D.Double(0, 0, pl.getPageWidth(), pl.getPageHeight());
+            
+            String svgFilePath;
+            if(Settings.get("plcc_S_img_output_format").equals("SVG")) {
+                svgFilePath = filePath;
+                ig2.stream(new FileWriter(filePath), false);                
+            }
+            else {
+                // hax!
+                Integer fileExtLength = Settings.get("plcc_S_img_output_fileext").length();     // already includes the dot
+                Integer pathLength = filePath.length();
+                svgFilePath = filePath.substring(0, pathLength - fileExtLength + 1);
+                ig2.stream(new FileWriter(svgFilePath), false);                
+            }
+            
             if(Settings.get("plcc_S_img_output_format").equals("PNG")) {
-                //ig2.drawImage(bi, null, 0, 0);  // Test
-                //PNGTranscoder tc = new PNGTranscoder();
-                //ImageIO.write(tc., "PNG", new File(filePath));
-                IO.convertSVGtoPNG(filePath, filePath + ".png", 0, 0, pl.getPageWidth(), pl.getPageHeight());
+                SVGConverter svgConverter = new SVGConverter();
+                svgConverter.setArea(aoi);
+                svgConverter.setWidth(pl.getPageWidth());
+                svgConverter.setHeight(pl.getPageHeight());
+                svgConverter.setDestinationType(DestinationType.PNG);
+                svgConverter.setSources(new String[]{svgFilePath});
+                svgConverter.setDst(new File(filePath));
+                svgConverter.execute();
+            }
+            
+            if(Settings.get("plcc_S_img_output_format").equals("JPG")) {
+                SVGConverter svgConverter = new SVGConverter();
+                svgConverter.setArea(aoi);
+                svgConverter.setWidth(pl.getPageWidth());
+                svgConverter.setHeight(pl.getPageHeight());
+                svgConverter.setDestinationType(DestinationType.JPEG);
+                svgConverter.setSources(new String[]{svgFilePath});
+                svgConverter.setDst(new File(filePath));
+                svgConverter.execute();
+            }
+            
+            if(Settings.get("plcc_S_img_output_format").equals("TIF")) {
+                SVGConverter svgConverter = new SVGConverter();
+                svgConverter.setArea(aoi);
+                svgConverter.setWidth(pl.getPageWidth());
+                svgConverter.setHeight(pl.getPageHeight());
+                svgConverter.setDestinationType(DestinationType.TIFF);
+                svgConverter.setSources(new String[]{svgFilePath});
+                svgConverter.setDst(new File(filePath));
+                svgConverter.execute();
             }
             
             

@@ -149,12 +149,16 @@ public class Settings {
         defSet("plcc_B_graphimg_header", "true", "Determines whether the graph images contain a header line with info on the graph type, PDBID and chain.");        
         defSet("plcc_B_graphimg_footer", "true", "Determines whether the graph images contain a footer line with info on the SSEs.");        
         defSet("plcc_B_graphimg_legend", "true", "Determines whether the graph images contain a legend that explains the color codes and SSE symbols. This is part of the footer.");        
+        defSet("plcc_B_graphimg_legend_always_all", "false", "Determines whether the legend contains all possible edge and vertex types, i.e., even those not occurring in the current image.");        
         defSet("plcc_I_min_fgraph_size_draw", "2", "The minimum size a folding graph must have in order to be drawn. Settings this to 1 or 0 draws all of them, including isolated vertices.");
         defSet("plcc_B_ptgl_text_output", "false", "Whether the PTGL text files (e.g., those required by the bet_neo) are written. Not writing them is faster but this program cannot replace the PTGL tool 'geom_neo' anymore if this is deactivated.");
         defSet("plcc_B_ptgl_geodat_output", "false", "Whether the PTGL text files geo.dat for SSE level contacts is written to a text file.");
         defSet("plcc_B_ramachandran_plot", "false", "Whether a Ramachandran plot is drawn to a file for each chain (slower).");
         defSet("plcc_B_strict_ptgl_behaviour", "true", "Whether plcc should try to strictly mimick the PTGL, including questionable stuff.");
         
+        defSet("plcc_B_output_images_dir_tree", "false", "Whether to write output images to a sub directory structure under the output directory instead of writing them in their directly. This is useful if you want to process the whole PDB because most filesystems will get into trouble with tens of thousands of files in a single directory. The directory structure will be chosen from the meta data, i.e., PDB ID, chain, graph type, etc.");
+        
+        defSet("plcc_S_temp_dir", ".", "The directory where temporary files can be created. You need write access to it, of course.");
         
         defSet("plcc_S_img_output_format", "SVG", "image output format (valid options: 'PNG', 'SVG')");
         defSet("plcc_S_img_output_fileext", ".svg", "file extension of output images (should fit plcc_S_img_output_format more or less, e.g. '.png', '.svg')");

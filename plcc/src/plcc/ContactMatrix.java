@@ -1017,6 +1017,8 @@ public class ContactMatrix {
 
     /**
      * Returns the graph vertex label of the SSE at position ssePos in the sseList.
+     * @param ssePos the index of the SSE
+     * @return the string representation of the SSE
      */
     private String vertexNameSsePos(Integer ssePos) {
         return(this.sseList.get(ssePos).shortStringRep());
@@ -1030,7 +1032,11 @@ public class ContactMatrix {
         for(Integer i = 0; i < this.sseList.size(); i++) {
             for(Integer j = i + 1; j < this.sseList.size(); j++) {
                 if(this.sseContactExistsPos(i, j)) {
-                    DBManager.writeContactToDB(this.pdbid, this.handleChain, sseList.get(i).getStartDsspNum(), sseList.get(j).getStartDsspNum(), spatialSSE[i][j]);
+                    try {
+                        DBManager.writeContactToDB(this.pdbid, this.handleChain, sseList.get(i).getStartDsspNum(), sseList.get(j).getStartDsspNum(), spatialSSE[i][j]);
+                    } catch(Exception e) {
+                        System.err.println("WARNING: DB: Could not reset DB state after inserting contact data.");
+                    }                    
                 }
             }
         }
