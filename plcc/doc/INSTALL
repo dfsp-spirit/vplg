@@ -1,0 +1,24 @@
+How to install VPLG
+===================
+
+
+Make sure you have Java >= 1.6 installed (the JRE will do, you do not need the SDK). You can run 'java -version' if
+in doubt. 
+
+
+After unpacking the release archive, all tools can be run directly from the resulting directory structure. 
+
+
+   cd downloads/
+   unzip vplg-<version>.zip
+
+   cd vplg/
+   java -jar plcc.jar
+  
+
+Note that the programs require the libraries in the lib/, relative to their path. So if you copy them elsewhere, you
+gotta copy the lib/ directory there as well.
+
+
+See the README_* files for more detailed instructions on how to install and use the tools.
+
