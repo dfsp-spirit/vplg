@@ -11,13 +11,14 @@ package splitpdb;
 
 //import java.util.*;
 import java.io.*;
+import java.util.zip.GZIPInputStream;
 
 /**
  *
  * The 'splitpdb' program parses a file in PDB (RCSB Protein Data Bank) format and
  * extracts various meta data on the protein from it. If the file describes a single
  * model (i.e., is X-Ray crystallography data), the output file is the input file.
- * If the inpput file contains multiple models, i.e., is NMR data, splitpdb
+ * If the input file contains multiple models, i.e., is NMR data, splitpdb
  * splits the file, extracting general data (not related to models) and all the
  * data on a certain model (usually the 1st) from it
  * and discarding the rest (all data related to other models). The input PDB file is
@@ -37,9 +38,12 @@ public class Main {
 
         String handleModelID = "1";
         String pdbSource = null;
-        String pdbTarget = null;
+        String pdbTargetFileName = null;
         Boolean allowOverwrite = false;
         Boolean requestedModelFound = true;             // only used if a model is explicitely specified (-m)
+        Boolean zippedInputFile = false;
+        Boolean zipOutput = false;
+        Integer debug = 0;  // debug level, higher value means more output
 
         // TODO: parse command line arguments here
         // ****************************************** parse command line args ******************************************
@@ -52,7 +56,7 @@ public class Main {
 
             // get PDB input file from first arg
             pdbSource = args[0];
-            pdbTarget = pdbSource + ".split";
+            pdbTargetFileName = pdbSource + ".split";
 
             // parse the rest of the arguments, if any
             if(args.length > 1) {
@@ -69,13 +73,34 @@ public class Main {
                     if(s.equals("-a") || s.equals("--allow-overwrite")) {
                         allowOverwrite = true;
                     }
+                    
+                    if(s.equals("-x") || s.equals("--zipped-input")) {
+                        zippedInputFile = true;
+                    }
+                    
+                    if(s.equals("-z") || s.equals("--zip-output")) {
+                        zipOutput = true;
+                    }                    
 
                     if(s.equals("-o") || s.equals("--outfile")) {
                         if(args.length <= i+1 ) {
                             syntaxError();
                         }
                         else {
-                            pdbTarget = args[i+1];
+                            pdbTargetFileName = args[i+1];
+                        }
+                    }
+                    
+                    if(s.equals("-d") || s.equals("--debug")) {
+                        if(args.length <= i+1 ) {
+                            syntaxError();
+                        }
+                        else {
+                            try {
+                                debug = Integer.valueOf(args[i+1]);
+                            } catch(Exception e) {
+                                syntaxError();
+                            }
                         }
                     }
 
@@ -105,6 +130,7 @@ public class Main {
 
         // ****************************************** check and open files ******************************************
 
+        String pdbTargetGzArchiveName = pdbTargetFileName + ".gz";
         // Check whether input file exists and is readable
         File pdbSourceFile = new File(pdbSource);
         if( ! (pdbSourceFile.isFile() && pdbSourceFile.canRead()) ) {
@@ -113,13 +139,22 @@ public class Main {
         }
 
         // check whether output file exists
-        File pdbTargetFile = new File(pdbTarget);
+        File pdbTargetFile;
+        
+        if(zipOutput) {
+            pdbTargetFile = new File(pdbTargetGzArchiveName);
+        }
+        else {
+            pdbTargetFile = new File(pdbTargetFileName);
+        }
+        
+        
         if( pdbTargetFile.exists() ) {
             if(allowOverwrite) {
-                System.out.println(apptag + "  Target file '" + pdbTarget + "' exists, overwriting as requested.");
+                System.out.println(apptag + "  Target file '" + pdbTargetFile.getAbsolutePath() + "' exists, overwriting as requested.");
             }
             else {
-                System.err.println(apptag + "ERROR: Target file '" + pdbTarget + "' exists, exiting (use -a to allow overwriting).");
+                System.err.println(apptag + "ERROR: Target file '" + pdbTargetFile.getAbsolutePath() + "' exists, exiting (use -a to allow overwriting).");
                 System.exit(1);
             }
         }
@@ -132,23 +167,42 @@ public class Main {
         // Open file readers for the input and output files
         BufferedReader reader = null;
         BufferedWriter writer = null;
-        try {
-            reader = new BufferedReader(new FileReader(pdbSourceFile));
-        } catch(Exception e) {
-            System.err.println(apptag + "ERROR: Could not open reader for file '" + pdbSource + "', exiting.");
-            System.exit(1);
+        String outputString = "";
+        
+        
+        if(zippedInputFile) {
+            try {
+                reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(pdbSourceFile) ) ) );
+            } catch(Exception e) {
+                System.err.println(apptag + "ERROR: Could not open gz reader for gzipped text file '" + pdbSource + "', exiting.");
+                System.exit(1);
+            }
         }
+        else {
+            try {
+                reader = new BufferedReader(new FileReader(pdbSourceFile));
+            } catch(Exception e) {
+                System.err.println(apptag + "ERROR: Could not open reader for text file '" + pdbSource + "', exiting.");
+                System.exit(1);
+            }            
+        }
+        
 
         System.out.println(apptag + "  Input PDB file '" + pdbSource + "' opened successfully.");
 
-        try {
-            writer = new BufferedWriter(new FileWriter(pdbTargetFile));
-        } catch(Exception e) {
-            System.err.println(apptag + "ERROR: Could not open writer for file '" + pdbTarget + "', exiting.");
-            System.exit(1);
-        }
+        
+        if(! zipOutput) {
+            try {
+                writer = new BufferedWriter(new FileWriter(pdbTargetFile));
+            } catch(Exception e) {
+                System.err.println(apptag + "ERROR: Could not open writer for file '" + pdbTargetFileName + "', exiting.");
+                System.exit(1);
+            }
 
-        System.out.println(apptag + "  Output PDB file '" + pdbTarget + "' opened successfully.");
+            System.out.println(apptag + "  Output PDB file '" + pdbTargetFileName + "' opened successfully.");
+        }
+        
+        
         System.out.println(apptag + "Parsing...");
 
         
@@ -174,6 +228,7 @@ public class Main {
             while ((line = reader.readLine()) != null) {
                 lineNum++;
 
+                // The NUMMDL record indicates total number of models in a PDB entry.
                 if(line.startsWith("NUMMDL")) {
                     try {
                         numModelsReported = Integer.valueOf(line.substring(10, 12).trim());
@@ -184,16 +239,21 @@ public class Main {
                     }
                     continue;       // Don't write the NUMMDL line
                 }
+                // REMARK RESOLUTION holds the resolution of the file. Not all files have this.
                 else if(line.startsWith("REMARK   2 RESOLUTION.")) {
                     resolutionLine = line.trim();
                     resolution = getResFromREMARK2Line(resolutionLine);
                 }
+                // marks the end of the current model
                 else if(line.startsWith("ENDMDL")) {
                     // We hit the end of the current model so we are not in any model atm. Obviously, we can't be in the wrong model then. ;)
-                    System.out.println(apptag + "    Found end of model '" + curModelID + "' in line " + lineNum + ".");
+                    if(debug > 0) {
+                        System.out.println(apptag + "    Found end of model '" + curModelID + "' in line " + lineNum + ".");
+                    }
                     inIncorrectModel = false;
                     continue;       // Don't write the ENDMDL line
                 }
+                // a new model starts here
                 else if (line.startsWith("MODEL")) {
                     containsModels = true;
                     numModels++;
@@ -203,7 +263,9 @@ public class Main {
                         System.err.println(apptag + "WARNING: Found MODEL record with empty model ID in line " + lineNum + ".");
                     }
                     else {
-                        System.out.println(apptag + "  #" + numModels + ": Found MODEL with model ID '" + curModelID + "' in line " + lineNum + ".");
+                        if(debug > 0) {
+                            System.out.println(apptag + "  #" + numModels + ": Found MODEL with model ID '" + curModelID + "' in line " + lineNum + ".");
+                        }
                     }
 
                     // Check whether this is the model we are interested in
@@ -224,8 +286,13 @@ public class Main {
                 //  to the new file. Note that we copy all the model-independent lines (e.g., all the header lines etc) to the output file.
 
                 if( ! inIncorrectModel) {
-                    writer.write(line);
-                    writer.newLine();   // Write system dependent end of line.
+                    if(zipOutput) {
+                        outputString += line + "\n";
+                    }
+                    else {
+                        writer.write(line);
+                        writer.newLine();   // Write system dependent end of line.
+                    }                    
                     numLinesWritten++;
                 }
                 
@@ -249,14 +316,27 @@ public class Main {
             System.err.println(apptag + "WARNING: Could not close file reader for input file.");
         }
 
-        // close writer to flush the buffer
-        try {
-            writer.flush();
-            writer.close();
-        } catch (Exception e) {
-            System.err.println(apptag + "ERROR: Could not close file writer for output file. Buffers may not have been flushed, output file may be incomplete.");
-            System.exit(1);
+        if(zipOutput) {
+            // close writer to flush the buffer            
+            if(IO.writeStringToZippedTextFile(outputString, new File(pdbTargetGzArchiveName), pdbTargetFileName)) {
+                System.out.println(apptag + "Wrote gzipped output PDB file to archive'" + pdbTargetGzArchiveName + "', file name in archive is '" + pdbTargetFileName + "'.");
+            }
+            else {
+                System.err.println(apptag + "ERROR: Could not write gzipped PDB output file to '" + pdbTargetGzArchiveName + "'.");
+            }
+            pdbTargetFileName = pdbTargetGzArchiveName;    // makes sure the output at the end has the correct output file name
         }
+        else {
+            // close writer to flush the buffer
+            try {
+                writer.flush();
+                writer.close();
+            } catch (Exception e) {
+                System.err.println(apptag + "ERROR: Could not close file writer for output file. Buffers may not have been flushed, output file may be incomplete.");
+                System.exit(1);
+            }            
+        }
+        
 
         // We're done.
         System.out.println(apptag + "Parsed " + lineNum + " lines in input file, wrote " + numLinesWritten + " of them to output file.");
@@ -275,32 +355,37 @@ public class Main {
 
         if(! containsModels) {
             System.out.println(apptag + "Input PDB file does not contain any models, output file is the input file.");
-            System.out.println(apptag + "All done, output file written to '" + pdbTarget + "'. Exiting.");
+            System.out.println(apptag + "All done, output file written to '" + pdbTargetFileName + "'. Exiting.");
             System.exit(2);
         }
 
-        System.out.println(apptag + "All done, output file with information on model '" + handleModelID + "' written to '" + pdbTarget + "'. Exiting.");
+        System.out.println(apptag + "All done, output file with information on model '" + handleModelID + "' written to '" + pdbTargetFileName + "'. Exiting.");
         System.exit(0);
     }
 
     
     /**
-     * Prints usage info to stdout.
+     * Prints usage info to STDOUT.
      */
     public static void usage() {
-        System.out.println(apptag + "This program is part of VPLG. Copyright Tim Schaefer 2012.");
+        System.out.println(apptag + "This program is part of VPLG, http://vplg.sourceforge.net. Copyright Tim Schaefer 2012.");
+        System.out.println(apptag + "VPLG is free software and comes without any warranty. See LICENSE for details.");
         System.out.println(apptag + "");
         System.out.println(apptag + "USAGE: java -jar splitpdb.jar <infile> [OPTIONS]");
         System.out.println(apptag + "       java -jar splitpdb.jar --help");
         System.out.println(apptag + "valid OPTIONS are: ");
-        System.out.println(apptag + "-h | --help              : show this help message and exit");
-        System.out.println(apptag + "-a | --allow-overwrite   : overwrite the output file if it exists");
-        System.out.println(apptag + "-o | --outfile <file>    : write output pdb file to <file> (instead of '<infile>.split')");
-        System.out.println(apptag + "-m | --model   <mid>     : extract data on model with id <mid> (instead of model 1)");
+        System.out.println(apptag + "-h | --help              : show this help message and exit.");
+        System.out.println(apptag + "-a | --allow-overwrite   : overwrite the output file if it exists.");
+        System.out.println(apptag + "-d | --debug <level>     : set debug level to <level>, which has to be an integer.");
+        System.out.println(apptag + "-o | --outfile <ofile>   : write output pdb file to <ofile> (instead of '<infile>.split').");
+        System.out.println(apptag + "-m | --model   <mid>     : extract data on model with id <mid> (instead of model 1).");
+        System.out.println(apptag + "-x | --zipped-input      : assume that the input PDB file is in zipped format and has to be extracted.");        
+        System.out.println(apptag + "-z | --zip-output        : write the output file in zipped format (archive will be named <ofile>.gz).");
         System.out.println(apptag + "");
         System.out.println(apptag + "EXAMPLES: java -jar splitpdb.jar 1blr.pdb -a");
         System.out.println(apptag + "          java -jar splitpdb.jar 1blr.pdb -o /tmp/1st_mdl/1blr.pdb");
         System.out.println(apptag + "          java -jar splitpdb.jar 1blr.pdb --model 8 -o 1blr_M8.pdb");
+        System.out.println(apptag + "          java -jar splitpdb.jar pdb1blr.ent.gz -x -z -o 1blr_M1.pdb");        
         System.out.println(apptag + "");
         System.out.println(apptag + "REQUIRED INPUT FILES: This program obviously requires the PDB file <infile>.");
         System.out.println(apptag + "");
@@ -318,10 +403,14 @@ public class Main {
         System.err.println(apptag + "ERROR: Invalid command line. Use '-h' or --help' for info on how to run this program.");
         System.exit(1);
     }
+    
+    
 
     /**
      * Parses the 'REMARK 2 RESOLUTION' record of a PDB file and returns the resolution in Angstroem, or -1.0 if it is 'NOT APPLICABLE' or could not be determined.
      * Lines may look like this 'REMARK   2 RESOLUTION.    2.24 ANGSTROMS.' or this 'REMARK   2 RESOLUTION. NOT APPLICABLE.'
+     * @param l the line to parse
+     * @return the resolution
      */
     public static Double getResFromREMARK2Line(String l) {
         Double res = -1.0;
