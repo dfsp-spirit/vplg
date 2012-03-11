@@ -84,7 +84,7 @@ public class Main {
     //  Main.calculateAllContacts().
     static Integer globalMaxSeqNeighborResDist;
     
-    static final String version = "0.51";
+    static final String version = "0.52";
     
     static ArrayList<File> deleteFilesOnExit;
 
@@ -275,6 +275,36 @@ public class Main {
                         }
                         else {
                             pdbFile = args[i+1];
+                        }
+                    }
+                    
+                    
+                    if(s.equals("-v") || s.equals("--del-db-protein")) {
+                        if(args.length <= i+1 ) {
+                            syntaxError();
+                        }
+                        else {
+                            String pdbidToDelete = args[i+1];
+                            Integer numRows = 0;
+                            System.out.println("Deleting protein with PDB identifier '" + pdbidToDelete + "' from database...");
+                            
+                            if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"))) {
+                                try {
+                                    
+                                    numRows = DBManager.deletePdbidFromDB(pdbidToDelete);
+                                } catch(Exception e) {
+                                    System.err.println("ERROR: Deleting protein failed: '" + e.getMessage() + "'. Exiting.");
+                                    System.exit(1);
+                                }
+                            }
+                                                        
+                            if(numRows > 0) {
+                                System.out.println("Protein deleted from database, " + numRows + " rows affected. Exiting.");
+                            }
+                            else {
+                                System.out.println("Protein was not in the database, " + numRows + " rows affected. Exiting.");
+                            }
+                            System.exit(0);
                         }
                     }
                     
@@ -2890,7 +2920,8 @@ public class Main {
      * Prints a short note on how to use this program to STDOUT. Called if the user runs the program without command line arguments (most likely because he does not know about them).
      */
     public static void usage_short() {
-        System.out.println("Copyright Tim Schaefer -- http://www.bioinformatik.uni-frankfurt.de");
+        System.out.println("This program is part of VPLG, http://vplg.sourceforge.net. Copyright Tim Schaefer 2012.");
+        System.out.println("VPLG is free software and comes without any warranty. See LICENSE for details.");        
         System.out.println("USAGE:         java -jar plcc.jar <pdbid> [OPTIONS]");
         System.out.println("DETAILED HELP: java -jar plcc.jar --help");
     }
@@ -2900,8 +2931,6 @@ public class Main {
      * Prints detailed usage info to STDOUT.
      */
     public static void usage() {
-        System.out.println("Copyright Tim Schaefer -- http://www.bioinformatik.uni-frankfurt.de");
-        System.out.println("");
         System.out.println("USAGE: java -jar plcc.jar <pdbid> [OPTIONS]");
         System.out.println("       java -jar plcc.jar --help");
         System.out.println("valid OPTIONS are: ");
@@ -2918,9 +2947,9 @@ public class Main {
         System.out.println("-i | --ignoreligands       : ignore ligand contacts in geom_neo format output files [DEBUG]");
         System.out.println("-j | --ddb <p> <c> <gt> <f>: get the graph type <gt> of chain <c> of pdbid <p> from the DB and draw it to file <f> (omit the file extension)*");
         System.out.println("-k | --img-dir-tree        : do write the output images to a sudbir tree of the output dir instead of directly in there");
-        System.out.println("-l | --draw-plcc-graph <f> : read graph in plcc format from file <f> and draw it to <f>.png, then exit (<pdbid> will be ignored)*");        
-        System.out.println("-n | --textfiles           : write meta data, debug info and interim results like residue contacts to text files (slower)");
+        System.out.println("-l | --draw-plcc-graph <f> : read graph in plcc format from file <f> and draw it to <f>.png, then exit (<pdbid> will be ignored)*");                
         System.out.println("-m | --image-format <f>    : write output images in format <f>, which can be 'PNG' for PNG bitmap format or 'SVG' for SVG vector format.");
+        System.out.println("-n | --textfiles           : write meta data, debug info and interim results like residue contacts to text files (slower)");
         System.out.println("-o | --outputdir <dir>     : write output files to directory <dir> (instead of '.', the current directory)");
         System.out.println("-p | --pdbfile <pdbfile>   : use input PDB file <pdbfile> (instead of assuming '<pdbid>.pdb')");
         System.out.println("     --gz-pdbfile <f>      : use gzipped input PDB file <f>.");
@@ -2929,6 +2958,7 @@ public class Main {
         System.out.println("-s | --showonscreen        : show an overview of the residue contact results on STDOUT during compuation  [DEBUG]");
         System.out.println("-t | --draw-tgf-graph <f>  : read graph in TGF format from file <f> and draw it to <f>.png, then exit (pdbid will be ignored)*");
         System.out.println("-u | --use-database        : write SSE contact data to database [requires DB credentials in cfg file]");                       
+        System.out.println("-v | --del-db-protein <p>  : delete the protein chain with PDBID <p> from the database [requires DB credentials in cfg file]");
         System.out.println("-w | --dont-write-images   : do not draw the SSE graphs and write them to image files [DEBUG]");                             
         System.out.println("-x | --check-rescts <f>    : compare the computed residue level contacts to those in geom_neo format file <f> and print differences");
         System.out.println("-X | --check-ssects <f>    : compare the computed SSE level contacts to those in bet_neo format file <f> and print differences");

@@ -376,7 +376,7 @@ public class DBManager {
             // create views
             //doInsertQuery("CREATE VIEW " + view_ssecontacts + " as select contact_id, least(sse1_type, sse2_type) sse1_type, greatest(sse1_type, sse2_type) sse2_type from (select k.contact_id, sse1.sse_type as sse1_type, sse2.sse_type as sse2_type from plcc_contact k left join plcc_sse sse1 on k.sse1=sse1.sse_id left join plcc_sse sse2 on k.sse2=sse2.sse_id) foo;");
             doInsertQuery("CREATE VIEW " + view_ssecontacts + " AS SELECT contact_id, least(sse1_type, sse2_type) sse1_type, greatest(sse1_type, sse2_type) sse2_type, sse1_lig_name, sse2_lig_name  FROM (SELECT k.contact_id, sse1.sse_type AS sse1_type, sse2.sse_type AS sse2_type, sse1.lig_name AS sse1_lig_name, sse2.lig_name AS sse2_lig_name FROM " + tbl_contact + " k LEFT JOIN " + tbl_sse + " sse1 ON k.sse1=sse1.sse_id LEFT JOIN " + tbl_sse + " sse2 ON k.sse2=sse2.sse_id) foo;");
-            doInsertQuery("CREATE VIEW " + view_graphs + " AS SELECT graph_id, pdb_id, chain_name, graph_type, graph_string FROM (SELECT k.graph_id, k.graph_type, k.graph_string, chain.chain_name AS chain_name, chain.pdb_id AS pdb_id FROM plcc_graph k LEFT JOIN " + tbl_chain + " chain ON k.chain_id=chain.chain_id) foo;");
+            doInsertQuery("CREATE VIEW " + view_graphs + " AS SELECT graph_id, pdb_id, chain_name, graph_type, graph_string FROM (SELECT k.graph_id, k.graph_type, k.graph_string, chain.chain_name AS chain_name, chain.pdb_id AS pdb_id FROM " + tbl_graph + " k LEFT JOIN " + tbl_chain + " chain ON k.chain_id=chain.chain_id) bar;");
 
             // add comments for tables
             doInsertQuery("COMMENT ON TABLE " + tbl_protein + " IS 'Stores information on a whole PDB file.';");
@@ -582,8 +582,9 @@ public class DBManager {
             statement = dbc.prepareStatement(query);
 
             statement.setString(1, pdb_id);
-                                
-            statement.executeUpdate();
+              
+            
+            count = statement.executeUpdate();
             dbc.commit();
             
             //md = rs.getMetaData();
