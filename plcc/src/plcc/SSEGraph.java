@@ -60,7 +60,7 @@ public abstract class SSEGraph {
     protected Integer[ ][ ] distMatrix;           // distances of the vertices within this graph
     protected Boolean isProteinGraph;             // true if this is a protein graph, false if this is a folding graph (a connected component of the protein graph)    
     protected SSEGraph parent;
-    
+       
     protected Boolean connectedComponentsComputed;
     protected Boolean distancesCalculated;
     protected ArrayList<FoldingGraph> connectedComponents;
@@ -74,6 +74,7 @@ public abstract class SSEGraph {
     
     /** the list of all SSEs of this graph which should be drawn. Not used yet. */
     protected ArrayList<DrawSSE> sseDrawList;
+    protected ArrayList<Integer> spatOrder;
     
     protected ArrayList<ArrayList<Integer>> adjLists;
     protected ArrayList<Set<Integer>> cliques;    // for Bron-Kerbosch algorithm
@@ -105,6 +106,7 @@ public abstract class SSEGraph {
 
         this.metadata = new HashMap<String, String>();
         this.init();
+        this.spatOrder = null;
     }
     
     
@@ -162,6 +164,50 @@ public abstract class SSEGraph {
            }
        } 
        return(false);
+    }
+    
+    
+    
+    /**
+     * Computes the spatial contact matrix for this graph from the sequential contact matrix and the spatial ordering.
+     * Will try to compute the spatial ordering using the computeSpatialVertexOrdering() function if it is null.
+     * @return the spatial contact matrix or a matrix of length[0][0] if no spatial ordering exists that can be used to compute such a matrix.
+     */
+    public Integer[][] getSpatialContactMatrix() {
+
+        Integer[][] noSuchMatrix = new Integer[0][0];
+        
+        if(this.spatOrder == null) {
+            this.computeSpatialVertexOrdering();
+        }
+        
+        if(spatOrder.size() != this.size) {
+            return(noSuchMatrix);
+        }
+        
+        Integer[][] spatContacts = new Integer[this.size][this.size];
+        
+        // init is not required because all fields are set in the next loop anyways
+        /*
+        for(Integer i = 0; i < this.size; i++) {
+            for(Integer j = 0; j < this.size; j++) {
+                spatContacts[i][j] = SpatRel.NONE;
+            }
+        }
+         * 
+         */
+        
+        // fill
+        Integer sseASeqIndex, sseBSeqIndex;
+        for(Integer i = 0; i < this.size; i++) {
+            sseASeqIndex = this.spatOrder.get(i);
+            for(Integer j = 0; j < this.size; j++) {
+                sseBSeqIndex = this.spatOrder.get(j);
+                spatContacts[i][j] = this.getContactType(sseASeqIndex, sseBSeqIndex);
+            }
+        }
+        
+        return(spatContacts);
     }
     
     
@@ -506,11 +552,16 @@ public abstract class SSEGraph {
      * @return a list containing the vertex indices in the requested order, or an empty list if no such order exists
      */
     public ArrayList<Integer> getSpatialOrderingOfVertexIndices() {
-        ArrayList<Integer> spatOrder = new ArrayList<Integer>();
+        ArrayList<Integer> spatialOrder = new ArrayList<Integer>();
         
         if(this.isBifurcated()) {
-            System.err.println("ERROR: getSpatialOrderingOfVertexIndices(): Called for bipartite graph, exiting.");
-            System.exit(1);
+            //System.err.println("WARNING: getSpatialOrderingOfVertexIndices(): Called for bipartite graph, ignoring.");
+            return(spatialOrder);
+        }
+        
+        if(this.numSSEContacts() != (this.numVertices() - 1)) {
+            //System.err.println("WARNING: getSpatialOrderingOfVertexIndices(): Graph cannot be linear: number of edges != number of vertices -1.");
+            return(spatialOrder);
         }
         
         //if(! this.distancesCalculated) {
@@ -518,25 +569,41 @@ public abstract class SSEGraph {
         //}
         
         Integer start = this.closestToNTerminusDegree1();
+        Boolean noVertexWithDegree1 = false;
+        //System.out.println("Start vertex of " + this.toString() + " is " + start + ".");     
         if(start < 0) {
-            System.err.println("WARNING: getSpatialOrderingOfVertexIndices(): No vertex of degree 1 found, order not possible.");
+            //System.err.println("WARNING: getSpatialOrderingOfVertexIndices(): No vertex of degree 1 found, order not possible.");
             // No vertex found so this notation is not posible, return an empty ArrayList
-            return(spatOrder);
-        }              
+            start = this.closestToNTerminus();
+            if(start < 0) {
+                // if no vertex with degree 1 exists, we do (by definition) use the vertex closest to the N terminus
+                return(spatialOrder);
+            }
+            else {
+                noVertexWithDegree1 = true;
+            }
+        } else {
+            spatialOrder.add(start);
+        }         
 
         Integer next;
         Integer last = start;
-        Integer cur = this.getSingleNeighborOf(start);
-        while(cur > 0) {
-            spatOrder.add(cur);            
+        Integer cur = ( noVertexWithDegree1 ? this.getVertexNeighborClosestToNTerminus(start) : this.getSingleNeighborOf(start) );
+        //System.out.println("Single neighbor of " + start + " is " + cur + ".");
+        while(cur >= 0 && cur != start) {
+            spatialOrder.add(cur);            
             next = this.getVertexNeighborBut(cur, last);
             last = cur;
             cur = next;
         }
 
-        assert spatOrder.size() == this.size : "ERROR: ProtGraph.getSpatialOrderingOfVertexIndices(): Length of spatial order array does not match number of graph vertices." ;
+        //assert spatOrder.size() == this.size : "ERROR: ProtGraph.getSpatialOrderingOfVertexIndices(): Length of spatial order array does not match number of graph vertices." ;
+
+        // DEBUG
+        //System.out.println("Spatial ordering of size " + spatOrder.size() + " found for graph with " + this.size + " vertices.");
         
-        return(spatOrder);
+
+        return(spatialOrder);
     }
     
     
@@ -554,7 +621,7 @@ public abstract class SSEGraph {
         }
                       
        for(SSE s : this.sseList) {
-           if(this.parent.getSSEByPosition(parentIndex).sameSSEas(s)) {
+           if(this.parent.getSSEBySeqPosition(parentIndex).sameSSEas(s)) {
                return(true);
            }
        }
@@ -696,6 +763,8 @@ public abstract class SSEGraph {
         adjLists.get(y).add(x);
         matrix[x][y] = spatialRelation;
         matrix[y][x] = spatialRelation;
+        
+        this.spatOrder = null;      // spatOrder has to be re-computed!
     }
 
     /**
@@ -706,6 +775,8 @@ public abstract class SSEGraph {
         matrix[y][x] = SpatRel.NONE;
         adjLists.get(x).remove(y);
         adjLists.get(y).remove(x);
+        
+        this.spatOrder = null;      // spatOrder has to be re-computed!
     }
 
     
@@ -756,6 +827,7 @@ public abstract class SSEGraph {
      * Returns the degree of the vertex at index x.
      */
     public Integer degreeOfVertex(Integer x) {
+        
         Integer degree = 0;
 
         for(Integer i = 0; i < this.size; i++) {
@@ -764,6 +836,10 @@ public abstract class SSEGraph {
             }
         }
         return(degree);
+        // * 
+        // */
+        
+        //return(adjLists.get(x).size());
     }
 
     
@@ -804,6 +880,56 @@ public abstract class SSEGraph {
         
         return(err);
     }
+    
+    
+    /**
+     * This function determines the index of the neighbor of the vertex at index 'vertexID' which is farthest from the N-terminus in the AA sequence.
+     * @param vertexID the index of the vertex to consider
+     * @return the index of the neighbor of the vertex at index 'vertexID' which is farthest from the N-terminus in the AA sequence, or -1 if no such vertex exists (i.e., this vertex has no neighbors).
+     */
+    public Integer getVertexNeighborFarthestFromNTerminus(Integer vertexID) {
+        
+        Integer err = -1;
+        
+        SSE tmp;
+        Integer minDist = Integer.MAX_VALUE;
+        Integer sseIndex = err;
+        
+        for(Integer i : this.neighborsOf(vertexID)) {
+            tmp = this.getSSEBySeqPosition(i);
+            if(tmp.getSSESeqChainNum() < minDist) {
+                minDist = tmp.getSSESeqChainNum();
+                sseIndex = i;
+            }
+        }
+        
+        return(sseIndex);
+    }
+    
+    
+    /**
+     * This function determines the index of the neighbor of the vertex at index 'vertexID' which is closest to the N-terminus in the AA sequence.
+     * @param vertexID the index of the vertex to consider
+     * @return the index of the neighbor of the vertex at index 'vertexID' which is closest to the N-terminus in the AA sequence, or -1 if no such vertex exists (i.e., this vertex has no neighbors).
+     */
+    public Integer getVertexNeighborClosestToNTerminus(Integer vertexID) {
+        
+        Integer err = -1;
+        
+        SSE tmpSSE;
+        Integer maxDist = Integer.MIN_VALUE;
+        Integer sseIndex = err;
+        
+        for(Integer i : this.neighborsOf(vertexID)) {
+            tmpSSE = this.getSSEBySeqPosition(i);
+            if(tmpSSE.getSSESeqChainNum() < maxDist) {
+                maxDist = tmpSSE.getSSESeqChainNum();
+                sseIndex = i;
+            }
+        }
+        
+        return(sseIndex);
+    }
 
 
 
@@ -829,11 +955,11 @@ public abstract class SSEGraph {
     }
 
     /**
-     * Returns the SSE represented by vertex position in this graph.
+     * Returns the SSE represented by vertex position in this graph. (This is the sequential index of the SSE in the graph, N to C terminus.)
      * @param position the index in the SSE list
      * @return the SSE object at the given index
      */
-    public SSE getSSEByPosition(Integer position) {
+    public SSE getSSEBySeqPosition(Integer position) {
         if(position >= this.size) {
             System.err.println("ERROR: getSSE(): Index " + position + " out of range, matrix size is " + this.size + ".");
             System.exit(-1);
@@ -1575,6 +1701,7 @@ public abstract class SSEGraph {
 
     /**
      * Determines the SSE/vertex which is closest to the N-terminus (has the lowest DSSP start residue number) and has a degree of 1.
+     * Note that no such vertex may exist, for example if the graph consists of nothing but a beta barrel (and thus all vertices have degree 2).
      * @return the index of the vertex or -1 if no such vertex exists in this graph
      */
     public Integer closestToNTerminusDegree1() {
@@ -1582,19 +1709,18 @@ public abstract class SSEGraph {
         Integer minDsspNum = Integer.MAX_VALUE;
 
         for(Integer i = 0; i < this.size; i++) {
-            if(sseList.get(i).getStartDsspNum() < minDsspNum && this.degreeOfVertex(i) == 1) {
-                minDsspNum = sseList.get(i).getStartDsspNum();
-                vertIndex = i;
-            }
+            if(this.degreeOfVertex(i) == 1) {
+                if(sseList.get(i).getStartDsspNum() < minDsspNum) {
+                    minDsspNum = sseList.get(i).getStartDsspNum();
+                    vertIndex = i;
+                }                
+            }            
         }
 
-        if(vertIndex < 0) {
-            System.err.println("WARNING: closestToNTerminusDegree1(): No SSE found, returning '" + vertIndex + "'.");
-            if(this.size > 0) {
-                System.err.println("ERROR: closestToNTerminusDegree1(): Graph has " + this.size + " vertices, so not finding anything is a bug.");
-                System.exit(-1);
-            }
-        }
+        //if(vertIndex < 0) {
+        //    System.err.println("WARNING: closestToNTerminusDegree1(): No SSE found, returning '" + vertIndex + "'.");            
+        //}
+        
         return(vertIndex);
     }
     
@@ -2538,6 +2664,35 @@ public abstract class SSEGraph {
             return(0);
         }
         return(min);
+    }
+    
+    
+    /**
+     * Computes the spatial, linear vertex ordering for this graph and assigns it to the class variable 'this.spatOrder'.
+     * Note that the ordering may be invalid because no such order exists for certain graphs. In this case, the length 
+     * of the spatOrder ArrayList is != the number of vertices in this graph.
+     * 
+     * The SSEs of this graph also get their spatialIndex property set by this function.
+     * 
+     * This function has to be called after all contacts have been added to the graph! Adding or removing edges from/to it will destroy the ordering.
+     * 
+     */
+    public void computeSpatialVertexOrdering() {
+        this.spatOrder = this.getSpatialOrderingOfVertexIndices();
+        
+        for(Integer i = 0; i < this.size; i++) {
+            this.getSSEBySeqPosition(i).setSpatialIndexInGraph(-2);
+        }
+        
+        for(Integer i = 0; i < spatOrder.size(); i++) {
+            this.getSSEBySeqPosition(i).setSpatialIndexInGraph(spatOrder.get(i));
+        }
+    }
+            
+    
+    @Override public String toString() {
+        String mgt = (this.isFoldingGraph() ? "FG" : "PG");
+        return("[" + mgt + " " + this.graphType + " graph of PDB " + this.pdbid + " chain " + this.chainid + "]");
     }
     
     

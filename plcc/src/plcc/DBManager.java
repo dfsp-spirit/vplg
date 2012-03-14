@@ -360,8 +360,9 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(2) not null, mol_name varchar(200) not null, organism_scientific varchar(200) not null, organism_common varchar(200) not null, pdb_id varchar(4) not null references plcc_protein ON DELETE CASCADE);");
             doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references plcc_chain ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence varchar(2000) not null, sse_type int not null, lig_name varchar(5));");
             doInsertQuery("CREATE TABLE " + tbl_contact + " (contact_id serial primary key, sse1 int not null references plcc_sse ON DELETE CASCADE, sse2 int not null references plcc_sse ON DELETE CASCADE, contact_type int not null, check (sse1 < sse2));");
-            doInsertQuery("CREATE TABLE " + tbl_graph + " (graph_id serial primary key, chain_id int not null references plcc_chain ON DELETE CASCADE, graph_type int not null, graph_string text not null);");
+            doInsertQuery("CREATE TABLE " + tbl_graph + " (graph_id serial primary key, chain_id int not null references plcc_chain ON DELETE CASCADE, graph_type int not null, graph_string text not null, graph_image_svg text);");
             
+            // various types encoded by integers. these tables should be removed in the future and the values stored as string directly instead.
             doInsertQuery("CREATE TABLE " + tbl_ssetypes + " (ssetype_id int not null primary key,  ssetype_text text not null);");
             doInsertQuery("CREATE TABLE " + tbl_contacttypes + " (contacttype_id int not null primary key,  contacttype_text text not null);");
             doInsertQuery("CREATE TABLE " + tbl_graphtypes + " (graphtype_id int not null primary key,  graphtype_text text not null);");
@@ -374,7 +375,6 @@ public class DBManager {
             doInsertQuery("ALTER TABLE " + tbl_graph + " ADD CONSTRAINT constr_graph_uniq UNIQUE (chain_id, graph_type);");
             
             // create views
-            //doInsertQuery("CREATE VIEW " + view_ssecontacts + " as select contact_id, least(sse1_type, sse2_type) sse1_type, greatest(sse1_type, sse2_type) sse2_type from (select k.contact_id, sse1.sse_type as sse1_type, sse2.sse_type as sse2_type from plcc_contact k left join plcc_sse sse1 on k.sse1=sse1.sse_id left join plcc_sse sse2 on k.sse2=sse2.sse_id) foo;");
             doInsertQuery("CREATE VIEW " + view_ssecontacts + " AS SELECT contact_id, least(sse1_type, sse2_type) sse1_type, greatest(sse1_type, sse2_type) sse2_type, sse1_lig_name, sse2_lig_name  FROM (SELECT k.contact_id, sse1.sse_type AS sse1_type, sse2.sse_type AS sse2_type, sse1.lig_name AS sse1_lig_name, sse2.lig_name AS sse2_lig_name FROM " + tbl_contact + " k LEFT JOIN " + tbl_sse + " sse1 ON k.sse1=sse1.sse_id LEFT JOIN " + tbl_sse + " sse2 ON k.sse2=sse2.sse_id) foo;");
             doInsertQuery("CREATE VIEW " + view_graphs + " AS SELECT graph_id, pdb_id, chain_name, graph_type, graph_string FROM (SELECT k.graph_id, k.graph_type, k.graph_string, chain.chain_name AS chain_name, chain.pdb_id AS pdb_id FROM " + tbl_graph + " k LEFT JOIN " + tbl_chain + " chain ON k.chain_id=chain.chain_id) bar;");
 
@@ -974,7 +974,6 @@ public class DBManager {
         Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
         
         Integer chain_db_id = getDBChainID(pdb_id, chain_name);
-        Boolean result = false;
         ResultSetMetaData md;
         ArrayList<String> columnHeaders;
         ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
@@ -1020,10 +1019,91 @@ public class DBManager {
                 tableData.add(rowData);
             }
             
-            result = true;
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: getGraph: '" + e.getMessage() + "'.");
-            result = false;
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        if(tableData.size() >= 1) {
+            if(tableData.get(0).size() >= 1) {
+                return(tableData.get(0).get(0));
+            }
+            else {
+                System.err.println("WARNING: DB: No entry for graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
+                return(null);
+            }
+        }
+        else {
+            return(null);
+        }        
+    }
+    
+    
+    /**
+     * Retrieves the VPLG format graph image for the requested graph in SVG format from the database. The graph is identified by the
+     * unique triplet (pdbid, chain_name, graph_type).
+     * @param pdbid the requested pdb ID, e.g. "1a0s"
+     * @param chain_name the requested pdb ID, e.g. "A"
+     * @param graph_type the requested graph type, e.g. "albe"
+     * @return an XML string representing the graph in SVG format, or null if no such graph exists.
+     * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
+     */
+    public static String getGraphImageSVG(String pdb_id, String chain_name, String graph_type) throws SQLException {
+        Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
+        
+        Integer chain_db_id = getDBChainID(pdb_id, chain_name);
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        
+
+        if (chain_db_id < 0) {
+            System.err.println("WARNING: getGraph(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
+            return(null);
+        }
+
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT graph_image_svg FROM " + tbl_graph + " WHERE (chain_id = ? AND graph_type = ?);";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setInt(1, chain_db_id);
+            statement.setInt(2, gtc);
+                                
+            rs = statement.executeQuery();
+            dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: getGraph: '" + e.getMessage() + "'.");
         } finally {
             if (statement != null) {
                 statement.close();

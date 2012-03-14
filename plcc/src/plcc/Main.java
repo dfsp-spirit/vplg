@@ -1291,6 +1291,20 @@ public class Main {
                 
                 imgFile = filePath + fs + fileNameWithExtension;
                 
+                // test spatial ordering, not used for anything atm
+                // TODO: remove this, it's only a test and takes time
+                if(pg.size > 0) {                                    
+                    ArrayList<Integer> spatOrder = pg.getSpatialOrderingOfVertexIndices();
+                    if(spatOrder.size() == pg.size && pg.size > 1) {
+                        String order = "      The " + gt + " graph of chain " + c.getPdbChainID() + " with " + pg.size + " vertices has a valid linear spatial ordering: [";
+                        for(Integer s = 0; s < spatOrder.size(); s++) {
+                            order += " " + spatOrder.get(s);
+                        }
+                        order += " ]";
+                        System.out.println(order);
+                    }
+                }
+                
 
                 if(Settings.getBoolean("plcc_B_draw_graphs")) {
                     if(pg.drawProteinGraph(imgFile, false)) {
@@ -1310,7 +1324,6 @@ public class Main {
                 }
                 
                 // But we may need to write the graph to the database
-                //TODO: the graph string will need escaping!
                 if(Settings.getBoolean("plcc_B_useDB")) {
                     try { 
                         DBManager.writeGraphToDB(pdbid, c.getPdbChainID(), ProtGraphs.getGraphTypeCode(gt), pg.toPlccGraphFormatString()); 
@@ -1370,10 +1383,27 @@ public class Main {
             // DEBUG
             // fg.calculateDistancesWithinGraph();
             // fg.printDistMatrix();
-
-
+            
             System.out.println("        Handling folding Graph #" + j + " containing " + fg.numVertices() + " vertices and " + fg.numEdges() + " edges (" + fg.numSSEContacts() + " SSE contacts).");
-
+            
+            // test spatial ordering, not used for anything atm
+            // TODO: remove this, it's only a test and takes time
+            if(fg.size > 0) { 
+                //System.out.println("        Testing folding graph with " + fg.size + " vertices for spatial ordering...");
+                ArrayList<Integer> spatOrder = fg.getSpatialOrderingOfVertexIndices();
+                String order;
+                if(spatOrder.size() == fg.size) {
+                    order = "        Folding graph #" + j + " with " + fg.size + " vertices has a valid linear spatial ordering: ";                                        
+                    order += " [";
+                    for(Integer s = 0; s < spatOrder.size(); s++) {
+                        order += " " + spatOrder.get(s);
+                    }
+                    order += " ]";
+                
+                    System.out.println(order);
+                }
+            }
+            
             // Draw all folding graphs in all notations
             //List<String> notations = Arrays.asList("KEY", "ADJ", "RED", "SEQ");
             ArrayList<String> notations = new ArrayList<String>();

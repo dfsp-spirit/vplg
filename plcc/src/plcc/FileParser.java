@@ -2117,7 +2117,7 @@ public class FileParser {
                 sseANum = i + 1;
                 sseBNum = j + 1;
                 
-                if(pg.getSSEByPosition(sseAIndex).isLigandSSE() || pg.getSSEByPosition(sseAIndex).isOtherSSE() || pg.getSSEByPosition(sseBIndex).isLigandSSE() || pg.getSSEByPosition(sseBIndex).isOtherSSE()) {
+                if(pg.getSSEBySeqPosition(sseAIndex).isLigandSSE() || pg.getSSEBySeqPosition(sseAIndex).isOtherSSE() || pg.getSSEBySeqPosition(sseBIndex).isLigandSSE() || pg.getSSEBySeqPosition(sseBIndex).isOtherSSE()) {
                     numLigContactsIgnored++;
                     continue;
                 }

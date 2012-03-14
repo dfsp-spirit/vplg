@@ -34,8 +34,13 @@ public class SSE implements java.io.Serializable {
 
 
     // Test for SSE adj graph
-    /** The sequential index of this SSE in the graph. Starts with 0. */
-    private Integer numInGraph;
+    /** The sequential index of this SSE in the graph (the index in the AA sequence, N to C terminus). Starts with 0. Negative value means unset. */
+    private Integer sequentialIndexInGraph;
+    
+    /** The spatial index of this SSE in the graph. Starts with 0. Does not exist for some graphs, e.g., bifurcated graphs. Negative value means unset. */
+    private Integer spatialIndexInGraph;
+    
+    /** True if this SSE has been assigned to an SSE graph already, false otherwise. */
     private Boolean inGraph;        
 
     
@@ -368,13 +373,18 @@ public class SSE implements java.io.Serializable {
     }
     
     
-    /** Sets the sequential number of this SSE in its current graph. This should be its index in the graph's SSE list and thus start with 0.
+    /** Sets the sequential number of this SSE in its current graph (the index in the AA sequence, N to C terminus). This should be its index in the graph's SSE list and thus start with 0.
      *  It also sets inGraph=true for this SSE.
-     * 
-     * @param index the index in the graph
-     * 
+     * @param index the sequential index in the graph, i.e., the index in the AA sequence
      */
-    public void setSeqIndexInGraph(Integer index) { this.numInGraph = index; this.inGraph = true; }
+    public void setSeqIndexInGraph(Integer index) { this.sequentialIndexInGraph = index; this.inGraph = true; }
+    
+    
+    /** Sets the spatial number of this SSE in its current graph. 
+     *  It also sets inGraph=true for this SSE.
+     * @param index the spatial index in the graph
+     */
+    public void setSpatialIndexInGraph(Integer index) { this.spatialIndexInGraph = index; this.inGraph = true; }
     
     
     /** Returns the sequential number of this SSE in its current graph or -1 if it not yet part of a protein graph. 
@@ -382,11 +392,25 @@ public class SSE implements java.io.Serializable {
      */
     public Integer getSeqIndexInGraph() { 
         if(this.inGraph) { 
-            return(this.numInGraph);
+            return(this.sequentialIndexInGraph);
         } 
         else {
             return(-1);
         }
     }
+    
+    /** Returns the spatial number of this SSE in its current graph or -1 if it not yet part of a protein graph or -2 if no such ordering exists for this graph. 
+     * @return the spatial number of this SSE in its current graph or -1 if it not yet part of a protein graph or -2 if no such ordering exists for this graph 
+     */
+    public Integer getSpatialIndexInGraph() { 
+        if(this.inGraph) { 
+            return(this.spatialIndexInGraph);
+        } 
+        else {
+            return(-1);
+        }
+    }
+    
+    
 
 }
