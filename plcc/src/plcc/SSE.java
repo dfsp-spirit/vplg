@@ -412,5 +412,17 @@ public class SSE implements java.io.Serializable {
     }
     
     
+    /**
+     * Convenience function, returns the notation label for this SSE for the linear notations (SEQ, KEY, ...). E.g., "e" for a beta strand and "h" for a helix.
+     * @return a one-letter string representing the label
+     */
+    public String getLinearNotationLabel() {
+        if(this.isHelix()) { return(SSEGraph.notationLabelHelix); }
+        else if(this.isBetaStrand()) { return(SSEGraph.notationLabelStrand); } 
+        else if(this.isLigandSSE()) { return(SSEGraph.notationLabelLigand); } 
+        else { return(SSEGraph.notationLabelOther); }            
+    }
+    
+    
 
 }

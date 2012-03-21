@@ -79,6 +79,12 @@ public abstract class SSEGraph {
     protected ArrayList<ArrayList<Integer>> adjLists;
     protected ArrayList<Set<Integer>> cliques;    // for Bron-Kerbosch algorithm
     
+    // labels for SSEs in the linear notation strings
+    public static final String notationLabelHelix = "h";
+    public static final String notationLabelStrand = "e";
+    public static final String notationLabelLigand = "l";
+    public static final String notationLabelOther = "o";
+    
     
     /**
      * Constructor. Requires a list of SSEs that will be represented by the vertices of the graph.
@@ -655,12 +661,12 @@ public abstract class SSEGraph {
     
         
     /**
-     * Determines the distance from vertex #x to vertex #y in the graph.
-     * @param x the index if the first SSE in the SSE list
-     * @param y the index if the second SSE in the SSE list
+     * Determines the distance from vertex #x to vertex #y in the graph. This is the spatial distance.
+     * @param x the index of the first SSE in the SSE list
+     * @param y the index of the second SSE in the SSE list
      * @return The length of the shortest path between the vertices at indices x and y.
      */
-    public Integer distPath(Integer x, Integer y) {
+    public Integer getSpatialDistance(Integer x, Integer y) {
         Integer [] distAllToX = pathDistanceAllVerts(x);
         return(distAllToX[y]);
     }
@@ -1258,7 +1264,7 @@ public abstract class SSEGraph {
             System.exit(-1);
         }
 
-        System.out.println("      Calculating distance of all " + this.size + " vertices to vertex " + x + ".");
+        //System.out.println("      Calculating distance of all " + this.size + " vertices to vertex " + x + ".");
 
         // Now perform breadth-first search with source vertex x and fill in the computed distances. Vertices not in the
         //  connected component of x will not be found and their distance will remain at -1.
@@ -1325,6 +1331,8 @@ public abstract class SSEGraph {
      * Generates the key notation (KEY) of this protein graph. Note that this notation differs
      * depending on the graph type: for all graphs but alpa(-only) and beta(-only) graphs, the SSE type is written
      * behind the distance.
+     * 
+     * This notation requires a valid spatial ordering to exist for this graph.
      *
      *  Example: [5, 1x, -2] is an alpha or beta graph. Vertex 1 is connected to 6 (parallel, which is the default): "+5" ,
      *                                                  6 connected with 7 (antiparallel or mixed, marked by the "x"): "+1x" and
@@ -1334,10 +1342,11 @@ public abstract class SSEGraph {
      *  An albe graph (or *lig graph) needs to add the SSE type to the notation, e.g.: [h, 3xh, 2e, -1l] is another graph,
      *  and the SSEs are of the following types: 1=>helix, 4=>helix, 6=>beta sheet, 5=>ligand.
      * 
-     * * @return the notation as a String
+     * @param forceLabelSSETypes whether to force labeling of SSE types in the string (i.e., even label the SSE type for graph types which can only contain a single type, e.g., beta graphs can only contain beta strands).
+     * @return the notation as a String or an empty string if this notation is not supported for this graph
      *
      */
-    public String getNotationKEY(Boolean addSSEType) {
+    public String getNotationKEY(Boolean forceLabelSSETypes) {
 
         if(this.isBifurcated()) {
             System.err.println("WARNING: #KEY notation not supported for bifurcated graphs. Check before requesting this.");
@@ -1349,9 +1358,98 @@ public abstract class SSEGraph {
             return("");
         }
         
-        System.err.println("WARNING: getNotationKEY(): not implemented yet.");
+        if(! this.hasSpatialOrdering()) {
+            System.err.println("WARNING: #KEY notation only supported for graphs with spatial ordering.");
+            return("");
+        }
+        
+        if(this.size < 1) {
+            return("");
+        }
+        
+        //System.err.println("WARNING: getNotationKEY(): not implemented yet.");
+        
+        Boolean labelSSEs = true;
+        if(this.graphType.equals("alpha") || this.graphType.equals("beta")) {
+            labelSSEs = false;
+        }
+        
+        if(forceLabelSSETypes) {
+            labelSSEs = true;
+        }
+        
+        String labelHelix = "";
+        String labelStrand = "";
+        String labelLigand = "";
+        String labelOther = "";
+        if(labelSSEs) {
+            labelHelix = SSEGraph.notationLabelHelix;
+            labelStrand = SSEGraph.notationLabelStrand;
+            labelLigand = SSEGraph.notationLabelLigand;
+            labelOther = SSEGraph.notationLabelOther;
+        }
+        
+        // ok, let's go
+        //this.computeSpatialVertexOrdering();        // already computed, no need to do it again
+        
+        
+        if(this.size < 1) {
+            return("[]");
+        } else if(this.size == 1) {
+            if(labelSSEs) {
+                return("[" + this.sseList.get(0).getLinearNotationLabel() + "]");
+            }
+            else {
+                return("[]");
+            }
+        }
+        else {                
+            Integer seqIndexCurrentSSE, seqIndexNextSSE;
 
-        return("");
+
+
+            String notation;
+            
+            if(labelSSEs) {
+                notation  = "[";
+            } else {
+                notation  = "[" + this.sseList.get(0).getLinearNotationLabel() + ",";
+            }
+            
+            for(Integer i = 0; i < (this.spatOrder.size() - 1); i++) {
+                seqIndexCurrentSSE = this.spatOrder.get(i);
+                seqIndexNextSSE = this.spatOrder.get(i + 1);
+                
+                //notation += this.getSpatialDistance(seqIndexCurrentSSE, seqIndexNextSSE);
+                notation += this.getSeqGraphSSEPairDistanceByIndices(seqIndexCurrentSSE, seqIndexNextSSE);
+                                                
+                if(this.isCrossoverConnection(seqIndexCurrentSSE, seqIndexNextSSE)) {
+                    notation += "x";
+                }
+                
+                if(labelSSEs) {
+                    notation += this.getSSEBySeqPosition(seqIndexNextSSE).getLinearNotationLabel();
+                }
+                
+                if(i + 1 < (this.spatOrder.size() - 1)) {
+                    notation += ",";
+                }
+            }
+            notation += "]";
+            return(notation);
+        }        
+    }
+    
+    
+    /**
+     * Determines whether the contact (x, y) in the contact matrix is a crossover contact (i.e., the SSEs are parallel).
+     * @return true if the two SSEs are parallel, false otherwise
+     */ 
+    public Boolean isCrossoverConnection(Integer x, Integer y) {
+        if(this.getContactType(x, y) == SpatRel.PARALLEL) {
+            return(true);
+        }
+        return(false);
     }
     
     
@@ -2664,6 +2762,27 @@ public abstract class SSEGraph {
             return(0);
         }
         return(min);
+    }
+    
+    
+    /**
+     * Determines whether this graph has a valid spatial ordering. It computes this ordering if that
+     * has not already been done.
+     * 
+     * @return true if the graph has such an ordering, false otherwise
+     */
+    public Boolean hasSpatialOrdering() {
+        
+        if(this.spatOrder == null) {        
+            this.computeSpatialVertexOrdering();
+        }
+        
+        if(this.spatOrder.size() == this.size) {
+            return(true);
+        } else {
+            return(false);
+        }
+        
     }
     
     

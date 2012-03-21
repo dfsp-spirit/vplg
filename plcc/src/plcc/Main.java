@@ -1302,7 +1302,11 @@ public class Main {
                         }
                         order += " ]";
                         System.out.println(order);
+                        
+                        // if its has a spatial ordering, it has a KEY notation
+                        System.out.println("      Key notation is: '" + pg.getNotationKEY(true) + "'.");
                     }
+                    
                 }
                 
 
@@ -1401,6 +1405,8 @@ public class Main {
                     order += " ]";
                 
                     System.out.println(order);
+                    
+                    System.out.println("        Key notation is: '" + fg.getNotationKEY(true) + "'.");
                 }
             }
             

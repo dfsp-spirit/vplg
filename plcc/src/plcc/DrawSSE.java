@@ -24,7 +24,7 @@ public class DrawSSE {
     private Position2D outgoingConnectorPos;
     private Shape shape;
     private PageLayout pl;
-    private String drawType;
+    private Integer drawStyle;
     
     
     /**
@@ -40,11 +40,11 @@ public class DrawSSE {
      * @param pl the page layout that is used for drawing. This allows this drawSSE to determine its position etc.
      * @param drawType the style in which to draw the SSE. See the documentation of the setDrawType() function for details.
      */
-    DrawSSE(SSE sse, Integer indexInDrawGraph, PageLayout pl, String drawType) {
+    DrawSSE(SSE sse, Integer indexInDrawGraph, PageLayout pl, Integer drawType) {
         this.sse = sse;
         this.indexInDrawnGraph = indexInDrawGraph;                
         this.pl = pl;
-        this.drawType = drawType;
+        this.drawStyle = drawType;
         
         // TODO: determine the positions here
     }
@@ -53,16 +53,10 @@ public class DrawSSE {
      * Allows the user to choose in which style this SSE should be drawn. Currently, the supported values
      * are "CIRCLE" for classic protein graph notation (vertices as circles) and "ARROW" for the notation 
      * used for the KEY description.
-     * @param drawType has to be either "CIRCLE" or "ARROW".
+     * @param drawType the draw style, use one of the DrawSSEGraph.SSEGRAPHSTYLE_* constants.
      */
-    public void setDrawType(String drawType) {
-        
-        if(! (drawType.equals("CIRCLE") || drawType.equals("ARROW"))) {
-            System.err.println("ERROR: DrawSSE.setDrawType(): drawType '" + drawType + "' invalid, ignoring;");
-            this.drawType = "CIRCLE";            
-        }
-        
-        this.drawType = drawType;
+    public void setDrawStyle(Integer drawType) {       
+        this.drawStyle = drawType;
     }
     
     
