@@ -85,6 +85,22 @@ public abstract class SSEGraph {
     public static final String notationLabelLigand = "l";
     public static final String notationLabelOther = "o";
     
+    // graph types
+    public static final String GRAPHTYPE_ALPHA = "alpha";
+    public static final String GRAPHTYPE_ALPHALIG = "alphalig";
+    public static final String GRAPHTYPE_BETA = "beta";
+    public static final String GRAPHTYPE_BETALIG = "betalig";
+    public static final String GRAPHTYPE_ALBE = "albe";
+    public static final String GRAPHTYPE_ALBELIG = "albelig";
+        
+    public static final Integer GRAPHTYPE_INT_ALPHA = 1;
+    public static final Integer GRAPHTYPE_INT_BETA = 2;
+    public static final Integer GRAPHTYPE_INT_ALBE = 3;
+    public static final Integer GRAPHTYPE_INT_ALPHALIG = 4;    
+    public static final Integer GRAPHTYPE_INT_BETALIG = 5;    
+    public static final Integer GRAPHTYPE_INT_ALBELIG = 6;
+    
+    
     
     /**
      * Constructor. Requires a list of SSEs that will be represented by the vertices of the graph.
@@ -326,38 +342,8 @@ public abstract class SSEGraph {
         
         return(aIndex - bIndex);
     }
-    
-    
-    /**
-     * Returns the distance of the SSE pair (a, b) in the primary structure, i.e., the length of a path 
-     * between these two SSEs. Note that this number considers the direction and may thus be negative.
-     * @param a the first SSE
-     * @param b the second SSE
-     * @return the path length between the SSEs, considers the direction and may thus be negative. For example, the
-     * distance between the SSEs with indices (3, 5) is 2 and the distance of the pair (5, 3) is -2.
-     * (Think of this distance in the graph-theoretic sense, you need the 2 edges [3=>4] and [4=>5] to get
-     * from 3 to 5.)
-     */
-    public Integer getPrimarySeqSSEPairDistanceBySSEsInParentGraph(SSE a, SSE b) {
-        if(a.sameSSEas(b)) { return(0); }        
+            
         
-        if(this.isProteinGraph) {
-            System.err.println("ERROR: getPrimarySeqSSEPairDistanceBySSEsInParentGraph(): This graph has no parent because it is a protein graph.");
-            System.exit(1);
-        }
-        
-        Integer aIndex = a.getSeqIndexInGraph();
-        Integer bIndex = b.getSeqIndexInGraph();
-        
-        if(aIndex < 0 || bIndex < 0) {
-            System.err.println("ERROR: getPrimarySeqSSEPairDistanceBySSEs(): Cannot determine distance between SSE pair, SSE(s) without index info.");
-            System.exit(1);
-        }
-        
-        return(aIndex - bIndex);
-    }
-    
-    
     /**
      * Draws the symbol for a beta strand at the given position.
      * @param ig2 the SVGGraphics2D object on which to draw
@@ -554,6 +540,8 @@ public abstract class SSEGraph {
      * not be part of this folding graph, which is no problem though. If no such vertex exists, the order does not exist.
      * The next vertex is the neighbor of this vertex in the folding graph (i.e., as SSE that this SSE is in contact with in 3D) and so on.
      * Note that this requires that all vertices (except for the first and last one) have exactly 2 neighbors. This cannot be the case if the graph is bifurcated (but the inverse does not hold, i.e., non-bifurcated graphs do not necessarily have a valid KEY ordering).
+     * 
+     * Note: To see this in action, you can use the beta graph of 1blr, chain A.
      * 
      * @return a list containing the vertex indices in the requested order, or an empty list if no such order exists
      */
@@ -992,6 +980,15 @@ public abstract class SSEGraph {
 
         //System.out.println("    No SSE with DSSP start and end residues " + dsspStart + "/" + dsspEnd + " found.");
         return(-1);
+    }
+    
+    
+    /**
+     * Returns the position of an SSE  in the vertex list.
+     * @return The index of the SSE if it was found, -1 otherwise.
+     */
+    public Integer getSSEIndex(SSE s) {
+        return(this.getSsePositionInList(s.getStartDsspNum(), s.getEndDsspNum()));
     }
 
 
@@ -1721,29 +1718,7 @@ public abstract class SSEGraph {
         
         return(outString);
     }
-    
-
-
-    /**
-     * NOT IMPLEMENTED YET.
-     * Returns the KEY notation of this vertex.
-     * 
-     */
-    public String getNotationKEYforVertex(Integer x) {
-        System.err.println("WARNING: getNotationKEYforVertex(): NOT IMPLEMENTED.");
-        return("IMPLEMENT_ME");
-
-    }
-
-    /**
-     * NOT IMPLEMENTED YET.
-     * Returns the position of this vertex in the KEY notation.
-     */
-    public Integer getPositionKEYForVertex(Integer x) {
-        System.err.println("WARNING: getPositionKEYforVertex(): NOT IMPLEMENTED.");
-        return(0);
-    }
-    
+        
     
     /**
      * Determines the SSE/vertex which is closest to the N-terminus (has the lowest DSSP start residue number).
@@ -2783,6 +2758,18 @@ public abstract class SSEGraph {
             return(false);
         }
         
+    }
+    
+    /**
+     * Returns the SSEString of the graph, e.g., "HHEHEHEHEHEHHEEHL".
+     * @return the SSEString, e.g., "HHEHEHEHEHEHHEEHL".
+     */
+    public String getSSEString() {
+        String s = "";
+        for(SSE sse : this.sseList) {
+            s += sse.getSseType();
+        }
+        return(s);
     }
     
     

@@ -65,7 +65,9 @@ public class DBManager {
         } catch (Exception e) {
             System.err.println("ERROR: Could not load JDBC driver '" + dbDriver + "'. Is the correct db driver installed at lib/postgresql-jdbc.jar?");
             System.err.println("ERROR: See the README for more info on getting the proper driver for your PostgreSQL server and Java versions.'");
+            System.err.println("ERROR: Message was: '" + e.getMessage() + "'.");
             System.exit(1);
+            
         }
 
         Boolean conOK = connect();
@@ -117,6 +119,7 @@ public class DBManager {
 
         return (true);
     }
+        
 
     /**
      * Determines whether the underlying DBMS supports transactions.
@@ -144,6 +147,7 @@ public class DBManager {
             return (ps.executeUpdate());          // num rows affected
         } catch (Exception e) {
             System.err.println("WARNING: doInsertQuery(): SQL statement '" + query + "' failed.");
+            System.err.println("WARNING: The error message was: '" + e.getMessage() + "'.");
             return (-1);
         } finally {
             if (ps != null) {
@@ -151,6 +155,7 @@ public class DBManager {
                     ps.close();
                 } catch (Exception ex) {
                     System.err.println("WARNING: doInsertQuery(): Could not close prepared statement.");
+                    System.err.println("WARNING: The error message was: '" + ex.getMessage() + "'.");
                 }
             }
         }
@@ -171,6 +176,7 @@ public class DBManager {
             return (ps.executeUpdate());          // num rows affected
         } catch (Exception e) {
             System.err.println("WARNING: doUpdateQuery(): SQL statement '" + query + "' failed.");
+            System.err.println("WARNING: The error message was: '" + e.getMessage() + "'.");
             return (-1);
         } finally {
             if (ps != null) {
@@ -178,6 +184,7 @@ public class DBManager {
                     ps.close();
                 } catch (Exception ex) {
                     System.err.println("WARNING: doUpdateQuery(): Could not close prepared statement.");
+                    System.err.println("WARNING: The error message was: '" + ex.getMessage() + "'.");
                 }
             }
         }
@@ -198,6 +205,7 @@ public class DBManager {
             return ps.executeUpdate();           // num rows affected
         } catch (Exception e) {
             System.err.println("WARNING: doDeleteQuery(): SQL statement '" + query + "' failed.");
+            System.err.println("WARNING: The error message was: '" + e.getMessage() + "'.");
             return (-1);
         } finally {
             if (ps != null) {
@@ -205,6 +213,7 @@ public class DBManager {
                     ps.close();
                 } catch (Exception ex) {
                     System.err.println("WARNING: doDeleteQuery(): Could not close prepared statement.");
+                    System.err.println("WARNING: The error message was: '" + ex.getMessage() + "'.");
                 }
             }
         }
@@ -252,7 +261,8 @@ public class DBManager {
             return (tableData);
         } catch (Exception e) {
             System.err.println("WARNING: doDeleteQuery(): SQL statement '" + query + "' failed.");
-            e.printStackTrace();
+            System.err.println("WARNING: The error message was: '" + e.getMessage() + "'.");
+            //e.printStackTrace();
             System.exit(1);
             return (null);
         } finally {
@@ -261,6 +271,7 @@ public class DBManager {
                     rs.close();
                 } catch (Exception ex) {
                     System.err.println("WARNING: doSelectQuery(): Could not close result set.");
+                    System.err.println("WARNING: The error message was: '" + ex.getMessage() + "'.");
                 }
             }
             if (ps != null) {
@@ -268,6 +279,7 @@ public class DBManager {
                     ps.close();
                 } catch (Exception ex) {
                     System.err.println("WARNING: doSelectQuery(): Could not close prepared statement.");
+                    System.err.println("WARNING: The error message was: '" + ex.getMessage() + "'.");
                 }
             }
         }
@@ -293,6 +305,7 @@ public class DBManager {
                 }
             } catch (Exception e) {
                 System.err.println("WARNING: closeConnection(): Could not close DB connection.");
+                System.err.println("WARNING: The error message was: '" + e.getMessage() + "'.");
                 return (false);
             }
         } else {
@@ -360,7 +373,7 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(2) not null, mol_name varchar(200) not null, organism_scientific varchar(200) not null, organism_common varchar(200) not null, pdb_id varchar(4) not null references plcc_protein ON DELETE CASCADE);");
             doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references plcc_chain ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence varchar(2000) not null, sse_type int not null, lig_name varchar(5));");
             doInsertQuery("CREATE TABLE " + tbl_contact + " (contact_id serial primary key, sse1 int not null references plcc_sse ON DELETE CASCADE, sse2 int not null references plcc_sse ON DELETE CASCADE, contact_type int not null, check (sse1 < sse2));");
-            doInsertQuery("CREATE TABLE " + tbl_graph + " (graph_id serial primary key, chain_id int not null references plcc_chain ON DELETE CASCADE, graph_type int not null, graph_string text not null, graph_image_svg text);");
+            doInsertQuery("CREATE TABLE " + tbl_graph + " (graph_id serial primary key, chain_id int not null references plcc_chain ON DELETE CASCADE, graph_type int not null, graph_string text not null, graph_image_svg text, sse_string text);");
             
             // various types encoded by integers. these tables should be removed in the future and the values stored as string directly instead.
             doInsertQuery("CREATE TABLE " + tbl_ssetypes + " (ssetype_id int not null primary key,  ssetype_text text not null);");
@@ -424,7 +437,7 @@ public class DBManager {
 
             res = true;      // Not really, need to check all of them.
 
-        } catch (Exception e) {
+        } catch (Exception e) {            
             res = false;
         }
 
@@ -677,7 +690,7 @@ public class DBManager {
      * @return true if the graph was inserted, false if errors occurred
      * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
      */
-    public static Boolean writeGraphToDB(String pdb_id, String chain_name, Integer graph_type, String graph_string) throws SQLException {
+    public static Boolean writeGraphToDB(String pdb_id, String chain_name, Integer graph_type, String graph_string, String sse_string) throws SQLException {
                
         Integer chain_db_id = getDBChainID(pdb_id, chain_name);
         Boolean result = false;
@@ -689,7 +702,7 @@ public class DBManager {
 
         PreparedStatement statement = null;
 
-        String query = "INSERT INTO " + tbl_graph + " (chain_id, graph_type, graph_string) VALUES (?, ?, ?);";
+        String query = "INSERT INTO " + tbl_graph + " (chain_id, graph_type, graph_string, sse_string) VALUES (?, ?, ?, ?);";
 
         try {
             dbc.setAutoCommit(false);
@@ -698,6 +711,7 @@ public class DBManager {
             statement.setInt(1, chain_db_id);
             statement.setInt(2, graph_type);
             statement.setString(3, graph_string);
+            statement.setString(4, sse_string);
                                 
             statement.executeUpdate();
             dbc.commit();
@@ -725,6 +739,11 @@ public class DBManager {
 
     /**
      * Writes information on a SSE contact to the database.
+     * @param pdb_id the PDB identifier of the protein
+     * @param chain_name the PDB chain name of the chain represented by the graph_string
+     * @param sse1_dssp_start the DSSP number of the first residue of the first SSE
+     * @param sse2_dssp_start the DSSP number of the first residue of the second SSE
+     * @param contact_type the contact type code
      */
     public static Boolean writeContactToDB(String pdb_id, String chain_name, Integer sse1_dssp_start, Integer sse2_dssp_start, Integer contact_type) throws SQLException {
 
@@ -888,6 +907,86 @@ public class DBManager {
     }
     
     
+    
+    /**
+     * Retrieves the PDB ID and the PDB chain name from the DB. The chain is identified by its PK.
+     * @param pk the primary key of the chain in the db (e.g., from the graphs table)
+     * @return an array of length 2 that contains the PDB ID at position 0 and the chain name at position 1. If no chain with the requested PK exists, the array has a length != 2.
+     */
+    public static String[] getPDBIDandChain(Integer dbChainID) {
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+               
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT pdb_id, chain_name FROM " + tbl_chain + " WHERE (chain_id = ?);";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setInt(1, dbChainID);
+                                
+            rs = statement.executeQuery();
+            dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: getDBChainID: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                dbc.setAutoCommit(true);
+            } catch(Exception e) { System.err.println("WARNING: DB: Could not close statement and reset autocommit."); }
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        if(tableData.size() == 1) {
+            if(tableData.get(0).size() == 2) {
+                return(new String[] { tableData.get(0).get(0), tableData.get(0).get(1)});
+            }
+            else {
+                System.err.println("ERROR: DB: getPDBIDandChain(): Result row has unexpected length.");
+                return(new String[] { "" } );
+            }
+        }
+        else {
+            if(tableData.isEmpty()) {
+                // no such PK, empty result list
+                return(new String[] { "" } );
+            } else {
+                System.err.println("ERROR: DB: getPDBIDandChain(): Result table has unexpected length '" + tableData.size() + "'. Should be either 0 or 1.");
+                return(new String[] { "" } );
+            }
+            
+        }        
+    }
+    
+    
     /**
      * Retrieves the internal database chain ID of a chain (it's PK) from the DB. The chain is identified by (pdb_id, chain_name).
      * @param pdb_id the PDB ID of the chain
@@ -1020,7 +1119,7 @@ public class DBManager {
             }
             
         } catch (SQLException e ) {
-            System.err.println("ERROR: SQL: getGraph: '" + e.getMessage() + "'.");
+            System.err.println("ERROR: SQL: getGraph: Retrieval of graph string failed: '" + e.getMessage() + "'.");
         } finally {
             if (statement != null) {
                 statement.close();
@@ -1041,6 +1140,212 @@ public class DBManager {
         else {
             return(null);
         }        
+    }
+    
+    
+    /**
+     * Retrieves the SSEstring for the requested graph from the database. The graph is identified by the
+     * unique triplet (pdbid, chain_name, graph_type).
+     * @param pdbid the requested pdb ID, e.g. "1a0s"
+     * @param chain_name the requested pdb ID, e.g. "A"
+     * @param graph_type the requested graph type, e.g. "albe"
+     * @return the SSEstring of the graph or null if no such graph exists.
+     * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
+     */
+    public static String getSSEString(String pdb_id, String chain_name, String graph_type) throws SQLException {
+        Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
+        
+        Integer chain_db_id = getDBChainID(pdb_id, chain_name);
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        
+
+        if (chain_db_id < 0) {
+            System.err.println("WARNING: getSSEString(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
+            return(null);
+        }
+
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT sse_string FROM " + tbl_graph + " WHERE (chain_id = ? AND graph_type = ?);";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setInt(1, chain_db_id);
+            statement.setInt(2, gtc);
+                                
+            rs = statement.executeQuery();
+            dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: getSSEString(): Retrieval of graph string failed: '" + e.getMessage() + "'.");
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        if(tableData.size() >= 1) {
+            if(tableData.get(0).size() >= 1) {
+                return(tableData.get(0).get(0));
+            }
+            else {
+                System.err.println("WARNING: DB: getSSEString(): No entry for graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
+                return(null);
+            }
+        }
+        else {
+            return(null);
+        }        
+    }
+    
+    
+    
+    /**
+     * Retrieves the SSEStrings of all protein graphs from the database.
+     * @param graphType the graph type, use one of the constants SSEGraph.GRAPHTYPE_* (e.g., SSEGraph.GRAPHTYPE_ALBE) or the word 'ALL' for all types.
+     * @return an ArrayList of String arrays. Each of the String arrays in the list has 3 fields. The 
+     * first fields (array[0]) contains the PDB ID of the chain, the second one (array[1]) contains the chain ID, the 
+     * third field contains the graph type and the fourth field contains the SSE string.
+     *  position 0 := pdb id
+     *  position 1 := chain id
+     *  position 2 := graph type
+     *  position 3 := SSE string
+     */
+    public static ArrayList<String[]> getAllSSEStrings(String graph_type) throws SQLException {
+        
+        ArrayList<String[]> pdbSSEStrings = new ArrayList<String[]>();
+        
+        // get a list of values pairs from the db here    
+                
+        Integer gtc = 1;        // graphTypeCode, e.g., 1 for alpha
+        Boolean allGraphs = false;
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        
+        if(graph_type.equals("ALL")) {
+            allGraphs = true;
+        }
+        else {
+            gtc = ProtGraphs.getGraphTypeCode(graph_type);
+        }
+
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT sse_string, chain_id, graph_type FROM " + tbl_graph + " WHERE (graph_type = ?);";
+        
+        if(allGraphs) {
+            query = "SELECT sse_string, chain_id, graph_type FROM " + tbl_graph + ";";
+        }
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            if( ! allGraphs) {
+                statement.setInt(1, gtc);
+            }
+            
+                                
+            rs = statement.executeQuery();
+            dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: getAllSSEStrings: '" + e.getMessage() + "'.");
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        String graphSSEStringDB, graphTypeDB, pdbidDB, chainNameDB;
+        Integer chainPK;
+        String[] data;
+        
+        
+        for(Integer i = 0; i < tableData.size(); i++) {            
+            
+            if(tableData.get(i).size() == 3) {
+                graphSSEStringDB = tableData.get(i).get(0);
+                graphTypeDB = tableData.get(i).get(2);
+                
+                try {
+                    chainPK = Integer.valueOf(tableData.get(i).get(1));
+                } catch(Exception e) {
+                    System.err.println("WARNING: DB: getAllSSEStrings(): '" + e.getMessage() + "' Ignoring data row.");
+                    continue;
+                }
+
+                // OK, now get the PDB ID and chain name
+                data = getPDBIDandChain(chainPK);
+                
+                if(data.length != 2) {
+                    System.err.println("WARNING: DB: getAllSSEStrings(): Could not find chain with PK '" + chainPK + "' in DB, ignoring data row.");
+                    continue;
+                }
+                else {
+                    pdbidDB = data[0];
+                    chainNameDB = data[1];
+                    pdbSSEStrings.add(new String[]{pdbidDB, chainNameDB, graphTypeDB, graphSSEStringDB});
+                }                
+            }
+            else {
+                System.err.println("WARNING: DB: getAllSSEStrings(): Result row #" + i + " has unexpected length " + tableData.get(i).size() + ".");
+                return(pdbSSEStrings);
+            }
+        }
+        
+        return(pdbSSEStrings);                        
     }
     
     

@@ -41,6 +41,7 @@ import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.DOMImplementation;
+import similarity.CompareOneToDB;
 
 
 /**
@@ -84,9 +85,12 @@ public class Main {
     //  Main.calculateAllContacts().
     static Integer globalMaxSeqNeighborResDist;
     
-    static final String version = "0.52";
+    static final String version = "0.53";
     
     static ArrayList<File> deleteFilesOnExit;
+    
+    /** Whether the PDB file name given on the command line is used. This is not the case for command lines which only operate on the database or which need no input file (e.g., --recreate-tables). */
+    static Boolean useFileFromCommandline = true;
 
 
 
@@ -269,6 +273,7 @@ public class Main {
                         }
                     }
 
+                    
                     if(s.equals("-p") || s.equals("--pdbfile")) {
                         if(args.length <= i+1 ) {
                             syntaxError();
@@ -279,6 +284,20 @@ public class Main {
                     }
                     
                     
+                    if(s.equals("-M") || s.equals("--similar")) {
+                        useFileFromCommandline = false;
+                        if(args.length <= i+3 ) {
+                            syntaxError();
+                        }
+                        else {                            
+                            Settings.set("plcc_B_search_similar", "true");
+                            Settings.set("plcc_B_search_similar_PDBID", args[i+1]);
+                            Settings.set("plcc_B_search_similar_chainID", args[i+2]);
+                            Settings.set("plcc_S_search_similar_graphtype", args[i+3]);
+                        }
+                    }
+                    
+                                                                               
                     if(s.equals("-v") || s.equals("--del-db-protein")) {
                         if(args.length <= i+1 ) {
                             syntaxError();
@@ -643,11 +662,45 @@ public class Main {
         
         
         System.out.println("  Debug level set to " + Settings.getInteger("plcc_I_debug_level") + ".");
-        System.out.println("  Using PDB file '" + pdbFile + "', dssp file '" + dsspFile + "', output directory '" + outputDir + "'.");
+        
+        if(useFileFromCommandline) {
+            System.out.println("  Using PDB file '" + pdbFile + "', dssp file '" + dsspFile + "', output directory '" + outputDir + "'.");
+        }
         
         if(Settings.getInteger("plcc_I_debug_level") > 0) {
             Settings.writeDocumentedDefaultFile(System.getProperty("user.home") + System.getProperty("file.separator") + ".plcc_example_settings");
         }
+        
+        
+        if(Settings.getBoolean("plcc_B_search_similar")) {
+            System.out.println("Searching for proteins similar to PDB ID '" + Settings.get("plcc_B_search_similar_PDBID") + "' chain '" + Settings.get("plcc_B_search_similar_chainID") + "' graph type '" + Settings.get("plcc_S_search_similar_graphtype") + "'.");
+            
+            if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"))) {
+                String patternSSEString = null;
+                try {
+                    patternSSEString = DBManager.getSSEString(Settings.get("plcc_B_search_similar_PDBID"), Settings.get("plcc_B_search_similar_chainID"), Settings.get("plcc_S_search_similar_graphtype"));
+                } catch (Exception e) {
+                    System.err.println("ERROR: DB: Could not retrieve SSE string for requested graph from database, exiting.");
+                    System.exit(1);
+                }
+                
+                if(patternSSEString == null) {
+                    System.err.println("ERROR: DB: SSE string for requested graph is not in the database, exiting.");
+                    System.exit(1);
+                } else {
+                    System.out.println("Using pattern SSEstring '" + patternSSEString + "'.");
+                }
+                
+                CompareOneToDB.compareSSEStringToDB(patternSSEString);
+                
+                System.exit(0);
+            } else {
+                System.err.println("ERROR: Could not connect to DB, exiting.");
+                System.exit(1);
+            }            
+            
+        }
+                
 
         File input_file;
         File output_dir;
@@ -1330,7 +1383,7 @@ public class Main {
                 // But we may need to write the graph to the database
                 if(Settings.getBoolean("plcc_B_useDB")) {
                     try { 
-                        DBManager.writeGraphToDB(pdbid, c.getPdbChainID(), ProtGraphs.getGraphTypeCode(gt), pg.toPlccGraphFormatString()); 
+                        DBManager.writeGraphToDB(pdbid, c.getPdbChainID(), ProtGraphs.getGraphTypeCode(gt), pg.toPlccGraphFormatString(), pg.getSSEString()); 
                         System.out.println("      Inserted '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + c.getPdbChainID() + "' into DB.");
                     }
                     catch(SQLException e) { 
@@ -2985,6 +3038,7 @@ public class Main {
         System.out.println("-k | --img-dir-tree        : do write the output images to a sudbir tree of the output dir instead of directly in there");
         System.out.println("-l | --draw-plcc-graph <f> : read graph in plcc format from file <f> and draw it to <f>.png, then exit (<pdbid> will be ignored)*");                
         System.out.println("-m | --image-format <f>    : write output images in format <f>, which can be 'PNG' for PNG bitmap format or 'SVG' for SVG vector format.");
+        System.out.println("-M | --similar <p> <c> <g> : find the proteins which are most similar to pdbid <p> chain <c> graph type <g> in the database.");
         System.out.println("-n | --textfiles           : write meta data, debug info and interim results like residue contacts to text files (slower)");
         System.out.println("-o | --outputdir <dir>     : write output files to directory <dir> (instead of '.', the current directory)");
         System.out.println("-p | --pdbfile <pdbfile>   : use input PDB file <pdbfile> (instead of assuming '<pdbid>.pdb')");

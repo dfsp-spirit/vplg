@@ -234,7 +234,7 @@ public class ProtGraphs {
      */
     public static HashMap<String, String> getMetaData(String graphString) {
         
-        HashMap md = new HashMap<String, String>();
+        HashMap<String, String> md = new HashMap<String, String>();
         
         md.put("format_version", "1");      // will be overwritten later if it occurs in the file. If it does NOT occur, this is the correct value.
         

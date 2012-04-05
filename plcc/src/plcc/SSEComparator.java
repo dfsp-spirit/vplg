@@ -11,7 +11,8 @@ package plcc;
 import java.util.*;
 
 /** 
- * Simple comparator which allows comparison of the SSEs by their sequential position in the AA sequence of their chain.
+ * Simple comparator which allows comparison of SSEs by their sequential position in the AA sequence
+ * of their chain.
  * 
  * @author ts
  */

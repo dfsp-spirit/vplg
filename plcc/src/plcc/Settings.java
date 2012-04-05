@@ -200,10 +200,10 @@ public class Settings {
 
         // Database stuff
         defSet("plcc_B_useDB", "false", "Whether to write statistics to the PostgreSQL database");
-        defSet("plcc_S_db_name", "ts", "Database name");
+        defSet("plcc_S_db_name", "vplg", "Database name");
         defSet("plcc_S_db_host", "127.0.0.1", "Hostname or IP of the DB server");
         defSet("plcc_I_db_port", "5432", "DB server port");
-        defSet("plcc_S_db_username", "ts", "DB username");
+        defSet("plcc_S_db_username", "vplg", "DB username");
         defSet("plcc_S_db_password", "", "DB password (empty if local is TRUST for this user)");
 
 
@@ -219,6 +219,14 @@ public class Settings {
         defSet("plcc_B_force_chain", "false", "Whether to force parsing a certain PDB chain");
         defSet("plcc_S_forced_chain_id", "A", "The forced chain ID, only used when plcc_B_force_chain is true");
 
+        
+        // similarity stuff
+        defSet("plcc_B_search_similar", "false", "Whether to activate the program mode which searches for the most similar protein");
+        defSet("plcc_S_search_similar_PDBID", "8icd", "Used only when plcc_B_search_similar is true. The protein PDB ID to use as a pattern during the similarity search.");
+        defSet("plcc_S_search_similar_chainID", "A", "Used only when plcc_B_search_similar is true. The protein chain ID to use as a pattern during the similarity search.");
+        defSet("plcc_S_search_similar_graphtype", "albelig", "Used only when plcc_B_search_similar is true. The graph type to use as a pattern during the similarity search.");
+        defSet("plcc_I_search_similar_num_results", "5", "Used only when plcc_B_search_similar is true. The number of results to print (e.g., 3 for the 3 most similar proteins in the DB).");
+        
 
         // Contact definition and calculation        
         defSet("plcc_I_atom_radius", "20", "The atom radius of protein atoms in 10th part Angstroem (setting 20 here means 2A)");
