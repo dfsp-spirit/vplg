@@ -266,6 +266,26 @@ public abstract class SSEGraph {
     
     
     /**
+     * Returns the number of contacts of a certain type.
+     * @param type the contact type, use of the constants in SpatRel, e.g., SpatRel.ANTIPARALLEL
+     * @return the number of contacts of the requested type in the graph
+     */
+    public Integer numContacts(Integer type) {
+        
+        Integer num = 0;
+        
+        for(Integer i = 0; i < size; i++) {
+           for(Integer j = i+1; j < size; j++) {
+               if(matrix[i][j] == type) {
+                   num++;
+               }
+           }           
+        }
+        return(num);
+    }
+    
+    
+    /**
      * Determines whether this graph contains at least one edge of type parallel.
      * @return true if it does, false otherwise
      */
@@ -698,6 +718,35 @@ public abstract class SSEGraph {
     public Integer numVertices() {
         return(this.size);
     }
+    
+    
+    /**
+     * Returns the number of helices in this graph.
+     * @return the number of helices
+     */
+    public Integer numHelices() {
+        Integer num = 0;
+        for(SSE s : this.sseList) {
+            if(s.isHelix()) {
+                num++;
+            }
+        }
+        return(num);
+    }
+    
+    /**
+     * Returns the number of beta strands in this graph.
+     * @return the number of beta strands
+     */
+    public Integer numBetaStrands() {
+        Integer num = 0;
+        for(SSE s : this.sseList) {
+            if(s.isBetaStrand()) {
+                num++;
+            }
+        }
+        return(num);
+    }
 
 
     /**
@@ -806,6 +855,8 @@ public abstract class SSEGraph {
         }
         return(n);
     }
+    
+   
     
     
     /**
@@ -1402,8 +1453,6 @@ public abstract class SSEGraph {
         }
         else {                
             Integer seqIndexCurrentSSE, seqIndexNextSSE;
-
-
 
             String notation;
             
@@ -2761,16 +2810,37 @@ public abstract class SSEGraph {
     }
     
     /**
-     * Returns the SSEString of the graph, e.g., "HHEHEHEHEHEHHEEHL".
-     * @return the SSEString, e.g., "HHEHEHEHEHEHHEEHL".
+     * Returns the SSEString of the graph in sequence order, e.g., "HHEHEHEHEHEHHEEHL".
+     * @return the SSEString in AA sequence order, e.g., "HHEHEHEHEHEHHEEHL".
      */
-    public String getSSEString() {
+    public String getSSEStringSequential() {
         String s = "";
         for(SSE sse : this.sseList) {
             s += sse.getSseType();
         }
         return(s);
     }
+    
+    /**
+     * Returns the SSEString of the graph in spatial order if this graph has such an order, e.g., "HHEHEHEHEHEHHEEHL".
+     * @return the SSEString in spatial order or the empty string "" if no such order exists for this graph
+     */
+    public String getSSEStringSpatial() {
+        
+        String spatSSEString = "";
+        Integer seqIndexCurrentSSE;
+        
+        if(this.hasSpatialOrdering()) {
+            
+            for(Integer i = 0; i < this.spatOrder.size(); i++) {
+                seqIndexCurrentSSE = this.spatOrder.get(i);
+                spatSSEString += this.sseList.get(seqIndexCurrentSSE).getSseType();
+            }
+        }
+        return(spatSSEString);
+    }
+    
+    
     
     
     /**

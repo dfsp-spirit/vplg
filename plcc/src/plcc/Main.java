@@ -42,6 +42,7 @@ import org.apache.batik.dom.GenericDOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.DOMImplementation;
 import similarity.CompareOneToDB;
+import similarity.Similarity;
 
 
 /**
@@ -284,6 +285,19 @@ public class Main {
                     }
                     
                     
+                    if(s.equals("-S") || s.equals("--sim-measure")) {
+                        //System.out.println("Setting similarity measure to " + args[i+1] + ".");
+                        if(args.length <= i+1 ) {
+                            syntaxError();
+                        }
+                        else {
+                            Settings.set("plcc_S_search_similar_method", args[i+1]);
+                        }
+                    }
+                    
+                    
+                    
+                    
                     if(s.equals("-M") || s.equals("--similar")) {
                         useFileFromCommandline = false;
                         if(args.length <= i+3 ) {
@@ -293,7 +307,7 @@ public class Main {
                             Settings.set("plcc_B_search_similar", "true");
                             Settings.set("plcc_B_search_similar_PDBID", args[i+1]);
                             Settings.set("plcc_B_search_similar_chainID", args[i+2]);
-                            Settings.set("plcc_S_search_similar_graphtype", args[i+3]);
+                            Settings.set("plcc_S_search_similar_graphtype", args[i+3]);                            
                         }
                     }
                     
@@ -660,8 +674,9 @@ public class Main {
             print_debug_malfunction_warning();            
         }
         
-        
-        System.out.println("  Debug level set to " + Settings.getInteger("plcc_I_debug_level") + ".");
+        if(Settings.getInteger("plcc_I_debug_level") > 0) {
+            System.out.println("  Debug level set to " + Settings.getInteger("plcc_I_debug_level") + ".");
+        }
         
         if(useFileFromCommandline) {
             System.out.println("  Using PDB file '" + pdbFile + "', dssp file '" + dsspFile + "', output directory '" + outputDir + "'.");
@@ -676,22 +691,32 @@ public class Main {
             System.out.println("Searching for proteins similar to PDB ID '" + Settings.get("plcc_B_search_similar_PDBID") + "' chain '" + Settings.get("plcc_B_search_similar_chainID") + "' graph type '" + Settings.get("plcc_S_search_similar_graphtype") + "'.");
             
             if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"))) {
-                String patternSSEString = null;
-                try {
-                    patternSSEString = DBManager.getSSEString(Settings.get("plcc_B_search_similar_PDBID"), Settings.get("plcc_B_search_similar_chainID"), Settings.get("plcc_S_search_similar_graphtype"));
-                } catch (Exception e) {
-                    System.err.println("ERROR: DB: Could not retrieve SSE string for requested graph from database, exiting.");
+                
+                if(Settings.get("plcc_S_search_similar_method").equals(Similarity.SIMILARITYMETHOD_STRINGSSE)) {
+                
+                    String patternSSEString = null;
+                    try {
+                        patternSSEString = DBManager.getSSEString(Settings.get("plcc_B_search_similar_PDBID"), Settings.get("plcc_B_search_similar_chainID"), Settings.get("plcc_S_search_similar_graphtype"));
+                    } catch (Exception e) {
+                        System.err.println("ERROR: DB: Could not retrieve SSE string for requested graph from database, exiting.");
+                        System.exit(1);
+                    }
+
+                    if(patternSSEString == null) {
+                        System.err.println("ERROR: DB: SSE string for requested graph is not in the database, exiting.");
+                        System.exit(1);
+                    } else {
+                        System.out.println("Using pattern SSEstring '" + patternSSEString + "'.");
+                    }
+
+                    CompareOneToDB.performSSEStringComparison(patternSSEString);
+                } else if (Settings.get("plcc_S_search_similar_method").equals(Similarity.SIMILARITYMETHOD_GRAPHSET)) {
+                    CompareOneToDB.performGraphSetComparison();                    
+                }
+                else {
+                    System.err.println("ERROR: Invalid similarity method: '" + Settings.get("plcc_S_search_similar_method") + "'. Use --help for info on valid settings.");
                     System.exit(1);
                 }
-                
-                if(patternSSEString == null) {
-                    System.err.println("ERROR: DB: SSE string for requested graph is not in the database, exiting.");
-                    System.exit(1);
-                } else {
-                    System.out.println("Using pattern SSEstring '" + patternSSEString + "'.");
-                }
-                
-                CompareOneToDB.compareSSEStringToDB(patternSSEString);
                 
                 System.exit(0);
             } else {
@@ -1053,7 +1078,7 @@ public class Main {
         
         String graphString = null;
         try { graphString = DBManager.getGraph(g_pdbid, g_chainid, g_graphtype); }
-        catch (SQLException e) { System.err.println("ERROR: SQL: Drawing of graph from DB failed."); return; }
+        catch (SQLException e) { System.err.println("ERROR: SQL: Drawing of graph from DB failed: '" + e.getMessage() + "'."); return; }
         
         if(graphString == null) {
             System.err.println("ERROR: No such graph in the database, exiting.");
@@ -1383,7 +1408,7 @@ public class Main {
                 // But we may need to write the graph to the database
                 if(Settings.getBoolean("plcc_B_useDB")) {
                     try { 
-                        DBManager.writeGraphToDB(pdbid, c.getPdbChainID(), ProtGraphs.getGraphTypeCode(gt), pg.toPlccGraphFormatString(), pg.getSSEString()); 
+                        DBManager.writeGraphToDB(pdbid, c.getPdbChainID(), ProtGraphs.getGraphTypeCode(gt), pg.toPlccGraphFormatString(), pg.getSSEStringSequential()); 
                         System.out.println("      Inserted '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + c.getPdbChainID() + "' into DB.");
                     }
                     catch(SQLException e) { 
@@ -3046,6 +3071,7 @@ public class Main {
         System.out.println("-q | --fg-notations <list> : draw only the folding graph notations in <list>, e.g. 'kars' = KEY, ADJ, RED and SEQ.");
         System.out.println("-r | --recreate-tables     : drop and recreate DB statistics tables, then exit (see -u)*");
         System.out.println("-s | --showonscreen        : show an overview of the residue contact results on STDOUT during compuation  [DEBUG]");
+        System.out.println("-S | --sim-measure <m>     : use similarity measure <m>. Valid settings include 'string_sse' and 'graph_set'.");
         System.out.println("-t | --draw-tgf-graph <f>  : read graph in TGF format from file <f> and draw it to <f>.png, then exit (pdbid will be ignored)*");
         System.out.println("-u | --use-database        : write SSE contact data to database [requires DB credentials in cfg file]");                       
         System.out.println("-v | --del-db-protein <p>  : delete the protein chain with PDBID <p> from the database [requires DB credentials in cfg file]");

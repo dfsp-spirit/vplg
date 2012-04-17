@@ -136,6 +136,7 @@ public class SSE implements java.io.Serializable {
      */
     public Integer getSSESeqChainNum() { return(sseSeqChainNum); }
     
+    /** Returns the SSEType string of this SSE. This is a single character, e.g., "H" for an alpha helix. */
     public String getSseType() { return(sseType); }
     public ArrayList<Residue> getResidues() { return(residues); }
     public Chain getChain() { return(chain); }

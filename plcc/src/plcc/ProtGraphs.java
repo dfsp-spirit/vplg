@@ -486,7 +486,7 @@ public class ProtGraphs {
             System.exit(1);
         }
         else {
-            System.out.println("  Parsed " + sses.size() + " SSEs from input file in plcc graph format.");
+            //System.out.println("  Parsed " + sses.size() + " SSEs from input file in plcc graph format.");
         }
         
         pg = new ProtGraph(sses);
@@ -540,7 +540,7 @@ public class ProtGraphs {
         }
                                 
         // Done.  
-        System.out.println("  Parsed " + numContactsAdded + " contacts from input file in plcc graph format.");
+        //System.out.println("  Parsed " + numContactsAdded + " contacts from input file in plcc graph format.");
             
         if(pg == null) {
             System.err.println("ERROR: Parsing graph from plcc format graph string failed, returning empty graph.");

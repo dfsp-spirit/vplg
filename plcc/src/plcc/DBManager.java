@@ -1228,7 +1228,7 @@ public class DBManager {
     
     
     /**
-     * Retrieves the SSEStrings of all protein graphs from the database.
+     * Retrieves the graph data of all protein graphs from the database.
      * @param graphType the graph type, use one of the constants SSEGraph.GRAPHTYPE_* (e.g., SSEGraph.GRAPHTYPE_ALBE) or the word 'ALL' for all types.
      * @return an ArrayList of String arrays. Each of the String arrays in the list has 3 fields. The 
      * first fields (array[0]) contains the PDB ID of the chain, the second one (array[1]) contains the chain ID, the 
@@ -1237,10 +1237,11 @@ public class DBManager {
      *  position 1 := chain id
      *  position 2 := graph type
      *  position 3 := SSE string
+     *  position 4 := graph string
      */
-    public static ArrayList<String[]> getAllSSEStrings(String graph_type) throws SQLException {
+    public static ArrayList<String[]> getAllGraphData(String graph_type) throws SQLException {
         
-        ArrayList<String[]> pdbSSEStrings = new ArrayList<String[]>();
+        ArrayList<String[]> graphData = new ArrayList<String[]>();
         
         // get a list of values pairs from the db here    
                 
@@ -1262,10 +1263,10 @@ public class DBManager {
         PreparedStatement statement = null;
         ResultSet rs = null;
 
-        String query = "SELECT sse_string, chain_id, graph_type FROM " + tbl_graph + " WHERE (graph_type = ?);";
+        String query = "SELECT sse_string, chain_id, graph_type, graph_string FROM " + tbl_graph + " WHERE (graph_type = ?);";
         
         if(allGraphs) {
-            query = "SELECT sse_string, chain_id, graph_type FROM " + tbl_graph + ";";
+            query = "SELECT sse_string, chain_id, graph_type, graph_string FROM " + tbl_graph + ";";
         }
 
         try {
@@ -1299,7 +1300,7 @@ public class DBManager {
             }
             
         } catch (SQLException e ) {
-            System.err.println("ERROR: SQL: getAllSSEStrings: '" + e.getMessage() + "'.");
+            System.err.println("ERROR: SQL: getAllGraphData: '" + e.getMessage() + "'.");
         } finally {
             if (statement != null) {
                 statement.close();
@@ -1308,21 +1309,22 @@ public class DBManager {
         }
         
         // OK, check size of results table and return 1st field of 1st column
-        String graphSSEStringDB, graphTypeDB, pdbidDB, chainNameDB;
+        String graphSSEStringDB, graphTypeDB, pdbidDB, chainNameDB, graphStringDB;
         Integer chainPK;
         String[] data;
         
         
         for(Integer i = 0; i < tableData.size(); i++) {            
             
-            if(tableData.get(i).size() == 3) {
+            if(tableData.get(i).size() == 4) {
                 graphSSEStringDB = tableData.get(i).get(0);
                 graphTypeDB = tableData.get(i).get(2);
+                graphStringDB = tableData.get(i).get(3);
                 
                 try {
                     chainPK = Integer.valueOf(tableData.get(i).get(1));
                 } catch(Exception e) {
-                    System.err.println("WARNING: DB: getAllSSEStrings(): '" + e.getMessage() + "' Ignoring data row.");
+                    System.err.println("WARNING: DB: getAllGraphData(): '" + e.getMessage() + "' Ignoring data row.");
                     continue;
                 }
 
@@ -1330,22 +1332,22 @@ public class DBManager {
                 data = getPDBIDandChain(chainPK);
                 
                 if(data.length != 2) {
-                    System.err.println("WARNING: DB: getAllSSEStrings(): Could not find chain with PK '" + chainPK + "' in DB, ignoring data row.");
+                    System.err.println("WARNING: DB: getAllGraphData(): Could not find chain with PK '" + chainPK + "' in DB, ignoring data row.");
                     continue;
                 }
                 else {
                     pdbidDB = data[0];
                     chainNameDB = data[1];
-                    pdbSSEStrings.add(new String[]{pdbidDB, chainNameDB, graphTypeDB, graphSSEStringDB});
+                    graphData.add(new String[]{pdbidDB, chainNameDB, graphTypeDB, graphSSEStringDB, graphStringDB});
                 }                
             }
             else {
-                System.err.println("WARNING: DB: getAllSSEStrings(): Result row #" + i + " has unexpected length " + tableData.get(i).size() + ".");
-                return(pdbSSEStrings);
+                System.err.println("WARNING: DB: getAllGraphData(): Result row #" + i + " has unexpected length " + tableData.get(i).size() + ".");
+                return(graphData);
             }
         }
         
-        return(pdbSSEStrings);                        
+        return(graphData);                        
     }
     
     

@@ -226,6 +226,8 @@ public class Settings {
         defSet("plcc_S_search_similar_chainID", "A", "Used only when plcc_B_search_similar is true. The protein chain ID to use as a pattern during the similarity search.");
         defSet("plcc_S_search_similar_graphtype", "albelig", "Used only when plcc_B_search_similar is true. The graph type to use as a pattern during the similarity search.");
         defSet("plcc_I_search_similar_num_results", "5", "Used only when plcc_B_search_similar is true. The number of results to print (e.g., 3 for the 3 most similar proteins in the DB).");
+        defSet("plcc_S_search_similar_method", "string_sse", "Used only when plcc_B_search_similar is true. The similarity measure to use, valid settings: string_sse, graph_set");
+        
         
 
         // Contact definition and calculation        

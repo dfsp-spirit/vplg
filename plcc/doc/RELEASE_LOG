@@ -11,3 +11,23 @@ Updates from version 2012-01-24 to 2012-01-30:
 * It is now possible to restrict computations to a specific chain on the command line
 
 
+Updates from version 2012-01-30 to 2012-02-21:
+================================================
+* fixed bitmap output support (-m)
+* fixed some database-related security issues
+* database structure has also been changed slightly
+* output files can now be written to a directory tree similar to the PDB directory structure to avoid problems with thousands of output files in a single directory (-k)
+* add support for gzipped input files
+* many other fixes
+
+
+Updates from version 2012-01-21 to 2012-04-17:
+================================================
+* support for deleting a protein from the database
+* splitpdb now also supports gzipped input PDB files and can also write gzipped output files
+* computation of a spatial vertex ordering of a graph if possible for the graph
+* based on this vertex ordering, the KEY notation from the Protein Topology Graph Library can also be computed
+* database layout changes and fixes
+* work on similarity methods for protein graphs (--similar command line option, similarity src package)
+* changed the values of some default settings inthe cfg file
+
