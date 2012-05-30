@@ -18,6 +18,10 @@ import java.util.ArrayList;
  * @author ts
  */
 public class Residue implements java.io.Serializable {
+    
+    public static final Integer RESIDUE_TYPE_AA = 0;
+    public static final Integer RESIDUE_TYPE_LIGAND = 1;
+    public static final Integer RESIDUE_TYPE_OTHER = 2;
 
     // declare class vars
     private String resName3 = null;                          // 3 letter name
@@ -47,16 +51,20 @@ public class Residue implements java.io.Serializable {
     // constructor
     public Residue() { atoms = new ArrayList<Atom>(); }
 
-    // constructor
+    /**
+     * Constructs a new residue with PDB residue number 'prn' and DSSP residue number 'drn'.
+     * @param prn
+     * @param drn 
+     */
     public Residue(Integer prn, Integer drn) {
         atoms = new ArrayList<Atom>();
         pdbResNum = prn;
         dsspResNum = drn;
     }
 
-    public Boolean isLigand() { return(this.type.equals(1)); }
-    public Boolean isAA() { return(this.type.equals(0)); }
-    public Boolean isOtherRes() { return(this.type.equals(2)); }
+    public Boolean isLigand() { return(this.type.equals(Residue.RESIDUE_TYPE_LIGAND)); }
+    public Boolean isAA() { return(this.type.equals(Residue.RESIDUE_TYPE_AA)); }
+    public Boolean isOtherRes() { return(this.type.equals(Residue.RESIDUE_TYPE_OTHER)); }
 
 
     /**
@@ -325,6 +333,7 @@ public class Residue implements java.io.Serializable {
     public Chain getChain() { return(chain); }
     public String getChainID() { return(chainID); }
     public ArrayList<Atom> getAtoms() { return(atoms); }
+    public Integer getNumAtoms() { return(this.atoms.size()); }
     public String getModelID() { return(modelID); }
     public String getiCode() { return(iCode); }
     public Integer getInternalID() { return(AminoAcid.name3ToID(resName3)); }

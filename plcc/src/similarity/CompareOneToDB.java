@@ -50,6 +50,8 @@ public class CompareOneToDB {
             System.err.println("WARNING: CompareOneToDB: SQL error while getting all SSEStrings: '" + e.getMessage() + "'.");
         }
         
+        System.out.println("Comparing given protein graph to " + sseStrings.size() + " of the protein graphs in the database.");
+        
         ScoringMatrix sm = new ScoringMatrix(ScoringMatrix.ALPHABET_SSE, ScoringMatrix.MATRIX_SSE, ScoringMatrix.GAP_PENALTY_SSE);
         SmithWaterman sw;
         NeedlemanWunsch nw;
@@ -121,7 +123,9 @@ public class CompareOneToDB {
     
     
     
-    
+     /**
+     * Performs the comparison and prints results to STDOUT.
+     */
     public static void performGraphSetComparison() {
         ArrayList<ComparisonResult> res = CompareOneToDB.getMostSimilarByGraphSetBased(Settings.get("plcc_S_search_similar_PDBID"), Settings.get("plcc_S_search_similar_chainID"), Settings.get("plcc_S_search_similar_graphtype"), Settings.getInteger("plcc_I_search_similar_num_results"));
                 
@@ -138,9 +142,133 @@ public class CompareOneToDB {
         System.out.println("Similarity search for PDB ID '" + Settings.get("plcc_B_search_similar_PDBID") + "' chain '" + Settings.get("plcc_B_search_similar_chainID") + "' graph type '" + Settings.get("plcc_S_search_similar_graphtype") + "' complete (" + res.size() + " results), exiting.");        
     }
     
+    
+    /**
+     * Performs the comparison and prints results to STDOUT.
+     */
+    public static void performGraphCompatGraphComparison() {
+        ArrayList<ComparisonResult> res = CompareOneToDB.getMostSimilarByCompatibilityGraph(Settings.get("plcc_S_search_similar_PDBID"), Settings.get("plcc_S_search_similar_chainID"), Settings.get("plcc_S_search_similar_graphtype"), Settings.getInteger("plcc_I_search_similar_num_results"));
+                
+        System.out.println("Comparison done, checking results.");
+        
+        if(res.size() > 0) {
+
+            for(ComparisonResult result : res) {
+                //System.out.println("  sim(" + result.getTargetString() + ") via "  + result.getMethod() + ": "  + result.getScore() + "\t(" +  result.getPropertyTarget() + ")"); 
+                System.out.println("  sim(" + result.getTargetString() + ") via "  + result.getMethod() + ": "  + result.getScore()); 
+            }
+
+        } else {
+            System.err.println("WARNING: Received no similarity results -- is the database empty?");  
+        }
+        System.out.println("Similarity search for PDB ID '" + Settings.get("plcc_B_search_similar_PDBID") + "' chain '" + Settings.get("plcc_B_search_similar_chainID") + "' graph type '" + Settings.get("plcc_S_search_similar_graphtype") + "' complete (" + res.size() + " results), exiting.");        
+    }
+    
 
     
     /**
+     * Compares the given graph with all others in the database using compatibility graph-based graph comparison methods.
+     * s@param g_pdbid the PDB ID used to identify the pattern graph
+     * @param g_chainid the chain ID used to identify the pattern graph
+     * @param g_graphtype the graph type used to identify the pattern graph
+     * @return a list of comparison results
+     */
+    public static ArrayList<ComparisonResult> getMostSimilarByCompatibilityGraph(String g_pdbid, String g_chainid, String g_graphtype, Integer maxNumberOfResults) {
+        
+        System.out.println("Retrieving " + g_graphtype + " graph for PDB entry " + g_pdbid + " chain " + g_chainid + " from DB.");
+        
+        String graphString = null;
+        ArrayList<ComparisonResult> results = new ArrayList<ComparisonResult>();
+        
+        // get the graph string of the pattern graph
+        try { 
+            graphString = DBManager.getGraphString(g_pdbid, g_chainid, g_graphtype); 
+        } catch (SQLException e) { 
+            System.err.println("ERROR: SQL: Could not get graph from DB: '" + e.getMessage() + "'."); 
+            return(results);            
+        }
+        
+        if(graphString == null) {
+            System.err.println("WARNING: DB: getMostSimilarByGraphSetBased: Pattern graph not found in database.");
+            return(results);
+        }
+        
+        ProtGraph pg = ProtGraphs.fromPlccGraphFormatString(graphString);
+        
+        String methodName = Similarity.SIMILARITYMETHOD_GRAPHCOMPAT;
+        
+        
+        ArrayList<String[]> graphData  = new ArrayList<String[]>();
+        
+        try {
+            graphData = DBManager.getAllGraphData(g_graphtype);
+        } catch(Exception e) {
+            System.err.println("WARNING: CompareOneToDB: SQL error while getting all SSEStrings: '" + e.getMessage() + "'.");
+        }
+        
+        System.out.println("Comparing given protein graph to " + graphData.size() + " of the protein graphs in the database.");
+        
+        String pdbidDB, chainidDB, graphTypeDB, sseStringDB, graphStringDB;
+        Integer score;
+        ProtGraph pgDB;    
+        
+        // iterate thtough all graphs in the DB and compare our template graph with all of them
+        for(String[] sseData : graphData) {
+            pdbidDB = sseData[0];
+            chainidDB = sseData[1];
+            graphTypeDB = sseData[2];
+            sseStringDB = sseData[3];
+            graphStringDB = sseData[4];
+            
+            
+            
+            try {
+                pgDB = ProtGraphs.fromPlccGraphFormatString(graphStringDB);
+            } catch(Exception e) {
+                System.err.println("WARNING: Could not create protein graph from graph string of " + pdbidDB + " chain " + chainidDB + " gt " + graphTypeDB + ": '" + e.getLocalizedMessage() + "'.");
+                continue;
+            }
+                                    
+            
+            
+            GraphSimilarity simSSE = new GraphSimilarity(pg, pgDB);
+            score = simSSE.compareByCompatibilityGraph();
+            
+            ComparisonResult cr = new ComparisonResult(methodName, score);
+            cr.setTarget(pdbidDB, chainidDB, graphTypeDB);
+            cr.setPropertySource(graphString);
+            cr.setPropertyTarget(graphStringDB);
+                
+            
+            results.add(cr);
+            Collections.sort(results, new ComparisonResultComparator());
+            
+            // make sure the list size does never exceed maxNumberOfResults
+            if(results.size() > maxNumberOfResults) {
+                // just add every result until the maximim number is reached
+                Integer overhead = results.size() - maxNumberOfResults;
+                for(Integer i = 0; i < overhead; i++) {
+                    // always remove the first element, i.e., the one with the lowest score
+                    // This will not break the ordering of the rest, so no need to re-order
+                    results.remove(0);  
+                }
+            }
+            
+                        
+        }
+        
+        
+        
+        
+        
+        return(results);
+    }
+    
+    
+    
+    /**
+     * 
+     * 
      * Compares the given graph with all others in the database using set-based graph comparison methods.
      * @param g_pdbid the PDB ID used to identify the pattern graph
      * @param g_chainid the chain ID used to identify the pattern graph
@@ -156,7 +284,7 @@ public class CompareOneToDB {
         
         // get the grapg of the pattern graph
         try { 
-            graphString = DBManager.getGraph(g_pdbid, g_chainid, g_graphtype); 
+            graphString = DBManager.getGraphString(g_pdbid, g_chainid, g_graphtype); 
         } catch (SQLException e) { 
             System.err.println("ERROR: SQL: Could not get graph from DB: '" + e.getMessage() + "'."); 
             return(results);            
@@ -185,6 +313,8 @@ public class CompareOneToDB {
         } catch(Exception e) {
             System.err.println("WARNING: CompareOneToDB: SQL error while getting all SSEStrings: '" + e.getMessage() + "'.");
         }
+        
+        System.out.println("Comparing given protein graph to " + graphData.size() + " of the protein graphs in the database.");
         
         String pdbidDB, chainidDB, graphTypeDB, sseStringDB, graphStringDB;
         Integer score;

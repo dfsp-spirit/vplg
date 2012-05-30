@@ -93,14 +93,41 @@ public class ProtGraphs {
     
     /**
      * Reads a file that has to contain a graph in TGF (trivial graph format) and turns it into a protein graph.
-     *
+     * @param file the path to the file
+     * @return the TGF string
      */
-    public static ProtGraph fromTrivialGraphFormat(String file) {
+    public static ProtGraph fromTrivialGraphFormatFile(String file) {
+        return(ProtGraphs.fromTrivialGraphFormatString(FileParser.slurpFileToString(file)));
+    }
+    
+    
+    /**
+     * Reads a string that has to contain a graph in TGF (trivial graph format) and turns it into a protein graph.
+     * @param s the source string
+     * @return the ProtGraph object
+     */
+    public static ProtGraph fromTrivialGraphFormatString(String s) {
 
         ProtGraph pg = null;
         Boolean inVertices = true;
-
-        ArrayList<String> lines = FileParser.slurpFile(file);
+        
+        String linesArr[] = s.split("\\r?\\n");
+        ArrayList<String> lines = new ArrayList<String>(Arrays.asList(linesArr));
+        
+        // DEBUG
+        //System.out.println("DEBUG: ProtGraphs.fromTrivialGraphFormatString: Handling string with " + lines.size() + " lines.");
+        //String cgFile = "compatgraph.tgf";
+        //IO.stringToTextFile(cgFile, s);
+        //System.out.println("DEBUG: wrote TGF to file '" + cgFile + "'.");
+        
+        //DEBUG
+        /*
+        Integer stopAtLine = lines.size() > 50 ? 50 : lines.size();
+        for(Integer i = 0; i < stopAtLine; i++) {
+            System.out.println("DEBUG: line #" + i + ":'" + lines.get(i) + "'");
+        }
+        */
+        
         ArrayList<SSE> sses = new ArrayList<SSE>();
         String l, vertexPart, vertexPart1, vertexPart2, labelPart, edgePart, vertexLabel, edgeLabel;
         l = vertexLabel = edgeLabel = vertexPart = labelPart = vertexPart1 = vertexPart2 = null;
@@ -126,9 +153,14 @@ public class ProtGraphs {
 
                 if(l.startsWith("#")) {         // We hit the border between vertices and edges, create the graph from the vertices we .
                     inVertices = false;            //  found so far and skip this line.
+                    
+                    if(sses.size() <= 0) {
+                        System.err.println("WARNING: ProtGraphs.fromTrivialGraphFormatFile(): In edge section but no vertices found so far.");
+                    }
+                    
                     pg = new ProtGraph(sses);
                     pg.setInfo("<NONE>", "<NONE>", "custom");
-                    //System.out.println("    Found separator vertex set /edge set separator '#' in line " + curLine + ".");
+                    //System.out.println("DEBUG: fromTrivialGraphFormatString: Found vertex set / edge set separator '#' in line " + curLine + ".");
                     continue;
                 }
                 else {
@@ -147,7 +179,7 @@ public class ProtGraphs {
                             labelPart = (l.substring(firstSpace, l.length())).trim();
                         } catch(Exception e) {
                             // We'll just skip this line for now
-                            System.err.println("WARNING: TGF_FORMAT: Skipping line " + curLine + " (could not parse as vertex).");
+                            System.err.println("WARNING: TGF_FORMAT: Skipping line " + curLine + " (could not parse as vertex: " + e.getMessage() + ").");
                             continue;
                         }                                                                        
                     }
@@ -158,10 +190,10 @@ public class ProtGraphs {
                         vertex = Integer.valueOf(vertexPart);
                         vertexLabel = vertexPart.trim();
                     } catch(Exception e) {
-                        System.err.println("WARNING: TGF_FORMAT: Skipping line " + curLine + " (could not extract vertex data).");
+                        System.err.println("WARNING: TGF_FORMAT: Skipping line " + curLine + " (could not extract vertex data:" + e.getMessage() + ".");
                         continue;
                         //System.err.println("ERROR: Parsing vertex line in trivial graph format file '" + file + "' failed. File broken or in wrong format?");
-                        //System.exit(-1);
+                        //System.exit(1);
                     }
 
                     // We can now create the vertex object (a fake SSE)
@@ -173,20 +205,29 @@ public class ProtGraphs {
                 }
             }
             else {                  // We are in the edge part
-                words = l.split("\\s", 3);
-                if(words.length < 2) {
-                    System.err.println("WARNING: TGF_FORMAT: Skipping line " + curLine + " (less than 2 fields can't encode an edge).");
+                //System.out.println("DEBUG: In edge part at line " + curLine + ".");
+                try {
+                    words = l.split("\\s", 3);                
+
+
+                    if(words.length < 2) {
+                        System.err.println("WARNING: TGF_FORMAT: Skipping line " + curLine + " (less than 2 fields can't encode an edge).");
+                        continue;
+                    }
+                    else if(words.length == 2) {
+                        vertexPart1 = words[0];
+                        vertexPart2 = words[1];
+                        labelPart = "";
+                    }
+                    else {
+                        vertexPart1 = words[0];
+                        vertexPart2 = words[1];
+                        labelPart = words[2];
+                    }
+                    //System.out.println("DEBUG: split line " + curLine + ".");
+                } catch (Exception ez) {
+                    System.err.println("ERROR: fromTrivialGraphFormatString: Could not split line '" + l + "': " + ez.getMessage() + ". Skipping.");
                     continue;
-                }
-                else if(words.length == 2) {
-                    vertexPart1 = words[0];
-                    vertexPart2 = words[1];
-                    labelPart = "";
-                }
-                else {
-                    vertexPart1 = words[0];
-                    vertexPart2 = words[1];
-                    labelPart = words[2];
                 }
 
                 // The parts have been defined, parse them
@@ -199,25 +240,32 @@ public class ProtGraphs {
                     System.err.println("WARNING: TGF_FORMAT: Skipping line " + curLine + " (could not parse as edge).");
                     continue;
                     //System.err.println("ERROR: Parsing vertex line in trivial graph format file '" + file + "' failed. File broken or in wrong format?");
-                    //System.exit(-1);
+                    //System.exit(1);
                 }
 
                 // We can now add this edge
                 if(pg == null) {
-                    System.err.println("ERROR: TGF_FORMAT: Graph in file '" + file + "' has no '#' line separating vertices from edges. File broken (skipping edge).");
+                    System.err.println("ERROR: TGF_FORMAT: Graph has no '#' line separating vertices from edges. File broken (skipping edge).");
                 }
                 else {
-                    pg.addContact(vertex1 - 1, vertex2 - 1, 1);
+                    //pg.addContact(vertex1 - 1, vertex2 - 1, 1);
+                    pg.addContact(vertex1, vertex2, 1);
+                    //System.out.println("Added contact.");
                 }
 
 
             }
         }
+        
+        //System.out.println("DEBUG: fromTrivialGraphFormatString: Handled " + lines.size() + " lines.");
 
         if(pg == null) {
-            System.err.println("WARNING: TGF_FORMAT: Graph in trivial graph format file '" + file + "' is empty (has no edges).");
+            System.err.println("WARNING: TGF_FORMAT: Graph in trivial graph format is empty (has no edges).");
             return(new ProtGraph(new ArrayList<SSE>()));
         }
+        
+        //System.out.println("DEBUG: ProtGraphs.fromTrivialGraphFormatString: Created ProtGraph.");
+        //System.out.println("DEBUG: ProtGraphs.fromTrivialGraphFormatString: Created ProtGraph is " + pg.toShortString() + ".");
 
         return(pg);
 

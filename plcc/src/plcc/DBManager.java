@@ -1069,7 +1069,7 @@ public class DBManager {
      * @return the string representation of the graph or null if no such graph exists.
      * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
      */
-    public static String getGraph(String pdb_id, String chain_name, String graph_type) throws SQLException {
+    public static String getGraphString(String pdb_id, String chain_name, String graph_type) throws SQLException {
         Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
         
         Integer chain_db_id = getDBChainID(pdb_id, chain_name);
@@ -1140,6 +1140,33 @@ public class DBManager {
         else {
             return(null);
         }        
+    }
+    
+    
+    /**
+     * Returns the requested ProtGraph object or NULL if no such graph exists in the DB (or DB errors occurred).
+     * @param pdb_id
+     * @param chain_name
+     * @param graph_type
+     * @return 
+     */
+    public static ProtGraph getGraph(String pdb_id, String chain_name, String graph_type) {
+
+        String graphString = null;
+        
+        try { 
+            graphString = DBManager.getGraphString(pdb_id, chain_name, graph_type); 
+        } catch (SQLException e) { 
+            System.err.println("ERROR: SQL: Could not get graph from DB: '" + e.getMessage() + "'."); 
+            return(null);            
+        }
+        
+        if(graphString == null) {
+            System.err.println("WARNING: DB: getMostSimilarByGraphSetBased: Pattern graph not found in database.");
+            return(null);
+        }
+        
+        return(ProtGraphs.fromPlccGraphFormatString(graphString));        
     }
     
     

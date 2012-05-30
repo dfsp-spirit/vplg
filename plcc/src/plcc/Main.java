@@ -199,6 +199,11 @@ public class Main {
 
             // get pdbid from first arg
             pdbid = args[0];
+
+            Integer expectedLengthPDBID = 4;
+            if(pdbid.length() != expectedLengthPDBID) {
+                System.err.println("WARNING: The given PDB identifier '" + pdbid + "' has an unusual length of " + pdbid.length() + " characters, expected " + expectedLengthPDBID + ".");
+            }
             
             // set default file names from the pdb id (these may be overwritten by args later)
             pdbFile = pdbid + ".pdb";
@@ -286,7 +291,7 @@ public class Main {
                     
                     
                     if(s.equals("-S") || s.equals("--sim-measure")) {
-                        //System.out.println("Setting similarity measure to " + args[i+1] + ".");
+                        System.out.println("Setting similarity measure to " + args[i+1] + ".");
                         if(args.length <= i+1 ) {
                             syntaxError();
                         }
@@ -693,6 +698,7 @@ public class Main {
             if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"))) {
                 
                 if(Settings.get("plcc_S_search_similar_method").equals(Similarity.SIMILARITYMETHOD_STRINGSSE)) {
+                    System.out.println("Using similarity method '" + Settings.get("plcc_S_search_similar_method") + "'.");
                 
                     String patternSSEString = null;
                     try {
@@ -711,7 +717,12 @@ public class Main {
 
                     CompareOneToDB.performSSEStringComparison(patternSSEString);
                 } else if (Settings.get("plcc_S_search_similar_method").equals(Similarity.SIMILARITYMETHOD_GRAPHSET)) {
+                    System.out.println("Using similarity method '" + Settings.get("plcc_S_search_similar_method") + "'.");
                     CompareOneToDB.performGraphSetComparison();                    
+                }
+                else if (Settings.get("plcc_S_search_similar_method").equals(Similarity.SIMILARITYMETHOD_GRAPHCOMPAT)) {
+                    System.out.println("Using similarity method '" + Settings.get("plcc_S_search_similar_method") + "'.");
+                    CompareOneToDB.performGraphCompatGraphComparison();                    
                 }
                 else {
                     System.err.println("ERROR: Invalid similarity method: '" + Settings.get("plcc_S_search_similar_method") + "'. Use --help for info on valid settings.");
@@ -1029,7 +1040,7 @@ public class Main {
 
         //System.out.println("Testing tgf implementation using file '" + tgfFile + "'.");
 
-        ProtGraph pg = ProtGraphs.fromTrivialGraphFormat(tgfFile);
+        ProtGraph pg = ProtGraphs.fromTrivialGraphFormatFile(tgfFile);
         System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to file '" + img + "'.");
         pg.drawProteinGraph(img, true);
         //pg.print();
@@ -1077,7 +1088,7 @@ public class Main {
         System.out.println("Retrieving " + g_graphtype + " graph for PDB entry " + g_pdbid + " chain " + g_chainid + " from DB.");
         
         String graphString = null;
-        try { graphString = DBManager.getGraph(g_pdbid, g_chainid, g_graphtype); }
+        try { graphString = DBManager.getGraphString(g_pdbid, g_chainid, g_graphtype); }
         catch (SQLException e) { System.err.println("ERROR: SQL: Drawing of graph from DB failed: '" + e.getMessage() + "'."); return; }
         
         if(graphString == null) {
@@ -1395,7 +1406,7 @@ public class Main {
 
                     // write the SSE info text file for the image (plcc graph format file)
                     plccGraphFile = filePath + fs + fileNameWithoutExtension + ".plg";
-                    if(writeStringToFile(plccGraphFile, (pg.toPlccGraphFormatString()))) {
+                    if(writeStringToFile(plccGraphFile, (pg.toVPLGGraphFormat()))) {
                         System.out.println("      Plcc format graph file written to '" + plccGraphFile + "'.");
                     } else {
                         System.err.println("WARNING: Could not write Plcc format graph file to '" + plccGraphFile + "'.");
@@ -1408,7 +1419,7 @@ public class Main {
                 // But we may need to write the graph to the database
                 if(Settings.getBoolean("plcc_B_useDB")) {
                     try { 
-                        DBManager.writeGraphToDB(pdbid, c.getPdbChainID(), ProtGraphs.getGraphTypeCode(gt), pg.toPlccGraphFormatString(), pg.getSSEStringSequential()); 
+                        DBManager.writeGraphToDB(pdbid, c.getPdbChainID(), ProtGraphs.getGraphTypeCode(gt), pg.toVPLGGraphFormat(), pg.getSSEStringSequential()); 
                         System.out.println("      Inserted '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + c.getPdbChainID() + "' into DB.");
                     }
                     catch(SQLException e) { 
@@ -3071,7 +3082,7 @@ public class Main {
         System.out.println("-q | --fg-notations <list> : draw only the folding graph notations in <list>, e.g. 'kars' = KEY, ADJ, RED and SEQ.");
         System.out.println("-r | --recreate-tables     : drop and recreate DB statistics tables, then exit (see -u)*");
         System.out.println("-s | --showonscreen        : show an overview of the residue contact results on STDOUT during compuation  [DEBUG]");
-        System.out.println("-S | --sim-measure <m>     : use similarity measure <m>. Valid settings include 'string_sse' and 'graph_set'.");
+        System.out.println("-S | --sim-measure <m>     : use similarity measure <m>. Valid settings include 'string_sse', 'graph_set' and 'graph_compat'.");
         System.out.println("-t | --draw-tgf-graph <f>  : read graph in TGF format from file <f> and draw it to <f>.png, then exit (pdbid will be ignored)*");
         System.out.println("-u | --use-database        : write SSE contact data to database [requires DB credentials in cfg file]");                       
         System.out.println("-v | --del-db-protein <p>  : delete the protein chain with PDBID <p> from the database [requires DB credentials in cfg file]");
@@ -3451,12 +3462,33 @@ public class Main {
         Residue r;
         SSE s;
         Integer ligSSECount = 1;
+        
+        // Use the min and max atoms setting for ligands
+        Integer ligMinAtoms = Settings.getInteger("plcc_I_lig_min_atoms");
+        Integer ligMaxAtoms = Settings.getInteger("plcc_I_lig_max_atoms");
+        Boolean noMax = false;
+        if(ligMaxAtoms < 0) {
+            noMax = true;
+        }
+        if( (ligMinAtoms > ligMaxAtoms) && !noMax) {
+            System.out.println("WARNING: Setting for minimum number of ligand atoms is > maximum setting, won't ever match.");
+        }
+        
+        Integer numAtoms;
+        Integer numLigIgnoredAtomChecks = 0;
 
         for(Integer i = 0; i < resList.size(); i++) {
 
             r = resList.get(i);
 
             if(r.isLigand()) {
+                
+                numAtoms = r.getNumAtoms();
+                if( (numAtoms < ligMinAtoms) || ((numAtoms > ligMaxAtoms) && !noMax) ) {
+                    // Ligand did NOT pass the atom check, ignore it
+                    numLigIgnoredAtomChecks++;
+                    continue;
+                }
 
                 ligSSECount++;
                 s = new SSE("L");
@@ -3479,6 +3511,10 @@ public class Main {
         }
 
         //System.out.println("    Found " + ligSSElist.size() + " ligand SSEs.");
+        if(numLigIgnoredAtomChecks > 0) {
+            System.out.println("    Ignored " + numLigIgnoredAtomChecks + " ligands due to atom number constraints [" + ligMinAtoms + ", " + ligMaxAtoms + "].");
+        }
+        
         return(ligSSElist);
     }
     

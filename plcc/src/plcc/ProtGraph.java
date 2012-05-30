@@ -99,6 +99,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
 
         // If the list of SSEs is empty, there are no connected components
         if(this.size < 1) {
+            this.connectedComponents = conComps;
             return;
         }
 
@@ -255,6 +256,37 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
         
         this.connectedComponents = conComps;
         this.connectedComponentsComputed = true;
+    }
+    
+    
+    /**
+     * Returns the largest connected component of this graph as a folding graph object (or NULL if this graph has no CCs, i.e., it has no vertices).
+     * Computes the CCs if they have not been computed yet.
+     * 
+     * @return the CC as a FoldingGraph (or NULL if this graph has no vertices)
+     */
+    public FoldingGraph getLargestConnectedComponent() {
+        if(! this.connectedComponentsComputed) {
+            this.computeConnectedComponents();
+        }
+        
+        Integer maxSize = 0;
+        Integer indexOfLargestCC = -1;
+        
+        FoldingGraph fg;
+        for(Integer i = 0;  i < this.connectedComponents.size(); i++) {
+            fg = this.connectedComponents.get(i);
+            if(fg.getSize() >= maxSize) {
+                maxSize = fg.getSize();
+                indexOfLargestCC = i;
+            }   
+        }
+        
+        if(indexOfLargestCC >= 0) {
+            return(this.connectedComponents.get(indexOfLargestCC));
+        } else {
+            return(null);
+        }
     }
     
     

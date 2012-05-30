@@ -115,19 +115,42 @@ public class FileParser {
     public static ArrayList<String> slurpFile(String file) {
 
         ArrayList<String> lines = new ArrayList<String>();
-        Integer numLines = 0;
 
         try {
             BufferedReader in = new BufferedReader(new FileReader(file));
             String line = null;
             while ((line = in.readLine()) != null) {
-                numLines++;
                 lines.add(line);
             }
 	} catch (IOException e) {
             System.err.println("ERROR: Could not read text file '" + file + "'.");
             e.printStackTrace();
-            System.exit(-1);
+            System.exit(1);
+	}
+
+        return(lines);
+    }
+    
+    
+    /**
+     * Reads the target text file and returns the data in it.
+     * @param file Path to a readable text file. Does NOT test whether it exist, do that earlier.
+     * @return all lines of the file as a single string
+     */
+    public static String slurpFileToString(String file) {
+
+        String lines = "";
+
+        try {
+            BufferedReader in = new BufferedReader(new FileReader(file));
+            String line = null;
+            while ((line = in.readLine()) != null) {
+                lines += line;
+            }
+	} catch (IOException e) {
+            System.err.println("ERROR: Could not read text file '" + file + "'.");
+            e.printStackTrace();
+            System.exit(1);
 	}
 
         return(lines);
@@ -1136,12 +1159,12 @@ public class FileParser {
                 getChainByPdbChainID(dsspChainID).addResidue(r);
 
 
-                r.setType(0);                   // DSSP files only contain protein residues, ligands are ignored
+                r.setType(Residue.RESIDUE_TYPE_AA);                   // DSSP files only contain protein residues, ligands are ignored
                 r.setPhi(phi);
                 r.setPsi(psi);
 
                 // Fix broken DSSP files that have lower case AA 1-letter codes for non-cysteine residues. We also make the lowercase CYS uppercase here
-                //  but this doesn'T matter because we are not interested in DSSPs opinion on the occurence of disulfide bonds anyway.
+                //  but this doesn't matter because we are not interested in DSSPs opinion on the occurence of disulfide bonds anyway.
                 resName1Letter = resName1Letter.toUpperCase();
 
                 // Fix DSSP file like the one for 2ZW3.pdb which list cysteine residues as 'o' instead of 'c'.
@@ -1221,7 +1244,7 @@ public class FileParser {
                 } catch(Exception e) {
                     System.err.println("ERROR: Hit broken MODEL line at PDB line number " + pLineNum + " while looking for Chains.");
                     e.printStackTrace();
-                    System.exit(-1);
+                    System.exit(1);
                 }
             }
 
@@ -1242,8 +1265,9 @@ public class FileParser {
                     chemSym = pLine.substring(76, 78);
                 } catch(Exception e) {
                     System.err.println("ERROR: Hit HETATM line at PDB line number " + pLineNum + " but parsing the line failed (length " + pLine.length() + ").");
-                    e.printStackTrace();
-                    System.exit(-1);
+                    System.err.println("ERROR: (continued) Message was '" + e.getMessage() + "'.");
+                    //e.printStackTrace();
+                    System.exit(1);
                 }
                 
                 // Create new ligand residue here if this Atom does not belong to the same residue as the last one did
@@ -1254,7 +1278,7 @@ public class FileParser {
                     // create new Residue from info, we'll have to see whether we really add it below though
                     lig = new Residue();
                     lig.setPdbResNum(resNumPDB);
-                    lig.setType(1);
+                    lig.setType(Residue.RESIDUE_TYPE_LIGAND);
                     resNumDSSP = getLastUsedDsspResNumOfDsspFile() + curLigNum; // assign an unused fake DSSP residue number
                     lig.setDsspResNum(resNumDSSP);
                     lig.setChainID(chainID);
@@ -1263,7 +1287,7 @@ public class FileParser {
                     lig.setAAName1(AminoAcid.getLigandName1());
                     lig.setChain(getChainByPdbChainID(chainID));
                     lig.setModelID(modelID);
-                    lig.setSSEString("L");
+                    lig.setSSEString(Settings.get("plcc_S_ligSSECode"));
                                       
 
                     // add ligand to list of residues if it not on the ignore list
@@ -1274,26 +1298,34 @@ public class FileParser {
                     }
                     else {
                         // add info from PDB HET fields (HET, HETNAM, HETSYN, FORMUL)
+                        // Note: we now use prepared statements so any strange chars do no longer lead to irritations or security trouble
+                        Boolean removeStuff = Settings.getBoolean("plcc_B_uglySQLhacks");
                         lf = getLigFormula(resNamePDB);
-                        lf = lf.replaceAll("\\s", "");               // remove all whitespace
-                        lf = lf.replaceAll("~", "");                 // remove tilde char (it causes SQL trouble during DB insert)
-                        lf = lf.replaceAll("\\\\", "");              // remove all backslashes (it causes SQL WARNING 'nonstandard use of escape in a string literal' during DB insert)
-                        lf = lf.replaceAll("'", "");              // remove all ticks (obviously SQL trouble)
+                        if(removeStuff) {
+                            lf = lf.replaceAll("\\s", "");               // remove all whitespace
+                            lf = lf.replaceAll("~", "");                 // remove tilde char (it causes SQL trouble during DB insert)
+                            lf = lf.replaceAll("\\\\", "");              // remove all backslashes (it causes SQL WARNING 'nonstandard use of escape in a string literal' during DB insert)
+                            lf = lf.replaceAll("'", "");              // remove all ticks (obviously SQL trouble)
+                        }
 
                         ln = getLigName(resNamePDB);
-                        ln = ln.replaceAll(" ", "_");                // replace spaces with underscores
-                        ln = ln.replaceAll("\\s", "");               // remove all other whitespace
-                        ln = ln.replaceAll("~", "");
-                        ln = ln.replaceAll("\\\\", "");
-                        ln = ln.replaceAll("'", "");
+                        if(removeStuff) {
+                            ln = ln.replaceAll(" ", "_");                // replace spaces with underscores
+                            ln = ln.replaceAll("\\s", "");               // remove all other whitespace
+                            ln = ln.replaceAll("~", "");
+                            ln = ln.replaceAll("\\\\", "");
+                            ln = ln.replaceAll("'", "");
+                        }
 
                         ls = getLigSynonyms(resNamePDB);
-                        ls = ls.replaceAll(" ", "_");
-                        ls = ls.replaceAll("\\s", "");
-                        ls = ls.replaceAll("~", "");
-                        ls = ls.replaceAll(";", ".");
-                        ls = ls.replaceAll("\\\\", "");
-                        ls = ls.replaceAll("'", "");
+                        if(removeStuff) {
+                            ls = ls.replaceAll(" ", "_");
+                            ls = ls.replaceAll("\\s", "");
+                            ls = ls.replaceAll("~", "");
+                            ls = ls.replaceAll(";", ".");
+                            ls = ls.replaceAll("\\\\", "");
+                            ls = ls.replaceAll("'", "");
+                        }
 
                         lig.setLigFormula(lf);
                         lig.setLigName(ln);
@@ -1301,10 +1333,15 @@ public class FileParser {
 
                         lastLigandNumPDB = resNumPDB;
                         lastChainID = chainID;
+                        
+                        //TODO: Add a check for the molecular weight of the ligand here and only add ligands
+                        //      which are within the range (range should be defined in cfg file).
+                        //      Problem atm is that the mol weight is not in the PDB file. Idea: count the atoms
+                        //      instead, use a range over number of atoms.
+                        
                         s_residues.add(lig);
                         
                         getChainByPdbChainID(chainID).addResidue(lig);
-
 
                         resIndex = s_residues.size() - 1;
                         resIndexDSSP[resNumDSSP] = resIndex;

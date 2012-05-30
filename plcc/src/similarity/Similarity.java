@@ -13,7 +13,13 @@ package similarity;
  */
 public class Similarity {
     
+    /** Comparison using string alignment methods based on the SSE strings of the graphs. */
     public static final String SIMILARITYMETHOD_STRINGSSE = "string_sse";
+    
+    /** Comparison using set based graph comparison, e.g., compare the number of edges and vertices. */
     public static final String SIMILARITYMETHOD_GRAPHSET = "graph_set";
+    
+    /** Comparison using the size of the compatibility graph h of a graph pair (g1, g2). */
+    public static final String SIMILARITYMETHOD_GRAPHCOMPAT = "graph_compat";
     
 }

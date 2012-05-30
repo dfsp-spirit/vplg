@@ -187,6 +187,13 @@ public class IO {
     }
     
     
+    /**
+     * Writes a SVG Doc to a PNG format file.
+     * @param doc
+     * @param outputFilename
+     * @param aoi
+     * @throws Exception 
+     */
     public static void writeSVGDOC2PNG (Document doc, String outputFilename, Rectangle aoi) throws Exception {
         
         PNGTranscoder trans = new PNGTranscoder();
@@ -202,6 +209,39 @@ public class IO {
 
         ostream.flush();
         ostream.close();
+    }
+    
+    
+    /**
+     * Writes the string 'text' to the text file 'targetFile'. Tries to create the file and overwrite stuff in it.
+     * @return true if it worked out, false otherwise. Will spit warning to STDERR if things go wrong.
+     */ 
+    public static Boolean stringToTextFile(String targetFile, String text) {
+        String file = targetFile;
+        FileWriter fw = null;
+        PrintWriter pw = null;
+
+        try {
+            fw = new FileWriter(file);
+            pw = new PrintWriter(fw);
+
+        }
+        catch (Exception e) {
+            System.err.println("ERROR: Could not write to file '" + file + "': " + e.getMessage() + ".");            
+            return(false);
+        }
+
+        pw.print(text);      
+        pw.close();  // If it isn't closed it won't flush the buffer and large parts of the file will be missing!
+
+        try {
+            fw.close();
+        } catch(Exception ex) {
+            System.err.println("WARNING: Could not close FileWriter for file '" + file + "': " + ex.getMessage() + ".");
+            return(false);
+        }
+        
+        return(true);
     }
 
     

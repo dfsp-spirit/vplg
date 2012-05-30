@@ -213,11 +213,12 @@ public class Settings {
         defSet("plcc_B_include_coils", "false", "Whether coils (DSSP SSE type ' ') should be considered");
         defSet("plcc_S_coilSSECode", "C", "The amino acid code used to mark a ligand residue");
         defSet("plcc_S_ligAACode", "J", "The amino acid code used to mark a ligand residue");
-        defSet("plcc_I_ligSAS", "20", "The solvent accessible surface value that is written to the dssplig file for ligands (not used atm)");
-        
-        // TODO: implement the lower 2 vars in Main
+        defSet("plcc_B_uglySQLhacks", "false", "Whether to rewrite string data like ligand atom formulas before inserting into DB");
+        defSet("plcc_I_ligSAS", "20", "The solvent accessible surface value that is written to the dssplig file for ligands (not used atm)");                
         defSet("plcc_B_force_chain", "false", "Whether to force parsing a certain PDB chain");
         defSet("plcc_S_forced_chain_id", "A", "The forced chain ID, only used when plcc_B_force_chain is true");
+        defSet("plcc_I_lig_min_atoms", "1", "The minimum number of atoms a ligand has to consist of to count as an SSE.");
+        defSet("plcc_I_lig_max_atoms", "-1", "The maximum number of atoms a ligand has to consist of to count as an SSE. Set to <0 for unlimited.");
 
         
         // similarity stuff
@@ -226,11 +227,11 @@ public class Settings {
         defSet("plcc_S_search_similar_chainID", "A", "Used only when plcc_B_search_similar is true. The protein chain ID to use as a pattern during the similarity search.");
         defSet("plcc_S_search_similar_graphtype", "albelig", "Used only when plcc_B_search_similar is true. The graph type to use as a pattern during the similarity search.");
         defSet("plcc_I_search_similar_num_results", "5", "Used only when plcc_B_search_similar is true. The number of results to print (e.g., 3 for the 3 most similar proteins in the DB).");
-        defSet("plcc_S_search_similar_method", "string_sse", "Used only when plcc_B_search_similar is true. The similarity measure to use, valid settings: string_sse, graph_set");
+        defSet("plcc_S_search_similar_method", "string_sse", "Used only when plcc_B_search_similar is true. The similarity measure to use, valid settings: string_sse, graph_set, graph_compat");
         
         
 
-        // Contact definition and calculation        
+        // Contact definition and computation     
         defSet("plcc_I_atom_radius", "20", "The atom radius of protein atoms in 10th part Angstroem (setting 20 here means 2A)");
         defSet("plcc_I_lig_atom_radius", "30", "The atom radius of ligand atoms in 10th part Angstroem (setting 40 here means 4A)");
         defSet("plcc_B_SSEcontactsAtom", "true", "Defines the contact level used to determine SSE contacts. If set to true, the number of atom level. contacts decides whether an SSE contact exists. If set to false, the residue level contacts are used instead.");

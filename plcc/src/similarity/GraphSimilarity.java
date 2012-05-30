@@ -8,8 +8,13 @@
 
 package similarity;
 
+import algorithms.CompatGraphComputation;
 import algorithms.NeedlemanWunsch;
 import algorithms.SmithWaterman;
+import java.util.ArrayList;
+import java.util.Set;
+import plcc.CompatGraph;
+import plcc.ProtGraph;
 import plcc.SSEGraph;
 
 /**
@@ -97,8 +102,74 @@ public class GraphSimilarity {
     }
     
     
+    
     /**
-     * Testing only.
+     * Compares the graphs g1 and g2 by computing their compatibility graph. The score is based on the 
+     * size of the compatibility graph.
+     * @return a score based on the size of the compatibility graph, larger values mean closer similarity
+     */
+    public Integer compareByCompatibilityGraph() {
+        CompatGraphComputation cgc = new CompatGraphComputation(this.graphA, this.graphB);
+        CompatGraph cg = cgc.computeEdgeCompatibiltyGraph();
+        //System.out.println("Compatibility graph(V=" + cg.numVertices() + ", E=" + cg.getNumEdges() + ") for " + graphA.toShortString() + " and " + graphB.toShortString() + ": \n" + cg + "\n");        
+        
+        // TODO: Come up with a good score that takes the graph sizes of g1 and g2 into account instead
+        //       of punishing small input graphs. This score makes no sense at all yet because we have
+        //       to perform clique detection to find common subgraphs first.
+        
+        if(cg == null) {
+            System.err.println("WARNING: compareByCompatibilityGraph(): CompatGraph is NULL, assuming score 0.");
+            return(0);
+        }
+        
+        Boolean findCliques = true;
+        if(findCliques) {
+            Integer minCliqueSize = 1;      // the vertices of cliques smaller than this number will not be printed
+            System.out.println("  Detecting cliques in compatibility graph, transforming compatibilty graph to protein graph...");
+            //try {
+                //System.out.println("   Trying to create ProtGraph...");
+                ProtGraph pg = cg.toFakeSSEGraph();
+                if(pg == null) {
+                    System.out.println("WARNING: GraphSimilarity.compareByCompatibilityGraph(): ProtGraph is NULL.");
+                } else {                
+                    //System.out.println("   Created ProtGraph.");
+                    System.out.println("   ProtGraph for clique detection is: " + pg.toShortString() + ".");
+                }
+                //try {
+                    ArrayList<Set<Integer>> cliques = pg.getMaximalCliques();
+                    System.out.println("  Found " + cliques.size() + " cliques:");
+                    
+                    Integer num = 0;
+                    for(Set<Integer> clique : cliques) {
+                        
+                        // print clique info
+                        System.out.print("   Clique #" + num + " of size " + clique.size());
+                        
+                        // print the vertex indices of the clique
+                        if(clique.size() >= minCliqueSize) {
+                            System.out.print(" [");
+                            for(Integer i : clique) {
+                                System.out.print(" " + i);
+                            }
+                            System.out.print(" ]\n");                                                    
+                        }                                                
+                        num++;
+                    }                    
+                    
+                //} catch (Exception ex) {
+                //    System.err.println("WARNING: Clique detection failed: '" + ex.getMessage() + "'.");
+                //}
+            //} catch (Exception e) {
+            //    System.err.println("WARNING: Could not start clique detection, could not create SSEGraph: '" + e.getMessage() + "'.");
+            //}                                                
+        }        
+        
+        return(cg.numVertices() + cg.getNumEdges());
+    }
+    
+    
+    /**
+     * For debugging/testing purposes only, not used in the program.
      */ 
     public static void main(String[] args) {
         String sseStringA = "HEHEHEHHEHHHHHHHEHHLL";

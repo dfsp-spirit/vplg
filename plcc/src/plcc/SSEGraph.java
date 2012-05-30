@@ -51,7 +51,7 @@ import org.w3c.dom.DOMImplementation;
  * 
  * @author spirit
  */
-public abstract class SSEGraph {
+public abstract class SSEGraph implements VPLGGraphFormat {
     
     /** the list of all SSEs of this graph */
     protected ArrayList<SSE> sseList;
@@ -71,6 +71,9 @@ public abstract class SSEGraph {
     protected String graphType;                           // the graph type, e.g. "albe"
     
     protected HashMap<String, String> metadata;
+    
+    protected Integer numCliquesSoFar;
+    protected Boolean reportCliques;
     
     /** the list of all SSEs of this graph which should be drawn. Not used yet. */
     protected ArrayList<DrawSSE> sseDrawList;
@@ -129,6 +132,7 @@ public abstract class SSEGraph {
         this.metadata = new HashMap<String, String>();
         this.init();
         this.spatOrder = null;
+        this.reportCliques = true;  // TODO: move to settings
     }
     
     
@@ -699,7 +703,7 @@ public abstract class SSEGraph {
     public Boolean sseContactExistsPos(Integer x, Integer y) {
         
         if(x < 0 || y < 0 || x > this.size - 1 || y > this.size - 1) {
-            System.err.println("WARNING: sseContactExistsPos(): SSE index out of bounds in PG (x=" + x + ", y=" + y + ").");
+            System.err.println("WARNING: sseContactExistsPos(): SSE index out of bounds in PG contact matrix of size " + matrix.length + " (x=" + x + ", y=" + y + ").");
             return(false);
         }
         
@@ -953,6 +957,60 @@ public abstract class SSEGraph {
     
     
     /**
+     * Returns the list of edges of this graph. Each edge is an Integer[] of length 2. The two integers
+     * represent the index of the 2 vertices connected by this edge.
+     * @return the list of edges
+     */
+    public ArrayList<Integer[]> getEdgeList() {
+        ArrayList<Integer[]> edges = new ArrayList<Integer[]>();
+        
+        for(Integer i = 0; i < this.size; i++) {
+            for(Integer j = 0; j < this.size; j++) {
+                if(this.containsEdge(i, j)) {
+                    edges.add(new Integer[] {i, j});
+                }            
+            }            
+        }
+        
+        return(edges);
+    }
+    
+    
+    
+    /**
+     * Determines the edge label of the edge e=(v1, v2).
+     * @param v1 first vertex of the edge
+     * @param v2 second vertex of the edge
+     * @return the edge label as a string (e.g. "p" for parallel) or NULL if no such edge exists in this graph
+     */
+    public String getEdgeLabel(Integer v1, Integer v2) {
+        if(this.containsEdge(v1, v2)) {
+            return(SpatRel.getString(this.matrix[v1][v2]));
+        }
+        else {
+            System.err.println("WARNING: SSEGraph.getEdgeLabel(): No such edge: (" + v1 + "," + v2 + ").");
+            return(null);
+        }
+        
+    }
+    
+    
+    
+    /**
+     * Determines the vertex label (i.e., the SSE type string: "H" for helix, "E" for beta strand, etc.) of the
+     * vertex defined by the given vertIndex.
+     * @param vertIndex the index of the vertex (SSE) in the vertex list
+     * @return the vertex label (the SSE type of the SSE represented by the vertex, e.g., "H" for helix) or NULL if no such vertex exists in this graph
+     */
+    public String getVertexLabel(Integer vertIndex) {
+        if(vertIndex < 0 || vertIndex >= this.size) {
+            return(null);
+        }
+        return(this.sseList.get(vertIndex).getSseType());        
+    }
+    
+    
+    /**
      * This function determines the index of the neighbor of the vertex at index 'vertexID' which is closest to the N-terminus in the AA sequence.
      * @param vertexID the index of the vertex to consider
      * @return the index of the neighbor of the vertex at index 'vertexID' which is closest to the N-terminus in the AA sequence, or -1 if no such vertex exists (i.e., this vertex has no neighbors).
@@ -1098,11 +1156,12 @@ public abstract class SSEGraph {
 
     /**
      * Implements the Bron-Kerbosch algorithm to find all maximal (= non-extandable) cliques. Note that these are NOT
-     * the largest cliques in the graph.
+     * only the largest cliques in the graph but all maximal ones.
      */
     public ArrayList<Set<Integer>> getMaximalCliques() {
 
-        cliques = new ArrayList<Set<Integer>>();        // global class var
+        this.cliques = new ArrayList<Set<Integer>>();        // global class var
+        this.numCliquesSoFar = 0;
 
         List<Integer> potential_clique = new ArrayList<Integer>();
         List<Integer> candidates = new ArrayList<Integer>();
@@ -1119,10 +1178,9 @@ public abstract class SSEGraph {
     }
 
     /**
-     * Part of the Bron-Kerbosch algorithm.
+     * The recursive part of the Bron-Kerbosch algorithm, used in getMaximalCliques().
      */
-    protected void findCliques(List<Integer> potential_clique, List<Integer> candidates, List<Integer> already_found)
-    {
+    protected void findCliques(List<Integer> potential_clique, List<Integer> candidates, List<Integer> already_found) {
         List<Integer> candidates_array = new ArrayList<Integer>(candidates);
         if (!end(candidates, already_found)) {
             // for each candidate_node in candidates do
@@ -1154,6 +1212,20 @@ public abstract class SSEGraph {
                 if (new_candidates.isEmpty() && new_already_found.isEmpty()) {
                     // potential_clique is maximal_clique
                     cliques.add(new HashSet<Integer>(potential_clique));
+                    this.numCliquesSoFar++;
+                    
+                    // DEBUG output
+                    if(this.reportCliques) {
+                        if(this.numCliquesSoFar % 1000 == 0) {
+                        System.out.print("    Found clique #" + this.numCliquesSoFar + " of size " + potential_clique.size() + ".\n");
+                        /*
+                        for(Integer v : potential_clique) {
+                            System.out.print(" " + v);
+                        }
+                        System.out.print(" ]\n");                         
+                         */
+                        }
+                    }
                 }
                 else {
                     // recursive call
@@ -1173,8 +1245,7 @@ public abstract class SSEGraph {
     /**
      * part of the Bron-Kerbosch Algorithm.
      */
-    protected boolean end(List<Integer> candidates, List<Integer> already_found)
-    {
+    protected boolean end(List<Integer> candidates, List<Integer> already_found) {
         // if a node in already_found is connected to all nodes in candidates
         boolean end = false;
         int edgecounter;
@@ -1718,7 +1789,7 @@ public abstract class SSEGraph {
      * 
      * @return a String representing this protein graph in plcc v2 format
      */
-    public String toPlccGraphFormatString() {
+    public String toVPLGGraphFormat() {
         this.metadata.put("format_version", "2");
         return(this.getPlccFormatHeader() + this.getMetaDataString() + this.getSSEListString() + this.getContactListString());
     }
@@ -2865,10 +2936,22 @@ public abstract class SSEGraph {
         }
     }
             
-    
+    /**
+     * Returns a short string description of this graph via its meta data like PDB ID, graph type, etc., without data on vertices and edges. 
+     * @return a short string description of this graph
+     */
     @Override public String toString() {
         String mgt = (this.isFoldingGraph() ? "FG" : "PG");
         return("[" + mgt + " " + this.graphType + " graph of PDB " + this.pdbid + " chain " + this.chainid + "]");
+    }
+    
+    
+    /**
+     * Returns a very short string description of this graph. 
+     * @return a string in format 'PDBID-CHAIN-GRAPHTYPE'.
+     */
+    public String toShortString() {
+        return(this.pdbid + "-" + this.chainid + "-" + this.graphType + "[" + this.numVertices() + "," + this.numSSEContacts() + "]");
     }
     
     
@@ -2878,6 +2961,9 @@ public abstract class SSEGraph {
     public void setPdbid(String s) { this.pdbid = s; this.metadata.put("pdbid", s); }
     public void setChainid(String s) { this.chainid = s; this.metadata.put("chainid", s);}
     public void setGraphType(String s) { this.graphType = s; this.metadata.put("graphtype", s);}
+    
+    /** Returns the size of this graph, i.e., the number of vertices in it. */
+    public Integer getSize() { return(this.numVertices()); }
 
     
         
