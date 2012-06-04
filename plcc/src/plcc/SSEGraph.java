@@ -51,7 +51,7 @@ import org.w3c.dom.DOMImplementation;
  * 
  * @author spirit
  */
-public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguageFormat {
+public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguageFormat, TrivialGraphFormat, DOTLanguageFormat {
     
     /** the list of all SSEs of this graph */
     protected ArrayList<SSE> sseList;
@@ -1294,7 +1294,8 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         for(Integer i = 0; i < this.sseList.size(); i++) {
             for(Integer j = i + 1; j < this.sseList.size(); j++) {
                 if(this.containsEdge(i, j)) {
-                    tgf += (i + 1) + " " + (j + 1) + SpatRel.getString(this.getContactType(i, j)) + "\n";
+                    //tgf += (i + 1) + " " + (j + 1) + " " + SpatRel.getString(this.getContactType(i, j)) + "\n";
+                    tgf += (i + 1) + " " + (j + 1) + " (" + (i + 1) + "-" + SpatRel.getString(this.getContactType(i, j)) + "-" + (j + 1) + ")\n";
                 }
             }
         }
@@ -2996,7 +2997,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             vertex = this.sseList.get(i);
             gmlf += startNode + "\n";
             gmlf += "    id " + i + "\n";
-            gmlf += "    label \"" + i + "\"\n";
+            gmlf += "    label \"" + i + "-" + vertex.getSseType() + "\"\n";
             gmlf += "    num_in_chain " + vertex.getSSESeqChainNum() + "\n";
             gmlf += "    sse_type \"" + vertex.getSseType() + "\"\n";
             gmlf += "    num_residues " + vertex.getLength() + "\n";
@@ -3039,6 +3040,55 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         
         return(gmlf);
     }
+    
+    
+    /**
+     * DOT language output support. See http://en.wikipedia.org/wiki/DOT_language for details.
+     */    
+    public String toDOTLanguageFormat() {
+        
+        String graphLabel = "ProteinGraph";
+        
+        // start graph
+        String dlf = "graph " + graphLabel + " {\n";
+        
+        // print the nodes
+        SSE vertex; String shapeModifier;
+        for(Integer i = 0; i < this.size; i++) {
+            
+                        
+            vertex = this.sseList.get(i);
+            shapeModifier = (vertex.getSseType().equals("E") ? ", shape=box" : "");
+            dlf += "    " + i + " [label=\"" + i + "-" + vertex.getSseType() + "\"" + shapeModifier + "];\n";
+        }
+        
+        // print the edges        
+        Integer src, tgt;
+        String colorModifier;
+        ArrayList<Integer[]> edges = this.getEdgeList();
+        for(Integer[] edge : edges) {
+            src = edge[0];
+            tgt = edge[1];
+            
+            colorModifier = "";
+            if(this.getContactType(src, tgt) == SpatRel.NONE) { continue; }
+            else if(this.getContactType(src, tgt) == SpatRel.PARALLEL) { colorModifier = " [color=red]"; }
+            else if(this.getContactType(src, tgt) == SpatRel.ANTIPARALLEL) { colorModifier = " [color=blue]"; }
+            else if(this.getContactType(src, tgt) == SpatRel.MIXED) { colorModifier = " [color=green]"; }
+            else if(this.getContactType(src, tgt) == SpatRel.LIGAND) { colorModifier = " [color=pink]"; }
+            else { colorModifier = ""; }
+                                        
+            dlf += "    " + src + " -- " + tgt + colorModifier + ";\n";                        
+        }
+        
+        
+        // close graph
+        dlf += "}\n";
+        
+        return(dlf);
+    }
+    
+    
 
     
         

@@ -86,7 +86,7 @@ public class Main {
     //  Main.calculateAllContacts().
     static Integer globalMaxSeqNeighborResDist;
     
-    static final String version = "0.53";
+    static final String version = "0.58";
     
     static ArrayList<File> deleteFilesOnExit;
     
@@ -1360,6 +1360,15 @@ public class Main {
                     String gmlfFile = filePath + fs + fileNameWithoutExtension + ".gml";
                     IO.stringToTextFile(gmlfFile, pg.toGraphModellingLanguageFormat());
                 }
+                if(Settings.getBoolean("plcc_B_output_TGF")) {
+                    String tgfFile = filePath + fs + fileNameWithoutExtension + ".tgf";
+                    IO.stringToTextFile(tgfFile, pg.toTrivialGraphFormat());
+                }
+                if(Settings.getBoolean("plcc_B_output_DOT")) {
+                    String dotLangFile = filePath + fs + fileNameWithoutExtension + ".gv";
+                    IO.stringToTextFile(dotLangFile, pg.toDOTLanguageFormat());
+                }
+                
                 
                 
                 // Create the file in a subdir tree based on the protein meta data if requested
