@@ -9,7 +9,9 @@ package plcc;
 
 import algorithms.CompatGraphComputation;
 import datastructures.Graph;
+import java.io.IOException;
 import java.util.ArrayList;
+import org.xml.sax.SAXException;
 
 /**
  * Implements a very simple undirected graph used as a temporary data structure for various calculations.
@@ -224,6 +226,6 @@ public class CompatGraph extends Graph<Integer[]>{
         }
         
         return(num);
-    }
+    }            
             
 }

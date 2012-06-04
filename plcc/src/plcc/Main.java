@@ -1001,7 +1001,7 @@ public class Main {
         }
         
 
-        // ********************************************** SSE stuff ******************************************//
+        // ********************************************** SSE stuff and graph computation ******************************************//
 
         if(Settings.getBoolean("plcc_B_calc_draw_graphs")) {
             System.out.println("  Calculating SSE graphs.");
@@ -1355,6 +1355,11 @@ public class Main {
                 
                 //pg.toFile(file + ".ptg");
                 //pg.print();
+                
+                if(Settings.getBoolean("plcc_B_output_GML")) {
+                    String gmlfFile = filePath + fs + fileNameWithoutExtension + ".gml";
+                    IO.stringToTextFile(gmlfFile, pg.toGraphModellingLanguageFormat());
+                }
                 
                 
                 // Create the file in a subdir tree based on the protein meta data if requested

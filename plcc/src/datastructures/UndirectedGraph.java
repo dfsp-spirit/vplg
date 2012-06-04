@@ -8,6 +8,8 @@
 package datastructures;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import plcc.IO;
 
 /**
  * An undirected graph. This can be used as is or extended. It is based on the abstract Graph class.
@@ -22,6 +24,33 @@ public class UndirectedGraph extends Graph<Integer> {
      */
     public UndirectedGraph(ArrayList<Integer> vertList) {
         super(vertList);
+    }
+    
+    
+    /**
+     * Testing main
+     * @param args 
+     */
+    public static void main(String[] args) {
+        System.out.println("Creating graph...");
+        UndirectedGraph g = new UndirectedGraph(new ArrayList<Integer>(Arrays.asList(0, 1, 2)));
+        g.addEdge(0, 1);
+        g.addEdge(0, 2);
+        
+        String doc = null;
+        String fileName = "tmp_graph.xml";
+        
+        try {
+            doc = g.toGraphMLFormat();
+        } catch(Exception e) {
+            System.err.println("ERROR: Exception message was '" + e.getMessage() + "'.");
+            System.exit(1);
+        }
+        
+        
+        IO.stringToTextFile(fileName, doc);
+        System.out.println("GraphML representation of graph written to file '" + fileName + "'.");
+        System.exit(0);
     }
         
 }

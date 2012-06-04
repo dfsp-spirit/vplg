@@ -7,14 +7,28 @@
  */
 package datastructures;
 
+import com.sun.org.apache.xml.internal.serialize.OutputFormat;
+import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import plcc.GraphMLFormat;
 import plcc.TrivialGraphFormat;
+
+import java.io.*;
+
+// Xerces 1 or 2 additional classes for XML generation (GraphML format).
+//import org.apache.xml.serialize.*;
+import com.sun.org.apache.xml.internal.serialize.XMLSerializer.*;
+import javax.xml.stream.XMLStreamWriter;
+import org.xml.sax.*;
+import org.xml.sax.helpers.*;
 
 /**
  * A generic, abstract graph class. The simplest non-abstract implementation is UndirectedGraph.
  * @author spirit
  */
-public abstract class Graph<V> implements TrivialGraphFormat {
+public abstract class Graph<V> implements TrivialGraphFormat, GraphMLFormat {
     
     /** Some vertices. Graphs like them. */
     protected ArrayList<V> vertices;
@@ -186,6 +200,100 @@ public abstract class Graph<V> implements TrivialGraphFormat {
             }
         }                
         return(tgf);
+    }
+    
+    
+    /**
+     * Returns a GraphML format string representation of this graph.
+     * GraphML is an XML-based format, see http://graphml.graphdrawing.org/ for details.
+     * @return the GraphML format string
+     */
+    public String toGraphMLFormat() throws SAXException, IOException {
+        
+        // Prepare format
+        //String filename = "tmp_graph.xml";
+        StringWriter writer = new StringWriter();
+        
+        //FileOutputStream writer = new FileOutputStream(filename);
+        OutputFormat of = new OutputFormat("XML", "UTF-8", true);
+        of.setIndent(1);
+        of.setIndenting(true);
+        of.setDoctype(null, "http://graphml.graphdrawing.org/dtds/1.0rc/graphml.dtd");
+        XMLSerializer serializer = new XMLSerializer(writer, of);
+        
+        // SAX ContentHandler
+        ContentHandler hd = null;
+        hd = serializer.asContentHandler();
+        hd.startDocument();
+        String namespaceURI = "http://graphml.graphdrawing.org/dtds/1.0rc/graphml.dtd";
+        String attributeURI = "http://graphml.graphdrawing.org/dtds/1.0rc/graphml.dtd";
+        
+        // ********** graph object **********
+        //hd.processingInstruction("xml-stylesheet","type=\"text/xsl\" href=\"users.xsl\"");
+        AttributesImpl atts = new AttributesImpl();
+        atts.clear();
+        atts.addAttribute(attributeURI, "", "ID", "CDATA", "G");  // some graph ID
+        atts.addAttribute(attributeURI, "", "EDGEDEFAULT", "CDATA", "UNDIRECTED");  // undirected edges
+        hd.startElement(namespaceURI, "", "GRAPH", atts);
+        
+                
+        // ********** get data from graph: vertices **********
+                
+        String vertexID, vertex;
+        
+        for (Integer i=0; i < this.vertices.size(); i++) {
+            // prepare attributes, e.g. "property=value"
+            atts.clear();
+            vertexID = this.vertices.get(i).toString();
+            vertex = this.vertices.get(i).toString();
+            
+            atts.addAttribute(attributeURI, "", "ID", "CDATA", vertexID);  // vertex ID
+            
+            // create the node/vertex element, e.g. "<protein>identifier</protein>
+            hd.startElement(namespaceURI, "", "NODE", atts);
+            hd.characters(vertex.toCharArray(), 0, vertex.length());
+            hd.endElement(namespaceURI, "", "NODE");
+        }
+        
+        // ********** get data from graph: edges **********
+        
+        String edgeID, edge, sourceVertex, targetVertex;
+        Integer edgeNum = 0;
+        
+        for (Integer i = 0; i < this.edgeMatrix.length; i++) {
+            for (Integer j = i+1; j < this.edgeMatrix.length; j++) {
+                
+                if(this.edgeMatrix[i][j] != Graph.EDGETYPE_NONE) {
+                    // prepare attributes, e.g. "property=value"
+                    atts.clear();
+                    edgeID = edgeNum.toString(); //this.edgeMatrix[i][j].toString();
+                    edge = edgeNum.toString();
+                    sourceVertex = this.vertices.get(i).toString();
+                    targetVertex = this.vertices.get(j).toString();
+
+                    atts.addAttribute(attributeURI, "", "ID", "CDATA", edgeID);  // edge ID
+                    atts.addAttribute(attributeURI, "", "SOURCE", "CDATA", sourceVertex);  // source vertex
+                    atts.addAttribute(attributeURI, "", "TARGET", "CDATA", targetVertex);  // target vertex
+
+                    // create the edge element, e.g. "<protein>identifier</protein>
+                    hd.startElement(namespaceURI, "", "EDGE", atts);
+                    hd.characters(edge.toCharArray(), 0, edge.length());
+                    hd.endElement(namespaceURI, "", "EDGE");
+                    edgeNum++;
+                }
+            }
+        }
+        
+        // ********** end the graph **********
+        
+        hd.endElement(namespaceURI, "", "GRAPH");
+        
+        
+        hd.endDocument();
+        String doc = writer.toString();
+        writer.close();   
+        
+        return(doc);
     }
     
     

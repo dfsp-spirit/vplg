@@ -51,7 +51,7 @@ import org.w3c.dom.DOMImplementation;
  * 
  * @author spirit
  */
-public abstract class SSEGraph implements VPLGGraphFormat {
+public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguageFormat {
     
     /** the list of all SSEs of this graph */
     protected ArrayList<SSE> sseList;
@@ -2964,6 +2964,81 @@ public abstract class SSEGraph implements VPLGGraphFormat {
     
     /** Returns the size of this graph, i.e., the number of vertices in it. */
     public Integer getSize() { return(this.numVertices()); }
+    
+    
+    /** Returns a Graph Modelling Language format representation of this graph.
+     *  See http://www.fim.uni-passau.de/fileadmin/files/lehrstuhl/brandenburg/projekte/gml/gml-technical-report.pdf for the publication 
+     * and http://en.wikipedia.org/wiki/Graph_Modelling_Language for a brief description.
+     * 
+     */
+    public String toGraphModellingLanguageFormat() {
+        
+        String gmlf = "";
+        
+        // print the header
+        String comment = this.toShortString();
+        String startNode = "  node [";
+        String endNode   = "  ]";
+        String startEdge = "  edge [";
+        String endEdge   = "  ]";
+        
+        gmlf += "graph [\n";
+        gmlf += "  id " + 1 + "\n";
+        gmlf += "  label \"" + "VPLG Protein Graph" + "\"\n";
+        gmlf += "  comment \"" + comment + "\"\n";
+        gmlf += "  directed 0\n";
+        gmlf += "  isplanar 1\n";
+        
+        
+        // print all nodes
+        SSE vertex;
+        for(Integer i = 0; i < this.size; i++) {
+            vertex = this.sseList.get(i);
+            gmlf += startNode + "\n";
+            gmlf += "    id " + i + "\n";
+            gmlf += "    label \"" + i + "\"\n";
+            gmlf += "    num_in_chain " + vertex.getSSESeqChainNum() + "\n";
+            gmlf += "    sse_type \"" + vertex.getSseType() + "\"\n";
+            gmlf += "    num_residues " + vertex.getLength() + "\n";
+            
+            gmlf += "    pdb_res_start \"" + vertex.getStartPdbResID() + "\"\n";
+            gmlf += "    pdb_res_end \"" + vertex.getEndPdbResID() + "\"\n";
+            
+            gmlf += "    dssp_res_start " + vertex.getStartDsspNum() + "\n";
+            gmlf += "    dssp_res_end " + vertex.getEndDsspNum() + "\n";
+            
+            gmlf += "    aa_sequence \"" + vertex.getAASequence() + "\"\n";
+            
+            
+            gmlf += "    pdb_id \"" + this.pdbid + "\"\n";
+            gmlf += "    chain_id \"" + this.chainid + "\"\n";
+            gmlf += "    graph_type \"" + this.graphType + "\"\n";
+            
+            gmlf += endNode + "\n";
+        }
+        
+        // print all edges
+        Integer src, tgt;
+        ArrayList<Integer[]> edges = this.getEdgeList();
+        for(Integer[] edge : edges) {
+            src = edge[0];
+            tgt = edge[1];
+            
+            gmlf += startEdge + "\n";
+            gmlf += "    source " + src + "\n";
+            gmlf += "    target " + tgt + "\n";
+            
+            gmlf += "    label \"(" + src + ", " + tgt + ")\"\n";
+            gmlf += "    spatial \"" + this.getEdgeLabel(src, tgt) + "\"\n";
+            
+            gmlf += endEdge + "\n";
+        }
+        
+        // print footer (close graph)
+        gmlf += "]\n";
+        
+        return(gmlf);
+    }
 
     
         
