@@ -148,8 +148,8 @@ public class FileParser {
                 lines += line;
             }
 	} catch (IOException e) {
-            System.err.println("ERROR: Could not read text file '" + file + "'.");
-            e.printStackTrace();
+            System.err.println("ERROR: Could not read text file '" + file + "':" + e.getMessage() + ".");
+            //e.printStackTrace();
             System.exit(1);
 	}
 

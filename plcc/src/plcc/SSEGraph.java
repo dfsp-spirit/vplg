@@ -55,8 +55,14 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     
     /** the list of all SSEs of this graph */
     protected ArrayList<SSE> sseList;
-    protected Integer size = null;    
+    
+    /** The size of this graph, i.e., the number of vertices in it. */
+    protected Integer size = null;   
+    
+    /** The edge matrix defining contacts and the type of spatial relation. */
     protected Integer[ ][ ] matrix;               // contacts and spatial relations between pairs of SSEs
+    
+    /** The matrix holding distances of vertices in the graph (shortest paths between them). */
     protected Integer[ ][ ] distMatrix;           // distances of the vertices within this graph
     protected Boolean isProteinGraph;             // true if this is a protein graph, false if this is a folding graph (a connected component of the protein graph)    
     protected SSEGraph parent;
@@ -133,6 +139,27 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         this.init();
         this.spatOrder = null;
         this.reportCliques = true;  // TODO: move to settings
+    }
+    
+    
+    /**
+     * Checks whether the SSE at index 'sseIndex' is the SSE closest to the N terminus in this graph.
+     * (This is the case if it is at sequential index 0.)
+     * @param sseIndex the sequential index of the SSE
+     * @return true if it is the SSE closest to the N terminus in this graph, false otherwise.
+     */
+    public Boolean isClosestToN(Integer sseIndex) {
+        return(sseIndex == 0);
+    }
+    
+    /**
+     * Checks whether the SSE at index 'sseIndex' is the SSE closest to the C terminus in this graph.
+     * (This is the case if it is at the last index.)
+     * @param sseIndex the sequential index of the SSE
+     * @return true if it is the SSE closest to the N terminus in this graph, false otherwise.
+     */
+    public Boolean isClosestToC(Integer sseIndex) {
+        return(sseIndex == (this.size - 1));
     }
     
     
@@ -1321,7 +1348,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             System.err.println("WARNING: closestToCTerminus(): No SSE found, returning '" + vertIndex + "'.");
             if(this.size > 0) {
                 System.err.println("ERROR: closestToCTerminus(): Graph has " + this.size + " vertices, so not finding anything is a bug.");
-                System.exit(-1);
+                System.exit(1);
             }
         }
         return(vertIndex);
@@ -2354,51 +2381,28 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             Rectangle2D aoi = new Rectangle2D.Double(0, 0, pl.getPageWidth(), pl.getPageHeight());
             
             String svgFilePath;
-            if(Settings.get("plcc_S_img_output_format").equals("SVG")) {
-                svgFilePath = filePath;
-                ig2.stream(new FileWriter(filePath), false);                
-            }
-            else {
-                // hax!
-                Integer fileExtLength = Settings.get("plcc_S_img_output_fileext").length();     // already includes the dot
-                Integer pathLength = filePath.length();
-                svgFilePath = filePath.substring(0, pathLength - fileExtLength + 1);
-                ig2.stream(new FileWriter(svgFilePath), false);                
-            }
             
-            if(Settings.get("plcc_S_img_output_format").equals("PNG")) {
-                SVGConverter svgConverter = new SVGConverter();
-                svgConverter.setArea(aoi);
-                svgConverter.setWidth(pl.getPageWidth());
-                svgConverter.setHeight(pl.getPageHeight());
-                svgConverter.setDestinationType(DestinationType.PNG);
-                svgConverter.setSources(new String[]{svgFilePath});
-                svgConverter.setDst(new File(filePath));
-                svgConverter.execute();
-            }
+            // hax!
+            Integer fileExtLength = Settings.get("plcc_S_img_output_fileext").length();     // already includes the dot
+            Integer pathLength = filePath.length();
+            svgFilePath = filePath.substring(0, pathLength - fileExtLength + 1) + "svg";
+            ig2.stream(new FileWriter(svgFilePath), false);                
             
-            if(Settings.get("plcc_S_img_output_format").equals("JPG")) {
-                SVGConverter svgConverter = new SVGConverter();
-                svgConverter.setArea(aoi);
-                svgConverter.setWidth(pl.getPageWidth());
-                svgConverter.setHeight(pl.getPageHeight());
+            SVGConverter svgConverter = new SVGConverter();
+            svgConverter.setArea(aoi);
+            svgConverter.setWidth(pl.getPageWidth());
+            svgConverter.setHeight(pl.getPageHeight());
+            if(Settings.get("plcc_S_img_output_format").equals("PNG")) {                
+                svgConverter.setDestinationType(DestinationType.PNG);                
+            } else if(Settings.get("plcc_S_img_output_format").equals("JPG")) {
                 svgConverter.setDestinationType(DestinationType.JPEG);
-                svgConverter.setSources(new String[]{svgFilePath});
-                svgConverter.setDst(new File(filePath));
-                svgConverter.execute();
-            }
-            
-            if(Settings.get("plcc_S_img_output_format").equals("TIF")) {
-                SVGConverter svgConverter = new SVGConverter();
-                svgConverter.setArea(aoi);
-                svgConverter.setWidth(pl.getPageWidth());
-                svgConverter.setHeight(pl.getPageHeight());
+            } else {
                 svgConverter.setDestinationType(DestinationType.TIFF);
-                svgConverter.setSources(new String[]{svgFilePath});
-                svgConverter.setDst(new File(filePath));
-                svgConverter.execute();
             }
             
+            svgConverter.setSources(new String[]{svgFilePath});
+            svgConverter.setDst(new File(filePath));
+            svgConverter.execute();                                    
             
 
         } catch (Exception e) {
@@ -2435,10 +2439,14 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
      */
     public ArrayList<Shape> getArcConnector(Integer startX, Integer startY, Integer targetX, Integer targetY, Stroke stroke, Boolean startUpwards) {
 
+        System.out.print("getArcConnector: startX=" + startX + ", startY=" + startY + ", targetX=" + targetX + ", targetY=" + targetY + ", startUpwards=" + startUpwards.toString() + ": ");
+        
         if(startY == targetY) {
+            System.out.print("getting simple connector(" + startY + " == " + targetY + ").\n");
             return(getSimpleArcConnector(startX, startY, targetX, stroke, startUpwards));            
         }
         else {
+            System.out.print("getting crossover connector(" + startY + " != " + targetY + ").\n");
             return(getCrossoverArcConnector(startX, startY, targetX, targetY, stroke, startUpwards));
         }        
     }
@@ -2533,7 +2541,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         Integer downwards = 180;
         
         ArrayList<Shape> parts = new ArrayList<Shape>();
-        Integer leftVertPosX, rightVertPosX, bothArcsSumWidth, bothArcsSumHeight, vertStartY, leftArcHeight, leftArcWidth, rightArcHeight, rightArcWidth;
+        Integer leftVertPosX, rightVertPosX, bothArcsSumWidth, bothArcsSumHeight, vertStartY, leftArcHeight, leftArcWidth, rightArcHeight, rightArcWidth, arcWidth, arcEllipseHeight;
         Integer leftArcUpperLeftX, leftArcUpperLeftY, centerBetweenBothArcsX, centerBetweenBothArcsY, leftArcEndX, leftArcEndY, rightArcEndX, rightArcEndY;
         Integer leftArcLowerRightX, leftArcLowerRightY, leftArcUpperRightX, leftArcUpperRightY;
         Integer rightArcLowerRightX, rightArcLowerRightY, rightArcUpperRightX, rightArcUpperRightY, rightArcUpperLeftX, rightArcUpperLeftY;
@@ -2557,16 +2565,19 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         bothArcsSumWidth = rightVertPosX - leftVertPosX;
         leftArcWidth = rightArcWidth = bothArcsSumWidth / 2;
         
-        bothArcsSumHeight = bothArcsSumWidth / 2;
-        leftArcHeight = rightArcHeight = bothArcsSumHeight / 2;
+        bothArcsSumHeight = bothArcsSumWidth;
+        //bothArcsSumHeight = bothArcsSumWidth;
+        leftArcHeight = rightArcHeight = arcEllipseHeight = bothArcsSumHeight / 2;
         
         centerBetweenBothArcsX = rightVertPosX - (bothArcsSumWidth / 2);    // this is where the upright line is created
         centerBetweenBothArcsY = vertStartY;
         
         leftArcUpperLeftX = leftVertPosX;
-        leftArcUpperLeftY = vertStartY - bothArcsSumHeight / 2;
+        leftArcUpperLeftY = vertStartY - (arcEllipseHeight / 2);
+        
         leftArcLowerRightX = leftArcUpperLeftX + leftArcWidth;
-        leftArcLowerRightY = leftArcUpperLeftY + leftArcHeight;
+        leftArcLowerRightY = leftArcUpperLeftY + leftArcHeight - (arcEllipseHeight / 2);
+        
         leftArcUpperRightX = leftArcUpperLeftX + leftArcWidth;
         leftArcUpperRightY = leftArcUpperLeftY;
         
@@ -2575,10 +2586,10 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         
         if(startUpwards) {                  
             
-            // left arc ends starts in lower right corner and ens in lower right corner of its bounding rectangle (looks like an inverted 'U')
+            // left arc starts in lower left corner and ends in lower right corner of its bounding rectangle (looks like an inverted 'U')
             leftArcEndX = leftArcLowerRightX;
             leftArcEndY = leftArcLowerRightY;
-            
+           
             // create the Shape for the left arc, which starts upwards in this case
             arc = new Arc2D.Double(leftArcUpperLeftX, leftArcUpperLeftY, leftArcWidth, leftArcHeight, upwards, 180, Arc2D.OPEN);
             shape = stroke.createStrokedShape(arc);
@@ -2596,7 +2607,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             // create the Shape for the right arc. it starts in upper left corner and ends in upper right corner of its bounding rectangle (looks like a 'U').
             rightArcUpperLeftX = lineEndX;
             rightArcUpperLeftY = lineEndY;
-            arc = new Arc2D.Double(rightArcUpperLeftX, rightArcUpperLeftY, rightArcWidth, rightArcHeight, downwards, 180, Arc2D.OPEN);
+            arc = new Arc2D.Double(rightArcUpperLeftX, rightArcUpperLeftY - (arcEllipseHeight / 2), rightArcWidth, rightArcHeight, downwards, 180, Arc2D.OPEN);
             shape = stroke.createStrokedShape(arc);
             parts.add(shape);
         }
@@ -2612,18 +2623,19 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             
             // create the Shape for the line, which goes straight up
             lineStartX = leftArcEndX;
-            lineStartY = leftArcEndY;
+            lineStartY = leftArcEndY + (arcEllipseHeight / 2);
             lineEndX = leftArcEndX;
-            lineEndY = leftArcEndY - lineLength;    // the line goes downwards, therefor the '-' in this case!
+            lineEndY = lineStartY - lineLength;    // the line goes downwards, therefor the '-' in this case!
             Line2D l = new Line2D.Double(lineStartX, lineStartY, lineEndX, lineEndY);
             shape = stroke.createStrokedShape(l);
             parts.add(shape);
             
             // create the Shape for the right arc. it starts in upper left corner and ends in upper right corner of its bounding rectangle (looks like a 'U').
             rightArcUpperLeftX = lineEndX;
-            rightArcUpperLeftY = lineEndY;
+            rightArcUpperLeftY = lineEndY - (arcEllipseHeight / 2);
             arc = new Arc2D.Double(rightArcUpperLeftX, rightArcUpperLeftY, rightArcWidth, rightArcHeight, upwards, 180, Arc2D.OPEN);
             shape = stroke.createStrokedShape(arc);
+            parts.add(shape);
 
         }
         return(parts);
@@ -2696,15 +2708,17 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
      * @param tailY The y location of the center of the "tail" of the arrow
      * @param headY The y location of the "head" of the arrow
      * @param widthTail The width of the arrow at the tail
-     * @param widthHead The width of the arrow at the broadest part of the head
+     * @param widthHead The width of the arrow at the broadest part of the head. Note that widthHead > widthTail is required if this is meant to make sense.
      */
     protected Polygon getArrowPolygon(int headY, int tailX, int tailY, int widthTail, int widthHead, int lengthHead) {
-        int[] xPoints = new int[7] ;
-        int[] yPoints = new int[7] ;
+        
+        int numPoints = 7;
+        int[] xPoints = new int[numPoints] ;
+        int[] yPoints = new int[numPoints] ;
      
         // Create all points of the arrow.
         
-        //Start at the left point of the tail and add the other points counter-clockwise.
+        //Start at the left point of the tail (the bottom left point when the arrow is pointing upwards) and add the other points counter-clockwise.
         xPoints[0] = tailX - (widthTail / 2);
         yPoints[0] = tailY;
         
@@ -2733,7 +2747,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         yPoints[6] = headY + lengthHead;
         
         // The line closing the polygon (between the last we just set and the first point) is automatically inserted to close the Polygon
-        return(new Polygon(xPoints, yPoints, 7));     
+        return(new Polygon(xPoints, yPoints, numPoints));     
     }
     
     

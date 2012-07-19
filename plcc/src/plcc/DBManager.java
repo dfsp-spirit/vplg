@@ -887,6 +887,9 @@ public class DBManager {
                 if (statement != null) {
                     statement.close();
                 }
+                if (rs != null) {
+                    rs.close();
+                }
                 dbc.setAutoCommit(true);
             } catch(Exception e) { System.err.println("WARNING: DB: Could not close statement and reset autocommit."); }
         }

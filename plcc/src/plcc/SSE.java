@@ -22,15 +22,15 @@ public class SSE implements java.io.Serializable {
 
     // settings
     private Integer MAX_RES = 100000;
-    private String SSE_TYPE_LIGAND = "L";                   // ligand
-    private String SSE_TYPE_BETASTRAND = "E";               // beta strand that is part of a beta sheet
-    private String SSE_TYPE_ALPHA_HELIX = "H";              // alpha helix
-    private String SSE_TYPE_ISOLATED_BETA = "B";            // isolated beta strand, not part of any beta sheet
-    private String SSE_TYPE_3HELIX = "G";                   // 3-helix (3 turns per 10 residues)
-    private String SSE_TYPE_5HELIX = "I";                   // 5-helix (pi helix)
-    private String SSE_TYPE_HTURN = "T";                    // hydrogen-bonded turn
-    private String SSE_TYPE_BEND = "S";                     // bend
-    private String SSE_TYPE_COIL = "C";                     // never assigned by DSSP, it calls these " "
+    public static final String SSE_TYPE_LIGAND = "L";                   // ligand
+    public static final String SSE_TYPE_BETASTRAND = "E";               // beta strand that is part of a beta sheet
+    public static final String SSE_TYPE_ALPHA_HELIX = "H";              // alpha helix
+    public static final String SSE_TYPE_ISOLATED_BETA = "B";            // isolated beta strand, not part of any beta sheet
+    public static final String SSE_TYPE_3HELIX = "G";                   // 3-helix (3 turns per 10 residues)
+    public static final String SSE_TYPE_5HELIX = "I";                   // 5-helix (pi helix)
+    public static final String SSE_TYPE_HTURN = "T";                    // hydrogen-bonded turn
+    public static final String SSE_TYPE_BEND = "S";                     // bend
+    public static final String SSE_TYPE_COIL = "C";                     // never assigned by DSSP, it calls these " "
 
 
     // Test for SSE adj graph
@@ -68,7 +68,7 @@ public class SSE implements java.io.Serializable {
      * Returns true if this SSE is a ligand SSE..
      */
     public Boolean isLigandSSE() {
-        if(sseType.equals(SSE_TYPE_LIGAND)) {
+        if(sseType.equals(SSE.SSE_TYPE_LIGAND)) {
             return(true);
         }
         return(false);
@@ -89,7 +89,7 @@ public class SSE implements java.io.Serializable {
      * Returns true if this SSE is a helix.
      */
     public Boolean isHelix() {
-        if(sseType.equals(SSE_TYPE_ALPHA_HELIX) || sseType.equals(SSE_TYPE_3HELIX) || sseType.equals(SSE_TYPE_5HELIX)) {
+        if(sseType.equals(SSE.SSE_TYPE_ALPHA_HELIX) || sseType.equals(SSE.SSE_TYPE_3HELIX) || sseType.equals(SSE.SSE_TYPE_5HELIX)) {
             return(true);
         }
         return(false);
@@ -99,7 +99,7 @@ public class SSE implements java.io.Serializable {
      * Returns true if this SSE is a beta strand.
      */
     public Boolean isBetaStrand() {
-        if(sseType.equals(SSE_TYPE_BETASTRAND) || sseType.equals(SSE_TYPE_ISOLATED_BETA)) {
+        if(sseType.equals(SSE.SSE_TYPE_BETASTRAND) || sseType.equals(SSE.SSE_TYPE_ISOLATED_BETA)) {
             return(true);
         }
         return(false);
@@ -110,7 +110,7 @@ public class SSE implements java.io.Serializable {
      * Returns true if this is not a helix, beta strand or ligand SSE.
      */
     public Boolean isOtherSSE() {
-        if(sseType.equals(SSE_TYPE_HTURN) || sseType.equals(SSE_TYPE_BEND) || sseType.equals(SSE_TYPE_COIL)) {
+        if(sseType.equals(SSE.SSE_TYPE_HTURN) || sseType.equals(SSE.SSE_TYPE_BEND) || sseType.equals(SSE.SSE_TYPE_COIL)) {
             return(true);
         }
         return(false);
@@ -121,7 +121,8 @@ public class SSE implements java.io.Serializable {
      * Not used yet.
      */
     public Boolean isPartOfBetaSheet() {
-        if(sseType.equals(SSE_TYPE_BETASTRAND)) {
+        System.out.println("WARNING: SSE.isPartOfBetaSheet(): Not implemented yet, returning TRUE.");
+        if(sseType.equals(SSE.SSE_TYPE_BETASTRAND)) {
             return(true);
         }
         return(false);
@@ -297,7 +298,7 @@ public class SSE implements java.io.Serializable {
 
         if(endRes == null || maxResNumDssp == -1) {
             System.err.println("ERROR: Could not determine end residue of non-empty SSE '" + sseIDPtgl + "' with length " + this.residues.size() + ".");
-            System.exit(-1);
+            System.exit(1);
         }
 
         return(endRes);
@@ -305,8 +306,24 @@ public class SSE implements java.io.Serializable {
 
     // setters
     public void setSseIDPtgl(String sID) { this.sseIDPtgl = sID; }
+    
+    /**
+     * Sets the SSE type of this SSE to 'sT'.
+     * @param sT 
+     */
     public void setSseType(String sT) { this.sseType = sT; }
-    public void addResidue(Residue r) { this.residues.add(r); }
+    
+    /**
+     * Adds the residue r to this SSE.
+     * @param r 
+     */
+    public void addResidue(Residue r) { 
+        if(r == null) {
+            throw new IllegalArgumentException("Residue must not be null.");
+        }
+        this.residues.add(r); 
+    }
+    
     public void setChain(Chain c) { this.chain = c; }
     public void setSeqSseNumDssp(Integer s) { this.seqSseNumDssp = s; }
     
@@ -412,6 +429,7 @@ public class SSE implements java.io.Serializable {
         }
     }
     
+       
     
     /**
      * Convenience function, returns the notation label for this SSE for the linear notations (SEQ, KEY, ...). E.g., "e" for a beta strand and "h" for a helix.

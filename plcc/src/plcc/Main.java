@@ -27,6 +27,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.RenderingHints;
 import java.awt.FontMetrics;
+import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Rectangle2D;
@@ -37,6 +38,7 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.SQLException;
+import javax.imageio.ImageIO;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.w3c.dom.Document;
@@ -477,11 +479,8 @@ public class Main {
                         else {
                             String format = args[i+1].toUpperCase();
                             
-                            if(format.equals("SVG")) {
-                                Settings.set("plcc_S_img_output_format", "SVG");
-                                Settings.set("plcc_S_img_output_fileext", ".svg");
-                            }
-                            else if((format.equals("PNG"))) {
+                            
+                            if((format.equals("PNG"))) {
                                 Settings.set("plcc_S_img_output_format", "PNG");
                                 Settings.set("plcc_S_img_output_fileext", ".png");
                             }
@@ -1526,7 +1525,7 @@ public class Main {
 
                 if(Settings.getBoolean("plcc_B_draw_graphs")) {
 
-                    fgFile = outputDir + System.getProperty("file.separator") + "graph_" + pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + "_" + nt + Settings.get("plcc_S_img_output_fileext");
+                    fgFile = outputDir + System.getProperty("file.separator") + "graph_" + pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + "_" + nt + ".png"; //Settings.get("plcc_S_img_output_fileext");
                     if(fg.drawFoldingGraph(nt, fgFile)) {
                         System.out.println("         -Folding graph #" + j + " of the " + pg.getGraphType() + " graph of chain " + pg.getChainid() + " written to file '" + fgFile + "' in " + nt + " notation.");
                     }
@@ -3087,7 +3086,7 @@ public class Main {
         System.out.println("-j | --ddb <p> <c> <gt> <f>: get the graph type <gt> of chain <c> of pdbid <p> from the DB and draw it to file <f> (omit the file extension)*");
         System.out.println("-k | --img-dir-tree        : do write the output images to a sudbir tree of the output dir instead of directly in there");
         System.out.println("-l | --draw-plcc-graph <f> : read graph in plcc format from file <f> and draw it to <f>.png, then exit (<pdbid> will be ignored)*");                
-        System.out.println("-m | --image-format <f>    : write output images in format <f>, which can be 'PNG' for PNG bitmap format or 'SVG' for SVG vector format.");
+        System.out.println("-m | --image-format <f>    : write output images in format <f>, which can be 'PNG' or 'JPG' (SVG vector format is always written).");
         System.out.println("-M | --similar <p> <c> <g> : find the proteins which are most similar to pdbid <p> chain <c> graph type <g> in the database.");
         System.out.println("-n | --textfiles           : write meta data, debug info and interim results like residue contacts to text files (slower)");
         System.out.println("-o | --outputdir <dir>     : write output files to directory <dir> (instead of '.', the current directory)");
@@ -3764,7 +3763,7 @@ public class Main {
      * Draws a Ramachandran plot (phi and psi angels of the residues) to an image file. Note that the angles are parsed from the DSSP
      * file but consider our SSE modifications. Still, the plot shows more about DSSP than about plcc.
      * 
-     * @param filePath the output path of the image
+     * @param filePath the output path of the image without extension
      * @param the Residues, in an ArrayList
      * @return true if the file was written, false otherwise
      */
@@ -3778,7 +3777,7 @@ public class Main {
         String svgNS = "http://www.w3.org/2000/svg";
         Document document = domImpl.createDocument(svgNS, "svg", null);
         // Create an instance of the SVG Generator.
-        SVGGraphics2D ig2 = new SVGGraphics2D(document);
+        //SVGGraphics2D ig2 = new SVGGraphics2D(document);
         
         
         
@@ -3825,7 +3824,7 @@ public class Main {
             // ------------------------- Prepare stuff -------------------------
             // TYPE_INT_ARGB specifies the image format: 8-bit RGBA packed into integer pixels
             BufferedImage bi = new BufferedImage(pageWidth, pageHeight, BufferedImage.TYPE_INT_ARGB);
-            //Graphics2D ig2 = bi.createGraphics();
+            Graphics2D ig2 = bi.createGraphics();
             ig2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                     RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -3940,8 +3939,9 @@ public class Main {
 
             
             // all done, write the image to disk
-            //ImageIO.write(bi, "PNG", new File(filePath));
-            ig2.stream(new FileWriter(filePath + ".svg"), false);
+            ImageIO.write(bi, "PNG", new File(filePath + ".png"));
+            //ig2.stream(new FileWriter(filePath + ".svg"), false);
+            ig2.dispose();
 
         } catch (Exception e) {
             System.err.println("WARNING: Could not write image file for ramachandran plot to file '" + filePath + "'. Check permissions.");

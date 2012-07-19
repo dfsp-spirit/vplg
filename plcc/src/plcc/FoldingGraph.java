@@ -17,7 +17,9 @@ import java.awt.Graphics2D;
 import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
+import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -180,7 +182,7 @@ public class FoldingGraph extends SSEGraph {
         //  a part of. So we gotta divide by 2 again; the maximal height is thus a quarter of the maximal distance between
         //  vertices in the image.
         Integer maxVertDist = this.numVertices() * vertDist;
-        Integer maxArcHeight = maxVertDist / 4;
+        Integer maxArcHeight = maxVertDist / 2;
 
         // the image area: the part where the vertices and arcs are drawn
         Integer imgWidth = numVert * vertDist + 2 * vertRadius;
@@ -255,15 +257,17 @@ public class FoldingGraph extends SSEGraph {
                     Integer spatRel = this.getContactType(sseIndex, lastsseIndex);
                     
                     if(spatRel == SpatRel.PARALLEL || spatRel == SpatRel.LIGAND) {
+                        // keep orientation
                         headingsSpatOrder[i] = headingsSpatOrder[i-1];
                     }
                     else if(spatRel == SpatRel.NONE) {
+                        // should never happen
                         headingsSpatOrder[i] = headingsSpatOrder[i-1];    // whatever
                         System.err.println("ERROR: Vertices without contact are considered neighbors in the graph.");
                         System.exit(1);
                     }
                     else {
-                        // all other spatial relations, e.g. SpatRel.ANTIPARALLEL
+                        // all other spatial relations, e.g. SpatRel.ANTIPARALLEL: invert orientation
                         headingsSpatOrder[i] = (headingsSpatOrder[i-1] == UP ? DOWN : UP);
                     }                
                 }
@@ -279,6 +283,7 @@ public class FoldingGraph extends SSEGraph {
             // now draw the connectors
             Integer iSpatIndex, jSpatIndex;
             Boolean startUpwards;
+            ig2.setStroke(new BasicStroke(1));
             if(this.numEdges() > 0) {                          
                 for(Integer i = 0; i < this.sseList.size(); i++) {
                     for(Integer j = i + 1; j < this.sseList.size(); j++) {
@@ -297,19 +302,22 @@ public class FoldingGraph extends SSEGraph {
                             // determine the center of the arc and the width of its rectangle bounding box
                             iSpatIndex = spatOrder.get(i);
                             jSpatIndex = spatOrder.get(j);
+                            
+                            // determine who is left and who is right
                             if(iSpatIndex < jSpatIndex) { leftVertSpat = iSpatIndex; leftVert = i; rightVertSpat = jSpatIndex; rightVert = j;}
                             else { leftVertSpat = jSpatIndex; leftVert = j; rightVertSpat = iSpatIndex; rightVert = i;}
-                            leftVertPosX = vertStartX + (leftVertSpat * vertDist);
-                            rightVertPosX = vertStartX + (rightVertSpat * vertDist);
+                            
+                            leftVertPosX = vertStartX + (leftVertSpat * vertDist);      // center of the left vertex object (arrow or rectangle)
+                            rightVertPosX = vertStartX + (rightVertSpat * vertDist);    // center of the right...
 
-                            connWidth = rightVertPosX - leftVertPosX;
-                            connHeight = connWidth / 2;
+                            connWidth = rightVertPosX - leftVertPosX;                   // total width of the connector
+                            connHeight = connWidth / 2;                                 // total height...
 
-                            connCenterX = rightVertPosX - (connWidth / 2);
-                            connCenterY = vertStartY;
+                            connCenterX = rightVertPosX - (connWidth / 2);      // the center of the connector, here we draw the line if it is required
+                            connCenterY = vertStartY - (connHeight / 2);
 
-                            connTopLeftX = leftVertPosX;
-                            connTopLeftY = vertStartY - connHeight / 2;
+                            connTopLeftX = leftVertPosX;                        // the upper left point of the connector, i.e., where it is connected to the left vertex object (if that vertex has to be connected at the upper end)                                                                
+                            connTopLeftY = vertStartY - (connHeight / 2);
 
                             spacerX = vertWidth;
                             spacerY = 0;
@@ -317,29 +325,36 @@ public class FoldingGraph extends SSEGraph {
                             
                             // Determine the y axis positions where the connector should start (at the left vertex) and end (at the right vertex). This depends
                             //  on whether the respective vertex points upwards or downwards.
+                            
+                            System.out.print("Contact " + i + "," + j + ": ");
+                            
                             if(headingsSeqOrder[leftVert] == UP) {
                                 // the left vertex points upwards, so the arc should start at its top
                                 leftVertPosY = vertStartY - vertHeight;
                                 startUpwards = true;
+                                System.out.print("leftVert starts upwards, ");
                             }
                             else {
                                 // the left vertex points downwards, so the arc should start at its bottom
                                 leftVertPosY = vertStartY;
                                 startUpwards = false;
+                                System.out.print("leftVert starts downwards, ");
                             }
                             
                             if(headingsSeqOrder[rightVert] == UP) {
-                                // the left vertex points upwards, so the arc should start at its top
-                                rightVertPosY = vertStartY - vertHeight;
+                                // the right vertex points upwards, so the arc should end at its bottom
+                                rightVertPosY = vertStartY;
+                                System.out.print("rightVert starts upwards. ");
                             }
                             else {
-                                // the left vertex points downwards, so the arc should start at its bottom
-                                rightVertPosY = vertStartY;
+                                // the right vertex points downwards, so the arc should end at its top
+                                rightVertPosY = vertStartY - vertHeight;
+                                System.out.print("rightVert starts downpwards. ");
                             }
                             
                             
-                            // draw it
-                            ig2.setStroke(new BasicStroke(2));
+                            // draw it        
+                            System.out.print("Getting arc from " + leftVertPosX + "," + leftVertPosY + " to " + rightVertPosX + "," + rightVertPosY + ".\n");
                             ArrayList<Shape> connShapes = this.getArcConnector(leftVertPosX, leftVertPosY, rightVertPosX, rightVertPosY, ig2.getStroke(), startUpwards);
                             for(Shape s : connShapes) {
                                 ig2.draw(s);
@@ -349,9 +364,28 @@ public class FoldingGraph extends SSEGraph {
                 }
             }
 
+            
+            ig2.setStroke(new BasicStroke(1));
 
+            // DEBUG
+            //Line2D line = new Line2D.Float(vertStartX, vertStartY, (vertStartX + ((this.sseList.size() - 1) * vertDist)), vertStartY);
+            //ig2.draw(line);
+            //System.out.println("Drawing " + this.sseList.size() + " vertices...");
+            
             // Draw the vertices as arrows or barrels (depending on the type)
             Polygon p;
+            
+            // prepare rotation of canvas            
+            AffineTransform origXform = ig2.getTransform();
+            AffineTransform newXform;
+                    
+            
+
+            int rotationCenterX, rotationCenterY;
+            int angle = 180;
+
+            
+            
             for(Integer i = 0; i < this.sseList.size(); i++) {
                 if(this.sseList.get(i).isHelix()) { ig2.setPaint(Color.RED); }
                 else if(this.sseList.get(i).isBetaStrand()) { ig2.setPaint(Color.BLACK); }
@@ -359,23 +393,65 @@ public class FoldingGraph extends SSEGraph {
                 else if(this.sseList.get(i).isOtherSSE()) { ig2.setPaint(Color.GRAY); }
                 else { ig2.setPaint(Color.LIGHT_GRAY); }
                 
-                // draw it
-                ig2.setStroke(new BasicStroke(1));
+                Integer currentVertX = vertStartX + (i * vertDist);
+                Integer currentVertY = vertStartY;
                 
+                // draw it                                
                 if(this.sseList.get(i).isHelix()) {
-                    p = getDefaultArrowPolygon(vertStartY - vertHeight, vertStartX + (i * vertDist), vertStartY);
+                    p = getDefaultArrowPolygon((vertStartY - vertHeight), currentVertX, currentVertY);
+                    //p = getDefaultBarrelPolygon(vertStartY - vertHeight, vertStartX + (i * vertDist), vertStartY);
+                    //System.out.println("SSE is helix: " + this.sseList.get(i).longStringRep() + ", drawing with base position (" + (vertStartX + (i * vertDist)) + "," + vertStartY + ").");
                     
                 }
                 else {
-                    p = getDefaultBarrelPolygon(vertStartY - vertHeight, vertStartX + (i * vertDist), vertStartY);
+                    p = getDefaultArrowPolygon((vertStartY - vertHeight), currentVertX, currentVertY);
+                    //p = getDefaultBarrelPolygon((vertStartY - vertHeight), (vertStartX + (i * vertDist)), vertStartY);
+                    //System.out.println("SSE is NOT a helix: " + this.sseList.get(i).longStringRep() + ", drawing with base position (" + (vertStartX + (i * vertDist)) + "," + vertStartY + ").");
                 }
                 
                 shape = ig2.getStroke().createStrokedShape(p);
+                                
+                newXform = (AffineTransform)(origXform.clone());
+                // set rotation center to center of the current arrow / rectangle
+                rotationCenterX = (vertStartX + (i * vertDist));
+                rotationCenterY = vertStartY - (vertHeight / 2);
                 
-                if(headingsSpatOrder[i] == DOWN) { ig2.rotate(180); }
+                // perform rotation
+                newXform.rotate(Math.toRadians(angle), rotationCenterX, rotationCenterY);
+                
+                if(headingsSpatOrder[i] == DOWN) { 
+                    //ig2.rotate(Math.toRadians(180));                                         
+                    ig2.setTransform(newXform);
+                    //System.out.println("Rotating canvas before drawing SSE #" + i + " of the list.");
+                }
                 ig2.draw(shape);
-                if(headingsSpatOrder[i] == DOWN) { ig2.rotate(-180); }
+                if(headingsSpatOrder[i] == DOWN) { 
+                    ig2.setTransform(origXform);
+                    //ig2.rotate(Math.toRadians(-180)); 
+                    //System.out.println("Rotating canvas back to normal after drawing SSE #" + i + " of the list.");
+                }
+                
+                
+                // draw the N or C terminus label under it if applicable
+                if( (this.closestToCTerminus() == i)  || (this.closestToNTerminus() == i) ) {
+                    if(this.closestToCTerminus() == i) {
+                        System.out.println("    SSE # " + i + " is closest to C terminus.");
+                        ig2.drawString("C", currentVertX, (currentVertY + 20));
+                    }
+                    
+                    if(this.closestToNTerminus() == i) { 
+                        System.out.println("    SSE # " + i + " is closest to N terminus.");
+                        ig2.drawString("N", currentVertX, (currentVertY + 20));
+                    }      
+                    
+                }
+                
+                
+                
             }
+            
+            //Line2D lineTop = new Line2D.Float(vertStartX, (vertStartY - vertHeight), (vertStartX + ((this.sseList.size() - 1) * vertDist)), (vertStartY - vertHeight));
+            //ig2.draw(lineTop);
             
             
 
@@ -397,7 +473,7 @@ public class FoldingGraph extends SSEGraph {
                     sseNumber = "" + (spatOrder.get(i) + 1);
                     stringWidth = fontMetrics.stringWidth(sseNumber);
                     stringHeight = fontMetrics.getAscent();
-                    ig2.drawString(sseNumber, footerStartX + (i * vertDist) + vertRadius / 2, footerStartY + (stringHeight / 4));
+                    ig2.drawString(sseNumber, footerStartX + (i * vertDist), footerStartY + (stringHeight / 4));
                 }
             }
 
@@ -407,11 +483,28 @@ public class FoldingGraph extends SSEGraph {
             ImageIO.write(bi, "PNG", new File(filePath));
 
         } catch (Exception e) {
-            System.err.println("WARNING: Could not write image file for graph to file '" + filePath + "'.");
+            System.err.println("WARNING: Could not write image file for graph to file '" + filePath + "': " + e.getMessage() + ".");
             return(false);
         }
 
         return(true);
+    }
+    
+    
+    /**
+     * Small debug function to mark a postition on the canvas with a cross in the specified color.
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param ig2 the G2D canvas to draw on
+     * @param c the Color
+     */
+    private void markPosition(Integer x, Integer y, Graphics2D ig2, Color c) {        
+        Integer crossWidth = 5;
+        
+        Line2D lineRC1 = new Line2D.Float(x - crossWidth, y, x + crossWidth, y);
+        Line2D lineRC2 = new Line2D.Float(x, y - crossWidth, x, y + crossWidth);
+        ig2.draw(lineRC1);
+        ig2.draw(lineRC2);
     }
 
 
