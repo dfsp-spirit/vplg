@@ -2,6 +2,11 @@ This is the VPLG release log.
 =============================
 
 
+Updates for version 2012-07-19:
+===============================
+* Added first version of the new VPG GUI.
+
+
 Updates from version 2012-01-24 to 2012-01-30:
 ================================================
 * Default rule set for atom and residue contacts is now PTGL compatible
