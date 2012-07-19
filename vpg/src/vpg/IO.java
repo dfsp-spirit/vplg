@@ -224,10 +224,15 @@ public class IO {
     /**
      * Executes the command given by a list of arguments.
      * @param cmd the command as a list of arguments
+     * @param workingDir the working directory for the process
      * @return an array of 2 string, first is input and second is error
-     * @throws Exception if something went wrong
+     * @throws Exception if something went wrong with the process of the workingDir does not exist
      */
-    public static String[] execCmd(String[] cmd) throws Exception {
+    public static String[] execCmd(String[] cmd, File workingDir) throws Exception {
+        
+        if(! (workingDir.isDirectory() && workingDir.canRead())) {
+            throw new IllegalArgumentException("Working directory '" + workingDir.getAbsolutePath() + "' does not exist.");
+        }
         
         String line;
         String[] inputAndError = new String[3];
@@ -235,9 +240,9 @@ public class IO {
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date dateStart = new Date();
         
-        System.out.println(Settings.getApptag() + "Starting external process at " + dateFormat.format(dateStart) + "...");
+        System.out.println(Settings.getApptag() + "Starting external process in working directory '" + workingDir + "' at " + dateFormat.format(dateStart) + "...");
         
-        Process p = Runtime.getRuntime().exec(cmd);
+        Process p = Runtime.getRuntime().exec(cmd, null, workingDir);
         BufferedReader brInput = new BufferedReader(new InputStreamReader(p.getInputStream()));        
         BufferedReader brError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.1" encoding="UTF-8" ?>
 
 <Form version="1.3" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <Properties>
@@ -42,24 +42,24 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" alignment="0" attributes="0">
+              <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jScrollPaneStatus" alignment="0" max="32767" attributes="0"/>
-                      <Component id="jSeparatorLower" alignment="1" max="32767" attributes="0"/>
-                      <Component id="jSeparatorUpper" alignment="0" max="32767" attributes="0"/>
+                      <Component id="jScrollPaneStatus" alignment="0" pref="505" max="32767" attributes="0"/>
+                      <Component id="jSeparatorLower" alignment="1" pref="505" max="32767" attributes="0"/>
+                      <Component id="jSeparatorUpper" alignment="0" pref="505" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="jLabelInputDSSP" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                  <EmptySpace min="0" pref="216" max="32767" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="jLabelInputPDB" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jTextFieldInputFilePDB" max="32767" attributes="0"/>
-                                      <Component id="jTextFieldInputFileDSSP" max="32767" attributes="0"/>
+                                      <Component id="jTextFieldInputFilePDB" pref="218" max="32767" attributes="0"/>
+                                      <Component id="jTextFieldInputFileDSSP" pref="218" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
                           </Group>
@@ -90,7 +90,7 @@
                               <Group type="102" attributes="0">
                                   <Component id="jLabelImageFormat" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="jComboBoxImageFormat" max="32767" attributes="0"/>
+                                  <Component id="jComboBoxImageFormat" pref="196" max="32767" attributes="0"/>
                               </Group>
                               <Component id="jCheckBoxAllowCoils" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="jCheckBoxAdditionalOutput" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -98,9 +98,9 @@
                               <Component id="jCheckBoxRamachandranPlot" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <Component id="jSeparatorCenter" alignment="0" max="32767" attributes="0"/>
+                      <Component id="jSeparatorCenter" alignment="0" pref="505" max="32767" attributes="0"/>
                       <Group type="102" alignment="1" attributes="0">
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="309" max="32767" attributes="0"/>
                           <Component id="jButtonCheckInput" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="jButtonRun" min="-2" max="-2" attributes="0"/>
@@ -110,7 +110,7 @@
                               <Component id="jLabelOptions" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabelPlccCommand" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabelResults" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="jScrollPane1" alignment="0" min="-2" pref="505" max="-2" attributes="0"/>
+                              <Component id="jScrollPanePlccCommand" alignment="0" min="-2" pref="505" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
@@ -119,8 +119,9 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jTextFieldCustomOutputDir" min="-2" pref="155" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="jButtonSelectCustomOutputDir" max="32767" attributes="0"/>
+                          <Component id="jButtonSelectCustomOutputDir" pref="165" max="32767" attributes="0"/>
                       </Group>
+                      <Component id="jLabelInputOutput" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -129,7 +130,9 @@
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
-                  <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="13" max="-2" attributes="0"/>
+                  <Component id="jLabelInputOutput" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jTextFieldInputFilePDB" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jButtonSelectFilePDB" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -183,7 +186,7 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabelPlccCommand" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jScrollPane1" pref="43" max="32767" attributes="0"/>
+                  <Component id="jScrollPanePlccCommand" pref="43" max="32767" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jButtonCheckInput" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -223,6 +226,7 @@
         <Component class="javax.swing.JButton" name="jButtonSelectFilePDB">
           <Properties>
             <Property name="text" type="java.lang.String" value="Select PDB file..."/>
+            <Property name="toolTipText" type="java.lang.String" value="Select the input PDB file."/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonSelectFilePDBActionPerformed"/>
@@ -231,6 +235,7 @@
         <Component class="javax.swing.JButton" name="jButtonSelectFileDSSP">
           <Properties>
             <Property name="text" type="java.lang.String" value="Select DSSP file..."/>
+            <Property name="toolTipText" type="java.lang.String" value="Select the input DSSP file."/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonSelectFileDSSPActionPerformed"/>
@@ -248,6 +253,7 @@
         <Component class="javax.swing.JButton" name="jButtonRun">
           <Properties>
             <Property name="text" type="java.lang.String" value="Run PLCC"/>
+            <Property name="toolTipText" type="java.lang.String" value="Runs PLCC with the settings defined above."/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <Events>
@@ -257,11 +263,13 @@
         <Component class="javax.swing.JCheckBox" name="jCheckBoxPdbFileIsGzipped">
           <Properties>
             <Property name="text" type="java.lang.String" value="is gzipped"/>
+            <Property name="toolTipText" type="java.lang.String" value="Whether the selected input file is compressed with gzip."/>
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="jCheckBoxDsspFileIsGzipped">
           <Properties>
             <Property name="text" type="java.lang.String" value="is gzipped"/>
+            <Property name="toolTipText" type="java.lang.String" value="Whether the selected input file is compressed with gzip."/>
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="jCheckBoxFoldingGraphs">
@@ -308,11 +316,13 @@
         <Component class="javax.swing.JCheckBox" name="jCheckBoxForceChain">
           <Properties>
             <Property name="text" type="java.lang.String" value="Force chain:"/>
+            <Property name="toolTipText" type="java.lang.String" value="Handle only the chain with the specified chain ID. PLCC will abort if no such chain exists."/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="jTextFieldForceChain">
           <Properties>
             <Property name="text" type="java.lang.String" value="A"/>
+            <Property name="toolTipText" type="java.lang.String" value="The PDB chain identifier of the chain."/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
         </Component>
@@ -329,6 +339,7 @@
                 <StringItem index="1" value="JPG"/>
               </StringArray>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="The output image format."/>
           </Properties>
         </Component>
         <Component class="javax.swing.JSeparator" name="jSeparatorCenter">
@@ -369,12 +380,13 @@
         <Component class="javax.swing.JButton" name="jButtonCheckInput">
           <Properties>
             <Property name="text" type="java.lang.String" value="Check settings"/>
+            <Property name="toolTipText" type="java.lang.String" value="Verifies the input and output settings."/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonCheckInputActionPerformed"/>
           </Events>
         </Component>
-        <Container class="javax.swing.JScrollPane" name="jScrollPane1">
+        <Container class="javax.swing.JScrollPane" name="jScrollPanePlccCommand">
           <Properties>
             <Property name="horizontalScrollBarPolicy" type="int" value="32"/>
             <Property name="verticalScrollBarPolicy" type="int" value="21"/>
@@ -396,6 +408,7 @@
         <Component class="javax.swing.JCheckBox" name="jCheckBoxCustomOutputDir">
           <Properties>
             <Property name="text" type="java.lang.String" value="Use custom output directory:"/>
+            <Property name="toolTipText" type="java.lang.String" value="Whether the directory on the right should be used instead of the default directory specified in the settings."/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="jTextFieldCustomOutputDir">
@@ -407,11 +420,17 @@
         <Component class="javax.swing.JButton" name="jButtonSelectCustomOutputDir">
           <Properties>
             <Property name="text" type="java.lang.String" value="Set output dir..."/>
+            <Property name="toolTipText" type="java.lang.String" value="Selects the output directory where images and other files are written."/>
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonSelectCustomOutputDirActionPerformed"/>
           </Events>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabelInputOutput">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Input and output"/>
+          </Properties>
         </Component>
       </SubComponents>
     </Container>
@@ -420,7 +439,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="jLabelStatus" alignment="0" max="32767" attributes="0"/>
+              <Component id="jLabelStatus" alignment="0" pref="525" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
@@ -435,7 +454,7 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Dialog" size="10" style="0"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="VPG Graph creator ready."/>
+            <Property name="text" type="java.lang.String" value="VPG Graph Creator ready."/>
           </Properties>
         </Component>
       </SubComponents>

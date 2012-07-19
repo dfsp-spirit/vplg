@@ -227,7 +227,7 @@ public class Settings {
             i = Integer.valueOf(s);
         }
         catch (Exception e) {
-            System.err.println("ERROR: Settings: Could not load setting '" + key + "' from settings as an Integer, invalid format.");
+            System.err.println(Settings.getApptag() + "ERROR: Settings: Could not load setting '" + key + "' from settings as an Integer, invalid format.");
             System.exit(1);
         }
         return(i);
@@ -260,7 +260,7 @@ public class Settings {
             f = Float.valueOf(s);
         }
         catch (Exception e) {
-            System.err.println("ERROR: Settings: Could not load setting '" + key + "' from settings as a Float, invalid format.");
+            System.err.println(Settings.getApptag() + "ERROR: Settings: Could not load setting '" + key + "' from settings as a Float, invalid format.");
             System.exit(1);
         }
         return(f);
@@ -286,7 +286,7 @@ public class Settings {
             return(false);
         }
         else {
-            System.err.println("ERROR: Settings: Could not load setting '" + key + "' from settings as Boolean, invalid format.");
+            System.err.println(Settings.getApptag() + "ERROR: Settings: Could not load setting '" + key + "' from settings as Boolean, invalid format.");
             System.exit(1);
             return(false);      // never reached
         }
@@ -343,16 +343,16 @@ public class Settings {
             return((String)cfg.getProperty(key));
         }
         else {
-            System.out.println("INFO: Settings: Setting '" + key + "' not defined in config file. Trying internal default.");
+            System.out.println(Settings.getApptag() + "INFO: Settings: Setting '" + key + "' not defined in config file. Trying internal default.");
             
             if(initSingleSettingFromDefault(key)) {
                 String s = defGet(key);
                 
-                System.out.println("INFO: Settings: Using internal default value '" + s + "' for setting '" + key + "'. Edit config file to override.");
+                System.out.println(Settings.getApptag() + "INFO: Settings: Using internal default value '" + s + "' for setting '" + key + "'. Edit config file to override.");
                 
                 return(s);                
             } else {
-                System.err.println("ERROR: Settings: No config file or default value for setting '" + key + "' exists, setting invalid.");
+                System.err.println(Settings.getApptag() + "ERROR: Settings: No config file or default value for setting '" + key + "' exists, setting invalid.");
                 System.exit(1);                
                 return("ERROR");    // for the IDE
             }                        
@@ -372,7 +372,7 @@ public class Settings {
             return((String)def.getProperty(key));
         }
         else {
-            System.err.println("ERROR: Settings: Could not load default setting '" + key + "' from default settings, no such setting.");
+            System.err.println(Settings.getApptag() + "ERROR: Settings: Could not load default setting '" + key + "' from default settings, no such setting.");
             System.exit(1);
             return(null);        // never reached, for the IDE
         }
@@ -452,7 +452,7 @@ public class Settings {
             cfg.store(new FileOutputStream(file), "These are the settings for plcc. See the documentation for info on them.");
             res = true;
         } catch(Exception e) {
-            System.err.println("WARNING: Settings: Could not write current properties to file '" + file + "': '" + e.getMessage() + "'.");
+            System.err.println(Settings.getApptag() + "WARNING: Settings: Could not write current properties to file '" + file + "': '" + e.getMessage() + "'.");
             res = false;
         }
 
@@ -478,7 +478,7 @@ public class Settings {
             def.store(new FileOutputStream(file), "These are the default settings for plcc. See the documentation for info on them.");
             res = true;
         } catch(Exception e) {
-            System.err.println("WARNING: Settings: Could not write default settings to file '" + file + "'.");
+            System.err.println(Settings.getApptag() + "WARNING: Settings: Could not write default settings to file '" + file + "'.");
             res = false;
         }
 
@@ -534,14 +534,14 @@ public class Settings {
             res = true;
         }
         catch (Exception e) {
-            System.err.println("WARNING: Could not write to file '" + filePath + "'.");
+            System.err.println(Settings.getApptag() + "WARNING: Could not write to file '" + filePath + "'.");
             res = false;
         }
        
         try {
             fw.close();
         } catch(Exception ex) {
-            System.err.println("WARNING: Could not close FileWriter for file '" + filePath + "'.");
+            System.err.println(Settings.getApptag() + "WARNING: Could not close FileWriter for file '" + filePath + "'.");
         }
         return(res);
     }                        

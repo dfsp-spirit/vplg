@@ -8,6 +8,7 @@
 
 package vpg;
 
+import java.awt.Color;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
@@ -127,13 +128,40 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         
         File pdbFile = new File(this.jTextFieldInputFilePDB.getText());
         if( ! (pdbFile.isFile() && pdbFile.canRead())) {
+            System.err.println(Settings.getApptag() + "WARNING: Cannot read input PDB file at path '" + pdbFile.getAbsolutePath() + "'.");
+            this.jTextFieldInputFilePDB.setBackground(Color.RED);
             ok = false;
+        } else {
+            this.jTextFieldInputFilePDB.setBackground(Color.WHITE);
         }
         
         File dsspFile = new File(this.jTextFieldInputFileDSSP.getText());
         if( ! (dsspFile.isFile() && dsspFile.canRead())) {
+            System.err.println(Settings.getApptag() + "WARNING: Cannot read input DSSP file at path '" + dsspFile.getAbsolutePath() + "'.");
+            this.jTextFieldInputFileDSSP.setBackground(Color.RED);
             ok = false;
-        }        
+        } else {
+            this.jTextFieldInputFileDSSP.setBackground(Color.WHITE);
+        } 
+        
+        File outDir = new File(this.getOutputDirFromForm());
+        if( ! (outDir.isDirectory() && outDir.canWrite())) {
+            System.err.println(Settings.getApptag() + "WARNING: Cannot write to output directory '" + outDir.getAbsolutePath() + "' or is does not even exist.");
+            
+            if(this.jCheckBoxCustomOutputDir.isSelected()) {
+                this.jTextFieldCustomOutputDir.setBackground(Color.RED);
+            } else {
+                this.jCheckBoxAdditionalOutput.setBackground(Color.RED);
+            }
+            
+            ok = false;
+        } else {
+            
+            this.jTextFieldCustomOutputDir.setBackground(Color.WHITE);
+            
+            this.jCheckBoxAdditionalOutput.setBackground(Color.WHITE);
+            
+        }
         
         return ok;        
     }
@@ -306,11 +334,12 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         jTextPaneStatus = new javax.swing.JTextPane();
         jLabelResults = new javax.swing.JLabel();
         jButtonCheckInput = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        jScrollPanePlccCommand = new javax.swing.JScrollPane();
         jTextFieldPlccCommand = new javax.swing.JTextField();
         jCheckBoxCustomOutputDir = new javax.swing.JCheckBox();
         jTextFieldCustomOutputDir = new javax.swing.JTextField();
         jButtonSelectCustomOutputDir = new javax.swing.JButton();
+        jLabelInputOutput = new javax.swing.JLabel();
         jPanelStats = new javax.swing.JPanel();
         jLabelStatus = new javax.swing.JLabel();
 
@@ -325,6 +354,7 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         jTextFieldInputFileDSSP.setText("/data/PDB/8icd.dssp");
 
         jButtonSelectFilePDB.setText("Select PDB file...");
+        jButtonSelectFilePDB.setToolTipText("Select the input PDB file.");
         jButtonSelectFilePDB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonSelectFilePDBActionPerformed(evt);
@@ -332,6 +362,7 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         });
 
         jButtonSelectFileDSSP.setText("Select DSSP file...");
+        jButtonSelectFileDSSP.setToolTipText("Select the input DSSP file.");
         jButtonSelectFileDSSP.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonSelectFileDSSPActionPerformed(evt);
@@ -341,6 +372,7 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         jLabelOptions.setText("General options");
 
         jButtonRun.setText("Run PLCC");
+        jButtonRun.setToolTipText("Runs PLCC with the settings defined above.");
         jButtonRun.setEnabled(false);
         jButtonRun.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -349,8 +381,10 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         });
 
         jCheckBoxPdbFileIsGzipped.setText("is gzipped");
+        jCheckBoxPdbFileIsGzipped.setToolTipText("Whether the selected input file is compressed with gzip.");
 
         jCheckBoxDsspFileIsGzipped.setText("is gzipped");
+        jCheckBoxDsspFileIsGzipped.setToolTipText("Whether the selected input file is compressed with gzip.");
 
         jCheckBoxFoldingGraphs.setText("Compute Folding Graphs");
         jCheckBoxFoldingGraphs.setToolTipText("Whether folding graphs (connected components) of the Protein Graph should also be drawn");
@@ -373,13 +407,16 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         jCheckBoxRamachandranPlot.setToolTipText("Draws a Ramachandran plot of the backbone angles of a chain to an image file.");
 
         jCheckBoxForceChain.setText("Force chain:");
+        jCheckBoxForceChain.setToolTipText("Handle only the chain with the specified chain ID. PLCC will abort if no such chain exists.");
 
         jTextFieldForceChain.setText("A");
+        jTextFieldForceChain.setToolTipText("The PDB chain identifier of the chain.");
         jTextFieldForceChain.setEnabled(false);
 
         jLabelImageFormat.setText("Image format:");
 
         jComboBoxImageFormat.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "PNG", "JPG" }));
+        jComboBoxImageFormat.setToolTipText("The output image format.");
 
         jLabelPlccCommand.setText("Resulting PLCC command line:");
 
@@ -393,32 +430,37 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         jLabelResults.setText("Results:");
 
         jButtonCheckInput.setText("Check settings");
+        jButtonCheckInput.setToolTipText("Verifies the input and output settings.");
         jButtonCheckInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonCheckInputActionPerformed(evt);
             }
         });
 
-        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        jScrollPanePlccCommand.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        jScrollPanePlccCommand.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 
         jTextFieldPlccCommand.setBackground(new java.awt.Color(220, 220, 220));
         jTextFieldPlccCommand.setEditable(false);
         jTextFieldPlccCommand.setText("java -jar plcc.jar 8icd");
-        jScrollPane1.setViewportView(jTextFieldPlccCommand);
+        jScrollPanePlccCommand.setViewportView(jTextFieldPlccCommand);
 
         jCheckBoxCustomOutputDir.setText("Use custom output directory:");
+        jCheckBoxCustomOutputDir.setToolTipText("Whether the directory on the right should be used instead of the default directory specified in the settings.");
 
         jTextFieldCustomOutputDir.setText("/tmp");
         jTextFieldCustomOutputDir.setEnabled(false);
 
         jButtonSelectCustomOutputDir.setText("Set output dir...");
+        jButtonSelectCustomOutputDir.setToolTipText("Selects the output directory where images and other files are written.");
         jButtonSelectCustomOutputDir.setEnabled(false);
         jButtonSelectCustomOutputDir.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonSelectCustomOutputDirActionPerformed(evt);
             }
         });
+
+        jLabelInputOutput.setText("Input and output");
 
         javax.swing.GroupLayout jPanelMainContentLayout = new javax.swing.GroupLayout(jPanelMainContent);
         jPanelMainContent.setLayout(jPanelMainContentLayout);
@@ -427,20 +469,20 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
             .addGroup(jPanelMainContentLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPaneStatus)
-                    .addComponent(jSeparatorLower, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jSeparatorUpper)
+                    .addComponent(jScrollPaneStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 505, Short.MAX_VALUE)
+                    .addComponent(jSeparatorLower, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 505, Short.MAX_VALUE)
+                    .addComponent(jSeparatorUpper, javax.swing.GroupLayout.DEFAULT_SIZE, 505, Short.MAX_VALUE)
                     .addGroup(jPanelMainContentLayout.createSequentialGroup()
                         .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanelMainContentLayout.createSequentialGroup()
                                 .addComponent(jLabelInputDSSP)
-                                .addGap(0, 0, Short.MAX_VALUE))
+                                .addGap(0, 216, Short.MAX_VALUE))
                             .addGroup(jPanelMainContentLayout.createSequentialGroup()
                                 .addComponent(jLabelInputPDB)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jTextFieldInputFilePDB)
-                                    .addComponent(jTextFieldInputFileDSSP))))
+                                    .addComponent(jTextFieldInputFilePDB, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
+                                    .addComponent(jTextFieldInputFileDSSP, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jCheckBoxPdbFileIsGzipped, javax.swing.GroupLayout.Alignment.TRAILING)
@@ -463,14 +505,14 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
                             .addGroup(jPanelMainContentLayout.createSequentialGroup()
                                 .addComponent(jLabelImageFormat)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jComboBoxImageFormat, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(jComboBoxImageFormat, 0, 196, Short.MAX_VALUE))
                             .addComponent(jCheckBoxAllowCoils)
                             .addComponent(jCheckBoxAdditionalOutput)
                             .addComponent(jLabelDebugOptions)
                             .addComponent(jCheckBoxRamachandranPlot)))
-                    .addComponent(jSeparatorCenter)
+                    .addComponent(jSeparatorCenter, javax.swing.GroupLayout.DEFAULT_SIZE, 505, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelMainContentLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGap(0, 309, Short.MAX_VALUE)
                         .addComponent(jButtonCheckInput)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButtonRun))
@@ -479,20 +521,23 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
                             .addComponent(jLabelOptions)
                             .addComponent(jLabelPlccCommand)
                             .addComponent(jLabelResults)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 505, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPanePlccCommand, javax.swing.GroupLayout.PREFERRED_SIZE, 505, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanelMainContentLayout.createSequentialGroup()
                         .addComponent(jCheckBoxCustomOutputDir)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jTextFieldCustomOutputDir, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jButtonSelectCustomOutputDir, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(jButtonSelectCustomOutputDir, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE))
+                    .addComponent(jLabelInputOutput))
                 .addContainerGap())
         );
         jPanelMainContentLayout.setVerticalGroup(
             jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelMainContentLayout.createSequentialGroup()
-                .addGap(33, 33, 33)
+                .addGap(13, 13, 13)
+                .addComponent(jLabelInputOutput)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextFieldInputFilePDB, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButtonSelectFilePDB)
@@ -538,7 +583,7 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabelPlccCommand)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
+                .addComponent(jScrollPanePlccCommand, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButtonCheckInput)
@@ -552,13 +597,13 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         );
 
         jLabelStatus.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
-        jLabelStatus.setText("VPG Graph creator ready.");
+        jLabelStatus.setText("VPG Graph Creator ready.");
 
         javax.swing.GroupLayout jPanelStatsLayout = new javax.swing.GroupLayout(jPanelStats);
         jPanelStats.setLayout(jPanelStatsLayout);
         jPanelStatsLayout.setHorizontalGroup(
             jPanelStatsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabelStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jLabelStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 525, Short.MAX_VALUE)
         );
         jPanelStatsLayout.setVerticalGroup(
             jPanelStatsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -607,20 +652,28 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         }
     }//GEN-LAST:event_jButtonSelectFileDSSPActionPerformed
 
+    
+    private File getWorkingDirFromForm() {
+        return new File(Settings.get("vpg_S_path_plcc")).getAbsoluteFile().getParentFile();
+    }
+    
     private void jButtonRunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRunActionPerformed
 
         String [] cmd = this.getCommandArray();
+        File workingDir = this.getWorkingDirFromForm();
         
         System.out.println(Settings.getApptag() + "Running plcc...");
         this.jTextPaneStatus.setText("Running plcc...");
         String resText = "";
         
         try {
-            String[] inputAndError = IO.execCmd(cmd);
+            String[] inputAndError = IO.execCmd(cmd, workingDir);
             Integer retVal = Integer.valueOf(inputAndError[2]);
             System.out.println(Settings.getApptag() + "Finished running plcc with return value " + retVal.toString() + ".");
-            System.out.println(Settings.getApptag() + "Output: " + inputAndError[0]);
-            System.out.println(Settings.getApptag() + "Errors: " + inputAndError[1]);
+            System.out.println(Settings.getApptag() + "PLCC output follows:\n" + inputAndError[0]);
+            System.out.println(Settings.getApptag() + "End of PLCC output.");
+            System.out.println(Settings.getApptag() + "PLCC errors and warnings follow:\n" + inputAndError[1]);
+            System.out.println(Settings.getApptag() + "End of PLCC errors and warnings.");
             resText = "Finished running plcc with return value " + retVal.toString() + ".\n";
             if(retVal == 0) {
                 resText += "OK: Process terminated as expected.\nOutput files should be in '" + this.getOutputDirFromForm() + "'.";
@@ -641,6 +694,17 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
     private void jButtonCheckInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCheckInputActionPerformed
         
         String statusText = "";
+        File workingDir = this.getWorkingDirFromForm();
+        
+        if(! workingDir.isDirectory() && workingDir.canRead()) {
+            this.jTextPaneStatus.setText("ERROR: Working directory '" + workingDir.toString() + "' with PLCC jar file does not exist.");
+            this.jLabelStatus.setText("WARNING: Path to plcc.jar does not exist, please fix in settings.");
+            this.jButtonRun.setEnabled(false);
+            return;
+        } else {
+            this.jLabelStatus.setText("VPG Graph Creator ready.");
+        }
+        
         
         if(this.inputFilesOK()) {
             statusText = "Input files seem OK.\n";
@@ -683,6 +747,7 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
      * @return true atm
      */
     public Boolean setCommandTextField() {
+        this.jLabelPlccCommand.setText("Resulting PLCC command line:");
         String[] cmd = this.getCommandArray();
         String cmdString = "";
         for(String s : cmd) { cmdString += s + " "; }
@@ -752,6 +817,7 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
     private javax.swing.JLabel jLabelDebugOptions;
     private javax.swing.JLabel jLabelImageFormat;
     private javax.swing.JLabel jLabelInputDSSP;
+    private javax.swing.JLabel jLabelInputOutput;
     private javax.swing.JLabel jLabelInputPDB;
     private javax.swing.JLabel jLabelOptions;
     private javax.swing.JLabel jLabelPlccCommand;
@@ -759,7 +825,7 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
     private javax.swing.JLabel jLabelStatus;
     private javax.swing.JPanel jPanelMainContent;
     private javax.swing.JPanel jPanelStats;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPanePlccCommand;
     private javax.swing.JScrollPane jScrollPaneStatus;
     private javax.swing.JSeparator jSeparatorCenter;
     private javax.swing.JSeparator jSeparatorLower;
