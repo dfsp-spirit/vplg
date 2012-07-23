@@ -1,5 +1,7 @@
 This is the README for the *splitpdb* program (splitpdb.jar), which is part of *VPLG* (Visualization of Protein Ligand Graphs).
 
+VPLG is free software and comes without any warranties. See the license for details.
+
 
 Description
 ============
@@ -17,7 +19,7 @@ The *splitpdb* program is written in Java and requires an JRE 1.6, which is avai
 Running the program
 ===================
 
-This is a command line program. The *dpg* frontend can be used to run this program and automatically generate the command line, but not all options are available from within *dpg*.
+This is a command line program. The *vpg* frontend can be used to run this program and automatically generate the command line, but not all options are available from within *vpg*.
 
 To extract the first model from the PDB file *1tst.pdb* and have *splitpdb* write the resulting PDB output file to *1tst.pdb.split*, use the following command line:
 
@@ -36,14 +38,11 @@ This program does not have a config file and there is no need to configure anyth
 
 
 
+
 Author
 ======
 
-The *splitpdb* program was written by Tim Schaefer. See http://www.bioinformatik.uni-frankfurt.de/about_us.html for contact information.
-
-The official VPLG website is at http://vplg.sourceforge.net/.
-
-TS
+The *splitpdb* program was written by Tim Schaefer. See http://rcmd.org/contact/ for contact information.
 
 
 

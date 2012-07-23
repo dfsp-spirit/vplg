@@ -298,8 +298,8 @@ public class Main {
                 
             }
         } catch(Exception e) {
-            System.err.println(apptag + "ERROR: Could not read/write while parsing PDB files, exiting. Details follow.");
-            e.printStackTrace();
+            System.err.println(apptag + "ERROR: Could not read/write while parsing PDB files: '" + e.getMessage() + "'.");
+            //e.printStackTrace();
             System.exit(1);
         }
 
@@ -313,7 +313,7 @@ public class Main {
             reader.close();
         } catch (Exception e) {
             // This ain't good (a potential waste of resources), but it should not be considered a catastrophe.
-            System.err.println(apptag + "WARNING: Could not close file reader for input file.");
+            System.err.println(apptag + "WARNING: Could not close file reader for input file: '" + e.getMessage() + "'.");
         }
 
         if(zipOutput) {
