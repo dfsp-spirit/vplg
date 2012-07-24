@@ -14,6 +14,7 @@ import java.awt.ItemSelectable;
 import java.awt.event.*;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 import javax.swing.*;
@@ -75,7 +76,7 @@ public class VpgGraphViewerFrame extends JFrame {
     this.extensions = new String[] { ".png", ".gif", ".jpg", ".jpeg" };
     
     fileDetailsTextArea.setEditable(false);
-    fileDetailsTextArea.setText("Select an image file on the left to load it.\n\nThe image will be displayed above and this area will show information on the selected file.\n\nSupported file formats are JPG, GIF and PNG.");
+    fileDetailsTextArea.setText("Select an image file on the left to load it.\n\nThe image will be displayed above and this area will show information on the selected file.\n\nSupported file formats are JPG, GIF and PNG.\n\nIn case a PLG file is available for a selected image, graph data will also show up in this box.\n");
     fileSystemModel = new FileSystemModel(new File(directory));
     //fileSystemModel.setRoot(new File(System.getProperty("user.home")));
     fileSystemModel.setValidExtensions(this.extensions);
@@ -110,6 +111,33 @@ public class VpgGraphViewerFrame extends JFrame {
                     ImageIcon image = new ImageIcon(file.getAbsolutePath());
                     //System.out.println("Created image icon from file " + file + ".");
                     imageLabel.setIcon(image);
+                    
+                    // now add graph info
+                    File plgFile = checkForPLGFileForImage(file);
+                    if( ! (plgFile == null)) {
+                        // TODO: parse graph
+                        HashMap<String, String> md = new HashMap<String, String>();
+                        /**
+                        try {
+                            md = IO.getMetaData(IO.slurpFileSingString(plgFile.getAbsolutePath()));
+                            
+                            String statusText = getFileDetails(file) + IO.getFormattedMetaDataString(md);
+                            fileDetailsTextArea.setText(statusText);
+                            
+                        } catch (Exception e) {
+                            System.err.println(Settings.getApptag() + "WARNING: Could not parse meta data from PLG file '" + plgFile.getAbsolutePath() + "': '" + e.getMessage() + "'.");
+                        }
+                        */
+                        try {
+                            String graphFileString = IO.slurpFileSingString(plgFile.getAbsolutePath());
+                            
+                            String statusText = getFileDetails(file) + "[---------- Graph file: ----------]\n" + IO.slurpFileSingString(plgFile.getAbsolutePath());
+                            fileDetailsTextArea.setText(statusText);
+                            
+                        } catch (Exception e) {
+                            System.err.println(Settings.getApptag() + "WARNING: Could not read PLG file '" + plgFile.getAbsolutePath() + "': '" + e.getMessage() + "'.");
+                        }
+                    }
                 }
             }
             else if(file.isDirectory()) {
@@ -126,7 +154,7 @@ public class VpgGraphViewerFrame extends JFrame {
         
       }
       
-    });
+    });    
     
     
     
@@ -147,6 +175,33 @@ public class VpgGraphViewerFrame extends JFrame {
     this.setVisible(true);
     splitPaneFilesRight.setDividerLocation(0.3);
     splitPaneImgDetails.setDividerLocation(0.8);
+  }
+  
+  /**
+   * Checks whether a PLG file (VPLG graph file) exists for a given image file. This is done
+   * based on the file name: the file extension  of the given file is replaced by ".plg" and
+   * if the resulting file exists, it is returned.
+   * @param imageFile the input image file
+   * @return the plg file if it exists, null otherwise
+   */
+  private File checkForPLGFileForImage(File imageFile) {
+      File plgFile = null;
+      
+      String imgFileName = imageFile.getName();
+      String[] tokens = imgFileName.split("\\.(?=[^\\.]+$)");
+      String fs = System.getProperty("file.separator");
+      if(tokens.length != 2) {
+          return null;
+      } else {
+          String base = tokens[0];
+          String extension = tokens[1];
+          File possiblePlgFile = new File(imageFile.getParent() + fs + base + ".plg");
+          if(possiblePlgFile.isFile() && possiblePlgFile.canRead()) {
+              return possiblePlgFile;
+          } else {
+              return null;
+          }
+      }     
   }
   
   
