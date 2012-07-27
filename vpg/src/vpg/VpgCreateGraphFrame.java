@@ -676,7 +676,7 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
             System.out.println(Settings.getApptag() + "End of PLCC errors and warnings.");
             resText = "Finished running plcc with return value " + retVal.toString() + ".\n";
             if(retVal == 0) {
-                resText += "OK: Process terminated as expected.\nOutput files should be in '" + this.getOutputDirFromForm() + "'.";
+                resText += "OK: Process terminated as expected.\nOutput files should be in '" + this.getOutputDirFromForm() + "'. You can view them with the Graph Viewer.\n";
             } else {
                 resText += "ERROR: Running PLCC failed, see the PLCC output below for details:\n-------------------------------------------------\n";
                 resText += inputAndError[1];

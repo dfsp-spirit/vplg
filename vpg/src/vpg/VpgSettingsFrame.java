@@ -8,15 +8,20 @@
 
 package vpg;
 
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import javax.swing.JFileChooser;
 import java.util.Properties;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 /**
  *
  * @author ts
  */
-public class VpgSettingsFrame extends javax.swing.JFrame {
+public class VpgSettingsFrame extends javax.swing.JFrame implements DocumentListener {
 
     /**
      * Creates new form VpgSettingsFrame
@@ -40,9 +45,104 @@ public class VpgSettingsFrame extends javax.swing.JFrame {
         this.jCheckBoxPdbfileLowercase.setSelected(Settings.getBoolean("vpg_B_download_pdbid_is_lowercase"));
         this.jCheckBoxDsspfileLowercase.setSelected(Settings.getBoolean("vpg_B_download_dsspid_is_lowercase"));
         
+        this.jTextFieldDefInputPath.getDocument().addDocumentListener(this);
+        this.jTextFieldDefOutputPath.getDocument().addDocumentListener(this);
+        this.jTextFieldPathDssp.getDocument().addDocumentListener(this);
+        this.jTextFieldPathPlccJar.getDocument().addDocumentListener(this);
+        this.jTextFieldPathSplitPDBJar.getDocument().addDocumentListener(this);
+        
         // set database settings, they are parsed from the plcc config file
-        parsePlccConfig();                
+        parsePlccConfig();        
+        checkPathSettings();
     }
+    
+    
+    /*
+    @Override public void actionPerformed(ActionEvent evt) {
+        Object source = evt.getSource();
+        System.out.println("event!");
+        if(source == this.jButtonBrowseDefInputPath || source == this.jButtonBrowseDefOutputPath) {
+            checkPathSettings();
+        }
+    }
+    * 
+    */
+    
+    @Override public void changedUpdate(DocumentEvent e) {
+        this.checkPathSettings();
+    }
+    
+    @Override public void removeUpdate(DocumentEvent e) {
+        this.checkPathSettings();
+    }
+    
+    @Override public void insertUpdate(DocumentEvent e) {
+        this.checkPathSettings();
+    }
+
+    
+    
+    /**
+     * Checks the current path settings and marks fields with problems in red.
+     */
+    private void checkPathSettings() {
+        File inputDir = new File(this.jTextFieldDefInputPath.getText());
+        if(inputDir.isDirectory() && inputDir.canRead()) {
+            this.jTextFieldDefInputPath.setBackground(Color.WHITE);
+            
+            if(! inputDir.canWrite()) {
+                System.err.println(Settings.getApptag() + "WARNING: Input directory '" + inputDir.getAbsolutePath() + "' is not writeable, download of input files to this dir not possible.");
+            }
+            
+        } else {
+            System.err.println(Settings.getApptag() + "WARNING: Input directory '" + inputDir.getAbsolutePath() + "' does not exist or is not readable.");
+            this.jTextFieldDefInputPath.setBackground(Color.RED);
+        }
+        
+        File outputDir = new File(this.jTextFieldDefOutputPath.getText());
+        if(outputDir.isDirectory() && outputDir.canWrite()) {
+            this.jTextFieldDefOutputPath.setBackground(Color.WHITE);
+        } else {
+            this.jTextFieldDefOutputPath.setBackground(Color.RED);
+            System.err.println(Settings.getApptag() + "WARNING: Output directory '" + outputDir.getAbsolutePath() + "' does not exist or is not writeable.");
+        }
+        
+        File plccJar = new File(this.jTextFieldPathPlccJar.getText());
+        if(plccJar.isFile() && plccJar.canRead()) {
+            this.jTextFieldPathPlccJar.setBackground(Color.WHITE);
+        } else {
+            this.jTextFieldPathPlccJar.setBackground(Color.RED);
+            System.err.println(Settings.getApptag() + "WARNING: PLCC jar file at '" + plccJar.getAbsolutePath() + "' does not exist or is not readable. ESSENTIAL!");
+        }
+        
+        File splitpdbJar = new File(this.jTextFieldPathSplitPDBJar.getText());
+        if(splitpdbJar.isFile() && splitpdbJar.canRead()) {
+            this.jTextFieldPathSplitPDBJar.setBackground(Color.WHITE);
+        } else {
+            this.jTextFieldPathSplitPDBJar.setBackground(Color.ORANGE);
+            System.err.println(Settings.getApptag() + "WARNING: SplitPDB jar file at '" + splitpdbJar.getAbsolutePath() + "' does not exist or is not readable.");
+        }
+        
+        File dssp = new File(this.jTextFieldPathDssp.getText());
+        if(dssp.isFile() && dssp.canExecute()) {
+            this.jTextFieldPathDssp.setBackground(Color.WHITE);
+        } else {
+            this.jTextFieldPathDssp.setBackground(Color.ORANGE);
+            System.err.println(Settings.getApptag() + "WARNING: dsspcmbi executable at '" + dssp.getAbsolutePath() + "' does not exist or is not executable.");
+        }
+        
+        File plccConfig = new File(this.jTextFieldConfigfilePlcc.getText());
+        if(plccConfig.isFile() && plccConfig.canRead()) {
+            this.jTextFieldConfigfilePlcc.setBackground(Color.WHITE);
+        } else {
+            this.jTextFieldConfigfilePlcc.setBackground(Color.ORANGE);
+            System.err.println(Settings.getApptag() + "WARNING: PLCC config file at '" + plccConfig.getAbsolutePath() + "' does not exist or is not readable.");
+        }
+        
+        
+    }
+
+
     
     /**
      * Parses DB info from plcc config and updates text fields.
@@ -53,17 +153,31 @@ public class VpgSettingsFrame extends javax.swing.JFrame {
         
         if(! (cfgFile.canRead() && cfgFile.isFile()) ) {
             System.err.println("[VPG] WARNING: Cannot read PLCC config file at '" + cfgFile.getAbsolutePath() + "'. Run plcc once to create it.");
+            this.jTextFieldConfigfilePlcc.setBackground(Color.RED);
+            this.jTextFieldConfigfilePlcc.setToolTipText("Config file does not exist, run PLCC to create it. Setting database defaults.");
+            this.jTextFieldDatabaseHost.setText("127.0.0.1");
+            this.jTextFieldDatabasePort.setText("5432");
+            this.jTextFieldDatabaseName.setText("vplg");
+            this.jTextFieldDatabaseUsername.setText("vplg");
+            this.jTextFieldDatabasePassword.setText("");                                
+            
+            return false;
         }
+        else {
         
-        Properties plccSettings = IO.getSettingsFromFile(cfgFile);
-        this.jTextFieldConfigfilePlcc.setText(IO.getPlccConfigFilePath());
-        
-        this.jTextFieldDatabaseHost.setText(plccSettings.getProperty("plcc_S_db_host"));
-        this.jTextFieldDatabasePort.setText(plccSettings.getProperty("plcc_I_db_port"));
-        this.jTextFieldDatabaseName.setText(plccSettings.getProperty("plcc_S_db_name"));
-        this.jTextFieldDatabaseUsername.setText(plccSettings.getProperty("plcc_S_db_username"));
-        this.jTextFieldDatabasePassword.setText(plccSettings.getProperty("plcc_S_db_password"));                                
-        return true;
+            Properties plccSettings = IO.getSettingsFromFile(cfgFile);
+            this.jTextFieldConfigfilePlcc.setText(IO.getPlccConfigFilePath());
+
+            this.jTextFieldDatabaseHost.setText(plccSettings.getProperty("plcc_S_db_host"));
+            this.jTextFieldDatabasePort.setText(plccSettings.getProperty("plcc_I_db_port"));
+            this.jTextFieldDatabaseName.setText(plccSettings.getProperty("plcc_S_db_name"));
+            this.jTextFieldDatabaseUsername.setText(plccSettings.getProperty("plcc_S_db_username"));
+            this.jTextFieldDatabasePassword.setText(plccSettings.getProperty("plcc_S_db_password"));                                
+            this.jTextFieldConfigfilePlcc.setBackground(Color.WHITE);
+            this.jTextFieldConfigfilePlcc.setToolTipText("The path to the PLCC configuration file.");
+            
+            return true;
+        }
     }
     
 
@@ -222,17 +336,17 @@ public class VpgSettingsFrame extends javax.swing.JFrame {
         jLabelPathPlccJar.setText("Path to PLCC (plcc.jar, part of VPLG):");
 
         jTextFieldPathPlccJar.setText("/home/ts/software/vplg/plcc.jar");
-        jTextFieldPathPlccJar.setToolTipText("The path to the PLCC jar file.");
+        jTextFieldPathPlccJar.setToolTipText("The path to the PLCC jar file. PLCC is the core of VPLG, it computes and visualizes protein ligand graphs.");
 
         jLabelPathSplitPDBJar.setText("Path to SplitPDB (splitpdb.jar, part of VPLG):");
 
         jTextFieldPathSplitPDBJar.setText("/home/ts/software/vplg/splitpdb.jar");
-        jTextFieldPathSplitPDBJar.setToolTipText("The path to the SplitPDB jar file.");
+        jTextFieldPathSplitPDBJar.setToolTipText("The path to the SplitPDB jar file. Allows you to generate DSSP files from PDB files which include several models on your computer with dsspcmbi.");
 
         jLabelPathDssp.setText("Path to DSSP (dsspcmbi or dsspcmbi.exe)");
 
         jTextFieldPathDssp.setText("/home/ts/software/dssp/dsspcmbi");
-        jTextFieldPathDssp.setToolTipText("The path to the external tool dsspcmbi by Kabsch and Sander.");
+        jTextFieldPathDssp.setToolTipText("The path to the external tool dsspcmbi by Kabsch and Sander. Allows you to generate DSSP files from PDB files on your computer.");
         jTextFieldPathDssp.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextFieldPathDsspActionPerformed(evt);

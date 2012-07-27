@@ -272,7 +272,7 @@
             <Component class="javax.swing.JTextField" name="jTextFieldPathPlccJar">
               <Properties>
                 <Property name="text" type="java.lang.String" value="/home/ts/software/vplg/plcc.jar"/>
-                <Property name="toolTipText" type="java.lang.String" value="The path to the PLCC jar file."/>
+                <Property name="toolTipText" type="java.lang.String" value="The path to the PLCC jar file. PLCC is the core of VPLG, it computes and visualizes protein ligand graphs."/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabelPathSplitPDBJar">
@@ -283,7 +283,7 @@
             <Component class="javax.swing.JTextField" name="jTextFieldPathSplitPDBJar">
               <Properties>
                 <Property name="text" type="java.lang.String" value="/home/ts/software/vplg/splitpdb.jar"/>
-                <Property name="toolTipText" type="java.lang.String" value="The path to the SplitPDB jar file."/>
+                <Property name="toolTipText" type="java.lang.String" value="The path to the SplitPDB jar file. Allows you to generate DSSP files from PDB files which include several models on your computer with dsspcmbi."/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabelPathDssp">
@@ -294,7 +294,7 @@
             <Component class="javax.swing.JTextField" name="jTextFieldPathDssp">
               <Properties>
                 <Property name="text" type="java.lang.String" value="/home/ts/software/dssp/dsspcmbi"/>
-                <Property name="toolTipText" type="java.lang.String" value="The path to the external tool dsspcmbi by Kabsch and Sander."/>
+                <Property name="toolTipText" type="java.lang.String" value="The path to the external tool dsspcmbi by Kabsch and Sander. Allows you to generate DSSP files from PDB files on your computer."/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jTextFieldPathDsspActionPerformed"/>

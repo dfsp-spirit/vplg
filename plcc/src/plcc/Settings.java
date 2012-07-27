@@ -214,11 +214,11 @@ public class Settings {
         defSet("plcc_I_defaultModel", "1", "The default model used if multiple models exist in the PDB file");
         defSet("plcc_S_ligSSECode", "L", "The SSE code used to mark a SSE of type ligand");
         defSet("plcc_B_include_coils", "false", "Whether coils (DSSP SSE type ' ') should be considered");
-        defSet("plcc_S_coilSSECode", "C", "The amino acid code used to mark a ligand residue");
+        defSet("plcc_S_coilSSECode", "C", "The amino acid code used to mark a coiled region residue");
         defSet("plcc_S_ligAACode", "J", "The amino acid code used to mark a ligand residue");
         defSet("plcc_B_uglySQLhacks", "false", "Whether to rewrite string data like ligand atom formulas before inserting into DB");
         defSet("plcc_I_ligSAS", "20", "The solvent accessible surface value that is written to the dssplig file for ligands (not used atm)");                
-        defSet("plcc_B_force_chain", "false", "Whether to force parsing a certain PDB chain");
+        defSet("plcc_B_force_chain", "false", "Whether to force parsing only a certain PDB chain");
         defSet("plcc_S_forced_chain_id", "A", "The forced chain ID, only used when plcc_B_force_chain is true");
         defSet("plcc_I_lig_min_atoms", "1", "The minimum number of atoms a ligand has to consist of to count as an SSE.");
         defSet("plcc_I_lig_max_atoms", "-1", "The maximum number of atoms a ligand has to consist of to count as an SSE. Set to <0 for unlimited.");

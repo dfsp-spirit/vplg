@@ -1349,7 +1349,11 @@ public class Main {
                 // draw the protein graph image
 
                 filePath = outputDir;
-                fileNameWithoutExtension = pdbid + "_" + c.getPdbChainID() + "_" + gt + "_PG";
+                String coils = "";
+                if(Settings.getBoolean("plcc_B_include_coils")) {
+                    coils = "_coils";
+                }
+                fileNameWithoutExtension = pdbid + "_" + c.getPdbChainID() + "_" + gt + coils + "_PG";
                 fileNameWithExtension = fileNameWithoutExtension + Settings.get("plcc_S_img_output_fileext");
                 
                 //pg.toFile(file + ".ptg");
