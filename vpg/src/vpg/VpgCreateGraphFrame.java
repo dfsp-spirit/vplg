@@ -14,108 +14,266 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.ArrayList;
 import javax.swing.JFileChooser;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 /**
  * A frame to create a protein graph from local input files.
  * @author ts
  */
-public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListener {
+public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListener, DocumentListener {
            
     
     @Override public void itemStateChanged(ItemEvent e) {
         Object source = e.getItemSelectable();
 
         if (source == this.jCheckBoxAdditionalOutput) {            
+            /**
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 System.out.println("+++ Additional output");                
             } else if(e.getStateChange() == ItemEvent.DESELECTED) {
                 System.out.println("--- Additional output");                
             }
+            */
             this.setCommandTextField();
         } 
         else if (source == this.jCheckBoxAllowCoils) {
+            /**
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 System.out.println("+++ Coils");                
             } else if(e.getStateChange() == ItemEvent.DESELECTED) {
                 System.out.println("--- Coils");                
             }
+            */
             this.setCommandTextField();
         }
         else if(source == this.jCheckBoxCustomOutputDir) {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-                System.out.println("+++ Custom output dir");
+                //System.out.println("+++ Custom output dir");
                 this.jTextFieldCustomOutputDir.setEnabled(true);
+                this.jTextFieldCustomOutputDir.setToolTipText("Currently using the custom directory from this field.");
                 this.jButtonSelectCustomOutputDir.setEnabled(true);
             } else if(e.getStateChange() == ItemEvent.DESELECTED) {
-                System.out.println("---  Custom output dir");
+                //System.out.println("---  Custom output dir");
                 this.jTextFieldCustomOutputDir.setEnabled(false);
+                this.jTextFieldCustomOutputDir.setToolTipText("Currently using default directory '" + Settings.get("vpg_S_output_dir") + "'.");
                 this.jButtonSelectCustomOutputDir.setEnabled(false);
                 //this.jTextFieldCustomOutputDir.setText(Settings.get("vpg_S_output_dir"));
             }
+            //this.inputFilesOK();
+            this.checkInput();
             this.setCommandTextField();
         }
         else if(source == this.jCheckBoxDsspFileIsGzipped) {
+            /**
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 System.out.println("+++ DSSP file is gzipped");                
             } else if(e.getStateChange() == ItemEvent.DESELECTED) {
                 System.out.println("--- DSSP file is gzipped");                
             }
+            */
             this.setCommandTextField();
         }
         else if(source == this.jCheckBoxPdbFileIsGzipped) {
+            /**
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 System.out.println("+++ PDB file is gzipped");                
             } else if(e.getStateChange() == ItemEvent.DESELECTED) {
                 System.out.println("--- PDB file is gzipped");                
             }
+            */
             this.setCommandTextField();
         }
         else if(source == this.jCheckBoxFoldingGraphs) {
+            /**
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 System.out.println("+++ FGs");                
             } else if(e.getStateChange() == ItemEvent.DESELECTED) {
                 System.out.println("--- FGs");                
             }
+            */
             this.setCommandTextField();
         }
         else if(source == this.jCheckBoxRamachandranPlot) {
+            /**
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 System.out.println("+++ Ramaplot");                
             } else if(e.getStateChange() == ItemEvent.DESELECTED) {
                 System.out.println("--- Ramaplot");                
             }
+            */
             this.setCommandTextField();
         }
         else if(source == this.jCheckBoxForceChain) {
+            
             if (e.getStateChange() == ItemEvent.SELECTED) {
-                System.out.println("+++ Force chain");                
+                //System.out.println("+++ Force chain");                
                 this.jTextFieldForceChain.setEnabled(true);
             } else if(e.getStateChange() == ItemEvent.DESELECTED) {
-                System.out.println("--- Force chain");                
+                //System.out.println("--- Force chain");                
                 this.jTextFieldForceChain.setEnabled(false);
             }
+            
             this.setCommandTextField();
         }
         else if(source == this.jCheckBoxOutputDirTree) {
+            /**
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 System.out.println("+++ Output dir tree");                
             } else if(e.getStateChange() == ItemEvent.DESELECTED) {
                 System.out.println("--- Output dir tree");                
             }
+            */
             this.setCommandTextField();
         }
         else if(source == this.jCheckBoxUseDatabase) {
+            /**
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 System.out.println("+++ Use database");                
             } else if(e.getStateChange() == ItemEvent.DESELECTED) {
                 System.out.println("--- Use database");                
             }
+            */
+            this.setCommandTextField();
+        }
+        else if(source == this.jCheckBoxPGtypes) {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                //System.out.println("+++ Limit PG types");
+                this.jCheckBoxPGalpha.setEnabled(true);
+                this.jCheckBoxPGbeta.setEnabled(true);
+                this.jCheckBoxPGalbe.setEnabled(true);
+                this.jCheckBoxPGalphalig.setEnabled(true);
+                this.jCheckBoxPGbetalig.setEnabled(true);
+                this.jCheckBoxPGalbelig.setEnabled(true);
+            } else if(e.getStateChange() == ItemEvent.DESELECTED) {
+                //System.out.println("--- Limit PG types");
+                this.jCheckBoxPGalpha.setEnabled(false);
+                this.jCheckBoxPGbeta.setEnabled(false);
+                this.jCheckBoxPGalbe.setEnabled(false);
+                this.jCheckBoxPGalphalig.setEnabled(false);
+                this.jCheckBoxPGbetalig.setEnabled(false);
+                this.jCheckBoxPGalbelig.setEnabled(false);
+            }
+            this.setCommandTextField();
+        }
+        else if(source == this.jCheckBoxPGalpha) {
+            /**
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                System.out.println("+++ PG type alpha");                
+            } else if(e.getStateChange() == ItemEvent.DESELECTED) {
+                System.out.println("--- PG type alpha");                
+            }
+            */
+            this.setCommandTextField();
+        }
+        else if(source == this.jCheckBoxPGbeta) {
+            /**
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                System.out.println("+++ PG type beta");                
+            } else if(e.getStateChange() == ItemEvent.DESELECTED) {
+                System.out.println("--- PG type beta");                
+            }
+            */
+            this.setCommandTextField();
+        }
+        else if(source == this.jCheckBoxPGalbe) {
+            /**
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                System.out.println("+++ PG type albe");                
+            } else if(e.getStateChange() == ItemEvent.DESELECTED) {
+                System.out.println("--- PG type albe");                
+            }
+            */ 
+            this.setCommandTextField();
+        }
+        else if(source == this.jCheckBoxPGalphalig) {
+            /**
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                System.out.println("+++ PG type alphalig");                
+            } else if(e.getStateChange() == ItemEvent.DESELECTED) {
+                System.out.println("--- PG type alphalig");                
+            }
+            */
+            this.setCommandTextField();
+        }
+        else if(source == this.jCheckBoxPGbetalig) {
+            /**
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                System.out.println("+++ PG type betalig");                
+            } else if(e.getStateChange() == ItemEvent.DESELECTED) {
+                System.out.println("--- PG type betalig");                
+            }
+            */ 
+            this.setCommandTextField();
+        }
+        else if(source == this.jCheckBoxPGalbelig) {
+            //if (e.getStateChange() == ItemEvent.SELECTED) {
+            //    System.out.println("+++ PG type albelig");                
+            //} else if(e.getStateChange() == ItemEvent.DESELECTED) {
+            //    System.out.println("--- PG type albelig");                
+            //}
+            this.setCommandTextField();
+        }
+        else if(source == this.jComboBoxImageFormat) {
+            //System.out.println("=== Image format");                            
             this.setCommandTextField();
         }
         
         else {
             //System.err.println(Settings.getApptag() + "WARNING: VpgCreateGraphFrame: Event from source " + source.toString() + " ignored.");
         }
+    }
+    
+    /**
+     * Item listener implementation.
+     * @param e the DocumentEvent to handle
+     */
+    @Override public void changedUpdate(DocumentEvent e) {
+        //this.inputFilesOK();
+        this.setZippedCheckbox(e);
+        this.checkInput();                
+    }
+    
+    /**
+     * Item listener implementation.
+     * @param e the DocumentEvent to handle
+     */
+    @Override public void removeUpdate(DocumentEvent e) {
+        //this.inputFilesOK();
+        this.setZippedCheckbox(e);
+        this.checkInput();
+        //System.out.println("remove");
+    }    
+    
+    /**
+     * Item listener implementation.
+     * @param e the DocumentEvent to handle
+     */
+    @Override public void insertUpdate(DocumentEvent e) {
+        //this.inputFilesOK();
+        this.setZippedCheckbox(e);
+        this.checkInput();
+        //System.out.println("insert");
+    }
+    
+    private void setZippedCheckbox(DocumentEvent e) {
+        if(e.getDocument() == this.jTextFieldInputFileDSSP.getDocument()) {
+            //System.out.println("change DSSP");
+            if(this.jTextFieldInputFileDSSP.getText().endsWith(".gz")) {
+                this.jCheckBoxDsspFileIsGzipped.setSelected(true);
+            } else {
+                this.jCheckBoxDsspFileIsGzipped.setSelected(false);
+            }
+        } else if(e.getDocument() == this.jTextFieldInputFilePDB.getDocument()) {
+            //System.out.println("change PDB");
+            if(this.jTextFieldInputFilePDB.getText().endsWith(".gz")) {
+                this.jCheckBoxPdbFileIsGzipped.setSelected(true);
+            } else {
+                this.jCheckBoxPdbFileIsGzipped.setSelected(false);
+            }
+        } else {
+            //System.out.println("change other");
+        }        
     }
     
 
@@ -256,6 +414,25 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         
         cmdList.add("--image-format");
         cmdList.add(this.jComboBoxImageFormat.getSelectedItem().toString());
+        
+        if(this.jCheckBoxPGtypes.isSelected()) {
+            cmdList.add("--sse-graphtypes");
+            String gtypes = "";
+            
+            if(this.jCheckBoxPGalpha.isSelected()) { gtypes += "a"; }
+            if(this.jCheckBoxPGbeta.isSelected()) { gtypes += "b"; }
+            if(this.jCheckBoxPGalbe.isSelected()) { gtypes += "c"; }
+            if(this.jCheckBoxPGalphalig.isSelected()) { gtypes += "d"; }
+            if(this.jCheckBoxPGbetalig.isSelected()) { gtypes += "e"; }
+            if(this.jCheckBoxPGalbelig.isSelected()) { gtypes += "f"; }
+            
+            if(gtypes.isEmpty()) {
+                System.err.println(Settings.getApptag() + "WARNING: PG types limited but no protein graph type selected, assuming albelig.");
+                gtypes = "f";
+                this.jCheckBoxPGalbelig.setSelected(true);
+            }
+            cmdList.add(gtypes);
+        }
 
 
         return cmdList.toArray(new String[cmdList.size()]);
@@ -288,8 +465,24 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         this.jComboBoxImageFormat.addItemListener(this);
         this.jCheckBoxCustomOutputDir.addItemListener(this);
         
+        this.jCheckBoxPGtypes.addItemListener(this);
+        this.jCheckBoxPGalpha.addItemListener(this);
+        this.jCheckBoxPGbeta.addItemListener(this);
+        this.jCheckBoxPGalbe.addItemListener(this);
+        this.jCheckBoxPGalphalig.addItemListener(this);
+        this.jCheckBoxPGbetalig.addItemListener(this);
+        this.jCheckBoxPGalbelig.addItemListener(this);
+        this.jComboBoxImageFormat.addItemListener(this);
+        
+        this.jTextFieldInputFilePDB.getDocument().addDocumentListener(this);
+        this.jTextFieldInputFileDSSP.getDocument().addDocumentListener(this);
+        this.jTextFieldCustomOutputDir.getDocument().addDocumentListener(this);
+
+        
         this.jTextFieldInputFilePDB.setText(Settings.get("vpg_S_input_dir") + fs + "8icd.pdb");
         this.jTextFieldInputFileDSSP.setText(Settings.get("vpg_S_input_dir") + fs + "8icd.dssp");
+        this.jTextFieldCustomOutputDir.setToolTipText("Currently using default directory '" + Settings.get("vpg_S_output_dir") + "'.");
+        this.jTextFieldCustomOutputDir.setText(Settings.get("vpg_S_last_custom_output_dir"));
         this.setCommandTextField();
              
     }
@@ -340,6 +533,13 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         jTextFieldCustomOutputDir = new javax.swing.JTextField();
         jButtonSelectCustomOutputDir = new javax.swing.JButton();
         jLabelInputOutput = new javax.swing.JLabel();
+        jCheckBoxPGtypes = new javax.swing.JCheckBox();
+        jCheckBoxPGalpha = new javax.swing.JCheckBox();
+        jCheckBoxPGbeta = new javax.swing.JCheckBox();
+        jCheckBoxPGalbe = new javax.swing.JCheckBox();
+        jCheckBoxPGalphalig = new javax.swing.JCheckBox();
+        jCheckBoxPGbetalig = new javax.swing.JCheckBox();
+        jCheckBoxPGalbelig = new javax.swing.JCheckBox();
         jPanelStats = new javax.swing.JPanel();
         jLabelStatus = new javax.swing.JLabel();
 
@@ -462,6 +662,36 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
 
         jLabelInputOutput.setText("Input and output");
 
+        jCheckBoxPGtypes.setText("Only compute PG graphs of type:");
+        jCheckBoxPGtypes.setToolTipText("Compute only the selected protein graph types instead of all types.");
+
+        jCheckBoxPGalpha.setText("alpha");
+        jCheckBoxPGalpha.setToolTipText("Alpha graphs consist of all alpha helices in a chain and the contacts between them.");
+        jCheckBoxPGalpha.setEnabled(false);
+
+        jCheckBoxPGbeta.setText("beta");
+        jCheckBoxPGbeta.setToolTipText("Beta graphs consist of all beta strands in a chain and the contacts between them.");
+        jCheckBoxPGbeta.setEnabled(false);
+
+        jCheckBoxPGalbe.setText("albe");
+        jCheckBoxPGalbe.setToolTipText("Albe graphs (or alphabeta graphs) consist of all alpha helices, beta strands and the contacts between them in a chain.");
+        jCheckBoxPGalbe.setEnabled(false);
+
+        jCheckBoxPGalphalig.setSelected(true);
+        jCheckBoxPGalphalig.setText("alphalig");
+        jCheckBoxPGalphalig.setToolTipText("Alphalig graphs consist of all alpha helices and ligands in a chain, and the contacts between them.");
+        jCheckBoxPGalphalig.setEnabled(false);
+
+        jCheckBoxPGbetalig.setSelected(true);
+        jCheckBoxPGbetalig.setText("betalig");
+        jCheckBoxPGbetalig.setToolTipText("Betalig graphs consist of all beta strands and ligands in a chain, and the contacts between them.");
+        jCheckBoxPGbetalig.setEnabled(false);
+
+        jCheckBoxPGalbelig.setSelected(true);
+        jCheckBoxPGalbelig.setText("albelig");
+        jCheckBoxPGalbelig.setToolTipText("Albelig graphs consist of all alpha helices, beta strands and ligands in a chain, and the contacts between them.");
+        jCheckBoxPGalbelig.setEnabled(false);
+
         javax.swing.GroupLayout jPanelMainContentLayout = new javax.swing.GroupLayout(jPanelMainContent);
         jPanelMainContent.setLayout(jPanelMainContentLayout);
         jPanelMainContentLayout.setHorizontalGroup(
@@ -469,20 +699,20 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
             .addGroup(jPanelMainContentLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPaneStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 505, Short.MAX_VALUE)
-                    .addComponent(jSeparatorLower, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 505, Short.MAX_VALUE)
-                    .addComponent(jSeparatorUpper, javax.swing.GroupLayout.DEFAULT_SIZE, 505, Short.MAX_VALUE)
+                    .addComponent(jScrollPaneStatus)
+                    .addComponent(jSeparatorLower, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jSeparatorUpper)
                     .addGroup(jPanelMainContentLayout.createSequentialGroup()
                         .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanelMainContentLayout.createSequentialGroup()
                                 .addComponent(jLabelInputDSSP)
-                                .addGap(0, 216, Short.MAX_VALUE))
+                                .addGap(0, 0, Short.MAX_VALUE))
                             .addGroup(jPanelMainContentLayout.createSequentialGroup()
                                 .addComponent(jLabelInputPDB)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jTextFieldInputFilePDB, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
-                                    .addComponent(jTextFieldInputFileDSSP, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE))))
+                                    .addComponent(jTextFieldInputFilePDB)
+                                    .addComponent(jTextFieldInputFileDSSP))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jCheckBoxPdbFileIsGzipped, javax.swing.GroupLayout.Alignment.TRAILING)
@@ -505,31 +735,45 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
                             .addGroup(jPanelMainContentLayout.createSequentialGroup()
                                 .addComponent(jLabelImageFormat)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jComboBoxImageFormat, 0, 196, Short.MAX_VALUE))
+                                .addComponent(jComboBoxImageFormat, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addComponent(jCheckBoxAllowCoils)
                             .addComponent(jCheckBoxAdditionalOutput)
                             .addComponent(jLabelDebugOptions)
                             .addComponent(jCheckBoxRamachandranPlot)))
-                    .addComponent(jSeparatorCenter, javax.swing.GroupLayout.DEFAULT_SIZE, 505, Short.MAX_VALUE)
+                    .addComponent(jSeparatorCenter)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelMainContentLayout.createSequentialGroup()
-                        .addGap(0, 309, Short.MAX_VALUE)
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jButtonCheckInput)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButtonRun))
-                    .addGroup(jPanelMainContentLayout.createSequentialGroup()
-                        .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabelOptions)
-                            .addComponent(jLabelPlccCommand)
-                            .addComponent(jLabelResults)
-                            .addComponent(jScrollPanePlccCommand, javax.swing.GroupLayout.PREFERRED_SIZE, 505, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanelMainContentLayout.createSequentialGroup()
                         .addComponent(jCheckBoxCustomOutputDir)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jTextFieldCustomOutputDir, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jButtonSelectCustomOutputDir, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE))
-                    .addComponent(jLabelInputOutput))
+                        .addComponent(jButtonSelectCustomOutputDir, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanelMainContentLayout.createSequentialGroup()
+                        .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabelOptions)
+                            .addComponent(jLabelPlccCommand)
+                            .addComponent(jLabelResults)
+                            .addComponent(jScrollPanePlccCommand, javax.swing.GroupLayout.PREFERRED_SIZE, 505, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabelInputOutput)
+                            .addGroup(jPanelMainContentLayout.createSequentialGroup()
+                                .addComponent(jCheckBoxPGtypes)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jCheckBoxPGalphalig)
+                                    .addComponent(jCheckBoxPGalpha))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jCheckBoxPGbeta)
+                                    .addComponent(jCheckBoxPGbetalig))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jCheckBoxPGalbe)
+                                    .addComponent(jCheckBoxPGalbelig))))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanelMainContentLayout.setVerticalGroup(
@@ -578,12 +822,23 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
                     .addComponent(jCheckBoxFoldingGraphs)
                     .addComponent(jLabelImageFormat)
                     .addComponent(jComboBoxImageFormat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jSeparatorCenter, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jCheckBoxPGtypes)
+                    .addComponent(jCheckBoxPGalpha)
+                    .addComponent(jCheckBoxPGbeta)
+                    .addComponent(jCheckBoxPGalbe))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jCheckBoxPGalphalig)
+                    .addComponent(jCheckBoxPGbetalig)
+                    .addComponent(jCheckBoxPGalbelig))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSeparatorCenter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabelPlccCommand)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPanePlccCommand, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
+                .addComponent(jScrollPanePlccCommand, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButtonCheckInput)
@@ -603,7 +858,7 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         jPanelStats.setLayout(jPanelStatsLayout);
         jPanelStatsLayout.setHorizontalGroup(
             jPanelStatsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabelStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 525, Short.MAX_VALUE)
+            .addComponent(jLabelStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanelStatsLayout.setVerticalGroup(
             jPanelStatsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -692,17 +947,24 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
     }//GEN-LAST:event_jButtonRunActionPerformed
 
     private void jButtonCheckInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCheckInputActionPerformed
-        
+        this.checkInput();
+                        
+    }//GEN-LAST:event_jButtonCheckInputActionPerformed
+
+    
+    private void checkInput() {
         String statusText = "";
         File workingDir = this.getWorkingDirFromForm();
         
         if(! workingDir.isDirectory() && workingDir.canRead()) {
             this.jTextPaneStatus.setText("ERROR: Working directory '" + workingDir.toString() + "' with PLCC jar file does not exist.");
             this.jLabelStatus.setText("WARNING: Path to plcc.jar does not exist, please fix in settings.");
+            this.jLabelPlccCommand.setToolTipText("Could not find a proper working directory with current settings.");
             this.jButtonRun.setEnabled(false);
             return;
         } else {
             this.jLabelStatus.setText("VPG Graph Creator ready.");
+            this.jLabelPlccCommand.setToolTipText("Working directory for the command will be '" + workingDir.getAbsolutePath() + "'.");
         }
         
         
@@ -726,9 +988,9 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
             this.jButtonRun.setEnabled(false);
         }
         
-        this.jTextPaneStatus.setText(statusText);                
-    }//GEN-LAST:event_jButtonCheckInputActionPerformed
-
+        this.jTextPaneStatus.setText(statusText);
+    }
+    
     private void jButtonSelectCustomOutputDirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSelectCustomOutputDirActionPerformed
         
         File defaultDir = new File(Settings.get("vpg_S_output_dir"));
@@ -810,6 +1072,13 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
     private javax.swing.JCheckBox jCheckBoxFoldingGraphs;
     private javax.swing.JCheckBox jCheckBoxForceChain;
     private javax.swing.JCheckBox jCheckBoxOutputDirTree;
+    private javax.swing.JCheckBox jCheckBoxPGalbe;
+    private javax.swing.JCheckBox jCheckBoxPGalbelig;
+    private javax.swing.JCheckBox jCheckBoxPGalpha;
+    private javax.swing.JCheckBox jCheckBoxPGalphalig;
+    private javax.swing.JCheckBox jCheckBoxPGbeta;
+    private javax.swing.JCheckBox jCheckBoxPGbetalig;
+    private javax.swing.JCheckBox jCheckBoxPGtypes;
     private javax.swing.JCheckBox jCheckBoxPdbFileIsGzipped;
     private javax.swing.JCheckBox jCheckBoxRamachandranPlot;
     private javax.swing.JCheckBox jCheckBoxUseDatabase;

@@ -145,6 +145,7 @@
         <Component class="javax.swing.JLabel" name="jLabelLocalPath">
           <Properties>
             <Property name="text" type="java.lang.String" value="Local output path:"/>
+            <Property name="toolTipText" type="java.lang.String" value="The local path where the downloaded files are stored."/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="jTextFieldLocalPath">
@@ -155,6 +156,7 @@
         <Component class="javax.swing.JLabel" name="jLabelFileType">
           <Properties>
             <Property name="text" type="java.lang.String" value="File type to download:"/>
+            <Property name="toolTipText" type="java.lang.String" value="Which file types to download."/>
           </Properties>
         </Component>
         <Component class="javax.swing.JRadioButton" name="jRadioButtonPDB">
@@ -163,6 +165,7 @@
               <ComponentRef name="buttonGroupDownloadWhat"/>
             </Property>
             <Property name="text" type="java.lang.String" value="PDB"/>
+            <Property name="toolTipText" type="java.lang.String" value="The PDB file contains atom coordinates, it is downloaded from the RCSB Protein Data Bank website."/>
           </Properties>
         </Component>
         <Component class="javax.swing.JRadioButton" name="jRadioButtonDSSP">
@@ -171,6 +174,7 @@
               <ComponentRef name="buttonGroupDownloadWhat"/>
             </Property>
             <Property name="text" type="java.lang.String" value="DSSP"/>
+            <Property name="toolTipText" type="java.lang.String" value="The DSSP file contains secondary structure assignments computed by DSSP, a program by Kabsch and Sander."/>
           </Properties>
         </Component>
         <Component class="javax.swing.JRadioButton" name="jRadioButtonBoth">
@@ -179,6 +183,7 @@
               <ComponentRef name="buttonGroupDownloadWhat"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Both"/>
+            <Property name="toolTipText" type="java.lang.String" value="Will download both the PDB and DSSP files."/>
           </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="jButtonSelectOutputPath">
@@ -192,6 +197,7 @@
         <Component class="javax.swing.JLabel" name="jLabelPdbId">
           <Properties>
             <Property name="text" type="java.lang.String" value="PDB ID:"/>
+            <Property name="toolTipText" type="java.lang.String" value="The RCSB Protein Data Bank identifier for a protein. You can get it at the PDB website."/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="jTextFieldPdbId">
@@ -209,7 +215,7 @@
         </Component>
         <Component class="javax.swing.JLabel" name="jLabelStatus">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Results:"/>
+            <Property name="text" type="java.lang.String" value="Status:"/>
           </Properties>
         </Component>
         <Container class="javax.swing.JScrollPane" name="jScrollPaneStatus">

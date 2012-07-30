@@ -43,13 +43,14 @@
       </Properties>
       <AccessibilityProperties>
         <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="Internet"/>
+        <Property name="AccessibleContext.accessibleDescription" type="java.lang.String" value=""/>
       </AccessibilityProperties>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
         <Container class="javax.swing.JPanel" name="jPanelSettingsGeneral">
           <Properties>
-            <Property name="toolTipText" type="java.lang.String" value="Shows general settings."/>
+            <Property name="toolTipText" type="java.lang.String" value=""/>
             <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[200, 100]"/>
             </Property>
@@ -197,9 +198,13 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" attributes="0">
+                              <Component id="jLabelDownloadDsspInfo" max="32767" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                          </Group>
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="jTextFieldPathSplitPDBJar" alignment="0" max="32767" attributes="0"/>
@@ -216,10 +221,6 @@
                                   <Component id="jButtonBrowseDssp" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="jLabelDownloadDsspInfo" min="-2" pref="396" max="-2" attributes="0"/>
-                              <EmptySpace max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="1" attributes="0">
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -278,6 +279,7 @@
             <Component class="javax.swing.JLabel" name="jLabelPathSplitPDBJar">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Path to SplitPDB (splitpdb.jar, part of VPLG):"/>
+                <Property name="toolTipText" type="java.lang.String" value="SplitPDB comes with VPLG and is required to generate DSSP files from PDB files locally."/>
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="jTextFieldPathSplitPDBJar">
@@ -289,6 +291,7 @@
             <Component class="javax.swing.JLabel" name="jLabelPathDssp">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Path to DSSP (dsspcmbi or dsspcmbi.exe)"/>
+                <Property name="toolTipText" type="java.lang.String" value="Dsspcmbi by Kabsch and Sander is required to generate DSSP files from PDB files locally."/>
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="jTextFieldPathDssp">
@@ -329,7 +332,7 @@
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Tahoma" size="10" style="0"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="DSSP can be downloaded from http://swift.cmbi.ru.nl/gv/dssp/"/>
+                <Property name="text" type="java.lang.String" value="DSSP by Kabsch and Sander can be downloaded from http://swift.cmbi.ru.nl/gv/dssp/"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JButton" name="jButtonSaveSettingsApplications">
@@ -355,9 +358,9 @@
           </AccessibilityProperties>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Web services" toolTip="Shows internet settings.">
+              <JTabbedPaneConstraints tabName="Web services" toolTip="">
                 <Property name="tabTitle" type="java.lang.String" value="Web services"/>
-                <Property name="tabToolTip" type="java.lang.String" value="Shows internet settings."/>
+                <Property name="tabToolTip" type="java.lang.String" value=""/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>

@@ -36,6 +36,8 @@ public class VpgAboutFrame extends javax.swing.JFrame {
         jScrollPaneInfoText = new javax.swing.JScrollPane();
         jTextAreaInfoText = new javax.swing.JTextArea();
 
+        setTitle("VPG -- About");
+
         jTitleLabel.setText("Vpg -- A frontend for VPLG");
         jTitleLabel.setMaximumSize(new java.awt.Dimension(1200, 1000));
         jTitleLabel.setMinimumSize(new java.awt.Dimension(100, 75));

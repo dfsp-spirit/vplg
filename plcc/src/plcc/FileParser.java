@@ -1002,16 +1002,17 @@ public class FileParser {
         }
 
         if(numModels > 1) {
-            System.out.println("    PDB: WARNING: Multiple models found, all but the default model will be ignored.");
+            System.out.println("    PDB: Multiple models found, all but the default model will be ignored.");
 
-
-            System.err.println("*************************************** WARNING ******************************************");
-            System.err.println("WARNING: Multiple models detected in PDB file. I'm fine with that but unless you did split");
-            System.err.println("WARNING:  the PDB file into separate models for DSSP, the current DSSP file is broken.");
-            System.err.println("WARNING:  I parse that file and rely on it. You know the deal: garbage in, garbage out.");
-            System.err.println("WARNING:  I'll continue but you have been warned. ;)");
-            System.err.println("*************************************** WARNING ******************************************");
-
+            if(Settings.getBoolean("plcc_B_split_dsspfile_warning")) {
+                System.err.println("*************************************** WARNING ******************************************");
+                System.err.println("WARNING: Multiple models detected in PDB file. I'm fine with that but unless you did split");
+                System.err.println("WARNING:  the PDB file into separate models for DSSP, the current DSSP file is broken.");
+                System.err.println("WARNING:  I parse that file and rely on it. You know the deal: garbage in, garbage out.");
+                System.err.println("WARNING:  I'll continue but you have been warned. ;)");
+                System.err.println("WARNING:  (Set 'plcc_B_split_dsspfile_warning' to 'false' in the config file to suppress this message.)");
+                System.err.println("*************************************** WARNING ******************************************");
+            }
         }
         
     }

@@ -53,6 +53,7 @@ public class VpgGraphViewerFrame extends JFrame {
     comboPanel = new JPanel();
     
     comboButton = new JButton("Set root");
+    comboButton.setToolTipText("Update the file system root of the directory tree below.");
     comboButton.addActionListener(new ActionListener() {
  
             @Override public void actionPerformed(ActionEvent e)
@@ -69,6 +70,7 @@ public class VpgGraphViewerFrame extends JFrame {
     this.combobox = new JComboBox(fsRoots);
     this.combobox.setSize(80, 20);
     this.combobox.setSelectedIndex(roots.length);
+    this.combobox.setToolTipText("Choose a file system root for the FS tree below.");
     comboPanel.add(combobox, JFrame.LEFT_ALIGNMENT);
     comboPanel.add(comboButton, JFrame.RIGHT_ALIGNMENT);
     

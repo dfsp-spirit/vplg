@@ -148,6 +148,7 @@ public class Settings {
         // paths
         defSet("vpg_S_input_dir", System.getProperty("user.home") + fs + "data" + fs + "PDB", "The input data directory where the PDB and DSSP files are.");
         defSet("vpg_S_output_dir", System.getProperty("user.home") + fs + "data" + fs + "VPLG", "The output directory where the graph files and images should be written to.");
+        defSet("vpg_S_last_custom_output_dir", System.getProperty("user.home") + fs + "data" + fs + "VPLG", "The custom output directory where the graph files and images should be written to. Overwritten every time you set it in the form.");
         
         defSet("vpg_S_path_dssp", System.getProperty("user.home") + fs + "software" + fs + "dssp" + fs + "dsspcmbi", "The path to the dsspcmbi executable.");
         defSet("vpg_S_path_plcc", System.getProperty("user.home") + fs + "software" + fs + "vplg" + fs + "plcc.jar", "The path to the plcc.jar file. This is part of VPLG.");
@@ -171,7 +172,7 @@ public class Settings {
      * @return the version string
      */
     public static String getVersion() {
-        return("0.02");
+        return("0.05");
     }
     
     

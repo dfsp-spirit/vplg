@@ -247,7 +247,7 @@ public class VpgSettingsFrame extends javax.swing.JFrame implements DocumentList
         jTabbedPaneSettings.setName("Internet"); // NOI18N
         jTabbedPaneSettings.setNextFocusableComponent(jPanelSettingsGeneral);
 
-        jPanelSettingsGeneral.setToolTipText("Shows general settings.");
+        jPanelSettingsGeneral.setToolTipText("");
         jPanelSettingsGeneral.setMinimumSize(new java.awt.Dimension(200, 100));
         jPanelSettingsGeneral.setName("General"); // NOI18N
         jPanelSettingsGeneral.setNextFocusableComponent(jPanelSettingsPaths);
@@ -339,11 +339,13 @@ public class VpgSettingsFrame extends javax.swing.JFrame implements DocumentList
         jTextFieldPathPlccJar.setToolTipText("The path to the PLCC jar file. PLCC is the core of VPLG, it computes and visualizes protein ligand graphs.");
 
         jLabelPathSplitPDBJar.setText("Path to SplitPDB (splitpdb.jar, part of VPLG):");
+        jLabelPathSplitPDBJar.setToolTipText("SplitPDB comes with VPLG and is required to generate DSSP files from PDB files locally.");
 
         jTextFieldPathSplitPDBJar.setText("/home/ts/software/vplg/splitpdb.jar");
         jTextFieldPathSplitPDBJar.setToolTipText("The path to the SplitPDB jar file. Allows you to generate DSSP files from PDB files which include several models on your computer with dsspcmbi.");
 
         jLabelPathDssp.setText("Path to DSSP (dsspcmbi or dsspcmbi.exe)");
+        jLabelPathDssp.setToolTipText("Dsspcmbi by Kabsch and Sander is required to generate DSSP files from PDB files locally.");
 
         jTextFieldPathDssp.setText("/home/ts/software/dssp/dsspcmbi");
         jTextFieldPathDssp.setToolTipText("The path to the external tool dsspcmbi by Kabsch and Sander. Allows you to generate DSSP files from PDB files on your computer.");
@@ -375,7 +377,7 @@ public class VpgSettingsFrame extends javax.swing.JFrame implements DocumentList
         });
 
         jLabelDownloadDsspInfo.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
-        jLabelDownloadDsspInfo.setText("DSSP can be downloaded from http://swift.cmbi.ru.nl/gv/dssp/");
+        jLabelDownloadDsspInfo.setText("DSSP by Kabsch and Sander can be downloaded from http://swift.cmbi.ru.nl/gv/dssp/");
 
         jButtonSaveSettingsApplications.setText("Save application settings");
         jButtonSaveSettingsApplications.addActionListener(new java.awt.event.ActionListener() {
@@ -392,6 +394,9 @@ public class VpgSettingsFrame extends javax.swing.JFrame implements DocumentList
                 .addContainerGap()
                 .addGroup(jPanelSettingsPathsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanelSettingsPathsLayout.createSequentialGroup()
+                        .addComponent(jLabelDownloadDsspInfo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(jPanelSettingsPathsLayout.createSequentialGroup()
                         .addGroup(jPanelSettingsPathsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jTextFieldPathSplitPDBJar)
                             .addComponent(jTextFieldPathDssp)
@@ -405,9 +410,6 @@ public class VpgSettingsFrame extends javax.swing.JFrame implements DocumentList
                             .addComponent(jButtonBrowseSplitPDBJar)
                             .addComponent(jButtonBrowseDssp))
                         .addGap(10, 10, 10))
-                    .addGroup(jPanelSettingsPathsLayout.createSequentialGroup()
-                        .addComponent(jLabelDownloadDsspInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 396, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelSettingsPathsLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jButtonSaveSettingsApplications)
@@ -517,7 +519,7 @@ public class VpgSettingsFrame extends javax.swing.JFrame implements DocumentList
                 .addContainerGap())
         );
 
-        jTabbedPaneSettings.addTab("Web services", null, jPanelSettingsInternet, "Shows internet settings.");
+        jTabbedPaneSettings.addTab("Web services", null, jPanelSettingsInternet, "");
         jPanelSettingsInternet.getAccessibleContext().setAccessibleName("Internet");
         jPanelSettingsInternet.getAccessibleContext().setAccessibleDescription("Shows internet settings.");
 
@@ -642,6 +644,7 @@ public class VpgSettingsFrame extends javax.swing.JFrame implements DocumentList
 
         getContentPane().add(jTabbedPaneSettings);
         jTabbedPaneSettings.getAccessibleContext().setAccessibleName("Internet");
+        jTabbedPaneSettings.getAccessibleContext().setAccessibleDescription("");
 
         getAccessibleContext().setAccessibleDescription("The VPG Settings");
 

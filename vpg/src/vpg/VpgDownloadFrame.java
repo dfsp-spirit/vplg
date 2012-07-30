@@ -8,17 +8,21 @@
 
 package vpg;
 
+import java.awt.Color;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 /**
  *
  * @author ts
  */
-public class VpgDownloadFrame extends javax.swing.JFrame {
+public class VpgDownloadFrame extends javax.swing.JFrame implements DocumentListener {
 
     /**
      * Creates new form VpgDownloadFrame
@@ -28,6 +32,9 @@ public class VpgDownloadFrame extends javax.swing.JFrame {
         this.jRadioButtonPDB.setSelected(true);
         this.jTextFieldLocalPath.setText(Settings.get("vpg_S_input_dir"));
         this.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        this.jTextFieldLocalPath.getDocument().addDocumentListener(this);
+        this.jTextFieldPdbId.getDocument().addDocumentListener(this);
+        this.checkInput();
     }
 
     /**
@@ -75,19 +82,24 @@ public class VpgDownloadFrame extends javax.swing.JFrame {
         );
 
         jLabelLocalPath.setText("Local output path:");
+        jLabelLocalPath.setToolTipText("The local path where the downloaded files are stored.");
 
         jTextFieldLocalPath.setText("/home/ts/data/");
 
         jLabelFileType.setText("File type to download:");
+        jLabelFileType.setToolTipText("Which file types to download.");
 
         buttonGroupDownloadWhat.add(jRadioButtonPDB);
         jRadioButtonPDB.setText("PDB");
+        jRadioButtonPDB.setToolTipText("The PDB file contains atom coordinates, it is downloaded from the RCSB Protein Data Bank website.");
 
         buttonGroupDownloadWhat.add(jRadioButtonDSSP);
         jRadioButtonDSSP.setText("DSSP");
+        jRadioButtonDSSP.setToolTipText("The DSSP file contains secondary structure assignments computed by DSSP, a program by Kabsch and Sander.");
 
         buttonGroupDownloadWhat.add(jRadioButtonBoth);
         jRadioButtonBoth.setText("Both");
+        jRadioButtonBoth.setToolTipText("Will download both the PDB and DSSP files.");
 
         jButtonSelectOutputPath.setText("Choose...");
         jButtonSelectOutputPath.addActionListener(new java.awt.event.ActionListener() {
@@ -97,6 +109,7 @@ public class VpgDownloadFrame extends javax.swing.JFrame {
         });
 
         jLabelPdbId.setText("PDB ID:");
+        jLabelPdbId.setToolTipText("The RCSB Protein Data Bank identifier for a protein. You can get it at the PDB website.");
 
         jTextFieldPdbId.setText("8icd");
 
@@ -107,7 +120,7 @@ public class VpgDownloadFrame extends javax.swing.JFrame {
             }
         });
 
-        jLabelStatus.setText("Results:");
+        jLabelStatus.setText("Status:");
 
         jTextAreaStatus.setBackground(new java.awt.Color(200, 200, 200));
         jTextAreaStatus.setColumns(20);
@@ -278,6 +291,63 @@ public class VpgDownloadFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButtonDownloadActionPerformed
 
+    
+    /**
+     * Item listener implementation.
+     * @param e the DocumentEvent to handle
+     */
+    @Override public void changedUpdate(DocumentEvent e) {
+        this.checkInput();                
+    }
+    
+    /**
+     * Item listener implementation.
+     * @param e the DocumentEvent to handle
+     */
+    @Override public void removeUpdate(DocumentEvent e) {
+        this.checkInput();
+    }    
+    
+    /**
+     * Item listener implementation.
+     * @param e the DocumentEvent to handle
+     */
+    @Override public void insertUpdate(DocumentEvent e) {
+        this.checkInput();
+    }
+    
+    
+    /**
+     * Checks input in the text fields of this form and colors them red if something is wrong with their current content.
+     */
+    private void checkInput() {
+        File localDir = new File(this.jTextFieldLocalPath.getText());
+        String statusText = "";
+        
+        if(localDir.isDirectory() && localDir.canWrite()) {
+            this.jTextFieldLocalPath.setBackground(Color.WHITE);
+            this.jTextFieldLocalPath.setToolTipText("The local directory where the downloaded files are stored.");
+            statusText += "Local download directory is ok.\n";
+        } else {
+            this.jTextFieldLocalPath.setBackground(Color.RED);
+            this.jTextFieldLocalPath.setToolTipText("That directory does not exist or is not writeable.");
+            statusText += "ERROR: Local download directory does not exist or is not writeable.\n";
+        }
+        
+        String pdbid = this.jTextFieldPdbId.getText();
+        if(pdbid.length() == 4) {
+            this.jTextFieldPdbId.setBackground(Color.WHITE);
+            this.jTextFieldPdbId.setToolTipText("The PDB identifier of the protein. You can get it at the RCSB Protein Data Bank website.");
+            statusText += "Format of PDB identifier looks good.\n";
+        } else {
+            this.jTextFieldPdbId.setBackground(Color.RED);
+            this.jTextFieldPdbId.setToolTipText("A PDB identifier should be 4 characters long. You can get it at the RCSB Protein Data Bank website.");            
+            statusText += "WARNING: Format of PDB identifier seems wrong, should be 4 characters long.\n";
+        }
+        this.jTextAreaStatus.setText(statusText);
+    }
+    
+    
     /**
      * @param args the command line arguments
      */

@@ -220,6 +220,22 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     }
     
     
+    /**
+     * Determines the number of isolated ligands in this graph. Isolated ligands are ligand SSEs which have
+     * no neighbors, i.e., their degree is 0.
+     * @return the number of isolated ligands in this graph
+     */
+    public Integer numIsolatedLigands() {        
+        Integer numIsolatedLigands = 0;
+        for(SSE s : this.sseList) {            
+            if(s.isLigandSSE() && this.degreeOfVertex(s.getSeqIndexInGraph()) == 0 ) {
+                numIsolatedLigands++;
+            }
+        }
+        return numIsolatedLigands;
+    }
+    
+    
     
     /**
      * Computes the spatial contact matrix for this graph from the sequential contact matrix and the spatial ordering.

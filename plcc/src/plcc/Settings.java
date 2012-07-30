@@ -56,6 +56,15 @@ public class Settings {
     public static String getDefaultConfigFilePath() {
         return(defaultFile);
     }
+    
+    
+    /**
+     * Returns the application tag that is printed as a prefix for all output lines.
+     * @return the apptag
+     */
+    public static String getApptag() {
+        return("[PLCC] ");
+    }
 
     /**
      * Loads the properties from the file 'file'. Should be called at the start of main to init the settings. These default
@@ -143,6 +152,8 @@ public class Settings {
         defSet("plcc_B_debug_compareSSEContacts", "false", "Whether to compare the computed SSE level contacts to those in the geom_neo output file that is supplied.");
         defSet("plcc_S_debug_compareSSEContactsFile", "geo.dat_ptgl", "The path to the geo.dat file to use for SSE level contact comparison.");                
         defSet("plcc_B_contact_debug_dysfunct", "false", "Atom level contact debugging mode. WARNING: When this is true, plcc will abort after the first few residues and produce wrong overall results!");
+        
+        defSet("plcc_B_split_dsspfile_warning", "true", "Whether to show a warning about splitting the DSSP file when multiple models are detected in a PDB file.");
         
         defSet("plcc_B_print_contacts", "false", "Whether the residue contacts are printed to stdout (slower)");
         defSet("plcc_B_write_lig_geolig", "true", "Determines whether ligand contacts are included in the <pdbid>.geolig file.");

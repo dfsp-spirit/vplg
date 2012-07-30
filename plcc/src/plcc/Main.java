@@ -88,7 +88,7 @@ public class Main {
     //  Main.calculateAllContacts().
     static Integer globalMaxSeqNeighborResDist;
     
-    static final String version = "0.58";
+    static final String version = "0.61";
     
     static ArrayList<File> deleteFilesOnExit;
     
@@ -1215,8 +1215,9 @@ public class Main {
         try {
             res = Double.valueOf(md.get("resolution"));
         } catch (Exception e) {
-            System.err.println("WARNING: Could not determine resolution of PDB file for protein '" + pdbid + "'.");
             res = -1.0;
+            System.err.println("WARNING: Could not determine resolution of PDB file for protein '" + pdbid + "', assuming NMR with resolution '" + res + "'.");
+            
         }
 
         //pdb_id, title, header, keywords, experiment, resolution
@@ -1342,6 +1343,15 @@ public class Main {
                     }
                 }
                 
+                Integer isoLig = pg.numIsolatedLigands();
+                String coilsUsed = "";
+                if(Settings.getBoolean("plcc_B_include_coils")) {
+                    coilsUsed = " including coils";
+                }
+                if(isoLig > 0) {
+                    System.out.println("      The " + gt + " graph of " + pdbid + " chain " + c.getPdbChainID() + coilsUsed + " contains " + isoLig + " isolated ligands.");
+                }
+                
                 // DEBUG: calculate distance matrix of the graph
                 //pg.calculateDistancesWithinGraph();
                 //pg.printDistMatrix();
@@ -1351,6 +1361,7 @@ public class Main {
                 filePath = outputDir;
                 String coils = "";
                 if(Settings.getBoolean("plcc_B_include_coils")) {
+                    //System.out.println("  Considering coils, this may fragment SSEs.");
                     coils = "_coils";
                 }
                 fileNameWithoutExtension = pdbid + "_" + c.getPdbChainID() + "_" + gt + coils + "_PG";

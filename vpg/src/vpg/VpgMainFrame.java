@@ -158,7 +158,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("VPG -- Frontend for Visualization of Protein Ligand Graphs");
         setMinimumSize(new java.awt.Dimension(400, 300));
-        setName("VpgMainFrame"); // NOI18N
+        setName("VPG Main Window"); // NOI18N
         setPreferredSize(new java.awt.Dimension(640, 360));
 
         jStatusBarPanel.setBackground(new java.awt.Color(210, 210, 210));
