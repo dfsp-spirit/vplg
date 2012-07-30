@@ -9,11 +9,17 @@ in doubt.
 After unpacking the release archive, all tools can be run directly from the resulting directory structure. 
 
 
-   cd downloads/
+   cd my_downloads_directory/
    unzip vplg-<version>.zip
 
    cd vplg/
-   java -jar plcc.jar
+   java -jar plcc.jar                            or
+   java -jar vpg.jar                             or
+   java -jar splitpdb.jar
+
+
+
+To start the graphical user interface on a GUI system with properly installed Java, simply double-click the file 'vpg.jar'.
   
 
 Note that the programs require the libraries in the lib/, relative to their path. So if you copy them elsewhere, you
@@ -21,4 +27,7 @@ gotta copy the lib/ directory there as well.
 
 
 See the README_* files for more detailed instructions on how to install and use the tools.
+
+--
+ts
 

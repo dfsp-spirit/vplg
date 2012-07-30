@@ -1,32 +1,7 @@
+The rpg.pl Perl script can be used to generate random protein graphs. It requires Perl to be installed.
 
+Run './rpl.pl -h' for usage info.
 
-The perl program rpg.pl generates random protein graphs in dpg/plcc format.
-
-
-INSTALLATION
-============
-Just 'chmod +x' it and make sure you have Perl installed (every UNIX system I have seen so far has Perl installed by default).
-
-
-
-RUNNING IT
-========== 
-You can simply run it like this to use the default settings:
-
-  ./rpg.pl
-
-You can also specify the number of vertices, the edge probability and an output file in the script itself or on the command line.
-Run './rpg.pl -h' for details on how to do this.
-
-
-USING THE GRAPHS
-================
-You can draw them with the plcc program, see the plcc README on how to do that. Atm, this does it:
-
-  java -jar plcc.jar IGNORED -l random_graph.plg
-
-When drawing *very* large graphs (e.g., 1000 vertices), you may need to increase the heap space of the Java VM to prevent out-of-memory errors. See the Java docs.
-
-Enjoy.
+RPG was written by ts.
 
 

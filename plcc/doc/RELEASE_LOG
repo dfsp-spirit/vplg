@@ -2,9 +2,7 @@ This is the VPLG release log.
 =============================
 
 
-Updates for version 2012-07-19:
-===============================
-* Added first version of the new VPG GUI.
+(Latest changes are near the end of this file.)
 
 
 Updates from version 2012-01-24 to 2012-01-30:
@@ -46,3 +44,24 @@ Updates from version 2012-04-17 to 2012-06-05:
    -TGF: option to save the computed protein graphs to text files in Trivial Graph Format format (.tgf files). This output is on by default and can be turned off by modifying the plcc_B_output_TGF option in the VPLG config file.
    -DOT language: option to save the computed protein graphs to text files in DOT language format . This output is on by default and can be turned off by modifying the plcc_B_output_DOT option in the VPLG config file, it writes .gv files. This allows you to open the graphs with GraphViz (http://www.graphviz.org/) and other software.
 
+Updates from version 2012-06-05 to 2012-07-19:
+===============================================
+* Added first version of the new VPG GUI.
+* A number of bug fixes for PLCC
+
+
+Updates from version 2012-07-19 to 2012-07-30:
+===============================================
+* Many bug fixes for the new VPG GUI, including:
+  -Now using the correct working dir when running PLCC, which prevents library-related crashes when using the database!
+  -A lot more documentation is available using tool tips, so just hover your mouse over an option if you need help
+  -Instant validation of input/output settings in all forms of VPG, invalid settings are marked in red
+* Some smaller fixes to PLCC, including:
+  -more detailed output
+  -output format improvements
+  -option to turn off DSSP file warnings for PDB files with several models
+
+
+
+--
+ts

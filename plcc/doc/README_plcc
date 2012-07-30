@@ -19,7 +19,7 @@ This program is written in Java so obviously, you need Java (the JRE will do, ve
 You need the libraries (jar files) in the lib/ folder in order to run *plcc*, and they have to be in './lib/', relative to
 the path where *plcc.jar* is. (So if you copy *plcc.jar* elsewhere, you need to copy the *lib/* directory there as well.)
 
-Note that the *plcc* is a command line application. We are currently working on a frontend for it, but it is not yet part of the official release.
+Note that the *plcc* is a command line application. You can use the *vpg* frontend if you prefer a graphical user interface.
 
 
 Running the program
@@ -154,7 +154,7 @@ A: The version is always printed when you run plcc, so running the software with
 Author, Website and Contact
 ============================
 
-*VPLG* was written by Tim Schaefer at the Molecular Bioinformatics group of Ina Koch at Goethe-University Frankfurt, Germany. It is based on earlier work by Ina Koch and Patrick May. See http://www.bioinformatik.uni-frankfurt.de for contact information. My personal website is at http://rcmd.org/.
+*VPLG* was written by Tim Schaefer at the Molecular Bioinformatics group of Ina Koch at Goethe-University Frankfurt, Germany. It is based on earlier ideas by Ina Koch and Patrick May. See http://www.bioinformatik.uni-frankfurt.de for contact information. My personal website is at http://rcmd.org/.
 
 
 

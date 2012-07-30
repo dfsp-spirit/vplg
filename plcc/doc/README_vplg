@@ -8,8 +8,8 @@ molecules while the edges model contacts and spatial relations between them.
 VPLG is written in Java using the Apache Batik library for SVG output. Database connectivity (optional) is provided by
 the PostgreSQL JDBC driver. VPLG was tested on Linux and Windows and should also run under MacOS.
 
-VPLG was written by Tim Schäfer at the Molecular Bioinformatics group of Ina Koch at Goethe-University Frankfurt, Germany. It
-is based on earlier work by Ina Koch and Patrick May.
+VPLG was written by Tim Schaefer at the Molecular Bioinformatics group of Ina Koch at Goethe-University Frankfurt, Germany. It
+is based on earlier ideas by Ina Koch and Patrick May.
 
 The official VPLG website is at http://vplg.sourceforge.net/.
 
