@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.1" encoding="UTF-8" ?>
 
 <Form version="1.3" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
@@ -27,6 +27,14 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItemDownloadFilesActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="jMenuItemGenerateDsspFile">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Generate DSSP file"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItemGenerateDsspFileActionPerformed"/>
               </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItemOpenImage">
@@ -96,9 +104,6 @@
       <Dimension value="[400, 300]"/>
     </Property>
     <Property name="name" type="java.lang.String" value="VPG Main Window" noResource="true"/>
-    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-      <Dimension value="[640, 360]"/>
-    </Property>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="menuBar" type="java.lang.String" value="jMenuBar"/>
@@ -149,7 +154,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="jStatusLabel" alignment="0" max="32767" attributes="0"/>
+              <Component id="jStatusLabel" alignment="0" pref="681" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
@@ -236,10 +241,11 @@
         <Component class="javax.swing.JComboBox" name="jComboBoxTasks">
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="3">
+              <StringArray count="4">
                 <StringItem index="0" value="Create a protein graph"/>
                 <StringItem index="1" value="Download a PDB or DSSP file"/>
-                <StringItem index="2" value="View existing graph images"/>
+                <StringItem index="2" value="Create a DSSP file from a PDB file"/>
+                <StringItem index="3" value="View existing graph images"/>
               </StringArray>
             </Property>
           </Properties>

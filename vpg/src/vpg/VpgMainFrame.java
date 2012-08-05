@@ -147,6 +147,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
         jMenuFile = new javax.swing.JMenu();
         jMenuItemCreateGraphs = new javax.swing.JMenuItem();
         jMenuItemDownloadFiles = new javax.swing.JMenuItem();
+        jMenuItemGenerateDsspFile = new javax.swing.JMenuItem();
         jMenuItemOpenImage = new javax.swing.JMenuItem();
         jMenuItemExit = new javax.swing.JMenuItem();
         jMenuEdit = new javax.swing.JMenu();
@@ -159,25 +160,24 @@ public class VpgMainFrame extends javax.swing.JFrame {
         setTitle("VPG -- Frontend for Visualization of Protein Ligand Graphs");
         setMinimumSize(new java.awt.Dimension(400, 300));
         setName("VPG Main Window"); // NOI18N
-        setPreferredSize(new java.awt.Dimension(640, 360));
 
         jStatusBarPanel.setBackground(new java.awt.Color(210, 210, 210));
 
-        jStatusLabel.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
+        jStatusLabel.setFont(new java.awt.Font("Dialog", 0, 10));
         jStatusLabel.setText("VPG ready.");
 
         javax.swing.GroupLayout jStatusBarPanelLayout = new javax.swing.GroupLayout(jStatusBarPanel);
         jStatusBarPanel.setLayout(jStatusBarPanelLayout);
         jStatusBarPanelLayout.setHorizontalGroup(
             jStatusBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 681, Short.MAX_VALUE)
         );
         jStatusBarPanelLayout.setVerticalGroup(
             jStatusBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jStatusLabel)
         );
 
-        jLabelWelcomeText1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        jLabelWelcomeText1.setFont(new java.awt.Font("Dialog", 1, 14));
         jLabelWelcomeText1.setText("Welcome to the Visualization of Protein Ligand Graphs software.");
 
         jLabelWelcomeLogo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -186,7 +186,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
 
         jLabelWelcomeTextWhatsup.setText("What would you like to do?");
 
-        jComboBoxTasks.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Create a protein graph", "Download a PDB or DSSP file", "View existing graph images" }));
+        jComboBoxTasks.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Create a protein graph", "Download a PDB or DSSP file", "Create a DSSP file from a PDB file", "View existing graph images" }));
 
         jButtonStartTask.setText("Let's start!");
         jButtonStartTask.addActionListener(new java.awt.event.ActionListener() {
@@ -245,6 +245,14 @@ public class VpgMainFrame extends javax.swing.JFrame {
             }
         });
         jMenuFile.add(jMenuItemDownloadFiles);
+
+        jMenuItemGenerateDsspFile.setText("Generate DSSP file");
+        jMenuItemGenerateDsspFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemGenerateDsspFileActionPerformed(evt);
+            }
+        });
+        jMenuFile.add(jMenuItemGenerateDsspFile);
 
         jMenuItemOpenImage.setText("Graph Image Viewer");
         jMenuItemOpenImage.addActionListener(new java.awt.event.ActionListener() {
@@ -437,8 +445,9 @@ public class VpgMainFrame extends javax.swing.JFrame {
             dlf.setDefaultCloseOperation(HIDE_ON_CLOSE);
             dlf.setVisible(true);
         }
-        else if(selection.equals("Generate a DSSP file using dsspcmbi")) {
+        else if(selection.equals("Create a DSSP file from a PDB file")) {
             System.out.println("[VPG] Starting module to generate DSSP file using dsspcmbi...");
+            new VpgGenerateDsspFileFrame().setVisible(true);
         }
         else if(selection.equals("View existing graph images")) {
             System.out.println("[VPG] Starting module to view graph images...");
@@ -460,6 +469,11 @@ public class VpgMainFrame extends javax.swing.JFrame {
         
         new VpgDownloadFrame().setVisible(true);
     }//GEN-LAST:event_jMenuItemDownloadFilesActionPerformed
+
+    private void jMenuItemGenerateDsspFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGenerateDsspFileActionPerformed
+
+        new VpgGenerateDsspFileFrame().setVisible(true);
+    }//GEN-LAST:event_jMenuItemGenerateDsspFileActionPerformed
 
     /**
      * @param args the command line arguments
@@ -517,6 +531,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItemCreateGraphs;
     private javax.swing.JMenuItem jMenuItemDownloadFiles;
     private javax.swing.JMenuItem jMenuItemExit;
+    private javax.swing.JMenuItem jMenuItemGenerateDsspFile;
     private javax.swing.JMenuItem jMenuItemOpenImage;
     private javax.swing.JMenuItem jMenuItemSettings;
     private javax.swing.JMenuItem jMenuManual;

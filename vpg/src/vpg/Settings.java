@@ -150,7 +150,12 @@ public class Settings {
         defSet("vpg_S_output_dir", System.getProperty("user.home") + fs + "data" + fs + "VPLG", "The output directory where the graph files and images should be written to.");
         defSet("vpg_S_last_custom_output_dir", System.getProperty("user.home") + fs + "data" + fs + "VPLG", "The custom output directory where the graph files and images should be written to. Overwritten every time you set it in the form.");
         
-        defSet("vpg_S_path_dssp", System.getProperty("user.home") + fs + "software" + fs + "dssp" + fs + "dsspcmbi", "The path to the dsspcmbi executable.");
+        String dsspcmbiExecutable = "dsspcmbi";
+        if(System.getProperty("os.name").startsWith("Windows")) {
+            dsspcmbiExecutable += ".exe";
+        }
+        
+        defSet("vpg_S_path_dssp", System.getProperty("user.home") + fs + "software" + fs + "dssp" + fs + dsspcmbiExecutable, "The path to the dsspcmbi executable.");
         defSet("vpg_S_path_plcc", System.getProperty("user.home") + fs + "software" + fs + "vplg" + fs + "plcc.jar", "The path to the plcc.jar file. This is part of VPLG.");
         defSet("vpg_S_path_splitpdb", System.getProperty("user.home") + fs + "software" + fs + "vplg" + fs + "splitpdb.jar", "The path to the splitpdb.jar file. This is part of VPLG.");
         
