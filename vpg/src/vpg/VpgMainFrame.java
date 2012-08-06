@@ -146,10 +146,11 @@ public class VpgMainFrame extends javax.swing.JFrame {
         jMenuBar = new javax.swing.JMenuBar();
         jMenuFile = new javax.swing.JMenu();
         jMenuItemCreateGraphs = new javax.swing.JMenuItem();
-        jMenuItemDownloadFiles = new javax.swing.JMenuItem();
-        jMenuItemGenerateDsspFile = new javax.swing.JMenuItem();
         jMenuItemOpenImage = new javax.swing.JMenuItem();
         jMenuItemExit = new javax.swing.JMenuItem();
+        jMenuInput = new javax.swing.JMenu();
+        jMenuItemDownloadFiles = new javax.swing.JMenuItem();
+        jMenuItemGenerateDsspFile = new javax.swing.JMenuItem();
         jMenuEdit = new javax.swing.JMenu();
         jMenuItemSettings = new javax.swing.JMenuItem();
         jMenuHelp = new javax.swing.JMenu();
@@ -228,8 +229,10 @@ public class VpgMainFrame extends javax.swing.JFrame {
                 .addContainerGap(68, Short.MAX_VALUE))
         );
 
+        jMenuFile.setMnemonic('f');
         jMenuFile.setText("File");
 
+        jMenuItemCreateGraphs.setMnemonic('g');
         jMenuItemCreateGraphs.setText("Create protein graph");
         jMenuItemCreateGraphs.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -238,22 +241,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
         });
         jMenuFile.add(jMenuItemCreateGraphs);
 
-        jMenuItemDownloadFiles.setText("Download input files");
-        jMenuItemDownloadFiles.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemDownloadFilesActionPerformed(evt);
-            }
-        });
-        jMenuFile.add(jMenuItemDownloadFiles);
-
-        jMenuItemGenerateDsspFile.setText("Generate DSSP file");
-        jMenuItemGenerateDsspFile.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemGenerateDsspFileActionPerformed(evt);
-            }
-        });
-        jMenuFile.add(jMenuItemGenerateDsspFile);
-
+        jMenuItemOpenImage.setMnemonic('v');
         jMenuItemOpenImage.setText("Graph Image Viewer");
         jMenuItemOpenImage.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -262,6 +250,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
         });
         jMenuFile.add(jMenuItemOpenImage);
 
+        jMenuItemExit.setMnemonic('x');
         jMenuItemExit.setText("Exit");
         jMenuItemExit.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -277,8 +266,33 @@ public class VpgMainFrame extends javax.swing.JFrame {
 
         jMenuBar.add(jMenuFile);
 
+        jMenuInput.setMnemonic('i');
+        jMenuInput.setText("Input");
+
+        jMenuItemDownloadFiles.setMnemonic('d');
+        jMenuItemDownloadFiles.setText("Download input files");
+        jMenuItemDownloadFiles.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemDownloadFilesActionPerformed(evt);
+            }
+        });
+        jMenuInput.add(jMenuItemDownloadFiles);
+
+        jMenuItemGenerateDsspFile.setMnemonic('g');
+        jMenuItemGenerateDsspFile.setText("Generate DSSP file");
+        jMenuItemGenerateDsspFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemGenerateDsspFileActionPerformed(evt);
+            }
+        });
+        jMenuInput.add(jMenuItemGenerateDsspFile);
+
+        jMenuBar.add(jMenuInput);
+
+        jMenuEdit.setMnemonic('e');
         jMenuEdit.setText("Edit");
 
+        jMenuItemSettings.setMnemonic('s');
         jMenuItemSettings.setText("Settings");
         jMenuItemSettings.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -289,8 +303,10 @@ public class VpgMainFrame extends javax.swing.JFrame {
 
         jMenuBar.add(jMenuEdit);
 
+        jMenuHelp.setMnemonic('h');
         jMenuHelp.setText("Help");
 
+        jMenuItemAbout.setMnemonic('a');
         jMenuItemAbout.setText("About");
         jMenuItemAbout.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -299,6 +315,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
         });
         jMenuHelp.add(jMenuItemAbout);
 
+        jMenuManual.setMnemonic('o');
         jMenuManual.setText("Online Documentation");
         jMenuManual.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -527,6 +544,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
     private javax.swing.JMenu jMenuEdit;
     private javax.swing.JMenu jMenuFile;
     private javax.swing.JMenu jMenuHelp;
+    private javax.swing.JMenu jMenuInput;
     private javax.swing.JMenuItem jMenuItemAbout;
     private javax.swing.JMenuItem jMenuItemCreateGraphs;
     private javax.swing.JMenuItem jMenuItemDownloadFiles;
