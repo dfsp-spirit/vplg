@@ -164,7 +164,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
 
         jStatusBarPanel.setBackground(new java.awt.Color(210, 210, 210));
 
-        jStatusLabel.setFont(new java.awt.Font("Dialog", 0, 10));
+        jStatusLabel.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
         jStatusLabel.setText("VPG ready.");
 
         javax.swing.GroupLayout jStatusBarPanelLayout = new javax.swing.GroupLayout(jStatusBarPanel);
@@ -232,6 +232,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
         jMenuFile.setMnemonic('f');
         jMenuFile.setText("File");
 
+        jMenuItemCreateGraphs.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.CTRL_MASK));
         jMenuItemCreateGraphs.setMnemonic('g');
         jMenuItemCreateGraphs.setText("Create protein graph");
         jMenuItemCreateGraphs.addActionListener(new java.awt.event.ActionListener() {
@@ -241,6 +242,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
         });
         jMenuFile.add(jMenuItemCreateGraphs);
 
+        jMenuItemOpenImage.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_V, java.awt.event.InputEvent.CTRL_MASK));
         jMenuItemOpenImage.setMnemonic('v');
         jMenuItemOpenImage.setText("Graph Image Viewer");
         jMenuItemOpenImage.addActionListener(new java.awt.event.ActionListener() {
@@ -250,6 +252,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
         });
         jMenuFile.add(jMenuItemOpenImage);
 
+        jMenuItemExit.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, java.awt.event.InputEvent.CTRL_MASK));
         jMenuItemExit.setMnemonic('x');
         jMenuItemExit.setText("Exit");
         jMenuItemExit.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -269,6 +272,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
         jMenuInput.setMnemonic('i');
         jMenuInput.setText("Input");
 
+        jMenuItemDownloadFiles.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.CTRL_MASK));
         jMenuItemDownloadFiles.setMnemonic('d');
         jMenuItemDownloadFiles.setText("Download input files");
         jMenuItemDownloadFiles.addActionListener(new java.awt.event.ActionListener() {
@@ -278,6 +282,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
         });
         jMenuInput.add(jMenuItemDownloadFiles);
 
+        jMenuItemGenerateDsspFile.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F, java.awt.event.InputEvent.CTRL_MASK));
         jMenuItemGenerateDsspFile.setMnemonic('g');
         jMenuItemGenerateDsspFile.setText("Generate DSSP file");
         jMenuItemGenerateDsspFile.addActionListener(new java.awt.event.ActionListener() {
@@ -292,6 +297,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
         jMenuEdit.setMnemonic('e');
         jMenuEdit.setText("Edit");
 
+        jMenuItemSettings.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_MASK));
         jMenuItemSettings.setMnemonic('s');
         jMenuItemSettings.setText("Settings");
         jMenuItemSettings.addActionListener(new java.awt.event.ActionListener() {
@@ -306,6 +312,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
         jMenuHelp.setMnemonic('h');
         jMenuHelp.setText("Help");
 
+        jMenuItemAbout.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
         jMenuItemAbout.setMnemonic('a');
         jMenuItemAbout.setText("About");
         jMenuItemAbout.addActionListener(new java.awt.event.ActionListener() {
@@ -315,6 +322,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
         });
         jMenuHelp.add(jMenuItemAbout);
 
+        jMenuManual.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
         jMenuManual.setMnemonic('o');
         jMenuManual.setText("Online Documentation");
         jMenuManual.addActionListener(new java.awt.event.ActionListener() {
