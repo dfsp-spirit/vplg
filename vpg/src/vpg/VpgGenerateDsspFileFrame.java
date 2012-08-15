@@ -89,6 +89,7 @@ public class VpgGenerateDsspFileFrame extends javax.swing.JFrame implements Item
         jScrollPaneDsspCmd = new javax.swing.JScrollPane();
         jTextFieldDsspCommand = new javax.swing.JTextField();
         jSeparator1 = new javax.swing.JSeparator();
+        jCheckBoxDeleteSplitAfterDsspRun = new javax.swing.JCheckBox();
         jPanelStatus = new javax.swing.JPanel();
         jLabelStatus = new javax.swing.JLabel();
 
@@ -206,6 +207,9 @@ public class VpgGenerateDsspFileFrame extends javax.swing.JFrame implements Item
         jTextFieldDsspCommand.setText("Checking command...");
         jScrollPaneDsspCmd.setViewportView(jTextFieldDsspCommand);
 
+        jCheckBoxDeleteSplitAfterDsspRun.setText("Delete output after successful DSSP run");
+        jCheckBoxDeleteSplitAfterDsspRun.setToolTipText("When this is selected, the output file of SplitPDB is deleted after a successful run of dsspcmbi.");
+
         javax.swing.GroupLayout jPanelMainContentLayout = new javax.swing.GroupLayout(jPanelMainContent);
         jPanelMainContent.setLayout(jPanelMainContentLayout);
         jPanelMainContentLayout.setHorizontalGroup(
@@ -237,25 +241,24 @@ public class VpgGenerateDsspFileFrame extends javax.swing.JFrame implements Item
                         .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanelMainContentLayout.createSequentialGroup()
                                 .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jCheckBoxSplitPdbOptRun)
+                                    .addComponent(jCheckBoxSplitPdbOptAllowOverwrite))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 68, Short.MAX_VALUE)
+                                .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addGroup(jPanelMainContentLayout.createSequentialGroup()
-                                        .addComponent(jCheckBoxSplitPdbOptRun)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 208, Short.MAX_VALUE)
                                         .addComponent(jCheckBoxSplitPdbOptCustomModel)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jTextFieldCustomModel, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(50, 50, 50))
-                                    .addGroup(jPanelMainContentLayout.createSequentialGroup()
-                                        .addComponent(jCheckBoxSplitPdbOptAllowOverwrite)
-                                        .addGap(0, 0, Short.MAX_VALUE)))
-                                .addGap(13, 13, 13))
+                                        .addComponent(jTextFieldCustomModel, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(jCheckBoxDeleteSplitAfterDsspRun))
+                                .addGap(63, 63, 63))
                             .addGroup(jPanelMainContentLayout.createSequentialGroup()
                                 .addComponent(jLabelSplitPdbCommand)
                                 .addGap(18, 18, 18)
-                                .addComponent(jScrollPaneSplitPdbCmd))
+                                .addComponent(jScrollPaneSplitPdbCmd, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE))
                             .addGroup(jPanelMainContentLayout.createSequentialGroup()
                                 .addComponent(jCheckBoxSplitPdbOptCustomOutfile)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextFieldSplitPdbCustomOutfile))))
+                                .addComponent(jTextFieldSplitPdbCustomOutfile, javax.swing.GroupLayout.DEFAULT_SIZE, 446, Short.MAX_VALUE))))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanelMainContentLayout.createSequentialGroup()
                         .addComponent(jLabelDsspInputPdbFile)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -293,7 +296,9 @@ public class VpgGenerateDsspFileFrame extends javax.swing.JFrame implements Item
                     .addComponent(jCheckBoxSplitPdbOptCustomModel)
                     .addComponent(jTextFieldCustomModel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jCheckBoxSplitPdbOptAllowOverwrite)
+                .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jCheckBoxSplitPdbOptAllowOverwrite)
+                    .addComponent(jCheckBoxDeleteSplitAfterDsspRun))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jCheckBoxSplitPdbOptCustomOutfile)
@@ -348,7 +353,7 @@ public class VpgGenerateDsspFileFrame extends javax.swing.JFrame implements Item
             .addGroup(jPanelStatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanelStatusLayout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(jLabelStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabelStatus, javax.swing.GroupLayout.DEFAULT_SIZE, 16, Short.MAX_VALUE)
                     .addGap(1, 1, 1)))
         );
 
@@ -518,6 +523,24 @@ public class VpgGenerateDsspFileFrame extends javax.swing.JFrame implements Item
             System.out.println(Settings.getApptag() + "Not running " + program + ".");
         }
         
+        // Delete tmp splitppb output file if both programs were run successfully and the user asked for it
+        if(runSplitPDB && runDSSP) {
+            if( (! splitPdbRunFailed) && (! dsspRunFailed) ) {
+                if(this.jCheckBoxDeleteSplitAfterDsspRun.isSelected()) {
+                    File tmpSplitPdbOutput = new File(this.getOutputFileSplitPDB());
+                    if(tmpSplitPdbOutput.isFile() && tmpSplitPdbOutput.canWrite()) {
+                        if(tmpSplitPdbOutput.delete()) {
+                            System.out.println(Settings.getApptag() + "Deleted temporary PDB file created by SplitPDB.");
+                            resText += "Deleted temporary PDB file created by SplitPDB at '" + this.getOutputFileSplitPDB() + "'.";
+                        } else {
+                            System.err.println(Settings.getApptag() + "WARNING: Could not delete temporary PDB file created by SplitPDB at '" + this.getOutputFileSplitPDB() + "'.");
+                            resText += "WARNING: Could not delete temporary PDB file created by SplitPDB at '" + this.getOutputFileSplitPDB() + "'.";
+                        }
+                        this.jTextAreaResults.setText(resText);
+                    }
+                }
+            }
+        }
         
         this.jButtonRun.setEnabled(false);
         //this.checkInput();
@@ -719,12 +742,20 @@ public class VpgGenerateDsspFileFrame extends javax.swing.JFrame implements Item
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 this.jCheckBoxSplitPdbOptAllowOverwrite.setEnabled(true);
                 this.jCheckBoxSplitPdbOptCustomModel.setEnabled(true);
-                this.jCheckBoxSplitPdbOptCustomOutfile.setEnabled(true);
+                this.jCheckBoxSplitPdbOptCustomOutfile.setEnabled(true);                                
                 this.jTextFieldDsspInputPdbFile.setText("<The SplitPDB output file>");
+                
+                if(this.jCheckBoxDsspOptRun.isSelected()) {
+                    this.jCheckBoxDeleteSplitAfterDsspRun.setEnabled(true);
+                } else {
+                    this.jCheckBoxDeleteSplitAfterDsspRun.setEnabled(false);
+                }
+                
             } else if(e.getStateChange() == ItemEvent.DESELECTED) {
                 this.jCheckBoxSplitPdbOptAllowOverwrite.setEnabled(false);
                 this.jCheckBoxSplitPdbOptCustomModel.setEnabled(false);
                 this.jCheckBoxSplitPdbOptCustomOutfile.setEnabled(false);
+                this.jCheckBoxDeleteSplitAfterDsspRun.setEnabled(false);
                 this.jTextFieldDsspInputPdbFile.setText("<The PDB file defined above>");
             }             
             this.jTextFieldDsspInputPdbFile.setToolTipText("Currently '" + this.determineDsspInputFile() + "'.");
@@ -735,15 +766,18 @@ public class VpgGenerateDsspFileFrame extends javax.swing.JFrame implements Item
                 this.jCheckBoxCustomDsspOutputPath.setEnabled(true);                
                 
                 if(this.jCheckBoxSplitPdbOptRun.isSelected()) {
+                    this.jCheckBoxDeleteSplitAfterDsspRun.setEnabled(true);
                     this.jTextFieldDsspInputPdbFile.setText("<The SplitPDB output file>");
                 } else {
+                    this.jCheckBoxDeleteSplitAfterDsspRun.setEnabled(false);
                     this.jTextFieldDsspInputPdbFile.setText("<The PDB file defined above>");
                 }
                 this.jTextFieldDsspInputPdbFile.setToolTipText("Currently '" + this.determineDsspInputFile() + "'.");
             } else if(e.getStateChange() == ItemEvent.DESELECTED) {
                 this.jCheckBoxCustomDsspOutputPath.setEnabled(false); 
                 this.jTextFieldDsspInputPdbFile.setText("<Not applicable, not runnning DSSP>");
-                this.jTextFieldDsspInputPdbFile.setToolTipText("Currently not used.");                
+                this.jTextFieldDsspInputPdbFile.setToolTipText("Currently not used.");   
+                this.jCheckBoxDeleteSplitAfterDsspRun.setEnabled(false);
             }                                     
         }
         else if(source == this.jCheckBoxSplitPdbOptCustomOutfile) {
@@ -908,6 +942,7 @@ public class VpgGenerateDsspFileFrame extends javax.swing.JFrame implements Item
     private javax.swing.JButton jButtonRun;
     private javax.swing.JButton jButtonSelectPpdInputFile;
     private javax.swing.JCheckBox jCheckBoxCustomDsspOutputPath;
+    private javax.swing.JCheckBox jCheckBoxDeleteSplitAfterDsspRun;
     private javax.swing.JCheckBox jCheckBoxDsspOptRun;
     private javax.swing.JCheckBox jCheckBoxInputPdbFileIsGzipped;
     private javax.swing.JCheckBox jCheckBoxSplitPdbOptAllowOverwrite;
