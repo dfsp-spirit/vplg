@@ -177,7 +177,7 @@ public class Settings {
      * @return the version string
      */
     public static String getVersion() {
-        return("0.12");
+        return("0.13");
     }
     
     

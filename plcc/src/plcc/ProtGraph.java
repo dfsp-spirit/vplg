@@ -195,7 +195,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
         Integer [] numInOldGraph;
         Integer numVerticesAdded;
         Integer numEdgesAdded;
-        FoldingGraph tpg;
+        FoldingGraph fg;
         for(Integer i = 0; i <= conCompNum; i++) {
             numVerticesAdded = 0;
             numEdgesAdded = 0;
@@ -225,7 +225,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
             }
             // Ok, we got the SSEs. Now create the graph.
             if(tmpSSEList.size() < 1) { continue; }
-            tpg = new FoldingGraph(tmpSSEList);
+            fg = new FoldingGraph(tmpSSEList);
 
             // Now add the contacts/edges between the vertices by iterating through the contact matrix of this graph and
             //  translating the indices to the new graph.
@@ -238,7 +238,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
                         // ...we may need to add the contact to the new graph. Only if both vertices of that edge
                         //  are part of the new graph, of course.
                         if(numInNewGraph[k] >= 0 && numInNewGraph[l] >= 0) {
-                            tpg.addContact(numInNewGraph[k], numInNewGraph[l], matrix[k][l]);
+                            fg.addContact(numInNewGraph[k], numInNewGraph[l], matrix[k][l]);
                             numEdgesAdded++;
                         }
                     }
@@ -248,10 +248,10 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
             // All the contacts have been added, the graph is complete. Let's add it to the list.
             //System.out.println("  Found new connected component consisting of " + numVerticesAdded + "/" + tpg.numVertices() + " vertices and " + numEdgesAdded + "/" + tpg.numEdges() + " edges:");
             //tpg.print();
-            tpg.declareFoldingGraphOf(this); // Each connected component of a protein graph is a folding graph
-            tpg.setInfo(this.pdbid, this.chainid, this.graphType);
-            tpg.setFoldingGraphNumber(i);
-            conComps.add(tpg);
+            fg.declareFoldingGraphOf(this); // Each connected component of a protein graph is a folding graph
+            fg.setInfo(this.pdbid, this.chainid, this.graphType);
+            fg.setFoldingGraphNumber(i);
+            conComps.add(fg);
         }
         
         this.connectedComponents = conComps;

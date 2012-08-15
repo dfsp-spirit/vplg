@@ -592,6 +592,47 @@ public class Main {
                     }
                     
                     
+                    if(s.equals("-O") || s.equals("--outputformats")) {
+                        if(args.length <= i+1 ) {
+                            syntaxError();
+                        }
+                        else {
+                            
+                            // If the user specifies the graph output formats manually, all those
+                            // which are NOT listed default to 'off':                                                        
+                            Settings.set("plcc_B_output_GML", "false");
+                            Settings.set("plcc_B_output_TGF", "false");
+                            Settings.set("plcc_B_output_DOT", "false");
+                            
+                            // Now add the listed ones back:
+                            String types = args[i+1].toLowerCase();
+                            
+                            if(types.equals("x")) {
+                                // Do nothing more, x means the user wants none of the extra formats, so
+                                //  only the PLCC format will be used
+                            } else {
+                            
+                                Integer nv = 0; // number of valid folding graph identifiers
+
+                                if(types.contains("g")) { Settings.set("plcc_B_output_GML", "true"); nv++; }
+                                if(types.contains("t")) { Settings.set("plcc_B_output_TGF", "true"); nv++; }
+                                if(types.contains("d")) { Settings.set("plcc_B_output_DOT", "true"); nv++; }
+
+                                // sanity check
+                                if(nv != types.length()) {
+                                    System.err.println("WARNING: List of folding graph notations given on command line '" + types + "' contains invalid chars (" + types.length() + " given, " + nv + " valid).");
+                                    System.err.println("WARNING: Valid chars: 'a' => alpha, 'b' => beta, 'c' => albe, 'd' => alphalig, 'e' => betalig, 'f' => albelig. Example: '-g ace'");
+
+                                    if(nv <= 0) {
+                                        syntaxError();
+                                    }
+                                }
+                            }
+                        }
+                        
+                    }
+                    
+                    
                     
 
                     if(s.equals("--debug") || s.equals("-D")) {
@@ -1540,7 +1581,7 @@ public class Main {
 
                 if(Settings.getBoolean("plcc_B_draw_graphs")) {
 
-                    fgFile = outputDir + System.getProperty("file.separator") + "graph_" + pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + "_" + nt + ".png"; //Settings.get("plcc_S_img_output_fileext");
+                    fgFile = outputDir + System.getProperty("file.separator") + pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + "_" + nt + ".png"; //Settings.get("plcc_S_img_output_fileext");
                     if(fg.drawFoldingGraph(nt, fgFile)) {
                         System.out.println("         -Folding graph #" + j + " of the " + pg.getGraphType() + " graph of chain " + pg.getChainid() + " written to file '" + fgFile + "' in " + nt + " notation.");
                     }
@@ -3105,6 +3146,7 @@ public class Main {
         System.out.println("-M | --similar <p> <c> <g> : find the proteins which are most similar to pdbid <p> chain <c> graph type <g> in the database.");
         System.out.println("-n | --textfiles           : write meta data, debug info and interim results like residue contacts to text files (slower)");
         System.out.println("-o | --outputdir <dir>     : write output files to directory <dir> (instead of '.', the current directory)");
+        System.out.println("-O | --outputformats <list>: write only graph output formats in <list>, where g=GML, t=TGF, d=DOT language. Specify 'x' for none (only PLCC format).");
         System.out.println("-p | --pdbfile <pdbfile>   : use input PDB file <pdbfile> (instead of assuming '<pdbid>.pdb')");
         System.out.println("     --gz-pdbfile <f>      : use gzipped input PDB file <f>.");
         System.out.println("-q | --fg-notations <list> : draw only the folding graph notations in <list>, e.g. 'kars' = KEY, ADJ, RED and SEQ.");

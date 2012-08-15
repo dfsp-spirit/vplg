@@ -154,8 +154,9 @@ public class VpgMainFrame extends javax.swing.JFrame {
         jMenuEdit = new javax.swing.JMenu();
         jMenuItemSettings = new javax.swing.JMenuItem();
         jMenuHelp = new javax.swing.JMenu();
-        jMenuItemAbout = new javax.swing.JMenuItem();
+        jMenuItemHelp = new javax.swing.JMenuItem();
         jMenuManual = new javax.swing.JMenuItem();
+        jMenuItemAbout = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("VPG -- Frontend for Visualization of Protein Ligand Graphs");
@@ -178,7 +179,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
             .addComponent(jStatusLabel)
         );
 
-        jLabelWelcomeText1.setFont(new java.awt.Font("Dialog", 1, 14));
+        jLabelWelcomeText1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         jLabelWelcomeText1.setText("Welcome to the Visualization of Protein Ligand Graphs software.");
 
         jLabelWelcomeLogo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -312,15 +313,15 @@ public class VpgMainFrame extends javax.swing.JFrame {
         jMenuHelp.setMnemonic('h');
         jMenuHelp.setText("Help");
 
-        jMenuItemAbout.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
-        jMenuItemAbout.setMnemonic('a');
-        jMenuItemAbout.setText("About");
-        jMenuItemAbout.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItemHelp.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F1, 0));
+        jMenuItemHelp.setMnemonic('h');
+        jMenuItemHelp.setText("Help");
+        jMenuItemHelp.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemAboutActionPerformed(evt);
+                jMenuItemHelpActionPerformed(evt);
             }
         });
-        jMenuHelp.add(jMenuItemAbout);
+        jMenuHelp.add(jMenuItemHelp);
 
         jMenuManual.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
         jMenuManual.setMnemonic('o');
@@ -331,6 +332,16 @@ public class VpgMainFrame extends javax.swing.JFrame {
             }
         });
         jMenuHelp.add(jMenuManual);
+
+        jMenuItemAbout.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItemAbout.setMnemonic('a');
+        jMenuItemAbout.setText("About");
+        jMenuItemAbout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemAboutActionPerformed(evt);
+            }
+        });
+        jMenuHelp.add(jMenuItemAbout);
 
         jMenuBar.add(jMenuHelp);
 
@@ -500,6 +511,11 @@ public class VpgMainFrame extends javax.swing.JFrame {
         new VpgGenerateDsspFileFrame().setVisible(true);
     }//GEN-LAST:event_jMenuItemGenerateDsspFileActionPerformed
 
+    private void jMenuItemHelpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemHelpActionPerformed
+        
+        new VpgHelpFrame().setVisible(true);
+    }//GEN-LAST:event_jMenuItemHelpActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -558,6 +574,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItemDownloadFiles;
     private javax.swing.JMenuItem jMenuItemExit;
     private javax.swing.JMenuItem jMenuItemGenerateDsspFile;
+    private javax.swing.JMenuItem jMenuItemHelp;
     private javax.swing.JMenuItem jMenuItemOpenImage;
     private javax.swing.JMenuItem jMenuItemSettings;
     private javax.swing.JMenuItem jMenuManual;

@@ -2180,7 +2180,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     
     
     
-        /**
+    /**
      * Draws the protein graph image of this graph, writing the image in PNG format to the file 'filePath' (which should maybe end in ".png").
      * If 'nonProteinGraph' is true, this graph is considered a custom (=non-protein) graph and the color coding for vertices and edges is NOT used.
      * In that case, the graph is drawn black and white and the labels for the N- and C-termini are NOT drawn.
@@ -2241,7 +2241,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             // ------------------------- Draw header -------------------------
 
             // check width of header string
-            String proteinHeader = "The " + this.graphType + " graph of PDB entry " + this.pdbid + ", chain " + this.chainid + " [V=" + this.numVertices() + ", E=" + this.numSSEContacts() + "].";
+            String proteinHeader = "The " + this.graphType + " protein graph of PDB entry " + this.pdbid + ", chain " + this.chainid + " [V=" + this.numVertices() + ", E=" + this.numSSEContacts() + "].";
             //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
             Integer stringHeight = fontMetrics.getAscent();
             String sseNumberSeq;    // the SSE number in the primary structure, N to C terminus
@@ -2422,7 +2422,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             
 
         } catch (Exception e) {
-            System.err.println("WARNING: Could not write image file for protein graph to file '" + filePath + "'.");
+            System.err.println("WARNING: Could not write image file for protein graph to file '" + filePath + "':" + e.getMessage() + "'.");
             return(false);
         }
 
@@ -2848,6 +2848,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         this.metadata.put("pdbid", pdbid);
         this.metadata.put("chainid", chainid);
         this.metadata.put("graphtype", graphType);
+        this.metadata.put("graphclass", "protein graph");
     }
     
     

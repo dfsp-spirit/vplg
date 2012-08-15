@@ -190,8 +190,8 @@ public class Settings {
         defSet("plcc_I_img_legend_font_size", "18", "The legend font size used in output images.");        
         defSet("plcc_I_img_text_line_height", "40", "The vertical distance between two lines of text in the image, e.g., in the footer.");
         
-        defSet("plcc_I_img_minPageWidth", "640", "The minimum image width in pixels, used in output images.");                                        
-        defSet("plcc_I_img_minPageHeight", "480", "The minimum image height in pixels, used in output images.");
+        defSet("plcc_I_img_minPageWidth", "800", "The minimum image width in pixels, used in output images.");                                        
+        defSet("plcc_I_img_minPageHeight", "600", "The minimum image height in pixels, used in output images.");
 
         // Folding graphs: "KEY", "ADJ", "RED", "SEQ
         defSet("plcc_B_folding_graphs", "false", "Determines whether folding graphs (connected components of the protein graph) are handled (calculated and drawn).");
