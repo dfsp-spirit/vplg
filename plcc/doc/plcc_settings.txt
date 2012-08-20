@@ -87,7 +87,7 @@ plcc_S_img_default_font=TimesRoman
 # plcc_I_search_similar_num_results: Used only when plcc_B_search_similar is true. The number of results to print (e.g., 3 for the 3 most similar proteins in the DB).
 plcc_I_search_similar_num_results=5
 
-# plcc_B_force_chain: Whether to force parsing a certain PDB chain
+# plcc_B_force_chain: Whether to force parsing only a certain PDB chain
 plcc_B_force_chain=false
 
 # plcc_S_forced_chain_id: The forced chain ID, only used when plcc_B_force_chain is true
@@ -98,6 +98,9 @@ plcc_I_lig_min_atoms=1
 
 # plcc_S_db_username: DB username
 plcc_S_db_username=vplg
+
+# plcc_B_output_DOT: Whether to save computed protein graphs to text files in DOT language Format (DOT).
+plcc_B_output_DOT=true
 
 # plcc_S_ligAACode: The amino acid code used to mark a ligand residue
 plcc_S_ligAACode=J
@@ -138,8 +141,8 @@ plcc_I_img_legend_font_size=18
 # plcc_S_debug_compareSSEContactsFile: The path to the geo.dat file to use for SSE level contact comparison.
 plcc_S_debug_compareSSEContactsFile=geo.dat_ptgl
 
-# plcc_S_img_output_fileext: file extension of output images (should fit plcc_S_img_output_format more or less, e.g. '.png', '.svg')
-plcc_S_img_output_fileext=.svg
+# plcc_S_img_output_fileext: file extension of output images (should fit plcc_S_img_output_format more or less, e.g. '.png', '.jpg')
+plcc_S_img_output_fileext=.png
 
 # plcc_S_search_similar_PDBID: Used only when plcc_B_search_similar is true. The protein PDB ID to use as a pattern during the similarity search.
 plcc_S_search_similar_PDBID=8icd
@@ -168,8 +171,11 @@ plcc_S_db_host=127.0.0.1
 # plcc_I_img_vert_radius: The radius of a vertex in the output image, in pixels
 plcc_I_img_vert_radius=10
 
-# plcc_S_img_output_format: image output format (valid options: 'PNG', 'SVG')
-plcc_S_img_output_format=SVG
+# plcc_S_img_output_format: image output format (valid options: 'PNG', 'JPG')
+plcc_S_img_output_format=PNG
+
+# plcc_B_split_dsspfile_warning: Whether to show a warning about splitting the DSSP file when multiple models are detected in a PDB file.
+plcc_B_split_dsspfile_warning=true
 
 # plcc_B_ptgl_text_output: Whether the PTGL text files (e.g., those required by the bet_neo) are written. Not writing them is faster but this program cannot replace the PTGL tool 'geom_neo' anymore if this is deactivated.
 plcc_B_ptgl_text_output=false
@@ -189,7 +195,7 @@ plcc_I_img_margin_bottom=40
 # plcc_I_spatrel_dd_smallest_parallel_ee: All values >= the one given here are considered parallel. This is for E/E (strand/strand) interactions. Note that the range in between these 2 values is considered mixed (none in the case of E/E).
 plcc_I_spatrel_dd_smallest_parallel_ee=1
 
-# plcc_S_coilSSECode: The amino acid code used to mark a ligand residue
+# plcc_S_coilSSECode: The amino acid code used to mark a coiled region residue
 plcc_S_coilSSECode=C
 
 # plcc_B_search_similar: Whether to activate the program mode which searches for the most similar protein

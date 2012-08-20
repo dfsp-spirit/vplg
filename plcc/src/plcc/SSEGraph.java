@@ -2924,6 +2924,75 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         return(s);
     }
     
+    
+    /**
+     * Generates a string representation of this graph which is similart to the Tops+ string as described in: Mallika Veeramalai and David Gilbert.
+     * "A Novel Method for Comparing Topological Models of Protein Structures Enhanced with Ligand Information"
+     * Bioinformatics, (2008), 24(23):2698-2705; doi:10.1093/bioinformatics/btn518
+     * @return a string representation of this graph
+     * 
+     */
+    public String getGraphPlusString() {
+        String graphString = "";
+        SSE sse, contactSSE;
+        String contactType;
+        
+        for(Integer i = 0; i < this.size; i++) {
+            sse = this.getSSEBySeqPosition(i);
+            
+            // the SSE itself, format: <SSE_type>[<dssp_start>-<length_in_residues>]
+            graphString += sse.getSseType() + "[" + sse.getStartDsspNum() + "-" + sse.getLength() + "]";
+            
+            // contacts for this SSE, format: (<distance_between_SSEs><spatial_relation>,<other_sse_type>=<sse_or_ligand_name>)
+            HashMap<Integer, String> contacts = this.getAllSpatialContactsForSSE(i);
+            for(Integer otherSSEIndex : contacts.keySet()) {
+                contactType = contacts.get(otherSSEIndex);
+                graphString += "(" + ((otherSSEIndex + 1) - (i + 1)) + contactType + ":";
+                contactSSE = this.sseList.get(otherSSEIndex);
+                if(contactSSE.isLigandSSE()) {
+                    graphString += "L=" + contactSSE.getLigandName3() + ")";
+                } else {
+                    graphString += "S=" + contactSSE.getSseType() + ")";
+                }
+            }
+            
+            if(i < (this.size - 1)) {
+                graphString += ",";
+            }
+        }
+        
+        return graphString;        
+    }
+    
+    
+    /**
+     * Returns all contacts for the SSE at the given index.
+     * @param sseIndex the index of the SSE
+     * @return the contacts as a HashMap. Keys are indices of SSEs that the SSE at 'sseIndex' is in contact with, values are their spatial relation (as a SpatRel string).
+     */
+    public HashMap<Integer, String> getAllSpatialContactsForSSE(Integer sseIndex) {
+        HashMap<Integer, String> contacts = new HashMap<Integer, String>();
+        
+        for(Integer i=0; i < this.size; i++) {
+            if(this.containsEdge(sseIndex, i) && sseIndex != i) {
+                contacts.put(i, this.getContactTypeString(sseIndex, i));
+            }
+        }
+        
+        return(contacts);
+    }
+    
+    
+    /**
+     * Returns the contact type string for the contact between the SSEs with indices i and j.
+     * @param i index of the first SSE
+     * @param j index of the second SSE
+     * @return the spatial relation of i and j, as a SpatRel String
+     */
+    public String getContactTypeString(Integer i, Integer j) {
+        return(SpatRel.getString(this.matrix[i][j]));
+    }
+    
     /**
      * Returns the SSEString of the graph in spatial order if this graph has such an order, e.g., "HHEHEHEHEHEHHEEHL".
      * @return the SSEString in spatial order or the empty string "" if no such order exists for this graph

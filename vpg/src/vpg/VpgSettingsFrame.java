@@ -50,6 +50,8 @@ public class VpgSettingsFrame extends javax.swing.JFrame implements DocumentList
         this.jTextFieldPathDssp.getDocument().addDocumentListener(this);
         this.jTextFieldPathPlccJar.getDocument().addDocumentListener(this);
         this.jTextFieldPathSplitPDBJar.getDocument().addDocumentListener(this);
+        this.jTextFieldPdbDownloadUrl.getDocument().addDocumentListener(this);
+        this.jTextFieldDsspDownloadUrl.getDocument().addDocumentListener(this);
         
         // set database settings, they are parsed from the plcc config file
         parsePlccConfig();        
@@ -139,6 +141,36 @@ public class VpgSettingsFrame extends javax.swing.JFrame implements DocumentList
             System.err.println(Settings.getApptag() + "WARNING: PLCC config file at '" + plccConfig.getAbsolutePath() + "' does not exist or is not readable.");
         }
         
+        String downloadUrlPDB = this.jTextFieldPdbDownloadUrl.getText();
+        if(downloadUrlPDB.startsWith("http://") || downloadUrlPDB.startsWith("ftp://")) {
+            
+            if(downloadUrlPDB.contains("<PDBID>")) {
+                this.jTextFieldPdbDownloadUrl.setBackground(Color.WHITE);
+            } else {
+                this.jTextFieldPdbDownloadUrl.setBackground(Color.ORANGE);
+                System.err.println(Settings.getApptag() + "WARNING: PDB download URL does not contain <PDBID> placeholder.");
+            }    
+            
+        } else {
+            this.jTextFieldPdbDownloadUrl.setBackground(Color.ORANGE);
+            System.err.println(Settings.getApptag() + "WARNING: PDB download URL should start with 'http://' or 'ftp://'.");
+        }
+        
+                        
+        String downloadUrlDSSP = this.jTextFieldDsspDownloadUrl.getText();
+        if(downloadUrlDSSP.startsWith("http://") || downloadUrlDSSP.startsWith("ftp://")) {
+            
+            if(downloadUrlDSSP.contains("<DSSPID>")) {
+                this.jTextFieldDsspDownloadUrl.setBackground(Color.WHITE);
+            } else {
+                this.jTextFieldDsspDownloadUrl.setBackground(Color.ORANGE);
+                System.err.println(Settings.getApptag() + "WARNING: DSSP download URL does not contain <DSSPID> placeholder.");
+            }    
+            
+        } else {
+            this.jTextFieldDsspDownloadUrl.setBackground(Color.ORANGE);
+            System.err.println(Settings.getApptag() + "WARNING: DSSP download URL should start with 'http://' or 'ftp://'.");
+        }
         
     }
 
@@ -237,13 +269,12 @@ public class VpgSettingsFrame extends javax.swing.JFrame implements DocumentList
         jButtonParsePlccConfigDB = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("VPG Settings");
-        setName("frameSettings");
+        setName("frameSettings"); // NOI18N
         setPreferredSize(new java.awt.Dimension(600, 500));
         getContentPane().setLayout(new java.awt.GridLayout(1, 0));
 
-        jTabbedPaneSettings.setToolTipText("Shows Paths settings.");
+        jTabbedPaneSettings.setToolTipText("");
         jTabbedPaneSettings.setName("Internet"); // NOI18N
         jTabbedPaneSettings.setNextFocusableComponent(jPanelSettingsGeneral);
 
@@ -326,10 +357,10 @@ public class VpgSettingsFrame extends javax.swing.JFrame implements DocumentList
                 .addContainerGap())
         );
 
-        jTabbedPaneSettings.addTab("General", null, jPanelSettingsGeneral, "Shows general settings.");
+        jTabbedPaneSettings.addTab("General", null, jPanelSettingsGeneral, "");
         jPanelSettingsGeneral.getAccessibleContext().setAccessibleName("General");
 
-        jPanelSettingsPaths.setToolTipText("Shows path settings.");
+        jPanelSettingsPaths.setToolTipText("");
         jPanelSettingsPaths.setName("Paths"); // NOI18N
         jPanelSettingsPaths.setNextFocusableComponent(jPanelSettingsInternet);
 
@@ -443,7 +474,7 @@ public class VpgSettingsFrame extends javax.swing.JFrame implements DocumentList
                 .addContainerGap())
         );
 
-        jTabbedPaneSettings.addTab("Applications", null, jPanelSettingsPaths, "Shows path settings.");
+        jTabbedPaneSettings.addTab("Applications", null, jPanelSettingsPaths, "");
         jPanelSettingsPaths.getAccessibleContext().setAccessibleName("Internet");
 
         jPanelSettingsInternet.setName("Internet"); // NOI18N
@@ -521,48 +552,48 @@ public class VpgSettingsFrame extends javax.swing.JFrame implements DocumentList
 
         jTabbedPaneSettings.addTab("Web services", null, jPanelSettingsInternet, "");
         jPanelSettingsInternet.getAccessibleContext().setAccessibleName("Internet");
-        jPanelSettingsInternet.getAccessibleContext().setAccessibleDescription("Shows internet settings.");
+        jPanelSettingsInternet.getAccessibleContext().setAccessibleDescription("Shows settings.");
 
         jLabelDatabaseHost.setText("PostgreSQL Database server (IP address or hostname):");
 
-        jTextFieldDatabaseHost.setBackground(new java.awt.Color(200, 200, 200));
         jTextFieldDatabaseHost.setEditable(false);
+        jTextFieldDatabaseHost.setBackground(new java.awt.Color(200, 200, 200));
         jTextFieldDatabaseHost.setText("127.0.0.1");
         jTextFieldDatabaseHost.setToolTipText("Database server IP or hostname, e.g., 127.0.0.1 or pgsql.mydomain.edu");
 
         jLabelDatabasePort.setText("Database port (PostgreSQL default is 5432):");
 
-        jTextFieldDatabasePort.setBackground(new java.awt.Color(200, 200, 200));
         jTextFieldDatabasePort.setEditable(false);
+        jTextFieldDatabasePort.setBackground(new java.awt.Color(200, 200, 200));
         jTextFieldDatabasePort.setText("5432");
         jTextFieldDatabasePort.setToolTipText("Database port, PostgreSQL uses 5432 by default.");
 
         jLabelDatabaseName.setText("Database name:");
 
-        jTextFieldDatabaseName.setBackground(new java.awt.Color(200, 200, 200));
         jTextFieldDatabaseName.setEditable(false);
+        jTextFieldDatabaseName.setBackground(new java.awt.Color(200, 200, 200));
         jTextFieldDatabaseName.setText("vplg");
         jTextFieldDatabaseName.setToolTipText("The name of the database you created for VPLG.");
 
         jLabelDatabaseUsername.setText("Database username:");
 
-        jTextFieldDatabaseUsername.setBackground(new java.awt.Color(200, 200, 200));
         jTextFieldDatabaseUsername.setEditable(false);
+        jTextFieldDatabaseUsername.setBackground(new java.awt.Color(200, 200, 200));
         jTextFieldDatabaseUsername.setText("vplg");
         jTextFieldDatabaseUsername.setToolTipText("The database username for VPLG.");
 
         jLabelDatabasePassword.setText("Database password:");
 
-        jTextFieldDatabasePassword.setBackground(new java.awt.Color(200, 200, 200));
         jTextFieldDatabasePassword.setEditable(false);
+        jTextFieldDatabasePassword.setBackground(new java.awt.Color(200, 200, 200));
         jTextFieldDatabasePassword.setToolTipText("The database password for the user given above.");
 
         jLabelNoteParsedFromConfigFile.setText("These settings are always read from the plcc configuration file at:");
 
         jLabelNoteParsedFromConfigFile2.setText("Edit that file to change them. Also note that you will need to create DB structure");
 
-        jTextFieldConfigfilePlcc.setBackground(new java.awt.Color(200, 200, 200));
         jTextFieldConfigfilePlcc.setEditable(false);
+        jTextFieldConfigfilePlcc.setBackground(new java.awt.Color(200, 200, 200));
         jTextFieldConfigfilePlcc.setText("/home/ts/.plcc_settings");
         jTextFieldConfigfilePlcc.setToolTipText("The path to the PLCC configuration file.");
 

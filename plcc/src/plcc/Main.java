@@ -1496,6 +1496,9 @@ public class Main {
                     }
                 }
                 
+                if(Settings.getInteger("plcc_I_debug_level") > 0) {
+                    System.out.println("      Graph plus string is '" + pg.getGraphPlusString() + "'.");
+                }
 
                 /* ----------------------------------------------- Folding graphs ---------------------------------------------- */
 
@@ -1511,7 +1514,7 @@ public class Main {
                 //ArrayList<Set<Integer>> mcs = pg.getMaximalCliques();
                 //for(Set s : mcs) {
                 //    System.out.println("  Found maximal clique of size " + s.size() + ".");
-                //}            
+                //}
                 
             }
             System.out.println("  +++++ All " + graphTypes.size() + " protein graphs of chain " + c.getPdbChainID() + " handled. +++++");

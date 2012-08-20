@@ -20,7 +20,10 @@ After unpacking the release archive, all tools can be run directly from the resu
 
 
 To start the graphical user interface on a GUI system with properly installed Java, simply double-click the file 'vpg.jar'.
-  
+
+(If the JAR file does not run at all or gets opened in some other application like an archiver, you need to edit the program 
+associated with the '.jar' file extension in your operating system or desktop environment. The program should be 'java' and the
+command should be something like 'java -jar %f'.)
 
 Note that the programs require the libraries in the lib/, relative to their path. So if you copy them elsewhere, you
 gotta copy the lib/ directory there as well.

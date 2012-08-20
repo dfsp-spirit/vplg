@@ -34,7 +34,6 @@ public class VpgHelpFrame extends javax.swing.JFrame {
         jScrollPaneHelpInfo = new javax.swing.JScrollPane();
         jTextAreaHelpInfo = new javax.swing.JTextArea();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("VPG -- Help");
 
         jLabelHelp.setText("Getting help for VPG");

@@ -72,7 +72,8 @@ public class VpgMainFrame extends javax.swing.JFrame {
     
     /**
      * Simple helper function that determines whether basic settings are ok. Used for status bar
-     * notification of broken settings.
+     * notification of broken settings. Checks input path, output path and the plcc.jar file. Ignores
+     * splitpdb.jar and dsspcmbi.
      * @return true if the essential stuff is configured correctly, false otherwise.
      */
     public Boolean essentialSettingsOK() {
@@ -143,6 +144,8 @@ public class VpgMainFrame extends javax.swing.JFrame {
         jLabelWelcomeTextWhatsup = new javax.swing.JLabel();
         jComboBoxTasks = new javax.swing.JComboBox();
         jButtonStartTask = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         jMenuBar = new javax.swing.JMenuBar();
         jMenuFile = new javax.swing.JMenu();
         jMenuItemCreateGraphs = new javax.swing.JMenuItem();
@@ -172,7 +175,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
         jStatusBarPanel.setLayout(jStatusBarPanelLayout);
         jStatusBarPanelLayout.setHorizontalGroup(
             jStatusBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 681, Short.MAX_VALUE)
+            .addComponent(jStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jStatusBarPanelLayout.setVerticalGroup(
             jStatusBarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -197,6 +200,10 @@ public class VpgMainFrame extends javax.swing.JFrame {
             }
         });
 
+        jLabel1.setText("VPLG allows you to compute, visualize and save protein ligand graphs for protein structure analysis.");
+
+        jLabel2.setText("It computes these graphs based on 3D atom coordinates from PDB files and SSE assignments from DSSP files.");
+
         javax.swing.GroupLayout jPanelMainContentLayout = new javax.swing.GroupLayout(jPanelMainContent);
         jPanelMainContent.setLayout(jPanelMainContentLayout);
         jPanelMainContentLayout.setHorizontalGroup(
@@ -209,10 +216,15 @@ public class VpgMainFrame extends javax.swing.JFrame {
                     .addComponent(jLabelWelcomeText1)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanelMainContentLayout.createSequentialGroup()
                         .addGap(35, 35, 35)
-                        .addComponent(jComboBoxTasks, javax.swing.GroupLayout.PREFERRED_SIZE, 259, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(16, 16, 16)
-                        .addComponent(jButtonStartTask)))
-                .addContainerGap(148, Short.MAX_VALUE))
+                        .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(jPanelMainContentLayout.createSequentialGroup()
+                                .addComponent(jComboBoxTasks, javax.swing.GroupLayout.PREFERRED_SIZE, 259, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(14, 14, 14)
+                                .addComponent(jButtonStartTask)
+                                .addGap(0, 0, Short.MAX_VALUE))))
+                    .addComponent(jLabel2))
+                .addGap(148, 148, 148))
         );
         jPanelMainContentLayout.setVerticalGroup(
             jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -221,13 +233,17 @@ public class VpgMainFrame extends javax.swing.JFrame {
                 .addComponent(jLabelWelcomeText1)
                 .addGap(18, 18, 18)
                 .addComponent(jLabelWelcomeLogo)
-                .addGap(39, 39, 39)
+                .addGap(19, 19, 19)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel2)
+                .addGap(12, 12, 12)
                 .addComponent(jLabelWelcomeTextWhatsup)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButtonStartTask)
-                    .addComponent(jComboBoxTasks, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(68, Short.MAX_VALUE))
+                    .addComponent(jComboBoxTasks, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonStartTask))
+                .addContainerGap(46, Short.MAX_VALUE))
         );
 
         jMenuFile.setMnemonic('f');
@@ -516,10 +532,41 @@ public class VpgMainFrame extends javax.swing.JFrame {
         new VpgHelpFrame().setVisible(true);
     }//GEN-LAST:event_jMenuItemHelpActionPerformed
 
+    
+    private static void usage() {
+        System.out.println(Settings.getApptag() + "USAGE: java -jar vpg.jar [<options>]");
+        System.out.println(Settings.getApptag() + "Starting this program without any options runs the GUI.");
+        System.out.println(Settings.getApptag() + "Valid options:");
+        System.out.println(Settings.getApptag() + "  -h | --help     : show this help screen and exit.");        
+        System.out.println(Settings.getApptag() + "  -v | --version  : show VPG version info and exit.");
+        System.out.println(Settings.getApptag() + "Note that VPG is a GUI application, it requires X11 or something like that.");
+        System.out.println(Settings.getApptag() + "You can run the SPLITPDB and PLCC programs from the command line though.");
+    }
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {                        
+        
+        System.out.println(Settings.getApptag() + "=============== VPG ===============");
+        System.out.println(Settings.getApptag() + "This is free software, it comes WITHOUT ANY WARRANTIES, not even implied warranties.");
+        System.out.println(Settings.getApptag() + "Copyright Tim Schaefer 2012, see http://vplg.sourceforge.net for more info.");
+        
+        if(args.length > 0) {
+            for(Integer i = 0; i < args.length; i++) {
+                
+                if(args[i].equals("-h") || args[i].equals("--help")) {
+                    usage();
+                    System.exit(0);                    
+                }
+                
+                if(args[i].equals("-v") || args[i].equals("--version")) {
+                    System.out.println(Settings.getApptag() + "VPG version: " + Settings.getVersion() + "");
+                    System.exit(0);                    
+                }
+                
+            }
+        }
         
         /*
          * Set the Nimbus look and feel
@@ -561,6 +608,8 @@ public class VpgMainFrame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonStartTask;
     private javax.swing.JComboBox jComboBoxTasks;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabelWelcomeLogo;
     private javax.swing.JLabel jLabelWelcomeText1;
     private javax.swing.JLabel jLabelWelcomeTextWhatsup;

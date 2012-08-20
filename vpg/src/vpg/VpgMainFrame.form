@@ -209,7 +209,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="jStatusLabel" alignment="0" pref="681" max="32767" attributes="0"/>
+              <Component id="jStatusLabel" alignment="0" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
@@ -242,12 +242,19 @@
                       <Component id="jLabelWelcomeText1" alignment="2" min="-2" max="-2" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="-2" pref="35" max="-2" attributes="0"/>
-                          <Component id="jComboBoxTasks" min="-2" pref="259" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
-                          <Component id="jButtonStartTask" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="jLabel1" alignment="1" max="32767" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="jComboBoxTasks" min="-2" pref="259" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
+                                  <Component id="jButtonStartTask" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              </Group>
+                          </Group>
                       </Group>
+                      <Component id="jLabel2" alignment="2" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="148" max="32767" attributes="0"/>
+                  <EmptySpace min="-2" pref="148" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -258,14 +265,18 @@
                   <Component id="jLabelWelcomeText1" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="jLabelWelcomeLogo" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="39" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
+                  <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
                   <Component id="jLabelWelcomeTextWhatsup" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jButtonStartTask" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jComboBoxTasks" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jButtonStartTask" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="68" max="32767" attributes="0"/>
+                  <EmptySpace pref="46" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -312,6 +323,16 @@
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonStartTaskActionPerformed"/>
           </Events>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabel1">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="VPLG allows you to compute, visualize and save protein ligand graphs for protein structure analysis."/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabel2">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="It computes these graphs based on 3D atom coordinates from PDB files and SSE assignments from DSSP files."/>
+          </Properties>
         </Component>
       </SubComponents>
     </Container>
