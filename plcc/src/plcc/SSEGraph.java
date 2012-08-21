@@ -1007,8 +1007,12 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     public ArrayList<Integer[]> getEdgeList() {
         ArrayList<Integer[]> edges = new ArrayList<Integer[]>();
         
+        if(this.getSize() < 2) {
+            return edges;
+        }
+        
         for(Integer i = 0; i < this.size; i++) {
-            for(Integer j = 0; j < this.size; j++) {
+            for(Integer j = i+1; j < this.size; j++) {
                 if(this.containsEdge(i, j)) {
                     edges.add(new Integer[] {i, j});
                 }            
@@ -1603,7 +1607,8 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     
     /**
      * Adds a constant backbone of contacts to the SSEs of this graph, i.e., connects the SSEs in sequential order
-     * from the N to the C terminus with contacts of type backbone.
+     * from the N to the C terminus with contacts of type backbone. Note that this function will replace any existing
+     * contacts between consecutive SSEs with contacts of type backbone.
      */
     public void addFullBackboneContacts() {
         if(this.size <= 1) {
@@ -3145,7 +3150,8 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             gmlf += "    source " + src + "\n";
             gmlf += "    target " + tgt + "\n";
             
-            gmlf += "    label \"(" + src + ", " + tgt + ")\"\n";
+            //gmlf += "    label \"(" + src + ", " + tgt + ":" + this.getEdgeLabel(src, tgt) +  ")\"\n";
+            gmlf += "    label \"" + this.getEdgeLabel(src, tgt) +  "\"\n";
             gmlf += "    spatial \"" + this.getEdgeLabel(src, tgt) + "\"\n";
             
             gmlf += endEdge + "\n";
@@ -3169,33 +3175,50 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         String dlf = "graph " + graphLabel + " {\n";
         
         // print the nodes
-        SSE vertex; String shapeModifier;
+        SSE vertex; String shapeModifier, vertColor;
         for(Integer i = 0; i < this.size; i++) {
             
                         
             vertex = this.sseList.get(i);
-            shapeModifier = (vertex.getSseType().equals("E") ? ", shape=box" : "");
-            dlf += "    " + i + " [label=\"" + i + "-" + vertex.getSseType() + "\"" + shapeModifier + "];\n";
+            
+            shapeModifier = "";
+            vertColor = "";
+            if(vertex.getSseType().equals("E")) {
+                shapeModifier = " shape=square";
+                vertColor = " color=black";
+            } else if(vertex.getSseType().equals("H")) {
+                shapeModifier = " shape=circle";
+                vertColor = " color=red";                
+            }  else if(vertex.getSseType().equals("L")) {
+                shapeModifier = " shape=triangle";
+                vertColor = " color=magenta";                
+            } else {
+                shapeModifier = " shape=circle";
+                vertColor = " color=gray";
+            }
+            
+            dlf += "    " + i + " [label=\"" + i + "-" + vertex.getSseType() + "\"" + shapeModifier + vertColor + "];\n";
         }
         
         // print the edges        
         Integer src, tgt;
-        String colorModifier;
+        String colorModifier, lineModifier, edgeLabel;
         ArrayList<Integer[]> edges = this.getEdgeList();
         for(Integer[] edge : edges) {
             src = edge[0];
             tgt = edge[1];
             
-            colorModifier = "";
+            colorModifier = lineModifier = "";
+            edgeLabel = "label=\"" + this.getContactTypeString(src, tgt) + "\"";
             if(this.getContactType(src, tgt) == SpatRel.NONE) { continue; }
-            else if(this.getContactType(src, tgt) == SpatRel.PARALLEL) { colorModifier = " [color=red]"; }
-            else if(this.getContactType(src, tgt) == SpatRel.ANTIPARALLEL) { colorModifier = " [color=blue]"; }
-            else if(this.getContactType(src, tgt) == SpatRel.MIXED) { colorModifier = " [color=green]"; }
-            else if(this.getContactType(src, tgt) == SpatRel.LIGAND) { colorModifier = " [color=pink]"; }
-            else if(this.getContactType(src, tgt) == SpatRel.BACKBONE) { colorModifier = " [color=orange]"; }
-            else { colorModifier = ""; }
+            else if(this.getContactType(src, tgt) == SpatRel.PARALLEL) { colorModifier = " color=red"; }
+            else if(this.getContactType(src, tgt) == SpatRel.ANTIPARALLEL) { colorModifier = " color=blue"; }
+            else if(this.getContactType(src, tgt) == SpatRel.MIXED) { colorModifier = " color=green"; }
+            else if(this.getContactType(src, tgt) == SpatRel.LIGAND) { colorModifier = " color=magenta"; }
+            else if(this.getContactType(src, tgt) == SpatRel.BACKBONE) { colorModifier = " color=orange"; lineModifier = " style=dotted"; }
+            else { colorModifier = " color=gray"; lineModifier=""; edgeLabel=""; }
                                         
-            dlf += "    " + src + " -- " + tgt + colorModifier + ";\n";                        
+            dlf += "    " + src + " -- " + tgt + " [" + edgeLabel + colorModifier + lineModifier + "]" + ";\n";                        
         }
         
         

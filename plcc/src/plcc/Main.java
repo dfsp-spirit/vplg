@@ -1759,6 +1759,7 @@ public class Main {
 
         
         if(Settings.getBoolean("plcc_B_forceBackboneContacts")) {
+            System.out.println("      Adding backbone contacts to consecutive SSEs of the " + graphType + " graph.");
             pg.addFullBackboneContacts();            
         }
 
