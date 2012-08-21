@@ -23,6 +23,7 @@ public class SpatRel {
     public static Integer PARALLEL = 2;             // parallel
     public static Integer ANTIPARALLEL = 3;         // antiparallel
     public static Integer LIGAND = 4;               // ligand (no direction, no spatial relations not aplicable)
+    public static Integer BACKBONE = 5;             // backbone (sequential N to C terminus)
 
     /** 
      * Returns the String representation for a contact with Integer id 'i'. Each string representation is a single
@@ -43,6 +44,9 @@ public class SpatRel {
         }
         else if(i.equals(LIGAND)) {
             return("l");
+        }
+        else if(i.equals(BACKBONE)) {
+            return("b");
         }
         else {
             System.err.println("ERROR: Spatial relation integer " + i + " is invalid.");
@@ -69,6 +73,9 @@ public class SpatRel {
         }
         else if(s.equals(getString(LIGAND))) {
             return(LIGAND);
+        }
+        else if(s.equals(getString(BACKBONE))) {
+            return(BACKBONE);
         }
         else {
             System.err.println("ERROR: Spatial relation string '" + s + "' is invalid.");

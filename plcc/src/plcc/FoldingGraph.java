@@ -617,6 +617,7 @@ public class FoldingGraph extends SSEGraph {
                         else if(edgeType.equals(SpatRel.ANTIPARALLEL)) { ig2.setPaint(Color.BLUE); }
                         else if(edgeType.equals(SpatRel.MIXED)) { ig2.setPaint(Color.GREEN); }
                         else if(edgeType.equals(SpatRel.LIGAND)) { ig2.setPaint(Color.MAGENTA); }
+                        else if(edgeType.equals(SpatRel.BACKBONE)) { ig2.setPaint(Color.ORANGE); }
                         else { ig2.setPaint(Color.LIGHT_GRAY); }
 
                         if(bw) { ig2.setPaint(Color.LIGHT_GRAY); }      // for non-protein graphs

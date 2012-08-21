@@ -1601,6 +1601,21 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         }        
     }
     
+    /**
+     * Adds a constant backbone of contacts to the SSEs of this graph, i.e., connects the SSEs in sequential order
+     * from the N to the C terminus with contacts of type backbone.
+     */
+    public void addFullBackboneContacts() {
+        if(this.size <= 1) {
+            return;
+        } else {
+            for(Integer i = 0; i < (this.size - 1); i++) {
+                this.addContact(i, (i+1), SpatRel.BACKBONE);
+            }
+        }
+        
+    }
+    
     
     /**
      * Determines whether the contact (x, y) in the contact matrix is a crossover contact (i.e., the SSEs are parallel).
@@ -2270,6 +2285,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
                         else if(edgeType.equals(SpatRel.ANTIPARALLEL)) { ig2.setPaint(Color.BLUE); }
                         else if(edgeType.equals(SpatRel.MIXED)) { ig2.setPaint(Color.GREEN); }
                         else if(edgeType.equals(SpatRel.LIGAND)) { ig2.setPaint(Color.MAGENTA); }
+                        else if(edgeType.equals(SpatRel.BACKBONE)) { ig2.setPaint(Color.ORANGE); }
                         else { ig2.setPaint(Color.LIGHT_GRAY); }
 
                         if(bw) { ig2.setPaint(Color.LIGHT_GRAY); }      // for non-protein graphs
@@ -3176,6 +3192,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             else if(this.getContactType(src, tgt) == SpatRel.ANTIPARALLEL) { colorModifier = " [color=blue]"; }
             else if(this.getContactType(src, tgt) == SpatRel.MIXED) { colorModifier = " [color=green]"; }
             else if(this.getContactType(src, tgt) == SpatRel.LIGAND) { colorModifier = " [color=pink]"; }
+            else if(this.getContactType(src, tgt) == SpatRel.BACKBONE) { colorModifier = " [color=orange]"; }
             else { colorModifier = ""; }
                                         
             dlf += "    " + src + " -- " + tgt + colorModifier + ";\n";                        

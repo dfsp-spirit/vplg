@@ -88,7 +88,7 @@ public class Main {
     //  Main.calculateAllContacts().
     static Integer globalMaxSeqNeighborResDist;
     
-    static final String version = "0.61";
+    static final String version = Settings.getVersion();
     
     static ArrayList<File> deleteFilesOnExit;
     
@@ -444,6 +444,11 @@ public class Main {
                     if(s.equals("-a") || s.equals("--include-coils")) {
                         Settings.set("plcc_B_include_coils", "true");
                     }
+                    
+                    if(s.equals("-B") || s.equals("--force-backbone")) {
+                        Settings.set("plcc_B_forceBackboneContacts", "true");
+                    }
+                   
 
                     if(s.equals("-w") || s.equals("--dont-write-images")) {
                         Settings.set("plcc_B_draw_graphs", "false");
@@ -1752,6 +1757,10 @@ public class Main {
         ProtGraph pg = chainCM.toProtGraph();
         pg.declareProteinGraph();
 
+        
+        if(Settings.getBoolean("plcc_B_forceBackboneContacts")) {
+            pg.addFullBackboneContacts();            
+        }
 
         //System.out.println("    ----- Done with " + graphType + " graph of chain " + c.getPdbChainID() + ". -----");
         return(pg);
@@ -3132,7 +3141,8 @@ public class Main {
         System.out.println("       java -jar plcc.jar --help");
         System.out.println("valid OPTIONS are: ");
         System.out.println("-a | --include-coils       : convert the SSE type of all ignored residues to C (coil) and include coils in the graphs [EXPERIMENTAL]");
-        System.out.println("-b | --draw-plcc-fgs <f>   : read graph in plcc format from file <f> and draw it and all its folding graphs, then exit (pdbid will be ignored)*");        
+        System.out.println("-b | --draw-plcc-fgs <f>   : read graph in plcc format from file <f> and draw it and all its folding graphs, then exit (pdbid will be ignored)*");
+        System.out.println("-B | --force-backbone      : add contacts of special type 'backbone' between all SSEs of a graph in sequential order (N to C terminus)");
         System.out.println("-c | --dont-calc-graphs    : do not calculate SSEs contact graphs, stop after residue level contact computation");
         System.out.println("-D | --debug <level>       : set debug level (0: off, 1: normal debug output. >=2: detailed debug output)  [DEBUG]");
         System.out.println("-d | --dsspfile <dsspfile> : use input DSSP file <dsspfile> (instead of assuming '<pdbid>.dssp')");
