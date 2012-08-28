@@ -179,6 +179,8 @@ public class Settings {
         defSet("plcc_B_output_GML", "true", "Whether to save computed protein graphs to text files in Graph Modelling Language format (GML).");
         defSet("plcc_B_output_TGF", "true", "Whether to save computed protein graphs to text files in Trivial Graph Format (TGF).");
         defSet("plcc_B_output_DOT", "true", "Whether to save computed protein graphs to text files in DOT language Format (DOT).");
+        defSet("plcc_B_output_kavosh", "true", "Whether to save computed protein graphs to text files in Kavosh format.");
+        defSet("plcc_B_kavosh_format_directed", "true", "Whether to treat the graphs as directed for the Kavosh output. If set to true, each edge (a, b) will appear twice in the output file: once as (a, b) and again as (b, a).");
         
         defSet("plcc_S_temp_dir", ".", "The directory where temporary files can be created. You need write access to it, of course.");
         

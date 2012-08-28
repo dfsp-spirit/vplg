@@ -632,6 +632,7 @@ public class Main {
                             Settings.set("plcc_B_output_GML", "false");
                             Settings.set("plcc_B_output_TGF", "false");
                             Settings.set("plcc_B_output_DOT", "false");
+                            Settings.set("plcc_B_output_kavosh", "false");
                             
                             // Now add the listed ones back:
                             String types = args[i+1].toLowerCase();
@@ -646,11 +647,12 @@ public class Main {
                                 if(types.contains("g")) { Settings.set("plcc_B_output_GML", "true"); nv++; }
                                 if(types.contains("t")) { Settings.set("plcc_B_output_TGF", "true"); nv++; }
                                 if(types.contains("d")) { Settings.set("plcc_B_output_DOT", "true"); nv++; }
+                                if(types.contains("k")) { Settings.set("plcc_B_output_kavosh", "true"); nv++; }
 
                                 // sanity check
                                 if(nv != types.length()) {
-                                    System.err.println("WARNING: List of folding graph notations given on command line '" + types + "' contains invalid chars (" + types.length() + " given, " + nv + " valid).");
-                                    System.err.println("WARNING: Valid chars: 'a' => alpha, 'b' => beta, 'c' => albe, 'd' => alphalig, 'e' => betalig, 'f' => albelig. Example: '-g ace'");
+                                    System.err.println("WARNING: List of output formats given on command line '" + types + "' contains invalid chars (" + types.length() + " given, " + nv + " valid).");
+                                    System.err.println("WARNING: Valid chars: 'g' => GML, 't' => TGF, 'd' => DOT lang, 'k' => kavosh. Example: '-O tg'");
 
                                     if(nv <= 0) {
                                         syntaxError();
@@ -1451,6 +1453,10 @@ public class Main {
                 if(Settings.getBoolean("plcc_B_output_DOT")) {
                     String dotLangFile = filePath + fs + fileNameWithoutExtension + ".gv";
                     IO.stringToTextFile(dotLangFile, pg.toDOTLanguageFormat());
+                }
+                if(Settings.getBoolean("plcc_B_output_kavosh")) {
+                    String kavoshFile = filePath + fs + fileNameWithoutExtension + ".kavosh";
+                    IO.stringToTextFile(kavoshFile, pg.toKavoshFormat());
                 }
                 
                 

@@ -13,7 +13,7 @@ package plcc;
  */
 public interface TrivialGraphFormat {
     
-     /**
+    /**
      * Returns a string representation of this object in trivial graph format (TGF).
      * @return the trivial graph format string
      */ 

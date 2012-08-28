@@ -51,7 +51,7 @@ import org.w3c.dom.DOMImplementation;
  * 
  * @author spirit
  */
-public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguageFormat, TrivialGraphFormat, DOTLanguageFormat {
+public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguageFormat, TrivialGraphFormat, DOTLanguageFormat, KavoshFormat {
     
     /** the list of all SSEs of this graph */
     protected ArrayList<SSE> sseList;
@@ -3232,6 +3232,37 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         dlf += "}\n";
         
         return(dlf);
+    }
+    
+    
+    public String toKavoshFormat() {
+        String kf = "";
+        
+        if(Settings.getBoolean("plcc_B_kavosh_format_directed")) {
+            kf += this.numEdges() + "\n";
+
+            for(Integer i = 0; i < this.getSize(); i++) {
+                for(Integer j = 0 ; j < this.getSize(); j++) {
+                    if(this.containsEdge(i, j) && i != j) {
+                        kf += (i+1) + " " + (j+1) + "\n";                    
+                    }            
+                }            
+            }
+            
+        } else {
+        
+            kf += this.numSSEContacts() + "\n";
+
+            for(Integer i = 0; i < this.getSize(); i++) {
+                for(Integer j = i + 1; j < this.getSize(); j++) {
+                    if(this.containsEdge(i, j)) {
+                        kf += (i+1) + " " + (j+1) + "\n";                    
+                    }            
+                }            
+            }
+        }
+        
+        return kf;
     }
     
     
