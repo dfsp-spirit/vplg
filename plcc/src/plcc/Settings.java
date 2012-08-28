@@ -194,9 +194,11 @@ public class Settings {
         defSet("plcc_I_img_header_height", "40", "The height of the header area in the output image, in pixels");
         defSet("plcc_I_img_footer_height", "120", "The height of the footer area in the output image, in pixels");
         defSet("plcc_S_img_default_font", "TimesRoman", "The default font used in output image labels. This has to be a valid font name, of course.");
-        defSet("plcc_I_img_default_font_size", "18", "The default font size used in output images.");
-        defSet("plcc_I_img_legend_font_size", "18", "The legend font size used in output images.");        
+        defSet("plcc_I_img_default_font_size", "16", "The default font size used in output images.");
+        defSet("plcc_I_img_legend_font_size", "16", "The legend font size used in output images.");        
         defSet("plcc_I_img_text_line_height", "40", "The vertical distance between two lines of text in the image, e.g., in the footer.");
+        defSet("plcc_I_img_min_img_height", "160", "The minimum size of the image area where the graph is drawn.");
+        defSet("plcc_I_img_min_arc_height", "100", "The minimum size of the arc area within the image area.");
         
         defSet("plcc_I_img_minPageWidth", "800", "The minimum image width in pixels, used in output images.");                                        
         defSet("plcc_I_img_minPageHeight", "600", "The minimum image height in pixels, used in output images.");

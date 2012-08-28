@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.3" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <Properties>
@@ -38,6 +38,11 @@
   </Layout>
   <SubComponents>
     <Container class="javax.swing.JPanel" name="jPanelMainContent">
+      <Properties>
+        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="0" green="0" red="d4" type="rgb"/>
+        </Property>
+      </Properties>
 
       <Layout>
         <DimensionLayout dim="0">
@@ -45,21 +50,25 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jScrollPaneStatus" alignment="0" pref="505" max="32767" attributes="0"/>
-                      <Component id="jSeparatorLower" alignment="1" pref="505" max="32767" attributes="0"/>
-                      <Component id="jSeparatorUpper" alignment="0" pref="505" max="32767" attributes="0"/>
+                      <Component id="jScrollPanePlccCommand" max="32767" attributes="0"/>
+                      <Component id="jScrollPaneStatus" alignment="0" max="32767" attributes="0"/>
+                      <Component id="jSeparatorLower" alignment="1" max="32767" attributes="0"/>
+                      <Component id="jSeparatorUpper" alignment="0" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="jLabelInputDSSP" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="216" max="32767" attributes="0"/>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="jLabelInputPDB" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jTextFieldInputFilePDB" pref="218" max="32767" attributes="0"/>
-                                      <Component id="jTextFieldInputFileDSSP" pref="218" max="32767" attributes="0"/>
+                                      <Component id="jTextFieldInputFilePDB" max="32767" attributes="0"/>
+                                      <Group type="102" attributes="0">
+                                          <Component id="jTextFieldInputFileDSSP" max="32767" attributes="0"/>
+                                          <EmptySpace min="-2" pref="145" max="-2" attributes="0"/>
+                                      </Group>
                                   </Group>
                               </Group>
                           </Group>
@@ -78,29 +87,61 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="jCheckBoxOutputDirTree" min="-2" max="-2" attributes="0"/>
                               <Component id="jCheckBoxUseDatabase" min="-2" max="-2" attributes="0"/>
-                              <Group type="102" attributes="0">
-                                  <Component id="jCheckBoxForceChain" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="jTextFieldForceChain" min="-2" pref="21" max="-2" attributes="0"/>
-                              </Group>
-                              <Component id="jCheckBoxFoldingGraphs" min="-2" max="-2" attributes="0"/>
+                              <Component id="jCheckBoxAdditionalOutput" min="-2" max="-2" attributes="0"/>
+                              <Component id="jCheckBoxRamachandranPlot" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
-                                  <Component id="jLabelImageFormat" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="jComboBoxImageFormat" pref="196" max="32767" attributes="0"/>
-                              </Group>
                               <Component id="jCheckBoxAllowCoils" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="jCheckBoxAdditionalOutput" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabelDebugOptions" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="jCheckBoxRamachandranPlot" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="jCheckBoxPGtypes" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <EmptySpace min="21" pref="21" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="jCheckBoxPGalpha" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jCheckBoxPGalphalig" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="jCheckBoxPGbeta" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jCheckBoxPGbetalig" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="jCheckBoxPGalbelig" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jCheckBoxPGalbe" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                          </Group>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="jCheckBoxLimitLigandAtoms" max="32767" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="jCheckBoxBackboneContacts" min="-2" max="-2" attributes="0"/>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <Component id="jCheckBoxForceChain" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="jTextFieldForceChain" min="-2" pref="21" max="-2" attributes="0"/>
+                                      </Group>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <EmptySpace min="-2" pref="21" max="-2" attributes="0"/>
+                                          <Component id="jLabelLigAtomsMin" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="jTextFieldSetLigAtomsMin" min="-2" pref="29" max="-2" attributes="0"/>
+                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          <Component id="jLabelLigAtomsMax" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="jTextFieldSetLigAtomsMax" min="-2" pref="26" max="-2" attributes="0"/>
+                                      </Group>
+                                  </Group>
+                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              </Group>
                           </Group>
                       </Group>
-                      <Component id="jSeparatorCenter" alignment="0" pref="505" max="32767" attributes="0"/>
+                      <Component id="jSeparatorCenter" alignment="0" max="32767" attributes="0"/>
                       <Group type="102" alignment="1" attributes="0">
-                          <EmptySpace min="0" pref="309" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           <Component id="jButtonCheckInput" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="jButtonRun" min="-2" max="-2" attributes="0"/>
@@ -110,31 +151,32 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jTextFieldCustomOutputDir" min="-2" pref="155" max="-2" attributes="0"/>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
-                          <Component id="jButtonSelectCustomOutputDir" pref="165" max="32767" attributes="0"/>
+                          <Component id="jButtonSelectCustomOutputDir" max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jLabelOptions" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="jLabelOptions" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="315" max="-2" attributes="0"/>
+                                  <Component id="jLabelContactOptions" min="-2" max="-2" attributes="0"/>
+                              </Group>
                               <Component id="jLabelPlccCommand" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabelResults" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="jScrollPanePlccCommand" alignment="0" min="-2" pref="505" max="-2" attributes="0"/>
                               <Component id="jLabelInputOutput" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
-                                  <Component id="jCheckBoxPGtypes" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+                                  <Component id="jLabelImageFormat" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="jComboBoxImageFormat" min="-2" pref="108" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="51" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jCheckBoxPGalphalig" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jCheckBoxPGalpha" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jCheckBoxPGbeta" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jCheckBoxPGbetalig" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jCheckBoxPGalbe" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jCheckBoxPGalbelig" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jCheckBoxFoldingGraphs" min="-2" max="-2" attributes="0"/>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <EmptySpace min="21" pref="21" max="-2" attributes="0"/>
+                                          <Component id="jCheckBoxFoldingGraphsRED" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                                          <Component id="jCheckBoxFoldingGraphsKEY" min="-2" max="-2" attributes="0"/>
+                                      </Group>
                                   </Group>
                               </Group>
                           </Group>
@@ -176,43 +218,52 @@
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabelOptions" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabelDebugOptions" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jLabelContactOptions" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jCheckBoxAdditionalOutput" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jCheckBoxOutputDirTree" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jCheckBoxAllowCoils" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jCheckBoxUseDatabase" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jCheckBoxRamachandranPlot" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jCheckBoxForceChain" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jTextFieldForceChain" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jCheckBoxFoldingGraphs" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jLabelImageFormat" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jComboBoxImageFormat" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jCheckBoxUseDatabase" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jCheckBoxPGtypes" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jCheckBoxBackboneContacts" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jCheckBoxPGtypes" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jCheckBoxAdditionalOutput" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jCheckBoxPGalpha" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jCheckBoxPGbeta" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jCheckBoxPGalbe" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jCheckBoxLimitLigandAtoms" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jCheckBoxRamachandranPlot" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jCheckBoxPGalphalig" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jCheckBoxPGbetalig" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jCheckBoxPGalbelig" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jLabelLigAtomsMin" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jTextFieldSetLigAtomsMin" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jLabelLigAtomsMax" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jTextFieldSetLigAtomsMax" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jLabelImageFormat" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jComboBoxImageFormat" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jCheckBoxFoldingGraphs" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jCheckBoxFoldingGraphsRED" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jCheckBoxFoldingGraphsKEY" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace pref="4" max="32767" attributes="0"/>
                   <Component id="jSeparatorCenter" min="-2" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Component id="jLabelPlccCommand" min="-2" max="-2" attributes="0"/>
@@ -276,7 +327,7 @@
         </Component>
         <Component class="javax.swing.JLabel" name="jLabelOptions">
           <Properties>
-            <Property name="text" type="java.lang.String" value="General options"/>
+            <Property name="text" type="java.lang.String" value="Input and output options"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JSeparator" name="jSeparatorLower">
@@ -305,9 +356,12 @@
         </Component>
         <Component class="javax.swing.JCheckBox" name="jCheckBoxFoldingGraphs">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Compute Folding Graphs"/>
+            <Property name="text" type="java.lang.String" value="Compute Folding Graph notations:"/>
             <Property name="toolTipText" type="java.lang.String" value="Whether folding graphs (connected components) of the Protein Graph should also be drawn"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jCheckBoxFoldingGraphsActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JCheckBox" name="jCheckBoxOutputDirTree">
           <Properties>
@@ -323,7 +377,7 @@
         </Component>
         <Component class="javax.swing.JLabel" name="jLabelDebugOptions">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Debug and experimental options"/>
+            <Property name="text" type="java.lang.String" value="Graph Options"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="jCheckBoxAdditionalOutput">
@@ -394,10 +448,10 @@
           <SubComponents>
             <Component class="javax.swing.JTextPane" name="jTextPaneStatus">
               <Properties>
+                <Property name="editable" type="boolean" value="false"/>
                 <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="dc" green="dc" red="dc" type="rgb"/>
                 </Property>
-                <Property name="editable" type="boolean" value="false"/>
                 <Property name="toolTipText" type="java.lang.String" value="Results of settings check or PLCC run."/>
               </Properties>
             </Component>
@@ -427,10 +481,10 @@
           <SubComponents>
             <Component class="javax.swing.JTextField" name="jTextFieldPlccCommand">
               <Properties>
+                <Property name="editable" type="boolean" value="false"/>
                 <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                   <Color blue="dc" green="dc" red="dc" type="rgb"/>
                 </Property>
-                <Property name="editable" type="boolean" value="false"/>
                 <Property name="text" type="java.lang.String" value="java -jar plcc.jar 8icd"/>
               </Properties>
             </Component>
@@ -465,7 +519,7 @@
         </Component>
         <Component class="javax.swing.JCheckBox" name="jCheckBoxPGtypes">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Only compute PG graphs of type:"/>
+            <Property name="text" type="java.lang.String" value="Compute only protein graphs of type:"/>
             <Property name="toolTipText" type="java.lang.String" value="Compute only the selected protein graph types instead of all types."/>
           </Properties>
         </Component>
@@ -514,6 +568,58 @@
             <Property name="enabled" type="boolean" value="false"/>
           </Properties>
         </Component>
+        <Component class="javax.swing.JCheckBox" name="jCheckBoxBackboneContacts">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Add SSE backbone contacts"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="jCheckBoxLimitLigandAtoms">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Filter ligands by atom count"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabelContactOptions">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Contact options"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="jCheckBoxFoldingGraphsRED">
+          <Properties>
+            <Property name="selected" type="boolean" value="true"/>
+            <Property name="text" type="java.lang.String" value="PGS"/>
+            <Property name="toolTipText" type="java.lang.String" value="Draws folding graphs in VPLG protein graph style."/>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="jCheckBoxFoldingGraphsKEY">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="BIOS"/>
+            <Property name="toolTipText" type="java.lang.String" value="Draws folding graphs in biology style."/>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabelLigAtomsMin">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="min:"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="jTextFieldSetLigAtomsMin">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="2"/>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabelLigAtomsMax">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="max:"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="jTextFieldSetLigAtomsMax">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="0"/>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
+        </Component>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JPanel" name="jPanelStats">
@@ -521,7 +627,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="jLabelStatus" alignment="0" pref="525" max="32767" attributes="0"/>
+              <Component id="jLabelStatus" alignment="0" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">

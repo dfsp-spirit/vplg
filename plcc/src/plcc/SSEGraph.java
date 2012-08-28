@@ -83,6 +83,9 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     
     /** the list of all SSEs of this graph which should be drawn. Not used yet. */
     protected ArrayList<DrawSSE> sseDrawList;
+    
+    /** This is a list of the vertices (defined by their sequential index) in this graph in spatial ordering. This means that spatOrder.get(i) returns the
+        sequential index of the SSE which is at position i in the graph if it is drawn in spatial ordering. */
     protected ArrayList<Integer> spatOrder;
     
     protected ArrayList<ArrayList<Integer>> adjLists;
@@ -420,7 +423,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     protected void drawSymbolBetaStrand(SVGGraphics2D ig2, Position2D startPos, PageLayout pl) {
         ig2.setStroke(new BasicStroke(2));
         ig2.setPaint(Color.BLACK);
-        Rectangle2D.Double rect = new Rectangle2D.Double(startPos.x, startPos.y, pl.vertDiameter, pl.vertDiameter);
+        Rectangle2D.Double rect = new Rectangle2D.Double(startPos.x, startPos.y, pl.getVertDiameter(), pl.getVertDiameter());
         ig2.fill(rect);        
     }
     
@@ -434,7 +437,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     protected void drawSymbolAlphaHelix(SVGGraphics2D ig2, Position2D startPos, PageLayout pl) {
         ig2.setStroke(new BasicStroke(2));
         ig2.setPaint(Color.RED);
-        Ellipse2D.Double circle = new Ellipse2D.Double(startPos.x, startPos.y, pl.vertDiameter, pl.vertDiameter);
+        Ellipse2D.Double circle = new Ellipse2D.Double(startPos.x, startPos.y, pl.getVertDiameter(), pl.getVertDiameter());
         ig2.fill(circle);
     }
     
@@ -448,7 +451,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     protected void drawSymbolLigand(SVGGraphics2D ig2, Position2D startPos, PageLayout pl) {
         ig2.setStroke(new BasicStroke(3));
         ig2.setPaint(Color.MAGENTA);
-        Ellipse2D.Double circle = new Ellipse2D.Double(startPos.x, startPos.y, pl.vertDiameter, pl.vertDiameter);
+        Ellipse2D.Double circle = new Ellipse2D.Double(startPos.x, startPos.y, pl.getVertDiameter(), pl.getVertDiameter());
         ig2.draw(circle);
         ig2.setStroke(new BasicStroke(2));
     }
@@ -463,7 +466,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     protected void drawSymbolOtherSSE(SVGGraphics2D ig2, Position2D startPos, PageLayout pl) {
         ig2.setStroke(new BasicStroke(2));
         ig2.setPaint(Color.GRAY);
-        Ellipse2D.Double circle = new Ellipse2D.Double(startPos.x, startPos.y, pl.vertDiameter, pl.vertDiameter);
+        Ellipse2D.Double circle = new Ellipse2D.Double(startPos.x, startPos.y, pl.getVertDiameter(), pl.getVertDiameter());
         ig2.fill(circle);
     }
     
@@ -489,8 +492,8 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         
         Integer spacer = 10;
         Integer pixelPosX = startPos.x;
-        Integer vertWidth = pl.vertDiameter;
-        Integer vertOffset = pl.vertDiameter / 4 * 3;
+        Integer vertWidth = pl.getVertDiameter();
+        Integer vertOffset = pl.getVertDiameter() / 4 * 3;
         String label;
         
         // Edges label
@@ -610,7 +613,10 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
      * 
      * Note: To see this in action, you can use the beta graph of 1blr, chain A.
      * 
-     * @return a list containing the vertex indices in the requested order, or an empty list if no such order exists
+     * @return a list containing the seq. vertex indices in the requested order, or an empty list if no such order exists.
+     * The list { 1, 0, 2, 3 } is valid and means that SSE #1 (the second SSE in sequential order) is the SSE with only one neighbor which
+     * is closest to the N-terminus. It has one 3D contact to SSE #0, which has a 3D contact to #2, which has a 3D contact with #3. Note
+     * that #1 and #3 both have 1 3D-neighbor, while #0 and #2 each have two. (The list does not start with SSE #0 because it has 2 3D-neighbors and thus cannot be the start, even though it is closer to the N-terminus than SSE#1.)
      */
     public ArrayList<Integer> getSpatialOrderingOfVertexIndices() {
         ArrayList<Integer> spatialOrder = new ArrayList<Integer>();
@@ -1813,7 +1819,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
      * @return the multi-line header string, including a label with PDB ID and graph type
      */
     protected String getPlccFormatHeader() {
-        String outString = "# This is the plcc SSE info file for the " + this.graphType + " graph of PDB entry " + this.pdbid + ", chain " + this.chainid + ".\n";
+        String outString = "# This is the plcc format protein graph file for the " + this.graphType + " graph of PDB entry " + this.pdbid + ", chain " + this.chainid + ".\n";
         outString += "# First character in a line indicates the line type ('#' => comment, '>' => meta data, '|' => SSE, '=' => contact).\n";
         //outString += "# Note on parsing this file: You can savely remove all whitespace from a line before splitting it.\n";
         
@@ -2252,7 +2258,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             ig2.fillRect(0, 0, pl.getPageWidth(), pl.getPageHeight());
             ig2.setPaint(Color.BLACK);
 
-
+            //pl.drawAreaOutlines(ig2);
             // prepare font
             Font font = pl.getStandardFont();
             ig2.setFont(font);
@@ -2337,13 +2343,13 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
                 // draw a shape based on SSE type
                 if(this.sseList.get(i).isBetaStrand()) {
                     // beta strands are black, filled squares
-                    rect = new Rectangle2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.vertDiameter, pl.vertDiameter);
+                    rect = new Rectangle2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
                     ig2.fill(rect);
                     
                 }
                 else if(this.sseList.get(i).isLigandSSE()) {
                     // ligands are magenta circles (non-filled)
-                    circle = new Ellipse2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.vertDiameter, pl.vertDiameter);
+                    circle = new Ellipse2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
                     //ig2.fill(circle);
                     ig2.setStroke(new BasicStroke(3));  // this does NOT get filled, so give it a thicker border
                     ig2.draw(circle);
@@ -2351,7 +2357,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
                 }
                 else {
                     // helices and all others are filled circles (helices are red circles, all others are gray circles)
-                    circle = new Ellipse2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.vertDiameter, pl.vertDiameter);
+                    circle = new Ellipse2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
                     ig2.fill(circle);                    
                 }
             }
@@ -2381,8 +2387,8 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
                 // line markers: S for sequence order, G for graph order
                 Integer lineHeight = pl.textLineHeight;            
                 if(this.sseList.size() > 0) {                                            
-                    ig2.drawString("G", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y);
-                    ig2.drawString("S", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight);
+                    ig2.drawString("PG", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (stringHeight / 4));
+                    ig2.drawString("SQ", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
                 }
                 else {
                     ig2.drawString("(Graph has no vertices.)", pl.getFooterStart().x, pl.getFooterStart().y);
@@ -2478,7 +2484,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
 
         System.out.print("getArcConnector: startX=" + startX + ", startY=" + startY + ", targetX=" + targetX + ", targetY=" + targetY + ", startUpwards=" + startUpwards.toString() + ": ");
         
-        if(startY == targetY) {
+        if(startY.equals(targetY)) {
             System.out.print("getting simple connector(" + startY + " == " + targetY + ").\n");
             return(getSimpleArcConnector(startX, startY, targetX, stroke, startUpwards));            
         }

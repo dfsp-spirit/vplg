@@ -8,7 +8,10 @@
 
 package plcc;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics2D;
 
 /**
  * A page layout that holds all non-SSE-specific information about the drawing process, e.g. the
@@ -31,10 +34,10 @@ public class PageLayout {
     public Integer marginTop;
     public Integer marginRight;
     public Integer marginBottom; 
+    public Integer minImgHeight;
     
     public Integer vertDist;
     public Integer vertRadius;
-    public Integer vertDiameter;
     
     public Integer minPageWidth;
     public Integer minPageHeight;
@@ -52,6 +55,7 @@ public class PageLayout {
     PageLayout(Integer numVerts) {
         
         this.numVerts = numVerts;
+        this.minImgHeight = Settings.getInteger("plcc_I_img_min_img_height");
         
         this.marginLeft = Settings.getInteger("plcc_I_img_margin_left");
         this.marginTop = Settings.getInteger("plcc_I_img_margin_top");
@@ -72,10 +76,19 @@ public class PageLayout {
         
         this.vertDist = Settings.getInteger("plcc_I_img_vert_dist");
         this.vertRadius = Settings.getInteger("plcc_I_img_vert_radius");
-        this.vertDiameter = vertRadius * 2;
         
         
         
+    }
+    
+    
+    public Integer getVertDiameter() {
+        return vertRadius * 2;
+    }
+    
+    
+    public void setVertRadius(Integer r) {
+        this.vertRadius = r;
     }
     
     
@@ -93,7 +106,7 @@ public class PageLayout {
      * @return the coordinates as a Position2D
      */
     public Position2D getFooterStart() {
-        return(new Position2D(marginLeft, marginTop + headerHeight + this.getImageAreaHeight() + 40));
+        return(new Position2D(imgStart.x, marginTop + headerHeight + this.getImageAreaHeight() + 40));
     }
     
     /**
@@ -113,12 +126,22 @@ public class PageLayout {
         return(numVerts * vertDist + (2 * vertRadius) );
     }
     
+    public Integer getHeaderWidth() {
+        return(getImageAreaWidth());
+    }
+    
+    public Integer getFooterWidth() {
+        return(getImageAreaWidth());
+    }
+    
     /**
      * Determines the height of the image area (page = header + image + footer).
      * @return the height in pixels
      */
     public Integer getImageAreaHeight() {
-        return(this.getMaxArcHeight() + (2 * vertRadius) );
+        Integer h = this.getMaxArcHeight() + (2 * vertRadius);
+        Integer min = Settings.getInteger("plcc_I_img_min_img_height");        
+        return(h < min ? min : h);
     }
     
     
@@ -130,7 +153,9 @@ public class PageLayout {
      * @return the maximum arc height in pixels
      */
     public Integer getMaxArcHeight() {
-        return(this.getMaxVertDist() / 4);    
+        Integer h = this.getMaxVertDist() / 4;
+        Integer min = Settings.getInteger("plcc_I_img_min_arc_height");
+        return(h < min ? min : h);    
     }
     
     
@@ -141,6 +166,11 @@ public class PageLayout {
     public Integer getPageWidth() {
         Integer w = marginLeft + this.getImageAreaWidth() + marginRight;
         return(w < minPageWidth ? minPageWidth : w);
+    }
+    
+    
+    public Position2D getMarginBottomStart() {
+        return(new Position2D(this.getPageStart().x, this.getPageHeight() - this.marginBottom));
     }
     
     
@@ -160,6 +190,20 @@ public class PageLayout {
      */
     public Font getStandardFont() {
         return(new Font(Settings.get("plcc_S_img_default_font"), Font.PLAIN, Settings.getInteger("plcc_I_img_default_font_size")));
+    }
+    
+    
+    public Position2D getHeaderStart() {
+        return headerStart;
+    }
+    
+    
+    public Position2D getImgStart() {
+        return imgStart;
+    }
+    
+    public Position2D getPageStart() {
+        return( new Position2D(0,0));
     }
     
     /**
@@ -204,7 +248,42 @@ public class PageLayout {
      * @return the position where to draw the left-most vertex
      */
     public Position2D getVertStart() {
-        return(new Position2D(imgStart.x, imgStart.y + this.getMaxArcHeight()));
+        return(new Position2D(imgStart.x, imgStart.y + this.getMaxArcHeight() + vertRadius));
+    }
+    
+    
+    /**
+     * Draws the outlines of the different ares (like header, image area, borders, ...) of this page layout
+     * into the given Graphics2D object. This is mainly a debug function.
+     * Note that this function sets the stroke and color of the G2D object, so you may need to reset them after
+     * calling it.
+     * @param g2d the Graphics2D object to draw
+     */
+    public void drawAreaOutlines(Graphics2D g2d) {
+        
+        //System.out.println("      Drawing page layout outlines.");
+        
+        g2d.setPaint(Color.LIGHT_GRAY);
+        g2d.setColor(Color.LIGHT_GRAY);
+        g2d.setStroke(new BasicStroke(1));
+
+        // horizontal line at upper margin, where header starts
+        g2d.drawLine(getPageStart().x, getHeaderStart().y, (getPageStart().x + getPageWidth()), getHeaderStart().y);
+        
+        // horizontal line where image area starts
+        g2d.drawLine(getImgStart().x, getImgStart().y, (getImgStart().x + getImageAreaWidth()), getImgStart().y);
+        
+        // horizontal line where footer starts
+        g2d.drawLine(getFooterStart().x, getFooterStart().y, (getFooterStart().x + getFooterWidth()), getFooterStart().y);
+        
+        // horizontal line where footer ends and lower margin starts
+        g2d.drawLine(getMarginBottomStart().x, getMarginBottomStart().y, (getMarginBottomStart().x + getPageWidth()), getMarginBottomStart().y);
+        
+        // vertical line for left margin
+        g2d.drawLine(marginLeft, getPageStart().y, marginLeft, (getPageStart().y + getPageHeight()));
+        
+        // vertical line for right margin
+        g2d.drawLine((getPageWidth() - marginRight), getPageStart().y, (getPageWidth() - marginRight), (getPageStart().y + getPageHeight()));
     }
     
 }

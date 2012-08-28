@@ -292,6 +292,30 @@ public class Main {
                     }
                     
                     
+                    if(s.equals("-L") || s.equals("--lig-filter")) {
+                        if(args.length <= i+2 ) {
+                            syntaxError("The --lig-filter option requires two arguments, you can set one of them to zero if you want only one border.");
+                        }
+                        else {
+                            Integer min = 0;
+                            Integer max = 0;
+                            try {
+                                min = Integer.parseInt(args[i+1]);
+                                max = Integer.parseInt(args[i+2]);                                
+                            } catch (Exception e) {
+                                syntaxError("The minimum and maximum atom count for ligands have to be numeric / integers.");
+                            }
+                            
+                            if(min > max && max != 0) {
+                                syntaxError("Minimum ligand atom number must not be greater than maximum ligand atom number (unless max = 0).");
+                            } else {
+                                Settings.set("plcc_I_lig_min_atoms", min.toString());
+                                Settings.set("plcc_I_lig_max_atoms", max.toString());
+                            }
+                        }
+                    }
+                    
+                    
                     if(s.equals("-S") || s.equals("--sim-measure")) {
                         System.out.println("Setting similarity measure to " + args[i+1] + ".");
                         if(args.length <= i+1 ) {
@@ -1554,6 +1578,15 @@ public class Main {
             // fg.calculateDistancesWithinGraph();
             // fg.printDistMatrix();
             
+            // write plcc graph format file
+            String plccGraphFile = outputDir + System.getProperty("file.separator") + pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + ".fg";
+            if(writeStringToFile(plccGraphFile, (fg.toVPLGGraphFormat()))) {
+                System.out.println("      Plcc format folding graph file written to '" + plccGraphFile + "'.");
+            } else {
+                System.err.println("WARNING: Could not write Plcc format folding graph file to '" + plccGraphFile + "'.");
+            }
+            
+            
             System.out.println("        Handling folding Graph #" + j + " containing " + fg.numVertices() + " vertices and " + fg.numEdges() + " edges (" + fg.numSSEContacts() + " SSE contacts).");
             
             // test spatial ordering, not used for anything atm
@@ -1798,6 +1831,15 @@ public class Main {
      */
     public static void syntaxError() {
         System.err.println("ERROR: Invalid command line. Use '-h' or --help' for info on how to run this program.");
+        System.exit(1);
+    }
+    
+    /**
+     * Prints short info on how to get help on command line options and exits the program.
+     */
+    public static void syntaxError(String hint) {
+        System.err.println("ERROR: Invalid command line. Use '-h' or --help' for info on how to run this program.");
+        System.err.println("ERROR: Hint: '" + hint + "'");
         System.exit(1);
     }
 
@@ -3156,6 +3198,7 @@ public class Main {
         System.out.println("-j | --ddb <p> <c> <gt> <f>: get the graph type <gt> of chain <c> of pdbid <p> from the DB and draw it to file <f> (omit the file extension)*");
         System.out.println("-k | --img-dir-tree        : do write the output images to a sudbir tree of the output dir instead of directly in there");
         System.out.println("-l | --draw-plcc-graph <f> : read graph in plcc format from file <f> and draw it to <f>.png, then exit (<pdbid> will be ignored)*");                
+        System.out.println("-L | --lig-filter <i> <a>  : only consider ligands which have at least <i> and at most <a> atoms. A setting of zero means no limit.");                
         System.out.println("-m | --image-format <f>    : write output images in format <f>, which can be 'PNG' or 'JPG' (SVG vector format is always written).");
         System.out.println("-M | --similar <p> <c> <g> : find the proteins which are most similar to pdbid <p> chain <c> graph type <g> in the database.");
         System.out.println("-n | --textfiles           : write meta data, debug info and interim results like residue contacts to text files (slower)");
@@ -3551,7 +3594,10 @@ public class Main {
         Integer ligMinAtoms = Settings.getInteger("plcc_I_lig_min_atoms");
         Integer ligMaxAtoms = Settings.getInteger("plcc_I_lig_max_atoms");
         Boolean noMax = false;
-        if(ligMaxAtoms < 0) {
+        if(ligMinAtoms <= 0) {
+            ligMinAtoms = 1;    // 1 means no filtering because every ligand has at least one atom
+        }
+        if(ligMaxAtoms <= 0) {
             noMax = true;
         }
         if( (ligMinAtoms > ligMaxAtoms) && !noMax) {

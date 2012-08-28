@@ -243,6 +243,24 @@ public class IO {
         
         return(true);
     }
+    
+    
+    public static String intArrayToString(Integer[] ar) {
+        String s = "";
+        for(Integer i : ar) {
+            s += i + " ";
+        }
+        return s;
+    }
+    
+    
+    public static String intArrayListToString(ArrayList<Integer> ar) {
+        String s = "";
+        for(Integer i : ar) {
+            s += i + " ";
+        }
+        return s;
+    }
 
     
 }

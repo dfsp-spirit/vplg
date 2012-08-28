@@ -85,13 +85,15 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
             this.setCommandTextField();
         }
         else if(source == this.jCheckBoxFoldingGraphs) {
-            /**
+            
             if (e.getStateChange() == ItemEvent.SELECTED) {
-                System.out.println("+++ FGs");                
+                this.jCheckBoxFoldingGraphsKEY.setEnabled(true);
+                this.jCheckBoxFoldingGraphsRED.setEnabled(true);                
             } else if(e.getStateChange() == ItemEvent.DESELECTED) {
-                System.out.println("--- FGs");                
+                this.jCheckBoxFoldingGraphsKEY.setEnabled(false);
+                this.jCheckBoxFoldingGraphsRED.setEnabled(false);                
             }
-            */
+            
             this.setCommandTextField();
         }
         else if(source == this.jCheckBoxRamachandranPlot) {
@@ -217,8 +219,20 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         else if(source == this.jComboBoxImageFormat) {
             //System.out.println("=== Image format");                            
             this.setCommandTextField();
+        } else if(source == this.jCheckBoxBackboneContacts) {
+            this.setCommandTextField();
+        } 
+        else if(source == this.jCheckBoxLimitLigandAtoms) {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                this.jTextFieldSetLigAtomsMin.setEnabled(true);
+                this.jTextFieldSetLigAtomsMax.setEnabled(true);
+            } else if(e.getStateChange() == ItemEvent.DESELECTED) {
+                this.jTextFieldSetLigAtomsMin.setEnabled(false);
+                this.jTextFieldSetLigAtomsMax.setEnabled(false);
+            }
+            
+            this.setCommandTextField();
         }
-        
         else {
             //System.err.println(Settings.getApptag() + "WARNING: VpgCreateGraphFrame: Event from source " + source.toString() + " ignored.");
         }
@@ -321,6 +335,68 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
             
         }
         
+        
+        if(this.jCheckBoxLimitLigandAtoms.isSelected()) {
+            Integer atmMin = 0;
+            Integer atmMax = 0;
+            Boolean minIsInteger = true;
+            Boolean maxIsInteger = true;
+            
+            String tooltipMin = "The minimum number of atoms a ligand molecule must have to be considered. Set to zero to disable.";
+            String tooltipMax = "The maximum number of atoms a ligand molecule must have to be considered. Set to zero to disable.";
+            
+            try {
+                atmMin = Integer.parseInt(this.jTextFieldSetLigAtomsMin.getText());                                
+                this.jTextFieldSetLigAtomsMin.setBackground(Color.WHITE);
+                this.jTextFieldSetLigAtomsMin.setToolTipText(tooltipMin);
+            } catch (Exception e) {
+                this.jTextFieldSetLigAtomsMin.setBackground(Color.RED);
+                this.jTextFieldSetLigAtomsMin.setToolTipText("Minimum atom number for ligands must be numeric / an integer.");
+                System.err.println(Settings.getApptag() + "WARNING: Minimum atom number for ligands must be numeric / an integer.");
+                minIsInteger = false;
+                ok = false;
+            }
+            
+            try {
+                atmMax = Integer.parseInt(this.jTextFieldSetLigAtomsMax.getText());
+                this.jTextFieldSetLigAtomsMax.setBackground(Color.WHITE);
+                this.jTextFieldSetLigAtomsMax.setToolTipText(tooltipMax);
+            } catch (Exception e) {
+                this.jTextFieldSetLigAtomsMax.setBackground(Color.RED);
+                this.jTextFieldSetLigAtomsMax.setToolTipText("Maximum atom number for ligands must be numeric / an integer.");
+                System.err.println(Settings.getApptag() + "WARNING: Maximum atom number for ligands must be numeric / an integer.");
+                ok = false;
+                maxIsInteger = false;
+            }
+            
+            if(minIsInteger && maxIsInteger) {
+                if( (atmMin > atmMax) && (atmMax != 0) ) {
+                    ok = false;
+                    this.jTextFieldSetLigAtomsMax.setBackground(Color.RED);
+                    this.jTextFieldSetLigAtomsMin.setToolTipText("Minimum ligand atom number is greater than maximum ligand atom number (set to zero to disable one).");
+                    this.jTextFieldSetLigAtomsMin.setBackground(Color.RED);
+                    this.jTextFieldSetLigAtomsMax.setToolTipText("Minimum ligand atom number is greater than maximum ligand atom number (set to zero to disable one).");
+                    System.err.println(Settings.getApptag() + "WARNING: Minimum ligand atom number is greater than maximum ligand atom number.");
+                } else {
+                    
+                    if(atmMin < 0 || atmMax < 0) {
+                        ok = false;
+                        this.jTextFieldSetLigAtomsMax.setBackground(Color.RED);
+                        this.jTextFieldSetLigAtomsMin.setToolTipText("Both minimum and maximum ligand atom numbers must be zero or greater (set to zero to disable).");
+                        this.jTextFieldSetLigAtomsMin.setBackground(Color.RED);
+                        this.jTextFieldSetLigAtomsMax.setToolTipText("Both minimum and maximum ligand atom numbers must be zero or greater (set to zero to disable).");
+                        System.err.println(Settings.getApptag() + "WARNING: Both minimum and maximum ligand atom numbers must be zero or greater (set to zero to disable).");
+                        
+                    } else {                    
+                        this.jTextFieldSetLigAtomsMax.setBackground(Color.WHITE);
+                        this.jTextFieldSetLigAtomsMax.setToolTipText(tooltipMax);
+                        this.jTextFieldSetLigAtomsMin.setBackground(Color.WHITE);
+                        this.jTextFieldSetLigAtomsMin.setToolTipText(tooltipMin);                    
+                    }
+                }
+            }
+        }
+        
         return ok;        
     }
     
@@ -393,6 +469,18 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         
         if(this.jCheckBoxFoldingGraphs.isSelected()) {
             cmdList.add("--folding-graphs");
+            cmdList.add("--fg-notations");
+            String gtypes = "";
+            
+            if(this.jCheckBoxFoldingGraphsKEY.isSelected()) { gtypes += "k"; }
+            if(this.jCheckBoxFoldingGraphsRED.isSelected()) { gtypes += "r"; }
+            
+            if(gtypes.isEmpty()) {
+                System.err.println(Settings.getApptag() + "WARNING: FGs active but no types selected, assuming RED.");
+                gtypes = "r";
+                this.jCheckBoxFoldingGraphsRED.setSelected(true);
+            }
+            cmdList.add(gtypes);
         }
         
         if(this.jCheckBoxForceChain.isSelected()) {
@@ -407,6 +495,11 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         if(this.jCheckBoxUseDatabase.isSelected()) {
             cmdList.add("--use-database");
         }
+        
+        if(this.jCheckBoxBackboneContacts.isSelected()) {
+            cmdList.add("--force-backbone");
+        }
+        
         
         if(this.jCheckBoxOutputDirTree.isSelected()) {
             cmdList.add("--img-dir-tree");
@@ -433,6 +526,14 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
             }
             cmdList.add(gtypes);
         }
+        
+        if(this.jCheckBoxLimitLigandAtoms.isSelected()) {
+            cmdList.add("--lig-filter");
+            cmdList.add(this.jTextFieldSetLigAtomsMin.getText());
+            cmdList.add(this.jTextFieldSetLigAtomsMax.getText());
+        }
+        
+        
 
 
         return cmdList.toArray(new String[cmdList.size()]);
@@ -472,11 +573,18 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         this.jCheckBoxPGalphalig.addItemListener(this);
         this.jCheckBoxPGbetalig.addItemListener(this);
         this.jCheckBoxPGalbelig.addItemListener(this);
+        this.jCheckBoxBackboneContacts.addItemListener(this);
         this.jComboBoxImageFormat.addItemListener(this);
+        this.jCheckBoxFoldingGraphsKEY.addItemListener(this);
+        this.jCheckBoxFoldingGraphsRED.addItemListener(this);
+        this.jCheckBoxLimitLigandAtoms.addItemListener(this);
         
         this.jTextFieldInputFilePDB.getDocument().addDocumentListener(this);
         this.jTextFieldInputFileDSSP.getDocument().addDocumentListener(this);
         this.jTextFieldCustomOutputDir.getDocument().addDocumentListener(this);
+        
+        this.jTextFieldSetLigAtomsMax.getDocument().addDocumentListener(this);
+        this.jTextFieldSetLigAtomsMin.getDocument().addDocumentListener(this);
 
         
         this.jTextFieldInputFilePDB.setText(Settings.get("vpg_S_input_dir") + fs + "8icd.pdb");
@@ -540,10 +648,21 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         jCheckBoxPGalphalig = new javax.swing.JCheckBox();
         jCheckBoxPGbetalig = new javax.swing.JCheckBox();
         jCheckBoxPGalbelig = new javax.swing.JCheckBox();
+        jCheckBoxBackboneContacts = new javax.swing.JCheckBox();
+        jCheckBoxLimitLigandAtoms = new javax.swing.JCheckBox();
+        jLabelContactOptions = new javax.swing.JLabel();
+        jCheckBoxFoldingGraphsRED = new javax.swing.JCheckBox();
+        jCheckBoxFoldingGraphsKEY = new javax.swing.JCheckBox();
+        jLabelLigAtomsMin = new javax.swing.JLabel();
+        jTextFieldSetLigAtomsMin = new javax.swing.JTextField();
+        jLabelLigAtomsMax = new javax.swing.JLabel();
+        jTextFieldSetLigAtomsMax = new javax.swing.JTextField();
         jPanelStats = new javax.swing.JPanel();
         jLabelStatus = new javax.swing.JLabel();
 
         setTitle("VPG Graph Creator");
+
+        jPanelMainContent.setForeground(new java.awt.Color(212, 0, 0));
 
         jLabelInputPDB.setText("Input PDB file:");
 
@@ -569,7 +688,7 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
             }
         });
 
-        jLabelOptions.setText("General options");
+        jLabelOptions.setText("Input and output options");
 
         jButtonRun.setText("Run PLCC");
         jButtonRun.setToolTipText("Runs PLCC with the settings defined above.");
@@ -586,8 +705,13 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         jCheckBoxDsspFileIsGzipped.setText("is gzipped");
         jCheckBoxDsspFileIsGzipped.setToolTipText("Whether the selected input file is compressed with gzip.");
 
-        jCheckBoxFoldingGraphs.setText("Compute Folding Graphs");
+        jCheckBoxFoldingGraphs.setText("Compute Folding Graph notations:");
         jCheckBoxFoldingGraphs.setToolTipText("Whether folding graphs (connected components) of the Protein Graph should also be drawn");
+        jCheckBoxFoldingGraphs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBoxFoldingGraphsActionPerformed(evt);
+            }
+        });
 
         jCheckBoxOutputDirTree.setText("Write output files to subdirectory tree");
         jCheckBoxOutputDirTree.setToolTipText("Write output files to a directory structure like the one used by the PDB servers instead of putting all files in the same directory.");
@@ -595,7 +719,7 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         jCheckBoxUseDatabase.setText("Write output graphs into database");
         jCheckBoxUseDatabase.setToolTipText("Whether the graphs should be written to the database. Requires a properly configured database.");
 
-        jLabelDebugOptions.setText("Debug and experimental options");
+        jLabelDebugOptions.setText("Graph Options");
 
         jCheckBoxAdditionalOutput.setText("Write additional output text files");
         jCheckBoxAdditionalOutput.setToolTipText("Writes additional meta data and detailed contact info to text files for each chain.");
@@ -622,8 +746,8 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
 
         jScrollPaneStatus.setBackground(new java.awt.Color(220, 220, 220));
 
-        jTextPaneStatus.setBackground(new java.awt.Color(220, 220, 220));
         jTextPaneStatus.setEditable(false);
+        jTextPaneStatus.setBackground(new java.awt.Color(220, 220, 220));
         jTextPaneStatus.setToolTipText("Results of settings check or PLCC run.");
         jScrollPaneStatus.setViewportView(jTextPaneStatus);
 
@@ -640,8 +764,8 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         jScrollPanePlccCommand.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         jScrollPanePlccCommand.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 
-        jTextFieldPlccCommand.setBackground(new java.awt.Color(220, 220, 220));
         jTextFieldPlccCommand.setEditable(false);
+        jTextFieldPlccCommand.setBackground(new java.awt.Color(220, 220, 220));
         jTextFieldPlccCommand.setText("java -jar plcc.jar 8icd");
         jScrollPanePlccCommand.setViewportView(jTextFieldPlccCommand);
 
@@ -662,7 +786,7 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
 
         jLabelInputOutput.setText("Input and output");
 
-        jCheckBoxPGtypes.setText("Only compute PG graphs of type:");
+        jCheckBoxPGtypes.setText("Compute only protein graphs of type:");
         jCheckBoxPGtypes.setToolTipText("Compute only the selected protein graph types instead of all types.");
 
         jCheckBoxPGalpha.setText("alpha");
@@ -692,6 +816,31 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         jCheckBoxPGalbelig.setToolTipText("Albelig graphs consist of all alpha helices, beta strands and ligands in a chain, and the contacts between them.");
         jCheckBoxPGalbelig.setEnabled(false);
 
+        jCheckBoxBackboneContacts.setText("Add SSE backbone contacts");
+
+        jCheckBoxLimitLigandAtoms.setText("Filter ligands by atom count");
+
+        jLabelContactOptions.setText("Contact options");
+
+        jCheckBoxFoldingGraphsRED.setSelected(true);
+        jCheckBoxFoldingGraphsRED.setText("PGS");
+        jCheckBoxFoldingGraphsRED.setToolTipText("Draws folding graphs in VPLG protein graph style.");
+        jCheckBoxFoldingGraphsRED.setEnabled(false);
+
+        jCheckBoxFoldingGraphsKEY.setText("BIOS");
+        jCheckBoxFoldingGraphsKEY.setToolTipText("Draws folding graphs in biology style.");
+        jCheckBoxFoldingGraphsKEY.setEnabled(false);
+
+        jLabelLigAtomsMin.setText("min:");
+
+        jTextFieldSetLigAtomsMin.setText("2");
+        jTextFieldSetLigAtomsMin.setEnabled(false);
+
+        jLabelLigAtomsMax.setText("max:");
+
+        jTextFieldSetLigAtomsMax.setText("0");
+        jTextFieldSetLigAtomsMax.setEnabled(false);
+
         javax.swing.GroupLayout jPanelMainContentLayout = new javax.swing.GroupLayout(jPanelMainContent);
         jPanelMainContent.setLayout(jPanelMainContentLayout);
         jPanelMainContentLayout.setHorizontalGroup(
@@ -699,6 +848,7 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
             .addGroup(jPanelMainContentLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPanePlccCommand)
                     .addComponent(jScrollPaneStatus)
                     .addComponent(jSeparatorLower, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jSeparatorUpper)
@@ -712,7 +862,9 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jTextFieldInputFilePDB)
-                                    .addComponent(jTextFieldInputFileDSSP))))
+                                    .addGroup(jPanelMainContentLayout.createSequentialGroup()
+                                        .addComponent(jTextFieldInputFileDSSP)
+                                        .addGap(145, 145, 145)))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jCheckBoxPdbFileIsGzipped, javax.swing.GroupLayout.Alignment.TRAILING)
@@ -725,21 +877,46 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
                         .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jCheckBoxOutputDirTree)
                             .addComponent(jCheckBoxUseDatabase)
-                            .addGroup(jPanelMainContentLayout.createSequentialGroup()
-                                .addComponent(jCheckBoxForceChain)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextFieldForceChain, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jCheckBoxFoldingGraphs))
+                            .addComponent(jCheckBoxAdditionalOutput)
+                            .addComponent(jCheckBoxRamachandranPlot))
                         .addGap(29, 29, 29)
                         .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanelMainContentLayout.createSequentialGroup()
-                                .addComponent(jLabelImageFormat)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jComboBoxImageFormat, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addComponent(jCheckBoxAllowCoils)
-                            .addComponent(jCheckBoxAdditionalOutput)
                             .addComponent(jLabelDebugOptions)
-                            .addComponent(jCheckBoxRamachandranPlot)))
+                            .addComponent(jCheckBoxPGtypes)
+                            .addGroup(jPanelMainContentLayout.createSequentialGroup()
+                                .addGap(21, 21, 21)
+                                .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jCheckBoxPGalpha)
+                                    .addComponent(jCheckBoxPGalphalig))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jCheckBoxPGbeta)
+                                    .addComponent(jCheckBoxPGbetalig))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jCheckBoxPGalbelig)
+                                    .addComponent(jCheckBoxPGalbe))))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jCheckBoxLimitLigandAtoms, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(jPanelMainContentLayout.createSequentialGroup()
+                                .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jCheckBoxBackboneContacts)
+                                    .addGroup(jPanelMainContentLayout.createSequentialGroup()
+                                        .addComponent(jCheckBoxForceChain)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jTextFieldForceChain, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanelMainContentLayout.createSequentialGroup()
+                                        .addGap(21, 21, 21)
+                                        .addComponent(jLabelLigAtomsMin)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jTextFieldSetLigAtomsMin, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(jLabelLigAtomsMax)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jTextFieldSetLigAtomsMax, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(0, 0, Short.MAX_VALUE))))
                     .addComponent(jSeparatorCenter)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelMainContentLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
@@ -754,25 +931,26 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
                         .addComponent(jButtonSelectCustomOutputDir, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanelMainContentLayout.createSequentialGroup()
                         .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabelOptions)
+                            .addGroup(jPanelMainContentLayout.createSequentialGroup()
+                                .addComponent(jLabelOptions)
+                                .addGap(315, 315, 315)
+                                .addComponent(jLabelContactOptions))
                             .addComponent(jLabelPlccCommand)
                             .addComponent(jLabelResults)
-                            .addComponent(jScrollPanePlccCommand, javax.swing.GroupLayout.PREFERRED_SIZE, 505, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabelInputOutput)
                             .addGroup(jPanelMainContentLayout.createSequentialGroup()
-                                .addComponent(jCheckBoxPGtypes)
+                                .addGap(4, 4, 4)
+                                .addComponent(jLabelImageFormat)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jComboBoxImageFormat, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(51, 51, 51)
                                 .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jCheckBoxPGalphalig)
-                                    .addComponent(jCheckBoxPGalpha))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jCheckBoxPGbeta)
-                                    .addComponent(jCheckBoxPGbetalig))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jCheckBoxPGalbe)
-                                    .addComponent(jCheckBoxPGalbelig))))
+                                    .addComponent(jCheckBoxFoldingGraphs)
+                                    .addGroup(jPanelMainContentLayout.createSequentialGroup()
+                                        .addGap(21, 21, 21)
+                                        .addComponent(jCheckBoxFoldingGraphsRED)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(jCheckBoxFoldingGraphsKEY)))))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -803,37 +981,46 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabelOptions)
-                    .addComponent(jLabelDebugOptions))
+                    .addComponent(jLabelDebugOptions)
+                    .addComponent(jLabelContactOptions))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jCheckBoxAdditionalOutput)
-                    .addComponent(jCheckBoxOutputDirTree))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jCheckBoxOutputDirTree)
                     .addComponent(jCheckBoxAllowCoils)
-                    .addComponent(jCheckBoxUseDatabase))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jCheckBoxRamachandranPlot)
                     .addComponent(jCheckBoxForceChain)
                     .addComponent(jTextFieldForceChain, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jCheckBoxFoldingGraphs)
-                    .addComponent(jLabelImageFormat)
-                    .addComponent(jComboBoxImageFormat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jCheckBoxUseDatabase)
+                    .addComponent(jCheckBoxPGtypes)
+                    .addComponent(jCheckBoxBackboneContacts))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jCheckBoxPGtypes)
+                    .addComponent(jCheckBoxAdditionalOutput)
                     .addComponent(jCheckBoxPGalpha)
                     .addComponent(jCheckBoxPGbeta)
-                    .addComponent(jCheckBoxPGalbe))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jCheckBoxPGalbe)
+                    .addComponent(jCheckBoxLimitLigandAtoms))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jCheckBoxRamachandranPlot)
                     .addComponent(jCheckBoxPGalphalig)
                     .addComponent(jCheckBoxPGbetalig)
-                    .addComponent(jCheckBoxPGalbelig))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(jCheckBoxPGalbelig)
+                    .addComponent(jLabelLigAtomsMin)
+                    .addComponent(jTextFieldSetLigAtomsMin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabelLigAtomsMax)
+                    .addComponent(jTextFieldSetLigAtomsMax, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabelImageFormat)
+                    .addComponent(jComboBoxImageFormat, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jCheckBoxFoldingGraphs))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jCheckBoxFoldingGraphsRED)
+                    .addComponent(jCheckBoxFoldingGraphsKEY))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 4, Short.MAX_VALUE)
                 .addComponent(jSeparatorCenter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabelPlccCommand)
@@ -951,12 +1138,20 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         this.jButtonRun.setEnabled(false);               
     }//GEN-LAST:event_jButtonRunActionPerformed
 
+    
+    /**
+     * Manually calls the check input function.
+     * @param evt 
+     */
     private void jButtonCheckInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCheckInputActionPerformed
         this.checkInput();
                         
     }//GEN-LAST:event_jButtonCheckInputActionPerformed
 
-    
+
+    /**
+     * Checks form input and validates data.
+     */
     private void checkInput() {
         String statusText = "";
         File workingDir = this.getWorkingDirFromForm();
@@ -1007,6 +1202,10 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
             this.jTextFieldCustomOutputDir.setText(fc.getSelectedFile().toString());
         }
     }//GEN-LAST:event_jButtonSelectCustomOutputDirActionPerformed
+
+    private void jCheckBoxFoldingGraphsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxFoldingGraphsActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCheckBoxFoldingGraphsActionPerformed
 
     
     /**
@@ -1072,10 +1271,14 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
     private javax.swing.JButton jButtonSelectFilePDB;
     private javax.swing.JCheckBox jCheckBoxAdditionalOutput;
     private javax.swing.JCheckBox jCheckBoxAllowCoils;
+    private javax.swing.JCheckBox jCheckBoxBackboneContacts;
     private javax.swing.JCheckBox jCheckBoxCustomOutputDir;
     private javax.swing.JCheckBox jCheckBoxDsspFileIsGzipped;
     private javax.swing.JCheckBox jCheckBoxFoldingGraphs;
+    private javax.swing.JCheckBox jCheckBoxFoldingGraphsKEY;
+    private javax.swing.JCheckBox jCheckBoxFoldingGraphsRED;
     private javax.swing.JCheckBox jCheckBoxForceChain;
+    private javax.swing.JCheckBox jCheckBoxLimitLigandAtoms;
     private javax.swing.JCheckBox jCheckBoxOutputDirTree;
     private javax.swing.JCheckBox jCheckBoxPGalbe;
     private javax.swing.JCheckBox jCheckBoxPGalbelig;
@@ -1088,11 +1291,14 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
     private javax.swing.JCheckBox jCheckBoxRamachandranPlot;
     private javax.swing.JCheckBox jCheckBoxUseDatabase;
     private javax.swing.JComboBox jComboBoxImageFormat;
+    private javax.swing.JLabel jLabelContactOptions;
     private javax.swing.JLabel jLabelDebugOptions;
     private javax.swing.JLabel jLabelImageFormat;
     private javax.swing.JLabel jLabelInputDSSP;
     private javax.swing.JLabel jLabelInputOutput;
     private javax.swing.JLabel jLabelInputPDB;
+    private javax.swing.JLabel jLabelLigAtomsMax;
+    private javax.swing.JLabel jLabelLigAtomsMin;
     private javax.swing.JLabel jLabelOptions;
     private javax.swing.JLabel jLabelPlccCommand;
     private javax.swing.JLabel jLabelResults;
@@ -1109,6 +1315,8 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
     private javax.swing.JTextField jTextFieldInputFileDSSP;
     private javax.swing.JTextField jTextFieldInputFilePDB;
     private javax.swing.JTextField jTextFieldPlccCommand;
+    private javax.swing.JTextField jTextFieldSetLigAtomsMax;
+    private javax.swing.JTextField jTextFieldSetLigAtomsMin;
     private javax.swing.JTextPane jTextPaneStatus;
     // End of variables declaration//GEN-END:variables
 }
