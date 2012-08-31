@@ -78,6 +78,40 @@ public class IO {
     }
     
     
+    
+    /**
+     * Writes the string 'text' to the text file 'targetFile'. Tries to create the file and overwrite stuff in it.
+     * @return true if it worked out, false otherwise. Will spit warning to STDERR if things go wrong.
+     */ 
+    public static Boolean stringToTextFile(String targetFile, String text) {
+        String file = targetFile;
+        FileWriter fw = null;
+        PrintWriter pw = null;
+
+        try {
+            fw = new FileWriter(file);
+            pw = new PrintWriter(fw);
+
+        }
+        catch (Exception e) {
+            System.err.println(Settings.getApptag() + "ERROR: Could not write to file '" + file + "': " + e.getMessage() + ".");            
+            return(false);
+        }
+
+        pw.print(text);      
+        pw.close();  // If it isn't closed it won't flush the buffer and large parts of the file will be missing!
+
+        try {
+            fw.close();
+        } catch(Exception ex) {
+            System.err.println(Settings.getApptag() + "WARNING: Could not close FileWriter for file '" + file + "': " + ex.getMessage() + ".");
+            return(false);
+        }
+        
+        return(true);
+    }
+    
+    
     /**
      * Constructs the PDB file download URL for the given PDB ID using the template URL from settings.
      * @param pdbid the pdbid to insert into the template URL string

@@ -147,10 +147,15 @@ public class FoldingGraph extends SSEGraph {
     private Integer getSSESeqIndexatSpatOrderPosition(Integer spatPos) {
         
         if(this.supportsKeyNotation()) {
-            return spatOrder.get(spatPos);            
-        } else {
-            return null;
-        }
+            for(Integer i = 0; i < this.getSize(); i++) {
+                if(this.spatOrder.get(i) == spatPos) {
+                    return i;
+                }
+            }
+        } 
+           
+        return null;
+        
     }
     
     
@@ -160,12 +165,8 @@ public class FoldingGraph extends SSEGraph {
      * @return the position of the SSE in spatOrder or null if no such SSE was found in the list / this graph has no valid spatial ordering.
      */
     private Integer getSpatOrderIndexOfSSE(Integer seqSSEIndex) {
-        if(this.supportsKeyNotation()) {
-            for(Integer i = 0; i < this.getSize(); i++) {
-                if(this.spatOrder.get(i) == seqSSEIndex) {
-                    return i;
-                }
-            }
+        if(this.supportsKeyNotation()) {            
+            return spatOrder.get(seqSSEIndex);                        
         }            
         return null;        
     }

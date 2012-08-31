@@ -150,6 +150,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
         jMenuFile = new javax.swing.JMenu();
         jMenuItemCreateGraphs = new javax.swing.JMenuItem();
         jMenuItemOpenImage = new javax.swing.JMenuItem();
+        jMenuItemBatchProcessing = new javax.swing.JMenuItem();
         jMenuItemExit = new javax.swing.JMenuItem();
         jMenuInput = new javax.swing.JMenu();
         jMenuItemDownloadFiles = new javax.swing.JMenuItem();
@@ -268,6 +269,16 @@ public class VpgMainFrame extends javax.swing.JFrame {
             }
         });
         jMenuFile.add(jMenuItemOpenImage);
+
+        jMenuItemBatchProcessing.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItemBatchProcessing.setMnemonic('b');
+        jMenuItemBatchProcessing.setText("Batch Processing");
+        jMenuItemBatchProcessing.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemBatchProcessingActionPerformed(evt);
+            }
+        });
+        jMenuFile.add(jMenuItemBatchProcessing);
 
         jMenuItemExit.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, java.awt.event.InputEvent.CTRL_MASK));
         jMenuItemExit.setMnemonic('x');
@@ -532,6 +543,10 @@ public class VpgMainFrame extends javax.swing.JFrame {
         new VpgHelpFrame().setVisible(true);
     }//GEN-LAST:event_jMenuItemHelpActionPerformed
 
+    private void jMenuItemBatchProcessingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemBatchProcessingActionPerformed
+        new VpgMassGraphProcessingFrame().setVisible(true);
+    }//GEN-LAST:event_jMenuItemBatchProcessingActionPerformed
+
     
     private static void usage() {
         System.out.println(Settings.getApptag() + "USAGE: java -jar vpg.jar [<options>]");
@@ -619,6 +634,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
     private javax.swing.JMenu jMenuHelp;
     private javax.swing.JMenu jMenuInput;
     private javax.swing.JMenuItem jMenuItemAbout;
+    private javax.swing.JMenuItem jMenuItemBatchProcessing;
     private javax.swing.JMenuItem jMenuItemCreateGraphs;
     private javax.swing.JMenuItem jMenuItemDownloadFiles;
     private javax.swing.JMenuItem jMenuItemExit;

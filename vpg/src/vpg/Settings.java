@@ -140,7 +140,7 @@ public class Settings {
         //  used automatically though, it's just a reminder.
 
         // general stuff
-        defSet("vpg_I_debug_level", "0", "Debug level");
+        defSet("vpg_I_debug_level", "0", "Debug level. 0 is default, setting higher numbers will spam STDOUT with messages and may result in funky stuff. Leave it alone unless you know what you are doing.");
         defSet("vpg_S_java_command", "java", "The command to start java. You need to specify the full path here if java is not in your path.");
         defSet("vpg_S_output_apptag", "[VPG] ", "The VPG application tag. Each line written to STDOUT starts with it.");
         defSet("vpg_S_online_manual_url", "https://sourceforge.net/p/vplg/wiki/Home/", "The URL of the VPLG online help.");
@@ -177,8 +177,10 @@ public class Settings {
      * @return the version string
      */
     public static String getVersion() {
-        return("0.15");
+        return("0.23");
     }
+    
+       
     
     
     /**
