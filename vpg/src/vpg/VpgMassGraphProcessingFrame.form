@@ -80,31 +80,9 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
-                                  <Component id="jLabelPdbFileDir" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                              </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="jLabelGetDsspFiles" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                  <Component id="jComboBoxGetDsspFilesBy" max="32767" attributes="0"/>
-                              </Group>
-                              <Component id="jTextFieldPdbFileDirectory" alignment="0" max="32767" attributes="0"/>
-                          </Group>
-                          <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
-                          <Component id="jButtonSelectPdbDir" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" alignment="1" attributes="0">
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                          <Component id="jButtonCheckSettings" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="jButtonRunBatchJob" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" alignment="0" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" attributes="0">
                                   <Component id="jCheckBoxCustomPlccSettings" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                  <Component id="jScrollPanePlccSettingsFile" max="32767" attributes="0"/>
+                                  <Component id="jScrollPanePlccSettingsFile" pref="526" max="32767" attributes="0"/>
                               </Group>
                               <Group type="102" attributes="0">
                                   <Component id="jLabelFinalOutputDir" min="-2" max="-2" attributes="0"/>
@@ -118,12 +96,29 @@
                               <Component id="jButtonSelectFinalOutputDir" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
+                      <Group type="102" alignment="1" attributes="0">
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          <Component id="jButtonCheckSettings" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="jButtonRunBatchJob" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <Group type="102" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jLabelSettings" alignment="0" min="-2" max="-2" attributes="0"/>
-                              <Component id="jCheckBoxDoNotRunSplitPDB" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabelDsspFileDir" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabelSettings" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabelInputFiles" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabelPdbFileDir" alignment="0" min="-2" pref="115" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="jTextFieldPdbFileDirectory" max="32767" attributes="0"/>
+                              <Component id="jTextFieldDsspFileDirectory" max="32767" attributes="0"/>
+                          </Group>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="jButtonSelectDsspDir" alignment="1" min="-2" max="-2" attributes="0"/>
+                              <Component id="jButtonSelectPdbDir" alignment="1" min="-2" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -134,18 +129,20 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jLabelPdbFileDir" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLabelInputFiles" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jTextFieldPdbFileDirectory" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jButtonSelectPdbDir" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jLabelPdbFileDir" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jLabelGetDsspFiles" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jComboBoxGetDsspFilesBy" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jLabelDsspFileDir" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jTextFieldDsspFileDirectory" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jButtonSelectDsspDir" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
                   <Component id="jSeparatorTop" min="-2" pref="10" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jLabelSettings" min="-2" max="-2" attributes="0"/>
@@ -163,9 +160,7 @@
                       <Component id="jTextFieldFinalOutputDir" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jButtonSelectFinalOutputDir" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jCheckBoxDoNotRunSplitPDB" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="56" max="32767" attributes="0"/>
+                  <EmptySpace pref="81" max="32767" attributes="0"/>
                   <Component id="jSeparatorBottom" min="-2" pref="10" max="-2" attributes="0"/>
                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
@@ -179,28 +174,13 @@
       <SubComponents>
         <Component class="javax.swing.JLabel" name="jLabelPdbFileDir">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Directory to search for PDB files:"/>
+            <Property name="text" type="java.lang.String" value="PDB file directory:"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="jTextFieldPdbFileDirectory">
           <Properties>
             <Property name="text" type="java.lang.String" value="/home/ts/data/PDB"/>
             <Property name="toolTipText" type="java.lang.String" value="The directory to search recursively for PDB files."/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JLabel" name="jLabelGetDsspFiles">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Get DSSP files by..."/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JComboBox" name="jComboBoxGetDsspFilesBy">
-          <Properties>
-            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="1">
-                <StringItem index="0" value="Searching the directory above (PDB and DSSP file for a protein can be in different subdirs)"/>
-              </StringArray>
-            </Property>
-            <Property name="toolTipText" type="java.lang.String" value="How to get the DSSP file for a PDB file,"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JSeparator" name="jSeparatorTop">
@@ -289,13 +269,28 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonSelectFinalOutputDirActionPerformed"/>
           </Events>
         </Component>
-        <Component class="javax.swing.JCheckBox" name="jCheckBoxDoNotRunSplitPDB">
+        <Component class="javax.swing.JLabel" name="jLabelInputFiles">
           <Properties>
-            <Property name="selected" type="boolean" value="true"/>
-            <Property name="text" type="java.lang.String" value="The DSSP files do NOT need to be preprocessed by running SplitPDB, i.e., none of them contain multiple models"/>
-            <Property name="toolTipText" type="java.lang.String" value="Activating this option will save time if all DSSP files are already proprocessed but will result in errors if this is not the case. Handle with care!"/>
-            <Property name="enabled" type="boolean" value="false"/>
+            <Property name="text" type="java.lang.String" value="Input files"/>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabelDsspFileDir">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="DSSP file directory:"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="jTextFieldDsspFileDirectory">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="/home/ts/data/DSSP"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButtonSelectDsspDir">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Select..."/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonSelectDsspDirActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

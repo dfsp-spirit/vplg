@@ -83,14 +83,54 @@ public class VpgJobs {
      * Runs splitPdb with the given settings.
      * @param pdbFile the input PDB file
      * @param requestedOutputFile the path where to write the output file, including file name
+     * @param workingDir the working directory
      * @param nonEssentialSplitPdbOptions the input option string, e.g. "--file input.txt --not-today --min-max 1 2 --faster"
-     * @return 
+     * @return a ProcessResult which holds various info. It is null if an exception occurred while trying to run the command.
      */
-    public static Boolean runSplitPdb(File pdbFile, File requestedOutputFile, String nonEssentialSplitPdbOptions) {
-        Boolean result = true;
+    public static synchronized ProcessResult runSplitPdb(File pdbFile, File requestedOutputFile, File workingDir, String nonEssentialSplitPdbOptions) {
+        
+        String stdout, stderr;
+        Integer retVal;
+        ArrayList<String> cmdList = new ArrayList<String>();
+        
+        cmdList.add(Settings.get("vpg_S_java_command"));
+        cmdList.add("-jar");
+        cmdList.add(Settings.get("vpg_S_path_splitpdb"));
+        
+        cmdList.add(pdbFile.getAbsolutePath());
+        
+        if(VpgJobs.fileSeemsGzipped(pdbFile.getName().toLowerCase())) {
+            cmdList.add("--zipped-input");
+        }
+                
+        cmdList.add("--allow-overwrite");                        
+        
+        cmdList.add("--outfile");
+        cmdList.add(requestedOutputFile.getAbsolutePath());     
+        
+        // add non-essential options
+        String[] neOptions = VpgJobs.getCommandArrayFromString(nonEssentialSplitPdbOptions);
+        for(String opt : neOptions) {
+            cmdList.add(opt);
+        }
+        
+        String [] cmd = cmdList.toArray(new String[cmdList.size()]);                       
+        
+        try {
+            String[] inputAndError = IO.execCmd(cmd, workingDir);
+            stdout = inputAndError[0];
+            stderr = inputAndError[1];
+            retVal = Integer.valueOf(inputAndError[2]);    
+            
+        } catch(Exception e) {
+            System.err.println(Settings.getApptag() + "ERROR running SplitPDB: '" + e.getMessage() + "'.");
+            return null;
+        }
+        
+
+        return new ProcessResult(cmd, workingDir, retVal, stdout, stderr);
         
         
-        return result;
     }
     
     
@@ -98,14 +138,47 @@ public class VpgJobs {
      * Runs DSSP (dsspcmbi) with the given settings.
      * @param pdbFile the input PDB file
      * @param requestedOutputFile the path where to write the output file, including file name
+     * @param workingDir the working directory 
      * @param nonEssentialSplitPdbOptions the input option string, e.g. "--file input.txt --not-today --min-max 1 2 --faster"
-     * @return 
+     * @return a ProcessResult which holds various info. It is null if an exception occurred while trying to run the command.
      */
-    public static Boolean runDssp(File pdbFile, File requestedOutputFile, String nonEssentialSplitPdbOptions) {
-        Boolean result = true;
+    public static synchronized ProcessResult runDssp(File pdbFile, File requestedOutputFile, File workingDir, String nonEssentialDsspOptions) {
+        
+        String stdout, stderr;
+        Integer retVal;
+        ArrayList<String> cmdList = new ArrayList<String>();
         
         
-        return result;
+        cmdList.add(Settings.get("vpg_S_path_dssp")); 
+        
+        cmdList.add("-i");
+        cmdList.add(pdbFile.getAbsolutePath());
+        
+        cmdList.add("-o");
+        cmdList.add(requestedOutputFile.getAbsolutePath());
+        
+        
+        // add non-essential options
+        String[] neOptions = VpgJobs.getCommandArrayFromString(nonEssentialDsspOptions);
+        for(String opt : neOptions) {
+            cmdList.add(opt);
+        }
+        
+        String [] cmd = cmdList.toArray(new String[cmdList.size()]);                       
+        
+        try {
+            String[] inputAndError = IO.execCmd(cmd, workingDir);
+            stdout = inputAndError[0];
+            stderr = inputAndError[1];
+            retVal = Integer.valueOf(inputAndError[2]);    
+            
+        } catch(Exception e) {
+            System.err.println(Settings.getApptag() + "ERROR running DSSP: '" + e.getMessage() + "'.");
+            return null;
+        }
+        
+
+        return new ProcessResult(cmd, workingDir, retVal, stdout, stderr);        
     }
     
     

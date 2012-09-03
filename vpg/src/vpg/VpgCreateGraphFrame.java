@@ -418,25 +418,11 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
     /**
      * Tries to determine the PDB ID from the input file name.
      * @return the PDBID if it succeeds, a null String otherwise
+     * @see VpgMassGraphProcessingFrame.determinePdbidFromPdbFilename()
      */
     public String determinePDBID() {
-        String fileName;
-        String pdbid = null;
-        
-        File pdbFile = new File(this.jTextFieldInputFilePDB.getText());
-        if(pdbFile.isFile() && pdbFile.canRead()) {
-            fileName = pdbFile.getName();
-            try {
-                pdbid = fileName.split("\\.")[0];
-            } catch(Exception e) {
-                System.err.println(Settings.getApptag() + "WARNING: Cannot determine PDBID from file name '" + fileName + "'.");
-                return null;
-            }
-
-        } else {
-            return null;             
-        }
-        return pdbid;
+        File f = new File(this.jTextFieldInputFilePDB.getText());        
+        return VpgMassGraphProcessingFrame.determinePdbidFromPdbFilename(f.getName());        
     }
     
 

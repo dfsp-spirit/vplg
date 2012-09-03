@@ -16,7 +16,10 @@ import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.JFileChooser;
@@ -52,12 +55,14 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
         
         String fs = System.getProperty("file.separator");
         this.jTextFieldPdbFileDirectory.setText(System.getProperty("user.home") + fs + "data" + fs + "PDB");
+        this.jTextFieldDsspFileDirectory.setText(System.getProperty("user.home") + fs + "data" + fs + "DSSP");
         this.jTextFieldPlccSettingsFile.setText(System.getProperty("user.home") + fs + "software" + fs + "vplg" + fs + "example_data" + fs + "plccopt" + fs + "default_settings.plccopt");
         this.jTextFieldFinalOutputDir.setText(System.getProperty("user.home") + fs + "data" + fs + "VPLG");
         
         this.jCheckBoxCustomPlccSettings.addItemListener(this);
         
         this.jTextFieldPdbFileDirectory.getDocument().addDocumentListener(this);
+        this.jTextFieldDsspFileDirectory.getDocument().addDocumentListener(this);
         this.jTextFieldPlccSettingsFile.getDocument().addDocumentListener(this);
         this.jTextFieldFinalOutputDir.getDocument().addDocumentListener(this);
         
@@ -83,10 +88,11 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
             Boolean allOk;
             Integer numOk = 0;
             int progress = 0;
-            setProgress(0);
+            setProgress(progress);
             maxProgress = pdbFilesWithValidDsspFiles.size();
                             
-            while (progress < maxProgress && !isCancelled()) {    
+            
+            while (progress <= maxProgress && ! this.isCancelled()) {    
                 if(pm.isCanceled()) {
                     System.out.println(Settings.getApptag() + "NOTE: Batch processing canceled in progress monitor.");
                     this.cancel(true);
@@ -127,31 +133,35 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
             System.out.println(Settings.getApptag() + "Results: " + successList.size() + " succeeded, " + failList.size() + " failed, " + numNotProcessed + " not processed.");
 
             String logText = "Results: " + successList.size() + " succeeded, " + failList.size() + " failed, " + numNotProcessed + " not processed.\n";
-            String failOutput = "";
+            String failOutput = "Failed PDB IDs: ";
             if(failList.size() > 0) {
-                failOutput += "WARNING: Failed PDB IDs: ";
                 for(String f : failList) {
                     failOutput += (f + " ");
                 }
-                failOutput += "\n";
-                System.err.print(Settings.getApptag() + failOutput);                
+                
+                System.err.println(Settings.getApptag() + failOutput);                
             }
 
+            failOutput += "\n";
             logText += failOutput;
 
-            String successOutput = "";
-            if(successList.size() > 0) {
-                successOutput += "Succeeded PDB IDs: ";
+            String successOutput = "Succeeded PDB IDs: ";
+            if(successList.size() > 0) {                
                 for(String f : successList) {
                     successOutput += (f + " ");
-                }
-                successOutput += "\n";
-                System.out.print(Settings.getApptag() + successOutput);                
+                }                
+                System.out.println(Settings.getApptag() + successOutput);                
             }
 
+            successOutput += "\n";
             logText += successOutput;
 
-            IO.stringToTextFile(batchLog.getAbsolutePath(), logText);
+            String logInfoText = "Log file written to '" + batchLog.getAbsolutePath() + "'.";
+            if(IO.stringToTextFile(batchLog.getAbsolutePath(), logText)) {
+                System.out.println(Settings.getApptag() + logInfoText);
+            }
+            
+            logText += logInfoText;
 
             JOptionPane.showMessageDialog(parent, logText, "VPG -- Batch processing results", JOptionPane.INFORMATION_MESSAGE);
             
@@ -189,8 +199,6 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
         jPanelContent = new javax.swing.JPanel();
         jLabelPdbFileDir = new javax.swing.JLabel();
         jTextFieldPdbFileDirectory = new javax.swing.JTextField();
-        jLabelGetDsspFiles = new javax.swing.JLabel();
-        jComboBoxGetDsspFilesBy = new javax.swing.JComboBox();
         jSeparatorTop = new javax.swing.JSeparator();
         jButtonSelectPdbDir = new javax.swing.JButton();
         jLabelSettings = new javax.swing.JLabel();
@@ -204,7 +212,10 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
         jLabelFinalOutputDir = new javax.swing.JLabel();
         jTextFieldFinalOutputDir = new javax.swing.JTextField();
         jButtonSelectFinalOutputDir = new javax.swing.JButton();
-        jCheckBoxDoNotRunSplitPDB = new javax.swing.JCheckBox();
+        jLabelInputFiles = new javax.swing.JLabel();
+        jLabelDsspFileDir = new javax.swing.JLabel();
+        jTextFieldDsspFileDirectory = new javax.swing.JTextField();
+        jButtonSelectDsspDir = new javax.swing.JButton();
 
         setTitle("VPG -- Batch Processor");
 
@@ -222,15 +233,10 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
         jLabelStatus.setBackground(new java.awt.Color(200, 200, 200));
         jLabelStatus.setText("VPG Batch processor ready.");
 
-        jLabelPdbFileDir.setText("Directory to search for PDB files:");
+        jLabelPdbFileDir.setText("PDB file directory:");
 
         jTextFieldPdbFileDirectory.setText("/home/ts/data/PDB");
         jTextFieldPdbFileDirectory.setToolTipText("The directory to search recursively for PDB files.");
-
-        jLabelGetDsspFiles.setText("Get DSSP files by...");
-
-        jComboBoxGetDsspFilesBy.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Searching the directory above (PDB and DSSP file for a protein can be in different subdirs)" }));
-        jComboBoxGetDsspFilesBy.setToolTipText("How to get the DSSP file for a PDB file,");
 
         jButtonSelectPdbDir.setText("Select...");
         jButtonSelectPdbDir.addActionListener(new java.awt.event.ActionListener() {
@@ -288,10 +294,18 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
             }
         });
 
-        jCheckBoxDoNotRunSplitPDB.setSelected(true);
-        jCheckBoxDoNotRunSplitPDB.setText("The DSSP files do NOT need to be preprocessed by running SplitPDB, i.e., none of them contain multiple models");
-        jCheckBoxDoNotRunSplitPDB.setToolTipText("Activating this option will save time if all DSSP files are already proprocessed but will result in errors if this is not the case. Handle with care!");
-        jCheckBoxDoNotRunSplitPDB.setEnabled(false);
+        jLabelInputFiles.setText("Input files");
+
+        jLabelDsspFileDir.setText("DSSP file directory:");
+
+        jTextFieldDsspFileDirectory.setText("/home/ts/data/DSSP");
+
+        jButtonSelectDsspDir.setText("Select...");
+        jButtonSelectDsspDir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonSelectDsspDirActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanelContentLayout = new javax.swing.GroupLayout(jPanelContent);
         jPanelContent.setLayout(jPanelContentLayout);
@@ -305,26 +319,9 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
                     .addGroup(jPanelContentLayout.createSequentialGroup()
                         .addGroup(jPanelContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanelContentLayout.createSequentialGroup()
-                                .addComponent(jLabelPdbFileDir)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(jPanelContentLayout.createSequentialGroup()
-                                .addComponent(jLabelGetDsspFiles)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jComboBoxGetDsspFilesBy, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addComponent(jTextFieldPdbFileDirectory))
-                        .addGap(10, 10, 10)
-                        .addComponent(jButtonSelectPdbDir))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelContentLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jButtonCheckSettings)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButtonRunBatchJob))
-                    .addGroup(jPanelContentLayout.createSequentialGroup()
-                        .addGroup(jPanelContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanelContentLayout.createSequentialGroup()
                                 .addComponent(jCheckBoxCustomPlccSettings)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jScrollPanePlccSettingsFile))
+                                .addComponent(jScrollPanePlccSettingsFile, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE))
                             .addGroup(jPanelContentLayout.createSequentialGroup()
                                 .addComponent(jLabelFinalOutputDir)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -333,27 +330,43 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
                         .addGroup(jPanelContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jButtonSelectPlccSettingsFile)
                             .addComponent(jButtonSelectFinalOutputDir)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelContentLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jButtonCheckSettings)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButtonRunBatchJob))
                     .addGroup(jPanelContentLayout.createSequentialGroup()
                         .addGroup(jPanelContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabelDsspFileDir)
                             .addComponent(jLabelSettings)
-                            .addComponent(jCheckBoxDoNotRunSplitPDB))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                            .addComponent(jLabelInputFiles)
+                            .addComponent(jLabelPdbFileDir, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanelContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextFieldPdbFileDirectory)
+                            .addComponent(jTextFieldDsspFileDirectory))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanelContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButtonSelectDsspDir, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jButtonSelectPdbDir, javax.swing.GroupLayout.Alignment.TRAILING))))
                 .addContainerGap())
         );
         jPanelContentLayout.setVerticalGroup(
             jPanelContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelContentLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabelPdbFileDir)
+                .addComponent(jLabelInputFiles)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextFieldPdbFileDirectory, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButtonSelectPdbDir))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(jButtonSelectPdbDir)
+                    .addComponent(jLabelPdbFileDir))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanelContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabelGetDsspFiles)
-                    .addComponent(jComboBoxGetDsspFilesBy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(jLabelDsspFileDir)
+                    .addComponent(jTextFieldDsspFileDirectory, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonSelectDsspDir))
+                .addGap(22, 22, 22)
                 .addComponent(jSeparatorTop, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabelSettings)
@@ -368,9 +381,7 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
                     .addComponent(jLabelFinalOutputDir)
                     .addComponent(jTextFieldFinalOutputDir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButtonSelectFinalOutputDir))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jCheckBoxDoNotRunSplitPDB)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 56, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 81, Short.MAX_VALUE)
                 .addComponent(jSeparatorBottom, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanelContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -462,7 +473,7 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
         if ("progress".equals(evt.getPropertyName()) ) {
             int progress = (Integer) evt.getNewValue();
             pm.setProgress(progress);
-            String message = "Batch processing task done with " + progress + " / " + maxProgress + " proteins.";
+            String message = "Batch processing task done with " + progress + " / " + maxProgress + " proteins. ";
             System.out.println(Settings.getApptag() + message);
             pm.setNote(message);
             taskOutput += message;
@@ -481,7 +492,12 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
         
         Integer numProteins = this.pdbFilesWithValidDsspFiles.size();
         String fs = System.getProperty("file.separator");
-        batchLog = new File(this.getOutputDir() + fs + "vpg_batch.log");
+        
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss");
+        Date date = new Date();
+        String dateString = dateFormat.format(date);
+        
+        batchLog = new File(this.getOutputDir() + fs + "vpg_batch_log_" + dateString + ".txt");
                         
         
         this.neOptions = VpgJobs.getOptionsFromOptFile(this.getPlccoptFileFromForm());
@@ -512,7 +528,7 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
         }
         
         System.out.println(Settings.getApptag() + "Processing " + numProteins + " proteins (PDB files).");
-        this.maxProgress = (numProteins - 1);
+        this.maxProgress = numProteins;
         
         pm = new ProgressMonitor(this, "Batch processing proteins...", "Running...", 0, this.maxProgress);
         pm.setMillisToPopup(0);
@@ -536,17 +552,7 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
         
     }//GEN-LAST:event_jButtonRunBatchJobActionPerformed
 
-    /*
-    private Boolean checkPMstate(ProgressMonitor pm, Boolean taskDone) {
-        if(pm.isCanceled()) {            
-            pm.close();
-            task.cancel(true);
-            return false;
-        }          
-        
-        return true;
-    }
-    */
+   
     
     private void jButtonSelectFinalOutputDirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSelectFinalOutputDirActionPerformed
         
@@ -564,6 +570,18 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
         
         this.checkInput();
     }//GEN-LAST:event_jButtonCheckSettingsActionPerformed
+
+    private void jButtonSelectDsspDirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSelectDsspDirActionPerformed
+        
+        File defaultDir = new File(Settings.get("vpg_S_output_dir"));
+        JFileChooser fc = new JFileChooser(defaultDir);
+        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int rVal = fc.showOpenDialog(this);
+
+        if (rVal == JFileChooser.APPROVE_OPTION) {
+            this.jTextFieldDsspFileDirectory.setText(fc.getSelectedFile().toString());
+        }
+    }//GEN-LAST:event_jButtonSelectDsspDirActionPerformed
 
     
     public String getOutputDir() {
@@ -627,14 +645,14 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
             allOk = false;
         }                
         
-        // TODO: Implement that the DSSP dir may differ from the PDB dir
-        File inputDirDssp = new File(this.jTextFieldPdbFileDirectory.getText());
+        
+        File inputDirDssp = new File(this.jTextFieldDsspFileDirectory.getText());
         if(inputDirDssp.canRead() && inputDirDssp.isDirectory()) {
-            this.jTextFieldPdbFileDirectory.setBackground(Color.WHITE);
+            this.jTextFieldDsspFileDirectory.setBackground(Color.WHITE);
             statusText += "DSSP input directory seems ok. ";            
             
         } else {
-            this.jTextFieldPdbFileDirectory.setBackground(Color.RED);
+            this.jTextFieldDsspFileDirectory.setBackground(Color.RED);
             statusText += "DSSP input directory  '" + inputDirDssp.getAbsolutePath() + "' invalid. ";
             allOk = false;
         }
@@ -663,11 +681,10 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
         
         
         if(allOk) {
-            this.pdbFiles = getPdbFilesInDirectory(inputDirPdb);
-            this.dsspFiles = getDsspFilesInDirectory(inputDirDssp);
+            
+            this.scanDirectoriesForInputFiles(inputDirPdb, inputDirDssp);
             Integer numPdbFiles = this.pdbFiles.size();
-            Integer numDsspFiles = this.dsspFiles.size();
-            this.pdbFilesWithValidDsspFiles = getProteinsWithBothInputFiles(this.pdbFiles, this.dsspFiles);
+            Integer numDsspFiles = this.dsspFiles.size();            
             Integer numPdbFilesWithValidDsspFiles = this.pdbFilesWithValidDsspFiles.size();
             
             System.out.println(Settings.getApptag() + "Found " + numPdbFiles + " PDB files in batch directory.");
@@ -707,6 +724,22 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
         
         
     }
+    
+    
+    /**
+     * Recursively scans the directories for input files and assigns the results to class 
+     * variables 'pdbFiles', 'dsspFiles' and 'pdbFilesWithValidDsspFiles'. The files can be
+     * in arbitrary subdirectories of the directories. May take some time if the directories
+     * contain lots of files, e.g., the entire PDB.
+     * @param inputDirPdb the directory to scan for PDB files
+     * @param inputDirDssp the directory to scan for DSSP files
+     */ 
+    private void scanDirectoriesForInputFiles(File inputDirPdb, File inputDirDssp) {
+        this.pdbFiles = getPdbFilesInDirectory(inputDirPdb);
+        this.dsspFiles = getDsspFilesInDirectory(inputDirDssp);
+        this.pdbFilesWithValidDsspFiles = getProteinsWithBothInputFiles(this.pdbFiles, this.dsspFiles);
+    }
+    
     
     /**
      * Determines all PDB file entries in 'pdbFiles' which have a mathcing DSSP file entry in 'dsspFiles'.
@@ -764,13 +797,15 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
      */
     public void recurseSearchPdb(File dir, HashMap<String, File> pdbFiles) {
         File[] children;
+        String lcName;
         if(dir.isDirectory()) {
             children = dir.listFiles();
             
             for(File child : children) {
                 if(child.isFile()) {
-                    if(child.getName().toLowerCase().endsWith(".pdb") || child.getName().toLowerCase().endsWith(".pdb.gz") || child.getName().toLowerCase().endsWith(".ent.gz")) {
-                        String pdbid = determinePdbidFromPdbFilename(child.getName());
+                    lcName = child.getName().toLowerCase();
+                    if(lcName.endsWith(".pdb") || lcName.endsWith(".pdb.gz") || lcName.endsWith(".ent.gz") || lcName.endsWith(".pdb.split") || lcName.endsWith(".pdb.split.gz")) {
+                        String pdbid = determinePdbidFromPdbFilename(lcName);
                         if(pdbid != null) {
                             pdbFiles.put(pdbid, child);
                         }
@@ -813,11 +848,12 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
     
     /**
      * Tries to determine the PDB identifier from a PDB file name. The file may be gzipped and
-     * the following name schemes are supported: "<PDBID>.pdb", "<PDBID>.pdb.gz", "pdb<PDBID>.ent.gz". 
+     * the following name schemes are supported: "<PDBID>.pdb", "<PDBID>.pdb.gz", "pdb<PDBID>.ent.gz", "<PDBID>.pdb.split",  "<PDBID>.pdb.split.gz".
+     * Examples: 8icd.pdb, 8icd.pdb.gz, pdb8icd.ent.gz, 8icd.pdb.split, 8icd.pdb.split.gz.
      * @param fname the input file name, must NOT contain the directory part 
      * @return the determined PDB identifier (a string of length 4, e.g., "8icd") or null if the name format was not supported
      */
-    public String determinePdbidFromPdbFilename(String fname) {
+    public static String determinePdbidFromPdbFilename(String fname) {
         String filename = fname.toLowerCase();
         String pdbid = "";
         
@@ -829,6 +865,10 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
                 pdbid = filename.split("\\.")[0];
             } else if(filename.endsWith(".ent.gz")) {
                 pdbid = (filename.split("\\.")[0]).replaceAll("pdb", "");
+            } else if(filename.endsWith(".pdb.split")) {
+                pdbid = filename.split("\\.")[0];
+            } else if(filename.endsWith(".pdb.split.gz")) {
+                pdbid = filename.split("\\.")[0];
             } else {
                 System.err.println(Settings.getApptag() + "WARNING: PDB file '" + fname + "' did not end with handled pattern, ignored.");
             }
@@ -921,14 +961,14 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonCheckSettings;
     private javax.swing.JButton jButtonRunBatchJob;
+    private javax.swing.JButton jButtonSelectDsspDir;
     private javax.swing.JButton jButtonSelectFinalOutputDir;
     private javax.swing.JButton jButtonSelectPdbDir;
     private javax.swing.JButton jButtonSelectPlccSettingsFile;
     private javax.swing.JCheckBox jCheckBoxCustomPlccSettings;
-    private javax.swing.JCheckBox jCheckBoxDoNotRunSplitPDB;
-    private javax.swing.JComboBox jComboBoxGetDsspFilesBy;
+    private javax.swing.JLabel jLabelDsspFileDir;
     private javax.swing.JLabel jLabelFinalOutputDir;
-    private javax.swing.JLabel jLabelGetDsspFiles;
+    private javax.swing.JLabel jLabelInputFiles;
     private javax.swing.JLabel jLabelPdbFileDir;
     private javax.swing.JLabel jLabelSettings;
     private javax.swing.JLabel jLabelStatus;
@@ -937,6 +977,7 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
     private javax.swing.JScrollPane jScrollPanePlccSettingsFile;
     private javax.swing.JSeparator jSeparatorBottom;
     private javax.swing.JSeparator jSeparatorTop;
+    private javax.swing.JTextField jTextFieldDsspFileDirectory;
     private javax.swing.JTextField jTextFieldFinalOutputDir;
     private javax.swing.JTextField jTextFieldPdbFileDirectory;
     private javax.swing.JTextField jTextFieldPlccSettingsFile;

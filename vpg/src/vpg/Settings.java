@@ -167,6 +167,9 @@ public class Settings {
         defSet("vpg_S_download_dsspfile_URL", "ftp://ftp.cmbi.ru.nl/pub/molbio/data/dssp/<DSSPID>.dssp", "The download URL for DSSP files. The part between < and > will be replaced by the dssp ID.");
         defSet("vpg_B_download_dsspid_is_lowercase", "true", "Whether the DSSP ID contained in the download URL on the DSSP file download server is lowercase.");                
         
+        // UI, confirm and warning dialogs
+        defSet("vpg_B_dssp_download_warning", "true", "Whether to show warnings if the current batch settings may result in many DSSP files being downloaded from the internet.");
+        
         
         return(true);
     }

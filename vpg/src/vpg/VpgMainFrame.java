@@ -150,13 +150,15 @@ public class VpgMainFrame extends javax.swing.JFrame {
         jMenuFile = new javax.swing.JMenu();
         jMenuItemCreateGraphs = new javax.swing.JMenuItem();
         jMenuItemOpenImage = new javax.swing.JMenuItem();
-        jMenuItemBatchProcessing = new javax.swing.JMenuItem();
         jMenuItemExit = new javax.swing.JMenuItem();
         jMenuInput = new javax.swing.JMenu();
         jMenuItemDownloadFiles = new javax.swing.JMenuItem();
         jMenuItemGenerateDsspFile = new javax.swing.JMenuItem();
         jMenuEdit = new javax.swing.JMenu();
         jMenuItemSettings = new javax.swing.JMenuItem();
+        jMenuBatchProcessing = new javax.swing.JMenu();
+        jMenuItemBatchDssp = new javax.swing.JMenuItem();
+        jMenuItemBatchGraph = new javax.swing.JMenuItem();
         jMenuHelp = new javax.swing.JMenu();
         jMenuItemHelp = new javax.swing.JMenuItem();
         jMenuManual = new javax.swing.JMenuItem();
@@ -270,16 +272,6 @@ public class VpgMainFrame extends javax.swing.JFrame {
         });
         jMenuFile.add(jMenuItemOpenImage);
 
-        jMenuItemBatchProcessing.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.event.InputEvent.CTRL_MASK));
-        jMenuItemBatchProcessing.setMnemonic('b');
-        jMenuItemBatchProcessing.setText("Batch Processing");
-        jMenuItemBatchProcessing.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemBatchProcessingActionPerformed(evt);
-            }
-        });
-        jMenuFile.add(jMenuItemBatchProcessing);
-
         jMenuItemExit.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, java.awt.event.InputEvent.CTRL_MASK));
         jMenuItemExit.setMnemonic('x');
         jMenuItemExit.setText("Exit");
@@ -336,6 +328,31 @@ public class VpgMainFrame extends javax.swing.JFrame {
         jMenuEdit.add(jMenuItemSettings);
 
         jMenuBar.add(jMenuEdit);
+
+        jMenuBatchProcessing.setMnemonic('b');
+        jMenuBatchProcessing.setText("Batch Processing");
+
+        jMenuItemBatchDssp.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItemBatchDssp.setMnemonic('d');
+        jMenuItemBatchDssp.setText("Batch DSSP file creator");
+        jMenuItemBatchDssp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemBatchDsspActionPerformed(evt);
+            }
+        });
+        jMenuBatchProcessing.add(jMenuItemBatchDssp);
+
+        jMenuItemBatchGraph.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_B, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItemBatchGraph.setMnemonic('g');
+        jMenuItemBatchGraph.setText("Batch Graph Creator");
+        jMenuItemBatchGraph.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemBatchGraphActionPerformed(evt);
+            }
+        });
+        jMenuBatchProcessing.add(jMenuItemBatchGraph);
+
+        jMenuBar.add(jMenuBatchProcessing);
 
         jMenuHelp.setMnemonic('h');
         jMenuHelp.setText("Help");
@@ -543,9 +560,14 @@ public class VpgMainFrame extends javax.swing.JFrame {
         new VpgHelpFrame().setVisible(true);
     }//GEN-LAST:event_jMenuItemHelpActionPerformed
 
-    private void jMenuItemBatchProcessingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemBatchProcessingActionPerformed
+    private void jMenuItemBatchGraphActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemBatchGraphActionPerformed
         new VpgMassGraphProcessingFrame().setVisible(true);
-    }//GEN-LAST:event_jMenuItemBatchProcessingActionPerformed
+    }//GEN-LAST:event_jMenuItemBatchGraphActionPerformed
+
+    private void jMenuItemBatchDsspActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemBatchDsspActionPerformed
+        
+        new VpgBatchDsspFrame().setVisible(true);
+    }//GEN-LAST:event_jMenuItemBatchDsspActionPerformed
 
     
     private static void usage() {
@@ -629,12 +651,14 @@ public class VpgMainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabelWelcomeText1;
     private javax.swing.JLabel jLabelWelcomeTextWhatsup;
     private javax.swing.JMenuBar jMenuBar;
+    private javax.swing.JMenu jMenuBatchProcessing;
     private javax.swing.JMenu jMenuEdit;
     private javax.swing.JMenu jMenuFile;
     private javax.swing.JMenu jMenuHelp;
     private javax.swing.JMenu jMenuInput;
     private javax.swing.JMenuItem jMenuItemAbout;
-    private javax.swing.JMenuItem jMenuItemBatchProcessing;
+    private javax.swing.JMenuItem jMenuItemBatchDssp;
+    private javax.swing.JMenuItem jMenuItemBatchGraph;
     private javax.swing.JMenuItem jMenuItemCreateGraphs;
     private javax.swing.JMenuItem jMenuItemDownloadFiles;
     private javax.swing.JMenuItem jMenuItemExit;
