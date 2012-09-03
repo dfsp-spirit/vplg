@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.3" maxVersion="1.8" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
+  <Properties>
+    <Property name="title" type="java.lang.String" value="VPG -- Batch DSSP file processing"/>
+  </Properties>
+  <SyntheticProperties>
+    <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
+  </SyntheticProperties>
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Component id="jPanelStatus" max="32767" attributes="0"/>
+          <Component id="jPanelContent" alignment="0" max="32767" attributes="0"/>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="1" attributes="0">
+              <Component id="jPanelContent" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jPanelStatus" min="-2" max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Container class="javax.swing.JPanel" name="jPanelStatus">
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Component id="jLabelStaus" alignment="0" max="32767" attributes="0"/>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Component id="jLabelStaus" alignment="1" pref="27" max="32767" attributes="0"/>
+          </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Component class="javax.swing.JLabel" name="jLabelStaus">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="VPG batch DSSP file creator ready."/>
+          </Properties>
+        </Component>
+      </SubComponents>
+    </Container>
+    <Container class="javax.swing.JPanel" name="jPanelContent">
+
+      <Layout>
+        <DimensionLayout dim="0">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="jSeparator1" max="32767" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="jLabelPdbDir" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="jTextFieldPdbFileDirectory" max="32767" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="jButtonSelectPdbDir" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Component id="jSeparatorTop" max="32767" attributes="0"/>
+                      <Group type="102" alignment="0" attributes="0">
+                          <EmptySpace min="21" pref="21" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="jCheckBoxSplitPdbGzippedOutput" min="-2" max="-2" attributes="0"/>
+                              <Component id="jCheckBoxSkipSplitPdbIfSplitAvailable" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="jLabelPutPdbFiles" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="jComboBoxPutPdbFiles" max="32767" attributes="0"/>
+                                      <Group type="102" attributes="0">
+                                          <Component id="jTextFieldPdbSplitOutputDir" max="32767" attributes="0"/>
+                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          <Component id="jButtonSelectPdbSplitOutputDir" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                  </Group>
+                              </Group>
+                          </Group>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="jLabelPutDsspFiles" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="jComboBoxPutDsspFiles" max="32767" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Component id="jTextFieldDsspOutputDir" max="32767" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="jButtonSelectDsspOutputDir" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                      </Group>
+                      <Group type="102" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="jCheckBoxDownloadFailedDsspFiles" min="-2" max="-2" attributes="0"/>
+                              <Component id="jCheckBoxRunSplitPdb" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabelInputFiles" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabeloptions" alignment="0" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="1" attributes="0">
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          <Component id="jButtonCheckSettings" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="jButtonRunBatchDssp" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+        <DimensionLayout dim="1">
+          <Group type="103" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="jLabelInputFiles" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jLabelPdbDir" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jTextFieldPdbFileDirectory" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jButtonSelectPdbDir" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="jSeparatorTop" min="-2" pref="10" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="1" attributes="0">
+                      <Group type="102" attributes="0">
+                          <Component id="jLabeloptions" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="jCheckBoxRunSplitPdb" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="jCheckBoxSkipSplitPdbIfSplitAvailable" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                          <Component id="jCheckBoxSplitPdbGzippedOutput" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Component id="jLabelPutPdbFiles" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Component id="jComboBoxPutPdbFiles" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jTextFieldPdbSplitOutputDir" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jButtonSelectPdbSplitOutputDir" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="jCheckBoxDownloadFailedDsspFiles" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jLabelPutDsspFiles" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jComboBoxPutDsspFiles" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jTextFieldDsspOutputDir" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jButtonSelectDsspOutputDir" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                  <Component id="jSeparator1" min="-2" pref="10" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jButtonRunBatchDssp" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jButtonCheckSettings" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <EmptySpace pref="39" max="32767" attributes="0"/>
+              </Group>
+          </Group>
+        </DimensionLayout>
+      </Layout>
+      <SubComponents>
+        <Component class="javax.swing.JLabel" name="jLabelInputFiles">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Input files"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabelPdbDir">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="PDB file directory:"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="jTextFieldPdbFileDirectory">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="/home/ts/data/PDB"/>
+            <Property name="toolTipText" type="java.lang.String" value="A directory containing PDB files. They may be in subdirectories."/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButtonSelectPdbDir">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Select..."/>
+            <Property name="toolTipText" type="java.lang.String" value="Select PDB directory."/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonSelectPdbDirActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JSeparator" name="jSeparatorTop">
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabeloptions">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Options"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="jCheckBoxRunSplitPdb">
+          <Properties>
+            <Property name="selected" type="boolean" value="true"/>
+            <Property name="text" type="java.lang.String" value="Run SplitPDB to extract one model from the PDB file for DSSP (required unless already done!)"/>
+            <Property name="toolTipText" type="java.lang.String" value="Runs SplitPDB. Required unless it has already been done! Run it if in doubt. Not running it saves time but leads to errors if it has not been run before!"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="jCheckBoxSkipSplitPdbIfSplitAvailable">
+          <Properties>
+            <Property name="selected" type="boolean" value="true"/>
+            <Property name="text" type="java.lang.String" value="...but skip running if a PDB file ending with &quot;.split&quot; or &quot;.split.gz&quot; is available for that protein "/>
+            <Property name="toolTipText" type="java.lang.String" value="Uses existing SplitPDB output files if they exist instead of running SplitPDB again."/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="jCheckBoxSplitPdbGzippedOutput">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Write gzipped PDB output files (NOT recommended because DSSP currently cannot process them)"/>
+            <Property name="toolTipText" type="java.lang.String" value="Whether to zip the split output PDB file."/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabelPutPdbFiles">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Put the resulting split PDB files:"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="jComboBoxPutPdbFiles">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+              <StringArray count="3">
+                <StringItem index="0" value="Into the directory where the original PDB file also is"/>
+                <StringItem index="1" value="All directly into the directory given below"/>
+                <StringItem index="2" value="In PDB-like subdirectories under the directory given below"/>
+              </StringArray>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Where to put the generated and split PDB files."/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="jTextFieldPdbSplitOutputDir">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="/home/ts/data/PDB_split"/>
+            <Property name="toolTipText" type="java.lang.String" value="The split PDB file output directory."/>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButtonSelectPdbSplitOutputDir">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Select..."/>
+            <Property name="toolTipText" type="java.lang.String" value="Select split PDB output directory."/>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonSelectPdbSplitOutputDirActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="jCheckBoxDownloadFailedDsspFiles">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Try to download a DSSP file from the internet if something went wrong while generating it locally"/>
+            <Property name="toolTipText" type="java.lang.String" value="Dowloads failed DSSP files from the internet. Use with care, may lead to mass download!"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="jLabelPutDsspFiles">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Put the resulting DSSP files:"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JComboBox" name="jComboBoxPutDsspFiles">
+          <Properties>
+            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+              <StringArray count="3">
+                <StringItem index="0" value="Into the directory where the original PDB file also is"/>
+                <StringItem index="1" value="All directly into the directory given below"/>
+                <StringItem index="2" value="In PDB-like subdirectories under the directory given below"/>
+              </StringArray>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Where to put the generated DSSP files."/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JTextField" name="jTextFieldDsspOutputDir">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="/home/ts/data/DSSP"/>
+            <Property name="toolTipText" type="java.lang.String" value="DSSP output directory."/>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButtonSelectDsspOutputDir">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Select..."/>
+            <Property name="toolTipText" type="java.lang.String" value="Select DSSP output directory."/>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JSeparator" name="jSeparator1">
+        </Component>
+        <Component class="javax.swing.JButton" name="jButtonRunBatchDssp">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Start batch processing"/>
+            <Property name="toolTipText" type="java.lang.String" value="Starts batch processing. May take a while for many input files."/>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonRunBatchDsspActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButtonCheckSettings">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Check settings"/>
+            <Property name="toolTipText" type="java.lang.String" value="Validate input."/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonCheckSettingsActionPerformed"/>
+          </Events>
+        </Component>
+      </SubComponents>
+    </Container>
+  </SubComponents>
+</Form>
