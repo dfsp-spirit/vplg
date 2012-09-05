@@ -148,6 +148,7 @@ public class Settings {
         // paths
         defSet("vpg_S_input_dir", System.getProperty("user.home") + fs + "data" + fs + "PDB", "The input data directory where the PDB and DSSP files are.");
         defSet("vpg_S_output_dir", System.getProperty("user.home") + fs + "data" + fs + "VPLG", "The output directory where the graph files and images should be written to.");
+        defSet("vpg_S_log_dir", System.getProperty("user.home") + fs + "data" + fs + "VPLG", "The directory where log files should be written to.");
         defSet("vpg_S_last_custom_output_dir", System.getProperty("user.home") + fs + "data" + fs + "VPLG", "The custom output directory where the graph files and images should be written to. Overwritten every time you set it in the form.");
         
         String dsspcmbiExecutable = "dsspcmbi";

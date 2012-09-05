@@ -59,13 +59,7 @@ public class VpgMainFrame extends javax.swing.JFrame {
         System.out.println(appTag + "Starting VPG version " + vpgVersion + " ...");
         initComponents();
         
-        if(this.essentialSettingsOK()) {
-            this.jStatusLabel.setText("VPG version " + vpgVersion + " ready.");
-        } else {
-            this.jStatusLabel.setText("VPG version " + vpgVersion + " started. Essential settings missing, please use Edit => Settings to fix the configuration.");            
-        }
         
-        this.minorSettingsCheck();
         
     }
     
@@ -84,13 +78,19 @@ public class VpgMainFrame extends javax.swing.JFrame {
         file = new File(Settings.get("vpg_S_input_dir"));
         if(! (file.canRead() && file.isDirectory())) {
             allgood = false;
-            System.out.println("[VPG] WARNING: Input directory not set correctly.");
+            System.out.println("[VPG] WARNING: Input directory not set correctly, does not exist or not readable.");
         }
         
         file = new File(Settings.get("vpg_S_output_dir"));
         if(! (file.canWrite() && file.isDirectory())) {
             allgood = false;
-            System.out.println("[VPG] WARNING: Output directory not set correctly.");
+            System.out.println("[VPG] WARNING: Output directory not set correctly, does not exist or not writeable.");
+        }
+        
+        file = new File(Settings.get("vpg_S_log_dir"));
+        if(! (file.canWrite() && file.isDirectory())) {
+            allgood = false;
+            System.out.println("[VPG] WARNING: Log directory not set correctly, does not exist or not writeable.");
         }
         
         file = new File(Settings.get("vpg_S_path_plcc"));
@@ -638,7 +638,17 @@ public class VpgMainFrame extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
-                new VpgMainFrame().setVisible(true);
+                VpgMainFrame vpg = new VpgMainFrame();
+                vpg.setVisible(true);
+                
+                if(vpg.essentialSettingsOK()) {
+                    vpg.jStatusLabel.setText("VPG version " + Settings.getVersion() + " ready.");
+                } else {
+                    vpg.jStatusLabel.setText("VPG version " + Settings.getVersion() + " ready.");
+                    JOptionPane.showMessageDialog(vpg, "Welcome to VPG!\n\n You should start by configuring the paths to essential programs under Edit => Settings.\nOnce the settings are ready, you will be able to compute and visualize your first protein ligand graph!\n\nEnjoy!", "VPG -- Welcome", JOptionPane.INFORMATION_MESSAGE);
+                }
+        
+                vpg.minorSettingsCheck();
             }
         });
     }

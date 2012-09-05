@@ -46,6 +46,7 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
     private ArrayList<String> successList;
     private ArrayList<String> failList;
     private File batchLog;
+    private String logText;
 
     /**
      * Creates new form VpgMassGraphProcessingFrame
@@ -53,6 +54,7 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
     public VpgMassGraphProcessingFrame() {
         initComponents();
         
+        logText = "";
         String fs = System.getProperty("file.separator");
         this.jTextFieldPdbFileDirectory.setText(System.getProperty("user.home") + fs + "data" + fs + "PDB");
         this.jTextFieldDsspFileDirectory.setText(System.getProperty("user.home") + fs + "data" + fs + "DSSP");
@@ -70,7 +72,10 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
     }
     
     /**
-     * A worker thread that calls the external SplitPDB program for many proteins.
+     * A worker thread that calls the external PLCC program for many proteins. It reads the input PDB and DSSP files
+     * from the class variables pdbFilesWithValidDsspFiles, pdbFiles and dsspFiles. It assumes that the DSSP files are already
+     * preprocessed and thus contain only one model.
+     * 
      * @author ts
      */
     class BatchProcessPdbFilesTask extends SwingWorker<Void, Void> {
@@ -80,6 +85,7 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
         public void setParent(Component c) {
             this.parent = c;
         }
+               
         
         @Override
         public Void doInBackground() {
@@ -132,7 +138,9 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
 
             System.out.println(Settings.getApptag() + "Results: " + successList.size() + " succeeded, " + failList.size() + " failed, " + numNotProcessed + " not processed.");
 
-            String logText = "Results: " + successList.size() + " succeeded, " + failList.size() + " failed, " + numNotProcessed + " not processed.\n";
+            
+            String shortLogText = "Results: " + successList.size() + " succeeded, " + failList.size() + " failed, " + numNotProcessed + " not processed.\n";
+            logText += shortLogText;
             String failOutput = "Failed PDB IDs: ";
             if(failList.size() > 0) {
                 for(String f : failList) {
@@ -161,9 +169,9 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
                 System.out.println(Settings.getApptag() + logInfoText);
             }
             
-            logText += logInfoText;
+            shortLogText += logInfoText;
 
-            JOptionPane.showMessageDialog(parent, logText, "VPG -- Batch processing results", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(parent, shortLogText, "VPG -- Batch processing results", JOptionPane.INFORMATION_MESSAGE);
             
             jButtonRunBatchJob.setEnabled(false);   // prevents user from starting over accidently or thinking it didnt run, he/she can click 'Check Settings', then start again.
             jButtonCheckSettings.setEnabled(true);
@@ -452,7 +460,7 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
     /**
      * This is invoked when task's progress property changes to update the ProgressMonitor accordingly.
      */
-    public void propertyChange(PropertyChangeEvent evt) {
+    @Override public void propertyChange(PropertyChangeEvent evt) {
         
         if ("state".equals(evt.getPropertyName()) ) {
             if (pm.isCanceled() || task.isDone()) {
@@ -479,25 +487,22 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
             taskOutput += message;
             
             
-        } 
-       
-       
-       
-        
+        }                              
  
     }
     
     
     private void jButtonRunBatchJobActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRunBatchJobActionPerformed
         
+        logText = "";
         Integer numProteins = this.pdbFilesWithValidDsspFiles.size();
         String fs = System.getProperty("file.separator");
         
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HHmmss");
         Date date = new Date();
         String dateString = dateFormat.format(date);
         
-        batchLog = new File(this.getOutputDir() + fs + "vpg_batch_log_" + dateString + ".txt");
+        batchLog = new File(Settings.get("vpg_S_log_dir") + fs + "vpg_batch_graph_log_" + dateString + ".txt");
                         
         
         this.neOptions = VpgJobs.getOptionsFromOptFile(this.getPlccoptFileFromForm());
@@ -584,6 +589,11 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
     }//GEN-LAST:event_jButtonSelectDsspDirActionPerformed
 
     
+     
+    /**
+     * Returns the current output dir setting from the form.
+     * @return the output directory as a string
+     */ 
     public String getOutputDir() {
         return this.jTextFieldFinalOutputDir.getText();
     }
@@ -766,13 +776,13 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
      * @return the file as a HashMap. Keys are PDB identifiers, values are the PDB File objects.
      */
     HashMap<String, File> getPdbFilesInDirectory(File dir) {
-        HashMap<String, File> pdbFiles = new HashMap<String, File>();
+        HashMap<String, File> locPdbFiles = new HashMap<String, File>();
         
         if(dir.isDirectory()) {
-            recurseSearchPdb(dir, pdbFiles);
+            recurseSearchPdb(dir, locPdbFiles);
         }
         
-        return pdbFiles;
+        return locPdbFiles;
     }
     
     /**
@@ -781,13 +791,13 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
      * @return the file as a HashMap. Keys are PDB identifiers, values are the DSSP File objects.
      */
     HashMap<String, File> getDsspFilesInDirectory(File dir) {
-        HashMap<String, File> dsspFiles = new HashMap<String, File>();
+        HashMap<String, File> locDsspFiles = new HashMap<String, File>();
         
         if(dir.isDirectory()) {
-            recurseSearchDssp(dir, dsspFiles);
+            recurseSearchDssp(dir, locDsspFiles);
         }
         
-        return dsspFiles;
+        return locDsspFiles;
     }
     
     /**
@@ -953,7 +963,7 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
+            @Override public void run() {
                 new VpgMassGraphProcessingFrame().setVisible(true);
             }
         });

@@ -292,6 +292,13 @@ public class Main {
                     }
                     
                     
+                    if(s.equals("-C") || s.equals("--create-config")) {
+                        // The config file has already been created before parsing the command line if it did not exist, so we just do nothing here.
+                        System.out.println("Tried to create PLCC config file at '" + Settings.getDefaultConfigFilePath() + "' (see above). Exiting.");
+                        System.exit(0);
+                    }
+                    
+                    
                     if(s.equals("-L") || s.equals("--lig-filter")) {
                         if(args.length <= i+2 ) {
                             syntaxError("The --lig-filter option requires two arguments, you can set one of them to zero if you want only one border.");
@@ -3193,6 +3200,7 @@ public class Main {
         System.out.println("-b | --draw-plcc-fgs <f>   : read graph in plcc format from file <f> and draw it and all its folding graphs, then exit (pdbid will be ignored)*");
         System.out.println("-B | --force-backbone      : add contacts of special type 'backbone' between all SSEs of a graph in sequential order (N to C terminus)");
         System.out.println("-c | --dont-calc-graphs    : do not calculate SSEs contact graphs, stop after residue level contact computation");
+        System.out.println("-C | --create-config       : creates a default config file if none exists yet, then exits.*");
         System.out.println("-D | --debug <level>       : set debug level (0: off, 1: normal debug output. >=2: detailed debug output)  [DEBUG]");
         System.out.println("-d | --dsspfile <dsspfile> : use input DSSP file <dsspfile> (instead of assuming '<pdbid>.dssp')");
         System.out.println("     --gz-dsspfile <f>     : use gzipped input DSSP file <f>.");
