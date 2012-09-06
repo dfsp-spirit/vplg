@@ -640,13 +640,13 @@ public class Main {
                             Settings.set("plcc_B_output_TGF", "false");
                             Settings.set("plcc_B_output_DOT", "false");
                             Settings.set("plcc_B_output_kavosh", "false");
+                            Settings.set("plcc_B_output_plcc", "false");
                             
                             // Now add the listed ones back:
                             String types = args[i+1].toLowerCase();
                             
                             if(types.equals("x")) {
-                                // Do nothing more, x means the user wants none of the extra formats, so
-                                //  only the PLCC format will be used
+                                // Do nothing more, x means the user wants none of the formats
                             } else {
                             
                                 Integer nv = 0; // number of valid folding graph identifiers
@@ -655,11 +655,12 @@ public class Main {
                                 if(types.contains("t")) { Settings.set("plcc_B_output_TGF", "true"); nv++; }
                                 if(types.contains("d")) { Settings.set("plcc_B_output_DOT", "true"); nv++; }
                                 if(types.contains("k")) { Settings.set("plcc_B_output_kavosh", "true"); nv++; }
+                                if(types.contains("p")) { Settings.set("plcc_B_output_plcc", "true"); nv++; }
 
                                 // sanity check
                                 if(nv != types.length()) {
                                     System.err.println("WARNING: List of output formats given on command line '" + types + "' contains invalid chars (" + types.length() + " given, " + nv + " valid).");
-                                    System.err.println("WARNING: Valid chars: 'g' => GML, 't' => TGF, 'd' => DOT lang, 'k' => kavosh. Example: '-O tg'");
+                                    System.err.println("WARNING: Valid chars: 'g' => GML, 't' => TGF, 'd' => DOT lang, 'k' => kavosh edge list, 'p' => PLCC. Example: '-O tgp'");
 
                                     if(nv <= 0) {
                                         syntaxError();
@@ -1465,6 +1466,12 @@ public class Main {
                     String kavoshFile = filePath + fs + fileNameWithoutExtension + ".kavosh";
                     IO.stringToTextFile(kavoshFile, pg.toKavoshFormat());
                 }
+                // write the SSE info text file for the image (plcc graph format file)
+                if(Settings.getBoolean("plcc_B_output_plcc")) {
+                    plccGraphFile = filePath + fs + fileNameWithoutExtension + ".plg";
+                    IO.stringToTextFile(plccGraphFile, pg.toVPLGGraphFormat());
+                }
+                    
                 
                 
                 
@@ -1493,6 +1500,7 @@ public class Main {
                 
                 // test spatial ordering, not used for anything atm
                 // TODO: remove this, it's only a test and takes time
+                /*
                 if(pg.size > 0) {                                    
                     ArrayList<Integer> spatOrder = pg.getSpatialOrderingOfVertexIndices();
                     if(spatOrder.size() == pg.size && pg.size > 1) {
@@ -1508,20 +1516,12 @@ public class Main {
                     }
                     
                 }
-                
+                */
 
                 if(Settings.getBoolean("plcc_B_draw_graphs")) {
                     if(pg.drawProteinGraph(imgFile, false)) {
                         System.out.println("      Image of graph written to file '" + imgFile + "'.");
-                    }
-
-                    // write the SSE info text file for the image (plcc graph format file)
-                    plccGraphFile = filePath + fs + fileNameWithoutExtension + ".plg";
-                    if(writeStringToFile(plccGraphFile, (pg.toVPLGGraphFormat()))) {
-                        System.out.println("      Plcc format graph file written to '" + plccGraphFile + "'.");
-                    } else {
-                        System.err.println("WARNING: Could not write Plcc format graph file to '" + plccGraphFile + "'.");
-                    }
+                    }                   
                 }
                 else {
                     System.out.println("      Image and graph output disabled, not drawing and writing protein graph files.");
@@ -3217,7 +3217,7 @@ public class Main {
         System.out.println("-M | --similar <p> <c> <g> : find the proteins which are most similar to pdbid <p> chain <c> graph type <g> in the database.");
         System.out.println("-n | --textfiles           : write meta data, debug info and interim results like residue contacts to text files (slower)");
         System.out.println("-o | --outputdir <dir>     : write output files to directory <dir> (instead of '.', the current directory)");
-        System.out.println("-O | --outputformats <list>: write only graph output formats in <list>, where g=GML, t=TGF, d=DOT language, e=Kavosh edge list. Specify 'x' for none (only PLCC format).");
+        System.out.println("-O | --outputformats <list>: write only graph output formats in <list>, where g=GML, t=TGF, d=DOT language, e=Kavosh edge list, p=PLCC. Specify 'x' for none.");
         System.out.println("-p | --pdbfile <pdbfile>   : use input PDB file <pdbfile> (instead of assuming '<pdbid>.pdb')");
         System.out.println("     --gz-pdbfile <f>      : use gzipped input PDB file <f>.");
         System.out.println("-q | --fg-notations <list> : draw only the folding graph notations in <list>, e.g. 'kars' = KEY, ADJ, RED and SEQ.");
