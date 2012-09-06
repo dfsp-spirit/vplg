@@ -3239,7 +3239,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         String kf = "";
         
         if(Settings.getBoolean("plcc_B_kavosh_format_directed")) {
-            kf += this.numEdges() + "\n";
+            kf += this.numVertices() + "\n";
 
             for(Integer i = 0; i < this.getSize(); i++) {
                 for(Integer j = 0 ; j < this.getSize(); j++) {
@@ -3251,7 +3251,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             
         } else {
         
-            kf += this.numSSEContacts() + "\n";
+            kf += this.numVertices() + "\n";
 
             for(Integer i = 0; i < this.getSize(); i++) {
                 for(Integer j = i + 1; j < this.getSize(); j++) {
