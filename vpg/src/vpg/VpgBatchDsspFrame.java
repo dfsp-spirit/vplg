@@ -895,6 +895,16 @@ public class VpgBatchDsspFrame extends javax.swing.JFrame implements ItemListene
         }
         
         
+        File dsspcmbi = new File(Settings.get("vpg_S_path_dssp"));
+        if( ! (dsspcmbi.isFile() && dsspcmbi.canExecute())) {
+            statusText += "ERROR: Path to dsspcmbi executable invalid.";
+            System.err.println(Settings.getApptag() + "ERROR: Path to dsspcmbi executable is not configured properly in settings or file not executable: '" + Settings.get("vpg_S_path_dssp") + "'.\n");
+            allOk = false;
+        } else {
+            System.out.println(Settings.getApptag() + "Dsspcmbi path ok.");
+        }
+        
+        
         if(this.jTextFieldPdbSplitOutputDir.isEnabled()) {
             File outputDirSplitPdb = new File(this.jTextFieldPdbSplitOutputDir.getText());
             if(outputDirSplitPdb.canWrite() && outputDirSplitPdb.isDirectory()) {
@@ -905,7 +915,7 @@ public class VpgBatchDsspFrame extends javax.swing.JFrame implements ItemListene
                     statusText += "SplitPDB output directory seems ok but has only " + freeSpaceMB + " MB free disk space.";
                     System.out.println(Settings.getApptag() + "WARNING: Output directory '" + outputDirSplitPdb.getAbsolutePath() + "' has only " + freeSpaceMB + " MB free disk space. ");
                 } else {
-                    statusText += "SplitPDB output directory seems ok. ";
+                    statusText += "SplitPDB output directory seems ok and has " + freeSpaceMB + " MB free disk space. ";
                 }
                 
                 
@@ -927,7 +937,7 @@ public class VpgBatchDsspFrame extends javax.swing.JFrame implements ItemListene
                     statusText += "DSSP output directory seems ok but has only " + freeSpaceMB + " MB free disk space.";
                     System.out.println(Settings.getApptag() + "WARNING: Output directory '" + outputDirDssp.getAbsolutePath() + "' has only " + freeSpaceMB + " MB free disk space. ");
                 } else {
-                    statusText += "DSSP output directory seems ok. ";
+                    statusText += "DSSP output directory seems ok and has " + freeSpaceMB + " MB free disk space. ";
                 }                                
             } else {
                 this.jTextFieldDsspOutputDir.setBackground(Color.RED);

@@ -195,6 +195,8 @@
                               <Group type="102" alignment="1" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="jCheckBoxGraphFormatEdgeList" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="jCheckBoxGraphFormatPlcc" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="32767" attributes="0"/>
                                   <Component id="jCheckBoxFoldingGraphsRED" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
@@ -293,6 +295,7 @@
                       <Component id="jCheckBoxGraphFormatGML" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jCheckBoxGraphFormatTGF" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jCheckBoxGraphFormatEdgeList" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jCheckBoxGraphFormatPlcc" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace pref="6" max="32767" attributes="0"/>
                   <Component id="jSeparatorCenter" min="-2" max="-2" attributes="0"/>
@@ -693,6 +696,13 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="EL"/>
             <Property name="toolTipText" type="java.lang.String" value="Kavosh edge list (.kavosh)"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JCheckBox" name="jCheckBoxGraphFormatPlcc">
+          <Properties>
+            <Property name="selected" type="boolean" value="true"/>
+            <Property name="text" type="java.lang.String" value="PLCC"/>
+            <Property name="toolTipText" type="java.lang.String" value="PLCC graph format"/>
           </Properties>
         </Component>
       </SubComponents>

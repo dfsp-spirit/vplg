@@ -248,6 +248,9 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         else if (source == this.jCheckBoxGraphFormatEdgeList) {
             this.setCommandTextField();
         }
+        else if (source == this.jCheckBoxGraphFormatPlcc) {
+            this.setCommandTextField();
+        }
         else {
             //System.err.println(Settings.getApptag() + "WARNING: VpgCreateGraphFrame: Event from source " + source.toString() + " ignored.");
         }
@@ -528,6 +531,10 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
             noneSelected = false;
             formatList += "t";
         }
+        if(this.jCheckBoxGraphFormatPlcc.isSelected()) {
+            noneSelected = false;
+            formatList += "p";
+        }
         if(noneSelected) {
             formatList += "x";
         }
@@ -591,6 +598,12 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         initComponents();
         
         String fs = System.getProperty("file.separator");
+        
+        this.jTextFieldInputFilePDB.setText(Settings.get("vpg_S_input_dir") + fs + "8icd.pdb");
+        this.jTextFieldInputFileDSSP.setText(Settings.get("vpg_S_input_dir") + fs + "8icd.dssp");
+        this.jTextFieldCustomOutputDir.setToolTipText("Currently using default directory '" + Settings.get("vpg_S_output_dir") + "'.");
+        this.jTextFieldCustomOutputDir.setText(Settings.get("vpg_S_last_custom_output_dir"));
+        
         this.jCheckBoxAdditionalOutput.addItemListener(this);
         this.jCheckBoxAllowCoils.addItemListener(this);
         this.jCheckBoxDsspFileIsGzipped.addItemListener(this);
@@ -620,6 +633,7 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         this.jCheckBoxGraphFormatEdgeList.addItemListener(this);
         this.jCheckBoxGraphFormatGML.addItemListener(this);
         this.jCheckBoxGraphFormatTGF.addItemListener(this);
+        this.jCheckBoxGraphFormatPlcc.addItemListener(this);
         
         this.jTextFieldInputFilePDB.getDocument().addDocumentListener(this);
         this.jTextFieldInputFileDSSP.getDocument().addDocumentListener(this);
@@ -629,10 +643,7 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         this.jTextFieldSetLigAtomsMin.getDocument().addDocumentListener(this);
 
         
-        this.jTextFieldInputFilePDB.setText(Settings.get("vpg_S_input_dir") + fs + "8icd.pdb");
-        this.jTextFieldInputFileDSSP.setText(Settings.get("vpg_S_input_dir") + fs + "8icd.dssp");
-        this.jTextFieldCustomOutputDir.setToolTipText("Currently using default directory '" + Settings.get("vpg_S_output_dir") + "'.");
-        this.jTextFieldCustomOutputDir.setText(Settings.get("vpg_S_last_custom_output_dir"));
+        
         this.setCommandTextField();
              
     }
@@ -705,6 +716,7 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         jCheckBoxGraphFormatGML = new javax.swing.JCheckBox();
         jCheckBoxGraphFormatTGF = new javax.swing.JCheckBox();
         jCheckBoxGraphFormatEdgeList = new javax.swing.JCheckBox();
+        jCheckBoxGraphFormatPlcc = new javax.swing.JCheckBox();
         jPanelStats = new javax.swing.JPanel();
         jLabelStatus = new javax.swing.JLabel();
 
@@ -914,6 +926,10 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         jCheckBoxGraphFormatEdgeList.setText("EL");
         jCheckBoxGraphFormatEdgeList.setToolTipText("Kavosh edge list (.kavosh)");
 
+        jCheckBoxGraphFormatPlcc.setSelected(true);
+        jCheckBoxGraphFormatPlcc.setText("PLCC");
+        jCheckBoxGraphFormatPlcc.setToolTipText("PLCC graph format");
+
         javax.swing.GroupLayout jPanelMainContentLayout = new javax.swing.GroupLayout(jPanelMainContent);
         jPanelMainContent.setLayout(jPanelMainContentLayout);
         jPanelMainContentLayout.setHorizontalGroup(
@@ -1036,6 +1052,8 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelMainContentLayout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jCheckBoxGraphFormatEdgeList)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jCheckBoxGraphFormatPlcc)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jCheckBoxFoldingGraphsRED)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -1116,7 +1134,8 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
                     .addComponent(jCheckBoxGraphFormatDOT)
                     .addComponent(jCheckBoxGraphFormatGML)
                     .addComponent(jCheckBoxGraphFormatTGF)
-                    .addComponent(jCheckBoxGraphFormatEdgeList))
+                    .addComponent(jCheckBoxGraphFormatEdgeList)
+                    .addComponent(jCheckBoxGraphFormatPlcc))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 6, Short.MAX_VALUE)
                 .addComponent(jSeparatorCenter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -1449,6 +1468,7 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
     private javax.swing.JCheckBox jCheckBoxGraphFormatDOT;
     private javax.swing.JCheckBox jCheckBoxGraphFormatEdgeList;
     private javax.swing.JCheckBox jCheckBoxGraphFormatGML;
+    private javax.swing.JCheckBox jCheckBoxGraphFormatPlcc;
     private javax.swing.JCheckBox jCheckBoxGraphFormatTGF;
     private javax.swing.JCheckBox jCheckBoxLimitLigandAtoms;
     private javax.swing.JCheckBox jCheckBoxOutputDirTree;
