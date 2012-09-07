@@ -175,12 +175,13 @@
         <Component class="javax.swing.JLabel" name="jLabelPdbFileDir">
           <Properties>
             <Property name="text" type="java.lang.String" value="PDB file directory:"/>
+            <Property name="toolTipText" type="java.lang.String" value="The directory to search for PDB input files."/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="jTextFieldPdbFileDirectory">
           <Properties>
             <Property name="text" type="java.lang.String" value="/home/ts/data/PDB"/>
-            <Property name="toolTipText" type="java.lang.String" value="The directory to search recursively for PDB files."/>
+            <Property name="toolTipText" type="java.lang.String" value="The directory to search recursively for PDB files. Examples for accepted file name patterns: &quot;8icd.pdb&quot;, &quot;8icd.pdb.gz&quot;, &quot;pdb8icd.ent.gz&quot;, &quot;8icd.pdb.split&quot;, &quot;8icd.pdb.split.gz&quot;."/>
           </Properties>
         </Component>
         <Component class="javax.swing.JSeparator" name="jSeparatorTop">
@@ -188,6 +189,7 @@
         <Component class="javax.swing.JButton" name="jButtonSelectPdbDir">
           <Properties>
             <Property name="text" type="java.lang.String" value="Select..."/>
+            <Property name="toolTipText" type="java.lang.String" value="Select PDB file directory."/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonSelectPdbDirActionPerformed"/>
@@ -201,6 +203,7 @@
         <Component class="javax.swing.JCheckBox" name="jCheckBoxCustomPlccSettings">
           <Properties>
             <Property name="text" type="java.lang.String" value="Use custom PLCC settings from file:"/>
+            <Property name="toolTipText" type="java.lang.String" value="Load custom PLCC settings saved in the &apos;Create Graph&apos; form."/>
           </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="jButtonSelectPlccSettingsFile">
@@ -224,6 +227,7 @@
             <Component class="javax.swing.JTextField" name="jTextFieldPlccSettingsFile">
               <Properties>
                 <Property name="text" type="java.lang.String" value="/home/ts/software/vplg/example_data/plccopt/default_settings.plccopt"/>
+                <Property name="toolTipText" type="java.lang.String" value="The PLCCOPT file to load. Optional."/>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
             </Component>
@@ -258,12 +262,13 @@
         <Component class="javax.swing.JTextField" name="jTextFieldFinalOutputDir">
           <Properties>
             <Property name="text" type="java.lang.String" value="/home/ts/data/VPLG"/>
-            <Property name="toolTipText" type="java.lang.String" value=""/>
+            <Property name="toolTipText" type="java.lang.String" value="The base output directory. Has to be writeable. Make sure it has some free disk space!"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="jButtonSelectFinalOutputDir">
           <Properties>
             <Property name="text" type="java.lang.String" value="Select..."/>
+            <Property name="toolTipText" type="java.lang.String" value="Select base output directory."/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonSelectFinalOutputDirActionPerformed"/>
@@ -277,16 +282,19 @@
         <Component class="javax.swing.JLabel" name="jLabelDsspFileDir">
           <Properties>
             <Property name="text" type="java.lang.String" value="DSSP file directory:"/>
+            <Property name="toolTipText" type="java.lang.String" value="The directory to search for DSSP input files."/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="jTextFieldDsspFileDirectory">
           <Properties>
             <Property name="text" type="java.lang.String" value="/home/ts/data/DSSP"/>
+            <Property name="toolTipText" type="java.lang.String" value="The directory to search recursively for DSSP files. Examples for accepted file name patterns: &quot;8icd.dssp&quot;, &quot;8icd.dssp.gz&quot;."/>
           </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="jButtonSelectDsspDir">
           <Properties>
             <Property name="text" type="java.lang.String" value="Select..."/>
+            <Property name="toolTipText" type="java.lang.String" value="Select DSSP file directory (may be the same as PDB dir)."/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonSelectDsspDirActionPerformed"/>

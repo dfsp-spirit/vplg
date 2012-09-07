@@ -43,6 +43,7 @@ public class VpgBatchDsspFrame extends javax.swing.JFrame implements ItemListene
     HashMap<String, File> pdbFilesReadyForDssp;
     HashMap<String, File> pdbFilesRequiringSplit;
     HashMap<String, File> allPdbFiles;
+    HashMap<String, File> allSplitPdbFiles;
     
     private ProgressMonitor pm;
     private BatchCreateDsspFilesTask task;
@@ -142,7 +143,7 @@ public class VpgBatchDsspFrame extends javax.swing.JFrame implements ItemListene
         @Override
         public Void doInBackground() {
             String fs = System.getProperty("file.separator");
-            String pdbid, pdbTag;
+            String pdbid, pdbTag;            
             ProcessResult prSplitPdb, prDssp;
             Boolean allOk, splitPdbFailed, dsspFailed, downloadFailed;
             Integer numOk = 0;
@@ -152,6 +153,11 @@ public class VpgBatchDsspFrame extends javax.swing.JFrame implements ItemListene
             File outputFileSplitPDB, outputFileDssp, outputDirSplitPDB, outputDirDssp;
             setProgress(progress);
             maxProgress = allPdbFiles.size();
+            
+            pdbTag = "[task] ";
+            logText += pdbTag + "SplitPDB base output directory='" + getSplitPDBOutputDir() + "'.\n";
+            logText += pdbTag + "DSSP base output directory='" + getDsspcmbiOutputDir() + "'.\n";
+            
             for (Iterator<String> it = allPdbFiles.keySet().iterator(); it.hasNext() && ! this.isCancelled() ; ) {
                 
                 // ----------------------------- init vars, get data and check for cancel ---------------------------------
@@ -173,6 +179,7 @@ public class VpgBatchDsspFrame extends javax.swing.JFrame implements ItemListene
                 pm.setProgress(Math.min(progress, maxProgress));
                 text = "SplitPDB: " + pdbid.toUpperCase() + " (" + progress + "/" + maxProgress + ").";
                 pm.setNote(text);
+                text = "Running SplitPDB for " + pdbid.toUpperCase() + ", (" + progress + "/" + maxProgress + ").";
                 logText += (pdbTag + text + "\n");
 
                 System.out.println(Settings.getApptag() + "#" + progress + ", " + pdbid.toUpperCase() + ": '" + allPdbFiles.get(pdbid) + "'.");
@@ -219,8 +226,15 @@ public class VpgBatchDsspFrame extends javax.swing.JFrame implements ItemListene
                     outputFileDssp = new File(fName);                    
                 }
                 
-                System.out.println(Settings.getApptag() + "The SplitPDB output file for " + pdbid + " will be written to '" + outputFileSplitPDB.getAbsolutePath() + "'.");
-                System.out.println(Settings.getApptag() + "The DSSP output file for " + pdbid + " will be written to '" + outputFileDssp.getAbsolutePath() + "'.");
+
+                if(allPdbFiles.get(pdbid).isFile() && allPdbFiles.get(pdbid).canRead()) {
+                    logText += pdbTag + "SplitPDB input file='" + allPdbFiles.get(pdbid).getAbsolutePath() + "' exists. SplitPDB output file='" + outputFileSplitPDB.getAbsolutePath() + "'.\n";
+                } else {
+                    logText += pdbTag + "ERROR: SplitPDB input file='" + allPdbFiles.get(pdbid).getAbsolutePath() + "' does NOT exist. SplitPDB output file='" + outputFileSplitPDB.getAbsolutePath() + "'.\n";
+                    System.err.println(Settings.getApptag() + "ERROR: SplitPDB input file='" + allPdbFiles.get(pdbid).getAbsolutePath() + "' does NOT exist.");
+                }
+                
+                logText += pdbTag + "DSSP output file for " + pdbid + " will be written to '" + outputFileDssp.getAbsolutePath() + "'.\n";
                 
                 // ----------------------------- run SplitPDB ---------------------------------
                 
@@ -230,9 +244,9 @@ public class VpgBatchDsspFrame extends javax.swing.JFrame implements ItemListene
                     prSplitPdb = VpgJobs.runSplitPdb(allPdbFiles.get(pdbid), outputFileSplitPDB, new File(System.getProperty("user.home")), neOptionsSplitPdb);
                     if(prSplitPdb == null) {
                         allOk = false;
-                        text = "ERROR: SplitPDB failed for protein " + pdbid + " and result was NULL (No output file at '" + outputFileSplitPDB.getAbsolutePath() + "').";
-                        System.err.println(Settings.getApptag() + text);
-                        logText += pdbTag + text + "\n";
+                        //text = "ERROR: SplitPDB failed for protein " + pdbid + " and result was NULL (No output file at '" + outputFileSplitPDB.getAbsolutePath() + "').";
+                        //System.err.println(Settings.getApptag() + text);
+                        //logText += pdbTag + text + "\n";
                     } else {
                         allOk = (prSplitPdb.getReturnValue() == 0 || prSplitPdb.getReturnValue() == 2);
                         text = "SplitPDB finished, return value was " + prSplitPdb.getReturnValue() + ".";
@@ -240,6 +254,7 @@ public class VpgBatchDsspFrame extends javax.swing.JFrame implements ItemListene
                         logText += pdbTag + text + "\n";
                         if(allOk) {
                             text = "SplitPDB succeeded for protein " + pdbid + ", output file is at '" + outputFileSplitPDB.getAbsolutePath() + "'.";
+                            allSplitPdbFiles.put(pdbid, outputFileSplitPDB);
                             System.out.println(Settings.getApptag() + text);
                             logText += pdbTag + text + "\n";
                         }
@@ -248,28 +263,66 @@ public class VpgBatchDsspFrame extends javax.swing.JFrame implements ItemListene
                       
                 if( ! allOk) {
                     splitPdbFailed = true;
+                    
+                    if(prSplitPdb == null) {
+                        text = "ERROR: SplitPDB run failed for " + pdbid + " and process result is NULL.";
+                    } else {
+                        text = "ERROR: SplitPDB run failed for " + pdbid + ", return value = " + prSplitPdb.getReturnValue() + ".";                                                
+                    }                    
+                    System.err.println(Settings.getApptag() + text + " See log for details.");
+                    logText += pdbTag + text + "\n";
+                    logText += pdbTag + "ERROR+: SplitPDB command was: '" + IO.stringArrayToString(prSplitPdb.getCommandArray(), " ") + "'.\n";                    
                     if(prSplitPdb != null) {
-                        text = "ERROR: SplitPDB failed for protein " + pdbid + ": retVal=" + prSplitPdb.getReturnValue() + " (No output file at '" + outputFileSplitPDB.getAbsolutePath() + "').";
-                        logText += pdbTag + text + "\n";
-                        System.err.println(Settings.getApptag() + text);
+                        if( ! prSplitPdb.getStdErrString().isEmpty()) {                           
+                            logText += pdbTag + "ERROR+: STDERR output of SplitPDB follows in next lines:" + "\n" + prSplitPdb.getStdErrString();
+                        } else {
+                            logText += pdbTag + "ERROR+: STDERR output of SplitPDB is empty." + "\n";
+                            if( ! prSplitPdb.getStdOutString().isEmpty()) {                           
+                                logText += pdbTag + "ERROR+: STDOUT output of SplitPDB follows in next lines:" + "\n" + prSplitPdb.getStdOutString();
+                            } else {
+                                logText += pdbTag + "ERROR+: STDOUT output of SplitPDB is empty." + "\n";
+                            }
+                        }
                     }
+                    
+                    
+                    //if(prSplitPdb != null) {
+                        //text = "ERROR: SplitPDB failed for protein " + pdbid + ": retVal=" + prSplitPdb.getReturnValue() + " (No output file at '" + outputFileSplitPDB.getAbsolutePath() + "').";
+                        //logText += pdbTag + text + "\n";
+                        //System.err.println(Settings.getApptag() + text);
+                    //}
                 }
                 // ----------------------------- run DSSP ---------------------------------
                 
                                                 
-                if(allOk) { 
+                if(allOk && allSplitPdbFiles.containsKey(pdbid)) { 
                             
                     text = "DSSP: " + pdbid.toUpperCase() + " (" + progress + "/" + maxProgress + ").";
                     System.out.println(Settings.getApptag() + text);
                     pm.setNote(text);
                     logText += pdbTag + (text + "\n");
                     
-                    prDssp = VpgJobs.runDssp(allPdbFiles.get(pdbid), outputFileDssp, new File(System.getProperty("user.home")), neOptionsDsspcmbi);
+                    File dsspInputFile = allSplitPdbFiles.get(pdbid);
+                    logText += pdbTag + "Dssp input file will be the SplitPDB output file at '" + dsspInputFile.getAbsolutePath() + "'.\n";
+                    
+                    if(dsspInputFile.isFile() && dsspInputFile.canRead()) {
+                        logText += pdbTag + "Dssp input file at '" + dsspInputFile.getAbsolutePath() + "' exists.\n";
+                    } else {
+                        logText += pdbTag + "ERROR: Dssp input file at '" + dsspInputFile.getAbsolutePath() + "' does NOT exists.\n";
+                        System.err.println("ERROR: Dssp input file at '" + dsspInputFile.getAbsolutePath() + "' does NOT exists.");
+                    }
+                    
+                    if(outputFileDssp.exists()) {
+                        logText += pdbTag + "WARNING: Dssp output file at '" + outputFileDssp.getAbsolutePath() + "' already exists, DSSP will overwrite it.\n";
+                        System.err.println("WARNING: Dssp output file at '" + outputFileDssp.getAbsolutePath() + "' already exists, DSSP will overwrite it.");
+                    }
+                    
+                    prDssp = VpgJobs.runDssp(dsspInputFile, outputFileDssp, new File(System.getProperty("user.home")), neOptionsDsspcmbi);
                     if(prDssp == null) {
                         allOk = false;
-                        text = "ERROR: DSSP failed for protein " + pdbid + " and result was NULL (No output file at '" + outputFileDssp.getAbsolutePath() + "').";
-                        logText += pdbTag + text + "\n";
-                        System.err.println(Settings.getApptag() + text);
+                        //text = "ERROR: DSSP failed for protein " + pdbid + " and result was NULL.";
+                        //logText += pdbTag + text + "\n";
+                        //System.err.println(Settings.getApptag() + text);
                     } else {
                         allOk = (prDssp.getReturnValue() == 0);
                     }
@@ -278,24 +331,48 @@ public class VpgBatchDsspFrame extends javax.swing.JFrame implements ItemListene
                     if(allOk) {
                         numOk++; 
                         successList.add(pdbid); 
-                        text = "DSSP succeeded for protein " + pdbid + ", output file is at '" + outputFileDssp.getAbsolutePath() + "').";
+                        text = "DSSP succeeded for protein " + pdbid + ", output file is at '" + outputFileDssp.getAbsolutePath() + "'.";
                         logText += pdbTag + text + "\n";
-                        System.err.println(Settings.getApptag() + text);
+                        System.out.println(Settings.getApptag() + text);
                         dsspFailed = false;
                     } else {
                         dsspFailed = true;
+                        
+                        
+                        if(prDssp == null) {
+                            text = "ERROR: DSSP run failed for " + pdbid + " and process result is NULL.";
+                        } else {
+                            text = "ERROR: DSSP run failed for " + pdbid + ", return value = " + prDssp.getReturnValue() + ".";                                                
+                        }                    
+                        System.err.println(Settings.getApptag() + text + " See log for details.");
+                        logText += pdbTag + text + "\n";
+                        logText += pdbTag + "ERROR+: DSSP command was: '" + IO.stringArrayToString(prDssp.getCommandArray(), " ") + "'.\n";                    
                         if(prDssp != null) {
-                            text = "ERROR: DSSP failed for protein " + pdbid + ": retVal=" + prDssp.getReturnValue() + " (No output file at '" + outputFileDssp.getAbsolutePath() + "').";
-                            logText += pdbTag + text + "\n";
-                            System.err.println(Settings.getApptag() + text);
+                            if( ! prDssp.getStdErrString().isEmpty()) {                           
+                                logText += pdbTag + "ERROR+: STDERR output of DSSP follows in next lines:" + "\n" + prDssp.getStdErrString();
+                            } else {
+                                logText += pdbTag + "ERROR+: STDERR output of DSSP is empty." + "\n";
+                                if( ! prDssp.getStdOutString().isEmpty()) {                           
+                                    logText += pdbTag + "ERROR+: STDOUT output of DSSP follows in next lines:" + "\n" + prDssp.getStdOutString();
+                                } else {
+                                    logText += pdbTag + "ERROR+: STDOUT output of DSSP is empty." + "\n";
+                                }
+                            }
                         }
+                        
+                        
+                        //if(prDssp != null) {
+                        //    text = "ERROR: DSSP failed for protein " + pdbid + ": retVal=" + prDssp.getReturnValue() + ". See log for details.";
+                        //    logText += pdbTag + text + "\n";
+                        //    System.err.println(Settings.getApptag() + text);
+                        //}
                     }
                     
                     
                 } else {          
                     // If SplitPdb failed, running DSSP makes no sense and we assume it also failed.
                     dsspFailed = true;
-                    text = "NOTE: Not running DSSP for protein " + pdbid + " because its SplitPDB run failed.";
+                    text = "Not running DSSP for protein " + pdbid + " because its SplitPDB run failed (no input file available).";
                     System.err.println(Settings.getApptag() + text);
                     logText += pdbTag + text + "\n";
                 }
@@ -305,7 +382,7 @@ public class VpgBatchDsspFrame extends javax.swing.JFrame implements ItemListene
                     if(this.downloadDsspIfFailed) {                        
                         
                         URL downloadUrlPdb = IO.getDownloadUrlPDB(pdbid);
-                        ArrayList<String> dlErrors = IO.wget(downloadUrlPdb, outputFileDssp.getAbsolutePath());
+                        ArrayList<String> dlErrors = IO.wget(downloadUrlPdb, outputFileDssp.getAbsolutePath(), true);
                         
                         if(dlErrors.isEmpty()) {
                             text = "Downloaded DSSP file for protein " + pdbid + ".";
@@ -317,10 +394,12 @@ public class VpgBatchDsspFrame extends javax.swing.JFrame implements ItemListene
                         } else {
                             // SplitPDB and/or DSSP failed and downloading failed, so this one is lost
                             text = "ERROR: Failed to downloaded DSSP file for protein " + pdbid + " to '" + outputFileDssp.getAbsolutePath() + "'.";
-                            System.err.println(Settings.getApptag() + text);
+                            System.err.println(Settings.getApptag() + text + " See log for details.");
                             logText += pdbTag + text + "\n";
                             downloadFailed = true;
                             failList.add(pdbid);
+                            
+                            logText += pdbTag + "ERROR+ Download error messages follow: '" + IO.arrayListToString(dlErrors, " | ") + "'.\n";
                             
                             text = "FAILED: All methods (including download) failed for protein " + pdbid + ", could not create DSSP file.";
                             logText += pdbTag + text + "\n";
@@ -508,7 +587,7 @@ public class VpgBatchDsspFrame extends javax.swing.JFrame implements ItemListene
         jLabelPdbDir.setText("PDB file directory:");
 
         jTextFieldPdbFileDirectory.setText("/home/ts/data/PDB");
-        jTextFieldPdbFileDirectory.setToolTipText("A directory containing PDB files. They may be in subdirectories.");
+        jTextFieldPdbFileDirectory.setToolTipText("A directory containing PDB files. They may be in subdirectories. Examples for accepted file name patterns: \"8icd.pdb\", \"8icd.pdb.gz\", \"pdb8icd.ent.gz\".");
 
         jButtonSelectPdbDir.setText("Select...");
         jButtonSelectPdbDir.setToolTipText("Select PDB directory.");
@@ -523,13 +602,15 @@ public class VpgBatchDsspFrame extends javax.swing.JFrame implements ItemListene
         jCheckBoxRunSplitPdb.setSelected(true);
         jCheckBoxRunSplitPdb.setText("Run SplitPDB to extract one model from the PDB file for DSSP (required unless already done!)");
         jCheckBoxRunSplitPdb.setToolTipText("Runs SplitPDB. Required unless it has already been done! Run it if in doubt. Not running it saves time but leads to errors if it has not been run before!");
+        jCheckBoxRunSplitPdb.setEnabled(false);
 
-        jCheckBoxSkipSplitPdbIfSplitAvailable.setSelected(true);
         jCheckBoxSkipSplitPdbIfSplitAvailable.setText("...but skip running if a PDB file ending with \".split\" or \".split.gz\" is available for that protein ");
         jCheckBoxSkipSplitPdbIfSplitAvailable.setToolTipText("Uses existing SplitPDB output files if they exist instead of running SplitPDB again.");
+        jCheckBoxSkipSplitPdbIfSplitAvailable.setEnabled(false);
 
         jCheckBoxSplitPdbGzippedOutput.setText("Write gzipped PDB output files (NOT recommended because DSSP currently cannot process them)");
         jCheckBoxSplitPdbGzippedOutput.setToolTipText("Whether to zip the split output PDB file.");
+        jCheckBoxSplitPdbGzippedOutput.setEnabled(false);
 
         jLabelPutPdbFiles.setText("Put the resulting split PDB files:");
 
@@ -822,7 +903,7 @@ public class VpgBatchDsspFrame extends javax.swing.JFrame implements ItemListene
 
         task.setCreateSubdirsForSplitPdbOutputFiles(this.jComboBoxPutPdbFiles.getSelectedIndex() == 2);                
         task.setCreateSubdirsForDsspOutputFiles(this.jComboBoxPutDsspFiles.getSelectedIndex() == 2);             
-        task.setDownloadDsspIfFailed(this.jCheckBoxDownloadFailedDsspFiles.isEnabled());
+        task.setDownloadDsspIfFailed(this.jCheckBoxDownloadFailedDsspFiles.isSelected());
         
         //System.out.println("Indices: subSplitPDB=" + this.jComboBoxPutPdbFiles.getSelectedIndex() +", subDssp=" + this.jComboBoxPutDsspFiles.getSelectedIndex() + ", dl=" + this.jCheckBoxDownloadFailedDsspFiles.isEnabled() + ".");
         
@@ -999,6 +1080,7 @@ public class VpgBatchDsspFrame extends javax.swing.JFrame implements ItemListene
             
             
             this.allPdbFiles = new HashMap<String, File>();
+            this.allSplitPdbFiles = new HashMap<String, File>();
             this.allPdbFiles.putAll(pdbFilesReadyForDssp);
             this.allPdbFiles.putAll(pdbFilesRequiringSplit);
             

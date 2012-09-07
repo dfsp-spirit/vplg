@@ -89,7 +89,7 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
         
         @Override
         public Void doInBackground() {
-            String pdbid;
+            String pdbid, pdbTag, text;
             ProcessResult pr;
             Boolean allOk;
             Integer numOk = 0;
@@ -106,19 +106,72 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
                 }
 
                 pdbid = pdbFilesWithValidDsspFiles.get(progress);
+                pdbTag = "[" + pdbid + "] ";
 
                 pm.setProgress(Math.min(progress, maxProgress));
                 pm.setNote("Processing " + pdbid.toUpperCase() + " (" + progress + "/" + maxProgress + ").");
 
-                System.out.println(Settings.getApptag() + "#" + progress + ", " + pdbid.toUpperCase() + ": '" + pdbFiles.get(pdbid) + "', '" + dsspFiles.get(pdbid) + "'.");
+                text = "#" + progress + ", " + pdbid.toUpperCase() + ": PDB input file='" + pdbFiles.get(pdbid) + "', DSSP input file='" + dsspFiles.get(pdbid) + "'.";
+                System.out.println(Settings.getApptag() + text);
+                logText += pdbTag + text + "\n";
 
-                pr = VpgJobs.runPlcc(pdbid, pdbFiles.get(pdbid), dsspFiles.get(pdbid), new File(System.getProperty("user.home")), new File(getOutputDir()), neOptions);
-                allOk = (pr.getReturnValue() == 0);
+                // ------------------- check whether input files exist ---------------------------------
+                if(pdbFiles.get(pdbid).isFile() && pdbFiles.get(pdbid).canRead()) {
+                    text = "PDB input file for " + pdbid + " '" + pdbFiles.get(pdbid).getAbsolutePath() + "' exists and is readable.";
+                    //System.out.println(Settings.getApptag() + text);
+                    logText += pdbTag + text + "\n";
+                } else {
+                    text = "ERROR: PDB input file for " + pdbid + " '" + pdbFiles.get(pdbid).getAbsolutePath() + "' does not exist or is not readable.";
+                    System.err.println(Settings.getApptag() + text);
+                    logText += pdbTag + text + "\n";                    
+                }
+                
+                if(dsspFiles.get(pdbid).isFile() && dsspFiles.get(pdbid).canRead()) {
+                    text = "DSSP input file for " + pdbid + " '" + dsspFiles.get(pdbid).getAbsolutePath() + "' exists and is readable.";
+                    //System.out.println(Settings.getApptag() + text);
+                    logText += pdbTag + text + "\n";
+                } else {
+                    text = "ERROR: DSSP input file for " + pdbid + " '" + dsspFiles.get(pdbid).getAbsolutePath() + "' does not exist or is not readable.";
+                    System.err.println(Settings.getApptag() + text);
+                    logText += pdbTag + text + "\n";                    
+                }
+                
+                // ---------------------------------- run ---------------------------------
+                
+                pr = VpgJobs.runPlcc(pdbid, pdbFiles.get(pdbid), dsspFiles.get(pdbid), Settings.getPlccWorkingDir(), new File(getOutputDir()), neOptions);
+                if(pr == null) {
+                    allOk = false;
+                } else {
+                    allOk = (pr.getReturnValue() == 0);
+                }
 
                 if(allOk) { 
-                    numOk++; 
+                    numOk++;
+                    text = "PLCC run succeeded for " + pdbid + ", return value = " + pr.getReturnValue() + ".";
+                    System.out.println(Settings.getApptag() + text);
+                    logText += pdbTag + text + "\n";
                     successList.add(pdbid);
                 } else {
+                    if(pr == null) {
+                        text = "ERROR: PLCC run failed for " + pdbid + " and process result is NULL.";
+                    } else {
+                        text = "ERROR: PLCC run failed for " + pdbid + ", return value = " + pr.getReturnValue() + ".";                                                
+                    }                    
+                    System.err.println(Settings.getApptag() + text + " See log for details.");
+                    logText += pdbTag + text + "\n";
+                    logText += pdbTag + "ERROR+: PLCC command was: '" + IO.stringArrayToString(pr.getCommandArray(), " ") + "'.\n";                    
+                    if(pr != null) {
+                        if( ! pr.getStdErrString().isEmpty()) {                           
+                            logText += pdbTag + "ERROR+: STDERR output of PLCC follows in next lines:" + "\n" + pr.getStdErrString();
+                        } else {
+                            logText += pdbTag + "ERROR+: STDERR output of PLCC is empty." + "\n";
+                            if( ! pr.getStdOutString().isEmpty()) {                           
+                                logText += pdbTag + "ERROR+: STDOUT output of PLCC follows in next lines:" + "\n" + pr.getStdOutString();
+                            } else {
+                                logText += pdbTag + "ERROR+: STDOUT output of PLCC is empty." + "\n";
+                            }
+                        }
+                    }
                     failList.add(pdbid);
                 }
 
@@ -242,11 +295,13 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
         jLabelStatus.setText("VPG Batch processor ready.");
 
         jLabelPdbFileDir.setText("PDB file directory:");
+        jLabelPdbFileDir.setToolTipText("The directory to search for PDB input files.");
 
         jTextFieldPdbFileDirectory.setText("/home/ts/data/PDB");
-        jTextFieldPdbFileDirectory.setToolTipText("The directory to search recursively for PDB files.");
+        jTextFieldPdbFileDirectory.setToolTipText("The directory to search recursively for PDB files. Examples for accepted file name patterns: \"8icd.pdb\", \"8icd.pdb.gz\", \"pdb8icd.ent.gz\", \"8icd.pdb.split\", \"8icd.pdb.split.gz\".");
 
         jButtonSelectPdbDir.setText("Select...");
+        jButtonSelectPdbDir.setToolTipText("Select PDB file directory.");
         jButtonSelectPdbDir.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonSelectPdbDirActionPerformed(evt);
@@ -256,6 +311,7 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
         jLabelSettings.setText("Settings");
 
         jCheckBoxCustomPlccSettings.setText("Use custom PLCC settings from file:");
+        jCheckBoxCustomPlccSettings.setToolTipText("Load custom PLCC settings saved in the 'Create Graph' form.");
 
         jButtonSelectPlccSettingsFile.setText("Select...");
         jButtonSelectPlccSettingsFile.setToolTipText("Select PLCC settings file. You can save one in the graph creator.");
@@ -270,6 +326,7 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
         jScrollPanePlccSettingsFile.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 
         jTextFieldPlccSettingsFile.setText("/home/ts/software/vplg/example_data/plccopt/default_settings.plccopt");
+        jTextFieldPlccSettingsFile.setToolTipText("The PLCCOPT file to load. Optional.");
         jTextFieldPlccSettingsFile.setEnabled(false);
         jScrollPanePlccSettingsFile.setViewportView(jTextFieldPlccSettingsFile);
 
@@ -293,9 +350,10 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
         jLabelFinalOutputDir.setToolTipText("The base output directory.");
 
         jTextFieldFinalOutputDir.setText("/home/ts/data/VPLG");
-        jTextFieldFinalOutputDir.setToolTipText("");
+        jTextFieldFinalOutputDir.setToolTipText("The base output directory. Has to be writeable. Make sure it has some free disk space!");
 
         jButtonSelectFinalOutputDir.setText("Select...");
+        jButtonSelectFinalOutputDir.setToolTipText("Select base output directory.");
         jButtonSelectFinalOutputDir.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonSelectFinalOutputDirActionPerformed(evt);
@@ -305,10 +363,13 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
         jLabelInputFiles.setText("Input files");
 
         jLabelDsspFileDir.setText("DSSP file directory:");
+        jLabelDsspFileDir.setToolTipText("The directory to search for DSSP input files.");
 
         jTextFieldDsspFileDirectory.setText("/home/ts/data/DSSP");
+        jTextFieldDsspFileDirectory.setToolTipText("The directory to search recursively for DSSP files. Examples for accepted file name patterns: \"8icd.dssp\", \"8icd.dssp.gz\".");
 
         jButtonSelectDsspDir.setText("Select...");
+        jButtonSelectDsspDir.setToolTipText("Select DSSP file directory (may be the same as PDB dir).");
         jButtonSelectDsspDir.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonSelectDsspDirActionPerformed(evt);

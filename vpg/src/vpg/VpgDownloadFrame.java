@@ -261,7 +261,7 @@ public class VpgDownloadFrame extends javax.swing.JFrame implements DocumentList
                 String outfilePdb = localDir.toString() + fs + downloadFilePdb;                    
                 statusText += "Downloading PDB file for " + pdbid + " from '" + downloadUrlPdb.toString() + "' to '" + outfilePdb + "'...\n";
                 this.jTextAreaStatus.setText(statusText);
-                errors = IO.wget(downloadUrlPdb, outfilePdb);
+                errors = IO.wget(downloadUrlPdb, outfilePdb, true);
                 
                 if( ! errors.isEmpty()) {
                     for(String e : errors) { statusText += e + "\n"; }                
@@ -278,7 +278,7 @@ public class VpgDownloadFrame extends javax.swing.JFrame implements DocumentList
                 String outfileDssp = localDir.toString() + fs + downloadFileDssp;                    
                 statusText += "Downloading DSSP file for " + pdbid + " from '" + downloadUrlDssp.toString() + "' to '" + outfileDssp + "'...\n";
                 this.jTextAreaStatus.setText(statusText);
-                errors = IO.wget(downloadUrlDssp, outfileDssp);
+                errors = IO.wget(downloadUrlDssp, outfileDssp, true);
                 
                 if( ! errors.isEmpty()) {
                     for(String e : errors) { statusText += e + "\n"; }                

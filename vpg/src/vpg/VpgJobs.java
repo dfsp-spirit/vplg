@@ -29,10 +29,15 @@ public class VpgJobs {
      */
     public static synchronized ProcessResult runPlcc(String pdbid, File pdbFile, File dsspFile, File workingDir, File outputDir, String nonEssentialPlccOptions) {
         String stdout, stderr;
+        String fs = System.getProperty("file.separator");
         Integer retVal;
         ArrayList<String> cmdList = new ArrayList<String>();
         
-        
+        // check for libs
+        File libDir = new File(workingDir.getAbsolutePath() + fs + "lib");
+        if( ! (libDir.isDirectory() && libDir.canRead())) {
+            System.err.println(Settings.getApptag() + "WARNING: No sub directory 'lib' found in the PLCC working directory.");
+        }
         
         // build essential command
         cmdList.add(Settings.get("vpg_S_java_command"));

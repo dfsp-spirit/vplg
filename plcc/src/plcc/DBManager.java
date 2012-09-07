@@ -403,6 +403,7 @@ public class DBManager {
             doInsertQuery("COMMENT ON COLUMN " + tbl_contact + ".contact_type IS '1=mixed, 2=parallel, 3=antiparallel, 4=ligand';");
             doInsertQuery("COMMENT ON COLUMN " + tbl_sse + ".lig_name IS 'The 3-letter ligand name from the PDB file and the RCSB ligand expo website. If this SSE is not a ligand SSE, this is the empty string.';");
             doInsertQuery("COMMENT ON COLUMN " + tbl_graph + ".graph_type IS '1=alpha, 2=beta, 3=albe, 4=alphalig, 5=betalig, 6=albelig';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_graph + ".graph_string IS 'The graph string in PLCC format';");
 
             // add indices
             doInsertQuery("CREATE INDEX plcc_idx_chain_insert ON " + tbl_chain + " (pdb_id, chain_name);");         // for SELECTs during data insert
@@ -433,6 +434,7 @@ public class DBManager {
             doInsertQuery("INSERT INTO " + tbl_contacttypes + " (contacttype_id, contacttype_text) VALUES (2, 'parallel');");
             doInsertQuery("INSERT INTO " + tbl_contacttypes + " (contacttype_id, contacttype_text) VALUES (3, 'antiparallel');");
             doInsertQuery("INSERT INTO " + tbl_contacttypes + " (contacttype_id, contacttype_text) VALUES (4, 'ligand');");
+            doInsertQuery("INSERT INTO " + tbl_contacttypes + " (contacttype_id, contacttype_text) VALUES (5, 'backbone');");
 
 
             res = true;      // Not really, need to check all of them.

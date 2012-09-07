@@ -198,7 +198,7 @@
         <Component class="javax.swing.JTextField" name="jTextFieldPdbFileDirectory">
           <Properties>
             <Property name="text" type="java.lang.String" value="/home/ts/data/PDB"/>
-            <Property name="toolTipText" type="java.lang.String" value="A directory containing PDB files. They may be in subdirectories."/>
+            <Property name="toolTipText" type="java.lang.String" value="A directory containing PDB files. They may be in subdirectories. Examples for accepted file name patterns: &quot;8icd.pdb&quot;, &quot;8icd.pdb.gz&quot;, &quot;pdb8icd.ent.gz&quot;."/>
           </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="jButtonSelectPdbDir">
@@ -222,19 +222,21 @@
             <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="Run SplitPDB to extract one model from the PDB file for DSSP (required unless already done!)"/>
             <Property name="toolTipText" type="java.lang.String" value="Runs SplitPDB. Required unless it has already been done! Run it if in doubt. Not running it saves time but leads to errors if it has not been run before!"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="jCheckBoxSkipSplitPdbIfSplitAvailable">
           <Properties>
-            <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="...but skip running if a PDB file ending with &quot;.split&quot; or &quot;.split.gz&quot; is available for that protein "/>
             <Property name="toolTipText" type="java.lang.String" value="Uses existing SplitPDB output files if they exist instead of running SplitPDB again."/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="jCheckBoxSplitPdbGzippedOutput">
           <Properties>
             <Property name="text" type="java.lang.String" value="Write gzipped PDB output files (NOT recommended because DSSP currently cannot process them)"/>
             <Property name="toolTipText" type="java.lang.String" value="Whether to zip the split output PDB file."/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabelPutPdbFiles">

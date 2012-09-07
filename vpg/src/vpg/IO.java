@@ -36,17 +36,26 @@ public class IO {
      * 
      * @param ftpUrl the FTP URL, e.g. "ftp://" + userName + ":" + password + "@" + server + "/public_html/" + fileName + "".
      * @param targetFile the local path where the file should be saved
+     * @param allowOverwrite whether to allow overwriting in case the target file exists. If set to 'false' and it exists, the function will abort the download. If set to true, it will delete and replace the file with the downloaded version.
      * @return a list of error messages. If this list is empty, everything worked out.
      */
-    public static ArrayList<String> wget(URL url, String targetFile) {
+    public static ArrayList<String> wget(URL url, String targetFile, Boolean allowOverwrite) {
  
         System.out.println(Settings.getApptag() + "Connecting to remote server to download file...");    
         ArrayList<String> errors = new ArrayList<String>();
         
         File outFile = new File(targetFile);
         if(outFile.exists()) {
-            errors.add("Output file '" + targetFile + "' already exists, aborting download.");
-            return errors;
+            if(allowOverwrite) {
+                if(outFile.delete()) {
+                    // OK
+                } else {
+                    errors.add("Output file '" + targetFile + "' already exists and failed to delete it, aborting download.");
+                }   return errors;
+            } else {
+                errors.add("Output file '" + targetFile + "' already exists, aborting download.");
+                return errors;
+            }
         }
  
         try {
@@ -436,6 +445,48 @@ public class IO {
         }
         
         return mdf;
+    }
+    
+    
+    /**
+     * 
+     * @param strings an array of strings
+     * @param joinString the string to put between the elements in the output string. A blank (" ") or 
+     * something like ", " is often a good choice. This will NOT appear after the last element, only between elements.
+     * @return the elements in a string, joined by the joinString
+     */
+    public static String stringArrayToString(String[] strings, String joinString) {
+        String res = "";
+        String s;
+        for(Integer i = 0; i < strings.length; i++) {
+            res += strings[i];
+            if(i < (strings.length - 1)) {
+                res += joinString;
+            }
+        }
+        
+        return res;
+    }
+    
+    
+    /**
+     * 
+     * @param strings an ArrayList of strings
+     * @param joinString the string to put between the elements in the output string. A blank (" ") or 
+     * something like ", " is often a good choice. This will NOT appear after the last element, only between elements.
+     * @return the elements in a string, joined by the joinString
+     */
+    public static String arrayListToString(ArrayList<String> strings, String joinString) {
+        String res = "";
+        String s;
+        for(Integer i = 0; i < strings.size(); i++) {
+            res += strings.get(i);
+            if(i < (strings.size() - 1)) {
+                res += joinString;
+            }
+        }
+        
+        return res;
     }
           
     

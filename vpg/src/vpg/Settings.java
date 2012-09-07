@@ -184,6 +184,10 @@ public class Settings {
         return("0.23");
     }
     
+    
+    public static File getPlccWorkingDir() {
+        return new File(Settings.get("vpg_S_path_plcc")).getParentFile();
+    }
        
     
     
