@@ -80,6 +80,20 @@ Updates from version 2012-08-07 to 2012-08-17:
   - New Help form (F1) which shows basic info on getting help for VPLG
   - Added basic validation to the PDB and DSSP file download URLs in the settings frame 
 
+Updates from version 2012-08-17 to 2012-09-07:
+================================================
+* PLCC:
+  - new command line option '-C' or '--create-config' to create a default config, then exit
+  - added Kavosh edge list output format
+  - changed '--outputformats' command line option, PLCC format is now a format like all others ('p') and 'x' does not write it anymore
+  - improvements to GML and DOT language exporters: better annotations of the graphs
+  - added new backbone contact type and option to force backbone contacts (-B or --force-backbone)
+  - comments on more DB tables
+* VPG:
+  - updated GUI to new PLCC features
+  - new experimental batch frame for creating DSSP files from PDB input files (using SplitPDB and dsspcmbi)
+  - new experimental batch frame for creating graphs from PDB and DSSP files
+  - many small bug fixes
 
 
 --
