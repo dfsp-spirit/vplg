@@ -506,6 +506,10 @@ public class Main {
                         Settings.set("plcc_B_output_images_dir_tree", "true");
                     }
                     
+                    if(s.equals("-K") || s.equals("--graph-dir-tree")) {
+                        Settings.set("plcc_B_output_textfiles_dir_tree", "true");
+                    }
+                    
                     
                     
                     if(s.equals("-m") || s.equals("--image-format")) {
@@ -1449,6 +1453,48 @@ public class Main {
                 
                 //pg.toFile(file + ".ptg");
                 //pg.print();
+                File targetDir;
+                String dirStructure;
+                // Create the file in a subdir tree based on the protein meta data if requested
+                if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
+                   
+                    if(! (pdbid.length() == 4)) {
+                        System.err.println("ERROR: PDB ID of length 4 required to output images in directory tree, using default '" + outputDir + "'.");
+                        dirStructure = outputDir;
+                        System.exit(1);
+                    } else {                    
+                        String mid2Chars = pdbid.substring(1, 3);                    
+                        dirStructure = outputDir + fs + mid2Chars + fs + pdbid;
+                        
+                    }
+                    
+                    targetDir = new File(dirStructure);
+                    if(targetDir.isDirectory()) {
+                        // dir already exsts
+                        if( ! targetDir.canWrite()) {
+                            System.err.println("ERROR: Cannot write to existing output directory '" + targetDir.getAbsolutePath() + "'.");
+                        } else {
+                            // all ok, it exists and we can write to it
+                            filePath = dirStructure;    
+                        }
+                    } else {
+                        if(targetDir.isFile()) {
+                            System.err.println("ERROR: Cannot create output directory '" + targetDir.getAbsolutePath() + "', file with that name exists. Using default '" + filePath + "'.");
+                        }
+                        
+                        try {
+                            Boolean resMkdir = targetDir.mkdirs();
+                            if(resMkdir) {
+                                // all ok, we created it (and thus can write to it)
+                                filePath = dirStructure;    
+                            }
+                        }catch(Exception e) {
+                            System.err.println("ERROR: Could not create required directory structure to output images under '" + outputDir + "', aborting. Using default '" + filePath + "'.");
+                            System.err.println("ERROR: The error was '" + e.getMessage() + "'.");
+                            //System.exit(1);
+                        }
+                    }
+                }
                 
                 if(Settings.getBoolean("plcc_B_output_GML")) {
                     String gmlfFile = filePath + fs + fileNameWithoutExtension + ".gml";
@@ -1470,31 +1516,7 @@ public class Main {
                 if(Settings.getBoolean("plcc_B_output_plcc")) {
                     plccGraphFile = filePath + fs + fileNameWithoutExtension + ".plg";
                     IO.stringToTextFile(plccGraphFile, pg.toVPLGGraphFormat());
-                }
-                    
-                
-                
-                
-                // Create the file in a subdir tree based on the protein meta data if requested
-                if(Settings.getBoolean("plcc_B_output_images_dir_tree")) {
-                   
-                    if(! (pdbid.length() == 4)) {
-                        System.err.println("ERROR: PDB ID of length 4 required to output images in directory tree.");
-                        System.exit(1);
-                    }
-                    
-                    String mid2Chars = pdbid.substring(1, 3);                    
-                    String dirStructure = outputDir + fs + "vplg_graphs" + fs + mid2Chars + fs + pdbid;
-                    
-                    try {
-                        new File(dirStructure).mkdirs();
-                        filePath = dirStructure;    
-                    }catch(Exception e) {
-                        System.err.println("ERROR: Could not create required directory structure to output images under '" + outputDir + "', aborting.");
-                        System.err.println("ERROR: The error was '" + e.getMessage() + "'.");
-                        System.exit(1);
-                    }
-                }
+                }                                                                                    
                 
                 imgFile = filePath + fs + fileNameWithExtension;
                 
@@ -3210,7 +3232,8 @@ public class Main {
         System.out.println("-h | --help                : show this help message and exit");
         System.out.println("-i | --ignoreligands       : ignore ligand contacts in geom_neo format output files [DEBUG]");
         System.out.println("-j | --ddb <p> <c> <gt> <f>: get the graph type <gt> of chain <c> of pdbid <p> from the DB and draw it to file <f> (omit the file extension)*");
-        System.out.println("-k | --img-dir-tree        : do write the output images to a sudbir tree of the output dir instead of directly in there");
+        System.out.println("-k | --img-dir-tree        : do write the output images to a PDB-style sudbir tree of the output dir (e.g., <OUTDIR>/ic/8icd/<outfile>)");
+        System.out.println("-K | --graph-dir-tree      : do write the output graph files to a PDB-style sudbir tree of the output dir ");
         System.out.println("-l | --draw-plcc-graph <f> : read graph in plcc format from file <f> and draw it to <f>.png, then exit (<pdbid> will be ignored)*");                
         System.out.println("-L | --lig-filter <i> <a>  : only consider ligands which have at least <i> and at most <a> atoms. A setting of zero means no limit.");                
         System.out.println("-m | --image-format <f>    : write output images in format <f>, which can be 'PNG' or 'JPG' (SVG vector format is always written).");

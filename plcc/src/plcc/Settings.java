@@ -175,7 +175,9 @@ public class Settings {
         defSet("plcc_B_ramachandran_plot", "false", "Whether a Ramachandran plot is drawn to a file for each chain (slower).");
         defSet("plcc_B_strict_ptgl_behaviour", "true", "Whether plcc should try to strictly mimick the PTGL, including questionable stuff.");
         
-        defSet("plcc_B_output_images_dir_tree", "false", "Whether to write output images to a sub directory structure under the output directory instead of writing them in their directly. This is useful if you want to process the whole PDB because most filesystems will get into trouble with tens of thousands of files in a single directory. The directory structure will be chosen from the meta data, i.e., PDB ID, chain, graph type, etc.");
+        defSet("plcc_B_output_images_dir_tree", "false", "Whether to write output images to a PDB-style sub directory structure under the output directory instead of writing them in their directly. This is useful if you want to process the whole PDB because most filesystems will get into trouble with tens of thousands of files in a single directory. The directory structure will be chosen from the meta data, i.e., PDB ID, chain, graph type, etc.");
+        defSet("plcc_B_output_textfiles_dir_tree", "false", "Whether to write output graph text files to a PDB-style sub directory structure under the output directory instead of writing them in their directly. This is useful if you want to process the whole PDB because most filesystems will get into trouble with tens of thousands of files in a single directory. The directory structure will be chosen from the meta data, i.e., PDB ID, chain, graph type, etc.");
+                
         defSet("plcc_B_output_GML", "true", "Whether to save computed protein graphs to text files in Graph Modelling Language format (GML).");
         defSet("plcc_B_output_TGF", "true", "Whether to save computed protein graphs to text files in Trivial Graph Format (TGF).");
         defSet("plcc_B_output_DOT", "true", "Whether to save computed protein graphs to text files in DOT language Format (DOT).");
