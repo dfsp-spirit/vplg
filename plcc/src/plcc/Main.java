@@ -510,6 +510,11 @@ public class Main {
                         Settings.set("plcc_B_output_textfiles_dir_tree", "true");
                     }
                     
+                    if(s.equals("--all-output-tree")) {
+                        Settings.set("plcc_B_output_images_dir_tree", "true");
+                        Settings.set("plcc_B_output_textfiles_dir_tree", "true");
+                    }
+                    
                     
                     
                     if(s.equals("-m") || s.equals("--image-format")) {
@@ -658,13 +663,13 @@ public class Main {
                                 if(types.contains("g")) { Settings.set("plcc_B_output_GML", "true"); nv++; }
                                 if(types.contains("t")) { Settings.set("plcc_B_output_TGF", "true"); nv++; }
                                 if(types.contains("d")) { Settings.set("plcc_B_output_DOT", "true"); nv++; }
-                                if(types.contains("k")) { Settings.set("plcc_B_output_kavosh", "true"); nv++; }
+                                if(types.contains("e")) { Settings.set("plcc_B_output_kavosh", "true"); nv++; }
                                 if(types.contains("p")) { Settings.set("plcc_B_output_plcc", "true"); nv++; }
 
                                 // sanity check
                                 if(nv != types.length()) {
                                     System.err.println("WARNING: List of output formats given on command line '" + types + "' contains invalid chars (" + types.length() + " given, " + nv + " valid).");
-                                    System.err.println("WARNING: Valid chars: 'g' => GML, 't' => TGF, 'd' => DOT lang, 'k' => kavosh edge list, 'p' => PLCC. Example: '-O tgp'");
+                                    System.err.println("WARNING: Valid chars: 'g' => GML, 't' => TGF, 'd' => DOT lang, 'e' => kavosh edge list, 'p' => PLCC. Example: '-O tgp'");
 
                                     if(nv <= 0) {
                                         syntaxError();
@@ -1403,7 +1408,8 @@ public class Main {
             
             String fileNameWithExtension = null;
             String fileNameWithoutExtension = null;
-            String filePath = null;
+            String filePathImg = null;
+            String filePathGraphs = null;
             String imgFile = null;
             String plccGraphFile = null;
             String fs = System.getProperty("file.separator");
@@ -1442,7 +1448,8 @@ public class Main {
 
                 // draw the protein graph image
 
-                filePath = outputDir;
+                filePathImg = outputDir;
+                filePathGraphs = outputDir;
                 String coils = "";
                 if(Settings.getBoolean("plcc_B_include_coils")) {
                     //System.out.println("  Considering coils, this may fragment SSEs.");
@@ -1475,50 +1482,72 @@ public class Main {
                             System.err.println("ERROR: Cannot write to existing output directory '" + targetDir.getAbsolutePath() + "'.");
                         } else {
                             // all ok, it exists and we can write to it
-                            filePath = dirStructure;    
+                            if(Settings.getBoolean("plcc_B_output_images_dir_tree")) { filePathImg = dirStructure; }
+                            if(Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) { filePathGraphs = dirStructure; }
+                                
                         }
                     } else {
                         if(targetDir.isFile()) {
-                            System.err.println("ERROR: Cannot create output directory '" + targetDir.getAbsolutePath() + "', file with that name exists. Using default '" + filePath + "'.");
+                            System.err.println("ERROR: Cannot create output directory '" + targetDir.getAbsolutePath() + "', file with that name exists. Using default '" + filePathImg + "'.");
                         }
                         
                         try {
                             Boolean resMkdir = targetDir.mkdirs();
                             if(resMkdir) {
                                 // all ok, we created it (and thus can write to it)
-                                filePath = dirStructure;    
+                                if(Settings.getBoolean("plcc_B_output_images_dir_tree")) { filePathImg = dirStructure; }
+                                if(Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) { filePathGraphs = dirStructure; }                                                                
                             }
                         }catch(Exception e) {
-                            System.err.println("ERROR: Could not create required directory structure to output images under '" + outputDir + "', aborting. Using default '" + filePath + "'.");
-                            System.err.println("ERROR: The error was '" + e.getMessage() + "'.");
+                            System.err.println("ERROR: Could not create required directory structure to output images under '" + outputDir + "'. Using default '" + filePathImg + "'.");
+                            System.err.println("ERROR+: The error was '" + e.getMessage() + "'.");
                             //System.exit(1);
                         }
                     }
                 }
                 
+                String graphFormatsWritten = "";
+                Integer numFormatsWritten = 0;
                 if(Settings.getBoolean("plcc_B_output_GML")) {
-                    String gmlfFile = filePath + fs + fileNameWithoutExtension + ".gml";
-                    IO.stringToTextFile(gmlfFile, pg.toGraphModellingLanguageFormat());
+                    String gmlfFile = filePathGraphs + fs + fileNameWithoutExtension + ".gml";
+                    if(IO.stringToTextFile(gmlfFile, pg.toGraphModellingLanguageFormat())) {
+                        graphFormatsWritten += "gml "; numFormatsWritten++;
+                    }
                 }
                 if(Settings.getBoolean("plcc_B_output_TGF")) {
-                    String tgfFile = filePath + fs + fileNameWithoutExtension + ".tgf";
-                    IO.stringToTextFile(tgfFile, pg.toTrivialGraphFormat());
+                    String tgfFile = filePathGraphs + fs + fileNameWithoutExtension + ".tgf";
+                    if(IO.stringToTextFile(tgfFile, pg.toTrivialGraphFormat())) {
+                        graphFormatsWritten += "tgf "; numFormatsWritten++;
+                    }
                 }
                 if(Settings.getBoolean("plcc_B_output_DOT")) {
-                    String dotLangFile = filePath + fs + fileNameWithoutExtension + ".gv";
-                    IO.stringToTextFile(dotLangFile, pg.toDOTLanguageFormat());
+                    String dotLangFile = filePathGraphs + fs + fileNameWithoutExtension + ".gv";
+                    if(IO.stringToTextFile(dotLangFile, pg.toDOTLanguageFormat())) {
+                        graphFormatsWritten += "gv "; numFormatsWritten++;
+                    }
                 }
                 if(Settings.getBoolean("plcc_B_output_kavosh")) {
-                    String kavoshFile = filePath + fs + fileNameWithoutExtension + ".kavosh";
-                    IO.stringToTextFile(kavoshFile, pg.toKavoshFormat());
+                    String kavoshFile = filePathGraphs + fs + fileNameWithoutExtension + ".kavosh";
+                    if(IO.stringToTextFile(kavoshFile, pg.toKavoshFormat())) {
+                        graphFormatsWritten += "kavosh "; numFormatsWritten++;
+                    }
                 }
                 // write the SSE info text file for the image (plcc graph format file)
                 if(Settings.getBoolean("plcc_B_output_plcc")) {
-                    plccGraphFile = filePath + fs + fileNameWithoutExtension + ".plg";
-                    IO.stringToTextFile(plccGraphFile, pg.toVPLGGraphFormat());
+                    plccGraphFile = filePathGraphs + fs + fileNameWithoutExtension + ".plg";
+                    if(IO.stringToTextFile(plccGraphFile, pg.toVPLGGraphFormat())) {
+                        graphFormatsWritten += "plg "; numFormatsWritten++;
+                    }
                 }                                                                                    
                 
-                imgFile = filePath + fs + fileNameWithExtension;
+                
+                if(numFormatsWritten > 0) {
+                    System.out.println("      Exported protein ligand graph in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + filePathGraphs + fs + "'.");
+                }
+                
+                
+                
+                imgFile = filePathImg + fs + fileNameWithExtension;
                 
                 // test spatial ordering, not used for anything atm
                 // TODO: remove this, it's only a test and takes time
@@ -1567,7 +1596,7 @@ public class Main {
                 /* ----------------------------------------------- Folding graphs ---------------------------------------------- */
 
                 if(Settings.getBoolean("plcc_B_folding_graphs")) {
-                    calculateFoldingGraphsForSSEGraph(pg, outputDir);                                    
+                    calculateFoldingGraphsForSSEGraph(pg, filePathImg);                                    
                 }
                 else {
                     //System.out.println("      Not handling folding graphs.");
@@ -1592,13 +1621,14 @@ public class Main {
      * Calculates all requested folding graphs for the protein graph (or 'SSE graph') pg. Which graphs are drawn is determined by the 
      * setting on the command line / configuration file.
      * @param pg the protein graphs
-     * @param outputDir the file system path where to write the image files
+     * @param outputDir the file system path where to write the image files. Has to exist and be writable.
      */
     public static void calculateFoldingGraphsForSSEGraph(ProtGraph pg, String outputDir) {
         //System.out.println("Searching connected components in " + graphType + " graph of chain " + c.getPdbChainID() + ".");
         ArrayList<FoldingGraph> ccs = pg.getConnectedComponents();
         FoldingGraph fg;           // A connected component of a protein graph is a folding graph
         String fgFile = null;
+        String fs = System.getProperty("file.separator");
 
         //System.out.println("Found " + ccs.size() + " connected components in " + graphType + " graph of chain " + c.getPdbChainID() + ".");
         for(Integer j = 0; j < ccs.size(); j++) {
@@ -1614,7 +1644,7 @@ public class Main {
             // fg.printDistMatrix();
             
             // write plcc graph format file
-            String plccGraphFile = outputDir + System.getProperty("file.separator") + pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + ".fg";
+            String plccGraphFile = outputDir + fs + pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + ".fg";
             if(writeStringToFile(plccGraphFile, (fg.toVPLGGraphFormat()))) {
                 System.out.println("      Plcc format folding graph file written to '" + plccGraphFile + "'.");
             } else {

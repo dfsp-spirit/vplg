@@ -96,5 +96,11 @@ Updates from version 2012-08-17 to 2012-09-07:
   - many small bug fixes
 
 
+Updates from version 2012-09-07 to 2012-09-14:
+================================================
+* PLCC: 
+  - added option to write all output files to a PDB-style subdirecotry structure (-K, -k), e.g. '<BASEOUTPUTDIR>/ic/8icd/8icd_A_albelig_PG.gml')
+  - fixed command line parsing of output formats, kavosh edge list format is now 'e' as described in help (it was 'k' before)
+
 --
 ts
