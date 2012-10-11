@@ -45,6 +45,11 @@ public class FoldingGraph extends SSEGraph {
     public final Integer ORIENTATION_UPWARDS = 1;       // direction: upwards (for the SSE symbols, e.g. arrows). Note that the direction represents the spatial relation between this SSE and its predecessor (i.e., an SSE pair), it is NOT a property of a single SSE.
     public final Integer ORIENTATION_DOWNWARDS = 2;     // direction: downwards
     
+    public static final String FG_NOTATION_KEY = "KEY";
+    public static final String FG_NOTATION_ADJ = "ADJ";
+    public static final String FG_NOTATION_RED = "RED";
+    public static final String FG_NOTATION_SEQ = "SEQ";
+    
     
     
     private Integer foldingGraphNumber = null;
@@ -66,7 +71,7 @@ public class FoldingGraph extends SSEGraph {
      * Draws the current folding graph in the notation 'notation' (which is one of "KEY", "SEQ", "ADJ" or "RED") and writes the image
      * in PNG format to file 'filePath'.
      * @param filePath the output path of the image
-     * @param notation the notation to use. valid notation strings are 'KEY', 'ADJ', 'RED' and 'SEQ'.
+     * @param notation the notation to use. valid notation strings are 'KEY', 'ADJ', 'RED' and 'SEQ', use the static FoldingGraph.FG_NOTATION_* strings.
      * @return true if it worked out, false otherwise 
      */
     public Boolean drawFoldingGraph(String notation, String filePath) {
@@ -89,20 +94,20 @@ public class FoldingGraph extends SSEGraph {
         }
 
         // OK, let's go.
-        if(notation.equals("KEY")) {
+        if(notation.equals(FoldingGraph.FG_NOTATION_KEY)) {
             if(this.supportsKeyNotation()) {
                 return(this.drawFoldingGraphKEY(filePath));
             } else {
                 return false;
             }
         }
-        else if(notation.equals("ADJ")) {
+        else if(notation.equals(FoldingGraph.FG_NOTATION_ADJ)) {
             return(this.drawFoldingGraphADJ(filePath));
         }
-        else if(notation.equals("RED")) {
+        else if(notation.equals(FoldingGraph.FG_NOTATION_RED)) {
             return(this.drawFoldingGraphRED(filePath));
         }
-        else if(notation.equals("SEQ")) {
+        else if(notation.equals(FoldingGraph.FG_NOTATION_SEQ)) {
             return(this.drawFoldingGraphSEQ(filePath));
         }
         else {
@@ -213,7 +218,7 @@ public class FoldingGraph extends SSEGraph {
         //--------------------------------------------------------------------------------------------------
         //--------------------------------------------------------------------------------------------------
         if(Settings.getInteger("plcc_I_debug_level") < 1) {
-            System.out.println("      Not drawing KEY notation: WIP.");
+            System.out.println("         -Not drawing KEY notation: WIP.");
             return false;
         }
         //--------------------------------------------------------------------------------------------------

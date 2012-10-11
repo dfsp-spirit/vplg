@@ -13,6 +13,7 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.FileFilter;
 import java.net.URI;
+import java.net.URLDecoder;
 import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -78,25 +79,25 @@ public class VpgMainFrame extends javax.swing.JFrame {
         file = new File(Settings.get("vpg_S_input_dir"));
         if(! (file.canRead() && file.isDirectory())) {
             allgood = false;
-            System.out.println("[VPG] WARNING: Input directory not set correctly, does not exist or not readable.");
+            System.out.println("[VPG] WARNING: Input directory '" + file.getAbsolutePath() + "' not set correctly, does not exist or not readable.");
         }
         
         file = new File(Settings.get("vpg_S_output_dir"));
         if(! (file.canWrite() && file.isDirectory())) {
             allgood = false;
-            System.out.println("[VPG] WARNING: Output directory not set correctly, does not exist or not writeable.");
+            System.out.println("[VPG] WARNING: Output directory '" + file.getAbsolutePath() + "' not set correctly, does not exist or not writeable.");
         }
         
         file = new File(Settings.get("vpg_S_log_dir"));
         if(! (file.canWrite() && file.isDirectory())) {
             allgood = false;
-            System.out.println("[VPG] WARNING: Log directory not set correctly, does not exist or not writeable.");
+            System.out.println("[VPG] WARNING: Log directory '" + file.getAbsolutePath() + "' not set correctly, does not exist or not writeable.");
         }
         
         file = new File(Settings.get("vpg_S_path_plcc"));
         if(! (file.canRead() && file.isFile())) {
             allgood = false;
-            System.out.println("[VPG] WARNING: Path to plcc.jar not set correctly. This program is essential, please fix.");
+            System.out.println("[VPG] WARNING: Path to plcc.jar '" + file.getAbsolutePath() + "' not set correctly. This program is essential, please fix.");
         }
         
         return allgood;
@@ -115,13 +116,14 @@ public class VpgMainFrame extends javax.swing.JFrame {
         file = new File(Settings.get("vpg_S_path_splitpdb"));
         if(! (file.canRead() && file.isFile())) {
             allgood = false;
-            System.out.println("[VPG] INFO: Path to splitpdb.jar not set correctly. This program is optional.");
+            System.out.println("[VPG] INFO: Path to splitpdb.jar '" + file.getAbsolutePath() + "' not set correctly. This program is optional.");
         }
         
         file = new File(Settings.get("vpg_S_path_dssp"));
         if(! (file.canRead() && file.isFile())) {
             allgood = false;
-            System.out.println("[VPG] INFO: Path to dsspcmbi not set correctly. This program is optional.");
+            System.out.println("[VPG] INFO: Path to dsspcmbi '" + file.getAbsolutePath() + "' not set correctly. This program is optional.");
+            System.out.println("[VPG] INFO+: The dsspcmbi binary may be called 'dssp-2.09-win32.exe' or similar, which is fine. You can also rename it to 'dsspcmbi.exe' if you want.)");                        
         }
         
         return allgood;
@@ -581,6 +583,89 @@ public class VpgMainFrame extends javax.swing.JFrame {
     }
     
     /**
+     * Determines the path of the JAR file and tries to guess where the other
+     * programs are installed based on this path.
+     * @return whether it seems to have worked, i.e., whether files exist at the guessed positions. Makes no guarantee that this are really the correct files, but the names are fine if this returns true.
+     */
+    private static Boolean tryToGuessSettingsFromJarPath() {
+        String path = null;
+        Boolean jarOK = false;
+        Boolean installPathOK = false;
+        
+        try {
+            path = VpgMainFrame.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+        } catch (Exception e) {
+            System.err.println(Settings.getApptag() + "WARNING: Could not create URI: '" + e.getMessage() + "'.");
+        }   
+        
+        if(path == null) {
+            System.err.println(Settings.getApptag() + "WARNING: Could not get path for VpgMainFrame class, cannot guess install path.");
+            return false;
+        } else {
+            System.out.println(Settings.getApptag() + "Undecoded path is '" + path + "'.");
+            File jarPath = new File(path);
+            if(jarPath.exists() && jarPath.isFile()) {
+                System.out.println(Settings.getApptag() + "Assumed JAR path '" + jarPath.getAbsolutePath() + "' exists.");
+                jarOK = true;
+            } else {
+                System.err.println(Settings.getApptag() + "WARNING: No file exists at assumed JAR path '" + jarPath.getAbsolutePath() + "'.");
+                jarOK = false;
+            }
+            
+            File installDir = jarPath.getParentFile();
+            if(installDir.isDirectory()) {
+                System.out.println(Settings.getApptag() + "Assumed install directory '" + installDir.getAbsolutePath() + "' exists.");
+                installPathOK = true;
+            } else {
+                System.err.println(Settings.getApptag() + "WARNING: Assumed install directory '" + installDir.getAbsolutePath() + "' exists.");
+                installPathOK = false;
+            }
+            
+            if(jarOK && installPathOK) {
+                System.out.println(Settings.getApptag() + "OK, guessed install path '" + installDir.getAbsolutePath() + "' contains JAR file (at '" + jarPath.getAbsolutePath() + "').");
+                setSettingsBasedOnInstallDir(installDir, false);
+                return true;
+            }
+        }
+
+        /*
+        String decodedPath = null;
+        try { 
+            URLDecoder.decode(path, "UTF-8");        
+        } catch(Exception e) {
+            System.err.println(Settings.getApptag() + "WARNING: Could not decode path of JAR file, cannot guess other settings: '" + e.getMessage() + "'.");
+            return false;
+        }
+        
+        if(decodedPath != null) {
+            System.out.println(Settings.getApptag() + "The JAR path seems to be '" + decodedPath + "'.");
+            //TODO: do some guessing on locations of splitpdb, output and log paths here and set them
+            return true;
+        } else {
+            System.err.println(Settings.getApptag() + "WARNING: Could not guess install path, decoded path is null (Maybe loaded from non-path?).");
+        }
+        */
+        
+        return false;
+    }
+    
+    /**
+     * Sets settings to application paths based on the install dir. This is done
+     * by using knowledge on how the VPLG programs are organized in the install directory, it does
+     * not search for them in the file system or do any other magic.
+     * This function will try to verify a guess unless forced not to, i.e., it only sets a setting if a file exists at
+     * the guessed path. Of course, the file could be anything.
+     * 
+     * @param installDir the base VPLG install dir
+     * @param forceSet if set to true, even settings that failed verification of file existence of file system level will be applied
+     */
+    public static void setSettingsBasedOnInstallDir(File installDir, Boolean forceSet) {
+        //TODO: implement me
+        System.out.println(Settings.getApptag() + "WARNING: setSettingsBasedOnInstallDir(): Implement me");
+    }
+    
+    
+    /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {                        
@@ -644,6 +729,12 @@ public class VpgMainFrame extends javax.swing.JFrame {
                 if(vpg.essentialSettingsOK()) {
                     vpg.jStatusLabel.setText("VPG version " + Settings.getVersion() + " ready.");
                 } else {
+                    System.out.println(Settings.getApptag() + "Trying to guess paths to VPLG programs from JAR path.");
+                    if(tryToGuessSettingsFromJarPath()) {
+                        System.out.println(Settings.getApptag() + "Settings determined and applied, hope they fit.");
+                    } else {
+                        System.err.println(Settings.getApptag() + "WARNING: Could not guess settings, user will have to adapt them manually.");
+                    }
                     vpg.jStatusLabel.setText("VPG version " + Settings.getVersion() + " ready.");
                     JOptionPane.showMessageDialog(vpg, "Welcome to VPG!\n\n You should start by configuring the paths to essential programs under Edit => Settings.\nOnce the settings are ready, you will be able to compute and visualize your first protein ligand graph!\n\nEnjoy!", "VPG -- Welcome", JOptionPane.INFORMATION_MESSAGE);
                 }

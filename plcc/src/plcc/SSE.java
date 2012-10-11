@@ -115,6 +115,22 @@ public class SSE implements java.io.Serializable {
         }
         return(false);
     }
+    
+    /**
+     * Returns the PLCC SSE type label (e.g., "H" for a helic, "L" for a ligand" SSE).
+     * @return the PLCC SSE type label (e.g., "H" for a helic, "L" for a ligand" SSE).
+     */
+    public String getPLCCSSELabel() {
+        if(this.isHelix()) {
+            return "H";
+        } else if(this.isBetaStrand()) {
+            return "E";
+        } else if(this.isLigandSSE()) {
+            return "L";
+        } else {
+            return "O";
+        }
+    }
 
 
     /**
@@ -137,7 +153,7 @@ public class SSE implements java.io.Serializable {
      */
     public Integer getSSESeqChainNum() { return(sseSeqChainNum); }
     
-    /** Returns the SSEType string of this SSE. This is a single character, e.g., "H" for an alpha helix. */
+    /** Returns the DSSP SSEType string of this SSE. This is a single character, e.g., "H" for an alpha helix. */
     public String getSseType() { return(sseType); }
     public ArrayList<Residue> getResidues() { return(residues); }
     public Chain getChain() { return(chain); }
@@ -322,6 +338,7 @@ public class SSE implements java.io.Serializable {
             throw new IllegalArgumentException("Residue must not be null.");
         }
         this.residues.add(r); 
+        r.setSSETypePlcc(this.getPLCCSSELabel());
     }
     
     public void setChain(Chain c) { this.chain = c; }

@@ -10,8 +10,6 @@
 package plcc;
 
 // imports
-import java.util.*;
-import java.io.*;
 import java.nio.channels.*;
 import java.util.Locale;
 //import java.net.*;
@@ -20,7 +18,6 @@ import java.util.Locale;
 //import org.jgrapht.alg.ConnectivityInspector;
 
 import java.util.*;
-import java.io.*;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -28,18 +25,13 @@ import java.awt.Font;
 import java.awt.RenderingHints;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Arc2D;
 import java.awt.geom.Rectangle2D;
 //import java.awt.*;
 import java.awt.image.*;
 import java.io.*;
 
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.sql.SQLException;
 import javax.imageio.ImageIO;
-import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.DOMImplementation;
@@ -166,6 +158,7 @@ public class Main {
         String chainsFile = "";
         String ligandsFile = "";
         String modelsFile = "";
+        String sseMappingsFile = "";
         String resMapFile = "";
         
         Boolean compareResContacts = false;
@@ -510,7 +503,7 @@ public class Main {
                         Settings.set("plcc_B_output_textfiles_dir_tree", "true");
                     }
                     
-                    if(s.equals("--all-output-tree")) {
+                    if(s.equals("--output-subdir-tree")) {
                         Settings.set("plcc_B_output_images_dir_tree", "true");
                         Settings.set("plcc_B_output_textfiles_dir_tree", "true");
                     }
@@ -1012,13 +1005,21 @@ public class Main {
             writeLigands(ligandsFile, pdbid, residues);
             
             // write residue mapping files
-            System.out.println("Writing residue mapping files...");
+            System.out.println("Writing residue mapping files for all chains...");
             for(Chain c : chains) {
                 writeResMappings(resMapFile + "_" + c.getPdbChainID() + ".resmap", c);
             }
             
             
-            
+            // write residue-to-SSE-mappings file
+           
+            // EDIT: Cannot write this here because PLCC SSEs are not assigned yet
+            /*
+            System.out.println("Writing SSE mapping files for all chains...");
+            for(Chain c : chains) {
+                writeSSEMappings(sseMappingsFile + "_" + c.getPdbChainID() + ".ssemap", c, pdbid);
+            }
+            */
 
             // write models file
             System.out.println("Writing models file...");
@@ -1290,12 +1291,13 @@ public class Main {
      */
     public static void calculateSSEGraphsForChains(ArrayList<Chain> allChains, ArrayList<Residue> resList, ArrayList<ResContactInfo> resContacts, String pdbid, String outputDir) {
 
+        //System.out.println("calculateSSEGraphsForChains: outputDir='" + outputDir + "'.");
         Chain c;
         ArrayList<SSE> chainDsspSSEs = new ArrayList<SSE>();
         ArrayList<SSE> chainLigSSEs = new ArrayList<SSE>();
         ArrayList<SSE> chainPtglSSEs = new ArrayList<SSE>();
         ArrayList<SSE> allChainSSEs = new ArrayList<SSE>();
-        
+        String fs = System.getProperty("file.separator");
 
         System.out.println("Calculating SSEs for all chains of protein " + pdbid + "...");
 
@@ -1329,6 +1331,9 @@ public class Main {
 
             ProtMetaInfo pmi = FileParser.getMetaInfo(pdbid, c.getPdbChainID());
             //pmi.print();
+            md.put("pdb_mol_name", pmi.getMolName());
+            md.put("pdb_org_sci", pmi.getOrgScientific());
+            md.put("pdb_org_common", pmi.getOrgCommon());
 
             if(Settings.getBoolean("plcc_B_useDB")) {
                 try {
@@ -1350,6 +1355,11 @@ public class Main {
             
             if(Settings.getInteger("plcc_I_debug_level") > 0) {
                 printSSEList(chainDsspSSEs, "DSSP");
+            }
+            
+            if(Settings.getBoolean("plcc_B_ptgl_text_output")) {
+                String sseMappingsFile = Settings.get("plcc_S_output_dir") + fs + pdbid.toLowerCase()  + "_" + c.getPdbChainID() + ".ssemap";
+                writeSSEMappings(sseMappingsFile, c, pdbid);
             }
             
             chainPtglSSEs = createAllPtglSSEsFromDsspSSEList(chainDsspSSEs);
@@ -1411,8 +1421,7 @@ public class Main {
             String filePathImg = null;
             String filePathGraphs = null;
             String imgFile = null;
-            String plccGraphFile = null;
-            String fs = System.getProperty("file.separator");
+            String plccGraphFile = null;           
 
 
             for(String gt : graphTypes) {
@@ -1421,6 +1430,7 @@ public class Main {
 
                 ProtGraph pg = calcGraphType(gt, allChainSSEs, c, resContacts, pdbid);
                 pg.setInfo(pdbid, c.getPdbChainID(), gt);
+                pg.addMetadata(md);
                 
                 
                 if(Settings.getBoolean("plcc_B_debug_compareSSEContacts")) {
@@ -1459,52 +1469,26 @@ public class Main {
                 fileNameWithExtension = fileNameWithoutExtension + Settings.get("plcc_S_img_output_fileext");
                 
                 //pg.toFile(file + ".ptg");
-                //pg.print();
-                File targetDir;
-                String dirStructure;
+                //pg.print();                
                 // Create the file in a subdir tree based on the protein meta data if requested
                 if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
                    
-                    if(! (pdbid.length() == 4)) {
-                        System.err.println("ERROR: PDB ID of length 4 required to output images in directory tree, using default '" + outputDir + "'.");
-                        dirStructure = outputDir;
-                        System.exit(1);
-                    } else {                    
-                        String mid2Chars = pdbid.substring(1, 3);                    
-                        dirStructure = outputDir + fs + mid2Chars + fs + pdbid;
-                        
-                    }
-                    
-                    targetDir = new File(dirStructure);
-                    if(targetDir.isDirectory()) {
-                        // dir already exsts
-                        if( ! targetDir.canWrite()) {
-                            System.err.println("ERROR: Cannot write to existing output directory '" + targetDir.getAbsolutePath() + "'.");
-                        } else {
-                            // all ok, it exists and we can write to it
-                            if(Settings.getBoolean("plcc_B_output_images_dir_tree")) { filePathImg = dirStructure; }
-                            if(Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) { filePathGraphs = dirStructure; }
-                                
-                        }
-                    } else {
-                        if(targetDir.isFile()) {
-                            System.err.println("ERROR: Cannot create output directory '" + targetDir.getAbsolutePath() + "', file with that name exists. Using default '" + filePathImg + "'.");
-                        }
-                        
-                        try {
-                            Boolean resMkdir = targetDir.mkdirs();
-                            if(resMkdir) {
-                                // all ok, we created it (and thus can write to it)
-                                if(Settings.getBoolean("plcc_B_output_images_dir_tree")) { filePathImg = dirStructure; }
-                                if(Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) { filePathGraphs = dirStructure; }                                                                
+                    File targetDir = IO.generatePDBstyleSubdirTreeName(pdbid, new File(outputDir));
+                    if(targetDir != null) {
+                        ArrayList<String> errors = IO.createDirIfItDoesntExist(targetDir);
+                        if( ! errors.isEmpty()) {
+                            for(String err : errors) {
+                                System.err.println("ERROR: " + err);
                             }
-                        }catch(Exception e) {
-                            System.err.println("ERROR: Could not create required directory structure to output images under '" + outputDir + "'. Using default '" + filePathImg + "'.");
-                            System.err.println("ERROR+: The error was '" + e.getMessage() + "'.");
-                            //System.exit(1);
-                        }
+                        } else {
+                            filePathImg = targetDir.getAbsolutePath();
+                            filePathGraphs = targetDir.getAbsolutePath();                        
+                        }                    
+                    } else {
+                        System.err.println("ERROR: Could not determine PDB-style subdir path name.");
                     }
                 }
+                
                 
                 String graphFormatsWritten = "";
                 Integer numFormatsWritten = 0;
@@ -1542,7 +1526,7 @@ public class Main {
                 
                 
                 if(numFormatsWritten > 0) {
-                    System.out.println("      Exported protein ligand graph in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + filePathGraphs + fs + "'.");
+                    System.out.println("      Exported protein ligand graph in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + new File(filePathGraphs).getAbsolutePath() + fs + "'.");
                 }
                 
                 
@@ -1642,17 +1626,57 @@ public class Main {
             // DEBUG
             // fg.calculateDistancesWithinGraph();
             // fg.printDistMatrix();
+            System.out.println("       *Handling folding Graph #" + j + " containing " + fg.numVertices() + " vertices and " + fg.numEdges() + " edges (" + fg.numSSEContacts() + " SSE contacts).");
             
-            // write plcc graph format file
-            String plccGraphFile = outputDir + fs + pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + ".fg";
-            if(writeStringToFile(plccGraphFile, (fg.toVPLGGraphFormat()))) {
-                System.out.println("      Plcc format folding graph file written to '" + plccGraphFile + "'.");
-            } else {
-                System.err.println("WARNING: Could not write Plcc format folding graph file to '" + plccGraphFile + "'.");
+            String fileNameWithoutExtension = pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j;
+            String graphFormatsWritten = "";
+            Integer numFormatsWritten = 0;
+            if(Settings.getBoolean("plcc_B_output_GML")) {
+                String gmlfFile = outputDir + fs + fileNameWithoutExtension + ".gml";
+                if(IO.stringToTextFile(gmlfFile, fg.toGraphModellingLanguageFormat())) {
+                    graphFormatsWritten += "gml "; numFormatsWritten++;
+                }
+            }
+            if(Settings.getBoolean("plcc_B_output_TGF")) {
+                String tgfFile = outputDir + fs + fileNameWithoutExtension + ".tgf";
+                if(IO.stringToTextFile(tgfFile, fg.toTrivialGraphFormat())) {
+                    graphFormatsWritten += "tgf "; numFormatsWritten++;
+                }
+            }
+            if(Settings.getBoolean("plcc_B_output_DOT")) {
+                String dotLangFile = outputDir + fs + fileNameWithoutExtension + ".gv";
+                if(IO.stringToTextFile(dotLangFile, fg.toDOTLanguageFormat())) {
+                    graphFormatsWritten += "gv "; numFormatsWritten++;
+                }
+            }
+            if(Settings.getBoolean("plcc_B_output_kavosh")) {
+                String kavoshFile = outputDir + fs + fileNameWithoutExtension + ".kavosh";
+                if(IO.stringToTextFile(kavoshFile, fg.toKavoshFormat())) {
+                    graphFormatsWritten += "kavosh "; numFormatsWritten++;
+                }
+            }
+            // write the SSE info text file for the image (plcc graph format file)
+            if(Settings.getBoolean("plcc_B_output_plcc")) {
+                String plccGraphFile = outputDir + fs + fileNameWithoutExtension + ".plg";
+                if(IO.stringToTextFile(plccGraphFile, fg.toVPLGGraphFormat())) {
+                    graphFormatsWritten += "plg "; numFormatsWritten++;
+                }
+            }                                                                                    
+
+
+            if(numFormatsWritten > 0) {
+                System.out.println("        Exported folding graph #" + j + " in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + new File(outputDir).getAbsolutePath() + fs + "'.");
             }
             
             
-            System.out.println("        Handling folding Graph #" + j + " containing " + fg.numVertices() + " vertices and " + fg.numEdges() + " edges (" + fg.numSSEContacts() + " SSE contacts).");
+            // write plcc graph format file
+            //String plccGraphFile = outputDir + fs + pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + ".plg";
+            //if(writeStringToFile(plccGraphFile, (fg.toVPLGGraphFormat()))) {
+            //    System.out.println("      Plcc format folding graph file written to '" + plccGraphFile + "'.");
+            //} else {
+            //    System.err.println("WARNING: Could not write Plcc format folding graph file to '" + plccGraphFile + "'.");
+            //}
+                                    
             
             // test spatial ordering, not used for anything atm
             // TODO: remove this, it's only a test and takes time
@@ -1678,15 +1702,20 @@ public class Main {
             //List<String> notations = Arrays.asList("KEY", "ADJ", "RED", "SEQ");
             ArrayList<String> notations = new ArrayList<String>();
 
-            if(Settings.getBoolean("plcc_B_foldgraphtype_KEY")) { notations.add("KEY"); }
-            if(Settings.getBoolean("plcc_B_foldgraphtype_ADJ")) { notations.add("ADJ"); }
-            if(Settings.getBoolean("plcc_B_foldgraphtype_RED")) { notations.add("RED"); }
-            if(Settings.getBoolean("plcc_B_foldgraphtype_SEQ")) { notations.add("SEQ"); }                                                
+            if(Settings.getBoolean("plcc_B_foldgraphtype_KEY")) { notations.add(FoldingGraph.FG_NOTATION_KEY); }
+            if(Settings.getBoolean("plcc_B_foldgraphtype_ADJ")) { notations.add(FoldingGraph.FG_NOTATION_ADJ); }
+            if(Settings.getBoolean("plcc_B_foldgraphtype_RED")) { notations.add(FoldingGraph.FG_NOTATION_RED); }
+            if(Settings.getBoolean("plcc_B_foldgraphtype_SEQ")) { notations.add(FoldingGraph.FG_NOTATION_SEQ); }                                                
 
+            if(Settings.getBoolean("plcc_B_draw_graphs")) {
+                System.out.println("        Drawing all supported versions of folding graph #" + j + ".");
+            }
+            
             for(String nt : notations) {
 
                 if(Settings.getBoolean("plcc_B_draw_graphs")) {
 
+                    
                     fgFile = outputDir + System.getProperty("file.separator") + pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + "_" + nt + ".png"; //Settings.get("plcc_S_img_output_fileext");
                     if(fg.drawFoldingGraph(nt, fgFile)) {
                         System.out.println("         -Folding graph #" + j + " of the " + pg.getGraphType() + " graph of chain " + pg.getChainid() + " written to file '" + fgFile + "' in " + nt + " notation.");
@@ -2807,6 +2836,23 @@ public class Main {
     }
     
     
+    /**
+     * Writes the residue info file that maps PDB residue IDs to DSSP residue IDs for all residues of the given chain. 
+     * @param mapFile the path to the output file
+     * @param c the chain to consider (all residues of this chain will be used)
+     */
+    public static void writeSSEMappings(String mapFile, Chain c, String pdbid) {
+        String s = "# SSE mappings for protein " + pdbid + " chain " + c.getPdbChainID() + " follow in format <PDB res number> <DSSP res number> <DSSP assignment> <PLCC assignment>";
+        ArrayList<Residue> res = c.getResidues();
+                
+        
+        for (Residue r : res) {
+            s += "" + r.getPdbResNum() + "|" + r.getDsspResNum() + "|" + r.getSSEStringDssp() + "|" + r.getSSETypePlcc() + "\n";
+        }
+        
+        IO.stringToTextFile(mapFile, s);
+    }
+    
     
     /**
      * Writes the residue info file that maps PDB residue IDs to DSSP residue IDs for all residues of the given chain. 
@@ -2828,7 +2874,7 @@ public class Main {
         catch (Exception e) {
             System.err.println("ERROR: Could not write to file '" + mapFile + "'.");
             e.printStackTrace();
-            System.exit(-1);
+            System.exit(1);
         }
 
 
@@ -2847,7 +2893,7 @@ public class Main {
         } catch(Exception ex) {
             System.err.println("ERROR: Could not close FileWriter for file '" + mapFile + "'.");
             ex.printStackTrace();
-            System.exit(-1);
+            System.exit(1);
         }
 
         System.out.println("  Wrote PDB/DSSP residue mapping info to file '" + mapFile + "'.");       
@@ -3260,10 +3306,9 @@ public class Main {
         System.out.println("-f | --folding-graphs      : also handle foldings graphs (connected components of the protein graph)");
         System.out.println("-g | --sse-graphtypes <l>  : compute only the SSE graphs in list <l>, e.g. 'abcdef' = alpha, beta, alhpabeta, alphalig, betalig and alphabetalig.");
         System.out.println("-h | --help                : show this help message and exit");
-        System.out.println("-i | --ignoreligands       : ignore ligand contacts in geom_neo format output files [DEBUG]");
-        System.out.println("-j | --ddb <p> <c> <gt> <f>: get the graph type <gt> of chain <c> of pdbid <p> from the DB and draw it to file <f> (omit the file extension)*");
-        System.out.println("-k | --img-dir-tree        : do write the output images to a PDB-style sudbir tree of the output dir (e.g., <OUTDIR>/ic/8icd/<outfile>)");
-        System.out.println("-K | --graph-dir-tree      : do write the output graph files to a PDB-style sudbir tree of the output dir ");
+        //System.out.println("-i | --ignoreligands       : ignore ligand contacts in geom_neo format output files [DEBUG]");
+        System.out.println("-j | --ddb <p> <c> <gt> <f>: get the graph type <gt> of chain <c> of pdbid <p> from the DB and draw it to file <f> (omit the file extension)*");        
+        System.out.println("-k | --output-subdir-tree  : write all output files to a PDB-style sudbir tree of the output dir (e.g., <OUTDIR>/ic/8icd/<outfile>). ");        
         System.out.println("-l | --draw-plcc-graph <f> : read graph in plcc format from file <f> and draw it to <f>.png, then exit (<pdbid> will be ignored)*");                
         System.out.println("-L | --lig-filter <i> <a>  : only consider ligands which have at least <i> and at most <a> atoms. A setting of zero means no limit.");                
         System.out.println("-m | --image-format <f>    : write output images in format <f>, which can be 'PNG' or 'JPG' (SVG vector format is always written).");
@@ -3275,15 +3320,15 @@ public class Main {
         System.out.println("     --gz-pdbfile <f>      : use gzipped input PDB file <f>.");
         System.out.println("-q | --fg-notations <list> : draw only the folding graph notations in <list>, e.g. 'kars' = KEY, ADJ, RED and SEQ.");
         System.out.println("-r | --recreate-tables     : drop and recreate DB statistics tables, then exit (see -u)*");
-        System.out.println("-s | --showonscreen        : show an overview of the residue contact results on STDOUT during compuation  [DEBUG]");
+        //System.out.println("-s | --showonscreen        : show an overview of the residue contact results on STDOUT during compuation  [DEBUG]");
         System.out.println("-S | --sim-measure <m>     : use similarity measure <m>. Valid settings include 'string_sse', 'graph_set' and 'graph_compat'.");
         System.out.println("-t | --draw-tgf-graph <f>  : read graph in TGF format from file <f> and draw it to <f>.png, then exit (pdbid will be ignored)*");
         System.out.println("-u | --use-database        : write SSE contact data to database [requires DB credentials in cfg file]");                       
         System.out.println("-v | --del-db-protein <p>  : delete the protein chain with PDBID <p> from the database [requires DB credentials in cfg file]");
         System.out.println("-w | --dont-write-images   : do not draw the SSE graphs and write them to image files [DEBUG]");                             
-        System.out.println("-x | --check-rescts <f>    : compare the computed residue level contacts to those in geom_neo format file <f> and print differences");
-        System.out.println("-X | --check-ssects <f>    : compare the computed SSE level contacts to those in bet_neo format file <f> and print differences");
-        System.out.println("-y | --write-geodat        : write the computed SSE level contacts in geo.dat format to a file (file name: <pdbid>_<chain>.geodat)");        
+        //System.out.println("-x | --check-rescts <f>    : compare the computed residue level contacts to those in geom_neo format file <f> and print differences");
+        //System.out.println("-X | --check-ssects <f>    : compare the computed SSE level contacts to those in bet_neo format file <f> and print differences");
+        //System.out.println("-y | --write-geodat        : write the computed SSE level contacts in geo.dat format to a file (file name: <pdbid>_<chain>.geodat)");        
         System.out.println("-z | --ramaplot            : draw a ramachandran plot of each chain to the file '<pdbid>_<chain>_plot.svg'");        
         System.out.println("");
         System.out.println("EXAMPLES: java -jar plcc.jar 8icd");
@@ -3533,6 +3578,7 @@ public class Main {
 
             curResidue = resList.get(i);
             curResString = curResidue.getSSEString();
+            curResidue.setSSEStringDssp(curResString);
 
             // If coiled regions should be included, this line keeps them from being ignored below.
             // In this case, we also assign the SSE type "coil" to all SSEs which would otherwise be

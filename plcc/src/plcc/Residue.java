@@ -44,7 +44,9 @@ public class Residue implements java.io.Serializable {
     private String ligSynonyms = null;                      // HETSYN record of PDB file (synonyms for this hetero group)
 
     private Integer centerSphereRadius = null;
-    private String sseString = null;                        // the SSE column from the DSSP file, may be the empty string "" because not all residues are assigned an SSE by DSSP
+    private String sseStringDssp = "?";
+    private String plccSSEType = "N";                       // not part of any PLCC SSE by default
+    private String sseString = null;                        // initially the SSE column from the DSSP file, may be the empty string "" because not all residues are assigned an SSE by DSSP, gets replaced by PLCC SSE string later
     private SSE sse = null;
     private Boolean isPartOfDsspSse = false;                // whether this Residue is part of a valid SSE according to DSSP (which does NOT assign a SSE to *all* residues)
 
@@ -338,7 +340,13 @@ public class Residue implements java.io.Serializable {
     public String getiCode() { return(iCode); }
     public Integer getInternalID() { return(AminoAcid.name3ToID(resName3)); }
     public String getFancyName() { return(this.resName3 + "-" + this.pdbResNum); }
+    /**
+     * Returns the PLCC SSE string of this SSE
+     * @return the PLCC SSE string of this SSE, e.g., "H", "E" or "L"
+     */
     public String getSSEString() { return(sseString); }
+    public String getSSEStringDssp() { return(sseStringDssp); }
+    public String getSSETypePlcc() { return(this.plccSSEType); }
     public SSE getSSE() { return(sse); }
     public Boolean getDsspSseState() { return(isPartOfDsspSse); }
     public String getUniquePDBName() { return(chainID + "-" + pdbResNum + "-" + iCode); }
@@ -389,6 +397,8 @@ public class Residue implements java.io.Serializable {
     public void setModelID(String s) { modelID = s; }
     public void setAtoms(ArrayList<Atom> a) { atoms = a; }
     public void setSSEString(String s) { sseString = s; }
+    public void setSSEStringDssp(String s) { sseStringDssp = s; }
+    public void setSSETypePlcc(String s) { plccSSEType = s; }
     public void setSSE(SSE s) { sse = s; }
     public void setDsspSseState(Boolean b) { isPartOfDsspSse = b; }
     public void setLigName(String s) { ligName = s; }

@@ -2878,6 +2878,16 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         this.metadata.put("graphclass", "protein graph");
     }
     
+    /**
+     * Adds the given meta data to this graph.
+     * @param md the meta data
+     */
+    public void addMetadata(HashMap<String, String> md) {
+        for(String key : md.keySet()) {
+            this.metadata.put(key, md.get(key));
+        }
+    }
+    
     
     
     /**
@@ -3094,6 +3104,25 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     public Integer getSize() { return(this.numVertices()); }
     
     
+    /**
+     * Returns the meta data as a single line. Useful for exporting to graph file formats that do only support a single comment string
+     * instead of arbitrary custom info fields.
+     * @return the meta data (pdbid, organism, etc) as a single line
+     */
+    public String getOneLineMetadataString() {
+        String sep = Settings.get("plcc_S_graph_metadata_splitstring");
+        String mds = "";
+        Integer numMD = this.metadata.keySet().size(); Integer cur = 0;
+        for(String key : this.metadata.keySet()) {
+            mds += key + "=" + this.metadata.get(key) + "";
+            if(cur < (this.metadata.keySet().size() - 1)) {
+                mds += sep;
+            }
+        }
+        return mds;
+    }
+    
+    
     /** Returns a Graph Modelling Language format representation of this graph.
      *  See http://www.fim.uni-passau.de/fileadmin/files/lehrstuhl/brandenburg/projekte/gml/gml-technical-report.pdf for the publication 
      * and http://en.wikipedia.org/wiki/Graph_Modelling_Language for a brief description.
@@ -3103,8 +3132,15 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         
         String gmlf = "";
         
+        // we put meta data in comments for GML language graphs
+        if(Settings.getBoolean("plcc_B_add_metadata_comments_GML")) {
+            for(String key : this.metadata.keySet()) {
+                gmlf += "//[VPLG_METADATA] " + key + "=" + this.metadata.get(key) + "\n";
+            }
+        }
+        
         // print the header
-        String comment = this.toShortString();
+        String shortStr = this.toShortString();
         String startNode = "  node [";
         String endNode   = "  ]";
         String startEdge = "  edge [";
@@ -3112,10 +3148,11 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         
         gmlf += "graph [\n";
         gmlf += "  id " + 1 + "\n";
-        gmlf += "  label \"" + "VPLG Protein Graph" + "\"\n";
-        gmlf += "  comment \"" + comment + "\"\n";
+        gmlf += "  label \"" + "VPLG Protein Graph " + shortStr + "\"\n";
+        gmlf += "  comment \"" + this.getOneLineMetadataString() + "\"\n";
         gmlf += "  directed 0\n";
         gmlf += "  isplanar 1\n";
+        gmlf += "  creator \"PLCC version " + Settings.getVersion() + "\"\n";
         
         
         // print all nodes
@@ -3137,10 +3174,13 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             
             gmlf += "    aa_sequence \"" + vertex.getAASequence() + "\"\n";
             
+            if(vertex.isLigandSSE()) {
+                gmlf += "    lig_name \"" + vertex.getLigandName3() + "\"\n";
+            }
             
-            gmlf += "    pdb_id \"" + this.pdbid + "\"\n";
-            gmlf += "    chain_id \"" + this.chainid + "\"\n";
-            gmlf += "    graph_type \"" + this.graphType + "\"\n";
+            //gmlf += "    pdb_id \"" + this.pdbid + "\"\n";
+            //gmlf += "    chain_id \"" + this.chainid + "\"\n";
+            //gmlf += "    graph_type \"" + this.graphType + "\"\n";
             
             gmlf += endNode + "\n";
         }
@@ -3175,10 +3215,21 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
      */    
     public String toDOTLanguageFormat() {
         
+        String dlf = "";
+        
+        // put meta data in comments for DOT language graphs
+        if(Settings.getBoolean("plcc_B_add_metadata_comments_GML")) {
+            for(String key : this.metadata.keySet()) {
+                dlf += "#[VPLG_METADATA] " + key + "=" + this.metadata.get(key) + "\n";
+            }
+
+            dlf += "#[VPLG_METADATA] creator=PLCC version " + Settings.getVersion() + "\n";
+        }
+        
         String graphLabel = "ProteinGraph";
         
         // start graph
-        String dlf = "graph " + graphLabel + " {\n";
+        dlf += "graph " + graphLabel + " {\n";
         
         // print the nodes
         SSE vertex; String shapeModifier, vertColor;

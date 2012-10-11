@@ -261,6 +261,76 @@ public class IO {
         }
         return s;
     }
+    
+    
+    /**
+     * Tries to create targetDir if it does not yet exist. Uses the existing dir (without deleting anything in there) if it does
+     * already exist.
+     * @param targetDir the directory, may be a dir structure
+     * @return a list of error messages. If this list is empty, everything worked and the dir is ready. If not, something went wrong.
+     */
+    public static ArrayList<String> createDirIfItDoesntExist(File targetDir) {
+        
+        ArrayList<String> problems = new ArrayList<String>();
+        
+        if(targetDir.isDirectory()) {
+            // dir already exsts
+            if( ! targetDir.canWrite()) {
+                problems.add("Cannot write to existing output directory '" + targetDir.getAbsolutePath() + "'.");
+            } else {
+                // all fine, we cqan write to it and will just use the existing one
+                return new ArrayList<String>();
+            }
+        } else {
+            if(targetDir.isFile()) {
+                problems.add("Cannot create output directory '" + targetDir.getAbsolutePath() + "', file (not a directory!) with that name exists.");
+            }
+            else {
+                try {
+                    Boolean resMkdir = targetDir.mkdirs();
+                    if(resMkdir) {
+                        // all ok, we created it (and thus can write to it)
+                        return new ArrayList<String>();                        
+                    }
+                }catch(Exception e) {
+                    problems.add("Could not create required directory structure.");
+                }
+            }
+        }
+        
+        return problems;
+    }
+    
+    
+    /**
+     * Generates the PDB-style subdir path name for a given PDB ID and base directory
+     * (like on the RCSB PDB FTP-server), but does NOT create the path in the file system.
+     * 
+     * @param pdbid the pdbid, a 4 character string
+     * @param baseOutputDir the base dir under which to create the path
+     * @return the path or null if no such path could be generated from the input data
+     */
+    public static File generatePDBstyleSubdirTreeName(String pdbid, File baseOutputDir) {
+        
+        if(baseOutputDir == null) {
+            return null;
+        }
+        //System.out.println("generatePDBstyleSubdirTreeName: baseOutputDir=" + baseOutputDir.getAbsolutePath() + ".");
+        
+        File dirStructure;
+        String fs = System.getProperty("file.separator");
+        
+        if(! (pdbid.length() == 4)) {
+            //System.err.println("ERROR: PDB ID of length 4 required to output images in directory tree, using '" + baseOutputDir + "'.");
+            dirStructure = null;
+            //System.exit(1);
+        } else {                    
+            String mid2Chars = pdbid.substring(1, 3);                    
+            dirStructure = new File(baseOutputDir.getAbsolutePath() + fs + mid2Chars + fs + pdbid);
+        }
+        
+        return dirStructure;
+    }
 
     
 }

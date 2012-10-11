@@ -71,7 +71,7 @@ public class Settings {
      * @return the PLCC version
      */
     public static String getVersion() {
-        return("0.68");
+        return("0.69");
     }
 
     /**
@@ -184,6 +184,9 @@ public class Settings {
         defSet("plcc_B_output_kavosh", "true", "Whether to save computed protein graphs to text files in Kavosh format.");
         defSet("plcc_B_kavosh_format_directed", "true", "Whether to treat the graphs as directed for the Kavosh output. If set to true, each edge (a, b) will appear twice in the output file: once as (a, b) and again as (b, a).");
         defSet("plcc_B_output_plcc", "true", "Whether to save computed protein graphs to text files in PLCC format.");
+        defSet("plcc_S_graph_metadata_splitstring", "|", "The field separator used when writing meta data to exported graphs.");
+        defSet("plcc_B_add_metadata_comments_GML", "false", "Whether to add meta data to exported GML format graphs in comments. Not all programs parse comments correctly.");
+        defSet("plcc_B_add_metadata_comments_DOT", "false", "Whether to add meta data to exported DOT language format graphs in comments. Not all programs parse comments correctly.");
         
         
         

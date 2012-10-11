@@ -20,6 +20,7 @@ import java.io.*;
 // Xerces 1 or 2 additional classes for XML generation (GraphML format).
 //import org.apache.xml.serialize.*;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer.*;
+import java.util.HashMap;
 import javax.xml.stream.XMLStreamWriter;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
@@ -33,6 +34,9 @@ public abstract class Graph<V> implements TrivialGraphFormat, GraphMLFormat {
     /** Some vertices. Graphs like them. */
     protected ArrayList<V> vertices;
     //protected ArrayList<ArrayList<Edge>> edges;
+    
+    protected HashMap<String, Object> metadata;
+    protected ArrayList<HashMap<String, Object>> vertexMetadata;
     
     /** Some edges because vertices like to be linked. */
     protected Integer[][] edgeMatrix;
@@ -50,6 +54,8 @@ public abstract class Graph<V> implements TrivialGraphFormat, GraphMLFormat {
         this.vertices = vertList;
         //this.edges = new ArrayList<ArrayList<Edge>>();
         this.edgeMatrix = new Integer[vertList.size()][vertList.size()];
+        this.metadata = new HashMap<String, Object>();
+        this.vertexMetadata = new ArrayList<HashMap<String, Object>>();
         
         for(Integer i = 0; i < this.vertices.size(); i++) {
             for(Integer j = 0; j < this.vertices.size(); j++) {
@@ -155,8 +161,22 @@ public abstract class Graph<V> implements TrivialGraphFormat, GraphMLFormat {
      * Returns all edges.
      * @return all edges
      */
-    public Integer[][] getEdges() {
+    public Integer[][] getEdgeMatrix() {
         return(this.edgeMatrix);
+    }
+    
+    public ArrayList<Integer[]> getEdges() {
+        ArrayList<Integer[]> edges = new ArrayList<Integer[]>();
+        
+        for(Integer i = 0; i < this.edgeMatrix.length; i++) {
+            for(Integer j = 0; j < this.edgeMatrix.length; j++) {
+                if(this.edgeMatrix[i][j] != EDGETYPE_NONE) {
+                    edges.add(new Integer[] { i, j });
+                }
+            }            
+        }
+        
+        return edges;
     }
     
     /**
@@ -315,6 +335,169 @@ public abstract class Graph<V> implements TrivialGraphFormat, GraphMLFormat {
         }
         
         return(s);
+    }
+    
+    
+    /**
+     * Retrieves edge meta data.
+     * @param key the key to get
+     * @return the object entry
+     */
+    public Object getMetadataEntry(String key) {
+        return this.metadata.get(key);
+    }
+    
+    
+    /**
+     * Sets the meta data entry.
+     * @param key the key
+     * @param value the value
+     */
+    public void setMetadataEntry(String key, Object value) {
+        this.metadata.put(key, value);    
+    }
+    
+    
+    /**
+     * Retrieves vertex meta data.
+     * @param vertIndex the index of the vertex
+     * @param key the key to get
+     * @return the object entry
+     */
+    public Object getVertexMetadataEntry(Integer vertIndex, String key) {
+        return this.vertexMetadata.get(vertIndex).get(key);
+    }
+    
+    
+    /**
+     * Sets the vertex meta data entry.
+     * @param vertIndex the index of the vertex
+     * @param key the key
+     * @param value the value
+     */
+    public void setVertexMetadataEntry(Integer vertIndex, String key, Object value) {
+        this.vertexMetadata.get(vertIndex).put(key, value);
+    }
+    
+    
+    /**
+     * DOT language output support. See http://en.wikipedia.org/wiki/DOT_language for details.
+     */    
+    public String toDOTLanguageFormat() {
+        
+        String graphLabel = "Graph";
+        
+        // start graph
+        String dlf = "graph " + graphLabel + " {\n";
+        
+        // print the nodes
+        V vertex; String shapeModifier, vertColor;
+        for(Integer i = 0; i < this.getSize(); i++) {
+            
+                        
+            vertex = this.vertices.get(i);
+            
+            shapeModifier = " shape=circle";
+            vertColor = " color=black";
+            
+            dlf += "    " + i + " [label=\"" + i + "\"" + shapeModifier + vertColor + "];\n";
+        }
+        
+        // print the edges        
+        Integer src, tgt;
+        String colorModifier, lineModifier, edgeLabel;
+        ArrayList<Integer[]> edges = this.getEdges();
+        for(Integer[] edge : edges) {
+            src = edge[0];
+            tgt = edge[1];
+            
+            colorModifier = " color=gray";
+            lineModifier = "";
+            edgeLabel = "label=\"" + src + "<=>" + tgt + "\"";                                        
+            dlf += "    " + src + " -- " + tgt + " [" + edgeLabel + colorModifier + lineModifier + "]" + ";\n";                        
+        }
+        
+        
+        // close graph
+        dlf += "}\n";
+        
+        return(dlf);
+    }
+    
+    
+    /** Returns a Graph Modelling Language format representation of this graph.
+     *  See http://www.fim.uni-passau.de/fileadmin/files/lehrstuhl/brandenburg/projekte/gml/gml-technical-report.pdf for the publication 
+     * and http://en.wikipedia.org/wiki/Graph_Modelling_Language for a brief description.
+     * 
+     */
+    public String toGraphModellingLanguageFormat() {
+        
+        String gmlf = "";
+        
+        // print the header
+        String comment = "Graph";
+        String startNode = "  node [";
+        String endNode   = "  ]";
+        String startEdge = "  edge [";
+        String endEdge   = "  ]";
+        
+        gmlf += "graph [\n";
+        gmlf += "  id " + 1 + "\n";
+        gmlf += "  label \"" + "VPLG Protein Graph" + "\"\n";
+        gmlf += "  comment \"" + comment + "\"\n";
+        gmlf += "  directed 0\n";
+        gmlf += "  isplanar 1\n";
+        
+        
+        // print all nodes
+        V vertex;
+        for(Integer i = 0; i < this.getSize(); i++) {
+            vertex = this.vertices.get(i);
+            gmlf += startNode + "\n";
+            gmlf += "    id " + i + "\n";
+            gmlf += "    label \"" + i + "\"\n";           
+            gmlf += endNode + "\n";
+        }
+        
+        // print all edges
+        Integer src, tgt;
+        ArrayList<Integer[]> edges = this.getEdges();
+        for(Integer[] edge : edges) {
+            src = edge[0];
+            tgt = edge[1];
+            
+            gmlf += startEdge + "\n";
+            gmlf += "    source " + src + "\n";
+            gmlf += "    target " + tgt + "\n";            
+            gmlf += "    label \"" + src + "=>" + tgt + "\"\n";            
+            gmlf += endEdge + "\n";
+        }
+        
+        // print footer (close graph)
+        gmlf += "]\n";
+        
+        return(gmlf);
+    }
+    
+    
+    /**
+     * Determines the kavosh edge list format string for this graph. First line is number of vertices. All other lines represent one edge.
+     * @return the kavosh edge list format string for this graph
+     */
+    public String toKavoshFormat() {
+        String kf = "";
+        
+        kf += this.numVertices() + "\n";
+
+        for(Integer i = 0; i < this.getSize(); i++) {
+            for(Integer j = 0 ; j < this.getSize(); j++) {
+                if(this.hasEdge(i, j) && i != j) {
+                    kf += (i+1) + " " + (j+1) + "\n";                    
+                }            
+            }            
+        }
+        
+        return kf;
     }
 
     

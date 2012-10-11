@@ -481,7 +481,9 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         
         
         if(this.jCheckBoxOutputDirTree.isSelected()) {
-            cmdList.add("--img-dir-tree");
+            //cmdList.add("--img-dir-tree");
+            cmdList.add("--output-subdir-tree");
+            
         }
         
         cmdList.add("--image-format");
@@ -954,8 +956,8 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
                                         .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                             .addComponent(jTextFieldInputFilePDB)
                                             .addGroup(jPanelMainContentLayout.createSequentialGroup()
-                                                .addComponent(jTextFieldInputFileDSSP)
-                                                .addGap(145, 145, 145)))))
+                                                .addComponent(jTextFieldInputFileDSSP, javax.swing.GroupLayout.PREFERRED_SIZE, 417, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(0, 0, Short.MAX_VALUE)))))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanelMainContentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jCheckBoxPdbFileIsGzipped, javax.swing.GroupLayout.Alignment.TRAILING)

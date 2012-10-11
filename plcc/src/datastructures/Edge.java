@@ -7,6 +7,8 @@
  */
 package datastructures;
 
+import java.util.HashMap;
+
 /**
  * A simple edge used to be used by the Graphs class.
  * @author spirit
@@ -16,6 +18,7 @@ class Edge {
     protected Integer endVertex;
     protected Integer edgeType;
     protected Integer defaultEdgeType = Graph.EDGETYPE_EDGE;
+    protected HashMap<String, Object> metadata;
 
     /**
      * Creates an edge of type edgeType from startVertex to endVertex.
@@ -27,6 +30,7 @@ class Edge {
         this.startVertex = startVertex;
         this.endVertex = endVertex;
         this.edgeType = edgeType;
+        this.metadata = new HashMap<String, Object>();
     }
     
     /**
@@ -38,6 +42,7 @@ class Edge {
         this.startVertex = vertexIndices[0];
         this.endVertex = vertexIndices[1];
         this.edgeType = edgeType;
+        this.metadata = new HashMap<String, Object>();
     }
     
     /**
@@ -48,6 +53,7 @@ class Edge {
         this.startVertex = vertexIndices[0];
         this.endVertex = vertexIndices[1];
         this.edgeType = this.defaultEdgeType;
+        this.metadata = new HashMap<String, Object>();
     }
     
     /**
@@ -74,6 +80,26 @@ class Edge {
      */
     public Integer getType() {
         return(this.edgeType);
+    }
+    
+    
+    /**
+     * Retrieves edge meta data.
+     * @param key the key to get
+     * @return the object entry
+     */
+    public Object getMetadataEntry(String key) {
+        return this.metadata.get(key);
+    }
+    
+    
+    /**
+     * Sets the metadata entry.
+     * @param key the key
+     * @param value the value
+     */
+    public void setMetadataEntry(String key, Object value) {
+        this.metadata.put(key, value);    
     }
     
 }

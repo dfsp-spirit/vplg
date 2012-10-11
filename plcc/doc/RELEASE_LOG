@@ -102,5 +102,16 @@ Updates from version 2012-09-07 to 2012-09-14:
   - added option to write all output files to a PDB-style subdirecotry structure (-K, -k), e.g. '<BASEOUTPUTDIR>/ic/8icd/8icd_A_albelig_PG.gml')
   - fixed command line parsing of output formats, kavosh edge list format is now 'e' as described in help (it was 'k' before)
 
+Updates from version 2012-09-14 to 2012-10-11:
+================================================
+* PLCC: 
+  - folding graphs can now be written in all supported graph formats, no only PLCC format
+  - GML-format graphs now contain the ligand name as a vertex comment for ligand vertices
+  - more useful output (but not more output)
+  - removed the difference between -K and -k command line options, it made no sense
+* VPG:
+  - increased size of some input text fields
+
+
 --
 ts
