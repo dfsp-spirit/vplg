@@ -10,6 +10,7 @@
 package plcc;
 
 
+import com.google.gson.Gson;
 import java.util.*;
 import java.io.*;
 
@@ -325,6 +326,9 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
         
         return(this.connectedComponents);
     }
+    
+    
+    
     
 }
 

@@ -46,6 +46,10 @@ public abstract class Graph<V> implements TrivialGraphFormat, GraphMLFormat {
     
     public final Integer EDGETYPE_DEFAULT = Graph.EDGETYPE_EDGE;
     
+    protected Boolean connectedComponentsComputed;
+    protected Boolean distancesCalculated;
+    protected ArrayList<Graph> connectedComponents;
+    
     /**
      * Constructs a graph from a vertex list. The list may be empty, of course.
      * @param vertList the vertex list
@@ -63,7 +67,22 @@ public abstract class Graph<V> implements TrivialGraphFormat, GraphMLFormat {
             }            
         }
         
-    }          
+    }
+    
+    public Graph() {
+        this.vertices = new ArrayList<V>();
+        //this.edges = new ArrayList<ArrayList<Edge>>();
+        this.edgeMatrix = new Integer[vertices.size()][vertices.size()];
+        this.metadata = new HashMap<String, Object>();
+        this.vertexMetadata = new ArrayList<HashMap<String, Object>>();
+        
+        for(Integer i = 0; i < this.vertices.size(); i++) {
+            for(Integer j = 0; j < this.vertices.size(); j++) {
+                this.edgeMatrix[i][j] = Graph.EDGETYPE_NONE;            
+            }            
+        }
+        
+    }
     
     /**
      * Adds an edge to this graph.

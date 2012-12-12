@@ -9,6 +9,9 @@
 
 package plcc;
 
+import com.google.gson.Gson;
+import datastructures.Graph;
+import datastructures.UndirectedGraph;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -1484,6 +1487,28 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
 
         // The queue is empty, so all vertices reachable from x have been checked.
         return(dist);
+    }
+    
+    
+    
+    /**
+     * Returns a node type list of the graph vertices. This is pretty special and intended
+     * for usage with RAGE (Dror Marcus and Yuval Shavitt. RAGE - A Rapid Graphlet Enumerator for Large Networks. Computer Networks (COMNET, Elsevier), to appear).
+     * @return the string description
+     */
+    public String getNodeTypeList() {
+        StringBuilder sb = new StringBuilder();
+        
+        for(SSE s : this.sseList) {
+            sb.append(s.getSeqIndexInGraph() + 1);
+            sb.append(" ");
+            sb.append("SSE_type ");
+            sb.append(s.getPLCCSSELabel());
+            sb.append("\n");
+        }
+        
+        
+        return sb.toString();
     }
 
     
@@ -3286,6 +3311,22 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     }
     
     
+    public String toEdgeList() {
+        StringBuilder sb = new StringBuilder();                            
+
+        for(Integer i = 0; i < this.getSize(); i++) {
+            for(Integer j = 0 ; j < this.getSize(); j++) {
+                if(this.containsEdge(i, j) && i != j) {
+                    sb.append(i+1);
+                    sb.append(" ");
+                    sb.append(j+1);
+                    sb.append("\n");                    
+                }            
+            }            
+        }
+        return sb.toString();
+    }
+    
     public String toKavoshFormat() {
         String kf = "";
         
@@ -3314,8 +3355,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         }
         
         return kf;
-    }
-    
+    }            
     
 
     

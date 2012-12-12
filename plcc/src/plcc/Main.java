@@ -16,7 +16,8 @@ import java.util.Locale;
 //import org.jgrapht.*;
 //import org.jgrapht.graph.*;
 //import org.jgrapht.alg.ConnectivityInspector;
-
+import com.google.gson.*;
+import datastructures.UndirectedGraph;
 import java.util.*;
 
 import java.awt.BasicStroke;
@@ -642,6 +643,7 @@ public class Main {
                             Settings.set("plcc_B_output_TGF", "false");
                             Settings.set("plcc_B_output_DOT", "false");
                             Settings.set("plcc_B_output_kavosh", "false");
+                            Settings.set("plcc_B_output_eld", "false");
                             Settings.set("plcc_B_output_plcc", "false");
                             
                             // Now add the listed ones back:
@@ -656,13 +658,14 @@ public class Main {
                                 if(types.contains("g")) { Settings.set("plcc_B_output_GML", "true"); nv++; }
                                 if(types.contains("t")) { Settings.set("plcc_B_output_TGF", "true"); nv++; }
                                 if(types.contains("d")) { Settings.set("plcc_B_output_DOT", "true"); nv++; }
-                                if(types.contains("e")) { Settings.set("plcc_B_output_kavosh", "true"); nv++; }
+                                if(types.contains("k")) { Settings.set("plcc_B_output_kavosh", "true"); nv++; }
+                                if(types.contains("e")) { Settings.set("plcc_B_output_eld", "true"); nv++; }
                                 if(types.contains("p")) { Settings.set("plcc_B_output_plcc", "true"); nv++; }
 
                                 // sanity check
                                 if(nv != types.length()) {
                                     System.err.println("WARNING: List of output formats given on command line '" + types + "' contains invalid chars (" + types.length() + " given, " + nv + " valid).");
-                                    System.err.println("WARNING: Valid chars: 'g' => GML, 't' => TGF, 'd' => DOT lang, 'e' => kavosh edge list, 'p' => PLCC. Example: '-O tgp'");
+                                    System.err.println("WARNING: Valid chars: 'g' => GML, 't' => TGF, 'd' => DOT lang, 'k' => kavosh, 'e' => edge list, p' => PLCC. Example: '-O tgp'");
 
                                     if(nv <= 0) {
                                         syntaxError();
@@ -950,6 +953,24 @@ public class Main {
 
         // **************************************    calculate the contacts    ******************************************
 
+        // JSON test 
+        Boolean jsonTest = false;
+        if(jsonTest) {
+            Gson gson = new Gson();
+            gson.toJson(1);
+            gson.toJson("abcd");
+            gson.toJson(new Long(10));
+            int[] values = { 1 };
+            gson.toJson(values);
+
+            //(Deserialization)
+            int one = gson.fromJson("1", int.class);
+            Integer one1 = gson.fromJson("1", Integer.class);
+            Long one2 = gson.fromJson("1", Long.class);
+            Boolean bfalse = gson.fromJson("false", Boolean.class);
+            String str = gson.fromJson("\"abc\"", String.class);
+            String anotherStr = gson.fromJson("[\"abc\"]", String.class);
+        }
 
         System.out.println("Calculating residue contacts...");
 
@@ -1516,13 +1537,28 @@ public class Main {
                         graphFormatsWritten += "kavosh "; numFormatsWritten++;
                     }
                 }
+                if(Settings.getBoolean("plcc_B_output_eld")) {
+                    String elFile = filePathGraphs + fs + fileNameWithoutExtension + ".el_edges";
+                    String nodeTypeListFile = filePathGraphs + fs + fileNameWithoutExtension + ".el_ntl";
+                    if(IO.stringToTextFile(elFile, pg.toEdgeList()) && IO.stringToTextFile(nodeTypeListFile, pg.getNodeTypeList())) {
+                        graphFormatsWritten += "el "; numFormatsWritten++;
+                    }
+                }
                 // write the SSE info text file for the image (plcc graph format file)
                 if(Settings.getBoolean("plcc_B_output_plcc")) {
                     plccGraphFile = filePathGraphs + fs + fileNameWithoutExtension + ".plg";
                     if(IO.stringToTextFile(plccGraphFile, pg.toVPLGGraphFormat())) {
                         graphFormatsWritten += "plg "; numFormatsWritten++;
                     }
-                }                                                                                    
+                }
+                
+                Boolean jsonTest = false;
+                if(jsonTest) {
+                    String jsonFile = "graph_test.json";
+                    if(IO.stringToTextFile(jsonFile, testJSONFormat())) {
+                        System.out.println("Wrote json test file.");
+                    }
+                }
                 
                 
                 if(numFormatsWritten > 0) {
@@ -1748,6 +1784,12 @@ public class Main {
         else {
             return("" + alph.charAt(seqNum % alph.length()));
         }
+    }
+    
+    public static String testJSONFormat() {
+        Gson gson = new Gson();
+        String json = gson.toJson(new UndirectedGraph());  
+        return json;
     }
 
     

@@ -26,6 +26,10 @@ public class UndirectedGraph extends Graph<Integer> {
         super(vertList);
     }
     
+    public UndirectedGraph() {
+        super();
+    }
+    
     
     /**
      * Testing main
