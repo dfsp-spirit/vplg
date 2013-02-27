@@ -3375,6 +3375,7 @@ class PriorityVertex implements Comparable<PriorityVertex> {
       public Integer index;
       public Integer minDistance;
       
+      
       @Override public String toString() { return("" + index); }
 
       /**
