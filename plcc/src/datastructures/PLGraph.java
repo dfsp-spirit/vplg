@@ -8,8 +8,7 @@
  */
 package datastructures;
 
-import molbi.spargel.datastructures.TypedGraph;
-import molbi.spargel.interfaces.ITypedGraph;
+
 import java.util.ArrayList;
 
 
@@ -18,7 +17,7 @@ import java.util.ArrayList;
  * implementation built on adjacency lists. It is based on the SPARGEL library. You need to add SPARGEL to the PLCC dependencies.
  * @author ts
  */
-public class PLGraph<VertexSSE> extends molbi.spargel.datastructures.TypedGraph {
+public class PLGraph<VertexSSE>  {
     
     /**
      * The RCSB identifier of this protein. A 4-letter string, e.g., '7TIM'.
@@ -43,7 +42,7 @@ public class PLGraph<VertexSSE> extends molbi.spargel.datastructures.TypedGraph 
     }    
     
     public PLGraph(ArrayList<VertexSSE> vertices) {
-        super(vertices);
+        //super(vertices);
         this.pdbid = "";
         this.chain = "";
         this.graphType = PLGRAPH_TYPE_NONE;

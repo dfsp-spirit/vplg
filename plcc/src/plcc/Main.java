@@ -16,7 +16,7 @@ import java.util.Locale;
 //import org.jgrapht.*;
 //import org.jgrapht.graph.*;
 //import org.jgrapht.alg.ConnectivityInspector;
-import com.google.gson.*;
+//import com.google.gson.*;
 import datastructures.UndirectedGraph;
 import java.util.*;
 
@@ -954,6 +954,7 @@ public class Main {
         // **************************************    calculate the contacts    ******************************************
 
         // JSON test 
+        /*
         Boolean jsonTest = false;
         if(jsonTest) {
             Gson gson = new Gson();
@@ -971,6 +972,7 @@ public class Main {
             String str = gson.fromJson("\"abc\"", String.class);
             String anotherStr = gson.fromJson("[\"abc\"]", String.class);
         }
+        */
 
         System.out.println("Calculating residue contacts...");
 
@@ -1552,6 +1554,7 @@ public class Main {
                     }
                 }
                 
+                /*
                 Boolean jsonTest = false;
                 if(jsonTest) {
                     String jsonFile = "graph_test.json";
@@ -1559,6 +1562,7 @@ public class Main {
                         System.out.println("Wrote json test file.");
                     }
                 }
+                */
                 
                 
                 if(numFormatsWritten > 0) {
@@ -1786,11 +1790,13 @@ public class Main {
         }
     }
     
+    /*
     public static String testJSONFormat() {
         Gson gson = new Gson();
         String json = gson.toJson(new UndirectedGraph());  
         return json;
     }
+    */
 
     
     /**

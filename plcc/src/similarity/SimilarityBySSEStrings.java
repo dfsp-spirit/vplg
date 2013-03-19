@@ -36,8 +36,8 @@ public class SimilarityBySSEStrings {
      * @return the global alignment score
      */
     public Integer compareSSEStringsGlobal() {
-        String sseStringA = graphA.getSSEString();
-        String sseStringB = graphB.getSSEString();
+        String sseStringA = graphA.getSSEStringSequential();
+        String sseStringB = graphB.getSSEStringSequential();
         
         NeedlemanWunsch nw = new NeedlemanWunsch(sseStringA, sseStringB);
         nw.setAlphabet("HELO");
@@ -52,8 +52,8 @@ public class SimilarityBySSEStrings {
      * @return the local alignment score
      */
     public Integer compareSSEStringsLocal() {
-        String sseStringA = graphA.getSSEString();
-        String sseStringB = graphB.getSSEString();
+        String sseStringA = graphA.getSSEStringSequential();
+        String sseStringB = graphB.getSSEStringSequential();
         
         SmithWaterman sw = new SmithWaterman(sseStringA, sseStringB);
         sw.setAlphabet("HELO");
