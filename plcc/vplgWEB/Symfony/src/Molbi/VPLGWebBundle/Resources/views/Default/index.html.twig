@@ -1,0 +1,18 @@
+{# The extended template is at src/Molbi/VPLGWebBundle/Resources/views/Default/base.html.twig #}
+{% extends 'MolbiVPLGWebBundle:Default:base.html.twig' %}
+
+ {% block body %}
+     <h2>
+	      VPLG -- Visualization of Protein Ligand Graphs
+     </h2>
+     <p>Welcome to the VPLG Web Interface!</p>
+     <p>VPLG uses a graph-based model to describe the structure of proteins on the super-secondary structure level. 
+        A protein-ligand graph is computed from the atomic coordinates in a PDB file and the secondary structure assignments
+        of the DSSP algorithm. In this graph, vertices represent secondary structure elements (SSEs, e.g. usually alpha
+        helices and beta sheets) or ligand molecules while the edges model contacts and spatial relations between them.
+     </p>
+     <p>This website can be used to list <a href="{{ path('proteins') }}">all proteins</a>, <a href="{{ path('chains') }}">all protein chains</a> or
+        <a href="{{ path('graphs') }}">all protein graphs</a> in the database. You can also view <a href="{{ path('protgraph') }}">protein graph images</a>.
+     </p>
+ {% endblock %}
+

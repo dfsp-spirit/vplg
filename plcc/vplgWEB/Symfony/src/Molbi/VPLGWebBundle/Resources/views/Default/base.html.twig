@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>{% block title %}VPLGWeb -- Visualization of Protein Ligand Graphs{% endblock %}</title>
+        {# the style sheet is at Symfony/web/main.css #}
+        {% block stylesheets %}<link href="{{ asset('main.css') }}" type="text/css" rel="stylesheet" />{% endblock %}
+        <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" />
+    </head>
+    <body>
+        {% block header %}<p class="header">VPLG header text</p><hr>{% endblock %}
+        {% block body %}<p>VPLG body text</p>{% endblock %}
+        {% block footer %}<hr><p class="footer">VPLG footer text</p>{% endblock %}
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>

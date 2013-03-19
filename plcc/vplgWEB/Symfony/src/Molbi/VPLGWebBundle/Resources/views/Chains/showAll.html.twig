@@ -1,0 +1,18 @@
+{# The extended template is at src/Molbi/VPLGWebBundle/Resources/views/Default/base.html.twig #}
+{% extends 'MolbiVPLGWebBundle:Default:base.html.twig' %}
+
+ {% block body %}
+     <h2>
+	      VPLG -- All protein chains
+     </h2>
+     <p>The following list shows all protein chains in the database.
+     <br />
+     <br />
+     <ul id="chains">
+            {% for chain in chains %}
+                <li>{{ chain.pdb_id }} | {{ chain.chain_name }}  | {{ chain.mol_name }} | {{ chain.organism_common }}  | {{ chain.organism_scientific }}</li>
+            {% endfor %}
+        </ul>
+     </p>
+ {% endblock %}
+

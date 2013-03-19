@@ -1,0 +1,2 @@
+PSQL_OPTIONS=" -d ptgl "
+

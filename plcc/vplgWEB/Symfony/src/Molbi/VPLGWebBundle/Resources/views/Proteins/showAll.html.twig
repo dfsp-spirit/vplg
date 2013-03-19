@@ -1,0 +1,18 @@
+{# The extended template is at src/Molbi/VPLGWebBundle/Resources/views/Default/base.html.twig #}
+{% extends 'MolbiVPLGWebBundle:Default:base.html.twig' %}
+
+ {% block body %}
+     <h2>
+	      VPLG -- All proteins
+     </h2>
+     <p>The following list shows all proteins in the database.
+     <br />
+     <br />
+     <ul id="proteins">
+            {% for protein in proteins %}
+                <li>{{ protein.pdb_id }} | {{ protein.header }}  | {{ protein.title }} | {{ protein.experiment }} | {{ protein.keywords }} | {{ protein.resolution }}</li>
+            {% endfor %}
+        </ul>
+     </p>
+ {% endblock %}
+

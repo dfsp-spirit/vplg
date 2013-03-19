@@ -1,0 +1,204 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="robots" content="index,follow" />
+<meta name="description" content="The VPLG software package can be used to visualize the structure of proteins on the super-secondary structure level." />
+<meta name="keywords" content="vplg, protein structure, graph theory, bioinformatics, graph visualization, ligands, protein structure topology" />
+<meta name="language" content="en" />
+<title>VPLG -- The Visualization of Protein-Ligand Graphs software package</title>
+<link rel="stylesheet" type="text/css" href="./vplg.css" />
+<style type="text/css">
+/*<![CDATA[*/
+ div.c2 {text-align: center}
+ p.c1 {text-align: center}
+/*]]>*/
+</style>
+</head>
+<body>
+<!-- <a href="http://rcmd.org/vplg/"><img src="./img/vplg_logo.png" align="left" alt="VPLG website link" /></a> -->
+<img src="./img/vplg_logo.png" align="left" alt="VPLG website link" /> <a href="http://sourceforge.net/p/vplg/wiki/Home/" target="_blank"><img src="./img/vplg_sf_logo.png" align="right" alt="VPLG Project website at Sourceforge" /></a>
+<p class="big c1">VPLG -- The <strong>V</strong>isualization of <strong>P</strong>rotein-<strong>L</strong>igand <strong>G</strong>raphs software package</p>
+<p class="text c1"><a href="#About">About</a> || <a href="#Download">Download &amp; License</a> || <a href="#Documentation">Documentation</a> || <a href="#Screenshots">Screenshots</a> || <a href="#Development">Code &amp; Development</a> || <a href="#Support">Support</a> || <a href="#Contact">Contact &amp; Citing</a></p>
+<hr />
+<a name="About" id="About"></a>
+<p class="big">About</p>
+<p class="text">VPLG uses a graph-based model to describe the structure of proteins on the super-secondary structure level. A protein-ligand graph is computed from the atomic coordinates in a PDB file and the secondary structure assignments of the DSSP algorithm. In this graph, vertices represent secondary structure elements (SSEs, e.g. usually alpha helices and beta sheets) or ligand molecules while the edges model contacts and spatial relations between them.<br />
+<br />
+VPLG is written in <a href="http://java.com/" target="_blank">Java</a> using the <a href="http://xmlgraphics.apache.org/batik/" target="_blank">Apache Batik library</a> for SVG output. Database connectivity (optional) is provided by the <a href="http://jdbc.postgresql.org/">PostgreSQL JDBC driver</a>. VPLG was tested on Linux and Windows and should also run under MacOS.</p>
+<table class="image">
+<tr>
+<td><img src="./img/protein_graph.png" alt="Graph representation of the alpha-chain of triosephosphate isomerase from PDB entry 7TIM" /></td>
+</tr>
+<tr>
+<td class="caption"><strong>Graph representation of the alpha-chain of triosephosphate isomerase from PDB entry 7TIM.</strong> The alpha helices are shown as red circles and the beta-strands as black squares. Ligands are represented by magenta circles. From left to right, the vertices are ordered by the position of the SSEs they represent in the amino acid sequence (N, N-terminus; C, C-terminus). The arks mark spatial contacts between SSEs (red, parallel; blue, anti-parallel; green, mixed; magenta, ligand contact). Image created with VPLG.</td>
+</tr>
+</table>
+<br />
+<br />
+<a name="Download" id="Download"></a>
+<p class="big">Download &amp; License</p>
+<p class="text">This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+<br />
+<br />
+VPLG is licensed under the <a href="http://www.perlfoundation.org/artistic_license_2_0" target="_blank">Artistic License 2.0</a>. This is a <a href="http://www.gnu.org/licenses/license-list.html%23ArtisticLicense2">free software license which is compatible with the GPL according to the FSF</a>. It is the same license that is used by the Perl programming language.
+<br />
+<br />
+Also keep in mind that the software is work in progress. You can download different versions, but it is recommended to always use the latest version.<br />
+<br />
+<br />
+The VPLG software package can be <a href="http://sourceforge.net/projects/vplg/files/">downloaded at our Sourceforge download site</a>.<br />
+<br /></p>
+<br />
+<br />
+<a name="Documentation" id="Documentation"></a>
+<p class="big">Documentation</p>
+<p class="text">Documentation is included in the release. See the <em>doc/</em> subdirectoy of your VPLG directory. You can also <a href="http://sourceforge.net/p/vplg/wiki/Home/">browse the VPLG documentation online</a>, of course. A quickstart guide and some information on how the program works and the format of the output graph file format is given below.<br />
+<br />
+<br />
+<a name="Quickstart" id="Quickstart"></a> <strong>Quickstart</strong><br />
+<br />
+Here is a quick and basic example on how to use PLCC for PDB entry 3KMF, assuming you have the files <em>3kmf.pdb</em> and <em>3kmf.dssp</em> ready and in the PLCC directory:</p>
+<p class="code">java -jar plcc.jar 3kmf</p>
+<p class="text">This will compute the SSE graphs and write them to image files in the current working directory. You may want to adapt advanced settings, e.g. which graph types to draw and which image format to use, in the config file <em>.plcc_settings</em> (note the dot), which will be created in your home directory the first time you run PLCC.<br />
+<br />
+Note that you can run PLCC without any parameters to get basic help. You can run the following command to access the built-in help:</p>
+<p class="code">java -jar plcc.jar --help</p>
+<p class="text"><br />
+<br />
+<a name="How_it_works" id="How_it_works"></a> <strong>How it works</strong><br />
+<br />
+This section roughly explains how VPLG works. See the paper for details.<br />
+<br /></p>
+<table border="0">
+<tr>
+<td><img src="./img/vplg_input_output.png" border="0" align="bottom" alt="fuw3c" /></td>
+<td><img src="./img/vplg_graph_creation.png" border="0" align="bottom" alt="fuw3c" /></td>
+</tr>
+<tr>
+<td class="caption"><strong>Data sources and output of VPLG.</strong> The PDB files containing 3D atomic coordinates are downloaded from the RCSB PDB and DSSP is used to assign SSEs to each protein residue. VPLG reads both the PDB and DSSP files and uses them to generate a protein graph file and a bitmap or vector image of the protein graph. Optionally, statistics and the graph can also be written to a database.</td>
+<td class="caption"><strong>Computation of the protein graph from 3D atom data.</strong> Contacts are calculated on atom level from the 3D data in a PDB file (1). All residues of the considered protein chain are assigned to SSEs (2), which become the vertices of the protein graph (3). The atom contact information is used to calculate the spatial relationships between the SSEs, represented by edges in the graph (4).</td>
+</tr>
+</table>
+<br />
+<br />
+<br />
+<br />
+<a name="Fileformat" id="Fileformat"></a> <strong>The <em>plg</em> File format</strong><br />
+<br />
+When VPLG is run for a protein, it writes a human-readable protein-ligand graph file in ASCII format (PLG file, file extension <em>.plg</em>) in addition to the image files. The file format was designed to be easily parsable. VPLG can read these files and visualize protein graphs from them directly, so if you have a PLG file the PDB and DSSP files are NOT required to draw the graph. An example for a file in PLG format is given below:<br />
+<pre>
+# This is the plcc SSE info file for the albelig graph of PDB entry 2hhb, chain A.
+> format_version > 2
+> pdbid > 2hhb
+> chainid > A
+> graphtype > albelig
+| 2hhb | A | albelig | 1 | 1 | H | 4 | 17 | A-4-  | A-17-  | PADKTNVKAAWGKV
+| 2hhb | A | albelig | 2 | 2 | H | 18 | 35 | A-18-  | A-35-  | GAHAGEYGAEALERMFLS
+| 2hhb | A | albelig | 3 | 3 | H | 37 | 71 | A-37-  | A-71-  | PTTKTYAQVKGHGKKVADALTNAVA 
+| 2hhb | A | albelig | 4 | 4 | H | 73 | 79 | A-73-  | A-79-  | VDDMPNA 
+| 2hhb | A | albelig | 5 | 5 | H | 81 | 89 | A-81-  | A-89-  | SALSDLHAH 
+| 2hhb | A | albelig | 6 | 6 | H | 96 | 112 | A-96-  | A-112-  | VNFKLLSHCLLVTLAAH 
+| 2hhb | A | albelig | 7 | 7 | H | 119 | 136 | A-119-  | A-136-  | PAVHASLDKFLASVSTVL 
+| 2hhb | A | albelig | 8 | 8 | L | 578 | 578 | A-142-  | A-142-  | J 
+# Printed info on 8 SSEs.
+= 1 = p = 2
+= 1 = a = 7
+= 2 = a = 3
+= 2 = a = 6
+= 3 = m = 4
+= 3 = l = 8
+= 4 = p = 5
+= 5 = p = 7
+= 5 = l = 8
+= 6 = p = 7
+= 6 = l = 8
+# Printed info on 11 contacts. EOF.
+</pre>
+<br />
+As you may have guessed, the first character in a line indicates the line type. There are four different line types:
+<ul>
+<li><strong>Comment lines</strong> start with a number sign (<strong>#</strong>). They are ignored during the drawing process.</li>
+<li><strong>Meta data lines</strong> describe a property of the whole graph. They start with the greater than symbol (<strong>&gt;</strong>).</li>
+<li><strong>SSE lines</strong> describe a single secondary structure element (SSE) of the protein. They start with the pipe symbol (<strong>|</strong>).</li>
+<li><strong>Contact lines</strong> describe a contact between a pair of SSEs. They start with an equals sign (<strong>=</strong>).</li>
+</ul>
+The meta data, SSE and contact lines consist of several fields, separated by different field separators. The line type indicator is also used as the field separator.<br />
+<br />
+Meta data lines consist of the following 2 fields in this order:
+<ul>
+<li><strong>field name</strong>: The property name. Example: <em>graphtype</em>.</li>
+<li><strong>value</strong>: The property value. Example: <em>albelig</em> for the albelig graph.</li>
+</ul>
+SSE lines consist of the following 11 fields in this order:
+<ul>
+<li><strong>PDB ID</strong>: The RCSB Protein Data Bank identifier of the protein. Example: <em>2HHB</em>.</li>
+<li><strong>chain ID</strong>: The chain identifier of this protein chain, from the PDB file. Example: <em>A</em> for the alpha chain.</li>
+<li><strong>graph type</strong>: The graph type, i.e., which SSEs are considered in this graph. Valid values are: <em>alpha</em>, <em>alphalig</em>, <em>beta</em>, <em>betalig</em>, <em>albe</em> and <em>albelig.</em></li>
+<li><strong>sequential SSE number in sequence</strong>: The sequential SSE number in the amino acid sequence, N-terminus to C-terminus. Note that this value is the same as the following number only for albelig graphs, because they include all SSEs of the chain. Example: <em>1</em> for the first SSE.</li>
+<li><strong>sequential SSE number in graph</strong>: The sequential SSE number in this protein graph. This SSE number also allows you to identify the SSE in the image (the number is underneath the vertex representing this SSE, in the "G" line.). Example: <em>1</em> for the first SSE.</li>
+<li><strong>SSE type</strong>: The SSE type. Valid values are <em>H</em> for alpha-helix, <em>E</em> for beta-strand, <em>C</em> for coil and <em>L</em> for ligand.</li>
+<li><strong>DSSP start residue number</strong>: The number that uniquely identifies the first residue of this SSE in the DSSP file. Example:<em>4</em></li>
+<li><strong>DSSP end residue number</strong>: The number that uniquely identifies the last residue of this SSE in the DSSP file. Example:<em>17</em></li>
+<li><strong>PDB end residue ID</strong>: The three PDB fields that uniquely identify the first residue of this SSE in the PDB file. These three fields are: <em>PDB chain ID (pChain)</em>, <em>PDB residue number (pResNum)</em> and <em>PDB insertion code (pInsCode)</em>. This field is in format <em>pChain-pResNum-pInsCode</em>. Note that the <em>pInsCode</em> part may be empty. Example: <em>A-4-</em></li>
+<li><strong>PDB start residue ID</strong>: The three PDB fields that uniquely identify the last residue of this SSE in the PDB file. See <em>PDB end residue ID</em> above for format. Example: <em>A-17-</em></li>
+<li><strong>Amino acid sequence</strong>: The amino acid sequence of the SSE in one-letter-code. Example: <em>PADKTNVKAAWGKV</em>.</li>
+</ul>
+Contact lines describe a spatial contact between a pair <em>(A, B)</em> of SSEs. They consist of the following 3 fields:
+<ul>
+<li><strong>sequential SSE number of SSE A</strong>: The sequential SSE number of the first SSE involved in this contact (see field 4 of the SSE line description). Example: <em>1</em>.</li>
+<li><strong>spatial relation</strong>: The spatial relation between the SSEs A and B. Valid values are: <em>p</em> for parallel, <em>a</em> for anti-parallel, <em>m</em> for mixed and <em>l</em> for ligand contact.</li>
+<li><strong>sequential SSE number of SSE B</strong>: The sequential SSE number of the second SSE involved in this contact (see field 4 of the SSE line description). Example: <em>2</em>.</li>
+</ul>
+Note on parsing these files: You can savely remove all whitespace from a line before splitting it.<br />
+<br />
+<br />
+<a name="Screenshots" id="Screenshots"></a>
+<p class="big">Screenshots</p>
+<p class="text">Some screenshots of VPLG and its output (PNGs generated from SVG files, click to enlarge). More and more recent screenshots are available in the Files section of our Sourceforge website.<br />
+<br /></p>
+<table border="0">
+<tr>
+<td><a href="./img/8icd_A_albelig.png" target="_blank"><img src="./img/thumb_8icd_A_albelig.png" border="0" align="bottom" alt="protein graph 8ICD" /></a></td>
+<td><a href="./img/random_graph.png" target="_blank"><img src="./img/thumb_random_graph.png" border="0" align="bottom" alt="non-protein graph" /></a></td>
+<td><a href="./img/large_graph.png" target="_blank"><img src="./img/thumb_large_graph.png" border="0" align="bottom" alt="large random protein graph" /></a></td>
+</tr>
+<tr>
+<td class="caption">Albelig graph of 8ICD, chain A</td>
+<td class="caption">Random non-protein graph with 50 vertices</td>
+<td class="caption">Large random protein graph</td>
+</tr>
+</table>
+<br />
+<br />
+<a name="Development" id="Development"></a>
+<p class="big">Code &amp; Development</p>
+<p class="text">
+The source code is included in the src/ directory of your VPLG release.
+<br />
+<br />
+The latest version of the VPLG code is managed in our non-public subversion repository atm. We are working on moving it to our public, read-only <a href="http://sourceforge.net/p/vplg/code/">Sourceforge SVN</a> in the near future. If you are interested in the
+development of VPLG, please contact the author to get write access.
+</p>
+<br />
+<br />
+<a name="Support" id="Support"></a>
+<p class="big">Support</p>
+<p class="text">You can use the <a href="http://sourceforge.net/p/vplg/tickets/">tickets system</a> or the <a href="http://sourceforge.net/p/vplg/discussion/">discussion forums</a> at our Sourceforge website to ask questions, report bugs and security issues, request features etc.</p>
+<br />
+<br />
+<a name="Contact" id="Contact"></a>
+<p class="big">Contact &amp; Citing VPLG</p>
+<p class="text">VPLG was written by Tim Schäfer at the Molecular Bioinformatics group of Ina Koch at Goethe-University Frankfurt, Germany. It is based on earlier work by Ina Koch and Patrick May. Contact information is <a href="http://www.bioinformatik.uni-frankfurt.de/about_us.html" target="_blank">available here</a>.
+<br /><br />
+Information on <a href="https://sourceforge.net/p/vplg/wiki/Citing/">how to cite VPLG is available here</a>.
+<br /><br />
+</p>
+<div class="c2"><a href="http://www.bioinformatik.uni-frankfurt.de/"><img src="./img/molbi_logo.png" alt="MolBI logo" /></a></div>
+<br />
+<br />
+<hr />
+<p class="text c1"><a href="#About">About</a> || <a href="#Download">Download &amp; License</a> || <a href="#Documentation">Documentation</a> || <a href="#Screenshots">Screenshots</a> || <a href="#Development">Code &amp; Development</a> || <a href="#Support">Support</a> || <a href="#Contact">Contact &amp; Citing</a></p>
+</body>
+</html>

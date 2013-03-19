@@ -1,0 +1,24 @@
+mpi4py_test:
+1) den teil ersetzen:
+### <paralell operation> ###
+if ((cur_job%7)==0):
+    result.append(cur_job)
+### </paralell operation> ###
+
+2) evtl. kann man datei nicht als argument mitgeben dann muss das auch ersetzt werden
+
+3) gather kann auskommentiert werden
+
+
+
+pbs job file:
+es sind eigentlich nur ein paar zeilen wirklich relevant
+
+1) openmpi eviroment setzen
+
+# load openmpi environment module
+. /usr/share/modules/init/bash
+module load openmpi.module
+
+2) anzahl der prozesse die gestartet werden
+mpirun -np 8 python mpi4py_test.py

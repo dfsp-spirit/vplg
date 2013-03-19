@@ -1,0 +1,23 @@
+# This is the plcc SSE info file for the albelig graph of PDB entry 7tim, chain A.
+# Line format is: 'PDB ID | chain ID | graph type | SSE number in image | SSE type | DSSP start residue # | DSSP end residue # | PDB end residue ID (format: chain-res#-icode) | PDB start residue ID | AA sequence'
+7tim | A | albelig | 1 | E | 4 | 9 | A-5-  | A-10-  | FFVGGN 
+7tim | A | albelig | 2 | H | 16 | 28 | A-17-  | A-29-  | KQSIKEIVERLNT 
+7tim | A | albelig | 3 | E | 35 | 40 | A-36-  | A-41-  | VEVVIC 
+7tim | A | albelig | 4 | H | 43 | 52 | A-44-  | A-53-  | ATYLDYSVSL 
+7tim | A | albelig | 5 | E | 58 | 62 | A-59-  | A-63-  | VTVGA 
+7tim | A | albelig | 6 | H | 79 | 84 | A-80-  | A-85-  | VDQIKD 
+7tim | A | albelig | 7 | E | 89 | 92 | A-90-  | A-93-  | WVIL 
+7tim | A | albelig | 8 | H | 95 | 100 | A-96-  | A-101-  | SERRSY 
+7tim | A | albelig | 9 | H | 105 | 117 | A-106-  | A-118-  | DKFIADKTKFALG 
+7tim | A | albelig | 10 | E | 121 | 126 | A-122-  | A-127-  | GVILCI 
+7tim | A | albelig | 11 | H | 130 | 134 | A-131-  | A-135-  | LEEKK 
+7tim | A | albelig | 12 | H | 138 | 152 | A-139-  | A-153-  | TLDVVERQLNAVLEE 
+7tim | A | albelig | 13 | E | 159 | 163 | A-160-  | A-164-  | VVVAY 
+7tim | A | albelig | 14 | H | 166 | 195 | A-167-  | A-196-  | VWAPEDAQDIHASIRKFLASKL 
+7tim | A | albelig | 15 | H | 197 | 202 | A-198-  | A-203-  | DKAASE 
+7tim | A | albelig | 16 | E | 205 | 208 | A-206-  | A-209-  | ILYG 
+7tim | A | albelig | 17 | H | 216 | 219 | A-217-  | A-220-  | AVTF 
+7tim | A | albelig | 18 | E | 227 | 230 | A-228-  | A-231-  | GFLV 
+7tim | A | albelig | 19 | H | 232 | 244 | A-233-  | A-245-  | GASLFVDIIN 
+7tim | A | albelig | 20 | L | 496 | 496 | A-249-  | A-249-  | J 
+# Printed info on 20 SSEs. EOF.

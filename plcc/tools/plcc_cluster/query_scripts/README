@@ -1,0 +1,17 @@
+To use these query scripts, make sure you can access the PLCC database qithout password.
+
+If your system user is 'ts' and you want to query the database 'vplg', edit your pgswl config files in /var/lib/pgsql/data/ like this:
+
+
+add a line to pg_ident.conf:
+"tsvplg		ts	vplg"	
+
+and add these lines in pg_hba.conf, but NOT at the end, but before the ALL lines (first matched line counts, so adding at the end will most likely not do anything):
+
+"local		vplg	vplg			trust"
+
+and
+
+"host		vplg	vplg	127.0.0.1/32	trust"
+
+Better remove these mapping later.

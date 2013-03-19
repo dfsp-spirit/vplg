@@ -1,0 +1,25 @@
+proteins:
+    pattern:  /VPLGWeb/proteins
+    defaults: { _controller: MolbiVPLGWebBundle:Proteins:showAll }
+
+graphs:
+    pattern:  /VPLGWeb/graphs
+    defaults: { _controller: MolbiVPLGWebBundle:Graphs:showAll }
+
+
+protgraph:
+    pattern:  /VPLGWeb/protein_graph/{pdbid}/{chain}/{graphtype}
+    defaults: { _controller: MolbiVPLGWebBundle:Graphs:showGraph, pdbid: 1a0s, chain: P, graphtype: albelig }
+    requirements:
+      pdbid:    a-z0-9{4}
+      chain:    a-zA-Z{1}
+      graphtype:     alpha|beta|albe|alphalig|betalig|albelig
+
+
+chains:
+    pattern:  /VPLGWeb/chains
+    defaults: { _controller: MolbiVPLGWebBundle:Chains:showAll }
+
+home:
+    pattern:  /VPLGWeb/
+    defaults: { _controller: MolbiVPLGWebBundle:Default:index }

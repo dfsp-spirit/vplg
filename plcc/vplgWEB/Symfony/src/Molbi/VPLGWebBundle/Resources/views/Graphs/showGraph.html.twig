@@ -1,0 +1,31 @@
+{# The extended template is at src/Molbi/VPLGWebBundle/Resources/views/Default/base.html.twig #}
+{% extends 'MolbiVPLGWebBundle:Default:base.html.twig' %}
+
+ {% block body %}
+     <h2>
+	      VPLG -- Protein graph
+     </h2>
+     <p>This page shows all data on a specific protein graph.
+     <br />
+     <br />
+     <table border="1">
+            <tr>
+            <th>PDB ID</th>
+	    <th>Chain</th>
+            <th>Graph type string</th>
+            <th>Graph image</th>            
+            </tr>           
+ 
+            {% for graph in graphs %}
+	    <tr>
+	    <td> {{ graph.pdb_id }} </td>
+	    <td> {{ graph.chain_name }} </td>
+            <td> {{ graph.graph_type_string }} </td>
+            <td> <img width="800px" height="600px" src="/~ts/Symfony/web/vplg_graphs/{{ graph.pdb_mid_letters }}/{{ graph.pdb_id }}/{{ graph.pdb_id }}_{{ graph.chain_name }}_{{ graph.graph_type_string }}_PG.svg" alt="graph" /> </td> 
+	    </tr>
+            {% endfor %}
+        </ul>
+     </table>
+     </p>
+ {% endblock %}
+

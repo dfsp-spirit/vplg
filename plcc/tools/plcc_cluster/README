@@ -1,0 +1,66 @@
+This README describes the VPLG cluster scripts.
+
+
+How these scripts work
+=======================
+These scripts are designed to run on multiple computers in a LAN which have a common directory (e.g., your HOME directory) mounted in the same place via NFS. You should place the whole script directory into such a directory.
+
+The results from all nodes are written to a database server by the PLCC application. You need to setup and configure this PostgreSQL database server for PLCC (see PLCC documentation or simply create a user and a database belonging to that user for usage by PLCC).
+
+The scripts in here are designed to get their settings from a single config file that is parsed by all of them (settings_statistics.cfg). There are a number of scripts which have to be run in the correct order. There are two ways for updating the database: single host or parallel on multiple machines. Obviously, the multiple machines way if faster (it should scale pretty well, i.e., if you have n machines, it should be about n times faster).
+
+Note: These script use no queuing system and only one thread is started per node. The threads on the nodes are completely independent, thus they
+      need no MPI or similar stuff. They write their results to a common database that has to be configured in the PLCC config file (see below for details). It needs the UNIX 'screen' utility, which is available in the package system of every Linux flavor I know of.
+
+
+
+How to use these scripts if you only have a single computer to process all PDB files
+=====================================================================================
+Here is the order in which to run the scripts and a description of what the scripts do.
+
+
+Preparation:
+0.0) Copy the plcc.jar file and the 'lib' directory from your VPLG installation to the 'plcc_run' subdirectory.
+0.1) Edit the config file 'settings_statistics.cfg' to match your local settings, you must specify the paths to splitpdb and dsspcmbi and other stuff.
+0.2) Edit the PLCC config file (at '~/.plcc_settings', run 'plcc --create-config' once if you do not have that file yet) and configure the database server.
+0.3) Get a copy of the PDB via rsync or update your copy if required. You can use the 'update_files_via_rsync.sh' script for this.
+
+Actual Update:
+1) Run the 'update_db_from_new_pdb_files_on_a_single_machine.sh' script.
+2) Done. When the script finishes, the data should be in the database.
+
+NOTE: Processing the whole PDB database (~70,000 PDB files) takes several days on a single desktop computer atm!
+
+
+
+
+
+How to use these scripts if you only have multiple computers (nodes)
+====================================================================
+Here is the order in which to run the scripts and a description of what the scripts do.
+
+NOTE: I assume in the following, that your HOME directory, the directories containing these scripts and the PDB data are available on
+      all machines at the same path, i.e., they are mounted via NFS or some other network file system. If this is not the case in your computing environment, you need to copy the data, scripts and PLCC config file with the database server settings to every node.
+      If you have a shared directory but it is NOT your home directory, you need to copy the PLCC config file to all nodes after preparing it because it is assumed to be at "$HOME/.plcc_settings" by PLCC.
+
+Preparation:
+0.1) Edit the config file 'settings_statistics.cfg' to match your local settings.
+0.2) Edit the PLCC config file (at '~/.plcc_settings', run 'plcc --help' once if you do not have that file yet) and configure the database server.
+0.3) Get a copy of the PDB via rsync or update your copy if required. You can use the 'update_files_via_rsync.sh' script for this.
+
+Actual Update:
+1) Add the DNS hostnames of all your nodes to the node file ('settings_node_hostnames.cfg'). We assume you have 'n' nodes in the following.
+2) Run the 'create_host_filelists.sh' script. This will search for input PDB files and create 'n' lists of input files (one for each host). If you have 400 input PDB files and two nodes named 'ixion55' and 'ixion56', it will write create the files 'filelist.ixion55' and 'filelist.ixion56', each of which will contain 200 paths to PDB files. Note that this script writes the paths to the PDB files as they appear on that box, thus you will have to rewrite them using your own scripts if the paths look different on the nodes.
+3-ALL-NODES) !!!ON EACH NODE!!! Run the 'run_update_on_this_node_in_screen.sh' script on each node (without any command line parameters, just ./ it). This will call the 'update_db_from_hostfilelist_on_this_node.sh' script with proper parameters for the host it is run on in a screen session, so you can logout and it will continue running in the background.
+4) Done. When the scripts are finished on all nodes, the data should be in the database.
+
+MPI version
+
+
+What to do oncve everything is done and all the proteins are in the database
+=============================================================================
+You can run your own SQL queries or have a look at the query_scripts/ directory, some queries are in there.
+
+
+--
+ts

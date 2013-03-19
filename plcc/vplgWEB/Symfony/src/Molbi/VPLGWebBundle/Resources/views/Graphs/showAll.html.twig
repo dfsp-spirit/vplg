@@ -1,0 +1,18 @@
+{# The extended template is at src/Molbi/VPLGWebBundle/Resources/views/Default/base.html.twig #}
+{% extends 'MolbiVPLGWebBundle:Default:base.html.twig' %}
+
+ {% block body %}
+     <h2>
+	      VPLG -- All protein graphs
+     </h2>
+     <p>The following list shows all protein graphs in the database.
+     <br />
+     <br />
+     <ul id="graphs">
+            {% for graph in graphs %}
+                <li>{{ graph.graph_id }} | {{ graph.chain_id }}  | {{ graph.graph_type }} | {{ graph.graph_string }}</li>
+            {% endfor %}
+        </ul>
+     </p>
+ {% endblock %}
+

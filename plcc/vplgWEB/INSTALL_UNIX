@@ -1,0 +1,57 @@
+How to install a VPLGWeb web server under UNIX/Linux
+=====================================================
+
+I: Download
+============
+1) Install apache2, apache2_mod_php5, postgresql-server and php5-pgsql from the package system
+1.2) Download Symfony2 from http://symfony.com/download
+1.3) Download VPLG from http://vplg.sourceforge.net
+
+II: Install and Setup
+======================
+2.1) Apache2/PHP setup
+2.1.1) Activate the extension 'php_pdo_pgsql' in /etc/apache2/php/php.ini or equiv. file (remove comment before the line) and restart Apache2
+
+2.2) PostgreSQL setup
+2.2.2) Under PostgreSQL, create a database user 'vplg' with login:
+         user@box> su postgres
+         postgres@box> psql 
+         psql> CREATE ROLE vplg WITH login;
+2.2.3) Under PostgreSQL, create a database 'vplg' which belongs to the user 'vplg'
+          user@box> su postgres
+          postgres@box> psql 
+          psql> CREATE DATABASE vplg OWNER vplg;
+
+2.3) Extract Symfony2 to your apache web root, e.g., /srv/www/htdocs/Symfony (<Symfony> from now on)
+2.3.1) Copy any existing Symfony project data to <Symfony>/src/<project>\               (e.g., VPLGWeb)
+2.3.2) Check Symfony configuration for postgresql in <Symfony>/app/config/config.yml:
+
+   doctrine:
+    dbal:
+        driver:   pdo_pgsql
+        host:     127.0.0.1
+        port:     5432
+        dbname:   vplg
+        user:     vplg
+        password: 
+        charset:  UTF8
+
+2.4) Extract VPLG to some path (we assume <VPLG> here) and make sure Java JRE >= 1.6 is installed
+2.4.1) Run 'java -jar plcc.jar' once to create the config file
+2.4.2) Edit the config file ~/.plcc_settings to ensure that the database credentials are correct (the settings are named plcc_S_db_*)
+2.4.3) Run 'java -jar plcc.jar NONE -r' to create the database tables which are used by VPLGWeb
+
+      
+III: Access and use
+====================
+3.1) Make sure Apache2 and the PostgreSQL server are running
+3.2) Use your web browser to navigate to: http://127.0.0.1/Symfony/web/app_dev.php/VPLGWeb/
+
+That's it.
+
+
+--
+ts
+
+
+
