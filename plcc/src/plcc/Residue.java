@@ -144,6 +144,40 @@ public class Residue implements java.io.Serializable {
         }        
         return deletedAtoms;
     }
+    
+    
+    /**
+     * Tells this residue to choose its alternate location PDB identifier and delete all its
+     * atoms which have other AltLocs. This function will always choose the AltLoc identifier which
+     * maximizes the number of atoms in this residue. The list of deleted atoms is returned so they can be deleted
+     * from the global atom list as well.
+     * @return the list of the atoms that were deleted
+     */
+    public ArrayList<Atom> chooseYourAltLoc() {
+        
+        if(this.atoms.size() < 1) {
+            System.err.println("WARNING: Residue " + this.getFancyName() + " has no atoms *before* choosing alternative location PDB field.");
+        }
+        
+        ArrayList<Atom> deletedAtoms;
+        
+        String chosenAltLoc = this.getAltLocWithMostAtoms();
+        int numAtomsWithChosenAltLoc = this.getNumAtomsWithAltLoc(chosenAltLoc);
+        
+        if(numAtomsWithChosenAltLoc < 1) {
+            System.err.println("WARNING: Chosen altLoc '" + chosenAltLoc + "' Residue " + this.getFancyName() + " leads to " + numAtomsWithChosenAltLoc + " atoms for residue " + this.getFancyName() + ".");
+        }
+        
+        deletedAtoms = this.deleteAtomsWithAltLocDifferentFrom(chosenAltLoc);
+        
+        if(this.atoms.size() < 1) {
+            System.err.println("ERROR: Residue " + this.getFancyName() + " has no atoms after choosing alternative location PDB field.");
+        }
+        
+        return deletedAtoms;
+    }
+    
+    
 
     /**
      * Determines the distance to another Residue, from Residue center to Residue center (C alpha atom to C alpha atom for AAs)
