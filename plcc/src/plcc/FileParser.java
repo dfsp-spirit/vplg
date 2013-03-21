@@ -357,6 +357,24 @@ public class FileParser {
         
         System.out.println("    PDB: Hit end of PDB file at line " + curLineNumPDB + ".");
 
+        // remove duplicate atoms from altLoc here
+        ArrayList<Atom> deletedAtoms;
+        int numAtomsDeletedAltLoc = 0;
+        int numResiduesAffected = 0;
+        for(Residue r : s_residues) {
+            deletedAtoms = r.chooseYourAltLoc();
+            
+            if(deletedAtoms.size() > 0) {
+                numResiduesAffected++;
+            }
+            
+            //delete atoms from global atom list as well
+            for(Atom a : deletedAtoms) {
+                s_atoms.remove(a);
+                numAtomsDeletedAltLoc++;
+            }
+        }
+        System.out.println("    PDB: Deleted " + numAtomsDeletedAltLoc + " duplicate atoms from " + numResiduesAffected + " residues which had several alternative locations.");
 
         // report statistics
         System.out.println("  All data parsed. Found " + s_models.size() + " models, " +
