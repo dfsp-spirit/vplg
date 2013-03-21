@@ -29,6 +29,7 @@ public class FileParser {
     static Integer maxUsedDsspResNumInDsspFile = null;
     static String firstModelName = "1";             // the model ID that identifies the first model in a PDB file
     static String defaultModelName = firstModelName;
+    static String lastAltLoc = " ";
 
     static String dsspFile = null;
     static String pdbFile = null;
@@ -396,7 +397,7 @@ public class FileParser {
      * @return true if the line could be parsed, false otherwise
      */
     private static boolean handlePdbLineANYATOM() {
-
+        
 
         Integer atomSerialNumber, resNumPDB, resNumDSSP;
         Integer coordX, coordY, coordZ;
@@ -463,16 +464,16 @@ public class FileParser {
             chemSym = curLinePDB.substring(76, 78);
             // 78 - 79 are ignored: atom charge
         } catch(Exception e) {
-            System.err.println("ERROR: Hit ATOM/HETATM line at PDB line number " + curLineNumPDB + " but parsing the line failed (length " + curLinePDB.length() + ").");
-            e.printStackTrace();
-            System.exit(1);
+            System.err.println("ERROR: Hit ATOM/HETATM line at PDB line number " + curLineNumPDB + " but parsing the line failed (length " + curLinePDB.length() + "): '" + e.getMessage() + "'.");
+            return false;
+            //System.exit(1);
         }
 
         // Ignore alternate location identifiers (only use the 1st one. It is identified by an altLoc field that is empty, "A" or "1").
-        if( ! (altLoc.equals(" ") || altLoc.equals("A") || altLoc.equals("1") )) {
-            //System.out.println("INFO: Ignored alternate atom location identifier '" + altLoc + "' for atom #" + atomSerialNumber + " in PDB file.");
-            return(false);
-        }
+        //if( ! (altLoc.equals(" ") || altLoc.equals("A") || altLoc.equals("1") )) {
+        //    //System.out.println("INFO: Ignored alternate atom location identifier '" + altLoc + "' for atom #" + atomSerialNumber + " in PDB file.");
+        //    return(false);
+        //}
 
         // Files that contain DNA or RNA are not supported atm
         if(resNamePDB.equals("  G") || resNamePDB.equals("  U") || resNamePDB.equals("  A") || resNamePDB.equals("  T") || resNamePDB.equals("  C")) {
@@ -487,7 +488,7 @@ public class FileParser {
         if(atomRecordName.equals("ATOM")) {
 
             if(isIgnoredAtom(chemSym)) {
-                a.setAtomtype(3);
+                //a.setAtomtype(3);
                 return(false);
             }
 
@@ -527,6 +528,7 @@ public class FileParser {
        
         a.setPdbAtomNum(atomSerialNumber);
         a.setAtomName(atomName);
+        a.setAltLoc(altLoc);
         a.setResidue(tmpRes);
         a.setChainID(chainID);        
         a.setChain(getChainByPdbChainID(chainID));
@@ -542,15 +544,14 @@ public class FileParser {
             a.setModel(getModelByModelID(curModelID));
         }
 
-        s_atoms.add(a);
+        
         if(tmpRes == null) {
             System.err.println("WARNING: Could not find Residue with PDB # " + resNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' in s_residues, skipping atom " + atomSerialNumber + ".");
             return(false);
-        } else {
+        } else {            
             tmpRes.addAtom(a);
-        }
-
-
+            s_atoms.add(a);
+        }                
 
         return(true);
     }

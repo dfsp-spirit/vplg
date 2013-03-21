@@ -10,6 +10,7 @@ package plcc;
 
 // imports
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 /**
@@ -68,6 +69,81 @@ public class Residue implements java.io.Serializable {
     public Boolean isAA() { return(this.type.equals(Residue.RESIDUE_TYPE_AA)); }
     public Boolean isOtherRes() { return(this.type.equals(Residue.RESIDUE_TYPE_OTHER)); }
 
+    /**
+     * Returns the alternate location identifier that most atoms of this residue share.
+     * @return the most common alternate location identifier of this residue. If this residue
+     * has no atoms, a space (" ", the PDB default altLoc) will be returned.
+     */
+    public String getAltLocWithMostAtoms() {
+        String maxAltLoc = " ";
+        
+        // add all altLocs
+        String altLoc;
+        Integer newCount;
+        Integer maxCount = 0;
+        HashMap<String, Integer> atomCountsByAltLoc = new HashMap<String, Integer>();
+        for(Atom a : this.atoms) {
+            altLoc = a.getAltLoc();
+            if(atomCountsByAltLoc.containsKey(altLoc)) {
+                newCount = atomCountsByAltLoc.get(altLoc) + 1;
+            } else {
+                newCount = 1;                
+            }
+            atomCountsByAltLoc.put(altLoc, newCount);
+            
+            // keep track of maximum
+            if(newCount > maxCount) {
+                maxAltLoc = altLoc;
+                maxCount = newCount;
+            }
+        }
+                
+        return maxAltLoc;
+    }
+    
+    /**
+     * Determines all atoms with the requested alternate location identifier.
+     * @param reqAltLoc the alternate location identifier (PDB file field)
+     * @return the atom list
+     */
+    public ArrayList<Atom> getAtomsWithAltLoc(String reqAltLoc) {
+        ArrayList<Atom> reqAtoms = new ArrayList<Atom>();
+        
+        for(Atom a : this.atoms) {
+            if(reqAltLoc.equals(a.getAltLoc())) {
+                reqAtoms.add(a);
+            }
+        }        
+        return reqAtoms;
+    }
+    
+    /**
+     * Determines the number of atoms with the requested alternate location identifier.
+     * @param reqAltLoc the alternate location identifier (PDB file field)
+     * @return the atom count with that altLoc
+     */
+    public int getNumAtomsWithAltLoc(String reqAltLoc) {
+        return this.getAtomsWithAltLoc(reqAltLoc).size();
+    }
+    
+    /**
+     * Deletes all atoms from this residue which do NOT have the specified alternate location identifier.
+     * @param keepAltLoc
+     * @return a list of the deleted atoms 
+     */
+    public ArrayList<Atom> deleteAtomsWithAltLocDifferentFrom(String keepAltLoc) {
+        ArrayList<Atom> deletedAtoms = new ArrayList<Atom>();
+        
+        Atom a;
+        for(int i = 0; i < this.atoms.size(); i++) {
+            a = this.atoms.get(i);
+            if( ! (a.getAltLoc()).equals(keepAltLoc) ) {
+                deletedAtoms.add(a);
+                this.atoms.remove(a);
+            }            
+        }        
+        return deletedAtoms;
+    }
 
     /**
      * Determines the distance to another Residue, from Residue center to Residue center (C alpha atom to C alpha atom for AAs)

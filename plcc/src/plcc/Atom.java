@@ -33,6 +33,23 @@ public class Atom implements java.io.Serializable {
     private Integer coordZ = null;
     private Integer pdbLineNum = null;
     private Chain chain = null;
+    private String altLoc = null;
+
+    /**
+     * Getter for PDB alternate location identifier.
+     * @return the altLoc string
+     */
+    public String getAltLoc() {
+        return altLoc;
+    }
+
+    /**
+     * Sets the alternate location identifier (from PDB file).
+     * @param altLoc the altLoc string (one character, usually " ")
+     */
+    public void setAltLoc(String altLoc) {
+        this.altLoc = altLoc;
+    }
 
     // constructor
     //public Atom() {}
