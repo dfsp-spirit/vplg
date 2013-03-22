@@ -179,7 +179,7 @@ public class Atom implements java.io.Serializable {
     }
 
     @Override public String toString() {
-        return("[Atom] #" + this.pdbAtomNumber + " NAME=" + this.name + " CS=" + this.chemSym + " Type=" + this.type + " Chain=" + this.chainID + " ResDssp=" + this.getResidue().getDsspResNum() + " ResPDB=" + this.getResidue().getUniquePDBName() + " Coords=" + getCoordString() + "");
+        return("[Atom] #" + this.pdbAtomNumber + " NAME=" + this.name + " CS=" + this.chemSym + " Type=" + this.type + " Chain=" + this.chainID + " ResDssp=" + this.getResidue().getDsspResNum() + " ResPDB=" + this.getResidue().getUniquePDBName() + " Coords=" + getCoordString() + " AltLoc='" + this.altLoc + "'.");
     }
 
     /**

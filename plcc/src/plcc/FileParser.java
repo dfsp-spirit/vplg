@@ -358,6 +358,7 @@ public class FileParser {
         System.out.println("    PDB: Hit end of PDB file at line " + curLineNumPDB + ".");
 
         // remove duplicate atoms from altLoc here
+        System.out.println("    PDB: Selecting alternative locations for atoms of all residues.");
         ArrayList<Atom> deletedAtoms;
         int numAtomsDeletedAltLoc = 0;
         int numResiduesAffected = 0;

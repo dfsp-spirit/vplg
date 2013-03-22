@@ -2208,22 +2208,23 @@ public class Main {
 
         // Iterate through all atoms of the two residues and check contacts for all pairs
         for(Integer i = 0; i < atoms_a.size(); i++) {
-
-            x = atoms_a.get(i);
+            
             
             if(i >= MAX_ATOMS_PER_AA && a.isAA()) {
-                System.err.println("WARNING: The AA residue " + a.getUniquePDBName() + " of type " + a.getName3() + " has more atoms than allowed, skipping atom #" + i + " of type " + x + ".");
+                System.err.println("WARNING: The AA residue " + a.getUniquePDBName() + " of type " + a.getName3() + " has more atoms than allowed, skipping atom #" + i + ".");
                 continue;
             }
+            
+            x = atoms_a.get(i);
 
             for(Integer j = 0; j < atoms_b.size(); j++) {
-                
-                y = atoms_b.get(j);
-
+                                
                 if(j >= MAX_ATOMS_PER_AA && b.isAA()) {
-                    System.err.println("WARNING: The AA residue " + b.getUniquePDBName() + " of type " + b.getName3() + " has more atoms than allowed, skipping atom #" + j + " of type " + y + ".");
+                    System.err.println("WARNING: The AA residue " + b.getUniquePDBName() + " of type " + b.getName3() + " has more atoms than allowed, skipping atom #" + j + ".");
                     continue;
                 }
+                
+                y = atoms_b.get(j);
                                 
 
                 // Check whether a contact exist. If so, classify it. Note that the code of geom_neo works based on the
