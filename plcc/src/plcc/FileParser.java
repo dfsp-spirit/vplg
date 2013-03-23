@@ -371,8 +371,11 @@ public class FileParser {
             
             //delete atoms from global atom list as well
             for(Atom a : deletedAtoms) {
-                s_atoms.remove(a);
-                numAtomsDeletedAltLoc++;
+                if(s_atoms.remove(a)) {
+                    numAtomsDeletedAltLoc++;
+                } else {
+                    System.err.println("WARNING: Atom requested to be removed from global list does not exist in there.");
+                }
             }
         }
         System.out.println("    PDB: Deleted " + numAtomsDeletedAltLoc + " duplicate atoms from " + numResiduesAffected + " residues which had several alternative locations.");
@@ -565,7 +568,7 @@ public class FileParser {
 
         
         if(tmpRes == null) {
-            System.err.println("WARNING: Could not find Residue with PDB # " + resNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' in s_residues, skipping atom " + atomSerialNumber + ".");
+            System.err.println("WARNING: Residue with PDB # " + resNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue.");
             return(false);
         } else {            
             tmpRes.addAtom(a);
@@ -1167,13 +1170,15 @@ public class FileParser {
                     psi = Float.valueOf(dLine.substring(109, 114).trim());
                     // rest is ignored: not needed
                 } catch(Exception e) {
-                    System.err.println("ERROR: Parsing of DSSP line " + dLineNum + " failed. DSSP file broken.");
-                    e.printStackTrace();
-                    System.exit(-1);
+                    System.err.println("ERROR: Parsing of DSSP line " + dLineNum + " failed: '" + e.getMessage() + "'. DSSP file looks broken.");
+                    //e.printStackTrace();
+                    continue;
                 }
 
                 // successfully parsed, create Residue and add all the info we know atm
                 r = new Residue(pdbResNum, dsspResNum);
+                //System.err.println("DEBUG: Created residue with PDB# " + pdbResNum + ", DSSP# " + dsspResNum + ".");
+                //System.err.println("DEBUG: Residue: " + r.getFancyName() + ".");
                 r.setChainID(dsspChainID);
                 // don't set the chain here, we'll set it later with the pdbChainID while creating the atoms
                 // EDIT: Why not?! I guess I thought that DSSP and PDB files used different chain IDs for residues when I wrote that.
@@ -1210,6 +1215,11 @@ public class FileParser {
                 r.setModelID("1");
 
 
+                // DEBUG 3eoj
+                //System.err.println("DEBUG --- residue state ---");
+                //if(r.getPdbResNum() == 8 || r.getPdbResNum() == 7 || r.getPdbResNum() == 213) {
+                //    System.err.println("DEBUG: RESIDUE: " + r.getFancyName() + ".");
+                //}
 
                 // add to list of Residues
                 s_residues.add(r);
@@ -1219,18 +1229,20 @@ public class FileParser {
                 //System.out.println("    DSSP: Added residue PDB # " +  pdbResNum + ", DSSP # " + dsspResNum + " to s_residues at index " + resIndex + ".");
 
                 // Debug tests
+                
                 /*
                 Residue tmp = s_residues.get(resIndex);
-                if(dsspResNum != (s_residues.get(resIndex)).getDsspResNumber()) {
+                if(dsspResNum != (s_residues.get(resIndex)).getDsspResNum()) {
                     System.err.println("ERROR: DSSP residue number of residue at index " + resIndex + " is not " + dsspResNum + " as expected, insertion failed.");
                     System.exit(-1);
                 }
 
-                if(pdbResNum != (s_residues.get(resIndex)).getPdbResNumber()) {
+                if(pdbResNum != (s_residues.get(resIndex)).getPdbResNum()) {
                     System.err.println("ERROR: PDB residue number of residue at index " + resIndex + " is not " + pdbResNum + " as expected, insertion failed.");
                     System.exit(-1);
                 }
                 */
+                
             }
         }
     }
