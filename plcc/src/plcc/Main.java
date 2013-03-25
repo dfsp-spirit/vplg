@@ -64,8 +64,8 @@ public class Main {
     // declare class vars
 
     // the array used to store statistics on contacts between the different AA types
-    static Integer NUM_AAs = 20 + 1 + 1;    // These are 20 real AAs, 1 extra for ligands and 1 for the total number count at index 0 (1st AA starts at index 1).
-    static Integer MAX_ATOMS_PER_AA = 15;   // As everybody knows, TRP is the AA with most atoms and
+    public static final Integer NUM_AAs = 20 + 1 + 1;    // These are 20 real AAs, 1 extra for ligands and 1 for the total number count at index 0 (1st AA starts at index 1).
+    public static final Integer MAX_ATOMS_PER_AA = 15;   // As everybody knows, TRP is the AA with most atoms and
                                             //  has 27 of them, but we ignore 'H' atoms (they are not
                                             //  included in most PDB files and if so, we filter them out.
                                             //  So only 14 of those atoms remain (but index starts at 1).
@@ -2207,21 +2207,24 @@ public class Main {
 
 
         // Iterate through all atoms of the two residues and check contacts for all pairs
+        outerloop:
         for(Integer i = 0; i < atoms_a.size(); i++) {
             
             
             if(i >= MAX_ATOMS_PER_AA && a.isAA()) {
-                System.err.println("WARNING: The AA residue " + a.getUniquePDBName() + " of type " + a.getName3() + " has more atoms than allowed, skipping atom #" + i + ".");
-                continue;
+                System.err.println("WARNING: calculateAtomContactsBetweenResidues(): The AA residue " + a.getUniquePDBName() + " of type " + a.getName3() + " has more atoms than allowed, skipping atom #" + i + ".");
+                break;
             }
             
             x = atoms_a.get(i);
 
+            innerloop:
             for(Integer j = 0; j < atoms_b.size(); j++) {
                                 
                 if(j >= MAX_ATOMS_PER_AA && b.isAA()) {
-                    System.err.println("WARNING: The AA residue " + b.getUniquePDBName() + " of type " + b.getName3() + " has more atoms than allowed, skipping atom #" + j + ".");
-                    continue;
+                    System.err.println("WARNING: calculateAtomContactsBetweenResidues(): The AA residue " + b.getUniquePDBName() + " of type " + b.getName3() + " has more atoms than allowed, skipping atom #" + j + ".");
+                    //continue;
+                    break outerloop;
                 }
                 
                 y = atoms_b.get(j);
@@ -2253,19 +2256,28 @@ public class Main {
                     statAtomIDj = j + 1;
                     if(x.isLigandAtom()) { statAtomIDi = 1; }       // Different ligands can have different numbers of atoms and separating them just makes no sense. We assign all contacts to the first atom.
                     if(y.isLigandAtom()) { statAtomIDj = 1; }
-                    contact[0][0][0][0]++;                 // update global total number of contacts
-                    contact[aIntID][bIntID][0][0]++;       // contacts AA type a <-> AA type b
-                    contact[bIntID][aIntID][0][0]++;       // contacts AA type b <-> AA type a
+                    
+                    try {
 
-                    //System.out.println("DEBUG: a=" + aIntID + ",b=" + bIntID + ",i=" + statAtomIDi + ",j=" + statAtomIDj + ". Residues=" + a.getFancyName() + "," + b.getFancyName() + ".");
-                    contact[aIntID][bIntID][statAtomIDi][statAtomIDj]++;       // contacts of atoms of AAs
-                    contact[bIntID][aIntID][statAtomIDj][statAtomIDi]++;
+                        contact[0][0][0][0]++;                 // update global total number of contacts
+                        contact[aIntID][bIntID][0][0]++;       // contacts AA type a <-> AA type b
+                        contact[bIntID][aIntID][0][0]++;       // contacts AA type b <-> AA type a
 
-                    contact[aIntID][bIntID][statAtomIDi][0]++;                 // total number of contacts for atom x of this AA
-                    contact[bIntID][aIntID][0][statAtomIDi]++;
 
-                    contact[aIntID][bIntID][statAtomIDj][0]++;                 // total number of contacts for atom x of this AA
-                    contact[bIntID][aIntID][0][statAtomIDj]++;
+                        //System.out.println("DEBUG: a=" + aIntID + ",b=" + bIntID + ",i=" + statAtomIDi + ",j=" + statAtomIDj + ". Residues=" + a.getFancyName() + "," + b.getFancyName() + ".");
+                        contact[aIntID][bIntID][statAtomIDi][statAtomIDj]++;       // contacts of atoms of AAs
+                        contact[bIntID][aIntID][statAtomIDj][statAtomIDi]++;
+
+                        contact[aIntID][bIntID][statAtomIDi][0]++;                 // total number of contacts for atom x of this AA
+                        contact[bIntID][aIntID][0][statAtomIDi]++;
+
+                        contact[aIntID][bIntID][statAtomIDj][0]++;                 // total number of contacts for atom x of this AA
+                        contact[bIntID][aIntID][0][statAtomIDj]++;
+                    } catch(java.lang.ArrayIndexOutOfBoundsException e) {
+                        System.err.println("WARNING: calculateAtomContactsBetweenResidues():Contact statistics array out of bounds. Residues with excessive number of atoms detected: " + e.getMessage() + ".");
+                        System.err.println("WARNING: calculateAtomContactsBetweenResidues(): (cont.) Ignoring contacts for these atoms (aIntID=" + aIntID + ", bIntID=" + bIntID + ", statAtomIDi=" + statAtomIDi + ", statAtomIDj=" + statAtomIDj + ").");
+                        continue;
+                    }
                     
                     // Determine the contact type.                    
                     if(x.isProteinAtom() && y.isProteinAtom()) {
@@ -2322,7 +2334,7 @@ public class Main {
                         else {
                             System.err.println("ERROR: Congrats, you found a bug in the atom contact type determination code (res " + a.getPdbResNum() + " atom " + i + " / res " + b.getPdbResNum() + " atom " + j + ").");
                             System.err.println("ERROR: Atom types are: i (PDB atom #" + x.getPdbAtomNum() + ") => " + x.getAtomType() + ", j (PDB atom #" + y.getPdbAtomNum() + ") => " + y.getAtomType() + ".");
-                            System.exit(-2);
+                            System.exit(1);
                         }
 
                         // Check for H bridges separately

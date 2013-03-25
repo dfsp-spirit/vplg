@@ -362,8 +362,14 @@ public class FileParser {
         ArrayList<Atom> deletedAtoms;
         int numAtomsDeletedAltLoc = 0;
         int numResiduesAffected = 0;
-        for(Residue r : s_residues) {
+        Residue r;
+        for(int i = 0; i < s_residues.size(); i++) {
+            r = s_residues.get(i);
             deletedAtoms = r.chooseYourAltLoc();
+            
+            if(r.getPdbResNum() == 209) {
+                System.out.println("DEBUG: ===> Residue " + r.toString() + " at list position " + i + " <===.");
+            }
             
             if(deletedAtoms.size() > 0) {
                 numResiduesAffected++;
@@ -620,26 +626,35 @@ public class FileParser {
      */
     private static Residue getResidueFromList(Integer resNumPDB, String chainID, String iCode) {
 
-        Residue r;
+        Residue tmp;
+        Residue found = null;
+        int numFound = 0;
 
         for(Integer i = 0; i < s_residues.size(); i++) {
 
-            r = s_residues.get(i);
+            tmp = s_residues.get(i);
 
-            if(r.getPdbResNum().equals(resNumPDB)) {
+            if(tmp.getPdbResNum().equals(resNumPDB)) {
 
-                if(r.getChainID().equals(chainID)) {
+                if(tmp.getChainID().equals(chainID)) {
                     
-                    if(r.getiCode().equals(iCode)) {
-                        return(r);
+                    if(tmp.getiCode().equals(iCode)) {
+                        found = tmp;
+                        numFound++;
+                        // break here and return found to increase speed
+                        return(found);
                     }                    
                 }
             }
         }
+        
+        if(numFound > 1) {
+            System.err.println("ERROR: More than one residue in list matches description (PDB#=" + resNumPDB + ", chain=" + chainID + ", iCode=" + iCode + ").");
+        }
 
         // Not found in the whole list, something went wrong
         //System.err.println("ERROR: Residue with PDB residue number '" + resNum + "' and chain ID '" + cID + "' and iCode '" + ic + "' does not exist in residue list.");
-        return(null);
+        return(found);
     }
 
 
