@@ -112,6 +112,15 @@ Updates from version 2012-09-14 to 2012-10-11:
 * VPG:
   - increased size of some input text fields
 
+Updates from version 2012-10-11 to 2013-03-25:
+================================================
+* PLCC (new version 0.70):
+  - fixed handling of alternate location PDB field for PDB files which do not have valid atoms in default location:
+    we now choose the AltLoc which has a CA atom and maximizes the number of atoms (only the latter for non-AAs)
+  - updates to javadoc and small fixes
+* VPG (new version 0.24):
+  - the log file is now written to the user home (instead of a subdir which may not exist at that time)
+
 
 --
 ts
