@@ -290,7 +290,7 @@ public class Residue implements java.io.Serializable {
         Atom b = r.getCenterAtom();
 
         if(a == null || b == null) {
-            System.err.println("WARNING: Could not determine distance of PDB Residues # " + pdbResNum + " and " + r.getPdbResNum() + ", assuming 100.");
+            System.err.println("WARNING: Could not determine distance of PDB Residues # " + pdbResNum + " and " + r.getPdbResNum() + " lacking center atoms, assuming 100.");
             //System.exit(-1);
             return(100);       // for the IDE ;)
         }
