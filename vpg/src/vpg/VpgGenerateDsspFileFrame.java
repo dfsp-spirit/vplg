@@ -13,6 +13,7 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.ArrayList;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -46,7 +47,19 @@ public class VpgGenerateDsspFileFrame extends javax.swing.JFrame implements Item
         this.jTextFieldInputPdbFile.setText(Settings.get("vpg_S_input_dir") + fs + "8icd.pdb");
         this.jTextFieldSplitPdbCustomOutfile.setText(Settings.get("vpg_S_input_dir") + fs + "8icd.pdb.split");
         this.jTextFieldCustomDsspOutputPath.setText(Settings.get("vpg_S_input_dir") + fs + "8icd.dssp");
+        
+        this.checkPrerequisiteSettings();
         this.checkInput();
+    }
+    
+    
+    
+    public void checkPrerequisiteSettings() {
+        
+        File dsspcmbi = new File(Settings.get("vpg_S_path_dssp"));
+        if( ! (dsspcmbi.isFile() && dsspcmbi.canExecute())) {
+            JOptionPane.showMessageDialog(this, "ERROR\n\n The path to the DSSP executable is not set properly. Please fix in settings and retry.", "VPG -- ERROR: DSSP path invalid", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     /**

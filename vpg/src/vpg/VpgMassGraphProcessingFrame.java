@@ -68,7 +68,16 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
         this.jTextFieldPlccSettingsFile.getDocument().addDocumentListener(this);
         this.jTextFieldFinalOutputDir.getDocument().addDocumentListener(this);
         
+        this.checkPrerequisiteSettings();
         this.checkInput();
+    }
+    
+    public void checkPrerequisiteSettings() {
+        
+        File plccJar = new File(Settings.get("vpg_S_path_plcc"));
+        if( ! (plccJar.isFile() && plccJar.canRead())) {
+            JOptionPane.showMessageDialog(this, "ERROR\n\n The path to the PLCC jar file is not set properly. Please fix in settings and retry.", "VPG -- ERROR: PLCC path invalid", JOptionPane.ERROR_MESSAGE);
+        }
     }
     
     /**

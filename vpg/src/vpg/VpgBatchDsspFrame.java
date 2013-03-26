@@ -87,6 +87,7 @@ public class VpgBatchDsspFrame extends javax.swing.JFrame implements ItemListene
         this.jComboBoxPutDsspFiles.addItemListener(this);
         this.jComboBoxPutPdbFiles.addItemListener(this);
         
+        checkPrerequisiteSettings();
         this.checkInput();
         
     }
@@ -1002,6 +1003,13 @@ public class VpgBatchDsspFrame extends javax.swing.JFrame implements ItemListene
     }
     
     
+    public void checkPrerequisiteSettings() {
+        
+        File dsspcmbi = new File(Settings.get("vpg_S_path_dssp"));
+        if( ! (dsspcmbi.isFile() && dsspcmbi.canExecute())) {
+            JOptionPane.showMessageDialog(this, "ERROR\n\n The path to the DSSP executable is not set properly. Please fix in settings and retry.", "VPG -- ERROR: DSSP path invalid", JOptionPane.ERROR_MESSAGE);
+        }
+    }
     
     public void checkInput() {
         

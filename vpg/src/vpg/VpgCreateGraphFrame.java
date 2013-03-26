@@ -645,9 +645,18 @@ public class VpgCreateGraphFrame extends javax.swing.JFrame implements ItemListe
         this.jTextFieldSetLigAtomsMin.getDocument().addDocumentListener(this);
 
         
-        
+        this.checkPrerequisiteSettings();
         this.setCommandTextField();
              
+    }
+    
+    
+    public void checkPrerequisiteSettings() {
+        
+        File plccJar = new File(Settings.get("vpg_S_path_plcc"));
+        if( ! (plccJar.isFile() && plccJar.canRead())) {
+            JOptionPane.showMessageDialog(this, "ERROR\n\n The path to the PLCC jar file is not set properly. Please fix in settings and retry.", "VPG -- ERROR: PLCC path invalid", JOptionPane.ERROR_MESSAGE);
+        }
     }
     
 
