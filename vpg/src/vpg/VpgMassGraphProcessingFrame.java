@@ -944,7 +944,7 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
             } else if(filename.endsWith(".pdb.gz")) {
                 pdbid = filename.split("\\.")[0];
             } else if(filename.endsWith(".ent.gz")) {
-                pdbid = (filename.split("\\.")[0]).replaceAll("pdb", "");
+                pdbid = (filename.split("\\.")[0]).replaceFirst("pdb", "");
             } else if(filename.endsWith(".pdb.split")) {
                 pdbid = filename.split("\\.")[0];
             } else if(filename.endsWith(".pdb.split.gz")) {
