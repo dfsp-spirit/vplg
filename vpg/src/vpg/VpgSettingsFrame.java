@@ -694,6 +694,7 @@ public class VpgSettingsFrame extends javax.swing.JFrame implements DocumentList
         
         File defaultDir = new File(Settings.get("vpg_S_input_dir"));
         JFileChooser fc = new JFileChooser(defaultDir);
+        fc.setDialogTitle("Open the default input directory.");
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int rVal = fc.showOpenDialog(this);
 
@@ -707,7 +708,8 @@ public class VpgSettingsFrame extends javax.swing.JFrame implements DocumentList
     private void jButtonBrowseDefOutputPathActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonBrowseDefOutputPathActionPerformed
         
         File defaultDir = new File(Settings.get("vpg_S_output_dir"));
-        JFileChooser fc = new JFileChooser(defaultDir);        
+        JFileChooser fc = new JFileChooser(defaultDir);   
+        fc.setDialogTitle("Open the default output path.");
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int rVal = fc.showOpenDialog(this);
 
@@ -722,6 +724,7 @@ public class VpgSettingsFrame extends javax.swing.JFrame implements DocumentList
         File defaultDir = new File(Settings.get("vpg_S_path_plcc"));
         JFileChooser fc = new JFileChooser(defaultDir);
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fc.setDialogTitle("Open the PLCC jar file (plcc.jar).");
         int rVal = fc.showOpenDialog(this);
 
         if (rVal == JFileChooser.APPROVE_OPTION) {
@@ -736,6 +739,7 @@ public class VpgSettingsFrame extends javax.swing.JFrame implements DocumentList
         File defaultDir = new File(Settings.get("vpg_S_path_splitpdb"));
         JFileChooser fc = new JFileChooser(defaultDir);
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fc.setDialogTitle("Open the SplitPDB jar file (splitpdb.jar).");
         int rVal = fc.showOpenDialog(this);
 
         if (rVal == JFileChooser.APPROVE_OPTION) {
@@ -750,6 +754,7 @@ public class VpgSettingsFrame extends javax.swing.JFrame implements DocumentList
         File defaultDir = new File(Settings.get("vpg_S_path_dssp"));
         JFileChooser fc = new JFileChooser(defaultDir);
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fc.setDialogTitle("Open the DSSP executable.");
         int rVal = fc.showOpenDialog(this);
 
         if (rVal == JFileChooser.APPROVE_OPTION) {
