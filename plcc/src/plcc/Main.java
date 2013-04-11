@@ -142,6 +142,7 @@ public class Main {
         ArrayList<Model> models = new ArrayList<Model>();
         ArrayList<Chain> chains = new ArrayList<Chain>();
         ArrayList<Residue> residues = new ArrayList<Residue>();
+        HashMap<Character, ArrayList<Integer>> sulfurBridges = new HashMap<Character, ArrayList<Integer>>();
         ArrayList<Atom> atoms = new ArrayList<Atom>();
         ArrayList<SSE> dsspSSEs = new ArrayList<SSE>();
         ArrayList<SSE> ptglSSEs = new ArrayList<SSE>();
@@ -911,6 +912,29 @@ public class Main {
         chains = FileParser.getChains();
         residues = FileParser.getResidues();
         atoms = FileParser.getAtoms();
+        sulfurBridges = FileParser.getSulfurBridges();
+        
+        String sBondString;
+        if(sulfurBridges.size() > 0) {
+            System.out.print("    DSSP: Protein contains " + sulfurBridges.size() + " disulfide bridges: ");
+            for(Character key : sulfurBridges.keySet()) {
+                sBondString = "(";
+                ArrayList<Integer> dsspResidueIDs = sulfurBridges.get(key);
+                
+                if(dsspResidueIDs.size() != 2) {
+                    System.err.println("WARNING: Disulfide bridge has " + dsspResidueIDs.size() + " member residues.");
+                }
+                
+                for(Integer dsspID : dsspResidueIDs) {
+                    sBondString += (dsspID + " ");
+                }
+                sBondString += ")";
+                System.out.print(sBondString);
+            }
+            System.out.print("\n");            
+        } else {
+            System.out.println("    DSSP: Protein contains no disulfide bridges.");
+        }
 
         // This is now done, separate for each chain, by a function in Main.java below
         // dsspSSEs = FileParser.getDsspSSEs(); 

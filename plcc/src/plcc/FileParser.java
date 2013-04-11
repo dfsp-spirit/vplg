@@ -45,6 +45,11 @@ public class FileParser {
     static ArrayList<Atom> s_atoms = null;
     static ArrayList<SSE> s_dsspSSEs = null;             // all SSEs according to DSSP definition
     static ArrayList<SSE> s_ptglSSEs = null;                // the modified SSE list the PTGL uses
+    
+    // The list of sulfur bridges (aka disulfide bridges) from the DSSP file. The key is the DSSP sulfur bridge
+    // id (an arbitrary character, starting with 'a' for the first bridge usually). The list in the value part contains
+    // the DSSP residue IDs of all residues which are part of the bridge (and thus should have length 2).
+    static HashMap<Character, ArrayList<Integer>> s_sulfurBridges;
 
     static Boolean dataInitDone = false;
 
@@ -258,6 +263,10 @@ public class FileParser {
     public static ArrayList<Atom> getAtoms() { return(s_atoms); }
     public static ArrayList<SSE> getDsspSSEs() { return(s_dsspSSEs); }
     public static ArrayList<SSE> getPtglSSEs() { return(s_ptglSSEs); }
+
+    public static HashMap<Character, ArrayList<Integer>> getSulfurBridges() {
+        return s_sulfurBridges;
+    }
 
 
     private static Boolean parseData() {
@@ -1158,6 +1167,7 @@ public class FileParser {
         Float psi = 0.0f;
 
         s_residues = new ArrayList<Residue>();
+        s_sulfurBridges = new HashMap<Character, ArrayList<Integer>>();
         Residue r;
 
         for(Integer i = dsspDataStartLine - 1; i < dsspLines.size(); i++) {
@@ -1204,9 +1214,29 @@ public class FileParser {
                 r.setPhi(phi);
                 r.setPsi(psi);
 
-                // Fix broken DSSP files that have lower case AA 1-letter codes for non-cysteine residues. We also make the lowercase CYS uppercase here
-                //  but this doesn't matter because we are not interested in DSSPs opinion on the occurence of disulfide bonds anyway.
-                resName1Letter = resName1Letter.toUpperCase();
+                // Cysteins which form a sulfur bridge are arbitrary lowercase letters in dssp. A residue
+                // with name 'a' means it is a cysteine, but it has forms a sulfur bridge with a second residue in the file that is
+                // also labeled 'a'.
+                try {
+                    char c = (resName1Letter.toCharArray())[0];
+                    if( ! Character.isUpperCase(c)) {
+                        resName1Letter = "C";   // change residue code cysteine
+                        
+                        // now go save the sulfur bridge
+                        if(s_sulfurBridges.containsKey(c)) {
+                            // the sulfur bridge partner is already in there
+                            (s_sulfurBridges.get(c)).add(dsspResNum);
+                        } else {
+                            // this is the first residue of the sulfur bridge pair
+                            ArrayList<Integer> tmp = new ArrayList<Integer>();
+                            tmp.add(dsspResNum);
+                            s_sulfurBridges.put(c, tmp);
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("WARNING: Something is fishy with residue in line " + dLineNum + " of the DSSP file: '" + e.getMessage() + "'.");
+                }
+                
 
                 // Fix DSSP file like the one for 2ZW3.pdb which list cysteine residues as 'o' instead of 'c'.
                 if(resName1Letter.equals("O") || resName1Letter.equals("U")) {
