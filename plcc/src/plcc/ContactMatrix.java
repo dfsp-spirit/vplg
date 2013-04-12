@@ -34,6 +34,7 @@ public class ContactMatrix {
     private Integer[ ][ ] contLC;
     private Integer[ ][ ] contCL;
     private Integer[ ][ ] contLL;
+    private Integer[ ][ ] contDISULFIDE;    // disulfide bridges
     private Integer[ ][ ] contSSE;      // contact matrix of the SSEs (1 = contact, 0 = no contact)
     private Integer[ ][ ] resContSSE;   // holds the number of residue level contacts
     private Integer[ ][ ] spatialSSE;   // spatial relations between pairs of SSEs
@@ -42,11 +43,11 @@ public class ContactMatrix {
 
     // All possible spatial relationships between two adjacent SSEs (some C #define replacement)
     // Also see the spatialInt2String() function if messing with these.
-    private Integer REL_NONE = SpatRel.NONE;                       // no relation (the SSEs are not in contact)
-    private Integer REL_MIXED = SpatRel.MIXED;                      // mixed (can't be determined, msot likely almost orthographic)
-    private Integer REL_PARALLEL = SpatRel.PARALLEL;                // parallel
-    private Integer REL_ANTIPARALLEL = SpatRel.ANTIPARALLEL;        // antiparallel
-    private Integer REL_LIGAND = SpatRel.LIGAND;                   // one of them is a ligand without direction so all others don't apply
+    //private final Integer REL_NONE = SpatRel.NONE;                       // no relation (the SSEs are not in contact)
+    //private final Integer REL_MIXED = SpatRel.MIXED;                      // mixed (can't be determined, msot likely almost orthographic)
+    //private final Integer REL_PARALLEL = SpatRel.PARALLEL;                // parallel
+    //private final Integer REL_ANTIPARALLEL = SpatRel.ANTIPARALLEL;        // antiparallel
+    //private final Integer REL_LIGAND = SpatRel.LIGAND;                   // one of them is a ligand without direction so all others don't apply
 
     // Constructor
     ContactMatrix(ArrayList<SSE> sses, String pdbid) {
@@ -62,6 +63,7 @@ public class ContactMatrix {
         contLC = new Integer[size][size];
         contCL = new Integer[size][size];
         contLL = new Integer[size][size];
+        contDISULFIDE = new Integer[size][size];
         contSSE = new Integer[size][size];
         resContSSE = new Integer[size][size];
         spatialSSE = new Integer[size][size];
@@ -343,25 +345,7 @@ public class ContactMatrix {
      * @param i the Integer constant to convert to a String
      */
     public String spatialInt2String(Integer i) {
-        if(i.equals(REL_NONE)) {
-            return("-");
-        }
-        else if(i.equals(REL_MIXED)) {
-            return("m");
-        }
-        else if(i.equals(REL_PARALLEL)) {
-            return("p");
-        }
-        else if(i.equals(REL_ANTIPARALLEL)) {
-            return("a");
-        }
-        else if(i.equals(REL_LIGAND)) {
-            return("l");
-        }
-        else {
-            System.err.println("WARNING: Integer " + i + " does not represent any known spatial relation.");
-            return("?");
-        }
+        return SpatRel.getString(i);
     }
 
     /**
@@ -453,10 +437,11 @@ public class ContactMatrix {
                 contLC[i][j] = 0;
                 contCL[i][j] = 0;
                 contLL[i][j] = 0;
+                contDISULFIDE[i][j] = 0;
                 contSSE[i][j] = 0;
                 resContSSE[i][j] = 0;
                 dblDif[i][j] = 0;               // this is fine even though it is a valid value, it will be overwritten in any case
-                spatialSSE[i][j] = REL_NONE;
+                spatialSSE[i][j] = SpatRel.NONE;
             }
         }
     }
@@ -509,6 +494,9 @@ public class ContactMatrix {
         }
         else if(type.equals("LL")) {
             return(contLL[x][y]);
+        }
+        else if(type.equals("DISULFIDE")) {
+            return(contDISULFIDE[x][y]);
         }
         else if(type.equals("TT")) {
             // total number of contacts
@@ -574,6 +562,9 @@ public class ContactMatrix {
         }
         else if(type.equals("LL")) {
             contLL[x][y] += num;
+        }
+        else if(type.equals("DISULFIDE")) {
+            contDISULFIDE[x][y] += num;
         }
         else {
             System.err.println("ERROR: addContacts(): Contact type '" + type + "' is not a valid contact type.");
@@ -814,8 +805,8 @@ public class ContactMatrix {
 
                     // Ligand always have the ligand relation because the others don't makes sense for them (they have no direction)
                     if(sseA.isLigandSSE() || sseB.isLigandSSE()) {
-                        spatialSSE[i][j] = REL_LIGAND;
-                        spatialSSE[j][i] = REL_LIGAND;
+                        spatialSSE[i][j] = SpatRel.LIGAND;
+                        spatialSSE[j][i] = SpatRel.LIGAND;
                         //System.out.println("    SSEs " + i + " and " + j + " are ligands, skipping DD calculation.");
                         continue;
                     }
@@ -915,23 +906,23 @@ public class ContactMatrix {
                     
                     
                     if(doubleDifference <= largestAntip) {
-                        spatialSSE[i][j] = REL_ANTIPARALLEL;
-                        spatialSSE[j][i] = REL_ANTIPARALLEL;
+                        spatialSSE[i][j] = SpatRel.ANTIPARALLEL;
+                        spatialSSE[j][i] = SpatRel.ANTIPARALLEL;
                         if(Settings.getInteger("plcc_I_debug_level") > 0) {
                             System.out.println("    SSEs " + i + " and " + j + " are antiparallel (DD=" + doubleDifference + ")." + sseA + ", " + sseB);
                         }
                     }
                     else if(doubleDifference >= smallestParallel) {
-                        spatialSSE[i][j] = REL_PARALLEL;
-                        spatialSSE[j][i] = REL_PARALLEL;
+                        spatialSSE[i][j] = SpatRel.PARALLEL;
+                        spatialSSE[j][i] = SpatRel.PARALLEL;
                         if(Settings.getInteger("plcc_I_debug_level") > 0) {
                             System.out.println("    SSEs " + i + " and " + j + " are parallel (DD=" + doubleDifference + ")." + sseA + ", " + sseB);
                         }
                     }
                     else {
                         // DD = 0
-                        spatialSSE[i][j] = REL_MIXED;
-                        spatialSSE[j][i] = REL_MIXED;
+                        spatialSSE[i][j] = SpatRel.MIXED;
+                        spatialSSE[j][i] = SpatRel.MIXED;
                         if(Settings.getInteger("plcc_I_debug_level") > 0) {
                             System.out.println("    SSEs " + i + " and " + j + " are mixed (DD=" + doubleDifference + ")." + sseA + ", " + sseB);
                         }
@@ -942,8 +933,8 @@ public class ContactMatrix {
                 }
                 else {
                     // The two SSEs are not in contact.
-                    spatialSSE[i][j] = REL_NONE;
-                    spatialSSE[j][i] = REL_NONE;
+                    spatialSSE[i][j] = SpatRel.NONE;
+                    spatialSSE[j][i] = SpatRel.NONE;
                 }                
 
             }

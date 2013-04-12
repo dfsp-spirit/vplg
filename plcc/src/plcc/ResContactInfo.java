@@ -24,18 +24,18 @@ public class ResContactInfo {
     private Integer[] numPairContacts;
     // The positions in the numPairContacts array hold the number of contacts of each type for a pair of residues:
     // Some cheap vars to make things easier to understand (a poor replacement for #define):
-    private Integer TT = 0;         //  0 = total number of contacts            (all residue type combinations)
-    private Integer BB = 1;         //  1 = # of backbone-backbone contacts     (protein - protein only)
-    private Integer CB = 2;         //  2 = # of sidechain-backbone contacts    (protein - protein only)
-    private Integer BC = 3;         //  3 = # of backbone-sidechain contacts    (protein - protein only)
-    private Integer CC = 4;         //  4 = # of sidechain-sidechain contacts   (protein - protein only)
-    private Integer HB1 = 5;         //  5 = # of H-bridge contacts 1, N=>0      (protein - protein only)
-    private Integer HB2 = 6;         //  6 = # of H-bridge contacts 2, 0=>N      (protein - protein only)
-    private Integer BL = 7;         //  7 = # of backbone-ligand contacts       (protein - ligand only)
-    private Integer LB = 8;         //  8 = # of ligand-backbone contacts       (protein - ligand only)
-    private Integer CL = 9;         //  9 = # of sidechain-ligand contacts      (protein - ligand only)
-    private Integer LC = 10;        // 10 = # of ligand-sidechain contacts      (protein - ligand only)
-    private Integer LL = 11;        // 11 = # of ligand-ligand contacts         (ligand - ligand only)
+    private final Integer TT = 0;         //  0 = total number of contacts            (all residue type combinations)
+    private final Integer BB = 1;         //  1 = # of backbone-backbone contacts     (protein - protein only)
+    private final Integer CB = 2;         //  2 = # of sidechain-backbone contacts    (protein - protein only)
+    private final Integer BC = 3;         //  3 = # of backbone-sidechain contacts    (protein - protein only)
+    private final Integer CC = 4;         //  4 = # of sidechain-sidechain contacts   (protein - protein only)
+    private final Integer HB1 = 5;         //  5 = # of H-bridge contacts 1, N=>0      (protein - protein only)
+    private final Integer HB2 = 6;         //  6 = # of H-bridge contacts 2, 0=>N      (protein - protein only)
+    private final Integer BL = 7;         //  7 = # of backbone-ligand contacts       (protein - ligand only)
+    private final Integer LB = 8;         //  8 = # of ligand-backbone contacts       (protein - ligand only)
+    private final Integer CL = 9;         //  9 = # of sidechain-ligand contacts      (protein - ligand only)
+    private final Integer LC = 10;        // 10 = # of ligand-sidechain contacts      (protein - ligand only)
+    private final Integer LL = 11;        // 11 = # of ligand-ligand contacts         (ligand - ligand only)
 
     // The different values in 'XY' vs 'YX' are only produced by the the sequential order of the
     //  residues (e.g., the ligand came fist: this was treated as an 'LB' contact, otherwise it
