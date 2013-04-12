@@ -40,14 +40,7 @@ public class ContactMatrix {
     private Integer[ ][ ] spatialSSE;   // spatial relations between pairs of SSEs
     private Integer[ ][ ] dblDif;       // double difference used to calculate spatial relations
     private ArrayList<SSE> sseList;
-
-    // All possible spatial relationships between two adjacent SSEs (some C #define replacement)
-    // Also see the spatialInt2String() function if messing with these.
-    //private final Integer REL_NONE = SpatRel.NONE;                       // no relation (the SSEs are not in contact)
-    //private final Integer REL_MIXED = SpatRel.MIXED;                      // mixed (can't be determined, msot likely almost orthographic)
-    //private final Integer REL_PARALLEL = SpatRel.PARALLEL;                // parallel
-    //private final Integer REL_ANTIPARALLEL = SpatRel.ANTIPARALLEL;        // antiparallel
-    //private final Integer REL_LIGAND = SpatRel.LIGAND;                   // one of them is a ligand without direction so all others don't apply
+   
 
     // Constructor
     ContactMatrix(ArrayList<SSE> sses, String pdbid) {

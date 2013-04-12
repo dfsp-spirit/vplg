@@ -2171,6 +2171,7 @@ public class Main {
         Integer[] numPairContacts = new Integer[12];
         // The positions in the numPairContacts array hold the number of contacts of each type for a pair of residues:
         // Some cheap vars to make things easier to understand (a replacement for #define):
+        /*
         Integer TT = 0;         //  0 = total number of contacts            (all residue type combinations)
         Integer BB = 1;         //  1 = # of backbone-backbone contacts     (protein - protein only)
         Integer CB = 2;         //  2 = # of sidechain-backbone contacts    (protein - protein only)
@@ -2183,6 +2184,7 @@ public class Main {
         Integer CL = 9;         //  9 = # of sidechain-ligand contacts      (protein - ligand only)
         Integer LC = 10;        // 10 = # of ligand-sidechain contacts      (protein - ligand only)
         Integer LL = 11;        // 11 = # of ligand-ligand contacts         (ligand - ligand only)
+        */
 
 
         Integer numTotalLigContactsPair = 0;
@@ -2269,7 +2271,7 @@ public class Main {
                                                     
 
                     // The van der Waals radii spheres overlap, contact found.
-                    numPairContacts[TT]++;   // update total number of contacts for this residue pair
+                    numPairContacts[ResContactInfo.TT]++;   // update total number of contacts for this residue pair
                     
                     // DEBUG
                     //System.out.println("DEBUG: Atom contact in distance " + dist + " between atom " + x + " and " + y + ".");
@@ -2311,48 +2313,48 @@ public class Main {
                         // Check the exact contact type
                         if(i <= numOfLastBackboneAtomInResidue && j <= numOfLastBackboneAtomInResidue) {
                             // to be precise, this is a backbone - backbone contact
-                            numPairContacts[BB]++;
+                            numPairContacts[ResContactInfo.BB]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[BB] < 0) || dist < minContactDistances[BB]) {
-                                minContactDistances[BB] = dist;
-                                contactAtomNumInResidueA[BB] = i;
-                                contactAtomNumInResidueB[BB] = j;
+                            if((minContactDistances[ResContactInfo.BB] < 0) || dist < minContactDistances[ResContactInfo.BB]) {
+                                minContactDistances[ResContactInfo.BB] = dist;
+                                contactAtomNumInResidueA[ResContactInfo.BB] = i;
+                                contactAtomNumInResidueB[ResContactInfo.BB] = j;
                             }
 
                         }
                         else if(i > numOfLastBackboneAtomInResidue && j <= numOfLastBackboneAtomInResidue) {
                             // to be precise, this is a chain - backbone contact
-                            numPairContacts[CB]++;
+                            numPairContacts[ResContactInfo.CB]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[CB] < 0) || dist < minContactDistances[CB]) {
-                                minContactDistances[CB] = dist;
-                                contactAtomNumInResidueA[CB] = i;
-                                contactAtomNumInResidueB[CB] = j;
+                            if((minContactDistances[ResContactInfo.CB] < 0) || dist < minContactDistances[ResContactInfo.CB]) {
+                                minContactDistances[ResContactInfo.CB] = dist;
+                                contactAtomNumInResidueA[ResContactInfo.CB] = i;
+                                contactAtomNumInResidueB[ResContactInfo.CB] = j;
                             }
 
                         }
                         else if(i <= numOfLastBackboneAtomInResidue && j > numOfLastBackboneAtomInResidue) {
                             // to be precise, this is a backbone - chain contact
-                            numPairContacts[BC]++;
+                            numPairContacts[ResContactInfo.BC]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[BC] < 0) || dist < minContactDistances[BC]) {
-                                minContactDistances[BC] = dist;
-                                contactAtomNumInResidueA[BC] = i;
-                                contactAtomNumInResidueB[BC] = j;
+                            if((minContactDistances[ResContactInfo.BC] < 0) || dist < minContactDistances[ResContactInfo.BC]) {
+                                minContactDistances[ResContactInfo.BC] = dist;
+                                contactAtomNumInResidueA[ResContactInfo.BC] = i;
+                                contactAtomNumInResidueB[ResContactInfo.BC] = j;
                             }
                         }
                         else if(i > numOfLastBackboneAtomInResidue && j > numOfLastBackboneAtomInResidue) {
                             // to be precise, this is a chain - chain contact
-                            numPairContacts[CC]++;          // 'C' instead of 'S' for side chain pays off
+                            numPairContacts[ResContactInfo.CC]++;          // 'C' instead of 'S' for side chain pays off
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[CC] < 0) || dist < minContactDistances[CC]) {
-                                minContactDistances[CC] = dist;
-                                contactAtomNumInResidueA[CC] = i;
-                                contactAtomNumInResidueB[CC] = j;
+                            if((minContactDistances[ResContactInfo.CC] < 0) || dist < minContactDistances[ResContactInfo.CC]) {
+                                minContactDistances[ResContactInfo.CC] = dist;
+                                contactAtomNumInResidueA[ResContactInfo.CC] = i;
+                                contactAtomNumInResidueB[ResContactInfo.CC] = j;
                             }
                         }
                         else {
@@ -2364,16 +2366,16 @@ public class Main {
                         // Check for H bridges separately
                         if(i.equals(atomIndexOfBackboneN) && j.equals(atomIndexOfBackboneO)) {
                             // H bridge from backbone atom 'N' of residue a to backbone atom 'O' of residue b.
-                            numPairContacts[HB]++;
+                            numPairContacts[ResContactInfo.HB]++;
                             // There can only be one of these so if we found it, simply update the distance.
-                            minContactDistances[HB] = dist;
+                            minContactDistances[ResContactInfo.HB] = dist;
                         }
 
                         if(i.equals(atomIndexOfBackboneO) && j.equals(atomIndexOfBackboneN)) {
                             // H bridge from backbone atom 'O' of residue a to backbone atom 'N' of residue b.
-                            numPairContacts[BH]++;
+                            numPairContacts[ResContactInfo.BH]++;
                             // There can only be one of these so if we found it, simply update the distance.
-                            minContactDistances[BH] = dist;
+                            minContactDistances[ResContactInfo.BH] = dist;
                         }
 
                     }
@@ -2385,25 +2387,25 @@ public class Main {
                         // Check the exact contact type
                         if(i <= numOfLastBackboneAtomInResidue) {
                             // to be precise, this is a backbone - ligand contact
-                            numPairContacts[BL]++;
+                            numPairContacts[ResContactInfo.BL]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[BL] < 0) || dist < minContactDistances[BL]) {
-                                minContactDistances[BL] = dist;
-                                contactAtomNumInResidueA[BL] = i;
-                                contactAtomNumInResidueB[BL] = j;
+                            if((minContactDistances[ResContactInfo.BL] < 0) || dist < minContactDistances[ResContactInfo.BL]) {
+                                minContactDistances[ResContactInfo.BL] = dist;
+                                contactAtomNumInResidueA[ResContactInfo.BL] = i;
+                                contactAtomNumInResidueB[ResContactInfo.BL] = j;
                             }
 
                         }
                         else {
                             // to be precise, this is a side chain - ligand contact
-                            numPairContacts[CL]++;
+                            numPairContacts[ResContactInfo.CL]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[CL] < 0) || dist < minContactDistances[CL]) {
-                                minContactDistances[CL] = dist;
-                                contactAtomNumInResidueA[CL] = i;
-                                contactAtomNumInResidueB[CL] = j;
+                            if((minContactDistances[ResContactInfo.CL] < 0) || dist < minContactDistances[ResContactInfo.CL]) {
+                                minContactDistances[ResContactInfo.CL] = dist;
+                                contactAtomNumInResidueA[ResContactInfo.CL] = i;
+                                contactAtomNumInResidueB[ResContactInfo.CL] = j;
                             }
                         }
 
@@ -2415,25 +2417,25 @@ public class Main {
                         // Check the exact contact type
                         if(j <= numOfLastBackboneAtomInResidue) {
                             // to be precise, this is a ligand - backbone contact
-                            numPairContacts[LB]++;
+                            numPairContacts[ResContactInfo.LB]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[LB] < 0) || dist < minContactDistances[LB]) {
-                                minContactDistances[LB] = dist;
-                                contactAtomNumInResidueA[LB] = i;
-                                contactAtomNumInResidueB[LB] = j;
+                            if((minContactDistances[ResContactInfo.LB] < 0) || dist < minContactDistances[ResContactInfo.LB]) {
+                                minContactDistances[ResContactInfo.LB] = dist;
+                                contactAtomNumInResidueA[ResContactInfo.LB] = i;
+                                contactAtomNumInResidueB[ResContactInfo.LB] = j;
                             }
 
                         }
                         else {
                             // to be precise, this is a ligand - side chain contact
-                            numPairContacts[LC]++;
+                            numPairContacts[ResContactInfo.LC]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                            if((minContactDistances[LC] < 0) || dist < minContactDistances[LC]) {
-                                minContactDistances[LC] = dist;
-                                contactAtomNumInResidueA[LC] = i;
-                                contactAtomNumInResidueB[LC] = j;
+                            if((minContactDistances[ResContactInfo.LC] < 0) || dist < minContactDistances[ResContactInfo.LC]) {
+                                minContactDistances[ResContactInfo.LC] = dist;
+                                contactAtomNumInResidueA[ResContactInfo.LC] = i;
+                                contactAtomNumInResidueB[ResContactInfo.LC] = j;
                             }
                         }
                             
@@ -2443,13 +2445,13 @@ public class Main {
                         numTotalLigContactsPair++;
 
                         // no choices here, ligands have no sub type
-                        numPairContacts[LL]++;
+                        numPairContacts[ResContactInfo.LL]++;
                         
                         // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
-                        if((minContactDistances[LL] < 0) || dist < minContactDistances[LL]) {
-                            minContactDistances[LL] = dist;
-                            contactAtomNumInResidueA[LL] = i;
-                            contactAtomNumInResidueB[LL] = j;
+                        if((minContactDistances[ResContactInfo.LL] < 0) || dist < minContactDistances[ResContactInfo.LL]) {
+                            minContactDistances[ResContactInfo.LL] = dist;
+                            contactAtomNumInResidueA[ResContactInfo.LL] = i;
+                            contactAtomNumInResidueB[ResContactInfo.LL] = j;
                         }
                         
 
@@ -2468,7 +2470,7 @@ public class Main {
 
 
         // Iteration through all atoms of the two residues is done
-        if(numPairContacts[TT] > 0) {
+        if(numPairContacts[ResContactInfo.TT] > 0) {
             result = new ResContactInfo(numPairContacts, minContactDistances, contactAtomNumInResidueA, contactAtomNumInResidueB, a, b, CAdist, numTotalLigContactsPair);
         }
         else {

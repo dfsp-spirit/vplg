@@ -24,24 +24,26 @@ public class ResContactInfo {
     private Integer[] numPairContacts;
     // The positions in the numPairContacts array hold the number of contacts of each type for a pair of residues:
     // Some cheap vars to make things easier to understand (a poor replacement for #define):
-    private final Integer TT = 0;         //  0 = total number of contacts            (all residue type combinations)
-    private final Integer BB = 1;         //  1 = # of backbone-backbone contacts     (protein - protein only)
-    private final Integer CB = 2;         //  2 = # of sidechain-backbone contacts    (protein - protein only)
-    private final Integer BC = 3;         //  3 = # of backbone-sidechain contacts    (protein - protein only)
-    private final Integer CC = 4;         //  4 = # of sidechain-sidechain contacts   (protein - protein only)
-    private final Integer HB1 = 5;         //  5 = # of H-bridge contacts 1, N=>0      (protein - protein only)
-    private final Integer HB2 = 6;         //  6 = # of H-bridge contacts 2, 0=>N      (protein - protein only)
-    private final Integer BL = 7;         //  7 = # of backbone-ligand contacts       (protein - ligand only)
-    private final Integer LB = 8;         //  8 = # of ligand-backbone contacts       (protein - ligand only)
-    private final Integer CL = 9;         //  9 = # of sidechain-ligand contacts      (protein - ligand only)
-    private final Integer LC = 10;        // 10 = # of ligand-sidechain contacts      (protein - ligand only)
-    private final Integer LL = 11;        // 11 = # of ligand-ligand contacts         (ligand - ligand only)
-
+    public static final Integer TT = 0;         //  0 = total number of contacts            (all residue type combinations)
+    public static final Integer BB = 1;         //  1 = # of backbone-backbone contacts     (protein - protein only)
+    public static final Integer CB = 2;         //  2 = # of sidechain-backbone contacts    (protein - protein only)
+    public static final Integer BC = 3;         //  3 = # of backbone-sidechain contacts    (protein - protein only)
+    public static final Integer CC = 4;         //  4 = # of sidechain-sidechain contacts   (protein - protein only)
+    public static final Integer HB = 5;         //  5 = # of H-bridge contacts 1, N=>0      (protein - protein only)
+    public static final Integer BH = 6;         //  6 = # of H-bridge contacts 2, 0=>N      (protein - protein only)
+    public static final Integer BL = 7;         //  7 = # of backbone-ligand contacts       (protein - ligand only)
+    public static final Integer LB = 8;         //  8 = # of ligand-backbone contacts       (protein - ligand only)
+    public static final Integer CL = 9;         //  9 = # of sidechain-ligand contacts      (protein - ligand only)
+    public static final Integer LC = 10;        // 10 = # of ligand-sidechain contacts      (protein - ligand only)
+    public static final Integer LL = 11;        // 11 = # of ligand-ligand contacts         (ligand - ligand only)
+    public static final Integer DISULFIDE = 12;        // 12 = # of disulfide bridges 
+    
+    
     // The different values in 'XY' vs 'YX' are only produced by the the sequential order of the
     //  residues (e.g., the ligand came fist: this was treated as an 'LB' contact, otherwise it
     //  had been treated as an 'BL' contact (note that residue pairs are compared only once by the
     //  loop in Main.calculateAllContacts()). Saving this separately seems strange but we have to
-    //  do it because geom_neo does it and we want out output to be compatible with it.
+    //  do it because geom_neo does it and we want our output to be compatible with it.
 
     private Integer numTotalLigContactsPair;
 
@@ -120,8 +122,8 @@ public class ResContactInfo {
     public Integer getCenterSphereRadiusResB() { return(this.resB.getCenterSphereRadius()); }
     public Integer getResPairDist() { return(dist); }
 
-    public Integer getHB1Dist() { return(minContactDistances[HB1]); }
-    public Integer getHB2Dist() { return(minContactDistances[HB2]); }
+    public Integer getHB1Dist() { return(minContactDistances[HB]); }
+    public Integer getHB2Dist() { return(minContactDistances[BH]); }
 
     public Integer getBBContactDist() { return(minContactDistances[BB]); }
     public Integer getBBContactAtomNumA() { return(contactAtomIndexInResidueA[BB] + 1); }   // The '+1' is required because geom_neo starts the atom index at '1' but we start it at '0'.
@@ -166,13 +168,14 @@ public class ResContactInfo {
     public Integer getNumContactsBC() { return(numPairContacts[BC]); }
     public Integer getNumContactsCB() { return(numPairContacts[CB]); }
     public Integer getNumContactsCC() { return(numPairContacts[CC]); }
-    public Integer getNumContactsHB1() { return(numPairContacts[HB1]); }
-    public Integer getNumContactsHB2() { return(numPairContacts[HB2]); }
+    public Integer getNumContactsHB1() { return(numPairContacts[HB]); }
+    public Integer getNumContactsHB2() { return(numPairContacts[BH]); }
     public Integer getNumContactsBL() { return(numPairContacts[BL]); }
     public Integer getNumContactsLB() { return(numPairContacts[LB]); }
     public Integer getNumContactsCL() { return(numPairContacts[CL]); }
     public Integer getNumContactsLC() { return(numPairContacts[LC]); }
     public Integer getNumContactsLL() { return(numPairContacts[LL]); }
+    public Integer getNumContactsDisulfide() { return(numPairContacts[DISULFIDE]); }
 
     // DEBUG only
     public Residue getResA() { return(resA); }
