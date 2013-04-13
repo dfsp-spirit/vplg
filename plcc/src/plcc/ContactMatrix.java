@@ -941,13 +941,12 @@ public class ContactMatrix {
      *
      */
     /*
-    public ProteinGraph<SSE, LabeledEdge> toJGraph() {
+    public ProtGraph<SSE, LabeledEdge> toJGraph() {
 
         SSE sseA, sseB;
         sseA = sseB = null;
 
-
-        ProteinGraph<SSE, LabeledEdge> graph = new ProteinGraph<SSE, LabeledEdge>(new ClassBasedEdgeFactory<SSE, LabeledEdge>(LabeledEdge.class));
+        ProtGraph<SSE, LabeledEdge> graph = new ProteinGraph<SSE, LabeledEdge>(new ClassBasedEdgeFactory<SSE, LabeledEdge>(LabeledEdge.class));
 
         
 
@@ -974,8 +973,8 @@ public class ContactMatrix {
         }
         return(graph);
     }
-     * 
-     */
+    */
+     
 
     
     /**
