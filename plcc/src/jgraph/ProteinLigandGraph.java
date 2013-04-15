@@ -66,4 +66,25 @@ public class ProteinLigandGraph<V, E> extends SimpleGraph<V, E> implements Undir
         }
     }
     
+    
+    /**
+     * Usage example.
+     * @param argv the command line arguments, ignored
+     */
+    public static void main(String[] argv) {
+        
+        ProteinLigandGraph plg = new ProteinLigandGraph<VertexSSE, PLGEdge>(PLGEdge.class);
+        
+        VertexSSE sse1 = new VertexSSE(VertexSSE.SSE_TYPE_HELIX);
+        VertexSSE sse2 = new VertexSSE(VertexSSE.SSE_TYPE_BETASTRAND);
+        VertexSSE sse3 = new VertexSSE(VertexSSE.SSE_TYPE_BETASTRAND);
+        VertexSSE sse4 = new VertexSSE(VertexSSE.SSE_TYPE_HELIX);
+        VertexSSE sse5 = new VertexSSE(VertexSSE.SSE_TYPE_LIGAND);
+        
+        plg.addEdge(sse1, sse2, new PLGEdge(PLGEdge.SPATREL_PARALLEL));
+        plg.addEdge(sse2, sse3, new PLGEdge(PLGEdge.SPATREL_ANTIPARALLEL));
+        plg.addEdge(sse1, sse4, new PLGEdge(PLGEdge.SPATREL_MIXED));
+        plg.addEdge(sse3, sse5, new PLGEdge(PLGEdge.SPATREL_LIGAND));
+    }
+    
 }

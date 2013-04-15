@@ -14,7 +14,21 @@ package jgraph;
  */
 public class VertexSSE {
     
+    public static final int SSE_TYPE_HELIX = 0;
+    public static final int SSE_TYPE_BETASTRAND = 1;
+    public static final int SSE_TYPE_LIGAND = 1;
+    
+    protected int sseType;
     protected String residueString;
+    
+    public VertexSSE(int sseType) {
+        this.sseType = sseType;
+        this.residueString = "";
+    }
+    
+    public int getSequenceLength() {
+        return this.residueString.length();
+    }
 
     public String getResidueString() {
         return residueString;
@@ -24,4 +38,8 @@ public class VertexSSE {
         this.residueString = residueString;
     }
     
+    @Override
+    public String toString() {
+      return "[t=" + this.sseType + ",l= " + this.getSequenceLength() + "]";
+    }
 }

@@ -23,14 +23,27 @@ public class PLGEdge extends org.jgrapht.graph.DefaultEdge {
     protected int spatialOrientation;
     protected BitSet bondProperties;
     
+    public static final Integer SPATREL_PARALLEL = 0;
+    public static final Integer SPATREL_ANTIPARALLEL = 1;
+    public static final Integer SPATREL_MIXED = 2;
+    public static final Integer SPATREL_LIGAND = 3;
+    
     public static final Integer BONDTYPE_VDW = 0;
     public static final Integer BONDTYPE_DISULFIDE = 1;
     public static final Integer BONDTYPE_INTERCHAIN = 2;
     
     public PLGEdge() {
         super();
-        bondProperties = new BitSet(3);
-        spatialOrientation = SpatRel.MIXED;
+        this.bondProperties = new BitSet(3);
+        this.bondProperties.set(PLGEdge.BONDTYPE_VDW);
+        this.spatialOrientation = SpatRel.MIXED;
+    }
+    
+    public PLGEdge(int spatialOrientation) {
+        super();
+        this.bondProperties = new BitSet(3);
+        this.bondProperties.set(PLGEdge.BONDTYPE_VDW);
+        this.spatialOrientation = spatialOrientation;
     }
 
     public int getSpatialOrientation() {
@@ -52,7 +65,7 @@ public class PLGEdge extends org.jgrapht.graph.DefaultEdge {
     
     @Override
     public String toString() {
-      return "s=" + spatialOrientation;
+      return "[" + this.getSource() + ":" + this.getTarget() + ",s=" + spatialOrientation + "]";
     }
     
 }
