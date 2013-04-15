@@ -14,4 +14,14 @@ package jgraph;
  */
 public class VertexSSE {
     
+    protected String residueString;
+
+    public String getResidueString() {
+        return residueString;
+    }
+
+    public void setResidueString(String residueString) {
+        this.residueString = residueString;
+    }
+    
 }
