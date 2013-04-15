@@ -80,6 +80,11 @@ public class ProteinLigandGraph<V, E> extends SimpleGraph<V, E> implements Undir
         VertexSSE sse3 = new VertexSSE(VertexSSE.SSE_TYPE_BETASTRAND);
         VertexSSE sse4 = new VertexSSE(VertexSSE.SSE_TYPE_HELIX);
         VertexSSE sse5 = new VertexSSE(VertexSSE.SSE_TYPE_LIGAND);
+        plg.addVertex(sse1);
+        plg.addVertex(sse2);
+        plg.addVertex(sse3);
+        plg.addVertex(sse4);
+        plg.addVertex(sse5);
         
         plg.addEdge(sse1, sse2, new PLGEdge(PLGEdge.SPATREL_PARALLEL));
         plg.addEdge(sse2, sse3, new PLGEdge(PLGEdge.SPATREL_ANTIPARALLEL));
