@@ -6,7 +6,7 @@
  * Written by Tim Schaefer, see http://rcmd.org/contact/.
  * 
  */
-package jgraph;
+package jgrapht;
 
 /**
  * A vertex for a protein ligand graph. Represents a secondary structure element (SSE).

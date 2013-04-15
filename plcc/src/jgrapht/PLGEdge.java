@@ -6,7 +6,7 @@
  * Written by Tim Schaefer, see http://rcmd.org/contact/.
  * 
  */
-package jgraph;
+package jgrapht;
 
 import java.util.BitSet;
 import plcc.SpatRel;
