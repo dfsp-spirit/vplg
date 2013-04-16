@@ -20,10 +20,38 @@ public class VertexSSE {
     
     protected int sseType;
     protected String residueString;
+    protected int firstResidueDsspNumber;
+    protected int lastResidueDsspNumber;
     
     public VertexSSE(int sseType) {
         this.sseType = sseType;
         this.residueString = "";
+        this.firstResidueDsspNumber = -1;
+        this.lastResidueDsspNumber = -1;
+    }
+
+    public int getSseType() {
+        return sseType;
+    }
+
+    public void setSseType(int sseType) {
+        this.sseType = sseType;
+    }
+
+    public int getFirstResidueDsspNumber() {
+        return firstResidueDsspNumber;
+    }
+
+    public void setFirstResidueDsspNumber(int firstResidueDsspNumber) {
+        this.firstResidueDsspNumber = firstResidueDsspNumber;
+    }
+
+    public int getLastResidueDsspNumber() {
+        return lastResidueDsspNumber;
+    }
+
+    public void setLastResidueDsspNumber(int lastResidueDsspNumber) {
+        this.lastResidueDsspNumber = lastResidueDsspNumber;
     }
     
     public int getSequenceLength() {
