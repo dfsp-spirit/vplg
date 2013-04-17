@@ -28,21 +28,23 @@ public class PLGEdge extends org.jgrapht.graph.DefaultEdge {
     public static final Integer SPATREL_MIXED = 2;
     public static final Integer SPATREL_LIGAND = 3;
     
-    public static final Integer BONDTYPE_VDW = 0;
-    public static final Integer BONDTYPE_DISULFIDE = 1;
-    public static final Integer BONDTYPE_INTERCHAIN = 2;
+    public static final Integer BONDPROPERTY_VDW = 0;
+    public static final Integer BONDPROPERTY_DISULFIDE = 1;
+    public static final Integer BONDPROPERTY_INTERCHAIN = 2;
+    
+    private static final Integer numBondTypes = 3;
     
     public PLGEdge() {
         super();
         this.bondProperties = new BitSet(3);
-        this.bondProperties.set(PLGEdge.BONDTYPE_VDW);
+        this.bondProperties.set(PLGEdge.BONDPROPERTY_VDW);
         this.spatialOrientation = SpatRel.MIXED;
     }
     
     public PLGEdge(int spatialOrientation) {
         super();
-        this.bondProperties = new BitSet(3);
-        this.bondProperties.set(PLGEdge.BONDTYPE_VDW);
+        this.bondProperties = new BitSet(numBondTypes);
+        this.bondProperties.set(PLGEdge.BONDPROPERTY_VDW);
         this.spatialOrientation = spatialOrientation;
     }
 
@@ -60,6 +62,24 @@ public class PLGEdge extends org.jgrapht.graph.DefaultEdge {
 
     public void setBondProperties(BitSet bondProperties) {
         this.bondProperties = bondProperties;
+    }
+    
+    public void setBondProperty(Integer bondType, Boolean setting) {
+        if(bondType < 0 || bondType >= numBondTypes) {
+            System.err.println("ERROR: setBondProperty(): Invalid bond type '" + bondType + "' given, ignoring. Must be 0.." + (numBondTypes - 1) + ".");
+            return;
+        } else {
+            this.bondProperties.set(bondType, setting);
+        }
+    }
+    
+    public Boolean getBondProperty(Integer bondType) {
+        if(bondType < 0 || bondType >= numBondTypes) {
+            System.err.println("ERROR: getBondProperty(): Invalid bond type '" + bondType + "' given, ignoring. Must be 0.." + (numBondTypes - 1) + ".");
+            return false;
+        } else {
+            return this.bondProperties.get(bondType);
+        }
     }
     
     

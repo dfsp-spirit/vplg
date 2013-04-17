@@ -22,12 +22,32 @@ public class VertexSSE {
     protected String residueString;
     protected int firstResidueDsspNumber;
     protected int lastResidueDsspNumber;
+    protected String firstResiduePdbString;
+
+    public String getFirstResiduePdbString() {
+        return firstResiduePdbString;
+    }
+
+    public void setFirstResiduePdbString(String firstResiduePdbString) {
+        this.firstResiduePdbString = firstResiduePdbString;
+    }
+
+    public String getLastResiduePdbString() {
+        return lastResiduePdbString;
+    }
+
+    public void setLastResiduePdbString(String lastResiduePdbString) {
+        this.lastResiduePdbString = lastResiduePdbString;
+    }
+    protected String lastResiduePdbString;
     
     public VertexSSE(int sseType) {
         this.sseType = sseType;
         this.residueString = "";
         this.firstResidueDsspNumber = -1;
         this.lastResidueDsspNumber = -1;
+        this.firstResiduePdbString = "";
+        this.lastResiduePdbString = "";
     }
 
     public int getSseType() {
