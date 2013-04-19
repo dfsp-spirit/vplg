@@ -510,6 +510,12 @@ public class Main {
                         Settings.set("plcc_B_output_textfiles_dir_tree", "true");
                     }
                     
+                    if(s.equals("-W") || s.equals("--output-www")) {
+                        Settings.set("plcc_B_output_images_dir_tree", "true");
+                        Settings.set("plcc_B_output_textfiles_dir_tree", "true");
+                        Settings.set("plcc_B_output_textfiles_dir_tree_html", "true");
+                    }
+                    
                     
                     
                     if(s.equals("-m") || s.equals("--image-format")) {
@@ -1589,6 +1595,7 @@ public class Main {
                 */
                 
                 
+                
                 if(numFormatsWritten > 0) {
                     System.out.println("      Exported protein ligand graph in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + new File(filePathGraphs).getAbsolutePath() + fs + "'.");
                 }
@@ -1821,6 +1828,7 @@ public class Main {
         return json;
     }
     */
+    
 
     
     /**
@@ -3395,7 +3403,7 @@ public class Main {
         System.out.println("-h | --help                : show this help message and exit");
         //System.out.println("-i | --ignoreligands       : ignore ligand contacts in geom_neo format output files [DEBUG]");
         System.out.println("-j | --ddb <p> <c> <gt> <f>: get the graph type <gt> of chain <c> of pdbid <p> from the DB and draw it to file <f> (omit the file extension)*");        
-        System.out.println("-k | --output-subdir-tree  : write all output files to a PDB-style sudbir tree of the output dir (e.g., <OUTDIR>/ic/8icd/<outfile>). ");        
+        System.out.println("-k | --output-subdir-tree  : write all output files to a PDB-style sudbir tree of the output dir (e.g., <OUTDIR>/ic/8icd/<outfile>). ");                
         System.out.println("-l | --draw-plcc-graph <f> : read graph in plcc format from file <f> and draw it to <f>.png, then exit (<pdbid> will be ignored)*");                
         System.out.println("-L | --lig-filter <i> <a>  : only consider ligands which have at least <i> and at most <a> atoms. A setting of zero means no limit.");                
         System.out.println("-m | --image-format <f>    : write output images in format <f>, which can be 'PNG' or 'JPG' (SVG vector format is always written).");
@@ -3413,6 +3421,7 @@ public class Main {
         System.out.println("-u | --use-database        : write SSE contact data to database [requires DB credentials in cfg file]");                       
         System.out.println("-v | --del-db-protein <p>  : delete the protein chain with PDBID <p> from the database [requires DB credentials in cfg file]");
         System.out.println("-w | --dont-write-images   : do not draw the SSE graphs and write them to image files [DEBUG]");                             
+        System.out.println("-W | --output-html         : add HTML navigation files to the subdir tree (see -k). ");
         //System.out.println("-x | --check-rescts <f>    : compare the computed residue level contacts to those in geom_neo format file <f> and print differences");
         //System.out.println("-X | --check-ssects <f>    : compare the computed SSE level contacts to those in bet_neo format file <f> and print differences");
         //System.out.println("-y | --write-geodat        : write the computed SSE level contacts in geo.dat format to a file (file name: <pdbid>_<chain>.geodat)");        
