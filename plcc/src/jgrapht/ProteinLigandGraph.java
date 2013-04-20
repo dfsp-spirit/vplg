@@ -16,7 +16,7 @@ import org.jgrapht.graph.SimpleGraph;
  * A protein ligand graph implementation bases on JGraphT.
  * @author ts
  */
-public class ProteinLigandGraph<V, E> extends SimpleGraph<V, E> implements UndirectedGraph<V, E> {
+public class ProteinLigandGraph<V extends Object, E extends Object> extends SimpleGraph<V, E> implements UndirectedGraph<V, E> {
     
     
     protected String pdbid;
@@ -73,7 +73,7 @@ public class ProteinLigandGraph<V, E> extends SimpleGraph<V, E> implements Undir
      */
     public static void main(String[] argv) {
         
-        ProteinLigandGraph plg = new ProteinLigandGraph<VertexSSE, PLGEdge>(PLGEdge.class);
+        ProteinLigandGraph<VertexSSE, PLGEdge> plg = new ProteinLigandGraph<VertexSSE, PLGEdge>(PLGEdge.class);
         
         VertexSSE sse1 = new VertexSSE(VertexSSE.SSE_TYPE_HELIX);
         VertexSSE sse2 = new VertexSSE(VertexSSE.SSE_TYPE_BETASTRAND);
