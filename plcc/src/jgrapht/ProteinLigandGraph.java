@@ -8,6 +8,7 @@
 package jgrapht;
 
 import java.util.List;
+import java.util.Set;
 import org.jgrapht.GraphPath;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.alg.DijkstraShortestPath;
@@ -67,6 +68,34 @@ public class ProteinLigandGraph<V extends Object, E extends Object> extends Simp
         }
     }
     
+    public String toFormatGML() {
+        StringBuilder sb = new StringBuilder();
+        
+        // write graph header and meta data
+        sb.append("graph [\n");
+        sb.append("  id ").append(1).append("\n");
+        sb.append("  label \"" + "VPLG Protein Graph " + "\"\n");
+        sb.append("  comment \"").append(this.getPdbid()).append("-").append(this.getChain()).append("\"\n");
+        sb.append("  directed 0\n");
+        sb.append("  isplanar 0\n");
+        sb.append("  creator \"VPLG\"\n");
+        
+        // write vertices
+        for(VertexSSE v : (Set<VertexSSE>)this.vertexSet()) {
+            sb.append(v.toFormatGML());
+        }
+        
+        // write edges
+        for(PLGEdge e : (Set<PLGEdge>)this.edgeSet()) {
+            sb.append(e.toFormatGML());
+        }
+        
+        // write graph footer
+        sb.append("]\n");
+        
+        return sb.toString();
+    }
+    
     
     /**
      * Usage example.
@@ -104,6 +133,13 @@ public class ProteinLigandGraph<V extends Object, E extends Object> extends Simp
             sb.append(e.toString()).append(" ");
         }
         System.out.println(sb.toString());
+        
+        // test GML output
+        System.out.println("Graph in GML format:\n");
+        System.out.println(plg.toFormatGML());
+        
+        // done
+        System.out.println("Tests done, exiting.");
     }
     
 }

@@ -8,6 +8,7 @@
 package jgrapht;
 
 import java.util.BitSet;
+import java.util.HashMap;
 import plcc.SpatRel;
 
 /**
@@ -67,6 +68,10 @@ public class PLGEdge extends org.jgrapht.graph.DefaultEdge {
     public int getSpatialOrientation() {
         return spatialOrientation;
     }
+    
+    public String getSpatialOrientationString() {
+        return PLGEdge.translateSpatRelString(this.spatialOrientation);
+    }
 
     public void setSpatialOrientation(int spatialOrientation) {
         this.spatialOrientation = spatialOrientation;
@@ -98,10 +103,23 @@ public class PLGEdge extends org.jgrapht.graph.DefaultEdge {
         }
     }
     
+    public String getBondPropertyString() {
+        String bp = "";
+        for(int i = 0; i < this.numBondTypes; i++) {
+            if(this.bondProperties.get(i)) {
+                bp += PLGEdge.translateBondPropertyString(i);
+            }
+            else {
+                bp += "-";
+            }            
+        }
+        return bp;
+    }
+    
     
     @Override
     public String toString() {
-      return "[[E]" + this.getSource() + "-" + PLGEdge.getSpatRelString(this.spatialOrientation) + "-" + this.getTarget() + "]";
+      return "[[E]" + this.getSource() + "-" + PLGEdge.translateSpatRelString(this.spatialOrientation) + "-" + this.getTarget() + "]";
     }
     
     
@@ -109,7 +127,7 @@ public class PLGEdge extends org.jgrapht.graph.DefaultEdge {
      * Returns the String representation for a contact with Integer id 'i'. Each string representation is a single
      * lowercase letter, e.g. "m" for 1 (meaning 'mixed').
      */
-    public static String getSpatRelString(Integer i) {
+    public static String translateSpatRelString(Integer i) {
         if(i.equals(PLGEdge.SPATREL_NONE)) {
             return(PLGEdge.SPATREL_STRING_NONE);
         }
@@ -138,7 +156,7 @@ public class PLGEdge extends org.jgrapht.graph.DefaultEdge {
      * Returns the String representation for a contact with bond property ID 'i'. Each string representation is a single
      * lowercase letter, e.g. "s" for "disulfide".
      */
-    public static String getBondPropertyString(Integer i) {
+    public static String translateBondPropertyString(Integer i) {
         if(i.equals(PLGEdge.BONDPROPERTY_VDW)) {
             return(PLGEdge.BONDPROPERTY_STRING_VDW);
         }
@@ -157,7 +175,7 @@ public class PLGEdge extends org.jgrapht.graph.DefaultEdge {
     /**
      * Returns the Integer representation of the contact String (e.g., 1 for "m").
      */
-    public static Integer getSpatRelInt(String s) {
+    public static Integer translateSpatRelInt(String s) {
         if(s.equals(PLGEdge.SPATREL_STRING_NONE)) {
             return(PLGEdge.SPATREL_NONE);
         }
@@ -186,7 +204,7 @@ public class PLGEdge extends org.jgrapht.graph.DefaultEdge {
     /**
      * Returns the Integer representation of the bond property string (e.g., 1 for "s", meaning disulfide).
      */
-    public static Integer getBondPropertyInt(String s) {
+    public static Integer translateBondPropertyInt(String s) {
         if(s.equals(PLGEdge.BONDPROPERTY_STRING_VDW)) {
             return(PLGEdge.BONDPROPERTY_VDW);
         }
@@ -201,6 +219,29 @@ public class PLGEdge extends org.jgrapht.graph.DefaultEdge {
             return(PLGEdge.BONDPROPERTY_VDW);
         }
 
+    }
+    
+    private HashMap<String, String> getExportProperties() {
+        HashMap<String, String> props = new HashMap<String, String>();
+        props.put("source", "" + ((VertexSSE)this.getSource()).getSequentialSSENumberInChain() );
+        props.put("target", "" + ((VertexSSE)this.getTarget()).getSequentialSSENumberInChain() );
+        props.put("label", "\"" + ((VertexSSE)this.getSource()).getSequentialSSENumberInChain() + "-" + this.getSpatialOrientationString() + "-" + ((VertexSSE)this.getTarget()).getSequentialSSENumberInChain() + "\"");
+        props.put("spatial_orientation", "\"" + this.getSpatialOrientationString() + "\"");
+        props.put("bond_properties", "" + this.getBondPropertyString() + "\"");
+        return props;
+    }
+    
+    public String toFormatGML() {
+        String startEdge = "  edge [\n";
+        String endEdge   = "  ]\n";
+        
+        StringBuilder sb = new StringBuilder(startEdge);
+        HashMap<String, String> props = this.getExportProperties();
+        for(String prop : props.keySet()) {
+            sb.append("   ").append(prop).append(" ").append(props.get(prop)).append("\n");
+        }
+        sb.append(endEdge);
+        return sb.toString();
     }
     
 }

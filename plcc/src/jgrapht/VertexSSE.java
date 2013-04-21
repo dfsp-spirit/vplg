@@ -7,11 +7,13 @@
  */
 package jgrapht;
 
+import java.util.HashMap;
+
 /**
  * A vertex for a protein ligand graph. Represents a secondary structure element (SSE).
  * @author ts
  */
-public class VertexSSE {
+public class VertexSSE implements Comparable<VertexSSE> {
        
     
     public static final String SSE_TYPE_LIGAND = "L";                   // ligand
@@ -105,5 +107,35 @@ public class VertexSSE {
     @Override
     public String toString() {
       return "[[V]t=" + this.sseType +  "]";
+    }
+
+    @Override
+    public int compareTo(VertexSSE other) {
+        return this.sequentialSSENumberInChain.compareTo(other.sequentialSSENumberInChain);
+    }
+    
+    private HashMap<String, String> getExportProperties() {
+        HashMap<String, String> props = new HashMap<String, String>();
+        props.put("id", "" + this.sequentialSSENumberInChain);
+        props.put("label", "\"" + this.sequentialSSENumberInChain + this.sseType + "\"");
+        props.put("residues", "\"" + this.residueString + "\"");
+        props.put("first_res_dssp", "" + this.firstResidueDsspNumber);
+        props.put("last_res_dssp", "" + this.lastResidueDsspNumber);
+        props.put("first_res_pdb", "\"" + this.firstResiduePdbString + "\"");
+        props.put("last_res_pdb", "\"" + this.lastResiduePdbString + "\"");
+        return props;
+    }
+    
+    public String toFormatGML() {
+        String startNode = "  node [\n";
+        String endNode   = "  ]\n";
+        
+        StringBuilder sb = new StringBuilder(startNode);
+        HashMap<String, String> props = this.getExportProperties();
+        for(String prop : props.keySet()) {
+            sb.append("   ").append(prop).append(" ").append(props.get(prop)).append("\n");
+        }
+        sb.append(endNode);
+        return sb.toString();
     }
 }
