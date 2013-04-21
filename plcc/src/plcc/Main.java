@@ -1473,8 +1473,9 @@ public class Main {
             String fileNameWithoutExtension = null;
             String filePathImg = null;
             String filePathGraphs = null;
+            String filePathHTML = null;
             String imgFile = null;
-            String plccGraphFile = null;           
+            String plccGraphFile = null;        
 
 
             for(String gt : graphTypes) {
@@ -1513,6 +1514,7 @@ public class Main {
 
                 filePathImg = outputDir;
                 filePathGraphs = outputDir;
+                filePathHTML = outputDir;
                 String coils = "";
                 if(Settings.getBoolean("plcc_B_include_coils")) {
                     //System.out.println("  Considering coils, this may fragment SSEs.");
@@ -1526,7 +1528,7 @@ public class Main {
                 // Create the file in a subdir tree based on the protein meta data if requested
                 if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
                    
-                    File targetDir = IO.generatePDBstyleSubdirTreeName(pdbid, new File(outputDir));
+                    File targetDir = IO.generatePDBstyleSubdirTreeName(new File(outputDir), pdbid, c.getPdbChainID());
                     if(targetDir != null) {
                         ArrayList<String> errors = IO.createDirIfItDoesntExist(targetDir);
                         if( ! errors.isEmpty()) {
@@ -1535,7 +1537,8 @@ public class Main {
                             }
                         } else {
                             filePathImg = targetDir.getAbsolutePath();
-                            filePathGraphs = targetDir.getAbsolutePath();                        
+                            filePathGraphs = targetDir.getAbsolutePath();
+                            filePathHTML = targetDir.getAbsolutePath();
                         }                    
                     } else {
                         System.err.println("ERROR: Could not determine PDB-style subdir path name.");

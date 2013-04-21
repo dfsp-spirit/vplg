@@ -68,6 +68,7 @@ public class ProteinLigandGraph<V extends Object, E extends Object> extends Simp
         }
     }
     
+    @SuppressWarnings("unchecked")
     public String toFormatGML() {
         StringBuilder sb = new StringBuilder();
         
@@ -81,6 +82,7 @@ public class ProteinLigandGraph<V extends Object, E extends Object> extends Simp
         sb.append("  creator \"VPLG\"\n");
         
         // write vertices
+        
         for(VertexSSE v : (Set<VertexSSE>)this.vertexSet()) {
             sb.append(v.toFormatGML());
         }
