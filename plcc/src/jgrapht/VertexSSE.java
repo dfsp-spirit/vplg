@@ -13,12 +13,19 @@ package jgrapht;
  * @author ts
  */
 public class VertexSSE {
+       
     
-    public static final int SSE_TYPE_HELIX = 0;
-    public static final int SSE_TYPE_BETASTRAND = 1;
-    public static final int SSE_TYPE_LIGAND = 1;
+    public static final String SSE_TYPE_LIGAND = "L";                   // ligand
+    public static final String SSE_TYPE_BETASTRAND = "E";               // beta strand that is part of a beta sheet
+    public static final String SSE_TYPE_ALPHA_HELIX = "H";              // alpha helix
+    public static final String SSE_TYPE_ISOLATED_BETA = "B";            // isolated beta strand, not part of any beta sheet
+    public static final String SSE_TYPE_3HELIX = "G";                   // 3-helix (3 turns per 10 residues)
+    public static final String SSE_TYPE_5HELIX = "I";                   // 5-helix (pi helix)
+    public static final String SSE_TYPE_HTURN = "T";                    // hydrogen-bonded turn
+    public static final String SSE_TYPE_BEND = "S";                     // bend
+    public static final String SSE_TYPE_COIL = "C";                     // never assigned by DSSP, it calls these " "
     
-    protected int sseType;
+    protected String sseType;
     protected String residueString;
     protected int firstResidueDsspNumber;
     protected int lastResidueDsspNumber;
@@ -41,7 +48,7 @@ public class VertexSSE {
     }
     protected String lastResiduePdbString;
     
-    public VertexSSE(int sseType) {
+    public VertexSSE(String sseType) {
         this.sseType = sseType;
         this.residueString = "";
         this.firstResidueDsspNumber = -1;
@@ -50,11 +57,11 @@ public class VertexSSE {
         this.lastResiduePdbString = "";
     }
 
-    public int getSseType() {
+    public String getSseType() {
         return sseType;
     }
 
-    public void setSseType(int sseType) {
+    public void setSseType(String sseType) {
         this.sseType = sseType;
     }
 
@@ -88,6 +95,6 @@ public class VertexSSE {
     
     @Override
     public String toString() {
-      return "[t=" + this.sseType + ",l= " + this.getSequenceLength() + "]";
+      return "[[V]t=" + this.sseType +  "]";
     }
 }

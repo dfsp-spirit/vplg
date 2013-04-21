@@ -9,7 +9,9 @@
 package jgrapht;
 
 import java.util.List;
+import org.jgrapht.GraphPath;
 import org.jgrapht.UndirectedGraph;
+import org.jgrapht.alg.DijkstraShortestPath;
 import org.jgrapht.graph.SimpleGraph;
 
 /**
@@ -73,12 +75,14 @@ public class ProteinLigandGraph<V extends Object, E extends Object> extends Simp
      */
     public static void main(String[] argv) {
         
+        // let's create a graph
+        System.out.println("Creating protein ligand graph.");
         ProteinLigandGraph<VertexSSE, PLGEdge> plg = new ProteinLigandGraph<VertexSSE, PLGEdge>(PLGEdge.class);
         
-        VertexSSE sse1 = new VertexSSE(VertexSSE.SSE_TYPE_HELIX);
+        VertexSSE sse1 = new VertexSSE(VertexSSE.SSE_TYPE_ALPHA_HELIX);
         VertexSSE sse2 = new VertexSSE(VertexSSE.SSE_TYPE_BETASTRAND);
         VertexSSE sse3 = new VertexSSE(VertexSSE.SSE_TYPE_BETASTRAND);
-        VertexSSE sse4 = new VertexSSE(VertexSSE.SSE_TYPE_HELIX);
+        VertexSSE sse4 = new VertexSSE(VertexSSE.SSE_TYPE_ALPHA_HELIX);
         VertexSSE sse5 = new VertexSSE(VertexSSE.SSE_TYPE_LIGAND);
         
         plg.addVertex(sse1);
@@ -91,6 +95,16 @@ public class ProteinLigandGraph<V extends Object, E extends Object> extends Simp
         plg.addEdge(sse2, sse3, (PLGEdge)new PLGEdge(PLGEdge.SPATREL_ANTIPARALLEL));
         plg.addEdge(sse1, sse4, (PLGEdge)new PLGEdge(PLGEdge.SPATREL_MIXED));
         plg.addEdge(sse3, sse5, (PLGEdge)new PLGEdge(PLGEdge.SPATREL_LIGAND));
+        
+        System.out.println("Created protein ligand graph: |V|=" + plg.vertexSet().size() + ", |E|=" + plg.edgeSet().size() + ".");
+        // run some stuff on it
+        
+        StringBuilder sb = new StringBuilder("Shortest path from 1 to 5: ");
+        DijkstraShortestPath<VertexSSE, PLGEdge> dsp = new DijkstraShortestPath<VertexSSE, PLGEdge>(plg, sse1, sse5);
+        for(PLGEdge e : (List<PLGEdge>)dsp.getPath().getEdgeList()) {
+            sb.append(e.toString()).append(" ");
+        }
+        System.out.println(sb.toString());
     }
     
 }
