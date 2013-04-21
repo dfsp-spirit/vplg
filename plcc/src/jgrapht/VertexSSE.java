@@ -29,6 +29,15 @@ public class VertexSSE {
     protected String residueString;
     protected int firstResidueDsspNumber;
     protected int lastResidueDsspNumber;
+    protected Integer sequentialSSENumberInChain;
+
+    public Integer getSequentialSSENumberInChain() {
+        return sequentialSSENumberInChain;
+    }
+
+    public void setSequentialSSENumberInChain(Integer sequentialSSENumberInChain) {
+        this.sequentialSSENumberInChain = sequentialSSENumberInChain;
+    }
     protected String firstResiduePdbString;
 
     public String getFirstResiduePdbString() {
@@ -48,7 +57,8 @@ public class VertexSSE {
     }
     protected String lastResiduePdbString;
     
-    public VertexSSE(String sseType) {
+    public VertexSSE(String sseType, int seqNumInChain) {
+        this.sequentialSSENumberInChain = seqNumInChain;
         this.sseType = sseType;
         this.residueString = "";
         this.firstResidueDsspNumber = -1;

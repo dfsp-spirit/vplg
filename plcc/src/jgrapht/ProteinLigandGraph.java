@@ -79,11 +79,11 @@ public class ProteinLigandGraph<V extends Object, E extends Object> extends Simp
         System.out.println("Creating protein ligand graph.");
         ProteinLigandGraph<VertexSSE, PLGEdge> plg = new ProteinLigandGraph<VertexSSE, PLGEdge>(PLGEdge.class);
         
-        VertexSSE sse1 = new VertexSSE(VertexSSE.SSE_TYPE_ALPHA_HELIX);
-        VertexSSE sse2 = new VertexSSE(VertexSSE.SSE_TYPE_BETASTRAND);
-        VertexSSE sse3 = new VertexSSE(VertexSSE.SSE_TYPE_BETASTRAND);
-        VertexSSE sse4 = new VertexSSE(VertexSSE.SSE_TYPE_ALPHA_HELIX);
-        VertexSSE sse5 = new VertexSSE(VertexSSE.SSE_TYPE_LIGAND);
+        VertexSSE sse1 = new VertexSSE(VertexSSE.SSE_TYPE_ALPHA_HELIX, 1);
+        VertexSSE sse2 = new VertexSSE(VertexSSE.SSE_TYPE_BETASTRAND, 2);
+        VertexSSE sse3 = new VertexSSE(VertexSSE.SSE_TYPE_BETASTRAND, 3);
+        VertexSSE sse4 = new VertexSSE(VertexSSE.SSE_TYPE_ALPHA_HELIX, 4);
+        VertexSSE sse5 = new VertexSSE(VertexSSE.SSE_TYPE_LIGAND, 5);
         
         plg.addVertex(sse1);
         plg.addVertex(sse2);
