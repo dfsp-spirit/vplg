@@ -36,6 +36,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
+import jgrapht.PLGEdge;
+import jgrapht.ProteinLigandGraph;
+import jgrapht.VertexSSE;
 
 import org.apache.batik.apps.rasterizer.DestinationType;
 import org.apache.batik.apps.rasterizer.SVGConverter;
@@ -3355,7 +3358,26 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         }
         
         return kf;
-    }            
+    }      
+    
+    public ProteinLigandGraph<VertexSSE, PLGEdge> toProteinLigandGraph() {
+        
+        ProteinLigandGraph<VertexSSE, PLGEdge> plg = new ProteinLigandGraph<VertexSSE, PLGEdge>(PLGEdge.class);
+        
+        // set meta data
+        plg.setPdbid(this.pdbid);
+        plg.setChain(this.chainid);
+        plg.setModelid(1);
+        
+        // add vertices
+        for (int i = 0; i < this.size; i++) {            
+            //TODO: continue here
+        }
+        
+        // add edges
+        return null;
+        
+    }
     
 
     
