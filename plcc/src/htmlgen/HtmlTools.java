@@ -93,6 +93,9 @@ public class HtmlTools {
         return "</span>\n";
     }
     
+    public static String hr() {
+        return "<hr/>\n";
+    }
      
     
     

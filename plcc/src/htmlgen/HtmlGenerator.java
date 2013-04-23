@@ -23,7 +23,7 @@ public class HtmlGenerator {
             
             //-------------- header ------------
             sb.append("<html>\n<head>\n");
-            sb.append("<title>" + "VPLG -- PDB ").append(pdbid).append(" --" + "</title>\n");
+            sb.append("<title>" + "VPLGweb -- PDB ").append(pdbid).append(" --" + "</title>\n");
             
             for(String s : relativeCssFilePaths) {            
                 sb.append("<link href=\"").append(s).append("\" rel=\"stylesheet\" type=\"text/css\">");
@@ -34,24 +34,25 @@ public class HtmlGenerator {
             sb.append("<body>\n");
             
             sb.append("<div class=\"logo\" align=\"center\">\n");
-            sb.append("<h1>VPLGweb</h1>\n");
-            sb.append("<hr/>\n");
+            sb.append(HtmlTools.heading("VPLGweb -- Visualization of Protein Ligand Graphs web server", 1));
+            sb.append(HtmlTools.hr());
             sb.append("</div>\n");
             
             
             // -------------------- protein info -------------------
             sb.append("<div class=\"protein\">\n");
-            sb.append("<h2>Protein info</h2>\n");
+            sb.append(HtmlTools.heading("Protein info", 2));
             sb.append("<p>");
             sb.append("PDB identifier: ").append(pdbid).append("<br/>");
-            sb.append("Link to structure at RCSB PDB website: <a href=\"http://www.rcsb.org/pdb/explore/explore.do?structureId=").append(pdbid).append("\">PDB ").append(pdbid).append("</a><br/>");
+            sb.append("Link to structure at RCSB PDB website: ");
+            sb.append(HtmlTools.link("http://www.rcsb.org/pdb/explore/explore.do?structureId=" + pdbid, pdbid));
             sb.append("</p>\n");
             sb.append("</div>");
             
             
             // -------------------- chain info -------------------
             sb.append("<div class=\"chains\">\n");
-            sb.append("<h2>Chain info</h2>\n");
+            sb.append(HtmlTools.heading("Chain info", 2));
             sb.append("<p>");
             sb.append("All ").append(chains.length).append(" chains of the protein:<br/>");
             for(String c : chains) {
@@ -62,8 +63,8 @@ public class HtmlGenerator {
             
             // ------------- body -- footer ---------------
             sb.append("<div class=\"footer\" align=\"center\">\n");
-            sb.append("<hr/>\n");
-            sb.append("<p>VPLGweb by ts</p>\n");
+            sb.append(HtmlTools.hr());
+            sb.append(HtmlTools.paragraph("VPLGweb by ts"));
             sb.append("</div>\n");
             
             
