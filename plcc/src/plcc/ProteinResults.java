@@ -8,26 +8,67 @@
 package plcc;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Stores all results produced for a PDB file. This is used to generate the HTML pages.
+ * This is a singleton.
  * @author spirit
  */
 public class ProteinResults {
     
-    private ArrayList<ProteinChainResults> chainResults;
+    private HashMap<String, ProteinChainResults> chainResults;
+    private String pdbid;
+    private String pdbHeaderTitle;
+
+    public String getPdbid() {
+        return pdbid;
+    }
+
+    public void setPdbid(String pdbid) {
+        this.pdbid = pdbid;
+    }
+
+    public String getPdbHeaderTitle() {
+        return pdbHeaderTitle;
+    }
+
+    public void setPdbHeaderTitle(String pdbHeaderTitle) {
+        this.pdbHeaderTitle = pdbHeaderTitle;
+    }
+    
     
     private static ProteinResults instance = null;
     
     protected ProteinResults() {
-      // Exists only to defeat instantiation.
+        // prevent instantiation
     }
     
     public static ProteinResults getInstance() {
       if(instance == null) {
          instance = new ProteinResults();
+         instance.init();
       }
       return instance;
    }
+    
+    private void init() {
+        chainResults = new HashMap<String, ProteinChainResults>();
+        pdbid = "";
+        pdbHeaderTitle = "";
+    }
+    
+    public boolean addProteinChainResults(ProteinChainResults res, String chainName) {
+        if(chainResults.containsKey(chainName)) {
+            return false;
+        } else {
+            chainResults.put(chainName, res);
+            return true;
+        }
+    }
+    
+    public ProteinChainResults getProteinChainResults(String chainName) {
+        return this.chainResults.get(chainName);        
+    }
     
 }

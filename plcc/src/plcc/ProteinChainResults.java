@@ -25,4 +25,12 @@ public class ProteinChainResults {
         proteinGraphs = new HashMap<String, SSEGraph>();
     }
     
+    public void addProteinGraph(SSEGraph g, String graphType) {
+        this.proteinGraphs.put(graphType, g);
+    }
+    
+    public SSEGraph getProteinGraph(String graphType) {
+        return this.proteinGraphs.get(graphType);
+    }
+    
 }
