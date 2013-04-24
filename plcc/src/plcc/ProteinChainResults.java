@@ -16,6 +16,13 @@ import java.util.HashMap;
  */
 public class ProteinChainResults {
     
+    public static final String GRAPHTYPE_ALPHA = "alpha";
+    public static final String GRAPHTYPE_BETA = "beta";
+    public static final String GRAPHTYPE_ALBE = "albe";
+    public static final String GRAPHTYPE_ALPHALIG = "alphalig";
+    public static final String GRAPHTYPE_BETALIG = "betalig";
+    public static final String GRAPHTYPE_ALBELIG = "albelig";
+    
     protected String chainName;
     protected HashMap<String, SSEGraph> proteinGraphs;
     protected HashMap<String, HashMap<String, File>> proteinGraphFilesInFormat;
@@ -27,6 +34,10 @@ public class ProteinChainResults {
     
     public void addProteinGraph(SSEGraph g, String graphType) {
         this.proteinGraphs.put(graphType, g);
+    }
+    
+    public void addProteinGraphOutputFile(String graphType, String format, File outFile) {
+        
     }
     
     public SSEGraph getProteinGraph(String graphType) {
