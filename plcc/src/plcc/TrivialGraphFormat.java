@@ -9,7 +9,7 @@ package plcc;
 
 /**
  *
- * @author spirit
+ * @author ts
  */
 public interface TrivialGraphFormat {
     

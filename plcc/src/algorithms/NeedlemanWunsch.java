@@ -11,7 +11,7 @@ import similarity.ScoringMatrix;
 
 /**
  * An implementation of the Needleman-Wunsch dynamic programming string alignment algorithm.
- * @author spirit
+ * @author ts
  */
 public class NeedlemanWunsch {
     

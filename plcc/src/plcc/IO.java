@@ -137,6 +137,15 @@ public class IO {
 
         return untaredFiles;
     }
+    
+    public static boolean fileExistsIsFileAndCanRead(File f) {
+        if(f != null) {
+            if(f.isFile() && f.canRead()) {
+                return true;
+            }            
+        }
+        return false;
+    }
 
     /**
      * Ungzip an input file into an output file.

@@ -10,7 +10,7 @@ package similarity;
 
 /**
  * This class implements a datatype that stores the result of the comparison of two SSE graphs by some property.
- * @author spirit
+ * @author ts
  */
 public class ComparisonResult {
     

@@ -11,7 +11,7 @@ import java.util.HashMap;
 
 /**
  * A simple edge used to be used by the Graphs class.
- * @author spirit
+ * @author ts
  */
 class Edge {
     protected Integer startVertex;

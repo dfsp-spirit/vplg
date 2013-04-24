@@ -11,7 +11,7 @@ package plcc;
 
 /**
  * This class implements a residue level contact, i.e., all information required about the contact between a pair (a, b) of Residue objects.
- * @author spirit
+ * @author ts
  */
 public class ResContactInfo {
 

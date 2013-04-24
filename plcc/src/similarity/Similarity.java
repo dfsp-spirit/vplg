@@ -9,7 +9,7 @@ package similarity;
 
 /**
  * Just some constants atm.
- * @author spirit
+ * @author ts
  */
 public class Similarity {
     

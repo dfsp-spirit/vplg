@@ -9,7 +9,7 @@ package htmlgen;
 
 /**
  * Some utility functions for generating HTML strings.
- * @author spirit
+ * @author ts
  */
 public class HtmlTools {
     

@@ -20,7 +20,7 @@ import plcc.SSEGraph;
 /**
  * This class provides various methods to compare two protein graphs by their string representations,
  * e.g., the SSE string.
- * @author spirit
+ * @author ts
  */
 public class GraphSimilarity {
     

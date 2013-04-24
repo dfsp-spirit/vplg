@@ -11,7 +11,7 @@ import similarity.ScoringMatrix;
 
 /**
  * An implementation of the SmithWaterman dynamic programming string alignment algorithm.
- * @author spirit
+ * @author ts
  */
 public class SmithWaterman {
     

@@ -18,7 +18,7 @@ import org.jgrapht.*;
  * Represents an SSE level contact matrix for a protein chain. Includes information on all SSE types, i.e., it is not
  * specific for a certain graph type.
  * 
- * @author spirit
+ * @author ts
  */
 public class ContactMatrix {
 

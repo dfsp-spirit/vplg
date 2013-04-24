@@ -27,7 +27,7 @@ import org.xml.sax.helpers.*;
 
 /**
  * A generic, abstract graph class. The simplest non-abstract implementation is UndirectedGraph.
- * @author spirit
+ * @author ts
  */
 public abstract class Graph<V> implements TrivialGraphFormat, GraphMLFormat {
     

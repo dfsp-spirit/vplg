@@ -13,7 +13,7 @@ import plcc.IO;
 
 /**
  * An undirected graph. This can be used as is or extended. It is based on the abstract Graph class.
- * @author spirit
+ * @author ts
  */
 public class UndirectedGraph extends Graph<Integer> {
     

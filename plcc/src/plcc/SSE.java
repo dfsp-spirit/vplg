@@ -15,7 +15,7 @@ import java.util.ArrayList;
 /**
  * Represents a secondary structure element (SSE), e.g., an alpha-helix or a beta-strand.
  * 
- * @author spirit
+ * @author ts
  */
 public class SSE implements java.io.Serializable {
 

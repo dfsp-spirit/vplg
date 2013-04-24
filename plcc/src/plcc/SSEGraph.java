@@ -55,7 +55,7 @@ import org.w3c.dom.DOMImplementation;
  * This class should hold all functions which they share.
  * 
  * 
- * @author spirit
+ * @author ts
  */
 public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguageFormat, TrivialGraphFormat, DOTLanguageFormat, KavoshFormat {
     
@@ -3391,7 +3391,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
  * A class required only for the priority queue used in the Dijkstra implementation of the ProtGraph class. 
  * Allows comparing vertices by their minDistance property.
  * 
- * @author spirit
+ * @author ts
  */
 class PriorityVertex implements Comparable<PriorityVertex> {
       public Integer index;

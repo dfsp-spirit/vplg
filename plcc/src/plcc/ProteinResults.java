@@ -13,7 +13,7 @@ import java.util.HashMap;
 /**
  * Stores all results produced for a PDB file. This is used to generate the HTML pages.
  * This is a singleton.
- * @author spirit
+ * @author ts
  */
 public class ProteinResults {
     

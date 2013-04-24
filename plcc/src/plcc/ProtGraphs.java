@@ -16,7 +16,7 @@ import java.util.*;
  * This is the static I/O class for the ProtGraph class. It allows you to read ProtGraphs from files and write them
  * to files.
  * 
- * @author spirit
+ * @author ts
  */
 public class ProtGraphs {
     

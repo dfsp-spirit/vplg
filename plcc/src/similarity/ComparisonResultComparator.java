@@ -11,7 +11,7 @@ import java.util.Comparator;
 
 /**
  * Simple comparator which allows comparison of ComparisonResults by their score.
- * @author spirit
+ * @author ts
  */
 public class ComparisonResultComparator implements Comparator<ComparisonResult> {
     

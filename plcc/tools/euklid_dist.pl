@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # calculates euklidian distance between two points in 3-dimensional space
-# written by spirit
+# written by spirit / ts
 
 if($#ARGV != 5) { die "USAGE: '$0 1x 1y 1z 2x 2y 2z'     where 1 and 2 are two 3D points defined by their x, y and z coordinates.\n"; }
 
