@@ -71,4 +71,8 @@ public class ProteinResults {
         return this.chainResults.get(chainName);        
     }
     
+    public String[] getAvailableChains() {
+        return (String[])this.chainResults.keySet().toArray();
+    }
+    
 }

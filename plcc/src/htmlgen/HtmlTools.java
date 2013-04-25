@@ -51,6 +51,26 @@ public class HtmlTools {
         return sb.toString();
     }
     
+    public static String uListStart() {
+        return "<ul>\n";
+    }
+    
+    public static String uListEnd() {
+        return "</ul>\n";
+    }
+    
+    public static String oListStart() {
+        return "<ol>\n";
+    }
+    
+    public static String oListEnd() {
+        return "</ol>\n";
+    }
+    
+    public static String listItem(String s) {
+        return "<li>" + s + "</li>\n";
+    }
+    
     public static String oList(String[] strings) {
         StringBuilder sb = new StringBuilder();
         sb.append("<ol>\n");

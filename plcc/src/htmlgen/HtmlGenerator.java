@@ -13,113 +13,164 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import plcc.IO;
+import plcc.ProteinChainResults;
+import plcc.ProteinResults;
 
 public class HtmlGenerator {
-	
-	
-	public String generateProteinChainWebpage(String pdbid, String[] chains, HashMap<String, File> graphTypeFiles, String[] relativeCssFilePaths) {
-            
-            StringBuilder sb = new StringBuilder();
-            
-            //-------------- header ------------
-            sb.append("<html>\n<head>\n");
-            sb.append("<title>" + "VPLGweb -- PDB ").append(pdbid).append(" --" + "</title>\n");
-            
-            for(String s : relativeCssFilePaths) {            
-                sb.append("<link href=\"").append(s).append("\" rel=\"stylesheet\" type=\"text/css\">");
-            }
-            sb.append("</head>\n");
-            
-            // ------------- body -- logo and title ---------------
-            sb.append("<body>\n");
-            
-            sb.append("<div class=\"logo\" align=\"center\">\n");
-            sb.append(HtmlTools.heading("VPLGweb -- Visualization of Protein Ligand Graphs web server", 1));
-            sb.append(HtmlTools.hr());
-            sb.append("</div>\n");
-            
-            
-            // -------------------- protein info -------------------
-            sb.append("<div class=\"protein\">\n");
-            sb.append(HtmlTools.heading("Protein info", 2));
-            sb.append("<p>");
-            sb.append("PDB identifier: ").append(pdbid).append("<br/>");
-            sb.append("Link to structure at RCSB PDB website: ");
-            sb.append(HtmlTools.link("http://www.rcsb.org/pdb/explore/explore.do?structureId=" + pdbid, pdbid));
-            sb.append("</p>\n");
-            sb.append("</div>");
-            
-            
-            // -------------------- chain info -------------------
-            sb.append("<div class=\"chains\">\n");
-            sb.append(HtmlTools.heading("Chain info", 2));
-            sb.append("<p>");
-            sb.append("All ").append(chains.length).append(" chains of the protein:<br/>");
-            for(String c : chains) {
-                sb.append("chain <a href=\"./").append(c).append("/\">chain ").append(c).append("</a><br/>");
-            }
-            sb.append("</p>\n");
-            sb.append("</div>");
-            
-            // ------------- body -- footer ---------------
-            sb.append("<div class=\"footer\" align=\"center\">\n");
-            sb.append(HtmlTools.hr());
-            sb.append(HtmlTools.paragraph("VPLGweb by ts"));
-            sb.append("</div>\n");
-            
-            
-            sb.append("</body>\n</html>\n");                                    
-            
-            return sb.toString();
-	}                
-        
-        
-        public String getCSS() {
-            StringBuilder sb = new StringBuilder();
-            sb.append("body {background-color: white; margin-top: 50px;margin-bottom: 50px;margin-right: 100px;margin-left: 100px;}\n");
-            sb.append("p { font-size:10pt; font-family:Arial,sans-serif;color:black }\n");
-            sb.append("p.text { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
-            sb.append("p.code { font-size:10pt; font-family:monospace; color:blue }\n");
-            sb.append("p.warn { font-size:10pt; font-family:monospace; color:red }\n");
-            sb.append("p.top { font-size:10pt; font-family:Arial,sans-serif; color:black; text-decoration:underline }\n");
-            sb.append("p.big { font-size:14pt; font-family:Arial,sans-serif; color:black }\n");
-            sb.append("p.tiny { font-size:7pt; font-family:Arial,sans-serif; color:black }\n");
-            sb.append("div.footer { font-size:7pt; font-family:Arial,sans-serif; color:black }\n");
-            sb.append("a:link {font-size:10pt;font-family:Arial,sans-serif;color:#800000;text-decoration:none}\n");
-            sb.append("p tinylink {font-size:7pt; color:#800000; text-decoration:none }\n");
-            sb.append("a:visited { font-size:10pt; color:#800000; text-decoration:none }\n");
-            sb.append("a:hover { font-size:10pt; color:#FF0000; text-decoration:none }\n");
-            sb.append("a:active { font-size:10pt; color:#FF0000; text-decoration:none }\n");
-            sb.append("a:focus { font-size:10pt;color:#800000; text-decoration:none }\n");
-            sb.append("td.caption { text-align: left; font-size:8pt; font-family:Arial,sans-serif; color:black; }\n");
-            sb.append("table.image { margin-left: 4em; }\n");
-            sb.append("Span.CENTERTEXT{text-align: center;}\n");
-            sb.append("div.CENTERTEXT{text-align: center;}\n");
-            return sb.toString();
-        }
-        
-        /**
-        * Usage example.
-        * @param argv the command line arguments, ignored
-        */
-        public static void main(String[] argv) {
-            
-            String pdbid = "7TIM";
-            String[] chains = new String[] { "A", "B" };
-            String[] cssFiles = new String[] { "vplgweb.css" };
-            
-            
-            String fs = System.getProperty("file.separator");
-            File outputBaseDir = new File(System.getProperty("user.home") + fs + "htmlTest");
-            IO.createDirIfItDoesntExist(outputBaseDir);
-            
-            HtmlGenerator hg = new HtmlGenerator();
-            String cssFilePath = outputBaseDir.getAbsolutePath() + fs + "vplgweb.css";
-            IO.stringToTextFile(cssFilePath, hg.getCSS());
-            
-            String chainFilePath = outputBaseDir.getAbsolutePath() + fs + "index.html";
-            IO.stringToTextFile(chainFilePath, hg.generateProteinChainWebpage(pdbid, chains, null, cssFiles));
-        }
+    
+    private String[] relativeCssFilePaths;
+    private File baseDir;
+    
+    public HtmlGenerator(File basDir) {
+        this.baseDir = baseDir;
+    }
 
+    public File getBaseDir() {
+        return baseDir;
+    }
+
+    public void setBaseDir(File baseDir) {
+        this.baseDir = baseDir;
+    }
+
+    public String[] getRelativeCssFilePaths() {
+        return relativeCssFilePaths;
+    }
+
+    /**
+     * Sets a list of CSS files which should be linked in the headers of all produced HTML files. Ensure that
+     * the paths are relative to the basedir (or absolute).
+     * @param relativeCssFilePaths 
+     */
+    public void setRelativeCssFilePaths(String[] relativeCssFilePaths) {
+        this.relativeCssFilePaths = relativeCssFilePaths;
+    }
+    
+    public void generateAllWebpagesForResult(ProteinResults pr) {
+
+        if(! IO.dirExistsIsDirectoryAndCanWrite(baseDir)) {
+            System.err.println("ERROR: Cannot create webpages under directory '" + baseDir + "', does not exist or cannot write to it.");
+            return;
+        }
+        
+        // ------------------- protein webpages -----------------------
+        
+        String pdbid = pr.getPdbid();
+        String fs = System.getProperty("file.separator");
+        String proteinWebsiteHtmlFile = this.baseDir + fs + pdbid + ".html";
+        
+        if(IO.stringToTextFile(proteinWebsiteHtmlFile, this.generateProteinWebpage(pr))) {
+            System.out.println("    Wrote protein website for PDB '" + pdbid + "' to " + new File(proteinWebsiteHtmlFile).getAbsolutePath() + ".");
+        } else {
+            System.err.println("ERROR: Could not write protein website for PDB '" + pdbid + "' to " + new File(proteinWebsiteHtmlFile).getAbsolutePath() + ".");
+        }
+        
+        // ------------------- chain webpages -----------------------
+    }
+	
+	
+    public String generateProteinWebpage(ProteinResults pr) {
+
+        StringBuilder sb = new StringBuilder();
+        
+        String pdbid = pr.getPdbid();
+        String[] chains = pr.getAvailableChains();
+        ProteinChainResults pcr;
+
+        //-------------- header ------------
+        sb.append("<html>\n<head>\n");
+        sb.append("<title>" + "VPLGweb -- PDB ").append(pdbid).append(" --" + "</title>\n");
+
+        for(String s : relativeCssFilePaths) {            
+            sb.append("<link href=\"").append(s).append("\" rel=\"stylesheet\" type=\"text/css\">");
+        }
+        sb.append("</head>\n");
+
+        // ------------- body -- logo and title ---------------
+        sb.append("<body>\n");
+
+        sb.append("<div class=\"logo\" align=\"center\">\n");
+        sb.append(HtmlTools.heading("VPLGweb -- Visualization of Protein Ligand Graphs web server", 1));
+        sb.append(HtmlTools.hr());
+        sb.append("</div>\n");
+
+
+        // -------------------- protein info -------------------
+        sb.append("<div class=\"protein\">\n");
+        sb.append(HtmlTools.heading("Protein info", 2));
+        sb.append("<p>");
+        sb.append("PDB identifier: ").append(pdbid).append("<br/>");
+        sb.append("Link to structure at RCSB PDB website: ");
+        sb.append(HtmlTools.link("http://www.rcsb.org/pdb/explore/explore.do?structureId=" + pdbid, pdbid));
+        sb.append("</p>\n");
+        sb.append("</div>");
+
+
+        // -------------------- chain info -------------------
+        sb.append("<div class=\"chains\">\n");
+        sb.append(HtmlTools.heading("Chain info", 2));
+        sb.append("<p>");
+        
+        if(chains.length > 0) {
+            sb.append("All ").append(chains.length).append(" chains of the protein:<br/>");
+            sb.append(HtmlTools.uListStart());
+            for(String chain : chains) {
+                pcr = pr.getProteinChainResults(chain);
+                if(pcr != null) {
+
+                }
+                sb.append(HtmlTools.listItem("chain " + chain));
+            }
+            sb.append(HtmlTools.uListEnd());
+        }
+        else {
+            sb.append("This PDB file contains no protein chains.\n");
+        }
+        
+        sb.append("</p>\n");
+        sb.append("</div>");
+
+        // ------------- body -- footer ---------------
+        sb.append("<div class=\"footer\" align=\"center\">\n");
+        sb.append(HtmlTools.hr());
+        sb.append(HtmlTools.paragraph("VPLGweb by ts"));
+        sb.append("</div>\n");
+
+
+        sb.append("</body>\n</html>\n");                                    
+
+        return sb.toString();
+    }                
+
+
+
+
+
+
+    /**
+    * Usage example.
+    * @param argv the command line arguments, ignored
+    */
+    public static void main(String[] argv) {
+
+        String pdbid = "7TIM";
+        String[] chains = new String[] { "A", "B" };
+        String[] cssFiles = new String[] { "vplgweb.css" };
+
+
+        String fs = System.getProperty("file.separator");
+        File outputBaseDir = new File(System.getProperty("user.home") + fs + "htmlTest");
+        IO.createDirIfItDoesntExist(outputBaseDir);
+
+        HtmlGenerator hg = new HtmlGenerator(outputBaseDir);
+        String cssFilePath = outputBaseDir.getAbsolutePath() + fs + "vplgweb.css";
+        CssGenerator cssG = new CssGenerator();
+        cssG.writeDefaultCssFileTo(new File(cssFilePath));
+        hg.setRelativeCssFilePaths(cssFiles);
+
+        String chainFilePath = outputBaseDir.getAbsolutePath() + fs + "index.html";
+        //IO.stringToTextFile(chainFilePath, hg.generateProteinChainWebpage(pdbid, chains, null));
+        System.err.println("OUT OF ORDER");
+    }
 	
 }

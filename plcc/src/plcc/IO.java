@@ -146,6 +146,15 @@ public class IO {
         }
         return false;
     }
+    
+    public static boolean dirExistsIsDirectoryAndCanWrite(File f) {
+        if(f != null) {
+            if(f.isDirectory() && f.canWrite()) {
+                return true;
+            }            
+        }
+        return false;
+    }
 
     /**
      * Ungzip an input file into an output file.

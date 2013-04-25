@@ -1153,7 +1153,9 @@ public class Main {
         }
         else {
             System.out.println("  Not calculating SSEs and not drawing graphs as requested.");
-        }
+        }        
+        
+        
 
         //drawTGFGraph("graph.tgf", "graph.tgf.png");       //DEBUG
         //dbTesting();        //DEBUG
