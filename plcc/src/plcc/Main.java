@@ -1681,7 +1681,7 @@ public class Main {
      * @param pg the protein graphs
      * @param outputDir the file system path where to write the image files. Has to exist and be writable.
      */
-    public static void calculateFoldingGraphsForSSEGraph(ProtGraph pg, String outputDir) {
+    public static ArrayList<FoldingGraph> calculateFoldingGraphsForSSEGraph(ProtGraph pg, String outputDir) {
         //System.out.println("Searching connected components in " + graphType + " graph of chain " + c.getPdbChainID() + ".");
         ArrayList<FoldingGraph> ccs = pg.getConnectedComponents();
         FoldingGraph fg;           // A connected component of a protein graph is a folding graph
@@ -1804,7 +1804,8 @@ public class Main {
                     //System.out.println("         Image output disabled, not drawing folding graph.");
                 }
             }
-        }        
+        }    
+        return ccs;
     }
     
 
