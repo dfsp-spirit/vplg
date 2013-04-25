@@ -1380,6 +1380,7 @@ public class Main {
 
         
         // handle all chains
+        ProteinChainResults pcr;
         for(Integer i = 0; i < allChains.size(); i++) {
             c = allChains.get(i);
             System.out.println("  +++++ Handling chain '" + c.getPdbChainID() + "'. +++++");
@@ -1389,6 +1390,9 @@ public class Main {
             md.put("pdb_mol_name", pmi.getMolName());
             md.put("pdb_org_sci", pmi.getOrgScientific());
             md.put("pdb_org_common", pmi.getOrgCommon());
+            
+            pcr = new ProteinChainResults(c.getPdbChainID());
+            pcr.setChainMetaData(pmi);
 
             if(Settings.getBoolean("plcc_B_useDB")) {
                 try {
@@ -1463,12 +1467,12 @@ public class Main {
             // read the list of requested graph types from the settings
             List<String> graphTypes = new ArrayList<String>();
 
-            if(Settings.getBoolean("plcc_B_graphtype_albe")) { graphTypes.add("albe"); }
-            if(Settings.getBoolean("plcc_B_graphtype_albelig")) { graphTypes.add("albelig"); }
-            if(Settings.getBoolean("plcc_B_graphtype_alpha")) { graphTypes.add("alpha"); }
-            if(Settings.getBoolean("plcc_B_graphtype_alphalig")) { graphTypes.add("alphalig"); }
-            if(Settings.getBoolean("plcc_B_graphtype_beta")) { graphTypes.add("beta"); }
-            if(Settings.getBoolean("plcc_B_graphtype_betalig")) { graphTypes.add("betalig"); }
+            if(Settings.getBoolean("plcc_B_graphtype_albe")) { graphTypes.add(SSEGraph.GRAPHTYPE_ALBE); }
+            if(Settings.getBoolean("plcc_B_graphtype_albelig")) { graphTypes.add(SSEGraph.GRAPHTYPE_ALBELIG); }
+            if(Settings.getBoolean("plcc_B_graphtype_alpha")) { graphTypes.add(SSEGraph.GRAPHTYPE_ALPHA); }
+            if(Settings.getBoolean("plcc_B_graphtype_alphalig")) { graphTypes.add(SSEGraph.GRAPHTYPE_ALPHALIG); }
+            if(Settings.getBoolean("plcc_B_graphtype_beta")) { graphTypes.add(SSEGraph.GRAPHTYPE_BETA); }
+            if(Settings.getBoolean("plcc_B_graphtype_betalig")) { graphTypes.add(SSEGraph.GRAPHTYPE_BETALIG); }
             
             
             String fileNameWithExtension = null;
@@ -1488,9 +1492,11 @@ public class Main {
                 pg.setInfo(pdbid, c.getPdbChainID(), gt);
                 pg.addMetadata(md);
                 
+                pcr.addProteinGraph(pg, gt);
+                
                 
                 if(Settings.getBoolean("plcc_B_debug_compareSSEContacts")) {
-                    if(gt.equals("albe")) {
+                    if(gt.equals(SSEGraph.GRAPHTYPE_ALBE)) {
                         System.out.println("Comparing calculated SSE contacts with those in the file '" + Settings.get("plcc_S_debug_compareSSEContactsFile") + "'...");
                         FileParser.compareSSEContactsWithGeoDatFile(Settings.get("plcc_S_debug_compareSSEContactsFile"), pg);
                     }        
@@ -1551,27 +1557,31 @@ public class Main {
                 String graphFormatsWritten = "";
                 Integer numFormatsWritten = 0;
                 if(Settings.getBoolean("plcc_B_output_GML")) {
-                    String gmlfFile = filePathGraphs + fs + fileNameWithoutExtension + ".gml";
-                    if(IO.stringToTextFile(gmlfFile, pg.toGraphModellingLanguageFormat())) {
+                    String gmlFile = filePathGraphs + fs + fileNameWithoutExtension + ".gml";
+                    if(IO.stringToTextFile(gmlFile, pg.toGraphModellingLanguageFormat())) {
                         graphFormatsWritten += "gml "; numFormatsWritten++;
+                        pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_GML, new File(gmlFile));
                     }
                 }
                 if(Settings.getBoolean("plcc_B_output_TGF")) {
                     String tgfFile = filePathGraphs + fs + fileNameWithoutExtension + ".tgf";
                     if(IO.stringToTextFile(tgfFile, pg.toTrivialGraphFormat())) {
                         graphFormatsWritten += "tgf "; numFormatsWritten++;
+                        pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_TGF, new File(tgfFile));
                     }
                 }
                 if(Settings.getBoolean("plcc_B_output_DOT")) {
                     String dotLangFile = filePathGraphs + fs + fileNameWithoutExtension + ".gv";
                     if(IO.stringToTextFile(dotLangFile, pg.toDOTLanguageFormat())) {
                         graphFormatsWritten += "gv "; numFormatsWritten++;
+                        pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_DOTLANGUAGE, new File(dotLangFile));
                     }
                 }
                 if(Settings.getBoolean("plcc_B_output_kavosh")) {
                     String kavoshFile = filePathGraphs + fs + fileNameWithoutExtension + ".kavosh";
                     if(IO.stringToTextFile(kavoshFile, pg.toKavoshFormat())) {
                         graphFormatsWritten += "kavosh "; numFormatsWritten++;
+                        pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_KAVOSH, new File(kavoshFile));
                     }
                 }
                 if(Settings.getBoolean("plcc_B_output_eld")) {
@@ -1579,6 +1589,7 @@ public class Main {
                     String nodeTypeListFile = filePathGraphs + fs + fileNameWithoutExtension + ".el_ntl";
                     if(IO.stringToTextFile(elFile, pg.toEdgeList()) && IO.stringToTextFile(nodeTypeListFile, pg.getNodeTypeList())) {
                         graphFormatsWritten += "el "; numFormatsWritten++;
+                        pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_EDGELIST, new File(elFile));
                     }
                 }
                 // write the SSE info text file for the image (plcc graph format file)
@@ -1586,6 +1597,7 @@ public class Main {
                     plccGraphFile = filePathGraphs + fs + fileNameWithoutExtension + ".plg";
                     if(IO.stringToTextFile(plccGraphFile, pg.toVPLGGraphFormat())) {
                         graphFormatsWritten += "plg "; numFormatsWritten++;
+                        pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_VPLG, new File(plccGraphFile));
                     }
                 }
                 
@@ -1632,6 +1644,7 @@ public class Main {
                 if(Settings.getBoolean("plcc_B_draw_graphs")) {
                     if(pg.drawProteinGraph(imgFile, false)) {
                         System.out.println("      Image of graph written to file '" + imgFile + "'.");
+                        pcr.addProteinGraphImage(gt, new File(imgFile));
                     }                   
                 }
                 else {
@@ -1656,7 +1669,8 @@ public class Main {
                 /* ----------------------------------------------- Folding graphs ---------------------------------------------- */
 
                 if(Settings.getBoolean("plcc_B_folding_graphs")) {
-                    calculateFoldingGraphsForSSEGraph(pg, filePathImg);                                    
+                    ProteinFoldingGraphResults fgRes = calculateFoldingGraphsForSSEGraph(pg, filePathImg);                                    
+                    pcr.addProteinFoldingGraphResults(gt, fgRes);
                 }
                 else {
                     //System.out.println("      Not handling folding graphs.");
@@ -1670,9 +1684,16 @@ public class Main {
                 //}
                 
             }
+            
+            // register results for chain
+            ProteinResults.getInstance().addProteinChainResults(pcr, c.getPdbChainID());
+            
             System.out.println("  +++++ All " + graphTypes.size() + " protein graphs of chain " + c.getPdbChainID() + " handled. +++++");
+            
         }
         System.out.println("All " + allChains.size() + " chains done.");
+        
+        
     }
     
     

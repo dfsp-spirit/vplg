@@ -28,12 +28,12 @@ public class ProteinChainResults {
         return new String[] { GRAPHTYPE_ALPHA, GRAPHTYPE_BETA, GRAPHTYPE_ALBE, GRAPHTYPE_ALPHALIG, GRAPHTYPE_BETALIG, GRAPHTYPE_ALBELIG };
     }
     
-    public static final String GRAPHFORMAT_GML = "gml";
-    public static final String GRAPHFORMAT_KAVOSH = "kavosh";
-    public static final String GRAPHFORMAT_EDGELIST = "edgelist";
-    public static final String GRAPHFORMAT_VPLG = "vplg";
-    public static final String GRAPHFORMAT_DOTLANGUAGE = "dotlanguage";
-    public static final String GRAPHFORMAT_TGF = "tgf";
+    public static final String GRAPHFORMAT_GML = GraphFormats.GRAPHFORMAT_GML;
+    public static final String GRAPHFORMAT_KAVOSH = GraphFormats.GRAPHFORMAT_KAVOSH;
+    public static final String GRAPHFORMAT_EDGELIST = GraphFormats.GRAPHFORMAT_EDGELIST;
+    public static final String GRAPHFORMAT_VPLG = GraphFormats.GRAPHFORMAT_VPLG;
+    public static final String GRAPHFORMAT_DOTLANGUAGE = GraphFormats.GRAPHFORMAT_DOTLANGUAGE;
+    public static final String GRAPHFORMAT_TGF = GraphFormats.GRAPHFORMAT_TGF;
     
     private String[] getGraphFormatsList() {
         return new String[] { GRAPHFORMAT_GML, GRAPHFORMAT_KAVOSH, GRAPHFORMAT_EDGELIST, GRAPHFORMAT_VPLG, GRAPHFORMAT_DOTLANGUAGE, GRAPHFORMAT_TGF };
@@ -41,7 +41,9 @@ public class ProteinChainResults {
     
     protected String chainName;
     protected HashMap<String, SSEGraph> proteinGraphs;
+    protected HashMap<String, File> proteinGraphImages;
     protected HashMap<String, File> proteinGraphFilesByFormat;
+    protected HashMap<String, ProteinFoldingGraphResults> foldingGraphResults;
     protected ProtMetaInfo chainMetaData;
 
     public ProtMetaInfo getChainMetaData() {
@@ -56,7 +58,17 @@ public class ProteinChainResults {
         this.chainName = chainName;
         proteinGraphs = new HashMap<String, SSEGraph>();
         proteinGraphFilesByFormat = new HashMap<String, File>();
+        proteinGraphImages = new HashMap<String, File>();
         chainMetaData = null;
+        foldingGraphResults = new HashMap<String, ProteinFoldingGraphResults>();
+    }
+    
+    public void addProteinFoldingGraphResults(String graphType, ProteinFoldingGraphResults res) {
+        this.foldingGraphResults.put(graphType, res);
+    }
+    
+    public ProteinFoldingGraphResults getProteinFoldingGraphResults(String graphType) {
+        return this.foldingGraphResults.get(graphType);
     }
     
     public void addProteinGraph(SSEGraph g, String graphType) {
@@ -73,6 +85,14 @@ public class ProteinChainResults {
     
     public File getProteinGraphOutputFile(String graphType, String format) {
         return this.proteinGraphFilesByFormat.get(getHashMapKeyForFile(graphType, format));
+    }
+    
+    public void addProteinGraphImage(String graphType, File outFile) {
+        proteinGraphImages.put(graphType, outFile);
+    }
+    
+    public File getProteinGraphImage(String graphType) {
+        return this.proteinGraphImages.get(graphType);
     }
     
     public SSEGraph getProteinGraph(String graphType) {
