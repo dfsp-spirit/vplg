@@ -21,6 +21,10 @@ public class ProteinFoldingGraphResults {
     public ProteinFoldingGraphResults() {
         foldingGraphs = new HashMap<Integer, FoldingGraph>();
     }
+    
+    public ProteinFoldingGraphResults(HashMap<Integer, FoldingGraph> foldingGraphs) {
+        this.foldingGraphs = foldingGraphs;
+    }
 
     public HashMap<Integer, FoldingGraph> getFoldingGraphs() {
         return foldingGraphs;

@@ -1017,6 +1017,8 @@ public class Main {
 
         System.out.println("Received data on " + cInfo.size() + " residue contacts that have been confirmed on atom level.");
         
+        ProteinResults.getInstance().setPdbid(pdbid);
+        
         
         // **************************************    output of the results    ******************************************
         
@@ -1680,10 +1682,18 @@ public class Main {
      * setting on the command line / configuration file.
      * @param pg the protein graphs
      * @param outputDir the file system path where to write the image files. Has to exist and be writable.
+     * @return the protein folding graph results, which gives access to the graphs and output files
      */
-    public static ArrayList<FoldingGraph> calculateFoldingGraphsForSSEGraph(ProtGraph pg, String outputDir) {
+    public static ProteinFoldingGraphResults calculateFoldingGraphsForSSEGraph(ProtGraph pg, String outputDir) {
         //System.out.println("Searching connected components in " + graphType + " graph of chain " + c.getPdbChainID() + ".");
         ArrayList<FoldingGraph> ccs = pg.getConnectedComponents();
+        
+        HashMap<Integer, FoldingGraph> ccsList = new HashMap<Integer, FoldingGraph>();
+        for (int i = 0; i < ccs.size(); i++) {
+            ccsList.put(i, ccs.get(i));            
+        }        
+        ProteinFoldingGraphResults fgRes = new ProteinFoldingGraphResults(ccsList);
+        
         FoldingGraph fg;           // A connected component of a protein graph is a folding graph
         String fgFile = null;
         String fs = System.getProperty("file.separator");
@@ -1805,7 +1815,7 @@ public class Main {
                 }
             }
         }    
-        return ccs;
+        return fgRes;
     }
     
 

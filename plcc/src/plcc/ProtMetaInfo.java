@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 
 /**
- * Holds meta information on a protein, e.g., the PDB ID, chain ID and various information parsed from the
+ * Holds meta information on a protein chain, e.g., the PDB ID, chain ID and various information parsed from the
  * header section of the PDB file.
  * @author ts
  */

@@ -42,11 +42,21 @@ public class ProteinChainResults {
     protected String chainName;
     protected HashMap<String, SSEGraph> proteinGraphs;
     protected HashMap<String, File> proteinGraphFilesByFormat;
+    protected ProtMetaInfo chainMetaData;
+
+    public ProtMetaInfo getChainMetaData() {
+        return chainMetaData;
+    }
+
+    public void setChainMetaData(ProtMetaInfo chainMetaData) {
+        this.chainMetaData = chainMetaData;
+    }
     
     public ProteinChainResults(String chainName) {
         this.chainName = chainName;
         proteinGraphs = new HashMap<String, SSEGraph>();
         proteinGraphFilesByFormat = new HashMap<String, File>();
+        chainMetaData = null;
     }
     
     public void addProteinGraph(SSEGraph g, String graphType) {
