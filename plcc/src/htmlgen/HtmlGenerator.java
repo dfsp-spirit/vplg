@@ -163,7 +163,8 @@ public class HtmlGenerator {
         String pdbid = pr.getPdbid();
         List<String> chains = pr.getAvailableChains();
         List<String> graphs;
-        ProteinChainResults pcr;
+        ProteinChainResults pcr, otherChainPcr;
+        pcr = pr.getProteinChainResults(chain);
 
         //-------------- header ------------
         sb.append(this.generateHeader("VPLGweb -- PDB " + pdbid + " -- chain " + chain, pathToBaseDir));
@@ -188,7 +189,11 @@ public class HtmlGenerator {
         sb.append("<div class=\"navigation_chain\">\n");
         sb.append(HtmlTools.heading("Navigation", 2));
         sb.append("<p>");
+        
+        // --- links to mother protein ---
         sb.append("Part of protein: ").append(HtmlTools.link(".." + fs + HtmlGenerator.getFileNameProtein(pdbid), pdbid)).append("<br/>\n");
+        
+        // --- links to other chains of the same protein ---
         sb.append("Other chains of this protein: ");
         if(chains.size() > 1) {
             sb.append("All ").append(chains.size() - 1).append(" chains of the protein:<br/>");
@@ -199,8 +204,8 @@ public class HtmlGenerator {
                     continue;
                 }
                 
-                pcr = pr.getProteinChainResults(otherChain);
-                if(pcr != null) {
+                otherChainPcr = pr.getProteinChainResults(otherChain);
+                if(otherChainPcr != null) {
                     sb.append(HtmlTools.listItem(HtmlTools.link("" + chain + fs + HtmlGenerator.getFileNameProteinAndChain(pdbid, chain), "chain " + otherChain)));
                 }
                 else {
@@ -212,6 +217,23 @@ public class HtmlGenerator {
         else {
             sb.append("The PDB file contains no other protein chains.<br/>\n");
         }
+        
+        // --- links to graphs ---
+        
+        if(pcr != null) {
+            graphs = pcr.getAvailableGraphs();
+            if(graphs.size() > 0) {
+                sb.append("All ").append(graphs.size()).append(" graphs of the protein:<br/>");
+                sb.append(HtmlTools.uListStart());
+                
+                // ---------------------- handle graph types ----------------------
+                for(String graphType : graphs) {
+                    sb.append(HtmlTools.listItem("" + HtmlTools.link("#" + graphType, graphType)));
+                }
+                sb.append(HtmlTools.uListEnd());
+            }
+        }
+        
         sb.append("</p>\n");
         sb.append("</div>");
 
@@ -220,7 +242,7 @@ public class HtmlGenerator {
         sb.append(HtmlTools.heading("Protein graphs", 2));
         sb.append("<p>");
         
-        pcr = pr.getProteinChainResults(chain);
+        
         SSEGraph g;
         SSE sse;
         if(pcr == null) {
@@ -228,13 +250,21 @@ public class HtmlGenerator {
         }
         else {
             graphs = pcr.getAvailableGraphs();
-            if(graphs.size() > 0) {
-                sb.append("All ").append(graphs.size()).append(" graphs of the protein:<br/>");
-                sb.append(HtmlTools.uListStart());
+            if(graphs.size() > 0) {                
+                
+                // ---------------------- handle graph types ----------------------
                 for(String graphType : graphs) {
+                    
+                    sb.append(HtmlTools.aname(graphType));
+                    sb.append(HtmlTools.heading("The " + graphType + " graph", 3));
+                    
+                    // ---------------------- SSE info table ----------------------
+                    sb.append(HtmlTools.heading("SSE information", 4));
+                    sb.append(HtmlTools.startParagraph());
                     g = pcr.getProteinGraph(graphType);
-                    if(g != null) {
-                        sb.append("This " + graphType + " graph consists of ").append(g.numVertices()).append(" SSEs.<br/>");
+                    if(g != null) {           
+                        
+                        sb.append("This ").append(graphType).append(" graph consists of ").append(g.numVertices()).append(" SSEs.<br/>");
                         
                         if(g.numVertices() > 0) {
                             sb.append(HtmlTools.uListStart());
@@ -243,13 +273,42 @@ public class HtmlGenerator {
                                 sb.append(HtmlTools.listItem(sse.getSseType()));
                             }
                             sb.append(HtmlTools.uListEnd());
-                        }
+                        }                                                
                     }
                     else {
-                        sb.append("No details are available for this graph.<br/>\n");
+                        sb.append("No SSE details are available for this graph.<br/>\n");
                     }
-                }
-                sb.append(HtmlTools.uListEnd());
+                    sb.append(HtmlTools.endParagraph());
+                    
+                    // ---------------------- graph image ----------------------
+                    sb.append(HtmlTools.heading("Graph image", 4));
+                    sb.append(HtmlTools.startParagraph());
+                    File graphImage = pcr.getProteinGraphImage(graphType);
+                    if(IO.fileExistsIsFileAndCanRead(graphImage)) {
+                        sb.append(HtmlTools.img(graphImage.getName(), "" + graphType + " graph of " + pdbid + " chain " + chain));  //TODO: we assume the image is in the same dir here, which is true atm but kinda ugly
+                    } else {
+                        sb.append("No image of this graph is available.<br/>");
+                    }
+                    sb.append(HtmlTools.endParagraph());
+                        
+                    // ---------------------- graph file download options ----------------------
+                    sb.append(HtmlTools.heading("Download graph", 4));
+                    sb.append(HtmlTools.startParagraph());
+                    List<String> formats = pcr.checkForOutputFormatsWithValidFiles(graphType);
+                    if(formats.size() > 0) {
+                        sb.append("This graph is available for download in the following formats:<br/>");
+                        sb.append(HtmlTools.uListStart());
+                        for(String f : formats) {
+                            sb.append(HtmlTools.listItem(HtmlTools.link(pcr.getProteinGraphOutputFile(graphType, f).getName(), f))); //TODO: we assume the graph file is in the same dir here, which is true atm but kinda ugly
+                        }                        
+                        sb.append(HtmlTools.uListEnd());
+                    }
+                    else {
+                        sb.append("No downloads are available for this graph.<br/>");
+                    }
+                    sb.append(HtmlTools.endParagraph());
+                    
+                }                
             }
             else {
                 sb.append("No graphs are available for this chain.<br/>\n");

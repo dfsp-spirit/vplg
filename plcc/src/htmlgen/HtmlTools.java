@@ -17,6 +17,10 @@ public class HtmlTools {
         return "<a href=\"" + targetUrl + "\">" + label + "</a>";
     }
     
+    public static String aname(String id) {
+        return "<a name=\"" + id + "\"></a>\n";
+    }
+    
     public static String tableStart(String[] headerStrings) {
         StringBuilder sb = new StringBuilder();
         sb.append("<table>\n<tr>\n");
@@ -111,6 +115,14 @@ public class HtmlTools {
     
     public static String endSpan() {
         return "</span>\n";
+    }
+    
+    public static String startParagraph() {
+        return "<p>\n";
+    }
+    
+    public static String endParagraph() {
+        return "</p>\n";
     }
     
     public static String hr() {

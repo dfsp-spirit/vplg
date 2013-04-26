@@ -130,6 +130,5 @@ public class ProteinChainResults {
         List<String> graphs = new ArrayList<String>();
         graphs.addAll(this.proteinGraphs.keySet());
         return graphs;
-    }
-    
+    }                    
 }
