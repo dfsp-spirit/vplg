@@ -244,7 +244,6 @@ public class HtmlGenerator {
         
         
         SSEGraph g;
-        SSE sse;
         if(pcr == null) {
             sb.append("No result files are available for this chain.<br/>\n");
         }
@@ -264,15 +263,17 @@ public class HtmlGenerator {
                     g = pcr.getProteinGraph(graphType);
                     if(g != null) {           
                         
-                        sb.append("This ").append(graphType).append(" graph consists of ").append(g.numVertices()).append(" SSEs.<br/>");
+                        sb.append("This ").append(graphType).append(" graph consists of ").append(g.numVertices()).append(" SSEs.<br/><br/>\n");
                         
                         if(g.numVertices() > 0) {
-                            sb.append(HtmlTools.uListStart());
+                            //sb.append(HtmlTools.uListStart());
+                            sb.append(HtmlTools.tableStart(g.getInfoFieldNames()));
                             for(int i = 0; i < g.numVertices(); i++) {
-                                sse = g.getSSEBySeqPosition(i);
-                                sb.append(HtmlTools.listItem(sse.getSseType()));
+                                sb.append(HtmlTools.tableRow(g.getInfoFieldsForSSE(i)));
+                            //    sb.append(HtmlTools.listItem(sse.getSseType()));
                             }
-                            sb.append(HtmlTools.uListEnd());
+                            //sb.append(HtmlTools.uListEnd());
+                            sb.append(HtmlTools.tableEnd());                                                        
                         }                                                
                     }
                     else {

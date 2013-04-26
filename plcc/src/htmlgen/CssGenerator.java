@@ -45,6 +45,8 @@ public class CssGenerator {
         sb.append("table.image { margin-left: 4em; }\n");
         sb.append("Span.CENTERTEXT{text-align: center;}\n");
         sb.append("div.CENTERTEXT{text-align: center;}\n");
+        sb.append("table, th, td {border: 1px solid black; font-size:10pt; font-family:monospace;}\n");
+        
         return sb.toString();
     }
     
