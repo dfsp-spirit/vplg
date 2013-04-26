@@ -3379,6 +3379,24 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         
     }
     
+    
+    public String[] getInfoFieldNames() {
+       return new String[] { "Position in chain" , "Position in graph", "SSE type", "DSSP start residue", "DSSP end residue", "PDB start residue ID", "PDB end residue", "AA sequence" };
+    }
+    
+    public String[] getInfoFieldsForSSE(int index) {
+        SSE sse = this.sseList.get(index);
+        String[] infoFields = new String[this.getInfoFieldNames().length];
+        infoFields[0] = "" + sse.getSSESeqChainNum();
+        infoFields[1] = "" + index;
+        infoFields[2] = "" + sse.getSseType();
+        infoFields[3] = "" + sse.getStartDsspNum();
+        infoFields[4] = "" + sse.getEndDsspNum();
+        infoFields[5] = "" + sse.getStartPdbResID();
+        infoFields[6] = "" + sse.getEndPdbResID();
+        infoFields[6] = "" + sse.getAASequence();
+        return infoFields;
+    }
 
     
         
