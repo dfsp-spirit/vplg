@@ -9,6 +9,7 @@ package plcc;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Stores all results produced for a PDB file. This is used to generate the HTML pages.
@@ -71,8 +72,10 @@ public class ProteinResults {
         return this.chainResults.get(chainName);        
     }
     
-    public String[] getAvailableChains() {
-        return (String[])this.chainResults.keySet().toArray();
+    public List<String> getAvailableChains() {        
+        List<String> chains = new ArrayList<String>();
+        chains.addAll(this.chainResults.keySet());
+        return chains;
     }
     
 }

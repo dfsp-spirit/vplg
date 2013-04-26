@@ -18,6 +18,8 @@ import java.util.Locale;
 //import org.jgrapht.alg.ConnectivityInspector;
 //import com.google.gson.*;
 import datastructures.UndirectedGraph;
+import htmlgen.CssGenerator;
+import htmlgen.HtmlGenerator;
 import java.util.*;
 
 import java.awt.BasicStroke;
@@ -1158,12 +1160,29 @@ public class Main {
             System.out.println("  Not calculating SSEs and not drawing graphs as requested.");
         }        
         
+        // ******************************************** HTML output ******************************************************* //
         
+        if(Settings.getBoolean("plcc_B_output_textfiles_dir_tree_html")) {
+            File outputBaseDir = new File(outputDir);   // the path where the subdir tree will be created (this is contain 'ic/8icd/A'-like directories in the end)
+            File outputDirProtein = IO.generatePDBstyleSubdirTreeName(new File(outputDir), pdbid);  // looks like '$OUTPUTBASEDIR/ic/8icd/'
+            if( ! IO.dirExistsIsDirectoryAndCanWrite(outputDirProtein)) {
+                IO.createDirIfItDoesntExist(outputDirProtein);
+            }
+            
+            HtmlGenerator htmlGen = new HtmlGenerator(outputDirProtein);
+            CssGenerator cssGen = new CssGenerator();
+            String cssFilePath = outputBaseDir.getAbsolutePath() + fs + "vplgweb.css";
+            cssGen.writeDefaultCssFileTo(new File(cssFilePath));
+            htmlGen.setRelativeCssFilePaths(new String[] { ".." + fs + "vplgweb.css" });        // no, this ain't beautiful
+            
+            htmlGen.generateAllWebpagesForResult(ProteinResults.getInstance());
+            
+        }
 
         //drawTGFGraph("graph.tgf", "graph.tgf.png");       //DEBUG
         //dbTesting();        //DEBUG
 
-        // ****************************************************    all done    **********************************************************
+        // ****************************************************    all done    ********************************************************** //
         
         if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
             print_debug_malfunction_warning();            
@@ -1541,7 +1560,7 @@ public class Main {
                 // Create the file in a subdir tree based on the protein meta data if requested
                 if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
                    
-                    File targetDir = IO.generatePDBstyleSubdirTreeName(new File(outputDir), pdbid, c.getPdbChainID());
+                    File targetDir = IO.generatePDBstyleSubdirTreeNameWithChain(new File(outputDir), pdbid, c.getPdbChainID());
                     if(targetDir != null) {
                         ArrayList<String> errors = IO.createDirIfItDoesntExist(targetDir);
                         if( ! errors.isEmpty()) {

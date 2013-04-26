@@ -25,7 +25,7 @@ public class HtmlGenerator {
     private String[] relativeCssFilePaths;
     private File baseDir;
     
-    public HtmlGenerator(File basDir) {
+    public HtmlGenerator(File baseDir) {
         this.baseDir = baseDir;
     }
 
@@ -88,7 +88,7 @@ public class HtmlGenerator {
         StringBuilder sb = new StringBuilder();
         
         String pdbid = pr.getPdbid();
-        String[] chains = pr.getAvailableChains();
+        List<String> chains = pr.getAvailableChains();
         ProteinChainResults pcr;
 
         //-------------- header ------------
@@ -125,8 +125,8 @@ public class HtmlGenerator {
         sb.append(HtmlTools.heading("Chain info", 2));
         sb.append("<p>");
         
-        if(chains.length > 0) {
-            sb.append("All ").append(chains.length).append(" chains of the protein:<br/>");
+        if(chains.size() > 0) {
+            sb.append("All ").append(chains.size()).append(" chains of the protein:<br/>");
             sb.append(HtmlTools.uListStart());
             for(String chain : chains) {
                 pcr = pr.getProteinChainResults(chain);
