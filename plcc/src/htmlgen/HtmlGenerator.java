@@ -17,6 +17,7 @@ import org.apache.logging.log4j.Logger;
 import plcc.IO;
 import plcc.ProteinChainResults;
 import plcc.ProteinResults;
+import plcc.SSE;
 import plcc.SSEGraph;
 
 public class HtmlGenerator {
@@ -221,6 +222,7 @@ public class HtmlGenerator {
         
         pcr = pr.getProteinChainResults(chain);
         SSEGraph g;
+        SSE sse;
         if(pcr == null) {
             sb.append("No result files are available for this chain.<br/>\n");
         }
@@ -232,7 +234,16 @@ public class HtmlGenerator {
                 for(String graphType : graphs) {
                     g = pcr.getProteinGraph(graphType);
                     if(g != null) {
-
+                        sb.append("This " + graphType + " graph consists of ").append(g.numVertices()).append(" SSEs.<br/>");
+                        
+                        if(g.numVertices() > 0) {
+                            sb.append(HtmlTools.uListStart());
+                            for(int i = 0; i < g.numVertices(); i++) {
+                                sse = g.getSSEBySeqPosition(i);
+                                sb.append(HtmlTools.listItem(sse.getSseType()));
+                            }
+                            sb.append(HtmlTools.uListEnd());
+                        }
                     }
                     else {
                         sb.append("No details are available for this graph.<br/>\n");
