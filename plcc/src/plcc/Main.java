@@ -1148,6 +1148,7 @@ public class Main {
         if(Settings.getBoolean("plcc_B_calc_draw_graphs")) {
             System.out.println("  Calculating SSE graphs.");
             calculateSSEGraphsForChains(handleChains, residues, cInfo, pdbid, outputDir);
+            calculateComplexGraph(handleChains, residues, cInfo, pdbid, outputDir);
         }
         else {
             System.out.println("  Not calculating SSEs and not drawing graphs as requested.");
@@ -4292,5 +4293,317 @@ public class Main {
         System.out.println("###################################################################################");
     }
     
+    
+    
+    
+    
+    
+    /**
+     * Calculates complex graph types which are configured in the config file for all given chains.
+     * @param allChains a list of chains, each chain will be handled separately
+     * @param resList a list of residues
+     * @param resContacts a list of residue contacts
+     * @param pdbid the PDBID of the protein, required to name files properly etc.
+     * @param outputDir where to write the output files. the filenames are deduced from graph type and pdbid.
+     */
+    public static void calculateComplexGraph(ArrayList<Chain> allChains, ArrayList<Residue> resList, ArrayList<ResContactInfo> resContacts, String pdbid, String outputDir) {
 
+        System.out.println("Calculating complex graph.");
+        Chain c;
+        ArrayList<SSE> chainDsspSSEs = new ArrayList<SSE>();
+        ArrayList<SSE> chainPtglSSEs = new ArrayList<SSE>();
+        ArrayList<SSE> allChainSSEs = new ArrayList<SSE>();
+        String fs = System.getProperty("file.separator");
+
+        System.out.println("Calculating SSEs for all chains of protein " + pdbid + "...");
+
+        HashMap<String, String> md = FileParser.getPDBMetaData();
+        Double res = -1.0;
+        try {
+            res = Double.valueOf(md.get("resolution"));
+        } catch (Exception e) {
+            res = -1.0;
+            System.err.println("WARNING: Could not determine resolution of PDB file for protein '" + pdbid + "', assuming NMR with resolution '" + res + "'.");
+            
+        }
+
+        //pdb_id, title, header, keywords, experiment, resolution
+        if(Settings.getBoolean("plcc_B_useDB")) {
+            // Try to delete the protein from the DB in case it is already in there. This won't hurt if it is not.
+            DBManager.deletePdbidFromDB(pdbid);
+            try {
+                DBManager.writeProteinToDB(pdbid, md.get("title"), md.get("header"), md.get("keywords"), md.get("experiment"), res);
+                System.out.println("  Info on protein '" + pdbid + "' written to DB.");
+            }catch (Exception e) {
+                System.err.println("WARNING: Could not write info on protein '" + pdbid + "' to DB.");
+            }
+        }
+
+        
+        // create vertices for all chains
+        ComplexGraph CompGraph = new ComplexGraph();
+        for(Integer i = 0; i < allChains.size(); i++) {
+            ComplexGraph.Vertice v1 = CompGraph.createVertice();
+            CompGraph.proteinNodeMap.put(v1, allChains.get(i).getPdbChainID());
+            System.out.println(allChains.get(i).getPdbChainID());
+        }
+        
+        // create edges for all contacts
+        for(Integer i = 0; i < resContacts.size(); i++) {
+            System.out.println(resContacts.get(i));
+            /*
+            c = allChains.get(i);
+            System.out.println("  +++++ Handling chain '" + c.getPdbChainID() + "'. +++++");
+
+            ProtMetaInfo pmi = FileParser.getMetaInfo(pdbid, c.getPdbChainID());
+            //pmi.print();
+            md.put("pdb_mol_name", pmi.getMolName());
+            md.put("pdb_org_sci", pmi.getOrgScientific());
+            md.put("pdb_org_common", pmi.getOrgCommon());
+
+            if(Settings.getBoolean("plcc_B_useDB")) {
+                try {
+                    if(DBManager.writeChainToDB(c.getPdbChainID(), pdbid, pmi.getMolName(), pmi.getOrgScientific(), pmi.getOrgCommon())) {
+                        System.out.println("    Info on chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
+                    }
+                    else {
+                        System.err.println("WARNING: Could not write info on chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' to DB.");
+                    }
+                }
+                catch(Exception e) {
+                    System.err.println("WARNING: DB: Could not reset DB connection.");
+                }
+            }
+
+            // determine SSEs for this chain
+            System.out.println("    Creating all SSEs for chain '" + c.getPdbChainID() + "' consisting of " + c.getResidues().size() + " residues.");
+            chainDsspSSEs = createAllDsspSSEsFromResidueList(c.getResidues());
+            
+            if(Settings.getInteger("plcc_I_debug_level") > 0) {
+                printSSEList(chainDsspSSEs, "DSSP");
+            }
+            
+            if(Settings.getBoolean("plcc_B_ptgl_text_output")) {
+                String sseMappingsFile = Settings.get("plcc_S_output_dir") + fs + pdbid.toLowerCase()  + "_" + c.getPdbChainID() + ".ssemap";
+                writeSSEMappings(sseMappingsFile, c, pdbid);
+            }
+            
+            chainPtglSSEs = createAllPtglSSEsFromDsspSSEList(chainDsspSSEs);
+            
+            if(Settings.getInteger("plcc_I_debug_level") > 0) {
+                printSSEList(chainPtglSSEs, "PTGL");
+            }
+            
+            //I DELETED THIS, IT'S JUST HERE FOR ME TO UNDERSTAND
+            //chainLigSSEs = createAllLigandSSEsFromResidueList(c.getResidues(), chainDsspSSEs);
+            //allChainSSEs = mergeSSEs(chainPtglSSEs, chainLigSSEs);
+            //System.out.println("    Added " + chainLigSSEs.size() + " ligand SSEs to the SSE list, now at " + allChainSSEs.size() + " SSEs.");
+
+            System.out.print("    SSEs: ");
+            for(Integer j = 0; j < allChainSSEs.size(); j++) {
+                System.out.print(allChainSSEs.get(j).getSseType());
+            }
+            System.out.print("\n");
+
+            // SSEs have been calculated, now assign the PTGL labels and sequential numbers on the chain
+            for(Integer j = 0; j < allChainSSEs.size(); j++) {
+                allChainSSEs.get(j).setSeqSseChainNum(j + 1);   // This is the correct value, determined from the list of all valid SSEs of this chain
+                allChainSSEs.get(j).setSseIDPtgl(getPtglSseIDForNum(j));
+
+                if(Settings.getBoolean("plcc_B_useDB")) {
+                    try {
+                       DBManager.writeSSEToDB(pdbid, c.getPdbChainID(), allChainSSEs.get(j).getStartDsspNum(), allChainSSEs.get(j).getEndDsspNum(), allChainSSEs.get(j).getStartPdbResID(), allChainSSEs.get(j).getEndPdbResID(), allChainSSEs.get(j).getAASequence(), allChainSSEs.get(j).getSSETypeInt(), allChainSSEs.get(j).getLigandName3()); 
+                       //System.out.println("  Info on SSE #" + (j + 1) + " of chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
+                    }
+                    catch(Exception e) {
+                        System.err.println("WARNING: Could not write info on SSE # " + j + " of chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' to DB.");
+                    }
+                }
+            }
+
+
+            //printSSEList(chainDsspSSEs, "DSSP SSEs of chain '" + c.getPdbChainID() + "'");
+            //printSSEList(chainPtglSSEs, "PTGL SSEs of chain '" + c.getPdbChainID() + "'");
+            //printSSEList(chainLigSSEs, "Ligand SSEs of chain '" + c.getPdbChainID() + "'");
+            //printSSEList(allChainSSEs, "All SSEs of chain '" + c.getPdbChainID() + "'");
+
+
+            // ************* Calculate the different graph types *************** //
+            //List<String> graphTypes = Arrays.asList("albe", "albelig", "beta", "betalig", "alpha", "alphalig");       // old hardcoded stuff
+            //List<String> graphTypes = Arrays.asList("albelig");                                                       // old hardcoded stuff
+            
+            // read the list of requested graph types from the settings
+            List<String> graphTypes = new ArrayList<String>();
+
+            if(Settings.getBoolean("plcc_B_graphtype_albe")) { graphTypes.add("albe"); }
+            if(Settings.getBoolean("plcc_B_graphtype_albelig")) { graphTypes.add("albelig"); }
+            if(Settings.getBoolean("plcc_B_graphtype_alpha")) { graphTypes.add("alpha"); }
+            if(Settings.getBoolean("plcc_B_graphtype_alphalig")) { graphTypes.add("alphalig"); }
+            if(Settings.getBoolean("plcc_B_graphtype_beta")) { graphTypes.add("beta"); }
+            if(Settings.getBoolean("plcc_B_graphtype_betalig")) { graphTypes.add("betalig"); }
+            
+            
+            String fileNameWithExtension = null;
+            String fileNameWithoutExtension = null;
+            String filePathImg = null;
+            String filePathGraphs = null;
+            String filePathHTML = null;
+            String imgFile = null;
+            String plccGraphFile = null;        
+
+
+            for(String gt : graphTypes) {
+
+                // create the protein graph for this graph type
+
+                ProtGraph pg = calcGraphType(gt, allChainSSEs, c, resContacts, pdbid);
+                pg.setInfo(pdbid, c.getPdbChainID(), gt);
+                pg.addMetadata(md);
+                
+                
+                if(Settings.getBoolean("plcc_B_debug_compareSSEContacts")) {
+                    if(gt.equals("albe")) {
+                        System.out.println("Comparing calculated SSE contacts with those in the file '" + Settings.get("plcc_S_debug_compareSSEContactsFile") + "'...");
+                        FileParser.compareSSEContactsWithGeoDatFile(Settings.get("plcc_S_debug_compareSSEContactsFile"), pg);
+                    }        
+                    else {
+                        System.out.println("INFO: SSE contact comparison request ignored since this is not an albe graph.");
+                    }
+                }
+                
+                Integer isoLig = pg.numIsolatedLigands();
+                String coilsUsed = "";
+                if(Settings.getBoolean("plcc_B_include_coils")) {
+                    coilsUsed = " including coils";
+                }
+                if(isoLig > 0) {
+                    System.out.println("      The " + gt + " graph of " + pdbid + " chain " + c.getPdbChainID() + coilsUsed + " contains " + isoLig + " isolated ligands.");
+                }
+                
+                // DEBUG: calculate distance matrix of the graph
+                //pg.calculateDistancesWithinGraph();
+                //pg.printDistMatrix();
+
+                // draw the protein graph image
+
+                filePathImg = outputDir;
+                filePathGraphs = outputDir;
+                filePathHTML = outputDir;
+                String coils = "";
+                if(Settings.getBoolean("plcc_B_include_coils")) {
+                    //System.out.println("  Considering coils, this may fragment SSEs.");
+                    coils = "_coils";
+                }
+                fileNameWithoutExtension = pdbid + "_" + c.getPdbChainID() + "_" + gt + coils + "_PG";
+                fileNameWithExtension = fileNameWithoutExtension + Settings.get("plcc_S_img_output_fileext");
+                
+                //pg.toFile(file + ".ptg");
+                //pg.print();                
+                // Create the file in a subdir tree based on the protein meta data if requested
+                if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
+                   
+                    File targetDir = IO.generatePDBstyleSubdirTreeName(new File(outputDir), pdbid, c.getPdbChainID());
+                    if(targetDir != null) {
+                        ArrayList<String> errors = IO.createDirIfItDoesntExist(targetDir);
+                        if( ! errors.isEmpty()) {
+                            for(String err : errors) {
+                                System.err.println("ERROR: " + err);
+                            }
+                        } else {
+                            filePathImg = targetDir.getAbsolutePath();
+                            filePathGraphs = targetDir.getAbsolutePath();
+                            filePathHTML = targetDir.getAbsolutePath();
+                        }                    
+                    } else {
+                        System.err.println("ERROR: Could not determine PDB-style subdir path name.");
+                    }
+                }
+                
+                
+                String graphFormatsWritten = "";
+                Integer numFormatsWritten = 0;
+                if(Settings.getBoolean("plcc_B_output_GML")) {
+                    String gmlfFile = filePathGraphs + fs + fileNameWithoutExtension + ".gml";
+                    if(IO.stringToTextFile(gmlfFile, pg.toGraphModellingLanguageFormat())) {
+                        graphFormatsWritten += "gml "; numFormatsWritten++;
+                    }
+                }
+                if(Settings.getBoolean("plcc_B_output_TGF")) {
+                    String tgfFile = filePathGraphs + fs + fileNameWithoutExtension + ".tgf";
+                    if(IO.stringToTextFile(tgfFile, pg.toTrivialGraphFormat())) {
+                        graphFormatsWritten += "tgf "; numFormatsWritten++;
+                    }
+                }
+                if(Settings.getBoolean("plcc_B_output_DOT")) {
+                    String dotLangFile = filePathGraphs + fs + fileNameWithoutExtension + ".gv";
+                    if(IO.stringToTextFile(dotLangFile, pg.toDOTLanguageFormat())) {
+                        graphFormatsWritten += "gv "; numFormatsWritten++;
+                    }
+                }
+                if(Settings.getBoolean("plcc_B_output_kavosh")) {
+                    String kavoshFile = filePathGraphs + fs + fileNameWithoutExtension + ".kavosh";
+                    if(IO.stringToTextFile(kavoshFile, pg.toKavoshFormat())) {
+                        graphFormatsWritten += "kavosh "; numFormatsWritten++;
+                    }
+                }
+                if(Settings.getBoolean("plcc_B_output_eld")) {
+                    String elFile = filePathGraphs + fs + fileNameWithoutExtension + ".el_edges";
+                    String nodeTypeListFile = filePathGraphs + fs + fileNameWithoutExtension + ".el_ntl";
+                    if(IO.stringToTextFile(elFile, pg.toEdgeList()) && IO.stringToTextFile(nodeTypeListFile, pg.getNodeTypeList())) {
+                        graphFormatsWritten += "el "; numFormatsWritten++;
+                    }
+                }
+                // write the SSE info text file for the image (plcc graph format file)
+                if(Settings.getBoolean("plcc_B_output_plcc")) {
+                    plccGraphFile = filePathGraphs + fs + fileNameWithoutExtension + ".plg";
+                    if(IO.stringToTextFile(plccGraphFile, pg.toVPLGGraphFormat())) {
+                        graphFormatsWritten += "plg "; numFormatsWritten++;
+                    }
+                }
+                
+
+                
+                
+                
+                if(numFormatsWritten > 0) {
+                    System.out.println("      Exported protein ligand graph in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + new File(filePathGraphs).getAbsolutePath() + fs + "'.");
+                }
+                
+                
+                
+                imgFile = filePathImg + fs + fileNameWithExtension;
+                
+                // test spatial ordering, not used for anything atm
+                // TODO: remove this, it's only a test and takes time
+
+
+                if(Settings.getBoolean("plcc_B_draw_graphs")) {
+                    if(pg.drawProteinGraph(imgFile, false)) {
+                        System.out.println("      Image of graph written to file '" + imgFile + "'.");
+                    }                   
+                }
+                else {
+                    System.out.println("      Image and graph output disabled, not drawing and writing protein graph files.");
+                }
+                
+                // But we may need to write the graph to the database
+                if(Settings.getBoolean("plcc_B_useDB")) {
+                    try { 
+                        DBManager.writeGraphToDB(pdbid, c.getPdbChainID(), ProtGraphs.getGraphTypeCode(gt), pg.toVPLGGraphFormat(), pg.getSSEStringSequential()); 
+                        System.out.println("      Inserted '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + c.getPdbChainID() + "' into DB.");
+                    }
+                    catch(SQLException e) { 
+                        System.err.println("ERROR: Failed to insert '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + c.getPdbChainID() + "' into DB."); 
+                    }
+                }
+                
+                if(Settings.getInteger("plcc_I_debug_level") > 0) {
+                    System.out.println("      Graph plus string is '" + pg.getGraphPlusString() + "'.");
+                }
+
+            }
+            System.out.println("  +++++ All " + graphTypes.size() + " protein graphs of chain " + c.getPdbChainID() + " handled. +++++");*/
+        }
+        System.out.println("All " + allChains.size() + " chains done.");
+    }
 }
