@@ -1173,7 +1173,7 @@ public class Main {
             CssGenerator cssGen = new CssGenerator();
             String cssFilePath = outputBaseDir.getAbsolutePath() + fs + "vplgweb.css";
             cssGen.writeDefaultCssFileTo(new File(cssFilePath));
-            htmlGen.setRelativeCssFilePaths(new String[] { ".." + fs + "vplgweb.css" });        // no, this ain't beautiful
+            htmlGen.setRelativeCssFilePathsFromBasedir(new String[] { fs + "vplgweb.css" });        // no, this ain't beautiful
             
             htmlGen.generateAllWebpagesForResult(ProteinResults.getInstance());
             
