@@ -25,12 +25,16 @@ public class CssGenerator {
         sb.append("body {background-color: white; margin-top: 50px;margin-bottom: 50px;margin-right: 100px;margin-left: 100px;}\n");
         sb.append("p { font-size:10pt; font-family:Arial,sans-serif;color:black }\n");
         sb.append("p.text { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
+        sb.append(".protein_graphs p { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
+        sb.append(".chains p { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
+        sb.append(".chain p { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
         sb.append("p.code { font-size:10pt; font-family:monospace; color:blue }\n");
         sb.append("p.warn { font-size:10pt; font-family:monospace; color:red }\n");
         sb.append("p.top { font-size:10pt; font-family:Arial,sans-serif; color:black; text-decoration:underline }\n");
         sb.append("p.big { font-size:14pt; font-family:Arial,sans-serif; color:black }\n");
         sb.append("p.tiny { font-size:7pt; font-family:Arial,sans-serif; color:black }\n");
         sb.append("div.footer { font-size:7pt; font-family:Arial,sans-serif; color:black }\n");
+        sb.append(".footer p { font-size:7pt; font-family:Arial,sans-serif; color:black }\n");
         sb.append("a:link {font-size:10pt;font-family:Arial,sans-serif;color:#800000;text-decoration:none}\n");
         sb.append("p tinylink {font-size:7pt; color:#800000; text-decoration:none }\n");
         sb.append("a:visited { font-size:10pt; color:#800000; text-decoration:none }\n");

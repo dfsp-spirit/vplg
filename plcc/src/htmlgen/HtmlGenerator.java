@@ -66,7 +66,7 @@ public class HtmlGenerator {
         String fs = System.getProperty("file.separator");
         String proteinWebsiteHtmlFile = this.baseDir + fs + HtmlGenerator.getFileNameProtein(pdbid);
         
-        if(IO.stringToTextFile(proteinWebsiteHtmlFile, this.generateProteinWebpage(pr, ".."))) {
+        if(IO.stringToTextFile(proteinWebsiteHtmlFile, this.generateProteinWebpage(pr, ".." + fs + ".."))) {
             System.out.println("    Wrote protein website for PDB '" + pdbid + "' to " + new File(proteinWebsiteHtmlFile).getAbsolutePath() + ".");
         } else {
             System.err.println("ERROR: Could not write protein website for PDB '" + pdbid + "' to " + new File(proteinWebsiteHtmlFile).getAbsolutePath() + ".");
@@ -81,7 +81,7 @@ public class HtmlGenerator {
             ArrayList<String> errors = IO.createDirIfItDoesntExist(targetDirChain);
             if(errors.isEmpty()) {
                         
-                if(IO.stringToTextFile(chainWebsiteHtmlFile, this.generateChainWebpage(pr, chain, ".." + fs + ".."))) {
+                if(IO.stringToTextFile(chainWebsiteHtmlFile, this.generateChainWebpage(pr, chain, ".." + fs + ".." + fs + ".."))) {
                     System.out.println("    Wrote protein website for PDB '" + pdbid + "' to " + new File(chainWebsiteHtmlFile).getAbsolutePath() + ".");
                 } else {
                     System.err.println("ERROR: Could not write protein website for PDB '" + pdbid + "' to " + new File(chainWebsiteHtmlFile).getAbsolutePath() + ".");
@@ -132,7 +132,7 @@ public class HtmlGenerator {
             for(String chain : chains) {
                 pcr = pr.getProteinChainResults(chain);
                 if(pcr != null) {
-                    sb.append(HtmlTools.listItem(HtmlTools.link("" + chain + fs + HtmlGenerator.getFileNameProteinAndChain(pdbid, chain), "chain " + chain)));
+                    sb.append(HtmlTools.listItem(HtmlTools.link("" + chain + fs + HtmlGenerator.getFileNameProteinAndChain(pdbid, chain), "Chain " + chain)));
                 }
                 else {
                     sb.append(HtmlTools.listItem("chain " + chain));
@@ -206,7 +206,7 @@ public class HtmlGenerator {
                 
                 otherChainPcr = pr.getProteinChainResults(otherChain);
                 if(otherChainPcr != null) {
-                    sb.append(HtmlTools.listItem(HtmlTools.link("" + chain + fs + HtmlGenerator.getFileNameProteinAndChain(pdbid, chain), "chain " + otherChain)));
+                    sb.append(HtmlTools.listItem(HtmlTools.link("" + chain + fs + HtmlGenerator.getFileNameProteinAndChain(pdbid, chain), "Chain " + otherChain)));
                 }
                 else {
                     sb.append(HtmlTools.listItem("chain " + otherChain));
@@ -228,7 +228,7 @@ public class HtmlGenerator {
                 
                 // ---------------------- handle graph types ----------------------
                 for(String graphType : graphs) {
-                    sb.append(HtmlTools.listItem("" + HtmlTools.link("#" + graphType, graphType)));
+                    sb.append(HtmlTools.listItem("" + HtmlTools.link("#" + graphType, "The " + graphType + " graph")));
                 }
                 sb.append(HtmlTools.uListEnd());
             }
