@@ -12,11 +12,15 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import plcc.IO;
 import plcc.ProteinChainResults;
 import plcc.ProteinResults;
 
 public class HtmlGenerator {
+    
+    static Logger logger = LogManager.getLogger(HtmlGenerator.class.getName());
     
     private String[] relativeCssFilePaths;
     private File baseDir;
@@ -48,8 +52,9 @@ public class HtmlGenerator {
     
     public void generateAllWebpagesForResult(ProteinResults pr) {
 
+        logger.entry();
         if(! IO.dirExistsIsDirectoryAndCanWrite(baseDir)) {
-            System.err.println("ERROR: Cannot create webpages under directory '" + baseDir + "', does not exist or cannot write to it.");
+            logger.error("ERROR: Cannot create webpages under directory '" + baseDir + "', does not exist or cannot write to it.");
             return;
         }
         
@@ -66,6 +71,15 @@ public class HtmlGenerator {
         }
         
         // ------------------- chain webpages -----------------------
+        
+        File targetDirChain;
+        for(String chain : pr.getAvailableChains()) {
+            targetDirChain = new File(this.baseDir + fs + chain);
+            ArrayList<String> res = IO.createDirIfItDoesntExist(targetDirChain);
+            if(! res.isEmpty()) {
+                System.err.println("ERROR: Could not create directory for chain '" + chain + "' at '" +  targetDirChain.getAbsolutePath() + "'.");
+            }
+        }
     }
 	
 	

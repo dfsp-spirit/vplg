@@ -34,11 +34,12 @@ import java.io.*;
 import java.sql.SQLException;
 import javax.imageio.ImageIO;
 import org.apache.batik.dom.GenericDOMImplementation;
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.DOMImplementation;
 import similarity.CompareOneToDB;
 import similarity.Similarity;
-
+import org.apache.logging.log4j.Logger;
 
 /**
  * This is the Main class of plcc.
@@ -61,8 +62,10 @@ import similarity.Similarity;
 public class Main {
 
 
+    
     // declare class vars
-
+    Logger logger = LogManager.getLogger(Main.class.getName());
+    
     // the array used to store statistics on contacts between the different AA types
     public static final Integer NUM_AAs = 20 + 1 + 1;    // These are 20 real AAs, 1 extra for ligands and 1 for the total number count at index 0 (1st AA starts at index 1).
     public static final Integer MAX_ATOMS_PER_AA = 15;   // As everybody knows, TRP is the AA with most atoms and
