@@ -142,7 +142,7 @@ public class HtmlTools {
     }
     
     public static String comment(String c) {
-        return "<!-- " + c + "-->";
+        return "<!-- " + c + " -->";
     }
     
     public static String italic(String c) {

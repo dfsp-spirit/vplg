@@ -15,6 +15,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import plcc.IO;
+import plcc.ProtMetaInfo;
 import plcc.ProteinChainResults;
 import plcc.ProteinResults;
 import plcc.SSE;
@@ -129,6 +130,7 @@ public class HtmlGenerator {
         sb.append(HtmlTools.startBody());
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_MAIN));
         sb.append(this.generateLogo(pathToBaseDir));
+        sb.append(HtmlGenerator.generateTopPageTitle(pdbid.toUpperCase()));
 
         // -------------------- protein info -------------------
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_PROTEIN));
@@ -152,8 +154,13 @@ public class HtmlGenerator {
             for(String chain : chains) {
                 pcr = pr.getProteinChainResults(chain);
                 if(pcr != null) {
-                    sb.append(HtmlTools.listItem(HtmlTools.link("" + chain + fs + HtmlGenerator.getFileNameProteinAndChain(pdbid, chain), "Chain " + chain)));
-                    //pcr.getChainMetaData().
+                    ProtMetaInfo pmi = pcr.getChainMetaData();
+                    if(pmi != null) {
+                        sb.append(HtmlTools.listItem(HtmlTools.link("" + chain + fs + HtmlGenerator.getFileNameProteinAndChain(pdbid, chain), "Chain " + chain) + " (Molecule " + pmi.getMolName() + " from organism " + pmi.getOrgScientific() + ")"));
+                    } 
+                    else {
+                        sb.append(HtmlTools.listItem(HtmlTools.link("" + chain + fs + HtmlGenerator.getFileNameProteinAndChain(pdbid, chain), "Chain " + chain)));
+                    }                                        
                 }
                 else {
                     sb.append(HtmlTools.listItem("chain " + chain));
@@ -204,18 +211,26 @@ public class HtmlGenerator {
         sb.append(HtmlTools.startBody());
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_MAIN));
         sb.append(this.generateLogo(pathToBaseDir));
+        sb.append(HtmlGenerator.generateTopPageTitle(pdbid.toUpperCase() + " chain " + chain.toUpperCase()));
 
 
         // -------------------- chain info -------------------
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_CHAIN));
         sb.append(HtmlTools.heading("Protein chain info", 2));
         sb.append(HtmlTools.startParagraph());
-        sb.append("PDB chain: ").append(pdbid).append(" chain ").append(chain).append("<br/>\n");
+        sb.append("PDB chain: ").append(pdbid).append(" chain ").append(chain).append(HtmlTools.brAndNewline());
         sb.append("Link to structure at RCSB PDB website: ");
-        sb.append(HtmlTools.link("http://www.rcsb.org/pdb/explore/explore.do?structureId=" + pdbid, pdbid)).append("<br/>\n");
+        sb.append(HtmlTools.link("http://www.rcsb.org/pdb/explore/explore.do?structureId=" + pdbid, pdbid)).append(HtmlTools.brAndNewline());
         
         if(pcr != null) {
-            
+            ProtMetaInfo pmi = pcr.getChainMetaData();
+            if(pmi != null) {
+                sb.append("Molecule ID: ").append(pmi.getMolID()).append(HtmlTools.brAndNewline());
+                sb.append("Molecule name: ").append(pmi.getMolName()).append(HtmlTools.brAndNewline());
+                sb.append("Organims (common): ").append(pmi.getOrgCommon()).append(HtmlTools.brAndNewline());
+                sb.append("Organims (scientific): ").append(pmi.getOrgScientific()).append(HtmlTools.brAndNewline());
+                sb.append("Taxon ID: ").append(pmi.getOrgTaxid()).append(HtmlTools.brAndNewline());
+            }            
         }
         
         sb.append(HtmlTools.endParagraph());
@@ -228,12 +243,12 @@ public class HtmlGenerator {
         sb.append(HtmlTools.startParagraph());
         
         // --- links to mother protein ---
-        sb.append("Part of protein: ").append(HtmlTools.link(".." + fs + HtmlGenerator.getFileNameProtein(pdbid), pdbid)).append("<br/>\n");
+        sb.append("Part of protein: ").append(HtmlTools.link(".." + fs + HtmlGenerator.getFileNameProtein(pdbid), pdbid)).append(HtmlTools.brAndNewline());
         
         // --- links to other chains of the same protein ---
         sb.append("Other chains of this protein: ");
         if(chains.size() > 1) {
-            sb.append("All ").append(chains.size() - 1).append(" chains of the protein:<br/>");
+            sb.append("All ").append(chains.size() - 1).append(" chains of the protein:").append(HtmlTools.brAndNewline());
             sb.append(HtmlTools.uListStart());
             for(String otherChain : chains) {
                 
@@ -253,21 +268,31 @@ public class HtmlGenerator {
         }
         else {
             sb.append(HtmlTools.italic("The PDB file contains no other protein chains."));
-            sb.append("<br/>\n");
+            sb.append(HtmlTools.brAndNewline());
         }
+        sb.append(HtmlTools.endParagraph());
         sb.append(HtmlTools.endDiv());  // navigation chains
         
         // --- links to graphs ---
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_NAVIGATION_GRAPHS));
+        sb.append(HtmlTools.startParagraph());
         if(pcr != null) {
+            SSEGraph g;
             graphs = pcr.getAvailableGraphs();
             if(graphs.size() > 0) {
-                sb.append("All ").append(graphs.size()).append(" graphs of the protein:<br/>");
+                sb.append("All ").append(graphs.size()).append(" graphs of the protein:");
                 sb.append(HtmlTools.uListStart());
                 
                 // ---------------------- handle graph types ----------------------
                 for(String graphType : graphs) {
-                    sb.append(HtmlTools.listItem("" + HtmlTools.link("#" + graphType, "The " + graphType + " graph")));
+                    
+                    
+                    g = pcr.getProteinGraph(graphType);
+                    if(g != null) {
+                        sb.append(HtmlTools.listItem("" + HtmlTools.link("#" + graphType, "The " + graphType + " graph") + " (|V|=" + g.numVertices() + ", |E|=" + g.numSSEContacts() + ")"));
+                    } else {
+                        sb.append(HtmlTools.listItem("" + HtmlTools.link("#" + graphType, "The " + graphType + " graph")));
+                    }
                 }
                 sb.append(HtmlTools.uListEnd());
             }
@@ -285,7 +310,7 @@ public class HtmlGenerator {
         SSEGraph g;
         if(pcr == null) {
             sb.append(HtmlTools.italic("No result files are available for this chain."));
-            sb.append("<br/>\n");            
+            sb.append(HtmlTools.brAndNewline());            
         }
         else {
             graphs = pcr.getAvailableGraphs();
@@ -303,7 +328,9 @@ public class HtmlGenerator {
                     g = pcr.getProteinGraph(graphType);
                     if(g != null) {           
                         
-                        sb.append("This ").append(graphType).append(" graph consists of ").append(g.numVertices()).append(" SSEs.<br/><br/>\n");
+                        sb.append("This ").append(graphType).append(" graph consists of ").append(g.numVertices()).append(" SSEs and ").append(g.numSSEContacts()).append(" edges. Here is the SSE list:");
+                        sb.append(HtmlTools.br());
+                        sb.append(HtmlTools.brAndNewline());
                         
                         if(g.numVertices() > 0) {
                             //sb.append(HtmlTools.uListStart());
@@ -318,7 +345,7 @@ public class HtmlGenerator {
                     }
                     else {
                         sb.append(HtmlTools.italic("No SSE details are available for this graph."));
-                        sb.append("<br/>\n");
+                        sb.append(HtmlTools.brAndNewline());
                     }
                     sb.append(HtmlTools.endParagraph());
                     
@@ -330,7 +357,7 @@ public class HtmlGenerator {
                         sb.append(HtmlTools.img(graphImage.getName(), "" + graphType + " graph of " + pdbid + " chain " + chain));  //TODO: we assume the image is in the same dir here, which is true atm but kinda ugly
                     } else {
                         sb.append(HtmlTools.italic("No image of this graph is available."));
-                        sb.append("<br/>\n");
+                        sb.append(HtmlTools.brAndNewline());
                     }
                     sb.append(HtmlTools.endParagraph());
                         
@@ -348,7 +375,7 @@ public class HtmlGenerator {
                     }
                     else {
                         sb.append(HtmlTools.italic("No downloads are available for this graph."));
-                        sb.append("<br/>\n");
+                        sb.append(HtmlTools.brAndNewline());
                     }
                     sb.append(HtmlTools.endParagraph());
                     
@@ -356,7 +383,7 @@ public class HtmlGenerator {
             }
             else {
                 sb.append(HtmlTools.italic("No graphs are available for this chain."));
-                sb.append("<br/>\n");
+                sb.append(HtmlTools.brAndNewline());
             }
         }
         
@@ -412,6 +439,10 @@ public class HtmlGenerator {
     
     public static String getFileNameProteinAndChain(String pdbid, String chain) {
         return "" + pdbid + "_" + chain + ".html";
+    }
+    
+    public static String generateTopPageTitle(String t) {
+        return "<h1 align=\"center\">" + t + "</h1>\n";
     }
 
 

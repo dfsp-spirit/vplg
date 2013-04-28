@@ -26,6 +26,12 @@ public class CssGenerator {
         sb.append("p { font-size:10pt; font-family:Arial,sans-serif;color:black }\n");
         sb.append("p.text { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
         sb.append(".protein_graphs p { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
+        sb.append(".navigation_graphs p { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
+        sb.append("ul { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
+        sb.append("ol { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
+        sb.append("li { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
+        sb.append(".navigation_chains p { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
+        sb.append(".protein_graphs p { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
         sb.append(".chains p { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
         sb.append(".chain p { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
         sb.append("p.code { font-size:10pt; font-family:monospace; color:blue }\n");
