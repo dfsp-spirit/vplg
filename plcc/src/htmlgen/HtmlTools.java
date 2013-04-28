@@ -128,7 +128,22 @@ public class HtmlTools {
     public static String hr() {
         return "<hr/>\n";
     }
+    
+    public static String startBody() {
+        return "<body>\n";
+    }
      
+    public static String endBody() {
+        return "</body>\n";
+    }
+    
+    public static String endHtml() {
+        return "</html>\n";
+    }
+    
+    public static String comment(String c) {
+        return "<!-- " + c + "-->";
+    }
     
     
 }

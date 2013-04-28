@@ -42,6 +42,16 @@ public class HtmlGenerator {
     public String[] getRelativeCssFilePathsFromBasedir() {
         return relativeCssFilePathsFromBasedir;
     }
+    
+    public static final String DIV_MAIN = "main";
+    public static final String DIV_PROTEIN = "protein";
+    public static final String DIV_CHAIN = "chain";
+    public static final String DIV_CHAINS = "chains";
+    public static final String DIV_NAVIGATION_CHAINS = "navigation_chains";
+    public static final String DIV_NAVIGATION_GRAPHS = "navigation_graphs";
+    public static final String DIV_PROTEIN_GRAPHS = "protein_graphs";
+    public static final String DIV_FOLDING_GRAPHS = "folding_graphs";
+    
 
     /**
      * Sets a list of CSS files which should be linked in the headers of all produced HTML files. Ensure that
@@ -51,7 +61,11 @@ public class HtmlGenerator {
     public void setRelativeCssFilePathsFromBasedir(String[] relativeCssFilePaths) {
         this.relativeCssFilePathsFromBasedir = relativeCssFilePaths;
     }
-    
+ 
+    /**
+     * Generates all webpages for the given protein results.
+     * @param pr The protein result data structure.
+     */
     public void generateAllWebpagesForResult(ProteinResults pr) {
 
         logger.entry();
@@ -95,6 +109,12 @@ public class HtmlGenerator {
     }
 	
 	
+    /**
+     * Generates the overview website for the protein (PDB file), which links all chains and shows PDB meta info.
+     * @param pr the protein result
+     * @param pathToBaseDir the base dir which holds the CSS style sheet and other global files
+     * @return the website string as HMTL
+     */
     public String generateProteinWebpage(ProteinResults pr, String pathToBaseDir) {
 
         StringBuilder sb = new StringBuilder();
@@ -107,24 +127,25 @@ public class HtmlGenerator {
         //-------------- header ------------
         sb.append(this.generateHeader("VPLGweb -- PDB " + pdbid, pathToBaseDir));
         // ------------- body -- logo and title ---------------
-        sb.append("<body>\n");
+        sb.append(HtmlTools.startBody());
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_MAIN));
         sb.append(this.generateLogo(pathToBaseDir));
 
         // -------------------- protein info -------------------
-        sb.append("<div class=\"protein\">\n");
-        sb.append(HtmlTools.heading("Protein info", 2));
-        sb.append("<p>");
-        sb.append("PDB identifier: ").append(pdbid).append("<br/>\n");
-        sb.append("Link to structure at RCSB PDB website: ");
-        sb.append(HtmlTools.link("http://www.rcsb.org/pdb/explore/explore.do?structureId=" + pdbid, pdbid));
-        sb.append("</p>\n");
-        sb.append("</div>\n");
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_PROTEIN));
+            sb.append(HtmlTools.heading("Protein info", 2));
+            sb.append(HtmlTools.startParagraph());
+            sb.append("PDB identifier: ").append(pdbid).append("<br/>\n");
+            sb.append("Link to structure at RCSB PDB website: ");
+            sb.append(HtmlTools.link("http://www.rcsb.org/pdb/explore/explore.do?structureId=" + pdbid, pdbid));
+            sb.append(HtmlTools.endParagraph());
+        sb.append(HtmlTools.endDiv());  // protein info
 
 
         // -------------------- chain info -------------------
-        sb.append("<div class=\"chains\">\n");
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_CHAINS));
         sb.append(HtmlTools.heading("Chain info", 2));
-        sb.append("<p>");
+        sb.append(HtmlTools.startParagraph());
         
         if(chains.size() > 0) {
             sb.append("All ").append(chains.size()).append(" chains of the protein:<br/>");
@@ -144,17 +165,27 @@ public class HtmlGenerator {
             sb.append("This PDB file contains no protein chains.\n");
         }
         
-        sb.append("</p>\n");
-        sb.append("</div>\n");
+        sb.append(HtmlTools.endParagraph());
+        sb.append(HtmlTools.endDiv());  // chains
 
+        
         // ------------- body -- footer ---------------
         sb.append(this.generateFooter(pathToBaseDir));
-        sb.append("</body>\n</html>\n");                                    
+        
+        sb.append(HtmlTools.endDiv());  // main
+        sb.append(HtmlTools.endBody());
+        sb.append(HtmlTools.endHtml());
 
         return sb.toString();
     }
     
-    
+    /**
+     * Generates the chain website for a  protein chain, which links all graphs and shows chain meta info.
+     * @param pr the protein result
+     * @param chain the PDB chain name
+     * @param pathToBaseDir the base dir which holds the CSS style sheet and other global files
+     * @return the website string as HMTL
+     */
     public String generateChainWebpage(ProteinResults pr, String chain, String pathToBaseDir) {
 
         StringBuilder sb = new StringBuilder();
@@ -170,25 +201,26 @@ public class HtmlGenerator {
         sb.append(this.generateHeader("VPLGweb -- PDB " + pdbid + " -- chain " + chain, pathToBaseDir));
 
         // ------------- body -- logo and title ---------------
-        sb.append("<body>\n");
+        sb.append(HtmlTools.startBody());
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_MAIN));
         sb.append(this.generateLogo(pathToBaseDir));
 
 
         // -------------------- chain info -------------------
-        sb.append("<div class=\"chain\">\n");
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_CHAIN));
         sb.append(HtmlTools.heading("Protein chain info", 2));
-        sb.append("<p>");
+        sb.append(HtmlTools.startParagraph());
         sb.append("PDB chain: ").append(pdbid).append(" chain ").append(chain).append("<br/>\n");
         sb.append("Link to structure at RCSB PDB website: ");
         sb.append(HtmlTools.link("http://www.rcsb.org/pdb/explore/explore.do?structureId=" + pdbid, pdbid));
-        sb.append("</p>\n");
-        sb.append("</div>");
+        sb.append(HtmlTools.endParagraph());
+        sb.append(HtmlTools.endDiv());  // chain
         
         // -------------------- navigation -------------------
         
-        sb.append("<div class=\"navigation_chain\">\n");
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_NAVIGATION_CHAINS));
         sb.append(HtmlTools.heading("Navigation", 2));
-        sb.append("<p>");
+        sb.append(HtmlTools.startParagraph());
         
         // --- links to mother protein ---
         sb.append("Part of protein: ").append(HtmlTools.link(".." + fs + HtmlGenerator.getFileNameProtein(pdbid), pdbid)).append("<br/>\n");
@@ -217,9 +249,10 @@ public class HtmlGenerator {
         else {
             sb.append("The PDB file contains no other protein chains.<br/>\n");
         }
+        sb.append(HtmlTools.endDiv());  // navigation chains
         
         // --- links to graphs ---
-        
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_NAVIGATION_GRAPHS));
         if(pcr != null) {
             graphs = pcr.getAvailableGraphs();
             if(graphs.size() > 0) {
@@ -234,13 +267,13 @@ public class HtmlGenerator {
             }
         }
         
-        sb.append("</p>\n");
-        sb.append("</div>");
+        sb.append(HtmlTools.endParagraph());
+        sb.append(HtmlTools.endDiv());  // navigation graphs
 
         // -------------------- protein graphs -------------------
-        sb.append("<div class=\"protein_graphs\">\n");
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_PROTEIN_GRAPHS));
         sb.append(HtmlTools.heading("Protein graphs", 2));
-        sb.append("<p>");
+        sb.append(HtmlTools.endParagraph());
         
         
         SSEGraph g;
@@ -316,12 +349,14 @@ public class HtmlGenerator {
             }
         }
         
-        sb.append("</p>\n");
-        sb.append("</div>");
+        sb.append(HtmlTools.endParagraph());
+        sb.append(HtmlTools.endDiv());  // protein graphs
 
         // ------------- body -- footer ---------------
         sb.append(this.generateFooter(pathToBaseDir));
-        sb.append("</body>\n</html>\n");                                    
+        sb.append(HtmlTools.endDiv());  // main
+        sb.append(HtmlTools.endBody());
+        sb.append(HtmlTools.endHtml());                                    
 
         return sb.toString();
     }
