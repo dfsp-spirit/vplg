@@ -99,8 +99,7 @@ public class HtmlGenerator {
                     System.out.println("    Wrote protein website for PDB '" + pdbid + "' to " + new File(chainWebsiteHtmlFile).getAbsolutePath() + ".");
                 } else {
                     System.err.println("ERROR: Could not write protein website for PDB '" + pdbid + "' to " + new File(chainWebsiteHtmlFile).getAbsolutePath() + ".");
-                }
-                
+                }                
             }
             else {
                 System.err.println("ERROR: Could not create directory for chain '" + chain + "' at '" +  targetDirChain.getAbsolutePath() + "'.");
@@ -154,6 +153,7 @@ public class HtmlGenerator {
                 pcr = pr.getProteinChainResults(chain);
                 if(pcr != null) {
                     sb.append(HtmlTools.listItem(HtmlTools.link("" + chain + fs + HtmlGenerator.getFileNameProteinAndChain(pdbid, chain), "Chain " + chain)));
+                    //pcr.getChainMetaData().
                 }
                 else {
                     sb.append(HtmlTools.listItem("chain " + chain));
@@ -212,7 +212,12 @@ public class HtmlGenerator {
         sb.append(HtmlTools.startParagraph());
         sb.append("PDB chain: ").append(pdbid).append(" chain ").append(chain).append("<br/>\n");
         sb.append("Link to structure at RCSB PDB website: ");
-        sb.append(HtmlTools.link("http://www.rcsb.org/pdb/explore/explore.do?structureId=" + pdbid, pdbid));
+        sb.append(HtmlTools.link("http://www.rcsb.org/pdb/explore/explore.do?structureId=" + pdbid, pdbid)).append("<br/>\n");
+        
+        if(pcr != null) {
+            
+        }
+        
         sb.append(HtmlTools.endParagraph());
         sb.append(HtmlTools.endDiv());  // chain
         
@@ -238,7 +243,7 @@ public class HtmlGenerator {
                 
                 otherChainPcr = pr.getProteinChainResults(otherChain);
                 if(otherChainPcr != null) {
-                    sb.append(HtmlTools.listItem(HtmlTools.link("" + chain + fs + HtmlGenerator.getFileNameProteinAndChain(pdbid, chain), "Chain " + otherChain)));
+                    sb.append(HtmlTools.listItem(HtmlTools.link(".." + fs + otherChain + fs + HtmlGenerator.getFileNameProteinAndChain(pdbid, otherChain), "Chain " + otherChain)));
                 }
                 else {
                     sb.append(HtmlTools.listItem("chain " + otherChain));
@@ -247,7 +252,8 @@ public class HtmlGenerator {
             sb.append(HtmlTools.uListEnd());
         }
         else {
-            sb.append("The PDB file contains no other protein chains.<br/>\n");
+            sb.append(HtmlTools.italic("The PDB file contains no other protein chains."));
+            sb.append("<br/>\n");
         }
         sb.append(HtmlTools.endDiv());  // navigation chains
         
@@ -278,7 +284,8 @@ public class HtmlGenerator {
         
         SSEGraph g;
         if(pcr == null) {
-            sb.append("No result files are available for this chain.<br/>\n");
+            sb.append(HtmlTools.italic("No result files are available for this chain."));
+            sb.append("<br/>\n");            
         }
         else {
             graphs = pcr.getAvailableGraphs();
@@ -310,7 +317,8 @@ public class HtmlGenerator {
                         }                                                
                     }
                     else {
-                        sb.append("No SSE details are available for this graph.<br/>\n");
+                        sb.append(HtmlTools.italic("No SSE details are available for this graph."));
+                        sb.append("<br/>\n");
                     }
                     sb.append(HtmlTools.endParagraph());
                     
@@ -321,7 +329,8 @@ public class HtmlGenerator {
                     if(IO.fileExistsIsFileAndCanRead(graphImage)) {
                         sb.append(HtmlTools.img(graphImage.getName(), "" + graphType + " graph of " + pdbid + " chain " + chain));  //TODO: we assume the image is in the same dir here, which is true atm but kinda ugly
                     } else {
-                        sb.append("No image of this graph is available.<br/>");
+                        sb.append(HtmlTools.italic("No image of this graph is available."));
+                        sb.append("<br/>\n");
                     }
                     sb.append(HtmlTools.endParagraph());
                         
@@ -338,14 +347,16 @@ public class HtmlGenerator {
                         sb.append(HtmlTools.uListEnd());
                     }
                     else {
-                        sb.append("No downloads are available for this graph.<br/>");
+                        sb.append(HtmlTools.italic("No downloads are available for this graph."));
+                        sb.append("<br/>\n");
                     }
                     sb.append(HtmlTools.endParagraph());
                     
                 }                
             }
             else {
-                sb.append("No graphs are available for this chain.<br/>\n");
+                sb.append(HtmlTools.italic("No graphs are available for this chain."));
+                sb.append("<br/>\n");
             }
         }
         
@@ -386,10 +397,12 @@ public class HtmlGenerator {
     
     public String generateFooter(String pathToBaseDir) {
         StringBuilder sb = new StringBuilder();
+        sb.append("<footer>\n");
         sb.append("<div class=\"footer\" align=\"center\">\n");
         sb.append(HtmlTools.hr());
-        sb.append(HtmlTools.paragraph("VPLGweb by ts"));
+        sb.append(HtmlTools.paragraph("VPLGweb by Tim Sch&auml;fer."));
         sb.append("</div>\n");
+        sb.append("</footer>\n");
         return sb.toString();
     }
     

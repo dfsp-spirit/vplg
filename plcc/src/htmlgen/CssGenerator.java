@@ -47,7 +47,7 @@ public class CssGenerator {
         sb.append("div.CENTERTEXT{text-align: center;}\n");
         sb.append("table, th, td {border: 1px solid black; font-size:10pt; font-family:monospace;}\n");
         sb.append("#main {max-width: 800px;margin: 0 auto;}\n");
-        
+        sb.append("footer {position: fixed;bottom: 0;left: 0;height: 50px;background-color: white;width: 100%;}");        
         return sb.toString();
     }
     

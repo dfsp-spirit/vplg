@@ -145,5 +145,17 @@ public class HtmlTools {
         return "<!-- " + c + "-->";
     }
     
+    public static String italic(String c) {
+        return "<span style=\"font-style:italic\">" + c + "</span>";
+    }
+    
+    public static String br() {
+        return "<br/>";
+    }
+    
+    public static String brAndNewline() {
+        return "<br/>\n";
+    }
+    
     
 }
