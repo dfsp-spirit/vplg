@@ -232,6 +232,11 @@ public class Settings {
         defSet("plcc_B_graphtype_beta", "true", "Determines whether alpha-beta graphs are drawn");
         defSet("plcc_B_graphtype_betalig", "true", "Determines whether alpha-beta graphs with ligands are drawn");
         defSet("plcc_S_output_dir", ".", "output directory");
+        
+        
+        // complex graphs: same, mere
+        defSet("plcc_B_complex_graph_same", "false", "Determines whether the complex graph is drawn with all nodes of the same type" );
+        defSet("plcc_B_complex_graph_mere", "false", "Determines whether the complex graph is drawn with nodes of different type for each mere" );
 
 
         // Database stuff
