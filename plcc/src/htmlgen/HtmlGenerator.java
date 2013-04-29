@@ -359,17 +359,23 @@ public class HtmlGenerator {
                     }
                     sb.append(HtmlTools.endParagraph());
                     
+                    sb.append(HtmlTools.brAndNewline());
+                    
                     // ---------------------- graph image ----------------------
                     sb.append(HtmlTools.heading("Graph image", 4));
-                    sb.append(HtmlTools.startParagraph());
+                    sb.append(HtmlTools.startParagraph());                    
                     File graphImage = pcr.getProteinGraphImage(graphType);
                     if(IO.fileExistsIsFileAndCanRead(graphImage)) {
-                        sb.append(HtmlTools.img(graphImage.getName(), "" + graphType + " graph of " + pdbid + " chain " + chain));  //TODO: we assume the image is in the same dir here, which is true atm but kinda ugly
+                        sb.append("Visualization of the " + graphType + " graph. The SSEs are ordered from the N terminus (left) to the"
+                            + "C terminus (right). Edges represent spatial contacts and their color encodes the relative orientation (see legend below for details). Click image to enlarge.");
+                        sb.append(HtmlTools.imgClickToEnlarge(graphImage.getName(), "" + graphType + " graph of " + pdbid + " chain " + chain, 800, null));  //TODO: we assume the image is in the same dir here, which is true atm but kinda ugly
                     } else {
                         sb.append(HtmlTools.italic("No image of this graph is available."));
                         sb.append(HtmlTools.brAndNewline());
                     }
                     sb.append(HtmlTools.endParagraph());
+                    
+                    sb.append(HtmlTools.brAndNewline());
                         
                     // ---------------------- graph file download options ----------------------
                     sb.append(HtmlTools.heading("Download graph", 4));
@@ -387,9 +393,11 @@ public class HtmlGenerator {
                         sb.append(HtmlTools.italic("No downloads are available for this graph."));
                         sb.append(HtmlTools.brAndNewline());
                     }
-                    sb.append(HtmlTools.endParagraph());
-                    
+                    sb.append(HtmlTools.endParagraph());                    
+                    sb.append(HtmlTools.br());
+                    sb.append(HtmlTools.brAndNewline());
                 }                
+                
             }
             else {
                 sb.append(HtmlTools.italic("No graphs are available for this chain."));

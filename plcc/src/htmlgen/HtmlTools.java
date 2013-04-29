@@ -93,6 +93,21 @@ public class HtmlTools {
         return "<img src=\"" + relPathToImage + "\" alt=\"" + altText + "\" width=\"" + width + "\" height=\"" + height + "\">\n";
     }
     
+    public static String imgClickToEnlarge(String relPathToImage, String altText, Integer width, Integer height) {
+        
+        String widthString = " width=\"" + width + "\" ";
+        if(width == null) {
+            widthString = "";
+        }
+        
+        String heightString = " height=\"" + height + "\" ";
+        if(height == null) {
+            heightString = "";
+        }
+        
+        return "<a href=\"" + relPathToImage + "\"><img src=\"" + relPathToImage + "\" alt=\"" + altText + "\"" + widthString + heightString + "></a>\n";
+    }    
+    
     public static String paragraph(String contents) {
         return "<p>\n" + contents + "</p>\n";
     }
