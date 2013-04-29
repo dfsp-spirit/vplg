@@ -142,6 +142,8 @@ public class HtmlGenerator {
             sb.append(HtmlTools.endParagraph());
         sb.append(HtmlTools.endDiv());  // protein info
 
+        
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
 
         // -------------------- chain info -------------------
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_CHAINS));
@@ -174,6 +176,8 @@ public class HtmlGenerator {
         
         sb.append(HtmlTools.endParagraph());
         sb.append(HtmlTools.endDiv());  // chains
+        
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
 
         
         // ------------- body -- footer ---------------
@@ -236,6 +240,8 @@ public class HtmlGenerator {
         sb.append(HtmlTools.endParagraph());
         sb.append(HtmlTools.endDiv());  // chain
         
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
+        
         // -------------------- navigation -------------------
         
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_NAVIGATION_CHAINS));
@@ -273,6 +279,8 @@ public class HtmlGenerator {
         sb.append(HtmlTools.endParagraph());
         sb.append(HtmlTools.endDiv());  // navigation chains
         
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
+        
         // --- links to graphs ---
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_NAVIGATION_GRAPHS));
         sb.append(HtmlTools.startParagraph());
@@ -300,6 +308,8 @@ public class HtmlGenerator {
         
         sb.append(HtmlTools.endParagraph());
         sb.append(HtmlTools.endDiv());  // navigation graphs
+        
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
 
         // -------------------- protein graphs -------------------
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_PROTEIN_GRAPHS));
