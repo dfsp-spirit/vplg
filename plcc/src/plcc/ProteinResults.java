@@ -74,8 +74,14 @@ public class ProteinResults {
             if(pcr != null) {
                 if(pcr.getAvailableGraphs().size() > 0) {
                     pcr.getPdbMetaDataFromGraph(pcr.getAvailableGraphs().get(0), key);
+                } else {
+                    System.err.println("PCR has no graphs.");
                 }
+            } else {
+                System.err.println("PCR for chain is NULL.");
             }
+        } else {
+            System.err.println("PR has no chains.");
         }
         return null;
     }
