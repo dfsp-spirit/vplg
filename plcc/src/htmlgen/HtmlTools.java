@@ -108,8 +108,20 @@ public class HtmlTools {
         return "<a href=\"" + relPathToImage + "\"><img src=\"" + relPathToImage + "\" alt=\"" + altText + "\"" + widthString + heightString + "></a>\n";
     }    
     
+    public static String svgImageObject(String relPathToImage) {
+        return "<object data=\"" + relPathToImage + "\" type=\"image/svg+xml\"></object>";
+    }
+    
+    public static String svgImageEmbed(String relPathToImage) {
+        return "<embed src=\"" + relPathToImage + "\" type=\"image/svg+xml\"/>";
+    }    
+    
     public static String paragraph(String contents) {
         return "<p>\n" + contents + "</p>\n";
+    }
+    
+    public static String paragraphClass(String contents, String classx) {
+        return "<p class=\"" + classx + "\">\n" + contents + "</p>\n";
     }
     
     public static String heading(String contents, int level) {

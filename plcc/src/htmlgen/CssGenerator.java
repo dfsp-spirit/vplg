@@ -25,12 +25,18 @@ public class CssGenerator {
         sb.append("body {background-color: white; margin-top: 50px;margin-bottom: 50px;margin-right: 100px;margin-left: 100px;}\n");
         sb.append("p { font-size:10pt; font-family:Arial,sans-serif;color:black }\n");
         sb.append("p.text { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
-        sb.append(".protein_graphs p { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
+        //sb.append(".protein_graphs { font-size:10pt; font-family:Arial,sans-serif; color:black;width:80%; align:center; }\n");
+        sb.append(".protein_graphs {margin-left: 0px;margin-top: 100px; -moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #B0B0B0;padding: 20px 20px;width:80%;float:center;}");
+        sb.append(".protein_graph {margin-left: 0px;margin-top: 100px; -moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #C0C0C0;padding: 20px 20px;width:90%;float:center;}");
+        sb.append(".top_row { font-size:10pt; font-family:Arial,sans-serif; color:black;width:100%; }\n");
+        sb.append(".navigation {margin-left: 0px; -moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #C0C0C0;padding: 20px 20px;width:45%;float:right;}");
         //sb.append(".navigation_graphs p { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
         sb.append(".protein {-moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #C0C0C0;padding: 20px 20px;}");
-        sb.append(".navigation_graphs {margin-left: 0px; -moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #C0C0C0;padding: 20px 20px;}");
-        sb.append(".navigation_chains {margin-left: 0px; -moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #C0C0C0;padding: 20px 20px;}");
-        sb.append(".chain {-moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #C0C0C0;padding: 20px 20px;}");
+        sb.append(".main {-moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #DCDCDC;padding: 20px 20px;width:100%;}");
+        //sb.append(".navigation_graphs {margin-left: 0px; -moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #C0C0C0;padding: 20px 20px;}");
+        //sb.append(".navigation_chains {margin-left: 0px; -moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #C0C0C0;padding: 20px 20px;}");
+        sb.append(".navigation {margin-left: 0px; -moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #C0C0C0;padding: 20px 20px;width:45%;float:right;}");
+        sb.append(".chain {-moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #C0C0C0;padding: 20px 20px; width:45%;float:left;}");
         sb.append(".chains {-moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #C0C0C0;padding: 20px 20px;}");
         sb.append("ul { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
         sb.append("ol { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
@@ -56,7 +62,10 @@ public class CssGenerator {
         sb.append("tr:nth-child(odd){ background-color:#eee; }\n");
         sb.append("tr:nth-child(even){ background-color:#fff; }");
         sb.append("#main {max-width: 800px;margin: 0 auto;}\n");
-        sb.append("footer {position: fixed;bottom: 0;left: 0;height: 50px;background-color: white;width: 100%;}");        
+        //sb.append("footer {position: fixed;bottom: 0;left: 0;height: 50px;background-color: white;width: 100%;}");        
+        sb.append("footer {bottom: 0;left: 0;height: 50px;width: 100%;}");        
+        sb.append("#clear{clear: both;}");
+        sb.append("#footer a {font-size:7pt; color:#800000; text-decoration:none }\n");
         //sb.append(".protein_graphs img{max-width:1000px;}");
         return sb.toString();
     }

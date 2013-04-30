@@ -68,6 +68,18 @@ public class ProteinResults {
         }
     }
     
+    public String getPdbMetaData(String key) {
+        if(this.getAvailableChains().size() > 0) {
+            ProteinChainResults pcr = this.getProteinChainResults(this.getAvailableChains().get(0));
+            if(pcr != null) {
+                if(pcr.getAvailableGraphs().size() > 0) {
+                    pcr.getPdbMetaDataFromGraph(pcr.getAvailableGraphs().get(0), key);
+                }
+            }
+        }
+        return null;
+    }
+    
     public ProteinChainResults getProteinChainResults(String chainName) {
         return this.chainResults.get(chainName);        
     }

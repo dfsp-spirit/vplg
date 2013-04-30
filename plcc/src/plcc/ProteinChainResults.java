@@ -75,11 +75,20 @@ public class ProteinChainResults {
     }
     
     public void addProteinGraph(SSEGraph g, String graphType) {
-        this.proteinGraphs.put(graphType, g);
+        this.proteinGraphs.put(graphType, g);        
     }
     
     private String getHashMapKeyForFile(String graphType, String format) {
         return "" + graphType + "_" + format;
+    }
+    
+    public String getPdbMetaDataFromGraph(String graphType, String metaDataKey) {
+        SSEGraph g = this.getProteinGraph(graphType);
+        if(g != null) {
+            return g.metadata.get(metaDataKey);
+        } else {
+            return null;
+        }
     }
     
     public void addProteinGraphOutputFile(String graphType, String format, File outFile) {

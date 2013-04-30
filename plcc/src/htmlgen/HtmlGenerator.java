@@ -45,13 +45,18 @@ public class HtmlGenerator {
     }
     
     public static final String DIV_MAIN = "main";
+    public static final String DIV_TOP_ROW = "top_row";
     public static final String DIV_PROTEIN = "protein";
     public static final String DIV_CHAIN = "chain";
     public static final String DIV_CHAINS = "chains";
+    public static final String DIV_CLEAR = "clear";
+    public static final String DIV_NAVIGATION = "navigation";
     public static final String DIV_NAVIGATION_CHAINS = "navigation_chains";
     public static final String DIV_NAVIGATION_GRAPHS = "navigation_graphs";
     public static final String DIV_PROTEIN_GRAPHS = "protein_graphs";
+    public static final String DIV_PROTEIN_GRAPH = "protein_graph";
     public static final String DIV_FOLDING_GRAPHS = "folding_graphs";
+    public static final String DIV_FOLDING_GRAPH = "folding_graph";
     
 
     /**
@@ -92,7 +97,7 @@ public class HtmlGenerator {
         File targetDirChain;
         for(String chain : pr.getAvailableChains()) {
             targetDirChain = new File(this.baseDir + fs + chain);
-            String chainWebsiteHtmlFile = targetDirChain.getAbsolutePath() + fs + pdbid + "_" + chain + ".html";
+            String chainWebsiteHtmlFile = targetDirChain.getAbsolutePath() + fs + HtmlGenerator.getFileNameProteinAndChain(pdbid, chain);
             ArrayList<String> errors = IO.createDirIfItDoesntExist(targetDirChain);
             if(errors.isEmpty()) {
                         
@@ -132,6 +137,7 @@ public class HtmlGenerator {
         sb.append(this.generateLogo(pathToBaseDir));
         sb.append(HtmlGenerator.generateTopPageTitle(pdbid.toUpperCase()));
 
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_TOP_ROW));
         // -------------------- protein info -------------------
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_PROTEIN));
             sb.append(HtmlTools.heading("Protein info", 2));
@@ -139,6 +145,21 @@ public class HtmlGenerator {
             sb.append("PDB identifier: ").append(pdbid).append("<br/>\n");
             sb.append("Link to structure at RCSB PDB website: ");
             sb.append(HtmlTools.link("http://www.rcsb.org/pdb/explore/explore.do?structureId=" + pdbid, pdbid));
+            
+            HashMap<String, String> metaData = new HashMap<String, String>();
+            metaData.put("Resolution", pr.getPdbMetaData("resolution"));
+            metaData.put("Experiment", pr.getPdbMetaData("experiment"));
+            metaData.put("Keywords", pr.getPdbMetaData("keywords"));
+            metaData.put("Resolution", pr.getPdbMetaData("header"));
+            metaData.put("Title", pr.getPdbMetaData("title"));
+            metaData.put("Date", pr.getPdbMetaData("date"));
+            
+            for(String key : metaData.keySet()) {
+                if(metaData.get(key) != null) {
+                    sb.append(key).append(": ").append(metaData.get(key)).append("<br/>\n");
+                }
+            }
+            
             sb.append(HtmlTools.endParagraph());
         sb.append(HtmlTools.endDiv());  // protein info
 
@@ -177,6 +198,9 @@ public class HtmlGenerator {
         sb.append(HtmlTools.endParagraph());
         sb.append(HtmlTools.endDiv());  // chains
         
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
+        
+        sb.append(HtmlTools.endDiv());  // top row
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
 
         
@@ -218,13 +242,14 @@ public class HtmlGenerator {
         sb.append(HtmlGenerator.generateTopPageTitle(pdbid.toUpperCase() + " chain " + chain.toUpperCase()));
 
 
-        // -------------------- chain info -------------------
+        // -------------------- chain info -------------------        
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_TOP_ROW));
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_CHAIN));
         sb.append(HtmlTools.heading("Protein chain info", 2));
         sb.append(HtmlTools.startParagraph());
         sb.append("PDB chain: ").append(pdbid).append(" chain ").append(chain).append(HtmlTools.brAndNewline());
-        sb.append("Link to structure at RCSB PDB website: ");
-        sb.append(HtmlTools.link("http://www.rcsb.org/pdb/explore/explore.do?structureId=" + pdbid, pdbid)).append(HtmlTools.brAndNewline());
+        //sb.append("Link to structure at RCSB PDB website: ");
+        //sb.append(HtmlTools.link("http://www.rcsb.org/pdb/explore/explore.do?structureId=" + pdbid, pdbid)).append(HtmlTools.brAndNewline());
         
         if(pcr != null) {
             ProtMetaInfo pmi = pcr.getChainMetaData();
@@ -240,11 +265,11 @@ public class HtmlGenerator {
         sb.append(HtmlTools.endParagraph());
         sb.append(HtmlTools.endDiv());  // chain
         
-        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
+        //sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
         
         // -------------------- navigation -------------------
         
-        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_NAVIGATION_CHAINS));
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_NAVIGATION));
         sb.append(HtmlTools.heading("Navigation", 2));
         sb.append(HtmlTools.startParagraph());
         
@@ -276,14 +301,14 @@ public class HtmlGenerator {
             sb.append(HtmlTools.italic("The PDB file contains no other protein chains."));
             sb.append(HtmlTools.brAndNewline());
         }
-        sb.append(HtmlTools.endParagraph());
-        sb.append(HtmlTools.endDiv());  // navigation chains
+        //sb.append(HtmlTools.endParagraph());
+        //sb.append(HtmlTools.endDiv());  // navigation chains
         
-        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
+        //sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
         
         // --- links to graphs ---
-        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_NAVIGATION_GRAPHS));
-        sb.append(HtmlTools.startParagraph());
+        //sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_NAVIGATION_GRAPHS));
+        //sb.append(HtmlTools.startParagraph());
         if(pcr != null) {
             SSEGraph g;
             graphs = pcr.getAvailableGraphs();
@@ -307,10 +332,25 @@ public class HtmlGenerator {
         }
         
         sb.append(HtmlTools.endParagraph());
-        sb.append(HtmlTools.endDiv());  // navigation graphs
+        sb.append(HtmlTools.endDiv());  // navigation graphs        
         
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
-
+        
+        sb.append(HtmlTools.endDiv());  // top row
+        
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_CLEAR));
+        sb.append(HtmlTools.endDiv());  // clear
+        
+        sb.append(HtmlTools.br());
+        sb.append(HtmlTools.br());
+        sb.append(HtmlTools.br());
+        sb.append(HtmlTools.br());
+        sb.append(HtmlTools.br());
+        sb.append(HtmlTools.br());
+        sb.append(HtmlTools.br());
+        sb.append(HtmlTools.br());
+        sb.append(HtmlTools.br());
+        
         // -------------------- protein graphs -------------------
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_PROTEIN_GRAPHS));
         sb.append(HtmlTools.heading("Protein graphs", 2));
@@ -329,6 +369,7 @@ public class HtmlGenerator {
                 // ---------------------- handle graph types ----------------------
                 for(String graphType : graphs) {
                     
+                    sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_PROTEIN_GRAPH));
                     sb.append(HtmlTools.aname(graphType));
                     sb.append(HtmlTools.heading("The " + graphType + " graph", 3));
                     
@@ -363,28 +404,36 @@ public class HtmlGenerator {
                     
                     // ---------------------- graph image ----------------------
                     
-                    boolean useVectorImage = false;
+                    boolean useVectorImageOnWebsite = false;
+                    boolean showImageOnWebsite = false;
                     
                     sb.append(HtmlTools.heading("Graph image", 4));
                     sb.append(HtmlTools.startParagraph());                    
                     File graphImage;
                     
-                    if(useVectorImage) {
+                    if(useVectorImageOnWebsite) {
                         graphImage = pcr.getProteinGraphImageVector(graphType);
                     } else {
                         graphImage = pcr.getProteinGraphImageBitmap(graphType);
                     }
                     
-                    if(IO.fileExistsIsFileAndCanRead(graphImage)) {
-                        sb.append("Visualization of the ").append(graphType).append(" graph. The SSEs are ordered from the N terminus (left) to the"
-                            + "C terminus (right). Edges represent spatial contacts and their color encodes the relative orientation (see legend below for details). Click image to enlarge.");
-                        sb.append(HtmlTools.imgClickToEnlarge(graphImage.getName(), "" + graphType + " graph of " + pdbid + " chain " + chain, 800, null));  //TODO: we assume the image is in the same dir here, which is true atm but kinda ugly
-                    } else {
-                        sb.append(HtmlTools.italic("No image of this graph is available."));
+                    if(showImageOnWebsite) {
+                        if(IO.fileExistsIsFileAndCanRead(graphImage)) {
+                            sb.append("Visualization of the ").append(graphType).append(" graph. The SSEs are ordered from the N terminus (left) to the"
+                                + "C terminus (right). Edges represent spatial contacts and their color encodes the relative orientation (see legend below for details). Click image to enlarge.");
+                            String relImagePath = graphImage.getName();
+                            if(useVectorImageOnWebsite) {
+                                sb.append(HtmlTools.svgImageObject(relImagePath));
+                            } else {
+                                sb.append(HtmlTools.imgClickToEnlarge(relImagePath, "" + graphType + " graph of " + pdbid + " chain " + chain, 800, null));  //TODO: we assume the image is in the same dir here, which is true atm but kinda ugly
+                            }
+                        } else {
+                            sb.append(HtmlTools.italic("No image of this graph is available."));
+                            sb.append(HtmlTools.brAndNewline());
+                            System.err.println("WARNING: No valid " + (useVectorImageOnWebsite ? "vector" : "bitmap") + " graph image registered for PDB " + pdbid + " chain " + chain + " graphtype " + graphType + ". " + (graphImage == null ? "Image is null." : "Path is '" + graphImage.getAbsolutePath() + "'."));
+                        }
                         sb.append(HtmlTools.brAndNewline());
-                        System.err.println("WARNING: No valid " + (useVectorImage ? "vector" : "bitmap") + " graph image registered for PDB " + pdbid + " chain " + chain + " graphtype " + graphType + ". " + (graphImage == null ? "Image is null." : "Path is '" + graphImage.getAbsolutePath() + "'."));
                     }
-                    sb.append(HtmlTools.brAndNewline());
                     
                     if(pcr.getAvailableGraphImages(graphType).size() > 0) {
                         sb.append("Download graph visualization images: ");
@@ -419,6 +468,9 @@ public class HtmlGenerator {
                     }
                     sb.append(HtmlTools.endParagraph());                    
                     sb.append(HtmlTools.br());
+                    sb.append(HtmlTools.brAndNewline());
+                    
+                    sb.append(HtmlTools.endDiv());  // protein graph
                     sb.append(HtmlTools.brAndNewline());
                 }                
                 
@@ -468,19 +520,21 @@ public class HtmlGenerator {
         StringBuilder sb = new StringBuilder();
         sb.append("<footer>\n");
         sb.append("<div class=\"footer\" align=\"center\">\n");
-        sb.append(HtmlTools.hr());
-        sb.append(HtmlTools.paragraph("VPLGweb by Tim Sch&auml;fer."));
+        //sb.append(HtmlTools.hr());
+        sb.append(HtmlTools.paragraphClass("VPLGweb by Tim Sch&auml;fer. <a href=\"http://blah.otg\">VPLG</a>", "tinylink"));
         sb.append("</div>\n");
         sb.append("</footer>\n");
         return sb.toString();
     }
     
     public static String getFileNameProtein(String pdbid) {
-        return "" + pdbid + ".html";
+        //return "" + pdbid + ".html";
+        return "index.html";
     }
     
     public static String getFileNameProteinAndChain(String pdbid, String chain) {
-        return "" + pdbid + "_" + chain + ".html";
+        //return "" + pdbid + "_" + chain + ".html";
+        return "index.html";
     }
     
     public static String generateTopPageTitle(String t) {
