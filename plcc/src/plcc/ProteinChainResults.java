@@ -85,10 +85,10 @@ public class ProteinChainResults {
     public String getPdbMetaDataFromGraph(String graphType, String metaDataKey) {
         SSEGraph g = this.getProteinGraph(graphType);
         if(g != null) {
-            System.err.println("YO");
+            //System.err.println("YO");
             return g.metadata.get(metaDataKey);            
         } else {
-            System.err.println("Graph " + graphType + " is null.");
+            //System.err.println("Graph " + graphType + " is null.");
             return null;
         }
     }

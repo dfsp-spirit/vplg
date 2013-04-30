@@ -21,6 +21,7 @@ public class ProteinResults {
     private HashMap<String, ProteinChainResults> chainResults;
     private String pdbid;
     private String pdbHeaderTitle;
+    private HashMap<String, String> proteinMetadata;
 
     public String getPdbid() {
         return pdbid;
@@ -55,6 +56,7 @@ public class ProteinResults {
     
     private void init() {
         chainResults = new HashMap<String, ProteinChainResults>();
+        proteinMetadata = new HashMap<String, String>();
         pdbid = "";
         pdbHeaderTitle = "";
     }
@@ -68,6 +70,19 @@ public class ProteinResults {
         }
     }
     
+    public String getProteinMetaDataEntry(String key) {
+        return this.proteinMetadata.get(key);
+    }
+    
+    public HashMap<String, String> getProteinMetaData() {
+        return this.proteinMetadata;
+    }
+    
+    public void addProteinMetaData(String key, String value) {
+        this.proteinMetadata.put(key, value);
+    }
+    
+    @Deprecated
     public String getPdbMetaData(String key) {
         if(this.getAvailableChains().size() > 0) {
             ProteinChainResults pcr = this.getProteinChainResults(this.getAvailableChains().get(0));
@@ -75,13 +90,13 @@ public class ProteinResults {
                 if(pcr.getAvailableGraphs().size() > 0) {
                     pcr.getPdbMetaDataFromGraph(pcr.getAvailableGraphs().get(0), key);
                 } else {
-                    System.err.println("PCR has no graphs.");
+                    //System.err.println("PCR has no graphs.");
                 }
             } else {
-                System.err.println("PCR for chain is NULL.");
+                //System.err.println("PCR for chain is NULL.");
             }
         } else {
-            System.err.println("PR has no chains.");
+            //System.err.println("PR has no chains.");
         }
         return null;
     }

@@ -1761,6 +1761,15 @@ public class FileParser {
         md.put("header", header);
         md.put("title", title);
         md.put("date", date);
+        
+        // register md with results
+        ProteinResults pr = ProteinResults.getInstance();
+        pr.addProteinMetaData("Resolution", resolution.toString());
+        pr.addProteinMetaData("Experiment", experiment);
+        pr.addProteinMetaData("Keywords", keywords);
+        pr.addProteinMetaData("Header", header);
+        pr.addProteinMetaData("Title", title);
+        pr.addProteinMetaData("Date", date);
 
         return(md);
     }

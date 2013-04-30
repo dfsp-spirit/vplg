@@ -144,19 +144,11 @@ public class HtmlGenerator {
             sb.append(HtmlTools.startParagraph());
             sb.append("PDB identifier: ").append(pdbid).append("<br/>\n");
             sb.append("Link to structure at RCSB PDB website: ");
-            sb.append(HtmlTools.link("http://www.rcsb.org/pdb/explore/explore.do?structureId=" + pdbid, pdbid));
+            sb.append(HtmlTools.link("http://www.rcsb.org/pdb/explore/explore.do?structureId=" + pdbid, pdbid)).append(HtmlTools.br());                        
             
-            HashMap<String, String> metaData = new HashMap<String, String>();
-            metaData.put("Resolution", pr.getPdbMetaData("resolution"));
-            metaData.put("Experiment", pr.getPdbMetaData("experiment"));
-            metaData.put("Keywords", pr.getPdbMetaData("keywords"));
-            metaData.put("Resolution", pr.getPdbMetaData("header"));
-            metaData.put("Title", pr.getPdbMetaData("title"));
-            metaData.put("Date", pr.getPdbMetaData("date"));
-            
-            for(String key : metaData.keySet()) {
-                if(metaData.get(key) != null) {
-                    sb.append(key).append(": ").append(metaData.get(key)).append("<br/>\n");
+            for(String key : pr.getProteinMetaData().keySet()) {
+                if(pr.getProteinMetaData().get(key) != null) {
+                    sb.append(key).append(": ").append(pr.getProteinMetaData().get(key)).append(HtmlTools.br());
                 }
             }
             
