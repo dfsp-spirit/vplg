@@ -2472,8 +2472,24 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             }
             
             svgConverter.setSources(new String[]{svgFilePath});
-            svgConverter.setDst(new File(filePath));
-            svgConverter.execute();                                    
+            svgConverter.setDst(new File(filePath));            
+            svgConverter.execute();                 
+            
+            // register resulting SVG file
+            String chain = this.chainid;
+            if(chainid != null) {
+                ProteinChainResults pcr = ProteinResults.getInstance().getProteinChainResults(chain);
+                if(pcr != null) {
+                    //System.out.println("Registering SVG at '" + svgFilePath + " as vector ouput image for chain " + chain + " graph type " + graphType + ".");
+                    pcr.addProteinGraphImageVector(graphType, new File(svgFilePath));
+                }
+                else {
+                    System.err.println("WARNING: Could not register SVG image to chain, no ProteinChainResult for chain " + chain + ".");
+                }
+            } else {
+                System.err.println("WARNING: Could not register SVG image to chain, chainid is NULL.");
+            }
+            
             
 
         } catch (Exception e) {

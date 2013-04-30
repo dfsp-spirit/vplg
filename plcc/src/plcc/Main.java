@@ -1155,7 +1155,7 @@ public class Main {
         if(Settings.getBoolean("plcc_B_calc_draw_graphs")) {
             System.out.println("  Calculating SSE graphs.");
             calculateSSEGraphsForChains(handleChains, residues, cInfo, pdbid, outputDir);
-            calculateComplexGraph(handleChains, residues, cInfo, pdbid, outputDir);
+            //calculateComplexGraph(handleChains, residues, cInfo, pdbid, outputDir);
         }
         else {
             System.out.println("  Not calculating SSEs and not drawing graphs as requested.");
@@ -1417,6 +1417,8 @@ public class Main {
             md.put("pdb_org_common", pmi.getOrgCommon());
             
             pcr = new ProteinChainResults(c.getPdbChainID());
+            // register results for chain
+            ProteinResults.getInstance().addProteinChainResults(pcr, c.getPdbChainID());
             pcr.setChainMetaData(pmi);
 
             if(Settings.getBoolean("plcc_B_useDB")) {
@@ -1669,7 +1671,7 @@ public class Main {
                 if(Settings.getBoolean("plcc_B_draw_graphs")) {
                     if(pg.drawProteinGraph(imgFile, false)) {
                         System.out.println("      Image of graph written to file '" + imgFile + "'.");
-                        pcr.addProteinGraphImage(gt, new File(imgFile));
+                        pcr.addProteinGraphImageBitmap(gt, new File(imgFile));
                     }                   
                 }
                 else {
@@ -1710,8 +1712,7 @@ public class Main {
                 
             }
             
-            // register results for chain
-            ProteinResults.getInstance().addProteinChainResults(pcr, c.getPdbChainID());
+            
             
             System.out.println("  +++++ All " + graphTypes.size() + " protein graphs of chain " + c.getPdbChainID() + " handled. +++++");
             

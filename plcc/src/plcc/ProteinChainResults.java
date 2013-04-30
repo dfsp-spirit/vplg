@@ -42,7 +42,8 @@ public class ProteinChainResults {
     
     protected String chainName;
     protected HashMap<String, SSEGraph> proteinGraphs;
-    protected HashMap<String, File> proteinGraphImages;
+    protected HashMap<String, File> proteinGraphImagesBitmap;
+    protected HashMap<String, File> proteinGraphImagesVector;
     protected HashMap<String, File> proteinGraphFilesByFormat;
     protected HashMap<String, ProteinFoldingGraphResults> foldingGraphResults;
     protected ProtMetaInfo chainMetaData;
@@ -59,7 +60,8 @@ public class ProteinChainResults {
         this.chainName = chainName;
         proteinGraphs = new HashMap<String, SSEGraph>();
         proteinGraphFilesByFormat = new HashMap<String, File>();
-        proteinGraphImages = new HashMap<String, File>();
+        proteinGraphImagesBitmap = new HashMap<String, File>();
+        proteinGraphImagesVector = new HashMap<String, File>();
         chainMetaData = null;
         foldingGraphResults = new HashMap<String, ProteinFoldingGraphResults>();
     }
@@ -88,12 +90,20 @@ public class ProteinChainResults {
         return this.proteinGraphFilesByFormat.get(getHashMapKeyForFile(graphType, format));
     }
     
-    public void addProteinGraphImage(String graphType, File outFile) {
-        proteinGraphImages.put(graphType, outFile);
+    public void addProteinGraphImageBitmap(String graphType, File outFile) {
+        proteinGraphImagesBitmap.put(graphType, outFile);
     }
     
-    public File getProteinGraphImage(String graphType) {
-        return this.proteinGraphImages.get(graphType);
+    public void addProteinGraphImageVector(String graphType, File outFile) {
+        proteinGraphImagesVector.put(graphType, outFile);
+    }
+    
+    public File getProteinGraphImageBitmap(String graphType) {
+        return this.proteinGraphImagesBitmap.get(graphType);
+    }
+    
+    public File getProteinGraphImageVector(String graphType) {
+        return this.proteinGraphImagesVector.get(graphType);
     }
     
     public SSEGraph getProteinGraph(String graphType) {
@@ -130,5 +140,16 @@ public class ProteinChainResults {
         List<String> graphs = new ArrayList<String>();
         graphs.addAll(this.proteinGraphs.keySet());
         return graphs;
-    }                    
+    }
+    
+    public List<File> getAvailableGraphImages(String graphType) {        
+        List<File> graphImages = new ArrayList<File>();
+        if(IO.fileExistsIsFileAndCanRead(this.getProteinGraphImageBitmap(graphType))) {
+            graphImages.add(this.getProteinGraphImageBitmap(graphType));
+        }
+        if(IO.fileExistsIsFileAndCanRead(this.getProteinGraphImageVector(graphType))) {
+            graphImages.add(this.getProteinGraphImageVector(graphType));
+        }
+        return graphImages;
+    }
 }

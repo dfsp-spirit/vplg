@@ -362,17 +362,41 @@ public class HtmlGenerator {
                     sb.append(HtmlTools.brAndNewline());
                     
                     // ---------------------- graph image ----------------------
+                    
+                    boolean useVectorImage = false;
+                    
                     sb.append(HtmlTools.heading("Graph image", 4));
                     sb.append(HtmlTools.startParagraph());                    
-                    File graphImage = pcr.getProteinGraphImage(graphType);
+                    File graphImage;
+                    
+                    if(useVectorImage) {
+                        graphImage = pcr.getProteinGraphImageVector(graphType);
+                    } else {
+                        graphImage = pcr.getProteinGraphImageBitmap(graphType);
+                    }
+                    
                     if(IO.fileExistsIsFileAndCanRead(graphImage)) {
-                        sb.append("Visualization of the " + graphType + " graph. The SSEs are ordered from the N terminus (left) to the"
+                        sb.append("Visualization of the ").append(graphType).append(" graph. The SSEs are ordered from the N terminus (left) to the"
                             + "C terminus (right). Edges represent spatial contacts and their color encodes the relative orientation (see legend below for details). Click image to enlarge.");
                         sb.append(HtmlTools.imgClickToEnlarge(graphImage.getName(), "" + graphType + " graph of " + pdbid + " chain " + chain, 800, null));  //TODO: we assume the image is in the same dir here, which is true atm but kinda ugly
                     } else {
                         sb.append(HtmlTools.italic("No image of this graph is available."));
                         sb.append(HtmlTools.brAndNewline());
+                        System.err.println("WARNING: No valid " + (useVectorImage ? "vector" : "bitmap") + " graph image registered for PDB " + pdbid + " chain " + chain + " graphtype " + graphType + ". " + (graphImage == null ? "Image is null." : "Path is '" + graphImage.getAbsolutePath() + "'."));
                     }
+                    sb.append(HtmlTools.brAndNewline());
+                    
+                    if(pcr.getAvailableGraphImages(graphType).size() > 0) {
+                        sb.append("Download graph visualization images: ");
+                        sb.append(HtmlTools.uListStart());
+                        for(File imgFile : pcr.getAvailableGraphImages(graphType)) {                            
+                            sb.append(HtmlTools.listItem("" + HtmlTools.link(imgFile.getName(), imgFile.getName())));                                                                        
+                        }
+                        sb.append(HtmlTools.uListEnd());
+                    } else {
+                        sb.append(HtmlTools.italic("No visualizations of this graph are available for download."));
+                    }
+                    sb.append(HtmlTools.brAndNewline());
                     sb.append(HtmlTools.endParagraph());
                     
                     sb.append(HtmlTools.brAndNewline());
