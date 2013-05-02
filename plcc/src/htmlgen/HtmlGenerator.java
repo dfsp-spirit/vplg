@@ -58,6 +58,8 @@ public class HtmlGenerator {
     public static final String DIV_PROTEIN_LINKS = "protein_links";
     public static final String DIV_FOLDING_GRAPHS = "folding_graphs";
     public static final String DIV_FOLDING_GRAPH = "folding_graph";
+    public static final String DIV_INTRO = "intro";
+    public static final String DIV_SEARCH = "searchform";
     
 
     /**
@@ -67,6 +69,221 @@ public class HtmlGenerator {
      */
     public void setRelativeCssFilePathsFromBasedir(String[] relativeCssFilePaths) {
         this.relativeCssFilePathsFromBasedir = relativeCssFilePaths;
+    }
+    
+    public void generateCoreWebpages(File outputBaseDir) {
+        String fs = System.getProperty("file.separator");
+        String startWebsiteHtmlFile =  outputBaseDir.getAbsolutePath() + fs + "index.html";
+        String searchWebsiteHtmlFile =  outputBaseDir.getAbsolutePath() + fs + "search.html";
+        String findWebsitePhpFile =  outputBaseDir.getAbsolutePath() + fs + "find.php";
+        
+        if(IO.stringToTextFile(startWebsiteHtmlFile, this.generateStartWebpage("."))) {
+            System.out.println("   Wrote VPLGweb start website to " + new File(startWebsiteHtmlFile).getAbsolutePath() + ".");
+        } else {
+            System.err.println("ERROR: Could not write VPLGweb start website to " + new File(startWebsiteHtmlFile).getAbsolutePath() + ".");
+        }
+        
+        if(IO.stringToTextFile(searchWebsiteHtmlFile, this.generateSearchWebpage("."))) {
+            System.out.println("   Wrote VPLGweb search website to " + new File(searchWebsiteHtmlFile).getAbsolutePath() + ".");
+        } else {
+            System.err.println("ERROR: Could not write VPLGweb search website to " + new File(searchWebsiteHtmlFile).getAbsolutePath() + ".");
+        }
+        
+        if(IO.stringToTextFile(findWebsitePhpFile, this.generateFindWebpage("."))) {
+            System.out.println("   Wrote VPLGweb find website to " + new File(findWebsitePhpFile).getAbsolutePath() + ".");
+        } else {
+            System.err.println("ERROR: Could not write VPLGweb find website to " + new File(findWebsitePhpFile).getAbsolutePath() + ".");
+        }
+    }
+    
+    public String generateStartWebpage(String pathToBaseDir) {
+        StringBuilder sb = new StringBuilder();
+        
+        //-------------- header ------------
+        sb.append(this.generateHeader("VPLGweb -- The Visualization of Protein Ligand Graphs web server -- Welcome", pathToBaseDir));
+        // ------------- body -- logo and title ---------------
+        sb.append(HtmlTools.startBody());
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_MAIN));
+        sb.append(this.generateLogo(pathToBaseDir));
+        sb.append(HtmlGenerator.generateTopPageTitle("Welcome to VPLGweb"));
+        
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_INTRO));
+        
+            // intro
+        
+            sb.append(HtmlTools.heading("About VPLGWeb", 2));
+            sb.append(HtmlTools.startParagraph());
+            sb.append("VPLGweb is a web server which allows for quick access to Protein Ligand Graphs for all ");
+            sb.append("protein chains in the RCSB Protein Data Bank (PDB). These graphs were computed from the ");
+            sb.append("3D atom coordinates in PDB files and the secondary structure assignments of the DSSP algortihm using the ");
+            sb.append(HtmlTools.link(HtmlGenerator.getVPLGSoftwareWebsite(), "VPLG software."));
+            sb.append(HtmlTools.endParagraph());
+            sb.append(HtmlTools.brAndNewline());
+            
+            // PLGs
+            sb.append(HtmlTools.heading("Protein ligand graphs", 2));
+            sb.append(HtmlTools.startParagraph());
+            sb.append("A protein graph models the structure of a protein chain. Each vertex ");
+            sb.append("in the graph represents a secondary structure element (SSE, e.g., an alpha helix ");
+            sb.append("or a beta strand) or a ligand. An edge between two vertices in the graph means that, ");
+            sb.append(" the respective SSEs are in contact in the 3D structure.");
+            sb.append(HtmlTools.endParagraph());
+            sb.append(HtmlTools.brAndNewline());
+            
+            // using
+            
+            sb.append(HtmlTools.heading("Using VPLGWeb", 2));
+            sb.append(HtmlTools.startParagraph());
+            sb.append("You can use the ");
+            sb.append(HtmlTools.link("search.html", "search form"));
+            sb.append(" to access the Protein Ligand Graphs of a certain PDB file.");
+            sb.append(HtmlTools.br());
+            sb.append(HtmlTools.brAndNewline());
+            sb.append("If you already know the PDB ID your are looing for, use this quickfind box:");
+            sb.append(HtmlTools.endParagraph());
+            sb.append(HtmlGenerator.generateQuickPDBBox("find.php"));
+            sb.append(HtmlTools.startParagraph());
+            sb.append("Last but not least, you can also use the address bar of your browser directly. The directory structure ");
+            sb.append("on this web server is identical to the RCSB PDB ftp server. So to see the graphs for PDB file ");
+            sb.append(HtmlTools.italic("8icd"));
+            sb.append(", go to ");
+            sb.append(HtmlTools.link("./ic/8icd/", "ic/8icd/"));
+            sb.append(".");
+            sb.append(HtmlTools.endParagraph());
+            sb.append(HtmlTools.brAndNewline());
+            
+            // contact and authors
+            
+            sb.append(HtmlTools.heading("Contact and citing VPLGweb", 2));
+            sb.append(HtmlTools.startParagraph());
+            sb.append("VPLGweb was writteb by Tim Sch&auml;fer at the ");
+            sb.append(HtmlTools.link("http://www.bioinformatik.uni-frankfurt.de", "Molecular Bioinformatics (MolBI) group"));
+            sb.append(" of Ina Koch at Goethe-University Frankfurt am Main, Germany.");
+            sb.append(HtmlTools.endParagraph());
+            sb.append(HtmlTools.brAndNewline());
+            
+        sb.append(HtmlTools.endDiv());  // intro       
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
+        
+        // ------------- body -- footer ---------------
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
+        sb.append(this.generateFooter(pathToBaseDir));
+        
+        sb.append(HtmlTools.endDiv());  // main
+        sb.append(HtmlTools.endBody());
+        sb.append(HtmlTools.endHtml());
+        
+        
+        return sb.toString();
+    }
+    
+    public String generateFindWebpage(String pathToBaseDir) {
+        StringBuilder sb = new StringBuilder();
+        
+        //-------------- header ------------
+        sb.append(this.generateHeader("VPLGweb -- The Visualization of Protein Ligand Graphs web server -- Search Results", pathToBaseDir));
+        // ------------- body -- logo and title ---------------
+        sb.append(HtmlTools.startBody());
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_MAIN));
+        sb.append(this.generateLogo(pathToBaseDir));
+        sb.append(HtmlGenerator.generateTopPageTitle("VPLGweb Search Results"));
+        
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_INTRO));
+        
+            // intro
+        
+            sb.append(HtmlTools.heading("Search results for your VPLGweb query", 2));
+            sb.append(HtmlTools.startParagraph());
+            
+            // TODO: add PHP code to handle query here
+            sb.append("<?php\n");
+            sb.append("echo \"This line was written using PHP.<br/>\";");
+            sb.append("\n?>\n");
+            
+            sb.append(HtmlTools.endParagraph());
+            sb.append(HtmlTools.brAndNewline());
+            
+            
+        sb.append(HtmlTools.endDiv());  // intro       
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
+        
+        // ------------- body -- footer ---------------
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
+        sb.append(this.generateFooter(pathToBaseDir));
+        
+        sb.append(HtmlTools.endDiv());  // main
+        sb.append(HtmlTools.endBody());
+        sb.append(HtmlTools.endHtml());
+        
+        
+        return sb.toString();
+    }
+    
+    public String generateSearchWebpage(String pathToBaseDir) {
+        StringBuilder sb = new StringBuilder();
+        
+        //-------------- header ------------
+        sb.append(this.generateHeader("VPLGweb -- The Visualization of Protein Ligand Graphs web server -- Search Form", pathToBaseDir));
+        // ------------- body -- logo and title ---------------
+        sb.append(HtmlTools.startBody());
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_MAIN));
+        sb.append(this.generateLogo(pathToBaseDir));
+        sb.append(HtmlGenerator.generateTopPageTitle("VPLGweb Search Form"));
+        
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_SEARCH));                
+            sb.append(HtmlTools.heading("Find by PDB identifier", 2));            
+            sb.append(HtmlTools.startParagraph());
+            sb.append("Here you search by PDB identifier:");
+            sb.append(HtmlTools.endParagraph());
+            sb.append(HtmlGenerator.generateQuickPDBBox("find.php"));
+        sb.append(HtmlTools.endDiv());  // search     
+        
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
+        
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_SEARCH));
+        sb.append(HtmlTools.heading("Find by PDB identifier and chain", 2));            
+            sb.append(HtmlTools.startParagraph());
+            sb.append("Here you search by PDB identifier and chain:");
+            sb.append(HtmlTools.endParagraph());
+            sb.append(HtmlGenerator.generateQuickPDBChainBox("find.php"));            
+            sb.append(HtmlTools.brAndNewline());
+        sb.append(HtmlTools.endDiv()); //search
+            
+            
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
+        
+        // ------------- body -- footer ---------------
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
+        sb.append(this.generateFooter(pathToBaseDir));
+        
+        sb.append(HtmlTools.endDiv());  // main
+        sb.append(HtmlTools.endBody());
+        sb.append(HtmlTools.endHtml());
+        
+        
+        return sb.toString();
+    }
+    
+    public static String generateQuickPDBBox(String pathToSearchForm) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<form name=\"input\" action=\"" + pathToSearchForm + "\" method=\"get\">");
+        sb.append("PDB ID: ");
+        sb.append("<input type=\"text\" name=\"pdbid\"  maxlength=\"4\" value=\"8icd\">");
+        sb.append("<input type=\"submit\" value=\"Find protein\">");
+        sb.append("</form>");
+        return sb.toString();
+    }
+    
+    public static String generateQuickPDBChainBox(String pathToSearchForm) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<form name=\"input\" action=\"" + pathToSearchForm + "\" method=\"get\">");
+        sb.append("PDB ID: ");
+        sb.append("<input type=\"text\" name=\"pdbid\" maxlength=\"4\" value=\"8icd\">");
+        sb.append("<input type=\"text\" name=\"chain\" maxlength=\"1\" value=\"A\">");
+        sb.append("<input type=\"submit\" value=\"Find protein chain\">");
+        sb.append("</form>");
+        return sb.toString();
     }
  
     /**
@@ -113,6 +330,8 @@ public class HtmlGenerator {
             }
         }
     }
+    
+    
 	
 	
     /**
@@ -293,7 +512,7 @@ public class HtmlGenerator {
         // --- links to other chains of the same protein ---
         sb.append("Other chains of this protein: ");
         if(chains.size() > 1) {
-            sb.append("All ").append(chains.size() - 1).append(" chains of the protein:").append(HtmlTools.brAndNewline());
+            sb.append("All ").append(chains.size() - 1).append(" other chains of this protein:").append(HtmlTools.brAndNewline());
             sb.append(HtmlTools.uListStart());
             for(String otherChain : chains) {
                 
@@ -303,11 +522,26 @@ public class HtmlGenerator {
                 
                 otherChainPcr = pr.getProteinChainResults(otherChain);
                 if(otherChainPcr != null) {
+                    ProtMetaInfo pmi = otherChainPcr.getChainMetaData();
+                    if(pmi != null) {
+                        sb.append(HtmlTools.listItem(HtmlTools.link("" + otherChain + fs + HtmlGenerator.getFileNameProteinAndChain(pdbid, otherChain), "Chain " + otherChain) + " (Molecule " + pmi.getMolName() + " from organism " + pmi.getOrgScientific() + ")"));
+                    } 
+                    else {
+                        sb.append(HtmlTools.listItem(HtmlTools.link("" + otherChain + fs + HtmlGenerator.getFileNameProteinAndChain(pdbid, otherChain), "Chain " + otherChain)));
+                    }                                        
+                }
+                else {
+                    sb.append(HtmlTools.listItem("chain " + otherChain));
+                }
+                
+                /*
+                if(otherChainPcr != null) {
                     sb.append(HtmlTools.listItem(HtmlTools.link(".." + fs + otherChain + fs + HtmlGenerator.getFileNameProteinAndChain(pdbid, otherChain), "Chain " + otherChain)));
                 }
                 else {
                     sb.append(HtmlTools.listItem("chain " + otherChain));
                 }
+                */
             }
             sb.append(HtmlTools.uListEnd());
         }
@@ -327,7 +561,7 @@ public class HtmlGenerator {
             SSEGraph g;
             graphs = pcr.getAvailableGraphs();
             if(graphs.size() > 0) {
-                sb.append("All ").append(graphs.size()).append(" graphs of the protein:");
+                sb.append("All ").append(graphs.size()).append(" graphs of this protein chain:");
                 sb.append(HtmlTools.uListStart());
                 
                 // ---------------------- handle graph types ----------------------
@@ -566,6 +800,10 @@ public class HtmlGenerator {
         return "http://rcmd.org/vplgweb/";
     }
     
+    public static String getVPLGSoftwareWebsite() {
+        return "http://vplg.sourceforge.net/";
+    }
+    
     public String generateFooter(String pathToBaseDir) {
         StringBuilder sb = new StringBuilder();
         sb.append("<footer>\n");
@@ -573,12 +811,12 @@ public class HtmlGenerator {
         sb.append(HtmlTools.startParagraph());
         
         sb.append("VPLGweb by ");
-        sb.append(HtmlTools.link("http://rcmd.org/ts/", "Tim Sch&auml;fer"));
+        sb.append("Tim Sch&auml;fer");
         sb.append(HtmlTools.brAndNewline());
         
         sb.append(HtmlTools.link(HtmlGenerator.getVPLGwebServerUrl(), "VPLGweb"));
         sb.append(" | ");
-        sb.append(HtmlTools.link("http://vplg.sourceforge.net/", "VPLG"));
+        sb.append(HtmlTools.link(HtmlGenerator.getVPLGSoftwareWebsite(), "VPLG"));
         sb.append(" | ");
         
         sb.append(HtmlTools.link("http://www.bioinformatik.uni-frankfurt.de", "MolBI Group"));

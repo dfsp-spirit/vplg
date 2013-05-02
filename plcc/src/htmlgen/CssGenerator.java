@@ -37,6 +37,7 @@ public class CssGenerator {
         //sb.append(".navigation_chains {margin-left: 0px; -moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #C0C0C0;padding: 20px 20px;}");
         //sb.append(".navigation {margin-left: 0px; -moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #C0C0C0;padding: 20px 20px;width:45%;float:right;}");
         sb.append(".chain {-moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #C0C0C0;padding: 20px 20px; }");
+        sb.append(".searchform {-moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #C0C0C0;padding: 20px 20px; }");
         sb.append(".chains {-moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #C0C0C0;padding: 20px 20px;}");
         sb.append(".protein_links {-moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #C0C0C0;padding: 20px 20px;}");
         sb.append("ul { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
@@ -73,6 +74,19 @@ public class CssGenerator {
         sb.append("#clear{clear: both;}");
         sb.append("#footer a {font-size:7pt; color:#800000; text-decoration:none }\n");
         //sb.append(".protein_graphs img{max-width:1000px;}");
+        // rounded table stuff
+        //sb.append("table {border-collapse:separate;border:solid black 1px;border-radius:6px;-moz-border-radius:6px;}\n");
+        //sb.append("td, th {border-left:solid black 1px;border-top:solid black 1px;padding: 0px;}\n");
+        //sb.append("th {border-top: none;}\n");
+        //sb.append("td:first-child, th:first-child {border-left: none;}\n");
+        //sb.append("th:first-child { -moz-border-radius: 6px 0 0 0; }\n");
+        //sb.append("th:last-child { -moz-border-radius: 0 6px 0 0; }\n");
+        //sb.append("tr:last-child td:first-child { -moz-border-radius: 0 0 0 6px; }\n");
+        //sb.append("tr:last-child td:last-child { -moz-border-radius: 0 0 6px 0; }\n");
+        // input forms
+        sb.append("form    {font-size: 10px;font-weight: bold;text-decoration: none;-webkit-border-radius: 10px;-moz-border-radius: 10px;border-radius: 10px;padding:10px;border: 1px solid #999}");
+        sb.append("input.button {font-size: 10px;}");
+        sb.append("input {font-size: 10px;}");
         return sb.toString();
     }
     
