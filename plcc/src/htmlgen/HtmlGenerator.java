@@ -198,6 +198,9 @@ public class HtmlGenerator {
             // TODO: add PHP code to handle query here
             sb.append("<?php\n");
             sb.append("echo \"This line was written using PHP.<br/>\";");
+            sb.append("import_request_variables('p', 'p_');");
+            sb.append("echo \"PDB ID = $p_pdbid<br/>\";");              
+            sb.append("echo \"chain  = $p_chain<br/>\";");
             sb.append("\n?>\n");
             
             sb.append(HtmlTools.endParagraph());
