@@ -188,7 +188,7 @@ public class HtmlGenerator {
         sb.append(this.generateLogo(pathToBaseDir));
         sb.append(HtmlGenerator.generateTopPageTitle("VPLGweb Search Results"));
         
-        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_INTRO));
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_SEARCH));
         
             // intro
         
@@ -197,24 +197,71 @@ public class HtmlGenerator {
             
             // TODO: add PHP code to handle query here
             sb.append("<?php\n");
-            sb.append("echo \"This line was written using PHP.<br/>\";");
-            sb.append("import_request_variables('p', 'p_');");
-            sb.append("echo \"PDB ID = $p_pdbid<br/>\";");              
-            sb.append("echo \"chain  = $p_chain<br/>\";");
+            
+            //sb.append("error_reporting(E_ALL);\n");
+            //sb.append("ini_set('display_errors', 'on');\n");
+            sb.append("$pdbid = $_GET['pdbid'];\n");              
+            sb.append("$chain = $_GET['chain'];\n");
+            //sb.append("echo \"This line was written using PHP.<br/>\";\n");
+            sb.append("echo \"PDB ID = $pdbid<br/>\";\n");              
+            sb.append("echo \"Chain  = $chain<br/>\";\n");
+            
+            sb.append("$valid_pdbid = FALSE;\n");
+            sb.append("$valid_chain = FALSE;\n");
+            
+            sb.append("if(ctype_alnum($pdbid) && strlen($pdbid) == 4) { $valid_pdbid = TRUE; }\n");
+            sb.append("if(ctype_alnum($chain) && strlen($chain) == 1) { $valid_chain = TRUE; }\n");
+            
+            sb.append("if($valid_pdbid) {\n");
+            sb.append("    echo \"PDB ID is valid.<br/>\";\n");
+            
+            sb.append("    if($valid_chain) {\n");
+            sb.append("        echo \"Chain is valid.<br/>\";\n");
+            sb.append("        $link = \"./\" . \"ic/\" . $pdbid . \"/\" . $chain . \"/\";\n");
+            sb.append("    }\n");
+            sb.append("    else {\n");
+            sb.append("        echo \"PDB ID is valid but chain is not.<br/>\";\n");
+            sb.append("        $link = \"./\" . \"ic/\" . $pdbid . \"/\";\n");
+            sb.append("    }\n");
+            //sb.append("    echo \"Link is $link.\";\n");
+            
+            sb.append("    if (file_exists($link)) {\n");
+            sb.append("        echo \"<a href='\" . $link . \">\" . \"target\" . \"</a><br/>\";\n");
+            sb.append("    }\n");
+            sb.append("    else {\n");
+            sb.append("        echo \"Sorry, no data available for that protein.<br/>\";\n");
+            sb.append("    }\n");
+            
+            
+            sb.append("}\n");            
+            sb.append("else { echo \"ERROR: The given PDB ID is invalid. Invalid query.<br/>\"; }\n");                        
             sb.append("\n?>\n");
             
             sb.append(HtmlTools.endParagraph());
             sb.append(HtmlTools.brAndNewline());
             
             
-        sb.append(HtmlTools.endDiv());  // intro       
+        sb.append(HtmlTools.endDiv());  // search       
+        
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
+                             
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_SEARCH));
+        sb.append(HtmlTools.heading("Start a new search", 2));
+        sb.append(HtmlTools.startParagraph());
+        sb.append("You can ");
+        sb.append(HtmlTools.link("search.html", "start a new search here"));
+        sb.append(".").append(HtmlTools.brAndNewline());
+        sb.append(HtmlTools.endParagraph());
+        sb.append(HtmlTools.endDiv());  // search
+        
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
         
         // ------------- body -- footer ---------------
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
         sb.append(this.generateFooter(pathToBaseDir));
         
-        sb.append(HtmlTools.endDiv());  // main
+        
+        
         sb.append(HtmlTools.endBody());
         sb.append(HtmlTools.endHtml());
         
