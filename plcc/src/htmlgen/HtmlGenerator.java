@@ -139,7 +139,7 @@ public class HtmlGenerator {
             sb.append(" to access the Protein Ligand Graphs of a certain PDB file.");
             sb.append(HtmlTools.br());
             sb.append(HtmlTools.brAndNewline());
-            sb.append("If you already know the PDB ID your are looing for, use this quickfind box:");
+            sb.append("If you already know the PDB ID your are looking for, use this quickfind box:");
             sb.append(HtmlTools.endParagraph());
             sb.append(HtmlGenerator.generateQuickPDBBox("find.php"));
             sb.append(HtmlTools.startParagraph());
