@@ -38,6 +38,7 @@ public class CssGenerator {
         sb.append(".navigation {margin-left: 0px; -moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #C0C0C0;padding: 20px 20px;width:45%;float:right;}");
         sb.append(".chain {-moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #C0C0C0;padding: 20px 20px; width:45%;float:left;}");
         sb.append(".chains {-moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #C0C0C0;padding: 20px 20px;}");
+        sb.append(".protein_links {-moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color: #C0C0C0;padding: 20px 20px;}");
         sb.append("ul { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
         sb.append("ol { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
         sb.append("li { font-size:10pt; font-family:Arial,sans-serif; color:black }\n");
@@ -48,12 +49,17 @@ public class CssGenerator {
         sb.append("p.tiny { font-size:7pt; font-family:Arial,sans-serif; color:black }\n");
         sb.append("div.footer { font-size:7pt; font-family:Arial,sans-serif; color:black }\n");
         sb.append(".footer p { font-size:7pt; font-family:Arial,sans-serif; color:black }\n");
-        sb.append("a:link {font-size:10pt;font-family:Arial,sans-serif;color:#800000;text-decoration:none}\n");
         sb.append("p tinylink {font-size:7pt; color:#800000; text-decoration:none }\n");
+        sb.append("a:link {font-size:10pt;font-family:Arial,sans-serif;color:#800000;text-decoration:none}\n");        
         sb.append("a:visited { font-size:10pt; color:#800000; text-decoration:none }\n");
         sb.append("a:hover { font-size:10pt; color:#FF0000; text-decoration:none }\n");
         sb.append("a:active { font-size:10pt; color:#FF0000; text-decoration:none }\n");
         sb.append("a:focus { font-size:10pt;color:#800000; text-decoration:none }\n");
+        sb.append(".footer a:link {font-size:7pt;font-family:Arial,sans-serif;color:#800000;text-decoration:none}\n");        
+        sb.append(".footer a:visited { font-size:7pt; color:#800000; text-decoration:none }\n");
+        sb.append(".footer a:hover { font-size:7pt; color:#FF0000; text-decoration:none }\n");
+        sb.append(".footer a:active { font-size:7pt; color:#FF0000; text-decoration:none }\n");
+        sb.append(".footer a:focus { font-size:7pt;color:#800000; text-decoration:none }\n");
         sb.append("td.caption { text-align: left; font-size:8pt; font-family:Arial,sans-serif; color:black; }\n");
         sb.append("table.image { margin-left: 4em; }\n");
         sb.append("Span.CENTERTEXT{text-align: center;}\n");

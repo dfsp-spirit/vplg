@@ -3396,13 +3396,13 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     }
     
     
-    public String[] getInfoFieldNames() {
+    public String[] getVertexInfoFieldNames() {
        return new String[] { "Position in graph" , "Position in chain", "SSE type", "DSSP start residue", "DSSP end residue", "PDB start residue ID", "PDB end residue", "AA sequence" };
     }
     
-    public String[] getInfoFieldsForSSE(int index) {
+    public String[] getVertexInfoFieldsForSSE(int index) {
         SSE sse = this.sseList.get(index);
-        String[] infoFields = new String[this.getInfoFieldNames().length];
+        String[] infoFields = new String[this.getVertexInfoFieldNames().length];
         infoFields[0] = "" + (index + 1);
         infoFields[1] = "" + sse.getSSESeqChainNum();
         infoFields[2] = "" + sse.getSseType();
@@ -3411,6 +3411,20 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         infoFields[5] = "" + sse.getStartPdbResID();
         infoFields[6] = "" + sse.getEndPdbResID();
         infoFields[7] = "" + sse.getAASequence();
+        return infoFields;
+    }
+    
+    public String[] getEdgeInfoFieldNames() {
+       return new String[] { "SSE 1 in graph", "SSE 2 in graph", "SSE 1 type", "SSE 2 type", "spatial contact type" };
+    }
+    
+    public String[] getEdgeInfoFieldsForEdge(int index1, int index2) {        
+        String[] infoFields = new String[this.getEdgeInfoFieldNames().length];
+        infoFields[0] = "" + (index1 + 1);
+        infoFields[1] = "" + (index2 + 1);
+        infoFields[2] = "" + this.getSSEBySeqPosition(index1).getSseType();
+        infoFields[3] = "" + this.getSSEBySeqPosition(index2).getSseType();
+        infoFields[4] = "" + this.getEdgeLabel(index1, index2);
         return infoFields;
     }
 

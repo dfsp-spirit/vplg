@@ -1164,6 +1164,7 @@ public class Main {
         // ******************************************** HTML output ******************************************************* //
         
         if(Settings.getBoolean("plcc_B_output_textfiles_dir_tree_html")) {
+            System.out.println(" Producing web pages for PDB " + pdbid + ".");
             File outputBaseDir = new File(outputDir);   // the path where the subdir tree will be created (this is contain 'ic/8icd/A'-like directories in the end)
             File outputDirProtein = IO.generatePDBstyleSubdirTreeName(new File(outputDir), pdbid);  // looks like '$OUTPUTBASEDIR/ic/8icd/'
             if( ! IO.dirExistsIsDirectoryAndCanWrite(outputDirProtein)) {
@@ -1173,10 +1174,13 @@ public class Main {
             HtmlGenerator htmlGen = new HtmlGenerator(outputDirProtein);
             CssGenerator cssGen = new CssGenerator();
             String cssFilePath = outputBaseDir.getAbsolutePath() + fs + "vplgweb.css";
-            cssGen.writeDefaultCssFileTo(new File(cssFilePath));
-            htmlGen.setRelativeCssFilePathsFromBasedir(new String[] { fs + "vplgweb.css" });        // no, this ain't beautiful
             
+            if(cssGen.writeDefaultCssFileTo(new File(cssFilePath))) {
+                System.out.println("   Wrote CSS file for web pages to '" + cssFilePath + "'.");
+            }
+            htmlGen.setRelativeCssFilePathsFromBasedir(new String[] { fs + "vplgweb.css" });        // no, this ain't beautiful            
             htmlGen.generateAllWebpagesForResult(ProteinResults.getInstance());
+            System.out.println(" Web pages done for PDB " + pdbid + ".");
             
         }
 

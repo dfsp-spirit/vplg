@@ -55,6 +55,7 @@ public class HtmlGenerator {
     public static final String DIV_NAVIGATION_GRAPHS = "navigation_graphs";
     public static final String DIV_PROTEIN_GRAPHS = "protein_graphs";
     public static final String DIV_PROTEIN_GRAPH = "protein_graph";
+    public static final String DIV_PROTEIN_LINKS = "protein_links";
     public static final String DIV_FOLDING_GRAPHS = "folding_graphs";
     public static final String DIV_FOLDING_GRAPH = "folding_graph";
     
@@ -87,7 +88,7 @@ public class HtmlGenerator {
         String proteinWebsiteHtmlFile = this.baseDir + fs + HtmlGenerator.getFileNameProtein(pdbid);
         
         if(IO.stringToTextFile(proteinWebsiteHtmlFile, this.generateProteinWebpage(pr, ".." + fs + ".."))) {
-            System.out.println("    Wrote protein website for PDB '" + pdbid + "' to " + new File(proteinWebsiteHtmlFile).getAbsolutePath() + ".");
+            System.out.println("   Wrote protein website for PDB '" + pdbid + "' to " + new File(proteinWebsiteHtmlFile).getAbsolutePath() + ".");
         } else {
             System.err.println("ERROR: Could not write protein website for PDB '" + pdbid + "' to " + new File(proteinWebsiteHtmlFile).getAbsolutePath() + ".");
         }
@@ -102,7 +103,7 @@ public class HtmlGenerator {
             if(errors.isEmpty()) {
                         
                 if(IO.stringToTextFile(chainWebsiteHtmlFile, this.generateChainWebpage(pr, chain, ".." + fs + ".." + fs + ".."))) {
-                    System.out.println("    Wrote protein website for PDB '" + pdbid + "' to " + new File(chainWebsiteHtmlFile).getAbsolutePath() + ".");
+                    System.out.println("    Wrote chain website for PDB '" + pdbid + "' chain '" + chain + "' to " + new File(chainWebsiteHtmlFile).getAbsolutePath() + ".");
                 } else {
                     System.err.println("ERROR: Could not write protein website for PDB '" + pdbid + "' to " + new File(chainWebsiteHtmlFile).getAbsolutePath() + ".");
                 }                
@@ -137,14 +138,12 @@ public class HtmlGenerator {
         sb.append(this.generateLogo(pathToBaseDir));
         sb.append(HtmlGenerator.generateTopPageTitle(pdbid.toUpperCase()));
 
-        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_TOP_ROW));
+        
         // -------------------- protein info -------------------
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_PROTEIN));
             sb.append(HtmlTools.heading("Protein info", 2));
             sb.append(HtmlTools.startParagraph());
-            sb.append("PDB identifier: ").append(pdbid).append("<br/>\n");
-            sb.append("Link to structure at RCSB PDB website: ");
-            sb.append(HtmlTools.link("http://www.rcsb.org/pdb/explore/explore.do?structureId=" + pdbid, pdbid)).append(HtmlTools.br());                        
+            sb.append("PDB identifier: ").append(pdbid).append(HtmlTools.brAndNewline());            
             
             for(String key : pr.getProteinMetaData().keySet()) {
                 if(pr.getProteinMetaData().get(key) != null) {
@@ -189,14 +188,37 @@ public class HtmlGenerator {
         
         sb.append(HtmlTools.endParagraph());
         sb.append(HtmlTools.endDiv());  // chains
-        
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
         
-        sb.append(HtmlTools.endDiv());  // top row
+        // ----------------------------------- links --------------------------------
+        
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_PROTEIN_LINKS));
+        sb.append(HtmlTools.heading("Links to external tools and databases", 2));
+        sb.append(HtmlTools.startParagraph());
+        
+        // RCSB PDB
+        sb.append("Structure at RCSB PDB: ");
+        sb.append(HtmlTools.link("http://www.rcsb.org/pdb/explore/explore.do?structureId=" + pdbid, pdbid + " @ RCSB PDB"));                        
+        sb.append(HtmlTools.br());
+        
+        // CATH
+        sb.append("Domain info from CATH: ");        
+        sb.append(HtmlTools.link("http://www.cathdb.info/pdb/" + pdbid, pdbid + " @ CATH"));                        
+        sb.append(HtmlTools.br());
+        
+        //SCOP
+        sb.append("Structural calssification from SCOP: ");        
+        sb.append(HtmlTools.link("http://scop.mrc-lmb.cam.ac.uk/scop/search.cgi?pdb=" + pdbid, pdbid + " @ SCOP"));                        
+        sb.append(HtmlTools.br());
+        
+        
+        sb.append(HtmlTools.endParagraph());
+        sb.append(HtmlTools.endDiv());  // chains
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
-
+                        
         
         // ------------- body -- footer ---------------
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
         sb.append(this.generateFooter(pathToBaseDir));
         
         sb.append(HtmlTools.endDiv());  // main
@@ -346,6 +368,11 @@ public class HtmlGenerator {
         // -------------------- protein graphs -------------------
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_PROTEIN_GRAPHS));
         sb.append(HtmlTools.heading("Protein graphs", 2));
+        sb.append(HtmlTools.startParagraph());
+        sb.append("A protein graph models the structure of a protein chain. Each vertex ");
+        sb.append("in the graph represents a secondary structure element (SSE, e.g., an alpha helix ");
+        sb.append("or a beta strand) or a ligand. An edge between two vertices in the graph means that, ");
+        sb.append(" the respective SSEs are in contact in the 3D structure.");
         sb.append(HtmlTools.endParagraph());
         
         
@@ -365,26 +392,45 @@ public class HtmlGenerator {
                     sb.append(HtmlTools.aname(graphType));
                     sb.append(HtmlTools.heading("The " + graphType + " graph", 3));
                     
+                    if(HtmlGenerator.getGraphInfoString(graphType) != null) {
+                        sb.append(HtmlTools.startParagraph());
+                        sb.append(HtmlGenerator.getGraphInfoString(graphType));
+                        sb.append(HtmlTools.endParagraph());
+                    }
+                    
                     // ---------------------- SSE info table ----------------------
                     sb.append(HtmlTools.heading("SSE information", 4));
                     sb.append(HtmlTools.startParagraph());
                     g = pcr.getProteinGraph(graphType);
                     if(g != null) {           
                         
-                        sb.append("This ").append(graphType).append(" graph consists of ").append(g.numVertices()).append(" SSEs and ").append(g.numSSEContacts()).append(" edges. Here is the SSE list:");
+                        sb.append("This ").append(graphType).append(" graph consists of ").append(g.numVertices()).append(" SSEs and ").append(g.numSSEContacts()).append(" edges.");
                         sb.append(HtmlTools.br());
                         sb.append(HtmlTools.brAndNewline());
                         
                         if(g.numVertices() > 0) {
-                            //sb.append(HtmlTools.uListStart());
-                            sb.append(HtmlTools.tableStart(g.getInfoFieldNames()));
+                            sb.append("Information on the " + g.numVertices() + " SSEs:");
+                            sb.append(HtmlTools.brAndNewline());
+                            sb.append(HtmlTools.tableStart(g.getVertexInfoFieldNames()));
                             for(int i = 0; i < g.numVertices(); i++) {
-                                sb.append(HtmlTools.tableRow(g.getInfoFieldsForSSE(i)));
-                            //    sb.append(HtmlTools.listItem(sse.getSseType()));
+                                sb.append(HtmlTools.tableRow(g.getVertexInfoFieldsForSSE(i)));
                             }
-                            //sb.append(HtmlTools.uListEnd());
                             sb.append(HtmlTools.tableEnd());                                                        
-                        }                                                
+                            sb.append(HtmlTools.brAndNewline());
+                        }             
+                        
+                        if(g.numSSEContacts() > 0) {
+                            sb.append("Information on the " + g.numSSEContacts()+ " spatial SSE contacts:");
+                            sb.append(HtmlTools.brAndNewline());
+                            sb.append(HtmlTools.tableStart(g.getEdgeInfoFieldNames()));
+                            
+                            for(Integer[] edge : g.getEdgeList()) {
+                                sb.append(HtmlTools.tableRow(g.getEdgeInfoFieldsForEdge(edge[0], edge[1])));
+                            }
+                            sb.append(HtmlTools.tableEnd());    
+                            sb.append(HtmlTools.brAndNewline());
+                        }
+                        
                     }
                     else {
                         sb.append(HtmlTools.italic("No SSE details are available for this graph."));
@@ -508,12 +554,29 @@ public class HtmlGenerator {
         return sb.toString();
     }
     
+    public static String getVPLGwebServerUrl() {
+        return "http://rcmd.org/vplgweb/";
+    }
+    
     public String generateFooter(String pathToBaseDir) {
         StringBuilder sb = new StringBuilder();
         sb.append("<footer>\n");
         sb.append("<div class=\"footer\" align=\"center\">\n");
-        //sb.append(HtmlTools.hr());
-        sb.append(HtmlTools.paragraphClass("VPLGweb by Tim Sch&auml;fer. <a href=\"http://blah.otg\">VPLG</a>", "tinylink"));
+        sb.append(HtmlTools.startParagraph());
+        
+        sb.append("VPLGweb by ");
+        sb.append(HtmlTools.link("http://rcmd.org/ts/", "Tim Sch&auml;fer"));
+        sb.append(HtmlTools.brAndNewline());
+        
+        sb.append(HtmlTools.link(HtmlGenerator.getVPLGwebServerUrl(), "VPLGweb"));
+        sb.append(" | ");
+        sb.append(HtmlTools.link("http://vplg.sourceforge.net/", "VPLG"));
+        sb.append(" | ");
+        
+        sb.append(HtmlTools.link("http://www.bioinformatik.uni-frankfurt.de", "MolBI Group"));
+        
+        
+        sb.append(HtmlTools.endParagraph());
         sb.append("</div>\n");
         sb.append("</footer>\n");
         return sb.toString();
@@ -531,6 +594,30 @@ public class HtmlGenerator {
     
     public static String generateTopPageTitle(String t) {
         return "<h1 align=\"center\">" + t + "</h1>\n";
+    }
+    
+    public static String getGraphInfoString(String graphType) {
+        if(graphType.equals(SSEGraph.GRAPHTYPE_ALPHA)) {
+            return "The alpha graph only considers the alpha helices of the protein chain.";
+        }
+        else if(graphType.equals(SSEGraph.GRAPHTYPE_BETA)) {
+            return "The beta graph only considers the beta strands of the protein chain.";            
+        }
+        else if(graphType.equals(SSEGraph.GRAPHTYPE_ALBE)) {
+            return "The albe graph considers both the alpha helices and beta strands of the protein chain.";            
+        }
+        else if(graphType.equals(SSEGraph.GRAPHTYPE_ALPHALIG)) {
+            return "The alphalig graph considers the alpha helices and ligands of the protein chain.";
+        }
+        else if(graphType.equals(SSEGraph.GRAPHTYPE_BETALIG)) {
+            return "The betalig graph considers the beta strands and ligands of the protein chain.";            
+        }
+        else if(graphType.equals(SSEGraph.GRAPHTYPE_ALBELIG)) {
+            return "The albelig graph considers the alpha helices, beta strands and ligands of the protein chain.";            
+        }
+        else {
+            return null;
+        }
     }
 
 
