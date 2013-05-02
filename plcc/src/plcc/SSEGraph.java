@@ -244,6 +244,35 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         return numIsolatedLigands;
     }
     
+    /**
+     * Determines the number of ligands in this graph. 
+     * @return the number of ligands in this graph
+     */
+    public Integer numLigands() {        
+        Integer numIsolatedLigands = 0;
+        for(SSE s : this.sseList) {            
+            if(s.isLigandSSE()) {
+                numIsolatedLigands++;
+            }
+        }
+        return numIsolatedLigands;
+    }
+    
+    
+    /**
+     * Returns all ligand SSEs of this graph.
+     * @return all ligand SSEs of this graph
+     */   
+    public ArrayList<SSE> getAllLigands() {
+        ArrayList<SSE> ligs = new ArrayList<SSE>();
+        for(SSE s : this.sseList) {            
+            if(s.isLigandSSE()) {
+                ligs.add(s);
+            }
+        }
+        return ligs;
+    }
+    
     
     
     /**
@@ -3414,8 +3443,22 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         return infoFields;
     }
     
+    public String[] getLigandInfoFieldsForSSE(int index) {
+        SSE sse = this.sseList.get(index);
+        String[] infoFields = new String[this.getLigandInfoFieldNames().length];
+        infoFields[0] = "" + (index + 1);
+        infoFields[1] = "" + sse.getSseType();
+        infoFields[2] = "" + sse.getStartPdbResID();
+        infoFields[3] = "" + sse.getLigandName3();
+        return infoFields;
+    }
+    
     public String[] getEdgeInfoFieldNames() {
-       return new String[] { "SSE 1 in graph", "SSE 2 in graph", "SSE 1 type", "SSE 2 type", "spatial contact type" };
+       return new String[] { "SSE 1 in graph", "SSE 2 in graph", "SSE 1 type", "SSE 2 type", "Spatial contact type" };
+    }
+    
+    public String[] getLigandInfoFieldNames() {
+       return new String[] { "Position in graph", "SSE type", "First PDB residue", "Ligand name" };
     }
     
     public String[] getEdgeInfoFieldsForEdge(int index1, int index2) {        

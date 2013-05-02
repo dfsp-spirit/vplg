@@ -207,7 +207,7 @@ public class HtmlGenerator {
         sb.append(HtmlTools.br());
         
         //SCOP
-        sb.append("Structural calssification from SCOP: ");        
+        sb.append("Structural classification from SCOP: ");        
         sb.append(HtmlTools.link("http://scop.mrc-lmb.cam.ac.uk/scop/search.cgi?pdb=" + pdbid, pdbid + " @ SCOP"));                        
         sb.append(HtmlTools.br());
         
@@ -279,7 +279,7 @@ public class HtmlGenerator {
         sb.append(HtmlTools.endParagraph());
         sb.append(HtmlTools.endDiv());  // chain
         
-        //sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
         
         // -------------------- navigation -------------------
         
@@ -357,13 +357,6 @@ public class HtmlGenerator {
         
         sb.append(HtmlTools.br());
         sb.append(HtmlTools.br());
-        sb.append(HtmlTools.br());
-        sb.append(HtmlTools.br());
-        sb.append(HtmlTools.br());
-        sb.append(HtmlTools.br());
-        sb.append(HtmlTools.br());
-        sb.append(HtmlTools.br());
-        sb.append(HtmlTools.br());
         
         // -------------------- protein graphs -------------------
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_PROTEIN_GRAPHS));
@@ -399,7 +392,7 @@ public class HtmlGenerator {
                     }
                     
                     // ---------------------- SSE info table ----------------------
-                    sb.append(HtmlTools.heading("SSE information", 4));
+                    sb.append(HtmlTools.heading("Graph structure", 4));
                     sb.append(HtmlTools.startParagraph());
                     g = pcr.getProteinGraph(graphType);
                     if(g != null) {           
@@ -431,6 +424,21 @@ public class HtmlGenerator {
                             sb.append(HtmlTools.brAndNewline());
                         }
                         
+                        if(g.numLigands() > 0) {
+                            sb.append("Information on the " + g.numLigands()+ " ligands:");
+                            sb.append(HtmlTools.brAndNewline());
+                            sb.append(HtmlTools.tableStart(g.getLigandInfoFieldNames()));
+                            
+                            for(int i = 0; i < g.numVertices(); i++) {
+                                if(g.getSSEBySeqPosition(i).isLigandSSE()) {
+                                    sb.append(HtmlTools.tableRow(g.getLigandInfoFieldsForSSE(i)));
+                                }                                
+                            }
+                            sb.append(HtmlTools.tableEnd());    
+                            sb.append(HtmlTools.brAndNewline());
+                            
+                        }
+                        
                     }
                     else {
                         sb.append(HtmlTools.italic("No SSE details are available for this graph."));
@@ -445,7 +453,7 @@ public class HtmlGenerator {
                     boolean useVectorImageOnWebsite = false;
                     boolean showImageOnWebsite = false;
                     
-                    sb.append(HtmlTools.heading("Graph image", 4));
+                    sb.append(HtmlTools.heading("Graph visualization", 4));
                     sb.append(HtmlTools.startParagraph());                    
                     File graphImage;
                     
