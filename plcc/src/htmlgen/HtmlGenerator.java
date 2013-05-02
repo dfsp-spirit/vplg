@@ -203,8 +203,8 @@ public class HtmlGenerator {
             sb.append("$pdbid = $_GET['pdbid'];\n");              
             sb.append("$chain = $_GET['chain'];\n");
             //sb.append("echo \"This line was written using PHP.<br/>\";\n");
-            sb.append("echo \"PDB ID = $pdbid<br/>\";\n");              
-            sb.append("echo \"Chain  = $chain<br/>\";\n");
+            //sb.append("echo \"PDB ID = $pdbid<br/>\";\n");              
+            //sb.append("echo \"Chain  = $chain<br/>\";\n");
             
             sb.append("$valid_pdbid = FALSE;\n");
             sb.append("$valid_chain = FALSE;\n");
@@ -213,20 +213,20 @@ public class HtmlGenerator {
             sb.append("if(ctype_alnum($chain) && strlen($chain) == 1) { $valid_chain = TRUE; }\n");
             
             sb.append("if($valid_pdbid) {\n");
-            sb.append("    echo \"PDB ID is valid.<br/>\";\n");
+            //sb.append("    echo \"PDB ID is valid.<br/>\";\n");
             
             sb.append("    if($valid_chain) {\n");
-            sb.append("        echo \"Chain is valid.<br/>\";\n");
+            //sb.append("        echo \"Chain is valid.<br/>\";\n");
             sb.append("        $link = \"./\" . \"ic/\" . $pdbid . \"/\" . $chain . \"/\";\n");
             sb.append("    }\n");
             sb.append("    else {\n");
-            sb.append("        echo \"PDB ID is valid but chain is not.<br/>\";\n");
+            //sb.append("        echo \"PDB ID is valid but chain is not.<br/>\";\n");
             sb.append("        $link = \"./\" . \"ic/\" . $pdbid . \"/\";\n");
             sb.append("    }\n");
             //sb.append("    echo \"Link is $link.\";\n");
             
             sb.append("    if (file_exists($link)) {\n");
-            sb.append("        echo \"<a href='\" . $link . \">\" . \"target\" . \"</a><br/>\";\n");
+            sb.append("        echo \"<a href='\" . $link . \"'>\" . \"Protein data available here.\" . \"</a><br/>\";\n");
             sb.append("    }\n");
             sb.append("    else {\n");
             sb.append("        echo \"Sorry, no data available for that protein.<br/>\";\n");
