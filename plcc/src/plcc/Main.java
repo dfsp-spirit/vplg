@@ -521,6 +521,13 @@ public class Main {
                         Settings.set("plcc_B_output_textfiles_dir_tree_html", "true");
                     }
                     
+                    if(s.equals("-H") || s.equals("--output-www-with-core")) {
+                        Settings.set("plcc_B_output_images_dir_tree", "true");
+                        Settings.set("plcc_B_output_textfiles_dir_tree", "true");
+                        Settings.set("plcc_B_output_textfiles_dir_tree_html", "true");
+                        Settings.set("plcc_B_output_textfiles_dir_tree_core_html", "true");
+                    }
+                    
                     
                     
                     if(s.equals("-m") || s.equals("--image-format")) {
@@ -1169,27 +1176,26 @@ public class Main {
             File outputDirProtein = IO.generatePDBstyleSubdirTreeName(new File(outputDir), pdbid);  // looks like '$OUTPUTBASEDIR/ic/8icd/'
             if( ! IO.dirExistsIsDirectoryAndCanWrite(outputDirProtein)) {
                 IO.createDirIfItDoesntExist(outputDirProtein);
-            }
-            
-            System.out.println("outputBaseDir is " + outputBaseDir.getAbsolutePath());
-            System.out.println("outputDirProtein is " + outputDirProtein.getAbsolutePath());
+            }                        
             
             HtmlGenerator htmlGen = new HtmlGenerator(outputDirProtein);
             CssGenerator cssGen = new CssGenerator();
-            String cssFilePath = outputBaseDir.getAbsolutePath() + fs + "vplgweb.css";
-            
-            String fsWeb = "/"; // the internet is UNIX
-            
-            if(cssGen.writeDefaultCssFileTo(new File(cssFilePath))) {
-                System.out.println("   Wrote CSS file for web pages to '" + cssFilePath + "'.");
-            }
+            String cssFilePath = outputBaseDir.getAbsolutePath() + fs + "vplgweb.css";            
+            String fsWeb = "/"; // the internet is UNIX                        
             htmlGen.setRelativeCssFilePathsFromBasedir(new String[] { fsWeb + "vplgweb.css" });        // no, this ain't beautiful            
             
-            htmlGen.generateCoreWebpages(outputBaseDir);
-            
+            if(Settings.getBoolean("plcc_B_output_textfiles_dir_tree_core_html")) {                
+                System.out.println("  Writing core webpages. The base output directory is '" + outputBaseDir.getAbsolutePath() + "'.");
+                if(cssGen.writeDefaultCssFileTo(new File(cssFilePath))) {
+                    System.out.println("   Wrote CSS file for web pages to '" + cssFilePath + "'.");
+                }
+                htmlGen.generateCoreWebpages(outputBaseDir);
+            }
+                        
+            System.out.println("  Writing protein-specific webpages. The protein-specific output directory is '" + outputDirProtein.getAbsolutePath() + "'.");
             htmlGen.generateAllWebpagesForResult(ProteinResults.getInstance());
-            System.out.println(" Web pages done for PDB " + pdbid + ".");
-            
+            System.out.println("  Web pages done for PDB " + pdbid + ".");
+            System.out.println(" Produced all web pages.");
         }
 
         //drawTGFGraph("graph.tgf", "graph.tgf.png");       //DEBUG
@@ -3474,6 +3480,7 @@ public class Main {
         System.out.println("-f | --folding-graphs      : also handle foldings graphs (connected components of the protein graph)");
         System.out.println("-g | --sse-graphtypes <l>  : compute only the SSE graphs in list <l>, e.g. 'abcdef' = alpha, beta, alhpabeta, alphalig, betalig and alphabetalig.");
         System.out.println("-h | --help                : show this help message and exit");
+        System.out.println("-H | --output-www-with-core: add HTML navigation files and core files to the subdir tree (implies -k, -W). ");
         //System.out.println("-i | --ignoreligands       : ignore ligand contacts in geom_neo format output files [DEBUG]");
         System.out.println("-j | --ddb <p> <c> <gt> <f>: get the graph type <gt> of chain <c> of pdbid <p> from the DB and draw it to file <f> (omit the file extension)*");        
         System.out.println("-k | --output-subdir-tree  : write all output files to a PDB-style sudbir tree of the output dir (e.g., <OUTDIR>/ic/8icd/<outfile>). ");                
@@ -3494,7 +3501,7 @@ public class Main {
         System.out.println("-u | --use-database        : write SSE contact data to database [requires DB credentials in cfg file]");                       
         System.out.println("-v | --del-db-protein <p>  : delete the protein chain with PDBID <p> from the database [requires DB credentials in cfg file]");
         System.out.println("-w | --dont-write-images   : do not draw the SSE graphs and write them to image files [DEBUG]");                             
-        System.out.println("-W | --output-html         : add HTML navigation files to the subdir tree (see -k). ");
+        System.out.println("-W | --output-www          : add HTML navigation files to the subdir tree (implies -k). ");
         //System.out.println("-x | --check-rescts <f>    : compare the computed residue level contacts to those in geom_neo format file <f> and print differences");
         //System.out.println("-X | --check-ssects <f>    : compare the computed SSE level contacts to those in bet_neo format file <f> and print differences");
         //System.out.println("-y | --write-geodat        : write the computed SSE level contacts in geo.dat format to a file (file name: <pdbid>_<chain>.geodat)");        

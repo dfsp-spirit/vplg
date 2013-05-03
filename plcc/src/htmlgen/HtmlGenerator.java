@@ -71,6 +71,10 @@ public class HtmlGenerator {
         this.relativeCssFilePathsFromBasedir = relativeCssFilePaths;
     }
     
+    /**
+     * Generates all wepages which are only required once for VPLGweb, i.e., those which are independent of the protein (start page, search form, etc.).
+     * @param outputBaseDir the base directory to use
+     */
     public void generateCoreWebpages(File outputBaseDir) {
         String fs = System.getProperty("file.separator");
         String startWebsiteHtmlFile =  outputBaseDir.getAbsolutePath() + fs + "index.html";
