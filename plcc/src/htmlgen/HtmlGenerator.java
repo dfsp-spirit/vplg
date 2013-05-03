@@ -876,13 +876,22 @@ public class HtmlGenerator {
     }
     
     public static String getVPLGSoftwareWebsite() {
-        return "http://vplg.sourceforge.net/";
+        return "http://www.bioinformatik.uni-frankfurt.de/tools/vplg/";
+    }
+    
+    public static String getVPLGSourceforgeWebsite() {
+        return "http://sourceforge.net/projects/vplg/";
+    }
+    
+    public static String getVPLGHelpWebsite() {
+        return "http://sourceforge.net/p/vplg/wiki/Home/";
     }
     
     public String generateFooter(String pathToBaseDir) {
         StringBuilder sb = new StringBuilder();
         sb.append("<footer>\n");
         sb.append("<div class=\"footer\" align=\"center\">\n");
+        sb.append(HtmlTools.hr());
         sb.append(HtmlTools.startParagraph());
         
         sb.append("VPLGweb by ");
@@ -893,8 +902,12 @@ public class HtmlGenerator {
         sb.append(" | ");
         sb.append(HtmlTools.link(HtmlGenerator.getVPLGSoftwareWebsite(), "VPLG"));
         sb.append(" | ");
+        sb.append(HtmlTools.link(HtmlGenerator.getVPLGSourceforgeWebsite(), "VPLG project @ SF"));
+        sb.append(" | ");
+        sb.append(HtmlTools.link(HtmlGenerator.getVPLGHelpWebsite(), "VPLG Help and Documentation"));
+        sb.append(" | ");
         
-        sb.append(HtmlTools.link("http://www.bioinformatik.uni-frankfurt.de", "MolBI Group"));
+        sb.append(HtmlTools.link("http://www.bioinformatik.uni-frankfurt.de", "MolBI Group @ Goethe-University Frankfurt"));
         
         
         sb.append(HtmlTools.endParagraph());
