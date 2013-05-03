@@ -1178,10 +1178,12 @@ public class Main {
             CssGenerator cssGen = new CssGenerator();
             String cssFilePath = outputBaseDir.getAbsolutePath() + fs + "vplgweb.css";
             
+            String fsWeb = "/"; // the internet is UNIX
+            
             if(cssGen.writeDefaultCssFileTo(new File(cssFilePath))) {
                 System.out.println("   Wrote CSS file for web pages to '" + cssFilePath + "'.");
             }
-            htmlGen.setRelativeCssFilePathsFromBasedir(new String[] { fs + "vplgweb.css" });        // no, this ain't beautiful            
+            htmlGen.setRelativeCssFilePathsFromBasedir(new String[] { fsWeb + "vplgweb.css" });        // no, this ain't beautiful            
             
             htmlGen.generateCoreWebpages(outputBaseDir);
             

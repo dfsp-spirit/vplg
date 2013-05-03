@@ -156,9 +156,28 @@ public class HtmlGenerator {
             
             sb.append(HtmlTools.heading("Contact and citing VPLGweb", 2));
             sb.append(HtmlTools.startParagraph());
-            sb.append("VPLGweb was writteb by Tim Sch&auml;fer at the ");
+            sb.append("VPLGweb was written by ");
+            sb.append(HtmlTools.link("http://rcmd.org/ts/", "Tim Sch&auml;fer"));
+            sb.append(" at the ");
             sb.append(HtmlTools.link("http://www.bioinformatik.uni-frankfurt.de", "Molecular Bioinformatics (MolBI) group"));
             sb.append(" of Ina Koch at Goethe-University Frankfurt am Main, Germany.");
+            sb.append(HtmlTools.brAndNewline());
+            sb.append(HtmlTools.brAndNewline());
+            sb.append("Please cite the following publication if you use VPLG or VPLGweb:");
+            sb.append(HtmlTools.brAndNewline());
+            sb.append(HtmlTools.uListStart());
+            sb.append(HtmlTools.listItemStart());
+            sb.append("Tim Sch&auml;fer, Patrick May and Ina Koch.");
+            sb.append(HtmlTools.italic("Computation and Visualization of Protein Topology Graphs Including Ligand Information."));
+            sb.append("German Conference on Bioinformatics 2012. ");
+            sb.append("(");
+            sb.append(HtmlTools.link("http://sourceforge.net/p/vplg/wiki/Citing/", "Details and BibTex file"));
+            sb.append(", ");
+            sb.append(HtmlTools.link("http://drops.dagstuhl.de/opus/volltexte/2012/3722", "Open Access Paper"));
+            sb.append(")");
+            sb.append(HtmlTools.listItemEnd());
+            sb.append(HtmlTools.uListEnd());
+            sb.append(HtmlTools.brAndNewline());
             sb.append(HtmlTools.endParagraph());
             sb.append(HtmlTools.brAndNewline());
             
@@ -226,7 +245,13 @@ public class HtmlGenerator {
             //sb.append("    echo \"Link is $link.\";\n");
             
             sb.append("    if (file_exists($link)) {\n");
-            sb.append("        echo \"<a href='\" . $link . \"'>\" . \"Protein data available here.\" . \"</a><br/>\";\n");
+            sb.append("        echo \"Protein data found.<br/><br/>\";\n");
+            sb.append("        if ($valid_chain) {\n");
+            sb.append("            echo \"<a href='\" . $link . \"'>\" . \"Protein $pdbid chain $chain\" . \"</a><br/>\";\n");
+            sb.append("        }\n");
+            sb.append("        else {\n");            
+            sb.append("            echo \"<a href='\" . $link . \"'>\" . \"Protein $pdbid\" . \"</a><br/>\";\n");
+            sb.append("        }\n");            
             sb.append("    }\n");
             sb.append("    else {\n");
             sb.append("        echo \"Sorry, no data available for that protein.<br/>\";\n");
@@ -831,7 +856,7 @@ public class HtmlGenerator {
         sb.append("<title>" + title +  "</title>\n");
 
         for(String cssFileName : relativeCssFilePathsFromBasedir) {            
-            sb.append("<link href=\"").append(pathToBaseDir).append(cssFileName).append("\" rel=\"stylesheet\" type=\"text/css\">");
+            sb.append("<link href=\"").append(pathToBaseDir).append(cssFileName).append("\" rel=\"stylesheet\" type=\"text/css\">\n");
         }
         sb.append("</head>\n");
         return sb.toString();        

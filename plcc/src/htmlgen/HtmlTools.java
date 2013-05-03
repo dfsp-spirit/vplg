@@ -75,6 +75,14 @@ public class HtmlTools {
         return "<li>" + s + "</li>\n";
     }
     
+    public static String listItemStart() {
+        return "<li>";
+    }
+    
+    public static String listItemEnd() {
+        return "</li>\n";
+    }
+    
     public static String oList(String[] strings) {
         StringBuilder sb = new StringBuilder();
         sb.append("<ol>\n");
