@@ -22,12 +22,44 @@ public class CssGenerator {
     
     public String getDefaultCSS() {
         
+        int colorScheme = 0;
+                
         String colorBackgroundBody = "white";
         String colorBackgroundMain = "#DCDCDC";
         String colorSections = "#C0C0C0";
         String colorFont = "black";
         String colorLinks = "#800000";
         String colorLinksActive = "#FF0000";
+        
+        if(colorScheme == 1) {            
+            // "2e3438"; // dark grayish
+            // "628767"; // greenish
+            // "aba972"; // dark yellowish
+            // "dbba75"; // brighter yellow
+            // "b25e54"; // red
+            colorBackgroundBody = "2e3438";  // dark grayish
+            colorBackgroundMain = "aba972"; // dark yellowish
+            colorSections = "dbba75"; // brighter yellow
+            colorFont = "black";
+            colorLinks = "#800000";
+            colorLinksActive = "#FF0000";            
+        }
+        
+        if(colorScheme == 2) {
+            // "4c2b2f"; // brownish
+            // "e57152"; // orange
+            // "e8de67"; // yellowish
+            // "ffefc3"; // egg shell
+            // "c0ccab"; // mint green
+            colorBackgroundBody = "4c2b2f"; // brownish
+            colorBackgroundMain = "c0ccab"; // mint green
+            colorSections = "e8de67"; // yellowish
+            colorFont = "black";
+            colorLinks = "#800000";
+            colorLinksActive = "#FF0000";
+        }
+        
+        
         
         StringBuilder sb = new StringBuilder();
         sb.append("body {background-color:").append(colorBackgroundBody).append("; margin-top: 50px;margin-bottom: 50px;margin-right: 100px;margin-left: 100px;}\n");
