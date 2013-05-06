@@ -23,7 +23,7 @@ import plcc.SSEGraph;
 
 public class HtmlGenerator {
     
-    static Logger logger = LogManager.getLogger(HtmlGenerator.class.getName());
+    //static Logger logger = LogManager.getLogger(HtmlGenerator.class.getName());
     
     private String[] relativeCssFilePathsFromBasedir;
     private File baseDir;
@@ -372,11 +372,13 @@ public class HtmlGenerator {
      */
     public void generateAllWebpagesForResult(ProteinResults pr) {
 
+        /*
         logger.entry();
         if(! IO.dirExistsIsDirectoryAndCanWrite(baseDir)) {
             logger.error("ERROR: Cannot create webpages under directory '" + baseDir + "', does not exist or cannot write to it.");
             return;
         }
+        */
         
         // ------------------- protein webpages -----------------------
         

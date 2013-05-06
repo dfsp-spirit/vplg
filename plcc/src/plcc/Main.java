@@ -66,7 +66,7 @@ public class Main {
 
     
     // declare class vars
-    Logger logger = LogManager.getLogger(Main.class.getName());
+    //Logger logger = LogManager.getLogger(Main.class.getName());
     
     // the array used to store statistics on contacts between the different AA types
     public static final Integer NUM_AAs = 20 + 1 + 1;    // These are 20 real AAs, 1 extra for ligands and 1 for the total number count at index 0 (1st AA starts at index 1).
