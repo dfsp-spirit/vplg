@@ -54,8 +54,11 @@
 # but mind a new variable $TMPDIR
 # this is scratch storage on the node you get onto, and it
 # is way much quicker to copy things there, run there and back-copy in the end
+
+
+MYHOME="/home/ts"
  
- 
+echo MYHOME is $MYHOME 
 echo Working directory is $PBS_O_WORKDIR
 echo tmp directory is $TMPDIR
 echo env is $ENVIRONMENT
@@ -77,8 +80,8 @@ hostname # not needed
 module load openmpi.module
 
 # copy files in temporary directory 
-scp /home/hs/src/*.py $TMPDIR
-scp /home/hs/src/py_scripts/mpi4py_test.py $TMPDIR
+scp $MYHOME/src/*.py $TMPDIR
+scp $MYHOME/src/py_scripts/mpi4py_test.py $TMPDIR
 
 cd $TMPDIR
 
@@ -86,10 +89,8 @@ cd $TMPDIR
 
 # create links (needed because data files are not copied into tmp directory)
 # NOT USED IN TESTFILE
-ln -s /develop/hendrik/textfiles $TMPDIR/textfiles
-ln -s /develop/hendrik/PDB $TMPDIR/PDB
-ln -s /home/hs/src/mpi4py-1.2.2/ $TMPDIR/mpi4py
-export LD_LIBRARY_PATH=/home/hs/libs/:${LD_LIBRARY_PATH}
+ln -s $MYHOME/software/openmpi/mpi4py-1.2.2/ $TMPDIR/mpi4py
+export LD_LIBRARY_PATH=$MYHOME/libs/:${LD_LIBRARY_PATH}
 
 # run script
 echo -n "started at: "
@@ -104,6 +105,6 @@ echo -n "terminated at: "
 date
 
 # copy-back everything needed. $TMPDIR gets cleaning in the new cluster!
-scp -r output.file $PBS_O_HOST:$PBS_O_WORKDIR/
+#scp -r output.file $PBS_O_HOST:$PBS_O_WORKDIR/
 
  
