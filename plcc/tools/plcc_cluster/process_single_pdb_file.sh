@@ -120,7 +120,7 @@ FILE=$(basename $FLN)
 
 ## now get the PDB ID from the file name (it starts at index 3 and is 4 characters long)
 PDBID=${FILE:3:4}
-echo "The PDB ID of the file is '$PDBID'."
+echo "$APPTAG The PDB ID of the file is '$PDBID'."
 
 if [ ! -r "$FLN" ]; then
     echo "$APPTAG ERROR: Could not open PDB file at '$FLN'."
@@ -132,7 +132,7 @@ echo "$APPTAG Handling PDB file '$FLN'. Assuming file extension '$REMOTE_PDB_FIL
 
 
 ## remove old protocol files. this is required because we only append to them later.
-DBINSERT_LOG="proc1pdb_${PDBID}.log"
+DBINSERT_LOG="${LOGDIR}/log_proc1pdb_${PDBID}.log"
 if [ -f $DBINSERT_LOG ]; then
     if rm $DBINSERT_LOG ; then
         echo "$APPTAG Deleted old db insert log '$DBINSERT_LOG'."
@@ -157,7 +157,7 @@ NUM_PLCC_FAIL=0
 
 ## Remember that this is a list of file names like this: '/srv/www/PDB/data/structures/divided/pdb/ic/pdb8icd.ent.gz'. So we need to extract the
 ##  PDB ID from that name, then run the insert scripts for that PDB ID.
-
+NUM_FILES=1
 
 let NUM_HANDLED++
 
@@ -167,7 +167,7 @@ if [ -r $FLN ]; then
 	cd $PLCC_RUN_DIR
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG FATAL ERROR: Cannot cd to plcc_run directory '$PLCC_RUN_DIR'."
-            echo "$APPTAG FATAL ERROR: Cannot cd to plcc_run directory '$PLCC_RUN_DIR'." >$DBINSERT_LOG
+            echo "$APPTAG FATAL ERROR: Cannot cd to plcc_run directory '$PLCC_RUN_DIR'." >>$DBINSERT_LOG
 	    exit 1
 	fi
 	
@@ -176,7 +176,7 @@ if [ -r $FLN ]; then
 
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG   Could not get PDB file for protein '$PDBID', skipping protein '$PDBID'."
-	    echo "$APPTAG   Could not get PDB file for protein '$PDBID', skipping protein '$PDBID'." >$DBINSERT_LOG
+	    echo "$APPTAG   Could not get PDB file for protein '$PDBID', skipping protein '$PDBID'." >>$DBINSERT_LOG
 	    let NUM_TOTAL_FAIL++
 	    let NUM_PDB_FAIL++
 	    del_output $PDBID
@@ -189,7 +189,7 @@ if [ -r $FLN ]; then
 
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG   Could not create DSSP file from PDB file '$PDBID.pdb', skipping protein '$PDBID'."
-	    echo "$APPTAG   Could not create DSSP file from PDB file '$PDBID.pdb', skipping protein '$PDBID'." >$DBINSERT_LOG
+	    echo "$APPTAG   Could not create DSSP file from PDB file '$PDBID.pdb', skipping protein '$PDBID'." >>$DBINSERT_LOG
 	    let NUM_TOTAL_FAIL++
 	    let NUM_DSSP_FAIL++
 	    del_output $PDBID
@@ -202,7 +202,7 @@ if [ -r $FLN ]; then
 
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG   Running plcc failed for PDB ID '$PDBID', skipping protein '$PDBID'."
-	    echo "$APPTAG   Running plcc failed for PDB ID '$PDBID', skipping protein '$PDBID'." >$DBINSERT_LOG
+	    echo "$APPTAG   Running plcc failed for PDB ID '$PDBID', skipping protein '$PDBID'." >>$DBINSERT_LOG
 	    let NUM_TOTAL_FAIL++
 	    let NUM_PLCC_FAIL++
 	    del_output $PDBID
@@ -218,13 +218,13 @@ if [ -r $FLN ]; then
 	cd $UPDATEDIR
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG FATAL ERROR: Cannot cd to update directory '$UPDATEDIR'. (Did you execute this from another path?)"
-	    echo "$APPTAG FATAL ERROR: Cannot cd to update directory '$UPDATEDIR'. (Did you execute this from another path?)" >$DBINSERT_LOG
+	    echo "$APPTAG FATAL ERROR: Cannot cd to update directory '$UPDATEDIR'. (Did you execute this from another path?)" >>$DBINSERT_LOG
 	    exit 1
 	fi
 
 else
     echo "$APPTAG Could not read file '$FLN', skipping."
-    echo "$APPTAG Could not read file '$FLN', skipping." >$DBINSERT_LOG
+    echo "$APPTAG Could not read file '$FLN', skipping." >>$DBINSERT_LOG
     let NUM_TOTAL_FAIL++
     let NUM_PDB_FAIL++
 fi	
