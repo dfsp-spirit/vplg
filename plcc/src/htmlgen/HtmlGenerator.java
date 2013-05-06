@@ -237,14 +237,15 @@ public class HtmlGenerator {
             
             sb.append("if($valid_pdbid) {\n");
             //sb.append("    echo \"PDB ID is valid.<br/>\";\n");
+            sb.append("    $mid_chars = substr($pdbid, 1, 2);\n");
             
             sb.append("    if($valid_chain) {\n");
             //sb.append("        echo \"Chain is valid.<br/>\";\n");
-            sb.append("        $link = \"./\" . \"ic/\" . $pdbid . \"/\" . $chain . \"/\";\n");
+            sb.append("        $link = \"./\" . $mid_chars . \"/\" . $pdbid . \"/\" . $chain . \"/\";\n");
             sb.append("    }\n");
             sb.append("    else {\n");
             //sb.append("        echo \"PDB ID is valid but chain is not.<br/>\";\n");
-            sb.append("        $link = \"./\" . \"ic/\" . $pdbid . \"/\";\n");
+            sb.append("        $link = \"./\" . $mid_chars . \"/\" . $pdbid . \"/\";\n");
             sb.append("    }\n");
             //sb.append("    echo \"Link is $link.\";\n");
             
