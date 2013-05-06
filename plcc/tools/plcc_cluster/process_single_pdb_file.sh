@@ -147,6 +147,10 @@ touch $DBINSERT_LOG || exit 1
 
 echo "$APPTAG Logging to '$DBINSERT_LOG'."
 
+echo "$APPTAG Handling PDB file '$FLN'. Assuming file extension '$REMOTE_PDB_FILE_EXTENSION'." >>$DBINSERT_LOG
+echo "$APPTAG The PDB ID of the file is '$PDBID'." >>$DBINSERT_LOG
+echo "$APPTAG The starting time is '$TIME_START'." >>$DBINSERT_LOG
+
 
 NUM_HANDLED=0
 NUM_SUCCESS=0
@@ -172,7 +176,7 @@ if [ -r $FLN ]; then
 	fi
 	
 	## Get the PDB file
-	./get_pdb_file.sh $PDBID >$DBINSERT_LOG 2>&1
+	./get_pdb_file.sh $PDBID >>$DBINSERT_LOG 2>&1
 
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG   Could not get PDB file for protein '$PDBID', skipping protein '$PDBID'."
@@ -185,7 +189,7 @@ if [ -r $FLN ]; then
 
 
 	## Now create the DSSP file
-	./create_dssp_file.sh $PDBID.pdb >$DBINSERT_LOG 2>&1
+	./create_dssp_file.sh $PDBID.pdb >>$DBINSERT_LOG 2>&1
 
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG   Could not create DSSP file from PDB file '$PDBID.pdb', skipping protein '$PDBID'."
@@ -198,7 +202,7 @@ if [ -r $FLN ]; then
 
 
 	## Ok, now call plcc to do the real work.
-	./plcc $PDBID $PLCC_OPTIONS >$DBINSERT_LOG 2>&1
+	./plcc $PDBID $PLCC_OPTIONS >>$DBINSERT_LOG 2>&1
 
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG   Running plcc failed for PDB ID '$PDBID', skipping protein '$PDBID'."
@@ -231,12 +235,12 @@ fi
 
 
 
-echo "$APPTAG -------------------------------------------------------------------"
-
 TIME_END=$(date)
 
 echo "$APPTAG Done, handled $NUM_HANDLED of the $NUM_FILES files ($NUM_SUCCESS ok, $NUM_TOTAL_FAIL failed)."
+echo "$APPTAG Done, handled $NUM_HANDLED of the $NUM_FILES files ($NUM_SUCCESS ok, $NUM_TOTAL_FAIL failed)." >>$DBINSERT_LOG
 echo "$APPTAG Started at '$TIME_START', finished at '$TIME_END'."
+echo "$APPTAG Started at '$TIME_START', finished at '$TIME_END'." >>$DBINSERT_LOG
 
 for TF in $LOCKFILE_DBINSERT $DBINSERT_FILE_LIST $DBINSERT_FILE_LIST_PROC
 do
@@ -249,6 +253,7 @@ done
 
 
 echo "$APPTAG All done, exiting."
+echo "$APPTAG All done, exiting." >>$DBINSERT_LOG
 exit 0
 
 
