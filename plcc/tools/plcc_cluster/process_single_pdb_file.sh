@@ -184,7 +184,6 @@ if [ -r $FLN ]; then
 	    let NUM_TOTAL_FAIL++
 	    let NUM_PDB_FAIL++
 	    del_output $PDBID
-	    continue
 	fi
 
 
@@ -197,7 +196,6 @@ if [ -r $FLN ]; then
 	    let NUM_TOTAL_FAIL++
 	    let NUM_DSSP_FAIL++
 	    del_output $PDBID
-	    continue
 	fi
 
 
@@ -210,7 +208,6 @@ if [ -r $FLN ]; then
 	    let NUM_TOTAL_FAIL++
 	    let NUM_PLCC_FAIL++
 	    del_output $PDBID
-	    continue
 	fi
 	
 	## everything worked it seems
