@@ -140,6 +140,82 @@ public class HtmlTools {
         return "<div class=\"" + classString + "\">\n";
     }
     
+    public static String startDivHideableWithID(String id) {
+        return "<div id=\"" + id + "\" name=\"" + id + "\" style=\"overflow:hidden;display:none\">\n";
+    }
+    
+    /*
+    public static String resizeJavascriptFunction() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<script language=\"JavaScript\" type=\"text/javascript\">\n");
+        sb.append("<!--\n");
+        sb.append("function setDivDisplayStyle(div_id, display_style) {\n");
+        sb.append("    var the_div = document.getElementById('div_id');\n");
+        sb.append("    the_div.style.display = display_style;\n");
+        sb.append("}\n");
+        sb.append("// -->\n");
+        sb.append("</script>\n");
+        return sb.toString();
+    }
+    */
+    
+    public static String resizeJavascriptFunctionFixedDiv(String divId) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<script language=\"JavaScript\" type=\"text/javascript\">\n");
+        sb.append("<!--\n");
+        sb.append("function setDivDisplayStyle").append(divId).append("(displaystyle) {\n");
+        sb.append("    var thediv = document.getElementById('").append(divId).append("');\n");
+        sb.append("    thediv.style.display = displaystyle;\n");
+        sb.append("}\n");
+        sb.append("// -->\n");
+        sb.append("</script>\n");
+        return sb.toString();
+    }
+    
+    /*
+    public static String divHideLinkFor(String divId, String label) {
+        return "<a href=\"javascript:setDivDisplayStyle('" + divId + "', 'none')\">" + label + "</a>\n";
+    }
+    
+    public static String divExpandLinkFor(String divId, String label) {
+        return "<a href=\"javascript:setDivDisplayStyle('" + divId + "', 'block')\">" + label + "</a>\n";
+    }
+    */
+    
+    public static String divHideLinkFixedDivFor(String divId, String label) {
+        return "<a href=\"javascript:setDivDisplayStyle" + divId + "('none')\">" + label + "</a>\n";
+    }
+    
+    public static String divExpandLinkFixedDivFor(String divId, String label) {
+        return "<a href=\"javascript:setDivDisplayStyle" + divId + "('block')\">" + label + "</a>\n";
+    }
+        
+    /*
+    public static String hideAndExpandLinksFor(String divId, String expandText, String hideText) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        sb.append(HtmlTools.divExpandLinkFor(divId, expandText));
+        sb.append(" | ");
+        sb.append(HtmlTools.divHideLinkFor(divId, hideText));
+        sb.append("]");
+        sb.append(HtmlTools.brAndNewline());
+        return sb.toString();
+    }
+    */
+    
+    public static String hideAndExpandLinksFixedDivFor(String divId, String expandText, String hideText) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(HtmlTools.startSpan("tool"));
+        sb.append("[");
+        sb.append(HtmlTools.divExpandLinkFixedDivFor(divId, expandText));
+        sb.append(" | ");
+        sb.append(HtmlTools.divHideLinkFixedDivFor(divId, hideText));
+        sb.append("]");
+        sb.append(HtmlTools.brAndNewline());
+        sb.append(HtmlTools.endSpan());
+        return sb.toString();
+    }
+    
     public static String endDiv() {
         return "</div>\n";
     }

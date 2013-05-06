@@ -577,7 +577,7 @@ public class HtmlGenerator {
         sb.append(HtmlTools.endParagraph());
         sb.append(HtmlTools.endDiv());  // chain
         
-        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                        
         
         // -------------------- navigation -------------------
         
@@ -653,6 +653,9 @@ public class HtmlGenerator {
                     } else {
                         sb.append(HtmlTools.listItem("" + HtmlTools.link("#" + graphType, "The " + graphType + " graph")));
                     }
+                    
+                    // js hide/show functions
+                    sb.append(HtmlTools.resizeJavascriptFunctionFixedDiv("hide_" + graphType + "_structure"));
                 }
                 sb.append(HtmlTools.uListEnd());
             }
@@ -707,11 +710,18 @@ public class HtmlGenerator {
                     // ---------------------- SSE info table ----------------------
                     sb.append(HtmlTools.heading("Graph structure", 4));
                     sb.append(HtmlTools.startParagraph());
+                    sb.append("The graph structure tables hold detailed information on the SSEs, spatial contacts and ligands of the " + graphType + " graph of this protein chain.");
+                    sb.append(HtmlTools.endParagraph());
+                    sb.append(HtmlTools.startDivHideableWithID("hide_" + graphType + "_structure"));
+                    sb.append(HtmlTools.startParagraph());
                     g = pcr.getProteinGraph(graphType);
                     if(g != null) {           
                         
                         sb.append("This ").append(graphType).append(" graph consists of ").append(g.numVertices()).append(" SSEs and ").append(g.numSSEContacts()).append(" edges.");
                         sb.append(HtmlTools.br());
+                        sb.append(HtmlTools.brAndNewline());
+                        
+                        sb.append(HtmlTools.startParagraph());
                         sb.append(HtmlTools.brAndNewline());
                         
                         if(g.numVertices() > 0) {
@@ -757,6 +767,8 @@ public class HtmlGenerator {
                         sb.append(HtmlTools.italic("No SSE details are available for this graph."));
                         sb.append(HtmlTools.brAndNewline());
                     }
+                    sb.append(HtmlTools.endDiv());  // end hide graph structure div
+                    sb.append(HtmlTools.hideAndExpandLinksFixedDivFor("hide_" + graphType + "_structure", "&gt;&gt;Expand " + graphType + " graph structure tables", "&lt;&lt;Hide " + graphType + " graph structure tables"));  // draw hide/show graph structure buttons
                     sb.append(HtmlTools.endParagraph());
                     
                     sb.append(HtmlTools.brAndNewline());

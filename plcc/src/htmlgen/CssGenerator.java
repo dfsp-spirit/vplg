@@ -101,6 +101,13 @@ public class CssGenerator {
         sb.append(".footer a:hover { font-size:7pt; color:").append(colorLinksActive).append("; text-decoration:none }\n");
         sb.append(".footer a:active { font-size:7pt; color:").append(colorLinksActive).append("; text-decoration:none }\n");
         sb.append(".footer a:focus { font-size:7pt;color:").append(colorLinks).append("; text-decoration:none }\n");
+        sb.append(".tool p { font-size:7pt; font-family:Arial,sans-serif; color:").append(colorFont).append(" }\n");
+        sb.append(".tool { font-size:7pt; font-family:Arial,sans-serif; color:").append(colorFont).append(" }\n");
+        sb.append(".tool a:link {font-size:7pt;font-family:Arial,sans-serif;color:").append(colorLinks).append(";text-decoration:none}\n");        
+        sb.append(".tool a:visited { font-size:7pt; color:").append(colorLinks).append("; text-decoration:none }\n");
+        sb.append(".tool a:hover { font-size:7pt; color:").append(colorLinksActive).append("; text-decoration:none }\n");
+        sb.append(".tool a:active { font-size:7pt; color:").append(colorLinksActive).append("; text-decoration:none }\n");
+        sb.append(".tool a:focus { font-size:7pt;color:").append(colorLinks).append("; text-decoration:none }\n");
         sb.append("td.caption { text-align: left; font-size:8pt; font-family:Arial,sans-serif; color:").append(colorFont).append("; }\n");
         sb.append("table.image { margin-left: 4em; }\n");
         sb.append("Span.CENTERTEXT{text-align: center;}\n");
