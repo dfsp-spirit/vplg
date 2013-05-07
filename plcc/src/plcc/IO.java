@@ -15,6 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.utils.IOUtils;
 import org.w3c.dom.Document;
+import resources.Resources;
 
 /**
  * This static class holds various methods related to input and output. It makes use of the Apache commons compress
@@ -409,6 +411,16 @@ public class IO {
         }
         
         return dirStructure;
+    }
+    
+    public static boolean copyResourceFileToFileSystemLocation(String pathToResourceFile, File targetFile) {
+        InputStream is = Resources.class.getClassLoader().getResourceAsStream(pathToResourceFile);
+        if(is != null) {
+            //TODO: implement me
+        }
+        
+        
+        return false;
     }
 
     

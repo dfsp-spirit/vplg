@@ -135,6 +135,7 @@ public class CssGenerator {
         sb.append(".button, button {padding: 5px;margin: 5px;margin-left:10px;}");
         sb.append("input.button {font-size: 10px;padding: 5px;margin: 5px;margin-left:10px;}");
         sb.append("input {font-size: 10px;}");
+        sb.append("input {-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;}");
         return sb.toString();
     }
     

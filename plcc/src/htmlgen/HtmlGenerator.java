@@ -98,6 +98,25 @@ public class HtmlGenerator {
         } else {
             System.err.println("ERROR: Could not write VPLGweb find website to " + new File(findWebsitePhpFile).getAbsolutePath() + ".");
         }
+        
+        if(this.writeResourceFilesToFilesystem(outputBaseDir.getAbsolutePath())) {
+            System.out.println("   Wrote resources files like images to base directory " + outputBaseDir.getAbsolutePath() + ".");
+        } else {
+            System.err.println("ERROR: Could not write resource files to base directory " + outputBaseDir.getAbsolutePath() + ".");
+        }
+    }
+    
+    public boolean writeResourceFilesToFilesystem(String pathToBaseDir) {
+        boolean allOk = true;
+        String fs = File.separator;
+        
+        File destination = new File(pathToBaseDir + fs + "vplg_logo.png");
+        if( ! IO.copyResourceFileToFileSystemLocation("/resources/vplg_logo.png", destination)) {
+            allOk = false;
+            System.err.println("ERROR: Failed to copy logo from JAR resources to file system path '" + destination + "'.");
+        }
+        
+        return allOk;
     }
     
     public String generateStartWebpage(String pathToBaseDir) {
@@ -152,6 +171,10 @@ public class HtmlGenerator {
             sb.append(HtmlTools.italic("8icd"));
             sb.append(", go to ");
             sb.append(HtmlTools.link("./ic/8icd/", "ic/8icd/"));
+            sb.append(" and for chain A of ");
+            sb.append(HtmlTools.italic("7tim"));
+            sb.append(", go to ");
+            sb.append(HtmlTools.link("./ti/7tim/A/", "ti/7tim/A/"));
             sb.append(".");
             sb.append(HtmlTools.endParagraph());
             sb.append(HtmlTools.brAndNewline());
