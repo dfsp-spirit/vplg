@@ -116,6 +116,12 @@ chmod u+x $TMPDIR/plcc_cluster/plcc_run/splitpdb
 # copy mpi4py software
 scp -r $MYHOME/software/openmpi/mpi4py/ $TMPDIR/
 
+MPI_SRC_DIR="$TMPDIR/mpi4py/src/MPI"
+if [ ! -d "$MPI_SRC_DIR" ]; then
+    echo "$APPTAG ERROR: Directory '$MPI_SRC_DIR' does not exist. Copying seems to have failed."
+    exit 1
+fi
+
 if [ ! -r "$INPUT_FILE" ]; then
     echo "$APPTAG ERROR: Cannot read input file '$INPUT_FILE'. This should be a file holding paths to all PDB files, one per line. Exiting."
     exit 1
