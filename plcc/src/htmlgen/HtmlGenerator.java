@@ -913,6 +913,7 @@ public class HtmlGenerator {
     public String generateLogo(String pathToBaseDir) {
         StringBuilder sb = new StringBuilder();
         sb.append("<div class=\"logo\" align=\"center\">\n");
+        sb.append("<img src=\"").append(pathToBaseDir).append("/vplg_logo.png\" alt=\"VPLG logo\" style=\"float:right;\" />\n");
         sb.append(HtmlTools.heading("VPLGweb -- Visualization of Protein Ligand Graphs web server", 1));
         sb.append(HtmlTools.hr());
         sb.append("</div>\n");
