@@ -20,7 +20,7 @@ Here is the order in which to run the scripts and a description of what the scri
 
 
 Preparation:
-0.0) Copy the plcc.jar file and the 'lib' directory from your VPLG installation to the 'plcc_run' subdirectory.
+0.0) Copy the plcc.jar file, splitpdb.jar file and the 'lib' directory from your VPLG installation to the 'plcc_run' subdirectory. Install dsspcmbi.
 0.1) Edit the config file 'settings_statistics.cfg' to match your local settings, you must specify the paths to splitpdb and dsspcmbi and other stuff.
 0.2) Edit the PLCC config file (at '~/.plcc_settings', run 'plcc --create-config' once if you do not have that file yet) and configure the database server.
 0.3) Get a copy of the PDB via rsync or update your copy if required. You can use the 'update_files_via_rsync.sh' script for this.
@@ -44,6 +44,7 @@ NOTE: I assume in the following, that your HOME directory, the directories conta
       If you have a shared directory but it is NOT your home directory, you need to copy the PLCC config file to all nodes after preparing it because it is assumed to be at "$HOME/.plcc_settings" by PLCC.
 
 Preparation:
+0.0) Copy the plcc.jar file, splitpdb.jar file and the 'lib' directory from your VPLG installation to the 'plcc_run' subdirectory. Install dsspcmbi.
 0.1) Edit the config file 'settings_statistics.cfg' to match your local settings.
 0.2) Edit the PLCC config file (at '~/.plcc_settings', run 'plcc --help' once if you do not have that file yet) and configure the database server.
 0.3) Get a copy of the PDB via rsync or update your copy if required. You can use the 'update_files_via_rsync.sh' script for this.

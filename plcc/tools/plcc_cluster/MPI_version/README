@@ -15,6 +15,8 @@ USING THESE SCRIPTS
 
 You should use the following steps to run the MPI version:
 
+0) 0.0) Copy the plcc.jar file, splitpdb.jar file and the 'lib' directory from your VPLG installation to the 'plcc_cluster/plcc_run/' subdirectory. Install dsspcmbi.
+
 1) Adapt settings in settings_statistics and the other script files.
 
 2) Update your local copy of the PDB.
