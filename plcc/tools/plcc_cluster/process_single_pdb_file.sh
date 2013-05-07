@@ -21,7 +21,7 @@ source $CFG_FILE
 function del_output()
 {
     ## remove various output files
-    L_PDBID="$1"
+    L_PDBID="$1"	# first parameter to this function
     list_size=0
     num_del=0
     for f in $L_PDBID.pdb $L_PDBID.dssp $L_PDBID.geolig $L_PDBID.ligands $L_PDBID.contactstats $L_PDBID.models $L_PDBID.chains $L_PDBID.dssplig $L_PDBID.geolig $L_PDBID.pymol $L_PDBID.geo
@@ -35,6 +35,54 @@ function del_output()
     done
     #echo "$APPTAG Checked for $list_size files, deleted $num_del."
 }
+
+function report_and_exit()
+{
+    L_EXITCODE="$1"	# first parameter to this function
+    TIME_END=$(date)
+
+    echo "$APPTAG Done, handled $NUM_HANDLED of the $NUM_FILES files ($NUM_SUCCESS ok, $NUM_TOTAL_FAIL failed)."
+    echo "$APPTAG Done, handled $NUM_HANDLED of the $NUM_FILES files ($NUM_SUCCESS ok, $NUM_TOTAL_FAIL failed)." >>$DBINSERT_LOG
+    echo "$APPTAG Started at '$TIME_START', finished at '$TIME_END'."
+    echo "$APPTAG Started at '$TIME_START', finished at '$TIME_END'." >>$DBINSERT_LOG
+
+    for TF in $LOCKFILE_DBINSERT $DBINSERT_FILE_LIST $DBINSERT_FILE_LIST_PROC
+    do
+	if [ -r $TF ]; then	
+	    if rm $TF ; then
+		echo "$APPTAG Deleted status file '$TF'."
+	    fi
+	fi
+    done
+
+
+    echo "$APPTAG All done, exiting."
+    echo "$APPTAG All done, exiting." >>$DBINSERT_LOG
+    exit $L_EXITCODE
+}
+
+function report_and_exit_nolog()
+{
+    L_EXITCODE="$1"	# first parameter to this function
+    TIME_END=$(date)
+
+    echo "$APPTAG Done, handled $NUM_HANDLED of the $NUM_FILES files ($NUM_SUCCESS ok, $NUM_TOTAL_FAIL failed)."
+    echo "$APPTAG Started at '$TIME_START', finished at '$TIME_END'."
+
+    for TF in $LOCKFILE_DBINSERT $DBINSERT_FILE_LIST $DBINSERT_FILE_LIST_PROC
+    do
+	if [ -r $TF ]; then	
+	    if rm $TF ; then
+		echo "$APPTAG Deleted status file '$TF'."
+	    fi
+	fi
+    done
+
+
+    echo "$APPTAG All done, exiting."
+    exit $L_EXITCODE
+}
+
 
 ################################################## end of functions ##################################################
 
@@ -94,10 +142,24 @@ if [ ! -d $UPDATEDIR ]; then
     exit 1
 fi
 
+GET_PDB_FILE_SCRIPT="./get_pdb_file.sh"
+## check pdb script
+if [ ! -x $GET_PDB_FILE_SCRIPT ]; then
+    echo "$APPTAG ##### ERROR: The get-pdb-file script '$GET_PDB_FILE_SCRIPT' does not exist or is not executable. Check settings. #####"
+    exit 1
+fi
+
+CREATE_DSSP_FILE_SCRIPT="./create_dssp_file.sh"
+## check dssp script
+if [ ! -x $CREATE_DSSP_FILE_SCRIPT ]; then
+    echo "$APPTAG ##### ERROR: The create-dssp-file script '$CREATE_DSSP_FILE_SCRIPT' does not exist or is not executable. Check settings. #####"
+    exit 1
+fi
+
 
 ## make sure this was executed from the path it is in (./update_db_from_new_pdb_files.sh instead of something like '/some/path/to/update_db_from_new_pdb_files.sh')
 if [ ! -f $UPDATEDIR/$CFG_FILE ]; then
-    echo "$APPTAG ##### ERROR: You have to run this script from the directory it is in. #####"
+    echo "$APPTAG ##### ERROR: Could not find config file at '$UPDATEDIR/$CFG_FILE'. You have to run this script from the directory it is in. #####"
     exit 1
 fi
 
@@ -135,9 +197,9 @@ echo "$APPTAG Handling PDB file '$FLN'. Assuming file extension '$REMOTE_PDB_FIL
 DBINSERT_LOG="${LOGDIR}/log_proc1pdb_${PDBID}.log"
 if [ -f $DBINSERT_LOG ]; then
     if rm $DBINSERT_LOG ; then
-        echo "$APPTAG Deleted old db insert log '$DBINSERT_LOG'."
+        echo "$APPTAG Deleted old db insert log '$DBINSERT_LOG' for this PDB file."
     else
-        echo "$APPTAG ERROR: Could not delete old db insert log '$DBINSERT_LOG'. Check permissions."
+        echo "$APPTAG ERROR: Could not delete old db insert log '$DBINSERT_LOG' for this PDB file. Check permissions."
         exit 1
     fi
 fi
@@ -145,7 +207,7 @@ fi
 touch $DBINSERT_LOG || exit 1
 
 
-echo "$APPTAG Logging to '$DBINSERT_LOG'."
+echo "$APPTAG Logging to '$DBINSERT_LOG' for this PDB file."
 
 echo "$APPTAG Handling PDB file '$FLN'. Assuming file extension '$REMOTE_PDB_FILE_EXTENSION'." >>$DBINSERT_LOG
 echo "$APPTAG The PDB ID of the file is '$PDBID'." >>$DBINSERT_LOG
@@ -172,11 +234,11 @@ if [ -r $FLN ]; then
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG FATAL ERROR: Cannot cd to plcc_run directory '$PLCC_RUN_DIR'."
             echo "$APPTAG FATAL ERROR: Cannot cd to plcc_run directory '$PLCC_RUN_DIR'." >>$DBINSERT_LOG
-	    exit 1
+	    report_and_exit 1
 	fi
 	
 	## Get the PDB file
-	./get_pdb_file.sh $PDBID >>$DBINSERT_LOG 2>&1
+	$GET_PDB_FILE_SCRIPT $PDBID >>$DBINSERT_LOG 2>&1
 
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG   Could not get PDB file for protein '$PDBID', skipping protein '$PDBID'."
@@ -184,11 +246,12 @@ if [ -r $FLN ]; then
 	    let NUM_TOTAL_FAIL++
 	    let NUM_PDB_FAIL++
 	    del_output $PDBID
+	    report_and_exit 1
 	fi
 
 
 	## Now create the DSSP file
-	./create_dssp_file.sh $PDBID.pdb >>$DBINSERT_LOG 2>&1
+	$CREATE_DSSP_FILE_SCRIPT $PDBID.pdb >>$DBINSERT_LOG 2>&1
 
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG   Could not create DSSP file from PDB file '$PDBID.pdb', skipping protein '$PDBID'."
@@ -196,11 +259,14 @@ if [ -r $FLN ]; then
 	    let NUM_TOTAL_FAIL++
 	    let NUM_DSSP_FAIL++
 	    del_output $PDBID
+	    report_and_exit 1
 	fi
 
 
 	## Ok, now call plcc to do the real work.
-	./plcc $PDBID $PLCC_OPTIONS >>$DBINSERT_LOG 2>&1
+	PLCC_COMMAND="./plcc $PDBID $PLCC_OPTIONS"
+	echo "$APPTAG PLCC command is '$PLCC_COMMAND'."
+	$PLCC_COMMAND >>$DBINSERT_LOG 2>&1
 
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG   Running plcc failed for PDB ID '$PDBID', skipping protein '$PDBID'."
@@ -208,49 +274,22 @@ if [ -r $FLN ]; then
 	    let NUM_TOTAL_FAIL++
 	    let NUM_PLCC_FAIL++
 	    del_output $PDBID
+	    report_and_exit 1
+	else
+	    ## everything worked it seems
+	    let NUM_SUCCESS++
+	    del_output $PDBID
+	    ## we delete the log file if everything went fine
+	    rm $DBINSERT_LOG
+	    report_and_exit_nolog 0
 	fi
-	
-	## everything worked it seems
-	let NUM_SUCCESS++
-
-	## delete output via bash function
-	del_output $PDBID
-
-	cd $UPDATEDIR
-	if [ $? -ne 0 ]; then
-	    echo "$APPTAG FATAL ERROR: Cannot cd to update directory '$UPDATEDIR'. (Did you execute this from another path?)"
-	    echo "$APPTAG FATAL ERROR: Cannot cd to update directory '$UPDATEDIR'. (Did you execute this from another path?)" >>$DBINSERT_LOG
-	    exit 1
-	fi
-
 else
     echo "$APPTAG Could not read file '$FLN', skipping."
     echo "$APPTAG Could not read file '$FLN', skipping." >>$DBINSERT_LOG
     let NUM_TOTAL_FAIL++
     let NUM_PDB_FAIL++
+    report_and_exit 1
 fi	
 
-
-
-TIME_END=$(date)
-
-echo "$APPTAG Done, handled $NUM_HANDLED of the $NUM_FILES files ($NUM_SUCCESS ok, $NUM_TOTAL_FAIL failed)."
-echo "$APPTAG Done, handled $NUM_HANDLED of the $NUM_FILES files ($NUM_SUCCESS ok, $NUM_TOTAL_FAIL failed)." >>$DBINSERT_LOG
-echo "$APPTAG Started at '$TIME_START', finished at '$TIME_END'."
-echo "$APPTAG Started at '$TIME_START', finished at '$TIME_END'." >>$DBINSERT_LOG
-
-for TF in $LOCKFILE_DBINSERT $DBINSERT_FILE_LIST $DBINSERT_FILE_LIST_PROC
-do
-    if [ -r $TF ]; then	
-	if rm $TF ; then
-	    echo "$APPTAG Deleted status file '$TF'."
-	fi
-    fi
-done
-
-
-echo "$APPTAG All done, exiting."
-echo "$APPTAG All done, exiting." >>$DBINSERT_LOG
-exit 0
 
 
