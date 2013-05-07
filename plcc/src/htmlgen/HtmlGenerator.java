@@ -100,9 +100,9 @@ public class HtmlGenerator {
         }
         
         if(this.writeResourceFilesToFilesystem(outputBaseDir.getAbsolutePath())) {
-            System.out.println("   Wrote resources files like images to base directory " + outputBaseDir.getAbsolutePath() + ".");
+            System.out.println("   Wrote resources files like images to base directory '" + outputBaseDir.getAbsolutePath() + "'.");
         } else {
-            System.err.println("ERROR: Could not write resource files to base directory " + outputBaseDir.getAbsolutePath() + ".");
+            System.err.println("ERROR: Could not write resource files to base directory '" + outputBaseDir.getAbsolutePath() + "'.");
         }
     }
     
@@ -110,11 +110,17 @@ public class HtmlGenerator {
         boolean allOk = true;
         String fs = File.separator;
         
-        File destination = new File(pathToBaseDir + fs + "vplg_logo.png");
-        if( ! IO.copyResourceFileToFileSystemLocation("/resources/vplg_logo.png", destination)) {
+        // copy logo
+        String source = "resources/vplg_logo.png";
+        File destination = new File(pathToBaseDir + fs + "vplg_logo.png");        
+        try {            
+            IO.copyResourceFileToFileSystemLocation(source, destination);                
+        } catch(Exception e) {
+            System.err.println("ERROR: Failed to copy logo from JAR resources at '" + source + "' to file system path '" + destination + "': '" + e.getMessage() + "'.");
             allOk = false;
-            System.err.println("ERROR: Failed to copy logo from JAR resources to file system path '" + destination + "'.");
         }
+        
+        // may copy more stuff here
         
         return allOk;
     }

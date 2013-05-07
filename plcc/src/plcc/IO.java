@@ -413,14 +413,26 @@ public class IO {
         return dirStructure;
     }
     
-    public static boolean copyResourceFileToFileSystemLocation(String pathToResourceFile, File targetFile) {
+    public static boolean copyResourceFileToFileSystemLocation(String pathToResourceFile, File targetFile) throws Exception {
+        boolean found = false;
         InputStream is = Resources.class.getClassLoader().getResourceAsStream(pathToResourceFile);
         if(is != null) {
-            //TODO: implement me
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            FileOutputStream fos = new FileOutputStream(targetFile);
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            
+            while ((bytesRead = is.read(buffer)) != -1) {
+                fos.write(buffer, 0, bytesRead);
+            }
+            fos.flush();
+            br.close();
+            is.close();
+            found = true;
+        } else {
+            throw new Exception ("Resource '" + pathToResourceFile + "' not found.");
         }
-        
-        
-        return false;
+        return found;
     }
 
     
