@@ -413,6 +413,14 @@ public class IO {
         return dirStructure;
     }
     
+    
+    /**
+     * Copies a file from this JAR's resources to a file system destination.
+     * @param pathToResourceFile the path to the resource inside the JAR, e.g., "resources/vplg_logo.png".
+     * @param targetFile the destination file
+     * @return true it the file was copied, false otherwise
+     * @throws Exception if the resource was not found
+     */
     public static boolean copyResourceFileToFileSystemLocation(String pathToResourceFile, File targetFile) throws Exception {
         boolean found = false;
         InputStream is = Resources.class.getClassLoader().getResourceAsStream(pathToResourceFile);
