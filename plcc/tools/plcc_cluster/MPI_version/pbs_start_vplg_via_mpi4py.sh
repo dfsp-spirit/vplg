@@ -88,10 +88,6 @@ echo "$APPTAG -----"
 # go to working dir
 cd $PBS_O_WORKDIR
 
-if [ ! -r "$INPUT_FILE" ]; then
-    echo "$APPTAG ERROR: Cannot read input file '$INPUT_FILE'. This should be a file holding paths to all PDB files, one per line. Exiting."
-    exit 1
-fi
 
 echo "$APPTAG Loading bash modules..." 
 # load openmpi environment module
@@ -115,6 +111,10 @@ chmod u+x $TMPDIR/plcc_cluster/plcc_run/splitpdb
 # copy mpi4py software
 scp -r $MYHOME/software/openmpi/mpi4py/ $TMPDIR/
 
+if [ ! -r "$INPUT_FILE" ]; then
+    echo "$APPTAG ERROR: Cannot read input file '$INPUT_FILE'. This should be a file holding paths to all PDB files, one per line. Exiting."
+    exit 1
+fi
 
 
 MPI4PY_SCRIPT="mpi4py_vplg.py"
