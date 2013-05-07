@@ -77,9 +77,8 @@ echo $APPTAG Running on host `hostname`
 echo $APPTAG Time is `date`
 echo $APPTAG Directory is `pwd`
 echo -n "$APPTAG This job runs on the following processors: "
-echo $APPTAG `cat $PBS_NODEFILE`
+echo `cat $PBS_NODEFILE`
 echo $APPTAG The java binary is at `which java`
-echo ""
 echo $APPTAG pbs job id is $PBS_JOBID
 echo "$APPTAG Using $NUM_PROCESSORS_PER_NODE processors"
 echo "$APPTAG Using $INPUT_FILE as the file containing the list of all PDB files to handle"
@@ -94,7 +93,9 @@ echo "$APPTAG Loading bash modules..."
 . /usr/share/Modules/3.2.10/init/bash
 #. /usr/share/modules/init/bash
 #module load gnu-openmpi
+#module load openmpi
 
+# this is only a test which was added because module loading seems broken atm
 export PATH="/usr/lib64/mpi/gcc/openmpi/bin:$PATH"
 export LD_LIBRARY_PATH="/usr/lib64/mpi/gcc/openmpi/lib64:$LD_LIBRARY_PATH"
 
