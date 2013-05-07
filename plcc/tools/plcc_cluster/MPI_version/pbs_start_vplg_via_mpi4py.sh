@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # pbs_start_vplg_via_mpi4py.sh -- pbs job script to run VPLG on the whole PDB database via PBS and MPI on a cluster.
 # This script allows you to use all CPUs of each node. The other update scripts only use one CPU per networked computer.
 #
@@ -92,7 +92,7 @@ echo "$APPTAG Loading bash modules..."
 # load openmpi environment module
 . /usr/share/Modules/3.2.10/init/bash
 #. /usr/share/modules/init/bash
-#module load gnu-openmpi
+module load gnu-openmpi
 #module load openmpi
 
 # this is only a test which was added because module loading seems broken atm
