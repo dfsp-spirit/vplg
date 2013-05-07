@@ -132,7 +132,7 @@ date
 #mpirun -np 8 /home/hs/src/mpi4py-1.2.2/build/exe.linux-x86_64-2.7/python2.7-mpi /home/hs/src/py_scripts/mpi4py_test.py
 #mpirun -np 8 /home/hs/src/mpi4py-1.2.2/build/exe.linux-x86_64-2.7/python2.7-mpi mpi4py_test.py
 cd $TMPDIR/plcc_cluster/MPI_version/
-mpirun -np $NUM_PROCESSORS_PER_NODE python mpi4py_vplg.py $INPUT_FILE
+mpirun --default-hostfile /etc/openmpi-default-hostfile -np $NUM_PROCESSORS_PER_NODE python mpi4py_vplg.py $INPUT_FILE
 
 
 echo -n "$APPTAG The script $MPI4PY_SCRIPT terminated at: "

@@ -4,8 +4,10 @@
 ## Use 'qsub pbs_start_vplg_via_mpi4py.sh' instead.
 ## This script takes as argument a file which holds the full path to the PDB files (one file per line).
 
+import sys
+sys.path.append('../../mpi4py/src/MPI/')
 from mpi4py import MPI
-from MpiTools import *
+from mpi4py_tools import *
 import shlex, subprocess
 import os
 
