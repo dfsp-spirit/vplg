@@ -86,12 +86,13 @@ echo "$APPTAG Using $INPUT_FILE as the file containing the list of all PDB files
 echo "$APPTAG -----"
  
 # go to working dir
-cd $PBS_O_WORKDIR
+#cd $PBS_O_WORKDIR
 
 
 echo "$APPTAG Loading bash modules..." 
 # load openmpi environment module
-. /usr/share/modules/init/bash
+. /usr/share/Modules/3.2.10/init/bash
+#. /usr/share/modules/init/bash
 module load openmpi.module
 
 
