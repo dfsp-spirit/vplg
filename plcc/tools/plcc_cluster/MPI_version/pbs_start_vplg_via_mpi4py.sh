@@ -62,6 +62,7 @@
 APPTAG="[PBS_VPLG_VIA_MPI4PY]"
 MYHOME="/home/ts"
 NUM_PROCESSORS_PER_NODE=8
+INPUT_FILE="$TMPDIR/plcc_cluster/status/dbinsert_file_list_proc.lst"	# this file contains a list of all PDB files that should be handled. You can create the list with the scripts in the plcc_cluster/ directory
 
 # report some stuff for log file 
 echo $APPTAG ----- Submitting job to pbs queue -----
@@ -81,10 +82,16 @@ echo $APPTAG The java binary is at `which java`
 echo ""
 echo $APPTAG pbs job id is $PBS_JOBID
 echo "$APPTAG Using $NUM_PROCESSORS_PER_NODE processors"
+echo "$APPTAG Using $INPUT_FILE as the file containing the list of all PDB files to handle"
 echo "$APPTAG -----"
  
 # go to working dir
 cd $PBS_O_WORKDIR
+
+if [ ! -r "$INPUT_FILE" ]; then
+    echo "$APPTAG ERROR: Cannot read input file '$INPUT_FILE'. This should be a file holding paths to all PDB files, one per line. Exiting."
+    exit 1
+fi
 
 echo "$APPTAG Loading bash modules..." 
 # load openmpi environment module
@@ -120,7 +127,7 @@ date
 #mpirun -np 8 /home/hs/src/mpi4py-1.2.2/build/exe.linux-x86_64-2.7/python2.7-mpi /home/hs/src/py_scripts/mpi4py_test.py
 #mpirun -np 8 /home/hs/src/mpi4py-1.2.2/build/exe.linux-x86_64-2.7/python2.7-mpi mpi4py_test.py
 cd $TMPDIR/plcc_cluster/MPI_version/
-mpirun -np $NUM_PROCESSORS_PER_NODE python mpi4py_vplg.py
+mpirun -np $NUM_PROCESSORS_PER_NODE python mpi4py_vplg.py $INPUT_FILE
 
 
 echo -n "$APPTAG The script $MPI4PY_SCRIPT terminated at: "
