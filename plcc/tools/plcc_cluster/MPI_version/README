@@ -1,24 +1,29 @@
-mpi4py_test:
-1) den teil ersetzen:
-### <paralell operation> ###
-if ((cur_job%7)==0):
-    result.append(cur_job)
-### </paralell operation> ###
+This is the README for the openMPI version of the vplg cluster scripts.
 
-2) evtl. kann man datei nicht als argument mitgeben dann muss das auch ersetzt werden
+Written by ts.
 
-3) gather kann auskommentiert werden
+ABOUT THESE SCRIPTS
+====================
+
+This version allows you to use all cores of each node. An OpenPBS script is available to submit the jobs to the PBS cluster queue as well.
+
+Note that the files in this directory (plcc_cluster/MPI_version/)also use scripts from the level above it (plcc_cluster/).
+
+
+USING THESE SCRIPTS
+====================
+
+You should use the following steps to run the MPI version:
+
+1) Adapt settings in settings_statistics and the other script files.
+
+2) Update your local copy of the PDB.
+
+3) Create the list of PDB files to handle (plcc_cluster/status/dbinsert_file_list_proc.lst) using the scripts in the plcc_cluster/ dir.
+
+4) Use the following command to run the MPI version:
+
+  qsub pbs_start_vplg_via_mpi4py.sh
 
 
 
-pbs job file:
-es sind eigentlich nur ein paar zeilen wirklich relevant
-
-1) openmpi eviroment setzen
-
-# load openmpi environment module
-. /usr/share/modules/init/bash
-module load openmpi.module
-
-2) anzahl der prozesse die gestartet werden
-mpirun -np 8 python mpi4py_test.py

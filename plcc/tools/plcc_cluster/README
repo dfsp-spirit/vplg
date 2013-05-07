@@ -54,10 +54,14 @@ Actual Update:
 3-ALL-NODES) !!!ON EACH NODE!!! Run the 'run_update_on_this_node_in_screen.sh' script on each node (without any command line parameters, just ./ it). This will call the 'update_db_from_hostfilelist_on_this_node.sh' script with proper parameters for the host it is run on in a screen session, so you can logout and it will continue running in the background.
 4) Done. When the scripts are finished on all nodes, the data should be in the database.
 
-MPI version
+
+How to use the MPI version of this scripts (requires an openMPI installation on a cluster, a job script fpr openPBS is supplied)
+==================================================================================================================================
+See the README file in the MPI_version/ subdirectory.
 
 
-What to do oncve everything is done and all the proteins are in the database
+
+What to do once everything is done and all the proteins are in the database
 =============================================================================
 You can run your own SQL queries or have a look at the query_scripts/ directory, some queries are in there.
 
