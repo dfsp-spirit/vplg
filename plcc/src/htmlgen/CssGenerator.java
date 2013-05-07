@@ -24,10 +24,12 @@ public class CssGenerator {
         
         int colorScheme = 0;
                 
-        String colorBackgroundBody = "white";
+        String colorBackgroundBody = "#382D2C";
+        //String colorBackgroundBody = "white";
         String colorBackgroundMain = "#DCDCDC";
         String colorSections = "#C0C0C0";
         String colorFont = "black";
+        String colorFontHeader = "#4C0000";
         String colorLinks = "#800000";
         String colorLinksActive = "#FF0000";
         
@@ -136,6 +138,11 @@ public class CssGenerator {
         sb.append("input.button {font-size: 10px;padding: 5px;margin: 5px;margin-left:10px;}");
         sb.append("input {font-size: 10px;}");
         sb.append("input {-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;}");
+        sb.append("h1 { color: ").append(colorFontHeader).append(";font-family: sans-serif;}");
+        sb.append("h2 { color: ").append(colorFontHeader).append(";font-family: sans-serif;}");
+        sb.append("h3 { color: ").append(colorFontHeader).append(";font-family: sans-serif;}");
+        sb.append("h4 { color: ").append(colorFontHeader).append(";font-family: sans-serif;}");
+        sb.append("h5 { color: ").append(colorFontHeader).append(";font-family: sans-serif;}");
         return sb.toString();
     }
     
