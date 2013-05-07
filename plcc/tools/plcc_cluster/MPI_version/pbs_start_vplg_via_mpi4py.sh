@@ -93,7 +93,10 @@ echo "$APPTAG Loading bash modules..."
 # load openmpi environment module
 . /usr/share/Modules/3.2.10/init/bash
 #. /usr/share/modules/init/bash
-module load openmpi.module
+#module load gnu-openmpi
+
+export PATH="/usr/lib64/mpi/gcc/openmpi/bin:$PATH"
+export LD_LIBRARY_PATH="/usr/lib64/mpi/gcc/openmpi/lib64:$LD_LIBRARY_PATH"
 
 
 # copy my python MPI job scripts to temporary directory 
