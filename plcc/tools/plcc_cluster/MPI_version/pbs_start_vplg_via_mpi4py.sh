@@ -1,4 +1,8 @@
 #!/bin/sh
+# pbs_start_vplg_via_mpi4py.sh -- pbs job script to run VPLG on the whole PDB database via PBS and MPI on a cluster.
+# This script allows you to use all CPUs of each node. The other update scripts only use one CPU per networked computer.
+#
+# Written by ts.
 #
 # remarks: a line beginning with # is a comment;
 # a line beginning with #PBS is a pbs command;
@@ -55,56 +59,75 @@
 # this is scratch storage on the node you get onto, and it
 # is way much quicker to copy things there, run there and back-copy in the end
 
-
+APPTAG="[PBS_VPLG_VIA_MPI4PY]"
 MYHOME="/home/ts"
- 
-echo MYHOME is $MYHOME 
-echo Working directory is $PBS_O_WORKDIR
-echo tmp directory is $TMPDIR
-echo env is $ENVIRONMENT
-echo Running on host `hostname`
-echo Time is `date`
-echo Directory is `pwd`
-echo This job runs on the following processors:
-echo `cat $PBS_NODEFILE`
-echo pbs job id is $PBS_JOBID
- 
-# This tells PBS what directory to go to
-cd $PBS_O_WORKDIR
- 
-hostname # not needed
-#date  # not needed
+NUM_PROCESSORS_PER_NODE=8
 
+# report some stuff for log file 
+echo $APPTAG ----- Submitting job to pbs queue -----
+
+echo $APPTAG Settings:
+echo "$APPTAG -----"
+echo $APPTAG MYHOME is $MYHOME
+echo $APPTAG Working directory is $PBS_O_WORKDIR
+echo $APPTAG The tmp directory is $TMPDIR
+echo $APPTAG Environment is $ENVIRONMENT
+echo $APPTAG Running on host `hostname`
+echo $APPTAG Time is `date`
+echo $APPTAG Directory is `pwd`
+echo -n "$APPTAG This job runs on the following processors: "
+echo $APPTAG `cat $PBS_NODEFILE`
+echo $APPTAG The java binary is at `which java`
+echo ""
+echo $APPTAG pbs job id is $PBS_JOBID
+echo "$APPTAG Using $NUM_PROCESSORS_PER_NODE processors"
+echo "$APPTAG -----"
+ 
+# go to working dir
+cd $PBS_O_WORKDIR
+
+echo "$APPTAG Loading bash modules..." 
 # load openmpi environment module
 . /usr/share/modules/init/bash
 module load openmpi.module
 
-# copy files in temporary directory 
-scp $MYHOME/src/*.py $TMPDIR
-scp $MYHOME/src/py_scripts/mpi4py_test.py $TMPDIR
 
-cd $TMPDIR
+# copy my python MPI job scripts to temporary directory 
+echo "$APPTAG Copying files to temporary directory '$TMPDIR'..."
+mkdir -p $TMPDIR/MPI_version
+scp -r $MYHOME/software/plcc_cluster/ $TMPDIR/
 
-#chmod u+x check_2x_pdbs.py
+# ensure important scripts are executable
+chmod u+x $TMPDIR/plcc_cluster/MPI_version/*.py
+chmod u+x $TMPDIR/plcc_cluster/process_single_pdb_file.sh
+chmod u+x $TMPDIR/plcc_cluster/plcc_run/get_pdb_file.sh
+chmod u+x $TMPDIR/plcc_cluster/plcc_run/create_dssp_file.sh
+chmod u+x $TMPDIR/plcc_cluster/plcc_run/plcc
+chmod u+x $TMPDIR/plcc_cluster/plcc_run/splitpdb
 
-# create links (needed because data files are not copied into tmp directory)
-# NOT USED IN TESTFILE
-ln -s $MYHOME/software/openmpi/mpi4py-1.2.2/ $TMPDIR/mpi4py
-export LD_LIBRARY_PATH=$MYHOME/libs/:${LD_LIBRARY_PATH}
+# copy mpi4py software
+scp -r $MYHOME/software/openmpi/mpi4py/ $TMPDIR/
 
+
+
+MPI4PY_SCRIPT="mpi4py_vplg.py"
+
+echo "$APPTAG Running mpi4py python scripts via mpirun..."
 # run script
-echo -n "started at: "
+echo -n "$APPTAG Started script $MPI4PY_SCRIPT at: "
 date
 
 #mpirun -np 8 /home/hs/src/mpi4py-1.2.2/build/exe.linux-x86_64-2.7/python2.7-mpi /home/hs/src/py_scripts/mpi4py_test.py
 #mpirun -np 8 /home/hs/src/mpi4py-1.2.2/build/exe.linux-x86_64-2.7/python2.7-mpi mpi4py_test.py
-mpirun -np 8 python mpi4py_test.py
+cd $TMPDIR/plcc_cluster/MPI_version/
+mpirun -np $NUM_PROCESSORS_PER_NODE python mpi4py_vplg.py
 
 
-echo -n "terminated at: "
+echo -n "$APPTAG The script $MPI4PY_SCRIPT terminated at: "
 date
 
 # copy-back everything needed. $TMPDIR gets cleaning in the new cluster!
 #scp -r output.file $PBS_O_HOST:$PBS_O_WORKDIR/
 
- 
+echo "$APPTAG All done, EOF."
+
