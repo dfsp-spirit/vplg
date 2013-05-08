@@ -116,11 +116,20 @@ chmod u+x $TMPDIR/plcc_cluster/plcc_run/splitpdb
 # copy mpi4py software
 scp -r $MYHOME/software/openmpi/mpi4py/ $TMPDIR/
 
-MPI_SRC_DIR="$TMPDIR/mpi4py/src/MPI"
-if [ ! -d "$MPI_SRC_DIR" ]; then
-    echo "$APPTAG ERROR: Directory '$MPI_SRC_DIR' does not exist. Copying seems to have failed."
+MPI4PY_DIR="$TMPDIR/mpi4py"
+MPI4PY_SRC_DIR="$MPI4PY_DIR/src/MPI"
+
+if [ ! -d "$MPI4PY_DIR" ]; then
+    echo "$APPTAG ERROR: The mpi4py directory '$MPI4PY_DIR' does not exist. Copying seems to have failed."
     exit 1
 fi
+
+if [ ! -d "$MPI4PY_SRC_DIR" ]; then
+    echo "$APPTAG ERROR: The mpi4py source directory '$MPI4PY_SRC_DIR' does not exist. Copying seems to have failed."
+    exit 1
+fi
+
+export PYTHON_PATH="$MPI4PY_SRC_DIR:$PYTHON_PATH"
 
 if [ ! -r "$INPUT_FILE" ]; then
     echo "$APPTAG ERROR: Cannot read input file '$INPUT_FILE'. This should be a file holding paths to all PDB files, one per line. Exiting."
@@ -131,17 +140,44 @@ fi
 MPI4PY_SCRIPT="mpi4py_vplg.py"
 
 echo "$APPTAG Running mpi4py python scripts via mpirun..."
-# run script
-echo -n "$APPTAG Started script $MPI4PY_SCRIPT at: "
-date
 
 #mpirun -np 8 /home/hs/src/mpi4py-1.2.2/build/exe.linux-x86_64-2.7/python2.7-mpi /home/hs/src/py_scripts/mpi4py_test.py
 #mpirun -np 8 /home/hs/src/mpi4py-1.2.2/build/exe.linux-x86_64-2.7/python2.7-mpi mpi4py_test.py
+
+#PYTHON="python"
+PYTHON="$MPI4PY_DIR/build/exe.linux-x86_64-2.7/python2.7-mpi"
+export LD_LIBRARY_PATH="$MPI4PY_DIR/build/lib.linux-x86_64-2.7/mpi4py/include/mpi4py/:$LD_LIBRARY_PATH"
+
+## We need libmpi.so.0, but only have libmpi.so.1 at /usr/lib64/mpi/gcc/openmpi/lib64/libmpi.so.1.
+#  So we create our own lib dir and symlink it from there.
+MYLIBS="$TMPDIR/libs/"
+mkdir -p $MYLIBS
+ln -s /usr/lib64/mpi/gcc/openmpi/lib64/libmpi.so.1 $MYLIBS/libmpi.so.0
+export LD_LIBRARY_PATH="$MYLIBS:$LD_LIBRARY_PATH"
+
+echo "$APPTAG LD_LIBRARY_PATH is '$LD_LIBRARY_PATH'"
+echo "$APPTAG PYTHON_PATH is '$PYTHON_PATH'"
+
+#OPENMPI_DEFAULT_HOSTFILE="/etc/openmpi-default-hostfile"
+OPENMPI_DEFAULT_HOSTFILE="\"none\""
+
+
+
 cd $TMPDIR/plcc_cluster/MPI_version/
-mpirun --default-hostfile /etc/openmpi-default-hostfile -np $NUM_PROCESSORS_PER_NODE python mpi4py_vplg.py $INPUT_FILE
+MPIRUN_CMD="mpirun --default-hostfile $OPENMPI_DEFAULT_HOSTFILE -np $NUM_PROCESSORS_PER_NODE $PYTHON $MPI4PY_SCRIPT $INPUT_FILE"
+
+echo "$APPTAG The mpirun command is '$MPIRUN_CMD'."
+
+# run script
+echo -n "$APPTAG Started script '$MPI4PY_SCRIPT' at: "
+date
 
 
-echo -n "$APPTAG The script $MPI4PY_SCRIPT terminated at: "
+## run it!
+$MPIRUN_CMD
+
+
+echo -n "$APPTAG The script '$MPI4PY_SCRIPT' terminated at: "
 date
 
 # copy-back everything needed. $TMPDIR gets cleaning in the new cluster!
