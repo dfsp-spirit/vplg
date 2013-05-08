@@ -84,27 +84,25 @@ echo "$APPTAG Using $NUM_PROCESSORS_PER_NODE processors"
 echo "$APPTAG Using $INPUT_FILE as the file containing the list of all PDB files to handle"
 echo "$APPTAG -----"
  
-# go to working dir
-#cd $PBS_O_WORKDIR
 
 
 echo "$APPTAG Loading bash modules..." 
-# load openmpi environment module
+## load openmpi environment module
 . /usr/share/Modules/3.2.10/init/bash
 #. /usr/share/modules/init/bash
 module load gnu-openmpi
 #module load openmpi
 
-# this is only a test which was added because module loading seems broken atm
+## set path to openmpi binarie
 export PATH="/usr/lib64/mpi/gcc/openmpi/bin:$PATH"
 #export LD_LIBRARY_PATH="/usr/lib64/mpi/gcc/openmpi/lib64:$LD_LIBRARY_PATH"
 
 
-# copy my python MPI job scripts to temporary directory 
+## copy my python MPI job scripts to temporary directory 
 echo "$APPTAG Copying files to temporary directory '$TMPDIR'..."
 scp -r $MYHOME/software/plcc_cluster/ $TMPDIR/
 
-# ensure important scripts are executable
+## ensure important scripts are executable
 chmod u+x $TMPDIR/plcc_cluster/MPI_version/*.py
 chmod u+x $TMPDIR/plcc_cluster/process_single_pdb_file.sh
 chmod u+x $TMPDIR/plcc_cluster/plcc_run/get_pdb_file.sh
@@ -127,7 +125,7 @@ MPI4PY_DIR="/develop/openmpi_mpi4py/mpi4py"
 #MPI4PY_SRC_DIR="$MPI4PY_DIR/src/MPI"
 
 if [ ! -d "$MPI4PY_DIR" ]; then
-    echo "$APPTAG ERROR: The mpi4py directory '$MPI4PY_DIR' does not exist. Copying seems to have failed."
+    echo "$APPTAG ERROR: The mpi4py directory '$MPI4PY_DIR' does not exist."
     exit 1
 fi
 
@@ -160,16 +158,23 @@ export LD_LIBRARY_PATH="$MPI4PY_DIR/build/lib.linux-x86_64-2.7/mpi4py/:$LD_LIBRA
 
 ## We need libmpi.so.0, but only have libmpi.so.1 at /usr/lib64/mpi/gcc/openmpi/lib64/libmpi.so.1.
 #  So we create our own lib dir and symlink it from there.
-MYLIBS="$TMPDIR/libs/"
-mkdir -p $MYLIBS
+#OPENMPI_LIBS="$TMPDIR/libs/"
+#mkdir -p $OPENMPI_LIBS
 #ln -s /usr/lib64/mpi/gcc/openmpi/lib64/libmpi.so.1 $MYLIBS/libmpi.so.0
 #ln -s /usr/lib64/mpi/gcc/openmpi/lib64/libopen-pal.so $MYLIBS/libopen-pal.so.0
 #ln -s /usr/lib64/mpi/gcc/openmpi/lib64/libopen-rte.so $MYLIBS/libopen-rte.so.0
-ln -s /develop/openmpi_build/lib/libmpi.so.1 $MYLIBS/libmpi.so.0
-ln -s /develop/openmpi_build/lib/libopen-pal.so $MYLIBS/libopen-pal.so.0
-ln -s /develop/openmpi_build/lib/libopen-rte.so $MYLIBS/libopen-rte.so.0
+#ln -s /develop/openmpi_build/lib/libmpi.so.1 $OPENMPI_LIBS/libmpi.so.0
+#ln -s /develop/openmpi_build/lib/libopen-pal.so $OPENMPI_LIBS/libopen-pal.so.0
+#ln -s /develop/openmpi_build/lib/libopen-rte.so $OPENMPI_LIBS/libopen-rte.so.0
 
-export LD_LIBRARY_PATH="$MYLIBS:$LD_LIBRARY_PATH"
+OPENMPI_LIBS="/develop/openmpi_mpi4py/openmpi/lib/"
+
+if [ ! -d "$OPENMPI_LIBS" ]; then
+    echo "$APPTAG ERROR: Directory '$OPENMPI_LIBS' does not exist. This should contain the openMPI libs like libmpi.so, libopen-pal.so and libopen-rte.so. Exiting."
+    exit 1
+fi
+
+export LD_LIBRARY_PATH="$OPENMPI_LIBS:$LD_LIBRARY_PATH"
 
 echo "$APPTAG LD_LIBRARY_PATH is '$LD_LIBRARY_PATH'"
 echo "$APPTAG PYTHONPATH is '$PYTHONPATH'"
