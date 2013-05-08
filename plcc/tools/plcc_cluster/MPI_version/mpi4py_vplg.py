@@ -15,7 +15,7 @@ from mpi4py_tools import *
 import shlex, subprocess
 import os
 
-print "[MPI4PY] Starting.\n"
+print "[MPI4PY] Appended copied dirs. PATH is now '" + str(sys.path) + "'.\n"
 
 print "[MPI4PY] Gathering global MPI information.\n"
 comm_world=MPI.COMM_WORLD
