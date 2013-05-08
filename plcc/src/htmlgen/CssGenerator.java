@@ -29,7 +29,8 @@ public class CssGenerator {
         String colorBackgroundMain = "#DCDCDC";
         String colorSections = "#C0C0C0";
         String colorFont = "black";
-        String colorFontHeader = "#4C0000";
+        //String colorFontHeader = "#4C0000";
+        String colorFontHeader = "#8A0829";
         String colorLinks = "#800000";
         String colorLinksActive = "#FF0000";
         

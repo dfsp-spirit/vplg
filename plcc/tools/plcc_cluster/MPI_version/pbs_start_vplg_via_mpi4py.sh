@@ -129,7 +129,8 @@ if [ ! -d "$MPI4PY_SRC_DIR" ]; then
     exit 1
 fi
 
-export PYTHON_PATH="$MPI4PY_SRC_DIR:$PYTHON_PATH"
+export PYTHONPATH="$MPI4PY_SRC_DIR:$PYTHONPATH"
+export PYTHONPATH="$MPI4PY_SRC_DIR/include:$PYTHONPATH"
 
 if [ ! -r "$INPUT_FILE" ]; then
     echo "$APPTAG ERROR: Cannot read input file '$INPUT_FILE'. This should be a file holding paths to all PDB files, one per line. Exiting."
@@ -159,7 +160,7 @@ ln -s /usr/lib64/mpi/gcc/openmpi/lib64/libopen-rte.so $MYLIBS/libopen-rte.so.0
 export LD_LIBRARY_PATH="$MYLIBS:$LD_LIBRARY_PATH"
 
 echo "$APPTAG LD_LIBRARY_PATH is '$LD_LIBRARY_PATH'"
-echo "$APPTAG PYTHON_PATH is '$PYTHON_PATH'"
+echo "$APPTAG PYTHONPATH is '$PYTHONPATH'"
 
 #OPENMPI_DEFAULT_HOSTFILE="/etc/openmpi-default-hostfile"
 OPENMPI_DEFAULT_HOSTFILE="none"

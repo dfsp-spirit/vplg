@@ -342,7 +342,7 @@ public class HtmlGenerator {
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_SEARCH));                
             sb.append(HtmlTools.heading("Find by PDB identifier", 2));            
             sb.append(HtmlTools.startParagraph());
-            sb.append("Here you search by PDB identifier:");
+            sb.append("Here you can search by PDB identifier:");
             sb.append(HtmlTools.endParagraph());
             sb.append(HtmlGenerator.generateQuickPDBBox("find.php"));
         sb.append(HtmlTools.endDiv());  // search     
@@ -353,7 +353,7 @@ public class HtmlGenerator {
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_SEARCH));
         sb.append(HtmlTools.heading("Find by PDB identifier and chain", 2));            
             sb.append(HtmlTools.startParagraph());
-            sb.append("Here you search by PDB identifier and chain:");
+            sb.append("Here you can search by PDB identifier and chain:");
             sb.append(HtmlTools.endParagraph());
             sb.append(HtmlGenerator.generateQuickPDBChainBox("find.php"));            
             sb.append(HtmlTools.brAndNewline());
@@ -389,6 +389,7 @@ public class HtmlGenerator {
         sb.append("<form name=\"input\" action=\"" + pathToSearchForm + "\" method=\"get\">");
         sb.append("PDB ID: ");
         sb.append("<input type=\"text\" name=\"pdbid\" maxlength=\"4\" value=\"8icd\">");
+        sb.append(" Chain: ");
         sb.append("<input type=\"text\" name=\"chain\" maxlength=\"1\" value=\"A\">");
         sb.append("<input type=\"submit\" value=\"Find protein chain\">");
         sb.append("</form>");
