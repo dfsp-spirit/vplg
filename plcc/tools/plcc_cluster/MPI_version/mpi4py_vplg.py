@@ -6,6 +6,7 @@
 
 import sys
 sys.path.append('../../mpi4py/src/MPI/')
+sys.path.append('../../mpi4py/build/lib.linux-x86_64-2.6/mpi4py/include/')
 from mpi4py import MPI
 from mpi4py_tools import *
 import shlex, subprocess
