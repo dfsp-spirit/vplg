@@ -124,20 +124,20 @@ fi
 #MPI4PY_DIR="$TMPDIR/mpi4py"
 
 MPI4PY_DIR="/develop/openmpi_mpi4py/mpi4py"
-MPI4PY_SRC_DIR="$MPI4PY_DIR/src/MPI"
+#MPI4PY_SRC_DIR="$MPI4PY_DIR/src/MPI"
 
 if [ ! -d "$MPI4PY_DIR" ]; then
     echo "$APPTAG ERROR: The mpi4py directory '$MPI4PY_DIR' does not exist. Copying seems to have failed."
     exit 1
 fi
 
-if [ ! -d "$MPI4PY_SRC_DIR" ]; then
-    echo "$APPTAG ERROR: The mpi4py source directory '$MPI4PY_SRC_DIR' does not exist. Copying seems to have failed."
-    exit 1
-fi
+#if [ ! -d "$MPI4PY_SRC_DIR" ]; then
+#    echo "$APPTAG ERROR: The mpi4py source directory '$MPI4PY_SRC_DIR' does not exist. Copying seems to have failed."
+#    exit 1
+#fi
 
-export PYTHONPATH="$MPI4PY_SRC_DIR:$PYTHONPATH"
-export PYTHONPATH="$MPI4PY_SRC_DIR/include:$PYTHONPATH"
+#export PYTHONPATH="$MPI4PY_SRC_DIR:$PYTHONPATH"
+#export PYTHONPATH="$MPI4PY_SRC_DIR/include:$PYTHONPATH"
 #export PYTHONPATH="/develop/python2.7_site_packages/:$PYTHONPATH"
 export PYTHONPATH="$MPI4PY_DIR/build/lib.linux-x86_64-2.7:$PYTHONPATH"
 
