@@ -62,7 +62,7 @@
 APPTAG="[PBS_VPLG_VIA_MPI4PY]"
 MYHOME="/home/ts"
 NUM_PROCESSORS_PER_NODE=8
-INPUT_FILE="$TMPDIR/plcc_cluster/status/dbinsert_file_list_proc.lst"	# this file contains a list of all PDB files that should be handled. You can create the list with the scripts in the plcc_cluster/ directory
+INPUT_FILE="$TMPDIR/plcc_cluster/status/dbinsert_file_list.lst"	# this file contains a list of all PDB files that should be handled. You can create the list with the scripts in the plcc_cluster/ directory
 
 # report some stuff for log file 
 echo $APPTAG ----- Submitting job to pbs queue -----
@@ -97,12 +97,11 @@ module load gnu-openmpi
 
 # this is only a test which was added because module loading seems broken atm
 export PATH="/usr/lib64/mpi/gcc/openmpi/bin:$PATH"
-export LD_LIBRARY_PATH="/usr/lib64/mpi/gcc/openmpi/lib64:$LD_LIBRARY_PATH"
+#export LD_LIBRARY_PATH="/usr/lib64/mpi/gcc/openmpi/lib64:$LD_LIBRARY_PATH"
 
 
 # copy my python MPI job scripts to temporary directory 
 echo "$APPTAG Copying files to temporary directory '$TMPDIR'..."
-mkdir -p $TMPDIR/MPI_version
 scp -r $MYHOME/software/plcc_cluster/ $TMPDIR/
 
 # ensure important scripts are executable
@@ -113,10 +112,18 @@ chmod u+x $TMPDIR/plcc_cluster/plcc_run/create_dssp_file.sh
 chmod u+x $TMPDIR/plcc_cluster/plcc_run/plcc
 chmod u+x $TMPDIR/plcc_cluster/plcc_run/splitpdb
 
-# copy mpi4py software
-scp -r $MYHOME/software/openmpi/mpi4py/ $TMPDIR/
+# test one of them to be sure
+if [ ! -f "$TMPDIR/plcc_cluster/plcc_run/get_pdb_file.sh" ]; then
+    echo "$APPTAG ERROR: The script '$TMPDIR/plcc_cluster/plcc_run/get_pdb_file.sh' does not exist. Copying seems to have failed."
+    exit 1
+fi
 
-MPI4PY_DIR="$TMPDIR/mpi4py"
+## copy mpi4py software
+# not done anymore, we start it from the mounted /develop/ directory now
+#scp -r $MYHOME/software/openmpi/mpi4py/ $TMPDIR/
+#MPI4PY_DIR="$TMPDIR/mpi4py"
+
+MPI4PY_DIR="/develop/openmpi_mpi4py/mpi4py"
 MPI4PY_SRC_DIR="$MPI4PY_DIR/src/MPI"
 
 if [ ! -d "$MPI4PY_DIR" ]; then
