@@ -131,7 +131,8 @@ fi
 
 export PYTHONPATH="$MPI4PY_SRC_DIR:$PYTHONPATH"
 export PYTHONPATH="$MPI4PY_SRC_DIR/include:$PYTHONPATH"
-export PYTHONPATH="/develop/python2.7_site_packages/:$PYTHONPATH"
+#export PYTHONPATH="/develop/python2.7_site_packages/:$PYTHONPATH"
+export PYTHONPATH="$MPI4PY_DIR/build/lib.linux-x86_64-2.7/mpi4py/:$PYTHONPATH"
 
 if [ ! -r "$INPUT_FILE" ]; then
     echo "$APPTAG ERROR: Cannot read input file '$INPUT_FILE'. This should be a file holding paths to all PDB files, one per line. Exiting."
