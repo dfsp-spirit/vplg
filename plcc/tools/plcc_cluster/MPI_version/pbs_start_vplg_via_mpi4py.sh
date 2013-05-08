@@ -157,7 +157,7 @@ mkdir -p $MYLIBS
 #ln -s /usr/lib64/mpi/gcc/openmpi/lib64/libmpi.so.1 $MYLIBS/libmpi.so.0
 #ln -s /usr/lib64/mpi/gcc/openmpi/lib64/libopen-pal.so $MYLIBS/libopen-pal.so.0
 #ln -s /usr/lib64/mpi/gcc/openmpi/lib64/libopen-rte.so $MYLIBS/libopen-rte.so.0
-ln -s /develop/openmpi_build/lib/lib64/libmpi.so.1 $MYLIBS/libmpi.so.0
+ln -s /develop/openmpi_build/lib/libmpi.so.1 $MYLIBS/libmpi.so.0
 ln -s /develop/openmpi_build/lib/libopen-pal.so $MYLIBS/libopen-pal.so.0
 ln -s /develop/openmpi_build/lib/libopen-rte.so $MYLIBS/libopen-rte.so.0
 
