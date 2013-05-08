@@ -7,6 +7,7 @@
 print "[MPI4PY] Starting.\n"
 
 import sys
+import os
 print "[MPI4PY] PATH is '" + str(sys.path) + "'.\n"
 curpath=os.getcwd()
 sys.path.append(str(curpath + '../../mpi4py/src/MPI/'))
