@@ -8,8 +8,9 @@ print "[MPI4PY] Starting.\n"
 
 import sys
 print "[MPI4PY] PATH is '" + str(sys.path) + "'.\n"
-sys.path.append('../../mpi4py/src/MPI/')
-sys.path.append('../../mpi4py/build/lib.linux-x86_64-2.6/mpi4py/include/')
+curpath=os.getcwd()
+sys.path.append(str(curpath + '../../mpi4py/src/MPI/'))
+sys.path.append(str(curpath + '../../mpi4py/build/lib.linux-x86_64-2.6/mpi4py/include/'))
 print "[MPI4PY] Appended copied MPI dirs to PATH. PATH is now '" + str(sys.path) + "'.\n"
 from mpi4py import MPI
 from mpi4py_tools import *
