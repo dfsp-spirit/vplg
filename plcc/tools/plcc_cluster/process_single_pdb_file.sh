@@ -144,14 +144,14 @@ fi
 
 GET_PDB_FILE_SCRIPT="./get_pdb_file.sh"
 ## check pdb script
-if [ ! -x $GET_PDB_FILE_SCRIPT ]; then
+if [ ! -x $PLCC_RUN_DIR/$GET_PDB_FILE_SCRIPT ]; then
     echo "$APPTAG ##### ERROR: The get-pdb-file script '$GET_PDB_FILE_SCRIPT' does not exist or is not executable. Check settings. #####"
     exit 1
 fi
 
 CREATE_DSSP_FILE_SCRIPT="./create_dssp_file.sh"
 ## check dssp script
-if [ ! -x $CREATE_DSSP_FILE_SCRIPT ]; then
+if [ ! -x $PLCC_RUN_DIR/$CREATE_DSSP_FILE_SCRIPT ]; then
     echo "$APPTAG ##### ERROR: The create-dssp-file script '$CREATE_DSSP_FILE_SCRIPT' does not exist or is not executable. Check settings. #####"
     exit 1
 fi
