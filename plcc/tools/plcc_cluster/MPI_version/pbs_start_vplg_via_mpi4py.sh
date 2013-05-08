@@ -153,13 +153,16 @@ export LD_LIBRARY_PATH="$MPI4PY_DIR/build/lib.linux-x86_64-2.7/mpi4py/include/mp
 MYLIBS="$TMPDIR/libs/"
 mkdir -p $MYLIBS
 ln -s /usr/lib64/mpi/gcc/openmpi/lib64/libmpi.so.1 $MYLIBS/libmpi.so.0
+ln -s /usr/lib64/mpi/gcc/openmpi/lib64/libopen-pal.so $MYLIBS/libopen-pal.so.0
+ln -s /usr/lib64/mpi/gcc/openmpi/lib64/libopen-rte.so $MYLIBS/libopen-rte.so.0
+
 export LD_LIBRARY_PATH="$MYLIBS:$LD_LIBRARY_PATH"
 
 echo "$APPTAG LD_LIBRARY_PATH is '$LD_LIBRARY_PATH'"
 echo "$APPTAG PYTHON_PATH is '$PYTHON_PATH'"
 
 #OPENMPI_DEFAULT_HOSTFILE="/etc/openmpi-default-hostfile"
-OPENMPI_DEFAULT_HOSTFILE="\"none\""
+OPENMPI_DEFAULT_HOSTFILE="none"
 
 
 
