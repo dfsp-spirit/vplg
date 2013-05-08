@@ -16,51 +16,67 @@ import plcc.IO;
  */
 public class CssGenerator {
     
-    public boolean writeDefaultCssFileTo(File outFile) {
-        return IO.stringToTextFile(outFile.getAbsolutePath(), this.getDefaultCSS());
+    public static final String COLORSCHEME_RED = "red";
+    public static final String COLORSCHEME_BLUE = "blue";
+    public static final String COLORSCHEME_GREEN = "green";
+    
+    public boolean writeDefaultCssFileTo(File outFile, String colorScheme) {
+        return IO.stringToTextFile(outFile.getAbsolutePath(), this.getDefaultCSS(colorScheme));
     }
     
-    public String getDefaultCSS() {
+    public String getDefaultCSS(String colorScheme) {
         
-        int colorScheme = 0;
                 
-        String colorBackgroundBody = "#382D2C";
-        //String colorBackgroundBody = "white";
-        String colorBackgroundMain = "#DCDCDC";
-        String colorSections = "#C0C0C0";
-        String colorFont = "black";
-        //String colorFontHeader = "#4C0000";
-        String colorFontHeader = "#8A0829";
-        String colorLinks = "#800000";
-        String colorLinksActive = "#FF0000";
+        String colorBackgroundBody;
+        String colorBackgroundMain;
+        String colorSections;
+        String colorFont;
+        String colorFontHeader;
+        String colorLinks;
+        String colorLinksActive;       
+                
         
-        if(colorScheme == 1) {            
-            // "2e3438"; // dark grayish
-            // "628767"; // greenish
-            // "aba972"; // dark yellowish
-            // "dbba75"; // brighter yellow
-            // "b25e54"; // red
-            colorBackgroundBody = "2e3438";  // dark grayish
-            colorBackgroundMain = "aba972"; // dark yellowish
-            colorSections = "dbba75"; // brighter yellow
+        if(colorScheme.equals(CssGenerator.COLORSCHEME_BLUE)) {            
+            // blue color scheme
+            colorBackgroundBody = "#382D2C";
+            colorBackgroundMain = "#DCDCDC";
+            colorSections = "#C0C0C0";
             colorFont = "black";
+            colorFontHeader = "#0B0B61";
+            colorLinks = "#2E2EFE";
+            colorLinksActive = "#5858FA";            
+        }
+        else if(colorScheme.equals(CssGenerator.COLORSCHEME_GREEN)) {
+            // green color scheme
+            colorBackgroundBody = "#382D2C";
+            colorBackgroundMain = "#DCDCDC";
+            colorSections = "#C0C0C0";
+            colorFont = "black";
+            colorFontHeader = "#21610B";
+            colorLinks = "#04B404";
+            colorLinksActive = "#04B404";            
+        }
+        else if(colorScheme.equals(CssGenerator.COLORSCHEME_RED)) {
+            // red color scheme
+            colorBackgroundBody = "#382D2C";
+            colorBackgroundMain = "#DCDCDC";
+            colorSections = "#C0C0C0";
+            colorFont = "black";
+            colorFontHeader = "#8A0829";
             colorLinks = "#800000";
             colorLinksActive = "#FF0000";            
         }
-        
-        if(colorScheme == 2) {
-            // "4c2b2f"; // brownish
-            // "e57152"; // orange
-            // "e8de67"; // yellowish
-            // "ffefc3"; // egg shell
-            // "c0ccab"; // mint green
-            colorBackgroundBody = "4c2b2f"; // brownish
-            colorBackgroundMain = "c0ccab"; // mint green
-            colorSections = "e8de67"; // yellowish
+        else {
+            // default is red color scheme
+            colorBackgroundBody = "#382D2C";
+            colorBackgroundMain = "#DCDCDC";
+            colorSections = "#C0C0C0";
             colorFont = "black";
+            colorFontHeader = "#8A0829";
             colorLinks = "#800000";
             colorLinksActive = "#FF0000";
         }
+       
         
         
         

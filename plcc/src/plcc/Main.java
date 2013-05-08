@@ -1179,13 +1179,25 @@ public class Main {
             HtmlGenerator htmlGen = new HtmlGenerator(outputDirProtein);
             CssGenerator cssGen = new CssGenerator();
             String cssFilePath = outputBaseDir.getAbsolutePath() + fs + "vplgweb.css";            
+            String cssFilePathRed = outputBaseDir.getAbsolutePath() + fs + "vplgweb_red.css";
+            String cssFilePathBlue = outputBaseDir.getAbsolutePath() + fs + "vplgweb_blue.css";
+            String cssFilePathGreen = outputBaseDir.getAbsolutePath() + fs + "vplgweb_green.css";
             String fsWeb = "/"; // the internet is UNIX                        
             htmlGen.setRelativeCssFilePathsFromBasedir(new String[] { fsWeb + "vplgweb.css" });        // no, this ain't beautiful            
             
             if(Settings.getBoolean("plcc_B_output_textfiles_dir_tree_core_html")) {                
                 System.out.println("  Writing core webpages. The base output directory is '" + outputBaseDir.getAbsolutePath() + "'.");
-                if(cssGen.writeDefaultCssFileTo(new File(cssFilePath))) {
-                    System.out.println("   Wrote CSS file for web pages to '" + cssFilePath + "'.");
+                if(cssGen.writeDefaultCssFileTo(new File(cssFilePath), CssGenerator.COLORSCHEME_RED)) {
+                    System.out.println("   Wrote default CSS file for web pages to '" + cssFilePath + "'.");
+                }
+                if(cssGen.writeDefaultCssFileTo(new File(cssFilePathRed), CssGenerator.COLORSCHEME_RED)) {
+                    System.out.println("   Wrote red CSS file for web pages to '" + cssFilePathRed + "'.");
+                }
+                if(cssGen.writeDefaultCssFileTo(new File(cssFilePathBlue), CssGenerator.COLORSCHEME_BLUE)) {
+                    System.out.println("   Wrote blue CSS file for web pages to '" + cssFilePathBlue + "'.");
+                }
+                if(cssGen.writeDefaultCssFileTo(new File(cssFilePathGreen), CssGenerator.COLORSCHEME_GREEN)) {
+                    System.out.println("   Wrote green CSS file for web pages to '" + cssFilePathGreen + "'.");
                 }
                 htmlGen.generateCoreWebpages(outputBaseDir);
             }

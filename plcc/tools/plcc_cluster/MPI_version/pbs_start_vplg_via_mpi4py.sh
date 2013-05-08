@@ -148,15 +148,18 @@ echo "$APPTAG Running mpi4py python scripts via mpirun..."
 
 #PYTHON="python"
 PYTHON="$MPI4PY_DIR/build/exe.linux-x86_64-2.7/python2.7-mpi"
-export LD_LIBRARY_PATH="$MPI4PY_DIR/build/lib.linux-x86_64-2.7/mpi4py/include/mpi4py/:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$MPI4PY_DIR/build/lib.linux-x86_64-2.7/mpi4py/:$LD_LIBRARY_PATH"
 
 ## We need libmpi.so.0, but only have libmpi.so.1 at /usr/lib64/mpi/gcc/openmpi/lib64/libmpi.so.1.
 #  So we create our own lib dir and symlink it from there.
 MYLIBS="$TMPDIR/libs/"
 mkdir -p $MYLIBS
-ln -s /usr/lib64/mpi/gcc/openmpi/lib64/libmpi.so.1 $MYLIBS/libmpi.so.0
-ln -s /usr/lib64/mpi/gcc/openmpi/lib64/libopen-pal.so $MYLIBS/libopen-pal.so.0
-ln -s /usr/lib64/mpi/gcc/openmpi/lib64/libopen-rte.so $MYLIBS/libopen-rte.so.0
+#ln -s /usr/lib64/mpi/gcc/openmpi/lib64/libmpi.so.1 $MYLIBS/libmpi.so.0
+#ln -s /usr/lib64/mpi/gcc/openmpi/lib64/libopen-pal.so $MYLIBS/libopen-pal.so.0
+#ln -s /usr/lib64/mpi/gcc/openmpi/lib64/libopen-rte.so $MYLIBS/libopen-rte.so.0
+ln -s /develop/openmpi_build/lib/lib64/libmpi.so.1 $MYLIBS/libmpi.so.0
+ln -s /develop/openmpi_build/lib/libopen-pal.so $MYLIBS/libopen-pal.so.0
+ln -s /develop/openmpi_build/lib/libopen-rte.so $MYLIBS/libopen-rte.so.0
 
 export LD_LIBRARY_PATH="$MYLIBS:$LD_LIBRARY_PATH"
 
