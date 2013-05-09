@@ -17,15 +17,19 @@ You should use the following steps to run the MPI version:
 
 0) 0.0) Copy the plcc.jar file, splitpdb.jar file and the 'lib' directory from your VPLG installation to the 'plcc_cluster/plcc_run/' subdirectory. Install dsspcmbi.
 
-1) Adapt settings in settings_statistics and the other script files.
+1) Adapt settings in settings_statistics.cfg and the other script files (output path, plcc command line options, path to dssp, etc.).
 
-2) Update your local copy of the PDB.
+2) Update your local copy of the PDB (you can use the rsync script provided on the RCSB website).
 
-3) Create the list of PDB files to handle (plcc_cluster/status/dbinsert_file_list_proc.lst) using the scripts in the plcc_cluster/ dir.
+3.1) Create the list of PDB files to handle (plcc_cluster/status/dbinsert_file_list.lst) using the scripts in the plcc_cluster/ dir.
+3.2) Split the list into chunks using the scripts in the plcc_cluster/ dir. The number of chunks is up to you, but if your cluster has n nodes,
+     you should create at least n chunks. More wont hurt, of course. The files 'plcc_cluster/status/filelistMPInumXXX' should exist afterwards.
 
 4) Use the following command to run the MPI version:
 
-  qsub pbs_start_vplg_via_mpi4py.sh
+  ./start_all_jobs_on_all_nodes_for_whole_PDB.sh
+
+  This will qsub each generated file list as a single job.
 
 
 
