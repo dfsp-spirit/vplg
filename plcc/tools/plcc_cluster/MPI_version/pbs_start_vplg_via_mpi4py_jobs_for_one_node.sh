@@ -1,6 +1,14 @@
 #!/bin/bash
-# pbs_start_vplg_via_mpi4py.sh -- pbs job script to run VPLG on the whole PDB database via PBS and MPI on a cluster.
-# This script allows you to use all CPUs of each node. The other update scripts only use one CPU per networked computer.
+# pbs_start_vplg_via_mpi4py_jpbs_for_one_node.sh -- pbs job script to run VPLG on a part of the whole PDB database via PBS and MPI on a cluster.
+#
+# This script allows you to use all CPUs of one node. The other update scripts only use one CPU per networked computer.
+#
+# Do NOT start this script directly. It should be submitted to the openpbs queue via the 'qsub' command.
+#
+# Parameters: a file listing the PDB files for this job. 
+#
+# This script is submitted to the queue by the 'pbs_start_all_jobs_on_all_nodes_whole_PDB.sh' script n times, each with 1 nth of the PDB files.
+#
 #
 # Written by ts.
 #
