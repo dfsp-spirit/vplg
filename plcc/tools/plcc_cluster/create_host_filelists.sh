@@ -22,7 +22,7 @@ CFG_FILE="./settings_statistics.cfg"
 APPTAG="[CHFL]"
 
 if [ ! -f "$CFG_FILE" ]; then
-	echo "$APPTAG Could not read config file $CFG_FILE."
+	echo "$APPTAG Could not read config file '$CFG_FILE'."
 else
 	echo "$APPTAG Config file seems fine."
 fi

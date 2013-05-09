@@ -1,7 +1,10 @@
 #!/bin/bash
 ## create_filelist_from_new_pdb_files.sh -- create the list of PDB files that need to be handled.
-##
-## Written by ts_2011
+#
+# Written by ts 2011
+#
+# Usage: "./create_filelist_from_new_pdb_files.sh [all]" 
+#        Omitting 'all' will only consider PDB files which have changed since the last update (if any).
 
 APPTAG="[CREATE_FL]"
 CFG_FILE="settings_statistics.cfg"
@@ -106,10 +109,9 @@ find $LOCAL_MIRRORDIR/ $DATE_FILTER -type f -name *$REMOTE_PDB_FILE_EXTENSION > 
 NUM_FILES=$(cat $DBINSERT_FILE_LIST | wc -w)
 
 echo "$APPTAG Found $NUM_FILES PDB files that need to be handled. Wrote unprocessed list to '$DBINSERT_FILE_LIST'."
-echo "$APPTAG All done. You can now use the UNIX 'split' command to split the list into multple files to run"
-echo "$APPTAG   the DB insert script on multiple machines that write into the same DB. Try something like the following:"
-echo "$APPTAG       cd status/ && split -d -a 3 -l 9250 dbinsert_file_list.lst filelistnum"
-echo "$APPTAG   or just run let this box handle the whole list."
+echo "$APPTAG All done. You can now use the 'create_host_filelists.sh' script to split the list into multple files to run"
+echo "$APPTAG the DB insert script on multiple machines that write into the same DB."
+echo "$APPTAG (Alternatively, you can let this box handle the whole list if you do not have multiple computers to spare.)"
 exit 0
 
 
