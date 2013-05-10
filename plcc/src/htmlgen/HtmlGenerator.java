@@ -140,7 +140,7 @@ public class HtmlGenerator {
         //-------------- header ------------
         sb.append(this.generateHeader("VPLGweb -- The Visualization of Protein Ligand Graphs web server -- Welcome", pathToBaseDir));
         // ------------- body -- logo and title ---------------
-        sb.append(HtmlTools.startBody());
+        sb.append(HtmlTools.startBodyAndCommonJS());
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_MAIN));
         sb.append(this.generateLogo(pathToBaseDir));
         sb.append(HtmlGenerator.generateTopPageTitle("Welcome to VPLGweb"));
@@ -226,8 +226,7 @@ public class HtmlGenerator {
         sb.append(HtmlTools.endDiv());  // intro       
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());  
         
-        // ------------- switch style form -----------------
-        sb.append(HtmlGenerator.jsFunctionSwitchStyleSheet());
+        // ------------- switch style form -----------------        
         sb.append(HtmlGenerator.jsSwitchStyleSheetForm());
         
         // ------------- body -- footer ---------------
@@ -248,7 +247,7 @@ public class HtmlGenerator {
         //-------------- header ------------
         sb.append(this.generateHeader("VPLGweb -- The Visualization of Protein Ligand Graphs web server -- Search Results", pathToBaseDir));
         // ------------- body -- logo and title ---------------
-        sb.append(HtmlTools.startBody());
+        sb.append(HtmlTools.startBodyAndCommonJS());
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_MAIN));
         sb.append(this.generateLogo(pathToBaseDir));
         sb.append(HtmlGenerator.generateTopPageTitle("VPLGweb Search Results"));
@@ -347,7 +346,7 @@ public class HtmlGenerator {
         //-------------- header ------------
         sb.append(this.generateHeader("VPLGweb -- The Visualization of Protein Ligand Graphs web server -- Search Form", pathToBaseDir));
         // ------------- body -- logo and title ---------------
-        sb.append(HtmlTools.startBody());
+        sb.append(HtmlTools.startBodyAndCommonJS());
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_MAIN));
         sb.append(this.generateLogo(pathToBaseDir));
         sb.append(HtmlGenerator.generateTopPageTitle("VPLGweb Search Form"));
@@ -477,7 +476,7 @@ public class HtmlGenerator {
         //-------------- header ------------
         sb.append(this.generateHeader("VPLGweb -- PDB " + pdbid, pathToBaseDir));
         // ------------- body -- logo and title ---------------
-        sb.append(HtmlTools.startBody());
+        sb.append(HtmlTools.startBodyAndCommonJS());
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_MAIN));
         sb.append(this.generateLogo(pathToBaseDir));
         sb.append(HtmlGenerator.generateTopPageTitle(pdbid.toUpperCase()));
@@ -594,7 +593,7 @@ public class HtmlGenerator {
         sb.append(this.generateHeader("VPLGweb -- PDB " + pdbid + " -- chain " + chain, pathToBaseDir));
 
         // ------------- body -- logo and title ---------------
-        sb.append(HtmlTools.startBody());
+        sb.append(HtmlTools.startBodyAndCommonJS());
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_MAIN));
         sb.append(this.generateLogo(pathToBaseDir));
         sb.append(HtmlGenerator.generateTopPageTitle(pdbid.toUpperCase() + " chain " + chain.toUpperCase()));
@@ -942,10 +941,11 @@ public class HtmlGenerator {
     
     public static String jsSwitchStyleSheetForm() {
         StringBuilder sb = new StringBuilder();
-        sb.append("<form>\n");
-        sb.append("<input type=\"submit\" onclick=\"switch_style('red');return false;\" name=\"theme\" value=\"red\" id=\"red\">\n");
-        sb.append("<input type=\"submit\" onclick=\"switch_style('blue');return false;\" name=\"theme\" value=\"blue\" id=\"blue\">\n");
-        sb.append("<input type=\"submit\" onclick=\"switch_style('green');return false;\" name=\"theme\" value=\"green\" id=\"green\">\n");        
+        sb.append("<form class=\"centerform\">\n");
+        sb.append("VPLGweb Style: ");
+        sb.append("<input type=\"submit\" onclick=\"switch_style('red');return false;\" name=\"theme\" value=\"blood\" id=\"red\">\n");
+        sb.append("<input type=\"submit\" onclick=\"switch_style('blue');return false;\" name=\"theme\" value=\"ice\" id=\"blue\">\n");
+        sb.append("<input type=\"submit\" onclick=\"switch_style('green');return false;\" name=\"theme\" value=\"hope\" id=\"green\">\n");        
         sb.append("</form>\n");
         return sb.toString();
     }
@@ -1036,7 +1036,7 @@ public class HtmlGenerator {
         sb.append("function set_cookie ( cookie_name, cookie_value, lifespan_in_days, valid_domain )\n");
         sb.append("{\n");
         sb.append("  // http://www.thesitewizard.com/javascripts/cookies.shtml\n");
-        sb.append("  console.log('Setting cookie.');");
+        //sb.append("  console.log('Setting cookie.');\n");
         sb.append("  var domain_string = valid_domain ? (\"; domain=\" + valid_domain) : '' ;\n");
         sb.append("  document.cookie = cookie_name + \"=\" + encodeURIComponent( cookie_value ) + \"; max-age=\" + 60 * 60 * 24 * lifespan_in_days + \"; path=/\" + domain_string ;\n");
         sb.append("}\n");
@@ -1083,6 +1083,13 @@ public class HtmlGenerator {
         else {
             return null;
         }
+    }
+    
+    
+    public static String commonJSFunctions() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(HtmlGenerator.jsFunctionSwitchStyleSheet());
+        return sb.toString();
     }
 
 

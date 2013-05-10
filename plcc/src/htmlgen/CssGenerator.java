@@ -150,16 +150,17 @@ public class CssGenerator {
         //sb.append("tr:last-child td:first-child { -moz-border-radius: 0 0 0 6px; }\n");
         //sb.append("tr:last-child td:last-child { -moz-border-radius: 0 0 6px 0; }\n");
         // input forms
-        sb.append("form    {font-size: 10px;font-weight: bold;text-decoration: none;-webkit-border-radius: 10px;-moz-border-radius: 10px;border-radius: 10px;padding:10px;border: 1px solid #999}");
-        sb.append(".button, button {padding: 5px;margin: 5px;margin-left:10px;}");
-        sb.append("input.button {font-size: 10px;padding: 5px;margin: 5px;margin-left:10px;}");
-        sb.append("input {font-size: 10px;}");
-        sb.append("input {-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;}");
-        sb.append("h1 { color: ").append(colorFontHeader).append(";font-family: sans-serif;}");
-        sb.append("h2 { color: ").append(colorFontHeader).append(";font-family: sans-serif;}");
-        sb.append("h3 { color: ").append(colorFontHeader).append(";font-family: sans-serif;}");
-        sb.append("h4 { color: ").append(colorFontHeader).append(";font-family: sans-serif;}");
-        sb.append("h5 { color: ").append(colorFontHeader).append(";font-family: sans-serif;}");
+        sb.append("form    {font-family:Arial,sans-serif;font-size: 10px;font-weight: bold;text-decoration: none;-webkit-border-radius: 10px;-moz-border-radius: 10px;border-radius: 10px;padding:10px;border: 1px solid #999}\n");
+        sb.append(".button, button {font-family:Arial,sans-serif;padding: 5px;margin: 5px;margin-left:10px;}\n");
+        sb.append("input.button {font-size: 10px;padding: 5px;margin: 5px;margin-left:10px;}\n");
+        sb.append("input {font-size: 10px; font-family:Arial,sans-serif;}\n");
+        sb.append("input {-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;}\n");
+        sb.append("h1 { color: ").append(colorFontHeader).append(";font-family: sans-serif;}\n");
+        sb.append("h2 { color: ").append(colorFontHeader).append(";font-family: sans-serif;}\n");
+        sb.append("h3 { color: ").append(colorFontHeader).append(";font-family: sans-serif;}\n");
+        sb.append("h4 { color: ").append(colorFontHeader).append(";font-family: sans-serif;}\n");
+        sb.append("h5 { color: ").append(colorFontHeader).append(";font-family: sans-serif;}\n");
+        sb.append("form.centerform { width:200px; margin:0 auto; text-align: center; }");
         return sb.toString();
     }
     

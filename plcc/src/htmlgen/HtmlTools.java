@@ -240,10 +240,15 @@ public class HtmlTools {
         return "<hr/>\n";
     }
     
-    public static String startBody() {
+    public static String startBodyAndCommonJS() {
         //return "<body>\n";
-        return "<body onload=\"set_style_from_cookie()\">\n";
+        StringBuilder sb = new StringBuilder();
+        sb.append("<body onload=\"set_style_from_cookie()\">\n");
+        sb.append(HtmlGenerator.commonJSFunctions());
+        return sb.toString();
     }
+    
+    
      
     public static String endBody() {
         return "</body>\n";
