@@ -224,7 +224,7 @@ public class HtmlGenerator {
             sb.append(HtmlTools.brAndNewline());
             
         sb.append(HtmlTools.endDiv());  // intro       
-        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());  
+        sb.append(HtmlTools.brAndNewline());  
         
         // ------------- switch style form -----------------        
         sb.append(HtmlGenerator.jsSwitchStyleSheetForm());

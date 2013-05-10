@@ -160,7 +160,7 @@ public class CssGenerator {
         sb.append("h3 { color: ").append(colorFontHeader).append(";font-family: sans-serif;}\n");
         sb.append("h4 { color: ").append(colorFontHeader).append(";font-family: sans-serif;}\n");
         sb.append("h5 { color: ").append(colorFontHeader).append(";font-family: sans-serif;}\n");
-        sb.append("form.centerform { width:200px; margin:0 auto; text-align: center; }");
+        sb.append("form.centerform { width:300px; margin:0 auto; text-align: center; }");
         return sb.toString();
     }
     

@@ -5,7 +5,8 @@
 #
 # Do NOT start this script directly. It should be submitted to the openpbs queue via the 'qsub' command.
 #
-# Parameters: a file listing the PDB files for this job. 
+# Parameters: a file containing a list of PDB files for this job. If you intend to start n jobs, the list should contain one nth of the PDB files.
+# TODO: this parameter is IGNORED atm and the full list is parsed, which is WRONG
 #
 # This script is submitted to the queue by the 'pbs_start_all_jobs_on_all_nodes_whole_PDB.sh' script n times, each with 1 nth of the PDB files.
 #
@@ -70,11 +71,12 @@
 APPTAG="[PBS_VPLG_VIA_MPI4PY]"
 MYHOME="/home/ts"
 NUM_PROCESSORS_PER_NODE=8
+
+#TODO: get the right input file for this node here! The file below is the full list, which makes no sense.
 INPUT_FILE="$TMPDIR/plcc_cluster/status/dbinsert_file_list.lst"	# this file contains a list of all PDB files that should be handled. You can create the list with the scripts in the plcc_cluster/ directory
 
-# report some stuff for log file 
+# report some stuff for log file
 echo $APPTAG ----- Submitting job to pbs queue -----
-
 echo $APPTAG Settings:
 echo "$APPTAG -----"
 echo $APPTAG MYHOME is $MYHOME
@@ -107,22 +109,28 @@ export PATH="/usr/lib64/mpi/gcc/openmpi/bin:$PATH"
 
 
 ## copy my python MPI job scripts to temporary directory 
-echo "$APPTAG Copying files to temporary directory '$TMPDIR'..."
-scp -r $MYHOME/software/plcc_cluster/ $TMPDIR/
+#echo "$APPTAG Copying files to temporary directory '$TMPDIR'..."
+#scp -r $MYHOME/software/plcc_cluster/ $TMPDIR/
+#PLCC_CLUSTER_DIR="$TMPDIR/plcc_cluster"
+
+# we now use plcc_cluster from the global dir
+PLCC_CLUSTER_DIR="$MYHOME/software/plcc_cluster"
+
 
 ## ensure important scripts are executable
-chmod u+x $TMPDIR/plcc_cluster/MPI_version/*.py
-chmod u+x $TMPDIR/plcc_cluster/process_single_pdb_file.sh
-chmod u+x $TMPDIR/plcc_cluster/plcc_run/get_pdb_file.sh
-chmod u+x $TMPDIR/plcc_cluster/plcc_run/create_dssp_file.sh
-chmod u+x $TMPDIR/plcc_cluster/plcc_run/plcc
-chmod u+x $TMPDIR/plcc_cluster/plcc_run/splitpdb
+#chmod u+x $TMPDIR/plcc_cluster/MPI_version/*.py
+#chmod u+x $TMPDIR/plcc_cluster/process_single_pdb_file.sh
+#chmod u+x $TMPDIR/plcc_cluster/plcc_run/get_pdb_file.sh
+#chmod u+x $TMPDIR/plcc_cluster/plcc_run/create_dssp_file.sh
+#chmod u+x $TMPDIR/plcc_cluster/plcc_run/plcc
+#chmod u+x $TMPDIR/plcc_cluster/plcc_run/splitpdb
 
 # test one of them to be sure
-if [ ! -f "$TMPDIR/plcc_cluster/plcc_run/get_pdb_file.sh" ]; then
-    echo "$APPTAG ERROR: The script '$TMPDIR/plcc_cluster/plcc_run/get_pdb_file.sh' does not exist. Copying seems to have failed."
-    exit 1
-fi
+SOME_PLCC_SCRIPT="$PLCC_CLUSTER_DIR/plcc_run/get_pdb_file.sh"
+#if [ ! -f "$SOME_PLCC_SCRIPT" ]; then
+#    echo "$APPTAG ERROR: The script '$SOME_PLCC_SCRIPT' does not exist. The plcc_cluster directory seems to be missing."
+#    exit 1
+#fi
 
 ## copy mpi4py software
 # not done anymore, we start it from the mounted /develop/ directory now
@@ -157,9 +165,6 @@ MPI4PY_SCRIPT="mpi4py_vplg.py"
 
 echo "$APPTAG Running mpi4py python scripts via mpirun..."
 
-#mpirun -np 8 /home/hs/src/mpi4py-1.2.2/build/exe.linux-x86_64-2.7/python2.7-mpi /home/hs/src/py_scripts/mpi4py_test.py
-#mpirun -np 8 /home/hs/src/mpi4py-1.2.2/build/exe.linux-x86_64-2.7/python2.7-mpi mpi4py_test.py
-
 #PYTHON="python"
 PYTHON="$MPI4PY_DIR/build/exe.linux-x86_64-2.7/python2.7-mpi"
 export LD_LIBRARY_PATH="$MPI4PY_DIR/build/lib.linux-x86_64-2.7/mpi4py/:$LD_LIBRARY_PATH"
@@ -192,10 +197,11 @@ OPENMPI_DEFAULT_HOSTFILE="none"
 
 
 
-cd $TMPDIR/plcc_cluster/MPI_version/
+cd $PLCC_CLUSTER_DIR/MPI_version/
 MPIRUN_CMD="mpirun --default-hostfile $OPENMPI_DEFAULT_HOSTFILE -np $NUM_PROCESSORS_PER_NODE $PYTHON $MPI4PY_SCRIPT $INPUT_FILE"
 
-echo "$APPTAG The mpirun command is '$MPIRUN_CMD'."
+echo "$APPTAG Now in directory '$(pwd)'."
+echo "$APPTAG The mpirun command to be executed is '$MPIRUN_CMD'."
 
 # run script
 echo -n "$APPTAG Started script '$MPI4PY_SCRIPT' at: "
@@ -210,6 +216,7 @@ echo -n "$APPTAG The script '$MPI4PY_SCRIPT' terminated at: "
 date
 
 # copy-back everything needed. $TMPDIR gets cleaning in the new cluster!
+# no need for this because we write to a permament directory
 #scp -r output.file $PBS_O_HOST:$PBS_O_WORKDIR/
 
 echo "$APPTAG All done, EOF."
