@@ -1036,7 +1036,8 @@ public class HtmlGenerator {
         sb.append("function set_cookie ( cookie_name, cookie_value, lifespan_in_days, valid_domain )\n");
         sb.append("{\n");
         sb.append("  // http://www.thesitewizard.com/javascripts/cookies.shtml\n");
-        sb.append("  var domain_string = valid_domain ? \"; domain=\" + valid_domain) : '' ;\n");
+        sb.append("  console.log('Setting cookie.');");
+        sb.append("  var domain_string = valid_domain ? (\"; domain=\" + valid_domain) : '' ;\n");
         sb.append("  document.cookie = cookie_name + \"=\" + encodeURIComponent( cookie_value ) + \"; max-age=\" + 60 * 60 * 24 * lifespan_in_days + \"; path=/\" + domain_string ;\n");
         sb.append("}\n");
         sb.append("\n");
