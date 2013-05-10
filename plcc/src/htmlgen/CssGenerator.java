@@ -54,7 +54,7 @@ public class CssGenerator {
             colorFont = "black";
             colorFontHeader = "#21610B";
             colorLinks = "#04B404";
-            colorLinksActive = "#04B404";            
+            colorLinksActive = "#2EFE2E";            
         }
         else if(colorScheme.equals(CssGenerator.COLORSCHEME_RED)) {
             // red color scheme
