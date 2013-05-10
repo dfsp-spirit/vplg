@@ -26,7 +26,12 @@ public class HtmlGenerator {
     //static Logger logger = LogManager.getLogger(HtmlGenerator.class.getName());
     
     private String[] relativeCssFilePathsFromBasedir;
+    private String[] cssTitles; //for switching via JS
     private File baseDir;
+
+    public void setCssTitles(String[] cssTitles) {
+        this.cssTitles = cssTitles;
+    }
     
     public HtmlGenerator(File baseDir) {
         this.baseDir = baseDir;
@@ -42,6 +47,10 @@ public class HtmlGenerator {
 
     public String[] getRelativeCssFilePathsFromBasedir() {
         return relativeCssFilePathsFromBasedir;
+    }
+    
+    public String[] getCssTitles() {
+        return cssTitles;
     }
     
     public static final String DIV_MAIN = "main";
@@ -215,7 +224,11 @@ public class HtmlGenerator {
             sb.append(HtmlTools.brAndNewline());
             
         sb.append(HtmlTools.endDiv());  // intro       
-        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());  
+        
+        // ------------- switch style form -----------------
+        sb.append(HtmlGenerator.jsFunctionSwitchStyleSheet());
+        sb.append(HtmlGenerator.jsSwitchStyleSheetForm());
         
         // ------------- body -- footer ---------------
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
@@ -902,11 +915,13 @@ public class HtmlGenerator {
         StringBuilder sb = new StringBuilder();
                 
         sb.append("<html>\n<head>\n");
-        sb.append("<title>" + title +  "</title>\n");
+        sb.append("<title>").append(title).append("</title>\n");
 
-        for(String cssFileName : relativeCssFilePathsFromBasedir) {            
-            sb.append("<link href=\"").append(pathToBaseDir).append(cssFileName).append("\" rel=\"stylesheet\" type=\"text/css\">\n");
+        for(int i = 0; i < relativeCssFilePathsFromBasedir.length; i++) {            
+            String cssFileName = relativeCssFilePathsFromBasedir[i];
+            sb.append("<link href=\"").append(pathToBaseDir).append(cssFileName).append("\" rel=\"stylesheet\" type=\"text/css\" title=\"").append(this.cssTitles[i]).append("\">\n");
         }
+        sb.append("<meta http-equiv=\"Default-Style\" content=\"red\">\n");
         sb.append("</head>\n");
         return sb.toString();        
     }
@@ -923,6 +938,16 @@ public class HtmlGenerator {
     
     public static String getVPLGwebServerUrl() {
         return "http://rcmd.org/vplgweb/";
+    }
+    
+    public static String jsSwitchStyleSheetForm() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<form>\n");
+        sb.append("<input type=\"submit\" onclick=\"switch_style('red');return false;\" name=\"theme\" value=\"red\" id=\"red\">\n");
+        sb.append("<input type=\"submit\" onclick=\"switch_style('blue');return false;\" name=\"theme\" value=\"blue\" id=\"blue\">\n");
+        sb.append("<input type=\"submit\" onclick=\"switch_style('green');return false;\" name=\"theme\" value=\"green\" id=\"green\">\n");        
+        sb.append("</form>\n");
+        return sb.toString();
     }
     
     public static String getVPLGSoftwareWebsite() {
@@ -974,6 +999,61 @@ public class HtmlGenerator {
     public static String getFileNameProteinAndChain(String pdbid, String chain) {
         //return "" + pdbid + "_" + chain + ".html";
         return "index.html";
+    }
+    
+    public static String jsFunctionSwitchStyleSheet() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<script language=\"JavaScript\" type=\"text/javascript\">\n");
+        sb.append("<!--\n");                
+        sb.append("var style_cookie_name = \"style\";\n");
+        sb.append("var style_cookie_duration = 30;\n");
+        sb.append("\n");
+        sb.append("function switch_style ( css_title )\n");
+        sb.append("{\n");
+        sb.append("  // You may use this script on your site free of charge provided\n");
+        sb.append("  // you do not remove this notice or the URL below. Script from\n");
+        sb.append("  // http://www.thesitewizard.com/javascripts/change-style-sheets.shtml\n");
+        sb.append("  var i, link_tag ;\n");
+        sb.append("  for (i = 0, link_tag = document.getElementsByTagName(\"link\");i < link_tag.length ; i++ ) {\n");
+        sb.append("    if ((link_tag[i].rel.indexOf( \"stylesheet\" ) != -1) && link_tag[i].title) {\n");
+        sb.append("      link_tag[i].disabled = true ;\n");
+        sb.append("      if (link_tag[i].title == css_title) {\n");
+        sb.append("        link_tag[i].disabled = false ;\n");
+        sb.append("      }\n");
+        sb.append("    }\n");
+        sb.append("  set_cookie( style_cookie_name, css_title, style_cookie_duration );\n");
+        sb.append("  }\n");
+        sb.append("}\n");
+        sb.append("\n");
+        sb.append("function set_style_from_cookie()\n");
+        sb.append("{\n");
+        sb.append("  var css_title = get_cookie( style_cookie_name );\n");
+        sb.append("  if (css_title.length) {\n");
+        sb.append("    switch_style( css_title );\n");
+        sb.append("  }\n");
+        sb.append("}\n");
+        sb.append("\n");
+        sb.append("function set_cookie ( cookie_name, cookie_value, lifespan_in_days, valid_domain )\n");
+        sb.append("{\n");
+        sb.append("  // http://www.thesitewizard.com/javascripts/cookies.shtml\n");
+        sb.append("  var domain_string = valid_domain ? \"; domain=\" + valid_domain) : '' ;\n");
+        sb.append("  document.cookie = cookie_name + \"=\" + encodeURIComponent( cookie_value ) + \"; max-age=\" + 60 * 60 * 24 * lifespan_in_days + \"; path=/\" + domain_string ;\n");
+        sb.append("}\n");
+        sb.append("\n");
+        sb.append("function get_cookie ( cookie_name )\n");
+        sb.append("{\n");
+        sb.append("  // http://www.thesitewizard.com/javascripts/cookies.shtml\n");
+        sb.append("  var cookie_string = document.cookie ;\n");
+        sb.append("  if (cookie_string.length != 0) {\n");
+        sb.append("    var cookie_value = cookie_string.match ('(^|;)[\\s]*' +cookie_name + '=([^;]*)' );\n");
+        sb.append("    return decodeURIComponent ( cookie_value[2] ) ;\n");
+        sb.append("  }\n");
+        sb.append("  return '' ;\n");
+        sb.append("}\n");
+        sb.append("\n");
+        sb.append("// -->\n");
+        sb.append("</script>\n");
+        return sb.toString();
     }
     
     public static String generateTopPageTitle(String t) {

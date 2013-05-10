@@ -241,7 +241,8 @@ public class HtmlTools {
     }
     
     public static String startBody() {
-        return "<body>\n";
+        //return "<body>\n";
+        return "<body onload=\"set_style_from_cookie()\">\n";
     }
      
     public static String endBody() {

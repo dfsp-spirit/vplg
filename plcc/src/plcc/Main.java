@@ -1183,7 +1183,8 @@ public class Main {
             String cssFilePathBlue = outputBaseDir.getAbsolutePath() + fs + "vplgweb_blue.css";
             String cssFilePathGreen = outputBaseDir.getAbsolutePath() + fs + "vplgweb_green.css";
             String fsWeb = "/"; // the internet is UNIX                        
-            htmlGen.setRelativeCssFilePathsFromBasedir(new String[] { fsWeb + "vplgweb.css" });        // no, this ain't beautiful            
+            htmlGen.setRelativeCssFilePathsFromBasedir(new String[] { fsWeb + "vplgweb.css", fsWeb + "vplgweb_red.css", fsWeb + "vplgweb_blue.css", fsWeb + "vplgweb_green.css" });        // no, this ain't beautiful            
+            htmlGen.setCssTitles(new String[] { "default", "red", "blue", "green" });
             
             if(Settings.getBoolean("plcc_B_output_textfiles_dir_tree_core_html")) {                
                 System.out.println("  Writing core webpages. The base output directory is '" + outputBaseDir.getAbsolutePath() + "'.");
