@@ -468,6 +468,7 @@ public class HtmlGenerator {
 
         StringBuilder sb = new StringBuilder();
         String fs = File.separator;
+        String fsWeb = "/";
         
         String pdbid = pr.getPdbid();
         List<String> chains = pr.getAvailableChains();
@@ -513,10 +514,10 @@ public class HtmlGenerator {
                 if(pcr != null) {
                     ProtMetaInfo pmi = pcr.getChainMetaData();
                     if(pmi != null) {
-                        sb.append(HtmlTools.listItem(HtmlTools.link("" + chain + fs + HtmlGenerator.getFileNameProteinAndChain(pdbid, chain), "Chain " + chain) + " (Molecule " + pmi.getMolName() + " from organism " + pmi.getOrgScientific() + ")"));
+                        sb.append(HtmlTools.listItem(HtmlTools.link("" + chain + fsWeb + HtmlGenerator.getFileNameProteinAndChain(pdbid, chain), "Chain " + chain) + " (Molecule " + pmi.getMolName() + " from organism " + pmi.getOrgScientific() + ")"));
                     } 
                     else {
-                        sb.append(HtmlTools.listItem(HtmlTools.link("" + chain + fs + HtmlGenerator.getFileNameProteinAndChain(pdbid, chain), "Chain " + chain)));
+                        sb.append(HtmlTools.listItem(HtmlTools.link("" + chain + fsWeb + HtmlGenerator.getFileNameProteinAndChain(pdbid, chain), "Chain " + chain)));
                     }                                        
                 }
                 else {
@@ -582,6 +583,7 @@ public class HtmlGenerator {
 
         StringBuilder sb = new StringBuilder();
         String fs = File.separator;
+        String fsWeb = "/";
         
         String pdbid = pr.getPdbid();
         List<String> chains = pr.getAvailableChains();
@@ -631,7 +633,7 @@ public class HtmlGenerator {
         sb.append(HtmlTools.startParagraph());
         
         // --- links to mother protein ---
-        sb.append("Part of protein: ").append(HtmlTools.link(".." + fs + HtmlGenerator.getFileNameProtein(pdbid), pdbid)).append(HtmlTools.brAndNewline());
+        sb.append("Part of protein: ").append(HtmlTools.link(".." + fsWeb + HtmlGenerator.getFileNameProtein(pdbid), pdbid)).append(HtmlTools.brAndNewline());
         
         // --- links to other chains of the same protein ---
         sb.append("Other chains of this protein: ");
@@ -648,10 +650,10 @@ public class HtmlGenerator {
                 if(otherChainPcr != null) {
                     ProtMetaInfo pmi = otherChainPcr.getChainMetaData();
                     if(pmi != null) {
-                        sb.append(HtmlTools.listItem(HtmlTools.link("" + otherChain + fs + HtmlGenerator.getFileNameProteinAndChain(pdbid, otherChain), "Chain " + otherChain) + " (Molecule " + pmi.getMolName() + " from organism " + pmi.getOrgScientific() + ")"));
+                        sb.append(HtmlTools.listItem(HtmlTools.link("" + otherChain + fsWeb + HtmlGenerator.getFileNameProteinAndChain(pdbid, otherChain), "Chain " + otherChain) + " (Molecule " + pmi.getMolName() + " from organism " + pmi.getOrgScientific() + ")"));
                     } 
                     else {
-                        sb.append(HtmlTools.listItem(HtmlTools.link("" + otherChain + fs + HtmlGenerator.getFileNameProteinAndChain(pdbid, otherChain), "Chain " + otherChain)));
+                        sb.append(HtmlTools.listItem(HtmlTools.link("" + otherChain + fsWeb + HtmlGenerator.getFileNameProteinAndChain(pdbid, otherChain), "Chain " + otherChain)));
                     }                                        
                 }
                 else {
