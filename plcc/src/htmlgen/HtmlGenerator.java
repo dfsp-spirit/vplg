@@ -115,6 +115,11 @@ public class HtmlGenerator {
         }
     }
     
+    /**
+     * Writes all resource files for the web pages (like images) from the JAR archive to the proper file system location for the website.
+     * @param pathToBaseDir
+     * @return true if all resources could be written, false otherwise
+     */
     public boolean writeResourceFilesToFilesystem(String pathToBaseDir) {
         boolean allOk = true;
         String fs = File.separator;
@@ -129,8 +134,25 @@ public class HtmlGenerator {
             allOk = false;
         }
         
-        // may copy more stuff here
+        // copy more stuff
+        HashMap<String, File> stuffToCopy = new HashMap<String, File>();
+        stuffToCopy.put("resources/graphtype_alpha.png", new File(pathToBaseDir + fs + "graphtype_alpha.png"));
+        stuffToCopy.put("resources/graphtype_alphalig.png", new File(pathToBaseDir + fs + "graphtype_alphalig.png"));
+        stuffToCopy.put("resources/graphtype_beta.png", new File(pathToBaseDir + fs + "graphtype_beta.png"));
+        stuffToCopy.put("resources/graphtype_betalig.png", new File(pathToBaseDir + fs + "graphtype_betalig.png"));
+        stuffToCopy.put("resources/graphtype_albe.png", new File(pathToBaseDir + fs + "graphtype_albe.png"));
+        stuffToCopy.put("resources/graphtype_albelig.png", new File(pathToBaseDir + fs + "graphtype_albelig.png"));
         
+        for(String res : stuffToCopy.keySet()) {
+            source = res;
+            destination = stuffToCopy.get(res);
+            try {            
+                IO.copyResourceFileToFileSystemLocation(source, destination);                
+            } catch(Exception e) {
+                System.err.println("ERROR: Failed to copy resource from JAR at '" + source + "' to file system path '" + destination + "': '" + e.getMessage() + "'.");
+                allOk = false;
+            }
+        }                        
         return allOk;
     }
     
@@ -748,6 +770,8 @@ public class HtmlGenerator {
                     sb.append(HtmlTools.aname(graphType));
                     sb.append(HtmlTools.heading("The " + graphType + " graph", 3));
                     
+                    sb.append("<img src=\"").append(HtmlTools.makeWebPath(pathToBaseDir)).append("/graphtype_").append(graphType).append(".png\" alt=\"The ").append(graphType).append(" graph.\" style=\"float:right;\" />\n");
+                    
                     if(HtmlGenerator.getGraphInfoString(graphType) != null) {
                         sb.append(HtmlTools.startParagraph());
                         sb.append(HtmlGenerator.getGraphInfoString(graphType));
@@ -757,7 +781,7 @@ public class HtmlGenerator {
                     // ---------------------- SSE info table ----------------------
                     sb.append(HtmlTools.heading("Graph structure", 4));
                     sb.append(HtmlTools.startParagraph());
-                    sb.append("The graph structure tables hold detailed information on the SSEs, spatial contacts and ligands of the " + graphType + " graph of this protein chain.");
+                    sb.append("The graph structure tables hold detailed information on the SSEs, spatial contacts and ligands of the ").append(graphType).append(" graph of this protein chain.");
                     sb.append(HtmlTools.endParagraph());
                     sb.append(HtmlTools.startDivHideableWithID("hide_" + graphType + "_structure"));
                     sb.append(HtmlTools.startParagraph());
