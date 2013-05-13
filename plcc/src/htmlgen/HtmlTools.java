@@ -21,6 +21,14 @@ public class HtmlTools {
         return "<a name=\"" + id + "\"></a>\n";
     }
     
+    public static String makeWebPath(String path) {
+        if(path == null) {
+            return "";
+        } else {
+            return path.replace("\\", "/");
+        }        
+    }
+    
     public static String tableStart(String[] headerStrings) {
         StringBuilder sb = new StringBuilder();
         sb.append("<table>\n<tr>\n");

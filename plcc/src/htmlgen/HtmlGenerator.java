@@ -918,7 +918,7 @@ public class HtmlGenerator {
 
         for(int i = 0; i < relativeCssFilePathsFromBasedir.length; i++) {            
             String cssFileName = relativeCssFilePathsFromBasedir[i];
-            sb.append("<link href=\"").append(pathToBaseDir).append(cssFileName).append("\" rel=\"stylesheet\" type=\"text/css\" title=\"").append(this.cssTitles[i]).append("\">\n");
+            sb.append("<link href=\"").append(HtmlTools.makeWebPath(pathToBaseDir)).append(cssFileName).append("\" rel=\"stylesheet\" type=\"text/css\" title=\"").append(this.cssTitles[i]).append("\">\n");
         }
         sb.append("<meta http-equiv=\"Default-Style\" content=\"red\">\n");
         sb.append("</head>\n");
@@ -928,7 +928,7 @@ public class HtmlGenerator {
     public String generateLogo(String pathToBaseDir) {
         StringBuilder sb = new StringBuilder();
         sb.append("<div class=\"logo\" align=\"center\">\n");
-        sb.append("<img src=\"").append(pathToBaseDir).append("/vplg_logo.png\" alt=\"VPLG logo\" style=\"float:right;\" />\n");
+        sb.append("<img src=\"").append(HtmlTools.makeWebPath(pathToBaseDir)).append("/vplg_logo.png\" alt=\"VPLG logo\" style=\"float:right;\" />\n");
         sb.append(HtmlTools.heading("VPLGweb -- Visualization of Protein Ligand Graphs web server", 1));
         sb.append(HtmlTools.hr());
         sb.append("</div>\n");
@@ -937,6 +937,10 @@ public class HtmlGenerator {
     
     public static String getVPLGwebServerUrl() {
         return "http://rcmd.org/vplgweb/";
+    }
+    
+    public static String getVPLGwebServerUrlRelative(String pathToBaseDir) {
+        return HtmlTools.makeWebPath(pathToBaseDir);
     }
     
     public static String jsSwitchStyleSheetForm() {
@@ -973,7 +977,8 @@ public class HtmlGenerator {
         sb.append("Tim Sch&auml;fer");
         sb.append(HtmlTools.brAndNewline());
         
-        sb.append(HtmlTools.link(HtmlGenerator.getVPLGwebServerUrl(), "VPLGweb"));
+        sb.append(HtmlTools.link(HtmlGenerator.getVPLGwebServerUrlRelative(pathToBaseDir), "VPLGweb"));
+        //sb.append(HtmlTools.link(HtmlGenerator.getVPLGwebServerUrl(), "VPLGweb"));
         sb.append(" | ");
         sb.append(HtmlTools.link(HtmlGenerator.getVPLGSoftwareWebsite(), "VPLG"));
         sb.append(" | ");
