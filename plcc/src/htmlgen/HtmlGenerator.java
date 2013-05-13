@@ -134,14 +134,19 @@ public class HtmlGenerator {
             allOk = false;
         }
         
-        // copy more stuff
+        // ----- copy more stuff -----
         HashMap<String, File> stuffToCopy = new HashMap<String, File>();
+        
+        // graph type images for the chain webpage
         stuffToCopy.put("resources/graphtype_alpha.png", new File(pathToBaseDir + fs + "graphtype_alpha.png"));
         stuffToCopy.put("resources/graphtype_alphalig.png", new File(pathToBaseDir + fs + "graphtype_alphalig.png"));
         stuffToCopy.put("resources/graphtype_beta.png", new File(pathToBaseDir + fs + "graphtype_beta.png"));
         stuffToCopy.put("resources/graphtype_betalig.png", new File(pathToBaseDir + fs + "graphtype_betalig.png"));
         stuffToCopy.put("resources/graphtype_albe.png", new File(pathToBaseDir + fs + "graphtype_albe.png"));
         stuffToCopy.put("resources/graphtype_albelig.png", new File(pathToBaseDir + fs + "graphtype_albelig.png"));
+        
+        // protein ligand graph image for start webpage
+        stuffToCopy.put("resources/protein_ligand_graph.png", new File(pathToBaseDir + fs + "protein_ligand_graph.png"));
         
         for(String res : stuffToCopy.keySet()) {
             source = res;
@@ -176,7 +181,7 @@ public class HtmlGenerator {
             sb.append("VPLGweb is a web server which allows for quick access to Protein Ligand Graphs for all ");
             sb.append("protein chains in the RCSB Protein Data Bank (PDB). These graphs were computed from the ");
             sb.append("3D atom coordinates in PDB files and the secondary structure assignments of the DSSP algortihm using the ");
-            sb.append(HtmlTools.link(HtmlGenerator.getVPLGSoftwareWebsite(), "VPLG software."));
+            sb.append(HtmlTools.linkBlank(HtmlGenerator.getVPLGSoftwareWebsite(), "VPLG software."));
             sb.append(HtmlTools.endParagraph());
             sb.append(HtmlTools.brAndNewline());
             
@@ -185,8 +190,19 @@ public class HtmlGenerator {
             sb.append(HtmlTools.startParagraph());
             sb.append("A protein graph models the structure of a protein chain. Each vertex ");
             sb.append("in the graph represents a secondary structure element (SSE, e.g., an alpha helix ");
-            sb.append("or a beta strand) or a ligand. An edge between two vertices in the graph means that, ");
-            sb.append(" the respective SSEs are in contact in the 3D structure.");
+            sb.append("or a beta strand) or a ligand. An edge between two vertices in the graph means that ");
+            sb.append("the respective SSEs are in contact in the 3D structure. Thus, protein ligand graphs model protein ");
+            sb.append("topology on the super-secondary structure level.");
+            sb.append(HtmlTools.brAndNewline());
+            sb.append(HtmlTools.brAndNewline());
+            sb.append("A typical protein ligand graph for a PDB chain has 10 to 80 vertices and a similar number of edges. More information on protein ligand graphs is available in the ");
+            sb.append(HtmlTools.linkBlank(HtmlGenerator.getVPLGHelpWebsite(), "VPLG Documentation"));
+            sb.append(".\n");            
+            sb.append(HtmlTools.endParagraph());
+            sb.append("<img src=\"").append(HtmlTools.makeWebPath(pathToBaseDir)).append("/protein_ligand_graph.png\" alt=\"A sample protein ligand graph.\" style=\"display: block;margin-left: auto;margin-right: auto;\" />\n");
+            sb.append(HtmlTools.brAndNewline());
+            sb.append(HtmlTools.startParagraph("tinycenter"));
+            sb.append("Protein ligand graph of 7TIM, chain A. This graph consists of 13 alpha helices, 8 beta strands and a ligand.");
             sb.append(HtmlTools.endParagraph());
             sb.append(HtmlTools.brAndNewline());
             
@@ -221,9 +237,9 @@ public class HtmlGenerator {
             sb.append(HtmlTools.heading("Contact and citing VPLGweb", 2));
             sb.append(HtmlTools.startParagraph());
             sb.append("VPLGweb was written by ");
-            sb.append(HtmlTools.link("http://rcmd.org/ts/", "Tim Sch&auml;fer"));
+            sb.append(HtmlTools.linkBlank("http://rcmd.org/ts/", "Tim Sch&auml;fer"));
             sb.append(" at the ");
-            sb.append(HtmlTools.link("http://www.bioinformatik.uni-frankfurt.de", "Molecular Bioinformatics (MolBI) group"));
+            sb.append(HtmlTools.linkBlank("http://www.bioinformatik.uni-frankfurt.de", "Molecular Bioinformatics (MolBI) group"));
             sb.append(" of Ina Koch at Goethe-University Frankfurt am Main, Germany.");
             sb.append(HtmlTools.brAndNewline());
             sb.append(HtmlTools.brAndNewline());
@@ -235,9 +251,9 @@ public class HtmlGenerator {
             sb.append(HtmlTools.italic("Computation and Visualization of Protein Topology Graphs Including Ligand Information."));
             sb.append("German Conference on Bioinformatics 2012. ");
             sb.append("(");
-            sb.append(HtmlTools.link("http://sourceforge.net/p/vplg/wiki/Citing/", "Details and BibTex file"));
+            sb.append(HtmlTools.linkBlank("http://sourceforge.net/p/vplg/wiki/Citing/", "Details and BibTex file"));
             sb.append(", ");
-            sb.append(HtmlTools.link("http://drops.dagstuhl.de/opus/volltexte/2012/3722", "Open Access Paper"));
+            sb.append(HtmlTools.linkBlank("http://drops.dagstuhl.de/opus/volltexte/2012/3722", "Open Access Paper"));
             sb.append(")");
             sb.append(HtmlTools.listItemEnd());
             sb.append(HtmlTools.uListEnd());
@@ -564,17 +580,17 @@ public class HtmlGenerator {
         
         // RCSB PDB
         sb.append("Structure at RCSB PDB: ");
-        sb.append(HtmlTools.link("http://www.rcsb.org/pdb/explore/explore.do?structureId=" + pdbid, pdbid + " @ RCSB PDB"));                        
+        sb.append(HtmlTools.linkBlank("http://www.rcsb.org/pdb/explore/explore.do?structureId=" + pdbid, pdbid + " @ RCSB PDB"));                        
         sb.append(HtmlTools.br());
         
         // CATH
         sb.append("Domain info from CATH: ");        
-        sb.append(HtmlTools.link("http://www.cathdb.info/pdb/" + pdbid, pdbid + " @ CATH"));                        
+        sb.append(HtmlTools.linkBlank("http://www.cathdb.info/pdb/" + pdbid, pdbid + " @ CATH"));                        
         sb.append(HtmlTools.br());
         
         //SCOP
         sb.append("Structural classification from SCOP: ");        
-        sb.append(HtmlTools.link("http://scop.mrc-lmb.cam.ac.uk/scop/search.cgi?pdb=" + pdbid, pdbid + " @ SCOP"));                        
+        sb.append(HtmlTools.linkBlank("http://scop.mrc-lmb.cam.ac.uk/scop/search.cgi?pdb=" + pdbid, pdbid + " @ SCOP"));                        
         sb.append(HtmlTools.br());
         
         
@@ -1006,14 +1022,14 @@ public class HtmlGenerator {
         sb.append(HtmlTools.link(HtmlGenerator.getVPLGwebServerUrlRelative(pathToBaseDir), "VPLGweb"));
         //sb.append(HtmlTools.link(HtmlGenerator.getVPLGwebServerUrl(), "VPLGweb"));
         sb.append(" | ");
-        sb.append(HtmlTools.link(HtmlGenerator.getVPLGSoftwareWebsite(), "VPLG"));
+        sb.append(HtmlTools.linkBlank(HtmlGenerator.getVPLGSoftwareWebsite(), "VPLG"));
         sb.append(" | ");
-        sb.append(HtmlTools.link(HtmlGenerator.getVPLGSourceforgeWebsite(), "VPLG project @ SF"));
+        sb.append(HtmlTools.linkBlank(HtmlGenerator.getVPLGSourceforgeWebsite(), "VPLG project @ SF"));
         sb.append(" | ");
-        sb.append(HtmlTools.link(HtmlGenerator.getVPLGHelpWebsite(), "VPLG Help and Documentation"));
+        sb.append(HtmlTools.linkBlank(HtmlGenerator.getVPLGHelpWebsite(), "VPLG Help and Documentation"));
         sb.append(" | ");
         
-        sb.append(HtmlTools.link("http://www.bioinformatik.uni-frankfurt.de", "MolBI Group @ Goethe-University Frankfurt"));
+        sb.append(HtmlTools.linkBlank("http://www.bioinformatik.uni-frankfurt.de", "MolBI Group @ Goethe-University Frankfurt"));
         
         
         sb.append(HtmlTools.endParagraph());

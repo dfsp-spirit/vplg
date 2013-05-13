@@ -107,6 +107,7 @@ public class CssGenerator {
         sb.append("p.top { font-size:10pt; font-family:Arial,sans-serif; color:").append(colorFont).append("; text-decoration:underline }\n");
         sb.append("p.big { font-size:14pt; font-family:Arial,sans-serif; color:").append(colorFont).append(" }\n");
         sb.append("p.tiny { font-size:7pt; font-family:Arial,sans-serif; color:").append(colorFont).append(" }\n");
+        sb.append("p.tinycenter { text-align: center; font-size:7pt; font-family:Arial,sans-serif; color:").append(colorFont).append(" }\n");                
         sb.append("div.footer { font-size:7pt; font-family:Arial,sans-serif; color:").append(colorFont).append(" }\n");
         sb.append(".footer p { font-size:7pt; font-family:Arial,sans-serif; color:").append(colorFont).append(" }\n");
         sb.append("p tinylink {font-size:7pt; color:").append(colorLinks).append("; text-decoration:none }\n");

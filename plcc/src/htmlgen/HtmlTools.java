@@ -17,6 +17,10 @@ public class HtmlTools {
         return "<a href=\"" + targetUrl + "\">" + label + "</a>";
     }
     
+    public static String linkBlank(String targetUrl, String label) {
+        return "<a href=\"" + targetUrl + "\" target=\"_blank\">" + label + "</a>";
+    }        
+    
     public static String aname(String id) {
         return "<a name=\"" + id + "\"></a>\n";
     }
@@ -238,6 +242,10 @@ public class HtmlTools {
     
     public static String startParagraph() {
         return "<p>\n";
+    }
+    
+    public static String startParagraph(String classString) {
+        return "<p class=\"" + classString + "\">\n";
     }
     
     public static String endParagraph() {
