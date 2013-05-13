@@ -282,6 +282,10 @@ public class HtmlTools {
         return "<span style=\"font-style:italic\">" + c + "</span>";
     }
     
+    public static String bold(String c) {
+        return "<span style=\"font-weight:bold\">" + c + "</span>";
+    }
+    
     public static String br() {
         return "<br/>";
     }

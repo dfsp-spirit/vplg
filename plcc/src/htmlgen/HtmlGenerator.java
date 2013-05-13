@@ -145,8 +145,11 @@ public class HtmlGenerator {
         stuffToCopy.put("resources/graphtype_albe.png", new File(pathToBaseDir + fs + "graphtype_albe.png"));
         stuffToCopy.put("resources/graphtype_albelig.png", new File(pathToBaseDir + fs + "graphtype_albelig.png"));
         
-        // protein ligand graph image for start webpage
+        // protein ligand graph image for start webpage, 7tim chain a
         stuffToCopy.put("resources/protein_ligand_graph.png", new File(pathToBaseDir + fs + "protein_ligand_graph.png"));
+        
+        // 7tim chain a structure rendered
+        stuffToCopy.put("resources/7tim_a_pymol.png", new File(pathToBaseDir + fs + "7tim_a_pymol.png"));
         
         for(String res : stuffToCopy.keySet()) {
             source = res;
@@ -180,7 +183,7 @@ public class HtmlGenerator {
             sb.append(HtmlTools.startParagraph());
             sb.append("VPLGweb is a web server which allows for quick access to Protein Ligand Graphs for all ");
             sb.append("protein chains in the RCSB Protein Data Bank (PDB). These graphs were computed from the ");
-            sb.append("3D atom coordinates in PDB files and the secondary structure assignments of the DSSP algortihm using the ");
+            sb.append("3D atom coordinates in PDB files and the secondary structure assignments of the DSSP algorithm using the ");
             sb.append(HtmlTools.linkBlank(HtmlGenerator.getVPLGSoftwareWebsite(), "VPLG software."));
             sb.append(HtmlTools.endParagraph());
             sb.append(HtmlTools.brAndNewline());
@@ -199,10 +202,25 @@ public class HtmlGenerator {
             sb.append(HtmlTools.linkBlank(HtmlGenerator.getVPLGHelpWebsite(), "VPLG Documentation"));
             sb.append(".\n");            
             sb.append(HtmlTools.endParagraph());
-            sb.append("<img src=\"").append(HtmlTools.makeWebPath(pathToBaseDir)).append("/protein_ligand_graph.png\" alt=\"A sample protein ligand graph.\" style=\"display: block;margin-left: auto;margin-right: auto;\" />\n");
+            sb.append("<img src=\"").append(HtmlTools.makeWebPath(pathToBaseDir)).append("/protein_ligand_graph.png\" alt=\"A sample protein ligand graph (PDB 7TIM, chain A).\" style=\"display: block;margin-left: auto;margin-right: auto;\" />\n");
             sb.append(HtmlTools.brAndNewline());
             sb.append(HtmlTools.startParagraph("tinycenter"));
-            sb.append("Protein ligand graph of 7TIM, chain A. This graph consists of 13 alpha helices, 8 beta strands and a ligand.");
+            sb.append(HtmlTools.bold("Protein ligand graph of 7TIM, chain A. "));
+            sb.append("This graph consists of 13 alpha helices, 8 beta strands and a ligand. ");
+            //sb.append(HtmlTools.brAndNewline());
+            sb.append("The structure contains a parallel beta-barrel consisting of all 8 beta strands, and the ligand PGH is close to ");
+            //sb.append(HtmlTools.brAndNewline());
+            sb.append("several strands of the barrel and to some of the alpha helices surrounding it. ");
+            //sb.append(HtmlTools.brAndNewline());
+            //sb.append("The 3D structure of 7TIM is shown for comparison below.");
+            sb.append("[");
+            sb.append(HtmlTools.startSpan("tool"));
+            sb.append(HtmlGenerator.popupWindowLink("Show 3D structure", HtmlTools.makeWebPath(pathToBaseDir) + "/7tim_a_pymol.png"));
+            sb.append(HtmlTools.endSpan());
+            sb.append("]");
+            //sb.append(HtmlTools.brAndNewline());
+            //sb.append("<img src=\"").append(HtmlTools.makeWebPath(pathToBaseDir)).append("/7tim_a_pymol.png\" alt=\"Rendered structure of PDB 7TIM chain A.\" style=\"display: block;margin-left: auto;margin-right: auto;\" />\n");            
+            //sb.append(HtmlTools.brAndNewline());
             sb.append(HtmlTools.endParagraph());
             sb.append(HtmlTools.brAndNewline());
             
@@ -1048,6 +1066,36 @@ public class HtmlGenerator {
         return "index.html";
     }
     
+    
+    /**
+     * Generates the JS code for a popup window. Use the popupWindowLink() function to access this.
+     * @param title
+     * @return 
+     */
+    public static String jsFunctionPopupWindow(String title) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<script lanuage=\"JavaScript\" type=\"text/Javascript\">\n");
+        sb.append("<!--\n");                
+        sb.append("function popup(someStuff){\n");
+        sb.append("  popupWindow = window.open(someStuff, \"").append(title).append("\", \"width=800,height=600,toolbar=0,titlebar=1,menubar=0,location=0,status=0,directories=0\")  \n");
+        sb.append("  popupWindow.document.title='").append(title).append("';\n");
+        sb.append("  popupWindow.focus()\n");
+        sb.append("}\n");
+        sb.append("// -->\n");
+        sb.append("</script>\n");
+        return sb.toString();
+    }
+    
+    /**
+     * A popup link which uses the JS created by jsFunctionPopupWindow() function.
+     * @param title the window title
+     * @param stuffToPopup the URL to popup, can be an image file
+     * @return the link string
+     */
+    public static String popupWindowLink(String linkTitle, String stuffToPopup) {
+        return "<a href=\"javascript:popup('" + stuffToPopup + "')\">" + linkTitle + "</a>";
+    }
+    
     public static String jsFunctionSwitchStyleSheet() {
         StringBuilder sb = new StringBuilder();
         sb.append("<script language=\"JavaScript\" type=\"text/javascript\">\n");
@@ -1136,6 +1184,7 @@ public class HtmlGenerator {
     public static String commonJSFunctions() {
         StringBuilder sb = new StringBuilder();
         sb.append(HtmlGenerator.jsFunctionSwitchStyleSheet());
+        sb.append(HtmlGenerator.jsFunctionPopupWindow("VPLGweb popup"));
         return sb.toString();
     }
 
