@@ -943,9 +943,9 @@ public class HtmlGenerator {
         StringBuilder sb = new StringBuilder();
         sb.append("<form class=\"centerform\">\n");
         sb.append("VPLGweb Style: ");
-        sb.append("<input type=\"submit\" onclick=\"switch_style('red');return false;\" name=\"theme\" value=\"blood\" id=\"red\">\n");
-        sb.append("<input type=\"submit\" onclick=\"switch_style('blue');return false;\" name=\"theme\" value=\"ice\" id=\"blue\">\n");
-        sb.append("<input type=\"submit\" onclick=\"switch_style('green');return false;\" name=\"theme\" value=\"hope\" id=\"green\">\n");        
+        sb.append("<input type=\"submit\" onclick=\"switch_style('red');return false;\" name=\"theme\" value=\"Red\" id=\"red\">\n");
+        sb.append("<input type=\"submit\" onclick=\"switch_style('blue');return false;\" name=\"theme\" value=\"Blue\" id=\"blue\">\n");
+        sb.append("<input type=\"submit\" onclick=\"switch_style('green');return false;\" name=\"theme\" value=\"Green\" id=\"green\">\n");        
         sb.append("</form>\n");
         return sb.toString();
     }
