@@ -5,6 +5,7 @@
 
 APPTAG="[GET_PDB]"
 CFG_FILE="../settings_statistics.cfg"
+ERRORLOG="/dev/stderr"
 
 ## get settings
 
@@ -12,11 +13,13 @@ source $CFG_FILE
 ## make sure the settings have been read
 if [ -z "$SETTINGSREAD" ]; then
     echo "$APPTAG ##### ERROR: Could not load settings from file '$CFG_FILE'. #####"
+    echo "$APPTAG ##### ERROR: Could not load settings from file '$CFG_FILE'. #####" >> $ERRORLOG
     exit 1
 fi
 
 if [ -z "$1" ]; then
     echo "$APPTAG USAGE: $0 <PDBID> [<OUTPUT_DIR>]"
+    echo "$APPTAG USAGE: $0 <PDBID> [<OUTPUT_DIR>]" >> $ERRORLOG
     echo "$APPTAG example: $0 3kmf /tmp"
     exit 1
 fi
@@ -37,6 +40,7 @@ PDBFILEPATH="${PDBPATH}/${PDBFILENAME}"
 cp $PDBFILEPATH .
 if [ $? -ne 0 ]; then
     echo "$APPTAG ERROR: Could not copy file '${PDBFILEPATH}' to the current directory."
+    echo "$APPTAG ERROR: Could not copy file '${PDBFILEPATH}' to the current directory." >> $ERRORLOG
     exit 1
 fi
 
@@ -47,6 +51,7 @@ rm $PDBFILE_EXTRACTED 2>/dev/null
 gunzip $PDBFILENAME
 if [ $? -ne 0 ]; then
     echo "$APPTAG ERROR: Could not extract file '${PDBFILENAME}' using gunzip."
+    echo "$APPTAG ERROR: Could not extract file '${PDBFILENAME}' using gunzip." >> $ERRORLOG
     exit 1
 fi
 
@@ -56,6 +61,7 @@ PDBFILE_FINAL="${PDBID}.pdb"
 mv $PDBFILE_EXTRACTED $PDBFILE_FINAL
 if [ $? -ne 0 ]; then
     echo "$APPTAG ERROR: Could not rename file '${PDBFILE_EXTRACTED}' to '${PDBFILE_FINAL}'."
+    echo "$APPTAG ERROR: Could not rename file '${PDBFILE_EXTRACTED}' to '${PDBFILE_FINAL}'." >> $ERRORLOG
     exit 1
 fi
 
@@ -67,6 +73,7 @@ if [ -n "$2" ]; then
     mv $PDBFILE_FINAL $TARGET_DIR
     if [ $? -ne 0 ]; then
         echo "$APPTAG ERROR: Could not move to '${PDBFILE_FINAL}' to '${TARGET_DIR}'."
+	echo "$APPTAG ERROR: Could not move to '${PDBFILE_FINAL}' to '${TARGET_DIR}'." >> $ERRORLOG
         exit 1
     else
         echo "$APPTAG Moved '${PDBFILE_FINAL}' to '${TARGET_DIR}'."

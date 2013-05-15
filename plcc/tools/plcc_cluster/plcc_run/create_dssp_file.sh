@@ -6,16 +6,20 @@
 APPTAG="[CREATE_DSSP]"
 CFG_FILE="../settings_statistics.cfg"
 
+ERRORLOG="/dev/stderr"
+
 ## get settings
 
 source $CFG_FILE
 ## make sure the settings have been read
 if [ -z "$SETTINGSREAD" ]; then
     echo "$APPTAG ##### ERROR: Could not load settings from file '$CFG_FILE'. #####"
+    echo "$APPTAG ##### ERROR: Could not load settings from file '$CFG_FILE'. #####" >> $ERRORLOG
     exit 1
 fi
 
 if [ -z "$1" ]; then
+    echo "$APPTAG USAGE: $0 <PDB_FILE> [<OUTPUT_PATH>]" >> $ERRORLOG
     echo "$APPTAG USAGE: $0 <PDB_FILE> [<OUTPUT_PATH>]"
     echo "$APPTAG example: $0 3kmf.pdb /tmp"
     exit 1
@@ -28,6 +32,7 @@ echo "$APPTAG Assuming PDB id '$PDBID'."
 ## check whether the PDB file exists and is readable
 if [ ! -f "$PDBFILE" -a -r "$PDBFILE" ]; then
     echo "$APPTAG ERROR: Could not read PDB file '$PDBFILE'."
+    echo "$APPTAG ERROR: Could not read PDB file '$PDBFILE'." >> $ERRORLOG
     exit 1
 fi
 
@@ -39,6 +44,7 @@ fi
 
 if [ ! -f "$DSSP" -a -x "$DSSP" ]; then
     echo "$APPTAG ERROR: Could not find executable DSSP binary file at '$DSSP'. Check path and permissions."
+    echo "$APPTAG ERROR: Could not find executable DSSP binary file at '$DSSP'. Check path and permissions." >> $ERRORLOG
     exit 1
 fi
 
@@ -47,6 +53,7 @@ fi
 SPLITPDB="./splitpdb"
 if [ ! -f "$SPLITPDB" -a -x "$SPLITPDB" ]; then
     echo "$APPTAG ERROR: Could not find splitpdb executable at '$SPLITPDB'. Check path and permissions."
+    echo "$APPTAG ERROR: Could not find splitpdb executable at '$SPLITPDB'. Check path and permissions." >> $ERRORLOG
     exit 1
 fi
 
@@ -54,12 +61,14 @@ SPLITPDBFILE="${PDBFILE}.split"
 $SPLITPDB $PDBFILE -o $SPLITPDBFILE $SPLITPDB_OPTIONS
 if [ $? -eq 1 ]; then
     echo "$APPTAG ERROR: splitpdb failed (return value 1)."
+    echo "$APPTAG ERROR: splitpdb failed (return value 1)." >> $ERRORLOG
     exit 1
 fi
 
 rm $PDBFILE && mv $SPLITPDBFILE $PDBFILE
 if [ $? -ne 0 ]; then
     echo "$APPTAG ERROR: Could not move split PDB file '$SPLITPDBFILE' to '$PDBFILE'."
+    echo "$APPTAG ERROR: Could not move split PDB file '$SPLITPDBFILE' to '$PDBFILE'." >> $ERRORLOG
     exit 1
 else
     echo "$APPTAG Deleted original PDB file and moved '$SPLITPDBFILE' to '$PDBFILE'. Running dsspcmbi..."
@@ -70,11 +79,13 @@ DSSPFILE="${PDBID}.dssp"
 $DSSP $PDBFILE > $DSSPFILE 2>/dev/null
 if [ $? -ne 0 ]; then
     echo "$APPTAG ERROR: Running dssp binary '$DSSP' for input file '$PDBFILE' failed."
+    echo "$APPTAG ERROR: Running dssp binary '$DSSP' for input file '$PDBFILE' failed." >> $ERRORLOG
     exit 1
 fi
 
 if [ ! -r "$DSSPFILE" ]; then
-    echo "$APPTAG ERROR: No DSSP file found at '$DSSPFILE'."
+    echo "$APPTAG ERROR: No DSSP file found at '$DSSPFILE' after DSSP run."
+    echo "$APPTAG ERROR: No DSSP file found at '$DSSPFILE' after DSSP run." >> $ERRORLOG
     exit 1
 fi
 
@@ -82,6 +93,7 @@ fi
 NUM_DSSP_LINES=$(wc -l $DSSPFILE 2>/dev/null | awk '{print $1}')
 if [ $? -ne 0 ]; then
     echo "$APPTAG ERROR: Could not determine length of DSSP file."
+    echo "$APPTAG ERROR: Could not determine length of DSSP file." >> $ERRORLOG
     exit 1
 fi
 
@@ -89,6 +101,7 @@ if [ $NUM_DSSP_LINES -le 28 ]; then
     # The data in DSSP files only starts in line 29, everything before that is the header.
     # If the file has no data section, the PDB file most likely contained no valid resides (e.g., DNA/RNA only).
     echo "$APPTAG ERROR: No data part in DSSP file '$DSSPFILE'."
+    echo "$APPTAG ERROR: No data part in DSSP file '$DSSPFILE'." >> $ERRORLOG
 fi
 
 ## OK, the DSSP file should be ok.
@@ -100,6 +113,7 @@ if [ -n "$2" ]; then
     mv $DSSPFILE $DSSPOUT
     if [ $? -ne 0 ]; then
         echo "$APPTAG ERROR: Could not move DSSP file '$DSSPFILE' to '$DSSPOUT'."
+	echo "$APPTAG ERROR: Could not move DSSP file '$DSSPFILE' to '$DSSPOUT'." >> $ERRORLOG
         exit 1
     else
 	echo "$APPTAG Moved DSSP file to '$DSSPOUT'."
