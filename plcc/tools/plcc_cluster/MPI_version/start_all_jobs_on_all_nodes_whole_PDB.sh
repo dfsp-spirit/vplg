@@ -11,12 +11,12 @@
 APPTAG="[START_ALL_MPI]"
 
 ## settings
-SINGLE_JOB_SCRIPT="pbs_start_vplg_via_mpi4py_jpbs_for_one_node.sh"
+SINGLE_JOB_SCRIPT="pbs_start_vplg_via_mpi4py_jobs_for_one_node.sh"
 
-echo "$APPTAG Preparing to submit all jobs to the openbpbs queue..."
+echo "$APPTAG Preparing to submit all jobs to the openpbs queue..."
 
 ## submit a job for each file list
-for FLIST in MPIfilelistnum*;
+for FLIST in ../status/MPIfilelistnum*;
 do
   ENV_VARIABLES="PDBFILELIST=$FLIST"
   CMD="qsub $SINGLE_JOB_SCRIPT -v $ENV_VARIABLES"

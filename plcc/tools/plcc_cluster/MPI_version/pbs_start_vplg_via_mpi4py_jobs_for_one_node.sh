@@ -73,7 +73,10 @@ MYHOME="/home/ts"
 NUM_PROCESSORS_PER_NODE=8
 
 #TODO: get the right input file for this node here! The file below is the full list, which makes no sense.
-INPUT_FILE="$TMPDIR/plcc_cluster/status/dbinsert_file_list.lst"	# this file contains a list of all PDB files that should be handled. You can create the list with the scripts in the plcc_cluster/ directory
+#INPUT_FILE="$TMPDIR/plcc_cluster/status/dbinsert_file_list.lst"	# this file contains a list of all PDB files that should be handled. You can create the list with the scripts in the plcc_cluster/ directory
+
+## This is now read from an environment variable which is passed to this script via the '-v' option of the 'qsub' pbs command
+INPUT_FILE=$PDBFILEIST
 
 # report some stuff for log file
 echo $APPTAG ----- Submitting job to pbs queue -----
@@ -91,7 +94,8 @@ echo `cat $PBS_NODEFILE`
 echo $APPTAG The java binary is at `which java`
 echo $APPTAG pbs job id is $PBS_JOBID
 echo "$APPTAG Using $NUM_PROCESSORS_PER_NODE processors"
-echo "$APPTAG Using $INPUT_FILE as the file containing the list of all PDB files to handle"
+echo "$APPTAG Using '$INPUT_FILE' as input file."
+echo "$APPTAG The input file lists `wc -l $INPUTFILE` PDB files to handle during this pbs job."
 echo "$APPTAG -----"
  
 
@@ -127,10 +131,10 @@ PLCC_CLUSTER_DIR="$MYHOME/software/plcc_cluster"
 
 # test one of them to be sure
 SOME_PLCC_SCRIPT="$PLCC_CLUSTER_DIR/plcc_run/get_pdb_file.sh"
-#if [ ! -f "$SOME_PLCC_SCRIPT" ]; then
-#    echo "$APPTAG ERROR: The script '$SOME_PLCC_SCRIPT' does not exist. The plcc_cluster directory seems to be missing."
-#    exit 1
-#fi
+if [ ! -f "$SOME_PLCC_SCRIPT" ]; then
+    echo "$APPTAG ERROR: The script '$SOME_PLCC_SCRIPT' does not exist. The plcc_cluster directory seems to be missing."
+    exit 1
+fi
 
 ## copy mpi4py software
 # not done anymore, we start it from the mounted /develop/ directory now
