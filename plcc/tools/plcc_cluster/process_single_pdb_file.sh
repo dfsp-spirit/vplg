@@ -10,7 +10,7 @@ CFG_FILE="settings_statistics.cfg"
 
 
 echo "$APPTAG ================ Processing single PDB file '$1' ==================="
-echo "$APPTAG Using settings from file '$CFG_FILE'."
+#echo "$APPTAG Using settings from file '$CFG_FILE'."
 
 
 
@@ -44,13 +44,13 @@ function report_and_exit()
     L_EXITCODE="$1"	# first parameter to this function
     TIME_END=$(date)
 
-    echo "$APPTAG Done, handled $NUM_HANDLED of the $NUM_FILES files ($NUM_SUCCESS ok, $NUM_TOTAL_FAIL failed)."
+    #echo "$APPTAG Done, handled $NUM_HANDLED of the $NUM_FILES files ($NUM_SUCCESS ok, $NUM_TOTAL_FAIL failed)."
     echo "$APPTAG Done, handled $NUM_HANDLED of the $NUM_FILES files ($NUM_SUCCESS ok, $NUM_TOTAL_FAIL failed)." >>$DBINSERT_LOG
     
-    echo "$APPTAG Started at '$TIME_START', finished at '$TIME_END'."
+    #echo "$APPTAG Started at '$TIME_START', finished at '$TIME_END'."
     echo "$APPTAG Started at '$TIME_START', finished at '$TIME_END'." >>$DBINSERT_LOG    
 
-    echo "$APPTAG All done, exiting."
+    #echo "$APPTAG All done, exiting."
     echo "$APPTAG All done, exiting." >>$DBINSERT_LOG
     exit $L_EXITCODE
 }
@@ -60,10 +60,10 @@ function report_and_exit_nolog()
     L_EXITCODE="$1"	# first parameter to this function
     TIME_END=$(date)
 
-    echo "$APPTAG Done, handled $NUM_HANDLED of the $NUM_FILES files ($NUM_SUCCESS ok, $NUM_TOTAL_FAIL failed)."
-    echo "$APPTAG Started at '$TIME_START', finished at '$TIME_END'."    
+    #echo "$APPTAG Done, handled $NUM_HANDLED of the $NUM_FILES files ($NUM_SUCCESS ok, $NUM_TOTAL_FAIL failed)."
+    #echo "$APPTAG Started at '$TIME_START', finished at '$TIME_END'."    
 
-    echo "$APPTAG All done, exiting."
+    #echo "$APPTAG All done, exiting."
     exit $L_EXITCODE
 }
 
@@ -164,6 +164,8 @@ TIME_START=$(date)
 
 if [ -z "$1" ]; then
     echo "$APPTAG ##### ERROR: Usage: $0 <PDB_FILE>"
+    echo "$APPTAG ##### ERROR: Usage: $0 <PDB_FILE>" >>$ERROR_LOG
+    echo "$APPTAG ##### ERROR: Usage: $0 <PDB_FILE>" >>$DBINSERT_LOG
     echo "The PDB file should be the path to the gzipped file that was retrieved via rsync from the PDB server. See config for file extension settings. (This script calls scripts to unzip it and create the DSSP file.)"
     exit 1
 fi
@@ -192,7 +194,7 @@ echo "$APPTAG Handling PDB file '$FLN'. Assuming file extension '$REMOTE_PDB_FIL
 DBINSERT_LOG="${LOGDIR}/log_proc1pdb_${PDBID}.log"
 if [ -f $DBINSERT_LOG ]; then
     if rm $DBINSERT_LOG ; then
-        echo "$APPTAG Deleted old db insert log '$DBINSERT_LOG' for this PDB file."
+        #echo "$APPTAG Deleted old db insert log '$DBINSERT_LOG' for this PDB file."
     else
 	echo "$APPTAG ##### ERROR: Could not delete old db insert log '$DBINSERT_LOG' for this PDB file. Check permissions."
         echo "$APPTAG ##### ERROR: Could not delete old db insert log '$DBINSERT_LOG' for this PDB file. Check permissions." >>$ERROR_LOG
@@ -204,8 +206,7 @@ fi
 #touch $DBINSERT_LOG || exit 1
 
 
-echo "$APPTAG Logging to '$DBINSERT_LOG' for this PDB file."
-
+echo "$APPTAG Logging to '$DBINSERT_LOG' for this PDB file." >>$DBINSERT_LOG
 echo "$APPTAG Handling PDB file '$FLN'. Assuming file extension '$REMOTE_PDB_FILE_EXTENSION'." >>$DBINSERT_LOG
 echo "$APPTAG The PDB ID of the file is '$PDBID'." >>$DBINSERT_LOG
 echo "$APPTAG The starting time is '$TIME_START'." >>$DBINSERT_LOG
@@ -266,7 +267,7 @@ if [ -r $FLN ]; then
 
 	## Ok, now call plcc to do the real work.
 	PLCC_COMMAND="./plcc $PDBID $PLCC_OPTIONS"
-	echo "$APPTAG PLCC command is '$PLCC_COMMAND'."
+	echo "$APPTAG PLCC command is '$PLCC_COMMAND'." >>$DBINSERT_LOG
 	$PLCC_COMMAND >>$DBINSERT_LOG 2>&1
 
 	if [ $? -ne 0 ]; then
