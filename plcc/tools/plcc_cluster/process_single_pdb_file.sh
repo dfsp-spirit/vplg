@@ -177,7 +177,7 @@ FILE=$(basename $FLN)
 
 ## now get the PDB ID from the file name (it starts at index 3 and is 4 characters long)
 PDBID=${FILE:3:4}
-echo "$APPTAG The PDB ID of the file is '$PDBID'."
+#echo "$APPTAG The PDB ID of the file is '$PDBID'."
 
 if [ ! -r "$FLN" ]; then
     echo "$APPTAG $PDBID ##### ERROR: Could not open PDB file at '$FLN'."
@@ -187,15 +187,14 @@ if [ ! -r "$FLN" ]; then
 fi
 
 
-echo "$APPTAG $PDBID Handling PDB file '$FLN'. Assuming file extension '$REMOTE_PDB_FILE_EXTENSION'."
+#echo "$APPTAG $PDBID Handling PDB file '$FLN'. Assuming file extension '$REMOTE_PDB_FILE_EXTENSION'."
 
 
 ## remove old protocol files. this is required because we only append to them later.
 DBINSERT_LOG="${LOGDIR}/log_proc1pdb_${PDBID}.log"
 if [ -f $DBINSERT_LOG ]; then
-    if rm $DBINSERT_LOG ; then
-        echo "$APPTAG $PDBID Deleted old db insert log '$DBINSERT_LOG' for this PDB file."
-    else
+    rm $DBINSERT_LOG
+    if [ $? -ne 0 ]; then
 	echo "$APPTAG $PDBID ##### ERROR: Could not delete old db insert log '$DBINSERT_LOG' for this PDB file. Check permissions."
         echo "$APPTAG $PDBID ##### ERROR: Could not delete old db insert log '$DBINSERT_LOG' for this PDB file. Check permissions." >>$ERROR_LOG
 	echo "$APPTAG $PDBID ##### ERROR: Could not delete old db insert log '$DBINSERT_LOG' for this PDB file. Check permissions." >>$DBINSERT_LOG
