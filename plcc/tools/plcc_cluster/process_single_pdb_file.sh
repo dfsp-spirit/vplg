@@ -1,5 +1,6 @@
 #!/bin/bash
-## process_single_pdb_file.sh -- processes a single PDB file. Takes 
+## process_single_pdb_file.sh -- processes a single PDB file. This is used by the MPI version of the update scripts.
+##                               You can also use it on its own, of course.
 ##
 ## Written by ts_2011
 
@@ -200,7 +201,7 @@ if [ -f $DBINSERT_LOG ]; then
     fi
 fi
 
-touch $DBINSERT_LOG || exit 1
+#touch $DBINSERT_LOG || exit 1
 
 
 echo "$APPTAG Logging to '$DBINSERT_LOG' for this PDB file."
@@ -231,6 +232,7 @@ if [ -r $FLN ]; then
 	    echo "$APPTAG ##### ERROR: Cannot cd to plcc_run directory '$PLCC_RUN_DIR'."
 	    echo "$APPTAG ##### ERROR: Cannot cd to plcc_run directory '$PLCC_RUN_DIR'." >>$ERROR_LOG
             echo "$APPTAG ##### ERROR: Cannot cd to plcc_run directory '$PLCC_RUN_DIR'." >>$DBINSERT_LOG
+	    del_output $PDBID
 	    report_and_exit 1
 	fi
 	
@@ -289,6 +291,7 @@ else
     echo "$APPTAG ##### ERROR: Could not read file '$FLN', skipping." >>$DBINSERT_LOG
     let NUM_TOTAL_FAIL++
     let NUM_PDB_FAIL++
+    del_output $PDBID
     report_and_exit 1
 fi	
 
