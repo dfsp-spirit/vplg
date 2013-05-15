@@ -165,7 +165,6 @@ TIME_START=$(date)
 if [ -z "$1" ]; then
     echo "$APPTAG ##### ERROR: Usage: $0 <PDB_FILE>"
     echo "$APPTAG ##### ERROR: Usage: $0 <PDB_FILE>" >>$ERROR_LOG
-    echo "$APPTAG ##### ERROR: Usage: $0 <PDB_FILE>" >>$DBINSERT_LOG
     echo "The PDB file should be the path to the gzipped file that was retrieved via rsync from the PDB server. See config for file extension settings. (This script calls scripts to unzip it and create the DSSP file.)"
     exit 1
 fi
@@ -181,8 +180,7 @@ PDBID=${FILE:3:4}
 
 if [ ! -r "$FLN" ]; then
     echo "$APPTAG $PDBID ##### ERROR: Could not open PDB file at '$FLN'."
-    echo "$APPTAG $PDBID ##### ERROR: Could not open PDB file at '$FLN'." >>$ERROR_LOG
-    echo "$APPTAG $PDBID ##### ERROR: Could not open PDB file at '$FLN'." >>$DBINSERT_LOG
+    echo "$APPTAG $PDBID ##### ERROR: Could not open PDB file at '$FLN'." >>$ERROR_LOG    
     exit 1
 fi
 
