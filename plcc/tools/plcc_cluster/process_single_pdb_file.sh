@@ -180,25 +180,25 @@ PDBID=${FILE:3:4}
 echo "$APPTAG The PDB ID of the file is '$PDBID'."
 
 if [ ! -r "$FLN" ]; then
-    echo "$APPTAG ##### ERROR: Could not open PDB file at '$FLN'."
-    echo "$APPTAG ##### ERROR: Could not open PDB file at '$FLN'." >>$ERROR_LOG
-    echo "$APPTAG ##### ERROR: Could not open PDB file at '$FLN'." >>$DBINSERT_LOG
+    echo "$APPTAG $PDBID ##### ERROR: Could not open PDB file at '$FLN'."
+    echo "$APPTAG $PDBID ##### ERROR: Could not open PDB file at '$FLN'." >>$ERROR_LOG
+    echo "$APPTAG $PDBID ##### ERROR: Could not open PDB file at '$FLN'." >>$DBINSERT_LOG
     exit 1
 fi
 
 
-echo "$APPTAG Handling PDB file '$FLN'. Assuming file extension '$REMOTE_PDB_FILE_EXTENSION'."
+echo "$APPTAG $PDBID Handling PDB file '$FLN'. Assuming file extension '$REMOTE_PDB_FILE_EXTENSION'."
 
 
 ## remove old protocol files. this is required because we only append to them later.
 DBINSERT_LOG="${LOGDIR}/log_proc1pdb_${PDBID}.log"
 if [ -f $DBINSERT_LOG ]; then
     if rm $DBINSERT_LOG ; then
-        #echo "$APPTAG Deleted old db insert log '$DBINSERT_LOG' for this PDB file."
+        echo "$APPTAG $PDBID Deleted old db insert log '$DBINSERT_LOG' for this PDB file."
     else
-	echo "$APPTAG ##### ERROR: Could not delete old db insert log '$DBINSERT_LOG' for this PDB file. Check permissions."
-        echo "$APPTAG ##### ERROR: Could not delete old db insert log '$DBINSERT_LOG' for this PDB file. Check permissions." >>$ERROR_LOG
-	echo "$APPTAG ##### ERROR: Could not delete old db insert log '$DBINSERT_LOG' for this PDB file. Check permissions." >>$DBINSERT_LOG
+	echo "$APPTAG $PDBID ##### ERROR: Could not delete old db insert log '$DBINSERT_LOG' for this PDB file. Check permissions."
+        echo "$APPTAG $PDBID ##### ERROR: Could not delete old db insert log '$DBINSERT_LOG' for this PDB file. Check permissions." >>$ERROR_LOG
+	echo "$APPTAG $PDBID ##### ERROR: Could not delete old db insert log '$DBINSERT_LOG' for this PDB file. Check permissions." >>$DBINSERT_LOG
         exit 1
     fi
 fi
@@ -206,10 +206,10 @@ fi
 #touch $DBINSERT_LOG || exit 1
 
 
-echo "$APPTAG Logging to '$DBINSERT_LOG' for this PDB file." >>$DBINSERT_LOG
-echo "$APPTAG Handling PDB file '$FLN'. Assuming file extension '$REMOTE_PDB_FILE_EXTENSION'." >>$DBINSERT_LOG
-echo "$APPTAG The PDB ID of the file is '$PDBID'." >>$DBINSERT_LOG
-echo "$APPTAG The starting time is '$TIME_START'." >>$DBINSERT_LOG
+#echo "$APPTAG $PDBID Logging to '$DBINSERT_LOG' for this PDB file." >>$DBINSERT_LOG
+#echo "$APPTAG $PDBID Handling PDB file '$FLN'. Assuming file extension '$REMOTE_PDB_FILE_EXTENSION'." >>$DBINSERT_LOG
+#echo "$APPTAG $PDBID The PDB ID of the file is '$PDBID'." >>$DBINSERT_LOG
+#echo "$APPTAG $PDBID The starting time is '$TIME_START'." >>$DBINSERT_LOG
 
 
 NUM_HANDLED=0
@@ -230,9 +230,9 @@ if [ -r $FLN ]; then
 
 	cd $PLCC_RUN_DIR
 	if [ $? -ne 0 ]; then
-	    echo "$APPTAG ##### ERROR: Cannot cd to plcc_run directory '$PLCC_RUN_DIR'."
-	    echo "$APPTAG ##### ERROR: Cannot cd to plcc_run directory '$PLCC_RUN_DIR'." >>$ERROR_LOG
-            echo "$APPTAG ##### ERROR: Cannot cd to plcc_run directory '$PLCC_RUN_DIR'." >>$DBINSERT_LOG
+	    echo "$APPTAG $PDBID ##### ERROR: Cannot cd to plcc_run directory '$PLCC_RUN_DIR'."
+	    echo "$APPTAG $PDBID ##### ERROR: Cannot cd to plcc_run directory '$PLCC_RUN_DIR'." >>$ERROR_LOG
+            echo "$APPTAG $PDBID ##### ERROR: Cannot cd to plcc_run directory '$PLCC_RUN_DIR'." >>$DBINSERT_LOG
 	    del_output $PDBID
 	    report_and_exit 1
 	fi
@@ -241,13 +241,15 @@ if [ -r $FLN ]; then
 	$GET_PDB_FILE_SCRIPT $PDBID >>$DBINSERT_LOG 2>&1
 
 	if [ $? -ne 0 ]; then
-	    echo "$APPTAG ##### ERROR: Could not get PDB file for protein '$PDBID', skipping protein '$PDBID'."
-	    echo "$APPTAG ##### ERROR: Could not get PDB file for protein '$PDBID', skipping protein '$PDBID'." >>$ERROR_LOG
-	    echo "$APPTAG ##### ERROR: Could not get PDB file for protein '$PDBID', skipping protein '$PDBID'." >>$DBINSERT_LOG
+	    echo "$APPTAG $PDBID ##### ERROR: Could not get PDB file for protein '$PDBID', skipping protein '$PDBID'."
+	    echo "$APPTAG $PDBID ##### ERROR: Could not get PDB file for protein '$PDBID', skipping protein '$PDBID'." >>$ERROR_LOG
+	    echo "$APPTAG $PDBID ##### ERROR: Could not get PDB file for protein '$PDBID', skipping protein '$PDBID'." >>$DBINSERT_LOG
 	    let NUM_TOTAL_FAIL++
 	    let NUM_PDB_FAIL++
 	    del_output $PDBID
 	    report_and_exit 1
+	else
+	    echo "$APPTAG $PDBID Retrieved the PDB file (unpacked and split)."
 	fi
 
 
@@ -255,31 +257,37 @@ if [ -r $FLN ]; then
 	$CREATE_DSSP_FILE_SCRIPT $PDBID.pdb >>$DBINSERT_LOG 2>&1
 
 	if [ $? -ne 0 ]; then
-	    echo "$APPTAG ##### ERROR: Could not create DSSP file from PDB file '$PDBID.pdb', skipping protein '$PDBID'."
-	    echo "$APPTAG ##### ERROR: Could not create DSSP file from PDB file '$PDBID.pdb', skipping protein '$PDBID'." >>$ERROR_LOG
-	    echo "$APPTAG ##### ERROR: Could not create DSSP file from PDB file '$PDBID.pdb', skipping protein '$PDBID'." >>$DBINSERT_LOG
+	    echo "$APPTAG $PDBID ##### ERROR: Could not create DSSP file from PDB file '$PDBID.pdb', skipping protein '$PDBID'."
+	    echo "$APPTAG $PDBID ##### ERROR: Could not create DSSP file from PDB file '$PDBID.pdb', skipping protein '$PDBID'." >>$ERROR_LOG
+	    echo "$APPTAG $PDBID ##### ERROR: Could not create DSSP file from PDB file '$PDBID.pdb', skipping protein '$PDBID'." >>$DBINSERT_LOG
 	    let NUM_TOTAL_FAIL++
 	    let NUM_DSSP_FAIL++
 	    del_output $PDBID
 	    report_and_exit 1
+	else
+	    echo "$APPTAG $PDBID Created the DSSP file."
 	fi
+	
 
 
 	## Ok, now call plcc to do the real work.
 	PLCC_COMMAND="./plcc $PDBID $PLCC_OPTIONS"
-	echo "$APPTAG PLCC command is '$PLCC_COMMAND'." >>$DBINSERT_LOG
+	echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'."
+	echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'." >>$ERROR_LOG
+	echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'." >>$DBINSERT_LOG
 	$PLCC_COMMAND >>$DBINSERT_LOG 2>&1
 
 	if [ $? -ne 0 ]; then
-	    echo "$APPTAG ##### ERROR: Running plcc failed for PDB ID '$PDBID', skipping protein '$PDBID'."
-	    echo "$APPTAG ##### ERROR: Running plcc failed for PDB ID '$PDBID', skipping protein '$PDBID'." >>$ERROR_LOG
-	    echo "$APPTAG ##### ERROR: Running plcc failed for PDB ID '$PDBID', skipping protein '$PDBID'." >>$DBINSERT_LOG
+	    echo "$APPTAG $PDBID ##### ERROR: Running plcc failed for PDB ID '$PDBID', skipping protein '$PDBID'."
+	    echo "$APPTAG $PDBID ##### ERROR: Running plcc failed for PDB ID '$PDBID', skipping protein '$PDBID'." >>$ERROR_LOG
+	    echo "$APPTAG $PDBID ##### ERROR: Running plcc failed for PDB ID '$PDBID', skipping protein '$PDBID'." >>$DBINSERT_LOG
 	    let NUM_TOTAL_FAIL++
 	    let NUM_PLCC_FAIL++
 	    del_output $PDBID
 	    report_and_exit 1
 	else
 	    ## everything worked it seems
+	    echo "$APPTAG $PDBID PLCC run successfully."
 	    let NUM_SUCCESS++
 	    del_output $PDBID
 	    ## we delete the log file if everything went fine
@@ -287,9 +295,9 @@ if [ -r $FLN ]; then
 	    report_and_exit_nolog 0
 	fi
 else
-    echo "$APPTAG ##### ERROR: Could not read file '$FLN', skipping."
-    echo "$APPTAG ##### ERROR: Could not read file '$FLN', skipping." >>$ERROR_LOG
-    echo "$APPTAG ##### ERROR: Could not read file '$FLN', skipping." >>$DBINSERT_LOG
+    echo "$APPTAG $PDBID ##### ERROR: Could not read file '$FLN', skipping."
+    echo "$APPTAG $PDBID ##### ERROR: Could not read file '$FLN', skipping." >>$ERROR_LOG
+    echo "$APPTAG $PDBID ##### ERROR: Could not read file '$FLN', skipping." >>$DBINSERT_LOG
     let NUM_TOTAL_FAIL++
     let NUM_PDB_FAIL++
     del_output $PDBID
