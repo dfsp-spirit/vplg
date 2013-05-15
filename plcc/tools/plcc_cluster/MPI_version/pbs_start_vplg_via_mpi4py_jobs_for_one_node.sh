@@ -5,8 +5,8 @@
 #
 # Do NOT start this script directly. It should be submitted to the openpbs queue via the 'qsub' command.
 #
-# Parameters: a file containing a list of PDB files for this job. If you intend to start n jobs, the list should contain one nth of the PDB files.
-# TODO: this parameter is IGNORED atm and the full list is parsed, which is WRONG
+# Parameters: none, but the input file is read from the ENV variable $PDBFILELIST which has to be set (see 'qsub -v' documentation on how to do this in openPBS)
+
 #
 # This script is submitted to the queue by the 'pbs_start_all_jobs_on_all_nodes_whole_PDB.sh' script n times, each with 1 nth of the PDB files.
 #
@@ -72,11 +72,13 @@ APPTAG="[PBS_VPLG_VIA_MPI4PY]"
 MYHOME="/home/ts"
 NUM_PROCESSORS_PER_NODE=8
 
+ERRORLOG="/dev/stderr"
+
 #TODO: get the right input file for this node here! The file below is the full list, which makes no sense.
 #INPUT_FILE="$TMPDIR/plcc_cluster/status/dbinsert_file_list.lst"	# this file contains a list of all PDB files that should be handled. You can create the list with the scripts in the plcc_cluster/ directory
 
 ## This is now read from an environment variable which is passed to this script via the '-v' option of the 'qsub' pbs command
-INPUT_FILE=$PDBFILEIST
+INPUT_FILE=$PDBFILELIST
 
 # report some stuff for log file
 echo $APPTAG ----- Submitting job to pbs queue -----
@@ -95,7 +97,14 @@ echo $APPTAG The java binary is at `which java`
 echo $APPTAG pbs job id is $PBS_JOBID
 echo "$APPTAG Using $NUM_PROCESSORS_PER_NODE processors"
 echo "$APPTAG Using '$INPUT_FILE' as input file."
-echo "$APPTAG The input file lists `wc -l $INPUTFILE` PDB files to handle during this pbs job."
+
+if [ ! -f "$INPUT_FILE" ]; then
+    echo "$APPTAG ERROR: The input file '$INPUT_FILE' does not exist (wd=`pwd`)."
+    echo "$APPTAG ERROR: The input file '$INPUT_FILE' does not exist (wd=`pwd`)." >> $ERRORLOG
+    exit 1
+fi
+
+echo "$APPTAG The input file lists `wc -l $INPUT_FILE` PDB files to handle during this pbs job."
 echo "$APPTAG -----"
  
 
@@ -133,6 +142,7 @@ PLCC_CLUSTER_DIR="$MYHOME/software/plcc_cluster"
 SOME_PLCC_SCRIPT="$PLCC_CLUSTER_DIR/plcc_run/get_pdb_file.sh"
 if [ ! -f "$SOME_PLCC_SCRIPT" ]; then
     echo "$APPTAG ERROR: The script '$SOME_PLCC_SCRIPT' does not exist. The plcc_cluster directory seems to be missing."
+    echo "$APPTAG ERROR: The script '$SOME_PLCC_SCRIPT' does not exist. The plcc_cluster directory seems to be missing." >> $ERRORLOG
     exit 1
 fi
 
@@ -146,6 +156,7 @@ MPI4PY_DIR="/develop/openmpi_mpi4py/mpi4py"
 
 if [ ! -d "$MPI4PY_DIR" ]; then
     echo "$APPTAG ERROR: The mpi4py directory '$MPI4PY_DIR' does not exist."
+    echo "$APPTAG ERROR: The mpi4py directory '$MPI4PY_DIR' does not exist." >> $ERRORLOG
     exit 1
 fi
 
@@ -161,6 +172,7 @@ export PYTHONPATH="$MPI4PY_DIR/build/lib.linux-x86_64-2.7:$PYTHONPATH"
 
 if [ ! -r "$INPUT_FILE" ]; then
     echo "$APPTAG ERROR: Cannot read input file '$INPUT_FILE'. This should be a file holding paths to all PDB files, one per line. Exiting."
+    echo "$APPTAG ERROR: Cannot read input file '$INPUT_FILE'. This should be a file holding paths to all PDB files, one per line. Exiting." >> $ERRORLOG
     exit 1
 fi
 
@@ -188,6 +200,7 @@ OPENMPI_LIBS="/develop/openmpi_mpi4py/openmpi/lib/"
 
 if [ ! -d "$OPENMPI_LIBS" ]; then
     echo "$APPTAG ERROR: Directory '$OPENMPI_LIBS' does not exist. This should contain the openMPI libs like libmpi.so, libopen-pal.so and libopen-rte.so. Exiting."
+    echo "$APPTAG ERROR: Directory '$OPENMPI_LIBS' does not exist. This should contain the openMPI libs like libmpi.so, libopen-pal.so and libopen-rte.so. Exiting." >> $ERRORLOG
     exit 1
 fi
 
