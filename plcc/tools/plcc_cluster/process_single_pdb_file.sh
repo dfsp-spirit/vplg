@@ -18,6 +18,8 @@ echo "$APPTAG ================ Processing single PDB file '$1' =================
 source $CFG_FILE
 
 ERROR_LOG="/dev/stderr"
+ERROR_LOG_GET_PDB_FILE="/dev/stderr"		# may be reset below once PDB ID is known
+ERROR_LOG_CREATE_DSSP_FILE="/dev/stderr"	# may be reset below once PDB ID is known
 
 ################################################## functions ##################################################
 
@@ -78,8 +80,8 @@ function report_and_exit_nolog()
 
 ## make sure the settings have been read
 if [ -z "$SETTINGSREAD" ]; then
-    echo "$APPTAG ##### ERROR: Could not load settings from file '$CFG_FILE'. #####"
-    echo "$APPTAG ##### ERROR: Could not load settings from file '$CFG_FILE'. #####" >>$ERROR_LOG
+    echo "$APPTAG ##### ERROR: Could not load settings from file '$CFG_FILE'."
+    echo "$APPTAG ##### ERROR: Could not load settings from file '$CFG_FILE'." >>$ERROR_LOG
     exit 1
 fi
 
@@ -102,8 +104,8 @@ fi
 
 ## make sure no rsync update is currently running
 if [ -f "$LOCKFILE_RSYNC" ]; then
-    echo "$APPTAG ##### ERROR: Rsync update currently in progress it seems, exiting. #####"
-    echo "$APPTAG ##### ERROR: Rsync update currently in progress it seems, exiting. #####" >>$ERROR_LOG
+    echo "$APPTAG ##### ERROR: Rsync update currently in progress it seems, exiting."
+    echo "$APPTAG ##### ERROR: Rsync update currently in progress it seems, exiting." >>$ERROR_LOG
     echo "$APPTAG Delete '$LOCKFILE_RSYNC' and try again if you are sure this is not the case."
     exit 1
 fi
@@ -119,16 +121,16 @@ fi
 
 ## check plcc_run dir
 if [ ! -d $PLCC_RUN_DIR ]; then
-    echo "$APPTAG ##### ERROR: The plcc_run directory '$PLCC_RUN_DIR' does not exist. Check settings. #####"
-    echo "$APPTAG ##### ERROR: The plcc_run directory '$PLCC_RUN_DIR' does not exist. Check settings. #####" >>$ERROR_LOG
+    echo "$APPTAG ##### ERROR: The plcc_run directory '$PLCC_RUN_DIR' does not exist. Check settings."
+    echo "$APPTAG ##### ERROR: The plcc_run directory '$PLCC_RUN_DIR' does not exist. Check settings." >>$ERROR_LOG
     exit 1
 fi
 
 
 ## check update dir
 if [ ! -d $UPDATEDIR ]; then
-    echo "$APPTAG ##### ERROR: The update directory '$UPDATEDIR' does not exist. Check settings. #####"
-    echo "$APPTAG ##### ERROR: The update directory '$UPDATEDIR' does not exist. Check settings. #####" >>$ERROR_LOG
+    echo "$APPTAG ##### ERROR: The update directory '$UPDATEDIR' does not exist. Check settings."
+    echo "$APPTAG ##### ERROR: The update directory '$UPDATEDIR' does not exist. Check settings." >>$ERROR_LOG
     exit 1
 fi
 
@@ -186,19 +188,27 @@ fi
 
 
 #echo "$APPTAG $PDBID Handling PDB file '$FLN'. Assuming file extension '$REMOTE_PDB_FILE_EXTENSION'."
-
+echo "$APPTAG $PDBID The log directory is '$LOGDIR'."
 
 ## remove old protocol files. this is required because we only append to them later.
 DBINSERT_LOG="${LOGDIR}/log_proc1pdb_${PDBID}.log"
-if [ -f $DBINSERT_LOG ]; then
-    rm $DBINSERT_LOG
-    if [ $? -ne 0 ]; then
-	echo "$APPTAG $PDBID ##### ERROR: Could not delete old db insert log '$DBINSERT_LOG' for this PDB file. Check permissions."
-        echo "$APPTAG $PDBID ##### ERROR: Could not delete old db insert log '$DBINSERT_LOG' for this PDB file. Check permissions." >>$ERROR_LOG
-	echo "$APPTAG $PDBID ##### ERROR: Could not delete old db insert log '$DBINSERT_LOG' for this PDB file. Check permissions." >>$DBINSERT_LOG
-        exit 1
+ERROR_LOG_PLCC="${LOGDIR}/log_plcc_${PDBID}.log"
+ERROR_LOG_GET_PDB_FILE="${LOGDIR}/log_getpdb_${PDBID}.log"
+ERROR_LOG_CREATE_DSSP_FILE="${LOGDIR}/log_createdssp_${PDBID}.log"
+
+for LOGFILE in $DBINSERT_LOG $ERROR_LOG_PLCC $ERROR_LOG_GET_PDB_FILE $ERROR_LOG_CREATE_DSSP_FILE
+do
+    if [ -f $LOGFILE ]; then
+	rm $LOGFILE
+	if [ $? -ne 0 ]; then
+	    echo "$APPTAG $PDBID ##### ERROR: Could not delete old logfile '$LOGFILE'. Check permissions."
+	    echo "$APPTAG $PDBID ##### ERROR: Could not delete old logfile '$LOGFILE'. Check permissions." >>$ERROR_LOG
+	    echo "$APPTAG $PDBID ##### ERROR: Could not delete old logfile '$LOGFILE'. Check permissions." >>$DBINSERT_LOG
+	    exit 1
+	fi
     fi
-fi
+done
+
 
 #touch $DBINSERT_LOG || exit 1
 
@@ -238,7 +248,7 @@ if [ -r $FLN ]; then
 	## Get the PDB file
 	GET_PDB_FILE_COMMAND="$GET_PDB_FILE_SCRIPT $PDBID"
 	echo "$APPTAG $PDBID The command to get the PDB file is '$GET_PDB_FILE_COMMAND'."
-	$GET_PDB_FILE_COMMAND >>$DBINSERT_LOG 2>&1
+	$GET_PDB_FILE_COMMAND 1>>$DBINSERT_LOG 2>>$ERROR_LOG_GET_PDB_FILE
 
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG $PDBID ##### ERROR: Could not get PDB file for protein '$PDBID', skipping protein '$PDBID'."
@@ -253,7 +263,7 @@ if [ -r $FLN ]; then
 	fi
 
 	## double-check it
-	$PDBFILE="$PDBID.pdb"
+	PDBFILE="$PDBID.pdb"
 	if [ ! -f "$PDBFILE" ]; then
 	    echo "$APPTAG $PDBID ##### ERROR: PDB file '$PDBFILE' not found even though creation looked good."
 	fi
@@ -261,7 +271,7 @@ if [ -r $FLN ]; then
 	## Now create the DSSP file
 	CREATE_DSSP_COMMAND="$CREATE_DSSP_FILE_SCRIPT $PDBFILE"
 	echo "$APPTAG $PDBID The command to create the DSSP file is '$CREATE_DSSP_COMMAND'."
-	$CREATE_DSSP_COMMAND >>$DBINSERT_LOG 2>&1
+	$CREATE_DSSP_COMMAND 1>>$DBINSERT_LOG 2>>$ERROR_LOG_CREATE_DSSP_FILE
 
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG $PDBID ##### ERROR: Could not create DSSP file from PDB file '$PDBFILE', skipping protein '$PDBID'."
@@ -276,7 +286,7 @@ if [ -r $FLN ]; then
 	fi
 
 	## double-check it
-	$DSSPFILE="$PDBID.dssp"
+	DSSPFILE="$PDBID.dssp"
 	if [ ! -f "$DSSPFILE" ]; then
 	    echo "$APPTAG $PDBID ##### ERROR: DSSP file '$DSSPFILE' not found even though creation looked good."
 	fi	
@@ -285,9 +295,9 @@ if [ -r $FLN ]; then
 	## Ok, now call plcc to do the real work.
 	PLCC_COMMAND="./plcc $PDBID $PLCC_OPTIONS"
 	echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'."
-	echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'." >>$ERROR_LOG
+	#echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'." >>$ERROR_LOG
 	echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'." >>$DBINSERT_LOG
-	$PLCC_COMMAND >>$DBINSERT_LOG 2>&1
+	$PLCC_COMMAND 1>>$DBINSERT_LOG 2>>$ERROR_LOG_PLCC
 
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG $PDBID ##### ERROR: Running plcc failed for PDB ID '$PDBID', skipping protein '$PDBID'."
@@ -302,8 +312,11 @@ if [ -r $FLN ]; then
 	    echo "$APPTAG $PDBID PLCC run successfully."
 	    let NUM_SUCCESS++
 	    del_output $PDBID
-	    ## we delete the log file if everything went fine
+	    ## we delete the log files if everything went fine
 	    rm $DBINSERT_LOG
+	    rm $ERROR_LOG_GET_PDB_FILE
+	    rm $ERROR_LOG_CREATE_DSSP_FILE
+	    rm $ERROR_LOG_PLCC
 	    report_and_exit_nolog 0
 	fi
 else
