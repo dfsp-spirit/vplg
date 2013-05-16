@@ -44,24 +44,50 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+## check it
+if [ ! -f $PDBFILENAME ]; then
+    echo "$APPTAG ERROR: Expected packed raw PDB file '${PDBFILENAME}' does not exist after copying to local dir '`pwd`'." >> $ERRORLOG
+    exit 1
+fi
+
+
 ## now that we have the file, extract it. This produces 'pdb3kmf.ent' from 'pdb3kmf.ent.gz'.
 PDBFILE_EXTRACTED="pdb${PDBID}.ent"
+
 ## delete ent file if it already exists
-rm $PDBFILE_EXTRACTED 2>/dev/null
+if [ -f $PDBFILE_EXTRACTED ]; then
+    echo "$APPTAG NOTE: Extracted PDB file '${PDBFILE_EXTRACTED}' already exists, deleting old version."
+    rm $PDBFILE_EXTRACTED 2>/dev/null
+fi
+
 gunzip $PDBFILENAME
 if [ $? -ne 0 ]; then
     echo "$APPTAG ERROR: Could not extract file '${PDBFILENAME}' using gunzip."
     echo "$APPTAG ERROR: Could not extract file '${PDBFILENAME}' using gunzip." >> $ERRORLOG
+    rm $PDBFILENAME
     exit 1
 fi
 
 ## rename the file
 
 PDBFILE_FINAL="${PDBID}.pdb"
+
+if [ ! -f $PDBFILE_EXTRACTED ]; then
+    echo "$APPTAG ERROR: Expected extracted PDB file '${PDBFILE_EXTRACTED}' does not exist." >> $ERRORLOG
+    exit 1
+fi
+
 mv $PDBFILE_EXTRACTED $PDBFILE_FINAL
 if [ $? -ne 0 ]; then
     echo "$APPTAG ERROR: Could not rename file '${PDBFILE_EXTRACTED}' to '${PDBFILE_FINAL}'."
     echo "$APPTAG ERROR: Could not rename file '${PDBFILE_EXTRACTED}' to '${PDBFILE_FINAL}'." >> $ERRORLOG
+    rm $PDBFILE_EXTRACTED
+    exit 1
+fi
+
+if [ ! -f $PDBFILE_FINAL ]; then
+    echo "$APPTAG ERROR: Expected final PDB file '${PDBFILE_FINAL}' does not exist." >> $ERRORLOG
+    rm $PDBFILE_EXTRACTED
     exit 1
 fi
 
