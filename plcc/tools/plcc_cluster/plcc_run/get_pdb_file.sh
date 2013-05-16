@@ -26,6 +26,9 @@ fi
 
 PDBID="$1"
 
+## debug
+ERRORLOG="/tmp/get_pdb_${PDBID}.log"
+
 ## extract the subdir from the pdbid (it is defined by the 2nd and 3rd letter of the id, e.g., for the pdbid '3kmf', it is 'km')
 PDB_SUBDIR=${PDBID:1:2}
 
@@ -57,14 +60,14 @@ PDBFILE_EXTRACTED="pdb${PDBID}.ent"
 ## delete ent file if it already exists
 if [ -f $PDBFILE_EXTRACTED ]; then
     echo "$APPTAG NOTE: Extracted PDB file '${PDBFILE_EXTRACTED}' already exists, deleting old version."
-    rm $PDBFILE_EXTRACTED 2>/dev/null
+    rm -rf $PDBFILE_EXTRACTED
 fi
 
 gunzip $PDBFILENAME
 if [ $? -ne 0 ]; then
     echo "$APPTAG ERROR: Could not extract file '${PDBFILENAME}' using gunzip."
     echo "$APPTAG ERROR: Could not extract file '${PDBFILENAME}' using gunzip." >> $ERRORLOG
-    rm $PDBFILENAME
+    rm -f $PDBFILENAME
     exit 1
 fi
 
@@ -81,13 +84,13 @@ mv $PDBFILE_EXTRACTED $PDBFILE_FINAL
 if [ $? -ne 0 ]; then
     echo "$APPTAG ERROR: Could not rename file '${PDBFILE_EXTRACTED}' to '${PDBFILE_FINAL}'."
     echo "$APPTAG ERROR: Could not rename file '${PDBFILE_EXTRACTED}' to '${PDBFILE_FINAL}'." >> $ERRORLOG
-    rm $PDBFILE_EXTRACTED
+    rm -f $PDBFILE_EXTRACTED
     exit 1
 fi
 
 if [ ! -f $PDBFILE_FINAL ]; then
     echo "$APPTAG ERROR: Expected final PDB file '${PDBFILE_FINAL}' does not exist." >> $ERRORLOG
-    rm $PDBFILE_EXTRACTED
+    rm -f $PDBFILE_EXTRACTED
     exit 1
 fi
 

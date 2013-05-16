@@ -33,11 +33,19 @@ function del_output()
     do
     	let list_size++
     	if [ -w $f ]; then
-    		rm $f
+    		rm -f $f
     		#echo "$APPTAG   Deleted file $f."
     		let num_del++
     	fi
     done
+
+
+    ## e.g. 'pdb3kmf.ent.gz'
+    RAWPDBFILENAME="${PDBFILE_DL_PREFIX}${L_PDBID}${PDBFILE_DL_SUFFIX}"
+    if [ -f $RAWPDBFILENAME ]; then
+	rm -f $RAWPDBFILENAME
+    fi
+
     #echo "$APPTAG Checked for $list_size files, deleted $num_del."
 }
 
@@ -196,14 +204,14 @@ ERROR_LOG_PLCC="${LOGDIR}/log_plcc_${PDBID}.log"
 ERROR_LOG_GET_PDB_FILE="${LOGDIR}/log_getpdb_${PDBID}.log"
 ERROR_LOG_CREATE_DSSP_FILE="${LOGDIR}/log_createdssp_${PDBID}.log"
 
-for LOGFILE in $DBINSERT_LOG $ERROR_LOG_PLCC $ERROR_LOG_GET_PDB_FILE $ERROR_LOG_CREATE_DSSP_FILE
+for L_LOGFILE in $DBINSERT_LOG $ERROR_LOG_PLCC $ERROR_LOG_GET_PDB_FILE $ERROR_LOG_CREATE_DSSP_FILE
 do
-    if [ -f $LOGFILE ]; then
-	rm $LOGFILE
+    if [ -f $L_LOGFILE ]; then
+	rm -f $L_LOGFILE
 	if [ $? -ne 0 ]; then
-	    echo "$APPTAG $PDBID ##### ERROR: Could not delete old logfile '$LOGFILE'. Check permissions."
-	    echo "$APPTAG $PDBID ##### ERROR: Could not delete old logfile '$LOGFILE'. Check permissions." >>$ERROR_LOG
-	    echo "$APPTAG $PDBID ##### ERROR: Could not delete old logfile '$LOGFILE'. Check permissions." >>$DBINSERT_LOG
+	    echo "$APPTAG $PDBID ##### ERROR: Could not delete old logfile '$L_LOGFILE'. Check permissions."
+	    echo "$APPTAG $PDBID ##### ERROR: Could not delete old logfile '$L_LOGFILE'. Check permissions." >>$ERROR_LOG
+	    echo "$APPTAG $PDBID ##### ERROR: Could not delete old logfile '$L_LOGFILE'. Check permissions." >>$DBINSERT_LOG
 	    exit 1
 	fi
     fi
@@ -248,7 +256,8 @@ if [ -r $FLN ]; then
 	## Get the PDB file
 	GET_PDB_FILE_COMMAND="$GET_PDB_FILE_SCRIPT $PDBID"
 	echo "$APPTAG $PDBID The command to get the PDB file is '$GET_PDB_FILE_COMMAND'."
-	$GET_PDB_FILE_COMMAND 1>>$DBINSERT_LOG 2>>$ERROR_LOG_GET_PDB_FILE
+	#$GET_PDB_FILE_COMMAND 1>>$DBINSERT_LOG 2>>$ERROR_LOG_GET_PDB_FILE
+	$GET_PDB_FILE_COMMAND
 
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG $PDBID ##### ERROR: Could not get PDB file for protein '$PDBID', skipping protein '$PDBID'."
@@ -271,7 +280,8 @@ if [ -r $FLN ]; then
 	## Now create the DSSP file
 	CREATE_DSSP_COMMAND="$CREATE_DSSP_FILE_SCRIPT $PDBFILE"
 	echo "$APPTAG $PDBID The command to create the DSSP file is '$CREATE_DSSP_COMMAND'."
-	$CREATE_DSSP_COMMAND 1>>$DBINSERT_LOG 2>>$ERROR_LOG_CREATE_DSSP_FILE
+	#$CREATE_DSSP_COMMAND 1>>$DBINSERT_LOG 2>>$ERROR_LOG_CREATE_DSSP_FILE
+	$CREATE_DSSP_COMMAND
 
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG $PDBID ##### ERROR: Could not create DSSP file from PDB file '$PDBFILE', skipping protein '$PDBID'."
@@ -297,7 +307,8 @@ if [ -r $FLN ]; then
 	echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'."
 	#echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'." >>$ERROR_LOG
 	echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'." >>$DBINSERT_LOG
-	$PLCC_COMMAND 1>>$DBINSERT_LOG 2>>$ERROR_LOG_PLCC
+	#$PLCC_COMMAND 1>>$DBINSERT_LOG 2>>$ERROR_LOG_PLCC
+	$PLCC_COMMAND
 
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG $PDBID ##### ERROR: Running plcc failed for PDB ID '$PDBID', skipping protein '$PDBID'."
@@ -313,10 +324,10 @@ if [ -r $FLN ]; then
 	    let NUM_SUCCESS++
 	    del_output $PDBID
 	    ## we delete the log files if everything went fine
-	    rm $DBINSERT_LOG
-	    rm $ERROR_LOG_GET_PDB_FILE
-	    rm $ERROR_LOG_CREATE_DSSP_FILE
-	    rm $ERROR_LOG_PLCC
+	    rm -f $DBINSERT_LOG
+	    rm -f $ERROR_LOG_GET_PDB_FILE
+	    rm -f $ERROR_LOG_CREATE_DSSP_FILE
+	    rm -f $ERROR_LOG_PLCC
 	    report_and_exit_nolog 0
 	fi
 else
