@@ -233,9 +233,12 @@ if [ -r $FLN ]; then
 	    del_output $PDBID
 	    report_and_exit 1
 	fi
+	echo "$APPTAG $PDBID Changed directory to '`pwd`'."
 	
 	## Get the PDB file
-	$GET_PDB_FILE_SCRIPT $PDBID >>$DBINSERT_LOG 2>&1
+	GET_PDB_FILE_COMMAND="$GET_PDB_FILE_SCRIPT $PDBID"
+	echo "$APPTAG $PDBID The command to get the PDB file is '$GET_PDB_FILE_COMMAND'."
+	$GET_PDB_FILE_COMMAND >>$DBINSERT_LOG 2>&1
 
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG $PDBID ##### ERROR: Could not get PDB file for protein '$PDBID', skipping protein '$PDBID'."
@@ -246,25 +249,37 @@ if [ -r $FLN ]; then
 	    del_output $PDBID
 	    report_and_exit 1
 	else
-	    echo "$APPTAG $PDBID Retrieved the PDB file (unpacked and split)."
+	    echo "$APPTAG $PDBID Retrieved the PDB file (unpacked, split and copied), script reported success."
 	fi
 
+	## double-check it
+	$PDBFILE="$PDBID.pdb"
+	if [ ! -f "$PDBFILE" ]; then
+	    echo "$APPTAG $PDBID ##### ERROR: PDB file '$PDBFILE' not found even though creation looked good."
+	fi
 
 	## Now create the DSSP file
-	$CREATE_DSSP_FILE_SCRIPT $PDBID.pdb >>$DBINSERT_LOG 2>&1
+	CREATE_DSSP_COMMAND="$CREATE_DSSP_FILE_SCRIPT $PDBFILE"
+	echo "$APPTAG $PDBID The command to create the DSSP file is '$CREATE_DSSP_COMMAND'."
+	$CREATE_DSSP_COMMAND >>$DBINSERT_LOG 2>&1
 
 	if [ $? -ne 0 ]; then
-	    echo "$APPTAG $PDBID ##### ERROR: Could not create DSSP file from PDB file '$PDBID.pdb', skipping protein '$PDBID'."
-	    echo "$APPTAG $PDBID ##### ERROR: Could not create DSSP file from PDB file '$PDBID.pdb', skipping protein '$PDBID'." >>$ERROR_LOG
-	    echo "$APPTAG $PDBID ##### ERROR: Could not create DSSP file from PDB file '$PDBID.pdb', skipping protein '$PDBID'." >>$DBINSERT_LOG
+	    echo "$APPTAG $PDBID ##### ERROR: Could not create DSSP file from PDB file '$PDBFILE', skipping protein '$PDBID'."
+	    echo "$APPTAG $PDBID ##### ERROR: Could not create DSSP file from PDB file '$PDBFILE', skipping protein '$PDBID'." >>$ERROR_LOG
+	    echo "$APPTAG $PDBID ##### ERROR: Could not create DSSP file from PDB file '$PDBFILE', skipping protein '$PDBID'." >>$DBINSERT_LOG
 	    let NUM_TOTAL_FAIL++
 	    let NUM_DSSP_FAIL++
 	    del_output $PDBID
 	    report_and_exit 1
 	else
-	    echo "$APPTAG $PDBID Created the DSSP file."
+	    echo "$APPTAG $PDBID Created the DSSP file, script reported success."
 	fi
-	
+
+	## double-check it
+	$DSSPFILE="$PDBID.dssp"
+	if [ ! -f "$DSSPFILE" ]; then
+	    echo "$APPTAG $PDBID ##### ERROR: DSSP file '$DSSPFILE' not found even though creation looked good."
+	fi	
 
 
 	## Ok, now call plcc to do the real work.
