@@ -55,6 +55,7 @@ for cur_job in jobs:
       command_line="./process_single_pdb_file.sh " + pdbfile + ""
       args = shlex.split(command_line)
       p = subprocess.Popen(args)
+      #exitCode = p.wait()
       ### </paralell operation> ###
 ### collect all results in rootprocess - save/handle results:
 

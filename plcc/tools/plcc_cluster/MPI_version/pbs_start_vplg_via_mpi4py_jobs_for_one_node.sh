@@ -123,11 +123,11 @@ export PATH="/usr/lib64/mpi/gcc/openmpi/bin:$PATH"
 
 ## copy my python MPI job scripts to temporary directory 
 #echo "$APPTAG Copying files to temporary directory '$TMPDIR'..."
-#scp -r $MYHOME/software/plcc_cluster/ $TMPDIR/
-#PLCC_CLUSTER_DIR="$TMPDIR/plcc_cluster"
+scp -r $MYHOME/software/plcc_cluster/ $TMPDIR/
+PLCC_CLUSTER_DIR="$TMPDIR/plcc_cluster"
 
 # we now use plcc_cluster from the global dir
-PLCC_CLUSTER_DIR="$MYHOME/software/plcc_cluster"
+#PLCC_CLUSTER_DIR="$MYHOME/software/plcc_cluster"
 
 
 ## ensure important scripts are executable

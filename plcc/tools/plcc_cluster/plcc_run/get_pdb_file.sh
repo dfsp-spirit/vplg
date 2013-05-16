@@ -5,7 +5,7 @@
 
 APPTAG="[GET_PDB]"
 CFG_FILE="../settings_statistics.cfg"
-ERRORLOG="/dev/stderr"
+ERRORLOG="/dev/stderr"		# may get reset later when PDB ID is known
 
 ## get settings
 
@@ -27,7 +27,7 @@ fi
 PDBID="$1"
 
 ## debug
-ERRORLOG="/tmp/get_pdb_${PDBID}.log"
+ERRORLOG="/develop/tmp/get_pdb_${PDBID}.log"
 
 ## extract the subdir from the pdbid (it is defined by the 2nd and 3rd letter of the id, e.g., for the pdbid '3kmf', it is 'km')
 PDB_SUBDIR=${PDBID:1:2}
@@ -42,8 +42,8 @@ PDBFILEPATH="${PDBPATH}/${PDBFILENAME}"
 
 cp $PDBFILEPATH .
 if [ $? -ne 0 ]; then
-    echo "$APPTAG ERROR: Could not copy file '${PDBFILEPATH}' to the current directory."
-    echo "$APPTAG ERROR: Could not copy file '${PDBFILEPATH}' to the current directory." >> $ERRORLOG
+    echo "$APPTAG ERROR: Could not copy file '${PDBFILEPATH}' to the current directory '`pwd`'."
+    echo "$APPTAG ERROR: Could not copy file '${PDBFILEPATH}' to the current directory '`pwd`'." >> $ERRORLOG
     exit 1
 fi
 
@@ -60,7 +60,7 @@ PDBFILE_EXTRACTED="pdb${PDBID}.ent"
 ## delete ent file if it already exists
 if [ -f $PDBFILE_EXTRACTED ]; then
     echo "$APPTAG NOTE: Extracted PDB file '${PDBFILE_EXTRACTED}' already exists, deleting old version."
-    rm -rf $PDBFILE_EXTRACTED
+    rm -f $PDBFILE_EXTRACTED
 fi
 
 gunzip $PDBFILENAME
