@@ -168,6 +168,16 @@ if [ ! -x "$DSSP_BINARY" ]; then
 fi
 
 
+## Create the PLCC_OUTPUT_DIR which is defined in the settings.
+# We do NOT copy results from this dir back to the cluster head atm, we keep them in /tmp/ only. This is a hack due to
+# limited disk space.
+source $PLCC_CLUSTER_DIR/settings_statistics.cfg
+if [ ! -d $PLCC_OUTPUT_DIR ]; then
+  echo "$APPTAG Creating output directory '$PLCC_OUTPUT_DIR' on this node."
+  mkdir -p $PLCC_OUTPUT_DIR
+fi
+chmod ugo+rwx $PLCC_OUTPUT_DIR || echo "$APPTAG ERROR: Could not change fs permissions for PLCC output directory '$PLCC_OUTPUT_DIR'."
+
 ## copy mpi4py software
 # not done anymore, we start it from the mounted /develop/ directory now
 #scp -r $MYHOME/software/openmpi/mpi4py/ $TMPDIR/
