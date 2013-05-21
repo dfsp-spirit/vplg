@@ -89,6 +89,7 @@ public class HtmlGenerator {
         String startWebsiteHtmlFile =  outputBaseDir.getAbsolutePath() + fs + "index.html";
         String searchWebsiteHtmlFile =  outputBaseDir.getAbsolutePath() + fs + "search.html";
         String findWebsitePhpFile =  outputBaseDir.getAbsolutePath() + fs + "find.php";
+        String visualizeWebsiteHtmlFile =  outputBaseDir.getAbsolutePath() + fs + "visualize.html";
         
         if(IO.stringToTextFile(startWebsiteHtmlFile, this.generateStartWebpage("."))) {
             System.out.println("   Wrote VPLGweb start website to " + new File(startWebsiteHtmlFile).getAbsolutePath() + ".");
@@ -107,6 +108,15 @@ public class HtmlGenerator {
         } else {
             System.err.println("ERROR: Could not write VPLGweb find website to " + new File(findWebsitePhpFile).getAbsolutePath() + ".");
         }
+        
+        if(IO.stringToTextFile(visualizeWebsiteHtmlFile, this.generateJmolWebpage("."))) {
+            System.out.println("   Wrote VPLGweb visualization website to " + new File(visualizeWebsiteHtmlFile).getAbsolutePath() + ".");
+        } else {
+            System.err.println("ERROR: Could not write VPLGweb visualization website to " + new File(visualizeWebsiteHtmlFile).getAbsolutePath() + ".");
+        }
+        
+        
+        
         
         if(this.writeResourceFilesToFilesystem(outputBaseDir.getAbsolutePath())) {
             System.out.println("   Wrote resources files like images to base directory '" + outputBaseDir.getAbsolutePath() + "'.");
@@ -442,9 +452,45 @@ public class HtmlGenerator {
         return sb.toString();
     }
     
+    public String generateJmolWebpage(String pathToBaseDir) {
+        StringBuilder sb = new StringBuilder();
+        
+        //-------------- header ------------
+        sb.append(this.generateHeaderSpecialJS("VPLGweb -- The Visualization of Protein Ligand Graphs web server -- Visualization", pathToBaseDir, new String[] { "Jmol.js" }));
+        // ------------- body -- logo and title ---------------
+        sb.append(HtmlTools.startBodyAndCommonJS());
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_MAIN));
+        sb.append(this.generateLogo(pathToBaseDir));
+        sb.append(HtmlGenerator.generateTopPageTitle("VPLGweb Jmol Visualization"));
+        
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_SEARCH));                
+        sb.append("This page can be used to visualize a protein using Jmol.");
+        sb.append(HtmlTools.endDiv());  // search     
+        
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
+        
+        sb.append(HtmlGenerator.jsFunctionJmolInit(pathToBaseDir));
+        // TODO: fix me
+        sb.append(HtmlGenerator.jsFunctionJmolPdb("7tim"));
+            
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
+        
+        // ------------- body -- footer ---------------
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
+        sb.append(this.generateFooter(pathToBaseDir));
+        
+        sb.append(HtmlTools.endDiv());  // main
+        sb.append(HtmlTools.endBody());
+        sb.append(HtmlTools.endHtml());
+        
+        
+        return sb.toString();
+    }
+    
     public static String generateQuickPDBBox(String pathToSearchForm) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<form name=\"input\" action=\"" + pathToSearchForm + "\" method=\"get\">");
+        sb.append("<form name=\"input\" action=\"").append(pathToSearchForm).append("\" method=\"get\">");
         sb.append("PDB ID: ");
         sb.append("<input type=\"text\" name=\"pdbid\"  maxlength=\"4\" value=\"8icd\">");
         sb.append("<input type=\"submit\" value=\"Find protein\">");
@@ -454,7 +500,7 @@ public class HtmlGenerator {
     
     public static String generateQuickPDBChainBox(String pathToSearchForm) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<form name=\"input\" action=\"" + pathToSearchForm + "\" method=\"get\">");
+        sb.append("<form name=\"input\" action=\"").append(pathToSearchForm).append("\" method=\"get\">");
         sb.append("PDB ID: ");
         sb.append("<input type=\"text\" name=\"pdbid\" maxlength=\"4\" value=\"8icd\">");
         sb.append(" Chain: ");
@@ -970,7 +1016,7 @@ public class HtmlGenerator {
     }
     
     
-    public String generateHeader(String title, String pathToBaseDir) {
+    public String generateHeaderSpecialJS(String title, String pathToBaseDir, String[] relativeJsFilePathsFromBasedir) {
         StringBuilder sb = new StringBuilder();
                 
         sb.append("<html>\n<head>\n");
@@ -980,6 +1026,28 @@ public class HtmlGenerator {
             String cssFileName = relativeCssFilePathsFromBasedir[i];
             sb.append("<link href=\"").append(HtmlTools.makeWebPath(pathToBaseDir)).append(cssFileName).append("\" rel=\"stylesheet\" type=\"text/css\" title=\"").append(this.cssTitles[i]).append("\">\n");
         }
+        
+        for(int i = 0; i < relativeJsFilePathsFromBasedir.length; i++) {
+            String jsFileName = relativeJsFilePathsFromBasedir[i];
+            sb.append("<script type=\"text/javascript\" src=\"").append(jsFileName).append("\"></script>\n");
+        }
+        
+        sb.append("<meta http-equiv=\"Default-Style\" content=\"red\">\n");
+        sb.append("</head>\n");
+        return sb.toString();        
+    }
+    
+    public String generateHeader(String title, String pathToBaseDir) {
+        StringBuilder sb = new StringBuilder();
+                
+        sb.append("<html>\n<head>\n");
+        sb.append("<title>").append(title).append("</title>\n");
+
+        for(int i = 0; i < relativeCssFilePathsFromBasedir.length; i++) {            
+            String cssFileName = relativeCssFilePathsFromBasedir[i];
+            sb.append("<link href=\"").append(HtmlTools.makeWebPath(pathToBaseDir)).append(cssFileName).append("\" rel=\"stylesheet\" type=\"text/css\" title=\"").append(this.cssTitles[i]).append("\">\n");
+        }                
+        
         sb.append("<meta http-equiv=\"Default-Style\" content=\"red\">\n");
         sb.append("</head>\n");
         return sb.toString();        
@@ -1094,6 +1162,27 @@ public class HtmlGenerator {
      */
     public static String popupWindowLink(String linkTitle, String stuffToPopup) {
         return "<a href=\"javascript:popup('" + stuffToPopup + "')\">" + linkTitle + "</a>";
+    }
+    
+    public static String jsFunctionJmolInit(String webPathToJmolFolder) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<script language=\"JavaScript\" type=\"text/javascript\">\n");
+        sb.append("<!--\n");                
+        sb.append("jmolInitialize(").append(webPathToJmolFolder).append(")\n");
+        sb.append("// -->\n");
+        sb.append("</script>\n");
+        return sb.toString();
+    }
+    
+    public static String jsFunctionJmolPdb(String pdbid) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<script language=\"JavaScript\" type=\"text/javascript\">\n");
+        sb.append("<!--\n");                
+        //TODO: add code here
+        sb.append("TODO: add js code here\n"); 
+        sb.append("// -->\n");
+        sb.append("</script>\n");
+        return sb.toString();
     }
     
     public static String jsFunctionSwitchStyleSheet() {
