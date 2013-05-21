@@ -12,7 +12,8 @@ NODE_FILE="settings_node_hostnames.cfg"
 NUM_NODES=$(cat $NODE_FILE | wc -l)
 
 ## The number of openpbs jobs you want, i.e., in how many parts the list of PDB files should be split. You should have at least as many jobs as you have cluster nodes. Having more jobs wont hurt (but having n+1 jobs with n nodes may be pretty stupid, rather choose 2n, 3n or whatever).
-NUM_JOBS=$NUM_NODES
+#NUM_JOBS=$NUM_NODES
+NUM_JOBS=$(echo "$NUM_NODES*$NUM_NODES*$NUM_NODES" | bc)
 
 ## A temp dir, must be writable
 #TMPDIR="/tmp"

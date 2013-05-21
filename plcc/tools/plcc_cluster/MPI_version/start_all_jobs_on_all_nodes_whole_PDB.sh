@@ -15,7 +15,16 @@ PLCC_CLUSTER_DIR="$MYHOME/software/plcc_cluster"
 ## settings
 SINGLE_JOB_SCRIPT="pbs_start_vplg_via_mpi4py_jobs_for_one_node.sh"
 
+echo "$APPTAG ----- Starting all jobs via openpbs -----"
+echo "$APPTAG Assuming plcc_cluster is installed at '$PLCC_CLUSTER_DIR'."
 echo "$APPTAG Preparing to submit all jobs to the openpbs queue..."
+
+FIRST_FILE_LIST="$PLCC_CLUSTER_DIR/status/MPIfilelistnum000"
+if [ ! -f "$FIRST_FILE_LIST" ]; then
+    echo "$APPTAG ERROR: Could not find the first PDB file list at '$FIRST_FILE_LIST'. Did you run the script to generate the lists?"
+    exit 1
+fi
+
 
 ## submit a job for each file list
 for FLIST in $PLCC_CLUSTER_DIR/status/MPIfilelistnum*;

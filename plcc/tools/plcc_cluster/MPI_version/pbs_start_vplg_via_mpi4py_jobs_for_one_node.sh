@@ -146,6 +146,27 @@ if [ ! -f "$SOME_PLCC_SCRIPT" ]; then
     exit 1
 fi
 
+PLCC_JAR="$PLCC_CLUSTER_DIR/plcc_run/plcc.jar"
+if [ ! -f "$PLCC_JAR" ]; then
+    echo "$APPTAG ERROR: The plcc JAR file '$PLCC_JAR' does not exist. You have to build PLCC and the libs and copy them over."
+    echo "$APPTAG ERROR: The plcc JAR file '$PLCC_JAR' does not exist. You have to build PLCC and the libs and copy them over." >> $ERRORLOG
+    exit 1
+fi
+
+## copy DSSP binary
+DSSP_SOURCE_DIR="$MYHOME/software/dssp"
+scp -r $DSSP_SOURCE_DIR $TMPDIR/
+DSSP_DIR="$TMPDIR/dssp"
+
+DSSP_BINARY="$DSSP_DIR/dsspcmbi"
+chmod +x $DSSP_BINARY
+if [ ! -x "$DSSP_BINARY" ]; then
+    echo "$APPTAG ERROR: The DSSP binary '$DSSP_BINARY' does not exist or is not executable."
+    echo "$APPTAG ERROR: The DSSP binary '$DSSP_BINARY' does not exist or is not executable." >> $ERRORLOG
+    exit 1
+fi
+
+
 ## copy mpi4py software
 # not done anymore, we start it from the mounted /develop/ directory now
 #scp -r $MYHOME/software/openmpi/mpi4py/ $TMPDIR/
@@ -175,6 +196,8 @@ if [ ! -r "$INPUT_FILE" ]; then
     echo "$APPTAG ERROR: Cannot read input file '$INPUT_FILE'. This should be a file holding paths to all PDB files, one per line. Exiting." >> $ERRORLOG
     exit 1
 fi
+
+
 
 
 MPI4PY_SCRIPT="mpi4py_vplg.py"
