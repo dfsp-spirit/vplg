@@ -139,14 +139,16 @@ PLCC_CLUSTER_DIR="$TMPDIR/plcc_cluster"
 #chmod u+x $TMPDIR/plcc_cluster/plcc_run/splitpdb
 
 # test one of them to be sure
-SOME_PLCC_SCRIPT="$PLCC_CLUSTER_DIR/plcc_run/get_pdb_file.sh"
+PLCC_CLUSTER_RUN_DIR="$PLCC_CLUSTER_DIR/plcc_run"
+
+SOME_PLCC_SCRIPT="$PLCC_CLUSTER_RUN_DIR/get_pdb_file.sh"
 if [ ! -f "$SOME_PLCC_SCRIPT" ]; then
     echo "$APPTAG ERROR: The script '$SOME_PLCC_SCRIPT' does not exist. The plcc_cluster directory seems to be missing."
     echo "$APPTAG ERROR: The script '$SOME_PLCC_SCRIPT' does not exist. The plcc_cluster directory seems to be missing." >> $ERRORLOG
     exit 1
 fi
 
-PLCC_JAR="$PLCC_CLUSTER_DIR/plcc_run/plcc.jar"
+PLCC_JAR="$PLCC_CLUSTER_RUN_DIR/plcc.jar"
 if [ ! -f "$PLCC_JAR" ]; then
     echo "$APPTAG ERROR: The plcc JAR file '$PLCC_JAR' does not exist. You have to build PLCC and the libs and copy them over."
     echo "$APPTAG ERROR: The plcc JAR file '$PLCC_JAR' does not exist. You have to build PLCC and the libs and copy them over." >> $ERRORLOG
@@ -154,11 +156,10 @@ if [ ! -f "$PLCC_JAR" ]; then
 fi
 
 ## copy DSSP binary
-DSSP_SOURCE_DIR="$MYHOME/software/dssp"
-scp -r $DSSP_SOURCE_DIR $TMPDIR/
-DSSP_DIR="$TMPDIR/dssp"
+DSSP_SOURCE_BINARY="$MYHOME/software/dssp/dsspcmbi"
+scp $DSSP_SOURCE_BINARY $PLCC_CLUSTER_RUN_DIR/
 
-DSSP_BINARY="$DSSP_DIR/dsspcmbi"
+DSSP_BINARY="$PLCC_CLUSTER_RUN_DIR/dsspcmbi"
 chmod +x $DSSP_BINARY
 if [ ! -x "$DSSP_BINARY" ]; then
     echo "$APPTAG ERROR: The DSSP binary '$DSSP_BINARY' does not exist or is not executable."

@@ -36,6 +36,10 @@ if [ ! -f "$PDBFILE" -a -r "$PDBFILE" ]; then
     exit 1
 fi
 
+
+## we now copy dsspcmbi to the plcc_run/ directory, so it should be right here (path from settings is ignored)
+DSSP="./dsspcmbi"
+
 ## check for dssp binary
 if [ "$OS" = "Windows_NT" ]; then
     DSSP="${DSSP}.exe"
