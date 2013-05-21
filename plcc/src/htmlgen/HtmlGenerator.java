@@ -453,6 +453,8 @@ public class HtmlGenerator {
     }
     
     public String generateJmolWebpage(String pathToBaseDir) {
+        String fs = File.separator;
+        String webFs = "/";
         StringBuilder sb = new StringBuilder();
         
         //-------------- header ------------
@@ -470,7 +472,7 @@ public class HtmlGenerator {
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
         
-        sb.append(HtmlGenerator.jsFunctionJmolInit(pathToBaseDir));
+        sb.append(HtmlGenerator.jsFunctionJmolInit(pathToBaseDir + webFs + "jmol"));
         // TODO: fix me
         sb.append(HtmlGenerator.jsFunctionJmolPdb("7tim"));
             
