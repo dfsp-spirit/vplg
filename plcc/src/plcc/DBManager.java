@@ -7,6 +7,7 @@
  */
 package plcc;
 
+import Tools.DP;
 import java.sql.*;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -146,16 +147,16 @@ public class DBManager {
             ps = dbc.prepareStatement(query);
             return (ps.executeUpdate());          // num rows affected
         } catch (Exception e) {
-            System.err.println("WARNING: doInsertQuery(): SQL statement '" + query + "' failed.");
-            System.err.println("WARNING: The error message was: '" + e.getMessage() + "'.");
+            DP.getInstance().w("doInsertQuery(): SQL statement '" + query + "' failed.");
+            DP.getInstance().w("The error message was: '" + e.getMessage() + "'.");
             return (-1);
         } finally {
             if (ps != null) {
                 try {
                     ps.close();
                 } catch (Exception ex) {
-                    System.err.println("WARNING: doInsertQuery(): Could not close prepared statement.");
-                    System.err.println("WARNING: The error message was: '" + ex.getMessage() + "'.");
+                    DP.getInstance().w("doInsertQuery(): Could not close prepared statement.");
+                    DP.getInstance().w("The error message was: '" + ex.getMessage() + "'.");
                 }
             }
         }
@@ -175,16 +176,16 @@ public class DBManager {
             ps = dbc.prepareStatement(query);
             return (ps.executeUpdate());          // num rows affected
         } catch (Exception e) {
-            System.err.println("WARNING: doUpdateQuery(): SQL statement '" + query + "' failed.");
-            System.err.println("WARNING: The error message was: '" + e.getMessage() + "'.");
+            DP.getInstance().w("doUpdateQuery(): SQL statement '" + query + "' failed.");
+            DP.getInstance().w("The error message was: '" + e.getMessage() + "'.");
             return (-1);
         } finally {
             if (ps != null) {
                 try {
                     ps.close();
                 } catch (Exception ex) {
-                    System.err.println("WARNING: doUpdateQuery(): Could not close prepared statement.");
-                    System.err.println("WARNING: The error message was: '" + ex.getMessage() + "'.");
+                    DP.getInstance().w("doUpdateQuery(): Could not close prepared statement.");
+                    DP.getInstance().w("The error message was: '" + ex.getMessage() + "'.");
                 }
             }
         }
@@ -204,16 +205,16 @@ public class DBManager {
             ps = dbc.prepareStatement(query);
             return ps.executeUpdate();           // num rows affected
         } catch (Exception e) {
-            System.err.println("WARNING: doDeleteQuery(): SQL statement '" + query + "' failed.");
-            System.err.println("WARNING: The error message was: '" + e.getMessage() + "'.");
+            DP.getInstance().w("doDeleteQuery(): SQL statement '" + query + "' failed.");
+            DP.getInstance().w("The error message was: '" + e.getMessage() + "'.");
             return (-1);
         } finally {
             if (ps != null) {
                 try {
                     ps.close();
                 } catch (Exception ex) {
-                    System.err.println("WARNING: doDeleteQuery(): Could not close prepared statement.");
-                    System.err.println("WARNING: The error message was: '" + ex.getMessage() + "'.");
+                    DP.getInstance().w("doDeleteQuery(): Could not close prepared statement.");
+                    DP.getInstance().w("The error message was: '" + ex.getMessage() + "'.");
                 }
             }
         }
@@ -260,8 +261,8 @@ public class DBManager {
             }
             return (tableData);
         } catch (Exception e) {
-            System.err.println("WARNING: doDeleteQuery(): SQL statement '" + query + "' failed.");
-            System.err.println("WARNING: The error message was: '" + e.getMessage() + "'.");
+            DP.getInstance().w("doDeleteQuery(): SQL statement '" + query + "' failed.");
+            DP.getInstance().w("The error message was: '" + e.getMessage() + "'.");
             //e.printStackTrace();
             System.exit(1);
             return (null);
@@ -270,16 +271,16 @@ public class DBManager {
                 try {
                     rs.close();
                 } catch (Exception ex) {
-                    System.err.println("WARNING: doSelectQuery(): Could not close result set.");
-                    System.err.println("WARNING: The error message was: '" + ex.getMessage() + "'.");
+                    DP.getInstance().w("doSelectQuery(): Could not close result set.");
+                    DP.getInstance().w("The error message was: '" + ex.getMessage() + "'.");
                 }
             }
             if (ps != null) {
                 try {
                     ps.close();
                 } catch (Exception ex) {
-                    System.err.println("WARNING: doSelectQuery(): Could not close prepared statement.");
-                    System.err.println("WARNING: The error message was: '" + ex.getMessage() + "'.");
+                    DP.getInstance().w("doSelectQuery(): Could not close prepared statement.");
+                    DP.getInstance().w("The error message was: '" + ex.getMessage() + "'.");
                 }
             }
         }
@@ -304,8 +305,8 @@ public class DBManager {
                     return (true);        // already closed
                 }
             } catch (Exception e) {
-                System.err.println("WARNING: closeConnection(): Could not close DB connection.");
-                System.err.println("WARNING: The error message was: '" + e.getMessage() + "'.");
+                DP.getInstance().w("closeConnection(): Could not close DB connection.");
+                DP.getInstance().w("The error message was: '" + e.getMessage() + "'.");
                 return (false);
             }
         } else {
@@ -531,7 +532,7 @@ public class DBManager {
             try {
                 deletePdbidFromDB(pdb_id);
             } catch (Exception e) {
-                System.err.println("WARNING: DB: writeProteinToDB: Protein '" + pdb_id + "' already in DB and deleting it failed.");
+                DP.getInstance().w("DB: writeProteinToDB: Protein '" + pdb_id + "' already in DB and deleting it failed.");
             }                        
         }
         
@@ -614,7 +615,7 @@ public class DBManager {
                     statement.close();
                 }
                 dbc.setAutoCommit(true);
-            } catch(Exception e) { System.err.println("WARNING: DB: deletePdbidFromDB: Could not close statement and reset autocommit."); }
+            } catch(Exception e) { DP.getInstance().w("DB: deletePdbidFromDB: Could not close statement and reset autocommit."); }
         }
         
         // The other tables are handled automatically via the ON DELETE CASCADE constraint.
@@ -893,7 +894,7 @@ public class DBManager {
                     rs.close();
                 }
                 dbc.setAutoCommit(true);
-            } catch(Exception e) { System.err.println("WARNING: DB: Could not close statement and reset autocommit."); }
+            } catch(Exception e) { DP.getInstance().w("DB: Could not close statement and reset autocommit."); }
         }
         
         // OK, check size of results table and return 1st field of 1st column
@@ -902,7 +903,7 @@ public class DBManager {
                 return(Integer.valueOf(tableData.get(0).get(0)));
             }
             else {
-                System.err.println("WARNING: DB: Chain '" + chain_name + "' of PDB ID '" + pdb_id + "' not in DB.");
+                DP.getInstance().w("DB: Chain '" + chain_name + "' of PDB ID '" + pdb_id + "' not in DB.");
                 return(-1);
             }
         }
@@ -966,7 +967,7 @@ public class DBManager {
                     statement.close();
                 }
                 dbc.setAutoCommit(true);
-            } catch(Exception e) { System.err.println("WARNING: DB: Could not close statement and reset autocommit."); }
+            } catch(Exception e) { DP.getInstance().w("DB: Could not close statement and reset autocommit."); }
         }
         
         // OK, check size of results table and return 1st field of 1st column
@@ -1046,7 +1047,7 @@ public class DBManager {
                     statement.close();
                 }
                 dbc.setAutoCommit(true);
-            } catch(Exception e) { System.err.println("WARNING: DB: Could not close statement and reset autocommit."); }
+            } catch(Exception e) { DP.getInstance().w("DB: Could not close statement and reset autocommit."); }
         }
         
         // OK, check size of results table and return 1st field of 1st column
@@ -1055,7 +1056,7 @@ public class DBManager {
                 return(true);
             }
             else {
-                System.err.println("WARNING: DB: Protein with PDB ID '" + pdb_id + "' not in DB.");
+                DP.getInstance().w("DB: Protein with PDB ID '" + pdb_id + "' not in DB.");
                 return(false);
             }
         }
@@ -1086,7 +1087,7 @@ public class DBManager {
         
 
         if (chain_db_id < 0) {
-            System.err.println("WARNING: getGraph(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
+            DP.getInstance().w("getGraph(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
             return(null);
         }
 
@@ -1138,7 +1139,7 @@ public class DBManager {
                 return(tableData.get(0).get(0));
             }
             else {
-                System.err.println("WARNING: DB: No entry for graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
+                DP.getInstance().w("DB: No entry for graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
                 return(null);
             }
         }
@@ -1167,7 +1168,7 @@ public class DBManager {
         }
         
         if(graphString == null) {
-            System.err.println("WARNING: DB: getMostSimilarByGraphSetBased: Pattern graph not found in database.");
+            DP.getInstance().w("DB: getMostSimilarByGraphSetBased: Pattern graph not found in database.");
             return(null);
         }
         
@@ -1196,7 +1197,7 @@ public class DBManager {
         
 
         if (chain_db_id < 0) {
-            System.err.println("WARNING: getSSEString(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
+            DP.getInstance().w("getSSEString(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
             return(null);
         }
 
@@ -1248,7 +1249,7 @@ public class DBManager {
                 return(tableData.get(0).get(0));
             }
             else {
-                System.err.println("WARNING: DB: getSSEString(): No entry for graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
+                DP.getInstance().w("DB: getSSEString(): No entry for graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
                 return(null);
             }
         }
@@ -1356,7 +1357,7 @@ public class DBManager {
                 try {
                     chainPK = Integer.valueOf(tableData.get(i).get(1));
                 } catch(Exception e) {
-                    System.err.println("WARNING: DB: getAllGraphData(): '" + e.getMessage() + "' Ignoring data row.");
+                    DP.getInstance().w("DB: getAllGraphData(): '" + e.getMessage() + "' Ignoring data row.");
                     continue;
                 }
 
@@ -1364,7 +1365,7 @@ public class DBManager {
                 data = getPDBIDandChain(chainPK);
                 
                 if(data.length != 2) {
-                    System.err.println("WARNING: DB: getAllGraphData(): Could not find chain with PK '" + chainPK + "' in DB, ignoring data row.");
+                    DP.getInstance().w("DB: getAllGraphData(): Could not find chain with PK '" + chainPK + "' in DB, ignoring data row.");
                     continue;
                 }
                 else {
@@ -1374,7 +1375,7 @@ public class DBManager {
                 }                
             }
             else {
-                System.err.println("WARNING: DB: getAllGraphData(): Result row #" + i + " has unexpected length " + tableData.get(i).size() + ".");
+                DP.getInstance().w("DB: getAllGraphData(): Result row #" + i + " has unexpected length " + tableData.get(i).size() + ".");
                 return(graphData);
             }
         }
@@ -1404,7 +1405,7 @@ public class DBManager {
         
 
         if (chain_db_id < 0) {
-            System.err.println("WARNING: getGraph(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
+            DP.getInstance().w("getGraph(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
             return(null);
         }
 
@@ -1456,7 +1457,7 @@ public class DBManager {
                 return(tableData.get(0).get(0));
             }
             else {
-                System.err.println("WARNING: DB: No entry for graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
+                DP.getInstance().w("DB: No entry for graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
                 return(null);
             }
         }

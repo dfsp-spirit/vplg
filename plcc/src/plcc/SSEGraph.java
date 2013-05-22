@@ -10,6 +10,7 @@
 package plcc;
 
 //import com.google.gson.Gson;
+import Tools.DP;
 import datastructures.Graph;
 import datastructures.UndirectedGraph;
 import java.awt.BasicStroke;
@@ -657,12 +658,12 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         ArrayList<Integer> spatialOrder = new ArrayList<Integer>();
         
         if(this.isBifurcated()) {
-            //System.err.println("WARNING: getSpatialOrderingOfVertexIndices(): Called for bipartite graph, ignoring.");
+            //DP.getInstance().w("getSpatialOrderingOfVertexIndices(): Called for bipartite graph, ignoring.");
             return(spatialOrder);
         }
         
         if(this.numSSEContacts() != (this.numVertices() - 1)) {
-            //System.err.println("WARNING: getSpatialOrderingOfVertexIndices(): Graph cannot be linear: number of edges != number of vertices -1.");
+            //DP.getInstance().w("getSpatialOrderingOfVertexIndices(): Graph cannot be linear: number of edges != number of vertices -1.");
             return(spatialOrder);
         }
         
@@ -674,7 +675,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         Boolean noVertexWithDegree1 = false;
         //System.out.println("Start vertex of " + this.toString() + " is " + start + ".");     
         if(start < 0) {
-            //System.err.println("WARNING: getSpatialOrderingOfVertexIndices(): No vertex of degree 1 found, order not possible.");
+            //DP.getInstance().w("getSpatialOrderingOfVertexIndices(): No vertex of degree 1 found, order not possible.");
             // No vertex found so this notation is not posible, return an empty ArrayList
             start = this.closestToNTerminus();
             if(start < 0) {
@@ -787,7 +788,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     public Boolean sseContactExistsPos(Integer x, Integer y) {
         
         if(x < 0 || y < 0 || x > this.size - 1 || y > this.size - 1) {
-            System.err.println("WARNING: sseContactExistsPos(): SSE index out of bounds in PG contact matrix of size " + matrix.length + " (x=" + x + ", y=" + y + ").");
+            DP.getInstance().w("sseContactExistsPos(): SSE index out of bounds in PG contact matrix of size " + matrix.length + " (x=" + x + ", y=" + y + ").");
             return(false);
         }
         
@@ -860,7 +861,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             res = true;
         }
         catch (Exception e) {
-            System.err.println("WARNING: Could not write serialized ProtGraph object to file '" + filePath + "'.");
+            DP.getInstance().w("Could not write serialized ProtGraph object to file '" + filePath + "'.");
             e.printStackTrace();
             res = false;
         }
@@ -1076,7 +1077,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             return(SpatRel.getString(this.matrix[v1][v2]));
         }
         else {
-            System.err.println("WARNING: SSEGraph.getEdgeLabel(): No such edge: (" + v1 + "," + v2 + ").");
+            DP.getInstance().w("SSEGraph.getEdgeLabel(): No such edge: (" + v1 + "," + v2 + ").");
             return(null);
         }
         
@@ -1406,7 +1407,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         }
 
         if(vertIndex < 0) {
-            System.err.println("WARNING: closestToCTerminus(): No SSE found, returning '" + vertIndex + "'.");
+            DP.getInstance().w("closestToCTerminus(): No SSE found, returning '" + vertIndex + "'.");
             if(this.size > 0) {
                 System.err.println("ERROR: closestToCTerminus(): Graph has " + this.size + " vertices, so not finding anything is a bug.");
                 System.exit(1);
@@ -1552,7 +1553,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
      */
     public String getNotationSEQ() {
         
-        System.err.println("WARNING: getNotationSEQ(): not implemented yet.");
+        DP.getInstance().w("getNotationSEQ(): not implemented yet.");
 
         return("");
     }
@@ -1579,17 +1580,17 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     public String getNotationKEY(Boolean forceLabelSSETypes) {
 
         if(this.isBifurcated()) {
-            System.err.println("WARNING: #KEY notation not supported for bifurcated graphs. Check before requesting this.");
+            DP.getInstance().w("#KEY notation not supported for bifurcated graphs. Check before requesting this.");
             return("");
         }
 
         if(! this.isConnected()) {
-            System.err.println("WARNING: #KEY notation only supported for connected graphs. (All folding graphs are connected - is this a protein graph instead of a folding graph?)");
+            DP.getInstance().w("#KEY notation only supported for connected graphs. (All folding graphs are connected - is this a protein graph instead of a folding graph?)");
             return("");
         }
         
         if(! this.hasSpatialOrdering()) {
-            System.err.println("WARNING: #KEY notation only supported for graphs with spatial ordering.");
+            DP.getInstance().w("#KEY notation only supported for graphs with spatial ordering.");
             return("");
         }
         
@@ -1597,7 +1598,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             return("");
         }
         
-        //System.err.println("WARNING: getNotationKEY(): not implemented yet.");
+        //DP.getInstance().w("getNotationKEY(): not implemented yet.");
         
         Boolean labelSSEs = true;
         if(this.graphType.equals("alpha") || this.graphType.equals("beta")) {
@@ -1983,7 +1984,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         }
 
         if(vertIndex < 0) {
-            System.err.println("WARNING: closestToNTerminus(): No SSE found, returning '" + vertIndex + "'.");
+            DP.getInstance().w("closestToNTerminus(): No SSE found, returning '" + vertIndex + "'.");
             if(this.size > 0) {
                 System.err.println("ERROR: closestToNTerminus(): Graph has " + this.size + " vertices, so not finding anything is a bug.");
                 System.exit(1);
@@ -2009,7 +2010,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         }
 
         if(vertex < 0) {
-            System.err.println("WARNING: closestToNTerminusOf(): No SSE found in list, returning '" + vertex + "'.");
+            DP.getInstance().w("closestToNTerminusOf(): No SSE found in list, returning '" + vertex + "'.");
             if(someVertices.size() > 0) {
                 System.err.println("ERROR: closestToNTerminusOf(): List has " + someVertices.size() + " vertices, so not finding anything is a bug.");
                 System.exit(-1);
@@ -2038,7 +2039,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         }
 
         //if(vertIndex < 0) {
-        //    System.err.println("WARNING: closestToNTerminusDegree1(): No SSE found, returning '" + vertIndex + "'.");            
+        //    DP.getInstance().w("closestToNTerminusDegree1(): No SSE found, returning '" + vertIndex + "'.");            
         //}
         
         return(vertIndex);
@@ -2513,16 +2514,16 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
                     pcr.addProteinGraphImageVector(graphType, new File(svgFilePath));
                 }
                 else {
-                    System.err.println("WARNING: Could not register SVG image to chain, no ProteinChainResult for chain " + chain + ".");
+                    DP.getInstance().w("Could not register SVG image to chain, no ProteinChainResult for chain " + chain + ".");
                 }
             } else {
-                System.err.println("WARNING: Could not register SVG image to chain, chainid is NULL.");
+                DP.getInstance().w("Could not register SVG image to chain, chainid is NULL.");
             }
             
             
 
         } catch (Exception e) {
-            System.err.println("WARNING: Could not write image file for protein graph to file '" + filePath + "':" + e.getMessage() + "'.");
+            DP.getInstance().w("Could not write image file for protein graph to file '" + filePath + "':" + e.getMessage() + "'.");
             return(false);
         }
 

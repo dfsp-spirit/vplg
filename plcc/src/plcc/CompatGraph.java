@@ -7,6 +7,7 @@
  */
 package plcc;
 
+import Tools.DP;
 import algorithms.CompatGraphComputation;
 import datastructures.Graph;
 import java.io.IOException;
@@ -49,7 +50,7 @@ public class CompatGraph extends Graph<Integer[]>{
     public void addVertex(Integer sourceEdge1, Integer sourceEdge2) {
         
         if(this.edgesInited) {
-            System.err.println("WARNING: Added vertex after edges have been inited, deleting all edges.");
+            DP.getInstance().w("Added vertex after edges have been inited, deleting all edges.");
             this.edgesInited = false;
         }
         
@@ -181,7 +182,7 @@ public class CompatGraph extends Graph<Integer[]>{
         ProtGraph pg = ProtGraphs.fromTrivialGraphFormatString(tgf);
         
         if(pg == null) {
-            System.err.println("WARNING: CompatGraph.toFakeSSEGraph(): The pg is NULL.");
+            DP.getInstance().w("CompatGraph.toFakeSSEGraph(): The pg is NULL.");
         } else {
             //System.out.println("DEBUG: CompatGraph.toFakeSSEGraph(): The pg is ok.");
         }

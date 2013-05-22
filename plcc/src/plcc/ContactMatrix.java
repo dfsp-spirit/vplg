@@ -9,6 +9,7 @@
 package plcc;
 
 // imports
+import Tools.DP;
 import java.util.ArrayList;
 import java.net.*;
 import org.jgrapht.*;
@@ -714,7 +715,7 @@ public class ContactMatrix {
                         }
                     }
                     else {
-                        System.err.println("WARNING: Contact between unhandled combination of SSE types " + a.getSseType() + " and " + b.getSseType() + ", using default rules.");
+                        DP.getInstance().w("Contact between unhandled combination of SSE types " + a.getSseType() + " and " + b.getSseType() + ", using default rules.");
                         if( (contBB[i][j] >= 2) || (contBC[i][j] + contCB[i][j] >= 2) || (contCC[i][j] >= 2)) {
                             contSSE[i][j] = 1;
                             contSSE[j][i] = 1;
@@ -890,11 +891,11 @@ public class ContactMatrix {
                     
                     // just a sanity test...
                     if(largestAntip == smallestParallel) {
-                        System.err.println("WARNING: Double difference calculation borders are equal, should differ.");
+                        DP.getInstance().w("Double difference calculation borders are equal, should differ.");
                     }
                     // ... and another one
                     if(largestAntip > smallestParallel) {
-                        System.err.println("WARNING: Double difference calculation borders are inverted: anti-parallel value should be larger than parallel value but it is vice versa.");
+                        DP.getInstance().w("Double difference calculation borders are inverted: anti-parallel value should be larger than parallel value but it is vice versa.");
                     }
                     
                     
@@ -1019,7 +1020,7 @@ public class ContactMatrix {
                     try {
                         DBManager.writeContactToDB(this.pdbid, this.handleChain, sseList.get(i).getStartDsspNum(), sseList.get(j).getStartDsspNum(), spatialSSE[i][j]);
                     } catch(Exception e) {
-                        System.err.println("WARNING: DB: Could not reset DB state after inserting contact data.");
+                        DP.getInstance().w("DB: Could not reset DB state after inserting contact data.");
                     }                    
                 }
             }

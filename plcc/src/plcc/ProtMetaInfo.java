@@ -9,6 +9,7 @@
 
 package plcc;
 
+import Tools.DP;
 import java.util.ArrayList;
 
 
@@ -94,7 +95,7 @@ public class ProtMetaInfo {
 
                     if(indexColon < 0 || indexSemicolon < 0 || indexColon > indexSemicolon) {
                         // Not found, this line is broken it seems. Ignore it.
-                        // System.err.println("WARNING: setYourMolID(): Could not parse MOL_ID line in strange format, skipping.");
+                        // DP.getInstance().w("setYourMolID(): Could not parse MOL_ID line in strange format, skipping.");
                         continue;
                     }
                     else {
@@ -103,7 +104,7 @@ public class ProtMetaInfo {
 
                     if(cur_mol_id.isEmpty()) {
                         // weirdo line, ignore it
-                        // System.err.println("WARNING: setYourMolID(): Could not parse empty MOL_ID line, skipping.");
+                        // DP.getInstance().w("setYourMolID(): Could not parse empty MOL_ID line, skipping.");
                         cur_mol_id = "UNKNOWN";
                         continue;
                     }
@@ -153,7 +154,7 @@ public class ProtMetaInfo {
 
         }
 
-        System.err.println("WARNING: setYourMolID(): Could not find MOL_ID token of chain '" + this.chainid + "' in COMPND record of PDB file.");
+        DP.getInstance().w("setYourMolID(): Could not find MOL_ID token of chain '" + this.chainid + "' in COMPND record of PDB file.");
         this.molID = mol_id;
         return(mol_id);
     }
@@ -166,7 +167,7 @@ public class ProtMetaInfo {
      */
     public Boolean getAllMetaData(ArrayList<String> pdbLines) {
         if( ! this.isReady()) {
-            System.err.println("WARNING: getAllMetaData(): PMI instance not ready, MOL_ID of chain '" + chainid + "' not known yet.");
+            DP.getInstance().w("getAllMetaData(): PMI instance not ready, MOL_ID of chain '" + chainid + "' not known yet.");
             return(false);
         }
 
@@ -193,7 +194,7 @@ public class ProtMetaInfo {
 
                     if(indexColon < 0 || indexLastChar < 0 || indexColon >= indexLastChar) {
                         // Not found, this line is broken it seems. Ignore it.
-                        System.err.println("WARNING: Could not parse MOL_ID from CPMPND line containing this token.");
+                        DP.getInstance().w("Could not parse MOL_ID from CPMPND line containing this token.");
                         continue;
                     }
                     else {
@@ -203,7 +204,7 @@ public class ProtMetaInfo {
 
                     if(cur_mol_id.isEmpty()) {
                         // weirdo line, ignore it
-                        System.err.println("WARNING: Could not parse MOL_ID from COMPND line containing this token.");
+                        DP.getInstance().w("Could not parse MOL_ID from COMPND line containing this token.");
                         cur_mol_id = "UNKNOWN";
                         continue;
                     }
@@ -227,7 +228,7 @@ public class ProtMetaInfo {
                         
                         if(indexColon < 0 || indexLastChar < 0 || indexColon >= indexLastChar) {
                             // Not found, this line is broken it seems. Ignore it.
-                            System.err.println("WARNING: Could not parse MOLECULE from COMPND line containing this token.");
+                            DP.getInstance().w("Could not parse MOLECULE from COMPND line containing this token.");
                             continue;
                         }
                         else {
@@ -247,7 +248,7 @@ public class ProtMetaInfo {
 
                     if(indexColon < 0 || indexLastChar < 0 || indexColon >= indexLastChar) {
                         // Not found, this line is broken it seems. Ignore it.
-                        System.err.println("WARNING: Could not parse MOL_ID from SOURCE line containing this token.");
+                        DP.getInstance().w("Could not parse MOL_ID from SOURCE line containing this token.");
                         continue;
                     }
                     else {
@@ -257,7 +258,7 @@ public class ProtMetaInfo {
 
                     if(cur_mol_id.isEmpty()) {
                         // weirdo line, ignore it
-                        System.err.println("WARNING: Could not parse MOL_ID from SOURCE line containing this token.");
+                        DP.getInstance().w("Could not parse MOL_ID from SOURCE line containing this token.");
                         cur_mol_id = "UNKNOWN";
                         continue;
                     }
@@ -279,7 +280,7 @@ public class ProtMetaInfo {
 
                         if(indexColon < 0 || indexLastChar < 0 || indexColon >= indexLastChar) {
                             // Not found, this line is broken it seems. Ignore it.
-                            System.err.println("WARNING: Could not parse ORGANISM_SCIENTIFIC from SOURCE line containing this token.");
+                            DP.getInstance().w("Could not parse ORGANISM_SCIENTIFIC from SOURCE line containing this token.");
                             continue;
                         }
                         else {
@@ -297,7 +298,7 @@ public class ProtMetaInfo {
 
                         if(indexColon < 0 || indexLastChar < 0 || indexColon >= indexLastChar) {
                             // Not found, this line is broken it seems. Ignore it.
-                            System.err.println("WARNING: Could not parse ORGANISM_COMMON from SOURCE line containing this token.");
+                            DP.getInstance().w("Could not parse ORGANISM_COMMON from SOURCE line containing this token.");
                             continue;
                         }
                         else {
@@ -315,7 +316,7 @@ public class ProtMetaInfo {
 
                         if(indexColon < 0 || indexLastChar < 0 || indexColon >= indexLastChar) {
                             // Not found, this line is broken it seems. Ignore it.
-                            System.err.println("WARNING: Could not parse ORGANISM_TAXID from SOURCE line containing this token.");
+                            DP.getInstance().w("Could not parse ORGANISM_TAXID from SOURCE line containing this token.");
                             continue;
                         }
                         else {

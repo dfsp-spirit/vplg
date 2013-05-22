@@ -7,6 +7,7 @@
  */
 package similarity;
 
+import Tools.DP;
 import algorithms.NeedlemanWunsch;
 import algorithms.SmithWaterman;
 import java.sql.SQLException;
@@ -38,7 +39,7 @@ public class CompareOneToDB {
         String methodName = Similarity.SIMILARITYMETHOD_STRINGSSE;
         
         //if(maxNumberOfResults != 1) {
-        //    System.err.println("WARNING: getMostSimilarToSSEString: parameter maxNumberOfResults not implemented yet and fixed at 1, returning only best score.");
+        //    DP.getInstance().w("getMostSimilarToSSEString: parameter maxNumberOfResults not implemented yet and fixed at 1, returning only best score.");
         //}
         
         ArrayList<ComparisonResult> results = new ArrayList<ComparisonResult>();        
@@ -47,7 +48,7 @@ public class CompareOneToDB {
         try {
             sseStrings = DBManager.getAllGraphData(graphType);
         } catch(Exception e) {
-            System.err.println("WARNING: CompareOneToDB: SQL error while getting all SSEStrings: '" + e.getMessage() + "'.");
+            DP.getInstance().w("CompareOneToDB: SQL error while getting all SSEStrings: '" + e.getMessage() + "'.");
         }
         
         System.out.println("Comparing given protein graph to " + sseStrings.size() + " of the protein graphs in the database.");
@@ -116,7 +117,7 @@ public class CompareOneToDB {
             }
 
         } else {
-            System.err.println("WARNING: Received no similarity results -- is the database empty?");  
+            DP.getInstance().w("Received no similarity results -- is the database empty?");  
         }
         System.out.println("Similarity search for PDB ID '" + Settings.get("plcc_B_search_similar_PDBID") + "' chain '" + Settings.get("plcc_B_search_similar_chainID") + "' graph type '" + Settings.get("plcc_S_search_similar_graphtype") + "' complete (" + res.size() + " results), exiting.");        
     }
@@ -137,7 +138,7 @@ public class CompareOneToDB {
             }
 
         } else {
-            System.err.println("WARNING: Received no similarity results -- is the database empty?");  
+            DP.getInstance().w("Received no similarity results -- is the database empty?");  
         }
         System.out.println("Similarity search for PDB ID '" + Settings.get("plcc_B_search_similar_PDBID") + "' chain '" + Settings.get("plcc_B_search_similar_chainID") + "' graph type '" + Settings.get("plcc_S_search_similar_graphtype") + "' complete (" + res.size() + " results), exiting.");        
     }
@@ -159,7 +160,7 @@ public class CompareOneToDB {
             }
 
         } else {
-            System.err.println("WARNING: Received no similarity results -- is the database empty?");  
+            DP.getInstance().w("Received no similarity results -- is the database empty?");  
         }
         System.out.println("Similarity search for PDB ID '" + Settings.get("plcc_B_search_similar_PDBID") + "' chain '" + Settings.get("plcc_B_search_similar_chainID") + "' graph type '" + Settings.get("plcc_S_search_similar_graphtype") + "' complete (" + res.size() + " results), exiting.");        
     }
@@ -189,7 +190,7 @@ public class CompareOneToDB {
         }
         
         if(graphString == null) {
-            System.err.println("WARNING: DB: getMostSimilarByGraphSetBased: Pattern graph not found in database.");
+            DP.getInstance().w("DB: getMostSimilarByGraphSetBased: Pattern graph not found in database.");
             return(results);
         }
         
@@ -203,7 +204,7 @@ public class CompareOneToDB {
         try {
             graphData = DBManager.getAllGraphData(g_graphtype);
         } catch(Exception e) {
-            System.err.println("WARNING: CompareOneToDB: SQL error while getting all SSEStrings: '" + e.getMessage() + "'.");
+            DP.getInstance().w("CompareOneToDB: SQL error while getting all SSEStrings: '" + e.getMessage() + "'.");
         }
         
         System.out.println("Comparing given protein graph to " + graphData.size() + " of the protein graphs in the database.");
@@ -225,7 +226,7 @@ public class CompareOneToDB {
             try {
                 pgDB = ProtGraphs.fromPlccGraphFormatString(graphStringDB);
             } catch(Exception e) {
-                System.err.println("WARNING: Could not create protein graph from graph string of " + pdbidDB + " chain " + chainidDB + " gt " + graphTypeDB + ": '" + e.getLocalizedMessage() + "'.");
+                DP.getInstance().w("Could not create protein graph from graph string of " + pdbidDB + " chain " + chainidDB + " gt " + graphTypeDB + ": '" + e.getLocalizedMessage() + "'.");
                 continue;
             }
                                     
@@ -291,7 +292,7 @@ public class CompareOneToDB {
         }
         
         if(graphString == null) {
-            System.err.println("WARNING: DB: getMostSimilarByGraphSetBased: Pattern graph not found in database.");
+            DP.getInstance().w("DB: getMostSimilarByGraphSetBased: Pattern graph not found in database.");
             return(results);
         }
         
@@ -303,7 +304,7 @@ public class CompareOneToDB {
         String methodName = Similarity.SIMILARITYMETHOD_GRAPHSET;
         
         //if(maxNumberOfResults != 1) {
-        //    System.err.println("WARNING: getMostSimilarToSSEString: parameter maxNumberOfResults not implemented yet and fixed at 1, returning only best score.");
+        //    DP.getInstance().w("getMostSimilarToSSEString: parameter maxNumberOfResults not implemented yet and fixed at 1, returning only best score.");
         //}
         
         ArrayList<String[]> graphData  = new ArrayList<String[]>();
@@ -311,7 +312,7 @@ public class CompareOneToDB {
         try {
             graphData = DBManager.getAllGraphData(g_graphtype);
         } catch(Exception e) {
-            System.err.println("WARNING: CompareOneToDB: SQL error while getting all SSEStrings: '" + e.getMessage() + "'.");
+            DP.getInstance().w("CompareOneToDB: SQL error while getting all SSEStrings: '" + e.getMessage() + "'.");
         }
         
         System.out.println("Comparing given protein graph to " + graphData.size() + " of the protein graphs in the database.");
@@ -332,7 +333,7 @@ public class CompareOneToDB {
             try {
                 pgDB = ProtGraphs.fromPlccGraphFormatString(graphStringDB);
             } catch(Exception e) {
-                System.err.println("WARNING: Could not create protein graph from graph string of " + pdbidDB + " chain " + chainidDB + " gt " + graphTypeDB + ".");
+                DP.getInstance().w("Could not create protein graph from graph string of " + pdbidDB + " chain " + chainidDB + " gt " + graphTypeDB + ".");
                 continue;
             }
             

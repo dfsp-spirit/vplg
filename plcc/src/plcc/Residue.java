@@ -9,6 +9,7 @@
 package plcc;
 
 // imports
+import Tools.DP;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -111,7 +112,7 @@ public class Residue implements java.io.Serializable {
         
         ArrayList<String> altLocsCA = this.getAltLocsWithAlphaCarbonAtoms();
         if(altLocsCA.size() < 1) {
-            System.err.println("WARNING: Residue " + this.getFancyName() + " has no AltLoc which includes an alpha carbon atom.");
+            DP.getInstance().w("Residue " + this.getFancyName() + " has no AltLoc which includes an alpha carbon atom.");
             return this.getAltLocWithMostAtoms();
         }
         
@@ -217,7 +218,7 @@ public class Residue implements java.io.Serializable {
     private ArrayList<String> getAltLocsWithAlphaCarbonAtoms() {
         
         if(! this.isAA()) {
-            System.err.println("WARNING: Non-AA residue cannot contain alpha carbon atom but asked to look for one.");
+            DP.getInstance().w("Non-AA residue cannot contain alpha carbon atom but asked to look for one.");
         }
         
         ArrayList<String> altLocsWithAlphaCarbon = new ArrayList<String>();
@@ -250,7 +251,7 @@ public class Residue implements java.io.Serializable {
     public ArrayList<Atom> chooseYourAltLoc() {
         
         if(this.atoms.size() < 1) {
-            System.err.println("WARNING: Residue " + this.getFancyName() + " has no atoms *before* choosing alternative location PDB field.");
+            DP.getInstance().w("Residue " + this.getFancyName() + " has no atoms *before* choosing alternative location PDB field.");
         }                
         ArrayList<Atom> deletedAtoms;
         
@@ -264,7 +265,7 @@ public class Residue implements java.io.Serializable {
         int numAtomsWithChosenAltLoc = this.getNumAtomsWithAltLoc(chosenAltLoc);
         
         if((numAtomsWithChosenAltLoc < 1 || numAtomsWithChosenAltLoc > Main.MAX_ATOMS_PER_AA) && this.isAA()) {
-            System.err.println("WARNING: Chosen altLoc '" + chosenAltLoc + "' leads to " + numAtomsWithChosenAltLoc + " atoms for AA residue " + this.getFancyName() + ".");
+            DP.getInstance().w("Chosen altLoc '" + chosenAltLoc + "' leads to " + numAtomsWithChosenAltLoc + " atoms for AA residue " + this.getFancyName() + ".");
         }
         
         
@@ -290,7 +291,7 @@ public class Residue implements java.io.Serializable {
         Atom b = r.getCenterAtom();
 
         if(a == null || b == null) {
-            System.err.println("WARNING: Could not determine distance of PDB Residues # " + pdbResNum + " and " + r.getPdbResNum() + " lacking center atoms, assuming 100.");
+            DP.getInstance().w("Could not determine distance of PDB Residues # " + pdbResNum + " and " + r.getPdbResNum() + " lacking center atoms, assuming 100.");
             //System.exit(-1);
             return(100);       // for the IDE ;)
         }
@@ -319,7 +320,7 @@ public class Residue implements java.io.Serializable {
             
             Integer rad = 50;      // 5 A
             
-            System.err.println("WARNING: Could not determine center sphere radius of PDB residue " + this.getPdbResNum() + ", may have no atoms. Using guessed value " + rad + ".");
+            DP.getInstance().w("Could not determine center sphere radius of PDB residue " + this.getPdbResNum() + ", may have no atoms. Using guessed value " + rad + ".");
             //System.exit(-1);
             this.centerSphereRadius = rad;
         }
@@ -343,7 +344,7 @@ public class Residue implements java.io.Serializable {
         //Integer atomRadius = Settings.getInteger("plcc_I_atom_radius");
 
         if(atoms.size() < 1) {
-            System.err.println("WARNING: getCenterAtom(): PDB residue " + this.pdbResNum + " chain " + this.getChainID() + " of type " + this.getName3() + " has " + atoms.size() + " atoms in default location. Aborting.");
+            DP.getInstance().w("getCenterAtom(): PDB residue " + this.pdbResNum + " chain " + this.getChainID() + " of type " + this.getName3() + " has " + atoms.size() + " atoms in default location. Aborting.");
             return(null);
         }
 
@@ -485,7 +486,7 @@ public class Residue implements java.io.Serializable {
         try {
             dist = this.getCenterAtom().distToAtom(r.getCenterAtom());
         } catch(Exception e) {
-            System.err.println("WARNING: Could not determine distance between DSSP residues " + this.getDsspResNum() + " and " + r.getDsspResNum() + ", assuming out of contact distance.");
+            DP.getInstance().w("Could not determine distance between DSSP residues " + this.getDsspResNum() + " and " + r.getDsspResNum() + ", assuming out of contact distance.");
             return(false);
         }
         Integer atomRadius;

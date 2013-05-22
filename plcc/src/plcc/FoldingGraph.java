@@ -9,6 +9,7 @@
 
 package plcc;
 
+import Tools.DP;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -84,7 +85,7 @@ public class FoldingGraph extends SSEGraph {
 
         // They should also be marked as folding graphs.
         if( ! this.isFoldingGraph()) {
-            System.err.println("WARNING: drawFoldingGraph(): This graph is connected but it is not declared to be a folding graph. Still trying to draw.");
+            DP.getInstance().w("drawFoldingGraph(): This graph is connected but it is not declared to be a folding graph. Still trying to draw.");
         }
 
         // Check minimum size
@@ -125,7 +126,7 @@ public class FoldingGraph extends SSEGraph {
      * @return true if it worked out, false otherwise 
      */
     private Boolean drawFoldingGraphADJ(String filePath) {
-        //System.err.println("WARNING: Folding graph notation 'ADJ' not implemented yet, drawing RED instead.");
+        //DP.getInstance().w("Folding graph notation 'ADJ' not implemented yet, drawing RED instead.");
         //return(this.drawFoldingGraphRED(filePath));
         return(false);
     }
@@ -183,7 +184,7 @@ public class FoldingGraph extends SSEGraph {
      * @return true if it worked out, false otherwise 
      */
     private Boolean drawFoldingGraphSEQ(String filePath) {
-        //System.err.println("WARNING: Folding graph notation 'SEQ' not implemented yet.");
+        //DP.getInstance().w("Folding graph notation 'SEQ' not implemented yet.");
         return(false);
     }
 
@@ -609,7 +610,7 @@ public class FoldingGraph extends SSEGraph {
             ImageIO.write(bi, "PNG", new File(filePath));
 
         } catch (Exception e) {
-            System.err.println("WARNING: Could not write image file for graph to file '" + filePath + "': " + e.getMessage() + ".");
+            DP.getInstance().w("Could not write image file for graph to file '" + filePath + "': " + e.getMessage() + ".");
             return(false);
         }
 
@@ -892,7 +893,7 @@ public class FoldingGraph extends SSEGraph {
             
 
         } catch (Exception e) {
-            System.err.println("WARNING: Could not write image file for protein graph to file '" + filePath + "':" + e.getMessage() + "'.");
+            DP.getInstance().w("Could not write image file for protein graph to file '" + filePath + "':" + e.getMessage() + "'.");
             return(false);
         }
 

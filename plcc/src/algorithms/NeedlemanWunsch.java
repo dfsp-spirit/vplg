@@ -7,6 +7,7 @@
  */
 package algorithms;
 
+import Tools.DP;
 import similarity.ScoringMatrix;
 
 /**
@@ -79,7 +80,7 @@ public class NeedlemanWunsch {
         this.gapPenalty = p;
         
         if(p > 0) {
-            System.err.println("WARNING: Gap penalty should be negative but is '" + p + "'.");    
+            DP.getInstance().w("Gap penalty should be negative but is '" + p + "'.");    
         }
         
         this.matrixComputed = false;

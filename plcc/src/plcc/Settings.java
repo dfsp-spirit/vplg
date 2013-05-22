@@ -9,6 +9,7 @@
 
 package plcc;
 
+import Tools.DP;
 import java.io.*;
 import java.util.Properties;
 import java.util.Map;
@@ -71,7 +72,7 @@ public class Settings {
      * @return the PLCC version
      */
     public static String getVersion() {
-        return("0.70");
+        return("0.78");
     }
 
     /**
@@ -98,7 +99,7 @@ public class Settings {
             stream.close();
             res = true;
         } catch (Exception e) {
-            System.err.println("WARNING: Settings: Could not load settings from properties file '" + configFile + "'." );
+            DP.getInstance().w("Settings: Could not load settings from properties file '" + configFile + "'." );
             res = false;
         }
 
@@ -587,7 +588,7 @@ public class Settings {
             cfg.store(new FileOutputStream(file), "These are the settings for plcc. See the documentation for info on them.");
             res = true;
         } catch(Exception e) {
-            System.err.println("WARNING: Settings: Could not write current properties to file '" + file + "'.");
+            DP.getInstance().w("Settings: Could not write current properties to file '" + file + "'.");
             res = false;
         }
 
@@ -613,7 +614,7 @@ public class Settings {
             def.store(new FileOutputStream(file), "These are the default settings for plcc. See the documentation for info on them.");
             res = true;
         } catch(Exception e) {
-            System.err.println("WARNING: Settings: Could not write default settings to file '" + file + "'.");
+            DP.getInstance().w("Settings: Could not write default settings to file '" + file + "'.");
             res = false;
         }
 
@@ -669,14 +670,14 @@ public class Settings {
             res = true;
         }
         catch (Exception e) {
-            System.err.println("WARNING: Could not write to file '" + filePath + "'.");
+            DP.getInstance().w("Could not write to file '" + filePath + "'.");
             res = false;
         }
        
         try {
             fw.close();
         } catch(Exception ex) {
-            System.err.println("WARNING: Could not close FileWriter for file '" + filePath + "'.");
+            DP.getInstance().w("Could not close FileWriter for file '" + filePath + "'.");
         }
         return(res);
     }                        

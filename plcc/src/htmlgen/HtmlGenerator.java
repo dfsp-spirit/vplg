@@ -8,6 +8,7 @@
 
 package htmlgen;
 
+import Tools.DP;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -458,23 +459,23 @@ public class HtmlGenerator {
         StringBuilder sb = new StringBuilder();
         
         //-------------- header ------------
-        sb.append(this.generateHeaderSpecialJS("VPLGweb -- The Visualization of Protein Ligand Graphs web server -- Visualization", pathToBaseDir, new String[] { "Jmol.js" }));
+        sb.append(this.generateHeaderSpecialJS("VPLGweb -- The Visualization of Protein Ligand Graphs web server -- Visualization", pathToBaseDir, new String[] { HtmlTools.makeWebPath("jsmol/JSmol.min.js") }));
         // ------------- body -- logo and title ---------------
         sb.append(HtmlTools.startBodyAndCommonJS());
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_MAIN));
         sb.append(this.generateLogo(pathToBaseDir));
-        sb.append(HtmlGenerator.generateTopPageTitle("VPLGweb Jmol Visualization"));
+        sb.append(HtmlGenerator.generateTopPageTitle("VPLGweb Visualization"));
         
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_SEARCH));                
-        sb.append("This page can be used to visualize a protein using Jmol.");
+        sb.append("This page can be used to visualize a protein using Jmol/JSmol. It requires JS and either HTML5 or the Java browser plugin.");
         sb.append(HtmlTools.endDiv());  // search     
         
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
         
-        sb.append(HtmlGenerator.jsFunctionJmolInit(pathToBaseDir + webFs + "jmol"));
+        sb.append(HtmlGenerator.jsFunctionJSmolInit(pathToBaseDir + webFs + "jsmol"));
         // TODO: fix me
-        sb.append(HtmlGenerator.jsFunctionJmolPdb("7tim"));
+        //sb.append(HtmlGenerator.jsFunctionJmolPdb("7tim"));
             
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
         
@@ -954,7 +955,7 @@ public class HtmlGenerator {
                         } else {
                             sb.append(HtmlTools.italic("No image of this graph is available."));
                             sb.append(HtmlTools.brAndNewline());
-                            System.err.println("WARNING: No valid " + (useVectorImageOnWebsite ? "vector" : "bitmap") + " graph image registered for PDB " + pdbid + " chain " + chain + " graphtype " + graphType + ". " + (graphImage == null ? "Image is null." : "Path is '" + graphImage.getAbsolutePath() + "'."));
+                            DP.getInstance().w("No valid " + (useVectorImageOnWebsite ? "vector" : "bitmap") + " graph image registered for PDB " + pdbid + " chain " + chain + " graphtype " + graphType + ". " + (graphImage == null ? "Image is null." : "Path is '" + graphImage.getAbsolutePath() + "'."));
                         }
                         sb.append(HtmlTools.brAndNewline());
                     }
@@ -1021,6 +1022,7 @@ public class HtmlGenerator {
     public String generateHeaderSpecialJS(String title, String pathToBaseDir, String[] relativeJsFilePathsFromBasedir) {
         StringBuilder sb = new StringBuilder();
                 
+        sb.append("<!DOCTYPE HTML>\n");
         sb.append("<html>\n<head>\n");
         sb.append("<title>").append(title).append("</title>\n");
 
@@ -1042,6 +1044,7 @@ public class HtmlGenerator {
     public String generateHeader(String title, String pathToBaseDir) {
         StringBuilder sb = new StringBuilder();
                 
+        sb.append("<!DOCTYPE HTML>\n");
         sb.append("<html>\n<head>\n");
         sb.append("<title>").append(title).append("</title>\n");
 
@@ -1166,6 +1169,7 @@ public class HtmlGenerator {
         return "<a href=\"javascript:popup('" + stuffToPopup + "')\">" + linkTitle + "</a>";
     }
     
+    /*
     public static String jsFunctionJmolInit(String webPathToJmolFolder) {
         StringBuilder sb = new StringBuilder();
         sb.append("<script language=\"JavaScript\" type=\"text/javascript\">\n");
@@ -1175,6 +1179,7 @@ public class HtmlGenerator {
         sb.append("</script>\n");
         return sb.toString();
     }
+        
     
     public static String jsFunctionJmolPdb(String pdbid) {
         StringBuilder sb = new StringBuilder();
@@ -1182,6 +1187,64 @@ public class HtmlGenerator {
         sb.append("<!--\n");                
         //TODO: add code here
         sb.append("TODO: add js code here\n"); 
+        sb.append("// -->\n");
+        sb.append("</script>\n");
+        return sb.toString();
+    }
+    */
+    
+    
+    /**
+     * Function to add a JSMOL object.
+     * See http://wiki.jmol.org/index.php/Jmol_JavaScript_Object for info.
+     * You need to copy jsmol to $WEBROOT/jsmol/ for this to work.
+     * @param webPathToJmolFolder
+     * @return 
+     */
+    public static String jsFunctionJSmolInit(String webPathToJmolFolder) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<script language=\"JavaScript\" type=\"text/javascript\">\n");
+        sb.append("<!--\n");   
+        
+        // for Java plugin version
+        sb.append("var InfoJavaPlugin = {\n");
+        sb.append("addSelectionOptions: false,\n");
+        sb.append("color: \"#FFFFFF\",\n");
+        sb.append("debug: false,\n");
+        sb.append("defaultModel: \":caffeine\",\n");
+        sb.append("height: 300,\n");
+        sb.append("isSigned: false,             // Java only\n");
+        sb.append("jarFile: \"jsmol/JmolApplet0.jar\",  // Java only\n");
+        sb.append("jarPath: \"./jsmol\",                // Java only\n");
+        sb.append("memoryLimit: 512,            // Java only\n");
+        sb.append("readyFunction: null,\n");
+        sb.append("script: null,\n");
+        //sb.append("serverURL: \"http://chemapps.stolaf.edu/jmol/jsmol/jsmol.php\",  // Example only!\n");
+        sb.append("serverURL: \"http://rcmd.org/vplgweb/jsmol/jsmol.php\",\n");
+        sb.append("src: null,\n");
+        sb.append("use: \"Java noWebGL noHTML5 noImage\",\n");
+        sb.append("width: 300\n");
+        sb.append("};	 \n");
+        
+        // for HTML5 version
+        sb.append("var InfoHTML5 = {\n");
+        sb.append("addSelectionOptions: false,\n");
+        sb.append("color: \"#FFFFFF\",\n");
+        sb.append("debug: false,\n");
+        sb.append("defaultModel: \":caffeine\",\n");
+        sb.append("height: 300,\n");
+        sb.append("j2sPath: \"jsmol/j2s\",              // HTML5 only\n");
+        sb.append("readyFunction: null,\n");
+        sb.append("script: null,\n");
+        //sb.append("serverURL: \"http://chemapps.stolaf.edu/jmol/jsmol/jsmol.php\",  // Example only!\n");
+        sb.append("serverURL: \"http://rcmd.org/vplgweb/jsmol/jsmol.php\",\n");
+        sb.append("src: null,\n");
+        sb.append("use: \"HTML5 Image\",\n");
+        sb.append("width: 300\n");
+        sb.append("};	 \n");
+
+        sb.append("Jmol.getApplet(\"myJmol\", InfoHTML5)\n");
+        //sb.append("Jmol.getApplet(\"myJmol\", InfoJavaPlugin)\n");
         sb.append("// -->\n");
         sb.append("</script>\n");
         return sb.toString();

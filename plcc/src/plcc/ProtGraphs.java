@@ -9,6 +9,7 @@
 package plcc;
 
 
+import Tools.DP;
 import java.io.*;
 import java.util.*;
 
@@ -37,7 +38,7 @@ public class ProtGraphs {
         else if(gt.equals("betalig")) { return(GRAPHTYPE_BETALIG); }
         else if(gt.equals("albelig")) { return(GRAPHTYPE_ALBELIG); }
         else {
-            System.err.println("WARNING: ProtGraphs.getGraphTypeCode(): Graph string '" + gt + "' invalid.");
+            DP.getInstance().w("ProtGraphs.getGraphTypeCode(): Graph string '" + gt + "' invalid.");
             return(-1);
         }
     }
@@ -56,7 +57,7 @@ public class ProtGraphs {
         else if(codeNum == GRAPHTYPE_BETALIG) { return("betalig"); }
         else if(codeNum == GRAPHTYPE_ALBELIG) { return("albelig"); }
         else {
-            System.err.println("WARNING: ProtGraphs.getGraphTypeString(): Graph code '" + codeNum + "' invalid.");
+            DP.getInstance().w("ProtGraphs.getGraphTypeString(): Graph code '" + codeNum + "' invalid.");
             return("invalid_graph_type");
         }
     }
@@ -74,7 +75,7 @@ public class ProtGraphs {
             pg = (ProtGraph)objectIn.readObject();
         }
         catch(Exception e) {
-            System.err.println("WARNING: Could not read ProtGraph object from file '" + file + "'.");
+            DP.getInstance().w("Could not read ProtGraph object from file '" + file + "'.");
             pg = null;
         }
         finally {
@@ -145,7 +146,7 @@ public class ProtGraphs {
 
             // skip empty lines
             if(l.length() < 1) {
-                //System.err.println("WARNING: TGF_FORMAT: Skipping line " + curLine + " (empty).");
+                //DP.getInstance().w("TGF_FORMAT: Skipping line " + curLine + " (empty).");
                 continue;
             }
 
@@ -155,7 +156,7 @@ public class ProtGraphs {
                     inVertices = false;            //  found so far and skip this line.
                     
                     if(sses.size() <= 0) {
-                        System.err.println("WARNING: ProtGraphs.fromTrivialGraphFormatFile(): In edge section but no vertices found so far.");
+                        DP.getInstance().w("ProtGraphs.fromTrivialGraphFormatFile(): In edge section but no vertices found so far.");
                     }
                     
                     pg = new ProtGraph(sses);
@@ -179,7 +180,7 @@ public class ProtGraphs {
                             labelPart = (l.substring(firstSpace, l.length())).trim();
                         } catch(Exception e) {
                             // We'll just skip this line for now
-                            System.err.println("WARNING: TGF_FORMAT: Skipping line " + curLine + " (could not parse as vertex: " + e.getMessage() + ").");
+                            DP.getInstance().w("TGF_FORMAT: Skipping line " + curLine + " (could not parse as vertex: " + e.getMessage() + ").");
                             continue;
                         }                                                                        
                     }
@@ -190,7 +191,7 @@ public class ProtGraphs {
                         vertex = Integer.valueOf(vertexPart);
                         vertexLabel = vertexPart.trim();
                     } catch(Exception e) {
-                        System.err.println("WARNING: TGF_FORMAT: Skipping line " + curLine + " (could not extract vertex data:" + e.getMessage() + ".");
+                        DP.getInstance().w("TGF_FORMAT: Skipping line " + curLine + " (could not extract vertex data:" + e.getMessage() + ".");
                         continue;
                         //System.err.println("ERROR: Parsing vertex line in trivial graph format file '" + file + "' failed. File broken or in wrong format?");
                         //System.exit(1);
@@ -211,7 +212,7 @@ public class ProtGraphs {
 
 
                     if(words.length < 2) {
-                        System.err.println("WARNING: TGF_FORMAT: Skipping line " + curLine + " (less than 2 fields can't encode an edge).");
+                        DP.getInstance().w("TGF_FORMAT: Skipping line " + curLine + " (less than 2 fields can't encode an edge).");
                         continue;
                     }
                     else if(words.length == 2) {
@@ -237,7 +238,7 @@ public class ProtGraphs {
                     vertex2 = Integer.valueOf(vertexPart2);
                     edgeLabel = labelPart.trim();
                 } catch(Exception e) {
-                    System.err.println("WARNING: TGF_FORMAT: Skipping line " + curLine + " (could not parse as edge).");
+                    DP.getInstance().w("TGF_FORMAT: Skipping line " + curLine + " (could not parse as edge).");
                     continue;
                     //System.err.println("ERROR: Parsing vertex line in trivial graph format file '" + file + "' failed. File broken or in wrong format?");
                     //System.exit(1);
@@ -260,7 +261,7 @@ public class ProtGraphs {
         //System.out.println("DEBUG: fromTrivialGraphFormatString: Handled " + lines.size() + " lines.");
 
         if(pg == null) {
-            System.err.println("WARNING: TGF_FORMAT: Graph in trivial graph format is empty (has no edges).");
+            DP.getInstance().w("TGF_FORMAT: Graph in trivial graph format is empty (has no edges).");
             return(new ProtGraph(new ArrayList<SSE>()));
         }
         

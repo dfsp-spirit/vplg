@@ -10,6 +10,7 @@
 package plcc;
 
 // imports
+import Tools.DP;
 import java.nio.channels.*;
 import java.util.Locale;
 //import java.net.*;
@@ -102,8 +103,7 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        
-        
+                
         System.out.println("[======================== plcc -- Protein-Ligand Contact Calculation ========================]");
         System.out.println("Init... (Version " +  version + ")");
         
@@ -116,8 +116,8 @@ public class Main {
         // Check library dir, warn if not there
         File libDir = new File("lib");
         if( ! libDir.exists()) {
-            System.err.println("WARNING: Library directory '" + libDir.toString() + "' not found. Libraries missing, will crash if functionality of them is required during this run.");
-            System.err.println("WARNING: Was this program executed from its installation directory? If not you need to copy the lib/ directory to the working directory.");
+            DP.getInstance().w("Library directory '" + libDir.toString() + "' not found. Libraries missing, will crash if functionality of them is required during this run.");
+            DP.getInstance().w("Was this program executed from its installation directory? If not you need to copy the lib/ directory to the working directory.");
             System.err.println("INFO: The Java library path is set to: '" + System.getProperty("java.library.path") + "'.");
             System.err.println("INFO: The Java classloader path is set to: '" + System.getProperty("java.class.path") + "'.");
         }
@@ -126,11 +126,11 @@ public class Main {
             //System.out.println("  Settings loaded from properties file.");
         }
         else {
-            System.err.println("WARNING: Could not load settings from properties file, trying to create it.");
+            DP.getInstance().w("Could not load settings from properties file, trying to create it.");
             if(Settings.createDefaultConfigFile()) {
                 System.out.println("  Default config file created, will use it from now on.");
             } else {
-                System.err.println("WARNING: Could not create default config file, check permissions. Using internal default settings.");
+                DP.getInstance().w("Could not create default config file, check permissions. Using internal default settings.");
             }
             Settings.resetAll();        // init settings with internal defaults for this run
         }
@@ -202,7 +202,7 @@ public class Main {
 
             Integer expectedLengthPDBID = 4;
             if(pdbid.length() != expectedLengthPDBID) {
-                System.err.println("WARNING: The given PDB identifier '" + pdbid + "' has an unusual length of " + pdbid.length() + " characters, expected " + expectedLengthPDBID + ".");
+                DP.getInstance().w("The given PDB identifier '" + pdbid + "' has an unusual length of " + pdbid.length() + " characters, expected " + expectedLengthPDBID + ".");
             }
             
             // set default file names from the pdb id (these may be overwritten by args later)
@@ -593,8 +593,8 @@ public class Main {
                             
                             // sanity check
                             if(nv != types.length()) {
-                                System.err.println("WARNING: List of folding graph notations given on command line '" + types + "' contains invalid chars (" + types.length() + " given, " + nv + " valid).");
-                                System.err.println("WARNING: Valid chars: 'k' => KEY, 'a' => ADJ, 'r' => RED, 's' => SEQ. Example: '-q kr'");
+                                DP.getInstance().w("List of folding graph notations given on command line '" + types + "' contains invalid chars (" + types.length() + " given, " + nv + " valid).");
+                                DP.getInstance().w("Valid chars: 'k' => KEY, 'a' => ADJ, 'r' => RED, 's' => SEQ. Example: '-q kr'");
                                 
                                 if(nv <= 0) {
                                     syntaxError();
@@ -636,8 +636,8 @@ public class Main {
                             
                             // sanity check
                             if(nv != types.length()) {
-                                System.err.println("WARNING: List of folding graph notations given on command line '" + types + "' contains invalid chars (" + types.length() + " given, " + nv + " valid).");
-                                System.err.println("WARNING: Valid chars: 'a' => alpha, 'b' => beta, 'c' => albe, 'd' => alphalig, 'e' => betalig, 'f' => albelig. Example: '-g ace'");
+                                DP.getInstance().w("List of folding graph notations given on command line '" + types + "' contains invalid chars (" + types.length() + " given, " + nv + " valid).");
+                                DP.getInstance().w("Valid chars: 'a' => alpha, 'b' => beta, 'c' => albe, 'd' => alphalig, 'e' => betalig, 'f' => albelig. Example: '-g ace'");
                                 
                                 if(nv <= 0) {
                                     syntaxError();
@@ -681,8 +681,8 @@ public class Main {
 
                                 // sanity check
                                 if(nv != types.length()) {
-                                    System.err.println("WARNING: List of output formats given on command line '" + types + "' contains invalid chars (" + types.length() + " given, " + nv + " valid).");
-                                    System.err.println("WARNING: Valid chars: 'g' => GML, 't' => TGF, 'd' => DOT lang, 'k' => kavosh, 'e' => edge list, p' => PLCC. Example: '-O tgp'");
+                                    DP.getInstance().w("List of output formats given on command line '" + types + "' contains invalid chars (" + types.length() + " given, " + nv + " valid).");
+                                    DP.getInstance().w("Valid chars: 'g' => GML, 't' => TGF, 'd' => DOT lang, 'k' => kavosh, 'e' => edge list, p' => PLCC. Example: '-O tgp'");
 
                                     if(nv <= 0) {
                                         syntaxError();
@@ -895,7 +895,7 @@ public class Main {
             }
             else {
                 System.out.println("  -> Database connection FAILED.");
-                System.err.println("WARNING: Could not establish database connection, not writing anything to the DB.");
+                DP.getInstance().w("Could not establish database connection, not writing anything to the DB.");
                 Settings.set("plcc_B_useDB", "false");
             }
         }
@@ -938,7 +938,7 @@ public class Main {
                 ArrayList<Integer> dsspResidueIDs = sulfurBridges.get(key);
                 
                 if(dsspResidueIDs.size() != 2) {
-                    System.err.println("WARNING: Disulfide bridge has " + dsspResidueIDs.size() + " member residues.");
+                    DP.getInstance().w("Disulfide bridge has " + dsspResidueIDs.size() + " member residues.");
                 }
                 
                 for(Integer dsspID : dsspResidueIDs) {
@@ -1137,7 +1137,7 @@ public class Main {
         }
         
         if(handleChains.size() < 1) {
-            System.err.println("WARNING: No chains to handle found in input data (" + chains.size() + " chains total).");
+            DP.getInstance().w("No chains to handle found in input data (" + chains.size() + " chains total).");
             System.exit(1);
         }
         
@@ -1384,7 +1384,7 @@ public class Main {
             System.out.println("Test DELETE done, " + numRows + " affected rows. All tests done.");
         }
         else {
-            System.err.println("WARNING: dbTesting(): Not using DB or DB connection failed. Skipping DB tests.");
+            DP.getInstance().w("dbTesting(): Not using DB or DB connection failed. Skipping DB tests.");
             System.exit(1);
         }
     }
@@ -1416,7 +1416,7 @@ public class Main {
             res = Double.valueOf(md.get("resolution"));
         } catch (Exception e) {
             res = -1.0;
-            System.err.println("WARNING: Could not determine resolution of PDB file for protein '" + pdbid + "', assuming NMR with resolution '" + res + "'.");
+            DP.getInstance().w("Could not determine resolution of PDB file for protein '" + pdbid + "', assuming NMR with resolution '" + res + "'.");
             
         }
 
@@ -1428,7 +1428,7 @@ public class Main {
                 DBManager.writeProteinToDB(pdbid, md.get("title"), md.get("header"), md.get("keywords"), md.get("experiment"), res);
                 System.out.println("  Info on protein '" + pdbid + "' written to DB.");
             }catch (Exception e) {
-                System.err.println("WARNING: Could not write info on protein '" + pdbid + "' to DB.");
+                DP.getInstance().w("Could not write info on protein '" + pdbid + "' to DB.");
             }
         }
 
@@ -1456,11 +1456,11 @@ public class Main {
                         System.out.println("    Info on chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
                     }
                     else {
-                        System.err.println("WARNING: Could not write info on chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' to DB.");
+                        DP.getInstance().w("Could not write info on chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' to DB.");
                     }
                 }
                 catch(Exception e) {
-                    System.err.println("WARNING: DB: Could not reset DB connection.");
+                    DP.getInstance().w("DB: Could not reset DB connection.");
                 }
             }
 
@@ -1504,7 +1504,7 @@ public class Main {
                        //System.out.println("  Info on SSE #" + (j + 1) + " of chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
                     }
                     catch(Exception e) {
-                        System.err.println("WARNING: Could not write info on SSE # " + j + " of chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' to DB.");
+                        DP.getInstance().w("Could not write info on SSE # " + j + " of chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' to DB.");
                     }
                 }
             }
@@ -1834,7 +1834,7 @@ public class Main {
             //if(writeStringToFile(plccGraphFile, (fg.toVPLGGraphFormat()))) {
             //    System.out.println("      Plcc format folding graph file written to '" + plccGraphFile + "'.");
             //} else {
-            //    System.err.println("WARNING: Could not write Plcc format folding graph file to '" + plccGraphFile + "'.");
+            //    DP.getInstance().w("Could not write Plcc format folding graph file to '" + plccGraphFile + "'.");
             //}
                                     
             
@@ -1942,14 +1942,14 @@ public class Main {
             res = true;
         }
         catch (Exception e) {
-            System.err.println("WARNING: Could not write to file '" + filePath + "'.");
+            DP.getInstance().w("Could not write to file '" + filePath + "'.");
             res = false;
         }
        
         try {
             fw.close();
         } catch(Exception ex) {
-            System.err.println("WARNING: Could not close FileWriter for file '" + filePath + "'.");
+            DP.getInstance().w("Could not close FileWriter for file '" + filePath + "'.");
         }
         return(res);
     }
@@ -2037,7 +2037,7 @@ public class Main {
                 System.out.println("  Wrote SSE level contacts for chain " + chainCM.getChain() + " in geo.dat format to file '" + gdf + "'.");
             }
             else {
-                System.err.println("WARNING: Failed to write SSE level contacts in geo.dat format to file '" + gdf + "'. Check permissions.");
+                DP.getInstance().w("Failed to write SSE level contacts in geo.dat format to file '" + gdf + "'. Check permissions.");
             }
         }
         
@@ -2077,7 +2077,7 @@ public class Main {
         ArrayList<SSE> kept = new ArrayList<SSE>();
 
         if(keepSSEs.size() < 1) {
-            System.err.println("WARNING: filterAllSSEsButList(): list keepSSEs is empty, removing *all* SSEs.");
+            DP.getInstance().w("filterAllSSEsButList(): list keepSSEs is empty, removing *all* SSEs.");
         }
 
         for(Integer i = 0; i < sses.size(); i++) {
@@ -2336,7 +2336,7 @@ public class Main {
             
             
             if(i >= MAX_ATOMS_PER_AA && a.isAA()) {
-                System.err.println("WARNING: calculateAtomContactsBetweenResidues(): The AA residue " + a.getUniquePDBName() + " of type " + a.getName3() + " has more atoms than allowed, skipping atom #" + i + ".");
+                DP.getInstance().w("calculateAtomContactsBetweenResidues(): The AA residue " + a.getUniquePDBName() + " of type " + a.getName3() + " has more atoms than allowed, skipping atom #" + i + ".");
                 break;
             }
             
@@ -2346,7 +2346,7 @@ public class Main {
             for(Integer j = 0; j < atoms_b.size(); j++) {
                                 
                 if(j >= MAX_ATOMS_PER_AA && b.isAA()) {
-                    System.err.println("WARNING: calculateAtomContactsBetweenResidues(): The AA residue " + b.getUniquePDBName() + " of type " + b.getName3() + " has more atoms than allowed, skipping atom #" + j + ".");
+                    DP.getInstance().w("calculateAtomContactsBetweenResidues(): The AA residue " + b.getUniquePDBName() + " of type " + b.getName3() + " has more atoms than allowed, skipping atom #" + j + ".");
                     //continue;
                     break outerloop;
                 }
@@ -2398,8 +2398,8 @@ public class Main {
                         contact[aIntID][bIntID][statAtomIDj][0]++;                 // total number of contacts for atom x of this AA
                         contact[bIntID][aIntID][0][statAtomIDj]++;
                     } catch(java.lang.ArrayIndexOutOfBoundsException e) {
-                        System.err.println("WARNING: calculateAtomContactsBetweenResidues():Contact statistics array out of bounds. Residues with excessive number of atoms detected: " + e.getMessage() + ".");
-                        System.err.println("WARNING: calculateAtomContactsBetweenResidues(): (cont.) Ignoring contacts for these atoms (aIntID=" + aIntID + ", bIntID=" + bIntID + ", statAtomIDi=" + statAtomIDi + ", statAtomIDj=" + statAtomIDj + ").");
+                        DP.getInstance().w("calculateAtomContactsBetweenResidues():Contact statistics array out of bounds. Residues with excessive number of atoms detected: " + e.getMessage() + ".");
+                        DP.getInstance().w("calculateAtomContactsBetweenResidues(): (cont.) Ignoring contacts for these atoms (aIntID=" + aIntID + ", bIntID=" + bIntID + ", statAtomIDi=" + statAtomIDi + ", statAtomIDj=" + statAtomIDj + ").");
                         continue;
                     }
                     
@@ -3193,7 +3193,7 @@ public class Main {
      */
     public static Boolean writeDsspLigFile(String dsspFile, String dsspLigFile, ArrayList<ResContactInfo> contacts, ArrayList<Residue> res) {
         
-        System.err.println("WARNING: writeDsspLigFile(): This function is deprecated, use writeOrderedDsspLigFile() instead.\n");
+        DP.getInstance().w("writeDsspLigFile(): This function is deprecated, use writeOrderedDsspLigFile() instead.\n");
         
         FileWriter dsspLigFW = null;
         PrintWriter dsspLigFH = null;
@@ -3711,7 +3711,7 @@ public class Main {
                 if(ligCont.isEmpty()) {
                     // The list of contact residues should not be empty at this time.
                     scriptThisLigCont = "";
-                    System.err.println("WARNING: getPymolSelectionScriptByLigand(): Residue without contacts in contact list. Bug?");
+                    DP.getInstance().w("getPymolSelectionScriptByLigand(): Residue without contacts in contact list. Bug?");
                 } else {
 
                     scriptThisLigCont = "select lig_" + r.getName3().trim() + r.getPdbResNum() + "_contacts,";
@@ -3751,7 +3751,7 @@ public class Main {
         curSSE = lastSSE = null;
 
         if(resList.size() < 1) {
-            System.err.println("WARNING: createAllDsspSSEsFromResidueList() Creating empty list of SSEs: residue list is empty.");
+            DP.getInstance().w("createAllDsspSSEsFromResidueList() Creating empty list of SSEs: residue list is empty.");
             //System.out.println("      Found " + dsspSSElist.size() + " SSEs according to DSSP definition.");
             return(dsspSSElist);
         }
@@ -4361,7 +4361,7 @@ public class Main {
             ig2.dispose();
 
         } catch (Exception e) {
-            System.err.println("WARNING: Could not write image file for ramachandran plot to file '" + filePath + "'. Check permissions.");
+            DP.getInstance().w("Could not write image file for ramachandran plot to file '" + filePath + "'. Check permissions.");
             return(false);
         }
 
@@ -4410,7 +4410,7 @@ public class Main {
             res = Double.valueOf(md.get("resolution"));
         } catch (Exception e) {
             res = -1.0;
-            System.err.println("WARNING: Could not determine resolution of PDB file for protein '" + pdbid + "', assuming NMR with resolution '" + res + "'.");
+            DP.getInstance().w("Could not determine resolution of PDB file for protein '" + pdbid + "', assuming NMR with resolution '" + res + "'.");
             
         }
 
@@ -4422,7 +4422,7 @@ public class Main {
                 DBManager.writeProteinToDB(pdbid, md.get("title"), md.get("header"), md.get("keywords"), md.get("experiment"), res);
                 System.out.println("  Info on protein '" + pdbid + "' written to DB.");
             }catch (Exception e) {
-                System.err.println("WARNING: Could not write info on protein '" + pdbid + "' to DB.");
+                DP.getInstance().w("Could not write info on protein '" + pdbid + "' to DB.");
             }
         }
 
@@ -4454,11 +4454,11 @@ public class Main {
                         System.out.println("    Info on chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
                     }
                     else {
-                        System.err.println("WARNING: Could not write info on chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' to DB.");
+                        DP.getInstance().w("Could not write info on chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' to DB.");
                     }
                 }
                 catch(Exception e) {
-                    System.err.println("WARNING: DB: Could not reset DB connection.");
+                    DP.getInstance().w("DB: Could not reset DB connection.");
                 }
             }
 
@@ -4503,7 +4503,7 @@ public class Main {
                        //System.out.println("  Info on SSE #" + (j + 1) + " of chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
                     }
                     catch(Exception e) {
-                        System.err.println("WARNING: Could not write info on SSE # " + j + " of chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' to DB.");
+                        DP.getInstance().w("Could not write info on SSE # " + j + " of chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' to DB.");
                     }
                 }
             }

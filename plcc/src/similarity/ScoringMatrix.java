@@ -7,6 +7,8 @@
  */
 package similarity;
 
+import Tools.DP;
+
 /**
  * A scoring matrix class for various strings. Intended to be used with the string alignment algorithms.
  * Provides some standard matrices via static objects.
@@ -50,7 +52,7 @@ public class ScoringMatrix {
         this.gapPenalty = gapPenalty; 
         
         if(this.matrix.length <= 0 || this.matrix[0].length != this.matrix.length || this.matrix.length != this.alphabet.length()) {
-            System.err.println("WARNING: ScoringMatrix(): Matrix does not cover the alphabet.");
+            DP.getInstance().w("ScoringMatrix(): Matrix does not cover the alphabet.");
         }
     }
     

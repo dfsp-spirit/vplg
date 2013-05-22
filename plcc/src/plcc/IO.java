@@ -8,6 +8,7 @@
 
 package plcc;
 
+import Tools.DP;
 import java.awt.Rectangle;
 import java.io.BufferedReader;
 import java.io.*;
@@ -257,7 +258,7 @@ public class IO {
         try {
             fw.close();
         } catch(Exception ex) {
-            System.err.println("WARNING: Could not close FileWriter for file '" + file + "': " + ex.getMessage() + ".");
+            DP.getInstance().w("Could not close FileWriter for file '" + file + "': " + ex.getMessage() + ".");
             return(false);
         }
         

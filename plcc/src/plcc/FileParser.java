@@ -10,6 +10,7 @@ package plcc;
 
 
 // imports
+import Tools.DP;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.io.*;
@@ -389,7 +390,7 @@ public class FileParser {
                 if(s_atoms.remove(a)) {
                     numAtomsDeletedAltLoc++;
                 } else {
-                    System.err.println("WARNING: Atom requested to be removed from global list does not exist in there.");
+                    DP.getInstance().w("Atom requested to be removed from global list does not exist in there.");
                 }
             }
         }
@@ -583,7 +584,7 @@ public class FileParser {
 
         
         if(tmpRes == null) {
-            System.err.println("WARNING: Residue with PDB # " + resNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue.");
+            DP.getInstance().w("Residue with PDB # " + resNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue.");
             return(false);
         } else {            
             tmpRes.addAtom(a);
@@ -603,7 +604,7 @@ public class FileParser {
      */
     @Deprecated private static Residue getResidueFromListOld(Integer resNum, String cID) {
         
-        System.err.println("WARNING: getResidueFromList(Integer, String): DEPRECATED: Use the function with iCode support instead!");
+        DP.getInstance().w("getResidueFromList(Integer, String): DEPRECATED: Use the function with iCode support instead!");
 
         Residue r;
 
@@ -749,7 +750,7 @@ public class FileParser {
 
     @Deprecated public static Residue getResByPdbNum(Integer p) {
         
-        System.err.println("WARNING: getResByPdbNum(): This function is deprecated because it does not support chains and iCode (use getResByPdbFields()).");
+        DP.getInstance().w("getResByPdbNum(): This function is deprecated because it does not support chains and iCode (use getResByPdbFields()).");
         System.exit(1);
 
         for(Integer i = 0; i < s_residues.size(); i++) {
@@ -906,7 +907,7 @@ public class FileParser {
                 foundChain = dline.substring(11, 12).trim();
 
                 if(tmpPdbResNum.length() == 0) { // The next command (lastChar) would be out of bounds anyway if this code is executed
-                    System.err.println("WARNING: Length of PDB number at line " + (i + 1) + " of DSSP file is 0." );
+                    DP.getInstance().w("Length of PDB number at line " + (i + 1) + " of DSSP file is 0." );
                 }
 
                 lastChar = tmpPdbResNum.charAt(tmpPdbResNum.length() - 1);
@@ -918,7 +919,7 @@ public class FileParser {
                 else {
                     // The last character is NO digit so it is the iCode
                     if(tmpPdbResNum.length() <= 1) {
-                        System.err.println("WARNING: Length of PDB number at line " + (i + 1) + " of DSSP file is 1 and this is not a digit." );
+                        DP.getInstance().w("Length of PDB number at line " + (i + 1) + " of DSSP file is 1 and this is not a digit." );
                     }
                     else {
                         foundPdbResNum = Integer.valueOf(tmpPdbResNum.substring(0, tmpPdbResNum.length() - 1));
@@ -926,7 +927,7 @@ public class FileParser {
                     }
                 }
             } catch(Exception e) {
-                System.err.println("WARNING: Something went wrong with parsing PDB number at line " + (i + 1) + " of DSSP file, ignoring." );
+                DP.getInstance().w("Something went wrong with parsing PDB number at line " + (i + 1) + " of DSSP file, ignoring." );
                 //System.exit(-1);
             }
 
@@ -1053,11 +1054,11 @@ public class FileParser {
 
             if(Settings.getBoolean("plcc_B_split_dsspfile_warning")) {
                 System.err.println("*************************************** WARNING ******************************************");
-                System.err.println("WARNING: Multiple models detected in PDB file. I'm fine with that but unless you did split");
-                System.err.println("WARNING:  the PDB file into separate models for DSSP, the current DSSP file is broken.");
-                System.err.println("WARNING:  I parse that file and rely on it. You know the deal: garbage in, garbage out.");
-                System.err.println("WARNING:  I'll continue but you have been warned. ;)");
-                System.err.println("WARNING:  (Set 'plcc_B_split_dsspfile_warning' to 'false' in the config file to suppress this message.)");
+                DP.getInstance().w("Multiple models detected in PDB file. I'm fine with that but unless you did split");
+                DP.getInstance().w(" the PDB file into separate models for DSSP, the current DSSP file is broken.");
+                DP.getInstance().w(" I parse that file and rely on it. You know the deal: garbage in, garbage out.");
+                DP.getInstance().w(" I'll continue but you have been warned. ;)");
+                DP.getInstance().w(" (Set 'plcc_B_split_dsspfile_warning' to 'false' in the config file to suppress this message.)");
                 System.err.println("*************************************** WARNING ******************************************");
             }
         }
@@ -1234,19 +1235,19 @@ public class FileParser {
                         }
                     }
                 } catch (Exception e) {
-                    System.err.println("WARNING: Something is fishy with residue in line " + dLineNum + " of the DSSP file: '" + e.getMessage() + "'.");
+                    DP.getInstance().w("Something is fishy with residue in line " + dLineNum + " of the DSSP file: '" + e.getMessage() + "'.");
                 }
                 
 
                 // Fix DSSP file like the one for 2ZW3.pdb which list cysteine residues as 'o' instead of 'c'.
                 if(resName1Letter.equals("O") || resName1Letter.equals("U")) {
-                    System.err.println("WARNING: Turned AA with 1-letter code '" + resName1Letter + "' into 'C'.");
+                    DP.getInstance().w("Turned AA with 1-letter code '" + resName1Letter + "' into 'C'.");
                     resName1Letter = "C";
                 }
 
                 // Define "asparagine or aspartic acid" as asparagine
                 if(resName1Letter.equals("B")) {
-                    System.err.println("WARNING: Turned AA with 1-letter code '" + resName1Letter + "' into 'N'.");
+                    DP.getInstance().w("Turned AA with 1-letter code '" + resName1Letter + "' into 'N'.");
                     resName1Letter = "N";
                 }
 
@@ -1692,7 +1693,7 @@ public class FileParser {
             }
         }
         else {
-            System.err.println("WARNING: getMetaInfo(): Could not extract MOL_ID for chain '" + chainid + "' from PDB header, meta data unknown.");
+            DP.getInstance().w("getMetaInfo(): Could not extract MOL_ID for chain '" + chainid + "' from PDB header, meta data unknown.");
         }
             
         return(pmi);
@@ -1804,7 +1805,7 @@ public class FileParser {
             }
 
         } catch(Exception e) {
-            System.err.println("WARNING: Could not parse resolution from 'REMARK 2 RESOLUTION' record, assuming 'NOT APPLICABLE'.");
+            DP.getInstance().w("Could not parse resolution from 'REMARK 2 RESOLUTION' record, assuming 'NOT APPLICABLE'.");
             res = -1.0;
         }
 
@@ -1929,7 +1930,7 @@ public class FileParser {
             
             /**
             if(line.length() != expLineLength) {
-                System.err.println("WARNING: Skipping geo line " + (i + 1) + " of file " + filePath + ": length " + line.length() + ", expected length " + expLineLength + ".");
+                DP.getInstance().w("Skipping geo line " + (i + 1) + " of file " + filePath + ": length " + line.length() + ", expected length " + expLineLength + ".");
                 numIgnored++;
                 continue;
             }
@@ -2015,7 +2016,7 @@ public class FileParser {
                 totalCont = scanner.nextInt();
                 
             } catch(Exception e) {
-                System.err.println("WARNING: Hit malformed contact line in residue contact file '" + filePath + "'. Skipping line " + (i + 1) + ".");
+                DP.getInstance().w("Hit malformed contact line in residue contact file '" + filePath + "'. Skipping line " + (i + 1) + ".");
                 numIgnored++;
                 continue;
             }
@@ -2198,8 +2199,8 @@ public class FileParser {
                 doubleDif = scanner.nextInt();
                 
             } catch(Exception e) {
-                System.err.println("WARNING: Hit malformed SSE contact line in SSE contact file '" + compareSSEContactsFile + "'. Skipping line " + (i + 1) + ".");
-                //System.err.println("WARNING: Parsed data (pdbidchain, sseA, sseB, numBB, numCB, numBC, numCC, sr, dd): " + pdbidAndChain + ", " + sseA + ", " + sseB + ", " + numBB + ", " + numBC + ", " + numCB + ", " + numCC + ", " + spatRel + ", " + doubleDif + ".");
+                DP.getInstance().w("Hit malformed SSE contact line in SSE contact file '" + compareSSEContactsFile + "'. Skipping line " + (i + 1) + ".");
+                //DP.getInstance().w("Parsed data (pdbidchain, sseA, sseB, numBB, numCB, numBC, numCC, sr, dd): " + pdbidAndChain + ", " + sseA + ", " + sseB + ", " + numBB + ", " + numBC + ", " + numCB + ", " + numCC + ", " + spatRel + ", " + doubleDif + ".");
                 numIgnored++;
                 continue;
             }

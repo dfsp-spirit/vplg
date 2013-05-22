@@ -8,6 +8,7 @@
 
 package similarity;
 
+import Tools.DP;
 import algorithms.CompatGraphComputation;
 import algorithms.NeedlemanWunsch;
 import algorithms.SmithWaterman;
@@ -118,7 +119,7 @@ public class GraphSimilarity {
         //       to perform clique detection to find common subgraphs first.
         
         if(cg == null) {
-            System.err.println("WARNING: compareByCompatibilityGraph(): CompatGraph is NULL, assuming score 0.");
+            DP.getInstance().w("compareByCompatibilityGraph(): CompatGraph is NULL, assuming score 0.");
             return(0);
         }
         
@@ -157,10 +158,10 @@ public class GraphSimilarity {
                     }                    
                     
                 //} catch (Exception ex) {
-                //    System.err.println("WARNING: Clique detection failed: '" + ex.getMessage() + "'.");
+                //    DP.getInstance().w("Clique detection failed: '" + ex.getMessage() + "'.");
                 //}
             //} catch (Exception e) {
-            //    System.err.println("WARNING: Could not start clique detection, could not create SSEGraph: '" + e.getMessage() + "'.");
+            //    DP.getInstance().w("Could not start clique detection, could not create SSEGraph: '" + e.getMessage() + "'.");
             //}                                                
         }        
         

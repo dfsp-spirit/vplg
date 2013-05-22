@@ -7,6 +7,8 @@
  */
 package Tools;
 
+import plcc.Settings;
+
 /**
  * A debug printer. This is a singleton.
  * @author ts
@@ -31,7 +33,16 @@ public class DP {
     }
     
     public void w(String msg) {
-        System.err.println("[WARNING] " + msg);
+        Boolean doWarn = true;
+        try {
+            doWarn = Settings.getBoolean("plcc_B_no_warn");
+        } catch(Exception e) {
+            // the settings have not been inited yet, so assume that we should warn
+            //System.err.println("WARNING: No settings yet.");
+        }
+        if(doWarn) {
+            System.err.println("[WARNING] " + msg);
+        }
     }
     
     public void e(String msg) {
