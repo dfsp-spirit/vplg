@@ -467,10 +467,12 @@ public class HtmlGenerator {
         sb.append(HtmlGenerator.generateTopPageTitle("VPLGweb Visualization"));
         
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_SEARCH));                
+        sb.append(HtmlTools.startParagraph());                
         sb.append("This page visualizes proteins using ");
         sb.append(HtmlTools.linkBlank("http://www.jmol.org", "Jmol/JSmol")); 
         sb.append(". "
                 + "It requires a modern browser (HTML 5 support) with JavaScript enabled.");
+        sb.append(HtmlTools.endParagraph());                
         sb.append(HtmlTools.endDiv());  // search     
         
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
@@ -480,6 +482,15 @@ public class HtmlGenerator {
         // TODO: fix me
         //sb.append(HtmlGenerator.jsFunctionJmolPdb("7tim"));
             
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
+        
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_SEARCH));   
+        sb.append(HtmlTools.startParagraph());                
+        sb.append("You can interact with the structure in 3D using your mouse. Use the context menu (right mouse button) to customize the viewer.\n");
+        sb.append(HtmlTools.endParagraph());                
+        sb.append(HtmlTools.endDiv());  // search     
+        
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
         
         // ------------- body -- footer ---------------
@@ -1211,49 +1222,67 @@ public class HtmlGenerator {
         
         // test
         sb.append("var pdb = getParameterByName('pdb');\n");
-        sb.append("document.write('<p>pdb= ' + pdb + '</p>');\n");
+        //sb.append("document.write('<p>pdb= ' + pdb + '</p>');\n");
         sb.append("var loadModel=\":caffeine\"\n");
         sb.append("if(pdb != \"\") {\n");
         sb.append("  loadModel=\"=\" + pdb;\n");
         sb.append("}\n");        
+        sb.append("else {\n");
+        sb.append("  document.write('<div class=\"searchform\">');\n");
+        sb.append("  document.write('<p>Use the controls below to load a structure of your choice.</p>');\n");        
+        sb.append("  document.write('</div>');\n");
+        sb.append("  document.write('<br/><br/>');\n");
+        sb.append("}\n");
+        sb.append("\n");
+        
         
         // for Java plugin version
         sb.append("var InfoJavaPlugin = {\n");
-        sb.append("addSelectionOptions: true,\n");
-        sb.append("color: \"#FFFFFF\",\n");
-        sb.append("debug: false,\n");
-        sb.append("defaultModel: loadModel,\n");
-        sb.append("width: 600,\n");
-        sb.append("height: 400,\n");
-        sb.append("isSigned: false,             // Java only\n");
-        sb.append("jarFile: \"jsmol/JmolApplet0.jar\",  // Java only\n");
-        sb.append("jarPath: \"./jsmol\",                // Java only\n");
-        sb.append("memoryLimit: 128,            // Java only\n");
-        sb.append("readyFunction: null,\n");
-        sb.append("script: null,\n");
-        //sb.append("serverURL: \"http://chemapps.stolaf.edu/jmol/jsmol/jsmol.php\",  // Example only!\n");
-        sb.append("serverURL: \"http://rcmd.org/vplgweb/jsmol/jsmol.php\",\n");
-        sb.append("src: null,\n");
-        sb.append("use: \"Java noWebGL noHTML5 noImage\"\n");        
+        sb.append("  addSelectionOptions: true,\n");
+        sb.append("  color: \"#FFFFFF\",\n");
+        sb.append("  debug: false,\n");
+        sb.append("  defaultModel: loadModel,\n");
+        sb.append("  width: 600,\n");
+        sb.append("  height: 400,\n");
+        sb.append("  isSigned: false,             // Java only\n");
+        sb.append("  jarFile: \"jsmol/JmolApplet0.jar\",  // Java only\n");
+        sb.append("  jarPath: \"./jsmol\",                // Java only\n");
+        sb.append("  memoryLimit: 128,            // Java only\n");
+        sb.append("  readyFunction: null,\n");
+        sb.append("  script: null,\n");
+        sb.append("  serverURL: \"http://rcmd.org/vplgweb/jsmol/jsmol.php\",\n");
+        sb.append("  src: null,\n");
+        sb.append("  use: \"Java noWebGL noHTML5 noImage\"\n");        
         sb.append("};	 \n");
+        sb.append("\n");
         
         // for HTML5 version
         sb.append("var InfoHTML5 = {\n");
-        sb.append("addSelectionOptions: true,\n");
-        sb.append("color: \"#FFFFFF\",\n");
-        sb.append("debug: false,\n");
-        sb.append("defaultModel: loadModel,\n");
-        sb.append("width: 600,\n");
-        sb.append("height: 400,\n");
-        sb.append("j2sPath: \"jsmol/j2s\",              // HTML5 only\n");
-        sb.append("readyFunction: null,\n");
-        sb.append("script: null,\n");
-        //sb.append("serverURL: \"http://chemapps.stolaf.edu/jmol/jsmol/jsmol.php\",  // Example only!\n");
-        sb.append("serverURL: \"http://rcmd.org/vplgweb/jsmol/jsmol.php\",\n");
-        sb.append("src: null,\n");
-        sb.append("use: \"HTML5 Image\"\n");        
+        sb.append("  addSelectionOptions: true,\n");
+        sb.append("  color: \"#FFFFFF\",\n");
+        sb.append("  debug: false,\n");
+        sb.append("  defaultModel: loadModel,\n");
+        sb.append("  width: 600,\n");
+        sb.append("  height: 400,\n");
+        sb.append("  j2sPath: \"jsmol/j2s\",              // HTML5 only\n");
+        sb.append("  readyFunction: null,\n");
+        sb.append("  script: null,\n");
+        sb.append("  serverURL: \"http://rcmd.org/vplgweb/jsmol/jsmol.php\",\n");
+        sb.append("  src: null,\n");
+        sb.append("  use: \"HTML5 Image\"\n");        
         sb.append("};	 \n");
+        sb.append("\n");
         
+        // set CSS stuff for appearance
+        sb.append("Jmol.setButtonCss(null, \"style='width:160px;font-family:Arial,sans-serif;'\");\n");
+        sb.append("Jmol.setAppletCss(null, \"style='font-family:Arial,sans-serif;'\");\n");
+        sb.append("Jmol.setCheckboxCss(null, \"style='font-family:Arial,sans-serif;'\");\n");
+        sb.append("Jmol.setLinkCss(null, \"style='font-family:Arial,sans-serif;'\");\n");
+        sb.append("Jmol.setMenuCss(null, \"style='font-family:Arial,sans-serif;'\");\n");
+        sb.append("Jmol.setRadioCss(null, \"style='font-family:Arial,sans-serif;'\");\n");
+        sb.append("\n");
+        
+        // go
         sb.append("Jmol.getApplet(\"myJmol\", InfoHTML5)\n");
         //sb.append("Jmol.getApplet(\"myJmol\", InfoJavaPlugin)\n");        
         
