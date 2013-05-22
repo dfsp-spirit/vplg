@@ -156,7 +156,8 @@ public class Settings {
         //  used automatically though, it's just a reminder.
 
         // Output and performance
-        defSet("plcc_I_debug_level", "0", "Debug level");
+        defSet("plcc_B_no_warn", "0", "Whether to suppress all warnings. The default is to print them.");
+        defSet("plcc_I_debug_level", "0", "Debug level. Higher value means more output.");
         defSet("plcc_B_debug_compareSSEContacts", "false", "Whether to compare the computed SSE level contacts to those in the geom_neo output file that is supplied.");
         defSet("plcc_S_debug_compareSSEContactsFile", "geo.dat_ptgl", "The path to the geo.dat file to use for SSE level contact comparison.");                
         defSet("plcc_B_contact_debug_dysfunct", "false", "Atom level contact debugging mode. WARNING: When this is true, plcc will abort after the first few residues and produce wrong overall results!");
