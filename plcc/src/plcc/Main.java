@@ -292,8 +292,13 @@ public class Main {
                     
                     if(s.equals("-C") || s.equals("--create-config")) {
                         // The config file has already been created before parsing the command line if it did not exist, so we just do nothing here.
+                        // We intentionally keep this option so we do not need to run other commands to get a config.
                         System.out.println("Tried to create PLCC config file at '" + Settings.getDefaultConfigFilePath() + "' (see above). Exiting.");
                         System.exit(0);
+                    }
+                    
+                    if(s.equals("-N") || s.equals("--no-warn")) {
+                        Settings.set("plcc_B_no_warn", "true");
                     }
                     
                     
@@ -3500,6 +3505,7 @@ public class Main {
         System.out.println("-m | --image-format <f>    : write output images in format <f>, which can be 'PNG' or 'JPG' (SVG vector format is always written).");
         System.out.println("-M | --similar <p> <c> <g> : find the proteins which are most similar to pdbid <p> chain <c> graph type <g> in the database.");
         System.out.println("-n | --textfiles           : write meta data, debug info and interim results like residue contacts to text files (slower)");
+        System.out.println("-N | --no-warn             : do not print any warnings (intended for cluster use to reduce job output in logs).");
         System.out.println("-o | --outputdir <dir>     : write output files to directory <dir> (instead of '.', the current directory)");
         System.out.println("-O | --outputformats <list>: write only graph output formats in <list>, where g=GML, t=TGF, d=DOT language, e=Kavosh edge list, p=PLCC. Specify 'x' for none.");
         System.out.println("-p | --pdbfile <pdbfile>   : use input PDB file <pdbfile> (instead of assuming '<pdbid>.pdb')");

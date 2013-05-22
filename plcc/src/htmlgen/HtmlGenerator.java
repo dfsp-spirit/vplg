@@ -1212,9 +1212,10 @@ public class HtmlGenerator {
         // test
         sb.append("var pdb = getParameterByName('pdb');\n");
         sb.append("document.write('<p>pdb= ' + pdb + '</p>');\n");
-        
-        //sb.append("var loadModel=\":caffeine\"\n");
-        sb.append("var loadModel=\"=\" + pdb;\n");
+        sb.append("var loadModel=\":caffeine\"\n");
+        sb.append("if(pdb != \"\") {\n");
+        sb.append("  loadModel=\"=\" + pdb;\n");
+        sb.append("}\n");        
         
         // for Java plugin version
         sb.append("var InfoJavaPlugin = {\n");
