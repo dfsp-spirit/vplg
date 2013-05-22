@@ -1214,14 +1214,14 @@ public class HtmlGenerator {
         sb.append("document.write('<p>pdb= ' + pdb + '</p>');\n");
         
         //sb.append("var loadModel=\":caffeine\"\n");
-        //sb.append("var loadModel=\"=\" + pdb;\n");
+        sb.append("var loadModel=\"=\" + pdb;\n");
         
         // for Java plugin version
         sb.append("var InfoJavaPlugin = {\n");
         sb.append("addSelectionOptions: true,\n");
         sb.append("color: \"#FFFFFF\",\n");
         sb.append("debug: false,\n");
-        sb.append("defaultModel: \":caffeine\",\n");
+        sb.append("defaultModel: loadModel,\n");
         sb.append("width: 600,\n");
         sb.append("height: 400,\n");
         sb.append("isSigned: false,             // Java only\n");
@@ -1241,7 +1241,7 @@ public class HtmlGenerator {
         sb.append("addSelectionOptions: true,\n");
         sb.append("color: \"#FFFFFF\",\n");
         sb.append("debug: false,\n");
-        sb.append("defaultModel: \":caffeine\",\n");
+        sb.append("defaultModel: loadModel,\n");
         sb.append("width: 600,\n");
         sb.append("height: 400,\n");
         sb.append("j2sPath: \"jsmol/j2s\",              // HTML5 only\n");
