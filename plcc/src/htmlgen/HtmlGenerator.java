@@ -110,7 +110,7 @@ public class HtmlGenerator {
             System.err.println("ERROR: Could not write VPLGweb find website to " + new File(findWebsitePhpFile).getAbsolutePath() + ".");
         }
         
-        if(IO.stringToTextFile(visualizeWebsiteHtmlFile, this.generateJmolWebpage("."))) {
+        if(IO.stringToTextFile(visualizeWebsiteHtmlFile, this.generateVisualize3DWebpage("."))) {
             System.out.println("   Wrote VPLGweb visualization website to " + new File(visualizeWebsiteHtmlFile).getAbsolutePath() + ".");
         } else {
             System.err.println("ERROR: Could not write VPLGweb visualization website to " + new File(visualizeWebsiteHtmlFile).getAbsolutePath() + ".");
@@ -453,7 +453,7 @@ public class HtmlGenerator {
         return sb.toString();
     }
     
-    public String generateJmolWebpage(String pathToBaseDir) {
+    public String generateVisualize3DWebpage(String pathToBaseDir) {
         String fs = File.separator;
         String webFs = "/";
         StringBuilder sb = new StringBuilder();
@@ -467,7 +467,10 @@ public class HtmlGenerator {
         sb.append(HtmlGenerator.generateTopPageTitle("VPLGweb Visualization"));
         
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_SEARCH));                
-        sb.append("This page can be used to visualize a protein using Jmol/JSmol. It requires JS and either HTML5 or the Java browser plugin.");
+        sb.append("This page visualizes proteins using ");
+        sb.append(HtmlTools.linkBlank("http://www.jmol.org", "Jmol/JSmol")); 
+        sb.append(". "
+                + "It requires a modern browser (HTML 5 support) with JavaScript enabled.");
         sb.append(HtmlTools.endDiv());  // search     
         
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
@@ -1206,45 +1209,56 @@ public class HtmlGenerator {
         sb.append("<script language=\"JavaScript\" type=\"text/javascript\">\n");
         sb.append("<!--\n");   
         
+        // test
+        sb.append("var pdb = getParameterByName('pdb');\n");
+        sb.append("document.write('<p>pdb= ' + pdb + '</p>');\n");
+        
+        //sb.append("var loadModel=\":caffeine\"\n");
+        //sb.append("var loadModel=\"=\" + pdb;\n");
+        
         // for Java plugin version
         sb.append("var InfoJavaPlugin = {\n");
-        sb.append("addSelectionOptions: false,\n");
+        sb.append("addSelectionOptions: true,\n");
         sb.append("color: \"#FFFFFF\",\n");
         sb.append("debug: false,\n");
         sb.append("defaultModel: \":caffeine\",\n");
-        sb.append("height: 300,\n");
+        sb.append("width: 600,\n");
+        sb.append("height: 400,\n");
         sb.append("isSigned: false,             // Java only\n");
         sb.append("jarFile: \"jsmol/JmolApplet0.jar\",  // Java only\n");
         sb.append("jarPath: \"./jsmol\",                // Java only\n");
-        sb.append("memoryLimit: 512,            // Java only\n");
+        sb.append("memoryLimit: 128,            // Java only\n");
         sb.append("readyFunction: null,\n");
         sb.append("script: null,\n");
         //sb.append("serverURL: \"http://chemapps.stolaf.edu/jmol/jsmol/jsmol.php\",  // Example only!\n");
         sb.append("serverURL: \"http://rcmd.org/vplgweb/jsmol/jsmol.php\",\n");
         sb.append("src: null,\n");
-        sb.append("use: \"Java noWebGL noHTML5 noImage\",\n");
-        sb.append("width: 300\n");
+        sb.append("use: \"Java noWebGL noHTML5 noImage\"\n");        
         sb.append("};	 \n");
         
         // for HTML5 version
         sb.append("var InfoHTML5 = {\n");
-        sb.append("addSelectionOptions: false,\n");
+        sb.append("addSelectionOptions: true,\n");
         sb.append("color: \"#FFFFFF\",\n");
         sb.append("debug: false,\n");
         sb.append("defaultModel: \":caffeine\",\n");
-        sb.append("height: 300,\n");
+        sb.append("width: 600,\n");
+        sb.append("height: 400,\n");
         sb.append("j2sPath: \"jsmol/j2s\",              // HTML5 only\n");
         sb.append("readyFunction: null,\n");
         sb.append("script: null,\n");
         //sb.append("serverURL: \"http://chemapps.stolaf.edu/jmol/jsmol/jsmol.php\",  // Example only!\n");
         sb.append("serverURL: \"http://rcmd.org/vplgweb/jsmol/jsmol.php\",\n");
         sb.append("src: null,\n");
-        sb.append("use: \"HTML5 Image\",\n");
-        sb.append("width: 300\n");
+        sb.append("use: \"HTML5 Image\"\n");        
         sb.append("};	 \n");
-
+        
         sb.append("Jmol.getApplet(\"myJmol\", InfoHTML5)\n");
-        //sb.append("Jmol.getApplet(\"myJmol\", InfoJavaPlugin)\n");
+        //sb.append("Jmol.getApplet(\"myJmol\", InfoJavaPlugin)\n");        
+        
+        // add controls
+        sb.append("Jmol.jmolCheckbox(myJmol,\"spacefill on\",\"spacefill off\",\"toggle display as spheres\");\n");
+        
         sb.append("// -->\n");
         sb.append("</script>\n");
         return sb.toString();
@@ -1306,6 +1320,22 @@ public class HtmlGenerator {
         return sb.toString();
     }
     
+    public static String jsFunctionGetQueryVariable() {
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("<script language=\"JavaScript\" type=\"text/javascript\">\n");
+        sb.append("<!--\n");                
+        sb.append("function getParameterByName(name) {\n");
+        sb.append("name = name.replace(/[\\[]/, \"\\\\\\[\").replace(/[\\]]/, \"\\\\\\]\");\n");
+        sb.append("var regex = new RegExp(\"[\\\\?&]\" + name + \"=([^&#]*)\"),\n");
+        sb.append("results = regex.exec(location.search);\n");
+        sb.append("return results == null ? \"\" : decodeURIComponent(results[1].replace(/\\+/g, \" \"));\n");
+        sb.append("}\n");
+        sb.append("// -->\n");
+        sb.append("</script>\n");
+        return sb.toString();
+    }
+    
     public static String generateTopPageTitle(String t) {
         return "<h1 align=\"center\">" + t + "</h1>\n";
     }
@@ -1339,6 +1369,7 @@ public class HtmlGenerator {
         StringBuilder sb = new StringBuilder();
         sb.append(HtmlGenerator.jsFunctionSwitchStyleSheet());
         sb.append(HtmlGenerator.jsFunctionPopupWindow("VPLGweb popup"));
+        sb.append(HtmlGenerator.jsFunctionGetQueryVariable());
         return sb.toString();
     }
 
