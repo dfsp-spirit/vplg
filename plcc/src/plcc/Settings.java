@@ -282,6 +282,8 @@ public class Settings {
         defSet("plcc_B_SSEcontactsAtom", "true", "Defines the contact level used to determine SSE contacts. If set to true, the number of atom level. contacts decides whether an SSE contact exists. If set to false, the residue level contacts are used instead.");
         defSet("plcc_I_max_contacts_per_type", "100", "The maximum number of contacts of a certain type that is counted for a residue pair. Simply set it to something very large if you don't want any limit (Integer.MAX_VALUE comes to mind). The PTGL uses a setting of 1 (so if a pair has 3 B/B cotacts and 2 C/B contacts, it is is counted as 1 B/B and 1 C/B.)");
         defSet("plcc_B_forceBackboneContacts", "false", "Whether all amino acids of a protein graph should be connected sequentially, from N to C terminus, with contacts of type backbone.");
+        defSet("plcc_B_skip_too_large", "false", "Whether to abort if the protein has more than 'plcc_I_skip_num_atoms_threshold' atoms.");
+        defSet("plcc_I_skip_num_atoms_threshold", "80000", "The maximal number of atoms per PDB file if 'plcc_B_skip_too_large' is true. In that case, PLCC will abort for PDB files with more atoms (for cluster mode).");
         
         // SSE definitions
         defSet("plcc_I_min_SSE_length", "3", "the minimal length in AAs a non-ligand SSE must have to be considered (PTGL-style filtering of very short SSEs)");

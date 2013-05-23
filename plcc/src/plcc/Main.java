@@ -230,6 +230,24 @@ public class Main {
                         }
                     }
                     
+                    if(s.equals("-Y") || s.equals("--skip-vast")) {
+                        if(args.length <= i+1 ) {
+                            syntaxError();
+                        }
+                        else {
+                            
+                            try {
+                                int tmp = Integer.parseInt(args[i+1]);
+                            } catch(Exception e) {
+                                syntaxError();
+                            }
+                            Settings.set("plcc_B_skip_too_large", "true");
+                            Settings.set("plcc_I_skip_num_atoms_threshold", args[i+1]);
+                        }
+                    }
+                    
+                            
+                    
                     if(s.equals("--gz-dsspfile")) {
                         if(args.length <= i+1 ) {
                             syntaxError();
@@ -941,6 +959,16 @@ public class Main {
         residues = FileParser.getResidues();
         atoms = FileParser.getAtoms();
         sulfurBridges = FileParser.getSulfurBridges();
+        
+        if(Settings.getBoolean("plcc_B_skip_too_large")) {
+            if(atoms.size() > Settings.getInteger("plcc_I_skip_num_atoms_threshold")) {
+                System.out.println("===== Terminating. =====");
+                System.out.println("Maximal number of atoms allowed in PDB file is set to " + Settings.getInteger("plcc_I_skip_num_atoms_threshold") + " and PDB " + pdbid + " contains " + atoms.size() + ".");
+                System.out.println("Set 'plcc_B_skip_too_large' to false in settings to avoid this. Exiting.");
+                System.exit(0);
+            }
+        }
+        
         
         String sBondString;
         if(sulfurBridges.size() > 0) {
@@ -3529,6 +3557,7 @@ public class Main {
         //System.out.println("-x | --check-rescts <f>    : compare the computed residue level contacts to those in geom_neo format file <f> and print differences");
         //System.out.println("-X | --check-ssects <f>    : compare the computed SSE level contacts to those in bet_neo format file <f> and print differences");
         //System.out.println("-y | --write-geodat        : write the computed SSE level contacts in geo.dat format to a file (file name: <pdbid>_<chain>.geodat)");        
+        System.out.println("-Y | --skip-vast <atoms>   : abort program execution for PDB files with more than <atoms> atoms before contact computation (for cluster mode, try 80000).");        
         System.out.println("-z | --ramaplot            : draw a ramachandran plot of each chain to the file '<pdbid>_<chain>_plot.svg'");        
         System.out.println("-Z | --silent              : silent mode. do not write output to STDOUT.");        
         System.out.println("");

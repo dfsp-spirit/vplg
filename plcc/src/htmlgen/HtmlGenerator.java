@@ -501,8 +501,6 @@ public class HtmlGenerator {
         sb.append(HtmlTools.startParagraph());                        
         
         sb.append(HtmlGenerator.jsFunctionJSmolInit(pathToBaseDir + webFs + "jsmol"));
-        // TODO: fix me
-        //sb.append(HtmlGenerator.jsFunctionJmolPdb("7tim"));
         sb.append(HtmlTools.endParagraph());                
         sb.append(HtmlTools.endDiv());  // appletarea
             
