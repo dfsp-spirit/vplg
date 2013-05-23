@@ -1341,8 +1341,9 @@ public class HtmlGenerator {
         //sb.append("Jmol.jmolBr();");
         //sb.append("Jmol.jmolCheckbox(myJmol,\"spacefill on\",\"spacefill off\",\"Toggle display as spheres\");\n");
         sb.append("Jmol.jmolBr();\n");
-        sb.append("Jmol.jmolCommandInput(\"myJmol\", \"Execute Jmol command\", \"80%\", \"jmol_cmd\", \"Jmol command prompt\")\n");
-        sb.append("document.write('<p class=\"tiny\">Selection examples: Try \"display :A\" to show obly chain A, \"display [ALA]\" to show only alanine residues and \"display *\" to reset.<br/>Rendering examples: Try \"spacefill 100%\" for space-filling, \"wireframe 0.15; spacefill 20%;\" for Ball-and-stick, \"wireframe 0.0; spacefill 0%;\" to reset.<br/>See the Jmol documentation for more info.</p>');\n");        
+        sb.append("document.write('<p class=\"tiny\">Jmol interactive scripting window:</p>');\n");        
+        sb.append("Jmol.jmolCommandInput(\"myJmol\", \"Execute Jmol command\", \"90%\", \"jmol_cmd\", \"Jmol command prompt\")\n");
+        sb.append("document.write('<p class=\"tiny\">Selection examples: Try \"display :A\" to show only chain A, \"display [ALA]\" to show only alanine residues and \"display *\" to reset.<br/>Rendering examples: Try \"spacefill 100%\" for space-filling, \"wireframe 0.15; spacefill 20%;\" for Ball-and-stick, \"wireframe 0.0; spacefill 0%;\" to reset. See the <a href=\"http://www.jmol.org\" target=\"_blank\">Jmol documentation</a> for more info.</p>');\n");        
         sb.append("// -->\n");
         sb.append("</script>\n");
         return sb.toString();
