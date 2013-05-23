@@ -70,6 +70,7 @@ public class HtmlGenerator {
     public static final String DIV_FOLDING_GRAPH = "folding_graph";
     public static final String DIV_INTRO = "intro";
     public static final String DIV_SEARCH = "searchform";
+    public static final String DIV_APPLETAREA = "appletarea";
     
 
     /**
@@ -470,23 +471,40 @@ public class HtmlGenerator {
         sb.append(HtmlTools.startParagraph());                
         sb.append("This page visualizes proteins using ");
         sb.append(HtmlTools.linkBlank("http://www.jmol.org", "Jmol/JSmol")); 
-        sb.append(". "
-                + "It requires a modern browser (HTML 5 support) with JavaScript enabled.");
+        sb.append(". ");        
+        sb.append(HtmlTools.endParagraph());                
+        sb.append(HtmlTools.startParagraph("tiny"));    
+        sb.append(HtmlTools.bold("Technical information: "));
+        sb.append("The visualization requires a modern browser with JavaScript enabled. The default is to load the recommended ");
+        sb.append(HtmlTools.link("./visualize.html?version=html5", "HTML 5 version"));
+        sb.append(", but you can also use the ");
+        sb.append(HtmlTools.link("./visualize.html?version=java", "Java plugin version"));
+        sb.append(" if you have the Java Web Plugin installed and activated in your browser.");
+        sb.append(HtmlTools.brAndNewline());                
+        sb.append(HtmlTools.brAndNewline());
+        
         sb.append(HtmlTools.endParagraph());                
         sb.append(HtmlTools.endDiv());  // search     
         
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
-        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline()); 
+        
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_APPLETAREA));                
+        sb.append(HtmlTools.startParagraph());                        
         
         sb.append(HtmlGenerator.jsFunctionJSmolInit(pathToBaseDir + webFs + "jsmol"));
         // TODO: fix me
         //sb.append(HtmlGenerator.jsFunctionJmolPdb("7tim"));
+        sb.append(HtmlTools.endParagraph());                
+        sb.append(HtmlTools.endDiv());  // appletarea
             
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline()); 
         
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_SEARCH));   
-        sb.append(HtmlTools.startParagraph());                
-        sb.append("You can interact with the structure in 3D using your mouse. Use the context menu (right mouse button) to customize the viewer.\n");
+        sb.append(HtmlTools.startParagraph());     
+        sb.append("You can use the controls to load a structure of your choice. ");
+        sb.append("Interact with the structure in 3D using your mouse. Use the context menu (right mouse button) to customize the viewer.\n");
         sb.append(HtmlTools.endParagraph());                
         sb.append(HtmlTools.endDiv());  // search     
         
@@ -1221,20 +1239,30 @@ public class HtmlGenerator {
         sb.append("<!--\n");   
         
         // test
-        sb.append("var pdb = getParameterByName('pdb');\n");
+        sb.append("var pdb = getParameterByName('pdb');\n");        
         //sb.append("document.write('<p>pdb= ' + pdb + '</p>');\n");
         sb.append("var loadModel=\":caffeine\"\n");
         sb.append("if(pdb != \"\") {\n");
-        sb.append("  loadModel=\"=\" + pdb;\n");
+        sb.append("  if(pdb.length == 4) {\n");
+        sb.append("    if(pdb.match(/^[0-9a-z]+$/)) {\n");
+        sb.append("      loadModel=\"=\" + pdb;\n");
+        sb.append("    }\n");        
+        sb.append("  }\n");                        
         sb.append("}\n");        
-        sb.append("else {\n");
-        sb.append("  document.write('<div class=\"searchform\">');\n");
-        sb.append("  document.write('<p>Use the controls below to load a structure of your choice.</p>');\n");        
-        sb.append("  document.write('</div>');\n");
-        sb.append("  document.write('<br/><br/>');\n");
-        sb.append("}\n");
+        //sb.append("else {\n");
+        //sb.append("  document.write('<div class=\"searchform\">');\n");
+        //sb.append("  document.write('<p>Use the controls below to load a structure of your choice.</p>');\n");        
+        //sb.append("  document.write('</div>');\n");
+        //sb.append("  document.write('<br/><br/>');\n");
+        //sb.append("}\n");
         sb.append("\n");
         
+        sb.append("var version = getParameterByName('version');\n");
+        sb.append("if(version == \"\") {\n");
+        sb.append("  version = \"html5\";\n");    // possible values: 'java' for java plugin, everything else is considered html5
+        sb.append("}\n");        
+        
+        sb.append("\n");
         
         // for Java plugin version
         sb.append("var InfoJavaPlugin = {\n");
@@ -1243,7 +1271,7 @@ public class HtmlGenerator {
         sb.append("  debug: false,\n");
         sb.append("  defaultModel: loadModel,\n");
         sb.append("  width: 600,\n");
-        sb.append("  height: 400,\n");
+        sb.append("  height: 600,\n");
         sb.append("  isSigned: false,             // Java only\n");
         sb.append("  jarFile: \"jsmol/JmolApplet0.jar\",  // Java only\n");
         sb.append("  jarPath: \"./jsmol\",                // Java only\n");
@@ -1263,7 +1291,7 @@ public class HtmlGenerator {
         sb.append("  debug: false,\n");
         sb.append("  defaultModel: loadModel,\n");
         sb.append("  width: 600,\n");
-        sb.append("  height: 400,\n");
+        sb.append("  height: 600,\n");
         sb.append("  j2sPath: \"jsmol/j2s\",              // HTML5 only\n");
         sb.append("  readyFunction: null,\n");
         sb.append("  script: null,\n");
@@ -1274,8 +1302,8 @@ public class HtmlGenerator {
         sb.append("\n");
         
         // set CSS stuff for appearance
-        sb.append("Jmol.setButtonCss(null, \"style='width:160px;font-family:Arial,sans-serif;'\");\n");
-        sb.append("Jmol.setAppletCss(null, \"style='font-family:Arial,sans-serif;'\");\n");
+        sb.append("Jmol.setButtonCss(null, \"style='font-family:Arial,sans-serif;'\");\n");
+        sb.append("Jmol.setAppletCss(null, \"style='font-family:Arial,sans-serif;margin-left=100px;'\");\n");
         sb.append("Jmol.setCheckboxCss(null, \"style='font-family:Arial,sans-serif;'\");\n");
         sb.append("Jmol.setLinkCss(null, \"style='font-family:Arial,sans-serif;'\");\n");
         sb.append("Jmol.setMenuCss(null, \"style='font-family:Arial,sans-serif;'\");\n");
@@ -1283,11 +1311,15 @@ public class HtmlGenerator {
         sb.append("\n");
         
         // go
-        sb.append("Jmol.getApplet(\"myJmol\", InfoHTML5)\n");
-        //sb.append("Jmol.getApplet(\"myJmol\", InfoJavaPlugin)\n");        
+        sb.append("if(version == \"java\") {\n");
+        sb.append("Jmol.getApplet(\"myJmol\", InfoJavaPlugin)\n");        
+        sb.append("}\n");        
+        sb.append("else {\n");        
+        sb.append("  Jmol.getApplet(\"myJmol\", InfoHTML5)\n");
+        sb.append("}\n");                       
         
-        // add controls
-        sb.append("Jmol.jmolCheckbox(myJmol,\"spacefill on\",\"spacefill off\",\"toggle display as spheres\");\n");
+        // add customized controls
+        //sb.append("Jmol.jmolCheckbox(myJmol,\"spacefill on\",\"spacefill off\",\"Toggle display as spheres\");\n");
         
         sb.append("// -->\n");
         sb.append("</script>\n");

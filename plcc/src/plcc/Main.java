@@ -118,8 +118,8 @@ public class Main {
         if( ! libDir.exists()) {
             DP.getInstance().w("Library directory '" + libDir.toString() + "' not found. Libraries missing, will crash if functionality of them is required during this run.");
             DP.getInstance().w("Was this program executed from its installation directory? If not you need to copy the lib/ directory to the working directory.");
-            System.err.println("INFO: The Java library path is set to: '" + System.getProperty("java.library.path") + "'.");
-            System.err.println("INFO: The Java classloader path is set to: '" + System.getProperty("java.class.path") + "'.");
+            DP.getInstance().w("INFO: The Java library path is set to: '" + System.getProperty("java.library.path") + "'.");
+            DP.getInstance().w("INFO: The Java classloader path is set to: '" + System.getProperty("java.class.path") + "'.");
         }
 
         if(Settings.load("")) {             // Empty string means that the default file of the Settings class is used

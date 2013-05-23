@@ -97,6 +97,7 @@ public class CssGenerator {
         //sb.append(".navigation {margin-left: 0px; -moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color:" + colorSections + ";padding: 20px 20px;width:45%;float:right;}");
         sb.append(".chain {-moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color:").append(colorSections).append(";padding: 20px 20px; }");
         sb.append(".searchform {-moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color:").append(colorSections).append(";padding: 20px 20px; }");
+        sb.append(".appletarea {-moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color:").append("white").append(";padding: 20px 20px; }");
         sb.append(".chains {-moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color:").append(colorSections).append(";padding: 20px 20px;}");
         sb.append(".protein_links {-moz-border-radius: 15px;-webkit-border-radius: 15px;border-radius: 15px;background-color:").append(colorSections).append(";padding: 20px 20px;}");
         sb.append("ul { font-size:10pt; font-family:Arial,sans-serif; color:").append(colorFont).append(" }\n");
@@ -107,6 +108,11 @@ public class CssGenerator {
         sb.append("p.top { font-size:10pt; font-family:Arial,sans-serif; color:").append(colorFont).append("; text-decoration:underline }\n");
         sb.append("p.big { font-size:14pt; font-family:Arial,sans-serif; color:").append(colorFont).append(" }\n");
         sb.append("p.tiny { font-size:7pt; font-family:Arial,sans-serif; color:").append(colorFont).append(" }\n");
+        sb.append("p.tiny a:link {font-size:7pt;font-family:Arial,sans-serif;color:").append(colorLinks).append(";text-decoration:none}\n");        
+        sb.append("p.tiny a:visited { font-size:7pt; color:").append(colorLinks).append("; text-decoration:none }\n");
+        sb.append("p.tiny a:hover { font-size:7pt; color:").append(colorLinksActive).append("; text-decoration:none }\n");
+        sb.append("p.tiny a:active { font-size:7pt; color:").append(colorLinksActive).append("; text-decoration:none }\n");
+        sb.append("p.tiny a:focus { font-size:7pt;color:").append(colorLinks).append("; text-decoration:none }\n");
         sb.append("p.tinycenter { text-align: center; font-size:7pt; font-family:Arial,sans-serif; color:").append(colorFont).append(" }\n");                
         sb.append("div.footer { font-size:7pt; font-family:Arial,sans-serif; color:").append(colorFont).append(" }\n");
         sb.append(".footer p { font-size:7pt; font-family:Arial,sans-serif; color:").append(colorFont).append(" }\n");
@@ -156,6 +162,13 @@ public class CssGenerator {
         sb.append("input.button {font-size: 10px;padding: 5px;margin: 5px;margin-left:10px;}\n");
         sb.append("input {font-size: 10px; font-family:Arial,sans-serif;}\n");
         sb.append("input {-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;}\n");
+        // applet area
+        sb.append(".appletarea form    {font-family:Arial,sans-serif;font-size: 10px;font-weight: bold;text-decoration: none;-webkit-border-radius: 10px;-moz-border-radius: 10px;border-radius: 10px;padding:10px;border: 1px solid #999}\n");
+        sb.append(".appletarea button {font-family:Arial,sans-serif;padding: 5px;margin: 5px;margin-left:10px;}\n");
+        sb.append(".appletarea input.button {font-size: 10px;padding: 5px;margin: 5px;margin-left:10px;}\n");
+        sb.append(".appletarea input {font-size: 10px; font-family:Arial,sans-serif;}\n");
+        sb.append(".appletarea input {-webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;}\n");
+        // headers
         sb.append("h1 { color: ").append(colorFontHeader).append(";font-family: sans-serif;}\n");
         sb.append("h2 { color: ").append(colorFontHeader).append(";font-family: sans-serif;}\n");
         sb.append("h3 { color: ").append(colorFontHeader).append(";font-family: sans-serif;}\n");
