@@ -204,6 +204,11 @@ ERROR_LOG_PLCC="${LOGDIR}/log_plcc_${PDBID}.log"
 ERROR_LOG_GET_PDB_FILE="${LOGDIR}/log_getpdb_${PDBID}.log"
 ERROR_LOG_CREATE_DSSP_FILE="${LOGDIR}/log_createdssp_${PDBID}.log"
 
+DBINSERT_LOG="/dev/null"
+ERROR_LOG_PLCC="/dev/null"
+ERROR_LOG_GET_PDB_FILE="/dev/null"
+ERROR_LOG_CREATE_DSSP_FILE="/dev/null"
+
 for L_LOGFILE in $DBINSERT_LOG $ERROR_LOG_PLCC $ERROR_LOG_GET_PDB_FILE $ERROR_LOG_CREATE_DSSP_FILE
 do
     if [ -f $L_LOGFILE ]; then
@@ -256,8 +261,8 @@ if [ -r $FLN ]; then
 	## Get the PDB file
 	GET_PDB_FILE_COMMAND="$GET_PDB_FILE_SCRIPT $PDBID"
 	echo "$APPTAG $PDBID The command to get the PDB file is '$GET_PDB_FILE_COMMAND'."
-	#$GET_PDB_FILE_COMMAND 1>>$DBINSERT_LOG 2>>$ERROR_LOG_GET_PDB_FILE
-	$GET_PDB_FILE_COMMAND
+	$GET_PDB_FILE_COMMAND 1>>$DBINSERT_LOG 2>>$ERROR_LOG_GET_PDB_FILE
+	#$GET_PDB_FILE_COMMAND
 
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG $PDBID ##### ERROR: Could not get PDB file for protein '$PDBID', skipping protein '$PDBID'."
@@ -280,8 +285,8 @@ if [ -r $FLN ]; then
 	## Now create the DSSP file
 	CREATE_DSSP_COMMAND="$CREATE_DSSP_FILE_SCRIPT $PDBFILE"
 	echo "$APPTAG $PDBID The command to create the DSSP file is '$CREATE_DSSP_COMMAND'."
-	#$CREATE_DSSP_COMMAND 1>>$DBINSERT_LOG 2>>$ERROR_LOG_CREATE_DSSP_FILE
-	$CREATE_DSSP_COMMAND
+	$CREATE_DSSP_COMMAND 1>>$DBINSERT_LOG 2>>$ERROR_LOG_CREATE_DSSP_FILE
+	#$CREATE_DSSP_COMMAND
 
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG $PDBID ##### ERROR: Could not create DSSP file from PDB file '$PDBFILE', skipping protein '$PDBID'."
@@ -307,8 +312,8 @@ if [ -r $FLN ]; then
 	echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'."
 	#echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'." >>$ERROR_LOG
 	echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'." >>$DBINSERT_LOG
-	#$PLCC_COMMAND 1>>$DBINSERT_LOG 2>>$ERROR_LOG_PLCC
-	$PLCC_COMMAND
+	$PLCC_COMMAND 1>>$DBINSERT_LOG 2>>$ERROR_LOG_PLCC
+	#$PLCC_COMMAND
 
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG $PDBID ##### ERROR: Running plcc failed for PDB ID '$PDBID', skipping protein '$PDBID'."
