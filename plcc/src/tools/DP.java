@@ -16,6 +16,14 @@ import plcc.Settings;
 public class DP {
     private static DP instance = null;
     
+    public static final String appTag = "[PLCC] ";
+    
+    public static final String errorTag = "[ERROR] ";
+    public static final String warningTag = "[WARNING] ";
+    public static final String infoTag = "[INFO] ";
+    public static final String debugTag = "[DEBUG] ";
+    public static final String messageTag = "[MSG] ";
+    
     protected DP() {
         // prevent instantiation
     }
@@ -41,24 +49,58 @@ public class DP {
             //System.err.println("WARNING: No settings yet.");
         }
         if(doWarn) {
-            System.err.println("[WARNING] " + msg);
+            System.err.println(DP.appTag + DP.warningTag + msg);
         }
     }
     
+    /**
+     * Prints an error. Newline is added at the end.
+     * @param msg the message to print
+     */
     public void e(String msg) {
-        System.err.println("[ERROR] " + msg);
+        System.err.println(DP.appTag + DP.errorTag + msg);
     }
     
+    
+    /**
+     * Prints a standard output message. Newline is added at the end.
+     * @param msg the message to print
+     */
     public void p(String msg) {
-        System.out.println("[MSG] " + msg);
+        System.out.println(DP.appTag + DP.messageTag + msg);
     }
     
+    /**
+     * Prints a standard output message to STDOUT without adding a newline. No other tags are added.
+     * @param msg the message to print
+     */
+    public void pp(String msg) {
+        System.out.print(msg);
+    }
+    
+    /**
+     * Prints an error message to STDERR without adding a newline. No other tags are added.
+     * @param msg the message to print
+     */
+    public void ee(String msg) {
+        System.err.print(msg);
+    }
+    
+    
+    /**
+     * Prints an info message. Newline is added at the end.
+     * @param msg the message to print
+     */
     public void i(String msg) {
-        System.out.println("[INFO] " + msg);
+        System.out.println(DP.appTag + DP.infoTag + msg);
     }
     
+    /**
+     * Prints a debug message. Newline is added at the end.
+     * @param msg the message to print
+     */
     public void d(String msg) {
-        System.out.println("[DEBUG] " + msg);
+        System.out.println(DP.appTag + DP.debugTag + msg);
     }
     
     
