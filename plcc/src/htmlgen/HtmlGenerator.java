@@ -48,10 +48,17 @@ public class HtmlGenerator {
 
     public String[] getRelativeCssFilePathsFromBasedir() {
         return relativeCssFilePathsFromBasedir;
-    }
+    }        
     
     public String[] getCssTitles() {
         return cssTitles;
+    }
+    
+    public static final String visualizeWebsiteFileNameRelativeToBasedir = "visualize.html";
+    
+    public static String getVisualizeLink(String pathToBaseDir, String pdbid) {
+        String webFs = "/";
+        return HtmlTools.makeWebPath(pathToBaseDir + webFs + HtmlGenerator.visualizeWebsiteFileNameRelativeToBasedir + "?pdb=" + pdbid);
     }
     
     public static final String DIV_MAIN = "main";
@@ -467,7 +474,8 @@ public class HtmlGenerator {
         sb.append(this.generateLogo(pathToBaseDir));
         sb.append(HtmlGenerator.generateTopPageTitle("VPLGweb Visualization"));
         
-        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_SEARCH));                
+        sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_SEARCH));   
+        sb.append(HtmlTools.heading("About the visualization", 2));
         sb.append(HtmlTools.startParagraph());                
         sb.append("This page visualizes proteins using ");
         sb.append(HtmlTools.linkBlank("http://www.jmol.org", "Jmol/JSmol")); 
@@ -502,9 +510,11 @@ public class HtmlGenerator {
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline()); 
         
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_SEARCH));   
-        sb.append(HtmlTools.startParagraph());     
-        sb.append("You can use the controls to load a structure of your choice. ");
-        sb.append("Interact with the structure in 3D using your mouse. Use the context menu (right mouse button) to customize the viewer.\n");
+        sb.append(HtmlTools.heading("Usage help", 2));             
+        sb.append(HtmlTools.startParagraph());             
+        sb.append("Interact with the structure in 3D using the mouse. Use the context menu (right mouse button) to customize the viewer.");
+        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
+        sb.append("You can use the menu to load a structure or small molecule from a database of your choice. Try searching for 'caffeine' in PubChem or NCI. Or search for proteins like '7tim' in the RCSB PDB.");
         sb.append(HtmlTools.endParagraph());                
         sb.append(HtmlTools.endDiv());  // search     
         
@@ -631,7 +641,7 @@ public class HtmlGenerator {
                     sb.append(key).append(": ").append(pr.getProteinMetaData().get(key)).append(HtmlTools.br());
                 }
             }
-            
+            sb.append("3D Visualization: ").append(HtmlTools.linkBlank(HtmlGenerator.getVisualizeLink(pathToBaseDir, pdbid), "Open 3D viewer [new tab]")).append(HtmlTools.brAndNewline());
             sb.append(HtmlTools.endParagraph());
         sb.append(HtmlTools.endDiv());  // protein info
 
