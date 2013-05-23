@@ -158,6 +158,7 @@ public class Settings {
 
         // Output and performance
         defSet("plcc_B_no_warn", "false", "Whether to suppress all warnings. The default is to print them.");
+        defSet("plcc_B_silent", "false", "Whether to suppress all output. Cluster mode, not recommended for normal usage.");
         defSet("plcc_I_debug_level", "0", "Debug level. Higher value means more output.");
         defSet("plcc_B_debug_compareSSEContacts", "false", "Whether to compare the computed SSE level contacts to those in the geom_neo output file that is supplied.");
         defSet("plcc_S_debug_compareSSEContactsFile", "geo.dat_ptgl", "The path to the geo.dat file to use for SSE level contact comparison.");                

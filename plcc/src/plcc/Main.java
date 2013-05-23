@@ -301,6 +301,13 @@ public class Main {
                         Settings.set("plcc_B_no_warn", "true");
                     }
                     
+                    if(s.equals("-Z") || s.equals("--silent")) {
+                        Settings.set("plcc_B_silent", "true");
+                        Settings.set("plcc_B_no_warn", "true");
+                    }
+                    
+                    
+                    
                     
                     if(s.equals("-L") || s.equals("--lig-filter")) {
                         if(args.length <= i+2 ) {
@@ -3523,6 +3530,7 @@ public class Main {
         //System.out.println("-X | --check-ssects <f>    : compare the computed SSE level contacts to those in bet_neo format file <f> and print differences");
         //System.out.println("-y | --write-geodat        : write the computed SSE level contacts in geo.dat format to a file (file name: <pdbid>_<chain>.geodat)");        
         System.out.println("-z | --ramaplot            : draw a ramachandran plot of each chain to the file '<pdbid>_<chain>_plot.svg'");        
+        System.out.println("-Z | --silent              : silent mode. do not write output to STDOUT.");        
         System.out.println("");
         System.out.println("EXAMPLES: java -jar plcc.jar 8icd");
         System.out.println("          java -jar plcc.jar 8icd -D 2 -d /tmp/dssp/8icd.dssp -p /tmp/pdb/8icd.pdb");
