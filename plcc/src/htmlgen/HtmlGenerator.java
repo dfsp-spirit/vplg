@@ -512,8 +512,15 @@ public class HtmlGenerator {
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_SEARCH));   
         sb.append(HtmlTools.heading("Usage help", 2));             
         sb.append(HtmlTools.startParagraph());             
-        sb.append("Interact with the structure in 3D using the mouse. Use the context menu (right mouse button) to customize the viewer.");
-        sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
+        sb.append("Use the context menu (right mouse button) to customize the viewer. Interact with the structure in 3D using the mouse (left mouse button): ");
+        sb.append(HtmlTools.endParagraph());                
+        sb.append(HtmlTools.uListStart());
+        sb.append(HtmlTools.listItem("Rotate around x/y axis: drag"));
+        sb.append(HtmlTools.listItem("Rotate around z axis: SHIFT + drag horizontally"));        
+        sb.append(HtmlTools.listItem("Zoom in and out: SHIFT + drag vertically"));
+        sb.append(HtmlTools.listItem("Translate: SHIFT + double-click, then drag"));
+        sb.append(HtmlTools.uListEnd());
+        sb.append(HtmlTools.startParagraph());                    
         sb.append("You can use the menu to load a structure or small molecule from a database of your choice. Try searching for 'caffeine' in PubChem or NCI. Or search for proteins like '7tim' in the RCSB PDB.");
         sb.append(HtmlTools.endParagraph());                
         sb.append(HtmlTools.endDiv());  // search     
@@ -1318,19 +1325,24 @@ public class HtmlGenerator {
         sb.append("Jmol.setLinkCss(null, \"style='font-family:Arial,sans-serif;'\");\n");
         sb.append("Jmol.setMenuCss(null, \"style='font-family:Arial,sans-serif;'\");\n");
         sb.append("Jmol.setRadioCss(null, \"style='font-family:Arial,sans-serif;'\");\n");
+        sb.append("Jmol.setGrabberOptions([ [\"$\", \"DB: Small molecules at NCI\"], [\":\", \"DB: Small molecules at PubChem\"], [\"==\", \"DB: Ligands at PDB\"], [\"=\", \"DB: Macromolecules at PDB\"] ]);\n");
         sb.append("\n");
         
         // go
         sb.append("if(version == \"java\") {\n");
-        sb.append("Jmol.getApplet(\"myJmol\", InfoJavaPlugin)\n");        
+        sb.append("Jmol.getApplet(\"myJmol\", InfoJavaPlugin);\n");        
         sb.append("}\n");        
         sb.append("else {\n");        
-        sb.append("  Jmol.getApplet(\"myJmol\", InfoHTML5)\n");
-        sb.append("}\n");                       
+        sb.append("  Jmol.getApplet(\"myJmol\", InfoHTML5);\n");
+        sb.append("}\n");                   
+        
         
         // add customized controls
+        //sb.append("Jmol.jmolBr();");
         //sb.append("Jmol.jmolCheckbox(myJmol,\"spacefill on\",\"spacefill off\",\"Toggle display as spheres\");\n");
-        
+        sb.append("Jmol.jmolBr();\n");
+        sb.append("Jmol.jmolCommandInput(\"myJmol\", \"Execute Jmol command\", \"80%\", \"jmol_cmd\", \"Jmol command prompt\")\n");
+        sb.append("document.write('<p class=\"tiny\">Selection examples: Try \"display :A\" to show obly chain A, \"display [ALA]\" to show only alanine residues and \"display *\" to reset.<br/>Rendering examples: Try \"spacefill 100%\" for space-filling, \"wireframe 0.15; spacefill 20%;\" for Ball-and-stick, \"wireframe 0.0; spacefill 0%;\" to reset.<br/>See the Jmol documentation for more info.</p>');\n");        
         sb.append("// -->\n");
         sb.append("</script>\n");
         return sb.toString();
