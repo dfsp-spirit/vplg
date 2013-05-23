@@ -7,7 +7,7 @@
  */
 package similarity;
 
-import Tools.DP;
+import tools.DP;
 import algorithms.NeedlemanWunsch;
 import algorithms.SmithWaterman;
 import java.sql.SQLException;

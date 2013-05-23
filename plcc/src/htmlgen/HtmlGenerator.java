@@ -8,7 +8,7 @@
 
 package htmlgen;
 
-import Tools.DP;
+import tools.DP;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;

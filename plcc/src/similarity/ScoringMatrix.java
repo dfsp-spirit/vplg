@@ -7,7 +7,7 @@
  */
 package similarity;
 
-import Tools.DP;
+import tools.DP;
 
 /**
  * A scoring matrix class for various strings. Intended to be used with the string alignment algorithms.

@@ -8,7 +8,7 @@
 
 package similarity;
 
-import Tools.DP;
+import tools.DP;
 import algorithms.CompatGraphComputation;
 import algorithms.NeedlemanWunsch;
 import algorithms.SmithWaterman;

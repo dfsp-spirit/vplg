@@ -5,7 +5,7 @@
  *
  * @author ts
  */
-package Tools;
+package tools;
 
 import plcc.Settings;
 

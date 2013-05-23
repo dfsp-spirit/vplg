@@ -7,7 +7,7 @@
  */
 package plcc;
 
-import Tools.DP;
+import tools.DP;
 import algorithms.CompatGraphComputation;
 import datastructures.Graph;
 import java.io.IOException;

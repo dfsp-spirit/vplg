@@ -7,7 +7,7 @@
  */
 package algorithms;
 
-import Tools.DP;
+import tools.DP;
 import similarity.ScoringMatrix;
 
 /**

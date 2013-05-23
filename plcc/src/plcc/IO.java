@@ -8,7 +8,7 @@
 
 package plcc;
 
-import Tools.DP;
+import tools.DP;
 import java.awt.Rectangle;
 import java.io.BufferedReader;
 import java.io.*;
