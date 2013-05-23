@@ -217,7 +217,7 @@ public class HtmlGenerator {
             sb.append("topology on the super-secondary structure level.");
             sb.append(HtmlTools.brAndNewline());
             sb.append(HtmlTools.brAndNewline());
-            sb.append("A typical protein ligand graph for a PDB chain has 10 to 80 vertices and a similar number of edges. More information on protein ligand graphs is available in the ");
+            sb.append("A typical protein ligand graph for a PDB chain has 15 to 50 vertices and a similar number of edges. More information on protein ligand graphs is available in the ");
             sb.append(HtmlTools.linkBlank(HtmlGenerator.getVPLGHelpWebsite(), "VPLG Documentation"));
             sb.append(".\n");            
             sb.append(HtmlTools.endParagraph());
