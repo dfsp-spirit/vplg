@@ -458,6 +458,11 @@ public class Main {
                         Settings.set("plcc_B_ptgl_geodat_output", "true");
                     }
                     
+                    if(s.equals("-E") || s.equals("--separate-chains")) {
+                        Settings.set("plcc_B_separate_contacts_by_chain", "true");
+                    }                    
+                    
+                    
                     if(s.equals("-z") || s.equals("--ramaplot")) {
                         Settings.set("plcc_B_ramachandran_plot", "true");
                     }
@@ -1023,7 +1028,9 @@ public class Main {
             globalMaxCenterSphereRadius = getGlobalMaxCenterSphereRadius(residues);
             System.out.println("  Maximal center sphere radius for all residues is " + globalMaxCenterSphereRadius + ".");
 
-            // ... and the maximal distance between neighbors in the AA sequence
+            // ... and the maximal distance between neighbors in the AA sequence.
+            // Note that this is a lot less useful with ligands enabled since they are always listed at the 
+            //  end of the chain and may be far (in 3D) from their predecessor in the sequence.
             globalMaxSeqNeighborResDist = getGlobalMaxSeqNeighborResDist(residues);        
             System.out.println("  Maximal distance between residues that are sequence neighbors is " + globalMaxSeqNeighborResDist + ".");
         }
@@ -1058,45 +1065,91 @@ public class Main {
 
         System.out.println("Calculating residue contacts...");
 
-        cInfo = calculateAllContacts(residues);
+        
+        boolean separateContactsByChain = Settings.getBoolean("plcc_B_separate_contacts_by_chain");
+        
+        if(separateContactsByChain) {
+            System.out.println("Separating atom contact computation by chains. Will not compute inter-chain contacts.");
+        }
+        
+        ArrayList<ResContactInfo> cInfoThisChain;
+        ProteinResults.getInstance().setPdbid(pdbid);
+        
+        if(separateContactsByChain) {
+            cInfoThisChain = new ArrayList<ResContactInfo>();
+            cInfo = null;
+        } else {        
+            cInfo = calculateAllContacts(residues);
+            System.out.println("Received data on " + cInfo.size() + " residue contacts that have been confirmed on atom level.");
+            cInfoThisChain = null;
+        }
         
         // DEBUG: compare computed contacts with those from a geom_neo file
         if(compareResContacts) {
-            System.out.println("DEBUG: Comparing calculated residue contacts with those in the file '" + compareResContactsFile + "'.");
-            FileParser.compareResContactsWithPdbidDotGeoFile(compareResContactsFile, false, cInfo);
-        }
+            if(separateContactsByChain) {
+                DP.getInstance().w("Cannot compare residue contacts for whole PDB file in compute-contacts-per-chain mode.");
+            }
+            else {
+                System.out.println("DEBUG: Comparing calculated residue contacts with those in the file '" + compareResContactsFile + "'.");
+                FileParser.compareResContactsWithPdbidDotGeoFile(compareResContactsFile, false, cInfo);
+            }
+        }               
         
-
-        System.out.println("Received data on " + cInfo.size() + " residue contacts that have been confirmed on atom level.");
         
-        ProteinResults.getInstance().setPdbid(pdbid);
         
         
         // **************************************    output of the results    ******************************************
         
         // print overview to STDOUT
         if(Settings.getBoolean("plcc_B_print_contacts")) {
-            System.out.println("Showing contact overview...");
-            showContactOverview(cInfo);
+            if(separateContactsByChain) {
+                DP.getInstance().w("Cannot show contact overview for whole PDB file in compute-contacts-per-chain mode.");
+            } 
+            else {
+                System.out.println("Showing contact overview...");
+                showContactOverview(cInfo);
+            }
         }
 
         if(Settings.getBoolean("plcc_B_print_contacts")) {
-            System.out.println("Showing statistics overview...");
-            showContactStatistics(residues.size());
+            if(separateContactsByChain) {
+                DP.getInstance().w("Cannot show contact statistics for whole PDB file in compute-contacts-per-chain mode.");
+            }
+            else {
+                System.out.println("Showing statistics overview...");
+                showContactStatistics(residues.size());
+            }
+            
         }
         
         // write the detailed and formated results to the output file
         if(Settings.getBoolean("plcc_B_ptgl_text_output")) {
-            System.out.println("Writing residue contact info file...");
-            writeContacts(cInfo, pdbIdDotGeoFile, false);
-
-            if(Settings.getBoolean("plcc_B_write_lig_geolig")) {
-                System.out.println("Writing full contact info file including ligands...");
-                writeContacts(cInfo, pdbIdDotGeoLigFile, true);
+            
+            if(separateContactsByChain) {
+                DP.getInstance().w("Cannot write residue contact info file for whole PDB file in compute-contacts-per-chain mode.");
+            }
+            else {
+                System.out.println("Writing residue contact info file...");
+                writeContacts(cInfo, pdbIdDotGeoFile, false);
             }
 
-            System.out.println("Writing statistics file...");
-            writeStatistics(conDotSetFile, pdbid, residues.size());
+            if(Settings.getBoolean("plcc_B_write_lig_geolig")) {
+                if(separateContactsByChain) {
+                    DP.getInstance().w("Cannot show contact statistics for whole PDB file in compute-contacts-per-chain mode.");
+                }   
+                else {
+                    System.out.println("Writing full contact info file including ligands...");
+                    writeContacts(cInfo, pdbIdDotGeoLigFile, true);
+                }
+            }
+
+            if(separateContactsByChain) {
+                DP.getInstance().w("Cannot write statistics file for whole PDB file in compute-contacts-per-chain mode.");
+            }
+            else {
+                System.out.println("Writing statistics file...");
+                writeStatistics(conDotSetFile, pdbid, residues.size());
+            }
 
             // write the dssplig file
             System.out.println("Writing DSSP ligand file...");
@@ -1133,22 +1186,27 @@ public class Main {
             writeModels(modelsFile, pdbid, allModelsIDsOfWholePDBFile);
 
             // generate the PyMol selection script
-            System.out.println("Generating Pymol script to highlight protein-ligand contacts...");
-            // String pms = getPymolSelectionScript(cInfo);             // old version: all protein residues on 1 selection
-            String pms = getPymolSelectionScriptByLigand(cInfo);        // new version: a separate selection of protein residues for each ligand
-
-
-            //System.out.println("***** Pymol script follows: *****");
-            //System.out.print(pms);
-            //System.out.println("***** End of Pymol script. *****");
-
-            String pmsFile = outputDir + fs + pdbid + ".pymol";
-
-            if(writeStringToFile(pmsFile, pms)) {
-                System.out.println("  PyMol script written to file '" + pmsFile + "'.");
+            if(separateContactsByChain) {
+                DP.getInstance().w("Cannot write PyMol script for whole PDB file in compute-contacts-per-chain mode.");
             }
             else {
-                System.err.println("ERROR: Could not write PyMol script to file '" + pmsFile + "'.");
+                System.out.println("Generating Pymol script to highlight protein-ligand contacts...");
+                // String pms = getPymolSelectionScript(cInfo);             // old version: all protein residues on 1 selection
+                String pms = getPymolSelectionScriptByLigand(cInfo);        // new version: a separate selection of protein residues for each ligand
+
+
+                //System.out.println("***** Pymol script follows: *****");
+                //System.out.print(pms);
+                //System.out.println("***** End of Pymol script. *****");
+
+                String pmsFile = outputDir + fs + pdbid + ".pymol";
+
+                if(writeStringToFile(pmsFile, pms)) {
+                    System.out.println("  PyMol script written to file '" + pmsFile + "'.");
+                }
+                else {
+                    System.err.println("ERROR: Could not write PyMol script to file '" + pmsFile + "'.");
+                }
             }
 
         }
@@ -1182,6 +1240,7 @@ public class Main {
             DP.getInstance().w("No chains to handle found in input data (" + chains.size() + " chains total).");
             System.exit(1);
         }
+                
         
 
         // *************************************** ramachandran plots for chains  *********************************//
@@ -1201,8 +1260,29 @@ public class Main {
 
         if(Settings.getBoolean("plcc_B_calc_draw_graphs")) {
             System.out.println("  Calculating SSE graphs.");
-            calculateSSEGraphsForChains(handleChains, residues, cInfo, pdbid, outputDir);
-            //calculateComplexGraph(handleChains, residues, cInfo, pdbid, outputDir);
+            
+            if(separateContactsByChain) {
+                String chainID;
+                ArrayList<Chain> theChain;
+                for(Chain c : handleChains) {
+                    // add current chain
+                    theChain = new ArrayList<Chain>();
+                    theChain.add(c);
+                    
+                    // compute chain contacts
+                    cInfoThisChain = calculateAllContactsLimitedByChain(residues, c.getPdbChainID());
+                    
+                    calculateSSEGraphsForChains(theChain, residues, cInfoThisChain, pdbid, outputDir);
+                }
+            }
+            else {
+                calculateSSEGraphsForChains(handleChains, residues, cInfo, pdbid, outputDir);
+                //calculateComplexGraph(handleChains, residues, cInfo, pdbid, outputDir);
+            }
+            
+            // discard contact info to free memory
+            cInfo = null;
+            cInfoThisChain = null;
         }
         else {
             System.out.println("  Not calculating SSEs and not drawing graphs as requested.");
@@ -3664,6 +3744,7 @@ public class Main {
         System.out.println("-d | --dsspfile <dsspfile> : use input DSSP file <dsspfile> (instead of assuming '<pdbid>.dssp')");
         System.out.println("     --gz-dsspfile <f>     : use gzipped input DSSP file <f>.");
         System.out.println("-e | --force-chain <c>     : only handle the chain with chain ID <c>.");
+        System.out.println("-E | --separate-contacts   : separate contact computation by chain (faster but limits statistics)");                
         System.out.println("-f | --folding-graphs      : also handle foldings graphs (connected components of the protein graph)");
         System.out.println("-g | --sse-graphtypes <l>  : compute only the SSE graphs in list <l>, e.g. 'abcdef' = alpha, beta, alhpabeta, alphalig, betalig and alphabetalig.");
         System.out.println("-h | --help                : show this help message and exit");
