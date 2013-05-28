@@ -196,7 +196,7 @@ public class Settings {
         defSet("plcc_B_add_metadata_comments_DOT", "false", "Whether to add meta data to exported DOT language format graphs in comments. Not all programs parse comments correctly.");
         
         
-        defSet("plcc_B_warn_cfg_fallback_to_default", "true", "Whether to print warnings when a setting is not defined in the config file and internal defaults are used.");
+        defSet("plcc_B_warn_cfg_fallback_to_default", "false", "Whether to print warnings when a setting is not defined in the config file and internal defaults are used.");
         defSet("plcc_S_temp_dir", ".", "The directory where temporary files can be created. You need write access to it, of course.");
         
         defSet("plcc_S_img_output_format", "PNG", "image output format (valid options: 'PNG', 'JPG')");
@@ -240,6 +240,7 @@ public class Settings {
         
         
         // complex graphs: same, mere
+        defSet("plcc_B_complex_graphs", "false" , "Whether or not complex graphs are drawn.");
         defSet("plcc_B_complex_graph_same", "false", "Determines whether the complex graph is drawn with all nodes of the same type" );
         defSet("plcc_B_complex_graph_mere", "false", "Determines whether the complex graph is drawn with nodes of different type for each mere" );
 
@@ -478,9 +479,9 @@ public class Settings {
                 }   
             }           
             
-            if(warnUnset) {
+            //if(warnUnset) {
                 //System.out.println("INFO: Settings: Setting '" + key + "' not defined in config file. Trying internal default.");
-            }
+            //}
             
             
             if(initSingleSettingFromDefault(key)) {
