@@ -977,6 +977,7 @@ public class Main {
         }
         
         
+        
         String sBondString;
         if(sulfurBridges.size() > 0) {
             System.out.print("    DSSP: Protein contains " + sulfurBridges.size() + " disulfide bridges: ");
@@ -1070,6 +1071,12 @@ public class Main {
         
         if(separateContactsByChain) {
             System.out.println("Separating atom contact computation by chains. Will not compute inter-chain contacts.");
+        }         
+        else {
+            if(atoms.size() > 50000 || chains.size() > 1) {
+                System.out.println("INFO: This multi-chain protein is large (" + atoms.size() + " atoms, " + chains.size() + " chains).");
+                System.out.println("INFO:  Using chain separation (the '-E' command line switch) will speed up the computation a lot.");
+            }
         }
         
         ArrayList<ResContactInfo> cInfoThisChain;
@@ -1261,6 +1268,8 @@ public class Main {
         if(Settings.getBoolean("plcc_B_calc_draw_graphs")) {
             System.out.println("  Calculating SSE graphs.");
             
+            System.out.println("Calculating SSEs for all chains of protein " + pdbid + "...");
+            
             if(separateContactsByChain) {
                 String chainID;
                 ArrayList<Chain> theChain;
@@ -1279,6 +1288,8 @@ public class Main {
                 calculateSSEGraphsForChains(handleChains, residues, cInfo, pdbid, outputDir);
                 //calculateComplexGraph(handleChains, residues, cInfo, pdbid, outputDir);
             }
+            
+            System.out.println("All " + handleChains.size() + " chains done.");
             
             // discard contact info to free memory
             cInfo = null;
@@ -1529,8 +1540,7 @@ public class Main {
         ArrayList<SSE> chainPtglSSEs = new ArrayList<SSE>();
         ArrayList<SSE> allChainSSEs = new ArrayList<SSE>();
         String fs = System.getProperty("file.separator");
-
-        System.out.println("Calculating SSEs for all chains of protein " + pdbid + "...");
+        
 
         HashMap<String, String> md = FileParser.getPDBMetaData();
         Double res = -1.0;
@@ -1868,7 +1878,7 @@ public class Main {
             System.out.println("  +++++ All " + graphTypes.size() + " protein graphs of chain " + c.getPdbChainID() + " handled. +++++");
             
         }
-        System.out.println("All " + allChains.size() + " chains done.");
+        //System.out.println("All " + allChains.size() + " chains done.");
         
         
     }
@@ -3744,7 +3754,7 @@ public class Main {
         System.out.println("-d | --dsspfile <dsspfile> : use input DSSP file <dsspfile> (instead of assuming '<pdbid>.dssp')");
         System.out.println("     --gz-dsspfile <f>     : use gzipped input DSSP file <f>.");
         System.out.println("-e | --force-chain <c>     : only handle the chain with chain ID <c>.");
-        System.out.println("-E | --separate-contacts   : separate contact computation by chain (faster but limits statistics)");                
+        System.out.println("-E | --separate-contacts   : separate contact computation by chain (way faster but disables all functions which require inter-chain contacts (stats, complex graphs)");
         System.out.println("-f | --folding-graphs      : also handle foldings graphs (connected components of the protein graph)");
         System.out.println("-g | --sse-graphtypes <l>  : compute only the SSE graphs in list <l>, e.g. 'abcdef' = alpha, beta, alhpabeta, alphalig, betalig and alphabetalig.");
         System.out.println("-h | --help                : show this help message and exit");
@@ -3781,6 +3791,7 @@ public class Main {
         System.out.println("EXAMPLES: java -jar plcc.jar 8icd");
         System.out.println("          java -jar plcc.jar 8icd -D 2 -d /tmp/dssp/8icd.dssp -p /tmp/pdb/8icd.pdb");
         System.out.println("          java -jar plcc.jar 8icd -o /tmp");
+        System.out.println("          java -jar plcc.jar 1o1d -E");
         System.out.println("          java -jar plcc.jar none -l prot_graph_3kmf_A.plg");
         System.out.println("          java -jar plcc.jar none -m PNG -ddb 8icd A albelig ~/img/protein_graph");        
         System.out.println("");

@@ -250,8 +250,10 @@ public class Residue implements java.io.Serializable {
      */
     public ArrayList<Atom> chooseYourAltLoc() {
         
-        if(this.atoms.size() < 1) {
-            DP.getInstance().w("Residue " + this.getFancyName() + " has no atoms *before* choosing alternative location PDB field.");
+        int numAtomsBefore = this.atoms.size();
+        if(numAtomsBefore < 1) {
+            DP.getInstance().w("Residue " + this.getFancyName() + " of chain " + this.getChainID() + " has no atoms *before* choosing alternative location PDB field.");
+            return new ArrayList<Atom>();
         }                
         ArrayList<Atom> deletedAtoms;
         
@@ -273,7 +275,7 @@ public class Residue implements java.io.Serializable {
         deletedAtoms = this.deleteAtomsWithAltLocDifferentFrom(chosenAltLoc);
                 
         if(this.atoms.size() < 1) {
-            System.err.println("ERROR: Residue " + this.getFancyName() + " has no atoms after choosing alternative location PDB field.");
+            DP.getInstance().w("Residue " + this.getFancyName() + " of chain " + this.getChainID() + " has no atoms after choosing alternative location PDB field (had " + numAtomsBefore + " before).");
         }
         
         return deletedAtoms;
