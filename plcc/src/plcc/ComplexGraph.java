@@ -42,5 +42,13 @@ public class ComplexGraph extends UAdjListGraph {
         proteinNodeMap = createVerticeMap();
     }
     
+    public Vertice getVerticeFromChain(String chainID){
+        for (int i = 0; i < ComplexGraph.this.getNumVertices(); i++){
+            if (ComplexGraph.this.proteinNodeMap.get(ComplexGraph.this.getVertice(i)).equals(chainID)){
+                return ComplexGraph.this.getVertice(i);
+            }
+        }
+        return null;
+    }
 
 }
