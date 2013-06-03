@@ -514,10 +514,9 @@ public class FileParser {
         //}
 
         // Files that contain DNA or RNA are not supported atm
-        if(resNamePDB.equals("  G") || resNamePDB.equals("  U") || resNamePDB.equals("  A") || resNamePDB.equals("  T") || resNamePDB.equals("  C")) {
-            System.out.println("WARNING: Atom #" + atomSerialNumber + " in PDB file belongs to DNA/RNA residue (residue 3-letter code is '" + resNamePDB + "').");
-            System.err.println("ERROR: PDB files containing DNA or RNA are not supported. Exiting.");
-            System.exit(2);
+        if(FileParser.isDNAorRNAresidueName(resNamePDB)) {
+            DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA/RNA residue (residue 3-letter code is '" + resNamePDB + "'), skipping.");
+            return false;
         }
 
         Atom a = new Atom();
@@ -592,6 +591,27 @@ public class FileParser {
         }                
 
         return(true);
+    }
+    
+    /**
+     * Returns true if the residue name stands for a 
+     * @param resNamePDB
+     * @return whether the residue name marks a DNA / RNA residue
+     */
+    public static boolean isDNAorRNAresidueName(String resNamePDB) {
+        
+        // standard ribonucleotides
+        if(resNamePDB.equals("  G") || resNamePDB.equals("  U") || resNamePDB.equals("  A") || resNamePDB.equals("  T") || resNamePDB.equals("  C") || resNamePDB.equals("  I")) {
+            return true;
+        }
+        
+        // standard deoxribonucleotides
+        if(resNamePDB.equals(" DG") || resNamePDB.equals(" DU") || resNamePDB.equals(" DA") || resNamePDB.equals(" DT") || resNamePDB.equals(" DC") || resNamePDB.equals(" DI")) {
+            return true;
+        }
+        
+        
+        return false;
     }
 
     
