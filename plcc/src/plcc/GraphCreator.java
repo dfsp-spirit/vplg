@@ -24,9 +24,15 @@ public class GraphCreator {
         System.err.println("ERROR: ProtGraph fromGMLString() not implemented yet.");
         System.exit(1);
         
-        ProtGraph g = new ProtGraph(new ArrayList<SSE>());
+        ProtGraph g;
+        
+        // parse data and prepare the list of SSEs for the graph
         ArrayList<SSE> sseList = new ArrayList<SSE>();
+        
+        // now create the graph from the SSE list
         g = new ProtGraph(sseList);
+        
+        // add some edges here
         return g;
     }
     
@@ -38,7 +44,7 @@ public class GraphCreator {
         String fs = ",";    // field separator
         String commentLineStartString = "#";
         String metaDataStartString = "#METADATA ";
-        ProtGraph g = new ProtGraph(new ArrayList<SSE>());
+        ProtGraph g;
         
         String[] lines = csv.split("\\r?\\n");
         System.out.println("Graph string consists of " + lines.length + " lines.");
@@ -53,7 +59,7 @@ public class GraphCreator {
         } catch(Exception e) {
             DP.getInstance().w("GraphCreator", "fromCSVString: input string contains no valid lines, returning empty graph.");
             DP.getInstance().w("GraphCreator", e.getMessage());
-            return g;
+            return new ProtGraph(new ArrayList<SSE>());
         }
         int maxVertexIndex = (maxVertexField0 > maxVertexField1 ? maxVertexField0 : maxVertexField1);
         
@@ -117,9 +123,8 @@ public class GraphCreator {
                 }
                 
                 // parse extra info if available
-                if(tokens.length > 3) {
-                    
-                    int srcX, srcY, tgtX, tgtY, srcType, tgtType;
+                if(tokens.length > 3) {                    
+
                     String srcClassString, tgtClassString;
                     
                     if(tokens.length == 7) {
@@ -129,10 +134,6 @@ public class GraphCreator {
                         try {
                             srcBothCoords = tokens[3];
                             tgtBothCoords = tokens[4];
-                            srcX = Integer.parseInt(srcBothCoords.split("_")[0]);
-                            srcY = Integer.parseInt(srcBothCoords.split("_")[1]);
-                            tgtX = Integer.parseInt(tgtBothCoords.split("_")[0]);
-                            tgtY = Integer.parseInt(tgtBothCoords.split("_")[1]);
                             srcClassString = tokens[5];
                             tgtClassString = tokens[6];
                         } catch(Exception e) {
