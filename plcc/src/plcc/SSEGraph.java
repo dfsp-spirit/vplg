@@ -30,6 +30,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -146,7 +147,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         }
 
         this.metadata = new HashMap<String, String>();
-        this.init();
+        this.initMatrices();
         this.spatOrder = null;
         this.reportCliques = true;  // TODO: move to settings
     }
@@ -898,6 +899,78 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         
         this.spatOrder = null;      // spatOrder has to be re-computed!
     }
+    
+    /**
+     * Adds a vertex to this graph. 
+     * @param vertex the vertex
+     * @return the (positive) index of the vertex in the graph if the vertex was added, -1 otherwise.
+     */
+    public Integer addVertex(SSE vertex) {
+        if(this.addVertexNoUpdate(vertex)) {
+            this.resizeAdjacencyLists();
+            this.resizeAdjacencyMatrix();
+            return (this.getSize() -1);
+        }
+        return -1;
+    }
+    
+    
+   
+    
+    /**
+     * Adds a vertex to this graph. WARNING: This function does NOT resize the adjacence lists, call 'resizeAdjacencyLists()' manually to do this after adding all vertices.
+     * @param vertex the vertex
+     * @return true if it was added, false otherwise
+     */
+    private synchronized boolean addVertexNoUpdate(SSE vertex) {        
+        this.sseList.add(vertex);
+        return true;
+    }
+    
+    
+    /**
+     * Forces resizing the adjacency lists to reflect the vertex count in the graph (e.g., after calling addVertexNoUpdate()). Existing edges are kept. Note that only increasing graph size is supported atm.
+     */
+    private void resizeAdjacencyLists() {
+        if(this.sseList.size() == this.adjLists.size()) {
+            return;
+        } else if(this.sseList.size() < this.adjLists.size()) {
+            DP.getInstance().c(toString(), "Detected removal of vertices from graph, updateLists does NOT yet support this.");
+        } else {
+            // we need to increase list sizes
+            int numToAdd = this.sseList.size() - this.adjLists.size();
+            for(int i = 0; i < numToAdd; i++) {
+                adjLists.add(new ArrayList<Integer>());
+            }
+        }        
+    }
+    
+    private void resizeAdjacencyMatrix() {
+        if(this.sseList.size() == this.matrix.length) {
+            return;
+        } else if(this.sseList.size() < this.matrix.length) {
+            DP.getInstance().c(toString(), "Detected removal of vertices from graph, updateLists does NOT yet support this.");
+        } else {
+            // we need to increase list sizes
+            int numToAdd = this.sseList.size() - this.matrix.length;
+            
+            // resize outer array
+            matrix = Arrays.copyOf(matrix, matrix.length + numToAdd);
+            // init the new array at the end
+            Arrays.fill(matrix[matrix.length - 1], SpatRel.NONE);
+            
+            // now increase the size of all the inner arrays
+            for(int i = 0; i < matrix.length; i++) {
+                matrix[i] = Arrays.copyOf(matrix[i], matrix[i].length + numToAdd);
+                // ... and init the new fields which we just added
+                for(int j = matrix[i].length - 1; j > matrix[i].length - 1 - numToAdd; j--) {
+                    matrix[i][j] = SpatRel.NONE;
+                }
+            }
+        }
+        
+        this.distancesCalculated = false;
+    }
 
     /**
      * Removes the edge between vertices x and y.
@@ -1154,9 +1227,13 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     public SSE getSSEBySeqPosition(Integer position) {
         if(position >= this.size) {
             System.err.println("ERROR: getSSE(): Index " + position + " out of range, matrix size is " + this.size + ".");
-            System.exit(-1);
+            System.exit(1);
         }
         return(sseList.get(position));
+    }
+    
+    public SSE getVertex(int index) {
+        return this.getSSEBySeqPosition(index);
     }
 
 
@@ -1193,11 +1270,12 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     /**
      * Inits the arrays, removing all edges from this graph.
      */
-    protected void init() {
+    protected void initMatrices() {
         for(Integer i = 0; i < size; i++) {
             for(Integer j = 0; j < size; j++) {
                 matrix[i][j] = SpatRel.NONE;
                 distMatrix[i][j] = Integer.MAX_VALUE;
+                this.distancesCalculated = false;
             }
         }
     }
@@ -1207,7 +1285,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
      * Inits the arrays, removing all edges from this graph.
      */
     public void reinit() {
-        this.init();
+        this.initMatrices();
     }
 
     /**

@@ -53,12 +53,51 @@ public class DP {
         }
     }
     
+    public void w(String srcTag, String msg) {
+        Boolean doWarn = true;
+        try {
+            doWarn = Settings.getBoolean("plcc_B_no_warn");
+        } catch(Exception e) {
+            // the settings have not been inited yet, so assume that we should warn
+            //System.err.println("WARNING: No settings yet.");
+        }
+        if(doWarn) {
+            System.err.println(DP.appTag + DP.warningTag + msg);
+        }
+    }
+    
     /**
      * Prints an error. Newline is added at the end.
      * @param msg the message to print
      */
     public void e(String msg) {
         System.err.println(DP.appTag + DP.errorTag + msg);
+    }
+    
+    /**
+     * Prints an error. Newline is added at the end.
+     * @param msg the message to print
+     */
+    public void e(String srcTag, String msg) {
+        System.err.println(DP.appTag + DP.errorTag + msg);
+    }
+    
+    /**
+     * Prints a critical error and exits. Newline is added at the end.
+     * @param msg the message to print
+     */
+    public void c(String srcTag, String msg) {
+        System.err.println(DP.appTag + DP.errorTag + msg);
+        System.exit(1);
+    }
+    
+    /**
+     * Prints a critical error and exits. Newline is added at the end.
+     * @param msg the message to print
+     */
+    public void c(String msg) {
+        System.err.println(DP.appTag + DP.errorTag + msg);
+        System.exit(1);
     }
     
     
@@ -96,11 +135,24 @@ public class DP {
     }
     
     /**
+     * Prints an info message. Newline is added at the end.
+     * @param msg the message to print
+     */
+    public void i(String srcTag, String msg) {
+        System.out.println(DP.appTag + DP.infoTag + msg);
+    }
+    
+    /**
      * Prints a debug message. Newline is added at the end.
      * @param msg the message to print
      */
     public void d(String msg) {
         System.out.println(DP.appTag + DP.debugTag + msg);
+    }
+    
+    
+    public void flush() {
+        // placeholder function for backwards compatibility only, does nothing
     }
     
     
