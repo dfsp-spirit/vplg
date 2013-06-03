@@ -536,7 +536,7 @@ public class FileParser {
             //}
 
             // set atom type
-            a.setAtomtype(0);
+            a.setAtomtype(Atom.ATOMTYPE_AA);
 
             // only ATOMs, not HETATMs, have a DSSP entry
             //a.setDsspResNum(getDsspResNumForPdbResNum(resNumPDB));
@@ -545,7 +545,7 @@ public class FileParser {
         else {          // HETATM
 
             if(isIgnoredLigRes(resNamePDB)) {
-                a.setAtomtype(2);       // invalid ligand (ignored)
+                a.setAtomtype(Atom.ATOMTYPE_IGNORED_LIGAND);       // invalid ligand (ignored)
 
                 // We do not need these atoms and they may lead to trouble later on, so
                 //  just return without adding the new Atom to any Residue here so this line
@@ -554,7 +554,7 @@ public class FileParser {
                 return(false);
             }
             else {
-                a.setAtomtype(1);       // valid ligand
+                a.setAtomtype(Atom.ATOMTYPE_LIGAND);       // valid ligand
                 //a.setDsspResNum(getDsspResNumForPdbFields(resNumPDB, chainID, iCode));  // We can't do this because the fake DSSP residue number has not yet been assigned
             }
         }

@@ -34,6 +34,11 @@ public class Atom implements java.io.Serializable {
     private Integer pdbLineNum = null;
     private Chain chain = null;
     private String altLoc = null;
+    
+    public static final Integer ATOMTYPE_AA = 0;
+    public static final Integer ATOMTYPE_LIGAND = 1;
+    public static final Integer ATOMTYPE_IGNORED_LIGAND = 2;
+    public static final Integer ATOMTYPE_IGNORED_ATOM = 3;
 
     /**
      * Getter for PDB alternate location identifier.
