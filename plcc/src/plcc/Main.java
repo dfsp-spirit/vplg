@@ -3,7 +3,7 @@
  *
  * Copyright Tim Schäfer 2012. VPLG is free software, see the LICENSE and README files for details.
  *
- * @author tsa
+ * @author ts
  */
 
 
@@ -458,9 +458,14 @@ public class Main {
                         Settings.set("plcc_B_ptgl_geodat_output", "true");
                     }
                     
-                    if(s.equals("-E") || s.equals("--separate-chains")) {
+                    if(s.equals("-E") || s.equals("--separate-contacts")) {
                         Settings.set("plcc_B_separate_contacts_by_chain", "true");
-                    }                    
+                    }
+                    
+                    if(s.equals("-G") || s.equals("--complex-graphs")) {
+                        Settings.set("plcc_B_complex_graphs", "true");
+                        Settings.set("plcc_B_separate_contacts_by_chain", "false");
+                    }
                     
                     
                     if(s.equals("-z") || s.equals("--ramaplot")) {
@@ -3761,6 +3766,7 @@ public class Main {
         System.out.println("-E | --separate-contacts   : separate contact computation by chain (way faster but disables all functions which require inter-chain contacts (stats, complex graphs)");
         System.out.println("-f | --folding-graphs      : also handle foldings graphs (connected components of the protein graph)");
         System.out.println("-g | --sse-graphtypes <l>  : compute only the SSE graphs in list <l>, e.g. 'abcdef' = alpha, beta, alhpabeta, alphalig, betalig and alphabetalig.");
+        System.out.println("-G | --complex-graphs      : compute and output complex graphs. Disables contact separation (see -E) if used.");
         System.out.println("-h | --help                : show this help message and exit");
         System.out.println("-H | --output-www-with-core: add HTML navigation files and core files to the subdir tree (implies -k, -W). ");
         //System.out.println("-i | --ignoreligands       : ignore ligand contacts in geom_neo format output files [DEBUG]");
@@ -4676,6 +4682,8 @@ public class Main {
         ArrayList<SSE> chainDsspSSEs = new ArrayList<SSE>();
         ArrayList<SSE> chainPtglSSEs = new ArrayList<SSE>();
         ArrayList<SSE> allChainSSEs = new ArrayList<SSE>();
+        ArrayList<SSE> oneChainSSEs = new ArrayList<SSE>();
+        HashMap chainSSEMap = new HashMap();
         String fs = System.getProperty("file.separator");
 
         System.out.println("Calculating SSEs for all chains of protein " + pdbid + "...");
@@ -4694,7 +4702,6 @@ public class Main {
         // Get SSEs for all chains
         for(Integer i = 0; i < allChains.size(); i++) {
             c = allChains.get(i);
-            System.out.println("  +++++ Handling chain '" + c.getPdbChainID() + "'. +++++");
 
             ProtMetaInfo pmi = FileParser.getMetaInfo(pdbid, c.getPdbChainID());
             //pmi.print();
@@ -4706,25 +4713,29 @@ public class Main {
             System.out.println("    Creating all SSEs for chain '" + c.getPdbChainID() + "' consisting of " + c.getResidues().size() + " residues.");
             chainDsspSSEs = createAllDsspSSEsFromResidueList(c.getResidues());
             
-            allChainSSEs = createAllPtglSSEsFromDsspSSEList(chainDsspSSEs);
+            oneChainSSEs = createAllPtglSSEsFromDsspSSEList(chainDsspSSEs);
 
             System.out.print("    SSEs: ");
-            for(Integer j = 0; j < allChainSSEs.size(); j++) {
-                System.out.print(allChainSSEs.get(j).getSseType());
+            for(Integer j = 0; j < oneChainSSEs.size(); j++) {
+                System.out.print(oneChainSSEs.get(j).getSseType());
             }
             System.out.print("\n");
 
             // SSEs have been calculated, now assign the PTGL labels and sequential numbers on the chain
-            for(Integer j = 0; j < allChainSSEs.size(); j++) {
-                allChainSSEs.get(j).setSeqSseChainNum(j + 1);   // This is the correct value, determined from the list of all valid SSEs of this chain
-                allChainSSEs.get(j).setSseIDPtgl(getPtglSseIDForNum(j));
+            for(Integer j = 0; j < oneChainSSEs.size(); j++) {
+                oneChainSSEs.get(j).setSeqSseChainNum(j + 1);   // This is the correct value, determined from the list of all valid SSEs of this chain
+                oneChainSSEs.get(j).setSseIDPtgl(getPtglSseIDForNum(j));
             }
+            System.out.println("one" + oneChainSSEs);
+            allChainSSEs.addAll(oneChainSSEs);
+            System.out.println("Allchainsses" + allChainSSEs);
+            chainSSEMap.put(c.getPdbChainID(), oneChainSSEs);
         }
         
         //!!!
         
         // create vertices for all chains
-        ComplexGraph CompGraph = new ComplexGraph();
+        ComplexGraph CompGraph = new ComplexGraph(pdbid);
         for(Integer i = 0; i < allChains.size(); i++) {
             ComplexGraph.Vertice v1 = CompGraph.createVertice();
             CompGraph.proteinNodeMap.put(v1, allChains.get(i).getPdbChainID());
@@ -4736,6 +4747,7 @@ public class Main {
             ComplexGraph.Vertice chainA = CompGraph.getVerticeFromChain(resContacts.get(i).getResA().getChainID());
             ComplexGraph.Vertice chainB = CompGraph.getVerticeFromChain(resContacts.get(i).getResB().getChainID());
             if (!chainA.equals(chainB)){
+                //System.out.println(resContacts.get(i));
                 //System.out.println("NEWSSETEST: " + resContacts.get(i).getResA().getSSE());
                 if (CompGraph.getEdge(chainA, chainB) == null){
                     ComplexGraph.Edge e1 = CompGraph.createEdge(chainA, chainB);
@@ -4910,7 +4922,7 @@ public class Main {
                             System.out.println("Loop Contact");
                         }
                     }
-                //System.out.println("Number of contacts: " + CompGraph.numAllInteractionsMap.get(CompGraph.getEdge(chainA, chainB)));
+                System.out.println("Number of contacts: " + CompGraph.numAllInteractionsMap.get(CompGraph.getEdge(chainA, chainB)));
                 }
                 interchainContacts.add(resContacts.get(i));
             }
@@ -4966,18 +4978,23 @@ public class Main {
         System.out.println(keepSSEs);
 
         // The SSEs should already be ordered anyway
-        Collections.sort(filteredChainSSEs, new SSEComparator());
+        //PROBABLY SHOULDN'T GET SORTED
+        System.out.println("filteredSSEs" + filteredChainSSEs);
+        //Collections.sort(filteredChainSSEs, new SSEComparator());
+        System.out.println("filteredSSEs" + filteredChainSSEs);
         
         // SSE list has been filtered, let's go
 
         // Calculate SSE level contacts
+        System.out.println("intr" + interchainContacts);
         ContactMatrix chainCM = new ContactMatrix(filteredChainSSEs, pdbid);
-        System.out.println(filteredChainSSEs);
         System.out.println(pdbid);
         chainCM.restrictToChain("ALL");
-        chainCM.fillFromContactList(interchainContacts, keepSSEs);
+        chainCM.fillFromContactList(resContacts, keepSSEs);
         chainCM.calculateSSEContactMatrix();
-        //chainCM.printTotalContactMatrix("TT");
+        chainCM.printResContMatrix();
+        DrawComplexGraph draw = new DrawComplexGraph();
+        draw.drawComplexGraph("WASSUP", graphType, CompGraph);
         System.out.println("All " + allChains.size() + " chains done.");
     }
 }

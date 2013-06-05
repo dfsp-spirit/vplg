@@ -25,12 +25,14 @@ public class ComplexGraph extends UAdjListGraph {
     public Map<Edge, Integer> numAllInteractionsMap;
     public Map<Edge, Integer> numDisulfidesMap;
     public Map<Vertice, String> proteinNodeMap;
+    private String pdbid;
     
     
     /**
      * Constructor.
      */
-    ComplexGraph() {
+    ComplexGraph(String pdbid) {
+        this.pdbid = pdbid;
         numHHInteractionsMap = createEdgeMap();
         numHSInteractionsMap = createEdgeMap();
         numHLInteractionsMap = createEdgeMap();
@@ -50,5 +52,8 @@ public class ComplexGraph extends UAdjListGraph {
         }
         return null;
     }
-
+    
+    public String getPDBID(){
+        return this.pdbid;
+    }
 }
