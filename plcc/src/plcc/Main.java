@@ -4927,14 +4927,14 @@ public class Main {
                 interchainContacts.add(resContacts.get(i));
             }
         }
-        System.out.println("All Interactions" + CompGraph.numAllInteractionsMap.values().toArray()[0]);
-        System.out.println("HH Interactions" + CompGraph.numHHInteractionsMap.values().toArray()[0]);
-        System.out.println("HS Interactions" + CompGraph.numHSInteractionsMap.values().toArray()[0]);
-        System.out.println("HL Interactions" + CompGraph.numHLInteractionsMap.values().toArray()[0]);
-        System.out.println("LL Interactions" + CompGraph.numLLInteractionsMap.values().toArray()[0]);
-        System.out.println("SS Interactions" + CompGraph.numSSInteractionsMap.values().toArray()[0]);
-        System.out.println("SL Interactions" + CompGraph.numSLInteractionsMap.values().toArray()[0]);
-        System.out.println("Neighbours = " + CompGraph.getNumEdges());
+        //System.out.println("All Interactions" + CompGraph.numAllInteractionsMap.values().toArray()[0]);
+        //System.out.println("HH Interactions" + CompGraph.numHHInteractionsMap.values().toArray()[0]);
+        //System.out.println("HS Interactions" + CompGraph.numHSInteractionsMap.values().toArray()[0]);
+        //System.out.println("HL Interactions" + CompGraph.numHLInteractionsMap.values().toArray()[0]);
+        //System.out.println("LL Interactions" + CompGraph.numLLInteractionsMap.values().toArray()[0]);
+        //System.out.println("SS Interactions" + CompGraph.numSSInteractionsMap.values().toArray()[0]);
+        //System.out.println("SL Interactions" + CompGraph.numSLInteractionsMap.values().toArray()[0]);
+        //System.out.println("Neighbours = " + CompGraph.getNumEdges());
         ArrayList<String> keepSSEs = new ArrayList<String>();
         ArrayList<SSE> filteredChainSSEs;
 
@@ -4996,5 +4996,13 @@ public class Main {
         DrawComplexGraph draw = new DrawComplexGraph();
         draw.drawComplexGraph("WASSUP", graphType, CompGraph);
         System.out.println("All " + allChains.size() + " chains done.");
+        
+        // added by ts
+        File complexGraphOutput = new File(outputDir + fs + "complexgraph_" + pdbid + "_" + graphType + ".gml");
+        if(CompGraph.writeToFileGML(complexGraphOutput)) {
+            System.out.println("Wrote complex graph to file '" + complexGraphOutput.getAbsolutePath() + "' in GML format.");
+        } else {
+            System.err.println("ERROR: Could not write complex graph to file '" + complexGraphOutput.getAbsolutePath() + "' in GML format.");
+        }
     }
 }

@@ -7,8 +7,14 @@
  */
 package plcc;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.sourceforge.spargel.datastructures.UAdjListGraph;
+import net.sourceforge.spargel.writers.GMLWriter;
 
 /**
  *
@@ -55,5 +61,48 @@ public class ComplexGraph extends UAdjListGraph {
     
     public String getPDBID(){
         return this.pdbid;
+    }
+    
+    /**
+     * Writes this complex graph to the file 'file' in GML format. Note that this function
+     * will overwrite the file if it exists.
+     * @param file the target file. Has to be writable.
+     * @return true if the file was written, false otherwise
+     */
+    public boolean writeToFileGML(File file) {
+        
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException ex) {
+                System.err.println("ERROR: Could not create file '" + file.getAbsolutePath() + "': " + ex.getMessage() + ".");
+                return false;
+            }
+        }
+        
+        GMLWriter gw = new GMLWriter(this);
+        gw.joinVerticeMap("chain", proteinNodeMap);
+        gw.joinEdgeMap("num_total_contacts", numAllInteractionsMap);
+        FileOutputStream fop = null;
+        boolean allOK = true;        
+        try {
+            fop = new FileOutputStream(file);
+            gw.write(fop);    
+            fop.flush();
+            fop.close();
+        } catch(Exception e) {
+            System.err.println("ERROR: Could not write complex graph to file '" + file.getAbsolutePath() + "': " + e.getMessage() + ".");
+            allOK = false;
+        } finally {
+            if(fop != null)  {
+                try {
+                    fop.close();
+                } catch(Exception e) {
+                    // nvm
+                }
+            }
+            
+        }
+        return allOK;
     }
 }
