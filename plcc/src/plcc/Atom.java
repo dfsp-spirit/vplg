@@ -231,5 +231,9 @@ public class Atom implements java.io.Serializable {
     public void setAtomtype(Integer i) { type = i; }
     public void setChain(Chain c) { chain = c; }
     public void setModel(Model m) { model = m; }
+    
+    public Position3D getPosition3D() {
+        return new Position3D(coordX, coordY, coordZ);
+    }
 
 }

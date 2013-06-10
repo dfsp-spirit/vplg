@@ -166,6 +166,10 @@ public class SSE implements java.io.Serializable {
     
     public Integer getSeqSseNumDssp() { return(seqSseNumDssp); }
 
+    /**
+     * Returns the amino acid sequence of this SSE, determined from the 1-letter-code names of its residues.
+     * @return the amino acid sequence of this SSE
+     */
     public String getAASequence() {
         String seq = "";
 
@@ -176,6 +180,67 @@ public class SSE implements java.io.Serializable {
         }
 
         return(seq);
+    }
+    
+    /**
+     * Determines the position of the central atom of this SSE. For real SSEs consisting of amino acids, the central
+     * atom of all alpha carbons is chosen. For ligands, the central atom of the first residue is chosen.
+     * @return the position of the central atom of this SSE
+     */
+    public Position3D getCentralAtomPosition() {
+        if(this.isLigandSSE()) {
+            // this is a ligand
+            if(this.residues.size() > 0) {
+                return this.residues.get(0).getCenterAtom().getPosition3D();
+            }
+            else {
+                return null;
+            }
+        } else {
+            // this is a protein SSE. 
+            
+            // First get all CA atoms.
+            ArrayList<Atom> alphaCarbons = new ArrayList<Atom>();
+            Atom ca;
+            for(Residue r : this.residues) {
+                ca = r.getAlphaCarbonAtom();
+                if(ca != null) { 
+                    alphaCarbons.add(ca);
+                }
+            }
+            
+            // now determine the central one
+            if(alphaCarbons.isEmpty()) {
+                // no alpha carbons -- just return some Atom if there are any
+                if(this.residues.size() > 0) {
+                    if(this.residues.get(0).getAtoms().size() > 0) {
+                        return this.residues.get(0).getAtoms().get(0).getPosition3D();
+                    }
+                }
+            } else {
+                // we have some alpha carbons, determine the central one
+                Atom c = Comp3DTools.getCenterAtomOf(alphaCarbons);
+                if(c != null) {
+                    return c.getPosition3D();
+                }
+            }
+        }
+        return null;
+    }
+    
+    /**
+     * Determines whether this SSE currently has at least one residue with at least one atom.
+     * @return 
+     */
+    public boolean hasResidueWithAtoms() {
+        if(this.residues.size() > 0) {
+            for(Residue r : this.residues) {
+                if(r.hasAtoms()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 
