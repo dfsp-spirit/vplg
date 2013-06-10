@@ -1,0 +1,10 @@
+These are example PDB and DSSP input files. Most of the are here for a special reason (to test special stuff):
+
+* 8icd: Standard protein, nothing special here. A single chain.
+* 7tim: Rather a standard protein. Two chains, both with ligands and beautiful, large tim barrels.
+* 1o1d: Very large, more than 90000 atoms and more than 30 chains.
+* 1lmb: Contains a DNA chain.
+* 1trz: Contains a sulfur bridge.
+
+
+
