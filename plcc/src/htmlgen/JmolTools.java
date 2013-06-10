@@ -9,6 +9,7 @@ package htmlgen;
 
 import plcc.Position3D;
 import plcc.SSE;
+import plcc.SSEGraph;
 import plcc.SpatRel;
 
 /**
@@ -42,9 +43,9 @@ public class JmolTools {
      * @param color the color (try 'red' or 'green')
      * @return the Jmol command to draw the circle
      */
-    public static String getCommandDrawSSECircleAroundAtom(String refName, Integer atomNum, String color) {
+    public static String getCommandDrawSSECircleAroundAtom(String refName, Integer atomNum, Double diameter, String color) {
         StringBuilder sb = new StringBuilder();
-        sb.append("draw ").append(refName).append(" diameter ").append(drawSSEcircleDiameter).append(" color ").append(color).append(" circle {atomno=").append(atomNum).append("};");
+        sb.append("draw ").append(refName).append(" diameter ").append(diameter).append(" color ").append(color).append(" circle {atomno=").append(atomNum).append("};");
         return sb.toString();        
     }
     
@@ -65,9 +66,9 @@ public class JmolTools {
      * @param color the color (try 'red' or 'green')
      * @return the Jmol command to draw the circle
      */
-    public static String getCommandDrawSSECircleAtPosition(String refName, Position3D position, String color) {
+    public static String getCommandDrawSSECircleAtPosition(String refName, Position3D position, Double diameter, String color) {
         StringBuilder sb = new StringBuilder();
-        sb.append("draw ").append(refName).append(" color ").append(color).append(" diameter ").append(drawSSEcircleDiameter).append(" circle ").append(JmolTools.posString(position)).append(";");
+        sb.append("draw ").append(refName).append(" color ").append(color).append(" diameter ").append(diameter).append(" circle ").append(JmolTools.posString(position)).append(";");
         return sb.toString();        
     }
     
@@ -132,7 +133,7 @@ public class JmolTools {
         
         Position3D sseCenter = s.getCentralAtomPosition();
         if(sseCenter != null) {
-            sb.append(getCommandDrawSSECircleAtPosition(s.shortLabel(), sseCenter, JmolTools.getColorForSSE(s)));
+            sb.append(getCommandDrawSSECircleAtPosition(s.shortLabel(), sseCenter, JmolTools.drawSSEcircleDiameter, JmolTools.getColorForSSE(s)));
         }
         
         return sb.toString();
@@ -155,6 +156,25 @@ public class JmolTools {
             sb.append(getCommandDrawLine(label, sseCenter1, sseCenter2, JmolTools.getColorForSpatRel(spatRel)));
         }
         
+        return sb.toString();
+    }
+    
+    
+    /**
+     * Highest-level function to visualize a whole SSE graph.
+     * @param g the input graph
+     * @return the Jmol command string to visualize the graph.
+     */
+    public static String visualizeGraphCommands(SSEGraph g) {
+        StringBuilder sb = new StringBuilder();
+        // edges first (lines)
+        for(Integer[] edge : g.getEdgeList()) {
+            sb.append(JmolTools.visualizeContactCommands(g.getVertex(edge[0]), g.getVertex(edge[1]), g.getContactType(edge[0], edge[1])));
+        }
+        // now the vertices (SSE circles)
+        for(int i = 0; i < g.numVertices(); i++) {
+            sb.append(JmolTools.visualizeSSECommands(g.getVertex(i)));
+        }
         return sb.toString();
     }
     

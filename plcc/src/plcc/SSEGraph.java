@@ -1116,7 +1116,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     
     /**
      * Returns the list of edges of this graph. Each edge is an Integer[] of length 2. The two integers
-     * represent the index of the 2 vertices connected by this edge.
+     * represent the index of the 2 vertices connected by this edge. Does return each edge only once (only returns (i,j) and not (j,i) as well).
      * @return the list of edges
      */
     public ArrayList<Integer[]> getEdgeList() {
