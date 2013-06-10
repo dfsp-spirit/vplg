@@ -79,13 +79,15 @@ public class JmolTools {
      */
     public static String getColorForSSE(SSE sse) {
         if(sse.isHelix()) {
-            return "red";
+            //return "red";
+            return "[255 0 0]";
         }
         else if(sse.isBetaStrand()) {
             return "black";
         }
         else if(sse.isLigandSSE()) {
-            return "purple";
+            //return "purple";
+            return "[255 9 255]";
         }
         else {
             return "gray";
@@ -100,16 +102,20 @@ public class JmolTools {
      */
     public static String getColorForSpatRel(Integer spatRel) {
         if(spatRel.equals(SpatRel.ANTIPARALLEL)) {
-            return "blue";
+            //return "blue";
+            return "[51 51 255]";
         }
-        else if(spatRel.equals(SpatRel.PARALLEL)) {
-            return "red";
+        else if(spatRel.equals(SpatRel.PARALLEL)) {            
+            //return "red";
+            return "[255 0 0]";
         }
         else if(spatRel.equals(SpatRel.LIGAND) ){
-            return "purple";
+            //return "purple";
+            return "[255 9 255]";
         }
         else if(spatRel.equals(SpatRel.MIXED) ){
-            return "green";
+            //return "green";
+            return "[51 255 51]";
         }
         else if(spatRel.equals(SpatRel.DISULFIDE) ){
             return "yellow";

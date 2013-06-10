@@ -1868,9 +1868,8 @@ public class Main {
                     // only for albelig atm
                     if(gt.equals(SSEGraph.GRAPHTYPE_ALBELIG)) {
                         System.out.println("      Jmol graph visualization commands follow:");
-                        System.out.println("      <---Jmol command start-->");
-                        System.out.println(JmolTools.visualizeGraphCommands(pg));
-                        System.out.println("      <---Jmol command end-->");
+                        System.out.println("        " + JmolTools.visualizeGraphCommands(pg));
+                        System.out.println("      Hint: Combine the Jmol command with 'delete water; display :" + c.getPdbChainID() + "; color atoms translucent orange; ' to better see the overlay.");
                     }
                 }
 
