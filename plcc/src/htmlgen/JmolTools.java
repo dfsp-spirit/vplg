@@ -27,7 +27,7 @@ public class JmolTools {
      * @param end the 3D end position of the line
      * @return the Jmol command to draw the line
      */
-    public static String getCommandDrawLine(String refName, Position3D start, Position3D end, Integer spatRel, String color) {
+    public static String getCommandDrawLine(String refName, Position3D start, Position3D end, String color) {
         StringBuilder sb = new StringBuilder();
         sb.append("draw ").append(refName).append(" color ").append(color).append(" ").append(JmolTools.posString(start)).append(" ").append(JmolTools.posString(end));
         return sb.toString();        
@@ -119,6 +119,43 @@ public class JmolTools {
         else {
             return "gray";
         }
+    }
+    
+    
+    /**
+     * High-level command to visualize an SSE.
+     * @param s the SSE
+     * @return the Jmol command
+     */
+    public static String visualizeSSECommands(SSE s) {
+        StringBuilder sb = new StringBuilder();
+        
+        Position3D sseCenter = s.getCentralAtomPosition();
+        if(sseCenter != null) {
+            sb.append(getCommandDrawSSECircleAtPosition(s.shortLabel(), sseCenter, JmolTools.getColorForSSE(s)));
+        }
+        
+        return sb.toString();
+    }
+    
+    /**
+     * High-level command to visualize a contact between two SSEs.
+     * @param s1 an SSE
+     * @param s2 another SSE that has a 3D contact with the first one
+     * @param spatRel the relative spatial orientation between s1 and s2
+     * @return the Jmol command
+     */
+    public static String visualizeContactCommands(SSE s1, SSE s2, Integer spatRel) {
+        StringBuilder sb = new StringBuilder();
+        
+        Position3D sseCenter1 = s1.getCentralAtomPosition();
+        Position3D sseCenter2 = s2.getCentralAtomPosition();
+        if(sseCenter1 != null && sseCenter2 != null) {
+            String label = "" + s1.shortLabel() + "=" + s2.shortLabel() + "";
+            sb.append(getCommandDrawLine(label, sseCenter1, sseCenter2, JmolTools.getColorForSpatRel(spatRel)));
+        }
+        
+        return sb.toString();
     }
     
     

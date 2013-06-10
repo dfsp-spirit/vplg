@@ -247,6 +247,14 @@ public class SSE implements java.io.Serializable {
     @Override public String toString() {
         return("[" + sseType + ":DSSP:" + this.getStartResidue().getDsspResNum() + "-" + this.getEndResidue().getDsspResNum() + ",PDB:" + this.getStartResidue().getUniquePDBName() + "-" + this.getEndResidue().getUniquePDBName() +"]");
     }
+    
+    /**
+     * Returns a very short label string for this SSE, e.g., "1-H" for SSE #1 in the chain, a helix.
+     * @return a very short label string for this SSE, e.g., "1-H" for SSE #1 in the chain, a helix.
+     */ 
+    public String shortLabel() {
+        return("" + this.sseSeqChainNum + "-" + sseType.toUpperCase());
+    }
 
     /**
      * Returns a string representation of this SSE object.
