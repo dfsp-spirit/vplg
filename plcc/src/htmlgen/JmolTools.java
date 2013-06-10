@@ -30,7 +30,7 @@ public class JmolTools {
      */
     public static String getCommandDrawLine(String refName, Position3D start, Position3D end, String color) {
         StringBuilder sb = new StringBuilder();
-        sb.append("draw ").append(refName).append(" color ").append(color).append(" ").append(JmolTools.posString(start)).append(" ").append(JmolTools.posString(end));
+        sb.append("draw ").append(refName).append(" color ").append(color).append(" ").append(JmolTools.posString(start)).append(" ").append(JmolTools.posString(end)).append("; ");
         return sb.toString();        
     }
     
@@ -45,7 +45,7 @@ public class JmolTools {
      */
     public static String getCommandDrawSSECircleAroundAtom(String refName, Integer atomNum, Double diameter, String color) {
         StringBuilder sb = new StringBuilder();
-        sb.append("draw ").append(refName).append(" diameter ").append(diameter).append(" color ").append(color).append(" circle {atomno=").append(atomNum).append("};");
+        sb.append("draw ").append(refName).append(" diameter ").append(diameter).append(" color ").append(color).append(" circle {atomno=").append(atomNum).append("}; ");
         return sb.toString();        
     }
     
@@ -68,7 +68,7 @@ public class JmolTools {
      */
     public static String getCommandDrawSSECircleAtPosition(String refName, Position3D position, Double diameter, String color) {
         StringBuilder sb = new StringBuilder();
-        sb.append("draw ").append(refName).append(" color ").append(color).append(" diameter ").append(diameter).append(" circle ").append(JmolTools.posString(position)).append(";");
+        sb.append("draw ").append(refName).append(" color ").append(color).append(" diameter ").append(diameter).append(" circle ").append(JmolTools.posString(position)).append("; ");
         return sb.toString();        
     }
     
@@ -131,9 +131,10 @@ public class JmolTools {
     public static String visualizeSSECommands(SSE s) {
         StringBuilder sb = new StringBuilder();
         
+        String label = s.shortLabel();
         Position3D sseCenter = s.getCentralAtomPosition();
         if(sseCenter != null) {
-            sb.append(getCommandDrawSSECircleAtPosition(s.shortLabel(), sseCenter, JmolTools.drawSSEcircleDiameter, JmolTools.getColorForSSE(s)));
+            sb.append(getCommandDrawSSECircleAtPosition(label, sseCenter, JmolTools.drawSSEcircleDiameter, JmolTools.getColorForSSE(s)));
         }
         
         return sb.toString();
@@ -152,7 +153,7 @@ public class JmolTools {
         Position3D sseCenter1 = s1.getCentralAtomPosition();
         Position3D sseCenter2 = s2.getCentralAtomPosition();
         if(sseCenter1 != null && sseCenter2 != null) {
-            String label = "" + s1.shortLabel() + "=" + s2.shortLabel() + "";
+            String label = "" + s1.shortLabel() + SpatRel.getString(spatRel).toLowerCase() + s2.shortLabel();
             sb.append(getCommandDrawLine(label, sseCenter1, sseCenter2, JmolTools.getColorForSpatRel(spatRel)));
         }
         

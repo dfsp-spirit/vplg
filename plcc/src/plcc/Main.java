@@ -21,6 +21,7 @@ import java.util.Locale;
 import datastructures.UndirectedGraph;
 import htmlgen.CssGenerator;
 import htmlgen.HtmlGenerator;
+import htmlgen.JmolTools;
 import java.util.*;
 
 import java.awt.BasicStroke;
@@ -1861,6 +1862,16 @@ public class Main {
                 
                 if(Settings.getInteger("plcc_I_debug_level") > 0) {
                     System.out.println("      Graph plus string is '" + pg.getGraphPlusString() + "'.");
+                }
+                
+                if(Settings.getBoolean("plcc_B_Jmol_graph_vis_commands")) {                    
+                    // only for albelig atm
+                    if(gt.equals(SSEGraph.GRAPHTYPE_ALBELIG)) {
+                        System.out.println("      Jmol graph visualization commands follow:");
+                        System.out.println("      <---Jmol command start-->");
+                        System.out.println(JmolTools.visualizeGraphCommands(pg));
+                        System.out.println("      <---Jmol command end-->");
+                    }
                 }
 
                 /* ----------------------------------------------- Folding graphs ---------------------------------------------- */

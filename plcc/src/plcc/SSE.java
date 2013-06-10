@@ -253,7 +253,7 @@ public class SSE implements java.io.Serializable {
      * @return a very short label string for this SSE, e.g., "1-H" for SSE #1 in the chain, a helix.
      */ 
     public String shortLabel() {
-        return("" + this.sseSeqChainNum + "-" + sseType.toUpperCase());
+        return("" + sseType.toLowerCase() + this.sequentialIndexInGraph);
     }
 
     /**

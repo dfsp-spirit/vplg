@@ -233,7 +233,7 @@ public class Atom implements java.io.Serializable {
     public void setModel(Model m) { model = m; }
     
     public Position3D getPosition3D() {
-        return new Position3D(coordX, coordY, coordZ);
+        return new Position3D(coordX / 10.0f, coordY  / 10.0f, coordZ / 10.0f);
     }
 
 }
