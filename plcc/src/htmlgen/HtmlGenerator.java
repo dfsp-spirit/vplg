@@ -1420,85 +1420,93 @@ public class HtmlGenerator {
         sb.append("$pdbid = $_GET['pdbid'];\n");              
         sb.append("$chain = $_GET['chain'];\n");        
         sb.append("$graphtype = $_GET['graphtype'];\n");
-        sb.append("echo \"This line was written using PHP.<br/>\";\n");
-        sb.append("echo \"Mode  = $mode<br/>\";\n");
-        sb.append("echo \"PDB ID = $pdbid<br/>\";\n");              
-        sb.append("echo \"Chain  = $chain<br/>\";\n");
-        sb.append("echo \"Graph type  = $graphtype<br/>\";\n");
+        //sb.append("echo \"This line was written using PHP.<br/>\";\n");
+        //sb.append("echo \"Mode  = $mode<br/>\";\n");
+        //sb.append("echo \"PDB ID = $pdbid<br/>\";\n");              
+        //sb.append("echo \"Chain  = $chain<br/>\";\n");
+        //sb.append("echo \"Graph type  = $graphtype<br/>\";\n");
         
         sb.append("if($mode == \"graph\" || $mode == \"allgraphs\") {\n");
         
+        sb.append("    $graphtypes = array();\n");
+        sb.append("    if($mode == \"graph\") {\n");
+        sb.append("        $graphtypes = array($graphtype);\n");
+        sb.append("    }\n");
+        sb.append("    if($mode == \"allgraphs\") {\n");
+        sb.append("        $graphtypes = array('alpha', 'beta', 'albe', 'alphalig', 'betalig', 'albelig');\n");
+        sb.append("    }\n");
 
-        sb.append("    $valid_pdbid = FALSE;\n");
-        sb.append("    $valid_chain = FALSE;\n");
-        sb.append("    $valid_graphtype = FALSE;\n");
-        sb.append("    $valid_all = FALSE;\n");
+        sb.append("    foreach ($graphtypes as $graphtype) {\n");
+        
+        sb.append("        $valid_pdbid = FALSE;\n");
+        sb.append("        $valid_chain = FALSE;\n");
+        sb.append("        $valid_graphtype = FALSE;\n");
+        sb.append("        $valid_all = FALSE;\n");
 
-        sb.append("    if(ctype_alnum($pdbid) && strlen($pdbid) == 4) { $valid_pdbid = TRUE; }\n");
-        sb.append("    if(ctype_alnum($chain) && strlen($chain) == 1) { $valid_chain = TRUE; }\n");
-        sb.append("    if($graphtype == \"alpha\" || $graphtype == \"beta\" || $graphtype == \"albe\" || $graphtype == \"alphalig\" || $graphtype == \"betalig\" || $graphtype == \"albelig\") { $valid_graphtype = TRUE; }\n");
-        sb.append("    $link = \"\";\n");
+        sb.append("        if(ctype_alnum($pdbid) && strlen($pdbid) == 4) { $valid_pdbid = TRUE; }\n");
+        sb.append("        if(ctype_alnum($chain) && strlen($chain) == 1) { $valid_chain = TRUE; }\n");
+        sb.append("        if($graphtype == \"alpha\" || $graphtype == \"beta\" || $graphtype == \"albe\" || $graphtype == \"alphalig\" || $graphtype == \"betalig\" || $graphtype == \"albelig\") { $valid_graphtype = TRUE; }\n");
+        sb.append("        $link = \"\";\n");
 
-        sb.append("    if($valid_pdbid) {\n");
-        sb.append("        echo \"PDB ID is valid.<br/>\";\n");
-        sb.append("        $mid_chars = substr($pdbid, 1, 2);\n");
+        sb.append("        if($valid_pdbid) {\n");
+        //sb.append("            echo \"PDB ID is valid.<br/>\";\n");
+        sb.append("            $mid_chars = substr($pdbid, 1, 2);\n");
 
-        sb.append("        if($valid_chain) {\n");
-        sb.append("            echo \"Chain is valid.<br/>\";\n");
-        sb.append("            if($valid_graphtype) {\n");
-        sb.append("                echo \"Graph type is valid.<br/>\";\n");
-        sb.append("                $valid_all = TRUE;\n");
-        sb.append("                $jmolfile = getJmolFileName($pdbid, $chain, $graphtype);\n");
-        sb.append("                $link = \"./\" . $mid_chars . \"/\" . $pdbid . \"/\" . $chain . \"/\" . $jmolfile ;\n");       
+        sb.append("            if($valid_chain) {\n");
+        //sb.append("                echo \"Chain is valid.<br/>\";\n");
+        sb.append("                if($valid_graphtype) {\n");
+        //sb.append("                    echo \"Graph type is valid.<br/>\";\n"); 
+       sb.append("                    $valid_all = TRUE;\n");
+        sb.append("                    $jmolfile = getJmolFileName($pdbid, $chain, $graphtype);\n");
+        sb.append("                    $link = \"./\" . $mid_chars . \"/\" . $pdbid . \"/\" . $chain . \"/\" . $jmolfile ;\n");       
+        sb.append("                }\n");
+        sb.append("                else {\n");
+        sb.append("                    echo \"ERROR: PDB ID and Chain are valid but graph type is not.<br/>\";\n");
+        sb.append("                }\n");
         sb.append("            }\n");
         sb.append("            else {\n");
-        sb.append("                echo \"PDB ID and Chain are valid but graph type is not.<br/>\";\n");
+        sb.append("                echo \"ERROR: PDB ID is valid but chain is not. Cannot show graphs.<br/>\";\n");
         sb.append("            }\n");
-        sb.append("        }\n");
-        sb.append("        else {\n");
-        sb.append("            echo \"PDB ID is valid but chain is not. Cannot show graphs.<br/>\";\n");
-        sb.append("        }\n");
-        sb.append("        echo \"Link is '$link'.<br/>\n\";\n");
+        //sb.append("            echo \"Link is '$link'.<br/>\";\n");
 
-        sb.append("        if ($valid_all && file_exists($link)) {\n");
-        sb.append("            echo \"Jmol command file found.<br/><br/>\n\";\n");
-        sb.append("            if ($valid_chain) {\n");
-        sb.append("                echo \"<a href='\" . $link . \"'>\" . \"Protein $pdbid chain $chain\" . \"</a><br/>\n\";\n");
-        sb.append("            }\n");
-        sb.append("            else {\n");            
-        sb.append("                echo \"<a href='\" . $link . \"'>\" . \"Protein $pdbid\" . \"</a><br/>\n\";\n");
-        sb.append("            }\n");            
-        sb.append("        }\n");
-        sb.append("        else {\n");
-        sb.append("            echo \"Sorry, no Jmol command file available for that graph.<br/>\";\n");
-        sb.append("        }\n");
-
-
-        sb.append("    }\n");            
-        sb.append("    else {\n");
-        sb.append("        echo \"ERROR: The given PDB ID is invalid. Invalid query.<br/>\";\n");                        
-        sb.append("    }\n");
-        
+        sb.append("            if ($valid_all) {\n");
+        sb.append("                if (file_exists($link)) {\n");
+        //sb.append("                    echo \"Jmol command file found.<br/><br/>\";\n");
         // draw button
-        sb.append("    echo \"The Jmol file is at $link.<br/>\";\n");
-        // TODO: get command from file
-        //sb.append("    $command = \"display :A\";\n");
-        sb.append("    $command = file_get_contents($link);\n");
+        //sb.append("                    echo \"The Jmol file is at $link.<br/>\";\n");
+        //sb.append("                    $command = \"display :A\";\n");
+        sb.append("                    $command = file_get_contents($link);\n");
         
-        sb.append("    $label = \"Visualize $graphtype graph\";\n");
-        sb.append("\n?>\n");
+        sb.append("                    $label = \"Visualize $graphtype graph\";\n");
+        sb.append("                    \n?>\n");
         
-        sb.append("<script language=\"JavaScript\" type=\"text/javascript\">\n");
-        sb.append("<!--\n");   
+        sb.append("                    <script language=\"JavaScript\" type=\"text/javascript\">\n");
+        sb.append("                    <!--\n");   
         
-        sb.append("<?php\n");
-        sb.append("    writeJmolButtonJs($command, $label);\n"); 
-        sb.append("\n?>\n");
+        sb.append("                    <?php\n");
+        sb.append("                    writeJmolButtonJs($command, $label);\n"); 
+        sb.append("                    \n?>\n");
         
-        sb.append("// -->\n");
-        sb.append("</script>\n");
+        sb.append("                    // -->\n");
+        sb.append("                    </script>\n");
         
-        sb.append("<?php\n");
+        sb.append("                    <?php\n");
+        // button end
+        sb.append("                }\n");
+        sb.append("                else {\n");
+        sb.append("                    echo \"INFO: Sorry, no visualization available for $graphtype graph of protein $pdbid chain $chain.<br/>\";\n");
+        sb.append("                }\n");
+        sb.append("            }\n");
+        sb.append("            else {\n");
+        sb.append("                echo \"ERROR: Some query parameters were invalid.<br/>\";\n");
+        sb.append("            }\n");
+        
+
+        sb.append("        }\n");            
+        sb.append("        else {\n");
+        sb.append("            echo \"ERROR: The given PDB ID is invalid. Invalid query.<br/>\";\n");                        
+        sb.append("        }\n");        
+        sb.append("    }\n"); // foreach
         sb.append("}\n");
         sb.append("\n?>\n");
         
