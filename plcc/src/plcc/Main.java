@@ -1675,7 +1675,6 @@ public class Main {
             String filePathGraphs = null;
             String filePathHTML = null;
             String imgFile = null;
-            String plccGraphFile = null;        
 
 
             for(String gt : graphTypes) {
@@ -1792,7 +1791,7 @@ public class Main {
                 }
                 // write the SSE info text file for the image (plcc graph format file)
                 if(Settings.getBoolean("plcc_B_output_plcc")) {
-                    plccGraphFile = filePathGraphs + fs + fileNameWithoutExtension + ".plg";
+                    String plccGraphFile = filePathGraphs + fs + fileNameWithoutExtension + ".plg";
                     if(IO.stringToTextFile(plccGraphFile, pg.toVPLGGraphFormat())) {
                         graphFormatsWritten += "plg "; numFormatsWritten++;
                         pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_VPLG, new File(plccGraphFile));
@@ -1865,11 +1864,19 @@ public class Main {
                 }
                 
                 if(Settings.getBoolean("plcc_B_Jmol_graph_vis_commands")) {                    
-                    // only for albelig atm
+                    // only print to STDOUT for albelig atm
                     if(gt.equals(SSEGraph.GRAPHTYPE_ALBELIG)) {
-                        System.out.println("      Jmol graph visualization commands follow:");
+                        System.out.println("      Jmol graph visualization commands for " + gt + " graph follow:");
                         System.out.println("        " + JmolTools.visualizeGraphCommands(pg));
                         System.out.println("      Hint: Combine the Jmol command with 'delete water; display :" + c.getPdbChainID() + "; color atoms translucent orange; ' to better see the overlay.");
+                    }
+                    
+                    // but compute for all graphs and register in web mode
+                    String graphVisualizationFileJmolCommands = filePathGraphs + fs + fileNameWithoutExtension + ".jmol";
+                    if(IO.stringToTextFile(graphVisualizationFileJmolCommands, JmolTools.visualizeGraphCommands(pg))) {
+                        if(Settings.getBoolean("plcc_B_output_textfiles_dir_tree_html")) {
+                            pcr.addProteinGraphVisJmolCommandFile(gt, new File(graphVisualizationFileJmolCommands));
+                        }
                     }
                 }
 
@@ -4693,7 +4700,7 @@ public class Main {
         ArrayList<SSE> chainPtglSSEs = new ArrayList<SSE>();
         ArrayList<SSE> allChainSSEs = new ArrayList<SSE>();
         ArrayList<SSE> oneChainSSEs = new ArrayList<SSE>();
-        HashMap chainSSEMap = new HashMap();
+        HashMap<String, ArrayList<SSE>> chainSSEMap = new HashMap<String, ArrayList<SSE>>();
         String fs = System.getProperty("file.separator");
 
         System.out.println("Calculating SSEs for all chains of protein " + pdbid + "...");

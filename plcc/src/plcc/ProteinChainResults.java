@@ -45,6 +45,7 @@ public class ProteinChainResults {
     protected HashMap<String, File> proteinGraphImagesBitmap;
     protected HashMap<String, File> proteinGraphImagesVector;
     protected HashMap<String, File> proteinGraphFilesByFormat;
+    protected HashMap<String, File> proteinGraphVisJmolCommandFiles;
     protected HashMap<String, ProteinFoldingGraphResults> foldingGraphResults;
     protected ProtMetaInfo chainMetaData;
 
@@ -62,6 +63,7 @@ public class ProteinChainResults {
         proteinGraphFilesByFormat = new HashMap<String, File>();
         proteinGraphImagesBitmap = new HashMap<String, File>();
         proteinGraphImagesVector = new HashMap<String, File>();
+        proteinGraphVisJmolCommandFiles = new HashMap<String, File>();
         chainMetaData = null;
         foldingGraphResults = new HashMap<String, ProteinFoldingGraphResults>();
     }
@@ -105,12 +107,20 @@ public class ProteinChainResults {
         proteinGraphImagesBitmap.put(graphType, outFile);
     }
     
-    public void addProteinGraphImageVector(String graphType, File outFile) {
-        proteinGraphImagesVector.put(graphType, outFile);
+    public void addProteinGraphVisJmolCommandFile(String graphType, File outFile) {
+        proteinGraphVisJmolCommandFiles.put(graphType, outFile);
     }
     
     public File getProteinGraphImageBitmap(String graphType) {
         return this.proteinGraphImagesBitmap.get(graphType);
+    }
+    
+    public void addProteinGraphImageVector(String graphType, File outFile) {
+        proteinGraphImagesVector.put(graphType, outFile);
+    }
+    
+    public File getProteinGraphVisJmolCommandFile(String graphType) {
+        return this.proteinGraphVisJmolCommandFiles.get(graphType);
     }
     
     public File getProteinGraphImageVector(String graphType) {

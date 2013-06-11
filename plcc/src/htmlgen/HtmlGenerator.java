@@ -54,12 +54,44 @@ public class HtmlGenerator {
         return cssTitles;
     }
     
-    public static final String visualizeWebsiteFileNameRelativeToBasedir = "visualize.html";
+    public static final String visualizeWebsiteFileNameRelativeToBasedir = "visualize.php";
     
-    public static String getVisualizeLink(String pathToBaseDir, String pdbid) {
+    /**
+     * Generates a visualize link for a whole PDB file. Loads the model without anything special.
+     * @param pathToBaseDir path to base dir
+     * @param pdbid the PDB identifier
+     * @return a HTML link
+     */
+    public static String getVisualizeLinkPDB(String pathToBaseDir, String pdbid) {
         String webFs = "/";
-        return HtmlTools.makeWebPath(pathToBaseDir + webFs + HtmlGenerator.visualizeWebsiteFileNameRelativeToBasedir + "?pdb=" + pdbid);
+        return HtmlTools.makeWebPath(pathToBaseDir + webFs + HtmlGenerator.visualizeWebsiteFileNameRelativeToBasedir + "?mode=structure&pdbid=" + pdbid);
     }
+    
+    /**
+     * Generates a visualize link for a whole PDB file. Loads the model without anything special.
+     * @param pathToBaseDir path to base dir
+     * @param pdbid the PDB identifier
+     * @param chainID the chain identifier
+     * @return a HTML link
+     */
+    public static String getVisualizeLinkChainAllGraph(String pathToBaseDir, String pdbid, String chainID) {
+        String webFs = "/";
+        return HtmlTools.makeWebPath(pathToBaseDir + webFs + HtmlGenerator.visualizeWebsiteFileNameRelativeToBasedir + "?mode=allgraphs&pdbid=" + pdbid + "&chain=" + chainID);
+    }
+    
+    /**
+     * Generates a visualize link for a whole PDB file. Loads the model without anything special.
+     * @param pathToBaseDir path to base dir
+     * @param pdbid the PDB identifier
+     * @param chainID the chain identifier
+     * @param graphType the graph type
+     * @return a HTML link
+     */
+    public static String getVisualizeLinkGraph(String pathToBaseDir, String pdbid, String chainID, String graphType) {
+        String webFs = "/";
+        return HtmlTools.makeWebPath(pathToBaseDir + webFs + HtmlGenerator.visualizeWebsiteFileNameRelativeToBasedir + "?mode=graph&pdbid=" + pdbid + "&chain=" + chainID + "&graphtype=" + graphType);
+    }
+       
     
     public static final String DIV_MAIN = "main";
     public static final String DIV_TOP_ROW = "top_row";
@@ -98,7 +130,7 @@ public class HtmlGenerator {
         String startWebsiteHtmlFile =  outputBaseDir.getAbsolutePath() + fs + "index.html";
         String searchWebsiteHtmlFile =  outputBaseDir.getAbsolutePath() + fs + "search.html";
         String findWebsitePhpFile =  outputBaseDir.getAbsolutePath() + fs + "find.php";
-        String visualizeWebsiteHtmlFile =  outputBaseDir.getAbsolutePath() + fs + "visualize.html";
+        String visualizeWebsitePhpFile =  outputBaseDir.getAbsolutePath() + fs + "visualize.php";
         
         if(IO.stringToTextFile(startWebsiteHtmlFile, this.generateStartWebpage("."))) {
             System.out.println("   Wrote VPLGweb start website to " + new File(startWebsiteHtmlFile).getAbsolutePath() + ".");
@@ -118,10 +150,10 @@ public class HtmlGenerator {
             System.err.println("ERROR: Could not write VPLGweb find website to " + new File(findWebsitePhpFile).getAbsolutePath() + ".");
         }
         
-        if(IO.stringToTextFile(visualizeWebsiteHtmlFile, this.generateVisualize3DWebpage("."))) {
-            System.out.println("   Wrote VPLGweb visualization website to " + new File(visualizeWebsiteHtmlFile).getAbsolutePath() + ".");
+        if(IO.stringToTextFile(visualizeWebsitePhpFile, this.generateVisualize3DWebpage("."))) {
+            System.out.println("   Wrote VPLGweb visualization website to " + new File(visualizeWebsitePhpFile).getAbsolutePath() + ".");
         } else {
-            System.err.println("ERROR: Could not write VPLGweb visualization website to " + new File(visualizeWebsiteHtmlFile).getAbsolutePath() + ".");
+            System.err.println("ERROR: Could not write VPLGweb visualization website to " + new File(visualizeWebsitePhpFile).getAbsolutePath() + ".");
         }
         
         
@@ -334,7 +366,7 @@ public class HtmlGenerator {
             sb.append(HtmlTools.heading("Search results for your VPLGweb query", 2));
             sb.append(HtmlTools.startParagraph());
             
-            // TODO: add PHP code to handle query here
+            // PHP code to handle query
             sb.append("<?php\n");
             
             //sb.append("error_reporting(E_ALL);\n");
@@ -415,6 +447,32 @@ public class HtmlGenerator {
         return sb.toString();
     }
     
+    /**
+     * Writes the PHP function to generate the file name of the Jmol commands file without the starting and closing PHP brackets.
+     * @return the function PHP code
+     */
+    public static String phpFunctionGetJmolFileName() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("function getJmolFileName($pdbid, $chain, $graphtype) {\n");
+        sb.append("  return $pdbid . \"_\" . $chain . \"_\" . $graphtype . \"_PG.jmol\";\n");
+        sb.append("}\n");
+        return sb.toString();
+    }
+    
+    /**
+     * Writes the JS code to generate the Jmol button, without the JS script tags.
+     * @return the js code
+     */
+    public static String phpFunctionWriteJmolButton() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("function writeJmolButtonJs($jmolcommands, $label) {\n");
+        sb.append("  echo \"Jmol.jmolButton(myJmol, '\" . $jmolcommands . \"', '\" . $label . \"');\";\n");
+        sb.append("}\n");
+        return sb.toString();
+    }
+    
+    
+    
     public String generateSearchWebpage(String pathToBaseDir) {
         StringBuilder sb = new StringBuilder();
         
@@ -484,9 +542,9 @@ public class HtmlGenerator {
         sb.append(HtmlTools.startParagraph("tiny"));    
         sb.append(HtmlTools.bold("Technical information: "));
         sb.append("The visualization requires a modern browser with JavaScript enabled. The default is to load the recommended ");
-        sb.append(HtmlTools.link("./visualize.html?version=html5", "HTML 5 version"));
+        sb.append(HtmlTools.link("./"  + HtmlGenerator.visualizeWebsiteFileNameRelativeToBasedir + "?version=html5", "HTML 5 version"));
         sb.append(", but you can also use the ");
-        sb.append(HtmlTools.link("./visualize.html?version=java", "Java plugin version"));
+        sb.append(HtmlTools.link("./" + HtmlGenerator.visualizeWebsiteFileNameRelativeToBasedir + "?version=java", "Java plugin version"));
         sb.append(" if you have the Java Web Plugin installed and activated in your browser.");
         sb.append(HtmlTools.brAndNewline());                
         sb.append(HtmlTools.brAndNewline());
@@ -502,7 +560,7 @@ public class HtmlGenerator {
         
         sb.append(HtmlGenerator.jsFunctionJSmolInit(pathToBaseDir + webFs + "jsmol"));
         sb.append(HtmlTools.endParagraph());                
-        sb.append(HtmlTools.endDiv());  // appletarea
+        sb.append(HtmlTools.endDiv());  // applet area
             
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline()); 
@@ -646,7 +704,7 @@ public class HtmlGenerator {
                     sb.append(key).append(": ").append(pr.getProteinMetaData().get(key)).append(HtmlTools.br());
                 }
             }
-            sb.append("3D Visualization: ").append(HtmlTools.linkBlank(HtmlGenerator.getVisualizeLink(pathToBaseDir, pdbid), "Open 3D viewer [new tab]")).append(HtmlTools.brAndNewline());
+            sb.append("3D Visualization: ").append(HtmlTools.linkBlank(HtmlGenerator.getVisualizeLinkPDB(pathToBaseDir, pdbid), "Open 3D viewer")).append(" (opens in new browser tab)").append(HtmlTools.brAndNewline());
             sb.append(HtmlTools.endParagraph());
         sb.append(HtmlTools.endDiv());  // protein info
 
@@ -1254,7 +1312,7 @@ public class HtmlGenerator {
         sb.append("<!--\n");   
         
         // test
-        sb.append("var pdb = getParameterByName('pdb');\n");        
+        sb.append("var pdb = getParameterByName('pdbid');\n");        
         //sb.append("document.write('<p>pdb= ' + pdb + '</p>');\n");
         sb.append("var loadModel=\":caffeine\"\n");
         sb.append("if(pdb != \"\") {\n");
@@ -1338,6 +1396,7 @@ public class HtmlGenerator {
         // add customized controls
         //sb.append("Jmol.jmolBr();");
         //sb.append("Jmol.jmolCheckbox(myJmol,\"spacefill on\",\"spacefill off\",\"Toggle display as spheres\");\n");
+        
         sb.append("Jmol.jmolBr();\n");
         sb.append("document.write('<p class=\"tiny\">Jmol interactive scripting window:</p>');\n");        
         sb.append("Jmol.jmolCommandInput(\"myJmol\", \"Execute Jmol command\", \"90%\", \"jmol_cmd\", \"Jmol command prompt\")\n");
@@ -1346,7 +1405,106 @@ public class HtmlGenerator {
         sb.append("document.write('</p>');\n");
         sb.append("// -->\n");
         sb.append("</script>\n");
+        
+        sb.append(HtmlGenerator.writePhpCodeToRenderVisualizeButtonsInJS());
         return sb.toString();
+    }
+    
+    public static String writePhpCodeToRenderVisualizeButtonsInJS() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<?php\n");
+            
+        sb.append(HtmlGenerator.phpFunctionGetJmolFileName());
+        sb.append(HtmlGenerator.phpFunctionWriteJmolButton());
+        sb.append("$mode = $_GET['mode'];\n");
+        sb.append("$pdbid = $_GET['pdbid'];\n");              
+        sb.append("$chain = $_GET['chain'];\n");        
+        sb.append("$graphtype = $_GET['graphtype'];\n");
+        sb.append("echo \"This line was written using PHP.<br/>\";\n");
+        sb.append("echo \"Mode  = $mode<br/>\";\n");
+        sb.append("echo \"PDB ID = $pdbid<br/>\";\n");              
+        sb.append("echo \"Chain  = $chain<br/>\";\n");
+        sb.append("echo \"Graph type  = $graphtype<br/>\";\n");
+        
+        sb.append("if($mode == \"graph\" || $mode == \"allgraphs\") {\n");
+        
+
+        sb.append("    $valid_pdbid = FALSE;\n");
+        sb.append("    $valid_chain = FALSE;\n");
+        sb.append("    $valid_graphtype = FALSE;\n");
+        sb.append("    $valid_all = FALSE;\n");
+
+        sb.append("    if(ctype_alnum($pdbid) && strlen($pdbid) == 4) { $valid_pdbid = TRUE; }\n");
+        sb.append("    if(ctype_alnum($chain) && strlen($chain) == 1) { $valid_chain = TRUE; }\n");
+        sb.append("    if($graphtype == \"alpha\" || $graphtype == \"beta\" || $graphtype == \"albe\" || $graphtype == \"alphalig\" || $graphtype == \"betalig\" || $graphtype == \"albelig\") { $valid_graphtype = TRUE; }\n");
+        sb.append("    $link = \"\";\n");
+
+        sb.append("    if($valid_pdbid) {\n");
+        sb.append("        echo \"PDB ID is valid.<br/>\";\n");
+        sb.append("        $mid_chars = substr($pdbid, 1, 2);\n");
+
+        sb.append("        if($valid_chain) {\n");
+        sb.append("            echo \"Chain is valid.<br/>\";\n");
+        sb.append("            if($valid_graphtype) {\n");
+        sb.append("                echo \"Graph type is valid.<br/>\";\n");
+        sb.append("                $valid_all = TRUE;\n");
+        sb.append("                $jmolfile = getJmolFileName($pdbid, $chain, $graphtype);\n");
+        sb.append("                $link = \"./\" . $mid_chars . \"/\" . $pdbid . \"/\" . $chain . \"/\" . $jmolfile ;\n");       
+        sb.append("            }\n");
+        sb.append("            else {\n");
+        sb.append("                echo \"PDB ID and Chain are valid but graph type is not.<br/>\";\n");
+        sb.append("            }\n");
+        sb.append("        }\n");
+        sb.append("        else {\n");
+        sb.append("            echo \"PDB ID is valid but chain is not. Cannot show graphs.<br/>\";\n");
+        sb.append("        }\n");
+        sb.append("        echo \"Link is '$link'.<br/>\n\";\n");
+
+        sb.append("        if ($valid_all && file_exists($link)) {\n");
+        sb.append("            echo \"Jmol command file found.<br/><br/>\n\";\n");
+        sb.append("            if ($valid_chain) {\n");
+        sb.append("                echo \"<a href='\" . $link . \"'>\" . \"Protein $pdbid chain $chain\" . \"</a><br/>\n\";\n");
+        sb.append("            }\n");
+        sb.append("            else {\n");            
+        sb.append("                echo \"<a href='\" . $link . \"'>\" . \"Protein $pdbid\" . \"</a><br/>\n\";\n");
+        sb.append("            }\n");            
+        sb.append("        }\n");
+        sb.append("        else {\n");
+        sb.append("            echo \"Sorry, no Jmol command file available for that graph.<br/>\";\n");
+        sb.append("        }\n");
+
+
+        sb.append("    }\n");            
+        sb.append("    else {\n");
+        sb.append("        echo \"ERROR: The given PDB ID is invalid. Invalid query.<br/>\";\n");                        
+        sb.append("    }\n");
+        
+        // draw button
+        sb.append("    echo \"The Jmol file is at $jmolfile.<br/>\";\n");
+        // TODO: get command from file
+        sb.append("    $command = \"display :A\";\n");
+        sb.append("    $label = \"show stuff\";\n");
+        sb.append("\n?>\n");
+        
+        sb.append("<script language=\"JavaScript\" type=\"text/javascript\">\n");
+        sb.append("<!--\n");   
+        
+        sb.append("<?php\n");
+        sb.append("    writeJmolButtonJs($command, $label);\n"); 
+        sb.append("\n?>\n");
+        
+        sb.append("// -->\n");
+        sb.append("</script>\n");
+        
+        sb.append("<?php\n");
+        sb.append("}\n");
+        sb.append("\n?>\n");
+        
+        return sb.toString();              
+    }
+    
+    public static String jsJmolButton(String jmolCommands, String label) {
+        return "Jmol.jmolButton(myJmol,\"" + jmolCommands + "\", \"" + label + "\");";
     }
     
     public static String jsFunctionSwitchStyleSheet() {
