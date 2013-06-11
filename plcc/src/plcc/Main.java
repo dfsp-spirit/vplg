@@ -1867,13 +1867,13 @@ public class Main {
                     // only print to STDOUT for albelig atm
                     if(gt.equals(SSEGraph.GRAPHTYPE_ALBELIG)) {
                         System.out.println("      Jmol graph visualization commands for " + gt + " graph follow:");
-                        System.out.println("        " + JmolTools.visualizeGraphCommands(pg));
+                        System.out.println("        " + JmolTools.visualizeGraphCommands(pg, false, false));
                         System.out.println("      Hint: Combine the Jmol command with 'delete water; display :" + c.getPdbChainID() + "; color atoms translucent orange; ' to better see the overlay.");
                     }
                     
                     // but compute for all graphs and register in web mode
                     String graphVisualizationFileJmolCommands = filePathGraphs + fs + fileNameWithoutExtension + ".jmol";
-                    if(IO.stringToTextFile(graphVisualizationFileJmolCommands, JmolTools.visualizeGraphCommands(pg))) {
+                    if(IO.stringToTextFile(graphVisualizationFileJmolCommands, JmolTools.visualizeGraphCommands(pg, true, true))) {
                         if(Settings.getBoolean("plcc_B_output_textfiles_dir_tree_html")) {
                             pcr.addProteinGraphVisJmolCommandFile(gt, new File(graphVisualizationFileJmolCommands));
                         }

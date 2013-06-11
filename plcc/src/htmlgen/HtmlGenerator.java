@@ -831,6 +831,10 @@ public class HtmlGenerator {
             }            
         }
         
+        sb.append("3D visualization: ");
+        sb.append(HtmlTools.linkBlank(HtmlGenerator.getVisualizeLinkChainAllGraph(pathToBaseDir, pdbid, chain.toLowerCase()), "Open 3D viewer"));
+        sb.append(" (opens in new browser tab)").append(HtmlTools.brAndNewline());
+        
         sb.append(HtmlTools.endParagraph());
         sb.append(HtmlTools.endDiv());  // chain
         
@@ -1313,6 +1317,7 @@ public class HtmlGenerator {
         
         // test
         sb.append("var pdb = getParameterByName('pdbid');\n");        
+        sb.append("var mode = getParameterByName('mode');\n");        
         //sb.append("document.write('<p>pdb= ' + pdb + '</p>');\n");
         sb.append("var loadModel=\":caffeine\"\n");
         sb.append("if(pdb != \"\") {\n");
@@ -1330,6 +1335,16 @@ public class HtmlGenerator {
         //sb.append("}\n");
         sb.append("\n");
         
+        // set mode to structure if unset
+        sb.append("if(mode == \"\") {\n");
+        sb.append("  mode=\"structure\";\n");
+        sb.append("}\n");
+        
+        sb.append("var selectavailable = false;\n");        
+        sb.append("if(mode == \"structure\") {\n");
+        sb.append("  selectavailable=true;\n");
+        sb.append("}\n");
+        
         sb.append("var version = getParameterByName('version');\n");
         sb.append("if(version == \"\") {\n");
         sb.append("  version = \"html5\";\n");    // possible values: 'java' for java plugin, everything else is considered html5
@@ -1339,7 +1354,7 @@ public class HtmlGenerator {
         
         // for Java plugin version
         sb.append("var InfoJavaPlugin = {\n");
-        sb.append("  addSelectionOptions: true,\n");
+        sb.append("  addSelectionOptions: selectavailable,\n");
         sb.append("  color: \"#FFFFFF\",\n");
         sb.append("  debug: false,\n");
         sb.append("  defaultModel: loadModel,\n");
@@ -1359,7 +1374,7 @@ public class HtmlGenerator {
         
         // for HTML5 version
         sb.append("var InfoHTML5 = {\n");
-        sb.append("  addSelectionOptions: true,\n");
+        sb.append("  addSelectionOptions: selectavailable,\n");
         sb.append("  color: \"#FFFFFF\",\n");
         sb.append("  debug: false,\n");
         sb.append("  defaultModel: loadModel,\n");
@@ -1419,6 +1434,7 @@ public class HtmlGenerator {
         sb.append("$mode = $_GET['mode'];\n");
         sb.append("$pdbid = $_GET['pdbid'];\n");              
         sb.append("$chain = $_GET['chain'];\n");        
+        sb.append("$chain = strtoupper($chain);\n");        
         sb.append("$graphtype = $_GET['graphtype'];\n");
         //sb.append("echo \"This line was written using PHP.<br/>\";\n");
         //sb.append("echo \"Mode  = $mode<br/>\";\n");

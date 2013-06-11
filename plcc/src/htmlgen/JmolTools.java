@@ -172,8 +172,13 @@ public class JmolTools {
      * @param g the input graph
      * @return the Jmol command string to visualize the graph.
      */
-    public static String visualizeGraphCommands(SSEGraph g) {
+    public static String visualizeGraphCommands(SSEGraph g, boolean hideOtherChains, boolean forceReload) {
         StringBuilder sb = new StringBuilder();
+        
+        if(forceReload) {
+            sb.append("load =").append(g.getPdbid().toUpperCase()).append("; ");
+        }
+        
         // edges first (lines)
         for(Integer[] edge : g.getEdgeList()) {
             sb.append(JmolTools.visualizeContactCommands(g.getVertex(edge[0]), g.getVertex(edge[1]), g.getContactType(edge[0], edge[1])));
@@ -182,6 +187,22 @@ public class JmolTools {
         for(int i = 0; i < g.numVertices(); i++) {
             sb.append(JmolTools.visualizeSSECommands(g.getVertex(i)));
         }
+        
+        if(hideOtherChains) {
+            sb.append(limitOneChainTranslucentCommands(g.getChainid()));
+        }
+        
+        return sb.toString();
+    }
+    
+    /**
+     * Function to limit visibility to one graph and show its atoms transparent. Deletes waters.
+     * @param chain the PDB chain id
+     * @return the Jmol command string 
+     */
+    public static String limitOneChainTranslucentCommands(String chain) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("delete water; cartoon only; display :").append(chain).append("; color cartoon translucent orange; ");
         return sb.toString();
     }
     
