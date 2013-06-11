@@ -1480,10 +1480,12 @@ public class HtmlGenerator {
         sb.append("    }\n");
         
         // draw button
-        sb.append("    echo \"The Jmol file is at $jmolfile.<br/>\";\n");
+        sb.append("    echo \"The Jmol file is at $link.<br/>\";\n");
         // TODO: get command from file
-        sb.append("    $command = \"display :A\";\n");
-        sb.append("    $label = \"show stuff\";\n");
+        //sb.append("    $command = \"display :A\";\n");
+        sb.append("    $command = file_get_contents($link);\n");
+        
+        sb.append("    $label = \"Visualize $graphtype graph\";\n");
         sb.append("\n?>\n");
         
         sb.append("<script language=\"JavaScript\" type=\"text/javascript\">\n");
