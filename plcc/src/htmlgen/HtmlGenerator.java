@@ -1461,11 +1461,11 @@ public class HtmlGenerator {
         sb.append("                    $link = \"./\" . $mid_chars . \"/\" . $pdbid . \"/\" . $chain . \"/\" . $jmolfile ;\n");       
         sb.append("                }\n");
         sb.append("                else {\n");
-        sb.append("                    echo \"ERROR: PDB ID and Chain are valid but graph type is not.<br/>\";\n");
+        sb.append("                    echo \"<p>ERROR: PDB ID and Chain are valid but graph type is not.</p>\";\n");
         sb.append("                }\n");
         sb.append("            }\n");
         sb.append("            else {\n");
-        sb.append("                echo \"ERROR: PDB ID is valid but chain is not. Cannot show graphs.<br/>\";\n");
+        sb.append("                echo \"<p>ERROR: PDB ID is valid but chain is not. Cannot show graphs.</p>\";\n");
         sb.append("            }\n");
         //sb.append("            echo \"Link is '$link'.<br/>\";\n");
 
@@ -1494,17 +1494,17 @@ public class HtmlGenerator {
         // button end
         sb.append("                }\n");
         sb.append("                else {\n");
-        sb.append("                    echo \"INFO: Sorry, no visualization available for $graphtype graph of protein $pdbid chain $chain.<br/>\";\n");
+        sb.append("                    echo \"<p>INFO: No visualization available for $graphtype graph of protein $pdbid chain $chain.</p>\";\n");
         sb.append("                }\n");
         sb.append("            }\n");
         sb.append("            else {\n");
-        sb.append("                echo \"ERROR: Some query parameters were invalid.<br/>\";\n");
+        sb.append("                echo \"<p>ERROR: Some query parameters were invalid.</p>\";\n");
         sb.append("            }\n");
         
 
         sb.append("        }\n");            
         sb.append("        else {\n");
-        sb.append("            echo \"ERROR: The given PDB ID is invalid. Invalid query.<br/>\";\n");                        
+        sb.append("            echo \"<p>ERROR: The given PDB ID is invalid. Invalid query.</p>\";\n");                        
         sb.append("        }\n");        
         sb.append("    }\n"); // foreach
         sb.append("}\n");
