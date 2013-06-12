@@ -31,16 +31,19 @@ public class DBManager {
     static String dbDriver;
     static Connection dbc;
     // table names
-    static String tbl_graph = "plcc_graph";
+    
     static String tbl_protein = "plcc_protein";
     static String tbl_chain = "plcc_chain";
     static String tbl_sse = "plcc_sse";
+    static String tbl_graph = "plcc_graph";
+    static String tbl_graphlets = "plcc_graphlets";
     
     static String tbl_ssetypes = "plcc_ssetypes";
     static String tbl_contacttypes = "plcc_contacttypes";
     static String tbl_graphtypes = "plcc_graphtypes";
     
     static String tbl_contact = "plcc_contact";
+    static String tbl_complex_contact = "plcc_complex_contact";
     static String view_ssecontacts = "plcc_ssetype_contacts";
     static String view_graphs = "plcc_graphs";
 
@@ -328,7 +331,9 @@ public class DBManager {
             doDeleteQuery("DROP TABLE " + tbl_chain + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_sse + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_contact + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_complex_contact + " CASCADE;");            
             doDeleteQuery("DROP TABLE " + tbl_graph + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_graphlets + " CASCADE;");
             
             doDeleteQuery("DROP TABLE " + tbl_graphtypes + ";");
             doDeleteQuery("DROP TABLE " + tbl_contacttypes + ";");
@@ -371,10 +376,12 @@ public class DBManager {
         try {
             // create tables
             doInsertQuery("CREATE TABLE " + tbl_protein + " (pdb_id varchar(4) primary key, header varchar(200) not null, title varchar(400) not null, experiment varchar(200) not null, keywords varchar(400) not null, resolution real not null);");
-            doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(2) not null, mol_name varchar(200) not null, organism_scientific varchar(200) not null, organism_common varchar(200) not null, pdb_id varchar(4) not null references plcc_protein ON DELETE CASCADE);");
-            doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references plcc_chain ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence varchar(2000) not null, sse_type int not null, lig_name varchar(5));");
-            doInsertQuery("CREATE TABLE " + tbl_contact + " (contact_id serial primary key, sse1 int not null references plcc_sse ON DELETE CASCADE, sse2 int not null references plcc_sse ON DELETE CASCADE, contact_type int not null, check (sse1 < sse2));");
-            doInsertQuery("CREATE TABLE " + tbl_graph + " (graph_id serial primary key, chain_id int not null references plcc_chain ON DELETE CASCADE, graph_type int not null, graph_string text not null, graph_image_svg text, sse_string text);");
+            doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(2) not null, mol_name varchar(200) not null, organism_scientific varchar(200) not null, organism_common varchar(200) not null, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE);");
+            doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence varchar(2000) not null, sse_type int not null, lig_name varchar(5));");
+            doInsertQuery("CREATE TABLE " + tbl_contact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null, check (sse1 < sse2));");
+            doInsertQuery("CREATE TABLE " + tbl_complex_contact + " (complex_contact_id serial primary key, chain1 int not null references " + tbl_chain + " ON DELETE CASCADE, chain2 int not null references " + tbl_chain + " ON DELETE CASCADE, contact_num_HH int not null, contact_num_HS int not null, contact_num_HL int not null, contact_num_SS int not null, contact_num_SL int not null, contact_num_LL int not null, contact_num_DS int not null);");
+            doInsertQuery("CREATE TABLE " + tbl_graph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null, graph_string_gml text not null, graph_image_svg text, sse_string text);");
+            doInsertQuery("CREATE TABLE " + tbl_graphlets + " (graphlet_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null, graphlet_count_000 int not null, graphlet_count_001 int not null, graphlet_count_002 int not null);");
             
             // various types encoded by integers. these tables should be removed in the future and the values stored as string directly instead.
             doInsertQuery("CREATE TABLE " + tbl_ssetypes + " (ssetype_id int not null primary key,  ssetype_text text not null);");
@@ -386,25 +393,41 @@ public class DBManager {
             doInsertQuery("ALTER TABLE " + tbl_chain + " ADD CONSTRAINT constr_chain_uniq UNIQUE (chain_name, pdb_id);");
             doInsertQuery("ALTER TABLE " + tbl_sse + " ADD CONSTRAINT constr_sse_uniq UNIQUE (chain_id, dssp_start, dssp_end);");
             doInsertQuery("ALTER TABLE " + tbl_contact + " ADD CONSTRAINT constr_contact_uniq UNIQUE (sse1, sse2);");
+            doInsertQuery("ALTER TABLE " + tbl_complex_contact + " ADD CONSTRAINT constr_complex_contact_uniq UNIQUE (chain1, chain2);");
             doInsertQuery("ALTER TABLE " + tbl_graph + " ADD CONSTRAINT constr_graph_uniq UNIQUE (chain_id, graph_type);");
+            doInsertQuery("ALTER TABLE " + tbl_graphlets + " ADD CONSTRAINT constr_graphlet_uniq UNIQUE (chain_id, graph_type);");
             
             // create views
             doInsertQuery("CREATE VIEW " + view_ssecontacts + " AS SELECT contact_id, least(sse1_type, sse2_type) sse1_type, greatest(sse1_type, sse2_type) sse2_type, sse1_lig_name, sse2_lig_name  FROM (SELECT k.contact_id, sse1.sse_type AS sse1_type, sse2.sse_type AS sse2_type, sse1.lig_name AS sse1_lig_name, sse2.lig_name AS sse2_lig_name FROM " + tbl_contact + " k LEFT JOIN " + tbl_sse + " sse1 ON k.sse1=sse1.sse_id LEFT JOIN " + tbl_sse + " sse2 ON k.sse2=sse2.sse_id) foo;");
-            doInsertQuery("CREATE VIEW " + view_graphs + " AS SELECT graph_id, pdb_id, chain_name, graph_type, graph_string FROM (SELECT k.graph_id, k.graph_type, k.graph_string, chain.chain_name AS chain_name, chain.pdb_id AS pdb_id FROM " + tbl_graph + " k LEFT JOIN " + tbl_chain + " chain ON k.chain_id=chain.chain_id) bar;");
+            doInsertQuery("CREATE VIEW " + view_graphs + " AS SELECT graph_id, pdb_id, chain_name, graph_type, graph_string_gml FROM (SELECT k.graph_id, k.graph_type, k.graph_string_gml, chain.chain_name AS chain_name, chain.pdb_id AS pdb_id FROM " + tbl_graph + " k LEFT JOIN " + tbl_chain + " chain ON k.chain_id=chain.chain_id) bar;");
 
             // add comments for tables
             doInsertQuery("COMMENT ON TABLE " + tbl_protein + " IS 'Stores information on a whole PDB file.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_chain + " IS 'Stores information on a protein chain.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_sse + " IS 'Stores information on a secondary structure element (SSE).';");
-            doInsertQuery("COMMENT ON TABLE " + tbl_contact + " IS 'Stores information on a contact between a pair of SSEs.';");
-            doInsertQuery("COMMENT ON TABLE " + tbl_graph + " IS 'Stores a description of the protein graph of a protein chain in VPLG text format. This is enough to draw the graph.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_contact + " IS 'Stores information on a contact between a pair of SSEs which are part of the same chain.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_complex_contact + " IS 'Stores information on a complex contact or inter-chain contact, i.e., a contact between a pair of SSEs which are part of different chains.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_graph + " IS 'Stores a description of the protein graph of a protein chain in GML text format. This is enough to draw the graph.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_graphlets + " IS 'Stores the graphlet counts for the different graphlets for a certain graph defined by pdbid, chain and graph type.';");
+            
+            doInsertQuery("COMMENT ON TABLE " + tbl_ssetypes + " IS 'Stores the names of the SSE types, e.g., 1=helix.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_contacttypes + " IS 'Stores the names of the contact types, e.g., 1=mixed.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_graphtypes + " IS 'Stores the names of the graph types, e.g., 1=alpha.';");
 
             // add comments for specific fields
             doInsertQuery("COMMENT ON COLUMN " + tbl_sse + ".sse_type IS '1=helix, 2=beta strand, 3=ligand, 4=other';");
-            doInsertQuery("COMMENT ON COLUMN " + tbl_contact + ".contact_type IS '1=mixed, 2=parallel, 3=antiparallel, 4=ligand';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_contact + ".contact_type IS '1=mixed, 2=parallel, 3=antiparallel, 4=ligand, 5=backbone';");
             doInsertQuery("COMMENT ON COLUMN " + tbl_sse + ".lig_name IS 'The 3-letter ligand name from the PDB file and the RCSB ligand expo website. If this SSE is not a ligand SSE, this is the empty string.';");
             doInsertQuery("COMMENT ON COLUMN " + tbl_graph + ".graph_type IS '1=alpha, 2=beta, 3=albe, 4=alphalig, 5=betalig, 6=albelig';");
-            doInsertQuery("COMMENT ON COLUMN " + tbl_graph + ".graph_string IS 'The graph string in PLCC format';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_graph + ".graph_string_gml IS 'The graph string in GML format';");
+            
+            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact + ".contact_num_HH IS 'Number of helix-helix contacts.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact + ".contact_num_HS IS 'Number of helix-strand contacts.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact + ".contact_num_HL IS 'Number of helix-ligand contacts.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact + ".contact_num_SS IS 'Number of strand-strand contacts.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact + ".contact_num_SL IS 'Number of strand-ligand contacts.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact + ".contact_num_LL IS 'Number of ligand-ligand contacts.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact + ".contact_num_DS IS 'Number of disulfide bridge contacts.';");
 
             // add indices
             doInsertQuery("CREATE INDEX plcc_idx_chain_insert ON " + tbl_chain + " (pdb_id, chain_name);");         // for SELECTs during data insert
@@ -414,7 +437,10 @@ public class DBManager {
             doInsertQuery("CREATE INDEX plcc_idx_sse_fk ON " + tbl_sse + " (chain_id);");                            // FK
             doInsertQuery("CREATE INDEX plcc_idx_contact_fk1 ON " + tbl_contact + " (sse1);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_contact_fk2 ON " + tbl_contact + " (sse2);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_complex_contact_fk1 ON " + tbl_complex_contact + " (chain1);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_complex_contact_fk2 ON " + tbl_complex_contact + " (chain2);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_graph_fk ON " + tbl_graph + " (chain_id);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_graphlets_fk ON " + tbl_graphlets + " (chain_id);");                       // FK
 
             // indices on PKs get created automatically
             
@@ -689,11 +715,11 @@ public class DBManager {
      * @param pdb_id the PDB identifier of the protein
      * @param chain_name the PDB chain name of the chain represented by the graph_string
      * @param graph_type the Integer representation of the graph type. use ProtGraphs.getGraphTypeCode() to get it.
-     * @param graph_string the graph in VPLG format
+     * @param graph_string_gml the graph in GML format
      * @return true if the graph was inserted, false if errors occurred
      * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
      */
-    public static Boolean writeGraphToDB(String pdb_id, String chain_name, Integer graph_type, String graph_string, String sse_string) throws SQLException {
+    public static Boolean writeGraphToDB(String pdb_id, String chain_name, Integer graph_type, String graph_string_gml, String sse_string) throws SQLException {
                
         Integer chain_db_id = getDBChainID(pdb_id, chain_name);
         Boolean result = false;
@@ -705,7 +731,7 @@ public class DBManager {
 
         PreparedStatement statement = null;
 
-        String query = "INSERT INTO " + tbl_graph + " (chain_id, graph_type, graph_string, sse_string) VALUES (?, ?, ?, ?);";
+        String query = "INSERT INTO " + tbl_graph + " (chain_id, graph_type, graph_string_gml, sse_string) VALUES (?, ?, ?, ?);";
 
         try {
             dbc.setAutoCommit(false);
@@ -713,7 +739,7 @@ public class DBManager {
 
             statement.setInt(1, chain_db_id);
             statement.setInt(2, graph_type);
-            statement.setString(3, graph_string);
+            statement.setString(3, graph_string_gml);
             statement.setString(4, sse_string);
                                 
             statement.executeUpdate();
@@ -739,11 +765,75 @@ public class DBManager {
         return(result);
     }
     
+    /**
+     * Writes information on the graphlet counts for a protein graph to the database. Used by graphlet computation
+     * algorithms to store the graphlets. Currently not used because this is done in a separate C++ program.
+     * 
+     * @param pdb_id the PDB identifier of the protein
+     * @param chain_name the PDB chain name of the chain represented by the graph_string
+     * @param graph_type the Integer representation of the graph type. use ProtGraphs.getGraphTypeCode() to get it.
+     * @param graphlet_counts an array holding the counts for the different graphlet types
+     * @return true if the graph was inserted, false if errors occurred
+     * @throws SQLException if the data could not be written or the database connection could not be closed or reset to auto commit (in the finally block)
+     */
+    public static Boolean writeGraphletsToDB(String pdb_id, String chain_name, Integer graph_type, Integer[] graphlet_counts) throws SQLException {
+
+        int numReqGraphletTypes = 3;
+        if(graphlet_counts.length != numReqGraphletTypes) {
+            System.err.println("ERROR: writeGraphletsToDB: Invalid number of graphlet types specified (got " + graphlet_counts.length + ", required " + numReqGraphletTypes + "). Skipping.");
+            return false;
+        }
+        
+        Integer chain_db_id = getDBChainID(pdb_id, chain_name);
+        Boolean result = false;
+
+        if (chain_db_id < 0) {
+            System.err.println("ERROR: writeGraphletsToDB: Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert SSE.");
+            return (false);
+        }
+
+        PreparedStatement statement = null;
+
+        String query = "INSERT INTO " + tbl_graphlets + " (chain_id, graph_type, graphlet_count_000, graphlet_count_001, graphlet_count_002) VALUES (?, ?, ?, ?, ?);";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setInt(1, chain_db_id);
+            statement.setInt(2, graph_type);
+            statement.setInt(3, graphlet_counts[0]);
+            statement.setInt(4, graphlet_counts[1]);
+            statement.setInt(5, graphlet_counts[2]);
+                                
+            statement.executeUpdate();
+            dbc.commit();
+            result = true;
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: writeGraphletsToDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: writeGraphletsToDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: writeGraphletsToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+            result = false;
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        }
+        return(result);
+    }
+    
 
     /**
      * Writes information on a SSE contact to the database.
      * @param pdb_id the PDB identifier of the protein
-     * @param chain_name the PDB chain name of the chain represented by the graph_string
+     * @param chain_name the PDB chain name, e.g., A
      * @param sse1_dssp_start the DSSP number of the first residue of the first SSE
      * @param sse2_dssp_start the DSSP number of the first residue of the second SSE
      * @param contact_type the contact type code
@@ -797,6 +887,86 @@ public class DBManager {
                     dbc.rollback();
                 } catch(SQLException excep) {
                     System.err.println("ERROR: SQL: writeContactToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+            result = false;
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        }
+                
+        return(result);
+    }
+    
+    /**
+     * Writes information on an inter-chain contact between a pair of SSEs from two different chains of a PDB file contact to the database.
+     * This stores the complex graph contacts. It is used for statistical purposes only at the moment.
+     * 
+     * @param pdb_id the PDB identifier of the protein
+     * @param chain1_name the PDB chain name of the first chain involved in the inter-chain contact
+     * @param chain2_name the PDB chain name of the second chain involved in the inter-chain contact
+     * @param numContactsHH the number of helix-helix contacts
+     * @param numContactsHS the number of helix-strand contacts
+     * @param numContactsHL the number of helix-ligand contacts
+     * @param numContactsSS the number of strand-strand contacts
+     * @param numContactsSL the number of strand-ligand contacts
+     * @param numContactsLL the number of ligand-ligand contacts
+     * @param numContactsDS the number of disulfide contacts
+     * @throws SQLException if the data could not be written or the database connection could not be closed or reset to auto commit (in the finally block)
+     * @return true if the data was written to the database, false otherwise
+     */
+    public static Boolean writeInterchainContactsToDB(String pdb_id, String chain1_name, String chain2_name, Integer numContactsHH, Integer numContactsHS, Integer numContactsHL, Integer numContactsSS, Integer numContactsSL, Integer numContactsLL, Integer numContactsDS) throws SQLException {
+        
+        if(numContactsHH + numContactsHS + numContactsHL + numContactsSS + numContactsSL + numContactsLL + numContactsDS <= 0) {
+            System.err.println("WARNING: Not writing interchain contacts to DB for PDB " + pdb_id + " chains " + chain1_name + " and " + chain2_name + ", sum is zero.");
+            return true;
+        }
+
+        Integer chain1_id = getDBChainID(pdb_id, chain1_name);
+        Integer chain2_id = getDBChainID(pdb_id, chain2_name);
+
+        if (chain1_id < 0) {
+            System.err.println("ERROR: DB: writeContactToDB(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain1_name + "' in DB, could not insert complex contact.");
+            return (false);
+        }
+        if (chain2_id < 0) {
+            System.err.println("ERROR: DB: writeContactToDB(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain2_name + "' in DB, could not insert complex contact.");
+            return (false);
+        }
+        
+
+        Boolean result = false;
+        PreparedStatement statement = null;
+
+        String query = "INSERT INTO " + tbl_complex_contact + " (chain1, chain2, contact_num_HH, contact_num_HS, contact_num_HL, contact_num_SS, contact_num_SL, contact_num_LL, contact_num_DS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+            
+            statement.setInt(1, chain1_id);
+            statement.setInt(2, chain2_id);
+            statement.setInt(3, numContactsHH);
+            statement.setInt(4, numContactsHS);
+            statement.setInt(5, numContactsHL);
+            statement.setInt(6, numContactsSS);
+            statement.setInt(7, numContactsSL);
+            statement.setInt(8, numContactsLL);
+            statement.setInt(9, numContactsDS);
+                                
+            statement.executeUpdate();
+            dbc.commit();
+            result = true;
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: writeInterchainContactsToDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: writeInterchainContactsToDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: writeInterchainContactsToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
                 }
             }
             result = false;
@@ -1067,12 +1237,12 @@ public class DBManager {
     
     
     /**
-     * Retrieves the VPLG format graph string for the requested graph from the database. The graph is identified by the
+     * Retrieves the GML format graph string for the requested graph from the database. The graph is identified by the
      * unique triplet (pdbid, chain_name, graph_type).
      * @param pdbid the requested pdb ID, e.g. "1a0s"
      * @param chain_name the requested pdb ID, e.g. "A"
      * @param graph_type the requested graph type, e.g. "albe"
-     * @return the string representation of the graph or null if no such graph exists.
+     * @return the GML format string representation of the graph or null if no such graph exists.
      * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
      */
     public static String getGraphString(String pdb_id, String chain_name, String graph_type) throws SQLException {
@@ -1094,7 +1264,7 @@ public class DBManager {
         PreparedStatement statement = null;
         ResultSet rs = null;
 
-        String query = "SELECT graph_string FROM " + tbl_graph + " WHERE (chain_id = ? AND graph_type = ?);";
+        String query = "SELECT graph_string_gml FROM " + tbl_graph + " WHERE (chain_id = ? AND graph_type = ?);";
 
         try {
             dbc.setAutoCommit(false);
@@ -1140,6 +1310,108 @@ public class DBManager {
             }
             else {
                 DP.getInstance().w("DB: No entry for graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
+                return(null);
+            }
+        }
+        else {
+            return(null);
+        }        
+    }
+    
+    
+    /**
+     * Retrieves the graphlet counts for the requested graph from the database. The graph is identified by the
+     * unique triplet (pdbid, chain_name, graph_type).
+     * @param pdbid the requested pdb ID, e.g. "1a0s"
+     * @param chain_name the requested pdb ID, e.g. "A"
+     * @param graph_type the requested graph type, e.g. "albe"
+     * @return an Integer array of the graphlet counts
+     * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
+     */
+    public static Integer[] getGraphletCounts(String pdb_id, String chain_name, String graph_type) throws SQLException {
+        
+        int numReqGraphletTypes = 3;
+        
+        Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
+        
+        Integer chain_db_id = getDBChainID(pdb_id, chain_name);
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        
+
+        if (chain_db_id < 0) {
+            DP.getInstance().w("getGraphletCounts(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
+            return(null);
+        }
+
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT graphlet_count_000, graphlet_count_001, graphlet_count_002 FROM " + tbl_graphlets + " WHERE (chain_id = ? AND graph_type = ?);";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setInt(1, chain_db_id);
+            statement.setInt(2, gtc);
+                                
+            rs = statement.executeQuery();
+            dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: getGraphletCounts: Retrieval of graphlets failed: '" + e.getMessage() + "'.");
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        ArrayList<String> rowGraphlets;
+        Integer[] result = new Integer[numReqGraphletTypes];        
+        if(tableData.size() >= 1) {
+            rowGraphlets = tableData.get(0);
+            if(rowGraphlets.size() > 0) {
+                if(rowGraphlets.size() == numReqGraphletTypes) {
+                    for(int i = 0; i < rowGraphlets.size(); i++) {
+                        try {
+                            result[i] = Integer.valueOf(rowGraphlets.get(i));
+                        } catch(Exception ce) {
+                            DP.getInstance().w("DB: getGraphletCounts: Cast error. Could not cast entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "' to Integer.");
+                            return null;
+                        }
+                    }
+                    return(result);
+                } else {
+                    DP.getInstance().w("DB: getGraphletCounts: Entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "' has wrong size.");
+                    return(null);
+                }                                
+            }
+            else {
+                DP.getInstance().w("DB: getGraphletCounts: No entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
                 return(null);
             }
         }

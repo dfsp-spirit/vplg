@@ -1349,7 +1349,25 @@ public class Main {
         }
 
         //drawTGFGraph("graph.tgf", "graph.tgf.png");       //DEBUG
-        //dbTesting();        //DEBUG
+        //();        //DEBUG
+        
+        // writing contacts to the database
+        /*
+        if(Settings.getBoolean("plcc_B_useDB")) {
+            String somePDBID = "7tim";
+            String chain1 = "A";      
+            String chain2 = "B";            
+            try {
+                if(DBManager.writeInterchainContactsToDB(somePDBID, chain1, chain2, 5, 10, 15, 20, 17, 13, 0)) {
+                    System.out.println("DEBUG: Wrote interchain contacts between chains " + chain1 + " and " + chain2 + " of PDB " + somePDBID + " to DB.");
+                } else {
+                    System.err.println("ERROR: Could not write interchain contacts between chains " + chain1 + " and " + chain2 + " of PDB " + somePDBID + " to DB. Skipping.");
+                }
+            } catch(Exception e) {
+                System.err.println("ERROR: Could not write interchain contacts between chains " + chain1 + " and " + chain2 + " of PDB " + somePDBID + " to DB. Skipping. Error was: '" + e.getMessage() + "'.");
+            }
+        }
+        */
 
         // ****************************************************    all done    ********************************************************** //
         
