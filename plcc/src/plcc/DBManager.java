@@ -921,7 +921,7 @@ public class DBManager {
         
         if(numContactsHH + numContactsHS + numContactsHL + numContactsSS + numContactsSL + numContactsLL + numContactsDS <= 0) {
             System.err.println("WARNING: Not writing interchain contacts to DB for PDB " + pdb_id + " chains " + chain1_name + " and " + chain2_name + ", sum is zero.");
-            return true;
+            return false;
         }
 
         Integer chain1_id = getDBChainID(pdb_id, chain1_name);
