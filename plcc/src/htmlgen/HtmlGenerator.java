@@ -530,14 +530,24 @@ public class HtmlGenerator {
         sb.append(HtmlTools.startBodyAndCommonJS());
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_MAIN));
         sb.append(this.generateLogo(pathToBaseDir));
-        sb.append(HtmlGenerator.generateTopPageTitle("VPLGweb Visualization"));
+        sb.append(HtmlGenerator.generateTopPageTitle("VPLGweb 3D Visualization"));
         
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_SEARCH));   
         sb.append(HtmlTools.heading("About the visualization", 2));
         sb.append(HtmlTools.startParagraph());                
         sb.append("This page visualizes proteins using ");
         sb.append(HtmlTools.linkBlank("http://www.jmol.org", "Jmol/JSmol")); 
-        sb.append(". ");        
+        sb.append(".");        
+        
+        // PHP code for mode specific stuff
+        sb.append("<?php\n");
+        sb.append("$mode = $_GET['mode'];\n");
+        sb.append("if($mode == \"graph\" || $mode == \"allgraphs\") {\n");
+        sb.append("    echo \" Use the buttons below the 3D window to visualize graphs in 3D. This will draw the different SSEs (vertices) as circles and show their 3D contacts (edges) as lines. The color code is identical to the 2D visualization.\";\n");
+        sb.append("}\n");
+        sb.append("\n?>\n");
+        // end of PHP part
+        
         sb.append(HtmlTools.endParagraph());                
         sb.append(HtmlTools.startParagraph("tiny"));    
         sb.append(HtmlTools.bold("Technical information: "));
@@ -545,7 +555,7 @@ public class HtmlGenerator {
         sb.append(HtmlTools.link("./"  + HtmlGenerator.visualizeWebsiteFileNameRelativeToBasedir + "?version=html5", "HTML 5 version"));
         sb.append(", but you can also use the ");
         sb.append(HtmlTools.link("./" + HtmlGenerator.visualizeWebsiteFileNameRelativeToBasedir + "?version=java", "Java plugin version"));
-        sb.append(" if you have the Java Web Plugin installed and activated in your browser.");
+        sb.append(" if you have the Java Web Plugin installed and activated in your browser. Also note that the model files are loaded from external servers, so this page will not work properly while these servers are down.");
         sb.append(HtmlTools.brAndNewline());                
         sb.append(HtmlTools.brAndNewline());
         
@@ -577,7 +587,15 @@ public class HtmlGenerator {
         sb.append(HtmlTools.listItem("Translate: SHIFT + double-click, then drag"));
         sb.append(HtmlTools.uListEnd());
         sb.append(HtmlTools.startParagraph());                    
-        sb.append("You can use the menu to load a structure or small molecule from a database of your choice. Try searching for 'caffeine' in PubChem or NCI. Or search for proteins like '7tim' in the RCSB PDB.");
+        
+        // PHP code for mode specific help text
+        sb.append("<?php\n");
+        sb.append("$mode = $_GET['mode'];\n");
+        sb.append("if( ! ($mode == \"graph\" || $mode == \"allgraphs\")) {\n");
+        sb.append("    echo \" You can use the menu to load a structure or small molecule from a database of your choice. Try searching for 'caffeine' in PubChem or NCI. Or search for proteins like '7tim' in the RCSB PDB.\";\n");
+        sb.append("}\n");
+        sb.append("\n?>\n");
+        // end of PHP part
         sb.append(HtmlTools.endParagraph());                
         sb.append(HtmlTools.endDiv());  // search     
         
@@ -1336,12 +1354,16 @@ public class HtmlGenerator {
         // test
         sb.append("var pdb = getParameterByName('pdbid');\n");        
         sb.append("var mode = getParameterByName('mode');\n");        
+        sb.append("var pdbInvalidorUnset = true;\n");
+        sb.append("var pdbUnset = true;\n");
         //sb.append("document.write('<p>pdb= ' + pdb + '</p>');\n");
         sb.append("var loadModel=\":caffeine\"\n");
         sb.append("if(pdb != \"\") {\n");
+        sb.append("  pdbUnset = false;\n");
         sb.append("  if(pdb.length == 4) {\n");
         sb.append("    if(pdb.match(/^[0-9a-z]+$/)) {\n");
         sb.append("      loadModel=\"=\" + pdb;\n");
+        sb.append("      pdbInvalidorUnset = false;\n");
         sb.append("    }\n");        
         sb.append("  }\n");                        
         sb.append("}\n");        
@@ -1436,6 +1458,20 @@ public class HtmlGenerator {
         sb.append("document.write('<p class=\"tiny\">');\n");
         sb.append("document.write('Selection examples: Try \"select 1-20:A; color red;\" to color residues 1 to 20 of chain A red.<br/>Display/hide examples: Try \"display :A\" to show only chain A, \"display [ALA]\" to show only alanine residues and \"display *\" to reset.<br/>Rendering examples: Try \"spacefill 100%\" for space-filling, \"wireframe 0.15; spacefill 20%;\" for Ball-and-stick, \"wireframe 0.0; spacefill 0%;\" to reset. See the <a href=\"http://www.jmol.org\" target=\"_blank\">Jmol documentation</a> for more info.');\n");        
         sb.append("document.write('</p>');\n");
+        
+        sb.append("if(pdbInvalidorUnset) {\n");
+        sb.append("    document.write('<p>');\n");
+        sb.append("    if(pdbUnset) {\n");
+        sb.append("        document.write('No PDB ID specified.');\n");
+        sb.append("    }\n");        
+        sb.append("    else {\n");
+        sb.append("        document.write('Invalid PDB ID specified.');\n");
+        sb.append("    }\n");        
+        sb.append("    document.write(' Loading default model caffeine.');\n");        
+        sb.append("    document.write('</p>');\n");
+        sb.append("}\n");        
+        
+        
         sb.append("// -->\n");
         sb.append("</script>\n");
         
@@ -1495,11 +1531,11 @@ public class HtmlGenerator {
         sb.append("                    $link = \"./\" . $mid_chars . \"/\" . $pdbid . \"/\" . $chain . \"/\" . $jmolfile ;\n");       
         sb.append("                }\n");
         sb.append("                else {\n");
-        sb.append("                    echo \"<p>ERROR: PDB ID and Chain are valid but graph type is not.</p>\";\n");
+        sb.append("                    echo \"<p>ERROR: Graph visualization: PDB ID and Chain are valid but graph type is not.</p>\";\n");
         sb.append("                }\n");
         sb.append("            }\n");
         sb.append("            else {\n");
-        sb.append("                echo \"<p>ERROR: PDB ID is valid but chain is not. Cannot show graphs.</p>\";\n");
+        sb.append("                echo \"<p>ERROR: Graph visualization: PDB ID is valid but chain is not. Cannot show graphs.</p>\";\n");
         sb.append("            }\n");
         //sb.append("            echo \"Link is '$link'.<br/>\";\n");
 
@@ -1528,17 +1564,17 @@ public class HtmlGenerator {
         // button end
         sb.append("                }\n");
         sb.append("                else {\n");
-        sb.append("                    echo \"<p>INFO: No visualization available for $graphtype graph of protein $pdbid chain $chain.</p>\";\n");
+        sb.append("                    echo \"<p>INFO: Graph visualization: No visualization available for $graphtype graph of protein $pdbid chain $chain.</p>\";\n");
         sb.append("                }\n");
         sb.append("            }\n");
         sb.append("            else {\n");
-        sb.append("                echo \"<p>ERROR: Some query parameters were invalid.</p>\";\n");
+        sb.append("                echo \"<p>ERROR: Graph visualization: Some query parameters were invalid.</p>\";\n");
         sb.append("            }\n");
         
 
         sb.append("        }\n");            
         sb.append("        else {\n");
-        sb.append("            echo \"<p>ERROR: The given PDB ID is invalid. Invalid query.</p>\";\n");                        
+        sb.append("            echo \"<p>ERROR: Graph visualization: The given PDB ID is invalid. Invalid query.</p>\";\n");                        
         sb.append("        }\n");        
         sb.append("    }\n"); // foreach
         sb.append("}\n");
