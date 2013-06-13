@@ -157,6 +157,28 @@ public class ProteinChainResults {
         return graphTypesValid;
     }
     
+    
+    public boolean validJmolCommandFileExistsFor(String graphType) {        
+        File jmolCmdFile = this.proteinGraphVisJmolCommandFiles.get(graphType);
+        if(jmolCmdFile != null) {
+            if(IO.fileExistsIsFileAndCanRead(jmolCmdFile)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public ArrayList<String> checkForGraphTypesWithValidJmolCmdFiles() {
+        ArrayList<String> graphTypesValid = new ArrayList<String>();
+                
+        for(String gt : this.getGraphTypesList()) {
+            if(this.validJmolCommandFileExistsFor(gt)) {
+               graphTypesValid.add(gt); 
+            }
+        }
+        return graphTypesValid;
+    }
+    
     public List<String> getAvailableGraphs() {        
         List<String> graphs = new ArrayList<String>();
         graphs.addAll(this.proteinGraphs.keySet());

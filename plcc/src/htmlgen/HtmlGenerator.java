@@ -1041,7 +1041,7 @@ public class HtmlGenerator {
                     boolean useVectorImageOnWebsite = false;
                     boolean showImageOnWebsite = false;
                     
-                    sb.append(HtmlTools.heading("Graph visualization", 4));
+                    sb.append(HtmlTools.heading("Graph 2D visualization", 4));
                     sb.append(HtmlTools.startParagraph());                    
                     File graphImage;
                     
@@ -1103,6 +1103,24 @@ public class HtmlGenerator {
                     sb.append(HtmlTools.endParagraph());                    
                     sb.append(HtmlTools.br());
                     sb.append(HtmlTools.brAndNewline());
+                    
+                    // ------------------------- 3D visualization -----------------------
+                    sb.append(HtmlTools.heading("Graph 3D visualization", 4));
+                    sb.append(HtmlTools.startParagraph());
+                    
+                    if(pcr.checkForGraphTypesWithValidJmolCmdFiles().contains(graphType)) {
+                        sb.append("3D visualization: ");
+                        sb.append(HtmlTools.linkBlank(HtmlGenerator.getVisualizeLinkChainAllGraph(pathToBaseDir, pdbid, chain.toLowerCase()), "Open 3D viewer"));
+                        sb.append(" (opens in new browser tab)").append(HtmlTools.brAndNewline());
+                    } else {
+                        sb.append("No 3D visualization is available for this graph.").append(HtmlTools.brAndNewline());
+                    }
+                    
+                    sb.append(HtmlTools.endParagraph());                    
+                    sb.append(HtmlTools.br());
+                    sb.append(HtmlTools.brAndNewline());
+                    
+                    // that's it
                     
                     sb.append(HtmlTools.endDiv());  // protein graph
                     sb.append(HtmlTools.brAndNewline());
