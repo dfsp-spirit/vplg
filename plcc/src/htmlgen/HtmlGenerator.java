@@ -1506,15 +1506,19 @@ public class HtmlGenerator {
         sb.append("        $graphtypes = array('alpha', 'beta', 'albe', 'alphalig', 'betalig', 'albelig');\n");
         sb.append("    }\n");
 
+        sb.append("    $valid_pdbid = FALSE;\n");
+        sb.append("    $valid_chain = FALSE;\n");
+        sb.append("    if(ctype_alnum($pdbid) && strlen($pdbid) == 4) { $valid_pdbid = TRUE; }\n");
+        sb.append("    if(ctype_alnum($chain) && strlen($chain) == 1) { $valid_chain = TRUE; }\n");
+        
+        sb.append("    if($valid_pdbid && $valid_chain) { echo \"<p>Visualization options for chain $chain of PDB $pdbid:</p>\";  }\n");
+        
         sb.append("    foreach ($graphtypes as $graphtype) {\n");
         
-        sb.append("        $valid_pdbid = FALSE;\n");
-        sb.append("        $valid_chain = FALSE;\n");
+        
         sb.append("        $valid_graphtype = FALSE;\n");
         sb.append("        $valid_all = FALSE;\n");
 
-        sb.append("        if(ctype_alnum($pdbid) && strlen($pdbid) == 4) { $valid_pdbid = TRUE; }\n");
-        sb.append("        if(ctype_alnum($chain) && strlen($chain) == 1) { $valid_chain = TRUE; }\n");
         sb.append("        if($graphtype == \"alpha\" || $graphtype == \"beta\" || $graphtype == \"albe\" || $graphtype == \"alphalig\" || $graphtype == \"betalig\" || $graphtype == \"albelig\") { $valid_graphtype = TRUE; }\n");
         sb.append("        $link = \"\";\n");
 
