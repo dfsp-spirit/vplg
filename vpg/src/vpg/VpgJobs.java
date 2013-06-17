@@ -57,7 +57,7 @@ public class VpgJobs {
             cmdList.add(opt);
         }
         
-        String [] cmd = cmdList.toArray(new String[cmdList.size()]);                       
+        String [] cmd = cmdList.toArray(new String[cmdList.size()]); 
         
         try {
             String[] inputAndError = IO.execCmd(cmd, workingDir);

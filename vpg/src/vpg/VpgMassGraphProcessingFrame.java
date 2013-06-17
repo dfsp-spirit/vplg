@@ -817,7 +817,7 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
     private void scanDirectoriesForInputFiles(File inputDirPdb, File inputDirDssp) {
         this.pdbFiles = getPdbFilesInDirectory(inputDirPdb);
         this.dsspFiles = getDsspFilesInDirectory(inputDirDssp);
-        this.pdbFilesWithValidDsspFiles = getProteinsWithBothInputFiles(this.pdbFiles, this.dsspFiles);
+        this.pdbFilesWithValidDsspFiles = getProteinsWithBothInputFiles(this.pdbFiles, this.dsspFiles, true);
     }
     
     
@@ -827,14 +827,42 @@ public class VpgMassGraphProcessingFrame extends javax.swing.JFrame implements I
      * @param dsspFiles the DSSP file HashMap. Keys are PDB identifiers, values are file objects which represent the path to the DSSP file for the protein with the PDB ID in key.
      * @return a list of all PDB IDs (keys in pdbFiles) for which a key with the same name in 'dsspFiles' exists.
      */
-    public ArrayList<String> getProteinsWithBothInputFiles(HashMap<String, File> pdbFiles, HashMap<String, File> dsspFiles) {
+    public ArrayList<String> getProteinsWithBothInputFiles(HashMap<String, File> pdbFiles, HashMap<String, File> dsspFiles, boolean verifyExistance) {
         ArrayList<String> validInputFiles = new ArrayList<String>();
         
+        File pdbFile, dsspFile;
+        boolean pdbidWasAdded;
         for(String pdbid : pdbFiles.keySet()) {
+            pdbidWasAdded = false;
             if(dsspFiles.containsKey(pdbid)) {
-                validInputFiles.add(pdbid);
+                if(verifyExistance) {
+                    pdbFile = pdbFiles.get(pdbid);
+                    if(pdbFile != null) {
+                        if(pdbFile.canRead() && pdbFile.isFile()) {
+                            // PDB file ok, check DSSP file
+                            dsspFile = dsspFiles.get(pdbid);
+                            if(dsspFile != null) {
+                                if(dsspFile.canRead() && dsspFile.isFile()) {
+                                    pdbidWasAdded = true;
+                                    validInputFiles.add(pdbid);
+                                }
+                            }
+                        }
+                    }
+                }
+                else {
+                    pdbidWasAdded = true;
+                    validInputFiles.add(pdbid);
+                }
+            }
+            if( ! pdbidWasAdded) {
+                String pdbFilePath = (pdbFiles.get(pdbid) == null ? "null" : pdbFiles.get(pdbid).getAbsolutePath());
+                String dsspFilePath = (dsspFiles.get(pdbid) == null ? "null" : dsspFiles.get(pdbid).getAbsolutePath());
+                System.out.println("Ignoring PDB ID " + pdbid + ", missing at least one of the input files (PDB='" + pdbFilePath + "', DSSP='" + dsspFilePath + "'.");
             }
         }
+        
+        
             
         return validInputFiles;
     }

@@ -283,6 +283,14 @@ public class IO {
         
         System.out.println(Settings.getApptag() + "Starting external process in working directory '" + workingDir + "' at " + dateFormat.format(dateStart) + "...");
         
+        StringBuilder sb = new StringBuilder();
+        sb.append(Settings.getApptag()).append("Running command '");
+        for(String s : cmd) {
+            sb.append(s).append(" ");
+        }
+        sb.append("'.\n");
+        System.out.println(sb.toString());
+        
         Process p = Runtime.getRuntime().exec(cmd, null, workingDir);
         BufferedReader brInput = new BufferedReader(new InputStreamReader(p.getInputStream()));        
         BufferedReader brError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
