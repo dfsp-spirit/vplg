@@ -5,7 +5,7 @@
 ## extracted and split, and that the dssp file is available in this dir as well.
 
 APPTAG="[PROC_ALL_HERE]"
-
+PLCC_OPTIONS="--use-database"
 
 echo "$APPTAG Processing all prepared PDB files in this directory which have valid DSSP files available."
 
@@ -20,8 +20,10 @@ for PDBFILE in *.pdb; do
   if [ -f "$DSSPFILE" ]; then
     echo "$APPTAG Processing PDB file $PDBFILE with PDBID $PDBID, using DSSP file $DSSPFILE.";
     let NUM_DSSP_AVAILABLE++
-    ./plcc $PDBID --use-database; 
-
+    PLCC_COMMAND="java -jar plcc.jar $PDBID $PLCC_OPTIONS"
+    echo "$APPTAG PLCC command to be executed is: '$PLCC_COMMAND'.";
+    ## run it!
+    $PLCC_COMMAND
     if [ $? -ne 0 ]; then
       let NUM_PLCC_FAIL++
       echo "$APPTAG ERROR: Running PLCC failed for protein '$PDBID', skipping."
