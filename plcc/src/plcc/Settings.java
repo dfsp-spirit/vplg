@@ -183,6 +183,7 @@ public class Settings {
         defSet("plcc_B_output_textfiles_dir_tree", "false", "Whether to write output graph text files to a PDB-style sub directory structure under the output directory instead of writing them in their directly. This is useful if you want to process the whole PDB because most filesystems will get into trouble with tens of thousands of files in a single directory. The directory structure will be chosen from the meta data, i.e., PDB ID, chain, graph type, etc.");
         defSet("plcc_B_output_textfiles_dir_tree_html", "false", "Whether to write HTML navigation files to the output directory tree. Only used if plcc_B_output_textfiles_dir_tree is true as well.");
         defSet("plcc_B_output_textfiles_dir_tree_core_html", "false", "Whether to write the core VPLGweb HTML files to the output directory tree. Only used if plcc_B_output_textfiles_dir_tree is true as well. These are the main page, search form and other stuff which is only needed once for the whole website.");
+        defSet("plcc_B_html_add_complex_graph_data", "true", "Whether to write data on the complex graph to the protein result HTML webpage (if available).");
                 
         defSet("plcc_B_output_GML", "true", "Whether to save computed protein graphs to text files in Graph Modelling Language format (GML).");
         defSet("plcc_B_output_TGF", "true", "Whether to save computed protein graphs to text files in Trivial Graph Format (TGF).");

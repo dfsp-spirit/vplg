@@ -15,12 +15,14 @@ import java.util.HashMap;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import plcc.ComplexGraph;
 import plcc.IO;
 import plcc.ProtMetaInfo;
 import plcc.ProteinChainResults;
 import plcc.ProteinResults;
 import plcc.SSE;
 import plcc.SSEGraph;
+import plcc.Settings;
 
 public class HtmlGenerator {
     
@@ -728,6 +730,51 @@ public class HtmlGenerator {
 
         
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
+        
+        // ------------------------ complex graph info ----------------------
+        if(Settings.getBoolean("plcc_B_complex_graphs") && Settings.getBoolean("plcc_B_html_add_complex_graph_data")) {
+            
+            String compGraphSubDir = "ALL";
+            
+            sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_CHAINS));
+            sb.append(HtmlTools.heading("Complex graph info", 2));
+            sb.append(HtmlTools.startParagraph());
+            sb.append("The complex graph describes the inter-chain contacts between chains of the PDB file. Each vertex represents a chain, and the edges represent 3D atom contacts between chains.\n");            
+            sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
+
+            if(chains.size() > 0) {
+                ComplexGraph compGraph = pr.getCompGraphRes().getCompGraph();
+                if(compGraph != null) {
+                    int numVerts = compGraph.getVertices().size();
+                    int numEdges = compGraph.getEdges().size();
+                    sb.append("The complex graph consists of ").append(numVerts).append(" vertices and ").append(numEdges).append(" edges.\n");
+                    sb.append(HtmlTools.brAndNewline());
+                    
+                    File gmlCGFile = pr.getCompGraphRes().getComGraphFileGML();
+                    if(IO.fileExistsIsFileAndCanRead(gmlCGFile)) {
+                        System.out.println("CompGraph file exists at '" + gmlCGFile.getAbsolutePath() + "'.");
+                        sb.append("Download complex graph: ");
+                        sb.append(HtmlTools.link(compGraphSubDir + fsWeb + gmlCGFile.getName(), (gmlCGFile.getName() + " (GML format)\n") ));
+                        sb.append(HtmlTools.brAndNewline());
+                    } else {
+                        sb.append("No complex graph download available.\n");
+                        sb.append(HtmlTools.brAndNewline());
+                    }
+                }
+                else {
+                    sb.append("No complex graph data available.\n");
+                    sb.append(HtmlTools.brAndNewline());
+                }
+            }
+            else {
+                sb.append("This PDB file contains no protein chains, no complex graph data available.\n");
+            }
+
+            sb.append(HtmlTools.endParagraph());
+            sb.append(HtmlTools.endDiv());  // chains
+            sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());
+            
+        }
 
         // -------------------- chain info -------------------
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_CHAINS));
