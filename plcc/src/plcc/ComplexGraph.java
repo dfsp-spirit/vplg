@@ -101,8 +101,7 @@ public class ComplexGraph extends UAdjListGraph {
             }
         });
 
-        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
-                "label", numAllInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("label", numAllInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
                 "num_HH_contacts", numHHInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
