@@ -22,6 +22,15 @@ public class ProteinResults {
     private String pdbid;
     private String pdbHeaderTitle;
     private HashMap<String, String> proteinMetadata;
+    private ComplexGraphResult compGraphRes;
+
+    public ComplexGraphResult getCompGraphRes() {
+        return compGraphRes;
+    }
+
+    public void setCompGraphRes(ComplexGraphResult compGraphRes) {
+        this.compGraphRes = compGraphRes;
+    }
 
     public String getPdbid() {
         return pdbid;
@@ -59,6 +68,7 @@ public class ProteinResults {
         proteinMetadata = new HashMap<String, String>();
         pdbid = "";
         pdbHeaderTitle = "";
+        compGraphRes = null;
     }
     
     public boolean addProteinChainResults(ProteinChainResults res, String chainName) {

@@ -4820,30 +4820,30 @@ public class Main {
         }
                 
         // create vertices for all chains
-        ComplexGraph CompGraph = new ComplexGraph(pdbid);
+        ComplexGraph compGraph = new ComplexGraph(pdbid);
         for(Integer i = 0; i < allChains.size(); i++) {
-            ComplexGraph.Vertex v1 = CompGraph.createVertex();
-            CompGraph.proteinNodeMap.put(v1, allChains.get(i).getPdbChainID());
+            ComplexGraph.Vertex v1 = compGraph.createVertex();
+            compGraph.proteinNodeMap.put(v1, allChains.get(i).getPdbChainID());
             //System.out.println(allChains.get(i).getPdbChainID());
         }
         
         System.out.println("  Computing CG contacts.");
         // create edges for all contacts
         for(Integer i = 0; i < resContacts.size(); i++) {
-            ComplexGraph.Vertex chainA = CompGraph.getVertexFromChain(resContacts.get(i).getResA().getChainID());
-            ComplexGraph.Vertex chainB = CompGraph.getVertexFromChain(resContacts.get(i).getResB().getChainID());
+            ComplexGraph.Vertex chainA = compGraph.getVertexFromChain(resContacts.get(i).getResA().getChainID());
+            ComplexGraph.Vertex chainB = compGraph.getVertexFromChain(resContacts.get(i).getResB().getChainID());
             // We only want interchain contacts
             if (!chainA.equals(chainB)){
-                if (CompGraph.getEdge(chainA, chainB) == null){
+                if (compGraph.getEdge(chainA, chainB) == null){
                     // We don't have an edge yet, but need one, so create an edge
-                    ComplexGraph.Edge e1 = CompGraph.createEdge(chainA, chainB);
-                    CompGraph.numAllInteractionsMap.put(e1, 1);
-                    CompGraph.numHHInteractionsMap.put(e1, 0);
-                    CompGraph.numHSInteractionsMap.put(e1, 0);
-                    CompGraph.numHLInteractionsMap.put(e1, 0);
-                    CompGraph.numSSInteractionsMap.put(e1, 0);
-                    CompGraph.numSLInteractionsMap.put(e1, 0);
-                    CompGraph.numLLInteractionsMap.put(e1, 0);
+                    ComplexGraph.Edge e1 = compGraph.createEdge(chainA, chainB);
+                    compGraph.numAllInteractionsMap.put(e1, 1);
+                    compGraph.numHHInteractionsMap.put(e1, 0);
+                    compGraph.numHSInteractionsMap.put(e1, 0);
+                    compGraph.numHLInteractionsMap.put(e1, 0);
+                    compGraph.numSSInteractionsMap.put(e1, 0);
+                    compGraph.numSLInteractionsMap.put(e1, 0);
+                    compGraph.numLLInteractionsMap.put(e1, 0);
                     if (resContacts.get(i).getResA().getSSE()!=null){
                         int firstSSE = resContacts.get(i).getResA().getSSE().getSSETypeInt();
                         switch (firstSSE){
@@ -4852,10 +4852,10 @@ public class Main {
                                     int secondSSE = resContacts.get(i).getResB().getSSE().getSSETypeInt();
                                     switch (secondSSE){
                                         case 1:
-                                            CompGraph.numHHInteractionsMap.put(e1, 1);
+                                            compGraph.numHHInteractionsMap.put(e1, 1);
                                             break;
                                         case 2:
-                                            CompGraph.numHSInteractionsMap.put(e1, 1);
+                                            compGraph.numHSInteractionsMap.put(e1, 1);
                                             break;
                                         case 3:
                                             //System.out.println("Ligand Contact");
@@ -4866,7 +4866,7 @@ public class Main {
                                     }
                                 }
                                 else{
-                                    CompGraph.numHLInteractionsMap.put(e1, 1);
+                                    compGraph.numHLInteractionsMap.put(e1, 1);
                                     //System.out.println("Loop Contact");
                                 }
                                 break;
@@ -4875,10 +4875,10 @@ public class Main {
                                     int secondSSE = resContacts.get(i).getResB().getSSE().getSSETypeInt();
                                     switch (secondSSE){
                                         case 1:
-                                            CompGraph.numHSInteractionsMap.put(e1, 1);
+                                            compGraph.numHSInteractionsMap.put(e1, 1);
                                             break;
                                         case 2:
-                                            CompGraph.numSSInteractionsMap.put(e1, 1);
+                                            compGraph.numSSInteractionsMap.put(e1, 1);
                                             break;
                                         case 3:
                                             //System.out.println("Ligand Contact");
@@ -4889,7 +4889,7 @@ public class Main {
                                     }
                                 }
                                 else{
-                                    CompGraph.numSLInteractionsMap.put(e1, 1);
+                                    compGraph.numSLInteractionsMap.put(e1, 1);
                                     //System.out.println("Loop Contact");
                                 }
                                 break;
@@ -4906,10 +4906,10 @@ public class Main {
                             int secondSSE = resContacts.get(i).getResB().getSSE().getSSETypeInt();
                             switch (secondSSE){
                                 case 1:
-                                    CompGraph.numHLInteractionsMap.put(e1, 1);
+                                    compGraph.numHLInteractionsMap.put(e1, 1);
                                     break;
                                 case 2:
-                                    CompGraph.numSLInteractionsMap.put(e1, 1);
+                                    compGraph.numSLInteractionsMap.put(e1, 1);
                                     break;
                                 case 3:
                                     //System.out.println("Ligand Contact");
@@ -4920,7 +4920,7 @@ public class Main {
                             }
                         }
                         else{
-                            CompGraph.numLLInteractionsMap.put(e1, 1);
+                            compGraph.numLLInteractionsMap.put(e1, 1);
                             //System.out.println("Loop Contact");
                         }
                     }
@@ -4928,7 +4928,7 @@ public class Main {
                 }
                 else{
                     // We already have an edge, just adjust values
-                    CompGraph.numAllInteractionsMap.put(CompGraph.getEdge(chainA, chainB), CompGraph.numAllInteractionsMap.get(CompGraph.getEdge(chainA, chainB)) + 1);
+                    compGraph.numAllInteractionsMap.put(compGraph.getEdge(chainA, chainB), compGraph.numAllInteractionsMap.get(compGraph.getEdge(chainA, chainB)) + 1);
                     if (resContacts.get(i).getResA().getSSE()!=null){
                         int firstSSE = resContacts.get(i).getResA().getSSE().getSSETypeInt();
                         switch (firstSSE){
@@ -4937,10 +4937,10 @@ public class Main {
                                     int secondSSE = resContacts.get(i).getResB().getSSE().getSSETypeInt();
                                     switch (secondSSE){
                                         case 1:
-                                            CompGraph.numHHInteractionsMap.put(CompGraph.getEdge(chainA, chainB), CompGraph.numHHInteractionsMap.get(CompGraph.getEdge(chainA, chainB)) + 1);
+                                            compGraph.numHHInteractionsMap.put(compGraph.getEdge(chainA, chainB), compGraph.numHHInteractionsMap.get(compGraph.getEdge(chainA, chainB)) + 1);
                                             break;
                                         case 2:
-                                            CompGraph.numHSInteractionsMap.put(CompGraph.getEdge(chainA, chainB), CompGraph.numHSInteractionsMap.get(CompGraph.getEdge(chainA, chainB)) + 1);
+                                            compGraph.numHSInteractionsMap.put(compGraph.getEdge(chainA, chainB), compGraph.numHSInteractionsMap.get(compGraph.getEdge(chainA, chainB)) + 1);
                                             break;
                                         case 3:
                                             //System.out.println("Ligand Contact");
@@ -4951,7 +4951,7 @@ public class Main {
                                     }
                                 }
                                 else{
-                                    CompGraph.numHLInteractionsMap.put(CompGraph.getEdge(chainA, chainB), CompGraph.numHLInteractionsMap.get(CompGraph.getEdge(chainA, chainB)) + 1);
+                                    compGraph.numHLInteractionsMap.put(compGraph.getEdge(chainA, chainB), compGraph.numHLInteractionsMap.get(compGraph.getEdge(chainA, chainB)) + 1);
                                     //System.out.println("Loop Contact");
                                 }
                                 break;
@@ -4960,10 +4960,10 @@ public class Main {
                                     int secondSSE = resContacts.get(i).getResB().getSSE().getSSETypeInt();
                                     switch (secondSSE){
                                         case 1:
-                                            CompGraph.numHSInteractionsMap.put(CompGraph.getEdge(chainA, chainB), CompGraph.numHSInteractionsMap.get(CompGraph.getEdge(chainA, chainB)) + 1);
+                                            compGraph.numHSInteractionsMap.put(compGraph.getEdge(chainA, chainB), compGraph.numHSInteractionsMap.get(compGraph.getEdge(chainA, chainB)) + 1);
                                             break;
                                         case 2:
-                                            CompGraph.numSSInteractionsMap.put(CompGraph.getEdge(chainA, chainB), CompGraph.numSSInteractionsMap.get(CompGraph.getEdge(chainA, chainB)) + 1);
+                                            compGraph.numSSInteractionsMap.put(compGraph.getEdge(chainA, chainB), compGraph.numSSInteractionsMap.get(compGraph.getEdge(chainA, chainB)) + 1);
                                             break;
                                         case 3:
                                             //System.out.println("Ligand Contact");
@@ -4974,7 +4974,7 @@ public class Main {
                                     }
                                 }
                                 else{
-                                    CompGraph.numSLInteractionsMap.put(CompGraph.getEdge(chainA, chainB), CompGraph.numSLInteractionsMap.get(CompGraph.getEdge(chainA, chainB)) + 1);
+                                    compGraph.numSLInteractionsMap.put(compGraph.getEdge(chainA, chainB), compGraph.numSLInteractionsMap.get(compGraph.getEdge(chainA, chainB)) + 1);
                                     //System.out.println("Loop Contact");
                                 }
                                 break;
@@ -4991,10 +4991,10 @@ public class Main {
                             int secondSSE = resContacts.get(i).getResB().getSSE().getSSETypeInt();
                             switch (secondSSE){
                                 case 1:
-                                    CompGraph.numHLInteractionsMap.put(CompGraph.getEdge(chainA, chainB), CompGraph.numHLInteractionsMap.get(CompGraph.getEdge(chainA, chainB)) + 1);
+                                    compGraph.numHLInteractionsMap.put(compGraph.getEdge(chainA, chainB), compGraph.numHLInteractionsMap.get(compGraph.getEdge(chainA, chainB)) + 1);
                                     break;
                                 case 2:
-                                    CompGraph.numSLInteractionsMap.put(CompGraph.getEdge(chainA, chainB), CompGraph.numSLInteractionsMap.get(CompGraph.getEdge(chainA, chainB)) + 1);
+                                    compGraph.numSLInteractionsMap.put(compGraph.getEdge(chainA, chainB), compGraph.numSLInteractionsMap.get(compGraph.getEdge(chainA, chainB)) + 1);
                                     break;
                                 case 3:
                                     //System.out.println("Ligand Contact");
@@ -5005,7 +5005,7 @@ public class Main {
                             }
                         }
                         else{
-                            CompGraph.numLLInteractionsMap.put(CompGraph.getEdge(chainA, chainB), CompGraph.numLLInteractionsMap.get(CompGraph.getEdge(chainA, chainB)) + 1);
+                            compGraph.numLLInteractionsMap.put(compGraph.getEdge(chainA, chainB), compGraph.numLLInteractionsMap.get(compGraph.getEdge(chainA, chainB)) + 1);
                             //System.out.println("Loop Contact");
                         }
                     }
@@ -5013,14 +5013,14 @@ public class Main {
                 interchainContacts.add(resContacts.get(i));
             }
         }
-        System.out.println("    All Interactions : " + CompGraph.numAllInteractionsMap.values().toArray()[0]);
-        System.out.println("    HH Interactions  : " + CompGraph.numHHInteractionsMap.values().toArray()[0]);
-        System.out.println("    HS Interactions  : " + CompGraph.numHSInteractionsMap.values().toArray()[0]);
-        System.out.println("    HL Interactions  : " + CompGraph.numHLInteractionsMap.values().toArray()[0]);
-        System.out.println("    LL Interactions  : " + CompGraph.numLLInteractionsMap.values().toArray()[0]);
-        System.out.println("    SS Interactions  : " + CompGraph.numSSInteractionsMap.values().toArray()[0]);
-        System.out.println("    SL Interactions  : " + CompGraph.numSLInteractionsMap.values().toArray()[0]);
-        System.out.println("    Neighbours       : " + CompGraph.getEdges().size());
+        System.out.println("    All Interactions : " + compGraph.numAllInteractionsMap.values().toArray()[0]);
+        System.out.println("    HH Interactions  : " + compGraph.numHHInteractionsMap.values().toArray()[0]);
+        System.out.println("    HS Interactions  : " + compGraph.numHSInteractionsMap.values().toArray()[0]);
+        System.out.println("    HL Interactions  : " + compGraph.numHLInteractionsMap.values().toArray()[0]);
+        System.out.println("    LL Interactions  : " + compGraph.numLLInteractionsMap.values().toArray()[0]);
+        System.out.println("    SS Interactions  : " + compGraph.numSSInteractionsMap.values().toArray()[0]);
+        System.out.println("    SL Interactions  : " + compGraph.numSLInteractionsMap.values().toArray()[0]);
+        System.out.println("    Neighbours       : " + compGraph.getEdges().size());
 
         // Calculate SSE level contacts
         //System.out.println("intr" + interchainContacts);
@@ -5032,7 +5032,7 @@ public class Main {
         try{
             myGML = new File(pdbid + "_CompGraph.gml");
             myGML.createNewFile();
-            CompGraph.writeToFileGML(myGML);
+            compGraph.writeToFileGML(myGML);
         }catch(IOException e){
             System.err.println("ERROR: Could not write complex graph to file '" + myGML.getAbsolutePath() + ". General I/O exception: '" + e.getMessage()+ "'.");
         }
