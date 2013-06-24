@@ -18,7 +18,8 @@ import java.util.Locale;
 //import org.jgrapht.graph.*;
 //import org.jgrapht.alg.ConnectivityInspector;
 //import com.google.gson.*;
-import datastructures.UndirectedGraph;
+//import datastructures.UndirectedGraph;
+import net.sourceforge.spargel.writers.GMLWriter;
 import htmlgen.CssGenerator;
 import htmlgen.HtmlGenerator;
 import htmlgen.JmolTools;
@@ -1702,10 +1703,7 @@ public class Main {
             for(String gt : graphTypes) {
 
                 // create the protein graph for this graph type
-                //System.out.println("SSEs: " + allChainSSEs);
-                if(Settings.getBoolean("plcc_B_complex_graphs")) {
-                    calculateComplexGraph(allChains, resList, resContacts, pdbid, outputDir, gt);
-                }
+                //System.out.println("SSEs: " + allChainSSEs);                
 
                 ProtGraph pg = calcGraphType(gt, allChainSSEs, c, resContacts, pdbid);
                 pg.setInfo(pdbid, c.getPdbChainID(), gt);
@@ -1926,6 +1924,12 @@ public class Main {
             System.out.println("  +++++ All " + graphTypes.size() + " protein graphs of chain " + c.getPdbChainID() + " handled. +++++");
             
         }
+        
+        // Calculate Complex Graph
+        if(Settings.getBoolean("plcc_B_complex_graphs")) {
+            calculateComplexGraph(allChains, resList, resContacts, pdbid, outputDir, SSEGraph.GRAPHTYPE_ALBELIG);
+        }
+        
         //System.out.println("All " + allChains.size() + " chains done.");
         
         
@@ -4700,11 +4704,6 @@ public class Main {
         System.out.println("###################################################################################");
     }
     
-    
-    
-    
-    
-    
     /**
      * Calculates complex graph types which are configured in the config file for all given chains.
      * @param allChains a list of chains, each chain will be handled separately
@@ -4715,17 +4714,25 @@ public class Main {
      */
     public static void calculateComplexGraph(ArrayList<Chain> allChains, ArrayList<Residue> resList, ArrayList<ResContactInfo> resContacts, String pdbid, String outputDir, String graphType) {
 
-        System.out.println("Calculating complex graph.");
+        System.out.println("Calculating complex graph (CG) of type " + graphType + ".");
         ArrayList<ResContactInfo> interchainContacts = new ArrayList<ResContactInfo>();
         Chain c;
         ArrayList<SSE> chainDsspSSEs = new ArrayList<SSE>();
         ArrayList<SSE> chainPtglSSEs = new ArrayList<SSE>();
         ArrayList<SSE> allChainSSEs = new ArrayList<SSE>();
         ArrayList<SSE> oneChainSSEs = new ArrayList<SSE>();
+        ArrayList<Integer> chainEnd = new ArrayList<Integer>();
         HashMap<String, ArrayList<SSE>> chainSSEMap = new HashMap<String, ArrayList<SSE>>();
         String fs = System.getProperty("file.separator");
+        String fileNameWithExtension = null;
+        String fileNameWithoutExtension = null;
+        String filePathImg = null;
+        String filePathGraphs = null;
+        String filePathHTML = null;
+        String imgFile = null;
+        String plccGraphFile = null;
 
-        System.out.println("Calculating SSEs for all chains of protein " + pdbid + "...");
+        System.out.println("  Calculating CG SSEs for all chains of protein " + pdbid + "...");
 
         HashMap<String, String> md = FileParser.getPDBMetaData();
         Double res = -1.0;
@@ -4736,11 +4743,48 @@ public class Main {
             System.err.println("WARNING: Could not determine resolution of PDB file for protein '" + pdbid + "', assuming NMR with resolution '" + res + "'.");
             
         }
+        
+        ArrayList<String> keepSSEs = new ArrayList<String>();
+        ArrayList<SSE> filteredChainSSEs;
 
-        //!!!
+        // Check whether coils should be kept
+        if(Settings.getBoolean("plcc_B_include_coils")) {
+            keepSSEs.add(Settings.get("plcc_S_coilSSECode"));
+        }
+
+        // Filter SSEs depending on the requested graph type
+        if(graphType.equals(SSEGraph.GRAPHTYPE_ALBE)) {
+            keepSSEs.add("E");
+            keepSSEs.add("H");
+        }
+        else if(graphType.equals(SSEGraph.GRAPHTYPE_ALPHA)) {
+            keepSSEs.add("H");
+        }
+        else if(graphType.equals(SSEGraph.GRAPHTYPE_BETA)) {
+            keepSSEs.add("E");            
+        }
+        else if(graphType.equals(SSEGraph.GRAPHTYPE_ALBELIG)) {
+            keepSSEs.add("E");
+            keepSSEs.add("H");
+            keepSSEs.add("L");
+        }
+        else if(graphType.equals(SSEGraph.GRAPHTYPE_ALPHALIG)) {
+            keepSSEs.add("H");
+            keepSSEs.add("L");
+        }
+        else if(graphType.equals(SSEGraph.GRAPHTYPE_BETALIG)) {
+            keepSSEs.add("E");
+            keepSSEs.add("L");
+        }
+        else {
+            System.err.println("ERROR: calculateComplexGraph(): Graph type '" + graphType + "' invalid. Skipping.");
+            return;
+        }
+
         // Get SSEs for all chains
         for(Integer i = 0; i < allChains.size(); i++) {
             c = allChains.get(i);
+            System.out.println("   *Handling chain " + c.getPdbChainID() + ".");
 
             ProtMetaInfo pmi = FileParser.getMetaInfo(pdbid, c.getPdbChainID());
             //pmi.print();
@@ -4749,7 +4793,7 @@ public class Main {
             md.put("pdb_org_common", pmi.getOrgCommon());
 
             // determine SSEs for this chain
-            System.out.println("    Creating all SSEs for chain '" + c.getPdbChainID() + "' consisting of " + c.getResidues().size() + " residues.");
+            //System.out.println("    Creating all SSEs for chain '" + c.getPdbChainID() + "' consisting of " + c.getResidues().size() + " residues.");
             chainDsspSSEs = createAllDsspSSEsFromResidueList(c.getResidues());
             
             oneChainSSEs = createAllPtglSSEsFromDsspSSEList(chainDsspSSEs);
@@ -4765,30 +4809,33 @@ public class Main {
                 oneChainSSEs.get(j).setSeqSseChainNum(j + 1);   // This is the correct value, determined from the list of all valid SSEs of this chain
                 oneChainSSEs.get(j).setSseIDPtgl(getPtglSseIDForNum(j));
             }
-            System.out.println("one" + oneChainSSEs);
-            allChainSSEs.addAll(oneChainSSEs);
-            System.out.println("Allchainsses" + allChainSSEs);
+
+
+            // Filter SSEs.
+            filteredChainSSEs = filterAllSSEsButList(oneChainSSEs, keepSSEs);
+            if(chainEnd.size()>0) chainEnd.add(chainEnd.get(chainEnd.size() - 1) + filteredChainSSEs.size());
+            else chainEnd.add(filteredChainSSEs.size());
+            allChainSSEs.addAll(filteredChainSSEs);
             chainSSEMap.put(c.getPdbChainID(), oneChainSSEs);
         }
-        
-        //!!!
-        
+                
         // create vertices for all chains
         ComplexGraph CompGraph = new ComplexGraph(pdbid);
         for(Integer i = 0; i < allChains.size(); i++) {
-            ComplexGraph.Vertice v1 = CompGraph.createVertice();
+            ComplexGraph.Vertex v1 = CompGraph.createVertex();
             CompGraph.proteinNodeMap.put(v1, allChains.get(i).getPdbChainID());
             //System.out.println(allChains.get(i).getPdbChainID());
         }
         
+        System.out.println("  Computing CG contacts.");
         // create edges for all contacts
         for(Integer i = 0; i < resContacts.size(); i++) {
-            ComplexGraph.Vertice chainA = CompGraph.getVerticeFromChain(resContacts.get(i).getResA().getChainID());
-            ComplexGraph.Vertice chainB = CompGraph.getVerticeFromChain(resContacts.get(i).getResB().getChainID());
+            ComplexGraph.Vertex chainA = CompGraph.getVertexFromChain(resContacts.get(i).getResA().getChainID());
+            ComplexGraph.Vertex chainB = CompGraph.getVertexFromChain(resContacts.get(i).getResB().getChainID());
+            // We only want interchain contacts
             if (!chainA.equals(chainB)){
-                //System.out.println(resContacts.get(i));
-                //System.out.println("NEWSSETEST: " + resContacts.get(i).getResA().getSSE());
                 if (CompGraph.getEdge(chainA, chainB) == null){
+                    // We don't have an edge yet, but need one, so create an edge
                     ComplexGraph.Edge e1 = CompGraph.createEdge(chainA, chainB);
                     CompGraph.numAllInteractionsMap.put(e1, 1);
                     CompGraph.numHHInteractionsMap.put(e1, 0);
@@ -4811,16 +4858,16 @@ public class Main {
                                             CompGraph.numHSInteractionsMap.put(e1, 1);
                                             break;
                                         case 3:
-                                            System.out.println("Ligand Contact");
+                                            //System.out.println("Ligand Contact");
                                             break;
                                         case 4:
-                                            System.out.println("Other Contact");
+                                            //System.out.println("Other Contact");
                                             break;
                                     }
                                 }
                                 else{
                                     CompGraph.numHLInteractionsMap.put(e1, 1);
-                                    System.out.println("Loop Contact");
+                                    //System.out.println("Loop Contact");
                                 }
                                 break;
                             case 2:
@@ -4834,23 +4881,23 @@ public class Main {
                                             CompGraph.numSSInteractionsMap.put(e1, 1);
                                             break;
                                         case 3:
-                                            System.out.println("Ligand Contact");
+                                            //System.out.println("Ligand Contact");
                                             break;
                                         case 4:
-                                            System.out.println("Other Contact");
+                                            //System.out.println("Other Contact");
                                             break;
                                     }
                                 }
                                 else{
                                     CompGraph.numSLInteractionsMap.put(e1, 1);
-                                    System.out.println("Loop Contact");
+                                    //System.out.println("Loop Contact");
                                 }
                                 break;
                             case 3:
-                                System.out.println("Ligand Contact");
+                                //System.out.println("Ligand Contact");
                                 break;
                             case 4:
-                                System.out.println("Other Contact");
+                                //System.out.println("Other Contact");
                                 break;
                         }
                     }
@@ -4865,21 +4912,22 @@ public class Main {
                                     CompGraph.numSLInteractionsMap.put(e1, 1);
                                     break;
                                 case 3:
-                                    System.out.println("Ligand Contact");
+                                    //System.out.println("Ligand Contact");
                                     break;
                                 case 4:
-                                    System.out.println("Other Contact");
+                                    //System.out.println("Other Contact");
                                     break;
                             }
                         }
                         else{
                             CompGraph.numLLInteractionsMap.put(e1, 1);
-                            System.out.println("Loop Contact");
+                            //System.out.println("Loop Contact");
                         }
                     }
-                    System.out.println("Contact found between chain " + resContacts.get(i).getResA().getChainID() + " and chain " + resContacts.get(i).getResB().getChainID());
+                    //System.out.println("Contact found between chain " + resContacts.get(i).getResA().getChainID() + " and chain " + resContacts.get(i).getResB().getChainID());
                 }
                 else{
+                    // We already have an edge, just adjust values
                     CompGraph.numAllInteractionsMap.put(CompGraph.getEdge(chainA, chainB), CompGraph.numAllInteractionsMap.get(CompGraph.getEdge(chainA, chainB)) + 1);
                     if (resContacts.get(i).getResA().getSSE()!=null){
                         int firstSSE = resContacts.get(i).getResA().getSSE().getSSETypeInt();
@@ -4895,16 +4943,16 @@ public class Main {
                                             CompGraph.numHSInteractionsMap.put(CompGraph.getEdge(chainA, chainB), CompGraph.numHSInteractionsMap.get(CompGraph.getEdge(chainA, chainB)) + 1);
                                             break;
                                         case 3:
-                                            System.out.println("Ligand Contact");
+                                            //System.out.println("Ligand Contact");
                                             break;
                                         case 4:
-                                            System.out.println("Other Contact");
+                                            //System.out.println("Other Contact");
                                             break;
                                     }
                                 }
                                 else{
                                     CompGraph.numHLInteractionsMap.put(CompGraph.getEdge(chainA, chainB), CompGraph.numHLInteractionsMap.get(CompGraph.getEdge(chainA, chainB)) + 1);
-                                    System.out.println("Loop Contact");
+                                    //System.out.println("Loop Contact");
                                 }
                                 break;
                             case 2:
@@ -4918,23 +4966,23 @@ public class Main {
                                             CompGraph.numSSInteractionsMap.put(CompGraph.getEdge(chainA, chainB), CompGraph.numSSInteractionsMap.get(CompGraph.getEdge(chainA, chainB)) + 1);
                                             break;
                                         case 3:
-                                            System.out.println("Ligand Contact");
+                                            //System.out.println("Ligand Contact");
                                             break;
                                         case 4:
-                                            System.out.println("Other Contact");
+                                            //System.out.println("Other Contact");
                                             break;
                                     }
                                 }
                                 else{
                                     CompGraph.numSLInteractionsMap.put(CompGraph.getEdge(chainA, chainB), CompGraph.numSLInteractionsMap.get(CompGraph.getEdge(chainA, chainB)) + 1);
-                                    System.out.println("Loop Contact");
+                                    //System.out.println("Loop Contact");
                                 }
                                 break;
                             case 3:
-                                System.out.println("Ligand Contact");
+                                //System.out.println("Ligand Contact");
                                 break;
                             case 4:
-                                System.out.println("Other Contact");
+                                //System.out.println("Other Contact");
                                 break;
                         }
                     }
@@ -4949,99 +4997,158 @@ public class Main {
                                     CompGraph.numSLInteractionsMap.put(CompGraph.getEdge(chainA, chainB), CompGraph.numSLInteractionsMap.get(CompGraph.getEdge(chainA, chainB)) + 1);
                                     break;
                                 case 3:
-                                    System.out.println("Ligand Contact");
+                                    //System.out.println("Ligand Contact");
                                     break;
                                 case 4:
-                                    System.out.println("Other Contact");
+                                    //System.out.println("Other Contact");
                                     break;
                             }
                         }
                         else{
                             CompGraph.numLLInteractionsMap.put(CompGraph.getEdge(chainA, chainB), CompGraph.numLLInteractionsMap.get(CompGraph.getEdge(chainA, chainB)) + 1);
-                            System.out.println("Loop Contact");
+                            //System.out.println("Loop Contact");
                         }
                     }
-                System.out.println("Number of contacts: " + CompGraph.numAllInteractionsMap.get(CompGraph.getEdge(chainA, chainB)));
                 }
                 interchainContacts.add(resContacts.get(i));
             }
         }
-        //System.out.println("All Interactions" + CompGraph.numAllInteractionsMap.values().toArray()[0]);
-        //System.out.println("HH Interactions" + CompGraph.numHHInteractionsMap.values().toArray()[0]);
-        //System.out.println("HS Interactions" + CompGraph.numHSInteractionsMap.values().toArray()[0]);
-        //System.out.println("HL Interactions" + CompGraph.numHLInteractionsMap.values().toArray()[0]);
-        //System.out.println("LL Interactions" + CompGraph.numLLInteractionsMap.values().toArray()[0]);
-        //System.out.println("SS Interactions" + CompGraph.numSSInteractionsMap.values().toArray()[0]);
-        //System.out.println("SL Interactions" + CompGraph.numSLInteractionsMap.values().toArray()[0]);
-        //System.out.println("Neighbours = " + CompGraph.getNumEdges());
-        ArrayList<String> keepSSEs = new ArrayList<String>();
-        ArrayList<SSE> filteredChainSSEs;
-
-        // Check whether coils should be kept
-        if(Settings.getBoolean("plcc_B_include_coils")) {
-            keepSSEs.add(Settings.get("plcc_S_coilSSECode"));
-        }
-
-        // Filter SSEs depending on the requested graph type
-        if(graphType.equals("albe")) {
-            keepSSEs.add("E");
-            keepSSEs.add("H");
-        }
-        else if(graphType.equals("alpha")) {
-            keepSSEs.add("H");
-        }
-        else if(graphType.equals("beta")) {
-            keepSSEs.add("E");            
-        }
-        else if(graphType.equals("albelig")) {
-            keepSSEs.add("E");
-            keepSSEs.add("H");
-            keepSSEs.add("L");
-        }
-        else if(graphType.equals("alphalig")) {
-            keepSSEs.add("H");
-            keepSSEs.add("L");
-        }
-        else if(graphType.equals("betalig")) {
-            keepSSEs.add("E");
-            keepSSEs.add("L");
-        }
-        else {
-            System.err.println("ERROR: calcGraphType(): Graph type '" + graphType + "' invalid.");
-            System.exit(1);
-        }
-
-        // Filters have been configured, now do the actual filtering.
-        filteredChainSSEs = filterAllSSEsButList(allChainSSEs, keepSSEs);
-        System.out.println("ALL " + allChainSSEs);
-        System.out.println(keepSSEs);
-
-        // The SSEs should already be ordered anyway
-        //PROBABLY SHOULDN'T GET SORTED
-        System.out.println("filteredSSEs" + filteredChainSSEs);
-        //Collections.sort(filteredChainSSEs, new SSEComparator());
-        System.out.println("filteredSSEs" + filteredChainSSEs);
-        
-        // SSE list has been filtered, let's go
+        System.out.println("    All Interactions : " + CompGraph.numAllInteractionsMap.values().toArray()[0]);
+        System.out.println("    HH Interactions  : " + CompGraph.numHHInteractionsMap.values().toArray()[0]);
+        System.out.println("    HS Interactions  : " + CompGraph.numHSInteractionsMap.values().toArray()[0]);
+        System.out.println("    HL Interactions  : " + CompGraph.numHLInteractionsMap.values().toArray()[0]);
+        System.out.println("    LL Interactions  : " + CompGraph.numLLInteractionsMap.values().toArray()[0]);
+        System.out.println("    SS Interactions  : " + CompGraph.numSSInteractionsMap.values().toArray()[0]);
+        System.out.println("    SL Interactions  : " + CompGraph.numSLInteractionsMap.values().toArray()[0]);
+        System.out.println("    Neighbours       : " + CompGraph.getEdges().size());
 
         // Calculate SSE level contacts
-        System.out.println("intr" + interchainContacts);
-        ContactMatrix chainCM = new ContactMatrix(filteredChainSSEs, pdbid);
-        System.out.println(pdbid);
+        //System.out.println("intr" + interchainContacts);
+        ContactMatrix chainCM = new ContactMatrix(allChainSSEs, pdbid);
         chainCM.restrictToChain("ALL");
         chainCM.fillFromContactList(resContacts, keepSSEs);
         chainCM.calculateSSEContactMatrix();
-        chainCM.printResContMatrix();
-        DrawComplexGraph draw = new DrawComplexGraph();
-        draw.drawComplexGraph("WASSUP", graphType, CompGraph);
-        System.out.println("All " + allChains.size() + " chains done.");
-        
-        // added by ts
-        File complexGraphOutput = new File(outputDir + fs + "complexgraph_" + pdbid + "_" + graphType + ".gml");
-        if(CompGraph.writeToFileGML(complexGraphOutput)) {
-            System.out.println("Wrote complex graph to file '" + complexGraphOutput.getAbsolutePath() + "' in GML format.");
-        } else {
-            System.err.println("ERROR: Could not write complex graph to file '" + complexGraphOutput.getAbsolutePath() + "' in GML format.");
+        File myGML = null;
+        try{
+            myGML = new File(pdbid + "_CompGraph.gml");
+            myGML.createNewFile();
+            CompGraph.writeToFileGML(myGML);
+        }catch(IOException e){
+            System.err.println("ERROR: Could not write complex graph to file '" + myGML.getAbsolutePath() + ". General I/O exception: '" + e.getMessage()+ "'.");
         }
-    }
+        
+       
+        
+        chainCM.calculateSSESpatialRelationMatrix(resContacts, true);                
+
+        ProtGraph pg = chainCM.toProtGraph();
+        pg.declareProteinGraph();
+
+        
+        if(Settings.getBoolean("plcc_B_forceBackboneContacts")) {
+            System.out.println("      Adding backbone contacts to consecutive SSEs of the " + graphType + " graph.");
+            pg.addFullBackboneContacts();            
+        }
+
+        //System.out.println("    ----- Done with " + graphType + " graph of chain " + c.getPdbChainID() + ". -----");
+        pg.setInfo(pdbid, "ALL", "complex_" + graphType);
+        pg.addMetadata(md);
+        pg.setComplexData(chainEnd, allChains);      
+
+        System.out.println("  Preparing to write complex graph files.");
+        
+        filePathImg = outputDir;
+        filePathGraphs = outputDir;
+        filePathHTML = outputDir;
+        String coils = "";
+        if(Settings.getBoolean("plcc_B_include_coils")) {
+            //System.out.println("  Considering coils, this may fragment SSEs.");
+            coils = "_coils";
+        }
+        fileNameWithoutExtension = pdbid + "_" + "complex" + "_" + "ALL" + "_" + graphType + coils + "_PG";
+        fileNameWithExtension = fileNameWithoutExtension + Settings.get("plcc_S_img_output_fileext");
+
+        //pg.toFile(file + ".ptg");
+        //pg.print();                
+        // Create the file in a subdir tree based on the protein meta data if requested
+        if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
+
+            File targetDir = IO.generatePDBstyleSubdirTreeName(new File(outputDir), pdbid, "ALL");
+            if(targetDir != null) {
+                ArrayList<String> errors = IO.createDirIfItDoesntExist(targetDir);
+                if( ! errors.isEmpty()) {
+                    for(String err : errors) {
+                        System.err.println("ERROR: " + err);
+                    }
+                } else {
+                    filePathImg = targetDir.getAbsolutePath();
+                    filePathGraphs = targetDir.getAbsolutePath();
+                    filePathHTML = targetDir.getAbsolutePath();
+                }                    
+            } else {
+                System.err.println("ERROR: Could not determine PDB-style subdir path name.");
+            }
+        }
+
+
+        String graphFormatsWritten = "";
+        Integer numFormatsWritten = 0;
+        if(Settings.getBoolean("plcc_B_output_GML")) {
+            String gmlfFile = filePathGraphs + fs + fileNameWithoutExtension + ".gml";
+            if(IO.stringToTextFile(gmlfFile, pg.toGraphModellingLanguageFormat())) {
+                graphFormatsWritten += "gml "; numFormatsWritten++;
+            }
+        }
+        if(Settings.getBoolean("plcc_B_output_TGF")) {
+            String tgfFile = filePathGraphs + fs + fileNameWithoutExtension + ".tgf";
+            if(IO.stringToTextFile(tgfFile, pg.toTrivialGraphFormat())) {
+                graphFormatsWritten += "tgf "; numFormatsWritten++;
+            }
+        }
+        if(Settings.getBoolean("plcc_B_output_DOT")) {
+            String dotLangFile = filePathGraphs + fs + fileNameWithoutExtension + ".gv";
+            if(IO.stringToTextFile(dotLangFile, pg.toDOTLanguageFormat())) {
+                graphFormatsWritten += "gv "; numFormatsWritten++;
+            }
+        }
+        if(Settings.getBoolean("plcc_B_output_kavosh")) {
+            String kavoshFile = filePathGraphs + fs + fileNameWithoutExtension + ".kavosh";
+            if(IO.stringToTextFile(kavoshFile, pg.toKavoshFormat())) {
+                graphFormatsWritten += "kavosh "; numFormatsWritten++;
+            }
+        }
+        if(Settings.getBoolean("plcc_B_output_eld")) {
+            String elFile = filePathGraphs + fs + fileNameWithoutExtension + ".el_edges";
+            String nodeTypeListFile = filePathGraphs + fs + fileNameWithoutExtension + ".el_ntl";
+            if(IO.stringToTextFile(elFile, pg.toEdgeList()) && IO.stringToTextFile(nodeTypeListFile, pg.getNodeTypeList())) {
+                graphFormatsWritten += "el "; numFormatsWritten++;
+            }
+        }
+        // write the SSE info text file for the image (plcc graph format file)
+        if(Settings.getBoolean("plcc_B_output_plcc")) {
+            plccGraphFile = filePathGraphs + fs + fileNameWithoutExtension + ".plg";
+            if(IO.stringToTextFile(plccGraphFile, pg.toVPLGGraphFormat())) {
+                graphFormatsWritten += "plg "; numFormatsWritten++;
+            }
+        }
+        
+        if(numFormatsWritten > 0) {
+            System.out.println("    Exported complex graph in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + new File(filePathGraphs).getAbsolutePath() + fs + "'.");
+        }
+
+        imgFile = filePathImg + fs + fileNameWithExtension;
+
+        if(Settings.getBoolean("plcc_B_draw_graphs")) {
+            if(pg.drawProteinGraph(imgFile, false)) {
+                System.out.println("    Image of complex graph written to file '" + imgFile + "'.");
+            }                   
+        }
+        else {
+            System.out.println("    Image and graph output disabled, not drawing and writing complex graph files.");
+        }              
+        
+        System.out.println("Complex graph computation done.");
+    }        
+    
+    
 }

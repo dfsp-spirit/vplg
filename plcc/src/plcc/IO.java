@@ -415,6 +415,36 @@ public class IO {
     }
     
     
+   /**
+    * Generates the PDB-style subdir path name for a given PDB ID, chain and base directory
+    * (simlar to on the RCSB PDB FTP-server), but does NOT create the path in the file system.
+    *
+    * @param pdbid the pdbid, a 4 character string
+    * @param chain the pdb chain id, a 1 character string
+    * @param baseOutputDir the base dir under which to create the path
+    * @return the path or null if no such path could be generated from the input data
+    */
+    public static File generatePDBstyleSubdirTreeName(File baseOutputDir, String pdbid, String chain) {
+        if(baseOutputDir == null) {
+            return null;
+        }
+        
+        //System.out.println("generatePDBstyleSubdirTreeName: baseOutputDir=" + baseOutputDir.getAbsolutePath() + ".");
+        File dirStructure;
+        String fs = System.getProperty("file.separator");
+        
+        if(! (pdbid.length() == 4)) {
+            //System.err.println("ERROR: PDB ID of length 4 required to output images in directory tree, using '" + baseOutputDir + "'.");
+            dirStructure = null;
+            //System.exit(1);
+        } else {
+            String mid2Chars = pdbid.substring(1, 3);
+            dirStructure = new File(baseOutputDir.getAbsolutePath() + fs + mid2Chars + fs + pdbid + fs + chain);
+        }
+        return dirStructure;
+    } 
+    
+    
     /**
      * Copies a file from this JAR's resources to a file system destination.
      * @param pathToResourceFile the path to the resource inside the JAR, e.g., "resources/vplg_logo.png".

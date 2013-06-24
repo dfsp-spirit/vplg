@@ -11,8 +11,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Iterator;
 import net.sourceforge.spargel.datastructures.UAdjListGraph;
 import net.sourceforge.spargel.writers.GMLWriter;
 
@@ -21,7 +20,7 @@ import net.sourceforge.spargel.writers.GMLWriter;
  * @author marcus
  */
 public class ComplexGraph extends UAdjListGraph {
-    
+
     public Map<Edge, Integer> numHHInteractionsMap;
     public Map<Edge, Integer> numHSInteractionsMap;
     public Map<Edge, Integer> numHLInteractionsMap;
@@ -30,15 +29,15 @@ public class ComplexGraph extends UAdjListGraph {
     public Map<Edge, Integer> numLLInteractionsMap;
     public Map<Edge, Integer> numAllInteractionsMap;
     public Map<Edge, Integer> numDisulfidesMap;
-    public Map<Vertice, String> proteinNodeMap;
+    public Map<Vertex, String> proteinNodeMap;
     private String pdbid;
-    
-    
+
     /**
      * Constructor.
      */
     ComplexGraph(String pdbid) {
         this.pdbid = pdbid;
+
         numHHInteractionsMap = createEdgeMap();
         numHSInteractionsMap = createEdgeMap();
         numHLInteractionsMap = createEdgeMap();
@@ -47,30 +46,34 @@ public class ComplexGraph extends UAdjListGraph {
         numLLInteractionsMap = createEdgeMap();
         numAllInteractionsMap = createEdgeMap();
         numDisulfidesMap = createEdgeMap();
-        proteinNodeMap = createVerticeMap();
+        proteinNodeMap = createVertexMap();
     }
-    
-    public Vertice getVerticeFromChain(String chainID){
-        for (int i = 0; i < ComplexGraph.this.getNumVertices(); i++){
-            if (ComplexGraph.this.proteinNodeMap.get(ComplexGraph.this.getVertice(i)).equals(chainID)){
-                return ComplexGraph.this.getVertice(i);
+
+    public Vertex getVertexFromChain(String chainID) {
+        Iterator<Vertex> vertIter = this.getVertices().iterator();
+        Vertex nextVert;
+        while (vertIter.hasNext()) {
+            nextVert = vertIter.next();
+            if (ComplexGraph.this.proteinNodeMap.get(nextVert).equals(chainID)) {
+                return nextVert;
             }
         }
         return null;
     }
-    
-    public String getPDBID(){
+
+    public String getPDBID() {
         return this.pdbid;
     }
-    
+
     /**
-     * Writes this complex graph to the file 'file' in GML format. Note that this function
-     * will overwrite the file if it exists.
+     * Writes this complex graph to the file 'file' in GML format. Note that
+     * this function will overwrite the file if it exists.
+     *
      * @param file the target file. Has to be writable.
      * @return true if the file was written, false otherwise
      */
     public boolean writeToFileGML(File file) {
-        
+
         if (!file.exists()) {
             try {
                 file.createNewFile();
@@ -79,29 +82,59 @@ public class ComplexGraph extends UAdjListGraph {
                 return false;
             }
         }
-        
+
         GMLWriter gw = new GMLWriter(this);
-        gw.joinVerticeMap("chain", proteinNodeMap);
-        gw.joinEdgeMap("num_total_contacts", numAllInteractionsMap);
+        gw.addVertexAttrWriter(new GMLWriter.AttrWriter<Vertex>() {
+            @Override
+            public String getAttribute() {
+                return "label";
+            }
+
+            @Override
+            public boolean hasValue(Vertex o) {
+                return proteinNodeMap.containsKey(o);
+            }
+
+            @Override
+            public String write(Vertex o) {
+                return '"' + proteinNodeMap.get(o).toString() + '"';
+            }
+        });
+
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
+                "label", numAllInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
+                "num_HH_contacts", numHHInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
+                "num_HS_contacts", numHSInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
+                "num_HL_contacts", numHLInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
+                "num_SS_contacts", numSSInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
+                "num_SL_contacts", numSLInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
+                "num_LL_contacts", numLLInteractionsMap));
+
         FileOutputStream fop = null;
-        boolean allOK = true;        
+        boolean allOK = true;
         try {
             fop = new FileOutputStream(file);
-            gw.write(fop);    
+            gw.write(fop);
             fop.flush();
             fop.close();
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.err.println("ERROR: Could not write complex graph to file '" + file.getAbsolutePath() + "': " + e.getMessage() + ".");
             allOK = false;
         } finally {
-            if(fop != null)  {
+            if (fop != null) {
                 try {
                     fop.close();
-                } catch(Exception e) {
+                } catch (Exception e) {
                     // nvm
                 }
             }
-            
+
         }
         return allOK;
     }

@@ -10,7 +10,6 @@
 package plcc;
 
 //import com.google.gson.Gson;
-import tools.DP;
 import datastructures.Graph;
 import datastructures.UndirectedGraph;
 import java.awt.BasicStroke;
@@ -30,7 +29,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -57,12 +55,18 @@ import org.w3c.dom.DOMImplementation;
  * This class should hold all functions which they share.
  * 
  * 
- * @author ts
+ * @author spirit
  */
 public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguageFormat, TrivialGraphFormat, DOTLanguageFormat, KavoshFormat {
     
     /** the list of all SSEs of this graph */
     protected ArrayList<SSE> sseList;
+    
+    /** Contains the number of the last SSE which is part of a certain chain*/
+    protected ArrayList<Integer> chainEnd = new ArrayList<Integer>();
+    
+    /** Contains a list of all chains*/
+    protected ArrayList<Chain> allChains = new ArrayList<Chain>();
     
     /** The size of this graph, i.e., the number of vertices in it. */
     protected Integer size = null;   
@@ -147,7 +151,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         }
 
         this.metadata = new HashMap<String, String>();
-        this.initMatrices();
+        this.init();
         this.spatOrder = null;
         this.reportCliques = true;  // TODO: move to settings
     }
@@ -244,35 +248,6 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             }
         }
         return numIsolatedLigands;
-    }
-    
-    /**
-     * Determines the number of ligands in this graph. 
-     * @return the number of ligands in this graph
-     */
-    public Integer numLigands() {        
-        Integer numIsolatedLigands = 0;
-        for(SSE s : this.sseList) {            
-            if(s.isLigandSSE()) {
-                numIsolatedLigands++;
-            }
-        }
-        return numIsolatedLigands;
-    }
-    
-    
-    /**
-     * Returns all ligand SSEs of this graph.
-     * @return all ligand SSEs of this graph
-     */   
-    public ArrayList<SSE> getAllLigands() {
-        ArrayList<SSE> ligs = new ArrayList<SSE>();
-        for(SSE s : this.sseList) {            
-            if(s.isLigandSSE()) {
-                ligs.add(s);
-            }
-        }
-        return ligs;
     }
     
     
@@ -569,7 +544,14 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             ig2.drawString(label, pixelPosX, startPos.y);
             pixelPosX += fontMetrics.stringWidth(label) + spacer;
         }
-               
+        
+        if(chainEnd.size()>0 || drawAll) {
+            label = "interchain";
+            ig2.setPaint(Color.PINK);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
+        
         // End of edges label
         if(this.numEdges() > 0) {
             label = "]";
@@ -659,12 +641,12 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         ArrayList<Integer> spatialOrder = new ArrayList<Integer>();
         
         if(this.isBifurcated()) {
-            //DP.getInstance().w("getSpatialOrderingOfVertexIndices(): Called for bipartite graph, ignoring.");
+            //System.err.println("WARNING: getSpatialOrderingOfVertexIndices(): Called for bipartite graph, ignoring.");
             return(spatialOrder);
         }
         
         if(this.numSSEContacts() != (this.numVertices() - 1)) {
-            //DP.getInstance().w("getSpatialOrderingOfVertexIndices(): Graph cannot be linear: number of edges != number of vertices -1.");
+            //System.err.println("WARNING: getSpatialOrderingOfVertexIndices(): Graph cannot be linear: number of edges != number of vertices -1.");
             return(spatialOrder);
         }
         
@@ -676,7 +658,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         Boolean noVertexWithDegree1 = false;
         //System.out.println("Start vertex of " + this.toString() + " is " + start + ".");     
         if(start < 0) {
-            //DP.getInstance().w("getSpatialOrderingOfVertexIndices(): No vertex of degree 1 found, order not possible.");
+            //System.err.println("WARNING: getSpatialOrderingOfVertexIndices(): No vertex of degree 1 found, order not possible.");
             // No vertex found so this notation is not posible, return an empty ArrayList
             start = this.closestToNTerminus();
             if(start < 0) {
@@ -789,7 +771,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     public Boolean sseContactExistsPos(Integer x, Integer y) {
         
         if(x < 0 || y < 0 || x > this.size - 1 || y > this.size - 1) {
-            DP.getInstance().w("sseContactExistsPos(): SSE index out of bounds in PG contact matrix of size " + matrix.length + " (x=" + x + ", y=" + y + ").");
+            System.err.println("WARNING: sseContactExistsPos(): SSE index out of bounds in PG contact matrix of size " + matrix.length + " (x=" + x + ", y=" + y + ").");
             return(false);
         }
         
@@ -862,7 +844,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             res = true;
         }
         catch (Exception e) {
-            DP.getInstance().w("Could not write serialized ProtGraph object to file '" + filePath + "'.");
+            System.err.println("WARNING: Could not write serialized ProtGraph object to file '" + filePath + "'.");
             e.printStackTrace();
             res = false;
         }
@@ -898,78 +880,6 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         matrix[y][x] = spatialRelation;
         
         this.spatOrder = null;      // spatOrder has to be re-computed!
-    }
-    
-    /**
-     * Adds a vertex to this graph. 
-     * @param vertex the vertex
-     * @return the (positive) index of the vertex in the graph if the vertex was added, -1 otherwise.
-     */
-    public Integer addVertex(SSE vertex) {
-        if(this.addVertexNoUpdate(vertex)) {
-            this.resizeAdjacencyLists();
-            this.resizeAdjacencyMatrix();
-            return (this.getSize() -1);
-        }
-        return -1;
-    }
-    
-    
-   
-    
-    /**
-     * Adds a vertex to this graph. WARNING: This function does NOT resize the adjacence lists, call 'resizeAdjacencyLists()' manually to do this after adding all vertices.
-     * @param vertex the vertex
-     * @return true if it was added, false otherwise
-     */
-    private synchronized boolean addVertexNoUpdate(SSE vertex) {        
-        this.sseList.add(vertex);
-        return true;
-    }
-    
-    
-    /**
-     * Forces resizing the adjacency lists to reflect the vertex count in the graph (e.g., after calling addVertexNoUpdate()). Existing edges are kept. Note that only increasing graph size is supported atm.
-     */
-    private void resizeAdjacencyLists() {
-        if(this.sseList.size() == this.adjLists.size()) {
-            return;
-        } else if(this.sseList.size() < this.adjLists.size()) {
-            DP.getInstance().c(toString(), "Detected removal of vertices from graph, updateLists does NOT yet support this.");
-        } else {
-            // we need to increase list sizes
-            int numToAdd = this.sseList.size() - this.adjLists.size();
-            for(int i = 0; i < numToAdd; i++) {
-                adjLists.add(new ArrayList<Integer>());
-            }
-        }        
-    }
-    
-    private void resizeAdjacencyMatrix() {
-        if(this.sseList.size() == this.matrix.length) {
-            return;
-        } else if(this.sseList.size() < this.matrix.length) {
-            DP.getInstance().c(toString(), "Detected removal of vertices from graph, updateLists does NOT yet support this.");
-        } else {
-            // we need to increase list sizes
-            int numToAdd = this.sseList.size() - this.matrix.length;
-            
-            // resize outer array
-            matrix = Arrays.copyOf(matrix, matrix.length + numToAdd);
-            // init the new array at the end
-            Arrays.fill(matrix[matrix.length - 1], SpatRel.NONE);
-            
-            // now increase the size of all the inner arrays
-            for(int i = 0; i < matrix.length; i++) {
-                matrix[i] = Arrays.copyOf(matrix[i], matrix[i].length + numToAdd);
-                // ... and init the new fields which we just added
-                for(int j = matrix[i].length - 1; j > matrix[i].length - 1 - numToAdd; j--) {
-                    matrix[i][j] = SpatRel.NONE;
-                }
-            }
-        }
-        
-        this.distancesCalculated = false;
     }
 
     /**
@@ -1116,7 +1026,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     
     /**
      * Returns the list of edges of this graph. Each edge is an Integer[] of length 2. The two integers
-     * represent the index of the 2 vertices connected by this edge. Does return each edge only once (only returns (i,j) and not (j,i) as well).
+     * represent the index of the 2 vertices connected by this edge.
      * @return the list of edges
      */
     public ArrayList<Integer[]> getEdgeList() {
@@ -1150,7 +1060,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             return(SpatRel.getString(this.matrix[v1][v2]));
         }
         else {
-            DP.getInstance().w("SSEGraph.getEdgeLabel(): No such edge: (" + v1 + "," + v2 + ").");
+            System.err.println("WARNING: SSEGraph.getEdgeLabel(): No such edge: (" + v1 + "," + v2 + ").");
             return(null);
         }
         
@@ -1227,13 +1137,9 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     public SSE getSSEBySeqPosition(Integer position) {
         if(position >= this.size) {
             System.err.println("ERROR: getSSE(): Index " + position + " out of range, matrix size is " + this.size + ".");
-            System.exit(1);
+            System.exit(-1);
         }
         return(sseList.get(position));
-    }
-    
-    public SSE getVertex(int index) {
-        return this.getSSEBySeqPosition(index);
     }
 
 
@@ -1270,12 +1176,11 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     /**
      * Inits the arrays, removing all edges from this graph.
      */
-    protected void initMatrices() {
+    protected void init() {
         for(Integer i = 0; i < size; i++) {
             for(Integer j = 0; j < size; j++) {
                 matrix[i][j] = SpatRel.NONE;
                 distMatrix[i][j] = Integer.MAX_VALUE;
-                this.distancesCalculated = false;
             }
         }
     }
@@ -1285,7 +1190,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
      * Inits the arrays, removing all edges from this graph.
      */
     public void reinit() {
-        this.initMatrices();
+        this.init();
     }
 
     /**
@@ -1485,7 +1390,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         }
 
         if(vertIndex < 0) {
-            DP.getInstance().w("closestToCTerminus(): No SSE found, returning '" + vertIndex + "'.");
+            System.err.println("WARNING: closestToCTerminus(): No SSE found, returning '" + vertIndex + "'.");
             if(this.size > 0) {
                 System.err.println("ERROR: closestToCTerminus(): Graph has " + this.size + " vertices, so not finding anything is a bug.");
                 System.exit(1);
@@ -1631,7 +1536,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
      */
     public String getNotationSEQ() {
         
-        DP.getInstance().w("getNotationSEQ(): not implemented yet.");
+        System.err.println("WARNING: getNotationSEQ(): not implemented yet.");
 
         return("");
     }
@@ -1658,17 +1563,17 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     public String getNotationKEY(Boolean forceLabelSSETypes) {
 
         if(this.isBifurcated()) {
-            DP.getInstance().w("#KEY notation not supported for bifurcated graphs. Check before requesting this.");
+            System.err.println("WARNING: #KEY notation not supported for bifurcated graphs. Check before requesting this.");
             return("");
         }
 
         if(! this.isConnected()) {
-            DP.getInstance().w("#KEY notation only supported for connected graphs. (All folding graphs are connected - is this a protein graph instead of a folding graph?)");
+            System.err.println("WARNING: #KEY notation only supported for connected graphs. (All folding graphs are connected - is this a protein graph instead of a folding graph?)");
             return("");
         }
         
         if(! this.hasSpatialOrdering()) {
-            DP.getInstance().w("#KEY notation only supported for graphs with spatial ordering.");
+            System.err.println("WARNING: #KEY notation only supported for graphs with spatial ordering.");
             return("");
         }
         
@@ -1676,7 +1581,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             return("");
         }
         
-        //DP.getInstance().w("getNotationKEY(): not implemented yet.");
+        //System.err.println("WARNING: getNotationKEY(): not implemented yet.");
         
         Boolean labelSSEs = true;
         if(this.graphType.equals("alpha") || this.graphType.equals("beta")) {
@@ -2062,7 +1967,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         }
 
         if(vertIndex < 0) {
-            DP.getInstance().w("closestToNTerminus(): No SSE found, returning '" + vertIndex + "'.");
+            System.err.println("WARNING: closestToNTerminus(): No SSE found, returning '" + vertIndex + "'.");
             if(this.size > 0) {
                 System.err.println("ERROR: closestToNTerminus(): Graph has " + this.size + " vertices, so not finding anything is a bug.");
                 System.exit(1);
@@ -2088,7 +1993,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         }
 
         if(vertex < 0) {
-            DP.getInstance().w("closestToNTerminusOf(): No SSE found in list, returning '" + vertex + "'.");
+            System.err.println("WARNING: closestToNTerminusOf(): No SSE found in list, returning '" + vertex + "'.");
             if(someVertices.size() > 0) {
                 System.err.println("ERROR: closestToNTerminusOf(): List has " + someVertices.size() + " vertices, so not finding anything is a bug.");
                 System.exit(-1);
@@ -2117,7 +2022,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         }
 
         //if(vertIndex < 0) {
-        //    DP.getInstance().w("closestToNTerminusDegree1(): No SSE found, returning '" + vertIndex + "'.");            
+        //    System.err.println("WARNING: closestToNTerminusDegree1(): No SSE found, returning '" + vertIndex + "'.");            
         //}
         
         return(vertIndex);
@@ -2248,6 +2153,11 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
      */
     public void setMetaData(HashMap<String, String> md) {
         this.metadata = md;
+    }
+    
+    public void setComplexData(ArrayList<Integer> chainEnd, ArrayList<Chain> allChains){
+        this.allChains = allChains;
+        this.chainEnd = chainEnd;
     }
     
     
@@ -2419,7 +2329,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             java.awt.Shape shape;
             Arc2D.Double arc;
             ig2.setStroke(new BasicStroke(2));  // thin edges
-            Integer edgeType, leftVert, rightVert, leftVertPosX, rightVertPosX, arcWidth, arcHeight, arcTopLeftX, arcTopLeftY, spacerX, spacerY;
+            Integer edgeType, leftVert, rightVert, leftVertPosX, rightVertPosX, arcWidth, arcHeight, arcTopLeftX, arcTopLeftY, spacerX, spacerY, iChainID, jChainID;
             for(Integer i = 0; i < this.sseList.size(); i++) {
                 for(Integer j = i + 1; j < this.sseList.size(); j++) {
 
@@ -2436,6 +2346,17 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
                         else { ig2.setPaint(Color.LIGHT_GRAY); }
 
                         if(bw) { ig2.setPaint(Color.LIGHT_GRAY); }      // for non-protein graphs
+                        
+                        // determine chain of SSEs
+                        iChainID = -1;
+                        jChainID = -2;
+                        for(Integer x = 0; x < chainEnd.size(); x++){
+                            if(i < chainEnd.get(x)) {iChainID = x; break;}
+                        }
+                        for(Integer x = 0; x < chainEnd.size(); x++){
+                            if(j < chainEnd.get(x)) {jChainID = x; break;}
+                        }
+                        if (iChainID != jChainID) {ig2.setPaint(Color.PINK);}
 
                         // determine the center of the arc and the width of its rectangle bounding box
                         if(i < j) { leftVert = i; rightVert = j; }
@@ -2529,7 +2450,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
                 else {
                     ig2.drawString("(Graph has no vertices.)", pl.getFooterStart().x, pl.getFooterStart().y);
                 }
-
+                iChainID = -1;
                 for(Integer i = 0; i < this.sseList.size(); i++) {
                     // Draw label for every nth vertex
                     if((i + 1) % printNth == 0) {
@@ -2540,11 +2461,22 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
 
                         ig2.drawString(sseNumberGraph, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4));
                         ig2.drawString(sseNumberSeq, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + lineHeight + (stringHeight / 4));                    
+                        
+                        // determine chain of SSEs
+                        for(Integer x = 0; x < chainEnd.size(); x++){
+                            if(i < chainEnd.get(x)) {iChainID = x; break;}
+                        }
+                        if(iChainID != -1) {ig2.drawString(allChains.get(iChainID).getPdbChainID(), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 2) + (stringHeight / 4));}
                     }
                 }
 
                 if(Settings.getBoolean("plcc_B_graphimg_legend")) {
-                    drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + lineHeight * 2 + (stringHeight / 4)), pl);
+                    if(iChainID != -1){
+                        drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + lineHeight * 3 + (stringHeight / 4)), pl);
+                    }
+                    else{
+                        drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + lineHeight * 2 + (stringHeight / 4)), pl);
+                    }
                 }
             
             }
@@ -2580,28 +2512,12 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             }
             
             svgConverter.setSources(new String[]{svgFilePath});
-            svgConverter.setDst(new File(filePath));            
-            svgConverter.execute();                 
-            
-            // register resulting SVG file
-            String chain = this.chainid;
-            if(chainid != null) {
-                ProteinChainResults pcr = ProteinResults.getInstance().getProteinChainResults(chain);
-                if(pcr != null) {
-                    //System.out.println("Registering SVG at '" + svgFilePath + " as vector ouput image for chain " + chain + " graph type " + graphType + ".");
-                    pcr.addProteinGraphImageVector(graphType, new File(svgFilePath));
-                }
-                else {
-                    DP.getInstance().w("Could not register SVG image to chain, no ProteinChainResult for chain " + chain + ".");
-                }
-            } else {
-                DP.getInstance().w("Could not register SVG image to chain, chainid is NULL.");
-            }
-            
+            svgConverter.setDst(new File(filePath));
+            svgConverter.execute();                                    
             
 
         } catch (Exception e) {
-            DP.getInstance().w("Could not write image file for protein graph to file '" + filePath + "':" + e.getMessage() + "'.");
+            System.err.println("WARNING: Could not write image file for protein graph to file '" + filePath + "':" + e.getMessage() + "'.");
             return(false);
         }
 
@@ -3454,6 +3370,11 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         return sb.toString();
     }
     
+    
+    public SSE getVertex(int index) {
+        return this.getSSEBySeqPosition(index);
+    } 
+    
     public String toKavoshFormat() {
         String kf = "";
         
@@ -3504,10 +3425,10 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     }
     
     
-    public String[] getVertexInfoFieldNames() {
-       return new String[] { "Position in graph" , "Position in chain", "SSE type", "DSSP start residue", "DSSP end residue", "PDB start residue ID", "PDB end residue", "AA sequence" };
+     public String[] getVertexInfoFieldNames() {
+        return new String[] { "Position in graph" , "Position in chain", "SSE type", "DSSP start residue", "DSSP end residue", "PDB start residue ID", "PDB end residue", "AA sequence" };
     }
-    
+     
     public String[] getVertexInfoFieldsForSSE(int index) {
         SSE sse = this.sseList.get(index);
         String[] infoFields = new String[this.getVertexInfoFieldNames().length];
@@ -3522,6 +3443,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         return infoFields;
     }
     
+    
     public String[] getLigandInfoFieldsForSSE(int index) {
         SSE sse = this.sseList.get(index);
         String[] infoFields = new String[this.getLigandInfoFieldNames().length];
@@ -3532,15 +3454,18 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         return infoFields;
     }
     
+    
     public String[] getEdgeInfoFieldNames() {
-       return new String[] { "SSE 1 in graph", "SSE 2 in graph", "SSE 1 type", "SSE 2 type", "Spatial contact type" };
+        return new String[] { "SSE 1 in graph", "SSE 2 in graph", "SSE 1 type", "SSE 2 type", "Spatial contact type" };
     }
+    
     
     public String[] getLigandInfoFieldNames() {
-       return new String[] { "Position in graph", "SSE type", "First PDB residue", "Ligand name" };
+        return new String[] { "Position in graph", "SSE type", "First PDB residue", "Ligand name" };
     }
     
-    public String[] getEdgeInfoFieldsForEdge(int index1, int index2) {        
+    
+    public String[] getEdgeInfoFieldsForEdge(int index1, int index2) {
         String[] infoFields = new String[this.getEdgeInfoFieldNames().length];
         infoFields[0] = "" + (index1 + 1);
         infoFields[1] = "" + (index2 + 1);
@@ -3549,6 +3474,20 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         infoFields[4] = "" + this.getEdgeLabel(index1, index2);
         return infoFields;
     }
+
+   /**
+    * Determines the number of ligands in this graph.
+    * @return the number of ligands in this graph
+    */
+    public Integer numLigands() {
+        Integer numIsolatedLigands = 0;
+        for(SSE s : this.sseList) {
+            if(s.isLigandSSE()) {
+                numIsolatedLigands++;
+            }
+        }
+        return numIsolatedLigands;
+    } 
 
     
         
@@ -3561,7 +3500,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
  * A class required only for the priority queue used in the Dijkstra implementation of the ProtGraph class. 
  * Allows comparing vertices by their minDistance property.
  * 
- * @author ts
+ * @author spirit
  */
 class PriorityVertex implements Comparable<PriorityVertex> {
       public Integer index;
