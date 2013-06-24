@@ -5034,19 +5034,7 @@ public class Main {
         chainCM.restrictToChain("ALL");
         chainCM.fillFromContactList(resContacts, keepSSEs);
         chainCM.calculateSSEContactMatrix();
-        File myGML = null;
-        try{
-            myGML = new File(pdbid + "_CompGraph.gml");
-            myGML.createNewFile();
-            if(compGraph.writeToFileGML(myGML)) {
-                System.out.println("    Complex graph chain-level notation written to file '" + myGML.getAbsolutePath() + "' in GML format.");
-                cgr.setComGraphFileGML(myGML);
-            } else {
-                System.err.println("ERROR: Could not write complex graph to file '" + myGML.getAbsolutePath() + "'.");
-            }
-        }catch(IOException e){
-            System.err.println("ERROR: Could not write complex graph to file '" + myGML.getAbsolutePath() + ". General I/O exception: '" + e.getMessage()+ "'.");
-        }
+        
         
        
         
@@ -5102,8 +5090,24 @@ public class Main {
             }
         }
 
+        // the simple complex graph (one vertex is one chain):
+        File myGML = null;
+        try {
+            myGML = new File(filePathGraphs + fs + pdbid + "_CompGraph.gml");
+            myGML.createNewFile();
+            if(compGraph.writeToFileGML(myGML)) {
+                System.out.println("    Complex graph chain-level notation written to file '" + myGML.getAbsolutePath() + "' in GML format.");
+                cgr.setComGraphFileGML(myGML);
+            } else {
+                System.err.println("ERROR: Could not write complex graph to file '" + myGML.getAbsolutePath() + "'.");
+            }
+        } catch(IOException e){
+            System.err.println("ERROR: Could not write complex graph to file '" + myGML.getAbsolutePath() + ". General I/O exception: '" + e.getMessage()+ "'.");
+        }
 
-        String graphFormatsWritten = "";
+        
+        // the detailed complex graph (each vertex is one SSE, vertices ordered by chain):
+        String graphFormatsWritten = "";        
         Integer numFormatsWritten = 0;
         if(Settings.getBoolean("plcc_B_output_compgraph_GML")) {
             String gmlfFile = filePathGraphs + fs + fileNameWithoutExtension + ".gml";

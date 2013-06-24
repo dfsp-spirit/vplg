@@ -747,7 +747,8 @@ public class HtmlGenerator {
                 if(compGraph != null) {
                     int numVerts = compGraph.getVertices().size();
                     int numEdges = compGraph.getEdges().size();
-                    sb.append("The complex graph consists of ").append(numVerts).append(" vertices and ").append(numEdges).append(" edges.\n");
+                    sb.append("The complex graph for PDB file ").append(pdbid).append(" consists of ").append(numVerts).append(" vertices and ").append(numEdges).append(" edges.\n");
+                    sb.append(HtmlTools.br());
                     sb.append(HtmlTools.brAndNewline());
                     
                     File gmlCGFile = pr.getCompGraphRes().getComGraphFileGML();
