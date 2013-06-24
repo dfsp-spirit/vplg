@@ -4714,6 +4714,8 @@ public class Main {
      */
     public static void calculateComplexGraph(ArrayList<Chain> allChains, ArrayList<Residue> resList, ArrayList<ResContactInfo> resContacts, String pdbid, String outputDir, String graphType) {
 
+        ComplexGraphResult cgr = new ComplexGraphResult();
+        
         System.out.println("Calculating complex graph (CG) of type " + graphType + ".");
         ArrayList<ResContactInfo> interchainContacts = new ArrayList<ResContactInfo>();
         Chain c;
@@ -5022,6 +5024,10 @@ public class Main {
         System.out.println("    SL Interactions  : " + compGraph.numSLInteractionsMap.values().toArray()[0]);
         System.out.println("    Neighbours       : " + compGraph.getEdges().size());
 
+        cgr.setCompGraph(compGraph);
+        
+        System.out.println("  Preparing to write complex graph files.");
+        
         // Calculate SSE level contacts
         //System.out.println("intr" + interchainContacts);
         ContactMatrix chainCM = new ContactMatrix(allChainSSEs, pdbid);
@@ -5032,7 +5038,12 @@ public class Main {
         try{
             myGML = new File(pdbid + "_CompGraph.gml");
             myGML.createNewFile();
-            compGraph.writeToFileGML(myGML);
+            if(compGraph.writeToFileGML(myGML)) {
+                System.out.println("    Complex graph chain-level notation written to file '" + myGML.getAbsolutePath() + "' in GML format.");
+                cgr.setComGraphFileGML(myGML);
+            } else {
+                System.err.println("ERROR: Could not write complex graph to file '" + myGML.getAbsolutePath() + "'.");
+            }
         }catch(IOException e){
             System.err.println("ERROR: Could not write complex graph to file '" + myGML.getAbsolutePath() + ". General I/O exception: '" + e.getMessage()+ "'.");
         }
@@ -5041,6 +5052,7 @@ public class Main {
         
         chainCM.calculateSSESpatialRelationMatrix(resContacts, true);                
 
+        // This graph is still required because it is used for drawing the VPLG-style picture
         ProtGraph pg = chainCM.toProtGraph();
         pg.declareProteinGraph();
 
@@ -5055,7 +5067,7 @@ public class Main {
         pg.addMetadata(md);
         pg.setComplexData(chainEnd, allChains);      
 
-        System.out.println("  Preparing to write complex graph files.");
+        
         
         filePathImg = outputDir;
         filePathGraphs = outputDir;
@@ -5093,31 +5105,31 @@ public class Main {
 
         String graphFormatsWritten = "";
         Integer numFormatsWritten = 0;
-        if(Settings.getBoolean("plcc_B_output_GML")) {
+        if(Settings.getBoolean("plcc_B_output_compgraph_GML")) {
             String gmlfFile = filePathGraphs + fs + fileNameWithoutExtension + ".gml";
             if(IO.stringToTextFile(gmlfFile, pg.toGraphModellingLanguageFormat())) {
                 graphFormatsWritten += "gml "; numFormatsWritten++;
             }
         }
-        if(Settings.getBoolean("plcc_B_output_TGF")) {
+        if(Settings.getBoolean("plcc_B_output_compgraph_TGF")) {
             String tgfFile = filePathGraphs + fs + fileNameWithoutExtension + ".tgf";
             if(IO.stringToTextFile(tgfFile, pg.toTrivialGraphFormat())) {
                 graphFormatsWritten += "tgf "; numFormatsWritten++;
             }
         }
-        if(Settings.getBoolean("plcc_B_output_DOT")) {
+        if(Settings.getBoolean("plcc_B_output_compgraph_DOT")) {
             String dotLangFile = filePathGraphs + fs + fileNameWithoutExtension + ".gv";
             if(IO.stringToTextFile(dotLangFile, pg.toDOTLanguageFormat())) {
                 graphFormatsWritten += "gv "; numFormatsWritten++;
             }
         }
-        if(Settings.getBoolean("plcc_B_output_kavosh")) {
+        if(Settings.getBoolean("plcc_B_output_compgraph_kavosh")) {
             String kavoshFile = filePathGraphs + fs + fileNameWithoutExtension + ".kavosh";
             if(IO.stringToTextFile(kavoshFile, pg.toKavoshFormat())) {
                 graphFormatsWritten += "kavosh "; numFormatsWritten++;
             }
         }
-        if(Settings.getBoolean("plcc_B_output_eld")) {
+        if(Settings.getBoolean("plcc_B_output_compgraph_eld")) {
             String elFile = filePathGraphs + fs + fileNameWithoutExtension + ".el_edges";
             String nodeTypeListFile = filePathGraphs + fs + fileNameWithoutExtension + ".el_ntl";
             if(IO.stringToTextFile(elFile, pg.toEdgeList()) && IO.stringToTextFile(nodeTypeListFile, pg.getNodeTypeList())) {
@@ -5125,7 +5137,7 @@ public class Main {
             }
         }
         // write the SSE info text file for the image (plcc graph format file)
-        if(Settings.getBoolean("plcc_B_output_plcc")) {
+        if(Settings.getBoolean("plcc_B_output_compgraph_plcc")) {
             plccGraphFile = filePathGraphs + fs + fileNameWithoutExtension + ".plg";
             if(IO.stringToTextFile(plccGraphFile, pg.toVPLGGraphFormat())) {
                 graphFormatsWritten += "plg "; numFormatsWritten++;
@@ -5148,6 +5160,8 @@ public class Main {
         }              
         
         System.out.println("Complex graph computation done.");
+        
+        ProteinResults.getInstance().setCompGraphRes(cgr);
     }        
     
     

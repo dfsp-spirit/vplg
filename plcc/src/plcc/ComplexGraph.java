@@ -83,7 +83,7 @@ public class ComplexGraph extends UAdjListGraph {
             }
         }
 
-        GMLWriter gw = new GMLWriter(this);
+        GMLWriter<ComplexGraph.Vertex, ComplexGraph.Edge> gw = new GMLWriter<ComplexGraph.Vertex, ComplexGraph.Edge>(this);
         gw.addVertexAttrWriter(new GMLWriter.AttrWriter<Vertex>() {
             @Override
             public String getAttribute() {
