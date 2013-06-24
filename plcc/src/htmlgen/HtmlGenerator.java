@@ -779,7 +779,7 @@ public class HtmlGenerator {
 
         // -------------------- chain info -------------------
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_CHAINS));
-        sb.append(HtmlTools.heading("Chain info", 2));
+        sb.append(HtmlTools.heading("Chain info and VPLGweb navigation", 2));
         sb.append(HtmlTools.startParagraph());
         
         if(chains.size() > 0) {
