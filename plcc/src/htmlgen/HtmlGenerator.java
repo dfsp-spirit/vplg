@@ -818,17 +818,17 @@ public class HtmlGenerator {
         
         // RCSB PDB
         sb.append("Structure at RCSB PDB: ");
-        sb.append(HtmlTools.linkBlank("http://www.rcsb.org/pdb/explore/explore.do?structureId=" + pdbid, pdbid + " @ RCSB PDB"));                        
+        sb.append(HtmlTools.linkBlank("http://www.rcsb.org/pdb/explore/explore.do?structureId=" + pdbid, "Search " + pdbid + " @ RCSB PDB"));                        
         sb.append(HtmlTools.br());
         
         // CATH
         sb.append("Domain info from CATH: ");        
-        sb.append(HtmlTools.linkBlank("http://www.cathdb.info/pdb/" + pdbid, pdbid + " @ CATH"));                        
+        sb.append(HtmlTools.linkBlank("http://www.cathdb.info/pdb/" + pdbid, "Search " + pdbid + " @ CATH"));                        
         sb.append(HtmlTools.br());
         
         //SCOP
         sb.append("Structural classification from SCOP: ");        
-        sb.append(HtmlTools.linkBlank("http://scop.mrc-lmb.cam.ac.uk/scop/search.cgi?pdb=" + pdbid, pdbid + " @ SCOP"));                        
+        sb.append(HtmlTools.linkBlank("http://scop.mrc-lmb.cam.ac.uk/scop/search.cgi?pdb=" + pdbid, "Search " + pdbid + " @ SCOP"));                        
         sb.append(HtmlTools.br());
         
         
