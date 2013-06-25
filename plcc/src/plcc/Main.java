@@ -5015,6 +5015,7 @@ public class Main {
                 interchainContacts.add(resContacts.get(i));
             }
         }
+        try {
         System.out.println("    All Interactions : " + compGraph.numAllInteractionsMap.values().toArray()[0]);
         System.out.println("    HH Interactions  : " + compGraph.numHHInteractionsMap.values().toArray()[0]);
         System.out.println("    HS Interactions  : " + compGraph.numHSInteractionsMap.values().toArray()[0]);
@@ -5023,6 +5024,9 @@ public class Main {
         System.out.println("    SS Interactions  : " + compGraph.numSSInteractionsMap.values().toArray()[0]);
         System.out.println("    SL Interactions  : " + compGraph.numSLInteractionsMap.values().toArray()[0]);
         System.out.println("    Neighbours       : " + compGraph.getEdges().size());
+        } catch(java.lang.ArrayIndexOutOfBoundsException e) {
+            //nvm
+        }
 
         cgr.setCompGraph(compGraph);
         
