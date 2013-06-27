@@ -32,6 +32,11 @@ public class SSE implements java.io.Serializable {
     public static final String SSE_TYPE_BEND = "S";                     // bend
     public static final String SSE_TYPE_COIL = "C";                     // never assigned by DSSP, it calls these " "
 
+    public static final Integer SSECLASS_NONE = 0;
+    public static final Integer SSECLASS_HELIX = 1;
+    public static final Integer SSECLASS_BETASTRAND = 2;
+    public static final Integer SSECLASS_LIGAND = 3;
+    public static final Integer SSECLASS_OTHER = 4;
 
     // Test for SSE adj graph
     /** The sequential index of this SSE in the graph (the index in the AA sequence, N to C terminus). Starts with 0. Negative value means unset. */
@@ -56,10 +61,30 @@ public class SSE implements java.io.Serializable {
     private String betaSheetLabel = null;
 
     /**
-     * Constructor that sets the SSE type to 'sseType'. It should be "H", "E", ... etc.
+     * Constructor that sets the SSE type to 'sseType'. It should be "H", "E", ... etc. Use SSE.SSE_TYPE_* constants.
      */
     public SSE(String sseType) {
         this.sseType = sseType;
+        residues = new ArrayList<Residue>();
+    }
+    
+    /**
+     * Constructor that sets the SSE type by the SSE class 'sseClass'. Use SSE.SSECLASS_* constants.
+     */
+    public SSE(Integer sseClass) {
+        if(sseClass.equals(SSE.SSECLASS_HELIX)) {
+            this.sseType = SSE.SSE_TYPE_ALPHA_HELIX;
+        } 
+        else if(sseClass.equals(SSE.SSECLASS_BETASTRAND)) {
+            this.sseType = SSE.SSE_TYPE_BETASTRAND;
+        }
+        else if(sseClass.equals(SSE.SSECLASS_LIGAND)) {
+            this.sseType = SSE.SSE_TYPE_LIGAND;
+        }
+        else {
+            System.err.println("WARNING: Creating SSE of invalid class '" + sseClass + "' not possible. Assuming alpha helix.");
+            this.sseType = SSE.SSE_TYPE_ALPHA_HELIX;
+        }
         residues = new ArrayList<Residue>();
     }
 
@@ -73,16 +98,18 @@ public class SSE implements java.io.Serializable {
         }
         return(false);
     }
+    
+    
 
     /**
      * Returns an integer that encodes the SSE type as follows: 1=helix, 2=beta strand, 3=ligand, 4=other. Only used by the statistics DB function atm.
      */
     public Integer getSSETypeInt() {
-        if(this.isHelix()) { return(1); }
-        else if(this.isBetaStrand()) { return(2); }
-        else if(this.isLigandSSE()) { return(3); }
-        else if(this.isOtherSSE()) { return(4); }
-        else { return(0); }
+        if(this.isHelix()) { return(SSE.SSECLASS_HELIX); }
+        else if(this.isBetaStrand()) { return(SSE.SSECLASS_BETASTRAND); }
+        else if(this.isLigandSSE()) { return(SSE.SSECLASS_LIGAND); }
+        else if(this.isOtherSSE()) { return(SSE.SSECLASS_OTHER); }
+        else { return(SSE.SSECLASS_NONE); }
     }
 
     /**

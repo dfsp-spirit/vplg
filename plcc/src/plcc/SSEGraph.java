@@ -3178,7 +3178,13 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
      * @return the meta data (pdbid, organism, etc) as a single line
      */
     public String getOneLineMetadataString() {
-        String sep = Settings.get("plcc_S_graph_metadata_splitstring");
+        String sep = "";
+        try {
+            sep = Settings.get("plcc_S_graph_metadata_splitstring");
+        } catch(java.lang.NullPointerException e) {
+            // no settings object yet
+            return "";
+        }
         String mds = "";
         Integer numMD = this.metadata.keySet().size(); Integer cur = 0;
         for(String key : this.metadata.keySet()) {
@@ -3201,10 +3207,14 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         String gmlf = "";
         
         // we put meta data in comments for GML language graphs
-        if(Settings.getBoolean("plcc_B_add_metadata_comments_GML")) {
-            for(String key : this.metadata.keySet()) {
-                gmlf += "//[VPLG_METADATA] " + key + "=" + this.metadata.get(key) + "\n";
+        try {
+            if(Settings.getBoolean("plcc_B_add_metadata_comments_GML")) {
+                for(String key : this.metadata.keySet()) {
+                    gmlf += "//[VPLG_METADATA] " + key + "=" + this.metadata.get(key) + "\n";
+                }
             }
+        } catch(java.lang.NullPointerException e) {
+            // no settings object yet, assume not to write stuff
         }
         
         // print the header
@@ -3219,7 +3229,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         gmlf += "  label \"" + "VPLG Protein Graph " + shortStr + "\"\n";
         gmlf += "  comment \"" + this.getOneLineMetadataString() + "\"\n";
         gmlf += "  directed 0\n";
-        gmlf += "  isplanar 1\n";
+        gmlf += "  isplanar 0\n";
         gmlf += "  creator \"PLCC version " + Settings.getVersion() + "\"\n";
         
         

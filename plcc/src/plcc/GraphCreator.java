@@ -8,9 +8,11 @@
 package plcc;
 
 import java.awt.Rectangle;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.NoSuchElementException;
+import java.util.Random;
 import tools.DP;
 
 /**
@@ -28,6 +30,8 @@ public class GraphCreator {
         
         // parse data and prepare the list of SSEs for the graph
         ArrayList<SSE> sseList = new ArrayList<SSE>();
+        
+        
         
         // now create the graph from the SSE list
         g = new ProtGraph(sseList);
@@ -199,6 +203,174 @@ public class GraphCreator {
         }
         
         return Collections.max(values);
+    }
+    
+    
+    /**
+     * Generates a random protein ligand graph with the specified number of vertices and the specified edge probability.
+     * @param numVertices the number of vertices to add to the graph
+     * @param edgeProb the edge probability (for each edge pair)
+     * @return the resulting protein ligand graph
+     */
+    public ProtGraph createRandom(int numVertices, double edgeProb) {
+        ProtGraph g;
+        
+        System.out.println(" Creating random protein ligand graph.");
+        
+        double[] vertexRelFreqs = new double[] { 0.41, 0.46, 0.13 };        
+        double[] vertexBorders = GraphCreator.createBordersFromRelativeFrequencyOfOccurence(vertexRelFreqs);
+        int[] vertexClasses = new int[] { SSE.SSECLASS_HELIX, SSE.SSECLASS_BETASTRAND, SSE.SSECLASS_LIGAND};
+        
+        ArrayList<SSE> vertices = new ArrayList<SSE>();
+        
+        // add vertices
+        SSE sse;
+        Integer vClass;
+        for(int i = 0; i < numVertices; i++) {
+            vClass = GraphCreator.drawClassFromDistribution(vertexBorders, vertexClasses);
+            sse = new SSE(vClass);    
+            Residue r = new Residue(i, i);
+            r.setAAName1("A");
+            r.setChainID("A");
+            r.setiCode("");
+            sse.addResidue(r);
+            if(vClass.equals(SSE.SSECLASS_LIGAND)) {
+                r.setResName3("LIG");
+            }
+            sse.setSeqSseChainNum(i);            
+            vertices.add(sse);
+        }
+        
+        g = new ProtGraph(vertices);
+        g.setInfo("rand", "A", "albelig");
+        
+        System.out.println("  Added all " + g.getSize() + " vertices to the graph.");
+        // add all edges
+        
+        double[] edgeRelFreqs = new double[] { 0.70, 0.09, 0.21 };        
+        double[] edgeBorders = GraphCreator.createBordersFromRelativeFrequencyOfOccurence(vertexRelFreqs);
+        int[] edgeClasses = new int[] { SpatRel.PARALLEL, SpatRel.ANTIPARALLEL, SpatRel.MIXED };
+        
+        Random rand = new Random();
+        long currentTime = System.currentTimeMillis();
+        rand.setSeed(currentTime);
+        int numEdges = 0;
+        double random;
+        for(int i = 0; i < g.numVertices(); i++) {
+            for(int j = i+1; j < g.numVertices(); j++) {
+                random = rand.nextDouble();
+                if(random <= edgeProb) {
+                    
+                    Integer spatOrientation;
+                    // check for ligands
+                    if(g.getVertex(i).isLigandSSE() || g.getVertex(j).isLigandSSE()) {
+                        spatOrientation = SpatRel.LIGAND;
+                    }
+                    else {
+                        spatOrientation = GraphCreator.drawClassFromDistribution(edgeBorders, edgeClasses);
+                    }
+                    
+                    g.addContact(i, j, spatOrientation);
+                    numEdges++;
+                }
+            }
+        }
+        System.out.println("  Added all " + numEdges + " edges to the graph.");
+        
+        return g;
+    }
+    
+    /**
+     * Creates the borders for the given relative frequencies between 0.0 and 1.0.
+     * @param relFreq the requested relative frequencies that should be reached 
+     * @return the borders between 0.0 and 1.0 that lead to the requested frequencies when drawing uniformely random from 0.0 to 1.0
+     * @throws IllegalArgumentException 
+     */
+    public static double[] createBordersFromRelativeFrequencyOfOccurence(double[] relFreq) throws IllegalArgumentException {
+        if(relFreq.length < 1) {
+            throw new IllegalArgumentException("Relative Frequencies must not be empty.");
+        }
+        
+        double sum = 0.0;
+        for(double f : relFreq) {
+            sum += f;
+        }
+        if(sum < 0.9 || sum > 1.1) {
+            throw new IllegalArgumentException("Sum of all relative frequencies must be 1.0 +/- 0.1.");
+        }
+        
+        double border = 0.0;
+        double[] borders = new double[relFreq.length - 1];
+        
+        for (int i = 0; i < (relFreq.length -1); i++) {
+            border += relFreq[i];
+            borders[i] = border;
+            
+        }        
+        
+        return borders;
+        
+    }
+    
+    
+    /**
+     * Draws a class from the given distribution defined by the borders
+     * @param borders the borders between classes, all must be in range 0..1
+     * @param classes the classes encoded as integers, can be arbitrary integers
+     * @return the class that was drawn randomly according to the distribution defined by the borders
+     * @throws IllegalArgumentException 
+     */
+    public static int drawClassFromDistribution(double[] borders, int[] classes) throws IllegalArgumentException {
+        
+        if(borders.length != (classes.length - 1)) {
+            throw new IllegalArgumentException("Number of classes must be (number of borders - 1), but there are " + borders.length + " borders and " + classes.length + " classes.");
+        }
+        
+        for(double b : borders) {
+            if(b < 0. || b > 1.) {
+                throw new IllegalArgumentException("All borders must be from the range 0..1 but one is " + b + ".");
+            }
+        }
+        
+        double draw = Math.random();
+        
+        int classIndex = 0;
+        for(int i = 0; i < borders.length; i++) {
+            if(draw > borders[i]) {
+                classIndex++;
+            }
+        }
+        
+        return classes[classIndex];
+    }
+    
+    
+    /**
+     * Main for testing only. (For Tatiana)
+     * @param argv command line arguments, ignored atm.
+     */
+    public static void main(String[] argv) {
+        // preparations
+        String fs = File.separator;
+        GraphCreator cg = new GraphCreator();
+        
+        // graph settings
+        int numVertices = 30;
+        double edgeProb = 0.05;
+        
+        // create the random protein ligand graph
+        SSEGraph g = cg.createRandom(numVertices, edgeProb);
+
+        // write it to a file in GML format
+        String gmlFile = System.getProperty("user.home") + fs + "random_protein_ligand_graph_" + numVertices + "V.gml";
+        if(IO.stringToTextFile(gmlFile, g.toGraphModellingLanguageFormat())) {
+            System.out.println("Wrote random graph with " + numVertices + " vertices and edge probability " + edgeProb + " to file '" + gmlFile + "'.");
+        } else {
+            System.err.println("ERROR: Could not write random graph  to file '" + gmlFile + "'.");
+        }
+        
+        // Done.
+        System.exit(0);
     }
     
 }
