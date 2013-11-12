@@ -27,7 +27,60 @@ fi
 
 PDBFILE="$1"
 PDBID=${PDBFILE:0:4}
+PDBID_CENTER=${PDBFILE:1:2}
 echo "$APPTAG Assuming PDB id '$PDBID'."
+
+DSSPFILE="${PDBID}.dssp"
+
+######################## Simply copy the file if the server has a DSSP database #####################
+
+
+if [ "$SERVER_HAS_LOCAL_DSSP_DATABASE" = "true" ]; then
+    echo "$APPTAG Server has local DSSP database at '$LOCAL_DSSP_DATA_DIR', copying files from there."
+    
+    if [ "$LOCAL_DSSP_DATA_DIR_USES_SUBDIRS" = "true" ]; then 
+        DSSP_SOURCE_FILE="${LOCAL_DSSP_DATA_DIR}${PDBID_CENTER}/${PDBID}.dssp"        
+        echo "$APPTAG Local DSSP database uses subdirectory structure."
+    else 
+        DSSP_SOURCE_FILE="${LOCAL_DSSP_DATA_DIR}${PDBID}.dssp"
+        echo "$APPTAG Local DSSP database does not use subdirectory structure."        
+    fi
+    
+    if [ -f $DSSP_SOURCE_FILE ]; then
+        cp $DSSP_SOURCE_FILE $DSSPFILE
+       
+        if [ -f $DSSP_FILE ]; then
+            echo "$APPTAG DSSP file copied from local DSSP database."
+
+	    ## We may need to move it though.
+	    if [ -n "$2" ]; then
+		DSSPOUT="$2"
+		mv $DSSPFILE $DSSPOUT
+		if [ $? -ne 0 ]; then
+		    echo "$APPTAG ERROR: Could not move DSSP file '$DSSPFILE' to '$DSSPOUT'."
+		    echo "$APPTAG ERROR: Could not move DSSP file '$DSSPFILE' to '$DSSPOUT'." >> $ERRORLOG
+		    exit 1
+		else
+		    echo "$APPTAG Moved DSSP file to '$DSSPOUT'."
+                    exit 0
+		fi
+            else
+              ## we are done already
+              exit 0
+	    fi            
+            
+        else
+          echo "$APPTAG Could not copy DSSP file from local DB, trying to create it..."
+        fi
+    else
+        echo "$APPTAG DSSP source file '$DSSP_SOURCE_FILE' does not exist in local DSSP database, trying to create it..."
+    fi
+
+    
+fi
+
+
+########################## we need to create it if we move after this line #########################
 
 ## check whether the PDB file exists and is readable
 if [ ! -f "$PDBFILE" -a -r "$PDBFILE" ]; then
