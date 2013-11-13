@@ -9,6 +9,7 @@ package datastructures;
 
 import java.util.ArrayList;
 import plcc.AminoAcid;
+import plcc.ResContactInfo;
 
 /**
  * An undirected, adjacency list based amino acid graph. Suitable for large, sparse graphs. 
@@ -17,6 +18,9 @@ import plcc.AminoAcid;
  * @author ts
  */
 public class AAGraph extends SparseGraph<AminoAcid, AAEdgeInfo> {
+    
+    
+    public static final String CHAINID_ALL_CHAINS = "ALL_CHAINS";
     
     /** PDB identifier. */
     private String pdbid;
@@ -31,11 +35,20 @@ public class AAGraph extends SparseGraph<AminoAcid, AAEdgeInfo> {
         super(vertices);
     }
     
+    /** Advanced Constructor, constructs the edges automatically from ResContactInfo list */
+    public AAGraph(ArrayList<AminoAcid> vertices, ArrayList<ResContactInfo> contacts) {
+        super(vertices);
+    }
+    
     /** Constructor */
     public AAGraph(ArrayList<AminoAcid> vertices, String pdbid, String chainid) {
         super(vertices);
         this.setPdbid(pdbid);
         this.setChainid(chainid);
+    }
+    
+    public boolean addEdgeFromRCI(ResContactInfo rci) {
+        throw new java.lang.UnsupportedOperationException("addEdgeFromRCI: Not implemented yet");
     }
     
     /** Constructor */

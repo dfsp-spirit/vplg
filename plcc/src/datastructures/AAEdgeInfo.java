@@ -7,10 +7,35 @@
  */
 package datastructures;
 
+import plcc.ResContactInfo;
+
 /**
  * Edge information for an amino acid (AA) graph.
  * @author ts
  */
 public class AAEdgeInfo {
+    
+    /** Information about the contacts between this residue pair. */
+    protected ResContactInfo rci;
+    
+    
+    public AAEdgeInfo() {
+        this.rci = null;
+    }
+    
+    public AAEdgeInfo(ResContactInfo rci) {
+        this.rci = rci;
+    }
+    
+    
+    
+    // simple getters and setters follow
+    public ResContactInfo getRci() {
+        return rci;
+    }
+
+    public void setRci(ResContactInfo rci) {
+        this.rci = rci;
+    }
     
 }

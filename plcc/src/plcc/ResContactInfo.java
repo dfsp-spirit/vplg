@@ -8,6 +8,8 @@
 
 package plcc;
 
+import java.util.Arrays;
+
 
 /**
  * This class implements a residue level contact, i.e., all information required about the contact between a pair (a, b) of Residue objects.
@@ -75,8 +77,7 @@ public class ResContactInfo {
      * @param b the second Residue of (a, b)
      * @param d the distance of this residue pair (residue center to residue center)
      * @param nlc the number of total ligand contacts of this residue pair 
-     */
-    
+     */    
     public ResContactInfo(Integer[] npcs, Integer[] mcds, Integer[] can_a, Integer[] can_b, Residue a, Residue b, Integer d, Integer nlc) {
 
         numPairContacts = npcs;
@@ -87,6 +88,30 @@ public class ResContactInfo {
         resB = b;
         dist = d;
         numTotalLigContactsPair = nlc;
+    }
+    
+    
+    /**
+     * Creates an empty ResContactInfo between the two residues and fills in their distance. All other values
+     * are set to zero or not initialized.
+     * @param a the first Residue
+     * @param b the second Residue
+     */
+    public ResContactInfo(Residue a, Residue b) {
+        resA = a;
+        resB = b;
+        dist = a.resCenterDistTo(b);  
+        numTotalLigContactsPair = 0;
+        
+        numPairContacts = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES];
+        minContactDistances = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES];
+        contactAtomIndexInResidueA = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES];
+        contactAtomIndexInResidueB = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES];
+        
+        Arrays.fill(numPairContacts, 0);
+        Arrays.fill(minContactDistances, Integer.MAX_VALUE);
+        Arrays.fill(contactAtomIndexInResidueA, -1);
+        Arrays.fill(contactAtomIndexInResidueB, -1);
     }
 
     /*
@@ -180,6 +205,14 @@ public class ResContactInfo {
     // DEBUG only
     public Residue getResA() { return(resA); }
     public Residue getResB() { return(resB); }
+    
+    /**
+     * Determines whether the residue pair described by this RCI is in contact, i.e., has contacts of any type.
+     * @return true if this RCI contains any kind of contact
+     */
+    public boolean describesContact() {
+        return(this.getNumContactsTotal() > 0 || this.getNumLigContactsTotal() > 0);
+    }
 
 
     // no setters needed, this class is only a nice wrapper for the ugly arrays

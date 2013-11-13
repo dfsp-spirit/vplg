@@ -10,6 +10,7 @@
 package plcc;
 
 // imports
+import datastructures.AAGraph;
 import tools.DP;
 import java.nio.channels.*;
 import java.util.Locale;
@@ -77,6 +78,10 @@ public class Main {
                                             //  has 27 of them, but we ignore 'H' atoms (they are not
                                             //  included in most PDB files and if so, we filter them out.
                                             //  So only 14 of those atoms remain (but index starts at 1).
+    
+    /** The number of different contact types which are stored for a pair of residues. See calculateAtomContactsBetweenResidues() and
+     the ResContactInfo class for details and usage. */
+    public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES = 12;
 
     /**
      * The contacts of a chain. The 4 fields are: AA 1 index, AA 2 index, atom index in AA 1, atom index in chain 2.
@@ -806,7 +811,8 @@ public class Main {
                     }
                     
                     if(s.equals("--aa-graphs")) {
-                        Settings.set("plcc_B_aa_graphs", "true");
+                        Settings.set("plcc_B_AAgraph_allchainscombined", "true");
+                        Settings.set("plcc_B_AAgraph_perchain", "true");
                     }
 
 
@@ -1122,7 +1128,7 @@ public class Main {
         
         
         
-        // **************************************    output of the results    ******************************************
+        // **************************************    output of the results of atom/residue level contact computation   ******************************************
         
         // print overview to STDOUT
         if(Settings.getBoolean("plcc_B_print_contacts")) {
@@ -1279,6 +1285,18 @@ public class Main {
             }
         }
         
+        
+        if(Settings.getBoolean("plcc_B_AAgraph_allchainscombined")) {
+            if(separateContactsByChain || cInfo == null) {
+                System.err.println("Cannot compute amino acid level contact graph for all chains combined, contact separation is on.");
+            } else {
+                System.out.println("Computing amino acid level contact graph for all chains combined.");
+                //AAGraph aag = new AAGraph();
+            }
+            
+            
+        }
+        
 
         // ********************************************** SSE stuff and graph computation ******************************************//
 
@@ -1297,6 +1315,11 @@ public class Main {
                     
                     // compute chain contacts
                     cInfoThisChain = calculateAllContactsLimitedByChain(residues, c.getPdbChainID());
+                    
+                    if(Settings.getBoolean("plcc_B_AAgraph_perchain")) {
+                        //TODO. cont
+                        AAGraph aag = new AAGraph();
+                    }
                     
                     calculateSSEGraphsForChains(theChain, residues, cInfoThisChain, pdbid, outputDir);
                 }
@@ -2594,7 +2617,7 @@ public class Main {
         ResContactInfo result = null;
 
 
-        Integer[] numPairContacts = new Integer[12];
+        Integer[] numPairContacts = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES];
         // The positions in the numPairContacts array hold the number of contacts of each type for a pair of residues:
         // Some cheap vars to make things easier to understand (a replacement for #define):
         /*
@@ -3025,7 +3048,7 @@ public class Main {
         catch (Exception e) {
             System.err.println("ERROR: Could not write to file '" + geoFile + "'.");
             e.printStackTrace();
-            System.exit(-1);
+            //System.exit(1);
         }
             
         for(Integer i = 0; i < contacts.size(); i++) {
@@ -3129,7 +3152,7 @@ public class Main {
             } catch (Exception ew) {
                 System.err.println("ERROR: Could not write info on contact " + contactNum + " to file '" + geoFile + "'.");
                 ew.printStackTrace();
-                System.exit(1);
+                //System.exit(1);
             }
 
 
@@ -3147,7 +3170,7 @@ public class Main {
         } catch(Exception ex) {
             System.err.println("ERROR: Could not close FileWriter for file '" + geoFile + "'.");
             ex.printStackTrace();
-            System.exit(1);
+            //System.exit(1);
         }
 
         System.out.println("  Wrote contact info on " + contactNum + " residue pairs to file '" + geoFile + "'.");

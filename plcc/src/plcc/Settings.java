@@ -255,7 +255,8 @@ public class Settings {
         defSet("plcc_B_complex_graph_mere", "false", "Determines whether the complex graph is drawn with nodes of different type for each mere" );
 
         // amino acid (AA) graphs
-        defSet("plcc_B_aa_graphs", "false", "Whether to compute and output amino acid graphs as well (vertices are AAs, not SSEs).");
+        defSet("plcc_B_AAgraph_allchainscombined", "false", "Whether to compute and output cobined amino acid graphs (one for all chains) as well (vertices are AAs, not SSEs).");
+        defSet("plcc_B_AAgraph_perchain", "false", "Whether to compute and output amino per-chain acid graphs as well (vertices are AAs, not SSEs).");
 
         // Database stuff
         defSet("plcc_B_useDB", "false", "Whether to write statistics to the PostgreSQL database");
