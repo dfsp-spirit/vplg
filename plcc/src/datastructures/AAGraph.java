@@ -10,6 +10,7 @@ package datastructures;
 import java.util.ArrayList;
 import plcc.AminoAcid;
 import plcc.ResContactInfo;
+import plcc.Residue;
 
 /**
  * An undirected, adjacency list based amino acid graph. Suitable for large, sparse graphs. 
@@ -47,8 +48,31 @@ public class AAGraph extends SparseGraph<AminoAcid, AAEdgeInfo> {
         this.setChainid(chainid);
     }
     
+    
+    /**
+     * Automatically adds an edge from a ResContactInfo object if applicable. Note that the edge is only added if the RCI describes a contact.
+     * @param rci the ResContactInfo object, must be for 2 residues which are part of this graph
+     * @return true if the edge was added, false otherwise
+     */
     public boolean addEdgeFromRCI(ResContactInfo rci) {
-        throw new java.lang.UnsupportedOperationException("addEdgeFromRCI: Not implemented yet");
+        if(rci.describesContact()) {            
+            Residue resA = rci.getResA();
+            Residue resB = rci.getResB();
+            //TODO: fix this
+            //int indexResA = this.getVertexIndex(resA);
+            //int indexResB = this.getVertexIndex(resB);
+            int indexResA = -1;
+            int indexResB = -1;
+            if(indexResA >= 0 && indexResB >= 0) {
+                AAEdgeInfo ei = new AAEdgeInfo(rci);
+                this.addEdge(indexResA, indexResB, ei);
+                return true;
+            }
+            else {
+                System.err.println("WARNING: Could not add edge from ResContactInfo, vertices not found in graph.");
+            }
+        }
+        return false;
     }
     
     /** Constructor */

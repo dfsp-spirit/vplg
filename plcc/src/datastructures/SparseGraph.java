@@ -94,6 +94,24 @@ public class SparseGraph<V, E> {
     
     
     /**
+     * Returns the index of the vertex object v in this graph, or a value smaller
+     * than 0 if this graph contains no such vertex.
+     * @param v the Vertex
+     * @return the index if the vertex is found, a value smaller than zero otherwise
+     */
+    public int getVertexIndex(V v) {
+        int idx = -1;
+        for(int i = 0; i < this.vertices.size(); i++) {
+            if(this.vertices.get(i).equals(v)) {
+                idx = i;
+                return idx;
+            }
+        }
+        return idx;
+    }
+    
+    
+    /**
      * Checks whether an edge exists between the vertices at index i and j.
      * @param i the vertex i by index
      * @param j the vertex j by index
