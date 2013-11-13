@@ -18,7 +18,7 @@ import plcc.Residue;
  * 
  * @author ts
  */
-public class AAGraph extends SparseGraph<AminoAcid, AAEdgeInfo> {
+public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> {
     
     
     public static final String CHAINID_ALL_CHAINS = "ALL_CHAINS";
@@ -32,17 +32,20 @@ public class AAGraph extends SparseGraph<AminoAcid, AAEdgeInfo> {
 
     
     /** Constructor */
-    public AAGraph(ArrayList<AminoAcid> vertices) {
+    public AAGraph(ArrayList<Residue> vertices) {
         super(vertices);
     }
     
     /** Advanced Constructor, constructs the edges automatically from ResContactInfo list */
-    public AAGraph(ArrayList<AminoAcid> vertices, ArrayList<ResContactInfo> contacts) {
+    public AAGraph(ArrayList<Residue> vertices, ArrayList<ResContactInfo> contacts) {
         super(vertices);
+        for(int i = 0; i < contacts.size(); i++) {
+            this.addEdgeFromRCI(contacts.get(i));
+        }
     }
     
     /** Constructor */
-    public AAGraph(ArrayList<AminoAcid> vertices, String pdbid, String chainid) {
+    public AAGraph(ArrayList<Residue> vertices, String pdbid, String chainid) {
         super(vertices);
         this.setPdbid(pdbid);
         this.setChainid(chainid);
@@ -54,15 +57,13 @@ public class AAGraph extends SparseGraph<AminoAcid, AAEdgeInfo> {
      * @param rci the ResContactInfo object, must be for 2 residues which are part of this graph
      * @return true if the edge was added, false otherwise
      */
-    public boolean addEdgeFromRCI(ResContactInfo rci) {
+    public final boolean addEdgeFromRCI(ResContactInfo rci) {
         if(rci.describesContact()) {            
             Residue resA = rci.getResA();
             Residue resB = rci.getResB();
-            //TODO: fix this
-            //int indexResA = this.getVertexIndex(resA);
-            //int indexResB = this.getVertexIndex(resB);
-            int indexResA = -1;
-            int indexResB = -1;
+
+            int indexResA = this.getVertexIndex(resA);
+            int indexResB = this.getVertexIndex(resB);
             if(indexResA >= 0 && indexResB >= 0) {
                 AAEdgeInfo ei = new AAEdgeInfo(rci);
                 this.addEdge(indexResA, indexResB, ei);
@@ -85,7 +86,7 @@ public class AAGraph extends SparseGraph<AminoAcid, AAEdgeInfo> {
         return pdbid;
     }
 
-    public void setPdbid(String pdbid) {
+    public final void setPdbid(String pdbid) {
         this.pdbid = pdbid;
     }
 
@@ -93,7 +94,7 @@ public class AAGraph extends SparseGraph<AminoAcid, AAEdgeInfo> {
         return chainid;
     }
 
-    public void setChainid(String chainid) {
+    public final void setChainid(String chainid) {
         this.chainid = chainid;
     }
 }

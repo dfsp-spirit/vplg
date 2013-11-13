@@ -1291,7 +1291,8 @@ public class Main {
                 System.err.println("Cannot compute amino acid level contact graph for all chains combined, contact separation is on.");
             } else {
                 System.out.println("Computing amino acid level contact graph for all chains combined.");
-                //AAGraph aag = new AAGraph();
+                AAGraph aag = new AAGraph(residues, cInfo);
+                //TODO: do something with aag
             }
             
             
@@ -1310,15 +1311,15 @@ public class Main {
                 ArrayList<Chain> theChain;
                 for(Chain c : handleChains) {
                     // add current chain
-                    theChain = new ArrayList<Chain>();
+                    theChain = new ArrayList<Chain>();   // it is a list, but only contains this single chain
                     theChain.add(c);
                     
                     // compute chain contacts
                     cInfoThisChain = calculateAllContactsLimitedByChain(residues, c.getPdbChainID());
                     
                     if(Settings.getBoolean("plcc_B_AAgraph_perchain")) {
-                        //TODO. cont
-                        AAGraph aag = new AAGraph();
+                        AAGraph aag = new AAGraph(c.getResidues(), cInfoThisChain);
+                        //TODO: do something with aag
                     }
                     
                     calculateSSEGraphsForChains(theChain, residues, cInfoThisChain, pdbid, outputDir);
