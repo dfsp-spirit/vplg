@@ -27,6 +27,9 @@ import org.xml.sax.helpers.*;
 
 /**
  * A generic, abstract graph class. The simplest non-abstract implementation is UndirectedGraph.
+ * Note that this graph is based on an adjacency matrix, it should therefor not be used for large,
+ * sparse graphs.
+ * 
  * @author ts
  */
 public abstract class Graph<V> implements TrivialGraphFormat, GraphMLFormat {
@@ -101,6 +104,8 @@ public abstract class Graph<V> implements TrivialGraphFormat, GraphMLFormat {
     public void addEdge(Integer start, Integer end) {
         this.edgeMatrix[start][end] = this.EDGETYPE_DEFAULT;
     }
+    
+    
     
     
     /**

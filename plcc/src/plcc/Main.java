@@ -78,19 +78,25 @@ public class Main {
                                             //  included in most PDB files and if so, we filter them out.
                                             //  So only 14 of those atoms remain (but index starts at 1).
 
+    /**
+     * The contacts of a chain. The 4 fields are: AA 1 index, AA 2 index, atom index in AA 1, atom index in chain 2.
+     */
     static Integer[][][][] contact;
 
     static Integer globalMaxCenterSphereRadius;
 
 
-    // This is required for the additional speedup during the calculation of residue contacts that
-    //  allows us to skip the next few residues if the distance between sequential neighbor residues
-    //  is large (I. Koch). It is set by setGlobalMaxSeqNeighborResDist() and used by the function
-    //  Main.calculateAllContacts().
+    /** This is required for the additional speedup during the calculation of residue contacts that
+      allows us to skip the next few residues if the distance between sequential neighbor residues
+      is large (I. Koch). It is set by setGlobalMaxSeqNeighborResDist() and used by the function
+      Main.calculateAllContacts(). */
     static Integer globalMaxSeqNeighborResDist;
     
     static final String version = Settings.getVersion();
     
+    /**
+     * Files added to this array during the run get deletes on program exit.
+     */
     static ArrayList<File> deleteFilesOnExit;
     
     /** Whether the PDB file name given on the command line is used. This is not the case for command lines which only operate on the database or which need no input file (e.g., --recreate-tables). */
@@ -202,7 +208,7 @@ public class Main {
             // get pdbid from first arg
             pdbid = args[0];
 
-            Integer expectedLengthPDBID = 4;
+            final Integer expectedLengthPDBID = 4;
             if(pdbid.length() != expectedLengthPDBID) {
                 DP.getInstance().w("The given PDB identifier '" + pdbid + "' has an unusual length of " + pdbid.length() + " characters, expected " + expectedLengthPDBID + ".");
             }
@@ -797,6 +803,10 @@ public class Main {
                             System.out.println("Handled plcc graph file '" + args[i+1] + " and folding graphs', exiting.");
                             System.exit(1);
                         }
+                    }
+                    
+                    if(s.equals("--aa-graphs")) {
+                        Settings.set("plcc_B_aa_graphs", "true");
                     }
 
 

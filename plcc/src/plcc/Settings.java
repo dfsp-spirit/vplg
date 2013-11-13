@@ -72,7 +72,7 @@ public class Settings {
      * @return the PLCC version
      */
     public static String getVersion() {
-        return("0.83");
+        return("0.84");
     }
 
     /**
@@ -254,6 +254,8 @@ public class Settings {
         defSet("plcc_B_complex_graph_same", "false", "Determines whether the complex graph is drawn with all nodes of the same type" );
         defSet("plcc_B_complex_graph_mere", "false", "Determines whether the complex graph is drawn with nodes of different type for each mere" );
 
+        // amino acid (AA) graphs
+        defSet("plcc_B_aa_graphs", "false", "Whether to compute and output amino acid graphs as well (vertices are AAs, not SSEs).");
 
         // Database stuff
         defSet("plcc_B_useDB", "false", "Whether to write statistics to the PostgreSQL database");
