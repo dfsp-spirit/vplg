@@ -3385,6 +3385,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         return this.getSSEBySeqPosition(index);
     } 
     
+    @Override
     public String toKavoshFormat() {
         String kf = "";
         

@@ -179,5 +179,21 @@ public class SparseGraph<V, E> {
     }
     
     
+    /**
+     * Returns a list of edges in this graph. Each integer array (of length 2) in the returned list holds
+     * the indices of a pair of adjacent vertices.
+     * @return a list of vertex pairs given by their indices which are neighbors
+     */
+    public ArrayList<Integer[]> getEdgeListIndex() {
+        ArrayList<Integer[]> allEdges = new ArrayList<Integer[]>();
+        for(int i = 0; i < this.edges.size(); i++) {
+            for(int j = 0; j < this.edges.get(i).size(); j++) {
+               int neighborOfI = this.edges.get(i).get(j);
+               allEdges.add(new Integer[]{i, neighborOfI});
+            }
+        }
+        return allEdges;
+    }
+    
     
 }

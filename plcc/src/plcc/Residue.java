@@ -572,11 +572,38 @@ public class Residue implements java.io.Serializable {
     public Integer getDsspResNum() { return(dsspResNum); }
     public Chain getChain() { return(chain); }
     public String getChainID() { return(chainID); }
+    
+    /**
+     * Returns the list of atoms of this residue.
+     * @return the atom list
+     */
     public ArrayList<Atom> getAtoms() { return(atoms); }
+    
+    /**
+     * Returns the atom count of this Residue.
+     * @return the number of atoms
+     */
     public Integer getNumAtoms() { return(this.atoms.size()); }
     public String getModelID() { return(modelID); }
+    
+    /**
+     * Returns the PDB insertion code field of this Residue.
+     * @return the PDB insertion code 
+     */
     public String getiCode() { return(iCode); }
+    
+    /**
+     * Returns the PTGL internal ID for this residue type (AA-type based).
+     * @return 
+     */
     public Integer getInternalID() { return(AminoAcid.name3ToID(resName3)); }
+    
+    /**
+     * Returns a string in pattern 'resName3 + '-' + pdbResNum', e.g., 'ARG-47'. Note that this
+     * does note include a reference to the chain (or insertion code) and thus is NOT unique for the
+     * PDB file. Use getUniquePDBName() instead if you need a unique name based on the PDB residue number.
+     * @return a residue string like 'ARG-47'
+     */
     public String getFancyName() { return(this.resName3 + "-" + this.pdbResNum); }
     /**
      * Returns the PLCC SSE string of this SSE
@@ -587,7 +614,19 @@ public class Residue implements java.io.Serializable {
     public String getSSETypePlcc() { return(this.plccSSEType); }
     public SSE getSSE() { return(sse); }
     public Boolean getDsspSseState() { return(isPartOfDsspSse); }
+    
+    /**
+     * Returns a string in format 'chainID + '-' + pdbResNum + '-' + iCode'. Note that the iCode may
+     * be empty (it is for most residues). Example: 'A-45-'.
+     * @return a string like 'A-45-'.
+     */
     public String getUniquePDBName() { return(chainID + "-" + pdbResNum + "-" + iCode); }
+    
+    /**
+     * Returns a string in format '(chainID + '-' + pdbResNum + '-' + iCode)'. Note that the iCode may
+     * be empty (it is for most residues). Example: '(A-45-)'.
+     * @return a string like '(A-45-)'.
+     */
     public String getUniqueString() { return("(" + chainID + "-" + pdbResNum + "-" + iCode + ")"); }
     public Float getPhi() { if(this.isAA()) { return(phi); } else { return(0.0f); } }
     public Float getPsi() { if(this.isAA()) { return(psi); } else { return(0.0f); } }

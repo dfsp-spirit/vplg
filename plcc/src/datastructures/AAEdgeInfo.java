@@ -7,13 +7,14 @@
  */
 package datastructures;
 
+import plcc.GraphModellingLanguageFormat;
 import plcc.ResContactInfo;
 
 /**
  * Edge information for an amino acid (AA) graph.
  * @author ts
  */
-public class AAEdgeInfo {
+public class AAEdgeInfo implements GraphModellingLanguageFormat {
     
     /** Information about the contacts between this residue pair. */
     protected ResContactInfo rci;
@@ -27,6 +28,12 @@ public class AAEdgeInfo {
         this.rci = rci;
     }
     
+    
+    @Override
+    public String toGraphModellingLanguageFormat() {
+        StringBuilder sb = new StringBuilder();
+        return sb.toString();
+    }
     
     
     // simple getters and setters follow
