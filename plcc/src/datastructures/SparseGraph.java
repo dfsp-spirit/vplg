@@ -196,4 +196,14 @@ public class SparseGraph<V, E> {
     }
     
     
+    /**
+     * Returns the vertex at index idx
+     * @param idx the vertex index
+     * @return the vertex at index idx
+     */
+    public V getVertex(int idx) {
+        return this.vertices.get(idx);
+    }
+    
+    
 }

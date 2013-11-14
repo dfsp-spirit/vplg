@@ -94,7 +94,8 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphMo
         StringBuilder gmlf = new StringBuilder();
         
         
-        
+        String label_pdbid = (this.pdbid == null ? "" : " PDB " + this.pdbid);
+        String label_chainid = ((this.chainid == null ||  this.chainid.equals(AAGraph.CHAINID_ALL_CHAINS)) ? "" : " chain " + this.chainid);
         // print the header
 
         String startNode = "  node [";
@@ -104,20 +105,21 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphMo
         
         gmlf.append("graph [\n");
         gmlf.append("  id ").append(1).append("\n");
-        gmlf.append("  label \"" + "VPLG Protein Graph ").append(this.pdbid).append("\"\n");
-        gmlf.append("  comment \"" + "VPLG Protein Graph ").append(this.pdbid).append("\"\n");
+        gmlf.append("  label \"" + "VPLG Protein Graph ").append(label_pdbid).append(label_chainid).append("\"\n");
+        gmlf.append("  comment \"" + "VPLG Protein Graph ").append(label_pdbid).append("\"\n");
         gmlf.append("  directed 0\n");
         gmlf.append("  isplanar 0\n");
-        gmlf.append("  creator \"PLCC\"\n)");
+        gmlf.append("  creator \"PLCC\"\n");
         
         
         // print all nodes
         Residue residue;
         for(Integer i = 0; i < this.getNumVertices(); i++) {
             residue = this.vertices.get(i);
-            gmlf.append(startNode).append("\n)");
+            gmlf.append(startNode).append("\n");
             gmlf.append("    id ").append(i).append("\n");
             gmlf.append("    label \"").append(i).append("-").append(residue.getUniquePDBName()).append("\"\n");
+            gmlf.append("    residue \"").append(residue.getName3()).append("\"\n");
             gmlf.append(endNode).append("\n");
         }
         
@@ -131,6 +133,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphMo
             gmlf.append(startEdge).append("\n");
             gmlf.append("    source ").append(src).append("\n");
             gmlf.append("    target ").append(tgt).append("\n");                        
+            gmlf.append("    weight ").append(this.getEdgeDistance(src, tgt)).append("\n");                        
             gmlf.append(endEdge).append("\n");
         }
         
@@ -138,6 +141,17 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphMo
         gmlf.append("]\n");
         
         return(gmlf.toString());
+    }
+    
+    
+    /**
+     * Returns the 3D euclidian distance between the Residues at indices i and j in this graph.
+     * @param i the residue i by index
+     * @param j the residue j by index
+     * @return the euclidian distance
+     */
+    public int getEdgeDistance(int i, int j) {
+        return this.getVertex(i).resCenterDistTo(this.getVertex(j));
     }
     
     /**

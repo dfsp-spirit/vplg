@@ -810,7 +810,7 @@ public class Main {
                         }
                     }
                     
-                    if(s.equals("--aa-graphs")) {
+                    if(s.equals("-i") || s.equals("--aa-graphs")) {
                         Settings.set("plcc_B_AAgraph_allchainscombined", "true");
                         Settings.set("plcc_B_AAgraph_perchain", "true");
                     }
@@ -1292,7 +1292,15 @@ public class Main {
             } else {
                 System.out.println("Computing amino acid level contact graph for all chains combined.");
                 AAGraph aag = new AAGraph(residues, cInfo);
-                //TODO: do something with aag
+                aag.setPdbid(pdbid);
+                aag.setChainid(AAGraph.CHAINID_ALL_CHAINS);
+                String aagFile = outputDir + fs + pdbid + "_aagraph.gml";
+                if(writeStringToFile(aagFile, aag.toGraphModellingLanguageFormat())) {
+                    System.out.println("  AAGraph for all chains written to file '" + aagFile + "'.");
+                }
+                else {
+                    System.err.println("ERROR: Could not write AAGraph for all chains to file '" + aagFile + "'.");
+                }
             }
             
             
@@ -1319,7 +1327,15 @@ public class Main {
                     
                     if(Settings.getBoolean("plcc_B_AAgraph_perchain")) {
                         AAGraph aag = new AAGraph(c.getResidues(), cInfoThisChain);
-                        //TODO: do something with aag
+                        aag.setPdbid(pdbid);
+                        aag.setChainid(c.getPdbChainID());
+                        String aagFile = outputDir + fs + pdbid + "_aagraph_chain_" + c.getPdbChainID() + ".gml";
+                        if(writeStringToFile(aagFile, aag.toGraphModellingLanguageFormat())) {
+                            System.out.println("  AAGraph for all chains written to file '" + aagFile + "'.");
+                        }
+                        else {
+                            System.err.println("ERROR: Could not write AAGraph for all chains to file '" + aagFile + "'.");
+                        }
                     }
                     
                     calculateSSEGraphsForChains(theChain, residues, cInfoThisChain, pdbid, outputDir);
@@ -1920,9 +1936,9 @@ public class Main {
                 if(Settings.getBoolean("plcc_B_Jmol_graph_vis_commands")) {                    
                     // only print to STDOUT for albelig atm
                     if(gt.equals(SSEGraph.GRAPHTYPE_ALBELIG)) {
-                        System.out.println("      Jmol graph visualization commands for " + gt + " graph follow:");
-                        System.out.println("        " + JmolTools.visualizeGraphCommands(pg, false, false));
-                        System.out.println("      Hint: Combine the Jmol command with 'delete water; display :" + c.getPdbChainID() + "; color atoms translucent orange; ' to better see the overlay.");
+                        //System.out.println("      Jmol graph visualization commands for " + gt + " graph follow:");
+                        //System.out.println("        " + JmolTools.visualizeGraphCommands(pg, false, false));
+                        //System.out.println("      Hint: Combine the Jmol command with 'delete water; display :" + c.getPdbChainID() + "; color atoms translucent orange; ' to better see the overlay.");
                     }
                     
                     // but compute for all graphs and register in web mode
@@ -3847,6 +3863,7 @@ public class Main {
         System.out.println("-h | --help                : show this help message and exit");
         System.out.println("-H | --output-www-with-core: add HTML navigation files and core files to the subdir tree (implies -k, -W). ");
         //System.out.println("-i | --ignoreligands       : ignore ligand contacts in geom_neo format output files [DEBUG]");
+        System.out.println("-i | --aa-graphs           : compute and output amino acid-based graphs as well");        
         System.out.println("-j | --ddb <p> <c> <gt> <f>: get the graph type <gt> of chain <c> of pdbid <p> from the DB and draw it to file <f> (omit the file extension)*");        
         System.out.println("-k | --output-subdir-tree  : write all output files to a PDB-style sudbir tree of the output dir (e.g., <OUTDIR>/ic/8icd/<outfile>). ");                
         System.out.println("-l | --draw-plcc-graph <f> : read graph in plcc format from file <f> and draw it to <f>.png, then exit (<pdbid> will be ignored)*");                
