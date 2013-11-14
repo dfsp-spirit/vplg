@@ -606,10 +606,19 @@ public class Residue implements java.io.Serializable {
      */
     public String getFancyName() { return(this.resName3 + "-" + this.pdbResNum); }
     /**
-     * Returns the PLCC SSE string of this SSE
-     * @return the PLCC SSE string of this SSE, e.g., "H", "E" or "L"
+     * Returns the PLCC SSE string of this SSE. May be blank/ a single space ' '.
+     * @return the PLCC SSE string of this SSE, e.g., "H", "E", " " or "L"
      */
     public String getSSEString() { return(sseString); }
+    
+    /**
+     * Returns the PLCC SSE string of this SSE, but uses "C" (instead of space " ") for empty SSE strings.
+     * @return the PLCC SSE string of this SSE, e.g., "H", "E", "C", or "L". C is for coil/none.
+     */
+    public String getNonEmptySSEString() { 
+        return((this.sseString.isEmpty() || this.sseString.equals(" ")) ? "C" : this.sseString); 
+    }
+    
     public String getSSEStringDssp() { return(sseStringDssp); }
     public String getSSETypePlcc() { return(this.plccSSEType); }
     public SSE getSSE() { return(sse); }
