@@ -1,5 +1,7 @@
 #!/bin/sh
 ## create_job_filelists_MPI_version.sh -- create the file lists for all MPI jobs. In the MPI version, the job lists are NOT assigned to a certain host. You should have at least as many jobs as you have cluster nodes. Having more jobs wont hurt (but having n+1 jobs with n nodes may be pretty stupid, rather choose 2n, 3n or whatever).
+##
+## USAGE: ./create_job_filelists_MPI_version.sh [all]
 
 
 
