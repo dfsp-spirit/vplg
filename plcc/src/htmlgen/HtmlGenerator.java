@@ -235,9 +235,12 @@ public class HtmlGenerator {
             sb.append(HtmlTools.heading("About VPLGWeb", 2));
             sb.append(HtmlTools.startParagraph());
             sb.append("VPLGweb is a web server which allows for quick access to Protein Ligand Graphs for all ");
-            sb.append("protein chains in the RCSB Protein Data Bank (PDB). These graphs were computed from the ");
-            sb.append("3D atom coordinates in PDB files and the secondary structure assignments of the DSSP algorithm using the ");
+            sb.append("protein chains in the <a href='http://www.rcsb.org/' target='_blank'>RCSB Protein Data Bank (PDB)</a>. These graphs were computed from the ");
+            sb.append("3D atom coordinates in PDB files and the secondary structure assignments of the <a href='http://swift.cmbi.ru.nl/gv/dssp/' target='_blank'>DSSP algorithm</a> using the ");
             sb.append(HtmlTools.linkBlank(HtmlGenerator.getVPLGSoftwareWebsite(), "VPLG software."));
+            sb.append(HtmlTools.endParagraph());
+            sb.append(HtmlTools.startParagraph());
+            sb.append("The protein ligand graphs are visualized by this server in 2D and 3D. They can also be downloaded in standard graph file formats like Graph Modeling Language (GML) for forther analysis in software like Gephi, Tulip or Cytoscape.");
             sb.append(HtmlTools.endParagraph());
             sb.append(HtmlTools.brAndNewline());
             
@@ -269,6 +272,8 @@ public class HtmlGenerator {
             sb.append("[");
             sb.append(HtmlTools.startSpan("tool"));
             sb.append(HtmlGenerator.popupWindowLink("Show 3D structure", HtmlTools.makeWebPath(pathToBaseDir) + "/7tim_a_pymol.png"));
+            sb.append(" | ");
+            sb.append(HtmlTools.linkBlank(HtmlTools.makeWebPath(pathToBaseDir) + "/visualize.php?mode=allgraphs&pdbid=7tim&chain=a", "Show graph overlay in 3D structure (select 'Visualize albelig graph')"));
             sb.append(HtmlTools.endSpan());
             sb.append("]");
             //sb.append(HtmlTools.brAndNewline());
@@ -303,8 +308,16 @@ public class HtmlGenerator {
             sb.append(HtmlTools.endParagraph());
             sb.append(HtmlTools.brAndNewline());
             
-            // contact and authors
+            // data
+            sb.append(HtmlTools.heading("Data", 2));
+            sb.append(HtmlTools.startParagraph());
+            sb.append("This server uses the PDB and DSSP versions from 2013-11-13 (retrieved via rsync). VPLGweb currently holds information on 90,724 proteins and 245,524 protein chains. It requires about 110 GB of disk space.");
+            sb.append(HtmlTools.endParagraph());
+            sb.append(HtmlTools.brAndNewline());
             
+            
+            
+            // contact and authors                                    
             sb.append(HtmlTools.heading("Contact and citing VPLGweb", 2));
             sb.append(HtmlTools.startParagraph());
             sb.append("VPLGweb was written by ");
@@ -400,12 +413,12 @@ public class HtmlGenerator {
             //sb.append("    echo \"Link is $link.\";\n");
             
             sb.append("    if (file_exists($link)) {\n");
-            sb.append("        echo \"Protein data found.<br/><br/>\";\n");
+            sb.append("        echo \"OK. Protein data found:<br/><br/>\";\n");
             sb.append("        if ($valid_chain) {\n");
-            sb.append("            echo \"<a href='\" . $link . \"'>\" . \"Protein $pdbid chain $chain\" . \"</a><br/>\";\n");
+            sb.append("            echo \"<ul><li><a href='\" . $link . \"'>\" . \"Protein $pdbid chain $chain\" . \"</a></li></ul><br/>\";\n");
             sb.append("        }\n");
             sb.append("        else {\n");            
-            sb.append("            echo \"<a href='\" . $link . \"'>\" . \"Protein $pdbid\" . \"</a><br/>\";\n");
+            sb.append("            echo \"<ul><li><a href='\" . $link . \"'>\" . \"Protein $pdbid\" . \"</a></li></ul><br/>\";\n");
             sb.append("        }\n");            
             sb.append("    }\n");
             sb.append("    else {\n");
@@ -567,6 +580,7 @@ public class HtmlGenerator {
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline());                                        
         sb.append(HtmlTools.br()).append(HtmlTools.brAndNewline()); 
         
+        sb.append(HtmlTools.aname("canvas"));
         sb.append(HtmlTools.startDiv(HtmlGenerator.DIV_APPLETAREA));                
         sb.append(HtmlTools.startParagraph());                        
         
