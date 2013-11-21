@@ -2347,9 +2347,10 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
 
                         if(bw) { ig2.setPaint(Color.LIGHT_GRAY); }      // for non-protein graphs
                         
+                        // ----- complex graph specific stuff -----
                         // determine chain of SSEs
                         iChainID = -1;
-                        jChainID = -2;
+                        jChainID = -1;
                         for(Integer x = 0; x < chainEnd.size(); x++){
                             if(i < chainEnd.get(x)) {iChainID = x; break;}
                         }
@@ -2357,6 +2358,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
                             if(j < chainEnd.get(x)) {jChainID = x; break;}
                         }
                         if (iChainID != jChainID) {ig2.setPaint(Color.PINK);}
+                        // ----- end complex graph specific stuff -----
 
                         // determine the center of the arc and the width of its rectangle bounding box
                         if(i < j) { leftVert = i; rightVert = j; }
