@@ -72,7 +72,7 @@ public class Settings {
      * @return the PLCC version
      */
     public static String getVersion() {
-        return("0.84");
+        return("0.85");
     }
 
     /**

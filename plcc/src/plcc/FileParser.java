@@ -779,7 +779,9 @@ public class FileParser {
         }
 
         if(hitDsspData) {
-            System.out.println("    DSSP: Found start of DSSP data in line " + curLineNumDSSP + ".");
+            if(! FileParser.silent) {
+                System.out.println("    DSSP: Found start of DSSP data in line " + curLineNumDSSP + ".");
+            }
             return(curLineNumDSSP);
         }
         else {
@@ -1048,11 +1050,16 @@ public class FileParser {
 
         // create the default model if this is a non-NMR file (crystal data) that contains no models
         if(s_models.size() < 1) {
-            System.out.println("    PDB: No models found in handled PDB lines. This most likely is a crystal data (non-NMR) file. Adding default model '" + defaultModelName + "'.");
+            if(! FileParser.silent) {
+                System.out.println("    PDB: No models found in handled PDB lines. This most likely is a crystal data (non-NMR) file. Adding default model '" + defaultModelName + "'.");
+            }
             s_models.add(new Model(defaultModelName));
+            
         }
 
-        System.out.println("    PDB: Handled PDB lines contain data from " + s_models.size() + " model(s).");
+        if(! FileParser.silent) {
+            System.out.println("    PDB: Handled PDB lines contain data from " + s_models.size() + " model(s).");
+        }
 
     }
 
@@ -1067,7 +1074,9 @@ public class FileParser {
         String pLine = "";
         Integer numModels = 0;
 
-        System.out.println("  Counting total number of models in the whole PDB file '" + pdbFile + "' (" + allPDBLines.size() + " lines)...");
+        if(! FileParser.silent) {
+            System.out.println("  Counting total number of models in the whole PDB file '" + pdbFile + "' (" + allPDBLines.size() + " lines)...");
+        }
 
         for(Integer i = 0; i < allPDBLines.size(); i++) {
 

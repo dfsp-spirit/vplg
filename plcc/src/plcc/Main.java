@@ -2351,8 +2351,11 @@ public class Main {
     public static ProtGraph calcGraphType(String graphType, ArrayList<SSE> allChainSSEs, Chain c, ArrayList<ResContactInfo> resContacts, String pdbid) {
 
         ContactMatrix chainCM;
+        Boolean silent = Settings.getBoolean("plcc_B_silent");
 
-        System.out.println("    ----- Calculating " + graphType + " graph of chain " + c.getPdbChainID() + ". -----");
+        if(! silent) {
+            System.out.println("    ----- Calculating " + graphType + " graph of chain " + c.getPdbChainID() + ". -----");
+        }
 
         ArrayList<String> keepSSEs = new ArrayList<String>();
         ArrayList<SSE> filteredChainSSEs;
@@ -2418,7 +2421,9 @@ public class Main {
         if(Settings.getBoolean("plcc_B_ptgl_geodat_output")) {
             String gdf = Settings.get("plcc_S_output_dir") + System.getProperty("file.separator") + pdbid + "_" + c.getPdbChainID() + "_" + graphType + ".geodat";            
             if(writeStringToFile(gdf, chainCM.toGeodatFormat(false, true))) {
-                System.out.println("  Wrote SSE level contacts for chain " + chainCM.getChain() + " in geo.dat format to file '" + gdf + "'.");
+                if(! silent) {
+                    System.out.println("  Wrote SSE level contacts for chain " + chainCM.getChain() + " in geo.dat format to file '" + gdf + "'.");
+                }
             }
             else {
                 DP.getInstance().w("Failed to write SSE level contacts in geo.dat format to file '" + gdf + "'. Check permissions.");
@@ -2440,7 +2445,9 @@ public class Main {
 
         
         if(Settings.getBoolean("plcc_B_forceBackboneContacts")) {
-            System.out.println("      Adding backbone contacts to consecutive SSEs of the " + graphType + " graph.");
+            if(! silent) {
+                System.out.println("      Adding backbone contacts to consecutive SSEs of the " + graphType + " graph.");
+            }
             pg.addFullBackboneContacts();            
         }
 
@@ -2516,7 +2523,9 @@ public class Main {
      */
     public static ArrayList<ResContactInfo> calculateAllContacts(ArrayList<Residue> res) {
         
-                
+        
+        Boolean silent = Settings.getBoolean("plcc_B_silent");
+        
         Residue a, b;
         Integer rs = res.size();
         
@@ -2555,7 +2564,9 @@ public class Main {
                 
                 // DEBUG
                 if(Settings.getInteger("plcc_I_debug_level") >= 1) {
-                    System.out.println("  Checking DSSP pair " + a.getDsspResNum() + "/" + b.getDsspResNum() + "...");
+                    if(! silent) {
+                        System.out.println("  Checking DSSP pair " + a.getDsspResNum() + "/" + b.getDsspResNum() + "...");
+                    }
                     //System.out.println("    " + a.getAtomsString());
                     //System.out.println(a.atomInfo());
                     //System.out.println("    " + b.getAtomsString());
@@ -2621,11 +2632,15 @@ public class Main {
         }
 
 
-        System.out.println("  Checked " + numResContactsChecked + " contacts for " + rs + " residues: " + numResContactsPossible + " possible, " + contactInfo.size() + " found, " + numResContactsImpossible + " impossible (collison spheres check).");
-        System.out.println("  Did not check " + numCmpSkipped + " contacts (skipped by seq neighbors check), would have been " + (numResContactsChecked + numCmpSkipped)  + ".");
+        if(! FileParser.silent) {
+            System.out.println("  Checked " + numResContactsChecked + " contacts for " + rs + " residues: " + numResContactsPossible + " possible, " + contactInfo.size() + " found, " + numResContactsImpossible + " impossible (collison spheres check).");
+            System.out.println("  Did not check " + numCmpSkipped + " contacts (skipped by seq neighbors check), would have been " + (numResContactsChecked + numCmpSkipped)  + ".");
+        }
 
         if( ! Settings.getBoolean("plcc_B_write_lig_geolig")) {
-            System.out.println("  Configured to ignore ligands, ignored " + numIgnoredLigandContacts + " ligand contacts.");
+            if(! FileParser.silent) {
+                System.out.println("  Configured to ignore ligands, ignored " + numIgnoredLigandContacts + " ligand contacts.");
+            }
         }
 
         return(contactInfo);
@@ -3485,7 +3500,7 @@ public class Main {
             }
         }
 
-        System.out.println("  Neighbor residues " + rID + " (type " + rT + ") and " + sID + " (type " + sT + ") found in distance " + maxDist + ".");
+        //System.out.println("  Neighbor residues " + rID + " (type " + rT + ") and " + sID + " (type " + sT + ") found in distance " + maxDist + ".");
         return(maxDist);
     }
 
