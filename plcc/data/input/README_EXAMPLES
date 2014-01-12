@@ -5,6 +5,8 @@ These are example PDB and DSSP input files. Most of the are here for a special r
 * 1o1d: Very large, more than 90000 atoms and more than 30 chains.
 * 1lmb: Contains a DNA chain.
 * 1trz: Contains a sulfur bridge.
+* 1gos: The beta graph of chain B contains a folding graph (FG) with a large and beautiful sequential ordering (for KEY notation drawing). It is the connected component consisting of the SSEs (9, 8, 29, 30, 31, 27, 35), numbers indicate index of SSE in chain.
+
 
 
 
