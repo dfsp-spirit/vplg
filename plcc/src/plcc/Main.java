@@ -994,6 +994,8 @@ public class Main {
         // **************************************    here we go: parse files and get data    ******************************************
         if(! silent) {
             System.out.println("Getting data...");
+        } else {
+            FileParser.silent = true;
         }
         FileParser.initData(pdbFile, dsspFile);
 
@@ -2520,7 +2522,7 @@ public class Main {
         
         if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
             rs = 2;
-            System.out.println("DEBUG: Limiting residue contact computation to the first " + rs + " residues.");            
+            System.out.println("DEBUG: Warning: Limiting residue contact computation to the first " + rs + " residues.");            
         }        
 
         Integer numResContactsChecked, numResContactsPossible, numResContactsImpossible, numCmpSkipped;
@@ -2533,7 +2535,8 @@ public class Main {
         Integer atomRadius = Settings.getInteger("plcc_I_atom_radius");
         Integer atomRadiusLig = Settings.getInteger("plcc_I_lig_atom_radius");
 
-        System.out.println("  Atom radius set to " + atomRadius + " for protein atoms, " + atomRadiusLig + " for ligand atoms (unit is 1/10th Angstroem).");
+        
+        //System.out.println("  Atom radius set to " + atomRadius + " for protein atoms, " + atomRadiusLig + " for ligand atoms (unit is 1/10th Angstroem).");
 
         Integer globalMaxCollisionRadius = globalMaxCenterSphereRadius + atomRadius;
         Integer globalMaxCenterSphereDiameter = globalMaxCollisionRadius * 2;
@@ -4497,7 +4500,8 @@ public class Main {
             printSSEList(consideredSSEs, "Considered");
         }
         
-        System.out.println("    Pre-filtered list of SSEs, " + consideredSSEs.size() + " left out of " + inputSSEs.size() + " (ignored SSEs of type 'B', 'T' and 'S').");
+        
+        //System.out.println("    Pre-filtered list of SSEs, " + consideredSSEs.size() + " left out of " + inputSSEs.size() + " (ignored SSEs of type 'B', 'T' and 'S').");
 
         SSE curSSE, nextSSE, afterNextSSE;
         curSSE = nextSSE = afterNextSSE = null;
@@ -4582,7 +4586,7 @@ public class Main {
 
         }
 
-        System.out.println("    PTGL adaptations of SSE list (merging etc) done, " + outputSSEs.size() +  " left out of the " + consideredSSEs.size() + " pre-filtered SSEs.");
+        //System.out.println("    PTGL adaptations of SSE list (merging etc) done, " + outputSSEs.size() +  " left out of the " + consideredSSEs.size() + " pre-filtered SSEs.");
 
         return(outputSSEs);
 

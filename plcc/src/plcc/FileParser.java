@@ -25,6 +25,7 @@ import java.util.Scanner;
 public class FileParser {
 
     // declare class vars
+    public static Boolean silent = false;
     static String fs = System.getProperty("file.separator");
     static Integer maxResidues = 11000;
     static Integer maxUsedDsspResNumInDsspFile = null;
@@ -78,15 +79,21 @@ public class FileParser {
         pdbFile = pf;
         dsspFile = df;
 
-        System.out.println("  Reading files...");
+        if(! FileParser.silent) {
+            System.out.println("  Reading files...");
+        }
         // read all lines of the files into lists
         pdbLines = new ArrayList<String>();
         pdbLines = slurpPDBFileToModel(pdbFile, "2");
-        System.out.println("    Read " + pdbLines.size() + " lines of file '" + pdbFile + "'.");
+        if(! FileParser.silent) {
+            System.out.println("    Read " + pdbLines.size() + " lines of file '" + pdbFile + "'.");
+        }
 
         dsspLines = new ArrayList<String>();
         dsspLines = slurpFile(dsspFile);
-        System.out.println("    Read all " + dsspLines.size() + " lines of file '" + dsspFile + "'.");
+        if(! FileParser.silent) {
+            System.out.println("    Read all " + dsspLines.size() + " lines of file '" + dsspFile + "'.");
+        }
 
         // parse the lists, filling the data arrays (models, chains, residues, atoms)
         s_models = new ArrayList<Model>();
@@ -101,6 +108,7 @@ public class FileParser {
         //                                              //  have to go through the whole list (which is slow and stupid, bah).
         resIndexDSSP = new Integer[maxResidues];
 
+        
         if(parseData()) {
             dataInitDone = true;
             return(true);
@@ -224,7 +232,9 @@ public class FileParser {
 
                     if( mID.equals(stopAtModelID) || endModelAlreadyHit ) {
                         endModelAlreadyHit = true;
-                        System.out.println("  Aborting the parsing of PDB file at line " + (numLines + 1) + " as requested because model " + mID + " starts here.");
+                        if(! FileParser.silent) {
+                            System.out.println("  Aborting the parsing of PDB file at line " + (numLines + 1) + " as requested because model " + mID + " starts here.");
+                        }
                         break;
                     }
                     else {
@@ -249,7 +259,7 @@ public class FileParser {
                 System.err.println("ERROR: Parsing line failed: '" + errMsg + "'.");
             }
             e.printStackTrace();
-            System.exit(-1);
+            System.exit(1);
 	}
 
         return(lines);
@@ -272,7 +282,9 @@ public class FileParser {
 
     private static Boolean parseData() {
 
-        System.out.println("  Parsing pdb and dssp file lines...");
+        if(! FileParser.silent) {
+            System.out.println("  Parsing pdb and dssp file lines...");
+        }
 
         // init class vars
         curLineNumPDB = 0;
@@ -284,12 +296,15 @@ public class FileParser {
         oldChainID = " ";
         oldModelID = "";
 
-
-        System.out.println("  Scanning whole PDB file for models...");
+        if(! FileParser.silent) {
+            System.out.println("  Scanning whole PDB file for models...");
+        }
         createAllModelIDsFromWholePdbFile();   // fills s_allModelIDsFromWholePDBFile
 
         // create all models, chains and residues first. parse atoms afterwards.
-        System.out.println("  Creating all Models from handled PDB lines...");
+        if(! FileParser.silent) {
+            System.out.println("  Creating all Models from handled PDB lines...");
+        }
         createAllModelsFromHandledPdbLines();   // fills s_models
 
         if(s_models.size() > 1) {
@@ -297,10 +312,14 @@ public class FileParser {
             System.exit(1);
         }
 
-        System.out.println("  Creating all Chains...");
+        if(! FileParser.silent) {
+            System.out.println("  Creating all Chains...");
+        }
         createAllChainsFromPdbData();   // fills s_chains
 
-        System.out.println("  Creating all Residues...");
+        if(! FileParser.silent) {
+            System.out.println("  Creating all Residues...");
+        }
         dsspDataStartLine = readDsspToData();
         createAllResiduesFromDsspData();    // fills s_residues
 
@@ -311,10 +330,14 @@ public class FileParser {
             System.exit(2);
         }
 
-        System.out.println("  Creating all Ligand Residues...");
+        if(! FileParser.silent) {
+            System.out.println("  Creating all Ligand Residues...");
+        }
         createAllLigandResiduesFromPdbData();       // adds stuff to s_residues
 
-        System.out.println("  Creating all SSEs according to DSSP definition...");
+        if(! FileParser.silent) {
+            System.out.println("  Creating all SSEs according to DSSP definition...");
+        }
         //s_dsspSSEs = createAllSSEsFromResidueList();     // fills s_dsspSSEs
 
         //System.out.println("   Done with all DSSP SSEs, ligand SSEs not created yet:");
@@ -329,8 +352,9 @@ public class FileParser {
         //createAllPtglSSEsFromSSEList();         // fills s_ptglSSEs
 
 
-
-        System.out.println("  Creating all Atoms...");
+        if(! FileParser.silent) {
+            System.out.println("  Creating all Atoms...");
+        }
         Boolean ignoreRestOfFile = false;
        
         // parse all PDB lines based on format definitions at http://deposit.rcsb.org/adit/docs/pdb_atom_format.html
@@ -364,11 +388,12 @@ public class FileParser {
 
         }
 
-        
-        System.out.println("    PDB: Hit end of PDB file at line " + curLineNumPDB + ".");
+        if(! FileParser.silent) {
+            System.out.println("    PDB: Hit end of PDB file at line " + curLineNumPDB + ".");
 
-        // remove duplicate atoms from altLoc here
-        System.out.println("    PDB: Selecting alternative locations for atoms of all residues.");
+            // remove duplicate atoms from altLoc here
+            System.out.println("    PDB: Selecting alternative locations for atoms of all residues.");
+        }
         ArrayList<Atom> deletedAtoms;
         int numAtomsDeletedAltLoc = 0;
         int numResiduesAffected = 0;
@@ -394,13 +419,15 @@ public class FileParser {
                 }
             }
         }
-        System.out.println("    PDB: Deleted " + numAtomsDeletedAltLoc + " duplicate atoms from " + numResiduesAffected + " residues which had several alternative locations.");
+        if(! FileParser.silent) {
+            System.out.println("    PDB: Deleted " + numAtomsDeletedAltLoc + " duplicate atoms from " + numResiduesAffected + " residues which had several alternative locations.");
 
-        // report statistics
-        System.out.println("  All data parsed. Found " + s_models.size() + " models, " +
-                                                       s_chains.size() + " chains, " +
-                                                       s_residues.size() + " residues, " +
-                                                       s_atoms.size() + " atoms.");
+            // report statistics
+            System.out.println("  All data parsed. Found " + s_models.size() + " models, " +
+                                                           s_chains.size() + " chains, " +
+                                                           s_residues.size() + " residues, " +
+                                                           s_atoms.size() + " atoms.");
+        }
 
         return(true);
     }
@@ -706,7 +733,9 @@ public class FileParser {
             System.exit(1);
         }
 
-        System.out.println("    PDB: Found C Terminus of chain " + cID + " at PDB line " + curLineNumPDB + ", PDB residue number " + cTerminusResNumPDB + ".");
+        if(! FileParser.silent) {
+            System.out.println("    PDB: Found C Terminus of chain " + cID + " at PDB line " + curLineNumPDB + ", PDB residue number " + cTerminusResNumPDB + ".");
+        }
         //TODO: mark the proper residue as C terminus
 
         return(true);
@@ -1063,14 +1092,18 @@ public class FileParser {
 
         }
 
-        System.out.println("    PDB: Scanned whole PDB file for Models, found " + numModels + ".");
+        if(! FileParser.silent) {
+            System.out.println("    PDB: Scanned whole PDB file for Models, found " + numModels + ".");
 
-        if(numModels < 1) {
-            System.out.println("    PDB: This most likely is crystal data (a non-NMR file without models). A default model will be created.");
+            if(numModels < 1) {
+                System.out.println("    PDB: This most likely is crystal data (a non-NMR file without models). A default model will be created.");
+            }
         }
 
         if(numModels > 1) {
-            System.out.println("    PDB: Multiple models found, all but the default model will be ignored.");
+            if(! FileParser.silent) {
+                System.out.println("    PDB: Multiple models found, all but the default model will be ignored.");
+            }
 
             if(Settings.getBoolean("plcc_B_split_dsspfile_warning")) {
                 System.err.println("*************************************** WARNING ******************************************");
@@ -1164,13 +1197,17 @@ public class FileParser {
 
                     s_chains.add(c);
 
-                    System.out.println("    PDB: New PDB Chain (chain ID '" + cID + "') starts at PDB line " + pLineNum + ".");
+                    if(! FileParser.silent) {
+                        System.out.println("    PDB: New PDB Chain (chain ID '" + cID + "') starts at PDB line " + pLineNum + ".");
+                    }
                 }
             }
 
         }
 
-        System.out.println("    PDB: Scanned PDB file for Chains, found " + s_chains.size() + ".");
+        if(! FileParser.silent) {
+            System.out.println("    PDB: Scanned PDB file for Chains, found " + s_chains.size() + ".");
+        }
 
     }
 
@@ -1196,7 +1233,9 @@ public class FileParser {
             dLineNum = i + 1;
 
             if(dLine.substring(13, 14).equals("!")) {       // chain brake
-                System.out.println("    DSSP: Found chain brake at DSSP line " + dLineNum + ".");
+                if(! FileParser.silent) {
+                    System.out.println("    DSSP: Found chain brake at DSSP line " + dLineNum + ".");
+                }
             }
             else {          // parse the residue line
 
@@ -1445,8 +1484,10 @@ public class FileParser {
                         resIndex = s_residues.size() - 1;
                         resIndexDSSP[resNumDSSP] = resIndex;
                         //resIndexPDB[resNumPDB] = resIndex;      // This will crash because some PDB files contain negative residue numbers so fuck it.
-                        System.out.println("    PDB: Added ligand '" +  resNamePDB + "-" + resNumPDB + "', chain " + chainID + " (line " + pLineNum + ", ligand #" + curLigNum + ", DSSP #" + resNumDSSP + ").");
-                        System.out.println("    PDB:   => Ligand name = '" + lig.getLigName() + "', formula = '" + lig.getLigFormula() + "', synonyms = '" + lig.getLigSynonyms() + "'.");
+                        if(! FileParser.silent) {
+                            System.out.println("    PDB: Added ligand '" +  resNamePDB + "-" + resNumPDB + "', chain " + chainID + " (line " + pLineNum + ", ligand #" + curLigNum + ", DSSP #" + resNumDSSP + ").");
+                            System.out.println("    PDB:   => Ligand name = '" + lig.getLigName() + "', formula = '" + lig.getLigFormula() + "', synonyms = '" + lig.getLigSynonyms() + "'.");
+                        }
                         
                     }
 
@@ -1709,7 +1750,9 @@ public class FileParser {
         if(pmi.isReady()) {
             //System.out.println("    Extracted MOL_ID '" + mol_id + "' for chain '" + chainid + "' from PDB header.");
             if(pmi.getAllMetaData(pdbLines)) {
-                System.out.println("    Retrieved all meta data for chain '" + chainid + "' from PDB header.");
+                if(! FileParser.silent) {
+                    System.out.println("    Retrieved all meta data for chain '" + chainid + "' from PDB header.");
+                }
             }
         }
         else {
