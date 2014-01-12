@@ -218,10 +218,12 @@ public class FoldingGraph extends SSEGraph {
         //--------------------------------------------------------------------------------------------------
         //--------------------------------------------------------------------------------------------------
         //--------------------------------------------------------------------------------------------------
+        /*
         if(Settings.getInteger("plcc_I_debug_level") < 1) {
             System.out.println("         -Not drawing KEY notation: WIP.");
             return false;
         }
+        */
         //--------------------------------------------------------------------------------------------------
         //--------------------------------------------------------------------------------------------------
         //--------------------------------------------------------------------------------------------------
@@ -356,7 +358,9 @@ public class FoldingGraph extends SSEGraph {
                     else if(spatRel == SpatRel.NONE) {
                         // should never happen
                         headingsSpatOrder[spatPos] = headingsSpatOrder[spatPos-1];    // whatever
-                        System.err.println("ERROR: Vertices without contact are considered neighbors in the graph.");
+                        System.err.println("WARNING: Vertices at indices " + sseSeqIndex + " and " + lastsseSeqIndex + " without contact are considered neighbors in the graph.");
+                        System.err.println("WARNING: SSE " + sseSeqIndex + ": " + this.getVertex(sseSeqIndex).longStringRep() + ", SSE " + lastsseSeqIndex + ": " + this.getVertex(lastsseSeqIndex).longStringRep() + ".");
+                        
                         //System.exit(1);
                     }
                     else {
@@ -373,6 +377,7 @@ public class FoldingGraph extends SSEGraph {
                 }
                 
                 // DEBUG output
+                /*
                 System.out.println("DEBUG: " + this.toShortString() );
                 System.out.println("DEBUG: SpatOrder: " + IO.intArrayListToString(this.spatOrder) );
                 System.out.println("DEBUG: SpatHeadg: " + IO.intArrayToString(headingsSpatOrder) );
@@ -382,6 +387,7 @@ public class FoldingGraph extends SSEGraph {
                     neighbors += this.degreeOfVertex(i) + " ";
                 }
                 System.out.println(neighbors);
+                */
                 
             }                                    
             
@@ -406,6 +412,10 @@ public class FoldingGraph extends SSEGraph {
                             else if(edgeType.equals(SpatRel.LIGAND)) { ig2.setPaint(Color.MAGENTA); }
                             else if(edgeType.equals(SpatRel.BACKBONE)) { ig2.setPaint(Color.ORANGE); }
                             else { ig2.setPaint(Color.LIGHT_GRAY); }
+                            
+                            if(Settings.getBoolean("plcc_B_key_foldinggraph_arcs_allways_black")) {
+                                ig2.setPaint(Color.BLACK);
+                            }
 
                             // determine the center of the arc and the width of its rectangle bounding box
                             //iSpatIndex = spatOrder.get(i);
@@ -446,35 +456,35 @@ public class FoldingGraph extends SSEGraph {
                             // Determine the y axis positions where the connector should start (at the left vertex) and end (at the right vertex). This depends
                             //  on whether the respective vertex points upwards or downwards.
                             
-                            System.out.print("Contact " + i + "," + j + " (left is " + leftVertSeq + "[spat:" + this.getSpatOrderIndexOfSSE(leftVertSeq) + "], right is " + rightVertSeq + "[spat:" + this.getSpatOrderIndexOfSSE(rightVertSeq) + "]): ");
+                            //System.out.print("Contact " + i + "," + j + " (left is " + leftVertSeq + "[spat:" + this.getSpatOrderIndexOfSSE(leftVertSeq) + "], right is " + rightVertSeq + "[spat:" + this.getSpatOrderIndexOfSSE(rightVertSeq) + "]): ");
                             
                             if(headingsSeqOrder[leftVertSeq] == ORIENTATION_UPWARDS) {
                                 // the left vertex points upwards, so the arc should start at its top
                                 leftVertPosY = vertStartY - vertHeight;
                                 startUpwards = true;
-                                System.out.print("leftVert starts upwards, ");
+                                //System.out.print("leftVert starts upwards, ");
                             }
                             else {
                                 // the left vertex points downwards, so the arc should start at its bottom
                                 leftVertPosY = vertStartY;
                                 startUpwards = false;
-                                System.out.print("leftVert starts downwards, ");
+                                //System.out.print("leftVert starts downwards, ");
                             }
                             
                             if(headingsSeqOrder[rightVertSeq] == ORIENTATION_UPWARDS) {
                                 // the right vertex points upwards, so the arc should end at its bottom
                                 rightVertPosY = vertStartY;
-                                System.out.print("rightVert starts upwards. ");
+                                //System.out.print("rightVert starts upwards. ");
                             }
                             else {
                                 // the right vertex points downwards, so the arc should end at its top
                                 rightVertPosY = vertStartY - vertHeight;
-                                System.out.print("rightVert starts downpwards. ");
+                                //System.out.print("rightVert starts downpwards. ");
                             }
                             
                             
                             // draw it        
-                            System.out.print("Getting arc from " + leftVertPosX + "," + leftVertPosY + " to " + rightVertPosX + "," + rightVertPosY + ".\n");
+                            //System.out.print("Getting arc from " + leftVertPosX + "," + leftVertPosY + " to " + rightVertPosX + "," + rightVertPosY + ".\n");
                             ArrayList<Shape> connShapes = this.getArcConnector(leftVertPosX, leftVertPosY, rightVertPosX, rightVertPosY, ig2.getStroke(), startUpwards);
                             for(Shape s : connShapes) {
                                 ig2.draw(s);
@@ -554,15 +564,18 @@ public class FoldingGraph extends SSEGraph {
                 
                 
                 // draw the N or C terminus label under it if applicable
-                if( (this.closestToCTerminus() == i)  || (this.closestToNTerminus() == i) ) {
-                    if(this.closestToCTerminus() == i) {
-                        System.out.println("    SSE # " + i + " is closest to C terminus.");
-                        //ig2.drawString("C", currentVertX, (currentVertY + 20));
+                //Integer compareToTerminus = s;
+                Integer compareToTerminus = i;
+                Integer ssePos = s;
+                if( (this.closestToCTerminus() == compareToTerminus)  || (this.closestToNTerminus() == compareToTerminus) ) {
+                    if(this.closestToCTerminus() == compareToTerminus) {
+                        System.out.println("    SSE # " + compareToTerminus + " (pos # " + ssePos + ") is closest to C terminus.");
+                        ig2.drawString("C", currentVertX, (currentVertY + 20));
                     }
                     
-                    if(this.closestToNTerminus() == i) { 
-                        System.out.println("    SSE # " + i + " is closest to N terminus.");
-                        //ig2.drawString("N", currentVertX, (currentVertY + 20));
+                    if(this.closestToNTerminus() == compareToTerminus) { 
+                        System.out.println("    SSE # " + compareToTerminus + " (pos # " + ssePos + ")  is closest to N terminus.");
+                        ig2.drawString("N", currentVertX, (currentVertY + 20));
                     }      
                     
                 }

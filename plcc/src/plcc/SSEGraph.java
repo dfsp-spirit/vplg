@@ -902,9 +902,16 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
      */
     public Integer getContactType(Integer x, Integer y) {
 
+        if(x < 0 || y < 0) {
+            System.err.println("ERROR: getContactType(): Contact " + x + "/" + y + " out of range (graph has " + this.sseList.size() + " vertices), no negative values allowed.");
+            //System.exit(-1);
+            return SpatRel.NONE;
+        }
+        
         if(x >= this.sseList.size() || y >= this.sseList.size()) {
             System.err.println("ERROR: getContactType(): Contact " + x + "/" + y + " out of range (graph has " + this.sseList.size() + " vertices).");
-            System.exit(-1);
+            //System.exit(-1);
+            return SpatRel.NONE;
         }
 
         return(matrix[x][y]);
@@ -1377,6 +1384,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
 
     /**
      * Determines the SSE/vertex which is closest to the C-terminus (has the highest DSSP end residue number).
+     * @return the SSE/vertex by index in the SSE list
      */
     public Integer closestToCTerminus() {
         Integer vertIndex = -1;
@@ -2552,14 +2560,14 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
      */
     public ArrayList<Shape> getArcConnector(Integer startX, Integer startY, Integer targetX, Integer targetY, Stroke stroke, Boolean startUpwards) {
 
-        System.out.print("getArcConnector: startX=" + startX + ", startY=" + startY + ", targetX=" + targetX + ", targetY=" + targetY + ", startUpwards=" + startUpwards.toString() + ": ");
+        // System.out.print("getArcConnector: startX=" + startX + ", startY=" + startY + ", targetX=" + targetX + ", targetY=" + targetY + ", startUpwards=" + startUpwards.toString() + ": ");
         
         if(startY.equals(targetY)) {
-            System.out.print("getting simple connector(" + startY + " == " + targetY + ").\n");
+            // System.out.print("getting simple connector(" + startY + " == " + targetY + ").\n");
             return(getSimpleArcConnector(startX, startY, targetX, stroke, startUpwards));            
         }
         else {
-            System.out.print("getting crossover connector(" + startY + " != " + targetY + ").\n");
+            // System.out.print("getting crossover connector(" + startY + " != " + targetY + ").\n");
             return(getCrossoverArcConnector(startX, startY, targetX, targetY, stroke, startUpwards));
         }        
     }

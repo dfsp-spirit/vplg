@@ -824,6 +824,12 @@ public class Main {
             usage_short();      // the first argument (pdbid) is required!
             System.exit(0);
         }
+        
+        
+        Boolean silent = false;
+        if(Settings.getBoolean("plcc_B_silent")) {
+            silent = true;
+        }
 
         // This check is rather useless and it will break PDB files that were split into multiple files (one for each
         //  model) and renames, e.g. "2kos_1.pdb" for model 1 of protein 2kos. It is therefore disabaled atm.
@@ -839,11 +845,15 @@ public class Main {
         }
         
         if(Settings.getInteger("plcc_I_debug_level") > 0) {
-            System.out.println("  Debug level set to " + Settings.getInteger("plcc_I_debug_level") + ".");
+            if(! silent) {
+             System.out.println("  Debug level set to " + Settings.getInteger("plcc_I_debug_level") + ".");
+            }
         }
         
         if(useFileFromCommandline) {
-            System.out.println("  Using PDB file '" + pdbFile + "', dssp file '" + dsspFile + "', output directory '" + outputDir + "'.");
+            if(! silent) {
+                System.out.println("  Using PDB file '" + pdbFile + "', dssp file '" + dsspFile + "', output directory '" + outputDir + "'.");
+            }
         }
         
         if(Settings.getInteger("plcc_I_debug_level") > 0) {
@@ -852,12 +862,16 @@ public class Main {
         
         
         if(Settings.getBoolean("plcc_B_search_similar")) {
-            System.out.println("Searching for proteins similar to PDB ID '" + Settings.get("plcc_B_search_similar_PDBID") + "' chain '" + Settings.get("plcc_B_search_similar_chainID") + "' graph type '" + Settings.get("plcc_S_search_similar_graphtype") + "'.");
+            if(! silent) {
+                System.out.println("Searching for proteins similar to PDB ID '" + Settings.get("plcc_B_search_similar_PDBID") + "' chain '" + Settings.get("plcc_B_search_similar_chainID") + "' graph type '" + Settings.get("plcc_S_search_similar_graphtype") + "'.");
+            }
             
             if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"))) {
                 
                 if(Settings.get("plcc_S_search_similar_method").equals(Similarity.SIMILARITYMETHOD_STRINGSSE)) {
-                    System.out.println("Using similarity method '" + Settings.get("plcc_S_search_similar_method") + "'.");
+                    if(! silent) {
+                        System.out.println("Using similarity method '" + Settings.get("plcc_S_search_similar_method") + "'.");                        
+                    }
                 
                     String patternSSEString = null;
                     try {
@@ -871,16 +885,22 @@ public class Main {
                         System.err.println("ERROR: DB: SSE string for requested graph is not in the database, exiting.");
                         System.exit(1);
                     } else {
-                        System.out.println("Using pattern SSEstring '" + patternSSEString + "'.");
+                        if(! silent) {
+                            System.out.println("Using pattern SSEstring '" + patternSSEString + "'.");
+                        }
                     }
 
                     CompareOneToDB.performSSEStringComparison(patternSSEString);
                 } else if (Settings.get("plcc_S_search_similar_method").equals(Similarity.SIMILARITYMETHOD_GRAPHSET)) {
-                    System.out.println("Using similarity method '" + Settings.get("plcc_S_search_similar_method") + "'.");
+                    if(! silent) {
+                        System.out.println("Using similarity method '" + Settings.get("plcc_S_search_similar_method") + "'.");
+                    }
                     CompareOneToDB.performGraphSetComparison();                    
                 }
                 else if (Settings.get("plcc_S_search_similar_method").equals(Similarity.SIMILARITYMETHOD_GRAPHCOMPAT)) {
-                    System.out.println("Using similarity method '" + Settings.get("plcc_S_search_similar_method") + "'.");
+                    if(! silent) {
+                        System.out.println("Using similarity method '" + Settings.get("plcc_S_search_similar_method") + "'.");
+                    }
                     CompareOneToDB.performGraphCompatGraphComparison();                    
                 }
                 else {
@@ -922,7 +942,9 @@ public class Main {
         }
 
 
-        System.out.println("  Checked required files and directories, looks good.");
+        if(! silent) {
+            System.out.println("  Checked required files and directories, looks good.");
+        }
 
         pdbIdDotGeoFile = output_dir + fs + pdbid.toLowerCase() + ".geo";               // holds info on contacts between residues of the PDB file
         pdbIdDotGeoLigFile = output_dir + fs + pdbid.toLowerCase() + ".geolig";         // holds info on contacts between residues + ligands of the PDB file
@@ -934,8 +956,10 @@ public class Main {
         resMapFile = output_dir + fs + pdbid.toLowerCase();         // chain and file extension is added later 
 
         if(Settings.getBoolean("plcc_B_ptgl_text_output")) {
-            System.out.println("  Using output files:\n    * " + pdbIdDotGeoFile + " for contact data\n    * " + pdbIdDotGeoLigFile + " for lig contact data");
-            System.out.println("    * " + conDotSetFile + " for contact statistics\n    * " + dsspLigFile + " for DSSP ligand file.");
+            if(! silent) {
+                System.out.println("  Using output files:\n    * " + pdbIdDotGeoFile + " for contact data\n    * " + pdbIdDotGeoLigFile + " for lig contact data");
+                System.out.println("    * " + conDotSetFile + " for contact statistics\n    * " + dsspLigFile + " for DSSP ligand file.");
+            }
         }
 
 
@@ -947,9 +971,13 @@ public class Main {
             Integer plcc_db_port = Settings.getInteger("plcc_I_db_port");
             String plcc_db_username = Settings.get("plcc_S_db_username");
             String plcc_db_password = Settings.get("plcc_S_db_password");
-            System.out.println("  Checking database connection to host '" + plcc_db_host + "' on port '" + plcc_db_port + "'...");
+            if(! silent) {
+                System.out.println("  Checking database connection to host '" + plcc_db_host + "' on port '" + plcc_db_port + "'...");
+            }
             if(DBManager.init(plcc_db_name, plcc_db_host, plcc_db_port, plcc_db_username, plcc_db_password)) {
-                System.out.println("  -> Database connection OK.");
+                if(! silent) {
+                    System.out.println("  -> Database connection OK.");
+                }
             }
             else {
                 System.out.println("  -> Database connection FAILED.");
@@ -958,28 +986,34 @@ public class Main {
             }
         }
         else {
-            System.out.println("  Not using the database as requested by options.");
+            if(! silent) {
+                System.out.println("  Not using the database as requested by options.");
+            }
         }
 
         // **************************************    here we go: parse files and get data    ******************************************
-        System.out.println("Getting data...");
+        if(! silent) {
+            System.out.println("Getting data...");
+        }
         FileParser.initData(pdbFile, dsspFile);
 
         allModelsIDsOfWholePDBFile = FileParser.getAllModelIDsFromWholePdbFile();
 
-        // print all model IDs from the PDB file (not just the handled model)
-        System.out.println("    PDB: Found the following NMR models in the whole PDB file:");
-        System.out.print("    PDB:");
-        
-        if(allModelsIDsOfWholePDBFile.size() > 0) {
-        
-            for(Integer i = 0; i < allModelsIDsOfWholePDBFile.size(); i++) {
-                System.out.print("  " + allModelsIDsOfWholePDBFile.get(i));
+        if(! silent) {
+            // print all model IDs from the PDB file (not just the handled model)
+            System.out.println("    PDB: Found the following NMR models in the whole PDB file:");
+            System.out.print("    PDB:");
+
+            if(allModelsIDsOfWholePDBFile.size() > 0) {
+
+                for(Integer i = 0; i < allModelsIDsOfWholePDBFile.size(); i++) {
+                    System.out.print("  " + allModelsIDsOfWholePDBFile.get(i));
+                }
+                System.out.print("\n");
             }
-            System.out.print("\n");
-        }
-        else {
-            System.out.print(" <None> (No NMR data, an artificial default model was added.)\n");
+            else {
+                System.out.print(" <None> (No NMR data, an artificial default model was added.)\n");
+            }
         }
         
         models = FileParser.getModels();    // doesn't do much anymore since only the PDB lines of model 1 are currently in there
@@ -990,11 +1024,13 @@ public class Main {
         
         if(Settings.getBoolean("plcc_B_skip_too_large")) {
             if(atoms.size() > Settings.getInteger("plcc_I_skip_num_atoms_threshold")) {
-                System.out.println("===== Terminating. =====");
-                System.out.println("Maximal number of atoms allowed in PDB file is set to " + Settings.getInteger("plcc_I_skip_num_atoms_threshold") + " and PDB " + pdbid + " contains " + atoms.size() + ".");
-                System.out.println("This is a batch/cluster feature to ignore very large PDB files which take ages to compute.");
-                System.out.println("A max_atoms setting of around 80.000 makes most sense (see PDB statistics).");
-                System.out.println("Set 'plcc_B_skip_too_large' to false in settings to avoid this. Exiting.");
+                System.err.println("===== Terminating: 'plcc_B_skip_too_large' is enabled in settings and this protein has too many atoms =====");
+                if(! silent) {
+                    System.out.println("Maximal number of atoms allowed in PDB file is set to " + Settings.getInteger("plcc_I_skip_num_atoms_threshold") + " and PDB " + pdbid + " contains " + atoms.size() + ".");
+                    System.out.println("This is a batch/cluster feature to ignore very large PDB files which take ages to compute.");
+                    System.out.println("A max_atoms setting of around 80.000 makes most sense (see PDB statistics).");
+                    System.out.println("Set 'plcc_B_skip_too_large' to false in settings to avoid this. Exiting.");
+                }
                 System.exit(0);
             }
         }
@@ -1003,7 +1039,9 @@ public class Main {
         
         String sBondString;
         if(sulfurBridges.size() > 0) {
-            System.out.print("    DSSP: Protein contains " + sulfurBridges.size() + " disulfide bridges: ");
+            if(! silent) {
+                System.out.print("    DSSP: Protein contains " + sulfurBridges.size() + " disulfide bridges: ");
+            }
             for(Character key : sulfurBridges.keySet()) {
                 sBondString = "(";
                 ArrayList<Integer> dsspResidueIDs = sulfurBridges.get(key);
@@ -1020,7 +1058,9 @@ public class Main {
             }
             System.out.print("\n");            
         } else {
-            System.out.println("    DSSP: Protein contains no disulfide bridges.");
+            if(! silent) {
+                System.out.println("    DSSP: Protein contains no disulfide bridges.");
+            }
         }
 
         // This is now done, separate for each chain, by a function in Main.java below
@@ -1050,18 +1090,24 @@ public class Main {
         else {
             // All residues exist, we can now calculate their maximal center sphere radius
             globalMaxCenterSphereRadius = getGlobalMaxCenterSphereRadius(residues);
-            System.out.println("  Maximal center sphere radius for all residues is " + globalMaxCenterSphereRadius + ".");
+            if(! silent) {
+                System.out.println("  Maximal center sphere radius for all residues is " + globalMaxCenterSphereRadius + ".");
+            }
 
             // ... and the maximal distance between neighbors in the AA sequence.
             // Note that this is a lot less useful with ligands enabled since they are always listed at the 
             //  end of the chain and may be far (in 3D) from their predecessor in the sequence.
-            globalMaxSeqNeighborResDist = getGlobalMaxSeqNeighborResDist(residues);        
-            System.out.println("  Maximal distance between residues that are sequence neighbors is " + globalMaxSeqNeighborResDist + ".");
+            globalMaxSeqNeighborResDist = getGlobalMaxSeqNeighborResDist(residues);     
+            if(! silent) {
+                System.out.println("  Maximal distance between residues that are sequence neighbors is " + globalMaxSeqNeighborResDist + ".");
+            }
         }
         // ... and fill in the frequencies of all AAs in this protein.
         getAADistribution(residues);
 
-        System.out.println("Received all data (" + models.size() + " Models, " + chains.size() + " Chains, " + residues.size() + " Residues, " + atoms.size() + " Atoms).");        
+        if(! silent) {
+            System.out.println("Received all data (" + models.size() + " Models, " + chains.size() + " Chains, " + residues.size() + " Residues, " + atoms.size() + " Atoms).");        
+        }
 
 
         // **************************************    calculate the contacts    ******************************************
@@ -1087,18 +1133,24 @@ public class Main {
         }
         */
 
-        System.out.println("Calculating residue contacts...");
+        if(! silent) {
+            System.out.println("Calculating residue contacts...");
+        }
 
         
         boolean separateContactsByChain = Settings.getBoolean("plcc_B_separate_contacts_by_chain");
         
         if(separateContactsByChain) {
-            System.out.println("Separating atom contact computation by chains. Will not compute inter-chain contacts.");
+            if(! silent) {
+                System.out.println("Separating atom contact computation by chains. Will not compute inter-chain contacts.");
+            }
         }         
         else {
-            if(atoms.size() > 50000 || chains.size() > 1) {
-                System.out.println("INFO: This multi-chain protein is large (" + atoms.size() + " atoms, " + chains.size() + " chains).");
-                System.out.println("INFO:  Using chain separation (the '-E' command line switch) will speed up the computation a lot.");
+            if(atoms.size() > 50000 || (chains.size() > 1 && atoms.size() > 15000)) {
+                if(! silent) {
+                    System.out.println("INFO: This multi-chain protein is large (" + atoms.size() + " atoms, " + chains.size() + " chains).");
+                    System.out.println("INFO:  Using chain separation (the '-E' command line switch) will speed up the computation a lot.");
+                }
             }
         }
         
@@ -1110,7 +1162,9 @@ public class Main {
             cInfo = null;
         } else {        
             cInfo = calculateAllContacts(residues);
-            System.out.println("Received data on " + cInfo.size() + " residue contacts that have been confirmed on atom level.");
+            if(! silent) {
+                System.out.println("Received data on " + cInfo.size() + " residue contacts that have been confirmed on atom level.");
+            }
             cInfoThisChain = null;
         }
         
@@ -1120,7 +1174,9 @@ public class Main {
                 DP.getInstance().w("Cannot compare residue contacts for whole PDB file in compute-contacts-per-chain mode.");
             }
             else {
-                System.out.println("DEBUG: Comparing calculated residue contacts with those in the file '" + compareResContactsFile + "'.");
+                if(! silent) {
+                    System.out.println("DEBUG: Comparing calculated residue contacts with those in the file '" + compareResContactsFile + "'.");
+                }
                 FileParser.compareResContactsWithPdbidDotGeoFile(compareResContactsFile, false, cInfo);
             }
         }               
@@ -1136,7 +1192,9 @@ public class Main {
                 DP.getInstance().w("Cannot show contact overview for whole PDB file in compute-contacts-per-chain mode.");
             } 
             else {
-                System.out.println("Showing contact overview...");
+                if(! silent) {
+                    System.out.println("Showing contact overview...");
+                }
                 showContactOverview(cInfo);
             }
         }
@@ -1146,7 +1204,9 @@ public class Main {
                 DP.getInstance().w("Cannot show contact statistics for whole PDB file in compute-contacts-per-chain mode.");
             }
             else {
-                System.out.println("Showing statistics overview...");
+                if(! silent) {
+                    System.out.println("Showing statistics overview...");
+                }
                 showContactStatistics(residues.size());
             }
             
@@ -1159,7 +1219,9 @@ public class Main {
                 DP.getInstance().w("Cannot write residue contact info file for whole PDB file in compute-contacts-per-chain mode.");
             }
             else {
-                System.out.println("Writing residue contact info file...");
+                if(! silent) {
+                    System.out.println("Writing residue contact info file...");
+                }
                 writeContacts(cInfo, pdbIdDotGeoFile, false);
             }
 
@@ -1168,7 +1230,9 @@ public class Main {
                     DP.getInstance().w("Cannot show contact statistics for whole PDB file in compute-contacts-per-chain mode.");
                 }   
                 else {
-                    System.out.println("Writing full contact info file including ligands...");
+                    if(! silent) {
+                        System.out.println("Writing full contact info file including ligands...");
+                    }
                     writeContacts(cInfo, pdbIdDotGeoLigFile, true);
                 }
             }
@@ -1177,25 +1241,35 @@ public class Main {
                 DP.getInstance().w("Cannot write statistics file for whole PDB file in compute-contacts-per-chain mode.");
             }
             else {
-                System.out.println("Writing statistics file...");
+                if(! silent) {
+                    System.out.println("Writing statistics file...");
+                }
                 writeStatistics(conDotSetFile, pdbid, residues.size());
             }
 
             // write the dssplig file
-            System.out.println("Writing DSSP ligand file...");
+            if(! silent) {
+                System.out.println("Writing DSSP ligand file...");
+            }
             //writeDsspLigFile(dsspFile, dsspLigFile, cInfo, residues);
             writeOrderedDsspLigFile(dsspFile, dsspLigFile, residues);
 
             // write chains file
-            System.out.println("Writing chain file...");
+            if(! silent) {
+                System.out.println("Writing chain file...");
+            }
             writeChains(chainsFile, pdbid, chains);
 
             // write ligand file
-            System.out.println("Writing ligand file...");
+            if(! silent) {
+                System.out.println("Writing ligand file...");
+            }
             writeLigands(ligandsFile, pdbid, residues);
             
             // write residue mapping files
-            System.out.println("Writing residue mapping files for all chains...");
+            if(! silent) {
+                System.out.println("Writing residue mapping files for all chains...");
+            }
             for(Chain c : chains) {
                 writeResMappings(resMapFile + "_" + c.getPdbChainID() + ".resmap", c);
             }
@@ -1212,7 +1286,9 @@ public class Main {
             */
 
             // write models file
-            System.out.println("Writing models file...");
+            if(! silent) {
+                System.out.println("Writing models file...");
+            }
             writeModels(modelsFile, pdbid, allModelsIDsOfWholePDBFile);
 
             // generate the PyMol selection script
@@ -1220,7 +1296,9 @@ public class Main {
                 DP.getInstance().w("Cannot write PyMol script for whole PDB file in compute-contacts-per-chain mode.");
             }
             else {
-                System.out.println("Generating Pymol script to highlight protein-ligand contacts...");
+                if(! silent) {
+                    System.out.println("Generating Pymol script to highlight protein-ligand contacts...");
+                }
                 // String pms = getPymolSelectionScript(cInfo);             // old version: all protein residues on 1 selection
                 String pms = getPymolSelectionScriptByLigand(cInfo);        // new version: a separate selection of protein residues for each ligand
 
@@ -1232,7 +1310,9 @@ public class Main {
                 String pmsFile = outputDir + fs + pdbid + ".pymol";
 
                 if(writeStringToFile(pmsFile, pms)) {
-                    System.out.println("  PyMol script written to file '" + pmsFile + "'.");
+                    if(! silent) {
+                        System.out.println("  PyMol script written to file '" + pmsFile + "'.");
+                    }
                 }
                 else {
                     System.err.println("ERROR: Could not write PyMol script to file '" + pmsFile + "'.");
@@ -1241,7 +1321,9 @@ public class Main {
 
         }
         else {
-            System.out.println("  Not writing any interim results to text files as requested (geom_neo compatibility mode off).");
+            if(! silent) {
+                System.out.println("  Not writing any interim results to text files as requested (geom_neo compatibility mode off).");
+            }
         }
         
         if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
@@ -1253,7 +1335,9 @@ public class Main {
         ArrayList<Chain> handleChains = new ArrayList<Chain>();
         if(Settings.getBoolean("plcc_B_force_chain")) {
         
-            System.out.println(" Forced handling of the chain with chain ID '" + Settings.get("plcc_S_forced_chain_id") + "' only.");
+            if(! silent) {
+                System.out.println(" Forced handling of the chain with chain ID '" + Settings.get("plcc_S_forced_chain_id") + "' only.");
+            }
             
             for(Chain c : chains) {
                 if(c.getPdbChainID().equals(Settings.get("plcc_S_forced_chain_id"))) {
@@ -1290,13 +1374,17 @@ public class Main {
             if(separateContactsByChain || cInfo == null) {
                 System.err.println("Cannot compute amino acid level contact graph for all chains combined, contact separation is on.");
             } else {
-                System.out.println("Computing amino acid level contact graph for all chains combined.");
+                if(! silent) {
+                    System.out.println("Computing amino acid level contact graph for all chains combined.");
+                }
                 AAGraph aag = new AAGraph(residues, cInfo);
                 aag.setPdbid(pdbid);
                 aag.setChainid(AAGraph.CHAINID_ALL_CHAINS);
                 String aagFile = outputDir + fs + pdbid + "_aagraph.gml";
                 if(writeStringToFile(aagFile, aag.toGraphModellingLanguageFormat())) {
-                    System.out.println("  AAGraph for all chains written to file '" + aagFile + "'.");
+                    if(! silent) {
+                        System.out.println("  AAGraph for all chains written to file '" + aagFile + "'.");
+                    }
                 }
                 else {
                     System.err.println("ERROR: Could not write AAGraph for all chains to file '" + aagFile + "'.");
@@ -1310,9 +1398,10 @@ public class Main {
         // ********************************************** SSE stuff and graph computation ******************************************//
 
         if(Settings.getBoolean("plcc_B_calc_draw_graphs")) {
-            System.out.println("  Calculating SSE graphs.");
-            
-            System.out.println("Calculating SSEs for all chains of protein " + pdbid + "...");
+            if(! silent) {
+                System.out.println("  Calculating SSE graphs.");
+                System.out.println("Calculating SSEs for all chains of protein " + pdbid + "...");
+            }
             
             if(separateContactsByChain) {
                 String chainID;
@@ -1331,7 +1420,9 @@ public class Main {
                         aag.setChainid(c.getPdbChainID());
                         String aagFile = outputDir + fs + pdbid + "_aagraph_chain_" + c.getPdbChainID() + ".gml";
                         if(writeStringToFile(aagFile, aag.toGraphModellingLanguageFormat())) {
-                            System.out.println("  AAGraph for all chains written to file '" + aagFile + "'.");
+                            if(! silent) {
+                                System.out.println("  AAGraph for all chains written to file '" + aagFile + "'.");
+                            }
                         }
                         else {
                             System.err.println("ERROR: Could not write AAGraph for all chains to file '" + aagFile + "'.");
@@ -1345,21 +1436,26 @@ public class Main {
                 calculateSSEGraphsForChains(handleChains, residues, cInfo, pdbid, outputDir);
                 //calculateComplexGraph(handleChains, residues, cInfo, pdbid, outputDir);
             }
-            
-            System.out.println("All " + handleChains.size() + " chains done.");
+            if(! silent) {
+                System.out.println("All " + handleChains.size() + " chains done.");
+            }
             
             // discard contact info to free memory
             cInfo = null;
             cInfoThisChain = null;
         }
         else {
-            System.out.println("  Not calculating SSEs and not drawing graphs as requested.");
+            if(! silent) {
+                System.out.println("  Not calculating SSEs and not drawing graphs as requested.");
+            }
         }        
         
         // ******************************************** HTML output ******************************************************* //
         
         if(Settings.getBoolean("plcc_B_output_textfiles_dir_tree_html")) {
-            System.out.println(" Producing web pages for PDB " + pdbid + ".");
+            if(! silent) {
+                System.out.println(" Producing web pages for PDB " + pdbid + ".");
+            }
             File outputBaseDir = new File(outputDir);   // the path where the subdir tree will be created (this contains 'ic/8icd/A'-like directories in the end)
             File outputDirProtein = IO.generatePDBstyleSubdirTreeName(new File(outputDir), pdbid);  // looks like '$OUTPUTBASEDIR/ic/8icd/'
             if( ! IO.dirExistsIsDirectoryAndCanWrite(outputDirProtein)) {
@@ -1376,27 +1472,41 @@ public class Main {
             htmlGen.setRelativeCssFilePathsFromBasedir(new String[] { fsWeb + "vplgweb.css", fsWeb + "vplgweb_red.css", fsWeb + "vplgweb_blue.css", fsWeb + "vplgweb_green.css" });        // no, this ain't beautiful            
             htmlGen.setCssTitles(new String[] { "default", "red", "blue", "green" });
             
-            if(Settings.getBoolean("plcc_B_output_textfiles_dir_tree_core_html")) {                
-                System.out.println("  Writing core webpages. The base output directory is '" + outputBaseDir.getAbsolutePath() + "'.");
+            if(Settings.getBoolean("plcc_B_output_textfiles_dir_tree_core_html")) {  
+                if(! silent) {
+                    System.out.println("  Writing core webpages. The base output directory is '" + outputBaseDir.getAbsolutePath() + "'.");
+                }
                 if(cssGen.writeDefaultCssFileTo(new File(cssFilePath), CssGenerator.COLORSCHEME_RED)) {
+                    if(! silent) {
                     System.out.println("   Wrote default CSS file for web pages to '" + cssFilePath + "'.");
+                    }
                 }
                 if(cssGen.writeDefaultCssFileTo(new File(cssFilePathRed), CssGenerator.COLORSCHEME_RED)) {
-                    System.out.println("   Wrote red CSS file for web pages to '" + cssFilePathRed + "'.");
+                    if(! silent) {                    
+                        System.out.println("   Wrote red CSS file for web pages to '" + cssFilePathRed + "'.");
+                    }
                 }
                 if(cssGen.writeDefaultCssFileTo(new File(cssFilePathBlue), CssGenerator.COLORSCHEME_BLUE)) {
-                    System.out.println("   Wrote blue CSS file for web pages to '" + cssFilePathBlue + "'.");
+                    if(! silent) {
+                        System.out.println("   Wrote blue CSS file for web pages to '" + cssFilePathBlue + "'.");
+                    }
                 }
                 if(cssGen.writeDefaultCssFileTo(new File(cssFilePathGreen), CssGenerator.COLORSCHEME_GREEN)) {
-                    System.out.println("   Wrote green CSS file for web pages to '" + cssFilePathGreen + "'.");
+                    if(! silent) {
+                        System.out.println("   Wrote green CSS file for web pages to '" + cssFilePathGreen + "'.");
+                    }
                 }
                 htmlGen.generateCoreWebpages(outputBaseDir);
             }
                         
-            System.out.println("  Writing protein-specific webpages. The protein-specific output directory is '" + outputDirProtein.getAbsolutePath() + "'.");
+            if(! silent) {
+                System.out.println("  Writing protein-specific webpages. The protein-specific output directory is '" + outputDirProtein.getAbsolutePath() + "'.");
+            }
             htmlGen.generateAllWebpagesForResult(ProteinResults.getInstance());
-            System.out.println("  Web pages done for PDB " + pdbid + ".");
-            System.out.println(" Produced all web pages.");
+            if(! silent) {
+                System.out.println("  Web pages done for PDB " + pdbid + ".");
+                System.out.println(" Produced all web pages.");
+            }
         }
 
         //drawTGFGraph("graph.tgf", "graph.tgf.png");       //DEBUG
@@ -1431,11 +1541,17 @@ public class Main {
         }
         
         if(deleteFilesOnExit.size() > 0) {
-            System.out.print("Deleting " + deleteFilesOnExit.size() + " temporary files... ");
+            if(! silent) {
+                System.out.print("Deleting " + deleteFilesOnExit.size() + " temporary files... ");
+            }
             Integer numDel = IO.deleteFiles(deleteFilesOnExit);
-            System.out.print(numDel + " ok.\n");
+            if(! silent) {
+                System.out.print(numDel + " ok.\n");
+            }
         }
-        System.out.println("All done, exiting.");
+        if(! silent) {
+            System.out.println("All done, exiting.");
+        }
         System.exit(0);
 
     }
@@ -1612,6 +1728,11 @@ public class Main {
      */
     public static void calculateSSEGraphsForChains(ArrayList<Chain> allChains, ArrayList<Residue> resList, ArrayList<ResContactInfo> resContacts, String pdbid, String outputDir) {
 
+        Boolean silent = false;
+        if(Settings.getBoolean("plcc_B_silent")) {
+            silent = true;
+        }
+        
         //System.out.println("calculateSSEGraphsForChains: outputDir='" + outputDir + "'.");
         Chain c;
         ArrayList<SSE> chainDsspSSEs = new ArrayList<SSE>();
@@ -1637,7 +1758,9 @@ public class Main {
             DBManager.deletePdbidFromDB(pdbid);
             try {
                 DBManager.writeProteinToDB(pdbid, md.get("title"), md.get("header"), md.get("keywords"), md.get("experiment"), res);
-                System.out.println("  Info on protein '" + pdbid + "' written to DB.");
+                if(! silent) {
+                    System.out.println("  Info on protein '" + pdbid + "' written to DB.");
+                }
             }catch (Exception e) {
                 DP.getInstance().w("Could not write info on protein '" + pdbid + "' to DB.");
             }
@@ -1648,7 +1771,9 @@ public class Main {
         ProteinChainResults pcr;
         for(Integer i = 0; i < allChains.size(); i++) {
             c = allChains.get(i);
-            System.out.println("  +++++ Handling chain '" + c.getPdbChainID() + "'. +++++");
+            if(! silent) {
+                System.out.println("  +++++ Handling chain '" + c.getPdbChainID() + "'. +++++");
+            }
 
             ProtMetaInfo pmi = FileParser.getMetaInfo(pdbid, c.getPdbChainID());
             //pmi.print();
@@ -1664,7 +1789,9 @@ public class Main {
             if(Settings.getBoolean("plcc_B_useDB")) {
                 try {
                     if(DBManager.writeChainToDB(c.getPdbChainID(), pdbid, pmi.getMolName(), pmi.getOrgScientific(), pmi.getOrgCommon())) {
-                        System.out.println("    Info on chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
+                        if(! silent) {
+                            System.out.println("    Info on chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
+                        }
                     }
                     else {
                         DP.getInstance().w("Could not write info on chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' to DB.");
@@ -1676,7 +1803,9 @@ public class Main {
             }
 
             // determine SSEs for this chain
-            System.out.println("    Creating all SSEs for chain '" + c.getPdbChainID() + "' consisting of " + c.getResidues().size() + " residues.");
+            if(! silent) {
+                System.out.println("    Creating all SSEs for chain '" + c.getPdbChainID() + "' consisting of " + c.getResidues().size() + " residues.");
+            }
             chainDsspSSEs = createAllDsspSSEsFromResidueList(c.getResidues());
             
             if(Settings.getInteger("plcc_I_debug_level") > 0) {
@@ -1696,14 +1825,16 @@ public class Main {
             
             chainLigSSEs = createAllLigandSSEsFromResidueList(c.getResidues(), chainDsspSSEs);
             allChainSSEs = mergeSSEs(chainPtglSSEs, chainLigSSEs);
-            System.out.println("    Added " + chainLigSSEs.size() + " ligand SSEs to the SSE list, now at " + allChainSSEs.size() + " SSEs.");
+            if(! silent) {
+                System.out.println("    Added " + chainLigSSEs.size() + " ligand SSEs to the SSE list, now at " + allChainSSEs.size() + " SSEs.");
+                System.out.print("    SSEs: ");
 
-            System.out.print("    SSEs: ");
-            for(Integer j = 0; j < allChainSSEs.size(); j++) {
-                System.out.print(allChainSSEs.get(j).getSseType());
+                for(Integer j = 0; j < allChainSSEs.size(); j++) {
+                    System.out.print(allChainSSEs.get(j).getSseType());
+                }
+                System.out.print("\n");
             }
-            System.out.print("\n");
-
+            
             // SSEs have been calculated, now assign the PTGL labels and sequential numbers on the chain
             for(Integer j = 0; j < allChainSSEs.size(); j++) {
                 allChainSSEs.get(j).setSeqSseChainNum(j + 1);   // This is the correct value, determined from the list of all valid SSEs of this chain
@@ -1764,11 +1895,15 @@ public class Main {
                 
                 if(Settings.getBoolean("plcc_B_debug_compareSSEContacts")) {
                     if(gt.equals(SSEGraph.GRAPHTYPE_ALBE)) {
-                        System.out.println("Comparing calculated SSE contacts with those in the file '" + Settings.get("plcc_S_debug_compareSSEContactsFile") + "'...");
+                        if(! silent) {
+                            System.out.println("Comparing calculated SSE contacts with those in the file '" + Settings.get("plcc_S_debug_compareSSEContactsFile") + "'...");
+                        }
                         FileParser.compareSSEContactsWithGeoDatFile(Settings.get("plcc_S_debug_compareSSEContactsFile"), pg);
                     }        
                     else {
-                        System.out.println("INFO: SSE contact comparison request ignored since this is not an albe graph.");
+                        if(! silent) {
+                            System.out.println("INFO: SSE contact comparison request ignored since this is not an albe graph.");
+                        }
                     }
                 }
                 
@@ -1778,7 +1913,9 @@ public class Main {
                     coilsUsed = " including coils";
                 }
                 if(isoLig > 0) {
-                    System.out.println("      The " + gt + " graph of " + pdbid + " chain " + c.getPdbChainID() + coilsUsed + " contains " + isoLig + " isolated ligands.");
+                    if(! silent) {
+                        System.out.println("      The " + gt + " graph of " + pdbid + " chain " + c.getPdbChainID() + coilsUsed + " contains " + isoLig + " isolated ligands.");
+                    }
                 }
                 
                 // DEBUG: calculate distance matrix of the graph
@@ -1881,7 +2018,9 @@ public class Main {
                 
                 
                 if(numFormatsWritten > 0) {
-                    System.out.println("      Exported protein ligand graph in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + new File(filePathGraphs).getAbsolutePath() + fs + "'.");
+                    if(! silent) {
+                        System.out.println("      Exported protein ligand graph in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + new File(filePathGraphs).getAbsolutePath() + fs + "'.");
+                    }
                 }
                 
                 
@@ -1910,19 +2049,25 @@ public class Main {
 
                 if(Settings.getBoolean("plcc_B_draw_graphs")) {
                     if(pg.drawProteinGraph(imgFile, false)) {
-                        System.out.println("      Image of graph written to file '" + imgFile + "'.");
+                        if(! silent) {
+                            System.out.println("      Image of graph written to file '" + imgFile + "'.");
+                        }
                         pcr.addProteinGraphImageBitmap(gt, new File(imgFile));
                     }                   
                 }
                 else {
-                    System.out.println("      Image and graph output disabled, not drawing and writing protein graph files.");
+                    if(! silent) {
+                        System.out.println("      Image and graph output disabled, not drawing and writing protein graph files.");
+                    }
                 }
                 
                 // But we may need to write the graph to the database
                 if(Settings.getBoolean("plcc_B_useDB")) {
                     try { 
                         DBManager.writeGraphToDB(pdbid, c.getPdbChainID(), ProtGraphs.getGraphTypeCode(gt), pg.toVPLGGraphFormat(), pg.getSSEStringSequential()); 
-                        System.out.println("      Inserted '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + c.getPdbChainID() + "' into DB.");
+                        if(! silent) {
+                            System.out.println("      Inserted '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + c.getPdbChainID() + "' into DB.");
+                        }
                     }
                     catch(SQLException e) { 
                         System.err.println("ERROR: Failed to insert '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + c.getPdbChainID() + "' into DB."); 
@@ -1930,7 +2075,9 @@ public class Main {
                 }
                 
                 if(Settings.getInteger("plcc_I_debug_level") > 0) {
-                    System.out.println("      Graph plus string is '" + pg.getGraphPlusString() + "'.");
+                    if(! silent) {
+                        System.out.println("      Graph plus string is '" + pg.getGraphPlusString() + "'.");
+                    }
                 }
                 
                 if(Settings.getBoolean("plcc_B_Jmol_graph_vis_commands")) {                    
@@ -1970,8 +2117,9 @@ public class Main {
             }
             
             
-            
-            System.out.println("  +++++ All " + graphTypes.size() + " protein graphs of chain " + c.getPdbChainID() + " handled. +++++");
+            if(! silent) {
+                System.out.println("  +++++ All " + graphTypes.size() + " protein graphs of chain " + c.getPdbChainID() + " handled. +++++");
+            }
             
         }
         
