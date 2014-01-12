@@ -828,6 +828,7 @@ public class Main {
         
         Boolean silent = false;
         if(Settings.getBoolean("plcc_B_silent")) {
+            System.out.println("  Silent mode active, only errors and warnings will be printed from now on. Bye.");
             silent = true;
         }
 
