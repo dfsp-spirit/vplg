@@ -834,10 +834,11 @@ public class Main {
 
         // This check is rather useless and it will break PDB files that were split into multiple files (one for each
         //  model) and renames, e.g. "2kos_1.pdb" for model 1 of protein 2kos. It is therefore disabaled atm.
-        //if(pdbid.length() != 4) {
-        //    System.err.println("ERROR: pdbid '" + pdbid + "' should be 4 characters long (but is " + pdbid.length() + ").");
-        //    System.exit(1);
-        //}
+        if(pdbid.length() != 4) {
+            if(! silent) {
+                //System.out.println("WARNING: The PDB identifier '" + pdbid + "' should be 4 characters long (but is " + pdbid.length() + ").");            
+            }
+        }
 
         // ****************************************************    test for required files    **********************************************************
 
@@ -847,7 +848,7 @@ public class Main {
         
         if(Settings.getInteger("plcc_I_debug_level") > 0) {
             if(! silent) {
-             System.out.println("  Debug level set to " + Settings.getInteger("plcc_I_debug_level") + ".");
+                System.out.println("  Debug level set to " + Settings.getInteger("plcc_I_debug_level") + ".");
             }
         }
         
