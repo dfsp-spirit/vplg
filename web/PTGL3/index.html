@@ -107,24 +107,26 @@
 				<div class="row" id="search">
 					<div class="col-lg-3 col-centered">
 						<div class="input-group">
-							<form action="searchResults.html">
-								<input type="text" class="form-control" id="searchInput" placeholder="Enter PDB ID or keyword...">
+							<form action="search.php" method="post">
+								<input type="text" class="form-control" name="keyword" id="searchInput" placeholder="Enter PDB ID or keyword...">
 								<button id="searchButton" type"submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+                                                                                                                                        	<br />
+                                                                                                                                                <div class="form-group">
+                                                                                                                                                <label class="inlineCheck">
+                                                                                                                                                    <input type="checkbox" id="selectredundCB" name="SelectRedund" value="1"> Remove sequence homologs </input>
+                                                                                                                                                </label>
+                                                                                                                                                 <label class="inlineCheck">
+                                                                                                                                                    <input type="checkbox" id="matchexactCB" name="exact" value="1">Match exact word</input>			
+                                                                                                                                                </label>
+                                                                                                                                                </div>
 							</form>
 							
-
-
-						
-						
 						</div><!-- end input-group -->
 					</div><!-- end col-centered -->
 				</div><!-- end row -->
 				
-				<div class="additional">					
-					<label id="inlineCheck" class="checkbox-inline">
-					  <input type="checkbox" id="inlineCheckbox3" value="option3"> Remove sequence homologs </input>
-					</label>
-			
+				<div class="additional">			
+		
 				<dl class="dl-horizontal">
 					<dt>SearchKey</dt>
 					<dd>Keyword search form with examples</dd>

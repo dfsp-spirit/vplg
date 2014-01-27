@@ -5,10 +5,10 @@
  */
 
 return array(
-    'host' => 'localhost',
-    'username' => 'root',
-    'pw' => 'PASCHWORD',
-    'db' => 'db_name',
+    'host' => '127.0.0.1',
+    'username' => 'vplg',
+    'pw' => '',
+    'db' => 'vplg',
     'port' => '5432'
 );
 ?>

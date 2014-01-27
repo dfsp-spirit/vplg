@@ -204,9 +204,9 @@ Notes: 		Hand coded for www.vplg.org
 		margin: 18px 30% 30px;
 		width: 100%;
 		}
-	#inlineCheck {
-		margin-left: 9%;
-		margin-bottom: 30px;
+	.inlineCheck {
+		margin-left: 1%;
+		margin-bottom: 1px;
 	}
 		
 	/* Search results page */
