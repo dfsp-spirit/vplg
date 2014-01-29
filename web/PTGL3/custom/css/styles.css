@@ -175,40 +175,38 @@ Notes: 		Hand coded for www.vplg.org
 		}
 		
 	
-	
-	.col-centered {
-		margin: auto auto auto auto;
-		float: none;
-		}
-	
+
 	#search {
 		padding-top: 10%;
 		padding-right: auto;
 		padding-left: auto;
 		}
-	#searchButton {
-		margin-left: 4px;
+
+	
+	
+	.input-line {
+		margin: 20% 40% 10px;
+		width: 100%;
 	}
 	
 	
-	.input-group {
-		margin-left: auto;
-		margin-right: auto;
+	.checkbox-input-line {
+		margin: 10px 36% 30px;
+		width: 100%;
 	}
-		
-	.col-lg-3 {
-		width: auto;
-		}
-		
+	
+	
+	
+	#left-checkbox {
+		padding-right: 10px;
+	}
+
 	
 	.additional {
 		margin: 18px 30% 30px;
 		width: 100%;
 		}
-	.inlineCheck {
-		margin-left: 1%;
-		margin-bottom: 1px;
-	}
+	
 		
 	/* Search results page */
 	

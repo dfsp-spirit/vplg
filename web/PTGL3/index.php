@@ -104,29 +104,27 @@
 		
 		
 		
-				<div class="row" id="search">
-					<div class="col-lg-3 col-centered">
-						<div class="input-group">
-							<form action="search.php" method="post">
-								<input type="text" class="form-control" name="keyword" id="searchInput" placeholder="Enter PDB ID or keyword...">
-								<button id="searchButton" type"submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
-                                                                                                                                        	<br />
-                                                                                                                                                <div class="form-group">
-                                                                                                                                                <label class="inlineCheck">
-                                                                                                                                                    <input type="checkbox" id="selectredundCB" name="SelectRedund" value="1"> Remove sequence homologs </input>
-                                                                                                                                                </label>
-                                                                                                                                                 <label class="inlineCheck">
-                                                                                                                                                    <input type="checkbox" id="matchexactCB" name="exact" value="1">Match exact word</input>			
-                                                                                                                                                </label>
-                                                                                                                                                </div>
-							</form>
+						
+			<form class="form-inline" action="search.php" method="post">
+				<div class="input-line">
+					<input type="text" class="form-control" name="keyword" id="searchInput" placeholder="Enter PDB ID or keyword...">
+					<button type"submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+				</div><!-- end input-line -->
+								
+				<div class="form-group checkbox-input-line">
+					<label id="left-checkbox">        
+						<input type="checkbox" id="selectredundCB" name="SelectRedund" value="1"> Remove sequence homologs </input>
+					</label>
+					<label>
+						<input type="checkbox" id="matchexactCB" name="exact" value="1"> Match exact word </input>
+					</label>
+				</div><!-- end form-group and checkbox-input-line" -->
+			</form><!-- end form-inline -->
 							
-						</div><!-- end input-group -->
-					</div><!-- end col-centered -->
-				</div><!-- end row -->
+						
+					
 				
-				<div class="additional">			
-		
+				<div class="additional">
 				<dl class="dl-horizontal">
 					<dt>SearchKey</dt>
 					<dd>Keyword search form with examples</dd>
