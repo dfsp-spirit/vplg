@@ -29,41 +29,9 @@
 		<script src="bootstrap/js/modernizr-2.6.2.min.js"></script>
 
                     <!-- Live Search for PDB IDs -->
-		<script type="text/javascript">
-		$(document).ready(function () {             
-			function search() {
-				var query_value = $('input#searchInput').val();
-				$('b#search-string').html(query_value);
-				if(query_value !== ''){
-					$.ajax({
-					type: "POST",
-					url: "liveSearch.php",
-					data: { query: query_value },
-					cache: false,
-					success: function(html){
-						$("input#searchInput").html(html);
-					}
-					});
-				}return false;    
-			}
+		<script src="livesearch.js" type="text/javascript"></script>
 
-			$("input#searchInput").on("keyup", function(e) {
-			// Set Timeout
-				clearTimeout($.data(this, 'timer'));
-				var search_string = $(this).val();
-				if (search_string == '') {
-					//$("ul#results").fadeOut();
-					//$('h4#results-text').fadeOut();
-				} else {
-					//$("ul#results").fadeIn();
-					//$('h4#results-text').fadeIn();
-					$(this).data('timer', setTimeout(search, 100));
-				};
-	    
-			});
-		});
-		</script>
-                
+
 	</head>
 
 	<body id="customBackground">
@@ -145,8 +113,9 @@
 				<div class="col-lg-3 col-centered">
 					<div class="input-group form-group">
 						<form class="form-inline" action="searchResults.php" method="post">
-							<input type="text" class="form-control" name="keyword" id="searchInput" placeholder="Enter PDB ID or keyword...">
+							<input type="text" class="form-control" name="keyword" id="searchInput" autocomplete="off" placeholder="Enter PDB ID or keyword...">
 							<button type"submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+							<div id="liveSearchResults"></div>
 						</form>
 						<form>
 							<label class="checkboxFont">

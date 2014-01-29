@@ -10,12 +10,12 @@ $db = pg_connect($conn_string)
 
 // Define Output HTML Formating
 $html = '';
-$html .= '<li class="result">';
-$html .= '<a target="_blank" href="urlString">';
-$html .= '<h3>IDString</h3>';
-$html .= '<h4>headerString</h4>';
+$html .= '<p class="result">';
+$html .= '<a href="urlString">';
+$html .= '<span>IDString - </span>';
+$html .= '<span>headerString</span>';
 $html .= '</a>';
-$html .= '</li>';
+$html .= '</p>';
 
 // Get Search
 $search_string = preg_replace("/[^A-Za-z0-9]/", " ", $_POST['query']);
@@ -23,7 +23,7 @@ $search_string = preg_replace("/[^A-Za-z0-9]/", " ", $_POST['query']);
 // Check Length More Than One Character
 if (strlen($search_string) >= 1 && $search_string !== ' ') {
 	// Build Query
-	$query = "SELECT * FROM plcc_protein WHERE pdb_id LIKE '%".$search_string."%' OR header LIKE '%".$search_string."%'";
+	$query = "SELECT * FROM plcc_protein WHERE pdb_id LIKE '%".$search_string."%' OR header LIKE '%".strtoupper($search_string)."%'";
 	$result = pg_query($db, $query) 
                   or die($query . ' -> Query failed: ' . pg_last_error());
 	$data = pg_fetch_all($result);
