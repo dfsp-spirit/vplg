@@ -30,7 +30,9 @@
 
 	<body id="customBackground">
 		
-		<div class="container" id="wrapper">
+		
+		<div class="wrapper">
+		<div class="container">
 	
 			<div class="navbar navbar-fixed-top" id="navColor">
 
@@ -160,8 +162,9 @@
 				</div><!-- end results -->
 			</div><!-- end container and searchResults -->
 			
-		</div><!-- end container and wrapper -->
+		</div><!-- end container-->
 
+		</div><!-- end wrapper -->
 	<footer id="footer">
 		<div class="container">
 			<p> 

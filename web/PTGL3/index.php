@@ -151,9 +151,6 @@
 		
 		
 		
-		
-		
-				
 		</div><!-- end container and wrapper -->
 			
 			
@@ -200,7 +197,10 @@
 			</p>
 	</div><!-- end container and text -->
 	</div><!--- end textWrapper -->
-	</div>
+	
+	</div><!-- end wrapper -->
+	
+	
 	<footer id="footer">
 		<div class="container">
 			<p> 
