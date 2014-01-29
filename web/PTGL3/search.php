@@ -31,18 +31,22 @@ if (strlen($keyword) == 4) {
 
 
 
-/*
+
 // establish pgsql connection
-$db = pg_pconnect($db_config['host'], $db_config['port'], $db_config['db'], $db_config['user'], $db_config['pw'])
-            or die($db_config['db'] . ' -> Connection error: ' . pg_last_error() . pg_result_error() . pg_result_error_field() . pg_result_status() . pg_connection_status() );
-
-$query = "SELECT * FROM banana WHERE id >= 1";  // e.g.
-$result = pg_query($query) 
+$conn_string = "host=" . $db_config['host'] . " port=" . $db_config['port'] . " dbname=" . $db_config['db'] . " user=" . $db_config['user'] ." password=" . $db_config['pw'];
+$db = pg_connect($conn_string)
+                or die($db_config['db'] . ' -> Connection error: ' . pg_last_error() . pg_result_error() . pg_result_error_field() . pg_result_status() . pg_connection_status() );            
+$query = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES";
+$result = pg_query($db, $query) 
                   or die($query . ' -> Query failed: ' . pg_last_error());
+$data = pg_fetch_all($result);
 
+foreach ($data as $item) {
+    echo $item["table_name"]. "\n<br \>";
+}
 
 pg_free_result($result); // clean memory
 pg_close($db); // close connection
-*/
+
 
 ?>

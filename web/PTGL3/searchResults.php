@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-
+<?php
+include('search.php');
+?>
 <html>
 	<head>
 		<meta charset="utf-8">
@@ -99,7 +101,7 @@
 						</ul><!-- end nav navbar-nav -->								
 					</div><!-- end nav-collapse -->
 					<div class="nav-collapse collapse navbar-responsive-collapse">
-						<form  class="navbar-form pull-right" action="searchResults.html">
+						<form  class="navbar-form pull-right" action="searchResults.php" method="post">
 							<input type="text" class="form-control" id="searchInput" placeholder="Enter PDB ID or keyword...">
 							<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
 						</form><!-- end navbar-form -->	

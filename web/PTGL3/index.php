@@ -28,6 +28,18 @@
 		<!-- Include Modernizr in the head, before any other JS -->
 		<script src="bootstrap/js/modernizr-2.6.2.min.js"></script>
 	
+                                    <!-- Live Search for PDB IDs -->
+                                    <script type="text/javascript">
+                                    $(document).ready(function () {
+                                        
+                                        $("input#searchInput").live("keyup", function(e) {
+                                        
+                                        }
+                                     )};
+                                    
+                                    
+                                    </script>
+                
 	</head>
 
 	<body id="customBackground">
@@ -108,7 +120,7 @@
 			<div class="row" id="search">
 				<div class="col-lg-3 col-centered">
 					<div class="input-group form-group">
-						<form class="form-inline" action="search.php" method="post">
+						<form class="form-inline" action="searchResults.php" method="post">
 							<input type="text" class="form-control" name="keyword" id="searchInput" placeholder="Enter PDB ID or keyword...">
 							<button type"submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
 						</form>

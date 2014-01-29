@@ -6,7 +6,7 @@
 
 return array(
     'host' => '127.0.0.1',
-    'username' => 'vplg',
+    'user' => 'vplg',
     'pw' => '',
     'db' => 'vplg',
     'port' => '5432'
