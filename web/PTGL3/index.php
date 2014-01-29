@@ -24,21 +24,45 @@
 		<!-- Custom CSS -->
 		<link rel="stylesheet" type="text/css" href="custom/css/styles.css">
 
-		
+		 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 		<!-- Include Modernizr in the head, before any other JS -->
 		<script src="bootstrap/js/modernizr-2.6.2.min.js"></script>
-	
-                                    <!-- Live Search for PDB IDs -->
-                                    <script type="text/javascript">
-                                    $(document).ready(function () {
-                                        
-                                        $("input#searchInput").live("keyup", function(e) {
-                                        
-                                        }
-                                     )};
-                                    
-                                    
-                                    </script>
+
+                    <!-- Live Search for PDB IDs -->
+		<script type="text/javascript">
+		$(document).ready(function () {             
+			function search() {
+				var query_value = $('input#searchInput').val();
+				$('b#search-string').html(query_value);
+				if(query_value !== ''){
+					$.ajax({
+					type: "POST",
+					url: "liveSearch.php",
+					data: { query: query_value },
+					cache: false,
+					success: function(html){
+						$("input#searchInput").html(html);
+					}
+					});
+				}return false;    
+			}
+
+			$("input#searchInput").on("keyup", function(e) {
+			// Set Timeout
+				clearTimeout($.data(this, 'timer'));
+				var search_string = $(this).val();
+				if (search_string == '') {
+					//$("ul#results").fadeOut();
+					//$('h4#results-text').fadeOut();
+				} else {
+					//$("ul#results").fadeIn();
+					//$('h4#results-text').fadeIn();
+					$(this).data('timer', setTimeout(search, 100));
+				};
+	    
+			});
+		});
+		</script>
                 
 	</head>
 
