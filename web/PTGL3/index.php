@@ -105,27 +105,31 @@
 		
 		
 						
-			<form class="form-inline" action="search.php" method="post">
-				<div class="input-line">
-					<input type="text" class="form-control" name="keyword" id="searchInput" placeholder="Enter PDB ID or keyword...">
-					<button type"submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
-				</div><!-- end input-line -->
-								
-				<div class="form-group checkbox-input-line">
-					<label id="left-checkbox">        
-						<input type="checkbox" id="selectredundCB" name="SelectRedund" value="1"> Remove sequence homologs </input>
-					</label>
-					<label>
-						<input type="checkbox" id="matchexactCB" name="exact" value="1"> Match exact word </input>
-					</label>
-				</div><!-- end form-group and checkbox-input-line" -->
-			</form><!-- end form-inline -->
-							
-						
+			<div class="row" id="search">
+				<div class="col-lg-3 col-centered">
+					<div class="input-group form-group">
+						<form class="form-inline" action="search.php" method="post">
+							<input type="text" class="form-control" name="keyword" id="searchInput" placeholder="Enter PDB ID or keyword...">
+							<button type"submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+						</form>
+						<form>
+							<label class="checkboxFont">
+								<input type="checkbox" id="inlineCheckbox3" value="option3"> Remove sequence homologs </input>
+							</label>
+							<label class="checkboxFont">
+								<input type="checkbox" id="matchexactCB" name="exact" value="1"> Match exact word </input>
+							</label>
+						</form>	
+					</div><!-- end input-group and form-group -->
+				</div><!-- end col-centered -->
+			</div><!-- end row -->
 					
-				
-				<div class="additional">
-				<dl class="dl-horizontal">
+			
+			<div class="row">
+				<div class="col-lg-3 col-centered">
+					<div class="input-group form-group">
+						<form>
+						<dl class="dl-horizontal">
 					<dt>SearchKey</dt>
 					<dd>Keyword search form with examples</dd>
 				</dl>
@@ -139,11 +143,20 @@
 					<dt>SearchSequence</dt>
 					<dd>Blast search for sequences</dd>
 				</dl>
-				</div><!-- end additional -->
+				</form>
+					</div><!-- end input-group and form-group -->
+				</div><!-- end col-centered -->
+			</div><!-- end row -->
+		
+		
+		
+		
+		
+		
+				
 		</div><!-- end container and wrapper -->
 			
 			
-
 	<div class="textWrapper">
 		<div class="line" id="lineAbout">
 			<div class="iconPos" id="iconAbout">

@@ -89,7 +89,7 @@ Notes: 		Hand coded for www.vplg.org
 	
 	/* Positioning of the circle/icon */
 	.iconPos {
-		left: 50%;
+		left: 47%;
 		position: absolute;
 		}
 
@@ -175,36 +175,36 @@ Notes: 		Hand coded for www.vplg.org
 		}
 		
 	
-
+	.col-centered {
+		margin: auto;
+		float: none;
+	}
+	
 	#search {
-		padding-top: 10%;
+		padding-top: 30%;
 		padding-right: auto;
 		padding-left: auto;
 		}
 
 	
 	
-	.input-line {
-		margin: 20% 40% 10px;
-		width: 100%;
+	.checkboxFont {
+		font-weight: normal;
 	}
 	
-	
-	.checkbox-input-line {
-		margin: 10px 36% 30px;
-		width: 100%;
+	.input-group {
+		margin-left: auto;
+		margin-right: auto;
 	}
-	
-	
-	
-	#left-checkbox {
-		padding-right: 10px;
-	}
+		
+	.col-lg-3 {
+		width: auto;
+		}
 
 	
-	.additional {
-		margin: 18px 30% 30px;
-		width: 100%;
+	.additional-search {
+		margin-left: auto;
+		margin-right: auto;
 		}
 	
 		
