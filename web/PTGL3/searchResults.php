@@ -109,9 +109,9 @@
 				
 			<div class="container" id="searchResults">
 					<h2> Search Results </h2>
-			<div class="results">
-				
-				<table border="0" class="resultsOrange">
+				<div class="results">
+			
+					<table border="0" class="resultsOrange">
 					<colgroup>
 						<col width="100">						
 					</colgroup>
@@ -122,7 +122,7 @@
 					<tr> <td class="tableCategories">Chain A</td> <td>Checkbox <br> SCOP</td><td></td> <td></td> </tr>
 				</table>
 			
-			<table border="0" class="resultsWhite">
+					<table border="0" class="resultsWhite">
 					<colgroup>
 						<col width="110">
 						<col width="100">
@@ -134,8 +134,7 @@
 					<tr> <td class="tableCategories">Chain A</td> <td>SCOP</td> </tr>
 				</table>
 			
-			
-			<table border="0" class="resultsOrange">
+					<table border="0" class="resultsOrange">
 					<colgroup>
 						<col width="110">
 						<col width="100">
@@ -147,8 +146,7 @@
 					<tr> <td class="tableCategories">Chain A</td> <td>SCOP</td> </tr>
 				</table>
 			
-			<div class="test">
-			<table border="0" class="resultsWhite">
+					<table border="0" class="resultsWhite">
 					<colgroup>
 						<col width="110">
 						<col width="100">
@@ -159,21 +157,9 @@
 					<tr> <td class="tableCategories">EC number</td> <td>5.3.1.1</td> </tr>
 					<tr> <td class="tableCategories">Chain A</td> <td>SCOP</td> </tr>
 				</table>
-				</div>
-			</div>
-			
-			
-			
-			
-			
-			
-			
+				</div><!-- end results -->
 			</div><!-- end container and searchResults -->
-		
-		
-		
-		
-		
+			
 		</div><!-- end container and wrapper -->
 
 	<footer id="footer">
