@@ -100,7 +100,7 @@
 									<li class="dropdown-header"></li>
 									
 									<li>
-										<a href="#">Contact Us</a>
+										<a href="contact.php">Contact Us</a>
 									</li>
 									
 									<li>
