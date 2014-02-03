@@ -245,7 +245,7 @@ Notes: 		Hand coded for www.vplg.org
 		outline: 0px none;
 		display: none;
 		max-height: 150px;
-		overflow: scroll;
+		overflow-y: scroll;
 		width: 301px;
 		
 		}
