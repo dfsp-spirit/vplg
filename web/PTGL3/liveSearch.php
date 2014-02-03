@@ -11,7 +11,7 @@ $db = pg_connect($conn_string)
 // Define Output HTML Formating
 $html = '';
 $html .= '<p class="result">';
-$html .= '<a href="urlString">';
+$html .= '<a href="urlString" title="IDString - headerString">';
 $html .= '<span>IDString - </span>';
 $html .= '<span>headerString</span>';
 $html .= '</a>';

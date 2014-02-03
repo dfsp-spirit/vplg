@@ -125,10 +125,9 @@
 							<input type="text" class="form-control" name="keyword" id="searchInput" autocomplete="off" placeholder="Enter PDB ID or keyword...">
 							<button type"submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
 							<div id="liveSearchResults"></div>
-						</form>
-						<form>
+							<br>
 							<label class="checkboxFont">
-								<input type="checkbox" id="inlineCheckbox3" value="option3"> Remove sequence homologs </input>
+								<input type="checkbox" id="inlineCheckbox3" name="SelectRedund" value="1"> Remove sequence homologs </input>
 							</label>
 							<label class="checkboxFont">
 								<input type="checkbox" id="matchexactCB" name="exact" value="1"> Match exact word </input>
