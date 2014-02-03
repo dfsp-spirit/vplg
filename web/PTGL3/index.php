@@ -121,7 +121,7 @@
 			<div class="row" id="search">
 				<div class="col-lg-3 col-centered">
 					<div class="input-group form-group">
-						<form class="form-inline" action="searchResults.php" method="post">
+						<form class="form-inline" action="searchResults.php" method="get">
 							<input type="text" class="form-control" name="keyword" id="searchInput" autocomplete="off" placeholder="Enter PDB ID or keyword...">
 							<button type"submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
 							<div id="liveSearchResults"></div>

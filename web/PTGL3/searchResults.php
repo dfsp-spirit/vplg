@@ -114,53 +114,9 @@ include('search.php');
 			<div class="container" id="searchResults">
 					<h2> Search Results </h2>
 				<div class="results">
-			
-					<table border="0" class="resultsOrange">
-					<colgroup>
-						<col width="100">						
-					</colgroup>
-					<tr class="tableHeaderOrange"> <td class="tableName">7tim</td> <td><i>Resolution:</i></td> <td></td> </tr>
-					<tr> <td class="tableCategories">Title</td> <td>STRUCTURE OF THE TRIOSEPHOSPHATE ISOMERASE- PHOSPHOGLYCOLOHYDROXAMATE COMPLEX: AN ANALOGUE OF THE INTERMEDIATE ON THE REACTION PATHWAY</td> <td></td> <td></td></tr>
-					<tr> <td class="tableCategories">Classification</td> <td>INTRAMOLECULAR OXIDOREDUCTASE</td> <td></td> <td></td></tr>
-					<tr> <td class="tableCategories">EC number</td> <td>5.3.1.1</td> <td></td> <td></td></tr>
-					<tr> <td class="tableCategories">Chain A</td> <td>Checkbox <br> SCOP</td><td></td> <td></td> </tr>
-				</table>
-			
-					<table border="0" class="resultsWhite">
-					<colgroup>
-						<col width="110">
-						<col width="100">
-					</colgroup>
-					<tr class="tableHeaderWhite"> <td class="tableName">7tim</td> <td></td> <td><i>Resolution:</i></td> </tr>
-					<tr> <td rowspan="4"><img width="100px" height="100px" src="images/7tim.jpg" alt="Preview"/></td> <td class="tableCategories">Title</td> <td>STRUCTURE OF THE TRIOSEPHOSPHATE ISOMERASE- PHOSPHOGLYCOLOHYDROXAMATE COMPLEX: AN ANALOGUE OF THE INTERMEDIATE ON THE REACTION PATHWAY</td> </tr>
-					<tr> <td class="tableCategories">Classification</td> <td>INTRAMOLECULAR OXIDOREDUCTASE</td> </tr>
-					<tr> <td class="tableCategories">EC number</td> <td>5.3.1.1</td> </tr>
-					<tr> <td class="tableCategories">Chain A</td> <td>SCOP</td> </tr>
-				</table>
-			
-					<table border="0" class="resultsOrange">
-					<colgroup>
-						<col width="110">
-						<col width="100">
-					</colgroup>
-					<tr class="tableHeaderOrange"> <td class="tableName">7tim</td> <td></td> <td><i>Resolution:</i></td> </tr>
-					<tr> <td rowspan="4"><img width="100px" height="100px" src="images/7tim.jpg" alt="Preview"/></td> <td class="tableCategories">Title</td> <td>STRUCTURE OF THE TRIOSEPHOSPHATE ISOMERASE- PHOSPHOGLYCOLOHYDROXAMATE COMPLEX: AN ANALOGUE OF THE INTERMEDIATE ON THE REACTION PATHWAY</td> </tr>
-					<tr> <td class="tableCategories">Classification</td> <td>INTRAMOLECULAR OXIDOREDUCTASE</td> </tr>
-					<tr> <td class="tableCategories">EC number</td> <td>5.3.1.1</td> </tr>
-					<tr> <td class="tableCategories">Chain A</td> <td>SCOP</td> </tr>
-				</table>
-			
-					<table border="0" class="resultsWhite">
-					<colgroup>
-						<col width="110">
-						<col width="100">
-					</colgroup>
-					<tr class="tableHeaderWhite"> <td class="tableName">7tim</td> <td></td> <td><i>Resolution:</i></td> </tr>
-					<tr> <td rowspan="4"><img width="100px" height="100px" src="images/7tim.jpg" alt="Preview"/></td> <td class="tableCategories">Title</td> <td>STRUCTURE OF THE TRIOSEPHOSPHATE ISOMERASE- PHOSPHOGLYCOLOHYDROXAMATE COMPLEX: AN ANALOGUE OF THE INTERMEDIATE ON THE REACTION PATHWAY</td> </tr>
-					<tr> <td class="tableCategories">Classification</td> <td>INTRAMOLECULAR OXIDOREDUCTASE</td> </tr>
-					<tr> <td class="tableCategories">EC number</td> <td>5.3.1.1</td> </tr>
-					<tr> <td class="tableCategories">Chain A</td> <td>SCOP</td> </tr>
-				</table>
+					<?php 
+						echo $tableString;					
+					?>
 				</div><!-- end results -->
 			</div><!-- end container and searchResults -->
 			
