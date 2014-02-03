@@ -169,9 +169,57 @@ include('search.php');
 		</div><!-- end wrapper -->
 	<footer id="footer">
 		<div class="container">
-			<p> 
-				Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam 					erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus 					est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut 					labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd 					gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-			</p>
+				<div class="row">
+				<div class="col-sm-2">
+				</div>
+			
+				<div class="col-sm-2">
+					<a href="#">Impressum</a>
+				</div>
+				
+				<div class="col-sm-2">
+					<a href="contact.php">Contact</a>
+				</div>
+				
+				<div class="col-sm-2">
+					<a href="http://www.bioinformatik.uni-frankfurt.de" target="_blank">MolBi - Group</a>
+				</div>
+				
+				<div class="col-sm-2">
+					<a href="#">Publications</a>
+				</div>
+				
+				<div class="col-sm-2">
+				</div>
+			
+			<div class="row">
+				<div class="col-sm-1">
+				</div>
+				<div class="col-sm-1">
+				</div>
+				<div class="col-sm-1">
+				</div>
+				<div class="col-sm-1">
+				</div>
+				<div class="col-sm-1">
+				</div>
+				<div class="col-sm-1">
+				</div>
+				<div class="col-sm-1">
+				</div>
+				<div class="col-sm-1">
+				</div>
+				<div class="col-sm-1">
+				</div>
+				<div class="col-sm-1">
+				</div>
+				
+				<div class="col-sm-2 flush-right">
+					<br>
+					<br>
+					Copyright © 2013 [name]
+				</div>
+			</div>
 		</div><!-- end container -->
 	</footer>
 		
