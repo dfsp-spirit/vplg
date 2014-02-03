@@ -10,10 +10,12 @@ $(document).ready(function () {
 			cache: false,
 			success: function(html){
 				$("#liveSearchResults").html(html);
-			}
+				}
 			});
-		}return false;    
+		} return false;    
 	}
+	
+
 
 	$("input#searchInput").on("keyup", function(e) {
 	// Set Timeout
@@ -27,6 +29,14 @@ $(document).ready(function () {
 			//$('h4#results-text').fadeIn();
 			$(this).data('timer', setTimeout(search, 100));
 		};
-
 	});
+	
+	$(document).on('click', '.result', function(e) {
+		var selectedElement = $( this ).attr( "title" );
+		var selectedElement = selectedElement.split("-", 1);
+		var selectedElement = selectedElement[0].trim();
+		$('input#searchInput').val(selectedElement);
+	});	
+	
+	
 });

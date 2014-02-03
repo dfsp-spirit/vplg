@@ -247,9 +247,16 @@ Notes: 		Hand coded for www.vplg.org
 		max-height: 150px;
 		overflow-y: scroll;
 		width: 301px;
-		
+		line-height: 25px;		
 		}
-		
+	
+	.result {
+		display: block;	
+		}
+	
+	.result:hover {
+		background: #e9e9e9;	
+		}
 		
 	/* Search results page */
 	

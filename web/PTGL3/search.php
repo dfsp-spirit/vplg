@@ -14,8 +14,8 @@ $selectRedund = 0;
 $exactSearch = 0;
 
 
-// try to get _POST
-if(isset($_POST)) {
+// try to get _GET
+if(isset($_GET)) {
     if(isset($_GET["keyword"])) {$keyword = $_GET["keyword"];};
     if(isset($_GET["exact"])) {$exactSearch = $_GETT["exact"];};
     if(isset($_GET["SelectRedund"])) {$selectRedund = $_GET["SelectRedund"];};
@@ -50,20 +50,42 @@ while (($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)) && ($counter <= 30)){
 	}
 	// var_dump($arr);
 	$tableString .= '<table border="0" class="results' .$class.'">
-				<colgroup>
-				<col width="100">						
-				</colgroup>
-				<tr class="tableHeader' .$class.'"> <td class="tableName">'.$arr["pdb_id"].'</td> <td><i>Resolution:</i></td><td>' .$arr["resolution"]. '</td> </tr>
-					<tr> <td class="tableCategories">Title</td><td>' .$arr["title"]. '</td> <td></td> <td></td></tr>
-					<tr> <td class="tableCategories">Classification</td> <td>'.$arr["header"].'</td> <td></td> <td></td></tr>
-					<tr> <td class="tableCategories">EC number</td> <td>#####</td> <td></td> <td></td></tr>
-					<tr> <td class="tableCategories">Chain A</td> <td>Checkbox <br> SCOP</td><td>####</td> <td></td> </tr>
+					<colgroup>
+						<col width="100">						
+					</colgroup>
+					<tr class="tableHeader' .$class.'"> 
+						<td class="tableName">'.$arr["pdb_id"].'</td> 
+						<td><i>Resolution:</i></td>
+						<td>' .$arr["resolution"]. '</td> 
+					</tr>
+					<tr>
+						<td class="tableCategories">Title</td>
+						<td>' .$arr["title"]. '</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr> 
+						<td class="tableCategories">Classification</td> 
+						<td>'.$arr["header"].'</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="tableCategories">EC number</td>
+						<td>#####</td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="tableCategories">Chain A</td>
+						<td>Checkbox <br> SCOP</td>
+						<td>####</td>
+						<td></td>
+					</tr>
 				</table>';
+	echo $counter;
 	$counter++;
 }
-/* foreach ($data as $item) {
-    echo $item["table_name"]. "\n<br \>";
-} */
 
 pg_free_result($result); // clean memory
 pg_close($db); // close connection
