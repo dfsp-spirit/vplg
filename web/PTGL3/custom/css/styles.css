@@ -269,6 +269,7 @@ Notes: 		Hand coded for www.vplg.org
 	
 	.resultsWhite {
 		background: rgba(217, 217, 217, .9);
+		width: 100%;
 		}
 	
 	.tableName {
