@@ -264,6 +264,10 @@ Notes: 		Hand coded for www.vplg.org
 		background: #e9e9e9;	
 		}
 		
+	
+	
+	
+	
 	/* Search results page */
 	
 	#searchResults {
@@ -271,57 +275,52 @@ Notes: 		Hand coded for www.vplg.org
 		}
 		
 		
-	.
-	
+	.results {
+		width: 100%;
+		overflow: hidden;
+		}
 	
 	.resultsOrange {
-		background: rgba(242, 191, 157, .9);
-		width: 100%;
+		background: rgba(241, 156, 101, .6);
 		}
 	
 	.resultsWhite {
-		background: rgba(217, 217, 217, .9);
-		width: 100%;
+		background: rgba(214, 214, 214, .6);
 		}
-	
-	.tableName {
-		font-size: 1.7em;
-		font-weight: bold;
-		}
-		
-	.tableCategories {
-		font-weight: bold;
-		}
-	
-	/* new results */
-	
-	.results {
-	width: 100%;
-	}
-	
+
 	
 	.resultsHeader {
-		width: 100%;
+		width: auto;
+		height: 2.1em;
+	}
+
+	.resultsHeaderOrange {
+		background: rgba(241, 156, 101, .8);
 		
 	}
+	
+	.resultsHeaderWhite {
+		background: rgba(214, 214, 214, .8);
 		
+	}
+	
+			
 	.resultsId {
 		width: 100px;
 		float: left;
-		
-		
-	}
+		font-size: 1.8em;
+		font-weight: bold;
+		}
 
 	.resultsRes {
+		margin-top: .8em;
 		width: auto;
 		float: left;
 	}
 	
 	.resultsLink {
-		padding-right: 0;
-		clear: right;
-		float: right;
-		
+		text-align: right;
+		padding-right: 1px;
 	}
 	
 	

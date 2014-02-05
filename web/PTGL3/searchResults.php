@@ -116,7 +116,65 @@ include('search.php');
 				
 			<div class="container" id="searchResults">
 					<h2> Search Results </h2>
-					<?php echo $tableString; ?>
+				<div class="results">
+					
+				<div class="resultsHeader">
+					<div class="resultsId">
+						ID
+					</div>
+					<div class="resultsRes">
+						Resolution:
+					</div>
+					<div class="resultsLink">
+						[PDB] [PDBSum] [FASTA]
+					</div>
+				</div><!-- end resultsHeader -->
+				
+				<div class="resultsBody1">
+					<div class="resultsTitle">
+					Title
+					</div>
+					<div class="resultsTitlePDB">
+					Full PDB Title
+					</div>
+				</div><!-- end resultsBody1 -->
+				
+				<div class="resultsBody2">
+					<div class="resultsClass">
+					Classification
+					</div>
+					<div class="resultsClassPDB">
+					Classification PDB
+					</div>
+				</div><!-- end resultsBody2 -->
+				
+				
+				
+				<div class="resultsBody3">
+					<div class="resultsEC">
+					EC number
+					</div>
+					<div class="resultsECNum">
+					ECNum
+					</div>
+				</div><!-- end resultsBody3 -->
+				
+				
+				<div class="resultsFooter">
+					<div class="resultsChain">
+					Chain
+					</div>
+					<div class="resultsChainNum">
+					Chain A B C
+					</div>
+					<div class="resultsSCOP">
+					SCOP
+					</div>
+					<div class="resultsCATH">
+					CATH
+					</div>
+				</div><!-- end resultsFooter -->
+				</div><!-- end results -->
 			</div><!-- end container and searchResults -->
 			
 		</div><!-- end container-->
