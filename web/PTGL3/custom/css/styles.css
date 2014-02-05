@@ -250,7 +250,11 @@ Notes: 		Hand coded for www.vplg.org
 		max-height: 150px;
 		overflow-y: scroll;
 		width: 301px;
-		line-height: 25px;		
+		line-height: 25px;
+		}
+	.liveSearchResultsPage { 
+		z-index: 5;
+		position: absolute;
 		}
 	
 	.result {

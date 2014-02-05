@@ -25,9 +25,11 @@ include('search.php');
 
 		<!-- Custom CSS -->
 		<link rel="stylesheet" type="text/css" href="custom/css/styles.css">
-
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 		<!-- Include Modernizr in the head, before any other JS -->
 		<script src="bootstrap/js/modernizr-2.6.2.min.js"></script>
+		  <!-- Live Search for PDB IDs -->
+		<script src="livesearch.js" type="text/javascript"></script>
 	</head>
 
 	<body id="customBackground">
@@ -104,6 +106,7 @@ include('search.php');
 						<form  class="navbar-form pull-right" action="searchResults.php" method="post">
 							<input type="text" class="form-control" id="searchInput" placeholder="Enter PDB ID or keyword...">
 							<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+							<div id="liveSearchResults" class="liveSearchResultsPage"></div>
 						</form><!-- end navbar-form -->	
 					</div>
 				</div><!-- end container -->

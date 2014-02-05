@@ -31,6 +31,11 @@ $(document).ready(function () {
 		};
 	});
 	
+	$( "input#searchInput" ).focus(function() {
+		$( this ).next( "span" ).css( "display", "inline" ).fadeOut( 1000 );
+	});
+	
+	
 	$(document).on('click', '.result', function(e) {
 		var selectedElement = $( this ).attr( "title" );
 		var selectedElement = selectedElement.split("-", 1);

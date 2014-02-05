@@ -43,7 +43,7 @@ $result = pg_query($db, $query)
 $counter = 0;
 $tableString = "";
 while (($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)) && ($counter <= 30)){
-	if ($counter % 2 == 0){
+	if ($counter % 2 == 0){     // performs alternating orange/white tables
 		$class = "Orange";
 	} else {
 		$class = "White";
