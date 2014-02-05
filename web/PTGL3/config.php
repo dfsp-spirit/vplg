@@ -5,7 +5,7 @@
  */
 
 return array(
-    'host' => '127.0.0.1',
+    'host' => '192.168.185.229',
     'user' => 'vplg',
     'pw' => '',
     'db' => 'vplg',

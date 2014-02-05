@@ -237,7 +237,10 @@ Notes: 		Hand coded for www.vplg.org
 		margin-right: auto;
 		}
 
-	#liveSearchResults {
+	#liveSearcresults {
+		margin-bottom: 40px;
+		width: 100%;
+	}hResults {
 		background: #d9d9d9;
 		border: 1px solid #A2A2A2;
 		border-color: rgba(82, 168, 236, 0.8);
@@ -265,10 +268,7 @@ Notes: 		Hand coded for www.vplg.org
 		}
 		
 		
-	.results {
-		margin-bottom: 40px;
-		width: 100%;
-	}
+	.
 	
 	
 	.resultsOrange {
@@ -289,4 +289,115 @@ Notes: 		Hand coded for www.vplg.org
 	.tableCategories {
 		font-weight: bold;
 		}
+	
+	/* new results */
+	
+	.results {
+	width: 100%;
+	}
+	
+	
+	.resultsHeader {
+		width: 100%;
+		
+	}
+		
+	.resultsId {
+		width: 100px;
+		float: left;
+		
+		
+	}
+
+	.resultsRes {
+		
+		float: left;
+	}
+	
+	.resultsLink {
+		padding-right: 0;
+		float: left;
+	}
+	
+	
+	.resultsBody1 {
+		
+	}
+	
+	
+	.resultsTitle {
+		width: 100px;
+	}
+	
+	
+	.resultsTitlePDB {
+		
+	}
+	
+	
+	.resultsBody2 {
+		
+	}
+	
+	
+	.resultsClass {
+		width: 100px;
+	}
+	
+	
+	.resultsClassPDB {
+		
+	}
+	
+	.resultsBody3 {
+		
+	}
+	
+	.resultsEC {
+		width: 100px;
+	}
+	
+	.resultsECNum {
+		
+	}
+	
+	.resultsFooter {
+		
+	}
+	
+	
+	.resultsChain {
+		width: 100px;
+	}
+	
+	.resultsChainNum {
+		
+	}
+	
+	.resultsSCOP {
+		
+	}
+	
+	.resultsCATH {
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
