@@ -237,10 +237,9 @@ Notes: 		Hand coded for www.vplg.org
 		margin-right: auto;
 		}
 
-	#liveSearcresults {
+	#liveSearchResults {
 		margin-bottom: 40px;
 		width: 100%;
-	}hResults {
 		background: #d9d9d9;
 		border: 1px solid #A2A2A2;
 		border-color: rgba(82, 168, 236, 0.8);
@@ -314,38 +313,42 @@ Notes: 		Hand coded for www.vplg.org
 	}
 
 	.resultsRes {
-		
+		width: auto;
 		float: left;
 	}
 	
 	.resultsLink {
 		padding-right: 0;
-		float: left;
+		clear: right;
+		float: right;
+		
 	}
 	
 	
 	.resultsBody1 {
-		
+		clear:left;
 	}
 	
 	
 	.resultsTitle {
 		width: 100px;
+		float: left;
 	}
 	
 	
 	.resultsTitlePDB {
-		
+		float: left;
 	}
 	
 	
 	.resultsBody2 {
-		
+		clear: left;
 	}
 	
 	
 	.resultsClass {
 		width: 100px;
+		float: left;
 	}
 	
 	
@@ -354,11 +357,12 @@ Notes: 		Hand coded for www.vplg.org
 	}
 	
 	.resultsBody3 {
-		
+		clear: left;
 	}
 	
 	.resultsEC {
 		width: 100px;
+		float: left;
 	}
 	
 	.resultsECNum {
@@ -366,24 +370,27 @@ Notes: 		Hand coded for www.vplg.org
 	}
 	
 	.resultsFooter {
-		
+		clear: left;
 	}
 	
 	
 	.resultsChain {
 		width: 100px;
+		float: left;
 	}
 	
 	.resultsChainNum {
-		
+		float: left;
 	}
 	
 	.resultsSCOP {
-		
+		padding-left: 1%;
+		float: left;
 	}
 	
 	.resultsCATH {
-		
+		padding-left: 1%;
+		float: left;
 	}
 	
 	

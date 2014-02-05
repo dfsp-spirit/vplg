@@ -135,20 +135,19 @@ include('search.php');
 					Title
 					</div>
 					<div class="resultsTitlePDB">
+					Full PDB Title
 					</div>
-				</div><!-- end resultsBody -->
+				</div><!-- end resultsBody1 -->
 				
 				<div class="resultsBody2">
 					<div class="resultsClass">
 					Classification
 					</div>
 					<div class="resultsClassPDB">
+					Classification PDB
 					</div>
 				</div><!-- end resultsBody2 -->
 				
-				
-				
-				</div><!-- end resultsBody2 -->
 				
 				
 				<div class="resultsBody3">
@@ -166,14 +165,14 @@ include('search.php');
 					Chain
 					</div>
 					<div class="resultsChainNum">
+					Chain A B C
 					</div>
 					<div class="resultsSCOP">
+					SCOP
 					</div>
 					<div class="resultsCATH">
+					CATH
 					</div>
-				
-				
-				
 				</div><!-- end resultsFooter -->
 				
 				
