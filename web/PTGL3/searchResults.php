@@ -103,8 +103,8 @@ include('search.php');
 						</ul><!-- end nav navbar-nav -->								
 					</div><!-- end nav-collapse -->
 					<div class="nav-collapse collapse navbar-responsive-collapse">
-						<form  class="navbar-form pull-right" action="searchResults.php" method="post">
-							<input type="text" class="form-control" id="searchInput" placeholder="Enter PDB ID or keyword...">
+						<form  class="navbar-form pull-right" action="searchResults.php" method="get">
+							<input type="text" class="form-control" name="keyword" id="searchInput" autocomplete="off" placeholder="Enter PDB ID or keyword...">
 							<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
 							<div id="liveSearchResults" class="liveSearchResultsPage"></div>
 						</form><!-- end navbar-form -->	
@@ -115,66 +115,8 @@ include('search.php');
 		
 				
 			<div class="container" id="searchResults">
-					<h2> Search Results </h2>
-				<div class="results">
-					
-				<div class="resultsHeader">
-					<div class="resultsId">
-						ID
-					</div>
-					<div class="resultsRes">
-						Resolution:
-					</div>
-					<div class="resultsLink">
-						[PDB] [PDBSum] [FASTA]
-					</div>
-				</div><!-- end resultsHeader -->
-				
-				<div class="resultsBody1">
-					<div class="resultsTitle">
-					Title
-					</div>
-					<div class="resultsTitlePDB">
-					Full PDB Title
-					</div>
-				</div><!-- end resultsBody1 -->
-				
-				<div class="resultsBody2">
-					<div class="resultsClass">
-					Classification
-					</div>
-					<div class="resultsClassPDB">
-					Classification PDB
-					</div>
-				</div><!-- end resultsBody2 -->
-				
-				
-				
-				<div class="resultsBody3">
-					<div class="resultsEC">
-					EC number
-					</div>
-					<div class="resultsECNum">
-					ECNum
-					</div>
-				</div><!-- end resultsBody3 -->
-				
-				
-				<div class="resultsFooter">
-					<div class="resultsChain">
-					Chain
-					</div>
-					<div class="resultsChainNum">
-					Chain A B C
-					</div>
-					<div class="resultsSCOP">
-					SCOP
-					</div>
-					<div class="resultsCATH">
-					CATH
-					</div>
-				</div><!-- end resultsFooter -->
-				</div><!-- end results -->
+				<h2> Search Results </h2>
+				<?php echo $tableString; ?>
 			</div><!-- end container and searchResults -->
 			
 		</div><!-- end container-->
