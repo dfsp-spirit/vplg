@@ -49,40 +49,32 @@ while (($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)) && ($counter <= 30)){
 		$class = "White";
 	}
 	// var_dump($arr);
-	$tableString .= '<table border="0" class="results' .$class.'">
-					<colgroup>
-						<col width="100">						
-					</colgroup>
-					<tr class="tableHeader' .$class.'"> 
-						<td class="tableName">'.$arr["pdb_id"].'</td> 
-						<td><i>Resolution:</i></td>
-						<td>' .$arr["resolution"]. '</td> 
-					</tr>
-					<tr>
-						<td class="tableCategories">Title</td>
-						<td>' .$arr["title"]. '</td>
-						<td></td>
-						<td></td>
-					</tr>
-					<tr> 
-						<td class="tableCategories">Classification</td> 
-						<td>'.$arr["header"].'</td>
-						<td></td>
-						<td></td>
-					</tr>
-					<tr>
-						<td class="tableCategories">EC number</td>
-						<td>#####</td>
-						<td></td>
-						<td></td>
-					</tr>
-					<tr>
-						<td class="tableCategories">Chain A</td>
-						<td>Checkbox <br> SCOP</td>
-						<td>####</td>
-						<td></td>
-					</tr>
-				</table>';
+	$tableString .=	 '<div class="results">					
+					<div class="resultsHeader">
+						<div class="resultsId">'.$arr["pdb_id"].'</div>
+						<div class="resultsRes">'.$arr["resolution"].'</div>
+						<div class="resultsLink"><a href="">LINKS</a></div>
+					</div>
+					<div class="resultsBody1">
+						<div class="resultsTitle">Title</div>
+						<div class="resultsTitlePDB">' .$arr["title"]. '</div>
+					</div>
+					<div class="resultsBody2">
+						<div class="resultsClass">Classification</div>
+						<div class="resultsClassPDB">'.$arr["header"].'</div>
+					</div>
+					<div class="resultsBody3">
+						<div class="resultsEC">EC#	</div>
+						<div class="resultsECNum">#####</div>
+					</div>
+					<div class="resultsFooter">
+						<div class="resultsChain">Chain</div>
+						<div class="resultsChainNum">####</div>
+						<div class="resultsSCOP">Scop ####</div>
+						<div class="resultsCATH">CATH ####</div>
+					</div>
+				</div>';
+				
 	echo $counter;
 	$counter++;
 }
