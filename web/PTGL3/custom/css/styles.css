@@ -322,6 +322,7 @@ Notes: 		Hand coded for www.vplg.org
 	}
 	
 	.resultsLink {
+		padding-top: .7em;
 		text-align: right;
 		padding-right: 1px;
 	}
@@ -402,8 +403,16 @@ Notes: 		Hand coded for www.vplg.org
 	
 	
 	
+	/* Load Proteins */
+	
+	#load {
+		margin-top: -5%;
+	}
 	
 	
+	#loadInput {
+		width: 301px;
+	}
 	
 	
 	

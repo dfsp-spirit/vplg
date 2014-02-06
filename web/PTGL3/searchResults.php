@@ -112,6 +112,23 @@ include('search.php');
 				</div><!-- end container -->
 			</div><!-- end navbar fixed-top -->
 		
+			<div class="container">
+				<div class="row" id="load">
+				<div class="col-lg-3 col-centered">
+					<div class="input-group form-group">
+						<form class="form-inline">
+							<input type="text" class="form-control" name="keyword" id="loadInput" autocomplete="off" placeholder="Load proteins...">
+							<button type"submit" class="btn btn-default" id="loadButton"><span>Load Proteins</span></button>
+						</form>	
+					</div><!-- end input-group and form-group -->
+				</div><!-- end col-centered -->
+			</div><!-- end row -->
+			
+			
+			
+			</div>
+		
+		
 		
 				
 			<div class="container" id="searchResults">
