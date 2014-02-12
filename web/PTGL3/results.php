@@ -113,36 +113,24 @@ include('search.php');
 			</div><!-- end navbar fixed-top -->
 		
 			<div class="container">
-				<div class="row" id="load">
-				<div class="col-lg-3 col-centered">
-					<div class="input-group form-group">
-						<form name="protChains" class="form-inline">
-							<input type="text" class="form-control" name="keyword" id="loadInput" autocomplete="off" placeholder="Load proteins...">
-							<button type="submit" class="btn btn-default" id="loadButton"><span>Load Proteins</span></button>
-					<div class="additionalProteinButtons">
-						<button type="button" class="btn btn-default btnSize" id="selectAllBtn"><span>Select all proteins</span></button>
-						<button type="button" class="btn btn-default btnSize protButton" id="resetBtn"><span>Reset</span></button>
-						<button type="button" class="btn btn-default btnSize protButton" id="selectMatchingBtn"><span>Select matching chains</span></button>
-					</div>
-					</div><!-- end input-group and form-group -->
-				</div><!-- end col-centered -->
-			</div><!-- end row -->
-			
-			
-			
-			</div>
-		
-		
-		
+				<!-- VERGLEICHE DER COOLE PROTEINE -->
 				
-			<div class="container" id="searchResults">
-				<h2> Search Results </h2>
-				<?php echo $tableString; ?>
-				</form>	
-			</div><!-- end container and searchResults -->
+				
+				
+				<!-- VERGLEICHE DER COOLE PROTEINE -->
+				
+				
+				
+				
+				<!-- VERGLEICHE DER COOLE PROTEINE -->
+			</div><!-- end container -->	
+			
+			
+			
+			
+			
 			
 		</div><!-- end container-->
-
 		</div><!-- end wrapper -->
 		
 		

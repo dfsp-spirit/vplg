@@ -56,7 +56,7 @@ if (($keyword == "") || (strlen($keyword) <= 2)) {
 		$tableString .=	 '<div class="results results'.$class.'">					
 						<div class="resultsHeader resultsHeader'.$class.'">
 							<div class="resultsId">'.$arr["pdb_id"].'</div>
-							<div class="resultsRes">Resolution: '.$arr["resolution"].'</div>
+							<div class="resultsRes">Resolution: '.$arr["resolution"].' &Aring;</div>
 							<div class="resultsLink"><a href="http://www.rcsb.org/pdb/explore/explore.do?structureId='.$arr["pdb_id"].'">[PDB]</a>
 												<a href="">[PDBSum]</a>
 												<a href="">[FASTA]</a></div>
@@ -75,7 +75,7 @@ if (($keyword == "") || (strlen($keyword) <= 2)) {
 						</div>
 						<div class="resultsFooter">
 							<div class="resultsChain">Chain</div>
-							<div class="resultsChainNum">####</div>
+							<div class="resultsChainNum"><input type=checkbox id="'.$arr["pdb_id"].'" class="chainCheckBox" name="1" value="'.$arr["pdb_id"].'"/>'.$arr["pdb_id"].'A</div>
 							<div class="resultsSCOP">Scop ####</div>
 							<div class="resultsCATH">CATH ####</div>
 						</div>
