@@ -124,7 +124,7 @@
 					<div class="input-group form-group">
 						<form class="form-inline" action="searchResults.php" method="get">
 							<input type="text" class="form-control" name="keyword" id="searchInput" autocomplete="off" placeholder="Enter PDB ID or keyword...">
-							<button type"submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+							<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
 							<div id="advancedButton">Advanced Search  <div id="arrow"><strong class="caret"></strong></div></div>
 							<div id="liveSearchResults"></div>
 							<label class="checkboxFont">
@@ -140,13 +140,13 @@
 								<label class="advancedLabel">Title
 									<input class="advancedInput" type="text" id="bla1" name="bla" placeholder="" size="20" maxlength="50"/>
 								</label>
-								<label class="advancedLabel">Het:
+								<label class="advancedLabel">Het
 									<input class="advancedInput" type="text" id="bla2" name="bla" placeholder=""" size="20" maxlength="50"/>
 								</label>
 								<label class="advancedLabel">Hetname
 									<input class="advancedInput" type="text" id="bla3" name="bla" placeholder="" size="20" maxlength="50"/>
 								</label>	
-								<label class="advancedLabel">SCPOP
+								<label class="advancedLabel">SCOP
 									<input class="advancedInput" type="text" id="bla4" name="bla" placeholder="" size="20" maxlength="50"/>
 								</label>
 								<label class="advancedLabel">SCOP ID

@@ -148,7 +148,7 @@
 						<br>
 						e-mail:  ina.koch (at) bioinformatik.uni-frankfurt.de
 						<br>
-						http://www.bioinformatik.uni-frankfurt.de/
+						<a href="http://www.bioinformatik.uni-frankfurt.de">http://www.bioinformatik.uni-frankfurt.de/</a>
 					</div><!-- end rightColumn and member1info -->
 				</div><!-- end firtElement -->
 				
@@ -171,7 +171,7 @@
 						<br>
 						e-mail:  may (at) mpimp-golm.mpg.de
 						<br>
-						http://bioinformatics.mpimp-golm.mpg.de/group-members/patrick-may
+						<a href="http://bioinformatics.mpimp-golm.mpg.de/group-members/patrick-may">http://bioinformatics.mpimp-golm.mpg.de/group-members/patrick-may</a>
 					</div><!-- end rightColumn and member2info -->
 				</div><!-- end secondElement -->
 				
