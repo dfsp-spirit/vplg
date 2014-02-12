@@ -53,12 +53,12 @@
 				</button>
 				
 
-				<a href="index.html" class="navbar-brand"><img src="ADD_IMAGE_HERE" alt="PTGL Logo"></a>
+				<a href="index.php" class="navbar-brand"><img src="ADD_IMAGE_HERE" alt="PTGL Logo"></a>
 
 					<div class="nav-collapse collapse navbar-responsive-collapse">
 						<ul class="nav navbar-nav">
 							<li  class="navbarFont">
-								<a href="index.html">Home</a>
+								<a href="index.php">Home</a>
 							</li>
 
 							<li class="navbarFont">
@@ -157,7 +157,7 @@
 					<br>
 					e-mail:  ina.koch (at) bioinformatik.uni-frankfurt.de
 					<br>
-					<a href="http://www.bioinformatik.uni-frankfurt.de">http://www.bioinformatik.uni-frankfurt.de/</a>
+					<a href="http://www.bioinformatik.uni-frankfurt.de" target="_blank">http://www.bioinformatik.uni-frankfurt.de/</a>
 				</div><!-- end rightColumn -->
 			</div><!-- end col-sm-6 -->
 		</div><!-- end row -->
@@ -184,7 +184,7 @@
 					<br>
 					e-mail:  may (at) mpimp-golm.mpg.de
 					<br>
-					<a href="http://bioinformatics.mpimp-golm.mpg.de/group-members/patrick-may">http://bioinformatics.mpimp-golm.mpg.de/group-members/patrick-may</a>
+					<a href="http://bioinformatics.mpimp-golm.mpg.de/group-members/patrick-may" target="_blank">http://bioinformatics.mpimp-golm.mpg.de/group-members/patrick-may</a>
 				</div><!-- end rightColumn-->
 			</div><!-- end col-sm-6 -->
 		</div><!-- end row -->

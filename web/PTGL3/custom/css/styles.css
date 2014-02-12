@@ -18,7 +18,18 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		height: 100%;
 		color: #0D0D0D;
 	}
-
+	
+	a {
+		color: #1E0FBE;
+	}
+	
+	a:visited {
+			color: purple;
+		}
+	
+	a:active a:focus a:hover { 
+		color: #2A6496;
+	}
 
 
 	
