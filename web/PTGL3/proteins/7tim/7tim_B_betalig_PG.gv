@@ -1,0 +1,23 @@
+graph ProteinGraph {
+    0 [label="0-E" shape=square color=black];
+    1 [label="1-E" shape=square color=black];
+    2 [label="2-E" shape=square color=black];
+    3 [label="3-E" shape=square color=black];
+    4 [label="4-E" shape=square color=black];
+    5 [label="5-E" shape=square color=black];
+    6 [label="6-E" shape=square color=black];
+    7 [label="7-E" shape=square color=black];
+    8 [label="8-L" shape=triangle color=magenta];
+    0 -- 1 [label="p" color=red];
+    0 -- 7 [label="p" color=red];
+    0 -- 8 [label="l" color=magenta];
+    1 -- 2 [label="p" color=red];
+    2 -- 3 [label="p" color=red];
+    3 -- 4 [label="p" color=red];
+    4 -- 5 [label="p" color=red];
+    4 -- 8 [label="l" color=magenta];
+    5 -- 6 [label="p" color=red];
+    6 -- 7 [label="p" color=red];
+    6 -- 8 [label="l" color=magenta];
+    7 -- 8 [label="l" color=magenta];
+}

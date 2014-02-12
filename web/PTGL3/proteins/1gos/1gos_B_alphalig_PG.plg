@@ -1,0 +1,61 @@
+# This is the plcc format protein graph file for the alphalig graph of PDB entry 1gos, chain B.
+# First character in a line indicates the line type ('#' => comment, '>' => meta data, '|' => SSE, '=' => contact).
+# The graph meta data follows in format '> key > value'.
+> keywords > OXIDOREDUCTASE, FAD-CONTAINING AMINE OXIDASE
+> pdb_mol_name > MONOAMINE OXIDASE
+> graphtype > alphalig
+> resolution > 3.0
+> date > 26-OCT-01
+> header > OXIDOREDUCTASE
+> pdb_org_common > HUMAN
+> title > HUMAN MONOAMINE OXIDASE B
+> format_version > 2
+> pdbid > 1gos
+> experiment > X-RAY DIFFRACTION
+> chainid > B
+> graphclass > protein graph
+> pdb_org_sci > HOMO SAPIENS
+# SSEs follow in format '| PDB ID | chain ID | graph type | sequential SSE number in chain | SSE number in graph and image | SSE type | DSSP start residue # | DSSP end residue # | PDB end residue ID (format: chain-res#-icode) | PDB start residue ID | AA sequence'
+| 1gos | B | alphalig | 2 | 1 | H | 509 | 519 | B-14-  | B-24-  | ISGMAAAKLLH 
+| 1gos | B | alphalig | 6 | 2 | H | 561 | 569 | B-66-  | B-74-  | NRILRLAKE 
+| 1gos | B | alphalig | 10 | 3 | H | 604 | 621 | B-109-  | B-126-  | PITYLDHNNFWRTMDDMG 
+| 1gos | B | alphalig | 11 | 4 | H | 629 | 631 | B-134-  | B-136-  | PWK 
+| 1gos | B | alphalig | 12 | 5 | H | 635 | 639 | B-140-  | B-144-  | AEEWD 
+| 1gos | B | alphalig | 13 | 6 | H | 643 | 650 | B-148-  | B-155-  | MKELLDKL 
+| 1gos | B | alphalig | 14 | 7 | H | 654 | 667 | B-159-  | B-172-  | ESAKQLATLFVNLC 
+| 1gos | B | alphalig | 15 | 8 | H | 672 | 674 | B-177-  | B-179-  | THE 
+| 1gos | B | alphalig | 16 | 9 | H | 677 | 685 | B-182-  | B-190-  | ALWFLWYVK 
+| 1gos | B | alphalig | 17 | 10 | H | 689 | 694 | B-194-  | B-199-  | GTTRII 
+| 1gos | B | alphalig | 19 | 11 | H | 710 | 719 | B-215-  | B-224-  | GQVSERIMDL 
+| 1gos | B | alphalig | 24 | 12 | H | 761 | 766 | B-266-  | B-271-  | PTLGMK 
+| 1gos | B | alphalig | 26 | 13 | H | 775 | 780 | B-280-  | B-285-  | MMRNQM 
+| 1gos | B | alphalig | 28 | 14 | H | 800 | 804 | B-305-  | B-309-  | FWRKK 
+| 1gos | B | alphalig | 32 | 15 | H | 841 | 848 | B-346-  | B-353-  | AHKARKLA 
+| 1gos | B | alphalig | 33 | 16 | H | 852 | 867 | B-357-  | B-372-  | KEERLKKLCELYAKVL 
+| 1gos | B | alphalig | 34 | 17 | H | 870 | 873 | B-375-  | B-378-  | LEAL 
+| 1gos | B | alphalig | 36 | 18 | H | 883 | 885 | B-388-  | B-390-  | WCE 
+| 1gos | B | alphalig | 37 | 19 | H | 902 | 908 | B-407-  | B-413-  | LTQYGRV 
+| 1gos | B | alphalig | 39 | 20 | H | 921 | 923 | B-426-  | B-428-  | TET 
+| 1gos | B | alphalig | 40 | 21 | H | 931 | 949 | B-436-  | B-454-  | MEGAVEAGERAAREILHAM 
+| 1gos | B | alphalig | 41 | 22 | H | 954 | 956 | B-459-  | B-461-  | EDE 
+| 1gos | B | alphalig | 42 | 23 | H | 976 | 980 | B-481-  | B-485-  | FLERH 
+| 1gos | B | alphalig | 43 | 24 | H | 984 | 990 | B-489-  | B-495-  | VPGLLRL 
+| 1gos | B | alphalig | 44 | 25 | L | 994 | 994 | B-600-  | B-600-  | J 
+| 1gos | B | alphalig | 45 | 26 | L | 995 | 995 | B-601-  | B-601-  | J 
+# Printed info on 26 SSEs.
+# The contacts between the SSEs follow in format '= SSE1 = contact_type = SSE2'. The SSEs are labeled by their position in this graph.
+= 1 = m = 11
+= 1 = p = 21
+= 1 = l = 25
+= 2 = m = 21
+= 3 = p = 7
+= 7 = l = 26
+= 10 = l = 26
+= 12 = l = 25
+= 13 = m = 19
+= 16 = m = 17
+= 18 = l = 25
+= 20 = l = 25
+= 21 = l = 25
+= 25 = l = 26
+# Listed 14 contacts. EOF.
