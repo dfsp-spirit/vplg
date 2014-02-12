@@ -30,6 +30,7 @@
 
                     <!-- Live Search for PDB IDs -->
 		<script src="livesearch.js" type="text/javascript"></script>
+		
 
 
 	</head>
@@ -124,14 +125,62 @@
 						<form class="form-inline" action="searchResults.php" method="get">
 							<input type="text" class="form-control" name="keyword" id="searchInput" autocomplete="off" placeholder="Enter PDB ID or keyword...">
 							<button type"submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+							<div id="advancedButton">Advanced Search  <div id="arrow"><strong class="caret"></strong></div></div>
 							<div id="liveSearchResults"></div>
-							<br>
 							<label class="checkboxFont">
 								<input type="checkbox" id="inlineCheckbox3" name="SelectRedund" value="1"> Remove sequence homologs </input>
 							</label>
 							<label class="checkboxFont">
 								<input type="checkbox" id="matchexactCB" name="exact" value="1"> Match exact word </input>
 							</label>
+							<div id="advancedSearch">
+								<label class="advancedLabel">PDB Identifier
+									<input class="advancedInput" type="text" id="bla" name="bla" placeholder="PDB ID" size="6" maxlength="4" />
+								</label>
+								<label class="advancedLabel">Title
+									<input class="advancedInput" type="text" id="bla1" name="bla" placeholder="" size="20" maxlength="50"/>
+								</label>
+								<label class="advancedLabel">Het:
+									<input class="advancedInput" type="text" id="bla2" name="bla" placeholder=""" size="20" maxlength="50"/>
+								</label>
+								<label class="advancedLabel">Hetname
+									<input class="advancedInput" type="text" id="bla3" name="bla" placeholder="" size="20" maxlength="50"/>
+								</label>	
+								<label class="advancedLabel">SCPOP
+									<input class="advancedInput" type="text" id="bla4" name="bla" placeholder="" size="20" maxlength="50"/>
+								</label>
+								<label class="advancedLabel">SCOP ID
+									<input class="advancedInput" type="text" id="bla5" name="bla" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="bla5a" name="bla" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="bla5b" name="bla" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="bla5c" name="bla" placeholder="" size="4" maxlength="4"/>
+								</label>
+								<label class="advancedLabel">CATH
+									<input class="advancedInput" type="text" id="bla6" name="bla" placeholder="" size="20" maxlength="50"/>
+								</label>
+								<label class="advancedLabel">CATH ID
+									<input class="advancedInput" type="text" id="bla7" name="bla" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="bla7a" name="bla" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="bla7b" name="bla" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="bla7c" name="bla" placeholder="" size="4" maxlength="4"/>
+								</label>
+								<label class="advancedLabel">EC
+									<input class="advancedInput" type="text" id="bla8" name="bla" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="bla8a" name="bla" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="bla8b" name="bla" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="bla8c" name="bla" placeholder="" size="4" maxlength="4"/>
+								</label>	
+								<label class="advancedLabel">Molecule
+									<input class="advancedInput" type="text" id="bla9" name="bla" placeholder="" size="20" maxlength="50"/>
+								</label>		
+								<label class="advancedLabel">Classification
+									<input class="advancedInput" type="text" id="bla00" name="bla" placeholder="" size="20" maxlength="50"/>
+								</label>		
+								<label class="advancedLabel">Graphs
+									<input class="advancedInput" type="text" id="bla01" name="bla" placeholder="" size="20" maxlength="50"/>
+								</label>
+								<button type="submit" class="btn btn-default advancedInput" style="margin-top:10px;"><span>Search</span></button>
+							</div>
 						</form>	
 					</div><!-- end input-group and form-group -->
 				</div><!-- end col-centered -->
