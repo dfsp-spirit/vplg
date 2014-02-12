@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <?php
-include('search.php');
+include('display_proteins.php');
 ?>
 <html>
 	<head>
