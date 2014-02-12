@@ -26,9 +26,11 @@ include('search.php');
 		<!-- Custom CSS -->
 		<link rel="stylesheet" type="text/css" href="custom/css/styles.css">
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+		
 		<!-- Include Modernizr in the head, before any other JS -->
 		<script src="bootstrap/js/modernizr-2.6.2.min.js"></script>
-		  <!-- Live Search for PDB IDs -->
+		
+		<!-- Live Search for PDB IDs -->
 		<script src="livesearch.js" type="text/javascript"></script>
 	</head>
 
@@ -173,7 +175,7 @@ include('search.php');
 				
 				<div class="col-sm-2">
 				</div>
-			
+			</div>
 			<div class="row">
 				<div class="col-sm-1">
 				</div>

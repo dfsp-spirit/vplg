@@ -23,18 +23,17 @@
 
 		<!-- Custom CSS -->
 		<link rel="stylesheet" type="text/css" href="custom/css/styles.css">
-
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+		
+		
+		<!-- Include Modernizr in the head, before any other JS -->
+		<script src="bootstrap/js/modernizr-2.6.2.min.js"></script>
 		
 		<!-- Include Modernizr in the head, before any other JS -->
 		<script src="bootstrap/js/modernizr-2.6.2.min.js"></script>
 		
 		<!-- Live Search for PDB IDs -->
-		<script type="text/javascript">
-			$(document).ready(function () {                            
-				$("input#searchInput").live("keyup", function(e) {                        
-					}
-				)};
-		</script>/* still needs to be modified */	
+		<script src="livesearch.js" type="text/javascript"></script>
 	</head>
 
 	
@@ -108,9 +107,10 @@
 						</ul><!-- end nav navbar-nav -->								
 					</div><!-- end nav-collapse -->
 					<div class="nav-collapse collapse navbar-responsive-collapse">
-						<form  class="navbar-form pull-right" action="searchResults.php" method="post">
-							<input type="text" class="form-control" id="searchInput" placeholder="Enter PDB ID or keyword...">
+						<form  class="navbar-form pull-right" action="searchResults.php" method="get">
+							<input type="text" class="form-control" name="keyword" id="searchInput" autocomplete="off" placeholder="Enter PDB ID or keyword...">
 							<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+							<div id="liveSearchResults" class="liveSearchResultsPage"></div>
 						</form><!-- end navbar-form -->	
 					</div>
 				</div><!-- end container -->
@@ -244,7 +244,7 @@
 				
 				<div class="col-sm-2">
 				</div>
-			
+			</div>
 			<div class="row">
 				<div class="col-sm-1">
 				</div>
