@@ -118,8 +118,13 @@ include('search.php');
 					<div class="input-group form-group">
 						<form class="form-inline">
 							<input type="text" class="form-control" name="keyword" id="loadInput" autocomplete="off" placeholder="Load proteins...">
-							<button type"submit" class="btn btn-default" id="loadButton"><span>Load Proteins</span></button>
+							<button type="submit" class="btn btn-default" id="loadButton"><span>Load Proteins</span></button>
 						</form>	
+					<div class="additionalProteinButtons">
+						<button type="submit" class="btn btn-default btnSize"><span>Select all proteins</span></button>
+						<button type="reset" class="btn btn-default btnSize protButton"><span>Reset</span></button>
+						<button type="submit" class="btn btn-default btnSize protButton"><span>Select matching chains</span></button>
+					</div>
 					</div><!-- end input-group and form-group -->
 				</div><!-- end col-centered -->
 			</div><!-- end row -->
@@ -139,6 +144,11 @@ include('search.php');
 		</div><!-- end container-->
 
 		</div><!-- end wrapper -->
+		
+		
+		
+		
+		
 	<footer id="footer">
 		<div class="container">
 				<div class="row">

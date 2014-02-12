@@ -411,12 +411,22 @@ Notes: 		Hand coded for www.vplg.org
 	
 	
 	#loadInput {
-		width: 301px;
+		width: 273px;
 	}
 	
 	
+	.additionalProteinButtons {
+		margin-top: 10%;
+	}
+	
+	.protButton {
+		margin-left: 4%;
+	}
 	
 	
+	.btnSize {
+			padding: 4px 6px;
+	}
 	
 	
 	
