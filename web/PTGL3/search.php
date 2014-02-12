@@ -75,7 +75,7 @@ if (($keyword == "") || (strlen($keyword) <= 2)) {
 						</div>
 						<div class="resultsFooter">
 							<div class="resultsChain">Chain</div>
-							<div class="resultsChainNum"><input type=checkbox id="'.$arr["pdb_id"].'" class="chainCheckBox" name="1" value="'.$arr["pdb_id"].'"/>'.$arr["pdb_id"].'A</div>
+							<div class="resultsChainNum"><input type=checkbox id="'.$arr["pdb_id"].'" class="chainCheckBox" value="'.$arr["pdb_id"].'"/>'.$arr["pdb_id"].'A</div>
 							<div class="resultsSCOP">Scop ####</div>
 							<div class="resultsCATH">CATH ####</div>
 						</div>

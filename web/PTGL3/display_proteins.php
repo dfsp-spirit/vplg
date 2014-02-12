@@ -9,32 +9,33 @@ error_reporting(-1);
 
 $db_config = include('config.php');     //TODO: Sichern?
 
-$keyword = "";
-$selectRedund = 0;
-$exactSearch = 0;
+// Define functions
+
+function getGraphbyID($pdbID){
+	# TODO
+}
+
 
 
 // try to get _GET
 if(isset($_GET)) {
-    if(isset($_GET["keyword"])) {$keyword = $_GET["keyword"];};
-    if(isset($_GET["exact"])) {$exactSearch = $_GET["exact"];};
-    if(isset($_GET["SelectRedund"])) {$selectRedund = $_GET["SelectRedund"];};
+    if(isset($_GET["pcs"])) {$pcs = $_GET["pcs"];};
 }
 
-echo "<br /><br /><br /><br /><br />Search Query: " . $keyword . "<br />Exact -> " . $exactSearch . "<br />Search Redundant -> ". $selectRedund . "<br />";
+echo "<br /><br /><br /><br /><br />Selected Chains: " . $pcs . "<br />";
 
-if (strlen($keyword) == 4) {
-    if (is_numeric($keyword[0])) {
-        echo 'Might be a PDB ID. URL: <a href="http://www.rcsb.org/pdb/explore/explore.do?structureId=' . $keyword . '">' . $keyword .'</a>';
-    }
+$chains = explode(" ", trim($pcs));  #Clip whitespaces and seperate PDB IDs at whitespaces -> Array
+var_dump($chains);
+
+foreach ($chains as $value ){
+	if (!(strlen($value) == 4) || (!(is_numeric($value[0])))) {
+		echo "<br />'" . $value . "' has a wrong PDB-ID format\n<br />";
+	}
 }
 
 
 
-if (($keyword == "") || (strlen($keyword) <= 2)) {
-	$tableString = "Sorry. Your search term is too short. <br>\n";
-	$tableString .= '<a href="./index.php">Go back</a> or use the query box in the upper right corner!';
-} else {
+/*
 	
 	// establish pgsql connection
 	$conn_string = "host=" . $db_config['host'] . " port=" . $db_config['port'] . " dbname=" . $db_config['db'] . " user=" . $db_config['user'] ." password=" . $db_config['pw'];
@@ -88,5 +89,5 @@ if (($keyword == "") || (strlen($keyword) <= 2)) {
 	pg_free_result($result); // clean memory
 	pg_close($db); // close connection
 }
-
+*/
 ?>

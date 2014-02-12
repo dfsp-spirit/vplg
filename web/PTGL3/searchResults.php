@@ -118,8 +118,8 @@ include('search.php');
 				<div class="row" id="load">
 				<div class="col-lg-3 col-centered">
 					<div class="input-group form-group">
-						<form name="protChains" class="form-inline">
-							<input type="text" class="form-control" name="keyword" id="loadInput" autocomplete="off" placeholder="Load proteins...">
+						<form name="protChains" class="form-inline" method="get" action="display_proteins">
+							<input type="text" class="form-control" name="pcs" id="loadInput" autocomplete="off" placeholder="Load proteins...">
 							<button type="submit" class="btn btn-default" id="loadButton"><span>Load Proteins</span></button>
 					<div class="additionalProteinButtons">
 						<button type="button" class="btn btn-default btnSize" id="selectAllBtn"><span>Select all proteins</span></button>
