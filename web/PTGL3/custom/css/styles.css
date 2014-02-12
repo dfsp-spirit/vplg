@@ -137,14 +137,37 @@ Notes: 		Hand coded for www.vplg.org
 /*	------------------------------------------------------------*/
 	/*Contact Us*/
 	
-	
-	#contactUs {
-		margin-top: 50px;
+	.contact {
+		margin-top: 2%;
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
 	}
 	
-	.contactTable{
-		background: rgba(229, 229, 229, .4);
+	#firstElement {
+		padding-bottom: 200px;
 	}
+	
+	
+	#secondElement {
+		margin-bottom: 200px;
+	}
+	
+	
+	#thirdElement {
+		
+	}
+	
+	.leftColumn {
+		float: left;
+	}
+	
+	
+	.rightColumn {
+		float: right;
+	}
+	
+	
 	
 /*	-------------------------------------------------------------
 	Typography
