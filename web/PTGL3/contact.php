@@ -120,101 +120,104 @@
 			<h2> Contact Us </h2>
 			<br>
 			<h4> List of people associated with PTGL </h4>
-			<div class="contact">
-				<div id="firstElement">
-					<div class="leftColumn" id="member1">
-						<strong>Prof. Dr. Ina Koch</strong>
-						<br>
-						Johann Wolfgang Goethe-University Frankfurt a. Main
-						<br>
-						Faculty of Computer Science and Mathematics, Dept. 12
-						<br>
-						Institute for Computer Science
-						<br>
-						Molecular Bioinformatics (MBI)
-						<br>
-						Robert-Mayer-Strasse 11-15
-						<br>
-						60325 Frankfurt a. Main
-						<br>
-						Germany
-					</div><!-- end leftColumn and member1 -->
-					
-					<div class="rightColumn" id="member1info">
-						<br>
-						Phone  +49 +69 798-24652
-						<br>
-						Fax    +49 +69 798-24650
-						<br>
-						e-mail:  ina.koch (at) bioinformatik.uni-frankfurt.de
-						<br>
-						<a href="http://www.bioinformatik.uni-frankfurt.de">http://www.bioinformatik.uni-frankfurt.de/</a>
-					</div><!-- end rightColumn and member1info -->
-				</div><!-- end firtElement -->
-				
-				<div id="secondElement">
-					<div class="leftColumn" id="member2">
-						<strong>Dr. Patrick May</strong>
-						<br>
-						Max Planck Institute of Molecular Plant Physiology
-						<br>
-						Am Muehlenberg 1
-						<br>
-						14476 Potsdam-Golm
-						<br>
-						Germany
-					</div><!-- end leftColumn and member2 -->
-					
-					<div class="rightColumn" id="member2info">
-						<br>
-						Phone  +49 331 567-8615
-						<br>
-						e-mail:  may (at) mpimp-golm.mpg.de
-						<br>
-						<a href="http://bioinformatics.mpimp-golm.mpg.de/group-members/patrick-may">http://bioinformatics.mpimp-golm.mpg.de/group-members/patrick-may</a>
-					</div><!-- end rightColumn and member2info -->
-				</div><!-- end secondElement -->
-				
-				
-				
-				<div id="thirdElement">
-					<div class="leftColumn" id="member3">
-						<strong>Dr. Thomas Steinke</strong>
-						<br>
-						Zuse Institute Berlin
-						<br>
-						Computer Science Research
-						<br>
-						Takustrasse 7
-						<br>
-						14195 Berlin
-						<br>
-						Germany
-					</div><!-- end leftColumn and member3 -->
-					
-					
-					<div class="rightColumn" id="member3info">
+			
+			
+			
+			
+			
+			
+		<div id="contact">
+		<div class="row" id="member1">
+			<div class="col-sm-6">
+				 <div class="leftColumn">
+					<strong>Prof. Dr. Ina Koch</strong>
 					<br>
-						e-mail:  steinke (at) zib.de
-					</div><!-- end rightColumn and member3info -->
-				</div><!-- end thirdElement -->
-			</div><!-- end contact -->
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-		</div><!-- end container -->
-		</div><!-- end container -->
-		</div><!-- end wrapper -->
+					Johann Wolfgang Goethe-University Frankfurt a. Main
+					<br>
+					Faculty of Computer Science and Mathematics, Dept. 12
+					<br>
+					Institute for Computer Science
+					<br>
+					Molecular Bioinformatics (MBI)
+					<br>
+					Robert-Mayer-Strasse 11-15
+					<br>
+					60325 Frankfurt a. Main
+					<br>
+					Germany
+				</div><!-- end leftColumn -->
+			</div><!-- end col-sm-6 -->
+				
+			<div class="col-sm-6">
+				<div class="rightColumn">
+					<br>
+					Phone  +49 +69 798-24652
+					<br>
+					Fax    +49 +69 798-24650
+					<br>
+					e-mail:  ina.koch (at) bioinformatik.uni-frankfurt.de
+					<br>
+					<a href="http://www.bioinformatik.uni-frankfurt.de">http://www.bioinformatik.uni-frankfurt.de/</a>
+				</div><!-- end rightColumn -->
+			</div><!-- end col-sm-6 -->
+		</div><!-- end row -->
+
+		<div class="row" id="member2">
+			<div class="col-sm-6">
+				<div class="leftColumn">
+					<strong>Dr. Patrick May</strong>
+					<br>
+					Max Planck Institute of Molecular Plant Physiology
+					<br>
+					Am Muehlenberg 1
+					<br>
+					14476 Potsdam-Golm
+					<br>
+					Germany
+				</div><!-- end leftColumn-->
+			</div><!-- end col-sm-6 -->
+		
+			<div class="col-sm-6">
+				<div class="rightColumn">
+					<br>
+					Phone  +49 331 567-8615
+					<br>
+					e-mail:  may (at) mpimp-golm.mpg.de
+					<br>
+					<a href="http://bioinformatics.mpimp-golm.mpg.de/group-members/patrick-may">http://bioinformatics.mpimp-golm.mpg.de/group-members/patrick-may</a>
+				</div><!-- end rightColumn-->
+			</div><!-- end col-sm-6 -->
+		</div><!-- end row -->
+		
+		<div class="row" id="member3">
+			<div class="col-sm-6">
+				<div class="leftColumn">
+					<strong>Dr. Thomas Steinke</strong>
+					<br>
+					Zuse Institute Berlin
+					<br>
+					Computer Science Research
+					<br>
+					Takustrasse 7
+					<br>
+					14195 Berlin
+					<br>
+					Germany
+				</div><!-- end leftColumn -->
+			</div><!-- end col-sm-6 -->
+			
+			<div class="col-sm-6">
+				<div class="rightColumn">
+					<br>
+					e-mail:  steinke (at) zib.de
+				</div><!-- end rightColumn -->
+			</div><!-- end col-sm-6 -->
+		</div><!-- end row -->
+		</div><!-- end contact -->
+		
+	</div><!-- end container -->
+	</div><!-- end container -->
+	</div><!-- end wrapper -->
 	
 	
 	<footer id="footer">

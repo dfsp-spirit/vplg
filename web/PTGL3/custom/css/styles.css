@@ -142,39 +142,22 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		margin-top: 5%;
 	}
 	
-	.contact {
-		margin-top: 2%;
-		padding: 10px 10px;
-		width: 100%;
-		height: 100%;
-		overflow: hidden;
+	#contact {
 		background: rgba(214, 214, 214, 0.4);
+		padding: 10px 10px;
 		
 	}
 	
-	#firstElement {
-		overflow: hidden;
-		margin-bottom: 5%;
+	#member1 {
+		padding-top: 1%;
 	}
 	
-	
-	#secondElement {
-		overflow: hidden;
-		margin-bottom: 5%;
+	#member2 {
+		padding-top: 2%;
 	}
 	
-	
-	#thirdElement {
-		overflow: hidden;
-	}
-	
-	.leftColumn {
-		float: left;
-	}
-	
-	
-	.rightColumn {
-		padding-left: 63%;
+	#member3 {
+		padding-top: 2%;
 	}
 	
 	
@@ -286,9 +269,10 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		width: 301px;
 		line-height: 25px;
 		}
-	.liveSearchResultsPage { 
+	.liveSearchResultsPage {
+		top: inherit !important;
 		z-index: 5;
-		position: absolute
+		position: absolute !important;
 		}
 	
 	.result {
