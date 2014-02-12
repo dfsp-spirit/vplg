@@ -119,7 +119,7 @@
 		<div class="container" id="contactUs">
 			<h2> Contact Us </h2>
 			<br>
-			<h4> List of people associated with PTGL: </h4>
+			<h4> List of people associated with PTGL </h4>
 			<div class="contact">
 				<div id="firstElement">
 					<div class="leftColumn" id="member1">
@@ -141,6 +141,7 @@
 					</div><!-- end leftColumn and member1 -->
 					
 					<div class="rightColumn" id="member1info">
+						<br>
 						Phone  +49 +69 798-24652
 						<br>
 						Fax    +49 +69 798-24650
@@ -165,6 +166,7 @@
 					</div><!-- end leftColumn and member2 -->
 					
 					<div class="rightColumn" id="member2info">
+						<br>
 						Phone  +49 331 567-8615
 						<br>
 						e-mail:  may (at) mpimp-golm.mpg.de
@@ -192,6 +194,7 @@
 					
 					
 					<div class="rightColumn" id="member3info">
+					<br>
 						e-mail:  steinke (at) zib.de
 					</div><!-- end rightColumn and member3info -->
 				</div><!-- end thirdElement -->

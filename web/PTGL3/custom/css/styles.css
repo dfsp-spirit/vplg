@@ -4,9 +4,9 @@
 My Custom CSS
 ==============
 
-Author:		Andreas Scheck
-Updated:	December 2013
-Notes: 		Hand coded for www.vplg.org
+Author:		Andreas Scheck, Daniel Bruness
+Updated:	February 2014
+Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 
 */
 
@@ -124,7 +124,7 @@ Notes: 		Hand coded for www.vplg.org
 		}
 		
 	
-	#test {
+	#intro {
 		margin-top: 8%;
 		margin-bottom: -8%;
 		text-align: center;
@@ -137,25 +137,35 @@ Notes: 		Hand coded for www.vplg.org
 /*	------------------------------------------------------------*/
 	/*Contact Us*/
 	
+	
+	#contactUs {
+		margin-top: 5%;
+	}
+	
 	.contact {
 		margin-top: 2%;
+		padding: 10px 10px;
 		width: 100%;
 		height: 100%;
 		overflow: hidden;
+		background: rgba(214, 214, 214, 0.4);
+		
 	}
 	
 	#firstElement {
-		padding-bottom: 200px;
+		overflow: hidden;
+		margin-bottom: 5%;
 	}
 	
 	
 	#secondElement {
-		margin-bottom: 200px;
+		overflow: hidden;
+		margin-bottom: 5%;
 	}
 	
 	
 	#thirdElement {
-		
+		overflow: hidden;
 	}
 	
 	.leftColumn {
@@ -164,7 +174,7 @@ Notes: 		Hand coded for www.vplg.org
 	
 	
 	.rightColumn {
-		float: right;
+		padding-left: 63%;
 	}
 	
 	
@@ -278,7 +288,7 @@ Notes: 		Hand coded for www.vplg.org
 		}
 	.liveSearchResultsPage { 
 		z-index: 5;
-		position: absolute;
+		position: absolute
 		}
 	
 	.result {
