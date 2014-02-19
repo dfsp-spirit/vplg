@@ -489,6 +489,9 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	}
 	
 	
+	svg{
+		 top:0; left:0; height:100%; width:100% 
+	}
 	
 	
 	

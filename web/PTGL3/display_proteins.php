@@ -35,6 +35,18 @@ foreach ($chains as $value ){
 
 
 */
+$svg1 = file_get_contents("./proteins/7tim/7tim_A_albe_PG.svg");
+
+$tableString = '		<div id="myCarousel">
+					<ul class="bxslider bx-prev bx-next">';
+ $tableString .= '				<li>
+							<img src="./proteins/7tim/7tim_A_albe_PG.png"></img>
+						</li>';
+ $tableString .= '				<li>
+							<img src="./proteins/1gos/1gos_A_albe_PG.png"></img>
+						</li>';
+ $tableString .= '			</ul>
+				</div>';
 /*
 	
 	// establish pgsql connection

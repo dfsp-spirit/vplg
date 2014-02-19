@@ -116,31 +116,16 @@ include('display_proteins.php');
 				</div><!-- end container -->
 			</div><!-- end navbar fixed-top -->
 		
-
 			
-			
-			
-			
-			
-			
-		<div id="myCarousel">
-<ul class="bxslider bx-prev bx-next">
-  <li><img src="./images/7tim.jpg" /></li>
-  <li><img src="./images/icon-blue.png" /></li>
-  <li><img src="./images/icon-green.png"/></li>
-</ul>
-			</div>
-			
-
-			
+			<!--BEGIN CAROUSEL -->
+			<?php echo $tableString; ?>
+			<!--END CAROUSEL -->
+		
 			
 		</div><!-- end container-->
 		</div><!-- end wrapper -->
 		
-		
-		
-		
-		
+
 	<footer id="footer">
 		<div class="container">
 				<div class="row">
