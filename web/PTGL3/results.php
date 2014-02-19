@@ -25,6 +25,8 @@ include('display_proteins.php');
 
 		<!-- Custom CSS -->
 		<link rel="stylesheet" type="text/css" href="custom/css/styles.css">
+		<link rel="stylesheet" type="text/css" href="custom/css/jquery.bxslider.css">
+		
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 		<!-- Include Modernizr in the head, before any other JS -->
 		<script src="bootstrap/js/modernizr-2.6.2.min.js"></script>
@@ -114,24 +116,22 @@ include('display_proteins.php');
 				</div><!-- end container -->
 			</div><!-- end navbar fixed-top -->
 		
-			<div class="container">
-				<!-- VERGLEICHE DER COOLE PROTEINE -->
-				
-				<svg width="50" height="50">
-					<rect x="0" y="0" width="50" height="50" fill="green" />
-				</svg>
-				
-				<!-- VERGLEICHE DER COOLE PROTEINE -->
-				
-				
-				
-				
-				<!-- VERGLEICHE DER COOLE PROTEINE -->
-			</div><!-- end container -->	
+
 			
 			
 			
 			
+			
+			
+		<div id="myCarousel">
+<ul class="bxslider bx-prev bx-next">
+  <li><img src="./images/7tim.jpg" /></li>
+  <li><img src="./images/icon-blue.png" /></li>
+  <li><img src="./images/icon-green.png"/></li>
+</ul>
+			</div>
+			
+
 			
 			
 		</div><!-- end container-->
@@ -165,7 +165,7 @@ include('display_proteins.php');
 				
 				<div class="col-sm-2">
 				</div>
-			
+			</div>
 			<div class="row">
 				<div class="col-sm-1">
 				</div>
@@ -229,7 +229,18 @@ include('display_proteins.php');
 		<script src="bootstrap/js/script.js"></script>
 
 
+		
+		
+		
+		
+		
+		
+		
+		
+<!-- bxSlider Javascript file -->
+<script src="./custom/js/jquery.bxslider.min.js"></script>
 
+		
 
 	</body>
 </html>

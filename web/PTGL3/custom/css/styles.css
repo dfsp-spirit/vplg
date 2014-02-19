@@ -493,3 +493,39 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	
 	
 	
+	
+	
+	/* --------------------------------------
+   Carousel
+   -------------------------------------- */
+
+#myCarousel {
+	margin-top: 100px;
+}
+
+.carousel-caption {
+	font-size: 24px;
+}
+
+.carousel-caption h4 {
+	font-size: 32px;
+}
+
+#myCarousel .item { height: 400px; }
+
+#slide1 {
+	background: url(http://upload.wikimedia.org/wikipedia/en/2/24/Lenna.png) top center no-repeat;
+}
+
+#slide2 {
+	background: url('../../images/carousel_medium_02.jpg') top center no-repeat;
+}
+
+#slide3 {
+	background: url('../../images/carousel_medium_03.jpg') top center no-repeat;
+}
+	
+	
+	
+	
+	
