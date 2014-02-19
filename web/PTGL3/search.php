@@ -47,6 +47,12 @@ if (($keyword == "") || (strlen($keyword) <= 2)) {
 	$counter = 0;
 	$tableString = "";
 	while (($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)) && ($counter <= 30)){
+		
+		$query = "SELECT * FROM plcc_chain WHERE pdb_id = '".$arr["pdb_id"]."' ORDER BY chain_name";
+		$result_chains = pg_query($db, $query) 
+					  or die($query . ' -> Query failed: ' . pg_last_error());
+
+		
 		if ($counter % 2 == 0){     // performs alternating orange/white tables
 			$class = "Orange";
 		} else {
@@ -72,14 +78,17 @@ if (($keyword == "") || (strlen($keyword) <= 2)) {
 						<div class="resultsBody3">
 							<div class="resultsEC">EC#	</div>
 							<div class="resultsECNum">#####</div>
-						</div>
-						<div class="resultsFooter">
-							<div class="resultsChain">Chain</div>
-							<div class="resultsChainNum"><input type=checkbox id="'.$arr["pdb_id"].'" class="chainCheckBox" value="'.$arr["pdb_id"].'"/>'.$arr["pdb_id"].'A</div>
+						</div>';
+		while ($chains = pg_fetch_array($result_chains, NULL, PGSQL_ASSOC)){
+				
+			$tableString .= '	<div class="resultsFooter">
+							<div class="resultsChain">Chain '.$chains["chain_name"].'</div>
+							<div class="resultsChainNum"><input type=checkbox id="'.$arr["pdb_id"] . $chains["chain_name"]. '" class="chainCheckBox" value="'.$arr["pdb_id"] . $chains["chain_name"].'"/>'.$arr["pdb_id"] . $chains["chain_name"].'</div>
 							<div class="resultsSCOP">Scop ####</div>
 							<div class="resultsCATH">CATH ####</div>
-						</div>
-					</div>';
+						</div>';
+		}
+		$tableString .= ' </div>';
 
 		echo $counter;
 		$counter++;

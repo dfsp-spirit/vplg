@@ -33,9 +33,8 @@ $(function() {
 	$('.chainCheckBox').click( function() {
 		var selectedProteins = "";
 		$('input[type=checkbox]').each(function () {
-			var sThisVal = (this.checked ? this.value : "");
-			selectedProteins += sThisVal + " ";
-		})
+			if (this.checked) selectedProteins += this.value + " "; })
+		
 		$('#loadInput').val(selectedProteins);
 	});
 	

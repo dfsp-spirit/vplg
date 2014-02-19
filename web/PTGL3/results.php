@@ -30,6 +30,8 @@ include('display_proteins.php');
 		<script src="bootstrap/js/modernizr-2.6.2.min.js"></script>
 		  <!-- Live Search for PDB IDs -->
 		<script src="livesearch.js" type="text/javascript"></script>
+		<!-- D3 Visual -->
+		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 	</head>
 
 	<body id="customBackground">
@@ -115,7 +117,9 @@ include('display_proteins.php');
 			<div class="container">
 				<!-- VERGLEICHE DER COOLE PROTEINE -->
 				
-				
+				<svg width="50" height="50">
+					<rect x="0" y="0" width="50" height="50" fill="green" />
+				</svg>
 				
 				<!-- VERGLEICHE DER COOLE PROTEINE -->
 				

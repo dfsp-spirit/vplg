@@ -15,7 +15,7 @@ function getGraphbyID($pdbID){
 	# TODO
 }
 
-
+/*
 
 // try to get _GET
 if(isset($_GET)) {
@@ -34,7 +34,7 @@ foreach ($chains as $value ){
 }
 
 
-
+*/
 /*
 	
 	// establish pgsql connection
