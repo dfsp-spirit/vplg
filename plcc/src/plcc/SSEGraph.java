@@ -3210,17 +3210,18 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     /** Returns a Graph Modelling Language format representation of this graph.
      *  See http://www.fim.uni-passau.de/fileadmin/files/lehrstuhl/brandenburg/projekte/gml/gml-technical-report.pdf for the publication 
      * and http://en.wikipedia.org/wiki/Graph_Modelling_Language for a brief description.
-     * 
+     * @return the GML format graph string
      */
+    @Override
     public String toGraphModellingLanguageFormat() {
         
-        String gmlf = "";
+        StringBuilder gmlf = new StringBuilder();
         
         // we put meta data in comments for GML language graphs
         try {
             if(Settings.getBoolean("plcc_B_add_metadata_comments_GML")) {
                 for(String key : this.metadata.keySet()) {
-                    gmlf += "//[VPLG_METADATA] " + key + "=" + this.metadata.get(key) + "\n";
+                    gmlf.append("//[VPLG_METADATA] ").append(key).append("=").append(this.metadata.get(key)).append("\n");
                 }
             }
         } catch(java.lang.NullPointerException e) {
@@ -3234,43 +3235,43 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         String startEdge = "  edge [";
         String endEdge   = "  ]";
         
-        gmlf += "graph [\n";
-        gmlf += "  id " + 1 + "\n";
-        gmlf += "  label \"" + "VPLG Protein Graph " + shortStr + "\"\n";
-        gmlf += "  comment \"" + this.getOneLineMetadataString() + "\"\n";
-        gmlf += "  directed 0\n";
-        gmlf += "  isplanar 0\n";
-        gmlf += "  creator \"PLCC version " + Settings.getVersion() + "\"\n";
+        gmlf.append("graph [\n");
+        gmlf.append("  id ").append(1).append("\n");
+        gmlf.append("  label \"" + "VPLG Protein Graph ").append(shortStr).append("\"\n");
+        gmlf.append("  comment \"").append(this.getOneLineMetadataString()).append("\"\n");
+        gmlf.append("  directed 0\n");
+        gmlf.append("  isplanar 0\n");
+        gmlf.append("  creator \"PLCC version ").append(Settings.getVersion()).append("\"\n");
         
         
         // print all nodes
         SSE vertex;
         for(Integer i = 0; i < this.size; i++) {
             vertex = this.sseList.get(i);
-            gmlf += startNode + "\n";
-            gmlf += "    id " + i + "\n";
-            gmlf += "    label \"" + i + "-" + vertex.getSseType() + "\"\n";
-            gmlf += "    num_in_chain " + vertex.getSSESeqChainNum() + "\n";
-            gmlf += "    sse_type \"" + vertex.getSseType() + "\"\n";
-            gmlf += "    num_residues " + vertex.getLength() + "\n";
+            gmlf.append(startNode).append("\n");
+            gmlf.append("    id ").append(i).append("\n");
+            gmlf.append("    label \"").append(i).append("-").append(vertex.getSseType()).append("\"\n");
+            gmlf.append("    num_in_chain ").append(vertex.getSSESeqChainNum()).append("\n");
+            gmlf.append("    sse_type \"").append(vertex.getSseType()).append("\"\n");
+            gmlf.append("    num_residues ").append(vertex.getLength()).append("\n");
             
-            gmlf += "    pdb_res_start \"" + vertex.getStartPdbResID() + "\"\n";
-            gmlf += "    pdb_res_end \"" + vertex.getEndPdbResID() + "\"\n";
+            gmlf.append("    pdb_res_start \"").append(vertex.getStartPdbResID()).append("\"\n");
+            gmlf.append("    pdb_res_end \"").append(vertex.getEndPdbResID()).append("\"\n");
             
-            gmlf += "    dssp_res_start " + vertex.getStartDsspNum() + "\n";
-            gmlf += "    dssp_res_end " + vertex.getEndDsspNum() + "\n";
+            gmlf.append("    dssp_res_start ").append(vertex.getStartDsspNum()).append("\n");
+            gmlf.append("    dssp_res_end ").append(vertex.getEndDsspNum()).append("\n");
             
-            gmlf += "    aa_sequence \"" + vertex.getAASequence() + "\"\n";
+            gmlf.append("    aa_sequence \"").append(vertex.getAASequence()).append("\"\n");
             
             if(vertex.isLigandSSE()) {
-                gmlf += "    lig_name \"" + vertex.getLigandName3() + "\"\n";
+                gmlf.append("    lig_name \"").append(vertex.getLigandName3()).append("\"\n");
             }
             
             //gmlf += "    pdb_id \"" + this.pdbid + "\"\n";
             //gmlf += "    chain_id \"" + this.chainid + "\"\n";
             //gmlf += "    graph_type \"" + this.graphType + "\"\n";
             
-            gmlf += endNode + "\n";
+            gmlf.append(endNode).append("\n");
         }
         
         // print all edges
@@ -3280,44 +3281,47 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             src = edge[0];
             tgt = edge[1];
             
-            gmlf += startEdge + "\n";
-            gmlf += "    source " + src + "\n";
-            gmlf += "    target " + tgt + "\n";
+            gmlf.append(startEdge).append("\n");
+            gmlf.append("    source ").append(src).append("\n");
+            gmlf.append("    target ").append(tgt).append("\n");
             
             //gmlf += "    label \"(" + src + ", " + tgt + ":" + this.getEdgeLabel(src, tgt) +  ")\"\n";
-            gmlf += "    label \"" + this.getEdgeLabel(src, tgt) +  "\"\n";
-            gmlf += "    spatial \"" + this.getEdgeLabel(src, tgt) + "\"\n";
+            gmlf.append("    label \"").append(this.getEdgeLabel(src, tgt)).append("\"\n");
+            gmlf.append("    spatial \"").append(this.getEdgeLabel(src, tgt)).append("\"\n");
             
-            gmlf += endEdge + "\n";
+            gmlf.append(endEdge).append("\n");
         }
         
         // print footer (close graph)
-        gmlf += "]\n";
+        gmlf.append("]\n");
         
-        return(gmlf);
+        return(gmlf.toString());
     }
     
     
     /**
-     * DOT language output support. See http://en.wikipedia.org/wiki/DOT_language for details.
+     * Generates a string representation of this graph in DOT language format.
+     * See http://en.wikipedia.org/wiki/DOT_language for details on the format.
+     * @return the DOT language format graph string
      */    
+    @Override
     public String toDOTLanguageFormat() {
         
-        String dlf = "";
+        StringBuilder dlf = new StringBuilder();
         
         // put meta data in comments for DOT language graphs
         if(Settings.getBoolean("plcc_B_add_metadata_comments_GML")) {
             for(String key : this.metadata.keySet()) {
-                dlf += "#[VPLG_METADATA] " + key + "=" + this.metadata.get(key) + "\n";
+                dlf.append("#[VPLG_METADATA] ").append(key).append("=").append(this.metadata.get(key)).append("\n");
             }
 
-            dlf += "#[VPLG_METADATA] creator=PLCC version " + Settings.getVersion() + "\n";
+            dlf.append("#[VPLG_METADATA] creator=PLCC version ").append(Settings.getVersion()).append("\n");
         }
         
         String graphLabel = "ProteinGraph";
         
         // start graph
-        dlf += "graph " + graphLabel + " {\n";
+        dlf.append("graph ").append(graphLabel).append(" {\n");
         
         // print the nodes
         SSE vertex; String shapeModifier, vertColor;
@@ -3328,21 +3332,26 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             
             shapeModifier = "";
             vertColor = "";
-            if(vertex.getSseType().equals("E")) {
-                shapeModifier = " shape=square";
-                vertColor = " color=black";
-            } else if(vertex.getSseType().equals("H")) {
-                shapeModifier = " shape=circle";
-                vertColor = " color=red";                
-            }  else if(vertex.getSseType().equals("L")) {
-                shapeModifier = " shape=triangle";
-                vertColor = " color=magenta";                
-            } else {
-                shapeModifier = " shape=circle";
-                vertColor = " color=gray";
+            switch (vertex.getSseType()) {
+                case "E":
+                    shapeModifier = " shape=square";
+                    vertColor = " color=black";
+                    break;
+                case "H":
+                    shapeModifier = " shape=circle";
+                    vertColor = " color=red";
+                    break;
+                case "L":
+                    shapeModifier = " shape=triangle";
+                    vertColor = " color=magenta";
+                    break;
+                default:
+                    shapeModifier = " shape=circle";
+                    vertColor = " color=gray";
+                    break;
             }
             
-            dlf += "    " + i + " [label=\"" + i + "-" + vertex.getSseType() + "\"" + shapeModifier + vertColor + "];\n";
+            dlf.append("    ").append(i).append(" [label=\"").append(i).append("-").append(vertex.getSseType()).append("\"").append(shapeModifier).append(vertColor).append("];\n");
         }
         
         // print the edges        
@@ -3363,17 +3372,23 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             else if(this.getContactType(src, tgt) == SpatRel.BACKBONE) { colorModifier = " color=orange"; lineModifier = " style=dotted"; }
             else { colorModifier = " color=gray"; lineModifier=""; edgeLabel=""; }
                                         
-            dlf += "    " + src + " -- " + tgt + " [" + edgeLabel + colorModifier + lineModifier + "]" + ";\n";                        
+            dlf.append("    ").append(src).append(" -- ").append(tgt).append(" [").append(edgeLabel).append(colorModifier).append(lineModifier).append("]" + ";\n");
         }
         
         
         // close graph
-        dlf += "}\n";
+        dlf.append("}\n");
         
-        return(dlf);
+        return(dlf.toString());
     }
     
     
+    
+    /**
+     * Generates a string representation of this graph in edge list format.
+     * Each line in the string represents an edge in the graph, given by vertex indices.
+     * @return the edge list format graph string
+     */
     public String toEdgeList() {
         StringBuilder sb = new StringBuilder();                            
 
@@ -3395,36 +3410,44 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         return this.getSSEBySeqPosition(index);
     } 
     
+    
+    /**
+     * Generates a string representation of this graph in Kavosh format. The first line contains the total
+     * number of vertices in the graph. The following lines represent one edge per line, given by the vertex indices.
+     * @return the kavosh format graph string
+     */
     @Override
     public String toKavoshFormat() {
-        String kf = "";
+        StringBuilder kf = new StringBuilder();
         
         if(Settings.getBoolean("plcc_B_kavosh_format_directed")) {
-            kf += this.numVertices() + "\n";
+            kf.append(this.numVertices()).append("\n");
 
             for(Integer i = 0; i < this.getSize(); i++) {
                 for(Integer j = 0 ; j < this.getSize(); j++) {
                     if(this.containsEdge(i, j) && i != j) {
-                        kf += (i+1) + " " + (j+1) + "\n";                    
+                        kf.append(i+1).append(" ").append(j+1).append("\n");
                     }            
                 }            
             }
             
         } else {
         
-            kf += this.numVertices() + "\n";
+            kf.append(this.numVertices()).append("\n");
 
             for(Integer i = 0; i < this.getSize(); i++) {
                 for(Integer j = i + 1; j < this.getSize(); j++) {
                     if(this.containsEdge(i, j)) {
-                        kf += (i+1) + " " + (j+1) + "\n";                    
+                        kf.append(i+1).append(" ").append(j+1).append("\n");
                     }            
                 }            
             }
         }
         
-        return kf;
+        return kf.toString();
     }      
+    
+    
     
     public ProteinLigandGraph<VertexSSE, PLGEdge> toProteinLigandGraph() {
         

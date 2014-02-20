@@ -294,6 +294,11 @@ public class IO {
         
         ArrayList<String> problems = new ArrayList<String>();
         
+        if(targetDir == null) {
+            problems.add("Directory is null.");
+            return problems;
+        }
+        
         if(targetDir.isDirectory()) {
             // dir already exsts
             if( ! targetDir.canWrite()) {
