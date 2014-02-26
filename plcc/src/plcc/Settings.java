@@ -72,7 +72,7 @@ public class Settings {
      * @return the PLCC version
      */
     public static String getVersion() {
-        return("0.85");
+        return("0.86");
     }
 
     /**
@@ -266,6 +266,7 @@ public class Settings {
         defSet("plcc_I_db_port", "5432", "DB server port");
         defSet("plcc_S_db_username", "vplg", "DB username");
         defSet("plcc_S_db_password", "", "DB password (empty if local is TRUST for this user)");
+        defSet("plcc_S_graph_image_base_path", "/srv/www/htdocs/vplgweb/data/", "The graph image base path for the database. The relative path to the path given here is used to locate the graph image on disk.");
 
 
         // PDB and DSSP file parsing and writing

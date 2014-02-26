@@ -35,15 +35,22 @@ public class DBManager {
     static String tbl_protein = "plcc_protein";
     static String tbl_chain = "plcc_chain";
     static String tbl_sse = "plcc_sse";
-    static String tbl_graph = "plcc_graph";
-    static String tbl_graphlets = "plcc_graphlets";
+    static String tbl_proteingraph = "plcc_graph";
+    static String tbl_foldinggraph = "plcc_foldinggraph";
+    static String tbl_complexgraph = "plcc_complexgraph";
+    static String tbl_graphletcount = "plcc_graphlets";
+    static String tbl_nm_ssetoproteingraph = "plcc_nm_ssetoproteingraph";
+    static String tbl_nm_ssetofoldinggraph = "plcc_nm_ssetofoldinggraph";
     
     static String tbl_ssetypes = "plcc_ssetypes";
     static String tbl_contacttypes = "plcc_contacttypes";
+    static String tbl_complexcontacttypes = "plcc_complexcontacttypes";
     static String tbl_graphtypes = "plcc_graphtypes";
     
-    static String tbl_contact = "plcc_contact";
-    static String tbl_complex_contact = "plcc_complex_contact";
+    static String tbl_ssecontact = "plcc_contact";
+    static String tbl_ssecontact_complexgraph = "plcc_ssecontact_complexgraph";
+    static String tbl_complex_contact_stats = "plcc_complex_contact";
+    
     static String view_ssecontacts = "plcc_ssetype_contacts";
     static String view_graphs = "plcc_graphs";
 
@@ -330,13 +337,18 @@ public class DBManager {
             doDeleteQuery("DROP TABLE " + tbl_protein + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_chain + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_sse + " CASCADE;");
-            doDeleteQuery("DROP TABLE " + tbl_contact + " CASCADE;");
-            doDeleteQuery("DROP TABLE " + tbl_complex_contact + " CASCADE;");            
-            doDeleteQuery("DROP TABLE " + tbl_graph + " CASCADE;");
-            doDeleteQuery("DROP TABLE " + tbl_graphlets + " CASCADE;");
-            
+            doDeleteQuery("DROP TABLE " + tbl_ssecontact + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_ssecontact_complexgraph + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_complex_contact_stats + " CASCADE;");            
+            doDeleteQuery("DROP TABLE " + tbl_proteingraph + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_foldinggraph + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_complexgraph + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_graphletcount + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_nm_ssetoproteingraph + ";");
+            doDeleteQuery("DROP TABLE " + tbl_nm_ssetofoldinggraph + ";");
             doDeleteQuery("DROP TABLE " + tbl_graphtypes + ";");
             doDeleteQuery("DROP TABLE " + tbl_contacttypes + ";");
+            doDeleteQuery("DROP TABLE " + tbl_complexcontacttypes + ";");
             doDeleteQuery("DROP TABLE " + tbl_ssetypes + ";");
 
             // The indices get dropped with the tables.
@@ -378,37 +390,52 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_protein + " (pdb_id varchar(4) primary key, header varchar(200) not null, title varchar(400) not null, experiment varchar(200) not null, keywords varchar(400) not null, resolution real not null);");
             doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(2) not null, mol_name varchar(200) not null, organism_scientific varchar(200) not null, organism_common varchar(200) not null, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE);");
             doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence varchar(2000) not null, sse_type int not null, lig_name varchar(5));");
-            doInsertQuery("CREATE TABLE " + tbl_contact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null, check (sse1 < sse2));");
-            doInsertQuery("CREATE TABLE " + tbl_complex_contact + " (complex_contact_id serial primary key, chain1 int not null references " + tbl_chain + " ON DELETE CASCADE, chain2 int not null references " + tbl_chain + " ON DELETE CASCADE, contact_num_HH int not null, contact_num_HS int not null, contact_num_HL int not null, contact_num_SS int not null, contact_num_SL int not null, contact_num_LL int not null, contact_num_DS int not null);");
-            doInsertQuery("CREATE TABLE " + tbl_graph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null, graph_string_gml text not null, graph_image_svg text, sse_string text);");
-            doInsertQuery("CREATE TABLE " + tbl_graphlets + " (graphlet_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null, graphlet_count_000 int not null, graphlet_count_001 int not null, graphlet_count_002 int not null);");
+            doInsertQuery("CREATE TABLE " + tbl_ssecontact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null, check (sse1 < sse2));");
+            doInsertQuery("CREATE TABLE " + tbl_ssecontact_complexgraph + " (ssecontact_complexgraph_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, complex_contact_type int not null, check (sse1 < sse2));");            
+            doInsertQuery("CREATE TABLE " + tbl_complex_contact_stats + " (complex_contact_id serial primary key, chain1 int not null references " + tbl_chain + " ON DELETE CASCADE, chain2 int not null references " + tbl_chain + " ON DELETE CASCADE, contact_num_HH int not null, contact_num_HS int not null, contact_num_HL int not null, contact_num_SS int not null, contact_num_SL int not null, contact_num_LL int not null, contact_num_DS int not null);");
+            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null, graph_string_gml text not null, graph_string_kavosh text, graph_image_svg text, graph_image_png text, sse_string text);");
+            doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graph_string_gml text not null, graph_string_kavosh text, graph_image_svg text, graph_image_png text, sse_string text);");
+            doInsertQuery("CREATE TABLE " + tbl_complexgraph + " (complexgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, graph_string_gml text not null, graph_string_kavosh text, graph_image_svg text, graph_image_png text);");
+            
+            doInsertQuery("CREATE TABLE " + tbl_graphletcount + " (graphlet_id serial primary key, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graphlet_count_000 int not null, graphlet_count_001 int not null, graphlet_count_002 int not null, graphlet_count_003 int not null, graphlet_count_004 int not null, graphlet_count_005 int not null, graphlet_count_006 int not null, graphlet_count_007 int not null, graphlet_count_008 int not null);");
+            doInsertQuery("CREATE TABLE " + tbl_nm_ssetoproteingraph + " (ssetoproteingraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE);");
+            doInsertQuery("CREATE TABLE " + tbl_nm_ssetofoldinggraph + " (ssetofoldinggraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE);");
+            
+            
             
             // various types encoded by integers. these tables should be removed in the future and the values stored as string directly instead.
             doInsertQuery("CREATE TABLE " + tbl_ssetypes + " (ssetype_id int not null primary key,  ssetype_text text not null);");
             doInsertQuery("CREATE TABLE " + tbl_contacttypes + " (contacttype_id int not null primary key,  contacttype_text text not null);");
+            doInsertQuery("CREATE TABLE " + tbl_complexcontacttypes + " (complexcontacttype_id int not null primary key,  complexcontacttype_text text not null);");
             doInsertQuery("CREATE TABLE " + tbl_graphtypes + " (graphtype_id int not null primary key,  graphtype_text text not null);");
 
             // set constraints
             doInsertQuery("ALTER TABLE " + tbl_protein + " ADD CONSTRAINT constr_protein_uniq UNIQUE (pdb_id);");
             doInsertQuery("ALTER TABLE " + tbl_chain + " ADD CONSTRAINT constr_chain_uniq UNIQUE (chain_name, pdb_id);");
             doInsertQuery("ALTER TABLE " + tbl_sse + " ADD CONSTRAINT constr_sse_uniq UNIQUE (chain_id, dssp_start, dssp_end);");
-            doInsertQuery("ALTER TABLE " + tbl_contact + " ADD CONSTRAINT constr_contact_uniq UNIQUE (sse1, sse2);");
-            doInsertQuery("ALTER TABLE " + tbl_complex_contact + " ADD CONSTRAINT constr_complex_contact_uniq UNIQUE (chain1, chain2);");
-            doInsertQuery("ALTER TABLE " + tbl_graph + " ADD CONSTRAINT constr_graph_uniq UNIQUE (chain_id, graph_type);");
-            doInsertQuery("ALTER TABLE " + tbl_graphlets + " ADD CONSTRAINT constr_graphlet_uniq UNIQUE (chain_id, graph_type);");
+            doInsertQuery("ALTER TABLE " + tbl_ssecontact + " ADD CONSTRAINT constr_contact_uniq UNIQUE (sse1, sse2);");
+            doInsertQuery("ALTER TABLE " + tbl_complex_contact_stats + " ADD CONSTRAINT constr_complex_contact_uniq UNIQUE (chain1, chain2);");
+            doInsertQuery("ALTER TABLE " + tbl_proteingraph + " ADD CONSTRAINT constr_graph_uniq UNIQUE (chain_id, graph_type);");
+            doInsertQuery("ALTER TABLE " + tbl_graphletcount + " ADD CONSTRAINT constr_graphlet_uniq UNIQUE (chain_id, graph_type);");
             
             // create views
-            doInsertQuery("CREATE VIEW " + view_ssecontacts + " AS SELECT contact_id, least(sse1_type, sse2_type) sse1_type, greatest(sse1_type, sse2_type) sse2_type, sse1_lig_name, sse2_lig_name  FROM (SELECT k.contact_id, sse1.sse_type AS sse1_type, sse2.sse_type AS sse2_type, sse1.lig_name AS sse1_lig_name, sse2.lig_name AS sse2_lig_name FROM " + tbl_contact + " k LEFT JOIN " + tbl_sse + " sse1 ON k.sse1=sse1.sse_id LEFT JOIN " + tbl_sse + " sse2 ON k.sse2=sse2.sse_id) foo;");
-            doInsertQuery("CREATE VIEW " + view_graphs + " AS SELECT graph_id, pdb_id, chain_name, graph_type, graph_string_gml FROM (SELECT k.graph_id, k.graph_type, k.graph_string_gml, chain.chain_name AS chain_name, chain.pdb_id AS pdb_id FROM " + tbl_graph + " k LEFT JOIN " + tbl_chain + " chain ON k.chain_id=chain.chain_id) bar;");
+            doInsertQuery("CREATE VIEW " + view_ssecontacts + " AS SELECT contact_id, least(sse1_type, sse2_type) sse1_type, greatest(sse1_type, sse2_type) sse2_type, sse1_lig_name, sse2_lig_name  FROM (SELECT k.contact_id, sse1.sse_type AS sse1_type, sse2.sse_type AS sse2_type, sse1.lig_name AS sse1_lig_name, sse2.lig_name AS sse2_lig_name FROM " + tbl_ssecontact + " k LEFT JOIN " + tbl_sse + " sse1 ON k.sse1=sse1.sse_id LEFT JOIN " + tbl_sse + " sse2 ON k.sse2=sse2.sse_id) foo;");
+            doInsertQuery("CREATE VIEW " + view_graphs + " AS SELECT graph_id, pdb_id, chain_name, graph_type, graph_string_gml FROM (SELECT k.graph_id, k.graph_type, k.graph_string_gml, chain.chain_name AS chain_name, chain.pdb_id AS pdb_id FROM " + tbl_proteingraph + " k LEFT JOIN " + tbl_chain + " chain ON k.chain_id=chain.chain_id) bar;");
 
             // add comments for tables
             doInsertQuery("COMMENT ON TABLE " + tbl_protein + " IS 'Stores information on a whole PDB file.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_chain + " IS 'Stores information on a protein chain.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_sse + " IS 'Stores information on a secondary structure element (SSE).';");
-            doInsertQuery("COMMENT ON TABLE " + tbl_contact + " IS 'Stores information on a contact between a pair of SSEs which are part of the same chain.';");
-            doInsertQuery("COMMENT ON TABLE " + tbl_complex_contact + " IS 'Stores information on a complex contact or inter-chain contact, i.e., a contact between a pair of SSEs which are part of different chains.';");
-            doInsertQuery("COMMENT ON TABLE " + tbl_graph + " IS 'Stores a description of the protein graph of a protein chain in GML text format. This is enough to draw the graph.';");
-            doInsertQuery("COMMENT ON TABLE " + tbl_graphlets + " IS 'Stores the graphlet counts for the different graphlets for a certain graph defined by pdbid, chain and graph type.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_ssecontact + " IS 'Stores information on a contact between a pair of SSEs which are part of the same chain.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_ssecontact_complexgraph + " IS 'Stores information on a contact between a pair of SSEs which are part of different chains of the same protein.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_complex_contact_stats + " IS 'Stores statistical information on the atom contacts of a complex contact. Does NOT include info for SSEs or AAs involved.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_proteingraph + " IS 'Stores descriptions of the protein graph of a protein chain. Multiple of these exist for a chain due to alpha, beta, alphabeta, alphalig, betalig and alphabetalig versions.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_foldinggraph + " IS 'Stores descriptions of a folding graph, which is a connected component of a protein graph.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_complexgraph + " IS 'Stores descriptions of a complex graph.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_graphletcount + " IS 'Stores the graphlet counts for the different graphlets for a certain graph defined by pdbid, chain and graph type.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_nm_ssetoproteingraph + " IS 'Assigns SSEs to protein graphs. An SSE may be part of multiple graphs, e.g., alpha, alphalig, and albe.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_nm_ssetofoldinggraph + " IS 'Assigns SSEs to folding graphs. An SSE may be part of multiple folding graphs, e.g., alpha, alphalig, and albe. It cannot be part of multiple alpha folding graphs though.';");
+            
             
             doInsertQuery("COMMENT ON TABLE " + tbl_ssetypes + " IS 'Stores the names of the SSE types, e.g., 1=helix.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_contacttypes + " IS 'Stores the names of the contact types, e.g., 1=mixed.';");
@@ -416,18 +443,21 @@ public class DBManager {
 
             // add comments for specific fields
             doInsertQuery("COMMENT ON COLUMN " + tbl_sse + ".sse_type IS '1=helix, 2=beta strand, 3=ligand, 4=other';");
-            doInsertQuery("COMMENT ON COLUMN " + tbl_contact + ".contact_type IS '1=mixed, 2=parallel, 3=antiparallel, 4=ligand, 5=backbone';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_ssecontact + ".contact_type IS '1=mixed, 2=parallel, 3=antiparallel, 4=ligand, 5=backbone';");
             doInsertQuery("COMMENT ON COLUMN " + tbl_sse + ".lig_name IS 'The 3-letter ligand name from the PDB file and the RCSB ligand expo website. If this SSE is not a ligand SSE, this is the empty string.';");
-            doInsertQuery("COMMENT ON COLUMN " + tbl_graph + ".graph_type IS '1=alpha, 2=beta, 3=albe, 4=alphalig, 5=betalig, 6=albelig';");
-            doInsertQuery("COMMENT ON COLUMN " + tbl_graph + ".graph_string_gml IS 'The graph string in GML format';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_proteingraph + ".graph_type IS '1=alpha, 2=beta, 3=albe, 4=alphalig, 5=betalig, 6=albelig';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_proteingraph + ".graph_string_gml IS 'The graph string in GML format';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_proteingraph + ".graph_string_kavosh IS 'The graph string in Kavosh format format';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_proteingraph + ".graph_image_svg IS 'The path to the SVG format file of the graph image, relative to plcc_S_graph_image_base_path';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_proteingraph + ".graph_image_png IS 'The path to the PNG format file of the graph image, relative to plcc_S_graph_image_base_path';");
             
-            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact + ".contact_num_HH IS 'Number of helix-helix contacts.';");
-            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact + ".contact_num_HS IS 'Number of helix-strand contacts.';");
-            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact + ".contact_num_HL IS 'Number of helix-ligand contacts.';");
-            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact + ".contact_num_SS IS 'Number of strand-strand contacts.';");
-            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact + ".contact_num_SL IS 'Number of strand-ligand contacts.';");
-            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact + ".contact_num_LL IS 'Number of ligand-ligand contacts.';");
-            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact + ".contact_num_DS IS 'Number of disulfide bridge contacts.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact_stats + ".contact_num_HH IS 'Number of helix-helix contacts.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact_stats + ".contact_num_HS IS 'Number of helix-strand contacts.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact_stats + ".contact_num_HL IS 'Number of helix-ligand contacts.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact_stats + ".contact_num_SS IS 'Number of strand-strand contacts.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact_stats + ".contact_num_SL IS 'Number of strand-ligand contacts.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact_stats + ".contact_num_LL IS 'Number of ligand-ligand contacts.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact_stats + ".contact_num_DS IS 'Number of disulfide bridge contacts.';");
 
             // add indices
             doInsertQuery("CREATE INDEX plcc_idx_chain_insert ON " + tbl_chain + " (pdb_id, chain_name);");         // for SELECTs during data insert
@@ -435,12 +465,20 @@ public class DBManager {
 
             doInsertQuery("CREATE INDEX plcc_idx_chain_fk ON " + tbl_chain + " (pdb_id);");                          // for JOINs, ON CASCADE, etc. (foreign key, FK)
             doInsertQuery("CREATE INDEX plcc_idx_sse_fk ON " + tbl_sse + " (chain_id);");                            // FK
-            doInsertQuery("CREATE INDEX plcc_idx_contact_fk1 ON " + tbl_contact + " (sse1);");                       // FK
-            doInsertQuery("CREATE INDEX plcc_idx_contact_fk2 ON " + tbl_contact + " (sse2);");                       // FK
-            doInsertQuery("CREATE INDEX plcc_idx_complex_contact_fk1 ON " + tbl_complex_contact + " (chain1);");                       // FK
-            doInsertQuery("CREATE INDEX plcc_idx_complex_contact_fk2 ON " + tbl_complex_contact + " (chain2);");                       // FK
-            doInsertQuery("CREATE INDEX plcc_idx_graph_fk ON " + tbl_graph + " (chain_id);");                       // FK
-            doInsertQuery("CREATE INDEX plcc_idx_graphlets_fk ON " + tbl_graphlets + " (chain_id);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_contact_fk1 ON " + tbl_ssecontact + " (sse1);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_contact_fk2 ON " + tbl_ssecontact + " (sse2);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_contact_complexgraph_fk1 ON " + tbl_ssecontact_complexgraph + " (sse1);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_contact_complexgraph_fk2 ON " + tbl_ssecontact_complexgraph + " (sse2);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_complex_contact_fk1 ON " + tbl_complex_contact_stats + " (chain1);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_complex_contact_fk2 ON " + tbl_complex_contact_stats + " (chain2);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_graph_fk ON " + tbl_proteingraph + " (chain_id);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_foldinggraph_fk ON " + tbl_foldinggraph + " (graph_id);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_graphlets_fk ON " + tbl_graphletcount + " (chain_id);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_ssetoproteingraph_fk1 ON " + tbl_nm_ssetoproteingraph + " (sse_id);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_ssetoproteingraph_fk2 ON " + tbl_nm_ssetoproteingraph + " (graph_id);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_ssetofoldinggraph_fk1 ON " + tbl_nm_ssetofoldinggraph + " (sse_id);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_ssetofoldinggraph_fk2 ON " + tbl_nm_ssetofoldinggraph + " (foldinggraph_id);");                       // FK
+            
 
             // indices on PKs get created automatically
             
@@ -462,11 +500,14 @@ public class DBManager {
             doInsertQuery("INSERT INTO " + tbl_contacttypes + " (contacttype_id, contacttype_text) VALUES (3, 'antiparallel');");
             doInsertQuery("INSERT INTO " + tbl_contacttypes + " (contacttype_id, contacttype_text) VALUES (4, 'ligand');");
             doInsertQuery("INSERT INTO " + tbl_contacttypes + " (contacttype_id, contacttype_text) VALUES (5, 'backbone');");
-
+            
+            doInsertQuery("INSERT INTO " + tbl_complexcontacttypes + " (complexcontacttype_id, complexcontacttype_text) VALUES (1, 'van-der-Waals');");
+            doInsertQuery("INSERT INTO " + tbl_complexcontacttypes + " (complexcontacttype_id, complexcontacttype_text) VALUES (2, 'disulfide');");
 
             res = true;      // Not really, need to check all of them.
 
-        } catch (Exception e) {            
+        } catch (Exception e) { 
+            System.err.println("ERROR: '" + e.getMessage() + "'.");
             res = false;
         }
 
@@ -731,7 +772,7 @@ public class DBManager {
 
         PreparedStatement statement = null;
 
-        String query = "INSERT INTO " + tbl_graph + " (chain_id, graph_type, graph_string_gml, sse_string) VALUES (?, ?, ?, ?);";
+        String query = "INSERT INTO " + tbl_proteingraph + " (chain_id, graph_type, graph_string_gml, sse_string) VALUES (?, ?, ?, ?);";
 
         try {
             dbc.setAutoCommit(false);
@@ -794,7 +835,7 @@ public class DBManager {
 
         PreparedStatement statement = null;
 
-        String query = "INSERT INTO " + tbl_graphlets + " (chain_id, graph_type, graphlet_count_000, graphlet_count_001, graphlet_count_002) VALUES (?, ?, ?, ?, ?);";
+        String query = "INSERT INTO " + tbl_graphletcount + " (chain_id, graph_type, graphlet_count_000, graphlet_count_001, graphlet_count_002) VALUES (?, ?, ?, ?, ?);";
 
         try {
             dbc.setAutoCommit(false);
@@ -866,7 +907,7 @@ public class DBManager {
         Boolean result = false;
         PreparedStatement statement = null;
 
-        String query = "INSERT INTO " + tbl_contact + " (sse1, sse2, contact_type) VALUES (?, ?, ?);";
+        String query = "INSERT INTO " + tbl_ssecontact + " (sse1, sse2, contact_type) VALUES (?, ?, ?);";
 
         try {
             dbc.setAutoCommit(false);
@@ -940,7 +981,7 @@ public class DBManager {
         Boolean result = false;
         PreparedStatement statement = null;
 
-        String query = "INSERT INTO " + tbl_complex_contact + " (chain1, chain2, contact_num_HH, contact_num_HS, contact_num_HL, contact_num_SS, contact_num_SL, contact_num_LL, contact_num_DS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO " + tbl_complex_contact_stats + " (chain1, chain2, contact_num_HH, contact_num_HS, contact_num_HL, contact_num_SS, contact_num_SL, contact_num_LL, contact_num_DS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
         try {
             dbc.setAutoCommit(false);
@@ -1264,7 +1305,7 @@ public class DBManager {
         PreparedStatement statement = null;
         ResultSet rs = null;
 
-        String query = "SELECT graph_string_gml FROM " + tbl_graph + " WHERE (chain_id = ? AND graph_type = ?);";
+        String query = "SELECT graph_string_gml FROM " + tbl_proteingraph + " WHERE (chain_id = ? AND graph_type = ?);";
 
         try {
             dbc.setAutoCommit(false);
@@ -1350,7 +1391,7 @@ public class DBManager {
         PreparedStatement statement = null;
         ResultSet rs = null;
 
-        String query = "SELECT graphlet_count_000, graphlet_count_001, graphlet_count_002 FROM " + tbl_graphlets + " WHERE (chain_id = ? AND graph_type = ?);";
+        String query = "SELECT graphlet_count_000, graphlet_count_001, graphlet_count_002 FROM " + tbl_graphletcount + " WHERE (chain_id = ? AND graph_type = ?);";
 
         try {
             dbc.setAutoCommit(false);
@@ -1476,7 +1517,7 @@ public class DBManager {
         PreparedStatement statement = null;
         ResultSet rs = null;
 
-        String query = "SELECT sse_string FROM " + tbl_graph + " WHERE (chain_id = ? AND graph_type = ?);";
+        String query = "SELECT sse_string FROM " + tbl_proteingraph + " WHERE (chain_id = ? AND graph_type = ?);";
 
         try {
             dbc.setAutoCommit(false);
@@ -1568,10 +1609,10 @@ public class DBManager {
         PreparedStatement statement = null;
         ResultSet rs = null;
 
-        String query = "SELECT sse_string, chain_id, graph_type, graph_string FROM " + tbl_graph + " WHERE (graph_type = ?);";
+        String query = "SELECT sse_string, chain_id, graph_type, graph_string FROM " + tbl_proteingraph + " WHERE (graph_type = ?);";
         
         if(allGraphs) {
-            query = "SELECT sse_string, chain_id, graph_type, graph_string FROM " + tbl_graph + ";";
+            query = "SELECT sse_string, chain_id, graph_type, graph_string FROM " + tbl_proteingraph + ";";
         }
 
         try {
@@ -1684,7 +1725,7 @@ public class DBManager {
         PreparedStatement statement = null;
         ResultSet rs = null;
 
-        String query = "SELECT graph_image_svg FROM " + tbl_graph + " WHERE (chain_id = ? AND graph_type = ?);";
+        String query = "SELECT graph_image_svg FROM " + tbl_proteingraph + " WHERE (chain_id = ? AND graph_type = ?);";
 
         try {
             dbc.setAutoCommit(false);
