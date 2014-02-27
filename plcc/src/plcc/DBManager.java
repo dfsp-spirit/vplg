@@ -32,6 +32,7 @@ public class DBManager {
     static Connection dbc;
     // table names
     
+    /** Name of the table which stores info on a PDB protein, identified by the PDB ID. */
     static String tbl_protein = "plcc_protein";
     static String tbl_chain = "plcc_chain";
     static String tbl_sse = "plcc_sse";
@@ -42,17 +43,24 @@ public class DBManager {
     static String tbl_nm_ssetoproteingraph = "plcc_nm_ssetoproteingraph";
     static String tbl_nm_ssetofoldinggraph = "plcc_nm_ssetofoldinggraph";
     
+    /** Name of the table which stores info on SSE types, e.g., alpha-helix, beta-strand and ligand. */
     static String tbl_ssetypes = "plcc_ssetypes";
+    
+    /** Name of the table which stores info on intra-chain SSE contact types, e.g., parallel, anti-parallel, mixed or ligand. */
     static String tbl_contacttypes = "plcc_contacttypes";
+    
+    /** Name of the table which stores info on inter-chain SSE contact types, e.g., van-der-Waals or disulfide bridge. */
     static String tbl_complexcontacttypes = "plcc_complexcontacttypes";
+    
+    /** Name of the table which stores info on graph types, e.g., alpha-graph, beta-graph, alphabeta-graph, alphalig-graph, and so on. */
     static String tbl_graphtypes = "plcc_graphtypes";
     
     static String tbl_ssecontact = "plcc_contact";
     static String tbl_ssecontact_complexgraph = "plcc_ssecontact_complexgraph";
     static String tbl_complex_contact_stats = "plcc_complex_contact";
     
-    static String view_ssecontacts = "plcc_ssetype_contacts";
-    static String view_graphs = "plcc_graphs";
+    static String view_ssecontacts = "plcc_view_ssetype_contacts";
+    static String view_graphs = "plcc_view_graphs";
 
     /**
      * Sets the database address and the credentials to access the DB.
@@ -396,12 +404,12 @@ public class DBManager {
             
             doInsertQuery("CREATE TABLE " + tbl_protein + " (pdb_id varchar(4) primary key, header varchar(200) not null, title varchar(400) not null, experiment varchar(200) not null, keywords varchar(400) not null, resolution real not null);");
             doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(2) not null, mol_name varchar(200) not null, organism_scientific varchar(200) not null, organism_common varchar(200) not null, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE);");
-            doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence varchar(2000) not null, sse_type int not null, lig_name varchar(5));");
+            doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence varchar(2000) not null, sse_type int not null references " + tbl_ssetypes + " ON DELETE CASCADE, lig_name varchar(5));");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null references " + tbl_contacttypes + " ON DELETE CASCADE, check (sse1 < sse2));");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact_complexgraph + " (ssecontact_complexgraph_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, complex_contact_type int not null references " + tbl_complexcontacttypes + " ON DELETE CASCADE check (sse1 < sse2));");            
             doInsertQuery("CREATE TABLE " + tbl_complex_contact_stats + " (complex_contact_id serial primary key, chain1 int not null references " + tbl_chain + " ON DELETE CASCADE, chain2 int not null references " + tbl_chain + " ON DELETE CASCADE, contact_num_HH int not null, contact_num_HS int not null, contact_num_HL int not null, contact_num_SS int not null, contact_num_SL int not null, contact_num_LL int not null, contact_num_DS int not null);");
-            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text not null, graph_string_kavosh text, graph_image_svg text, graph_image_png text, sse_string text);");
-            doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graph_string_gml text not null, graph_string_kavosh text, graph_image_svg text, graph_image_png text, sse_string text);");
+            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text not null, graph_string_kavosh text, graph_string_ptgl_adj text, graph_string_ptgl_red text, graph_string_ptgl_key text, graph_string_ptgl_seq text, graph_image_adj_svg text, graph_image_adj_png text, graph_image_red_svg text, graph_image_red_png text, graph_image_key_svg text, graph_image_key_png text, graph_image_seq_svg text, graph_image_seq_png text, sse_string text);");
+            doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graph_string_gml text not null, graph_string_kavosh text, graph_string_ptgl_adj text, graph_string_ptgl_red text, graph_string_ptgl_key text, graph_string_ptgl_seq text, graph_image_adj_svg text, graph_image_adj_png text, graph_image_red_svg text, graph_image_red_png text, graph_image_key_svg text, graph_image_key_png text, graph_image_seq_svg text, graph_image_seq_png text, sse_string text);");
             doInsertQuery("CREATE TABLE " + tbl_complexgraph + " (complexgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, graph_string_gml text not null, graph_string_kavosh text, graph_image_svg text, graph_image_png text);");
 
             /**
@@ -469,16 +477,16 @@ public class DBManager {
             doInsertQuery("COMMENT ON COLUMN " + tbl_proteingraph + ".graph_type IS '1=alpha, 2=beta, 3=albe, 4=alphalig, 5=betalig, 6=albelig';");
             doInsertQuery("COMMENT ON COLUMN " + tbl_proteingraph + ".graph_string_gml IS 'The graph string in GML format';");
             doInsertQuery("COMMENT ON COLUMN " + tbl_proteingraph + ".graph_string_kavosh IS 'The graph string in Kavosh format format';");
-            doInsertQuery("COMMENT ON COLUMN " + tbl_proteingraph + ".graph_image_svg IS 'The path to the SVG format file of the graph image, relative to plcc_S_graph_image_base_path';");
-            doInsertQuery("COMMENT ON COLUMN " + tbl_proteingraph + ".graph_image_png IS 'The path to the PNG format file of the graph image, relative to plcc_S_graph_image_base_path';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_proteingraph + ".graph_image_adj_svg IS 'The path to the SVG format file of the ADJ graph image, relative to plcc_S_graph_image_base_path';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_proteingraph + ".graph_image_adj_png IS 'The path to the PNG format file of the ADJ graph image, relative to plcc_S_graph_image_base_path';");
             
-            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact_stats + ".contact_num_HH IS 'Number of helix-helix contacts.';");
-            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact_stats + ".contact_num_HS IS 'Number of helix-strand contacts.';");
-            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact_stats + ".contact_num_HL IS 'Number of helix-ligand contacts.';");
-            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact_stats + ".contact_num_SS IS 'Number of strand-strand contacts.';");
-            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact_stats + ".contact_num_SL IS 'Number of strand-ligand contacts.';");
-            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact_stats + ".contact_num_LL IS 'Number of ligand-ligand contacts.';");
-            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact_stats + ".contact_num_DS IS 'Number of disulfide bridge contacts.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact_stats + ".contact_num_HH IS 'Number of helix-helix contacts between the chains.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact_stats + ".contact_num_HS IS 'Number of helix-strand contacts between the chains.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact_stats + ".contact_num_HL IS 'Number of helix-ligand contacts between the chains.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact_stats + ".contact_num_SS IS 'Number of strand-strand contacts between the chains.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact_stats + ".contact_num_SL IS 'Number of strand-ligand contacts between the chains.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact_stats + ".contact_num_LL IS 'Number of ligand-ligand contacts between the chains.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_complex_contact_stats + ".contact_num_DS IS 'Number of disulfide bridge contacts between the chains.';");
 
             // add indices
             doInsertQuery("CREATE INDEX plcc_idx_chain_insert ON " + tbl_chain + " (pdb_id, chain_name);");         // for SELECTs during data insert
