@@ -42,13 +42,13 @@ fi
 ## graphs
 if [ "$CLEAN_GRAPHS" = "YES" ]; then
   echo "$APPTAG Cleaning graphs..."
-  rm *.tgf *.gv *.gml *.plg *.fg *.kavosh *.el *.el_ntl *.json
+  rm *.tgf *.gv *.gml *.plg *.fg *.kavosh *.el *.el_ntl *.json *.el_edges
 fi
 
 ## meta data
 if [ "$CLEAN_METADATA" = "YES" ]; then
   echo "$APPTAG Cleaning metadata..."
-  rm *.chains *.geo *.geolig *.contactstats *.dssplig *.models  *.pymol  *.ligands *.resmap
+  rm *.chains *.geo *.geolig *.contactstats *.dssplig *.models  *.pymol  *.ligands *.resmap *.jmol
 fi
 
 echo "$APPTAG Done, exiting."

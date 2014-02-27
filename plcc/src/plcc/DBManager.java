@@ -416,7 +416,7 @@ public class DBManager {
             doInsertQuery("ALTER TABLE " + tbl_ssecontact + " ADD CONSTRAINT constr_contact_uniq UNIQUE (sse1, sse2);");
             doInsertQuery("ALTER TABLE " + tbl_complex_contact_stats + " ADD CONSTRAINT constr_complex_contact_uniq UNIQUE (chain1, chain2);");
             doInsertQuery("ALTER TABLE " + tbl_proteingraph + " ADD CONSTRAINT constr_graph_uniq UNIQUE (chain_id, graph_type);");
-            doInsertQuery("ALTER TABLE " + tbl_graphletcount + " ADD CONSTRAINT constr_graphlet_uniq UNIQUE (chain_id, graph_type);");
+            doInsertQuery("ALTER TABLE " + tbl_graphletcount + " ADD CONSTRAINT constr_graphlet_uniq UNIQUE (graph_id);");
             
             // create views
             doInsertQuery("CREATE VIEW " + view_ssecontacts + " AS SELECT contact_id, least(sse1_type, sse2_type) sse1_type, greatest(sse1_type, sse2_type) sse2_type, sse1_lig_name, sse2_lig_name  FROM (SELECT k.contact_id, sse1.sse_type AS sse1_type, sse2.sse_type AS sse2_type, sse1.lig_name AS sse1_lig_name, sse2.lig_name AS sse2_lig_name FROM " + tbl_ssecontact + " k LEFT JOIN " + tbl_sse + " sse1 ON k.sse1=sse1.sse_id LEFT JOIN " + tbl_sse + " sse2 ON k.sse2=sse2.sse_id) foo;");
@@ -472,8 +472,8 @@ public class DBManager {
             doInsertQuery("CREATE INDEX plcc_idx_complex_contact_fk1 ON " + tbl_complex_contact_stats + " (chain1);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_complex_contact_fk2 ON " + tbl_complex_contact_stats + " (chain2);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_graph_fk ON " + tbl_proteingraph + " (chain_id);");                       // FK
-            doInsertQuery("CREATE INDEX plcc_idx_foldinggraph_fk ON " + tbl_foldinggraph + " (graph_id);");                       // FK
-            doInsertQuery("CREATE INDEX plcc_idx_graphlets_fk ON " + tbl_graphletcount + " (chain_id);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_foldinggraph_fk ON " + tbl_foldinggraph + " (foldinggraph_id);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_graphlets_fk ON " + tbl_graphletcount + " (graph_id);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_ssetoproteingraph_fk1 ON " + tbl_nm_ssetoproteingraph + " (sse_id);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_ssetoproteingraph_fk2 ON " + tbl_nm_ssetoproteingraph + " (graph_id);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_ssetofoldinggraph_fk1 ON " + tbl_nm_ssetofoldinggraph + " (sse_id);");                       // FK

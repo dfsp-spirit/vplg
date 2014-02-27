@@ -3556,6 +3556,7 @@ class PriorityVertex implements Comparable<PriorityVertex> {
       /**
        * Implements comparability between PriorityVertex instances via the minDinstance property, as required by the priorityQueue.
        */ 
+    @Override
       public int compareTo(PriorityVertex other) {
           return(Double.compare(this.minDistance, other.minDistance));
       }
