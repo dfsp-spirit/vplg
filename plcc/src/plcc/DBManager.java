@@ -387,27 +387,48 @@ public class DBManager {
 
         try {
             // create tables
-            doInsertQuery("CREATE TABLE " + tbl_protein + " (pdb_id varchar(4) primary key, header varchar(200) not null, title varchar(400) not null, experiment varchar(200) not null, keywords varchar(400) not null, resolution real not null);");
-            doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(2) not null, mol_name varchar(200) not null, organism_scientific varchar(200) not null, organism_common varchar(200) not null, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE);");
-            doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence varchar(2000) not null, sse_type int not null, lig_name varchar(5));");
-            doInsertQuery("CREATE TABLE " + tbl_ssecontact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null, check (sse1 < sse2));");
-            doInsertQuery("CREATE TABLE " + tbl_ssecontact_complexgraph + " (ssecontact_complexgraph_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, complex_contact_type int not null, check (sse1 < sse2));");            
-            doInsertQuery("CREATE TABLE " + tbl_complex_contact_stats + " (complex_contact_id serial primary key, chain1 int not null references " + tbl_chain + " ON DELETE CASCADE, chain2 int not null references " + tbl_chain + " ON DELETE CASCADE, contact_num_HH int not null, contact_num_HS int not null, contact_num_HL int not null, contact_num_SS int not null, contact_num_SL int not null, contact_num_LL int not null, contact_num_DS int not null);");
-            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null, graph_string_gml text not null, graph_string_kavosh text, graph_image_svg text, graph_image_png text, sse_string text);");
-            doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graph_string_gml text not null, graph_string_kavosh text, graph_image_svg text, graph_image_png text, sse_string text);");
-            doInsertQuery("CREATE TABLE " + tbl_complexgraph + " (complexgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, graph_string_gml text not null, graph_string_kavosh text, graph_image_svg text, graph_image_png text);");
-            
-            doInsertQuery("CREATE TABLE " + tbl_graphletcount + " (graphlet_id serial primary key, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graphlet_count_000 int not null, graphlet_count_001 int not null, graphlet_count_002 int not null, graphlet_count_003 int not null, graphlet_count_004 int not null, graphlet_count_005 int not null, graphlet_count_006 int not null, graphlet_count_007 int not null, graphlet_count_008 int not null);");
-            doInsertQuery("CREATE TABLE " + tbl_nm_ssetoproteingraph + " (ssetoproteingraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE);");
-            doInsertQuery("CREATE TABLE " + tbl_nm_ssetofoldinggraph + " (ssetofoldinggraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE);");
-            
-            
             
             // various types encoded by integers. these tables should be removed in the future and the values stored as string directly instead.
             doInsertQuery("CREATE TABLE " + tbl_ssetypes + " (ssetype_id int not null primary key,  ssetype_text text not null);");
             doInsertQuery("CREATE TABLE " + tbl_contacttypes + " (contacttype_id int not null primary key,  contacttype_text text not null);");
             doInsertQuery("CREATE TABLE " + tbl_complexcontacttypes + " (complexcontacttype_id int not null primary key,  complexcontacttype_text text not null);");
             doInsertQuery("CREATE TABLE " + tbl_graphtypes + " (graphtype_id int not null primary key,  graphtype_text text not null);");
+            
+            doInsertQuery("CREATE TABLE " + tbl_protein + " (pdb_id varchar(4) primary key, header varchar(200) not null, title varchar(400) not null, experiment varchar(200) not null, keywords varchar(400) not null, resolution real not null);");
+            doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(2) not null, mol_name varchar(200) not null, organism_scientific varchar(200) not null, organism_common varchar(200) not null, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE);");
+            doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence varchar(2000) not null, sse_type int not null, lig_name varchar(5));");
+            doInsertQuery("CREATE TABLE " + tbl_ssecontact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null references " + tbl_contacttypes + " ON DELETE CASCADE, check (sse1 < sse2));");
+            doInsertQuery("CREATE TABLE " + tbl_ssecontact_complexgraph + " (ssecontact_complexgraph_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, complex_contact_type int not null references " + tbl_complexcontacttypes + " ON DELETE CASCADE check (sse1 < sse2));");            
+            doInsertQuery("CREATE TABLE " + tbl_complex_contact_stats + " (complex_contact_id serial primary key, chain1 int not null references " + tbl_chain + " ON DELETE CASCADE, chain2 int not null references " + tbl_chain + " ON DELETE CASCADE, contact_num_HH int not null, contact_num_HS int not null, contact_num_HL int not null, contact_num_SS int not null, contact_num_SL int not null, contact_num_LL int not null, contact_num_DS int not null);");
+            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text not null, graph_string_kavosh text, graph_image_svg text, graph_image_png text, sse_string text);");
+            doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graph_string_gml text not null, graph_string_kavosh text, graph_image_svg text, graph_image_png text, sse_string text);");
+            doInsertQuery("CREATE TABLE " + tbl_complexgraph + " (complexgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, graph_string_gml text not null, graph_string_kavosh text, graph_image_svg text, graph_image_png text);");
+
+            /**
+             * The contents of the graphlet_counts[55] SQL array is as follows (from Tatianas thesis, pp. 36-37):
+             *   The structure of the feature vector with the length 55:
+             *   - The ﬁrst 29 entries are unlabeled graphlets in the order of their appearance on the
+             *   ﬁgure 3.1 of Tatianas bachelor thesis:
+             *       – 2 entries: unlabeled graphlets g1 , g2 with 3 vertices;
+             *       – 6 entries: unlabeled graphlets g1 , g6 with 4 vertices;
+             *       – 21 entries: unlabeled graphlets g1 , g21 with 5 vertices.
+             *   - The rest 26 entries are the proposed labeled graphlets:
+             *       – 4 entries: all labellings of the g1 (triangle) with 3 vertices: [HHH, HHE, HEE, EEE];
+             *       – 6 entries: all labellings of the g2 (2-path) with 3 vertices: [HHH, HHE, EHE, HEH, HEE, EEE];
+             *
+             *       – 10 entries: all labellings of the g6 (3-path) with 4 vertices: [HHHH, HHHE, EHHE, HHEH, HHEE, EHEH, EHEE, HEEH, HEEE, EEEE];
+             *       – 4 entries: biologically-motivated graphlets, which encode the structural motifs, see the illustration 3.2, in the following order:
+             *          ∗ β − α − β motif: [EaHaE],
+             *          ∗ β − β − β motif: [EaEaE],
+             *          ∗ Greek key motif: [EaEaEaE],
+             *          ∗ 4 parallel not necessarily adjacent β sheets as a part of a β-barrel structure: [EpEpEpE] with “H” standing for α-helices, “E” for β-sheets, “p” for parallel and “a” for anti-parallel orientation;
+             *       – 2 entries: all labelings of the graphlet g1 with one vertex, or simply the vertices with the label “H” and the vertices with the label “E” added to get the distribution vertex labels.
+             *
+             */
+            doInsertQuery("CREATE TABLE " + tbl_graphletcount + " (graphlet_id serial primary key, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graphlet_counts int[55] not null);");
+            doInsertQuery("CREATE TABLE " + tbl_nm_ssetoproteingraph + " (ssetoproteingraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE);");
+            doInsertQuery("CREATE TABLE " + tbl_nm_ssetofoldinggraph + " (ssetofoldinggraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE);");
+                                                
 
             // set constraints
             doInsertQuery("ALTER TABLE " + tbl_protein + " ADD CONSTRAINT constr_protein_uniq UNIQUE (pdb_id);");
