@@ -91,6 +91,18 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		}
 
 	/* All the different line colors for the different topics */
+	#About {
+		padding-top: 50px;
+		}
+	
+	#UserGuide {
+		padding-top: 50px;
+	}
+	
+	#DatabaseFormat {
+		padding-top: 50px;
+	}
+	
 	#lineAbout {
 		background-color: #0A7B83;
 		}	

@@ -51,11 +51,11 @@
 				
 
 				<a href="#" class="navbar-brand"><img src="ADD_IMAGE_HERE" alt="PTGL Logo"></a>
-
-					<div class="nav-collapse collapse navbar-responsive-collapse">
+					<div class="nav-collapse collapse navbar-responsive-collapse" id="navbar-example">
+						<div class="navbar-scrollspy">
 						<ul class="nav navbar-nav">
 							<li  class="active navbarFont">
-								<a href="#">Home</a>
+								<a href="#Home">Home</a>
 							</li>
 
 							<li class="navbarFont">
@@ -63,11 +63,11 @@
 							</li>
 						
 							<li class="navbarFont">
-								<a href="#User Guide">User Guide</a>
+								<a href="#UserGuide">User Guide</a>
 							</li>
 							
 							<li class="navbarFont">
-								<a href="#Database Format">Database Format</a>
+								<a href="#DatabaseFormat">Database Format</a>
 							</li>
 							
 							<li class="dropdown">
@@ -102,19 +102,17 @@
 								</ul><!-- end dropdown menu -->
 							</li><!-- end dropdown -->
 						</ul><!-- end nav navbar-nav -->
-							
+						</div><!-- end navbar-scrollspy -->
 					</div><!-- end nav-collapse -->
 				</div><!-- end container -->
 			</div><!-- end navbar fixed-top -->
 		
-		
-		<div class="container" id="intro">
-		<!-- Intro message -->
-			PTGL stands for Protein Topology Graph Library. It is a database application for protein topologies.
-		
-		
-		</div><!-- end container-->
-		
+		<div id="Home">
+			<div class="container" id="intro">
+			<!-- Intro message -->
+				PTGL stands for Protein Topology Graph Library. It is a database application for protein topologies.
+			</div><!-- end container-->
+		</div><!-- end Home -->
 		
 		
 		
@@ -217,74 +215,94 @@
 			
 			
 	<div class="textWrapper">
-		<div class="line" id="lineAbout">
-			<div class="iconPos" id="iconAbout">
-				<img  width="100px" height="100px" src="images/icon-blueGlyph.png" alt="Icon">
-				<a name="About"></a>
-			</div><!-- end iconPos -->
-		</div><!-- end line and lineAbout -->
-			
-		<div class="container" id="text">
-			<h2>About</h2>
-				<a href="ptgl.html">PTGL</a>
-is a web-based database application for protein topologies. In order to define a mathematically unique description of protein topology the secondary structure topology of a protein is described by methods of applied graph theory. The
-<a href="ptglhelp.html#prot">protein graph</a>
-is defined as an undirected labelled graph on three description levels according to the considered secondary structure elements (SSE): the
-<a href="ptglhelp.html#alph">Alpha graph</a>
-, the
-<a href="ptglhelp.html#beta">Beta graph</a>
-, and the
-<a href="ptglhelp.html#albe">Alpha-Beta graph</a>
-. The connected components of the Protein graph form
-<a href="ptglhelp.html#fold">Folding graphs</a>
-. A
-<a href="ptglhelp.html#prot">Protein graph</a>
-can consist of one or more
-<a href="ptglhelp.html#fold">Folding graphs</a>
-. The three graph types were defined for each protein of the
-<a href="http://www.rcsb.org/pdb/">PDB</a>
-. For each graph type exists four
-<a href="ptglhelp.html#nota">linear notations</a>
-with corresponding graphic representations. In PTGL all
-<a href="ptglhelp.html#fold">Folding graphs</a>
-, all SSEs, and additional protein information are stored for every protein structure annotated in
-<a href="http://www.rcsb.org/pdb/"> PDB</a>
-for which SSEs according
-<a href="http://www.cmbi.kun.nl/gv/dssp/">DSSP</a>
-are defined, which is not a NMR structure, has a resolution less than 3.5 Å and a sequence length of at least 20 amino acids. The database enables the user to search for the topology of a protein or for certain topologies and subtopologies using the
-<a href="ptglhelp.html#nota">linear notations</a>
-. Additionally, it could be searched for sequence similarity in
-<a href="http://www.rcsb.org/pdb/">PDB</a>
-sequences.
-		</div><!-- end container and text -->
-
-		<div class="line" id="lineUserGuide">
-			<div class="iconPos" id="iconUserGuide">
-				<img width="100px" height="100px" src="images/icon-greenGlyph.png" alt="Icon"/>
-				<a name="User Guide"></a>
-			</div><!-- end iconPos -->
-		</div><!-- end line and lineUser Guide -->
+		<div id="About">
+			<div class="line" id="lineAbout">
+				<div class="iconPos" id="iconAbout">
+					<img  width="100px" height="100px" src="images/icon-blueGlyph.png" alt="Icon">
+					<div id="About"></div>
+				</div><!-- end iconPos -->
+			</div><!-- end line and lineAbout -->
+				
+			<div class="container" id="text">
+				<h2>About</h2>
+					<a href="ptgl.html">PTGL</a>
+	is a web-based database application for protein topologies. In order to define a mathematically unique description of protein topology the secondary structure topology of a protein is described by methods of applied graph theory. The
+	<a href="ptglhelp.html#prot">protein graph</a>
+	is defined as an undirected labelled graph on three description levels according to the considered secondary structure elements (SSE): the
+	<a href="ptglhelp.html#alph">Alpha graph</a>
+	, the
+	<a href="ptglhelp.html#beta">Beta graph</a>
+	, and the
+	<a href="ptglhelp.html#albe">Alpha-Beta graph</a>
+	. The connected components of the Protein graph form
+	<a href="ptglhelp.html#fold">Folding graphs</a>
+	. A
+	<a href="ptglhelp.html#prot">Protein graph</a>
+	can consist of one or more
+	<a href="ptglhelp.html#fold">Folding graphs</a>
+	. The three graph types were defined for each protein of the
+	<a href="http://www.rcsb.org/pdb/">PDB</a>
+	. For each graph type exists four
+	<a href="ptglhelp.html#nota">linear notations</a>
+	with corresponding graphic representations. In PTGL all
+	<a href="ptglhelp.html#fold">Folding graphs</a>
+	, all SSEs, and additional protein information are stored for every protein structure annotated in
+	<a href="http://www.rcsb.org/pdb/"> PDB</a>
+	for which SSEs according
+	<a href="http://www.cmbi.kun.nl/gv/dssp/">DSSP</a>
+	are defined, which is not a NMR structure, has a resolution less than 3.5 Å and a sequence length of at least 20 amino acids. The database enables the user to search for the topology of a protein or for certain topologies and subtopologies using the
+	<a href="ptglhelp.html#nota">linear notations</a>
+	. Additionally, it could be searched for sequence similarity in
+	<a href="http://www.rcsb.org/pdb/">PDB</a>
+	sequences.
+			</div><!-- end container and text -->
+		</div><!-- end About -->
 		
-		<div class="container" id="text">
-			<h2>User Guide</h2>
+		<div id="UserGuide">
+			<div class="line" id="lineUserGuide">
+				<div class="iconPos" id="iconUserGuide">
+					<img width="100px" height="100px" src="images/icon-greenGlyph.png" alt="Icon"/>
+				</div><!-- end iconPos -->
+			</div><!-- end line and lineUser Guide -->
+			
+			<div class="container" id="text">
+				<h2>User Guide</h2>
+					<p>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam 						erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata 						sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor 						invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet 						clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing 					elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et 					justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+					</p>
+					<p>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam 						erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata 						sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor 						invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet 						clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing 					elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et 					justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+					</p>
+					<p>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam 						erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata 						sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor 						invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet 						clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing 					elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et 					justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+					</p>
+					<p>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam 						erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata 						sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor 						invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet 						clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing 					elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et 					justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+					</p>
+			</div><!-- end container and text -->
+		</div><!-- end UserGuide -->
+		
+		
+		<div id="DatabaseFormat">
+			<div class="line" id="lineDatabaseFormat">
+				<div class="iconPos" id="iconDatabaseFormat">
+					<img width="100px" height="100px" src="images/icon-yellowGlyph.png" alt="Icon"/>
+				</div><!-- end iconPos -->
+			</div><!-- end line and lineDatabaseFormat -->
+			
+			<div class="container" id="text">
+			<h2>Database Format</h2>
 				<p>
 					Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam 						erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata 						sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor 						invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet 						clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing 					elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et 					justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
 				</p>
+				<p>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam 						erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata 						sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor 						invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet 						clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing 					elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et 					justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+					</p>
+					<p>
+						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam 						erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata 						sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor 						invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet 						clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing 					elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et 					justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+					</p>
 		</div><!-- end container and text -->
-			
-		<div class="line" id="lineDatabaseFormat">
-			<div class="iconPos" id="iconDatabaseFormat">
-				<img width="100px" height="100px" src="images/icon-yellowGlyph.png" alt="Icon"/>
-				<a name="Database Format"></a>
-			</div><!-- end iconPos -->
-		</div><!-- end line and lineDatabaseFormat -->
-		
-		<div class="container" id="text">
-		<h2>Database Format</h2>
-			<p>
-				Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam 						erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata 						sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor 						invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet 						clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing 					elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et 					justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-			</p>
-	</div><!-- end container and text -->
+	</div><!-- end DatabaseFormat -->
 	</div><!--- end textWrapper -->
 	
 	</div><!-- end wrapper -->
