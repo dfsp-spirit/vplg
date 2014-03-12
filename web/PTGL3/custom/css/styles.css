@@ -516,37 +516,58 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	
 	
 	
+	/* -----------------------------------
+	 content.php
+	------------------------------------*/
+	
+	#contentText {
+		margin-top: 5%;
+	}
+	
+	#contentTable {
+		margin-top: 5%;
+		background: rgba(214, 214, 214, 0.4);
+		}
+	
+	.borderless>thead>tr>th, 
+	.borderless>tbody>tr>th, 
+	.borderless>tfoot>tr>th, 
+	.borderless>thead>tr>td, 
+	.borderless>tbody>tr>td, 
+	.borderless>tfoot>tr>td {
+		border-top: none; 
+		}
+	
+	.tablecenter {
+		text-align: center;
+	}
+
 	/* --------------------------------------
    Carousel
    -------------------------------------- */
 
-#myCarousel {
-	margin-top: 100px;
-}
+	#myCarousel {
+		margin-top: 100px;
+	}
 
-.carousel-caption {
-	font-size: 24px;
-}
+	.carousel-caption {
+		font-size: 24px;
+	}
 
-.carousel-caption h4 {
-	font-size: 32px;
-}
+	.carousel-caption h4 {
+		font-size: 32px;
+	}
 
-#myCarousel .item { height: 400px; }
+	#myCarousel .item { height: 400px; }
 
-#slide1 {
-	background: url(http://upload.wikimedia.org/wikipedia/en/2/24/Lenna.png) top center no-repeat;
-}
+	#slide1 {
+		background: url(http://upload.wikimedia.org/wikipedia/en/2/24/Lenna.png) top center no-repeat;
+	}
 
-#slide2 {
-	background: url('../../images/carousel_medium_02.jpg') top center no-repeat;
-}
+	#slide2 {
+		background: url('../../images/carousel_medium_02.jpg') top center no-repeat;
+	}
 
-#slide3 {
-	background: url('../../images/carousel_medium_03.jpg') top center no-repeat;
-}
-	
-	
-	
-	
-	
+	#slide3 {
+		background: url('../../images/carousel_medium_03.jpg') top center no-repeat;
+	}
