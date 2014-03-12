@@ -76,11 +76,11 @@
 								
 								<ul class="dropdown-menu">
 									<li>
-										<a href="#">Content</a>
+										<a href="content.php">Content</a>
 									</li>
 									
 									<li>
-										<a href="#">Publications</a>
+										<a href="publications.php">Publications</a>
 									</li>
 									
 									<li>
@@ -254,7 +254,7 @@
 	<a href="ptglhelp.html#nota">linear notations</a>
 	. Additionally, it could be searched for sequence similarity in
 	<a href="http://www.rcsb.org/pdb/">PDB</a>
-	sequences.
+	sequences. <a href="about.php">Read more...</a>
 			</div><!-- end container and text -->
 		</div><!-- end About -->
 		

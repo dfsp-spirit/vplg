@@ -24,7 +24,8 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	}
 	
 	a:visited {
-			color: purple;
+			/*color: purple;*/
+			color: #1E0FBE;
 		}
 	
 	a:active a:focus a:hover { 
@@ -562,9 +563,17 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	
 	
 	
+	/*----------------------------------------
+	 about.php
+	 ---------------------------------------*/
 	
+	#about {
+		margin-top: 5%;
+	}
 	
-	
+	.noBullets {
+		list-style-type: none;
+	}
 	
 
 

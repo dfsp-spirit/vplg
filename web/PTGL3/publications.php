@@ -54,7 +54,7 @@
 					<div class="nav-collapse collapse navbar-responsive-collapse" id="navbar-example">
 						<div class="navbar-scrollspy">
 						<ul class="nav navbar-nav">
-							<li  class="active navbarFont">
+							<li  class="navbarFont">
 								<a href="index.php#Home">Home</a>
 							</li>
 
@@ -76,7 +76,7 @@
 								
 								<ul class="dropdown-menu">
 									<li>
-										<a href="#">Content</a>
+										<a href="content.php">Content</a>
 									</li>
 									
 									<li>

@@ -79,11 +79,11 @@
 								
 								<ul class="dropdown-menu">
 									<li>
-										<a href="#">Content</a>
+										<a href="content.php">Content</a>
 									</li>
 									
 									<li>
-										<a href="#">Publications</a>
+										<a href="publications.php">Publications</a>
 									</li>
 									
 									<li>
