@@ -75,8 +75,14 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		line-height: auto;
         margin: auto auto 0;
 		}
-
+	
+	a.footerLink:link, a.footerLink:visited {
+			color: #636262;
+			}
 		
+	a.footerLink:hover, a.footerLink:active {
+			color: #fff;
+	}
 		
 	.flush-right {
 		text-align: right;

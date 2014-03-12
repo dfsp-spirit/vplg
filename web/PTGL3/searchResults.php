@@ -60,15 +60,15 @@ include('search.php');
 							</li>
 
 							<li class="navbarFont">
-								<a href="#About">About</a>
+								<a href="index.php#About">About</a>
 							</li>
 						
 							<li class="navbarFont">
-								<a href="#User Guide">User Guide</a>
+								<a href="index.php#UserGuide">User Guide</a>
 							</li>
 							
 							<li class="navbarFont">
-								<a href="#Database Format">Database Format</a>
+								<a href="index.php#DatabaseFormat">Database Format</a>
 							</li>		
 
 							<li class="dropdown">
