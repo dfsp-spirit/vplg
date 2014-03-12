@@ -541,6 +541,32 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	.tablecenter {
 		text-align: center;
 	}
+	
+	
+	
+	/*-------------------------------------
+	 publications.php
+	 ------------------------------------*/
+	
+	#publications {
+		margin-top: 5%;
+	}
+	
+	#publicationsList {
+		background: rgba(214, 214, 214, 0.4);
+		padding-top: 10px;
+		padding-bottom: 10px;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
 
 	/* --------------------------------------
    Carousel
