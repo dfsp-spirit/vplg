@@ -24,8 +24,8 @@ include('search.php');
 
 
 		<!-- Custom CSS -->
-		<link rel="stylesheet" type="text/css" href="custom/css/styles.css">
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="custom/css/styles.css">
 		
 		<!-- Include Modernizr in the head, before any other JS -->
 		<script src="bootstrap/js/modernizr-2.6.2.min.js"></script>
@@ -158,19 +158,19 @@ include('search.php');
 				</div>
 			
 				<div class="col-sm-2">
-					<a href="#">Impressum</a>
+					<a class="footerLink" href="#">Impressum</a>
 				</div>
 				
 				<div class="col-sm-2">
-					<a href="contact.php">Contact</a>
+					<a class="footerLink" href="contact.php">Contact</a>
 				</div>
 				
 				<div class="col-sm-2">
-					<a href="http://www.bioinformatik.uni-frankfurt.de" target="_blank">MolBi - Group</a>
+					<a class="footerLink" href="http://www.bioinformatik.uni-frankfurt.de" target="_blank">MolBi - Group</a>
 				</div>
 				
 				<div class="col-sm-2">
-					<a href="#">Publications</a>
+					<a class="footerLink" href="publications.php">Publications</a>
 				</div>
 				
 				<div class="col-sm-2">

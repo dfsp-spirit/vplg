@@ -576,7 +576,24 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	}
 	
 
-
+	.imgFormAboutphp {
+		width: 450px;
+		heigth: 600px;
+		border: 4px;
+		margin: 10px;
+		}
+	
+	
+	.imgCenter {
+		text-align: center;
+		}
+	
+	#aboutTable {
+		background: rgba(214, 214, 214, 0.4);
+		}
+	
+	
+	
 	/* --------------------------------------
    Carousel
    -------------------------------------- */

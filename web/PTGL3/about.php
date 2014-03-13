@@ -50,12 +50,12 @@
 				</button>
 				
 
-				<a href="#" class="navbar-brand"><img src="ADD_IMAGE_HERE" alt="PTGL Logo"></a>
+				<a href="index.php" class="navbar-brand"><img src="ADD_IMAGE_HERE" alt="PTGL Logo"></a>
 					<div class="nav-collapse collapse navbar-responsive-collapse" id="navbar-example">
 						<div class="navbar-scrollspy">
 						<ul class="nav navbar-nav">
 							<li  class="navbarFont">
-								<a href="index.php#Home">Home</a>
+								<a href="index.php">Home</a>
 							</li>
 
 							<li class="navbarFont">
@@ -167,9 +167,9 @@
 			<br>
 			<h4> <u>Protein Graphs</u> </h4>
 			
-			Using <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a> structure data the SSEs are defined according to the assignment of the <a href="http://swift.cmbi.ru.nl/gv/dssp/" target="_blank">DSSP</a>-algorithm with some modifications. Then, the spatial
+			<p>Using <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a> structure data the SSEs are defined according to the assignment of the <a href="http://swift.cmbi.ru.nl/gv/dssp/" target="_blank">DSSP</a>-algorithm with some modifications. Then, the spatial
 			contacts between the SSEs are generated according <a href="publications.php">KOCH et al.</a>. These information form the basis for the description of protein structures as
-			graphs.
+			graphs.</p>
 			A Protein graph is defined as labelled undirected graph. In the case of the Protein graph the vertices correspond to the SSEs, helices and
 			strands. The edges of the Protein graph represent spatial adjacencies of SSEs. These adjacencies are defined through contacts between SSEs.
 			According to the type of atoms forming the contact, there are backbone-backbone-contacts, sidechain-sidechain-contacts, and sidechain-backbone
@@ -180,7 +180,7 @@
 			According to the SSE type of interest the Protein graph can be defined as <a href="#alphaGraph">Alpha</a>, <a href="#betaGraph">Beta</a>, or <a href="#alphaBetaGraph">Alpha-Beta</a> graph (see example below). SSEs
 			are ordered as red circles (helices) or black quadrats (strands) on a straight line according to their sequential order from the N- to
 			the C-terminus. The spatial neighbourhoods are drawn as arcs between SSEs. The edges are coloured according to their labelling, red for
-			parallel, green for mixed, and blue for anti-parallel neighbourhood. 
+			parallel, green for mixed, and blue for anti-parallel neighbourhood.
 			
 			
 			<a name="alphaGraph"></a>
@@ -188,6 +188,7 @@
 			<br>
 			<h5> <u>Alpha Graph</u> </h5>
 			The Alpha-Graph of the protein 1TIM chain A consisting only of 13 helices.
+			<p class="imgCenter"><img src="./images/1timA_alph.0.png" alt="Alpha Graph of 1timA" title="Alpha Graph of 1timA" class="img-responsive imgFormAboutphp"/></p>
 			
 			
 			<a name="betaGraph"></a>
@@ -195,26 +196,29 @@
 			<br>
 			<h5> <u>Beta Graph</u> </h5>
 			The Beta-Graph of the protein 1TIM chain A consisting only of 8 strands.
+			<p class="imgCenter"><img src="./images/1timA_beta.0.png" alt="Beta Graph of 1timA" title="Beta Graph of 1timA" class="img-responsive imgFormAboutphp"/></p>
 			
 			<a name="alphaBetaGraph"></a>
 			<br>
 			<br>
 			<h5> <u>Alpha-Beta Graph</u> </h5>
-			The Alpha-Beta-Graph of the protein 1TIM chain A consisting of 21 SSEs (13 helices and 8 strands). 
+			The Alpha-Beta Graph of the protein 1TIM chain A consisting of 21 SSEs (13 helices and 8 strands). 
+			<p class="imgCenter"><img class="img-responsive imgFormAboutphp" src="./images/1timA_albe.0.png" alt="Alpha-Beta Graph of 1timA" title="Alpha-Beta Graph of 1timA"></p>
 			
 			
 			<a name="foldingGraph"></a>
 			<br>
 			<br>
 			<h4> <u>Folding Graphs</u> </h4>
-			A connected component of the <a href="#proteinGraph">Protein graph</a> is called Folding graph. Folding graphs are denoted with capital letters in alphabetical order
-			according to their occurrence in the sequence, beginning at the N-terminus.
-			<a href="#proteinGraph">Protein graphs</a> are built of one or more Folding graphs. Below, you find the <a href="#rasmolbec">schematic representation</a> of the antigen receptor protein 1BEC
+			<p>A connected component of the <a href="#proteinGraph">Protein graph</a> is called Folding graph. Folding graphs are denoted with capital letters in alphabetical order
+			according to their occurrence in the sequence, beginning at the N-terminus.</p>
+			
+			<p><a href="#proteinGraph">Protein graphs</a> are built of one or more Folding graphs. Below, you find the <a href="#rasmolbec">schematic representation</a> of the antigen receptor protein 1BEC
 			(figure from the <a href="http://www.fli-leibnitz.de/cgi-bin/ImgLib.pl?Code=1BEC">Jena Library of Biological Macromoleculs</a>). Helices are coloured red and strands blue. 1BEC is a transport membrane protein
 			that detects foreign molecules at the cell surface. It has two domains, which are represented by the Folding graphs A and E, which are mainly
 			built by strands. The protein consists of one chain A and exhibits six Folding graphs. Two large Folding graphs (Folding graphs 1BEC_A and
 			1BEC_E), and four Folding graphs 1BEC_B, 1BEC_C, 1BEC_D, and 1BEC_F consisting only of a single helix (see <href="#alphaBeta1bec">Protein graph of 1bec</a>: helices 9,
-			11, 14, and 22). Folding graphs consisting of only one SSE are found mostly at the protein surface and not in the protein core.
+			11, 14, and 22). Folding graphs consisting of only one SSE are found mostly at the protein surface and not in the protein core.</p>
 			Especially in beta-sheet containing Folding graphs, the maximal vertex degree of the Folding graphs is not larger than two. Thus, we distinguish
 			between so-called bifurcated and non-bifurcated topological structures. A <a href="#proteinGraph">Protein graph</a> or a Folding graph is called bifucated, if there is any
 			vertex degree greater than 2, if not, the graph is non- bifurcated. 
@@ -223,25 +227,29 @@
 			<br>
 			<br>
 			<h5> <u>3D structure of 1BEC</u> </h5>
+				<p><img src="./images/1bec.gif" alt="3D structure of 1BEC" title="3D structure of 1BEC" class="img-responsive imgFormAboutphp"/></p>
+			
 			
 			<a name="alphaBeta1bec"></a>
 			<h5> <u>Alpha-Beta Protein graph of 1BEC</u> </h5>
+				<p><img src="./images/1becA_albe.0.png" alt="Alpha-Beta Protein graph of 1BEC" title="Alpha-Beta Protein graph of 1BEC" class="img-responsive imgFormAboutphp"/></p>
 			<h5> <u>Alpha-Beta Folding graph A of 1BEC</u> </h5>
+				<p><img src="./images/1becAAa_al.0.png" alt="Alpha-Beta Folding graph A of 1BEC" title="Alpha-Beta Folding graph A of 1BEC" class="img-responsive imgFormAboutphp"/></p>
 			<h5> <u>Alpha-Beta Folding graph B of 1BEC</u> </h5>
-			
+				<p><img src="./images/1becAEa_al.0.png" alt="Alpha-Beta Folding graph B of 1BEC" title="Alpha-Beta Folding graph B of 1BEC" class="img-responsive imgFormAboutphp"/></p>
 			
 			<a name="linearNot"></a>
 			<br>
 			<br>
 			<h4> <u>Linear Notations</u> </h4>
-			A notation serves as a unique, canonical, and linear description and classification of structures. The notations for Folding graphs reveal to
-			the feature of protein structure as a linear sequence of amino acids, and describe the arrangement of SSEs correctly and completely.
-			There are two possibilities of representing Protein graphs: first, one can order the SSEs in one line according to their occurrence in sequence,
+			<p>A notation serves as a unique, canonical, and linear description and classification of structures. The notations for Folding graphs reveal to
+			the feature of protein structure as a linear sequence of amino acids, and describe the arrangement of SSEs correctly and completely.</p>
+			<p>There are two possibilities of representing Protein graphs: first, one can order the SSEs in one line according to their occurrence in sequence,
 			or second, according to their occurrence in space. In the first case, the <a href="#adj">adjacent</a> notation, ADJ, the <a href="#red">reduced</a> notation, RED, and the <a href="#seq">sequence</a>
-			notation, SEQ, SSEs are ordered as points on a straight line according to their sequential order from the N- to the C-terminus.
-			It is difficult to draw the spatial arrangements of the SSEs in a straight line, because in most proteins SSEs exhibit more than two spatial
+			notation, SEQ, SSEs are ordered as points on a straight line according to their sequential order from the N- to the C-terminus.</p>
+			<p>It is difficult to draw the spatial arrangements of the SSEs in a straight line, because in most proteins SSEs exhibit more than two spatial
 			neighbours. Therefore, the second description type, the <a href="#key">key</a> notation, KEY, can be drawn only for non-bifurcated Folding graphs. Helices and
-			strands are represented by cylinders and arrows, respectively. The sequential neighbourhood is described by arcs between arrows and cylinders.
+			strands are represented by cylinders and arrows, respectively. The sequential neighbourhood is described by arcs between arrows and cylinders.</p>
 			The notations are written in different brackets: [] denote non-bifurcated, {} bifurcated folding graphs, and () indicate barrel structures. 
 			
 			<a name="adj"></a>
@@ -249,16 +257,17 @@
 			<br>
 			<br>
 			<h5> <u>The adjucent and reduced notation</u> </h5>
-			All vertices of the <a href="#proteinGraph">Protein graph</a> are considered in the adjacent (ADJ) notation of a Folding graph. SSEs of the Folding graph are ordered
+			<p>All vertices of the <a href="#proteinGraph">Protein graph</a> are considered in the adjacent (ADJ) notation of a Folding graph. SSEs of the Folding graph are ordered
 			according to their occurrence in the sequence. Beginning with the first SSE and following the spatial neighbourhoods the sequential distances
-			are noted followed by the neighbourhood type.
+			are noted followed by the neighbourhood type.</p>
 			The reduced (RED) notation is the same as for ADJ notation, but only those SSEs of the considered Folding graph count. See below, the ADJ and
 			RED notations of the Beta-Folding graph E in human alpha thrombin chain B(1D3T). The beta sheet consists of six strands arranged both in
 			parallel with one additional mixed edge to helix 12. 
 
 			<h5> <u>ADJ Notation</u> </h5>
+				<p><img src="./images/1d3tBEa_albe.png" alt="Adjacent notation" title="Adjacent notation" class="img-responsive imgFormAboutphp"/></p>
 			<h5> <u>RED Notation</u> </h5>
-			
+				<p><img src="./images/1d3tBEr_albe.png" alt="Reduced notation" title="Reduced notation" class="img-responsive imgFormAboutphp"/></p>
 			<a name="key"></a>
 			<br>
 			<br>
@@ -273,6 +282,7 @@
 			B of the histocompatibility antigen (1IEB). The Folding graph consists of 3 helices and 4 strands. This topology exhibits one cross over
 			connection from helix 6 to helix 7 and forms an <a href="#alphaBetaGraph">Alpha-Beta</a> barrel structure. 
 			
+			<p><img src="./images/1iebBk.png" alt="Key notation" title="Key notation" class="img-responsive imgFormAboutphp"/></p>
 			
 			<a name="seq"></a>
 			<br>
@@ -281,11 +291,69 @@
 			This notation is the same as the <a href="#adj">ADJ</a> notation, but the sequential differences are counted. Although the SEQ notation is trivial, the notation
 			can be useful, for example, searching for ψ-loops requires a special SEQ notation. 
 			
+			<p><img src="./images/1ars_Bs_beta.png" alt="Sequence notation" title="Sequence notation" class="img-responsive imgFormAboutphp"/></p>
 			
 			<a name="linking"></a>
 			<br>
 			<br>
 			<h4> <u>Linking PTGL</u> </h4>
+			<p>You can link PTGL in two ways:</p>
+			<p><b>1.</b> Link to a certain PDB-id, chain id, <a href="#proteinGraph">graph type</a> and <a href="#linearNot">notation type</a>, e.g. PDB-id=1g3e, chain id=A, graph type=Alpha-Beta, and notation type=KEY, then the link is:</p>
+			<br>
+			<p>The encoding is the following:</p>
+			<div class="table-responsive" id="aboutTable">
+				<table class="table table-condensed table-hover borderless">
+					<tr class="tablecenter">
+						<th class="tablecenter">parameter</th>
+						<th class="tablecenter">allowed values</th>
+						<th class="tablecenter">description</th>
+						<tr class="tablecenter">
+						</tr>
+						<tr class="tablecenter">
+							<td></td>
+							<td>z</td>
+							<td><a href="#alphaBetaGraph">Alpha-Beta</td>
+						</tr>
+						<tr class="tablecenter">
+							<td>topology</td>
+							<td>a</td>
+							<td><a href="#alphaGraph">Alpha</a></td>
+						</tr>
+						<tr class="tablecenter">
+							<td></td>
+							<td>b</td>
+							<td><a href="betaGraph">Beta</a></td>
+						</tr>
+						<tr class="tablecenter">
+							<td></td>
+							<td>1</td>
+							<td><a href="#adj">ADJ</a></td>
+						</tr>
+						<tr class="tablecenter">
+							<td>rep</td>
+							<td>2</td>
+							<td><a href="#red">RED</a></td>
+						</tr>
+						<tr class="tablecenter">
+							<td></td>
+							<td>3</td>
+							<td><a href="#key">KEY</a></td>
+						</tr>
+						<tr class="tablecenter">
+							<td></td>
+							<td>4</td>
+							<td><a href="#seq">SEQ</a></td>
+						</tr>
+					</tr>
+				</table>
+			</div>
+			
+			<p><b>protlist	&#x3c;pdb-id&#x3e;&#x3c;chain-id&#x3e;	  e.g. 1g3eA</b></p>
+			
+			
+			<p><b>2.</b> If you only have the PDB-id you can link as follows:</p>
+			
+			
 		
 		
 		
@@ -315,7 +383,7 @@
 				</div>
 				
 				<div class="col-sm-2">
-					<a class="footerLink" href="#">Publications</a>
+					<a class="footerLink" href="publications.php">Publications</a>
 				</div>
 				
 				<div class="col-sm-2">

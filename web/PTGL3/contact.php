@@ -227,19 +227,19 @@
 				</div>
 			
 				<div class="col-sm-2">
-					<a href="#">Impressum</a>
+					<a class="footerLink" href="#">Impressum</a>
 				</div>
 				
 				<div class="col-sm-2">
-					<a href="contact.php">Contact</a>
+					<a class="footerLink" href="contact.php">Contact</a>
 				</div>
 				
 				<div class="col-sm-2">
-					<a href="http://www.bioinformatik.uni-frankfurt.de" target="_blank">MolBi - Group</a>
+					<a class="footerLink" href="http://www.bioinformatik.uni-frankfurt.de" target="_blank">MolBi - Group</a>
 				</div>
 				
 				<div class="col-sm-2">
-					<a href="#">Publications</a>
+					<a class="footerLink" href="publications.php">Publications</a>
 				</div>
 				
 				<div class="col-sm-2">

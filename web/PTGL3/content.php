@@ -50,12 +50,12 @@
 				</button>
 				
 
-				<a href="#" class="navbar-brand"><img src="ADD_IMAGE_HERE" alt="PTGL Logo"></a>
+				<a href="index.php" class="navbar-brand"><img src="ADD_IMAGE_HERE" alt="PTGL Logo"></a>
 					<div class="nav-collapse collapse navbar-responsive-collapse" id="navbar-example">
 						<div class="navbar-scrollspy">
 						<ul class="nav navbar-nav">
 							<li  class="navbarFont">
-								<a href="index.php#Home">Home</a>
+								<a href="index.php">Home</a>
 							</li>
 
 							<li class="navbarFont">
@@ -125,7 +125,7 @@
 				
 		
 			<div class="table-responsive" id="contentTable">
-				<table class="table table-condensed table-hover borderless tablecenter">
+				<table class="table table-condensed table-hover borderless">
 					<tr>
 						<th class="tablecenter">Graph-type</th>
 						<th class="tablecenter">Notation-type</th>
@@ -251,7 +251,7 @@
 				</div>
 				
 				<div class="col-sm-2">
-					<a class="footerLink" href="#">Publications</a>
+					<a class="footerLink" href="publications.php">Publications</a>
 				</div>
 				
 				<div class="col-sm-2">

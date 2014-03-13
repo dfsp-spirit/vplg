@@ -327,7 +327,7 @@
 				</div>
 				
 				<div class="col-sm-2">
-					<a class="footerLink" href="#">Publications</a>
+					<a class="footerLink" href="publications.php">Publications</a>
 				</div>
 				
 				<div class="col-sm-2">

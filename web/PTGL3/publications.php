@@ -50,12 +50,12 @@
 				</button>
 				
 
-				<a href="#" class="navbar-brand"><img src="ADD_IMAGE_HERE" alt="PTGL Logo"></a>
+				<a href="index.php" class="navbar-brand"><img src="ADD_IMAGE_HERE" alt="PTGL Logo"></a>
 					<div class="nav-collapse collapse navbar-responsive-collapse" id="navbar-example">
 						<div class="navbar-scrollspy">
 						<ul class="nav navbar-nav">
 							<li  class="navbarFont">
-								<a href="index.php#Home">Home</a>
+								<a href="index.php">Home</a>
 							</li>
 
 							<li class="navbarFont">
