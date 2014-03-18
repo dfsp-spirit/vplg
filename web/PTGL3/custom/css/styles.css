@@ -159,13 +159,92 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		margin-bottom: -8%;
 		text-align: center;
 	}
+	
+	
+	
+	
+	/* User Guide */
+	
+	.ugCentering {
+		padding-top: 3px;
+		padding-bottom: 3px;
+		padding-left: 15px;
+		padding-right: 15px;
+		margin-bottom: 10px;
+		margin-left: auto;
+		margin-right: auto;
+		border-collapse: separate;
+		}
 		
+	.ugBorder {
+		border-right-style: dotted;
+		border-left-style: dotted;
+		border-right-width: thin;
+		border-left-width: thin;
+		border-color: black;
+		}
+	
+	
+	#ugStandardSearch {
+		width: 80%;
+		margin-top: 2%;
+		background-color: #0a7b83;
+		cursor: pointer;
+		cursor: hand;
+		}
+	
+	
+	#ugAdvancedSearch {
+		width: 80%;
+		background-color: #2aa876;
+		cursor: pointer;
+		cursor: hand;
+		}
 		
+	.ugCenterHeadings {
+		text-align: center;
+		}
 		
+	#ugSearchkms {
 		
+		}
 		
-/*	------------------------------------------------------------*/
-	/*Contact Us*/
+	#ugSearchkms1 {
+		background-color: #ffd265;
+		
+		}
+		
+	#ugSearchk {
+		background-color: #ffd265;
+		cursor: pointer;
+		cursor: hand;
+		}
+	
+	#ugSearchkms2 {
+		background-color: #f19c65;
+		}
+	
+	#ugSearchm {
+		background-color: #f19c65;
+		cursor: pointer;
+		cursor: hand;
+	}
+	
+	#ugSearchkms3 {
+		background-color: #ce4d45;
+		}
+	
+	#ugSearchs {
+		background-color: #ce4d45;
+		cursor: pointer;
+		cursor: hand;
+	}
+		
+	
+		
+/*	------------------------------------------------------------
+	Contact Us
+	------------------------------------------------------------*/
 	
 	
 	#contactUs {
@@ -273,7 +352,7 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		margin-right: auto;
 	}
 		
-	.col-lg-3 {
+	.col-lg-3-centering {
 		width: auto;
 		}
 

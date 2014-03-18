@@ -4,7 +4,7 @@ Custom JS
 ============
 
 */
-
+$(document).ready(function() {
 
 /* Scrollspy */
 $('body').scrollspy({ target: '.navbar-scrollspy' })
@@ -72,7 +72,7 @@ $(function() {
 });
 
 
-
+});
 
 
 
