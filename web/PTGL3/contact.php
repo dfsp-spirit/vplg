@@ -100,7 +100,7 @@
 									</li>
 									
 									<li>
-										<a href="#">Help</a>
+										<a href="help.php">Help</a>
 									</li>
 								</ul><!-- end dropdown menu -->
 							</li><!-- end dropdown -->

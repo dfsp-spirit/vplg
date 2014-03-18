@@ -672,6 +672,20 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		}
 	
 	
+	/* --------------------------------------
+		help.php
+	---------------------------------------*/
+	
+	#help {
+		margin-top: 5%;
+		}
+	
+	.anchor {
+		display: block;
+		position: relative;
+		top: -55px;
+		visibilty: hidden;
+		}
 	
 	/* --------------------------------------
    Carousel

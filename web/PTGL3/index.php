@@ -96,7 +96,7 @@
 									</li>
 									
 									<li>
-										<a href="#">Help</a>
+										<a href="help.php">Help</a>
 									</li>
 								</ul><!-- end dropdown menu -->
 							</li><!-- end dropdown -->
@@ -252,7 +252,7 @@
 				<h2>User Guide</h2>
 					
 					
-					<div class="row">
+					<div class="row" id="scroll1">
 						<div class="col-lg-3 col-lg-3-centering col-centered">
 							<div class="ugCentering" id="ugStandardSearch">
 								<h3 class="ugCenterHeadings">Standard Search</h3>
@@ -264,14 +264,13 @@
 						</div><!-- end col-centered -->
 					</div><!-- end row -->
 					
-					
 					<div class="row">
 						<div class="col-lg-3 col-lg-3-centering col-centered">
 							<div class="ugCentering" id="ugAdvancedSearch">
 								<h3 class="ugCenterHeadings">Advanced Search</h3>
 								<p><strong>PDB ID</strong> The 4 character unique indentifier for the structure as defined by the PDB. Begins with a number 1-9 followed by 3 alphanumeric characters. </p>
 								<p><strong>TITLE</strong> The TITLE record contains a title for the experiment or analysis that is represented in the entry. It should identify an entry in the PDB in the same way that a title identifies a paper.The PDB records COMPND, SOURCE, EXPDTA, and REMARKs provide information that may also be found in TITLE. You may think of the title as describing the experiment, and the compound record as describing the molecule(s).</p>
-								<p><strong>Classification</strong> A classification for the molecule. </p>
+								<p id="scroll2"><strong>Classification</strong> A classification for the molecule. </p>
 								<p><strong>HET</strong> The heterogen section of a PDB file contains the complete description of non-standard residues in the entry.</p>
 								<p><strong>HETNAME</strong> This record gives the chemical name of the compound with the given HET</p>
 								<p><strong>SCOP</strong> SCOP classification.</p>
@@ -295,7 +294,7 @@
 								<br>
 								<p></p>
 								<br>
-								<br>
+								<br id="scroll3">
 								<br>
 								<br>
 								<br>
@@ -324,7 +323,7 @@
 								<br>
 								<br>
 								<br>
-								<br>
+								<br id="scroll3">
 								<br>
 								<br>
 								<br>
@@ -350,7 +349,7 @@
 								<br>
 								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<tt>inase</tt>
 								<p>would also return kinase (as well as other things).</p>
-								<p>Such queries can be time consuming and result in too many hits of little consequence.</p>
+								<p id="scroll3">Such queries can be time consuming and result in too many hits of little consequence.</p>
 								<p>Queries can be made more meaningful by:</p>
 								<ul>
 									<li>
@@ -365,7 +364,7 @@
 								<p>where <tt>header</tt> is an example of an <i>attribute </i>and <tt>kinase </tt>
 								is an example of a text string. Simply stated, <u>only</u> <tt>header</tt> 
 								fields are searched for the string kinase, not the complete PTGL database. 
-								The text string following an attribute can be a phrase containing multiple words.
+								The text string following an attribute can be a phrase containing multiple words.</p>
 								
 								
 						</div><!-- end col-centered -->
@@ -521,7 +520,7 @@
 				<br>
 				<br>
 				<br>
-				<p>For a complete documentation with examples of how to search fast and effectively please click <a href="help.php">here</a>.
+				<p>For a complete documentation with examples of how to search fast and effectively please <a href="help.php">click here</a>.
 				
 			</div><!-- end container and text -->
 		</div><!-- end UserGuide -->
@@ -638,7 +637,7 @@
 		
 		<!-- Custom JS -->
 		<script src="bootstrap/js/script.js"></script>
-		<script src="userguide.js" type="text/javascript"></script>
+		<script src="custom/js/userguide.js" type="text/javascript"></script>
 		
 		
 		<!-- Live Search for PDB IDs -->
