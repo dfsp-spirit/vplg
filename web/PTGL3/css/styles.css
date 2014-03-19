@@ -658,7 +658,8 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	.imgFormAboutphp {
 		width: 450px;
 		heigth: 600px;
-		border: 4px;
+		border: solid;
+		border-width: 1px;
 		margin: 10px;
 		}
 	
@@ -686,6 +687,15 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		top: -55px;
 		visibilty: hidden;
 		}
+	
+	.imgFormHelp {
+		height: 300px;
+		border: solid;
+		border-width: 1px;
+		margin: 10px;
+	
+	}
+	
 	
 	/* --------------------------------------
    Carousel

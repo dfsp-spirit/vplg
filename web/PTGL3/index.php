@@ -462,7 +462,7 @@
 								must be considerd. The first is composed of two beta-hairpin motifs and an enclosed 
 								alpha helix and the second an alpha helix which is surrounded by two beta sheets.</p>
 								
-								<h4>Alpha - Beta Plaits</h4>
+								<h4>Alpha-Beta Plaits</h4>
 								<p>This motif has four of five beta strand, which form an antiparallel beta sheet. In-between 
 								the sheet are two or more alpha helices.</p>
 								
