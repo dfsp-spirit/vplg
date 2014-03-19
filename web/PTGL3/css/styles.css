@@ -1,0 +1,718 @@
+ 
+/*
+
+My Custom CSS
+==============
+
+Author:		Andreas Scheck, Daniel Bruness
+Updated:	February 2014
+Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
+
+*/
+
+
+/*	-------------------------------------------------------------
+	Layout
+	-----------------------------------------------------------*/
+	html, body {
+		height: 100%;
+		color: #0D0D0D;
+	}
+	
+	a {
+		color: #1E0FBE;
+	}
+	
+	a:visited {
+			/*color: purple;*/
+			color: #1E0FBE;
+		}
+	
+	a:active a:focus a:hover { 
+		color: #2A6496;
+	}
+
+
+	
+	#customBackground {
+	background-color: #A2A2A2;
+	
+  		background: -moz-radial-gradient(center, circle, #A2A2A2 40%, #434142 100%);
+		background: -webkit-radial-gradient(center, circle, #A2A2A2 40%, #434142 100%);
+		background: -ms-radial-gradient(center, circle, #A2A2A2 40%, #434142 100%);
+		background: -o-radial-gradient(center, circle, #A2A2A2 40%, #434142 100%);
+			
+	}
+	
+	
+	
+	/* Wraps the whole file so the footer can be put into the correct position */
+	.wrapper {
+              position:relative;
+              width:100%;
+              min-height:100%;
+              height:auto;
+              margin: 0 auto;
+			  
+		}
+	 
+	/* Effects things that are inside the footer */
+	footer {
+		 background-color: #343434;
+		 color: #636262;
+		 font-size: 11px;
+		 padding-top: 20px;
+		 padding-bottom: 10px; 
+		 /*margin-top: 60px;*/
+		 }
+		 
+	
+	/* Works together with the wrapper so the footer can be put into the correct position */	 
+	
+	#footer {
+        position:relative;
+        width:100%;
+        height: auto;
+		line-height: auto;
+        margin: auto auto 0;
+		}
+	
+	a.footerLink:link, a.footerLink:visited {
+			color: #636262;
+			}
+		
+	a.footerLink:hover, a.footerLink:active {
+			color: #fff;
+	}
+		
+	.flush-right {
+		text-align: right;
+	}
+		
+	
+	/* Horizontal line separating the different topics */
+	.line {
+		border :none;
+		background-color:#FFFFFF;
+		height: 4px;
+		}
+
+	/* All the different line colors for the different topics */
+	#About {
+		padding-top: 50px;
+		}
+	
+	#UserGuide {
+		padding-top: 50px;
+	}
+	
+	#DatabaseFormat {
+		padding-top: 50px;
+	}
+	
+	#lineAbout {
+		background-color: #0A7B83;
+		}	
+	
+	#lineUserGuide {
+		background-color: #2AA876;
+		}	
+		
+	#lineDatabaseFormat {
+		background-color: #FFD265;
+		}	
+	
+	
+	/* Positioning of the circle/icon */
+	.iconPos {
+		left: 47%;
+		position: absolute;
+		}
+
+	#iconAbout {
+		margin-top: -50px;
+		}
+	
+	#iconUserGuide {
+		margin-top: -50px;
+		}
+		
+	#iconDatabaseFormat {
+		margin-top: -50px;
+		}
+	
+	
+	
+	.textWrapper {
+	margin-top: 10%;
+		}
+	
+	/* Make space for the text in the topics */
+	#text {
+		margin-top: 20px;
+		margin-bottom: 80px;
+		}
+		
+	
+	#intro {
+		margin-top: 8%;
+		margin-bottom: -8%;
+		text-align: center;
+	}
+	
+	
+	
+	
+	/* User Guide */
+	
+	.ugCentering {
+		padding-top: 3px;
+		padding-bottom: 3px;
+		padding-left: 15px;
+		padding-right: 15px;
+		margin-bottom: 10px;
+		margin-left: auto;
+		margin-right: auto;
+		border-collapse: separate;
+		}
+		
+	.ugBorder {
+		border-right-style: dotted;
+		border-left-style: dotted;
+		border-right-width: thin;
+		border-left-width: thin;
+		border-color: black;
+		}
+	
+	
+	#ugStandardSearch {
+		width: 80%;
+		margin-top: 2%;
+		background-color: #0a7b83;
+		cursor: pointer;
+		cursor: hand;
+		}
+	
+	
+	#ugAdvancedSearch {
+		width: 80%;
+		background-color: #2aa876;
+		cursor: pointer;
+		cursor: hand;
+		}
+		
+	.ugCenterHeadings {
+		text-align: center;
+		}
+		
+	#ugSearchkms {
+		
+		}
+		
+	#ugSearchkms1 {
+		background-color: #ffd265;
+		
+		}
+		
+	#ugSearchk {
+		background-color: #ffd265;
+		cursor: pointer;
+		cursor: hand;
+		}
+	
+	#ugSearchkms2 {
+		background-color: #f19c65;
+		}
+	
+	#ugSearchm {
+		background-color: #f19c65;
+		cursor: pointer;
+		cursor: hand;
+	}
+	
+	#ugSearchkms3 {
+		background-color: #ce4d45;
+		}
+	
+	#ugSearchs {
+		background-color: #ce4d45;
+		cursor: pointer;
+		cursor: hand;
+	}
+		
+	
+		
+/*	------------------------------------------------------------
+	Contact Us
+	------------------------------------------------------------*/
+	
+	
+	#contactUs {
+		margin-top: 5%;
+	}
+	
+	#contact {
+		background: rgba(214, 214, 214, 0.4);
+		padding: 10px 10px;
+		
+	}
+	
+	#member1 {
+		padding-top: 1%;
+	}
+	
+	#member2 {
+		padding-top: 2%;
+	}
+	
+	#member3 {
+		padding-top: 2%;
+	}
+	
+	
+	
+/*	-------------------------------------------------------------
+	Typography
+	-----------------------------------------------------------*/
+	
+	
+	
+	
+/*	-------------------------------------------------------------
+	Navbar
+	-----------------------------------------------------------*/
+	
+	#navColor {
+		background-color: #343434;
+		}
+	
+	
+	.navbar-nav > .open > a, .navbar-nav > .open > a:hover, .navbar-nav > .open > a:focus {
+		background-color: #2e2f30;
+		color: #ffffff;
+	
+	}
+	
+	
+	.active {
+		background-color: #000000;
+		}
+	
+	.navbar-nav > .active > a, .navbar-nav > .active > a:hover, .navbar-nav > .active > a:focus {
+		background-color: #2e2f30;
+		color: #ffffff;
+		}
+		
+	.nav > li > a:hover, .nav > li > a:focus {
+		background-color: #2e2f30;
+		color: #ffffff;
+		}
+		
+	.navbar-nav > li > a {
+		color: #636262;
+  		}
+		
+	
+	.navbar-brand {
+		padding: 13px 15px;	
+		}
+	
+	.navbarFont {
+		font-size: larger;
+		}
+
+	
+/*	-------------------------------------------------------------
+	Search
+	-----------------------------------------------------------*/
+	#searchInput {
+		width: 301px;
+		}
+		
+	
+	.col-centered {
+		margin: auto;
+		float: none;
+	}
+	
+	#search {
+		padding-top: 20%;
+		padding-right: auto;
+		padding-left: auto;
+		}
+
+	
+	
+	.checkboxFont {
+		font-weight: normal;
+	}
+	
+	.input-group {
+		margin-left: auto;
+		margin-right: auto;
+	}
+		
+	.col-lg-3-centering {
+		width: auto;
+		}
+
+	
+	.additional-search {
+		margin-left: auto;
+		margin-right: auto;
+		}
+
+	#liveSearchResults {
+		margin-bottom: 0px;
+		top: -23px;
+		position:relative;
+		width: 100%;
+		background: #d9d9d9;
+		border: 1px solid #A2A2A2;
+		border-color: rgba(82, 168, 236, 0.8);
+		box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.075) inset, 0px 0px 8px rgba(82, 168, 236, 0.6);
+		outline: 0px none;
+		display: none;
+		max-height: 150px;
+		overflow-y: scroll;
+		width: 301px;
+		line-height: 25px;
+		}
+	.liveSearchResultsPage {
+		top: inherit !important;
+		z-index: 5;
+		position: absolute !important;
+		}
+	
+	.result {
+		display: block;	
+		}
+	
+	.result:hover {
+		background: #e9e9e9;	
+		}
+	.resultHover{
+		background: #e9e9e9 !important;
+		}
+	/* Index Advanced Search Area */
+	
+	#advancedButton {
+		display: block;
+		text-align: right;
+		color:teal;
+		margin-top:3px;
+		}
+	
+	#advancedSearch {
+		display: none;	
+		}
+	#arrow {
+		float:right;
+		margin-left: 3px;
+		transform:rotate(-90deg);
+		}
+	.rotateArrow {
+		transform:rotate(0deg)!important;
+		}
+	
+	.advancedInput {
+		float:right;
+		}
+	.advancedLabel {
+		display: block;
+		width: 300px;
+		margin-left: auto;
+		margin-right: auto;
+		font-weight: normal;
+		}
+	
+	
+	/* Search results page */
+	
+	#searchResults {
+		margin-top: 50px;
+		}
+		
+		
+	.results {
+		width: 100%;
+		overflow: hidden;
+		}
+	
+	.resultsOrange {
+		background: rgba(241, 156, 101, .6);
+		}
+	
+	.resultsWhite {
+		background: rgba(214, 214, 214, .6);
+		}
+
+	
+	.resultsHeader {
+		width: auto;
+		height: 2.1em;
+	}
+
+	.resultsHeaderOrange {
+		background: rgba(241, 156, 101, .8);
+		
+	}
+	
+	.resultsHeaderWhite {
+		background: rgba(214, 214, 214, .8);
+		
+	}
+	
+			
+	.resultsId {
+		width: 100px;
+		float: left;
+		font-size: 1.8em;
+		font-weight: bold;
+		}
+
+	.resultsRes {
+		margin-top: .8em;
+		width: auto;
+		float: left;
+	}
+	
+	.resultsLink {
+		padding-top: .7em;
+		text-align: right;
+		padding-right: 1px;
+	}
+	
+	
+	.resultsBody1 {
+		clear:left;
+	}
+	
+	
+	.resultsTitle {
+		width: 100px;
+		float: left;
+	}
+	
+	
+	.resultsTitlePDB {
+		overflow: hidden;
+	}
+	
+	
+	.resultsBody2 {
+		clear: left;
+	}
+	
+	
+	.resultsClass {
+		width: 100px;
+		float: left;
+	}
+	
+	
+	.resultsClassPDB {
+		overflow: hidden;  /* Dat passt scho :) */
+	}
+	
+	.resultsBody3 {
+		clear: left;
+	}
+	
+	.resultsEC {
+		width: 100px;
+		float: left;
+	}
+	
+	.resultsECNum {
+		
+	}
+	
+	.resultsFooter {
+		clear: left;
+	}
+	
+	
+	.resultsChain {
+		width: 100px;
+		float: left;
+	}
+	
+	.resultsChainNum {
+		float: left;
+	}
+	
+	.resultsSCOP {
+		padding-left: 1%;
+		float: left;
+	}
+	
+	.resultsCATH {
+		padding-left: 1%;
+		float: left;
+	}
+	
+	
+	.chainCheckBox {
+		
+	}
+	
+	
+	
+	
+	
+	/* Load Proteins */
+	
+	#load {
+		margin-top: -5%;
+	}
+	
+	
+	#loadInput {
+		width: 273px;
+	}
+	
+	
+	.additionalProteinButtons {
+		margin-top: 10%;
+	}
+	
+	.protButton {
+		margin-left: 4%;
+	}
+	
+	
+	.btnSize {
+			padding: 4px 6px;
+	}
+	
+	
+	svg{
+		 top:0; left:0; height:100%; width:100% 
+	}
+	
+	
+	
+	
+	
+	
+	/* -----------------------------------
+	 content.php
+	------------------------------------*/
+	
+	#contentText {
+		margin-top: 5%;
+	}
+	
+	#contentTable {
+		margin-top: 5%;
+		background: rgba(214, 214, 214, 0.4);
+		}
+	
+	.borderless>thead>tr>th, 
+	.borderless>tbody>tr>th, 
+	.borderless>tfoot>tr>th, 
+	.borderless>thead>tr>td, 
+	.borderless>tbody>tr>td, 
+	.borderless>tfoot>tr>td {
+		border-top: none; 
+		}
+	
+	.tablecenter {
+		text-align: center;
+	}
+	
+	
+	
+	/*-------------------------------------
+	 publications.php
+	 ------------------------------------*/
+	
+	#publications {
+		margin-top: 5%;
+	}
+	
+	#publicationsList {
+		background: rgba(214, 214, 214, 0.4);
+		padding-top: 10px;
+		padding-bottom: 10px;
+	}
+	
+	
+	
+	
+	
+	/*----------------------------------------
+	 about.php
+	 ---------------------------------------*/
+	
+	#about {
+		margin-top: 5%;
+	}
+	
+	.noBullets {
+		list-style-type: none;
+	}
+	
+
+	.imgFormAboutphp {
+		width: 450px;
+		heigth: 600px;
+		border: 4px;
+		margin: 10px;
+		}
+	
+	
+	.imgCenter {
+		text-align: center;
+		}
+	
+	#aboutTable {
+		background: rgba(214, 214, 214, 0.4);
+		}
+	
+	
+	/* --------------------------------------
+		help.php
+	---------------------------------------*/
+	
+	#help {
+		margin-top: 5%;
+		}
+	
+	.anchor {
+		display: block;
+		position: relative;
+		top: -55px;
+		visibilty: hidden;
+		}
+	
+	/* --------------------------------------
+   Carousel
+   -------------------------------------- */
+
+	#myCarousel {
+		margin-top: 100px;
+	}
+
+	.carousel-caption {
+		font-size: 24px;
+	}
+
+	.carousel-caption h4 {
+		font-size: 32px;
+	}
+
+	#myCarousel .item { height: 400px; }
+
+	#slide1 {
+		background: url(http://upload.wikimedia.org/wikipedia/en/2/24/Lenna.png) top center no-repeat;
+	}
+
+	#slide2 {
+		background: url('../../images/carousel_medium_02.jpg') top center no-repeat;
+	}
+
+	#slide3 {
+		background: url('../../images/carousel_medium_03.jpg') top center no-repeat;
+	}
