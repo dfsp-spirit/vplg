@@ -76,6 +76,9 @@
 								
 								<ul class="dropdown-menu">
 									<li>
+										<a href="about.php">About</a>
+									</li>
+									<li>
 										<a href="content.php">Content</a>
 									</li>
 									
@@ -400,7 +403,7 @@
 		<h5><u>Globin Fold</u></h5>
 		<p>The Globin Fold is an alpha helix structure motif which is composed of a bundle consisting 
 		of eight alpha helices, which are connected over short loop regions. The helices have not a 
-		fixed arrangement but the last two helices in sequential order make up an antiparallel pair.</p>
+		fixed arrangement (dotted lines in the picture) but the last two helices in sequential order make up an antiparallel pair.</p>
 		
 		<img src="./images/globin_struktur.jpg" alt="Globin Fold" title="Globin Fold" class="img-responsive imgFormHelp"/>
 		
@@ -411,7 +414,8 @@
 		<h5><u>Up and Down Barrel</u></h5>
 		<p>The Up and Down Barrel is composed of a series of antiparallel beta strands which are 
 		connected over hydrogen bonds. There are two major families of the Up and Down Barrel, 
-		the ten-stranded and the eight-stranded version.</p>
+		the ten-stranded and the eight-stranded version. The picture below shows the the schematic 
+		representation of an eight-stranded type and an example three-dimensional image.</p>
 		
 		<img src="./images/barrel_struktur.jpg" alt="Up and Down Barrel" title="Up and Down Barrel" class="img-respnsive imgFormHelp"/>
 
@@ -433,7 +437,7 @@
 		<p>This beta motif contains between four and eight beta sheets, which are arrange around 
 		the center of the protein. Four antiparallel beta strand form each sheet. One sheet makes 
 		up one of the propeller blades. To build a four-bladed propeller four of these sheets 
-		are grouped together.</p
+		are grouped together. The image shows a four-bladed propeller motif.</p
 		
 		<img src="./images/propeller_struktur.jpg" alt="Beta Propeller" title="Beta Propeller" class="img-responsive imgFormHelp"/>
 
@@ -461,7 +465,7 @@
 		<br>
 		<h5><u>Alpha-Beta Plaits</u></h5>
 		<p>This motif has four of five beta strand, which form an antiparallel beta sheet. In-between 
-		the sheet are two or more alpha helices.</p>
+		the sheet are two or more alpha helices. The image shows a schematic arrangement.</p>
 		
 		<img src="./images/plait_struktur.jpg" alt="Alpha-Beta Plaits" title="Alpha-Beta Plaits" class="img-responsive imgFormHelp"/>
 
@@ -523,12 +527,13 @@
 	
 	<footer id="footer">
 		<div class="container">
-				<div class="row">
+			<div class="row">
 				<div class="col-sm-2">
+					<a href="about.php" class="footerLink">About</a>
 				</div>
 			
 				<div class="col-sm-2">
-					<a class="footerLink" href="#">Impressum</a>
+					<a class="footerLink" href="help.php">Help</a>
 				</div>
 				
 				<div class="col-sm-2">
@@ -544,7 +549,9 @@
 				</div>
 				
 				<div class="col-sm-2">
+					<a href="about.php#linking" class="footerLink">Linking PTGL</a>
 				</div>
+			</div>
 			
 			<div class="row">
 				<div class="col-sm-1">

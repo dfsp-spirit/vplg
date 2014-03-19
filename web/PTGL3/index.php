@@ -75,6 +75,9 @@
 								
 								<ul class="dropdown-menu">
 									<li>
+										<a href="about.php">About</a>
+									</li>
+									<li>
 										<a href="content.php">Content</a>
 									</li>
 									
@@ -553,12 +556,13 @@
 	
 	<footer id="footer">
 		<div class="container">
-				<div class="row">
+			<div class="row">
 				<div class="col-sm-2">
+					<a href="about.php" class="footerLink">About</a>
 				</div>
 			
 				<div class="col-sm-2">
-					<a class="footerLink" href="#">Impressum</a>
+					<a class="footerLink" href="help.php">Help</a>
 				</div>
 				
 				<div class="col-sm-2">
@@ -574,8 +578,9 @@
 				</div>
 				
 				<div class="col-sm-2">
+					<a href="about.php#linking" class="footerLink">Linking PTGL</a>
 				</div>
-			
+			</div>
 			<div class="row">
 				<div class="col-sm-1">
 				</div>

@@ -76,6 +76,9 @@
 								
 								<ul class="dropdown-menu">
 									<li>
+										<a href="#">About</a>
+									</li>
+									<li>
 										<a href="content.php">Content</a>
 									</li>
 									
@@ -147,9 +150,9 @@
 				
 			
 			
-			<a name="ptgl"></a>
 			<br>
 			<br>	
+			<a class="anchor" id="ptgl"></a>
 			<h3> <u>What is PTGL?</u> </h3>
 			
 			PTGL is a web-based database application for protein topologies. In order to define a mathematically unique description of protein topology
@@ -162,9 +165,9 @@
 			Å and a sequence length of at least 20 amino acids. The database enables the user to search for the topology of a protein or for certain
 			topologies and subtopologies using the <a href="#linearNot">linear notations</a>. Additionally, it could be searched for sequence similarity in <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a> sequences.
 			
-			<a name="proteinGraph"></a>
 			<br>
 			<br>
+			<a class="anchor" id="proteinGraph"></a>
 			<h4> <u>Protein Graphs</u> </h4>
 			
 			<p>Using <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a> structure data the SSEs are defined according to the assignment of the <a href="http://swift.cmbi.ru.nl/gv/dssp/" target="_blank">DSSP</a>-algorithm with some modifications. Then, the spatial
@@ -183,32 +186,32 @@
 			parallel, green for mixed, and blue for anti-parallel neighbourhood.
 			
 			
-			<a name="alphaGraph"></a>
 			<br>
 			<br>
+			<a class="anchor" id="alphaGraph"></a>
 			<h5> <u>Alpha Graph</u> </h5>
 			The Alpha-Graph of the protein 1TIM chain A consisting only of 13 helices.
 			<p class="imgCenter"><img src="./images/1timA_alph.0.png" alt="Alpha Graph of 1timA" title="Alpha Graph of 1timA" class="img-responsive imgFormAboutphp"/></p>
 			
 			
-			<a name="betaGraph"></a>
 			<br>
 			<br>
+			<a class="anchor" id="betaGraph"></a>
 			<h5> <u>Beta Graph</u> </h5>
 			The Beta-Graph of the protein 1TIM chain A consisting only of 8 strands.
 			<p class="imgCenter"><img src="./images/1timA_beta.0.png" alt="Beta Graph of 1timA" title="Beta Graph of 1timA" class="img-responsive imgFormAboutphp"/></p>
 			
-			<a name="alphaBetaGraph"></a>
 			<br>
 			<br>
+			<a class="anchor" id="alphaBetaGraph"></a>
 			<h5> <u>Alpha-Beta Graph</u> </h5>
 			The Alpha-Beta Graph of the protein 1TIM chain A consisting of 21 SSEs (13 helices and 8 strands). 
 			<p class="imgCenter"><img class="img-responsive imgFormAboutphp" src="./images/1timA_albe.0.png" alt="Alpha-Beta Graph of 1timA" title="Alpha-Beta Graph of 1timA"></p>
 			
 			
-			<a name="foldingGraph"></a>
 			<br>
 			<br>
+			<a class="anchor" id="foldingGraph"></a>
 			<h4> <u>Folding Graphs</u> </h4>
 			<p>A connected component of the <a href="#proteinGraph">Protein graph</a> is called Folding graph. Folding graphs are denoted with capital letters in alphabetical order
 			according to their occurrence in the sequence, beginning at the N-terminus.</p>
@@ -223,14 +226,14 @@
 			between so-called bifurcated and non-bifurcated topological structures. A <a href="#proteinGraph">Protein graph</a> or a Folding graph is called bifucated, if there is any
 			vertex degree greater than 2, if not, the graph is non- bifurcated. 
 			
-			<a name="rasmolbec"></a>
 			<br>
 			<br>
+			<a class="anchor" id="rasmolbec"></a>
 			<h5> <u>3D structure of 1BEC</u> </h5>
 				<p><img src="./images/1bec.gif" alt="3D structure of 1BEC" title="3D structure of 1BEC" class="img-responsive imgFormAboutphp"/></p>
 			
 			
-			<a name="alphaBeta1bec"></a>
+			<a class="anchor" id="alphaBeta1bec"></a>
 			<h5> <u>Alpha-Beta Protein graph of 1BEC</u> </h5>
 				<p><img src="./images/1becA_albe.0.png" alt="Alpha-Beta Protein graph of 1BEC" title="Alpha-Beta Protein graph of 1BEC" class="img-responsive imgFormAboutphp"/></p>
 			<h5> <u>Alpha-Beta Folding graph A of 1BEC</u> </h5>
@@ -238,9 +241,9 @@
 			<h5> <u>Alpha-Beta Folding graph B of 1BEC</u> </h5>
 				<p><img src="./images/1becAEa_al.0.png" alt="Alpha-Beta Folding graph B of 1BEC" title="Alpha-Beta Folding graph B of 1BEC" class="img-responsive imgFormAboutphp"/></p>
 			
-			<a name="linearNot"></a>
 			<br>
 			<br>
+			<a class="anchor" id="linearNot"></a>
 			<h4> <u>Linear Notations</u> </h4>
 			<p>A notation serves as a unique, canonical, and linear description and classification of structures. The notations for Folding graphs reveal to
 			the feature of protein structure as a linear sequence of amino acids, and describe the arrangement of SSEs correctly and completely.</p>
@@ -252,10 +255,10 @@
 			strands are represented by cylinders and arrows, respectively. The sequential neighbourhood is described by arcs between arrows and cylinders.</p>
 			The notations are written in different brackets: [] denote non-bifurcated, {} bifurcated folding graphs, and () indicate barrel structures. 
 			
-			<a name="adj"></a>
-			<a name="red"></a>
 			<br>
 			<br>
+			<a class="anchor" id="adj"></a>
+			<a class="anchor" id="red"></a>
 			<h5> <u>The adjucent and reduced notation</u> </h5>
 			<p>All vertices of the <a href="#proteinGraph">Protein graph</a> are considered in the adjacent (ADJ) notation of a Folding graph. SSEs of the Folding graph are ordered
 			according to their occurrence in the sequence. Beginning with the first SSE and following the spatial neighbourhoods the sequential distances
@@ -268,9 +271,9 @@
 				<p><img src="./images/1d3tBEa_albe.png" alt="Adjacent notation" title="Adjacent notation" class="img-responsive imgFormAboutphp"/></p>
 			<h5> <u>RED Notation</u> </h5>
 				<p><img src="./images/1d3tBEr_albe.png" alt="Reduced notation" title="Reduced notation" class="img-responsive imgFormAboutphp"/></p>
-			<a name="key"></a>
 			<br>
 			<br>
+			<a class="anchor" id="key"></a>
 			<h5> <u>KEY Notation</u> </h5>
 			The KEY notation is very close to the topology diagrams of biologists, e.g. Brändén and Tooze (1999). Topologies are described by diagrams of
 			arrows for strands and cylinders for helices. As in the <a href="#red">RED</a> notation SSEs of the considered Folding graph are taken into account. SSEs are
@@ -284,18 +287,18 @@
 			
 			<p><img src="./images/1iebBk.png" alt="Key notation" title="Key notation" class="img-responsive imgFormAboutphp"/></p>
 			
-			<a name="seq"></a>
 			<br>
 			<br>
+			<a class="anchor" id="seq"></a>
 			<h5> <u>SEQ Notation</u> </h5>
 			This notation is the same as the <a href="#adj">ADJ</a> notation, but the sequential differences are counted. Although the SEQ notation is trivial, the notation
 			can be useful, for example, searching for ψ-loops requires a special SEQ notation. 
 			
 			<p><img src="./images/1ars_Bs_beta.png" alt="Sequence notation" title="Sequence notation" class="img-responsive imgFormAboutphp"/></p>
 			
-			<a name="linking"></a>
 			<br>
 			<br>
+			<a class="anchor" id="linking"></a>
 			<h4> <u>Linking PTGL</u> </h4>
 			<p>You can link PTGL in two ways:</p>
 			<p><b>1.</b> Link to a certain PDB-id, chain id, <a href="#proteinGraph">graph type</a> and <a href="#linearNot">notation type</a>, e.g. PDB-id=1g3e, chain id=A, graph type=Alpha-Beta, and notation type=KEY, then the link is:</p>
@@ -366,12 +369,13 @@
 	
 	<footer id="footer">
 		<div class="container">
-				<div class="row">
+			<div class="row">
 				<div class="col-sm-2">
+					<a href="about.php" class="footerLink">About</a>
 				</div>
 			
 				<div class="col-sm-2">
-					<a class="footerLink" href="#">Impressum</a>
+					<a class="footerLink" href="help.php">Help</a>
 				</div>
 				
 				<div class="col-sm-2">
@@ -387,7 +391,9 @@
 				</div>
 				
 				<div class="col-sm-2">
+					<a href="about.php#linking" class="footerLink">Linking PTGL</a>
 				</div>
+			</div>
 			
 			<div class="row">
 				<div class="col-sm-1">
