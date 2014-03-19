@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <?php
-include('display_proteins.php');
+include('/backend/display_proteins.php');
 ?>
 <html>
 	<head>
@@ -19,19 +19,19 @@ include('display_proteins.php');
 		
 
 		<!-- Bootstrap CSS -->
-		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
-		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap-glyphicons.css">
+		<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" href="css/bootstrap-glyphicons.css">
 
 
 		<!-- Custom CSS -->
-		<link rel="stylesheet" type="text/css" href="custom/css/styles.css">
-		<link rel="stylesheet" type="text/css" href="custom/css/jquery.bxslider.css">
+		<link rel="stylesheet" type="text/css" href="css/styles.css">
+		<link rel="stylesheet" type="text/css" href="css/jquery.bxslider.css">
 		
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 		<!-- Include Modernizr in the head, before any other JS -->
-		<script src="bootstrap/js/modernizr-2.6.2.min.js"></script>
+		<script src="js/modernizr-2.6.2.min.js"></script>
 		  <!-- Live Search for PDB IDs -->
-		<script src="livesearch.js" type="text/javascript"></script>
+		<script src="js/livesearch.js" type="text/javascript"></script>
 		<!-- D3 Visual -->
 		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 	</head>
@@ -205,13 +205,13 @@ include('display_proteins.php');
 		<script src="http://code.jquery.com/jquery.js"></script>
 		
 		<!-- If no online access, fallback to our hardcoded version of jQuery -->
-		<script>window.jQuery || document.write('<script src="bootstrap/js/jquery-1.8.2.min.js"><\/script>')</script>
+		<script>window.jQuery || document.write('<script src="js/jquery-1.8.2.min.js"><\/script>')</script>
 		
 		<!-- Bootstrap JS -->
-		<script src="bootstrap/js/bootstrap.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
 		
 		<!-- Custom JS -->
-		<script src="bootstrap/js/script.js"></script>
+		<script src="js/script.js"></script>
 
 
 		
@@ -223,7 +223,7 @@ include('display_proteins.php');
 		
 		
 <!-- bxSlider Javascript file -->
-<script src="./custom/js/jquery.bxslider.min.js"></script>
+<script src="js/jquery.bxslider.min.js"></script>
 
 		
 

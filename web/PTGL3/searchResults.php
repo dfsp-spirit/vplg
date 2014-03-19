@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <?php
-include('search.php');
+include('/backend/search.php');
 ?>
 <html>
 	<head>
@@ -19,19 +19,19 @@ include('search.php');
 		
 
 		<!-- Bootstrap CSS -->
-		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css">
-		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap-glyphicons.css">
+		<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" href="css/bootstrap-glyphicons.css">
 
 
 		<!-- Custom CSS -->
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="custom/css/styles.css">
+		<link rel="stylesheet" type="text/css" href="css/styles.css">
 		
 		<!-- Include Modernizr in the head, before any other JS -->
-		<script src="bootstrap/js/modernizr-2.6.2.min.js"></script>
+		<script src="js/modernizr-2.6.2.min.js"></script>
 		
 		<!-- Live Search for PDB IDs -->
-		<script src="livesearch.js" type="text/javascript"></script>
+		<script src="js/livesearch.js" type="text/javascript"></script>
 	</head>
 
 	<body id="customBackground">
@@ -118,7 +118,7 @@ include('search.php');
 				<div class="row" id="load">
 				<div class="col-lg-3 col-centered">
 					<div class="input-group form-group">
-						<form name="protChains" class="form-inline" method="get" action="display_proteins">
+						<form name="protChains" class="form-inline" method="get" action="display_proteins.php">
 							<input type="text" class="form-control" name="pcs" id="loadInput" autocomplete="off" placeholder="Load proteins...">
 							<button type="submit" class="btn btn-default" id="loadButton"><span>Load Proteins</span></button>
 					<div class="additionalProteinButtons">
@@ -207,19 +207,6 @@ include('search.php');
 		</div><!-- end container -->
 	</footer>
 		
-		
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -230,13 +217,13 @@ include('search.php');
 		<script src="http://code.jquery.com/jquery.js"></script>
 		
 		<!-- If no online access, fallback to our hardcoded version of jQuery -->
-		<script>window.jQuery || document.write('<script src="bootstrap/js/jquery-1.8.2.min.js"><\/script>')</script>
+		<script>window.jQuery || document.write('<script src="js/jquery-1.8.2.min.js"><\/script>')</script>
 		
 		<!-- Bootstrap JS -->
-		<script src="bootstrap/js/bootstrap.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
 		
 		<!-- Custom JS -->
-		<script src="bootstrap/js/script.js"></script>
+		<script src="js/script.js"></script>
 
 
 
