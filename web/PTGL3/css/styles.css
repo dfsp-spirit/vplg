@@ -46,6 +46,22 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	
 	
 	
+	
+	a.topLink:link, a.topLink:visited {
+			color: #343434;
+			}
+		
+	a.topLink:hover, a.topLink:active {
+			color: black;
+	}
+		
+	.topLink {
+		text-align: right;
+	}
+	
+	
+	
+	
 	/* Wraps the whole file so the footer can be put into the correct position */
 	.wrapper {
               position:relative;

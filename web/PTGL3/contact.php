@@ -23,6 +23,7 @@
 
 		<!-- Custom CSS -->
 		<link rel="stylesheet" type="text/css" href="css/styles.css">
+		<link rel="stylesheet" href="css/font-awesome.css"/>
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 		
 		
@@ -183,11 +184,11 @@
 			<div class="col-sm-6">
 				<div class="rightColumn">
 					<br>
-					Phone  +49 331 567-8615
+					<i class="fa fa-phone"></i> Phone  +49 331 567-8615
 					<br>
-					e-mail:  may (at) mpimp-golm.mpg.de
+					<i class="fa fa-envelope-o"></i> e-mail:  may (at) mpimp-golm.mpg.de
 					<br>
-					<a href="http://bioinformatics.mpimp-golm.mpg.de/group-members/patrick-may" target="_blank">http://bioinformatics.mpimp-golm.mpg.de/group-members/patrick-may</a>
+					<i class="fa fa-external-link"><a href="http://bioinformatics.mpimp-golm.mpg.de/group-members/patrick-may" target="_blank"></i> http://bioinformatics.mpimp-golm.mpg.de/group-members/patrick-may</a>
 				</div><!-- end rightColumn-->
 			</div><!-- end col-sm-6 -->
 		</div><!-- end row -->

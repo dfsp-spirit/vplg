@@ -23,6 +23,7 @@
 
 		<!-- Custom CSS -->
 		<link rel="stylesheet" type="text/css" href="css/styles.css">
+		<link rel="stylesheet" href="css/font-awesome.css"/>
 
 		 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 		<!-- Include Modernizr in the head, before any other JS -->
@@ -174,7 +175,7 @@
 			results or if you only want results that exactly match the input query.</p>
 			<p>You can search two or more protein topologies in the 
 			PTGL database and get a list with all informations of these topologies.</p>
-			
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		<br>
 		<br>
 		<a class="anchor" id="helpAdvancedSearch"></a>
@@ -244,7 +245,7 @@
 			<p><h4>Graphs</h4> A string standing for a Linear Notation of a certain Folding Graph.</p>
 			<p>Examples:</p>
 		
-		
+		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
 		
 		
@@ -282,7 +283,7 @@
 		is an example of a text string. Simply stated, <u>only</u> <tt>header</tt> 
 		fields are searched for the string kinase, not the complete PTGL database. 
 		The text string following an attribute can be a phrase containing multiple words.</p>
-		
+		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
 		<br>
 		<a class="anchor" id="helpAttributes"></a>
@@ -299,7 +300,7 @@
 		<p><strong>cath</strong> Text found in the PTGL CATH table records CLASS, TOPOLOGY, ARCHITECTURE, HOMOLOGOUS FAMILY, COMM, SOURCE
 		which describe the different hierarchy levels, the species and some comments of a certain CATH domain.</p>
 		
-		
+		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
 		<br>
 		<a class="anchor" id="helpComplexQueries"></a>
@@ -321,7 +322,7 @@
 		<p>It is necessary to use ( )'s to maintain the logic of a query that uses more than one "'ot' clause, or use the Refine Your Query option at the top of the Query Results page.</p>
 		<p>Search strings should not begin with the 'not' operator. </p>
 		<p>Operators should only be used individually (for example, the syntax 'and not' should not be used).</p>
-		
+		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
 		<br>
 		<a class="anchor" id="helpExamples"></a>
@@ -355,7 +356,7 @@
 		<p><strong>compound: lysozyme and compound: native</strong>&nbsp;&nbsp; Find native lysozyme topologies. </p>
 		<br>
 		<p><strong>hetname: FE.</strong>&nbsp;&nbsp; Find all topologies whose FE in the HET group.</p>
-		
+		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		<br>
 		<br>
 		<a class="anchor" id="helpSearchMotifs"></a>
@@ -366,7 +367,7 @@
 		<p>SearchMotifs provides a search for common protein structure motifs in the PTGL database and returns a list with all 
 		informations about these motifs. If, after reading the explanation of using SearchMotifs, you need additional help about 
 		the usage, please send an e-mail to <a href="mailto:ina.koch@tfh-berlin.de">ina.koch@tfh-berlin.de</a>
-		
+		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 
 		<br>
 		<a class="anchor" id="helpUsage"></a>
@@ -375,7 +376,7 @@
 		<p>To submit a search request you have to select one of the following protein structure classes, 
 		either <a href="#helpAlpha">>Alpha Motifs</a>, <a href="#helpBeta">Beta Motifs</a> or <a href="#helpAlphaBeta">Alpha Beta Motifs</a>. 
 		For each of these classes a subset of common folds is defined.</p>
-		
+		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
 		<br>
 		<a class="anchor" id="helpProteinStructureMotifs"></a>
@@ -384,7 +385,7 @@
 		elements in a protein domain. One differentiates between <a href="#helpAlpha">>Alpha Motifs</a>, which consist solely of alpha helices, 
 		<a href="#helpBeta">Beta Motifs</a>, which are composed of beta sheets and <a href="#helpAlphaBeta">Alpha Beta Motifs</a>, a combination 
 		of both, alpha helices and beta sheets.</p>
-		
+		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
 		<br>
 		<a class="anchor" id="helpAlphaMotifs"></a>
@@ -396,7 +397,7 @@
 		which have an antiparallel connection (right picture).</p>
 		
 		<img src="./images/4helixbeide_struktur.jpg" alt="Four helix bundle Typ I/Typ II" title="Four helix bundle Typ I/Typ II" class="img-responsive imgFormHelp"/>
-		
+		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
 	
 		<br>
@@ -406,7 +407,7 @@
 		fixed arrangement (dotted lines in the picture) but the last two helices in sequential order make up an antiparallel pair.</p>
 		
 		<img src="./images/globin_struktur.jpg" alt="Globin Fold" title="Globin Fold" class="img-responsive imgFormHelp"/>
-		
+		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
 		<br>
 		<a class="anchor" id="helpBetaMotifs"></a>
@@ -418,7 +419,7 @@
 		representation of an eight-stranded type and an example three-dimensional image.</p>
 		
 		<img src="./images/barrel_struktur.jpg" alt="Up and Down Barrel" title="Up and Down Barrel" class="img-respnsive imgFormHelp"/>
-
+<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
 		
 		<br>
@@ -429,7 +430,7 @@
 		the sandwich.</p>
 		
 		<img src="./images/immuno_struktur.jpg" alt="Immunoglobulin Fold" title="Immunoglobulin Fold" class="img-responsive imgFormHelp"/>
-		
+		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
 		
 		<br>
@@ -437,10 +438,10 @@
 		<p>This beta motif contains between four and eight beta sheets, which are arrange around 
 		the center of the protein. Four antiparallel beta strand form each sheet. One sheet makes 
 		up one of the propeller blades. To build a four-bladed propeller four of these sheets 
-		are grouped together. The image shows a four-bladed propeller motif.</p
+		are grouped together. The image shows a four-bladed propeller motif.</p>
 		
 		<img src="./images/propeller_struktur.jpg" alt="Beta Propeller" title="Beta Propeller" class="img-responsive imgFormHelp"/>
-
+<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
 		<br>
 		<h5><u>Jelly Roll</u></h5>
@@ -449,7 +450,7 @@
 		hold four strands.</p>
 		
 		<img src="./images/jelly_struktur.jpg" alt="Jelly Roll" title="Jelly Roll" class="img-responsive imgFormHelp"/>
-
+<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
 		<br>
 		<a class="anchor" id="helpAlphaBetaMotifs"></a>
@@ -460,7 +461,7 @@
 		alpha helix and the second an alpha helix which is surrounded by two beta sheets.</p>
 
 		<img src="./images/ubib_struktur.jpg" alt="Ubiquitin Roll" title="Ubiquitin Roll" class="img-responsive imgFormHelp"/>
-		
+		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
 		<br>
 		<h5><u>Alpha-Beta Plaits</u></h5>
@@ -468,7 +469,7 @@
 		the sheet are two or more alpha helices. The image shows a schematic arrangement.</p>
 		
 		<img src="./images/plait_struktur.jpg" alt="Alpha-Beta Plaits" title="Alpha-Beta Plaits" class="img-responsive imgFormHelp"/>
-
+<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
 		<br>
 		<h5><u>Rossman Fold</u></h5>
@@ -476,7 +477,7 @@
 		in-between alpha helices.</p>
 		
 		<img src="./images/rossman_struktur.jpg" alt="Rossman Fold" title="Rossman Fold" class="img-responsive imgFormHelp"/>
-
+		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
 		<br>
 		<h5><u>TIM Barrel</u></h5>
@@ -485,7 +486,7 @@
 		make up the outer part of the motif.</p>
 		
 		<img src="./images/tim_struktur.jpg" alt="TIM Barrel" title="TIM Barrel" class="img-responsive imgFormHelp"/>
-
+		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
 		<br>
 		<br>
@@ -504,7 +505,7 @@
 		<p>or like</p>
 		<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<tt>1hkb; 1kba; 2cse; 4dfh; 1ard</tt></p>
 		<p>The PDB-IDs must be separated by , or ;. There is no limit of PDB-IDs.</p>
-
+<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
 		<br>
 		<a class="anchor" id="helpAttributes2"></a>
@@ -512,14 +513,14 @@
 		<p>The following is a list of <b>attributes</b> and their definitions:</p>
 		<p><strong>pdb_id</strong>&nbsp;&nbsp; Text describing the unique PDB identifier as found in the PDB HEADER record and 
 		consisting of 4 alphanumeric characters.</p>
-
+<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
 		<br>
 		<a class="anchor" id="helpExamples2"></a>
 		<h4>Examples</h4>
 		<p><b>1hkb,1hba,1cse,1ard</b>&nbsp;&nbsp; Find the four topologies <i>1hkb</i>, <i>1hba</i>, <i>1cse</i> and <i>1ard</i> in the PTGL-database</p>
 		<p><b>1hkb;1hba;1cse;1ard</b>&nbsp;&nbsp; Find the four topologies <i>1hkb</i>, <i>1hba</i>, <i>1cse</i> and <i>1ard</i> in the PTGL-database></p>
-		
+		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		</div>
 		</div><!-- end container and contentText -->
 	</div><!-- end wrapper -->

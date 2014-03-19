@@ -23,6 +23,7 @@
 
 		<!-- Custom CSS -->
 		<link rel="stylesheet" type="text/css" href="css/styles.css">
+		<link rel="stylesheet" href="css/font-awesome.css"/>
 
 		 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 		<!-- Include Modernizr in the head, before any other JS -->
@@ -164,7 +165,7 @@
 			protein structure annotated in <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a> for which SSEs according DSSP are defined, which is not a NMR structure, has a resolution less than 3.5
 			Å and a sequence length of at least 20 amino acids. The database enables the user to search for the topology of a protein or for certain
 			topologies and subtopologies using the <a href="#linearNot">linear notations</a>. Additionally, it could be searched for sequence similarity in <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a> sequences.
-			
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 			<br>
 			<br>
 			<a class="anchor" id="proteinGraph"></a>
@@ -184,7 +185,7 @@
 			are ordered as red circles (helices) or black quadrats (strands) on a straight line according to their sequential order from the N- to
 			the C-terminus. The spatial neighbourhoods are drawn as arcs between SSEs. The edges are coloured according to their labelling, red for
 			parallel, green for mixed, and blue for anti-parallel neighbourhood.
-			
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 			
 			<br>
 			<br>
@@ -207,7 +208,7 @@
 			<h5> <u>Alpha-Beta Graph</u> </h5>
 			The Alpha-Beta Graph of the protein 1TIM chain A consisting of 21 SSEs (13 helices and 8 strands). 
 			<p class="imgCenter"><img class="img-responsive imgFormAboutphp" src="./images/1timA_albe.0.png" alt="Alpha-Beta Graph of 1timA" title="Alpha-Beta Graph of 1timA"></p>
-			
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 			
 			<br>
 			<br>
@@ -225,7 +226,7 @@
 			Especially in beta-sheet containing Folding graphs, the maximal vertex degree of the Folding graphs is not larger than two. Thus, we distinguish
 			between so-called bifurcated and non-bifurcated topological structures. A <a href="#proteinGraph">Protein graph</a> or a Folding graph is called bifucated, if there is any
 			vertex degree greater than 2, if not, the graph is non- bifurcated. 
-			
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 			<br>
 			<br>
 			<a class="anchor" id="rasmolbec"></a>
@@ -240,7 +241,7 @@
 				<p><img src="./images/1becAAa_al.0.png" alt="Alpha-Beta Folding graph A of 1BEC" title="Alpha-Beta Folding graph A of 1BEC" class="img-responsive imgFormAboutphp"/></p>
 			<h5> <u>Alpha-Beta Folding graph B of 1BEC</u> </h5>
 				<p><img src="./images/1becAEa_al.0.png" alt="Alpha-Beta Folding graph B of 1BEC" title="Alpha-Beta Folding graph B of 1BEC" class="img-responsive imgFormAboutphp"/></p>
-			
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 			<br>
 			<br>
 			<a class="anchor" id="linearNot"></a>
@@ -254,7 +255,7 @@
 			neighbours. Therefore, the second description type, the <a href="#key">key</a> notation, KEY, can be drawn only for non-bifurcated Folding graphs. Helices and
 			strands are represented by cylinders and arrows, respectively. The sequential neighbourhood is described by arcs between arrows and cylinders.</p>
 			The notations are written in different brackets: [] denote non-bifurcated, {} bifurcated folding graphs, and () indicate barrel structures. 
-			
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 			<br>
 			<br>
 			<a class="anchor" id="adj"></a>
@@ -271,6 +272,8 @@
 				<p><img src="./images/1d3tBEa_albe.png" alt="Adjacent notation" title="Adjacent notation" class="img-responsive imgFormAboutphp"/></p>
 			<h5> <u>RED Notation</u> </h5>
 				<p><img src="./images/1d3tBEr_albe.png" alt="Reduced notation" title="Reduced notation" class="img-responsive imgFormAboutphp"/></p>
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
+			
 			<br>
 			<br>
 			<a class="anchor" id="key"></a>
@@ -286,7 +289,7 @@
 			connection from helix 6 to helix 7 and forms an <a href="#alphaBetaGraph">Alpha-Beta</a> barrel structure. 
 			
 			<p><img src="./images/1iebBk.png" alt="Key notation" title="Key notation" class="img-responsive imgFormAboutphp"/></p>
-			
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 			<br>
 			<br>
 			<a class="anchor" id="seq"></a>
@@ -295,7 +298,7 @@
 			can be useful, for example, searching for ψ-loops requires a special SEQ notation. 
 			
 			<p><img src="./images/1ars_Bs_beta.png" alt="Sequence notation" title="Sequence notation" class="img-responsive imgFormAboutphp"/></p>
-			
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 			<br>
 			<br>
 			<a class="anchor" id="linking"></a>
@@ -356,7 +359,7 @@
 			
 			<p><b>2.</b> If you only have the PDB-id you can link as follows:</p>
 			
-			
+			<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
 		
 		
