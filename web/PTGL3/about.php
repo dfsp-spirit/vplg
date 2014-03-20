@@ -328,7 +328,7 @@
 						<tr class="tablecenter">
 							<td></td>
 							<td>b</td>
-							<td><a href="betaGraph">Beta</a></td>
+							<td><a href="#betaGraph">Beta</a></td>
 						</tr>
 						<tr class="tablecenter">
 							<td></td>

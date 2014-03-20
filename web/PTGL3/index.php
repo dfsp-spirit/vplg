@@ -145,7 +145,7 @@
 									<input class="advancedInput" type="text" id="bla1" name="bla" placeholder="" size="20" maxlength="50"/>
 								</label>
 								<label class="advancedLabel">Het
-									<input class="advancedInput" type="text" id="bla2" name="bla" placeholder=""" size="20" maxlength="50"/>
+									<input class="advancedInput" type="text" id="bla2" name="bla" placeholder="" size="20" maxlength="50"/>
 								</label>
 								<label class="advancedLabel">Hetname
 									<input class="advancedInput" type="text" id="bla3" name="bla" placeholder="" size="20" maxlength="50"/>
@@ -191,7 +191,6 @@
 				<div class="col-lg-4"></div>
 			</div><!-- end row -->
 					
-			
 			<div class="row">
 				<div class="col-lg-3 col-lg-3-centering col-centered">
 					<div class="input-group form-group">
@@ -574,16 +573,16 @@
 			</div><!-- end line and lineDatabaseFormat -->
 			
 			<div class="container" id="text">
-			<h2>Database Format</h2>
-				<p>
-					Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam 						erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata 						sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor 						invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet 						clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing 					elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et 					justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-				</p>
-				<p>
-						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam 						erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata 						sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor 						invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet 						clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing 					elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et 					justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-					</p>
-					<p>
-						Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam 						erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata 						sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor 						invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet 						clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing 					elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et 					justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-					</p>
+			<h2>Database & File Format</h2>
+				<h3>File Formats and Standards</h3>
+				<p>PostScript - can be viewed with <a href="http://www.cs.wisc.edu/~ghost/" target="_blank">Ghostview</a></p>
+				
+				<h3>PTGL PostgreSQL Database</h3>
+				<p>PTGL PostgreSQL Databse Schema</p>
+				<p>Download PostgreSQL database <a href="files/ptgl.sql.gz">ptgl.sql.gz (<b>(238 Mb)</b>)</a> LINK BROKEN ATM</p>
+				<p>The database was dumped and gzipped using the following command: <tt>pg_dump ptgl | gzip >ptgl.sql.gz</tt></p>
+				<p>(to restore the database on your local computer, please read: <a href="http://www.postgresql.org/docs/manuals/" target="_blank">Postgres manual</a></p>).
+				
 		</div><!-- end container and text -->
 	</div><!-- end DatabaseFormat -->
 	</div><!--- end textWrapper -->

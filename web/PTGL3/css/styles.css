@@ -126,6 +126,7 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		padding-top: 50px;
 	}
 	
+	
 	#lineAbout {
 		background-color: #0A7B83;
 		}	
@@ -410,6 +411,8 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	.resultHover{
 		background: #e9e9e9 !important;
 		}
+	
+	
 	/* Index Advanced Search Area */
 	
 	#advancedButton {
@@ -605,7 +608,7 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	/* Load Proteins */
 	
 	#load {
-		margin-top: -5%;
+		margin-top: 15%;
 	}
 	
 	
@@ -615,7 +618,8 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	
 	
 	.additionalProteinButtons {
-		margin-top: 10%;
+		margin-top: 15%;
+		width: 391px;
 	}
 	
 	.protButton {
@@ -767,3 +771,37 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	#slide3 {
 		background: url('../../images/carousel_medium_03.jpg') top center no-repeat;
 	}
+
+	
+	
+	
+@media print {
+  * { background: transparent !important; color: black !important; text-shadow: none !important; filter:none !important; -ms-filter: none !important; }
+  a, a:visited { text-decoration: underline; }
+  a[href]:after { content: " (" attr(href) ")"; }
+  abbr[title]:after { content: " (" attr(title) ")"; }
+  .ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after { content: ""; }  /* Don't show links for images, or javascript/internal links */
+  pre, blockquote { border: 1px solid #999; page-break-inside: avoid; }
+  thead { display: table-header-group; }
+  tr, img { page-break-inside: avoid; }
+  img { max-width: 100% !important; }
+  @page { margin-left: 0.5cm !important; 
+		  margin-right: 0.5cm !important;
+		  margin-top: 1.5cm !important;
+		  margin-bottom: 2cm !important; }
+  p, h1, h2, h3, h4 { orphans: 3; widows: 3; }
+  h1, h2, h3, h4 { page-break-after: avoid; }
+  
+  html, body { height: 90% !important; }
+  #footer { display: none !important; }
+  #iconAbout, #iconUserGuide, #iconDatabaseFormat { display: none !important; }
+  .topLink { display: none !important; }
+  #advancedSearch, #addSearchMotif, #addSearchSequence, #addSearchKey { display: block !important; }
+  #arrow, #flipArrow, #flipArrow2, #flipArrow3 { transform: rotate(0deg) !important; }
+  #ugStandardSearch, #ugAdvancedSearch, #ugSearchkms { display: block !important; page-break-inside: avoid; }
+  #ugSearchkms1, #ugSearchkms2, #ugSearchkms3 { display: none !important; page-break-inside: avoid; }
+  br { display: none !important; }
+  #lineAbout, #lineUserGuide, #lineDatabaseFormat { display: none !important; }
+  #iconAbout, #iconUserGuide, #iconDatabaseFormat, #text { margin: 0px !important; }
+  .line { display: none !important; }
+}

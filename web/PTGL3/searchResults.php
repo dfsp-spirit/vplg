@@ -24,8 +24,8 @@ include('/backend/search.php');
 
 
 		<!-- Custom CSS -->
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="css/styles.css">
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 		
 		<!-- Include Modernizr in the head, before any other JS -->
 		<script src="js/modernizr-2.6.2.min.js"></script>
