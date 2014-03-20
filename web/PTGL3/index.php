@@ -197,18 +197,50 @@
 					<div class="input-group form-group">
 						<form>
 						<dl class="dl-horizontal">
+					<div id="additionalSearch">
 					<dt>SearchKey</dt>
-					<dd>Keyword search form with examples</dd>
+					<dd>Keyword search <strong class="caret" id="flipArrow" ></strong></dd>
+					</div>
+					<div id="addSearchKey">
+						<dd>Use the standard search form above to search protein topologies.</dd>
+						<dd>Enter keywords known to relate to the biological macromolecules <br>
+						of interest and select the <span class="glyphicon glyphicon-search"></span>"Search" button.</dd>
+					</div>
 				</dl>
 				
 				<dl class="dl-horizontal">
+					<div id="additionalSearch2">
 					<dt>SearchMotifs</dt>
-					<dd>Search form for topological protein structure motifs</dd>
+					<dd>Search form for topological protein structure motifs <strong class="caret" id="flipArrow2" ></strong></dd>
+					</div>
+					<div id="addSearchMotif">
+					<br>
+						<h4>Alpha Motifs</h4>
+						<p>Four Helix Bundle (<a href="help.php#helpAlphaMotifs">?</a>) - Globin Fold (<a href="help.php#helpAlphaMotifs">?</a>)</p>
+						
+						<h4>Beta Motifs</h4>
+						<p>Up and Down Barrel (<a href="help.php#helpBetaMotifs">?</a>) 
+						- Immunoglobulin Fold (<a href="help.php#helpBetaMotifs">?</a>) - 
+						Beta Propeller (<a href="help.php#helpBetaMotifs">?</a>) - 
+						Jelly Roll (<a href="help.php#helpBetaMotifs">?</a>)</p>
+						
+						<h4>Alpha Beta Motifs</h4>
+						<p>Ubiquitin Roll (<a href="help.php#helpAlphaBetaMotifs">?</a>) - 
+						Alpha-Beta Plait (<a href="help.php#helpAlphaBetaMotifs">?</a>) - 
+						Rossman Fold (<a href="help.php#helpAlphaBetaMotifs">?</a>) - 
+						TIM Barrel (<a href="help.php#helpBetaMotifs">?</a>)</p>
+					</div>
 				</dl>
 				
 				<dl class="dl-horizontal">
+					<div id="additionalSearch3">
 					<dt>SearchSequence</dt>
-					<dd>Blast search for sequences</dd>
+					<dd>Blast search for sequences <strong class="caret" id="flipArrow3" ></strong></dd>
+					</div>
+					<div id="addSearchSequence">
+					<p>Search strings are case insensitive.</p>
+					</div>
+					
 				</dl>
 				</form>
 					</div><!-- end input-group and form-group -->
@@ -299,7 +331,6 @@
 								and select the "Search" button.</p>
 								<br>
 								<p></p>
-								<br>
 								<br id="scroll3">
 								<br>
 								<br>
@@ -319,7 +350,10 @@
 								<p>To submit a search request you have to select one of the following protein stucture classes, 
 								either <strong>Alpha Motifs</strong>, <strong>Beta Motifs</strong> or <strong>Alpha Beta Motifs</strong>. 
 								For each of these classes a subset of common folds is defined.</p>
-								<p>Classification of Protein Structure Motifs is based on the possible composition of secondary structure elements in a protein domain. One differentiates between Alpha Motifs, which consist solely of alpha helices, Beta Motifs, which are composed of beta sheets and Alpha Beta Motifs, a combination of both, alpha helices and beta sheets.</p>
+								<p>Classification of Protein Structure Motifs is based on the possible composition of secondary structure 
+								elements in a protein domain. One differentiates between Alpha Motifs, which consist solely of alpha helices, 
+								Beta Motifs, which are composed of beta sheets and Alpha Beta Motifs, a combination of both, alpha helices and 
+								beta sheets.</p>
 						</div><!-- end col-centered -->
 						
 						<div class="col-lg-4" id="ugSearchs">

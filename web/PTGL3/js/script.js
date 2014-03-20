@@ -7,8 +7,10 @@ Custom JS
 $(document).ready(function() {
 
 /* Scrollspy */
-$('body').scrollspy({ target: '.navbar-scrollspy' })
-
+$('body').scrollspy({ target: '.navbar-scrollspy' });
+$("#addSearchKey").hide();
+$('#addSearchMotif').hide();
+$('#addSearchSequence').hide();
 
 $(function() {
 	
@@ -28,6 +30,21 @@ $(function() {
 	$('#advancedButton').click( function() {
 		$('#advancedSearch').slideToggle();
 		$('#arrow').toggleClass('rotateArrow');
+	});
+	
+	$('#additionalSearch').click(function() {
+		$('#addSearchKey').fadeToggle();
+		$('#flipArrow').toggleClass('rotateArrow');
+	});
+	
+	$('#additionalSearch2').click(function() {
+		$('#addSearchMotif').slideToggle();
+		$('#flipArrow2').toggleClass('rotateArrow');
+	});
+	
+	$('#additionalSearch3').click(function() {
+		$('#addSearchSequence').slideToggle();
+		$('#flipArrow3').toggleClass('rotateArrow');
 	});
 	
 	
@@ -56,7 +73,6 @@ $(function() {
 			$(this).attr('checked', false);
 			console.log(this.id + " is now " + $(this).attr('checked'));
 		})
-		
 	});	
 	
 	

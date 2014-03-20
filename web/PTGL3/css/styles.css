@@ -443,6 +443,31 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		}
 	
 	
+	#addSearchMotif {
+		text-align: center;
+	}
+	
+	#addSearchSequence {
+		text-align: center;
+	}
+	
+	
+	#flipArrow {
+		margin-left: 3px;
+		transform: rotate(-90deg);
+	}
+
+	#flipArrow2 {
+		margin-left: 3px;
+		transform: rotate(-90deg);
+	}
+	
+	#flipArrow3 {
+		margin-left: 3px;
+		transform: rotate(-90deg);
+	}
+	
+	
 	/* Search results page */
 	
 	#searchResults {
