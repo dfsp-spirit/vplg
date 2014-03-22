@@ -75,16 +75,15 @@ $(function() {
 		})
 	});	
 	
-	
-	
-	$('.bxslider').bxSlider({
-		minSlides: 1,
-		maxSlides: 1,
-		slideWidth: 9000
+
 });
 	
 	
-	
+	var viewWidth = $(window).width();
+	$('.bxslider').bxSlider({
+		minSlide: 1,
+		maxSlide: 1,
+		slideWidth: viewWidth
 });
 
 

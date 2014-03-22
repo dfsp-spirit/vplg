@@ -1,0 +1,31 @@
+.bx-wrapper .bx-viewport {
+	left: 0px;
+	}
+	/*
+.bx-wrapper .bx-prev {
+	margin-left: 10px;
+	padding-bottom: 50px;
+	padding-right: 50px;
+	transform: rotate(180deg);
+	}*/
+	
+/*	
+.bx-wrapper .bx-next {
+	margin-left: 10px;
+	padding-bottom: 50px;
+	padding-right: 50px;
+	}*/
+	
+
+
+
+	
+/* Make every background "invisible" so the user gets the feeling he is swapping the
+	actual page 		*/
+/*
+.bx-viewport{
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+	}
+	*/

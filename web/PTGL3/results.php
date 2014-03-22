@@ -26,8 +26,9 @@ include('/backend/display_proteins.php');
 		<!-- Custom CSS -->
 		<link rel="stylesheet" type="text/css" href="css/styles.css">
 		<link rel="stylesheet" type="text/css" href="css/jquery.bxslider.css">
+		<link rel="stylesheet" type="text/css" href="css/bxslider-custom.css">
 		
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 		<!-- Include Modernizr in the head, before any other JS -->
 		<script src="js/modernizr-2.6.2.min.js"></script>
 		  <!-- Live Search for PDB IDs -->
@@ -117,12 +118,13 @@ include('/backend/display_proteins.php');
 			</div><!-- end navbar fixed-top -->
 		
 			
-			<!--BEGIN CAROUSEL -->
-			<?php echo $tableString; ?>
-			<!--END CAROUSEL -->
+			
 		
 			
 		</div><!-- end container-->
+		<!--BEGIN CAROUSEL -->
+			<?php echo $tableString; ?>
+			<!--END CAROUSEL -->
 		</div><!-- end wrapper -->
 		
 
@@ -201,8 +203,10 @@ include('/backend/display_proteins.php');
 		<!-- All Javascript at the bottom of the page for faster page loading -->
 		<!-- also needed for the dropdown menus etc. ... -->
 		
+		
+		<!-- Don not use this import, as bxSlider seems not to work with newer versions of jQuery -->
 		<!-- First try for the online version of jQuery-->
-		<script src="http://code.jquery.com/jquery.js"></script>
+		<!-- <script src="http://code.jquery.com/jquery.js"></script> -->
 		
 		<!-- If no online access, fallback to our hardcoded version of jQuery -->
 		<script>window.jQuery || document.write('<script src="js/jquery-1.8.2.min.js"><\/script>')</script>
