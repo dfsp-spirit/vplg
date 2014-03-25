@@ -40,6 +40,10 @@ public class DP {
         // init stuff here
     }
     
+    /**
+     * Prints a warning. Newline is added at the end.
+     * @param msg the message to print
+     */
     public void w(String msg) {
         Boolean doWarn = true;
         try {
@@ -53,6 +57,11 @@ public class DP {
         }
     }
     
+    /**
+     * Prints a warning. Newline is added at the end.
+     * @param srcTag the source tag to print before the actual message
+     * @param msg the message to print
+     */
     public void w(String srcTag, String msg) {
         Boolean doWarn = true;
         try {
@@ -76,6 +85,7 @@ public class DP {
     
     /**
      * Prints an error. Newline is added at the end.
+     * @param srcTag the source tag to print before the actual message
      * @param msg the message to print
      */
     public void e(String srcTag, String msg) {

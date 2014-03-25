@@ -434,8 +434,8 @@ public class DBManager {
              *
              */
             doInsertQuery("CREATE TABLE " + tbl_graphletcount + " (graphlet_id serial primary key, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graphlet_counts int[55] not null);");
-            doInsertQuery("CREATE TABLE " + tbl_nm_ssetoproteingraph + " (ssetoproteingraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE);");
-            doInsertQuery("CREATE TABLE " + tbl_nm_ssetofoldinggraph + " (ssetofoldinggraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE);");
+            doInsertQuery("CREATE TABLE " + tbl_nm_ssetoproteingraph + " (ssetoproteingraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, position_in_graph int not null);");
+            doInsertQuery("CREATE TABLE " + tbl_nm_ssetofoldinggraph + " (ssetofoldinggraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, position_in_graph int not null);");
                                                 
 
             // set constraints
@@ -786,10 +786,18 @@ public class DBManager {
      * @param chain_name the PDB chain name of the chain represented by the graph_string
      * @param graph_type the Integer representation of the graph type. use ProtGraphs.getGraphTypeCode() to get it.
      * @param graph_string_gml the graph in GML format
+     * @param graph_string_plcc the graph in plcc format
+     * @param graph_string_kavosh the graph in kavosh format
+     * @param graph_string_dotlanguage the graph in DOT language format
+     * @param graph_string_ptgl_red the graph in PTGL RED notation
+     * @param graph_string_ptgl_adj the graph in PTGL ADJ notation
+     * @param graph_string_ptgl_key the graph in PTGL KEY notation
+     * @param graph_string_ptgl_seq the graph in PTGL SEQ notation
+     * @param sse_string the graph in SSE string notation
      * @return true if the graph was inserted, false if errors occurred
      * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
      */
-    public static Boolean writeGraphToDB(String pdb_id, String chain_name, Integer graph_type, String graph_string_gml, String sse_string) throws SQLException {
+    public static Boolean writeProteinGraphToDB(String pdb_id, String chain_name, Integer graph_type, String graph_string_gml, String graph_string_plcc, String graph_string_kavosh, String graph_string_dotlanguage, String graph_string_ptgl_red, String graph_string_ptgl_adj, String graph_string_ptgl_key, String graph_string_ptgl_seq, String sse_string) throws SQLException {
                
         Integer chain_db_id = getDBChainID(pdb_id, chain_name);
         Boolean result = false;
@@ -801,7 +809,7 @@ public class DBManager {
 
         PreparedStatement statement = null;
 
-        String query = "INSERT INTO " + tbl_proteingraph + " (chain_id, graph_type, graph_string_gml, sse_string) VALUES (?, ?, ?, ?);";
+        String query = "INSERT INTO " + tbl_proteingraph + " (chain_id, graph_type, graph_string_gml, graph_string_plcc, graph_string_kavosh, graph_string_dotlanguage, graph_string_ptgl_red, graph_string_ptgl_adj, graph_string_ptgl_key, graph_string_ptgl_seq, sse_string) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
         try {
             dbc.setAutoCommit(false);
@@ -810,7 +818,14 @@ public class DBManager {
             statement.setInt(1, chain_db_id);
             statement.setInt(2, graph_type);
             statement.setString(3, graph_string_gml);
-            statement.setString(4, sse_string);
+            statement.setString(4, graph_string_plcc);
+            statement.setString(5, graph_string_kavosh);
+            statement.setString(6, graph_string_dotlanguage);
+            statement.setString(7, graph_string_ptgl_adj);
+            statement.setString(8, graph_string_ptgl_red);
+            statement.setString(9, graph_string_ptgl_key);
+            statement.setString(10, graph_string_ptgl_seq);
+            statement.setString(11, sse_string);
                                 
             statement.executeUpdate();
             dbc.commit();
