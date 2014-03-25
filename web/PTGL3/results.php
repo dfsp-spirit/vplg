@@ -116,15 +116,31 @@ include('/backend/display_proteins.php');
 					</div>
 				</div><!-- end container -->
 			</div><!-- end navbar fixed-top -->
-		
-			
-			
-		
-			
 		</div><!-- end container-->
+	
+		
+		<div class="container" id="proteinDisplay">
+			<b>Please note:</b> Only <a href="about.php#foldingGraph">folding graphs</a> with more than one SSE are presented. The <a href="about.php#foldingGraph">folding graphs</a> with only one SSE
+			are representing just single vertices in the <a href="about.php#proteinGraph">protein graph</a>.
+			<p>In the <a href="about.php#key">key</a> notation only folding graphs can be shown that are <a href="">non-bifurcated</a>.</p>
+		</div>
+		
+		
+		
+		
 		<!--BEGIN CAROUSEL -->
 			<?php echo $tableString; ?>
-			<!--END CAROUSEL -->
+		<!--END CAROUSEL -->
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		</div><!-- end wrapper -->
 		
 

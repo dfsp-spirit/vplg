@@ -742,6 +742,32 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	}
 	
 	
+	/*-----------------------------------------
+		results.php
+	-----------------------------------------*/
+	
+	#proteinDisplay {
+		margin-top: 5%;
+		}
+	
+	.proteingraph {
+		margin-right: 5%;
+		width: 60%;
+		float: left;
+		}
+	
+	#sse {
+		width: 40%;
+		}
+	
+	#bx-pager {
+		text-align: center;
+	}
+	
+
+	
+	
+	
 	/* --------------------------------------
    Carousel
    -------------------------------------- */

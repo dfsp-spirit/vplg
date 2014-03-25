@@ -38,7 +38,7 @@ foreach ($chains as $value ){
 $svg1 = file_get_contents("./proteins/7tim/7tim_A_albe_PG.svg");
 
 $tableString = '		<div id="myCarousel">
-					<ul class="bxslider bx-prev bx-next">';
+					<ul class="bxslider bx-prev bx-next" id="carouselSlider">';
  
 /*$tableString .= '		<li>
 							<img src="./proteins/7tim/7tim_A_albe_PG.png"></img>
@@ -46,11 +46,103 @@ $tableString = '		<div id="myCarousel">
  */
  $tableString .= ' <li>
 						<div class="container">
-					
-						<h4>Alpha Motifs</h4>
-						<p>Four Helix Bundle (<a href="help.php#helpAlphaMotifs">?</a>) - Globin Fold (<a href="help.php#helpAlphaMotifs">?</a>)</p>
+						<h3>1a0c</h3>
+						<h4>Protein graph 1a0cA</h4>
 						
-					</div>
+						<div class="proteingraph">
+							<img src="proteins/7tim/7tim_A_albe_PG.png" alt=""/>
+						
+						</div>
+						
+						<div class="table-responsive" id="sse">
+							<table class="table table-condensed table-hover borderless">
+								<tr>
+									<th class="tablecenter">Nr.</th>
+									<th class="tablecenter">Type</th>
+									<th class="tablecenter">Sequence</th>
+									<th class="tablecenter">from - to</th>
+								</tr>
+								<tr class="tablecenter">
+									<td>1</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr><tr class="tablecenter">
+									<td>1</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr><tr class="tablecenter">
+									<td>1</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr><tr class="tablecenter">
+									<td>1</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr><tr class="tablecenter">
+									<td>1</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr><tr class="tablecenter">
+									<td>1</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr><tr class="tablecenter">
+									<td>1</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr><tr class="tablecenter">
+									<td>1</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr><tr class="tablecenter">
+									<td>1</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr><tr class="tablecenter">
+									<td>1</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr><tr class="tablecenter">
+									<td>1</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr>
+								
+							</table>
+						</div><!-- end table-responsive -->
+						
+						<p>Select linear notation</p>
+						
+						
+						
+						<ul class="bxslider" id="tada">
+						  <li><img src="/test.png" /></li>
+						  <li><img src="/test.png" /></li>
+						  <li><img src="/test.png" /></li>
+						</ul>
+
+						
+						<div id="bx-pager">
+						  <a data-slide-index="0" href=""><img src="/thumbtest.png" /></a>
+						  <a data-slide-index="1" href=""><img src="/thumbtest.png" /></a>
+						  <a data-slide-index="2" href=""><img src="/thumbtest.png" /></a>
+						</div>
+						
+						
+						
+							
+						</div>
 					</li>';
 					
 					 $tableString .= ' <li>
