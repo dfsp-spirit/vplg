@@ -152,21 +152,23 @@ public class FileParser {
      * @param file Path to a readable text file. Does NOT test whether it exist, do that earlier.
      * @return all lines of the file as a single string
      */
-    public static String slurpFileToString(String file) {
+    public static String slurpFileToString(String file) throws IOException {
 
         String lines = "";
 
-        try {
+        //try {
             BufferedReader in = new BufferedReader(new FileReader(file));
             String line = null;
             while ((line = in.readLine()) != null) {
                 lines += line;
             }
-	} catch (IOException e) {
+	//} 
+        /*catch (IOException e) {
             System.err.println("ERROR: Could not read text file '" + file + "':" + e.getMessage() + ".");
             //e.printStackTrace();
             System.exit(1);
 	}
+        */
 
         return(lines);
     }

@@ -1618,7 +1618,7 @@ public class Main {
         System.out.println("Retrieving " + g_graphtype + " graph for PDB entry " + g_pdbid + " chain " + g_chainid + " from DB.");
         
         String graphString = null;
-        try { graphString = DBManager.getGraphString(g_pdbid, g_chainid, g_graphtype); }
+        try { graphString = DBManager.getGraphStringGML(g_pdbid, g_chainid, g_graphtype); }
         catch (SQLException e) { System.err.println("ERROR: SQL: Drawing of graph from DB failed: '" + e.getMessage() + "'."); return; }
         
         if(graphString == null) {

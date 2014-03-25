@@ -408,8 +408,8 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_ssecontact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null references " + tbl_contacttypes + " ON DELETE CASCADE, check (sse1 < sse2));");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact_complexgraph + " (ssecontact_complexgraph_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, complex_contact_type int not null references " + tbl_complexcontacttypes + " ON DELETE CASCADE check (sse1 < sse2));");            
             doInsertQuery("CREATE TABLE " + tbl_complex_contact_stats + " (complex_contact_id serial primary key, chain1 int not null references " + tbl_chain + " ON DELETE CASCADE, chain2 int not null references " + tbl_chain + " ON DELETE CASCADE, contact_num_HH int not null, contact_num_HS int not null, contact_num_HL int not null, contact_num_SS int not null, contact_num_SL int not null, contact_num_LL int not null, contact_num_DS int not null);");
-            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text not null, graph_string_kavosh text, graph_string_ptgl_adj text, graph_string_ptgl_red text, graph_string_ptgl_key text, graph_string_ptgl_seq text, graph_image_adj_svg text, graph_image_adj_png text, graph_image_red_svg text, graph_image_red_png text, graph_image_key_svg text, graph_image_key_png text, graph_image_seq_svg text, graph_image_seq_png text, sse_string text);");
-            doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graph_string_gml text not null, graph_string_kavosh text, graph_string_ptgl_adj text, graph_string_ptgl_red text, graph_string_ptgl_key text, graph_string_ptgl_seq text, graph_image_adj_svg text, graph_image_adj_png text, graph_image_red_svg text, graph_image_red_png text, graph_image_key_svg text, graph_image_key_png text, graph_image_seq_svg text, graph_image_seq_png text, sse_string text);");
+            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text not null, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_ptgl_adj text, graph_string_ptgl_red text, graph_string_ptgl_key text, graph_string_ptgl_seq text, graph_image_adj_svg text, graph_image_adj_png text, graph_image_red_svg text, graph_image_red_png text, graph_image_key_svg text, graph_image_key_png text, graph_image_seq_svg text, graph_image_seq_png text, sse_string text);");
+            doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graph_string_gml text not null, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_ptgl_adj text, graph_string_ptgl_red text, graph_string_ptgl_key text, graph_string_ptgl_seq text, graph_image_adj_svg text, graph_image_adj_png text, graph_image_red_svg text, graph_image_red_png text, graph_image_key_svg text, graph_image_key_png text, graph_image_seq_svg text, graph_image_seq_png text, sse_string text);");
             doInsertQuery("CREATE TABLE " + tbl_complexgraph + " (complexgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, graph_string_gml text not null, graph_string_kavosh text, graph_image_svg text, graph_image_png text);");
 
             /**
@@ -1311,11 +1311,64 @@ public class DBManager {
      * unique triplet (pdbid, chain_name, graph_type).
      * @param pdbid the requested pdb ID, e.g. "1a0s"
      * @param chain_name the requested pdb ID, e.g. "A"
-     * @param graph_type the requested graph type, e.g. "albe"
+     * @param graph_type the requested graph type, e.g. "albe". Use the constants in the ProtGraphs class.
      * @return the GML format string representation of the graph or null if no such graph exists.
      * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
      */
-    public static String getGraphString(String pdb_id, String chain_name, String graph_type) throws SQLException {
+    public static String getGraphStringGML(String pdb_id, String chain_name, String graph_type) throws SQLException {
+        return DBManager.getGraphString(ProtGraphs.GRAPHFORMAT_GML, pdb_id, chain_name, graph_type);
+    }
+    
+    /**
+     * Retrieves the Kavosh format graph string for the requested graph from the database. The graph is identified by the
+     * unique triplet (pdbid, chain_name, graph_type).
+     * @param pdbid the requested pdb ID, e.g. "1a0s"
+     * @param chain_name the requested pdb ID, e.g. "A"
+     * @param graph_type the requested graph type, e.g. "albe". Use the constants in the ProtGraphs class.
+     * @return the GML format string representation of the graph or null if no such graph exists.
+     * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
+     */
+    public static String getGraphStringKavosh(String pdb_id, String chain_name, String graph_type) throws SQLException {
+        return DBManager.getGraphString(ProtGraphs.GRAPHFORMAT_KAVOSH, pdb_id, chain_name, graph_type);
+    }
+    
+    /**
+     * Retrieves the PLCC format graph string for the requested graph from the database. The graph is identified by the
+     * unique triplet (pdbid, chain_name, graph_type).
+     * @param pdbid the requested pdb ID, e.g. "1a0s"
+     * @param chain_name the requested pdb ID, e.g. "A"
+     * @param graph_type the requested graph type, e.g. "albe". Use the constants in the ProtGraphs class.
+     * @return the GML format string representation of the graph or null if no such graph exists.
+     * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
+     */
+    public static String getGraphStringPLCC(String pdb_id, String chain_name, String graph_type) throws SQLException {
+        return DBManager.getGraphString(ProtGraphs.GRAPHFORMAT_PLCC, pdb_id, chain_name, graph_type);
+    }
+    
+    /**
+     * Retrieves the DOT language format graph string for the requested graph from the database. The graph is identified by the
+     * unique triplet (pdbid, chain_name, graph_type).
+     * @param pdbid the requested pdb ID, e.g. "1a0s"
+     * @param chain_name the requested pdb ID, e.g. "A"
+     * @param graph_type the requested graph type, e.g. "albe". Use the constants in the ProtGraphs class.
+     * @return the GML format string representation of the graph or null if no such graph exists.
+     * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
+     */
+    public static String getGraphStringDOTLanguage(String pdb_id, String chain_name, String graph_type) throws SQLException {
+        return DBManager.getGraphString(ProtGraphs.GRAPHFORMAT_DOTLANGUAGE, pdb_id, chain_name, graph_type);
+    }
+    
+    /**
+     * Retrieves a graph string for the requested graph from the database. The graph is identified by the
+     * unique triplet (pdbid, chain_name, graph_type). You need to supply the format you want. Some formats may be null or the empty string.
+     * @param graph_format the requested graph format, e.g. "GML". Use the constants in ProtGraphs class, like ProtGraphs.GRAPHFORMAT_GML.
+     * @param pdbid the requested pdb ID, e.g. "1a0s"
+     * @param chain_name the requested pdb ID, e.g. "A"
+     * @param graph_type the requested graph type, e.g. "albe". Use the constants in the ProtGraphs class.
+     * @return the GML format string representation of the graph or null if no such graph exists.
+     * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
+     */
+    public static String getGraphString(String graph_format, String pdb_id, String chain_name, String graph_type) throws SQLException {
         Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
         
         Integer chain_db_id = getDBChainID(pdb_id, chain_name);
@@ -1333,8 +1386,23 @@ public class DBManager {
 
         PreparedStatement statement = null;
         ResultSet rs = null;
+        
+        String query_graph_format_field = "graph_string_gml";
+        if(graph_format.equals(ProtGraphs.GRAPHFORMAT_GML)) {
+            query_graph_format_field = "graph_string_gml";
+        }
+        else if(graph_format.equals(ProtGraphs.GRAPHFORMAT_KAVOSH)) {
+            query_graph_format_field = "graph_string_kavosh";
+        }
+        else if(graph_format.equals(ProtGraphs.GRAPHFORMAT_DOTLANGUAGE)) {
+            query_graph_format_field = "graph_string_dotlanguage";
+        }
+        else if(graph_format.equals(ProtGraphs.GRAPHFORMAT_PLCC)) {
+            query_graph_format_field = "graph_string_plcc";
+        }
+        
 
-        String query = "SELECT graph_string_gml FROM " + tbl_proteingraph + " WHERE (chain_id = ? AND graph_type = ?);";
+        String query = "SELECT " + query_graph_format_field + " FROM " + tbl_proteingraph + " WHERE (chain_id = ? AND graph_type = ?);";
 
         try {
             dbc.setAutoCommit(false);
@@ -1493,17 +1561,18 @@ public class DBManager {
     
     /**
      * Returns the requested ProtGraph object or NULL if no such graph exists in the DB (or DB errors occurred).
-     * @param pdb_id
-     * @param chain_name
-     * @param graph_type
-     * @return 
+     * Note that the ProtGraph is created from the PLCC format graph string.
+     * @param pdb_id the PDB identifier, e.g., "7TIM"
+     * @param chain_name the PDB chain name, e.g., "A"
+     * @param graph_type the graph type, e.g., "albe". Use the constants in ProtGraphs class.
+     * @return the ProtGraph instance created from the string representation in the database
      */
     public static ProtGraph getGraph(String pdb_id, String chain_name, String graph_type) {
 
         String graphString = null;
         
         try { 
-            graphString = DBManager.getGraphString(pdb_id, chain_name, graph_type); 
+            graphString = DBManager.getGraphStringGML(pdb_id, chain_name, graph_type); 
         } catch (SQLException e) { 
             System.err.println("ERROR: SQL: Could not get graph from DB: '" + e.getMessage() + "'."); 
             return(null);            

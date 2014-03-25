@@ -30,6 +30,19 @@ public class ProtGraphs {
     public static final Integer GRAPHTYPE_BETALIG = 5;
     public static final Integer GRAPHTYPE_ALBELIG = 6;
     
+    
+    // graph format strings, used to define the foramt for database queries (and other stuff)
+    public static final String GRAPHFORMAT_PLCC = "PLCC";           // internal plcc format (v2)
+    public static final String GRAPHFORMAT_TGF = "TGF";             // trivial graph format
+    public static final String GRAPHFORMAT_KAVOSH = "KAVOSH";       // kavosh format. an edge list, first line is number of vertives.
+    public static final String GRAPHFORMAT_GML = "GML";             // graph modeling language
+    public static final String GRAPHFORMAT_DOTLANGUAGE = "DOT";     // DOT language
+    public static final String GRAPHFORMAT_PTGL_KEY = "PTGL_KEY";
+    public static final String GRAPHFORMAT_PTGL_RED = "PTGL_RED";
+    public static final String GRAPHFORMAT_PTGL_SEQ = "PTGL_SEQ";
+    public static final String GRAPHFORMAT_PTGL_ADJ = "PTGL_ADJ";
+    
+    
     public static Integer getGraphTypeCode(String gt) {
         if(gt.equals("alpha")) { return(GRAPHTYPE_ALPHA); }
         else if(gt.equals("beta")) { return(GRAPHTYPE_BETA); }
@@ -95,10 +108,17 @@ public class ProtGraphs {
     /**
      * Reads a file that has to contain a graph in TGF (trivial graph format) and turns it into a protein graph.
      * @param file the path to the file
-     * @return the TGF string
+     * @return the TGF string or null if the file could not be read
      */
     public static ProtGraph fromTrivialGraphFormatFile(String file) {
-        return(ProtGraphs.fromTrivialGraphFormatString(FileParser.slurpFileToString(file)));
+        ProtGraph g;
+        try {
+            g = ProtGraphs.fromTrivialGraphFormatString(FileParser.slurpFileToString(file));
+        } catch(IOException e) {
+            System.err.println("Could not TGF format graph from input file: '" + e.getMessage() + "'.");
+            g = null;
+        }
+        return(g);
     }
     
     

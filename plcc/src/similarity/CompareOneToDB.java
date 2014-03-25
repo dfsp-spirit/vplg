@@ -183,7 +183,7 @@ public class CompareOneToDB {
         
         // get the graph string of the pattern graph
         try { 
-            graphString = DBManager.getGraphString(g_pdbid, g_chainid, g_graphtype); 
+            graphString = DBManager.getGraphStringGML(g_pdbid, g_chainid, g_graphtype); 
         } catch (SQLException e) { 
             System.err.println("ERROR: SQL: Could not get graph from DB: '" + e.getMessage() + "'."); 
             return(results);            
@@ -285,7 +285,7 @@ public class CompareOneToDB {
         
         // get the grapg of the pattern graph
         try { 
-            graphString = DBManager.getGraphString(g_pdbid, g_chainid, g_graphtype); 
+            graphString = DBManager.getGraphStringGML(g_pdbid, g_chainid, g_graphtype); 
         } catch (SQLException e) { 
             System.err.println("ERROR: SQL: Could not get graph from DB: '" + e.getMessage() + "'."); 
             return(results);            
