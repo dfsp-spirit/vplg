@@ -859,10 +859,37 @@ public class DBManager {
     public static String getFieldnameForGraphImageRepresentationType(String graphImageRepresentationType) {
         String fieldName = null;
         
-        if(graphImageRepresentationType.equals(ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT)) {
-            fieldName = "graph_image_png";
-        } else if(graphImageRepresentationType.equals(ProtGraphs.GRAPHIMAGE_VECTOR_REPRESENTATION_VPLG_DEFAULT)) {
-            fieldName = "graph_image_svg";
+        switch (graphImageRepresentationType) {
+            case ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT:
+                fieldName = "graph_image_png";
+                break;
+            case ProtGraphs.GRAPHIMAGE_VECTOR_REPRESENTATION_VPLG_DEFAULT:
+                fieldName = "graph_image_svg";
+                break;
+            case ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_ADJ:
+                fieldName = "graph_image_adj_png";
+                break;
+            case ProtGraphs.GRAPHIMAGE_VECTOR_REPRESENTATION_PTGL_ADJ:
+                fieldName = "graph_image_adj_svg";
+                break;
+            case ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_RED:
+                fieldName = "graph_image_red_png";
+                break;
+            case ProtGraphs.GRAPHIMAGE_VECTOR_REPRESENTATION_PTGL_RED:
+                fieldName = "graph_image_red_svg";
+                break;
+            case ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_KEY:
+                fieldName = "graph_image_key_png";
+                break;
+            case ProtGraphs.GRAPHIMAGE_VECTOR_REPRESENTATION_PTGL_KEY:
+                fieldName = "graph_image_key_svg";
+                break;
+            case ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_SEQ:
+                fieldName = "graph_image_seq_png";
+                break;
+            case ProtGraphs.GRAPHIMAGE_VECTOR_REPRESENTATION_PTGL_SEQ:
+                fieldName = "graph_image_seq_svg";
+                break;
         }
         
         return fieldName;
