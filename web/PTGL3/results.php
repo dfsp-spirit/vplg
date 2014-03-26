@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <?php
-include('/backend/display_proteins.php');
+include('backend/display_proteins.php');
 ?>
 <html>
 	<head>
@@ -129,13 +129,9 @@ include('/backend/display_proteins.php');
 		
 		
 		<!--BEGIN CAROUSEL -->
-			<?php echo $tableString; ?>
+		<?php echo $tableString; ?>
 		<!--END CAROUSEL -->
-		
-		
-		
-		
-		
+	
 		
 		
 		
@@ -223,15 +219,18 @@ include('/backend/display_proteins.php');
 		<!-- Don not use this import, as bxSlider seems not to work with newer versions of jQuery -->
 		<!-- First try for the online version of jQuery-->
 		<!-- <script src="http://code.jquery.com/jquery.js"></script> -->
-		
 		<!-- If no online access, fallback to our hardcoded version of jQuery -->
-		<script>window.jQuery || document.write('<script src="js/jquery-1.8.2.min.js"><\/script>')</script>
+		<!--<script>window.jQuery || document.write('<script src="js/jquery-1.8.2.min.js"><\/script>')</script>-->
 		
+		
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+
 		<!-- Bootstrap JS -->
 		<script src="js/bootstrap.min.js"></script>
 		
 		<!-- Custom JS -->
 		<script src="js/script.js"></script>
+		<script src="js/bxslider-custom.js"></script>
 
 
 		

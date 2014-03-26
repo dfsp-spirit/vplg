@@ -123,26 +123,36 @@ $tableString = '		<div id="myCarousel">
 						</div><!-- end table-responsive -->
 						
 						<p>Select linear notation</p>
-						
-						
-						
-						<ul class="bxslider" id="tada">
-						  <li><img src="/test.png" /></li>
-						  <li><img src="/test.png" /></li>
-						  <li><img src="/test.png" /></li>
-						</ul>
+					
+					
+					
+					
+					<ul class="bxslider" id="tada">
+						  <li><img src="test.png" /></li>
+						  <li><img src="test.png" /></li>
+						  <li><img src="test.png" /></li>
+					</ul>
 
 						
+						
 						<div id="bx-pager">
-						  <a data-slide-index="0" href=""><img src="/thumbtest.png" /></a>
-						  <a data-slide-index="1" href=""><img src="/thumbtest.png" /></a>
-						  <a data-slide-index="2" href=""><img src="/thumbtest.png" /></a>
+						
+						  <a class="thumbalign" data-slide-index="0" href=""><img src="thumbtest.png" /></a>
+						 
+						  <a class="thumbalign" data-slide-index="1" href=""><img src="thumbtest.png" /></a>
+						  
+						  <a class="thumbalign" data-slide-index="2" href=""><img src="thumbtest.png" /></a>
+						
 						</div>
 						
 						
 						
-							
+						
+						
+						
 						</div>
+					
+						
 					</li>';
 					
 					 $tableString .= ' <li>

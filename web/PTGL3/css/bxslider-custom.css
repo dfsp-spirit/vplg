@@ -15,17 +15,39 @@
 	padding-bottom: 50px;
 	padding-right: 50px;
 	}*/
-	
 
 
+.thumbalign {
+	margin-right: 10px;
+	text-align: center;
+	float: left;
+}
+
+#bx-pager {
+/* Width of thumbnail + 10px from margin-right*/
+  width: 330px;
+  margin-left: auto; 
+  margin-right: auto; 
+  text-align: center;
+}
+
+.bx-controls-direction a {
+	height: 100% !important;
+	top: 0 !important;
+}
+
+
+.bx-next {
+	height: 100px;
+	margin-top: 50%;
+}
 
 	
 /* Make every background "invisible" so the user gets the feeling he is swapping the
 	actual page 		*/
-/*
+	
 .bx-viewport{
 	background: transparent !important;
 	border: none !important;
 	box-shadow: none !important;
 	}
-	*/
