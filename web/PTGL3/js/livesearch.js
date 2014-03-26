@@ -28,7 +28,6 @@ $(document).ready(function () {
 	}
 
 	$("input#searchInput").on("keyup", function(e) {
-		alert("dei muddi");
 		switch(e.keyCode) {
 		case 40:
 			Navigate(1);
