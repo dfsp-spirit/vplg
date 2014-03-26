@@ -408,9 +408,9 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_ssecontact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null references " + tbl_contacttypes + " ON DELETE CASCADE, check (sse1 < sse2));");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact_complexgraph + " (ssecontact_complexgraph_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, complex_contact_type int not null references " + tbl_complexcontacttypes + " ON DELETE CASCADE check (sse1 < sse2));");            
             doInsertQuery("CREATE TABLE " + tbl_complex_contact_stats + " (complex_contact_id serial primary key, chain1 int not null references " + tbl_chain + " ON DELETE CASCADE, chain2 int not null references " + tbl_chain + " ON DELETE CASCADE, contact_num_HH int not null, contact_num_HS int not null, contact_num_HL int not null, contact_num_SS int not null, contact_num_SL int not null, contact_num_LL int not null, contact_num_DS int not null);");
-            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text not null, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_ptgl_adj text, graph_string_ptgl_red text, graph_string_ptgl_key text, graph_string_ptgl_seq text, graph_image_adj_svg text, graph_image_adj_png text, graph_image_red_svg text, graph_image_red_png text, graph_image_key_svg text, graph_image_key_png text, graph_image_seq_svg text, graph_image_seq_png text, sse_string text);");
-            doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graph_string_gml text not null, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_ptgl_adj text, graph_string_ptgl_red text, graph_string_ptgl_key text, graph_string_ptgl_seq text, graph_image_adj_svg text, graph_image_adj_png text, graph_image_red_svg text, graph_image_red_png text, graph_image_key_svg text, graph_image_key_png text, graph_image_seq_svg text, graph_image_seq_png text, sse_string text);");
-            doInsertQuery("CREATE TABLE " + tbl_complexgraph + " (complexgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, graph_string_gml text not null, graph_string_kavosh text, graph_image_svg text, graph_image_png text);");
+            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_ptgl_adj text, graph_string_ptgl_red text, graph_string_ptgl_key text, graph_string_ptgl_seq text, graph_image_png text, graph_image_svg text, graph_image_adj_svg text, graph_image_adj_png text, graph_image_red_svg text, graph_image_red_png text, graph_image_key_svg text, graph_image_key_png text, graph_image_seq_svg text, graph_image_seq_png text, sse_string text);");
+            doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_ptgl_adj text, graph_string_ptgl_red text, graph_string_ptgl_key text, graph_string_ptgl_seq text, graph_image_png text, graph_image_svg text, graph_image_adj_svg text, graph_image_adj_png text, graph_image_red_svg text, graph_image_red_png text, graph_image_key_svg text, graph_image_key_png text, graph_image_seq_svg text, graph_image_seq_png text, sse_string text);");
+            doInsertQuery("CREATE TABLE " + tbl_complexgraph + " (complexgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, graph_string_gml text, graph_string_kavosh text, graph_image_svg text, graph_image_png text);");
 
             /**
              * The contents of the graphlet_counts[55] SQL array is as follows (from Tatianas thesis, pp. 36-37):
@@ -908,13 +908,13 @@ public class DBManager {
         Boolean result = false;
         
         PreparedStatement statement = null;
-        String graph_image_field = DBManager.getFieldnameForGraphImageRepresentationType(graphImageRepresentationType);
-        if(graph_image_field == null) {
+        String graphImageFieldName = DBManager.getFieldnameForGraphImageRepresentationType(graphImageRepresentationType);
+        if(graphImageFieldName == null) {
             System.err.println("Invalid graph image represenation type. Cannot set graph image path in database.");
             return false;
         }
 
-        String query = "UPDATE " + tbl_proteingraph + " SET " + graph_image_field + " = ? WHERE graph_id = ?;";
+        String query = "UPDATE " + tbl_proteingraph + " SET " + graphImageFieldName + " = ? WHERE graph_id = ?;";
 
         try {
             dbc.setAutoCommit(false);
@@ -1596,7 +1596,7 @@ public class DBManager {
      * @return the database ID of the graph or a negative number if an error occurred or no such graph exists in the db
      * @throws SQLException 
      */
-    public static Integer getGraphDatabaseID(String pdb_id, String chain_name, String graph_type) throws SQLException {
+    public static Integer getDBGraphID(String pdb_id, String chain_name, String graph_type) throws SQLException {
         Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
         
         Integer chain_db_id = getDBChainID(pdb_id, chain_name);
