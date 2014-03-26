@@ -849,6 +849,95 @@ public class DBManager {
         }
         return(result);
     }
+
+    
+    /**
+     * Determines the database field name (in the plcc_graph table) for the given image representation.
+     * @param graphImageRepresentationType the graph image representation, use constants in ProtGraphs class, e.g., ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT.
+     * @return the field name or null if the representation is invalid
+     */
+    public static String getFieldnameForGraphImageRepresentationType(String graphImageRepresentationType) {
+        String fieldName = null;
+        
+        if(graphImageRepresentationType.equals(ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT)) {
+            fieldName = "graph_image_png";
+        } else if(graphImageRepresentationType.equals(ProtGraphs.GRAPHIMAGE_VECTOR_REPRESENTATION_VPLG_DEFAULT)) {
+            fieldName = "graph_image_svg";
+        }
+        
+        return fieldName;
+    }
+    
+    /**
+     * Sets the image path for a specific graph representation on the database. The graph has to exist in the database already.
+     * 
+     * @param graphDatabaseID the graph ID in the database. Use the getGrapDatabaseID function if you dont know it.
+     * @param graphImageRepresentationType The image representation type, defines format and image type (like PNG format and PTGL KEY notation image). Use the constants in ProtGraphs class, e.g., ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT.
+     * @param relativeImagePath the relative image path to set in the database for the specified representation
+     * @return true if the update succeeded, false otherwise
+     * @throws SQLException if something goes wrong with the database
+     */
+    public static Boolean updateGraphImagePathInDB(Integer graphDatabaseID, String graphImageRepresentationType, String relativeImagePath) throws SQLException {
+        Boolean result = false;
+        
+        PreparedStatement statement = null;
+        String graph_image_field = DBManager.getFieldnameForGraphImageRepresentationType(graphImageRepresentationType);
+        if(graph_image_field == null) {
+            System.err.println("Invalid graph image represenation type. Cannot set graph image path in database.");
+            return false;
+        }
+
+        String query = "UPDATE " + tbl_proteingraph + " SET " + graph_image_field + " = ? WHERE graph_id = ?;";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            
+            statement.setString(1, relativeImagePath);
+            statement.setInt(2, graphDatabaseID);
+                                
+            statement.executeUpdate();
+            dbc.commit();
+            result = true;
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: updateGraphImagePathInDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: updateGraphImagePathInDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: updateGraphImagePathInDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+            result = false;
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        }
+        
+        return result;
+        
+    }
+    
+    
+    /**
+     * Assigns the SSEs in the list to the given graph (identified by PDB ID, chain ID and graph type) in the database, using the order
+     * of the SSEs in the input list.
+     * @param sses a list of SSEs, in the order of the graph (N to C terminus on the chain, but some SSEs of the chain may be missing of course, depending on the graph type)
+     * @param pdb_id the PDB ID of the graph
+     * @param chain_name the chain name of the graph
+     * @param graph_type the graph type. Use the integer codes in ProtGraphs class
+     * @return the number of SSEs successfully assigned to the graph
+     * @throws SQLException if something goes wrong with the database server
+     */
+    public static Integer assignSSEsToGraphInOrder(ArrayList<SSE> sses, String pdb_id, String chain_name, Integer graph_type) throws SQLException {
+        Integer numAssigned = 0;
+        
+        return numAssigned;
+    }
     
     /**
      * Writes information on the graphlet counts for a protein graph to the database. Used by graphlet computation
@@ -1473,6 +1562,97 @@ public class DBManager {
     
     
     /**
+     * Determines and returns the internal database ID (primary key) of the graph identified by the given properties (PDB ID, chain, gt).
+     * @param pdb_id the PDB identifier of the graph
+     * @param chain_name the PDB chain name of the graph
+     * @param graph_type the graph type, use the string constants in ProtGraphs class
+     * @return the database ID of the graph or a negative number if an error occurred or no such graph exists in the db
+     * @throws SQLException 
+     */
+    public static Integer getGraphDatabaseID(String pdb_id, String chain_name, String graph_type) throws SQLException {
+        Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
+        
+        Integer chain_db_id = getDBChainID(pdb_id, chain_name);
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        
+
+        if (chain_db_id < 0) {
+            DP.getInstance().w("getGraph(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
+            return(-1);
+        }
+
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        
+       
+
+        String query = "SELECT graph_id FROM " + tbl_proteingraph + " WHERE (chain_id = ? AND graph_type = ?);";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setInt(1, chain_db_id);
+            statement.setInt(2, gtc);
+                                
+            rs = statement.executeQuery();
+            dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: getGraphDatabaseID(): Retrieval of graph failed: '" + e.getMessage() + "'.");
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        if(tableData.size() >= 1) {
+            if(tableData.get(0).size() >= 1) {
+                String graph_id_str = tableData.get(0).get(0);
+                try {
+                    Integer graph_id_int = Integer.parseInt(graph_id_str);
+                    return graph_id_int;
+                } catch(java.lang.NumberFormatException e) {
+                    DP.getInstance().e("DB: getGraphDatabaseID(): Could not parse graph database ID as integer, seems invalid.");
+                    return -1;
+                }
+            }
+            else {
+                DP.getInstance().w("DB: No entry for graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
+                return(-1);
+            }
+        }
+        else {
+            return(-1);
+        }        
+    }
+    
+    
+    /**
      * Retrieves the graphlet counts for the requested graph from the database. The graph is identified by the
      * unique triplet (pdbid, chain_name, graph_type).
      * @param pdbid the requested pdb ID, e.g. "1a0s"
@@ -1587,14 +1767,14 @@ public class DBManager {
         String graphString = null;
         
         try { 
-            graphString = DBManager.getGraphStringGML(pdb_id, chain_name, graph_type); 
+            graphString = DBManager.getGraphStringPLCC(pdb_id, chain_name, graph_type); 
         } catch (SQLException e) { 
             System.err.println("ERROR: SQL: Could not get graph from DB: '" + e.getMessage() + "'."); 
             return(null);            
         }
         
         if(graphString == null) {
-            DP.getInstance().w("DB: getMostSimilarByGraphSetBased: Pattern graph not found in database.");
+            DP.getInstance().w("DB: getGraph: Graph '" + pdb_id + "-" + chain_name + "-" + graph_type + "' not found in database.");
             return(null);
         }
         
@@ -1811,15 +1991,15 @@ public class DBManager {
     
     
     /**
-     * Retrieves the VPLG format graph image for the requested graph in SVG format from the database. The graph is identified by the
+     * Retrieves the relative path of the graph image for the requested graph in SVG format from the database. The graph is identified by the
      * unique triplet (pdbid, chain_name, graph_type).
      * @param pdbid the requested pdb ID, e.g. "1a0s"
      * @param chain_name the requested pdb ID, e.g. "A"
      * @param graph_type the requested graph type, e.g. "albe"
-     * @return an XML string representing the graph in SVG format, or null if no such graph exists.
+     * @return the relative path to the graph image in SVG format, or null if no such graph image exists (path relative to the base directory, see Settings class).
      * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
      */
-    public static String getGraphImageSVG(String pdb_id, String chain_name, String graph_type) throws SQLException {
+    public static String getGraphImagePathSVG(String pdb_id, String chain_name, String graph_type) throws SQLException {
         Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
         
         Integer chain_db_id = getDBChainID(pdb_id, chain_name);

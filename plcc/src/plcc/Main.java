@@ -2069,6 +2069,7 @@ public class Main {
                 if(Settings.getBoolean("plcc_B_useDB")) {
                     try { 
                         DBManager.writeProteinGraphToDB(pdbid, c.getPdbChainID(), ProtGraphs.getGraphTypeCode(gt), pg.toGraphModellingLanguageFormat(), pg.toVPLGGraphFormat(), pg.toKavoshFormat(), pg.toDOTLanguageFormat(), pg.toPtglFormatADJ(), pg.toPtglFormatRED(), pg.toPtglFormatKEY(), pg.toPtglFormatSEQ(), pg.getSSEStringSequential()); 
+                        
                         if(! silent) {
                             System.out.println("      Inserted '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + c.getPdbChainID() + "' into DB.");
                         }

@@ -42,6 +42,18 @@ public class ProtGraphs {
     public static final String GRAPHFORMAT_PTGL_SEQ = "PTGL_SEQ";
     public static final String GRAPHFORMAT_PTGL_ADJ = "PTGL_ADJ";
     
+    // the graph image representation (bitmap is PNG format atm, vector is SVG). Used for the database.
+    public static final String GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT = "IMG_BITMAP_VPLG";
+    public static final String GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_KEY = "IMG_BITMAP_PTGL_KEY";
+    public static final String GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_RED = "IMG_BITMAP_PTGL_RED";
+    public static final String GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_SEQ = "IMG_BITMAP_PTGL_SEQ";
+    public static final String GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_ADJ = "IMG_BITMAP_PTGL_ADJ";
+    public static final String GRAPHIMAGE_VECTOR_REPRESENTATION_VPLG_DEFAULT = "IMG_VECTOR_VPLG";
+    public static final String GRAPHIMAGE_VECTOR_REPRESENTATION_PTGL_KEY = "IMG_VECTOR_PTGL_KEY";
+    public static final String GRAPHIMAGE_VECTOR_REPRESENTATION_PTGL_RED = "IMG_VECTOR_PTGL_RED";
+    public static final String GRAPHIMAGE_VECTOR_REPRESENTATION_PTGL_SEQ = "IMG_VECTOR_PTGL_SEQ";
+    public static final String GRAPHIMAGE_VECTOR_REPRESENTATION_PTGL_ADJ = "IMG_VECTOR_PTGL_ADJ";
+    
     
     public static Integer getGraphTypeCode(String gt) {
         if(gt.equals("alpha")) { return(GRAPHTYPE_ALPHA); }
