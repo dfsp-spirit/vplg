@@ -28,13 +28,11 @@ include('backend/display_proteins.php');
 		<link rel="stylesheet" type="text/css" href="css/jquery.bxslider.css">
 		<link rel="stylesheet" type="text/css" href="css/bxslider-custom.css">
 		
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+		
 		<!-- Include Modernizr in the head, before any other JS -->
 		<script src="js/modernizr-2.6.2.min.js"></script>
-		  <!-- Live Search for PDB IDs -->
-		<script src="js/livesearch.js" type="text/javascript"></script>
-		<!-- D3 Visual -->
-		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+		  
+
 	</head>
 
 	<body id="customBackground">
@@ -230,19 +228,20 @@ include('backend/display_proteins.php');
 		
 		<!-- Custom JS -->
 		<script src="js/script.js"></script>
+		
+
+		<!-- Live Search for PDB IDs -->
+		<script src="js/livesearch.js" type="text/javascript"></script>
+		
+		<!-- bxSlider Javascript file -->
+		<script src="js/jquery.bxslider.min.js"></script>
 		<script src="js/bxslider-custom.js"></script>
+			
 
-
 		
 		
 		
 		
-		
-		
-		
-		
-<!-- bxSlider Javascript file -->
-<script src="js/jquery.bxslider.min.js"></script>
 
 		
 
