@@ -5,7 +5,7 @@ $(document).ready(function () {
 		if(query_value !== ''){
 			$.ajax({
 			type: "POST",
-			url: "liveSearch.php",
+			url: "./backend/liveSearch.php",
 			data: { query: query_value },
 			cache: false,
 			success: function(html){
@@ -28,6 +28,7 @@ $(document).ready(function () {
 	}
 
 	$("input#searchInput").on("keyup", function(e) {
+		alert("dei muddi");
 		switch(e.keyCode) {
 		case 40:
 			Navigate(1);
