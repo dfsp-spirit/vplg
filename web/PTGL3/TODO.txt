@@ -1,0 +1,11 @@
+hmtl:
+- fill in text
+- setup links
+- printable version
+- links ToTop
+
+js:
+- tooltip
+- popover
+- carousel 
+- add AdvancedSearch to all pages
