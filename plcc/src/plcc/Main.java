@@ -1846,7 +1846,9 @@ public class Main {
 
                 if(Settings.getBoolean("plcc_B_useDB")) {
                     try {
-                       DBManager.writeSSEToDB(pdbid, c.getPdbChainID(), allChainSSEs.get(j).getStartDsspNum(), allChainSSEs.get(j).getEndDsspNum(), allChainSSEs.get(j).getStartPdbResID(), allChainSSEs.get(j).getEndPdbResID(), allChainSSEs.get(j).getAASequence(), allChainSSEs.get(j).getSSETypeInt(), allChainSSEs.get(j).getLigandName3()); 
+                       SSE ssej = allChainSSEs.get(j);
+                       Integer ssePositionInChain = j + 1;
+                       DBManager.writeSSEToDB(pdbid, c.getPdbChainID(), ssej.getStartDsspNum(), ssej.getEndDsspNum(), ssej.getStartPdbResID(), ssej.getEndPdbResID(), ssej.getAASequence(), ssej.getSSETypeInt(), ssej.getLigandName3(), ssePositionInChain); 
                        //System.out.println("  Info on SSE #" + (j + 1) + " of chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
                     }
                     catch(Exception e) {

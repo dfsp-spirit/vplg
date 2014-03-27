@@ -404,7 +404,7 @@ public class DBManager {
             
             doInsertQuery("CREATE TABLE " + tbl_protein + " (pdb_id varchar(4) primary key, header varchar(200) not null, title varchar(400) not null, experiment varchar(200) not null, keywords varchar(400) not null, resolution real not null);");
             doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(2) not null, mol_name varchar(200) not null, organism_scientific varchar(200) not null, organism_common varchar(200) not null, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE);");
-            doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence varchar(2000) not null, sse_type int not null references " + tbl_ssetypes + " ON DELETE CASCADE, lig_name varchar(5));");
+            doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence varchar(2000) not null, sse_type int not null references " + tbl_ssetypes + " ON DELETE CASCADE, lig_name varchar(5), position_in_chain int);");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null references " + tbl_contacttypes + " ON DELETE CASCADE, check (sse1 < sse2));");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact_complexgraph + " (ssecontact_complexgraph_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, complex_contact_type int not null references " + tbl_complexcontacttypes + " ON DELETE CASCADE check (sse1 < sse2));");            
             doInsertQuery("CREATE TABLE " + tbl_complex_contact_stats + " (complex_contact_id serial primary key, chain1 int not null references " + tbl_chain + " ON DELETE CASCADE, chain2 int not null references " + tbl_chain + " ON DELETE CASCADE, contact_num_HH int not null, contact_num_HS int not null, contact_num_HL int not null, contact_num_SS int not null, contact_num_SL int not null, contact_num_LL int not null, contact_num_DS int not null);");
@@ -548,7 +548,7 @@ public class DBManager {
     /**
      * Writes information on a SSE to the database. Note that the protein + chain have to exist in the database already.
      */
-    public static Boolean writeSSEToDB(String pdb_id, String chain_name, Integer dssp_start, Integer dssp_end, String pdb_start, String pdb_end, String sequence, Integer sse_type, String lig_name) throws SQLException {
+    public static Boolean writeSSEToDB(String pdb_id, String chain_name, Integer dssp_start, Integer dssp_end, String pdb_start, String pdb_end, String sequence, Integer sse_type, String lig_name, Integer ssePositionInChain) throws SQLException {
 
         Integer chain_id = getDBChainID(pdb_id, chain_name);
 
@@ -570,7 +570,7 @@ public class DBManager {
          * 
          */
 
-        String query = "INSERT INTO " + tbl_sse + " (chain_id, dssp_start, dssp_end, pdb_start, pdb_end, sequence, sse_type, lig_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO " + tbl_sse + " (chain_id, dssp_start, dssp_end, pdb_start, pdb_end, sequence, sse_type, lig_name, position_in_chain) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
                 // chain_id + ", " + dssp_start + ", " + dssp_end + ", '" + pdb_start + "', '" + pdb_end + "', '" + sequence + "', " + sse_type + ", '" + lig_name + "');";
                 
         try {
@@ -585,6 +585,7 @@ public class DBManager {
             statement.setString(6, sequence);
             statement.setInt(7, sse_type);
             statement.setString(8, lig_name);
+            statement.setInt(9, ssePositionInChain);
                                 
             statement.executeUpdate();
             dbc.commit();
@@ -915,7 +916,8 @@ public class DBManager {
         }
 
         String query = "UPDATE " + tbl_proteingraph + " SET " + graphImageFieldName + " = ? WHERE graph_id = ?;";
-
+        Integer numRowsAffected = 0;
+        
         try {
             dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
@@ -924,7 +926,7 @@ public class DBManager {
             statement.setString(1, relativeImagePath);
             statement.setInt(2, graphDatabaseID);
                                 
-            statement.executeUpdate();
+            numRowsAffected = statement.executeUpdate();
             dbc.commit();
             result = true;
         } catch (SQLException e ) {
@@ -943,8 +945,8 @@ public class DBManager {
                 statement.close();
             }
             dbc.setAutoCommit(true);
-        }
-        
+        } 
+       
         return result;
         
     }
@@ -963,7 +965,84 @@ public class DBManager {
     public static Integer assignSSEsToGraphInOrder(ArrayList<SSE> sses, String pdb_id, String chain_name, Integer graph_type) throws SQLException {
         Integer numAssigned = 0;
         
+        Integer chain_id = getDBChainID(pdb_id, chain_name);
+        if(chain_id <= 0) {
+            DP.getInstance().e("DBManager", "assignSSEsToGraphInOrder(): Chain not found in DB, cannot assign SSEs.");
+            return 0;
+        }
+        
+        ArrayList<Integer> sseDBids = new ArrayList<Integer>();
+        for(SSE sse : sses) {
+            Integer sseID = DBManager.getDBSseID(sse.getStartDsspNum(), chain_id);
+            if(sseID > 0) {
+                sseDBids.add(sseID);
+            }
+            else {
+                DP.getInstance().e("DBManager", "assignSSEsToGraphInOrder(): SSE not found in DB, cannot assign it to graph.");
+            }
+        }
+        
+        Integer graphDbID = DBManager.getDBGraphID(pdb_id, chain_name, ProtGraphs.getGraphTypeString(graph_type));
+        if(graphDbID > 0) {
+            for(int i = 0; i < sseDBids.size(); i++) {
+                numAssigned += DBManager.assignSSEtoGraph(sseDBids.get(i), graphDbID, (i+1));
+            }                            
+        } else {
+            DP.getInstance().e("DBManager", "assignSSEsToGraphInOrder(): Graph not found in DB, cannot assign SSEs to it.");            
+        }
+        
         return numAssigned;
+    }
+    
+    /**
+     * Assigns an SSE to a graph, defining its position in it.
+     * @param sseDbId the database id (primary key) of the SSE
+     * @param graphDbId the database id (primary key) of the graph
+     * @param ssePositionInGraph the position of the SSE in the graph. The first SSE should be 1 (NOT 0).
+     * @return the number of affected rows (1 on success, 0 on error)
+     */
+    public static Integer assignSSEtoGraph(Integer sseDbId, Integer graphDbId, Integer ssePositionInGraph) throws SQLException {
+        if(ssePositionInGraph <= 0) {
+            DP.getInstance().e("DBManager", "assignSSEToGraph(): ssePositionInGraph must be > 0, skipping SSE assignment.");            
+            return 0;
+        }
+        
+        Integer numRowsAffected = 0;
+        
+        // assign SSE
+        PreparedStatement statement = null;
+        
+        String query = "INSERT INTO " + tbl_nm_ssetoproteingraph + " (sse_id, graph_id, position_in_graph) VALUES (?, ?, ?);";
+        
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            
+            statement.setInt(1, sseDbId);
+            statement.setInt(2, graphDbId);
+            statement.setInt(3, ssePositionInGraph);
+                                
+            numRowsAffected = statement.executeUpdate();
+            dbc.commit();
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: updateGraphImagePathInDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: updateGraphImagePathInDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: updateGraphImagePathInDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        } 
+        
+        return numRowsAffected;
     }
     
     /**
