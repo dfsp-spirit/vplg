@@ -2052,20 +2052,6 @@ public class Main {
                     
                 }
                 */
-
-                if(Settings.getBoolean("plcc_B_draw_graphs")) {
-                    if(pg.drawProteinGraph(imgFile, false)) {
-                        if(! silent) {
-                            System.out.println("      Image of graph written to file '" + imgFile + "'.");
-                        }
-                        pcr.addProteinGraphImageBitmap(gt, new File(imgFile));
-                    }                   
-                }
-                else {
-                    if(! silent) {
-                        System.out.println("      Image and graph output disabled, not drawing and writing protein graph files.");
-                    }
-                }
                 
                 // But we may need to write the graph to the database
                 if(Settings.getBoolean("plcc_B_useDB")) {
@@ -2077,9 +2063,54 @@ public class Main {
                         }
                     }
                     catch(SQLException e) { 
-                        System.err.println("ERROR: Failed to insert '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + c.getPdbChainID() + "' into DB."); 
+                        DP.getInstance().e("Main", "Failed to insert '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + c.getPdbChainID() + "' into DB: '" + e.getMessage() + "'."); 
+                    }
+                    
+                    // assign SSEs in database
+                    try {
+                        int numAssigned = DBManager.assignSSEsToGraphInOrder(pg.sseList, pdbid, c.getPdbChainID(), ProtGraphs.getGraphTypeCode(gt));
+                        if(! silent) {
+                            System.out.println("      Assigned " + numAssigned + " SSEs to " + gt + " graph of PDB ID '" + pdbid + "' chain '" + c.getPdbChainID() + "' in the DB.");
+                        }
+                    } catch(SQLException ex) {
+                       DP.getInstance().e("Main", "Could not assign SSEs to graph in the database: '" + ex.getMessage() + "'.");
                     }
                 }
+
+                if(Settings.getBoolean("plcc_B_draw_graphs")) {
+                    if(pg.drawProteinGraph(imgFile, false)) {
+                        if(! silent) {
+                            System.out.println("      Image of graph written to file '" + imgFile + "'.");
+                        }
+                        pcr.addProteinGraphImageBitmap(gt, new File(imgFile));
+                        
+                        // set image location is database if required
+                        if(Settings.getBoolean("plcc_B_useDB")) {
+                            Integer graphDBID = -1;
+                            try {
+                                graphDBID = DBManager.getDBGraphID(pdbid, c.getPdbChainID(), gt);
+                            } catch(SQLException ex) {
+                                DP.getInstance().e("Main", "Could not find graph in database: '" + ex.getMessage() + "'.");
+                            }
+                            if(graphDBID > 0) {
+                                try {
+                                    DBManager.updateGraphImagePathInDB(graphDBID, ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT, fileNameWithExtension);
+                                } catch(SQLException e) {
+                                    DP.getInstance().e("Main", "Could not update graph image path in database: '" + e.getMessage() + "'.");
+                                }
+                            } else {
+                                DP.getInstance().e("Main", "Could not find " + gt + " graph for PDB " + pdbid + " chain " + c.getPdbChainID() + " in database to set image path.");
+                            }
+                        }
+                    }                   
+                }
+                else {
+                    if(! silent) {
+                        System.out.println("      Image and graph output disabled, not drawing and writing protein graph files.");
+                    }
+                }
+                
+                
                 
                 if(Settings.getInteger("plcc_I_debug_level") > 0) {
                     if(! silent) {

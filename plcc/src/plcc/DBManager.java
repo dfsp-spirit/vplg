@@ -902,17 +902,16 @@ public class DBManager {
      * @param graphDatabaseID the graph ID in the database. Use the getGrapDatabaseID function if you dont know it.
      * @param graphImageRepresentationType The image representation type, defines format and image type (like PNG format and PTGL KEY notation image). Use the constants in ProtGraphs class, e.g., ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT.
      * @param relativeImagePath the relative image path to set in the database for the specified representation
-     * @return true if the update succeeded, false otherwise
+     * @return the number of rows affected by the SQL query
      * @throws SQLException if something goes wrong with the database
      */
-    public static Boolean updateGraphImagePathInDB(Integer graphDatabaseID, String graphImageRepresentationType, String relativeImagePath) throws SQLException {
-        Boolean result = false;
+    public static Integer updateGraphImagePathInDB(Integer graphDatabaseID, String graphImageRepresentationType, String relativeImagePath) throws SQLException {
         
         PreparedStatement statement = null;
         String graphImageFieldName = DBManager.getFieldnameForGraphImageRepresentationType(graphImageRepresentationType);
         if(graphImageFieldName == null) {
             System.err.println("Invalid graph image represenation type. Cannot set graph image path in database.");
-            return false;
+            return 0;
         }
 
         String query = "UPDATE " + tbl_proteingraph + " SET " + graphImageFieldName + " = ? WHERE graph_id = ?;";
@@ -928,7 +927,6 @@ public class DBManager {
                                 
             numRowsAffected = statement.executeUpdate();
             dbc.commit();
-            result = true;
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: updateGraphImagePathInDB: '" + e.getMessage() + "'.");
             if (dbc != null) {
@@ -939,7 +937,6 @@ public class DBManager {
                     System.err.println("ERROR: SQL: updateGraphImagePathInDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
                 }
             }
-            result = false;
         } finally {
             if (statement != null) {
                 statement.close();
@@ -947,7 +944,7 @@ public class DBManager {
             dbc.setAutoCommit(true);
         } 
        
-        return result;
+        return numRowsAffected;
         
     }
     
