@@ -2069,7 +2069,7 @@ public class Main {
                     
                     // assign SSEs in database
                     try {
-                        int numAssigned = DBManager.assignSSEsToGraphInOrder(pg.sseList, pdbid, chain, ProtGraphs.getGraphTypeCode(gt));
+                        int numAssigned = DBManager.assignSSEsToProteinGraphInOrder(pg.sseList, pdbid, chain, ProtGraphs.getGraphTypeCode(gt));
                         if(! silent) {
                             System.out.println("      Assigned " + numAssigned + " SSEs to " + gt + " graph of PDB ID '" + pdbid + "' chain '" + chain + "' in the DB.");
                         }

@@ -781,7 +781,8 @@ public class DBManager {
     
     /**
      * Writes information on a protein graph to the database. This includes a string representing the protein
-     * graph in VPLG format. Note that the chain has to exist in the database already.
+     * graph in VPLG format. Note that the chain has to exist in the database already. You can set the path to
+     * the graph images later using the updateGraphImage... functions.
      * 
      * @param pdb_id the PDB identifier of the protein
      * @param chain_name the PDB chain name of the chain represented by the graph_string
@@ -804,7 +805,7 @@ public class DBManager {
         Boolean result = false;
 
         if (chain_db_id < 0) {
-            System.err.println("ERROR: writeGraphToDB: Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert SSE.");
+            System.err.println("ERROR: writeProteinGraphToDB: Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert protein graph.");
             return (false);
         }
 
@@ -832,13 +833,93 @@ public class DBManager {
             dbc.commit();
             result = true;
         } catch (SQLException e ) {
-            System.err.println("ERROR: SQL: writeGraphToDB: '" + e.getMessage() + "'.");
+            System.err.println("ERROR: SQL: writeProteinGraphToDB: '" + e.getMessage() + "'.");
             if (dbc != null) {
                 try {
-                    System.err.print("ERROR: SQL: writeGraphToDB: Transaction is being rolled back.");
+                    System.err.print("ERROR: SQL: writeProteinGraphToDB: Transaction is being rolled back.");
                     dbc.rollback();
                 } catch(SQLException excep) {
-                    System.err.println("ERROR: SQL: writeGraphToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                    System.err.println("ERROR: SQL: writeProteinGraphToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+            result = false;
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        }
+        return(result);
+    }
+    
+    
+    /**
+     * Writes information on a folding graph to the database. This includes a string representing the folding
+     * graph in VPLG format. Note that the chain and the parent protein graph has to exist in the database already. You can set the path to
+     * the graph images later using the updateFoldingGraphImage... functions.
+     * 
+     * @param pdb_id the PDB identifier of the protein
+     * @param chain_name the PDB chain name of the chain represented by the graph_string
+     * @param graph_type the Integer representation of the graph type. use ProtGraphs.getGraphTypeCode() to get it.
+     * @param graph_string_gml the graph in GML format
+     * @param graph_string_plcc the graph in plcc format
+     * @param graph_string_kavosh the graph in kavosh format
+     * @param graph_string_dotlanguage the graph in DOT language format
+     * @param graph_string_ptgl_red the graph in PTGL RED notation
+     * @param graph_string_ptgl_adj the graph in PTGL ADJ notation
+     * @param graph_string_ptgl_key the graph in PTGL KEY notation
+     * @param graph_string_ptgl_seq the graph in PTGL SEQ notation
+     * @param sse_string the graph in SSE string notation
+     * @return true if the graph was inserted, false if errors occurred
+     * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
+     */
+    public static Boolean writeFoldingGraphToDB(String pdb_id, String chain_name, Integer graph_type, String graph_string_gml, String graph_string_plcc, String graph_string_kavosh, String graph_string_dotlanguage, String graph_string_ptgl_red, String graph_string_ptgl_adj, String graph_string_ptgl_key, String graph_string_ptgl_seq, String sse_string) throws SQLException {
+               
+        Integer chain_db_id = getDBChainID(pdb_id, chain_name);
+        Boolean result = false;
+
+        if (chain_db_id < 0) {
+            DP.getInstance().e("writeFoldingGraphToDB()" , "Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert folding graph.");
+            return (false);
+        }
+        
+        String graphTypeString = ProtGraphs.getGraphTypeString(graph_type);
+        Integer parent_graph_id = DBManager.getDBGraphID(pdb_id, chain_name, graphTypeString);
+        if(parent_graph_id <= 0) {
+            DP.getInstance().e("writeFoldingGraphToDB()" , "Could not find parent " + graphTypeString + " graph with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert folding graph.");
+            return (false);
+        } 
+
+        PreparedStatement statement = null;
+
+        String query = "INSERT INTO " + tbl_foldinggraph + " (parent_graph_id, graph_string_gml, graph_string_plcc, graph_string_kavosh, graph_string_dotlanguage, graph_string_ptgl_red, graph_string_ptgl_adj, graph_string_ptgl_key, graph_string_ptgl_seq, sse_string) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setInt(1, parent_graph_id);
+            statement.setString(2, graph_string_gml);
+            statement.setString(3, graph_string_plcc);
+            statement.setString(4, graph_string_kavosh);
+            statement.setString(5, graph_string_dotlanguage);
+            statement.setString(6, graph_string_ptgl_adj);
+            statement.setString(7, graph_string_ptgl_red);
+            statement.setString(8, graph_string_ptgl_key);
+            statement.setString(9, graph_string_ptgl_seq);
+            statement.setString(10, sse_string);
+                                
+            statement.executeUpdate();
+            dbc.commit();
+            result = true;
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: writeFoldingGraphToDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: writeFoldingGraphToDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: writeFoldingGraphToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
                 }
             }
             result = false;
@@ -950,7 +1031,7 @@ public class DBManager {
     
     
     /**
-     * Assigns the SSEs in the list to the given graph (identified by PDB ID, chain ID and graph type) in the database, using the order
+     * Assigns the SSEs in the list to the given protein graph (identified by PDB ID, chain ID and graph type) in the database, using the order
      * of the SSEs in the input list.
      * @param sses a list of SSEs, in the order of the graph (N to C terminus on the chain, but some SSEs of the chain may be missing of course, depending on the graph type)
      * @param pdb_id the PDB ID of the graph
@@ -959,12 +1040,12 @@ public class DBManager {
      * @return the number of SSEs successfully assigned to the graph
      * @throws SQLException if something goes wrong with the database server
      */
-    public static Integer assignSSEsToGraphInOrder(ArrayList<SSE> sses, String pdb_id, String chain_name, Integer graph_type) throws SQLException {
+    public static Integer assignSSEsToProteinGraphInOrder(ArrayList<SSE> sses, String pdb_id, String chain_name, Integer graph_type) throws SQLException {
         Integer numAssigned = 0;
         
         Integer chain_id = getDBChainID(pdb_id, chain_name);
         if(chain_id <= 0) {
-            DP.getInstance().e("DBManager", "assignSSEsToGraphInOrder(): Chain not found in DB, cannot assign SSEs.");
+            DP.getInstance().e("DBManager", "assignSSEsToProteinGraphInOrder(): Chain not found in DB, cannot assign SSEs.");
             return 0;
         }
         
@@ -975,32 +1056,148 @@ public class DBManager {
                 sseDBids.add(sseID);
             }
             else {
-                DP.getInstance().e("DBManager", "assignSSEsToGraphInOrder(): SSE not found in DB, cannot assign it to graph.");
+                DP.getInstance().e("DBManager", "assignSSEsToProteinGraphInOrder(): SSE not found in DB, cannot assign it to graph.");
             }
         }
         
         Integer graphDbID = DBManager.getDBGraphID(pdb_id, chain_name, ProtGraphs.getGraphTypeString(graph_type));
         if(graphDbID > 0) {
             for(int i = 0; i < sseDBids.size(); i++) {
-                numAssigned += DBManager.assignSSEtoGraph(sseDBids.get(i), graphDbID, (i+1));
+                numAssigned += DBManager.assignSSEtoProteinGraph(sseDBids.get(i), graphDbID, (i+1));
             }                            
         } else {
-            DP.getInstance().e("DBManager", "assignSSEsToGraphInOrder(): Graph not found in DB, cannot assign SSEs to it.");            
+            DP.getInstance().e("DBManager", "assignSSEsToProteinGraphInOrder(): Graph not found in DB, cannot assign SSEs to it.");            
         }
         
         return numAssigned;
     }
     
     /**
-     * Assigns an SSE to a graph, defining its position in it.
+     * Assigns the SSEs in the list to the given folding graph (identified by PDB ID, chain ID and graph type) in the database, using the order
+     * of the SSEs in the input list.
+     * @param sses a list of SSEs, in the order of the graph (N to C terminus on the chain, but some SSEs of the chain may be missing of course, depending on the graph type)
+     * @param foldingGraphDbId the database ID of the folding graph
+     * @return the number of SSEs successfully assigned to the graph
+     * @throws SQLException if something goes wrong with the database server
+     */
+    public static Integer assignSSEsToFoldingGraphInOrder(ArrayList<SSE> sses, Integer foldingGraphDbId) throws SQLException {
+        Integer numAssigned = 0;
+        
+        Integer chain_database_id = DBManager.getDBChainIDofFoldingGraph(foldingGraphDbId);
+        
+        ArrayList<Integer> sseDBids = new ArrayList<Integer>();
+        for(SSE sse : sses) {
+            Integer sseID = DBManager.getDBSseID(sse.getStartDsspNum(), chain_database_id);
+            if(sseID > 0) {
+                sseDBids.add(sseID);
+            }
+            else {
+                DP.getInstance().e("DBManager", "assignSSEsToFoldingGraphInOrder(): SSE not found in DB, cannot assign it to graph.");
+            }
+        }
+        
+
+        if(foldingGraphDbId > 0) {
+            for(int i = 0; i < sseDBids.size(); i++) {
+                numAssigned += DBManager.assignSSEtoFoldingGraph(sseDBids.get(i), foldingGraphDbId, (i+1));
+            }                            
+        } else {
+            DP.getInstance().e("DBManager", "assignSSEsToFoldingGraphInOrder(): Graph not found in DB, cannot assign SSEs to it.");            
+        }
+        
+        return numAssigned;
+    }
+    
+    
+    
+    /**
+     * Determines the internal database ID (primary key) of the protein chain of the given folding graph.
+     * @param foldingGraphDbId the internal folding graph ID from the database
+     * @return the database ID or a value smaller than zero if no such chain (or graph) exists
+     * @throws SQLException 
+     */
+    public static Integer getDBChainIDofFoldingGraph(Integer foldingGraphDbId) throws SQLException {
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT c.chain_id FROM " + tbl_foldinggraph + " f WHERE (f.foldinggraph_id = ?) INNER JOIN " + tbl_proteingraph + " p ON f.parent_graph_id = p.graph_id INNER JOIN " + tbl_chain + " c ON p.chain_id = c.chain_id;";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setInt(1, foldingGraphDbId);
+                                
+            rs = statement.executeQuery();
+            dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: getDBChainIDofFoldingGraph(): '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
+                dbc.setAutoCommit(true);
+            } catch(Exception e) { DP.getInstance().w("DB: getDBChainIDofFoldingGraph(): Could not close statement and reset autocommit."); }
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        if(tableData.size() >= 1) {
+            if(tableData.get(0).size() >= 1) {
+                return(Integer.valueOf(tableData.get(0).get(0)));
+            }
+            else {
+                DP.getInstance().w("DB: getDBChainIDofFoldingGraph(): Folding graph not in DB.");
+                return(-1);
+            }
+        }
+        else {
+            return(-1);
+        }        
+                      
+    }
+    
+    
+    
+    /**
+     * Assigns an SSE to a protein graph, defining its position in it.
      * @param sseDbId the database id (primary key) of the SSE
      * @param graphDbId the database id (primary key) of the graph
      * @param ssePositionInGraph the position of the SSE in the graph. The first SSE should be 1 (NOT 0).
      * @return the number of affected rows (1 on success, 0 on error)
      */
-    public static Integer assignSSEtoGraph(Integer sseDbId, Integer graphDbId, Integer ssePositionInGraph) throws SQLException {
+    public static Integer assignSSEtoProteinGraph(Integer sseDbId, Integer graphDbId, Integer ssePositionInGraph) throws SQLException {
         if(ssePositionInGraph <= 0) {
-            DP.getInstance().e("DBManager", "assignSSEToGraph(): ssePositionInGraph must be > 0, skipping SSE assignment.");            
+            DP.getInstance().e("DBManager", "assignSSEToProteinGraph(): ssePositionInGraph must be > 0, skipping SSE assignment.");            
             return 0;
         }
         
@@ -1023,13 +1220,13 @@ public class DBManager {
             numRowsAffected = statement.executeUpdate();
             dbc.commit();
         } catch (SQLException e ) {
-            System.err.println("ERROR: SQL: updateGraphImagePathInDB: '" + e.getMessage() + "'.");
+            System.err.println("ERROR: SQL: assignSSEToProteinGraph(): '" + e.getMessage() + "'.");
             if (dbc != null) {
                 try {
-                    System.err.print("ERROR: SQL: updateGraphImagePathInDB: Transaction is being rolled back.");
+                    System.err.print("ERROR: SQL: assignSSEToProteinGraph(): Transaction is being rolled back.");
                     dbc.rollback();
                 } catch(SQLException excep) {
-                    System.err.println("ERROR: SQL: updateGraphImagePathInDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                    System.err.println("ERROR: SQL: assignSSEToProteinGraph(): Could not roll back transaction: '" + excep.getMessage() + "'.");                    
                 }
             }
         } finally {
@@ -1041,6 +1238,59 @@ public class DBManager {
         
         return numRowsAffected;
     }
+    
+    
+    /**
+     * Assigns an SSE to a folding graph, defining its position in it.
+     * @param sseDbId the database id (primary key) of the SSE
+     * @param graphDbId the database id (primary key) of the graph
+     * @param ssePositionInGraph the position of the SSE in the graph. The first SSE should be 1 (NOT 0).
+     * @return the number of affected rows (1 on success, 0 on error)
+     */
+    public static Integer assignSSEtoFoldingGraph(Integer sseDbId, Integer graphDbId, Integer ssePositionInGraph) throws SQLException {
+        if(ssePositionInGraph <= 0) {
+            DP.getInstance().e("DBManager", "assignSSEToFoldingGraph(): ssePositionInGraph must be > 0, skipping SSE assignment.");            
+            return 0;
+        }
+        
+        Integer numRowsAffected = 0;
+        
+        // assign SSE
+        PreparedStatement statement = null;
+        
+        String query = "INSERT INTO " + tbl_nm_ssetofoldinggraph + " (sse_id, foldinggraph_id, position_in_graph) VALUES (?, ?, ?);";
+        
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            
+            statement.setInt(1, sseDbId);
+            statement.setInt(2, graphDbId);
+            statement.setInt(3, ssePositionInGraph);
+                                
+            numRowsAffected = statement.executeUpdate();
+            dbc.commit();
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: assignSSEToFoldingGraph(): '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: assignSSEToFoldingGraph(): Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: assignSSEToFoldingGraph(): Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        } 
+        
+        return numRowsAffected;    
+    }
+    
     
     /**
      * Writes information on the graphlet counts for a protein graph to the database. Used by graphlet computation
