@@ -1775,11 +1775,12 @@ public class Main {
         ProteinChainResults pcr;
         for(Integer i = 0; i < allChains.size(); i++) {
             c = allChains.get(i);
+            String chain = c.getPdbChainID();
             if(! silent) {
-                System.out.println("  +++++ Handling chain '" + c.getPdbChainID() + "'. +++++");
+                System.out.println("  +++++ Handling chain '" + chain + "'. +++++");
             }
 
-            ProtMetaInfo pmi = FileParser.getMetaInfo(pdbid, c.getPdbChainID());
+            ProtMetaInfo pmi = FileParser.getMetaInfo(pdbid, chain);
             //pmi.print();
             md.put("pdb_mol_name", pmi.getMolName());
             md.put("pdb_org_sci", pmi.getOrgScientific());
@@ -1787,18 +1788,18 @@ public class Main {
             
             pcr = new ProteinChainResults(c.getPdbChainID());
             // register results for chain
-            ProteinResults.getInstance().addProteinChainResults(pcr, c.getPdbChainID());
+            ProteinResults.getInstance().addProteinChainResults(pcr, chain);
             pcr.setChainMetaData(pmi);
 
             if(Settings.getBoolean("plcc_B_useDB")) {
                 try {
-                    if(DBManager.writeChainToDB(c.getPdbChainID(), pdbid, pmi.getMolName(), pmi.getOrgScientific(), pmi.getOrgCommon())) {
+                    if(DBManager.writeChainToDB(chain, pdbid, pmi.getMolName(), pmi.getOrgScientific(), pmi.getOrgCommon())) {
                         if(! silent) {
-                            System.out.println("    Info on chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
+                            System.out.println("    Info on chain '" + chain + "' of protein '" + pdbid + "' written to DB.");
                         }
                     }
                     else {
-                        DP.getInstance().w("Could not write info on chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' to DB.");
+                        DP.getInstance().w("Could not write info on chain '" + chain + "' of protein '" + pdbid + "' to DB.");
                     }
                 }
                 catch(Exception e) {
@@ -1808,7 +1809,7 @@ public class Main {
 
             // determine SSEs for this chain
             if(! silent) {
-                System.out.println("    Creating all SSEs for chain '" + c.getPdbChainID() + "' consisting of " + c.getResidues().size() + " residues.");
+                System.out.println("    Creating all SSEs for chain '" + chain + "' consisting of " + c.getResidues().size() + " residues.");
             }
             chainDsspSSEs = createAllDsspSSEsFromResidueList(c.getResidues());
             
@@ -1817,7 +1818,7 @@ public class Main {
             }
             
             if(Settings.getBoolean("plcc_B_ptgl_text_output")) {
-                String sseMappingsFile = Settings.get("plcc_S_output_dir") + fs + pdbid.toLowerCase()  + "_" + c.getPdbChainID() + ".ssemap";
+                String sseMappingsFile = Settings.get("plcc_S_output_dir") + fs + pdbid.toLowerCase()  + "_" + chain + ".ssemap";
                 writeSSEMappings(sseMappingsFile, c, pdbid);
             }
             
@@ -1848,11 +1849,11 @@ public class Main {
                     try {
                        SSE ssej = allChainSSEs.get(j);
                        Integer ssePositionInChain = j + 1;
-                       DBManager.writeSSEToDB(pdbid, c.getPdbChainID(), ssej.getStartDsspNum(), ssej.getEndDsspNum(), ssej.getStartPdbResID(), ssej.getEndPdbResID(), ssej.getAASequence(), ssej.getSSETypeInt(), ssej.getLigandName3(), ssePositionInChain); 
+                       DBManager.writeSSEToDB(pdbid, chain, ssej.getStartDsspNum(), ssej.getEndDsspNum(), ssej.getStartPdbResID(), ssej.getEndPdbResID(), ssej.getAASequence(), ssej.getSSETypeInt(), ssej.getLigandName3(), ssePositionInChain); 
                        //System.out.println("  Info on SSE #" + (j + 1) + " of chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
                     }
                     catch(Exception e) {
-                        DP.getInstance().w("Could not write info on SSE # " + j + " of chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' to DB.");
+                        DP.getInstance().w("Could not write info on SSE # " + j + " of chain '" + chain + "' of protein '" + pdbid + "' to DB.");
                     }
                 }
             }
@@ -1893,7 +1894,7 @@ public class Main {
                 //System.out.println("SSEs: " + allChainSSEs);                
 
                 ProtGraph pg = calcGraphType(gt, allChainSSEs, c, resContacts, pdbid);
-                pg.setInfo(pdbid, c.getPdbChainID(), gt);
+                pg.setInfo(pdbid, chain, gt);
                 pg.addMetadata(md);
                 
                 pcr.addProteinGraph(pg, gt);
@@ -1920,7 +1921,7 @@ public class Main {
                 }
                 if(isoLig > 0) {
                     if(! silent) {
-                        System.out.println("      The " + gt + " graph of " + pdbid + " chain " + c.getPdbChainID() + coilsUsed + " contains " + isoLig + " isolated ligands.");
+                        System.out.println("      The " + gt + " graph of " + pdbid + " chain " + chain + coilsUsed + " contains " + isoLig + " isolated ligands.");
                     }
                 }
                 
@@ -1938,7 +1939,7 @@ public class Main {
                     //System.out.println("  Considering coils, this may fragment SSEs.");
                     coils = "_coils";
                 }
-                fileNameWithoutExtension = pdbid + "_" + c.getPdbChainID() + "_" + gt + coils + "_PG";
+                fileNameWithoutExtension = pdbid + "_" + chain + "_" + gt + coils + "_PG";
                 fileNameWithExtension = fileNameWithoutExtension + Settings.get("plcc_S_img_output_fileext");
                 
                 //pg.toFile(file + ".ptg");
@@ -1946,7 +1947,7 @@ public class Main {
                 // Create the file in a subdir tree based on the protein meta data if requested
                 if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
                    
-                    File targetDir = IO.generatePDBstyleSubdirTreeNameWithChain(new File(outputDir), pdbid, c.getPdbChainID());
+                    File targetDir = IO.generatePDBstyleSubdirTreeNameWithChain(new File(outputDir), pdbid, chain);
                     if(targetDir != null) {
                         ArrayList<String> errors = IO.createDirIfItDoesntExist(targetDir);
                         if( ! errors.isEmpty()) {
@@ -2056,21 +2057,21 @@ public class Main {
                 // But we may need to write the graph to the database
                 if(Settings.getBoolean("plcc_B_useDB")) {
                     try { 
-                        DBManager.writeProteinGraphToDB(pdbid, c.getPdbChainID(), ProtGraphs.getGraphTypeCode(gt), pg.toGraphModellingLanguageFormat(), pg.toVPLGGraphFormat(), pg.toKavoshFormat(), pg.toDOTLanguageFormat(), pg.toPtglFormatADJ(), pg.toPtglFormatRED(), pg.toPtglFormatKEY(), pg.toPtglFormatSEQ(), pg.getSSEStringSequential()); 
+                        DBManager.writeProteinGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), pg.toGraphModellingLanguageFormat(), pg.toVPLGGraphFormat(), pg.toKavoshFormat(), pg.toDOTLanguageFormat(), pg.toPtglFormatADJ(), pg.toPtglFormatRED(), pg.toPtglFormatKEY(), pg.toPtglFormatSEQ(), pg.getSSEStringSequential()); 
                         
                         if(! silent) {
-                            System.out.println("      Inserted '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + c.getPdbChainID() + "' into DB.");
+                            System.out.println("      Inserted '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + chain + "' into DB.");
                         }
                     }
                     catch(SQLException e) { 
-                        DP.getInstance().e("Main", "Failed to insert '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + c.getPdbChainID() + "' into DB: '" + e.getMessage() + "'."); 
+                        DP.getInstance().e("Main", "Failed to insert '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + chain + "' into DB: '" + e.getMessage() + "'."); 
                     }
                     
                     // assign SSEs in database
                     try {
-                        int numAssigned = DBManager.assignSSEsToGraphInOrder(pg.sseList, pdbid, c.getPdbChainID(), ProtGraphs.getGraphTypeCode(gt));
+                        int numAssigned = DBManager.assignSSEsToGraphInOrder(pg.sseList, pdbid, chain, ProtGraphs.getGraphTypeCode(gt));
                         if(! silent) {
-                            System.out.println("      Assigned " + numAssigned + " SSEs to " + gt + " graph of PDB ID '" + pdbid + "' chain '" + c.getPdbChainID() + "' in the DB.");
+                            System.out.println("      Assigned " + numAssigned + " SSEs to " + gt + " graph of PDB ID '" + pdbid + "' chain '" + chain + "' in the DB.");
                         }
                     } catch(SQLException ex) {
                        DP.getInstance().e("Main", "Could not assign SSEs to graph in the database: '" + ex.getMessage() + "'.");
@@ -2088,18 +2089,27 @@ public class Main {
                         if(Settings.getBoolean("plcc_B_useDB")) {
                             Integer graphDBID = -1;
                             try {
-                                graphDBID = DBManager.getDBGraphID(pdbid, c.getPdbChainID(), gt);
+                                graphDBID = DBManager.getDBGraphID(pdbid, chain, gt);
                             } catch(SQLException ex) {
                                 DP.getInstance().e("Main", "Could not find graph in database: '" + ex.getMessage() + "'.");
                             }
                             if(graphDBID > 0) {
+                                
+                                
+                                String dbImagePath = fileNameWithExtension;
+                                if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
+                                    dbImagePath = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain) + fs + fileNameWithExtension;
+                                }
+                                DP.getInstance().d("dbImagePath is '" + dbImagePath + "'.");
+                                
+                                
                                 try {
-                                    DBManager.updateGraphImagePathInDB(graphDBID, ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT, fileNameWithExtension);
+                                    DBManager.updateGraphImagePathInDB(graphDBID, ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT, dbImagePath);
                                 } catch(SQLException e) {
                                     DP.getInstance().e("Main", "Could not update graph image path in database: '" + e.getMessage() + "'.");
                                 }
                             } else {
-                                DP.getInstance().e("Main", "Could not find " + gt + " graph for PDB " + pdbid + " chain " + c.getPdbChainID() + " in database to set image path.");
+                                DP.getInstance().e("Main", "Could not find " + gt + " graph for PDB " + pdbid + " chain " + chain + " in database to set image path.");
                             }
                         }
                     }                   

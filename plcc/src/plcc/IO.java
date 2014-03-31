@@ -382,11 +382,33 @@ public class IO {
             dirStructure = null;
             //System.exit(1);
         } else {                    
-            String mid2Chars = pdbid.substring(1, 3);                    
-            dirStructure = new File(baseOutputDir.getAbsolutePath() + fs + mid2Chars + fs + pdbid + fs + chain);
+            String relPathToBaseOutputDir = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain);
+            dirStructure = new File(baseOutputDir.getAbsolutePath() + fs + relPathToBaseOutputDir);
         }
         
         return dirStructure;
+    }
+    
+    
+    /**
+     * Generates the PDB-FTP server style-sub path from the pidb id and chain. This path consists of 3 sub directory
+     * names: the mid 2 chars, the PDB id and the chain. Example: for 8icd, chain A, this is 'ic/8icd/A'.
+     * @param pdbid the PDB id, e.g., 8icd
+     * @param chain the PDB chain name, e.g., A
+     * @return the PDB-style sub dir path, e.g., 'ic/8icd/A'. Note that there are no slashes at the start and end.
+     */
+    public static String getRelativeOutputPathtoBaseOutputDir(String pdbid, String chain) {
+        String fs = System.getProperty("file.separator");
+        String res;
+        if(! (pdbid.length() == 4)) {
+            DP.getInstance().w("IO.getRelativeOutputPathtoBaseOutputDir()", "The length of the PDB ID is not 4, returning empty path.");
+            res = "";
+        } else {                    
+            String mid2Chars = pdbid.substring(1, 3);  
+            res = mid2Chars + fs + pdbid + fs + chain;
+        }
+        
+        return res;
     }
     
     /**
