@@ -2087,7 +2087,7 @@ public class Main {
                         
                         // set image location is database if required
                         if(Settings.getBoolean("plcc_B_useDB")) {
-                            Integer graphDBID = -1;
+                            Long graphDBID = -1L;
                             try {
                                 graphDBID = DBManager.getDBGraphID(pdbid, chain, gt);
                             } catch(SQLException ex) {
@@ -2100,7 +2100,7 @@ public class Main {
                                 if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
                                     dbImagePath = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain) + fs + fileNameWithExtension;
                                 }
-                                DP.getInstance().d("dbImagePath is '" + dbImagePath + "'.");
+                                //DP.getInstance().d("dbImagePath is '" + dbImagePath + "'.");
                                 
                                 
                                 try {

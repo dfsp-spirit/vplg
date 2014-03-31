@@ -550,7 +550,7 @@ public class DBManager {
      */
     public static Boolean writeSSEToDB(String pdb_id, String chain_name, Integer dssp_start, Integer dssp_end, String pdb_start, String pdb_end, String sequence, Integer sse_type, String lig_name, Integer ssePositionInChain) throws SQLException {
 
-        Integer chain_id = getDBChainID(pdb_id, chain_name);
+        Long chain_id = getDBChainID(pdb_id, chain_name);
 
         if (chain_id < 0) {
             System.err.println("ERROR: writeSSEToDB: Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert SSE.");
@@ -577,7 +577,7 @@ public class DBManager {
             dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
-            statement.setInt(1, chain_id);
+            statement.setLong(1, chain_id);
             statement.setInt(2, dssp_start);
             statement.setInt(3, dssp_end);
             statement.setString(4, pdb_start);
@@ -801,7 +801,7 @@ public class DBManager {
      */
     public static Boolean writeProteinGraphToDB(String pdb_id, String chain_name, Integer graph_type, String graph_string_gml, String graph_string_plcc, String graph_string_kavosh, String graph_string_dotlanguage, String graph_string_ptgl_red, String graph_string_ptgl_adj, String graph_string_ptgl_key, String graph_string_ptgl_seq, String sse_string) throws SQLException {
                
-        Integer chain_db_id = getDBChainID(pdb_id, chain_name);
+        Long chain_db_id = getDBChainID(pdb_id, chain_name);
         Boolean result = false;
 
         if (chain_db_id < 0) {
@@ -817,7 +817,7 @@ public class DBManager {
             dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
-            statement.setInt(1, chain_db_id);
+            statement.setLong(1, chain_db_id);
             statement.setInt(2, graph_type);
             statement.setString(3, graph_string_gml);
             statement.setString(4, graph_string_plcc);
@@ -875,7 +875,7 @@ public class DBManager {
      */
     public static Long writeFoldingGraphToDB(String pdb_id, String chain_name, Integer graph_type, String graph_string_gml, String graph_string_plcc, String graph_string_kavosh, String graph_string_dotlanguage, String graph_string_ptgl_red, String graph_string_ptgl_adj, String graph_string_ptgl_key, String graph_string_ptgl_seq, String sse_string) throws SQLException {
                
-        Integer chain_db_id = getDBChainID(pdb_id, chain_name);
+        Long chain_db_id = getDBChainID(pdb_id, chain_name);
         Boolean result = false;
         ResultSet generatedKeys = null;
         Long insertID = -1L;
@@ -886,7 +886,7 @@ public class DBManager {
         }
         
         String graphTypeString = ProtGraphs.getGraphTypeString(graph_type);
-        Integer parent_graph_id = DBManager.getDBGraphID(pdb_id, chain_name, graphTypeString);
+        Long parent_graph_id = DBManager.getDBGraphID(pdb_id, chain_name, graphTypeString);
         if(parent_graph_id <= 0) {
             DP.getInstance().e("writeFoldingGraphToDB()" , "Could not find parent " + graphTypeString + " graph with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert folding graph.");
             return (-1L);
@@ -901,7 +901,7 @@ public class DBManager {
             dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
-            statement.setInt(1, parent_graph_id);
+            statement.setLong(1, parent_graph_id);
             statement.setString(2, graph_string_gml);
             statement.setString(3, graph_string_plcc);
             statement.setString(4, graph_string_kavosh);
@@ -1000,7 +1000,7 @@ public class DBManager {
      * @return the number of rows affected by the SQL query
      * @throws SQLException if something goes wrong with the database
      */
-    public static Integer updateProteinGraphImagePathInDB(Integer graphDatabaseID, String graphImageRepresentationType, String relativeImagePath) throws SQLException {
+    public static Integer updateProteinGraphImagePathInDB(Long graphDatabaseID, String graphImageRepresentationType, String relativeImagePath) throws SQLException {
         
         PreparedStatement statement = null;
         String graphImageFieldName = DBManager.getFieldnameForGraphImageRepresentationType(graphImageRepresentationType);
@@ -1018,7 +1018,7 @@ public class DBManager {
 
             
             statement.setString(1, relativeImagePath);
-            statement.setInt(2, graphDatabaseID);
+            statement.setLong(2, graphDatabaseID);
                                 
             numRowsAffected = statement.executeUpdate();
             dbc.commit();
@@ -1112,15 +1112,15 @@ public class DBManager {
     public static Integer assignSSEsToProteinGraphInOrder(ArrayList<SSE> sses, String pdb_id, String chain_name, Integer graph_type) throws SQLException {
         Integer numAssigned = 0;
         
-        Integer chain_id = getDBChainID(pdb_id, chain_name);
+        Long chain_id = getDBChainID(pdb_id, chain_name);
         if(chain_id <= 0) {
             DP.getInstance().e("DBManager", "assignSSEsToProteinGraphInOrder(): Chain not found in DB, cannot assign SSEs.");
             return 0;
         }
         
-        ArrayList<Integer> sseDBids = new ArrayList<Integer>();
+        ArrayList<Long> sseDBids = new ArrayList<Long>();
         for(SSE sse : sses) {
-            Integer sseID = DBManager.getDBSseID(sse.getStartDsspNum(), chain_id);
+            Long sseID = DBManager.getDBSseID(sse.getStartDsspNum(), chain_id);
             if(sseID > 0) {
                 sseDBids.add(sseID);
             }
@@ -1129,7 +1129,7 @@ public class DBManager {
             }
         }
         
-        Integer graphDbID = DBManager.getDBGraphID(pdb_id, chain_name, ProtGraphs.getGraphTypeString(graph_type));
+        Long graphDbID = DBManager.getDBGraphID(pdb_id, chain_name, ProtGraphs.getGraphTypeString(graph_type));
         if(graphDbID > 0) {
             for(int i = 0; i < sseDBids.size(); i++) {
                 numAssigned += DBManager.assignSSEtoProteinGraph(sseDBids.get(i), graphDbID, (i+1));
@@ -1149,14 +1149,14 @@ public class DBManager {
      * @return the number of SSEs successfully assigned to the graph
      * @throws SQLException if something goes wrong with the database server
      */
-    public static Integer assignSSEsToFoldingGraphInOrder(ArrayList<SSE> sses, Integer foldingGraphDbId) throws SQLException {
+    public static Integer assignSSEsToFoldingGraphInOrder(ArrayList<SSE> sses, Long foldingGraphDbId) throws SQLException {
         Integer numAssigned = 0;
         
-        Integer chain_database_id = DBManager.getDBChainIDofFoldingGraph(foldingGraphDbId);
+        Long chain_database_id = DBManager.getDBChainIDofFoldingGraph(foldingGraphDbId);
         
-        ArrayList<Integer> sseDBids = new ArrayList<Integer>();
+        ArrayList<Long> sseDBids = new ArrayList<Long>();
         for(SSE sse : sses) {
-            Integer sseID = DBManager.getDBSseID(sse.getStartDsspNum(), chain_database_id);
+            Long sseID = DBManager.getDBSseID(sse.getStartDsspNum(), chain_database_id);
             if(sseID > 0) {
                 sseDBids.add(sseID);
             }
@@ -1185,7 +1185,7 @@ public class DBManager {
      * @return the database ID or a value smaller than zero if no such chain (or graph) exists
      * @throws SQLException 
      */
-    public static Integer getDBChainIDofFoldingGraph(Integer foldingGraphDbId) throws SQLException {
+    public static Long getDBChainIDofFoldingGraph(Long foldingGraphDbId) throws SQLException {
         
         ResultSetMetaData md;
         ArrayList<String> columnHeaders;
@@ -1202,7 +1202,7 @@ public class DBManager {
             dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
-            statement.setInt(1, foldingGraphDbId);
+            statement.setLong(1, foldingGraphDbId);
                                 
             rs = statement.executeQuery();
             dbc.commit();
@@ -1242,15 +1242,15 @@ public class DBManager {
         // OK, check size of results table and return 1st field of 1st column
         if(tableData.size() >= 1) {
             if(tableData.get(0).size() >= 1) {
-                return(Integer.valueOf(tableData.get(0).get(0)));
+                return(Long.valueOf(tableData.get(0).get(0)));
             }
             else {
                 DP.getInstance().w("DB: getDBChainIDofFoldingGraph(): Folding graph not in DB.");
-                return(-1);
+                return(-1L);
             }
         }
         else {
-            return(-1);
+            return(-1L);
         }        
                       
     }
@@ -1264,7 +1264,7 @@ public class DBManager {
      * @param ssePositionInGraph the position of the SSE in the graph. The first SSE should be 1 (NOT 0).
      * @return the number of affected rows (1 on success, 0 on error)
      */
-    public static Integer assignSSEtoProteinGraph(Integer sseDbId, Integer graphDbId, Integer ssePositionInGraph) throws SQLException {
+    public static Integer assignSSEtoProteinGraph(Long sseDbId, Long graphDbId, Integer ssePositionInGraph) throws SQLException {
         if(ssePositionInGraph <= 0) {
             DP.getInstance().e("DBManager", "assignSSEToProteinGraph(): ssePositionInGraph must be > 0, skipping SSE assignment.");            
             return 0;
@@ -1282,8 +1282,8 @@ public class DBManager {
             statement = dbc.prepareStatement(query);
 
             
-            statement.setInt(1, sseDbId);
-            statement.setInt(2, graphDbId);
+            statement.setLong(1, sseDbId);
+            statement.setLong(2, graphDbId);
             statement.setInt(3, ssePositionInGraph);
                                 
             numRowsAffected = statement.executeUpdate();
@@ -1316,7 +1316,7 @@ public class DBManager {
      * @param ssePositionInGraph the position of the SSE in the graph. The first SSE should be 1 (NOT 0).
      * @return the number of affected rows (1 on success, 0 on error)
      */
-    public static Integer assignSSEtoFoldingGraph(Integer sseDbId, Integer graphDbId, Integer ssePositionInGraph) throws SQLException {
+    public static Integer assignSSEtoFoldingGraph(Long sseDbId, Long graphDbId, Integer ssePositionInGraph) throws SQLException {
         if(ssePositionInGraph <= 0) {
             DP.getInstance().e("DBManager", "assignSSEToFoldingGraph(): ssePositionInGraph must be > 0, skipping SSE assignment.");            
             return 0;
@@ -1334,8 +1334,8 @@ public class DBManager {
             statement = dbc.prepareStatement(query);
 
             
-            statement.setInt(1, sseDbId);
-            statement.setInt(2, graphDbId);
+            statement.setLong(1, sseDbId);
+            statement.setLong(2, graphDbId);
             statement.setInt(3, ssePositionInGraph);
                                 
             numRowsAffected = statement.executeUpdate();
@@ -1380,7 +1380,7 @@ public class DBManager {
             return false;
         }
         
-        Integer chain_db_id = getDBChainID(pdb_id, chain_name);
+        Long chain_db_id = getDBChainID(pdb_id, chain_name);
         Boolean result = false;
 
         if (chain_db_id < 0) {
@@ -1396,7 +1396,7 @@ public class DBManager {
             dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
-            statement.setInt(1, chain_db_id);
+            statement.setLong(1, chain_db_id);
             statement.setInt(2, graph_type);
             statement.setInt(3, graphlet_counts[0]);
             statement.setInt(4, graphlet_counts[1]);
@@ -1441,16 +1441,16 @@ public class DBManager {
             return (false);
         }
 
-        Integer chain_id = getDBChainID(pdb_id, chain_name);
+        Long db_chain_id = getDBChainID(pdb_id, chain_name);
 
-        if (chain_id < 0) {
+        if (db_chain_id < 0) {
             System.err.println("ERROR: DB: writeContactToDB(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert SSE.");
             return (false);
         }
 
-        Integer sse1_id = getDBSseID(sse1_dssp_start, chain_id);
-        Integer sse2_id = getDBSseID(sse2_dssp_start, chain_id);
-        Integer tmp;
+        Long sse1_id = getDBSseID(sse1_dssp_start, db_chain_id);
+        Long sse2_id = getDBSseID(sse2_dssp_start, db_chain_id);
+        Long tmp;
 
         // We may need to switch the IDs to make sure the 1st of them is always lower
         if (sse1_id > sse2_id) {
@@ -1468,8 +1468,8 @@ public class DBManager {
             dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
-            statement.setInt(1, sse1_id);
-            statement.setInt(2, sse2_id);
+            statement.setLong(1, sse1_id);
+            statement.setLong(2, sse2_id);
             statement.setInt(3, contact_type);
                                 
             statement.executeUpdate();
@@ -1520,8 +1520,8 @@ public class DBManager {
             return false;
         }
 
-        Integer chain1_id = getDBChainID(pdb_id, chain1_name);
-        Integer chain2_id = getDBChainID(pdb_id, chain2_name);
+        Long chain1_id = getDBChainID(pdb_id, chain1_name);
+        Long chain2_id = getDBChainID(pdb_id, chain2_name);
 
         if (chain1_id < 0) {
             System.err.println("ERROR: DB: writeContactToDB(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain1_name + "' in DB, could not insert complex contact.");
@@ -1542,8 +1542,8 @@ public class DBManager {
             dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
             
-            statement.setInt(1, chain1_id);
-            statement.setInt(2, chain2_id);
+            statement.setLong(1, chain1_id);
+            statement.setLong(2, chain2_id);
             statement.setInt(3, numContactsHH);
             statement.setInt(4, numContactsHS);
             statement.setInt(5, numContactsHL);
@@ -1580,21 +1580,21 @@ public class DBManager {
     /**
      * Retrieves the internal database SSE ID of a SSE from the DB.
      * @param dssp_start the DSSP start residue number of the SSE
-     * @param chain_id the DB chain ID of the chain the SSE is part of
+     * @param db_chain_id the DB chain ID of the chain the SSE is part of
      * @return The ID if it was found, -1 otherwise.
      */
-    private static Integer getDBSseID(Integer dssp_start, Integer chain_id) {
-        Integer id = -1;
-        ArrayList<ArrayList<String>> rowarray = doSelectQuery("SELECT s.sse_id FROM " + tbl_sse + " s JOIN " + tbl_chain + " c ON ( s.chain_id = c.chain_id ) WHERE ( s.dssp_start = " + dssp_start + " AND c.chain_id = '" + chain_id + "' );");
+    private static Long getDBSseID(Integer dssp_start, Long db_chain_id) {
+        Long id = -1L;
+        ArrayList<ArrayList<String>> rowarray = doSelectQuery("SELECT s.sse_id FROM " + tbl_sse + " s JOIN " + tbl_chain + " c ON ( s.chain_id = c.chain_id ) WHERE ( s.dssp_start = " + dssp_start + " AND c.chain_id = '" + db_chain_id + "' );");
 
         if (rowarray == null) {
-            return (-1);
+            return (-1L);
         } else {
             try {
-                id = Integer.valueOf(rowarray.get(0).get(0));
+                id = Long.valueOf(rowarray.get(0).get(0));
                 return (id);
             } catch (Exception e) {
-                return (-1);
+                return (-1L);
             }
         }
     }
@@ -1608,7 +1608,7 @@ public class DBManager {
      * @param chain_name the PDB chain name
      * @return the internal database chain id (its primary key, e.g. '2352365175365'). This is NOT the pdb chain name.
      */
-    public static Integer getDBChainID(String pdb_id, String chain_name) {
+    public static Long getDBChainID(String pdb_id, String chain_name) {
         
         ResultSetMetaData md;
         ArrayList<String> columnHeaders;
@@ -1666,15 +1666,15 @@ public class DBManager {
         // OK, check size of results table and return 1st field of 1st column
         if(tableData.size() >= 1) {
             if(tableData.get(0).size() >= 1) {
-                return(Integer.valueOf(tableData.get(0).get(0)));
+                return(Long.valueOf(tableData.get(0).get(0)));
             }
             else {
                 DP.getInstance().w("DB: Chain '" + chain_name + "' of PDB ID '" + pdb_id + "' not in DB.");
-                return(-1);
+                return(-1L);
             }
         }
         else {
-            return(-1);
+            return(-1L);
         }        
     }
     
@@ -1897,7 +1897,7 @@ public class DBManager {
     public static String getGraphString(String graph_format, String pdb_id, String chain_name, String graph_type) throws SQLException {
         Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
         
-        Integer chain_db_id = getDBChainID(pdb_id, chain_name);
+        Long chain_db_id = getDBChainID(pdb_id, chain_name);
         ResultSetMetaData md;
         ArrayList<String> columnHeaders;
         ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
@@ -1934,7 +1934,7 @@ public class DBManager {
             dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
-            statement.setInt(1, chain_db_id);
+            statement.setLong(1, chain_db_id);
             statement.setInt(2, gtc);
                                 
             rs = statement.executeQuery();
@@ -1991,10 +1991,10 @@ public class DBManager {
      * @return the database ID of the graph or a negative number if an error occurred or no such graph exists in the db
      * @throws SQLException 
      */
-    public static Integer getDBGraphID(String pdb_id, String chain_name, String graph_type) throws SQLException {
+    public static Long getDBGraphID(String pdb_id, String chain_name, String graph_type) throws SQLException {
         Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
         
-        Integer chain_db_id = getDBChainID(pdb_id, chain_name);
+        Long chain_db_id = getDBChainID(pdb_id, chain_name);
         ResultSetMetaData md;
         ArrayList<String> columnHeaders;
         ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
@@ -2004,7 +2004,7 @@ public class DBManager {
 
         if (chain_db_id < 0) {
             DP.getInstance().w("getGraph(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
-            return(-1);
+            return(-1L);
         }
 
         PreparedStatement statement = null;
@@ -2018,7 +2018,7 @@ public class DBManager {
             dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
-            statement.setInt(1, chain_db_id);
+            statement.setLong(1, chain_db_id);
             statement.setInt(2, gtc);
                                 
             rs = statement.executeQuery();
@@ -2056,20 +2056,20 @@ public class DBManager {
             if(tableData.get(0).size() >= 1) {
                 String graph_id_str = tableData.get(0).get(0);
                 try {
-                    Integer graph_id_int = Integer.parseInt(graph_id_str);
+                    Long graph_id_int = Long.parseLong(graph_id_str);
                     return graph_id_int;
                 } catch(java.lang.NumberFormatException e) {
                     DP.getInstance().e("DB: getGraphDatabaseID(): Could not parse graph database ID as integer, seems invalid.");
-                    return -1;
+                    return -1L;
                 }
             }
             else {
                 DP.getInstance().w("DB: No entry for graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
-                return(-1);
+                return(-1L);
             }
         }
         else {
-            return(-1);
+            return(-1L);
         }        
     }
     
@@ -2089,7 +2089,7 @@ public class DBManager {
         
         Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
         
-        Integer chain_db_id = getDBChainID(pdb_id, chain_name);
+        Long chain_db_id = getDBChainID(pdb_id, chain_name);
         ResultSetMetaData md;
         ArrayList<String> columnHeaders;
         ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
@@ -2111,7 +2111,7 @@ public class DBManager {
             dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
-            statement.setInt(1, chain_db_id);
+            statement.setLong(1, chain_db_id);
             statement.setInt(2, gtc);
                                 
             rs = statement.executeQuery();
@@ -2216,7 +2216,7 @@ public class DBManager {
     public static String getSSEString(String pdb_id, String chain_name, String graph_type) throws SQLException {
         Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
         
-        Integer chain_db_id = getDBChainID(pdb_id, chain_name);
+        Long chain_db_id = getDBChainID(pdb_id, chain_name);
         ResultSetMetaData md;
         ArrayList<String> columnHeaders;
         ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
@@ -2238,7 +2238,7 @@ public class DBManager {
             dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
-            statement.setInt(1, chain_db_id);
+            statement.setLong(1, chain_db_id);
             statement.setInt(2, gtc);
                                 
             rs = statement.executeQuery();
@@ -2424,7 +2424,7 @@ public class DBManager {
     public static String getGraphImagePathSVG(String pdb_id, String chain_name, String graph_type) throws SQLException {
         Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
         
-        Integer chain_db_id = getDBChainID(pdb_id, chain_name);
+        Long chain_db_id = getDBChainID(pdb_id, chain_name);
         ResultSetMetaData md;
         ArrayList<String> columnHeaders;
         ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
@@ -2446,7 +2446,7 @@ public class DBManager {
             dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
-            statement.setInt(1, chain_db_id);
+            statement.setLong(1, chain_db_id);
             statement.setInt(2, gtc);
                                 
             rs = statement.executeQuery();
