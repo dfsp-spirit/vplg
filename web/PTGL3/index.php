@@ -114,7 +114,7 @@
 		<div id="Home">
 			<div class="container" id="intro">
 			<!-- Intro message -->
-				PTGL stands for Protein Topology Graph Library. It is a database application for protein topologies.
+				Protein Topology Graph Library aims at providing a database on protein secondary structure topologies.
 			</div><!-- end container-->
 		</div><!-- end Home -->
 		
