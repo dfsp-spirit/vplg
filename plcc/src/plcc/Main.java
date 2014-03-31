@@ -2104,7 +2104,7 @@ public class Main {
                                 
                                 
                                 try {
-                                    DBManager.updateGraphImagePathInDB(graphDBID, ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT, dbImagePath);
+                                    DBManager.updateProteinGraphImagePathInDB(graphDBID, ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT, dbImagePath);
                                 } catch(SQLException e) {
                                     DP.getInstance().e("Main", "Could not update graph image path in database: '" + e.getMessage() + "'.");
                                 }

@@ -978,7 +978,7 @@ public class DBManager {
     }
     
     /**
-     * Sets the image path for a specific graph representation on the database. The graph has to exist in the database already.
+     * Sets the image path for a specific protein graph representation in the database. The graph has to exist in the database already.
      * 
      * @param graphDatabaseID the graph ID in the database. Use the getGrapDatabaseID function if you dont know it.
      * @param graphImageRepresentationType The image representation type, defines format and image type (like PNG format and PTGL KEY notation image). Use the constants in ProtGraphs class, e.g., ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT.
@@ -986,12 +986,12 @@ public class DBManager {
      * @return the number of rows affected by the SQL query
      * @throws SQLException if something goes wrong with the database
      */
-    public static Integer updateGraphImagePathInDB(Integer graphDatabaseID, String graphImageRepresentationType, String relativeImagePath) throws SQLException {
+    public static Integer updateProteinGraphImagePathInDB(Integer graphDatabaseID, String graphImageRepresentationType, String relativeImagePath) throws SQLException {
         
         PreparedStatement statement = null;
         String graphImageFieldName = DBManager.getFieldnameForGraphImageRepresentationType(graphImageRepresentationType);
         if(graphImageFieldName == null) {
-            System.err.println("Invalid graph image represenation type. Cannot set graph image path in database.");
+            System.err.println("Invalid graph image represenation type. Cannot set protein graph image path in database.");
             return 0;
         }
 
@@ -1009,13 +1009,13 @@ public class DBManager {
             numRowsAffected = statement.executeUpdate();
             dbc.commit();
         } catch (SQLException e ) {
-            System.err.println("ERROR: SQL: updateGraphImagePathInDB: '" + e.getMessage() + "'.");
+            System.err.println("ERROR: SQL: updateProteinGraphImagePathInDB: '" + e.getMessage() + "'.");
             if (dbc != null) {
                 try {
-                    System.err.print("ERROR: SQL: updateGraphImagePathInDB: Transaction is being rolled back.");
+                    System.err.print("ERROR: SQL: updateProteinGraphImagePathInDB: Transaction is being rolled back.");
                     dbc.rollback();
                 } catch(SQLException excep) {
-                    System.err.println("ERROR: SQL: updateGraphImagePathInDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                    System.err.println("ERROR: SQL: updateProteinGraphImagePathInDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
                 }
             }
         } finally {
@@ -1028,6 +1028,61 @@ public class DBManager {
         return numRowsAffected;
         
     }
+    
+    
+    
+    /**
+     * Sets the image path for a specific folding graph representation in the database. The graph has to exist in the database already.
+     * 
+     * @param graphDatabaseID the graph ID in the database. Use the getGrapDatabaseID function if you dont know it.
+     * @param graphImageRepresentationType The image representation type, defines format and image type (like PNG format and PTGL KEY notation image). Use the constants in ProtGraphs class, e.g., ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT.
+     * @param relativeImagePath the relative image path to set in the database for the specified representation
+     * @return the number of rows affected by the SQL query
+     * @throws SQLException if something goes wrong with the database
+     */
+    public static Integer updateFoldingGraphImagePathInDB(Integer graphDatabaseID, String graphImageRepresentationType, String relativeImagePath) throws SQLException {
+        
+        PreparedStatement statement = null;
+        String graphImageFieldName = DBManager.getFieldnameForGraphImageRepresentationType(graphImageRepresentationType);
+        if(graphImageFieldName == null) {
+            System.err.println("Invalid folding graph image represenation type. Cannot set folding graph image path in database.");
+            return 0;
+        }
+
+        String query = "UPDATE " + tbl_foldinggraph + " SET " + graphImageFieldName + " = ? WHERE foldinggraph_id = ?;";
+        Integer numRowsAffected = 0;
+        
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            
+            statement.setString(1, relativeImagePath);
+            statement.setInt(2, graphDatabaseID);
+                                
+            numRowsAffected = statement.executeUpdate();
+            dbc.commit();
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: updateFoldingGraphImagePathInDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: updateFoldingGraphImagePathInDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: updateFoldingGraphImagePathInDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        } 
+       
+        return numRowsAffected;
+        
+    }
+    
     
     
     /**
