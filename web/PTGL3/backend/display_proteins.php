@@ -48,7 +48,7 @@ $tableString = '		<div id="myCarousel">
 						<div class="container">
 						<p>Select topology type</p>
 						
-						<form class="form-inline" role="form">
+						
 						<div class="radio">
 						  <label>
 						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
@@ -70,9 +70,8 @@ $tableString = '		<div id="myCarousel">
 						  </label>
 						</div>
 						
-						</form>
 						
-						<h3>1a0c</h3>
+					
 						<h4>Protein graph 1a0cA</h4>
 						
 						<div class="proteingraph">
@@ -263,7 +262,7 @@ $tableString = '		<div id="myCarousel">
 						<div class="container">
 						<p>Select topology type</p>
 						
-						<form class="form-inline" role="form">
+						
 						<div class="radio">
 						  <label>
 						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
@@ -285,9 +284,8 @@ $tableString = '		<div id="myCarousel">
 						  </label>
 						</div>
 						
-						</form>
 						
-						<h3>1a0c</h3>
+						
 						<h4>Protein graph 1a0cB</h4>
 						
 						<div class="proteingraph">
@@ -457,7 +455,7 @@ $tableString = '		<div id="myCarousel">
 						<div class="container">
 						<p>Select topology type</p>
 						
-						<form class="form-inline" role="form">
+						
 						<div class="radio">
 						  <label>
 						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
@@ -479,9 +477,9 @@ $tableString = '		<div id="myCarousel">
 						  </label>
 						</div>
 						
-						</form>
 						
-						<h3>1a0c</h3>
+						
+					
 						<h4>Protein graph 1a0cC</h4>
 						
 						<div class="proteingraph">
