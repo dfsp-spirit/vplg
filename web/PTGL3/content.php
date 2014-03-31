@@ -36,6 +36,9 @@
 	</head>
 
 	<body id="customBackground">
+		<noscript>
+			<META HTTP-EQUIV="Refresh" CONTENT="0;URL=errorJS.php">
+		</noscript>
 		<div class="wrapper">
 		<div class="container">
 		
@@ -84,10 +87,6 @@
 									
 									<li>
 										<a href="publications.php">Publications</a>
-									</li>
-									
-									<li>
-										<a href="#">File Formats</a>
 									</li>
 									
 									<!-- divider class creates a horizontal line in the dropdown menu -->

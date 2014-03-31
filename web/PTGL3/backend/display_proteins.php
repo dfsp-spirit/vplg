@@ -46,6 +46,32 @@ $tableString = '		<div id="myCarousel">
  */
  $tableString .= ' <li>
 						<div class="container">
+						<p>Select topology type</p>
+						
+						<form class="form-inline" role="form">
+						<div class="radio">
+						  <label>
+						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+						    Alpha-Beta
+						  </label>
+						</div>
+						
+						<div class="radio">
+						  <label>
+						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+						    Alpha
+						  </label>
+						</div>
+						  
+						  <div class="radio">
+						  <label>
+						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+						    Beta
+						  </label>
+						</div>
+						
+						</form>
+						
 						<h3>1a0c</h3>
 						<h4>Protein graph 1a0cA</h4>
 						
@@ -68,63 +94,142 @@ $tableString = '		<div id="myCarousel">
 									<td>MEEHL</td>
 									<td>37 - 41</td>
 								</tr><tr class="tablecenter">
-									<td>1</td>
+									<td>2</td>
+									<td>E</td>
+									<td>FSIA</td>
+									<td>43 - 46</td>
+								</tr><tr class="tablecenter">
+									<td>3</td>
+									<td>H</td>
+									<td>YWHTF</td>
+									<td>47 - 51</td>
+								</tr><tr class="tablecenter">
+									<td>4</td>
+									<td>H</td>
+									<td>PWNH</td>
+									<td>67 - 70</td>
+								</tr><tr class="tablecenter">
+									<td>5</td>
+									<td>H</td>
+									<td>PMDIAKARVEAAFEFFDKI</td>
+									<td>74 - 92</td>
+								</tr><tr class="tablecenter">
+									<td>6</td>
+									<td>E</td>
+									<td>YFCFH</td>
+									<td>96 - 100</td>
+								</tr><tr class="tablecenter">
+									<td>7</td>
 									<td>H</td>
 									<td>MEEHL</td>
 									<td>37 - 41</td>
 								</tr><tr class="tablecenter">
-									<td>1</td>
+									<td>8</td>
 									<td>H</td>
 									<td>MEEHL</td>
 									<td>37 - 41</td>
 								</tr><tr class="tablecenter">
-									<td>1</td>
+									<td>9</td>
 									<td>H</td>
 									<td>MEEHL</td>
 									<td>37 - 41</td>
 								</tr><tr class="tablecenter">
-									<td>1</td>
+									<td>10</td>
 									<td>H</td>
 									<td>MEEHL</td>
 									<td>37 - 41</td>
 								</tr><tr class="tablecenter">
-									<td>1</td>
-									<td>H</td>
-									<td>MEEHL</td>
-									<td>37 - 41</td>
-								</tr><tr class="tablecenter">
-									<td>1</td>
-									<td>H</td>
-									<td>MEEHL</td>
-									<td>37 - 41</td>
-								</tr><tr class="tablecenter">
-									<td>1</td>
-									<td>H</td>
-									<td>MEEHL</td>
-									<td>37 - 41</td>
-								</tr><tr class="tablecenter">
-									<td>1</td>
-									<td>H</td>
-									<td>MEEHL</td>
-									<td>37 - 41</td>
-								</tr><tr class="tablecenter">
-									<td>1</td>
-									<td>H</td>
-									<td>MEEHL</td>
-									<td>37 - 41</td>
-								</tr><tr class="tablecenter">
-									<td>1</td>
+									<td>11</td>
 									<td>H</td>
 									<td>MEEHL</td>
 									<td>37 - 41</td>
 								</tr>
-								
+								</tr><tr class="tablecenter">
+									<td>12</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>13</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>14</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>15</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>16</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>17</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>18</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>19</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>20</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>21</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr>
 							</table>
 						</div><!-- end table-responsive -->
+					
+					
+					
+						<p>Select linear notation:</p>
+						<div id="selectNot">
+						<div class="radio">
+						  <label>
+						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+						    adjacent
+						  </label>
+						</div>
 						
-						<p>Select linear notation</p>
-					
-					
+						<div class="radio">
+						  <label>
+						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+						    reduced
+						  </label>
+						</div>
+						  
+						  <div class="radio">
+						  <label>
+						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+						    key
+						  </label>
+						</div>
+						  
+						  <div class="radio">
+							  <label>
+							    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+							    sequence
+							  </label>
+						</div>
+						</div><!-- end selectNot -->		
 					
 					
 					<ul class="bxslider" id="tada">
@@ -154,118 +259,396 @@ $tableString = '		<div id="myCarousel">
 					
 						
 					</li>';
-					
-					 $tableString .= ' <li>
+						$tableString .= ' <li>
 						<div class="container">
-					
-						<h4>Alpha1 Motifs</h4>
-						<p>Four Helix Bundle (<a href="help.php#helpAlphaMotifs">?</a>) - Globin Foldkasdfjööööööööööööööööööööööööööööööööööölskdjflsdkafjsdöalkfjsdölfkjsdfklsdjflösdkjfsdlkfjsdklfjsdlfkjsdlfsdjfllsdfjsdlfkjsdlfjksdlkfjsdlfkjsdlkfjslödfkjsdlfköjsdklöfjsdklfjsdklfjskdlafjsladkfjasdlkfjsdlkfjsdalkfjsladkfjsladkfjsdlakfjlsdkfjlasdkjflsdkajfasdlkfjlasdfjk (<a href="help.php#helpAlphaMotifs">?</a>)</p>
+						<p>Select topology type</p>
 						
+						<form class="form-inline" role="form">
+						<div class="radio">
+						  <label>
+						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+						    Alpha-Beta
+						  </label>
+						</div>
+						
+						<div class="radio">
+						  <label>
+						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+						    Alpha
+						  </label>
+						</div>
+						  
+						  <div class="radio">
+						  <label>
+						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+						    Beta
+						  </label>
+						</div>
+						
+						</form>
+						
+						<h3>1a0c</h3>
+						<h4>Protein graph 1a0cB</h4>
+						
+						<div class="proteingraph">
+							<img src="proteins/7tim/7tim_A_albe_PG.png" alt=""/>
+						
+						</div>
+						
+						<div class="table-responsive" id="sse">
+							<table class="table table-condensed table-hover borderless">
+								<tr>
+									<th class="tablecenter">Nr.</th>
+									<th class="tablecenter">Type</th>
+									<th class="tablecenter">Sequence</th>
+									<th class="tablecenter">from - to</th>
+								</tr>
+								<tr class="tablecenter">
+									<td>1</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr><tr class="tablecenter">
+									<td>2</td>
+									<td>E</td>
+									<td>FSIA</td>
+									<td>43 - 46</td>
+								</tr><tr class="tablecenter">
+									<td>3</td>
+									<td>H</td>
+									<td>YWHTF</td>
+									<td>47 - 51</td>
+								</tr><tr class="tablecenter">
+									<td>4</td>
+									<td>H</td>
+									<td>PWNH</td>
+									<td>67 - 70</td>
+								</tr><tr class="tablecenter">
+									<td>5</td>
+									<td>H</td>
+									<td>PMDIAKARVEAAFEFFDKI</td>
+									<td>74 - 92</td>
+								</tr><tr class="tablecenter">
+									<td>6</td>
+									<td>E</td>
+									<td>YFCFH</td>
+									<td>96 - 100</td>
+								</tr><tr class="tablecenter">
+									<td>7</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr><tr class="tablecenter">
+									<td>8</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr><tr class="tablecenter">
+									<td>9</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr><tr class="tablecenter">
+									<td>10</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr><tr class="tablecenter">
+									<td>11</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr>
+								</tr><tr class="tablecenter">
+									<td>12</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>13</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>14</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>15</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>16</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>17</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>18</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>19</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>20</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>21</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr>
+							</table>
+						</div><!-- end table-responsive -->
+					
+					
+					
+						<p>Select linear notation:</p>
+						<div id="selectNot">
+						<div class="radio">
+						  <label>
+						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+						    adjacent
+						  </label>
+						</div>
+						
+						<div class="radio">
+						  <label>
+						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+						    reduced
+						  </label>
+						</div>
+						  
+						  <div class="radio">
+						  <label>
+						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+						    key
+						  </label>
+						</div>
+						  
+						  <div class="radio">
+							  <label>
+							    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+							    sequence
+							  </label>
+						</div>
+						</div><!-- end selectNot -->		
 					</div>
+					
+						
 					</li>';
 					
-					 $tableString .= ' <li>
-						<div class="container">
 					
-						<h4>Alpha2 Motifs</h4>
-						<p>Four Helix Bundle (<a href="help.php#helpAlphaMotifs">?</a>) - Globin Fold (<a href="help.php#helpAlphaMotifs">?</a>)</p>
+					
+					
+					$tableString .= ' <li>
+						<div class="container">
+						<p>Select topology type</p>
 						
-					</div>
-					</li>';
-					
-					 $tableString .= ' <li>
-						<div class="container">
-					
-						<h4>Alpha3 Motifs</h4>
-						<p>Four Helix Bundle (<a href="help.php#helpAlphaMotifs">?</a>) - Globin Fold (<a href="help.php#helpAlphaMotifs">?</a>)</p>
+						<form class="form-inline" role="form">
+						<div class="radio">
+						  <label>
+						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+						    Alpha-Beta
+						  </label>
+						</div>
 						
-					</div>
-					</li>';
-					
-					 $tableString .= ' <li>
-						<div class="container">
-					
-						<h4>Alpha4 Motifs</h4>
-						<p>Four Helix Bundle (<a href="help.php#helpAlphaMotifs">?</a>) - Globin Fold (<a href="help.php#helpAlphaMotifs">?</a>)</p>
+						<div class="radio">
+						  <label>
+						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+						    Alpha
+						  </label>
+						</div>
+						  
+						  <div class="radio">
+						  <label>
+						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+						    Beta
+						  </label>
+						</div>
 						
-					</div>
-					</li>';
+						</form>
+						
+						<h3>1a0c</h3>
+						<h4>Protein graph 1a0cC</h4>
+						
+						<div class="proteingraph">
+							<img src="proteins/7tim/7tim_A_albe_PG.png" alt=""/>
+						
+						</div>
+						
+						<div class="table-responsive" id="sse">
+							<table class="table table-condensed table-hover borderless">
+								<tr>
+									<th class="tablecenter">Nr.</th>
+									<th class="tablecenter">Type</th>
+									<th class="tablecenter">Sequence</th>
+									<th class="tablecenter">from - to</th>
+								</tr>
+								<tr class="tablecenter">
+									<td>1</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr><tr class="tablecenter">
+									<td>2</td>
+									<td>E</td>
+									<td>FSIA</td>
+									<td>43 - 46</td>
+								</tr><tr class="tablecenter">
+									<td>3</td>
+									<td>H</td>
+									<td>YWHTF</td>
+									<td>47 - 51</td>
+								</tr><tr class="tablecenter">
+									<td>4</td>
+									<td>H</td>
+									<td>PWNH</td>
+									<td>67 - 70</td>
+								</tr><tr class="tablecenter">
+									<td>5</td>
+									<td>H</td>
+									<td>PMDIAKARVEAAFEFFDKI</td>
+									<td>74 - 92</td>
+								</tr><tr class="tablecenter">
+									<td>6</td>
+									<td>E</td>
+									<td>YFCFH</td>
+									<td>96 - 100</td>
+								</tr><tr class="tablecenter">
+									<td>7</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr><tr class="tablecenter">
+									<td>8</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr><tr class="tablecenter">
+									<td>9</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr><tr class="tablecenter">
+									<td>10</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr><tr class="tablecenter">
+									<td>11</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr>
+								</tr><tr class="tablecenter">
+									<td>12</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>13</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>14</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>15</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>16</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>17</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>18</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>19</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>20</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr></tr><tr class="tablecenter">
+									<td>21</td>
+									<td>H</td>
+									<td>MEEHL</td>
+									<td>37 - 41</td>
+								</tr>
+							</table>
+						</div><!-- end table-responsive -->
 					
-					 $tableString .= ' <li>
-						<div class="container">
-					<div class="textWrapper">
-		<div id="About">
-			<div class="line" id="lineAbout">
-				<div class="iconPos" id="iconAbout">
-					<img  width="100px" height="100px" src="images/icon-blueGlyph.png" alt="Icon">
-					<div id="About"></div>
-				</div><!-- end iconPos -->
-			</div><!-- end line and lineAbout -->
+					
+					
+						<p>Select linear notation:</p>
+						<div id="selectNot">
+						<div class="radio">
+						  <label>
+						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+						    adjacent
+						  </label>
+						</div>
+						
+						<div class="radio">
+						  <label>
+						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+						    reduced
+						  </label>
+						</div>
+						  
+						  <div class="radio">
+						  <label>
+						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+						    key
+						  </label>
+						</div>
+						  
+						  <div class="radio">
+							  <label>
+							    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+							    sequence
+							  </label>
+						</div>
+						</div><!-- end selectNot -->		
+					
+					
+				</div>
+				</div>
+					
+						
+					</li>';
 				
-			<div class="container" id="text">
-				<h2>About</h2>
-					PTGL is a web-based database application for protein topologies. In order to define a mathematically unique description of protein topology
-					the secondary structure topology of a protein is described by methods of applied graph theory. The <a href="about.php#proteinGraph">Protein graph</a> is defined as an undirected
-					labelled graph on three description levels according to the considered secondary structure elements (SSE): the <a href="about.php#alphaGraph">Alpha graph</a>, the <a href="about.php#betaGraph">Beta graph</a>,
-					and the <a href="about.php#alphaBetaGraph">Alpha-Beta graph</a>. The connected components of the <a href="about.php#proteinGraph">Protein graph</a> form <a href="about.php#foldingGraph">Folding graphs</a>. A <a href="about.php#proteinGraph">Protein graph</a> can consist of one or more
-					<a href="about.php#foldingGraph">Folding graphs</a>. The three graph types were defined for each protein of the <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a>. For each graph type exists four <a href="about.php#linearNot">linear notations</a> with
-					corresponding graphic representations. In PTGL all <a href="about.php#foldingGraph">Folding graphs</a>, all SSEs, and additional protein information are stored for every
-					protein structure annotated in <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a> for which SSEs according DSSP are defined, which is not a NMR structure, has a resolution less than 3.5
-					Å and a sequence length of at least 20 amino acids. The database enables the user to search for the topology of a protein or for certain
-					topologies and subtopologies using the <a href="about.php#linearNot">linear notations</a>. Additionally, it could be searched for sequence similarity in <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a> sequences.
-					<a href="about.php">Read more...</a>
-			
-			
-			</div><!-- end container and text -->
-		</div><!-- end About -->
-		
-		<div id="UserGuide">
-			<div class="line" id="lineUserGuide">
-				<div class="iconPos" id="iconUserGuide">
-					<img width="100px" height="100px" src="images/icon-greenGlyph.png" alt="Icon"/>
-				</div><!-- end iconPos -->
-			</div><!-- end line and lineUser Guide -->
-			
-			<div class="container" id="text">
-				<h2>User Guide</h2>
 					
-					
-					<div class="row" id="scroll1">
-						<div class="col-lg-3 col-lg-3-centering col-centered">
-							<div class="ugCentering" id="ugStandardSearch">
-								<h3 class="ugCenterHeadings">Standard Search</h3>
-								<p>In order to search for proteins simply enter the protein name or the
-								corresponding protein PDB-ID into the search field.</p>
-								<p>You can also use the two checkboxes to either remove sequence homologs from
-								results or if you only want results that exactly match the input query.</p>
-							</div><!-- end ugCentering -->
-						</div><!-- end col-centered -->
-					</div><!-- end row -->
-					
-					<div class="row">
-						<div class="col-lg-3 col-lg-3-centering col-centered">
-							<div class="ugCentering" id="ugAdvancedSearch">
-								<h3 class="ugCenterHeadings">Advanced Search</h3>
-								<p><strong>PDB ID</strong> The 4 character unique indentifier for the structure as defined by the PDB. Begins with a number 1-9 followed by 3 alphanumeric characters. </p>
-								<p><strong>TITLE</strong> The TITLE record contains a title for the experiment or analysis that is represented in the entry. It should identify an entry in the PDB in the same way that a title identifies a paper.The PDB records COMPND, SOURCE, EXPDTA, and REMARKs provide information that may also be found in TITLE. You may think of the title as describing the experiment, and the compound record as describing the molecule(s).</p>
-								<p id="scroll2"><strong>Classification</strong> A classification for the molecule. </p>
-								<p><strong>HET</strong> The heterogen section of a PDB file contains the complete description of non-standard residues in the entry.</p>
-								<p><strong>HETNAME</strong> This record gives the chemical name of the compound with the given HET</p>
-								<p><strong>SCOP</strong> SCOP classification.</p>
-								<p><strong>SCOPID</strong> SCOP identifier.</p>
-								<p><strong>CATH</strong> CATH classification.</p>
-								<p><strong>CATHID</strong> CATH domain identifier.</p>
-								<p><strong>EC</strong> ENZYME number.</p>
-								<p><strong>Molecule</strong> Name of the molecule.</p>
-								<p><strong>Graphs</strong> A string standing for a Linear Notation of a certain Folding Graph.</p>
-								</div><!-- end ugCentering -->
-						</div><!-- end col-centered -->
-					</div><!-- end row -->
-						
-					</div>
-					</li>';
- 
- 
+
  /*
  
  

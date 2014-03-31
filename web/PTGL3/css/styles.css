@@ -37,10 +37,10 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	#customBackground {
 	background-color: #A2A2A2;
 	
-  		background: -moz-radial-gradient(center, circle, #A2A2A2 40%, #434142 100%);
-		background: -webkit-radial-gradient(center, circle, #A2A2A2 40%, #434142 100%);
-		background: -ms-radial-gradient(center, circle, #A2A2A2 40%, #434142 100%);
-		background: -o-radial-gradient(center, circle, #A2A2A2 40%, #434142 100%);
+  		background: -moz-radial-gradient(center, circle, #A2A2A2 50%, #696567 100%);
+		background: -webkit-radial-gradient(center, circle, #A2A2A2 50%, #696567 100%);
+		background: -ms-radial-gradient(center, circle, #A2A2A2 50%, #696567 100%);
+		background: -o-radial-gradient(center, circle, #A2A2A2 50%, #696567 100%);
 			
 	}
 	
@@ -702,7 +702,6 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 
 	.imgFormAboutphp {
 		width: 450px;
-		heigth: 600px;
 		border: solid;
 		border-width: 1px;
 		margin: 10px;
@@ -757,17 +756,20 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		}
 	
 	#sse {
-		width: 40%;
+		width: 35%;
+		height: 360px;
+		overflow: auto;
+		margin-bottom: 5%;
 		}
 	
 	#bx-pager {
 		text-align: center;
-		
 	}
-	
 
-	
-	
+	#selectNot {
+		margin-left: 5%;
+	}
+
 	
 	/* --------------------------------------
    Carousel

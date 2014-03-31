@@ -35,12 +35,13 @@ include('backend/display_proteins.php');
 
 	</head>
 
-	<body id="customBackground">
-		
-		
+<body id="customBackground">
+		<noscript>
+			<META HTTP-EQUIV="Refresh" CONTENT="0;URL=errorJS.php">
+		</noscript>
 		<div class="wrapper">
 		<div class="container">
-	
+		
 			<div class="navbar navbar-fixed-top" id="navColor">
 
 				<div class="container">
@@ -53,8 +54,8 @@ include('backend/display_proteins.php');
 				
 
 				<a href="index.php" class="navbar-brand"><img src="ADD_IMAGE_HERE" alt="PTGL Logo"></a>
-
-					<div class="nav-collapse collapse navbar-responsive-collapse">
+					<div class="nav-collapse collapse navbar-responsive-collapse" id="navbar-example">
+						<div class="navbar-scrollspy">
 						<ul class="nav navbar-nav">
 							<li  class="navbarFont">
 								<a href="index.php">Home</a>
@@ -70,26 +71,25 @@ include('backend/display_proteins.php');
 							
 							<li class="navbarFont">
 								<a href="index.php#DatabaseFormat">Database Format</a>
-							</li>		
-
+							</li>
+							
 							<li class="dropdown">
 								<!-- <strong>caret</strong> creates the little triangle/arrow -->
 								<a href="#"  class="navbarFont dropdown-toggle" data-toggle="dropdown"> Services <strong class="caret"></strong></a>
 								
 								<ul class="dropdown-menu">
 									<li>
-										<a href="#">Content</a>
+										<a href="about.php">About</a>
+									</li>
+									<li>
+										<a href="content.php">Content</a>
 									</li>
 									
 									<li>
-										<a href="#">Publications</a>
+										<a href="publications.php">Publications</a>
 									</li>
-									
-									<li>
-										<a href="#">File Formats</a>
-									</li>
-									
-									<!-- divider class makes a horizontal line in the dropdown menu -->
+																		
+									<!-- divider class creates a horizontal line in the dropdown menu -->
 									<li class="divider"></li>
 									
 									<li class="dropdown-header"></li>
@@ -99,11 +99,12 @@ include('backend/display_proteins.php');
 									</li>
 									
 									<li>
-										<a href="#">Help</a>
+										<a href="help.php">Help</a>
 									</li>
 								</ul><!-- end dropdown menu -->
 							</li><!-- end dropdown -->
-						</ul><!-- end nav navbar-nav -->								
+						</ul><!-- end nav navbar-nav -->
+						</div><!-- end navbar-scrollspy -->
 					</div><!-- end nav-collapse -->
 					<div class="nav-collapse collapse navbar-responsive-collapse">
 						<form  class="navbar-form pull-right" action="searchResults.php" method="get">
@@ -216,7 +217,7 @@ include('backend/display_proteins.php');
 		
 		<!-- Don not use this import, as bxSlider seems not to work with newer versions of jQuery -->
 		<!-- First try for the online version of jQuery-->
-		<!-- <script src="http://code.jquery.com/jquery.js"></script>
+		<!-- <script src="http://code.jquery.com/jquery.js"></script>-->
 		<!-- If no online access, fallback to our hardcoded version of jQuery -->
 		<!-- <script>window.jQuery || document.write('<script src="js/jquery-1.8.2.min.js"><\/script>')</script>-->
 	
