@@ -870,30 +870,33 @@ public class DBManager {
      * @param graph_string_ptgl_key the graph in PTGL KEY notation
      * @param graph_string_ptgl_seq the graph in PTGL SEQ notation
      * @param sse_string the graph in SSE string notation
-     * @return true if the graph was inserted, false if errors occurred
+     * @return the database insert ID or a value smaller than 1 if something went wrong
      * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
      */
-    public static Boolean writeFoldingGraphToDB(String pdb_id, String chain_name, Integer graph_type, String graph_string_gml, String graph_string_plcc, String graph_string_kavosh, String graph_string_dotlanguage, String graph_string_ptgl_red, String graph_string_ptgl_adj, String graph_string_ptgl_key, String graph_string_ptgl_seq, String sse_string) throws SQLException {
+    public static Long writeFoldingGraphToDB(String pdb_id, String chain_name, Integer graph_type, String graph_string_gml, String graph_string_plcc, String graph_string_kavosh, String graph_string_dotlanguage, String graph_string_ptgl_red, String graph_string_ptgl_adj, String graph_string_ptgl_key, String graph_string_ptgl_seq, String sse_string) throws SQLException {
                
         Integer chain_db_id = getDBChainID(pdb_id, chain_name);
         Boolean result = false;
+        ResultSet generatedKeys = null;
+        Long insertID = -1L;
 
         if (chain_db_id < 0) {
             DP.getInstance().e("writeFoldingGraphToDB()" , "Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert folding graph.");
-            return (false);
+            return (-1L);
         }
         
         String graphTypeString = ProtGraphs.getGraphTypeString(graph_type);
         Integer parent_graph_id = DBManager.getDBGraphID(pdb_id, chain_name, graphTypeString);
         if(parent_graph_id <= 0) {
             DP.getInstance().e("writeFoldingGraphToDB()" , "Could not find parent " + graphTypeString + " graph with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert folding graph.");
-            return (false);
+            return (-1L);
         } 
 
         PreparedStatement statement = null;
 
         String query = "INSERT INTO " + tbl_foldinggraph + " (parent_graph_id, graph_string_gml, graph_string_plcc, graph_string_kavosh, graph_string_dotlanguage, graph_string_ptgl_red, graph_string_ptgl_adj, graph_string_ptgl_key, graph_string_ptgl_seq, sse_string) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-
+        int affectedRows = 0;
+        
         try {
             dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
@@ -909,7 +912,18 @@ public class DBManager {
             statement.setString(9, graph_string_ptgl_seq);
             statement.setString(10, sse_string);
                                 
-            statement.executeUpdate();
+            affectedRows = statement.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Inserting folding graph into DB failed, no rows affected.");
+            }
+            
+            // get DB insert id
+            generatedKeys = statement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                insertID = generatedKeys.getLong(1);
+            } else {
+                throw new SQLException("Inserting folding graph into DB failed, no generated key obtained.");
+            }
             dbc.commit();
             result = true;
         } catch (SQLException e ) {
@@ -929,7 +943,7 @@ public class DBManager {
             }
             dbc.setAutoCommit(true);
         }
-        return(result);
+        return(insertID);
     }
 
     
