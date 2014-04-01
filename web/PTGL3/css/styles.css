@@ -35,13 +35,21 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 
 	
 	#customBackground {
+	/* Old color setup
 	background-color: #A2A2A2;
 	
-  		background: -moz-radial-gradient(center, circle, #A2A2A2 50%, #696567 100%);
+  		background: -moz-radial-gradient(center, circle, #EDEDED 40%, #ADADAD 100%);
 		background: -webkit-radial-gradient(center, circle, #A2A2A2 50%, #696567 100%);
 		background: -ms-radial-gradient(center, circle, #A2A2A2 50%, #696567 100%);
 		background: -o-radial-gradient(center, circle, #A2A2A2 50%, #696567 100%);
-			
+			*/
+	
+	background-color: #ADADAD;
+	
+  		background: -moz-radial-gradient(center, circle, #EDEDED 40%, #ADADAD 100%);
+		background: -webkit-radial-gradient(center, circle, #EDEDED 40%, #ADADAD 100%);
+		background: -ms-radial-gradient(center, circle, #EDEDED 40%, #ADADAD 100%);
+		background: -o-radial-gradient(center, circle, #EDEDED 40%, #ADADAD 100%);
 	}
 	
 	
@@ -74,8 +82,8 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	 
 	/* Effects things that are inside the footer */
 	footer {
-		 background-color: #343434;
-		 color: #636262;
+		 background-color: #6E6E6E;
+		 color: #D4D4D4;
 		 font-size: 11px;
 		 padding-top: 20px;
 		 padding-bottom: 10px; 
@@ -94,7 +102,7 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		}
 	
 	a.footerLink:link, a.footerLink:visited {
-			color: #636262;
+			color: #D4D4D4;
 			}
 		
 	a.footerLink:hover, a.footerLink:active {
@@ -257,6 +265,14 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		cursor: hand;
 	}
 		
+		
+		.table-hover > tbody > tr:hover > td, .table-hover > tbody > tr:hover > th {
+    background-color: rgb(212, 212, 212);
+	}
+	
+	.whiteBack > tbody > tr:hover > td, .table-hover > tbody > tr:hover > th {
+    background-color: rgb(255, 255, 255);
+	}
 	
 		
 /*	------------------------------------------------------------
@@ -269,7 +285,7 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	}
 	
 	#contact {
-		background: rgba(214, 214, 214, 0.4);
+		background: rgba(255, 255, 255, 0.4);
 		padding: 10px 10px;
 		
 	}
@@ -300,33 +316,39 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	-----------------------------------------------------------*/
 	
 	#navColor {
+	/* old color setup
 		background-color: #343434;
+		*/
+		background-color: #6E6E6E;
 		}
 	
 	
 	.navbar-nav > .open > a, .navbar-nav > .open > a:hover, .navbar-nav > .open > a:focus {
-		background-color: #2e2f30;
+		background-color: #4F4F4F;
 		color: #ffffff;
 	
 	}
 	
 	
 	.active {
-		background-color: #000000;
+		background-color: #4F4F4F;
 		}
 	
 	.navbar-nav > .active > a, .navbar-nav > .active > a:hover, .navbar-nav > .active > a:focus {
-		background-color: #2e2f30;
+		background-color: #4F4F4F;
 		color: #ffffff;
 		}
 		
 	.nav > li > a:hover, .nav > li > a:focus {
-		background-color: #2e2f30;
+		background-color: #4F4F4F;
 		color: #ffffff;
 		}
 		
 	.navbar-nav > li > a {
+		/* old color setup
 		color: #636262;
+		*/
+		color: #D4D4D4;
   		}
 		
 	
@@ -338,6 +360,18 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		font-size: larger;
 		}
 
+	
+	.navbar-nav > .dropdown > a .caret {
+    border-bottom-color: #D4D4D4;
+    border-top-color: #D4D4D4;
+	}
+	
+	
+	.navbar-nav > .dropdown > a:hover .caret, .navbar-nav > .dropdown > a:focus .caret {
+    border-bottom-color: #ffffff;
+    border-top-color: #ffffff;
+	}
+	
 	
 /*	-------------------------------------------------------------
 	Search
@@ -651,7 +685,7 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	
 	#contentTable {
 		margin-top: 5%;
-		background: rgba(214, 214, 214, 0.4);
+		background: rgba(255, 255, 255, 0.4);
 		}
 	
 	.borderless>thead>tr>th, 
@@ -678,7 +712,7 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	}
 	
 	#publicationsList {
-		background: rgba(214, 214, 214, 0.4);
+		background: rgba(255, 255, 255, 0.4);
 		padding-top: 10px;
 		padding-bottom: 10px;
 	}
@@ -713,8 +747,11 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		}
 	
 	#aboutTable {
-		background: rgba(214, 214, 214, 0.4);
+		background: rgba(255, 255, 255, 0.4);
 		}
+	
+	
+
 	
 	
 	/* --------------------------------------

@@ -80,7 +80,7 @@ $tableString = '		<div id="myCarousel">
 						</div>
 						
 						<div class="table-responsive" id="sse">
-							<table class="table table-condensed table-hover borderless">
+							<table class="table table-condensed table-hover borderless whiteBack">
 								<tr>
 									<th class="tablecenter">Nr.</th>
 									<th class="tablecenter">Type</th>

@@ -80,27 +80,27 @@
 								
 								<ul class="dropdown-menu">
 									<li>
-										<a href="#">About</a>
+										<a href="#"><span class="fa fa-info"></span> About</a>
 									</li>
 									<li>
-										<a href="content.php">Content</a>
+										<a href="content.php"><i class="fa fa-briefcase"></i> Content</a>
 									</li>
 									
 									<li>
-										<a href="publications.php">Publications</a>
+										<a href="publications.php"><i class="fa fa-copy"></i> Publications</a>
 									</li>
-									
+																	
 									<!-- divider class creates a horizontal line in the dropdown menu -->
 									<li class="divider"></li>
 									
 									<li class="dropdown-header"></li>
 									
 									<li>
-										<a href="contact.php">Contact Us</a>
+										<a href="contact.php"><i class="fa fa-user"></i> Contact Us</a>
 									</li>
 									
 									<li>
-										<a href="help.php">Help</a>
+										<a href="help.php"><i class="fa fa-question"></i> Help</a>
 									</li>
 								</ul><!-- end dropdown menu -->
 							</li><!-- end dropdown -->

@@ -83,27 +83,27 @@
 								
 								<ul class="dropdown-menu">
 									<li>
-										<a href="about.php">About</a>
+										<a href="about.php"><span class="fa fa-info"></span> About</a>
 									</li>
 									<li>
-										<a href="content.php">Content</a>
+										<a href="content.php"><i class="fa fa-briefcase"></i> Content</a>
 									</li>
 									
 									<li>
-										<a href="publications.php">Publications</a>
+										<a href="publications.php"><i class="fa fa-copy"></i> Publications</a>
 									</li>
-									
-									<!-- divider class makes a horizontal line in the dropdown menu -->
+																	
+									<!-- divider class creates a horizontal line in the dropdown menu -->
 									<li class="divider"></li>
 									
 									<li class="dropdown-header"></li>
 									
 									<li>
-										<a href="#">Contact Us</a>
+										<a href="#"><i class="fa fa-user"></i> Contact Us</a>
 									</li>
 									
 									<li>
-										<a href="help.php">Help</a>
+										<a href="help.php"><i class="fa fa-question"></i> Help</a>
 									</li>
 								</ul><!-- end dropdown menu -->
 							</li><!-- end dropdown -->
@@ -154,13 +154,13 @@
 			<div class="col-sm-6">
 				<div class="rightColumn">
 					<br>
-					Phone  +49 +69 798-24652
+					<i class="fa fa-phone"></i> Phone  +49 +69 798-24652
 					<br>
 					Fax    +49 +69 798-24650
 					<br>
-					e-mail:  ina.koch (at) bioinformatik.uni-frankfurt.de
+					<i class="fa fa-envelope-o"></i> e-mail:  ina.koch (at) bioinformatik.uni-frankfurt.de
 					<br>
-					<a href="http://www.bioinformatik.uni-frankfurt.de" target="_blank">http://www.bioinformatik.uni-frankfurt.de/</a>
+					<i class="fa fa-external-link"><a href="http://www.bioinformatik.uni-frankfurt.de" target="_blank"></i> http://www.bioinformatik.uni-frankfurt.de/</a>
 				</div><!-- end rightColumn -->
 			</div><!-- end col-sm-6 -->
 		</div><!-- end row -->
@@ -212,7 +212,7 @@
 			<div class="col-sm-6">
 				<div class="rightColumn">
 					<br>
-					e-mail:  steinke (at) zib.de
+					<i class="fa fa-envelope-o"></i> e-mail:  steinke (at) zib.de
 				</div><!-- end rightColumn -->
 			</div><!-- end col-sm-6 -->
 		</div><!-- end row -->

@@ -23,6 +23,7 @@
 
 		<!-- Custom CSS -->
 		<link rel="stylesheet" type="text/css" href="css/styles.css">
+		<link rel="stylesheet" href="css/font-awesome.css"/>
 
 		 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 		<!-- Include Modernizr in the head, before any other JS -->
@@ -79,27 +80,27 @@
 								
 								<ul class="dropdown-menu">
 									<li>
-										<a href="about.php">About</a>
+										<a href="about.php"><span class="fa fa-info"></span> About</a>
 									</li>
 									<li>
-										<a href="#">Content</a>
+										<a href="#"><i class="fa fa-briefcase"></i> Content</a>
 									</li>
 									
 									<li>
-										<a href="publications.php">Publications</a>
+										<a href="publications.php"><i class="fa fa-copy"></i> Publications</a>
 									</li>
-									
+																	
 									<!-- divider class creates a horizontal line in the dropdown menu -->
 									<li class="divider"></li>
 									
 									<li class="dropdown-header"></li>
 									
 									<li>
-										<a href="contact.php">Contact Us</a>
+										<a href="contact.php"><i class="fa fa-user"></i> Contact Us</a>
 									</li>
 									
 									<li>
-										<a href="help.php">Help</a>
+										<a href="help.php"><i class="fa fa-question"></i> Help</a>
 									</li>
 								</ul><!-- end dropdown menu -->
 							</li><!-- end dropdown -->
