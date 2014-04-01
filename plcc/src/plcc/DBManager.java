@@ -879,8 +879,13 @@ public class DBManager {
      */
     public static Long writeFoldingGraphToDB(String pdb_id, String chain_name, Integer graph_type, Integer fg_number, String graph_string_gml, String graph_string_plcc, String graph_string_kavosh, String graph_string_dotlanguage, String graph_string_ptgl_red, String graph_string_ptgl_adj, String graph_string_ptgl_key, String graph_string_ptgl_seq, String sse_string) throws SQLException {
                
+        
+        if(fg_number < 1) {
+            DP.getInstance().e("writeFoldingGraphToDB", "Folding graph number must be 1 or greater, skipping.");
+            return(-1L);
+        }
+        
         Long chain_db_id = getDBChainID(pdb_id, chain_name);
-        Boolean result = false;
         ResultSet generatedKeys = null;
         Long insertID = -1L;
 
@@ -890,7 +895,7 @@ public class DBManager {
         }
         
         String graphTypeString = ProtGraphs.getGraphTypeString(graph_type);
-        Long parent_graph_id = DBManager.getDBGraphID(pdb_id, chain_name, graphTypeString);
+        Long parent_graph_id = DBManager.getDBProteinGraphID(pdb_id, chain_name, graphTypeString);
         if(parent_graph_id <= 0) {
             DP.getInstance().e("writeFoldingGraphToDB()" , "Could not find parent " + graphTypeString + " graph with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert folding graph.");
             return (-1L);
@@ -906,19 +911,20 @@ public class DBManager {
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, parent_graph_id);
-            statement.setString(2, graph_string_gml);
-            statement.setString(3, graph_string_plcc);
-            statement.setString(4, graph_string_kavosh);
-            statement.setString(5, graph_string_dotlanguage);
-            statement.setString(6, graph_string_ptgl_adj);
-            statement.setString(7, graph_string_ptgl_red);
-            statement.setString(8, graph_string_ptgl_key);
-            statement.setString(9, graph_string_ptgl_seq);
-            statement.setString(10, sse_string);
+            statement.setInt(2, fg_number);
+            statement.setString(3, graph_string_gml);
+            statement.setString(4, graph_string_plcc);
+            statement.setString(5, graph_string_kavosh);
+            statement.setString(6, graph_string_dotlanguage);
+            statement.setString(7, graph_string_ptgl_adj);
+            statement.setString(8, graph_string_ptgl_red);
+            statement.setString(9, graph_string_ptgl_key);
+            statement.setString(10, graph_string_ptgl_seq);
+            statement.setString(11, sse_string);
                                 
             affectedRows = statement.executeUpdate();
             if (affectedRows == 0) {
-                throw new SQLException("Inserting folding graph into DB failed, no rows affected.");
+                DP.getInstance().w("Inserting folding graph into DB failed, no rows affected.");
             }
             
             // get DB insert id
@@ -926,10 +932,9 @@ public class DBManager {
             if (generatedKeys.next()) {
                 insertID = generatedKeys.getLong(1);
             } else {
-                throw new SQLException("Inserting folding graph into DB failed, no generated key obtained.");
+                DP.getInstance().w("Inserting folding graph into DB failed, no generated key obtained.");
             }
             dbc.commit();
-            result = true;
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: writeFoldingGraphToDB: '" + e.getMessage() + "'.");
             if (dbc != null) {
@@ -940,7 +945,6 @@ public class DBManager {
                     System.err.println("ERROR: SQL: writeFoldingGraphToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
                 }
             }
-            result = false;
         } finally {
             if (statement != null) {
                 statement.close();
@@ -1133,7 +1137,7 @@ public class DBManager {
             }
         }
         
-        Long graphDbID = DBManager.getDBGraphID(pdb_id, chain_name, ProtGraphs.getGraphTypeString(graph_type));
+        Long graphDbID = DBManager.getDBProteinGraphID(pdb_id, chain_name, ProtGraphs.getGraphTypeString(graph_type));
         if(graphDbID > 0) {
             for(int i = 0; i < sseDBids.size(); i++) {
                 numAssigned += DBManager.assignSSEtoProteinGraph(sseDBids.get(i), graphDbID, (i+1));
@@ -1156,7 +1160,17 @@ public class DBManager {
     public static Integer assignSSEsToFoldingGraphInOrder(ArrayList<SSE> sses, Long foldingGraphDbId) throws SQLException {
         Integer numAssigned = 0;
         
+        if(foldingGraphDbId < 1) {
+            DP.getInstance().e("DBManager", "assignSSEsToFoldingGraphInOrder(): Folding graph database ID must be >= 1 but is  '" + foldingGraphDbId + " ', aborting.");
+            return 0;
+        }
+        
         Long chain_database_id = DBManager.getDBChainIDofFoldingGraph(foldingGraphDbId);
+        
+        if(chain_database_id < 1) {
+            DP.getInstance().e("DBManager", "assignSSEsToFoldingGraphInOrder(): Could not find chain of folding graph with ID '" + foldingGraphDbId + " ' in database.");
+            return 0;
+        }
         
         ArrayList<Long> sseDBids = new ArrayList<Long>();
         for(SSE sse : sses) {
@@ -1200,7 +1214,7 @@ public class DBManager {
         PreparedStatement statement = null;
         ResultSet rs = null;
 
-        String query = "SELECT c.chain_id FROM " + tbl_foldinggraph + " f WHERE (f.foldinggraph_id = ?) INNER JOIN " + tbl_proteingraph + " p ON f.parent_graph_id = p.graph_id INNER JOIN " + tbl_chain + " c ON p.chain_id = c.chain_id;";
+        String query = "SELECT c.chain_id FROM " + tbl_foldinggraph + " f INNER JOIN " + tbl_proteingraph + " p ON f.parent_graph_id = p.graph_id INNER JOIN " + tbl_chain + " c ON p.chain_id = c.chain_id WHERE (f.foldinggraph_id = ?) ;";
 
         try {
             dbc.setAutoCommit(false);
@@ -1988,14 +2002,15 @@ public class DBManager {
     
     
     /**
-     * Determines and returns the internal database ID (primary key) of the graph identified by the given properties (PDB ID, chain, gt).
+     * Determines and returns the internal database ID (primary key) of the protein graph identified by the given properties (PDB ID, chain, gt).
+     * 
      * @param pdb_id the PDB identifier of the graph
      * @param chain_name the PDB chain name of the graph
      * @param graph_type the graph type, use the string constants in ProtGraphs class
      * @return the database ID of the graph or a negative number if an error occurred or no such graph exists in the db
      * @throws SQLException 
      */
-    public static Long getDBGraphID(String pdb_id, String chain_name, String graph_type) throws SQLException {
+    public static Long getDBProteinGraphID(String pdb_id, String chain_name, String graph_type) throws SQLException {
         Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
         
         Long chain_db_id = getDBChainID(pdb_id, chain_name);
@@ -2069,6 +2084,96 @@ public class DBManager {
             }
             else {
                 DP.getInstance().w("DB: No entry for graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
+                return(-1L);
+            }
+        }
+        else {
+            return(-1L);
+        }        
+    }
+    
+    
+    /**
+     * Determines and returns the internal database ID (primary key) of the folding graph identified by the given properties (PDB ID, chain, gt, fg_number).
+     * 
+     * @param pdb_id the PDB identifier of the graph
+     * @param chain_name the PDB chain name of the graph
+     * @param graph_type the graph type, use the string constants in ProtGraphs class
+     * @param fg_number the folding graph number
+     * @return the database ID of the graph or a negative number if an error occurred or no such graph exists in the db
+     * @throws SQLException 
+     */
+    public static Long getDBFoldingGraphID(String pdb_id, String chain_name, String graph_type, Integer fg_number) throws SQLException {
+        Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        
+       Long parentGraphID = DBManager.getDBProteinGraphID(pdb_id, chain_name, graph_type);
+       if (parentGraphID < 1) {
+            DP.getInstance().w("getDBFoldingGraphID(): Could not find parent " + graph_type + " graph with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
+            return(-1L);
+        }
+
+        String query = "SELECT foldinggraph_id FROM " + tbl_foldinggraph + " WHERE (parent_graph_id = ? AND fg_number = ?);";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, parentGraphID);
+            statement.setInt(2, fg_number);
+                                
+            rs = statement.executeQuery();
+            dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: getDBFoldingGraphID(): Retrieval of graph failed: '" + e.getMessage() + "'.");
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        if(tableData.size() >= 1) {
+            if(tableData.get(0).size() >= 1) {
+                String graph_id_str = tableData.get(0).get(0);
+                try {
+                    Long graph_id_int = Long.parseLong(graph_id_str);
+                    return graph_id_int;
+                } catch(java.lang.NumberFormatException e) {
+                    DP.getInstance().e("DB: getDBFoldingGraphID(): Could not parse graph database ID as integer, seems invalid.");
+                    return -1L;
+                }
+            }
+            else {
+                DP.getInstance().w("DB: No entry for folding graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
                 return(-1L);
             }
         }

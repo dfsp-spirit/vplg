@@ -2089,7 +2089,7 @@ public class Main {
                         if(Settings.getBoolean("plcc_B_useDB")) {
                             Long graphDBID = -1L;
                             try {
-                                graphDBID = DBManager.getDBGraphID(pdbid, chain, gt);
+                                graphDBID = DBManager.getDBProteinGraphID(pdbid, chain, gt);
                             } catch(SQLException ex) {
                                 DP.getInstance().e("Main", "Could not find graph in database: '" + ex.getMessage() + "'.");
                             }
@@ -2206,7 +2206,11 @@ public class Main {
 
         //System.out.println("Found " + ccs.size() + " connected components in " + graphType + " graph of chain " + c.getPdbChainID() + ".");
         for(Integer j = 0; j < ccs.size(); j++) {
+            Integer fg_number = j + 1;
             fg = ccs.get(j);
+            String pdbid = fg.pdbid;
+            String chain = fg.chainid;
+            String gt = fg.graphType;
 
             if(fg.numVertices() < Settings.getInteger("plcc_I_min_fgraph_size_draw")) {
                 //System.out.println("        Ignoring folding graph #" + j + " of size " + fg.numVertices() + ", minimum size is " + Settings.getInteger("plcc_I_min_fgraph_size_draw") + ".");
@@ -2299,6 +2303,36 @@ public class Main {
 
             if(Settings.getBoolean("plcc_B_draw_graphs")) {
                 System.out.println("        Drawing all supported versions of folding graph #" + j + ".");
+            }
+            
+            // We may need to write the folding graph to the database
+            if(Settings.getBoolean("plcc_B_useDB")) {   
+                Long fgDbId = -1L;
+                try { 
+                    fgDbId = DBManager.writeFoldingGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), fg_number, fg.toGraphModellingLanguageFormat(), fg.toVPLGGraphFormat(), fg.toKavoshFormat(), fg.toDOTLanguageFormat(), fg.toPtglFormatADJ(), fg.toPtglFormatRED(), fg.toPtglFormatKEY(), fg.toPtglFormatSEQ(), fg.getSSEStringSequential()); 
+                    DP.getInstance().p("      Inserted '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB.");
+                }
+                catch(SQLException e) { 
+                    DP.getInstance().e("Main", "Failed to insert '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB: '" + e.getMessage() + "'."); 
+                }
+
+                // assign SSEs in database
+                try {
+                    fgDbId = DBManager.getDBFoldingGraphID(pdbid, chain, gt, fg_number);
+                } catch(SQLException sqlex) {
+                    DP.getInstance().e("Main", "Folding graph #" + fg_number + " not found in DB.");
+                    fgDbId = -1L;
+                }
+                if(fgDbId >= 1) {
+                    try {
+                        int numAssigned = DBManager.assignSSEsToFoldingGraphInOrder(fg.sseList, fgDbId);
+                        DP.getInstance().p("      Assigned " + numAssigned + " SSEs to " + gt + " folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' in the DB.");
+                    } catch(SQLException ex) {
+                       DP.getInstance().e("Main", "Could not assign SSEs to graph in the database: '" + ex.getMessage() + "'.");
+                    }
+                } else {
+                    DP.getInstance().e("Main", "Cannot assign SSEs to folding graph #" + fg_number + ", FG not found in DB.");
+                }
             }
             
             for(String nt : notations) {
