@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <?php
-include('backend/display_proteins.php');
+include('./backend/display_proteins.php');
 ?>
 <html>
 	<head>
@@ -54,7 +54,7 @@ include('backend/display_proteins.php');
 				</button>
 				
 
-				<a href="index.php" class="navbar-brand"><img src="ADD_IMAGE_HERE" alt="PTGL Logo"></a>
+				<a href="index.php" class="navbar-brand"><img src="./images/molbi.png" alt="PTGL Logo"></a>
 					<div class="nav-collapse collapse navbar-responsive-collapse" id="navbar-example">
 						<div class="navbar-scrollspy">
 						<ul class="nav navbar-nav">
@@ -195,22 +195,6 @@ include('backend/display_proteins.php');
 			</div>
 		</div><!-- end container -->
 	</footer>
-		
-		
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 		<!-- All Javascript at the bottom of the page for faster page loading -->
 		<!-- also needed for the dropdown menus etc. ... -->
@@ -239,10 +223,6 @@ include('backend/display_proteins.php');
 		<!-- bxSlider Javascript file -->
 		<script src="js/jquery.bxslider.min.js"></script>
 		<script src="js/bxslider-custom.js"></script>
-			
-		
-		
-		
 
 	</body>
 </html>

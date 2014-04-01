@@ -472,7 +472,7 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		float:right;
 		}
 	.advancedLabel {
-		display: block;
+		display: inline-block;
 		width: 300px;
 		margin-left: auto;
 		margin-right: auto;

@@ -21,8 +21,6 @@ if(isset($_GET)) {
     if(isset($_GET["SelectRedund"])) {$selectRedund = $_GET["SelectRedund"];};
 }
 
-echo "<br /><br /><br /><br /><br />Search Query: " . $keyword . "<br />Exact -> " . $exactSearch . "<br />Search Redundant -> ". $selectRedund . "<br />";
-
 if (strlen($keyword) == 4) {
     if (is_numeric($keyword[0])) {
         echo 'Might be a PDB ID. URL: <a href="http://www.rcsb.org/pdb/explore/explore.do?structureId=' . $keyword . '">' . $keyword .'</a>';

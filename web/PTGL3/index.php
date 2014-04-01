@@ -55,7 +55,7 @@
 				</button>
 				
 
-				<a href="#" class="navbar-brand"><img src="ADD_IMAGE_HERE" alt="PTGL Logo"></a>
+				<a href="#" class="navbar-brand"><img src="./images/molbi.png" alt="PTGL Logo"></a>
 					<div class="nav-collapse collapse navbar-responsive-collapse" id="navbar-example">
 						<div class="navbar-scrollspy">
 						<ul class="nav navbar-nav">
@@ -138,49 +138,49 @@
 							</label>
 							<div id="advancedSearch">
 								<label class="advancedLabel">PDB Identifier
-									<input class="advancedInput" type="text" id="bla" name="bla" placeholder="PDB ID" size="6" maxlength="4" />
+									<input class="advancedInput" type="text" id="pdbid" name="pdbid" placeholder="PDB ID" size="6" maxlength="4" />
 								</label>
 								<label class="advancedLabel">Title
-									<input class="advancedInput" type="text" id="bla1" name="bla" placeholder="" size="20" maxlength="50"/>
+									<input class="advancedInput" type="text" id="title" name="title" placeholder="Title" size="20" maxlength="50"/>
 								</label>
 								<label class="advancedLabel">Het
-									<input class="advancedInput" type="text" id="bla2" name="bla" placeholder="" size="20" maxlength="50"/>
+									<input class="advancedInput" type="text" id="het" name="het" placeholder="Het" size="20" maxlength="50"/>
 								</label>
 								<label class="advancedLabel">Hetname
-									<input class="advancedInput" type="text" id="bla3" name="bla" placeholder="" size="20" maxlength="50"/>
+									<input class="advancedInput" type="text" id="hetname" name="hetname" placeholder="Hetname" size="20" maxlength="50"/>
 								</label>	
 								<label class="advancedLabel">SCOP
-									<input class="advancedInput" type="text" id="bla4" name="bla" placeholder="" size="20" maxlength="50"/>
+									<input class="advancedInput" type="text" id="scop" name="scop" placeholder="SCOP" size="20" maxlength="50"/>
 								</label>
 								<label class="advancedLabel">SCOP ID
-									<input class="advancedInput" type="text" id="bla5" name="bla" placeholder="" size="4" maxlength="4"/>
-									<input class="advancedInput" type="text" id="bla5a" name="bla" placeholder="" size="4" maxlength="4"/>
-									<input class="advancedInput" type="text" id="bla5b" name="bla" placeholder="" size="4" maxlength="4"/>
-									<input class="advancedInput" type="text" id="bla5c" name="bla" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="scopid1" name="scopid1" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="scopid2" name="scopid2" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="scopid3" name="scopid3" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="scopid4" name="scopid4" placeholder="" size="4" maxlength="4"/>
 								</label>
 								<label class="advancedLabel">CATH
-									<input class="advancedInput" type="text" id="bla6" name="bla" placeholder="" size="20" maxlength="50"/>
+									<input class="advancedInput" type="text" id="cath" name="cath" placeholder="CATH" size="20" maxlength="50"/>
 								</label>
 								<label class="advancedLabel">CATH ID
-									<input class="advancedInput" type="text" id="bla7" name="bla" placeholder="" size="4" maxlength="4"/>
-									<input class="advancedInput" type="text" id="bla7a" name="bla" placeholder="" size="4" maxlength="4"/>
-									<input class="advancedInput" type="text" id="bla7b" name="bla" placeholder="" size="4" maxlength="4"/>
-									<input class="advancedInput" type="text" id="bla7c" name="bla" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="cathid1" name="cathid1" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="cathid2" name="cathid2" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="cathid3" name="cathid3" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="cathid4" name="cathid4" placeholder="" size="4" maxlength="4"/>
 								</label>
 								<label class="advancedLabel">EC
-									<input class="advancedInput" type="text" id="bla8" name="bla" placeholder="" size="4" maxlength="4"/>
-									<input class="advancedInput" type="text" id="bla8a" name="bla" placeholder="" size="4" maxlength="4"/>
-									<input class="advancedInput" type="text" id="bla8b" name="bla" placeholder="" size="4" maxlength="4"/>
-									<input class="advancedInput" type="text" id="bla8c" name="bla" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="ec1" name="ec1" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="ec2" name="ec2" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="ec3" name="ec3" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="ec4" name="ec4" placeholder="" size="4" maxlength="4"/>
 								</label>	
 								<label class="advancedLabel">Molecule
-									<input class="advancedInput" type="text" id="bla9" name="bla" placeholder="" size="20" maxlength="50"/>
+									<input class="advancedInput" type="text" id="molecule" name="molecule" placeholder="Molecule" size="20" maxlength="50"/>
 								</label>		
 								<label class="advancedLabel">Classification
-									<input class="advancedInput" type="text" id="bla00" name="bla" placeholder="" size="20" maxlength="50"/>
+									<input class="advancedInput" type="text" id="classification" name="classification" placeholder="Classification" size="20" maxlength="50"/>
 								</label>		
 								<label class="advancedLabel">Graphs
-									<input class="advancedInput" type="text" id="bla01" name="bla" placeholder="" size="20" maxlength="50"/>
+									<input class="advancedInput" type="text" id="graphs" name="graphs" placeholder="Graphs" size="20" maxlength="50"/>
 								</label>
 								<button type="submit" class="btn btn-default advancedInput" style="margin-top:10px;"><span>Search</span></button>
 							</div>

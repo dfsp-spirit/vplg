@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <?php
-include('/backend/search.php');
+include('./backend/search.php');
 ?>
 <html>
 	<head>
@@ -53,7 +53,7 @@ include('/backend/search.php');
 				</button>
 				
 
-				<a href="index.php" class="navbar-brand"><img src="ADD_IMAGE_HERE" alt="PTGL Logo"></a>
+				<a href="index.php" class="navbar-brand"><img src="./images/molbi.png" alt="PTGL Logo"></a>
 
 					<div class="nav-collapse collapse navbar-responsive-collapse">
 						<ul class="nav navbar-nav">
