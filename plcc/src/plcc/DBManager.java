@@ -908,7 +908,7 @@ public class DBManager {
         
         try {
             dbc.setAutoCommit(false);
-            statement = dbc.prepareStatement(query);
+            statement = dbc.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
             statement.setLong(1, parent_graph_id);
             statement.setInt(2, fg_number);
