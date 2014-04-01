@@ -1062,7 +1062,7 @@ public class DBManager {
      * @return the number of rows affected by the SQL query
      * @throws SQLException if something goes wrong with the database
      */
-    public static Integer updateFoldingGraphImagePathInDB(Integer graphDatabaseID, String graphImageRepresentationType, String relativeImagePath) throws SQLException {
+    public static Integer updateFoldingGraphImagePathInDB(Long graphDatabaseID, String graphImageRepresentationType, String relativeImagePath) throws SQLException {
         
         PreparedStatement statement = null;
         String graphImageFieldName = DBManager.getFieldnameForGraphImageRepresentationType(graphImageRepresentationType);
@@ -1080,7 +1080,7 @@ public class DBManager {
 
             
             statement.setString(1, relativeImagePath);
-            statement.setInt(2, graphDatabaseID);
+            statement.setLong(2, graphDatabaseID);
                                 
             numRowsAffected = statement.executeUpdate();
             dbc.commit();

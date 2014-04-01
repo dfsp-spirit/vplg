@@ -31,7 +31,7 @@ public class ProtGraphs {
     public static final Integer GRAPHTYPE_ALBELIG = 6;
     
     
-    // graph format strings, used to define the foramt for database queries (and other stuff)
+    // graph format strings, used to define the format for database queries (and other stuff)
     public static final String GRAPHFORMAT_PLCC = "PLCC";           // internal plcc format (v2)
     public static final String GRAPHFORMAT_TGF = "TGF";             // trivial graph format
     public static final String GRAPHFORMAT_KAVOSH = "KAVOSH";       // kavosh format. an edge list, first line is number of vertives.

@@ -2306,11 +2306,12 @@ public class Main {
             }
             
             // We may need to write the folding graph to the database
+            Long fgDbId = -1L;
             if(Settings.getBoolean("plcc_B_useDB")) {   
-                Long fgDbId = -1L;
+                
                 try { 
                     fgDbId = DBManager.writeFoldingGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), fg_number, fg.toGraphModellingLanguageFormat(), fg.toVPLGGraphFormat(), fg.toKavoshFormat(), fg.toDOTLanguageFormat(), fg.toPtglFormatADJ(), fg.toPtglFormatRED(), fg.toPtglFormatKEY(), fg.toPtglFormatSEQ(), fg.getSSEStringSequential()); 
-                    DP.getInstance().p("      Inserted '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB.");
+                    System.out.println("      Inserted '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB, ID=" + fgDbId + ".");
                 }
                 catch(SQLException e) { 
                     DP.getInstance().e("Main", "Failed to insert '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB: '" + e.getMessage() + "'."); 
@@ -2326,7 +2327,7 @@ public class Main {
                 if(fgDbId >= 1) {
                     try {
                         int numAssigned = DBManager.assignSSEsToFoldingGraphInOrder(fg.sseList, fgDbId);
-                        DP.getInstance().p("      Assigned " + numAssigned + " SSEs to " + gt + " folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' in the DB.");
+                        System.out.println("      Assigned " + numAssigned + " SSEs to " + gt + " folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' in the DB.");
                     } catch(SQLException ex) {
                        DP.getInstance().e("Main", "Could not assign SSEs to graph in the database: '" + ex.getMessage() + "'.");
                     }
@@ -2339,10 +2340,53 @@ public class Main {
 
                 if(Settings.getBoolean("plcc_B_draw_graphs")) {
 
-                    
-                    fgFile = outputDir + System.getProperty("file.separator") + pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + "_" + nt + ".png"; //Settings.get("plcc_S_img_output_fileext");
+                    String fileNameWithExtension = pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + "_" + nt + ".png";
+                    fgFile = outputDir + System.getProperty("file.separator") + fileNameWithExtension; //Settings.get("plcc_S_img_output_fileext");
                     if(fg.drawFoldingGraph(nt, fgFile)) {
                         System.out.println("         -Folding graph #" + j + " of the " + pg.getGraphType() + " graph of chain " + pg.getChainid() + " written to file '" + fgFile + "' in " + nt + " notation.");
+                        
+                        // save image path to database if required
+                        if(Settings.getBoolean("plcc_B_useDB")) {
+                            
+
+                            String dbImagePath = fileNameWithExtension;
+                            if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
+                                dbImagePath = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain) + fs + fileNameWithExtension;
+                            }
+                            //DP.getInstance().d("dbImagePath is '" + dbImagePath + "'.");
+
+                            String dbGraphImageType;
+                            if(nt.equals(FoldingGraph.FG_NOTATION_ADJ)) {
+                                dbGraphImageType = ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_ADJ;
+                            } else if(nt.equals(FoldingGraph.FG_NOTATION_RED)) {
+                                dbGraphImageType = ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_RED;                            
+                            } else if(nt.equals(FoldingGraph.FG_NOTATION_KEY)) {
+                                dbGraphImageType = ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_KEY;                            
+                            } else if(nt.equals(FoldingGraph.FG_NOTATION_SEQ)) {
+                                dbGraphImageType = ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_SEQ;
+                            }
+                            else {
+                                DP.getInstance().e("Invalid folding graph notation type '" + nt + "', skipping.");
+                                continue;
+                            }
+                            
+                            // RED is the default and is added to the default field as well
+                            if(dbGraphImageType.equals(ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_RED)) {
+                                try {
+                                    DBManager.updateFoldingGraphImagePathInDB(fgDbId, ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT, dbImagePath);
+                                } catch(SQLException e) {
+                                    DP.getInstance().e("Main", "Could not update default notation folding graph image path in database: '" + e.getMessage() + "'.");
+                                }
+                            }
+
+                            // all the other notations get added only here
+                            try {
+                                DBManager.updateFoldingGraphImagePathInDB(fgDbId, dbGraphImageType, dbImagePath);
+                            } catch(SQLException e) {
+                                DP.getInstance().e("Main", "Could not update " + nt + " notation folding graph image path in database: '" + e.getMessage() + "'.");
+                            }
+
+                        }                                                
                     }
                     else {
                         if(Settings.getInteger("plcc_I_debug_level") > 0) {
