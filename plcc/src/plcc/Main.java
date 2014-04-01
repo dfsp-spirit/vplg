@@ -2057,7 +2057,7 @@ public class Main {
                 // But we may need to write the graph to the database
                 if(Settings.getBoolean("plcc_B_useDB")) {
                     try { 
-                        DBManager.writeProteinGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), pg.toGraphModellingLanguageFormat(), pg.toVPLGGraphFormat(), pg.toKavoshFormat(), pg.toDOTLanguageFormat(), pg.toPtglFormatADJ(), pg.toPtglFormatRED(), pg.toPtglFormatKEY(), pg.toPtglFormatSEQ(), pg.getSSEStringSequential()); 
+                        DBManager.writeProteinGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), pg.toGraphModellingLanguageFormat(), pg.toVPLGGraphFormat(), pg.toKavoshFormat(), pg.toDOTLanguageFormat(), pg.getNotationADJ(), pg.getNotationRED(), pg.getNotationKEY(true), pg.getNotationSEQ(), pg.getSSEStringSequential()); 
                         
                         if(! silent) {
                             System.out.println("      Inserted '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + chain + "' into DB.");
@@ -2310,7 +2310,7 @@ public class Main {
             if(Settings.getBoolean("plcc_B_useDB")) {   
                 
                 try { 
-                    fgDbId = DBManager.writeFoldingGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), fg_number, fg.toGraphModellingLanguageFormat(), fg.toVPLGGraphFormat(), fg.toKavoshFormat(), fg.toDOTLanguageFormat(), fg.toPtglFormatADJ(), fg.toPtglFormatRED(), fg.toPtglFormatKEY(), fg.toPtglFormatSEQ(), fg.getSSEStringSequential()); 
+                    fgDbId = DBManager.writeFoldingGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), fg_number, fg.toGraphModellingLanguageFormat(), fg.toVPLGGraphFormat(), fg.toKavoshFormat(), fg.toDOTLanguageFormat(), fg.getNotationADJ(), fg.getNotationRED(), fg.getNotationKEY(true), fg.getNotationSEQ(), fg.getSSEStringSequential()); 
                     System.out.println("      Inserted '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB, ID=" + fgDbId + ".");
                 }
                 catch(SQLException e) { 

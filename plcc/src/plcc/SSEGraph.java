@@ -1549,6 +1549,28 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
 
         return("");
     }
+    
+    /**
+     * Generates the adjacent notation (ADJ) of this protein graph.
+     * @return the notation as a String
+     */
+    public String getNotationADJ() {
+        
+        System.err.println("WARNING: getNotationADJ(): not implemented yet.");
+
+        return("");
+    }
+    
+    /**
+     * Generates the sequential notation (SEQ) of this protein graph.
+     * @return the notation as a String
+     */
+    public String getNotationRED() {
+        
+        System.err.println("WARNING: getNotationRED(): not implemented yet.");
+
+        return("");
+    }
 
     /**
      * Generates the key notation (KEY) of this protein graph. Note that this notation differs
@@ -3446,53 +3468,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         }
         
         return kf.toString();
-    }      
-    
-    
-    /**
-     * Creates a PTGL notation string from this SSE graph.
-     * @return the PTGL ADJ format string for this graph
-     */      
-    public String toPtglFormatADJ() {
-        DP.getInstance().w("toPtglFormatADJ() -- not implemented yet");
-        
-        StringBuilder sb = new StringBuilder();
-        return sb.toString();
-    }
-    
-    /**
-     * Creates a PTGL notation string from this SSE graph.
-     * @return the PTGL ADJ format string for this graph
-     */      
-    public String toPtglFormatRED() {
-        DP.getInstance().w("toPtglFormatRED() -- not implemented yet");
-        
-        StringBuilder sb = new StringBuilder();
-        return sb.toString();
-    }
-    
-    
-    /**
-     * Creates a PTGL notation string from this SSE graph.
-     * @return the PTGL ADJ format string for this graph
-     */      
-    public String toPtglFormatKEY() {
-        DP.getInstance().w("toPtglFormatKEY() -- not implemented yet");
-        
-        StringBuilder sb = new StringBuilder();
-        return sb.toString();
-    }
-    
-    /**
-     * Creates a PTGL notation string from this SSE graph.
-     * @return the PTGL ADJ format string for this graph
-     */      
-    public String toPtglFormatSEQ() {
-        DP.getInstance().w("toPtglFormatSEQ() -- not implemented yet");
-        
-        StringBuilder sb = new StringBuilder();
-        return sb.toString();
-    }
+    }                  
     
     
     public ProteinLigandGraph<VertexSSE, PLGEdge> toProteinLigandGraph() {
