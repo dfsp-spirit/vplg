@@ -2,12 +2,14 @@
 /*
  *  postgreSQL Config 
  *  returns DB-values as array
+
+ 'host' => '192.168.185.248',
  */
 
 return array(
-    'host' => '192.168.185.248',
+    'host' => 'localhost',
     'user' => 'vplg',
-    'pw' => 'vplg',
+    'pw' => '',
     'db' => 'vplg',
     'port' => '5432'
 );

@@ -8,11 +8,13 @@ $(document).ready(function() {
 		slideWidth: viewWidth
 	});
 	
-	$('#tada').bxSlider({
+	$('.tada').bxSlider({
+		startSlide: 0,
+		controls: false,
 		minSlide: 1,
 		maxSlide: 1,
-		slideWidth: 500,
-		pagerCustom: '#bx-pager'
+		slideWidth: 600,
+		pagerCustom: '.bx-pager-own'
 		});
 	
 });

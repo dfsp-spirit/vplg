@@ -799,7 +799,7 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		margin-bottom: 5%;
 		}
 	
-	#bx-pager {
+	.bx-pager-own {
 		text-align: center;
 	}
 
@@ -836,6 +836,22 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 
 	#slide3 {
 		background: url('../../images/carousel_medium_03.jpg') top center no-repeat;
+	}
+
+	.bxslider {
+		list-style: none;
+	}
+
+	.bxslider p {
+		text-align: right;
+	}
+
+	.bx-pager-own a {
+		color: #0D0D0D;
+	}
+
+	.bx-pager-own .active {
+		color: #fff;
 	}
 
 	

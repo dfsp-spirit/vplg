@@ -21,16 +21,21 @@
 	margin-right: 10px;
 	text-align: center;
 	float: left;
+	width: 100px;
+	word-break: break-word;
 }
 
-#bx-pager {
+.bx-pager-own {
 /* Width of thumbnail + 10px from margin-right*/
-  width: 330px;
+  display: inline-block;
   margin-left: auto; 
   margin-right: auto; 
   text-align: center;
 }
 
+.bx-pager-own p {
+  text-align: center;
+}
 
 
 

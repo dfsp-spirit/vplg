@@ -8,7 +8,22 @@ error_reporting(-1);
 // Define variables
 
 $db_config = include('./backend/config.php');     //TODO: Sichern?
-$sse_type = "alpha"; # alpha-helix is #1
+$graphtype = "alpha"; # alpha-helix is #1
+$graphtypes = ["alpha", "beta", "albe", "alphalig", "betalig", "albelig"];
+
+$graphtype_dict = [
+	"alpha" => "Alpha",
+	"beta" => "Beta",
+	"albe" => "Alpha-Beta",
+	"alphalig" => "Alpha-Ligand",
+	"betalig" => "Beta-Ligand",
+	"albelig" => "Alpha-Beta-Ligand"
+];
+
+$index = array_search($graphtype, $graphtypes); //remove currently displayed graphtype from graphtype array
+if($index !== FALSE){
+    unset($graphtypes[$index]);
+}
 
 $sse_type_shortcuts = [
     1 => "H",
@@ -16,6 +31,9 @@ $sse_type_shortcuts = [
     3 => "L",
     4 => "O"
 ];
+
+
+
 
 // Define functions
 
@@ -53,41 +71,32 @@ foreach ($chains as $value){
 					  or die($query . ' -> Query failed: ' . pg_last_error());		  
 		$chain_id = pg_fetch_array($result, NULL, PGSQL_ASSOC);
 		$chain_id = (int) $chain_id['chain_id'];
-		var_dump($chain_id);
-		echo $chain_id;
-		echo "string";
+
 		
 		$query = "SELECT * FROM plcc_sse WHERE chain_id = ".$chain_id."";
 		$result = pg_query($db, $query) 
 					  or die($query . ' -> Query failed: ' . pg_last_error());
 		$tableString .= '<li>
 						<div class="container">
-						<p>Select topology type</p>
 						
-						
-						<div class="radio">
-						  <label>
-						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
-						    Alpha-Beta
-						  </label>
-						</div>
-						
-						<div class="radio">
-						  <label>
-						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
-						    Alpha
-						  </label>
-						</div>
-						  
-						  <div class="radio">
-						  <label>
-						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
-						    Beta
-						  </label>
-						</div>				  
+
 						<h4>Protein graph '.$value.'</h4>
 						 <div class="proteingraph">
-							<img src="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$sse_type.'_PG.png" alt=""/>
+							<ul class="bxslider tada">
+								<li><img src="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$graphtype.'_PG.png" alt="" />
+								<p>Download Graph: [GML] [PS] [else]</p></li>
+								';	
+					
+						foreach ($graphtypes as $gt){
+							$tableString .= '<li><img src="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$gt.'_PG.png" alt="" />
+											<p>Download Graph: [GML] [PS] [else]</p></li>
+										';
+						}
+
+					$tableString .= '</ul>
+
+
+							
 						 </div>
 						
 						 <div class="table-responsive" id="sse">
@@ -112,7 +121,8 @@ foreach ($chains as $value){
 		
 		$tableString .= '</table>
 						</div><!-- end table-responsive -->
-					
+						
+						<!-- 
 						<p>Select linear notation:</p>
 						<div id="selectNot">
 						<div class="radio">
@@ -120,7 +130,7 @@ foreach ($chains as $value){
 						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
 						    adjacent
 						  </label>
-						</div>
+						</div> 
 						
 						<div class="radio">
 						  <label>
@@ -142,22 +152,29 @@ foreach ($chains as $value){
 							    sequence
 							  </label>
 						</div>
-						</div><!-- end selectNot -->		
-					
-					
-					<ul class="bxslider" id="tada">
-						  <li><img src="test.png" /></li>
-						  <li><img src="test.png" /></li>
-						  <li><img src="test.png" /></li>
-					</ul>
-
-						<div id="bx-pager">
-						  <a class="thumbalign" data-slide-index="0" href=""><img src="thumbtest.png" /></a>
-						  <a class="thumbalign" data-slide-index="1" href=""><img src="thumbtest.png" /></a>					  
-						  <a class="thumbalign" data-slide-index="2" href=""><img src="thumbtest.png" /></a>
 						</div>		
+						-->
+					
 
-					</li>';
+					<div class="bx-pager-own">
+					<p>- Select topology type -</p>
+					<a class="thumbalign" data-slide-index="0" href=""><img src="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$graphtype.'_PG.png" width="100px" height="100px" />
+																		'.$graphtype_dict[$graphtype].'
+																		</a>
+
+					';
+
+					$c = 1;					
+					foreach ($graphtypes as $gt){
+						$tableString .= ' <a class="thumbalign" data-slide-index="'.$c++.'" href=""><img src="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$gt.'_PG.png" width="100px" height="100px" />
+											'.$graphtype_dict[$gt].'
+										  </a>
+										';
+					}
+						 
+
+			 $tableString .= '</div>		
+							</li>';
 	}
 }
 
