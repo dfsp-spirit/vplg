@@ -125,17 +125,17 @@
 			<div class="col-lg-4"></div>
 				<div class="col-lg-4">
 					<div class="input-group form-group">
-						<form class="form-inline" action="searchResults.php" method="get">
+						<form class="form-inline" action="searchResults.php" method="post">
 							<input type="text" class="form-control" name="keyword" id="searchInput" autocomplete="off" placeholder="Enter PDB ID or keyword...">
 							<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
 							<div id="advancedButton"> Advanced Search  <div id="arrow"><strong class="caret"></strong></div></div>
 							<div id="liveSearchResults"></div>
-							<label class="checkboxFont">
+							<!--- <label class="checkboxFont">
 								<input type="checkbox" id="inlineCheckbox3" name="SelectRedund" value="1"> Remove sequence homologs </input>
 							</label>
 							<label class="checkboxFont">
 								<input type="checkbox" id="matchexactCB" name="exact" value="1"> Match exact word </input>
-							</label>
+							</label> -->
 							<div id="advancedSearch">
 								<label class="advancedLabel">PDB Identifier
 									<input class="advancedInput" type="text" id="pdbid" name="pdbid" placeholder="PDB ID" size="6" maxlength="4" />
@@ -153,25 +153,16 @@
 									<input class="advancedInput" type="text" id="scop" name="scop" placeholder="SCOP" size="20" maxlength="50"/>
 								</label>
 								<label class="advancedLabel">SCOP ID
-									<input class="advancedInput" type="text" id="scopid1" name="scopid1" placeholder="" size="4" maxlength="4"/>
-									<input class="advancedInput" type="text" id="scopid2" name="scopid2" placeholder="" size="4" maxlength="4"/>
-									<input class="advancedInput" type="text" id="scopid3" name="scopid3" placeholder="" size="4" maxlength="4"/>
-									<input class="advancedInput" type="text" id="scopid4" name="scopid4" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="scopid" name="scopid" placeholder="SCOP ID" size="16" maxlength="16"/>
 								</label>
 								<label class="advancedLabel">CATH
 									<input class="advancedInput" type="text" id="cath" name="cath" placeholder="CATH" size="20" maxlength="50"/>
 								</label>
 								<label class="advancedLabel">CATH ID
-									<input class="advancedInput" type="text" id="cathid1" name="cathid1" placeholder="" size="4" maxlength="4"/>
-									<input class="advancedInput" type="text" id="cathid2" name="cathid2" placeholder="" size="4" maxlength="4"/>
-									<input class="advancedInput" type="text" id="cathid3" name="cathid3" placeholder="" size="4" maxlength="4"/>
-									<input class="advancedInput" type="text" id="cathid4" name="cathid4" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="cathid" name="cathid" placeholder="CATH ID" size="16" maxlength="16"/>
 								</label>
 								<label class="advancedLabel">EC
-									<input class="advancedInput" type="text" id="ec1" name="ec1" placeholder="" size="4" maxlength="4"/>
-									<input class="advancedInput" type="text" id="ec2" name="ec2" placeholder="" size="4" maxlength="4"/>
-									<input class="advancedInput" type="text" id="ec3" name="ec3" placeholder="" size="4" maxlength="4"/>
-									<input class="advancedInput" type="text" id="ec4" name="ec4" placeholder="" size="4" maxlength="4"/>
+									<input class="advancedInput" type="text" id="ec" name="ec" placeholder="EC Number" size="16" maxlength="16"/>
 								</label>	
 								<label class="advancedLabel">Molecule
 									<input class="advancedInput" type="text" id="molecule" name="molecule" placeholder="Molecule" size="20" maxlength="50"/>
