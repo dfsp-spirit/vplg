@@ -1,10 +1,11 @@
 #!/bin/sh
 ## fill_database.sh -- fill the VPLG database from the PDB and DSSP files in this directory
 ## This script assumes that plcc.jar and some PDB/DSSP files are in this directory. It also assumes the DB is setup correctly.
+## NOTE: Using coils is broken (in various ways).
 
 APPTAG="[FDB]"
 NODSSP_LIST="dssp_files_missing.lst"
-USE_COILS="YES"
+USE_COILS="NO"
 
 if [ -f $NODSSP_LIST ]; then
    rm $NODSSP_LIST
@@ -24,7 +25,7 @@ do
 	if [ ! -r $DSSPFILE ]; then
 	   echo "$filename" >> $NODSSP_LIST
 	else
-	    ./plcc $filename -u
+	    ./plcc $filename -u -E
 	    if [ "$USE_COILS" = "YES" ]; then
 	        ./plcc $filename -a
             fi
