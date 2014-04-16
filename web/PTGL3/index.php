@@ -125,7 +125,7 @@
 			<div class="col-lg-4"></div>
 				<div class="col-lg-4">
 					<div class="input-group form-group">
-						<form class="form-inline" action="searchResults.php" method="post">
+						<form class="form-inline" action="search.php" method="post">
 							<input type="text" class="form-control" name="keyword" id="searchInput" autocomplete="off" placeholder="Enter PDB ID or keyword...">
 							<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
 							<div id="advancedButton"> Advanced Search  <div id="arrow"><strong class="caret"></strong></div></div>
@@ -137,6 +137,10 @@
 								<input type="checkbox" id="matchexactCB" name="exact" value="1"> Match exact word </input>
 							</label> -->
 							<div id="advancedSearch">
+								<label class="advancedLabel">Logic operation:&nbsp;&nbsp;&nbsp;&nbsp;
+									<input class="radio" type="radio" name="logic" value="AND" checked>&nbsp;&nbsp;AND&nbsp;</input>
+									<input class="radio" type="radio" name="logic" value="OR">&nbsp;&nbsp;OR&nbsp;</input>
+								</label>
 								<label class="advancedLabel">PDB Identifier
 									<input class="advancedInput" type="text" id="pdbid" name="pdbid" placeholder="PDB ID" size="6" maxlength="4" />
 								</label>
@@ -173,7 +177,7 @@
 								<label class="advancedLabel">Graphs
 									<input class="advancedInput" type="text" id="graphs" name="graphs" placeholder="Graphs" size="20" maxlength="50"/>
 								</label>
-								<button type="submit" class="btn btn-default advancedInput" style="margin-top:10px;"><span>Search</span></button>
+								<button type="submit" class="btn btn-default advancedInput" style="margin-top:35px;"><span>Search</span></button>
 							</div>
 						</form>	
 					</div><!-- end input-group and form-group -->

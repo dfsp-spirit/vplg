@@ -9,38 +9,62 @@ error_reporting(-1);
 
 $db_config = include('config.php');     //TODO: Sichern?
 
-$keyword = "";
-$selectRedund = 0;
-$exactSearch = 0;
 
-
-// try to get _GET
-if(isset($_GET)) {
-    if(isset($_GET["keyword"])) {$keyword = $_GET["keyword"];};
-    if(isset($_GET["exact"])) {$exactSearch = $_GET["exact"];};
-    if(isset($_GET["SelectRedund"])) {$selectRedund = $_GET["SelectRedund"];};
-}
-
-if (strlen($keyword) == 4) {
-    if (is_numeric($keyword[0])) {
-        echo 'Might be a PDB ID. URL: <a href="http://www.rcsb.org/pdb/explore/explore.do?structureId=' . $keyword . '">' . $keyword .'</a>';
-    }
-}
-
-
-
-if (($keyword == "") || (strlen($keyword) <= 2)) {
+// try to get POST data
+$none_set = true;
+if(isset($_POST)) {
+    if(isset($_POST["keyword"])) {$keyword = $_POST["keyword"];  $none_set = false;} else {$keyword = "";};
+    if(isset($_POST["pdbid"])) {$pdbid = $_POST["pdbid"];  $none_set = false;};
+    if(isset($_POST["title"])) {$title = $_POST["title"];  $none_set = false;};
+    if(isset($_POST["het"])) {$het = $_POST["het"];  $none_set = false;};
+    if(isset($_POST["hetname"])) {$hetname = $_POST["hetname"];  $none_set = false;};
+    if(isset($_POST["scop"])) {$scop = $_POST["scop"];  $none_set = false;};
+    if(isset($_POST["scopid"])) {$scopid = $_POST["scopid"];  $none_set = false;};
+    if(isset($_POST["cath"])) {$cath = $_POST["cath"];  $none_set = false;};
+    if(isset($_POST["cathid"])) {$cathid = $_POST["cathid"];  $none_set = false;};
+    if(isset($_POST["ec"])) {$ec = $_POST["ec"];  $none_set = false;};
+    if(isset($_POST["molecule"])) {$molecule = $_POST["molecule"];  $none_set = false;};
+    if(isset($_POST["classification"])) {$classification = $_POST["classification"];  $none_set = false;};
+    if(isset($_POST["graphs"])) {$graphs = $_POST["graphs"];  $none_set = false;};
+    if(isset($_POST["logic"])) {$logic = $_POST["logic"];  $none_set = false;};
+} else {
 	$tableString = "Sorry. Your search term is too short. <br>\n";
 	$tableString .= '<a href="./index.php">Go back</a> or use the query box in the upper right corner!';
-} else {
+}
+
+if ((($keyword == "") || (strlen($keyword) <= 2)) && ($none_set == true)) {
+	$tableString = "Sorry. Your search term is too short.<br>\n";
+	$tableString .= '<a href="./index.php">Go back</a> or use the query box in the upper right corner!';
+} else { 	// establish pgsql connection
 	
-	// establish pgsql connection
 	$conn_string = "host=" . $db_config['host'] . " port=" . $db_config['port'] . " dbname=" . $db_config['db'] . " user=" . $db_config['user'] ." password=" . $db_config['pw'];
 	$db = pg_connect($conn_string)
 					or die($db_config['db'] . ' -> Connection error: ' . pg_last_error() . pg_result_error() . pg_result_error_field() . pg_result_status() . pg_connection_status() );            
-	$query = "SELECT * FROM plcc_protein WHERE pdb_id LIKE '%".$keyword."%' OR header LIKE '%".strtoupper($keyword)."%'";
-	$result = pg_query($db, $query) 
-					  or die($query . ' -> Query failed: ' . pg_last_error());
+	
+	#TODO change queries
+	$query = "SELECT * FROM plcc_protein WHERE ";
+	if (isset($keyword) && ($keyword != "")) { $query .= "pdb_id LIKE '%".$keyword."%' OR header LIKE '%".strtoupper($keyword)."%' ".$logic." "; };
+	if (isset($pdbid)) {   $query .= "pdb_id LIKE '%".$pdbid."%' ".$logic." "; };
+	if (isset($title)) {   $query .= "title LIKE '%".$title."%' ".$logic." "; };
+	if (isset($het)) {     $query .= "pdb_id LIKE '%".$het."%' ".$logic." "; };
+	if (isset($hetname)) { $query .= "pdb_id LIKE '%".$hetname."%' ".$logic." "; };
+	if (isset($scop)) {    $query .= "pdb_id LIKE '%".$scop."%' ".$logic." "; };
+	if (isset($scopid)) {  $query .= "pdb_id LIKE '%".$scopid."%' ".$logic." "; };
+	if (isset($cath)) {    $query .= "pdb_id LIKE '%".$cath."%' ".$logic." "; };
+	if (isset($cathid)) {  $query .= "pdb_id LIKE '%".$cathid."%' ".$logic." "; };
+	if (isset($ec)) {      $query .= "pdb_id LIKE '%".$ec."%' ".$logic." "; };
+	if (isset($molecule)) {$query .= "pdb_id LIKE '%".$molecule."%' ".$logic." "; };
+	if (isset($classification)) {$query .= "pdb_id LIKE '%".$classification."%' ".$logic." "; };
+	if (isset($graphs)) {  $query .= "pdb_id LIKE '%".$graphs."%' ".$logic." "; };
+
+	if ($logic == "OR") {
+		$query = rtrim($query, " OR ");
+	} else {
+		$query = rtrim($query, " AND ");
+	}
+	echo "<br><br><br>.....<br>".$query;
+
+	$result = pg_query($db, $query) or die($query . ' -> Query failed: ' . pg_last_error());
 
 	$counter = 0;
 	$tableString = "";
@@ -50,13 +74,9 @@ if (($keyword == "") || (strlen($keyword) <= 2)) {
 		$result_chains = pg_query($db, $query) 
 					  or die($query . ' -> Query failed: ' . pg_last_error());
 
-		
-		if ($counter % 2 == 0){     // performs alternating orange/white tables
-			$class = "Orange";
-		} else {
-			$class = "White";
-		}
-		// var_dump($arr);
+		// provides alternating orange/white tables
+		if ($counter % 2 == 0){$class = "Orange";} else {$class = "White";}
+
 		$tableString .=	 '<div class="results results'.$class.'">					
 						<div class="resultsHeader resultsHeader'.$class.'">
 							<div class="resultsId">'.$arr["pdb_id"].'</div>

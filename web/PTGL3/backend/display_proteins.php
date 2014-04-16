@@ -83,13 +83,19 @@ foreach ($chains as $value){
 						<h4>Protein graph '.$value.'</h4>
 						 <div class="proteingraph">
 							<ul class="bxslider tada">
-								<li><img src="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$graphtype.'_PG.png" alt="" />
-								<p>Download Graph: [GML] [PS] [else]</p></li>
+								<li><a href="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$graphtype.'_PG.png" target="_blank">
+									<img src="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$graphtype.'_PG.png" alt="" />
+									</a>
+									<a href="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$graphtype.'_PG.png" target="_blank">Full Size Image</a>
+								<span class="download-options">Download Graph: [GML] [PS] [else]</span></li>
 								';	
 					
 						foreach ($graphtypes as $gt){
-							$tableString .= '<li><img src="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$gt.'_PG.png" alt="" />
-											<p>Download Graph: [GML] [PS] [else]</p></li>
+							$tableString .= '<li><a href="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$gt.'_PG.png" target="_blank">
+												<img src="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$gt.'_PG.png" alt="" />
+												</a>
+											<a href="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$gt.'_PG.png" target="_blank">Full Size Image</a>
+											<span class="download-options">Download Graph: [GML] [PS] [else]</span></li>
 										';
 						}
 

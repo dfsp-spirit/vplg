@@ -854,6 +854,17 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		color: #fff;
 	}
 
+	.tada li img {
+		border: 1px solid grey;
+	}
+
+	.tada li a {
+		color: #0D0D0D;
+	}
+
+	.download-options {
+		float: right;
+	}
 	
 	
 	
