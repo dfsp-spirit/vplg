@@ -26,7 +26,9 @@ if(isset($_POST)) {
     if(isset($_POST["molecule"])) {$molecule = $_POST["molecule"];  $none_set = false;};
     if(isset($_POST["classification"])) {$classification = $_POST["classification"];  $none_set = false;};
     if(isset($_POST["graphs"])) {$graphs = $_POST["graphs"];  $none_set = false;};
-    if(isset($_POST["logic"])) {$logic = $_POST["logic"];  $none_set = false;};
+    if(isset($_POST["logic"])) {$logic = $_POST["logic"];};
+    if(isset($_POST["proteincomplexes"])) {$proteincomplexes = $_POST["proteincomplexes"];};
+
 } else {
 	$tableString = "Sorry. Your search term is too short. <br>\n";
 	$tableString .= '<a href="./index.php">Go back</a> or use the query box in the upper right corner!';
@@ -57,6 +59,7 @@ if ((($keyword == "") || (strlen($keyword) <= 2)) && ($none_set == true)) {
 	if (isset($classification)) {$query .= "pdb_id LIKE '%".$classification."%' ".$logic." "; };
 	if (isset($graphs)) {  $query .= "pdb_id LIKE '%".$graphs."%' ".$logic." "; };
 
+
 	if ($logic == "OR") {
 		$query = rtrim($query, " OR ");
 	} else {
@@ -82,8 +85,7 @@ if ((($keyword == "") || (strlen($keyword) <= 2)) && ($none_set == true)) {
 							<div class="resultsId">'.$arr["pdb_id"].'</div>
 							<div class="resultsRes">Resolution: '.$arr["resolution"].' &Aring;</div>
 							<div class="resultsLink"><a href="http://www.rcsb.org/pdb/explore/explore.do?structureId='.$arr["pdb_id"].'">[PDB]</a>
-												<a href="">[PDBSum]</a>
-												<a href="">[FASTA]</a></div>
+												<a href="http://www.rcsb.org/pdb/download/downloadFile.do?fileFormat=FASTA&compression=NO&structureId='.$arr["pdb_id"].'">[FASTA]</a></div>
 						</div>
 						<div class="resultsBody1">
 							<div class="resultsTitle">Title</div>

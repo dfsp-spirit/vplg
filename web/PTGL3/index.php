@@ -130,10 +130,10 @@
 							<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
 							<div id="advancedButton"> Advanced Search  <div id="arrow"><strong class="caret"></strong></div></div>
 							<div id="liveSearchResults"></div>
-							<!--- <label class="checkboxFont">
-								<input type="checkbox" id="inlineCheckbox3" name="SelectRedund" value="1"> Remove sequence homologs </input>
-							</label>
 							<label class="checkboxFont">
+								<input type="checkbox" id="inlineCheckbox3" name="proteincomplexes" value="1"> Search for Protein Complexes </input>
+							</label>
+							<!-- <label class="checkboxFont">
 								<input type="checkbox" id="matchexactCB" name="exact" value="1"> Match exact word </input>
 							</label> -->
 							<div id="advancedSearch">

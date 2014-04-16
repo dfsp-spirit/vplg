@@ -9,28 +9,28 @@ error_reporting(-1);
 
 $db_config = include('./backend/config.php');     //TODO: Sichern?
 $graphtype = "alpha"; # alpha-helix is #1
-$graphtypes = ["alpha", "beta", "albe", "alphalig", "betalig", "albelig"];
+$graphtypes = array("alpha", "beta", "albe", "alphalig", "betalig", "albelig");
 
-$graphtype_dict = [
+$graphtype_dict = (
 	"alpha" => "Alpha",
 	"beta" => "Beta",
 	"albe" => "Alpha-Beta",
 	"alphalig" => "Alpha-Ligand",
 	"betalig" => "Beta-Ligand",
 	"albelig" => "Alpha-Beta-Ligand"
-];
+);
 
 $index = array_search($graphtype, $graphtypes); //remove currently displayed graphtype from graphtype array
 if($index !== FALSE){
     unset($graphtypes[$index]);
 }
 
-$sse_type_shortcuts = [
+$sse_type_shortcuts = (
     1 => "H",
     2 => "B",
     3 => "L",
     4 => "O"
-];
+);
 
 
 
