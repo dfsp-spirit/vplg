@@ -32,7 +32,9 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		color: #2A6496;
 	}
 
-
+	.btn {
+		padding: 8px 12px;
+		}
 	
 	#customBackground {
 	/* Old color setup

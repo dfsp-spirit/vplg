@@ -128,7 +128,7 @@
 						<form class="form-inline" action="search.php" method="post">
 							<input type="text" class="form-control" name="keyword" id="searchInput" autocomplete="off" placeholder="Enter PDB ID or keyword...">
 							<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
-							<div id="advancedButton"> Advanced Search  <div id="arrow"><strong class="caret"></strong></div></div>
+							<div id="advancedButton"> Advanced Search <div id="arrow"><strong class="caret"></strong></div></div>
 							<div id="liveSearchResults"></div>
 							<label class="checkboxFont">
 								<input type="checkbox" id="inlineCheckbox3" name="proteincomplexes" value="1"> Search for Protein Complexes </input>

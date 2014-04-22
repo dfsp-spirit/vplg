@@ -103,7 +103,6 @@ include('./backend/display_proteins.php');
 										<a href="help.php"><i class="fa fa-question"></i> Help</a>
 									</li>
 								</ul><!-- end dropdown menu -->
-							</li><!-- end dropdown -->
 						</ul><!-- end nav navbar-nav -->
 						</div><!-- end navbar-scrollspy -->
 					</div><!-- end nav-collapse -->
@@ -142,27 +141,29 @@ include('./backend/display_proteins.php');
 
 	<footer id="footer">
 		<div class="container">
-				<div class="row">
+			<div class="row">
 				<div class="col-sm-2">
+					<a href="about.php" class="footerLink">About</a>
 				</div>
 			
 				<div class="col-sm-2">
-					<a href="#">Impressum</a>
+					<a class="footerLink" href="help.php">Help</a>
 				</div>
 				
 				<div class="col-sm-2">
-					<a href="contact.php">Contact</a>
+					<a class="footerLink" href="contact.php">Contact</a>
 				</div>
 				
 				<div class="col-sm-2">
-					<a href="http://www.bioinformatik.uni-frankfurt.de" target="_blank">MolBi - Group</a>
+					<a class="footerLink" href="http://www.bioinformatik.uni-frankfurt.de" target="_blank">MolBi - Group</a>
 				</div>
 				
 				<div class="col-sm-2">
-					<a href="#">Publications</a>
+					<a class="footerLink" href="publications.php">Publications</a>
 				</div>
 				
 				<div class="col-sm-2">
+					<a href="about.php#linking" class="footerLink">Linking PTGL</a>
 				</div>
 			</div>
 			<div class="row">
@@ -195,6 +196,7 @@ include('./backend/display_proteins.php');
 			</div>
 		</div><!-- end container -->
 	</footer>
+		
 
 		<!-- All Javascript at the bottom of the page for faster page loading -->
 		<!-- also needed for the dropdown menus etc. ... -->
@@ -206,6 +208,15 @@ include('./backend/display_proteins.php');
 		<!-- If no online access, fallback to our hardcoded version of jQuery -->
 		<!-- <script>window.jQuery || document.write('<script src="js/jquery-1.8.2.min.js"><\/script>')</script>-->
 	
+		
+		
+		<!-- First try for the online version of jQuery-->
+		<script src="http://code.jquery.com/jquery.js"></script>
+		
+		<!-- If no online access, fallback to our hardcoded version of jQuery -->
+		<script>window.jQuery || document.write('<script src="js/jquery-1.8.2.min.js"><\/script>')</script>
+		
+		
 		
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 
