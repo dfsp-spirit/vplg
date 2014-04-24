@@ -1150,7 +1150,7 @@ public class Main {
             }
         }         
         else {
-            if(atoms.size() > 50000 || (chains.size() > 1 && atoms.size() > 15000)) {
+            if((chains.size() > 1 && atoms.size() > 50000) || (chains.size() > 2 && atoms.size() > 15000)) {
                 if(! silent) {
                     System.out.println("INFO: This multi-chain protein is large (" + atoms.size() + " atoms, " + chains.size() + " chains).");
                     System.out.println("INFO:  Using chain separation (the '-E' command line switch) will speed up the computation a lot.");
@@ -1407,9 +1407,12 @@ public class Main {
                 System.out.println("Calculating SSEs for all chains of protein " + pdbid + "...");
             }
             
+            Boolean allowDeletionOfExistingProteinFromDB;
+            
             if(separateContactsByChain) {
                 String chainID;
                 ArrayList<Chain> theChain;
+                int numChainsHandled = 0;
                 for(Chain c : handleChains) {
                     // add current chain
                     theChain = new ArrayList<Chain>();   // it is a list, but only contains this single chain
@@ -1433,11 +1436,21 @@ public class Main {
                         }
                     }
                     
-                    calculateSSEGraphsForChains(theChain, residues, cInfoThisChain, pdbid, outputDir);
+                    // When chain separation is active, we can only allow deletion of old protein instances when this is the first chain we insert for this protein!
+                    allowDeletionOfExistingProteinFromDB = false;
+                    
+                    if(numChainsHandled == 0) {
+                        allowDeletionOfExistingProteinFromDB = true;
+                    }
+                    
+                    calculateSSEGraphsForChains(theChain, residues, cInfoThisChain, pdbid, outputDir, allowDeletionOfExistingProteinFromDB);
+                    
+                    numChainsHandled++;
                 }
             }
             else {
-                calculateSSEGraphsForChains(handleChains, residues, cInfo, pdbid, outputDir);
+                allowDeletionOfExistingProteinFromDB = true;
+                calculateSSEGraphsForChains(handleChains, residues, cInfo, pdbid, outputDir, allowDeletionOfExistingProteinFromDB);
                 //calculateComplexGraph(handleChains, residues, cInfo, pdbid, outputDir);
             }
             if(! silent) {
@@ -1729,8 +1742,9 @@ public class Main {
      * @param resContacts a list of residue contacts
      * @param pdbid the PDBID of the protein, required to name files properly etc.
      * @param outputDir where to write the output files. the filenames are deduced from graph type and pdbid.
+     * @paramn allowDeletionOfExistingProteinFromDB whether this function should try to delete old versions of the protein (not chain!) from the database.
      */
-    public static void calculateSSEGraphsForChains(ArrayList<Chain> allChains, ArrayList<Residue> resList, ArrayList<ResContactInfo> resContacts, String pdbid, String outputDir) {
+    public static void calculateSSEGraphsForChains(ArrayList<Chain> allChains, ArrayList<Residue> resList, ArrayList<ResContactInfo> resContacts, String pdbid, String outputDir, Boolean allowDeletionOfExistingProteinFromDB) {
 
         Boolean silent = false;
         if(Settings.getBoolean("plcc_B_silent")) {
@@ -1759,7 +1773,13 @@ public class Main {
         //pdb_id, title, header, keywords, experiment, resolution
         if(Settings.getBoolean("plcc_B_useDB")) {
             // Try to delete the protein from the DB in case it is already in there. This won't hurt if it is not.
-            DBManager.deletePdbidFromDB(pdbid);
+            
+            // TODO: We MUST NOT DO THIS if chain separation is active -- we will delete the chains which have already been inserted!
+            if(allowDeletionOfExistingProteinFromDB) {
+                DBManager.deletePdbidFromDB(pdbid);
+            }
+            
+            
             try {
                 DBManager.writeProteinToDB(pdbid, md.get("title"), md.get("header"), md.get("keywords"), md.get("experiment"), res);
                 if(! silent) {
