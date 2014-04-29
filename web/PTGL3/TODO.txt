@@ -1,11 +1,9 @@
-hmtl:
-- fill in text
-- setup links
-- printable version
-- links ToTop
 
-js:
-- tooltip
-- popover
-- carousel 
+- printable version
+ for results.php
+- tooltip (?)
+
 - add AdvancedSearch to all pages
+- errorJS.php got deleted -> add it again
+- add correct PTGL Logo on all pages
+- help.php#AdvancedSearch -> Examples? fix Content 

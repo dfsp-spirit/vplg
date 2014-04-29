@@ -215,17 +215,19 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	#ugStandardSearch {
 		width: 80%;
 		margin-top: 2%;
-		background-color: #0a7b83;
+		background-color: #0DA0AB;
 		cursor: pointer;
 		cursor: hand;
+		border-radius: 10px;
 		}
 	
 	
 	#ugAdvancedSearch {
 		width: 80%;
-		background-color: #2aa876;
+		background-color: #3DF4AC;
 		cursor: pointer;
 		cursor: hand;
+		border-radius: 10px;
 		}
 		
 	.ugCenterHeadings {
@@ -237,35 +239,40 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		}
 		
 	#ugSearchkms1 {
-		background-color: #ffd265;
-		
+		background-color: #FFD27B;
+		border-radius: 4px;
 		}
 		
 	#ugSearchk {
-		background-color: #ffd265;
+		background-color: #FFD27B;
 		cursor: pointer;
 		cursor: hand;
+		border-radius: 4px;
 		}
 	
 	#ugSearchkms2 {
-		background-color: #f19c65;
+		background-color: #FEA87A;
+		border-radius: 4px;
 		}
 	
 	#ugSearchm {
-		background-color: #f19c65;
+		background-color: #FEA87A;
 		cursor: pointer;
 		cursor: hand;
-	}
+		border-radius: 4px;
+		}
 	
 	#ugSearchkms3 {
-		background-color: #ce4d45;
+		background-color: #FF5F55;
+		border-radius: 4px;
 		}
 	
 	#ugSearchs {
-		background-color: #ce4d45;
+		background-color: #FF5F55;
 		cursor: pointer;
 		cursor: hand;
-	}
+		border-radius: 4px;
+		}
 		
 		
 		.table-hover > tbody > tr:hover > td, .table-hover > tbody > tr:hover > th {
