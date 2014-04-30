@@ -11,7 +11,7 @@ $db_config = include('./backend/config.php');     //TODO: Sichern?
 $graphtype = "alpha"; # alpha-helix is #1
 $graphtypes = array("alpha", "beta", "albe", "alphalig", "betalig", "albelig");
 
-$graphtype_dict = (
+$graphtype_dict = array(
 	"alpha" => "Alpha",
 	"beta" => "Beta",
 	"albe" => "Alpha-Beta",
@@ -25,7 +25,7 @@ if($index !== FALSE){
     unset($graphtypes[$index]);
 }
 
-$sse_type_shortcuts = (
+$sse_type_shortcuts = array(
     1 => "H",
     2 => "B",
     3 => "L",
@@ -80,7 +80,7 @@ foreach ($chains as $value){
 						<div class="container">
 						
 
-						<h4>Protein graph '.$value.'</h4>
+						<h4>Protein graph for '.$pdb_chain[0].', chain '.$pdb_chain[1].'</h4>
 						 <div class="proteingraph">
 							<ul class="bxslider tada">
 								<li><a href="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$graphtype.'_PG.png" target="_blank">
