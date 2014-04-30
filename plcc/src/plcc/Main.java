@@ -3528,9 +3528,9 @@ public class Main {
 
         }
         catch (Exception e) {
-            System.err.println("ERROR: Could not write to file '" + consetFile + "'.");
-            e.printStackTrace();
-            System.exit(1);
+            System.err.println("ERROR: Could not write to file '" + consetFile + "': '" + e.getMessage() + "'.");
+            //e.printStackTrace();
+            //System.exit(1);
         }
 
         conFH.println("AA distribution and contact statistics for protein " + pdb + ".\n");
@@ -3573,9 +3573,9 @@ public class Main {
         try {
             conFW.close();
         } catch(Exception ex) {
-            System.err.println("ERROR: Could not close FileWriter for file '" + consetFile + "'.");
-            ex.printStackTrace();
-            System.exit(1);
+            System.err.println("WARNING: Could not close FileWriter for file '" + consetFile + "'.");
+            //ex.printStackTrace();
+            //System.exit(1);
         }
 
         System.out.println("  Wrote contact statistics to file '" + consetFile + "'.");

@@ -54,6 +54,19 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphMo
     
     
     /**
+     * Computes a matrix of the number of interactions for each AA type, e.g., how many interactions exist for this
+     * protein between AAs of the types ARG and LYS, ARG and ARG, ... This returns a 20*20 matrix.
+     * 
+     * TODO: implement this
+     * 
+     * @return 
+     */
+    public int[][] getAminoAcidTypeInteractionMatrix() {
+        throw new java.lang.UnsupportedOperationException("Not implemented yet.");
+    }
+    
+    
+    /**
      * Automatically adds an edge from a ResContactInfo object if applicable. Note that the edge is only added if the RCI describes a contact.
      * @param rci the ResContactInfo object, must be for 2 residues which are part of this graph
      * @return true if the edge was added, false otherwise
