@@ -73,7 +73,7 @@ foreach ($chains as $value){
 		$chain_id = (int) $chain_id['chain_id'];
 
 		
-		$query = "SELECT * FROM plcc_sse WHERE chain_id = ".$chain_id."";
+		$query = "SELECT * FROM plcc_sse WHERE chain_id = ".$chain_id." ORDER BY pdb_start";
 		$result = pg_query($db, $query) 
 					  or die($query . ' -> Query failed: ' . pg_last_error());
 		$tableString .= '<li>
@@ -101,8 +101,6 @@ foreach ($chains as $value){
 
 					$tableString .= '</ul>
 
-
-							
 						 </div>
 						
 						 <div class="table-responsive" id="sse">
@@ -115,11 +113,13 @@ foreach ($chains as $value){
 								</tr>';
 		$counter = 1;						
 		while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
+			$pdb_start = str_replace("-", "", substr($arr["pdb_start"], 1));
+			$pdb_end = str_replace("-", "", substr($arr["pdb_end"], 1));
 			$tableString .= '<tr class="tablecenter">
 									<td>'.$counter.'</td>
 									<td>'.$sse_type_shortcuts[$arr["sse_type"]].'</td>
 									<td>'.$arr["sequence"].'</td>
-									<td>'.$arr["dssp_start"].' - '.$arr["dssp_end"].'</td>
+									<td>'.$pdb_start.' - '.$pdb_end.'</td>
 								</tr>';
 
 			$counter++;

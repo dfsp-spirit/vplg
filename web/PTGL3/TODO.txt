@@ -1,9 +1,14 @@
+############## TODO-LIST ###############
 
-- printable version
- for results.php
-- tooltip (?)
 
 - add AdvancedSearch to all pages
-- errorJS.php got deleted -> add it again
+
 - add correct PTGL Logo on all pages
-- help.php#AdvancedSearch -> Examples? fix Content 
+- help.php#AdvancedSearch -> Examples? fix Content
+- Search for "Protein Complexes"
+- 3D Structure (jmol) Overlay
+- Security
+
+
+- printable version for results.php
+- Tooltips Advanced Search
