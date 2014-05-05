@@ -1384,6 +1384,8 @@ public class Main {
                 AAGraph aag = new AAGraph(residues, cInfo);
                 aag.setPdbid(pdbid);
                 aag.setChainid(AAGraph.CHAINID_ALL_CHAINS);
+                
+                // write the AA graph
                 String aagFile = outputDir + fs + pdbid + "_aagraph.gml";
                 if(writeStringToFile(aagFile, aag.toGraphModellingLanguageFormat())) {
                     if(! silent) {
@@ -1393,6 +1395,19 @@ public class Main {
                 else {
                     System.err.println("ERROR: Could not write AAGraph for all chains to file '" + aagFile + "'.");
                 }
+                
+                // write the AA contact statistics matrix (by AA type, not single AA)
+                String aaMatrixFile = outputDir + fs + pdbid + "_aatypematrix.gml";
+                if(writeStringToFile(aaMatrixFile, aag.getAminoAcidTypeInteractionMatrixGML())) {
+                    if(! silent) {
+                        System.out.println("  AA type contact stats matrix for all chains written to file '" + aaMatrixFile + "'.");
+                    }
+                }
+                else {
+                    System.err.println("ERROR: Could not write AA type contact stats matrix for all chains to file '" + aaMatrixFile + "'.");
+                }
+                
+                
             }
             
             
@@ -1425,14 +1440,27 @@ public class Main {
                         AAGraph aag = new AAGraph(c.getResidues(), cInfoThisChain);
                         aag.setPdbid(pdbid);
                         aag.setChainid(c.getPdbChainID());
+                        
+                        // write AA graph
                         String aagFile = outputDir + fs + pdbid + "_aagraph_chain_" + c.getPdbChainID() + ".gml";
                         if(writeStringToFile(aagFile, aag.toGraphModellingLanguageFormat())) {
                             if(! silent) {
-                                System.out.println("  AAGraph for all chains written to file '" + aagFile + "'.");
+                                System.out.println("  AAGraph for chain " + c.getPdbChainID() + " written to file '" + aagFile + "'.");
                             }
                         }
                         else {
-                            System.err.println("ERROR: Could not write AAGraph for all chains to file '" + aagFile + "'.");
+                            System.err.println("ERROR: Could not write AAGraph for chain " + c.getPdbChainID() + " to file '" + aagFile + "'.");
+                        }
+                        
+                        // write the AA contact statistics matrix (by AA type, not single AA)
+                        String aaMatrixFile = outputDir + fs + pdbid + "_aatypematrix_chain_" + c.getPdbChainID() + ".gml";
+                        if(writeStringToFile(aaMatrixFile, aag.getAminoAcidTypeInteractionMatrixGML())) {
+                            if(! silent) {
+                                System.out.println("  AA type contact stats matrix for chain " + c.getPdbChainID() + " written to file '" + aaMatrixFile + "'.");
+                            }
+                        }
+                        else {
+                            System.err.println("ERROR: Could not write AA type contact stats matrix for chain " + c.getPdbChainID() + " to file '" + aaMatrixFile + "'.");
                         }
                     }
                     
@@ -2653,7 +2681,7 @@ public class Main {
 
         for(Integer i = 0; i < res.size(); i++) {
             r = res.get(i);
-            rID = r.getInternalID();
+            rID = r.getInternalAAID();
 
             contact[rID][0][0][0]++;
 
@@ -3002,8 +3030,8 @@ public class Main {
         Integer atomIndexOfBackboneN = 0;       // backbone nitrogen atom index
         Integer atomIndexOfBackboneO = 3;       // backbone oxygen atom index
 
-        Integer aIntID = a.getInternalID();     // Internal AA ID (ALA=1, ARG=2, ...)
-        Integer bIntID = b.getInternalID();
+        Integer aIntID = a.getInternalAAID();     // Internal AA ID (ALA=1, ARG=2, ...)
+        Integer bIntID = b.getInternalAAID();
         Integer statAtomIDi, statAtomIDj;
 
 

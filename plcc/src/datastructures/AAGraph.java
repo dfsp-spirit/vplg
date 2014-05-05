@@ -8,6 +8,7 @@
 package datastructures;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import plcc.AminoAcid;
 import plcc.GraphModellingLanguageFormat;
 import plcc.ResContactInfo;
@@ -55,14 +56,108 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphMo
     
     /**
      * Computes a matrix of the number of interactions for each AA type, e.g., how many interactions exist for this
-     * protein between AAs of the types ARG and LYS, ARG and ARG, ... This returns a 20*20 matrix.
+     * protein between AAs of the types ARG and LYS, ARG and ARG, ... This returns a 21*21 matrix, ignore the 0 lines (matrix[0][whatever] and matrix[whatever][0]). The reason for this to start at 1
+     * is that it uses the internal PTGL AA type identifier (which starts at 1 for historical/compatibility reasons).
      * 
-     * TODO: implement this
+     * @return a matrix of dimension 21x21 which describes the number of contacts between the 20 natural amino acid types (LYS, ARG, ...) for this graph (or protein chain). The indices in the list correspond to the internal AA ID for that type, i.e., the amino acids in the lists start at index 1 and you can get
+     * their names using the AminoAcid.intIDToName3() function. The 0 fields of both lists (matrix[0][whatever] and matrix[whatever][0]) can be ignored. They contain the sum of all 
+     * contacts (no matter the type of the other AA) for the given AA type though.
      * 
-     * @return 
      */
     public int[][] getAminoAcidTypeInteractionMatrix() {
-        throw new java.lang.UnsupportedOperationException("Not implemented yet.");
+        int[][] matrix = new int[21][21];
+        for (int i = 0; i < matrix.length; i++) {
+            Arrays.fill(matrix[i], 0);
+        }
+        
+        ArrayList<Integer[]> allEdges = this.getEdgeListIndex();
+        int numIgnored = 0;
+        for(Integer[] edge : allEdges) {
+            Integer resAPtglAAtype = this.vertices.get(edge[0]).getInternalAAID();
+            Integer resBPtglAAtype = this.vertices.get(edge[1]).getInternalAAID();
+            
+            if(resAPtglAAtype > 0 && resAPtglAAtype < matrix.length) {
+                if(resBPtglAAtype > 0 && resBPtglAAtype < matrix.length) {
+                    matrix[resAPtglAAtype][resBPtglAAtype]++;
+                    matrix[resBPtglAAtype][resAPtglAAtype]++;
+                    
+                    matrix[resAPtglAAtype][0]++;    // total contacts of AA type resA
+                    matrix[resBPtglAAtype][0]++;    // total contacts of AA type resB                
+                    matrix[0][resAPtglAAtype]++;    // total contacts of AA type resA
+                    matrix[0][resBPtglAAtype]++;    // total contacts of AA type resB                
+                }                
+                else {
+                    numIgnored++;
+                }
+            }                        
+            else {
+                numIgnored++;
+            }
+        }
+        
+        return matrix;
+    }
+    
+    
+    /**
+     * Computes a GML representation of the amino acid contact statistics matrix. GML is the Graph Modeling Language format.
+     * This uses the getAminoAcidTypeInteractionMatrix() function to compute the matrix.
+     * @return a GML string representation of the amino acid contact stats matrix
+     */
+    public String getAminoAcidTypeInteractionMatrixGML() {
+        int[][]matrix = this.getAminoAcidTypeInteractionMatrix();
+        
+        StringBuilder gml = new StringBuilder();
+        
+        
+        String label_pdbid = (this.pdbid == null ? "" : " PDB " + this.pdbid);
+        String label_chainid = ((this.chainid == null ||  this.chainid.equals(AAGraph.CHAINID_ALL_CHAINS)) ? "" : " chain " + this.chainid);
+        // print the header
+
+        String startNode = "  node [";
+        String endNode   = "  ]";
+        String startEdge = "  edge [";
+        String endEdge   = "  ]";
+        
+        gml.append("graph [\n");
+        gml.append("  id ").append(1).append("\n");
+        gml.append("  label \"" + "VPLG Amino acid contact stats matrix ").append(label_pdbid).append(label_chainid).append("\"\n");
+        gml.append("  comment \"" + "VPLG Amino acid contact stats matrix  ").append(label_pdbid).append("\"\n");
+        gml.append("  directed 0\n");
+        gml.append("  isplanar 0\n");
+        gml.append("  creator \"PLCC\"\n");
+        
+        
+        // print the 20 vertices -- one for each of the 20 amino acid types
+        for(Integer i = 1; i < matrix.length; i++) {
+            gml.append(startNode).append("\n");
+            gml.append("    id ").append(i).append("\n");
+            String aaType = AminoAcid.intIDToName3(i);
+            gml.append("    label \"").append(aaType).append("\"\n");
+            gml.append(endNode).append("\n");
+        }
+        
+        // print the edges with labels -- an edge label is the number of contacts between AAs of the given types
+        Integer src, tgt, numContacts;
+        ArrayList<Integer[]> allEdges = this.getEdgeListIndex();
+        for(Integer i = 1; i < matrix.length; i++) {
+            for(Integer j = 1; i < matrix[0].length; j++) {
+                src = i;
+                tgt = j;
+                numContacts = matrix[i][j];
+            
+                gml.append(startEdge).append("\n");
+                gml.append("    source ").append(src).append("\n");
+                gml.append("    target ").append(tgt).append("\n");                        
+                gml.append("    weight ").append(numContacts).append("\n");                        
+                gml.append(endEdge).append("\n");
+            }
+        }
+            
+        // print footer (close graph)
+        gml.append("]\n");
+        
+        return(gml.toString());        
     }
     
     
@@ -72,19 +167,25 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphMo
      * @return true if the edge was added, false otherwise
      */
     public final boolean addEdgeFromRCI(ResContactInfo rci) {
-        if(rci.describesContact()) {            
+        if(rci.describesAnyContact()) {            
             Residue resA = rci.getResA();
             Residue resB = rci.getResB();
 
             int indexResA = this.getVertexIndex(resA);
             int indexResB = this.getVertexIndex(resB);
             if(indexResA >= 0 && indexResB >= 0) {
-                AAEdgeInfo ei = new AAEdgeInfo(rci);
-                this.addEdge(indexResA, indexResB, ei);
-                return true;
+                if(rci.describesAnyContact()) {
+                    AAEdgeInfo ei = new AAEdgeInfo(rci);
+                    this.addEdge(indexResA, indexResB, ei);
+                    return true;
+                }
+                else {
+                    return false;                           
+                }
             }
             else {
                 System.err.println("WARNING: Could not add edge from ResContactInfo, vertices not found in graph.");
+                return false;
             }
         }
         return false;

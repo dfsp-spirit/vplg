@@ -140,8 +140,8 @@ public class ResContactInfo {
     public String getResName3B() { return(this.resB.getName3()); }
     public String getResName1A() { return(this.resA.getAAName1()); }
     public String getResName1B() { return(this.resB.getAAName1()); }
-    public Integer getAAIDResA() { return(this.resA.getInternalID()); }
-    public Integer getAAIDResB() { return(this.resB.getInternalID()); }
+    public Integer getAAIDResA() { return(this.resA.getInternalAAID()); }
+    public Integer getAAIDResB() { return(this.resB.getInternalAAID()); }
 
     public Integer getCenterSphereRadiusResA() { return(this.resA.getCenterSphereRadius()); }
     public Integer getCenterSphereRadiusResB() { return(this.resB.getCenterSphereRadius()); }
@@ -207,10 +207,10 @@ public class ResContactInfo {
     public Residue getResB() { return(resB); }
     
     /**
-     * Determines whether the residue pair described by this RCI is in contact, i.e., has contacts of any type.
+     * Determines whether the residue pair described by this RCI is in any contact, i.e., has contacts of any type.
      * @return true if this RCI contains any kind of contact
      */
-    public boolean describesContact() {
+    public boolean describesAnyContact() {
         return(this.getNumContactsTotal() > 0 || this.getNumLigContactsTotal() > 0);
     }
 

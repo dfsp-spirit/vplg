@@ -567,6 +567,8 @@ public class Residue implements java.io.Serializable {
     // getters
     public String getName3() { return(resName3); }
     public String getAAName1() { return(AAName1); }
+    
+    /** Returns the residue type: 0=AA, 1=Ligand, 2=Other. */
     public Integer getType() { return(type); }
     public Integer getPdbResNum() { return(pdbResNum); }
     public Integer getDsspResNum() { return(dsspResNum); }
@@ -596,7 +598,7 @@ public class Residue implements java.io.Serializable {
      * Returns the PTGL internal ID for this residue type (AA-type based).
      * @return 
      */
-    public Integer getInternalID() { return(AminoAcid.name3ToID(resName3)); }
+    public Integer getInternalAAID() { return(AminoAcid.name3ToID(resName3)); }
     
     /**
      * Returns a string in pattern 'resName3 + '-' + pdbResNum', e.g., 'ARG-47'. Note that this

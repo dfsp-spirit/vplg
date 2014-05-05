@@ -18,12 +18,14 @@ public class AminoAcid {
 
     // declare class vars
 
-    // The AAs above 20 (J, B, Z, X) are PDB / ligand specific special AAs.
-    static String[] names3 = { "ALA", "ARG", "ASN", "ASP", "CYS", "GLU", "GLN", "GLY", "HIS", "ILE", "LEU", "LYS", "MET", "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL", "LIG", "_B_", "_Z_", "_X_" };
-    static String[] names1 = { "A",    "R",  "N",   "D",    "C",  "E",   "Q",   "G",   "H",   "I",   "L",   "K",   "M",   "F",   "P",   "S",   "T",   "W",   "Y",   "V",   "J",   "B",   "Z",   "X" };
+    /* The AAs above 20 (J, B, Z, X) are PDB / ligand specific special AAs. */    
+    public static final String[] names3 = { "ALA", "ARG", "ASN", "ASP", "CYS", "GLU", "GLN", "GLY", "HIS", "ILE", "LEU", "LYS", "MET", "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL", "LIG", "_B_", "_Z_", "_X_" };
+    // quick find line, index:               0      1      2      3      4      5      6      7      8      9      10     11     12     13     14     15     16     17     18     19     20     21     22     23    
+    
+    public static final String[] names1 = { "A",    "R",  "N",   "D",    "C",  "E",   "Q",   "G",   "H",   "I",   "L",   "K",   "M",   "F",   "P",   "S",   "T",   "W",   "Y",   "V",   "J",   "B",   "Z",   "X" };
 
     // The number of atoms the AAs have (in order of the names3/names1 arrays)
-    static Integer[] atoms = {  5,     11,    8,     8,     6,     9,     9,     4,     10,    8,     8,     9,     8,     11,    7,     6,     7,     14,    12,    7,     8,     9,     4,     10 };
+    public static final Integer[] atoms = {  5,     11,    8,     8,     6,     9,     9,     4,     10,    8,     8,     9,     8,     11,    7,     6,     7,     14,    12,    7,     8,     9,     4,     10 };
 
     
     /**
@@ -45,6 +47,7 @@ public class AminoAcid {
 
     /**
      * Converts the internal PTGL id of an amino acid to the 3-letter code.
+     * The IDs start with 1 (not zero! -- blame the original PTGL for this, not me).
      */
     public static String intIDToName3(Integer id) {
         if(id <= names3.length && id >= 1) {

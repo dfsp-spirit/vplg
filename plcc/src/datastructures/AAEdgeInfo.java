@@ -32,6 +32,9 @@ public class AAEdgeInfo implements GraphModellingLanguageFormat {
     @Override
     public String toGraphModellingLanguageFormat() {
         StringBuilder sb = new StringBuilder();
+        if(this.rci.describesAnyContact()) {
+            sb.append("edge [\n      source ?\n      target ?\n      label \"edge label\"\n]\n");
+        }
         return sb.toString();
     }
     
