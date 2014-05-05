@@ -1150,10 +1150,12 @@ public class Main {
             }
         }         
         else {
-            if((chains.size() > 1 && atoms.size() > 50000) || (chains.size() > 2 && atoms.size() > 15000)) {
-                if(! silent) {
-                    System.out.println("INFO: This multi-chain protein is large (" + atoms.size() + " atoms, " + chains.size() + " chains).");
-                    System.out.println("INFO:  Using chain separation (the '-E' command line switch) will speed up the computation a lot.");
+            if( ! Settings.getBoolean("plcc_B_complex_graphs")) {
+                if((chains.size() > 1 && atoms.size() > 50000) || (chains.size() > 2 && atoms.size() > 15000)) {
+                    if(! silent) {
+                        System.out.println("INFO: This multi-chain protein is large (" + atoms.size() + " atoms, " + chains.size() + " chains).");
+                        System.out.println("INFO:  Using chain separation (the '-E' command line switch) will speed up the computation a lot.");
+                    }
                 }
             }
         }
