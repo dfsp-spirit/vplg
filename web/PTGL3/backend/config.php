@@ -7,7 +7,7 @@
  */
 
 return array(
-    'host' => '192.168.185.248',
+    'host' => 'localhost',
     'user' => 'vplg',
     'pw' => 'vplg',
     'db' => 'vplg',

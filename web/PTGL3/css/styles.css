@@ -35,6 +35,10 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	.btn {
 		padding: 8px 12px;
 		}
+	#loadButton {
+		position: absolute;
+		margin-left: 1px;
+	}
 	
 	#customBackground {
 	/* Old color setup
@@ -396,7 +400,7 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	}
 	
 	#search {
-		padding-top: 20%;
+		padding-top: 130px;
 		padding-right: auto;
 		padding-left: auto;
 		}
@@ -517,17 +521,21 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	/* Search results page */
 	
 	#searchResults {
-		margin-top: 50px;
+		/* margin-top: 50px; */
 		}
 		
-		
+	.bx-wrapper > .container {
+		padding-right: 10px;
+	}		
+
 	.results {
 		width: 100%;
 		overflow: hidden;
+		border-top: 1px solid grey;
 		}
 	
 	.resultsOrange {
-		background: rgba(241, 156, 101, .6);
+		background: #BEDBE6;
 		}
 	
 	.resultsWhite {
@@ -541,7 +549,7 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	}
 
 	.resultsHeaderOrange {
-		background: rgba(241, 156, 101, .8);
+		background: #7DC0C5;
 		
 	}
 	
@@ -554,18 +562,18 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	.resultsId {
 		width: 100px;
 		float: left;
-		font-size: 1.8em;
-		font-weight: bold;
+		font-size: 1.5em;
+		font-weight: normal;
 		}
 
 	.resultsRes {
-		margin-top: .8em;
+		margin-top: .7em;
 		width: auto;
 		float: left;
 	}
 	
 	.resultsLink {
-		padding-top: .7em;
+		padding-top: .6em;
 		text-align: right;
 		padding-right: 1px;
 	}
@@ -641,6 +649,7 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	
 	
 	.chainCheckBox {
+		margin-right: 3px !important;
 		
 	}
 	
