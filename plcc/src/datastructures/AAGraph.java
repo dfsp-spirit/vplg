@@ -55,16 +55,46 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphMo
     
     
     /**
+     * Counts the number of amino acids of all types in the protein (how many ARG, how many PHE, ...).
+     * Note that only the 20 natural AAs are considered (ligands and PDB special AAs like 'unknown' are ignored.
+     * 
+     * @return a list of the AA type counts. The index in the list is the PTGL-style AA identifier (see the AminoAcid class).
+     * This means that you can get the count for "ALA" by: count_ala = counts[name3ToID("ALA")];.
+     * Because the internal IDs start with 1, the 0 field is not required for the AA types. It contains the total number of valid AAs.
+     */
+    public int[] getAATypeCounts() {
+        int[] counts = new int[21];
+        Arrays.fill(counts, 0);
+        
+        Integer residueTypeID;        
+        for(Residue r : this.vertices) {
+            residueTypeID = r.getInternalAAID();
+            if(residueTypeID > 0 && residueTypeID < counts.length) {
+                counts[residueTypeID]++;
+                counts[0]++;    // total number of valid AAs
+            }
+        }                
+        
+        return counts;
+    }
+    
+    /**
      * Computes a matrix of the number of interactions for each AA type, e.g., how many interactions exist for this
      * protein between AAs of the types ARG and LYS, ARG and ARG, ... This returns a 21*21 matrix, ignore the 0 lines (matrix[0][whatever] and matrix[whatever][0]). The reason for this to start at 1
      * is that it uses the internal PTGL AA type identifier (which starts at 1 for historical/compatibility reasons).
+     
+     * @param computeCountsForAllAminoAcidTypes if this parameter is set to true, then the counts for all AA types are also computed. They
+     * are written to the 0 fields of the first matrix dimension (matrix[0][AAtypeID]). The field matrix[0][0] contains the total number of valid (natural) amino acids in the residue list.
+     * If this parameter is false, the count computation is skipped and all these fields contain zeros.
      * 
      * @return a matrix of dimension 21x21 which describes the number of contacts between the 20 natural amino acid types (LYS, ARG, ...) for this graph (or protein chain). The indices in the list correspond to the internal AA ID for that type, i.e., the amino acids in the lists start at index 1 and you can get
-     * their names using the AminoAcid.intIDToName3() function. The 0 fields of both lists (matrix[0][whatever] and matrix[whatever][0]) can be ignored. They contain the sum of all 
-     * contacts (no matter the type of the other AA) for the given AA type though.
+     * their names using the AminoAcid.intIDToName3() function. The 0 fields of the 2nd dimension (matrix[AAtypeID][0]) contain the sum of all 
+     * contacts (no matter the type of the other AA) for the given AA type.
      * 
      */
-    public int[][] getAminoAcidTypeInteractionMatrix() {
+    public int[][] getAminoAcidTypeInteractionMatrix(boolean computeCountsForAllAminoAcidTypes) {
+                
+        
         int[][] matrix = new int[21][21];
         for (int i = 0; i < matrix.length; i++) {
             Arrays.fill(matrix[i], 0);
@@ -83,8 +113,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphMo
                     
                     matrix[resAPtglAAtype][0]++;    // total contacts of AA type resA
                     matrix[resBPtglAAtype][0]++;    // total contacts of AA type resB                
-                    matrix[0][resAPtglAAtype]++;    // total contacts of AA type resA
-                    matrix[0][resBPtglAAtype]++;    // total contacts of AA type resB                
+                                   
                 }                
                 else {
                     numIgnored++;
@@ -93,6 +122,16 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphMo
             else {
                 numIgnored++;
             }
+        }
+        
+        if(computeCountsForAllAminoAcidTypes) {
+            int[] counts = getAATypeCounts();
+            matrix[0][0] = counts[0];   // total number of AAs
+            
+            for(int i = 1; i < counts.length; i++) {
+                matrix[0][i] = counts[i];   // fill in number of AAs of specific type
+            }
+            
         }
         
         return matrix;
@@ -105,7 +144,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphMo
      * @return a GML string representation of the amino acid contact stats matrix
      */
     public String getAminoAcidTypeInteractionMatrixGML() {
-        int[][]matrix = this.getAminoAcidTypeInteractionMatrix();
+        int[][]matrix = this.getAminoAcidTypeInteractionMatrix(false);
         
         StringBuilder gml = new StringBuilder();
         
@@ -144,13 +183,15 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphMo
             for(Integer j = 1; j < matrix[0].length; j++) {
                 src = i;
                 tgt = j;
-                numContacts = matrix[i][j];
-            
-                gml.append(startEdge).append("\n");
-                gml.append("    source ").append(src).append("\n");
-                gml.append("    target ").append(tgt).append("\n");                        
-                gml.append("    weight ").append(numContacts).append("\n");                        
-                gml.append(endEdge).append("\n");
+                numContacts = matrix[src][tgt];
+                
+                if(numContacts > 0) {
+                    gml.append(startEdge).append("\n");
+                    gml.append("    source ").append(src).append("\n");
+                    gml.append("    target ").append(tgt).append("\n");                        
+                    gml.append("    weight ").append(numContacts).append("\n");                        
+                    gml.append(endEdge).append("\n");
+                }
             }
         }
             
