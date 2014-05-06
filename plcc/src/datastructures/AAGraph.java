@@ -141,7 +141,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphMo
         Integer src, tgt, numContacts;
         ArrayList<Integer[]> allEdges = this.getEdgeListIndex();
         for(Integer i = 1; i < matrix.length; i++) {
-            for(Integer j = 1; i < matrix[0].length; j++) {
+            for(Integer j = 1; j < matrix[0].length; j++) {
                 src = i;
                 tgt = j;
                 numContacts = matrix[i][j];
