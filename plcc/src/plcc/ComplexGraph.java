@@ -101,7 +101,30 @@ public class ComplexGraph extends UAdjListGraph {
             }
         });
 
-        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("label", numAllInteractionsMap));
+        //gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>());
+        /**
+         * Overwrite the edge attribute writer for the labels. This has to be done
+         * because the labels need to be enclosed in closing quotation marks to mark them as strings (due to
+         * the GML format definition).
+         */
+        gw.addEdgeAttrWriter(new GMLWriter.AttrWriter<Edge>() {
+            @Override
+            public String getAttribute() {
+                return "label";
+            }
+
+            @Override
+            public boolean hasValue(Edge e) {
+                return numAllInteractionsMap.containsKey(e);
+            }
+
+            @Override
+            public String write(Edge e) {
+                return '"' + numAllInteractionsMap.get(e).toString() + '"';
+            }
+            
+        });
+        
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
                 "num_HH_contacts", numHHInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
