@@ -1467,10 +1467,17 @@ public class Main {
                     }
                     
                     // When chain separation is active, we can only allow deletion of old protein instances when this is the first chain we insert for this protein!
-                    allowDeletionOfExistingProteinFromDB = false;
-                    
-                    if(numChainsHandled == 0) {
+                    allowDeletionOfExistingProteinFromDB = false;                    
+                    if(numChainsHandled == 0) {http:// 
+                       if(! silent) {
+                            System.out.println("Handling first chain (#" + numChainsHandled + ") with chain separation active, allowing deletion of protein from DB (must be old data).");
+                        }
                         allowDeletionOfExistingProteinFromDB = true;
+                    } else {
+                        if(! silent) {
+                            System.out.println("Handling chain #" + numChainsHandled + " with chain separation active, NOT allowing deletion of protein from DB (data from previous chain).");
+                        }
+                        allowDeletionOfExistingProteinFromDB = false;
                     }
                     
                     calculateSSEGraphsForChains(theChain, residues, cInfoThisChain, pdbid, outputDir, allowDeletionOfExistingProteinFromDB);
@@ -1478,7 +1485,7 @@ public class Main {
                     numChainsHandled++;
                 }
             }
-            else {
+            else {  // no chain separation active
                 allowDeletionOfExistingProteinFromDB = true;
                 calculateSSEGraphsForChains(handleChains, residues, cInfo, pdbid, outputDir, allowDeletionOfExistingProteinFromDB);
                 //calculateComplexGraph(handleChains, residues, cInfo, pdbid, outputDir);
@@ -1772,7 +1779,7 @@ public class Main {
      * @param resContacts a list of residue contacts
      * @param pdbid the PDBID of the protein, required to name files properly etc.
      * @param outputDir where to write the output files. the filenames are deduced from graph type and pdbid.
-     * @paramn allowDeletionOfExistingProteinFromDB whether this function should try to delete old versions of the protein (not chain!) from the database.
+     * @param allowDeletionOfExistingProteinFromDB whether this function should try to delete old versions of the protein (not chain!) from the database.
      */
     public static void calculateSSEGraphsForChains(ArrayList<Chain> allChains, ArrayList<Residue> resList, ArrayList<ResContactInfo> resContacts, String pdbid, String outputDir, Boolean allowDeletionOfExistingProteinFromDB) {
 
@@ -1804,7 +1811,7 @@ public class Main {
         if(Settings.getBoolean("plcc_B_useDB")) {
             // Try to delete the protein from the DB in case it is already in there. This won't hurt if it is not.
             
-            // TODO: We MUST NOT DO THIS if chain separation is active -- we will delete the chains which have already been inserted!
+            // We do NOT DO THIS if chain separation is active -- we will delete the chains which have already been inserted!
             if(allowDeletionOfExistingProteinFromDB) {
                 DBManager.deletePdbidFromDB(pdbid);
             }
@@ -1853,7 +1860,7 @@ public class Main {
                     }
                 }
                 catch(Exception e) {
-                    DP.getInstance().w("DB: Could not reset DB connection.");
+                    DP.getInstance().w("DB: Could not reset DB connection: '" + e.getMessage() + "'.");
                 }
             }
 

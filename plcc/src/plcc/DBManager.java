@@ -337,7 +337,7 @@ public class DBManager {
     }
 
     /**
-     * Drops (=deletes) all statistics tables in the database.
+     * Drops (=deletes) all PLCC tables in the database and all of their content.
      * @return whether it worked out
      */
     public static Boolean dropTables() {
