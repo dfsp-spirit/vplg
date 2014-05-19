@@ -40,8 +40,11 @@ public class DBManager {
     static String tbl_foldinggraph = "plcc_foldinggraph";
     static String tbl_complexgraph = "plcc_complexgraph";
     static String tbl_graphletcount = "plcc_graphlets";
+    static String tbl_motif = "plcc_motif";
+    static String tbl_motiftype = "plcc_motiftype";
     static String tbl_nm_ssetoproteingraph = "plcc_nm_ssetoproteingraph";
     static String tbl_nm_ssetofoldinggraph = "plcc_nm_ssetofoldinggraph";
+    static String tbl_nm_chaintomotif = "plcc_nm_chaintomotif";
     
     /** Name of the table which stores info on SSE types, e.g., alpha-helix, beta-strand and ligand. */
     static String tbl_ssetypes = "plcc_ssetypes";
@@ -355,7 +358,10 @@ public class DBManager {
             doDeleteQuery("DROP TABLE " + tbl_nm_ssetoproteingraph + ";");
             doDeleteQuery("DROP TABLE " + tbl_nm_ssetofoldinggraph + ";");
             doDeleteQuery("DROP TABLE " + tbl_graphtypes + ";");
-            doDeleteQuery("DROP TABLE " + tbl_contacttypes + ";");
+            doDeleteQuery("DROP TABLE " + tbl_contacttypes + ";");            
+            doDeleteQuery("DROP TABLE " + tbl_motiftype + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_motif + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_nm_chaintomotif + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_complexcontacttypes + ";");
             doDeleteQuery("DROP TABLE " + tbl_ssetypes + ";");
 
@@ -366,6 +372,7 @@ public class DBManager {
             res = true;      // Not really, need to check all of them
 
         } catch (Exception e) {
+            System.err.println("ERROR: SQL failed: '" + e.getMessage() + "'.");
             res = false;
         }
 
@@ -411,6 +418,9 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_ptgl_adj text, graph_string_ptgl_red text, graph_string_ptgl_key text, graph_string_ptgl_seq text, graph_image_png text, graph_image_svg text, graph_image_adj_svg text, graph_image_adj_png text, graph_image_red_svg text, graph_image_red_png text, graph_image_key_svg text, graph_image_key_png text, graph_image_seq_svg text, graph_image_seq_png text, sse_string text);");
             doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, fg_number int not null, graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_ptgl_adj text, graph_string_ptgl_red text, graph_string_ptgl_key text, graph_string_ptgl_seq text, graph_image_png text, graph_image_svg text, graph_image_adj_svg text, graph_image_adj_png text, graph_image_red_svg text, graph_image_red_png text, graph_image_key_svg text, graph_image_key_png text, graph_image_seq_svg text, graph_image_seq_png text, sse_string text);");
             doInsertQuery("CREATE TABLE " + tbl_complexgraph + " (complexgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, graph_string_gml text, graph_string_kavosh text, graph_image_svg text, graph_image_png text);");
+            doInsertQuery("CREATE TABLE " + tbl_motiftype + " (motiftype_id serial primary key, motiftype_name varchar(40));");
+            doInsertQuery("CREATE TABLE " + tbl_motif + " (motif_id serial primary key, motiftype_id int not null references " + tbl_motiftype + " ON DELETE CASCADE, motif_name varchar(40));");
+            
 
             /**
              * The contents of the graphlet_counts[55] SQL array is as follows (from Tatianas thesis, pp. 36-37):
@@ -436,6 +446,7 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_graphletcount + " (graphlet_id serial primary key, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graphlet_counts int[55] not null);");
             doInsertQuery("CREATE TABLE " + tbl_nm_ssetoproteingraph + " (ssetoproteingraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, position_in_graph int not null);");
             doInsertQuery("CREATE TABLE " + tbl_nm_ssetofoldinggraph + " (ssetofoldinggraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, position_in_graph int not null);");
+            doInsertQuery("CREATE TABLE " + tbl_nm_chaintomotif + " (chaintomotif_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, motif_id int not null references " + tbl_motif + " ON DELETE CASCADE);");
                                                 
 
             // set constraints
@@ -511,6 +522,8 @@ public class DBManager {
             doInsertQuery("CREATE INDEX plcc_idx_ssetoproteingraph_fk2 ON " + tbl_nm_ssetoproteingraph + " (graph_id);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_ssetofoldinggraph_fk1 ON " + tbl_nm_ssetofoldinggraph + " (sse_id);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_ssetofoldinggraph_fk2 ON " + tbl_nm_ssetofoldinggraph + " (foldinggraph_id);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_chaintomotif_fk1 ON " + tbl_nm_chaintomotif + " (chain_id);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_chaintomotif_fk2 ON " + tbl_nm_chaintomotif + " (motif_id);");                       // FK
             
 
             // indices on PKs get created automatically
@@ -536,8 +549,27 @@ public class DBManager {
             
             doInsertQuery("INSERT INTO " + tbl_complexcontacttypes + " (complexcontacttype_id, complexcontacttype_text) VALUES (1, 'van-der-Waals');");
             doInsertQuery("INSERT INTO " + tbl_complexcontacttypes + " (complexcontacttype_id, complexcontacttype_text) VALUES (2, 'disulfide');");
+            
+            doInsertQuery("INSERT INTO " + tbl_motiftype + " (motiftype_id, motiftype_name) VALUES (1, 'alpha');");
+            doInsertQuery("INSERT INTO " + tbl_motiftype + " (motiftype_id, motiftype_name) VALUES (2, 'beta');");
+            doInsertQuery("INSERT INTO " + tbl_motiftype + " (motiftype_id, motiftype_name) VALUES (3, 'alpha beta');");
+            
+            // alpha motifs
+            doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name) VALUES (1, 1, 'Four Helix Bundle');");
+            doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name) VALUES (2, 1, 'Globin Fold');");
+            // beta motifs
+            doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name) VALUES (3, 2, 'Up and Down Barrel');");
+            doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name) VALUES (4, 2, 'Immunoglobin Fold');");
+            doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name) VALUES (5, 2, 'Beta Propeller');");
+            doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name) VALUES (6, 2, 'Jelly Roll');");
+            // alpha beta motifs
+            doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name) VALUES (7, 3, 'Ubiquitin Roll');");
+            doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name) VALUES (8, 3, 'Alpha Beta Plait');");
+            doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name) VALUES (9, 3, 'Rossman Fold');");
+            doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name) VALUES (10, 3, 'TIM Barrel');");
+            
 
-            res = true;      // Not really, need to check all of them.
+            res = true;      // Not really, need to check all of them. We currently leave this to the user (failed queries will at least spit error messages to STDERR).
 
         } catch (Exception e) { 
             System.err.println("ERROR: '" + e.getMessage() + "'.");
