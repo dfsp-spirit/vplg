@@ -34,15 +34,6 @@ $sse_type_shortcuts = array(
 
 
 
-
-// Define functions
-
-function getGraphByID($pdbID){
-	# TODO
-}
-
-
-
 // try to get _GET
 if(isset($_GET)) {
     if(isset($_GET["pcs"])) {$pcs = $_GET["pcs"];};
@@ -59,12 +50,15 @@ $conn_string = "host=" . $db_config['host'] . " port=" . $db_config['port'] . " 
 $tableString = '<div id="myCarousel">
 				  <ul class="bxslider bx-prev bx-next" id="carouselSlider">';
 
-
+$loaded_images = 0;
+$allChainIDs = array();
 foreach ($chains as $value){
 	if (!(strlen($value) == 5)) {
 		echo "<br />'" . $value . "' has a wrong PDB-ID format\n<br />";
 	}
 	else {
+
+		array_push($allChainIDs, $value);
 		$pdb_chain = str_split($value, 4);
 		$query = "SELECT * FROM plcc_chain WHERE pdb_id LIKE '%".$pdb_chain[0]."%' AND chain_name LIKE '%".$pdb_chain[1]."%'"; #select chain_id only?
 		$result = pg_query($db, $query) 
@@ -81,24 +75,46 @@ foreach ($chains as $value){
 						
 
 						<h4>Protein graph for '.$pdb_chain[0].', chain '.$pdb_chain[1].'</h4>
+
 						 <div class="proteingraph">
+						 	<div>
+						 	<input type="checkbox" name="" value=""> Enqueue in Downloadlist
+						 	<span class="download-options"><a href="">3D-View [JMOL]</a></span>
+							</div>	
 							<ul class="bxslider tada">
-								<li><a href="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$graphtype.'_PG.png" target="_blank">
+								<li id="'.$pdb_chain[0].$pdb_chain[1].'">';
+
+					if($loaded_images < 2){		
+					$tableString .= '<a title="Loaded_'.$loaded_images.'" href="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$graphtype.'_PG.png" target="_blank">
 									<img src="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$graphtype.'_PG.png" alt="" />
 									</a>
 									<a href="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$graphtype.'_PG.png" target="_blank">Full Size Image</a>
-								<span class="download-options">Download Graph: [GML] [PS] [else]</span></li>
-								';	
+								<span class="download-options">Download Graph: 
+								<a href="">[PS]</a>
+								<a href="">[SVG]</a>
+								<a href="">[PNG]</a></span>';
+					
+					}
+
+					$tableString .= '</li>';	
 					
 						foreach ($graphtypes as $gt){
-							$tableString .= '<li><a href="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$gt.'_PG.png" target="_blank">
+							$tableString .= '<li>';
+							
+							if($loaded_images < 2){
+							$tableString .= '<a href="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$gt.'_PG.png" target="_blank">
 												<img src="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$gt.'_PG.png" alt="" />
 												</a>
 											<a href="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$gt.'_PG.png" target="_blank">Full Size Image</a>
-											<span class="download-options">Download Graph: [GML] [PS] [else]</span></li>
-										';
+											<span class="download-options">Download Graph: 
+											<a href="">[PS]</a>
+											<a href="">[SVG]</a>
+											<a href="">[PNG]</a></span>';
+							
+							}
+							$tableString .= '</li>';
 						}
-
+						
 					$tableString .= '</ul>
 
 						 </div>
@@ -162,13 +178,14 @@ foreach ($chains as $value){
 						-->
 					
 
-					<div class="bx-pager-own">
-					<p>- Select topology type -</p>
-					<a class="thumbalign" data-slide-index="0" href=""><img src="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$graphtype.'_PG.png" width="100px" height="100px" />
+					<div id="'.$pdb_chain[0].$pdb_chain[1].'_pager" class="bx-pager-own">';
+					
+				if($loaded_images < 2){
+					$tableString .= '<p>- Select topology type -</p>
+									<a class="thumbalign" data-slide-index="0" href=""><img src="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$graphtype.'_PG.png" width="100px" height="100px" />
 																		'.$graphtype_dict[$graphtype].'
-																		</a>
+																		</a>';
 
-					';
 
 					$c = 1;					
 					foreach ($graphtypes as $gt){
@@ -177,11 +194,13 @@ foreach ($chains as $value){
 										  </a>
 										';
 					}
+				}
 						 
 
 			 $tableString .= '</div>		
 							</li>';
 	}
+	$loaded_images++;
 }
 
  $tableString .= '	</ul>

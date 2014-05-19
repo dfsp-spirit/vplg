@@ -2,10 +2,12 @@ $(document).ready(function() {
 
 
 	var viewWidth = $(window).width();
-	$('#carouselSlider').bxSlider({
+	var slider = $('#carouselSlider').bxSlider({
 		minSlide: 1,
 		maxSlide: 1,
-		slideWidth: viewWidth
+		slideWidth: viewWidth,
+		infiniteLoop: false,
+		hideControlOnEnd: true
 	});
 	
 	$('.tada').bxSlider({

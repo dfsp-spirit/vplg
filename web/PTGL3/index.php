@@ -153,26 +153,8 @@
 								<label class="advancedLabel">Hetname
 									<input class="advancedInput" type="text" id="hetname" name="hetname" placeholder="Hetname" size="20" maxlength="50"/>
 								</label>	
-								<label class="advancedLabel">SCOP
-									<input class="advancedInput" type="text" id="scop" name="scop" placeholder="SCOP" size="20" maxlength="50"/>
-								</label>
-								<label class="advancedLabel">SCOP ID
-									<input class="advancedInput" type="text" id="scopid" name="scopid" placeholder="SCOP ID" size="16" maxlength="16"/>
-								</label>
-								<label class="advancedLabel">CATH
-									<input class="advancedInput" type="text" id="cath" name="cath" placeholder="CATH" size="20" maxlength="50"/>
-								</label>
-								<label class="advancedLabel">CATH ID
-									<input class="advancedInput" type="text" id="cathid" name="cathid" placeholder="CATH ID" size="16" maxlength="16"/>
-								</label>
-								<label class="advancedLabel">EC
-									<input class="advancedInput" type="text" id="ec" name="ec" placeholder="EC Number" size="16" maxlength="16"/>
-								</label>	
 								<label class="advancedLabel">Molecule
 									<input class="advancedInput" type="text" id="molecule" name="molecule" placeholder="Molecule" size="20" maxlength="50"/>
-								</label>		
-								<label class="advancedLabel">Classification
-									<input class="advancedInput" type="text" id="classification" name="classification" placeholder="Classification" size="20" maxlength="50"/>
 								</label>		
 								<label class="advancedLabel">Graphs
 									<input class="advancedInput" type="text" id="graphs" name="graphs" placeholder="Graphs" size="20" maxlength="50"/>

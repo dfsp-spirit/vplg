@@ -16,7 +16,7 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	-----------------------------------------------------------*/
 	html, body {
 		height: 100%;
-		color: #0D0D0D;
+		color: rgba(62, 62, 62, 1);
 	}
 	
 	a {
@@ -142,7 +142,7 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	
 	
 	#lineAbout {
-		background-color: #0A7B83;
+		background-color: #0DA0AB;
 		}	
 	
 	#lineUserGuide {
@@ -831,7 +831,14 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
    -------------------------------------- */
 
 	#myCarousel {
-		margin-top: 100px;
+		margin-top: 1px;
+	}
+
+	#multipleDownload {
+		display: block;
+    	margin-left: 10px;
+    	margin-top: 66px !important;
+    	position: relative;
 	}
 
 	.carousel-caption {

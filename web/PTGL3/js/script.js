@@ -12,6 +12,7 @@ $("#addSearchKey").hide();
 $('#addSearchMotif').hide();
 $('#addSearchSequence').hide();
 
+
 $(function() {
 	
 	$('#alertMe').click(function(e) {

@@ -4,6 +4,7 @@ include('./backend/display_proteins.php');
 ?>
 <html>
 	<head>
+		<meta http-equiv="cache-control" content="no-cache">
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -122,6 +123,11 @@ include('./backend/display_proteins.php');
 			<b>Please note:</b> Only <a href="about.php#foldingGraph">folding graphs</a> with more than one SSE are presented. The <a href="about.php#foldingGraph">folding graphs</a> with only one SSE
 			are representing just single vertices in the <a href="about.php#proteinGraph">protein graph</a>.
 			<p>In the <a href="about.php#key">key</a> notation only folding graphs can be shown that are <a href="">non-bifurcated</a>.</p>
+			<span id="multipleDownload">Download checked Proteins as <select name="multipledownload">
+												<option value="null">-- Select to download --</option>
+												<option value="ps">PostScript</option>
+												<option value="svg">SVG</option>
+												<option value="png">PNG</option></select>																								
 		</div>
 		
 		
@@ -222,18 +228,87 @@ include('./backend/display_proteins.php');
 
 		<!-- Bootstrap JS -->
 		<script src="js/bootstrap.min.js"></script>
-		<script src="js/script.js"></script>
 		
 		<!-- Custom JS -->
-		<script src="js/script.js"></script>
-		
+		<!-- <script src="js/script.js"></script>
+			
 
 		<!-- Live Search for PDB IDs -->
-		<script src="js/livesearch.js" type="text/javascript"></script>
+		<!-- <script src="js/livesearch.js" type="text/javascript"></script>
 		
 		<!-- bxSlider Javascript file -->
 		<script src="js/jquery.bxslider.min.js"></script>
-		<script src="js/bxslider-custom.js"></script>
+		<!-- <script src="js/bxslider-custom.js"></script> -->
+
+
+
+		<!-- Dynamic ContentLoader -->
+		<script type="text/javascript">
+
+		$(document).ready(function () {             
+
+		var viewWidth = $(window).width();
+			slider = $('#carouselSlider').bxSlider({
+			minSlide: 1,
+			maxSlide: 1,
+			slideWidth: viewWidth,
+			infiniteLoop: false,
+			hideControlOnEnd: true
+		});
+	
+		$('.tada').bxSlider({
+			startSlide: 0,
+			controls: false,
+			minSlide: 1,
+			maxSlide: 1,
+			slideWidth: 600,
+			pagerCustom: '.bx-pager-own'
+		});
+
+
+		function loadNext() {
+		
+			currentSlide = slider.getCurrentSlide();
+			var chainIDs = <?php echo json_encode($allChainIDs); ?>;
+			console.log("Current Slide: " + currentSlide);
+			console.log(chainIDs);
+			console.log("Put data into #"+ chainIDs[currentSlide + 1]);
+			var dataToSend = {'currentSlide' : currentSlide, 'chainIDs[]' : <?php echo json_encode($allChainIDs); ?> } ;
+
+		
+		//Main Images
+			$.ajax({
+			type: "POST",
+			url: "./backend/getImages.php",
+			data: dataToSend,
+			cache: false,
+			success: function(html){
+				$("#"+ chainIDs[currentSlide + 1]).html(html);
+				slider.reloadSlider({
+    				startSlide: currentSlide
+    			});
+			}
+			}); 
+		}	
+
+
+		var steps = 0;
+		var prevsteps = 0;
+		$("[class='bx-next']").click( function() {
+			steps++;
+			if(steps % 1 == 0 && steps > prevsteps){
+				loadNext();
+				prevsteps = steps;
+			}
+		});
+
+		$("[class='bx-prev']").click( function() {
+			steps--;
+		});	
+		});
+
+
+		</script>	
 
 	</body>
 </html>
