@@ -110,7 +110,7 @@ public class DBManager {
             dbmd = dbc.getMetaData();
             sql = dbc.createStatement();
             conOK = true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             //System.err.println("ERROR: Could not connect to database at '" + dbURL + "'.");
             System.err.println("ERROR: Could not connect to database at '" + dbURL + "' with user '" + dbUsername + "'.");
             System.err.println("ERROR: The error message was: '" + e.getMessage() + "'.");
@@ -119,8 +119,9 @@ public class DBManager {
 
         try {
             System.out.println("Connection to " + dbmd.getDatabaseProductName() + " " + dbmd.getDatabaseProductVersion() + " successful.");
-        } catch (Exception e) {
+        } catch (SQLException e) {
             // Something didn't work out if this failed.
+            System.err.println("ERROR: DB Connection failed: '" + e.getMessage() + "'.");
             conOK = false;
         }
 
@@ -135,7 +136,7 @@ public class DBManager {
 
         try {
             dbc.getMetaData();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             return (connect());
         }
 
@@ -157,6 +158,7 @@ public class DBManager {
     /**
      * Executes the SQL insert query 'query' and returns the number of inserted rows if it succeeds, -1 otherwise.
      * WARNING: This does not do any checks on the input so do not expose this to user input.
+     * @param query the SQL query
      * @return The number of inserted rows if it succeeds, -1 otherwise.
      */
     public static int doInsertQuery(String query) {
@@ -167,7 +169,7 @@ public class DBManager {
         try {
             ps = dbc.prepareStatement(query);
             return (ps.executeUpdate());          // num rows affected
-        } catch (Exception e) {
+        } catch (SQLException e) {
             DP.getInstance().w("doInsertQuery(): SQL statement '" + query + "' failed.");
             DP.getInstance().w("The error message was: '" + e.getMessage() + "'.");
             return (-1);
@@ -175,7 +177,7 @@ public class DBManager {
             if (ps != null) {
                 try {
                     ps.close();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     DP.getInstance().w("doInsertQuery(): Could not close prepared statement.");
                     DP.getInstance().w("The error message was: '" + ex.getMessage() + "'.");
                 }
@@ -186,6 +188,7 @@ public class DBManager {
     /**
      * Executes the SQL update query 'query' and returns the number of updated rows if it succeeds, -1 otherwise.
      * WARNING: This does not do any checks on the input so do not expose this to user input.
+     * @param query the SQL query
      * @return The number of updated rows if it succeeds, -1 otherwise.
      */
     public static int doUpdateQuery(String query) {
@@ -196,7 +199,7 @@ public class DBManager {
         try {
             ps = dbc.prepareStatement(query);
             return (ps.executeUpdate());          // num rows affected
-        } catch (Exception e) {
+        } catch (SQLException e) {
             DP.getInstance().w("doUpdateQuery(): SQL statement '" + query + "' failed.");
             DP.getInstance().w("The error message was: '" + e.getMessage() + "'.");
             return (-1);
@@ -204,7 +207,7 @@ public class DBManager {
             if (ps != null) {
                 try {
                     ps.close();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     DP.getInstance().w("doUpdateQuery(): Could not close prepared statement.");
                     DP.getInstance().w("The error message was: '" + ex.getMessage() + "'.");
                 }
@@ -215,6 +218,7 @@ public class DBManager {
     /**
      * Executes the SQL delete query 'query' and returns the number of updated rows if it succeeds, -1 otherwise.
      * WARNING: This does not do any checks on the input so do not expose this to user input.
+     * @param query the SQL query
      * @return The number of deleted rows if it succeeds, -1 otherwise.
      */
     public static int doDeleteQuery(String query) {
@@ -225,7 +229,7 @@ public class DBManager {
         try {
             ps = dbc.prepareStatement(query);
             return ps.executeUpdate();           // num rows affected
-        } catch (Exception e) {
+        } catch (SQLException e) {
             DP.getInstance().w("doDeleteQuery(): SQL statement '" + query + "' failed.");
             DP.getInstance().w("The error message was: '" + e.getMessage() + "'.");
             return (-1);
@@ -233,7 +237,7 @@ public class DBManager {
             if (ps != null) {
                 try {
                     ps.close();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     DP.getInstance().w("doDeleteQuery(): Could not close prepared statement.");
                     DP.getInstance().w("The error message was: '" + ex.getMessage() + "'.");
                 }
@@ -281,7 +285,7 @@ public class DBManager {
                 tableData.add(rowData);
             }
             return (tableData);
-        } catch (Exception e) {
+        } catch (SQLException e) {
             DP.getInstance().w("doDeleteQuery(): SQL statement '" + query + "' failed.");
             DP.getInstance().w("The error message was: '" + e.getMessage() + "'.");
             //e.printStackTrace();
@@ -291,7 +295,7 @@ public class DBManager {
             if (rs != null) {
                 try {
                     rs.close();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     DP.getInstance().w("doSelectQuery(): Could not close result set.");
                     DP.getInstance().w("The error message was: '" + ex.getMessage() + "'.");
                 }
@@ -299,7 +303,7 @@ public class DBManager {
             if (ps != null) {
                 try {
                     ps.close();
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     DP.getInstance().w("doSelectQuery(): Could not close prepared statement.");
                     DP.getInstance().w("The error message was: '" + ex.getMessage() + "'.");
                 }
@@ -325,7 +329,7 @@ public class DBManager {
                 } else {
                     return (true);        // already closed
                 }
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 DP.getInstance().w("closeConnection(): Could not close DB connection.");
                 DP.getInstance().w("The error message was: '" + e.getMessage() + "'.");
                 return (false);
@@ -372,7 +376,7 @@ public class DBManager {
             res = true;      // Not really, need to check all of them
 
         } catch (Exception e) {
-            System.err.println("ERROR: SQL failed: '" + e.getMessage() + "'.");
+            System.err.println("ERROR: Drop tables SQL failed: '" + e.getMessage() + "'.");
             res = false;
         }
 
@@ -572,7 +576,7 @@ public class DBManager {
             res = true;      // Not really, need to check all of them. We currently leave this to the user (failed queries will at least spit error messages to STDERR).
 
         } catch (Exception e) { 
-            System.err.println("ERROR: '" + e.getMessage() + "'.");
+            System.err.println("ERROR: Creating DB tables failed: '" + e.getMessage() + "'.");
             res = false;
         }
 
@@ -583,6 +587,18 @@ public class DBManager {
     
     /**
      * Writes information on a SSE to the database. Note that the protein + chain have to exist in the database already.
+     * @param pdb_id the PDB identifier, e.g., "7tim"
+     * @param chain_name the PDB chain name, e.g., "A"
+     * @param dssp_start the dssp residue number of the first residue of the SSE
+     * @param pdb_end the PDB residue string of the last residue of the SSE
+     * @param pdb_start the PDB residue number of the first residue of the SSE
+     * @param dssp_end the dssp residue number of the last residue of the SSE
+     * @param lig_name the ligand name in 3 letter notation if this SSE is a ligand, the empty string otherwise
+     * @param sse_type the SSE type as an integer, see the SSE class
+     * @param sequence the AA sequence of this SSE
+     * @param ssePositionInChain the position of this SSE in the SSE list of the whole chain (N to C)
+     * @return whether it worked out
+     * @throws java.sql.SQLException if something with the DB went wrong 
      */
     public static Boolean writeSSEToDB(String pdb_id, String chain_name, Integer dssp_start, Integer dssp_end, String pdb_start, String pdb_end, String sequence, Integer sse_type, String lig_name, Integer ssePositionInChain) throws SQLException {
 
@@ -713,6 +729,7 @@ public class DBManager {
 
     /**
      * Deletes all entries related to the PDB ID 'pdb_id' from the plcc database tables.
+     * @param pdb_id the PDB identifier, e.g., "7tim"
      * @return The number of affected records (0 if the PDB ID was not in the database).
      */
     public static Integer deletePdbidFromDB(String pdb_id) {
@@ -748,7 +765,7 @@ public class DBManager {
                     statement.close();
                 }
                 dbc.setAutoCommit(true);
-            } catch(Exception e) { DP.getInstance().w("DB: deletePdbidFromDB: Could not close statement and reset autocommit."); }
+            } catch(SQLException e) { DP.getInstance().w("DB: deletePdbidFromDB: Could not close statement and reset autocommit."); }
         }
         
         // The other tables are handled automatically via the ON DELETE CASCADE constraint.
@@ -1316,6 +1333,7 @@ public class DBManager {
      * @param graphDbId the database id (primary key) of the graph
      * @param ssePositionInGraph the position of the SSE in the graph. The first SSE should be 1 (NOT 0).
      * @return the number of affected rows (1 on success, 0 on error)
+     * @throws java.sql.SQLException if something goes wrong with the DB
      */
     public static Integer assignSSEtoProteinGraph(Long sseDbId, Long graphDbId, Integer ssePositionInGraph) throws SQLException {
         if(ssePositionInGraph <= 0) {
@@ -1368,6 +1386,7 @@ public class DBManager {
      * @param graphDbId the database id (primary key) of the graph
      * @param ssePositionInGraph the position of the SSE in the graph. The first SSE should be 1 (NOT 0).
      * @return the number of affected rows (1 on success, 0 on error)
+     * @throws java.sql.SQLException if something goes wrong with the DB
      */
     public static Integer assignSSEtoFoldingGraph(Long sseDbId, Long graphDbId, Integer ssePositionInGraph) throws SQLException {
         if(ssePositionInGraph <= 0) {
@@ -1486,6 +1505,8 @@ public class DBManager {
      * @param sse1_dssp_start the DSSP number of the first residue of the first SSE
      * @param sse2_dssp_start the DSSP number of the first residue of the second SSE
      * @param contact_type the contact type code
+     * @return whether it worked out
+     * @throws java.sql.SQLException if something goes wrong with the DB
      */
     public static Boolean writeContactToDB(String pdb_id, String chain_name, Integer sse1_dssp_start, Integer sse2_dssp_start, Integer contact_type) throws SQLException {
 
@@ -1646,7 +1667,7 @@ public class DBManager {
             try {
                 id = Long.valueOf(rowarray.get(0).get(0));
                 return (id);
-            } catch (Exception e) {
+            } catch (NumberFormatException e) {
                 return (-1L);
             }
         }
@@ -1713,7 +1734,7 @@ public class DBManager {
                     rs.close();
                 }
                 dbc.setAutoCommit(true);
-            } catch(Exception e) { DP.getInstance().w("DB: Could not close statement and reset autocommit."); }
+            } catch(SQLException e) { DP.getInstance().w("DB: Could not close statement and reset autocommit."); }
         }
         
         // OK, check size of results table and return 1st field of 1st column
@@ -1786,7 +1807,7 @@ public class DBManager {
                     statement.close();
                 }
                 dbc.setAutoCommit(true);
-            } catch(Exception e) { DP.getInstance().w("DB: Could not close statement and reset autocommit."); }
+            } catch(SQLException e) { DP.getInstance().w("DB: Could not close statement and reset autocommit."); }
         }
         
         // OK, check size of results table and return 1st field of 1st column
@@ -1813,10 +1834,9 @@ public class DBManager {
     
     
     /**
-     * Retrieves the internal database chain ID of a chain (it's PK) from the DB. The chain is identified by (pdb_id, chain_name).
-     * @param pdb_id the PDB ID of the chain
-     * @param chain_name the PDB chain name
-     * @return the internal database chain id (its primary key, e.g. '2352365175365'). This is NOT the pdb chain name.
+     * Determines whether a protein exists in the database.
+     * @param pdb_id the PDB ID of the protein
+     * @return true if it exists, false otherwise
      */
     public static Boolean proteinExistsInDB(String pdb_id) {
         
@@ -1866,7 +1886,7 @@ public class DBManager {
                     statement.close();
                 }
                 dbc.setAutoCommit(true);
-            } catch(Exception e) { DP.getInstance().w("DB: Could not close statement and reset autocommit."); }
+            } catch(SQLException e) { DP.getInstance().w("DB: Could not close statement and reset autocommit."); }
         }
         
         // OK, check size of results table and return 1st field of 1st column
@@ -1888,7 +1908,7 @@ public class DBManager {
     /**
      * Retrieves the GML format graph string for the requested graph from the database. The graph is identified by the
      * unique triplet (pdbid, chain_name, graph_type).
-     * @param pdbid the requested pdb ID, e.g. "1a0s"
+     * @param pdb_id the requested pdb ID, e.g. "1a0s"
      * @param chain_name the requested pdb ID, e.g. "A"
      * @param graph_type the requested graph type, e.g. "albe". Use the constants in the ProtGraphs class.
      * @return the GML format string representation of the graph or null if no such graph exists.
@@ -1901,7 +1921,7 @@ public class DBManager {
     /**
      * Retrieves the Kavosh format graph string for the requested graph from the database. The graph is identified by the
      * unique triplet (pdbid, chain_name, graph_type).
-     * @param pdbid the requested pdb ID, e.g. "1a0s"
+     * @param pdb_id the requested pdb ID, e.g. "1a0s"
      * @param chain_name the requested pdb ID, e.g. "A"
      * @param graph_type the requested graph type, e.g. "albe". Use the constants in the ProtGraphs class.
      * @return the GML format string representation of the graph or null if no such graph exists.
@@ -1914,7 +1934,7 @@ public class DBManager {
     /**
      * Retrieves the PLCC format graph string for the requested graph from the database. The graph is identified by the
      * unique triplet (pdbid, chain_name, graph_type).
-     * @param pdbid the requested pdb ID, e.g. "1a0s"
+     * @param pdb_id the requested pdb ID, e.g. "1a0s"
      * @param chain_name the requested pdb ID, e.g. "A"
      * @param graph_type the requested graph type, e.g. "albe". Use the constants in the ProtGraphs class.
      * @return the GML format string representation of the graph or null if no such graph exists.
@@ -1927,7 +1947,7 @@ public class DBManager {
     /**
      * Retrieves the DOT language format graph string for the requested graph from the database. The graph is identified by the
      * unique triplet (pdbid, chain_name, graph_type).
-     * @param pdbid the requested pdb ID, e.g. "1a0s"
+     * @param pdb_id the requested pdb ID, e.g. "1a0s"
      * @param chain_name the requested pdb ID, e.g. "A"
      * @param graph_type the requested graph type, e.g. "albe". Use the constants in the ProtGraphs class.
      * @return the GML format string representation of the graph or null if no such graph exists.
@@ -1941,7 +1961,7 @@ public class DBManager {
      * Retrieves a graph string for the requested graph from the database. The graph is identified by the
      * unique triplet (pdbid, chain_name, graph_type). You need to supply the format you want. Some formats may be null or the empty string.
      * @param graph_format the requested graph format, e.g. "GML". Use the constants in ProtGraphs class, like ProtGraphs.GRAPHFORMAT_GML.
-     * @param pdbid the requested pdb ID, e.g. "1a0s"
+     * @param pdb_id the requested pdb ID, e.g. "1a0s"
      * @param chain_name the requested pdb ID, e.g. "A"
      * @param graph_type the requested graph type, e.g. "albe". Use the constants in the ProtGraphs class.
      * @return the GML format string representation of the graph or null if no such graph exists.
@@ -2221,7 +2241,7 @@ public class DBManager {
     /**
      * Retrieves the graphlet counts for the requested graph from the database. The graph is identified by the
      * unique triplet (pdbid, chain_name, graph_type).
-     * @param pdbid the requested pdb ID, e.g. "1a0s"
+     * @param pdb_id the requested pdb ID, e.g. "1a0s"
      * @param chain_name the requested pdb ID, e.g. "A"
      * @param graph_type the requested graph type, e.g. "albe"
      * @return an Integer array of the graphlet counts
@@ -2298,7 +2318,7 @@ public class DBManager {
                     for(int i = 0; i < rowGraphlets.size(); i++) {
                         try {
                             result[i] = Integer.valueOf(rowGraphlets.get(i));
-                        } catch(Exception ce) {
+                        } catch(NumberFormatException ce) {
                             DP.getInstance().w("DB: getGraphletCounts: Cast error. Could not cast entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "' to Integer.");
                             return null;
                         }
@@ -2351,7 +2371,7 @@ public class DBManager {
     /**
      * Retrieves the SSEstring for the requested graph from the database. The graph is identified by the
      * unique triplet (pdbid, chain_name, graph_type).
-     * @param pdbid the requested pdb ID, e.g. "1a0s"
+     * @param pdb_id the requested pdb ID, e.g. "1a0s"
      * @param chain_name the requested pdb ID, e.g. "A"
      * @param graph_type the requested graph type, e.g. "albe"
      * @return the SSEstring of the graph or null if no such graph exists.
@@ -2434,7 +2454,7 @@ public class DBManager {
     
     /**
      * Retrieves the graph data of all protein graphs from the database.
-     * @param graphType the graph type, use one of the constants SSEGraph.GRAPHTYPE_* (e.g., SSEGraph.GRAPHTYPE_ALBE) or the word 'ALL' for all types.
+     * @param graph_type the graph type, use one of the constants SSEGraph.GRAPHTYPE_* (e.g., SSEGraph.GRAPHTYPE_ALBE) or the word 'ALL' for all types.
      * @return an ArrayList of String arrays. Each of the String arrays in the list has 3 fields. The 
      * first fields (array[0]) contains the PDB ID of the chain, the second one (array[1]) contains the chain ID, the 
      * third field contains the graph type and the fourth field contains the SSE string.
@@ -2443,6 +2463,7 @@ public class DBManager {
      *  position 2 := graph type
      *  position 3 := SSE string
      *  position 4 := graph string
+     * @throws java.sql.SQLException if something goes wrong with the DB
      */
     public static ArrayList<String[]> getAllGraphData(String graph_type) throws SQLException {
         
@@ -2528,7 +2549,7 @@ public class DBManager {
                 
                 try {
                     chainPK = Integer.valueOf(tableData.get(i).get(1));
-                } catch(Exception e) {
+                } catch(NumberFormatException e) {
                     DP.getInstance().w("DB: getAllGraphData(): '" + e.getMessage() + "' Ignoring data row.");
                     continue;
                 }
@@ -2559,7 +2580,7 @@ public class DBManager {
     /**
      * Retrieves the relative path of the graph image for the requested graph in SVG format from the database. The graph is identified by the
      * unique triplet (pdbid, chain_name, graph_type).
-     * @param pdbid the requested pdb ID, e.g. "1a0s"
+     * @param pdb_id the requested pdb ID, e.g. "1a0s"
      * @param chain_name the requested pdb ID, e.g. "A"
      * @param graph_type the requested graph type, e.g. "albe"
      * @return the relative path to the graph image in SVG format, or null if no such graph image exists (path relative to the base directory, see Settings class).
