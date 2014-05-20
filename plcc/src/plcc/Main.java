@@ -1424,6 +1424,13 @@ public class Main {
                 System.out.println("Calculating SSEs for all chains of protein " + pdbid + "...");
             }
             
+            /** Whether the next call to the SSE graph computation function is allowed
+             * to delete old entries of the current PDB ID from the database. This is required
+             * so we can insert proteins which are already there (without explicitely deleting them first).
+             * We cannot do this when chain separation is active though, because in that case, the SSE graph computation
+             * function gets calles several times (once for each chain) and will delete the previously entered chains.
+             * For the first call, we still need to delete the old ones though.
+             */
             Boolean allowDeletionOfExistingProteinFromDB;
             
             if(separateContactsByChain) {
@@ -1467,8 +1474,7 @@ public class Main {
                     }
                     
                     // When chain separation is active, we can only allow deletion of old protein instances when this is the first chain we insert for this protein!
-                    allowDeletionOfExistingProteinFromDB = false;                    
-                    if(numChainsHandled == 0) {http:// 
+                    if(numChainsHandled == 0) { 
                        if(! silent) {
                             System.out.println("Handling first chain (#" + numChainsHandled + ") with chain separation active, allowing deletion of protein from DB (must be old data).");
                         }
