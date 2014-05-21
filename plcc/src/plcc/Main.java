@@ -1424,7 +1424,9 @@ public class Main {
                 System.out.println("Calculating SSEs for all chains of protein " + pdbid + "...");
             }
             
-            writeProteinDataToDatabase(pdbid);
+            if(Settings.getBoolean("plcc_B_useDB")) {
+                writeProteinDataToDatabase(pdbid);
+            }
                         
             
             if(separateContactsByChain) {
