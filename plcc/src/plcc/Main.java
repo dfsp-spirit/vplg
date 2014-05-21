@@ -406,7 +406,7 @@ public class Main {
                                     numRows = DBManager.deletePdbidFromDB(pdbidToDelete);
                                 } catch(Exception e) {
                                     System.err.println("ERROR: Deleting protein failed: '" + e.getMessage() + "'. Exiting.");
-                                    System.exit(1);
+                                    //System.exit(1);
                                 }
                             }
                                                         
@@ -1424,14 +1424,8 @@ public class Main {
                 System.out.println("Calculating SSEs for all chains of protein " + pdbid + "...");
             }
             
-            /** Whether the next call to the SSE graph computation function is allowed
-             * to delete old entries of the current PDB ID from the database. This is required
-             * so we can insert proteins which are already there (without explicitely deleting them first).
-             * We cannot do this when chain separation is active though, because in that case, the SSE graph computation
-             * function gets calles several times (once for each chain) and will delete the previously entered chains.
-             * For the first call, we still need to delete the old ones though.
-             */
-            Boolean allowDeletionOfExistingProteinFromDB;
+            writeProteinDataToDatabase(pdbid);
+                        
             
             if(separateContactsByChain) {
                 String chainID;
@@ -1473,27 +1467,14 @@ public class Main {
                         }
                     }
                     
-                    // When chain separation is active, we can only allow deletion of old protein instances when this is the first chain we insert for this protein!
-                    if(numChainsHandled == 0) { 
-                       if(! silent) {
-                            System.out.println("Handling first chain (#" + numChainsHandled + ") with chain separation active, allowing deletion of protein from DB (must be old data).");
-                        }
-                        allowDeletionOfExistingProteinFromDB = true;
-                    } else {
-                        if(! silent) {
-                            System.out.println("Handling chain #" + numChainsHandled + " with chain separation active, NOT allowing deletion of protein from DB (data from previous chain).");
-                        }
-                        allowDeletionOfExistingProteinFromDB = false;
-                    }
                     
-                    calculateSSEGraphsForChains(theChain, residues, cInfoThisChain, pdbid, outputDir, allowDeletionOfExistingProteinFromDB);
+                    calculateSSEGraphsForChains(theChain, residues, cInfoThisChain, pdbid, outputDir);
                     
                     numChainsHandled++;
                 }
             }
             else {  // no chain separation active
-                allowDeletionOfExistingProteinFromDB = true;
-                calculateSSEGraphsForChains(handleChains, residues, cInfo, pdbid, outputDir, allowDeletionOfExistingProteinFromDB);
+                calculateSSEGraphsForChains(handleChains, residues, cInfo, pdbid, outputDir);
                 //calculateComplexGraph(handleChains, residues, cInfo, pdbid, outputDir);
             }
             if(! silent) {
@@ -1779,30 +1760,13 @@ public class Main {
 
 
     /**
-     * Calculates all SSE graph types which are configured in the config file for all given chains.
-     * @param allChains a list of chains, each chain will be handled separately
-     * @param resList a list of residues
-     * @param resContacts a list of residue contacts
-     * @param pdbid the PDBID of the protein, required to name files properly etc.
-     * @param outputDir where to write the output files. the filenames are deduced from graph type and pdbid.
-     * @param allowDeletionOfExistingProteinFromDB whether this function should try to delete old versions of the protein (not chain!) from the database.
+     * Writes data on the current protein to the database and deletes any old data in there which has the same PDB identifier.
+     * @param pdbid the PDB ID to use
      */
-    public static void calculateSSEGraphsForChains(ArrayList<Chain> allChains, ArrayList<Residue> resList, ArrayList<ResContactInfo> resContacts, String pdbid, String outputDir, Boolean allowDeletionOfExistingProteinFromDB) {
-
-        Boolean silent = false;
-        if(Settings.getBoolean("plcc_B_silent")) {
-            silent = true;
-        }
+    public static void writeProteinDataToDatabase(String pdbid) {
         
-        //System.out.println("calculateSSEGraphsForChains: outputDir='" + outputDir + "'.");
-        Chain c;
-        ArrayList<SSE> chainDsspSSEs = new ArrayList<SSE>();
-        ArrayList<SSE> chainLigSSEs = new ArrayList<SSE>();
-        ArrayList<SSE> chainPtglSSEs = new ArrayList<SSE>();
-        ArrayList<SSE> allChainSSEs = new ArrayList<SSE>();
-        String fs = System.getProperty("file.separator");
+        Boolean silent = Settings.getBoolean("plcc_B_silent");
         
-
         HashMap<String, String> md = FileParser.getPDBMetaData();
         Double res = -1.0;
         try {
@@ -1812,26 +1776,50 @@ public class Main {
             DP.getInstance().w("Could not determine resolution of PDB file for protein '" + pdbid + "', assuming NMR with resolution '" + res + "'.");
             
         }
-
+                
         //pdb_id, title, header, keywords, experiment, resolution
         if(Settings.getBoolean("plcc_B_useDB")) {
             // Try to delete the protein from the DB in case it is already in there. This won't hurt if it is not.
             
-            // We do NOT DO THIS if chain separation is active -- we will delete the chains which have already been inserted!
-            if(allowDeletionOfExistingProteinFromDB) {
-                DBManager.deletePdbidFromDB(pdbid);
+            int numDel = 0;            
+            numDel = DBManager.deletePdbidFromDB(pdbid);
+            if(! silent) {
+                System.out.println("  Deleted " + numDel + " protein(s) with PDB ID '" + pdbid + "' from DB.");
             }
-            
-            
+                        
             try {
                 DBManager.writeProteinToDB(pdbid, md.get("title"), md.get("header"), md.get("keywords"), md.get("experiment"), res);
                 if(! silent) {
                     System.out.println("  Info on protein '" + pdbid + "' written to DB.");
                 }
             }catch (Exception e) {
-                DP.getInstance().w("Could not write info on protein '" + pdbid + "' to DB.");
+                DP.getInstance().w("Could not write info on protein '" + pdbid + "' to DB: '" + e.getMessage() + "'.");
             }
-        }
+        }        
+    }
+    
+    /**
+     * Calculates all SSE graph types which are configured in the config file for all given chains.
+     * @param allChains a list of chains, each chain will be handled separately
+     * @param resList a list of residues
+     * @param resContacts a list of residue contacts
+     * @param pdbid the PDBID of the protein, required to name files properly etc.
+     * @param outputDir where to write the output files. the filenames are deduced from graph type and pdbid.
+     * @param allowDeletionOfExistingProteinFromDB whether this function should try to delete old versions of the protein (not chain!) from the database.
+     */
+    public static void calculateSSEGraphsForChains(ArrayList<Chain> allChains, ArrayList<Residue> resList, ArrayList<ResContactInfo> resContacts, String pdbid, String outputDir) {
+
+        Boolean silent = Settings.getBoolean("plcc_B_silent");
+        
+        //System.out.println("calculateSSEGraphsForChains: outputDir='" + outputDir + "'.");
+        Chain c;
+        ArrayList<SSE> chainDsspSSEs = new ArrayList<SSE>();
+        ArrayList<SSE> chainLigSSEs = new ArrayList<SSE>();
+        ArrayList<SSE> chainPtglSSEs = new ArrayList<SSE>();
+        ArrayList<SSE> allChainSSEs = new ArrayList<SSE>();
+        String fs = System.getProperty("file.separator");
+               
+        HashMap<String, String> md = FileParser.getPDBMetaData();
 
         
         // handle all chains

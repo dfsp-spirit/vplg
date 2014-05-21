@@ -665,7 +665,7 @@ public class DBManager {
         
     
     /**
-     * Writes data on a protein to the database
+     * Writes data on a protein to the database. This will delete old versions in the database.
      * @param pdb_id the PDB id of the protein
      * @param title the PDB title field
      * @param header the PDB header field
