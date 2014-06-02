@@ -79,7 +79,7 @@ foreach ($chains as $value){
 						 <div class="proteingraph">
 						 	<div>
 						 	<input type="checkbox" name="" value=""> Enqueue in Downloadlist
-						 	<span class="download-options"><a href="">3D-View [JMOL]</a></span>
+						 	<span class="download-options"><a href="3dview.php?q='.$pdb_chain[0].$pdb_chain[1].'">3D-View [JMOL]</a></span>
 							</div>	
 							<ul class="bxslider tada">
 								<li id="'.$pdb_chain[0].$pdb_chain[1].'">';

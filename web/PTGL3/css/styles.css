@@ -764,6 +764,21 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		background: rgba(255, 255, 255, 0.4);
 		padding: 10px;
 	}
+
+
+	/*-------------------------------------
+	 3Dview.php
+	 ------------------------------------*/
+	
+	#D3view {
+		margin-top: 5%;
+	}
+
+
+	#D3viewcontainer {
+		background: rgba(255, 255, 255, 0.4);
+		padding: 10px;
+	}	
 	
 	
 	/*----------------------------------------

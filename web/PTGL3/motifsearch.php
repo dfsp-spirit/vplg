@@ -22,16 +22,15 @@
 
 
 		<!-- Custom CSS -->
-		<link rel="stylesheet" href="css/font-awesome.css"/>
 		<link rel="stylesheet" type="text/css" href="css/styles.css">
-		<!--<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet"> -->
+		<link rel="stylesheet" href="css/font-awesome.css"/>
 
-
+		 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 		<!-- Include Modernizr in the head, before any other JS -->
 		<script src="js/modernizr-2.6.2.min.js"></script>
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
-        
+                    <!-- Live Search for PDB IDs -->
+		<script src="js/livesearch.js" type="text/javascript"></script>
 		
 
 
@@ -42,164 +41,11 @@
 			<META HTTP-EQUIV="Refresh" CONTENT="0;URL=errorJS.php">
 		</noscript>
 		<div class="wrapper">
-		
 
 		<?php include('navbar.php'); ?>
-			
-		
-		<div id="Home">
-			<div class="container" id="intro">
-			<!-- Intro message -->
-				Protein Topology Graph Library aims at providing a database on protein secondary structure topologies.
-			</div><!-- end container-->
-		</div><!-- end Home -->
-		
-		
-		
-						
-			<div class="row" id="search">
-			<div class="col-lg-4"></div>
-				<div class="col-lg-4">
-					<div class="input-group form-group">
-						<form class="form-inline" action="search.php" method="post">
-							<input type="text" class="form-control" name="keyword" id="searchInput" autocomplete="off" placeholder="Enter PDB ID or keyword...">
-							<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button><br>
-							<span><a href="motifsearch.php">Search for motifs</a></span>
-							<div id="advancedButton"> Advanced Search <div id="arrow"><strong class="caret"></strong></div></div>
-							<div id="liveSearchResults"></div>
 
-							<label class="checkboxFont">
-								<input type="checkbox" id="inlineCheckbox3" name="proteincomplexes" value="1"> Search for Protein Complexes </input>
-							</label>
-							<!-- <label class="checkboxFont">
-								<input type="checkbox" id="matchexactCB" name="exact" value="1"> Match exact word </input>
-							</label> -->
-							<div id="advancedSearch">
-								<label class="advancedLabel">Logic operation:&nbsp;&nbsp;&nbsp;&nbsp;
-									<input class="radio" type="radio" name="logic" value="AND" checked>&nbsp;&nbsp;AND&nbsp;</input>
-									<input class="radio" type="radio" name="logic" value="OR">&nbsp;&nbsp;OR&nbsp;</input>
-								</label>
-								<label class="advancedLabel">PDB Identifier
-									<input class="advancedInput" type="text" id="pdbid" name="pdbid" placeholder="PDB ID" size="6" maxlength="4" />
-								</label>
-								<label class="advancedLabel">Title
-									<input class="advancedInput" type="text" id="title" name="title" placeholder="Title" size="20" maxlength="50"/>
-								</label>
-								<label class="advancedLabel">Het
-									<input class="advancedInput" type="text" id="het" name="het" placeholder="Het" size="20" maxlength="50"/>
-								</label>
-								<label class="advancedLabel">Hetname
-									<input class="advancedInput" type="text" id="hetname" name="hetname" placeholder="Hetname" size="20" maxlength="50"/>
-								</label>	
-								<label class="advancedLabel">Molecule
-									<input class="advancedInput" type="text" id="molecule" name="molecule" placeholder="Molecule" size="20" maxlength="50"/>
-								</label>		
-								<label class="advancedLabel">Graphs
-									<input class="advancedInput" type="text" id="graphs" name="graphs" placeholder="Graphs" size="20" maxlength="50"/>
-								</label>
-								<button type="submit" class="btn btn-default advancedInput" style="margin-top:35px;"><span>Search</span></button>
-							</div>
-						</form>	
-					</div><!-- end input-group and form-group -->
-				</div><!-- end col-centered -->
-				<div class="col-lg-4"></div>
-			</div><!-- end row -->
-					
-			<div class="row">
-				<div class="col-lg-3 col-lg-3-centering col-centered">
-					<div class="input-group form-group">
-						<form>
-						<dl class="dl-horizontal">
-					<div id="additionalSearch">
-					<dt>SearchKey</dt>
-					<dd>Keyword search <strong class="caret" id="flipArrow" ></strong></dd>
-					</div>
-					<div id="addSearchKey">
-						<dd>Use the standard search form above to search protein topologies.</dd>
-						<dd>Enter keywords known to relate to the biological macromolecules <br>
-						of interest and select the <span class="glyphicon glyphicon-search"></span>"Search" button.</dd>
-					</div>
-				</dl>
-				
-				<dl class="dl-horizontal">
-					<div id="additionalSearch2">
-					<dt>SearchMotifs</dt>
-					<dd>Search form for topological protein structure motifs <strong class="caret" id="flipArrow2" ></strong></dd>
-					</div>
-					<div id="addSearchMotif">
-					<br>
-						<h4>Alpha Motifs</h4>
-						<p>Four Helix Bundle (<a href="help.php#helpAlphaMotifs">?</a>) - Globin Fold (<a href="help.php#helpAlphaMotifs">?</a>)</p>
-						
-						<h4>Beta Motifs</h4>
-						<p>Up and Down Barrel (<a href="help.php#helpBetaMotifs">?</a>) 
-						- Immunoglobulin Fold (<a href="help.php#helpBetaMotifs">?</a>) - 
-						Beta Propeller (<a href="help.php#helpBetaMotifs">?</a>) - 
-						Jelly Roll (<a href="help.php#helpBetaMotifs">?</a>)</p>
-						
-						<h4>Alpha Beta Motifs</h4>
-						<p>Ubiquitin Roll (<a href="help.php#helpAlphaBetaMotifs">?</a>) - 
-						Alpha-Beta Plait (<a href="help.php#helpAlphaBetaMotifs">?</a>) - 
-						Rossman Fold (<a href="help.php#helpAlphaBetaMotifs">?</a>) - 
-						TIM Barrel (<a href="help.php#helpBetaMotifs">?</a>)</p>
-					</div>
-				</dl>
-				
-				<dl class="dl-horizontal">
-					<div id="additionalSearch3">
-					<dt>SearchSequence</dt>
-					<dd>Blast search for sequences <strong class="caret" id="flipArrow3" ></strong></dd>
-					</div>
-					<div id="addSearchSequence">
-					<p>Search strings are case insensitive.</p>
-					</div>
-					
-				</dl>
-				</form>
-					</div><!-- end input-group and form-group -->
-				</div><!-- end col-centered -->
-			</div><!-- end row -->
 		
-		
-		
-		
-		</div><!-- end container and wrapper -->
-			
-			
-	<div class="textWrapper">
-		<div id="About">
-			<div class="line" id="lineAbout">
-				<div class="iconPos" id="iconAbout">
-					<img  width="100px" height="100px" src="images/icon-blueGlyph.png" alt="Icon">
-					<div id="About"></div>
-				</div><!-- end iconPos -->
-			</div><!-- end line and lineAbout -->
-				
-			<div class="container" id="text">
-				<h2>About</h2>
-					PTGL is a web-based database application for protein topologies. In order to define a mathematically unique description of protein topology
-					the secondary structure topology of a protein is described by methods of applied graph theory. The <a href="about.php#proteinGraph">Protein graph</a> is defined as an undirected
-					labelled graph on three description levels according to the considered secondary structure elements (SSE): the <a href="about.php#alphaGraph">Alpha graph</a>, the <a href="about.php#betaGraph">Beta graph</a>,
-					and the <a href="about.php#alphaBetaGraph">Alpha-Beta graph</a>. The connected components of the <a href="about.php#proteinGraph">Protein graph</a> form <a href="about.php#foldingGraph">Folding graphs</a>. A <a href="about.php#proteinGraph">Protein graph</a> can consist of one or more
-					<a href="about.php#foldingGraph">Folding graphs</a>. The three graph types were defined for each protein of the <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a>. For each graph type exists four <a href="about.php#linearNot">linear notations</a> with
-					corresponding graphic representations. In PTGL all <a href="about.php#foldingGraph">Folding graphs</a>, all SSEs, and additional protein information are stored for every
-					protein structure annotated in <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a> for which SSEs according DSSP are defined, which is not a NMR structure, has a resolution less than 3.5
-					Å and a sequence length of at least 20 amino acids. The database enables the user to search for the topology of a protein or for certain
-					topologies and subtopologies using the <a href="about.php#linearNot">linear notations</a>. Additionally, it could be searched for sequence similarity in <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a> sequences.
-					<a href="about.php">Read more...</a>
-			
-			
-			</div><!-- end container and text -->
-		</div><!-- end About -->
-		
-		<div id="UserGuide">
-			<div class="line" id="lineUserGuide">
-				<div class="iconPos" id="iconUserGuide">
-					<img width="100px" height="100px" src="images/icon-greenGlyph.png" alt="Icon"/>
-				</div><!-- end iconPos -->
-			</div><!-- end line and lineUser Guide -->
-			
-			<div class="container" id="text">
+		<div class="container" id="text">
 				<h2>User Guide</h2>
 					
 					
@@ -477,35 +323,13 @@
 				
 			</div><!-- end container and text -->
 		</div><!-- end UserGuide -->
-		
-		
-		<div id="DatabaseFormat">
-			<div class="line" id="lineDatabaseFormat">
-				<div class="iconPos" id="iconDatabaseFormat">
-					<img width="100px" height="100px" src="images/icon-yellowGlyph.png" alt="Icon"/>
-				</div><!-- end iconPos -->
-			</div><!-- end line and lineDatabaseFormat -->
-			
-			<div class="container" id="text">
-			<h2>Database & File Format</h2>
-				<h3>File Formats and Standards</h3>
-				<p>PostScript - can be viewed with <a href="http://www.cs.wisc.edu/~ghost/" target="_blank">Ghostview</a></p>
-				
-				<h3>PTGL PostgreSQL Database</h3>
-				<p>PTGL PostgreSQL Databse Schema</p>
-				<p>Download PostgreSQL database <a href="files/ptgl.sql.gz">ptgl.sql.gz (<b>(238 Mb)</b>)</a> LINK BROKEN ATM</p>
-				<p>The database was dumped and gzipped using the following command: <tt>pg_dump ptgl | gzip >ptgl.sql.gz</tt></p>
-				<p>(to restore the database on your local computer, please read: <a href="http://www.postgresql.org/docs/manuals/" target="_blank">Postgres manual</a>).</p>
-				
-		</div><!-- end container and text -->
-	</div><!-- end DatabaseFormat -->
-	</div><!--- end textWrapper -->
-	
 	</div><!-- end wrapper -->
 	
 	
 	<?php include('footer.php'); ?>
 		
+
+
 
 
 		<!-- All Javascript at the bottom of the page for faster page loading -->
@@ -521,14 +345,9 @@
 		<script src="js/bootstrap.min.js"></script>
 		
 		<!-- Custom JS -->
+				<!-- Custom JS -->
 		<script src="js/script.js"></script>
 		<script src="js/userguide.js" type="text/javascript"></script>
-		
-		
-		<!-- Live Search for PDB IDs -->
-		<script src="js/livesearch.js" type="text/javascript"></script>
-		
-		
 
 
 
