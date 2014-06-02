@@ -1,5 +1,5 @@
 Clazz.declarePackage ("J.symmetry");
-Clazz.load (["J.util.Matrix4f"], "J.symmetry.HallRotation", null, function () {
+Clazz.load (["JU.M4"], "J.symmetry.HallRotation", null, function () {
 c$ = Clazz.decorateAsClass (function () {
 this.rotCode = null;
 this.seitzMatrix = null;
@@ -7,11 +7,11 @@ this.seitzMatrixInv = null;
 Clazz.instantialize (this, arguments);
 }, J.symmetry, "HallRotation");
 Clazz.prepareFields (c$, function () {
-this.seitzMatrix =  new J.util.Matrix4f ();
-this.seitzMatrixInv =  new J.util.Matrix4f ();
+this.seitzMatrix =  new JU.M4 ();
+this.seitzMatrixInv =  new JU.M4 ();
 });
 Clazz.makeConstructor (c$, 
-($fz = function (code, matrixData) {
+ function (code, matrixData) {
 this.rotCode = code;
 var data =  Clazz.newFloatArray (16, 0);
 var dataInv =  Clazz.newFloatArray (16, 0);
@@ -36,12 +36,17 @@ ipt++;
 }
 this.seitzMatrix.setA (data);
 this.seitzMatrixInv.setA (dataInv);
-}, $fz.isPrivate = true, $fz), "~S,~S");
-c$.lookup = $_M(c$, "lookup", 
+}, "~S,~S");
+c$.lookup = Clazz.defineMethod (c$, "lookup", 
 function (code) {
-for (var i = J.symmetry.HallRotation.hallRotationTerms.length; --i >= 0; ) if (J.symmetry.HallRotation.hallRotationTerms[i].rotCode.equals (code)) return J.symmetry.HallRotation.hallRotationTerms[i];
+for (var i = J.symmetry.HallRotation.getHallTerms ().length; --i >= 0; ) if (J.symmetry.HallRotation.hallRotationTerms[i].rotCode.equals (code)) return J.symmetry.HallRotation.hallRotationTerms[i];
 
 return null;
 }, "~S");
-c$.hallRotationTerms = c$.prototype.hallRotationTerms = [ new J.symmetry.HallRotation ("1_", "+00 0+0 00+"),  new J.symmetry.HallRotation ("2x", "+00 0-0 00-"),  new J.symmetry.HallRotation ("2y", "-00 0+0 00-"),  new J.symmetry.HallRotation ("2z", "-00 0-0 00+"),  new J.symmetry.HallRotation ("2\'", "0-0 -00 00-"),  new J.symmetry.HallRotation ("2\"", "0+0 +00 00-"),  new J.symmetry.HallRotation ("2x\'", "-00 00- 0-0"),  new J.symmetry.HallRotation ("2x\"", "-00 00+ 0+0"),  new J.symmetry.HallRotation ("2y\'", "00- 0-0 -00"),  new J.symmetry.HallRotation ("2y\"", "00+ 0-0 +00"),  new J.symmetry.HallRotation ("2z\'", "0-0 -00 00-"),  new J.symmetry.HallRotation ("2z\"", "0+0 +00 00-"),  new J.symmetry.HallRotation ("3x", "+00 00- 0+-"),  new J.symmetry.HallRotation ("3y", "-0+ 0+0 -00"),  new J.symmetry.HallRotation ("3z", "0-0 +-0 00+"),  new J.symmetry.HallRotation ("3*", "00+ +00 0+0"),  new J.symmetry.HallRotation ("4x", "+00 00- 0+0"),  new J.symmetry.HallRotation ("4y", "00+ 0+0 -00"),  new J.symmetry.HallRotation ("4z", "0-0 +00 00+"),  new J.symmetry.HallRotation ("6x", "+00 0+- 0+0"),  new J.symmetry.HallRotation ("6y", "00+ 0+0 -0+"),  new J.symmetry.HallRotation ("6z", "+-0 +00 00+")];
+c$.getHallTerms = Clazz.defineMethod (c$, "getHallTerms", 
+ function () {
+return (J.symmetry.HallRotation.hallRotationTerms == null ? J.symmetry.HallRotation.hallRotationTerms = [ new J.symmetry.HallRotation ("1_", "+00 0+0 00+"),  new J.symmetry.HallRotation ("2x", "+00 0-0 00-"),  new J.symmetry.HallRotation ("2y", "-00 0+0 00-"),  new J.symmetry.HallRotation ("2z", "-00 0-0 00+"),  new J.symmetry.HallRotation ("2\'", "0-0 -00 00-"),  new J.symmetry.HallRotation ("2\"", "0+0 +00 00-"),  new J.symmetry.HallRotation ("2x\'", "-00 00- 0-0"),  new J.symmetry.HallRotation ("2x\"", "-00 00+ 0+0"),  new J.symmetry.HallRotation ("2y\'", "00- 0-0 -00"),  new J.symmetry.HallRotation ("2y\"", "00+ 0-0 +00"),  new J.symmetry.HallRotation ("2z\'", "0-0 -00 00-"),  new J.symmetry.HallRotation ("2z\"", "0+0 +00 00-"),  new J.symmetry.HallRotation ("3x", "+00 00- 0+-"),  new J.symmetry.HallRotation ("3y", "-0+ 0+0 -00"),  new J.symmetry.HallRotation ("3z", "0-0 +-0 00+"),  new J.symmetry.HallRotation ("3*", "00+ +00 0+0"),  new J.symmetry.HallRotation ("4x", "+00 00- 0+0"),  new J.symmetry.HallRotation ("4y", "00+ 0+0 -00"),  new J.symmetry.HallRotation ("4z", "0-0 +00 00+"),  new J.symmetry.HallRotation ("6x", "+00 0+- 0+0"),  new J.symmetry.HallRotation ("6y", "00+ 0+0 -0+"),  new J.symmetry.HallRotation ("6z", "+-0 +00 00+")] : J.symmetry.HallRotation.hallRotationTerms);
+});
+Clazz.defineStatics (c$,
+"hallRotationTerms", null);
 });

@@ -1,5 +1,5 @@
 Clazz.declarePackage ("J.jvxl.readers");
-Clazz.load (["J.jvxl.readers.PolygonFileReader", "java.util.Hashtable", "J.util.P3"], "J.jvxl.readers.NffReader", ["java.lang.Float", "J.jvxl.data.JvxlCoder", "J.util.ColorUtil", "$.Logger"], function () {
+Clazz.load (["J.jvxl.readers.PolygonFileReader", "java.util.Hashtable", "JU.P3"], "J.jvxl.readers.NffReader", ["java.lang.Float", "JU.CU", "J.jvxl.data.JvxlCoder", "JW.Logger"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.nPolygons = 0;
 this.vertexMap = null;
@@ -8,23 +8,27 @@ Clazz.instantialize (this, arguments);
 }, J.jvxl.readers, "NffReader", J.jvxl.readers.PolygonFileReader);
 Clazz.prepareFields (c$, function () {
 this.vertexMap =  new java.util.Hashtable ();
-this.pt =  new J.util.P3 ();
+this.pt =  new JU.P3 ();
 });
 Clazz.makeConstructor (c$, 
 function () {
 Clazz.superConstructor (this, J.jvxl.readers.NffReader, []);
 });
-$_M(c$, "setHeader", 
+Clazz.overrideMethod (c$, "init2", 
+function (sg, br) {
+this.init2PFR (sg, br);
+}, "J.jvxl.readers.SurfaceGenerator,java.io.BufferedReader");
+Clazz.defineMethod (c$, "setHeader", 
 function () {
 this.jvxlFileHeaderBuffer.append ("NFF file format\nvertices and triangles only\n");
 J.jvxl.data.JvxlCoder.jvxlCreateHeaderWithoutTitleOrAtoms (this.volumeData, this.jvxlFileHeaderBuffer);
 });
 Clazz.overrideMethod (c$, "getSurfaceData", 
 function () {
-if (this.readVerticesAndPolygons ()) J.util.Logger.info ("NFF file contains " + this.nVertices + " vertices and " + this.nTriangles + " triangles");
- else J.util.Logger.error (this.params.fileName + ": Error reading Nff data ");
+if (this.readVerticesAndPolygons ()) JW.Logger.info ("NFF file contains " + this.nVertices + " vertices and " + this.nTriangles + " triangles");
+ else JW.Logger.error (this.params.fileName + ": Error reading Nff data ");
 });
-$_M(c$, "readVerticesAndPolygons", 
+Clazz.defineMethod (c$, "readVerticesAndPolygons", 
 function () {
 var color = 0xFF0000;
 try {
@@ -36,7 +40,7 @@ case '#':
 this.vertexMap.clear ();
 continue;
 case 'f':
-color = J.util.ColorUtil.colorTriadToInt (this.parseFloatStr (tokens[1]), this.parseFloatStr (tokens[2]), this.parseFloatStr (tokens[3]));
+color = JU.CU.colorTriadToFFRGB (this.parseFloatStr (tokens[1]), this.parseFloatStr (tokens[2]), this.parseFloatStr (tokens[3]));
 continue;
 case 'p':
 if (this.line.equals ("pp 3")) {
@@ -56,8 +60,8 @@ throw e;
 }
 return true;
 });
-$_M(c$, "getVertex", 
-($fz = function () {
+Clazz.defineMethod (c$, "getVertex", 
+ function () {
 var i = this.vertexMap.get (this.readLine ());
 if (i == null) {
 var tokens = this.getTokens ();
@@ -67,5 +71,5 @@ if (this.isAnisotropic) this.setVertexAnisotropy (this.pt);
 i = Integer.$valueOf (this.addVertexCopy (this.pt, 0, this.nVertices++));
 this.vertexMap.put (this.line, i);
 }return i.intValue ();
-}, $fz.isPrivate = true, $fz));
+});
 });

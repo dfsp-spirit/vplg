@@ -1,21 +1,17 @@
 Clazz.declarePackage ("J.adapter.smarter");
-Clazz.load (["J.api.JmolAdapter"], "J.adapter.smarter.SmarterJmolAdapter", ["J.adapter.smarter.AtomIterator", "$.AtomSetCollection", "$.BondIterator", "$.Resolver", "$.StructureIterator", "J.util.Logger"], function () {
+Clazz.load (["J.api.JmolAdapter"], "J.adapter.smarter.SmarterJmolAdapter", ["java.io.BufferedReader", "javajs.api.GenericBinaryDocument", "J.adapter.smarter.AtomIterator", "$.AtomSetCollection", "$.AtomSetCollectionReader", "$.BondIterator", "$.Resolver", "$.StructureIterator", "JW.Logger"], function () {
 c$ = Clazz.declareType (J.adapter.smarter, "SmarterJmolAdapter", J.api.JmolAdapter);
-Clazz.makeConstructor (c$, 
-function () {
-Clazz.superConstructor (this, J.adapter.smarter.SmarterJmolAdapter, ["SmarterJmolAdapter"]);
-});
 Clazz.overrideMethod (c$, "getFileTypeName", 
-function (atomSetCollectionOrReader) {
-if (Clazz.instanceOf (atomSetCollectionOrReader, J.adapter.smarter.AtomSetCollection)) return (atomSetCollectionOrReader).getFileTypeName ();
-if (Clazz.instanceOf (atomSetCollectionOrReader, java.io.BufferedReader)) return J.adapter.smarter.Resolver.getFileType (atomSetCollectionOrReader);
+function (ascOrReader) {
+if (Clazz.instanceOf (ascOrReader, J.adapter.smarter.AtomSetCollection)) return (ascOrReader).fileTypeName;
+if (Clazz.instanceOf (ascOrReader, java.io.BufferedReader)) return J.adapter.smarter.Resolver.getFileType (ascOrReader);
 return null;
 }, "~O");
 Clazz.overrideMethod (c$, "getAtomSetCollectionReader", 
 function (name, type, bufferedReader, htParams) {
 return J.adapter.smarter.SmarterJmolAdapter.staticGetAtomSetCollectionReader (name, type, bufferedReader, htParams);
 }, "~S,~S,~O,java.util.Map");
-c$.staticGetAtomSetCollectionReader = $_M(c$, "staticGetAtomSetCollectionReader", 
+c$.staticGetAtomSetCollectionReader = Clazz.defineMethod (c$, "staticGetAtomSetCollectionReader", 
 function (name, type, bufferedReader, htParams) {
 try {
 var ret = J.adapter.smarter.Resolver.getAtomCollectionReader (name, type, bufferedReader, htParams, -1);
@@ -41,11 +37,11 @@ throw ex;
 }
 }
 bufferedReader = null;
-J.util.Logger.error ("" + e);
+JW.Logger.error ("" + e);
 return "" + e;
 }
 }, "~S,~S,~O,java.util.Map");
-$_M(c$, "getAtomSetCollectionFromReader", 
+Clazz.defineMethod (c$, "getAtomSetCollectionFromReader", 
 function (fname, reader, htParams) {
 var ret = J.adapter.smarter.Resolver.getAtomCollectionReader (fname, null, reader, htParams, -1);
 if (Clazz.instanceOf (ret, J.adapter.smarter.AtomSetCollectionReader)) {
@@ -54,25 +50,25 @@ return (ret).readData ();
 }return "" + ret;
 }, "~S,~O,java.util.Map");
 Clazz.overrideMethod (c$, "getAtomSetCollection", 
-function (atomSetCollectionReader) {
-return J.adapter.smarter.SmarterJmolAdapter.staticGetAtomSetCollection (atomSetCollectionReader);
+function (ascReader) {
+return J.adapter.smarter.SmarterJmolAdapter.staticGetAtomSetCollection (ascReader);
 }, "~O");
-c$.staticGetAtomSetCollection = $_M(c$, "staticGetAtomSetCollection", 
+c$.staticGetAtomSetCollection = Clazz.defineMethod (c$, "staticGetAtomSetCollection", 
 function (a) {
 var br = null;
 try {
 br = a.reader;
 var ret = a.readData ();
 if (!(Clazz.instanceOf (ret, J.adapter.smarter.AtomSetCollection))) return ret;
-var atomSetCollection = ret;
-if (atomSetCollection.errorMessage != null) return atomSetCollection.errorMessage;
-return atomSetCollection;
+var asc = ret;
+if (asc.errorMessage != null) return asc.errorMessage;
+return asc;
 } catch (e) {
 try {
 System.out.println (e.toString ());
 } catch (ee) {
 if (Clazz.exceptionOf (ee, Exception)) {
-J.util.Logger.error (e.toString ());
+JW.Logger.error (e.toString ());
 } else {
 throw ee;
 }
@@ -86,7 +82,7 @@ throw ex;
 }
 }
 br = null;
-J.util.Logger.error ("" + e);
+JW.Logger.error ("" + e);
 return "" + e;
 }
 }, "J.adapter.smarter.AtomSetCollectionReader");
@@ -95,13 +91,17 @@ function (filesReader, names, types, htParams, getReadersOnly) {
 var size = names.length;
 var readers = (getReadersOnly ?  new Array (size) : null);
 var atomsets = (getReadersOnly ? null :  new Array (size));
+var r = null;
+var vwr = htParams.get ("vwr");
 for (var i = 0; i < size; i++) {
 try {
+if (r != null) htParams.put ("vwr", vwr);
 var reader = filesReader.getBufferedReaderOrBinaryDocument (i, false);
-if (!(Clazz.instanceOf (reader, java.io.BufferedReader) || Clazz.instanceOf (reader, J.api.JmolDocument))) return reader;
+if (!(Clazz.instanceOf (reader, java.io.BufferedReader) || Clazz.instanceOf (reader, javajs.api.GenericBinaryDocument))) return reader;
 var ret = J.adapter.smarter.Resolver.getAtomCollectionReader (names[i], (types == null ? null : types[i]), reader, htParams, i);
 if (!(Clazz.instanceOf (ret, J.adapter.smarter.AtomSetCollectionReader))) return ret;
-var r = ret;
+r = ret;
+r.setup (null, null, null);
 if (r.isBinary) {
 r.setup (names[i], htParams, filesReader.getBufferedReaderOrBinaryDocument (i, true));
 } else {
@@ -114,7 +114,8 @@ if (!(Clazz.instanceOf (ret, J.adapter.smarter.AtomSetCollection))) return ret;
 atomsets[i] = ret;
 if (atomsets[i].errorMessage != null) return atomsets[i].errorMessage;
 }} catch (e) {
-J.util.Logger.error ("" + e);
+JW.Logger.error ("" + e);
+if (!vwr.isJS) e.printStackTrace ();
 return "" + e;
 }
 }
@@ -133,7 +134,7 @@ if (!(Clazz.instanceOf (ret, J.adapter.smarter.AtomSetCollection))) return ret;
 asc[i] = ret;
 if (asc[i].errorMessage != null) return asc[i].errorMessage;
 } catch (e) {
-J.util.Logger.error ("" + e);
+JW.Logger.error ("" + e);
 return "" + e;
 }
 }
@@ -170,91 +171,68 @@ var asc = ret;
 if (asc.errorMessage != null) return asc.errorMessage;
 return asc;
 } catch (e) {
-J.util.Logger.error ("" + e);
+JW.Logger.error ("" + e);
 return "" + e;
 }
 }, "~O,java.util.Map");
 Clazz.overrideMethod (c$, "finish", 
-function (atomSetCollection, modelSet, baseModelIndex, baseAtomIndex) {
-(atomSetCollection).finish (modelSet, baseModelIndex, baseAtomIndex);
-}, "~O,J.modelset.ModelSet,~N,~N");
+function (asc) {
+(asc).finish ();
+}, "~O");
 Clazz.overrideMethod (c$, "getAtomSetCollectionName", 
-function (atomSetCollection) {
-return (atomSetCollection).getCollectionName ();
+function (asc) {
+return (asc).collectionName;
 }, "~O");
 Clazz.overrideMethod (c$, "getAtomSetCollectionAuxiliaryInfo", 
-function (atomSetCollection) {
-return (atomSetCollection).getAtomSetCollectionAuxiliaryInfoMap ();
+function (asc) {
+return (asc).ascAuxiliaryInfo;
 }, "~O");
 Clazz.overrideMethod (c$, "getAtomSetCount", 
-function (atomSetCollection) {
-return (atomSetCollection).getAtomSetCount ();
+function (asc) {
+return (asc).atomSetCount;
 }, "~O");
 Clazz.overrideMethod (c$, "getAtomSetNumber", 
-function (atomSetCollection, atomSetIndex) {
-return (atomSetCollection).getAtomSetNumber (atomSetIndex);
+function (asc, atomSetIndex) {
+return (asc).getAtomSetNumber (atomSetIndex);
 }, "~O,~N");
 Clazz.overrideMethod (c$, "getAtomSetName", 
-function (atomSetCollection, atomSetIndex) {
-return (atomSetCollection).getAtomSetName (atomSetIndex);
+function (asc, atomSetIndex) {
+return (asc).getAtomSetName (atomSetIndex);
 }, "~O,~N");
 Clazz.overrideMethod (c$, "getAtomSetAuxiliaryInfo", 
-function (atomSetCollection, atomSetIndex) {
-return (atomSetCollection).getAtomSetAuxiliaryInfo (atomSetIndex);
+function (asc, atomSetIndex) {
+return (asc).getAtomSetAuxiliaryInfo (atomSetIndex);
 }, "~O,~N");
 Clazz.overrideMethod (c$, "getHydrogenAtomCount", 
-function (atomSetCollection) {
-return (atomSetCollection).getHydrogenAtomCount ();
+function (asc) {
+return (asc).getHydrogenAtomCount ();
 }, "~O");
 Clazz.overrideMethod (c$, "getBondList", 
-function (atomSetCollection) {
-return (atomSetCollection).getBondList ();
+function (asc) {
+return (asc).getBondList ();
 }, "~O");
 Clazz.overrideMethod (c$, "getAtomCount", 
-function (atomSetCollection) {
-var a = atomSetCollection;
-return (a.bsAtoms == null ? a.getAtomCount () : a.bsAtoms.cardinality ());
+function (asc) {
+var a = asc;
+return (a.bsAtoms == null ? a.ac : a.bsAtoms.cardinality ());
 }, "~O");
 Clazz.overrideMethod (c$, "coordinatesAreFractional", 
-function (atomSetCollection) {
-return (atomSetCollection).coordinatesAreFractional;
-}, "~O");
-Clazz.overrideMethod (c$, "getNotionalUnitcell", 
-function (atomSetCollection) {
-return (atomSetCollection).notionalUnitCell;
-}, "~O");
-Clazz.overrideMethod (c$, "getPdbScaleMatrix", 
-function (atomSetCollection) {
-var a = (atomSetCollection).notionalUnitCell;
-if (a.length < 22) return null;
-var b =  Clazz.newFloatArray (16, 0);
-for (var i = 0; i < 16; i++) b[i] = a[6 + i];
-
-return b;
-}, "~O");
-Clazz.overrideMethod (c$, "getPdbScaleTranslate", 
-function (atomSetCollection) {
-var a = (atomSetCollection).notionalUnitCell;
-if (a.length < 22) return null;
-var b =  Clazz.newFloatArray (3, 0);
-b[0] = a[9];
-b[1] = a[13];
-b[2] = a[17];
-return b;
+function (asc) {
+return (asc).coordinatesAreFractional;
 }, "~O");
 Clazz.overrideMethod (c$, "getAtomIterator", 
-function (atomSetCollection) {
-return  new J.adapter.smarter.AtomIterator (atomSetCollection);
+function (asc) {
+return  new J.adapter.smarter.AtomIterator (asc);
 }, "~O");
 Clazz.overrideMethod (c$, "getBondIterator", 
-function (atomSetCollection) {
-return  new J.adapter.smarter.BondIterator (atomSetCollection);
+function (asc) {
+return  new J.adapter.smarter.BondIterator (asc);
 }, "~O");
 Clazz.overrideMethod (c$, "getStructureIterator", 
-function (atomSetCollection) {
-return (atomSetCollection).getStructureCount () == 0 ? null :  new J.adapter.smarter.StructureIterator (atomSetCollection);
+function (asc) {
+return (asc).structureCount == 0 ? null :  new J.adapter.smarter.StructureIterator (asc);
 }, "~O");
-c$.close = $_M(c$, "close", 
+c$.close = Clazz.defineMethod (c$, "close", 
 function (bufferedReader) {
 if (Clazz.instanceOf (bufferedReader, java.io.BufferedReader)) (bufferedReader).close ();
  else (bufferedReader).close ();

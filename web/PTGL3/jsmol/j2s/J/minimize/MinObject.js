@@ -10,11 +10,11 @@ Clazz.overrideMethod (c$, "toString",
 function () {
 return this.type + " " + this.data[0] + "," + this.data[1] + (this.data.length > 2 ? "," + this.data[2] + "," + this.data[3] : "") + " " + J.minimize.MinObject.decodeKey (this.key);
 });
-c$.getKey = $_M(c$, "getKey", 
+c$.getKey = Clazz.defineMethod (c$, "getKey", 
 function (type, a1, a2, a3, a4) {
 return Integer.$valueOf ((((((((a4 << 7) + a3) << 7) + a2) << 7) + a1) << 4) + type);
 }, "~N,~N,~N,~N,~N");
-c$.decodeKey = $_M(c$, "decodeKey", 
+c$.decodeKey = Clazz.defineMethod (c$, "decodeKey", 
 function (key) {
 if (key == null) return null;
 var i = key.intValue ();
@@ -27,5 +27,5 @@ i >>= 7;
 var c = i & 0x7F;
 i >>= 7;
 var d = i & 0x7F;
-return type + ": " + (a < 10 ? "  " : " ") + a + (b < 10 ? "  " : " ") + b + (c < 10 ? "  " : " ") + c + (d < 10 ? "  " : " ") + d;
+return (type < 0 ? type + ": " : "") + (a < 10 ? "  " : " ") + a + (b < 10 ? "  " : " ") + b + (c < 10 ? "  " : " ") + c + (d > 120 ? "" : (d < 10 ? "  " : " ") + d);
 }, "Integer");

@@ -51,10 +51,9 @@ this.tl = Clazz.newArray(1, null);
 this.td = Clazz.newArray(1, null);
 }this.reset ();
 }, "JZ.ZStream,~N");
-$_M(c$, "reset", 
+Clazz.defineMethod (c$, "reset", 
 function () {
-if (this.mode == 4 || this.mode == 5) {
-}if (this.mode == 6) {
+if (this.mode == 6) {
 this.codes.free (this.z);
 }this.mode = 0;
 this.bitk = 0;
@@ -63,7 +62,7 @@ this.read = this.write = 0;
 if (this.check) {
 this.z.checksum.reset ();
 }});
-$_M(c$, "proc", 
+Clazz.defineMethod (c$, "proc", 
 function (r) {
 var t;
 var b;
@@ -318,8 +317,7 @@ return this.inflate_flush (r);
 b |= (this.z.next_in[p++] & 0xff) << k;
 k += 8;
 }
-if (this.tb[0] == -1) {
-}t = this.hufts[(this.tb[0] + (b & JZ.InfBlocks.inflate_mask[t])) * 3 + 1];
+t = this.hufts[(this.tb[0] + (b & JZ.InfBlocks.inflate_mask[t])) * 3 + 1];
 c = this.hufts[(this.tb[0] + (b & JZ.InfBlocks.inflate_mask[t])) * 3 + 2];
 if (c < 16) {
 b >>>= (t);
@@ -453,22 +451,22 @@ return this.inflate_flush (r);
 }
 }
 }, "~N");
-$_M(c$, "free", 
+Clazz.defineMethod (c$, "free", 
 function () {
 this.reset ();
 this.window = null;
 this.hufts = null;
 });
-$_M(c$, "set_dictionary", 
+Clazz.defineMethod (c$, "set_dictionary", 
 function (d, start, n) {
 System.arraycopy (d, start, this.window, 0, n);
 this.read = this.write = n;
 }, "~A,~N,~N");
-$_M(c$, "sync_point", 
+Clazz.defineMethod (c$, "sync_point", 
 function () {
 return this.mode == 1 ? 1 : 0;
 });
-$_M(c$, "inflate_flush", 
+Clazz.defineMethod (c$, "inflate_flush", 
 function (r) {
 var n;
 var p;

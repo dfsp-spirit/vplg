@@ -5,11 +5,11 @@ this.max_code = 0;
 this.stat_desc = null;
 Clazz.instantialize (this, arguments);
 }, JZ, "Tree");
-c$.d_code = $_M(c$, "d_code", 
+c$.d_code = Clazz.defineMethod (c$, "d_code", 
 function (dist) {
 return ((dist) < 256 ? JZ.Tree._dist_code[dist] : JZ.Tree._dist_code[256 + ((dist) >>> 7)]);
 }, "~N");
-$_M(c$, "gen_bitlen", 
+Clazz.defineMethod (c$, "gen_bitlen", 
 function (s) {
 var tree = this.dyn_tree;
 var stree = this.stat_desc.static_tree;
@@ -63,7 +63,7 @@ tree[m * 2 + 1] = bits;
 }
 }
 }, "JZ.Deflate");
-$_M(c$, "build_tree", 
+Clazz.defineMethod (c$, "build_tree", 
 function (s) {
 var tree = this.dyn_tree;
 var stree = this.stat_desc.static_tree;
@@ -109,7 +109,7 @@ s.heap[--s.heap_max] = s.heap[1];
 this.gen_bitlen (s);
 JZ.Tree.gen_codes (tree, max_code, s.bl_count);
 }, "JZ.Deflate");
-c$.gen_codes = $_M(c$, "gen_codes", 
+c$.gen_codes = Clazz.defineMethod (c$, "gen_codes", 
 function (tree, max_code, bl_count) {
 var code = 0;
 var bits;
@@ -124,7 +124,7 @@ if (len == 0) continue;
 tree[n * 2] = (JZ.Tree.bi_reverse (JZ.Tree.next_code[len]++, len));
 }
 }, "~A,~N,~A");
-c$.bi_reverse = $_M(c$, "bi_reverse", 
+c$.bi_reverse = Clazz.defineMethod (c$, "bi_reverse", 
 function (code, len) {
 var res = 0;
 do {

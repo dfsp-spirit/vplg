@@ -13,9 +13,9 @@ Clazz.instantialize (this, arguments);
 Clazz.prepareFields (c$, function () {
 this.buf1 =  Clazz.newByteArray (1, 0);
 });
-Clazz.makeConstructor (c$, 
+Clazz.defineMethod (c$, "jzSetDOS", 
 function (out, deflater, size, close_out) {
-Clazz.superConstructor (this, JZ.DeflaterOutputStream, [out]);
+this.jzSetFOS (out);
 if (size == 0) size = 512;
 this.deflater = deflater;
 this.buffer =  Clazz.newByteArray (size, 0);
@@ -26,7 +26,7 @@ function (b) {
 this.buf1[0] = (b & 0xff);
 this.write (this.buf1, 0, 1);
 }, "~N");
-$_M(c$, "write", 
+Clazz.defineMethod (c$, "write", 
 function (b, off, len) {
 if (this.deflater.finished ()) throw  new java.io.IOException ("finished");
 if ( new Boolean ( new Boolean (off < 0 | len < 0).valueOf () | off + len > b.length).valueOf ()) throw  new IndexOutOfBoundsException ();
@@ -38,7 +38,7 @@ var err = this.deflate (flush);
 if (err == 1) break;
 }
 }, "~A,~N,~N");
-$_M(c$, "finish", 
+Clazz.defineMethod (c$, "finish", 
 function () {
 while (!this.deflater.finished ()) {
 this.deflate (4);
@@ -53,7 +53,7 @@ this.deflater.end ();
 }if (this.close_out) this.out.close ();
 this.closed = true;
 }});
-$_M(c$, "deflate", 
+Clazz.defineMethod (c$, "deflate", 
 function (flush) {
 this.deflater.setOutput (this.buffer, 0, this.buffer.length);
 var err = this.deflater.deflate (flush);
@@ -82,23 +82,23 @@ if (err == 1) break;
 }
 }this.out.flush ();
 });
-$_M(c$, "getTotalIn", 
+Clazz.defineMethod (c$, "getTotalIn", 
 function () {
 return this.deflater.getTotalIn ();
 });
-$_M(c$, "getTotalOut", 
+Clazz.defineMethod (c$, "getTotalOut", 
 function () {
 return this.deflater.getTotalOut ();
 });
-$_M(c$, "setSyncFlush", 
+Clazz.defineMethod (c$, "setSyncFlush", 
 function (syncFlush) {
 this.syncFlush = syncFlush;
 }, "~B");
-$_M(c$, "getSyncFlush", 
+Clazz.defineMethod (c$, "getSyncFlush", 
 function () {
 return this.syncFlush;
 });
-$_M(c$, "getDeflater", 
+Clazz.defineMethod (c$, "getDeflater", 
 function () {
 return this.deflater;
 });

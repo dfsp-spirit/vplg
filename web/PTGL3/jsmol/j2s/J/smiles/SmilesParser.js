@@ -1,5 +1,5 @@
 Clazz.declarePackage ("J.smiles");
-Clazz.load (["java.util.Hashtable"], "J.smiles.SmilesParser", ["java.lang.Character", "$.Float", "J.smiles.InvalidSmilesException", "$.SmilesAtom", "$.SmilesBond", "$.SmilesMeasure", "$.SmilesSearch", "J.util.Elements", "$.JmolList", "$.Logger", "$.Parser", "$.SB", "$.TextFormat"], function () {
+Clazz.load (["java.util.Hashtable"], "J.smiles.SmilesParser", ["java.lang.Character", "JU.List", "$.PT", "$.SB", "J.smiles.InvalidSmilesException", "$.SmilesAtom", "$.SmilesBond", "$.SmilesMeasure", "$.SmilesSearch", "JW.Elements", "$.Logger", "$.Txt"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.isSmarts = false;
 this.isBioSequence = false;
@@ -15,7 +15,7 @@ Clazz.prepareFields (c$, function () {
 this.ringBonds =  new java.util.Hashtable ();
 this.htMeasures =  new java.util.Hashtable ();
 });
-c$.getMolecule = $_M(c$, "getMolecule", 
+c$.getMolecule = Clazz.defineMethod (c$, "getMolecule", 
 function (pattern, isSmarts) {
 return ( new J.smiles.SmilesParser (isSmarts)).parse (pattern);
 }, "~S,~B");
@@ -23,12 +23,12 @@ Clazz.makeConstructor (c$,
 function (isSmarts) {
 this.isSmarts = isSmarts;
 }, "~B");
-$_M(c$, "reset", 
+Clazz.defineMethod (c$, "reset", 
 function () {
 this.braceCount = 0;
 this.branchLevel = 0;
 });
-$_M(c$, "parse", 
+Clazz.defineMethod (c$, "parse", 
 function (pattern) {
 if (pattern == null) throw  new J.smiles.InvalidSmilesException ("SMILES expressions must not be null");
 var search =  new J.smiles.SmilesSearch ();
@@ -47,7 +47,7 @@ if (strFlags.indexOf ("NOSTEREO") >= 0) this.flags |= 2;
 if (pattern.indexOf ("$") >= 0) pattern = this.parseVariables (pattern);
 if (this.isSmarts && pattern.indexOf ("[$") >= 0) pattern = this.parseVariableLength (pattern);
 if (pattern.indexOf ("||") >= 0) {
-var patterns = J.util.TextFormat.splitChars (pattern, "||");
+var patterns = JU.PT.split (pattern, "||");
 var toDo = "";
 search.subSearches =  new Array (patterns.length);
 for (var i = 0; i < patterns.length; i++) {
@@ -56,13 +56,13 @@ if (toDo.indexOf (key) < 0) {
 search.subSearches[i] = this.getSearch (search, patterns[i], this.flags);
 toDo += key;
 }}
-J.util.Logger.info (toDo);
+JW.Logger.info (toDo);
 return search;
 }return this.getSearch (search, pattern, this.flags);
 }, "~S");
-$_M(c$, "parseVariableLength", 
-($fz = function (pattern) {
-var sout =  new J.util.SB ();
+Clazz.defineMethod (c$, "parseVariableLength", 
+ function (pattern) {
+var sout =  new JU.SB ();
 var len = pattern.length - 1;
 var nParen = 0;
 var haveInternalOr = false;
@@ -84,7 +84,7 @@ len--;
 }
 }
 if (pattern.indexOf ("||") >= 0) {
-var patterns = J.util.TextFormat.splitChars (pattern, "||");
+var patterns = JU.PT.split (pattern, "||");
 for (var i = 0; i < patterns.length; i++) sout.append ("||").append (this.parseVariableLength (patterns[i]));
 
 } else {
@@ -140,7 +140,7 @@ continue;
 }if (max == -2147483648) max = min;
 if (repeat.indexOf ("|") >= 0) repeat = "[$(" + repeat + ")]";
 for (var i = min; i <= max; i++) {
-var sb =  new J.util.SB ();
+var sb =  new JU.SB ();
 sb.append ("||").append (pattern.substring (0, pt0));
 for (var j = 0; j < i; j++) sb.append (repeat);
 
@@ -150,8 +150,8 @@ sout.appendSB (sb);
 }
 if (!isOK) throw  new J.smiles.InvalidSmilesException ("bad variable expression: " + bracketed);
 }return (haveInternalOr ? this.parseVariableLength (sout.substring (2)) : sout.length () < 2 ? pattern : sout.substring (2));
-}, $fz.isPrivate = true, $fz), "~S");
-$_M(c$, "getSearch", 
+}, "~S");
+Clazz.defineMethod (c$, "getSearch", 
 function (parent, pattern, flags) {
 this.htMeasures =  new java.util.Hashtable ();
 var molecule =  new J.smiles.SmilesSearch ();
@@ -164,12 +164,12 @@ this.parseSmiles (molecule, pattern, null, false);
 if (this.braceCount != 0) throw  new J.smiles.InvalidSmilesException ("unmatched '{'");
 if (!this.ringBonds.isEmpty ()) throw  new J.smiles.InvalidSmilesException ("Open ring");
 molecule.setAtomArray ();
-for (var i = molecule.atomCount; --i >= 0; ) {
+for (var i = molecule.ac; --i >= 0; ) {
 var atom = molecule.patternAtoms[i];
 atom.setBondArray ();
 if (!this.isSmarts && atom.bioType == '\0' && !atom.setHydrogenCount (molecule)) throw  new J.smiles.InvalidSmilesException ("unbracketed atoms must be one of: B, C, N, O, P, S, F, Cl, Br, I,");
 }
-if (this.isSmarts) for (var i = molecule.atomCount; --i >= 0; ) {
+if (this.isSmarts) for (var i = molecule.ac; --i >= 0; ) {
 var atom = molecule.patternAtoms[i];
 this.checkNested (molecule, atom, flags);
 for (var k = 0; k < atom.nAtomsOr; k++) this.checkNested (molecule, atom.atomsOr[k], flags);
@@ -181,8 +181,8 @@ if (!this.isSmarts && !this.isBioSequence) molecule.elementCounts[1] = molecule.
 this.fixChirality (molecule);
 return molecule;
 }, "J.smiles.SmilesSearch,~S,~N");
-$_M(c$, "checkNested", 
-($fz = function (molecule, atom, flags) {
+Clazz.defineMethod (c$, "checkNested", 
+ function (molecule, atom, flags) {
 if (atom.iNested > 0) {
 var o = molecule.getNested (atom.iNested);
 if (Clazz.instanceOf (o, String)) {
@@ -190,12 +190,12 @@ var s = o;
 if (s.startsWith ("select")) return;
 if (s.charAt (0) != '~' && atom.bioType != '\0') s = "~" + atom.bioType + "~" + s;
 var search = this.getSearch (molecule, s, flags);
-if (search.atomCount > 0 && search.patternAtoms[0].selected) atom.selected = true;
+if (search.ac > 0 && search.patternAtoms[0].selected) atom.selected = true;
 molecule.setNested (atom.iNested, search);
-}}}, $fz.isPrivate = true, $fz), "J.smiles.SmilesSearch,J.smiles.SmilesAtom,~N");
-$_M(c$, "fixChirality", 
-($fz = function (molecule) {
-for (var i = molecule.atomCount; --i >= 0; ) {
+}}}, "J.smiles.SmilesSearch,J.smiles.SmilesAtom,~N");
+Clazz.defineMethod (c$, "fixChirality", 
+ function (molecule) {
+for (var i = molecule.ac; --i >= 0; ) {
 var sAtom = molecule.patternAtoms[i];
 var stereoClass = sAtom.getChiralClass ();
 if (stereoClass == -2147483648) continue;
@@ -229,9 +229,9 @@ break;
 if (stereoClass == 0) throw  new J.smiles.InvalidSmilesException ("Incorrect number of bonds for stereochemistry descriptor");
 sAtom.setChiralClass (stereoClass);
 }
-}, $fz.isPrivate = true, $fz), "J.smiles.SmilesSearch");
-$_M(c$, "parseSmiles", 
-($fz = function (molecule, pattern, currentAtom, isBranchAtom) {
+}, "J.smiles.SmilesSearch");
+Clazz.defineMethod (c$, "parseSmiles", 
+ function (molecule, pattern, currentAtom, isBranchAtom) {
 var ret =  Clazz.newIntArray (1, 0);
 var pt = 0;
 var ch;
@@ -304,7 +304,7 @@ if (bond.order != -1 && bond.order != 0) bond.set2a (null, currentAtom);
 break;
 default:
 var ch2 = (!this.isBioSequence && Character.isUpperCase (ch) ? J.smiles.SmilesParser.getChar (pattern, index + 1) : '\0');
-if (ch != 'X' || ch2 != 'x') if (!Character.isLowerCase (ch2) || J.util.Elements.elementNumberFromSymbol (pattern.substring (index, index + 2), true) == 0) ch2 = '\0';
+if (ch != 'X' || ch2 != 'x') if (!Character.isLowerCase (ch2) || JW.Elements.elementNumberFromSymbol (pattern.substring (index, index + 2), true) == 0) ch2 = '\0';
 if (ch2 != '\0' && "NA CA BA PA SC AC".indexOf (pattern.substring (index, index + 2)) >= 0) {
 ch2 = '\0';
 }var size = (Character.isUpperCase (ch) && Character.isLowerCase (ch2) ? 2 : 1);
@@ -318,9 +318,9 @@ if (ch == '}' && this.checkBrace (molecule, ch, '}')) index++;
 }pattern = pattern.substring (index);
 isBranchAtom = false;
 }
-}, $fz.isPrivate = true, $fz), "J.smiles.SmilesSearch,~S,J.smiles.SmilesAtom,~B");
-$_M(c$, "checkBioType", 
-($fz = function (pattern, index) {
+}, "J.smiles.SmilesSearch,~S,J.smiles.SmilesAtom,~B");
+Clazz.defineMethod (c$, "checkBioType", 
+ function (pattern, index) {
 this.isBioSequence = (pattern.charAt (index) == '~');
 if (this.isBioSequence) {
 index++;
@@ -330,9 +330,9 @@ if (ch == '~' && ((ch = pattern.charAt (1)) == '*' || Character.isLowerCase (ch)
 this.bioType = ch;
 index = 3;
 }}return index;
-}, $fz.isPrivate = true, $fz), "~S,~N");
-$_M(c$, "parseMeasure", 
-($fz = function (molecule, strMeasure, currentAtom) {
+}, "~S,~N");
+Clazz.defineMethod (c$, "parseMeasure", 
+ function (molecule, strMeasure, currentAtom) {
 var pt = strMeasure.indexOf (":");
 var isNot = false;
 var id = (pt < 0 ? strMeasure : strMeasure.substring (0, pt));
@@ -354,18 +354,18 @@ var s = strMeasure.substring (pt + 1, pt2);
 if (s.startsWith ("!")) {
 isNot = true;
 s = s.substring (1);
-}var min = (pt + 1 == pt2 ? 0 : Float.parseFloat (s));
+}var min = (pt + 1 == pt2 ? 0 : JU.PT.fVal (s));
 s = strMeasure.substring (pt2 + 1);
-var max = (s.length == 0 ? 3.4028235E38 : Float.parseFloat (s));
+var max = (s.length == 0 ? 3.4028235E38 : JU.PT.fVal (s));
 m =  new J.smiles.SmilesMeasure (molecule, index, type, min, max, isNot);
 molecule.measures.addLast (m);
 if (index > 0) this.htMeasures.put (id, m);
- else if (index == 0 && J.util.Logger.debugging) J.util.Logger.debug ("measure created: " + m);
+ else if (index == 0 && JW.Logger.debugging) JW.Logger.debug ("measure created: " + m);
 } else {
 if (!m.addPoint (currentAtom.index)) break;
 if (m.nPoints == m.type) {
 this.htMeasures.remove (id);
-if (J.util.Logger.debugging) J.util.Logger.debug ("measure created: " + m);
+if (JW.Logger.debugging) JW.Logger.debug ("measure created: " + m);
 }return;
 }if (!m.addPoint (currentAtom.index)) break;
 } catch (e) {
@@ -378,9 +378,9 @@ throw e;
 return;
 }
 throw  new J.smiles.InvalidSmilesException ("invalid measure: " + strMeasure);
-}, $fz.isPrivate = true, $fz), "J.smiles.SmilesSearch,~S,J.smiles.SmilesAtom");
-$_M(c$, "checkBrace", 
-($fz = function (molecule, ch, type) {
+}, "J.smiles.SmilesSearch,~S,J.smiles.SmilesAtom");
+Clazz.defineMethod (c$, "checkBrace", 
+ function (molecule, ch, type) {
 switch (ch) {
 case '{':
 if (ch != type) break;
@@ -397,9 +397,9 @@ default:
 return false;
 }
 throw  new J.smiles.InvalidSmilesException ("Unmatched '}'");
-}, $fz.isPrivate = true, $fz), "J.smiles.SmilesSearch,~S,~S");
-$_M(c$, "parseNested", 
-($fz = function (molecule, pattern, prefix) {
+}, "J.smiles.SmilesSearch,~S,~S");
+Clazz.defineMethod (c$, "parseNested", 
+ function (molecule, pattern, prefix) {
 var index;
 prefix = "$(" + prefix;
 while ((index = pattern.lastIndexOf (prefix)) >= 0) {
@@ -408,11 +408,11 @@ var pt = index + s.length + 3;
 pattern = pattern.substring (0, index) + "_" + molecule.addNested (s) + "_" + pattern.substring (pt);
 }
 return pattern;
-}, $fz.isPrivate = true, $fz), "J.smiles.SmilesSearch,~S,~S");
-$_M(c$, "parseVariables", 
-($fz = function (pattern) {
-var keys =  new J.util.JmolList ();
-var values =  new J.util.JmolList ();
+}, "J.smiles.SmilesSearch,~S,~S");
+Clazz.defineMethod (c$, "parseVariables", 
+ function (pattern) {
+var keys =  new JU.List ();
+var values =  new JU.List ();
 var index;
 var ipt = 0;
 var iptLast = -1;
@@ -430,10 +430,10 @@ ipt = J.smiles.SmilesParser.skipTo (pattern, ipt, ';');
 iptLast = ++ipt;
 }
 if (iptLast < 0) return pattern;
-return J.util.TextFormat.replaceStrings (pattern.substring (iptLast), keys, values);
-}, $fz.isPrivate = true, $fz), "~S");
-$_M(c$, "parseAtom", 
-($fz = function (molecule, atomSet, pattern, currentAtom, bond, isBracketed, isPrimitive, isBranchAtom) {
+return JW.Txt.replaceStrings (pattern.substring (iptLast), keys, values);
+}, "~S");
+Clazz.defineMethod (c$, "parseAtom", 
+ function (molecule, atomSet, pattern, currentAtom, bond, isBracketed, isPrimitive, isBranchAtom) {
 if (pattern == null || pattern.length == 0) throw  new J.smiles.InvalidSmilesException ("Empty atom definition");
 var newAtom = (atomSet == null ? molecule.addAtom () : isPrimitive ? atomSet.addPrimitive () : atomSet.addAtomOr ());
 if (this.braceCount > 0) newAtom.selected = true;
@@ -476,7 +476,7 @@ mass = -mass;
 } else {
 switch (ch) {
 case '"':
-var type = J.util.Parser.getQuotedStringAt (pattern, index);
+var type = JU.PT.getQuotedStringAt (pattern, index);
 index += type.length + 2;
 newAtom.setAtomType (type);
 break;
@@ -517,11 +517,11 @@ mustBeSymbol = !Character.isDigit (nextChar) || J.smiles.SmilesParser.getChar (p
 } else if ("DdhRrvXx".indexOf (ch) >= 0 && Character.isDigit (nextChar)) {
 mustBeSymbol = false;
 } else if (!symbol.equals ("A") && !symbol.equals ("Xx")) {
-mustBeSymbol = (J.util.Elements.elementNumberFromSymbol (symbol, true) > 0);
+mustBeSymbol = (JW.Elements.elementNumberFromSymbol (symbol, true) > 0);
 if (!mustBeSymbol && sym2 !== "") {
 sym2 = "";
 symbol = symbol.substring (0, 1);
-mustBeSymbol = (J.util.Elements.elementNumberFromSymbol (symbol, true) > 0);
+mustBeSymbol = (JW.Elements.elementNumberFromSymbol (symbol, true) > 0);
 }}}if (mustBeSymbol) {
 if (!isBracketed && !this.isSmarts && !this.isBioSequence && !J.smiles.SmilesAtom.allowSmilesUnbracketed (symbol) || !newAtom.setSymbol (symbol = ch + sym2)) throw  new J.smiles.InvalidSmilesException ("Invalid atom symbol: " + symbol);
 if (isPrimitive) atomSet.hasSymbol = true;
@@ -592,9 +592,9 @@ if (!isBracketed) bond.set2a (null, newAtom);
 if (this.branchLevel == 0 && (bond.order == 17 || bond.order == 112)) this.branchLevel++;
 }if (this.branchLevel == 0) molecule.lastChainAtom = newAtom;
 return newAtom;
-}, $fz.isPrivate = true, $fz), "J.smiles.SmilesSearch,J.smiles.SmilesAtom,~S,J.smiles.SmilesAtom,J.smiles.SmilesBond,~B,~B,~B");
-$_M(c$, "parseRing", 
-($fz = function (molecule, ringNum, currentAtom, bond) {
+}, "J.smiles.SmilesSearch,J.smiles.SmilesAtom,~S,J.smiles.SmilesAtom,J.smiles.SmilesBond,~B,~B,~B");
+Clazz.defineMethod (c$, "parseRing", 
+ function (molecule, ringNum, currentAtom, bond) {
 var r = Integer.$valueOf (ringNum);
 var bond0 = this.ringBonds.get (r);
 if (bond0 == null) {
@@ -616,9 +616,9 @@ if (bond0.order != -1 && bond0.order != bond.order) throw  new J.smiles.InvalidS
 bond0.set (bond);
 currentAtom.bondCount--;
 bond0.setAtom2 (currentAtom);
-}, $fz.isPrivate = true, $fz), "J.smiles.SmilesSearch,~N,J.smiles.SmilesAtom,J.smiles.SmilesBond");
-$_M(c$, "checkCharge", 
-($fz = function (pattern, index, newAtom) {
+}, "J.smiles.SmilesSearch,~N,J.smiles.SmilesAtom,J.smiles.SmilesBond");
+Clazz.defineMethod (c$, "checkCharge", 
+ function (pattern, index, newAtom) {
 var len = pattern.length;
 var ch = pattern.charAt (index);
 var count = 1;
@@ -637,9 +637,9 @@ count++;
 }
 }}newAtom.setCharge (ch == '+' ? count : -count);
 return index;
-}, $fz.isPrivate = true, $fz), "~S,~N,J.smiles.SmilesAtom");
-$_M(c$, "checkChirality", 
-($fz = function (pattern, index, newAtom) {
+}, "~S,~N,J.smiles.SmilesAtom");
+Clazz.defineMethod (c$, "checkChirality", 
+ function (pattern, index, newAtom) {
 var stereoClass = 0;
 var order = -2147483648;
 var len = pattern.length;
@@ -685,12 +685,12 @@ index = pt;
 }newAtom.setChiralClass (stereoClass);
 newAtom.setChiralOrder (order);
 if (J.smiles.SmilesParser.getChar (pattern, index) == '?') {
-J.util.Logger.info ("Ignoring '?' in stereochemistry");
+JW.Logger.info ("Ignoring '?' in stereochemistry");
 index++;
 }return index;
-}, $fz.isPrivate = true, $fz), "~S,~N,J.smiles.SmilesAtom");
-$_M(c$, "parseBond", 
-($fz = function (molecule, bondSet, pattern, bond, currentAtom, isPrimitive, isBranchAtom) {
+}, "~S,~N,J.smiles.SmilesAtom");
+Clazz.defineMethod (c$, "parseBond", 
+ function (molecule, bondSet, pattern, bond, currentAtom, isPrimitive, isBranchAtom) {
 var ch = J.smiles.SmilesParser.getChar (pattern, 0);
 if (ch == '.') {
 if (bond != null || bondSet != null) throw  new J.smiles.InvalidSmilesException ("invalid '.'");
@@ -728,9 +728,9 @@ break;
 newBond.set2 (bondType, isBondNot);
 if (this.isBioSequence && bondSet != null) bondSet.set2 (bondType, isBondNot);
 }return newBond;
-}, $fz.isPrivate = true, $fz), "J.smiles.SmilesSearch,J.smiles.SmilesBond,~S,J.smiles.SmilesBond,J.smiles.SmilesAtom,~B,~B");
-$_M(c$, "checkLogic", 
-($fz = function (molecule, pattern, atom, bond, currentAtom, isPrimitive, isBranchAtom) {
+}, "J.smiles.SmilesSearch,J.smiles.SmilesBond,~S,J.smiles.SmilesBond,J.smiles.SmilesAtom,~B,~B");
+Clazz.defineMethod (c$, "checkLogic", 
+ function (molecule, pattern, atom, bond, currentAtom, isPrimitive, isBranchAtom) {
 var pt = pattern.indexOf (',');
 var len = pattern.length;
 while (true) {
@@ -759,7 +759,7 @@ index = pt + 1;
 if (!this.isSmarts || pt == 0) break;
 if (bond != null && pt < 0) {
 if (len > 1) {
-var sNew =  new J.util.SB ();
+var sNew =  new JU.SB ();
 for (var i = 0; i < len; ) {
 var ch = pattern.charAt (i++);
 sNew.appendC (ch);
@@ -780,9 +780,9 @@ return false;
 }
 var ch = pattern.charAt (pt);
 throw  new J.smiles.InvalidSmilesException ((this.isSmarts ? "invalid placement for '" + ch + "'" : "[" + ch + "] notation only valid with SMARTS, not SMILES,") + " in " + pattern);
-}, $fz.isPrivate = true, $fz), "J.smiles.SmilesSearch,~S,J.smiles.SmilesAtom,J.smiles.SmilesBond,J.smiles.SmilesAtom,~B,~B");
-c$.getSubPattern = $_M(c$, "getSubPattern", 
-($fz = function (pattern, index, ch) {
+}, "J.smiles.SmilesSearch,~S,J.smiles.SmilesAtom,J.smiles.SmilesBond,J.smiles.SmilesAtom,~B,~B");
+c$.getSubPattern = Clazz.defineMethod (c$, "getSubPattern", 
+ function (pattern, index, ch) {
 var ch2;
 var margin = 1;
 switch (ch) {
@@ -811,13 +811,13 @@ if (pCount == 0) return pattern.substring (index + margin, pt + 1 - margin);
 pCount++;
 }}
 throw  new J.smiles.InvalidSmilesException ("Unmatched " + ch);
-}, $fz.isPrivate = true, $fz), "~S,~N,~S");
-c$.getChar = $_M(c$, "getChar", 
-($fz = function (pattern, i) {
+}, "~S,~N,~S");
+c$.getChar = Clazz.defineMethod (c$, "getChar", 
+ function (pattern, i) {
 return (i < pattern.length ? pattern.charAt (i) : '\0');
-}, $fz.isPrivate = true, $fz), "~S,~N");
-c$.getDigits = $_M(c$, "getDigits", 
-($fz = function (pattern, index, ret) {
+}, "~S,~N");
+c$.getDigits = Clazz.defineMethod (c$, "getDigits", 
+ function (pattern, index, ret) {
 var pt = index;
 var len = pattern.length;
 while (pt < len && Character.isDigit (pattern.charAt (pt))) pt++;
@@ -832,28 +832,28 @@ throw e;
 }
 }
 return pt;
-}, $fz.isPrivate = true, $fz), "~S,~N,~A");
-c$.skipTo = $_M(c$, "skipTo", 
-($fz = function (pattern, index, ch0) {
+}, "~S,~N,~A");
+c$.skipTo = Clazz.defineMethod (c$, "skipTo", 
+ function (pattern, index, ch0) {
 var pt = index;
 var ch;
 while ((ch = J.smiles.SmilesParser.getChar (pattern, ++pt)) != ch0 && ch != '\0') {
 }
 return (ch == '\0' ? -1 : pt);
-}, $fz.isPrivate = true, $fz), "~S,~N,~S");
-c$.getRingPointer = $_M(c$, "getRingPointer", 
+}, "~S,~N,~S");
+c$.getRingPointer = Clazz.defineMethod (c$, "getRingPointer", 
 function (i) {
 return (i < 10 ? "" + i : i < 100 ? "%" + i : "%(" + i + ")");
 }, "~N");
-c$.cleanPattern = $_M(c$, "cleanPattern", 
+c$.cleanPattern = Clazz.defineMethod (c$, "cleanPattern", 
 function (pattern) {
-pattern = J.util.TextFormat.replaceAllCharacters (pattern, " \t\n\r", "");
-pattern = J.util.TextFormat.simpleReplace (pattern, "^^", "'");
+pattern = JU.PT.replaceAllCharacters (pattern, " \t\n\r", "");
+pattern = JU.PT.rep (pattern, "^^", "'");
 var i = 0;
 var i2 = 0;
 while ((i = pattern.indexOf ("//*")) >= 0 && (i2 = pattern.indexOf ("*//")) >= i) pattern = pattern.substring (0, i) + pattern.substring (i2 + 3);
 
-pattern = J.util.TextFormat.simpleReplace (pattern, "//", "");
+pattern = JU.PT.rep (pattern, "//", "");
 return pattern;
 }, "~S");
 });

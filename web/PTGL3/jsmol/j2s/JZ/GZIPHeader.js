@@ -15,28 +15,28 @@ this.done = false;
 this.mtime = 0;
 Clazz.instantialize (this, arguments);
 }, JZ, "GZIPHeader", null, Cloneable);
-$_M(c$, "setModifiedTime", 
+Clazz.defineMethod (c$, "setModifiedTime", 
 function (mtime) {
 this.mtime = mtime;
 }, "~N");
-$_M(c$, "getModifiedTime", 
+Clazz.defineMethod (c$, "getModifiedTime", 
 function () {
 return this.mtime;
 });
-$_M(c$, "setOS", 
+Clazz.defineMethod (c$, "setOS", 
 function (os) {
 if ((0 <= os && os <= 13) || os == 255) this.os = os;
  else throw  new IllegalArgumentException ("os: " + os);
 }, "~N");
-$_M(c$, "getOS", 
+Clazz.defineMethod (c$, "getOS", 
 function () {
 return this.os;
 });
-$_M(c$, "setName", 
+Clazz.defineMethod (c$, "setName", 
 function (name) {
 this.name = JZ.ZStream.getBytes (name);
 }, "~S");
-$_M(c$, "getName", 
+Clazz.defineMethod (c$, "getName", 
 function () {
 if (this.name == null) return "";
 try {
@@ -49,11 +49,11 @@ throw e;
 }
 }
 });
-$_M(c$, "setComment", 
+Clazz.defineMethod (c$, "setComment", 
 function (comment) {
 this.comment = JZ.ZStream.getBytes (comment);
 }, "~S");
-$_M(c$, "getComment", 
+Clazz.defineMethod (c$, "getComment", 
 function () {
 if (this.comment == null) return "";
 try {
@@ -66,15 +66,15 @@ throw e;
 }
 }
 });
-$_M(c$, "setCRC", 
+Clazz.defineMethod (c$, "setCRC", 
 function (crc) {
 this.crc = crc;
 }, "~N");
-$_M(c$, "getCRC", 
+Clazz.defineMethod (c$, "getCRC", 
 function () {
 return this.crc;
 });
-$_M(c$, "put", 
+Clazz.defineMethod (c$, "put", 
 function (d) {
 var flag = 0;
 if (this.text) {
@@ -112,7 +112,7 @@ d.put_byteB (0);
 d.put_byte (this.comment, 0, this.comment.length);
 d.put_byteB (0);
 }}, "JZ.Deflate");
-$_M(c$, "clone", 
+Clazz.defineMethod (c$, "clone", 
 function () {
 var gheader = Clazz.superCall (this, JZ.GZIPHeader, "clone", []);
 var tmp;

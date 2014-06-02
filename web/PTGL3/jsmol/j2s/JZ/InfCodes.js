@@ -23,7 +23,7 @@ function (z, s) {
 this.z = z;
 this.s = s;
 }, "JZ.ZStream,JZ.InfBlocks");
-$_M(c$, "init", 
+Clazz.defineMethod (c$, "init", 
 function (bl, bd, tl, tl_index, td, td_index) {
 this.mode = 0;
 this.lbits = bl;
@@ -34,7 +34,7 @@ this.dtree = td;
 this.dtree_index = td_index;
 this.tree = null;
 }, "~N,~N,~A,~N,~A,~N");
-$_M(c$, "proc", 
+Clazz.defineMethod (c$, "proc", 
 function (r) {
 var j;
 var tindex;
@@ -311,10 +311,10 @@ return this.s.inflate_flush (r);
 }
 }
 }, "~N");
-$_M(c$, "free", 
+Clazz.defineMethod (c$, "free", 
 function (z) {
 }, "JZ.ZStream");
-$_M(c$, "inflate_fast", 
+Clazz.defineMethod (c$, "inflate_fast", 
 function (bl, bd, tl, tl_index, td, td_index, s, z) {
 var t;
 var tp;

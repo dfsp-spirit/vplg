@@ -9,8 +9,8 @@ function () {
 Clazz.superConstructor (this, J.consolejs.AppletConsole, []);
 });
 Clazz.overrideMethod (c$, "start", 
-function (viewer) {
-this.setViewer (viewer);
+function (vwr) {
+this.setViewer (vwr);
 this.setLabels ();
 this.displayConsole ();
 }, "J.api.JmolViewer");
@@ -22,7 +22,10 @@ this.jsConsole = new Jmol.Console.JSConsole(this);
 }, "~S");
 Clazz.overrideMethod (c$, "setTitle", 
 function () {
-});
+{
+if (this.jsConsole)
+this.jsConsole.setTitle(this.getLabel("title"));
+}});
 Clazz.overrideMethod (c$, "setVisible", 
 function (visible) {
 {

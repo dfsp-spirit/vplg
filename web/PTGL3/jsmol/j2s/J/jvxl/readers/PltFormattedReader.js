@@ -1,16 +1,16 @@
 Clazz.declarePackage ("J.jvxl.readers");
-Clazz.load (["J.jvxl.readers.VolumeFileReader"], "J.jvxl.readers.PltFormattedReader", ["J.util.SB", "J.viewer.Viewer"], function () {
+Clazz.load (["J.jvxl.readers.VolumeFileReader"], "J.jvxl.readers.PltFormattedReader", ["JU.SB", "JV.Viewer"], function () {
 c$ = Clazz.declareType (J.jvxl.readers, "PltFormattedReader", J.jvxl.readers.VolumeFileReader);
 Clazz.makeConstructor (c$, 
 function () {
 Clazz.superConstructor (this, J.jvxl.readers.PltFormattedReader, []);
 });
-$_M(c$, "init2", 
+Clazz.overrideMethod (c$, "init2", 
 function (sg, br) {
-Clazz.superCall (this, J.jvxl.readers.PltFormattedReader, "init2", [sg, br]);
+this.init2VFR (sg, br);
 this.isAngstroms = true;
 this.jvxlData.wasCubic = true;
-this.jvxlFileHeaderBuffer =  new J.util.SB ();
+this.jvxlFileHeaderBuffer =  new JU.SB ();
 this.nSurfaces = 1;
 }, "J.jvxl.readers.SurfaceGenerator,java.io.BufferedReader");
 Clazz.overrideMethod (c$, "readParameters", 
@@ -20,7 +20,7 @@ var n2 = this.parseInt ();
 this.nPointsX = this.parseIntStr (this.readLine ());
 this.nPointsY = this.parseInt ();
 this.nPointsZ = this.parseInt ();
-this.jvxlFileHeaderBuffer.append ("Plt formatted data (" + n1 + "," + n2 + ") " + this.nPointsX + " x " + this.nPointsY + " x " + this.nPointsZ + " \nJmol " + J.viewer.Viewer.getJmolVersion () + '\n');
+this.jvxlFileHeaderBuffer.append ("Plt formatted data (" + n1 + "," + n2 + ") " + this.nPointsX + " x " + this.nPointsY + " x " + this.nPointsZ + " \nJmol " + JV.Viewer.getJmolVersion () + '\n');
 this.volumetricOrigin.set (0, 0, 0);
 var xmin = this.parseFloatStr (this.readLine ().substring (0, 12));
 var xmax = this.parseFloatRange (this.line, 12, 24);

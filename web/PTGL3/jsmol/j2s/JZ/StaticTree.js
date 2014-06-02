@@ -9,13 +9,13 @@ this.max_length = 0;
 Clazz.instantialize (this, arguments);
 }, JZ, "StaticTree");
 Clazz.makeConstructor (c$, 
-($fz = function (static_tree, extra_bits, extra_base, elems, max_length) {
+ function (static_tree, extra_bits, extra_base, elems, max_length) {
 this.static_tree = static_tree;
 this.extra_bits = extra_bits;
 this.extra_base = extra_base;
 this.elems = elems;
 this.max_length = max_length;
-}, $fz.isPrivate = true, $fz), "~A,~A,~N,~N,~N");
+}, "~A,~A,~N,~N,~N");
 Clazz.defineStatics (c$,
 "MAX_BITS", 15,
 "BL_CODES", 19,

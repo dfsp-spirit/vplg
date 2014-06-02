@@ -16,28 +16,27 @@ this.data_type = 0;
 this.checksum = null;
 Clazz.instantialize (this, arguments);
 }, JZ, "ZStream");
-$_M(c$, "setAdler32", 
+Clazz.defineMethod (c$, "setAdler32", 
 function () {
 this.checksum =  new JZ.Adler32 ();
 });
-$_M(c$, "inflate", 
+Clazz.defineMethod (c$, "inflate", 
 function (f) {
 if (this.istate == null) return -2;
 return this.istate.inflate (f);
 }, "~N");
-$_M(c$, "deflate", 
+Clazz.defineMethod (c$, "deflate", 
 function (flush) {
 if (this.dstate == null) {
 return -2;
 }return this.dstate.deflate (flush);
 }, "~N");
-$_M(c$, "flush_pending", 
+Clazz.defineMethod (c$, "flush_pending", 
 function () {
 var len = this.dstate.pending;
 if (len > this.avail_out) len = this.avail_out;
 if (len == 0) return;
-if (this.dstate.pending_buf.length <= this.dstate.pending_out || this.next_out.length <= this.next_out_index || this.dstate.pending_buf.length < (this.dstate.pending_out + len) || this.next_out.length < (this.next_out_index + len)) {
-}System.arraycopy (this.dstate.pending_buf, this.dstate.pending_out, this.next_out, this.next_out_index, len);
+System.arraycopy (this.dstate.pending_buf, this.dstate.pending_out, this.next_out, this.next_out_index, len);
 this.next_out_index += len;
 this.dstate.pending_out += len;
 this.total_out += len;
@@ -46,7 +45,7 @@ this.dstate.pending -= len;
 if (this.dstate.pending == 0) {
 this.dstate.pending_out = 0;
 }});
-$_M(c$, "read_buf", 
+Clazz.defineMethod (c$, "read_buf", 
 function (buf, start, size) {
 var len = this.avail_in;
 if (len > size) len = size;
@@ -59,23 +58,23 @@ this.next_in_index += len;
 this.total_in += len;
 return len;
 }, "~A,~N,~N");
-$_M(c$, "getAdler", 
+Clazz.defineMethod (c$, "getAdler", 
 function () {
 return this.checksum.getValue ();
 });
-$_M(c$, "free", 
+Clazz.defineMethod (c$, "free", 
 function () {
 this.next_in = null;
 this.next_out = null;
 this.msg = null;
 });
-$_M(c$, "setOutput", 
+Clazz.defineMethod (c$, "setOutput", 
 function (buf, off, len) {
 this.next_out = buf;
 this.next_out_index = off;
 this.avail_out = len;
 }, "~A,~N,~N");
-$_M(c$, "setInput", 
+Clazz.defineMethod (c$, "setInput", 
 function (buf, off, len, append) {
 if (len <= 0 && append && this.next_in != null) return;
 if (this.avail_in > 0 && append) {
@@ -90,19 +89,19 @@ this.next_in = buf;
 this.next_in_index = off;
 this.avail_in = len;
 }}, "~A,~N,~N,~B");
-$_M(c$, "getAvailIn", 
+Clazz.defineMethod (c$, "getAvailIn", 
 function () {
 return this.avail_in;
 });
-$_M(c$, "getTotalOut", 
+Clazz.defineMethod (c$, "getTotalOut", 
 function () {
 return this.total_out;
 });
-$_M(c$, "getTotalIn", 
+Clazz.defineMethod (c$, "getTotalIn", 
 function () {
 return this.total_in;
 });
-c$.getBytes = $_M(c$, "getBytes", 
+c$.getBytes = Clazz.defineMethod (c$, "getBytes", 
 function (s) {
 {
 var x = [];

@@ -4,7 +4,7 @@ c$ = Clazz.decorateAsClass (function () {
 this.$finished = false;
 Clazz.instantialize (this, arguments);
 }, JZ, "Deflater", JZ.ZStream);
-$_M(c$, "init", 
+Clazz.defineMethod (c$, "init", 
 function (level, bits, nowrap) {
 if (bits == 0) bits = 15;
 this.$finished = false;
@@ -30,12 +30,12 @@ this.dstate = null;
 this.free ();
 return ret;
 });
-$_M(c$, "params", 
+Clazz.defineMethod (c$, "params", 
 function (level, strategy) {
 if (this.dstate == null) return -2;
 return this.dstate.deflateParams (level, strategy);
 }, "~N,~N");
-$_M(c$, "setDictionary", 
+Clazz.defineMethod (c$, "setDictionary", 
 function (dictionary, dictLength) {
 if (this.dstate == null) return -2;
 return this.dstate.deflateSetDictionary (dictionary, dictLength);
@@ -44,14 +44,14 @@ Clazz.overrideMethod (c$, "finished",
 function () {
 return this.$finished;
 });
-$_M(c$, "finish", 
+Clazz.defineMethod (c$, "finish", 
 function () {
 });
-$_M(c$, "getBytesRead", 
+Clazz.defineMethod (c$, "getBytesRead", 
 function () {
 return this.dstate.getBytesRead ();
 });
-$_M(c$, "getBytesWritten", 
+Clazz.defineMethod (c$, "getBytesWritten", 
 function () {
 return this.dstate.getBytesWritten ();
 });

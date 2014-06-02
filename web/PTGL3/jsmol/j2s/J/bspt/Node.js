@@ -1,5 +1,5 @@
 Clazz.declarePackage ("J.bspt");
-Clazz.load (["J.bspt.Element"], "J.bspt.Node", ["java.lang.NullPointerException", "J.bspt.Leaf", "J.util.Logger"], function () {
+Clazz.load (["J.bspt.Element"], "J.bspt.Node", ["java.lang.NullPointerException", "J.bspt.Leaf"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.dim = 0;
 this.minLeft = 0;
@@ -16,7 +16,6 @@ Clazz.superConstructor (this, J.bspt.Node, []);
 this.bspt = bspt;
 if (level == bspt.treeDepth) {
 bspt.treeDepth = level + 1;
-if (bspt.treeDepth >= 100) J.util.Logger.error ("BSPT tree depth too great:" + bspt.treeDepth);
 }if (leafLeft.count != 2) throw  new NullPointerException ();
 this.dim = level % bspt.dimMax;
 leafLeft.sort (this.dim);
@@ -29,7 +28,7 @@ this.eleLeft = leafLeft;
 this.eleRight = leafRight;
 this.count = 2;
 }, "J.bspt.Bspt,~N,J.bspt.Leaf");
-$_M(c$, "addTuple", 
+Clazz.defineMethod (c$, "addTuple", 
 function (level, tuple) {
 var dimValue = J.bspt.Node.getDimensionValue (tuple, this.dim);
 ++this.count;
@@ -58,8 +57,8 @@ if (dimValue < this.minRight) this.minRight = dimValue;
  else if (dimValue > this.maxRight) this.maxRight = dimValue;
 this.eleRight = this.eleRight.addTuple (level + 1, tuple);
 }return this;
-}, "~N,J.util.P3");
-$_M(c$, "dump", 
+}, "~N,JU.P3");
+Clazz.defineMethod (c$, "dump", 
 function (level, sb) {
 sb.append ("\nnode LEFT" + level);
 this.eleLeft.dump (level + 1, sb);
@@ -67,13 +66,13 @@ for (var i = 0; i < level; ++i) sb.append ("->");
 
 sb.append (" RIGHT" + level);
 this.eleRight.dump (level + 1, sb);
-}, "~N,J.util.SB");
-$_M(c$, "toString", 
+}, "~N,JU.SB");
+Clazz.defineMethod (c$, "toString", 
 function () {
 return this.eleLeft.toString () + this.dim + ":" + "\n" + this.eleRight.toString ();
 });
-c$.getDimensionValue = $_M(c$, "getDimensionValue", 
+c$.getDimensionValue = Clazz.defineMethod (c$, "getDimensionValue", 
 function (pt, dim) {
 return (dim == 0 ? pt.x : dim == 1 ? pt.y : pt.z);
-}, "J.util.P3,~N");
+}, "JU.P3,~N");
 });

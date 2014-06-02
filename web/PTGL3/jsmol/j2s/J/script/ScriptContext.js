@@ -1,41 +1,85 @@
 Clazz.declarePackage ("J.script");
+Clazz.load (null, "J.script.ScriptContext", ["java.util.Hashtable", "J.script.SV"], function () {
 c$ = Clazz.decorateAsClass (function () {
-this.fullpath = "";
-this.scriptFileName = null;
-this.parallelProcessor = null;
-this.functionName = null;
-this.script = null;
-this.lineNumbers = null;
-this.lineIndices = null;
 this.aatoken = null;
-this.statement = null;
-this.statementLength = 0;
-this.pc = 0;
-this.pcEnd = 2147483647;
-this.lineEnd = 2147483647;
-this.iToken = 0;
-this.outputBuffer = null;
-this.contextVariables = null;
-this.isFunction = false;
-this.isStateScript = false;
-this.isTryCatch = false;
+this.allowJSThreads = false;
+this.chk = false;
+this.contextPath = " >> ";
+this.vars = null;
+this.displayLoadErrorsSave = false;
 this.errorMessage = null;
 this.errorMessageUntranslated = null;
-this.iCommandError = -1;
 this.errorType = null;
-this.scriptLevel = 0;
-this.chk = false;
-this.executionStepping = false;
 this.executionPaused = false;
-this.scriptExtensions = null;
-this.contextPath = " >> ";
-this.parentContext = null;
-this.token = null;
-this.mustResumeEval = false;
-this.isJSThread = false;
-this.allowJSThreads = false;
-this.displayLoadErrorsSave = false;
-this.tryPt = 0;
+this.executionStepping = false;
+this.functionName = null;
+this.iCommandError = -1;
+this.id = 0;
 this.isComplete = true;
+this.isFunction = false;
+this.isJSThread = false;
+this.isStateScript = false;
+this.isTryCatch = false;
+this.iToken = 0;
+this.lineEnd = 2147483647;
+this.lineIndices = null;
+this.lineNumbers = null;
+this.mustResumeEval = false;
+this.outputBuffer = null;
+this.parallelProcessor = null;
+this.parentContext = null;
+this.pc = 0;
+this.pc0 = 0;
+this.pcEnd = 2147483647;
+this.script = null;
+this.scriptExtensions = null;
+this.scriptFileName = null;
+this.scriptLevel = 0;
+this.statement = null;
+this.htFileCache = null;
+this.statementLength = 0;
+this.token = null;
+this.tryPt = 0;
+this.theToken = null;
+this.theTok = 0;
 Clazz.instantialize (this, arguments);
 }, J.script, "ScriptContext");
+Clazz.makeConstructor (c$, 
+function () {
+this.id = ++J.script.ScriptContext.contextCount;
+});
+Clazz.defineMethod (c$, "setMustResume", 
+function () {
+var sc = this;
+while (sc != null) {
+sc.mustResumeEval = true;
+sc.pc = sc.pc0;
+sc = sc.parentContext;
+}
+});
+Clazz.defineMethod (c$, "getVariable", 
+function ($var) {
+var context = this;
+while (context != null && !context.isFunction) {
+if (context.vars != null && context.vars.containsKey ($var)) return context.vars.get ($var);
+context = context.parentContext;
+}
+return null;
+}, "~S");
+Clazz.defineMethod (c$, "getFullMap", 
+function () {
+var ht =  new java.util.Hashtable ();
+var context = this;
+if (this.contextPath != null) ht.put ("_path", J.script.SV.newS (this.contextPath));
+while (context != null && !context.isFunction) {
+if (context.vars != null) for (var key, $key = context.vars.keySet ().iterator (); $key.hasNext () && ((key = $key.next ()) || true);) if (!ht.containsKey (key)) {
+var val = context.vars.get (key);
+if (val.tok != 2 || val.intValue != 2147483647) ht.put (key, val);
+}
+context = context.parentContext;
+}
+return ht;
+});
+Clazz.defineStatics (c$,
+"contextCount", 0);
+});

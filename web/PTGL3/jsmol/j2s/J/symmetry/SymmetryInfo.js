@@ -1,5 +1,5 @@
 Clazz.declarePackage ("J.symmetry");
-Clazz.load (null, "J.symmetry.SymmetryInfo", ["J.util.SimpleUnitCell"], function () {
+Clazz.load (null, "J.symmetry.SymmetryInfo", ["JW.SimpleUnitCell"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.coordinatesAreFractional = false;
 this.isMultiCell = false;
@@ -10,14 +10,14 @@ this.cellRange = null;
 this.periodicOriginXyz = null;
 Clazz.instantialize (this, arguments);
 }, J.symmetry, "SymmetryInfo");
-$_M(c$, "isPeriodic", 
+Clazz.defineMethod (c$, "isPeriodic", 
 function () {
 return this.periodicOriginXyz != null;
 });
 Clazz.makeConstructor (c$, 
 function () {
 });
-$_M(c$, "setSymmetryInfo", 
+Clazz.defineMethod (c$, "setSymmetryInfo", 
 function (info) {
 this.cellRange = info.get ("unitCellRange");
 this.periodicOriginXyz = info.get ("periodicOriginXyz");
@@ -34,7 +34,7 @@ for (var i = 0; i < symmetryCount; i++) this.symmetryInfoString += "\n" + this.s
 
 }this.symmetryInfoString += "\n";
 var notionalUnitcell = info.get ("notionalUnitcell");
-if (!J.util.SimpleUnitCell.isValid (notionalUnitcell)) return null;
+if (!JW.SimpleUnitCell.isValid (notionalUnitcell)) return null;
 this.coordinatesAreFractional = info.containsKey ("coordinatesAreFractional") ? (info.get ("coordinatesAreFractional")).booleanValue () : false;
 this.isMultiCell = (this.coordinatesAreFractional && this.symmetryOperations != null);
 return notionalUnitcell;

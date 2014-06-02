@@ -1,20 +1,20 @@
-$_L(["java.lang.RuntimeException"],"java.lang.annotation.IncompleteAnnotationException",null,function(){
-c$=$_C(function(){
+Clazz.load(["java.lang.RuntimeException"],"java.lang.annotation.IncompleteAnnotationException",null,function(){
+c$=Clazz.decorateAsClass(function(){
 this.$annotationType=null;
 this.$elementName=null;
-$_Z(this,arguments);
+Clazz.instantialize(this,arguments);
 },java.lang.annotation,"IncompleteAnnotationException",RuntimeException);
-$_K(c$,
+Clazz.makeConstructor(c$,
 function(annotationType,elementName){
-$_R(this,java.lang.annotation.IncompleteAnnotationException,[("annotation.0",elementName,annotationType)]);
+Clazz.superConstructor(this,java.lang.annotation.IncompleteAnnotationException,[("annotation.0",elementName,annotationType)]);
 this.$annotationType=annotationType;
 this.$elementName=elementName;
 },"Class,~S");
-$_M(c$,"annotationType",
+Clazz.defineMethod(c$,"annotationType",
 function(){
 return this.$annotationType;
 });
-$_M(c$,"elementName",
+Clazz.defineMethod(c$,"elementName",
 function(){
 return this.$elementName;
 });

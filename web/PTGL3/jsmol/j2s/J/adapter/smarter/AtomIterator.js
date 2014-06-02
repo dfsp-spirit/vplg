@@ -3,23 +3,22 @@ Clazz.load (["J.api.JmolAdapterAtomIterator"], "J.adapter.smarter.AtomIterator",
 c$ = Clazz.decorateAsClass (function () {
 this.iatom = 0;
 this.atom = null;
-this.atomCount = 0;
+this.ac = 0;
 this.atoms = null;
 this.bsAtoms = null;
 Clazz.instantialize (this, arguments);
-}, J.adapter.smarter, "AtomIterator", J.api.JmolAdapterAtomIterator);
+}, J.adapter.smarter, "AtomIterator", null, J.api.JmolAdapterAtomIterator);
 Clazz.makeConstructor (c$, 
-function (atomSetCollection) {
-Clazz.superConstructor (this, J.adapter.smarter.AtomIterator, []);
-this.atomCount = atomSetCollection.getAtomCount ();
-this.atoms = atomSetCollection.getAtoms ();
-this.bsAtoms = atomSetCollection.bsAtoms;
+function (asc) {
+this.ac = asc.ac;
+this.atoms = asc.atoms;
+this.bsAtoms = asc.bsAtoms;
 this.iatom = 0;
 }, "J.adapter.smarter.AtomSetCollection");
 Clazz.overrideMethod (c$, "hasNext", 
 function () {
-if (this.iatom == this.atomCount) return false;
-while ((this.atom = this.atoms[this.iatom++]) == null || (this.bsAtoms != null && !this.bsAtoms.get (this.atom.atomIndex))) if (this.iatom == this.atomCount) return false;
+if (this.iatom == this.ac) return false;
+while ((this.atom = this.atoms[this.iatom++]) == null || (this.bsAtoms != null && !this.bsAtoms.get (this.atom.index))) if (this.iatom == this.ac) return false;
 
 this.atoms[this.iatom - 1] = null;
 return true;
@@ -38,7 +37,7 @@ return this.atom.atomSite + 1;
 });
 Clazz.overrideMethod (c$, "getUniqueID", 
 function () {
-return Integer.$valueOf (this.atom.atomIndex);
+return Integer.$valueOf (this.atom.index);
 });
 Clazz.overrideMethod (c$, "getElementNumber", 
 function () {
@@ -56,37 +55,17 @@ Clazz.overrideMethod (c$, "getPartialCharge",
 function () {
 return this.atom.partialCharge;
 });
-Clazz.overrideMethod (c$, "getEllipsoid", 
+Clazz.overrideMethod (c$, "getTensors", 
 function () {
-return this.atom.ellipsoid;
+return this.atom.tensors;
 });
 Clazz.overrideMethod (c$, "getRadius", 
 function () {
 return this.atom.radius;
 });
-Clazz.overrideMethod (c$, "getX", 
+Clazz.overrideMethod (c$, "getVib", 
 function () {
-return this.atom.x;
-});
-Clazz.overrideMethod (c$, "getY", 
-function () {
-return this.atom.y;
-});
-Clazz.overrideMethod (c$, "getZ", 
-function () {
-return this.atom.z;
-});
-Clazz.overrideMethod (c$, "getVectorX", 
-function () {
-return this.atom.vectorX;
-});
-Clazz.overrideMethod (c$, "getVectorY", 
-function () {
-return this.atom.vectorY;
-});
-Clazz.overrideMethod (c$, "getVectorZ", 
-function () {
-return this.atom.vectorZ;
+return (this.atom.vib == null || Float.isNaN (this.atom.vib.z) ? null : this.atom.vib);
 });
 Clazz.overrideMethod (c$, "getBfactor", 
 function () {
@@ -94,7 +73,7 @@ return Float.isNaN (this.atom.bfactor) && this.atom.anisoBorU != null ? this.ato
 });
 Clazz.overrideMethod (c$, "getOccupancy", 
 function () {
-return this.atom.occupancy;
+return Clazz.floatToInt (this.atom.foccupancy * 100);
 });
 Clazz.overrideMethod (c$, "getIsHetero", 
 function () {
@@ -106,11 +85,11 @@ return this.atom.atomSerial;
 });
 Clazz.overrideMethod (c$, "getChainID", 
 function () {
-return J.api.JmolAdapter.canonizeChainID (this.atom.chainID);
+return this.atom.chainID;
 });
 Clazz.overrideMethod (c$, "getAlternateLocationID", 
 function () {
-return J.api.JmolAdapter.canonizeAlternateLocationID (this.atom.alternateLocationID);
+return J.api.JmolAdapter.canonizeAlternateLocationID (this.atom.altLoc);
 });
 Clazz.overrideMethod (c$, "getGroup3", 
 function () {

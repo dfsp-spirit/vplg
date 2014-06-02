@@ -1,7 +1,7 @@
-$_L(["java.lang.Error"],"java.lang.annotation.AnnotationFormatError",null,function(){
-c$=$_T(java.lang.annotation,"AnnotationFormatError",Error);
-$_K(c$,
+Clazz.load(["java.lang.Error"],"java.lang.annotation.AnnotationFormatError",null,function(){
+c$=Clazz.declareType(java.lang.annotation,"AnnotationFormatError",Error);
+Clazz.makeConstructor(c$,
 function(cause){
-$_R(this,java.lang.annotation.AnnotationFormatError,[cause==null?null:cause.toString(),cause]);
+Clazz.superConstructor(this,java.lang.annotation.AnnotationFormatError,[cause==null?null:cause.toString(),cause]);
 },"Throwable");
 });

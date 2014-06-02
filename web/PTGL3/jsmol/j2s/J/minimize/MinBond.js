@@ -18,7 +18,7 @@ this.data = [atomIndex1, atomIndex2];
 this.order = order;
 this.key = key;
 }, "~N,~N,~N,~N,~N,~N,Integer");
-$_M(c$, "getOtherAtom", 
+Clazz.defineMethod (c$, "getOtherAtom", 
 function (index) {
 return this.data[this.data[0] == index ? 1 : 0];
 }, "~N");

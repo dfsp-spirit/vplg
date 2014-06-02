@@ -1,5 +1,5 @@
 Clazz.declarePackage ("J.g3d");
-Clazz.load (null, "J.g3d.CylinderRenderer", ["J.util.ArrayUtil", "$.Shader"], function () {
+Clazz.load (null, "J.g3d.CylinderRenderer", ["JU.AU", "JW.Shader"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.g3d = null;
 this.line3d = null;
@@ -75,7 +75,7 @@ this.g3d = g3d;
 this.line3d = g3d.line3d;
 this.shader = g3d.shader;
 }, "J.g3d.Graphics3D");
-$_M(c$, "render", 
+Clazz.defineMethod (c$, "render", 
 function (colixA, colixB, isScreenedA, isScreenedB, endcaps, diameter, xA, yA, zA, xB, yB, zB) {
 if (diameter > this.g3d.getRenderHeight () * 3) return;
 this.isScreenedA = isScreenedA;
@@ -110,7 +110,7 @@ for (var i = this.rasterCount; --i >= 0; ) this.plotRaster (i);
 this.g3d.setZMargin (0);
 if (endcaps == 3) this.renderSphericalEndcaps ();
 }, "~N,~N,~B,~B,~N,~N,~N,~N,~N,~N,~N,~N");
-$_M(c$, "renderBits", 
+Clazz.defineMethod (c$, "renderBits", 
 function (colixA, colixB, isScreenedA, isScreenedB, endcaps, diameter, xA, yA, zA, xB, yB, zB) {
 if (diameter > this.g3d.getRenderHeight () * 3) return;
 this.isScreenedA = isScreenedA;
@@ -162,8 +162,8 @@ this.xAf += this.dxBf;
 this.yAf += this.dyBf;
 this.zAf += this.dzBf;
 }, "~N,~N,~B,~B,~N,~N,~N,~N,~N,~N,~N,~N");
-$_M(c$, "plotRasterBits", 
-($fz = function (i) {
+Clazz.defineMethod (c$, "plotRasterBits", 
+ function (i) {
 var fpz = this.fp8ShadeIndexUp[i] >> (8);
 var fpzBack = fpz >> 1;
 var x = this.xRaster[i];
@@ -179,8 +179,8 @@ this.g3d.plotPixelUnclippedArgb (this.argbEndcap, this.xEndcap - x, this.yEndcap
 }}this.line3d.plotLineDeltaBits (this.shadesA, this.isScreenedA, this.shadesB, this.isScreenedB, fpz, this.xA + x, this.yA + y, this.zA - z, this.dxB, this.dyB, this.dzB, this.clipped);
 if (this.drawBackside) {
 this.line3d.plotLineDelta (this.shadesA[fpzBack], this.isScreenedA, this.shadesB[fpzBack], this.isScreenedB, this.xA - x, this.yA - y, this.zA + z, this.dxB, this.dyB, this.dzB, this.clipped);
-}}, $fz.isPrivate = true, $fz), "~N");
-$_M(c$, "renderCone", 
+}}, "~N");
+Clazz.defineMethod (c$, "renderCone", 
 function (colix, isScreened, endcap, diameter, xA, yA, zA, xTip, yTip, zTip, doFill, isBarb) {
 if (diameter > this.g3d.getRenderHeight () * 3) return;
 this.dxBf = (xTip) - (this.xAf = xA);
@@ -213,8 +213,8 @@ for (var i = this.rasterCount; --i >= 0; ) this.plotRasterCone (i, doFill, isBar
 
 this.g3d.setZMargin (0);
 }, "~N,~B,~N,~N,~N,~N,~N,~N,~N,~N,~B,~B");
-$_M(c$, "generateBaseEllipse", 
-($fz = function () {
+Clazz.defineMethod (c$, "generateBaseEllipse", 
+ function () {
 this.tEvenDiameter = (this.diameter & 1) == 0;
 this.radius = this.diameter / 2.0;
 this.radius2 = this.radius * this.radius;
@@ -235,9 +235,9 @@ this.calcRotatedPoint (1, 2, false);
 this.rasterCount = 3;
 this.interpolate (0, 1);
 this.interpolate (1, 2);
-}, $fz.isPrivate = true, $fz));
-$_M(c$, "generateBaseEllipsePrecisely", 
-($fz = function (isBarb) {
+});
+Clazz.defineMethod (c$, "generateBaseEllipsePrecisely", 
+ function (isBarb) {
 this.tEvenDiameter = (this.diameter & 1) == 0;
 this.radius = this.diameter / 2.0;
 this.radius2 = this.radius * this.radius;
@@ -269,9 +269,9 @@ this.xRaster[i] = Clazz.doubleToInt (Math.floor (this.txRaster[i]));
 this.yRaster[i] = Clazz.doubleToInt (Math.floor (this.tyRaster[i]));
 this.zRaster[i] = Clazz.doubleToInt (Math.floor (this.tzRaster[i]));
 }
-}, $fz.isPrivate = true, $fz), "~B");
-$_M(c$, "calcRotatedPoint", 
-($fz = function (t, i, isPrecision) {
+}, "~B");
+Clazz.defineMethod (c$, "calcRotatedPoint", 
+ function (t, i, isPrecision) {
 this.tRaster[i] = t;
 var tPI = t * 3.141592653589793;
 var xT = Math.sin (tPI) * this.cosTheta;
@@ -293,9 +293,9 @@ this.xRaster[i] = Clazz.doubleToInt (xR);
 this.yRaster[i] = Clazz.doubleToInt (yR);
 this.zRaster[i] = Clazz.doubleToInt (zR + 0.5);
 }this.fp8ShadeIndexUp[i] = this.shader.getShadeFp8 (xR, yR, zR);
-}, $fz.isPrivate = true, $fz), "~N,~N,~B");
-$_M(c$, "interpolate", 
-($fz = function (iLower, iUpper) {
+}, "~N,~N,~B");
+Clazz.defineMethod (c$, "interpolate", 
+ function (iLower, iUpper) {
 var dx = this.xRaster[iUpper] - this.xRaster[iLower];
 if (dx < 0) dx = -dx;
 var dy = this.yRaster[iUpper] - this.yRaster[iLower];
@@ -320,9 +320,9 @@ return;
 }}
 this.xRaster[iMid] = this.xRaster[iLower];
 this.yRaster[iMid] = this.yRaster[iUpper];
-}, $fz.isPrivate = true, $fz), "~N,~N");
-$_M(c$, "interpolatePrecisely", 
-($fz = function (iLower, iUpper) {
+}, "~N,~N");
+Clazz.defineMethod (c$, "interpolatePrecisely", 
+ function (iLower, iUpper) {
 var dx = Clazz.doubleToInt (Math.floor (this.txRaster[iUpper])) - Clazz.doubleToInt (Math.floor (this.txRaster[iLower]));
 if (dx < 0) dx = -dx;
 var dy = Clazz.doubleToInt (Math.floor (this.tyRaster[iUpper])) - Clazz.doubleToInt (Math.floor (this.tyRaster[iLower]));
@@ -347,9 +347,9 @@ return;
 }}
 this.txRaster[iMid] = this.txRaster[iLower];
 this.tyRaster[iMid] = this.tyRaster[iUpper];
-}, $fz.isPrivate = true, $fz), "~N,~N");
-$_M(c$, "plotRaster", 
-($fz = function (i) {
+}, "~N,~N");
+Clazz.defineMethod (c$, "plotRaster", 
+ function (i) {
 var fpz = this.fp8ShadeIndexUp[i] >> (8);
 var fpzBack = fpz >> 1;
 var x = this.xRaster[i];
@@ -365,26 +365,26 @@ this.g3d.plotPixelUnclippedArgb (this.argbEndcap, this.xEndcap - x, this.yEndcap
 }}this.line3d.plotLineDeltaA (this.shadesA, this.isScreenedA, this.shadesB, this.isScreenedB, fpz, this.xA + x, this.yA + y, this.zA - z, this.dxB, this.dyB, this.dzB, this.clipped);
 if (this.drawBackside) {
 this.line3d.plotLineDelta (this.shadesA[fpzBack], this.isScreenedA, this.shadesB[fpzBack], this.isScreenedB, this.xA - x, this.yA - y, this.zA + z, this.dxB, this.dyB, this.dzB, this.clipped);
-}}, $fz.isPrivate = true, $fz), "~N");
-$_M(c$, "allocRaster", 
-($fz = function (isPrecision) {
+}}, "~N");
+Clazz.defineMethod (c$, "allocRaster", 
+ function (isPrecision) {
 while (this.rasterCount >= this.xRaster.length) {
-this.xRaster = J.util.ArrayUtil.doubleLengthI (this.xRaster);
-this.yRaster = J.util.ArrayUtil.doubleLengthI (this.yRaster);
-this.zRaster = J.util.ArrayUtil.doubleLengthI (this.zRaster);
-this.tRaster = J.util.ArrayUtil.doubleLengthF (this.tRaster);
+this.xRaster = JU.AU.doubleLengthI (this.xRaster);
+this.yRaster = JU.AU.doubleLengthI (this.yRaster);
+this.zRaster = JU.AU.doubleLengthI (this.zRaster);
+this.tRaster = JU.AU.doubleLengthF (this.tRaster);
 }
-while (this.rasterCount >= this.fp8ShadeIndexUp.length) this.fp8ShadeIndexUp = J.util.ArrayUtil.doubleLengthI (this.fp8ShadeIndexUp);
+while (this.rasterCount >= this.fp8ShadeIndexUp.length) this.fp8ShadeIndexUp = JU.AU.doubleLengthI (this.fp8ShadeIndexUp);
 
 if (isPrecision) while (this.rasterCount >= this.txRaster.length) {
-this.txRaster = J.util.ArrayUtil.doubleLengthF (this.txRaster);
-this.tyRaster = J.util.ArrayUtil.doubleLengthF (this.tyRaster);
-this.tzRaster = J.util.ArrayUtil.doubleLengthF (this.tzRaster);
+this.txRaster = JU.AU.doubleLengthF (this.txRaster);
+this.tyRaster = JU.AU.doubleLengthF (this.tyRaster);
+this.tzRaster = JU.AU.doubleLengthF (this.tzRaster);
 }
 return this.rasterCount++;
-}, $fz.isPrivate = true, $fz), "~B");
-$_M(c$, "findMinMaxY", 
-($fz = function () {
+}, "~B");
+Clazz.defineMethod (c$, "findMinMaxY", 
+ function () {
 this.yMin = this.yMax = this.yRaster[0];
 for (var i = this.rasterCount; --i > 0; ) {
 var y = this.yRaster[i];
@@ -395,9 +395,9 @@ y = -y;
 if (y < this.yMin) this.yMin = y;
  else if (y > this.yMax) this.yMax = y;
 }}
-}, $fz.isPrivate = true, $fz));
-$_M(c$, "findMinMaxX", 
-($fz = function (y) {
+});
+Clazz.defineMethod (c$, "findMinMaxX", 
+ function (y) {
 this.xMin = 2147483647;
 this.xMax = -2147483648;
 for (var i = this.rasterCount; --i >= 0; ) {
@@ -418,9 +418,9 @@ this.zXMin = -this.zRaster[i];
 this.xMax = x;
 this.zXMax = -this.zRaster[i];
 }}}
-}, $fz.isPrivate = true, $fz), "~N");
-$_M(c$, "renderFlatEndcap", 
-($fz = function (tCylinder) {
+}, "~N");
+Clazz.defineMethod (c$, "renderFlatEndcap", 
+ function (tCylinder) {
 if (this.dzB == 0 || !this.g3d.setColix (this.colixEndcap)) return;
 var xT = this.xA;
 var yT = this.yA;
@@ -437,9 +437,9 @@ var count = this.xMax - this.xMin + 1;
 this.g3d.setColorNoisy (this.endcapShadeIndex);
 this.g3d.plotPixelsClippedRaster (count, xT + this.xMin, yT + y, zT - this.zXMin - 1, zT - this.zXMax - 1, null, null);
 }
-}, $fz.isPrivate = true, $fz), "~B");
-$_M(c$, "renderFlatEndcapPrecisely", 
-($fz = function (tCylinder) {
+}, "~B");
+Clazz.defineMethod (c$, "renderFlatEndcapPrecisely", 
+ function (tCylinder) {
 if (this.dzBf == 0 || !this.g3d.setColix (this.colixEndcap)) return;
 var xTf = this.xAf;
 var yTf = this.yAf;
@@ -458,14 +458,14 @@ var count = this.xMax - this.xMin + 1;
 this.g3d.setColorNoisy (this.endcapShadeIndex);
 this.g3d.plotPixelsClippedRaster (count, xT + this.xMin, yT + y, zT - this.zXMin - 1, zT - this.zXMax - 1, null, null);
 }
-}, $fz.isPrivate = true, $fz), "~B");
-$_M(c$, "renderSphericalEndcaps", 
-($fz = function () {
+}, "~B");
+Clazz.defineMethod (c$, "renderSphericalEndcaps", 
+ function () {
 if (this.colixA != 0 && this.g3d.setColix (this.colixA)) this.g3d.fillSphereXYZ (this.diameter, this.xA, this.yA, this.zA + 1);
 if (this.colixB != 0 && this.g3d.setColix (this.colixB)) this.g3d.fillSphereXYZ (this.diameter, this.xA + this.dxB, this.yA + this.dyB, this.zA + this.dzB + 1);
-}, $fz.isPrivate = true, $fz));
-$_M(c$, "plotRasterCone", 
-($fz = function (i, doFill, isBarb) {
+});
+Clazz.defineMethod (c$, "plotRasterCone", 
+ function (i, doFill, isBarb) {
 var x = this.txRaster[i];
 var y = this.tyRaster[i];
 var z = this.tzRaster[i];
@@ -487,9 +487,9 @@ this.line3d.plotLineDeltaA (this.shadesA, this.isScreenedA, this.shadesA, this.i
 this.line3d.plotLineDeltaA (this.shadesA, this.isScreenedA, this.shadesA, this.isScreenedA, fpz, Clazz.floatToInt (xUp) + 1, Clazz.floatToInt (yUp), Clazz.floatToInt (zUp), Clazz.doubleToInt (Math.ceil (this.xTip - xUp)) + 1, Clazz.doubleToInt (Math.ceil (this.yTip - yUp)), Clazz.doubleToInt (Math.ceil (this.zTip - zUp)), true);
 }if (!isBarb && !(this.endcaps != 2 && this.dzB > 0)) {
 this.line3d.plotLineDelta (argb, this.isScreenedA, argb, this.isScreenedA, Clazz.floatToInt (xDn), Clazz.floatToInt (yDn), Clazz.floatToInt (zDn), Clazz.doubleToInt (Math.ceil (this.xTip - xDn)), Clazz.doubleToInt (Math.ceil (this.yTip - yDn)), Clazz.doubleToInt (Math.ceil (this.zTip - zDn)), true);
-}}}, $fz.isPrivate = true, $fz), "~N,~B,~B");
-$_M(c$, "calcArgbEndcap", 
-($fz = function (tCylinder, isFloat) {
+}}}, "~N,~B,~B");
+Clazz.defineMethod (c$, "calcArgbEndcap", 
+ function (tCylinder, isFloat) {
 this.tEndcapOpen = false;
 var dzf = (isFloat ? this.dzBf : this.dzB);
 if (this.endcaps == 3 || dzf == 0) return;
@@ -510,8 +510,8 @@ shadesEndcap = this.shadesB;
 this.xEndcap += this.dxB;
 this.yEndcap += this.dyB;
 this.zEndcap += this.dzB;
-}if (this.endcapShadeIndex > J.util.Shader.shadeIndexNoisyLimit) this.endcapShadeIndex = J.util.Shader.shadeIndexNoisyLimit;
+}if (this.endcapShadeIndex > JW.Shader.shadeIndexNoisyLimit) this.endcapShadeIndex = JW.Shader.shadeIndexNoisyLimit;
 this.argbEndcap = shadesEndcap[this.endcapShadeIndex];
 this.tEndcapOpen = (this.endcaps == 1);
-}, $fz.isPrivate = true, $fz), "~B,~B");
+}, "~B,~B");
 });

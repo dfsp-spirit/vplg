@@ -1,7 +1,6 @@
 Clazz.declarePackage ("J.renderspecial");
-Clazz.load (["J.render.ShapeRenderer", "J.util.P3", "$.P3i", "$.V3"], "J.renderspecial.VectorsRenderer", ["J.shape.Shape"], function () {
+Clazz.load (["J.render.ShapeRenderer", "JU.P3", "$.P3i", "$.V3"], "J.renderspecial.VectorsRenderer", ["J.shape.Shape", "JW.Vibration"], function () {
 c$ = Clazz.decorateAsClass (function () {
-this.vector2 = null;
 this.pointVectorEnd = null;
 this.pointArrowHead = null;
 this.screenVectorEnd = null;
@@ -13,15 +12,15 @@ this.vectorScale = 0;
 this.vectorSymmetry = false;
 this.headScale = 0;
 this.doShaft = false;
+this.vibTemp = null;
 Clazz.instantialize (this, arguments);
 }, J.renderspecial, "VectorsRenderer", J.render.ShapeRenderer);
 Clazz.prepareFields (c$, function () {
-this.vector2 =  new J.util.V3 ();
-this.pointVectorEnd =  new J.util.P3 ();
-this.pointArrowHead =  new J.util.P3 ();
-this.screenVectorEnd =  new J.util.P3i ();
-this.screenArrowHead =  new J.util.P3i ();
-this.headOffsetVector =  new J.util.V3 ();
+this.pointVectorEnd =  new JU.P3 ();
+this.pointArrowHead =  new JU.P3 ();
+this.screenVectorEnd =  new JU.P3i ();
+this.screenArrowHead =  new JU.P3i ();
+this.headOffsetVector =  new JU.V3 ();
 });
 Clazz.overrideMethod (c$, "render", 
 function () {
@@ -32,12 +31,12 @@ if (mads == null) return false;
 var atoms = vectors.atoms;
 var colixes = vectors.colixes;
 var needTranslucent = false;
-this.vectorScale = this.viewer.getFloat (1649410065);
-this.vectorSymmetry = this.viewer.getBoolean (603979973);
-for (var i = this.modelSet.getAtomCount (); --i >= 0; ) {
+this.vectorScale = this.vwr.getFloat (1649410049);
+this.vectorSymmetry = this.vwr.getBoolean (603979973);
+for (var i = this.ms.getAtomCount (); --i >= 0; ) {
 var atom = atoms[i];
-if (!atom.isVisible (this.myVisibilityFlag)) continue;
-var vibrationVector = this.viewer.getVibrationVector (i);
+if (!this.isVisibleForMe (atom)) continue;
+var vibrationVector = this.vwr.getVibration (i);
 if (vibrationVector == null) continue;
 if (!this.transform (mads[i], atom, vibrationVector)) continue;
 if (!this.g3d.setColix (J.shape.Shape.getColix (colixes, i, atom))) {
@@ -45,15 +44,16 @@ needTranslucent = true;
 continue;
 }this.renderVector (atom);
 if (this.vectorSymmetry) {
-this.vector2.setT (vibrationVector);
-this.vector2.scale (-1);
-this.transform (mads[i], atom, this.vector2);
+if (this.vibTemp == null) this.vibTemp =  new JW.Vibration ();
+this.vibTemp.setT (vibrationVector);
+this.vibTemp.scale (-1);
+this.transform (mads[i], atom, this.vibTemp);
 this.renderVector (atom);
 }}
 return needTranslucent;
 });
-$_M(c$, "transform", 
-($fz = function (mad, atom, vibrationVector) {
+Clazz.defineMethod (c$, "transform", 
+ function (mad, atom, vibrationVector) {
 var len = vibrationVector.length ();
 if (Math.abs (len * this.vectorScale) < 0.01) return false;
 this.headScale = -0.2;
@@ -62,20 +62,19 @@ this.doShaft = (0.1 + Math.abs (this.headScale / len) < Math.abs (this.vectorSca
 this.headOffsetVector.setT (vibrationVector);
 this.headOffsetVector.scale (this.headScale / len);
 this.pointVectorEnd.scaleAdd2 (this.vectorScale, vibrationVector, atom);
-this.pointArrowHead.setT (this.pointVectorEnd);
-this.pointArrowHead.add (this.headOffsetVector);
-this.screenArrowHead.setT (this.viewer.transformPtVib (this.pointArrowHead, vibrationVector));
-this.screenVectorEnd.setT (this.viewer.transformPtVib (this.pointVectorEnd, vibrationVector));
-this.diameter = Clazz.floatToInt (mad < 1 ? 1 : mad <= 20 ? mad : this.viewer.scaleToScreen (this.screenVectorEnd.z, mad));
+this.pointArrowHead.add2 (this.pointVectorEnd, this.headOffsetVector);
+this.screenArrowHead.setT (this.vwr.transformPtVib (this.pointArrowHead, vibrationVector));
+this.screenVectorEnd.setT (this.vwr.transformPtVib (this.pointVectorEnd, vibrationVector));
+this.diameter = Clazz.floatToInt (mad < 1 ? 1 : mad <= 20 ? mad : this.vwr.scaleToScreen (this.screenVectorEnd.z, mad));
 this.headWidthPixels = this.diameter << 1;
 if (this.headWidthPixels < this.diameter + 2) this.headWidthPixels = this.diameter + 2;
 return true;
-}, $fz.isPrivate = true, $fz), "~N,J.modelset.Atom,J.util.V3");
-$_M(c$, "renderVector", 
-($fz = function (atom) {
-if (this.doShaft) this.g3d.fillCylinderScreen (1, this.diameter, atom.screenX, atom.screenY, atom.screenZ, this.screenArrowHead.x, this.screenArrowHead.y, this.screenArrowHead.z);
+}, "~N,JM.Atom,JW.Vibration");
+Clazz.defineMethod (c$, "renderVector", 
+ function (atom) {
+if (this.doShaft) this.g3d.fillCylinderScreen (1, this.diameter, atom.sX, atom.sY, atom.sZ, this.screenArrowHead.x, this.screenArrowHead.y, this.screenArrowHead.z);
 this.g3d.fillConeScreen (2, this.headWidthPixels, this.screenArrowHead, this.screenVectorEnd, false);
-}, $fz.isPrivate = true, $fz), "J.modelset.Atom");
+}, "JM.Atom");
 Clazz.defineStatics (c$,
 "arrowHeadOffset", -0.2);
 });

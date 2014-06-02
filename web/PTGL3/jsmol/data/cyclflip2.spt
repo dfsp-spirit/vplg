@@ -1,4 +1,5 @@
-load $SCRIPT_PATH$/cyclflip2.jmol
+load data/cyclflip2.jmol
+myModel = _modelFile
 delay 1
 set antialiasdisplay
 animation off
@@ -15,6 +16,11 @@ anim mode once
 var doflip = false
 
 function showEnergy() {
+	if (_modelFile != myModel) {
+		set animframeCallback ""
+		return
+	}
+	
   var  y =  (_modelname.split("= ")[3].split(" ")[1] - (-162)) * 10
   var  x = (_frameid % 1000000) / 35.0 * (_width - 40) + 20
   draw [@{x-5}  @y] [@x @y]
@@ -47,7 +53,9 @@ function showEnergy() {
   if (_frameid == 1000010 || _frameid == 1000025) { echo "half chair (transition state)"; animation off;delay 5;echo "..."; animation play }
 }
 
-set animFrameCallback "jmolscript:showEnergy"
+
+	set animFrameCallback "jmolscript:showEnergy"
+
 
 animation on
 

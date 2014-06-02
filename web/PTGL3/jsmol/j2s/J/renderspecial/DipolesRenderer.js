@@ -1,5 +1,5 @@
 Clazz.declarePackage ("J.renderspecial");
-Clazz.load (["J.render.ShapeRenderer", "J.util.P3", "$.V3"], "J.renderspecial.DipolesRenderer", ["J.util.C", "$.P3i"], function () {
+Clazz.load (["J.render.ShapeRenderer", "JU.P3", "$.V3"], "J.renderspecial.DipolesRenderer", ["JU.P3i", "JW.C"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.dipoleVectorScale = 0;
 this.offset = null;
@@ -13,21 +13,21 @@ this.crossWidthPixels = 0;
 Clazz.instantialize (this, arguments);
 }, J.renderspecial, "DipolesRenderer", J.render.ShapeRenderer);
 Clazz.prepareFields (c$, function () {
-this.offset =  new J.util.V3 ();
+this.offset =  new JU.V3 ();
 this.screens =  new Array (6);
 this.points =  new Array (6);
 {
 for (var i = 0; i < 6; i++) {
-this.screens[i] =  new J.util.P3i ();
-this.points[i] =  new J.util.P3 ();
+this.screens[i] =  new JU.P3i ();
+this.points[i] =  new JU.P3 ();
 }
-}this.cross0 =  new J.util.P3 ();
-this.cross1 =  new J.util.P3 ();
+}this.cross0 =  new JU.P3 ();
+this.cross1 =  new JU.P3 ();
 });
 Clazz.overrideMethod (c$, "render", 
 function () {
 var dipoles = this.shape;
-this.dipoleVectorScale = this.viewer.getFloat (570425356);
+this.dipoleVectorScale = this.vwr.getFloat (570425355);
 var needTranslucent = false;
 for (var i = dipoles.dipoleCount; --i >= 0; ) {
 var dipole = dipoles.dipoles[i];
@@ -35,19 +35,17 @@ if (dipole.visibilityFlags != 0 && this.transform (dipole) && this.renderDipoleV
 }
 return needTranslucent;
 });
-$_M(c$, "transform", 
-($fz = function (dipole) {
+Clazz.defineMethod (c$, "transform", 
+ function (dipole) {
 var vector = dipole.vector;
 this.offset.setT (vector);
 if (dipole.center == null) {
 this.offset.scale (dipole.offsetAngstroms / dipole.dipoleValue);
 if (this.dipoleVectorScale < 0) this.offset.add (vector);
-this.points[0].setT (dipole.origin);
-this.points[0].add (this.offset);
+this.points[0].add2 (dipole.origin, this.offset);
 } else {
 this.offset.scale (-0.5 * this.dipoleVectorScale);
-this.points[0].setT (dipole.center);
-this.points[0].add (this.offset);
+this.points[0].add2 (dipole.center, this.offset);
 if (dipole.offsetAngstroms != 0) {
 this.offset.setT (vector);
 this.offset.scale (dipole.offsetAngstroms / dipole.dipoleValue);
@@ -57,7 +55,7 @@ this.points[2].scaleAdd2 (this.dipoleVectorScale * (0.14), vector, this.points[0
 this.points[3].scaleAdd2 (this.dipoleVectorScale / 2, vector, this.points[0]);
 this.points[4].scaleAdd2 (this.dipoleVectorScale * 0.9, vector, this.points[0]);
 this.points[5].scaleAdd2 (this.dipoleVectorScale, vector, this.points[0]);
-if (dipole.atoms[0] != null && this.modelSet.isAtomHidden (dipole.atoms[0].getIndex ())) return false;
+if (dipole.atoms[0] != null && this.ms.isAtomHidden (dipole.atoms[0].i)) return false;
 this.offset.setT (this.points[3]);
 this.offset.cross (this.offset, vector);
 if (this.offset.length () == 0) {
@@ -66,25 +64,25 @@ this.offset.cross (this.offset, vector);
 }this.offset.scale (dipole.offsetSide / this.offset.length ());
 for (var i = 0; i < 6; i++) this.points[i].add (this.offset);
 
-for (var i = 0; i < 6; i++) this.viewer.transformPtScr (this.points[i], this.screens[i]);
+for (var i = 0; i < 6; i++) this.vwr.transformPtScr (this.points[i], this.screens[i]);
 
-this.viewer.transformPt3f (this.points[1], this.cross0);
-this.viewer.transformPt3f (this.points[2], this.cross1);
+this.vwr.transformPt3f (this.points[1], this.cross0);
+this.vwr.transformPt3f (this.points[2], this.cross1);
 this.mad = dipole.mad;
-var d = this.viewer.scaleToScreen (this.screens[3].z, this.mad);
+var d = this.vwr.scaleToScreen (this.screens[3].z, this.mad);
 this.diameter = Clazz.floatToInt (d);
 this.headWidthPixels = Clazz.doubleToInt (Math.floor (d * 2.0));
 if (this.headWidthPixels < this.diameter + 5) this.headWidthPixels = this.diameter + 5;
 this.crossWidthPixels = this.headWidthPixels;
 return true;
-}, $fz.isPrivate = true, $fz), "J.shapespecial.Dipole");
-$_M(c$, "renderDipoleVector", 
-($fz = function (dipole) {
-var colixA = (dipole.bond == null ? dipole.colix : J.util.C.getColixInherited (dipole.colix, dipole.bond.colix));
+}, "J.shapespecial.Dipole");
+Clazz.defineMethod (c$, "renderDipoleVector", 
+ function (dipole) {
+var colixA = (dipole.bond == null ? dipole.colix : JW.C.getColixInherited (dipole.colix, dipole.bond.colix));
 var colixB = colixA;
 if (dipole.atoms[0] != null) {
-colixA = J.util.C.getColixInherited (colixA, dipole.atoms[0].getColix ());
-colixB = J.util.C.getColixInherited (colixB, dipole.atoms[1].getColix ());
+colixA = JW.C.getColixInherited (colixA, dipole.atoms[0].getColix ());
+colixB = JW.C.getColixInherited (colixB, dipole.atoms[1].getColix ());
 }if (colixA == 0) colixA = 5;
 if (colixB == 0) colixB = 5;
 if (this.dipoleVectorScale < 0) {
@@ -111,7 +109,7 @@ this.g3d.fillConeScreen (2, this.headWidthPixels, this.screens[4], this.screens[
 } else {
 needTranslucent = true;
 }return needTranslucent;
-}, $fz.isPrivate = true, $fz), "J.shapespecial.Dipole");
+}, "J.shapespecial.Dipole");
 Clazz.defineStatics (c$,
 "cylinderBase", 0,
 "cross", 1,

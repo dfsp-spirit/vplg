@@ -42,74 +42,10 @@
 			<META HTTP-EQUIV="Refresh" CONTENT="0;URL=errorJS.php">
 		</noscript>
 		<div class="wrapper">
-		<div class="container">
 		
-			<div class="navbar navbar-fixed-top" id="navColor">
 
-				<div class="container">
-
-				<button class="navbar-toggle" data-target=".navbar-responsive-collapse" data-toggle="collapse" type="button">
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-				</button>
-				
-
-				<a href="#" class="navbar-brand"><img src="./images/molbi.png" alt="PTGL Logo"></a>
-					<div class="nav-collapse collapse navbar-responsive-collapse" id="navbar-example">
-						<div class="navbar-scrollspy">
-						<ul class="nav navbar-nav">
-							<li  class="active navbarFont">
-								<a href="#Home">Home</a>
-							</li>
-
-							<li class="navbarFont">
-								<a href="#About">About</a>
-							</li>
-						
-							<li class="navbarFont">
-								<a href="#UserGuide">User Guide</a>
-							</li>
-							
-							<li class="navbarFont">
-								<a href="#DatabaseFormat">Database Format</a>
-							</li>
-							
-							<li class="dropdown">
-								<!-- <strong>caret</strong> creates the little triangle/arrow -->
-								<a href="#"  class="navbarFont dropdown-toggle" data-toggle="dropdown"> Services <strong class="caret"></strong></a>
-								
-								<ul class="dropdown-menu">
-									<li>
-										<a href="about.php"><span class="fa fa-info"></span> About</a>
-									</li>
-									<li>
-										<a href="content.php"><i class="fa fa-briefcase"></i> Content</a>
-									</li>
-									
-									<li>
-										<a href="publications.php"><i class="fa fa-copy"></i> Publications</a>
-									</li>
-																	
-									<!-- divider class creates a horizontal line in the dropdown menu -->
-									<li class="divider"></li>
-									
-									<li class="dropdown-header"></li>
-									
-									<li>
-										<a href="contact.php"><i class="fa fa-user"></i> Contact Us</a>
-									</li>
-									
-									<li>
-										<a href="help.php"><i class="fa fa-question"></i> Help</a>
-									</li>
-								</ul><!-- end dropdown menu -->
-							</li><!-- end dropdown -->
-						</ul><!-- end nav navbar-nav -->
-						</div><!-- end navbar-scrollspy -->
-					</div><!-- end nav-collapse -->
-				</div><!-- end container -->
-			</div><!-- end navbar fixed-top -->
+		<?php include('navbar.php'); ?>
+			
 		
 		<div id="Home">
 			<div class="container" id="intro">
@@ -567,63 +503,7 @@
 	</div><!-- end wrapper -->
 	
 	
-	<footer id="footer">
-		<div class="container">
-			<div class="row">
-				<div class="col-sm-2">
-					<a href="about.php" class="footerLink">About</a>
-				</div>
-			
-				<div class="col-sm-2">
-					<a class="footerLink" href="help.php">Help</a>
-				</div>
-				
-				<div class="col-sm-2">
-					<a class="footerLink" href="contact.php">Contact</a>
-				</div>
-				
-				<div class="col-sm-2">
-					<a class="footerLink" href="http://www.bioinformatik.uni-frankfurt.de" target="_blank">MolBi - Group</a>
-				</div>
-				
-				<div class="col-sm-2">
-					<a class="footerLink" href="publications.php">Publications</a>
-				</div>
-				
-				<div class="col-sm-2">
-					<a href="about.php#linking" class="footerLink">Linking PTGL</a>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-1">
-				</div>
-				<div class="col-sm-1">
-				</div>
-				<div class="col-sm-1">
-				</div>
-				<div class="col-sm-1">
-				</div>
-				<div class="col-sm-1">
-				</div>
-				<div class="col-sm-1">
-				</div>
-				<div class="col-sm-1">
-				</div>
-				<div class="col-sm-1">
-				</div>
-				<div class="col-sm-1">
-				</div>
-				<div class="col-sm-1">
-				</div>
-				
-				<div class="col-sm-2 flush-right">
-					<br>
-					<br>
-					Copyright © 2013 [name]
-				</div>
-			</div>
-		</div><!-- end container -->
-	</footer>
+	<?php include('footer.php'); ?>
 		
 
 

@@ -36,7 +36,7 @@ return total;
 }
 return total;
 }, "~N");
-$_M(c$, "getChecksum", 
+Clazz.defineMethod (c$, "getChecksum", 
 function () {
 return this.cksum;
 });

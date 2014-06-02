@@ -1,1 +1,1 @@
-$_I(java.lang.annotation,"Annotation");
+Clazz.declareInterface(java.lang.annotation,"Annotation");

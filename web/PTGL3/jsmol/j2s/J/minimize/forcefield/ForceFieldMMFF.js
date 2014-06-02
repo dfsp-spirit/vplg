@@ -1,22 +1,23 @@
 Clazz.declarePackage ("J.minimize.forcefield");
-Clazz.load (["J.minimize.forcefield.ForceField"], "J.minimize.forcefield.ForceFieldMMFF", ["java.lang.Boolean", "$.Float", "java.util.Hashtable", "J.minimize.MinAtom", "$.MinObject", "J.minimize.forcefield.AtomType", "$.CalculationsMMFF", "J.util.ArrayUtil", "$.BS", "$.BSUtil", "$.Elements", "$.Escape", "$.JmolList", "$.Logger", "$.Parser"], function () {
+Clazz.load (["J.minimize.forcefield.ForceField"], "J.minimize.forcefield.ForceFieldMMFF", ["java.lang.Float", "java.util.Hashtable", "JU.AU", "$.BS", "$.List", "$.PT", "J.minimize.MinAtom", "$.MinObject", "J.minimize.forcefield.AtomType", "$.CalculationsMMFF", "JW.BSUtil", "$.Elements", "$.Escape", "$.Logger"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.useEmpiricalRules = true;
 this.rawAtomTypes = null;
 this.rawBondTypes = null;
 this.rawMMFF94Charges = null;
 this.vRings = null;
+this.line = null;
 this.typeData = null;
 Clazz.instantialize (this, arguments);
 }, J.minimize.forcefield, "ForceFieldMMFF", J.minimize.forcefield.ForceField);
 Clazz.prepareFields (c$, function () {
 this.typeData =  Clazz.newIntArray (4, 0);
 });
-$_M(c$, "getAtomTypeDescriptions", 
+Clazz.defineMethod (c$, "getAtomTypeDescriptions", 
 function () {
 return J.minimize.forcefield.ForceFieldMMFF.getAtomTypeDescs (this.rawAtomTypes);
 });
-$_M(c$, "getPartialCharges", 
+Clazz.defineMethod (c$, "getPartialCharges", 
 function () {
 return this.rawMMFF94Charges;
 });
@@ -25,63 +26,72 @@ function (m) {
 Clazz.superConstructor (this, J.minimize.forcefield.ForceFieldMMFF, []);
 this.minimizer = m;
 this.name = "MMFF";
-this.getChargeParameters ();
+this.getParameters ();
 }, "J.minimize.Minimizer");
 Clazz.overrideMethod (c$, "clear", 
 function () {
 });
 Clazz.overrideMethod (c$, "setModel", 
 function (bsElements, elemnoMax) {
-this.getMinimizationParameters ();
 var m = this.minimizer;
 if (!this.setArrays (m.atoms, m.bsAtoms, m.bonds, m.rawBondCount, false, false)) return false;
 this.setModelFields ();
 this.fixTypes ();
-this.calc =  new J.minimize.forcefield.CalculationsMMFF (this, J.minimize.forcefield.ForceFieldMMFF.ffParams, this.minAtoms, this.minBonds, this.minAngles, this.minTorsions, this.minimizer.constraints);
+this.calc =  new J.minimize.forcefield.CalculationsMMFF (this, J.minimize.forcefield.ForceFieldMMFF.ffParams, this.minAtoms, this.minBonds, this.minAngles, this.minTorsions, this.minPositions, this.minimizer.constraints);
 this.calc.setLoggingEnabled (true);
 return this.calc.setupCalculations ();
-}, "J.util.BS,~N");
-$_M(c$, "setArrays", 
+}, "JU.BS,~N");
+Clazz.defineMethod (c$, "setArrays", 
 function (atoms, bsAtoms, bonds, rawBondCount, doRound, allowUnknowns) {
 var m = this.minimizer;
-this.vRings = J.util.ArrayUtil.createArrayOfArrayList (4);
-this.rawAtomTypes = J.minimize.forcefield.ForceFieldMMFF.setAtomTypes (atoms, bsAtoms, m.viewer.getSmilesMatcher (), this.vRings, allowUnknowns);
+this.vRings = JU.AU.createArrayOfArrayList (4);
+this.rawAtomTypes = J.minimize.forcefield.ForceFieldMMFF.setAtomTypes (atoms, bsAtoms, m.vwr.getSmilesMatcher (), this.vRings, allowUnknowns);
 if (this.rawAtomTypes == null) return false;
 this.rawBondTypes = this.setBondTypes (bonds, rawBondCount, bsAtoms);
 this.rawMMFF94Charges = J.minimize.forcefield.ForceFieldMMFF.calculatePartialCharges (bonds, this.rawBondTypes, atoms, this.rawAtomTypes, bsAtoms, doRound);
 return true;
-}, "~A,J.util.BS,~A,~N,~B,~B");
-$_M(c$, "getChargeParameters", 
-($fz = function () {
+}, "~A,JU.BS,~A,~N,~B,~B");
+Clazz.defineMethod (c$, "getParameters", 
+ function () {
 if (J.minimize.forcefield.ForceFieldMMFF.ffParams != null) return;
-this.getAtomTypes ("MMFF94-smarts.txt");
+this.getAtomTypes ();
 var data =  new java.util.Hashtable ();
-this.getMmffParameters ("mmffpbci.par.txt", data, 1);
-this.getMmffParameters ("mmffchg.par.txt", data, 34);
-($t$ = J.minimize.forcefield.ForceFieldMMFF.ffParams = data, J.minimize.forcefield.ForceFieldMMFF.prototype.ffParams = J.minimize.forcefield.ForceFieldMMFF.ffParams, $t$);
-}, $fz.isPrivate = true, $fz));
-$_M(c$, "getMinimizationParameters", 
-($fz = function () {
-if (J.minimize.forcefield.ForceFieldMMFF.ffParams.containsKey (Integer.$valueOf (-1))) return;
-this.getMmffParameters ("mmffang.par.txt", J.minimize.forcefield.ForceFieldMMFF.ffParams, 5);
-this.getMmffParameters ("mmffbndk.par.txt", J.minimize.forcefield.ForceFieldMMFF.ffParams, 546);
-this.getMmffParameters ("mmffbond.par.txt", J.minimize.forcefield.ForceFieldMMFF.ffParams, 3);
-this.getMmffParameters ("mmffoop.par.txt", J.minimize.forcefield.ForceFieldMMFF.ffParams, 13);
-this.getMmffParameters ("mmffstbn.par.txt", J.minimize.forcefield.ForceFieldMMFF.ffParams, 21);
-this.getMmffParameters ("mmffdfsb.par.txt", J.minimize.forcefield.ForceFieldMMFF.ffParams, 37);
-this.getMmffParameters ("mmfftor.par.txt", J.minimize.forcefield.ForceFieldMMFF.ffParams, 9);
-this.getMmffParameters ("mmffvdw.par.txt", J.minimize.forcefield.ForceFieldMMFF.ffParams, 17);
-J.minimize.forcefield.ForceFieldMMFF.ffParams.put (Integer.$valueOf (-1), Boolean.TRUE);
-}, $fz.isPrivate = true, $fz));
-$_M(c$, "getMmffParameters", 
-($fz = function (fileName, data, dataType) {
+var resourceName = "mmff94.par.txt";
+if (JW.Logger.debugging) JW.Logger.debug ("reading data from " + resourceName);
+var br = null;
 var line = null;
-var value = null;
-if (J.util.Logger.debugging) J.util.Logger.info ("reading data from " + fileName);
 try {
-var br = this.getBufferedReader (fileName);
-while ((line = br.readLine ()) != null && line.length < 5 || !line.startsWith ("*")) continue;
-
+br = this.getBufferedReader (resourceName);
+var pt = 0;
+var dataType = 0;
+while (true) {
+while ((pt = (line = br.readLine ()).indexOf (".PAR")) < 0) {
+}
+if ((dataType = J.minimize.forcefield.ForceFieldMMFF.types[Clazz.doubleToInt ("END.BCI.CHG.ANG.NDK.OND.OOP.TBN.FSB.TOR.VDW.".indexOf (line.substring (pt - 3, pt + 1)) / 4)]) < 1) break;
+this.readParams (br, dataType, data);
+}
+br.close ();
+} catch (e) {
+if (Clazz.exceptionOf (e, Exception)) {
+System.err.println ("Exception " + e.toString () + " in getResource " + resourceName + " line=" + line);
+} else {
+throw e;
+}
+} finally {
+try {
+br.close ();
+} catch (e) {
+if (Clazz.exceptionOf (e, java.io.IOException)) {
+} else {
+throw e;
+}
+}
+}
+J.minimize.forcefield.ForceFieldMMFF.ffParams = data;
+});
+Clazz.defineMethod (c$, "readParams", 
+ function (br, dataType, data) {
+var value = null;
 var a1 = 0;
 var a2 = 127;
 var a3 = 127;
@@ -117,8 +127,11 @@ a4 = 122;
 type = 0;
 break;
 }
-while ((line = br.readLine ()) != null) {
-if (line.length < 5 || line.startsWith ("*")) continue;
+while (!br.readLine ().startsWith ("*")) {
+}
+while ((this.line = br.readLine ()).startsWith ("*")) {
+}
+do {
 switch (dataType) {
 case 546:
 case 13:
@@ -126,57 +139,57 @@ case 1:
 case 37:
 break;
 case 17:
-if (line.charAt (5) != ' ') continue;
+if (this.line.charAt (5) != ' ') continue;
 break;
 case 34:
-if (line.charAt (0) == '4') continue;
+if (this.line.charAt (0) == '4') continue;
 case 5:
 case 3:
 case 21:
 case 9:
-type = line.charCodeAt (0) - 48;
+type = this.line.charCodeAt (0) - 48;
 break;
 }
 switch (dataType) {
 case 13:
 case 9:
-a4 = J.util.Parser.parseInt (line.substring (18, 20).trim ());
+a4 = this.ival (18, 20);
 case 5:
 case 21:
 case 37:
-a3 = J.util.Parser.parseInt (line.substring (13, 15).trim ());
+a3 = this.ival (13, 15);
 case 546:
 case 3:
 case 34:
-a2 = J.util.Parser.parseInt (line.substring (8, 10).trim ());
+a2 = this.ival (8, 10);
 case 1:
 case 17:
-a1 = J.util.Parser.parseInt (line.substring (3, 5).trim ());
+a1 = this.ival (3, 5);
 break;
 }
 switch (dataType) {
 case 546:
-value = [J.util.Parser.dVal (line.substring (19, 25).trim ()), J.util.Parser.dVal (line.substring (13, 18).trim ())];
+value = [this.dval (19, 25), this.dval (13, 18)];
 break;
 case 3:
-value = [J.util.Parser.dVal (line.substring (14, 20).trim ()), J.util.Parser.dVal (line.substring (25, 31).trim ())];
+value = [this.dval (14, 20), this.dval (25, 31)];
 break;
 case 5:
 case 21:
-value = [J.util.Parser.dVal (line.substring (19, 25).trim ()), J.util.Parser.dVal (line.substring (28, 35).trim ())];
+value = [this.dval (19, 25), this.dval (28, 35)];
 break;
 case 34:
-value = Float.$valueOf (J.util.Parser.fVal (line.substring (10, 20).trim ()));
+value = Float.$valueOf (this.fval (10, 20));
 break;
 case 13:
-value = [J.util.Parser.dVal (line.substring (24, 30).trim ())];
+value = [this.dval (24, 30)];
 break;
 case 1:
-value = Float.$valueOf (J.util.Parser.fVal (line.substring (5, 15).trim ()));
+value = Float.$valueOf (this.fval (5, 15));
 break;
 case 37:
-var v1 = J.util.Parser.dVal (line.substring (19, 25).trim ());
-var v2 = J.util.Parser.dVal (line.substring (28, 35).trim ());
+var v1 = this.dval (19, 25);
+var v2 = this.dval (28, 35);
 value = [v1, v2];
 var key = J.minimize.MinObject.getKey (type, a1, a2, a3, a4);
 data.put (key, value);
@@ -186,58 +199,62 @@ a1 = a3;
 a3 = a;
 break;
 case 9:
-value = [J.util.Parser.dVal (line.substring (22, 28).trim ()), J.util.Parser.dVal (line.substring (30, 36).trim ()), J.util.Parser.dVal (line.substring (38, 44).trim ())];
+value = [this.dval (22, 28), this.dval (30, 36), this.dval (38, 44)];
 break;
 case 17:
-value = [J.util.Parser.dVal (line.substring (10, 15).trim ()), J.util.Parser.dVal (line.substring (20, 25).trim ()), J.util.Parser.dVal (line.substring (30, 35).trim ()), J.util.Parser.dVal (line.substring (40, 45).trim ()), line.charAt (46)];
+value = [this.dval (10, 15), this.dval (20, 25), this.dval (30, 35), this.dval (40, 45), this.line.charAt (46)];
 break;
 }
 var key = J.minimize.MinObject.getKey (type, a1, a2, a3, a4);
 data.put (key, value);
-if (J.util.Logger.debugging) J.util.Logger.info (J.minimize.MinObject.decodeKey (key) + " " + (Clazz.instanceOf (value, Float) ? value : J.util.Escape.eAD (value)));
-}
-br.close ();
-} catch (e) {
-if (Clazz.exceptionOf (e, Exception)) {
-System.err.println ("Exception " + e.toString () + " in getResource " + fileName + " line=" + line);
-} else {
-throw e;
-}
-}
-}, $fz.isPrivate = true, $fz), "~S,java.util.Map,~N");
-$_M(c$, "getAtomTypes", 
-($fz = function (fileName) {
-var types =  new J.util.JmolList ();
-var line = null;
+if (JW.Logger.debugging) JW.Logger.debug (J.minimize.MinObject.decodeKey (key) + " " + (Clazz.instanceOf (value, Float) ? value : JW.Escape.eAD (value)));
+} while (!(this.line = br.readLine ()).startsWith ("$"));
+}, "java.io.BufferedReader,~N,java.util.Map");
+Clazz.defineMethod (c$, "ival", 
+ function (i, j) {
+return JU.PT.parseInt (this.line.substring (i, j).trim ());
+}, "~N,~N");
+Clazz.defineMethod (c$, "fval", 
+ function (i, j) {
+return JU.PT.fVal (this.line.substring (i, j).trim ());
+}, "~N,~N");
+Clazz.defineMethod (c$, "dval", 
+ function (i, j) {
+return JU.PT.dVal (this.line.substring (i, j).trim ());
+}, "~N,~N");
+Clazz.defineMethod (c$, "getAtomTypes", 
+ function () {
+var resourceName = "MMFF94-smarts.txt";
+var types =  new JU.List ();
 try {
-var br = this.getBufferedReader (fileName);
+var br = this.getBufferedReader (resourceName);
 var at;
 types.addLast ( new J.minimize.forcefield.AtomType (0, 0, 0, 0, 1, "H or NOT FOUND", ""));
-while ((line = br.readLine ()) != null) {
-if (line.length == 0 || line.startsWith ("#")) continue;
-var elemNo = J.util.Parser.parseInt (line.substring (3, 5).trim ());
-var mmType = J.util.Parser.parseInt (line.substring (6, 8).trim ());
-var hType = J.util.Parser.parseInt (line.substring (9, 11).trim ());
-var formalCharge = J.util.Parser.fVal (line.substring (12, 15).trim ()) / 12;
-var val = J.util.Parser.parseInt (line.substring (16, 18).trim ());
-var desc = line.substring (19, 44).trim ();
-var smarts = line.substring (45).trim ();
+while ((this.line = br.readLine ()) != null) {
+if (this.line.length == 0 || this.line.startsWith ("#")) continue;
+var elemNo = this.ival (3, 5);
+var mmType = this.ival (6, 8);
+var hType = this.ival (9, 11);
+var formalCharge = this.fval (12, 15) / 12;
+var val = this.ival (16, 18);
+var desc = this.line.substring (19, 44).trim ();
+var smarts = this.line.substring (45).trim ();
 types.addLast (at =  new J.minimize.forcefield.AtomType (elemNo, mmType, hType, formalCharge, val, desc, smarts));
 J.minimize.forcefield.ForceFieldMMFF.setFlags (at);
 }
 br.close ();
 } catch (e) {
 if (Clazz.exceptionOf (e, Exception)) {
-System.err.println ("Exception " + e.toString () + " in getResource " + fileName + " line=" + line);
+System.err.println ("Exception " + e.toString () + " in getResource " + resourceName + " line=" + this.line);
 } else {
 throw e;
 }
 }
-J.util.Logger.info ((types.size () - 1) + " SMARTS-based atom types read");
-($t$ = J.minimize.forcefield.ForceFieldMMFF.atomTypes = types, J.minimize.forcefield.ForceFieldMMFF.prototype.atomTypes = J.minimize.forcefield.ForceFieldMMFF.atomTypes, $t$);
-}, $fz.isPrivate = true, $fz), "~S");
-c$.setFlags = $_M(c$, "setFlags", 
-($fz = function (at) {
+JW.Logger.info ((types.size () - 1) + " SMARTS-based atom types read");
+J.minimize.forcefield.ForceFieldMMFF.atomTypes = types;
+});
+c$.setFlags = Clazz.defineMethod (c$, "setFlags", 
+ function (at) {
 switch (at.mmType) {
 case 32:
 case 35:
@@ -362,8 +379,8 @@ case 61:
 at.mltb = 3;
 break;
 }
-}, $fz.isPrivate = true, $fz), "J.minimize.forcefield.AtomType");
-c$.calculatePartialCharges = $_M(c$, "calculatePartialCharges", 
+}, "J.minimize.forcefield.AtomType");
+c$.calculatePartialCharges = Clazz.defineMethod (c$, "calculatePartialCharges", 
 function (bonds, bTypes, atoms, aTypes, bsAtoms, doRound) {
 var partialCharges =  Clazz.newFloatArray (atoms.length, 0);
 for (var i = bsAtoms.nextSetBit (0); i >= 0; i = bsAtoms.nextSetBit (i + 1)) partialCharges[i] = J.minimize.forcefield.ForceFieldMMFF.atomTypes.get (Math.max (0, aTypes[i])).formalCharge;
@@ -372,13 +389,13 @@ var a1 = null;
 for (var i = bTypes.length; --i >= 0; ) {
 a1 = bonds[i].getAtom1 ();
 var a2 = bonds[i].getAtom2 ();
-var ok1 = bsAtoms.get (a1.index);
-var ok2 = bsAtoms.get (a2.index);
+var ok1 = bsAtoms.get (a1.i);
+var ok2 = bsAtoms.get (a2.i);
 if (!ok1 && !ok2) continue;
-var it = aTypes[a1.index];
+var it = aTypes[a1.i];
 var at1 = J.minimize.forcefield.ForceFieldMMFF.atomTypes.get (Math.max (0, it));
 var type1 = (it < 0 ? -it : at1.mmType);
-it = aTypes[a2.index];
+it = aTypes[a2.i];
 var at2 = J.minimize.forcefield.ForceFieldMMFF.atomTypes.get (Math.max (0, it));
 var type2 = (it < 0 ? -it : at2.mmType);
 var dq;
@@ -388,17 +405,17 @@ var bFactor = (type1 < type2 ? -1 : 1);
 var key = J.minimize.MinObject.getKey (bondType, bFactor == 1 ? type2 : type1, bFactor == 1 ? type1 : type2, 127, 124);
 var bciValue = J.minimize.forcefield.ForceFieldMMFF.ffParams.get (key);
 var bci;
-var msg = (J.util.Logger.debugging ? a1 + "/" + a2 + " mmTypes=" + type1 + "/" + type2 + " formalCharges=" + at1.formalCharge + "/" + at2.formalCharge + " bci = " : null);
+var msg = (JW.Logger.debugging ? a1 + "/" + a2 + " mmTypes=" + type1 + "/" + type2 + " formalCharges=" + at1.formalCharge + "/" + at2.formalCharge + " bci = " : null);
 if (bciValue == null) {
 var pa = (J.minimize.forcefield.ForceFieldMMFF.ffParams.get (J.minimize.MinObject.getKey (0, type1, 127, 127, 127))).floatValue ();
 var pb = (J.minimize.forcefield.ForceFieldMMFF.ffParams.get (J.minimize.MinObject.getKey (0, type2, 127, 127, 127))).floatValue ();
 bci = pa - pb;
-if (J.util.Logger.debugging) msg += pa + " - " + pb + " = ";
+if (JW.Logger.debugging) msg += pa + " - " + pb + " = ";
 } else {
 bci = bFactor * bciValue.floatValue ();
-}if (J.util.Logger.debugging) {
+}if (JW.Logger.debugging) {
 msg += bci;
-J.util.Logger.debug (msg);
+JW.Logger.debug (msg);
 }dq = at2.fcadj * at2.formalCharge - at1.fcadj * at1.formalCharge + bci;
 } catch (e) {
 if (Clazz.exceptionOf (e, Exception)) {
@@ -407,8 +424,8 @@ dq = NaN;
 throw e;
 }
 }
-if (ok1) partialCharges[a1.index] += dq;
-if (ok2) partialCharges[a2.index] -= dq;
+if (ok1) partialCharges[a1.i] += dq;
+if (ok2) partialCharges[a2.i] -= dq;
 }
 if (doRound) {
 var abscharge = 0;
@@ -417,26 +434,26 @@ partialCharges[i] = (Math.round (partialCharges[i] * 1000)) / 1000;
 abscharge += Math.abs (partialCharges[i]);
 }
 if (abscharge == 0 && a1 != null) {
-partialCharges[a1.index] = -0.0;
+partialCharges[a1.i] = -0.0;
 }}return partialCharges;
-}, "~A,~A,~A,~A,J.util.BS,~B");
-c$.isBondType1 = $_M(c$, "isBondType1", 
-($fz = function (at1, at2) {
+}, "~A,~A,~A,~A,JU.BS,~B");
+c$.isBondType1 = Clazz.defineMethod (c$, "isBondType1", 
+ function (at1, at2) {
 return at1.sbmb && at2.sbmb || at1.arom && at2.arom;
-}, $fz.isPrivate = true, $fz), "J.minimize.forcefield.AtomType,J.minimize.forcefield.AtomType");
-$_M(c$, "getBondType", 
-($fz = function (bond, at1, at2, index1, index2) {
+}, "J.minimize.forcefield.AtomType,J.minimize.forcefield.AtomType");
+Clazz.defineMethod (c$, "getBondType", 
+ function (bond, at1, at2, index1, index2) {
 return (J.minimize.forcefield.ForceFieldMMFF.isBondType1 (at1, at2) && bond.getCovalentOrder () == 1 && !this.isAromaticBond (index1, index2) ? 1 : 0);
-}, $fz.isPrivate = true, $fz), "J.modelset.Bond,J.minimize.forcefield.AtomType,J.minimize.forcefield.AtomType,~N,~N");
-$_M(c$, "isAromaticBond", 
-($fz = function (a1, a2) {
+}, "JM.Bond,J.minimize.forcefield.AtomType,J.minimize.forcefield.AtomType,~N,~N");
+Clazz.defineMethod (c$, "isAromaticBond", 
+ function (a1, a2) {
 if (this.vRings[3] != null) for (var i = this.vRings[3].size (); --i >= 0; ) {
 var bsRing = this.vRings[3].get (i);
 if (bsRing.get (a1) && bsRing.get (a2)) return true;
 }
 return false;
-}, $fz.isPrivate = true, $fz), "~N,~N");
-c$.getAtomTypeDescs = $_M(c$, "getAtomTypeDescs", 
+}, "~N,~N");
+c$.getAtomTypeDescs = Clazz.defineMethod (c$, "getAtomTypeDescs", 
 function (types) {
 var stypes =  new Array (types.length);
 for (var i = types.length; --i >= 0; ) {
@@ -444,18 +461,18 @@ stypes[i] = String.valueOf (types[i] < 0 ? -types[i] : J.minimize.forcefield.For
 }
 return stypes;
 }, "~A");
-c$.setAtomTypes = $_M(c$, "setAtomTypes", 
-($fz = function (atoms, bsAtoms, smartsMatcher, vRings, allowUnknowns) {
-var bitSets =  new J.util.JmolList ();
+c$.setAtomTypes = Clazz.defineMethod (c$, "setAtomTypes", 
+ function (atoms, bsAtoms, smartsMatcher, vRings, allowUnknowns) {
+var bitSets =  new JU.List ();
 var smarts =  new Array (J.minimize.forcefield.ForceFieldMMFF.atomTypes.size ());
 var types =  Clazz.newIntArray (atoms.length, 0);
-var bsElements =  new J.util.BS ();
-var bsHydrogen =  new J.util.BS ();
-var bsConnected = J.util.BSUtil.copy (bsAtoms);
+var bsElements =  new JU.BS ();
+var bsHydrogen =  new JU.BS ();
+var bsConnected = JW.BSUtil.copy (bsAtoms);
 for (var i = bsAtoms.nextSetBit (0); i >= 0; i = bsAtoms.nextSetBit (i + 1)) {
 var a = atoms[i];
 var bonds = a.getBonds ();
-if (bonds != null) for (var j = bonds.length; --j >= 0; ) if (bonds[j].isCovalent ()) bsConnected.set (bonds[j].getOtherAtom (a).index);
+if (bonds != null) for (var j = bonds.length; --j >= 0; ) if (bonds[j].isCovalent ()) bsConnected.set (bonds[j].getOtherAtom (a).i);
 
 }
 for (var i = bsConnected.nextSetBit (0); i >= 0; i = bsConnected.nextSetBit (i + 1)) {
@@ -475,9 +492,17 @@ if (!bsElements.get (at.elemNo)) continue;
 smarts[i] = at.smartsCode;
 nUsed++;
 }
-J.util.Logger.info (nUsed + " SMARTS matches used");
+JW.Logger.info (nUsed + " SMARTS matches used");
+try {
 smartsMatcher.getSubstructureSets (smarts, atoms, atoms.length, 20, bsConnected, bitSets, vRings);
-var bsDone =  new J.util.BS ();
+} catch (e) {
+if (Clazz.exceptionOf (e, Exception)) {
+JW.Logger.error (e.toString ());
+} else {
+throw e;
+}
+}
+var bsDone =  new JU.BS ();
 for (var j = 0; j < bitSets.size (); j++) {
 var bs = bitSets.get (j);
 if (bs == null) continue;
@@ -489,37 +514,37 @@ bsDone.or (bs);
 for (var i = bsHydrogen.nextSetBit (0); i >= 0; i = bsHydrogen.nextSetBit (i + 1)) {
 var bonds = atoms[i].getBonds ();
 if (bonds != null) {
-var j = types[bonds[0].getOtherAtom (atoms[i]).index];
+var j = types[bonds[0].getOtherAtom (atoms[i]).i];
 if (j != 0) bsDone.set (i);
 types[i] = -J.minimize.forcefield.ForceFieldMMFF.atomTypes.get (j).hType;
 }}
-if (J.util.Logger.debugging) for (var i = bsConnected.nextSetBit (0); i >= 0; i = bsConnected.nextSetBit (i + 1)) J.util.Logger.info ("atom " + atoms[i] + "\ttype " + (types[i] < 0 ? "" + -types[i] : (J.minimize.forcefield.ForceFieldMMFF.atomTypes.get (types[i]).mmType + "\t" + J.minimize.forcefield.ForceFieldMMFF.atomTypes.get (types[i]).smartsCode + "\t" + J.minimize.forcefield.ForceFieldMMFF.atomTypes.get (types[i]).descr)));
+if (JW.Logger.debugging) for (var i = bsConnected.nextSetBit (0); i >= 0; i = bsConnected.nextSetBit (i + 1)) JW.Logger.debug ("atom " + atoms[i] + "\ttype " + (types[i] < 0 ? "" + -types[i] : (J.minimize.forcefield.ForceFieldMMFF.atomTypes.get (types[i]).mmType + "\t" + J.minimize.forcefield.ForceFieldMMFF.atomTypes.get (types[i]).smartsCode + "\t" + J.minimize.forcefield.ForceFieldMMFF.atomTypes.get (types[i]).descr)));
 
 if (!allowUnknowns && bsDone.cardinality () != bsConnected.cardinality ()) return null;
 return types;
-}, $fz.isPrivate = true, $fz), "~A,J.util.BS,J.api.SmilesMatcherInterface,~A,~B");
-$_M(c$, "setBondTypes", 
-($fz = function (bonds, bondCount, bsAtoms) {
+}, "~A,JU.BS,J.api.SmilesMatcherInterface,~A,~B");
+Clazz.defineMethod (c$, "setBondTypes", 
+ function (bonds, bondCount, bsAtoms) {
 var bTypes =  Clazz.newIntArray (bondCount, 0);
 for (var i = bondCount; --i >= 0; ) {
 var a1 = bonds[i].getAtom1 ();
 var a2 = bonds[i].getAtom2 ();
-var ok1 = bsAtoms.get (a1.index);
-var ok2 = bsAtoms.get (a2.index);
+var ok1 = bsAtoms.get (a1.i);
+var ok2 = bsAtoms.get (a2.i);
 if (!ok1 && !ok2) continue;
-var it = this.rawAtomTypes[a1.index];
+var it = this.rawAtomTypes[a1.i];
 var at1 = J.minimize.forcefield.ForceFieldMMFF.atomTypes.get (Math.max (0, it));
-it = this.rawAtomTypes[a2.index];
+it = this.rawAtomTypes[a2.i];
 var at2 = J.minimize.forcefield.ForceFieldMMFF.atomTypes.get (Math.max (0, it));
-bTypes[i] = this.getBondType (bonds[i], at1, at2, a1.index, a2.index);
+bTypes[i] = this.getBondType (bonds[i], at1, at2, a1.i, a2.i);
 }
 return bTypes;
-}, $fz.isPrivate = true, $fz), "~A,~N,J.util.BS");
-$_M(c$, "fixTypes", 
-($fz = function () {
+}, "~A,~N,JU.BS");
+Clazz.defineMethod (c$, "fixTypes", 
+ function () {
 for (var i = this.minAtomCount; --i >= 0; ) {
 var a = this.minAtoms[i];
-var rawIndex = a.atom.index;
+var rawIndex = a.atom.i;
 var it = this.rawAtomTypes[rawIndex];
 a.ffAtomType = J.minimize.forcefield.ForceFieldMMFF.atomTypes.get (Math.max (0, it));
 var type = (it < 0 ? -it : J.minimize.forcefield.ForceFieldMMFF.atomTypes.get (it).mmType);
@@ -541,9 +566,9 @@ for (var i = this.minTorsions.length; --i >= 0; ) {
 var torsion = this.minTorsions[i];
 torsion.key = this.getKey (torsion, torsion.type, 9);
 }
-}, $fz.isPrivate = true, $fz));
-$_M(c$, "setAngleType", 
-($fz = function (angle) {
+});
+Clazz.defineMethod (c$, "setAngleType", 
+ function (angle) {
 angle.type = this.minBonds[angle.data[3]].type + this.minBonds[angle.data[4]].type;
 if (this.checkRings (this.vRings[0], angle.data, 3)) {
 angle.type += (angle.type == 0 ? 3 : 4);
@@ -558,29 +583,29 @@ angle.sbType += this.minBonds[angle.data[4]].type;
 break;
 }
 return angle.type;
-}, $fz.isPrivate = true, $fz), "J.minimize.MinAngle");
-$_M(c$, "setTorsionType", 
-($fz = function (t) {
+}, "J.minimize.MinAngle");
+Clazz.defineMethod (c$, "setTorsionType", 
+ function (t) {
 if (this.checkRings (this.vRings[1], t.data, 4)) return (t.type = 4);
 t.type = (this.minBonds[t.data[5]].type == 1 ? 1 : this.minBonds[t.data[4]].type == 0 && this.minBonds[t.data[6]].type == 0 ? 0 : 2);
 if (t.type == 0 && this.checkRings (this.vRings[2], t.data, 4)) {
 t.type = 5;
 }return t.type;
-}, $fz.isPrivate = true, $fz), "J.minimize.MinTorsion");
-$_M(c$, "typeOf", 
-($fz = function (iAtom) {
+}, "J.minimize.MinTorsion");
+Clazz.defineMethod (c$, "typeOf", 
+ function (iAtom) {
 return this.minAtoms[iAtom].ffType;
-}, $fz.isPrivate = true, $fz), "~N");
-$_M(c$, "checkRings", 
-($fz = function (v, minlist, n) {
+}, "~N");
+Clazz.defineMethod (c$, "checkRings", 
+ function (v, minlist, n) {
 if (v != null) for (var i = v.size (); --i >= 0; ) {
 var bs = v.get (i);
-if (bs.get (this.minAtoms[minlist[0]].atom.index) && bs.get (this.minAtoms[minlist[1]].atom.index) && (n < 3 || bs.get (this.minAtoms[minlist[2]].atom.index)) && (n < 4 || bs.get (this.minAtoms[minlist[3]].atom.index))) return true;
+if (bs.get (this.minAtoms[minlist[0]].atom.i) && bs.get (this.minAtoms[minlist[1]].atom.i) && (n < 3 || bs.get (this.minAtoms[minlist[2]].atom.i)) && (n < 4 || bs.get (this.minAtoms[minlist[3]].atom.i))) return true;
 }
 return false;
-}, $fz.isPrivate = true, $fz), "J.util.JmolList,~A,~N");
-$_M(c$, "getKey", 
-($fz = function (obj, type, ktype) {
+}, "JU.List,~A,~N");
+Clazz.defineMethod (c$, "getKey", 
+ function (obj, type, ktype) {
 var o = (Clazz.instanceOf (obj, J.minimize.MinObject) ? obj : null);
 var data = (o == null ? obj : o.data);
 var n = 4;
@@ -683,13 +708,13 @@ case 5:
 return (ddata != null && ddata[0] != 0 ? key : this.applyEmpiricalRules (o, ddata, 5));
 }
 return key;
-}, $fz.isPrivate = true, $fz), "~O,~N,~N");
-$_M(c$, "getTorsionKey", 
-($fz = function (type, i, j) {
+}, "~O,~N,~N");
+Clazz.defineMethod (c$, "getTorsionKey", 
+ function (type, i, j) {
 return J.minimize.MinObject.getKey (type, J.minimize.forcefield.ForceFieldMMFF.getEquivalentType (this.typeData[0], i), this.typeData[1], this.typeData[2], J.minimize.forcefield.ForceFieldMMFF.getEquivalentType (this.typeData[3], j));
-}, $fz.isPrivate = true, $fz), "~N,~N,~N");
-$_M(c$, "applyEmpiricalRules", 
-($fz = function (o, ddata, ktype) {
+}, "~N,~N,~N");
+Clazz.defineMethod (c$, "applyEmpiricalRules", 
+ function (o, ddata, ktype) {
 var rr;
 var rr2;
 var beta = 0;
@@ -863,52 +888,52 @@ return Integer.$valueOf (-1);
 default:
 return null;
 }
-}, $fz.isPrivate = true, $fz), "J.minimize.MinObject,~A,~N");
-c$.getR0 = $_M(c$, "getR0", 
-($fz = function (b) {
+}, "J.minimize.MinObject,~A,~N");
+c$.getR0 = Clazz.defineMethod (c$, "getR0", 
+ function (b) {
 return (b.ddata == null ? (J.minimize.forcefield.ForceFieldMMFF.ffParams.get (b.key)) : b.ddata)[1];
-}, $fz.isPrivate = true, $fz), "J.minimize.MinBond");
-$_M(c$, "getRowFor", 
-($fz = function (i) {
+}, "J.minimize.MinBond");
+Clazz.defineMethod (c$, "getRowFor", 
+ function (i) {
 var elemno = this.minAtoms[i].atom.getElementNumber ();
 return (elemno < 3 ? 0 : elemno < 11 ? 1 : elemno < 19 ? 2 : elemno < 37 ? 3 : 4);
-}, $fz.isPrivate = true, $fz), "~N");
-$_M(c$, "getOutOfPlaneParameter", 
+}, "~N");
+Clazz.defineMethod (c$, "getOutOfPlaneParameter", 
 function (data) {
 var ddata = J.minimize.forcefield.ForceFieldMMFF.ffParams.get (this.getKey (data, 6, 13));
 return (ddata == null ? 0 : ddata[0]);
 }, "~A");
-c$.sortOop = $_M(c$, "sortOop", 
-($fz = function (typeData) {
+c$.sortOop = Clazz.defineMethod (c$, "sortOop", 
+ function (typeData) {
 J.minimize.forcefield.ForceFieldMMFF.fixTypeOrder (typeData, 0, 2);
 J.minimize.forcefield.ForceFieldMMFF.fixTypeOrder (typeData, 0, 3);
 J.minimize.forcefield.ForceFieldMMFF.fixTypeOrder (typeData, 2, 3);
-}, $fz.isPrivate = true, $fz), "~A");
-c$.fixTypeOrder = $_M(c$, "fixTypeOrder", 
-($fz = function (a, i, j) {
+}, "~A");
+c$.fixTypeOrder = Clazz.defineMethod (c$, "fixTypeOrder", 
+ function (a, i, j) {
 if (a[i] > a[j]) {
 J.minimize.forcefield.ForceFieldMMFF.swap (a, i, j);
 return true;
 }return false;
-}, $fz.isPrivate = true, $fz), "~A,~N,~N");
-$_M(c$, "fixOrder", 
-($fz = function (a, i, j) {
+}, "~A,~N,~N");
+Clazz.defineMethod (c$, "fixOrder", 
+ function (a, i, j) {
 var test = this.typeOf (a[j]) - this.typeOf (a[i]);
 if (test < 0) J.minimize.forcefield.ForceFieldMMFF.swap (a, i, j);
 return (test < 0 ? -1 : test > 0 ? 1 : 0);
-}, $fz.isPrivate = true, $fz), "~A,~N,~N");
-c$.swap = $_M(c$, "swap", 
-($fz = function (a, i, j) {
+}, "~A,~N,~N");
+c$.swap = Clazz.defineMethod (c$, "swap", 
+ function (a, i, j) {
 var t = a[i];
 a[i] = a[j];
 a[j] = t;
-}, $fz.isPrivate = true, $fz), "~A,~N,~N");
-c$.getEquivalentType = $_M(c$, "getEquivalentType", 
-($fz = function (type, level) {
+}, "~A,~N,~N");
+c$.getEquivalentType = Clazz.defineMethod (c$, "getEquivalentType", 
+ function (type, level) {
 return (type == 0 ? 0 : type == 70 || type > 82 ? type : level == 2 ? 0 : J.minimize.forcefield.ForceFieldMMFF.equivalentTypes[((type - 1) << 1) + level]);
-}, $fz.isPrivate = true, $fz), "~N,~N");
-c$.getZParam = $_M(c$, "getZParam", 
-($fz = function (elemno) {
+}, "~N,~N");
+c$.getZParam = Clazz.defineMethod (c$, "getZParam", 
+ function (elemno) {
 switch (elemno) {
 case 1:
 return 1.395;
@@ -934,9 +959,9 @@ case 53:
 return 3.086;
 }
 return 0.0;
-}, $fz.isPrivate = true, $fz), "~N");
-c$.getCParam = $_M(c$, "getCParam", 
-($fz = function (elemno) {
+}, "~N");
+c$.getCParam = Clazz.defineMethod (c$, "getCParam", 
+ function (elemno) {
 switch (elemno) {
 case 5:
 return 0.704;
@@ -958,9 +983,9 @@ case 33:
 return 0.825;
 }
 return 0.0;
-}, $fz.isPrivate = true, $fz), "~N");
-c$.getUParam = $_M(c$, "getUParam", 
-($fz = function (elemno) {
+}, "~N");
+c$.getUParam = Clazz.defineMethod (c$, "getUParam", 
+ function (elemno) {
 switch (elemno) {
 case 6:
 case 7:
@@ -972,9 +997,9 @@ case 16:
 return 1.25;
 }
 return 0.0;
-}, $fz.isPrivate = true, $fz), "~N");
-c$.getVParam = $_M(c$, "getVParam", 
-($fz = function (elemno) {
+}, "~N");
+c$.getVParam = Clazz.defineMethod (c$, "getVParam", 
+ function (elemno) {
 switch (elemno) {
 case 6:
 return 2.12;
@@ -990,9 +1015,9 @@ case 16:
 return 0.49;
 }
 return 0.0;
-}, $fz.isPrivate = true, $fz), "~N");
-c$.getCovalentRadius = $_M(c$, "getCovalentRadius", 
-($fz = function (elemno) {
+}, "~N");
+c$.getCovalentRadius = Clazz.defineMethod (c$, "getCovalentRadius", 
+ function (elemno) {
 switch (elemno) {
 case 1:
 return 0.33;
@@ -1043,11 +1068,11 @@ return 1.53;
 case 83:
 return 1.55;
 default:
-return J.util.Elements.getBondingRadiusFloat (elemno, 0);
+return JW.Elements.getBondingRadius (elemno, 0);
 }
-}, $fz.isPrivate = true, $fz), "~N");
-c$.getRuleBondLength = $_M(c$, "getRuleBondLength", 
-($fz = function (a, b, boAB, isAromatic) {
+}, "~N");
+c$.getRuleBondLength = Clazz.defineMethod (c$, "getRuleBondLength", 
+ function (a, b, boAB, isAromatic) {
 switch (boAB) {
 case 1:
 case 2:
@@ -1062,8 +1087,8 @@ var elemnoA = a.atom.getElementNumber ();
 var elemnoB = b.atom.getElementNumber ();
 var r0a = J.minimize.forcefield.ForceFieldMMFF.getCovalentRadius (elemnoA);
 var r0b = J.minimize.forcefield.ForceFieldMMFF.getCovalentRadius (elemnoB);
-var Xa = J.util.Elements.getAllredRochowElectroNeg (elemnoA);
-var Xb = J.util.Elements.getAllredRochowElectroNeg (elemnoB);
+var Xa = JW.Elements.getAllredRochowElectroNeg (elemnoA);
+var Xb = JW.Elements.getAllredRochowElectroNeg (elemnoB);
 var c = (elemnoA == 1 || elemnoB == 1 ? 0.05 : 0.085);
 var n = 1.4;
 var r = r0a + r0b;
@@ -1077,7 +1102,6 @@ case 0x21:
 boAB = 5;
 break;
 }
-var red = 0;
 switch (boAB) {
 case 1:
 switch (a.ffAtomType.mltb) {
@@ -1085,10 +1109,8 @@ case 0:
 break;
 case 1:
 case 2:
-red += J.minimize.forcefield.ForceFieldMMFF.r0reductions[1];
 break;
 case 3:
-red += J.minimize.forcefield.ForceFieldMMFF.r0reductions[0];
 break;
 }
 switch (b.ffAtomType.mltb) {
@@ -1096,20 +1118,17 @@ case 0:
 break;
 case 1:
 case 2:
-red += J.minimize.forcefield.ForceFieldMMFF.r0reductions[1];
 break;
 case 3:
-red += J.minimize.forcefield.ForceFieldMMFF.r0reductions[0];
 break;
 }
 break;
 default:
-red += 2 * J.minimize.forcefield.ForceFieldMMFF.r0reductions[boAB];
 break;
 }
 r -= c * Math.pow (Math.abs (Xa - Xb), n);
 return r;
-}, $fz.isPrivate = true, $fz), "J.minimize.MinAtom,J.minimize.MinAtom,~N,~B");
+}, "J.minimize.MinAtom,J.minimize.MinAtom,~N,~B");
 Clazz.defineStatics (c$,
 "A4_VDW", 122,
 "A4_BNDK", 123,
@@ -1133,7 +1152,8 @@ Clazz.defineStatics (c$,
 "TYPE_OOP", 0xD,
 "atomTypes", null,
 "ffParams", null,
+"names", "END.BCI.CHG.ANG.NDK.OND.OOP.TBN.FSB.TOR.VDW.",
+"types", [0, 1, 34, 5, 546, 3, 13, 21, 37, 9, 17],
 "sbMap", [0, 1, 3, 5, 4, 6, 8, 9, 11],
-"equivalentTypes", [1, 1, 2, 1, 3, 1, 4, 1, 5, 5, 6, 6, 7, 6, 8, 8, 9, 8, 10, 8, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 15, 17, 15, 18, 15, 19, 19, 1, 1, 21, 5, 22, 1, 23, 5, 24, 5, 25, 25, 26, 25, 28, 5, 28, 5, 29, 5, 2, 1, 31, 31, 7, 6, 21, 5, 8, 8, 6, 6, 36, 5, 2, 1, 9, 8, 10, 8, 10, 8, 3, 1, 42, 8, 10, 8, 16, 15, 10, 8, 9, 8, 42, 8, 9, 8, 6, 6, 21, 5, 7, 6, 21, 5, 42, 8, 9, 8, 10, 8, 10, 8, 2, 1, 10, 8, 6, 6, 4, 1, 42, 8, 10, 8, 2, 1, 2, 1, 9, 8, 9, 8, 9, 8, 8, 8, 9, 8, 70, 70, 5, 5, 16, 15, 18, 15, 17, 15, 26, 25, 9, 8, 12, 12, 2, 1, 9, 8, 2, 1, 10, 8, 9, 8],
-"r0reductions", [0.08, 0.03, 0.10, 0.17, 0.075, 0.04]);
+"equivalentTypes", [1, 1, 2, 1, 3, 1, 4, 1, 5, 5, 6, 6, 7, 6, 8, 8, 9, 8, 10, 8, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 15, 17, 15, 18, 15, 19, 19, 1, 1, 21, 5, 22, 1, 23, 5, 24, 5, 25, 25, 26, 25, 28, 5, 28, 5, 29, 5, 2, 1, 31, 31, 7, 6, 21, 5, 8, 8, 6, 6, 36, 5, 2, 1, 9, 8, 10, 8, 10, 8, 3, 1, 42, 8, 10, 8, 16, 15, 10, 8, 9, 8, 42, 8, 9, 8, 6, 6, 21, 5, 7, 6, 21, 5, 42, 8, 9, 8, 10, 8, 10, 8, 2, 1, 10, 8, 6, 6, 4, 1, 42, 8, 10, 8, 2, 1, 2, 1, 9, 8, 9, 8, 9, 8, 8, 8, 9, 8, 70, 70, 5, 5, 16, 15, 18, 15, 17, 15, 26, 25, 9, 8, 12, 12, 2, 1, 9, 8, 2, 1, 10, 8, 9, 8]);
 });

@@ -737,6 +737,33 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	
 	
 	
+	/*-------------------------------------
+	 citing.php
+	 ------------------------------------*/
+	#citing {
+		margin-top: 5%;
+	}
+
+
+	#bibtex {
+		background: rgba(255, 255, 255, 0.4);
+		padding: 10px;
+		font-size: smaller;
+		font-family: monospace, sans-serif;
+	}
+
+	/*-------------------------------------
+	 imprint.php
+	 ------------------------------------*/
+	#imprint {
+		margin-top: 5%;
+	}
+
+
+	#imprinttext {
+		background: rgba(255, 255, 255, 0.4);
+		padding: 10px;
+	}
 	
 	
 	/*----------------------------------------

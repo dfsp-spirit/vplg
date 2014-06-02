@@ -4,17 +4,19 @@ c$ = Clazz.decorateAsClass (function () {
 this.eval = null;
 this.message = null;
 this.untranslated = null;
+this.isError = false;
 Clazz.instantialize (this, arguments);
 }, J.script, "ScriptException", Exception);
 Clazz.makeConstructor (c$, 
-function (scriptEvaluator, msg, untranslated, isError) {
+function (se, msg, untranslated, isError) {
 Clazz.superConstructor (this, J.script.ScriptException, []);
-this.eval = scriptEvaluator;
+this.eval = se;
 this.message = msg;
+this.isError = isError;
 if (!isError) return;
 this.eval.setException (this, msg, untranslated);
-}, "J.api.JmolScriptEvaluator,~S,~S,~B");
-$_M(c$, "getErrorMessageUntranslated", 
+}, "J.script.ScriptError,~S,~S,~B");
+Clazz.defineMethod (c$, "getErrorMessageUntranslated", 
 function () {
 return this.untranslated;
 });

@@ -1,7 +1,7 @@
 Clazz.declarePackage ("JZ");
 Clazz.load (["JZ.ZStream"], "JZ.Inflater", ["JZ.Inflate"], function () {
 c$ = Clazz.declareType (JZ, "Inflater", JZ.ZStream);
-$_M(c$, "init", 
+Clazz.defineMethod (c$, "init", 
 function (w, nowrap) {
 this.setAdler32 ();
 if (w == 0) w = 15;
@@ -21,17 +21,17 @@ if (this.istate == null) return -2;
 var ret = this.istate.inflateEnd ();
 return ret;
 });
-$_M(c$, "sync", 
+Clazz.defineMethod (c$, "sync", 
 function () {
 if (this.istate == null) return -2;
 return this.istate.inflateSync ();
 });
-$_M(c$, "syncPoint", 
+Clazz.defineMethod (c$, "syncPoint", 
 function () {
 if (this.istate == null) return -2;
 return this.istate.inflateSyncPoint ();
 });
-$_M(c$, "setDictionary", 
+Clazz.defineMethod (c$, "setDictionary", 
 function (dictionary, dictLength) {
 if (this.istate == null) return -2;
 return this.istate.inflateSetDictionary (dictionary, dictLength);
@@ -40,7 +40,7 @@ Clazz.overrideMethod (c$, "finished",
 function () {
 return this.istate.mode == 12;
 });
-$_M(c$, "reset", 
+Clazz.defineMethod (c$, "reset", 
 function () {
 this.avail_in = 0;
 if (this.istate != null) this.istate.reset ();

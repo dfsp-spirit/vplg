@@ -23,11 +23,11 @@ Clazz.instantialize (this, arguments);
 Clazz.prepareFields (c$, function () {
 this.crcbuf =  Clazz.newByteArray (4, 0);
 });
-$_M(c$, "reset", 
+Clazz.defineMethod (c$, "reset", 
 function () {
 this.inflateReset ();
 });
-$_M(c$, "inflateReset", 
+Clazz.defineMethod (c$, "inflateReset", 
 function () {
 if (this.z == null) return -2;
 this.z.total_in = this.z.total_out = 0;
@@ -37,7 +37,7 @@ this.need_bytes = -1;
 this.blocks.reset ();
 return 0;
 });
-$_M(c$, "inflateEnd", 
+Clazz.defineMethod (c$, "inflateEnd", 
 function () {
 if (this.blocks != null) {
 this.blocks.free ();
@@ -47,7 +47,7 @@ Clazz.makeConstructor (c$,
 function (z) {
 this.z = z;
 }, "JZ.ZStream");
-$_M(c$, "inflateInit", 
+Clazz.defineMethod (c$, "inflateInit", 
 function (w) {
 this.z.msg = null;
 this.blocks = null;
@@ -68,7 +68,7 @@ this.blocks =  new JZ.InfBlocks (this.z, 1 << w);
 this.inflateReset ();
 return 0;
 }, "~N");
-$_M(c$, "inflate", 
+Clazz.defineMethod (c$, "inflate", 
 function (f) {
 var r;
 var b;
@@ -387,7 +387,7 @@ return -2;
 }
 }
 }, "~N");
-$_M(c$, "inflateSetDictionary", 
+Clazz.defineMethod (c$, "inflateSetDictionary", 
 function (dictionary, dictLength) {
 if (this.z == null || (this.mode != 6 && this.wrap != 0)) {
 return -2;
@@ -407,7 +407,7 @@ index = dictLength - length;
 this.mode = 7;
 return 0;
 }, "~A,~N");
-$_M(c$, "inflateSync", 
+Clazz.defineMethod (c$, "inflateSync", 
 function () {
 var n;
 var p;
@@ -445,13 +445,13 @@ this.z.total_out = w;
 this.mode = 7;
 return 0;
 });
-$_M(c$, "inflateSyncPoint", 
+Clazz.defineMethod (c$, "inflateSyncPoint", 
 function () {
 if (this.z == null || this.blocks == null) return -2;
 return this.blocks.sync_point ();
 });
-$_M(c$, "readBytes", 
-($fz = function (n, r, f) {
+Clazz.defineMethod (c$, "readBytes", 
+ function (n, r, f) {
 if (this.need_bytes == -1) {
 this.need_bytes = n;
 this.need = 0;
@@ -470,9 +470,9 @@ this.need &= 0xffff;
 this.need &= 0xffffffff;
 }this.need_bytes = -1;
 return r;
-}, $fz.isPrivate = true, $fz), "~N,~N,~N");
-$_M(c$, "readString", 
-($fz = function (r, f) {
+}, "~N,~N,~N");
+Clazz.defineMethod (c$, "readString", 
+ function (r, f) {
 if (this.tmp_string == null) {
 this.tmp_string =  new java.io.ByteArrayOutputStream ();
 }var b = 0;
@@ -488,9 +488,9 @@ this.z.checksum.update (this.z.next_in, this.z.next_in_index, 1);
 this.z.next_in_index++;
 } while (b != 0);
 return r;
-}, $fz.isPrivate = true, $fz), "~N,~N");
-$_M(c$, "readBytes", 
-($fz = function (r, f) {
+}, "~N,~N");
+Clazz.defineMethod (c$, "readBytes", 
+ function (r, f) {
 if (this.tmp_string == null) {
 this.tmp_string =  new java.io.ByteArrayOutputStream ();
 }while (this.need > 0) {
@@ -505,20 +505,20 @@ this.z.next_in_index++;
 this.need--;
 }
 return r;
-}, $fz.isPrivate = true, $fz), "~N,~N");
-$_M(c$, "checksum", 
-($fz = function (n, v) {
+}, "~N,~N");
+Clazz.defineMethod (c$, "checksum", 
+ function (n, v) {
 for (var i = 0; i < n; i++) {
 this.crcbuf[i] = (v & 0xff);
 v >>= 8;
 }
 this.z.checksum.update (this.crcbuf, 0, n);
-}, $fz.isPrivate = true, $fz), "~N,~N");
-$_M(c$, "getGZIPHeader", 
+}, "~N,~N");
+Clazz.defineMethod (c$, "getGZIPHeader", 
 function () {
 return this.gheader;
 });
-$_M(c$, "inParsingHeader", 
+Clazz.defineMethod (c$, "inParsingHeader", 
 function () {
 switch (this.mode) {
 case 14:
@@ -540,7 +540,7 @@ return false;
 }
 });
 c$.$Inflate$Return$ = function () {
-Clazz.pu$h ();
+Clazz.pu$h(self.c$);
 c$ = Clazz.decorateAsClass (function () {
 Clazz.prepareCallback (this, arguments);
 this.r = 0;

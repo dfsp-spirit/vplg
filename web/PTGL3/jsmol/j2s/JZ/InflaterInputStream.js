@@ -33,7 +33,7 @@ Clazz.overrideMethod (c$, "read",
 function (b, off, len) {
 return this.readInf (b, off, len);
 }, "~A,~N,~N");
-$_M(c$, "readInf", 
+Clazz.defineMethod (c$, "readInf", 
 function (b, off, len) {
 if (this.closed) {
 throw  new java.io.IOException ("Stream closed");
@@ -99,7 +99,7 @@ if (this.myinflater) this.inflater.end ();
 if (this.close_in) this.$in.close ();
 this.closed = true;
 }});
-$_M(c$, "fill", 
+Clazz.defineMethod (c$, "fill", 
 function () {
 if (this.closed) {
 throw  new java.io.IOException ("Stream closed");
@@ -125,22 +125,22 @@ Clazz.overrideMethod (c$, "reset",
 function () {
 throw  new java.io.IOException ("mark/reset not supported");
 });
-$_M(c$, "getTotalIn", 
+Clazz.defineMethod (c$, "getTotalIn", 
 function () {
 return this.inflater.getTotalIn ();
 });
-$_M(c$, "getTotalOut", 
+Clazz.defineMethod (c$, "getTotalOut", 
 function () {
 return this.inflater.getTotalOut ();
 });
-$_M(c$, "getAvailIn", 
+Clazz.defineMethod (c$, "getAvailIn", 
 function () {
 if (this.inflater.avail_in <= 0) return null;
 var tmp =  Clazz.newByteArray (this.inflater.avail_in, 0);
 System.arraycopy (this.inflater.next_in, this.inflater.next_in_index, tmp, 0, this.inflater.avail_in);
 return tmp;
 });
-$_M(c$, "readHeader", 
+Clazz.defineMethod (c$, "readHeader", 
 function () {
 var empty = "".getBytes ();
 this.inflater.setInput (empty, 0, 0, false);
@@ -157,7 +157,7 @@ err = this.inflater.inflate (0);
 if (err != 0) throw  new java.io.IOException (this.inflater.msg);
 } while (this.inflater.istate.inParsingHeader ());
 });
-$_M(c$, "getInflater", 
+Clazz.defineMethod (c$, "getInflater", 
 function () {
 return this.inflater;
 });

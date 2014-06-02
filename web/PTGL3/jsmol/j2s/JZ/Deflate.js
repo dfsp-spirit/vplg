@@ -76,19 +76,19 @@ this.dyn_ltree =  Clazz.newShortArray (1146, 0);
 this.dyn_dtree =  Clazz.newShortArray (122, 0);
 this.bl_tree =  Clazz.newShortArray (78, 0);
 }, "JZ.ZStream");
-$_M(c$, "deflateInit", 
+Clazz.defineMethod (c$, "deflateInit", 
 function (level) {
 return this.deflateInit2 (level, 15);
 }, "~N");
-$_M(c$, "deflateInit2", 
+Clazz.defineMethod (c$, "deflateInit2", 
 function (level, bits) {
 return this.deflateInit5 (level, 8, bits, 8, 0);
 }, "~N,~N");
-$_M(c$, "deflateInit3", 
+Clazz.defineMethod (c$, "deflateInit3", 
 function (level, bits, memlevel) {
 return this.deflateInit5 (level, 8, bits, memlevel, 0);
 }, "~N,~N,~N");
-$_M(c$, "lm_init", 
+Clazz.defineMethod (c$, "lm_init", 
 function () {
 this.window_size = 2 * this.w_size;
 this.head[this.hash_size - 1] = 0;
@@ -106,7 +106,7 @@ this.match_length = this.prev_length = 2;
 this.match_available = 0;
 this.ins_h = 0;
 });
-$_M(c$, "tr_init", 
+Clazz.defineMethod (c$, "tr_init", 
 function () {
 this.l_desc.dyn_tree = this.dyn_ltree;
 this.l_desc.stat_desc = JZ.StaticTree.static_l_desc;
@@ -119,7 +119,7 @@ this.bi_valid = 0;
 this.last_eob_len = 8;
 this.init_block ();
 });
-$_M(c$, "init_block", 
+Clazz.defineMethod (c$, "init_block", 
 function () {
 for (var i = 0; i < 286; i++) this.dyn_ltree[i * 2] = 0;
 
@@ -131,7 +131,7 @@ this.dyn_ltree[512] = 1;
 this.opt_len = this.static_len = 0;
 this.last_lit = this.matches = 0;
 });
-$_M(c$, "pqdownheap", 
+Clazz.defineMethod (c$, "pqdownheap", 
 function (tree, k) {
 var v = this.heap[k];
 var j = k << 1;
@@ -145,13 +145,13 @@ j <<= 1;
 }
 this.heap[k] = v;
 }, "~A,~N");
-c$.smaller = $_M(c$, "smaller", 
+c$.smaller = Clazz.defineMethod (c$, "smaller", 
 function (tree, n, m, depth) {
 var tn2 = tree[n * 2];
 var tm2 = tree[m * 2];
 return (tn2 < tm2 || (tn2 == tm2 && depth[n] <= depth[m]));
 }, "~A,~N,~N,~A");
-$_M(c$, "scan_tree", 
+Clazz.defineMethod (c$, "scan_tree", 
 function (tree, max_code) {
 var n;
 var prevlen = -1;
@@ -191,7 +191,7 @@ max_count = 7;
 min_count = 4;
 }}
 }, "~A,~N");
-$_M(c$, "build_bl_tree", 
+Clazz.defineMethod (c$, "build_bl_tree", 
 function () {
 var max_blindex;
 this.scan_tree (this.dyn_ltree, this.l_desc.max_code);
@@ -203,7 +203,7 @@ if (this.bl_tree[JZ.Tree.bl_order[max_blindex] * 2 + 1] != 0) break;
 this.opt_len += 3 * (max_blindex + 1) + 5 + 5 + 4;
 return max_blindex;
 });
-$_M(c$, "send_all_trees", 
+Clazz.defineMethod (c$, "send_all_trees", 
 function (lcodes, dcodes, blcodes) {
 var rank;
 this.send_bits (lcodes - 257, 5);
@@ -215,7 +215,7 @@ this.send_bits (this.bl_tree[JZ.Tree.bl_order[rank] * 2 + 1], 3);
 this.send_tree (this.dyn_ltree, lcodes - 1);
 this.send_tree (this.dyn_dtree, dcodes - 1);
 }, "~N,~N,~N");
-$_M(c$, "send_tree", 
+Clazz.defineMethod (c$, "send_tree", 
 function (tree, max_code) {
 var n;
 var prevlen = -1;
@@ -261,32 +261,32 @@ max_count = 7;
 min_count = 4;
 }}
 }, "~A,~N");
-$_M(c$, "put_byte", 
+Clazz.defineMethod (c$, "put_byte", 
 function (p, start, len) {
 System.arraycopy (p, start, this.pending_buf, this.pending, len);
 this.pending += len;
 }, "~A,~N,~N");
-$_M(c$, "put_byteB", 
+Clazz.defineMethod (c$, "put_byteB", 
 function (c) {
 {
 this.pending_buf[this.pending++] = c&0xff;
 }}, "~N");
-$_M(c$, "put_short", 
+Clazz.defineMethod (c$, "put_short", 
 function (w) {
 this.put_byteB ((w));
 this.put_byteB ((w >>> 8));
 }, "~N");
-$_M(c$, "putShortMSB", 
+Clazz.defineMethod (c$, "putShortMSB", 
 function (b) {
 this.put_byteB ((b >> 8));
 this.put_byteB ((b));
 }, "~N");
-$_M(c$, "send_code", 
+Clazz.defineMethod (c$, "send_code", 
 function (c, tree) {
 var c2 = c * 2;
 this.send_bits ((tree[c2] & 0xffff), (tree[c2 + 1] & 0xffff));
 }, "~N,~A");
-$_M(c$, "send_bits", 
+Clazz.defineMethod (c$, "send_bits", 
 function (value, length) {
 var len = length;
 if (this.bi_valid > 16 - len) {
@@ -299,7 +299,7 @@ this.bi_valid += len - 16;
 this.bi_buf |= (((value) << this.bi_valid) & 0xffff);
 this.bi_valid += len;
 }}, "~N,~N");
-$_M(c$, "_tr_align", 
+Clazz.defineMethod (c$, "_tr_align", 
 function () {
 this.send_bits (2, 3);
 this.send_code (256, JZ.StaticTree.static_ltree);
@@ -310,7 +310,7 @@ this.send_code (256, JZ.StaticTree.static_ltree);
 this.bi_flush ();
 }this.last_eob_len = 7;
 });
-$_M(c$, "_tr_tally", 
+Clazz.defineMethod (c$, "_tr_tally", 
 function (dist, lc) {
 this.pending_buf[this.d_buf + this.last_lit * 2] = (dist >>> 8);
 this.pending_buf[this.d_buf + this.last_lit * 2 + 1] = dist;
@@ -334,7 +334,7 @@ out_length >>>= 3;
 if ((this.matches < (Clazz.doubleToInt (this.last_lit / 2))) && out_length < Clazz.doubleToInt (in_length / 2)) return true;
 }return (this.last_lit == this.lit_bufsize - 1);
 }, "~N,~N");
-$_M(c$, "compress_block", 
+Clazz.defineMethod (c$, "compress_block", 
 function (ltree, dtree) {
 var dist;
 var lc;
@@ -366,7 +366,7 @@ this.send_bits (dist, extra);
 }this.send_code (256, ltree);
 this.last_eob_len = ltree[513];
 }, "~A,~A");
-$_M(c$, "set_data_type", 
+Clazz.defineMethod (c$, "set_data_type", 
 function () {
 var n = 0;
 var ascii_freq = 0;
@@ -385,7 +385,7 @@ n++;
 }
 this.data_type = (bin_freq > (ascii_freq >>> 2) ? 0 : 1);
 });
-$_M(c$, "bi_flush", 
+Clazz.defineMethod (c$, "bi_flush", 
 function () {
 if (this.bi_valid == 16) {
 this.put_short (this.bi_buf);
@@ -396,7 +396,7 @@ this.put_byteB (this.bi_buf);
 this.bi_buf >>>= 8;
 this.bi_valid -= 8;
 }});
-$_M(c$, "bi_windup", 
+Clazz.defineMethod (c$, "bi_windup", 
 function () {
 if (this.bi_valid > 8) {
 this.put_short (this.bi_buf);
@@ -405,7 +405,7 @@ this.put_byteB (this.bi_buf);
 }this.bi_buf = 0;
 this.bi_valid = 0;
 });
-$_M(c$, "copy_block", 
+Clazz.defineMethod (c$, "copy_block", 
 function (buf, len, header) {
 this.bi_windup ();
 this.last_eob_len = 8;
@@ -414,13 +414,13 @@ this.put_short (len);
 this.put_short (~len);
 }this.put_byte (this.window, buf, len);
 }, "~N,~N,~B");
-$_M(c$, "flush_block_only", 
+Clazz.defineMethod (c$, "flush_block_only", 
 function (eof) {
 this._tr_flush_block (this.block_start >= 0 ? this.block_start : -1, this.strstart - this.block_start, eof);
 this.block_start = this.strstart;
 this.strm.flush_pending ();
 }, "~B");
-$_M(c$, "deflate_stored", 
+Clazz.defineMethod (c$, "deflate_stored", 
 function (flush) {
 var max_block_size = 0xffff;
 var max_start;
@@ -447,12 +447,12 @@ this.flush_block_only (flush == 4);
 if (this.strm.avail_out == 0) return (flush == 4) ? 2 : 0;
 return flush == 4 ? 3 : 1;
 }, "~N");
-$_M(c$, "_tr_stored_block", 
+Clazz.defineMethod (c$, "_tr_stored_block", 
 function (buf, stored_len, eof) {
 this.send_bits ((0) + (eof ? 1 : 0), 3);
 this.copy_block (buf, stored_len, true);
 }, "~N,~N,~B");
-$_M(c$, "_tr_flush_block", 
+Clazz.defineMethod (c$, "_tr_flush_block", 
 function (buf, stored_len, eof) {
 var opt_lenb;
 var static_lenb;
@@ -480,7 +480,7 @@ this.compress_block (this.dyn_ltree, this.dyn_dtree);
 if (eof) {
 this.bi_windup ();
 }}, "~N,~N,~B");
-$_M(c$, "fill_window", 
+Clazz.defineMethod (c$, "fill_window", 
 function () {
 var n;
 var m;
@@ -518,7 +518,7 @@ this.ins_h = this.window[this.strstart] & 0xff;
 this.ins_h = (((this.ins_h) << this.hash_shift) ^ (this.window[this.strstart + 1] & 0xff)) & this.hash_mask;
 }} while (this.lookahead < 262 && this.strm.avail_in != 0);
 });
-$_M(c$, "deflate_fast", 
+Clazz.defineMethod (c$, "deflate_fast", 
 function (flush) {
 var hash_head = 0;
 var bflush;
@@ -568,7 +568,7 @@ if (flush == 4) return 2;
 return 0;
 }return flush == 4 ? 3 : 1;
 }, "~N");
-$_M(c$, "deflate_slow", 
+Clazz.defineMethod (c$, "deflate_slow", 
 function (flush) {
 var hash_head = 0;
 var bflush;
@@ -630,7 +630,7 @@ if (flush == 4) return 2;
 return 0;
 }return flush == 4 ? 3 : 1;
 }, "~N");
-$_M(c$, "longest_match", 
+Clazz.defineMethod (c$, "longest_match", 
 function (cur_match) {
 var chain_length = this.max_chain_length;
 var scan = this.strstart;
@@ -665,8 +665,8 @@ scan_end = this.window[scan + best_len];
 if (best_len <= this.lookahead) return best_len;
 return this.lookahead;
 }, "~N");
-$_M(c$, "deflateInit5", 
-($fz = function (level, method, windowBits, memLevel, strategy) {
+Clazz.defineMethod (c$, "deflateInit5", 
+ function (level, method, windowBits, memLevel, strategy) {
 var wrap = 1;
 this.strm.msg = null;
 if (level == -1) level = 6;
@@ -700,8 +700,8 @@ this.level = level;
 this.strategy = strategy;
 this.method = method;
 return this.deflateReset ();
-}, $fz.isPrivate = true, $fz), "~N,~N,~N,~N,~N");
-$_M(c$, "deflateReset", 
+}, "~N,~N,~N,~N,~N");
+Clazz.defineMethod (c$, "deflateReset", 
 function () {
 this.strm.total_in = this.strm.total_out = 0;
 this.strm.msg = null;
@@ -717,7 +717,7 @@ this.tr_init ();
 this.lm_init ();
 return 0;
 });
-$_M(c$, "deflateEnd", 
+Clazz.defineMethod (c$, "deflateEnd", 
 function () {
 if (this.status != 42 && this.status != 113 && this.status != 666) {
 return -2;
@@ -727,7 +727,7 @@ this.prev = null;
 this.window = null;
 return this.status == 113 ? -3 : 0;
 });
-$_M(c$, "deflateParams", 
+Clazz.defineMethod (c$, "deflateParams", 
 function (_level, _strategy) {
 var err = 0;
 if (_level == -1) {
@@ -745,7 +745,7 @@ this.max_chain_length = JZ.Deflate.config_table[this.level].max_chain;
 }this.strategy = _strategy;
 return err;
 }, "~N,~N");
-$_M(c$, "deflateSetDictionary", 
+Clazz.defineMethod (c$, "deflateSetDictionary", 
 function (dictionary, dictLength) {
 var length = dictLength;
 var index = 0;
@@ -767,7 +767,7 @@ this.head[this.ins_h] = n;
 }
 return 0;
 }, "~A,~N");
-$_M(c$, "deflate", 
+Clazz.defineMethod (c$, "deflate", 
 function (flush) {
 var old_flush;
 if (flush > 4 || flush < 0) {
@@ -863,21 +863,21 @@ this.putShortMSB ((adler & 0xffff));
 if (this.wrap > 0) this.wrap = -this.wrap;
 return this.pending != 0 ? 0 : 1;
 }, "~N");
-$_M(c$, "getGZIPHeader", 
+Clazz.defineMethod (c$, "getGZIPHeader", 
 function () {
 if (this.gheader == null) {
 this.gheader =  new JZ.GZIPHeader ();
 }return this.gheader;
 });
-$_M(c$, "getBytesRead", 
+Clazz.defineMethod (c$, "getBytesRead", 
 function () {
 return this.strm.total_in;
 });
-$_M(c$, "getBytesWritten", 
+Clazz.defineMethod (c$, "getBytesWritten", 
 function () {
 return this.strm.total_out;
 });
-Clazz.pu$h ();
+Clazz.pu$h(self.c$);
 c$ = Clazz.decorateAsClass (function () {
 this.good_length = 0;
 this.max_lazy = 0;
@@ -905,7 +905,7 @@ Clazz.defineStatics (c$,
 "SLOW", 2,
 "config_table", null);
 {
-($t$ = JZ.Deflate.config_table =  new Array (10), JZ.Deflate.prototype.config_table = JZ.Deflate.config_table, $t$);
+JZ.Deflate.config_table =  new Array (10);
 JZ.Deflate.config_table[0] =  new JZ.Deflate.Config (0, 0, 0, 0, 0);
 JZ.Deflate.config_table[1] =  new JZ.Deflate.Config (4, 4, 8, 4, 1);
 JZ.Deflate.config_table[2] =  new JZ.Deflate.Config (4, 5, 16, 8, 1);

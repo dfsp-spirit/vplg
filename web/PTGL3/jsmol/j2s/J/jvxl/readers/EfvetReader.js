@@ -1,5 +1,5 @@
 Clazz.declarePackage ("J.jvxl.readers");
-Clazz.load (["J.jvxl.readers.PolygonFileReader"], "J.jvxl.readers.EfvetReader", ["J.jvxl.data.JvxlCoder", "J.util.ColorUtil", "$.Logger", "$.P3"], function () {
+Clazz.load (["J.jvxl.readers.PolygonFileReader"], "J.jvxl.readers.EfvetReader", ["JU.CU", "$.P3", "J.jvxl.data.JvxlCoder", "JW.Logger"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.vertexMap = null;
 Clazz.instantialize (this, arguments);
@@ -8,9 +8,9 @@ Clazz.makeConstructor (c$,
 function () {
 Clazz.superConstructor (this, J.jvxl.readers.EfvetReader, []);
 });
-$_M(c$, "init2", 
+Clazz.overrideMethod (c$, "init2", 
 function (sg, br) {
-Clazz.superCall (this, J.jvxl.readers.EfvetReader, "init2", [sg, br]);
+this.init2PFR (sg, br);
 this.jvxlFileHeaderBuffer.append ("efvet file format\nvertices and triangles only\n");
 J.jvxl.data.JvxlCoder.jvxlCreateHeaderWithoutTitleOrAtoms (this.volumeData, this.jvxlFileHeaderBuffer);
 this.hasColorData = true;
@@ -20,18 +20,18 @@ function () {
 this.getHeader ();
 this.getVertices ();
 this.getTriangles ();
-J.util.Logger.info ("efvet file contains " + this.nVertices + " vertices and " + this.nTriangles + " triangles");
+JW.Logger.info ("efvet file contains " + this.nVertices + " vertices and " + this.nTriangles + " triangles");
 });
-$_M(c$, "getHeader", 
-($fz = function () {
+Clazz.defineMethod (c$, "getHeader", 
+ function () {
 this.skipTo ("<efvet", null);
 while (this.readLine ().length > 0 && this.line.indexOf (">") < 0) this.jvxlFileHeaderBuffer.append ("# " + this.line + "\n");
 
-J.util.Logger.info (this.jvxlFileHeaderBuffer.toString ());
-}, $fz.isPrivate = true, $fz));
-$_M(c$, "getVertices", 
-($fz = function () {
-var pt =  new J.util.P3 ();
+JW.Logger.info (this.jvxlFileHeaderBuffer.toString ());
+});
+Clazz.defineMethod (c$, "getVertices", 
+ function () {
+var pt =  new JU.P3 ();
 var value = 0;
 this.skipTo ("<vertices", "count");
 this.jvxlData.vertexCount = this.nVertices = this.parseInt ();
@@ -45,8 +45,8 @@ this.skipTo ("property=", null);
 this.line = this.line.$replace ('"', ' ');
 var tokens = this.getTokens ();
 var dataIndex = this.params.fileIndex;
-if (dataIndex > 0 && dataIndex < tokens.length) J.util.Logger.info ("property " + tokens[dataIndex]);
- else J.util.Logger.info (this.line);
+if (dataIndex > 0 && dataIndex < tokens.length) JW.Logger.info ("property " + tokens[dataIndex]);
+ else JW.Logger.info (this.line);
 for (var i = 0; i < this.nVertices; i++) {
 this.skipTo ("<vertex", "image");
 this.parseFloatArray (values, null, ">");
@@ -57,12 +57,12 @@ for (var j = 0; j < dataIndex; j++) value = this.parseFloat ();
 if (this.isAnisotropic) this.setVertexAnisotropy (pt);
 var v = this.vertexMap[i + 1] = this.addVC (pt, value, i);
 if (v >= 0 && this.jvxlData.vertexColors != null) {
-this.jvxlData.vertexColors[v] = J.util.ColorUtil.colorTriadToInt (values[6], values[7], values[8]);
+this.jvxlData.vertexColors[v] = JU.CU.colorTriadToFFRGB (values[6], values[7], values[8]);
 this.jvxlData.nVertexColors++;
 }}
-}, $fz.isPrivate = true, $fz));
-$_M(c$, "getTriangles", 
-($fz = function () {
+});
+Clazz.defineMethod (c$, "getTriangles", 
+ function () {
 this.skipTo ("<triangle_array", "count");
 this.nTriangles = this.parseInt ();
 for (var i = 0; i < this.nTriangles; i++) {
@@ -72,9 +72,9 @@ var b = this.getInt ();
 var c = this.getInt ();
 if (a >= 0 && b >= 0 && c >= 0) this.addTriangleCheck (a, b, c, 7, 0, false, 0);
 }
-}, $fz.isPrivate = true, $fz));
-$_M(c$, "getInt", 
-($fz = function () {
+});
+Clazz.defineMethod (c$, "getInt", 
+ function () {
 return this.vertexMap[this.parseInt ()];
-}, $fz.isPrivate = true, $fz));
+});
 });

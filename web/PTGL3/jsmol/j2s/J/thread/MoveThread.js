@@ -21,37 +21,41 @@ this.transZ = 0;
 Clazz.instantialize (this, arguments);
 }, J.thread, "MoveThread", J.thread.JmolThread);
 Clazz.makeConstructor (c$, 
-function (transformManager, viewer) {
-Clazz.superConstructor (this, J.thread.MoveThread);
-this.setViewer (viewer, "MoveThread");
-this.transformManager = transformManager;
-}, "J.viewer.TransformManager,J.viewer.Viewer");
-$_M(c$, "set", 
-function (dRot, dZoom, dTrans, dSlab, floatSecondsTotal, fps) {
-this.dRot = dRot;
-this.dTrans = dTrans;
-this.dZoom = dZoom;
-this.dSlab = dSlab;
-this.floatSecondsTotal = floatSecondsTotal;
+function () {
+Clazz.superConstructor (this, J.thread.MoveThread, []);
+});
+Clazz.overrideMethod (c$, "setManager", 
+function (manager, vwr, params) {
+var options = params;
+this.setViewer (vwr, "MoveThread");
+this.transformManager = manager;
+this.dRot = options[0];
+this.dTrans = options[1];
+var f = options[2];
+this.dZoom = f[0];
+this.dSlab = f[1];
+this.floatSecondsTotal = f[2];
+var fps = Clazz.floatToInt (f[3]);
 this.slab = this.transformManager.getSlabPercentSetting ();
 this.transX = this.transformManager.getTranslationXPercent ();
 this.transY = this.transformManager.getTranslationYPercent ();
 this.transZ = this.transformManager.getTranslationZPercent ();
 this.timePerStep = Clazz.doubleToInt (1000 / fps);
-this.totalSteps = Clazz.floatToInt (fps * floatSecondsTotal);
+this.totalSteps = Clazz.floatToInt (fps * this.floatSecondsTotal);
 if (this.totalSteps <= 0) this.totalSteps = 1;
 var radiansPerDegreePerStep = (1 / 57.29577951308232 / this.totalSteps);
-this.radiansXStep = radiansPerDegreePerStep * dRot.x;
-this.radiansYStep = radiansPerDegreePerStep * dRot.y;
-this.radiansZStep = radiansPerDegreePerStep * dRot.z;
-this.zoomPercent0 = this.transformManager.zoomPercent;
+this.radiansXStep = radiansPerDegreePerStep * this.dRot.x;
+this.radiansYStep = radiansPerDegreePerStep * this.dRot.y;
+this.radiansZStep = radiansPerDegreePerStep * this.dRot.z;
+this.zoomPercent0 = this.transformManager.zmPct;
 this.iStep = 0;
-}, "J.util.V3,~N,J.util.V3,~N,~N,~N");
+return this.totalSteps;
+}, "~O,JV.Viewer,~O");
 Clazz.overrideMethod (c$, "run1", 
 function (mode) {
 while (true) switch (mode) {
 case -1:
-if (this.floatSecondsTotal > 0) this.viewer.setInMotion (true);
+if (this.floatSecondsTotal > 0) this.vwr.setInMotion (true);
 mode = 0;
 break;
 case 0:
@@ -69,8 +73,8 @@ if (this.dSlab != 0) this.transformManager.slabToPercent (Clazz.doubleToInt (Mat
 var timeSpent = (System.currentTimeMillis () - this.startTime);
 var timeAllowed = this.iStep * this.timePerStep;
 if (timeSpent < timeAllowed) {
-this.viewer.requestRepaintAndWait ();
-if (!this.isJS && !this.viewer.isScriptExecuting ()) {
+this.vwr.requestRepaintAndWait ("moveThread");
+if (!this.isJS && !this.vwr.isScriptExecuting ()) {
 mode = -2;
 break;
 }timeSpent = (System.currentTimeMillis () - this.startTime);
@@ -78,7 +82,7 @@ this.sleepTime = timeAllowed - timeSpent;
 if (!this.runSleep (this.sleepTime, 0)) return;
 }break;
 case -2:
-if (this.floatSecondsTotal > 0) this.viewer.setInMotion (false);
+if (this.floatSecondsTotal > 0) this.vwr.setInMotion (false);
 this.resumeEval ();
 return;
 }

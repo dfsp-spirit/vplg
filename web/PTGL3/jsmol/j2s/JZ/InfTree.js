@@ -8,8 +8,8 @@ this.u = null;
 this.x = null;
 Clazz.instantialize (this, arguments);
 }, JZ, "InfTree");
-$_M(c$, "huft_build", 
-($fz = function (b, bindex, n, s, d, e, t, m, hp, hn, v) {
+Clazz.defineMethod (c$, "huft_build", 
+ function (b, bindex, n, s, d, e, t, m, hp, hn, v) {
 var a;
 var f;
 var g;
@@ -136,8 +136,8 @@ mask = (1 << w) - 1;
 }
 }
 return y != 0 && g != 1 ? -5 : 0;
-}, $fz.isPrivate = true, $fz), "~A,~N,~N,~N,~A,~A,~A,~A,~A,~A,~A");
-$_M(c$, "inflate_trees_bits", 
+}, "~A,~N,~N,~N,~A,~A,~A,~A,~A,~A,~A");
+Clazz.defineMethod (c$, "inflate_trees_bits", 
 function (c, bb, tb, hp, z) {
 var result;
 this.initWorkArea (19);
@@ -150,7 +150,7 @@ z.msg = "incomplete dynamic bit lengths tree";
 result = -3;
 }return result;
 }, "~A,~A,~A,~A,JZ.ZStream");
-$_M(c$, "inflate_trees_dynamic", 
+Clazz.defineMethod (c$, "inflate_trees_dynamic", 
 function (nl, nd, c, bl, bd, tl, td, hp, z) {
 var result;
 this.initWorkArea (288);
@@ -177,7 +177,7 @@ result = -3;
 }return result;
 }return 0;
 }, "~N,~N,~A,~A,~A,~A,~A,~A,JZ.ZStream");
-c$.inflate_trees_fixed = $_M(c$, "inflate_trees_fixed", 
+c$.inflate_trees_fixed = Clazz.defineMethod (c$, "inflate_trees_fixed", 
 function (bl, bd, tl, td, z) {
 bl[0] = 9;
 bd[0] = 5;
@@ -185,8 +185,8 @@ tl[0] = JZ.InfTree.fixed_tl;
 td[0] = JZ.InfTree.fixed_td;
 return 0;
 }, "~A,~A,~A,~A,JZ.ZStream");
-$_M(c$, "initWorkArea", 
-($fz = function (vsize) {
+Clazz.defineMethod (c$, "initWorkArea", 
+ function (vsize) {
 if (this.hn == null) {
 this.hn =  Clazz.newIntArray (1, 0);
 this.v =  Clazz.newIntArray (vsize, 0);
@@ -207,7 +207,7 @@ this.r[i] = 0;
 }
 System.arraycopy (this.c, 0, this.u, 0, 15);
 System.arraycopy (this.c, 0, this.x, 0, 16);
-}, $fz.isPrivate = true, $fz), "~N");
+}, "~N");
 Clazz.defineStatics (c$,
 "MANY", 1440,
 "Z_OK", 0,

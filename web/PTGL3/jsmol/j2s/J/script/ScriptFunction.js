@@ -1,5 +1,5 @@
 Clazz.declarePackage ("J.script");
-Clazz.load (["J.api.JmolScriptFunction", "java.util.Hashtable", "J.util.JmolList"], "J.script.ScriptFunction", ["J.script.SV", "$.T", "J.util.ArrayUtil", "$.SB"], function () {
+Clazz.load (["J.api.JmolScriptFunction", "java.util.Hashtable", "JU.List"], "J.script.ScriptFunction", ["JU.AU", "$.SB", "J.script.SV", "$.T"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.pt0 = 0;
 this.chpt0 = 0;
@@ -18,10 +18,10 @@ this.script = null;
 Clazz.instantialize (this, arguments);
 }, J.script, "ScriptFunction", null, J.api.JmolScriptFunction);
 Clazz.prepareFields (c$, function () {
-this.names =  new J.util.JmolList ();
+this.names =  new JU.List ();
 this.variables =  new java.util.Hashtable ();
 });
-$_M(c$, "isVariable", 
+Clazz.defineMethod (c$, "isVariable", 
 function (ident) {
 return this.variables.containsKey (ident);
 }, "~S");
@@ -33,23 +33,23 @@ function (name, tok) {
 this.set (name, tok);
 this.typeName = J.script.T.nameOf (tok);
 }, "~S,~N");
-$_M(c$, "set", 
+Clazz.defineMethod (c$, "set", 
 function (name, tok) {
 this.name = name;
 this.tok = tok;
 }, "~S,~N");
-$_M(c$, "setVariables", 
+Clazz.defineMethod (c$, "setVariables", 
 function (contextVariables, params) {
 var nParams = (params == null ? 0 : params.size ());
 for (var i = this.names.size (); --i >= 0; ) {
 var name = this.names.get (i).toLowerCase ();
 var $var = (i < this.nParameters && i < nParams ? params.get (i) : null);
-if ($var != null && $var.tok != 7) $var = J.script.SV.newScriptVariableToken ($var);
-contextVariables.put (name, ($var == null ? J.script.SV.newVariable (4, "").setName (name) : $var));
+if ($var != null && $var.tok != 7) $var = J.script.SV.newT ($var);
+contextVariables.put (name, ($var == null ? J.script.SV.newS ("").setName (name) : $var));
 }
-contextVariables.put ("_retval", J.script.SV.newScriptVariableInt (this.tok == 364558 ? 2147483647 : 0));
-}, "java.util.Map,J.util.JmolList");
-$_M(c$, "unsetVariables", 
+contextVariables.put ("_retval", J.script.SV.newI (this.tok == 364558 ? 2147483647 : 0));
+}, "java.util.Map,JU.List");
+Clazz.defineMethod (c$, "unsetVariables", 
 function (contextVariables, params) {
 var nParams = (params == null ? 0 : params.size ());
 var nNames = this.names.size ();
@@ -61,21 +61,21 @@ var local = contextVariables.get (this.names.get (i).toLowerCase ());
 if (local.tok != 7) continue;
 global.value = local.value;
 }
-}, "java.util.Map,J.util.JmolList");
-$_M(c$, "addVariable", 
+}, "java.util.Map,JU.List");
+Clazz.defineMethod (c$, "addVariable", 
 function (name, isParameter) {
 this.variables.put (name, name);
 this.names.addLast (name);
 if (isParameter) this.nParameters++;
 }, "~S,~B");
-c$.setFunction = $_M(c$, "setFunction", 
+c$.setFunction = Clazz.defineMethod (c$, "setFunction", 
 function ($function, script, ichCurrentCommand, pt, lineNumbers, lineIndices, lltoken) {
 var cmdpt0 = $function.cmdpt0;
 var chpt0 = $function.chpt0;
 var nCommands = pt - cmdpt0;
 $function.setScript (script.substring (chpt0, ichCurrentCommand));
 var aatoken = $function.aatoken =  new Array (nCommands);
-$function.lineIndices = J.util.ArrayUtil.newInt2 (nCommands);
+$function.lineIndices = JU.AU.newInt2 (nCommands);
 $function.lineNumbers =  Clazz.newShortArray (nCommands, 0);
 var line0 = (lineNumbers[cmdpt0] - 1);
 for (var i = 0; i < nCommands; i++) {
@@ -90,22 +90,22 @@ for (var i = pt; --i >= cmdpt0; ) {
 lltoken.remove (i);
 lineIndices[i][0] = lineIndices[i][1] = 0;
 }
-}, "J.script.ScriptFunction,~S,~N,~N,~A,~A,J.util.JmolList");
-$_M(c$, "setScript", 
-($fz = function (s) {
+}, "J.script.ScriptFunction,~S,~N,~N,~A,~A,JU.List");
+Clazz.defineMethod (c$, "setScript", 
+ function (s) {
 this.script = s;
 if (this.script != null && this.script !== "" && !this.script.endsWith ("\n")) this.script += "\n";
-}, $fz.isPrivate = true, $fz), "~S");
+}, "~S");
 Clazz.overrideMethod (c$, "toString", 
 function () {
-var s =  new J.util.SB ().append ("/*\n * ").append (this.name).append ("\n */\n").append (this.getSignature ()).append ("{\n");
+var s =  new JU.SB ().append ("/*\n * ").append (this.name).append ("\n */\n").append (this.getSignature ()).append ("{\n");
 if (this.script != null) s.append (this.script);
 s.append ("}\n");
 return s.toString ();
 });
 Clazz.overrideMethod (c$, "getSignature", 
 function () {
-var s =  new J.util.SB ().append (this.typeName).append (" ").append (this.name).append (" (");
+var s =  new JU.SB ().append (this.typeName).append (" ").append (this.name).append (" (");
 for (var i = 0; i < this.nParameters; i++) {
 if (i > 0) s.append (", ");
 s.append (this.names.get (i));

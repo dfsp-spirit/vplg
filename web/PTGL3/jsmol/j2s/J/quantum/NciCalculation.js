@@ -1,5 +1,5 @@
 Clazz.declarePackage ("J.quantum");
-Clazz.load (["J.api.QuantumPlaneCalculationInterface", "J.quantum.QuantumCalculation", "J.util.ArrayUtil"], "J.quantum.NciCalculation", ["java.lang.Double", "J.util.BS", "$.BSUtil", "$.Eigen", "$.Escape", "$.Logger"], function () {
+Clazz.load (["J.api.QuantumPlaneCalculationInterface", "J.quantum.QuantumCalculation", "JU.AU"], "J.quantum.NciCalculation", ["java.lang.Double", "JU.BS", "JW.BSUtil", "$.Eigen", "$.Escape", "$.Logger"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.havePoints = false;
 this.isReducedDensity = false;
@@ -40,7 +40,7 @@ this.p2 = null;
 Clazz.instantialize (this, arguments);
 }, J.quantum, "NciCalculation", J.quantum.QuantumCalculation, J.api.QuantumPlaneCalculationInterface);
 Clazz.prepareFields (c$, function () {
-this.yzPlanesRho = J.util.ArrayUtil.newFloat2 (2);
+this.yzPlanesRho = JU.AU.newFloat2 (2);
 });
 Clazz.overrideMethod (c$, "getNoValue", 
 function () {
@@ -54,14 +54,14 @@ Clazz.overrideMethod (c$, "setupCalculation",
 function (volumeData, bsSelected, bsExcluded, bsMolecules, calculationType, atomCoordAngstroms, firstAtomOffset, shells, gaussians, dfCoefMaps, slaters, moCoefficients, linearCombination, isSquaredLinear, coefs, partialCharges, isDensityOnly, points, parameters, testFlags) {
 this.useAbsolute = (testFlags == 2);
 this.bsExcluded = bsExcluded;
-var bsLigand =  new J.util.BS ();
+var bsLigand =  new JU.BS ();
 bsLigand.or (bsSelected);
 if (bsExcluded != null) {
 bsLigand.andNot (bsExcluded);
 }this.isPromolecular = (firstAtomOffset >= 0);
 this.havePoints = (points != null);
 this.isReducedDensity = isDensityOnly;
-if (parameters != null) J.util.Logger.info ("NCI calculation parameters = " + J.util.Escape.eAF (parameters));
+if (parameters != null) JW.Logger.info ("NCI calculation parameters = " + JW.Escape.eAF (parameters));
 this.type = Clazz.doubleToInt (J.quantum.NciCalculation.getParameter (parameters, 1, 0, "type"));
 if (this.type != 0 && bsMolecules == null) this.type = 0;
 this.rhoMin = J.quantum.NciCalculation.getParameter (parameters, 2, 1e-5, "rhoMin");
@@ -93,7 +93,7 @@ break;
 }
 this.nMolecules = 0;
 if (!this.isPromolecular && this.type == 0) atomCoordAngstroms = null;
-J.util.Logger.info ("NCI calculation type = " + (this.isPromolecular ? "promolecular " : "SCF(CUBE) ") + stype);
+JW.Logger.info ("NCI calculation type = " + (this.isPromolecular ? "promolecular " : "SCF(CUBE) ") + stype);
 this.voxelData = volumeData.getVoxelData ();
 this.countsXYZ = volumeData.getVoxelCounts ();
 this.initialize (this.countsXYZ[0], this.countsXYZ[1], this.countsXYZ[2], points);
@@ -109,18 +109,18 @@ if (this.qmAtoms[i].znuc < 1) {
 this.qmAtoms[i] = null;
 } else if (this.qmAtoms[i].znuc > 18) {
 this.qmAtoms[i].znuc = 18;
-J.util.Logger.info ("NCI calculation just setting nuclear charge for " + this.qmAtoms[i].atom + " to 18 (argon)");
+JW.Logger.info ("NCI calculation just setting nuclear charge for " + this.qmAtoms[i].atom + " to 18 (argon)");
 }}
 this.nMolecules = 0;
 if (this.type != 0) {
 for (var i = 0; i < bsMolecules.length; i++) {
-var bs = J.util.BSUtil.copy (bsMolecules[i]);
+var bs = JW.BSUtil.copy (bsMolecules[i]);
 bs.and (bsSelected);
 if (bs.nextSetBit (0) < 0) continue;
 for (var j = bs.nextSetBit (0); j >= 0; j = bs.nextSetBit (j + 1)) this.qmAtoms[qmMap[j]].iMolecule = this.nMolecules;
 
 this.nMolecules++;
-J.util.Logger.info ("Molecule " + (this.nMolecules) + " (" + bs.cardinality () + " atoms): " + J.util.Escape.eBS (bs));
+JW.Logger.info ("Molecule " + (this.nMolecules) + " (" + bs.cardinality () + " atoms): " + JW.Escape.eBS (bs));
 }
 this.rhoMolecules =  Clazz.newDoubleArray (this.nMolecules, 0);
 }if (this.nMolecules == 0) this.nMolecules = 1;
@@ -129,43 +129,43 @@ this.noValuesAtAll = (this.type != 0 && this.type != 1);
 this.type = 0;
 }if (!this.isPromolecular) this.getBsOK ();
 }if (!this.isReducedDensity || !this.isPromolecular) this.initializeEigen ();
-this.doDebug = (J.util.Logger.debugging);
+this.doDebug = (JW.Logger.debugging);
 return true;
-}, "J.api.VolumeDataInterface,J.util.BS,J.util.BS,~A,~S,~A,~N,J.util.JmolList,~A,~A,~O,~A,~A,~B,~A,~A,~B,~A,~A,~N");
-c$.getParameter = $_M(c$, "getParameter", 
-($fz = function (parameters, i, def, name) {
+}, "J.api.VolumeDataInterface,JU.BS,JU.BS,~A,~S,~A,~N,JU.List,~A,~A,~O,~A,~A,~B,~A,~A,~B,~A,~A,~N");
+c$.getParameter = Clazz.defineMethod (c$, "getParameter", 
+ function (parameters, i, def, name) {
 var param = (parameters == null || parameters.length < i + 1 ? 0 : parameters[i]);
 if (param == 0) param = def;
-J.util.Logger.info ("NCI calculation parameters[" + i + "] (" + name + ") = " + param);
+JW.Logger.info ("NCI calculation parameters[" + i + "] (" + name + ") = " + param);
 return param;
-}, $fz.isPrivate = true, $fz), "~A,~N,~N,~S");
-$_M(c$, "getBsOK", 
-($fz = function () {
+}, "~A,~N,~N,~S");
+Clazz.defineMethod (c$, "getBsOK", 
+ function () {
 if (this.noValuesAtAll || this.nMolecules == 1) return;
-this.bsOK = J.util.BSUtil.newBitSet (this.nX * this.nY * this.nZ);
+this.bsOK = JU.BS.newN (this.nX * this.nY * this.nZ);
 this.setXYZBohr (null);
 for (var ix = 0, index = 0; ix < this.countsXYZ[0]; ix++) for (var iy = 0; iy < this.countsXYZ[1]; iy++) for (var iz = 0; iz < this.countsXYZ[2]; index++, iz++) this.processAtoms (ix, iy, iz, index);
 
 
 
-J.util.Logger.info ("NCI calculation SCF " + (this.type == 1 ? "intra" : "inter") + "molecular grid points = " + this.bsOK.cardinality ());
-}, $fz.isPrivate = true, $fz));
+JW.Logger.info ("NCI calculation SCF " + (this.type == 1 ? "intra" : "inter") + "molecular grid points = " + this.bsOK.cardinality ());
+});
 Clazz.overrideMethod (c$, "createCube", 
 function () {
 this.setXYZBohr (this.points);
 this.process ();
 });
-$_M(c$, "initializeOnePoint", 
+Clazz.overrideMethod (c$, "initializeOnePoint", 
 function () {
 if (this.eigen == null) this.initializeEigen ();
 this.isReducedDensity = false;
-Clazz.superCall (this, J.quantum.NciCalculation, "initializeOnePoint", []);
+this.initializeOnePointQC ();
 });
-$_M(c$, "initializeEigen", 
-($fz = function () {
-this.eigen =  new J.util.Eigen (3);
+Clazz.defineMethod (c$, "initializeEigen", 
+ function () {
+this.eigen =  new JW.Eigen ().set (3);
 this.hess =  Clazz.newDoubleArray (3, 3, 0);
-}, $fz.isPrivate = true, $fz));
+});
 Clazz.overrideMethod (c$, "getPlane", 
 function (ix, yzPlane) {
 if (this.noValuesAtAll) {
@@ -181,7 +181,7 @@ for (var iy = 0, i = 0; iy < this.countsXYZ[1]; iy++) for (var iz = 0; iz < this
 
 
 }, "~N,~A");
-$_M(c$, "process", 
+Clazz.defineMethod (c$, "process", 
 function () {
 if (this.noValuesAtAll) return;
 for (var ix = this.xMax; --ix >= this.xMin; ) {
@@ -192,8 +192,8 @@ for (var iz = this.zMin; iz < this.zMax; iz++) this.vd[(this.havePoints ? 0 : iz
 }
 }
 });
-$_M(c$, "getValue", 
-($fz = function (rho, isReducedDensity) {
+Clazz.defineMethod (c$, "getValue", 
+ function (rho, isReducedDensity) {
 var s;
 if (rho == 100.0) return NaN;
 if (isReducedDensity) {
@@ -211,9 +211,9 @@ this.eigen.calc (this.hess);
 var lambda2 = this.eigen.getRealEigenvalues ()[1];
 s = (lambda2 < 0 ? -rho : rho);
 }return s;
-}, $fz.isPrivate = true, $fz), "~N,~B");
-$_M(c$, "processAtoms", 
-($fz = function (ix, iy, iz, index) {
+}, "~N,~B");
+Clazz.defineMethod (c$, "processAtoms", 
+ function (ix, iy, iz, index) {
 var rho = 0;
 if (this.isReducedDensity) {
 if (this.isPromolecular) this.gxTemp = this.gyTemp = this.gzTemp = 0;
@@ -280,7 +280,7 @@ break;
 if (this.useAbsolute) this.grad = this.gxTemp + this.gyTemp + this.gzTemp;
  else this.grad = Math.sqrt (this.gxTemp * this.gxTemp + this.gyTemp * this.gyTemp + this.gzTemp * this.gzTemp);
 }return rho;
-}, $fz.isPrivate = true, $fz), "~N,~N,~N,~N");
+}, "~N,~N,~N,~N");
 Clazz.overrideMethod (c$, "setPlanes", 
 function (planes) {
 this.yzPlanesRaw = planes;
@@ -325,14 +325,14 @@ plane[i] = this.getValue (rho, true);
 }}
 
 }, "~N,~A");
-$_M(c$, "process", 
+Clazz.defineMethod (c$, "process", 
 function (vA, vB, f) {
 var valueA = this.getPlaneValue (vA);
 var valueB = this.getPlaneValue (vB);
 return (valueA + f * (valueB - valueA));
 }, "~N,~N,~N");
-$_M(c$, "getPlaneValue", 
-($fz = function (vA) {
+Clazz.defineMethod (c$, "getPlaneValue", 
+ function (vA) {
 var i = (vA % this.yzCount);
 var x = Clazz.doubleToInt (vA / this.yzCount);
 var y = Clazz.doubleToInt (i / this.nZ);
@@ -355,7 +355,7 @@ this.gxzTemp = ((p2[i + 1] - p2[i - 1]) - (p0[i + 1] - p0[i - 1])) / (4 * dx * d
 this.gyzTemp = ((p1[i + this.nZ + 1] - p1[i - this.nZ + 1]) - (p1[i + this.nZ - 1] - p1[i - this.nZ - 1])) / (4 * dy * dz);
 if (Double.isNaN (this.gxxTemp) || Double.isNaN (this.gyyTemp) || Double.isNaN (this.gzzTemp) || Double.isNaN (this.gxyTemp) || Double.isNaN (this.gxzTemp) || Double.isNaN (this.gyzTemp)) return NaN;
 return this.getValue (rho, false);
-}, $fz.isPrivate = true, $fz), "~N");
+}, "~N");
 Clazz.defineStatics (c$,
 "TYPE_ALL", 0,
 "TYPE_INTRA", 1,

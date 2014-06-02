@@ -1,5 +1,5 @@
 Clazz.declarePackage ("J.script");
-Clazz.load (["J.script.T", "J.util.P3"], "J.script.SV", ["java.lang.Boolean", "$.Float", "java.util.Arrays", "$.Collections", "$.Hashtable", "J.modelset.Bond", "J.util.BS", "$.BSUtil", "$.Escape", "$.JmolList", "$.Measure", "$.Parser", "$.SB", "$.TextFormat"], function () {
+Clazz.load (["javajs.api.JSONEncodable", "J.script.T", "JU.P3"], "J.script.SV", ["java.lang.Boolean", "$.Float", "java.util.Arrays", "$.Collections", "$.Hashtable", "$.Map", "JU.BArray", "$.BS", "$.Base64", "$.List", "$.M3", "$.M34", "$.M4", "$.P4", "$.PT", "$.Quat", "$.SB", "$.T3", "$.V3", "JM.BondSet", "J.script.ScriptContext", "JW.BSUtil", "$.Escape", "$.Measure", "$.Txt"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.index = 2147483647;
 this.flags = 2;
@@ -8,42 +8,48 @@ if (!Clazz.isClassDefined ("J.script.SV.Sort")) {
 J.script.SV.$SV$Sort$ ();
 }
 Clazz.instantialize (this, arguments);
-}, J.script, "SV", J.script.T);
-c$.newVariable = $_M(c$, "newVariable", 
+}, J.script, "SV", J.script.T, javajs.api.JSONEncodable);
+c$.newV = Clazz.defineMethod (c$, "newV", 
 function (tok, value) {
 var sv =  new J.script.SV ();
 sv.tok = tok;
 sv.value = value;
 return sv;
 }, "~N,~O");
-c$.newScriptVariableInt = $_M(c$, "newScriptVariableInt", 
+c$.newI = Clazz.defineMethod (c$, "newI", 
 function (i) {
 var sv =  new J.script.SV ();
 sv.tok = 2;
 sv.intValue = i;
 return sv;
 }, "~N");
-c$.newScriptVariableBs = $_M(c$, "newScriptVariableBs", 
-function (bs, index) {
-var sv = J.script.SV.newVariable (10, bs);
-if (index >= 0) sv.index = index;
-return sv;
-}, "J.util.BS,~N");
-c$.newScriptVariableToken = $_M(c$, "newScriptVariableToken", 
+c$.newS = Clazz.defineMethod (c$, "newS", 
+function (s) {
+return J.script.SV.newV (4, s);
+}, "~S");
+c$.newT = Clazz.defineMethod (c$, "newT", 
 function (x) {
-return J.script.SV.newScriptVariableIntValue (x.tok, x.intValue, x.value);
+return J.script.SV.newSV (x.tok, x.intValue, x.value);
 }, "J.script.T");
-c$.newScriptVariableIntValue = $_M(c$, "newScriptVariableIntValue", 
+c$.newSV = Clazz.defineMethod (c$, "newSV", 
 function (tok, intValue, value) {
-var sv = J.script.SV.newVariable (tok, value);
+var sv = J.script.SV.newV (tok, value);
 sv.intValue = intValue;
 return sv;
 }, "~N,~N,~O");
-c$.sizeOf = $_M(c$, "sizeOf", 
+Clazz.defineMethod (c$, "setv", 
+function (v) {
+this.index = v.index;
+this.intValue = v.intValue;
+this.tok = v.tok;
+this.value = v.value;
+return this;
+}, "J.script.SV");
+c$.sizeOf = Clazz.defineMethod (c$, "sizeOf", 
 function (x) {
 switch (x == null ? 0 : x.tok) {
 case 10:
-return J.util.BSUtil.cardinalityOf (J.script.SV.bsSelectToken (x));
+return JW.BSUtil.cardinalityOf (J.script.SV.bsSelectToken (x));
 case 1048589:
 case 1048588:
 return -1;
@@ -59,176 +65,185 @@ case 11:
 return -32;
 case 12:
 return -64;
+case 15:
+return -256;
 case 4:
 return (x.value).length;
 case 7:
-return x.intValue == 2147483647 ? (x).getList ().size () : J.script.SV.sizeOf (J.script.SV.selectItemTok (x));
+return x.intValue == 2147483647 ? (x).getList ().size () : J.script.SV.sizeOf (J.script.SV.selectItemTok (x, -2147483648));
 case 6:
 return (x.value).size ();
+case 14:
+return (x.value).getFullMap ().size ();
 default:
 return 0;
 }
 }, "J.script.T");
-c$.isVariableType = $_M(c$, "isVariableType", 
+c$.isVariableType = Clazz.defineMethod (c$, "isVariableType", 
 function (x) {
-return (Clazz.instanceOf (x, J.script.SV) || Clazz.instanceOf (x, J.util.BS) || Clazz.instanceOf (x, Boolean) || Clazz.instanceOf (x, Float) || Clazz.instanceOf (x, Integer) || Clazz.instanceOf (x, String) || Clazz.instanceOf (x, J.util.P3) || Clazz.instanceOf (x, J.util.V3) || Clazz.instanceOf (x, J.util.P4) || Clazz.instanceOf (x, J.util.Quaternion) || Clazz.instanceOf (x, java.util.Map) || J.script.SV.isArray (x));
+return (Clazz.instanceOf (x, J.script.SV) || Clazz.instanceOf (x, Boolean) || Clazz.instanceOf (x, Integer) || Clazz.instanceOf (x, Float) || Clazz.instanceOf (x, String) || Clazz.instanceOf (x, JU.T3) || Clazz.instanceOf (x, JU.BS) || Clazz.instanceOf (x, JU.P4) || Clazz.instanceOf (x, JU.Quat) || Clazz.instanceOf (x, JU.M34) || Clazz.instanceOf (x, java.util.Map) || Clazz.instanceOf (x, JU.List) || Clazz.instanceOf (x, JU.BArray) || Clazz.instanceOf (x, J.script.ScriptContext) || J.script.SV.isArray (x));
 }, "~O");
-c$.getVariable = $_M(c$, "getVariable", 
+c$.isArray = Clazz.defineMethod (c$, "isArray", 
+ function (x) {
+{
+return Clazz.instanceOf(x, Array);
+}}, "~O");
+c$.getVariable = Clazz.defineMethod (c$, "getVariable", 
 function (x) {
-if (x == null) return J.script.SV.newVariable (4, "");
+if (x == null) return J.script.SV.newS ("");
 if (Clazz.instanceOf (x, J.script.SV)) return x;
 if (Clazz.instanceOf (x, Boolean)) return J.script.SV.getBoolean ((x).booleanValue ());
-if (Clazz.instanceOf (x, Integer)) return J.script.SV.newScriptVariableInt ((x).intValue ());
-if (Clazz.instanceOf (x, Float)) return J.script.SV.newVariable (3, x);
+if (Clazz.instanceOf (x, Integer)) return J.script.SV.newI ((x).intValue ());
+if (Clazz.instanceOf (x, Float)) return J.script.SV.newV (3, x);
 if (Clazz.instanceOf (x, String)) {
 x = J.script.SV.unescapePointOrBitsetAsVariable (x);
 if (Clazz.instanceOf (x, J.script.SV)) return x;
-return J.script.SV.newVariable (4, x);
-}if (Clazz.instanceOf (x, J.util.P3)) return J.script.SV.newVariable (8, x);
-if (Clazz.instanceOf (x, J.util.V3)) return J.script.SV.newVariable (8, J.util.P3.newP (x));
-if (Clazz.instanceOf (x, J.util.BS)) return J.script.SV.newVariable (10, x);
-if (Clazz.instanceOf (x, J.util.P4)) return J.script.SV.newVariable (9, x);
-if (Clazz.instanceOf (x, J.util.Quaternion)) return J.script.SV.newVariable (9, (x).toPoint4f ());
-if (Clazz.instanceOf (x, J.util.Matrix3f)) return J.script.SV.newVariable (11, x);
-if (Clazz.instanceOf (x, J.util.Matrix4f)) return J.script.SV.newVariable (12, x);
+return J.script.SV.newV (4, x);
+}if (Clazz.instanceOf (x, JU.P3)) return J.script.SV.newV (8, x);
+if (Clazz.instanceOf (x, JU.V3)) return J.script.SV.newV (8, JU.P3.newP (x));
+if (Clazz.instanceOf (x, JU.BS)) return J.script.SV.newV (10, x);
+if (Clazz.instanceOf (x, JU.P4)) return J.script.SV.newV (9, x);
+if (Clazz.instanceOf (x, JU.Quat)) return J.script.SV.newV (9, (x).toPoint4f ());
+if (Clazz.instanceOf (x, JU.M34)) return J.script.SV.newV (Clazz.instanceOf (x, JU.M4) ? 12 : 11, x);
 if (Clazz.instanceOf (x, java.util.Map)) return J.script.SV.getVariableMap (x);
-if (Clazz.instanceOf (x, J.util.JmolList)) return J.script.SV.getVariableList (x);
-if (J.util.Escape.isAV (x)) return J.script.SV.getVariableAV (x);
-if (J.util.Escape.isAI (x)) return J.script.SV.getVariableAI (x);
-if (J.util.Escape.isAF (x)) return J.script.SV.getVariableAF (x);
-if (J.util.Escape.isAD (x)) return J.script.SV.getVariableAD (x);
-if (J.util.Escape.isAS (x)) return J.script.SV.getVariableAS (x);
-if (J.util.Escape.isAP (x)) return J.script.SV.getVariableAP (x);
-if (J.util.Escape.isAII (x)) return J.script.SV.getVariableAII (x);
-if (J.util.Escape.isAFF (x)) return J.script.SV.getVariableAFF (x);
-if (J.util.Escape.isAFloat (x)) return J.script.SV.newVariable (13, x);
-return J.script.SV.newVariable (4, J.util.Escape.toReadable (null, x));
+if (Clazz.instanceOf (x, JU.List)) return J.script.SV.getVariableList (x);
+if (Clazz.instanceOf (x, JU.BArray)) return J.script.SV.newV (15, x);
+if (Clazz.instanceOf (x, J.script.ScriptContext)) return J.script.SV.newV (14, x);
+if (JW.Escape.isAV (x)) return J.script.SV.getVariableAV (x);
+if (JU.PT.isAI (x)) return J.script.SV.getVariableAI (x);
+if (JU.PT.isAB (x)) return J.script.SV.getVariableAB (x);
+if (JU.PT.isAF (x)) return J.script.SV.getVariableAF (x);
+if (JU.PT.isAD (x)) return J.script.SV.getVariableAD (x);
+if (JU.PT.isAS (x)) return J.script.SV.getVariableAS (x);
+if (JU.PT.isAP (x)) return J.script.SV.getVariableAP (x);
+if (JU.PT.isAII (x)) return J.script.SV.getVariableAII (x);
+if (JU.PT.isAFF (x)) return J.script.SV.getVariableAFF (x);
+if (JU.PT.isASS (x)) return J.script.SV.getVariableASS (x);
+if (JU.PT.isADD (x)) return J.script.SV.getVariableADD (x);
+if (JU.PT.isAFloat (x)) return J.script.SV.newV (13, x);
+return J.script.SV.newS (x.toString ());
 }, "~O");
-c$.isArray = $_M(c$, "isArray", 
-($fz = function (x) {
-{
-return Clazz.instanceOf(x, Array);
-}}, $fz.isPrivate = true, $fz), "~O");
-c$.getVariableMap = $_M(c$, "getVariableMap", 
+c$.getVariableMap = Clazz.defineMethod (c$, "getVariableMap", 
 function (x) {
 var ht = x;
-var e = ht.keySet ().iterator ();
-while (e.hasNext ()) {
-if (!(Clazz.instanceOf (ht.get (e.next ()), J.script.SV))) {
+var o = null;
+for (var oo, $oo = ht.values ().iterator (); $oo.hasNext () && ((oo = $oo.next ()) || true);) {
+o = oo;
+break;
+}
+if (!(Clazz.instanceOf (o, J.script.SV))) {
 var x2 =  new java.util.Hashtable ();
-for (var entry, $entry = ht.entrySet ().iterator (); $entry.hasNext () && ((entry = $entry.next ()) || true);) {
-var key = entry.getKey ();
-var o = entry.getValue ();
-if (J.script.SV.isVariableType (o)) x2.put (key, J.script.SV.getVariable (o));
- else x2.put (key, J.script.SV.newVariable (4, J.util.Escape.toReadable (null, o)));
-}
+for (var entry, $entry = ht.entrySet ().iterator (); $entry.hasNext () && ((entry = $entry.next ()) || true);) x2.put (entry.getKey (), J.script.SV.getVariable (entry.getValue ()));
+
 x = x2;
-}break;
-}
-return J.script.SV.newVariable (6, x);
+}return J.script.SV.newV (6, x);
 }, "java.util.Map");
-c$.getVariableList = $_M(c$, "getVariableList", 
+c$.getVariableList = Clazz.defineMethod (c$, "getVariableList", 
 function (v) {
 var len = v.size ();
-if (len > 0 && Clazz.instanceOf (v.get (0), J.script.SV)) return J.script.SV.newVariable (7, v);
-var objects =  new J.util.JmolList ();
+if (len > 0 && Clazz.instanceOf (v.get (0), J.script.SV)) return J.script.SV.newV (7, v);
+var objects =  new JU.List ();
 for (var i = 0; i < len; i++) objects.addLast (J.script.SV.getVariable (v.get (i)));
 
-return J.script.SV.newVariable (7, objects);
-}, "J.util.JmolList");
-c$.getVariableAV = $_M(c$, "getVariableAV", 
+return J.script.SV.newV (7, objects);
+}, "JU.List");
+c$.getVariableAV = Clazz.defineMethod (c$, "getVariableAV", 
 function (v) {
-var objects =  new J.util.JmolList ();
+var objects =  new JU.List ();
 for (var i = 0; i < v.length; i++) objects.addLast (v[i]);
 
-return J.script.SV.newVariable (7, objects);
+return J.script.SV.newV (7, objects);
 }, "~A");
-c$.getVariableAD = $_M(c$, "getVariableAD", 
+c$.getVariableAD = Clazz.defineMethod (c$, "getVariableAD", 
 function (f) {
-var objects =  new J.util.JmolList ();
-for (var i = 0; i < f.length; i++) objects.addLast (J.script.SV.newVariable (3, Float.$valueOf (f[i])));
+var objects =  new JU.List ();
+for (var i = 0; i < f.length; i++) objects.addLast (J.script.SV.newV (3, Float.$valueOf (f[i])));
 
-return J.script.SV.newVariable (7, objects);
+return J.script.SV.newV (7, objects);
 }, "~A");
-c$.getVariableAS = $_M(c$, "getVariableAS", 
+c$.getVariableAS = Clazz.defineMethod (c$, "getVariableAS", 
 function (s) {
-var objects =  new J.util.JmolList ();
-for (var i = 0; i < s.length; i++) objects.addLast (J.script.SV.newVariable (4, s[i]));
+var objects =  new JU.List ();
+for (var i = 0; i < s.length; i++) objects.addLast (J.script.SV.newV (4, s[i]));
 
-return J.script.SV.newVariable (7, objects);
+return J.script.SV.newV (7, objects);
 }, "~A");
-c$.getVariableAP = $_M(c$, "getVariableAP", 
+c$.getVariableAP = Clazz.defineMethod (c$, "getVariableAP", 
 function (p) {
-var objects =  new J.util.JmolList ();
-for (var i = 0; i < p.length; i++) objects.addLast (J.script.SV.newVariable (8, p[i]));
+var objects =  new JU.List ();
+for (var i = 0; i < p.length; i++) objects.addLast (J.script.SV.newV (8, p[i]));
 
-return J.script.SV.newVariable (7, objects);
+return J.script.SV.newV (7, objects);
 }, "~A");
-c$.getVariableAFF = $_M(c$, "getVariableAFF", 
+c$.getVariableAFF = Clazz.defineMethod (c$, "getVariableAFF", 
 function (fx) {
-var objects =  new J.util.JmolList ();
+var objects =  new JU.List ();
 for (var i = 0; i < fx.length; i++) objects.addLast (J.script.SV.getVariableAF (fx[i]));
 
-return J.script.SV.newVariable (7, objects);
+return J.script.SV.newV (7, objects);
 }, "~A");
-c$.getVariableAII = $_M(c$, "getVariableAII", 
+c$.getVariableADD = Clazz.defineMethod (c$, "getVariableADD", 
+function (fx) {
+var objects =  new JU.List ();
+for (var i = 0; i < fx.length; i++) objects.addLast (J.script.SV.getVariableAD (fx[i]));
+
+return J.script.SV.newV (7, objects);
+}, "~A");
+c$.getVariableASS = Clazz.defineMethod (c$, "getVariableASS", 
+function (fx) {
+var objects =  new JU.List ();
+for (var i = 0; i < fx.length; i++) objects.addLast (J.script.SV.getVariableAS (fx[i]));
+
+return J.script.SV.newV (7, objects);
+}, "~A");
+c$.getVariableAII = Clazz.defineMethod (c$, "getVariableAII", 
 function (ix) {
-var objects =  new J.util.JmolList ();
+var objects =  new JU.List ();
 for (var i = 0; i < ix.length; i++) objects.addLast (J.script.SV.getVariableAI (ix[i]));
 
-return J.script.SV.newVariable (7, objects);
+return J.script.SV.newV (7, objects);
 }, "~A");
-c$.getVariableAF = $_M(c$, "getVariableAF", 
+c$.getVariableAF = Clazz.defineMethod (c$, "getVariableAF", 
 function (f) {
-var objects =  new J.util.JmolList ();
-for (var i = 0; i < f.length; i++) objects.addLast (J.script.SV.newVariable (3, Float.$valueOf (f[i])));
+var objects =  new JU.List ();
+for (var i = 0; i < f.length; i++) objects.addLast (J.script.SV.newV (3, Float.$valueOf (f[i])));
 
-return J.script.SV.newVariable (7, objects);
+return J.script.SV.newV (7, objects);
 }, "~A");
-c$.getVariableAI = $_M(c$, "getVariableAI", 
+c$.getVariableAI = Clazz.defineMethod (c$, "getVariableAI", 
 function (ix) {
-var objects =  new J.util.JmolList ();
-for (var i = 0; i < ix.length; i++) objects.addLast (J.script.SV.newVariable (2, Integer.$valueOf (ix[i])));
+var objects =  new JU.List ();
+for (var i = 0; i < ix.length; i++) objects.addLast (J.script.SV.newI (ix[i]));
 
-return J.script.SV.newVariable (7, objects);
+return J.script.SV.newV (7, objects);
 }, "~A");
-$_M(c$, "setv", 
-function (v, asCopy) {
-this.index = v.index;
-this.intValue = v.intValue;
-this.tok = v.tok;
-this.value = v.value;
-if (asCopy) {
-switch (this.tok) {
-case 6:
-this.value =  new java.util.Hashtable (v.value);
-break;
-case 7:
-var o2 =  new J.util.JmolList ();
-var o1 = v.getList ();
-for (var i = 0; i < o1.size (); i++) o2.addLast (o1.get (i));
+c$.getVariableAB = Clazz.defineMethod (c$, "getVariableAB", 
+function (ix) {
+var objects =  new JU.List ();
+for (var i = 0; i < ix.length; i++) objects.addLast (J.script.SV.newI (ix[i]));
 
-this.value = o2;
-break;
-}
-}return this;
-}, "J.script.SV,~B");
-$_M(c$, "setName", 
+return J.script.SV.newV (7, objects);
+}, "~A");
+Clazz.defineMethod (c$, "setName", 
 function (name) {
 this.myName = name;
 this.flags |= 1;
 return this;
 }, "~S");
-$_M(c$, "setGlobal", 
+Clazz.defineMethod (c$, "isModified", 
 function () {
-this.flags &= -3;
-return this;
+return J.script.T.tokAttr (this.flags, 2);
 });
-$_M(c$, "canIncrement", 
+Clazz.defineMethod (c$, "setModified", 
+function (tf) {
+if (tf) this.flags |= 2;
+ else this.flags &= -3;
+}, "~B");
+Clazz.defineMethod (c$, "canIncrement", 
 function () {
-return J.script.T.tokAttr (this.flags, 1);
+return true;
 });
-$_M(c$, "increment", 
+Clazz.defineMethod (c$, "increment", 
 function (n) {
 if (!this.canIncrement ()) return false;
 switch (this.tok) {
@@ -239,32 +254,27 @@ case 3:
 this.value = Float.$valueOf ((this.value).floatValue () + n);
 break;
 default:
-this.value = J.script.SV.nValue (this);
-if (Clazz.instanceOf (this.value, Integer)) {
-this.tok = 2;
-this.intValue = (this.value).intValue ();
-} else {
-this.tok = 3;
-}}
+return false;
+}
 return true;
 }, "~N");
-$_M(c$, "asBoolean", 
+Clazz.defineMethod (c$, "asBoolean", 
 function () {
 return J.script.SV.bValue (this);
 });
-$_M(c$, "asInt", 
+Clazz.defineMethod (c$, "asInt", 
 function () {
 return J.script.SV.iValue (this);
 });
-$_M(c$, "asFloat", 
+Clazz.defineMethod (c$, "asFloat", 
 function () {
 return J.script.SV.fValue (this);
 });
-$_M(c$, "asString", 
+Clazz.defineMethod (c$, "asString", 
 function () {
 return J.script.SV.sValue (this);
 });
-c$.oValue = $_M(c$, "oValue", 
+c$.oValue = Clazz.defineMethod (c$, "oValue", 
 function (x) {
 switch (x == null ? 0 : x.tok) {
 case 1048589:
@@ -281,7 +291,7 @@ default:
 return x.value;
 }
 }, "J.script.SV");
-c$.nValue = $_M(c$, "nValue", 
+c$.nValue = Clazz.defineMethod (c$, "nValue", 
 function (x) {
 var iValue;
 switch (x == null ? 0 : x.tok) {
@@ -299,11 +309,12 @@ iValue = 0;
 }
 return Integer.$valueOf (iValue);
 }, "J.script.T");
-c$.bValue = $_M(c$, "bValue", 
-($fz = function (x) {
+c$.bValue = Clazz.defineMethod (c$, "bValue", 
+ function (x) {
 switch (x == null ? 0 : x.tok) {
 case 1048589:
 case 6:
+case 14:
 return true;
 case 1048588:
 return false;
@@ -314,6 +325,7 @@ case 4:
 case 7:
 return J.script.SV.fValue (x) != 0;
 case 10:
+case 15:
 return J.script.SV.iValue (x) != 0;
 case 8:
 case 9:
@@ -323,8 +335,8 @@ return Math.abs (J.script.SV.fValue (x)) > 0.0001;
 default:
 return false;
 }
-}, $fz.isPrivate = true, $fz), "J.script.T");
-c$.iValue = $_M(c$, "iValue", 
+}, "J.script.T");
+c$.iValue = Clazz.defineMethod (c$, "iValue", 
 function (x) {
 switch (x == null ? 0 : x.tok) {
 case 1048589:
@@ -342,12 +354,14 @@ case 11:
 case 12:
 return Clazz.floatToInt (J.script.SV.fValue (x));
 case 10:
-return J.util.BSUtil.cardinalityOf (J.script.SV.bsSelectToken (x));
+return JW.BSUtil.cardinalityOf (J.script.SV.bsSelectToken (x));
+case 15:
+return (x.value).data.length;
 default:
 return 0;
 }
 }, "J.script.T");
-c$.fValue = $_M(c$, "fValue", 
+c$.fValue = Clazz.defineMethod (c$, "fValue", 
 function (x) {
 switch (x == null ? 0 : x.tok) {
 case 1048589:
@@ -364,29 +378,29 @@ if (i == 2147483647) return (x).getList ().size ();
 case 4:
 return J.script.SV.toFloat (J.script.SV.sValue (x));
 case 10:
+case 15:
 return J.script.SV.iValue (x);
 case 8:
-return (x.value).distance (J.script.SV.pt0);
+return (x.value).length ();
 case 9:
-return J.util.Measure.distanceToPlane (x.value, J.script.SV.pt0);
+return JW.Measure.distanceToPlane (x.value, J.script.SV.pt0);
 case 11:
-var pt =  new J.util.P3 ();
-(x.value).transform (pt);
-return pt.distance (J.script.SV.pt0);
+var pt =  new JU.P3 ();
+(x.value).rotate (pt);
+return pt.length ();
 case 12:
-var pt1 =  new J.util.P3 ();
-(x.value).transform (pt1);
-return pt1.distance (J.script.SV.pt0);
+var pt1 =  new JU.P3 ();
+(x.value).rotTrans (pt1);
+return pt1.length ();
 default:
 return 0;
 }
 }, "J.script.T");
-c$.sValue = $_M(c$, "sValue", 
+c$.sValue = Clazz.defineMethod (c$, "sValue", 
 function (x) {
 if (x == null) return "";
 var i;
 var sb;
-var map;
 switch (x.tok) {
 case 1048589:
 return "true";
@@ -396,16 +410,17 @@ case 2:
 return "" + x.intValue;
 case 10:
 var bs = J.script.SV.bsSelectToken (x);
-return (Clazz.instanceOf (x.value, J.modelset.Bond.BondSet) ? J.util.Escape.eBond (bs) : J.util.Escape.eBS (bs));
+return (Clazz.instanceOf (x.value, JM.BondSet) ? JW.Escape.eBond (bs) : JW.Escape.eBS (bs));
 case 7:
 var sv = (x).getList ();
 i = x.intValue;
 if (i <= 0) i = sv.size () - i;
 if (i != 2147483647) return (i < 1 || i > sv.size () ? "" : J.script.SV.sValue (sv.get (i - 1)));
 case 6:
-sb =  new J.util.SB ();
-map =  new java.util.Hashtable ();
-J.script.SV.sValueArray (sb, x, map, 0, false);
+case 14:
+if (Clazz.instanceOf (x.value, String)) return x.value;
+sb =  new JU.SB ();
+J.script.SV.sValueArray (sb, x, "", "", false, true);
 return sb.toString ();
 case 4:
 var s = x.value;
@@ -415,25 +430,48 @@ if (i == 2147483647) return s;
 if (i < 1 || i > s.length) return "";
 return "" + s.charAt (i - 1);
 case 8:
-return J.util.Escape.eP (x.value);
+return JW.Escape.eP (x.value);
 case 9:
-return J.util.Escape.eP4 (x.value);
+return JW.Escape.eP4 (x.value);
 case 11:
 case 12:
-return J.util.Escape.e (x.value);
+return JW.Escape.e (x.value);
 default:
 return x.value.toString ();
 }
 }, "J.script.T");
-c$.sValueArray = $_M(c$, "sValueArray", 
-($fz = function (sb, vx, map, level, isEscaped) {
+c$.sValueArray = Clazz.defineMethod (c$, "sValueArray", 
+ function (sb, vx, path, tabs, isEscaped, isRaw) {
 switch (vx.tok) {
 case 6:
-if (map.containsKey (vx)) {
+case 14:
+case 7:
+var thiskey = ";" + vx.hashCode () + ";";
+if (path.indexOf (thiskey) >= 0) {
 sb.append (isEscaped ? "{}" : vx.myName == null ? "<circular reference>" : "<" + vx.myName + ">");
 break;
-}map.put (vx, Boolean.TRUE);
-var ht = vx.value;
+}path += thiskey;
+if (vx.tok == 7) {
+if (!isRaw) sb.append (isEscaped ? "[ " : tabs + "[\n");
+var sx = vx.getList ();
+for (var i = 0; i < sx.size (); i++) {
+if (isEscaped && i > 0) sb.append (",");
+var sv = sx.get (i);
+J.script.SV.sValueArray (sb, sv, path, tabs + "\t", isEscaped, tabs.length == 0 && !isEscaped && J.script.SV.isRawType (sv.tok));
+if (!isEscaped) sb.append ("\n");
+}
+if (!isRaw) sb.append (isEscaped ? " ]" : tabs + "]");
+} else {
+var ht = (vx.tok == 14 ? (vx.value).getFullMap () : vx.getMap ());
+J.script.SV.addKeys (sb, path, ht, tabs, isEscaped);
+}break;
+default:
+if (!isRaw && !isEscaped) sb.append (tabs);
+sb.append (isEscaped ? vx.escape () : J.script.SV.sValue (vx));
+}
+}, "JU.SB,J.script.SV,~S,~S,~B,~B");
+c$.addKeys = Clazz.defineMethod (c$, "addKeys", 
+ function (sb, path, ht, tabs, isEscaped) {
 var keyset = ht.keySet ();
 var keys = ht.keySet ().toArray ( new Array (keyset.size ()));
 java.util.Arrays.sort (keys);
@@ -442,82 +480,82 @@ sb.append ("{ ");
 var sep = "";
 for (var i = 0; i < keys.length; i++) {
 var key = keys[i];
-sb.append (sep).append (J.util.Escape.eS (key)).appendC (':');
-J.script.SV.sValueArray (sb, ht.get (key), map, level + 1, true);
-sep = ", ";
+sb.append (sep).append (JU.PT.esc (key)).appendC (':');
+J.script.SV.sValueArray (sb, ht.get (key), path, tabs + "\t", true, false);
+sep = ",";
 }
 sb.append (" }");
-break;
-}for (var i = 0; i < keys.length; i++) {
-sb.append (keys[i]).append ("\t:");
-var v = ht.get (keys[i]);
-var sb2 =  new J.util.SB ();
-J.script.SV.sValueArray (sb2, v, map, level + 1, isEscaped);
+return;
+}sb.append (tabs).append ("{\n");
+tabs += "\t";
+for (var i = 0; i < keys.length; i++) {
+sb.append (tabs);
+var key = keys[i];
+sb.append (key).append ("\t:");
+var sb2 =  new JU.SB ();
+var v = ht.get (key);
+isEscaped = J.script.SV.isRawType (v.tok);
+J.script.SV.sValueArray (sb2, v, path, tabs, isEscaped, false);
 var value = sb2.toString ();
-sb.append (value.indexOf ("\n") >= 0 ? "\n" : "\t");
+if (isEscaped) sb.append ("\t");
+ else sb.append ("\n");
 sb.append (value).append ("\n");
 }
-break;
-case 7:
-if (map.containsKey (vx)) {
-sb.append (isEscaped ? "[]" : vx.myName == null ? "<circular reference>" : "<" + vx.myName + ">");
-break;
-}map.put (vx, Boolean.TRUE);
-if (isEscaped) sb.append ("[");
-var sx = vx.getList ();
-for (var i = 0; i < sx.size (); i++) {
-if (isEscaped && i > 0) sb.append (",");
-var sv = sx.get (i);
-J.script.SV.sValueArray (sb, sv, map, level + 1, isEscaped);
-if (!isEscaped) sb.append ("\n");
+sb.append (tabs.substring (1)).append ("}");
+}, "JU.SB,~S,java.util.Map,~S,~B");
+c$.isRawType = Clazz.defineMethod (c$, "isRawType", 
+ function (tok) {
+switch (tok) {
+case 4:
+case 3:
+case 2:
+case 8:
+case 9:
+case 10:
+case 15:
+case 1048589:
+case 1048588:
+return true;
 }
-if (isEscaped) sb.append ("]");
-break;
-default:
-if (!isEscaped) for (var j = 0; j < level - 1; j++) sb.append ("\t");
-
-sb.append (isEscaped ? vx.escape () : J.script.SV.sValue (vx));
-}
-}, $fz.isPrivate = true, $fz), "J.util.SB,J.script.SV,java.util.Map,~N,~B");
-c$.ptValue = $_M(c$, "ptValue", 
+return false;
+}, "~N");
+c$.ptValue = Clazz.defineMethod (c$, "ptValue", 
 function (x) {
 switch (x.tok) {
 case 8:
 return x.value;
 case 4:
-var o = J.util.Escape.uP (x.value);
-if (Clazz.instanceOf (o, J.util.P3)) return o;
+var o = JW.Escape.uP (x.value);
+if (Clazz.instanceOf (o, JU.P3)) return o;
 }
 return null;
 }, "J.script.SV");
-c$.pt4Value = $_M(c$, "pt4Value", 
+c$.pt4Value = Clazz.defineMethod (c$, "pt4Value", 
 function (x) {
 switch (x.tok) {
 case 9:
 return x.value;
 case 4:
-var o = J.util.Escape.uP (x.value);
-if (!(Clazz.instanceOf (o, J.util.P4))) break;
+var o = JW.Escape.uP (x.value);
+if (!(Clazz.instanceOf (o, JU.P4))) break;
 return o;
 }
 return null;
 }, "J.script.SV");
-c$.toFloat = $_M(c$, "toFloat", 
-($fz = function (s) {
-if (s.equalsIgnoreCase ("true")) return 1;
-if (s.equalsIgnoreCase ("false") || s.length == 0) return 0;
-return J.util.Parser.parseFloatStrict (s);
-}, $fz.isPrivate = true, $fz), "~S");
-c$.concatList = $_M(c$, "concatList", 
+c$.toFloat = Clazz.defineMethod (c$, "toFloat", 
+ function (s) {
+return (s.equalsIgnoreCase ("true") ? 1 : s.length == 0 || s.equalsIgnoreCase ("false") ? 0 : JU.PT.parseFloatStrict (s));
+}, "~S");
+c$.concatList = Clazz.defineMethod (c$, "concatList", 
 function (x1, x2, asNew) {
 var v1 = x1.getList ();
 var v2 = x2.getList ();
 if (!asNew) {
-if (v2 == null) v1.addLast (J.script.SV.newScriptVariableToken (x2));
+if (v2 == null) v1.addLast (J.script.SV.newT (x2));
  else for (var i = 0; i < v2.size (); i++) v1.addLast (v2.get (i));
 
 return x1;
-}var vlist =  new J.util.JmolList ();
+}var vlist =  new JU.List ();
 if (v1 == null) vlist.addLast (x1);
  else for (var i = 0; i < v1.size (); i++) vlist.addLast (v1.get (i));
 
@@ -526,37 +564,29 @@ if (v2 == null) vlist.addLast (x2);
 
 return J.script.SV.getVariableList (vlist);
 }, "J.script.SV,J.script.SV,~B");
-c$.bsSelectToken = $_M(c$, "bsSelectToken", 
+c$.bsSelectToken = Clazz.defineMethod (c$, "bsSelectToken", 
 function (x) {
-x = J.script.SV.selectItemTok2 (x, -2147483648);
+x = J.script.SV.selectItemTok (x, -2147483648);
 return x.value;
 }, "J.script.T");
-c$.bsSelectVar = $_M(c$, "bsSelectVar", 
+c$.bsSelectVar = Clazz.defineMethod (c$, "bsSelectVar", 
 function ($var) {
 if ($var.index == 2147483647) $var = J.script.SV.selectItemVar ($var);
 return $var.value;
 }, "J.script.SV");
-c$.bsSelectRange = $_M(c$, "bsSelectRange", 
+c$.bsSelectRange = Clazz.defineMethod (c$, "bsSelectRange", 
 function (x, n) {
-x = J.script.SV.selectItemTok (x);
-x = J.script.SV.selectItemTok2 (x, (n <= 0 ? n : 1));
-x = J.script.SV.selectItemTok2 (x, (n <= 0 ? 2147483646 : n));
+x = J.script.SV.selectItemTok (x, -2147483648);
+x = J.script.SV.selectItemTok (x, (n <= 0 ? n : 1));
+x = J.script.SV.selectItemTok (x, (n <= 0 ? 2147483646 : n));
 return x.value;
 }, "J.script.T,~N");
-c$.selectItemVar = $_M(c$, "selectItemVar", 
+c$.selectItemVar = Clazz.defineMethod (c$, "selectItemVar", 
 function ($var) {
 if ($var.index != 2147483647 || $var.tok == 7 && $var.intValue == 2147483647) return $var;
-return J.script.SV.selectItemVar2 ($var, -2147483648);
+return J.script.SV.selectItemTok ($var, -2147483648);
 }, "J.script.SV");
-c$.selectItemTok = $_M(c$, "selectItemTok", 
-function ($var) {
-return J.script.SV.selectItemTok2 ($var, -2147483648);
-}, "J.script.T");
-c$.selectItemVar2 = $_M(c$, "selectItemVar2", 
-function ($var, i2) {
-return J.script.SV.selectItemTok2 ($var, i2);
-}, "J.script.SV,~N");
-c$.selectItemTok2 = $_M(c$, "selectItemTok2", 
+c$.selectItemTok = Clazz.defineMethod (c$, "selectItemTok", 
 function (tokenIn, i2) {
 switch (tokenIn.tok) {
 case 11:
@@ -571,21 +601,20 @@ return tokenIn;
 var bs = null;
 var s = null;
 var i1 = tokenIn.intValue;
+var isOne = (i2 == -2147483648);
 if (i1 == 2147483647) {
-if (i2 == -2147483648) i2 = i1;
-var v = J.script.SV.newScriptVariableIntValue (tokenIn.tok, i2, tokenIn.value);
-return v;
+return J.script.SV.newSV (tokenIn.tok, (isOne ? i1 : i2), tokenIn.value);
 }var len = 0;
 var isInputSelected = (Clazz.instanceOf (tokenIn, J.script.SV) && (tokenIn).index != 2147483647);
-var tokenOut = J.script.SV.newScriptVariableIntValue (tokenIn.tok, 2147483647, null);
+var tokenOut = J.script.SV.newSV (tokenIn.tok, 2147483647, null);
 switch (tokenIn.tok) {
 case 10:
-if (Clazz.instanceOf (tokenIn.value, J.modelset.Bond.BondSet)) {
-bs =  new J.modelset.Bond.BondSet (tokenIn.value, (tokenIn.value).getAssociatedAtoms ());
-len = J.util.BSUtil.cardinalityOf (bs);
+if (Clazz.instanceOf (tokenIn.value, JM.BondSet)) {
+bs =  new JM.BondSet (tokenIn.value, (tokenIn.value).getAssociatedAtoms ());
+len = JW.BSUtil.cardinalityOf (bs);
 } else {
-bs = J.util.BSUtil.copy (tokenIn.value);
-len = (isInputSelected ? 1 : J.util.BSUtil.cardinalityOf (bs));
+bs = JW.BSUtil.copy (tokenIn.value);
+len = (isInputSelected ? 1 : JW.BSUtil.cardinalityOf (bs));
 }break;
 case 7:
 len = (tokenIn).getList ().size ();
@@ -607,10 +636,10 @@ if (i1 > 0 && Math.abs (i1) > len) {
 var col = i1 % 10;
 var row = Clazz.doubleToInt ((i1 - col) / 10);
 if (col > 0 && col <= len && row <= len) {
-if (tokenIn.tok == 11) return J.script.SV.newVariable (3, Float.$valueOf ((tokenIn.value).getElement (row - 1, col - 1)));
-return J.script.SV.newVariable (3, Float.$valueOf ((tokenIn.value).getElement (row - 1, col - 1)));
-}return J.script.SV.newVariable (4, "");
-}if (Math.abs (i1) > len) return J.script.SV.newVariable (4, "");
+if (tokenIn.tok == 11) return J.script.SV.newV (3, Float.$valueOf ((tokenIn.value).getElement (row - 1, col - 1)));
+return J.script.SV.newV (3, Float.$valueOf ((tokenIn.value).getElement (row - 1, col - 1)));
+}return J.script.SV.newV (4, "");
+}if (Math.abs (i1) > len) return J.script.SV.newV (4, "");
 var data =  Clazz.newFloatArray (len, 0);
 if (len == 3) {
 if (i1 < 0) (tokenIn.value).getColumn (-1 - i1, data);
@@ -618,108 +647,126 @@ if (i1 < 0) (tokenIn.value).getColumn (-1 - i1, data);
 } else {
 if (i1 < 0) (tokenIn.value).getColumn (-1 - i1, data);
  else (tokenIn.value).getRow (i1 - 1, data);
-}if (i2 == -2147483648) return J.script.SV.getVariableAF (data);
-if (i2 < 1 || i2 > len) return J.script.SV.newVariable (4, "");
-return J.script.SV.newVariable (3, Float.$valueOf (data[i2 - 1]));
+}if (isOne) return J.script.SV.getVariableAF (data);
+if (i2 < 1 || i2 > len) return J.script.SV.newV (4, "");
+return J.script.SV.newV (3, Float.$valueOf (data[i2 - 1]));
 }if (i1 <= 0) i1 = len + i1;
+if (!isOne) {
 if (i1 < 1) i1 = 1;
 if (i2 == 0) i2 = len;
  else if (i2 < 0) i2 = len + i2;
-if (i2 > len) i2 = len;
- else if (i2 < i1) i2 = i1;
-switch (tokenIn.tok) {
+if (i2 < i1) i2 = i1;
+}switch (tokenIn.tok) {
 case 10:
 tokenOut.value = bs;
 if (isInputSelected) {
 if (i1 > 1) bs.clearAll ();
 break;
+}if (isOne) {
+if (i1 == len) {
+i2 = bs.length () - 1;
+} else if (i1 == 1) {
+i2 = bs.nextSetBit (0);
+}if (i2 >= -1) {
+bs.clearAll ();
+if (i2 >= 0) bs.set (i2);
+break;
+}i2 = i1;
 }var n = 0;
 for (var j = bs.nextSetBit (0); j >= 0; j = bs.nextSetBit (j + 1)) if (++n < i1 || n > i2) bs.clear (j);
 
 break;
 case 4:
-if (i1 < 1 || i1 > len) tokenOut.value = "";
- else tokenOut.value = s.substring (i1 - 1, i2);
+tokenOut.value = (--i1 < 0 || i1 >= len ? "" : isOne ? s.substring (i1, i1 + 1) : s.substring (i1, Math.min (i2, len)));
 break;
 case 7:
-if (i1 < 1 || i1 > len || i2 > len) return J.script.SV.newVariable (4, "");
-if (i2 == i1) return (tokenIn).getList ().get (i1 - 1);
-var o2 =  new J.util.JmolList ();
+if (--i1 < 0 || i1 >= len) return J.script.SV.newV (4, "");
+if (isOne) return (tokenIn).getList ().get (i1);
+var o2 =  new JU.List ();
 var o1 = (tokenIn).getList ();
-n = i2 - i1 + 1;
-for (var i = 0; i < n; i++) o2.addLast (J.script.SV.newScriptVariableToken (o1.get (i + i1 - 1)));
+var nn = Math.min (i2, len) - i1;
+for (var i = 0; i < nn; i++) o2.addLast (J.script.SV.newT (o1.get (i + i1)));
 
 tokenOut.value = o2;
 break;
 }
 return tokenOut;
 }, "J.script.T,~N");
-$_M(c$, "setSelectedValue", 
-function (selector, $var) {
-if (selector == 2147483647) return false;
+Clazz.defineMethod (c$, "setSelectedValue", 
+function (pt1, pt2, $var) {
+if (pt1 == 2147483647) return;
 var len;
 switch (this.tok) {
 case 11:
 case 12:
 len = (this.tok == 11 ? 3 : 4);
-if (selector > 10) {
-var col = selector % 10;
-var row = Clazz.doubleToInt ((selector - col) / 10);
+if (pt2 != 2147483647) {
+var col = pt2;
+var row = pt1;
 if (col > 0 && col <= len && row <= len) {
 if (this.tok == 11) (this.value).setElement (row - 1, col - 1, J.script.SV.fValue ($var));
  else (this.value).setElement (row - 1, col - 1, J.script.SV.fValue ($var));
-return true;
-}}if (selector != 0 && Math.abs (selector) <= len && $var.tok == 7) {
+return;
+}}if (pt1 != 0 && Math.abs (pt1) <= len && $var.tok == 7) {
 var sv = $var.getList ();
 if (sv.size () == len) {
 var data =  Clazz.newFloatArray (len, 0);
 for (var i = 0; i < len; i++) data[i] = J.script.SV.fValue (sv.get (i));
 
-if (selector > 0) {
-if (this.tok == 11) (this.value).setRowA (selector - 1, data);
- else (this.value).setRow (selector - 1, data);
+if (pt1 > 0) {
+if (this.tok == 11) (this.value).setRowA (pt1 - 1, data);
+ else (this.value).setRowA (pt1 - 1, data);
 } else {
-if (this.tok == 11) (this.value).setColumnA (-1 - selector, data);
- else (this.value).setColumn (-1 - selector, data);
-}return true;
-}}return false;
+if (this.tok == 11) (this.value).setColumnA (-1 - pt1, data);
+ else (this.value).setColumnA (-1 - pt1, data);
+}break;
+}}break;
 case 4:
 var str = this.value;
 var pt = str.length;
-if (selector <= 0) selector = pt + selector;
-if (--selector < 0) selector = 0;
-while (selector >= str.length) str += " ";
+if (pt1 <= 0) pt1 = pt + pt1;
+if (--pt1 < 0) pt1 = 0;
+while (pt1 >= str.length) str += " ";
 
-this.value = str.substring (0, selector) + J.script.SV.sValue ($var) + str.substring (selector + 1);
-return true;
+if (pt2 == 2147483647) {
+pt2 = pt1;
+} else {
+if (--pt2 < 0) pt2 = pt + pt2;
+while (pt2 >= str.length) str += " ";
+
+}if (pt2 >= pt1) this.value = str.substring (0, pt1) + J.script.SV.sValue ($var) + str.substring (++pt2);
+this.intValue = this.index = 2147483647;
+break;
 case 7:
 len = this.getList ().size ();
-if (selector <= 0) selector = len + selector;
-if (--selector < 0) selector = 0;
-if (len <= selector) {
-for (var i = len; i <= selector; i++) this.getList ().addLast (J.script.SV.newVariable (4, ""));
+if (pt1 <= 0) pt1 = len + pt1;
+if (--pt1 < 0) pt1 = 0;
+if (len <= pt1) {
+for (var i = len; i <= pt1; i++) this.getList ().addLast (J.script.SV.newV (4, ""));
 
-}this.getList ().set (selector, $var);
-return true;
+}this.getList ().set (pt1, $var);
+break;
 }
-return false;
-}, "~N,J.script.SV");
-$_M(c$, "escape", 
+}, "~N,~N,J.script.SV");
+Clazz.defineMethod (c$, "escape", 
 function () {
 switch (this.tok) {
 case 4:
-return J.util.Escape.eS (this.value);
+return JU.PT.esc (this.value);
+case 11:
+case 12:
+return JU.PT.toJSON (null, this.value);
 case 7:
 case 6:
-var sb =  new J.util.SB ();
-var map =  new java.util.Hashtable ();
-J.script.SV.sValueArray (sb, this, map, 0, true);
+case 14:
+var sb =  new JU.SB ();
+J.script.SV.sValueArray (sb, this, "", "", true, false);
 return sb.toString ();
 default:
 return J.script.SV.sValue (this);
 }
 });
-c$.unescapePointOrBitsetAsVariable = $_M(c$, "unescapePointOrBitsetAsVariable", 
+c$.unescapePointOrBitsetAsVariable = Clazz.defineMethod (c$, "unescapePointOrBitsetAsVariable", 
 function (o) {
 if (o == null) return o;
 var v = null;
@@ -744,21 +791,20 @@ break;
 } else if (Clazz.instanceOf (o, String)) {
 s = o;
 }if (s != null && s.length == 0) return s;
-if (v == null) v = J.util.Escape.unescapePointOrBitsetOrMatrixOrArray (s);
-if (Clazz.instanceOf (v, J.util.P3)) return (J.script.SV.newVariable (8, v));
-if (Clazz.instanceOf (v, J.util.P4)) return J.script.SV.newVariable (9, v);
-if (Clazz.instanceOf (v, J.util.BS)) {
-if (s != null && s.indexOf ("[{") == 0) v =  new J.modelset.Bond.BondSet (v);
-return J.script.SV.newVariable (10, v);
-}if (Clazz.instanceOf (v, J.util.Matrix3f)) return (J.script.SV.newVariable (11, v));
-if (Clazz.instanceOf (v, J.util.Matrix4f)) return J.script.SV.newVariable (12, v);
+if (v == null) v = JW.Escape.uABsM (s);
+if (Clazz.instanceOf (v, JU.P3)) return (J.script.SV.newV (8, v));
+if (Clazz.instanceOf (v, JU.P4)) return J.script.SV.newV (9, v);
+if (Clazz.instanceOf (v, JU.BS)) {
+if (s != null && s.indexOf ("[{") == 0) v =  new JM.BondSet (v);
+return J.script.SV.newV (10, v);
+}if (Clazz.instanceOf (v, JU.M34)) return (J.script.SV.newV (Clazz.instanceOf (v, JU.M3) ? 11 : 12, v));
 return o;
 }, "~O");
-c$.getBoolean = $_M(c$, "getBoolean", 
+c$.getBoolean = Clazz.defineMethod (c$, "getBoolean", 
 function (value) {
-return J.script.SV.newScriptVariableToken (value ? J.script.SV.vT : J.script.SV.vF);
+return J.script.SV.newT (value ? J.script.SV.vT : J.script.SV.vF);
 }, "~B");
-c$.sprintf = $_M(c$, "sprintf", 
+c$.sprintf = Clazz.defineMethod (c$, "sprintf", 
 function (strFormat, $var) {
 if ($var == null) return strFormat;
 var vd = (strFormat.indexOf ("d") >= 0 || strFormat.indexOf ("i") >= 0 ?  Clazz.newIntArray (1, 0) : null);
@@ -775,30 +821,33 @@ for (var i = 0; i < list2.length; i++) list2[i] = J.script.SV.sprintf (strFormat
 
 return list2;
 }, "~S,J.script.SV");
-c$.sprintf = $_M(c$, "sprintf", 
-($fz = function (strFormat, $var, of, vd, vf, ve, getS, getP, getQ) {
+c$.sprintf = Clazz.defineMethod (c$, "sprintf", 
+ function (strFormat, $var, of, vd, vf, ve, getS, getP, getQ) {
 if (vd != null) vd[0] = J.script.SV.iValue ($var);
 if (vf != null) vf[0] = J.script.SV.fValue ($var);
 if (ve != null) ve[0] = J.script.SV.fValue ($var);
 if (getS) of[3] = J.script.SV.sValue ($var);
 if (getP) of[4] = $var.value;
 if (getQ) of[5] = $var.value;
-return J.util.TextFormat.sprintf (strFormat, "IFDspq", of);
-}, $fz.isPrivate = true, $fz), "~S,J.script.SV,~A,~A,~A,~A,~B,~B,~B");
-c$.sprintfArray = $_M(c$, "sprintfArray", 
+return JW.Txt.sprintf (strFormat, "IFDspq", of);
+}, "~S,J.script.SV,~A,~A,~A,~A,~B,~B,~B");
+c$.sprintfArray = Clazz.defineMethod (c$, "sprintfArray", 
 function (args) {
 switch (args.length) {
 case 0:
 return "";
 case 1:
 return J.script.SV.sValue (args[0]);
+case 2:
+if (args[0].value.toString ().equalsIgnoreCase ("base64")) return ";base64," + JU.Base64.getBase64 (args[1].tok == 15 ? (args[1].value).data : args[1].asString ().getBytes ()).toString ();
+if (args[0].value.toString ().equalsIgnoreCase ("json")) return args[1].toJSON ();
 }
-var format = J.util.TextFormat.split (J.util.TextFormat.simpleReplace (J.script.SV.sValue (args[0]), "%%", "\1"), '%');
-var sb =  new J.util.SB ();
+var sb =  new JU.SB ();
+var format = JU.PT.split (JU.PT.rep (J.script.SV.sValue (args[0]), "%%", "\1"), "%");
 sb.append (format[0]);
 for (var i = 1; i < format.length; i++) {
-var ret = J.script.SV.sprintf (J.util.TextFormat.formatCheck ("%" + format[i]), (i < args.length ? args[i] : null));
-if (J.util.Escape.isAS (ret)) {
+var ret = J.script.SV.sprintf (JW.Txt.formatCheck ("%" + format[i]), (i < args.length ? args[i] : null));
+if (JU.PT.isAS (ret)) {
 var list = ret;
 for (var j = 0; j < list.length; j++) sb.append (list[j]).append ("\n");
 
@@ -807,36 +856,43 @@ continue;
 }
 return sb.toString ();
 }, "~A");
-Clazz.overrideMethod (c$, "toString", 
-function () {
-return this.toString2 () + "[" + this.myName + " index =" + this.index + " intValue=" + this.intValue + "]";
-});
-c$.getBitSet = $_M(c$, "getBitSet", 
+c$.getBitSet = Clazz.defineMethod (c$, "getBitSet", 
 function (x, allowNull) {
 switch (x.tok) {
 case 10:
 return J.script.SV.bsSelectVar (x);
 case 7:
-var bs =  new J.util.BS ();
+var bs =  new JU.BS ();
 var sv = x.value;
 for (var i = 0; i < sv.size (); i++) if (!sv.get (i).unEscapeBitSetArray (bs) && allowNull) return null;
 
 return bs;
 }
-return (allowNull ? null :  new J.util.BS ());
+return (allowNull ? null :  new JU.BS ());
 }, "J.script.SV,~B");
-c$.areEqual = $_M(c$, "areEqual", 
+c$.areEqual = Clazz.defineMethod (c$, "areEqual", 
 function (x1, x2) {
 if (x1 == null || x2 == null) return false;
-if (x1.tok == 4 && x2.tok == 4) return J.script.SV.sValue (x1).equalsIgnoreCase (J.script.SV.sValue (x2));
-if (x1.tok == 8 && x2.tok == 8) return ((x1.value).distance (x2.value) < 0.000001);
-if (x1.tok == 9 && x2.tok == 9) return ((x1.value).distance (x2.value) < 0.000001);
-return (Math.abs (J.script.SV.fValue (x1) - J.script.SV.fValue (x2)) < 0.000001);
+if (x1.tok == x2.tok) {
+switch (x1.tok) {
+case 4:
+case 10:
+case 15:
+case 6:
+case 7:
+case 14:
+return x1.equals (x2);
+case 8:
+return ((x1.value).distance (x2.value) < 0.000001);
+case 9:
+return ((x1.value).distance (x2.value) < 0.000001);
+}
+}return (Math.abs (J.script.SV.fValue (x1) - J.script.SV.fValue (x2)) < 0.000001);
 }, "J.script.SV,J.script.SV");
-$_M(c$, "sortOrReverse", 
+Clazz.defineMethod (c$, "sortOrReverse", 
 function (arrayPt) {
 var x = this.getList ();
-if (x == null || x.size () < 2) return this;
+if (x != null && x.size () > 1) {
 if (arrayPt == -2147483648) {
 var n = x.size ();
 for (var i = 0; i < n; i++) {
@@ -846,13 +902,20 @@ x.set (n, v);
 }
 } else {
 java.util.Collections.sort (this.getList (), Clazz.innerTypeInstance (J.script.SV.Sort, this, null, --arrayPt));
-}return this;
+}}return this;
 }, "~N");
-$_M(c$, "unEscapeBitSetArray", 
+Clazz.defineMethod (c$, "pushPop", 
+function (o) {
+var x = this.getList ();
+if (o == null || x == null) return (x == null || x.size () == 0 ? J.script.SV.newS ("") : x.remove (x.size () - 1));
+x.addLast (J.script.SV.newI (0).setv (o));
+return this;
+}, "J.script.SV");
+Clazz.defineMethod (c$, "unEscapeBitSetArray", 
 function (bs) {
 switch (this.tok) {
 case 4:
-var bs1 = J.util.Escape.uB (this.value);
+var bs1 = JU.BS.unescape (this.value);
 if (bs1 == null) return false;
 bs.or (bs1);
 return true;
@@ -861,15 +924,15 @@ bs.or (this.value);
 return true;
 }
 return false;
-}, "J.util.BS");
-c$.unEscapeBitSetArray = $_M(c$, "unEscapeBitSetArray", 
+}, "JU.BS");
+c$.unEscapeBitSetArray = Clazz.defineMethod (c$, "unEscapeBitSetArray", 
 function (x, allowNull) {
-var bs =  new J.util.BS ();
+var bs =  new JU.BS ();
 for (var i = 0; i < x.size (); i++) if (!x.get (i).unEscapeBitSetArray (bs) && allowNull) return null;
 
 return bs;
 }, "java.util.ArrayList,~B");
-c$.listValue = $_M(c$, "listValue", 
+c$.listValue = Clazz.defineMethod (c$, "listValue", 
 function (x) {
 if (x.tok != 7) return [J.script.SV.sValue (x)];
 var sv = (x).getList ();
@@ -878,7 +941,7 @@ for (var i = sv.size (); --i >= 0; ) list[i] = J.script.SV.sValue (sv.get (i));
 
 return list;
 }, "J.script.T");
-c$.flistValue = $_M(c$, "flistValue", 
+c$.flistValue = Clazz.defineMethod (c$, "flistValue", 
 function (x, nMin) {
 if (x.tok != 7) return [J.script.SV.fValue (x)];
 var sv = (x).getList ();
@@ -889,7 +952,7 @@ for (var i = Math.min (sv.size (), nMin); --i >= 0; ) list[i] = J.script.SV.fVal
 
 return list;
 }, "J.script.T,~N");
-$_M(c$, "toArray", 
+Clazz.defineMethod (c$, "toArray", 
 function () {
 var dim;
 var m3 = null;
@@ -907,7 +970,7 @@ default:
 return;
 }
 this.tok = 7;
-var o2 =  new J.util.JmolList ();
+var o2 =  new JU.List ();
 for (var i = 0; i < dim; i++) {
 var a =  Clazz.newFloatArray (dim, 0);
 if (m3 == null) m4.getRow (i, a);
@@ -916,16 +979,68 @@ o2.set (i, J.script.SV.getVariableAF (a));
 }
 this.value = o2;
 });
-$_M(c$, "mapValue", 
+Clazz.defineMethod (c$, "mapValue", 
 function (key) {
-return (this.tok == 6 ? (this.value).get (key) : null);
+switch (this.tok) {
+case 6:
+return (this.value).get (key);
+case 14:
+var sc = (this.value);
+return (key.equals ("_path") ? J.script.SV.newS (sc.contextPath) : sc.getVariable (key));
+}
+return null;
 }, "~S");
-$_M(c$, "getList", 
+Clazz.defineMethod (c$, "getList", 
 function () {
 return (this.tok == 7 ? this.value : null);
 });
+c$.isScalar = Clazz.defineMethod (c$, "isScalar", 
+function (x) {
+switch (x.tok) {
+case 7:
+return false;
+case 4:
+return ((x.value).indexOf ("\n") < 0);
+default:
+return true;
+}
+}, "J.script.SV");
+Clazz.overrideMethod (c$, "toJSON", 
+function () {
+switch (this.tok) {
+case 1048589:
+case 1048588:
+case 2:
+case 3:
+return J.script.SV.sValue (this);
+case 15:
+return JU.PT.byteArrayToJSON ((this.value).data);
+case 14:
+return JU.PT.toJSON (null, (this.value).getFullMap ());
+default:
+return JU.PT.toJSON (null, this.value);
+}
+});
+Clazz.defineMethod (c$, "mapPut", 
+function (key, v) {
+this.getMap ().put (key, v);
+}, "~S,J.script.SV");
+Clazz.defineMethod (c$, "getMap", 
+ function () {
+switch (this.tok) {
+case 6:
+return this.value;
+case 14:
+return (this.value).vars;
+}
+return null;
+});
+Clazz.overrideMethod (c$, "toString", 
+function () {
+return this.toString2 () + "[" + this.myName + " index =" + this.index + " intValue=" + this.intValue + "]";
+});
 c$.$SV$Sort$ = function () {
-Clazz.pu$h ();
+Clazz.pu$h(self.c$);
 c$ = Clazz.decorateAsClass (function () {
 Clazz.prepareCallback (this, arguments);
 this.arrayPt = 0;
@@ -962,10 +1077,10 @@ return (f < g ? -1 : f > g ? 1 : 0);
 }, "J.script.SV,J.script.SV");
 c$ = Clazz.p0p ();
 };
-c$.vT = c$.prototype.vT = J.script.SV.newScriptVariableIntValue (1048589, 1, "true");
-c$.vF = c$.prototype.vF = J.script.SV.newScriptVariableIntValue (1048588, 0, "false");
+c$.vT = c$.prototype.vT = J.script.SV.newSV (1048589, 1, "true");
+c$.vF = c$.prototype.vF = J.script.SV.newSV (1048588, 0, "false");
 Clazz.defineStatics (c$,
 "FLAG_CANINCREMENT", 1,
-"FLAG_LOCALVAR", 2);
-c$.pt0 = c$.prototype.pt0 =  new J.util.P3 ();
+"FLAG_MODIFIED", 2);
+c$.pt0 = c$.prototype.pt0 =  new JU.P3 ();
 });

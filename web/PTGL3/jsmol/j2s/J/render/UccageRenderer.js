@@ -1,5 +1,5 @@
 Clazz.declarePackage ("J.render");
-Clazz.load (["J.render.CageRenderer", "J.util.P3"], "J.render.UccageRenderer", ["J.util.BoxInfo", "$.C", "$.SimpleUnitCell", "$.TextFormat"], function () {
+Clazz.load (["J.render.CageRenderer", "JU.P3"], "J.render.UccageRenderer", ["JU.DF", "JW.BoxInfo", "$.C", "$.SimpleUnitCell"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.fid = 0;
 this.verticesT = null;
@@ -12,55 +12,56 @@ Clazz.instantialize (this, arguments);
 }, J.render, "UccageRenderer", J.render.CageRenderer);
 Clazz.prepareFields (c$, function () {
 this.verticesT =  new Array (8);
-{
-for (var i = 8; --i >= 0; ) {
-this.verticesT[i] =  new J.util.P3 ();
-}
-}this.fset0 = J.util.P3.new3 (555, 555, 1);
-this.cell0 =  new J.util.P3 ();
-this.cell1 =  new J.util.P3 ();
-this.offset =  new J.util.P3 ();
-this.offsetT =  new J.util.P3 ();
+this.fset0 = JU.P3.new3 (555, 555, 1);
+this.cell0 =  new JU.P3 ();
+this.cell1 =  new JU.P3 ();
+this.offset =  new JU.P3 ();
+this.offsetT =  new JU.P3 ();
 });
 Clazz.overrideMethod (c$, "initRenderer", 
 function () {
-this.tickEdges = J.util.BoxInfo.uccageTickEdges;
+for (var i = 8; --i >= 0; ) this.verticesT[i] =  new JU.P3 ();
+
+this.tickEdges = JW.BoxInfo.uccageTickEdges;
 this.draw000 = false;
 });
 Clazz.overrideMethod (c$, "render", 
 function () {
-this.imageFontScaling = this.viewer.getImageFontScaling ();
+this.imageFontScaling = this.vwr.getImageFontScaling ();
 this.font3d = this.g3d.getFont3DScaled ((this.shape).font3d, this.imageFontScaling);
-var mad = this.viewer.getObjectMad (5);
-if (mad == 0 || this.viewer.isJmolDataFrame () || this.viewer.isNavigating () && this.viewer.getBoolean (603979887)) return false;
-this.colix = this.viewer.getObjectColix (5);
-var needTranslucent = J.util.C.isColixTranslucent (this.colix);
+var mad = this.vwr.getObjectMad (5);
+if (mad == 0 || this.vwr.isJmolDataFrame () || this.vwr.isNavigating () && this.vwr.getBoolean (603979888)) return false;
+this.colix = this.vwr.getObjectColix (5);
+var needTranslucent = JW.C.isColixTranslucent (this.colix);
 if (!this.isExport && needTranslucent != this.g3d.isPass2 ()) return needTranslucent;
 this.render1 (mad);
 return false;
 });
-$_M(c$, "render1", 
-($fz = function (mad) {
+Clazz.defineMethod (c$, "render1", 
+ function (mad) {
 this.g3d.setColix (this.colix);
-var unitcell = this.viewer.getCurrentUnitCell ();
+var unitcell = this.vwr.getCurrentUnitCell ();
 if (unitcell == null) return;
 this.isPolymer = unitcell.isPolymer ();
 this.isSlab = unitcell.isSlab ();
 var vertices = unitcell.getUnitCellVertices ();
 this.offset.setT (unitcell.getCartesianOffset ());
+this.offsetT.set (0, 0, 0);
+unitcell.toCartesian (this.offsetT, true);
+this.offset.sub (this.offsetT);
 var fset = unitcell.getUnitCellMultiplier ();
 var haveMultiple = (fset != null);
 if (!haveMultiple) fset = this.fset0;
-J.util.SimpleUnitCell.ijkToPoint3f (Clazz.floatToInt (fset.x), this.cell0, 0);
-J.util.SimpleUnitCell.ijkToPoint3f (Clazz.floatToInt (fset.y), this.cell1, 1);
+JW.SimpleUnitCell.ijkToPoint3f (Clazz.floatToInt (fset.x), this.cell0, 0);
+JW.SimpleUnitCell.ijkToPoint3f (Clazz.floatToInt (fset.y), this.cell1, 1);
 var firstLine;
 var allow0;
 var allow1;
 if (fset.z < 0) {
 this.cell0.scale (-1 / fset.z);
 this.cell1.scale (-1 / fset.z);
-}var axisPoints = this.viewer.getAxisPoints ();
-var drawAllLines = (this.viewer.getObjectMad (1) == 0 || this.viewer.getFloat (570425346) < 2 || axisPoints == null);
+}var axisPoints = this.vwr.getAxisPoints ();
+var drawAllLines = (this.vwr.getObjectMad (1) == 0 || this.vwr.getFloat (570425346) < 2 || axisPoints == null);
 var aPoints = axisPoints;
 for (var x = Clazz.floatToInt (this.cell0.x); x < this.cell1.x; x++) {
 for (var y = Clazz.floatToInt (this.cell0.y); y < this.cell1.y; y++) {
@@ -85,15 +86,15 @@ this.renderCage (mad, this.verticesT, aPoints, firstLine, allow0, allow1, Math.a
 }
 }
 }
-if (this.viewer.getBoolean (603979828) && !this.viewer.isPreviewOnly () && !unitcell.isPeriodic ()) this.renderInfo (unitcell);
-}, $fz.isPrivate = true, $fz), "~N");
-$_M(c$, "nfformat", 
-($fz = function (x) {
-return (J.util.TextFormat.formatDecimal (x, 3));
-}, $fz.isPrivate = true, $fz), "~N");
-$_M(c$, "renderInfo", 
-($fz = function (symmetry) {
-if (this.isExport || !this.g3d.setColix (this.viewer.getColixBackgroundContrast ())) return;
+if (this.vwr.getBoolean (603979828) && !this.vwr.isPreviewOnly () && !unitcell.isPeriodic ()) this.renderInfo (unitcell);
+}, "~N");
+Clazz.defineMethod (c$, "nfformat", 
+ function (x) {
+return (JU.DF.formatDecimal (x, 3));
+}, "~N");
+Clazz.defineMethod (c$, "renderInfo", 
+ function (symmetry) {
+if (this.isExport || !this.g3d.setColix (this.vwr.getColixBackgroundContrast ())) return;
 this.fid = this.g3d.getFontFidFS ("Monospaced", 14 * this.imageFontScaling);
 this.g3d.setFontFid (this.fid);
 var lineheight = Clazz.doubleToInt (Math.floor (15 * this.imageFontScaling));
@@ -121,5 +122,5 @@ y += lineheight;
 this.g3d.drawStringNoSlab ("\u03B2=" + this.nfformat (symmetry.getUnitCellInfoType (4)) + "\u00B0", null, x, y, 0, 0);
 }y += lineheight;
 this.g3d.drawStringNoSlab ("\u03B3=" + this.nfformat (symmetry.getUnitCellInfoType (5)) + "\u00B0", null, x, y, 0, 0);
-}}, $fz.isPrivate = true, $fz), "J.api.SymmetryInterface");
+}}, "J.api.SymmetryInterface");
 });

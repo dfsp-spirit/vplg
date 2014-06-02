@@ -1,5 +1,5 @@
 Clazz.declarePackage ("J.jvxl.readers");
-Clazz.load (["J.jvxl.readers.AtomDataReader"], "J.jvxl.readers.AtomPropertyMapper", ["java.lang.Float", "J.api.Interface", "J.util.Logger"], function () {
+Clazz.load (["J.jvxl.readers.AtomDataReader"], "J.jvxl.readers.AtomPropertyMapper", ["java.lang.Float", "J.api.Interface", "JW.Logger"], function () {
 c$ = Clazz.decorateAsClass (function () {
 this.mepCalc = null;
 this.mepType = null;
@@ -14,9 +14,9 @@ Clazz.makeConstructor (c$,
 function () {
 Clazz.superConstructor (this, J.jvxl.readers.AtomPropertyMapper, []);
 });
-$_M(c$, "init", 
+Clazz.overrideMethod (c$, "init", 
 function (sg) {
-Clazz.superCall (this, J.jvxl.readers.AtomPropertyMapper, "init", [sg]);
+this.initADR (sg);
 this.mepType = sg.getReaderData ();
 }, "J.jvxl.readers.SurfaceGenerator");
 Clazz.overrideMethod (c$, "setup", 
@@ -38,16 +38,16 @@ this.smoothingPower = (this.smoothingPower - 11) / 2;
 if (this.mepType != null) {
 this.doSmoothProperty = true;
 if (this.params.mep_calcType >= 0) this.calcType = this.params.mep_calcType;
-this.mepCalc = J.api.Interface.getOptionInterface ("quantum." + this.mepType + "Calculation");
+this.mepCalc = J.api.Interface.getOption ("quantum." + this.mepType + "Calculation");
 }if (!this.doSmoothProperty && this.maxDistance == 2147483647) this.maxDistance = 5;
 this.getAtoms (this.params.bsSelected, this.doAddHydrogens, true, false, false, true, false, NaN);
 if (this.meshDataServer != null) this.meshDataServer.fillMeshData (this.meshData, 1, null);
 if (!this.doSmoothProperty && this.meshData.vertexSource != null) {
 this.hasColorData = true;
-for (var i = this.meshData.vertexCount; --i >= 0; ) {
+for (var i = this.meshData.vc; --i >= 0; ) {
 var iAtom = this.meshData.vertexSource[i];
 if (iAtom >= 0) {
-this.meshData.vertexValues[i] = this.params.theProperty[iAtom];
+this.meshData.vvs[i] = this.params.theProperty[iAtom];
 } else {
 this.hasColorData = false;
 break;
@@ -56,13 +56,13 @@ break;
 this.setRanges (this.params.solvent_ptsPerAngstrom, this.params.solvent_gridMax, 0);
 this.params.cutoff = 0;
 }, "~B");
-$_M(c$, "setVolumeData", 
+Clazz.overrideMethod (c$, "setVolumeData", 
 function () {
-if (this.params.thePlane != null) Clazz.superCall (this, J.jvxl.readers.AtomPropertyMapper, "setVolumeData", []);
+if (this.params.thePlane != null) this.setVolumeDataADR ();
 });
 Clazz.overrideMethod (c$, "initializeMapping", 
 function () {
-if (this.params.showTiming) J.util.Logger.startTimer ("property mapping");
+if (this.params.showTiming) JW.Logger.startTimer ("property mapping");
 if (this.bsNearby != null) this.bsMySelected.or (this.bsNearby);
 this.iter = this.atomDataServer.getSelectedAtomIterator (this.bsMySelected, false, false, false);
 });
@@ -70,7 +70,7 @@ Clazz.overrideMethod (c$, "finalizeMapping",
 function () {
 this.iter.release ();
 this.iter = null;
-if (this.params.showTiming) J.util.Logger.checkTimer ("property mapping", false);
+if (this.params.showTiming) JW.Logger.checkTimer ("property mapping", false);
 });
 Clazz.overrideMethod (c$, "generateCube", 
 function () {
@@ -114,5 +114,5 @@ vdiv += d2;
 value += d2 * p;
 }}
 return (this.mepCalc != null ? value : this.doSmoothProperty ? (vdiv == 0 || dminNearby < dmin ? NaN : value / vdiv) : value);
-}, "J.util.P3,~B");
+}, "JU.P3,~B");
 });

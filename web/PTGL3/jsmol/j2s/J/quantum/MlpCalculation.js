@@ -1,5 +1,5 @@
 Clazz.declarePackage ("J.quantum");
-Clazz.load (["J.quantum.MepCalculation"], "J.quantum.MlpCalculation", ["java.lang.Float", "J.util.Logger"], function () {
+Clazz.load (["J.quantum.MepCalculation"], "J.quantum.MlpCalculation", ["java.lang.Float", "JW.Logger"], function () {
 c$ = Clazz.declareType (J.quantum, "MlpCalculation", J.quantum.MepCalculation);
 Clazz.makeConstructor (c$, 
 function () {
@@ -29,8 +29,8 @@ break;
 default:
 f = NaN;
 }
-}}if (J.util.Logger.debugging) J.util.Logger.info (atoms[i].getInfo () + " " + f);
+}}if (JW.Logger.debugging) JW.Logger.debug (atoms[i].getInfo () + " " + f);
 potentials[i] = f;
 }
-}, "~A,~A,J.util.BS,J.util.BS,J.util.BS,~S");
+}, "~A,~A,JU.BS,JU.BS,JU.BS,~S");
 });

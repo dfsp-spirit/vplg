@@ -1,5 +1,5 @@
 Clazz.declarePackage ("J.minimize");
-Clazz.load (["J.util.BS", "$.JmolList"], "J.minimize.MinAtom", null, function () {
+Clazz.load (["JU.BS", "$.List"], "J.minimize.MinAtom", null, function () {
 c$ = Clazz.decorateAsClass (function () {
 this.index = 0;
 this.sType = null;
@@ -21,37 +21,37 @@ Clazz.instantialize (this, arguments);
 Clazz.prepareFields (c$, function () {
 this.coord =  Clazz.newDoubleArray (3, 0);
 this.force =  Clazz.newDoubleArray (3, 0);
-this.bonds =  new J.util.JmolList ();
-this.bsVdw =  new J.util.BS ();
-this.bs14 =  new J.util.BS ();
+this.bonds =  new JU.List ();
+this.bsVdw =  new JU.BS ();
+this.bs14 =  new JU.BS ();
 });
 Clazz.overrideMethod (c$, "toString", 
 function () {
 return "#" + this.index + " " + this.sType;
 });
 Clazz.makeConstructor (c$, 
-function (index, atom, coord, atomCount) {
+function (index, atom, coord, ac) {
 this.index = index;
 this.atom = atom;
 this.coord = coord;
-this.bsVdw.setBits (index + 1, atomCount);
+this.bsVdw.setBits (index + 1, ac);
 this.bsVdw.clear (index);
 this.hCount = atom.getCovalentHydrogenCount ();
-}, "~N,J.modelset.Atom,~A,~N");
-$_M(c$, "set", 
+}, "~N,JM.Atom,~A,~N");
+Clazz.defineMethod (c$, "set", 
 function () {
 this.coord[0] = this.atom.x;
 this.coord[1] = this.atom.y;
 this.coord[2] = this.atom.z;
 });
-$_M(c$, "getBondTo", 
+Clazz.defineMethod (c$, "getBondTo", 
 function (iAtom) {
 this.getBondedAtomIndexes ();
 for (var i = 0; i < this.nBonds; i++) if (this.bondedAtoms[i] == iAtom) return this.bonds.get (i);
 
 return null;
 }, "~N");
-$_M(c$, "getBondedAtomIndexes", 
+Clazz.defineMethod (c$, "getBondedAtomIndexes", 
 function () {
 if (this.bondedAtoms == null) {
 this.bondedAtoms =  Clazz.newIntArray (this.nBonds, 0);
@@ -59,21 +59,21 @@ for (var i = this.nBonds; --i >= 0; ) this.bondedAtoms[i] = this.bonds.get (i).g
 
 }return this.bondedAtoms;
 });
-$_M(c$, "getIdentity", 
+Clazz.defineMethod (c$, "getIdentity", 
 function () {
 return this.atom.getInfo ();
 });
-$_M(c$, "addBond", 
+Clazz.defineMethod (c$, "addBond", 
 function (bond, i) {
 this.bonds.addLast (bond);
 this.nBonds++;
 this.bsVdw.clear (i);
 }, "J.minimize.MinBond,~N");
-$_M(c$, "getBondIndex", 
+Clazz.defineMethod (c$, "getBondIndex", 
 function (j) {
 return this.bonds.get (j).index;
 }, "~N");
-c$.isLinear = $_M(c$, "isLinear", 
+c$.isLinear = Clazz.defineMethod (c$, "isLinear", 
 function (minAtom) {
 switch (minAtom.ffType) {
 case 4:
