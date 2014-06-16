@@ -51,7 +51,7 @@ include('./backend/display_proteins.php');
 			are representing just single vertices in the <a href="about.php#proteinGraph">protein graph</a>.
 			<p>In the <a href="about.php#key">key</a> notation only folding graphs can be shown that are <a href="">non-bifurcated</a>.</p>
 			
-			<span id="multipleDownload">Download checked Proteins as <select name="multipledownload">
+			<span id="multipleDownload">Download checked Proteins as <select id="multidown" name="multipledownload">
 												<option value="null">-- Select to download --</option>
 												<option value="ps">PostScript</option>
 												<option value="svg">SVG</option>
@@ -111,8 +111,10 @@ include('./backend/display_proteins.php');
 		<!-- <script src="js/livesearch.js" type="text/javascript"></script>
 		
 		<!-- bxSlider Javascript file -->
-		<script src="js/jquery.bxslider.min.js"></script>
+		<script src="js/jquery.bxslider.min.js"></script>	
 		<!-- <script src="js/bxslider-custom.js"></script> -->
+
+		<script src="js/queuedownload.js"></script>
 
 
 

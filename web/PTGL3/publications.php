@@ -50,7 +50,7 @@
 			<br>
 			
 			<ul id="publicationsList">
-				<li> ###MISSING####<a href="http://nar.oxfordjournals.org/cgi/content/abstract/gkp980?ijkey=LzGHNiRmy73nxhR&keytype=ref">10.1093/nar/gkp980</a> (Database issue 2010). </li>
+				<li>Koch I, Kreuchwig A, May P (2013). Hierarchical representation of supersecondary structures using a graph-theoretical approach. Journal of Methods in molecular biology 2013;932:7-33. (<a href="http://www.ncbi.nlm.nih.gov/pubmed/22987344">/pubmed/22987344</a>).</li>
 				<li>May P, Kreuschwig A, Steinke T, Koch I (2009). PTGL - a database for secondary structure-based protein topologies. Nucleic Acids Research, <a href="http://nar.oxfordjournals.org/cgi/content/abstract/gkp980?ijkey=LzGHNiRmy73nxhR&keytype=ref">10.1093/nar/gkp980</a> (Database issue 2010). </li>
 				<li>May P, Barthel S, Koch I (2004). PTGL - Protein Topology Graph Library. Bioinformatics 20(17):3277-3279.</li>
 				<li>Koch I, Lengauer T (1997) Detection of distant structural similarities in a set of proteins using a fast graph-based method. Proceedings of the Fifth International Conference on Intelligent Systems for Molecular Biology, 21.-26 Juni, Halkidiki, Greece AAAI Press, California. eds. T. Gaasterland, P. Karp, K. Karplus, C. Ouzounis, C. Sander, A. Valencia:167-187. </li>

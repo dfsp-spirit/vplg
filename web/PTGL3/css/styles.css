@@ -391,6 +391,22 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 /*	-------------------------------------------------------------
 	Search
 	-----------------------------------------------------------*/
+	.motifimagecontainer {
+		display: inline-block;
+		height: 250px;
+		margin-bottom: 25px;
+	}
+
+	.motifimage {
+		height: 100%
+	}
+
+	.motiftext {
+		width: 100%;
+	}
+
+
+
 	#searchInput {
 		width: 301px;
 		}

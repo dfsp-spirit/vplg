@@ -60,15 +60,15 @@ foreach ($chains as $value){
 
 		array_push($allChainIDs, $value);
 		$pdb_chain = str_split($value, 4);
-		$query = "SELECT * FROM plcc_chain, plcc_graph WHERE pdb_id LIKE '%".$pdb_chain[0]."%' AND chain_name LIKE '%".$pdb_chain[1]."%' AND plcc_graph.chain_id = plcc_chain.chain_id"; 
+		$query = "SELECT * FROM plcc_chain, plcc_graph WHERE pdb_id LIKE '%".$pdb_chain[0]."%' AND chain_name LIKE '%".$pdb_chain[1]."%' AND plcc_graph.chain_id = plcc_chain.chain_id ORDER BY graph_type"; 
 		$result = pg_query($db, $query) 
 					  or die($query . ' -> Query failed: ' . pg_last_error());		  
-		$chain_id = pg_fetch_array($result, NULL, PGSQL_ASSOC);
-		$chain_id = (int) $chain_id['chain_id'];
+		$data = pg_fetch_array($result, NULL, PGSQL_ASSOC);
+		$chain_id = (int) $data['chain_id'];
 
 		
 		$query = "SELECT * FROM plcc_sse WHERE chain_id = ".$chain_id." ORDER BY position_in_chain";
-		$result = pg_query($db, $query) 
+		$result_2 = pg_query($db, $query) 
 					  or die($query . ' -> Query failed: ' . pg_last_error());
 		$tableString .= '<li>
 						<div class="container">
@@ -78,17 +78,17 @@ foreach ($chains as $value){
 
 						 <div class="proteingraph">
 						 	<div>
-						 	<input type="checkbox" name="" value=""> Enqueue in Downloadlist
+						 	<input type="checkbox" name="'.$pdb_chain[0].$pdb_chain[1].'" value="'.$pdb_chain[0].$pdb_chain[1].'"> Enqueue in Downloadlist
 						 	<span class="download-options"><a href="3dview.php?q='.$pdb_chain[0].$pdb_chain[1].'">3D-View [JMOL]</a></span>
 							</div>	
 							<ul class="bxslider tada">
 								<li id="'.$pdb_chain[0].$pdb_chain[1].'">';
 
 					if($loaded_images < 2){		
-					$tableString .= '<a title="Loaded_'.$loaded_images.'" href="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$graphtype.'_PG.png" target="_blank">
-									<img src="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$graphtype.'_PG.png" alt="" />
+					$tableString .= '<a title="Loaded_'.$loaded_images.'" href="./data/'.$data['graph_image_png'].'" target="_blank">
+									<img src="./data/'.$data['graph_image_png'].'" alt="" />
 									</a>
-									<a href="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$graphtype.'_PG.png" target="_blank">Full Size Image</a>
+									<a href="./data/'.$data['graph_image_png'].'" target="_blank">Full Size Image</a>
 								<span class="download-options">Download Graph: 
 								<a href="">[PS]</a>
 								<a href="">[SVG]</a>
@@ -98,14 +98,14 @@ foreach ($chains as $value){
 
 					$tableString .= '</li>';	
 					
-						foreach ($graphtypes as $gt){
+						while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
 							$tableString .= '<li>';
 							
 							if($loaded_images < 2){
-							$tableString .= '<a href="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$gt.'_PG.png" target="_blank">
-												<img src="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$gt.'_PG.png" alt="" />
+							$tableString .= '<a href="./data/'.$arr['graph_image_png'].'" target="_blank">
+												<img src="../data/'.$arr['graph_image_png'].'" alt="" />
 												</a>
-											<a href="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$gt.'_PG.png" target="_blank">Full Size Image</a>
+											<a href="./data/'.$arr['graph_image_png'].'" target="_blank">Full Size Image</a>
 											<span class="download-options">Download Graph: 
 											<a href="">[PS]</a>
 											<a href="">[SVG]</a>
@@ -128,7 +128,7 @@ foreach ($chains as $value){
 									<th class="tablecenter">from - to</th>
 								</tr>';
 		$counter = 1;						
-		while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
+		while ($arr = pg_fetch_array($result_2, NULL, PGSQL_ASSOC)){
 			$pdb_start = str_replace("-", "", substr($arr["pdb_start"], 1));
 			$pdb_end = str_replace("-", "", substr($arr["pdb_end"], 1));
 			$tableString .= '<tr class="tablecenter">
@@ -182,14 +182,14 @@ foreach ($chains as $value){
 					
 				if($loaded_images < 2){
 					$tableString .= '<p>- Select topology type -</p>
-									<a class="thumbalign" data-slide-index="0" href=""><img src="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$graphtype.'_PG.png" width="100px" height="100px" />
+									<a class="thumbalign" data-slide-index="0" href=""><img src="./data/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$graphtype.'_PG.png" width="100px" height="100px" />
 																		'.$graphtype_dict[$graphtype].'
 																		</a>';
 
 
 					$c = 1;					
 					foreach ($graphtypes as $gt){
-						$tableString .= ' <a class="thumbalign" data-slide-index="'.$c++.'" href=""><img src="./proteins/'.$pdb_chain[0].'/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$gt.'_PG.png" width="100px" height="100px" />
+						$tableString .= ' <a class="thumbalign" data-slide-index="'.$c++.'" href=""><img src="./data/'.$pdb_chain[0].'_'.$pdb_chain[1].'_'.$gt.'_PG.png" width="100px" height="100px" />
 											'.$graphtype_dict[$gt].'
 										  </a>
 										';

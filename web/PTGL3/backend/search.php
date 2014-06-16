@@ -18,7 +18,9 @@ function get_cath_link($pdbid, $chain = null) {
 $db_config = include('config.php');     //TODO: Sichern?
 
 
+
 // try to get POST data
+$logic = "OR";
 $none_set = true;
 if(isset($_POST)) {
     if(isset($_POST["keyword"])) {$keyword = $_POST["keyword"];  $none_set = false;} else {$keyword = "";};
@@ -52,15 +54,14 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 					or die($db_config['db'] . ' -> Connection error: ' . pg_last_error() . pg_result_error() . pg_result_error_field() . pg_result_status() . pg_connection_status() );            
 	
 	#TODO change queries
-
 	$query = "SELECT * FROM plcc_protein WHERE ";
-	if ($keyword != "") { $query .= "pdb_id LIKE '%".$keyword."%' OR header LIKE '%".strtoupper($keyword)."%' ".$logic." "; };
-	if ($pdbid != "") {   $query .= "pdb_id LIKE '%".$pdbid."%' ".$logic." "; };
-	if ($title != "") {   $query .= "title LIKE '%".$title."%' ".$logic." "; };
-	if ($het != "") {     $query .= "pdb_id LIKE '%".$het."%' ".$logic." "; };
-	if ($hetname != "") { $query .= "pdb_id LIKE '%".$hetname."%' ".$logic." "; };
-	if ($molecule != "") {$query .= "pdb_id LIKE '%".$molecule."%' ".$logic." "; };
-	if ($graphs != "") {  $query .= "pdb_id LIKE '%".$graphs."%' ".$logic." "; };
+	if (isset($keyword) && $keyword != "") { $query .= "pdb_id LIKE '%".$keyword."%' OR header LIKE '%".strtoupper($keyword)."%' ".$logic." "; };
+	if (isset($pdbid) && $pdbid != "") {   $query .= "pdb_id LIKE '%".$pdbid."%' ".$logic." "; };
+	if (isset($title) && $title != "") {   $query .= "title LIKE '%".$title."%' ".$logic." "; };
+	if (isset($het) && $het != "") {     $query .= "pdb_id LIKE '%".$het."%' ".$logic." "; };
+	if (isset($hetname) && $hetname != "") { $query .= "pdb_id LIKE '%".$hetname."%' ".$logic." "; };
+	if (isset($molecule) && $molecule != "") {$query .= "pdb_id LIKE '%".$molecule."%' ".$logic." "; };
+	if (isset($graphs) && $graphs != "") {  $query .= "pdb_id LIKE '%".$graphs."%' ".$logic." "; };
 
 
 	if ($logic == "OR") {
@@ -68,7 +69,7 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 	} else {
 		$query = rtrim($query, " AND ");
 	}
-	echo "<br><br><br>.....<br>".$query;
+
 
 	$result = pg_query($db, $query) or die($query . ' -> Query failed: ' . pg_last_error());
 

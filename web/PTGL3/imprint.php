@@ -50,10 +50,19 @@
 			<br>
 			
 			<div id="imprinttext">
-			Inhaltlich Verantwortliche <br>
-			Paragraphen <br>
-			Mehr Paragraphen <br>
-			
+			© 2014 Molecular Bioinformatics @ Goethe-University <br>
+			<br>
+			<br>
+			Johann Wolfgang Goethe-University Frankfurt a. Main <br>
+			Faculty of Computer Science and Mathematics, Dept. 12 <br>
+			Institute for Computer Science <br>
+			Molecular Bioinformatics (MBI) <br>
+			Robert-Mayer-Strasse 11-15 <br>
+			60325 Frankfurt a. Main <br>
+			Germany  <br>
+			<br>
+			<a href="http://www.bioinformatik.uni-frankfurt.de/">http://www.bioinformatik.uni-frankfurt.de/</a> <br>
+			<br>
 			</div>
 
 		
