@@ -1,0 +1,83 @@
+# This is the plcc format protein graph file for the albelig graph of PDB entry 1o1d, chain 8.
+# First character in a line indicates the line type ('#' => comment, '>' => meta data, '|' => SSE, '=' => contact).
+# The graph meta data follows in format '> key > value'.
+> keywords > ACTIN-MYOSIN COMPLEX IN SITU IN MUSCLE, CONTRACTILE PROTEIN
+> pdb_mol_name > SKELETAL MUSCLE ACTIN
+> graphtype > albelig
+> resolution > 70.0
+> date > 18-NOV-02
+> header > CONTRACTILE PROTEIN
+> pdb_org_common > RABBIT
+> title > MOLECULAR MODELS OF AVERAGED RIGOR CROSSBRIDGES FROMTOMOGRAMS OF INSECT FLIGHT MUSCLE
+> format_version > 2
+> pdbid > 1o1d
+> experiment > ELECTRON MICROSCOPY
+> chainid > 8
+> graphclass > protein graph
+> pdb_org_sci > ORYCTOLAGUS CUNICULUS
+# SSEs follow in format '| PDB ID | chain ID | graph type | sequential SSE number in chain | SSE number in graph and image | SSE type | DSSP start residue # | DSSP end residue # | PDB end residue ID (format: chain-res#-icode) | PDB start residue ID | AA sequence'
+| 1o1d | 8 | albelig | 1 | 1 | E | 9444 | 9448 | 8-8-  | 8-12-  | LVCDN 
+| 1o1d | 8 | albelig | 2 | 2 | E | 9452 | 9457 | 8-16-  | 8-21-  | LVKAGF 
+| 1o1d | 8 | albelig | 3 | 3 | E | 9465 | 9468 | 8-29-  | 8-32-  | AVFP 
+| 1o1d | 8 | albelig | 4 | 4 | E | 9471 | 9474 | 8-35-  | 8-38-  | VGRP 
+| 1o1d | 8 | albelig | 5 | 5 | H | 9492 | 9496 | 8-56-  | 8-60-  | DEAQS 
+| 1o1d | 8 | albelig | 6 | 6 | H | 9498 | 9500 | 8-62-  | 8-64-  | RGI 
+| 1o1d | 8 | albelig | 7 | 7 | E | 9501 | 9504 | 8-65-  | 8-68-  | LTLK 
+| 1o1d | 8 | albelig | 8 | 8 | H | 9515 | 9527 | 8-79-  | 8-91-  | WDDMEKIWHHTFY 
+| 1o1d | 8 | albelig | 9 | 9 | H | 9534 | 9536 | 8-98-  | 8-100-  | PEE 
+| 1o1d | 8 | albelig | 10 | 10 | E | 9539 | 9543 | 8-103-  | 8-107-  | TLLTE 
+| 1o1d | 8 | albelig | 11 | 11 | H | 9549 | 9562 | 8-113-  | 8-126-  | KANREKMTQIMFET 
+| 1o1d | 8 | albelig | 12 | 12 | E | 9567 | 9572 | 8-131-  | 8-136-  | AMYVAI 
+| 1o1d | 8 | albelig | 13 | 13 | H | 9573 | 9580 | 8-137-  | 8-144-  | QAVLSLYA 
+| 1o1d | 8 | albelig | 14 | 14 | E | 9586 | 9591 | 8-150-  | 8-155-  | GIVLDS 
+| 1o1d | 8 | albelig | 15 | 15 | E | 9596 | 9602 | 8-160-  | 8-166-  | THNVPIY 
+| 1o1d | 8 | albelig | 16 | 16 | H | 9608 | 9610 | 8-172-  | 8-174-  | PHA 
+| 1o1d | 8 | albelig | 17 | 17 | E | 9612 | 9614 | 8-176-  | 8-178-  | MRL 
+| 1o1d | 8 | albelig | 18 | 18 | H | 9618 | 9630 | 8-182-  | 8-194-  | GRDLTDYLMKILT 
+| 1o1d | 8 | albelig | 19 | 19 | H | 9639 | 9652 | 8-203-  | 8-216-  | TAEREIVRDIKEKL 
+| 1o1d | 8 | albelig | 20 | 20 | H | 9660 | 9668 | 8-224-  | 8-232-  | ENEMATAAS 
+| 1o1d | 8 | albelig | 21 | 21 | E | 9674 | 9677 | 8-238-  | 8-241-  | KSYE 
+| 1o1d | 8 | albelig | 22 | 22 | E | 9683 | 9686 | 8-247-  | 8-250-  | VITI 
+| 1o1d | 8 | albelig | 23 | 23 | H | 9689 | 9692 | 8-253-  | 8-256-  | ERFR 
+| 1o1d | 8 | albelig | 24 | 24 | H | 9695 | 9698 | 8-259-  | 8-262-  | ETLF 
+| 1o1d | 8 | albelig | 25 | 25 | H | 9700 | 9703 | 8-264-  | 8-267-  | PSFI 
+| 1o1d | 8 | albelig | 26 | 26 | H | 9710 | 9718 | 8-274-  | 8-282-  | IHETTYNSI 
+| 1o1d | 8 | albelig | 27 | 27 | H | 9726 | 9730 | 8-290-  | 8-294-  | RKDLY 
+| 1o1d | 8 | albelig | 28 | 28 | E | 9733 | 9736 | 8-297-  | 8-300-  | NVMS 
+| 1o1d | 8 | albelig | 29 | 29 | H | 9738 | 9741 | 8-302-  | 8-305-  | GTTM 
+| 1o1d | 8 | albelig | 30 | 30 | H | 9745 | 9754 | 8-309-  | 8-318-  | IADRMQKEIT 
+| 1o1d | 8 | albelig | 31 | 31 | H | 9771 | 9784 | 8-335-  | 8-348-  | RKYSVWIGGSILAS 
+| 1o1d | 8 | albelig | 32 | 32 | H | 9789 | 9791 | 8-353-  | 8-355-  | QQM 
+| 1o1d | 8 | albelig | 33 | 33 | H | 9795 | 9801 | 8-359-  | 8-365-  | KQEYDEA 
+| 1o1d | 8 | albelig | 34 | 34 | H | 9804 | 9807 | 8-368-  | 8-371-  | SIVH 
+# Printed info on 34 SSEs.
+# The contacts between the SSEs follow in format '= SSE1 = contact_type = SSE2'. The SSEs are labeled by their position in this graph.
+= 1 = a = 2
+= 1 = p = 10
+= 1 = m = 31
+= 2 = a = 3
+= 2 = p = 31
+= 4 = a = 7
+= 4 = m = 8
+= 6 = m = 7
+= 8 = m = 11
+= 10 = p = 12
+= 11 = a = 12
+= 11 = m = 33
+= 11 = m = 34
+= 12 = m = 13
+= 13 = m = 15
+= 13 = m = 31
+= 14 = a = 15
+= 14 = m = 26
+= 14 = p = 28
+= 14 = m = 29
+= 15 = a = 17
+= 15 = p = 26
+= 18 = m = 19
+= 18 = m = 23
+= 19 = m = 21
+= 21 = a = 22
+= 26 = m = 30
+= 28 = m = 31
+# Listed 28 contacts. EOF.

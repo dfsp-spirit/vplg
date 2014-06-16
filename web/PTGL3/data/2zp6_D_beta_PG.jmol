@@ -1,0 +1,1 @@
+load =2ZP6; draw e0 color black diameter 5.0 circle {-23.2 30.6 1.3}; delete water; cartoon only; display :D; color cartoon translucent orange; 

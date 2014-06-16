@@ -188,6 +188,8 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	#intro {
 		margin-top: 8%;
 		margin-bottom: -8%;
+		margin-left: auto;
+		margin-right: auto;
 		text-align: center;
 	}
 	
@@ -400,7 +402,7 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	}
 	
 	#search {
-		padding-top: 130px;
+		padding-top: 11%; /*180px; */
 		padding-right: auto;
 		padding-left: auto;
 		}

@@ -1,0 +1,55 @@
+# This is the plcc format protein graph file for the alpha graph of PDB entry 2xcg, chain A.
+# First character in a line indicates the line type ('#' => comment, '>' => meta data, '|' => SSE, '=' => contact).
+# The graph meta data follows in format '> key > value'.
+> keywords > FLAVOPROTEIN, MAOB, MITOCHONDRION, OXIDOREDUCTASE, TRANSMEMBRANE
+> pdb_mol_name > AMINE OXIDASE [FLAVIN-CONTAINING] B
+> graphtype > alpha
+> resolution > 1.9
+> date > 23-APR-10
+> header > OXIDOREDUCTASE
+> pdb_org_common > HUMAN
+> title > TRANYLCYPROMINE-INHIBITED HUMAN MONOAMINE OXIDASE B INCOMPLEX WITH 2-(2-BENZOFURANYL)-2-IMIDAZOLINE
+> format_version > 2
+> pdbid > 2xcg
+> experiment > X-RAY DIFFRACTION
+> chainid > A
+> graphclass > protein graph
+> pdb_org_sci > HOMO SAPIENS
+# SSEs follow in format '| PDB ID | chain ID | graph type | sequential SSE number in chain | SSE number in graph and image | SSE type | DSSP start residue # | DSSP end residue # | PDB end residue ID (format: chain-res#-icode) | PDB start residue ID | AA sequence'
+| 2xcg | A | alpha | 2 | 1 | H | 12 | 23 | A-14-  | A-25-  | ISGMAAAKLLHD 
+| 2xcg | A | alpha | 4 | 2 | H | 64 | 72 | A-66-  | A-74-  | NRILRLAKE 
+| 2xcg | A | alpha | 8 | 3 | H | 107 | 124 | A-109-  | A-126-  | PITYLDHNNFWRTMDDMG 
+| 2xcg | A | alpha | 9 | 4 | H | 132 | 134 | A-134-  | A-136-  | PWK 
+| 2xcg | A | alpha | 10 | 5 | H | 138 | 142 | A-140-  | A-144-  | AEEWD 
+| 2xcg | A | alpha | 11 | 6 | H | 146 | 153 | A-148-  | A-155-  | MKELLDKL 
+| 2xcg | A | alpha | 12 | 7 | H | 157 | 171 | A-159-  | A-173-  | ESAKQLATLFVNLCV 
+| 2xcg | A | alpha | 13 | 8 | H | 180 | 188 | A-182-  | A-190-  | ALWFLWYVK 
+| 2xcg | A | alpha | 14 | 9 | H | 193 | 197 | A-195-  | A-199-  | TTRII 
+| 2xcg | A | alpha | 16 | 10 | H | 213 | 226 | A-215-  | A-228-  | GQVSERIMDLLGDR 
+| 2xcg | A | alpha | 22 | 11 | H | 264 | 269 | A-266-  | A-271-  | PTLGMK 
+| 2xcg | A | alpha | 24 | 12 | H | 278 | 283 | A-280-  | A-285-  | MMRNQM 
+| 2xcg | A | alpha | 26 | 13 | H | 303 | 307 | A-305-  | A-309-  | FWRKK 
+| 2xcg | A | alpha | 30 | 14 | H | 345 | 350 | A-347-  | A-352-  | HKARKL 
+| 2xcg | A | alpha | 31 | 15 | H | 355 | 370 | A-357-  | A-372-  | KEERLKKLCELYAKVL 
+| 2xcg | A | alpha | 32 | 16 | H | 373 | 376 | A-375-  | A-378-  | LEAL 
+| 2xcg | A | alpha | 34 | 17 | H | 386 | 388 | A-388-  | A-390-  | WCE 
+| 2xcg | A | alpha | 35 | 18 | H | 404 | 411 | A-406-  | A-413-  | ILTQYGRV 
+| 2xcg | A | alpha | 37 | 19 | H | 424 | 426 | A-426-  | A-428-  | TET 
+| 2xcg | A | alpha | 38 | 20 | H | 434 | 451 | A-436-  | A-453-  | MEGAVEAGERAAREILHA 
+| 2xcg | A | alpha | 39 | 21 | H | 457 | 459 | A-459-  | A-461-  | EDE 
+| 2xcg | A | alpha | 40 | 22 | H | 479 | 483 | A-481-  | A-485-  | FLERH 
+| 2xcg | A | alpha | 41 | 23 | H | 487 | 497 | A-489-  | A-499-  | VPGLLRLIGLT 
+# Printed info on 23 SSEs.
+# The contacts between the SSEs follow in format '= SSE1 = contact_type = SSE2'. The SSEs are labeled by their position in this graph.
+= 1 = p = 10
+= 1 = p = 20
+= 2 = m = 20
+= 3 = p = 7
+= 5 = m = 18
+= 6 = a = 7
+= 7 = m = 8
+= 7 = m = 9
+= 12 = m = 18
+= 15 = m = 16
+= 19 = m = 20
+# Listed 11 contacts. EOF.

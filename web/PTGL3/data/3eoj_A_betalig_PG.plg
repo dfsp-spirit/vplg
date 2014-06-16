@@ -1,0 +1,172 @@
+# This is the plcc format protein graph file for the betalig graph of PDB entry 3eoj, chain A.
+# First character in a line indicates the line type ('#' => comment, '>' => meta data, '|' => SSE, '=' => contact).
+# The graph meta data follows in format '> key > value'.
+> keywords > EXCITATION ENERGY TRANSFER, BETA SHEET, GAMMA-TURNS,BACTERIOCHLOROPHYLL, CHLOROPHYLL, CHROMOPHORE, ELECTRONTRANSPORT, MAGNESIUM, METAL-BINDING, PHOTOSYNTHESIS,REACTION CENTER, TRANSPORT
+> pdb_mol_name > BACTERIOCHLOROPHYLL A PROTEIN
+> graphtype > betalig
+> resolution > 1.3
+> date > 27-SEP-08
+> header > PHOTOSYNTHESIS
+> pdb_org_common > UNKNOWN
+> title > FMO PROTEIN FROM PROSTHECOCHLORIS AESTUARII 2K AT 1.3ARESOLUTION
+> format_version > 2
+> pdbid > 3eoj
+> experiment > X-RAY DIFFRACTION
+> chainid > A
+> graphclass > protein graph
+> pdb_org_sci > PROSTHECOCHLORIS AESTUARII 2K
+# SSEs follow in format '| PDB ID | chain ID | graph type | sequential SSE number in chain | SSE number in graph and image | SSE type | DSSP start residue # | DSSP end residue # | PDB end residue ID (format: chain-res#-icode) | PDB start residue ID | AA sequence'
+| 3eoj | A | betalig | 1 | 1 | E | 3 | 12 | A-10-  | A-19-  | TAHSDYEIIL 
+| 3eoj | A | betalig | 2 | 2 | E | 20 | 28 | A-27-  | A-35-  | GQVKGRAKV 
+| 3eoj | A | betalig | 3 | 3 | E | 39 | 49 | A-46-  | A-56-  | TDCNIRIDAKP 
+| 3eoj | A | betalig | 4 | 4 | E | 57 | 67 | A-64-  | A-74-  | VRFTTKIESVV 
+| 3eoj | A | betalig | 5 | 5 | E | 70 | 82 | A-77-  | A-89-  | VKNTLNVEVDIAN 
+| 3eoj | A | betalig | 6 | 6 | E | 87 | 98 | A-94-  | A-105-  | RRIAVGEGSLSV 
+| 3eoj | A | betalig | 7 | 7 | E | 101 | 115 | A-108-  | A-122-  | FSHSFSFEGSVVNMY 
+| 3eoj | A | betalig | 9 | 8 | E | 134 | 145 | A-141-  | A-152-  | GRQFHDILMKVP 
+| 3eoj | A | betalig | 13 | 9 | E | 191 | 193 | A-198-  | A-200-  | QRI 
+| 3eoj | A | betalig | 14 | 10 | E | 197 | 204 | A-204-  | A-211-  | VVNSSNVE 
+| 3eoj | A | betalig | 15 | 11 | E | 210 | 221 | A-218-  | A-229-  | VGVTRWKFSHAG 
+| 3eoj | A | betalig | 18 | 12 | E | 244 | 252 | A-252-  | A-260-  | ASIEGGFRS 
+| 3eoj | A | betalig | 19 | 13 | E | 257 | 265 | A-265-  | A-273-  | IEVKVDGNL 
+| 3eoj | A | betalig | 20 | 14 | E | 269 | 273 | A-277-  | A-281-  | SRDAG 
+| 3eoj | A | betalig | 21 | 15 | E | 276 | 279 | A-284-  | A-287-  | LRRI 
+| 3eoj | A | betalig | 23 | 16 | E | 300 | 308 | A-308-  | A-316-  | TVDTQLKIV 
+| 3eoj | A | betalig | 24 | 17 | E | 314 | 319 | A-322-  | A-327-  | KIRYAA 
+| 3eoj | A | betalig | 25 | 18 | E | 324 | 326 | A-332-  | A-334-  | SQN 
+| 3eoj | A | betalig | 26 | 19 | E | 329 | 333 | A-337-  | A-341-  | EYRWS 
+| 3eoj | A | betalig | 28 | 20 | E | 353 | 357 | A-361-  | A-365-  | EVLYA 
+| 3eoj | A | betalig | 29 | 21 | L | 359 | 359 | A-371-  | A-371-  | J 
+| 3eoj | A | betalig | 30 | 22 | L | 360 | 360 | A-372-  | A-372-  | J 
+| 3eoj | A | betalig | 31 | 23 | L | 361 | 361 | A-373-  | A-373-  | J 
+| 3eoj | A | betalig | 32 | 24 | L | 362 | 362 | A-374-  | A-374-  | J 
+| 3eoj | A | betalig | 33 | 25 | L | 363 | 363 | A-375-  | A-375-  | J 
+| 3eoj | A | betalig | 34 | 26 | L | 364 | 364 | A-376-  | A-376-  | J 
+| 3eoj | A | betalig | 35 | 27 | L | 365 | 365 | A-377-  | A-377-  | J 
+| 3eoj | A | betalig | 36 | 28 | L | 366 | 366 | A-378-  | A-378-  | J 
+| 3eoj | A | betalig | 37 | 29 | L | 367 | 367 | A-379-  | A-379-  | J 
+| 3eoj | A | betalig | 38 | 30 | L | 368 | 368 | A-380-  | A-380-  | J 
+| 3eoj | A | betalig | 39 | 31 | L | 369 | 369 | A-381-  | A-381-  | J 
+| 3eoj | A | betalig | 40 | 32 | L | 370 | 370 | A-382-  | A-382-  | J 
+| 3eoj | A | betalig | 41 | 33 | L | 371 | 371 | A-383-  | A-383-  | J 
+| 3eoj | A | betalig | 42 | 34 | L | 372 | 372 | A-384-  | A-384-  | J 
+| 3eoj | A | betalig | 43 | 35 | L | 373 | 373 | A-385-  | A-385-  | J 
+| 3eoj | A | betalig | 44 | 36 | L | 374 | 374 | A-386-  | A-386-  | J 
+| 3eoj | A | betalig | 45 | 37 | L | 375 | 375 | A-390-  | A-390-  | J 
+| 3eoj | A | betalig | 46 | 38 | L | 376 | 376 | A-387-  | A-387-  | J 
+| 3eoj | A | betalig | 47 | 39 | L | 377 | 377 | A-391-  | A-391-  | J 
+| 3eoj | A | betalig | 48 | 40 | L | 378 | 378 | A-388-  | A-388-  | J 
+| 3eoj | A | betalig | 49 | 41 | L | 379 | 379 | A-392-  | A-392-  | J 
+| 3eoj | A | betalig | 50 | 42 | L | 380 | 380 | A-389-  | A-389-  | J 
+| 3eoj | A | betalig | 51 | 43 | L | 381 | 381 | A-393-  | A-393-  | J 
+| 3eoj | A | betalig | 52 | 44 | L | 382 | 382 | A-1232-  | A-1232-  | J 
+| 3eoj | A | betalig | 53 | 45 | L | 383 | 383 | A-2378-  | A-2378-  | J 
+# Printed info on 45 SSEs.
+# The contacts between the SSEs follow in format '= SSE1 = contact_type = SSE2'. The SSEs are labeled by their position in this graph.
+= 1 = a = 2
+= 1 = p = 16
+= 1 = l = 23
+= 1 = l = 24
+= 1 = l = 34
+= 1 = l = 36
+= 2 = a = 13
+= 2 = l = 23
+= 2 = l = 24
+= 2 = l = 25
+= 2 = l = 36
+= 3 = a = 4
+= 3 = a = 12
+= 3 = l = 22
+= 3 = l = 23
+= 3 = l = 24
+= 3 = l = 25
+= 3 = l = 26
+= 3 = l = 30
+= 4 = a = 5
+= 4 = l = 22
+= 4 = l = 24
+= 4 = l = 25
+= 4 = l = 26
+= 4 = l = 35
+= 5 = a = 6
+= 5 = l = 22
+= 5 = l = 25
+= 5 = l = 26
+= 5 = l = 35
+= 5 = l = 41
+= 6 = a = 7
+= 6 = l = 21
+= 6 = l = 22
+= 6 = l = 25
+= 6 = l = 26
+= 6 = l = 33
+= 6 = l = 35
+= 6 = l = 41
+= 7 = a = 8
+= 7 = l = 21
+= 7 = l = 22
+= 7 = l = 26
+= 7 = l = 28
+= 7 = l = 33
+= 7 = l = 44
+= 8 = a = 11
+= 8 = l = 21
+= 8 = l = 22
+= 8 = l = 26
+= 8 = l = 28
+= 9 = a = 11
+= 9 = l = 29
+= 9 = l = 31
+= 10 = a = 11
+= 10 = l = 21
+= 10 = l = 37
+= 11 = l = 21
+= 11 = l = 26
+= 12 = a = 13
+= 12 = l = 22
+= 12 = l = 23
+= 12 = l = 24
+= 12 = l = 25
+= 12 = l = 26
+= 12 = l = 30
+= 12 = l = 32
+= 13 = l = 23
+= 13 = l = 24
+= 13 = l = 25
+= 13 = l = 26
+= 13 = l = 30
+= 13 = l = 32
+= 14 = a = 15
+= 14 = l = 38
+= 14 = l = 39
+= 15 = a = 20
+= 15 = l = 24
+= 15 = l = 38
+= 15 = l = 39
+= 16 = a = 19
+= 16 = l = 24
+= 16 = l = 34
+= 17 = p = 19
+= 17 = a = 20
+= 17 = l = 43
+= 18 = a = 19
+= 20 = l = 24
+= 21 = l = 22
+= 21 = l = 26
+= 21 = l = 27
+= 22 = l = 23
+= 22 = l = 24
+= 22 = l = 26
+= 22 = l = 27
+= 23 = l = 24
+= 23 = l = 25
+= 23 = l = 27
+= 24 = l = 25
+= 24 = l = 26
+= 24 = l = 27
+= 25 = l = 26
+= 25 = l = 27
+= 29 = l = 31
+= 34 = l = 36
+= 40 = l = 45
+# Listed 106 contacts. EOF.

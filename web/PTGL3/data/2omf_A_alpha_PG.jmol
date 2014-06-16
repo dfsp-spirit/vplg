@@ -1,0 +1,1 @@
+load =2OMF; draw h0 color [255 0 0] diameter 5.0 circle {1.3 41.3 31.1}; draw h0 color [255 0 0] diameter 5.0 circle {18.5 36.6 19.9}; draw h0 color [255 0 0] diameter 5.0 circle {12.3 50.7 56.7}; delete water; cartoon only; display :A; color cartoon translucent orange; 

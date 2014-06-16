@@ -1,0 +1,93 @@
+# This is the plcc format protein graph file for the alphalig graph of PDB entry 3eoj, chain A.
+# First character in a line indicates the line type ('#' => comment, '>' => meta data, '|' => SSE, '=' => contact).
+# The graph meta data follows in format '> key > value'.
+> keywords > EXCITATION ENERGY TRANSFER, BETA SHEET, GAMMA-TURNS,BACTERIOCHLOROPHYLL, CHLOROPHYLL, CHROMOPHORE, ELECTRONTRANSPORT, MAGNESIUM, METAL-BINDING, PHOTOSYNTHESIS,REACTION CENTER, TRANSPORT
+> pdb_mol_name > BACTERIOCHLOROPHYLL A PROTEIN
+> graphtype > alphalig
+> resolution > 1.3
+> date > 27-SEP-08
+> header > PHOTOSYNTHESIS
+> pdb_org_common > UNKNOWN
+> title > FMO PROTEIN FROM PROSTHECOCHLORIS AESTUARII 2K AT 1.3ARESOLUTION
+> format_version > 2
+> pdbid > 3eoj
+> experiment > X-RAY DIFFRACTION
+> chainid > A
+> graphclass > protein graph
+> pdb_org_sci > PROSTHECOCHLORIS AESTUARII 2K
+# SSEs follow in format '| PDB ID | chain ID | graph type | sequential SSE number in chain | SSE number in graph and image | SSE type | DSSP start residue # | DSSP end residue # | PDB end residue ID (format: chain-res#-icode) | PDB start residue ID | AA sequence'
+| 3eoj | A | alphalig | 8 | 1 | H | 120 | 123 | A-127-  | A-130-  | DAVR 
+| 3eoj | A | alphalig | 10 | 2 | H | 149 | 164 | A-156-  | A-171-  | NDLVDTWEGFQQSISG 
+| 3eoj | A | alphalig | 11 | 3 | H | 166 | 177 | A-173-  | A-184-  | GANFGDWIREFW 
+| 3eoj | A | alphalig | 12 | 4 | H | 182 | 188 | A-189-  | A-195-  | AFAAINE 
+| 3eoj | A | alphalig | 16 | 5 | H | 226 | 229 | A-234-  | A-237-  | DSIS 
+| 3eoj | A | alphalig | 17 | 6 | H | 237 | 239 | A-245-  | A-247-  | VEQ 
+| 3eoj | A | alphalig | 22 | 7 | H | 284 | 291 | A-292-  | A-299-  | LIPLVHHG 
+| 3eoj | A | alphalig | 27 | 8 | H | 335 | 345 | A-343-  | A-353-  | GAYARWVEHVC 
+| 3eoj | A | alphalig | 29 | 9 | L | 359 | 359 | A-371-  | A-371-  | J 
+| 3eoj | A | alphalig | 30 | 10 | L | 360 | 360 | A-372-  | A-372-  | J 
+| 3eoj | A | alphalig | 31 | 11 | L | 361 | 361 | A-373-  | A-373-  | J 
+| 3eoj | A | alphalig | 32 | 12 | L | 362 | 362 | A-374-  | A-374-  | J 
+| 3eoj | A | alphalig | 33 | 13 | L | 363 | 363 | A-375-  | A-375-  | J 
+| 3eoj | A | alphalig | 34 | 14 | L | 364 | 364 | A-376-  | A-376-  | J 
+| 3eoj | A | alphalig | 35 | 15 | L | 365 | 365 | A-377-  | A-377-  | J 
+| 3eoj | A | alphalig | 36 | 16 | L | 366 | 366 | A-378-  | A-378-  | J 
+| 3eoj | A | alphalig | 37 | 17 | L | 367 | 367 | A-379-  | A-379-  | J 
+| 3eoj | A | alphalig | 38 | 18 | L | 368 | 368 | A-380-  | A-380-  | J 
+| 3eoj | A | alphalig | 39 | 19 | L | 369 | 369 | A-381-  | A-381-  | J 
+| 3eoj | A | alphalig | 40 | 20 | L | 370 | 370 | A-382-  | A-382-  | J 
+| 3eoj | A | alphalig | 41 | 21 | L | 371 | 371 | A-383-  | A-383-  | J 
+| 3eoj | A | alphalig | 42 | 22 | L | 372 | 372 | A-384-  | A-384-  | J 
+| 3eoj | A | alphalig | 43 | 23 | L | 373 | 373 | A-385-  | A-385-  | J 
+| 3eoj | A | alphalig | 44 | 24 | L | 374 | 374 | A-386-  | A-386-  | J 
+| 3eoj | A | alphalig | 45 | 25 | L | 375 | 375 | A-390-  | A-390-  | J 
+| 3eoj | A | alphalig | 46 | 26 | L | 376 | 376 | A-387-  | A-387-  | J 
+| 3eoj | A | alphalig | 47 | 27 | L | 377 | 377 | A-391-  | A-391-  | J 
+| 3eoj | A | alphalig | 48 | 28 | L | 378 | 378 | A-388-  | A-388-  | J 
+| 3eoj | A | alphalig | 49 | 29 | L | 379 | 379 | A-392-  | A-392-  | J 
+| 3eoj | A | alphalig | 50 | 30 | L | 380 | 380 | A-389-  | A-389-  | J 
+| 3eoj | A | alphalig | 51 | 31 | L | 381 | 381 | A-393-  | A-393-  | J 
+| 3eoj | A | alphalig | 52 | 32 | L | 382 | 382 | A-1232-  | A-1232-  | J 
+| 3eoj | A | alphalig | 53 | 33 | L | 383 | 383 | A-2378-  | A-2378-  | J 
+# Printed info on 33 SSEs.
+# The contacts between the SSEs follow in format '= SSE1 = contact_type = SSE2'. The SSEs are labeled by their position in this graph.
+= 2 = l = 9
+= 3 = l = 9
+= 3 = l = 10
+= 3 = l = 14
+= 3 = l = 19
+= 3 = l = 25
+= 4 = l = 15
+= 4 = l = 17
+= 4 = l = 19
+= 4 = l = 28
+= 4 = l = 33
+= 5 = l = 13
+= 5 = l = 14
+= 6 = l = 13
+= 6 = l = 26
+= 7 = l = 11
+= 7 = l = 12
+= 7 = l = 15
+= 7 = l = 30
+= 8 = l = 11
+= 8 = l = 12
+= 9 = l = 10
+= 9 = l = 14
+= 9 = l = 15
+= 10 = l = 11
+= 10 = l = 12
+= 10 = l = 14
+= 10 = l = 15
+= 11 = l = 12
+= 11 = l = 13
+= 11 = l = 15
+= 12 = l = 13
+= 12 = l = 14
+= 12 = l = 15
+= 13 = l = 14
+= 13 = l = 15
+= 17 = l = 19
+= 22 = l = 24
+= 28 = l = 33
+# Listed 39 contacts. EOF.

@@ -59,13 +59,7 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 	if ($title != "") {   $query .= "title LIKE '%".$title."%' ".$logic." "; };
 	if ($het != "") {     $query .= "pdb_id LIKE '%".$het."%' ".$logic." "; };
 	if ($hetname != "") { $query .= "pdb_id LIKE '%".$hetname."%' ".$logic." "; };
-	if ($scop != "") {    $query .= "pdb_id LIKE '%".$scop."%' ".$logic." "; };
-	if ($scopid != "") {  $query .= "pdb_id LIKE '%".$scopid."%' ".$logic." "; };
-	if ($cath != "") {    $query .= "pdb_id LIKE '%".$cath."%' ".$logic." "; };
-	if ($cathid != "") {  $query .= "pdb_id LIKE '%".$cathid."%' ".$logic." "; };
-	if ($ec != "") {      $query .= "pdb_id LIKE '%".$ec."%' ".$logic." "; };
 	if ($molecule != "") {$query .= "pdb_id LIKE '%".$molecule."%' ".$logic." "; };
-	if ($classification != "") {$query .= "pdb_id LIKE '%".$classification."%' ".$logic." "; };
 	if ($graphs != "") {  $query .= "pdb_id LIKE '%".$graphs."%' ".$logic." "; };
 
 

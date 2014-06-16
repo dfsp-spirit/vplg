@@ -64,7 +64,6 @@
 						<form class="form-inline" action="search.php" method="post">
 							<input type="text" class="form-control" name="keyword" id="searchInput" autocomplete="off" placeholder="Enter PDB ID or keyword...">
 							<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button><br>
-							<span><a href="motifsearch.php">Search for motifs</a></span>
 							<div id="advancedButton"> Advanced Search <div id="arrow"><strong class="caret"></strong></div></div>
 							<div id="liveSearchResults"></div>
 

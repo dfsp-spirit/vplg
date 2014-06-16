@@ -1,0 +1,3 @@
+graph ProteinGraph {
+    0 [label="0-H" shape=circle color=red];
+}

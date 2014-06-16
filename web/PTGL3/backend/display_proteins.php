@@ -60,14 +60,14 @@ foreach ($chains as $value){
 
 		array_push($allChainIDs, $value);
 		$pdb_chain = str_split($value, 4);
-		$query = "SELECT * FROM plcc_chain WHERE pdb_id LIKE '%".$pdb_chain[0]."%' AND chain_name LIKE '%".$pdb_chain[1]."%'"; #select chain_id only?
+		$query = "SELECT * FROM plcc_chain, plcc_graph WHERE pdb_id LIKE '%".$pdb_chain[0]."%' AND chain_name LIKE '%".$pdb_chain[1]."%' AND plcc_graph.chain_id = plcc_chain.chain_id"; 
 		$result = pg_query($db, $query) 
 					  or die($query . ' -> Query failed: ' . pg_last_error());		  
 		$chain_id = pg_fetch_array($result, NULL, PGSQL_ASSOC);
 		$chain_id = (int) $chain_id['chain_id'];
 
 		
-		$query = "SELECT * FROM plcc_sse WHERE chain_id = ".$chain_id." ORDER BY pdb_start";
+		$query = "SELECT * FROM plcc_sse WHERE chain_id = ".$chain_id." ORDER BY position_in_chain";
 		$result = pg_query($db, $query) 
 					  or die($query . ' -> Query failed: ' . pg_last_error());
 		$tableString .= '<li>

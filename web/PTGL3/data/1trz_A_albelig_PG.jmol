@@ -1,0 +1,1 @@
+load =1TRZ; draw h0 color [255 0 0] diameter 5.0 circle {0.6 15.9 -15.6}; draw h0 color [255 0 0] diameter 5.0 circle {7.4 16.8 -5.6}; delete water; cartoon only; display :A; color cartoon translucent orange; 

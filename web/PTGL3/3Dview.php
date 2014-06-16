@@ -61,7 +61,7 @@ var s = document.location.search;
 Jmol._debugCode = (s.indexOf("debugcode") >= 0);
 
 jmol_isReady = function(applet) {
-	document.title = (applet._id + " - Jmol " + ___JmolVersion)
+	document.title = ("PTGL - Jmol " + ___JmolVersion)
 	Jmol._getElement(applet, "appletdiv").style.border="1px solid grey"
 }		
 
@@ -77,12 +77,12 @@ var Info = {
 	jarFile: "./jsmol/JmolAppletSigned.jar",
 	isSigned: true,
 	///script: "set antialiasDisplay;load jsmol/data/<?php echo $molecule; ?>.mol",
-	script: "set antialiasDisplay;load proteins/7tim/tim_A_albe_PG.jmol",
-	serverURL: "http://chemapps.stolaf.edu/jmol/jsmol/php/jsmol.php",
+	script: "set antialiasDisplay; load data/7tim_A_albe_PG.jmol",
+	serverURL: "./jsmol/php/jsmol.php",
 	readyFunction: jmol_isReady,
 	disableJ2SLoadMonitor: true,
-  disableInitialConsole: true,
-  allowJavaScript: true
+  	disableInitialConsole: true,
+  	allowJavaScript: true
 	//defaultModel: "$dopamine",
 	//console: "none", // default will be jmolApplet0_infodiv, but you can designate another div here or "none"
 }

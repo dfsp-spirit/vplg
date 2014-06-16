@@ -1,0 +1,38 @@
+# This is the plcc format protein graph file for the albe graph of PDB entry 3kmf, chain C.
+# First character in a line indicates the line type ('#' => comment, '>' => meta data, '|' => SSE, '=' => contact).
+# The graph meta data follows in format '> key > value'.
+> keywords > HEMOLGOBIN, T-STATE, DEOXY, HISTIDINE, PROTONATION, HEME,IRON, METAL-BINDING, OXYGEN TRANSPORT, TRANSPORT, OXYGENSTORAGE
+> pdb_mol_name > HEMOGLOBIN SUBUNIT BETA
+> graphtype > albe
+> resolution > 2.0
+> date > 10-NOV-09
+> header > OXYGEN STORAGE, OXYGEN TRANSPORT
+> pdb_org_common > HUMAN
+> title > ROOM TEMPERATURE TIME-OF-FLIGHT NEUTRON DIFFRACTION STUDY OFDEOXY HUMAN NORMAL ADULT HEMOGLOBIN
+> format_version > 2
+> pdbid > 3kmf
+> experiment > NEUTRON DIFFRACTION
+> chainid > C
+> graphclass > protein graph
+> pdb_org_sci > HOMO SAPIENS
+# SSEs follow in format '| PDB ID | chain ID | graph type | sequential SSE number in chain | SSE number in graph and image | SSE type | DSSP start residue # | DSSP end residue # | PDB end residue ID (format: chain-res#-icode) | PDB start residue ID | AA sequence'
+| 3kmf | C | albe | 1 | 1 | H | 147 | 159 | C-205-  | C-217-  | PEEKSAVTALWGK 
+| 3kmf | C | albe | 2 | 2 | H | 162 | 176 | C-220-  | C-234-  | VDEVGGEALGRLLVV 
+| 3kmf | C | albe | 3 | 3 | H | 178 | 183 | C-236-  | C-241-  | PWTQRF 
+| 3kmf | C | albe | 4 | 4 | H | 185 | 187 | C-243-  | C-245-  | ESF 
+| 3kmf | C | albe | 5 | 5 | H | 193 | 197 | C-251-  | C-255-  | PDAVM 
+| 3kmf | C | albe | 6 | 6 | H | 200 | 214 | C-258-  | C-272-  | PKVKAHGKKVLGAFS 
+| 3kmf | C | albe | 7 | 7 | H | 220 | 236 | C-278-  | C-294-  | LDNLKGTFATLSELHCD 
+| 3kmf | C | albe | 8 | 8 | H | 244 | 263 | C-302-  | C-321-  | NFRLLGNVLVCVLAHHFGKE 
+| 3kmf | C | albe | 9 | 9 | H | 266 | 283 | C-324-  | C-341-  | PPVQAAYQKVVAGVANAL 
+# Printed info on 9 SSEs.
+# The contacts between the SSEs follow in format '= SSE1 = contact_type = SSE2'. The SSEs are labeled by their position in this graph.
+= 1 = m = 8
+= 1 = m = 9
+= 2 = m = 3
+= 2 = m = 5
+= 2 = a = 6
+= 2 = m = 8
+= 7 = m = 9
+= 8 = a = 9
+# Listed 8 contacts. EOF.

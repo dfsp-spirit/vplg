@@ -1,0 +1,43 @@
+# This is the plcc format protein graph file for the alpha graph of PDB entry 2w70, chain A.
+# First character in a line indicates the line type ('#' => comment, '>' => meta data, '|' => SSE, '=' => contact).
+# The graph meta data follows in format '> key > value'.
+> keywords > LIGASE, BIOTIN, INHIBITOR, ATP-BINDING, FATTY ACIDBIOSYNTHESIS, BIOTIN CARBOXYLASE, NUCLEOTIDE-BINDING,LIPID SYNTHESIS, ATP-GRASP DOMAIN, FRAGMENT SCREENING
+> pdb_mol_name > BIOTIN CARBOXYLASE
+> graphtype > alpha
+> resolution > 1.77
+> date > 19-DEC-08
+> header > LIGASE
+> pdb_org_common > UNKNOWN
+> title > CRYSTAL STRUCTURE OF BIOTIN CARBOXYLASE FROM E. COLI INCOMPLEX WITH THE AMINO-THIAZOLE-PYRIMIDINE FRAGMENT
+> format_version > 2
+> pdbid > 2w70
+> experiment > X-RAY DIFFRACTION
+> chainid > A
+> graphclass > protein graph
+> pdb_org_sci > ESCHERICHIA COLI
+# SSEs follow in format '| PDB ID | chain ID | graph type | sequential SSE number in chain | SSE number in graph and image | SSE type | DSSP start residue # | DSSP end residue # | PDB end residue ID (format: chain-res#-icode) | PDB start residue ID | AA sequence'
+| 2w70 | A | alpha | 2 | 1 | H | 11 | 24 | A-11-  | A-24-  | GEIALRILRACKEL 
+| 2w70 | A | alpha | 4 | 2 | H | 34 | 36 | A-34-  | A-36-  | SAD 
+| 2w70 | A | alpha | 5 | 3 | H | 40 | 44 | A-40-  | A-44-  | KHVLL 
+| 2w70 | A | alpha | 7 | 4 | H | 56 | 58 | A-56-  | A-58-  | SVK 
+| 2w70 | A | alpha | 8 | 5 | H | 63 | 73 | A-63-  | A-73-  | IPAIISAAEIT 
+| 2w70 | A | alpha | 10 | 6 | H | 89 | 97 | A-89-  | A-97-  | ANFAEQVER 
+| 2w70 | A | alpha | 11 | 7 | H | 107 | 114 | A-107-  | A-114-  | AETIRLMG 
+| 2w70 | A | alpha | 12 | 8 | H | 116 | 126 | A-116-  | A-126-  | KVSAIAAMKKA 
+| 2w70 | A | alpha | 13 | 9 | H | 142 | 152 | A-142-  | A-152-  | MDKNRAIAKRI 
+| 2w70 | A | alpha | 16 | 10 | H | 175 | 193 | A-175-  | A-193-  | DAELAQSISMTRAEAKAAF 
+| 2w70 | A | alpha | 21 | 11 | H | 250 | 267 | A-250-  | A-267-  | PELRRYIGERCAKACVDI 
+| 2w70 | A | alpha | 24 | 12 | H | 297 | 304 | A-297-  | A-304-  | HPVTEMIT 
+| 2w70 | A | alpha | 25 | 13 | H | 308 | 317 | A-308-  | A-317-  | LIKEQLRIAA 
+| 2w70 | A | alpha | 26 | 14 | H | 325 | 327 | A-325-  | A-327-  | QEE 
+| 2w70 | A | alpha | 31 | 15 | H | 395 | 408 | A-395-  | A-408-  | RDVAIARMKNALQE 
+| 2w70 | A | alpha | 33 | 16 | H | 418 | 425 | A-418-  | A-425-  | VDLQIRIM 
+| 2w70 | A | alpha | 34 | 17 | H | 428 | 432 | A-428-  | A-432-  | ENFQH 
+| 2w70 | A | alpha | 35 | 18 | H | 439 | 444 | A-439-  | A-444-  | YLEKKL 
+# Printed info on 18 SSEs.
+# The contacts between the SSEs follow in format '= SSE1 = contact_type = SSE2'. The SSEs are labeled by their position in this graph.
+= 1 = m = 13
+= 7 = m = 8
+= 9 = m = 10
+= 15 = m = 16
+# Listed 4 contacts. EOF.

@@ -1,0 +1,49 @@
+# This is the plcc format protein graph file for the alphalig graph of PDB entry 1o1d, chain X.
+# First character in a line indicates the line type ('#' => comment, '>' => meta data, '|' => SSE, '=' => contact).
+# The graph meta data follows in format '> key > value'.
+> keywords > ACTIN-MYOSIN COMPLEX IN SITU IN MUSCLE, CONTRACTILE PROTEIN
+> pdb_mol_name > SKELETAL MUSCLE ACTIN
+> graphtype > alphalig
+> resolution > 70.0
+> date > 18-NOV-02
+> header > CONTRACTILE PROTEIN
+> pdb_org_common > RABBIT
+> title > MOLECULAR MODELS OF AVERAGED RIGOR CROSSBRIDGES FROMTOMOGRAMS OF INSECT FLIGHT MUSCLE
+> format_version > 2
+> pdbid > 1o1d
+> experiment > ELECTRON MICROSCOPY
+> chainid > X
+> graphclass > protein graph
+> pdb_org_sci > ORYCTOLAGUS CUNICULUS
+# SSEs follow in format '| PDB ID | chain ID | graph type | sequential SSE number in chain | SSE number in graph and image | SSE type | DSSP start residue # | DSSP end residue # | PDB end residue ID (format: chain-res#-icode) | PDB start residue ID | AA sequence'
+| 1o1d | X | alphalig | 5 | 1 | H | 984 | 988 | X-56-  | X-60-  | DEAQS 
+| 1o1d | X | alphalig | 6 | 2 | H | 990 | 992 | X-62-  | X-64-  | RGI 
+| 1o1d | X | alphalig | 8 | 3 | H | 1007 | 1019 | X-79-  | X-91-  | WDDMEKIWHHTFY 
+| 1o1d | X | alphalig | 9 | 4 | H | 1026 | 1028 | X-98-  | X-100-  | PEE 
+| 1o1d | X | alphalig | 11 | 5 | H | 1041 | 1054 | X-113-  | X-126-  | KANREKMTQIMFET 
+| 1o1d | X | alphalig | 13 | 6 | H | 1065 | 1072 | X-137-  | X-144-  | QAVLSLYA 
+| 1o1d | X | alphalig | 16 | 7 | H | 1100 | 1102 | X-172-  | X-174-  | PHA 
+| 1o1d | X | alphalig | 18 | 8 | H | 1110 | 1122 | X-182-  | X-194-  | GRDLTDYLMKILT 
+| 1o1d | X | alphalig | 19 | 9 | H | 1131 | 1144 | X-203-  | X-216-  | TAEREIVRDIKEKL 
+| 1o1d | X | alphalig | 20 | 10 | H | 1152 | 1160 | X-224-  | X-232-  | ENEMATAAS 
+| 1o1d | X | alphalig | 23 | 11 | H | 1181 | 1184 | X-253-  | X-256-  | ERFR 
+| 1o1d | X | alphalig | 24 | 12 | H | 1187 | 1190 | X-259-  | X-262-  | ETLF 
+| 1o1d | X | alphalig | 25 | 13 | H | 1192 | 1195 | X-264-  | X-267-  | PSFI 
+| 1o1d | X | alphalig | 26 | 14 | H | 1202 | 1210 | X-274-  | X-282-  | IHETTYNSI 
+| 1o1d | X | alphalig | 27 | 15 | H | 1218 | 1222 | X-290-  | X-294-  | RKDLY 
+| 1o1d | X | alphalig | 29 | 16 | H | 1230 | 1233 | X-302-  | X-305-  | GTTM 
+| 1o1d | X | alphalig | 30 | 17 | H | 1237 | 1246 | X-309-  | X-318-  | IADRMQKEIT 
+| 1o1d | X | alphalig | 31 | 18 | H | 1263 | 1276 | X-335-  | X-348-  | RKYSVWIGGSILAS 
+| 1o1d | X | alphalig | 32 | 19 | H | 1281 | 1283 | X-353-  | X-355-  | QQM 
+| 1o1d | X | alphalig | 33 | 20 | H | 1287 | 1293 | X-359-  | X-365-  | KQEYDEA 
+| 1o1d | X | alphalig | 34 | 21 | H | 1296 | 1299 | X-368-  | X-371-  | SIVH 
+# Printed info on 21 SSEs.
+# The contacts between the SSEs follow in format '= SSE1 = contact_type = SSE2'. The SSEs are labeled by their position in this graph.
+= 3 = m = 5
+= 5 = m = 20
+= 5 = m = 21
+= 6 = m = 18
+= 8 = m = 9
+= 8 = m = 11
+= 14 = m = 17
+# Listed 7 contacts. EOF.
