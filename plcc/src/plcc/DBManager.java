@@ -2249,7 +2249,7 @@ public class DBManager {
      */
     public static Integer[] getGraphletCounts(String pdb_id, String chain_name, String graph_type) throws SQLException {
         
-        int numReqGraphletTypes = 3;
+        int numReqGraphletTypes = 29;
         
         Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
         
@@ -2268,15 +2268,25 @@ public class DBManager {
 
         PreparedStatement statement = null;
         ResultSet rs = null;
+        Long graphid = DBManager.getDBProteinGraphID(pdb_id, chain_name, graph_type);
+        
+        if(graphid <= 0) {
+            return null;
+        }
 
-        String query = "SELECT graphlet_count_000, graphlet_count_001, graphlet_count_002 FROM " + tbl_graphletcount + " WHERE (chain_id = ? AND graph_type = ?);";
+        String query = "SELECT graphlet_counts[0], graphlet_counts[1], graphlet_counts[2], graphlet_counts[3], graphlet_counts[4],"
+                + " graphlet_counts[5], graphlet_counts[6], graphlet_counts[7], graphlet_counts[8], graphlet_counts[9],"
+                + " graphlet_counts[10], graphlet_counts[11], graphlet_counts[12], graphlet_counts[13], graphlet_counts[14],"
+                + " graphlet_counts[15], graphlet_counts[16], graphlet_counts[17], graphlet_counts[18], graphlet_counts[19],"
+                + " graphlet_counts[20], graphlet_counts[21], graphlet_counts[22], graphlet_counts[23], graphlet_counts[24],"
+                + " graphlet_counts[25], graphlet_counts[26], graphlet_counts[27], graphlet_counts[28], "
+                + " FROM " + tbl_graphletcount + " WHERE (graph_id = ?);";
 
         try {
             dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
-            statement.setLong(1, chain_db_id);
-            statement.setInt(2, gtc);
+            statement.setLong(1, graphid);
                                 
             rs = statement.executeQuery();
             dbc.commit();
