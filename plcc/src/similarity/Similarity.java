@@ -22,4 +22,7 @@ public class Similarity {
     /** Comparison using the size of the compatibility graph h of a graph pair (g1, g2). */
     public static final String SIMILARITYMETHOD_GRAPHCOMPAT = "graph_compat";
     
+    /** Comparison using the relative graphlet frequency distance. */
+    public static final String SIMILARITYMETHOD_GRAPHLET_RELGRAPHLETFREQ = "graphlet_relfreq";
+    
 }

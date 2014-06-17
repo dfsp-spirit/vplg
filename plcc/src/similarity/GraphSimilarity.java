@@ -17,6 +17,7 @@ import java.util.Set;
 import plcc.CompatGraph;
 import plcc.ProtGraph;
 import plcc.SSEGraph;
+import static similarity.SimilarityByGraphlets.getRandIntegerArray;
 
 /**
  * This class provides various methods to compare two protein graphs by their string representations,
@@ -209,6 +210,22 @@ public class GraphSimilarity {
         alignment = sw.getAlignment();
         System.out.println(alignment[0]);
         System.out.println(alignment[1]);        
+        
+        
+        System.out.println("Comparing by relative graphlet frequency distance -- random graphlet distributions:");
+        Integer[] graphletsA = SimilarityByGraphlets.getRandIntegerArray(30, 0, 9);
+        Integer[] graphletsB = SimilarityByGraphlets.getRandIntegerArray(30, 0, 9);
+        System.out.println("GraphletsA: " + SimilarityByGraphlets.getVectorStringForIntegerArray(graphletsA));
+        System.out.println("GraphletsB: " + SimilarityByGraphlets.getVectorStringForIntegerArray(graphletsB));
+        System.out.println("RGFD(A,B) is : " + SimilarityByGraphlets.getRelativeGraphletFrequencyDistance(graphletsA, graphletsB));
+        
+        
+        System.out.println("Comparing by relative graphlet frequency distance -- similar graphlet distributions:");
+        Integer[] graphletsC = SimilarityByGraphlets.getRandIntegerArray(30, 0, 9);
+        Integer[] graphletsD = SimilarityByGraphlets.mutateIntegerArray(graphletsC, 3, 0.1);
+        System.out.println("GraphletsC: " + SimilarityByGraphlets.getVectorStringForIntegerArray(graphletsC));
+        System.out.println("GraphletsD: " + SimilarityByGraphlets.getVectorStringForIntegerArray(graphletsD));
+        System.out.println("RGFD(C,D) is : " + SimilarityByGraphlets.getRelativeGraphletFrequencyDistance(graphletsC, graphletsD));
         
         System.exit(0);
     }
