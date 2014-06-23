@@ -1417,6 +1417,7 @@ public class FileParser {
                     System.err.println("ERROR: (continued) Message was '" + e.getMessage() + "'.");
                     //e.printStackTrace();
                     System.exit(1);
+                    //continue;
                 }
                 
                 // Create new ligand residue here if this Atom does not belong to the same residue as the last one did
@@ -1534,10 +1535,10 @@ public class FileParser {
                     continuation = (line.substring(16, 18)).trim();
                     asterisk = (line.substring(18, 19)).trim();
                     formula = (line.substring(19, 71)).trim();
-                } catch(Exception e) {
+                } catch(NumberFormatException e) {
                     System.err.println("ERROR: Parsing FORMUL line at PDB line number " + i + " failed.");
-                    e.printStackTrace();
-                    System.exit(-1);
+                    //e.printStackTrace();
+                    continue;
                 }
 
                 if(continuation.equals("")) {
@@ -1554,7 +1555,7 @@ public class FileParser {
 
         // This should never be reached.
         System.out.println("WARNING: getLigFormula(): No formula found for hetero group " + ligName3 + ".");        
-        return("NO_FORMULA_FOUND");
+        return("");
     }
 
     // parses the lines of a PDB file to find the chemical name of a hetero residue in the HETNAM records
@@ -1574,8 +1575,9 @@ public class FileParser {
                     name = (line.substring(15, 71)).trim();
                 } catch(Exception e) {
                     System.err.println("ERROR: Parsing HETNAM line at PDB line number " + i + " failed.");
-                    e.printStackTrace();
-                    System.exit(-1);
+                    //e.printStackTrace();
+                    //System.exit(-1);
+                    continue;
                 }
 
                 if(continuation.equals("")) {
@@ -1601,7 +1603,7 @@ public class FileParser {
         else {
             // All others should have a HETNAM record so this should never be reached.
             System.out.println("WARNING: getLigName(): No name found for hetero group " + ligName3 + ".");
-            return("NO_NAME_FOUND");
+            return("");
         }
     }
 
@@ -1622,8 +1624,9 @@ public class FileParser {
                     synonyms = (line.substring(15, 71)).trim();
                 } catch(Exception e) {
                     System.err.println("ERROR: Parsing HETSYN line at PDB line number " + i + " failed.");
-                    e.printStackTrace();
-                    System.exit(-1);
+                    //e.printStackTrace();
+                    //System.exit(-1);
+                    continue;
                 }
 
                 if(continuation.equals("")) {
@@ -1640,7 +1643,7 @@ public class FileParser {
 
         // This could be reached for various valid entries I guess (or do they have a HETSYN line with empty syn field?).
         //System.out.println("WARNING: getLigSynonyms(): No synonym found for hetero group " + ligName3 + ".");
-        return("NO_SYNONYMS_FOUND");
+        return("");
     }
 
     public static Chain getChainByPdbChainID(String cID) {
@@ -1658,7 +1661,7 @@ public class FileParser {
 
         if(resultChain == null) {
             System.err.println("ERROR: Could not find Chain '" + cID + "' in s_chains.");
-            System.exit(-1);
+            System.exit(1);
             return(null);   // for the IDE
         }
 

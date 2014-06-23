@@ -34,6 +34,20 @@ public class Chain implements java.io.Serializable {
     public String getModelID() { return(modelID); }
     public Model getModel() { return(model); }
     public ArrayList<Residue> getResidues() { return(residues); }
+    
+    /**
+     * Returns a list of all ligand residues in this chain.
+     * @return a list of all ligand residues in this chain
+     */
+    public ArrayList<Residue> getAllLigandResidues() {
+        ArrayList<Residue> ligands = new ArrayList<Residue>();
+        for(Residue r : this.residues) {
+            if(r.isLigand()) {
+                ligands.add(r);
+            }
+        }
+        return ligands;
+    }
 
     // setters
     public void addResidue(Residue r) { residues.add(r); }

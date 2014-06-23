@@ -42,6 +42,8 @@ public class DBManager {
     static String tbl_graphletcount = "plcc_graphlets";
     static String tbl_motif = "plcc_motif";
     static String tbl_motiftype = "plcc_motiftype";
+    static String tbl_ligand = "plcc_ligand";
+    static String tbl_nm_ligandtochain = "plcc_nm_ligandtochain";
     static String tbl_nm_ssetoproteingraph = "plcc_nm_ssetoproteingraph";
     static String tbl_nm_ssetofoldinggraph = "plcc_nm_ssetofoldinggraph";
     static String tbl_nm_chaintomotif = "plcc_nm_chaintomotif";
@@ -368,6 +370,9 @@ public class DBManager {
             doDeleteQuery("DROP TABLE " + tbl_nm_chaintomotif + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_complexcontacttypes + ";");
             doDeleteQuery("DROP TABLE " + tbl_ssetypes + ";");
+            doDeleteQuery("DROP TABLE " + tbl_ligand + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_nm_ligandtochain + " CASCADE;");
+            
 
             // The indices get dropped with the tables.
             //doDeleteQuery("DROP INDEX plcc_idx_chain_insert;");
@@ -414,12 +419,12 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_graphtypes + " (graphtype_id int not null primary key,  graphtype_text text not null);");
             
             doInsertQuery("CREATE TABLE " + tbl_protein + " (pdb_id varchar(4) primary key, header varchar(200) not null, title varchar(400) not null, experiment varchar(200) not null, keywords varchar(400) not null, resolution real not null);");
-            doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(2) not null, mol_name varchar(200) not null, organism_scientific varchar(200) not null, organism_common varchar(200) not null, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE);");
+            doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(2) not null, mol_name varchar(200) not null, organism_scientific varchar(200) not null, organism_common varchar(200) not null, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, chain_isinnonredundantset smallint DEFAULT 1);");
             doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence varchar(2000) not null, sse_type int not null references " + tbl_ssetypes + " ON DELETE CASCADE, lig_name varchar(5), position_in_chain int);");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null references " + tbl_contacttypes + " ON DELETE CASCADE, check (sse1 < sse2));");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact_complexgraph + " (ssecontact_complexgraph_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, complex_contact_type int not null references " + tbl_complexcontacttypes + " ON DELETE CASCADE check (sse1 < sse2));");            
             doInsertQuery("CREATE TABLE " + tbl_complex_contact_stats + " (complex_contact_id serial primary key, chain1 int not null references " + tbl_chain + " ON DELETE CASCADE, chain2 int not null references " + tbl_chain + " ON DELETE CASCADE, contact_num_HH int not null, contact_num_HS int not null, contact_num_HL int not null, contact_num_SS int not null, contact_num_SL int not null, contact_num_LL int not null, contact_num_DS int not null);");
-            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_ptgl_adj text, graph_string_ptgl_red text, graph_string_ptgl_key text, graph_string_ptgl_seq text, graph_image_png text, graph_image_svg text, graph_image_adj_svg text, graph_image_adj_png text, graph_image_red_svg text, graph_image_red_png text, graph_image_key_svg text, graph_image_key_png text, graph_image_seq_svg text, graph_image_seq_png text, sse_string text);");
+            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_ptgl_adj text, graph_string_ptgl_red text, graph_string_ptgl_key text, graph_string_ptgl_seq text, graph_image_png text, graph_image_svg text, graph_image_adj_svg text, graph_image_adj_png text, graph_image_red_svg text, graph_image_red_png text, graph_image_key_svg text, graph_image_key_png text, graph_image_seq_svg text, graph_image_seq_png text, sse_string text, graph_containsbetabarrel smallint DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, fg_number int not null, graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_ptgl_adj text, graph_string_ptgl_red text, graph_string_ptgl_key text, graph_string_ptgl_seq text, graph_image_png text, graph_image_svg text, graph_image_adj_svg text, graph_image_adj_png text, graph_image_red_svg text, graph_image_red_png text, graph_image_key_svg text, graph_image_key_png text, graph_image_seq_svg text, graph_image_seq_png text, sse_string text);");
             doInsertQuery("CREATE TABLE " + tbl_complexgraph + " (complexgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, graph_string_gml text, graph_string_kavosh text, graph_image_svg text, graph_image_png text);");
             doInsertQuery("CREATE TABLE " + tbl_motiftype + " (motiftype_id serial primary key, motiftype_name varchar(40));");
@@ -451,6 +456,9 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_nm_ssetoproteingraph + " (ssetoproteingraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, position_in_graph int not null);");
             doInsertQuery("CREATE TABLE " + tbl_nm_ssetofoldinggraph + " (ssetofoldinggraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, position_in_graph int not null);");
             doInsertQuery("CREATE TABLE " + tbl_nm_chaintomotif + " (chaintomotif_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, motif_id int not null references " + tbl_motif + " ON DELETE CASCADE);");
+            
+            doInsertQuery("CREATE TABLE " + tbl_ligand + " (ligand_name3 varchar(3) primary key, ligand_longname varchar(300), ligand_formula varchar(300), ligand_synonyms varchar(300));");
+            doInsertQuery("CREATE TABLE " + tbl_nm_ligandtochain + " (ligandtochain_id serial primary key, ligandtochain_chainid int not null references " + tbl_chain + " ON DELETE CASCADE, ligandtochain_ligandname3 varchar(3) not null references " + tbl_ligand + " ON DELETE CASCADE);");
                                                 
 
             // set constraints
@@ -462,6 +470,7 @@ public class DBManager {
             doInsertQuery("ALTER TABLE " + tbl_proteingraph + " ADD CONSTRAINT constr_graph_uniq UNIQUE (chain_id, graph_type);");
             doInsertQuery("ALTER TABLE " + tbl_foldinggraph + " ADD CONSTRAINT constr_foldgraph_uniq UNIQUE (parent_graph_id, fg_number);");
             doInsertQuery("ALTER TABLE " + tbl_graphletcount + " ADD CONSTRAINT constr_graphlet_uniq UNIQUE (graph_id);");
+            doInsertQuery("ALTER TABLE " + tbl_nm_ligandtochain + " ADD CONSTRAINT constr_ligtochain_uniq UNIQUE (ligandtochain_chainid, ligandtochain_ligandname3);");
             
             // create views
             doInsertQuery("CREATE VIEW " + view_ssecontacts + " AS SELECT contact_id, least(sse1_type, sse2_type) sse1_type, greatest(sse1_type, sse2_type) sse2_type, sse1_lig_name, sse2_lig_name  FROM (SELECT k.contact_id, sse1.sse_type AS sse1_type, sse2.sse_type AS sse2_type, sse1.lig_name AS sse1_lig_name, sse2.lig_name AS sse2_lig_name FROM " + tbl_ssecontact + " k LEFT JOIN " + tbl_sse + " sse1 ON k.sse1=sse1.sse_id LEFT JOIN " + tbl_sse + " sse2 ON k.sse2=sse2.sse_id) foo;");
@@ -726,6 +735,60 @@ public class DBManager {
 
     }
     
+    /**
+     * Writes data on a ligand to the database. This will NOT delete old versions in the database.
+     * @param ligand_name3 the PDB ligand abbreviation, 3 chars, e.g., "ICT" for isocitric acid. See http://ligand-expo.rcsb.org/  for details.
+     * @param ligand_longname the long name, usually chemical formular or other name, for the ligand
+     * @param ligand_formula the chemical formula for the ligand, from PDB file header
+     * @param ligand_synonyms the synonyms for the ligand, from PDB file header
+     * @return true if the ligand was written to the DB, false otherwise
+     * @throws SQLException if the DB could not be reset or closed properly
+     */
+    public static Boolean writeLigandToDBUnlessAlreadyThere(String ligand_name3, String ligand_longname, String ligand_formula, String ligand_synonyms) throws SQLException {
+        
+        if(ligandExistsInDB(ligand_name3)) {
+            return false;                   
+        }
+        
+        Boolean result = false;
+
+        PreparedStatement statement = null;
+
+        String query = "INSERT INTO " + tbl_ligand + " (ligand_name3, ligand_longname, ligand_formula, ligand_synonyms) VALUES (?, ?, ?, ?);";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setString(1, ligand_name3);
+            statement.setString(2, ligand_longname);
+            statement.setString(3, ligand_formula);
+            statement.setString(4, ligand_synonyms);
+                                
+            statement.executeUpdate();
+            dbc.commit();
+            result = true;
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: writeLigandToDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: writeLigandToDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: writeLigandToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+            result = false;
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        }
+        return(result);
+
+    }
+    
 
     /**
      * Deletes all entries related to the PDB ID 'pdb_id' from the plcc database tables.
@@ -849,10 +912,11 @@ public class DBManager {
      * @param graph_string_ptgl_key the graph in PTGL KEY notation
      * @param graph_string_ptgl_seq the graph in PTGL SEQ notation
      * @param sse_string the graph in SSE string notation
+     * @param containsBetaBarrel whether the graph contains a beta barrel (used for stats only)
      * @return true if the graph was inserted, false if errors occurred
      * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
      */
-    public static Boolean writeProteinGraphToDB(String pdb_id, String chain_name, Integer graph_type, String graph_string_gml, String graph_string_plcc, String graph_string_kavosh, String graph_string_dotlanguage, String graph_string_ptgl_red, String graph_string_ptgl_adj, String graph_string_ptgl_key, String graph_string_ptgl_seq, String sse_string) throws SQLException {
+    public static Boolean writeProteinGraphToDB(String pdb_id, String chain_name, Integer graph_type, String graph_string_gml, String graph_string_plcc, String graph_string_kavosh, String graph_string_dotlanguage, String graph_string_ptgl_red, String graph_string_ptgl_adj, String graph_string_ptgl_key, String graph_string_ptgl_seq, String sse_string, Boolean containsBetaBarrel) throws SQLException {
                
         Long chain_db_id = getDBChainID(pdb_id, chain_name);
         Boolean result = false;
@@ -861,10 +925,11 @@ public class DBManager {
             System.err.println("ERROR: writeProteinGraphToDB: Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert protein graph.");
             return (false);
         }
-
+        
+        Integer graph_containsbetabarrel = (containsBetaBarrel ? 1 : 0);
         PreparedStatement statement = null;
 
-        String query = "INSERT INTO " + tbl_proteingraph + " (chain_id, graph_type, graph_string_gml, graph_string_plcc, graph_string_kavosh, graph_string_dotlanguage, graph_string_ptgl_red, graph_string_ptgl_adj, graph_string_ptgl_key, graph_string_ptgl_seq, sse_string) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO " + tbl_proteingraph + " (chain_id, graph_type, graph_string_gml, graph_string_plcc, graph_string_kavosh, graph_string_dotlanguage, graph_string_ptgl_red, graph_string_ptgl_adj, graph_string_ptgl_key, graph_string_ptgl_seq, sse_string, graph_containsbetabarrel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
         try {
             dbc.setAutoCommit(false);
@@ -881,6 +946,7 @@ public class DBManager {
             statement.setString(9, graph_string_ptgl_key);
             statement.setString(10, graph_string_ptgl_seq);
             statement.setString(11, sse_string);
+            statement.setInt(12, graph_containsbetabarrel);
                                 
             statement.executeUpdate();
             dbc.commit();
@@ -926,10 +992,11 @@ public class DBManager {
      * @param graph_string_ptgl_key the graph in PTGL KEY notation
      * @param graph_string_ptgl_seq the graph in PTGL SEQ notation
      * @param sse_string the graph in SSE string notation
+     * @param containsBetaBarrel whether the graph contains a beta barrel (used for stats only)
      * @return the database insert ID or a value smaller than 1 if something went wrong
      * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
      */
-    public static Long writeFoldingGraphToDB(String pdb_id, String chain_name, Integer graph_type, Integer fg_number, String graph_string_gml, String graph_string_plcc, String graph_string_kavosh, String graph_string_dotlanguage, String graph_string_ptgl_red, String graph_string_ptgl_adj, String graph_string_ptgl_key, String graph_string_ptgl_seq, String sse_string) throws SQLException {
+    public static Long writeFoldingGraphToDB(String pdb_id, String chain_name, Integer graph_type, Integer fg_number, String graph_string_gml, String graph_string_plcc, String graph_string_kavosh, String graph_string_dotlanguage, String graph_string_ptgl_red, String graph_string_ptgl_adj, String graph_string_ptgl_key, String graph_string_ptgl_seq, String sse_string, Boolean containsBetaBarrel) throws SQLException {
                
         
         if(fg_number < 1) {
@@ -952,10 +1019,12 @@ public class DBManager {
             DP.getInstance().e("writeFoldingGraphToDB()" , "Could not find parent " + graphTypeString + " graph with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert folding graph.");
             return (-1L);
         } 
+        
+        Integer graph_containsbetabarrel = (containsBetaBarrel ? 1 : 0);
 
         PreparedStatement statement = null;
 
-        String query = "INSERT INTO " + tbl_foldinggraph + " (parent_graph_id, fg_number, graph_string_gml, graph_string_plcc, graph_string_kavosh, graph_string_dotlanguage, graph_string_ptgl_red, graph_string_ptgl_adj, graph_string_ptgl_key, graph_string_ptgl_seq, sse_string) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO " + tbl_foldinggraph + " (parent_graph_id, fg_number, graph_string_gml, graph_string_plcc, graph_string_kavosh, graph_string_dotlanguage, graph_string_ptgl_red, graph_string_ptgl_adj, graph_string_ptgl_key, graph_string_ptgl_seq, sse_string, graph_containsbetabarrel) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         int affectedRows = 0;
         
         try {
@@ -973,6 +1042,7 @@ public class DBManager {
             statement.setString(9, graph_string_ptgl_key);
             statement.setString(10, graph_string_ptgl_seq);
             statement.setString(11, sse_string);
+            statement.setInt(12, graph_containsbetabarrel);
                                 
             affectedRows = statement.executeUpdate();
             if (affectedRows == 0) {
@@ -1367,6 +1437,52 @@ public class DBManager {
                     dbc.rollback();
                 } catch(SQLException excep) {
                     System.err.println("ERROR: SQL: assignSSEToProteinGraph(): Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        } 
+        
+        return numRowsAffected;
+    }
+    
+    /**
+     * Assigns an SSE to a protein graph, defining its position in it.
+     * @param chainDbId the database id (primary key) of the chain
+     * @param ligand_name3 the 3-char ligand name (PDB ligand expo)
+     * @return the number of affected rows (1 on success, 0 on error)
+     * @throws java.sql.SQLException if something goes wrong with the DB
+     */
+    public static synchronized Integer assignLigandToProteinChain(Long chainDbId, String ligand_name3) throws SQLException {
+        
+        Integer numRowsAffected = 0;
+        
+        // assign SSE
+        PreparedStatement statement = null;
+        
+        String query = "INSERT INTO " + tbl_nm_ligandtochain + " (ligandtochain_chainid, ligandtochain_ligandname3) VALUES (?, ?);";
+        
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            
+            statement.setLong(1, chainDbId);
+            statement.setString(2, ligand_name3);
+                                
+            numRowsAffected = statement.executeUpdate();
+            dbc.commit();
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: assignLigandToProteinChain(): '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: assignLigandToProteinChain(): Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: assignLigandToProteinChain(): Could not roll back transaction: '" + excep.getMessage() + "'.");                    
                 }
             }
         } finally {
@@ -1834,11 +1950,12 @@ public class DBManager {
     
     
     /**
-     * Determines whether a protein exists in the database.
+     * Determines whether a protein exists in the database. Note race condition problems with this
+     * approach if run on several machines which write to the same DB.
      * @param pdb_id the PDB ID of the protein
      * @return true if it exists, false otherwise
      */
-    public static Boolean proteinExistsInDB(String pdb_id) {
+    public static synchronized Boolean proteinExistsInDB(String pdb_id) {
         
         ResultSetMetaData md;
         ArrayList<String> columnHeaders;
@@ -1896,6 +2013,89 @@ public class DBManager {
             }
             else {
                 DP.getInstance().w("DB: Protein with PDB ID '" + pdb_id + "' not in DB.");
+                return(false);
+            }
+        }
+        else {
+            return(false);
+        }        
+    }
+    
+    /**
+     * Determines whether a ligand, identified by its 3-char abbreviation like "ICT", exists in the database. Note race condition problems with this
+     * approach if run in parallel on several machines which write to the same DB.
+     * @param ligand_name3 the PDB ligand abbreviation, 3 chars, e.g., "ICT" for isocitric acid. See http://ligand-expo.rcsb.org/  for details.
+     * @return true if it exists, false otherwise
+     */
+    public static synchronized Boolean ligandExistsInDB(String ligand_name3) {
+        
+        
+        if(ligand_name3 == null) {
+            DP.getInstance().w("DBManger", "ligandExistsInDB: Invalid ligand code, must not be null.");
+            return false;
+        }
+        else {
+            if(ligand_name3.length() != 3) {
+                DP.getInstance().w("DBManger", "ligandExistsInDB: Invalid ligand code, must consist of exactly 3 characters.");
+                return false;
+            }
+        }
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT ligand_name3 FROM " + tbl_ligand + " WHERE (ligand_name3 = ?);";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setString(1, ligand_name3);
+                                
+            rs = statement.executeQuery();
+            dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: ligandExistsInDB:'" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DB: ligandExistsInDB: Could not close statement and reset autocommit."); }
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        if(tableData.size() >= 1) {
+            if(tableData.get(0).size() >= 1) {
+                return(true);
+            }
+            else {
                 return(false);
             }
         }
