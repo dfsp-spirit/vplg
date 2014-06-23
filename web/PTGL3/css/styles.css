@@ -788,6 +788,14 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	 3Dview.php
 	 ------------------------------------*/
 	
+	#myJmol_appletinfotablediv {
+		z-index: 0;
+	}
+	
+	#appdiv {
+		margin-bottom: 10%;
+	}
+	
 	#D3view {
 		margin-top: 5%;
 	}

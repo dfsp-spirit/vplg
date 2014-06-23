@@ -130,40 +130,40 @@
 						<h4>Alpha Motifs</h4>
 						<div class="motifimagecontainer">
 						   <div class="motiftext">Four Helix Bundle (<a href="help.php#helpAlphaMotifs">?</a>)</div>
-						   <a href=""><img class="motifimage" src="/images/4helixbeide_struktur.jpg" /></a></div>
+						   <a href=""><img class="motifimage" src="./images/4helixbeide_struktur.jpg" /></a></div>
 						<div class="motifimagecontainer">
 						   <div class="motiftext">Globin Fold (<a href="help.php#helpAlphaMotifs">?</a>)</div>
-						   <a href=""><img class="motifimage" src="/images/globin_struktur.jpg" /></a></div>
+						   <a href=""><img class="motifimage" src="./images/globin_struktur.jpg" /></a></div>
 
 						
 						<h4>Beta Motifs</h4>
 						<div class="motifimagecontainer">
 						   <div class="motiftext">Up and Down Barrel (<a href="help.php#helpBetaMotifs">?</a>)</div>
-						   <a href=""><img class="motifimage" src="/images/barrel_struktur.jpg" /></a></div>	
+						   <a href=""><img class="motifimage" src="./images/barrel_struktur.jpg" /></a></div>	
 						<div class="motifimagecontainer">
 						   <div class="motiftext">Immunoglobulin Fold (<a href="help.php#helpBetaMotifs">?</a>)</div>
-						   <a href=""><img class="motifimage" src="/images/immuno_struktur.jpg" /></a></div>
+						   <a href=""><img class="motifimage" src="./images/immuno_struktur.jpg" /></a></div>
 						<div class="motifimagecontainer">
 						   <div class="motiftext">Beta Propeller (<a href="help.php#helpBetaMotifs">?</a>)</div>
-						   <a href=""><img class="motifimage" src="/images/propeller_struktur.jpg" /></a></div>	
+						   <a href=""><img class="motifimage" src="./images/propeller_struktur.jpg" /></a></div>	
 						<div class="motifimagecontainer">
 						   <div class="motiftext">Jelly Roll (<a href="help.php#helpBetaMotifs">?</a>)</div>
-						   <a href=""><img class="motifimage" src="/images/jelly_struktur.jpg" /></a></div>		
+						   <a href=""><img class="motifimage" src="./images/jelly_struktur.jpg" /></a></div>		
 
 						
 						<h4>Alpha Beta Motifs</h4>
 						<div class="motifimagecontainer">
 						   <div class="motiftext">Ubiquitin Roll (<a href="help.php#helpAlphaBetaMotifs">?</a>)</div>
-						   <a href=""><img class="motifimage" src="/images/ubibeide_struktur.jpg" /></a></div>	
+						   <a href=""><img class="motifimage" src="./images/ubibeide_struktur.jpg" /></a></div>	
 						<div class="motifimagecontainer">
 						   <div class="motiftext">Alpha-Beta Plait (<a href="help.php#helpAlphaBetaMotifs">?</a>)</div>
-						   <a href=""><img class="motifimage" src="/images/plait_struktur.jpg" /></a></div>
+						   <a href=""><img class="motifimage" src="./images/plait_struktur.jpg" /></a></div>
 						<div class="motifimagecontainer">
 						   <div class="motiftext">Rossman Fold (<a href="help.php#helpAlphaBetaMotifs">?</a>)</div>
-						   <a href=""><img class="motifimage" src="/images/rossman_struktur.jpg" /></a></div>	
+						   <a href=""><img class="motifimage" src="./images/rossman_struktur.jpg" /></a></div>	
 						<div class="motifimagecontainer">
 						   <div class="motiftext">TIM Barrel (<a href="help.php#helpBetaMotifs">?</a>)</div>
-						   <a href=""><img class="motifimage" src="/images/tim_struktur.jpg" /></a></div>	
+						   <a href=""><img class="motifimage" src="./images/tim_struktur.jpg" /></a></div>	
 
 					</div>
 				</dl>
