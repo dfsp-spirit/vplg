@@ -46,10 +46,10 @@ if (strlen($search_string) >= 1 && $search_string !== ' ') {
 
 */
 
-$output = '<a href="./proteins/'.$pdb_id.'/'.$pdb_id.'_'.$chain.'_alpha_PG.png" target="_blank">
-			<img src="./proteins/'.$pdb_id.'/'.$pdb_id.'_'.$chain.'_alpha_PG.png" alt="" />
+$output = '<a href="./data/'.$pdb_id.'_'.$chain.'_alpha_PG.png" target="_blank">
+			<img src="./data/'.$pdb_id.'_'.$chain.'_alpha_PG.png" alt="" />
 			 </a>
-			 <a href="./proteins/'.$pdb_id.'/'.$pdb_id.'_'.$chain.'_alpha_PG.png" target="_blank">Full Size Image</a>
+			 <a href="./data/'.$pdb_id.'_'.$chain.'_alpha_PG.png" target="_blank">Full Size Image</a>
 			 <span class="download-options">Download Graph: [GML] [PS] [else]</span>';
 
 echo $output;

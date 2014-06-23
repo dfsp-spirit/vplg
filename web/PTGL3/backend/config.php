@@ -11,6 +11,10 @@ return array(
     'user' => 'vplg',
     'pw' => 'vplg',
     'db' => 'vplg',
-    'port' => '5432'
+    'port' => '5432',
+    ## End of database settings ##
+
+    'enable_complex_graphs' => FALSE,
+    'enable_motif_search' => FALSE
 );
 ?>

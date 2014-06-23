@@ -48,16 +48,16 @@
 		<div class="container" id="citing">
 			<h2> Citing PTGL </h2>
 			<br>
-			<p>A publication explaining the method in detail has been published in the Proceedings of the German Conference on Bioinformatics (GCB) 2012 and is available here at the Dagstuhl Research Online Publication Server (Open Access).</p>
+			<p>A publication explaining the method in detail has been published #where??#.</p>
 			<p>BibTeX - Entry:</p>
 
 			
 			<div id="bibtex">
 				@InProceedings{schfer_et_al:OASIcs:2012:3722,<br>
-				author =    {Tim Sch{\"a}fer and Patrick May and Ina Koch},<br>
-				title = {{Computation and Visualization of Protein Topology Graphs Including Ligand Information}},<br>
-				booktitle = {German Conference on Bioinformatics 2012},<br>
-				pages = {108--118},<br>
+				author =    {Ina Koch and Kreuchwig Annika and Patrick May},<br>
+				title = {{Hierarchical representation of supersecondary structures using a graph-theoretical approach}},<br>
+				booktitle = {Protein Supersecondary Structure},<br>
+				pages = {7--35},<br>
 				series =    {OpenAccess Series in Informatics (OASIcs)},<br>
 				ISBN =  {978-3-939897-44-6},<br>
 				ISSN =  {2190-6807},<br>

@@ -1,5 +1,19 @@
 <!DOCTYPE html>
 
+<?php
+
+ini_set('display_errors',1);
+ini_set('display_startup_errors',1);
+error_reporting(-1);
+
+
+$db_config = include('./backend/config.php'); 
+$ENABLE_COMPLEX_GRAPHS = $db_config['enable_complex_graphs'];
+$ENABLE_MOTIF_SEARCH = $db_config['enable_motif_search'];
+$ENABLE_BLAST_SEARCH = $db_config['enable_blast_search'];
+
+?>
+
 <html>
 	<head>
 		<meta charset="utf-8">
@@ -67,7 +81,7 @@
 							<div id="advancedButton"> Advanced Search <div id="arrow"><strong class="caret"></strong></div></div>
 							<div id="liveSearchResults"></div>
 
-							<label class="checkboxFont">
+							<label class="checkboxFont" <?php if(!$ENABLE_COMPLEX_GRAPHS) echo 'style="display:none !important;"'?> >
 								<input type="checkbox" id="inlineCheckbox3" name="proteincomplexes" value="1"> Search for Protein Complexes </input>
 							</label>
 							<!-- <label class="checkboxFont">
@@ -120,7 +134,7 @@
 					</div>
 				</dl>
 				
-				<dl class="dl-horizontal">
+				<dl class="dl-horizontal" <?php if(!$ENABLE_MOTIF_SEARCH) echo 'style="display:none !important;"' ?>>
 					<div id="additionalSearch2">
 					<dt>SearchMotifs</dt>
 					<dd>Search form for topological protein structure motifs <strong class="caret" id="flipArrow2" ></strong></dd>
