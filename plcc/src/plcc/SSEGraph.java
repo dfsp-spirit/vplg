@@ -34,23 +34,26 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import jgrapht.PLGEdge;
 import jgrapht.ProteinLigandGraph;
 import jgrapht.VertexSSE;
 
 import org.apache.batik.apps.rasterizer.DestinationType;
 import org.apache.batik.apps.rasterizer.SVGConverter;
-import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.dom.GenericDOMImplementation;
+import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.transcoder.image.PNGTranscoder;
-import org.w3c.dom.Document;
-import org.w3c.dom.DOMImplementation;
-import tools.DP;
-import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D;
-//import org.apache.xmlgraphics.java2d.ps.PSDocumentGraphics2D;
 import org.apache.commons.io.IOUtils;
+import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
+import plcc.DrawTools.IMAGEFORMAT;
+import tools.DP;
 
 
 /**
@@ -2284,7 +2287,34 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         return(pathToTarget);
     }
     
-    
+    /**
+     * 
+     * @param baseFilePathNoExt the base file path where to put the image (without dot and file extension)
+     * @param drawBlackAndWhite whether to omit colors, only useful for non-protein graphs
+     * @return a map of formats to the corresponding output files written to disk
+     */
+    public HashMap<IMAGEFORMAT, String> drawProteinGraph(String baseFilePathNoExt, Boolean drawBlackAndWhite) {
+        IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ IMAGEFORMAT.JPEG, IMAGEFORMAT.PDF };
+        DrawResult drawRes = this.drawProteinGraphG2D(drawBlackAndWhite);
+        
+        String svgFilePath = baseFilePathNoExt + ".svg";
+        HashMap<IMAGEFORMAT, String> resultFilesByFormat = new HashMap<IMAGEFORMAT, String>();
+        try {
+            DrawTools.writeG2dToSVGFile(svgFilePath, drawRes);
+            resultFilesByFormat.put(IMAGEFORMAT.SVG, svgFilePath);
+            resultFilesByFormat.putAll(DrawTools.convertSVGFileToOtherFormats(svgFilePath, baseFilePathNoExt, drawRes, formats));
+        } catch (IOException ex) {
+            DP.getInstance().e("Could not write graph file : '" + ex.getMessage() + "'.");
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("Output graph files: ");
+        for(IMAGEFORMAT format : resultFilesByFormat.keySet()) {
+            sb.append(format.toString() + " => " + resultFilesByFormat.get(format) + " ");
+        }
+        System.out.println(sb.toString());
+        return resultFilesByFormat;
+    }
     
     /**
      * Draws the protein graph image of this graph, writing the image in PNG format to the file 'filePath' (which should maybe end in ".png").
@@ -2292,10 +2322,10 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
      * In that case, the graph is drawn black and white and the labels for the N- and C-termini are NOT drawn.
      * 
      * @param filePath the file system path where to write the graph image (without file extension and the dot before it)
-     * @param nonProteinGraph whether the graph is a non-protein graph and thus does NOT contain information on the relative SSE orientation in the expected way. If so, it is drawn in gray scale because the color code become useless (true => gray scale, false => color).
-     * @return whether the graph could be drawn and written to the file filePath
+     * @param nonProteinGraph whether the graph is a non-protein graph and thus does NOT contain information on the relative SSE orientation in the expected way. If so, it is drawn in gray scale because the color code becomes useless (true => gray scale, false => color).
+     * @return the DrawResult. You can write this to a file or whatever.
      */
-    public Boolean drawProteinGraph(String filePath, Boolean nonProteinGraph) {
+    public DrawResult drawProteinGraphG2D(Boolean nonProteinGraph) {
 
         
         Integer numVerts = this.numVertices();
@@ -2307,11 +2337,11 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         PageLayout pl = new PageLayout(numVerts);        
         Position2D vertStart = pl.getVertStart();
         
-        try {
+        
 
             // ------------------------- Prepare stuff -------------------------
             // TYPE_INT_ARGB specifies the image format: 8-bit RGBA packed into integer pixels
-            BufferedImage bi = new BufferedImage(pl.getPageWidth(), pl.getPageHeight(), BufferedImage.TYPE_INT_ARGB);
+            //BufferedImage bi = new BufferedImage(pl.getPageWidth(), pl.getPageHeight(), BufferedImage.TYPE_INT_ARGB);
             
             SVGGraphics2D ig2;
             
@@ -2391,7 +2421,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
                         for(Integer x = 0; x < chainEnd.size(); x++){
                             if(j < chainEnd.get(x)) {jChainID = x; break;}
                         }
-                        if (iChainID != jChainID) {ig2.setPaint(Color.PINK);}
+                        if (!Objects.equals(iChainID, jChainID)) {ig2.setPaint(Color.PINK);}
                         // ----- end complex graph specific stuff -----
 
                         // determine the center of the arc and the width of its rectangle bounding box
@@ -2525,39 +2555,10 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             //Writer out = new OutputStreamWriter(fos, "UTF-8");
             //ig2.stream(out, useCSS); 
             
-            Rectangle2D aoi = new Rectangle2D.Double(0, 0, pl.getPageWidth(), pl.getPageHeight());
+            Rectangle2D roi = new Rectangle2D.Double(0, 0, pl.getPageWidth(), pl.getPageHeight());
             
-            String svgFilePath;
-            
-            // hax!
-            Integer fileExtLength = Settings.get("plcc_S_img_output_fileext").length();     // already includes the dot
-            Integer pathLength = filePath.length();
-            svgFilePath = filePath.substring(0, pathLength - fileExtLength + 1) + "svg";
-            ig2.stream(new FileWriter(svgFilePath), false);                
-            
-            SVGConverter svgConverter = new SVGConverter();
-            svgConverter.setArea(aoi);
-            svgConverter.setWidth(pl.getPageWidth());
-            svgConverter.setHeight(pl.getPageHeight());
-            if(Settings.get("plcc_S_img_output_format").equals("PNG")) {                
-                svgConverter.setDestinationType(DestinationType.PNG);                
-            } else if(Settings.get("plcc_S_img_output_format").equals("JPG")) {
-                svgConverter.setDestinationType(DestinationType.JPEG);
-            } else {
-                svgConverter.setDestinationType(DestinationType.TIFF);
-            }
-            
-            svgConverter.setSources(new String[]{svgFilePath});
-            svgConverter.setDst(new File(filePath));
-            svgConverter.execute();                                    
-            
-
-        } catch (Exception e) {
-            System.err.println("WARNING: Could not write image file for protein graph to file '" + filePath + "':" + e.getMessage() + "'.");
-            return(false);
-        }
-
-        return(true);
+            DrawResult drawRes = new DrawResult(ig2, roi);
+            return drawRes;                                                                         
     }
     
     

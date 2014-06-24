@@ -11,9 +11,23 @@ package plcc;
 
 // imports
 import datastructures.AAGraph;
-import tools.DP;
+import htmlgen.CssGenerator;
+import htmlgen.HtmlGenerator;
+import htmlgen.JmolTools;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.*;
+import java.io.*;
 import java.nio.channels.*;
+import java.sql.SQLException;
+import java.util.*;
 import java.util.Locale;
+import javax.imageio.ImageIO;
 //import java.net.*;
 //import org.jgrapht.*;
 //import org.jgrapht.graph.*;
@@ -21,31 +35,15 @@ import java.util.Locale;
 //import com.google.gson.*;
 //import datastructures.UndirectedGraph;
 import net.sourceforge.spargel.writers.GMLWriter;
-import htmlgen.CssGenerator;
-import htmlgen.HtmlGenerator;
-import htmlgen.JmolTools;
-import java.util.*;
-
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.RenderingHints;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.geom.Rectangle2D;
-//import java.awt.*;
-import java.awt.image.*;
-import java.io.*;
-
-import java.sql.SQLException;
-import javax.imageio.ImageIO;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.logging.log4j.LogManager;
-import org.w3c.dom.Document;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
+import plcc.DrawTools.IMAGEFORMAT;
 import similarity.CompareOneToDB;
 import similarity.Similarity;
-import org.apache.logging.log4j.Logger;
+import tools.DP;
 
 /**
  * This is the Main class of plcc.
@@ -1634,13 +1632,12 @@ public class Main {
                 
         ProtGraph pg = ProtGraphs.fromPlccGraphFormatString(graphString);
         System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to file '" + img + "'.");
-        if(pg.drawProteinGraph(img, false)) {
-            System.out.println("  Protein graph image written to file '" + img + "'.");
-            
-            if(drawFoldingGraphsAsWell) {
-                calculateFoldingGraphsForSSEGraph(pg, Settings.get("plcc_S_output_dir"));
-            }
-        }
+        pg.drawProteinGraph(img, false); 
+        System.out.println("  Protein graph image written to file '" + img + "'.");
+
+        if(drawFoldingGraphsAsWell) {
+            calculateFoldingGraphsForSSEGraph(pg, Settings.get("plcc_S_output_dir"));
+        }        
         else {
             System.err.println("ERROR: Drawing of graph failed.");
         }       
@@ -1661,22 +1658,18 @@ public class Main {
         catch (SQLException e) { System.err.println("ERROR: SQL: Drawing of graph from DB failed: '" + e.getMessage() + "'."); return; }
         
         if(graphString == null) {
-            System.err.println("ERROR: No such graph in the database, exiting.");
-            System.exit(1);
+            System.err.println("ERROR: No such graph in the database to draw.");
+            return;
         }
         
         ProtGraph pg = ProtGraphs.fromPlccGraphFormatString(graphString);
         System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to file '" + outputimg + "'.");
-        if(pg.drawProteinGraph(outputimg, false)) {
-            System.out.println("  Protein graph image written to file '" + outputimg + "'.");
-            
-            if(drawFoldingGraphsAsWell) {
-                calculateFoldingGraphsForSSEGraph(pg, Settings.get("plcc_S_output_dir"));
-            }
+        pg.drawProteinGraph(outputimg, false);
+        System.out.println("  Protein graph image written to file '" + outputimg + "'.");
+
+        if(drawFoldingGraphsAsWell) {
+            calculateFoldingGraphsForSSEGraph(pg, Settings.get("plcc_S_output_dir"));
         }
-        else {
-            System.err.println("ERROR: Drawing of graph from DB failed.");
-        }       
     }
 
 
@@ -2103,6 +2096,7 @@ public class Main {
                 
                 
                 imgFile = filePathImg + fs + fileNameWithExtension;
+                String imgFileNoExt = filePathImg;
                 
                 // test spatial ordering, not used for anything atm
                 // TODO: remove this, it's only a test and takes time
@@ -2151,40 +2145,40 @@ public class Main {
                 }
 
                 if(Settings.getBoolean("plcc_B_draw_graphs")) {
-                    if(pg.drawProteinGraph(imgFile, false)) {
-                        if(! silent) {
-                            System.out.println("      Image of graph written to file '" + imgFile + "'.");
+                    HashMap<IMAGEFORMAT, String> filesByFormat = pg.drawProteinGraph(imgFileNoExt, false);
+                    if(! silent) {
+                        System.out.println("      Image of graph written to file '" + imgFile + "'.");
+                    }
+                    pcr.addProteinGraphImageBitmap(gt, new File(imgFile));
+
+                    // set image location is database if required
+                    if(Settings.getBoolean("plcc_B_useDB")) {
+                        Long graphDBID = -1L;
+                        try {
+                            graphDBID = DBManager.getDBProteinGraphID(pdbid, chain, gt);
+                        } catch(SQLException ex) {
+                            DP.getInstance().e("Main", "Could not find graph in database: '" + ex.getMessage() + "'.");
                         }
-                        pcr.addProteinGraphImageBitmap(gt, new File(imgFile));
-                        
-                        // set image location is database if required
-                        if(Settings.getBoolean("plcc_B_useDB")) {
-                            Long graphDBID = -1L;
+                        if(graphDBID > 0) {
+
+
+                            String dbImagePath = fileNameWithExtension;
+                            if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
+                                dbImagePath = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain) + fs + fileNameWithExtension;
+                            }
+                            //DP.getInstance().d("dbImagePath is '" + dbImagePath + "'.");
+
+
                             try {
-                                graphDBID = DBManager.getDBProteinGraphID(pdbid, chain, gt);
-                            } catch(SQLException ex) {
-                                DP.getInstance().e("Main", "Could not find graph in database: '" + ex.getMessage() + "'.");
+                                DBManager.updateProteinGraphImagePathInDB(graphDBID, ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT, dbImagePath);
+                            } catch(SQLException e) {
+                                DP.getInstance().e("Main", "Could not update graph image path in database: '" + e.getMessage() + "'.");
                             }
-                            if(graphDBID > 0) {
-                                
-                                
-                                String dbImagePath = fileNameWithExtension;
-                                if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
-                                    dbImagePath = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain) + fs + fileNameWithExtension;
-                                }
-                                //DP.getInstance().d("dbImagePath is '" + dbImagePath + "'.");
-                                
-                                
-                                try {
-                                    DBManager.updateProteinGraphImagePathInDB(graphDBID, ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT, dbImagePath);
-                                } catch(SQLException e) {
-                                    DP.getInstance().e("Main", "Could not update graph image path in database: '" + e.getMessage() + "'.");
-                                }
-                            } else {
-                                DP.getInstance().e("Main", "Could not find " + gt + " graph for PDB " + pdbid + " chain " + chain + " in database to set image path.");
-                            }
+                        } else {
+                            DP.getInstance().e("Main", "Could not find " + gt + " graph for PDB " + pdbid + " chain " + chain + " in database to set image path.");
                         }
-                    }                   
+                    }
+                                     
                 }
                 else {
                     if(! silent) {
@@ -5573,9 +5567,8 @@ public class Main {
         imgFile = filePathImg + fs + fileNameWithExtension;
 
         if(Settings.getBoolean("plcc_B_draw_graphs")) {
-            if(pg.drawProteinGraph(imgFile, false)) {
-                System.out.println("    Image of complex graph written to file '" + imgFile + "'.");
-            }                   
+            pg.drawProteinGraph(imgFile, false);
+            System.out.println("    Image of complex graph written to file '" + imgFile + "'.");
         }
         else {
             System.out.println("    Image and graph output disabled, not drawing and writing complex graph files.");
