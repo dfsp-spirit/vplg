@@ -2291,14 +2291,12 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
      * 
      * @param baseFilePathNoExt the base file path where to put the image (without dot and file extension)
      * @param drawBlackAndWhite whether to omit colors, only useful for non-protein graphs
+     * @param formats an array of type DrawTools.IMAGEFORMAT. Do not include SVG, this will always be drawn anyways
      * @return a map of formats to the corresponding output files written to disk
      */
-    public HashMap<IMAGEFORMAT, String> drawProteinGraph(String baseFilePathNoExt, Boolean drawBlackAndWhite) {                
-        
-        // TODO: get these from cfg
-        // SVG always get drawn, so do NOT add it here
-        IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ IMAGEFORMAT.PNG, IMAGEFORMAT.PDF };
-        
+    public HashMap<IMAGEFORMAT, String> drawProteinGraph(String baseFilePathNoExt, Boolean drawBlackAndWhite, IMAGEFORMAT[] formats) {                
+               
+       
         DrawResult drawRes = this.drawProteinGraphG2D(drawBlackAndWhite);
         
         String svgFilePath = baseFilePathNoExt + ".svg";

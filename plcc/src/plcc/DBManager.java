@@ -1077,13 +1077,42 @@ public class DBManager {
         return(insertID);
     }
 
+    
+    /**
+     * Determines DB field name. Name of the field that stores the path to the protein graph image in given format.
+     * @param format the format, use DrawTools.FORMAT_* constants
+     * @return the name of the database field that stores the path to the graph image in given format and representation, or null if no field for the combination exists in the DB modell
+     */
+    public static String getFieldnameForProteinGraphImageFormat(String format) {
+        String fieldName = null;
+        
+        if(format.equals(DrawTools.FORMAT_PNG)) {            
+            fieldName = "graph_image_png";
+        }
+        else if(format.equals(DrawTools.FORMAT_SVG)) {
+            fieldName = "graph_image_svg";
+        }
+        else if(format.equals(DrawTools.FORMAT_JPEG)) {
+            fieldName = "graph_image_jpg";
+        }
+        else if(format.equals(DrawTools.FORMAT_TIFF)) {
+            fieldName = "graph_image_tif";
+        }
+        else if(format.equals(DrawTools.FORMAT_PDF)) {
+            fieldName = "graph_image_pdf";
+        }
+        
+        return fieldName;
+    }
+        
+    
     /**
      * Determines DB field name. Name of the field that stores the path to the graph image in given format and representation.
      * @param format the format, use DrawTools.FORMAT_* constants
      * @param notation the notation, use ProtGraphs.GRAPHNOTATION_* constants
      * @return the name of the database field that stores the path to the graph image in given format and representation, or null if no field for the combination exists in the DB modell
      */
-    public static String getFieldnameForGraphImageType(String format, String notation) {
+    public static String getFieldnameForFoldingGraphImageType(String format, String notation) {
         String fieldName = null;
         
         if(format.equals(DrawTools.FORMAT_PNG)) {
@@ -1260,15 +1289,14 @@ public class DBManager {
      * 
      * @param graphDatabaseID the graph ID in the database. Use the getGrapDatabaseID function if you do not know it.
      * @param format The image format, see DrawTools.IMAGEFORMAT
-     * @param notation The graph notation type, e.g., "KEY". Use the constants in ProtGraphs class, e.g., ProtGraphs.GRAPHNOTATION_KEY.
      * @param relativeImagePath the relative image path to set in the database for the specified representation
      * @return the number of rows affected by the SQL query
      * @throws SQLException if something goes wrong with the database
      */
-    public static Integer updateProteinGraphImagePathInDB(Long graphDatabaseID, IMAGEFORMAT format, String notation, String relativeImagePath) throws SQLException {
+    public static Integer updateProteinGraphImagePathInDB(Long graphDatabaseID, IMAGEFORMAT format, String relativeImagePath) throws SQLException {
         
         PreparedStatement statement = null;
-        String graphImageFieldName = DBManager.getFieldnameForGraphImageType(format.toString(), notation);
+        String graphImageFieldName = DBManager.getFieldnameForProteinGraphImageFormat(format.toString());
         if(graphImageFieldName == null) {
             DP.getInstance().w("DBManager", "updateProteinGraphImagePathInDB: Invalid graph image represenation type (or no field for type in DB). Cannot set protein graph image path in database.");
             return 0;
@@ -1313,13 +1341,67 @@ public class DBManager {
     /**
      * Sets the image path for a specific folding graph representation in the database. The graph has to exist in the database already.
      * 
+     * @param graphDatabaseID the graph ID in the database. Use the getGrapDatabaseID function if you do not know it.
+     * @param format The image format, see DrawTools.IMAGEFORMAT
+     * @param notation The graph notation type, e.g., "KEY". Use the constants in ProtGraphs class, e.g., ProtGraphs.GRAPHNOTATION_KEY.
+     * @param relativeImagePath the relative image path to set in the database for the specified representation
+     * @return the number of rows affected by the SQL query
+     * @throws SQLException if something goes wrong with the database
+     */    
+    public static Integer updateFoldingGraphImagePathInDB(Long graphDatabaseID, IMAGEFORMAT format, String notation, String relativeImagePath) throws SQLException {
+        
+        PreparedStatement statement = null;
+        String graphImageFieldName = DBManager.getFieldnameForFoldingGraphImageType(format.toString(), notation);
+        if(graphImageFieldName == null) {
+            System.err.println("Invalid folding graph image represenation type. Cannot set folding graph image path in database.");
+            return 0;
+        }
+
+        String query = "UPDATE " + tbl_foldinggraph + " SET " + graphImageFieldName + " = ? WHERE foldinggraph_id = ?;";
+        Integer numRowsAffected = 0;
+        
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            
+            statement.setString(1, relativeImagePath);
+            statement.setLong(2, graphDatabaseID);
+                                
+            numRowsAffected = statement.executeUpdate();
+            dbc.commit();
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: updateFoldingGraphImagePathInDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: updateFoldingGraphImagePathInDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: updateFoldingGraphImagePathInDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        } 
+       
+        return numRowsAffected;
+        
+    }
+    
+    /**
+     * Sets the image path for a specific folding graph representation in the database. The graph has to exist in the database already.
+     * 
      * @param graphDatabaseID the graph ID in the database. Use the getGrapDatabaseID function if you dont know it.
      * @param graphImageRepresentationType The image representation type, defines format and image type (like PNG format and PTGL KEY notation image). Use the constants in ProtGraphs class, e.g., ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT.
      * @param relativeImagePath the relative image path to set in the database for the specified representation
      * @return the number of rows affected by the SQL query
      * @throws SQLException if something goes wrong with the database
      */
-    public static Integer updateFoldingGraphImagePathInDB(Long graphDatabaseID, String graphImageRepresentationType, String relativeImagePath) throws SQLException {
+    @Deprecated
+    public static Integer updateFoldingGraphImagePathInDBOld(Long graphDatabaseID, String graphImageRepresentationType, String relativeImagePath) throws SQLException {
         
         PreparedStatement statement = null;
         String graphImageFieldName = DBManager.getFieldnameForGraphImageRepresentationType(graphImageRepresentationType);

@@ -776,7 +776,8 @@ public class Main {
                         else {
                             Settings.set("plcc_B_graphimg_header", "false");
                             System.out.println("Drawing custom graph in TGF format from file '" + args[i+1] + "'.");
-                            drawTGFGraph(args[i+1], args[i+1] + Settings.get("plcc_S_img_output_fileext"));
+                            IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
+                            drawTGFGraph(args[i+1], args[i+1], formats);
                             System.out.println("Done drawing TGF graph, exiting.");
                             System.exit(1);
                         }
@@ -1603,24 +1604,24 @@ public class Main {
      * @param tgfFile the path to the TGF file which contains the graph to draw
      * @param img the output path where the resulting image should be written
      */
-    public static void drawTGFGraph(String tgfFile, String img) {
+    public static void drawTGFGraph(String tgfFile, String img, IMAGEFORMAT[] formats) {
 
         //System.out.println("Testing tgf implementation using file '" + tgfFile + "'.");
 
         ProtGraph pg = ProtGraphs.fromTrivialGraphFormatFile(tgfFile);
-        System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to file '" + img + "'.");
-        pg.drawProteinGraph(img, true);
+        System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to base file '" + img + "'.");
+        pg.drawProteinGraph(img, true, formats);
         //pg.print();
-        System.out.println("  Graph image written to file '" + img + "'.");
+        System.out.println("  Graph image written to base file '" + img + "'.");
     }
     
     
     /**
      * Draws the image of a graph from the file 'plccGraphFile' (which is expected to contain a graph in PLCC format) and writes it to the PNG file 'img'.
      * @param plccGraphFile the input file in plcc format
-     * @param img the path where to write the output image (including the file extension)
+     * @param imgNoExt the path where to write the output image (without the file extension)
      */
-    public static void drawPlccGraphFromFile(String plccGraphFile, String img, Boolean drawFoldingGraphsAsWell) {
+    public static void drawPlccGraphFromFile(String plccGraphFile, String imgNoExt, Boolean drawFoldingGraphsAsWell) {
 
         //System.out.println("Testing plcc graph reading implementation using file '" + plccGraphFile + "'.");
 
@@ -1630,10 +1631,11 @@ public class Main {
             ProtGraphs.printPlccMetaData(graphString);
         }
                 
+        IMAGEFORMAT[] formats = new IMAGEFORMAT[] { DrawTools.IMAGEFORMAT.PNG };
         ProtGraph pg = ProtGraphs.fromPlccGraphFormatString(graphString);
-        System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to file '" + img + "'.");
-        pg.drawProteinGraph(img, false); 
-        System.out.println("  Protein graph image written to file '" + img + "'.");
+        System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to base file '" + imgNoExt + "'.");
+        pg.drawProteinGraph(imgNoExt, false, formats); 
+        System.out.println("  Protein graph image written to base file '" + imgNoExt + "'.");
 
         if(drawFoldingGraphsAsWell) {
             calculateFoldingGraphsForSSEGraph(pg, Settings.get("plcc_S_output_dir"));
@@ -1646,10 +1648,13 @@ public class Main {
     
     /**
      * Draws the image of a graph from the file 'plccGraphFile' (which is expected to contain a graph in PLCC format) and writes it to the PNG file 'img'.
-     * @param plccGraphFile the input file in plcc format
-     * @param img the path where to write the output image (including the file extension)
+     * @param g_pdbid the PDB id
+     * @param g_chainid the chain ID
+     * @param drawFoldingGraphsAsWell whether to draw FGs
+     * @param g_graphtype the graph type
+     * @param outputImgNoExt the path where to write the output image (without the file extension)
      */
-    public static void drawPlccGraphFromDB(String g_pdbid, String g_chainid, String g_graphtype, String outputimg, Boolean drawFoldingGraphsAsWell) {
+    public static void drawPlccGraphFromDB(String g_pdbid, String g_chainid, String g_graphtype, String outputImgNoExt, Boolean drawFoldingGraphsAsWell) {
 
         System.out.println("Retrieving " + g_graphtype + " graph for PDB entry " + g_pdbid + " chain " + g_chainid + " from DB.");
         
@@ -1663,9 +1668,10 @@ public class Main {
         }
         
         ProtGraph pg = ProtGraphs.fromPlccGraphFormatString(graphString);
-        System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to file '" + outputimg + "'.");
-        pg.drawProteinGraph(outputimg, false);
-        System.out.println("  Protein graph image written to file '" + outputimg + "'.");
+        IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
+        System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to base file '" + outputImgNoExt + "'.");
+        pg.drawProteinGraph(outputImgNoExt, false, formats);
+        System.out.println("  Protein graph image written to base file '" + outputImgNoExt + "'.");
 
         if(drawFoldingGraphsAsWell) {
             calculateFoldingGraphsForSSEGraph(pg, Settings.get("plcc_S_output_dir"));
@@ -2144,57 +2150,51 @@ public class Main {
                     }
                 }
 
-                String[] notations = new String[] { ProtGraphs.GRAPHNOTATION_DEF };
                 if(Settings.getBoolean("plcc_B_draw_graphs")) {
                     
-                    for(String notation : notations) {
-                    
-                        //TODO: hier notations einbauen
-                                 
-                        HashMap<IMAGEFORMAT, String> filesByFormat = pg.drawProteinGraph(imgFileNoExt, false);
-                        if(! silent) {
-                            System.out.println("      Image of graph written to file '" + imgFile + "'.");
-                        }
-                        //pcr.addProteinGraphImageBitmap(gt, new File(imgFile));
-                        for(IMAGEFORMAT f : filesByFormat.keySet()) {
-                            pcr.addProteinGraphOutputImage(gt, f.toString(), new File(filesByFormat.get(f)));
-                        }
+                    IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG, DrawTools.IMAGEFORMAT.PDF };
 
-                        // set image location in database if required
-                        if(Settings.getBoolean("plcc_B_useDB")) {
-                            Long graphDBID = -1L;
-                            try {
-                                graphDBID = DBManager.getDBProteinGraphID(pdbid, chain, gt);
-                            } catch(SQLException ex) {
-                                DP.getInstance().e("Main", "Could not find graph in database: '" + ex.getMessage() + "'.");
-                            }
-                            if(graphDBID > 0) {
-
-                                String dbImagePath;
-                                for(IMAGEFORMAT format : filesByFormat.keySet()) {
-                                    dbImagePath = fileNameWithoutExtension + DrawTools.getFileExtensionForImageFormat(format);
-
-
-                                    if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
-                                        dbImagePath = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain) + fs + dbImagePath;
-                                    }
-                                    //DP.getInstance().d("dbImagePath is '" + dbImagePath + "'.");
-
-
-                                    try {
-                                        DBManager.updateProteinGraphImagePathInDB(graphDBID, format, notation, dbImagePath);
-                                    } catch(SQLException e) {
-                                        DP.getInstance().e("Main", "Could not update graph image path in database: '" + e.getMessage() + "'.");
-                                    }
-                                }
-                            } else {
-                                DP.getInstance().e("Main", "Could not find " + gt + " graph for PDB " + pdbid + " chain " + chain + " in database to set image path.");
-                            }
-                        }
-                    }
+                    HashMap<IMAGEFORMAT, String> filesByFormatCurNotation = pg.drawProteinGraph(imgFileNoExt, false, formats);
                     if(! silent) {
-                        DP.getInstance().i("Graph images drawn in " + notations.length + " notations.");
+                        System.out.println("      Image of graph written to file '" + imgFile + "'.");
                     }
+                    //pcr.addProteinGraphImageBitmap(gt, new File(imgFile));
+                    for(IMAGEFORMAT f : filesByFormatCurNotation.keySet()) {
+                        pcr.addProteinGraphOutputImage(gt, f.toString(), new File(filesByFormatCurNotation.get(f)));
+                    }
+
+                    // set image location in database if required
+                    if(Settings.getBoolean("plcc_B_useDB")) {
+                        Long graphDBID = -1L;
+                        try {
+                            graphDBID = DBManager.getDBProteinGraphID(pdbid, chain, gt);
+                        } catch(SQLException ex) {
+                            DP.getInstance().e("Main", "Could not find graph in database: '" + ex.getMessage() + "'.");
+                        }
+                        if(graphDBID > 0) {
+
+                            String dbImagePath;
+                            for(IMAGEFORMAT format : filesByFormatCurNotation.keySet()) {
+                                dbImagePath = fileNameWithoutExtension + DrawTools.getFileExtensionForImageFormat(format);
+
+
+                                if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
+                                    dbImagePath = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain) + fs + dbImagePath;
+                                }
+                                //DP.getInstance().d("dbImagePath is '" + dbImagePath + "'.");
+
+
+                                try {
+                                    DBManager.updateProteinGraphImagePathInDB(graphDBID, format, dbImagePath);
+                                } catch(SQLException e) {
+                                    DP.getInstance().e("Main", "Could not update graph image path in database: '" + e.getMessage() + "'.");
+                                }
+                            }
+                        } else {
+                            DP.getInstance().e("Main", "Could not find " + gt + " graph for PDB " + pdbid + " chain " + chain + " in database to set image path.");
+                        }
+                        
+                    }                    
                                      
                 }
                 else {
@@ -2456,7 +2456,7 @@ public class Main {
                             // RED is the default and is added to the default field as well
                             if(dbGraphImageType.equals(ProtGraphs.GRAPHIMAGE_PNG_RED)) {
                                 try {
-                                    DBManager.updateFoldingGraphImagePathInDB(fgDbId, ProtGraphs.GRAPHIMAGE_PNG_DEFAULT, dbImagePath);
+                                    DBManager.updateFoldingGraphImagePathInDBOld(fgDbId, ProtGraphs.GRAPHIMAGE_PNG_DEFAULT, dbImagePath);
                                 } catch(SQLException e) {
                                     DP.getInstance().e("Main", "Could not update default notation folding graph image path in database: '" + e.getMessage() + "'.");
                                 }
@@ -2464,7 +2464,7 @@ public class Main {
 
                             // all the other notations get added only here
                             try {
-                                DBManager.updateFoldingGraphImagePathInDB(fgDbId, dbGraphImageType, dbImagePath);
+                                DBManager.updateFoldingGraphImagePathInDBOld(fgDbId, dbGraphImageType, dbImagePath);
                             } catch(SQLException e) {
                                 DP.getInstance().e("Main", "Could not update " + nt + " notation folding graph image path in database: '" + e.getMessage() + "'.");
                             }
@@ -5581,11 +5581,14 @@ public class Main {
             System.out.println("    Exported complex graph in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + new File(filePathGraphs).getAbsolutePath() + fs + "'.");
         }
 
-        imgFile = filePathImg + fs + fileNameWithExtension;
+        String imgFileNoExt = filePathImg + fs + fileNameWithoutExtension;
+        //imgFile = filePathImg + fs + fileNameWithExtension;
 
+        
         if(Settings.getBoolean("plcc_B_draw_graphs")) {
-            pg.drawProteinGraph(imgFile, false);
-            System.out.println("    Image of complex graph written to file '" + imgFile + "'.");
+            IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
+            pg.drawProteinGraph(imgFileNoExt, false, formats);
+            System.out.println("    Image of complex graph written to base file '" + imgFileNoExt + "'.");
         }
         else {
             System.out.println("    Image and graph output disabled, not drawing and writing complex graph files.");
