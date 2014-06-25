@@ -30,7 +30,39 @@ public class DrawTools {
     public static final String FORMAT_PDF = "PDF";
     public static final String FORMAT_JPEG = "JPEG";
     
+    public static final String DEFAULT_FORMAT_BITMAP = FORMAT_PNG;
+    public static final String DEFAULT_FORMAT_VECTOR = FORMAT_SVG;
+    
+    public static final String[] ALL_IMAGE_FORMATS = new String[] { FORMAT_PNG, FORMAT_SVG, FORMAT_TIFF, FORMAT_PDF, FORMAT_JPEG };
+    
     public enum IMAGEFORMAT { PNG, SVG, TIFF, PDF, JPEG }
+    
+    /**
+     * Returns the file extension including the dot, e.g., ".pdf" for format PDF.
+     * @param f the image format
+     * @return the file extension, including the dot (e.g., ".pdf" for format PDF).
+     */
+    public static String getFileExtensionForImageFormat(IMAGEFORMAT f) {
+        if (f.equals(IMAGEFORMAT.JPEG)) {
+            return ".jpg";
+        } 
+        else if(f.equals(IMAGEFORMAT.TIFF)) {
+            return ".tiff";
+        }
+        else if(f.equals(IMAGEFORMAT.PDF)) {
+            return ".pdf";
+        }
+        else if(f.equals(IMAGEFORMAT.SVG)) {
+            return ".svg";
+        }
+        else if(f.equals(IMAGEFORMAT.PNG)) {
+            return ".png";
+        }
+        else {
+            DP.getInstance().e("DrawTools", "getFileExtensionForImageFormat: Unsupported image format, returning empty file extension.");
+            return "";
+        }
+    }
     
     
     /**

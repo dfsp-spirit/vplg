@@ -7,11 +7,12 @@
  */
 package plcc;
 
-import tools.DP;
 import java.sql.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import plcc.DrawTools.IMAGEFORMAT;
+import tools.DP;
 
 /**
  * A database manager class that is used to create and maintain a connection to a PostgreSQL database server.
@@ -1076,6 +1077,70 @@ public class DBManager {
         return(insertID);
     }
 
+    /**
+     * Determines DB field name. Name of the field that stores the path to the graph image in given format and representation.
+     * @param format the format, use DrawTools.FORMAT_* constants
+     * @param notation the notation, use ProtGraphs.GRAPHNOTATION_* constants
+     * @return the name of the database field that stores the path to the graph image in given format and representation, or null if no field for the combination exists in the DB modell
+     */
+    public static String getFieldnameForGraphImageType(String format, String notation) {
+        String fieldName = null;
+        
+        if(format.equals(DrawTools.FORMAT_PNG)) {
+            if(notation.equals(ProtGraphs.GRAPHNOTATION_DEF)) {
+                fieldName = "graph_image_png";
+            }
+            else if(notation.equals(ProtGraphs.GRAPHNOTATION_ADJ)) {
+                fieldName = "graph_image_adj_png";
+            }
+            else if(notation.equals(ProtGraphs.GRAPHNOTATION_RED)) {
+                fieldName = "graph_image_red_png";
+            }
+            else if(notation.equals(ProtGraphs.GRAPHNOTATION_SEQ)) {
+                fieldName = "graph_image_seq_png";
+            }
+            else if(notation.equals(ProtGraphs.GRAPHNOTATION_KEY)) {
+                fieldName = "graph_image_key_png";
+            }
+        }
+        else if(format.equals(DrawTools.FORMAT_SVG)) {
+            if(notation.equals(ProtGraphs.GRAPHNOTATION_DEF)) {
+                fieldName = "graph_image_svg";
+            }
+            else if(notation.equals(ProtGraphs.GRAPHNOTATION_ADJ)) {
+                fieldName = "graph_image_adj_svg";
+            }
+            else if(notation.equals(ProtGraphs.GRAPHNOTATION_RED)) {
+                fieldName = "graph_image_red_svg";
+            }
+            else if(notation.equals(ProtGraphs.GRAPHNOTATION_SEQ)) {
+                fieldName = "graph_image_seq_svg";
+            }
+            else if(notation.equals(ProtGraphs.GRAPHNOTATION_KEY)) {
+                fieldName = "graph_image_key_svg";
+            }
+            
+        }
+        else if(format.equals(DrawTools.FORMAT_PDF)) {
+            if(notation.equals(ProtGraphs.GRAPHNOTATION_DEF)) {
+                fieldName = "graph_image_pdf";
+            }
+            else if(notation.equals(ProtGraphs.GRAPHNOTATION_ADJ)) {
+                fieldName = "graph_image_adj_pdf";
+            }
+            else if(notation.equals(ProtGraphs.GRAPHNOTATION_RED)) {
+                fieldName = "graph_image_red_pdf";
+            }
+            else if(notation.equals(ProtGraphs.GRAPHNOTATION_SEQ)) {
+                fieldName = "graph_image_seq_pdf";
+            }
+            else if(notation.equals(ProtGraphs.GRAPHNOTATION_KEY)) {
+                fieldName = "graph_image_key_pdf";
+            }            
+        }
+        
+        return fieldName;
+    }
     
     /**
      * Determines the database field name (in the plcc_graph table) for the given image representation.
@@ -1086,35 +1151,51 @@ public class DBManager {
         String fieldName = null;
         
         switch (graphImageRepresentationType) {
-            case ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT:
+            case ProtGraphs.GRAPHIMAGE_PNG_DEFAULT:
                 fieldName = "graph_image_png";
                 break;
-            case ProtGraphs.GRAPHIMAGE_VECTOR_REPRESENTATION_VPLG_DEFAULT:
+            case ProtGraphs.GRAPHIMAGE_SVG_DEFAULT:
                 fieldName = "graph_image_svg";
                 break;
-            case ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_ADJ:
+            case ProtGraphs.GRAPHIMAGE_PNG_ADJ:
                 fieldName = "graph_image_adj_png";
                 break;
-            case ProtGraphs.GRAPHIMAGE_VECTOR_REPRESENTATION_PTGL_ADJ:
+            case ProtGraphs.GRAPHIMAGE_SVG_ADJ:
                 fieldName = "graph_image_adj_svg";
                 break;
-            case ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_RED:
+            case ProtGraphs.GRAPHIMAGE_PNG_RED:
                 fieldName = "graph_image_red_png";
                 break;
-            case ProtGraphs.GRAPHIMAGE_VECTOR_REPRESENTATION_PTGL_RED:
+            case ProtGraphs.GRAPHIMAGE_SVG_RED:
                 fieldName = "graph_image_red_svg";
                 break;
-            case ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_KEY:
+            case ProtGraphs.GRAPHIMAGE_PNG_KEY:
                 fieldName = "graph_image_key_png";
                 break;
-            case ProtGraphs.GRAPHIMAGE_VECTOR_REPRESENTATION_PTGL_KEY:
+            case ProtGraphs.GRAPHIMAGE_SVG_KEY:
                 fieldName = "graph_image_key_svg";
                 break;
-            case ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_SEQ:
+            case ProtGraphs.GRAPHIMAGE_PNG_SEQ:
                 fieldName = "graph_image_seq_png";
                 break;
-            case ProtGraphs.GRAPHIMAGE_VECTOR_REPRESENTATION_PTGL_SEQ:
+            case ProtGraphs.GRAPHIMAGE_SVG_SEQ:
                 fieldName = "graph_image_seq_svg";
+                break;
+            // PDF
+            case ProtGraphs.GRAPHIMAGE_PDF_DEFAULT:
+                fieldName = "graph_image_pdf";
+                break;
+            case ProtGraphs.GRAPHIMAGE_PDF_ADJ:
+                fieldName = "graph_image_adj_pdf";
+                break;
+            case ProtGraphs.GRAPHIMAGE_PDF_RED:
+                fieldName = "graph_image_red_pdf";
+                break;
+            case ProtGraphs.GRAPHIMAGE_PDF_KEY:
+                fieldName = "graph_image_key_pdf";
+                break;
+            case ProtGraphs.GRAPHIMAGE_PDF_SEQ:
+                fieldName = "graph_image_seq_pdf";
                 break;
         }
         
@@ -1130,12 +1211,66 @@ public class DBManager {
      * @return the number of rows affected by the SQL query
      * @throws SQLException if something goes wrong with the database
      */
-    public static Integer updateProteinGraphImagePathInDB(Long graphDatabaseID, String graphImageRepresentationType, String relativeImagePath) throws SQLException {
+    @Deprecated
+    public static Integer updateProteinGraphImagePathInDBOld(Long graphDatabaseID, String graphImageRepresentationType, String relativeImagePath) throws SQLException {
         
         PreparedStatement statement = null;
         String graphImageFieldName = DBManager.getFieldnameForGraphImageRepresentationType(graphImageRepresentationType);
         if(graphImageFieldName == null) {
             System.err.println("Invalid graph image represenation type. Cannot set protein graph image path in database.");
+            return 0;
+        }
+
+        String query = "UPDATE " + tbl_proteingraph + " SET " + graphImageFieldName + " = ? WHERE graph_id = ?;";
+        Integer numRowsAffected = 0;
+        
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            
+            statement.setString(1, relativeImagePath);
+            statement.setLong(2, graphDatabaseID);
+                                
+            numRowsAffected = statement.executeUpdate();
+            dbc.commit();
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: updateProteinGraphImagePathInDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: updateProteinGraphImagePathInDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: updateProteinGraphImagePathInDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        } 
+       
+        return numRowsAffected;
+        
+    }
+    
+    /**
+     * Sets the image path for a specific protein graph representation in the database. The graph has to exist in the database already.
+     * 
+     * @param graphDatabaseID the graph ID in the database. Use the getGrapDatabaseID function if you do not know it.
+     * @param format The image format, see DrawTools.IMAGEFORMAT
+     * @param notation The graph notation type, e.g., "KEY". Use the constants in ProtGraphs class, e.g., ProtGraphs.GRAPHNOTATION_KEY.
+     * @param relativeImagePath the relative image path to set in the database for the specified representation
+     * @return the number of rows affected by the SQL query
+     * @throws SQLException if something goes wrong with the database
+     */
+    public static Integer updateProteinGraphImagePathInDB(Long graphDatabaseID, IMAGEFORMAT format, String notation, String relativeImagePath) throws SQLException {
+        
+        PreparedStatement statement = null;
+        String graphImageFieldName = DBManager.getFieldnameForGraphImageType(format.toString(), notation);
+        if(graphImageFieldName == null) {
+            DP.getInstance().w("DBManager", "updateProteinGraphImagePathInDB: Invalid graph image represenation type (or no field for type in DB). Cannot set protein graph image path in database.");
             return 0;
         }
 

@@ -2096,7 +2096,7 @@ public class Main {
                 
                 
                 imgFile = filePathImg + fs + fileNameWithExtension;
-                String imgFileNoExt = filePathImg;
+                String imgFileNoExt = filePathImg + fs + fileNameWithoutExtension;
                 
                 // test spatial ordering, not used for anything atm
                 // TODO: remove this, it's only a test and takes time
@@ -2144,39 +2144,56 @@ public class Main {
                     }
                 }
 
+                String[] notations = new String[] { ProtGraphs.GRAPHNOTATION_DEF };
                 if(Settings.getBoolean("plcc_B_draw_graphs")) {
-                    HashMap<IMAGEFORMAT, String> filesByFormat = pg.drawProteinGraph(imgFileNoExt, false);
-                    if(! silent) {
-                        System.out.println("      Image of graph written to file '" + imgFile + "'.");
-                    }
-                    pcr.addProteinGraphImageBitmap(gt, new File(imgFile));
-
-                    // set image location is database if required
-                    if(Settings.getBoolean("plcc_B_useDB")) {
-                        Long graphDBID = -1L;
-                        try {
-                            graphDBID = DBManager.getDBProteinGraphID(pdbid, chain, gt);
-                        } catch(SQLException ex) {
-                            DP.getInstance().e("Main", "Could not find graph in database: '" + ex.getMessage() + "'.");
+                    
+                    for(String notation : notations) {
+                    
+                        //TODO: hier notations einbauen
+                                 
+                        HashMap<IMAGEFORMAT, String> filesByFormat = pg.drawProteinGraph(imgFileNoExt, false);
+                        if(! silent) {
+                            System.out.println("      Image of graph written to file '" + imgFile + "'.");
                         }
-                        if(graphDBID > 0) {
+                        //pcr.addProteinGraphImageBitmap(gt, new File(imgFile));
+                        for(IMAGEFORMAT f : filesByFormat.keySet()) {
+                            pcr.addProteinGraphOutputImage(gt, f.toString(), new File(filesByFormat.get(f)));
+                        }
 
-
-                            String dbImagePath = fileNameWithExtension;
-                            if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
-                                dbImagePath = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain) + fs + fileNameWithExtension;
-                            }
-                            //DP.getInstance().d("dbImagePath is '" + dbImagePath + "'.");
-
-
+                        // set image location in database if required
+                        if(Settings.getBoolean("plcc_B_useDB")) {
+                            Long graphDBID = -1L;
                             try {
-                                DBManager.updateProteinGraphImagePathInDB(graphDBID, ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT, dbImagePath);
-                            } catch(SQLException e) {
-                                DP.getInstance().e("Main", "Could not update graph image path in database: '" + e.getMessage() + "'.");
+                                graphDBID = DBManager.getDBProteinGraphID(pdbid, chain, gt);
+                            } catch(SQLException ex) {
+                                DP.getInstance().e("Main", "Could not find graph in database: '" + ex.getMessage() + "'.");
                             }
-                        } else {
-                            DP.getInstance().e("Main", "Could not find " + gt + " graph for PDB " + pdbid + " chain " + chain + " in database to set image path.");
+                            if(graphDBID > 0) {
+
+                                String dbImagePath;
+                                for(IMAGEFORMAT format : filesByFormat.keySet()) {
+                                    dbImagePath = fileNameWithoutExtension + DrawTools.getFileExtensionForImageFormat(format);
+
+
+                                    if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
+                                        dbImagePath = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain) + fs + dbImagePath;
+                                    }
+                                    //DP.getInstance().d("dbImagePath is '" + dbImagePath + "'.");
+
+
+                                    try {
+                                        DBManager.updateProteinGraphImagePathInDB(graphDBID, format, notation, dbImagePath);
+                                    } catch(SQLException e) {
+                                        DP.getInstance().e("Main", "Could not update graph image path in database: '" + e.getMessage() + "'.");
+                                    }
+                                }
+                            } else {
+                                DP.getInstance().e("Main", "Could not find " + gt + " graph for PDB " + pdbid + " chain " + chain + " in database to set image path.");
+                            }
                         }
+                    }
+                    if(! silent) {
+                        DP.getInstance().i("Graph images drawn in " + notations.length + " notations.");
                     }
                                      
                 }
@@ -2423,13 +2440,13 @@ public class Main {
 
                             String dbGraphImageType;
                             if(nt.equals(FoldingGraph.FG_NOTATION_ADJ)) {
-                                dbGraphImageType = ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_ADJ;
+                                dbGraphImageType = ProtGraphs.GRAPHIMAGE_PNG_ADJ;
                             } else if(nt.equals(FoldingGraph.FG_NOTATION_RED)) {
-                                dbGraphImageType = ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_RED;                            
+                                dbGraphImageType = ProtGraphs.GRAPHIMAGE_PNG_RED;                            
                             } else if(nt.equals(FoldingGraph.FG_NOTATION_KEY)) {
-                                dbGraphImageType = ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_KEY;                            
+                                dbGraphImageType = ProtGraphs.GRAPHIMAGE_PNG_KEY;                            
                             } else if(nt.equals(FoldingGraph.FG_NOTATION_SEQ)) {
-                                dbGraphImageType = ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_SEQ;
+                                dbGraphImageType = ProtGraphs.GRAPHIMAGE_PNG_SEQ;
                             }
                             else {
                                 DP.getInstance().e("Invalid folding graph notation type '" + nt + "', skipping.");
@@ -2437,9 +2454,9 @@ public class Main {
                             }
                             
                             // RED is the default and is added to the default field as well
-                            if(dbGraphImageType.equals(ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_RED)) {
+                            if(dbGraphImageType.equals(ProtGraphs.GRAPHIMAGE_PNG_RED)) {
                                 try {
-                                    DBManager.updateFoldingGraphImagePathInDB(fgDbId, ProtGraphs.GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT, dbImagePath);
+                                    DBManager.updateFoldingGraphImagePathInDB(fgDbId, ProtGraphs.GRAPHIMAGE_PNG_DEFAULT, dbImagePath);
                                 } catch(SQLException e) {
                                     DP.getInstance().e("Main", "Could not update default notation folding graph image path in database: '" + e.getMessage() + "'.");
                                 }

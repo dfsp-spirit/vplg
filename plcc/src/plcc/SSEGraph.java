@@ -2293,8 +2293,12 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
      * @param drawBlackAndWhite whether to omit colors, only useful for non-protein graphs
      * @return a map of formats to the corresponding output files written to disk
      */
-    public HashMap<IMAGEFORMAT, String> drawProteinGraph(String baseFilePathNoExt, Boolean drawBlackAndWhite) {
-        IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ IMAGEFORMAT.JPEG, IMAGEFORMAT.PDF };
+    public HashMap<IMAGEFORMAT, String> drawProteinGraph(String baseFilePathNoExt, Boolean drawBlackAndWhite) {                
+        
+        // TODO: get these from cfg
+        // SVG always get drawn, so do NOT add it here
+        IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ IMAGEFORMAT.PNG, IMAGEFORMAT.PDF };
+        
         DrawResult drawRes = this.drawProteinGraphG2D(drawBlackAndWhite);
         
         String svgFilePath = baseFilePathNoExt + ".svg";
@@ -3330,10 +3334,12 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             gmlf.append("    num_residues ").append(vertex.getLength()).append("\n");
             
             gmlf.append("    pdb_res_start \"").append(vertex.getStartPdbResID()).append("\"\n");
-            gmlf.append("    pdb_res_end \"").append(vertex.getEndPdbResID()).append("\"\n");
+            gmlf.append("    pdb_res_end \"").append(vertex.getEndPdbResID()).append("\"\n");            
             
             gmlf.append("    dssp_res_start ").append(vertex.getStartDsspNum()).append("\n");
             gmlf.append("    dssp_res_end ").append(vertex.getEndDsspNum()).append("\n");
+            
+            gmlf.append("    pdb_residues_full \"").append(vertex.getAllPdbResiduesString(",")).append("\"\n");
             
             gmlf.append("    aa_sequence \"").append(vertex.getAASequence()).append("\"\n");
             

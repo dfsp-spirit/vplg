@@ -43,16 +43,27 @@ public class ProtGraphs {
     public static final String GRAPHFORMAT_PTGL_ADJ = "PTGL_ADJ";
     
     // the graph image representation (bitmap is PNG format atm, vector is SVG). Used for the database.
-    public static final String GRAPHIMAGE_BITMAP_REPRESENTATION_VPLG_DEFAULT = "IMG_BITMAP_VPLG";
-    public static final String GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_KEY = "IMG_BITMAP_PTGL_KEY";
-    public static final String GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_RED = "IMG_BITMAP_PTGL_RED";
-    public static final String GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_SEQ = "IMG_BITMAP_PTGL_SEQ";
-    public static final String GRAPHIMAGE_BITMAP_REPRESENTATION_PTGL_ADJ = "IMG_BITMAP_PTGL_ADJ";
-    public static final String GRAPHIMAGE_VECTOR_REPRESENTATION_VPLG_DEFAULT = "IMG_VECTOR_VPLG";
-    public static final String GRAPHIMAGE_VECTOR_REPRESENTATION_PTGL_KEY = "IMG_VECTOR_PTGL_KEY";
-    public static final String GRAPHIMAGE_VECTOR_REPRESENTATION_PTGL_RED = "IMG_VECTOR_PTGL_RED";
-    public static final String GRAPHIMAGE_VECTOR_REPRESENTATION_PTGL_SEQ = "IMG_VECTOR_PTGL_SEQ";
-    public static final String GRAPHIMAGE_VECTOR_REPRESENTATION_PTGL_ADJ = "IMG_VECTOR_PTGL_ADJ";
+    public static final String GRAPHIMAGE_PNG_DEFAULT = "IMG_PNG_VPLG";
+    public static final String GRAPHIMAGE_PNG_KEY = "IMG_PNG_PTGL_KEY";
+    public static final String GRAPHIMAGE_PNG_RED = "IMG_PNG_PTGL_RED";
+    public static final String GRAPHIMAGE_PNG_SEQ = "IMG_PNG_PTGL_SEQ";
+    public static final String GRAPHIMAGE_PNG_ADJ = "IMG_PNG_PTGL_ADJ";
+    public static final String GRAPHIMAGE_SVG_DEFAULT = "IMG_SVG_VPLG";
+    public static final String GRAPHIMAGE_SVG_KEY = "IMG_SVG_PTGL_KEY";
+    public static final String GRAPHIMAGE_SVG_RED = "IMG_SVG_PTGL_RED";
+    public static final String GRAPHIMAGE_SVG_SEQ = "IMG_SVG_PTGL_SEQ";
+    public static final String GRAPHIMAGE_SVG_ADJ = "IMG_SVG_PTGL_ADJ";
+    public static final String GRAPHIMAGE_PDF_DEFAULT = "IMG_PDF_VPLG";
+    public static final String GRAPHIMAGE_PDF_KEY = "IMG_PDF_PTGL_KEY";
+    public static final String GRAPHIMAGE_PDF_RED = "IMG_PDF_PTGL_RED";
+    public static final String GRAPHIMAGE_PDF_SEQ = "IMG_PDF_PTGL_SEQ";
+    public static final String GRAPHIMAGE_PDF_ADJ = "IMG_PDF_PTGL_ADJ";
+    
+    public static final String GRAPHNOTATION_ADJ = "ADJ";
+    public static final String GRAPHNOTATION_RED = "RED";
+    public static final String GRAPHNOTATION_SEQ = "SEQ";
+    public static final String GRAPHNOTATION_KEY = "KEY";
+    public static final String GRAPHNOTATION_DEF = "DEF";
     
     
     public static Integer getGraphTypeCode(String gt) {

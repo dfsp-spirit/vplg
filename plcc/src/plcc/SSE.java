@@ -308,7 +308,7 @@ public class SSE implements java.io.Serializable {
 
         if(residues.size() < 1) {
             System.err.println("ERROR: Empty SSE '" + sseIDPtgl + "' has no start. Check size before asking.");
-            System.exit(1);
+            return null;
         }
 
         Integer minResNumDssp = MAX_RES;
@@ -328,7 +328,7 @@ public class SSE implements java.io.Serializable {
 
         if(startRes == null || minResNumDssp == MAX_RES) {
             System.err.println("ERROR: Could not determine start residue of non-empty SSE '" + sseIDPtgl + "' with length " + this.residues.size() + ".");
-            System.exit(1);
+            return null;
         }
 
         return(startRes);
@@ -351,6 +351,22 @@ public class SSE implements java.io.Serializable {
         return(this.getStartResidue().getUniquePDBName());
     }
 
+    /**
+     * Returns a String identifying all residues of this SSE in the PDB file.
+     * @param separator the separator to use between the residue strings, e.g., ","
+     */
+    public String getAllPdbResiduesString(String separator) {
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < this.residues.size(); i++) {
+            Residue r = this.residues.get(i);
+            sb.append(r.getUniquePDBName());
+            if(i < this.residues.size() - 1) {
+                sb.append(separator);
+            }
+        }
+        return(sb.toString());
+    }
+    
     /**
      * Returns a unique String identifying the last residue of this SSE in the PDB file.
      */

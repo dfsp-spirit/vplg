@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import plcc.DrawTools.IMAGEFORMAT;
 
 /**
  * A data structure to store the PLCC results for a chain, i.e., all the graphs and their output files.
@@ -45,6 +46,7 @@ public class ProteinChainResults {
     protected HashMap<String, File> proteinGraphImagesBitmap;
     protected HashMap<String, File> proteinGraphImagesVector;
     protected HashMap<String, File> proteinGraphFilesByFormat;
+    protected HashMap<String, File> proteinGraphImagesByFormat;
     protected HashMap<String, File> proteinGraphVisJmolCommandFiles;
     protected HashMap<String, ProteinFoldingGraphResults> foldingGraphResults;
     protected ProtMetaInfo chainMetaData;
@@ -61,6 +63,7 @@ public class ProteinChainResults {
         this.chainName = chainName;
         proteinGraphs = new HashMap<String, SSEGraph>();
         proteinGraphFilesByFormat = new HashMap<String, File>();
+        proteinGraphImagesByFormat = new HashMap<String, File>();
         proteinGraphImagesBitmap = new HashMap<String, File>();
         proteinGraphImagesVector = new HashMap<String, File>();
         proteinGraphVisJmolCommandFiles = new HashMap<String, File>();
@@ -84,6 +87,10 @@ public class ProteinChainResults {
         return "" + graphType + "_" + format;
     }
     
+    private String getImageFormatHashMapKeyForFile(String graphType, IMAGEFORMAT format) {
+        return "" + graphType + "_" + format.toString();
+    }
+    
     public String getPdbMetaDataFromGraph(String graphType, String metaDataKey) {
         SSEGraph g = this.getProteinGraph(graphType);
         if(g != null) {
@@ -103,6 +110,15 @@ public class ProteinChainResults {
         return this.proteinGraphFilesByFormat.get(getHashMapKeyForFile(graphType, format));
     }
     
+    public void addProteinGraphOutputImage(String graphType, String format, File outFile) {
+        proteinGraphImagesByFormat.put(getHashMapKeyForFile(graphType, format), outFile);
+    }
+    
+    public File getProteinGraphOutputImage(String graphType, String format) {
+        return this.proteinGraphImagesByFormat.get(getHashMapKeyForFile(graphType, format));
+    }
+    
+    @Deprecated
     public void addProteinGraphImageBitmap(String graphType, File outFile) {
         proteinGraphImagesBitmap.put(graphType, outFile);
     }
@@ -111,10 +127,13 @@ public class ProteinChainResults {
         proteinGraphVisJmolCommandFiles.put(graphType, outFile);
     }
     
+    @Deprecated
     public File getProteinGraphImageBitmap(String graphType) {
-        return this.proteinGraphImagesBitmap.get(graphType);
+        //return this.proteinGraphImagesBitmap.get(graphType);
+        return this.getProteinGraphOutputImage(graphType, DrawTools.DEFAULT_FORMAT_BITMAP);
     }
     
+    @Deprecated
     public void addProteinGraphImageVector(String graphType, File outFile) {
         proteinGraphImagesVector.put(graphType, outFile);
     }
@@ -123,8 +142,10 @@ public class ProteinChainResults {
         return this.proteinGraphVisJmolCommandFiles.get(graphType);
     }
     
+    @Deprecated
     public File getProteinGraphImageVector(String graphType) {
-        return this.proteinGraphImagesVector.get(graphType);
+        //return this.proteinGraphImagesVector.get(graphType);
+        return this.getProteinGraphOutputImage(graphType, DrawTools.DEFAULT_FORMAT_VECTOR);
     }
     
     public SSEGraph getProteinGraph(String graphType) {
@@ -185,7 +206,8 @@ public class ProteinChainResults {
         return graphs;
     }
     
-    public List<File> getAvailableGraphImages(String graphType) {        
+    @Deprecated
+    public List<File> getAvailableGraphImagesVectorOrBitmap(String graphType) {        
         List<File> graphImages = new ArrayList<File>();
         if(IO.fileExistsIsFileAndCanRead(this.getProteinGraphImageBitmap(graphType))) {
             graphImages.add(this.getProteinGraphImageBitmap(graphType));
@@ -193,6 +215,21 @@ public class ProteinChainResults {
         if(IO.fileExistsIsFileAndCanRead(this.getProteinGraphImageVector(graphType))) {
             graphImages.add(this.getProteinGraphImageVector(graphType));
         }
+        return graphImages;
+    }
+    
+    
+    public List<File> getAvailableGraphImages(String graphType) {        
+        List<File> graphImages = new ArrayList<File>();
+                
+        SSEGraph g;
+        for(String format : DrawTools.ALL_IMAGE_FORMATS) {
+            File img = this.getProteinGraphOutputImage(graphType, format);
+            if(IO.fileExistsIsFileAndCanRead(img)) {
+                graphImages.add(img);                        
+            }            
+        }
+        
         return graphImages;
     }
 }
