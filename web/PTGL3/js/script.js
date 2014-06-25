@@ -59,19 +59,39 @@ $(function() {
 	
 	$('#selectAllBtn').click( function() {
 		var selectedProteins = "";
+		var numberOfChains = 0;
 		$('input[type=checkbox]').each(function () {
+			numberOfChains++;
 			selectedProteins += this.value + " ";
-			$(this).attr('checked', true);
 			console.log(this.id + " is now " + $(this).attr('checked'));
 		})
-		$('#loadInput').val(selectedProteins);
+		
+		if(numberOfChains > 20){
+			var r = confirm("You selected more than 20 chains. Loading could take a while. Are you sure to proceed?");
+			if(r == true) {
+				$('#loadInput').val(selectedProteins);
+				$('input[type=checkbox]').each(function () {
+					$(this).prop('checked', true);
+				})
+			} else {
+				$('input[type=checkbox]').each(function () {
+					$(this).prop('checked', false);
+					console.log(this.id + " is now " + $(this).attr('checked'));
+				})
+			} 
+		} else {
+			$('#loadInput').val(selectedProteins);
+				$('input[type=checkbox]').each(function () {
+					$(this).prop('checked', true);
+			})
+		}
 	});
 	
 	
 	$('#resetBtn').click( function() {
 		$('#loadInput').val("");
 		$('input[type=checkbox]').each(function () {
-			$(this).attr('checked', false);
+			$(this).prop('checked', false);
 			console.log(this.id + " is now " + $(this).attr('checked'));
 		})
 	});	

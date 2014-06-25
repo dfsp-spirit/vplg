@@ -25,11 +25,6 @@
 							<li class="navbarFont">
 								<a href="index.php#UserGuide">User Guide</a>
 							</li>
-							
-							<li class="navbarFont">
-								<a href="index.php#DatabaseFormat">Database Format</a>
-							</li>		
-
 							<li class="dropdown">
 								<!-- <strong>caret</strong> creates the little triangle/arrow -->
 								<a href="#"  class="navbarFont dropdown-toggle" data-toggle="dropdown"> Services <strong class="caret"></strong></a>
@@ -66,13 +61,22 @@
 							</li><!-- end dropdown -->
 						</ul><!-- end nav navbar-nav -->								
 					</div><!-- end nav-collapse -->
+					
+					<!-- start live search -->
+					<?php 
+					if (basename($_SERVER['PHP_SELF']) != "index.php"){
+						echo '
 					<div class="nav-collapse collapse navbar-responsive-collapse">
 						<form  class="navbar-form pull-right" action="search.php" method="post">
 							<input type="text" class="form-control" name="keyword" id="searchInput" autocomplete="off" placeholder="Enter PDB ID or keyword...">
 							<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
 							<div id="liveSearchResults" class="liveSearchResultsPage"></div>
 						</form><!-- end navbar-form -->	
-					</div>
+					</div> <!-- end live search -->';
+					}
+					?>
+					
+					
 				</div><!-- end container -->
 			</div><!-- end navbar fixed-top -->
 </div>

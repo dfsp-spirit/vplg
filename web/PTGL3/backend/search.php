@@ -28,14 +28,7 @@ if(isset($_POST)) {
     if(isset($_POST["title"])) {$title = $_POST["title"];  $none_set = false;};
     if(isset($_POST["het"])) {$het = $_POST["het"];  $none_set = false;};
     if(isset($_POST["hetname"])) {$hetname = $_POST["hetname"];  $none_set = false;};
-    if(isset($_POST["scop"])) {$scop = $_POST["scop"];  $none_set = false;};
-    if(isset($_POST["scopid"])) {$scopid = $_POST["scopid"];  $none_set = false;};
-    if(isset($_POST["cath"])) {$cath = $_POST["cath"];  $none_set = false;};
-    if(isset($_POST["cathid"])) {$cathid = $_POST["cathid"];  $none_set = false;};
-    if(isset($_POST["ec"])) {$ec = $_POST["ec"];  $none_set = false;};
     if(isset($_POST["molecule"])) {$molecule = $_POST["molecule"];  $none_set = false;};
-    if(isset($_POST["classification"])) {$classification = $_POST["classification"];  $none_set = false;};
-    if(isset($_POST["graphs"])) {$graphs = $_POST["graphs"];  $none_set = false;};
     if(isset($_POST["logic"])) {$logic = $_POST["logic"];};
     if(isset($_POST["proteincomplexes"])) {$proteincomplexes = $_POST["proteincomplexes"];};
 
@@ -61,7 +54,6 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 	if (isset($het) && $het != "") {     $query .= "pdb_id LIKE '%".$het."%' ".$logic." "; };
 	if (isset($hetname) && $hetname != "") { $query .= "pdb_id LIKE '%".$hetname."%' ".$logic." "; };
 	if (isset($molecule) && $molecule != "") {$query .= "pdb_id LIKE '%".$molecule."%' ".$logic." "; };
-	if (isset($graphs) && $graphs != "") {  $query .= "pdb_id LIKE '%".$graphs."%' ".$logic." "; };
 
 
 	if ($logic == "OR") {
@@ -75,6 +67,7 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 
 	$counter = 0;
 	$tableString = "";
+	$numberOfChains = 0;
 	while (($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)) && ($counter <= 30)){
 		
 		$query = "SELECT * FROM plcc_chain WHERE pdb_id = '".$arr["pdb_id"]."' ORDER BY chain_name";
@@ -88,8 +81,8 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 						<div class="resultsHeader resultsHeader'.$class.'">
 							<div class="resultsId">'.$arr["pdb_id"].'</div>
 							<div class="resultsRes">Resolution: '.$arr["resolution"].' &Aring;</div>
-							<div class="resultsLink"><a href="http://www.rcsb.org/pdb/explore/explore.do?structureId='.$arr["pdb_id"].'">[PDB]</a>
-												<a href="http://www.rcsb.org/pdb/download/downloadFile.do?fileFormat=FASTA&compression=NO&structureId='.$arr["pdb_id"].'">[FASTA]</a></div>
+							<div class="resultsLink"><a href="http://www.rcsb.org/pdb/explore/explore.do?structureId='.$arr["pdb_id"].'" target="_blank">[PDB]</a>
+												<a href="http://www.rcsb.org/pdb/download/downloadFile.do?fileFormat=FASTA&compression=NO&structureId='.$arr["pdb_id"].'" target="_blank">[FASTA]</a></div>
 						</div>
 						<div class="resultsBody1">
 							<div class="resultsTitle">Title</div>
@@ -100,11 +93,12 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 							<div class="resultsClassPDB">'.ucfirst(strtolower($arr["header"])).'</div>
 						</div>';
 		while ($chains = pg_fetch_array($result_chains, NULL, PGSQL_ASSOC)){
+			$numberOfChains++;
 			$cathlink = get_cath_link($arr["pdb_id"], $chains["chain_name"]);
 			$tableString .= '	<div class="resultsFooter">
 							<div class="resultsChain">Chain '.$chains["chain_name"].'</div>
 							<div class="resultsChainNum"><input type=checkbox id="'.$arr["pdb_id"] . $chains["chain_name"]. '" class="chainCheckBox" value="'.$arr["pdb_id"] . $chains["chain_name"].'"/>'.$arr["pdb_id"] . $chains["chain_name"].'</div>
-							<div class="resultsCATH"><a href="'.$cathlink.'">CATH</a></div>
+							<div class="resultsCATH"><a href="'.$cathlink.'" target="_blank">CATH</a></div>
 						</div>';
 		}
 		$tableString .= ' </div>';

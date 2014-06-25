@@ -51,9 +51,8 @@ include('./backend/search.php');
 							<input type="text" class="form-control" name="pcs" id="loadInput" autocomplete="off" placeholder="Load proteins...">
 							<button type="submit" class="btn btn-default" id="loadButton"><span>Load Proteins</span></button>
 					<div class="additionalProteinButtons">
-						<button type="button" class="btn btn-default btnSize" id="selectAllBtn"><span>Select all proteins</span></button>
+						<button type="button" class="btn btn-default btnSize" id="selectAllBtn"><span>Select all (<?php echo $numberOfChains; ?>) protein-chains</span></button>
 						<button type="button" class="btn btn-default btnSize protButton" id="resetBtn"><span>Reset</span></button>
-						<button type="button" class="btn btn-default btnSize protButton" id="selectMatchingBtn"><span>Select matching chains</span></button>
 					</div>
 					</div><!-- end input-group and form-group -->
 				</div><!-- end col-centered -->

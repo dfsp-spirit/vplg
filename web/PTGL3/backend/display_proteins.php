@@ -111,11 +111,12 @@ foreach ($chains as $value){
 					$tableString .= '</li>';	
 					
 						while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
-							$tableString .= '<li>';
+							
 							
 							if($loaded_images < 2){
+								$tableString .= '<li>';
 								$tableString .= '<a href="./data/'.$arr['graph_image_png'].'" target="_blank">
-												<img src="../data/'.$arr['graph_image_png'].'" alt="" />
+												<img src="./data/'.$arr['graph_image_png'].'" alt="" />
 												</a>
 											<a href="./data/'.$arr['graph_image_png'].'" target="_blank">Full Size Image</a>
 											<span class="download-options">Download Graph: ';
@@ -130,9 +131,9 @@ foreach ($chains as $value){
 									$tableString .= '<a href="./data/'.$data['graph_image_png'].'" target="_blank">[PNG]</a>';
 								}
 								$tableString .= '</span>';
-					
+								$tableString .= '</li>';
 					 		}
-							$tableString .= '</li>';
+							
 						}
 						
 					$tableString .= '</ul>
@@ -163,42 +164,7 @@ foreach ($chains as $value){
 		
 		$tableString .= '</table>
 						</div><!-- end table-responsive -->
-						
-						<!-- 
-						<p>Select linear notation:</p>
-						<div id="selectNot">
-						<div class="radio">
-						  <label>
-						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
-						    adjacent
-						  </label>
-						</div> 
-						
-						<div class="radio">
-						  <label>
-						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1">
-						    reduced
-						  </label>
-						</div>
-						  
-						  <div class="radio">
-						  <label>
-						    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1">
-						    key
-						  </label>
-						</div>
-						  
-						  <div class="radio">
-							  <label>
-							    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1">
-							    sequence
-							  </label>
-						</div>
-						</div>		
-						-->
-					
-
-					<div id="'.$pdbID.$chainName.'_pager" class="bx-pager-own">';
+						<div id="'.$pdbID.$chainName.'_pager" class="bx-pager-own">';
 					
 				if($loaded_images < 2){
 					$tableString .= '<p>- Select topology type -</p>

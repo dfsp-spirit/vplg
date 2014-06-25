@@ -107,9 +107,6 @@ $ENABLE_BLAST_SEARCH = $db_config['enable_blast_search'];
 								<label class="advancedLabel">Molecule
 									<input class="advancedInput" type="text" id="molecule" name="molecule" placeholder="Molecule" size="20" maxlength="50"/>
 								</label>		
-								<label class="advancedLabel">Graphs
-									<input class="advancedInput" type="text" id="graphs" name="graphs" placeholder="Graphs" size="20" maxlength="50"/>
-								</label>
 								<button type="submit" class="btn btn-default advancedInput" style="margin-top:35px;"><span>Search</span></button>
 							</div>
 						</form>	
@@ -515,27 +512,7 @@ $ENABLE_BLAST_SEARCH = $db_config['enable_blast_search'];
 			</div><!-- end container and text -->
 		</div><!-- end UserGuide -->
 		
-		
-		<div id="DatabaseFormat">
-			<div class="line" id="lineDatabaseFormat">
-				<div class="iconPos" id="iconDatabaseFormat">
-					<img width="100px" height="100px" src="images/icon-yellowGlyph.png" alt="Icon"/>
-				</div><!-- end iconPos -->
-			</div><!-- end line and lineDatabaseFormat -->
-			
-			<div class="container" id="text">
-			<h2>Database & File Format</h2>
-				<h3>File Formats and Standards</h3>
-				<p>PostScript - can be viewed with <a href="http://www.cs.wisc.edu/~ghost/" target="_blank">Ghostview</a></p>
-				
-				<h3>PTGL PostgreSQL Database</h3>
-				<p>PTGL PostgreSQL Databse Schema</p>
-				<p>Download PostgreSQL database <a href="files/ptgl.sql.gz">ptgl.sql.gz (<b>(238 Mb)</b>)</a> LINK BROKEN ATM</p>
-				<p>The database was dumped and gzipped using the following command: <tt>pg_dump ptgl | gzip >ptgl.sql.gz</tt></p>
-				<p>(to restore the database on your local computer, please read: <a href="http://www.postgresql.org/docs/manuals/" target="_blank">Postgres manual</a>).</p>
-				
-		</div><!-- end container and text -->
-	</div><!-- end DatabaseFormat -->
+	
 	</div><!--- end textWrapper -->
 	
 	</div><!-- end wrapper -->

@@ -48,31 +48,57 @@
 		<div class="container" id="citing">
 			<h2> Citing PTGL </h2>
 			<br>
-			<p>A publication explaining the method in detail has been published #where??#.</p>
+			<p>A publication explaining the method in detail has been published in 'Methods in Molecular Biology
+				932 (Protein Supersecondary Structurs) by editor A.E. Kister in 2013.</p>
 			<p>BibTeX - Entry:</p>
 
 			
 			<div id="bibtex">
-				@InProceedings{schfer_et_al:OASIcs:2012:3722,<br>
-				author =    {Ina Koch and Kreuchwig Annika and Patrick May},<br>
-				title = {{Hierarchical representation of supersecondary structures using a graph-theoretical approach}},<br>
-				booktitle = {Protein Supersecondary Structure},<br>
-				pages = {7--35},<br>
-				series =    {OpenAccess Series in Informatics (OASIcs)},<br>
-				ISBN =  {978-3-939897-44-6},<br>
-				ISSN =  {2190-6807},<br>
-				year =  {2012},<br>
-				volume =    {26},<br>
-				editor =    {Sebastian B{\"o}cker and Franziska Hufsky and Kerstin Scheubert and Jana Schleicher and Stefan Schuster},<br>
-				publisher = {Schloss Dagstuhl--Leibniz-Zentrum fuer Informatik},<br>
-				address =   {Dagstuhl, Germany},<br>
-				URL =       {http://drops.dagstuhl.de/opus/volltexte/2012/3722},<br>
-				URN =       {urn:nbn:de:0030-drops-37226},<br>
-				doi =       {http://dx.doi.org/10.4230/OASIcs.GCB.2012.108},<br>
-				annote =    {Keywords: protein structure, graph theory, ligand, secondary structure, protein ligang graph}<br>
+				@PROCEEDINGS{kister:protein_supersecondary_structures,<br>
+				EDITOR      = "Alexander E. Kister",<br>
+				TITLE       = "Protein Supersecondary Structures",<br>
+				ADDRESS     = "Piscataway, NJ",<br>
+				YEAR        = 2013,<br>
+				}<br>
+				<br>
+				@INPROCEEDINGS{koch_et_al:hierarchical_representation_of_supersecondary_structures,<br>
+				AUTHOR       = "Koch, Ina and Kreuchwig, Annika and May, Patrick",<br>
+				TITLE        = "Hierarchical Representation of Supersecondary Structures Using a<br>
+								 Graph-Theoretical Approach",<br>
+				PAGES        = "7 -- 33",<br>
+				ADRESS     = "Frankfurt",<br>
+				YEAR		= "2013",<br>
 				}<br>
 
 			</div>
+			<br>
+			<p>Please use this BibTeX-entry for citing.</p>
+			
+		
+		<!-- BiBTex Entry Tim 
+		
+	  <div id="bibtex">
+		@InProceedings{schfer_et_al:OASIcs:2012:3722,<br>
+		author =    {Tim Sch{\"a}fer and Patrick May and Ina Koch},<br>
+		title = {{Computation and Visualization of Protein Topology Graphs Including Ligand Information}},<br>
+		booktitle = {German Conference on Bioinformatics 2012},<br>
+		pages = {108--118},<br>
+		series =    {OpenAccess Series in Informatics (OASIcs)},<br>
+		ISBN =  {978-3-939897-44-6},<br>
+		ISSN =  {2190-6807},<br>
+		year =  {2012},<br>
+		volume =    {26},<br>
+		editor =    {Sebastian B{\"o}cker and Franziska Hufsky and Kerstin Scheubert and Jana Schleicher and Stefan Schuster},<br>
+		publisher = {Schloss Dagstuhl--Leibniz-Zentrum fuer Informatik},<br>
+		address =   {Dagstuhl, Germany},<br>
+		URL =       {http://drops.dagstuhl.de/opus/volltexte/2012/3722},<br>
+		URN =       {urn:nbn:de:0030-drops-37226},<br>
+		doi =       {http://dx.doi.org/10.4230/OASIcs.GCB.2012.108},<br>
+		annote =    {Keywords: protein structure, graph theory, ligand, secondary structure, protein ligang graph}<br>
+		}<br>
+	  </div>
+		
+		-->
 
 
 		

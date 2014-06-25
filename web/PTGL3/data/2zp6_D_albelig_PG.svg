@@ -10,7 +10,7 @@
     ><g font-family="'Serif'" font-size="16px" text-rendering="optimizeLegibility"
     ><text x="80" xml:space="preserve" y="40" stroke="none"
       >The albelig protein graph of PDB entry 2zp6, chain D [V=3, E=1].</text
-      ><path fill="fuchsia" stroke-width="2" d="M191 190 C191 186.3123 189.5165 182.7937 186.8339 179.6227 C184.216 176.5281 180.4478 173.7505 175.8022 171.4277 C166.6157 166.8345 153.9617 164 140 164 C126.0383 164 113.3843 166.8345 104.1978 171.4277 C99.5522 173.7505 95.784 176.5281 93.1661 179.6227 C90.4835 182.7937 89 186.3123 89 190 L89 191 L91 191 L91 190 C91 186.7841 92.3147 183.726 94.6924 180.915 C97.1348 178.0277 100.6889 175.4183 105.0915 173.2169 C114.0014 168.7619 126.3475 166 140 166 C153.6525 166 165.9986 168.7619 174.9085 173.2169 C179.3111 175.4183 182.8652 178.0277 185.3076 180.915 C187.6853 183.726 189 186.7841 189 190 L189 191 L191 191 L191 190 Z" stroke="none"
+      ><path fill="fuchsia" stroke-width="2" d="M189 190 L189 190 C189 177.2447 167.755 166 140 166 L140 165 L140 166 C112.245 166 91 177.2447 91 190 L91 191 L89 191 L89 190 C89 175.1411 112.5266 164 140 164 L140 164 C167.4735 164 191 175.1411 191 190 L191 191 L189 191 Z" stroke="none"
       /><circle fill="red" stroke-width="2" r="10" cx="90" cy="200" stroke="none"
       /><rect x="130" width="20" stroke-width="2" height="20" y="190" stroke="none"
       /><circle fill="none" stroke-width="3" r="10" cx="190" cy="200" stroke="fuchsia"
@@ -36,22 +36,22 @@
       >3</text
       ><text x="80" xml:space="preserve" stroke-width="2" y="363" stroke="none"
       >[Edges: </text
-      ><text fill="fuchsia" x="142" xml:space="preserve" stroke-width="2" y="363" stroke="none"
+      ><text fill="fuchsia" x="139" xml:space="preserve" stroke-width="2" y="363" stroke="none"
       >ligand</text
-      ><text x="191" xml:space="preserve" stroke-width="2" y="363" stroke="none"
+      ><text x="184" xml:space="preserve" stroke-width="2" y="363" stroke="none"
       >]</text
-      ><text x="206" xml:space="preserve" stroke-width="2" y="363" stroke="none"
+      ><text x="199" xml:space="preserve" stroke-width="2" y="363" stroke="none"
       > [Vertices: </text
-      ><circle fill="red" stroke-width="2" r="10" cx="295" cy="358" stroke="none"
-      /><text fill="red" x="315" xml:space="preserve" stroke-width="2" y="363" stroke="none"
+      ><circle fill="red" stroke-width="2" r="10" cx="285" cy="358" stroke="none"
+      /><text fill="red" x="305" xml:space="preserve" stroke-width="2" y="363" stroke="none"
       >helix</text
-      ><rect x="356" width="20" stroke-width="2" height="20" y="348" stroke="none"
-      /><text x="386" xml:space="preserve" stroke-width="2" y="363" stroke="none"
+      ><rect x="342" width="20" stroke-width="2" height="20" y="348" stroke="none"
+      /><text x="372" xml:space="preserve" stroke-width="2" y="363" stroke="none"
       >strand</text
-      ><circle fill="none" stroke-width="3" r="10" cx="444" cy="358" stroke="fuchsia"
-      /><text fill="fuchsia" x="464" xml:space="preserve" stroke-width="2" y="363" stroke="none"
+      ><circle fill="none" stroke-width="3" r="10" cx="429" cy="358" stroke="fuchsia"
+      /><text fill="fuchsia" x="449" xml:space="preserve" stroke-width="2" y="363" stroke="none"
       >ligand</text
-      ><text x="513" xml:space="preserve" stroke-width="2" y="363" stroke="none"
+      ><text x="494" xml:space="preserve" stroke-width="2" y="363" stroke="none"
       >]</text
     ></g
   ></g

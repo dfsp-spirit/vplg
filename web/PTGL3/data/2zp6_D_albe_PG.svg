@@ -30,13 +30,13 @@
       >2</text
       ><text x="80" xml:space="preserve" stroke-width="2" y="363" stroke="none"
       > [Vertices: </text
-      ><circle fill="red" stroke-width="2" r="10" cx="169" cy="358" stroke="none"
-      /><text fill="red" x="189" xml:space="preserve" stroke-width="2" y="363" stroke="none"
+      ><circle fill="red" stroke-width="2" r="10" cx="166" cy="358" stroke="none"
+      /><text fill="red" x="186" xml:space="preserve" stroke-width="2" y="363" stroke="none"
       >helix</text
-      ><rect x="230" width="20" stroke-width="2" height="20" y="348" stroke="none"
-      /><text x="260" xml:space="preserve" stroke-width="2" y="363" stroke="none"
+      ><rect x="223" width="20" stroke-width="2" height="20" y="348" stroke="none"
+      /><text x="253" xml:space="preserve" stroke-width="2" y="363" stroke="none"
       >strand</text
-      ><text x="308" xml:space="preserve" stroke-width="2" y="363" stroke="none"
+      ><text x="300" xml:space="preserve" stroke-width="2" y="363" stroke="none"
       >]</text
     ></g
   ></g

@@ -51,13 +51,13 @@ include('./backend/display_proteins.php');
 			are representing just single vertices in the <a href="about.php#proteinGraph">protein graph</a>.
 			<p>In the <a href="about.php#key">key</a> notation only folding graphs can be shown that are <a href="">non-bifurcated</a>.</p>
 			
-			<span id="multipleDownload">Download checked Proteins as <select id="multidown" name="multipledownload">
+			<span id="multipleDownload">Download checked proteins as <select id="multidown" name="multipledownload">
 												<option value="null">-- Select to download --</option>
 												<option value="ps">PostScript</option>
 												<option value="svg">SVG</option>
 												<option value="png">PNG</option></select>		
 			<br>
-			<span>Please <a href="citing.php">cite PTGL</a> correctly, if you are using our data & images.</span>																					
+			<span>Please <a href="citing.php">cite PTGL</a>, if you are using our data & images.</span>																					
 		</div>
 		
 		
@@ -91,7 +91,7 @@ include('./backend/display_proteins.php');
 		
 		
 		<!-- First try for the online version of jQuery-->
-		<script src="http://code.jquery.com/jquery.js"></script>
+		<!-- <script src="http://code.jquery.com/jquery.js"></script> -->
 		
 		<!-- If no online access, fallback to our hardcoded version of jQuery -->
 		<script>window.jQuery || document.write('<script src="js/jquery-1.8.2.min.js"><\/script>')</script>
@@ -114,77 +114,97 @@ include('./backend/display_proteins.php');
 		<script src="js/jquery.bxslider.min.js"></script>	
 		<!-- <script src="js/bxslider-custom.js"></script> -->
 
-		<script src="js/queuedownload.js"></script>
+		<!-- <script src="js/queuedownload.js"></script> -->
 
 
 
 		<!-- Dynamic ContentLoader -->
-		<script type="text/javascript">
+		
+<script type="text/javascript">
 
 		$(document).ready(function () {             
 
-		var viewWidth = $(window).width();
-			slider = $('#carouselSlider').bxSlider({
-			minSlide: 1,
-			maxSlide: 1,
-			slideWidth: viewWidth,
-			infiniteLoop: false,
-			hideControlOnEnd: true
-		});
-	
-		$('.tada').bxSlider({
-			startSlide: 0,
-			controls: false,
-			minSlide: 1,
-			maxSlide: 1,
-			slideWidth: 600,
-			pagerCustom: '.bx-pager-own'
-		});
+				var viewWidth = $(window).width();
+				slider = $('#carouselSlider').bxSlider({
+				minSlide: 1,
+				maxSlide: 1,
+				slideWidth: viewWidth,
+				infiniteLoop: false,
+				hideControlOnEnd: true
+			});
+
+				tadas = $('.tada').bxSlider({
+				startSlide: 0,
+				controls: false,
+				minSlide: 1,
+				maxSlide: 1,
+				slideWidth: 600,
+				pagerCustom: '.bx-pager-own'
+			});
 
 
-		function loadNext() {
-		
-			currentSlide = slider.getCurrentSlide();
-			var chainIDs = <?php echo json_encode($allChainIDs); ?>;
-			console.log("Current Slide: " + currentSlide);
-			console.log(chainIDs);
-			console.log("Put data into #"+ chainIDs[currentSlide + 1]);
-			var dataToSend = {'currentSlide' : currentSlide, 'chainIDs[]' : <?php echo json_encode($allChainIDs); ?> } ;
+			function loadNext() {
 
-		
-		//Main Images
-			$.ajax({
-			type: "POST",
-			url: "./backend/getImages.php",
-			data: dataToSend,
-			cache: false,
-			success: function(html){
-				$("#"+ chainIDs[currentSlide + 1]).html(html);
-				slider.reloadSlider({
-    				startSlide: currentSlide
-    			});
-			}
-			}); 
-		}	
+				currentSlide = slider.getCurrentSlide();
+				var chainIDs = <?php echo json_encode($allChainIDs); ?>;
+				console.log("Current Slide: " + currentSlide);
+				console.log(chainIDs);
+				console.log("Put data into #"+ chainIDs[currentSlide + 1]);
+				var dataToSend = {'currentSlide' : currentSlide, 'chainIDs[]' : <?php echo json_encode($allChainIDs); ?> } ;
 
 
-		var steps = 0;
-		var prevsteps = 0;
-		$("[class='bx-next']").click( function() {
-			steps++;
-			if(steps % 1 == 0 && steps > prevsteps){
-				loadNext();
-				prevsteps = steps;
-			}
-		});
+			//Main Images
+				$.ajax({
+				  type: "POST",
+				  url: "./backend/getMainImage.php",
+				  data: dataToSend,
+				  cache: false,
+				  success: function(html){					
+			  		  $("#"+ chainIDs[currentSlide + 1]).html(html);
+					  //slider.reloadSlider({
+					  //	startSlide: currentSlide
+					  //});
+				  }
+				});
+				
+				$.ajax({
+				type: "POST",
+				url: "./backend/getThumbImages.php",
+				data: dataToSend,
+				cache: false,
+				success: function(html){					
+					$("#"+ chainIDs[currentSlide + 1]+"_pager").html(html);
+					slider.reloadSlider({
+						startSlide: currentSlide
+					});
+				}
+				}); 
+				
+			}	
 
-		$("[class='bx-prev']").click( function() {
-			steps--;
-		});	
+
+			var steps = 0;
+			var prevsteps = 0;
+			$('body').on('click','a.bx-next', function() {
+				console.log("Clicked 'next'");
+				steps++;
+				if(steps % 1 == 0 && steps > prevsteps){
+					console.log("Steps: " + steps);
+					console.log("Try to load next...");
+					loadNext();
+					prevsteps = steps;
+				}
+				console.log("done..");
+			});
+
+			$('body').on('click','a.bx-prev', function() {
+				steps--;
+				console.log("Steps decremented to: " + steps);
+			});	
 		});
 
 
 		</script>	
-
+		
 	</body>
 </html>

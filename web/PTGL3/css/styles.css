@@ -410,6 +410,10 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	#searchInput {
 		width: 301px;
 		}
+	
+	#searchInputMain {
+		width: 301px;
+	}
 		
 	
 	.col-centered {
@@ -539,7 +543,7 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	/* Search results page */
 	
 	#searchResults {
-		/* margin-top: 50px; */
+		margin-bottom: 50px;
 		}
 		
 	.bx-wrapper > .container {
