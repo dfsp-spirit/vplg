@@ -2299,6 +2299,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
        
         DrawResult drawRes = this.drawProteinGraphG2D(drawBlackAndWhite);
         
+        //System.out.println("drawProteinGraph: Basefilepath is '" + baseFilePathNoExt + "'.");
         String svgFilePath = baseFilePathNoExt + ".svg";
         HashMap<IMAGEFORMAT, String> resultFilesByFormat = new HashMap<IMAGEFORMAT, String>();
         try {

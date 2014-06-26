@@ -113,9 +113,11 @@ public class DrawTools {
                 DP.getInstance().w("Unsupported image output format ignored.");
                 continue;
             }
+            
+            String outputFileBasePathWithExt = outputFileBasePathNoExt + formatFileExt;
 
-            svgConverter.setSources(new String[]{svgInputFilePath});
-            svgConverter.setDst(new File(outputFileBasePathNoExt));
+            svgConverter.setSources(new String[]{svgInputFilePath});            
+            svgConverter.setDst(new File(outputFileBasePathWithExt));
             try {      
                 svgConverter.execute();
                 outfilesByFormat.put(format, outputFileBasePathNoExt + formatFileExt);

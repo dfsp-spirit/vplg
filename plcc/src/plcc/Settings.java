@@ -9,11 +9,13 @@
 
 package plcc;
 
-import tools.DP;
 import java.io.*;
-import java.util.Properties;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
+import plcc.DrawTools.IMAGEFORMAT;
+import tools.DP;
 
 /**
  * This class implements a static class that manages program settings. It supports loading them from and
@@ -65,6 +67,27 @@ public class Settings {
      */
     public static String getApptag() {
         return("[PLCC] ");
+    }
+    
+    /**
+     * Creates an array of the output image formats which are set in the settings.
+     * @return the output formats
+     */
+    public static IMAGEFORMAT[] getOutputImageFormats() {
+        ArrayList<IMAGEFORMAT> formats = new ArrayList<IMAGEFORMAT>();
+        
+        if(Settings.getBoolean("plcc_B_img_output_format_PNG")) {
+            formats.add(IMAGEFORMAT.PNG);
+        }
+        if(Settings.getBoolean("plcc_B_img_output_format_PDF")) {
+            formats.add(IMAGEFORMAT.PDF);
+        }
+        // --- ignore SVG because it is always produced ---
+        //if(Settings.getBoolean("plcc_B_img_output_format_SVG")) {
+        //    formats.add(IMAGEFORMAT.SVG);
+        //}
+        
+        return (IMAGEFORMAT[])formats.toArray(new IMAGEFORMAT[formats.size()]);
     }
     
     /**
@@ -212,6 +235,11 @@ public class Settings {
         
         defSet("plcc_S_img_output_format", "PNG", "image output format (valid options: 'PNG', 'JPG')");
         defSet("plcc_S_img_output_fileext", ".png", "file extension of output images (should fit plcc_S_img_output_format more or less, e.g. '.png', '.jpg')");
+        
+        // new output format settings
+        defSet("plcc_B_img_output_format_PNG", "true", "Whether to write output images in PNG format.");
+        defSet("plcc_B_img_output_format_PDF", "true", "Whether to write output images in PDF format.");
+        defSet("plcc_B_img_output_format_SVG", "true", "Whether to write output images in SVG format.");
         
         defSet("plcc_I_img_margin_left", "80", "Size of the left image margin in pixels");
         defSet("plcc_I_img_margin_top", "40", "Size of the top image margin in pixels");

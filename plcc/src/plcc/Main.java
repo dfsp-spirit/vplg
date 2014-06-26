@@ -2152,7 +2152,9 @@ public class Main {
 
                 if(Settings.getBoolean("plcc_B_draw_graphs")) {
                     
-                    IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG, DrawTools.IMAGEFORMAT.PDF };
+                    IMAGEFORMAT[] formats;
+                    // formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG, DrawTools.IMAGEFORMAT.PDF };                    
+                    formats = Settings.getOutputImageFormats();
 
                     HashMap<IMAGEFORMAT, String> filesByFormatCurNotation = pg.drawProteinGraph(imgFileNoExt, false, formats);
                     if(! silent) {
