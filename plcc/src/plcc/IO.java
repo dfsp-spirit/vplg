@@ -102,6 +102,17 @@ public class IO {
     }
     
     
+    public static String intArrayToString(Integer[] in) {
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < in.length; i++) {
+            sb.append(in[i]);
+            if(i < in.length - 1) {
+                sb.append(",");
+            }
+        }
+        return sb.toString();
+    }
+    
     /** Untar an input file into an output file.
 
      * The output file is created in the output folder, having the same name
@@ -266,13 +277,7 @@ public class IO {
     }
     
     
-    public static String intArrayToString(Integer[] ar) {
-        String s = "";
-        for(Integer i : ar) {
-            s += i + " ";
-        }
-        return s;
-    }
+    
     
     
     public static String intArrayListToString(ArrayList<Integer> ar) {

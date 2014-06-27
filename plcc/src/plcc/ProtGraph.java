@@ -193,7 +193,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
 
         // Iterate through all connected components (CCs)
         Integer [] numInNewGraph;
-        Integer [] numInOldGraph;
+        Integer [] posInParentGraph;
         Integer numVerticesAdded;
         Integer numEdgesAdded;
         FoldingGraph fg;
@@ -201,33 +201,101 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
             numVerticesAdded = 0;
             numEdgesAdded = 0;
              numInNewGraph = new Integer [sseList.size()];
-             numInOldGraph = new Integer [sseList.size()];
+             posInParentGraph = new Integer [sseList.size()];  // This would only need as size the number of SSEs in the FG (instead of the PG), but we do not know it yet. This gets transformed into an ArrayList of proper size later.
              // init the arrays
              for(Integer j = 0; j < sseList.size(); j++) {
                  numInNewGraph[j] = -1;
-                 numInOldGraph[j] = -1;
+                 posInParentGraph[j] = -1;
              }
 
 
             // For each CC, create a graph with all SSEs that are marked with this connected component number.
             // We need to get all SSEs first because we need to pass the list to the constructor:
             ArrayList<SSE> tmpSSEList = new ArrayList<SSE>();
+            
+            // Determine last SSE in parent graph which is part of the FG. We need this because for ADJ and SEQ notations, we need
+            //  to add vertices which are NOT part of the CC as well (all vertices between first and last vertex of the CC).
+            int lastIndexOfSSEinParentGraphWhichIsPartOfFG = -1;
+            int firstIndexOfSSEinParentGraphWhichIsPartOfFG = -1;
+            
+            
             for(Integer j = 0; j < sseList.size(); j++) {
-
                 // If SSE j is marked to be part of connected component i
                 if(m[j].equals(i)) {
+                    if(firstIndexOfSSEinParentGraphWhichIsPartOfFG == -1) {
+                        // first index not set yet
+                        firstIndexOfSSEinParentGraphWhichIsPartOfFG = j;
+                    }
+                    lastIndexOfSSEinParentGraphWhichIsPartOfFG = j;
+                }
+            }
+            
+            
+            /** Whether we compute an ADJ or SEQ folding graph, and thus need to include vertices which are NOT part of the connected component. */
+            boolean includeADJandSEQvertices = false;
+            
+            Integer[] fgVertexIndexInADJ = new Integer[sseList.size()];
+            Arrays.fill(fgVertexIndexInADJ, -1);
+            boolean inADJandSEQvertices = false;
+            boolean vertexAddedThisStep;
+            int posInADJ = 0;
+            
+            for(Integer j = 0; j < sseList.size(); j++) {
+
+                vertexAddedThisStep = false;
+                inADJandSEQvertices = (j >= firstIndexOfSSEinParentGraphWhichIsPartOfFG && j <= lastIndexOfSSEinParentGraphWhichIsPartOfFG);
+                // If SSE j is marked to be part of connected component i
+                if(m[j].equals(i) || (includeADJandSEQvertices && inADJandSEQvertices)) {
                     // ...add it to the list of SSEs for that CC.
                     tmpSSEList.add(sseList.get(j));
                     numInNewGraph[j] = numVerticesAdded;
-                    numInOldGraph[numVerticesAdded] = j;
+                    posInParentGraph[numVerticesAdded] = j;                                                            
                     numVerticesAdded++;
+                    vertexAddedThisStep = true;
                 }
-
+                
+                if(inADJandSEQvertices) {
+                    if(vertexAddedThisStep) {
+                        fgVertexIndexInADJ[numVerticesAdded - 1] = posInADJ;
+                    }                    
+                    posInADJ++;
+                }
             }
+        
+            
             // Ok, we got the SSEs. Now create the graph.
             if(tmpSSEList.size() < 1) { continue; }
             fg = new FoldingGraph(tmpSSEList);
-
+            
+            // compute proper list of indices in ADJ and SEQ folding graphs and set it
+            ArrayList<Integer> fgVertexIndicesInADJandSEQfoldingGraphs = new ArrayList<Integer>();
+            for(int x = 0; x < fgVertexIndexInADJ.length; x++) {
+                if(fgVertexIndexInADJ[x] >= 0) {
+                    fgVertexIndicesInADJandSEQfoldingGraphs.add(fgVertexIndexInADJ[x]);
+                }
+            }
+            
+            // compute proper list of indices in old graph and set it
+            ArrayList<Integer> fgVertexIndicesInParentGraph = new ArrayList<Integer>();
+            for(int x = 0; x < posInParentGraph.length; x++) {
+                if(posInParentGraph[x] >= 0) {
+                    fgVertexIndicesInParentGraph.add(posInParentGraph[x]);
+                }
+            }
+            fg.setVertexIndicesInParentGraph(fgVertexIndicesInParentGraph);
+            
+            Boolean debug = true;
+            if(debug) {
+                System.out.println("DDDDD Created new FG from CC #" + i + " of graph, size = " + fg.size + ". Showing positions of vertices in parent graph: " + IO.intArrayListToString(fgVertexIndicesInParentGraph) + ".");                
+                if(includeADJandSEQvertices) {
+                    System.out.println("DDDDD Including ADJ and SEQ vertices as well. fgVertexIndexInADJ: " + IO.intArrayListToString(fgVertexIndicesInADJandSEQfoldingGraphs) + ".");
+                } else {
+                    System.out.println("DDDDD Including only RED and KEY vertices. fgVertexIndexInADJ: " + IO.intArrayListToString(fgVertexIndicesInADJandSEQfoldingGraphs) + ".");
+                }
+            }
+            fg.setVertexIndicesInADJandSEQfoldingGraphs(fgVertexIndicesInADJandSEQfoldingGraphs);
+                                                 
+            
             // Now add the contacts/edges between the vertices by iterating through the contact matrix of this graph and
             //  translating the indices to the new graph.
             for(Integer k = 0; k < this.size; k++) {

@@ -122,7 +122,7 @@ public class DrawTools {
                 svgConverter.execute();
                 outfilesByFormat.put(format, outputFileBasePathNoExt + formatFileExt);
             } catch (SVGConverterException ex) {
-                DP.getInstance().e("Could not convert SVG file to format '" + format + "', skipping.");
+                DP.getInstance().e("Could not convert SVG file to format '" + format + "': '" + ex.getMessage() + "'. Skipping.");
             }
         }
         return outfilesByFormat;

@@ -54,6 +54,8 @@ public class FoldingGraph extends SSEGraph {
     
     
     private Integer foldingGraphNumber = null;
+    /** Mapping of vertex indices in this folding graph to vertex indices in the parent PG. At position n in the list, the position of the vertex at index n in this FG in the parent PG is given. */
+    private ArrayList<Integer> vertexIndicesInParentGraph = null;
     
     
     
@@ -64,6 +66,31 @@ public class FoldingGraph extends SSEGraph {
     FoldingGraph(ArrayList<SSE> sses) {
         super(sses);
         this.isProteinGraph = false;
+    }
+    
+    /**
+     * Specifies the index of each vertex in the parent graph.
+     * @param order the vertex order. At position n in the list, the position of the vertex at index n in this FG in the parent PG is given.
+     */
+    public void setVertexIndicesInParentGraph(ArrayList<Integer> order) {
+        if(order.size() != this.size) {
+            DP.getInstance().e("FoldingGraph", "setVertexIndicesInParentGraph: Given vertex order in parent graph has wrong length, not setting it.");
+            return;
+        }
+        this.vertexIndicesInParentGraph = order;
+    }
+    
+    /**
+     * Specifies the index of each vertex in the ADJ and SEQ folding graphs (these graphs include more vertices than just the CC vertices, so indices differ).
+     * @param order the vertex order. At position n in the list, the position of the vertex at index n in this FG in the ADJ or SEQ FG is given. Note that, if this is a ADJ or SEQ folding graph,
+     * this list is rather useless / trivial.
+     */
+    public void setVertexIndicesInADJandSEQfoldingGraphs(ArrayList<Integer> order) {
+        if(order.size() != this.size) {
+            DP.getInstance().e("FoldingGraph", "setVertexIndicesInADJandSEQfoldingGraphs: Given vertex order in ADJ and SEQ folding graphs has wrong length, not setting it.");
+            return;
+        }
+        this.vertexIndicesInParentGraph = order;
     }
     
     
