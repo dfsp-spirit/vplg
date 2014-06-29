@@ -57,7 +57,8 @@ public class FoldingGraph extends SSEGraph {
     /** Mapping of vertex indices in this folding graph to vertex indices in the parent PG. At position n in the list, the position of the vertex at index n in this FG in the parent PG is given. */
     private ArrayList<Integer> vertexIndicesInParentGraph = null;
     
-    
+    /** Whether this FG contains the additional vertices required for ADJ and SEQ notations (as opposed to those vertices for RED and KEY). */
+    private Boolean isForADJandSEQNotations;
     
     /**
      * Constructor. Requires a list of SSEs that will be represented by the vertices of the graph.
@@ -66,6 +67,18 @@ public class FoldingGraph extends SSEGraph {
     FoldingGraph(ArrayList<SSE> sses) {
         super(sses);
         this.isProteinGraph = false;
+    }
+    
+    public void setForADJandSEQ(Boolean b) {
+        this.isForADJandSEQNotations = b;
+    }
+    
+    /**
+     * Determines whether this FG is suitable to compute the ADJ and SEQ notations.
+     * @return true if this FG is suitable to compute the ADJ and SEQ notations, false if is suitable for RED and KEY.
+     */ 
+    public boolean getIsForADJandSEQNotations() {
+        return this.isForADJandSEQNotations;
     }
     
     /**
@@ -91,6 +104,24 @@ public class FoldingGraph extends SSEGraph {
             return;
         }
         this.vertexIndicesInParentGraph = order;
+    }
+    
+    public String computeFGstringNotationSEQ() {
+        if( ! this.isForADJandSEQNotations) {
+            DP.getInstance().e("", "computeFGstringNotationSEQ: This FG does not contain SEQ vertices.");
+        }
+        StringBuilder sb = new StringBuilder();
+        // todo: implement this
+        return sb.toString();
+    }
+    
+    public String computeFGstringNotationADJ() {
+        if( ! this.isForADJandSEQNotations) {
+            DP.getInstance().e("", "computeFGstringNotationADJ: This FG does not contain ADJ vertices.");
+        }
+        StringBuilder sb = new StringBuilder();
+        // todo: implement this
+        return sb.toString();
     }
     
     
@@ -240,10 +271,7 @@ public class FoldingGraph extends SSEGraph {
      */
     private Boolean drawFoldingGraphKEY(String filePath) {
         
-        //TODO: remove this when function is ready
-        // Currently this is under development and broken, so disable it
-        //--------------------------------------------------------------------------------------------------
-        //--------------------------------------------------------------------------------------------------
+       
         //--------------------------------------------------------------------------------------------------
         /*
         if(Settings.getInteger("plcc_I_debug_level") < 1) {
@@ -252,8 +280,7 @@ public class FoldingGraph extends SSEGraph {
         }
         */
         //--------------------------------------------------------------------------------------------------
-        //--------------------------------------------------------------------------------------------------
-        //--------------------------------------------------------------------------------------------------
+       
         
         if(! this.supportsKeyNotation()) {
             System.err.println("NOTE: ProtGraph.drawFoldingGraphKEY(): Called for graph which does not support KEY notation, skipping.");

@@ -275,6 +275,13 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
                 }
             }
             
+            if(includeADJandSEQvertices) {
+                fg.setForADJandSEQ(true);
+            }
+            else {
+                fg.setForADJandSEQ(false);
+            }
+            
             // compute proper list of indices in old graph and set it
             ArrayList<Integer> fgVertexIndicesInParentGraph = new ArrayList<Integer>();
             for(int x = 0; x < posInParentGraph.length; x++) {
