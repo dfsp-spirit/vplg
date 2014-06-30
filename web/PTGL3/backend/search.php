@@ -17,7 +17,7 @@ function get_cath_link($pdbid, $chain = null) {
 
 $db_config = include('config.php');     //TODO: Sichern?
 
-
+phpinfo();
 
 // try to get POST data
 $logic = "OR";
@@ -81,7 +81,7 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 	$numberOfChains = 0;
 	while (($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)) && ($counter <= 30)){
 		
-		$query = "SELECT * FROM plcc_chain WHERE pdb_id = '".$arr["pdb_id"]."' ORDER BY chain_name";
+		$query = "SELECT DISTINCT (chain_name), pdb_id FROM plcc_chain WHERE pdb_id = '".$arr["pdb_id"]."' ORDER BY chain_name";
 		if($ligandname != "" ){
 			$query = "SELECT DISTINCT (chain_name), pdb_id, ligandtochain_chainid FROM plcc_chain, plcc_nm_ligandtochain WHERE plcc_chain.pdb_id = '".$arr["pdb_id"]."'
 					  AND plcc_chain.chain_id = plcc_nm_ligandtochain.ligandtochain_chainid
