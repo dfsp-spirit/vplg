@@ -2129,7 +2129,7 @@ public class Main {
                                         
                     
                     try { 
-                        DBManager.writeProteinGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), pg.toGraphModellingLanguageFormat(), pg.toVPLGGraphFormat(), pg.toKavoshFormat(), pg.toDOTLanguageFormat(), pg.getNotationADJ(), pg.getNotationRED(), pg.getNotationKEY(true), pg.getNotationSEQ(), pg.getSSEStringSequential(), pg.containsBetaBarrel()); 
+                        DBManager.writeProteinGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), pg.toGraphModellingLanguageFormat(), pg.toVPLGGraphFormat(), pg.toKavoshFormat(), pg.toDOTLanguageFormat(), pg.getSSEStringSequential(), pg.containsBetaBarrel()); 
                         
                         if(! silent) {
                             System.out.println("      Inserted '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + chain + "' into DB.");

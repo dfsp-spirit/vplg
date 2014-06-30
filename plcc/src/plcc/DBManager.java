@@ -425,7 +425,7 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_ssecontact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null references " + tbl_contacttypes + " ON DELETE CASCADE, check (sse1 < sse2));");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact_complexgraph + " (ssecontact_complexgraph_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, complex_contact_type int not null references " + tbl_complexcontacttypes + " ON DELETE CASCADE check (sse1 < sse2));");            
             doInsertQuery("CREATE TABLE " + tbl_complex_contact_stats + " (complex_contact_id serial primary key, chain1 int not null references " + tbl_chain + " ON DELETE CASCADE, chain2 int not null references " + tbl_chain + " ON DELETE CASCADE, contact_num_HH int not null, contact_num_HS int not null, contact_num_HL int not null, contact_num_SS int not null, contact_num_SL int not null, contact_num_LL int not null, contact_num_DS int not null);");
-            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_image_png text, graph_image_svg text, graph_image_pdf text, sse_string text, graph_containsbetabarrel smallint DEFAULT 0);");
+            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_image_png text, graph_image_svg text, graph_image_pdf text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, fg_number int not null, graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_ptgl_adj text, graph_string_ptgl_red text, graph_string_ptgl_key text, graph_string_ptgl_seq text, graph_image_adj_svg text, graph_image_adj_png text, graph_image_adj_pdf text, graph_image_red_svg text, graph_image_red_png text, graph_image_red_pdf text, graph_image_key_svg text, graph_image_key_png text, graph_image_key_pdf text, graph_image_seq_svg text, graph_image_seq_png text, graph_image_seq_pdf text, sse_string text);");
             doInsertQuery("CREATE TABLE " + tbl_complexgraph + " (complexgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, graph_string_gml text, graph_string_kavosh text, graph_image_svg text, graph_image_png text);");
             doInsertQuery("CREATE TABLE " + tbl_motiftype + " (motiftype_id serial primary key, motiftype_name varchar(40));");
@@ -909,16 +909,12 @@ public class DBManager {
      * @param graph_string_plcc the graph in plcc format
      * @param graph_string_kavosh the graph in kavosh format
      * @param graph_string_dotlanguage the graph in DOT language format
-     * @param graph_string_ptgl_red the graph in PTGL RED notation
-     * @param graph_string_ptgl_adj the graph in PTGL ADJ notation
-     * @param graph_string_ptgl_key the graph in PTGL KEY notation
-     * @param graph_string_ptgl_seq the graph in PTGL SEQ notation
      * @param sse_string the graph in SSE string notation
      * @param containsBetaBarrel whether the graph contains a beta barrel (used for stats only)
      * @return true if the graph was inserted, false if errors occurred
      * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
      */
-    public static Boolean writeProteinGraphToDB(String pdb_id, String chain_name, Integer graph_type, String graph_string_gml, String graph_string_plcc, String graph_string_kavosh, String graph_string_dotlanguage, String graph_string_ptgl_red, String graph_string_ptgl_adj, String graph_string_ptgl_key, String graph_string_ptgl_seq, String sse_string, Boolean containsBetaBarrel) throws SQLException {
+    public static Boolean writeProteinGraphToDB(String pdb_id, String chain_name, Integer graph_type, String graph_string_gml, String graph_string_plcc, String graph_string_kavosh, String graph_string_dotlanguage, String sse_string, Boolean containsBetaBarrel) throws SQLException {
                
         Long chain_db_id = getDBChainID(pdb_id, chain_name);
         Boolean result = false;
@@ -931,7 +927,7 @@ public class DBManager {
         Integer graph_containsbetabarrel = (containsBetaBarrel ? 1 : 0);
         PreparedStatement statement = null;
 
-        String query = "INSERT INTO " + tbl_proteingraph + " (chain_id, graph_type, graph_string_gml, graph_string_plcc, graph_string_kavosh, graph_string_dotlanguage, graph_string_ptgl_red, graph_string_ptgl_adj, graph_string_ptgl_key, graph_string_ptgl_seq, sse_string, graph_containsbetabarrel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO " + tbl_proteingraph + " (chain_id, graph_type, graph_string_gml, graph_string_plcc, graph_string_kavosh, graph_string_dotlanguage, sse_string, graph_containsbetabarrel) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
 
         try {
             dbc.setAutoCommit(false);
@@ -943,12 +939,12 @@ public class DBManager {
             statement.setString(4, graph_string_plcc);
             statement.setString(5, graph_string_kavosh);
             statement.setString(6, graph_string_dotlanguage);
-            statement.setString(7, graph_string_ptgl_adj);
-            statement.setString(8, graph_string_ptgl_red);
-            statement.setString(9, graph_string_ptgl_key);
-            statement.setString(10, graph_string_ptgl_seq);
-            statement.setString(11, sse_string);
-            statement.setInt(12, graph_containsbetabarrel);
+            //statement.setString(7, graph_string_ptgl_adj);
+            //statement.setString(8, graph_string_ptgl_red);
+            //statement.setString(9, graph_string_ptgl_key);
+            //statement.setString(10, graph_string_ptgl_seq);
+            statement.setString(7, sse_string);
+            statement.setInt(8, graph_containsbetabarrel);
                                 
             statement.executeUpdate();
             dbc.commit();
