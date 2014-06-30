@@ -69,6 +69,18 @@ public class SSE implements java.io.Serializable {
     }
     
     /**
+     * Returns the PTGL string notation for folding graphs for this sse type (like "e" for strand).
+     * @return 
+     */
+    public String getSseFgNotation() {
+        if(this.isHelix()) { return("h"); }
+        else if(this.isBetaStrand()) { return("e"); }
+        else if(this.isLigandSSE()) { return("l"); }
+        else if(this.isOtherSSE()) { return("o"); }
+        else { return("o"); }
+    }
+    
+    /**
      * Constructor that sets the SSE type by the SSE class 'sseClass'. Use SSE.SSECLASS_* constants.
      */
     public SSE(Integer sseClass) {

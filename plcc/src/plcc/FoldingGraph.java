@@ -105,26 +105,7 @@ public class FoldingGraph extends SSEGraph {
         }
         this.vertexIndicesInParentGraph = order;
     }
-    
-    public String computeFGstringNotationSEQ() {
-        if( ! this.isForADJandSEQNotations) {
-            DP.getInstance().e("", "computeFGstringNotationSEQ: This FG does not contain SEQ vertices.");
-        }
-        StringBuilder sb = new StringBuilder();
-        // todo: implement this
-        return sb.toString();
-    }
-    
-    public String computeFGstringNotationADJ() {
-        if( ! this.isForADJandSEQNotations) {
-            DP.getInstance().e("", "computeFGstringNotationADJ: This FG does not contain ADJ vertices.");
-        }
-        StringBuilder sb = new StringBuilder();
-        // todo: implement this
-        return sb.toString();
-    }
-    
-    
+           
     
     /**
      * Draws the current folding graph in the notation 'notation' (which is one of "KEY", "SEQ", "ADJ" or "RED") and writes the image
@@ -1052,6 +1033,191 @@ public class FoldingGraph extends SSEGraph {
         this.metadata.put("graphclass", "folding graph");     
         this.metadata.put("foldinggraphnumber", this.foldingGraphNumber + "");     
     }
+
+    /**
+     * Generates the key notation (KEY) of this protein graph. Note that this notation differs
+     * depending on the graph type: for all graphs but alpa(-only) and beta(-only) graphs, the SSE type is written
+     * behind the distance.
+     *
+     * This notation requires a valid spatial ordering to exist for this graph.
+     *
+     *  Example: [5, 1x, -2] is an alpha or beta graph. Vertex 1 is connected to 6 (parallel, which is the default): "+5" ,
+     *                                                  6 connected with 7 (antiparallel or mixed, marked by the "x"): "+1x" and
+     *                                                  7 is connected to 5 (parallel again): "-2".
+     *
+     *
+     *  An albe graph (or *lig graph) needs to add the SSE type to the notation, e.g.: [h, 3xh, 2e, -1l] is another graph,
+     *  and the SSEs are of the following types: 1=>helix, 4=>helix, 6=>beta sheet, 5=>ligand.
+     *
+     * @param forceLabelSSETypes whether to force labeling of SSE types in the string (i.e., even label the SSE type for graph types which can only contain a single type, e.g., beta graphs can only contain beta strands).
+     * @return the notation as a String or an empty string if this notation is not supported for this graph
+     *
+     */
+    public String getNotationKEY(Boolean forceLabelSSETypes) {
+        if (this.isBifurcated()) {
+            System.err.println("WARNING: #KEY notation not supported for bifurcated graphs. Check before requesting this.");
+            return "";
+        }
+        if (!this.isConnected()) {
+            System.err.println("WARNING: #KEY notation only supported for connected graphs. (All folding graphs are connected - is this a protein graph instead of a folding graph?)");
+            return "";
+        }
+        if (!this.hasSpatialOrdering()) {
+            System.err.println("WARNING: #KEY notation only supported for graphs with spatial ordering.");
+            return "";
+        }
+        if (this.size < 1) {
+            return "";
+        }
+        //System.err.println("WARNING: getNotationKEY(): not implemented yet.");
+        Boolean labelSSEs = true;
+        if (this.graphType.equals("alpha") || this.graphType.equals("beta")) {
+            labelSSEs = false;
+        }
+        if (forceLabelSSETypes) {
+            labelSSEs = true;
+        }
+        String labelHelix = "";
+        String labelStrand = "";
+        String labelLigand = "";
+        String labelOther = "";
+        if (labelSSEs) {
+            labelHelix = SSEGraph.notationLabelHelix;
+            labelStrand = SSEGraph.notationLabelStrand;
+            labelLigand = SSEGraph.notationLabelLigand;
+            labelOther = SSEGraph.notationLabelOther;
+        }
+        // ok, let's go
+        //this.computeSpatialVertexOrdering();        // already computed, no need to do it again
+        if (this.size < 1) {
+            return "[]";
+        } else if (this.size == 1) {
+            if (labelSSEs) {
+                return "[" + this.sseList.get(0).getLinearNotationLabel() + "]";
+            } else {
+                return "[]";
+            }
+        } else {
+            Integer seqIndexCurrentSSE;
+            Integer seqIndexNextSSE;
+            String notation;
+            if (labelSSEs) {
+                notation = "[";
+            } else {
+                notation = "[" + this.sseList.get(0).getLinearNotationLabel() + ",";
+            }
+            for (Integer i = 0; i < (this.spatOrder.size() - 1); i++) {
+                seqIndexCurrentSSE = this.spatOrder.get(i);
+                seqIndexNextSSE = this.spatOrder.get(i + 1);
+                //notation += this.getSpatialDistance(seqIndexCurrentSSE, seqIndexNextSSE);
+                notation += this.getSeqGraphSSEPairDistanceByIndices(seqIndexCurrentSSE, seqIndexNextSSE);
+                if (this.isCrossoverConnection(seqIndexCurrentSSE, seqIndexNextSSE)) {
+                    notation += "x";
+                }
+                if (labelSSEs) {
+                    notation += this.getSSEBySeqPosition(seqIndexNextSSE).getLinearNotationLabel();
+                }
+                if (i + 1 < (this.spatOrder.size() - 1)) {
+                    notation += ",";
+                }
+            }
+            notation += "]";
+            return notation;
+        }
+    }
+    
+    
+    
+    public String getNotationSEQ() {
+        StringBuilder sb = new StringBuilder();
+        return sb.toString();
+    }
+
+    /**
+     * Implements PTGL FG notation.
+     * @return 
+     */
+    public String getNotationRED() {
+        
+        if(this.isForADJandSEQNotations) {
+            DP.getInstance().e("FoldingGraph", "getNotationRED: FG not suitable for notation RED.");
+            return "";
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+               
+        SSE currentSSE; SSE neighbor;
+        ArrayList<Integer> neighborIndices; // these are ordered N to C terminus
+        
+        for(int i = 0; i < this.sseList.size(); i++) {
+            currentSSE = this.sseList.get(i);
+            sb.append(currentSSE.getSseFgNotation());
+            
+            // iterate through all spatial neighbors
+            neighborIndices = this.neighborsOf(i);
+            for(int j = 0; j < neighborIndices.size(); j++) {
+                neighbor = this.sseList.get(neighborIndices.get(j)); 
+                if(j < neighborIndices.size() - 1) {
+                    sb.append("-");
+                }
+                Integer dist = this.computeDistanceSequentialByIndices(i, j);
+                sb.append(dist);
+                sb.append(neighbor.getSseFgNotation());
+                if(j < neighborIndices.size() - 1) {
+                    sb.append(",");
+                }
+            }
+            
+        }
+        
+        sb.append("]");
+        return sb.toString();
+    }
+    
+    /**
+     * Implements PTGL FG notation.
+     * @return 
+     */
+    public String getNotationADJ() {
+        
+        if( ! this.isForADJandSEQNotations) {
+            DP.getInstance().e("FoldingGraph", "getNotationADJ: FG not suitable for notation ADJ.");
+            return "";
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+               
+        SSE currentSSE; SSE neighbor;
+        ArrayList<Integer> neighborIndices; // these are ordered N to C terminus
+        
+        for(int i = 0; i < this.sseList.size(); i++) {
+            currentSSE = this.sseList.get(i);
+            sb.append(currentSSE.getSseFgNotation());
+            
+            // iterate through all spatial neighbors
+            neighborIndices = this.neighborsOf(i);
+            for(int j = 0; j < neighborIndices.size(); j++) {
+                neighbor = this.sseList.get(neighborIndices.get(j)); 
+                if(j < neighborIndices.size() - 1) {
+                    sb.append("-");
+                }
+                Integer dist = this.computeDistanceSequentialByIndices(i, j);
+                sb.append(dist);
+                sb.append(neighbor.getSseFgNotation());
+                if(j < neighborIndices.size() - 1) {
+                    sb.append(",");
+                }
+            }
+            
+        }
+        
+        sb.append("]");
+        return sb.toString();
+    }
+    
+    
 
     
 }

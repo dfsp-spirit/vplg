@@ -939,10 +939,6 @@ public class DBManager {
             statement.setString(4, graph_string_plcc);
             statement.setString(5, graph_string_kavosh);
             statement.setString(6, graph_string_dotlanguage);
-            //statement.setString(7, graph_string_ptgl_adj);
-            //statement.setString(8, graph_string_ptgl_red);
-            //statement.setString(9, graph_string_ptgl_key);
-            //statement.setString(10, graph_string_ptgl_seq);
             statement.setString(7, sse_string);
             statement.setInt(8, graph_containsbetabarrel);
                                 
