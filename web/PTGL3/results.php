@@ -52,10 +52,10 @@ include('./backend/display_proteins.php');
 			<p>In the <a href="about.php#key">key</a> notation only folding graphs can be shown that are <a href="">non-bifurcated</a>.</p>
 			
 			<span id="multipleDownload">Download checked proteins as <select id="multidown" name="multipledownload">
-												<option value="null">-- Select to download --</option>
-												<option value="ps">PostScript</option>
-												<option value="svg">SVG</option>
-												<option value="png">PNG</option></select>		
+												<option class="downloadOption" value="null">-- Select to download --</option>
+												<option class="downloadOption" value="ps">PostScript</option>
+												<option class="downloadOption" value="svg">SVG</option>
+												<option class="downloadOption" value="png">PNG</option></select>		
 			<br>
 			<span>Please <a href="citing.php">cite PTGL</a>, if you are using our data & images.</span>																					
 		</div>
@@ -141,6 +141,31 @@ include('./backend/display_proteins.php');
 				slideWidth: 600,
 				pagerCustom: '.bx-pager-own'
 			});
+			
+			$('.downloadOption').click( function (){
+				
+				var downloadType = this.value;
+				var proteins = new Array();
+				
+				if(this.value != "null") {
+					$('input[type=checkbox]').each(function () {
+						if (this.checked) {
+							proteins.push(this.value);
+							console.log(this.value + " was added to proteins array");
+						}
+					})
+					var dataToSend = {'downloadType' : downloadType, 'proteins[]': proteins};	
+					$.ajax({
+						type: "POST",
+						url: "./backend/downloadFiles.php",
+						data: dataToSend,
+						cache: false,
+						success: function(html){					
+							console.log(html);
+						}
+					});
+				}
+			});
 
 
 			function loadNext() {
@@ -182,7 +207,7 @@ include('./backend/display_proteins.php');
 				
 			}	
 
-
+			/*
 			var steps = 0;
 			var prevsteps = 0;
 			$('body').on('click','a.bx-next', function() {
@@ -200,8 +225,8 @@ include('./backend/display_proteins.php');
 			$('body').on('click','a.bx-prev', function() {
 				steps--;
 				console.log("Steps decremented to: " + steps);
-			});	
-		});
+			}); */	
+		}); 
 
 
 		</script>	

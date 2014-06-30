@@ -82,30 +82,36 @@ $ENABLE_BLAST_SEARCH = $db_config['enable_blast_search'];
 							<div id="liveSearchResults"></div>
 
 							<label class="checkboxFont" <?php if(!$ENABLE_COMPLEX_GRAPHS) echo 'style="display:none !important;"'?> >
-								<input type="checkbox" id="inlineCheckbox3" name="proteincomplexes" value="1"> Search for Protein Complexes </input>
+								<input type="checkbox" id="inlineCheckbox3" name="proteincomplexes" value="1"> Search for Protein Complexes
 							</label>
-							<!-- <label class="checkboxFont">
-								<input type="checkbox" id="matchexactCB" name="exact" value="1"> Match exact word </input>
-							</label> -->
 							<div id="advancedSearch">
 								<label class="advancedLabel">Logic operation:&nbsp;&nbsp;&nbsp;&nbsp;
-									<input class="radio" type="radio" name="logic" value="AND" checked>&nbsp;&nbsp;AND&nbsp;</input>
-									<input class="radio" type="radio" name="logic" value="OR">&nbsp;&nbsp;OR&nbsp;</input>
+									<input class="radio" type="radio" name="logic" value="AND"> &nbsp;&nbsp;AND&nbsp;
+									<input class="radio" type="radio" name="logic" value="OR" checked> &nbsp;&nbsp;OR&nbsp;
 								</label>
 								<label class="advancedLabel">PDB Identifier
 									<input class="advancedInput" type="text" id="pdbid" name="pdbid" placeholder="PDB ID" size="6" maxlength="4" />
+									<i title="Use the PDB ID. For example '7tim' or '8icd'." style="position:absolute; right:50px;"  class="fa fa-question"></i>
 								</label>
 								<label class="advancedLabel">Title
 									<input class="advancedInput" type="text" id="title" name="title" placeholder="Title" size="20" maxlength="50"/>
+									<i title="Search for keywords in the protein title. I.e. 'Human'" style="position:absolute; right:50px;"  class="fa fa-question"></i>
 								</label>
-								<label class="advancedLabel">Het
-									<input class="advancedInput" type="text" id="het" name="het" placeholder="Het" size="20" maxlength="50"/>
+								<label class="advancedLabel">Has Ligand
+									<select class="advancedInput" id="hasligand" name="hasligand">
+										<option value="null">Both</option>
+										<option value="1">Yes</option>
+										<option value="0">No</option>
+									</select>
+									<i title="Choose if proteins have a ligand or not." style="position:absolute; right:50px;"  class="fa fa-question"></i>
 								</label>
-								<label class="advancedLabel">Hetname
-									<input class="advancedInput" type="text" id="hetname" name="hetname" placeholder="Hetname" size="20" maxlength="50"/>
+								<label class="advancedLabel">Ligand Name
+									<input class="advancedInput" type="text" id="ligandname" name="ligandname" placeholder="Ligand Name" size="20" maxlength="50"/>
+									<i title="Search for proteins which contain a special ligand. Use ligand acronyms like 'FAD' or parts of the ligands long name." style="position:absolute; right:50px;"  class="fa fa-question"></i>
 								</label>	
 								<label class="advancedLabel">Molecule
 									<input class="advancedInput" type="text" id="molecule" name="molecule" placeholder="Molecule" size="20" maxlength="50"/>
+									<i title="FILL" style="position:absolute; right:50px;"  class="fa fa-question"></i>
 								</label>		
 								<button type="submit" class="btn btn-default advancedInput" style="margin-top:35px;"><span>Search</span></button>
 							</div>

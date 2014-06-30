@@ -65,7 +65,7 @@ foreach ($chains as $value){
 
 		pg_query($db, "DEALLOCATE ALL");
 		$query = "SELECT * FROM plcc_chain, plcc_graph WHERE pdb_id LIKE $1 AND chain_name LIKE $2 AND plcc_graph.chain_id = plcc_chain.chain_id ORDER BY graph_type"; 
-		$result = pg_prepare($db, "getChains", $query) or die($query . ' -> Query failed: ' . pg_last_error());		
+		pg_prepare($db, "getChains", $query) or die($query . ' -> Query failed: ' . pg_last_error());		
 		$result = pg_execute($db, "getChains", array("%".$pdbID."%", "%".$chainName."%"));  
 		$data = pg_fetch_array($result, NULL, PGSQL_ASSOC);
 		$chain_id = (int) $data['chain_id'];
@@ -83,13 +83,12 @@ foreach ($chains as $value){
 						 <div class="proteingraph">
 						 	<div>
 						 	<input type="checkbox" name="'.$pdbID.$chainName.'" value="'.$pdbID.$chainName.'"> Enqueue in Downloadlist
-						 	<span class="download-options"><a href="3Dview.php?q='.$pdbID.$chainName.'">3D-View [JMOL]</a></span>
+						 	<span class="download-options"><a href="3Dview.php?pdbid='.$pdbID.'&chain='.$chainName.'&mode=allgraphs" target="_blank">3D-View [JMOL]</a></span>
 							</div>	
-							<ul class="bxslider tada">
-								<li id="'.$pdbID.$chainName.'">';
+							<ul id="'.$pdbID.$chainName.'" class="bxslider tada">';
 
 					if($loaded_images < 2){		
-						$tableString .= '<a title="Loaded_'.$loaded_images.'" href="./data/'.$data['graph_image_png'].'" target="_blank">
+						$tableString .= '<li><a title="Loaded_'.$loaded_images.'" href="./data/'.$data['graph_image_png'].'" target="_blank">
 									<img src="./data/'.$data['graph_image_png'].'" alt="" />
 									</a>
 									<a href="./data/'.$data['graph_image_png'].'" target="_blank">Full Size Image</a>
@@ -104,16 +103,16 @@ foreach ($chains as $value){
 						if(isset($data['graph_image_png']) && file_exists("./data/".$data['graph_image_png'])){
 							$tableString .= '<a href="./data/'.$data['graph_image_png'].'" target="_blank">[PNG]</a>';
 						}
-						$tableString .= '</span>';
+						$tableString .= '</span></li>';
 					
 					}
 
-					$tableString .= '</li>';	
+					$tableString .= '';	
 					
 						while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
 							
 							
-							if($loaded_images < 2){
+							// if($loaded_images < 2){  // Use this to limit the amount of loaded images
 								$tableString .= '<li>';
 								$tableString .= '<a href="./data/'.$arr['graph_image_png'].'" target="_blank">
 												<img src="./data/'.$arr['graph_image_png'].'" alt="" />
@@ -132,7 +131,7 @@ foreach ($chains as $value){
 								}
 								$tableString .= '</span>';
 								$tableString .= '</li>';
-					 		}
+					 		// } 
 							
 						}
 						
@@ -166,7 +165,7 @@ foreach ($chains as $value){
 						</div><!-- end table-responsive -->
 						<div id="'.$pdbID.$chainName.'_pager" class="bx-pager-own">';
 					
-				if($loaded_images < 2){
+				// if($loaded_images < 2){ // use this to limit preloaded images
 					$tableString .= '<p>- Select topology type -</p>
 									<a class="thumbalign" data-slide-index="0" href=""><img src="./data/'.$pdbID.'_'.$chainName.'_'.$graphtype.'_PG.png" width="100px" height="100px" />
 																		'.$graphtype_dict[$graphtype].'
@@ -179,7 +178,7 @@ foreach ($chains as $value){
 											'.$graphtype_dict[$gt].'
 										  </a>
 										';
-					}
+					// }
 				}
 						 
 

@@ -26,20 +26,21 @@ if(isset($_POST)) {
     if(isset($_POST["keyword"])) {$keyword = $_POST["keyword"];  $none_set = false;} else {$keyword = "";};
     if(isset($_POST["pdbid"])) {$pdbid = $_POST["pdbid"];  $none_set = false;};
     if(isset($_POST["title"])) {$title = $_POST["title"];  $none_set = false;};
-    if(isset($_POST["het"])) {$het = $_POST["het"];  $none_set = false;};
-    if(isset($_POST["hetname"])) {$hetname = $_POST["hetname"];  $none_set = false;};
+    if(isset($_POST["hasligand"])) {$hasligand = $_POST["hasligand"];  $none_set = false;};
+    if(isset($_POST["ligandname"])) {$ligandname = $_POST["ligandname"];  $none_set = false;};
     if(isset($_POST["molecule"])) {$molecule = $_POST["molecule"];  $none_set = false;};
     if(isset($_POST["logic"])) {$logic = $_POST["logic"];};
     if(isset($_POST["proteincomplexes"])) {$proteincomplexes = $_POST["proteincomplexes"];};
-
 } else {
 	$tableString = "Sorry. Your search term is too short. <br>\n";
 	$tableString .= '<a href="./index.php">Go back</a> or use the query box in the upper right corner!';
+	exit;
 }
 
 if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALSE) {
 	$tableString = "Sorry. Your search term is too short.<br>\n";
 	$tableString .= '<a href="./index.php">Go back</a> or use the query box in the upper right corner!';
+	exit;
 } else { 	// establish pgsql connection
 	
 	$conn_string = "host=" . $db_config['host'] . " port=" . $db_config['port'] . " dbname=" . $db_config['db'] . " user=" . $db_config['user'] ." password=" . $db_config['pw'];
@@ -47,12 +48,23 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 					or die($db_config['db'] . ' -> Connection error: ' . pg_last_error() . pg_result_error() . pg_result_error_field() . pg_result_status() . pg_connection_status() );            
 	
 	#TODO change queries
-	$query = "SELECT * FROM plcc_protein WHERE ";
-	if (isset($keyword) && $keyword != "") { $query .= "pdb_id LIKE '%".$keyword."%' OR header LIKE '%".strtoupper($keyword)."%' ".$logic." "; };
-	if (isset($pdbid) && $pdbid != "") {   $query .= "pdb_id LIKE '%".$pdbid."%' ".$logic." "; };
-	if (isset($title) && $title != "") {   $query .= "title LIKE '%".$title."%' ".$logic." "; };
-	if (isset($het) && $het != "") {     $query .= "pdb_id LIKE '%".$het."%' ".$logic." "; };
-	if (isset($hetname) && $hetname != "") { $query .= "pdb_id LIKE '%".$hetname."%' ".$logic." "; };
+	$query = "SELECT * FROM plcc_protein, plcc_chain, plcc_nm_ligandtochain WHERE ";
+	if (isset($keyword) && $keyword != "") {
+		$query .= "plcc_protein.pdb_id LIKE '%".$keyword."%' 
+					OR plcc_protein.header LIKE '%".strtoupper($keyword)."%' ".$logic." "; 
+	};
+	if (isset($pdbid) && $pdbid != "") {   $query .= "plcc_protein.pdb_id LIKE '%".$pdbid."%' ".$logic." "; };
+	if (isset($title) && $title != "") {   $query .= "plcc_protein.title LIKE '%".strtoupper($title)."%' ".$logic." "; };
+	if (isset($hasligand) && $hasligand == "1") {
+		$query .= "ligandtochain_ligandname3 IS NOT NULL
+					AND plcc_nm_ligandtochain.ligandtochain_chainid = plcc_chain.chain_id 
+					AND plcc_chain.pdb_id = plcc_protein.pdb_id ".$logic." "; 
+	};
+	if (isset($ligandname) && $ligandname != "") { 
+		$query .= "ligandtochain_ligandname3 LIKE '%".$ligandname."' 
+					AND plcc_nm_ligandtochain.ligandtochain_chainid = plcc_chain.chain_id 
+					AND plcc_chain.pdb_id = plcc_protein.pdb_id ".$logic." "; 
+	};
 	if (isset($molecule) && $molecule != "") {$query .= "pdb_id LIKE '%".$molecule."%' ".$logic." "; };
 
 
@@ -62,7 +74,6 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 		$query = rtrim($query, " AND ");
 	}
 
-
 	$result = pg_query($db, $query) or die($query . ' -> Query failed: ' . pg_last_error());
 
 	$counter = 0;
@@ -71,6 +82,11 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 	while (($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)) && ($counter <= 30)){
 		
 		$query = "SELECT * FROM plcc_chain WHERE pdb_id = '".$arr["pdb_id"]."' ORDER BY chain_name";
+		if($ligandname != "" ){
+			$query = "SELECT DISTINCT (chain_name), pdb_id, ligandtochain_chainid FROM plcc_chain, plcc_nm_ligandtochain WHERE plcc_chain.pdb_id = '".$arr["pdb_id"]."'
+					  AND plcc_chain.chain_id = plcc_nm_ligandtochain.ligandtochain_chainid
+					  ORDER BY chain_name";
+		}
 		$result_chains = pg_query($db, $query) 
 					  or die($query . ' -> Query failed: ' . pg_last_error());
 
@@ -103,8 +119,7 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 		}
 		$tableString .= ' </div>';
 
-		echo $counter;
-		$counter++;
+		// $counter++; do not limit displayed proteins
 	}
 
 	pg_free_result($result); // clean memory

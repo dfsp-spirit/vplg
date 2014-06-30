@@ -52,7 +52,7 @@ $output = '<a href="./data/'.$data['graph_image_png'].'" target="_blank">
 			 <span class="download-options">Download Graph: [GML] [PS] [else]</span>';
 */
 
-$output .= '
+$output = '<li>
 <a title="Loaded_'.$loaded_images.'" href="./data/'.$data['graph_image_png'].'" target="_blank">
 	<img src="./data/'.$data['graph_image_png'].'" alt="" />
 </a>
@@ -74,7 +74,7 @@ if(isset($data['graph_image_png']) && file_exists("./data/".$data['graph_image_p
 }
 
 $output .= '
-</span>';
+</span></li>';
 
 while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
 	$output .= '<li>';
