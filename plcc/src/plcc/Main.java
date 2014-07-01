@@ -2421,14 +2421,14 @@ public class Main {
                 }
             }
             
-            for(String nt : notations) {
+            for(String notation : notations) {
 
                 if(Settings.getBoolean("plcc_B_draw_graphs")) {
 
-                    String fileNameWithExtension = pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + "_" + nt + ".png";
+                    String fileNameWithExtension = pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + "_" + notation + ".png";
                     fgFile = outputDir + System.getProperty("file.separator") + fileNameWithExtension; //Settings.get("plcc_S_img_output_fileext");
-                    if(fg.drawFoldingGraph(nt, fgFile)) {
-                        System.out.println("         -Folding graph #" + j + " of the " + pg.getGraphType() + " graph of chain " + pg.getChainid() + " written to file '" + fgFile + "' in " + nt + " notation.");
+                    if(fg.drawFoldingGraph(notation, fgFile)) {
+                        System.out.println("         -Folding graph #" + j + " of the " + pg.getGraphType() + " graph of chain " + pg.getChainid() + " written to file '" + fgFile + "' in " + notation + " notation.");
                         
                         // save image path to database if required
                         if(Settings.getBoolean("plcc_B_useDB")) {
@@ -2438,44 +2438,20 @@ public class Main {
                             if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
                                 dbImagePath = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain) + fs + fileNameWithExtension;
                             }
-                            //DP.getInstance().d("dbImagePath is '" + dbImagePath + "'.");
-
-                            String dbGraphImageType;
-                            if(nt.equals(FoldingGraph.FG_NOTATION_ADJ)) {
-                                dbGraphImageType = ProtGraphs.GRAPHIMAGE_PNG_ADJ;
-                            } else if(nt.equals(FoldingGraph.FG_NOTATION_RED)) {
-                                dbGraphImageType = ProtGraphs.GRAPHIMAGE_PNG_RED;                            
-                            } else if(nt.equals(FoldingGraph.FG_NOTATION_KEY)) {
-                                dbGraphImageType = ProtGraphs.GRAPHIMAGE_PNG_KEY;                            
-                            } else if(nt.equals(FoldingGraph.FG_NOTATION_SEQ)) {
-                                dbGraphImageType = ProtGraphs.GRAPHIMAGE_PNG_SEQ;
-                            }
-                            else {
-                                DP.getInstance().e("Invalid folding graph notation type '" + nt + "', skipping.");
-                                continue;
-                            }
-                            
-                            // RED is the default and is added to the default field as well
-                            if(dbGraphImageType.equals(ProtGraphs.GRAPHIMAGE_PNG_RED)) {
-                                try {
-                                    DBManager.updateFoldingGraphImagePathInDBOld(fgDbId, ProtGraphs.GRAPHIMAGE_PNG_DEFAULT, dbImagePath);
-                                } catch(SQLException e) {
-                                    DP.getInstance().e("Main", "Could not update default notation folding graph image path in database: '" + e.getMessage() + "'.");
-                                }
-                            }
-
-                            // all the other notations get added only here
+                            //DP.getInstance().d("dbImagePath is '" + dbImagePath + "'.");                            
+                                                        
+     
                             try {
-                                DBManager.updateFoldingGraphImagePathInDBOld(fgDbId, dbGraphImageType, dbImagePath);
+                                DBManager.updateFoldingGraphImagePathInDB(fgDbId, DrawTools.IMAGEFORMAT.PNG, notation, dbImagePath);
                             } catch(SQLException e) {
-                                DP.getInstance().e("Main", "Could not update " + nt + " notation folding graph image path in database: '" + e.getMessage() + "'.");
+                                DP.getInstance().e("Main", "Could not update " + notation + " notation folding graph image path in database: '" + e.getMessage() + "'.");
                             }
 
                         }                                                
                     }
                     else {
                         if(Settings.getInteger("plcc_I_debug_level") > 0) {
-                            System.err.println("NOTE: Could not draw notation " + nt + " of folding graph #" + j + " of the " + pg.getGraphType() + " graph of chain " + pg.getChainid() + ". (Tried to write to file '" + fgFile + "'.)");
+                            System.err.println("NOTE: Could not draw notation " + notation + " of folding graph #" + j + " of the " + pg.getGraphType() + " graph of chain " + pg.getChainid() + ". (Tried to write to file '" + fgFile + "'.)");
                         }
                     }
                 }

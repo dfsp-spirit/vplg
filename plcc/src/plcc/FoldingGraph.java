@@ -393,8 +393,8 @@ public class FoldingGraph extends SSEGraph {
                     else if(spatRel == SpatRel.NONE) {
                         // should never happen
                         headingsSpatOrder[spatPos] = headingsSpatOrder[spatPos-1];    // whatever
-                        System.err.println("WARNING: Vertices at indices " + sseSeqIndex + " and " + lastsseSeqIndex + " without contact are considered neighbors in the graph.");
-                        System.err.println("WARNING: SSE " + sseSeqIndex + ": " + this.getVertex(sseSeqIndex).longStringRep() + ", SSE " + lastsseSeqIndex + ": " + this.getVertex(lastsseSeqIndex).longStringRep() + ".");
+                        //System.err.println("WARNING: Vertices at indices " + sseSeqIndex + " and " + lastsseSeqIndex + " without contact are considered neighbors in the graph.");
+                        //System.err.println("WARNING: SSE " + sseSeqIndex + ": " + this.getVertex(sseSeqIndex).longStringRep() + ", SSE " + lastsseSeqIndex + ": " + this.getVertex(lastsseSeqIndex).longStringRep() + ".");
                         
                         //System.exit(1);
                     }
