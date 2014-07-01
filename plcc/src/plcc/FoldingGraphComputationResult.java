@@ -8,6 +8,8 @@
 
 package plcc;
 
+import tools.DP;
+
 /**
  * This stores the result of a folding graph computation. The result includes 
  * two graphs: 1) the RED/KEY graph, which is a connected component of the parent 
@@ -25,9 +27,23 @@ public class FoldingGraphComputationResult {
     /** The FG with vertices for the RED and KEY notations: only the vertices of a single connected component of the protein graph. */
     private FoldingGraph fgREDandKEY;
     
+    
+    /**
+     * Constructor.
+     * @param fgADJandSEQ a FG suited for ADJ and SEQ notations (includes non-CC vertices from parent PG)
+     * @param fgREDandKEY a FG suited for RED and KEY notations (strictly a CC of the parent PG)
+     */
     FoldingGraphComputationResult(FoldingGraph fgADJandSEQ, FoldingGraph fgREDandKEY) {
         this.fgADJandSEQ = fgADJandSEQ;
         this.fgREDandKEY = fgREDandKEY;
+        
+        if( ! this.fgADJandSEQ.getIsForADJandSEQNotations()) {
+            DP.getInstance().e("FoldingGraphComputationResult", "Given ADJ/SEQ FG is not a proper FG of this type.");
+        }
+        
+        if( this.fgREDandKEY.getIsForADJandSEQNotations()) {
+            DP.getInstance().e("FoldingGraphComputationResult", "Given RED/KEY FG is not a proper FG of this type.");
+        }
     }
 
     public FoldingGraph getFgADJandSEQ() {

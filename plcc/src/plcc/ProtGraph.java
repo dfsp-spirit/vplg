@@ -11,47 +11,46 @@ package plcc;
 
 
 //import com.google.gson.Gson;
-import java.util.*;
-import java.io.*;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Polygon;
-import java.awt.geom.*;
-import java.awt.image.*;
-import java.awt.RenderingHints;
 import java.awt.FontMetrics;
 import java.awt.GradientPaint;
 import java.awt.Graphics2D;
+import java.awt.Polygon;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
-import java.awt.geom.Ellipse2D;
+import java.awt.event.*;
+import java.awt.geom.*;
 import java.awt.geom.Arc2D;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.*;
+import java.awt.image.*;
 import java.awt.image.BufferedImage;
+import java.awt.print.*;
+import java.io.*;
+import java.io.*;
 import java.io.File;
 import java.io.IOException;
-import javax.imageio.ImageIO;
+import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.PriorityQueue;
 import javax.imageio.*;
+import javax.imageio.ImageIO;
 import javax.print.*;
 import javax.print.attribute.*;
 import javax.swing.*;
 //import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import java.awt.print.*;
-import java.io.*;
-import java.util.PriorityQueue;
-import java.util.List;
-import java.util.Collections;
-
-
-import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.dom.GenericDOMImplementation;
+import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.transcoder.image.PNGTranscoder;
-import org.w3c.dom.Document;
 import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
+import tools.DP;
 
 
 
@@ -305,7 +304,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
             }
             fg.setVertexIndicesInParentGraph(fgVertexIndicesInParentGraph);
             
-            Boolean debug = true;
+            /* Boolean debug = true;
             if(debug) {
                 System.out.println("DDDDD Created new FG from CC #" + i + " of graph, size = " + fg.size + ". Showing positions of vertices in parent graph: " + IO.intArrayListToString(fgVertexIndicesInParentGraph) + ".");                
                 if(includeADJandSEQvertices) {
@@ -314,6 +313,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
                     System.out.println("DDDDD Including only RED and KEY vertices. fgVertexIndexInADJ: " + IO.intArrayListToString(fgVertexIndicesInADJandSEQfoldingGraphs) + ".");
                 }
             }
+            */
             fg.setVertexIndicesInADJandSEQfoldingGraphs(fgVertexIndicesInADJandSEQfoldingGraphs);
                                                  
             
@@ -398,6 +398,24 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
         }
         
         return(this.connectedComponentsREDKEY.size());
+    }
+    
+    public ArrayList<FoldingGraphComputationResult> getFoldingGraphComputationResults() {
+        ArrayList<FoldingGraphComputationResult> results = new ArrayList<FoldingGraphComputationResult>();
+        
+        ArrayList<FoldingGraph> fgsADJSEQ = this.getFoldingGraphsADJSEQ();
+        ArrayList<FoldingGraph> fgsREDKEY = this.getFoldingGraphsREDKEY();
+        
+        if(fgsADJSEQ.size() != fgsREDKEY.size()) {
+            DP.getInstance().w("ProtGraph", "getFoldingGraphComputationResults: sizes of lists do not match, returning empty results.");
+            return results;
+        }
+        
+        for(int i = 0; i < fgsADJSEQ.size(); i++) {
+            results.add(new FoldingGraphComputationResult(fgsADJSEQ.get(i), fgsREDKEY.get(i)));
+        }
+        
+        return results;
     }
     
     
