@@ -1054,6 +1054,12 @@ public class FoldingGraph extends SSEGraph {
      *
      */
     public String getNotationKEY(Boolean forceLabelSSETypes) {
+        
+        if( this.isForADJandSEQNotations) {
+            DP.getInstance().e("FoldingGraph", "getNotationKEY: FG not suitable for notation KEY -- this includes more vertices than only the CC.");
+            return "";
+        }
+        
         if (this.isBifurcated()) {
             System.err.println("WARNING: #KEY notation not supported for bifurcated graphs. Check before requesting this.");
             return "";
@@ -1130,7 +1136,42 @@ public class FoldingGraph extends SSEGraph {
     
     public String getNotationSEQ() {
         StringBuilder sb = new StringBuilder();
+        
+        if( ! this.isForADJandSEQNotations) {
+            DP.getInstance().e("FoldingGraph", "getNotationSEQ: FG not suitable for notation SEQ -- missing some vertices, this is only the CC.");
+            return "";
+        }
+        
+        sb.append("[");
+               
+        SSE currentSSE; SSE neighbor;
+        ArrayList<Integer> neighborIndices; // these are ordered N to C terminus
+        int degreeOfNextSeqVertex;
+        int distToNextInSameCC;
+        int numConsecutiveVertsIsolated;
+        boolean nextSeqVertexIsIsolated;
+        for(int i = 0; i < this.sseList.size() - 1; i++) {
+            currentSSE = this.sseList.get(i);
+            
+            // Determine how many isolated vertices follow. These are the vertices which are not from the same CC.
+            numConsecutiveVertsIsolated = 0;
+            for(int neighborIndex = i + 1; neighborIndex < this.sseList.size(); neighborIndex++) {
+                if(this.degreeOfVertex(neighborIndex) == 0) {
+                    numConsecutiveVertsIsolated++;
+                }                
+            }
+            
+            distToNextInSameCC = 1 + numConsecutiveVertsIsolated;                                    
+            sb.append(distToNextInSameCC);
+            
+            if(i < this.sseList.size() - 2) {
+                sb.append(",");
+            }
+        }
+        
+        sb.append("]");
         return sb.toString();
+        
     }
 
     /**
@@ -1182,7 +1223,7 @@ public class FoldingGraph extends SSEGraph {
     public String getNotationADJ() {
         
         if( ! this.isForADJandSEQNotations) {
-            DP.getInstance().e("FoldingGraph", "getNotationADJ: FG not suitable for notation ADJ.");
+            DP.getInstance().e("FoldingGraph", "getNotationADJ: FG not suitable for notation ADJ -- missing some vertices, this is only the CC.");
             return "";
         }
         
