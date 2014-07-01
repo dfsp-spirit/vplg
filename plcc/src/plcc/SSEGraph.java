@@ -86,9 +86,14 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     protected Boolean isProteinGraph;             // true if this is a protein graph, false if this is a folding graph (a connected component of the protein graph)    
     protected SSEGraph parent;
        
-    protected Boolean connectedComponentsComputed;
+    protected Boolean connectedComponentsComputedREDKEY;
+    protected Boolean connectedComponentsComputedADJSEQ;
+    
     protected Boolean distancesCalculated;
-    protected ArrayList<FoldingGraph> connectedComponents;
+    /** The connected components of this graph, i.e., the RED/KEY folding graphs. */
+    protected ArrayList<FoldingGraph> connectedComponentsREDKEY;
+    /** The connected components + vertices of the parent graph in between them, i.e., the ADJ/SEQ folding graphs. */
+    protected ArrayList<FoldingGraph> connectedComponentsADJSEQ;
     
     
     protected String pdbid;                               // the PDB ID this graph represents, e.g. "3kmf"
@@ -145,9 +150,11 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         this.distMatrix = new Integer[size][size];      // distances in graph
         this.isProteinGraph = true;
         this.parent = null;
-        this.connectedComponents = new ArrayList<FoldingGraph>();
+        this.connectedComponentsREDKEY = new ArrayList<FoldingGraph>();
         
-        this.connectedComponentsComputed = false;
+        this.connectedComponentsComputedREDKEY = false;
+        this.connectedComponentsComputedADJSEQ = false;
+        
         this.distancesCalculated = false;
 
         adjLists = new ArrayList<ArrayList<Integer>>();

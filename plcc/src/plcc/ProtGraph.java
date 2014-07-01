@@ -94,13 +94,21 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
     /**
      * Determines all connected components of this graph and writes them into the connectedComponents ArrayList.
      * See Cormen et al. 2001, Introduction to Algorithms.
+     * @param includeADJandSEQvertices Whether we compute an ADJ or SEQ folding graph, and thus 
+     * need to include vertices which are NOT part of the connected component. If these vertices
+     * are added, the results are written to connectedComponentsADJSEQ (otherwise to connectedComponentsREDKEY). Technically,
+     * if you set this to true, the results are NOT the connected components of the parent graph anymore.
      */
-    public void computeConnectedComponents() {
+    public void computeConnectedComponents(boolean includeADJandSEQvertices) {
         ArrayList<FoldingGraph> conComps = new ArrayList<FoldingGraph>();
 
         // If the list of SSEs is empty, there are no connected components
         if(this.size < 1) {
-            this.connectedComponents = conComps;
+            if(includeADJandSEQvertices) {
+                this.connectedComponentsADJSEQ = conComps;
+            } else {
+                this.connectedComponentsREDKEY = conComps;
+            }
             return;
         }
 
@@ -218,21 +226,27 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
             int lastIndexOfSSEinParentGraphWhichIsPartOfFG = -1;
             int firstIndexOfSSEinParentGraphWhichIsPartOfFG = -1;
             
+            /** Whether to include all parent graph vertices in the FGs for ADJ and SEQ notations. If false, only vertices between the first and last FG vertex will be added. */
+            Boolean includeAllVerticesInADJandSEQ = false;
             
-            for(Integer j = 0; j < sseList.size(); j++) {
-                // If SSE j is marked to be part of connected component i
-                if(m[j].equals(i)) {
-                    if(firstIndexOfSSEinParentGraphWhichIsPartOfFG == -1) {
-                        // first index not set yet
-                        firstIndexOfSSEinParentGraphWhichIsPartOfFG = j;
-                    }
-                    lastIndexOfSSEinParentGraphWhichIsPartOfFG = j;
-                }
+            if(includeAllVerticesInADJandSEQ) {
+                // add all vertices of the parent PG to this ~CC
+                firstIndexOfSSEinParentGraphWhichIsPartOfFG = 0;
+                lastIndexOfSSEinParentGraphWhichIsPartOfFG = sseList.size() - 1;
             }
-            
-            
-            /** Whether we compute an ADJ or SEQ folding graph, and thus need to include vertices which are NOT part of the connected component. */
-            boolean includeADJandSEQvertices = false;
+            else {
+                // add on the vertices between first and last vertex of the CC
+                for(Integer j = 0; j < sseList.size(); j++) {
+                    // If SSE j is marked to be part of connected component i
+                    if(m[j].equals(i)) {
+                        if(firstIndexOfSSEinParentGraphWhichIsPartOfFG == -1) {
+                            // first index not set yet
+                            firstIndexOfSSEinParentGraphWhichIsPartOfFG = j;
+                        }
+                        lastIndexOfSSEinParentGraphWhichIsPartOfFG = j;
+                    }
+                }
+            }                                   
             
             Integer[] fgVertexIndexInADJ = new Integer[sseList.size()];
             Arrays.fill(fgVertexIndexInADJ, -1);
@@ -330,8 +344,14 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
             conComps.add(fg);
         }
         
-        this.connectedComponents = conComps;
-        this.connectedComponentsComputed = true;
+        if(includeADJandSEQvertices) {
+            this.connectedComponentsADJSEQ = conComps;
+            this.connectedComponentsComputedADJSEQ = true;
+        } else {
+            this.connectedComponentsREDKEY = conComps;
+            this.connectedComponentsComputedREDKEY = true;
+        }
+        
     }
     
     
@@ -342,16 +362,16 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
      * @return the CC as a FoldingGraph (or NULL if this graph has no vertices)
      */
     public FoldingGraph getLargestConnectedComponent() {
-        if(! this.connectedComponentsComputed) {
-            this.computeConnectedComponents();
+        if(! this.connectedComponentsComputedREDKEY) {
+            this.computeConnectedComponents(false);
         }
         
         Integer maxSize = 0;
         Integer indexOfLargestCC = -1;
         
         FoldingGraph fg;
-        for(Integer i = 0;  i < this.connectedComponents.size(); i++) {
-            fg = this.connectedComponents.get(i);
+        for(Integer i = 0;  i < this.connectedComponentsREDKEY.size(); i++) {
+            fg = this.connectedComponentsREDKEY.get(i);
             if(fg.getSize() >= maxSize) {
                 maxSize = fg.getSize();
                 indexOfLargestCC = i;
@@ -359,7 +379,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
         }
         
         if(indexOfLargestCC >= 0) {
-            return(this.connectedComponents.get(indexOfLargestCC));
+            return(this.connectedComponentsREDKEY.get(indexOfLargestCC));
         } else {
             return(null);
         }
@@ -371,13 +391,13 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
      * Returns the number of connected components this graph consists of, computing them first if necessary.
      * @return the number of CCs
      */
-    public Integer numConnectedComponents() {
+    public Integer numConnectedComponentsREDKEY() {
         
-        if( ! this.connectedComponentsComputed) {
-            this.computeConnectedComponents();
+        if( ! this.connectedComponentsComputedREDKEY) {
+            this.computeConnectedComponents(false);
         }
         
-        return(this.connectedComponents.size());
+        return(this.connectedComponentsREDKEY.size());
     }
     
     
@@ -386,8 +406,8 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
      * @return true if it is connected, false otherwise
      */
     @Override public Boolean isConnected() {
-        return(this.numConnectedComponents().equals(1));
-    }
+        return(this.numConnectedComponentsREDKEY().equals(1));
+    }        
     
     
     /**
@@ -395,12 +415,33 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
      * @return the list of CCs as graphs
      */
     public ArrayList<FoldingGraph> getConnectedComponents() {
-        if( ! this.connectedComponentsComputed) {
-            this.computeConnectedComponents();            
+        if( ! this.connectedComponentsComputedREDKEY) {
+            this.computeConnectedComponents(false);            
         }
         
-        return(this.connectedComponents);
+        return(this.connectedComponentsREDKEY);
     }
+    
+    /**
+     * Returns the RED/KEY folding graphs as a list of graphs. Computes them first if this has not yet been done.
+     * @return the list of CCs as graphs
+     */
+    public ArrayList<FoldingGraph> getFoldingGraphsREDKEY() {
+        return(this.getConnectedComponents());
+    }
+    
+    /**
+     * Returns the RED/KEY folding graphs as a list of graphs. Computes them first if this has not yet been done.
+     * @return the list of CCs as graphs
+     */
+    public ArrayList<FoldingGraph> getFoldingGraphsADJSEQ() {
+        if( ! this.connectedComponentsComputedADJSEQ) {
+            this.computeConnectedComponents(true);            
+        }
+        
+        return(this.connectedComponentsADJSEQ);
+    }
+    
 
     /**
      * Generates the key notation (KEY) of this protein graph. Note that this notation differs
