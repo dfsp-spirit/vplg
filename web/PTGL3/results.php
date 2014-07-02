@@ -74,7 +74,7 @@ include('./backend/display_proteins.php');
 		
 		</div><!-- end wrapper -->
 		
-
+		<div id="downloadfile"></div>
 	<?php include('footer.php'); ?>
 		
 
@@ -157,11 +157,12 @@ include('./backend/display_proteins.php');
 					var dataToSend = {'downloadType' : downloadType, 'proteins[]': proteins};	
 					$.ajax({
 						type: "POST",
-						url: "./backend/downloadFiles.php",
+						url: "./backend/createZip.php",
 						data: dataToSend,
 						cache: false,
-						success: function(html){					
+						success: function(html){	
 							console.log(html);
+							window.location = './backend/downloadZip.php?dl='+html;
 						}
 					});
 				}

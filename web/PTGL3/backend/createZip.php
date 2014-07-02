@@ -47,13 +47,14 @@ function create_zip($files = array(),$destination = '',$overwrite = false) {
 		
 		error_log("zip closed (Destination: ".$destination.")");
 		if(file_exists($destination)){
+			echo $destination; 
 			error_log("zip exists ".$destination);
-			header("Content-type: application/zip"); 
+			/* header("Content-type: application/zip"); 
 			header("Content-Disposition: attachment; filename=$destination");
 			header("Content-length: " . filesize($destination));
 			header("Pragma: no-cache"); 
 			header("Expires: 0"); 
-			readfile("$destination");
+			readfile("$destination"); */
 		} else {
 			error_log("ERROR: Zip doesnt exist at ".$destination);
 		}
