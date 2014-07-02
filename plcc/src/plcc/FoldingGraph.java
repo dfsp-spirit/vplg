@@ -1061,15 +1061,15 @@ public class FoldingGraph extends SSEGraph {
         }
         
         if (this.isBifurcated()) {
-            System.err.println("WARNING: #KEY notation not supported for bifurcated graphs. Check before requesting this.");
+            //System.err.println("WARNING: #KEY notation not supported for bifurcated graphs. Check before requesting this.");
             return "";
         }
         if (!this.isConnected()) {
-            System.err.println("WARNING: #KEY notation only supported for connected graphs. (All folding graphs are connected - is this a protein graph instead of a folding graph?)");
+            //System.err.println("WARNING: #KEY notation only supported for connected graphs. (All folding graphs are connected - is this a protein graph instead of a folding graph?)");
             return "";
         }
         if (!this.hasSpatialOrdering()) {
-            System.err.println("WARNING: #KEY notation only supported for graphs with spatial ordering.");
+            //System.err.println("WARNING: #KEY notation only supported for graphs with spatial ordering.");
             return "";
         }
         if (this.size < 1) {
