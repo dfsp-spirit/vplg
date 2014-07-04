@@ -2301,64 +2301,12 @@ public class Main {
                 //System.out.println("        Ignoring folding graph #" + j + " of size " + fg.numVertices() + ", minimum size is " + Settings.getInteger("plcc_I_min_fgraph_size_draw") + ".");
                 continue;
             }
-
-            // DEBUG
-            // fg.calculateDistancesWithinGraph();
-            // fg.printDistMatrix();
-            System.out.println("       *Handling folding Graph #" + j + " containing " + fg.numVertices() + " vertices and " + fg.numEdges() + " edges (" + fg.numSSEContacts() + " SSE contacts).");
             
-            String fileNameWithoutExtension = pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j;
-            String graphFormatsWritten = "";
-            Integer numFormatsWritten = 0;
-            if(Settings.getBoolean("plcc_B_output_GML")) {
-                String gmlfFile = outputDir + fs + fileNameWithoutExtension + ".gml";
-                if(IO.stringToTextFile(gmlfFile, fg.toGraphModellingLanguageFormat())) {
-                    graphFormatsWritten += "gml "; numFormatsWritten++;
-                }
-            }
-            if(Settings.getBoolean("plcc_B_output_TGF")) {
-                String tgfFile = outputDir + fs + fileNameWithoutExtension + ".tgf";
-                if(IO.stringToTextFile(tgfFile, fg.toTrivialGraphFormat())) {
-                    graphFormatsWritten += "tgf "; numFormatsWritten++;
-                }
-            }
-            if(Settings.getBoolean("plcc_B_output_DOT")) {
-                String dotLangFile = outputDir + fs + fileNameWithoutExtension + ".gv";
-                if(IO.stringToTextFile(dotLangFile, fg.toDOTLanguageFormat())) {
-                    graphFormatsWritten += "gv "; numFormatsWritten++;
-                }
-            }
-            if(Settings.getBoolean("plcc_B_output_kavosh")) {
-                String kavoshFile = outputDir + fs + fileNameWithoutExtension + ".kavosh";
-                if(IO.stringToTextFile(kavoshFile, fg.toKavoshFormat())) {
-                    graphFormatsWritten += "kavosh "; numFormatsWritten++;
-                }
-            }
-            // write the SSE info text file for the image (plcc graph format file)
-            if(Settings.getBoolean("plcc_B_output_plcc")) {
-                String plccGraphFile = outputDir + fs + fileNameWithoutExtension + ".plg";
-                if(IO.stringToTextFile(plccGraphFile, fg.toVPLGGraphFormat())) {
-                    graphFormatsWritten += "plg "; numFormatsWritten++;
-                }
-            }                                                                                    
-
-
-            if(numFormatsWritten > 0) {
-                System.out.println("        Exported folding graph #" + j + " in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + new File(outputDir).getAbsolutePath() + fs + "'.");
-            }
-            
-            
-            // write plcc graph format file
-            //String plccGraphFile = outputDir + fs + pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + ".plg";
-            //if(writeStringToFile(plccGraphFile, (fg.toVPLGGraphFormat()))) {
-            //    System.out.println("      Plcc format folding graph file written to '" + plccGraphFile + "'.");
-            //} else {
-            //    DP.getInstance().w("Could not write Plcc format folding graph file to '" + plccGraphFile + "'.");
-            //}
-                                    
+            writeFGGraphStrings(fg, outputDir, j);                                                        
             
             // test spatial ordering, not used for anything atm
             // TODO: remove this, it's only a test and takes time
+            /*
             if(fg.size > 0) { 
                 //System.out.println("        Testing folding graph with " + fg.size + " vertices for spatial ordering...");
                 ArrayList<Integer> spatOrder = fg.getSpatialOrderingOfVertexIndices();
@@ -2376,6 +2324,7 @@ public class Main {
                     System.out.println("        Key notation is: '" + fg.getNotationKEY(true) + "'.");
                 }
             }
+            */
             
             // Draw all folding graphs in all notations
             //List<String> notations = Arrays.asList("KEY", "ADJ", "RED", "SEQ");
@@ -2463,7 +2412,200 @@ public class Main {
         return fgRes;
     }
     
+    /**
+     * Calculates all requested folding graphs for the protein graph (or 'SSE graph') pg. Which graphs are drawn is determined by the 
+     * setting on the command line / configuration file.
+     * This function uses the new FoldingGraphComputationResult and computes separate graphs for ADJ/SEQ and RED/KEY folding graphs.
+     * @param pg the protein graphs
+     * @param outputDir the file system path where to write the image files. Has to exist and be writable.
+     * @return the protein folding graph results, which gives access to the graphs and output files
+     */
+    /*
+    public static ProteinFoldingGraphResults calculateFoldingGraphsForSSEGraphNew(ProtGraph pg, String outputDir) {
+        //System.out.println("Searching connected components in " + graphType + " graph of chain " + c.getPdbChainID() + ".");
+        ArrayList<FoldingGraphComputationResult> fgcs = pg.getFoldingGraphComputationResults();
+        
+        HashMap<Integer, FoldingGraph> ccsList = new HashMap<Integer, FoldingGraph>();
+        for (int i = 0; i < fgcs.size(); i++) {
+            ccsList.put(i, fgcs.get(i).getFgREDandKEY());            
+        }        
+        ProteinFoldingGraphResults fgRes = new ProteinFoldingGraphResults(ccsList);
+        
+        FoldingGraph fg;           // A connected component of a protein graph is a folding graph
+        String fgFile = null;
+        String fs = System.getProperty("file.separator");
 
+        //System.out.println("Found " + ccs.size() + " connected components in " + graphType + " graph of chain " + c.getPdbChainID() + ".");
+        for(Integer j = 0; j < ccs.size(); j++) {
+            Integer fg_number = j + 1;
+            fg = ccs.get(j);
+            String pdbid = fg.pdbid;
+            String chain = fg.chainid;
+            String gt = fg.graphType;
+
+            if(fg.numVertices() < Settings.getInteger("plcc_I_min_fgraph_size_draw")) {
+                //System.out.println("        Ignoring folding graph #" + j + " of size " + fg.numVertices() + ", minimum size is " + Settings.getInteger("plcc_I_min_fgraph_size_draw") + ".");
+                continue;
+            }
+
+            // DEBUG
+            // fg.calculateDistancesWithinGraph();
+            // fg.printDistMatrix();
+            writeFGGraphStrings(fg, outputDir, j);
+            
+            
+            // write plcc graph format file
+            //String plccGraphFile = outputDir + fs + pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + ".plg";
+            //if(writeStringToFile(plccGraphFile, (fg.toVPLGGraphFormat()))) {
+            //    System.out.println("      Plcc format folding graph file written to '" + plccGraphFile + "'.");
+            //} else {
+            //    DP.getInstance().w("Could not write Plcc format folding graph file to '" + plccGraphFile + "'.");
+            //}
+                                    
+            
+            // test spatial ordering, not used for anything atm
+            // TODO: remove this, it's only a test and takes time
+           
+            
+            // Draw all folding graphs in all notations
+            //List<String> notations = Arrays.asList("KEY", "ADJ", "RED", "SEQ");
+            ArrayList<String> notations = new ArrayList<String>();
+
+            if(Settings.getBoolean("plcc_B_foldgraphtype_KEY")) { notations.add(FoldingGraph.FG_NOTATION_KEY); }
+            if(Settings.getBoolean("plcc_B_foldgraphtype_ADJ")) { notations.add(FoldingGraph.FG_NOTATION_ADJ); }
+            if(Settings.getBoolean("plcc_B_foldgraphtype_RED")) { notations.add(FoldingGraph.FG_NOTATION_RED); }
+            if(Settings.getBoolean("plcc_B_foldgraphtype_SEQ")) { notations.add(FoldingGraph.FG_NOTATION_SEQ); }                                                
+
+            if(Settings.getBoolean("plcc_B_draw_graphs")) {
+                System.out.println("        Drawing all supported versions of folding graph #" + j + ".");
+            }
+            
+            // We may need to write the folding graph to the database
+            Long fgDbId = -1L;
+            if(Settings.getBoolean("plcc_B_useDB")) {   
+                
+                try { 
+                    fgDbId = DBManager.writeFoldingGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), fg_number, fg.toGraphModellingLanguageFormat(), fg.toVPLGGraphFormat(), fg.toKavoshFormat(), fg.toDOTLanguageFormat(), fg.getNotationADJ(), fg.getNotationRED(), fg.getNotationKEY(true), fg.getNotationSEQ(), fg.getSSEStringSequential(), fg.containsBetaBarrel()); 
+                    System.out.println("      Inserted '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB, ID=" + fgDbId + ".");
+                }
+                catch(SQLException e) { 
+                    DP.getInstance().e("Main", "Failed to insert '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB: '" + e.getMessage() + "'."); 
+                }
+
+                // assign SSEs in database
+                try {
+                    fgDbId = DBManager.getDBFoldingGraphID(pdbid, chain, gt, fg_number);
+                } catch(SQLException sqlex) {
+                    DP.getInstance().e("Main", "Folding graph #" + fg_number + " not found in DB.");
+                    fgDbId = -1L;
+                }
+                if(fgDbId >= 1) {
+                    try {
+                        int numAssigned = DBManager.assignSSEsToFoldingGraphInOrder(fg.sseList, fgDbId);
+                        System.out.println("      Assigned " + numAssigned + " SSEs to " + gt + " folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' in the DB.");
+                    } catch(SQLException ex) {
+                       DP.getInstance().e("Main", "Could not assign SSEs to graph in the database: '" + ex.getMessage() + "'.");
+                    }
+                } else {
+                    DP.getInstance().e("Main", "Cannot assign SSEs to folding graph #" + fg_number + ", FG not found in DB.");
+                }
+            }
+            
+            for(String notation : notations) {
+
+                if(Settings.getBoolean("plcc_B_draw_graphs")) {
+
+                    String fileNameWithExtension = pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + "_" + notation + ".png";
+                    fgFile = outputDir + System.getProperty("file.separator") + fileNameWithExtension; //Settings.get("plcc_S_img_output_fileext");
+                    if(fg.drawFoldingGraph(notation, fgFile)) {
+                        System.out.println("         -Folding graph #" + j + " of the " + pg.getGraphType() + " graph of chain " + pg.getChainid() + " written to file '" + fgFile + "' in " + notation + " notation.");
+                        
+                        // save image path to database if required
+                        if(Settings.getBoolean("plcc_B_useDB")) {
+                            
+
+                            String dbImagePath = fileNameWithExtension;
+                            if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
+                                dbImagePath = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain) + fs + fileNameWithExtension;
+                            }
+                            //DP.getInstance().d("dbImagePath is '" + dbImagePath + "'.");                            
+                                                        
+     
+                            try {
+                                DBManager.updateFoldingGraphImagePathInDB(fgDbId, DrawTools.IMAGEFORMAT.PNG, notation, dbImagePath);
+                            } catch(SQLException e) {
+                                DP.getInstance().e("Main", "Could not update " + notation + " notation folding graph image path in database: '" + e.getMessage() + "'.");
+                            }
+
+                        }                                                
+                    }
+                    else {
+                        if(Settings.getInteger("plcc_I_debug_level") > 0) {
+                            System.err.println("NOTE: Could not draw notation " + notation + " of folding graph #" + j + " of the " + pg.getGraphType() + " graph of chain " + pg.getChainid() + ". (Tried to write to file '" + fgFile + "'.)");
+                        }
+                    }
+                }
+                else {
+                    //System.out.println("         Image output disabled, not drawing folding graph.");
+                }
+            }
+        }    
+        return fgRes;
+    }
+*/
+    
+
+
+    /**
+     * Writes the folding graph strings to files on the HDD. This does NOT include the PTGL notations, only GML etc.
+     * @param fg the folding graph
+     * @param outputDir the directory where to write the files
+     * @param fgNumber the CC number of this FG (within the parent PG)
+     */
+    public static void writeFGGraphStrings(FoldingGraph fg, String outputDir, int fgNumber) {
+        System.out.println("       *Handling folding Graph #" + fgNumber + " containing " + fg.numVertices() + " vertices and " + fg.numEdges() + " edges (" + fg.numSSEContacts() + " SSE contacts).");
+            String fs = File.separator;
+            String fileNameWithoutExtension = fg.getPdbid() + "_" + fg.getChainid() + "_" + fg.getGraphType() + "_FG_" + fgNumber;
+            String graphFormatsWritten = "";
+            Integer numFormatsWritten = 0;
+            if(Settings.getBoolean("plcc_B_output_GML")) {
+                String gmlfFile = outputDir + fs + fileNameWithoutExtension + ".gml";
+                if(IO.stringToTextFile(gmlfFile, fg.toGraphModellingLanguageFormat())) {
+                    graphFormatsWritten += "gml "; numFormatsWritten++;
+                }
+            }
+            if(Settings.getBoolean("plcc_B_output_TGF")) {
+                String tgfFile = outputDir + fs + fileNameWithoutExtension + ".tgf";
+                if(IO.stringToTextFile(tgfFile, fg.toTrivialGraphFormat())) {
+                    graphFormatsWritten += "tgf "; numFormatsWritten++;
+                }
+            }
+            if(Settings.getBoolean("plcc_B_output_DOT")) {
+                String dotLangFile = outputDir + fs + fileNameWithoutExtension + ".gv";
+                if(IO.stringToTextFile(dotLangFile, fg.toDOTLanguageFormat())) {
+                    graphFormatsWritten += "gv "; numFormatsWritten++;
+                }
+            }
+            if(Settings.getBoolean("plcc_B_output_kavosh")) {
+                String kavoshFile = outputDir + fs + fileNameWithoutExtension + ".kavosh";
+                if(IO.stringToTextFile(kavoshFile, fg.toKavoshFormat())) {
+                    graphFormatsWritten += "kavosh "; numFormatsWritten++;
+                }
+            }
+            // write the SSE info text file for the image (plcc graph format file)
+            if(Settings.getBoolean("plcc_B_output_plcc")) {
+                String plccGraphFile = outputDir + fs + fileNameWithoutExtension + ".plg";
+                if(IO.stringToTextFile(plccGraphFile, fg.toVPLGGraphFormat())) {
+                    graphFormatsWritten += "plg "; numFormatsWritten++;
+                }
+            }                                                                                    
+
+
+            if(numFormatsWritten > 0) {
+                System.out.println("        Exported folding graph #" + fgNumber + " in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + new File(outputDir).getAbsolutePath() + fs + "'.");
+            }
+    }
+    
     /**
      * Determines the PTGL SSE ID for the SSE at sequential position seqNum in the primary sequence.
      *

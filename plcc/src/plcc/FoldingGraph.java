@@ -51,6 +51,43 @@ public class FoldingGraph extends SSEGraph {
     public static final String FG_NOTATION_RED = "RED";
     public static final String FG_NOTATION_SEQ = "SEQ";
     
+    private FoldingGraph sisterFG = null;
+
+    /**
+     * Getter for the sister FoldingGraph.
+     * @return the sister FoldingGraph. If this is a ADJ/SEQ FG, the sister graph is the corresponding RED/KEY FG (and vice versa).
+     */ 
+    public FoldingGraph getSisterFG() {
+        return sisterFG;
+    }
+
+    /**
+     * Sets the sister FoldingGraph. If this is a ADJ/SEQ FG, the sister graph is the corresponding RED/KEY FG (and vice versa).
+     * @param sisterFG the corresponding sister folding graph of this FG
+     * @return whether the graph was set
+     */
+    public boolean setSisterFG(FoldingGraph sisterFG) {
+        if(this.isForADJandSEQNotations) {
+            // this is ADJ/SEQ
+            if(sisterFG.getIsForADJandSEQNotations()) {
+                DP.getInstance().e("FoldingGraph", "Cannot set sister FG of same type (ADJ/SEQ).");
+                return false;
+            } else {
+                this.sisterFG = sisterFG;
+                return true;
+            }
+        } else {
+            // this is RED/KEY
+            if( ! sisterFG.getIsForADJandSEQNotations()) {
+                DP.getInstance().e("FoldingGraph", "Cannot set sister FG of same type (RED/KEY).");
+                return false;
+            } else {
+                this.sisterFG = sisterFG;
+                return true;
+            }
+        }
+    }
+    
     
     
     private Integer foldingGraphNumber = null;
