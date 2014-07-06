@@ -27,6 +27,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Objects;
 import javax.imageio.ImageIO;
 import org.apache.batik.apps.rasterizer.DestinationType;
 import org.apache.batik.apps.rasterizer.SVGConverter;
@@ -622,13 +623,13 @@ public class FoldingGraph extends SSEGraph {
                 // perform rotation
                 newXform.rotate(Math.toRadians(angle), rotationCenterX, rotationCenterY);
                 
-                if(headingsSeqOrder[i] == ORIENTATION_DOWNWARDS) { 
+                if(Objects.equals(headingsSeqOrder[i], ORIENTATION_DOWNWARDS)) { 
                     //ig2.rotate(Math.toRadians(180));                                         
                     ig2.setTransform(newXform);
                     //System.out.println("Rotating canvas before drawing SSE #" + i + " of the list.");
                 }
                 ig2.draw(shape);
-                if(headingsSeqOrder[i] == ORIENTATION_DOWNWARDS) { 
+                if(Objects.equals(headingsSeqOrder[i], ORIENTATION_DOWNWARDS)) { 
                     ig2.setTransform(origXform);
                     //ig2.rotate(Math.toRadians(-180)); 
                     //System.out.println("Rotating canvas back to normal after drawing SSE #" + i + " of the list.");
@@ -639,14 +640,14 @@ public class FoldingGraph extends SSEGraph {
                 //Integer compareToTerminus = s;
                 Integer compareToTerminus = i;
                 Integer ssePos = s;
-                if( (this.closestToCTerminus() == compareToTerminus)  || (this.closestToNTerminus() == compareToTerminus) ) {
-                    if(this.closestToCTerminus() == compareToTerminus) {
-                        System.out.println("    SSE # " + compareToTerminus + " (pos # " + ssePos + ") is closest to C terminus.");
+                if( (Objects.equals(this.closestToCTerminus(), compareToTerminus))  || (Objects.equals(this.closestToNTerminus(), compareToTerminus)) ) {
+                    if(Objects.equals(this.closestToCTerminus(), compareToTerminus)) {
+                        //System.out.println("    SSE # " + compareToTerminus + " (pos # " + ssePos + ") is closest to C terminus.");
                         ig2.drawString("C", currentVertX, (currentVertY + 20));
                     }
                     
-                    if(this.closestToNTerminus() == compareToTerminus) { 
-                        System.out.println("    SSE # " + compareToTerminus + " (pos # " + ssePos + ")  is closest to N terminus.");
+                    if(Objects.equals(this.closestToNTerminus(), compareToTerminus)) { 
+                        //System.out.println("    SSE # " + compareToTerminus + " (pos # " + ssePos + ")  is closest to N terminus.");
                         ig2.drawString("N", currentVertX, (currentVertY + 20));
                     }      
                     
@@ -1090,11 +1091,17 @@ public class FoldingGraph extends SSEGraph {
      * @return the notation as a String or an empty string if this notation is not supported for this graph
      *
      */
-    public String getNotationKEY(Boolean forceLabelSSETypes) {
+    public String getNotationKEY(Boolean forceLabelSSETypes) {               
         
-        if( this.isForADJandSEQNotations) {
-            DP.getInstance().e("FoldingGraph", "getNotationKEY: FG not suitable for notation KEY -- this includes more vertices than only the CC.");
-            return "";
+        if(this.isForADJandSEQNotations) {
+            FoldingGraph sisterGraph = this.getSisterFG();
+            if(sisterGraph == null) {
+                DP.getInstance().e("FoldingGraph", "getNotationKEY: FG not suitable for notation KEY and sister graph is not set.");
+                return "";
+            }
+            else {
+                return sisterGraph.getNotationKEY(forceLabelSSETypes);
+            }
         }
         
         if (this.isBifurcated()) {
@@ -1169,14 +1176,85 @@ public class FoldingGraph extends SSEGraph {
         }
     }
     
+    /**
+     * Wrapper function to get the requested PTGL folding graph string notation.
+     * @param notation the notation, use constants in FoldingGraph class
+     * @return the PTGL FG notation string
+     */
+    public String getPTGLNotation(String notation) {
+        if(notation.equals(FoldingGraph.FG_NOTATION_ADJ)) {
+            return this.getNotationADJ();
+        }
+        else if(notation.equals(FoldingGraph.FG_NOTATION_RED)) {
+            return this.getNotationRED();
+        }
+        else if(notation.equals(FoldingGraph.FG_NOTATION_KEY)) {
+            return this.getNotationKEY(true);
+        }
+        else if(notation.equals(FoldingGraph.FG_NOTATION_SEQ)) {
+            return this.getNotationSEQ();
+        }
+        else {
+            DP.getInstance().e("FoldingGraph", " getPTGLNotation(): Invalid PTGL notation string, returning empty notation.");
+            return "";
+        }
+    }
+    
+    /**
+     * Determines the size (i.e., number of vertices) of the ADJ/SEQ folding graph.
+     * @return the size (i.e., number of vertices) of the ADJ/SEQ folding graph, or -1 if the proper FG is not set.
+     */
+    public int getGraphSizeADJandSEQ() {
+        if(this.isForADJandSEQNotations) {
+            return this.getSize();
+        }
+        
+        FoldingGraph sisterGraph = this.getSisterFG();
+        if(sisterGraph == null) {
+            DP.getInstance().w("FoldingGraph", "getGraphSizeADJandSEQ: FG not suitable for notations ADJ/SEQ and sister graph is not set.");
+            return -1;
+        }
+        else {
+            return sisterGraph.getSize();
+        }        
+    }
+    
+    /**
+     * Determines the size (i.e., number of vertices) of the RED/KEY folding graph.
+     * @return the size (i.e., number of vertices) of the RED/KEY folding graph, or -1 if the proper FG is not set.
+     */
+    public int getGraphSizeREDandKEY() {
+        if( ! this.isForADJandSEQNotations) {
+            return this.getSize();
+        }
+        
+        FoldingGraph sisterGraph = this.getSisterFG();
+        if(sisterGraph == null) {
+            DP.getInstance().w("FoldingGraph", "getGraphSizeREDandKEY: FG not suitable for notations RED/KEY and sister graph is not set.");
+            return -1;
+        }
+        else {
+            return sisterGraph.getSize();
+        }        
+    }
     
     
+    /**
+     * Implements the PTGL folding graph string notation SEQ.
+     * @return the SEQ notation PTGL FG string
+     */
     public String getNotationSEQ() {
         StringBuilder sb = new StringBuilder();
         
         if( ! this.isForADJandSEQNotations) {
-            DP.getInstance().e("FoldingGraph", "getNotationSEQ: FG not suitable for notation SEQ -- missing some vertices, this is only the CC.");
-            return "";
+            FoldingGraph sisterGraph = this.getSisterFG();
+            if(sisterGraph == null) {
+                DP.getInstance().e("FoldingGraph", "getNotationSEQ: FG not suitable for notation SEQ and sister graph is not set.");
+                return "";
+            }
+            else {
+                return sisterGraph.getNotationSEQ();
+            }
         }
         
         sb.append("[");
@@ -1212,14 +1290,20 @@ public class FoldingGraph extends SSEGraph {
     }
 
     /**
-     * Implements PTGL FG notation.
-     * @return 
+     * Implements PTGL FG notation RED.
+     * @return the RED notation PTGL FG string
      */
-    public String getNotationRED() {
+    public String getNotationRED() {               
         
         if(this.isForADJandSEQNotations) {
-            DP.getInstance().e("FoldingGraph", "getNotationRED: FG not suitable for notation RED.");
-            return "";
+            FoldingGraph sisterGraph = this.getSisterFG();
+            if(sisterGraph == null) {
+                DP.getInstance().e("FoldingGraph", "getNotationRED: FG not suitable for notation RED and sister graph is not set.");
+                return "";
+            }
+            else {
+                return sisterGraph.getNotationRED();
+            }
         }
         
         StringBuilder sb = new StringBuilder();
@@ -1227,13 +1311,17 @@ public class FoldingGraph extends SSEGraph {
                
         SSE currentSSE; SSE neighbor;
         ArrayList<Integer> neighborIndices; // these are ordered N to C terminus
-        
+        boolean neighborAdded;
         for(int i = 0; i < this.sseList.size(); i++) {
             currentSSE = this.sseList.get(i);
             sb.append(currentSSE.getSseFgNotation());
+            if(i < this.sseList.size() - 1) {
+                sb.append(",");
+            }
             
             // iterate through all spatial neighbors
             neighborIndices = this.neighborsOf(i);
+            neighborAdded = (neighborIndices.size() > 0);
             for(int j = 0; j < neighborIndices.size(); j++) {
                 neighbor = this.sseList.get(neighborIndices.get(j)); 
                 if(j < neighborIndices.size() - 1) {
@@ -1243,6 +1331,11 @@ public class FoldingGraph extends SSEGraph {
                 sb.append(dist);
                 sb.append(neighbor.getSseFgNotation());
                 if(j < neighborIndices.size() - 1) {
+                    sb.append(",");
+                }
+            }
+            if(neighborAdded) {
+                if(i < this.sseList.size() - 1) {
                     sb.append(",");
                 }
             }
@@ -1260,8 +1353,14 @@ public class FoldingGraph extends SSEGraph {
     public String getNotationADJ() {
         
         if( ! this.isForADJandSEQNotations) {
-            DP.getInstance().e("FoldingGraph", "getNotationADJ: FG not suitable for notation ADJ -- missing some vertices, this is only the CC.");
-            return "";
+            FoldingGraph sisterGraph = this.getSisterFG();
+            if(sisterGraph == null) {
+                DP.getInstance().e("FoldingGraph", "getNotationADJ: FG not suitable for notation ADJ and sister graph is not set.");
+                return "";
+            }
+            else {
+                return sisterGraph.getNotationADJ();
+            }
         }
         
         StringBuilder sb = new StringBuilder();
@@ -1273,9 +1372,13 @@ public class FoldingGraph extends SSEGraph {
         for(int i = 0; i < this.sseList.size(); i++) {
             currentSSE = this.sseList.get(i);
             sb.append(currentSSE.getSseFgNotation());
+            if(i < this.sseList.size() - 1) {
+                sb.append(",");
+            }
             
             // iterate through all spatial neighbors
             neighborIndices = this.neighborsOf(i);
+            boolean neighborAdded = (neighborIndices.size() > 0);
             for(int j = 0; j < neighborIndices.size(); j++) {
                 neighbor = this.sseList.get(neighborIndices.get(j)); 
                 if(j < neighborIndices.size() - 1) {
@@ -1285,6 +1388,11 @@ public class FoldingGraph extends SSEGraph {
                 sb.append(dist);
                 sb.append(neighbor.getSseFgNotation());
                 if(j < neighborIndices.size() - 1) {
+                    sb.append(",");
+                }
+            }
+            if(neighborAdded) {
+                if(i < this.sseList.size() - 1) {
                     sb.append(",");
                 }
             }

@@ -8,6 +8,7 @@
 
 package plcc;
 
+import java.util.ArrayList;
 import tools.DP;
 
 /**
@@ -78,4 +79,20 @@ public class FoldingGraphComputationResult {
         return this.fgREDandKEY.getNotationKEY(true);
     }
     
+    
+    public static ArrayList<FoldingGraph> getFoldingGraphsADJandSEQFromFGCR(ArrayList<FoldingGraphComputationResult> fgcrList) {
+        ArrayList<FoldingGraph> list = new ArrayList<FoldingGraph>();
+        for(int i = 0; i < fgcrList.size(); i++) {
+            list.add(fgcrList.get(i).getFgADJandSEQ());
+        }
+        return list;
+    }
+    
+    public static ArrayList<FoldingGraph> getFoldingGraphsREDandKEYFromFGCR(ArrayList<FoldingGraphComputationResult> fgcrList) {
+        ArrayList<FoldingGraph> list = new ArrayList<FoldingGraph>();
+        for(int i = 0; i < fgcrList.size(); i++) {
+            list.add(fgcrList.get(i).getFgREDandKEY());
+        }
+        return list;
+    }
 }

@@ -2277,11 +2277,14 @@ public class Main {
      */
     public static ProteinFoldingGraphResults calculateFoldingGraphsForSSEGraph(ProtGraph pg, String outputDir) {
         //System.out.println("Searching connected components in " + graphType + " graph of chain " + c.getPdbChainID() + ".");
-        ArrayList<FoldingGraph> ccs = pg.getConnectedComponents();
+        
+        ArrayList<FoldingGraphComputationResult> fgcs = pg.getFoldingGraphComputationResults();
+        //ArrayList<FoldingGraph> ccs = pg.getConnectedComponents();
+        ArrayList<FoldingGraph> foldingGraphsREDKEY = FoldingGraphComputationResult.getFoldingGraphsREDandKEYFromFGCR(fgcs);
         
         HashMap<Integer, FoldingGraph> ccsList = new HashMap<Integer, FoldingGraph>();
-        for (int i = 0; i < ccs.size(); i++) {
-            ccsList.put(i, ccs.get(i));            
+        for (int i = 0; i < foldingGraphsREDKEY.size(); i++) {
+            ccsList.put(i, foldingGraphsREDKEY.get(i));            
         }        
         ProteinFoldingGraphResults fgRes = new ProteinFoldingGraphResults(ccsList);
         
@@ -2290,9 +2293,10 @@ public class Main {
         String fs = System.getProperty("file.separator");
 
         //System.out.println("Found " + ccs.size() + " connected components in " + graphType + " graph of chain " + c.getPdbChainID() + ".");
-        for(Integer j = 0; j < ccs.size(); j++) {
+        System.out.println("      --- Handling all " + foldingGraphsREDKEY.size() + "folding graphs of the " + pg.graphType + " protein graph ---");
+        for(Integer j = 0; j < foldingGraphsREDKEY.size(); j++) {
             Integer fg_number = j + 1;
-            fg = ccs.get(j);
+            fg = foldingGraphsREDKEY.get(j);
             String pdbid = fg.pdbid;
             String chain = fg.chainid;
             String gt = fg.graphType;
@@ -2301,6 +2305,7 @@ public class Main {
                 //System.out.println("        Ignoring folding graph #" + j + " of size " + fg.numVertices() + ", minimum size is " + Settings.getInteger("plcc_I_min_fgraph_size_draw") + ".");
                 continue;
             }
+            
             
             writeFGGraphStrings(fg, outputDir, j);                                                        
             
@@ -2355,7 +2360,7 @@ public class Main {
                 try {
                     fgDbId = DBManager.getDBFoldingGraphID(pdbid, chain, gt, fg_number);
                 } catch(SQLException sqlex) {
-                    DP.getInstance().e("Main", "Folding graph #" + fg_number + " not found in DB.");
+                    DP.getInstance().e("Main", "Folding graph #" + fg_number + " not found in DB: '" + sqlex.getMessage() + "'.");
                     fgDbId = -1L;
                 }
                 if(fgDbId >= 1) {
@@ -2370,8 +2375,15 @@ public class Main {
                 }
             }
             
+            System.out.println("        -- Handling all " + notations.size() + " notations of the " + pg.getGraphType() + " FG #" + j + "--");
+            System.out.println("          At FG #" + j + ", sizeADJSEQ=" + fg.getGraphSizeADJandSEQ() + ", sizeREDKEY=" + fg.getGraphSizeREDandKEY() + ".");
             for(String notation : notations) {
-
+                
+                // compute PTGL folding graph notation strings
+                System.out.println("          FG #" + j + " notation " + notation + " is: '" + fg.getPTGLNotation(notation) + "'");
+                
+                
+                // draw graphs
                 if(Settings.getBoolean("plcc_B_draw_graphs")) {
 
                     String fileNameWithExtension = pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + "_" + notation + ".png";
@@ -2563,6 +2575,7 @@ public class Main {
      * @param fgNumber the CC number of this FG (within the parent PG)
      */
     public static void writeFGGraphStrings(FoldingGraph fg, String outputDir, int fgNumber) {
+        
         System.out.println("       *Handling folding Graph #" + fgNumber + " containing " + fg.numVertices() + " vertices and " + fg.numEdges() + " edges (" + fg.numSSEContacts() + " SSE contacts).");
             String fs = File.separator;
             String fileNameWithoutExtension = fg.getPdbid() + "_" + fg.getChainid() + "_" + fg.getGraphType() + "_FG_" + fgNumber;

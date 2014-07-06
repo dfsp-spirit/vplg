@@ -415,8 +415,13 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
             return results;
         }
         
+        FoldingGraph adjGraph; FoldingGraph redGraph;
         for(int i = 0; i < fgsADJSEQ.size(); i++) {
-            results.add(new FoldingGraphComputationResult(fgsADJSEQ.get(i), fgsREDKEY.get(i)));
+            adjGraph = fgsADJSEQ.get(i);
+            redGraph = fgsREDKEY.get(i);
+            adjGraph.setSisterFG(redGraph);
+            redGraph.setSisterFG(adjGraph);
+            results.add(new FoldingGraphComputationResult(adjGraph, redGraph));
         }
         
         return results;

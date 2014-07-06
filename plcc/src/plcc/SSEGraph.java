@@ -2185,9 +2185,9 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         }
         
         StringBuilder sb = new StringBuilder();
-        sb.append("Output graph files: ");
+        sb.append("      Output graph files: ");
         for(IMAGEFORMAT format : resultFilesByFormat.keySet()) {
-            sb.append(format.toString() + " => " + resultFilesByFormat.get(format) + " ");
+            sb.append("(").append(format.toString()).append(" => ").append(resultFilesByFormat.get(format)).append(") ");
         }
         System.out.println(sb.toString());
         return resultFilesByFormat;
