@@ -2293,7 +2293,7 @@ public class Main {
         String fs = System.getProperty("file.separator");
 
         //System.out.println("Found " + ccs.size() + " connected components in " + graphType + " graph of chain " + c.getPdbChainID() + ".");
-        System.out.println("      --- Handling all " + foldingGraphsREDKEY.size() + "folding graphs of the " + pg.graphType + " protein graph ---");
+        System.out.println("      --- Handling all " + foldingGraphsREDKEY.size() + " folding graphs of the " + pg.graphType + " protein graph ---");
         for(Integer j = 0; j < foldingGraphsREDKEY.size(); j++) {
             Integer fg_number = j + 1;
             fg = foldingGraphsREDKEY.get(j);

@@ -1289,12 +1289,20 @@ public class FoldingGraph extends SSEGraph {
         
     }
 
+    
+    //TODO: continue here
+    private int determineNotationStartVertexADJ() {
+        int startIndex = -1;
+        //if(this.)
+        return startIndex;
+    }
+    
     /**
      * Implements PTGL FG notation RED.
      * @return the RED notation PTGL FG string
      */
     public String getNotationRED() {               
-        
+        // TODO: mark the vertices which were already visited, use the BFS algorithm instead of sequential iteration
         if(this.isForADJandSEQNotations) {
             FoldingGraph sisterGraph = this.getSisterFG();
             if(sisterGraph == null) {
@@ -1327,7 +1335,7 @@ public class FoldingGraph extends SSEGraph {
                 if(j < neighborIndices.size() - 1) {
                     sb.append("-");
                 }
-                Integer dist = this.computeDistanceSequentialByIndices(i, j);
+                Integer dist = this.computeDistanceSequentialByIndices(i, neighborIndices.get(j));
                 sb.append(dist);
                 sb.append(neighbor.getSseFgNotation());
                 if(j < neighborIndices.size() - 1) {
@@ -1382,9 +1390,9 @@ public class FoldingGraph extends SSEGraph {
             for(int j = 0; j < neighborIndices.size(); j++) {
                 neighbor = this.sseList.get(neighborIndices.get(j)); 
                 if(j < neighborIndices.size() - 1) {
-                    sb.append("-");
+                    sb.append("-"); // go back if there are more neighbors
                 }
-                Integer dist = this.computeDistanceSequentialByIndices(i, j);
+                Integer dist = this.computeDistanceSequentialByIndices(i, neighborIndices.get(j));
                 sb.append(dist);
                 sb.append(neighbor.getSseFgNotation());
                 if(j < neighborIndices.size() - 1) {
