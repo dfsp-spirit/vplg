@@ -486,7 +486,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
         SSE v;
         for(int i = 0; i < this.size; i++) {
             v = this.getVertex(i);
-            sb.append(String.format("%s       %d       %d       %d", v.getPLCCSSELabel(), v.getLength(), v.getStartDsspNum(), v.getEndDsspNum()));
+            sb.append(String.format("%s\t%d\t%d\t%d", v.getPLCCSSELabel(), v.getLength(), v.getStartDsspNum(), v.getEndDsspNum()));
             sb.append("\n");
         }
         
@@ -499,7 +499,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
             indexW = e[1];
             v = this.getVertex(indexV);
             w = this.getVertex(indexW);
-            sb.append(String.format("%d %d %s %s", indexV, indexW, this.getContactTypeStringPTGLGraph(indexV, indexW), ("" + v.getPLCCSSELabel() + w.getPLCCSSELabel())));
+            sb.append(String.format("%d\t%d\t%s\t%s", indexV, indexW, this.getContactTypeStringPTGLGraph(indexV, indexW), ("" + v.getPLCCSSELabel() + w.getPLCCSSELabel())));
             sb.append("\n");
         }
         
