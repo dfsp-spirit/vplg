@@ -27,6 +27,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 import javax.imageio.ImageIO;
 import org.apache.batik.apps.rasterizer.DestinationType;
@@ -51,6 +52,9 @@ public class FoldingGraph extends SSEGraph {
     public static final String FG_NOTATION_ADJ = "ADJ";
     public static final String FG_NOTATION_RED = "RED";
     public static final String FG_NOTATION_SEQ = "SEQ";
+
+    /** Names for the folds (folding graphs) by index of the CC. The first CC is called 'A', the second 'B', and so on. */
+    public static final String foldNames = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
     
     private FoldingGraph sisterFG = null;
 
@@ -109,6 +113,19 @@ public class FoldingGraph extends SSEGraph {
     
     public void setForADJandSEQ(Boolean b) {
         this.isForADJandSEQNotations = b;
+    }
+    
+    public String[] getPTGLNotationsPerl() {
+        
+        int ADJ = 0;    // array indices
+        int RED = 1;
+        int KEY = 2;
+        int SEQ = 3;
+        
+        String[] notations = new String[4];
+        Arrays.fill(notations, "");
+        
+        return notations;
     }
     
     /**

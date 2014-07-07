@@ -469,6 +469,42 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
         return(this.connectedComponentsADJSEQ);
     }
     
+    /**
+     * Creates a .graph file in the notation that is used by the Perl script by Patrick. The script
+     * computes the PTGL notations from this format.
+     * @return the graph in the PTGL .graph file format
+     */
+    public String toPTGLGraphFormatPerl() {
+        StringBuilder sb = new StringBuilder();
+        
+        // header
+        sb.append("chains: 1\n");
+        sb.append("# protein: ").append(this.pdbid).append(this.chainid).append("\n");
+        sb.append("# SSEs: ").append(this.getSize()).append("\n");
+        
+        // vertices
+        SSE v;
+        for(int i = 0; i < this.size; i++) {
+            v = this.getVertex(i);
+            sb.append(String.format("%s       %d       %d       %d", v.getPLCCSSELabel(), v.getLength(), v.getStartDsspNum(), v.getEndDsspNum()));
+            sb.append("\n");
+        }
+        
+        // edges
+        SSE w;
+        int indexV; int indexW;
+        sb.append("# SSE contacts:\n");
+        for(Integer[] e : this.getEdgeList()) {
+            indexV = e[0];
+            indexW = e[1];
+            v = this.getVertex(indexV);
+            w = this.getVertex(indexW);
+            sb.append(String.format("%d %d %s %s", indexV, indexW, this.getContactTypeStringPTGLGraph(indexV, indexW), ("" + v.getPLCCSSELabel() + w.getPLCCSSELabel())));
+            sb.append("\n");
+        }
+        
+        return sb.toString();
+    }
 
     /**
      * Generates the key notation (KEY) of this protein graph. Note that this notation differs

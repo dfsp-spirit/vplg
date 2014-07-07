@@ -57,8 +57,8 @@ public class Residue implements java.io.Serializable {
 
     /**
      * Constructs a new residue with PDB residue number 'prn' and DSSP residue number 'drn'.
-     * @param prn
-     * @param drn 
+     * @param prn the PDB residue number
+     * @param drn the DSSP residue number
      */
     public Residue(Integer prn, Integer drn) {
         atoms = new ArrayList<Atom>();

@@ -3060,6 +3060,33 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     }
     
     /**
+     * Returns the PTGL .graph file contact type string for the contact between the SSEs with indices i and j.
+     * @param i index of the first SSE
+     * @param j index of the second SSE
+     * @return the spatial relation of i and j, as a PTGL .graph format string
+     */
+    public String getContactTypeStringPTGLGraph(Integer i, Integer j) {
+        int r = this.matrix[i][j];
+        String res;
+        if(r == SpatRel.MIXED) {
+            return "X";
+        }
+        else if(r == SpatRel.PARALLEL) {
+            return "P";
+        }
+        else if(r == SpatRel.ANTIPARALLEL) {
+            return "A";
+        }
+        else if(r == SpatRel.LIGAND) {
+            return "L";
+        }
+        else {
+            DP.getInstance().e("SSEGraph", "getContactTypeStringPTGLGraph(): No PTGL string known for contact type int = " + r + ".");
+            return "?";
+        }
+    }
+    
+    /**
      * Returns the SSEString of the graph in spatial order if this graph has such an order, e.g., "HHEHEHEHEHEHHEEHL".
      * @return the SSEString in spatial order or the empty string "" if no such order exists for this graph
      */

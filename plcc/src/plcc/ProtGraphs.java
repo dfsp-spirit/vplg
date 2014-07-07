@@ -12,6 +12,7 @@ package plcc;
 import tools.DP;
 import java.io.*;
 import java.util.*;
+import tools.PlccUtilities;
 
 /**
  * This is the static I/O class for the ProtGraph class. It allows you to read ProtGraphs from files and write them
@@ -643,6 +644,168 @@ public class ProtGraphs {
         pg.setMetaData(getMetaData(graphString));
         return(pg);
 
+    }
+    
+   
+    
+    
+    
+    public static ProtGraph generateRandomPG(int numVerts, String graphType, String chain, String pdbid) {
+        
+        double edgeProb = 0.05;
+        
+        ArrayList<SSE> vertices = new ArrayList<SSE>();
+        SSE sse;
+        int sseType;
+        double r;
+        Residue res;
+        // draw the length (in AAs) for all the SSEs
+        int[] sseLength = new int[numVerts];
+        int[] sseStartNumDSSP = new int[numVerts];
+        int[] sseEndNumDSSP = new int[numVerts];
+        int currentPos = 0;
+        int randLength;
+        int randCoiledRegionLength;
+        for (int i = 0; i < numVerts; i++) {
+            randLength = PlccUtilities.randInt(6, 20);
+            sseLength[i] = randLength;
+            sseStartNumDSSP[i] = currentPos;
+            sseEndNumDSSP[i] = currentPos + randLength -1;
+            currentPos = currentPos + randLength;
+            
+            // skip some DSSP numbers, this may be a coiled region which does not occur in the SSE residues
+            randCoiledRegionLength = PlccUtilities.randInt(4, 8);
+            currentPos += randCoiledRegionLength;
+        }
+        
+        // generate SSEs
+        for (int i = 0; i < numVerts; i++) {
+            if(graphType.equals(ProtGraph.GRAPHTYPE_ALPHA)) {
+                sseType = SSE.SSECLASS_HELIX;
+            }
+            else if(graphType.equals(ProtGraph.GRAPHTYPE_BETA)) {
+                sseType = SSE.SSECLASS_BETASTRAND;
+            }
+            else if(graphType.equals(ProtGraph.GRAPHTYPE_ALBE)) {                
+                sseType = PlccUtilities.pickOneRandomlyUniformFrom(new int[]{ SSE.SSECLASS_HELIX, SSE.SSECLASS_BETASTRAND });
+            }
+            else if(graphType.equals(ProtGraph.GRAPHTYPE_ALPHALIG)) {
+                sseType = SSE.SSECLASS_HELIX;
+                if(Math.random() > 0.8) {
+                    sseType = PlccUtilities.pickOneRandomlyUniformFrom(new int[]{ SSE.SSECLASS_HELIX, SSE.SSECLASS_LIGAND });
+                }                
+            }
+            else if(graphType.equals(ProtGraph.GRAPHTYPE_BETALIG)) {
+                sseType = SSE.SSECLASS_BETASTRAND;
+                if(Math.random() > 0.8) {
+                    sseType = PlccUtilities.pickOneRandomlyUniformFrom(new int[]{ SSE.SSECLASS_BETASTRAND, SSE.SSECLASS_LIGAND });                    
+                }
+            }
+            else if(graphType.equals(ProtGraph.GRAPHTYPE_ALBELIG)) {                
+                sseType = PlccUtilities.pickOneRandomlyUniformFrom(new int[]{ SSE.SSECLASS_HELIX, SSE.SSECLASS_BETASTRAND });
+                if(Math.random() > 0.7) {
+                    sseType = PlccUtilities.pickOneRandomlyUniformFrom(new int[]{ SSE.SSECLASS_HELIX, SSE.SSECLASS_BETASTRAND, SSE.SSECLASS_LIGAND });                
+                }
+            }
+            else {
+                DP.getInstance().e("", "Invalid graph type, returning null.");
+                return null;
+            }
+                
+            sse = new SSE(sseType);
+            
+            // fill in Residue info for the SSE
+            int resNumOffset = 0;
+            int dsspResNum, pdbResNum;
+            for(int j = 0; j < sseLength[i]; j++) {                
+                // create Residue
+                dsspResNum = sseStartNumDSSP[i] + resNumOffset;
+                pdbResNum = dsspResNum;
+                res = new Residue(dsspResNum, pdbResNum);
+                res.setAAName1("?");                                                                      // see comment on AA sequence above
+                res.setChainID(chain);
+                res.setiCode(" ");
+                
+                // add Residue to SSE
+                sse.addResidue(res);                
+                
+                resNumOffset++;
+            }
+            
+            // set other SSE info
+            sse.setSeqSseChainNum(i);
+            
+            // add the SSE to the list
+            vertices.add(sse);  
+            
+        }
+        
+        
+        // create PG
+        ProtGraph pg = new ProtGraph(vertices);
+        pg.setInfo(pdbid, chain, graphType);
+        
+        
+        // add the edges
+        int vType, wType, spatRel;
+        for(int i = 0; i < pg.getSize(); i++) {
+            for(int j = 0; j < pg.getSize(); j++) {
+                
+                if(i == j) {
+                    continue;   // no self edges
+                }
+                
+                if(Math.random() < edgeProb) {
+                    // add an edge
+                    vType = pg.getVertex(i).getSSETypeInt();
+                    wType = pg.getVertex(j).getSSETypeInt();
+                    
+                    if(vType == SSE.SSECLASS_LIGAND || wType == SSE.SSECLASS_LIGAND) {
+                        spatRel = SpatRel.LIGAND;                        
+                    }
+                    else {
+                        spatRel = PlccUtilities.pickOneRandomlyUniformFrom(new int[] { SpatRel.ANTIPARALLEL, SpatRel.PARALLEL, SpatRel.MIXED });
+                    }
+                    
+                    pg.addContact(i, j, spatRel);
+                }
+            }            
+        }
+        
+        
+        return pg;
+    }
+    
+    
+    /**
+     * Main for testing only.
+     * @param args ignored
+     */
+    public static void main(String[] args) {
+        ProtGraph pg;
+        String pgInfo;
+        
+        System.out.println("---Generating random alpha PG...");
+        pg = ProtGraphs.generateRandomPG(12, ProtGraph.GRAPHTYPE_ALPHA, "A", "f4k3");
+        pgInfo = "PG(V=" + pg.getSize() + ", E=" + pg.getEdgeList().size() + "):\n";
+        System.out.println(pgInfo + pg.toPTGLGraphFormatPerl() + "\n");
+        
+        System.out.println("---Generating random beta PG...");
+        pg = ProtGraphs.generateRandomPG(12, ProtGraph.GRAPHTYPE_BETA, "A", "f4k3");
+        pgInfo = "PG(V=" + pg.getSize() + ", E=" + pg.getEdgeList().size() + "):\n";
+        System.out.println(pgInfo + pg.toPTGLGraphFormatPerl() + "\n");
+        
+        System.out.println("---Generating random albe PG...");
+        pg = ProtGraphs.generateRandomPG(12, ProtGraph.GRAPHTYPE_ALBE, "A", "f4k3");
+        pgInfo = "PG(V=" + pg.getSize() + ", E=" + pg.getEdgeList().size() + "):\n";
+        System.out.println(pgInfo + pg.toPTGLGraphFormatPerl() + "\n");
+        
+        System.out.println("---Generating random albelig PG...");
+        pg = ProtGraphs.generateRandomPG(12, ProtGraph.GRAPHTYPE_ALBELIG, "A", "f4k3");
+        pgInfo = "PG(V=" + pg.getSize() + ", E=" + pg.getEdgeList().size() + "):\n";
+        System.out.println(pgInfo + pg.toPTGLGraphFormatPerl() + "\n");
+        
+        
     }
 
 
