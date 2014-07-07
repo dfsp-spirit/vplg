@@ -471,7 +471,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
     
     /**
      * Creates a .graph file in the notation that is used by the Perl script by Patrick. The script
-     * computes the PTGL notations from this format.
+     * computes the PTGL notations from this format. Note that .graph is the input format for Patrick's PTGL notation Perl script.
      * @return the graph in the PTGL .graph file format
      */
     public String toPTGLGraphFormatPerl() {

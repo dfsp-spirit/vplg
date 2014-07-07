@@ -3061,6 +3061,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     
     /**
      * Returns the PTGL .graph file contact type string for the contact between the SSEs with indices i and j.
+     * Note that .graph is the input format for Patrick's PTGL notation Perl script.
      * @param i index of the first SSE
      * @param j index of the second SSE
      * @return the spatial relation of i and j, as a PTGL .graph format string
