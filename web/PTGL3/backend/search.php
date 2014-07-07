@@ -1,4 +1,13 @@
 <?php
+/**search.php
+ * 
+ * Author: Daniel Bruneß <dbruness@gmail.com>
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
 
 ini_set('display_errors',1);
 ini_set('display_startup_errors',1);
@@ -13,11 +22,7 @@ function get_cath_link($pdbid, $chain = null) {
   }
 }
 
-// Define variables
-
 $db_config = include('config.php');     //TODO: Sichern?
-
-phpinfo();
 
 // try to get POST data
 $logic = "OR";
@@ -47,25 +52,76 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 	$db = pg_connect($conn_string)
 					or die($db_config['db'] . ' -> Connection error: ' . pg_last_error() . pg_result_error() . pg_result_error_field() . pg_result_status() . pg_connection_status() );            
 	
-	#TODO change queries
-	$query = "SELECT * FROM plcc_protein, plcc_chain, plcc_nm_ligandtochain WHERE ";
+	
+	$firstQuerySet = false;
+	$query = "";
+	
 	if (isset($keyword) && $keyword != "") {
-		$query .= "plcc_protein.pdb_id LIKE '%".$keyword."%' 
-					OR plcc_protein.header LIKE '%".strtoupper($keyword)."%' ".$logic." "; 
-	};
-	if (isset($pdbid) && $pdbid != "") {   $query .= "plcc_protein.pdb_id LIKE '%".$pdbid."%' ".$logic." "; };
-	if (isset($title) && $title != "") {   $query .= "plcc_protein.title LIKE '%".strtoupper($title)."%' ".$logic." "; };
-	if (isset($hasligand) && $hasligand == "1") {
-		$query .= "ligandtochain_ligandname3 IS NOT NULL
-					AND plcc_nm_ligandtochain.ligandtochain_chainid = plcc_chain.chain_id 
-					AND plcc_chain.pdb_id = plcc_protein.pdb_id ".$logic." "; 
-	};
+		$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
+				   FROM plcc_chain c
+				   INNER JOIN plcc_protein p
+				   ON p.pdb_id = c.pdb_id 
+				   WHERE p.pdb_id LIKE '%".$keyword."%' 
+				   OR p.header LIKE '%".strtoupper($keyword)."%'
+				   ORDER BY pdb_id, chain_name";
+		$firstQuerySet = true; };
+	
+	if (isset($pdbid) && $pdbid != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
+				   FROM plcc_chain c
+				   INNER JOIN plcc_protein p
+				   ON p.pdb_id = c.pdb_id 
+				   WHERE p.pdb_id = '".$pdbid."'
+				   ORDER BY pdb_id, chain_name";
+		$firstQuerySet = true; };
+	
+	if (isset($title) && $title != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
+				   FROM plcc_chain c
+				   INNER JOIN plcc_protein p
+				   ON p.pdb_id = c.pdb_id 
+				   WHERE p.title = '".strtoupper($title)."'
+				   ORDER BY pdb_id, chain_name";
+		$firstQuerySet = true; };
+	
+	if (isset($hasligand) && $hasligand != "null") {
+		if($hasligand == "1") {
+			$operator = " NOT ";
+		} else if ($hasligand == "0"){
+			$operator = " ";
+		}
+		
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
+				   FROM plcc_nm_ligandtochain l
+				   INNER JOIN plcc_chain c ON l.ligandtochain_chainid = c.chain_id
+				   INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id 
+				   WHERE l.ligandtochain_ligandname3 IS".$operator."NULL
+				   ORDER BY pdb_id, chain_name"; 
+		$firstQuerySet = true; };
+
 	if (isset($ligandname) && $ligandname != "") { 
-		$query .= "ligandtochain_ligandname3 LIKE '%".$ligandname."' 
-					AND plcc_nm_ligandtochain.ligandtochain_chainid = plcc_chain.chain_id 
-					AND plcc_chain.pdb_id = plcc_protein.pdb_id ".$logic." "; 
-	};
-	if (isset($molecule) && $molecule != "") {$query .= "pdb_id LIKE '%".$molecule."%' ".$logic." "; };
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
+				   FROM plcc_nm_ligandtochain l
+				   INNER JOIN plcc_chain c ON l.ligandtochain_chainid = c.chain_id
+				   INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id 
+				   WHERE l.ligandtochain_ligandname3 = '".$ligandname."'
+				   ORDER BY pdb_id, chain_name"; 
+		$firstQuerySet = true; };
+
+	if (isset($molecule) && $molecule != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
+				   FROM plcc_chain c
+				   INNER JOIN plcc_protein p
+				   ON p.pdb_id = c.pdb_id 
+				   WHERE c.mol_name LIKE '%".$molecule."%'
+				   ORDER BY pdb_id, chain_name";
+		$firstQuerySet = true; };
+
 
 
 	if ($logic == "OR") {
@@ -79,49 +135,54 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 	$counter = 0;
 	$tableString = "";
 	$numberOfChains = 0;
-	while (($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)) && ($counter <= 30)){
+	$createdHeadlines = Array();
+	while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
+		$numberOfChains++;
 		
-		$query = "SELECT DISTINCT (chain_name), pdb_id FROM plcc_chain WHERE pdb_id = '".$arr["pdb_id"]."' ORDER BY chain_name";
-		if($ligandname != "" ){
-			$query = "SELECT DISTINCT (chain_name), pdb_id, ligandtochain_chainid FROM plcc_chain, plcc_nm_ligandtochain WHERE plcc_chain.pdb_id = '".$arr["pdb_id"]."'
-					  AND plcc_chain.chain_id = plcc_nm_ligandtochain.ligandtochain_chainid
-					  ORDER BY chain_name";
-		}
-		$result_chains = pg_query($db, $query) 
-					  or die($query . ' -> Query failed: ' . pg_last_error());
-
+		$pdb_id =  $arr['pdb_id'];
+		$chain_name = $arr['chain_name'];
+		$resolution = $arr['resolution'];
+		$title = $arr["title"];
+		$header = $arr["header"];
+		$cathlink = get_cath_link($pdb_id, $chain_name);
+		
 		// provides alternating orange/white tables
-		if ($counter % 2 == 0){$class = "Orange";} else {$class = "White";}
-
-		$tableString .=	 '<div class="results results'.$class.'">					
-						<div class="resultsHeader resultsHeader'.$class.'">
-							<div class="resultsId">'.$arr["pdb_id"].'</div>
-							<div class="resultsRes">Resolution: '.$arr["resolution"].' &Aring;</div>
-							<div class="resultsLink"><a href="http://www.rcsb.org/pdb/explore/explore.do?structureId='.$arr["pdb_id"].'" target="_blank">[PDB]</a>
-												<a href="http://www.rcsb.org/pdb/download/downloadFile.do?fileFormat=FASTA&compression=NO&structureId='.$arr["pdb_id"].'" target="_blank">[FASTA]</a></div>
-						</div>
-						<div class="resultsBody1">
-							<div class="resultsTitle">Title</div>
-							<div class="resultsTitlePDB">' .ucfirst(strtolower($arr["title"])). '</div>
-						</div>
-						<div class="resultsBody2">
-							<div class="resultsClass">Classification</div>
-							<div class="resultsClassPDB">'.ucfirst(strtolower($arr["header"])).'</div>
-						</div>';
-		while ($chains = pg_fetch_array($result_chains, NULL, PGSQL_ASSOC)){
-			$numberOfChains++;
-			$cathlink = get_cath_link($arr["pdb_id"], $chains["chain_name"]);
-			$tableString .= '	<div class="resultsFooter">
-							<div class="resultsChain">Chain '.$chains["chain_name"].'</div>
-							<div class="resultsChainNum"><input type=checkbox id="'.$arr["pdb_id"] . $chains["chain_name"]. '" class="chainCheckBox" value="'.$arr["pdb_id"] . $chains["chain_name"].'"/>'.$arr["pdb_id"] . $chains["chain_name"].'</div>
-							<div class="resultsCATH"><a href="'.$cathlink.'" target="_blank">CATH</a></div>
-						</div>';
+		if ($counter % 2 == 0){
+			$class = "Orange";	
+		} else {
+			$class = "White";
 		}
-		$tableString .= ' </div>';
+		
+		if(!in_array($pdb_id, $createdHeadlines)){
+			$tableString .=	 '<div class="results results'.$class.'">					
+							<div class="resultsHeader resultsHeader'.$class.'">
+								<div class="resultsId">'.$pdb_id.'</div>
+								<div class="resultsRes">Resolution: '.$resolution.' &Aring;</div>
+								<div class="resultsLink"><a href="http://www.rcsb.org/pdb/explore/explore.do?structureId='.$pdb_id.'" target="_blank">[PDB]</a>
+													<a href="http://www.rcsb.org/pdb/download/downloadFile.do?fileFormat=FASTA&compression=NO&structureId='.$pdb_id.'" target="_blank">[FASTA]</a></div>
+							</div>
+							<div class="resultsBody1">
+								<div class="resultsTitle">Title</div>
+								<div class="resultsTitlePDB">' .ucfirst(strtolower($title)). '</div>
+							</div>
+							<div class="resultsBody2">
+								<div class="resultsClass">Classification</div>
+								<div class="resultsClassPDB">'.ucfirst(strtolower($header)).'</div>
+							</div>';
 
-		// $counter++; do not limit displayed proteins
+			array_push($createdHeadlines, $pdb_id);
+		}
+
+		$tableString .= '	<div class="resultsFooter">
+						<div class="resultsChain">Chain '.$chain_name.'</div>
+						<div class="resultsChainNum"><input type=checkbox id="'.$pdb_id . $chain_name. '" class="chainCheckBox" value="'.$pdb_id . $chain_name.'"/>'.$pdb_id . $chain_name.'</div>
+						<div class="resultsCATH"><a href="'.$cathlink.'" target="_blank">CATH</a></div>
+					</div>';
+		
+
+		$counter++;
 	}
-
+	$tableString .= ' </div>';
 	pg_free_result($result); // clean memory
 	pg_close($db); // close connection
 }

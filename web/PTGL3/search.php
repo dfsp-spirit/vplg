@@ -48,7 +48,7 @@ include('./backend/search.php');
 				<div class="col-lg-3 col-centered">
 					<div class="input-group form-group">
 						<form name="protChains" class="form-inline" method="get" action="results.php">
-							<input type="text" class="form-control" name="pcs" id="loadInput" autocomplete="off" placeholder="Load proteins...">
+							<input type="text" class="form-control" name="q" id="loadInput" autocomplete="off" placeholder="Load proteins...">
 							<button type="submit" class="btn btn-default" id="loadButton"><span>Load Proteins</span></button>
 					<div class="additionalProteinButtons">
 						<button type="button" class="btn btn-default btnSize" id="selectAllBtn"><span>Select all (<?php echo $numberOfChains; ?>) protein-chains</span></button>
@@ -57,14 +57,9 @@ include('./backend/search.php');
 					</div><!-- end input-group and form-group -->
 				</div><!-- end col-centered -->
 			</div><!-- end row -->
-			
-			
-			
+		
 			</div>
 		
-		
-		
-				
 			<div class="container" id="searchResults">
 				<h2> Search Results </h2>
 				<?php echo $tableString; ?>

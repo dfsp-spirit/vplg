@@ -19,7 +19,7 @@ function create_zip($files = array(),$destination = '',$overwrite = false) {
 			//make sure the file exists
 			if(file_exists('../data/'.$file) && is_readable('../data/'.$file)) {
 				$valid_files[] = $file;
-				error_log("Is valid: '../data/".$file."'");
+
 			}
 		}
 	}
@@ -27,7 +27,7 @@ function create_zip($files = array(),$destination = '',$overwrite = false) {
 	if(count($valid_files)) {
 		//create the archive
 		
-		error_log("We do have files");
+
 		$zip = new ZipArchive();
 		error_log("Zip Class found");
 		if($zip->open($destination,$overwrite ? ZIPARCHIVE::OVERWRITE : ZIPARCHIVE::CREATE) !== true) {
@@ -44,31 +44,18 @@ function create_zip($files = array(),$destination = '',$overwrite = false) {
 		
 		//close the zip -- done!
 		$res = $zip->close();
-		
-		error_log("zip closed (Destination: ".$destination.")");
+
 		if(file_exists($destination)){
 			echo $destination; 
-			error_log("zip exists ".$destination);
-			/* header("Content-type: application/zip"); 
-			header("Content-Disposition: attachment; filename=$destination");
-			header("Content-length: " . filesize($destination));
-			header("Pragma: no-cache"); 
-			header("Expires: 0"); 
-			readfile("$destination"); */
-		} else {
-			error_log("ERROR: Zip doesnt exist at ".$destination);
-		}
+		} 
 		//check to make sure the file exists
 		return file_exists($destination);
 	}
 	else
 	{	
-		error_log("Bad files!");
 		return false;
 	}
 }
-
-
 
 
 if(isset($_POST['proteins']) && isset($_POST['downloadType'])) {

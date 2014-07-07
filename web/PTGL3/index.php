@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <?php
 
 ini_set('display_errors',1);
@@ -11,6 +10,7 @@ $db_config = include('./backend/config.php');
 $ENABLE_COMPLEX_GRAPHS = $db_config['enable_complex_graphs'];
 $ENABLE_MOTIF_SEARCH = $db_config['enable_motif_search'];
 $ENABLE_BLAST_SEARCH = $db_config['enable_blast_search'];
+$USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 
 ?>
 
@@ -80,23 +80,32 @@ $ENABLE_BLAST_SEARCH = $db_config['enable_blast_search'];
 							<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button><br>
 							<div id="advancedButton"> Advanced Search <div id="arrow"><strong class="caret"></strong></div></div>
 							<div id="liveSearchResults"></div>
-
-							<label class="checkboxFont" <?php if(!$ENABLE_COMPLEX_GRAPHS) echo 'style="display:none !important;"'?> >
+							
+							<?php if($ENABLE_COMPLEX_GRAPHS) { ?>
+							<label class="checkboxFont">
 								<input type="checkbox" id="inlineCheckbox3" name="proteincomplexes" value="1"> Search for Protein Complexes
 							</label>
+							<?php } ?>
+							
 							<div id="advancedSearch">
+								
+								<?php if($USE_LOGIC_OPERATORS) { ?>
 								<label class="advancedLabel">Logic operation:&nbsp;&nbsp;&nbsp;&nbsp;
 									<input class="radio" type="radio" name="logic" value="AND"> &nbsp;&nbsp;AND&nbsp;
 									<input class="radio" type="radio" name="logic" value="OR" checked> &nbsp;&nbsp;OR&nbsp;
 								</label>
+								<?php } ?>
+								
 								<label class="advancedLabel">PDB Identifier
 									<input class="advancedInput" type="text" id="pdbid" name="pdbid" placeholder="PDB ID" size="6" maxlength="4" />
 									<i title="Use the PDB ID. For example '7tim' or '8icd'." style="position:absolute; right:50px;"  class="fa fa-question"></i>
 								</label>
+								
 								<label class="advancedLabel">Title
 									<input class="advancedInput" type="text" id="title" name="title" placeholder="Title" size="20" maxlength="50"/>
 									<i title="Search for keywords in the protein title. I.e. 'Human'" style="position:absolute; right:50px;"  class="fa fa-question"></i>
 								</label>
+								
 								<label class="advancedLabel">Has Ligand
 									<select class="advancedInput" id="hasligand" name="hasligand">
 										<option value="null">Both</option>
@@ -111,7 +120,7 @@ $ENABLE_BLAST_SEARCH = $db_config['enable_blast_search'];
 								</label>	
 								<label class="advancedLabel">Molecule
 									<input class="advancedInput" type="text" id="molecule" name="molecule" placeholder="Molecule" size="20" maxlength="50"/>
-									<i title="FILL" style="position:absolute; right:50px;"  class="fa fa-question"></i>
+									<i title="Look for chains which appear in certain molecules e.g. 'MYOSINE'" style="position:absolute; right:50px;"  class="fa fa-question"></i>
 								</label>		
 								<button type="submit" class="btn btn-default advancedInput" style="margin-top:35px;"><span>Search</span></button>
 							</div>
@@ -137,7 +146,8 @@ $ENABLE_BLAST_SEARCH = $db_config['enable_blast_search'];
 					</div>
 				</dl>
 				
-				<dl class="dl-horizontal" <?php if(!$ENABLE_MOTIF_SEARCH) echo 'style="display:none !important;"' ?>>
+				<?php if($ENABLE_MOTIF_SEARCH) { ?>
+				<dl class="dl-horizontal">
 					<div id="additionalSearch2">
 					<dt>SearchMotifs</dt>
 					<dd>Search form for topological protein structure motifs <strong class="caret" id="flipArrow2" ></strong></dd>
@@ -184,7 +194,9 @@ $ENABLE_BLAST_SEARCH = $db_config['enable_blast_search'];
 
 					</div>
 				</dl>
+				<?php } ?>
 				
+				<?php if($ENABLE_BLAST_SEARCH) { ?>
 				<dl class="dl-horizontal">
 					<div id="additionalSearch3">
 					<dt>SearchSequence</dt>
@@ -195,6 +207,8 @@ $ENABLE_BLAST_SEARCH = $db_config['enable_blast_search'];
 					</div>
 					
 				</dl>
+				<?php } ?>			
+				
 				</form>
 					</div><!-- end input-group and form-group -->
 				</div><!-- end col-centered -->
