@@ -1,0 +1,44 @@
+chains: 1
+# protein: 1g3iH
+# SSEs: 15
+E     6     2     7
+E     5    12    16
+E     3    20    22
+E     4    25    28
+E     4    34    37
+E     7    42    48
+H    17    50    66
+H    12    71    82
+E     7    93    99
+E     5   103   107
+E     3   111   113
+E     5   120   124
+H    13   127   139
+H    13   145   157
+E     5   168   172
+# SSE contacts: 
+0 1 A EE
+0 8 P EE
+0 11 A EE
+0 12 P HE
+0 13 A HE
+1 5 P EE
+1 13 X HE
+1 14 A EE
+2 3 A EE
+4 5 A EE
+4 6 X HE
+4 14 P EE
+5 6 A HE
+5 8 A EE
+6 7 X HH
+6 8 X HE
+7 9 P HE
+8 9 A EE
+8 11 A EE
+9 10 A EE
+9 11 P EE
+11 12 A HE
+12 13 A HH
+13 14 X HE
+

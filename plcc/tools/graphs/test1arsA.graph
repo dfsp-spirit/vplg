@@ -1,0 +1,20 @@
+chains: 1
+# protein: 1arsA
+# SSEs: 10
+E	3	3	3
+E	3	3	3
+E	3	3	3
+E	3	3	3
+E	3	3	3
+E	3	3	3
+E	3	3	3
+E	3	3	3
+E	3	3	3
+E	3	3	3
+# SSE contacts:
+1 9 A EE
+2 3 P EE
+2 6 P EE
+6 7 P EE
+7 8 P EE
+8 9 A EE

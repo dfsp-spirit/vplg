@@ -1,0 +1,16 @@
+chains: 1
+# protein: 1gmpA
+# SSEs: 7
+E	3	5	7
+H	3	8	10
+H	11	13	23
+E	4	53	56
+E	4	69	72	
+E	4	79	82
+E	4	90	93
+# SSE-contacts:
+0 6 A EE
+3 4 A EE
+4 5 A EE
+5 6 A EE
+
