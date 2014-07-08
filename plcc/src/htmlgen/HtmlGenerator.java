@@ -475,6 +475,18 @@ public class HtmlGenerator {
     }
     
     /**
+     * Writes the PHP function to generate the file name of the Jmol commands file without the starting and closing PHP brackets.
+     * @return the function PHP code
+     */
+    public static String phpFunctionGetJmolResBlueFileName() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("function getJmolResBlueFileName($pdbid, $chain, $graphtype) {\n");
+        sb.append("  return $pdbid . \"_\" . $chain . \"_\" . $graphtype . \"_PG_resblue.jmol\";\n");
+        sb.append("}\n");
+        return sb.toString();
+    }
+    
+    /**
      * Writes the JS code to generate the Jmol button, without the JS script tags.
      * @return the js code
      */
@@ -1542,10 +1554,14 @@ public class HtmlGenerator {
     }
     
     public static String writePhpCodeToRenderVisualizeButtonsInJS() {
+        
+        boolean includeResBlueButtons = true;
+        
         StringBuilder sb = new StringBuilder();
         sb.append("<?php\n");
             
         sb.append(HtmlGenerator.phpFunctionGetJmolFileName());
+        sb.append(HtmlGenerator.phpFunctionGetJmolResBlueFileName());
         sb.append(HtmlGenerator.phpFunctionWriteJmolButton());
         sb.append("$mode = $_GET['mode'];\n");
         sb.append("$pdbid = $_GET['pdbid'];\n");              
@@ -1594,7 +1610,9 @@ public class HtmlGenerator {
         //sb.append("                    echo \"Graph type is valid.<br/>\";\n"); 
        sb.append("                    $valid_all = TRUE;\n");
         sb.append("                    $jmolfile = getJmolFileName($pdbid, $chain, $graphtype);\n");
+        sb.append("                    $jmolresbluefile = getJmolResBlueFileName($pdbid, $chain, $graphtype);\n");
         sb.append("                    $link = \"./\" . $mid_chars . \"/\" . $pdbid . \"/\" . $chain . \"/\" . $jmolfile ;\n");       
+        sb.append("                    $linkresblue = \"./\" . $mid_chars . \"/\" . $pdbid . \"/\" . $chain . \"/\" . $jmolresbluefile ;\n");       
         sb.append("                }\n");
         sb.append("                else {\n");
         sb.append("                    echo \"<p>ERROR: Graph visualization: PDB ID and Chain are valid but graph type is not.</p>\";\n");
@@ -1632,6 +1650,36 @@ public class HtmlGenerator {
         sb.append("                else {\n");
         sb.append("                    echo \"<p>INFO: Graph visualization: No visualization available for $graphtype graph of protein $pdbid chain $chain.</p>\";\n");
         sb.append("                }\n");
+        
+        if(includeResBlueButtons) {
+            sb.append("                if (file_exists($linkresblue)) {\n");
+            //sb.append("                    echo \"Jmol command file found.<br/><br/>\";\n");
+            // draw button
+            //sb.append("                    echo \"The Jmol resblue file is at $linkresblue.<br/>\";\n");
+            //sb.append("                    $command = \"display :A\";\n");
+            sb.append("                    $commandresblue = file_get_contents($linkresblue);\n");
+
+            sb.append("                    $labelresblue = \"Show $graphtype graph SSEs\";\n");
+            sb.append("                    \n?>\n");
+
+            sb.append("                    <script language=\"JavaScript\" type=\"text/javascript\">\n");
+            sb.append("                    <!--\n");   
+
+            sb.append("                    <?php\n");
+            sb.append("                    writeJmolButtonJs($commandresblue, $labelresblue);\n"); 
+            sb.append("                    \n?>\n");
+
+            sb.append("                    // -->\n");
+            sb.append("                    </script>\n");
+
+            sb.append("                    <?php\n");
+            // button end
+            sb.append("                }\n");
+            sb.append("                else {\n");
+            sb.append("                    echo \"<p>INFO: Graph resblue visualization: No visualization available for $graphtype graph of protein $pdbid chain $chain.</p>\";\n");
+            sb.append("                }\n");
+        }
+        
         sb.append("            }\n");
         sb.append("            else {\n");
         sb.append("                echo \"<p>ERROR: Graph visualization: Some query parameters were invalid.</p>\";\n");
