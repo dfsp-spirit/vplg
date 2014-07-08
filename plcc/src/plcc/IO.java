@@ -278,13 +278,28 @@ public class IO {
     
     
     
-    
+    public static String space(int s) {
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < s; i++) {
+            sb.append("    ");
+        }
+        return sb.toString();
+    }
     
     public static String intArrayListToString(ArrayList<Integer> ar) {
         String s = "";
         for(Integer i : ar) {
             s += i + " ";
         }
+        return s;
+    }
+    
+    public static String intListToString(List<Integer> ar, String start, String end) {
+        String s = start;
+        for(Integer i : ar) {
+            s += i + " ";
+        }
+        s += end;
         return s;
     }
     

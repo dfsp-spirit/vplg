@@ -8,8 +8,13 @@
 package algorithms;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Set;
 import plcc.CompatGraph;
+import plcc.ProtGraph;
+import plcc.SSE;
 import plcc.SSEGraph;
+import plcc.SpatRel;
 
 /**
  * Defines methods to compute the edge compatibility graph of two protein graphs.
@@ -308,6 +313,40 @@ public class CompatGraphComputation {
      */
     public String vertHToString(Integer[] vertex) {
         return("[V(H)::e1(G1)=" + vertex[VERTEX1] + ", e2(G2)=" + vertex[VERTEX2] + "]");
+    }
+    
+    
+    public static void main(String[] args) {
+        
+        
+        
+        // test clique detection
+        ArrayList<SSE> sses = new ArrayList<SSE>();
+        for(int i = 0; i < 4; i++) {
+            SSE s = new SSE(SSE.SSECLASS_HELIX);
+            sses.add(s);
+        }
+        ProtGraph pg = new ProtGraph(sses);
+        pg.addContact(0, 1, SpatRel.MIXED);
+        pg.addContact(0, 2, SpatRel.MIXED);
+        pg.addContact(0, 3, SpatRel.MIXED);        
+        pg.addContact(1, 2, SpatRel.MIXED);        
+        pg.addContact(2, 3, SpatRel.MIXED);
+        
+        ArrayList<Set<Integer>> cliques = pg.getMaximalCliques();
+        System.out.println("Searching for cliques in graph of size " + pg.getSize() + " with " + pg.getEdgeList().size() + " edges.");
+        
+        StringBuilder sb = new StringBuilder();
+        for(Set<Integer> c : cliques) {
+            sb.append("Found clique: ");
+            for (Iterator<Integer> it = c.iterator(); it.hasNext(); ) {
+                Integer f = it.next();
+                sb.append(" " + f);
+            }
+            sb.append("\n");
+        }
+        
+        System.out.println(sb.toString());
     }
     
 }
