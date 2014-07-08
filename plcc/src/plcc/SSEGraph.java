@@ -1293,12 +1293,17 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         }
         
         List<Integer> candidates_array = new ArrayList<Integer>(candidates);
+        if(debug && candidates_array.isEmpty()) {            
+            System.out.println(IO.space(printDepth) + "Candidates list is empty, ending recursion");
+        }
         if (!end(candidates, already_found)) {
             // for each candidate_node in candidates do
             int candidateNum = 0;   // for output explanation only
             for (Integer candidate : candidates_array) {
                 
-                System.out.println(IO.space(printDepth) + "At candidate #" + candidateNum + " of " + candidates_array.size() + " total (which is " + candidates_array.get(candidateNum) + ").");
+                if(debug) {
+                    System.out.println(IO.space(printDepth) + "At candidate #" + (candidateNum + 1 )+ " of " + candidates_array.size() + " total (which is " + candidates_array.get(candidateNum) + ")." + " C=" + IO.intListToString(potential_clique, "[", "]") + ", P=" + IO.intListToString(candidates, "[", "]") + ", S=" + IO.intListToString(already_found, "[", "]"));
+                }
                 
                 List<Integer> new_candidates = new ArrayList<Integer>();
                 List<Integer> new_already_found = new ArrayList<Integer>();
@@ -1356,6 +1361,10 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
                 // move candidate_node from potential_clique to already_found;
                 already_found.add(candidate);
                 potential_clique.remove(candidate);
+                
+                if(debug && (candidateNum == candidates_array.size() - 1)) {
+                    System.out.println(IO.space(printDepth) + "Last candidate used (" + (candidateNum + 1 )+ " of " + candidates_array.size() + "), ending recursion");
+                }
                 candidateNum++;
             }
         }
