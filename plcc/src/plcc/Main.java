@@ -2213,19 +2213,23 @@ public class Main {
                     }
                 }
                 
-                if(Settings.getBoolean("plcc_B_Jmol_graph_vis_commands")) {                    
-                    // only print to STDOUT for albelig atm
-                    if(gt.equals(SSEGraph.GRAPHTYPE_ALBELIG)) {
-                        //System.out.println("      Jmol graph visualization commands for " + gt + " graph follow:");
-                        //System.out.println("        " + JmolTools.visualizeGraphCommands(pg, false, false));
-                        //System.out.println("      Hint: Combine the Jmol command with 'delete water; display :" + c.getPdbChainID() + "; color atoms translucent orange; ' to better see the overlay.");
-                    }
-                    
-                    // but compute for all graphs and register in web mode
+                // commands to draw the graph in 3D into the PDB coords in JMOL
+                if(Settings.getBoolean("plcc_B_Jmol_graph_vis_commands")) {                                                            
                     String graphVisualizationFileJmolCommands = filePathGraphs + fs + fileNameWithoutExtension + ".jmol";
                     if(IO.stringToTextFile(graphVisualizationFileJmolCommands, JmolTools.visualizeGraphCommands(pg, true, true))) {
                         if(Settings.getBoolean("plcc_B_output_textfiles_dir_tree_html")) {
                             pcr.addProteinGraphVisJmolCommandFile(gt, new File(graphVisualizationFileJmolCommands));
+                        }
+                    }
+                }
+                
+                // commands to color the SSEs of the graph blue in 3D in JMOL
+                if(Settings.getBoolean("plcc_B_Jmol_graph_vis_resblue_commands")) {                                        
+                    
+                    String graphVisualizationResBlueFileJmolCommands = filePathGraphs + fs + fileNameWithoutExtension + "_resblue" + ".jmol";
+                    if(IO.stringToTextFile(graphVisualizationResBlueFileJmolCommands, JmolTools.visualizeGraphSubsetSSEsInBlue(pg, pg.sseList, true, true))) {
+                        if(Settings.getBoolean("plcc_B_output_textfiles_dir_tree_html")) {
+                            pcr.addProteinGraphVisResBlueJmolCommandFile(gt, new File(graphVisualizationResBlueFileJmolCommands));
                         }
                     }
                 }

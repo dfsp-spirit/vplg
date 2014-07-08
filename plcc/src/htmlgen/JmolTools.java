@@ -7,7 +7,9 @@
  */
 package htmlgen;
 
+import java.util.ArrayList;
 import plcc.Position3D;
+import plcc.Residue;
 import plcc.SSE;
 import plcc.SSEGraph;
 import plcc.SpatRel;
@@ -96,6 +98,14 @@ public class JmolTools {
     
     
     /**
+     * Returns the jmol command to hide water.
+     * @return the jmol command to hide water.
+     */
+    public static String getHideWatersCommand() {
+        return "hide waters;";
+    }
+    
+    /**
      * Returns the Jmol color string for a certain spatial orientation type.
      * @param spatRel the spatial orientation (between two SSEs), e.g., SpatRel.PARALLEL
      * @return the Jmol color string, e.g., "red"
@@ -170,6 +180,8 @@ public class JmolTools {
     /**
      * Highest-level function to visualize a whole SSE graph.
      * @param g the input graph
+     * @param hideOtherChains whether to hide the other chains
+     * @param forceReload whether to force a reload of the PDB file before starting the coloring commands
      * @return the Jmol command string to visualize the graph.
      */
     public static String visualizeGraphCommands(SSEGraph g, boolean hideOtherChains, boolean forceReload) {
@@ -178,6 +190,8 @@ public class JmolTools {
         if(forceReload) {
             sb.append("load =").append(g.getPdbid().toUpperCase()).append("; ");
         }
+        
+        sb.append(JmolTools.getHideWatersCommand());
         
         // edges first (lines)
         for(Integer[] edge : g.getEdgeList()) {
@@ -194,6 +208,84 @@ public class JmolTools {
         
         return sb.toString();
     }
+    
+    /**
+     * Returns the jmol commands to color a subset of the SSEs in the graph in blue.
+     * @param g the graph (used for meta data like PDB ID only)
+     * @param ssesToColor the list of SSEs to color in blue. (All their residues will be colored.)
+     * @param hideOtherChains whether to hide the other chains
+     * @param forceReload whether to force a reload of the PDB file before starting the coloring commands
+     * @return the jmol command string
+     */
+    public static String visualizeGraphSubsetSSEsInBlue(SSEGraph g, ArrayList<SSE> ssesToColor, boolean hideOtherChains, boolean forceReload) {
+        ArrayList<Residue> allResidues = new ArrayList<Residue>();
+        for(SSE sse : ssesToColor) {
+            for(Residue r : sse.getResidues()) {
+                allResidues.add(r);
+            }
+        }
+        return JmolTools.visualizeGraphSubsetResiduesInBlue(g, allResidues, hideOtherChains, forceReload);
+    }
+    
+    
+    /**
+     * Returns the jmol commands to color a subset of the residues in the graph in blue.
+     * @param g the graph (used for meta data like PDB ID only)
+     * @param residuesToColor the list of residues to color in blue
+     * @param hideOtherChains whether to hide the other chains
+     * @param forceReload whether to force a reload of the PDB file before starting the coloring commands
+     * @return the jmol command string
+     */
+    public static String visualizeGraphSubsetResiduesInBlue(SSEGraph g, ArrayList<Residue> residuesToColor, boolean hideOtherChains, boolean forceReload) {
+        StringBuilder sb = new StringBuilder();
+        
+        if(forceReload) {
+            sb.append("load =").append(g.getPdbid().toUpperCase()).append("; ");
+        }
+        
+        sb.append(JmolTools.getHideWatersCommand());
+             
+        // color all residues blue        
+        sb.append(JmolTools.getSelectAllResiduesCommand(residuesToColor));                
+        sb.append("color blue;");
+        
+        if(hideOtherChains) {
+            sb.append(limitOneChainTranslucentCommands(g.getChainid()));
+        }
+        
+        return sb.toString();
+    }
+    
+    
+    /**
+     * Determines the jmol command to select all residues in the list
+     * @param res the residue list
+     * @return the jmol command string
+     */
+    public static String getSelectAllResiduesCommand(ArrayList<Residue> res) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("select ");
+        for(int i = 0; i < res.size(); i++) {
+            sb.append(JmolTools.getSingleResidueIdentificationString(res.get(i)));
+            if(i < res.size() - 1) {
+                sb.append(", ");
+            }
+        }
+        sb.append(";");
+        
+        return sb.toString();
+    }
+    
+    
+    /**
+     * Determines the jmol identification string for the given residue.
+     * @param r the residue
+     * @return the jmol identification string, e.g., "23:a" for residue # 23 in chain A
+     */ 
+    public static String getSingleResidueIdentificationString(Residue r) {
+        return r.getPdbResNum() + ":" + r.getChainID().toLowerCase();
+    }
+    
     
     /**
      * Function to limit visibility to one graph and show its atoms transparent. Deletes waters.

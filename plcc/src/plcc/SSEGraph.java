@@ -29,6 +29,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -3513,7 +3514,25 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         return numIsolatedLigands;
     } 
 
-    
+    /**
+     * Determines the degree distribution of this graph. For a graph with n vertices, it counts 
+     * how often each of the possible vertex degrees 0..n-1 occur in the graph.
+     * @return a list of counts for each possible degree. So to get the number of 
+     * vertices with degree 5, check in list[5]. The max degree you can check for is n -1 for a graph with n vertices.
+     */
+    public int[] getDegreeDistribution() {
+        int maxDegree = this.size - 1;
+        int[] degreeDistribution = new int[maxDegree + 1];
+        Arrays.fill(degreeDistribution, 0);
+        
+        int d;
+        for(int i = 0; i < this.size; i++) {
+            d = this.degreeOfVertex(i);
+            degreeDistribution[d]++;
+        }
+        
+        return degreeDistribution;
+    }
         
     
     

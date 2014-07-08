@@ -48,6 +48,7 @@ public class ProteinChainResults {
     protected HashMap<String, File> proteinGraphFilesByFormat;
     protected HashMap<String, File> proteinGraphImagesByFormat;
     protected HashMap<String, File> proteinGraphVisJmolCommandFiles;
+    protected HashMap<String, File> proteinGraphVisJmolResBlueCommandFiles;
     protected HashMap<String, ProteinFoldingGraphResults> foldingGraphResults;
     protected ProtMetaInfo chainMetaData;
 
@@ -67,6 +68,7 @@ public class ProteinChainResults {
         proteinGraphImagesBitmap = new HashMap<String, File>();
         proteinGraphImagesVector = new HashMap<String, File>();
         proteinGraphVisJmolCommandFiles = new HashMap<String, File>();
+        proteinGraphVisJmolResBlueCommandFiles = new HashMap<String, File>();
         chainMetaData = null;
         foldingGraphResults = new HashMap<String, ProteinFoldingGraphResults>();
     }
@@ -127,6 +129,10 @@ public class ProteinChainResults {
         proteinGraphVisJmolCommandFiles.put(graphType, outFile);
     }
     
+    public void addProteinGraphVisResBlueJmolCommandFile(String graphType, File outFile) {
+        proteinGraphVisJmolResBlueCommandFiles.put(graphType, outFile);
+    }
+    
     @Deprecated
     public File getProteinGraphImageBitmap(String graphType) {
         //return this.proteinGraphImagesBitmap.get(graphType);
@@ -140,6 +146,10 @@ public class ProteinChainResults {
     
     public File getProteinGraphVisJmolCommandFile(String graphType) {
         return this.proteinGraphVisJmolCommandFiles.get(graphType);
+    }
+    
+    public File getProteinGraphVisJmolResBlueCommandFile(String graphType) {
+        return this.proteinGraphVisJmolResBlueCommandFiles.get(graphType);
     }
     
     @Deprecated
@@ -189,11 +199,32 @@ public class ProteinChainResults {
         return false;
     }
     
+    public boolean validJmolCommandFileResBlueExistsFor(String graphType) {        
+        File jmolCmdFile = this.proteinGraphVisJmolResBlueCommandFiles.get(graphType);
+        if(jmolCmdFile != null) {
+            if(IO.fileExistsIsFileAndCanRead(jmolCmdFile)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public ArrayList<String> checkForGraphTypesWithValidJmolCmdFiles() {
         ArrayList<String> graphTypesValid = new ArrayList<String>();
                 
         for(String gt : this.getGraphTypesList()) {
             if(this.validJmolCommandFileExistsFor(gt)) {
+               graphTypesValid.add(gt); 
+            }
+        }
+        return graphTypesValid;
+    }
+    
+    public ArrayList<String> checkForGraphTypesWithValidJmolResBlueCmdFiles() {
+        ArrayList<String> graphTypesValid = new ArrayList<String>();
+                
+        for(String gt : this.getGraphTypesList()) {
+            if(this.validJmolCommandFileResBlueExistsFor(gt)) {
                graphTypesValid.add(gt); 
             }
         }
