@@ -286,6 +286,16 @@ public class IO {
         return sb.toString();
     }
     
+    public static String treeSpace(int s) {
+        if(s == 0) { return ""; }
+        StringBuilder sb = new StringBuilder();        
+        for(int i = 0; i < s - 1; i++) {
+            sb.append("     ");
+        }
+        sb.append("+----");
+        return sb.toString();
+    }
+    
     public static String intArrayListToString(ArrayList<Integer> ar) {
         String s = "";
         for(Integer i : ar) {

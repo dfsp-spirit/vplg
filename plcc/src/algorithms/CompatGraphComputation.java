@@ -10,7 +10,11 @@ package algorithms;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 import plcc.CompatGraph;
+import plcc.IO;
 import plcc.ProtGraph;
 import plcc.SSE;
 import plcc.SSEGraph;
@@ -317,8 +321,55 @@ public class CompatGraphComputation {
     
     
     public static void main(String[] args) {
+        CompatGraphComputation.testBronKerbosch();
+        CompatGraphComputation.testTrees();
+    }
         
+     
+    public static void testTrees() {
         
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("0");
+        DefaultMutableTreeNode node1 = new DefaultMutableTreeNode("1");
+        DefaultMutableTreeNode node2 = new DefaultMutableTreeNode("2");
+        DefaultMutableTreeNode node3 = new DefaultMutableTreeNode("3");
+        DefaultMutableTreeNode node4 = new DefaultMutableTreeNode("4");
+        DefaultMutableTreeNode node5 = new DefaultMutableTreeNode("5");
+        // add nodes
+        
+        root.add(node1);
+        root.add(node2);
+        node1.add(node3);
+        node1.add(node4);
+        node2.add(node5);
+
+        System.out.println("Tree: \n" + drawTree(root));
+    }
+    
+    /**
+     * Recursively draws the subtree under the node node. Use the wrapper function drawTree(DefaultMutableTreeNode root) instead of calling this one directly.
+     * @param node
+     * @param sb
+     * @param depth 
+     */
+    public static void drawTree(DefaultMutableTreeNode node, StringBuilder sb, int depth) {
+        sb.append(IO.treeSpace(depth)).append(node.toString()).append("\n");
+        for(int i = 0; i < node.getChildCount(); i++) {
+            drawTree((DefaultMutableTreeNode)node.getChildAt(i), sb, depth + 1);
+        }
+    }
+    
+    /**
+     * Recursively draws the subtree under the node node (wrapper function, call this one).
+     * @param root the root of the subtree to draw
+     * @return the string representation
+     */
+    public static String drawTree(DefaultMutableTreeNode root) {
+        StringBuilder sb = new StringBuilder();
+        drawTree(root, sb, 0);
+        return sb.toString();
+    }
+    
+    public static void testBronKerbosch() {
         
         // test clique detection
         ArrayList<SSE> sses = new ArrayList<SSE>();
@@ -347,6 +398,9 @@ public class CompatGraphComputation {
         }
         
         System.out.println(sb.toString());
+        
+       
+        
     }
     
 }

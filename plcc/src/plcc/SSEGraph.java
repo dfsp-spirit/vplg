@@ -1275,7 +1275,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             candidates.add(i);
         }
 
-        int printDepth = 0;
+        int printDepth = 1;
         findCliques(potential_clique, candidates, already_found, printDepth);
         return cliques;
 
