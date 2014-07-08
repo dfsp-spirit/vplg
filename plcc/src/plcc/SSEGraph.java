@@ -1343,6 +1343,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
                     cliques.add(new HashSet<Integer>(potential_clique));
                     if(debug) {
                         System.out.println(IO.space(printDepth) + "Found new clique: " + IO.intListToString(potential_clique, "[", "]"));
+                        System.out.println(IO.space(printDepth) + "BK recursion tree: \n" + CompatGraphComputation.drawTree((DefaultMutableTreeNode)node.getRoot()));
                     }
                     this.numCliquesSoFar++;
                     
@@ -1376,6 +1377,10 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
                 }
                 candidateNum++;
             }
+        }
+        else {
+            // end
+            System.out.println(IO.space(printDepth) + "Recursion end met");
         }
     }
 
