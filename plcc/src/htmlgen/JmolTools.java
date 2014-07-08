@@ -244,13 +244,14 @@ public class JmolTools {
         }
         
         sb.append(JmolTools.getHideWatersCommand());
+        sb.append("cartoon only; ");
              
         // color all residues blue        
         sb.append(JmolTools.getSelectAllResiduesCommand(residuesToColor));                
         sb.append("color blue;");
         
         if(hideOtherChains) {
-            sb.append(limitOneChainTranslucentCommands(g.getChainid()));
+            sb.append("display :" + g.getChainid() + "; ");
         }
         
         return sb.toString();
