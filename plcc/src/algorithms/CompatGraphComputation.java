@@ -322,18 +322,18 @@ public class CompatGraphComputation {
     
     public static void main(String[] args) {
         CompatGraphComputation.testBronKerbosch();
-        CompatGraphComputation.testTrees();
+        //CompatGraphComputation.testTrees();
     }
         
      
     public static void testTrees() {
         
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("0");
-        DefaultMutableTreeNode node1 = new DefaultMutableTreeNode("1");
-        DefaultMutableTreeNode node2 = new DefaultMutableTreeNode("2");
-        DefaultMutableTreeNode node3 = new DefaultMutableTreeNode("3");
-        DefaultMutableTreeNode node4 = new DefaultMutableTreeNode("4");
-        DefaultMutableTreeNode node5 = new DefaultMutableTreeNode("5");
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode(new TreeNodeData("0"));
+        DefaultMutableTreeNode node1 = new DefaultMutableTreeNode(new TreeNodeData("1"));
+        DefaultMutableTreeNode node2 = new DefaultMutableTreeNode(new TreeNodeData("2"));
+        DefaultMutableTreeNode node3 = new DefaultMutableTreeNode(new TreeNodeData("3"));
+        DefaultMutableTreeNode node4 = new DefaultMutableTreeNode(new TreeNodeData("4"));
+        DefaultMutableTreeNode node5 = new DefaultMutableTreeNode(new TreeNodeData("5"));
         // add nodes
         
         root.add(node1);

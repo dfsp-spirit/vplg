@@ -10,6 +10,8 @@
 package plcc;
 
 //import com.google.gson.Gson;
+import algorithms.CompatGraphComputation;
+import algorithms.TreeNodeData;
 import datastructures.Graph;
 import datastructures.UndirectedGraph;
 import java.awt.BasicStroke;
@@ -40,6 +42,7 @@ import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.tree.DefaultMutableTreeNode;
 import jgrapht.PLGEdge;
 import jgrapht.ProteinLigandGraph;
 import jgrapht.VertexSSE;
@@ -1276,7 +1279,9 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         }
 
         int printDepth = 1;
-        findCliques(potential_clique, candidates, already_found, printDepth);
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("r");
+        findCliques(potential_clique, candidates, already_found, printDepth, root);
+        System.out.println("BK recursion tree: \n" + CompatGraphComputation.drawTree(root));
         return cliques;
 
     }
@@ -1284,7 +1289,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     /**
      * The recursive part of the Bron-Kerbosch algorithm, used in getMaximalCliques().
      */
-    protected void findCliques(List<Integer> potential_clique, List<Integer> candidates, List<Integer> already_found, int printDepth) {
+    protected void findCliques(List<Integer> potential_clique, List<Integer> candidates, List<Integer> already_found, int printDepth, DefaultMutableTreeNode node) {
         
         boolean debug = true;
         
@@ -1300,6 +1305,9 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
             // for each candidate_node in candidates do
             int candidateNum = 0;   // for output explanation only
             for (Integer candidate : candidates_array) {
+                
+                DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(new TreeNodeData("" + candidate));
+                node.add(newNode);
                 
                 if(debug) {
                     System.out.println(IO.space(printDepth) + "At candidate #" + (candidateNum + 1 )+ " of " + candidates_array.size() + " total (which is " + candidates_array.get(candidateNum) + ")." + " C=" + IO.intListToString(potential_clique, "[", "]") + ", P=" + IO.intListToString(candidates, "[", "]") + ", S=" + IO.intListToString(already_found, "[", "]"));
@@ -1331,6 +1339,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
                 // if new_candidates and new_already_found are empty
                 if (new_candidates.isEmpty() && new_already_found.isEmpty()) {
                     // potential_clique is maximal_clique
+                    ((TreeNodeData)newNode.getUserObject()).markSpecial(true, IO.intListToString(potential_clique, "[", "]"));
                     cliques.add(new HashSet<Integer>(potential_clique));
                     if(debug) {
                         System.out.println(IO.space(printDepth) + "Found new clique: " + IO.intListToString(potential_clique, "[", "]"));
@@ -1355,7 +1364,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
                     if(debug) {
                         System.out.println(IO.space(printDepth) + "No clique found, next Recursion with C=" + IO.intListToString(potential_clique, "[", "]") + ", P=" + IO.intListToString(new_candidates, "[", "]") + ", S=" + IO.intListToString(new_already_found, "[", "]"));
                     }
-                    findCliques(potential_clique, new_candidates, new_already_found, printDepth + 1);
+                    findCliques(potential_clique, new_candidates, new_already_found, printDepth + 1, newNode);
                 } 
 
                 // move candidate_node from potential_clique to already_found;
