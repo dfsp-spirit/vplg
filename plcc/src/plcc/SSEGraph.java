@@ -1380,7 +1380,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         }
         else {
             // end
-            System.out.println(IO.space(printDepth) + "Recursion end met");
+            System.out.println(IO.space(printDepth) + "Recursion end met (aborting handling of same subtree once more)");
         }
     }
 
