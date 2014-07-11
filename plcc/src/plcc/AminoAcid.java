@@ -17,15 +17,26 @@ package plcc;
 public class AminoAcid {
 
     // declare class vars
+    public static final Integer CHEMPROPAA_UNKNOWN = -1;
+    public static final Integer CHEMPROPAA_SMALL_APOLAR = 0;
+    public static final Integer CHEMPROPAA_HYDROPHOBIC = 1;
+    public static final Integer CHEMPROPAA_POLAR = 2;
+    public static final Integer CHEMPROPAA_NEGATIVE_CHARGE = 3;
+    public static final Integer CHEMPROPAA_POSITIVE_CHARGE = 4;
 
-    /* The AAs above 20 (J, B, Z, X) are PDB / ligand specific special AAs. */    
+
+    /** The AAs above 20 (J, B, Z, X) are PDB / ligand specific special AAs. */    
     public static final String[] names3 = { "ALA", "ARG", "ASN", "ASP", "CYS", "GLU", "GLN", "GLY", "HIS", "ILE", "LEU", "LYS", "MET", "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL", "LIG", "_B_", "_Z_", "_X_" };
     // quick find line, index:               0      1      2      3      4      5      6      7      8      9      10     11     12     13     14     15     16     17     18     19     20     21     22     23    
     
+    /** One letter AA code. */
     public static final String[] names1 = { "A",    "R",  "N",   "D",    "C",  "E",   "Q",   "G",   "H",   "I",   "L",   "K",   "M",   "F",   "P",   "S",   "T",   "W",   "Y",   "V",   "J",   "B",   "Z",   "X" };
 
-    // The number of atoms the AAs have (in order of the names3/names1 arrays)
+    /** The number of atoms the AAs have (in order of the names3/names1 arrays) */
     public static final Integer[] atoms = {  5,     11,    8,     8,     6,     9,     9,     4,     10,    8,     8,     9,     8,     11,    7,     6,     7,     14,    12,    7,     8,     9,     4,     10 };
+    
+    /** The biochemical properties of the AAs (in order of the names3/names1 arrays) */
+    public static final Integer[] chemProps = {  AminoAcid.CHEMPROPAA_SMALL_APOLAR,     AminoAcid.CHEMPROPAA_POSITIVE_CHARGE,    AminoAcid.CHEMPROPAA_POLAR,     AminoAcid.CHEMPROPAA_NEGATIVE_CHARGE,     AminoAcid.CHEMPROPAA_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_NEGATIVE_CHARGE,     AminoAcid.CHEMPROPAA_POLAR,     AminoAcid.CHEMPROPAA_SMALL_APOLAR,     AminoAcid.CHEMPROPAA_POLAR,    AminoAcid.CHEMPROPAA_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_POSITIVE_CHARGE,     AminoAcid.CHEMPROPAA_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_HYDROPHOBIC,    AminoAcid.CHEMPROPAA_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_SMALL_APOLAR,     AminoAcid.CHEMPROPAA_SMALL_APOLAR,     AminoAcid.CHEMPROPAA_HYDROPHOBIC,    AminoAcid.CHEMPROPAA_HYDROPHOBIC,    AminoAcid.CHEMPROPAA_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_UNKNOWN,     AminoAcid.CHEMPROPAA_UNKNOWN,     AminoAcid.CHEMPROPAA_UNKNOWN,     AminoAcid.CHEMPROPAA_UNKNOWN };
 
     
     /**
@@ -55,8 +66,8 @@ public class AminoAcid {
         }
         else{
             System.err.println("ERROR: No AA with internal ID " + id + " exists.");
-            System.exit(-1);
-            return("ERR");
+            //System.exit(-1);
+            return("???");
         }
     }
 
@@ -83,8 +94,25 @@ public class AminoAcid {
 
         // only hit if nothing was found
         System.err.println("ERROR: Could not convert 3 letter amino acid code '" + name3 + "' to 1 letter code, not found.");
-        System.exit(-1);
-        return("");             // for the IDE
+        //System.exit(-1);
+        return("?");             // for the IDE
+    }
+    
+    /**
+     * Get chemical property classification for an AA given by 3 letter AA code.
+     * @param name3 the 3 letter name of the amino acid, e.g., "ALA"
+     * @return the chemical property, which is one of the constants at AminoAcid.CHEMPROPAA_*
+     */
+    public static Integer getChemPropOfAAByName3(String name3) {
+        for(Integer i = 0; i < names3.length; i++) {
+            if(names3[i].equals(name3)) {
+                return(chemProps[i]);
+            }
+        }
+
+        // only hit if nothing was found
+        System.err.println("ERROR: Could not find chemical properties for 3 letter amino acid code '" + name3 + "'.");
+        return(AminoAcid.CHEMPROPAA_UNKNOWN);
     }
 
     /**

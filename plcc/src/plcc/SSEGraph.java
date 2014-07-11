@@ -1263,6 +1263,8 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     /**
      * Implements the Bron-Kerbosch algorithm to find all maximal (= non-extandable) cliques. Note that these are NOT
      * only the largest cliques in the graph but all maximal ones.
+     * 
+     * This is based on the JGraphT source code.
      */
     public ArrayList<Set<Integer>> getMaximalCliques() {
 
@@ -1288,6 +1290,8 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
 
     /**
      * The recursive part of the Bron-Kerbosch algorithm, used in getMaximalCliques().
+     * 
+     * This is based on the JGraphT source code.
      */
     protected void findCliques(List<Integer> potential_clique, List<Integer> candidates, List<Integer> already_found, int printDepth, DefaultMutableTreeNode node) {
         

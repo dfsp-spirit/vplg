@@ -24,7 +24,8 @@ public class Residue implements java.io.Serializable {
     public static final Integer RESIDUE_TYPE_AA = 0;
     public static final Integer RESIDUE_TYPE_LIGAND = 1;
     public static final Integer RESIDUE_TYPE_OTHER = 2;
-
+    
+    
     // declare class vars
     private String resName3 = null;                          // 3 letter name
     private String AAName1 = null;                          // 1 letter name, AAs only
@@ -52,6 +53,20 @@ public class Residue implements java.io.Serializable {
     private SSE sse = null;
     private Boolean isPartOfDsspSse = false;                // whether this Residue is part of a valid SSE according to DSSP (which does NOT assign a SSE to *all* residues)
 
+    
+    /**
+     * Determines the chemical properties of this AA.
+     * @return the chemical property, which is one of the constants at AminoAcid.CHEMPROPAA_* (Example: ALA => AminoAcid.CHEMPROPAA_SMALL_APOLAR).
+     */
+    public Integer getChemicalPropertyType() {
+        if(this.isAA()) {            
+            return AminoAcid.getChemPropOfAAByName3(this.resName3);
+        }
+        else {
+            return AminoAcid.CHEMPROPAA_UNKNOWN;            
+        }
+    }
+    
     // constructor
     public Residue() { atoms = new ArrayList<Atom>(); }
 
