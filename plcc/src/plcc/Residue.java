@@ -12,6 +12,7 @@ package plcc;
 import tools.DP;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 
 /**
@@ -72,13 +73,13 @@ public class Residue implements java.io.Serializable {
 
     /**
      * Constructs a new residue with PDB residue number 'prn' and DSSP residue number 'drn'.
-     * @param prn the PDB residue number
-     * @param drn the DSSP residue number
+     * @param residueNumberPDB the PDB residue number
+     * @param residueNumberDSSP the DSSP residue number
      */
-    public Residue(Integer prn, Integer drn) {
+    public Residue(Integer residueNumberPDB, Integer residueNumberDSSP) {
         atoms = new ArrayList<Atom>();
-        pdbResNum = prn;
-        dsspResNum = drn;
+        pdbResNum = residueNumberPDB;
+        dsspResNum = residueNumberDSSP;
     }
     
     /**
@@ -324,6 +325,7 @@ public class Residue implements java.io.Serializable {
 
     /**
      * Determines the distance to another Residue, from Residue center to Residue center (C alpha atom to C alpha atom for AAs)
+     * @param r the other residue
      * @return The center-to-center distance.
      */
     public Integer resCenterDistTo(Residue r) {
@@ -485,7 +487,7 @@ public class Residue implements java.io.Serializable {
         //  no atoms within a single residue should have such a large distance.
         // Note though that this value is not touched for AAs since the C alpha is assumed to be the center, thus
         //  we don't compare all atoms with each other for AAs. We only calculate the distance from the CA to all others.
-        if(totalMinMaxDist == MAXDIST && (! this.isAA())) {
+        if(Objects.equals(totalMinMaxDist, MAXDIST) && (! this.isAA())) {
             System.err.println("ERROR: MinMax distance of the atoms of PDB residue " + pdbResNum + " is >= " + MAXDIST + ", seems *very* unlikely.");
             System.exit(-1);
         }
@@ -520,6 +522,7 @@ public class Residue implements java.io.Serializable {
     /**
      * This function determines whether we need to look at the atoms to check for contacts betweens
      * this residue and a 2nd one. If the center spheres don't overlap, there cannot exist any atom contacts.
+     * @param r the other residue
      */
     public Boolean contactPossibleWithResidue(Residue r) {
 

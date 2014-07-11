@@ -91,8 +91,8 @@ public class DBManager {
             System.err.println("ERROR: Could not load JDBC driver '" + dbDriver + "'. Is the correct db driver installed at lib/postgresql-jdbc.jar?");
             System.err.println("ERROR: See the README for more info on getting the proper driver for your PostgreSQL server and Java versions.'");
             System.err.println("ERROR: Message was: '" + e.getMessage() + "'.");
-            System.exit(1);
-            
+            System.exit(1);     // if this code is called, the user explcitely requested to use the DB, so we should die if it does not work.
+            return false;
         }
 
         Boolean conOK = connect();
