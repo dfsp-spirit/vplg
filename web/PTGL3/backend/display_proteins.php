@@ -1,17 +1,42 @@
 <?php
-/**
+/** This file creates the tables for the protein display page dynamically.
  * 
+ * It recives the parameter 'q' which contains a list of PDB-IDs (inclusive the chain name)
+ * which are should be seperated by a single whitespace. It has no return value but
+ * provides the variable $tableString which contains the HTML code for displaying the
+ * proteingraphs in several content-sliders.
+ *   
+ * @author Daniel Bruness <dbruness@gmail.com>
+ * @author Andreas Scheck <andreas.scheck.home@googlemail.com>
  */
-ini_set('display_errors',1); // #TODO Remove these lines later...!
-ini_set('display_startup_errors',1);
-error_reporting(-1);
 
+// ini_set('display_errors',1); // #TODO Remove these lines later...!
+// ini_set('display_startup_errors',1);
+// error_reporting(-1);
+
+// get config values
 $CONFIG				= include('./backend/config.php'); 
+$DB_HOST		= $CONFIG['host'];
+$DB_PORT		= $CONFIG['port'];
+$DB_NAME		= $CONFIG['db'];
+$DB_USER		= $CONFIG['user'];
+$DB_PASSWORD	= $CONFIG['pw'];
 $BUILD_FILE_PATH	= $CONFIG['build_file_path'];
 $IMG_ROOT_PATH		= $CONFIG['img_root_path'];
+
+// the graphtype which should be displayed first. Standard: alpha-graph
+// and all other graphtypes
 $graphtype			= "alpha"; # alpha-helix is #1
 $graphtypes			= array("alpha", "beta", "albe", "alphalig", "betalig", "albelig");
 
+//remove currently displayed graphtype from graphtype array
+// to be honest: not sure if neccessary...!
+$index = array_search($graphtype, $graphtypes);
+if($index !== FALSE){
+    unset($graphtypes[$index]);
+} 
+
+// translate graphtype abbr. to understandable string
 $graphtype_dict = array(
 	"alpha"		=> "Alpha",
 	"beta"		=> "Beta",
@@ -21,11 +46,7 @@ $graphtype_dict = array(
 	"albelig"	=> "Alpha-Beta-Ligand"
 );
 
-$index = array_search($graphtype, $graphtypes); //remove currently displayed graphtype from graphtype array
-if($index !== FALSE){
-    unset($graphtypes[$index]);
-}
-
+// translate SSE-type abbr. into letters
 $sse_type_shortcuts = array(
     1 => "H",
     2 => "B",
@@ -33,35 +54,51 @@ $sse_type_shortcuts = array(
     4 => "O"
 );
 
-
+// if _GET is set and contains the parameter 'q' then..
 if(isset($_GET)) {
-    if(isset($_GET["q"])) {$q = $_GET["q"];};
+    if(isset($_GET["q"])) {
+		// .. set the value to $q.
+		$q = $_GET["q"];
+	}
 }
 
+// seperate PDB-IDs at the whitespace and remove unneccessary whitespaces at start and end
+// results into an array full of PDB-IDs.
+$chains = explode(" ", trim($q));
 
-$chains = explode(" ", trim($q));  #Clip whitespaces and seperate PDB IDs at whitespaces -> Array
-
-$conn_string = "host=" . $CONFIG['host'] . " port=" . $CONFIG['port'] . " dbname=" . $CONFIG['db'] . " user=" . $CONFIG['user'] ." password=" . $CONFIG['pw'];
+// establish database connection
+$conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
 $db = pg_connect($conn_string)
-		or die($CONFIG['db'] . ' -> Connection error: ' . pg_last_error() . pg_result_error() . pg_result_error_field() . pg_result_status() . pg_connection_status() );            
+		or die($DB_NAME . ' -> Connection error: ' . pg_last_error() . pg_result_error() . pg_result_error_field() . pg_result_status() . pg_connection_status() );            
 	
-
+// start to fill the html-tableString with content. This string will be echoed later
+// to display the here created HTML construct.
 $tableString = '<div id="myCarousel">
 				  <ul class="bxslider bx-prev bx-next" id="carouselSlider">';
 
+// init the variable which counts the number of loaded images. You may need this
+// if you want to restrict the number of at-once-loaded images (partially implemented)
 $loaded_images = 0;
+// this variable contains the PDB-IDs which was handled at the moment. This is also
+// used for loading content dynamically.
 $allChainIDs = array();
+
+// for each PDB-ID+chainname...
 foreach ($chains as $value){
+	// check for correct format (maybe check also for correct letters/numbers..?)
 	if (!(strlen($value) == 5)) {
 		echo "<br />'" . $value . "' has a wrong PDB-ID format\n<br />";
 	}
+	// if everything is fine..
 	else {
-
+		// push current handled ID to the previous mentioned array
 		array_push($allChainIDs, $value);
+		// Split into PDB-ID and chainname
 		$pdb_chain = str_split($value, 4);
 		$pdbID = $pdb_chain[0];
 		$chainName = $pdb_chain[1];
-
+		
+		// remove previous prepared_statements from DB
 		pg_query($db, "DEALLOCATE ALL");
 		$query = "SELECT * FROM plcc_chain, plcc_graph 
 				  WHERE pdb_id LIKE $1 
@@ -71,14 +108,16 @@ foreach ($chains as $value){
 		
 		pg_prepare($db, "getChains", $query) or die($query . ' -> Query failed: ' . pg_last_error());		
 		$result = pg_execute($db, "getChains", array("%".$pdbID."%", "%".$chainName."%"));  
+		// first: get first dataset only (maybe too complicated implementation.. :(  )
 		$data = pg_fetch_array($result, NULL, PGSQL_ASSOC);
 		$chain_id = (int) $data['chain_id'];
 
-		
+		// query SSE informations/table with chain_id
 		$query_SSE = "SELECT * FROM plcc_sse WHERE chain_id = ".$chain_id." ORDER BY position_in_chain";
 		$result_SSE = pg_query($db, $query_SSE) 
 					  or die($query . ' -> Query failed: ' . pg_last_error());
 		
+		// continue building the HTML string. Not further explained from now on.
 		$tableString .= '<li>
 						<div class="container">
 						<h4>Protein graph for '.$pdbID.', chain '.$chainName.'</h4>
@@ -89,26 +128,31 @@ foreach ($chains as $value){
 						  </div>	
 						  <ul id="'.$pdbID.$chainName.'" class="bxslider tada">';
 
-					// if($loaded_images < 2){		// use this to limit preloaded images
+		// if($loaded_images < 2){		// use this to limit preloaded images
 		$tableString .= '<li><a title="Loaded_'.$loaded_images.'" href="./data/'.$data['graph_image_png'].'" target="_blank">
 						  <img src="./data/'.$data['graph_image_png'].'" alt="" />
 						</a>
 						<a href="./data/'.$data['graph_image_png'].'" target="_blank">Full Size Image</a>
 						<span class="download-options">Download Graph: ';
 
-		if(isset($data['graph_image_eps']) && file_exists("./data/".$data['graph_image_eps'])) {
-			$tableString .= '<a href="./data/'.$data['graph_image_eps'].'" target="_blank">[EPS]</a>';
+		// check if downloadable files exist. If so, then add link to file (4x)
+		if(isset($data['graph_image_pdf']) && file_exists($IMG_ROOT_PATH.$data['graph_image_pdf'])) {
+			$tableString .= '<a href="./data/'.$data['graph_image_pdf'].'" target="_blank">[PDF]</a>';
 		}
-		if(isset($data['graph_image_svg']) && file_exists("./data/".$data['graph_image_svg'])){
+		if(isset($data['graph_image_svg']) && file_exists($IMG_ROOT_PATH.$data['graph_image_svg'])){
 			$tableString .= '<a href="./data/'.$data['graph_image_svg'].'" target="_blank">[SVG]</a>';
 		}
-		if(isset($data['graph_image_png']) && file_exists("./data/".$data['graph_image_png'])){
+		if(isset($data['graph_image_png']) && file_exists($IMG_ROOT_PATH.$data['graph_image_png'])){
 			$tableString .= '<a href="./data/'.$data['graph_image_png'].'" target="_blank">[PNG]</a>';
+		}
+		if(isset($data['graph_string_gml']) && file_exists($IMG_ROOT_PATH.$data['graph_string_gml'])){
+			$tableString .= '<a href="./data/'.$data['graph_string_gml'].'" target="_blank">[GML]</a>';
 		}
 		$tableString .= '</span></li>';
 
-	// } // use this to limit preloaded images
+		// }	// use this to limit preloaded images
 
+		// get the rest of the dataset. Until here we used only the first dataset from the DB.
 		while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
 			// if($loaded_images < 2){  // Use this to limit the amount of loaded images
 			$tableString .= '<li>';
@@ -117,19 +161,23 @@ foreach ($chains as $value){
 							 </a>
 						     <a href="./data/'.$arr['graph_image_png'].'" target="_blank">Full Size Image</a>
 						     <span class="download-options">Download Graph: ';
-
-			if(isset($data['graph_image_eps']) && file_exists("./data/".$data['graph_image_eps'])){
-				$tableString .= '<a href="./data/'.$data['graph_image_eps'].'" target="_blank">[EPS]</a>';
-			}
-			if(isset($data['graph_image_svg']) && file_exists("./data/".$data['graph_image_svg'])){
-				$tableString .= '<a href="./data/'.$data['graph_image_svg'].'" target="_blank">[SVG]</a>';
-			}
-			if(isset($data['graph_image_png']) && file_exists("./data/".$data['graph_image_png'])){
-				$tableString .= '<a href="./data/'.$data['graph_image_png'].'" target="_blank">[PNG]</a>';
-			}
+				
+				// check if downloadable files exist. If so, then add link to file (4x)
+				if(isset($data['graph_image_pdf']) && file_exists($IMG_ROOT_PATH.$data['graph_image_pdf'])) {
+					$tableString .= '<a href="./data/'.$data['graph_image_pdf'].'" target="_blank">[PDF]</a>';
+				}
+				if(isset($data['graph_image_svg']) && file_exists($IMG_ROOT_PATH.$data['graph_image_svg'])){
+					$tableString .= '<a href="./data/'.$data['graph_image_svg'].'" target="_blank">[SVG]</a>';
+				}
+				if(isset($data['graph_image_png']) && file_exists($IMG_ROOT_PATH.$data['graph_image_png'])){
+					$tableString .= '<a href="./data/'.$data['graph_image_png'].'" target="_blank">[PNG]</a>';
+				}
+				if(isset($data['graph_string_gml']) && file_exists($IMG_ROOT_PATH.$data['graph_string_gml'])){
+					$tableString .= '<a href="./data/'.$data['graph_string_gml'].'" target="_blank">[GML]</a>';
+				}
 			$tableString .= '</span>';
 			$tableString .= '</li>';
-		// } 
+			// } 
 		}
 
 		$tableString .= '</ul>
@@ -142,8 +190,10 @@ foreach ($chains as $value){
 							<th class="tablecenter">Sequence</th>
 							<th class="tablecenter">from - to</th>
 						  </tr>';
-		$counter = 1;	
 		
+		// counter to numerate SSEs in the table
+		$counter = 1;	
+		// create SSE table (displayed to the right of protein graph)
 		while ($arr = pg_fetch_array($result_SSE, NULL, PGSQL_ASSOC)){
 			$pdb_start = str_replace("-", "", substr($arr["pdb_start"], 1));
 			$pdb_end = str_replace("-", "", substr($arr["pdb_end"], 1));
@@ -164,7 +214,10 @@ foreach ($chains as $value){
 		$tableString .= '<p>- Select topology type -</p>
 						<a class="thumbalign" data-slide-index="0" href=""><img src="./data/'.$pdbID.'_'.$chainName.'_'.$graphtype.'_PG.png" width="100px" height="100px" />
 						'.$graphtype_dict[$graphtype].'</a>';
+		
+		// counter for the data-slide-index property of the bxSlider.
 		$c = 1;					
+		// create thumbails for the (inner) slider. One thumb for each graphtype
 		foreach ($graphtypes as $gt){
 			$tableString .= ' <a class="thumbalign" data-slide-index="'.$c++.'" href=""><img src="./data/'.$pdbID.'_'.$chainName.'_'.$gt.'_PG.png" width="100px" height="100px" />
 								'.$graphtype_dict[$gt].'
@@ -175,7 +228,7 @@ foreach ($chains as $value){
 	}
 	$loaded_images++;
 }
-
- $tableString .= '</ul></div>';				
-
+// last entry for the tableString
+$tableString .= '</ul></div>';				
+//EOF
 ?>

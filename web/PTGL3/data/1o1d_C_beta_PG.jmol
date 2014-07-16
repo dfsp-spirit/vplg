@@ -1,1 +1,0 @@
-load =1O1D; draw e0ae1 color [51 51 255] {-81.8 -55.2 107.4} {-86.4 -56.6 106.1}; draw e0 color black diameter 5.0 circle {-81.8 -55.2 107.4}; draw e1 color black diameter 5.0 circle {-86.4 -56.6 106.1}; delete water; cartoon only; display :C; color cartoon translucent orange; 

@@ -1,1 +1,0 @@
-load =3KMF; draw l0 color [255 9 255] diameter 5.0 circle {4.3 23.5 55.1}; delete water; cartoon only; display :E; color cartoon translucent orange; 

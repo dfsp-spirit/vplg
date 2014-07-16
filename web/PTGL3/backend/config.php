@@ -1,14 +1,17 @@
 <?php
-/**
- *  postgreSQL Config 
- *  returns DB-values as array
- *
- *
+/** This file stores the configuration and the database connection information
+ *  in an array in returns it.
+ *   
+ * @author Daniel Bruness <dbruness@gmail.com>
+ * @author Andreas Scheck <andreas.scheck.home@googlemail.com>
  */
 
+/**
+ * Returns the configuration data in an associative array
+ */
 return array(
 	//---- Database settings ----//
-    'host'	=> '192.168.185.248', // UNI_DB 192.168.185.248
+    'host'	=> '192.168.185.248',
     'user'	=> 'vplg',
     'pw'	=> 'vplg',
     'db'	=> 'vplg',
@@ -29,4 +32,8 @@ return array(
 	'img_root_path'		=> './data/'
 	//---- End of file settings ----//
 );
+
+
+
+//EOF
 ?>

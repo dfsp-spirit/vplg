@@ -1,3 +1,0 @@
-graph ProteinGraph {
-    0 [label="0-L" shape=triangle color=magenta];
-}

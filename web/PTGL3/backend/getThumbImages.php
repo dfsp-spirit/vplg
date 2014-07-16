@@ -1,4 +1,22 @@
 <?php
+/** This file is neccessary if the images should be loaded dynamically.
+ * 
+ * In fact this file could be deleted, its condition is worse than getMainImage.php
+ * 
+ * Unfortunatly this version does NOT work correctly and is pretty useless at this
+ * point. In fact it should work like the display_proteins.php script. 
+ * The idea was, that this file is called by an AJAX request, get the neccessary images
+ * and put the new createt HTML string into the existing HTML structure. Well, its twisted...
+ * 
+ * It receives an array of PDB-IDs which where selected by the user. Also, it gets an value
+ * of the currently selected protein-slide (int). So you should be able to load
+ * the correct and now needed images. Somehow, that was the idea. 
+ * 
+ * The main problem is, that loading new images corrupts the slider... :(
+ *   
+ * @author Daniel Bruness <dbruness@gmail.com>
+ * @author Andreas Scheck <andreas.scheck.home@googlemail.com>
+ */
 
 $graphtype = "alpha"; # alpha-helix is #1
 $graphtypes = array("alpha", "beta", "albe", "alphalig", "betalig", "albelig");

@@ -1,32 +1,52 @@
 <?php
-/**search.php
+/** This file provides the search results depending on the search query.
  * 
- * Author: Daniel Bruneß <dbruness@gmail.com>
- * 
- * 
- * 
- * 
- * 
+ * It receives the parameters from the search box on the frontpage or the advanced search box.
+ * If there are multiple search keywords, the query is joined either with OR or AND.
+ * The results (if we got some) are displayed in a table and the HTML construct is
+ * stored in the $tableString, which will be echoed later.
+ *   
+ * @author Daniel Bruness <dbruness@gmail.com>
+ * @author Andreas Scheck <andreas.scheck.home@googlemail.com>
  */
 
-ini_set('display_errors',1);
-ini_set('display_startup_errors',1);
-error_reporting(-1);
+// ini_set('display_errors',1); // #TODO Remove these lines later...!
+// ini_set('display_startup_errors',1);
+// error_reporting(-1);
 
+// get config values
+$CONFIG				= include('./backend/config.php'); 
+$DB_HOST		= $CONFIG['host'];
+$DB_PORT		= $CONFIG['port'];
+$DB_NAME		= $CONFIG['db'];
+$DB_USER		= $CONFIG['user'];
+$DB_PASSWORD	= $CONFIG['pw'];
+$BUILD_FILE_PATH	= $CONFIG['build_file_path'];
+$IMG_ROOT_PATH		= $CONFIG['img_root_path'];
+
+
+/** The function creates a CATH link with a PDB-ID and optional a chain-name
+ * 
+ * @param type $pdbid
+ * @param type $chain
+ * @return type
+ */
 function get_cath_link($pdbid, $chain = null) {
-  if($chain == null) {
-    return "http://www.cathdb.info/pdb/" . $pdbid;
-  }
-  else {
-    return "http://www.cathdb.info/chain/" . $pdbid . $chain;
-  }
+	// if no chainname is given...
+	if($chain == null) {
+	  return "http://www.cathdb.info/pdb/" . $pdbid;
+	}
+	else {
+	  return "http://www.cathdb.info/chain/" . $pdbid . $chain;
+	}
 }
 
-$db_config = include('config.php');     //TODO: Sichern?
 
-// try to get POST data
+// set standard logic operator to "OR"
 $logic = "OR";
+// variable to check if any search value is set. none_set = true -> nothing is set.
 $none_set = true;
+// check if parameters are set. If so, set the associated variable with the value
 if(isset($_POST)) {
     if(isset($_POST["keyword"])) {$keyword = $_POST["keyword"];  $none_set = false;} else {$keyword = "";};
     if(isset($_POST["pdbid"])) {$pdbid = $_POST["pdbid"];  $none_set = false;};
@@ -37,33 +57,35 @@ if(isset($_POST)) {
     if(isset($_POST["logic"])) {$logic = $_POST["logic"];};
     if(isset($_POST["proteincomplexes"])) {$proteincomplexes = $_POST["proteincomplexes"];};
 } else {
+	// if nothing is set or the query is too short...
 	$tableString = "Sorry. Your search term is too short. <br>\n";
 	$tableString .= '<a href="./index.php">Go back</a> or use the query box in the upper right corner!';
 	exit;
 }
 
-if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALSE) {
+if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALSE) { // #TODO redefine this check...
 	$tableString = "Sorry. Your search term is too short.<br>\n";
 	$tableString .= '<a href="./index.php">Go back</a> or use the query box in the upper right corner!';
 	exit;
-} else { 	// establish pgsql connection
-	
-	$conn_string = "host=" . $db_config['host'] . " port=" . $db_config['port'] . " dbname=" . $db_config['db'] . " user=" . $db_config['user'] ." password=" . $db_config['pw'];
+} else {
+	// establish database connection
+	$conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
 	$db = pg_connect($conn_string)
-					or die($db_config['db'] . ' -> Connection error: ' . pg_last_error() . pg_result_error() . pg_result_error_field() . pg_result_status() . pg_connection_status() );            
-	
-	
+			or die($DB_NAME . ' -> Connection error: ' . pg_last_error() . pg_result_error() . pg_result_error_field() . pg_result_status() . pg_connection_status() );            
+
+	// later, if no query is set before, there will be no CONCAT/UNION
 	$firstQuerySet = false;
-	$query = "";
+	$query = "SELECT chain_id, chain_name, pdb_id, resolution, title, header
+			  FROM ( ";
 	
+	// following: the queries for each set parameter
 	if (isset($keyword) && $keyword != "") {
 		$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
 				   FROM plcc_chain c
 				   INNER JOIN plcc_protein p
 				   ON p.pdb_id = c.pdb_id 
 				   WHERE p.pdb_id LIKE '%".$keyword."%' 
-				   OR p.header LIKE '%".strtoupper($keyword)."%'
-				   ORDER BY pdb_id, chain_name";
+				   OR p.header LIKE '%".strtoupper($keyword)."%'";
 		$firstQuerySet = true; };
 	
 	if (isset($pdbid) && $pdbid != ""){
@@ -72,8 +94,7 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 				   FROM plcc_chain c
 				   INNER JOIN plcc_protein p
 				   ON p.pdb_id = c.pdb_id 
-				   WHERE p.pdb_id = '".$pdbid."'
-				   ORDER BY pdb_id, chain_name";
+				   WHERE p.pdb_id = '".$pdbid."'";
 		$firstQuerySet = true; };
 	
 	if (isset($title) && $title != ""){
@@ -82,8 +103,7 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 				   FROM plcc_chain c
 				   INNER JOIN plcc_protein p
 				   ON p.pdb_id = c.pdb_id 
-				   WHERE p.title = '".strtoupper($title)."'
-				   ORDER BY pdb_id, chain_name";
+				   WHERE p.title = '".strtoupper($title)."'";
 		$firstQuerySet = true; };
 	
 	if (isset($hasligand) && $hasligand != "null") {
@@ -94,23 +114,30 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 		}
 		
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
-				   FROM plcc_nm_ligandtochain l
-				   INNER JOIN plcc_chain c ON l.ligandtochain_chainid = c.chain_id
-				   INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id 
-				   WHERE l.ligandtochain_ligandname3 IS".$operator."NULL
-				   ORDER BY pdb_id, chain_name"; 
-		$firstQuerySet = true; };
+			$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
+					FROM plcc_nm_ligandtochain l
+					INNER JOIN plcc_chain c ON l.ligandtochain_chainid = c.chain_id
+					INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id 
+					WHERE l.ligandtochain_ligandname3 IS".$operator."NULL"; 
+			$firstQuerySet = true; 
+		 
+	};
 
 	if (isset($ligandname) && $ligandname != "") { 
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
+		/*$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
 				   FROM plcc_nm_ligandtochain l
 				   INNER JOIN plcc_chain c ON l.ligandtochain_chainid = c.chain_id
 				   INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id 
 				   WHERE l.ligandtochain_ligandname3 = '".$ligandname."'
-				   ORDER BY pdb_id, chain_name"; 
-		$firstQuerySet = true; };
+				   ORDER BY pdb_id, chain_name"; */
+		$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
+				   FROM plcc_chain c
+				   INNER JOIN plcc_nm_ligandtochain l2c ON c.chain_id = l2c.ligandtochain_chainid
+				   INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id 
+				   WHERE l2c.ligandtochain_ligandname3 = '".$ligandname."'"; 
+		$firstQuerySet = true; 	
+	};
 
 	if (isset($molecule) && $molecule != ""){
 		if($firstQuerySet) { $query .= " UNION "; }
@@ -118,27 +145,21 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 				   FROM plcc_chain c
 				   INNER JOIN plcc_protein p
 				   ON p.pdb_id = c.pdb_id 
-				   WHERE c.mol_name LIKE '%".$molecule."%'
-				   ORDER BY pdb_id, chain_name";
+				   WHERE c.mol_name LIKE '%".$molecule."%'";
 		$firstQuerySet = true; };
 
-
-
-	if ($logic == "OR") {
-		$query = rtrim($query, " OR ");
-	} else {
-		$query = rtrim($query, " AND ");
-	}
+	$query .= " ) results
+			  ORDER BY pdb_id, chain_name";
+  
 
 	$result = pg_query($db, $query) or die($query . ' -> Query failed: ' . pg_last_error());
 
+	// this counter is used to display alternating table colors
 	$counter = 0;
 	$tableString = "";
-	$numberOfChains = 0;
 	$createdHeadlines = Array();
 	while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
-		$numberOfChains++;
-		
+		// set protein/chain information for readability		
 		$pdb_id =  $arr['pdb_id'];
 		$chain_name = $arr['chain_name'];
 		$resolution = $arr['resolution'];
@@ -146,13 +167,14 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 		$header = $arr["header"];
 		$cathlink = get_cath_link($pdb_id, $chain_name);
 		
-		// provides alternating orange/white tables
+		// provides alternating blue/white tables
 		if ($counter % 2 == 0){
-			$class = "Orange";	
+			$class = "Orange";	// the CSS class is still called orange...
 		} else {
 			$class = "White";
 		}
 		
+		// if the headline of the PDB-ID is NOT created yet...
 		if(!in_array($pdb_id, $createdHeadlines)){
 			$tableString .=	 '<div class="results results'.$class.'">					
 							<div class="resultsHeader resultsHeader'.$class.'">
@@ -169,10 +191,10 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 								<div class="resultsClass">Classification</div>
 								<div class="resultsClassPDB">'.ucfirst(strtolower($header)).'</div>
 							</div>';
-
+			// now the headline is created, so push the PDB-ID to the createdHeadlines array
 			array_push($createdHeadlines, $pdb_id);
 		}
-
+		// if the headline is already there..
 		$tableString .= '	<div class="resultsFooter">
 						<div class="resultsChain">Chain '.$chain_name.'</div>
 						<div class="resultsChainNum"><input type=checkbox id="'.$pdb_id . $chain_name. '" class="chainCheckBox" value="'.$pdb_id . $chain_name.'"/>'.$pdb_id . $chain_name.'</div>
@@ -186,5 +208,5 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 	pg_free_result($result); // clean memory
 	pg_close($db); // close connection
 }
-
+//EOF
 ?>

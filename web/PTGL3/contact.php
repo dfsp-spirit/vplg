@@ -63,7 +63,7 @@
 				 <div class="leftColumn">
 					<strong>Prof. Dr. Ina Koch</strong>
 					<br>
-					Johann Wolfgang Goethe-University Frankfurt a. Main
+					Johann Wolfgang Goethe-University Frankfurt am Main
 					<br>
 					Faculty of Computer Science and Mathematics, Dept. 12
 					<br>
@@ -73,7 +73,7 @@
 					<br>
 					Robert-Mayer-Strasse 11-15
 					<br>
-					60325 Frankfurt a. Main
+					60325 Frankfurt am Main
 					<br>
 					Germany
 				</div><!-- end leftColumn -->
@@ -125,7 +125,7 @@
 				<div class="leftColumn">
 					<strong>Tim Schäfer</strong>
 					<br>
-					Johann Wolfgang Goethe-University Frankfurt a. Main
+					Johann Wolfgang Goethe-University Frankfurt am Main
 					<br>
 					Faculty of Computer Science and Mathematics, Dept. 12
 					<br>
@@ -135,7 +135,7 @@
 					<br>
 					Robert-Mayer-Strasse 11-15
 					<br>
-					60325 Frankfurt a. Main
+					60325 Frankfurt am Main
 					<br>
 					Germany
 				</div><!-- end leftColumn -->

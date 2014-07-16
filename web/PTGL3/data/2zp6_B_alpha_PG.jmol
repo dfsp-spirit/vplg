@@ -1,1 +1,0 @@
-load =2ZP6; draw h0 color [255 0 0] diameter 5.0 circle {-28.0 20.9 -0.7}; delete water; cartoon only; display :B; color cartoon translucent orange; 

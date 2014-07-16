@@ -80,7 +80,7 @@ document.getElementById('headlineChain').innerHTML = pdb; // .toUppserCase or no
 if(mode == "") {
   mode="structure";
 }
-var selectavailable = false;
+var selectavailable = false;null
 if(mode == "structure") {
   selectavailable=true;
 }
@@ -137,6 +137,10 @@ else {
   Jmol.getApplet("myJmol", InfoHTML5);
 }
 Jmol.jmolBr();
+
+Jmol.jmolButton(myJmol, 'display not water;', 'Hide water');
+Jmol.jmolButton(myJmol, 'display all', 'Show all');
+
 document.write('<p class="tiny">Jmol interactive scripting window:</p>');
 Jmol.jmolCommandInput("myJmol", "Execute Jmol command", "90%", "jmol_cmd", "Jmol command prompt")
 document.write('<p class="tiny">');
@@ -162,6 +166,12 @@ if(pdbInvalidorUnset) {
 function getJmolFileName($pdbid, $chain, $graphtype) {
   return $pdbid . "_" . $chain . "_" . $graphtype . "_PG.jmol";
 }
+
+function getJmolResBlueFileName($pdbid, $chain, $graphtype) {
+  return $pdbid . "_" . $chain . "_" . $graphtype . "_PG_resblue.jmol";
+}
+
+
 function writeJmolButtonJs($jmolcommands, $label) {
   echo "Jmol.jmolButton(myJmol, '" . $jmolcommands . "', '" . $label . "');";
 }
@@ -194,7 +204,9 @@ if($mode == "graph" || $mode == "allgraphs") {
                 if($valid_graphtype) {
                     $valid_all = TRUE;
                     $jmolfile = getJmolFileName($pdbid, $chain, $graphtype);
+					$jmolresbluefile = getJmolResBlueFileName($pdbid, $chain, $graphtype);
                     $link = "./data/". $jmolfile ;
+					$linkresblue = "./data/". $jmolresbluefile ;
                 }
                 else {
                     echo "<p>ERROR: Graph visualization: PDB ID and Chain are valid but graph type is not.</p>";
@@ -212,9 +224,25 @@ if($mode == "graph" || $mode == "allgraphs") {
                     <script language="JavaScript" type="text/javascript">
                     <!--
                     <?php
+						writeJmolButtonJs($command, $label);
+					?>
+                    // -->
+                    </script>
+                    <?php
+                }
+                else {
+                    echo "<p>INFO: Graph visualization: No visualization available for $graphtype graph of protein $pdbid chain $chain.</p>";
+                }
+
+                if (file_exists($linkresblue)) {
+                    $command = file_get_contents($linkresblue);
+                    $label = "Visualize $graphtype graph";
+                    ?>
+                    <script language="JavaScript" type="text/javascript">
+                    <!--
+                    <?php
                     writeJmolButtonJs($command, $label);
-                    
-?>
+                    ?>
                     // -->
                     </script>
                     <?php

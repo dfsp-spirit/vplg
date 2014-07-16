@@ -53,9 +53,10 @@ include('./backend/display_proteins.php');
 			
 			<span id="multipleDownload">Download checked proteins as <select id="multidown" name="multipledownload">
 												<option class="downloadOption" value="null">-- Select to download --</option>
-												<option class="downloadOption" value="ps">PostScript</option>
+												<option class="downloadOption" value="pdf">PDF</option>
 												<option class="downloadOption" value="svg">SVG</option>
-												<option class="downloadOption" value="png">PNG</option></select>		
+												<option class="downloadOption" value="png">PNG</option>
+												<option class="downloadOption" value="gml">GML</option></select>		
 			<br>
 			<span>Please <a href="citing.php">cite PTGL</a>, if you are using our data & images.</span>																					
 		</div>

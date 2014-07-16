@@ -1,5 +1,0 @@
-graph ProteinGraph {
-    0 [label="0-H" shape=circle color=red];
-    1 [label="1-E" shape=square color=black];
-    0 -- 1 [label="m" color=green];
-}
