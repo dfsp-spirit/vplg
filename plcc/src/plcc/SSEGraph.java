@@ -3264,8 +3264,16 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         gmlf.append("  comment \"").append(this.getOneLineMetadataString()).append("\"\n");
         gmlf.append("  directed 0\n");
         gmlf.append("  isplanar 0\n");
-        gmlf.append("  creator \"PLCC version ").append(Settings.getVersion()).append("\"\n");
+        try {
+            gmlf.append("  creator \"PLCC version ").append(Settings.getVersion()).append("\"\n");
+        }catch(java.lang.NullPointerException e) {
+            // no settings object yet, assume not to write stuff
+        }
         
+        gmlf.append("  pdb_id \"" + this.pdbid + "\"\n");
+        gmlf.append("  chain_id \"" + this.chainid + "\"\n");
+        gmlf.append("  graph_type \"" + this.graphType + "\"\n");
+        gmlf.append("  is_protein_graph " + (this.isProteinGraph ? "1" : "0") + "\n");
         
         // print all nodes
         SSE vertex;
