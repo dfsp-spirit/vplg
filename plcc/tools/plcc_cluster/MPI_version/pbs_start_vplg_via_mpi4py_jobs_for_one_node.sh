@@ -93,7 +93,8 @@ echo $APPTAG Time is `date`
 echo $APPTAG Directory is `pwd`
 echo -n "$APPTAG This job runs on the following processors: "
 echo `cat $PBS_NODEFILE`
-echo $APPTAG The java binary is at `which java`
+echo $APPTAG A java binary is at `which java`
+echo $APPTAG Note though that the plcc shell script in plcc_run may use another java
 echo $APPTAG pbs job id is $PBS_JOBID
 echo "$APPTAG Using $NUM_PROCESSORS_PER_NODE processors"
 echo "$APPTAG Using '$INPUT_FILE' as input file."
@@ -116,13 +117,14 @@ echo "$APPTAG Loading bash modules..."
 module load gnu-openmpi
 #module load openmpi
 
-## set path to openmpi binarie
+## set path to openmpi binary
 export PATH="/usr/lib64/mpi/gcc/openmpi/bin:$PATH"
 #export LD_LIBRARY_PATH="/usr/lib64/mpi/gcc/openmpi/lib64:$LD_LIBRARY_PATH"
 
 
 ## copy my python MPI job scripts to temporary directory 
 #echo "$APPTAG Copying files to temporary directory '$TMPDIR'..."
+## This will also coyp the graphletanalyer, which is in plcc_run/
 scp -r $MYHOME/software/plcc_cluster/ $TMPDIR/
 PLCC_CLUSTER_DIR="$TMPDIR/plcc_cluster"
 
@@ -153,6 +155,12 @@ if [ ! -f "$PLCC_JAR" ]; then
     echo "$APPTAG ERROR: The plcc JAR file '$PLCC_JAR' does not exist. You have to build PLCC and the libs and copy them over."
     echo "$APPTAG ERROR: The plcc JAR file '$PLCC_JAR' does not exist. You have to build PLCC and the libs and copy them over." >> $ERRORLOG
     exit 1
+fi
+
+GRAPHLETANALYSER="$PLCC_CLUSTER_RUN_DIR/graphletanalyser"
+if [ ! -f "$GRAPHLETANALYSER" ]; then
+    echo "$APPTAG WARNING: The graphletanaylser binary '$GRAPHLETANALYSER' does not exist. You have to build it and copy it over to plcc_run."
+    echo "$APPTAG WARNING: The graphletanaylser binary '$GRAPHLETANALYSER' does not exist. You have to build it and copy it over to plcc_run." >> $ERRORLOG
 fi
 
 ## copy DSSP binary
@@ -267,8 +275,9 @@ echo -n "$APPTAG The script '$MPI4PY_SCRIPT' terminated at: "
 date
 
 # copy-back everything needed. $TMPDIR gets cleaning in the new cluster!
-# no need for this because we write to a permament directory
+# no need for this because we write to a permament directory directly, it is mounted via NFS
 #scp -r output.file $PBS_O_HOST:$PBS_O_WORKDIR/
+#cp -r $PLCC_OUTPUT_DIR $PLCC_OUTPUT_COPY_DIR_ALL_NODES
 
 echo "$APPTAG All done, EOF."
 
