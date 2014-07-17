@@ -189,7 +189,7 @@ public class Settings {
         defSet("plcc_B_contact_debug_dysfunct", "false", "Atom level contact debugging mode. WARNING: When this is true, plcc will abort after the first few residues and produce wrong overall results!");
         
         defSet("plcc_B_split_dsspfile_warning", "true", "Whether to show a warning about splitting the DSSP file when multiple models are detected in a PDB file.");
-        
+        defSet("plcc_B_clustermode", "false", "Whether to write extra output files used only in cluster mode, like GML albe graph file list.");
         defSet("plcc_B_print_contacts", "false", "Whether the residue contacts are printed to stdout (slower)");
         defSet("plcc_B_write_lig_geolig", "true", "Determines whether ligand contacts are included in the <pdbid>.geolig file.");
         defSet("plcc_B_graphimg_header", "true", "Determines whether the graph images contain a header line with info on the graph type, PDBID and chain.");        

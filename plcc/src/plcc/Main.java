@@ -330,6 +330,10 @@ public class Main {
                         Settings.set("plcc_B_no_warn", "true");
                     }
                     
+                    if(s.equals("--cluster")) {
+                        Settings.set("plcc_B_clustermode", "true");
+                    }
+                    
                     if(s.equals("-Z") || s.equals("--silent")) {
                         Settings.set("plcc_B_silent", "true");
                         Settings.set("plcc_B_no_warn", "true");
@@ -1331,6 +1335,16 @@ public class Main {
             }
         }
         
+        if(Settings.getBoolean("plcc_B_clustermode")) {
+            // write the chains file if it has not yet been written
+            if( ! Settings.getBoolean("plcc_B_ptgl_text_output")) {
+                if(! silent) {
+                    System.out.println("Writing chain file due to cluster mode setting...");
+                }
+                writeChains(chainsFile, pdbid, chains);
+            }
+        }
+        
         if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
             print_debug_malfunction_warning();
             System.out.println("WARNING: ABORTING execution here due to DEBUG settings, results incomplete.");
@@ -2265,9 +2279,7 @@ public class Main {
             calculateComplexGraph(allChains, resList, resContacts, pdbid, outputDir, SSEGraph.GRAPHTYPE_ALBELIG);
         }
         
-        //System.out.println("All " + allChains.size() + " chains done.");
-        
-        
+        //System.out.println("All " + allChains.size() + " chains done.");                
     }
     
     
