@@ -327,12 +327,31 @@ if [ -r $FLN ]; then
 	    ## everything worked it seems
 	    echo "$APPTAG $PDBID PLCC run successfully."
 	    let NUM_SUCCESS++
-	    del_output $PDBID
+	    #del_output $PDBID
 	    ## we delete the log files if everything went fine
 	    rm -f $DBINSERT_LOG
 	    rm -f $ERROR_LOG_GET_PDB_FILE
 	    rm -f $ERROR_LOG_CREATE_DSSP_FILE
 	    rm -f $ERROR_LOG_PLCC
+	    
+            if [ "$RUN_GRAPHLETANALYSER" = "YES" ]; then
+                echo "$APPTAG Running Graphletanalyser to compute graphlets."
+		CHAINS_FILE="${PLCC_OUTPUT_DIR}/${PDBID}.chains"
+		if [ ! -f "$CHAINS_FILE" ]; then
+		       echo "$APPTAG ##### ERROR: No chains file found at '$CHAINS_FILE', is '--cluster' set as PLCC command line option?"
+	        else
+			for CHAIN in $(cat ${CHAINSFILE});
+			do
+				ALBE_GML_GRAPHFILE="${PLCC_OUTPUT_DIR}/$PDBID_$CHAIN.gml"
+				if [ -f "$ALBE_GML_GRAPHFILE" ]; then
+					./graphletanalyser --useDatabase $ALBE_GML_GRAPHFILE
+				else
+					echo "$APPTAG ##### ERROR:The albe GML graph file was not found on disk, cannot run graphletanalyser on it."
+				fi
+			done
+		fi
+	    fi
+
 	    report_and_exit_nolog 0
 	fi
 else
