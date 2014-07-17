@@ -1,11 +1,27 @@
 #!/bin/bash
+## plcc startup script by Tim Schaefer
+
+
+APPTAG="[PLCC_STARTSCRIPT]"
 
 ## check for java in PATH
 which java > /dev/null
 if [ $? -ne 0 ]; then
-    echo "ERROR: Could not find 'java' executable in PATH. Is the JRE installed?"
+    echo "$APPTAG ERROR: Could not find 'java' executable in PATH. Is the JRE installed?"
     exit 1
 fi
 
+JAVABIN=$(which java)
+
+
+## I need my own java7 binary on the cluster because it only has java6
+CUSTOM_JAVABIN="/home/ts/software/java/jdk/bin/java"
+if [ -f $CUSTOM_JAVABIN ]; then
+    JAVABIN="$CUSTOM_JAVABIN"
+fi
+
+
+echo "$APPTAG Using java binary from '$JAVABIN'."
+
 ## k, run
-java -jar plcc.jar $@
+$JAVABIN -jar plcc.jar $@
