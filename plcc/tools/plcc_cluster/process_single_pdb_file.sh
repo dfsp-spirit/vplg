@@ -342,13 +342,14 @@ if [ -r $FLN ]; then
 	        else
 			for CHAIN in $(cat ${CHAINSFILE});
 			do
-				ALBE_GML_GRAPHFILE="${PLCC_OUTPUT_DIR}/$PDBID_$CHAIN.gml"
+				ALBE_GML_GRAPHFILE="${PLCC_OUTPUT_DIR}/${PDBID}_${CHAIN}_albe_PG.gml"
 				if [ -f "$ALBE_GML_GRAPHFILE" ]; then
 					./graphletanalyser --useDatabase $ALBE_GML_GRAPHFILE
 				else
-					echo "$APPTAG ##### ERROR:The albe GML graph file was not found on disk, cannot run graphletanalyser on it."
+					echo "$APPTAG ##### ERROR:The albe GML graph file was not found at '$ALBE_GML_GRAPHFILE', cannot run graphletanalyser on it."
 				fi
 			done
+			rm "$CHAINS_FILE"
 		fi
 	    fi
 
