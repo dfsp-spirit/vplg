@@ -27,7 +27,7 @@ fi
 PDBID="$1"
 
 ## debug
-ERRORLOG="/develop/tmp/get_pdb_${PDBID}.log"
+ERRORLOG="/tmp/get_pdb_${PDBID}.log"
 
 ## extract the subdir from the pdbid (it is defined by the 2nd and 3rd letter of the id, e.g., for the pdbid '3kmf', it is 'km')
 PDB_SUBDIR=${PDBID:1:2}
