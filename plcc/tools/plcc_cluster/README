@@ -46,7 +46,8 @@ NOTE: I assume in the following, that your HOME directory, the directories conta
 Preparation:
 0.0) Copy the plcc.jar file, splitpdb.jar file and the 'lib' directory from your VPLG installation to the 'plcc_run' subdirectory. Install dsspcmbi.
 0.1) Edit the config file 'settings_statistics.cfg' to match your local settings.
-0.2) Edit the PLCC config file (at '~/.plcc_settings', run 'plcc --help' once if you do not have that file yet) and configure the database server.
+0.2) Edit the PLCC config file (at '~/.plcc_settings', run 'plcc --help' once if you do not have that file yet) and configure the database server. 
+     Then change to plcc_run/ and execute './plcc NONE --recreate-tables' once to create the DB structure (and test DB connectivity).
 0.3) Get a copy of the PDB via rsync or update your copy if required. You can use the 'update_files_via_rsync.sh' script for this.
 
 Actual Update:
