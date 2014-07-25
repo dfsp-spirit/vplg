@@ -425,7 +425,7 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_ssecontact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null references " + tbl_contacttypes + " ON DELETE CASCADE, check (sse1 < sse2));");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact_complexgraph + " (ssecontact_complexgraph_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, complex_contact_type int not null references " + tbl_complexcontacttypes + " ON DELETE CASCADE check (sse1 < sse2));");            
             doInsertQuery("CREATE TABLE " + tbl_complex_contact_stats + " (complex_contact_id serial primary key, chain1 int not null references " + tbl_chain + " ON DELETE CASCADE, chain2 int not null references " + tbl_chain + " ON DELETE CASCADE, contact_num_HH int not null, contact_num_HS int not null, contact_num_HL int not null, contact_num_SS int not null, contact_num_SL int not null, contact_num_LL int not null, contact_num_DS int not null);");
-            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_image_png text, graph_image_svg text, graph_image_pdf text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
+            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_image_png text, graph_image_svg text, graph_image_pdf text, filepath_graphfile_gml, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, fg_number int not null, graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_ptgl_adj text, graph_string_ptgl_red text, graph_string_ptgl_key text, graph_string_ptgl_seq text, graph_image_adj_svg text, graph_image_adj_png text, graph_image_adj_pdf text, graph_image_red_svg text, graph_image_red_png text, graph_image_red_pdf text, graph_image_key_svg text, graph_image_key_png text, graph_image_key_pdf text, graph_image_seq_svg text, graph_image_seq_png text, graph_image_seq_pdf text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_complexgraph + " (complexgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, graph_string_gml text, graph_string_kavosh text, graph_image_svg text, graph_image_png text);");
             doInsertQuery("CREATE TABLE " + tbl_motiftype + " (motiftype_id serial primary key, motiftype_name varchar(40));");
@@ -1295,6 +1295,63 @@ public class DBManager {
 
             
             statement.setString(1, relativeImagePath);
+            statement.setLong(2, graphDatabaseID);
+                                
+            numRowsAffected = statement.executeUpdate();
+            dbc.commit();
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: updateProteinGraphImagePathInDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: updateProteinGraphImagePathInDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: updateProteinGraphImagePathInDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        } 
+       
+        return numRowsAffected;
+        
+    }
+    
+    
+    /**
+     * Sets the path for a specific protein graph output text file format (e.g., GML) in the database. The graph has to exist in the database already.
+     * 
+     * @param graphDatabaseID the graph ID in the database. Use the getGrapDatabaseID function if you do not know it.
+     * @param format The format, e.g., "GML"
+     * @param relativeFilePath the relative image path to set in the database for the specified representation
+     * @return the number of rows affected by the SQL query
+     * @throws SQLException if something goes wrong with the database
+     */
+    public static Integer updateProteinGraphTextformatPathInDB(Long graphDatabaseID, String format, String relativeFilePath) throws SQLException {
+        
+        PreparedStatement statement = null;
+        String dbFieldNameGraphFile = "";
+
+        if(format.equals("GML")) {
+            dbFieldNameGraphFile = "filepath_graphfile_gml";
+        } else {
+            // TODO: create fields in DB and handle other fields here
+            DP.getInstance().w("updateProteinGraphTextformatPathInDB", "Format not supported by DB scheme yet, ignoring.");
+            return 0;
+        }
+        
+        String query = "UPDATE " + tbl_proteingraph + " SET " + dbFieldNameGraphFile + " = ? WHERE graph_id = ?;";
+        Integer numRowsAffected = 0;
+        
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            
+            statement.setString(1, relativeFilePath);
             statement.setLong(2, graphDatabaseID);
                                 
             numRowsAffected = statement.executeUpdate();

@@ -2047,13 +2047,14 @@ public class Main {
                     }
                 }
                 
+                Boolean gmlWritten = false; String gmlFile = "";    // for DB path reconstruction later
                 
                 String graphFormatsWritten = "";
                 Integer numFormatsWritten = 0;
                 if(Settings.getBoolean("plcc_B_output_GML")) {
-                    String gmlFile = filePathGraphs + fs + fileNameWithoutExtension + ".gml";
+                    gmlFile = filePathGraphs + fs + fileNameWithoutExtension + ".gml";
                     if(IO.stringToTextFile(gmlFile, pg.toGraphModellingLanguageFormat())) {
-                        graphFormatsWritten += "gml "; numFormatsWritten++;
+                        graphFormatsWritten += "gml "; numFormatsWritten++; gmlWritten = true;
                         pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_GML, new File(gmlFile));
                     }
                 }
@@ -2151,6 +2152,29 @@ public class Main {
                     }
                     catch(SQLException e) { 
                         DP.getInstance().e("Main", "Failed to insert '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + chain + "' into DB: '" + e.getMessage() + "'."); 
+                    }
+                    
+                    // update GML path
+                    if(gmlWritten) {
+                        Long graphDBID = -1L;
+                        try {
+                            graphDBID = DBManager.getDBProteinGraphID(pdbid, chain, gt);
+                        } catch(SQLException ex) {
+                            DP.getInstance().e("Main", "Could not find graph in database to update GML file path: '" + ex.getMessage() + "'.");
+                        }
+                        if(graphDBID > 0) {
+                            String gmlFileDBPath = gmlFile;
+
+                            if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
+                                gmlFileDBPath = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain) + fs + gmlFileDBPath;
+                            }
+                            
+                            try {
+                                DBManager.updateProteinGraphTextformatPathInDB(graphDBID, "GML", gmlFileDBPath);
+                            } catch(SQLException ex) {
+                                DP.getInstance().e("Main", "Could not update GML file path of graph in database: '" + ex.getMessage() + "'.");
+                            }
+                        }
                     }
                     
                     // assign SSEs in database
