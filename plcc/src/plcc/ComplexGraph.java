@@ -21,12 +21,12 @@ import net.sourceforge.spargel.writers.GMLWriter;
  */
 public class ComplexGraph extends UAdjListGraph {
 
-    public Map<Edge, Integer> numHHInteractionsMap;
-    public Map<Edge, Integer> numHSInteractionsMap;
-    public Map<Edge, Integer> numHLInteractionsMap;
+    public Map<Edge, Integer> numHelixHelixInteractionsMap;
+    public Map<Edge, Integer> numHelixStrandInteractionsMap;
+    public Map<Edge, Integer> numHelixLoopInteractionsMap;
     public Map<Edge, Integer> numSSInteractionsMap;
-    public Map<Edge, Integer> numSLInteractionsMap;
-    public Map<Edge, Integer> numLLInteractionsMap;
+    public Map<Edge, Integer> numStrandLoopInteractionsMap;
+    public Map<Edge, Integer> numLoopLoopInteractionsMap;
     public Map<Edge, Integer> numAllInteractionsMap;
     public Map<Edge, Integer> numDisulfidesMap;
     public Map<Vertex, String> proteinNodeMap;
@@ -38,12 +38,12 @@ public class ComplexGraph extends UAdjListGraph {
     ComplexGraph(String pdbid) {
         this.pdbid = pdbid;
 
-        numHHInteractionsMap = createEdgeMap();
-        numHSInteractionsMap = createEdgeMap();
-        numHLInteractionsMap = createEdgeMap();
+        numHelixHelixInteractionsMap = createEdgeMap();
+        numHelixStrandInteractionsMap = createEdgeMap();
+        numHelixLoopInteractionsMap = createEdgeMap();
         numSSInteractionsMap = createEdgeMap();
-        numSLInteractionsMap = createEdgeMap();
-        numLLInteractionsMap = createEdgeMap();
+        numStrandLoopInteractionsMap = createEdgeMap();
+        numLoopLoopInteractionsMap = createEdgeMap();
         numAllInteractionsMap = createEdgeMap();
         numDisulfidesMap = createEdgeMap();
         proteinNodeMap = createVertexMap();
@@ -126,17 +126,17 @@ public class ComplexGraph extends UAdjListGraph {
         });
         
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
-                "num_HH_contacts", numHHInteractionsMap));
+                "num_HH_contacts", numHelixHelixInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
-                "num_HS_contacts", numHSInteractionsMap));
+                "num_HS_contacts", numHelixStrandInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
-                "num_HL_contacts", numHLInteractionsMap));
+                "num_HL_contacts", numHelixLoopInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
                 "num_SS_contacts", numSSInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
-                "num_SL_contacts", numSLInteractionsMap));
+                "num_SL_contacts", numStrandLoopInteractionsMap));
         gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
-                "num_LL_contacts", numLLInteractionsMap));
+                "num_LL_contacts", numLoopLoopInteractionsMap));
 
         FileOutputStream fop = null;
         boolean allOK = true;

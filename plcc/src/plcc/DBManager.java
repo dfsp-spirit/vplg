@@ -173,16 +173,16 @@ public class DBManager {
             ps = dbc.prepareStatement(query);
             return (ps.executeUpdate());          // num rows affected
         } catch (SQLException e) {
-            DP.getInstance().e("doInsertQuery(): SQL statement '" + query + "' failed.");
-            DP.getInstance().e("The error message was: '" + e.getMessage() + "'.");
+            DP.getInstance().e("doInsertQuery(): SQL statement '" + query + "' failed: '" + e.getMessage() + "'.");
+            //DP.getInstance().e("The error message was: '" + e.getMessage() + "'.");
             return (-1);
         } finally {
             if (ps != null) {
                 try {
                     ps.close();
                 } catch (SQLException ex) {
-                    DP.getInstance().w("doInsertQuery(): Could not close prepared statement.");
-                    DP.getInstance().w("The error message was: '" + ex.getMessage() + "'.");
+                    DP.getInstance().w("doInsertQuery(): Could not close prepared statement: '" + ex.getMessage() + "'.");
+                    //DP.getInstance().w("The error message was: '" + ex.getMessage() + "'.");
                 }
             }
         }
@@ -203,16 +203,16 @@ public class DBManager {
             ps = dbc.prepareStatement(query);
             return (ps.executeUpdate());          // num rows affected
         } catch (SQLException e) {
-            DP.getInstance().w("doUpdateQuery(): SQL statement '" + query + "' failed.");
-            DP.getInstance().w("The error message was: '" + e.getMessage() + "'.");
+            DP.getInstance().w("doUpdateQuery(): SQL statement '" + query + "' failed: '" + e.getMessage() + "'.");
+            //DP.getInstance().w("The error message was: '" + e.getMessage() + "'.");
             return (-1);
         } finally {
             if (ps != null) {
                 try {
                     ps.close();
                 } catch (SQLException ex) {
-                    DP.getInstance().w("doUpdateQuery(): Could not close prepared statement.");
-                    DP.getInstance().w("The error message was: '" + ex.getMessage() + "'.");
+                    DP.getInstance().w("doUpdateQuery(): Could not close prepared statement: '" + ex.getMessage() + "'.");
+                    //DP.getInstance().w("The error message was: '" + ex.getMessage() + "'.");
                 }
             }
         }
@@ -233,16 +233,16 @@ public class DBManager {
             ps = dbc.prepareStatement(query);
             return ps.executeUpdate();           // num rows affected
         } catch (SQLException e) {
-            DP.getInstance().w("doDeleteQuery(): SQL statement '" + query + "' failed.");
-            DP.getInstance().w("The error message was: '" + e.getMessage() + "'.");
+            DP.getInstance().w("doDeleteQuery(): SQL statement '" + query + "' failed: '" + e.getMessage() + "'.");
+            //DP.getInstance().w("The error message was: '" + e.getMessage() + "'.");
             return (-1);
         } finally {
             if (ps != null) {
                 try {
                     ps.close();
                 } catch (SQLException ex) {
-                    DP.getInstance().w("doDeleteQuery(): Could not close prepared statement.");
-                    DP.getInstance().w("The error message was: '" + ex.getMessage() + "'.");
+                    DP.getInstance().w("doDeleteQuery(): Could not close prepared statement: '" + ex.getMessage() + "'.");
+                    //DP.getInstance().w("The error message was: '" + ex.getMessage() + "'.");
                 }
             }
         }
@@ -289,9 +289,7 @@ public class DBManager {
             }
             return (tableData);
         } catch (SQLException e) {
-            DP.getInstance().w("doDeleteQuery(): SQL statement '" + query + "' failed.");
-            DP.getInstance().w("The error message was: '" + e.getMessage() + "'.");
-            //e.printStackTrace();
+            DP.getInstance().w("doDeleteQuery(): SQL statement '" + query + "' failed.: '" + e.getMessage() + "'.");
             System.exit(1);
             return (null);
         } finally {
@@ -299,16 +297,14 @@ public class DBManager {
                 try {
                     rs.close();
                 } catch (SQLException ex) {
-                    DP.getInstance().w("doSelectQuery(): Could not close result set.");
-                    DP.getInstance().w("The error message was: '" + ex.getMessage() + "'.");
+                    DP.getInstance().w("doSelectQuery(): Could not close result set: '" + ex.getMessage() + "'.");
                 }
             }
             if (ps != null) {
                 try {
                     ps.close();
                 } catch (SQLException ex) {
-                    DP.getInstance().w("doSelectQuery(): Could not close prepared statement.");
-                    DP.getInstance().w("The error message was: '" + ex.getMessage() + "'.");
+                    DP.getInstance().w("doSelectQuery(): Could not close prepared statement: '" + ex.getMessage() + "'.");
                 }
             }
         }
@@ -333,8 +329,7 @@ public class DBManager {
                     return (true);        // already closed
                 }
             } catch (SQLException e) {
-                DP.getInstance().w("closeConnection(): Could not close DB connection.");
-                DP.getInstance().w("The error message was: '" + e.getMessage() + "'.");
+                DP.getInstance().w("closeConnection(): Could not close DB connection: '" + e.getMessage() + "'.");                
                 return (false);
             }
         } else {
@@ -379,7 +374,7 @@ public class DBManager {
             //doDeleteQuery("DROP INDEX plcc_idx_chain_insert;");
             //doDeleteQuery("DROP INDEX plcc_idx_sse_insert;");
 
-            res = true;      // Not really, need to check all of them
+            res = true;      // Not really, need to check all of them. But errors are written to STDERR by the methods, so the user will know if something went wrong
 
         } catch (Exception e) {
             System.err.println("ERROR: Drop tables SQL failed: '" + e.getMessage() + "'.");

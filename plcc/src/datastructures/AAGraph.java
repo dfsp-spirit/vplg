@@ -36,6 +36,8 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphMo
     /** Constructor */
     public AAGraph(ArrayList<Residue> vertices) {
         super(vertices);
+        this.pdbid = "";
+        this.chainid = "";
     }
     
     /** Advanced Constructor, constructs the edges automatically from ResContactInfo list */
@@ -44,6 +46,8 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphMo
         for(int i = 0; i < contacts.size(); i++) {
             this.addEdgeFromRCI(contacts.get(i));
         }
+        this.pdbid = "";
+        this.chainid = "";
     }
     
     /** Constructor */
@@ -165,6 +169,15 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphMo
         gml.append("  directed 0\n");
         gml.append("  isplanar 0\n");
         gml.append("  creator \"PLCC\"\n");
+        gml.append("  pdb_id \"").append(this.pdbid).append("\"\n");
+        gml.append("  chain_id \"").append(this.chainid).append("\"\n");
+        gml.append("  graph_type \"" + "aa_graph" + "\"\n");
+        gml.append("  is_protein_graph 1\n");
+        gml.append("  is_folding_graph 0\n");
+        gml.append("  is_SSE_graph 0\n");
+        gml.append("  is_AA_graph 1\n");
+        gml.append("  is_AA_type_contact_matrix 1\n");
+        gml.append("  is_all_chains_graph ").append(this.isAllChainsGraph() ? "1" : "0").append("\n");
         
         
         // print the 20 vertices -- one for each of the 20 amino acid types
@@ -201,6 +214,16 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphMo
         return(gml.toString());        
     }
     
+    /**
+     * Determines whether this graph is for all chains of a PDB file or only for a single chain.
+     * @return true if it is for all chains, false otherwise
+     */
+    public boolean isAllChainsGraph() {
+        if(this.chainid.equals(AAGraph.CHAINID_ALL_CHAINS)) {
+            return true;
+        }
+        return false;
+    }
     
     /**
      * Automatically adds an edge from a ResContactInfo object if applicable. Note that the edge is only added if the RCI describes a contact.
@@ -265,6 +288,15 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphMo
         gmlf.append("  directed 0\n");
         gmlf.append("  isplanar 0\n");
         gmlf.append("  creator \"PLCC\"\n");
+        gmlf.append("  pdb_id \"").append(this.pdbid).append("\"\n");
+        gmlf.append("  chain_id \"").append(this.chainid).append("\"\n");
+        gmlf.append("  graph_type \"" + "aa_graph" + "\"\n");
+        gmlf.append("  is_protein_graph 1\n");
+        gmlf.append("  is_folding_graph 0\n");
+        gmlf.append("  is_SSE_graph 0\n");
+        gmlf.append("  is_AA_graph 1\n");
+        gmlf.append("  is_AA_type_contact_matrix 0\n");
+        gmlf.append("  is_all_chains_graph ").append(this.isAllChainsGraph() ? "1" : "0").append("\n");
         
         
         // print all nodes

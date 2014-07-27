@@ -3274,6 +3274,10 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         gmlf.append("  chain_id \"" + this.chainid + "\"\n");
         gmlf.append("  graph_type \"" + this.graphType + "\"\n");
         gmlf.append("  is_protein_graph " + (this.isProteinGraph ? "1" : "0") + "\n");
+        gmlf.append("  is_folding_graph " + (this.isProteinGraph ? "0" : "1") + "\n");
+        gmlf.append("  is_SSE_graph 1\n");
+        gmlf.append("  is_AA_graph 0\n");
+        gmlf.append("  is_all_chains_graph " + (this.isComplexGraph() ? "1" : "0") + "\n");
         
         // print all nodes
         SSE vertex;
@@ -3415,7 +3419,13 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         return(dlf.toString());
     }
     
-    
+    /**
+     * Pseudo-method, setting this info is not implemented yet. Always returns false until that is fixed.
+     * @return false
+     */
+    public boolean isComplexGraph() {
+        return false;
+    }
     
     /**
      * Generates a string representation of this graph in edge list format.
