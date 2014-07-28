@@ -2169,6 +2169,8 @@ public class Main {
                                 gmlFileDBPath = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain) + fs + gmlFileDBPath;
                             }
                             
+                            gmlFileDBPath = IO.stripTrailingShitFromPathIfThere(gmlFileDBPath);
+                            
                             try {
                                 DBManager.updateProteinGraphTextformatPathInDB(graphDBID, "GML", gmlFileDBPath);
                             } catch(SQLException ex) {

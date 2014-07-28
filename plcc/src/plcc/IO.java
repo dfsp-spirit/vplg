@@ -113,6 +113,20 @@ public class IO {
         return sb.toString();
     }
     
+    
+    /**
+     * Ugly hack to remove a trailing "./" or ".\" from a string.
+     * @param path the input string, which may or may not start with "./" or ".\"
+     * @return if the input string starts with one of the mentioned patterns, the input string with the trailing pattern removed. Otherwise, the output string is the input string.
+     */
+    public static String stripTrailingShitFromPathIfThere(String path) {
+        String np = path;
+        if(np.startsWith("./") || np.startsWith(".\\")) {
+            np = np.substring(2);
+        }
+        return np;
+    }
+    
     /** Untar an input file into an output file.
 
      * The output file is created in the output folder, having the same name
