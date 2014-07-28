@@ -2195,9 +2195,10 @@ public class Main {
                     formats = Settings.getOutputImageFormats();
 
                     HashMap<IMAGEFORMAT, String> filesByFormatCurNotation = pg.drawProteinGraph(imgFileNoExt, false, formats);
-                    if(! silent) {
-                        System.out.println("      Image of graph written to file '" + imgFile + "'.");
-                    }
+                    //if(! silent) {
+                    //    System.out.println("      Image of graph written to file '" + imgFile + "'.");
+                    //}
+                    
                     //pcr.addProteinGraphImageBitmap(gt, new File(imgFile));
                     for(IMAGEFORMAT f : filesByFormatCurNotation.keySet()) {
                         pcr.addProteinGraphOutputImage(gt, f.toString(), new File(filesByFormatCurNotation.get(f)));
