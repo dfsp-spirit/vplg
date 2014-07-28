@@ -29,7 +29,7 @@ function del_output()
     L_PDBID="$1"	# first parameter to this function
     list_size=0
     num_del=0
-    for f in $L_PDBID.pdb $L_PDBID.dssp $L_PDBID.geolig $L_PDBID.ligands $L_PDBID.contactstats $L_PDBID.models $L_PDBID.chains $L_PDBID.dssplig $L_PDBID.geolig $L_PDBID.pymol $L_PDBID.geo
+    for f in $L_PDBID.pdb $L_PDBID.dssp $L_PDBID.geolig $L_PDBID.ligands $L_PDBID.contactstats $L_PDBID.models $L_PDBID.dssplig $L_PDBID.geolig $L_PDBID.pymol $L_PDBID.geo
     do
     	let list_size++
     	if [ -w $f ]; then
@@ -349,7 +349,10 @@ if [ -r $FLN ]; then
 					echo "$APPTAG ##### ERROR:The albe GML graph file was not found at '$ALBE_GML_GRAPHFILE', cannot run graphletanalyser on it."
 				fi
 			done
-			rm "$CHAINS_FILE"
+
+			if [ "$DELETE_CLUSTER_CHAINS_FILE" = "YES" ]; then
+				rm "$CHAINS_FILE"
+			fi
 		fi
 	    fi
 
