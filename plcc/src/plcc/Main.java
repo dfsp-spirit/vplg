@@ -512,6 +512,20 @@ public class Main {
                             if(DBManager.createTables()) {
                                 System.out.println("  DB: Tried to create statistics tables (no error messages => OK).");
                             }
+                            
+                            boolean printTables = true;
+                            if(printTables) {
+                                StringBuilder sb = new StringBuilder();
+                                ArrayList<String> t = DBManager.getPlccTablesCurrentlyInDatabase();
+                                sb.append("There are now " + t.size() + " tables in the database " + DBManager.getConnectionInfoDatabaseName() + ": ");
+                                for (int j = 0; j < t.size(); j++) {
+                                    sb.append(t.get(j));
+                                    if(j < t.size() - 1) {
+                                        sb.append(", ");
+                                    }
+                                }
+                                System.out.println(sb.toString());
+                            }
                         }
                         else {
                             System.err.println("ERROR: Could not modify tables, DB connection failed.");

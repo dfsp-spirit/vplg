@@ -3121,5 +3121,33 @@ public class DBManager {
             return(null);
         }        
     }
+
+    /**
+     * Queries the PG information schema and retrieves the names of all (non-system) tables
+     * in the vplg database.
+     * @return a list of table names currently in the DB (without system tables)
+     */
+    public static ArrayList<String> getPlccTablesCurrentlyInDatabase() {
+        ArrayList<String> t = new ArrayList<String>();
+        
+        ArrayList<ArrayList<String>> tableData = DBManager.doSelectQuery("SELECT table_name, table_schema FROM information_schema.tables WHERE table_schema NOT IN ('pg_catalog', 'information_schema');");
+        
+        for(ArrayList<String> row : tableData) {
+            if(row.size() >= 1) {
+                t.add(row.get(0));
+            }
+        }
+        
+        return t;
+    }
+    
+    
+    /**
+     * Returns the name of the database currently in use.
+     * @return the name of the database currently in use
+     */
+    public static String getConnectionInfoDatabaseName() {
+        return dbName;
+    }
     
 }
