@@ -8,6 +8,9 @@
 ###      '0 */3 * * * /path/to/run_unless_running.sh'
 ###
 ### Make sure to edit the settings below to fill in your command. And make sure that cron is running, of course. ;) That's it.
+###
+### With the current command setup, this should be run on the PTGL3 server to pull the output of the PTGL3 update from the cluster.
+### Note that you will have to configure password-less authentication via ssh (using SSH-keys) for the rsync command to work.
 
 
 # some commands we need
@@ -27,7 +30,10 @@ $ECHO "$APPTAG Checking whether to run commands. Current time is $DATESTR."
 PIDFILE=/var/run/rur_vplg-copy-results.pid
 
 # The command that should be executed (unless it still runs). This most likely takes some time.
-COMMAND="/usr/bin/rsync -avh source target"
+#COMMAND="/usr/bin/rsync -rh /tmp/results/ /srv/www/htdocs/myapp/data/results/"
+
+### Note that you will have to configure password-less authentication via ssh (using SSH-keys) for the rsync command to work.
+COMMAND="/usr/bin/rsync -rhe ssh ts@odysseus.bioinformatik.uni-frankfurt.de:/shares/modshare/vplg_all_nodes_output/ /srv/www/htdocs/ptgl3"
 
 
 ########## end of settings -- no need to edit below this line ##########
@@ -38,7 +44,7 @@ if [ -e "$PIDFILE" ] ; then
     # our pidfile exists, let's make sure the process is still running though
     PID=`$CAT "$PIDFILE"`
     if $KILL -0 "$PID" > /dev/null 2>&1 ; then
-        $ECHO "$APPTAG The script is still running, skipping this run at $DATESTR."
+        $ECHO "$APPTAG The command is still running, skipping this run at $DATESTR."
         exit 0
     fi
  fi
@@ -47,6 +53,7 @@ if [ -e "$PIDFILE" ] ; then
 $ECHO "$$" > $PIDFILE
 
 # run the command we came for
+$ECHO "$APPTAG The command is not running anymore, starting new instance at $DATESTR."
 $($COMMAND)
 
 # remove PID file
