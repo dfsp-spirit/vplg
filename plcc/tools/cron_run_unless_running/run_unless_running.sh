@@ -59,4 +59,6 @@ $($COMMAND)
 # remove PID file
 $RM -f "$PIDFILE"
 
-$ECHO "$APPTAG Exiting."
+DATESTR=$($DATE)
+
+$ECHO "$APPTAG Exiting at $DATESTR."
