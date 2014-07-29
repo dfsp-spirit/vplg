@@ -45,15 +45,26 @@ jobs=comm_world.scatter(jobs,root=0)
 print apptag + "There are " + str(len(jobs)) + " to do for me.\n"
 
 
-# this script is run in the plcc_cluster/MPI_version directory, so go up to plcc_cluster/
-rundir = "../plcc_run/"
+# this script is run in the plcc_cluster/MPI_version directory, so go up one dir to plcc_cluster
+rundir = "../"
 if not os.path.exists(rundir):
-   print apptag + "ERROR: The run directory does not exist at '" + rundir + "'.\n"
+   print apptag + "ERROR: The plcc_cluster directory does not exist at '" + rundir + "'.\n"
    sys.exit(1)
 
 os.chdir(rundir)
 
-print apptag + "Changed directory to '" + os.getcwd() + "'.\n"
+print apptag + "Changed directory to '" + os.getcwd() + "', this should be the plcc_cluster dir.\n"
+
+rscript = "./process_single_pdb_file.sh"
+if os.path.isfile(rscript):
+   print apptag + "Script '" + rscript + "' found in current dir, OK.\n"
+   if os.access(rscript, os.X_OK):
+      print apptag + "Script '" + rscript + "' seems to be executable, OK.\n"
+   else:
+      print apptag + "ERROR: The script '" + rscript + "' does not seem to be executable.\n"
+else:
+   print apptag + "ERROR: The script '" + rscript + "' does not exist here.\n"
+
 
 print apptag + "Running script 'process_single_pdb_file.sh' for all " + str(len(jobs)) + " jobs (PDB files) in my list.\n"
 
@@ -63,7 +74,9 @@ for cur_job in jobs:
 #         result.append(cur_job)
       pdbfile=cur_job      
       # Note: the PLCC command line options are set in the settings_statistics.cfg file
-      command_line="./process_single_pdb_file.sh " + pdbfile + ""
+      if not os.path.isfile(pdbfile):
+         print apptag + "WARNING: PDB file '" + pdbfile + "' does not seem to exist.\n"
+      command_line="/bin/bash ./process_single_pdb_file.sh " + pdbfile + ""
       print apptag + "  Running command '" + command_line + "'.\n"
       args = shlex.split(command_line)
       p = subprocess.Popen(args)
