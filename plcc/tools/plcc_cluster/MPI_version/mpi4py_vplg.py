@@ -46,7 +46,14 @@ print apptag + "There are " + str(len(jobs)) + " to do for me.\n"
 
 
 # this script is run in the plcc_cluster/MPI_version directory, so go up to plcc_cluster/
-os.chdir("../")
+rundir = "../plcc_run/"
+if not os.path.exists(rundir):
+   print apptag + "ERROR: The run directory does not exist at '" + rundir + "'.\n"
+   sys.exit(1)
+
+os.chdir(rundir)
+
+print apptag + "Changed directory to '" + os.getcwd() + "'.\n"
 
 print apptag + "Running script 'process_single_pdb_file.sh' for all " + str(len(jobs)) + " jobs (PDB files) in my list.\n"
 
