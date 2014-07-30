@@ -10,9 +10,10 @@
  * @author Andreas Scheck <andreas.scheck.home@googlemail.com>
  */
 
-// ini_set('display_errors',1); // #TODO Remove these lines later...!
-// ini_set('display_startup_errors',1);
-// error_reporting(-1);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+ini_set('log_errors', TRUE);
+error_reporting(E_ERROR);
 
 // get config values
 $CONFIG				= include('./backend/config.php'); 
@@ -21,8 +22,16 @@ $DB_PORT		= $CONFIG['port'];
 $DB_NAME		= $CONFIG['db'];
 $DB_USER		= $CONFIG['user'];
 $DB_PASSWORD	= $CONFIG['pw'];
-$BUILD_FILE_PATH	= $CONFIG['build_file_path'];
-$IMG_ROOT_PATH		= $CONFIG['img_root_path'];
+$BUILD_FILE_PATH = $CONFIG['build_file_path'];
+$IMG_ROOT_PATH	 = $CONFIG['img_root_path'];
+$DEBUG			= $CONFIG['debug'];
+
+if($DEBUG){
+	ini_set('display_errors', 1);
+	ini_set('display_startup_errors', 1);
+	ini_set('log_errors', TRUE);
+	error_reporting(E_ALL);
+}
 
 // the graphtype which should be displayed first. Standard: alpha-graph
 // and all other graphtypes
@@ -129,24 +138,24 @@ foreach ($chains as $value){
 						  <ul id="'.$pdbID.$chainName.'" class="bxslider tada">';
 
 		// if($loaded_images < 2){		// use this to limit preloaded images
-		$tableString .= '<li><a title="Loaded_'.$loaded_images.'" href="./data/'.$data['graph_image_png'].'" target="_blank">
-						  <img src="./data/'.$data['graph_image_png'].'" alt="" />
+		$tableString .= '<li><a title="Loaded_'.$loaded_images.'" href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">
+						  <img src="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" alt="" />
 						</a>
-						<a href="./data/'.$data['graph_image_png'].'" target="_blank">Full Size Image</a>
+						<a href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">Full Size Image</a>
 						<span class="download-options">Download Graph: ';
 
 		// check if downloadable files exist. If so, then add link to file (4x)
 		if(isset($data['graph_image_pdf']) && file_exists($IMG_ROOT_PATH.$data['graph_image_pdf'])) {
-			$tableString .= '<a href="./data/'.$data['graph_image_pdf'].'" target="_blank">[PDF]</a>';
+			$tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_pdf'].'" target="_blank">[PDF]</a>';
 		}
 		if(isset($data['graph_image_svg']) && file_exists($IMG_ROOT_PATH.$data['graph_image_svg'])){
-			$tableString .= '<a href="./data/'.$data['graph_image_svg'].'" target="_blank">[SVG]</a>';
+			$tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_svg'].'" target="_blank">[SVG]</a>';
 		}
 		if(isset($data['graph_image_png']) && file_exists($IMG_ROOT_PATH.$data['graph_image_png'])){
-			$tableString .= '<a href="./data/'.$data['graph_image_png'].'" target="_blank">[PNG]</a>';
+			$tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">[PNG]</a>';
 		}
-		if(isset($data['graph_string_gml']) && file_exists($IMG_ROOT_PATH.$data['graph_string_gml'])){
-			$tableString .= '<a href="./data/'.$data['graph_string_gml'].'" target="_blank">[GML]</a>';
+		if(isset($data['filepath_graphfile_gml']) && file_exists($IMG_ROOT_PATH.$data['filepath_graphfile_gml'])){
+			$tableString .= '<a href="'.$IMG_ROOT_PATH.$data['filepath_graphfile_gml'].'" target="_blank">[GML]</a>';
 		}
 		$tableString .= '</span></li>';
 
@@ -156,24 +165,24 @@ foreach ($chains as $value){
 		while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
 			// if($loaded_images < 2){  // Use this to limit the amount of loaded images
 			$tableString .= '<li>';
-			$tableString .= '<a href="./data/'.$arr['graph_image_png'].'" target="_blank">
-							   <img src="./data/'.$arr['graph_image_png'].'" alt="" />
+			$tableString .= '<a href="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" target="_blank">
+							   <img src="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" alt="" />
 							 </a>
-						     <a href="./data/'.$arr['graph_image_png'].'" target="_blank">Full Size Image</a>
+						     <a href="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" target="_blank">Full Size Image</a>
 						     <span class="download-options">Download Graph: ';
 				
 				// check if downloadable files exist. If so, then add link to file (4x)
 				if(isset($data['graph_image_pdf']) && file_exists($IMG_ROOT_PATH.$data['graph_image_pdf'])) {
-					$tableString .= '<a href="./data/'.$data['graph_image_pdf'].'" target="_blank">[PDF]</a>';
+					$tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_pdf'].'" target="_blank">[PDF]</a>';
 				}
 				if(isset($data['graph_image_svg']) && file_exists($IMG_ROOT_PATH.$data['graph_image_svg'])){
-					$tableString .= '<a href="./data/'.$data['graph_image_svg'].'" target="_blank">[SVG]</a>';
+					$tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_svg'].'" target="_blank">[SVG]</a>';
 				}
 				if(isset($data['graph_image_png']) && file_exists($IMG_ROOT_PATH.$data['graph_image_png'])){
-					$tableString .= '<a href="./data/'.$data['graph_image_png'].'" target="_blank">[PNG]</a>';
+					$tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">[PNG]</a>';
 				}
-				if(isset($data['graph_string_gml']) && file_exists($IMG_ROOT_PATH.$data['graph_string_gml'])){
-					$tableString .= '<a href="./data/'.$data['graph_string_gml'].'" target="_blank">[GML]</a>';
+				if(isset($data['filepath_graphfile_gml']) && file_exists($IMG_ROOT_PATH.$data['filepath_graphfile_gml'])){
+					$tableString .= '<a href="'.$IMG_ROOT_PATH.$data['filepath_graphfile_gml'].'" target="_blank">[GML]</a>';
 				}
 			$tableString .= '</span>';
 			$tableString .= '</li>';
@@ -212,14 +221,14 @@ foreach ($chains as $value){
 					
 		// if($loaded_images < 2){ // use this to limit preloaded images
 		$tableString .= '<p>- Select topology type -</p>
-						<a class="thumbalign" data-slide-index="0" href=""><img src="./data/'.$pdbID.'_'.$chainName.'_'.$graphtype.'_PG.png" width="100px" height="100px" />
+						<a class="thumbalign" data-slide-index="0" href=""><img src="'.$IMG_ROOT_PATH.$pdbID.'_'.$chainName.'_'.$graphtype.'_PG.png" width="100px" height="100px" />
 						'.$graphtype_dict[$graphtype].'</a>';
 		
 		// counter for the data-slide-index property of the bxSlider.
 		$c = 1;					
 		// create thumbails for the (inner) slider. One thumb for each graphtype
 		foreach ($graphtypes as $gt){
-			$tableString .= ' <a class="thumbalign" data-slide-index="'.$c++.'" href=""><img src="./data/'.$pdbID.'_'.$chainName.'_'.$gt.'_PG.png" width="100px" height="100px" />
+			$tableString .= ' <a class="thumbalign" data-slide-index="'.$c++.'" href=""><img src="'.$IMG_ROOT_PATH.$pdbID.'_'.$chainName.'_'.$gt.'_PG.png" width="100px" height="100px" />
 								'.$graphtype_dict[$gt].'
 							  </a>';
 		}

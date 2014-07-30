@@ -10,9 +10,10 @@
  * @author Andreas Scheck <andreas.scheck.home@googlemail.com>
  */
 
-// ini_set('display_errors',1); // #TODO Remove these lines later...!
-// ini_set('display_startup_errors',1);
-// error_reporting(-1);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+ini_set('log_errors', TRUE);
+error_reporting(E_ERROR);
 
 // get config values
 $CONFIG				= include('./backend/config.php'); 
@@ -23,6 +24,14 @@ $DB_USER		= $CONFIG['user'];
 $DB_PASSWORD	= $CONFIG['pw'];
 $BUILD_FILE_PATH	= $CONFIG['build_file_path'];
 $IMG_ROOT_PATH		= $CONFIG['img_root_path'];
+$DEBUG			= $CONFIG['debug'];
+
+if($DEBUG){
+	ini_set('display_errors', 1);
+	ini_set('display_startup_errors', 1);
+	ini_set('log_errors', TRUE);
+	error_reporting(E_ALL);
+}
 
 
 /** The function creates a CATH link with a PDB-ID and optional a chain-name
@@ -44,18 +53,16 @@ function get_cath_link($pdbid, $chain = null) {
 
 // set standard logic operator to "OR"
 $logic = "OR";
-// variable to check if any search value is set. none_set = true -> nothing is set.
-$none_set = true;
 // check if parameters are set. If so, set the associated variable with the value
 if(isset($_POST)) {
-    if(isset($_POST["keyword"])) {$keyword = $_POST["keyword"];  $none_set = false;} else {$keyword = "";};
-    if(isset($_POST["pdbid"])) {$pdbid = $_POST["pdbid"];  $none_set = false;};
-    if(isset($_POST["title"])) {$title = $_POST["title"];  $none_set = false;};
-    if(isset($_POST["hasligand"])) {$hasligand = $_POST["hasligand"];  $none_set = false;};
-    if(isset($_POST["ligandname"])) {$ligandname = $_POST["ligandname"];  $none_set = false;};
-    if(isset($_POST["molecule"])) {$molecule = $_POST["molecule"];  $none_set = false;};
+    if(isset($_POST["keyword"])) {$keyword = $_POST["keyword"];} else {$keyword = "";};
+    if(isset($_POST["pdbid"])) {$pdbid = $_POST["pdbid"];};
+    if(isset($_POST["title"])) {$title = $_POST["title"];};
+    if(isset($_POST["hasligand"])) {$hasligand = $_POST["hasligand"];};
+    if(isset($_POST["ligandname"])) {$ligandname = $_POST["ligandname"];};
+    if(isset($_POST["molecule"])) {$molecule = $_POST["molecule"];};
     if(isset($_POST["logic"])) {$logic = $_POST["logic"];};
-    if(isset($_POST["proteincomplexes"])) {$proteincomplexes = $_POST["proteincomplexes"];};
+    // if(isset($_POST["proteincomplexes"])) {$proteincomplexes = $_POST["proteincomplexes"];};
 } else {
 	// if nothing is set or the query is too short...
 	$tableString = "Sorry. Your search term is too short. <br>\n";
@@ -63,7 +70,7 @@ if(isset($_POST)) {
 	exit;
 }
 
-if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALSE) { // #TODO redefine this check...
+if (($none_set == true)) { // #TODO redefine this check...
 	$tableString = "Sorry. Your search term is too short.<br>\n";
 	$tableString .= '<a href="./index.php">Go back</a> or use the query box in the upper right corner!';
 	exit;
@@ -152,12 +159,13 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 			  ORDER BY pdb_id, chain_name";
   
 
-	$result = pg_query($db, $query) or die($query . ' -> Query failed: ' . pg_last_error());
+	$result = pg_query($db, $query); // or die($query . ' -> Query failed: ' . pg_last_error());
 
 	// this counter is used to display alternating table colors
 	$counter = 0;
 	$tableString = "";
 	$createdHeadlines = Array();
+	$numberOfChains = 0;
 	while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
 		// set protein/chain information for readability		
 		$pdb_id =  $arr['pdb_id'];
@@ -201,7 +209,7 @@ if (/*(($keyword == "") || (strlen($keyword) <= 2)) || ($none_set == true)*/FALS
 						<div class="resultsCATH"><a href="'.$cathlink.'" target="_blank">CATH</a></div>
 					</div>';
 		
-
+		$numberOfChains++;
 		$counter++;
 	}
 	$tableString .= ' </div>';

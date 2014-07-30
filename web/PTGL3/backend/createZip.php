@@ -6,17 +6,28 @@
  * @author Andreas Scheck <andreas.scheck.home@googlemail.com>
  */
 
-// ini_set('display_errors',1);
-// ini_set('display_startup_errors',1);
-// error_reporting(-1);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+ini_set('log_errors', TRUE);
+error_reporting(E_ERROR);
 
-// get databse connection values
-$CONFIG			= include('config.php');
+// get config values
+$CONFIG				= include('./backend/config.php'); 
 $DB_HOST		= $CONFIG['host'];
 $DB_PORT		= $CONFIG['port'];
 $DB_NAME		= $CONFIG['db'];
-$DB_USER		= $CONIFG['user'];
+$DB_USER		= $CONFIG['user'];
 $DB_PASSWORD	= $CONFIG['pw'];
+$BUILD_FILE_PATH = $CONFIG['build_file_path'];
+$IMG_ROOT_PATH	 = $CONFIG['img_root_path'];
+$DEBUG			= $CONFIG['debug'];
+
+if($DEBUG){
+	ini_set('display_errors', 1);
+	ini_set('display_startup_errors', 1);
+	ini_set('log_errors', TRUE);
+	error_reporting(E_ALL);
+}
 
 
 // if the directory is not writable then abort this script
@@ -49,7 +60,7 @@ function create_zip($files = array(),$destination = '',$overwrite = false) {
 		//cycle through each file
 		foreach($files as $file) {
 			//make sure the file exists
-			if(file_exists('../data/'.$file) && is_readable('../data/'.$file)) {
+			if(file_exists('.'.$IMG_ROOT_PATH.$file) && is_readable('.'.$IMG_ROOT_PATH.$file)) {
 				$valid_files[] = $file;
 			}
 		}
@@ -65,7 +76,7 @@ function create_zip($files = array(),$destination = '',$overwrite = false) {
 
 		//add the files
 		foreach($valid_files as $file) {
-			$zip->addFile('../data/'.$file,$file);
+			$zip->addFile('.'.$IMG_ROOT_PATH.$file,$file);
 
 		}
 		//close the zip -- done!
@@ -93,7 +104,7 @@ if(isset($_POST['proteins']) && isset($_POST['downloadType'])) {
 	// set the imagetype by joining the parameter with the predefined filename string 
 	$imageType = "graph_image_".strtolower($downloadType);
 	if($downloadType == "gml") {
-		$imageType = "graph_string_".strtolower($downloadType); // exception for GML files
+		$imageType = "filepath_graphfile_gml"; // exception for GML files
 	}
 	
 	// establish databse connection

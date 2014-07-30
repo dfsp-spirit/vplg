@@ -29,11 +29,14 @@ return array(
 	
 	//---- File settings ----//
 	'build_file_path'	=> FALSE,
-	'img_root_path'		=> './data/'
+	'img_root_path'		=> './data/',
 	//---- End of file settings ----//
+	
+	
+	//---- Debug settings ----//
+	'debug_mode' => FALSE
+	//---- End of debug settings ----//
 );
-
-
 
 //EOF
 ?>

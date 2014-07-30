@@ -57,6 +57,7 @@ $(function() {
 		$('#loadInput').val(selectedProteins);
 	});
 	
+	// if clicking on "Select all protein chains...
 	$('#selectAllBtn').click( function() {
 		var selectedProteins = "";
 		var numberOfChains = 0;

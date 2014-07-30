@@ -16,9 +16,10 @@
  * @author Andreas Scheck <andreas.scheck.home@googlemail.com>
  */
 
-// ini_set('display_errors',1); // #TODO Remove these lines later...!
-// ini_set('display_startup_errors',1);
-// error_reporting(-1);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+ini_set('log_errors', TRUE);
+error_reporting(E_ERROR);
 
 // get config values
 $CONFIG				= include('./backend/config.php'); 
@@ -29,6 +30,14 @@ $DB_USER		= $CONFIG['user'];
 $DB_PASSWORD	= $CONFIG['pw'];
 $BUILD_FILE_PATH	= $CONFIG['build_file_path'];
 $IMG_ROOT_PATH		= $CONFIG['img_root_path'];
+$DEBUG			= $CONFIG['debug'];
+
+if($DEBUG){
+	ini_set('display_errors', 1);
+	ini_set('display_startup_errors', 1);
+	ini_set('log_errors', TRUE);
+	error_reporting(E_ALL);
+}
 
 // the graphtype which should be displayed first. Standard: alpha-graph
 // and all other graphtypes
