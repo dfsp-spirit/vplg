@@ -33,7 +33,6 @@ if($DEBUG){
 	error_reporting(E_ALL);
 }
 
-
 /** The function creates a CATH link with a PDB-ID and optional a chain-name
  * 
  * @param type $pdbid
@@ -77,9 +76,8 @@ if (($none_set == true)) { // #TODO redefine this check...
 } else {
 	// establish database connection
 	$conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
-	$db = pg_connect($conn_string)
-			or die($DB_NAME . ' -> Connection error: ' . pg_last_error() . pg_result_error() . pg_result_error_field() . pg_result_status() . pg_connection_status() );            
-
+	$db = pg_connect($conn_string);
+	
 	// later, if no query is set before, there will be no CONCAT/UNION
 	$firstQuerySet = false;
 	$query = "SELECT chain_id, chain_name, pdb_id, resolution, title, header

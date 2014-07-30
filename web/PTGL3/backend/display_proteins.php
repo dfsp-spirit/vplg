@@ -77,9 +77,8 @@ $chains = explode(" ", trim($q));
 
 // establish database connection
 $conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
-$db = pg_connect($conn_string)
-		or die($DB_NAME . ' -> Connection error: ' . pg_last_error() . pg_result_error() . pg_result_error_field() . pg_result_status() . pg_connection_status() );            
-	
+$db = pg_connect($conn_string);
+
 // start to fill the html-tableString with content. This string will be echoed later
 // to display the here created HTML construct.
 $tableString = '<div id="myCarousel">

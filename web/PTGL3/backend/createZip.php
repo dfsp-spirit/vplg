@@ -109,13 +109,12 @@ if(isset($_POST['proteins']) && isset($_POST['downloadType'])) {
 	
 	// establish databse connection
 	$conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
-	$db = pg_connect($conn_string)
-			or die($DB_NAME . ' -> Connection error: ' . pg_last_error() . pg_result_error() . pg_result_error_field() . pg_result_status() . pg_connection_status() );            
+	$db = pg_connect($conn_string);            
 	// remove previous prepared_statement
 	pg_query($db, "DEALLOCATE ALL");
 	// create query to recive all graph image file paths
 	$query = "SELECT * FROM plcc_chain, plcc_graph WHERE pdb_id=$1 AND chain_name LIKE $2 AND plcc_graph.chain_id = plcc_chain.chain_id ORDER BY graph_type"; 
-	pg_prepare($db, "getImages", $query) or die($query . ' -> Query failed: ' . pg_last_error());		
+	pg_prepare($db, "getImages", $query);
 	
 	// create array as list of filenames
 	$files = array();

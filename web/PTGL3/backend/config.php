@@ -34,9 +34,8 @@ return array(
 	
 	
 	//---- Debug settings ----//
-	'debug_mode' => FALSE
+	'debug_mode' => TRUE
 	//---- End of debug settings ----//
 );
-
 //EOF
 ?>

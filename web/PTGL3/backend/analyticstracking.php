@@ -13,6 +13,3 @@
   ga('send', 'pageview');
 
 </script>
-<?php
-//EOF
-?>

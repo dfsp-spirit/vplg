@@ -14,7 +14,7 @@ ini_set('log_errors', TRUE);
 error_reporting(E_ERROR);
 
 // get config values
-$CONFIG				= include('./backend/config.php'); 
+$CONFIG			= include('config.php'); 
 $DB_HOST		= $CONFIG['host'];
 $DB_PORT		= $CONFIG['port'];
 $DB_NAME		= $CONFIG['db'];
@@ -31,11 +31,9 @@ if($DEBUG){
 	error_reporting(E_ALL);
 }
 
-
 // establish database connection
 $conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
-$db = pg_connect($conn_string)
-		or die($DB_NAME . ' -> Connection error: ' . pg_last_error() . pg_result_error() . pg_result_error_field() . pg_result_status() . pg_connection_status() );            
+$db = pg_connect($conn_string);
 
 // Define Output HTML Formating which will be displayed in the grey box below the search field.
 $html = '';
@@ -51,8 +49,7 @@ $search_string = preg_replace("/[^A-Za-z0-9]/", " ", $_POST['query']);
 if (strlen($search_string) >= 1 && $search_string !== ' ') {
 	// build query
 	$query = "SELECT * FROM plcc_protein WHERE pdb_id LIKE '%".strtolower($search_string)."%' OR header LIKE '%".strtoupper($search_string)."%'";
-	$result = pg_query($db, $query) 
-                  or die($query . ' -> Query failed: ' . pg_last_error());
+	$result = pg_query($db, $query);
 	$data = pg_fetch_all($result);
 
 	// check if we have results
