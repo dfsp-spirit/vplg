@@ -33,7 +33,7 @@ PIDFILE=/var/run/rur_vplg-copy-results.pid
 #COMMAND="/usr/bin/rsync -rh /tmp/results/ /srv/www/htdocs/myapp/data/results/"
 
 ### Note that you will have to configure password-less authentication via ssh (using SSH-keys) for the rsync command to work.
-COMMAND="/usr/bin/rsync -rhe ssh ts@odysseus.bioinformatik.uni-frankfurt.de:/shares/modshare/vplg_all_nodes_output/ /srv/www/htdocs/ptgl3"
+COMMAND="/usr/bin/rsync -rhe ssh ts@odysseus.bioinformatik.uni-frankfurt.de:/shares/modshare/vplg_all_nodes_output/ /srv/www/ptgl3/"
 
 
 ########## end of settings -- no need to edit below this line ##########

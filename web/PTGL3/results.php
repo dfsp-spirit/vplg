@@ -37,9 +37,11 @@
 		<?php include('navbar.php'); ?>
 			
 		<div class="container" id="proteinDisplay">
+		<!--
 			<b>Please note:</b> Only <a href="about.php#foldingGraph">folding graphs</a> with more than one SSE are presented. The <a href="about.php#foldingGraph">folding graphs</a> with only one SSE
 			are representing just single vertices in the <a href="about.php#proteinGraph">protein graph</a>.
 			<p>In the <a href="about.php#key">key</a> notation only folding graphs can be shown that are <a href="">non-bifurcated</a>.</p>
+			-->
 			
 			<span id="multipleDownload">Download checked proteins as <select id="multidown" name="multipledownload">
 				<option class="downloadOption" value="null">-- Select to download --</option>
@@ -47,8 +49,8 @@
 				<option class="downloadOption" value="svg">SVG</option>
 				<option class="downloadOption" value="png">PNG</option>
 				<option class="downloadOption" value="gml">GML</option></select>		
-			<br>
-			<span>Please <a href="citing.php">cite PTGL</a>, if you are using our data & images.</span>																					
+			<br><br>
+			<!-- <span>Please <a href="citing.php">cite PTGL</a>, if you are using our data and images.</span> -->
 		</div>
 		
 		<!--BEGIN CAROUSEL -->
