@@ -8,6 +8,7 @@
 package plcc;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * This class implements an SSE graph drawer. It exists to draw a certain SSEGraph in a specific style and order.
@@ -73,14 +74,14 @@ public class DrawSSEGraph {
                     this.drawSSEs.add(new DrawSSE(g.getSSEBySeqPosition(seqIndex), i, this.pl, this.style));
                 }
             } else {
-                System.err.println("ERROR: DrawSSEGraph(): Graph has no spatial order, which should have been checked before.");
-                System.exit(1);
+                //System.err.println("ERROR: DrawSSEGraph(): Graph has no spatial order, which should have been checked before.");
+                throw new IllegalArgumentException("Graph has no spatial order.");
             }
             
         } else {
             // should never happen 
-            System.err.println("ERROR: DrawSSEGraph(): Order '" + sseGraphOrder + "' unknown, not adding any SSEs.");
-            System.exit(1);
+            //System.err.println("ERROR: DrawSSEGraph(): Order '" + sseGraphOrder + "' unknown, not adding any SSEs.");
+            throw new IllegalArgumentException("Order '" + sseGraphOrder + "' unknown, not adding any SSEs.");
         }
                         
     }
@@ -101,7 +102,7 @@ public class DrawSSEGraph {
             return(false);
         }
         
-        if(sseGraphOrder == DrawSSEGraph.SSEGRAPHORDER_SPATIAL) {
+        if(Objects.equals(sseGraphOrder, DrawSSEGraph.SSEGRAPHORDER_SPATIAL)) {
             if( ! this.g.hasSpatialOrdering()) {
                 return(false);
             }
