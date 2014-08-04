@@ -55,10 +55,14 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 		<div class="container" id="intro">
 		<!-- Intro message -->
 			The Protein Topology Graph Library (PTGL) provides a database of protein secondary structure topologies. It is based on protein ligand graphs computed
-			by the <a href="http://www.bioinformatik.uni-frankfurt.de/tools/vplg/" target="_blank">VPLG software</a>. VPLG uses a graph-based model to describe the structure of proteins on the super-secondary structure level. A protein ligand graph is
+			by the <a href="http://www.bioinformatik.uni-frankfurt.de/tools/vplg/" target="_blank">VPLG software</a>. VPLG uses a graph-based model to describe the structure of proteins on the super-secondary structure level.
+			
+			<!--
+			A protein ligand graph is
 			computed from the atomic coordinates in a PDB file and the secondary structure assignments of the DSSP algorithm. In this graph, vertices
 			represent secondary structure elements (SSEs, usually alpha helices and beta strands) or ligand molecules while the edges model contacts and 
 			relative orientations between the SSEs.
+			-->
 			
 		</div><!-- end container-->
 	</div><!-- end Home -->
