@@ -98,17 +98,17 @@ $pdb_chain = str_split($chainIDs[$loadSlideNumner], 4);
 $pdbID = $pdb_chain[0];
 $chainName = $pdb_chain[1];
 
-
+$gt_file_alpha = get_valid_png_file_name_on_disk_of($pdbID, $chainName, $graphtype);	// also ensures that the file exists on disk!
 $output = '<p>- Select topology type -</p>
 				<a class="thumbalign" data-slide-index="0" href="">
-					<img src="./data/'.$pdbID.'_'.$chainName.'_'.$graphtype.'_PG.png" width="100px" height="100px" />'
+					<img src="' . $gt_file_alpha . '" width="100px" height="100px" />'
 					.$graphtype_dict[$graphtype].'</a>';
 
 $c = 1;					
 foreach ($graphtypes as $gt){
         $gt_file = get_valid_png_file_name_on_disk_of($pdbID, $chainName, $gt);	// also ensures that the file exists on disk!
         if(strlen($gt_file) > 0) {	
-	  $output .= ' <a class="thumbalign" data-slide-index="'.$c++.'" href=""><img src="./data/'. $gt_file . ' width="100px" height="100px" />
+	  $output .= ' <a class="thumbalign" data-slide-index="'.$c++.'" href=""><img src="'. $gt_file . '" width="100px" height="100px" />
 						'.$graphtype_dict[$gt].'
 					  </a>
 					';
