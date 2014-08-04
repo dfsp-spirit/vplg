@@ -101,7 +101,7 @@ $chainName = $pdb_chain[1];
 
 $gt_file_alpha = get_valid_png_file_name_on_disk_of($pdbID, $chainName, $graphtype);	// also ensures that the file exists on disk!
 
-echo "\n <!-- DEBUG: The file is at: '" . $gt_file_alpha . "'. --> \n"; 
+//echo "\n <!-- DEBUG: The alpha file is at: '" . $gt_file_alpha . "'. --> \n"; 
 
 $output = '<p>- Select topology type -</p>
 				<a class="thumbalign" data-slide-index="0" href="">
