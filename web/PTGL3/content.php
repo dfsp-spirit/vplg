@@ -35,6 +35,61 @@
 
 </head>
 
+
+<?php
+
+  // should start in HTML part of document, NOT inside <script> tags!
+  function prepare_plot_js_canvas($canvas_html_id = "mycanvas", $context_name = "ctx", $width = 700, $height = 400) {
+    $res = "";
+    $res .= '<canvas id="' . $canvas_html_id . '" width="' . $width . '" height="' . $height . '"></canvas>' . "\n";
+    $res .=  '<script>' . "\n";
+    $res .= 'var ' . $context_name . ' = document.getElementById("' . $canvas_html_id . '").getContext("2d");' . "\n";
+    $res .= "</script>\n";
+    return $res;
+  }
+
+  // should be called in <script> tags , creates a line chart
+  function do_plot_js($context_name = "ctx", $dataset_var_name = "data", $result_assign_var_name = "myChart") {
+    $res = 'var ' . $result_assign_var_name . ' = new Chart(' . $context_name . ').Line(' . $dataset_var_name . ');' . "\n";
+    return $res;
+  }
+
+  // should be called in <script> tags , creates a line chart
+  function do_plot_js_line($context_name = "ctx", $dataset_var_name = "data", $result_assign_var_name = "myChart") {
+    return do_plot_js($context_name, $dataset_var_name, $result_assign_var_name);
+  }
+
+  // creates a bar chart
+  function do_plot_js_bar($context_name = "ctx", $dataset_var_name = "data", $result_assign_var_name = "myChart") {
+    $res = 'var ' . $result_assign_var_name . ' = new Chart(' . $context_name . ').Bar(' . $dataset_var_name . ');' . "\n";
+    return $res;
+  }
+  
+  
+  function get_lineplot_code($unique_plot_id, $labels = array(), $datasets = array()) {
+    
+    $ret_code = "";
+    
+    $canvas_name = "mycanvas" . $unique_plot_id;
+    $ctx_name = "ctx" . $unique_plot_id;
+    $data_name = "data" . $unique_plot_id;
+    $chart_name = "mychart" . $unique_plot_id;
+
+    $ret_code .= prepare_plot_js_canvas($canvas_name, $ctx_name);
+    
+    $ret_code .= "<script>\n";
+    $ret_code .= "var " . $data_name . " = ";
+    $ret_code .= get_plot_js_formatted_data($labels, $datasets);
+    
+    // start the actual plot
+    $ret_code .= do_plot_js($ctx_name, $data_name, $chart_name);
+    $ret_code .= "</script>\n";
+    
+    return $ret_code;
+  }
+
+?>
+
 <body id="customBackground">
 	<noscript>
 		<META HTTP-EQUIV="Refresh" CONTENT="0;URL=errorJS.php">
@@ -51,7 +106,6 @@
 		<h4><font color="red">274,459</font> Protein chains</h4>
 		<h4><font color="red">5,088,843</font> Secondary structure elements (SSEs)</h4>
 		<h4><font color="red">4,964,550</font> 3D contacts between SSEs</h4>
-		<h4><font color="red"> * 4,964,550</font> parallel contacts</h4>
 
 
 		<div class="table-responsive" id="contentTable">
@@ -64,7 +118,7 @@
 				</tr>
 				
 				<tr class="tablecenter">
-					<th class="tablecenter">Alpha</th>
+					<th>Alpha</th>
 					<td>274,454</td>
 					<td>0</td>
 					<td>2,357,932</td>
@@ -72,21 +126,21 @@
 				</tr>
 				
 				<tr class="tablecenter">
-					<th class="tablecenter">Beta</th>
+					<th>Beta</th>
 					<td>274,452</td>
 					<td>169,560</td>
 					<td>2,094,599</td>
 				</tr>
 				
 				<tr class="tablecenter">
-					<th class="tablecenter">Alpha-Beta</th>
+					<th>Alpha-Beta</th>
 					<td>274,459</td>
 					<td>169,542</td>
 					<td>4,452,531</td>
 				</tr>
 				
 				<tr class="tablecenter">
-					<th class="tablecenter">Alphalig</th>
+					<th>Alphalig</th>
 					<td>274,454</td>
 					<td>0</td>
 					<td>2,988,890</td>
@@ -94,14 +148,14 @@
 				</tr>
 				
 				<tr class="tablecenter">
-					<th class="tablecenter">Betalig</th>
+					<th>Betalig</th>
 					<td>274,452</td>
 					<td>169,560</td>
 					<td>2,723,377</td>
 				</tr>
 				
 				<tr class="tablecenter">
-					<th class="tablecenter">Alpha-Betalig</th>
+					<th>Alpha-Betalig</th>
 					<td>274,459</td>
 					<td>169,542</td>
 					<td>5,099,843</td>
@@ -109,6 +163,16 @@
 				
 			</table>
 		</div><!-- end table-responsive -->
+		
+		<?php
+		  $labels = array("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday");        // mysql order weekdays
+		  $datasets = array();
+		  $dataset1 = array(11, 23, 3, 5, 24, 44, 7);
+		  array_push($datasets, $dataset1);
+		  $code = get_lineplot_code("1", $labels, $datasets);
+		  echo $code;
+                ?>
+		
 </div><!-- end container and contentText -->
 </div><!-- end wrapper -->
 
