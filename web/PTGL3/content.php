@@ -31,7 +31,7 @@
 				<!-- Live Search for PDB IDs -->
 	<script src="js/livesearch.js" type="text/javascript"></script>
 
-
+        <script src="chart_js/Chart.js"></script>
 
 </head>
 
@@ -65,6 +65,87 @@
     return $res;
   }
   
+  function get_plot_js_formatted_data($labels = array(), $datasets = array()) {
+  
+    $format_commands = array();
+
+    $fc0 = '';
+    $fc0 .= '       fillColor : "rgba(151,187,205,0.5)",' . "\n";
+    $fc0 .= '       strokeColor : "rgba(151,187,205,1)",' . "\n";
+    $fc0 .= '       pointColor : "rgba(151,187,205,1)",' . "\n";
+    $fc0 .= '       pointStrokeColor : "#fff",' . "\n";
+
+    array_push($format_commands, $fc0);
+
+    $fc1 = '';
+    $fc1 .= '       fillColor : "rgba(220,220,220,0.5)",' . "\n";
+    $fc1 .= '       strokeColor : "rgba(220,220,220,1)",' . "\n";
+    $fc1 .= '       pointColor : "rgba(220,220,220,1)",' . "\n";
+    $fc1 .= '       pointStrokeColor : "#fff",' . "\n";
+    
+    array_push($format_commands, $fc1);
+
+
+    $res = "{" . "\n";     // open var name
+
+    // print labels row
+    $res .= "labels : [";
+
+    for($i = 0; $i < count($labels); $i++) {
+      $label = $labels[$i];
+      $res .= '"' . $label . '"';
+      if($i < (count($labels) - 1)) {
+	$res .= ',';
+      }
+    }
+    $res .= "]," . "\n";     // close labels
+
+    // print datasets
+    $res .= "datasets : [" . "\n";
+
+    for($i = 0; $i < count($datasets); $i++) {
+      
+      $dataset = $datasets[$i];
+
+      $res .= "    {" . "\n";   // open dataset
+
+      if($i < count($format_commands)) {
+	$res .= $format_commands[$i];
+      }
+      else {
+	$res .= $format_commands[0]; // use the first if not enough different options
+      }
+
+      // format color stuff
+      //$res .= '       fillColor : "rgba(151,187,205,0.5)",' . "\n";
+      //$res .= '       strokeColor : "rgba(151,187,205,1)",' . "\n";
+      //$res .= '       pointColor : "rgba(151,187,205,1)",' . "\n";
+      //$res .= '       pointStrokeColor : "#fff",' . "\n";
+
+      // the data itself
+      $res .= '       data : [';
+      for($j = 0; $j < count($dataset); $j++) {
+	$date = $dataset[$j];
+	$res .= $date;
+	if($j < (count($dataset) - 1)) {
+	  $res .= ',';
+	}
+      }
+      $res .= ']' . "\n";
+
+      $res .= "    }" . "\n";   // close dataset
+
+      if($i < (count($datasets) - 1)) {
+	$res .= "," . "\n";
+      }
+    }
+
+    $res .= "  ]" . "\n"; // close datasets
+    $res .= "}" . "\n"; // close var name
+    
+    return $res;
+  }
+  
   
   function get_lineplot_code($unique_plot_id, $labels = array(), $datasets = array()) {
     
@@ -75,7 +156,7 @@
     $data_name = "data" . $unique_plot_id;
     $chart_name = "mychart" . $unique_plot_id;
 
-    $ret_code .= prepare_plot_js_canvas($canvas_name, $ctx_name);
+    $ret_code .= prepare_plot_js_canvas($canvas_name, $ctx_name, 700, 400);
     
     $ret_code .= "<script>\n";
     $ret_code .= "var " . $data_name . " = ";
@@ -164,18 +245,21 @@
 			</table>
 		</div><!-- end table-responsive -->
 		
-		<?php
+<?php
+		
 		  $labels = array("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday");        // mysql order weekdays
 		  $datasets = array();
 		  $dataset1 = array(11, 23, 3, 5, 24, 44, 7);
 		  array_push($datasets, $dataset1);
-		  $code = get_lineplot_code("1", $labels, $datasets);
-		  //echo "received code\n";
-		  //echo $code;
-                ?>
+		  $code = get_lineplot_code("1", $labels, $datasets);		  
+		  echo $code;
+		  
+?>
+		
 		
 </div><!-- end container and contentText -->
 </div><!-- end wrapper -->
+
 
 <?php include('footer.php'); ?>
 	<!-- All Javascript at the bottom of the page for faster page loading -->
