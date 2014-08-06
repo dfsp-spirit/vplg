@@ -49,7 +49,9 @@
 
 		<h4><font color="red">98,161</font> PDB files</h4>
 		<h4><font color="red">274,459</font> Protein chains</h4>
-		<h4><font color="red">5,088,843</font> Secondary structure elements</h4>
+		<h4><font color="red">5,088,843</font> Secondary structure elements (SSEs)</h4>
+		<h4><font color="red">4,964,550</font> 3D contacts between SSEs</h4>
+		<h4><font color="red"> * 4,964,550</font> parallel contacts</h4>
 
 
 		<div class="table-responsive" id="contentTable">
