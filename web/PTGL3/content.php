@@ -31,7 +31,7 @@
 				<!-- Live Search for PDB IDs -->
 	<script src="js/livesearch.js" type="text/javascript"></script>
 
-        <script src="chart_js/Chart.js"></script>
+        <script src="chart_js/Chart.min.js"></script>
 
 </head>
 
@@ -62,6 +62,18 @@
   // creates a bar chart
   function do_plot_js_bar($context_name = "ctx", $dataset_var_name = "data", $result_assign_var_name = "myChart") {
     $res = 'var ' . $result_assign_var_name . ' = new Chart(' . $context_name . ').Bar(' . $dataset_var_name . ');' . "\n";
+    return $res;
+  }
+  
+  // creates a pe chart
+  function do_plot_js_pie($context_name = "ctx", $dataset_var_name = "data", $result_assign_var_name = "myChart") {
+    $res = 'var ' . $result_assign_var_name . ' = new Chart(' . $context_name . ').Pie(' . $dataset_var_name . ');' . "\n";
+    return $res;
+  }
+  
+  // creates a doughnut chart
+  function do_plot_js_doughnut($context_name = "ctx", $dataset_var_name = "data", $result_assign_var_name = "myChart") {
+    $res = 'var ' . $result_assign_var_name . ' = new Chart(' . $context_name . ').Doughnut(' . $dataset_var_name . ');' . "\n";
     return $res;
   }
   
@@ -147,7 +159,7 @@
   }
   
   
-  function get_lineplot_code($unique_plot_id, $labels = array(), $datasets = array()) {
+  function get_plot_code($unique_plot_id, $plot_type = "line", $labels = array(), $datasets = array()) {
     
     $ret_code = "";
     
@@ -163,7 +175,21 @@
     $ret_code .= get_plot_js_formatted_data($labels, $datasets);
     
     // start the actual plot
-    $ret_code .= do_plot_js($ctx_name, $data_name, $chart_name);
+    if($plot_type == "bar") {
+      $ret_code .= do_plot_js_bar($ctx_name, $data_name, $chart_name);
+    }
+    else if($plot_type == "pie") {
+      $ret_code .= do_plot_js_pie($ctx_name, $data_name, $chart_name);
+    }
+    else if($plot_type == "doughnut") {
+      $ret_code .= do_plot_js_doughnut($ctx_name, $data_name, $chart_name);
+    }
+    else if($plot_type == "line") {
+      $ret_code .= do_plot_js_line($ctx_name, $data_name, $chart_name);
+    }
+    else {	// assume "line"
+      $ret_code .= do_plot_js_line($ctx_name, $data_name, $chart_name);
+    }
     $ret_code .= "</script>\n";
     
     return $ret_code;
@@ -251,8 +277,11 @@
 		  $datasets = array();
 		  $dataset1 = array(11, 23, 3, 5, 24, 44, 7);
 		  array_push($datasets, $dataset1);
-		  $code = get_lineplot_code("1", $labels, $datasets);		  
-		  echo $code;
+		  $plot_type = "bar"; // "bar", "pie", "doughnut" or "line" are supported atm
+		  //$plot_type = "pie";
+		  
+		  $code = get_plot_code("1", $plot_type, $labels, $datasets);		  
+		  //echo $code;
 		  
 ?>
 		
