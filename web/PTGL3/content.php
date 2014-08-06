@@ -170,7 +170,8 @@
 		  $dataset1 = array(11, 23, 3, 5, 24, 44, 7);
 		  array_push($datasets, $dataset1);
 		  $code = get_lineplot_code("1", $labels, $datasets);
-		  echo $code;
+		  echo "received code\n";
+		  //echo $code;
                 ?>
 		
 </div><!-- end container and contentText -->
