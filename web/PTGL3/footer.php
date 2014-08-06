@@ -32,35 +32,14 @@
 			<div class="col-sm-2">
 				<a href="about.php#linking" class="footerLink">Linking PTGL</a>
 			</div>
-		</div>
-		
-		<div class="row">
-			<div class="col-sm-1">
-			</div>
-			<div class="col-sm-1">
-			</div>
-			<div class="col-sm-1">
-			</div>
-			<div class="col-sm-1">
-			</div>
-			<div class="col-sm-1">
-			</div>
-			<div class="col-sm-1">
-			</div>
-			<div class="col-sm-1">
-			</div>
-			<div class="col-sm-1">
-			</div>
-			<div class="col-sm-1">
-			</div>
-			<div class="col-sm-1">
-			</div>
 			
-			<div class="col-sm-2 flush-right">
-				<br>
-				<br>
+			<!--
+			<div class="col-sm-2">
 				Copyright © 2014 Molecular Bioinformatics (MBI) - University of Frankfurt
 			</div>
+			-->
+			
 		</div>
+
 	</div><!-- end container -->
 </footer>

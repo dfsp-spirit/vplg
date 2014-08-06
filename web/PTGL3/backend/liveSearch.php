@@ -48,7 +48,9 @@ $search_string = preg_replace("/[^A-Za-z0-9]/", " ", $_POST['query']);
 // if searchstring-length is > 1 and not only 1 whitespace...
 if (strlen($search_string) >= 1 && $search_string !== ' ') {
 	// build query
-	$query = "SELECT * FROM plcc_protein WHERE pdb_id LIKE '%".strtolower($search_string)."%' OR header LIKE '%".strtoupper($search_string)."%'";
+	$query = "SELECT p.pdb_id, p.header 
+			  FROM plcc_protein p 
+			  WHERE p.pdb_id LIKE '%".strtolower($search_string)."%' OR header LIKE '%".strtoupper($search_string)."%'";
 	$result = pg_query($db, $query);
 	$data = pg_fetch_all($result);
 

@@ -129,6 +129,7 @@
 							console.log(this.value + " was added to proteins array");
 						}
 					})
+					
 					var dataToSend = {'downloadType' : downloadType, 'proteins[]': proteins};	
 					$.ajax({
 						type: "POST",

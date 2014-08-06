@@ -16,7 +16,7 @@ ini_set('log_errors', TRUE);
 error_reporting(E_ERROR);
 
 // get config values
-$CONFIG				= include('./backend/config.php'); 
+$CONFIG			= include('./backend/config.php'); 
 $DB_HOST		= $CONFIG['host'];
 $DB_PORT		= $CONFIG['port'];
 $DB_NAME		= $CONFIG['db'];
@@ -37,13 +37,6 @@ if($DEBUG){
 // and all other graphtypes
 $graphtype			= "alpha"; # alpha-helix is #1
 $graphtypes			= array("alpha", "beta", "albe", "alphalig", "betalig", "albelig");
-
-//remove currently displayed graphtype from graphtype array
-// to be honest: not sure if neccessary...!
-$index = array_search($graphtype, $graphtypes);
-if($index !== FALSE){
-    unset($graphtypes[$index]);
-} 
 
 // translate graphtype abbr. to understandable string
 $graphtype_dict = array(
@@ -108,22 +101,23 @@ foreach ($chains as $value){
 		
 		// remove previous prepared_statements from DB
 		pg_query($db, "DEALLOCATE ALL");
-		$query = "SELECT * FROM plcc_chain, plcc_graph 
-				  WHERE pdb_id LIKE $1 
-				  AND chain_name LIKE $2 
-				  AND plcc_graph.chain_id = plcc_chain.chain_id 
+		$query = "SELECT c.chain_id, g.graph_image_png, g.graph_image_pdf, g.graph_image_svg, g.filepath_graphfile_gml 
+				  FROM plcc_chain c, plcc_graph g 
+				  WHERE c.pdb_id LIKE $1 
+				  AND c.chain_name LIKE $2 
+				  AND g.chain_id = c.chain_id 
 				  ORDER BY graph_type"; 
 		
-		pg_prepare($db, "getChains", $query) or die($query . ' -> Query failed: ' . pg_last_error());		
+		pg_prepare($db, "getChains", $query);		
 		$result = pg_execute($db, "getChains", array("%".$pdbID."%", "%".$chainName."%"));  
 		// first: get first dataset only (maybe too complicated implementation.. :(  )
 		$data = pg_fetch_array($result, NULL, PGSQL_ASSOC);
 		$chain_id = (int) $data['chain_id'];
+		echo $chain_id;
 
 		// query SSE informations/table with chain_id
 		$query_SSE = "SELECT * FROM plcc_sse WHERE chain_id = ".$chain_id." ORDER BY position_in_chain";
-		$result_SSE = pg_query($db, $query_SSE) 
-					  or die($query . ' -> Query failed: ' . pg_last_error());
+		$result_SSE = pg_query($db, $query_SSE);
 		
 		// continue building the HTML string. Not further explained from now on.
 		$tableString .= '<li>
@@ -142,6 +136,9 @@ foreach ($chains as $value){
 						</a>
 						<a href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">Full Size Image</a>
 						<span class="download-options">Download Graph: ';
+		
+		echo "servus";
+		echo array_keys($data);
 
 		// check if downloadable files exist. If so, then add link to file (4x)
 		if(isset($data['graph_image_pdf']) && file_exists($IMG_ROOT_PATH.$data['graph_image_pdf'])) {
@@ -162,7 +159,6 @@ foreach ($chains as $value){
 
 		// get the rest of the dataset. Until here we used only the first dataset from the DB.
 		while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
-			// if($loaded_images < 2){  // Use this to limit the amount of loaded images
 			$tableString .= '<li>';
 			$tableString .= '<a href="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" target="_blank">
 							   <img src="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" alt="" />
@@ -185,7 +181,6 @@ foreach ($chains as $value){
 				}
 			$tableString .= '</span>';
 			$tableString .= '</li>';
-			// } 
 		}
 
 		$tableString .= '</ul>
@@ -218,20 +213,17 @@ foreach ($chains as $value){
 						</div><!-- end table-responsive -->
 						<div id="'.$pdbID.$chainName.'_pager" class="bx-pager-own">';
 					
-		// if($loaded_images < 2){ // use this to limit preloaded images
-		$tableString .= '<p>- Select topology type -</p>
-						<a class="thumbalign" data-slide-index="0" href=""><img src="'.$IMG_ROOT_PATH.$pdbID.'_'.$chainName.'_'.$graphtype.'_PG.png" width="100px" height="100px" />
-						'.$graphtype_dict[$graphtype].'</a>';
+		$tableString .= '<p>- Select topology type -</p>';
 		
 		// counter for the data-slide-index property of the bxSlider.
-		$c = 1;					
+		$c = 0;					
 		// create thumbails for the (inner) slider. One thumb for each graphtype
-		foreach ($graphtypes as $gt){
-			$tableString .= ' <a class="thumbalign" data-slide-index="'.$c++.'" href=""><img src="'.$IMG_ROOT_PATH.$pdbID.'_'.$chainName.'_'.$gt.'_PG.png" width="100px" height="100px" />
-								'.$graphtype_dict[$gt].'
+		$result_thumbs = pg_execute($db, "getChains", array("%".$pdbID."%", "%".$chainName."%"));
+		while ($arr = pg_fetch_array($result_thumbs, NULL, PGSQL_ASSOC)){
+			$tableString .= ' <a class="thumbalign" data-slide-index="'.$c++.'" href=""><img src="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" width="100px" height="100px" />
+								'.$graphtype_dict[$graphtypes[$c-1]].'
 							  </a>';
 		}
-		//}
 		$tableString .= '</div></li>';
 	}
 	$loaded_images++;

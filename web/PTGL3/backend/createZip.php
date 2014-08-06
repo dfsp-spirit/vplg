@@ -12,7 +12,7 @@ ini_set('log_errors', TRUE);
 error_reporting(E_ERROR);
 
 // get config values
-$CONFIG				= include('./backend/config.php'); 
+$CONFIG			= require('config.php'); 
 $DB_HOST		= $CONFIG['host'];
 $DB_PORT		= $CONFIG['port'];
 $DB_NAME		= $CONFIG['db'];
@@ -20,7 +20,7 @@ $DB_USER		= $CONFIG['user'];
 $DB_PASSWORD	= $CONFIG['pw'];
 $BUILD_FILE_PATH = $CONFIG['build_file_path'];
 $IMG_ROOT_PATH	 = $CONFIG['img_root_path'];
-$DEBUG			= $CONFIG['debug'];
+$DEBUG			= $CONFIG['debug_mode'];
 
 if($DEBUG){
 	ini_set('display_errors', 1);
@@ -50,6 +50,7 @@ if (!is_writable('../temp_downloads/')) { die('directory not writable'); }
  * @return boolean
  */
 function create_zip($files = array(),$destination = '',$overwrite = false) {
+	global $IMG_ROOT_PATH;
 	//if the zip file already exists and overwrite is false, return false
 	$destination = "../temp_downloads/".$destination.".zip";
 	if(file_exists($destination) && !$overwrite) { return false; }
@@ -113,7 +114,11 @@ if(isset($_POST['proteins']) && isset($_POST['downloadType'])) {
 	// remove previous prepared_statement
 	pg_query($db, "DEALLOCATE ALL");
 	// create query to recive all graph image file paths
-	$query = "SELECT * FROM plcc_chain, plcc_graph WHERE pdb_id=$1 AND chain_name LIKE $2 AND plcc_graph.chain_id = plcc_chain.chain_id ORDER BY graph_type"; 
+	$query = "SELECT g.graph_image_png, g.graph_image_pdf, g.graph_image_svg, g.filepath_graphfile_gml
+			  FROM plcc_chain c, plcc_graph g 
+			  WHERE pdb_id=$1 AND chain_name LIKE $2 
+			  AND g.chain_id = c.chain_id 
+			  ORDER BY graph_type"; 
 	pg_prepare($db, "getImages", $query);
 	
 	// create array as list of filenames

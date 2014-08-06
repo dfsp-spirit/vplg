@@ -164,11 +164,15 @@ if(pdbInvalidorUnset) {
 		</noscript>
 <?php
 function getJmolFileName($pdbid, $chain, $graphtype) {
-  return $pdbid . "_" . $chain . "_" . $graphtype . "_PG.jmol";
+  $path = substr($pdbid, 1,2);
+  $path = $path . "/" . $pdbid . "/" . $chain . "/";
+  return $path.$pdbid . "_" . $chain . "_" . $graphtype . "_PG.jmol";
 }
 
 function getJmolResBlueFileName($pdbid, $chain, $graphtype) {
-  return $pdbid . "_" . $chain . "_" . $graphtype . "_PG_resblue.jmol";
+  $path = substr($pdbid, 1,2);
+  $path = $path . "/" . $pdbid . "/" . $chain . "/";
+  return $path.$pdbid . "_" . $chain . "_" . $graphtype . "_PG_resblue.jmol";
 }
 
 
@@ -233,10 +237,10 @@ if($mode == "graph" || $mode == "allgraphs") {
                 else {
                     echo "<p>INFO: Graph visualization: No visualization available for $graphtype graph of protein $pdbid chain $chain.</p>";
                 }
-
+				
                 if (file_exists($linkresblue)) {
                     $command = file_get_contents($linkresblue);
-                    $label = "Visualize $graphtype graph";
+                    $label = "Visualize $graphtype graph [comic]";
                     ?>
                     <script language="JavaScript" type="text/javascript">
                     <!--
