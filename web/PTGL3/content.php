@@ -47,103 +47,64 @@
 		<h2> Current holdings </h2>
 		<br>
 
-		<h4><font color="red">54859</font> Proteins</h4>
-		<h4><font color="red">2094546</font> Secondary Structure Elements</h4>
+		<h4><font color="red">98,161</font> PDB files</h4>
+		<h4><font color="red">274,459</font> Protein chains</h4>
+		<h4><font color="red">5,088,843</font> Secondary structure elements</h4>
 
 
 		<div class="table-responsive" id="contentTable">
 			<table class="table table-condensed table-hover borderless">
 				<tr>
 					<th class="tablecenter">Graph-type</th>
-					<th class="tablecenter">Notation-type</th>
-					<th class="tablecenter">Total</th>
-					<th class="tablecenter">Non-redundant</th>
-					<th class="tablecenter">Barrels</th>
+					<th class="tablecenter">Number of graphs</th>
+					<th class="tablecenter">Graphs containing beta-barrel</th>
+					<th class="tablecenter">Number of SSEs in graphs</th>
 				</tr>
+				
 				<tr class="tablecenter">
 					<th class="tablecenter">Alpha</th>
-					<td>ADJ</td>
-					<td>636820</td>
-					<td>26984</td>
-					<td>1063</td>
+					<td>274,454</td>
+					<td>0</td>
+					<td>2,357,932</td>
+
 				</tr>
-				<tr class="tablecenter">
-					<td></td>
-					<td>RED</td>
-					<td>636820</td>
-					<td>1772</td>
-					<td>385</td>
-				</tr>
-				<tr class="tablecenter">
-					<td></td>
-					<td>KEY</td>
-					<td>636820</td>
-					<td>887</td>
-					<td>191</td>
-				</tr>
-				<tr class="tablecenter">
-					<td></td>
-					<td>SEQ</td>
-					<td>636820</td>
-					<td>9054</td>
-					<td>479</td>
-				</tr>
+				
 				<tr class="tablecenter">
 					<th class="tablecenter">Beta</th>
-					<td>ADJ</td>
-					<td>199122</td>
-					<td>13418</td>
-					<td>1220</td>
+					<td>274,452</td>
+					<td>169,560</td>
+					<td>2,094,599</td>
 				</tr>
-				<tr class="tablecenter">
-					<td></td>
-					<td>RED</td>
-					<td>199122</td>
-					<td>9528</td>
-					<td>705</td>
-				</tr>
-				<tr class="tablecenter">
-					<td></td>
-					<td>KEY</td>
-					<td>199122</td>
-					<td>2470</td>
-					<td>696</td>
-				</tr>
-				<tr class="tablecenter">
-					<td></td>
-					<td>SEQ</td>
-					<td>199122</td>
-					<td>3262</td>
-					<td>435</td>
-				</tr>
+				
 				<tr class="tablecenter">
 					<th class="tablecenter">Alpha-Beta</th>
-					<td>ADJ</td>
-					<td>606816</td>
-					<td>77127</td>
-					<td>1494</td>
+					<td>274,459</td>
+					<td>169,542</td>
+					<td>4,452,531</td>
 				</tr>
+				
 				<tr class="tablecenter">
-					<td></td>
-					<td>RED</td>
-					<td>606816</td>
-					<td>62500</td>
-					<td>761</td>
+					<th class="tablecenter">Alphalig</th>
+					<td>274,454</td>
+					<td>0</td>
+					<td>2,988,890</td>
+
 				</tr>
+				
 				<tr class="tablecenter">
-					<td></td>
-					<td>KEY</td>
-					<td>606816</td>
-					<td>3109</td>
-					<td>666</td>
+					<th class="tablecenter">Betalig</th>
+					<td>274,452</td>
+					<td>169,560</td>
+					<td>2,723,377</td>
 				</tr>
+				
 				<tr class="tablecenter">
-					<td></td>
-					<td>SEQ</td>
-					<td>606816</td>
-					<td>43798</td>
-					<td>1040</td>
+					<th class="tablecenter">Alpha-Betalig</th>
+					<td>274,459</td>
+					<td>169,542</td>
+					<td>5,099,843</td>
 				</tr>
+				
 			</table>
 		</div><!-- end table-responsive -->
 </div><!-- end container and contentText -->
