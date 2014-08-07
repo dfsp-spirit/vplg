@@ -8,7 +8,7 @@
 	<meta name="author" content="">
 	<link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
 
-	<title>PTGL 2.0</title>
+	<title>PTGL 3.0 -- Contact</title>
 
 
 	<!-- Mobile viewport optimized -->
