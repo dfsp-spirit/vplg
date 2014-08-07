@@ -326,15 +326,15 @@
 		<h4><font color="red">98,161</font> PDB files</h4>
 		<h4><font color="red">274,459</font> Protein chains</h4>
 		<h4><font color="red">5,088,843</font> Secondary structure elements (SSEs)</h4>
-		<h4><font color="red">4,964,550</font> 3D contacts between SSEs</h4>
+		<h4><font color="red">4,964,550</font> 3D contacts between SSEs of the same chain</h4>
 
 
 		<div class="table-responsive" id="contentTable">
 			<table class="table table-condensed table-hover borderless">
 				<tr>
-					<th class="tablecenter">Graph-type</th>
+					<th class="tablecenter">Graph type</th>
 					<th class="tablecenter">Number of graphs</th>
-					<th class="tablecenter">Graphs containing beta-barrel</th>
+					<th class="tablecenter">Graphs containing beta-barrels</th>
 					<th class="tablecenter">Number of SSEs in graphs</th>
 				</tr>
 				
@@ -366,7 +366,9 @@
 		</div><!-- end table-responsive -->
 		
 <?php
+		  // ------------------------------ plots -----------------------------------
 		
+		  // ----- SSEs in graphs -----
 		  $labels = array("Alpha", "Beta", "Alpha-Beta", "Alphalig", "Betalig", "Alpha-Betalig");
 		  $datasets = array();
 		  $dataset1 = array($table_data[0][3], $table_data[1][3], $table_data[2][3], $table_data[3][3], $table_data[4][3], $table_data[5][3]);
@@ -378,7 +380,10 @@
 		  
 		  echo "<h4>Number of SSEs in graphs</h4>\n" . $code . "\n\n";
 		  
+		  
 		  echo "<br/><br/><br/><br/>\n";
+		  
+		  // ----- total SSEs by type -----
 		  
 		  $labels = array("Helix", "Strand", "Ligand");
 		  $datasets = array();
@@ -389,6 +394,55 @@
 		  $code = get_plot_code("2", $plot_type, $labels, $datasets);		  
 		  
 		  echo "<h4>Number of SSEs by type</h4>\n" . $code . "\n\n";
+		  
+		  
+		  
+		  echo "<br/><br/><br/><br/>\n";
+		  
+		  
+		  // ----- total contacts by type -----
+		  
+		  $labels = array("Mixed", "Parallel", "Antiparallel", "Ligand");
+		  $datasets = array();
+		  $dataset1 = array(1232714, 776965, 1553370, 1391501);
+		  array_push($datasets, $dataset1);
+		  
+		  $plot_type = "bar";		  
+		  $code = get_plot_code("3", $plot_type, $labels, $datasets);		  
+		  
+		  echo "<h4>Number of contacts by type</h4>\n" . $code . "\n\n";
+		  
+		  echo "<br/><br/><br/><br/>\n";
+		  
+		  
+		  // ----- protein functions -----
+		  
+		  $labels = array("Transcription", "Unknown", "Immune system", "Lyase", "Oxidureductase", "Transferase", "Hydrolase");
+		  $datasets = array();
+		  $dataset1 = array(2302, 2394, 2609, 3257, 8892, 11330, 14696);
+		  array_push($datasets, $dataset1);
+		  
+		  $plot_type = "bar";		  
+		  $code = get_plot_code("4", $plot_type, $labels, $datasets);		  
+		  
+		  echo "<h4>Most common protein functions</h4>\n" . $code . "\n\n";
+		  
+		  echo "<br/><br/><br/><br/>\n";
+		  
+		  
+		  // ----- source organism -----
+		  
+		  $labels = array("Bos taurus", "Saccharomyces cerevisia", "Mus musculus", "Thermus thermophilus", "Unknown", "Escherichia coli", "Homo sapiens");
+		  $datasets = array();
+		  $dataset1 = array(5219, 8822, 9349, 11464, 19161, 21117, 53667);
+		  array_push($datasets, $dataset1);
+		  
+		  $plot_type = "bar";		  
+		  $code = get_plot_code("5", $plot_type, $labels, $datasets);		  
+		  
+		  echo "<h4>Most common source organisms</h4>\n" . $code . "\n\n";
+		  
+		  echo "<br/><br/><br/><br/>\n";
 		  
 ?>
 		
