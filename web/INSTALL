@@ -1,0 +1,40 @@
+PTGL3 web server installation guide
+====================================
+
+To install your own PTGL3 web server, you will need the following:
+
+  * root access to a linux server with 
+    - at least 250 GB free disk space
+    - the VPLG software suite to create the graph data from the PDB and DSSP data (http://sourceforge.net/projects/vplg/).
+      VPLG computes and saves graph data to the data dir (these files are served by the web server) and fills the database.
+      
+      See the VPLG documentation and the plcc_cluster documentation for details. (This takes weeks on a single desktop computer!)
+    
+    
+  * basic linux admin skills (installing and configuring Apache2 and a PostgreSQL database server is not explained in this document)
+  
+  
+Installing the PTGL3 server
+============================
+
+  - install the webserver and configure a web directory for the PTGL3 (e.g., /srv/www/htdocs/PTGL3/)
+    (make sure that php-zip support and -postgresql support is installed)
+  
+  
+  - copy the web interface PHP there
+  
+  
+  - edit the config file and set database credentials (cfg file should now be at: /srv/www/htdocs/PTGL3/backend/config.php)
+  
+    The database should contain the data computed by VPLG. The database size is > 14 GB.
+    
+    
+  - copy the data computed by VPLG to the data dir (unless changed in cfg file, this is now: /srv/www/htdocs/PTGL3/data/). 
+  
+    Note: This is > 180 GB for the whole PDB.
+    
+    
+  - make sure that the Apache user can read the whole PTGL3 www-dir AND that he can write to PTGL3/temp_downloads/.
+  
+  
+That's it.

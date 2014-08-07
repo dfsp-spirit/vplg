@@ -1,0 +1,16 @@
+This is the PHP web interface for the PTGL3 web server.
+
+It was written by Daniel Bruneß and Andreas Scheck. Copyright 2014 Molecular Bioinformatics @ Goethe-University Frankfurt am Main, Germany.
+
+Molecular Bioinformatics
+Secretary Mrs. Geiss
+Robert-Mayer-Str. 11-15
+60325 Frankfurt am Main
+Germany
+phone: +49(0)69/798-24651
+fax: +49(0)69/798-24650 
+
+
+This is free software released under the Artistic License 2, see the LICENSE file for details.
+
+If you want to setup your own PTGL 3 server, please see the INSTALL file for instructions.
