@@ -599,6 +599,51 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
     }
     
     
+    /**
+     * Tests only.
+     * @param args ignored 
+     */
+    public static void main(String[] args) {
+        
+        // create test graph
+        ArrayList<SSE> sses = new ArrayList<SSE>();
+        for(int i = 0; i < 4; i++) {
+            SSE s = new SSE(SSE.SSECLASS_HELIX);
+            sses.add(s);
+        }
+        ProtGraph pg1 = new ProtGraph(sses);
+        pg1.addContact(0, 1, SpatRel.MIXED);
+        pg1.addContact(0, 2, SpatRel.MIXED);
+        pg1.addContact(0, 3, SpatRel.MIXED);        
+        pg1.addContact(1, 2, SpatRel.MIXED);        
+        pg1.addContact(2, 3, SpatRel.MIXED);
+        
+        ArrayList<Integer> sseIndices = new ArrayList<Integer>();
+        for(Integer i = 0; i < 4; i++) { sseIndices.add(i); }
+        
+        boolean pg1containsCycle = pg1.hasCycleInVertexSet(sseIndices);
+        if(pg1containsCycle) {
+            System.out.println("Graph 1 contains a cycle.");
+        }
+        else {
+            System.out.println("Graph 1 does not contain a cycle.");
+        }
+        
+        ProtGraph pg2 = new ProtGraph(sses);
+        pg2.addContact(0, 1, SpatRel.MIXED);
+        pg2.addContact(1, 2, SpatRel.MIXED);
+        pg2.addContact(2, 3, SpatRel.MIXED);
+        //pg2.addContact(3, 0, SpatRel.MIXED);
+        
+        boolean pg2containsCycle = pg2.hasCycleInVertexSet(sseIndices);
+        if(pg2containsCycle) {
+            System.out.println("Graph 2 contains a cycle.");
+        }
+        else {
+            System.out.println("Graph 2 does not contain a cycle.");
+        }
+
+    }
     
     
 }

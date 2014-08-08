@@ -32,6 +32,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,6 +41,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -1005,6 +1007,21 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
      */
     public ArrayList<Integer> neighborsOf(Integer vertexIndex) {
         return(adjLists.get(vertexIndex));
+    }
+    
+    /**
+     * Returns all neighbors of a vertex which are in the given set.
+     * @param vertexIndex the target vertex
+     * @param retainVerts the set of allowed return values
+     * @return the remaining neighbors
+     */
+    public ArrayList<Integer> neighborsOfFromSet(Integer vertexIndex, Collection retainVerts) {
+        ArrayList<Integer> nf = new ArrayList<Integer>();
+        for(Integer n : adjLists.get(vertexIndex)) {
+            nf.add(n);
+        }
+        nf.retainAll(retainVerts);
+        return nf;
     }
     
     
@@ -2101,6 +2118,40 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         return(computePaths(source, target));
     }
     
+    
+    /**
+     * Determines whether the vertices in the list (which are vertex indices of this graph) contains a cycle.
+     * @param vertexPositions the vertices to consider (by index in this graph)
+     * @return the cycle or an empty list if no cycle exists in the set
+     */
+    Boolean hasCycleInVertexSet(ArrayList<Integer> vertexPositions) {
+        
+        Stack<Integer> stack = new Stack<Integer>();
+        HashSet<Integer> visited = new HashSet<Integer>();
+        Integer cur;
+        int start; int end;
+        
+        stack.add(vertexPositions.get(0));
+        while(stack.size() > 0) {
+            cur = stack.remove(0);
+            if( ! visited.contains(cur)) {
+                visited.add(cur);
+                ArrayList<Integer> curNeighbors = this.neighborsOfFromSet(cur, vertexPositions);
+                start = 0;
+                end = curNeighbors.size() - 1;
+                while(start < end) {
+                    if(visited.contains(curNeighbors.get(start))) {
+                        return true;
+                    }
+                    else {
+                        stack.add(curNeighbors.get(start));
+                    }
+                    start++;
+                }
+            }
+        }
+        return false;
+    }
     
     /**
      * Sets the metadata for this graph.
