@@ -641,13 +641,7 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         return(pixelPosX);
     }
     
-    
-    /**
-     * Determines whether this graph is connected, i.e. consists of a single connected component.
-     * @return true if it is connected, false otherwise
-     */
-    public abstract Boolean isConnected();
-                  
+        
     
     
     /**
@@ -2117,14 +2111,29 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
     protected ArrayList<Integer> getPathBetweenVertices(Integer source, Integer target) {
         return(computePaths(source, target));
     }
+
+    
+    /**
+     * Determines whether this graph contains a cycle (works on connected graphs only).
+     * Note that this function only works if this graph is connected.
+     * @return true if a cycle exists, false otherwise. May NOT find the cycle if this graph is not connected.
+     */
+    public Boolean hasCycle() {
+        ArrayList<Integer> allIndices = new ArrayList<Integer>();
+        for(int i = 0; i < this.getSize(); i++) {
+            allIndices.add(i);
+        }
+        return this.hasCycleInVertexSet(allIndices);
+    }
     
     
     /**
      * Determines whether the vertices in the list (which are vertex indices of this graph) contains a cycle.
+     * Note that this function only works if all vertices in the list are connected.
      * @param vertexPositions the vertices to consider (by index in this graph)
-     * @return the cycle or an empty list if no cycle exists in the set
+     * @return true if a cycle exists, false otherwise. May NOT find the cycle if the vertex set is not connected.
      */
-    Boolean hasCycleInVertexSet(ArrayList<Integer> vertexPositions) {
+    public Boolean hasCycleInVertexSet(ArrayList<Integer> vertexPositions) {
         
         Stack<Integer> stack = new Stack<Integer>();
         HashSet<Integer> visited = new HashSet<Integer>();
@@ -2149,6 +2158,89 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
                     start++;
                 }
             }
+        }
+        return false;
+    }
+    
+    
+    /**
+     * Tests whether the given vertex set is connected, i.e., each vertex is reachable from all other vertices.
+     * @param vertexPositions the vertices, by index in the graph
+     * @return true if all vertices in the list are connected, false otherwise
+     */
+    public Boolean isConnectedVertexSet(ArrayList<Integer> vertexPositions) {
+        
+        if(vertexPositions.isEmpty()) {
+            throw new java.lang.IllegalArgumentException("SSEGraph.isConnectedVertexSet(): vertex list must not be empty.");
+        }
+        
+        Stack<Integer> stack = new Stack<Integer>();
+        HashSet<Integer> visited = new HashSet<Integer>();
+        Integer cur;
+        int start; int end;
+        
+        stack.add(vertexPositions.get(0));
+        while(stack.size() > 0) {
+            cur = stack.remove(0);
+            if( ! visited.contains(cur)) {
+                visited.add(cur);
+                ArrayList<Integer> curNeighbors = this.neighborsOfFromSet(cur, vertexPositions);
+                start = 0;
+                end = curNeighbors.size() - 1;
+                while(start < end) {
+                    if( ! visited.contains(curNeighbors.get(start))) {
+                        stack.add(curNeighbors.get(start));
+                    }
+                    start++;
+                }
+            }
+        }        
+        
+        if(visited.size() == vertexPositions.size()) {
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Tests whether this graph is connected, i.e., each vertex is reachable from all other vertices.
+     * @return true if this graph is connected, false otherwise
+     */
+    public Boolean isConnected() {
+        
+        ArrayList<Integer> vertexPositions = new ArrayList<Integer>();
+        for(int i = 0; i < this.getSize(); i++) {
+            vertexPositions.add(i);
+        }
+        
+        if(vertexPositions.isEmpty()) {
+            throw new java.lang.IllegalArgumentException("SSEGraph.isConnected(): vertex list must not be empty.");
+        }
+        
+        Stack<Integer> stack = new Stack<Integer>();
+        HashSet<Integer> visited = new HashSet<Integer>();
+        Integer cur;
+        int start; int end;
+        
+        stack.add(vertexPositions.get(0));
+        while(stack.size() > 0) {
+            cur = stack.remove(0);
+            if( ! visited.contains(cur)) {
+                visited.add(cur);
+                ArrayList<Integer> curNeighbors = this.neighborsOf(cur);
+                start = 0;
+                end = curNeighbors.size() - 1;
+                while(start < end) {
+                    if( ! visited.contains(curNeighbors.get(start))) {
+                        stack.add(curNeighbors.get(start));
+                    }
+                    start++;
+                }
+            }
+        }        
+        
+        if(visited.size() == vertexPositions.size()) {
+            return true;
         }
         return false;
     }

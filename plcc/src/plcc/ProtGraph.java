@@ -626,7 +626,15 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
             System.out.println("Graph 1 contains a cycle.");
         }
         else {
-            System.out.println("Graph 1 does not contain a cycle.");
+            System.out.println("Graph 1 does NOT contain a cycle.");
+        }
+        
+        boolean pg1isConnected = pg1.isConnected();
+        if(pg1isConnected) {
+            System.out.println("Graph 1 is connected.");
+        }
+        else {
+            System.out.println("Graph 1 is NOT connected.");
         }
         
         ProtGraph pg2 = new ProtGraph(sses);
@@ -640,7 +648,15 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
             System.out.println("Graph 2 contains a cycle.");
         }
         else {
-            System.out.println("Graph 2 does not contain a cycle.");
+            System.out.println("Graph 2 does NOT contain a cycle.");
+        }
+        
+        boolean pg2isConnected = pg2.isConnected();
+        if(pg2isConnected) {
+            System.out.println("Graph 2 is connected.");
+        }
+        else {
+            System.out.println("Graph 2 is NOT connected.");
         }
 
     }
