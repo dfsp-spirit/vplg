@@ -13,6 +13,7 @@ package plcc;
 import algorithms.CompatGraphComputation;
 import algorithms.TreeNodeData;
 import datastructures.Graph;
+import datastructures.SimpleGraphInterface;
 import datastructures.UndirectedGraph;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -70,7 +71,7 @@ import tools.DP;
  * 
  * @author spirit
  */
-public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguageFormat, TrivialGraphFormat, DOTLanguageFormat, KavoshFormat {
+public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguageFormat, TrivialGraphFormat, DOTLanguageFormat, KavoshFormat, SimpleGraphInterface {
     
     /** the list of all SSEs of this graph */
     protected ArrayList<SSE> sseList;
