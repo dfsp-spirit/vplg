@@ -153,7 +153,7 @@ public class SimpleGraphDrawer {
      * have a shift (because they started further up) and assigns the free shifts to the rest.
      * @param l the edge list
      */
-    public void assignShifts(List<DrawEdge> l) {
+    private void assignShifts(List<DrawEdge> l) {
         Collections.sort(l, new DrawEdgeComparator());
         Set<Integer> usedShifts = getUsedShifts(l);
         
