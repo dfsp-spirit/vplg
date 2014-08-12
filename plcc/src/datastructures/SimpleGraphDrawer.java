@@ -76,7 +76,10 @@ public class SimpleGraphDrawer {
             
             maxShift = maxShiftOf(edgesHere);
             drawChars = new String[(maxShift + 1) * 2];
-            sb.append("[").append(i).append("]");
+            
+            // append vertex marker
+            sb.append("").append(String.format("%4d", i)).append(" ");
+            
             Arrays.fill(drawChars, " ");
             for(DrawEdge e : edgesHere) {
                 System.out.print(e + "=>" + getShift(e) + "");
@@ -110,7 +113,7 @@ public class SimpleGraphDrawer {
                 assignShifts(edgesHere);
                 maxShift = maxShiftOf(edgesHere);
                 drawChars = new String[(maxShift + 1) * 2];
-                sb.append("   ");
+                sb.append("     ");
                 Arrays.fill(drawChars, " ");
                 for(DrawEdge e : edgesHere) {
                     System.out.print(e + "=>" + getShift(e) + "");
@@ -341,9 +344,18 @@ public class SimpleGraphDrawer {
         pg1.addContact(1, 2, SpatRel.MIXED);        
         pg1.addContact(2, 3, SpatRel.MIXED);
         
+        // create a second test graph
+        ProtGraph pg2 = new ProtGraph(sses);
+        pg2.addContact(0, 1, SpatRel.MIXED);
+        pg2.addContact(1, 2, SpatRel.MIXED);
+        pg2.addContact(2, 3, SpatRel.MIXED);
+        pg2.addContact(3, 0, SpatRel.MIXED);
         
-        SimpleGraphDrawer sgd = new SimpleGraphDrawer(pg1);
-        System.out.println("Graph:\n" + sgd.getGraphConsoleDrawing());
+        SimpleGraphDrawer sgd1 = new SimpleGraphDrawer(pg1);
+        System.out.println("Graph 1:\n" + sgd1.getGraphConsoleDrawing());
+        
+        SimpleGraphDrawer sgd2 = new SimpleGraphDrawer(pg2);
+        System.out.println("Graph 2:\n" + sgd2.getGraphConsoleDrawing());
         
     }
     
