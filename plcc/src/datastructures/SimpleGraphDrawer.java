@@ -32,6 +32,8 @@ public class SimpleGraphDrawer {
     int numVerts;
     int[][] edgeShifts;
     
+    public Boolean silent;
+    
     public static final Character defaultEdgeStart = '*';    
     public static final String edgeEnd = "+";
     public static final String edgeElong = "|";
@@ -42,6 +44,7 @@ public class SimpleGraphDrawer {
      * @param g the input graph to draw
      */
     public SimpleGraphDrawer(SimpleGraphInterface g) {
+        this.silent = true;
         this.g = g;
         numVerts = g.getSize();
         edgeShifts = new int[numVerts][numVerts];
@@ -68,7 +71,7 @@ public class SimpleGraphDrawer {
             edgesHere = drawnEdgesAtVert(i);
             assignShifts(edgesHere);
             
-            System.out.print("At vertex #" + i + ", edges here are : ");
+            if(! this.silent) { System.out.print("At vertex #" + i + ", edges here are : "); }
             //for(DrawEdge e : edgesHere) {
             //    System.out.print(e);
             //}
@@ -82,24 +85,24 @@ public class SimpleGraphDrawer {
             
             Arrays.fill(drawChars, " ");
             for(DrawEdge e : edgesHere) {
-                System.out.print(e + "=>" + getShift(e) + "");
+                if(! this.silent) { System.out.print(e + "=>" + getShift(e) + ""); }
                 if(e.source == i) {
                     // edge starts here
-                    System.out.print("s ");
+                    if(! this.silent) { System.out.print("s "); }
                     drawChars[getShift(e) * 2] = g.getEdgeLabelChar(e.source, e.target) + "";
                 }
                 else if(e.target == i) {
                     // edge ends here
-                    System.out.print("e ");
+                    if(! this.silent) { System.out.print("e "); }
                     drawChars[getShift(e) * 2] = edgeEnd;
                 }
                 else {
                     // edge continues
-                    System.out.print("c ");
+                    if(! this.silent) { System.out.print("c "); }
                     drawChars[getShift(e) * 2] = edgeElong;
                 }
             }
-            System.out.print("\n");
+            if(! this.silent) { System.out.print("\n"); }
             
             for(String s : drawChars) {
                 sb.append(s);
@@ -108,7 +111,7 @@ public class SimpleGraphDrawer {
             
             // draw the line between the vertices
             if(i < numVerts -1) {
-                System.out.print("Between verts #" + i + " and " + j + ", edges: ");
+                if(! this.silent) {  System.out.print("Between verts #" + i + " and " + j + ", edges: "); }
                 edgesHere = drawnEdgesBetweenVerts(i, j);
                 assignShifts(edgesHere);
                 maxShift = maxShiftOf(edgesHere);
@@ -116,11 +119,11 @@ public class SimpleGraphDrawer {
                 sb.append("      ");
                 Arrays.fill(drawChars, " ");
                 for(DrawEdge e : edgesHere) {
-                    System.out.print(e + "=>" + getShift(e) + "");
-                    System.out.print("c "); // all edges continue here
+                    if(! this.silent) { System.out.print(e + "=>" + getShift(e) + ""); }
+                    if(! this.silent) { System.out.print("c "); } // all edges continue here 
                     drawChars[getShift(e) * 2] = edgeElong;
                 }
-                System.out.print("\n");
+                if(! this.silent) { System.out.print("\n"); }
                 
                 for(String s : drawChars) {
                     sb.append(s);
