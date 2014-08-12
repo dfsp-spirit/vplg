@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import plcc.ProtGraph;
+import plcc.ProtGraphs;
 import plcc.SSE;
 import plcc.SpatRel;
 
@@ -78,7 +79,7 @@ public class SimpleGraphDrawer {
             drawChars = new String[(maxShift + 1) * 2];
             
             // append vertex marker
-            sb.append("").append(String.format("%4d", i)).append(" ");
+            sb.append("").append(String.format("%4d", i)).append(g.getVertexLabelChar(i)).append(" ");
             
             Arrays.fill(drawChars, " ");
             for(DrawEdge e : edgesHere) {
@@ -86,7 +87,7 @@ public class SimpleGraphDrawer {
                 if(e.source == i) {
                     // edge starts here
                     System.out.print("s ");
-                    drawChars[getShift(e) * 2] = edgeStart;
+                    drawChars[getShift(e) * 2] = g.getEdgeLabelChar(e.source, e.target) + "";
                 }
                 else if(e.target == i) {
                     // edge ends here
@@ -113,7 +114,7 @@ public class SimpleGraphDrawer {
                 assignShifts(edgesHere);
                 maxShift = maxShiftOf(edgesHere);
                 drawChars = new String[(maxShift + 1) * 2];
-                sb.append("     ");
+                sb.append("      ");
                 Arrays.fill(drawChars, " ");
                 for(DrawEdge e : edgesHere) {
                     System.out.print(e + "=>" + getShift(e) + "");
@@ -345,11 +346,7 @@ public class SimpleGraphDrawer {
         pg1.addContact(2, 3, SpatRel.MIXED);
         
         // create a second test graph
-        ProtGraph pg2 = new ProtGraph(sses);
-        pg2.addContact(0, 1, SpatRel.MIXED);
-        pg2.addContact(1, 2, SpatRel.MIXED);
-        pg2.addContact(2, 3, SpatRel.MIXED);
-        pg2.addContact(3, 0, SpatRel.MIXED);
+        ProtGraph pg2 = ProtGraphs.generateRandomPG(20, "albelig", "A", "7tim");
         
         SimpleGraphDrawer sgd1 = new SimpleGraphDrawer(pg1);
         System.out.println("Graph 1:\n" + sgd1.getGraphConsoleDrawing());

@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- *
+ * A very simple graph interface. Works by index.
  * @author ts
  */
 public interface SimpleGraphInterface {
@@ -24,5 +24,9 @@ public interface SimpleGraphInterface {
     public Boolean containsEdge(Integer i, Integer j);
     
     public ArrayList<Integer> neighborsOf(Integer i);
+    
+    public Character getVertexLabelChar(Integer i);
+    
+    public Character getEdgeLabelChar(Integer i, Integer j);
     
 }

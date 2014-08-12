@@ -13,6 +13,7 @@ package plcc;
 import algorithms.CompatGraphComputation;
 import algorithms.TreeNodeData;
 import datastructures.Graph;
+import datastructures.SimpleGraphAdapter;
 import datastructures.SimpleGraphInterface;
 import datastructures.UndirectedGraph;
 import java.awt.BasicStroke;
@@ -71,7 +72,7 @@ import tools.DP;
  * 
  * @author spirit
  */
-public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguageFormat, TrivialGraphFormat, DOTLanguageFormat, KavoshFormat, SimpleGraphInterface {
+public abstract class SSEGraph extends SimpleGraphAdapter implements VPLGGraphFormat, GraphModellingLanguageFormat, TrivialGraphFormat, DOTLanguageFormat, KavoshFormat, SimpleGraphInterface {
     
     /** the list of all SSEs of this graph */
     protected ArrayList<SSE> sseList;
@@ -3241,10 +3242,20 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
      * Returns the contact type string for the contact between the SSEs with indices i and j.
      * @param i index of the first SSE
      * @param j index of the second SSE
-     * @return the spatial relation of i and j, as a SpatRel String
+     * @return the spatial relation of i and j, as a SpatRel String (e.g., "m" for mixed).
      */
     public String getContactTypeString(Integer i, Integer j) {
         return(SpatRel.getString(this.matrix[i][j]));
+    }
+    
+    /**
+     * Returns the contact type character for the contact between the SSEs with indices i and j.
+     * @param i index of the first SSE
+     * @param j index of the second SSE
+     * @return the spatial relation of i and j, as a SpatRel character (e.g., 'm' for mixed).
+     */
+    public Character getContactTypeCharacter(Integer i, Integer j) {
+        return(SpatRel.getCharacter(this.matrix[i][j]));
     }
     
     /**
@@ -3719,6 +3730,36 @@ public abstract class SSEGraph implements VPLGGraphFormat, GraphModellingLanguag
         return numIsolatedLigands;
     } 
 
+    
+    @Override
+    public Character getVertexLabelChar(Integer i) {
+        char c;
+        
+        try {
+            String l = this.getVertex(i).getPLCCSSELabel();
+            c = l.charAt(0);
+        } catch(Exception e) {
+            if(i >= 0 && i <= 9) {
+                c =  (char) ('0' + i);
+            } else {
+                c = 'v';
+            }
+        }
+        return c;
+    }
+    
+    @Override
+    public Character getEdgeLabelChar(Integer i, Integer j) {
+        char c;        
+        try {
+            c = this.getContactTypeCharacter(i, j);
+        } catch(Exception e) {
+            c =  '*';
+        }
+        return c;
+    }
+    
+    
     /**
      * Determines the degree distribution of this graph. For a graph with n vertices, it counts 
      * how often each of the possible vertex degrees 0..n-1 occur in the graph.

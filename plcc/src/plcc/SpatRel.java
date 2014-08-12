@@ -35,6 +35,15 @@ public class SpatRel {
     public static final String STRING_BACKBONE = "b";
     public static final String STRING_DISULFIDE = "d";
     public static final String STRING_COMPLEX = "c";
+    
+    public static final Character CHAR_NONE = '-';
+    public static final Character CHAR_MIXED = 'm';
+    public static final Character CHAR_PARALLEL = 'p';
+    public static final Character CHAR_ANTIPARALLEL = 'a';
+    public static final Character CHAR_LIGAND = 'l';
+    public static final Character CHAR_BACKBONE = 'b';
+    public static final Character CHAR_DISULFIDE = 'd';
+    public static final Character CHAR_COMPLEX = 'c';
 
     /** 
      * Returns the String representation for a contact with Integer id 'i'. Each string representation is a single
@@ -69,6 +78,42 @@ public class SpatRel {
             System.err.println("ERROR: Spatial relation integer " + i + " is invalid.");
             System.exit(1);
             return("?");
+        }
+    }
+    
+    /** 
+     * Returns the Character representation for a contact with Integer id 'i'. Each char representation is a single
+     * lowercase letter, e.g. 'm' for 1 (meaning 'mixed').
+     */
+    public static Character getCharacter(Integer i) {
+        if(i.equals(SpatRel.NONE)) {
+            return(SpatRel.CHAR_NONE);
+        }
+        else if(i.equals(SpatRel.MIXED)) {
+            return(SpatRel.CHAR_MIXED);
+        }
+        else if(i.equals(SpatRel.PARALLEL)) {
+            return(SpatRel.CHAR_PARALLEL);
+        }
+        else if(i.equals(SpatRel.ANTIPARALLEL)) {
+            return(SpatRel.CHAR_ANTIPARALLEL);
+        }
+        else if(i.equals(SpatRel.LIGAND)) {
+            return(SpatRel.CHAR_LIGAND);
+        }
+        else if(i.equals(SpatRel.BACKBONE)) {
+            return(SpatRel.CHAR_BACKBONE);
+        }
+        else if(i.equals(SpatRel.DISULFIDE)) {
+            return(SpatRel.CHAR_DISULFIDE);
+        }
+        else if(i.equals(SpatRel.COMPLEX)) {
+            return(SpatRel.CHAR_COMPLEX);
+        }
+        else {
+            System.err.println("ERROR: Spatial relation integer " + i + " is invalid.");
+            System.exit(1);
+            return('?');
         }
     }
 
