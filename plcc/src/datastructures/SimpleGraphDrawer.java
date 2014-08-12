@@ -32,11 +32,10 @@ public class SimpleGraphDrawer {
     int numVerts;
     int[][] edgeShifts;
     
-    public static final String edgeStart = "*";
-    //public static final String edgeStart = Character.toString ((char) 191);
+    public static final Character defaultEdgeStart = '*';    
     public static final String edgeEnd = "+";
-    //public static final String edgeEnd = Character.toString ((char) 217);
     public static final String edgeElong = "|";
+    public static final Character defaultVertexLabel = 'v';
     
     /**
      * Constructor, sets the graph to draw.

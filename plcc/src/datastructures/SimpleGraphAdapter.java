@@ -16,12 +16,11 @@ public abstract class SimpleGraphAdapter implements SimpleGraphInterface {
     
     @Override
     public Character getVertexLabelChar(Integer i) {
-        char c = (char) ('0' + i);
-        return c;
+        return SimpleGraphDrawer.defaultVertexLabel;
     }
     
     @Override
     public Character getEdgeLabelChar(Integer i, Integer j) {
-        return '*';
+        return SimpleGraphDrawer.defaultEdgeStart;
     }
 }
