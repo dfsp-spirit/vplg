@@ -107,29 +107,28 @@ $(function() {
 	
 	// if clicking on "Select all protein chains...
 	$('#selectAllBtn').click( function() {
-		var selectedProteins = "";
+		chains = [];
 		var numberOfChains = 0;
 		$('input[type=checkbox]').each(function () {
 			numberOfChains++;
-			selectedProteins += this.value + " ";
-			console.log(this.id + " is now " + $(this).attr('checked'));
+			chains.push(this.value);
 		})
 		
 		if(numberOfChains > 20){
 			var r = confirm("You selected more than 20 chains. Loading could take a while. Are you sure to proceed?");
 			if(r == true) {
-				$('#loadInput').val(selectedProteins);
+				fill_input_field(chains);
 				$('input[type=checkbox]').each(function () {
 					$(this).prop('checked', true);
 				})
 			} else {
 				$('input[type=checkbox]').each(function () {
 					$(this).prop('checked', false);
-					console.log(this.id + " is now " + $(this).attr('checked'));
+
 				})
 			} 
 		} else {
-			$('#loadInput').val(selectedProteins);
+			fill_input_field(chains);
 			$('input[type=checkbox]').each(function () {
 				$(this).prop('checked', true);
 			})
@@ -141,7 +140,6 @@ $(function() {
 		$('#loadInput').val("");
 		$('input[type=checkbox]').each(function () {
 			$(this).prop('checked', false);
-			console.log(this.id + " is now " + $(this).attr('checked'));
 		})
 	});
 

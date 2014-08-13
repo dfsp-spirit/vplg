@@ -160,7 +160,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 				   FROM plcc_chain c
 				   INNER JOIN plcc_protein p
 				   ON p.pdb_id = c.pdb_id 
-				   WHERE p.title = '".strtoupper($title)."'";
+				   WHERE p.title LIKE '%".strtoupper($title)."%'";
 		$firstQuerySet = true; };
 	
 	if (isset($hasligand) && $hasligand != "null") {
