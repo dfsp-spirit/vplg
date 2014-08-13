@@ -14,7 +14,7 @@ $graphtype=$ARGV[1] if $ARGV[1]=~/(beta|alpha)/;
 
 my $verbose=0;
 $verbose=1 if $ARGV[1] eq 1 or $ARGV[2]==1;
-#$verbose=1;
+$verbose=1;
 
 
 print "graphtype: $graphtype\n";
@@ -65,10 +65,14 @@ while($str=<GRAPH>){
 		  $g->set_attribute('start',$ct,$3);
 		  $g->set_attribute('stop',$ct,$4);
 		} else {
-		  $g->set_vertex_attribute('type',$ct,lc($1));
-		  $g->set_vertex_attribute('len',$ct,$2);
-		  $g->set_vertex_attribute('start',$ct,$3);
-		  $g->set_vertex_attribute('stop',$ct,$4);		
+		  #$g->set_vertex_attribute('type',$ct,lc($1));
+		  #$g->set_vertex_attribute('len',$ct,$2);
+		  #$g->set_vertex_attribute('start',$ct,$3);
+		  #$g->set_vertex_attribute('stop',$ct,$4);		
+		  $g->set_vertex_attribute($ct,'type',lc($1));
+		  $g->set_vertex_attribute($ct,'len',$2);
+		  $g->set_vertex_attribute($ct,'start',$3);
+		  $g->set_vertex_attribute($ct,'stop',$4);		
 		}
 		print "g = $g\n" if $verbose;
 
@@ -89,9 +93,12 @@ while($str=<GRAPH>){
 		  $g->set_attribute('topo',$totalPos{$1+1},$totalPos{$2+1},lc($topo));
 		  $g->set_attribute('status',$totalPos{$1+1},$totalPos{$2+1},0);
 		} else {
-		  $g->set_edge_attribute('type',$totalPos{$1+1},$totalPos{$2+1},lc($4));
-		  $g->set_edge_attribute('topo',$totalPos{$1+1},$totalPos{$2+1},lc($topo));
-		  $g->set_edge_attribute('status',$totalPos{$1+1},$totalPos{$2+1},0);		
+		  #$g->set_edge_attribute('type',$totalPos{$1+1},$totalPos{$2+1},lc($4));
+		  #$g->set_edge_attribute('topo',$totalPos{$1+1},$totalPos{$2+1},lc($topo));
+		  #$g->set_edge_attribute('status',$totalPos{$1+1},$totalPos{$2+1},0);		
+		  $g->set_edge_attribute($totalPos{$1+1},$totalPos{$2+1},'type',lc($4));
+		  $g->set_edge_attribute($totalPos{$1+1},$totalPos{$2+1},'topo',lc($topo));
+		  $g->set_edge_attribute($totalPos{$1+1},$totalPos{$2+1},'status',0);		
 		}
 		$nedges++;
 		print "$str\n" if $verbose;
@@ -110,7 +117,7 @@ print "number of edges: ",scalar($g->edges),"\n" if $verbose;
 print "number of vertices: ",scalar($g->vertices),"\n" if $verbose;
 
 # get the connected components as list of vertex lists
-my @S = $g->strongly_connected_components;
+my @S = $g->connected_components;
 my %S=();
 print "number of connected components: ",scalar(@S),"\n";
 
@@ -142,10 +149,18 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 
 	if (scalar(@vs)==1){
 		if($graphtype=~/albe/){
-			$seqNotation=$kl1.$g->get_attribute('type',$vs[0]).$kl2;
-			$keyNotation=$kl1.$g->get_attribute('type',$vs[0]).$kl2;
-			$adjNotation=$kl1.$g->get_attribute('type',$vs[0]).$kl2;
-			$redNotation=$kl1.$g->get_attribute('type',$vs[0]).$kl2;
+		        if ( $g->is_compat02 ) {
+			  $seqNotation=$kl1.$g->get_attribute('type',$vs[0]).$kl2;
+			  $keyNotation=$kl1.$g->get_attribute('type',$vs[0]).$kl2;
+			  $adjNotation=$kl1.$g->get_attribute('type',$vs[0]).$kl2;
+			  $redNotation=$kl1.$g->get_attribute('type',$vs[0]).$kl2;
+			}
+			else {
+			  $seqNotation=$kl1.$g->get_vertex_attribute('type',$vs[0]).$kl2;
+			  $keyNotation=$kl1.$g->get_vertex_attribute('type',$vs[0]).$kl2;
+			  $adjNotation=$kl1.$g->get_vertex_attribute('type',$vs[0]).$kl2;
+			  $redNotation=$kl1.$g->get_vertex_attribute('type',$vs[0]).$kl2;
+			}
 		}else{
 			$seqNotation=$kl1.$kl2;
 			$keyNotation=$kl1.$kl2;
@@ -176,7 +191,13 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 		$redNotation=$kl1;
 		$keyNotation=$kl1;
 		$seqNotation=$kl1;
-		$seqNotation.=$g->get_attribute("type",$vs[0]) if $graphtype eq "albe";
+		
+		if ( $g->is_compat02 ) {
+		  $seqNotation.=$g->get_attribute("type",$vs[0]) if $graphtype eq "albe";
+		}
+		else {
+		   $seqNotation.=$g->get_vertex_attribute("type",$vs[0]) if $graphtype eq "albe";
+		}
 
 		$adjstart = $vs[0];
 		$redstart = $vs[0];
@@ -210,7 +231,11 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 		my $adjcur=$cur;
 		my %adjvisited=();
 		
-		$adjNotation.=$g->get_attribute("type",$adjcur) if $graphtype eq "albe";
+		if ( $g->is_compat02 ) {
+		  $adjNotation.=$g->get_attribute("type",$adjcur) if $graphtype eq "albe";
+		} else {
+		  $adjNotation.=$g->get_vertex_attribute("type",$adjcur) if $graphtype eq "albe";
+		}
 		
 		$adjstart=$cur;
 		$adjvisited{$cur}++;
@@ -257,7 +282,13 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 				if($left > $right){$left=$adjv; $right=$adjcur;}
 
 				#next if exists($adjvisited{$adjv}) and $g->get_attribute('status',$left,$right)==1;
-				next if $g->get_attribute('status',$left,$right)==1;
+				if ( $g->is_compat02 ) {
+				  next if $g->get_attribute('status',$left,$right)==1;
+				}
+				else {
+				  next if $g->get_edge_attribute('status',$left,$right)==1;
+				}
+				
 				next if $adjdegrees{$adjv}==0;
 
 				if (!$found){
@@ -275,8 +306,12 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 				my $left=$adjcur;
 				my $right=$next;
 				if($left > $right){$left=$next; $right=$adjcur;}
-
-				$edgeType=$g->get_attribute('topo',$left,$right);
+				
+				if ( $g->is_compat02 ) {
+				  $edgeType=$g->get_attribute('topo',$left,$right);
+				} else {
+				  $edgeType=$g->get_edge_attribute('topo',$left,$right);
+				}
 				$adjNotation.="," if (($graphtype eq "albe") or ($graphtype ne "albe" and scalar(keys(%adjvisited))>1));
 				$adjNotation.=($next - $adjcur).lc($edgeType);
 
@@ -307,7 +342,12 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 				}
 			}
 
-			$adjNotation.=$g->get_attribute("type",$next) if $graphtype eq "albe";	
+			
+			if ( $g->is_compat02 ) {
+			  $adjNotation.=$g->get_attribute("type",$next) if $graphtype eq "albe";	
+			} else {
+			  $adjNotation.=$g->get_vertex_attribute("type",$next) if $graphtype eq "albe";	
+			}
 			
 			# ordering
 
@@ -343,7 +383,12 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 		print "\nRED notation:\n" if $verbose;
 		my $redcur=$cur;
 		my %redvisited=();
-		$redNotation.=$g->get_attribute("type",$redcur) if $graphtype eq "albe";
+		
+		if ( $g->is_compat02 ) {
+		  $redNotation.=$g->get_attribute("type",$redcur) if $graphtype eq "albe";
+		} else {
+		  $redNotation.=$g->get_vertex_attribute("type",$redcur) if $graphtype eq "albe";
+		}
 		
 		$redstart=$pos{$cur};
 		$redvisited{$cur}++;
@@ -370,7 +415,12 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 				my $right=$redv;
 				if($left > $right){$left=$redv; $right=$redcur;}
 
-				print "neighbour: $redv status: ".$g->get_attribute('status',$left,$right)."\n" if $verbose;
+				if ( $g->is_compat02 ) {
+				  print "neighbour: $redv status: ".$g->get_attribute('status',$left,$right)."\n" if $verbose;
+				} else {
+				  print "neighbour: $redv status: ".$g->get_edge_attribute('status',$left,$right)."\n" if $verbose;
+				}
+				
 				# close the cycle
 				if($hC and scalar(keys(%redvisited)) == scalar(@vs)){
 					$found=1;
@@ -379,7 +429,15 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 				}
 
 				
-				next if $g->get_attribute('status',$left,$right)==1;
+				if ( $g->is_compat02 ) {
+				  next if $g->get_attribute('status',$left,$right)==1;
+				}
+				else {
+				  next if $g->get_edge_attribute('status',$left,$right)==1;
+				}
+				
+				
+				
 				next if $reddegrees{$redv}==0;
 
 				if (!$found){
@@ -398,7 +456,11 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 				my $right=$next;
 				if($left > $right){$left=$next; $right=$redcur;}
 
-				$edgeType=$g->get_attribute('topo',$left,$right);
+				if ( $g->is_compat02 ) {
+				  $edgeType=$g->get_attribute('topo',$left,$right);
+				} else {
+				  $edgeType=$g->get_edge_attribute('topo',$left,$right);				
+				}
 
 				$redNotation.="," if (($graphtype eq "albe") or ($graphtype ne "albe" and scalar(keys(%redvisited))>1));
 				$redNotation.=($pos{$next} - $pos{$redcur}).lc($edgeType);
@@ -433,7 +495,12 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 				}
 			}
 
-			$redNotation.=$g->get_attribute("type",$next) if $graphtype eq "albe";	
+			
+			if ( $g->is_compat02 ) {
+			  $redNotation.=$g->get_attribute("type",$next) if $graphtype eq "albe";	
+			} else {
+			  $redNotation.=$g->get_vertex_attribute("type",$next) if $graphtype eq "albe";	
+			}
 			
 			$redcur=$next;
 			$redvisited{$next}++;
@@ -466,8 +533,13 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 			my @order=sort{$a<=>$b} keys(%tvertex);
 			my @pos=sort {$a<=>$b} keys(%pos);
 
-			$keystart=$tvertex{$pos[0]};			
-			$keyNotation.=$g->get_attribute("type",$pos[0]) if $graphtype eq "albe";
+			$keystart=$tvertex{$pos[0]};	
+			
+			if ( $g->is_compat02 ) {
+			  $keyNotation.=$g->get_attribute("type",$pos[0]) if $graphtype eq "albe";
+			} else {
+			  $keyNotation.=$g->get_vertex_attribute("type",$pos[0]) if $graphtype eq "albe";
+			}
 			
 			for($i=1;$i<=scalar(@pos)-1;$i++){
 				
@@ -482,7 +554,12 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 				$keyNotation.="," if (($i==1 and $graphtype eq "albe") or ($i>1));
 				$keyNotation.=$dist;
 				$keyNotation.="x" if ($order{$pos[$i-1]} eq $order{$pos[$i]});
-				$keyNotation.=$g->get_attribute('type',$vs[$i]) if $graphtype eq "albe";
+				
+				if ( $g->is_compat02 ) {
+				  $keyNotation.=$g->get_attribute('type',$vs[$i]) if $graphtype eq "albe";
+				} else {
+				  $keyNotation.=$g->get_vertex_attribute('type',$vs[$i]) if $graphtype eq "albe";
+				}
 			}
 
 			print "keynotation: $keyNotation\n" if $verbose;
@@ -495,7 +572,12 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 		for($i=1;$i<scalar(@vs);$i++){
 			$seqNotation.="," if (($graphtype eq "albe") or (($graphtype ne "albe") and ($i > 1))) ;
 			$seqNotation.=abs($vs[$i]-$vs[$i-1]);
-			$seqNotation.=$g->get_attribute('type',$vs[$i]) if $graphtype eq "albe";
+			
+			if ( $g->is_compat02 ) {
+			  $seqNotation.=$g->get_attribute('type',$vs[$i]) if $graphtype eq "albe";
+			}else {
+			  $seqNotation.=$g->get_vertex_attribute('type',$vs[$i]) if $graphtype eq "albe";
+			}
 		}
 
 		# write the closing bracket
