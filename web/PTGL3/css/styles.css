@@ -426,7 +426,11 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		padding-right: auto;
 		padding-left: auto;
 		}
-
+		
+	#pager {
+		margin: auto auto 22px;
+		text-align: center;
+	}
 	
 	
 	.checkboxFont {

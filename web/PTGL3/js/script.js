@@ -12,6 +12,19 @@ $("#addSearchKey").hide();
 $('#addSearchMotif').hide();
 $('#addSearchSequence').hide();
 
+// if checkedChains is set
+if (!(typeof checkedChains === 'undefined')) {
+	var selectedProteins = "";
+    for(var i = 0; i < window.checkedChains.length; i++){
+		chain = window.checkedChains[i];
+		console.log(chain);
+		selectedProteins += chain + " ";
+		
+		$('input:checkbox[value=' + chain + ']').prop('checked', true);
+		$('#loadInput').val(selectedProteins);
+	}
+}
+
 
 $(function() {
 	
@@ -82,8 +95,8 @@ $(function() {
 			} 
 		} else {
 			$('#loadInput').val(selectedProteins);
-				$('input[type=checkbox]').each(function () {
-					$(this).prop('checked', true);
+			$('input[type=checkbox]').each(function () {
+				$(this).prop('checked', true);
 			})
 		}
 	});
@@ -95,12 +108,32 @@ $(function() {
 			$(this).prop('checked', false);
 			console.log(this.id + " is now " + $(this).attr('checked'));
 		})
-	});	
-});
-	
+	});
+
+	$('.changepage').click( function (){
+		var chains = new Array();
+		var proteins = new Array();
+		
+		$('input[type=checkbox]').each(function () {
+			if (this.checked) {
+				chains.push(this.value);
+			}
+		})
+
+		var dataToSend = {'chains[]' : chains};	
+		$.ajax({
+			type: "POST",
+			url: "./backend/chains_to_session.php",
+			data: dataToSend,
+			cache: false,
+			success: function(html){	
+				console.log(html);
+			}
+		});
+				
+	});
 
 
 });
 
-
-
+});

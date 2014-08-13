@@ -70,8 +70,7 @@ $(document).ready(function () {
 			$('input#searchInput').val(selectedElement);
 		}
 	});
-	
-	
+		
 	$('#sendit').click(function(e) {
  		content = $('#searchInput').val();
 		pdb_content = $('#pdbid').val();
@@ -89,11 +88,9 @@ $(document).ready(function () {
 	
 	$('#sendit_nav').click(function(e) {
  		content = $('#searchInput').val();
-		alert("peng");
  		if(content.length < 3){
  			e.preventDefault();
  			alert("Please enter at least 3 characters!");
  		}
  	});
-	
 });

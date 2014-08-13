@@ -53,25 +53,68 @@ function get_cath_link($pdbid, $chain = null) {
 if(isset($_GET["next"])) {
 	if(is_numeric($_GET["next"]) && $_GET["next"] >= 0){
 		$limit_start = $_GET["next"];
+		$keyword = $_SESSION["keyword"];
+		$pdbid = $_SESSION["pdbid"];
+		$title = $_SESSION["title"];
+		$hasligand = $_SESSION["hasligand"];
+		$ligandname = $_SESSION["ligandname"];
+		$molecule = $_SESSION["molecule"];
+		$logic = $_SESSION["logic"];
+		
 	} else {
 		$limit_start = 0;
 		unset($_SESSION['chains']); // or session_unset();
+		session_unset();
 	}
 } else {
 	$limit_start = 0;
 	session_unset();
 }
 
+// give the selected chains to JS
+if(isset($_SESSION["chains"])){
+	var_dump($_SESSION["chains"]);
+	echo '<script type="text/javascript">';
+	echo ('window.checkedChains = new Array(\''. implode('\',\'', $_SESSION["chains"]) .'\');');
+	echo '</script>';
+}
 
 // check if parameters are set. If so, set the associated variable with the value
 if(isset($_POST)) {
-    if(isset($_POST["keyword"])) {$keyword = $_POST["keyword"];} else {$keyword = "";};
-    if(isset($_POST["pdbid"])) {$pdbid = $_POST["pdbid"];};
-    if(isset($_POST["title"])) {$title = $_POST["title"];};
-    if(isset($_POST["hasligand"])) {$hasligand = $_POST["hasligand"];};
-    if(isset($_POST["ligandname"])) {$ligandname = $_POST["ligandname"];};
-    if(isset($_POST["molecule"])) {$molecule = $_POST["molecule"];};
-    if(isset($_POST["logic"])) {$logic = $_POST["logic"];};
+    if(isset($_POST["keyword"])) {
+		$keyword = $_POST["keyword"];
+		$_SESSION["keyword"] = $keyword;
+	} 
+    
+	if(isset($_POST["pdbid"])) {
+		$pdbid = $_POST["pdbid"];
+		$_SESSION["pdbid"] = $pdbid;
+	}
+	
+    if(isset($_POST["title"])) {
+		$title = $_POST["title"];
+		$_SESSION["title"] = $title;
+	}
+	
+    if(isset($_POST["hasligand"])) {
+		$hasligand = $_POST["hasligand"];
+		$_SESSION["hasligand"] = $hasligand;
+	}
+	
+    if(isset($_POST["ligandname"])) {
+		$ligandname = $_POST["ligandname"];
+		$_SESSION["ligandname"] = $ligandname;
+	}
+	
+    if(isset($_POST["molecule"])) {
+		$molecule = $_POST["molecule"];
+		$_SESSION["molecule"] = $molecule;
+	}
+	
+    if(isset($_POST["logic"])) {
+		$logic = $_POST["logic"];
+		$_SESSION["logic"] = $logic;
+	}
     // if(isset($_POST["proteincomplexes"])) {$proteincomplexes = $_POST["proteincomplexes"];};
 } else {
 	// if nothing is set or the query is too short...
@@ -163,17 +206,19 @@ if (($none_set == true)) { // #TODO redefine this check...
 				   ON p.pdb_id = c.pdb_id 
 				   WHERE c.mol_name LIKE '%".$molecule."%'";
 		$firstQuerySet = true; };
-
+	
+	$count_query = $query . " ) results";
 	$query .= " ) results
 			  ORDER BY pdb_id, chain_name";
 
-	$count_query = str_replace("chain_id, chain_name, pdb_id, resolution, title, header", "COUNT(*)", $query);
-	$query .= " LIMIT '".$limit_start."',30";
+	$count_query = str_replace("chain_id, chain_name, pdb_id, resolution, title, header", "COUNT(*)", $count_query);
+	$query .= " LIMIT 30 OFFSET ".$limit_start;
   
-
 	$result = pg_query($db, $query); // or die($query . ' -> Query failed: ' . pg_last_error());
-	$count_result = pg_query($db, $query); // or die($query . ' -> Query failed: ' . pg_last_error());
-	$row_count = pg_fetch_array($count_result, NULL, PGSQL_ASSOC)
+	$count_result = pg_query($db, $count_query); // or die($query . ' -> Query failed: ' . pg_last_error());
+
+	$row_count = pg_fetch_array($count_result, NULL, PGSQL_ASSOC);
+	$row_count = $row_count["count"];
 
 	// this counter is used to display alternating table colors
 	$counter = 0;
@@ -182,18 +227,23 @@ if (($none_set == true)) { // #TODO redefine this check...
 
 	// beginn to create pager
 	$tableString = '<div id="pager">';
-	if($limit_start > 30) {
-		$tableString .= '<a href="/?next='.$limit_start - 30.'">previous << </a>  ';
+	if($limit_start >= 30) {
+		$tableString .= '<a class="changepage" href="?next='.($limit_start - 30).'"><< previous </a>  ';
 	}
 
-	$tableString .= '-- Showing results '.$limit_start.' to '.$limit_start + 30.' -- ';
-
+	$tableString .= '-- Showing results '.$limit_start.' to ';
+	
+	if($limit_start + 30 > $row_count){
+		$tableString .= $row_count . ' (of '.$row_count.') -- ';
+	} else {
+		$tableString .= ($limit_start + 30) . ' (of '.$row_count.') -- ';
+	}
+	
 	if(($limit_start + 30) < $row_count){
-		$tableString .= '<a href="/?next='.$limit_start + 30.'"> >> next</a>';
+		$tableString .= '<a class="changepage" href="?next='.($limit_start + 30).'"> next >></a>';
 	}
 	$tableString .= '</div>';
 	// EOPager
-
 
 	while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
 		// set protein/chain information for readability		
