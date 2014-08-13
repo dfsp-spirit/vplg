@@ -47,9 +47,10 @@ function fill_input_field(chains){
 	console.log(uniqueChains);
 	for(var i = 0; i < uniqueChains.length; i++){
 		// if checkbox exists
-		if($('input:checkbox[value=' + uniqueChains[i] + ']').length > 0){
+		if($('input:checkbox[value=' + uniqueChains[i] + ']').length > 0){	
 			// and if its checked
 			if($('input:checkbox[value=' + uniqueChains[i] + ']').prop('checked')){
+				console.log(uniqueChains[i]);
 				chainText += uniqueChains[i] + " ";
 			}
 		} else {
@@ -112,15 +113,14 @@ $(function() {
 		$('input[type=checkbox]').each(function () {
 			numberOfChains++;
 			chains.push(this.value);
-		})
-		
+		})		
 		if(numberOfChains > 20){
 			var r = confirm("You selected more than 20 chains. Loading could take a while. Are you sure to proceed?");
 			if(r == true) {
-				fill_input_field(chains);
 				$('input[type=checkbox]').each(function () {
 					$(this).prop('checked', true);
 				})
+				fill_input_field(chains);
 			} else {
 				$('input[type=checkbox]').each(function () {
 					$(this).prop('checked', false);
@@ -128,10 +128,10 @@ $(function() {
 				})
 			} 
 		} else {
-			fill_input_field(chains);
 			$('input[type=checkbox]').each(function () {
 				$(this).prop('checked', true);
 			})
+			fill_input_field(chains);
 		}
 	});
 	
