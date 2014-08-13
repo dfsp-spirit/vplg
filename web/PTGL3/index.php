@@ -76,7 +76,7 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 				<div class="input-group form-group">
 					<form class="form-inline" action="search.php" method="post">
 						<input type="text" class="form-control" name="keyword" id="searchInput" autocomplete="off" placeholder="Enter PDB ID or keyword...">
-						<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button><br>
+						<button type="submit" id="sendit" "class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button><br>
 						<div id="advancedButton"> Advanced Search <div id="arrow"><strong class="caret"></strong></div></div>
 						<div id="liveSearchResults"></div>
 

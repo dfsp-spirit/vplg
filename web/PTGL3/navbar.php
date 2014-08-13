@@ -58,7 +58,7 @@
 						<div class="nav-collapse collapse navbar-responsive-collapse">
 							<form  class="navbar-form pull-right" action="search.php" method="post">
 								<input type="text" class="form-control" name="keyword" id="searchInput" autocomplete="off" placeholder="Enter PDB ID or keyword...">
-								<button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+								<button type="submit" id="sendit_nav" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
 								<div id="liveSearchResults" class="liveSearchResultsPage"></div>
 							</form><!-- end navbar-form -->	
 						</div> <!-- end live search -->';

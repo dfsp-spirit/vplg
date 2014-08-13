@@ -16,7 +16,7 @@ ini_set('log_errors', TRUE);
 error_reporting(E_ERROR);
 
 // get config values
-$CONFIG				= include('./backend/config.php'); 
+$CONFIG			= include('./backend/config.php'); 
 $DB_HOST		= $CONFIG['host'];
 $DB_PORT		= $CONFIG['port'];
 $DB_NAME		= $CONFIG['db'];
@@ -50,8 +50,19 @@ function get_cath_link($pdbid, $chain = null) {
 }
 
 
-// set standard logic operator to "OR"
-$logic = "OR";
+if(isset($_GET["next"])) {
+	if(is_numeric($_GET["next"]) && $_GET["next"] >= 0){
+		$limit_start = $_GET["next"];
+	} else {
+		$limit_start = 0;
+		unset($_SESSION['chains']); // or session_unset();
+	}
+} else {
+	$limit_start = 0;
+	session_unset();
+}
+
+
 // check if parameters are set. If so, set the associated variable with the value
 if(isset($_POST)) {
     if(isset($_POST["keyword"])) {$keyword = $_POST["keyword"];} else {$keyword = "";};
@@ -155,15 +166,35 @@ if (($none_set == true)) { // #TODO redefine this check...
 
 	$query .= " ) results
 			  ORDER BY pdb_id, chain_name";
+
+	$count_query = str_replace("chain_id, chain_name, pdb_id, resolution, title, header", "COUNT(*)", $query);
+	$query .= " LIMIT '".$limit_start."',30";
   
 
 	$result = pg_query($db, $query); // or die($query . ' -> Query failed: ' . pg_last_error());
+	$count_result = pg_query($db, $query); // or die($query . ' -> Query failed: ' . pg_last_error());
+	$row_count = pg_fetch_array($count_result, NULL, PGSQL_ASSOC)
 
 	// this counter is used to display alternating table colors
 	$counter = 0;
-	$tableString = "";
 	$createdHeadlines = Array();
 	$numberOfChains = 0;
+
+	// beginn to create pager
+	$tableString = '<div id="pager">';
+	if($limit_start > 30) {
+		$tableString .= '<a href="/?next='.$limit_start - 30.'">previous << </a>  ';
+	}
+
+	$tableString .= '-- Showing results '.$limit_start.' to '.$limit_start + 30.' -- ';
+
+	if(($limit_start + 30) < $row_count){
+		$tableString .= '<a href="/?next='.$limit_start + 30.'"> >> next</a>';
+	}
+	$tableString .= '</div>';
+	// EOPager
+
+
 	while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
 		// set protein/chain information for readability		
 		$pdb_id =  $arr['pdb_id'];
@@ -199,6 +230,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 							</div>';
 			// now the headline is created, so push the PDB-ID to the createdHeadlines array
 			array_push($createdHeadlines, $pdb_id);
+			$counter++;
 		}
 		// if the headline is already there..
 		$tableString .= '	<div class="resultsFooter">
@@ -208,7 +240,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 					</div>';
 		
 		$numberOfChains++;
-		$counter++;
+		
 	}
 	$tableString .= ' </div>';
 	pg_free_result($result); // clean memory
