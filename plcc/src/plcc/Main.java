@@ -2109,6 +2109,15 @@ public class Main {
                         pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_VPLG, new File(plccGraphFile));
                     }
                 }
+                if(Settings.getBoolean("plcc_B_output_perlfg")) {
+                    String perlGraphFile = filePathGraphs + fs + fileNameWithoutExtension + ".graph";
+                    if(IO.stringToTextFile(perlGraphFile, pg.toPTGLGraphFormatPerl())) {
+                        graphFormatsWritten += "perlfg "; numFormatsWritten++;
+                        pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_PERLFOLDINGGRAPHSCRIPT, new File(perlGraphFile));
+                    }
+                }
+                
+                
                 
                 /*
                 Boolean jsonTest = false;

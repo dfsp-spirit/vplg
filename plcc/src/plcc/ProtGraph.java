@@ -499,7 +499,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
             indexW = e[1];
             v = this.getVertex(indexV);
             w = this.getVertex(indexW);
-            sb.append(String.format("%d\t%d\t%s\t%s", indexV, indexW, this.getContactTypeStringPTGLGraph(indexV, indexW), ("" + v.getPLCCSSELabel() + w.getPLCCSSELabel())));
+            sb.append(String.format("%d %d %s %s", indexV, indexW, this.getContactTypeStringPTGLGraph(indexV, indexW), ("" + v.getPLCCSSELabel() + w.getPLCCSSELabel())));
             sb.append("\n");
         }
         
