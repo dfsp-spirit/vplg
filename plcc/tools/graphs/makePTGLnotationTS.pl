@@ -286,7 +286,7 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 				  next if $g->get_attribute('status',$left,$right)==1;
 				}
 				else {
-				  next if $g->get_edge_attribute('status',$left,$right)==1;
+				  next if $g->get_edge_attribute($left,$right,'status')==1;
 				}
 				
 				next if $adjdegrees{$adjv}==0;
@@ -310,7 +310,7 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 				if ( $g->is_compat02 ) {
 				  $edgeType=$g->get_attribute('topo',$left,$right);
 				} else {
-				  $edgeType=$g->get_edge_attribute('topo',$left,$right);
+				  $edgeType=$g->get_edge_attribute($left,$right,'topo');
 				}
 				$adjNotation.="," if (($graphtype eq "albe") or ($graphtype ne "albe" and scalar(keys(%adjvisited))>1));
 				$adjNotation.=($next - $adjcur).lc($edgeType);
@@ -418,7 +418,7 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 				if ( $g->is_compat02 ) {
 				  print "neighbour: $redv status: ".$g->get_attribute('status',$left,$right)."\n" if $verbose;
 				} else {
-				  print "neighbour: $redv status: ".$g->get_edge_attribute('status',$left,$right)."\n" if $verbose;
+				  print "neighbour: $redv status: ".$g->get_edge_attribute($left,$right,'status')."\n" if $verbose;
 				}
 				
 				# close the cycle
@@ -433,7 +433,7 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 				  next if $g->get_attribute('status',$left,$right)==1;
 				}
 				else {
-				  next if $g->get_edge_attribute('status',$left,$right)==1;
+				  next if $g->get_edge_attribute($left,$right,'status')==1;
 				}
 				
 				
@@ -459,7 +459,7 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 				if ( $g->is_compat02 ) {
 				  $edgeType=$g->get_attribute('topo',$left,$right);
 				} else {
-				  $edgeType=$g->get_edge_attribute('topo',$left,$right);				
+				  $edgeType=$g->get_edge_attribute($left,$right,'topo');				
 				}
 
 				$redNotation.="," if (($graphtype eq "albe") or ($graphtype ne "albe" and scalar(keys(%redvisited))>1));
@@ -708,7 +708,7 @@ sub checkEdgeStatus{
 			if ( $g->is_compat02 ) {
 			  return 0 if ($g->get_attribute('status',$left,$right) == 0);
 			} else {
-			  return 0 if ($g->get_edge_attribute('status',$left,$right) == 0);
+			  return 0 if ($g->get_edge_attribute($left,$right,'status') == 0);
 			}
 		}
 	}
