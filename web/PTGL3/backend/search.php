@@ -211,7 +211,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 			  ORDER BY pdb_id, chain_name";
 
 	$count_query = str_replace("chain_id, chain_name, pdb_id, resolution, title, header", "COUNT(*)", $count_query);
-	$query .= " LIMIT 30 OFFSET ".$limit_start;
+	$query .= " LIMIT 50 OFFSET ".$limit_start;
   
 	$result = pg_query($db, $query); // or die($query . ' -> Query failed: ' . pg_last_error());
 	$count_result = pg_query($db, $count_query); // or die($query . ' -> Query failed: ' . pg_last_error());
