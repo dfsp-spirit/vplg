@@ -319,7 +319,7 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 				  $g->set_attribute('status',$left,$right,1);
 				}
 				else {
-				  $g->set_edge_attribute('status',$left,$right,1);
+				  $g->set_edge_attribute($left,$right,'status',1);
 				}
 			
 				$adjdegrees{$adjcur}--;
@@ -469,7 +469,7 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 				if ( $g->is_compat02 ) {
 				  $g->set_attribute('status',$left,$right,1);
 				} else {
-				  $g->set_edge_attribute('status',$left,$right,1);
+				  $g->set_edge_attribute($left,$right,'status',1);
 				}
 
 				$reddegrees{$redcur}--;
@@ -684,7 +684,7 @@ sub resetEdgeStatus{
 				if ( $g->is_compat02 ) {
 				    $g->set_attribute('status',$left,$right,0);
 				  } else {
-				    $g->set_edge_attribute('status',$left,$right,0);
+				    $g->set_edge_attribute($left,$right,'status',0);
 				  }
 			}
 		}
