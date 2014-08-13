@@ -658,7 +658,12 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
         else {
             System.out.println("Graph 2 is NOT connected.");
         }
-
+        
+        ProtGraph pg3 = ProtGraphs.generateRandomPG(5, "albe", "A", "rand");
+        String pf = pg3.toPTGLGraphFormatPerl();
+        System.out.println("Graph format perl:\n" + pf);
+        
+       
     }
     
     

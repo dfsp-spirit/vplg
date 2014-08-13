@@ -11,6 +11,7 @@ package plcc;
 
 // imports
 import java.util.ArrayList;
+import tools.DP;
 
 /**
  * Represents a secondary structure element (SSE), e.g., an alpha-helix or a beta-strand.
@@ -353,7 +354,12 @@ public class SSE implements java.io.Serializable {
      * @return The DSSP residue number of the first residue of this SSE.
      */
     public Integer getStartDsspNum() {
-        return(this.getStartResidue().getDsspResNum());
+        Residue r = this.getStartResidue();
+        if(r == null) {
+            DP.getInstance().w("SSE", "getStartDsspNum(): This SSE has no residues.");
+            return 0;
+        }
+        return(r.getDsspResNum());
     }
 
     /**
@@ -393,7 +399,12 @@ public class SSE implements java.io.Serializable {
      * @return The DSSP residue number of the last residue of this SSE.
      */
     public Integer getEndDsspNum() {
-        return(this.getEndResidue().getDsspResNum());
+        Residue r = this.getEndResidue();
+        if(r == null) {
+            DP.getInstance().w("SSE", "getEndDsspNum(): This SSE has no residues.");
+            return 0;
+        }
+        return(r.getDsspResNum());
     }
     
     /**

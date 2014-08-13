@@ -1437,29 +1437,96 @@ public abstract class SSEGraph extends SimpleGraphAdapter implements VPLGGraphFo
      * Returns a String which represents this graph in 'Trivial Graph Format'. See http://docs.yworks.com/yfiles/doc/developers-guide/tgf.html.
      * @return the (multi-line) TGF string
      */
+    @Override
     public String toTrivialGraphFormat() {
 
-        String tgf = "";
+        StringBuilder tgf = new StringBuilder();
 
         // add vertices
         for(Integer i = 0; i < this.sseList.size(); i++) {
-            tgf += (i + 1) + " " + (i + 1) + "-" + sseList.get(i).getSseType() + "\n";
+            tgf.append(i + 1).append(" ").append(i + 1).append("-").append(sseList.get(i).getSseType()).append("\n");
         }
 
         // separator to indicate that edges follow
-        tgf += "#\n";
+        tgf.append("#\n");
 
         // edges
         for(Integer i = 0; i < this.sseList.size(); i++) {
             for(Integer j = i + 1; j < this.sseList.size(); j++) {
                 if(this.containsEdge(i, j)) {
                     //tgf += (i + 1) + " " + (j + 1) + " " + SpatRel.getString(this.getContactType(i, j)) + "\n";
-                    tgf += (i + 1) + " " + (j + 1) + " (" + (i + 1) + "-" + SpatRel.getString(this.getContactType(i, j)) + "-" + (j + 1) + ")\n";
+                    tgf.append(i + 1).append(" ").append(j + 1).append(" (").append(i + 1).append("-").append(SpatRel.getString(this.getContactType(i, j))).append("-").append(j + 1).append(")\n");
                 }
             }
         }
 
-        return(tgf);
+        return(tgf.toString());
+    }
+    
+    
+    /**
+     * Converts this graph to the format required by the Perl script which computes the 
+     * PTGL folding graph notations on the old PTGL server. The name of the updated version
+     * of the script is 'makePTGLnotationsTS.pl'. Each file is for one graph of one
+     * chain. Here is an example output:
+
+chains: 1
+# protein: 1arsA
+# SSEs: 10
+E	3	3	3
+E	3	3	3
+E	3	3	3
+E	3	3	3
+E	3	3	3
+E	3	3	3
+E	3	3	3
+E	3	3	3
+E	3	3	3
+E	3	3	3
+# SSE contacts:
+1 9 A EE
+2 3 P EE
+2 6 P EE
+6 7 P EE
+7 8 P EE
+8 9 A EE
+
+     * 
+     * This format is for internal use at MolBI (for historical reasons) only. Do not expose
+     * it.
+     * 
+     * @return the graph string
+     */
+    public String toPerlFoldingGraphNotationsScriptFormat() {
+
+        StringBuilder pf = new StringBuilder();
+        pf.append("chains: 1\n");
+        pf.append("# protein: ").append(this.pdbid).append(this.chainid).append("\n");
+        pf.append("# SSEs: ").append(this.size).append("\n");
+
+        // add vertices
+        SSE sse;
+        for(Integer i = 0; i < this.sseList.size(); i++) {
+            sse = this.getVertex(i);
+            pf.append(sse.getPLCCSSELabel()).append("\t").append(sse.getAASequence().length()).append("\t").append(sse.getStartResidue().getPdbResNum()).append("\t").append(sse.getEndResidue().getPdbResNum()).append("\n");
+        }
+
+        // separator to indicate that edges follow
+        pf.append("# SSE contacts:\n");
+
+        // edges
+        SSE sseA, sseB;
+        for(Integer i = 0; i < this.sseList.size(); i++) {
+            for(Integer j = i + 1; j < this.sseList.size(); j++) {
+                if(this.containsEdge(i, j)) {
+                    sseA = this.getVertex(i);
+                    sseB = this.getVertex(j);
+                    pf.append((i + 1) + " " + (j + 1) + " " + (SpatRel.getString(this.getContactType(i, j))).toUpperCase() + " " + sseA.getPLCCSSELabel() + sseB.getPLCCSSELabel() + "\n");
+                }
+            }
+        }
+
+        return(pf.toString());
     }
 
     /**

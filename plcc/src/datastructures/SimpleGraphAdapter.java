@@ -9,7 +9,8 @@
 package datastructures;
 
 /**
- * A simple adapter to make using the SimpleGraphInterface easier. You can extend this to get some methods pre-implemented.
+ * A simple adapter to make using the SimpleGraphInterface easier. You can extend this to 
+ * get some methods pre-implemented.
  * @author ts
  */
 public abstract class SimpleGraphAdapter implements SimpleGraphInterface {
