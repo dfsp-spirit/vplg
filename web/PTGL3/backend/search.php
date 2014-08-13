@@ -72,7 +72,6 @@ if(isset($_GET["next"])) {
 
 // give the selected chains to JS
 if(isset($_SESSION["chains"])){
-	var_dump($_SESSION["chains"]);
 	echo '<script type="text/javascript">';
 	echo ('window.checkedChains = new Array(\''. implode('\',\'', $_SESSION["chains"]) .'\');');
 	echo '</script>';

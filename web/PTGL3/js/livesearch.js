@@ -70,7 +70,7 @@ $(document).ready(function () {
 			$('input#searchInput').val(selectedElement);
 		}
 	});
-	
+	/*
 	$('#sendit').click(function(e) {
  		content = $('#searchInput').val();
 		pdb_content = $('#pdbid').val();
@@ -93,5 +93,5 @@ $(document).ready(function () {
  			alert("Please enter at least 3 characters!");
  		}
  	});
-	
+	*/
 });

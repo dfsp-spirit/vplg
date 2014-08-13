@@ -4,6 +4,7 @@ Custom JS
 ============
 
 */
+
 $(document).ready(function() {
 
 /* Scrollspy */
@@ -23,6 +24,40 @@ if (!(typeof checkedChains === 'undefined')) {
 		$('input:checkbox[value=' + chain + ']').prop('checked', true);
 		$('#loadInput').val(selectedProteins);
 	}
+}
+
+function fill_input_field(chains){
+	var oldChainText = $('#loadInput').val();
+	if(!(oldChainText == "")){
+		var oldChains = oldChainText.split(" ");
+	} else {
+		var oldChains = []
+	}
+	
+	chains = chains.concat(oldChains);
+	chains.sort();
+	
+	var chainText = "";
+	var uniqueChains = [];
+	$.each(chains, function(i, el){
+		if($.inArray(el, uniqueChains) === -1 && !(el == "")){
+			uniqueChains.push(el);
+		} 
+	});
+	console.log(uniqueChains);
+	for(var i = 0; i < uniqueChains.length; i++){
+		// if checkbox exists
+		if($('input:checkbox[value=' + uniqueChains[i] + ']').length > 0){
+			// and if its checked
+			if($('input:checkbox[value=' + uniqueChains[i] + ']').prop('checked')){
+				chainText += uniqueChains[i] + " ";
+			}
+		} else {
+			chainText += uniqueChains[i] + " ";
+		}
+	}
+	
+	$('#loadInput').val(chainText);
 }
 
 
@@ -63,11 +98,11 @@ $(function() {
 	
 	
 	$('.chainCheckBox').click( function() {
-		var selectedProteins = "";
+		var chains = [];
 		$('input[type=checkbox]').each(function () {
-			if (this.checked) selectedProteins += this.value + " "; })
+			if (this.checked) chains.push(this.value); })
 		
-		$('#loadInput').val(selectedProteins);
+		fill_input_field(chains);
 	});
 	
 	// if clicking on "Select all protein chains...
