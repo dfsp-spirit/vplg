@@ -63,7 +63,6 @@ if(isset($_GET["next"])) {
 		
 	} else {
 		$limit_start = 0;
-		unset($_SESSION['chains']); // or session_unset();
 		session_unset();
 	}
 } else {
@@ -227,20 +226,20 @@ if (($none_set == true)) { // #TODO redefine this check...
 
 	// beginn to create pager
 	$tableString = '<div id="pager">';
-	if($limit_start >= 30) {
-		$tableString .= '<a class="changepage" href="?next='.($limit_start - 30).'"><< previous </a>  ';
+	if($limit_start >= 50) {
+		$tableString .= '<a class="changepage" href="?next='.($limit_start - 50).'"><< previous </a>  ';
 	}
 
 	$tableString .= '-- Showing results '.$limit_start.' to ';
 	
-	if($limit_start + 30 > $row_count){
+	if($limit_start + 50 > $row_count){
 		$tableString .= $row_count . ' (of '.$row_count.') -- ';
 	} else {
-		$tableString .= ($limit_start + 30) . ' (of '.$row_count.') -- ';
+		$tableString .= ($limit_start + 50) . ' (of '.$row_count.') -- ';
 	}
 	
-	if(($limit_start + 30) < $row_count){
-		$tableString .= '<a class="changepage" href="?next='.($limit_start + 30).'"> next >></a>';
+	if(($limit_start + 50) < $row_count){
+		$tableString .= '<a class="changepage" href="?next='.($limit_start + 50).'"> next >></a>';
 	}
 	$tableString .= '</div>';
 	// EOPager

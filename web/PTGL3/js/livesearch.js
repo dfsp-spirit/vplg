@@ -70,7 +70,7 @@ $(document).ready(function () {
 			$('input#searchInput').val(selectedElement);
 		}
 	});
-		
+	/*	
 	$('#sendit').click(function(e) {
  		content = $('#searchInput').val();
 		pdb_content = $('#pdbid').val();
@@ -78,9 +78,9 @@ $(document).ready(function () {
 		ligandname_con = $('#ligandname').val();
 		molecule_con = $('#molecule').val();
 		
- 		if(content.length < 3 && pdb_content.length < 3&& 
-		   title_content.length < 3 && ligandname_con.length < 3 && 
-		   molecule_con < 3){
+ 		if(content.length < 2 && pdb_content.length < 2 && 
+		   title_content.length < 2 && ligandname_con.length < 2 && 
+		   molecule_con < 2){
  			e.preventDefault();
  			alert("Please enter at least 3 characters!");
  		}
@@ -88,9 +88,10 @@ $(document).ready(function () {
 	
 	$('#sendit_nav').click(function(e) {
  		content = $('#searchInput').val();
- 		if(content.length < 3){
+ 		if(content.length < 2){
  			e.preventDefault();
  			alert("Please enter at least 3 characters!");
  		}
  	});
+	*/
 });

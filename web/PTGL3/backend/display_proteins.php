@@ -113,7 +113,6 @@ foreach ($chains as $value){
 		// first: get first dataset only (maybe too complicated implementation.. :(  )
 		$data = pg_fetch_array($result, NULL, PGSQL_ASSOC);
 		$chain_id = (int) $data['chain_id'];
-		echo $chain_id;
 
 		// query SSE informations/table with chain_id
 		$query_SSE = "SELECT * FROM plcc_sse WHERE chain_id = ".$chain_id." ORDER BY position_in_chain";
@@ -137,8 +136,6 @@ foreach ($chains as $value){
 						<a href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">Full Size Image</a>
 						<span class="download-options">Download Graph: ';
 		
-		echo "servus";
-		echo array_keys($data);
 
 		// check if downloadable files exist. If so, then add link to file (4x)
 		if(isset($data['graph_image_pdf']) && file_exists($IMG_ROOT_PATH.$data['graph_image_pdf'])) {

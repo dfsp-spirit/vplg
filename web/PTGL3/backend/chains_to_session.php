@@ -18,7 +18,7 @@ if(isset($_POST)){
 		
 		$all_chains = array_merge($chains, $prev_chains);
 		$unique_chains = array_unique($all_chains);
-		echo $unique_chains;
+		asort($unique_chains);
 		
 		$_SESSION["chains"] = $unique_chains;
 	}
