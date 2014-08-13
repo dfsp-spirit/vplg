@@ -705,7 +705,11 @@ sub checkEdgeStatus{
 
 		if($g->has_edge($left,$right)){
 			print "$vertex is not completed yet\n";
-			return 0 if ($g->get_attribute('status',$left,$right) == 0);
+			if ( $g->is_compat02 ) {
+			  return 0 if ($g->get_attribute('status',$left,$right) == 0);
+			} else {
+			  return 0 if ($g->get_edge_attribute('status',$left,$right) == 0);
+			}
 		}
 	}
 	print "$vertex is completely processed\n";
