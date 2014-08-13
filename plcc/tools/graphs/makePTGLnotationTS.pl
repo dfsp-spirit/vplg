@@ -156,10 +156,10 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 			  $redNotation=$kl1.$g->get_attribute('type',$vs[0]).$kl2;
 			}
 			else {
-			  $seqNotation=$kl1.$g->get_vertex_attribute('type',$vs[0]).$kl2;
-			  $keyNotation=$kl1.$g->get_vertex_attribute('type',$vs[0]).$kl2;
-			  $adjNotation=$kl1.$g->get_vertex_attribute('type',$vs[0]).$kl2;
-			  $redNotation=$kl1.$g->get_vertex_attribute('type',$vs[0]).$kl2;
+			  $seqNotation=$kl1.$g->get_vertex_attribute($vs[0], 'type').$kl2;
+			  $keyNotation=$kl1.$g->get_vertex_attribute($vs[0], 'type').$kl2;
+			  $adjNotation=$kl1.$g->get_vertex_attribute($vs[0], 'type').$kl2;
+			  $redNotation=$kl1.$g->get_vertex_attribute($vs[0], 'type').$kl2;
 			}
 		}else{
 			$seqNotation=$kl1.$kl2;
@@ -196,7 +196,7 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 		  $seqNotation.=$g->get_attribute("type",$vs[0]) if $graphtype eq "albe";
 		}
 		else {
-		   $seqNotation.=$g->get_vertex_attribute("type",$vs[0]) if $graphtype eq "albe";
+		   $seqNotation.=$g->get_vertex_attribute($vs[0],"type") if $graphtype eq "albe";
 		}
 
 		$adjstart = $vs[0];
@@ -234,7 +234,7 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 		if ( $g->is_compat02 ) {
 		  $adjNotation.=$g->get_attribute("type",$adjcur) if $graphtype eq "albe";
 		} else {
-		  $adjNotation.=$g->get_vertex_attribute("type",$adjcur) if $graphtype eq "albe";
+		  $adjNotation.=$g->get_vertex_attribute($adjcur,"type") if $graphtype eq "albe";
 		}
 		
 		$adjstart=$cur;
@@ -346,7 +346,7 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 			if ( $g->is_compat02 ) {
 			  $adjNotation.=$g->get_attribute("type",$next) if $graphtype eq "albe";	
 			} else {
-			  $adjNotation.=$g->get_vertex_attribute("type",$next) if $graphtype eq "albe";	
+			  $adjNotation.=$g->get_vertex_attribute($next,"type") if $graphtype eq "albe";	
 			}
 			
 			# ordering
@@ -387,7 +387,7 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 		if ( $g->is_compat02 ) {
 		  $redNotation.=$g->get_attribute("type",$redcur) if $graphtype eq "albe";
 		} else {
-		  $redNotation.=$g->get_vertex_attribute("type",$redcur) if $graphtype eq "albe";
+		  $redNotation.=$g->get_vertex_attribute($redcur,"type") if $graphtype eq "albe";
 		}
 		
 		$redstart=$pos{$cur};
@@ -499,7 +499,7 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 			if ( $g->is_compat02 ) {
 			  $redNotation.=$g->get_attribute("type",$next) if $graphtype eq "albe";	
 			} else {
-			  $redNotation.=$g->get_vertex_attribute("type",$next) if $graphtype eq "albe";	
+			  $redNotation.=$g->get_vertex_attribute($next,"type") if $graphtype eq "albe";	
 			}
 			
 			$redcur=$next;
@@ -538,7 +538,7 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 			if ( $g->is_compat02 ) {
 			  $keyNotation.=$g->get_attribute("type",$pos[0]) if $graphtype eq "albe";
 			} else {
-			  $keyNotation.=$g->get_vertex_attribute("type",$pos[0]) if $graphtype eq "albe";
+			  $keyNotation.=$g->get_vertex_attribute($pos[0],"type") if $graphtype eq "albe";
 			}
 			
 			for($i=1;$i<=scalar(@pos)-1;$i++){
@@ -558,7 +558,7 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 				if ( $g->is_compat02 ) {
 				  $keyNotation.=$g->get_attribute('type',$vs[$i]) if $graphtype eq "albe";
 				} else {
-				  $keyNotation.=$g->get_vertex_attribute('type',$vs[$i]) if $graphtype eq "albe";
+				  $keyNotation.=$g->get_vertex_attribute($vs[$i],"type") if $graphtype eq "albe";
 				}
 			}
 
@@ -576,7 +576,7 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 			if ( $g->is_compat02 ) {
 			  $seqNotation.=$g->get_attribute('type',$vs[$i]) if $graphtype eq "albe";
 			}else {
-			  $seqNotation.=$g->get_vertex_attribute('type',$vs[$i]) if $graphtype eq "albe";
+			  $seqNotation.=$g->get_vertex_attribute($vs[$i],"type") if $graphtype eq "albe";
 			}
 		}
 
