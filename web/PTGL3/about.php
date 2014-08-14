@@ -49,7 +49,12 @@
 							<li class="noBullets">  <a href="#alphaGraph">Alpha</a> </li>
 							<li class="noBullets">  <a href="#betaGraph">Beta</a> </li>
 							<li class="noBullets">  <a href="#alphaBetaGraph">Alpha-Beta</a> </li>
+							<li class="noBullets">  <a href="#alphaLigGraph">Alpha-Ligand</a> </li>
+							<li class="noBullets">  <a href="#betaLigGraph">Beta-Ligand</a> </li>
+							<li class="noBullets">  <a href="#alphaBetaLigGraph">Alpha-Beta-Ligand</a> </li>
 						</ul>
+						
+					<!--
 					<li  class="noBullets">  <a href="#foldingGraph">Folding Graphs</a> </li>
 					<li class="noBullets">  <a href="#linearNot">Linear Notation</a> </li>
 					<ul>
@@ -59,6 +64,7 @@
 						<li class="noBullets">  <a href="#seq">Sequence notation</a> </li>
 					</ul>
 					</li>
+					-->
 				</ul>
 			<li class="noBullets"> <a href="#linking">Linking PTGL</a> </li>
 			</li>
@@ -67,11 +73,23 @@
 		<br>
 		<br>	
 		<a class="anchor" id="ptgl"></a>
-		<h3> <u>What is PTGL?</u> </h3>
+		<h3> <u>What is PTGL 3?</u> </h3>
 
-		PTGL is a web-based database application for protein topologies. In order to define a mathematically unique description of protein topology
-		the secondary structure topology of a protein is described by methods of applied graph theory. The <a href="#proteinGraph">Protein graph</a> is defined as an undirected
-		labelled graph on three description levels according to the considered secondary structure elements (SSE): the <a href="#alphaGraph">Alpha graph</a>, the <a href="#betaGraph">Beta graph</a>,
+		PTGL 3 is a web-based database application for the analysis protein topologies. It uses a graph-based model to describe the structure
+		of proteins on the super-secondary structure level. A protein graph is computed from the 3D atomic coordinates in
+		a PDB file and the secondary structure assignments of the DSSP algorithm. In a protein graph graph, vertices represent secondary
+		structure elements (SSEs, usually alpha helices and beta strands) or ligand molecules while the edges model contacts and relative orientations between
+		them. 
+		<br />
+		
+		<p class="imgCenter"><img src="./images/protein_graph.png" alt="Protein graph" title="Protein graph" class="img-responsive imgFormAboutphp"/></p>
+		
+		<br/>
+		The result is an undirected, labelled graph for a single protein chain. Since a PDB file may contain more than one chain, you may also get
+		more than one graph per PDB file.
+		<br />
+		The most common and important SSEs in proteins are alpha helices and beta strands, and some structures in the PDB also contain ligands.
+		So the PTGL contains 6 different graph types, which differ in the considered secondary structure elements (SSE): the <a href="#alphaGraph">Alpha graph</a>, the <a href="#betaGraph">Beta graph</a>,
 		and the <a href="#alphaBetaGraph">Alpha-Beta graph</a>. The connected components of the <a href="#proteinGraph">Protein graph</a> form <a href="#foldingGraph">Folding graphs</a>. A <a href="#proteinGraph">Protein graph</a> can consist of one or more
 		<a href="#foldingGraph">Folding graphs</a>. The three graph types were defined for each protein of the <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a>. For each graph type exists four <a href="#linearNot">linear notations</a> with
 		corresponding graphic representations. In PTGL all <a href="#foldingGraph">Folding graphs</a>, all SSEs, and additional protein information are stored for every
