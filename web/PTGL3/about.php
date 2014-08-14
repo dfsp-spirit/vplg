@@ -167,51 +167,51 @@
 		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 
 		<a class="anchor" id="exampleGraphTypes"></a>
-		<h4>An exmaple for the different graph types</h4>
+		<h4>PDB 7TIM as an example for the different graph types</h4>
 		
 		<br>
 		<br>
 		<a class="anchor" id="alphaGraph"></a>
 		<h5> <u>Alpha Graph</u> </h5>
-		The Alpha-Graph of the protein 1TIM chain A consisting only of 13 helices.
-		<p class="imgCenter"><img src="./images/1timA_alph.0.png" alt="Alpha Graph of 1timA" title="Alpha Graph of 1timA" class="img-responsive imgFormAboutphp"/></p>
+		The Alpha-Graph of the protein 7TIM chain A consisting only of 13 helices.
+		<p class="imgCenter"><img src="./images/7tim_A_alpha_PG.png" alt="Alpha Graph of 7timA" title="Alpha Graph of 7timA" class="img-responsive imgFormAboutphp"/></p>		
 
 
 		<br>
 		<br>
 		<a class="anchor" id="betaGraph"></a>
 		<h5> <u>Beta Graph</u> </h5>
-		The Beta-Graph of the protein 1TIM chain A consisting only of 8 strands.
-		<p class="imgCenter"><img src="./images/1timA_beta.0.png" alt="Beta Graph of 1timA" title="Beta Graph of 1timA" class="img-responsive imgFormAboutphp"/></p>
+		The Beta-Graph of the protein 7TIM chain A consisting only of 8 strands.
+		<p class="imgCenter"><img src="./images/7tim_A_beta_PG.png" alt="Alpha Graph of 7timA" title="Alpha Graph of 7timA" class="img-responsive imgFormAboutphp"/></p>
 
 		<br>
 		<br>
 		<a class="anchor" id="alphaBetaGraph"></a>
 		<h5> <u>Alpha-Beta Graph</u> </h5>
-		The Alpha-Beta Graph of the protein 1TIM chain A consisting of 21 SSEs (13 helices and 8 strands). 
-		<p class="imgCenter"><img class="img-responsive imgFormAboutphp" src="./images/1timA_albe.0.png" alt="Alpha-Beta Graph of 1timA" title="Alpha-Beta Graph of 1timA"></p>
+		The Alpha-Beta Graph of the protein 7TIM chain A consisting of 21 SSEs (13 helices and 8 strands). 
+		<p class="imgCenter"><img class="img-responsive imgFormAboutphp" src="./images/7tim_A_albe_PG.png" alt="Alpha-Beta Graph of 7timA" title="Alpha-Beta Graph of 7timA"></p>
 		
 		<br>
 		<br>
 		<a class="anchor" id="alphaLigGraph"></a>
-		<h5> <u>Alpha Graph</u> </h5>
-		The Alpha-Graph of the protein 1TIM chain A consisting only of 13 helices.
-		<p class="imgCenter"><img src="./images/1timA_alph.0.png" alt="Alpha Graph of 1timA" title="Alpha Graph of 1timA" class="img-responsive imgFormAboutphp"/></p>
+		<h5> <u>Alpha-Ligand Graph</u> </h5>
+		The Alpha-Ligand Graph of the protein 7TIM chain A consisting of 13 helices and 1 ligand.
+		<p class="imgCenter"><img src="./images/7tim_A_alphalig_PG.png" alt="Alpha-Ligand Graph of 7timA" title="Alpha-Ligand Graph of 7timA" class="img-responsive imgFormAboutphp"/></p>
 
 
 		<br>
 		<br>
 		<a class="anchor" id="betaLigGraph"></a>
-		<h5> <u>Beta Graph</u> </h5>
-		The Beta-Graph of the protein 1TIM chain A consisting only of 8 strands.
-		<p class="imgCenter"><img src="./images/1timA_beta.0.png" alt="Beta Graph of 1timA" title="Beta Graph of 1timA" class="img-responsive imgFormAboutphp"/></p>
+		<h5> <u>Beta-Ligand Graph</u> </h5>
+		The Beta-Ligand-Graph of the protein 7TIM chain A consisting of 8 strands and 1 ligand.
+		<p class="imgCenter"><img src="./images/7tim_A_betalig_PG.png" alt="Beta-Ligand Graph of 7timA" title="Beta Graph of 7timA" class="img-responsive imgFormAboutphp"/></p>
 
 		<br>
 		<br>
 		<a class="anchor" id="alphaBetaLigGraph"></a>
-		<h5> <u>Alpha-Beta Graph</u> </h5>
-		The Alpha-Beta Graph of the protein 1TIM chain A consisting of 21 SSEs (13 helices and 8 strands). 
-		<p class="imgCenter"><img class="img-responsive imgFormAboutphp" src="./images/1timA_albe.0.png" alt="Alpha-Beta Graph of 1timA" title="Alpha-Beta Graph of 1timA"></p>
+		<h5> <u>Alpha-Beta-Ligand Graph</u> </h5>
+		The Alpha-Beta-Ligand Graph of the protein 7TIM chain A consisting of 22 SSEs (13 helices, 8 strands and 1 ligand). 
+		<p class="imgCenter"><img class="img-responsive imgFormAboutphp" src="./images/7tim_A_albelig_PG.png" alt="Alpha-Beta-Ligand Graph of 7timA" title="Alpha-Beta Graph of 7timA"></p>
 		
 		
 		
