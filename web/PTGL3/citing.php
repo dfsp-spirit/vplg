@@ -40,27 +40,26 @@
 	<div class="container" id="citing">
 		<h2> Citing PTGL </h2>
 		<br>
-		<p>A publication explaining the method in detail has been published in 'Methods in Molecular Biology
-			932 (Protein Supersecondary Structurs) by editor A.E. Kister in 2013.</p>
+		<p>A publication explaining the method in detail has been published in 2013:</p>
 		<p>BibTeX - Entry:</p>
 
 		<div id="bibtex">
-			@PROCEEDINGS{kister:protein_supersecondary_structures,<br>
-			EDITOR      = "Alexander E. Kister",<br>
-			TITLE       = "Protein Supersecondary Structures",<br>
-			ADDRESS     = "Piscataway, NJ",<br>
-			YEAR        = 2013,<br>
-			}<br>
-			<br>
-			@INPROCEEDINGS{koch_et_al:hierarchical_representation_of_supersecondary_structures,<br>
-			AUTHOR       = "Koch, Ina and Kreuchwig, Annika and May, Patrick",<br>
-			TITLE        = "Hierarchical Representation of Supersecondary Structures Using a<br>
-							 Graph-Theoretical Approach",<br>
-			PAGES        = "7 -- 33",<br>
-			ADRESS     = "Frankfurt",<br>
-			YEAR		= "2013",<br>
-			}<br>
-
+		@incollection{<br/>
+		year={2013},<br/>
+		isbn={978-1-62703-064-9},<br/>
+		booktitle={Protein Supersecondary Structures},<br/>
+		volume={932},<br/>
+		series={Methods in Molecular Biology},<br/>
+		editor={Kister, Alexander E.},<br/>
+		doi={10.1007/978-1-62703-065-6_2},<br/>
+		title={Hierarchical Representation of Supersecondary Structures Using a Graph-Theoretical Approach},<br/>
+		url={http://dx.doi.org/10.1007/978-1-62703-065-6_2},<br/>
+		publisher={Humana Press},<br/>
+		keywords={Graph-theory; Supersecondary structure; Protein graph; Folding graph; Adjacent notation; Reduced notation; Key notation; Sequence notation; Greek key; Four-helix bundle; Globin fold; Up-and-down barrel; Immunoglobulin fold; β-Propeller; Jelly roll; Rossman fold; TIM barrel; Ubiquitin roll; αβ-Plaits},<br/>
+		author={Koch, Ina and Kreuchwig, Annika and May, Patrick},<br/>
+		pages={7-33},<br/>
+		language={English}<br/>
+		}<br/>
 		</div>
 		<br>
 		<p>Please use this BibTeX-entry for citing.</p>

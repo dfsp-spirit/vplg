@@ -37,8 +37,11 @@
 	<?php include('navbar.php'); ?>
 
 	<div class="container" id="publications">
-		<h2> Publications </h2>
+		<h2> Publications related to the PTGL</h2>
 		<br>
+		
+		Here is a list of all publications related to the PTGL. If you want to cite the PTGL, please use the publication listed under <a href="./citing.php">Citing the PTGL</a>.
+		<br /><br/>
 
 		<ul id="publicationsList">
 			<li>Koch I, Kreuchwig A, May P (2013). Hierarchical representation of supersecondary structures using a graph-theoretical approach. Journal of Methods in molecular biology 2013;932:7-33. (<a href="http://www.ncbi.nlm.nih.gov/pubmed/22987344">/pubmed/22987344</a>).</li>

@@ -76,7 +76,7 @@
 		<h3> <u>What is PTGL 3?</u> </h3>
 
 		PTGL 3 is a web-based database application for the analysis protein topologies. It uses a graph-based model to describe the structure
-		of proteins on the super-secondary structure level. A protein graph is computed from the 3D atomic coordinates in
+		of protein chains on the super-secondary structure level. A protein graph is computed from the 3D atomic coordinates of a single chain in
 		a PDB file and the secondary structure assignments of the DSSP algorithm. In a protein graph graph, vertices represent secondary
 		structure elements (SSEs, usually alpha helices and beta strands) or ligand molecules while the edges model contacts and relative orientations between
 		them. 

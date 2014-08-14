@@ -102,7 +102,7 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 
 							<label class="advancedLabel">Title
 								<input class="advancedInput" type="text" id="title" name="title" placeholder="Title" size="20" maxlength="50"/>
-								<i title="Search for keywords in the protein title. I.e. 'Human'" style="position:absolute; right:50px;"  class="fa fa-question"></i>
+								<i title="Search for keywords in the protein title, e.g., 'Human'." style="position:absolute; right:50px;"  class="fa fa-question"></i>
 							</label>
 
 							<label class="advancedLabel">Has Ligand
@@ -111,15 +111,15 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 									<option value="1">Yes</option>
 									<option value="0">No</option>
 								</select>
-								<i title="Choose if proteins have a ligand or not." style="position:absolute; right:50px;"  class="fa fa-question"></i>
+								<i title="Choose whether the protein has a ligand or not." style="position:absolute; right:50px;"  class="fa fa-question"></i>
 							</label>
 							<label class="advancedLabel">Ligand Name
 								<input class="advancedInput" type="text" id="ligandname" name="ligandname" placeholder="Ligand Name" size="20" maxlength="50"/>
-								<i title="Search for proteins which contain a special ligand. Use ligand acronyms like 'FAD' or parts of the ligands long name." style="position:absolute; right:50px;"  class="fa fa-question"></i>
+								<i title="Search for proteins which contain a special ligand. Use the 3-letter ligand codes from RCSB Ligand Expo, e.g., 'FAD'. You can also use parts of the ligands long name." style="position:absolute; right:50px;"  class="fa fa-question"></i>
 							</label>	
 							<label class="advancedLabel">Molecule
 								<input class="advancedInput" type="text" id="molecule" name="molecule" placeholder="Molecule" size="20" maxlength="50"/>
-								<i title="Look for chains which appear in certain molecules e.g. 'MYOSINE'" style="position:absolute; right:50px;"  class="fa fa-question"></i>
+								<i title="Search for chains which appear in certain molecules e.g. 'MYOSINE'" style="position:absolute; right:50px;"  class="fa fa-question"></i>
 							</label>		
 							<button type="submit" class="btn btn-default advancedInput" style="margin-top:35px;"><span>Search</span></button>
 						</div>
@@ -230,6 +230,7 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 
 		<div class="container" id="text">
 			<h2>About</h2>
+			<!--
 				PTGL is a web-based database application for protein topologies. In order to define a mathematically unique description of protein topology
 				the secondary structure topology of a protein is described by methods of applied graph theory. The <a href="about.php#proteinGraph">Protein graph</a> is defined as an undirected
 				labelled graph on three description levels according to the considered secondary structure elements (SSE): the <a href="about.php#alphaGraph">Alpha graph</a>, the <a href="about.php#betaGraph">Beta graph</a>,
@@ -239,6 +240,12 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 				protein structure annotated in <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a> for which SSEs according DSSP are defined, which is not a NMR structure, has a resolution less than 3.5
 				Å and a sequence length of at least 20 amino acids. The database enables the user to search for the topology of a protein or for certain
 				topologies and subtopologies using the <a href="about.php#linearNot">linear notations</a>. Additionally, it could be searched for sequence similarity in <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a> sequences.
+				-->
+				PTGL 3 is a web-based database application for the analysis protein topologies. It uses a graph-based model to describe the structure
+		of protein chains on the super-secondary structure level. A protein graph is computed from the 3D atomic coordinates of a single chain in
+		a PDB file and the secondary structure assignments of the DSSP algorithm. In a protein graph graph, vertices represent secondary
+		structure elements (SSEs, usually alpha helices and beta strands) or ligand molecules while the edges model contacts and relative orientations between
+		them. 
 				<a href="about.php">Read more...</a>
 
 
@@ -272,9 +279,9 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 					<div class="col-lg-3 col-lg-3-centering col-centered">
 						<div class="ugCentering" id="ugAdvancedSearch">
 							<h3 class="ugCenterHeadings">Advanced Search</h3>
-							<p><strong>PDB ID</strong> The 4 character unique indentifier for the structure as defined by the PDB. Begins with a number 1-9 followed by 3 alphanumeric characters. </p>
-							<p><strong>TITLE</strong> The TITLE record contains a title for the experiment or analysis that is represented in the entry. It should identify an entry in the PDB in the same way that a title identifies a paper.The PDB records COMPND, SOURCE, EXPDTA, and REMARKs provide information that may also be found in TITLE. You may think of the title as describing the experiment, and the compound record as describing the molecule(s).</p>
-							<p id="scroll2"><strong>Classification</strong> A classification for the molecule. </p>
+							<p><strong>PDB identifier</strong> The 4 character unique indentifier for the structure as defined by the PDB. Begins with a number 1-9 followed by 3 alphanumeric characters. </p>
+							<p><strong>Title</strong> The TITLE record contains a title for the experiment or analysis that is represented in the entry. It should identify an entry in the PDB in the same way that a title identifies a paper.The PDB records COMPND, SOURCE, EXPDTA, and REMARKs provide information that may also be found in TITLE. You may think of the title as describing the experiment, and the compound record as describing the molecule(s).</p>
+							<!--<p id="scroll2"><strong>Classification</strong> A classification for the molecule. </p>
 							<p><strong>HET</strong> The heterogen section of a PDB file contains the complete description of non-standard residues in the entry.</p>
 							<p><strong>HETNAME</strong> This record gives the chemical name of the compound with the given HET</p>
 							<p><strong>SCOP</strong> SCOP classification.</p>
@@ -284,6 +291,12 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 							<p><strong>EC</strong> ENZYME number.</p>
 							<p><strong>Molecule</strong> Name of the molecule.</p>
 							<p><strong>Graphs</strong> A string standing for a Linear Notation of a certain Folding Graph.</p>
+							-->
+							<p><strong>Has ligand</strong> Choose whether the protein has a ligand or not.</p>
+							<p><strong>Ligand name</strong> Search for proteins which contain a special ligand. Use the 3-letter ligand codes from RCSB Ligand Expo, e.g., 'FAD'. You can also use parts of the ligands long name.</p>
+							<p><strong>Molecule</strong> Search the PDB MOLECULE record for chain names, e.g., 'MYOSINE'.</p>
+																													
+							
 							</div><!-- end ugCentering -->
 					</div><!-- end col-centered -->
 				</div><!-- end row -->
