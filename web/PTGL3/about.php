@@ -181,7 +181,7 @@
 		<br>
 		<a class="anchor" id="betaGraph"></a>
 		<h5> <u>Beta Graph</u> </h5>
-		The Beta-Graph of the protein 7TIM chain A consisting only of 8 strands.
+		The Beta-Graph of the protein 7TIM chain A consisting only of 8 strands.  Note the beta barrel in the protein, which is clearly visible as a circle of parallel beta-strands in this graph.
 		<p class="imgCenter"><img src="./images/7tim_A_beta_PG.png" alt="Alpha Graph of 7timA" title="Alpha Graph of 7timA" class="img-responsive imgFormAboutphp"/></p>
 
 		<br>
