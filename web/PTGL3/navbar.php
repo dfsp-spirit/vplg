@@ -44,7 +44,8 @@
 								<a href="contact.php"><i class="fa fa-user"></i> Contact Us</a>
 							</li>
 							<li>
-								<a href="help.php"><i class="fa fa-question"></i> Help</a>
+								<!-- <a href="help.php"><i class="fa fa-question"></i> Help</a> -->
+								<a href="index.php#UserGuide"><i class="fa fa-question"></i> Help</a>
 							</li>
 						</ul><!-- end dropdown menu -->
 					</li><!-- end dropdown -->

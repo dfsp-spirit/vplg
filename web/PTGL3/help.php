@@ -46,6 +46,8 @@
 
 	<div class="container" id="help">
 	<h2>Help</h2>
+	
+<!--	
 
 	<h3> Table of contents </h3>
 		<ul>
@@ -431,8 +433,20 @@
 	<p><b>1hkb;1hba;1cse;1ard</b>&nbsp;&nbsp; Find the four topologies <i>1hkb</i>, <i>1hba</i>, <i>1cse</i> and <i>1ard</i> in the PTGL-database></p>
 	<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 	</div>
-	</div><!-- end container and contentText -->
-</div><!-- end wrapper -->
+	</div>
+	
+-->
+
+Please see the <a href="index.php#UserGuide">PTGL User Guide</a> for help.
+
+<br /><br /><br /><br /><br /><br />
+<br /><br /><br /><br /><br /><br />
+<br /><br /><br /><br /><br /><br />
+<br /><br /><br /><br /><br /><br />
+
+</div>
+
+
 
 
 <?php include('footer.php'); ?>

@@ -301,7 +301,7 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 					</div><!-- end col-centered -->
 				</div><!-- end row -->
 
-
+<!--
 				<div class="row" id="ugSearchkms">
 					<div class="col-lg-4" id="ugSearchk">
 						<h3>Search Key</h3>
@@ -319,7 +319,7 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 							<br>
 							<br>
 							<br>
-							</div><!-- end col-centered -->
+							</div>
 
 					<div class="col-lg-4" id="ugSearchm">
 						<h3>Search Motifs</h3>
@@ -333,7 +333,7 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 							elements in a protein domain. One differentiates between Alpha Motifs, which consist solely of alpha helices, 
 							Beta Motifs, which are composed of beta sheets and Alpha Beta Motifs, a combination of both, alpha helices and 
 							beta sheets.</p>
-					</div><!-- end col-centered -->
+					</div>
 
 					<div class="col-lg-4" id="ugSearchs">
 						<h3>Search Sequence</h3>
@@ -352,8 +352,8 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 							<br>
 							<br>
 							<br>
-					</div><!-- end col-centered -->
-				</div><!-- end row -->
+					</div>
+				</div>
 
 
 
@@ -386,7 +386,7 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 							The text string following an attribute can be a phrase containing multiple words.</p>
 
 
-					</div><!-- end col-centered -->
+					</div>
 
 					<div class="col-lg-4 ugBorder">
 						<h3>Attributes</h3>
@@ -407,7 +407,7 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 						<br>
 						<br>
 						<br>
-					</div><!-- end col-centered -->
+					</div>
 
 					<div class="col-lg-4">
 						<h3>Complex Queries</h3>
@@ -428,8 +428,8 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 							<p>It is necessary to use ( )'s to maintain the logic of a query that uses more than one "'ot' clause, or use the Refine Your Query option at the top of the Query Results page.</p>
 							<p>Operators should only be used individually (for example, the syntax 'and not' should not be used).</p>
 							<p>Search strings should not begin with the 'not' operator. </p>
-					</div><!-- end col-centered -->
-				</div><!-- end row -->
+					</div>
+				</div>
 
 
 
@@ -446,7 +446,7 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 							<p>The Globin Fold is an alpha helix structure motif which is composed of a bundle consisting 
 							of eight alpha helices, which are connected over short loop regions. The helices have not a 
 							fixed arrangement but the last two helices in sequential order make up an antiparallel pair.</p> 
-					</div><!-- end col-centered -->
+					</div>
 
 					<div class="col-lg-4 ugBorder">
 						<h3>Beta Motifs</h3>
@@ -472,7 +472,7 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 							The barrel includes eight beta strands, which build a two-layer sandwich, which each 
 							hold four strands.</p>
 
-					</div><!-- end col-centered -->
+					</div>
 
 					<div class="col-lg-4">
 						<h3>Alpha-Beta Motifs</h3>
@@ -494,8 +494,8 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 							strands compose the inner part of the structure and the alpha helices lie around them to 
 							make up the outer part of the motif.</p>
 
-					</div><!-- end col-centered -->
-				</div><!-- end row -->
+					</div>
+				</div>
 
 
 
@@ -511,7 +511,7 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 						<p>or like</p>
 						<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<tt>1hkb; 1kba; 2cse; 4dfh; 1ard</tt></p>
 						<p>The PDB-IDs must be separated by , or ;. There is no limit of PDB-IDs.</p>
-					</div><!-- end col-centered -->
+					</div>
 
 					<div class="col-lg-4 ugBorder">
 						<h3>Attributes</h3>
@@ -527,19 +527,21 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 						<br>
 						<br>
 						<br>
-					</div><!-- end col-centered -->
+					</div>
 
 					<div class="col-lg-4">
 						<h3>Examples</h3>
 						<p><b>1hkb,1hba,1cse,1ard</b> Find the four topologies <i>1hkb</i>, <i>1hba</i>, <i>1cse</i> and <i>1ard</i> in the PTGL-database</p>
 						<p><b>1hkb;1hba;1cse;1ard</b> Find the four topologies <i>1hkb</i>, <i>1hba</i>, <i>1cse</i> and <i>1ard</i> in the PTGL-database></p>
-					</div><!-- end col-centered -->
-				</div><!-- end row -->
+					</div>
+				</div>
 
 			<br>
 			<br>
 			<br>
-			<p>For a complete documentation with examples of how to search fast and effectively please <a href="help.php">click here</a>.
+-->
+			
+			<!-- <p>For a complete documentation with examples of how to search fast and effectively please <a href="help.php">click here</a>. -->
 
 		</div><!-- end container and text -->
 	</div><!-- end UserGuide -->
