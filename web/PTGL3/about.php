@@ -43,7 +43,12 @@
 			<li class="noBullets"> <a href="#ptgl">What is PTGL?</a> </li>
 			<li class="noBullets">
 				<ul>
-					<li class="noBullets">  <a href="#proteinGraph">Protein Graphs</a> </li>
+					<li class="noBullets">  <a href="#proteinGraph">Protein graphs</a> </li>
+					<ul>
+					    <li class="noBullets">  <a href="#graphTypes">Graph types</a> </li>
+					</ul>
+					<li class="noBullets">  <a href="#explainImages">Interpreting the graph images</a> </li>
+					<li class="noBullets">  <a href="#exampleGraphTypes">An example for the graph types</a> </li>
 					<li class="noBullets">
 						<ul>
 							<li class="noBullets">  <a href="#alphaGraph">Alpha</a> </li>
@@ -66,58 +71,104 @@
 					</li>
 					-->
 				</ul>
-			<li class="noBullets"> <a href="#linking">Linking PTGL</a> </li>
+			<!-- <li class="noBullets"> <a href="#linking">Linking PTGL</a> </li> -->
 			</li>
 		</ul>
 
 		<br>
 		<br>	
 		<a class="anchor" id="ptgl"></a>
-		<h3> <u>What is PTGL 3?</u> </h3>
+		<h3> What is PTGL 3? </h3>
 
+		<p>
 		PTGL 3 is a web-based database application for the analysis protein topologies. It uses a graph-based model to describe the structure
 		of protein chains on the super-secondary structure level. A protein graph is computed from the 3D atomic coordinates of a single chain in
-		a PDB file and the secondary structure assignments of the DSSP algorithm. In a protein graph graph, vertices represent secondary
+		a PDB file and the secondary structure assignments of the DSSP algorithm. The computation of the protein graph is done by our software <a href="http://www.bioinformatik.uni-frankfurt.de/tools/vplg/" target="_blank">Visualization of Protein Ligand Graphs (VPLG)</a>. In a protein graph graph, vertices represent secondary
 		structure elements (SSEs, usually alpha helices and beta strands) or ligand molecules while the edges model contacts and relative orientations between
-		them. 
-		<br />
+		them. The result is an undirected, labelled graph for a single protein chain.
+		<br /><br /></p>
 		
 		<p class="imgCenter"><img src="./images/protein_graph.png" alt="Protein graph" title="Protein graph" class="img-responsive imgFormAboutphp"/></p>
 		
 		<br/>
-		The result is an undirected, labelled graph for a single protein chain. Since a PDB file may contain more than one chain, you may also get
-		more than one graph per PDB file.
+		
 		<br />
+		<!--
 		The most common and important SSEs in proteins are alpha helices and beta strands, and some structures in the PDB also contain ligands.
-		So the PTGL contains 6 different graph types, which differ in the considered secondary structure elements (SSE): the <a href="#alphaGraph">Alpha graph</a>, the <a href="#betaGraph">Beta graph</a>,
-		and the <a href="#alphaBetaGraph">Alpha-Beta graph</a>. The connected components of the <a href="#proteinGraph">Protein graph</a> form <a href="#foldingGraph">Folding graphs</a>. A <a href="#proteinGraph">Protein graph</a> can consist of one or more
+		So the PTGL contains 6 different graph types, which differ in the considered secondary structure elements (SSE). The three base graph types are the <a href="#alphaGraph">Alpha graph</a>, the <a href="#betaGraph">Beta graph</a>,
+		and the <a href="#alphaBetaGraph">Alpha-Beta graph</a>. If you are interested in the ligands as well, you can also use the <a href="#alphaLigGraph">Alpha-Ligand graph</a>, the <a href="#betaLigGraph">Beta-Ligand graph</a>,
+		and the <a href="#alphaBetaLigGraph">Alpha-Beta-Ligand graph</a>
+		-->
+		
+		<!--
+		The connected components of the <a href="#proteinGraph">Protein graph</a> form <a href="#foldingGraph">Folding graphs</a>. A <a href="#proteinGraph">Protein graph</a> can consist of one or more
 		<a href="#foldingGraph">Folding graphs</a>. The three graph types were defined for each protein of the <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a>. For each graph type exists four <a href="#linearNot">linear notations</a> with
 		corresponding graphic representations. In PTGL all <a href="#foldingGraph">Folding graphs</a>, all SSEs, and additional protein information are stored for every
 		protein structure annotated in <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a> for which SSEs according DSSP are defined, which is not a NMR structure, has a resolution less than 3.5
 		Å and a sequence length of at least 20 amino acids. The database enables the user to search for the topology of a protein or for certain
 		topologies and subtopologies using the <a href="#linearNot">linear notations</a>. Additionally, it could be searched for sequence similarity in <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a> sequences.
 		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
+		-->
 		<br>
 		<br>
 		<a class="anchor" id="proteinGraph"></a>
-		<h4> <u>Protein Graphs</u> </h4>
+		<h3> Protein Graphs </h3>
 
-		<p>Using <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a> structure data the SSEs are defined according to the assignment of the <a href="http://swift.cmbi.ru.nl/gv/dssp/" target="_blank">DSSP</a>-algorithm with some modifications. Then, the spatial
-		contacts between the SSEs are generated according <a href="publications.php">KOCH et al.</a>. These information form the basis for the description of protein structures as
+		<p>Using the 3D structure data from the <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a>, the SSEs are defined according to
+		the assignment of the <a href="http://swift.cmbi.ru.nl/gv/dssp/" target="_blank">DSSP</a> algorithm with some 
+		modifications. Then, the spatial
+		contacts between the SSEs are computed according to <a href="publications.php">Koch <i>et al.</i>, 2013</a>. For the ligand versions, the explanation can
+		be found in <a href="publications.php">Sch&auml;fer <i>et al.</i>, 2012</a>. This information forms the basis for the description of protein structures as
 		graphs.</p>
-		A Protein graph is defined as labelled undirected graph. In the case of the Protein graph the vertices correspond to the SSEs, helices and
-		strands. The edges of the Protein graph represent spatial adjacencies of SSEs. These adjacencies are defined through contacts between SSEs.
+		
+		<p>
+		A Protein graph is defined as labelled, undirected graph. The vertices correspond to the SSEs or ligands, and they are labelled with
+		the SSE type (alpha helix, beta strand or ligand). The vertices of the Protein graph are enumerated as they occur in the sequence from the N- to the C-terminus.
+		
+		
+		<!--
 		According to the type of atoms forming the contact, there are backbone-backbone-contacts, sidechain-sidechain-contacts, and sidechain-backbone
 		contacts. Two vertices are connected, if there are at least two backbone-backbone-contacts or two sidechain-backbone-contacts or three
-		sidechain-sidechain contacts. The vertices of the Protein graph are enumerated as they occur in the sequence from the N- to the C-terminus.
+		sidechain-sidechain contacts.-->
+		</p>
+		
+		<p>
+		The edges of the Protein graph represent spatial adjacencies of SSEs. These adjacencies are defined through atom contacts between SSEs, based on the van-der-Waals radius.
 		According to this direction two spatial neighboured SSEs, which are connected, could have a parallel (p), anti-parallel (a), or mixed (m)
-		neighbourhood. If only helix or strand topology is of interest, the graph modelling allows to exclude the non-interesting SSE type.
-		According to the SSE type of interest the Protein graph can be defined as <a href="#alphaGraph">Alpha</a>, <a href="#betaGraph">Beta</a>, or <a href="#alphaBetaGraph">Alpha-Beta</a> graph (see example below). SSEs
-		are ordered as red circles (helices) or black quadrats (strands) on a straight line according to their sequential order from the N- to
+		neighbourhood. 
+		</p>
+		
+		<br/>
+		<a class="anchor" id="graphTypes"></a>
+		<h4> Graph Types </h4>
+		
+		<p>		
+		If only a certain SSE type is of interest, the graph modelling allows to exclude the non-interesting SSE types.
+		According to the SSE type of interest, the Protein graph can be defined as an <a href="#alphaGraph">Alpha graph</a>, <a href="#betaGraph">Beta graph</a>, or <a href="#alphaBetaGraph">Alpha-Beta graph</a>.
+		If you are interested in the ligands as well, you can also use the <a href="#alphaLigGraph">Alpha-Ligand graph</a>, the <a href="#betaLigGraph">Beta-Ligand graph</a>,
+		and the <a href="#alphaBetaLigGraph">Alpha-Beta-Ligand graph</a>.</p>
+		
+		<p>
+		The Alpha graph only contains alpha helices and the contacts between them. The Alpha-Beta graph contains alpha helices, beta strands and the contacts betweem them. And so on.
+		</p>
+		
+		<a class="anchor" id="explainImages"></a>
+		<h3>Interpreting the graph images</h3>
+
+		<p>
+		In the graph visualizations available on the PTGL server, the SSEs
+		are ordered as red circles (helices), black quadrats (strands), or magenta rings (ligands) on a straight line according to their sequential order from the N- to
 		the C-terminus. The spatial neighbourhoods are drawn as arcs between SSEs. The edges are coloured according to their labelling, red for
-		parallel, green for mixed, and blue for anti-parallel neighbourhood.
+		parallel, green for mixed, blue for anti-parallel, and magenta for ligand neighbourhood. Here is the key for the images:
+		</p>
+		
+		<p class="imgCenter"><img src="./images/vplg_legend.png" alt="PTGL graph image key" title="PTGL graph image key" class="img-responsive imgFormAboutphp"/></p>
+		
 		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 
+		<a class="anchor" id="exampleGraphTypes"></a>
+		<h4>An exmaple for the different graph types</h4>
+		
 		<br>
 		<br>
 		<a class="anchor" id="alphaGraph"></a>
@@ -139,8 +190,40 @@
 		<h5> <u>Alpha-Beta Graph</u> </h5>
 		The Alpha-Beta Graph of the protein 1TIM chain A consisting of 21 SSEs (13 helices and 8 strands). 
 		<p class="imgCenter"><img class="img-responsive imgFormAboutphp" src="./images/1timA_albe.0.png" alt="Alpha-Beta Graph of 1timA" title="Alpha-Beta Graph of 1timA"></p>
-		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
+		
+		<br>
+		<br>
+		<a class="anchor" id="alphaLigGraph"></a>
+		<h5> <u>Alpha Graph</u> </h5>
+		The Alpha-Graph of the protein 1TIM chain A consisting only of 13 helices.
+		<p class="imgCenter"><img src="./images/1timA_alph.0.png" alt="Alpha Graph of 1timA" title="Alpha Graph of 1timA" class="img-responsive imgFormAboutphp"/></p>
 
+
+		<br>
+		<br>
+		<a class="anchor" id="betaLigGraph"></a>
+		<h5> <u>Beta Graph</u> </h5>
+		The Beta-Graph of the protein 1TIM chain A consisting only of 8 strands.
+		<p class="imgCenter"><img src="./images/1timA_beta.0.png" alt="Beta Graph of 1timA" title="Beta Graph of 1timA" class="img-responsive imgFormAboutphp"/></p>
+
+		<br>
+		<br>
+		<a class="anchor" id="alphaBetaLigGraph"></a>
+		<h5> <u>Alpha-Beta Graph</u> </h5>
+		The Alpha-Beta Graph of the protein 1TIM chain A consisting of 21 SSEs (13 helices and 8 strands). 
+		<p class="imgCenter"><img class="img-responsive imgFormAboutphp" src="./images/1timA_albe.0.png" alt="Alpha-Beta Graph of 1timA" title="Alpha-Beta Graph of 1timA"></p>
+		
+		
+		
+		
+		
+
+		
+		
+		<!--
+		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
+		
+		
 		<br>
 		<br>
 		<a class="anchor" id="foldingGraph"></a>
@@ -232,6 +315,14 @@
 		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		<br>
 		<br>
+		
+		
+		
+		-->
+		
+		
+		<!--
+		
 		<a class="anchor" id="linking"></a>
 		<h4> <u>Linking PTGL</u> </h4>
 		<p>You can link PTGL in two ways:</p>
@@ -288,7 +379,8 @@
 		<p><b>protlist	&#x3c;pdb-id&#x3e;&#x3c;chain-id&#x3e;	  e.g. 1g3eA</b></p>
 
 
-		<p><b>2.</b> If you only have the PDB-id you can link as follows:</p>
+		-->
+
 
 		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 
