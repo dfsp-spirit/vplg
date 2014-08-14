@@ -18,7 +18,7 @@ import tools.DP;
  * 
  * @author ts
  */
-public class SSE implements java.io.Serializable {
+public class SSE extends SSEGraphVertex implements java.io.Serializable  {
 
 
     // settings
