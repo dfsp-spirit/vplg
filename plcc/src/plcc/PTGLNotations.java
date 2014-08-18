@@ -21,26 +21,7 @@ public class PTGLNotations {
     
     
     ProtGraph g;
-    String redNotation;
-    String adjNotation;
-
-    public String getRedNotation() {
-        return redNotation;
-    }
-
-    public String getAdjNotation() {
-        return adjNotation;
-    }
-
-    public String getKeyNotation() {
-        return keyNotation;
-    }
-
-    public String getSeqNotation() {
-        return seqNotation;
-    }
-    String keyNotation;
-    String seqNotation;
+  
     
     public static final String foldNames = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
     
@@ -48,19 +29,10 @@ public class PTGLNotations {
     
     public PTGLNotations(ProtGraph g) {
         this.g = g;
-        redNotation = adjNotation = keyNotation = seqNotation = "";
     }
     
     
-    public void computeLinearNotations() {
-        
-        redNotation = adjNotation = keyNotation = seqNotation = "";
-        
-        StringBuilder RED = new StringBuilder();
-        StringBuilder ADJ = new StringBuilder();
-        StringBuilder KEY = new StringBuilder();
-        StringBuilder SEQ = new StringBuilder();
-        
+    public void computeLinearNotations() {                        
         
         // prepare the data we need
         List<FoldingGraph> foldingGraphs = g.getConnectedComponents();
@@ -97,9 +69,16 @@ public class PTGLNotations {
         
         // OK, start the linear notation computation
         int adjstart, redstart, keystart, seqstart;
+        int foldNum = 0;
         for(Integer i : startVertices) {
             List<Integer> ccVerts = sortedConnectedComponents.get(i);
-            //System.out.println("CC with start vertex " + i + ": " + IO.intListToString(verts));
+            System.out.println("At fold # " + foldNum + ", CC with start vertex " + i + ": " + IO.intListToString(ccVerts));
+            
+            StringBuilder RED = new StringBuilder();
+            StringBuilder ADJ = new StringBuilder();
+            StringBuilder KEY = new StringBuilder();
+            StringBuilder SEQ = new StringBuilder();
+        
             
             String bracketStart = "[";
             String bracketEnd = "]";
@@ -109,36 +88,60 @@ public class PTGLNotations {
             
             
             if (ccVerts.size() == 1){
-		if(g.getGraphType().equals("albe")) {
-		     this.seqNotation = bracketStart + g.getVertex(ccVerts.get(0)).getLinearNotationLabel() + bracketEnd;
-                     this.keyNotation = bracketStart + g.getVertex(ccVerts.get(0)).getLinearNotationLabel() + bracketEnd;
-                     this.adjNotation = bracketStart + g.getVertex(ccVerts.get(0)).getLinearNotationLabel() + bracketEnd;
-                     this.redNotation = bracketStart + g.getVertex(ccVerts.get(0)).getLinearNotationLabel() + bracketEnd;
-			
-		} else {
-                    this.seqNotation = bracketStart + bracketEnd;
-                     this.keyNotation = bracketStart + bracketEnd;
-                     this.adjNotation = bracketStart + bracketEnd;
-                     this.redNotation = bracketStart + bracketEnd;
-                }
+                ADJ.append(bracketStart);
+                RED.append(bracketStart);
+                SEQ.append(bracketStart);
+                KEY.append(bracketStart);
+                
+		if(g.getGraphType().equals("albe")) {		     
+                     ADJ.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());
+                     RED.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());
+                     SEQ.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());
+                     KEY.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());			
+		} 
+                
+                ADJ.append(bracketEnd);
+                RED.append(bracketEnd);
+                SEQ.append(bracketEnd);
+                KEY.append(bracketEnd);
+                
+                
 		adjstart = ccVerts.get(0);
 		redstart = ccVerts.get(0);
 		keystart = ccVerts.get(0);
 		seqstart = ccVerts.get(0);
-	}else{
+            } else {
+                
+                if(! isBifurcated) {
+                    bracketStart = "{";
+                    bracketEnd = "}";
+                    System.out.println("Fold # " + foldNum + " is not bifurcated.");
+		} else if(g.hasCycleInVertexSet((ArrayList<Integer>) ccVerts)) {                    
+                    bracketStart = "(";
+                    bracketEnd = ")";
+                    System.out.println("Fold # " + foldNum + " has a cycle.");
+                    hasCycle = true;
+		} else {
+                    System.out.println("Fold # " + foldNum + " is bifurcated.");
+		}
+		
+		// write the opening bracket and for albe the type of the starting SSE
+		ADJ.append(bracketStart);
+                RED.append(bracketStart);
+                KEY.append(bracketStart);
+                SEQ.append(bracketStart);
+            }
             
+            System.out.println("# " + foldNum + " RED: " + RED.toString());
+            System.out.println("# " + foldNum + " ADJ: " + ADJ.toString());
+            System.out.println("# " + foldNum + " KEY: " + KEY.toString());
+            System.out.println("# " + foldNum + " SEQ: " + SEQ.toString());
+            
+            foldNum++;
         }
-        
-        
-        
-        
-        
-        
-        // all done, set results
-        this.redNotation = RED.toString();
-        this.adjNotation = ADJ.toString();
-        this.keyNotation = KEY.toString();
-        this.seqNotation = SEQ.toString();
+                
+            
+       
     }
     
     
@@ -158,10 +161,7 @@ public class PTGLNotations {
         PTGLNotations p = new PTGLNotations(g);
         p.computeLinearNotations();
         
-        System.out.println("RED: " + p.getRedNotation());
-        System.out.println("ADJ: " + p.getAdjNotation());
-        System.out.println("KEY: " + p.getKeyNotation());
-        System.out.println("SEQ: " + p.getSeqNotation());
+        
     }
     
     
