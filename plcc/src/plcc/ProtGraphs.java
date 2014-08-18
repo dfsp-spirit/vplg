@@ -31,6 +31,13 @@ public class ProtGraphs {
     public static final Integer GRAPHTYPE_BETALIG = 5;
     public static final Integer GRAPHTYPE_ALBELIG = 6;
     
+    public static final String GRAPHTYPE_STRING_ALPHA = "alpha";
+    public static final String GRAPHTYPE_STRING_BETA = "beta";
+    public static final String GRAPHTYPE_STRING_ALBE = "albe";
+    public static final String GRAPHTYPE_STRING_ALPHALIG = "alphalig";
+    public static final String GRAPHTYPE_STRING_BETALIG = "betalig";
+    public static final String GRAPHTYPE_STRING_ALBELIG = "albelig";
+    
     
     // graph format strings, used to define the format for database queries (and other stuff)
     public static final String GRAPHFORMAT_PLCC = "PLCC";           // internal plcc format (v2)

@@ -93,7 +93,7 @@ public class PTGLNotations {
                 SEQ.append(bracketStart);
                 KEY.append(bracketStart);
                 
-		if(g.getGraphType().equals("albe")) {		     
+		if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {		     
                      ADJ.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());
                      RED.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());
                      SEQ.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());
@@ -130,6 +130,19 @@ public class PTGLNotations {
                 RED.append(bracketStart);
                 KEY.append(bracketStart);
                 SEQ.append(bracketStart);
+                
+                if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
+                    SEQ.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());
+                }
+                
+                adjstart = ccVerts.get(0);
+		redstart = ccVerts.get(0);
+		keystart = ccVerts.get(0);
+		seqstart = ccVerts.get(0);
+                
+                // TODO: continue here, use the Perl script under plcc/tool/graphs/.
+                //       This is in line 207.
+                throw new java.lang.UnsupportedOperationException("computeLinearNotations(): Not implemented yet");
             }
             
             System.out.println("# " + foldNum + " RED: " + RED.toString());
