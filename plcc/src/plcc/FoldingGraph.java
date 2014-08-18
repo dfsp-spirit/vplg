@@ -99,6 +99,7 @@ public class FoldingGraph extends SSEGraph {
     private Integer foldingGraphNumber = null;
     /** Mapping of vertex indices in this folding graph to vertex indices in the parent PG. At position n in the list, the position of the vertex at index n in this FG in the parent PG is given. */
     private ArrayList<Integer> vertexIndicesInParentGraph = null;
+    private ArrayList<Integer> vertexIndicesInADJandSEQfgs = null;
     
     /** Whether this FG contains the additional vertices required for ADJ and SEQ notations (as opposed to those vertices for RED and KEY). */
     private Boolean isForADJandSEQNotations;
@@ -166,6 +167,7 @@ public class FoldingGraph extends SSEGraph {
             return;
         }
         this.vertexIndicesInParentGraph = order;
+        //System.out.println("[FG] vertex order in parent set to: " + IO.intListToString(this.vertexIndicesInParentGraph) + ".");
     }
     
     /**
@@ -177,8 +179,8 @@ public class FoldingGraph extends SSEGraph {
         if(order.size() != this.size) {
             DP.getInstance().e("FoldingGraph", "setVertexIndicesInADJandSEQfoldingGraphs: Given vertex order in ADJ and SEQ folding graphs has wrong length, not setting it.");
             return;
-        }
-        this.vertexIndicesInParentGraph = order;
+        }        
+        this.vertexIndicesInADJandSEQfgs = order;
     }
            
     

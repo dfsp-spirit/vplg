@@ -262,7 +262,8 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
                     // ...add it to the list of SSEs for that CC.
                     tmpSSEList.add(sseList.get(j));
                     numInNewGraph[j] = numVerticesAdded;
-                    posInParentGraph[numVerticesAdded] = j;                                                            
+                    posInParentGraph[numVerticesAdded] = j;  
+                    //System.out.println("[PG] CC #" + i + ": Position of vertex " + numVerticesAdded + " in parent graph was " + j + ".");
                     numVerticesAdded++;
                     vertexAddedThisStep = true;
                 }
@@ -296,12 +297,14 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
             }
             
             // compute proper list of indices in old graph and set it
+            //System.out.println("[PG] CC #" + i + ": posInParentGraph complete: " + IO.intArrayToString(posInParentGraph));
             ArrayList<Integer> fgVertexIndicesInParentGraph = new ArrayList<Integer>();
             for(int x = 0; x < posInParentGraph.length; x++) {
                 if(posInParentGraph[x] >= 0) {
                     fgVertexIndicesInParentGraph.add(posInParentGraph[x]);
                 }
             }
+            //System.out.println("[PG] CC #" + i + ": vertexIndicesInParentGraph: " + IO.intListToString(fgVertexIndicesInParentGraph));
             fg.setVertexIndicesInParentGraph(fgVertexIndicesInParentGraph);
             
             /* Boolean debug = true;

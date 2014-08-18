@@ -310,7 +310,7 @@ public class IO {
         return sb.toString();
     }
     
-    public static String intArrayListToString(ArrayList<Integer> ar) {
+    public static String intListToString(List<Integer> ar) {
         String s = "";
         for(Integer i : ar) {
             s += i + " ";

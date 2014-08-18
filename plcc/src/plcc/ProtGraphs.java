@@ -776,6 +776,59 @@ public class ProtGraphs {
         return pg;
     }
     
+    public static ProtGraph generate_7tim_A_albe() {
+        
+        int numVerts = 21;
+        String graphType = "albe";
+        String chain = "A";
+        String pdbid = "7tim";
+        
+        
+        ArrayList<SSE> vertices = new ArrayList<SSE>();
+                
+        vertices.add(new SSE(SSE.SSECLASS_BETASTRAND));
+        vertices.add(new SSE(SSE.SSECLASS_HELIX));
+        vertices.add(new SSE(SSE.SSECLASS_BETASTRAND));
+        vertices.add(new SSE(SSE.SSECLASS_HELIX));
+        vertices.add(new SSE(SSE.SSECLASS_BETASTRAND));
+        vertices.add(new SSE(SSE.SSECLASS_HELIX));
+        vertices.add(new SSE(SSE.SSECLASS_BETASTRAND));
+        vertices.add(new SSE(SSE.SSECLASS_HELIX));
+        vertices.add(new SSE(SSE.SSECLASS_HELIX));
+        vertices.add(new SSE(SSE.SSECLASS_BETASTRAND));
+        vertices.add(new SSE(SSE.SSECLASS_HELIX));
+        vertices.add(new SSE(SSE.SSECLASS_HELIX));
+        vertices.add(new SSE(SSE.SSECLASS_BETASTRAND));
+        vertices.add(new SSE(SSE.SSECLASS_HELIX));
+        vertices.add(new SSE(SSE.SSECLASS_HELIX));
+        vertices.add(new SSE(SSE.SSECLASS_HELIX));
+        vertices.add(new SSE(SSE.SSECLASS_BETASTRAND));
+        vertices.add(new SSE(SSE.SSECLASS_HELIX));
+        vertices.add(new SSE(SSE.SSECLASS_BETASTRAND));
+        vertices.add(new SSE(SSE.SSECLASS_HELIX));
+        vertices.add(new SSE(SSE.SSECLASS_HELIX));
+        
+        // create PG
+        ProtGraph pg = new ProtGraph(vertices);
+        pg.setInfo(pdbid, chain, graphType);
+        
+        pg.addContact(0, 2, SpatRel.PARALLEL);
+        pg.addContact(0, 18, SpatRel.PARALLEL);
+        pg.addContact(1, 3, SpatRel.PARALLEL);
+        pg.addContact(2, 4, SpatRel.PARALLEL);
+        pg.addContact(4, 6, SpatRel.PARALLEL);
+        pg.addContact(6, 9, SpatRel.PARALLEL);
+        pg.addContact(8, 11, SpatRel.PARALLEL);
+        pg.addContact(9, 11, SpatRel.MIXED);
+        pg.addContact(9, 12, SpatRel.PARALLEL);
+        pg.addContact(11, 14, SpatRel.PARALLEL);
+        pg.addContact(12, 16, SpatRel.PARALLEL);
+        pg.addContact(14, 16, SpatRel.MIXED);
+        pg.addContact(16, 18, SpatRel.PARALLEL);                
+        
+        return pg;
+    }
+    
     
     /**
      * Main for testing only.
