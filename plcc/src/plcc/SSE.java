@@ -20,7 +20,7 @@ import tools.DP;
  */
 public class SSE extends SSEGraphVertex implements java.io.Serializable  {
 
-
+    
     // settings
     private Integer MAX_RES = 100000;
     public static final String SSE_TYPE_LIGAND = "L";                   // ligand
@@ -65,6 +65,7 @@ public class SSE extends SSEGraphVertex implements java.io.Serializable  {
      * Constructor that sets the SSE type to 'sseType'. It should be "H", "E", ... etc. Use SSE.SSE_TYPE_* constants.
      */
     public SSE(String sseType) {
+        super();
         this.sseType = sseType;
         residues = new ArrayList<Residue>();
     }

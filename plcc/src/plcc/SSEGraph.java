@@ -3846,8 +3846,45 @@ E	3	3	3
         
         return degreeDistribution;
     }
-        
     
+    
+    /**
+     * Sets the status of all vertices to 'not visited'. Used for algorithms like BFS.
+     */
+    public void resetVertexStates() {
+        for(int i = 0; i < this.getSize(); i++) {
+            this.getVertex(i).visitedState = SSEGraphVertex.STATE_NOT_VISITED;
+        }
+    }
+    
+    
+    /**
+     * Determines whether the set of vertices in bifurcated, i.e., whether any vertex in the set has a degree greater than 2.
+     * @param vertexIndices the vertex set to check, vertices are given by their index in the vertex list of this graph
+     * @return true if bifurcated, false otherwise
+     */
+    public boolean vertexSetIsBifurcated(Collection<Integer> vertexIndices) {
+        for(int idx : vertexIndices) {
+            if(this.degreeOfVertex(idx) > 2) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    
+    /**
+     * Returns a list of the degrees of all vertices in this graph.
+     * @return a list of the degrees of all vertices in this graph, ordered by index.
+     */
+    public List<Integer> getAllVertexDegrees() {
+        ArrayList<Integer> degrees = new ArrayList<Integer>();
+        for(int i = 0; i < this.getSize(); i++) {
+            degrees.add(this.degreeOfVertex(i));
+        }
+        return degrees;
+    }
+                    
     
 
 }

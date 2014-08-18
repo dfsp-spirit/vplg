@@ -9,7 +9,6 @@
 
 package plcc;
 
-import tools.DP;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -28,6 +27,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import javax.imageio.ImageIO;
 import org.apache.batik.apps.rasterizer.DestinationType;
@@ -36,6 +36,7 @@ import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
+import tools.DP;
 
 /**
  *
@@ -134,6 +135,25 @@ public class FoldingGraph extends SSEGraph {
      */ 
     public boolean getIsForADJandSEQNotations() {
         return this.isForADJandSEQNotations;
+    }
+    
+    
+    /**
+     * Returns all vertices of this graph.
+     * @return all vertices of this graph
+     */
+    public List<SSE> getVertexList() {
+        return this.sseList;
+    }
+    
+    
+    /**
+     * Returns a mapping of vertex indices in this folding graph to vertex indices in the parent PG. At position n in
+     * the list, the position of the vertex at index n in this FG in the parent PG is given.
+     * @return a mapping of vertex indices in this folding graph to vertex indices in the parent PG
+     */
+    public List<Integer> getVertexIndexListInParentGraph() {
+        return this.vertexIndicesInParentGraph;
     }
     
     /**
