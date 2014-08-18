@@ -96,14 +96,40 @@ public class PTGLNotations {
         Collections.sort(startVertices);
         
         // OK, start the linear notation computation
+        int adjstart, redstart, keystart, seqstart;
         for(Integer i : startVertices) {
-            List<Integer> verts = sortedConnectedComponents.get(i);
-            //System.out.println("CC with start vertex " + i + ": " + IO.intListToString(verts) + "\n");
+            List<Integer> ccVerts = sortedConnectedComponents.get(i);
+            //System.out.println("CC with start vertex " + i + ": " + IO.intListToString(verts));
+            
+            String bracketStart = "[";
+            String bracketEnd = "]";
+            Boolean hasCycle = false;
+            
+            Boolean isBifurcated = g.vertexSetIsBifurcated(ccVerts);
+            
+            
+            if (ccVerts.size() == 1){
+		if(g.getGraphType().equals("albe")) {
+		     this.seqNotation = bracketStart + g.getVertex(ccVerts.get(0)).getLinearNotationLabel() + bracketEnd;
+                     this.keyNotation = bracketStart + g.getVertex(ccVerts.get(0)).getLinearNotationLabel() + bracketEnd;
+                     this.adjNotation = bracketStart + g.getVertex(ccVerts.get(0)).getLinearNotationLabel() + bracketEnd;
+                     this.redNotation = bracketStart + g.getVertex(ccVerts.get(0)).getLinearNotationLabel() + bracketEnd;
+			
+		} else {
+                    this.seqNotation = bracketStart + bracketEnd;
+                     this.keyNotation = bracketStart + bracketEnd;
+                     this.adjNotation = bracketStart + bracketEnd;
+                     this.redNotation = bracketStart + bracketEnd;
+                }
+		adjstart = ccVerts.get(0);
+		redstart = ccVerts.get(0);
+		keystart = ccVerts.get(0);
+		seqstart = ccVerts.get(0);
+	}else{
             
         }
         
-        String bracketStart = "[";
-        String bracketEnd = "]";
+        
         
         
         
