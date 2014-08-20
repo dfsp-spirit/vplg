@@ -8,7 +8,7 @@
 	<meta name="author" content="">
 	<link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
 
-	<title>PTGL 3.0 -- Citing PTGL and VPLG</title>
+	<title>VPLG -- Citing VPLG</title>
 
 	<!-- Mobile viewport optimized -->
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scale=1.0, user-scalable=no"/>
@@ -38,8 +38,9 @@
 		<?php include('navbar.php'); ?>
 
 	<div class="container" id="citing">
-		<h2> Citing PTGL </h2>
+		<h2> Citing VPLG</h2>
 		<br>
+		<!--
 		<p>A publication explaining the method in detail has been published in 2013:</p>
 		<p>BibTeX - Entry:</p>
 
@@ -63,9 +64,9 @@
 		</div>
 		<br>
 		<p>Please use this BibTeX-entry for citing.</p>
+-->
 
-
-	<!-- BiBTex Entry Tim 
+	<!-- BiBTex Entry Tim -->
 
   <div id="bibtex">
 	@InProceedings{schfer_et_al:OASIcs:2012:3722,<br>
@@ -87,8 +88,10 @@
 	annote =    {Keywords: protein structure, graph theory, ligand, secondary structure, protein ligang graph}<br>
 	}<br>
   </div>
+  <br>
+		<p>Please use this BibTeX-entry for citing.</p>
 
-	-->
+
 	
 	</div><!-- end container and contentText -->
 	</div><!-- end wrapper -->

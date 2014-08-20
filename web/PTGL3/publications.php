@@ -8,7 +8,7 @@
 	<meta name="author" content="">
 	<link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
 
-	<title>PTGL 3.0 -- Publications</title>
+	<title>VPLG -- Publications</title>
 
 	<!-- Mobile viewport optimized -->
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scale=1.0, user-scalable=no"/>
@@ -37,15 +37,15 @@
 	<?php include('navbar.php'); ?>
 
 	<div class="container" id="publications">
-		<h2> Publications related to the PTGL</h2>
+		<h2> Publications related to the VPLG and PTGL</h2>
 		<br>
 		
-		Here is a list of all publications related to the PTGL. If you want to cite the PTGL, please use the publication listed under <a href="./citing.php">Citing the PTGL</a>.
+		Here is a list of all publications related to the VPLG and PTGL. If you want to cite the VPLG, please use the publication listed under <a href="./citing.php">Citing the VPLG</a>.
 		<br /><br/>
 
 		<ul id="publicationsList">
+		<li>Schäfer T, May P, Koch I (2012). Computation and Visualization of Protein Topology Graphs Including Ligand Information. German Conference on Bioinformatics 2012; 108-118. (<a href="http://drops.dagstuhl.de/opus/volltexte/2012/3722">DROPS</a>).</li>
 			<li>Koch I, Kreuchwig A, May P (2013). Hierarchical representation of supersecondary structures using a graph-theoretical approach. Journal of Methods in molecular biology 2013;932:7-33. (<a href="http://www.ncbi.nlm.nih.gov/pubmed/22987344">/pubmed/22987344</a>).</li>
-			<li>Schäfer T, May P, Koch I (2012). Computation and Visualization of Protein Topology Graphs Including Ligand Information. German Conference on Bioinformatics 2012; 108-118. (<a href="http://drops.dagstuhl.de/opus/volltexte/2012/3722">DROPS</a>).</li>
 			<li>May P, Kreuschwig A, Steinke T, Koch I (2009). PTGL - a database for secondary structure-based protein topologies. Nucleic Acids Research, <a href="http://nar.oxfordjournals.org/cgi/content/abstract/gkp980?ijkey=LzGHNiRmy73nxhR&keytype=ref">10.1093/nar/gkp980</a> (Database issue 2010). </li>
 			<li>May P, Barthel S, Koch I (2004). PTGL - Protein Topology Graph Library. Bioinformatics 20(17):3277-3279.</li>
 			<li>Koch I, Lengauer T (1997) Detection of distant structural similarities in a set of proteins using a fast graph-based method. Proceedings of the Fifth International Conference on Intelligent Systems for Molecular Biology, 21.-26 Juni, Halkidiki, Greece AAAI Press, California. eds. T. Gaasterland, P. Karp, K. Karplus, C. Ouzounis, C. Sander, A. Valencia:167-187. </li>

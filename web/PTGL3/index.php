@@ -22,7 +22,7 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 	<meta name="author" content="">
 	<link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
 
-	<title>PTGL 3.0 -- The protein Topology Graph Library</title>
+	<title>VPLG -- The Visualization of Protein-Ligand Graphs</title>
 
 	<!-- Mobile viewport optimized -->
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scale=1.0, user-scalable=no"/>
@@ -54,7 +54,7 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 	<div id="Home">
 		<div class="container" id="intro">
 		<!-- Intro message -->
-			The Protein Topology Graph Library (PTGL) provides a database of protein secondary structure topologies. It is based on protein ligand graphs computed
+			The Visualization of Protein-Ligand Graphs (VPLG) provides a database of protein secondary structure topologies. It is based on protein ligand graphs computed
 			by the <a href="http://www.bioinformatik.uni-frankfurt.de/tools/vplg/" target="_blank">VPLG software</a>. VPLG uses a graph-based model to describe the structure of proteins on the super-secondary structure level.
 			
 			<!--
@@ -241,7 +241,7 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 				Å and a sequence length of at least 20 amino acids. The database enables the user to search for the topology of a protein or for certain
 				topologies and subtopologies using the <a href="about.php#linearNot">linear notations</a>. Additionally, it could be searched for sequence similarity in <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a> sequences.
 				-->
-				PTGL 3 is a web-based database application for the analysis protein topologies. It uses a graph-based model to describe the structure
+				VPLG is a web-based database application for the analysis protein topologies. It uses a graph-based model to describe the structure
 		of protein chains on the super-secondary structure level. A protein graph is computed from the 3D atomic coordinates of a single chain in
 		a PDB file and the secondary structure assignments of the DSSP algorithm. In a protein graph graph, vertices represent secondary
 		structure elements (SSEs, usually alpha helices and beta strands) or ligand molecules while the edges model contacts and relative orientations between

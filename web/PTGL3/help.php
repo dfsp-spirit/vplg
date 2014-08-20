@@ -8,7 +8,7 @@
 	<meta name="author" content="">
 	<link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
 
-	<title>PTGL 3.0 -- Help</title>
+	<title>VPLG -- Help</title>
 
 
 	<!-- Mobile viewport optimized -->
@@ -437,7 +437,7 @@
 	
 -->
 
-Please see the <a href="index.php#UserGuide">PTGL User Guide</a> for help.
+Please see the <a href="index.php#UserGuide">VPLG User Guide</a> for help.
 
 <br /><br /><br /><br /><br /><br />
 <br /><br /><br /><br /><br /><br />
@@ -447,7 +447,7 @@ Please see the <a href="index.php#UserGuide">PTGL User Guide</a> for help.
 </div>
 
 
-
+</div>
 
 <?php include('footer.php'); ?>
 	<!-- All Javascript at the bottom of the page for faster page loading -->

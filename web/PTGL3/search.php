@@ -6,11 +6,11 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="PTGL">
+	<meta name="description" content="VPLG">
 	<meta name="author" content="">
 	<link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
 
-	<title>PTGL 3.0 -- Search for proteins</title>
+	<title>VPLG -- Search for proteins</title>
 
 	<!-- Mobile viewport optimized -->
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scale=1.0, user-scalable=no"/>

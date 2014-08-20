@@ -8,7 +8,7 @@
 	<meta name="author" content="">
 	<link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
 
-	<title>PTGL 3.0 -- Motif search</title>
+	<title>VPLG -- Motif search</title>
 
 	<!-- Mobile viewport optimized -->
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scale=1.0, user-scalable=no"/>
@@ -107,7 +107,7 @@
 
 					<div class="col-lg-4" id="ugSearchs">
 						<h3>Search Sequence</h3>
-							<p>Search PTGL with your protein sequence using <a href="http://www.ncbi.nlm.nih.gov/BLAST/blastcgihelp.shtml" target="_blank">BLASTP</a>.</p>
+							<p>Search VPLG with your protein sequence using <a href="http://www.ncbi.nlm.nih.gov/BLAST/blastcgihelp.shtml" target="_blank">BLASTP</a>.</p>
 							<br>
 							<br>
 							<br>
@@ -149,7 +149,7 @@
 							<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<tt>header: kinase</tt></p>
 							<p>where <tt>header</tt> is an example of an <i>attribute </i>and <tt>kinase </tt>
 							is an example of a text string. Simply stated, <u>only</u> <tt>header</tt> 
-							fields are searched for the string kinase, not the complete PTGL database. 
+							fields are searched for the string kinase, not the complete VPLG database. 
 							The text string following an attribute can be a phrase containing multiple words.</p>
 
 
@@ -158,15 +158,15 @@
 					<div class="col-lg-4 ugBorder">
 						<h3>Attributes</h3>
 							<p>The following is a list of <b>attributes</b> and their definitions:</p>
-							<p><strong>header</strong> Text found in a PTGL database that refers to the PDB-HEADER record, which classifies the macromolecule.</p>
-							<p><strong>compound</strong> Text found in a PTGL COMPND record, which describes the macromolecular components or the experiment or analysis of the macromolecule of the PTGL entry.</p>
+							<p><strong>header</strong> Text found in a VPLG database that refers to the PDB-HEADER record, which classifies the macromolecule.</p>
+							<p><strong>compound</strong> Text found in a VPLG COMPND record, which describes the macromolecular components or the experiment or analysis of the macromolecule of the VPLG entry.</p>
 							<p><strong>het</strong> Text found in the HET records, a 3 letter/number abbreviation for HET groups.</p>
 							<p><strong>hetname</strong> Description of the HET group as found in the HET record.</p>
 							<p><strong>pdb_id</strong> Text describing the unique PDB identifier as found in the PDB HEADER record and consisting of 4 alphanumeric characters.</p>
-							<p><strong>molecule</strong> Text found in the PTGL MOLECULE records which describes the name/function of a certain protein chain.</p>
-							<p><strong>scop</strong> Text found in the PTGL SCOP table records CLASS, FOLD, SUPERFAMILY, FAMILY, DOMAIN, SPECIES,
+							<p><strong>molecule</strong> Text found in the VPLG MOLECULE records which describes the name/function of a certain protein chain.</p>
+							<p><strong>scop</strong> Text found in the VPLG SCOP table records CLASS, FOLD, SUPERFAMILY, FAMILY, DOMAIN, SPECIES,
 							which describe the different hierarchy levels, domain name or species name of a certain SCOP domain.</p>
-							<p><strong>cath</strong> Text found in the PTGL CATH table records CLASS, TOPOLOGY, ARCHITECTURE, HOMOLOGOUS FAMILY, COMM, SOURCE
+							<p><strong>cath</strong> Text found in the VPLG CATH table records CLASS, TOPOLOGY, ARCHITECTURE, HOMOLOGOUS FAMILY, COMM, SOURCE
 							which describe the different hierarchy levels, the species and some comments of a certain CATH domain.</p>
 						<br>
 						<br>
@@ -295,8 +295,8 @@
 
 					<div class="col-lg-4">
 						<h3>Examples</h3>
-						<p><b>1hkb,1hba,1cse,1ard</b> Find the four topologies <i>1hkb</i>, <i>1hba</i>, <i>1cse</i> and <i>1ard</i> in the PTGL-database</p>
-						<p><b>1hkb;1hba;1cse;1ard</b> Find the four topologies <i>1hkb</i>, <i>1hba</i>, <i>1cse</i> and <i>1ard</i> in the PTGL-database></p>
+						<p><b>1hkb,1hba,1cse,1ard</b> Find the four topologies <i>1hkb</i>, <i>1hba</i>, <i>1cse</i> and <i>1ard</i> in the VPLG-database</p>
+						<p><b>1hkb;1hba;1cse;1ard</b> Find the four topologies <i>1hkb</i>, <i>1hba</i>, <i>1cse</i> and <i>1ard</i> in the VPLG-database></p>
 					</div><!-- end col-centered -->
 				</div><!-- end row -->
 

@@ -8,7 +8,7 @@
 	<meta name="author" content="">
 	<link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
 
-	<title>PTGL 3.0 -- Contact</title>
+	<title>VPLG -- Contact</title>
 
 
 	<!-- Mobile viewport optimized -->
@@ -49,7 +49,7 @@
 	<div class="container" id="contactUs">
 		<h2> Contact Us </h2>
 		<br>
-		<h4> List of people associated with PTGL </h4>
+		<h4> List of people associated with VPLG </h4>
 
 
 	<div id="contact">
@@ -88,33 +88,6 @@
 		</div><!-- end col-sm-6 -->
 	</div><!-- end row -->
 
-	<div class="row" id="member2">
-		<div class="col-sm-6">
-			<div class="leftColumn">
-				<strong>Dr. Patrick May</strong>
-				<br>
-				Luxembourg Centre for Systems Biomedicine 
-				<br>
-				7, Avenue des Hauts Fourneaux 
-				<br>
-				L-4362 BELVAL
-				<br>
-				Luxembourg
-			</div><!-- end leftColumn-->
-		</div><!-- end col-sm-6 -->
-
-		<div class="col-sm-6">
-			<div class="rightColumn">
-				<br>
-				<i class="fa fa-phone"></i> Phone  +352 46 66 44 6263
-				<br>
-				<i class="fa fa-envelope-o"></i> e-mail:  patrick.may (at) uni.lu
-				<br>
-				<i class="fa fa-external-link"><a href="http://wwwen.uni.lu/lcsb/people/patrick_may" target="_blank"></i> http://wwwen.uni.lu/lcsb/people/patrick_may</a>
-			</div><!-- end rightColumn-->
-		</div><!-- end col-sm-6 -->
-	</div><!-- end row -->
-
 	<div class="row" id="member3">
 		<div class="col-sm-6">
 			<div class="leftColumn">
@@ -122,7 +95,7 @@
 				<br>
 				Johann Wolfgang Goethe-University Frankfurt am Main
 				<br>
-				Faculty of Computer Science and Mathematics, Dept. 12
+				Faculty of Computer Science and Mathematics
 				<br>
 				Institute for Computer Science
 				<br>

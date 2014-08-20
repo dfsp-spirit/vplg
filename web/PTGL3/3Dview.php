@@ -9,7 +9,7 @@
 		<meta name="author" content="">
 		<link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
 
-		<title>PTGL 3.0 -- 3D protein visualization</title>
+		<title>VPLG -- 3D protein visualization</title>
 
 
 		<!-- Mobile viewport optimized -->
