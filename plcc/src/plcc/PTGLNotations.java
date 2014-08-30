@@ -25,6 +25,9 @@ public class PTGLNotations {
   
     
     public static final String foldNames = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+    public static final String EDGE_ATTRIBUTE_STATUS = "status";
+    public static final String STATUS_NOT_VISITED = "0";
+    public static final String STATUS_VISITED = "1";
     
     
     
@@ -186,13 +189,60 @@ public class PTGLNotations {
                 tvertexList.add(adjcur);
                 
                 HashMap<Integer, Integer> tvertex = new HashMap<>();
-                int found = 0;
+                int next, left, right, adjv;
+                Boolean found = false;
                 order.put(adjcur, "+");                
                 Boolean hc = hasCycle;
                 int adjct = 0;
                 tvertex.put(adjcur, adjct + 1);
                 
+                
+                // line 260 of Perl script
+                List<Integer> adjNeighbors;
+                g.resetVertexStates();
                 while( ! isFinished(adjdegrees, ccVerts) || (hc && adjvisited.size() <= ccVerts.size())) {
+                    adjNeighbors = g.neighborsOf(adjcur);
+                    Collections.sort(adjNeighbors);
+                    
+                    found = false;
+                    next = -1;
+                    
+                    for(int k = 0; k < adjNeighbors.size(); k++) {
+                        
+                        adjv = adjNeighbors.get(k);
+                        
+                        if(hc && adjvisited.size() == ccVerts.size()) {
+                            found = true;
+                            next = adjv;
+                            hc = false;                            
+                        }
+                        
+                        left = adjcur;
+                        right = adjv;
+                        
+                        if(left > right) {
+                            left = adjv;
+                            right = adjcur;
+                        }
+                        
+                        String edgeStatus = g.getEdgeAttribute(left, right, EDGE_ATTRIBUTE_STATUS);
+                        if(edgeStatus != null) {
+                            if(edgeStatus.equals(PTGLNotations.STATUS_VISITED)) {
+                                continue;
+                            }
+                        }
+                        
+                        if(adjdegrees.get(adjv) == 0) {
+                            continue;
+                        }
+                        
+                        if(! found) {
+                            next = adjv;
+                            found = true;
+                            break;
+                        }
+                    }
+                    
                     
                 }
                 

@@ -13,6 +13,7 @@ package plcc;
 import algorithms.CompatGraphComputation;
 import algorithms.TreeNodeData;
 import datastructures.Graph;
+import datastructures.SimpleAttributedGraphAdapter;
 import datastructures.SimpleGraphAdapter;
 import datastructures.SimpleGraphInterface;
 import datastructures.UndirectedGraph;
@@ -72,7 +73,7 @@ import tools.DP;
  * 
  * @author spirit
  */
-public abstract class SSEGraph extends SimpleGraphAdapter implements VPLGGraphFormat, GraphModellingLanguageFormat, TrivialGraphFormat, DOTLanguageFormat, KavoshFormat, SimpleGraphInterface {
+public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements VPLGGraphFormat, GraphModellingLanguageFormat, TrivialGraphFormat, DOTLanguageFormat, KavoshFormat, SimpleGraphInterface {
     
     /** the list of all SSEs of this graph */
     protected ArrayList<SSE> sseList;
@@ -176,6 +177,10 @@ public abstract class SSEGraph extends SimpleGraphAdapter implements VPLGGraphFo
         this.init();
         this.spatOrder = null;
         this.reportCliques = true;  // TODO: move to settings
+        
+        edgeAttributes = new HashMap<>();
+        vertexAttributes = new HashMap<>();
+        graphAttributes = new HashMap<>();
     }
     
     /**
