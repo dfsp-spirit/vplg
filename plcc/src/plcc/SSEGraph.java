@@ -3884,6 +3884,18 @@ E	3	3	3
         }
         return degrees;
     }
+    
+    /**
+     * Returns a HashMap of the degrees of all vertices in this graph.
+     * @return a HashMap of the degrees of all vertices in this graph, ordered by index.
+     */
+    public HashMap<Integer, Integer> getAllVertexDegreesMap() {
+        HashMap<Integer, Integer> degrees = new HashMap<>();
+        for(int i = 0; i < this.getSize(); i++) {
+            degrees.put(i, this.degreeOfVertex(i));
+        }
+        return degrees;
+    }
                     
     
 

@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -50,7 +51,8 @@ public class PTGLNotations {
         //    System.out.println("  " + IO.intListToString(connectedComponents.get(i)));
         //}
         
-        List<Integer> degrees = g.getAllVertexDegrees();
+        //List<Integer> degrees = g.getAllVertexDegrees();
+        HashMap<Integer, Integer> degrees = g.getAllVertexDegreesMap();
         
         /** Contains a list of the sorted connected components of g. The keys are the indices of the left-most vertex in each set (and the values are the set). */
         HashMap<Integer, List<Integer>> sortedConnectedComponents = new HashMap<Integer, List<Integer>>();
@@ -135,14 +137,66 @@ public class PTGLNotations {
                     SEQ.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());
                 }
                 
-                adjstart = ccVerts.get(0);
-		redstart = ccVerts.get(0);
-		keystart = ccVerts.get(0);
-		seqstart = ccVerts.get(0);
+                Integer cur = ccVerts.get(0);
+                
+                adjstart = cur;
+		redstart = cur;
+		keystart = cur;
+		seqstart = cur;
                 
                 // TODO: continue here, use the Perl script under plcc/tool/graphs/.
                 //       This is in line 207.
-                throw new java.lang.UnsupportedOperationException("computeLinearNotations(): Not implemented yet");
+                HashMap<Integer, String> order = new HashMap<>();
+                HashMap<Integer, Integer> pos = new HashMap<>();
+                
+                pos.put(cur, 1);
+                
+                // check where to begin: the first vertex with degree 1 in the CC
+                Boolean deg1found = false;
+                int degree;
+                for(int j = 0; j < ccVerts.size(); j++) {
+                    degree = g.degreeOfVertex(ccVerts.get(j));
+                    if( ! deg1found && degree == 1) {
+                        cur = ccVerts.get(j);
+                        deg1found = true;
+                    }
+                    pos.put(ccVerts.get(j), j+1);
+                }
+                
+                // ----------------------------- ADJ notation ----------------------
+                System.out.println("-----ADJ Notation-----");
+                Integer adjcur = cur;
+                HashSet<Integer> adjvisited = new HashSet<>();
+                
+                if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
+                    ADJ.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());
+                }
+                adjstart = cur;
+                adjvisited.add(cur);
+                //List<Integer> adjdegrees = new ArrayList<>();
+                HashMap<Integer, Integer> adjdegrees = new HashMap<>();
+                for(Integer key : degrees.keySet()) {
+                    adjdegrees.put(key, degrees.get(key));
+                }
+                
+                
+                //System.out.println("Degrees: " + IO.intListToString(degrees));
+                //System.out.println("ADJ Degrees: " + IO.intListToString(adjdegrees));
+                List<Integer> tvertexList = new ArrayList<>();
+                tvertexList.add(adjcur);
+                
+                HashMap<Integer, Integer> tvertex = new HashMap<>();
+                int found = 0;
+                order.put(adjcur, "+");                
+                Boolean hc = hasCycle;
+                int adjct = 0;
+                tvertex.put(adjcur, adjct + 1);
+                
+                while( ! isFinished(adjdegrees, ccVerts) || (hc && adjvisited.size() <= ccVerts.size())) {
+                    
+                }
+                
+                //throw new java.lang.UnsupportedOperationException("computeLinearNotations(): Not implemented yet");
             }
             
             System.out.println("# " + foldNum + " RED: " + RED.toString());
@@ -154,7 +208,23 @@ public class PTGLNotations {
         }
                 
             
+        
        
+    }
+    
+    /**
+     * Checks whether none of the vertices in the list has a degree > 0.
+     * @param degrees the degrees Map: key is a vertex index, value is its degree
+     * @param vertices the list of vertices
+     * @return true if all vertices have a degree of 0 according to the Map, false otherwise
+     */
+    private Boolean isFinished(HashMap<Integer, Integer> degrees, List<Integer> vertices) {            
+        for(int i = 0; i < vertices.size(); i++) {
+            if(degrees.get(vertices.get(i)) > 0) {
+                return false;
+            }
+        }
+        return true;
     }
     
     
