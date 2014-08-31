@@ -9,6 +9,7 @@
 package datastructures;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * A simple adapter to make using the GraphAttributedInterface easier. You can extend this
@@ -22,6 +23,11 @@ public abstract class GraphAttributedAdapter implements GraphAttributedInterface
     private HashMap<String, String> vertexAttributes;
     private HashMap<String, String> edgeAttributes;    
     
+    public GraphAttributedAdapter() {
+        graphAttributes = new HashMap<>();
+        vertexAttributes = new HashMap<>();
+        edgeAttributes = new HashMap<>();
+    }
     
     private String getEdgeIdentifierLabel(int i, int j) {
         return i + "_" + j + "_"; 
@@ -61,4 +67,17 @@ public abstract class GraphAttributedAdapter implements GraphAttributedInterface
         return graphAttributes.get(name);
     }
     
+    @Override
+    public void initVertexAttribute(List<Integer> verts, String name, String value) {
+        for(Integer v : verts) {
+            setVertexAttribute(v, name, value);
+        }
+    }
+    
+    @Override
+    public void initEdgeAttribute(List<Integer[]> edges, String name, String value) {
+        for(Integer[] edge : edges) {
+            setEdgeAttribute(edge[0], edge[1], name, value);
+        }
+    }
 }

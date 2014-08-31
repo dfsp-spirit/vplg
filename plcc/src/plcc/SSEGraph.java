@@ -152,6 +152,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
      * @param sses a list of SSEs which make up this folding graph. The contacts have to be added later (or there will be none).
      */
     SSEGraph(ArrayList<SSE> sses) {
+        super();
         this.sseList = sses;
         this.sseDrawList = new ArrayList<DrawSSE>();
         this.size = sseList.size();
@@ -176,11 +177,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         this.metadata = new HashMap<String, String>();
         this.init();
         this.spatOrder = null;
-        this.reportCliques = true;  // TODO: move to settings
-        
-        edgeAttributes = new HashMap<>();
-        vertexAttributes = new HashMap<>();
-        graphAttributes = new HashMap<>();
+        this.reportCliques = true;  // TODO: move to settings               
     }
     
     /**

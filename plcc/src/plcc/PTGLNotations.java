@@ -225,7 +225,7 @@ public class PTGLNotations {
                             right = adjcur;
                         }
                         
-                        String edgeStatus = g.getEdgeAttribute(left, right, EDGE_ATTRIBUTE_STATUS);
+                        String edgeStatus = g.getEdgeAttribute(left, right, PTGLNotations.EDGE_ATTRIBUTE_STATUS);
                         if(edgeStatus != null) {
                             if(edgeStatus.equals(PTGLNotations.STATUS_VISITED)) {
                                 continue;
@@ -241,6 +241,34 @@ public class PTGLNotations {
                             found = true;
                             break;
                         }
+                    }
+                    
+                    // line 304 in Perl script
+                    if(found) {
+                        left = adjcur;
+                        right = next;
+                        
+                        if(left > right) {
+                            left = next;
+                            right = adjcur;
+                        }
+                        
+                        String edgeType = g.getEdgeLabel(left, right);
+                        
+                        if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && adjvisited.size() > 1)) {
+                            ADJ.append(",");
+                        }
+                        
+                        ADJ.append(next - adjcur).append(edgeType.toLowerCase());
+                        
+                        g.setEdgeAttribute(left, right, PTGLNotations.EDGE_ATTRIBUTE_STATUS, PTGLNotations.STATUS_VISITED);
+                        
+                        adjdegrees.put(adjcur, adjdegrees.get(adjcur) - 1);
+                        adjdegrees.put(next, adjdegrees.get(next) - 1);
+                    }
+                    else {  // not found
+                        // end of the path
+                        
                     }
                     
                     

@@ -1,12 +1,16 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This file is part of SPARGEL, the sparse graph extension library.
+ * 
+ * This is free software, published under the WTFPL.
+ * 
+ * Written by Tim Schaefer, see http://rcmd.org/contact/.
+ * 
  */
 
 package datastructures;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  *
@@ -18,6 +22,11 @@ public abstract class SimpleAttributedGraphAdapter implements GraphAttributedInt
     protected HashMap<String, String> vertexAttributes;
     protected HashMap<String, String> edgeAttributes;    
     
+    public SimpleAttributedGraphAdapter() {
+        graphAttributes = new HashMap<>();
+        vertexAttributes = new HashMap<>();
+        edgeAttributes = new HashMap<>();
+    }
     
     private String getEdgeIdentifierLabel(int i, int j) {
         return i + "_" + j + "_"; 
@@ -65,6 +74,20 @@ public abstract class SimpleAttributedGraphAdapter implements GraphAttributedInt
     @Override
     public Character getEdgeLabelChar(Integer i, Integer j) {
         return SimpleGraphDrawer.defaultEdgeStart;
+    }
+    
+    @Override
+    public void initVertexAttribute(List<Integer> verts, String name, String value) {
+        for(Integer v : verts) {
+            setVertexAttribute(v, name, value);
+        }
+    }
+    
+    @Override
+    public void initEdgeAttribute(List<Integer[]> edges, String name, String value) {
+        for(Integer[] edge : edges) {
+            setEdgeAttribute(edge[0], edge[1], name, value);
+        }
     }
     
 }

@@ -8,6 +8,8 @@
 
 package datastructures;
 
+import java.util.List;
+
 /**
  * An interface for adding graph, edge and vertex attributes to a graph.
  * @author ts
@@ -25,5 +27,9 @@ public interface GraphAttributedInterface {
     public void setGraphAttribute(String name, String value);
     
     public String getGraphAttribute(String name);
+    
+    public void initVertexAttribute(List<Integer> verts, String name, String value);
+    
+    public void initEdgeAttribute(List<Integer[]> edges, String name, String value);
     
 }
