@@ -189,7 +189,8 @@ public class PTGLNotations {
                 tvertexList.add(adjcur);
                 
                 HashMap<Integer, Integer> tvertex = new HashMap<>();
-                int next, left, right, adjv;
+                Integer next, left, right, adjv;
+                String edgeType = "";   // what should we init this to? It seems undef in the Perl script.
                 Boolean found = false;
                 order.put(adjcur, "+");                
                 Boolean hc = hasCycle;
@@ -253,7 +254,7 @@ public class PTGLNotations {
                             right = adjcur;
                         }
                         
-                        String edgeType = g.getEdgeLabel(left, right);
+                        edgeType = g.getEdgeLabel(left, right);
                         
                         if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && adjvisited.size() > 1)) {
                             ADJ.append(",");
@@ -268,9 +269,49 @@ public class PTGLNotations {
                     }
                     else {  // not found
                         // end of the path
-                        
+                        next = getVertexDegree1(adjdegrees, ccVerts);
+                        if(next != null) {
+                            if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && adjvisited.size() > 1)) {
+                                ADJ.append(",");
+                            }
+                            
+                            ADJ.append((next - adjcur) + "z");
+                            
+                        } else {
+                            next = getVertexDegreeGreater1(adjdegrees, ccVerts);
+                            if(next != null) {
+                                if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && adjvisited.size() > 1)) {
+                                    ADJ.append(",");
+                                }
+                            }
+                            else {
+                                System.err.println("ADJ notation error: could not find next vertex in circle.");
+                            }
+                        }
                     }
                     
+                    if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
+                        ADJ.append(g.getVertex(next).getLinearNotationLabel());
+                    }
+                    
+                    // ordering, line 352
+                    if(edgeType.equals("p") || edgeType.equals("m")) {
+                        order.put(next, order.get(adjcur));
+                    }else if(order.get(adjcur).equals("-")) {
+                        order.put(next, "+");
+                    }else{
+                        order.put(next, "-");
+                    }
+                    
+                    adjcur = next;
+                    
+                    if(tvertexList.size() < ccVerts.size()) {
+                        adjct++;
+                        tvertexList.add(adjcur);
+                        tvertex.put(adjcur, adjct + 1);
+                    }
+                    
+                    adjvisited.add(next);
                     
                 }
                 
@@ -303,6 +344,40 @@ public class PTGLNotations {
             }
         }
         return true;
+    }
+    
+    
+    /**
+     * Returns the first vertex with degree 1 from the list, or null if the list contains no such vertex.
+     * @param degrees the degrees Map: key is a vertex index, value is its degree
+     * @param vertices the list of vertices
+     * @return the first vertex with degree 1 from the list, or null if the list contains no such vertex
+     */
+    private Integer getVertexDegree1(HashMap<Integer, Integer> degrees, List<Integer> vertices) {            
+        Collections.sort(vertices);
+        for(int i = 0; i < vertices.size(); i++) {
+            if(degrees.get(vertices.get(i)) == 1) {
+                return vertices.get(i);
+            }
+        }
+        return null;
+    }
+
+    
+    /**
+     * Returns the first vertex with degree greater 1 from the list, or null if the list contains no such vertex.
+     * @param degrees the degrees Map: key is a vertex index, value is its degree
+     * @param vertices the list of vertices
+     * @return the first vertex with degree greater 1 from the list, or null if the list contains no such vertex
+     */
+    private Integer getVertexDegreeGreater1(HashMap<Integer, Integer> degrees, List<Integer> vertices) {            
+        Collections.sort(vertices);
+        for(int i = 0; i < vertices.size(); i++) {
+            if(degrees.get(vertices.get(i)) > 1) {
+                return vertices.get(i);
+            }
+        }
+        return null;
     }
     
     
