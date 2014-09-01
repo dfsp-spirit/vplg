@@ -22,7 +22,7 @@ public class PTGLNotations {
     
     
     ProtGraph g;
-  
+    Boolean verbose;
     
     public static final String foldNames = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
     public static final String EDGE_ATTRIBUTE_STATUS = "status";
@@ -33,6 +33,7 @@ public class PTGLNotations {
     
     public PTGLNotations(ProtGraph g) {
         this.g = g;
+        this.verbose = true;
     }
     
     
@@ -147,8 +148,7 @@ public class PTGLNotations {
 		keystart = cur;
 		seqstart = cur;
                 
-                // TODO: continue here, use the Perl script under plcc/tool/graphs/.
-                //       This is in line 207.
+                //       This is in line 207 of the Perl script.
                 HashMap<Integer, String> order = new HashMap<>();
                 HashMap<Integer, Integer> pos = new HashMap<>();
                 
@@ -167,13 +167,14 @@ public class PTGLNotations {
                 }
                 
                 // ----------------------------- ADJ notation ----------------------
-                System.out.println("-----ADJ Notation-----");
+                System.out.println("#" + foldNum + " -----ADJ Notation-----");
                 Integer adjcur = cur;
                 HashSet<Integer> adjvisited = new HashSet<>();
                 
                 if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
                     ADJ.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());
                 }
+                
                 adjstart = cur;
                 adjvisited.add(cur);
                 //List<Integer> adjdegrees = new ArrayList<>();
@@ -201,9 +202,22 @@ public class PTGLNotations {
                 // line 260 of Perl script
                 List<Integer> adjNeighbors;
                 g.resetVertexStates();
+                int numIterations = 0;
                 while( ! isFinished(adjdegrees, ccVerts) || (hc && adjvisited.size() <= ccVerts.size())) {
+                    
+                    Boolean fin = isFinished(adjdegrees, ccVerts);
+                    
+                    if(verbose) {
+                        System.out.println("Fold#" + foldNum + "  At iteration #" + numIterations + ", adjcur=" + adjcur + ". adjvisited.size()=" + adjvisited.size() + ", ccVerts.size()=" + ccVerts.size() + ", finished=" + fin + ".");
+                    }                    
+                    numIterations++;
+                    
                     adjNeighbors = g.neighborsOf(adjcur);
                     Collections.sort(adjNeighbors);
+                    
+                    if(verbose) {
+                        System.out.println("Fold#" + foldNum + "    Neighbors of " + adjcur + ": " + IO.intListToString(adjNeighbors));
+                    } 
                     
                     found = false;
                     next = -1;
@@ -233,7 +247,7 @@ public class PTGLNotations {
                             }
                         }
                         
-                        if(adjdegrees.get(adjv) == 0) {
+                        if(adjdegrees.get(adjv) <= 0) {
                             continue;
                         }
                         
@@ -266,8 +280,17 @@ public class PTGLNotations {
                         
                         adjdegrees.put(adjcur, adjdegrees.get(adjcur) - 1);
                         adjdegrees.put(next, adjdegrees.get(next) - 1);
+                        
+                        if(verbose) {
+                            System.out.println("Fold#" + foldNum + ": Found. Set adjdegree of " + adjcur + " to " + adjdegrees.get(adjcur) + "," + " set adjdegree of " + next + " to " + adjdegrees.get(next) + ".");
+                        }
                     }
                     else {  // not found
+                        
+                        if(verbose) {
+                            System.out.println("Fold#" + foldNum + ": NOT found.");
+                        }
+                        
                         // end of the path
                         next = getVertexDegree1(adjdegrees, ccVerts);
                         if(next != null) {
@@ -286,6 +309,7 @@ public class PTGLNotations {
                             }
                             else {
                                 System.err.println("ADJ notation error: could not find next vertex in circle.");
+                                System.exit(1);
                             }
                         }
                     }
@@ -340,6 +364,9 @@ public class PTGLNotations {
     private Boolean isFinished(HashMap<Integer, Integer> degrees, List<Integer> vertices) {            
         for(int i = 0; i < vertices.size(); i++) {
             if(degrees.get(vertices.get(i)) > 0) {
+                if(verbose) {
+                    System.out.println("isFinished(): No, degree of vertex #" + i + ", which is " + vertices.get(i) + ", is " + degrees.get(vertices.get(i)) + ". All degrees >0: " + IO.hashMapValuesGreater0ToString(degrees) + ".");
+                }
                 return false;
             }
         }
@@ -380,7 +407,11 @@ public class PTGLNotations {
         return null;
     }
     
-    
+    private void resetEdgeStatus(List<Integer> verts) {
+        for(Integer v : verts) {
+            TODO: continue
+        }
+    }
     
     /**
      * Testing main only

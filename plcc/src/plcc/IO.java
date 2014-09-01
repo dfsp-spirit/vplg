@@ -8,18 +8,19 @@
 
 package plcc;
 
-import tools.DP;
 import java.awt.Rectangle;
-import java.io.BufferedReader;
 import java.io.*;
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
@@ -33,6 +34,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.utils.IOUtils;
 import org.w3c.dom.Document;
 import resources.Resources;
+import tools.DP;
 
 /**
  * This static class holds various methods related to input and output. It makes use of the Apache commons compress
@@ -108,6 +110,24 @@ public class IO {
             sb.append(in[i]);
             if(i < in.length - 1) {
                 sb.append(",");
+            }
+        }
+        return sb.toString();
+    }
+    
+    public static String hashMapToString(HashMap<Integer, Integer> map) {
+        StringBuilder sb = new StringBuilder();
+        for(Entry e : map.entrySet()) {
+            sb.append(e.getKey()).append("=>").append(e.getValue()).append(" ");
+        }
+        return sb.toString();
+    }
+    
+    public static String hashMapValuesGreater0ToString(HashMap<Integer, Integer> map) {
+        StringBuilder sb = new StringBuilder();
+        for(Entry e : map.entrySet()) {
+            if((Integer)e.getValue() > 0) {
+                sb.append(e.getKey()).append("=>").append(e.getValue()).append(" ");
             }
         }
         return sb.toString();
