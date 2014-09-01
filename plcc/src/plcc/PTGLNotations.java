@@ -41,7 +41,11 @@ public class PTGLNotations {
         
         // prepare the data we need
         List<FoldingGraph> foldingGraphs = g.getConnectedComponents();
-        System.out.println("Detected " + foldingGraphs.size() + " connected components.");
+        
+        if(verbose) {
+            System.out.println("Detected " + foldingGraphs.size() + " connected components.");
+            System.out.println("|V|=" + g.getSize() + ", |E|=" + g.getEdgeList().size() + ".");
+        }
         
         List<List<Integer>> connectedComponents = new ArrayList<List<Integer>>();
         for(int i = 0; i < foldingGraphs.size(); i++) {
@@ -139,7 +143,15 @@ public class PTGLNotations {
                 SEQ.append(bracketStart);
                 
                 if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
+                    if(verbose) {
+                        System.out.println("This is an ALBE graph.");
+                    }
                     SEQ.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());
+                }
+                else {
+                    if(verbose) {
+                        System.out.println("This is an NOT an ALBE graph, graph type is '" + g.getGraphType() + ".");
+                    }
                 }
                 
                 Integer cur = ccVerts.get(0);
@@ -151,9 +163,12 @@ public class PTGLNotations {
                 
                 //       This is in line 207 of the Perl script.
                 HashMap<Integer, String> order = new HashMap<>();
+                
+                /** This stores the position of vertex in the list. it is useless in our case, but the original implementation needed it because 
+                 vertex n was stored at position (n+1) in the list. That is, the first spot in the list was empty. */
                 HashMap<Integer, Integer> pos = new HashMap<>();
                 
-                pos.put(cur, 1);
+                pos.put(cur, 0);    // this is 'pos.put(cur, 1)' in the orginal Perl script
                 
                 // check where to begin: the first vertex with degree 1 in the CC
                 Boolean deg1found = false;
@@ -164,7 +179,7 @@ public class PTGLNotations {
                         cur = ccVerts.get(j);
                         deg1found = true;
                     }
-                    pos.put(ccVerts.get(j), j+1);
+                    pos.put(ccVerts.get(j), j); // this is 'pos.put(ccVerts.get(j), j+1)' in the orginal Perl script
                 }
                 
                 if(verbose) {
@@ -178,7 +193,11 @@ public class PTGLNotations {
                 HashSet<Integer> adjvisited = new HashSet<>();
                 
                 if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
-                    ADJ.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());
+                    String startLabel = g.getVertex(cur).getLinearNotationLabel();
+                    ADJ.append(startLabel);
+                    if(verbose) {
+                        System.out.println("Start vertex is " + cur + ", type:" + g.getVertex(cur).getPLCCSSELabel() + ", label=" + startLabel + ".");
+                    }
                 }
                 
                 adjstart = cur;
@@ -207,14 +226,16 @@ public class PTGLNotations {
                 
                 // line 260 of Perl script
                 List<Integer> adjNeighbors;
-                g.resetVertexStates();
+                //g.resetVertexStates();
+                resetEdgeStatus(ccVerts);
                 int numIterations = 0;
-                while( ! isFinished(adjdegrees, ccVerts) || (hc && adjvisited.size() <= ccVerts.size())) {
+                while( ! isFinished(adjdegrees, ccVerts) || (hc && (adjvisited.size() < ccVerts.size()) )) {
                     
                     Boolean fin = isFinished(adjdegrees, ccVerts);
                     
                     if(verbose) {
                         System.out.println("Fold#" + foldNum + "  ===== At iteration #" + numIterations + ", adjcur=" + adjcur + ". adjvisited.size()=" + adjvisited.size() + ", ccVerts.size()=" + ccVerts.size() + ", finished=" + fin + ". =====");
+                        System.out.println("adjvisited: " + IO.hashSetToString(adjvisited));
                     }                    
                     numIterations++;
                     
@@ -367,6 +388,10 @@ public class PTGLNotations {
                     }
                     
                     adjvisited.add(next);
+                    
+                    if(verbose) {
+                        System.out.println("Notation so far: '" + ADJ.toString() + "'.");
+                    }
                     
                 }
                 

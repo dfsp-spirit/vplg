@@ -105,6 +105,9 @@ while($str=<GRAPH>){
 		print "g = $g\n" if $verbose;
 
 	}
+	else {
+	  print "Could not parse line: '$str'.\n";
+	}
 }
 close(GRAPH);
 
@@ -264,9 +267,9 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 			$found=0;
 			$next=-1;
 
-			if ($verbose){
+			#if ($verbose){
 				print "\n$adjcur has neighbours: ";print_array(@adjneighbors);print "\n";
-			}
+			#}
 
 			foreach my $adjv (@adjneighbors){
 				
@@ -302,7 +305,8 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 			print " next found $found: $next\n" if $verbose;	
 
 			if($found){
-
+			
+			        print "next found: $next\n";
 				my $left=$adjcur;
 				my $right=$next;
 				if($left > $right){$left=$next; $right=$adjcur;}

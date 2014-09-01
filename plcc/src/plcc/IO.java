@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -119,6 +120,14 @@ public class IO {
         StringBuilder sb = new StringBuilder();
         for(Entry e : map.entrySet()) {
             sb.append(e.getKey()).append("=>").append(e.getValue()).append(" ");
+        }
+        return sb.toString();
+    }
+    
+    public static String hashSetToString(HashSet<Integer> set) {
+        StringBuilder sb = new StringBuilder();
+        for(Integer i : set) {
+            sb.append(i).append(" ");
         }
         return sb.toString();
     }
