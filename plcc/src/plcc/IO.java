@@ -133,6 +133,18 @@ public class IO {
         return sb.toString();
     }
     
+    public static String hashMapValuesGreater0OfKeysToString(HashMap<Integer, Integer> map, List<Integer> interestedInKeys) {
+        StringBuilder sb = new StringBuilder();
+        Integer value;
+        for(Integer key : interestedInKeys) {
+            value = map.get(key);
+            if(value > 0) {
+                sb.append(key).append("=>").append(value).append(" ");
+            }
+        }
+        return sb.toString();
+    }
+    
     
     /**
      * Ugly hack to remove a trailing "./" or ".\" from a string.

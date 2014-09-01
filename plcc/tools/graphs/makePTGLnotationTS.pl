@@ -327,13 +327,16 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 			}else{
 				# end of path
 				if(getVertexDegree1(\%adjdegrees,\@vs)){
+					
 					$next=getVertexDegree1(\%adjdegrees,\@vs);
+					print "Found vertex with degree 1, it is $next.\n";
 					print "now the z-vertices: $next\n" if $verbose;
 					# first go back to the last vertex
 					$adjNotation.="," if (($graphtype eq "albe") or ($graphtype ne "albe" and scalar(keys(%adjvisited))>1));
 					$adjNotation.=($next - $adjcur)."z";
 				}elsif(getVertexDegreeGreater1(\%adjdegrees,\@vs)){
 				        $next=getVertexDegreeGreater1(\%adjdegrees,\@vs);
+				        print "Found vertex with degree GREATER 1, it is $next.\n";
 					print "now the z-vertices: $next\n" if $verbose;
 					# first go back to the last vertex
 					$adjNotation.="," if (($graphtype eq "albe") or ($graphtype ne "albe" and scalar(keys(%adjvisited))>1));

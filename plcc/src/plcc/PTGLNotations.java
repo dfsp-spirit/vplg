@@ -63,7 +63,7 @@ public class PTGLNotations {
         for(List<Integer> connComp : connectedComponents) {
             Collections.sort(connComp);
             //System.out.println("Sorted CC: " + IO.intListToString(connComp));
-            sortedConnectedComponents.put(connComp.get(0), connComp);
+            sortedConnectedComponents.put(connComp.get(0), connComp);   // use first vertex of the CC as key
         }
         
         System.out.println("Received " + sortedConnectedComponents.size() + " sorted vertex sets.");
@@ -78,6 +78,7 @@ public class PTGLNotations {
         int foldNum = 0;
         for(Integer i : startVertices) {
             List<Integer> ccVerts = sortedConnectedComponents.get(i);
+            resetEdgeStatus(ccVerts);
             System.out.println("At fold # " + foldNum + ", CC with start vertex " + i + ": " + IO.intListToString(ccVerts));
             
             StringBuilder RED = new StringBuilder();
@@ -166,6 +167,11 @@ public class PTGLNotations {
                     pos.put(ccVerts.get(j), j+1);
                 }
                 
+                if(verbose) {
+                    System.out.println("pos: " + IO.hashMapToString(pos));
+                }
+                
+                // line 230 in the Perl script
                 // ----------------------------- ADJ notation ----------------------
                 System.out.println("#" + foldNum + " -----ADJ Notation-----");
                 Integer adjcur = cur;
@@ -192,10 +198,10 @@ public class PTGLNotations {
                 HashMap<Integer, Integer> tvertex = new HashMap<>();
                 Integer next, left, right, adjv;
                 String edgeType = "";   // what should we init this to? It seems undef in the Perl script.
-                Boolean found = false;
+                Boolean foundNextVertex = false;
                 order.put(adjcur, "+");                
                 Boolean hc = hasCycle;
-                int adjct = 0;
+                Integer adjct = 0;
                 tvertex.put(adjcur, adjct + 1);
                 
                 
@@ -208,7 +214,7 @@ public class PTGLNotations {
                     Boolean fin = isFinished(adjdegrees, ccVerts);
                     
                     if(verbose) {
-                        System.out.println("Fold#" + foldNum + "  At iteration #" + numIterations + ", adjcur=" + adjcur + ". adjvisited.size()=" + adjvisited.size() + ", ccVerts.size()=" + ccVerts.size() + ", finished=" + fin + ".");
+                        System.out.println("Fold#" + foldNum + "  ===== At iteration #" + numIterations + ", adjcur=" + adjcur + ". adjvisited.size()=" + adjvisited.size() + ", ccVerts.size()=" + ccVerts.size() + ", finished=" + fin + ". =====");
                     }                    
                     numIterations++;
                     
@@ -219,15 +225,17 @@ public class PTGLNotations {
                         System.out.println("Fold#" + foldNum + "    Neighbors of " + adjcur + ": " + IO.intListToString(adjNeighbors));
                     } 
                     
-                    found = false;
+                    foundNextVertex = false;
                     next = -1;
                     
+                    // line 271 of Perl script   
+                    // Determine the next vertex
                     for(int k = 0; k < adjNeighbors.size(); k++) {
                         
                         adjv = adjNeighbors.get(k);
                         
                         if(hc && adjvisited.size() == ccVerts.size()) {
-                            found = true;
+                            foundNextVertex = true;
                             next = adjv;
                             hc = false;                            
                         }
@@ -240,6 +248,8 @@ public class PTGLNotations {
                             right = adjcur;
                         }
                         
+                        
+                        
                         String edgeStatus = g.getEdgeAttribute(left, right, PTGLNotations.EDGE_ATTRIBUTE_STATUS);
                         if(edgeStatus != null) {
                             if(edgeStatus.equals(PTGLNotations.STATUS_VISITED)) {
@@ -251,15 +261,15 @@ public class PTGLNotations {
                             continue;
                         }
                         
-                        if(! found) {
+                        if(! foundNextVertex) {
                             next = adjv;
-                            found = true;
+                            foundNextVertex = true;
                             break;
                         }
                     }
                     
                     // line 304 in Perl script
-                    if(found) {
+                    if(foundNextVertex) {
                         left = adjcur;
                         right = next;
                         
@@ -269,6 +279,9 @@ public class PTGLNotations {
                         }
                         
                         edgeType = g.getEdgeLabel(left, right);
+                        if(verbose) {
+                            System.out.println("Fold#" + foldNum + ": Found next vertex " + next + ". Edge label is '" + edgeType + "'.");
+                        }
                         
                         if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && adjvisited.size() > 1)) {
                             ADJ.append(",");
@@ -278,22 +291,32 @@ public class PTGLNotations {
                         
                         g.setEdgeAttribute(left, right, PTGLNotations.EDGE_ATTRIBUTE_STATUS, PTGLNotations.STATUS_VISITED);
                         
-                        adjdegrees.put(adjcur, adjdegrees.get(adjcur) - 1);
-                        adjdegrees.put(next, adjdegrees.get(next) - 1);
+                        Integer adjcurDegree = adjdegrees.get(adjcur);
+                        Integer nextDegree = adjdegrees.get(next);
                         
+                        if(adjcurDegree > 0) {
+                            adjdegrees.put(adjcur, adjcurDegree - 1);
+                        }
+                        if(nextDegree > 0) {
+                            adjdegrees.put(next, nextDegree - 1);
+                        }
+                                                
                         if(verbose) {
-                            System.out.println("Fold#" + foldNum + ": Found. Set adjdegree of " + adjcur + " to " + adjdegrees.get(adjcur) + "," + " set adjdegree of " + next + " to " + adjdegrees.get(next) + ".");
+                            System.out.println("Fold#" + foldNum + ": Found next vertex. Set adjdegree of " + adjcur + " to " + adjdegrees.get(adjcur) + " (was " + adjcurDegree + ")" + ", set adjdegree of " + next + " to " + adjdegrees.get(next) + " (was " + nextDegree + ").");
                         }
                     }
                     else {  // not found
                         
                         if(verbose) {
-                            System.out.println("Fold#" + foldNum + ": NOT found.");
+                            System.out.println("Fold#" + foldNum + ": Did NOT find next vertex, end of path.");
                         }
                         
                         // end of the path
                         next = getVertexDegree1(adjdegrees, ccVerts);
                         if(next != null) {
+                            if(verbose) {
+                                System.out.println("Fold#" + foldNum + ": Found vertex with degree 1, it is " + next + ".");
+                            }
                             if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && adjvisited.size() > 1)) {
                                 ADJ.append(",");
                             }
@@ -303,11 +326,15 @@ public class PTGLNotations {
                         } else {
                             next = getVertexDegreeGreater1(adjdegrees, ccVerts);
                             if(next != null) {
+                                if(verbose) {
+                                    System.out.println("Fold#" + foldNum + ": Found vertex with degree GREATER 1 (z-vertex), it is " + next + " with degree " + adjdegrees.get(next) + ".");
+                                }
                                 if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && adjvisited.size() > 1)) {
                                     ADJ.append(",");
                                 }
                             }
                             else {
+                                // next is still null, this makes no sense
                                 System.err.println("ADJ notation error: could not find next vertex in circle.");
                                 System.exit(1);
                             }
@@ -327,6 +354,10 @@ public class PTGLNotations {
                         order.put(next, "-");
                     }
                     
+                    if(verbose) {
+                        System.out.println("Set order of vertex next=" + next + " to '" + order.get(next) + "'. adjcur=" + adjcur + ".");
+                    }
+                    
                     adjcur = next;
                     
                     if(tvertexList.size() < ccVerts.size()) {
@@ -338,6 +369,8 @@ public class PTGLNotations {
                     adjvisited.add(next);
                     
                 }
+                
+                resetEdgeStatus(ccVerts);
                 
                 //throw new java.lang.UnsupportedOperationException("computeLinearNotations(): Not implemented yet");
             }
@@ -365,8 +398,10 @@ public class PTGLNotations {
         for(int i = 0; i < vertices.size(); i++) {
             if(degrees.get(vertices.get(i)) > 0) {
                 if(verbose) {
-                    System.out.println("isFinished(): No, degree of vertex #" + i + ", which is " + vertices.get(i) + ", is " + degrees.get(vertices.get(i)) + ". All degrees >0: " + IO.hashMapValuesGreater0ToString(degrees) + ".");
+                    //System.out.println("isFinished(): No, degree of vertex #" + i + ", which is " + vertices.get(i) + ", is " + degrees.get(vertices.get(i)) + ". All degrees >0: " + IO.hashMapValuesGreater0ToString(degrees) + ".");
+                    System.out.println("isFinished(): No, degree of vertex #" + i + ", which is " + vertices.get(i) + ", is " + degrees.get(vertices.get(i)) + ". All degrees >0: " + IO.hashMapValuesGreater0OfKeysToString(degrees, vertices) + ".");
                 }
+                
                 return false;
             }
         }
@@ -381,7 +416,7 @@ public class PTGLNotations {
      * @return the first vertex with degree 1 from the list, or null if the list contains no such vertex
      */
     private Integer getVertexDegree1(HashMap<Integer, Integer> degrees, List<Integer> vertices) {            
-        Collections.sort(vertices);
+        //Collections.sort(vertices);
         for(int i = 0; i < vertices.size(); i++) {
             if(degrees.get(vertices.get(i)) == 1) {
                 return vertices.get(i);
@@ -398,7 +433,7 @@ public class PTGLNotations {
      * @return the first vertex with degree greater 1 from the list, or null if the list contains no such vertex
      */
     private Integer getVertexDegreeGreater1(HashMap<Integer, Integer> degrees, List<Integer> vertices) {            
-        Collections.sort(vertices);
+        //Collections.sort(vertices);
         for(int i = 0; i < vertices.size(); i++) {
             if(degrees.get(vertices.get(i)) > 1) {
                 return vertices.get(i);
@@ -407,11 +442,37 @@ public class PTGLNotations {
         return null;
     }
     
+    
+    /**
+     * Sets the edge status of all the edges of all vertices in the list to STATUS_NOT_VISITED.
+     * @param verts a list of vertices. All edges adjacent to these vertices will be affected.
+     */
     private void resetEdgeStatus(List<Integer> verts) {
+        setEdgeStatusOfVerticesTo(verts, PTGLNotations.STATUS_NOT_VISITED);
+    }
+    
+    
+    /**
+     * Sets the edge status (visited / not yet visited) of all the edges of all vertices in the list to the given
+     * status.
+     * @param verts a list of vertices. All edges adjacent to these vertices will be affected.
+     * @param status the status to set. Use the constants PTGLNotations.STATUS_*
+     */
+    private void setEdgeStatusOfVerticesTo(List<Integer> verts, String status) {
+        Integer left, right;
         for(Integer v : verts) {
-            TODO: continue
+            List<Integer> neighbors = g.neighborsOf(v);
+            for(Integer neighbor : neighbors) {
+                left = v;
+                right = neighbor;
+                if(left > right) {
+                    left = neighbor; right = v;
+                }
+                g.setEdgeAttribute(left, right, PTGLNotations.EDGE_ATTRIBUTE_STATUS, status);
+            }
         }
     }
+    
     
     /**
      * Testing main only
