@@ -380,7 +380,14 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 				#print "degrees: \n";print_hash(\%adjdegrees); print "\n";
 				print "visited: ";print_array(sort{$a<=>$b} keys(%adjvisited));print "\n" if $verbose;
 			}			
-		}	
+		}
+		
+		my $fi = isFinished(\%adjdegrees,\@vs);
+		if($fi) {
+		  print "FINSHED\n";
+		} else {
+		  print "NOT FINISHED\n";
+		}
 
 		# reset the attrbutes
 		resetEdgeStatus(@vs);

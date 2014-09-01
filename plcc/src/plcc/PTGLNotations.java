@@ -164,8 +164,7 @@ public class PTGLNotations {
                 //       This is in line 207 of the Perl script.
                 HashMap<Integer, String> order = new HashMap<>();
                 
-                /** This stores the position of vertex in the list. it is useless in our case, but the original implementation needed it because 
-                 vertex n was stored at position (n+1) in the list. That is, the first spot in the list was empty. */
+                /** This stores the position of vertex in the list. */
                 HashMap<Integer, Integer> pos = new HashMap<>();
                 
                 pos.put(cur, 0);    // this is 'pos.put(cur, 1)' in the orginal Perl script
@@ -219,9 +218,9 @@ public class PTGLNotations {
                 String edgeType = "";   // what should we init this to? It seems undef in the Perl script.
                 Boolean foundNextVertex = false;
                 order.put(adjcur, "+");                
-                Boolean hc = hasCycle;
+                Boolean hc = hasCycle;  // we need a copy because hc gets reset later
                 Integer adjct = 0;
-                tvertex.put(adjcur, adjct + 1);
+                tvertex.put(adjcur, adjct); // tvertex.put(adjcur, adjct + 1);
                 
                 
                 // line 260 of Perl script
@@ -384,7 +383,8 @@ public class PTGLNotations {
                     if(tvertexList.size() < ccVerts.size()) {
                         adjct++;
                         tvertexList.add(adjcur);
-                        tvertex.put(adjcur, adjct + 1);
+                        //tvertex.put(adjcur, adjct + 1);
+                        tvertex.put(adjcur, adjct);
                     }
                     
                     adjvisited.add(next);
