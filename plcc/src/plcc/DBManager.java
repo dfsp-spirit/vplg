@@ -3151,4 +3151,8 @@ public class DBManager {
         return dbName;
     }
     
+    public static void writeLinearNotationToDatabase(PTGLNotationFoldResult pnfr, String pdbid, String chain, String graphType, Integer startVertexInParent) {
+        // TODO: continue here
+    }
+    
 }

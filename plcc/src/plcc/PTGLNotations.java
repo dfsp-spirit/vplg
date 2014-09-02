@@ -23,7 +23,7 @@ import java.util.Map;
 public class PTGLNotations {
     
     
-    ProtGraph g;
+    private ProtGraph g;
     public Boolean verbose;
     public Boolean adjverbose;
     public Boolean redverbose;
@@ -35,6 +35,7 @@ public class PTGLNotations {
     public static final String STATUS_NOT_VISITED = "0";
     public static final String STATUS_VISITED = "1";
     
+    private Boolean resultsComputed;
     
     List<PTGLNotationFoldResult> results;
     
@@ -80,9 +81,22 @@ public class PTGLNotations {
         this.keyverbose = false;
         this.seqverbose = false;
         
+        this.resultsComputed = false;
         this.results = new ArrayList<>();
     }
     
+    
+    /**
+     * Computes the notations only if required and returns the results.
+     * @return the computation results, i.e., the linear notations for all folds of the protein graph.
+     */
+    public List<PTGLNotationFoldResult> getResults() {
+        if(! this.resultsComputed) {
+            this.computeLinearNotations();
+        }
+        
+        return results;
+    }
     
     /**
      * Computes all PTGL linear notations for all folds.
@@ -122,7 +136,9 @@ public class PTGLNotations {
             sortedConnectedComponents.put(connComp.get(0), connComp);   // use first vertex of the CC as key
         }
         
-        System.out.println("Received " + sortedConnectedComponents.size() + " sorted vertex sets.");
+        if(verbose) {
+            System.out.println("Received " + sortedConnectedComponents.size() + " sorted vertex sets.");
+        }
         
         // need to sort entries 
         List<Integer> startVertices = new ArrayList<Integer>();
@@ -133,6 +149,7 @@ public class PTGLNotations {
         int adjstart, redstart, keystart, seqstart;
         int foldNum = 0;
         String foldName;
+        
         for(Integer i : startVertices) {
             List<Integer> ccVerts = sortedConnectedComponents.get(i);
             
@@ -143,6 +160,9 @@ public class PTGLNotations {
                 System.err.println("WARNING: Fold number " + foldNum + " of connected component exceeds available fold name characters. Setting name to non-unique string '" + foldName + "'.");
             }
             
+            PTGLNotationFoldResult pnfr = new PTGLNotationFoldResult(foldNum, foldName);
+            pnfr.graphType = g.getGraphType();
+            pnfr.verticesInParent = ccVerts;
             
             resetEdgeStatus(ccVerts);
             if(verbose) {
@@ -791,12 +811,28 @@ public class PTGLNotations {
                 System.out.println("    #" + foldNum + " SEQ: " + SEQ.toString());
             }
             
+            pnfr.redNotation = RED.toString();
+            pnfr.adjNotation = ADJ.toString();
+            pnfr.keyNotation = KEY.toString();
+            pnfr.seqNotation = SEQ.toString();
+            
+            pnfr.redStart = redstart;
+            pnfr.adjStart = adjstart;
+            pnfr.keyStart = keystart;
+            pnfr.seqStart = seqstart;
+            
+            pnfr.redSize = ccVerts.size();
+            pnfr.adjSize = ccVerts.size();
+            pnfr.keySize = ccVerts.size();
+            pnfr.seqSize = ccVerts.size();
+            
+            results.add(pnfr);
+            
             foldNum++;
         }
                 
             
-        
-       
+        this.resultsComputed = true;       
     }
     
     /**
@@ -899,8 +935,9 @@ public class PTGLNotations {
         System.out.println("Graph :\n" + sgd1.getGraphConsoleDrawing());
         
         PTGLNotations p = new PTGLNotations(g);
-        p.blare();
-        p.computeLinearNotations();
+        //p.stfu();
+        //p.blare();        
+        List<PTGLNotationFoldResult> results = p.getResults();
         
         
     }

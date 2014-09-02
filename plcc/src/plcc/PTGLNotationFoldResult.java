@@ -8,6 +8,8 @@
 
 package plcc;
 
+import java.util.List;
+
 /**
  * Stores the results of the PTGL linear notation computation for a single fold (connected component) of a protein graph.
  * @author ts
@@ -16,6 +18,9 @@ public class PTGLNotationFoldResult {
     
     private String foldName;
     private Integer foldNumber;
+    
+    public String graphType;
+    public List<Integer> verticesInParent;
     
     public String adjNotation;
     public String redNotation;
@@ -54,7 +59,10 @@ public class PTGLNotationFoldResult {
         this.adjSize = 0;
         this.redSize = 0;
         this.keySize = 0;
-        this.seqSize = 0;        
+        this.seqSize = 0;    
+        
+        this.graphType = null;
+        this.verticesInParent = null;
     }
     
     
