@@ -22,7 +22,11 @@ public class PTGLNotations {
     
     
     ProtGraph g;
-    Boolean verbose;
+    public Boolean verbose;
+    public Boolean adjverbose;
+    public Boolean redverbose;
+    public Boolean keyverbose;
+    public Boolean seqverbose;
     
     public static final String foldNames = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
     public static final String EDGE_ATTRIBUTE_STATUS = "status";
@@ -30,10 +34,25 @@ public class PTGLNotations {
     public static final String STATUS_VISITED = "1";
     
     
+    /**
+     * Disables all debug output.
+     */
+    public void stfu() {
+        this.verbose = false;
+        this.adjverbose = false;
+        this.redverbose = false;
+        this.keyverbose = false;
+        this.seqverbose = false;
+    }
+    
     
     public PTGLNotations(ProtGraph g) {
         this.g = g;
-        this.verbose = true;
+        this.verbose = false;
+        this.adjverbose = false;
+        this.redverbose = true;
+        this.keyverbose = false;
+        this.seqverbose = false;
     }
     
     
@@ -83,7 +102,9 @@ public class PTGLNotations {
         for(Integer i : startVertices) {
             List<Integer> ccVerts = sortedConnectedComponents.get(i);
             resetEdgeStatus(ccVerts);
-            System.out.println("At fold # " + foldNum + ", CC with start vertex " + i + ": " + IO.intListToString(ccVerts));
+            if(verbose) {
+                System.out.println("At fold # " + foldNum + ", CC with start vertex " + i + ": " + IO.intListToString(ccVerts));
+            }
             
             StringBuilder RED = new StringBuilder();
             StringBuilder ADJ = new StringBuilder();
@@ -131,14 +152,20 @@ public class PTGLNotations {
                 if(! isNotBifurcated) {
                     bracketStart = "{";
                     bracketEnd = "}";
-                    System.out.println("  Fold # " + foldNum + " is bifurcated.");
+                    if(verbose) {
+                        System.out.println("  Fold # " + foldNum + " is bifurcated.");
+                    }
 		} else if(g.hasCycleInVertexSet((ArrayList<Integer>) ccVerts)) {                    
                     bracketStart = "(";
                     bracketEnd = ")";
-                    System.out.println("  Fold # " + foldNum + " has a cycle.");
+                    if(verbose) {
+                        System.out.println("  Fold # " + foldNum + " has a cycle.");
+                    }
                     hasCycle = true;
 		} else {
-                    System.out.println("  Fold # " + foldNum + " is not bifurcated.");
+                    if(verbose) {
+                        System.out.println("  Fold # " + foldNum + " is not bifurcated.");
+                    }
 		}
 		
 		// write the opening bracket and for albe the type of the starting SSE
@@ -192,14 +219,16 @@ public class PTGLNotations {
                 
                 // line 230 in the Perl script
                 // ----------------------------- ADJ notation ----------------------
-                System.out.println("  #" + foldNum + " -----ADJ Notation-----");
+                if(adjverbose) {
+                    System.out.println("  #" + foldNum + " -----ADJ Notation-----");
+                }
                 Integer adjcur = cur;
                 HashSet<Integer> adjvisited = new HashSet<>();
                 
                 if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
                     String startLabel = g.getVertex(cur).getLinearNotationLabel();
                     ADJ.append(startLabel);
-                    if(verbose) {
+                    if(adjverbose) {
                         System.out.println("    Start vertex is " + cur + ", type:" + g.getVertex(cur).getPLCCSSELabel() + ", label=" + startLabel + ".");
                     }
                 }
@@ -237,7 +266,7 @@ public class PTGLNotations {
                     
                     Boolean fin = isFinished(adjdegrees, ccVerts);
                     
-                    if(verbose) {
+                    if(adjverbose) {
                         System.out.println("    Fold#" + foldNum + "  ===== At iteration #" + numIterations + ", adjcur=" + adjcur + ". adjvisited.size()=" + adjvisited.size() + ", ccVerts.size()=" + ccVerts.size() + ", finished=" + fin + ". =====");
                         System.out.println("    adjvisited (" + adjvisited.size() + " of " + ccVerts.size() + "): " + IO.hashSetToString(adjvisited));
                     }                    
@@ -246,7 +275,7 @@ public class PTGLNotations {
                     adjNeighbors = g.neighborsOf(adjcur);
                     Collections.sort(adjNeighbors);
                     
-                    if(verbose) {
+                    if(adjverbose) {
                         System.out.println("    Fold#" + foldNum + "    Neighbors of " + adjcur + ": " + IO.intListToString(adjNeighbors));
                     } 
                     
@@ -304,7 +333,7 @@ public class PTGLNotations {
                         }
                         
                         edgeType = g.getEdgeLabel(left, right);
-                        if(verbose) {
+                        if(adjverbose) {
                             System.out.println("    Fold#" + foldNum + ": Found next vertex " + next + ". Edge label is '" + edgeType + "'.");
                         }
                         
@@ -326,20 +355,20 @@ public class PTGLNotations {
                             adjdegrees.put(next, nextDegree - 1);
                         }
                                                 
-                        if(verbose) {
+                        if(adjverbose) {
                             System.out.println("    Fold#" + foldNum + ": Found next vertex. Set adjdegree of " + adjcur + " to " + adjdegrees.get(adjcur) + " (was " + adjcurDegree + ")" + ", set adjdegree of " + next + " to " + adjdegrees.get(next) + " (was " + nextDegree + ").");
                         }
                     }
                     else {  // not found
                         
-                        if(verbose) {
+                        if(adjverbose) {
                             System.out.println("    Fold#" + foldNum + ": Did NOT find next vertex, end of path.");
                         }
                         
                         // end of the path
                         next = getVertexDegree1(adjdegrees, ccVerts);
                         if(next != null) {
-                            if(verbose) {
+                            if(adjverbose) {
                                 System.out.println("    Fold#" + foldNum + ": Found vertex with degree 1, it is " + next + ".");
                             }
                             if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && adjvisited.size() > 1)) {
@@ -351,7 +380,7 @@ public class PTGLNotations {
                         } else {
                             next = getVertexDegreeGreater1(adjdegrees, ccVerts);
                             if(next != null) {
-                                if(verbose) {
+                                if(adjverbose) {
                                     System.out.println("    Fold#" + foldNum + ": Found vertex with degree GREATER 1 (z-vertex), it is " + next + " with degree " + adjdegrees.get(next) + ".");
                                 }
                                 if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && adjvisited.size() > 1)) {
@@ -379,7 +408,7 @@ public class PTGLNotations {
                         order.put(next, "-");
                     }
                     
-                    if(verbose) {
+                    if(adjverbose) {
                         System.out.println("    Set order of vertex next=" + next + " to '" + order.get(next) + "'. adjcur=" + adjcur + ".");
                     }
                     
@@ -394,7 +423,7 @@ public class PTGLNotations {
                     
                     adjvisited.add(next);
                     
-                    if(verbose) {
+                    if(adjverbose) {
                         System.out.println("    ADJ Notation so far: '" + ADJ.toString() + "'.");
                     }
                     
@@ -404,19 +433,37 @@ public class PTGLNotations {
                 
                 resetEdgeStatus(ccVerts);
                 
-                if(verbose) {
+                if(adjverbose) {
                     System.out.println("    ADJ notation done.");
                     System.out.println("    -----------------------------.");
+                }
+                
+                if(redverbose) {
+                    System.out.println("    RED notation starts");
                 }
                 
                 //throw new java.lang.UnsupportedOperationException("computeLinearNotations(): Not implemented yet");
             }
             
-            System.out.println("  #" + foldNum + ": All notations done. Overview:");
-            System.out.println("    RED: " + RED.toString());
-            System.out.println("    ADJ: " + ADJ.toString());
-            System.out.println("    KEY: " + KEY.toString());
-            System.out.println("    SEQ: " + SEQ.toString());
+            if(verbose) {
+                System.out.println("  #" + foldNum + ": All notations done. Overview:");
+            }
+            
+            if(redverbose) {
+                System.out.println("    RED: " + RED.toString());
+            }
+            
+            if(adjverbose) {
+                System.out.println("    ADJ: " + ADJ.toString());
+            }
+            
+            if(keyverbose) {
+                System.out.println("    KEY: " + KEY.toString());
+            }
+            
+            if(seqverbose) {    
+                System.out.println("    SEQ: " + SEQ.toString());
+            }
             
             foldNum++;
         }
@@ -437,7 +484,7 @@ public class PTGLNotations {
         for(int i = 0; i < vertices.size(); i++) {
             v = vertices.get(i);
             if(degrees.get(v) > 0) {
-                if(verbose) {
+                if(adjverbose) {
                     //System.out.println("  isFinished(): No, degree of vertex #" + i + ", which is " + vertices.get(i) + ", is " + degrees.get(vertices.get(i)) + ". All degrees >0: " + IO.hashMapValuesGreater0ToString(degrees) + ".");
                     System.out.println("  isFinished(): No, degree of vertex #" + i + ", which is " + v + ", is " + degrees.get(vertices.get(i)) + ". All degrees >0: " + IO.hashMapValuesGreater0OfKeysToString(degrees, vertices) + ".");
                 }                
