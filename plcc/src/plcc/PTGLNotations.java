@@ -50,8 +50,8 @@ public class PTGLNotations {
         this.g = g;
         this.verbose = false;
         this.adjverbose = false;
-        this.redverbose = true;
-        this.keyverbose = false;
+        this.redverbose = false;
+        this.keyverbose = true;
         this.seqverbose = false;
     }
     
@@ -610,15 +610,101 @@ public class PTGLNotations {
                     
                 }
                 
-                RED.append(bracketEnd);
-                    
-                resetEdgeStatus(ccVerts);
+                RED.append(bracketEnd);                                    
 
                 if(redverbose) {
                     System.out.println("    RED notation done.");
                     System.out.println("    -----------------------------.");
                 }
+                
+                resetEdgeStatus(ccVerts);
+                
+                //#########################################################################
+                //############################### KEY #####################################
+                //#########################################################################
+                
+                if(keyverbose) {
+                    System.out.println("    KEY notation starts for fold  #" + foldNum + ".");
+                }
+                
+                if(isNotBifurcated) {
+                    Integer keycur = cur;
+                    HashSet<Integer> keyvisited = new HashSet<>();
+                    
+                    List<Integer> keyorder = new ArrayList<>();
+                    keyorder.addAll(tvertex.keySet());
+                    Collections.sort(keyorder);
+                    
+                    List<Integer> keypos = new ArrayList<>();
+                    keypos.addAll(pos.keySet());
+                    Collections.sort(keypos);
+                    
+                    keystart = tvertex.get(keypos.get(0));
+                    
+                    if(keyverbose) {
+                        System.out.println("    KEY starts. keyorder=" + IO.intListToString(keyorder) + ".");
+                        System.out.println("      keypos=" + IO.intListToString(keypos) + ".");
+                        System.out.println("      tvertex=" + IO.hashMapToString(tvertex) + ".");
+                    }
+                    
+                    if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
+                        KEY.append(g.getVertex(keypos.get(0)).getLinearNotationLabel());
+                    }
+                    
+                    int dist;
+                    Integer u, v, tu, tv;
+                    for(int k = 1; k < keypos.size(); k++) {
+                        u = keypos.get(i);
+                        v = keypos.get(i-1);
+                        tu = tvertex.get(u);
+                        tv = tvertex.get(v);
+                        dist = tu - tv;
+                        
+                        if(keyverbose) {
+                            System.out.println("      u=" + u + ", v=" + v + ", tu=" + tu + ", tv=" + tv + ", dist(tu,tv)=" + dist + ".");
+                        }
+                        
+                        if((k==1 && g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || (k > 1))) {
+                            KEY.append(",");
+                        }
+                        
+                        KEY.append(dist);
+                        
+                        Integer posi = keypos.get(i);
+                        Integer posiminus1 = keypos.get(i-1);
+                        String order_posi = order.get(posi);
+                        String order_posiminus1 = order.get(posiminus1);
+                        
+                        if(keyverbose) {
+                            System.out.println("posi=" + posi + ", posimines1=" + posiminus1 + ", order_posi=" + order_posi + ", order_posiminus1=" + order_posiminus1 + ".");
+                        }
+                        
+                        if(order_posiminus1.equals(order_posi)) {
+                            KEY.append("x");
+                        }
+                        
+                        if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
+                            KEY.append(g.getVertex(ccVerts.get(k)).getLinearNotationLabel());
+                        }
+                    }
+                    
+                    KEY.append(bracketEnd);
+                    // KEY done
+                }
+                else {
+                    if(keyverbose) {
+                        System.out.println("    No KEY notation available, vertex set bifurcated.");
+                        KEY.setLength(0);   // erase all contents in it so far -- this includes the starting bracket which has already been set
+                    }
+                }
                                 
+                if(keyverbose) {
+                    System.out.println("    KEY notation done.");
+                    System.out.println("    -----------------------------.");
+                }
+                
+                
+                
                 //throw new java.lang.UnsupportedOperationException("computeLinearNotations(): Not implemented yet");
             }
             
@@ -627,19 +713,19 @@ public class PTGLNotations {
             }
             
             if(redverbose) {
-                System.out.println("    RED: " + RED.toString());
+                System.out.println("    #" + foldNum + " RED: " + RED.toString());
             }
             
             if(adjverbose) {
-                System.out.println("    ADJ: " + ADJ.toString());
+                System.out.println("    #" + foldNum + " ADJ: " + ADJ.toString());
             }
             
             if(keyverbose) {
-                System.out.println("    KEY: " + KEY.toString());
+                System.out.println("    #" + foldNum + " KEY: " + KEY.toString());
             }
             
             if(seqverbose) {    
-                System.out.println("    SEQ: " + SEQ.toString());
+                System.out.println("    #" + foldNum + " SEQ: " + SEQ.toString());
             }
             
             foldNum++;
