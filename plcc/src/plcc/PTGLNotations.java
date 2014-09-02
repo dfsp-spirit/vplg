@@ -196,10 +196,10 @@ public class PTGLNotations {
                 //       This is in line 207 of the Perl script.
                 HashMap<Integer, String> order = new HashMap<>();
                 
-                /** This stores the position of vertex in the list. */
+                /** This stores the position of vertex in the list for the RED notation. */
                 HashMap<Integer, Integer> pos = new HashMap<>();
                 
-                pos.put(cur, 0);    // this is 'pos.put(cur, 1)' in the orginal Perl script
+                pos.put(cur, 1);    // this is 'pos.put(cur, 1)' in the orginal Perl script
                 
                 // check where to begin: the first vertex with degree 1 in the CC
                 Boolean deg1found = false;
@@ -210,12 +210,16 @@ public class PTGLNotations {
                         cur = ccVerts.get(j);
                         deg1found = true;
                     }
-                    pos.put(ccVerts.get(j), j); // this is 'pos.put(ccVerts.get(j), j+1)' in the orginal Perl script
+                    pos.put(ccVerts.get(j), j+1); // this is 'pos.put(ccVerts.get(j), j+1)' in the orginal Perl script
                 }
                 
                 if(verbose) {
                     System.out.println("  pos: " + IO.hashMapToString(pos));
                 }
+                
+                //#########################################################################
+                //############################### ADJ #####################################
+                //#########################################################################
                 
                 // line 230 in the Perl script
                 // ----------------------------- ADJ notation ----------------------
@@ -438,10 +442,183 @@ public class PTGLNotations {
                     System.out.println("    -----------------------------.");
                 }
                 
+                //#########################################################################
+                //############################### RED #####################################
+                //#########################################################################
+                
                 if(redverbose) {
                     System.out.println("    RED notation starts");
                 }
                 
+                Integer redcur = cur;
+                HashSet<Integer> redvisited = new HashSet<>();
+                
+                if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
+                    RED.append(g.getVertex(redcur).getLinearNotationLabel());
+                }
+                                                
+                redstart = pos.get(redcur);
+                redvisited.add(redcur);
+                
+                if(redverbose) {
+                    System.out.println("    Start vertex is " + redcur + ", pos(recur)=" + redstart + ".");
+                }
+                
+                HashMap<Integer, Integer> reddegrees = new HashMap<>();
+                for(Integer key : degrees.keySet()) {
+                    reddegrees.put(key, degrees.get(key));
+                }
+                
+                hc = hasCycle;
+                foundNextVertex = false;
+                
+                while( ! isFinished(reddegrees, ccVerts) || (hc && redvisited.size() <= ccVerts.size())) {
+                    
+                    List<Integer> redNeighbors = g.neighborsOf(redcur);
+                    Collections.sort(redNeighbors);
+                    
+                    foundNextVertex = false;
+                    next = -1;
+                    
+                    Integer redv;
+                    for(int k = 0; k < redNeighbors.size(); k++) {
+                        
+                        redv = redNeighbors.get(k);
+                        
+                        left = redcur;
+                        right = redv;
+                        
+                        if(left > right) {
+                            left = redv;
+                            right = redcur;
+                        }
+                        
+                        // close cycle
+                        if(hc && redvisited.size() == ccVerts.size()) {                            
+                            foundNextVertex = true;
+                            next = redv;
+                            hc = false;                            
+                            if(redverbose) {
+                                System.out.println("    Cycle closed: Found next vertex " + next + ".");
+                            }
+                        }
+                        
+                        
+                                                                        
+                        String edgeStatus = g.getEdgeAttribute(left, right, PTGLNotations.EDGE_ATTRIBUTE_STATUS);
+                        if(edgeStatus != null) {
+                            if(edgeStatus.equals(PTGLNotations.STATUS_VISITED)) {
+                                continue;
+                            }
+                        }
+                        
+                        if(reddegrees.get(redv) <= 0) {
+                            continue;
+                        }
+                        
+                        if(! foundNextVertex) {
+                            next = redv;
+                            foundNextVertex = true;
+                            if(redverbose) {
+                                System.out.println("    No next set yet, setting next vertex to " + next + ".");
+                            }
+                            break;
+                        }
+                    }
+                    
+                    if(foundNextVertex) {
+                        left = redcur;
+                        right = next;
+                        
+                        if(left > right) {
+                            left = next;
+                            right = redcur;
+                        }
+                        
+                        edgeType = g.getEdgeLabel(left, right);
+                        if(redverbose) {
+                            System.out.println("    Fold#" + foldNum + ": Found next vertex " + next + ". Edge label is '" + edgeType + "'.");
+                        }
+                        
+                        if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && adjvisited.size() > 1)) {
+                            RED.append(",");
+                        }
+                        
+                        RED.append(pos.get(next) - pos.get(redcur)).append(edgeType.toLowerCase());
+                        
+                        g.setEdgeAttribute(left, right, PTGLNotations.EDGE_ATTRIBUTE_STATUS, PTGLNotations.STATUS_VISITED);
+                        
+                        Integer redcurDegree = reddegrees.get(redcur);
+                        Integer nextDegree = reddegrees.get(next);
+                        
+                        if(redcurDegree > 0) {
+                            reddegrees.put(redcur, redcurDegree - 1);
+                        }
+                        if(nextDegree > 0) {
+                            reddegrees.put(next, nextDegree - 1);
+                        }
+                                                
+                        if(redverbose) {
+                            System.out.println("    Fold#" + foldNum + ": Found next vertex. Set reddegree of " + redcur + " to " + reddegrees.get(redcur) + " (was " + redcurDegree + ")" + ", set reddegree of " + next + " to " + reddegrees.get(next) + " (was " + nextDegree + ").");
+                        }
+                    }
+                    else {  // not found
+                        
+                        if(redverbose) {
+                            System.out.println("    Fold#" + foldNum + ": Did NOT find next vertex, end of path.");
+                        }
+                        
+                        // end of the path
+                        next = getVertexDegree1(reddegrees, ccVerts);
+                        if(next != null) {
+                            if(redverbose) {
+                                System.out.println("    Fold#" + foldNum + ": Found vertex with degree 1, it is " + next + ".");
+                            }
+                            if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && redvisited.size() > 1)) {
+                                RED.append(",");
+                            }
+                            
+                            RED.append((pos.get(next) - pos.get(redcur)) + "z");
+                            
+                        } else {
+                            next = getVertexDegreeGreater1(reddegrees, ccVerts);
+                            if(next != null) {
+                                if(redverbose) {
+                                    System.out.println("    Fold#" + foldNum + ": Found vertex with degree GREATER 1 (z-vertex), it is " + next + " with degree " + reddegrees.get(next) + ".");
+                                }
+                                
+                                if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && adjvisited.size() > 1)) {
+                                    RED.append(",");
+                                }
+                                
+                                RED.append((pos.get(next) - pos.get(redcur)) + "z");
+                            }
+                            else {
+                                // next is still null, this makes no sense
+                                System.err.println("    RED notation error: could not find next vertex in circle.");
+                                System.exit(1);
+                            }
+                        }
+                    }
+                    
+                    if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
+                        RED.append(g.getVertex(next).getLinearNotationLabel());
+                    }
+                    
+                    redcur = next;
+                    redvisited.add(next);
+                    
+                }
+                
+                RED.append(bracketEnd);
+                    
+                resetEdgeStatus(ccVerts);
+
+                if(redverbose) {
+                    System.out.println("    RED notation done.");
+                    System.out.println("    -----------------------------.");
+                }
+                                
                 //throw new java.lang.UnsupportedOperationException("computeLinearNotations(): Not implemented yet");
             }
             
