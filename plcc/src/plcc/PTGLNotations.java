@@ -45,13 +45,24 @@ public class PTGLNotations {
         this.seqverbose = false;
     }
     
+    /**
+     * Enables all debug output.
+     */
+    public void blare() {
+        this.verbose = true;
+        this.adjverbose = true;
+        this.redverbose = true;
+        this.keyverbose = true;
+        this.seqverbose = true;
+    }
+    
     
     public PTGLNotations(ProtGraph g) {
         this.g = g;
         this.verbose = false;
         this.adjverbose = false;
         this.redverbose = false;
-        this.keyverbose = true;
+        this.keyverbose = false;
         this.seqverbose = false;
     }
     
@@ -703,9 +714,29 @@ public class PTGLNotations {
                     System.out.println("    -----------------------------.");
                 }
                 
+                //#########################################################################
+                //############################### SEQ #####################################
+                //#########################################################################
                 
+                for(int k = 1; k < ccVerts.size(); k++) {
+                    if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && k > 1)) {
+                        SEQ.append(",");
+                    }
+                    
+                    int dist = Math.abs(ccVerts.get(k) - ccVerts.get(k-1));
+                    SEQ.append(dist);
+                    
+                    if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
+                        SEQ.append(g.getVertex(ccVerts.get(k)).getLinearNotationLabel());
+                    }                    
+                }
                 
-                //throw new java.lang.UnsupportedOperationException("computeLinearNotations(): Not implemented yet");
+                SEQ.append(bracketEnd);
+                
+                if(seqverbose) {
+                    System.out.println("    SEQ notation done.");
+                    System.out.println("    -----------------------------.");
+                }                
             }
             
             if(verbose) {
@@ -836,6 +867,7 @@ public class PTGLNotations {
         System.out.println("Graph :\n" + sgd1.getGraphConsoleDrawing());
         
         PTGLNotations p = new PTGLNotations(g);
+        p.blare();
         p.computeLinearNotations();
         
         
