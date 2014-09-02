@@ -1,7 +1,9 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This file is part of the Visualization of Protein Ligand Graphs (VPLG) software package.
+ *
+ * Copyright Tim Schäfer 2012. VPLG is free software, see the LICENSE and README files for details.
+ *
+ * @author ts
  */
 
 package plcc;
@@ -34,6 +36,8 @@ public class PTGLNotations {
     public static final String STATUS_VISITED = "1";
     
     
+    List<PTGLNotationFoldResult> results;
+    
     /**
      * Disables all debug output.
      */
@@ -57,17 +61,35 @@ public class PTGLNotations {
     }
     
     
+    /**
+     * Inits the class with the protein graph it should work on. Atm, the only supported graph types are albe, alpha and beta.
+     * @param g the protein graph. Supported graph types are albe, alpha and beta.
+     */
     public PTGLNotations(ProtGraph g) {
+        
+        String gt = g.getGraphType();
+        if( ! gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALPHA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_BETA)) {
+            System.err.println("ERROR: PTGLNotations: Graph type not supported. Please provide an alpha, beta or albe graph.");
+            System.exit(1);
+        }
+        
         this.g = g;
         this.verbose = false;
         this.adjverbose = false;
         this.redverbose = false;
         this.keyverbose = false;
         this.seqverbose = false;
+        
+        this.results = new ArrayList<>();
     }
     
     
+    /**
+     * Computes all PTGL linear notations for all folds.
+     */
     public void computeLinearNotations() {                        
+        
+        this.results = new ArrayList<>();
         
         // prepare the data we need
         List<FoldingGraph> foldingGraphs = g.getConnectedComponents();
@@ -110,8 +132,18 @@ public class PTGLNotations {
         // OK, start the linear notation computation
         int adjstart, redstart, keystart, seqstart;
         int foldNum = 0;
+        String foldName;
         for(Integer i : startVertices) {
             List<Integer> ccVerts = sortedConnectedComponents.get(i);
+            
+            if(foldNum <= foldNames.length() - 1) {
+                foldName = "" + foldNames.charAt(foldNum);
+            } else {
+                foldName = "0";     // the last name in the foldNames list
+                System.err.println("WARNING: Fold number " + foldNum + " of connected component exceeds available fold name characters. Setting name to non-unique string '" + foldName + "'.");
+            }
+            
+            
             resetEdgeStatus(ccVerts);
             if(verbose) {
                 System.out.println("At fold # " + foldNum + ", CC with start vertex " + i + ": " + IO.intListToString(ccVerts));
