@@ -400,6 +400,8 @@ public class PTGLNotations {
                     
                 }
                 
+                ADJ.append(bracketEnd);
+                
                 resetEdgeStatus(ccVerts);
                 
                 if(verbose) {
@@ -410,10 +412,11 @@ public class PTGLNotations {
                 //throw new java.lang.UnsupportedOperationException("computeLinearNotations(): Not implemented yet");
             }
             
-            System.out.println("# " + foldNum + " RED: " + RED.toString());
-            System.out.println("# " + foldNum + " ADJ: " + ADJ.toString());
-            System.out.println("# " + foldNum + " KEY: " + KEY.toString());
-            System.out.println("# " + foldNum + " SEQ: " + SEQ.toString());
+            System.out.println("  #" + foldNum + ": All notations done. Overview:");
+            System.out.println("    RED: " + RED.toString());
+            System.out.println("    ADJ: " + ADJ.toString());
+            System.out.println("    KEY: " + KEY.toString());
+            System.out.println("    SEQ: " + SEQ.toString());
             
             foldNum++;
         }
