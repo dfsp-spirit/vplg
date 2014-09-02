@@ -149,6 +149,7 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 
 	# checkBifurcation
 	my $isBifurcated=isBifurcated(@vs);
+	print "bifurcated! (but may have cylce)\n" if $isBifurcated;
 
 	if (scalar(@vs)==1){
 		if($graphtype=~/albe/){
@@ -259,6 +260,7 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 		my $adjct=0;
 		$tvertex{$adjcur}=$adjct+1;
 		#print "tvertex: tvertex[$adjcur] (".$tvertex{$adjcur}.")=".$adjct+1."\n";
+		print "has circle!\n" if $hC;
 		
 		while ( !isFinished(\%adjdegrees,\@vs) or ($hC and scalar(keys(%adjvisited))<=scalar(@vs)) ) {
 			#$no++;
@@ -388,6 +390,7 @@ foreach my $s (sort{$a<=>$b} keys(%S)){
 		} else {
 		  print "NOT FINISHED\n";
 		}
+		print "num adj visited:" . scalar(keys(%adjvisited)) . " num verts in cc: " . scalar(@vs) . ".\n";
 
 		# reset the attrbutes
 		resetEdgeStatus(@vs);

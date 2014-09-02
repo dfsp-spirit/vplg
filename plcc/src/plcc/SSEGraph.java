@@ -3874,6 +3874,15 @@ E	3	3	3
         return false;
     }
     
+    /**
+     * Determines whether the set of vertices in NOT bifurcated. Function for PTGL script only.
+     * @param vertexIndices the vertex set to check, vertices are given by their index in the vertex list of this graph
+     * @return true if NOT bifurcated, false otherwise
+     */
+    public boolean vertexSetIsNotBifurcated(Collection<Integer> vertexIndices) {
+        return( ! vertexSetIsBifurcated(vertexIndices));
+    }
+    
     
     /**
      * Returns a list of the degrees of all vertices in this graph.
