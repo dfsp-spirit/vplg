@@ -86,7 +86,9 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
 
     
 
-    
+    public void computeConnectedComponents() {
+        computeConnectedComponents(false);
+    }
     
     
     
@@ -99,6 +101,12 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
      * if you set this to true, the results are NOT the connected components of the parent graph anymore.
      */
     public void computeConnectedComponents(boolean includeADJandSEQvertices) {
+        
+        if(includeADJandSEQvertices) {
+            DP.getInstance().e("ProtGraph", "computeConnectedComponents(): including ADJ and SEQ vertices is depracated and should not be used anymore.");
+            System.exit(1);
+        }
+        
         ArrayList<FoldingGraph> conComps = new ArrayList<FoldingGraph>();
 
         // If the list of SSEs is empty, there are no connected components

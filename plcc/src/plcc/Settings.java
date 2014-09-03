@@ -224,6 +224,8 @@ public class Settings {
         defSet("plcc_B_output_compgraph_kavosh", "false", "Whether to save computed detailed complex graphs (including SSE info) to text files in Kavosh format.");
         defSet("plcc_B_output_compgraph_eld", "false", "Whether to save computed detailed complex graphs (including SSE info) to text files in edge list format with a vertex type list file.");
         defSet("plcc_B_output_compgraph_plcc", "false", "Whether to save computed detailed complex graphs (including SSE info) to text files in PLCC format.");
+        defSet("plcc_B_output_fg_linear_notations_to_file", "true", "Whether to save computed PTGL linear notations of folding graphs to a text file.");
+        
         
         defSet("plcc_S_graph_metadata_splitstring", "|", "The field separator used when writing meta data to exported graphs.");
         defSet("plcc_B_add_metadata_comments_GML", "false", "Whether to add meta data to exported GML format graphs in comments. Not all programs parse comments correctly.");

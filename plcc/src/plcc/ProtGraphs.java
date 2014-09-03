@@ -789,6 +789,7 @@ public class ProtGraphs {
      */
     public static void setFoldingGraphNumbers(List<FoldingGraph> foldingGraphs) {
         
+        // the comparator sorts by index of left-most vertex in parent graph
         Collections.sort(foldingGraphs, new FoldingGraphComparator());
         
         for(int i = 0; i< foldingGraphs.size(); i++) {
@@ -796,6 +797,12 @@ public class ProtGraphs {
         }
     }
     
+    
+    /**
+     * Generates a protein graph that has the same vertices and edges as the 7TIM chain A albe graph. Used for
+     * testing in main() functions. Under the SSE level, the graph is incomplete, it has no proper atoms with coords.
+     * @return a fake albe protein graph of 7TIM chain A
+     */
     public static ProtGraph generate_7tim_A_albe() {
         
         int numVerts = 21;

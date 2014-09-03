@@ -1071,7 +1071,16 @@ public class FoldingGraph extends SSEGraph {
         //}        
     }
     
+    /**
+     * Set the folding graph number based on the vertex position in the parent graph. See the FoldingGraphComparator class for details on the ordering to use.
+     * @param i the number to set.
+     */
     public void setFoldingGraphNumber(Integer i) { this.foldingGraphNumber = i; }
+    
+    /**
+     * Returns the folding graph number based on the vertex position in the parent graph. See the FoldingGraphComparator class for details on the ordering to use.
+     * @return the folding graph number based on the vertex position in the parent graph. See the FoldingGraphComparator class for details on the ordering to use.
+     */
     public Integer getFoldingGraphNumber() { return(this.foldingGraphNumber); }
     
     /**

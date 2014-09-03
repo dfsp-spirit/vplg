@@ -2346,11 +2346,17 @@ public class Main {
         
         ArrayList<FoldingGraphComputationResult> fgcs = pg.getFoldingGraphComputationResults();
         //ArrayList<FoldingGraph> ccs = pg.getConnectedComponents();
-        ArrayList<FoldingGraph> foldingGraphsREDKEY = FoldingGraphComputationResult.getFoldingGraphsREDandKEYFromFGCR(fgcs);
+        ArrayList<FoldingGraph> foldingGraphs = FoldingGraphComputationResult.getFoldingGraphsREDandKEYFromFGCR(fgcs);
+        Collections.sort(foldingGraphs, new FoldingGraphComparator());
+        
+        PTGLNotations p = new PTGLNotations(pg);
+        p.stfu();
+        List<PTGLNotationFoldResult> resultsPTGLNotations = p.getResults();
+
         
         HashMap<Integer, FoldingGraph> ccsList = new HashMap<Integer, FoldingGraph>();
-        for (int i = 0; i < foldingGraphsREDKEY.size(); i++) {
-            ccsList.put(i, foldingGraphsREDKEY.get(i));            
+        for (int i = 0; i < foldingGraphs.size(); i++) {
+            ccsList.put(i, foldingGraphs.get(i));            
         }        
         ProteinFoldingGraphResults fgRes = new ProteinFoldingGraphResults(ccsList);
         
@@ -2359,44 +2365,33 @@ public class Main {
         String fs = System.getProperty("file.separator");
 
         //System.out.println("Found " + ccs.size() + " connected components in " + graphType + " graph of chain " + c.getPdbChainID() + ".");
-        System.out.println("      --- Handling all " + foldingGraphsREDKEY.size() + " folding graphs of the " + pg.graphType + " protein graph ---");
-        for(Integer j = 0; j < foldingGraphsREDKEY.size(); j++) {
-            Integer fg_number = j + 1;
-            fg = foldingGraphsREDKEY.get(j);
+        System.out.println("      --- Handling all " + foldingGraphs.size() + " folding graphs of the " + pg.graphType + " protein graph ---");
+        for(Integer j = 0; j < foldingGraphs.size(); j++) {            
+            fg = foldingGraphs.get(j);
+            Integer fg_number = fg.getFoldingGraphNumber();
             String pdbid = fg.pdbid;
             String chain = fg.chainid;
             String gt = fg.graphType;
 
+            PTGLNotationFoldResult pnfr = resultsPTGLNotations.get(j);
+            if(!Objects.equals(pnfr.getFoldNumber(), fg_number)) {
+                DP.getInstance().e("Main", "calculateFoldingGraphsForSSEGraph(): fg_number of PTGLNotationFoldResult does not match current fg_number.");
+                System.exit(1);
+            }
+            
             if(fg.numVertices() < Settings.getInteger("plcc_I_min_fgraph_size_draw")) {
                 //System.out.println("        Ignoring folding graph #" + j + " of size " + fg.numVertices() + ", minimum size is " + Settings.getInteger("plcc_I_min_fgraph_size_draw") + ".");
                 continue;
             }
             
-            
-            writeFGGraphStrings(fg, outputDir, j);                                                        
-            
-            // test spatial ordering, not used for anything atm
-            // TODO: remove this, it's only a test and takes time
-            /*
-            if(fg.size > 0) { 
-                //System.out.println("        Testing folding graph with " + fg.size + " vertices for spatial ordering...");
-                ArrayList<Integer> spatOrder = fg.getSpatialOrderingOfVertexIndices();
-                String order;
-                if(spatOrder.size() == fg.size) {
-                    order = "        Folding graph #" + j + " with " + fg.size + " vertices has a valid linear spatial ordering: ";                                        
-                    order += " [";
-                    for(Integer s = 0; s < spatOrder.size(); s++) {
-                        order += " " + spatOrder.get(s);
-                    }
-                    order += " ]";
-                
-                    System.out.println(order);
-                    
-                    System.out.println("        Key notation is: '" + fg.getNotationKEY(true) + "'.");
-                }
+            // graph strings in GML format and others, does NOT include PTGL linear notations
+            writeFGGraphStrings(fg, outputDir, fg.getFoldingGraphNumber());
+            if(Settings.getBoolean("plcc_B_output_fg_linear_notations_to_file")) {
+                writeFGLinearNotationStrings(fg, outputDir, fg.getFoldingGraphNumber(), pnfr);
             }
-            */
             
+            // compute
+                
             // Draw all folding graphs in all notations
             //List<String> notations = Arrays.asList("KEY", "ADJ", "RED", "SEQ");
             ArrayList<String> notations = new ArrayList<String>();
@@ -2404,7 +2399,7 @@ public class Main {
             if(Settings.getBoolean("plcc_B_foldgraphtype_KEY")) { notations.add(FoldingGraph.FG_NOTATION_KEY); }
             if(Settings.getBoolean("plcc_B_foldgraphtype_ADJ")) { notations.add(FoldingGraph.FG_NOTATION_ADJ); }
             if(Settings.getBoolean("plcc_B_foldgraphtype_RED")) { notations.add(FoldingGraph.FG_NOTATION_RED); }
-            if(Settings.getBoolean("plcc_B_foldgraphtype_SEQ")) { notations.add(FoldingGraph.FG_NOTATION_SEQ); }                                                
+            if(Settings.getBoolean("plcc_B_foldgraphtype_SEQ")) { notations.add(FoldingGraph.FG_NOTATION_SEQ); }                                                            
 
             if(Settings.getBoolean("plcc_B_draw_graphs")) {
                 System.out.println("        Drawing all supported versions of folding graph #" + j + ".");
@@ -2413,11 +2408,9 @@ public class Main {
             // We may need to write the folding graph to the database
             Long fgDbId = -1L;
             if(Settings.getBoolean("plcc_B_useDB")) {   
-                
-                int vertex_num_in_parent = 1;
-                
+                                
                 try { 
-                    fgDbId = DBManager.writeFoldingGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), fg_number, FoldingGraph.getFoldNameOfFoldNumber(fg_number), vertex_num_in_parent, fg.toGraphModellingLanguageFormat(), fg.toVPLGGraphFormat(), fg.toKavoshFormat(), fg.toDOTLanguageFormat(), fg.getSSEStringSequential(), fg.containsBetaBarrel()); 
+                    fgDbId = DBManager.writeFoldingGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), fg_number, FoldingGraph.getFoldNameOfFoldNumber(fg_number), fg.getMinimalVertexIndexInParentGraph(), fg.toGraphModellingLanguageFormat(), fg.toVPLGGraphFormat(), fg.toKavoshFormat(), fg.toDOTLanguageFormat(), fg.getSSEStringSequential(), fg.containsBetaBarrel()); 
                     System.out.println("      Inserted '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB, ID=" + fgDbId + ".");
                 }
                 catch(SQLException e) { 
@@ -2443,12 +2436,12 @@ public class Main {
                 }
             }
             
-            System.out.println("        -- Handling all " + notations.size() + " notations of the " + pg.getGraphType() + " FG #" + j + "--");
-            System.out.println("          At FG #" + j + ", sizeADJSEQ=" + fg.getGraphSizeADJandSEQ() + ", sizeREDKEY=" + fg.getGraphSizeREDandKEY() + ".");
+            System.out.println("        -- Handling all " + notations.size() + " notations of the " + pg.getGraphType() + " FG #" + j + "(fg_number=" + fg_number + ")--");
+            System.out.println("          At FG #" + j + "(fg_number=" + fg_number + "), sizeADJSEQ=" + fg.getGraphSizeADJandSEQ() + ", sizeREDKEY=" + fg.getGraphSizeREDandKEY() + ".");
             for(String notation : notations) {
                 
                 // compute PTGL folding graph notation strings
-                System.out.println("          FG #" + j + " notation " + notation + " is: '" + fg.getPTGLNotation(notation) + "'");
+                System.out.println("          FG #" + j + "(fg_number=" + fg_number + ") notation " + notation + " is: '" + fg.getPTGLNotation(notation) + "'");
                 
                 
                 // draw graphs
@@ -2645,46 +2638,80 @@ public class Main {
     public static void writeFGGraphStrings(FoldingGraph fg, String outputDir, int fgNumber) {
         
         System.out.println("       *Handling folding Graph #" + fgNumber + " containing " + fg.numVertices() + " vertices and " + fg.numEdges() + " edges (" + fg.numSSEContacts() + " SSE contacts).");
-            String fs = File.separator;
-            String fileNameWithoutExtension = fg.getPdbid() + "_" + fg.getChainid() + "_" + fg.getGraphType() + "_FG_" + fgNumber;
-            String graphFormatsWritten = "";
-            Integer numFormatsWritten = 0;
-            if(Settings.getBoolean("plcc_B_output_GML")) {
-                String gmlfFile = outputDir + fs + fileNameWithoutExtension + ".gml";
-                if(IO.stringToTextFile(gmlfFile, fg.toGraphModellingLanguageFormat())) {
-                    graphFormatsWritten += "gml "; numFormatsWritten++;
-                }
+        String fs = File.separator;
+        String fileNameWithoutExtension = fg.getPdbid() + "_" + fg.getChainid() + "_" + fg.getGraphType() + "_FG_" + fgNumber;
+        String graphFormatsWritten = "";
+        Integer numFormatsWritten = 0;
+        if(Settings.getBoolean("plcc_B_output_GML")) {
+            String gmlfFile = outputDir + fs + fileNameWithoutExtension + ".gml";
+            if(IO.stringToTextFile(gmlfFile, fg.toGraphModellingLanguageFormat())) {
+                graphFormatsWritten += "gml "; numFormatsWritten++;
             }
-            if(Settings.getBoolean("plcc_B_output_TGF")) {
-                String tgfFile = outputDir + fs + fileNameWithoutExtension + ".tgf";
-                if(IO.stringToTextFile(tgfFile, fg.toTrivialGraphFormat())) {
-                    graphFormatsWritten += "tgf "; numFormatsWritten++;
-                }
+        }
+        if(Settings.getBoolean("plcc_B_output_TGF")) {
+            String tgfFile = outputDir + fs + fileNameWithoutExtension + ".tgf";
+            if(IO.stringToTextFile(tgfFile, fg.toTrivialGraphFormat())) {
+                graphFormatsWritten += "tgf "; numFormatsWritten++;
             }
-            if(Settings.getBoolean("plcc_B_output_DOT")) {
-                String dotLangFile = outputDir + fs + fileNameWithoutExtension + ".gv";
-                if(IO.stringToTextFile(dotLangFile, fg.toDOTLanguageFormat())) {
-                    graphFormatsWritten += "gv "; numFormatsWritten++;
-                }
+        }
+        if(Settings.getBoolean("plcc_B_output_DOT")) {
+            String dotLangFile = outputDir + fs + fileNameWithoutExtension + ".gv";
+            if(IO.stringToTextFile(dotLangFile, fg.toDOTLanguageFormat())) {
+                graphFormatsWritten += "gv "; numFormatsWritten++;
             }
-            if(Settings.getBoolean("plcc_B_output_kavosh")) {
-                String kavoshFile = outputDir + fs + fileNameWithoutExtension + ".kavosh";
-                if(IO.stringToTextFile(kavoshFile, fg.toKavoshFormat())) {
-                    graphFormatsWritten += "kavosh "; numFormatsWritten++;
-                }
+        }
+        if(Settings.getBoolean("plcc_B_output_kavosh")) {
+            String kavoshFile = outputDir + fs + fileNameWithoutExtension + ".kavosh";
+            if(IO.stringToTextFile(kavoshFile, fg.toKavoshFormat())) {
+                graphFormatsWritten += "kavosh "; numFormatsWritten++;
             }
-            // write the SSE info text file for the image (plcc graph format file)
-            if(Settings.getBoolean("plcc_B_output_plcc")) {
-                String plccGraphFile = outputDir + fs + fileNameWithoutExtension + ".plg";
-                if(IO.stringToTextFile(plccGraphFile, fg.toVPLGGraphFormat())) {
-                    graphFormatsWritten += "plg "; numFormatsWritten++;
-                }
-            }                                                                                    
+        }
+        // write the SSE info text file for the image (plcc graph format file)
+        if(Settings.getBoolean("plcc_B_output_plcc")) {
+            String plccGraphFile = outputDir + fs + fileNameWithoutExtension + ".plg";
+            if(IO.stringToTextFile(plccGraphFile, fg.toVPLGGraphFormat())) {
+                graphFormatsWritten += "plg "; numFormatsWritten++;
+            }
+        }                                                                                    
 
 
-            if(numFormatsWritten > 0) {
-                System.out.println("        Exported folding graph #" + fgNumber + " in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + new File(outputDir).getAbsolutePath() + fs + "'.");
-            }
+        if(numFormatsWritten > 0) {
+            System.out.println("        Exported folding graph #" + fgNumber + " in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + new File(outputDir).getAbsolutePath() + fs + "'.");
+        }
+    }
+    
+    
+    /**
+     * Writes the PTGL linear notations strings.
+     * @param fg
+     * @param outputDir
+     * @param fgNumber
+     * @param pnfr 
+     */
+    public static void writeFGLinearNotationStrings(FoldingGraph fg, String outputDir, int fgNumber, PTGLNotationFoldResult pnfr) {
+        
+        String fs = File.separator;
+        String fileNameWithoutExtension = fg.getPdbid() + "_" + fg.getChainid() + "_" + fg.getGraphType() + "_FG_" + fgNumber;
+        Integer numFormatsWritten = 0;
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("# line format is '<notation_type>:<start_vertex>:<num_sses>:<notation>'\n");
+        sb.append("ADJ:").append(pnfr.adjStart).append(":").append(pnfr.adjSize).append(":").append(pnfr.adjNotation).append("\n");
+        sb.append("RED:").append(pnfr.redStart).append(":").append(pnfr.redSize).append(":").append(pnfr.redNotation).append("\n");
+        sb.append("KEY:").append(pnfr.keyStart).append(":").append(pnfr.keySize).append(":").append(pnfr.keyNotation).append("\n");
+        sb.append("SEQ:").append(pnfr.seqStart).append(":").append(pnfr.seqSize).append(":").append(pnfr.seqNotation).append("\n");
+        
+        String linearNotationsFile = outputDir + fs + fileNameWithoutExtension + ".ptgllinnot";
+        if(IO.stringToTextFile(linearNotationsFile, sb.toString())) {
+            numFormatsWritten++;
+        }
+        
+        if(numFormatsWritten > 0) {
+            System.out.println("        Exported linear notations of " + fg.getGraphType() + " folding graph #" + fgNumber + " in PTGL format to dir '" + new File(outputDir).getAbsolutePath() + fs + "'.");
+        }
+        else {
+            System.err.println("        Could not export linear notations of " + fg.getGraphType() + " folding graph #" + fgNumber + " in PTGL format to dir '" + new File(outputDir).getAbsolutePath() + fs + "'.");
+        }
     }
     
     /**
