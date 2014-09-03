@@ -342,11 +342,20 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
             //System.out.println("  Found new connected component consisting of " + numVerticesAdded + "/" + tpg.numVertices() + " vertices and " + numEdgesAdded + "/" + tpg.numEdges() + " edges:");
             //tpg.print();
             fg.declareFoldingGraphOf(this); // Each connected component of a protein graph is a folding graph
-            fg.setFoldingGraphNumber(i);
+            fg.setFoldingGraphNumber(i);   // will be set properly for RED/KEY CCs after this computation, see below
             fg.setInfo(this.pdbid, this.chainid, this.graphType);            
             conComps.add(fg);
         }
         
+        // now set the foldingGraphNumbers (ordered by position of the left-most vertex of the CC in the parent)
+        if(! includeADJandSEQvertices) {
+            ProtGraphs.setFoldingGraphNumbers(conComps);
+        }
+        else {
+            DP.getInstance().w("ProGraph", "Cannot set proper CC foldingGraphNumbers, makes no sense with ADJ/SEQ vertices.");
+        }
+        
+        // log computation done
         if(includeADJandSEQvertices) {
             this.connectedComponentsADJSEQ = conComps;
             this.connectedComponentsComputedADJSEQ = true;

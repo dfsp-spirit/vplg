@@ -2414,8 +2414,10 @@ public class Main {
             Long fgDbId = -1L;
             if(Settings.getBoolean("plcc_B_useDB")) {   
                 
+                int vertex_num_in_parent = 1;
+                
                 try { 
-                    fgDbId = DBManager.writeFoldingGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), fg_number, fg.toGraphModellingLanguageFormat(), fg.toVPLGGraphFormat(), fg.toKavoshFormat(), fg.toDOTLanguageFormat(), fg.getNotationADJ(), fg.getNotationRED(), fg.getNotationKEY(true), fg.getNotationSEQ(), fg.getSSEStringSequential(), fg.containsBetaBarrel()); 
+                    fgDbId = DBManager.writeFoldingGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), fg_number, FoldingGraph.getFoldNameOfFoldNumber(fg_number), vertex_num_in_parent, fg.toGraphModellingLanguageFormat(), fg.toVPLGGraphFormat(), fg.toKavoshFormat(), fg.toDOTLanguageFormat(), fg.getSSEStringSequential(), fg.containsBetaBarrel()); 
                     System.out.println("      Inserted '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB, ID=" + fgDbId + ".");
                 }
                 catch(SQLException e) { 

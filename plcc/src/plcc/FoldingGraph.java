@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import javax.imageio.ImageIO;
@@ -56,6 +57,16 @@ public class FoldingGraph extends SSEGraph {
 
     /** Names for the folds (folding graphs) by index of the CC. The first CC is called 'A', the second 'B', and so on. */
     public static final String foldNames = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
+    
+    public static String getFoldNameOfFoldNumber(int fn) {
+        if(fn < foldNames.length()) {
+            return "" + foldNames.charAt(fn);
+        }
+        else {
+            DP.getInstance().w("FoldingGraph", "getFoldNameOfFoldNumber(): No unique name available for fold #" + fn + ".");
+            return "0"; // the last fold name
+        }
+    }
     
     private FoldingGraph sisterFG = null;
 
@@ -117,6 +128,7 @@ public class FoldingGraph extends SSEGraph {
         this.isForADJandSEQNotations = b;
     }
     
+    @Deprecated
     public String[] getPTGLNotationsPerl() {
         
         int ADJ = 0;    // array indices
@@ -155,6 +167,16 @@ public class FoldingGraph extends SSEGraph {
      */
     public List<Integer> getVertexIndexListInParentGraph() {
         return this.vertexIndicesInParentGraph;
+    }
+    
+    
+    /**
+     * Returns the minimum of a mapping of vertex indices in this folding graph to vertex indices in the parent PG.
+     * (See the function getVertexIndexListInParentGraph() for details.) This is used to create an ordering of the connected components of a protein graph.
+     * @return the minimum of a mapping of vertex indices in this folding graph to vertex indices in the parent PG.
+     */
+    public Integer getMinimalVertexIndexInParentGraph() {
+        return Collections.min(this.vertexIndicesInParentGraph);
     }
     
     /**
@@ -1130,6 +1152,7 @@ public class FoldingGraph extends SSEGraph {
      * @return the notation as a String or an empty string if this notation is not supported for this graph
      *
      */
+    @Deprecated
     public String getNotationKEY(Boolean forceLabelSSETypes) {               
         
         if(this.isForADJandSEQNotations) {
@@ -1220,6 +1243,7 @@ public class FoldingGraph extends SSEGraph {
      * @param notation the notation, use constants in FoldingGraph class
      * @return the PTGL FG notation string
      */
+    @Deprecated
     public String getPTGLNotation(String notation) {
         if(notation.equals(FoldingGraph.FG_NOTATION_ADJ)) {
             return this.getNotationADJ();
@@ -1282,6 +1306,7 @@ public class FoldingGraph extends SSEGraph {
      * Implements the PTGL folding graph string notation SEQ.
      * @return the SEQ notation PTGL FG string
      */
+    @Deprecated
     public String getNotationSEQ() {
         StringBuilder sb = new StringBuilder();
         
@@ -1327,19 +1352,13 @@ public class FoldingGraph extends SSEGraph {
         return sb.toString();
         
     }
-
-    
-    //TODO: continue here
-    private int determineNotationStartVertexADJ() {
-        int startIndex = -1;
-        //if(this.)
-        return startIndex;
-    }
+        
     
     /**
      * Implements PTGL FG notation RED.
      * @return the RED notation PTGL FG string
      */
+    @Deprecated
     public String getNotationRED() {               
         // TODO: mark the vertices which were already visited, use the BFS algorithm instead of sequential iteration
         if(this.isForADJandSEQNotations) {
@@ -1397,6 +1416,7 @@ public class FoldingGraph extends SSEGraph {
      * Implements PTGL FG notation.
      * @return 
      */
+    @Deprecated
     public String getNotationADJ() {
         
         if( ! this.isForADJandSEQNotations) {

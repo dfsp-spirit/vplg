@@ -783,6 +783,19 @@ public class ProtGraphs {
         return pg;
     }
     
+    /**
+     * Sets the folding graph numbers based on the vertex positions in the parent graph.
+     * @param conComps all folding graphs of the same parent protein graph
+     */
+    public static void setFoldingGraphNumbers(List<FoldingGraph> foldingGraphs) {
+        
+        Collections.sort(foldingGraphs, new FoldingGraphComparator());
+        
+        for(int i = 0; i< foldingGraphs.size(); i++) {
+            foldingGraphs.get(i).setFoldingGraphNumber(i);
+        }
+    }
+    
     public static ProtGraph generate_7tim_A_albe() {
         
         int numVerts = 21;
