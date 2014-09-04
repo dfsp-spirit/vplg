@@ -357,7 +357,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
         
         // now set the foldingGraphNumbers (ordered by position of the left-most vertex of the CC in the parent)
         if(! includeADJandSEQvertices) {
-            ProtGraphs.setFoldingGraphNumbers(conComps);
+            ProtGraphs.setFoldingGraphNumbers(conComps);    // this call also sorts the CCs
         }
         else {
             DP.getInstance().w("ProGraph", "Cannot set proper CC foldingGraphNumbers, makes no sense with ADJ/SEQ vertices.");

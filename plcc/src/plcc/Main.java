@@ -2683,10 +2683,10 @@ public class Main {
     
     /**
      * Writes the PTGL linear notations strings.
-     * @param fg
-     * @param outputDir
-     * @param fgNumber
-     * @param pnfr 
+     * @param fg the folding graph (a PG connected component)
+     * @param outputDir the output base directory
+     * @param fgNumber the number of the FG (in the parent graph connected component ordering, see FoldingGraphComparator class for details). You can use fg.getFoldingGraphNumber() to determine this.
+     * @param pnfr the PTGL linear notation result for this fold/connected component/FG. The PTGLNotations class computes this.
      */
     public static void writeFGLinearNotationStrings(FoldingGraph fg, String outputDir, int fgNumber, PTGLNotationFoldResult pnfr) {
         
@@ -2695,7 +2695,7 @@ public class Main {
         Integer numFormatsWritten = 0;
         StringBuilder sb = new StringBuilder();
         
-        sb.append("# line format is '<notation_type>:<start_vertex>:<num_sses>:<notation>'\n");
+        sb.append("# line format is '<notation_type>:<start_vertex_index_in_parent_protein_graph>:<number_of_sses_in_connected_component>:<notation_string>'\n");
         sb.append("ADJ:").append(pnfr.adjStart).append(":").append(pnfr.adjSize).append(":").append(pnfr.adjNotation).append("\n");
         sb.append("RED:").append(pnfr.redStart).append(":").append(pnfr.redSize).append(":").append(pnfr.redNotation).append("\n");
         sb.append("KEY:").append(pnfr.keyStart).append(":").append(pnfr.keySize).append(":").append(pnfr.keyNotation).append("\n");

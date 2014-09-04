@@ -1078,6 +1078,14 @@ public class FoldingGraph extends SSEGraph {
     public void setFoldingGraphNumber(Integer i) { this.foldingGraphNumber = i; }
     
     /**
+     * Returns the fold name (which depends on the folding graph number).
+     * @return the fold name (which depends on the folding graph number)
+     */
+    public String getFoldingGraphFoldName() {
+        return FoldingGraph.getFoldNameOfFoldNumber(this.foldingGraphNumber);
+    }
+    
+    /**
      * Returns the folding graph number based on the vertex position in the parent graph. See the FoldingGraphComparator class for details on the ordering to use.
      * @return the folding graph number based on the vertex position in the parent graph. See the FoldingGraphComparator class for details on the ordering to use.
      */

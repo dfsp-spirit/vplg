@@ -104,6 +104,27 @@ public class IO {
         return(true);
     }
     
+    /**
+     * Checks whether the two lists a and b contain the same values (not Integer objects!) in the same order.
+     * @param a the first list
+     * @param b the second list
+     * @return true if the two lists a and b contain the same values (not Integer objects!) in the same order, false otherwise
+     */
+    public static Boolean intListsContainsSameValuesInSameOrder(List<Integer> a, List<Integer> b) {
+        if(a.size() != b.size()) {
+            return false;
+        }
+        
+        int u, v;
+        for(int i = 0; i < a.size(); i++) {
+            u = a.get(i).intValue();
+            v = b.get(i).intValue();
+            if( u != v) {
+                return false;
+            }
+        }
+        return true;
+    }
     
     public static String intArrayToString(Integer[] in) {
         StringBuilder sb = new StringBuilder();

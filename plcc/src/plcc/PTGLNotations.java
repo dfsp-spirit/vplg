@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import tools.DP;
 
 /**
  *
@@ -99,14 +100,14 @@ public class PTGLNotations {
     }
     
     /**
-     * Computes all PTGL linear notations for all folds.
+     * Computes all PTGL linear notations for all folds. You must use the getResults() mwthod to retrieve the results.
      */
     public void computeLinearNotations() {                        
         
         this.results = new ArrayList<>();
         
         // prepare the data we need
-        List<FoldingGraph> foldingGraphs = g.getConnectedComponents();
+        List<FoldingGraph> foldingGraphs = g.getConnectedComponents();  // returns sorted list of CCs
         
         if(verbose) {
             System.out.println("Detected " + foldingGraphs.size() + " connected components.");
@@ -148,21 +149,30 @@ public class PTGLNotations {
         // OK, start the linear notation computation
         int adjstart, redstart, keystart, seqstart;
         int foldNum = 0;
-        String foldName;
         
         for(Integer i : startVertices) {
             List<Integer> ccVerts = sortedConnectedComponents.get(i);
             
-            if(foldNum <= foldNames.length() - 1) {
-                foldName = "" + foldNames.charAt(foldNum);
-            } else {
-                foldName = "0";     // the last name in the foldNames list
-                System.err.println("WARNING: Fold number " + foldNum + " of connected component exceeds available fold name characters. Setting name to non-unique string '" + foldName + "'.");
-            }
+            FoldingGraph fg = foldingGraphs.get(foldNum); // this is the correct one because they are sorted from the beginning, the g.getConnectedComponents() function returns them sorted
             
-            PTGLNotationFoldResult pnfr = new PTGLNotationFoldResult(foldNum, foldName);
-            pnfr.graphType = g.getGraphType();
-            pnfr.verticesInParent = ccVerts;
+            /*
+            boolean verifyFGIndentity = false;
+            if(verifyFGIndentity) {
+                List<Integer> fgVerts = fg.getVertexIndexListInParentGraph();
+                Collections.sort(fgVerts);
+                if( ! IO.intListsContainsSameValuesInSameOrder(fgVerts, ccVerts)) {
+                    DP.getInstance().e("PTGLNotations", "Folding graph #" + foldNum + " vertex list does not match current vertex list.");
+                    DP.getInstance().e("PTGLNotations", "fgVerts: " + IO.intListToString(fgVerts) + ".");
+                    DP.getInstance().e("PTGLNotations", "ccVerts: " + IO.intListToString(fgVerts) + ".");
+                } else {
+                    if(verbose) {
+                        System.out.println("Identitiy check for fold # " + foldNum + " OK.");
+                    }
+                }
+            } 
+            */
+                                                                
+            PTGLNotationFoldResult pnfr = new PTGLNotationFoldResult(fg);
             
             resetEdgeStatus(ccVerts);
             if(verbose) {
@@ -755,9 +765,10 @@ public class PTGLNotations {
                     // KEY done
                 }
                 else {
+                    KEY.setLength(0);   // erase all contents in it so far -- this includes the starting bracket which has already been set
                     if(keyverbose) {
                         System.out.println("    No KEY notation available, vertex set bifurcated.");
-                        KEY.setLength(0);   // erase all contents in it so far -- this includes the starting bracket which has already been set
+                        
                     }
                 }
                                 
@@ -938,6 +949,13 @@ public class PTGLNotations {
         //p.stfu();
         //p.blare();        
         List<PTGLNotationFoldResult> results = p.getResults();
+        
+        for(PTGLNotationFoldResult r : results) {
+            Main.writeFGLinearNotationStrings(r.getFoldingGraph(), ".", r.getFoldNumber(), r);
+        }
+        
+        
+        
         
         
     }
