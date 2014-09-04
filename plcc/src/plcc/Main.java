@@ -2402,10 +2402,18 @@ public class Main {
                 
                 // atm, only alpha, beta and beta FGs are supported in the database
                 if(gt.equals(ProtGraphs.GRAPHTYPE_ALPHA) || gt.equals(ProtGraphs.GRAPHTYPE_BETA) || gt.equals(ProtGraphs.GRAPHTYPE_ALBE)) {
+                    Long insertID = -1L;
                     try {
-                        DBManager.writeFoldLinearNotationsToDatabase(fg.getPdbid(), fg.getChainid(), fg.getGraphType(), fg.getFoldingGraphNumber(), pnfr);
+                        insertID = DBManager.writeFoldLinearNotationsToDatabase(fg.getPdbid(), fg.getChainid(), fg.getGraphType(), fg.getFoldingGraphNumber(), pnfr);
                     } catch (SQLException ex) {
                         DP.getInstance().e("Main", "Could not write " + fg.getGraphType() + " FG # " + fg.getFoldingGraphNumber() + " linear notations to DB: '" + ex.getMessage() + "'.");
+                    }
+                    if(insertID < 0) {
+                        DP.getInstance().e("Main", "Could not write " + fg.getGraphType() + " FG # " + fg.getFoldingGraphNumber() + " linear notations to DB, empty insert ID.");
+                        System.exit(1);
+                    }
+                    else {
+                        System.out.println("Wrote linear notations for FG to database.##############");
                     }
                 }                                
             }
@@ -2417,11 +2425,7 @@ public class Main {
             if(Settings.getBoolean("plcc_B_foldgraphtype_KEY")) { notations.add(FoldingGraph.FG_NOTATION_KEY); }
             if(Settings.getBoolean("plcc_B_foldgraphtype_ADJ")) { notations.add(FoldingGraph.FG_NOTATION_ADJ); }
             if(Settings.getBoolean("plcc_B_foldgraphtype_RED")) { notations.add(FoldingGraph.FG_NOTATION_RED); }
-            if(Settings.getBoolean("plcc_B_foldgraphtype_SEQ")) { notations.add(FoldingGraph.FG_NOTATION_SEQ); }                                                            
-
-            if(Settings.getBoolean("plcc_B_draw_graphs")) {
-                System.out.println("        Drawing all supported versions of folding graph #" + j + ".");
-            }
+            if(Settings.getBoolean("plcc_B_foldgraphtype_SEQ")) { notations.add(FoldingGraph.FG_NOTATION_SEQ); }                                                                        
             
             // We may need to write the folding graph to the database
             Long fgDbId = -1L;
@@ -2454,29 +2458,28 @@ public class Main {
                 }
             }
             
-            System.out.println("        -- Handling all " + notations.size() + " notations of the " + pg.getGraphType() + " FG #" + j + "(fg_number=" + fg_number + ")--");
-            System.out.println("          At FG #" + j + "(fg_number=" + fg_number + ").");
-            for(String notation : notations) {                                                
-                
-                // draw folding graphs
-                if(Settings.getBoolean("plcc_B_draw_folding_graphs")) {
+            // draw folding graphs            
+            if(Settings.getBoolean("plcc_B_draw_folding_graphs")) {
+                System.out.println("        -- Drawing all " + notations.size() + " notations of the " + pg.getGraphType() + " FG #" + j + "(fg_number=" + fg_number + ")--");
+                //System.out.println("          At FG #" + j + "(fg_number=" + fg_number + ").");
+                for(String notation : notations) {                                                
 
                     String fileNameWithExtension = pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + "_" + notation + ".png";
                     fgFile = outputDir + System.getProperty("file.separator") + fileNameWithExtension; //Settings.get("plcc_S_img_output_fileext");
                     if(fg.drawFoldingGraph(notation, fgFile)) {
                         System.out.println("         -Folding graph #" + j + " of the " + pg.getGraphType() + " graph of chain " + pg.getChainid() + " written to file '" + fgFile + "' in " + notation + " notation.");
-                        
+
                         // save image path to database if required
                         if(Settings.getBoolean("plcc_B_useDB")) {
-                            
+
 
                             String dbImagePath = fileNameWithExtension;
                             if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
                                 dbImagePath = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain) + fs + fileNameWithExtension;
                             }
                             //DP.getInstance().d("dbImagePath is '" + dbImagePath + "'.");                            
-                                                        
-     
+
+
                             try {
                                 DBManager.updateFoldingGraphImagePathInDB(fgDbId, DrawTools.IMAGEFORMAT.PNG, notation, dbImagePath);
                             } catch(SQLException e) {
@@ -2490,10 +2493,8 @@ public class Main {
                             System.err.println("NOTE: Could not draw notation " + notation + " of folding graph #" + j + " of the " + pg.getGraphType() + " graph of chain " + pg.getChainid() + ". (Tried to write to file '" + fgFile + "'.)");
                         }
                     }
-                }
-                else {
-                    //System.out.println("         Image output disabled, not drawing folding graph.");
-                }
+                } // notations
+                    
             }
         }    
         return fgRes;

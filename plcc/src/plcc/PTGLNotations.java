@@ -727,8 +727,8 @@ public class PTGLNotations {
                     int dist;
                     Integer u, v, tu, tv;
                     for(int k = 1; k < keypos.size(); k++) {
-                        u = keypos.get(i);
-                        v = keypos.get(i-1);
+                        u = keypos.get(k);
+                        v = keypos.get(k-1);
                         tu = tvertex.get(u);
                         tv = tvertex.get(v);
                         dist = tu - tv;
@@ -743,8 +743,8 @@ public class PTGLNotations {
                         
                         KEY.append(dist);
                         
-                        Integer posi = keypos.get(i);
-                        Integer posiminus1 = keypos.get(i-1);
+                        Integer posi = keypos.get(k);
+                        Integer posiminus1 = keypos.get(k-1);
                         String order_posi = order.get(posi);
                         String order_posiminus1 = order.get(posiminus1);
                         
