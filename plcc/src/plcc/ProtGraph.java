@@ -103,7 +103,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
     public void computeConnectedComponents(boolean includeADJandSEQvertices) {
         
         if(includeADJandSEQvertices) {
-            DP.getInstance().e("ProtGraph", "computeConnectedComponents(): including ADJ and SEQ vertices is depracated and should not be used anymore.");
+            DP.getInstance().e("ProtGraph", "computeConnectedComponents(): including ADJ and SEQ vertices is deprecated and should not be used anymore.");
             System.exit(1);
         }
         
@@ -424,6 +424,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
      * Returns the full FG computation results list, i.e., a list of FGC results. Each result contains 2 folding graphs: the ADJ/SEQ graph and the RED/KEY graph.
      * @return a list of FGC results. Each result contains 2 folding graphs: the ADJ/SEQ graph and the RED/KEY graph.
      */
+    @Deprecated
     public ArrayList<FoldingGraphComputationResult> getFoldingGraphComputationResults() {
         ArrayList<FoldingGraphComputationResult> results = new ArrayList<FoldingGraphComputationResult>();
         

@@ -1025,8 +1025,8 @@ public class DBManager {
     public static Long writeFoldingGraphToDB(String pdb_id, String chain_name, Integer graph_type, Integer fg_number, String fold_name, Integer first_vertex_position_in_parent, String graph_string_gml, String graph_string_plcc, String graph_string_kavosh, String graph_string_dotlanguage, String sse_string, Boolean containsBetaBarrel) throws SQLException {
                
         
-        if(fg_number < 1) {
-            DP.getInstance().e("writeFoldingGraphToDB", "Folding graph number must be 1 or greater, skipping.");
+        if(fg_number < 0) {
+            DP.getInstance().e("writeFoldingGraphToDB", "Folding graph number must be 0 or greater, skipping.");
             return(-1L);
         }
         

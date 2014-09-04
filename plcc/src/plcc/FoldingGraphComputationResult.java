@@ -47,6 +47,7 @@ public class FoldingGraphComputationResult {
         }
     }
 
+    /*
     public FoldingGraph getFgADJandSEQ() {
         return fgADJandSEQ;
     }
@@ -95,4 +96,5 @@ public class FoldingGraphComputationResult {
         }
         return list;
     }
+    */
 }

@@ -1260,6 +1260,7 @@ public class FoldingGraph extends SSEGraph {
      * @param notation the notation, use constants in FoldingGraph class
      * @return the PTGL FG notation string
      */
+    /*
     @Deprecated
     public String getPTGLNotation(String notation) {
         if(notation.equals(FoldingGraph.FG_NOTATION_ADJ)) {
@@ -1279,11 +1280,13 @@ public class FoldingGraph extends SSEGraph {
             return "";
         }
     }
+    */
     
     /**
      * Determines the size (i.e., number of vertices) of the ADJ/SEQ folding graph.
      * @return the size (i.e., number of vertices) of the ADJ/SEQ folding graph, or -1 if the proper FG is not set.
      */
+    /*
     public int getGraphSizeADJandSEQ() {
         if(this.isForADJandSEQNotations) {
             return this.getSize();
@@ -1298,11 +1301,13 @@ public class FoldingGraph extends SSEGraph {
             return sisterGraph.getSize();
         }        
     }
+    */
     
     /**
      * Determines the size (i.e., number of vertices) of the RED/KEY folding graph.
      * @return the size (i.e., number of vertices) of the RED/KEY folding graph, or -1 if the proper FG is not set.
      */
+    /*
     public int getGraphSizeREDandKEY() {
         if( ! this.isForADJandSEQNotations) {
             return this.getSize();
@@ -1317,12 +1322,14 @@ public class FoldingGraph extends SSEGraph {
             return sisterGraph.getSize();
         }        
     }
+    /*
     
     
     /**
      * Implements the PTGL folding graph string notation SEQ.
      * @return the SEQ notation PTGL FG string
      */
+    /*
     @Deprecated
     public String getNotationSEQ() {
         StringBuilder sb = new StringBuilder();
@@ -1369,12 +1376,13 @@ public class FoldingGraph extends SSEGraph {
         return sb.toString();
         
     }
-        
+    */  
     
     /**
      * Implements PTGL FG notation RED.
      * @return the RED notation PTGL FG string
      */
+    /*
     @Deprecated
     public String getNotationRED() {               
         // TODO: mark the vertices which were already visited, use the BFS algorithm instead of sequential iteration
@@ -1428,11 +1436,13 @@ public class FoldingGraph extends SSEGraph {
         sb.append("]");
         return sb.toString();
     }
+    */
     
     /**
      * Implements PTGL FG notation.
      * @return 
      */
+    /*
     @Deprecated
     public String getNotationADJ() {
         
@@ -1486,7 +1496,7 @@ public class FoldingGraph extends SSEGraph {
         sb.append("]");
         return sb.toString();
     }
-    
+    */
     
 
     

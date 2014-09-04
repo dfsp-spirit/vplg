@@ -70,9 +70,9 @@ public class PTGLNotations {
     public PTGLNotations(ProtGraph g) {
         
         String gt = g.getGraphType();
-        if( ! gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALPHA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_BETA)) {
-            System.err.println("ERROR: PTGLNotations: Graph type not supported. Please provide an alpha, beta or albe graph.");
-            System.exit(1);
+        if( ! (gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALPHA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_BETA))) {
+            System.err.println("ERROR: PTGLNotations: Graph type '" + gt + "' not supported. Please provide an alpha, beta or albe graph.");
+            //System.exit(1);
         }
         
         this.g = g;

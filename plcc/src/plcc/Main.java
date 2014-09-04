@@ -1666,12 +1666,12 @@ public class Main {
         pg.drawProteinGraph(imgNoExt, false, formats); 
         System.out.println("  Protein graph image written to base file '" + imgNoExt + "'.");
 
-        if(drawFoldingGraphsAsWell) {
-            calculateFoldingGraphsForSSEGraph(pg, Settings.get("plcc_S_output_dir"));
-        }        
-        else {
-            System.err.println("ERROR: Drawing of graph failed.");
-        }       
+        //if(drawFoldingGraphsAsWell) {
+        //    calculateFoldingGraphsForSSEGraph(pg, Settings.get("plcc_S_output_dir"));
+        //}        
+        //else {
+        //    System.err.println("ERROR: Drawing of graph failed.");
+        //}       
     }
     
     
@@ -1702,9 +1702,9 @@ public class Main {
         pg.drawProteinGraph(outputImgNoExt, false, formats);
         System.out.println("  Protein graph image written to base file '" + outputImgNoExt + "'.");
 
-        if(drawFoldingGraphsAsWell) {
-            calculateFoldingGraphsForSSEGraph(pg, Settings.get("plcc_S_output_dir"));
-        }
+        //if(drawFoldingGraphsAsWell) {
+        //    calculateFoldingGraphsForSSEGraph(pg, Settings.get("plcc_S_output_dir"));
+        //}
     }
 
 
@@ -2302,11 +2302,16 @@ public class Main {
                 /* ----------------------------------------------- Folding graphs ---------------------------------------------- */
 
                 if(Settings.getBoolean("plcc_B_folding_graphs")) {
-                    ProteinFoldingGraphResults fgRes = calculateFoldingGraphsForSSEGraph(pg, filePathImg);                                    
-                    pcr.addProteinFoldingGraphResults(gt, fgRes);
+                    if(gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALPHA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_BETA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
+                        System.out.println("      Computing " + gt + " folding graphs.");
+                        ProteinFoldingGraphResults fgRes = calculateFoldingGraphsForSSEGraph(pg, filePathImg);                                    
+                        pcr.addProteinFoldingGraphResults(gt, fgRes);
+                    } else {
+                        System.out.println("      Handling folding graphs, but skipping graph type '" + gt + "'.");
+                    }
                 }
                 else {
-                    //System.out.println("      Not handling folding graphs.");
+                    System.out.println("      Not handling folding graphs.");
                 }
 
                 // DEBUG: a test only, makes no sense here
@@ -2345,9 +2350,10 @@ public class Main {
     public static ProteinFoldingGraphResults calculateFoldingGraphsForSSEGraph(ProtGraph pg, String outputDir) {
         //System.out.println("Searching connected components in " + graphType + " graph of chain " + c.getPdbChainID() + ".");
         
-        ArrayList<FoldingGraphComputationResult> fgcs = pg.getFoldingGraphComputationResults();
+        //ArrayList<FoldingGraphComputationResult> fgcs = pg.getFoldingGraphComputationResults();
         //ArrayList<FoldingGraph> ccs = pg.getConnectedComponents();
-        ArrayList<FoldingGraph> foldingGraphs = FoldingGraphComputationResult.getFoldingGraphsREDandKEYFromFGCR(fgcs);
+        //ArrayList<FoldingGraph> foldingGraphs = FoldingGraphComputationResult.getFoldingGraphsREDandKEYFromFGCR(fgcs);
+        ArrayList<FoldingGraph> foldingGraphs = pg.getConnectedComponents();
         Collections.sort(foldingGraphs, new FoldingGraphComparator());
         
         PTGLNotations p = new PTGLNotations(pg);
@@ -2449,12 +2455,8 @@ public class Main {
             }
             
             System.out.println("        -- Handling all " + notations.size() + " notations of the " + pg.getGraphType() + " FG #" + j + "(fg_number=" + fg_number + ")--");
-            System.out.println("          At FG #" + j + "(fg_number=" + fg_number + "), sizeADJSEQ=" + fg.getGraphSizeADJandSEQ() + ", sizeREDKEY=" + fg.getGraphSizeREDandKEY() + ".");
-            for(String notation : notations) {
-                
-                // compute PTGL folding graph notation strings
-                System.out.println("          FG #" + j + "(fg_number=" + fg_number + ") notation " + notation + " is: '" + fg.getPTGLNotation(notation) + "'");
-                
+            System.out.println("          At FG #" + j + "(fg_number=" + fg_number + ").");
+            for(String notation : notations) {                                                
                 
                 // draw folding graphs
                 if(Settings.getBoolean("plcc_B_draw_folding_graphs")) {
