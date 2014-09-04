@@ -2387,7 +2387,7 @@ public class Main {
             }
             
             if(fg.numVertices() < Settings.getInteger("plcc_I_min_fgraph_size_draw")) {
-                System.out.println("        Ignoring folding graph #" + j + " of size " + fg.numVertices() + ", minimum size is " + Settings.getInteger("plcc_I_min_fgraph_size_draw") + ".");
+                System.out.println("          Ignoring folding graph #" + j + " of size " + fg.numVertices() + ", minimum size is " + Settings.getInteger("plcc_I_min_fgraph_size_draw") + ".");
                 continue;
             }
             
@@ -2433,7 +2433,7 @@ public class Main {
                                 
                 try { 
                     fgDbId = DBManager.writeFoldingGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), fg_number, FoldingGraph.getFoldNameOfFoldNumber(fg_number), fg.getMinimalVertexIndexInParentGraph(), fg.toGraphModellingLanguageFormat(), fg.toVPLGGraphFormat(), fg.toKavoshFormat(), fg.toDOTLanguageFormat(), fg.getSSEStringSequential(), fg.containsBetaBarrel()); 
-                    System.out.println("      Inserted '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB, ID=" + fgDbId + ".");
+                    System.out.println("        Inserted '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB, ID=" + fgDbId + ".");
                 }
                 catch(SQLException e) { 
                     DP.getInstance().e("Main", "Failed to insert '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB: '" + e.getMessage() + "'."); 
@@ -2449,7 +2449,7 @@ public class Main {
                 if(fgDbId >= 1) {
                     try {
                         int numAssigned = DBManager.assignSSEsToFoldingGraphInOrder(fg.sseList, fgDbId);
-                        System.out.println("      Assigned " + numAssigned + " SSEs to " + gt + " folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' in the DB.");
+                        System.out.println("        Assigned " + numAssigned + " SSEs to " + gt + " folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' in the DB.");
                     } catch(SQLException ex) {
                        DP.getInstance().e("Main", "Could not assign SSEs to graph in the database: '" + ex.getMessage() + "'.");
                     }
@@ -2532,7 +2532,7 @@ public class Main {
             String gt = fg.graphType;
 
             if(fg.numVertices() < Settings.getInteger("plcc_I_min_fgraph_size_draw")) {
-                //System.out.println("        Ignoring folding graph #" + j + " of size " + fg.numVertices() + ", minimum size is " + Settings.getInteger("plcc_I_min_fgraph_size_draw") + ".");
+                //System.out.println("          Ignoring folding graph #" + j + " of size " + fg.numVertices() + ", minimum size is " + Settings.getInteger("plcc_I_min_fgraph_size_draw") + ".");
                 continue;
             }
 
@@ -2574,7 +2574,7 @@ public class Main {
                 
                 try { 
                     fgDbId = DBManager.writeFoldingGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), fg_number, fg.toGraphModellingLanguageFormat(), fg.toVPLGGraphFormat(), fg.toKavoshFormat(), fg.toDOTLanguageFormat(), fg.getNotationADJ(), fg.getNotationRED(), fg.getNotationKEY(true), fg.getNotationSEQ(), fg.getSSEStringSequential(), fg.containsBetaBarrel()); 
-                    System.out.println("      Inserted '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB, ID=" + fgDbId + ".");
+                    System.out.println("        Inserted '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB, ID=" + fgDbId + ".");
                 }
                 catch(SQLException e) { 
                     DP.getInstance().e("Main", "Failed to insert '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB: '" + e.getMessage() + "'."); 
@@ -2590,7 +2590,7 @@ public class Main {
                 if(fgDbId >= 1) {
                     try {
                         int numAssigned = DBManager.assignSSEsToFoldingGraphInOrder(fg.sseList, fgDbId);
-                        System.out.println("      Assigned " + numAssigned + " SSEs to " + gt + " folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' in the DB.");
+                        System.out.println("        Assigned " + numAssigned + " SSEs to " + gt + " folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' in the DB.");
                     } catch(SQLException ex) {
                        DP.getInstance().e("Main", "Could not assign SSEs to graph in the database: '" + ex.getMessage() + "'.");
                     }
@@ -2652,7 +2652,7 @@ public class Main {
      */
     public static void writeFGGraphStrings(FoldingGraph fg, String outputDir, int fgNumber) {
         
-        System.out.println("       *Handling folding Graph #" + fgNumber + " containing " + fg.numVertices() + " vertices and " + fg.numEdges() + " edges (" + fg.numSSEContacts() + " SSE contacts).");
+        System.out.println("       *Handling " + fg.getGraphType() + " folding Graph #" + fgNumber + " containing " + fg.numVertices() + " vertices and " + fg.numEdges() + " edges (" + fg.numSSEContacts() + " SSE contacts).");
         String fs = File.separator;
         String fileNameWithoutExtension = fg.getPdbid() + "_" + fg.getChainid() + "_" + fg.getGraphType() + "_FG_" + fgNumber;
         String graphFormatsWritten = "";
