@@ -27,6 +27,7 @@ import java.nio.channels.*;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.Locale;
+import java.util.logging.Level;
 import javax.imageio.ImageIO;
 //import java.net.*;
 //import org.jgrapht.*;
@@ -2387,10 +2388,21 @@ public class Main {
             // graph strings in GML format and others, does NOT include PTGL linear notations
             writeFGGraphStrings(fg, outputDir, fg.getFoldingGraphNumber());
             if(Settings.getBoolean("plcc_B_output_fg_linear_notations_to_file")) {
-                writeFGLinearNotationStrings(fg, outputDir, fg.getFoldingGraphNumber(), pnfr);
+                writeFGLinearNotationStrings(pnfr.getFoldingGraph(), outputDir, pnfr.getFoldNumber(), pnfr);
             }
             
-            // compute
+            // we may need to write the FG linear notations to the database
+            if(Settings.getBoolean("plcc_B_useDB")) {
+                
+                // atm, only alpha, beta and beta FGs are supported in the database
+                if(gt.equals(ProtGraphs.GRAPHTYPE_ALPHA) || gt.equals(ProtGraphs.GRAPHTYPE_BETA) || gt.equals(ProtGraphs.GRAPHTYPE_ALBE)) {
+                    try {
+                        DBManager.writeFoldLinearNotationsToDatabase(fg.getPdbid(), fg.getChainid(), fg.getGraphType(), fg.getFoldingGraphNumber(), pnfr);
+                    } catch (SQLException ex) {
+                        DP.getInstance().e("Main", "Could not write " + fg.getGraphType() + " FG # " + fg.getFoldingGraphNumber() + " linear notations to DB: '" + ex.getMessage() + "'.");
+                    }
+                }                                
+            }
                 
             // Draw all folding graphs in all notations
             //List<String> notations = Arrays.asList("KEY", "ADJ", "RED", "SEQ");
@@ -2444,8 +2456,8 @@ public class Main {
                 System.out.println("          FG #" + j + "(fg_number=" + fg_number + ") notation " + notation + " is: '" + fg.getPTGLNotation(notation) + "'");
                 
                 
-                // draw graphs
-                if(Settings.getBoolean("plcc_B_draw_graphs")) {
+                // draw folding graphs
+                if(Settings.getBoolean("plcc_B_draw_folding_graphs")) {
 
                     String fileNameWithExtension = pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + "_" + notation + ".png";
                     fgFile = outputDir + System.getProperty("file.separator") + fileNameWithExtension; //Settings.get("plcc_S_img_output_fileext");

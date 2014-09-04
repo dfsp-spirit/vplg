@@ -377,6 +377,9 @@ public class DBManager {
             doDeleteQuery("DROP TABLE " + tbl_ssetypes + ";");
             doDeleteQuery("DROP TABLE " + tbl_ligand + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_nm_ligandtochain + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_fglinnot_alpha + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_fglinnot_beta + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_fglinnot_albe + " CASCADE;");
             
 
             // The indices get dropped with the tables.
@@ -1097,6 +1100,102 @@ public class DBManager {
         return(insertID);
     }
 
+    /**
+     * Writes all 4 linear notations of a single fold (connected component) to the database.
+     * @param pdb_id the PBD id
+     * @param chain_name the chain name
+     * @param graph_type the graph type string, use constants
+     * @param fg_number the fg_number of the fold, the FG knows it
+     * @param pnfr the results of computing the linear notations
+     * @return the DB id of the insert or -1 if nothing has been inserted
+     * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
+     */
+    public static Long writeFoldLinearNotationsToDatabase(String pdb_id, String chain_name, String graph_type, Integer fg_number, PTGLNotationFoldResult pnfr) throws SQLException {
+        
+        Long insertID = -1L;
+        ResultSet generatedKeys = null;        
+        
+        String linnot_table = "";
+        
+        if(graph_type.equals(ProtGraph.GRAPHTYPE_ALPHA)) {
+            linnot_table = DBManager.tbl_fglinnot_alpha;
+        }
+        else if(graph_type.equals(ProtGraph.GRAPHTYPE_BETA)) {
+            linnot_table = DBManager.tbl_fglinnot_beta;
+        }
+        else if(graph_type.equals(ProtGraph.GRAPHTYPE_ALBE)) {
+            linnot_table = DBManager.tbl_fglinnot_albe;
+        }
+        else {
+            DP.getInstance().e("DBManager", "Wrong folding graph type, writing linear notation to DB not supported.");
+            return -1L;
+        }
+        
+        
+        Long fgdbid = -1L;
+        try {
+            fgdbid = DBManager.getDBFoldingGraphID(pdb_id, chain_name, graph_type, fg_number);
+        } catch(SQLException e) {
+            DP.getInstance().e("DBManager", "Error finding folding graph: '" + e.getMessage() + "'. Cannot write linear notations.");
+            return -1L;
+        }
+        
+        if(fgdbid < 0) {
+            DP.getInstance().e("DBManager", "Could not find folding graph in DB. Cannot write linear notations.");
+            return -1L;
+        }
+        
+        PreparedStatement statement = null;
+        
+
+        String query = "INSERT INTO " + linnot_table + " (linnot_foldinggraph_id, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_key, firstvertexpos_seq) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        int affectedRows = 0;
+        
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+
+            statement.setLong(1, fgdbid);
+            statement.setString(2, pnfr.adjNotation);
+            statement.setString(3, pnfr.redNotation);
+            statement.setString(4, pnfr.keyNotation);            
+            statement.setString(5, pnfr.seqNotation);
+            statement.setInt(6, pnfr.adjStart);
+            statement.setInt(7, pnfr.redStart);
+            statement.setInt(8, pnfr.keyStart);
+            statement.setInt(9, pnfr.seqStart);
+                                
+            affectedRows = statement.executeUpdate();
+            if (affectedRows == 0) {
+                DP.getInstance().w("Inserting folding graph linear notation into DB failed, no rows affected.");
+            }
+            
+            // get DB insert id
+            generatedKeys = statement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                insertID = generatedKeys.getLong(1);
+            } else {
+                DP.getInstance().w("Inserting folding graph linear notation into DB failed, no generated key obtained.");
+            }
+            dbc.commit();
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: writeFoldLinearNotationsToDatabase: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: writeFoldLinearNotationsToDatabase: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: writeFoldLinearNotationsToDatabase: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        }
+        return(insertID);                
+    }
     
     /**
      * Determines DB field name. Name of the field that stores the path to the protein graph image in given format.
@@ -1416,6 +1515,7 @@ public class DBManager {
      * @return the number of rows affected by the SQL query
      * @throws SQLException if something goes wrong with the database
      */    
+    @Deprecated
     public static Integer updateFoldingGraphImagePathInDB(Long graphDatabaseID, IMAGEFORMAT format, String notation, String relativeImagePath) throws SQLException {
         
         PreparedStatement statement = null;
