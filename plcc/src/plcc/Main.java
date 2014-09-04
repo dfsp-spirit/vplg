@@ -2387,7 +2387,7 @@ public class Main {
             }
             
             if(fg.numVertices() < Settings.getInteger("plcc_I_min_fgraph_size_draw")) {
-                //System.out.println("        Ignoring folding graph #" + j + " of size " + fg.numVertices() + ", minimum size is " + Settings.getInteger("plcc_I_min_fgraph_size_draw") + ".");
+                System.out.println("        Ignoring folding graph #" + j + " of size " + fg.numVertices() + ", minimum size is " + Settings.getInteger("plcc_I_min_fgraph_size_draw") + ".");
                 continue;
             }
             
