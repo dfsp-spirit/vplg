@@ -466,7 +466,7 @@ public class PTGLNotations {
                             }
                             else {
                                 // next is still null, this makes no sense
-                                System.err.println("    ADJ notation error: could not find next vertex in circle.");
+                                System.err.println("ERROR: ADJ notation: could not find next vertex in path, this makes no sense.");
                                 System.exit(1);
                             }
                         }

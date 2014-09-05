@@ -1127,7 +1127,7 @@ public class DBManager {
             linnot_table = DBManager.tbl_fglinnot_albe;
         }
         else {
-            DP.getInstance().e("DBManager", "Wrong folding graph type, writing linear notation to DB not supported.");
+            DP.getInstance().e("DBManager", "Wrong folding graph type '" + graph_type + "', writing linear notation to DB not supported.");
             return -1L;
         }
         
@@ -1136,12 +1136,12 @@ public class DBManager {
         try {
             fgdbid = DBManager.getDBFoldingGraphID(pdb_id, chain_name, graph_type, fg_number);
         } catch(SQLException e) {
-            DP.getInstance().e("DBManager", "Error finding folding graph: '" + e.getMessage() + "'. Cannot write linear notations.");
+            DP.getInstance().e("DBManager", "Error finding " + pdb_id + " chain " + chain_name + " " + graph_type + " folding graph: '" + e.getMessage() + "'. Cannot write linear notations.");
             return -1L;
         }
         
         if(fgdbid < 0) {
-            DP.getInstance().e("DBManager", "Could not find folding graph in DB. Cannot write linear notations.");
+            DP.getInstance().e("DBManager", "Could not find " + pdb_id + " chain " + chain_name + " " + graph_type + " folding graph graph in DB. Cannot write linear notations.");
             return -1L;
         }
         

@@ -2395,28 +2395,7 @@ public class Main {
             writeFGGraphStrings(fg, outputDir, fg.getFoldingGraphNumber());
             if(Settings.getBoolean("plcc_B_output_fg_linear_notations_to_file")) {
                 writeFGLinearNotationStrings(pnfr.getFoldingGraph(), outputDir, pnfr.getFoldNumber(), pnfr);
-            }
-            
-            // we may need to write the FG linear notations to the database
-            if(Settings.getBoolean("plcc_B_useDB")) {
-                
-                // atm, only alpha, beta and beta FGs are supported in the database
-                if(gt.equals(ProtGraphs.GRAPHTYPE_ALPHA) || gt.equals(ProtGraphs.GRAPHTYPE_BETA) || gt.equals(ProtGraphs.GRAPHTYPE_ALBE)) {
-                    Long insertID = -1L;
-                    try {
-                        insertID = DBManager.writeFoldLinearNotationsToDatabase(fg.getPdbid(), fg.getChainid(), fg.getGraphType(), fg.getFoldingGraphNumber(), pnfr);
-                    } catch (SQLException ex) {
-                        DP.getInstance().e("Main", "Could not write " + fg.getGraphType() + " FG # " + fg.getFoldingGraphNumber() + " linear notations to DB: '" + ex.getMessage() + "'.");
-                    }
-                    if(insertID < 0) {
-                        DP.getInstance().e("Main", "Could not write " + fg.getGraphType() + " FG # " + fg.getFoldingGraphNumber() + " linear notations to DB, empty insert ID.");
-                        System.exit(1);
-                    }
-                    else {
-                        System.out.println("Wrote linear notations for FG to database.##############");
-                    }
-                }                                
-            }
+            }                        
                 
             // Draw all folding graphs in all notations
             //List<String> notations = Arrays.asList("KEY", "ADJ", "RED", "SEQ");
@@ -2456,6 +2435,28 @@ public class Main {
                 } else {
                     DP.getInstance().e("Main", "Cannot assign SSEs to folding graph #" + fg_number + ", FG not found in DB.");
                 }
+                
+                
+
+                // atm, only alpha, beta and beta FGs are supported in the database
+                if(gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALPHA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_BETA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
+                    Long insertID = -1L;
+                    try {
+                        insertID = DBManager.writeFoldLinearNotationsToDatabase(fg.getPdbid(), fg.getChainid(), fg.getGraphType(), fg.getFoldingGraphNumber(), pnfr);
+                    } catch (SQLException ex) {
+                        DP.getInstance().e("Main", "Could not write " + fg.getGraphType() + " FG # " + fg.getFoldingGraphNumber() + " linear notations to DB: '" + ex.getMessage() + "'.");
+                    }
+                    if(insertID < 0) {
+                        DP.getInstance().e("Main", "Could not write " + fg.getGraphType() + " FG # " + fg.getFoldingGraphNumber() + " linear notations to DB, empty insert ID.");                        
+                    }
+                    else {
+                        System.out.println("        Wrote PTGL linear notations for " + fg.getGraphType() + " FG # " + fg.getFoldingGraphNumber() + " to database.");
+                    }
+                }
+                else {
+                    System.out.println("        Linear notations of folding graph type '" + gt + "' not supported by database, skipping.");
+                }
+                
             }
             
             // draw folding graphs            

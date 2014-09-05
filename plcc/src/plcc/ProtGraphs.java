@@ -24,12 +24,12 @@ public class ProtGraphs {
     
     private static ObjectInputStream objectIn;
     
-    public static final Integer GRAPHTYPE_ALPHA = 1;
-    public static final Integer GRAPHTYPE_BETA = 2;
-    public static final Integer GRAPHTYPE_ALBE = 3;
-    public static final Integer GRAPHTYPE_ALPHALIG = 4;
-    public static final Integer GRAPHTYPE_BETALIG = 5;
-    public static final Integer GRAPHTYPE_ALBELIG = 6;
+    public static final Integer GRAPHTYPE_INT_ALPHA = 1;
+    public static final Integer GRAPHTYPE_INT_BETA = 2;
+    public static final Integer GRAPHTYPE_INT_ALBE = 3;
+    public static final Integer GRAPHTYPE_INT_ALPHALIG = 4;
+    public static final Integer GRAPHTYPE_INT_BETALIG = 5;
+    public static final Integer GRAPHTYPE_INT_ALBELIG = 6;
     
     public static final String GRAPHTYPE_STRING_ALPHA = "alpha";
     public static final String GRAPHTYPE_STRING_BETA = "beta";
@@ -75,12 +75,12 @@ public class ProtGraphs {
     
     
     public static Integer getGraphTypeCode(String gt) {
-        if(gt.equals("alpha")) { return(GRAPHTYPE_ALPHA); }
-        else if(gt.equals("beta")) { return(GRAPHTYPE_BETA); }
-        else if(gt.equals("albe")) { return(GRAPHTYPE_ALBE); }
-        else if(gt.equals("alphalig")) { return(GRAPHTYPE_ALPHALIG); }
-        else if(gt.equals("betalig")) { return(GRAPHTYPE_BETALIG); }
-        else if(gt.equals("albelig")) { return(GRAPHTYPE_ALBELIG); }
+        if(gt.equals("alpha")) { return(GRAPHTYPE_INT_ALPHA); }
+        else if(gt.equals("beta")) { return(GRAPHTYPE_INT_BETA); }
+        else if(gt.equals("albe")) { return(GRAPHTYPE_INT_ALBE); }
+        else if(gt.equals("alphalig")) { return(GRAPHTYPE_INT_ALPHALIG); }
+        else if(gt.equals("betalig")) { return(GRAPHTYPE_INT_BETALIG); }
+        else if(gt.equals("albelig")) { return(GRAPHTYPE_INT_ALBELIG); }
         else {
             DP.getInstance().w("ProtGraphs.getGraphTypeCode(): Graph string '" + gt + "' invalid.");
             return(-1);
@@ -94,12 +94,12 @@ public class ProtGraphs {
      * @return the common name of the graph type, e.g., "albe"
      */
     public static String getGraphTypeString(Integer codeNum) {
-        if(codeNum == GRAPHTYPE_ALPHA) { return("alpha"); }
-        else if(codeNum == GRAPHTYPE_BETA) { return("beta"); }
-        else if(codeNum == GRAPHTYPE_ALBE) { return("albe"); }
-        else if(codeNum == GRAPHTYPE_ALPHALIG) { return("alphalig"); }
-        else if(codeNum == GRAPHTYPE_BETALIG) { return("betalig"); }
-        else if(codeNum == GRAPHTYPE_ALBELIG) { return("albelig"); }
+        if(codeNum == GRAPHTYPE_INT_ALPHA) { return("alpha"); }
+        else if(codeNum == GRAPHTYPE_INT_BETA) { return("beta"); }
+        else if(codeNum == GRAPHTYPE_INT_ALBE) { return("albe"); }
+        else if(codeNum == GRAPHTYPE_INT_ALPHALIG) { return("alphalig"); }
+        else if(codeNum == GRAPHTYPE_INT_BETALIG) { return("betalig"); }
+        else if(codeNum == GRAPHTYPE_INT_ALBELIG) { return("albelig"); }
         else {
             DP.getInstance().w("ProtGraphs.getGraphTypeString(): Graph code '" + codeNum + "' invalid.");
             return("invalid_graph_type");
