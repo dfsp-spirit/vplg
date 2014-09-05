@@ -571,7 +571,25 @@ public class DBManager {
             doInsertQuery("CREATE INDEX plcc_idx_ssetofoldinggraph_fk2 ON " + tbl_nm_ssetofoldinggraph + " (foldinggraph_id);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_chaintomotif_fk1 ON " + tbl_nm_chaintomotif + " (chain_id);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_chaintomotif_fk2 ON " + tbl_nm_chaintomotif + " (motif_id);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotalpha_fk ON " + tbl_fglinnot_alpha + " (linnot_foldinggraph_id);");          // FK
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotbeta_fk ON " + tbl_fglinnot_beta + " (linnot_foldinggraph_id);");          // FK
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotalbe_fk ON " + tbl_fglinnot_albe + " (linnot_foldinggraph_id);");          // FK
             
+            // speed-up pattern op queries, e.g., WHERE ptgl_linnot_red like 'blah%'
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotalpha_search_adj ON " + tbl_fglinnot_alpha + " (ptgl_linnot_adj text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotalpha_search_red ON " + tbl_fglinnot_alpha + " (ptgl_linnot_red text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotalpha_search_seq ON " + tbl_fglinnot_alpha + " (ptgl_linnot_seq text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotalpha_search_key ON " + tbl_fglinnot_alpha + " (ptgl_linnot_key text_pattern_ops);");
+            
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotbeta_search_adj ON " + tbl_fglinnot_beta + " (ptgl_linnot_adj text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotbeta_search_red ON " + tbl_fglinnot_beta + " (ptgl_linnot_red text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotbeta_search_seq ON " + tbl_fglinnot_beta + " (ptgl_linnot_seq text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotbeta_search_key ON " + tbl_fglinnot_beta + " (ptgl_linnot_key text_pattern_ops);");
+            
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotalbe_search_adj ON " + tbl_fglinnot_albe + " (ptgl_linnot_adj text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotalbe_search_red ON " + tbl_fglinnot_albe + " (ptgl_linnot_red text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotalbe_search_seq ON " + tbl_fglinnot_albe + " (ptgl_linnot_seq text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotalbe_search_key ON " + tbl_fglinnot_albe + " (ptgl_linnot_key text_pattern_ops);");
 
             // indices on PKs get created automatically
             
