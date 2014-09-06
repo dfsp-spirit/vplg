@@ -613,7 +613,7 @@ public class PTGLNotations {
                             System.out.println("    Fold#" + foldNum + ": Found next vertex " + next + ". Edge label is '" + edgeType + "'.");
                         }
                         
-                        if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && adjvisited.size() > 1)) {
+                        if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && redvisited.size() > 1)) {
                             RED.append(",");
                         }
                         
