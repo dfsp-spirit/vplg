@@ -508,6 +508,12 @@ public class DBManager {
             doInsertQuery("COMMENT ON TABLE " + tbl_nm_ssetoproteingraph + " IS 'Assigns SSEs to protein graphs. An SSE may be part of multiple graphs, e.g., alpha, alphalig, and albe.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_nm_ssetofoldinggraph + " IS 'Assigns SSEs to folding graphs. An SSE may be part of multiple folding graphs, e.g., alpha, alphalig, and albe. It cannot be part of multiple alpha folding graphs though.';");
             
+            doInsertQuery("COMMENT ON TABLE " + tbl_ligand + " IS 'Stores information on a ligand. This is something like ICT in general.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_nm_ligandtochain + " IS 'Assigns a certain ligand to a protein chain, meaning that the chain contains a ligand of that type.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_nm_chaintomotif + " IS 'Assigns a certain motif to a protein chain, meaning that the chain contains that motif.';");
+            
+            doInsertQuery("COMMENT ON TABLE " + tbl_motif + " IS 'Stores information on a specific protein motif, e.g., globin fold.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_motiftype + " IS 'Stores information on a motif type, e.g., alpha motif or beta motif.';");
             
             doInsertQuery("COMMENT ON TABLE " + tbl_ssetypes + " IS 'Stores the names of the SSE types, e.g., 1=helix.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_contacttypes + " IS 'Stores the names of the contact types, e.g., 1=mixed.';");
