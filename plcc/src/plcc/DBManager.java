@@ -72,10 +72,11 @@ public class DBManager {
     static String tbl_fglinnot_beta = "plcc_fglinnot_beta";
     
     /** Name of the table which stores the PTGL linear notation of a folding graph. */
-    static String tbl_fglinnot_albe = "plcc_fglinnot_albe";
+    static String tbl_fglinnot_albe = "plcc_fglinnot_albe";        
     
     static String view_ssecontacts = "plcc_view_ssetype_contacts";
     static String view_graphs = "plcc_view_graphs";
+    static String view_foldinggraphs = "plcc_view_foldinggraphs";
 
     /**
      * Sets the database address and the credentials to access the DB.
@@ -489,9 +490,12 @@ public class DBManager {
             
             // create views
             doInsertQuery("CREATE VIEW " + view_ssecontacts + " AS SELECT contact_id, least(sse1_type, sse2_type) sse1_type, greatest(sse1_type, sse2_type) sse2_type, sse1_lig_name, sse2_lig_name  FROM (SELECT k.contact_id, sse1.sse_type AS sse1_type, sse2.sse_type AS sse2_type, sse1.lig_name AS sse1_lig_name, sse2.lig_name AS sse2_lig_name FROM " + tbl_ssecontact + " k LEFT JOIN " + tbl_sse + " sse1 ON k.sse1=sse1.sse_id LEFT JOIN " + tbl_sse + " sse2 ON k.sse2=sse2.sse_id) foo;");
-            doInsertQuery("CREATE VIEW " + view_graphs + " AS SELECT graph_id, pdb_id, chain_name, graph_type, graph_string_gml FROM (SELECT k.graph_id, k.graph_type, k.graph_string_gml, chain.chain_name AS chain_name, chain.pdb_id AS pdb_id FROM " + tbl_proteingraph + " k LEFT JOIN " + tbl_chain + " chain ON k.chain_id=chain.chain_id) bar;");
+            doInsertQuery("CREATE VIEW " + view_graphs + " AS SELECT graph_id, pdb_id, chain_name, graphtype_text, graph_string_gml, sse_string, graph_containsbetabarrel FROM (SELECT k.graph_id, gt.graphtype_text, k.graph_string_gml, k.sse_string, k.graph_containsbetabarrel, chain.chain_name AS chain_name, chain.pdb_id AS pdb_id FROM " + tbl_proteingraph + " k LEFT JOIN " + tbl_chain + " chain ON k.chain_id=chain.chain_id LEFT JOIN " + tbl_graphtypes + " gt ON k.graph_type=gt.graphtype_id) bar;");
+            doInsertQuery("CREATE VIEW " + view_foldinggraphs + " AS SELECT foldinggraph_id, parent_graph_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, sse_string, graph_containsbetabarrel FROM (SELECT fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM " + tbl_foldinggraph + " fg LEFT JOIN " + tbl_proteingraph + " pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN " + tbl_chain + " c ON pg.chain_id=c.chain_id LEFT JOIN " + tbl_graphtypes + " gt ON pg.graph_type=gt.graphtype_id) bar;");
+            
             doInsertQuery("COMMENT ON VIEW " + view_ssecontacts + " IS 'Easy overview of SSE contacts.';");
             doInsertQuery("COMMENT ON VIEW " + view_graphs + " IS 'Easy overview of graph information.';");
+            doInsertQuery("COMMENT ON VIEW " + view_foldinggraphs + " IS 'Easy overview of folding graph information.';");
             
             // add comments for tables
             doInsertQuery("COMMENT ON TABLE " + tbl_protein + " IS 'Stores information on a whole PDB file.';");
