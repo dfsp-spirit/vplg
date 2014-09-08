@@ -3510,8 +3510,7 @@ E	3	3	3
             gmlf.append(startNode).append("\n");
             gmlf.append("    id ").append(i).append("\n");
             gmlf.append("    label \"").append(i).append("-").append(vertex.getSseType()).append("\"\n");
-            gmlf.append("    num_in_chain ").append(vertex.getSSESeqChainNum()).append("\n");
-            gmlf.append("    sse_type \"").append(vertex.getSseType()).append("\"\n");
+            gmlf.append("    num_in_chain ").append(vertex.getSSESeqChainNum()).append("\n");            
             gmlf.append("    num_residues ").append(vertex.getLength()).append("\n");
             
             gmlf.append("    pdb_res_start \"").append(vertex.getStartPdbResID()).append("\"\n");
@@ -3528,9 +3527,7 @@ E	3	3	3
                 gmlf.append("    lig_name \"").append(vertex.getLigandName3()).append("\"\n");
             }
             
-            //gmlf += "    pdb_id \"" + this.pdbid + "\"\n";
-            //gmlf += "    chain_id \"" + this.chainid + "\"\n";
-            //gmlf += "    graph_type \"" + this.graphType + "\"\n";
+            gmlf.append("    sse_type \"").append(vertex.getSseType()).append("\"\n");
             
             gmlf.append(endNode).append("\n");
         }
