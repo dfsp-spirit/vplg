@@ -74,12 +74,24 @@ public class DBManager {
     /** Name of the table which stores the PTGL linear notation of a folding graph. */
     static String tbl_fglinnot_albe = "plcc_fglinnot_albe";        
     
+    /** Name of the table which stores the PTGL linear notation of a folding graph. */
+    static String tbl_fglinnot_alphalig = "plcc_fglinnot_alphalig";
+    
+    /** Name of the table which stores the PTGL linear notation of a folding graph. */
+    static String tbl_fglinnot_betalig = "plcc_fglinnot_betalig";
+    
+    /** Name of the table which stores the PTGL linear notation of a folding graph. */
+    static String tbl_fglinnot_albelig = "plcc_fglinnot_albelig";        
+    
     static String view_ssecontacts = "plcc_view_ssetype_contacts";
     static String view_graphs = "plcc_view_graphs";
     static String view_foldinggraphs = "plcc_view_foldinggraphs";
     static String view_fglinnotsalpha = "plcc_view_fglinnotsalpha";
     static String view_fglinnotsbeta = "plcc_view_fglinnotsbeta";
     static String view_fglinnotsalbe = "plcc_view_fglinnotsalbe";
+    static String view_fglinnotsalphalig = "plcc_view_fglinnotsalphalig";
+    static String view_fglinnotsbetalig = "plcc_view_fglinnotsbetalig";
+    static String view_fglinnotsalbelig = "plcc_view_fglinnotsalbelig";
 
     /**
      * Sets the database address and the credentials to access the DB.
@@ -384,6 +396,9 @@ public class DBManager {
             doDeleteQuery("DROP TABLE " + tbl_fglinnot_alpha + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_fglinnot_beta + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_fglinnot_albe + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_fglinnot_alphalig + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_fglinnot_betalig + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_fglinnot_albelig + " CASCADE;");
             
 
             // The indices get dropped with the tables.
@@ -475,6 +490,9 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_fglinnot_alpha + " (linnotalpha_id serial primary key, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text);");
             doInsertQuery("CREATE TABLE " + tbl_fglinnot_beta + " (linnotbeta_id serial primary key, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text);");
             doInsertQuery("CREATE TABLE " + tbl_fglinnot_albe + " (linnotalbe_id serial primary key, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text);");
+            doInsertQuery("CREATE TABLE " + tbl_fglinnot_alphalig + " (linnotalphalig_id serial primary key, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text);");
+            doInsertQuery("CREATE TABLE " + tbl_fglinnot_betalig + " (linnotbetalig_id serial primary key, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text);");
+            doInsertQuery("CREATE TABLE " + tbl_fglinnot_albelig + " (linnotalbelig_id serial primary key, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text);");
 
             // set constraints
             doInsertQuery("ALTER TABLE " + tbl_protein + " ADD CONSTRAINT constr_protein_uniq UNIQUE (pdb_id);");
@@ -490,6 +508,9 @@ public class DBManager {
             doInsertQuery("ALTER TABLE " + tbl_fglinnot_alpha + " ADD CONSTRAINT constr_fglinnotalpha_uniq UNIQUE (linnot_foldinggraph_id);");
             doInsertQuery("ALTER TABLE " + tbl_fglinnot_beta + " ADD CONSTRAINT constr_fglinnotbeta_uniq UNIQUE (linnot_foldinggraph_id);");
             doInsertQuery("ALTER TABLE " + tbl_fglinnot_albe + " ADD CONSTRAINT constr_fglinnotalbe_uniq UNIQUE (linnot_foldinggraph_id);");
+            doInsertQuery("ALTER TABLE " + tbl_fglinnot_alphalig + " ADD CONSTRAINT constr_fglinnotalphalig_uniq UNIQUE (linnot_foldinggraph_id);");
+            doInsertQuery("ALTER TABLE " + tbl_fglinnot_betalig + " ADD CONSTRAINT constr_fglinnotbetalig_uniq UNIQUE (linnot_foldinggraph_id);");
+            doInsertQuery("ALTER TABLE " + tbl_fglinnot_albelig + " ADD CONSTRAINT constr_fglinnotalbelig_uniq UNIQUE (linnot_foldinggraph_id);");
             
             // create views
             doInsertQuery("CREATE VIEW " + view_ssecontacts + " AS SELECT contact_id, least(sse1_type, sse2_type) sse1_type, greatest(sse1_type, sse2_type) sse2_type, sse1_lig_name, sse2_lig_name  FROM (SELECT k.contact_id, sse1.sse_type AS sse1_type, sse2.sse_type AS sse2_type, sse1.lig_name AS sse1_lig_name, sse2.lig_name AS sse2_lig_name FROM " + tbl_ssecontact + " k LEFT JOIN " + tbl_sse + " sse1 ON k.sse1=sse1.sse_id LEFT JOIN " + tbl_sse + " sse2 ON k.sse2=sse2.sse_id) foo;");
@@ -499,6 +520,9 @@ public class DBManager {
             doInsertQuery("CREATE VIEW " + view_fglinnotsalpha + " AS SELECT linnotalpha_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key FROM (SELECT la.linnotalpha_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM " + tbl_fglinnot_alpha + " la LEFT JOIN " + tbl_foldinggraph + " fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN " + tbl_proteingraph + " pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN " + tbl_chain + " c ON pg.chain_id=c.chain_id LEFT JOIN " + tbl_graphtypes + " gt ON pg.graph_type=gt.graphtype_id) bar ;");
             doInsertQuery("CREATE VIEW " + view_fglinnotsbeta + " AS SELECT linnotbeta_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key FROM (SELECT la.linnotbeta_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM " + tbl_fglinnot_beta + " la LEFT JOIN " + tbl_foldinggraph + " fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN " + tbl_proteingraph + " pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN " + tbl_chain + " c ON pg.chain_id=c.chain_id LEFT JOIN " + tbl_graphtypes + " gt ON pg.graph_type=gt.graphtype_id) bar ;");
             doInsertQuery("CREATE VIEW " + view_fglinnotsalbe + " AS SELECT linnotalbe_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key FROM (SELECT la.linnotalbe_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM " + tbl_fglinnot_albe + " la LEFT JOIN " + tbl_foldinggraph + " fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN " + tbl_proteingraph + " pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN " + tbl_chain + " c ON pg.chain_id=c.chain_id LEFT JOIN " + tbl_graphtypes + " gt ON pg.graph_type=gt.graphtype_id) bar ;");
+            doInsertQuery("CREATE VIEW " + view_fglinnotsalphalig + " AS SELECT linnotalphalig_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key FROM (SELECT la.linnotalphalig_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM " + tbl_fglinnot_alphalig + " la LEFT JOIN " + tbl_foldinggraph + " fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN " + tbl_proteingraph + " pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN " + tbl_chain + " c ON pg.chain_id=c.chain_id LEFT JOIN " + tbl_graphtypes + " gt ON pg.graph_type=gt.graphtype_id) bar ;");
+            doInsertQuery("CREATE VIEW " + view_fglinnotsbetalig + " AS SELECT linnotbetalig_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key FROM (SELECT la.linnotbetalig_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM " + tbl_fglinnot_betalig + " la LEFT JOIN " + tbl_foldinggraph + " fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN " + tbl_proteingraph + " pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN " + tbl_chain + " c ON pg.chain_id=c.chain_id LEFT JOIN " + tbl_graphtypes + " gt ON pg.graph_type=gt.graphtype_id) bar ;");
+            doInsertQuery("CREATE VIEW " + view_fglinnotsalbelig + " AS SELECT linnotalbelig_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key FROM (SELECT la.linnotalbelig_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM " + tbl_fglinnot_albelig + " la LEFT JOIN " + tbl_foldinggraph + " fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN " + tbl_proteingraph + " pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN " + tbl_chain + " c ON pg.chain_id=c.chain_id LEFT JOIN " + tbl_graphtypes + " gt ON pg.graph_type=gt.graphtype_id) bar ;");
             
             // add comments on views
             doInsertQuery("COMMENT ON VIEW " + view_ssecontacts + " IS 'Easy overview of SSE contacts.';");
@@ -508,6 +532,9 @@ public class DBManager {
             doInsertQuery("COMMENT ON VIEW " + view_fglinnotsalpha + " IS 'Overview of alpha linear notation information, includes the PDB ID, chain name, graph type and fold number.';");
             doInsertQuery("COMMENT ON VIEW " + view_fglinnotsbeta + " IS 'Overview of beta linear notation information, includes the PDB ID, chain name, graph type and fold number.';");
             doInsertQuery("COMMENT ON VIEW " + view_fglinnotsalbe + " IS 'Overview of albe linear notation information, includes the PDB ID, chain name, graph type and fold number.';");
+            doInsertQuery("COMMENT ON VIEW " + view_fglinnotsalphalig + " IS 'Overview of alphalig linear notation information, includes the PDB ID, chain name, graph type and fold number.';");
+            doInsertQuery("COMMENT ON VIEW " + view_fglinnotsbetalig + " IS 'Overview of betalig linear notation information, includes the PDB ID, chain name, graph type and fold number.';");
+            doInsertQuery("COMMENT ON VIEW " + view_fglinnotsalbelig + " IS 'Overview of albelig linear notation information, includes the PDB ID, chain name, graph type and fold number.';");
             
             // add comments for tables
             doInsertQuery("COMMENT ON TABLE " + tbl_protein + " IS 'Stores information on a whole PDB file.';");
@@ -538,6 +565,9 @@ public class DBManager {
             doInsertQuery("COMMENT ON TABLE " + tbl_fglinnot_alpha + " IS 'Stores the PTGL linear notation strings ADJ, RED, KEY and SEQ for a single fold of some alpha protein graph. Also stores file system paths to graph images.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_fglinnot_beta + " IS 'Stores the PTGL linear notation strings ADJ, RED, KEY and SEQ for a single fold of some beta protein graph. Also stores file system paths to graph images.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_fglinnot_albe + " IS 'Stores the PTGL linear notation strings ADJ, RED, KEY and SEQ for a single fold of some albe protein graph. Also stores file system paths to graph images.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_fglinnot_alphalig + " IS 'Stores the PTGL linear notation strings ADJ, RED, KEY and SEQ for a single fold of some alphalig protein graph. Also stores file system paths to graph images.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_fglinnot_betalig + " IS 'Stores the PTGL linear notation strings ADJ, RED, KEY and SEQ for a single fold of some betalig protein graph. Also stores file system paths to graph images.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_fglinnot_albelig + " IS 'Stores the PTGL linear notation strings ADJ, RED, KEY and SEQ for a single fold of some albelig protein graph. Also stores file system paths to graph images.';");
             
             
             // add comments for specific fields
@@ -596,6 +626,9 @@ public class DBManager {
             doInsertQuery("CREATE INDEX plcc_idx_fglinnotalpha_fk ON " + tbl_fglinnot_alpha + " (linnot_foldinggraph_id);");          // FK
             doInsertQuery("CREATE INDEX plcc_idx_fglinnotbeta_fk ON " + tbl_fglinnot_beta + " (linnot_foldinggraph_id);");          // FK
             doInsertQuery("CREATE INDEX plcc_idx_fglinnotalbe_fk ON " + tbl_fglinnot_albe + " (linnot_foldinggraph_id);");          // FK
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotalphalig_fk ON " + tbl_fglinnot_alphalig + " (linnot_foldinggraph_id);");          // FK
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotbetalig_fk ON " + tbl_fglinnot_betalig + " (linnot_foldinggraph_id);");          // FK
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotalbelig_fk ON " + tbl_fglinnot_albelig + " (linnot_foldinggraph_id);");          // FK
             
             // speed-up pattern op queries, e.g., WHERE ptgl_linnot_red like 'blah%'
             doInsertQuery("CREATE INDEX plcc_idx_fglinnotalpha_search_adj ON " + tbl_fglinnot_alpha + " (ptgl_linnot_adj text_pattern_ops);");
@@ -612,6 +645,21 @@ public class DBManager {
             doInsertQuery("CREATE INDEX plcc_idx_fglinnotalbe_search_red ON " + tbl_fglinnot_albe + " (ptgl_linnot_red text_pattern_ops);");
             doInsertQuery("CREATE INDEX plcc_idx_fglinnotalbe_search_seq ON " + tbl_fglinnot_albe + " (ptgl_linnot_seq text_pattern_ops);");
             doInsertQuery("CREATE INDEX plcc_idx_fglinnotalbe_search_key ON " + tbl_fglinnot_albe + " (ptgl_linnot_key text_pattern_ops);");
+            
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotalphalig_search_adj ON " + tbl_fglinnot_alphalig + " (ptgl_linnot_adj text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotalphalig_search_red ON " + tbl_fglinnot_alphalig + " (ptgl_linnot_red text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotalphalig_search_seq ON " + tbl_fglinnot_alphalig + " (ptgl_linnot_seq text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotalphalig_search_key ON " + tbl_fglinnot_alphalig + " (ptgl_linnot_key text_pattern_ops);");
+            
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotbetalig_search_adj ON " + tbl_fglinnot_betalig + " (ptgl_linnot_adj text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotbetalig_search_red ON " + tbl_fglinnot_betalig + " (ptgl_linnot_red text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotbetalig_search_seq ON " + tbl_fglinnot_betalig + " (ptgl_linnot_seq text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotbetalig_search_key ON " + tbl_fglinnot_betalig + " (ptgl_linnot_key text_pattern_ops);");
+            
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotalbelig_search_adj ON " + tbl_fglinnot_albelig + " (ptgl_linnot_adj text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotalbelig_search_red ON " + tbl_fglinnot_albelig + " (ptgl_linnot_red text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotalbelig_search_seq ON " + tbl_fglinnot_albelig + " (ptgl_linnot_seq text_pattern_ops);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnotalbelig_search_key ON " + tbl_fglinnot_albelig + " (ptgl_linnot_key text_pattern_ops);");
 
             // indices on PKs get created automatically
             
@@ -1165,6 +1213,15 @@ public class DBManager {
         }
         else if(graph_type.equals(ProtGraph.GRAPHTYPE_ALBE)) {
             linnot_table = DBManager.tbl_fglinnot_albe;
+        }
+        else if(graph_type.equals(ProtGraph.GRAPHTYPE_ALPHALIG)) {
+            linnot_table = DBManager.tbl_fglinnot_alphalig;
+        }
+        else if(graph_type.equals(ProtGraph.GRAPHTYPE_BETALIG)) {
+            linnot_table = DBManager.tbl_fglinnot_betalig;
+        }
+        else if(graph_type.equals(ProtGraph.GRAPHTYPE_ALBELIG)) {
+            linnot_table = DBManager.tbl_fglinnot_albelig;
         }
         else {
             DP.getInstance().e("DBManager", "Wrong folding graph type '" + graph_type + "', writing linear notation to DB not supported.");
