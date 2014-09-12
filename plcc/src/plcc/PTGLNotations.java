@@ -196,8 +196,10 @@ public class PTGLNotations {
                 }
             }
             
+            Boolean hasKeyNotation;
             
             if (ccVerts.size() == 1){
+                hasKeyNotation = true;
                 ADJ.append(bracketStart);
                 RED.append(bracketStart);
                 SEQ.append(bracketStart);
@@ -700,7 +702,10 @@ public class PTGLNotations {
                     System.out.println("    KEY notation starts for fold  #" + foldNum + ".");
                 }
                 
+                
+                
                 if(isNotBifurcated) {
+                    hasKeyNotation = true;
                     Integer keycur = cur;
                     HashSet<Integer> keyvisited = new HashSet<>();
                     
@@ -765,7 +770,9 @@ public class PTGLNotations {
                     // KEY done
                 }
                 else {
+                    hasKeyNotation = false;
                     KEY.setLength(0);   // erase all contents in it so far -- this includes the starting bracket which has already been set
+                    keystart = -1;
                     if(keyverbose) {
                         System.out.println("    No KEY notation available, vertex set bifurcated.");
                         
@@ -836,6 +843,12 @@ public class PTGLNotations {
             pnfr.adjSize = ccVerts.size();
             pnfr.keySize = ccVerts.size();
             pnfr.seqSize = ccVerts.size();
+            
+            if(! hasKeyNotation) {
+                pnfr.keyNotation = null;
+                pnfr.keyStart = -1;
+                pnfr.keySize = -1;
+            }
             
             results.add(pnfr);
             

@@ -73,14 +73,18 @@ public class ProtGraphs {
     public static final String GRAPHNOTATION_KEY = "KEY";
     public static final String GRAPHNOTATION_DEF = "DEF";
     
-    
+    /**
+     * Returns the graph type integer constant (e.g., ProGraphs.GRAPHTYPE_INT_ALBE) for a graph type string constant (e.g., ProtGraphs.GRAPHTYPE_STRING_ALBE).
+     * @param gt the graph type as a string (e.g., "albe", but use the constants ProtGraphs.GRAPHTYPE_STRING_*.
+     * @return the graph type code (one of ProtGraphs.GRAPHTYPE_INT_*, or -1 if the given string graph type is invalid.)
+     */
     public static Integer getGraphTypeCode(String gt) {
-        if(gt.equals("alpha")) { return(GRAPHTYPE_INT_ALPHA); }
-        else if(gt.equals("beta")) { return(GRAPHTYPE_INT_BETA); }
-        else if(gt.equals("albe")) { return(GRAPHTYPE_INT_ALBE); }
-        else if(gt.equals("alphalig")) { return(GRAPHTYPE_INT_ALPHALIG); }
-        else if(gt.equals("betalig")) { return(GRAPHTYPE_INT_BETALIG); }
-        else if(gt.equals("albelig")) { return(GRAPHTYPE_INT_ALBELIG); }
+        if(gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALPHA)) { return(GRAPHTYPE_INT_ALPHA); }
+        else if(gt.equals(ProtGraphs.GRAPHTYPE_STRING_BETA)) { return(GRAPHTYPE_INT_BETA); }
+        else if(gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) { return(GRAPHTYPE_INT_ALBE); }
+        else if(gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALPHALIG)) { return(GRAPHTYPE_INT_ALPHALIG); }
+        else if(gt.equals(ProtGraphs.GRAPHTYPE_STRING_BETALIG)) { return(GRAPHTYPE_INT_BETALIG); }
+        else if(gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALBELIG)) { return(GRAPHTYPE_INT_ALBELIG); }
         else {
             DP.getInstance().w("ProtGraphs.getGraphTypeCode(): Graph string '" + gt + "' invalid.");
             return(-1);
