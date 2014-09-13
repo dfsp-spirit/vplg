@@ -41,7 +41,7 @@ if($DEBUG){
  */
 function get_cath_link($pdbid, $chain = null) {
 	// if no chainname is given...
-	if($chain == null) {
+	if($chain === null) {
 	  return "http://www.cathdb.info/pdb/" . $pdbid;
 	}
 	else {
@@ -63,7 +63,7 @@ function get_linnot_query_string($linnot_type, $linnot_query_string, $query_grap
 	    $tick = "";
 	}
 	
-	if(! ($linnot_type == "adj" || $linnot_type == "red" || $linnot_type == "seq" || $linnot_type == "key")) {
+	if(! ($linnot_type === "adj" || $linnot_type === "red" || $linnot_type === "seq" || $linnot_type === "key")) {
 	  return '';
 	}
 	
