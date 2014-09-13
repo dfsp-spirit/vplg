@@ -49,6 +49,38 @@ function get_cath_link($pdbid, $chain = null) {
 	}
 }
 
+/**
+  * Returns the SQL query string to get the linear notation of the requested type.
+  * @param $linnot_type the linear notation type. This is used to create the colum name and has to be 'adj', 'red', 'key' or 'seq'.
+  * @param $linnot_query_string the linear notation you are searching for (e.g., '{1h,3hp}'). You can provide a prepared statement template like '$1', but then you should set $bool_enclose_linnot_query_string_in_ticks to false.
+  * @param $query_graph_type_int the graph type. 1=alpha, 2=beta, 3=albe, 4=alphalig, 5=betalig, 6=albelig.
+  * @param $bool_enclose_linnot_query_string_in_ticks whether whether to enclose the linnot_query_string in ticks ('). The ticks must not be there if this is used in a prepared statement, where $linnot_query_string is set to something like '$3'.
+  */
+function get_linnot_query_string($linnot_type, $linnot_query_string, $query_graph_type_int, $bool_enclose_linnot_query_string_in_ticks = true) {
+    $tick = "'";
+	
+	if(! $bool_enclose_linnot_query_string_in_ticks) {
+	    $tick = "";
+	}
+	
+	if(! ($linnot_type == "adj" || $linnot_type == "red" || $linnot_type == "seq" || $linnot_type == "key")) {
+	  return '';
+	}
+	
+    $res = "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
+				   FROM plcc_fglinnot ln
+				   INNER JOIN plcc_foldinggraph fg
+				   ON ln.linnot_foldinggraph_id = fg.foldinggraph_id
+				   INNER JOIN plcc_graph pg
+				   ON fg.parent_graph_id = pg.graph_id
+				   INNER JOIN plcc_chain c
+				   ON pg.chain_id = c.chain_id
+				   INNER JOIN plcc_protein p
+				   ON p.pdb_id = c.pdb_id 
+				   WHERE ( ln.ptgl_linnot_" . $linnot_type . " = " . $tick . $linnot_query_string . $tick . " AND pg.graph_type = " . $query_graph_type_int . " )";
+				   
+    return $res;
+}
 
 if(isset($_GET["next"])) {
 	if(is_numeric($_GET["next"]) && $_GET["next"] >= 0){
@@ -60,6 +92,30 @@ if(isset($_GET["next"])) {
 		$ligandname = $_SESSION["ligandname"];
 		$molecule = $_SESSION["molecule"];
 		$logic = $_SESSION["logic"];
+		$linnotalphaadj = $_SESSION["linnotalphaadj"];
+		$linnotalphared = $_SESSION["linnotalphared"];
+		$linnotalphaseq = $_SESSION["linnotalphaseq"];
+		$linnotalphakey = $_SESSION["linnotalphakey"];
+		$linnotbetaadj = $_SESSION["linnotbetaadj"];
+		$linnotbetared = $_SESSION["linnotbetared"];
+		$linnotbetaseq = $_SESSION["linnotbetaseq"];
+		$linnotbetakey = $_SESSION["linnotbetakey"];
+		$linnotalbeadj = $_SESSION["linnotalbeadj"];
+		$linnotalbered = $_SESSION["linnotalbered"];
+		$linnotalbeseq = $_SESSION["linnotalbeseq"];
+		$linnotalbekey = $_SESSION["linnotalbekey"];
+		$linnotalphaligadj = $_SESSION["linnotalphaligadj"];
+		$linnotalphaligred = $_SESSION["linnotalphaligred"];
+		$linnotalphaligseq = $_SESSION["linnotalphaligseq"];
+		$linnotalphaligkey = $_SESSION["linnotalphaligkey"];
+		$linnotbetaligadj = $_SESSION["linnotbetaligadj"];
+		$linnotbetaligred = $_SESSION["linnotbetaligred"];
+		$linnotbetaligseq = $_SESSION["linnotbetaligseq"];
+		$linnotbetaligkey = $_SESSION["linnotbetaligkey"];
+		$linnotalbeligadj = $_SESSION["linnotalbeligadj"];
+		$linnotalbeligred = $_SESSION["linnotalbeligred"];
+		$linnotalbeligseq = $_SESSION["linnotalbeligseq"];
+		$linnotalbeligkey = $_SESSION["linnotalbeligkey"];
 		
 	} else {
 		$limit_start = 0;
@@ -113,6 +169,113 @@ if(isset($_POST)) {
 		$logic = $_POST["logic"];
 		$_SESSION["logic"] = $logic;
 	}
+	
+	if(isset($_POST["linnotalphaadj"])) {
+		$linnotalphaadj = $_POST["linnotalphaadj"];
+		$_SESSION["linnotalphaadj"] = $linnotalphaadj;
+	}
+	if(isset($_POST["linnotalphared"])) {
+		$linnotalphared = $_POST["linnotalphared"];
+		$_SESSION["linnotalphared"] = $linnotalphared;
+	}
+	if(isset($_POST["linnotalphaseq"])) {
+		$linnotalphaseq = $_POST["linnotalphaseq"];
+		$_SESSION["linnotalphaseq"] = $linnotalphaseq;
+	}
+	if(isset($_POST["linnotalphakey"])) {
+		$linnotalphakey = $_POST["linnotalphakey"];
+		$_SESSION["linnotalphakey"] = $linnotalphakey;
+	}
+	
+	if(isset($_POST["linnotbetaadj"])) {
+		$linnotbetaadj = $_POST["linnotbetaadj"];
+		$_SESSION["linnotbetaadj"] = $linnotbetaadj;
+	}
+	if(isset($_POST["linnotbetared"])) {
+		$linnotbetared = $_POST["linnotbetared"];
+		$_SESSION["linnotbetared"] = $linnotbetared;
+	}
+	if(isset($_POST["linnotbetaseq"])) {
+		$linnotbetaseq = $_POST["linnotbetaseq"];
+		$_SESSION["linnotbetaseq"] = $linnotbetaseq;
+	}
+	if(isset($_POST["linnotbetakey"])) {
+		$linnotbetakey = $_POST["linnotbetakey"];
+		$_SESSION["linnotbetakey"] = $linnotbetakey;
+	}
+	
+	if(isset($_POST["linnotalbeadj"])) {
+		$linnotalbeadj = $_POST["linnotalbeadj"];
+		$_SESSION["linnotalbeadj"] = $linnotalbeadj;
+	}
+	if(isset($_POST["linnotalbered"])) {
+		$linnotalbered = $_POST["linnotalbered"];
+		$_SESSION["linnotalbered"] = $linnotalbered;
+	}
+	if(isset($_POST["linnotalbeseq"])) {
+		$linnotalbeseq = $_POST["linnotalbeseq"];
+		$_SESSION["linnotalbeseq"] = $linnotalbeseq;
+	}
+	if(isset($_POST["linnotalbekey"])) {
+		$linnotalbekey = $_POST["linnotalbekey"];
+		$_SESSION["linnotalbekey"] = $linnotalbekey;
+	}
+	
+	// ligand versions follow:
+	
+	
+	if(isset($_POST["linnotalphaligadj"])) {
+		$linnotalphaligadj = $_POST["linnotalphaligadj"];
+		$_SESSION["linnotalphaligadj"] = $linnotalphaligadj;
+	}
+	if(isset($_POST["linnotalphaligred"])) {
+		$linnotalphaligred = $_POST["linnotalphaligred"];
+		$_SESSION["linnotalphaligred"] = $linnotalphaligred;
+	}
+	if(isset($_POST["linnotalphaligseq"])) {
+		$linnotalphaligseq = $_POST["linnotalphaligseq"];
+		$_SESSION["linnotalphaligseq"] = $linnotalphaligseq;
+	}
+	if(isset($_POST["linnotalphaligkey"])) {
+		$linnotalphaligkey = $_POST["linnotalphaligkey"];
+		$_SESSION["linnotalphaligkey"] = $linnotalphaligkey;
+	}
+	
+	if(isset($_POST["linnotbetaligadj"])) {
+		$linnotbetaligadj = $_POST["linnotbetaligadj"];
+		$_SESSION["linnotbetaligadj"] = $linnotbetaligadj;
+	}
+	if(isset($_POST["linnotbetaligred"])) {
+		$linnotbetaligred = $_POST["linnotbetaligred"];
+		$_SESSION["linnotbetaligred"] = $linnotbetaligred;
+	}
+	if(isset($_POST["linnotbetaligseq"])) {
+		$linnotbetaligseq = $_POST["linnotbetaligseq"];
+		$_SESSION["linnotbetaligseq"] = $linnotbetaligseq;
+	}
+	if(isset($_POST["linnotbetaligkey"])) {
+		$linnotbetaligkey = $_POST["linnotbetaligkey"];
+		$_SESSION["linnotbetaligkey"] = $linnotbetaligkey;
+	}
+	
+	if(isset($_POST["linnotalbeligadj"])) {
+		$linnotalbeligadj = $_POST["linnotalbeligadj"];
+		$_SESSION["linnotalbeligadj"] = $linnotalbeligadj;
+	}
+	if(isset($_POST["linnotalbeligred"])) {
+		$linnotalbeligred = $_POST["linnotalbeligred"];
+		$_SESSION["linnotalbeligred"] = $linnotalbeligred;
+	}
+	if(isset($_POST["linnotalbeligseq"])) {
+		$linnotalbeligseq = $_POST["linnotalbeligseq"];
+		$_SESSION["linnotalbeligseq"] = $linnotalbeligseq;
+	}
+	if(isset($_POST["linnotalbeligkey"])) {
+		$linnotalbeligkey = $_POST["linnotalbeligkey"];
+		$_SESSION["linnotalbeligkey"] = $linnotalbeligkey;
+	}
+	
+	
     // if(isset($_POST["proteincomplexes"])) {$proteincomplexes = $_POST["proteincomplexes"];};
 } else {
 	// if nothing is set or the query is too short...
@@ -203,7 +366,166 @@ if (($none_set == true)) { // #TODO redefine this check...
 				   INNER JOIN plcc_protein p
 				   ON p.pdb_id = c.pdb_id 
 				   WHERE c.mol_name LIKE '%".$molecule."%'";
-		$firstQuerySet = true; };
+		$firstQuerySet = true; 
+	};
+	
+	// ----- linnot alpha queries -----
+	
+	if (isset($linnotalphaadj) && $linnotalphaadj != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("adj", $linnotalphaadj, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	if (isset($linnotalphared) && $linnotalphared != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("red", $linnotalphared, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	if (isset($linnotalphaseq) && $linnotalphaseq != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("seq", $linnotalphaseq, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	if (isset($linnotalphakey) && $linnotalphakey != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("key", $linnotalphakey, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	// ----- linnot beta queries -----
+	
+	if (isset($linnotbetaadj) && $linnotbetaadj != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("adj", $linnotbetaadj, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	if (isset($linnotbetared) && $linnotbetared != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("red", $linnotbetared, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	if (isset($linnotbetaseq) && $linnotbetaseq != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("seq", $linnotbetaseq, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	if (isset($linnotbetakey) && $linnotbetakey != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("key", $linnotbetakey, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	// ----- linnot albe queries -----
+	
+	if (isset($linnotalbeadj) && $linnotalbeadj != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("adj", $linnotalbeadj, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	if (isset($linnotalbered) && $linnotalbered != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("red", $linnotalbered, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	if (isset($linnotalbeseq) && $linnotalbeseq != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("seq", $linnotalbeseq, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	if (isset($linnotalbekey) && $linnotalbekey != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("key", $linnotalbekey, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	// ----- linnot alphalig queries -----
+	
+	if (isset($linnotalphaligadj) && $linnotalphaligadj != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("adj", $linnotalphaligadj, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	if (isset($linnotalphaligred) && $linnotalphaligred != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("red", $linnotalphaligred, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	if (isset($linnotalphaligseq) && $linnotalphaligseq != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("seq", $linnotalphaligseq, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	if (isset($linnotalphaligkey) && $linnotalphaligkey != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("key", $linnotalphaligkey, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	// ----- linnot betalig queries -----
+	
+	if (isset($linnotbetaligadj) && $linnotbetaligadj != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("adj", $linnotbetaligadj, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	if (isset($linnotbetaligred) && $linnotbetaligred != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("red", $linnotbetaligred, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	if (isset($linnotbetaligseq) && $linnotbetaligseq != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("seq", $linnotbetaligseq, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	if (isset($linnotbetaligkey) && $linnotbetaligkey != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("key", $linnotbetaligkey, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	// ----- linnot albelig queries -----
+	
+	if (isset($linnotalbeligadj) && $linnotalbeligadj != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("adj", $linnotalbeligadj, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	if (isset($linnotalbeligred) && $linnotalbeligred != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("red", $linnotalbeligred, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	if (isset($linnotalbeligseq) && $linnotalbeligseq != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("seq", $linnotalbeligseq, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	if (isset($linnotalbeligkey) && $linnotalbeligkey != ""){
+		if($firstQuerySet) { $query .= " UNION "; }
+		$query .= get_linnot_query_string("key", $linnotalbeligkey, 1, true);
+		$firstQuerySet = true; 
+	};
+	
+	
 	
 	$count_query = $query . " ) results";
 	$query .= " ) results
@@ -223,7 +545,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 	$createdHeadlines = Array();
 	$numberOfChains = 0;
 
-	// beginn to create pager
+	// begin to create pager
 	$tableString = '<div id="pager">';
 	if($limit_start >= 50) {
 		$tableString .= '<a class="changepage" href="?next='.($limit_start - 50).'"><< previous </a>  ';

@@ -54,7 +54,7 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 	<div id="Home">
 		<div class="container" id="intro">
 		<!-- Intro message -->
-			The Visualization of Protein-Ligand Graphs (VPLG) provides a database of protein secondary structure topologies. It is based on protein ligand graphs computed
+			The Visualization of Protein-Ligand Graphs (VPLG) web server provides a database of protein secondary structure topologies. It is based on protein ligand graphs computed
 			by the <a href="http://www.bioinformatik.uni-frankfurt.de/tools/vplg/" target="_blank">VPLG software</a>. VPLG uses a graph-based model to describe the structure of proteins on the super-secondary structure level.
 			
 			<!--
