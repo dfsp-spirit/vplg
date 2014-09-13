@@ -399,25 +399,25 @@ if (($none_set == true)) { // #TODO redefine this check...
 	
 	if (isset($linnotbetaadj) && $linnotbetaadj != ""){
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= get_linnot_query_string("adj", $linnotbetaadj, 1, true);
+		$query .= get_linnot_query_string("adj", $linnotbetaadj, 2, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotbetared) && $linnotbetared != ""){
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= get_linnot_query_string("red", $linnotbetared, 1, true);
+		$query .= get_linnot_query_string("red", $linnotbetared, 2, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotbetaseq) && $linnotbetaseq != ""){
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= get_linnot_query_string("seq", $linnotbetaseq, 1, true);
+		$query .= get_linnot_query_string("seq", $linnotbetaseq, 2, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotbetakey) && $linnotbetakey != ""){
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= get_linnot_query_string("key", $linnotbetakey, 1, true);
+		$query .= get_linnot_query_string("key", $linnotbetakey, 2, true);
 		$firstQuerySet = true; 
 	};
 	
@@ -425,25 +425,25 @@ if (($none_set == true)) { // #TODO redefine this check...
 	
 	if (isset($linnotalbeadj) && $linnotalbeadj != ""){
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= get_linnot_query_string("adj", $linnotalbeadj, 1, true);
+		$query .= get_linnot_query_string("adj", $linnotalbeadj, 3, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalbered) && $linnotalbered != ""){
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= get_linnot_query_string("red", $linnotalbered, 1, true);
+		$query .= get_linnot_query_string("red", $linnotalbered, 3, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalbeseq) && $linnotalbeseq != ""){
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= get_linnot_query_string("seq", $linnotalbeseq, 1, true);
+		$query .= get_linnot_query_string("seq", $linnotalbeseq, 3, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalbekey) && $linnotalbekey != ""){
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= get_linnot_query_string("key", $linnotalbekey, 1, true);
+		$query .= get_linnot_query_string("key", $linnotalbekey, 3, true);
 		$firstQuerySet = true; 
 	};
 	
@@ -451,25 +451,25 @@ if (($none_set == true)) { // #TODO redefine this check...
 	
 	if (isset($linnotalphaligadj) && $linnotalphaligadj != ""){
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= get_linnot_query_string("adj", $linnotalphaligadj, 1, true);
+		$query .= get_linnot_query_string("adj", $linnotalphaligadj, 4, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalphaligred) && $linnotalphaligred != ""){
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= get_linnot_query_string("red", $linnotalphaligred, 1, true);
+		$query .= get_linnot_query_string("red", $linnotalphaligred, 4, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalphaligseq) && $linnotalphaligseq != ""){
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= get_linnot_query_string("seq", $linnotalphaligseq, 1, true);
+		$query .= get_linnot_query_string("seq", $linnotalphaligseq, 4, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalphaligkey) && $linnotalphaligkey != ""){
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= get_linnot_query_string("key", $linnotalphaligkey, 1, true);
+		$query .= get_linnot_query_string("key", $linnotalphaligkey, 4, true);
 		$firstQuerySet = true; 
 	};
 	
@@ -477,25 +477,25 @@ if (($none_set == true)) { // #TODO redefine this check...
 	
 	if (isset($linnotbetaligadj) && $linnotbetaligadj != ""){
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= get_linnot_query_string("adj", $linnotbetaligadj, 1, true);
+		$query .= get_linnot_query_string("adj", $linnotbetaligadj, 5, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotbetaligred) && $linnotbetaligred != ""){
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= get_linnot_query_string("red", $linnotbetaligred, 1, true);
+		$query .= get_linnot_query_string("red", $linnotbetaligred, 5, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotbetaligseq) && $linnotbetaligseq != ""){
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= get_linnot_query_string("seq", $linnotbetaligseq, 1, true);
+		$query .= get_linnot_query_string("seq", $linnotbetaligseq, 5, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotbetaligkey) && $linnotbetaligkey != ""){
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= get_linnot_query_string("key", $linnotbetaligkey, 1, true);
+		$query .= get_linnot_query_string("key", $linnotbetaligkey, 5, true);
 		$firstQuerySet = true; 
 	};
 	
@@ -503,25 +503,25 @@ if (($none_set == true)) { // #TODO redefine this check...
 	
 	if (isset($linnotalbeligadj) && $linnotalbeligadj != ""){
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= get_linnot_query_string("adj", $linnotalbeligadj, 1, true);
+		$query .= get_linnot_query_string("adj", $linnotalbeligadj, 6, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalbeligred) && $linnotalbeligred != ""){
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= get_linnot_query_string("red", $linnotalbeligred, 1, true);
+		$query .= get_linnot_query_string("red", $linnotalbeligred, 6, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalbeligseq) && $linnotalbeligseq != ""){
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= get_linnot_query_string("seq", $linnotalbeligseq, 1, true);
+		$query .= get_linnot_query_string("seq", $linnotalbeligseq, 6, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalbeligkey) && $linnotalbeligkey != ""){
 		if($firstQuerySet) { $query .= " UNION "; }
-		$query .= get_linnot_query_string("key", $linnotalbeligkey, 1, true);
+		$query .= get_linnot_query_string("key", $linnotalbeligkey, 6, true);
 		$firstQuerySet = true; 
 	};
 	
