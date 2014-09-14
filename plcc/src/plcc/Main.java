@@ -1607,6 +1607,8 @@ public class Main {
 
         // ****************************************************    all done    ********************************************************** //
         
+        
+        
         if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
             print_debug_malfunction_warning();            
         }
@@ -2306,6 +2308,8 @@ public class Main {
                         System.out.println("      Computing " + gt + " folding graphs.");
                         ProteinFoldingGraphResults fgRes = calculateFoldingGraphsForSSEGraph(pg, filePathImg);                                    
                         pcr.addProteinFoldingGraphResults(gt, fgRes);
+                                                
+                        
                     } else {
                         System.out.println("      Handling folding graphs, but skipping graph type '" + gt + "'.");
                     }
@@ -2326,6 +2330,16 @@ public class Main {
             
             if(! silent) {
                 System.out.println("  +++++ All " + graphTypes.size() + " protein graphs of chain " + c.getPdbChainID() + " handled. +++++");
+            }
+            
+            if(Settings.getBoolean("plcc_B_useDB") && Settings.getBoolean("plcc_B_folding_graphs")) {
+                Integer numAssigned = 0;
+                try {
+                    numAssigned = DBManager.checkAndAssignChainToAllMotifsInDatabase(pdbid, chain);
+                    System.out.println("      Computed SSE motifs for chain, found " + numAssigned + " motifs in all folding graph linear notations.");
+                } catch(Exception e) {
+                    DP.getInstance().e("Main", "Computing SSE motifs failed for PDB " + pdbid + " chain " + chain + ": '" + e.getMessage() + "'.");
+                }
             }
             
         }

@@ -499,7 +499,7 @@ public class DBManager {
             //doInsertQuery("CREATE TABLE " + tbl_fglinnot_alphalig + " (linnotalphalig_id serial primary key, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text);");
             //doInsertQuery("CREATE TABLE " + tbl_fglinnot_betalig + " (linnotbetalig_id serial primary key, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text);");
             //doInsertQuery("CREATE TABLE " + tbl_fglinnot_albelig + " (linnotalbelig_id serial primary key, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text);");           
-            doInsertQuery("CREATE TABLE " + tbl_fglinnot + " (linnot_id serial primary key, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text);");
+            doInsertQuery("CREATE TABLE " + tbl_fglinnot + " (linnot_id serial primary key, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text, num_sses int);");
 
             // set constraints
             doInsertQuery("ALTER TABLE " + tbl_protein + " ADD CONSTRAINT constr_protein_uniq UNIQUE (pdb_id);");
@@ -511,6 +511,7 @@ public class DBManager {
             doInsertQuery("ALTER TABLE " + tbl_foldinggraph + " ADD CONSTRAINT constr_foldgraph_uniq UNIQUE (parent_graph_id, fg_number);");
             doInsertQuery("ALTER TABLE " + tbl_graphletcount + " ADD CONSTRAINT constr_graphlet_uniq UNIQUE (graph_id);");
             doInsertQuery("ALTER TABLE " + tbl_nm_ligandtochain + " ADD CONSTRAINT constr_ligtochain_uniq UNIQUE (ligandtochain_chainid, ligandtochain_ligandname3);");
+            doInsertQuery("ALTER TABLE " + tbl_nm_chaintomotif + " ADD CONSTRAINT constr_chaintomotif_uniq UNIQUE (chain_id, motif_id);");
             
             //doInsertQuery("ALTER TABLE " + tbl_fglinnot_alpha + " ADD CONSTRAINT constr_fglinnotalpha_uniq UNIQUE (linnot_foldinggraph_id);");
             //doInsertQuery("ALTER TABLE " + tbl_fglinnot_beta + " ADD CONSTRAINT constr_fglinnotbeta_uniq UNIQUE (linnot_foldinggraph_id);");
@@ -840,13 +841,13 @@ public class DBManager {
         if(proteinGraphDBids.keySet().size() != 6) {
             DP.getInstance().w("DBManager", "checkAndAssignChainToAllMotifsInDatabase(): Found only " + proteinGraphDBids.keySet().size() + " instead of 6 protein graphs for PDB " + pdbid + " chain " + chain + " in the DB. May miss motifes.");
         }
-        
-        
+                
         Integer rowsAffectedTotal = 0;
         Long motif_db_id;
         
-        if(DBManager.chainContainsMotif_4helix(chain_db_id, proteinGraphDBids)) {
-            motif_db_id = 1L;   // the motif ID for 4 helix, see the plcc_motifs table
+        // check all 10 motives:
+        if(DBManager.chainContainsMotif_4helix(chain_db_id)) {
+            motif_db_id = 1L;   // the motif ID for 4-helix, see the plcc_motifs table
             rowsAffectedTotal += DBManager.assignChainToMotiv(chain_db_id, motif_db_id);
         }
         
@@ -860,11 +861,84 @@ public class DBManager {
      * Checks whether the chain contains a 4 helix motif. These checks consider the different linear notations of several graph types.
      * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
      * @param chain_db_id
-     * @param proteinGraphDBids a map of the graph type names assigned to their protein graph DB ids (use DBManager.getProteinGraphDBidsOf(pdbid, chain) to get this)
      * @return true if the motif was found, false otherwise
      */
-    public static Boolean chainContainsMotif_4helix(Long chain_db_id, Map<String, Long> proteinGraphDBids) {
-        DP.getInstance().w("DBManager", "chainContainsMotif_4helix(): IMPLEMENT ME");
+    public static Boolean chainContainsMotif_4helix(Long chain_db_id) {
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        
+        /*
+        "Select pdb,chain from alpha where (red like '%1a,1a,1a,-3_%' and red not  like '%-1a,1a,1a,-3_%'  ) or (red like '%-3_,1a,1a,1a%')  or (red like '%3_,1a,1a,1a%' and red not like '%-3_,1a,1a,1a%') or (red like '%-4_,1a,1a,2a%') or (red like '%2a,1a,1a,-4_%' and red not like '%-2a,1a,1a,-4_%' )  group by pdb,chain";
+       "Select pdb,chain from alpha where (red like '%-1a,-1a,-1a,3_%') or (red like '%3_,-1a,-1a,-1a%' and red not like '%-3_,-1a,-1a,-1a%')   group by pdb,chain";
+	   "Select pdb,chain from alpha where red LIKE '%1p,1a,1p%' and red not like '%-1p,1a,1p%' group by pdb,chain";
+	   "Select pdb,chain from alpha where red LIKE '%1a,1a,1a%' and seq like '%1,1,1%' and sse < 6 group by pdb,chain";
+	   "Select pdb,chain from albe where  (red LIKE '[h,1ah,1ah,1ah]') group by pdb,chain";
+        */
+        
+        StringBuilder querySB = new StringBuilder();
+        querySB.append("SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header ");
+	querySB.append("FROM plcc_fglinnot ln ");
+	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
+	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
+	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
+	querySB.append("WHERE ( c.chain_id = $1 AND (pg.graph_type = 1 AND (ln.ptgl_linnot_red like '%1a,1a,1a,-3_%' and ln.ptgl_linnot_red not like '%-1a,1a,1a,-3_%') or (ln.ptgl_linnot_red like '%-3_,1a,1a,1a%') or (ln.ptgl_linnot_red like '%3_,1a,1a,1a%' and ln.ptgl_linnot_red not like '%-3_,1a,1a,1a%') or (ln.ptgl_linnot_red like '%-4_,1a,1a,2a%') or (ln.ptgl_linnot_red like '%2a,1a,1a,-4_%' and ln.ptgl_linnot_red not like '%-2a,1a,1a,-4_%') or (ln.ptgl_linnot_red LIKE '%1p,1a,1p%' and ln.ptgl_linnot_red not like '%-1p,1a,1p%') or (ln.ptgl_linnot_red LIKE '%1a,1a,1a%' and ln.ptgl_linnot_seq like '%1,1,1%' and ln.num_sses < 6 ) ) or (pg.graph_type = 4 AND ln.ptgl_linnot_red LIKE '[h,1ah,1ah,1ah]')");
+        
+        String query = querySB.toString();
+        
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, chain_db_id);
+                                
+            rs = statement.executeQuery();
+            dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 0; i < count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 0; i < count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "chainContainsMotif_4helix() '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
+                dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_4helix(): Could not close statement and reset autocommit: '" + e.getMessage() + "'."); }
+        }
+        
+        // check results
+        if(tableData.size() >= 1) {
+            return true;
+        }
+
         return false;
     }
     
@@ -1474,7 +1548,7 @@ public class DBManager {
         PreparedStatement statement = null;
         
 
-        String query = "INSERT INTO " + DBManager.tbl_fglinnot + " (linnot_foldinggraph_id, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_key, firstvertexpos_seq) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO " + DBManager.tbl_fglinnot + " (linnot_foldinggraph_id, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_key, firstvertexpos_seq, num_sses) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         int affectedRows = 0;
         
         try {
@@ -1491,6 +1565,7 @@ public class DBManager {
             statement.setInt(7, pnfr.redStart);
             statement.setInt(8, pnfr.keyStart);
             statement.setInt(9, pnfr.seqStart);
+            statement.setInt(10, pnfr.adjSize);
                                 
             affectedRows = statement.executeUpdate();
             if (affectedRows == 0) {
