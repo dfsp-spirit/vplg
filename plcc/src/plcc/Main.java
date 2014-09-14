@@ -2440,30 +2440,32 @@ public class Main {
 
                 // atm, only alpha, beta and beta FGs are supported in the database
                 if(gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALPHA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_BETA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
-                    Long insertID = -1L;
-                    //Long insertIDSingleTable = -1L;
+                    //Long insertIDMultiTable = -1L;
+                    Long insertIDSingleTable = -1L;
                     try {
-                        insertID = DBManager.writeFoldLinearNotationsToDatabase(fg.getPdbid(), fg.getChainid(), fg.getGraphType(), fg.getFoldingGraphNumber(), pnfr);
-                        //insertIDSingleTable = DBManager.writeFoldLinearNotationsToDatabaseSingleTable(fg.getPdbid(), fg.getChainid(), fg.getGraphType(), fg.getFoldingGraphNumber(), pnfr);
+                        //insertID = DBManager.writeFoldLinearNotationsToDatabaseMultiTable(fg.getPdbid(), fg.getChainid(), fg.getGraphType(), fg.getFoldingGraphNumber(), pnfr);
+                        insertIDSingleTable = DBManager.writeFoldLinearNotationsToDatabaseSingleTable(fg.getPdbid(), fg.getChainid(), fg.getGraphType(), fg.getFoldingGraphNumber(), pnfr);
                     } catch (SQLException ex) {
                         DP.getInstance().e("Main", "Could not write " + fg.getGraphType() + " FG # " + fg.getFoldingGraphNumber() + " linear notations to DB: '" + ex.getMessage() + "'.");
                     }
                     
-                    if(insertID < 0) {
+                    /*
+                    if(insertIDMultiTable < 0) {
                         DP.getInstance().e("Main", "Could not write " + fg.getGraphType() + " FG # " + fg.getFoldingGraphNumber() + " linear notations to multi linnot tables in DB, empty insert ID.");                        
                     }
                     else {
                         System.out.println("        Wrote PTGL linear notations for " + fg.getGraphType() + " FG # " + fg.getFoldingGraphNumber() + " to database (multi linnot tables).");
                     }
+                    */
                     
-                    /*
+                    
                     if(insertIDSingleTable < 0) {
                         DP.getInstance().e("Main", "Could not write " + fg.getGraphType() + " FG # " + fg.getFoldingGraphNumber() + " linear notations to single linnot table in DB, empty insert ID.");                        
                     }
                     else {
                         System.out.println("        Wrote PTGL linear notations for " + fg.getGraphType() + " FG # " + fg.getFoldingGraphNumber() + " to database (single linnot table).");
                     }
-                    */
+                    
                 }
                 else {
                     System.out.println("        Linear notations of folding graph type '" + gt + "' not supported by database, skipping.");

@@ -8,6 +8,8 @@
  *   
  * @author Daniel Bruness <dbruness@gmail.com>
  * @author Andreas Scheck <andreas.scheck.home@googlemail.com>
+ *
+ * Tim added options to search for folding graph linear notations, SEPT 2014.
  */
 
 ini_set('display_errors', 0);
@@ -82,6 +84,59 @@ function get_linnot_query_string($linnot_type, $linnot_query_string, $query_grap
     return $res;
 }
 
+/** 
+  * Returns the mitif code or a value < 0 if the abbriv is invalid.
+  */
+function get_motif_id($motif_abbreviation) {
+	$motif_id = -1;
+	if($motif_abbreviation === "4helix") {
+		$motif_id = 1;
+	}
+	else if($motif_abbreviation === "globin") {
+		$motif_id = 2;
+	}
+	else if($motif_abbreviation === "barrel") {
+		$motif_id = 3;
+	}
+	else if($motif_abbreviation === "immuno") {
+		$motif_id = 4;
+	}
+	else if($motif_abbreviation === "propeller") {
+		$motif_id = 5;
+	}
+	else if($motif_abbreviation === "jelly") {
+		$motif_id = 6;
+	}
+	else if($motif_abbreviation === "ubi") {
+		$motif_id = 7;
+	}
+	else if($motif_abbreviation === "plait") {
+		$motif_id = 8;
+	}
+	else if($motif_abbreviation === "rossman") {
+		$motif_id = 9;
+	}
+	else if($motif_abbreviation === "tim") {
+		$motif_id = 10;
+	}
+	else {
+		$motif_id = -1;
+	}
+	return $motif_id;
+}
+
+function get_motif_query_string($motif_id) {   
+	
+    $res = "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
+				   FROM plcc_nm_chaintomotif c2m
+				   INNER JOIN plcc_chain c
+				   ON c2m.chain_id = c.chain_id				   
+				   INNER JOIN plcc_protein p
+				   ON p.pdb_id = c.pdb_id 
+				   WHERE c2m.motif_id = " . $motif_id . "";
+   return $res;
+}
+
 if(isset($_GET["next"])) {
 	if(is_numeric($_GET["next"]) && $_GET["next"] >= 0){
 		$limit_start = $_GET["next"];
@@ -116,6 +171,7 @@ if(isset($_GET["next"])) {
 		$linnotalbeligred = $_SESSION["linnotalbeligred"];
 		$linnotalbeligseq = $_SESSION["linnotalbeligseq"];
 		$linnotalbeligkey = $_SESSION["linnotalbeligkey"];
+		$motif = $_SESSION["motif"];
 		
 	} else {
 		$limit_start = 0;
@@ -273,6 +329,12 @@ if(isset($_POST)) {
 	if(isset($_POST["linnotalbeligkey"])) {
 		$linnotalbeligkey = $_POST["linnotalbeligkey"];
 		$_SESSION["linnotalbeligkey"] = $linnotalbeligkey;
+	}
+	
+	// motif search
+	if(isset($_POST["motif"])) {
+		$motif = $_POST["motif"];
+		$_SESSION["motif"] = $motif;
 	}
 	
 	
@@ -525,6 +587,17 @@ if (($none_set == true)) { // #TODO redefine this check...
 		$firstQuerySet = true; 
 	};
 	
+	// motif search
+	
+	if (isset($motif) && $motif != ""){
+	
+		$motif_id = get_motif_id($motif);
+		if($motif_id > 0) {
+			if($firstQuerySet) { $query .= " UNION "; }
+			$query .= get_motif_query_string($motif_id);
+			$firstQuerySet = true; 			
+		} 
+	};
 	
 	
 	$count_query = $query . " ) results";
