@@ -87,7 +87,6 @@ public class DBManager {
     //static String tbl_fglinnot_albelig = "plcc_fglinnot_albelig";        
     
     static String view_sses = "plcc_view_sses";
-    static String view_sses_secondat = "plcc_view_sses_secondat";
     
     static String view_ssecontacts = "plcc_view_ssetype_contacts";
     static String view_graphs = "plcc_view_graphs";
@@ -539,8 +538,7 @@ public class DBManager {
             //doInsertQuery("CREATE VIEW " + view_fglinnotsalbelig + " AS SELECT linnotalbelig_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key FROM (SELECT la.linnotalbelig_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM " + tbl_fglinnot_albelig + " la LEFT JOIN " + tbl_foldinggraph + " fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN " + tbl_proteingraph + " pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN " + tbl_chain + " c ON pg.chain_id=c.chain_id LEFT JOIN " + tbl_graphtypes + " gt ON pg.graph_type=gt.graphtype_id) bar ;");
             doInsertQuery("CREATE VIEW " + view_fglinnots + " AS SELECT linnot_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key FROM (SELECT la.linnot_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM " + tbl_fglinnot + " la LEFT JOIN " + tbl_foldinggraph + " fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN " + tbl_proteingraph + " pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN " + tbl_chain + " c ON pg.chain_id=c.chain_id LEFT JOIN " + tbl_graphtypes + " gt ON pg.graph_type=gt.graphtype_id) bar ;");
             
-            doInsertQuery("CREATE VIEW " + view_sses + " AS SELECT s.sse_id, p.pdb_id, c.chain_name, s.position_in_chain, s.dssp_start, s.dssp_end, sset.ssetype_text FROM " + tbl_sse + " s INNER JOIN " + tbl_chain + " c ON s.chain_id = c.chain_id INNER JOIN " + tbl_protein + " p ON c.pdb_id = p.pdb_id INNER JOIN " + tbl_ssetypes + " sset ON s.sse_type = sset.ssetype_id;");
-            //doInsertQuery("CREATE VIEW " + view_sses_secondat + " AS SELECT linnot_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key FROM (SELECT la.linnot_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM " + tbl_fglinnot + " la LEFT JOIN " + tbl_foldinggraph + " fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN " + tbl_proteingraph + " pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN " + tbl_chain + " c ON pg.chain_id=c.chain_id LEFT JOIN " + tbl_graphtypes + " gt ON pg.graph_type=gt.graphtype_id) bar ;");
+            doInsertQuery("CREATE VIEW " + view_sses + " AS SELECT s.sse_id, p.pdb_id, c.chain_name, s.position_in_chain, s.dssp_start, s.dssp_end, sset.ssetype_text FROM " + tbl_sse + " s INNER JOIN " + tbl_chain + " c ON s.chain_id = c.chain_id INNER JOIN " + tbl_protein + " p ON c.pdb_id = p.pdb_id INNER JOIN " + tbl_ssetypes + " sset ON s.sse_type = sset.ssetype_id;");            
             
             // add comments on views
             doInsertQuery("COMMENT ON VIEW " + view_ssecontacts + " IS 'Easy overview of SSE contacts.';");
@@ -593,7 +591,7 @@ public class DBManager {
             // add comments for specific fields
             doInsertQuery("COMMENT ON COLUMN " + tbl_sse + ".sse_type IS '1=helix, 2=beta strand, 3=ligand, 4=other';");
             doInsertQuery("COMMENT ON COLUMN " + tbl_ssecontact + ".contact_type IS '1=mixed, 2=parallel, 3=antiparallel, 4=ligand, 5=backbone';");
-            doInsertQuery("COMMENT ON COLUMN " + tbl_sse + ".lig_name IS 'The 3-letter ligand name from the PDB file and the RCSB ligand expo website. If this SSE is not a ligand SSE, this is the empty string.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_sse + ".lig_name IS 'The 3-letter ligand name from the PDB file and the RCSB ligand expo website. If this SSE is not a ligand SSE, this is null.';");
             doInsertQuery("COMMENT ON COLUMN " + tbl_proteingraph + ".graph_type IS '1=alpha, 2=beta, 3=albe, 4=alphalig, 5=betalig, 6=albelig';");
             doInsertQuery("COMMENT ON COLUMN " + tbl_proteingraph + ".graph_string_gml IS 'The graph string in GML format';");
             doInsertQuery("COMMENT ON COLUMN " + tbl_proteingraph + ".graph_string_kavosh IS 'The graph string in Kavosh format format';");
@@ -777,7 +775,13 @@ public class DBManager {
         Boolean result = false;
 
         PreparedStatement statement = null;
- 
+
+        if(lig_name != null) {
+            if(lig_name.isEmpty()) {
+                lig_name = null;
+            }
+        }
+        
         /*
         if (lig_name.length() >= 1) {
             query = "INSERT INTO " + tbl_sse + " (chain_id, dssp_start, dssp_end, pdb_start, pdb_end, sequence, sse_type, lig_name) VALUES (" + chain_id + ", " + dssp_start + ", " + dssp_end + ", '" + pdb_start + "', '" + pdb_end + "', '" + sequence + "', " + sse_type + ", '" + lig_name + "');";
