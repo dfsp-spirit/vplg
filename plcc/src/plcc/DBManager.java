@@ -51,6 +51,7 @@ public class DBManager {
     
     /** Name of the table which stores info on SSE types, e.g., alpha-helix, beta-strand and ligand. */
     static String tbl_ssetypes = "plcc_ssetypes";
+    static String tbl_secondat = "plcc_secondat";
     
     /** Name of the table which stores info on intra-chain SSE contact types, e.g., parallel, anti-parallel, mixed or ligand. */
     static String tbl_contacttypes = "plcc_contacttypes";
@@ -400,6 +401,7 @@ public class DBManager {
             doDeleteQuery("DROP TABLE " + tbl_ligand + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_nm_ligandtochain + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_fglinnot + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_secondat + " CASCADE;");
             
             //doDeleteQuery("DROP TABLE " + tbl_fglinnot_alpha + " CASCADE;");
             //doDeleteQuery("DROP TABLE " + tbl_fglinnot_beta + " CASCADE;");
@@ -456,6 +458,7 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_protein + " (pdb_id varchar(4) primary key, header varchar(200) not null, title varchar(400) not null, experiment varchar(200) not null, keywords varchar(400) not null, resolution real not null);");
             doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(2) not null, mol_name varchar(200) not null, organism_scientific varchar(200) not null, organism_common varchar(200) not null, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, chain_isinnonredundantset smallint DEFAULT 1);");
             doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence varchar(2000) not null, sse_type int not null references " + tbl_ssetypes + " ON DELETE CASCADE, lig_name varchar(5), position_in_chain int);");
+            doInsertQuery("CREATE TABLE " + tbl_secondat + " (secondat_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, alpha_fg_number int, alpha_fg_foldname varchar(2), alpha_fg_position int, beta_fg_number int, beta_fg_foldname varchar(2), beta_fg_position int, albe_fg_number int, albe_fg_foldname varchar(2), albe_fg_position int, alphalig_fg_number int, alphalig_fg_foldname varchar(2), alphalig_fg_position int, betalig_fg_number int, betalig_fg_foldname varchar(2), betalig_fg_position int, albelig_fg_number int, albelig_fg_foldname varchar(2), albelig_fg_position int);");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null references " + tbl_contacttypes + " ON DELETE CASCADE, check (sse1 < sse2));");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact_complexgraph + " (ssecontact_complexgraph_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, complex_contact_type int not null references " + tbl_complexcontacttypes + " ON DELETE CASCADE check (sse1 < sse2));");            
             doInsertQuery("CREATE TABLE " + tbl_complex_contact_stats + " (complex_contact_id serial primary key, chain1 int not null references " + tbl_chain + " ON DELETE CASCADE, chain2 int not null references " + tbl_chain + " ON DELETE CASCADE, contact_num_HH int not null, contact_num_HS int not null, contact_num_HL int not null, contact_num_SS int not null, contact_num_SL int not null, contact_num_LL int not null, contact_num_DS int not null);");
@@ -514,6 +517,7 @@ public class DBManager {
             doInsertQuery("ALTER TABLE " + tbl_graphletcount + " ADD CONSTRAINT constr_graphlet_uniq UNIQUE (graph_id);");
             doInsertQuery("ALTER TABLE " + tbl_nm_ligandtochain + " ADD CONSTRAINT constr_ligtochain_uniq UNIQUE (ligandtochain_chainid, ligandtochain_ligandname3);");
             doInsertQuery("ALTER TABLE " + tbl_nm_chaintomotif + " ADD CONSTRAINT constr_chaintomotif_uniq UNIQUE (chain_id, motif_id);");
+            doInsertQuery("ALTER TABLE " + tbl_secondat + " ADD CONSTRAINT constr_secondat_uniq UNIQUE (sse_id);");
             
             //doInsertQuery("ALTER TABLE " + tbl_fglinnot_alpha + " ADD CONSTRAINT constr_fglinnotalpha_uniq UNIQUE (linnot_foldinggraph_id);");
             //doInsertQuery("ALTER TABLE " + tbl_fglinnot_beta + " ADD CONSTRAINT constr_fglinnotbeta_uniq UNIQUE (linnot_foldinggraph_id);");
@@ -586,6 +590,7 @@ public class DBManager {
             //doInsertQuery("COMMENT ON TABLE " + tbl_fglinnot_betalig + " IS 'Stores the PTGL linear notation strings ADJ, RED, KEY and SEQ for a single fold of some betalig protein graph. Also stores file system paths to graph images.';");
             //doInsertQuery("COMMENT ON TABLE " + tbl_fglinnot_albelig + " IS 'Stores the PTGL linear notation strings ADJ, RED, KEY and SEQ for a single fold of some albelig protein graph. Also stores file system paths to graph images.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_fglinnot + " IS 'Stores the PTGL linear notation strings ADJ, RED, KEY and SEQ for a single fold (all graph types). Also stores file system paths to graph images.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_secondat + " IS 'Stores the position of a certain SSE in the folding graphs. For each graph type, the FG number (and name) in which the SSE occurs and its position in that fg are given. This table is ugly and does not follow good DB design rules, it is required for historical reasons though.';");
             
             
             // add comments for specific fields
@@ -621,6 +626,11 @@ public class DBManager {
             //doInsertQuery("COMMENT ON COLUMN " + tbl_fglinnot_alpha + ".firstvertexpos_adj IS 'The start vertex of the ADJ notation. This is the index in the protein graph, not in this connected component.';");
             //doInsertQuery("COMMENT ON COLUMN " + tbl_fglinnot_beta + ".firstvertexpos_adj IS 'The start vertex of the ADJ notation. This is the index in the protein graph, not in this connected component.';");
             //doInsertQuery("COMMENT ON COLUMN " + tbl_fglinnot_albe + ".firstvertexpos_adj IS 'The start vertex of the ADJ notation. This is the index in the protein graph, not in this connected component.';");            
+
+            
+            doInsertQuery("COMMENT ON COLUMN " + tbl_secondat + ".alpha_fg_number IS 'The number of the alpha folding graph in which this SSE occurs. Note that it can occur in 0 or 1 alpha FGs (in 0 if it is not an alpha helix, in 1 otherwise). If it does not occur in any alpha FG, this is null.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_secondat + ".alpha_fg_foldname IS 'The fold name of the alpha folding graph in which this SSE occurs. Note that it can occur in 0 or 1 alpha FGs (in 0 if it is not an alpha helix, in 1 otherwise). If it does not occur in any alpha FG, this is null.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_secondat + ".alpha_fg_position IS 'The position of this SSE in the alpha FG defined by the field alpha_fg_number.';");
             
             // add indices
             doInsertQuery("CREATE INDEX plcc_idx_chain_insert ON " + tbl_chain + " (pdb_id, chain_name);");         // for SELECTs during data insert
@@ -692,6 +702,8 @@ public class DBManager {
             
             doInsertQuery("CREATE INDEX plcc_idx_motif_search_name ON " + tbl_motif + " (motif_name text_pattern_ops);");
             doInsertQuery("CREATE INDEX plcc_idx_motif_search_abbrev ON " + tbl_motif + " (motif_abbreviation text_pattern_ops);");
+            
+            doInsertQuery("CREATE INDEX plcc_idx_secondat_fk ON " + tbl_secondat + " (sse_id);");                       // FK
 
             // indices on PKs get created automatically
             
