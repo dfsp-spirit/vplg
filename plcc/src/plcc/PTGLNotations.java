@@ -71,7 +71,7 @@ public class PTGLNotations {
         
         String gt = g.getGraphType();
         if( ! (gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALPHA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_BETA))) {
-            System.err.println("ERROR: PTGLNotations: Graph type '" + gt + "' not supported. Please provide an alpha, beta or albe graph.");
+            System.err.println("WARNING: PTGLNotations: Graph type '" + gt + "' is experimental. Please provide an alpha, beta or albe graph for stable results.");
             //System.exit(1);
         }
         
@@ -188,6 +188,7 @@ public class PTGLNotations {
             String bracketStart = "[";
             String bracketEnd = "]";
             Boolean hasCycle = false;
+            Boolean isMultiSSETypeGraph = ProtGraphs.isGraphTypeWhichContainsMoreThanOneSSETypes(g.getGraphType());
             
             Boolean isNotBifurcated = g.vertexSetIsNotBifurcated(ccVerts);
             if(verbose) {
@@ -205,7 +206,7 @@ public class PTGLNotations {
                 SEQ.append(bracketStart);
                 KEY.append(bracketStart);
                 
-		if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {		     
+		if(isMultiSSETypeGraph) {		     
                      ADJ.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());
                      RED.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());
                      SEQ.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());
@@ -249,15 +250,15 @@ public class PTGLNotations {
                 KEY.append(bracketStart);
                 SEQ.append(bracketStart);
                 
-                if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
+                if(isMultiSSETypeGraph) {
                     if(verbose) {
-                        System.out.println("  This is an ALBE graph.");
+                        System.out.println("  This is a multi SSE type graph, graph type is '" +  g.getGraphType() + "'.");
                     }
                     SEQ.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());
                 }
                 else {
                     if(verbose) {
-                        System.out.println("  This is an NOT an ALBE graph, graph type is '" + g.getGraphType() + ".");
+                        System.out.println("  This is an NOT a multi SSE type graph, graph type is '" + g.getGraphType() + ".");
                     }
                 }
                 
@@ -304,7 +305,8 @@ public class PTGLNotations {
                 Integer adjcur = cur;
                 HashSet<Integer> adjvisited = new HashSet<>();
                 
-                if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
+                if(isMultiSSETypeGraph) {
+                //if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
                     String startLabel = g.getVertex(cur).getLinearNotationLabel();
                     ADJ.append(startLabel);
                     if(adjverbose) {
@@ -416,7 +418,8 @@ public class PTGLNotations {
                             System.out.println("    Fold#" + foldNum + ": Found next vertex " + next + ". Edge label is '" + edgeType + "'.");
                         }
                         
-                        if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && adjvisited.size() > 1)) {
+                        if(isMultiSSETypeGraph || (! isMultiSSETypeGraph && adjvisited.size() > 1)) {
+                        //if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && adjvisited.size() > 1)) {
                             ADJ.append(",");
                         }
                         
@@ -450,7 +453,8 @@ public class PTGLNotations {
                             if(adjverbose) {
                                 System.out.println("    Fold#" + foldNum + ": Found vertex with degree 1, it is " + next + ".");
                             }
-                            if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && adjvisited.size() > 1)) {
+                            if(isMultiSSETypeGraph || (! isMultiSSETypeGraph && adjvisited.size() > 1)) {
+                            //if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && adjvisited.size() > 1)) {
                                 ADJ.append(",");
                             }
                             
@@ -462,7 +466,7 @@ public class PTGLNotations {
                                 if(adjverbose) {
                                     System.out.println("    Fold#" + foldNum + ": Found vertex with degree GREATER 1 (z-vertex), it is " + next + " with degree " + adjdegrees.get(next) + ".");
                                 }
-                                if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && adjvisited.size() > 1)) {
+                                if(isMultiSSETypeGraph || ( ! isMultiSSETypeGraph && adjvisited.size() > 1)) {
                                     ADJ.append(",");
                                 }
                             }
@@ -474,12 +478,12 @@ public class PTGLNotations {
                         }
                     }
                     
-                    if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
+                    if(isMultiSSETypeGraph) {
                         ADJ.append(g.getVertex(next).getLinearNotationLabel());
                     }
                     
                     // ordering, line 352
-                    if(edgeType.equals("p") || edgeType.equals("m")) {
+                    if(edgeType.equals("p") || edgeType.equals("m") || edgeType.equals("l")) {
                         order.put(next, order.get(adjcur));
                     }else if(order.get(adjcur).equals("-")) {
                         order.put(next, "+");
@@ -528,7 +532,7 @@ public class PTGLNotations {
                 Integer redcur = cur;
                 HashSet<Integer> redvisited = new HashSet<>();
                 
-                if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
+                if(isMultiSSETypeGraph) {
                     RED.append(g.getVertex(redcur).getLinearNotationLabel());
                 }
                                                 
@@ -615,7 +619,7 @@ public class PTGLNotations {
                             System.out.println("    Fold#" + foldNum + ": Found next vertex " + next + ". Edge label is '" + edgeType + "'.");
                         }
                         
-                        if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && redvisited.size() > 1)) {
+                        if(isMultiSSETypeGraph || ( ! isMultiSSETypeGraph && redvisited.size() > 1)) {
                             RED.append(",");
                         }
                         
@@ -649,7 +653,7 @@ public class PTGLNotations {
                             if(redverbose) {
                                 System.out.println("    Fold#" + foldNum + ": Found vertex with degree 1, it is " + next + ".");
                             }
-                            if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && redvisited.size() > 1)) {
+                            if(isMultiSSETypeGraph || ( ! isMultiSSETypeGraph && redvisited.size() > 1)) {
                                 RED.append(",");
                             }
                             
@@ -662,7 +666,7 @@ public class PTGLNotations {
                                     System.out.println("    Fold#" + foldNum + ": Found vertex with degree GREATER 1 (z-vertex), it is " + next + " with degree " + reddegrees.get(next) + ".");
                                 }
                                 
-                                if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && adjvisited.size() > 1)) {
+                                if(isMultiSSETypeGraph || ( ! isMultiSSETypeGraph && adjvisited.size() > 1)) {
                                     RED.append(",");
                                 }
                                 
@@ -676,7 +680,7 @@ public class PTGLNotations {
                         }
                     }
                     
-                    if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
+                    if(isMultiSSETypeGraph) {
                         RED.append(g.getVertex(next).getLinearNotationLabel());
                     }
                     
@@ -725,7 +729,7 @@ public class PTGLNotations {
                         System.out.println("      tvertex=" + IO.hashMapToString(tvertex) + ".");
                     }
                     
-                    if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
+                    if(isMultiSSETypeGraph) {
                         KEY.append(g.getVertex(keypos.get(0)).getLinearNotationLabel());
                     }
                     
@@ -742,7 +746,7 @@ public class PTGLNotations {
                             System.out.println("      u=" + u + ", v=" + v + ", tu=" + tu + ", tv=" + tv + ", dist(tu,tv)=" + dist + ".");
                         }
                         
-                        if((k==1 && g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || (k > 1))) {
+                        if((k==1 && isMultiSSETypeGraph || (k > 1))) {
                             KEY.append(",");
                         }
                         
@@ -761,7 +765,7 @@ public class PTGLNotations {
                             KEY.append("x");
                         }
                         
-                        if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
+                        if(isMultiSSETypeGraph) {
                             KEY.append(g.getVertex(ccVerts.get(k)).getLinearNotationLabel());
                         }
                     }
@@ -789,14 +793,14 @@ public class PTGLNotations {
                 //#########################################################################
                 
                 for(int k = 1; k < ccVerts.size(); k++) {
-                    if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && k > 1)) {
+                    if(isMultiSSETypeGraph || ( ! isMultiSSETypeGraph && k > 1)) {
                         SEQ.append(",");
                     }
                     
                     int dist = Math.abs(ccVerts.get(k) - ccVerts.get(k-1));
                     SEQ.append(dist);
                     
-                    if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
+                    if(isMultiSSETypeGraph) {
                         SEQ.append(g.getVertex(ccVerts.get(k)).getLinearNotationLabel());
                     }                    
                 }

@@ -90,6 +90,31 @@ public class ProtGraphs {
             return(-1);
         }
     }
+
+    /**
+     * Returns true if the given graph type string is a string representing a ligand graph (alphalig, betalig or albelig), false otherwise
+     * @param graphType the graph type string, e.g., "alpha" or some constant from ProtGraphs.GRAPHTYPE_STRING_*
+     * @return true if the given graph type string is a string representing a ligand graph (alphalig, betalig or albelig), false otherwise
+     */
+    public static boolean isGraphTypeWhichContainsLigandSSEs(String graphType) {
+        if(graphType.equals(ProtGraphs.GRAPHTYPE_STRING_ALPHALIG) || graphType.equals(ProtGraphs.GRAPHTYPE_STRING_BETALIG) || graphType.equals(ProtGraphs.GRAPHTYPE_STRING_ALBELIG)) {
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Returns true if the given graph type represents a graph type which can contain more than one SSE types (an alpha graph contains only 1 sse type, an albelig graph contains 3 SSE types).
+     * @param graphType the graph type string, e.g., "alpha" or some constant from ProtGraphs.GRAPHTYPE_STRING_*
+     * @return true if the given graph type represents a graph type which can contain more than one SSE types (an alpha graph contains only 1 sse type, an albelig graph contains 3 SSE types).
+     */
+    public static boolean isGraphTypeWhichContainsMoreThanOneSSETypes(String graphType) {
+        if(graphType.equals(ProtGraphs.GRAPHTYPE_STRING_ALPHA) || graphType.equals(ProtGraphs.GRAPHTYPE_STRING_BETA)) {
+            return false;
+        }
+        return true;
+    }
+    
     
     /**
      * Returns the graph string (e.g., "albe") for the given graph code number. This is used in the database,

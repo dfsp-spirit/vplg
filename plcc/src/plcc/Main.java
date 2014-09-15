@@ -1891,7 +1891,9 @@ public class Main {
                             for(Residue ligand : c.getAllLigandResidues()) {
                                 ligName3 = ligand.getName3();
                                 DBManager.writeLigandToDBUnlessAlreadyThere(ligName3, ligand.getLigName(), ligand.getLigFormula(), ligand.getLigSynonyms());
-                                DBManager.assignLigandToProteinChain(chainDbId, ligName3);
+                                if( ! DBManager.assignmentLigandToProteinChainExistsInDB(chainDbId, ligName3)) {
+                                    DBManager.assignLigandToProteinChain(chainDbId, ligName3);
+                                }
                             }
                         }
                         else {

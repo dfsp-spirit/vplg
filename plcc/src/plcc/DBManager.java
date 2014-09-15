@@ -889,9 +889,10 @@ public class DBManager {
 	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
 	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
 	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
-	querySB.append("WHERE ( c.chain_id = $1 AND (pg.graph_type = 1 AND (ln.ptgl_linnot_red like '%1a,1a,1a,-3_%' and ln.ptgl_linnot_red not like '%-1a,1a,1a,-3_%') or (ln.ptgl_linnot_red like '%-3_,1a,1a,1a%') or (ln.ptgl_linnot_red like '%3_,1a,1a,1a%' and ln.ptgl_linnot_red not like '%-3_,1a,1a,1a%') or (ln.ptgl_linnot_red like '%-4_,1a,1a,2a%') or (ln.ptgl_linnot_red like '%2a,1a,1a,-4_%' and ln.ptgl_linnot_red not like '%-2a,1a,1a,-4_%') or (ln.ptgl_linnot_red LIKE '%1p,1a,1p%' and ln.ptgl_linnot_red not like '%-1p,1a,1p%') or (ln.ptgl_linnot_red LIKE '%1a,1a,1a%' and ln.ptgl_linnot_seq like '%1,1,1%' and ln.num_sses < 6 ) ) or (pg.graph_type = 4 AND ln.ptgl_linnot_red LIKE '[h,1ah,1ah,1ah]')");
+	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 1 AND (ln.ptgl_linnot_red like '%1a,1a,1a,-3_%' and ln.ptgl_linnot_red not like '%-1a,1a,1a,-3_%') or (ln.ptgl_linnot_red like '%-3_,1a,1a,1a%') or (ln.ptgl_linnot_red like '%3_,1a,1a,1a%' and ln.ptgl_linnot_red not like '%-3_,1a,1a,1a%') or (ln.ptgl_linnot_red like '%-4_,1a,1a,2a%') or (ln.ptgl_linnot_red like '%2a,1a,1a,-4_%' and ln.ptgl_linnot_red not like '%-2a,1a,1a,-4_%') or (ln.ptgl_linnot_red LIKE '%1p,1a,1p%' and ln.ptgl_linnot_red not like '%-1p,1a,1p%') or (ln.ptgl_linnot_red LIKE '%1a,1a,1a%' and ln.ptgl_linnot_seq like '%1,1,1%' and ln.num_sses < 6 ) ) or (pg.graph_type = 4 AND ln.ptgl_linnot_red LIKE '[h,1ah,1ah,1ah]') )");
         
         String query = querySB.toString();
+        int numFound = 0;
         
         try {
             dbc.setAutoCommit(false);
@@ -904,24 +905,13 @@ public class DBManager {
             
             md = rs.getMetaData();
             count = md.getColumnCount();
-
-            columnHeaders = new ArrayList<String>();
-
-            for (int i = 0; i < count; i++) {
-                columnHeaders.add(md.getColumnName(i));
-            }
-
-
+            
             while (rs.next()) {
-                rowData = new ArrayList<String>();
-                for (int i = 0; i < count; i++) {
-                    rowData.add(rs.getString(i));
-                }
-                tableData.add(rowData);
+                numFound++;
             }
             
         } catch (SQLException e ) {
-            DP.getInstance().e("DBManager", "chainContainsMotif_4helix() '" + e.getMessage() + "'.");
+            DP.getInstance().e("DBManager", "SQL: chainContainsMotif_4helix(): '" + e.getMessage() + "'.");
         } finally {
             try {
                 if (statement != null) {
@@ -935,7 +925,7 @@ public class DBManager {
         }
         
         // check results
-        if(tableData.size() >= 1) {
+        if(numFound >= 1) {
             return true;
         }
 
@@ -2809,6 +2799,90 @@ public class DBManager {
         }        
     }
     
+    
+    /**
+     * Determines whether a certain ligand2chain assignment already exists in the DB.
+     * @param chainDbId the internal chain database ID
+     * @param ligName3 the ligand name, 3 letter code
+     * @return true if the assignment exists, false otherwise
+     */
+    public static synchronized Boolean assignmentLigandToProteinChainExistsInDB(Long chainDbId, String ligName3) {
+        if(ligName3 == null) {
+            DP.getInstance().w("DBManger", "assignmentLigandToProteinChainExistsInDB: Invalid ligand code, must not be null.");
+            return false;
+        }
+        else {
+            if(ligName3.length() != 3) {
+                DP.getInstance().w("DBManger", "assignmentLigandToProteinChainExistsInDB: Invalid ligand code, must consist of exactly 3 characters.");
+                return false;
+            }
+        }
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT ligandtochain_id FROM " + tbl_nm_ligandtochain + " WHERE (ligandtochain_chainid = ? AND ligandtochain_ligandname3 = ?);";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, chainDbId);
+            statement.setString(2, ligName3);
+                                
+            rs = statement.executeQuery();
+            dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "assignmentLigandToProteinChainExistsInDB: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "assignmentLigandToProteinChainExistsInDB: Could not close statement and reset autocommit."); }
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        if(tableData.size() >= 1) {
+            if(tableData.get(0).size() >= 1) {
+                return(true);
+            }
+            else {
+                return(false);
+            }
+        }
+        else {
+            return(false);
+        }
+        
+    }
+    
     /**
      * Determines whether a ligand, identified by its 3-char abbreviation like "ICT", exists in the database. Note race condition problems with this
      * approach if run in parallel on several machines which write to the same DB.
@@ -3685,17 +3759,5 @@ public class DBManager {
         return dbName;
     }
     
-    
-    /**
-     * Write the linear notation to the database.
-     * @param pnfr
-     * @param pdbid
-     * @param chain
-     * @param parentGraphType
-     * @param startVertexInParent 
-     */
-    public static void writeLinearNotationToDatabase(PTGLNotationFoldResult pnfr, String pdbid, String chain, String parentGraphType, Integer startVertexInParent) {
-        // TODO: continue here
-    }
     
 }
