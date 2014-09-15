@@ -2307,26 +2307,27 @@ public class Main {
 
                 if(Settings.getBoolean("plcc_B_folding_graphs")) {
                     if(gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALPHA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_BETA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
-                        System.out.println("      Computing " + gt + " folding graphs.");
+                        
+                        if( ! Settings.getBoolean("plcc_B_silent")) {
+                            System.out.println("      Computing " + gt + " folding graphs.");
+                        }
+                        
                         ProteinFoldingGraphResults fgRes = calculateFoldingGraphsForSSEGraph(pg, filePathImg);                                    
                         pcr.addProteinFoldingGraphResults(gt, fgRes);
                                                 
                         
                     } else {
-                        System.out.println("      Handling folding graphs, but skipping graph type '" + gt + "'.");
+                        if( ! silent) {
+                            System.out.println("      Handling folding graphs, but skipping graph type '" + gt + "'.");
+                        }
                     }
                 }
                 else {
-                    System.out.println("      Not handling folding graphs.");
+                    if( ! silent) {
+                        System.out.println("      Not handling folding graphs.");
+                    }
                 }
-
-                // DEBUG: a test only, makes no sense here
-                //System.out.println("Detecting maximal cliques in " + graphType + " graph of chain " + c.getPdbChainID() + " for fun.");
-                //ArrayList<Set<Integer>> mcs = pg.getMaximalCliques();
-                //for(Set s : mcs) {
-                //    System.out.println("  Found maximal clique of size " + s.size() + ".");
-                //}
-                
+              
             }
             
             
@@ -2338,7 +2339,9 @@ public class Main {
                 Integer numAssigned = 0;
                 try {
                     numAssigned = DBManager.checkAndAssignChainToAllMotifsInDatabase(pdbid, chain);
-                    System.out.println("      Computed SSE motifs for chain, found " + numAssigned + " motifs in all folding graph linear notations.");
+                    if(! silent) {
+                        System.out.println("      Computed SSE motifs for chain, found " + numAssigned + " motifs in all folding graph linear notations.");
+                    }
                 } catch(Exception e) {
                     DP.getInstance().e("Main", "Computing SSE motifs failed for PDB " + pdbid + " chain " + chain + ": '" + e.getMessage() + "'.");
                 }
@@ -2365,7 +2368,7 @@ public class Main {
      */
     public static ProteinFoldingGraphResults calculateFoldingGraphsForSSEGraph(ProtGraph pg, String outputDir) {
         //System.out.println("Searching connected components in " + graphType + " graph of chain " + c.getPdbChainID() + ".");
-        
+        boolean silent = Settings.getBoolean("plcc_B_silent");
         //ArrayList<FoldingGraphComputationResult> fgcs = pg.getFoldingGraphComputationResults();
         //ArrayList<FoldingGraph> ccs = pg.getConnectedComponents();
         //ArrayList<FoldingGraph> foldingGraphs = FoldingGraphComputationResult.getFoldingGraphsREDandKEYFromFGCR(fgcs);
@@ -2388,7 +2391,9 @@ public class Main {
         String fs = System.getProperty("file.separator");
 
         //System.out.println("Found " + ccs.size() + " connected components in " + graphType + " graph of chain " + c.getPdbChainID() + ".");
-        System.out.println("      --- Handling all " + foldingGraphs.size() + " folding graphs of the " + pg.graphType + " protein graph ---");
+        if(! silent) {
+            System.out.println("      --- Handling all " + foldingGraphs.size() + " " + pg.graphType + " folding graphs of the " + pg.graphType + " protein graph ---");
+        }
         for(Integer j = 0; j < foldingGraphs.size(); j++) {            
             fg = foldingGraphs.get(j);
             Integer fg_number = fg.getFoldingGraphNumber();
@@ -2403,7 +2408,9 @@ public class Main {
             }
             
             if(fg.numVertices() < Settings.getInteger("plcc_I_min_fgraph_size_draw")) {
-                System.out.println("          Ignoring folding graph #" + j + " of size " + fg.numVertices() + ", minimum size is " + Settings.getInteger("plcc_I_min_fgraph_size_draw") + ".");
+                if(! silent) {
+                    System.out.println("       *Ignoring " + gt + " folding graph #" + j + " of size " + fg.numVertices() + " (minimum size is " + Settings.getInteger("plcc_I_min_fgraph_size_draw") + ").");
+                }
                 continue;
             }
             
@@ -2428,7 +2435,9 @@ public class Main {
                                 
                 try { 
                     fgDbId = DBManager.writeFoldingGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), fg_number, FoldingGraph.getFoldNameOfFoldNumber(fg_number), fg.getMinimalVertexIndexInParentGraph(), fg.toGraphModellingLanguageFormat(), fg.toVPLGGraphFormat(), fg.toKavoshFormat(), fg.toDOTLanguageFormat(), fg.getSSEStringSequential(), fg.containsBetaBarrel()); 
-                    System.out.println("        Inserted '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB, ID=" + fgDbId + ".");
+                    if(! silent) {
+                        System.out.println("        Inserted '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB, ID=" + fgDbId + ".");
+                    }
                 }
                 catch(SQLException e) { 
                     DP.getInstance().e("Main", "Failed to insert '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB: '" + e.getMessage() + "'."); 
@@ -2444,7 +2453,9 @@ public class Main {
                 if(fgDbId >= 1) {
                     try {
                         int numAssigned = DBManager.assignSSEsToFoldingGraphInOrder(fg.sseList, fgDbId);
-                        System.out.println("        Assigned " + numAssigned + " SSEs to " + gt + " folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' in the DB.");
+                        if(! silent) {
+                            System.out.println("        Assigned " + numAssigned + " SSEs to " + gt + " folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' in the DB.");
+                        }
                     } catch(SQLException ex) {
                        DP.getInstance().e("Main", "Could not assign SSEs to graph in the database: '" + ex.getMessage() + "'.");
                     }
@@ -2453,7 +2464,6 @@ public class Main {
                 }
                 
                 
-
                 // atm, only alpha, beta and beta FGs are supported in the database
                 if(gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALPHA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_BETA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
                     //Long insertIDMultiTable = -1L;
@@ -2479,26 +2489,34 @@ public class Main {
                         DP.getInstance().e("Main", "Could not write " + fg.getGraphType() + " FG # " + fg.getFoldingGraphNumber() + " linear notations to single linnot table in DB, empty insert ID.");                        
                     }
                     else {
-                        System.out.println("        Wrote PTGL linear notations for " + fg.getGraphType() + " FG # " + fg.getFoldingGraphNumber() + " to database (single linnot table).");
+                        if(! silent) {
+                            System.out.println("        Wrote PTGL linear notations for " + fg.getGraphType() + " FG # " + fg.getFoldingGraphNumber() + " to database (single linnot table).");
+                        }
                     }
                     
                 }
                 else {
-                    System.out.println("        Linear notations of folding graph type '" + gt + "' not supported by database, skipping.");
+                    if(! silent) {
+                        System.out.println("        Linear notations of folding graph type '" + gt + "' not supported by database, skipping.");
+                    }
                 }
                 
             }
             
             // draw folding graphs            
             if(Settings.getBoolean("plcc_B_draw_folding_graphs")) {
-                System.out.println("        -- Drawing all " + notations.size() + " notations of the " + pg.getGraphType() + " FG #" + j + "(fg_number=" + fg_number + ")--");
+                if(! silent) {
+                    System.out.println("        -- Drawing all " + notations.size() + " notations of the " + pg.getGraphType() + " FG #" + j + "(fg_number=" + fg_number + ")--");
+                }
                 //System.out.println("          At FG #" + j + "(fg_number=" + fg_number + ").");
                 for(String notation : notations) {                                                
 
                     String fileNameWithExtension = pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + "_" + notation + ".png";
                     fgFile = outputDir + System.getProperty("file.separator") + fileNameWithExtension; //Settings.get("plcc_S_img_output_fileext");
                     if(fg.drawFoldingGraph(notation, fgFile)) {
-                        System.out.println("         -Folding graph #" + j + " of the " + pg.getGraphType() + " graph of chain " + pg.getChainid() + " written to file '" + fgFile + "' in " + notation + " notation.");
+                        if(! silent) {
+                            System.out.println("         -Folding graph #" + j + " of the " + pg.getGraphType() + " graph of chain " + pg.getChainid() + " written to file '" + fgFile + "' in " + notation + " notation.");
+                        }
 
                         // save image path to database if required
                         if(Settings.getBoolean("plcc_B_useDB")) {
@@ -2683,7 +2701,12 @@ public class Main {
      */
     public static void writeFGGraphStrings(FoldingGraph fg, String outputDir, int fgNumber) {
         
-        System.out.println("       *Handling " + fg.getGraphType() + " folding Graph #" + fgNumber + " containing " + fg.numVertices() + " vertices and " + fg.numEdges() + " edges (" + fg.numSSEContacts() + " SSE contacts).");
+        boolean silent = Settings.getBoolean("plcc_B_silent");
+        
+        if(! silent) {
+            System.out.println("       *Handling " + fg.getGraphType() + " folding Graph #" + fgNumber + " containing " + fg.numVertices() + " vertices and " + fg.numEdges() + " edges (" + fg.numSSEContacts() + " SSE contacts).");
+        }
+        
         String fs = File.separator;
         String fileNameWithoutExtension = fg.getPdbid() + "_" + fg.getChainid() + "_" + fg.getGraphType() + "_FG_" + fgNumber;
         String graphFormatsWritten = "";
@@ -2722,7 +2745,9 @@ public class Main {
 
 
         if(numFormatsWritten > 0) {
-            System.out.println("        Exported folding graph #" + fgNumber + " in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + new File(outputDir).getAbsolutePath() + fs + "'.");
+            if(! silent) {
+                System.out.println("        Exported folding graph #" + fgNumber + " in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + new File(outputDir).getAbsolutePath() + fs + "'.");
+            }
         }
     }
     
@@ -2735,6 +2760,8 @@ public class Main {
      * @param pnfr the PTGL linear notation result for this fold/connected component/FG. The PTGLNotations class computes this.
      */
     public static void writeFGLinearNotationStrings(FoldingGraph fg, String outputDir, int fgNumber, PTGLNotationFoldResult pnfr) {
+        
+        boolean silent = Settings.getBoolean("plcc_B_silent");
         
         String fs = File.separator;
         String fileNameWithoutExtension = fg.getPdbid() + "_" + fg.getChainid() + "_" + fg.getGraphType() + "_FG_" + fgNumber;
@@ -2753,10 +2780,14 @@ public class Main {
         }
         
         if(numFormatsWritten > 0) {
-            System.out.println("        Exported linear notations of " + fg.getGraphType() + " folding graph #" + fgNumber + " in PTGL format to dir '" + new File(outputDir).getAbsolutePath() + fs + "'.");
+            if(! silent) {
+                System.out.println("        Exported linear notations of " + fg.getGraphType() + " folding graph #" + fgNumber + " in PTGL format to dir '" + new File(outputDir).getAbsolutePath() + fs + "'.");
+            }
         }
         else {
-            System.err.println("        Could not export linear notations of " + fg.getGraphType() + " folding graph #" + fgNumber + " in PTGL format to dir '" + new File(outputDir).getAbsolutePath() + fs + "'.");
+            if(! silent) {
+                System.err.println("        Could not export linear notations of " + fg.getGraphType() + " folding graph #" + fgNumber + " in PTGL format to dir '" + new File(outputDir).getAbsolutePath() + fs + "'.");
+            }
         }
     }
     
@@ -5527,6 +5558,7 @@ public class Main {
             compGraph.proteinNodeMap.put(v, allChains.get(i).getPdbChainID());
             //System.out.println(allChains.get(i).getPdbChainID());
         }
+        
         
         System.out.println("  Computing CG contacts.");
         // create edges for all contacts

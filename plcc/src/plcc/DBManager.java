@@ -861,7 +861,7 @@ public class DBManager {
      * Checks whether the chain contains a 4 helix motif. These checks consider the different linear notations of several graph types.
      * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
      * @param chain_db_id
-     * @return true if the motif was found, false otherwise
+     * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
      */
     public static Boolean chainContainsMotif_4helix(Long chain_db_id) {
         
@@ -883,7 +883,7 @@ public class DBManager {
         */
         
         StringBuilder querySB = new StringBuilder();
-        querySB.append("SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header ");
+        querySB.append("SELECT p.pdb_id, c.chain_name ");
 	querySB.append("FROM plcc_fglinnot ln ");
 	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
 	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
@@ -892,7 +892,6 @@ public class DBManager {
 	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 1 AND (ln.ptgl_linnot_red like '%1a,1a,1a,-3_%' and ln.ptgl_linnot_red not like '%-1a,1a,1a,-3_%') or (ln.ptgl_linnot_red like '%-3_,1a,1a,1a%') or (ln.ptgl_linnot_red like '%3_,1a,1a,1a%' and ln.ptgl_linnot_red not like '%-3_,1a,1a,1a%') or (ln.ptgl_linnot_red like '%-4_,1a,1a,2a%') or (ln.ptgl_linnot_red like '%2a,1a,1a,-4_%' and ln.ptgl_linnot_red not like '%-2a,1a,1a,-4_%') or (ln.ptgl_linnot_red LIKE '%1p,1a,1p%' and ln.ptgl_linnot_red not like '%-1p,1a,1p%') or (ln.ptgl_linnot_red LIKE '%1a,1a,1a%' and ln.ptgl_linnot_seq like '%1,1,1%' and ln.num_sses < 6 ) ) or (pg.graph_type = 4 AND ln.ptgl_linnot_red LIKE '[h,1ah,1ah,1ah]') )");
         
         String query = querySB.toString();
-        int numFound = 0;
         
         try {
             dbc.setAutoCommit(false);
@@ -905,31 +904,46 @@ public class DBManager {
             
             md = rs.getMetaData();
             count = md.getColumnCount();
-            
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
             while (rs.next()) {
-                numFound++;
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
             }
             
         } catch (SQLException e ) {
-            DP.getInstance().e("DBManager", "SQL: chainContainsMotif_4helix(): '" + e.getMessage() + "'.");
+            DP.getInstance().e("DBManager", "SQL: chainContainsMotif_4helix: '" + e.getMessage() + "'.");
         } finally {
             try {
                 if (statement != null) {
                     statement.close();
                 }
-                if (rs != null) {
-                    rs.close();
-                }
                 dbc.setAutoCommit(true);
-            } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_4helix(): Could not close statement and reset autocommit: '" + e.getMessage() + "'."); }
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_4helix: Could not close statement and reset autocommit."); }
         }
         
-        // check results
-        if(numFound >= 1) {
-            return true;
+        // OK, check size of results table and return 1st field of 1st column
+        if(tableData.size() >= 1) {
+            if(tableData.get(0).size() >= 1) {
+                return(true);
+            }
+            else {
+                return(false);
+            }
         }
+        else {
+            return(false);
+        }        
 
-        return false;
     }
     
     /**
@@ -2942,14 +2956,14 @@ public class DBManager {
             }
             
         } catch (SQLException e ) {
-            System.err.println("ERROR: SQL: ligandExistsInDB:'" + e.getMessage() + "'.");
+            DP.getInstance().e("DBManager", "SQL: ligandExistsInDB:'" + e.getMessage() + "'.");
         } finally {
             try {
                 if (statement != null) {
                     statement.close();
                 }
                 dbc.setAutoCommit(true);
-            } catch(SQLException e) { DP.getInstance().w("DB: ligandExistsInDB: Could not close statement and reset autocommit."); }
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "DB: ligandExistsInDB: Could not close statement and reset autocommit."); }
         }
         
         // OK, check size of results table and return 1st field of 1st column
@@ -3041,7 +3055,7 @@ public class DBManager {
         
 
         if (chain_db_id < 0) {
-            DP.getInstance().w("getGraph(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
+            DP.getInstance().w("DBManager", "getGraphString(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
             return(null);
         }
 
@@ -3094,7 +3108,7 @@ public class DBManager {
             }
             
         } catch (SQLException e ) {
-            System.err.println("ERROR: SQL: getGraph: Retrieval of graph string failed: '" + e.getMessage() + "'.");
+            DP.getInstance().e("DBManager", "ERROR: SQL: getGraph: Retrieval of graph string failed: '" + e.getMessage() + "'.");
         } finally {
             if (statement != null) {
                 statement.close();
@@ -3108,7 +3122,7 @@ public class DBManager {
                 return(tableData.get(0).get(0));
             }
             else {
-                DP.getInstance().w("DB: No entry for graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
+                DP.getInstance().w("DBManager", "DB: No entry for graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
                 return(null);
             }
         }

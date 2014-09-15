@@ -2442,12 +2442,14 @@ E	3	3	3
             DP.getInstance().e("Could not write graph file : '" + ex.getMessage() + "'.");
         }
         
-        StringBuilder sb = new StringBuilder();
-        sb.append("      Output graph files: ");
-        for(IMAGEFORMAT format : resultFilesByFormat.keySet()) {
-            sb.append("(").append(format.toString()).append(" => ").append(resultFilesByFormat.get(format)).append(") ");
+        if( ! Settings.getBoolean("plcc_B_silent")) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("      Output graph files: ");
+            for(IMAGEFORMAT format : resultFilesByFormat.keySet()) {
+                sb.append("(").append(format.toString()).append(" => ").append(resultFilesByFormat.get(format)).append(") ");
+            }
+            System.out.println(sb.toString());
         }
-        System.out.println(sb.toString());
         return resultFilesByFormat;
     }
     
