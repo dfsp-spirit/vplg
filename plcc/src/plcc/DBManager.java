@@ -86,6 +86,9 @@ public class DBManager {
     /** Name of the table which stores the PTGL linear notation of a folding graph. */
     //static String tbl_fglinnot_albelig = "plcc_fglinnot_albelig";        
     
+    static String view_sses = "plcc_view_sses";
+    static String view_sses_secondat = "plcc_view_sses_secondat";
+    
     static String view_ssecontacts = "plcc_view_ssetype_contacts";
     static String view_graphs = "plcc_view_graphs";
     static String view_foldinggraphs = "plcc_view_foldinggraphs";
@@ -535,6 +538,9 @@ public class DBManager {
             //doInsertQuery("CREATE VIEW " + view_fglinnotsbetalig + " AS SELECT linnotbetalig_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key FROM (SELECT la.linnotbetalig_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM " + tbl_fglinnot_betalig + " la LEFT JOIN " + tbl_foldinggraph + " fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN " + tbl_proteingraph + " pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN " + tbl_chain + " c ON pg.chain_id=c.chain_id LEFT JOIN " + tbl_graphtypes + " gt ON pg.graph_type=gt.graphtype_id) bar ;");
             //doInsertQuery("CREATE VIEW " + view_fglinnotsalbelig + " AS SELECT linnotalbelig_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key FROM (SELECT la.linnotalbelig_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM " + tbl_fglinnot_albelig + " la LEFT JOIN " + tbl_foldinggraph + " fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN " + tbl_proteingraph + " pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN " + tbl_chain + " c ON pg.chain_id=c.chain_id LEFT JOIN " + tbl_graphtypes + " gt ON pg.graph_type=gt.graphtype_id) bar ;");
             doInsertQuery("CREATE VIEW " + view_fglinnots + " AS SELECT linnot_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key FROM (SELECT la.linnot_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM " + tbl_fglinnot + " la LEFT JOIN " + tbl_foldinggraph + " fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN " + tbl_proteingraph + " pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN " + tbl_chain + " c ON pg.chain_id=c.chain_id LEFT JOIN " + tbl_graphtypes + " gt ON pg.graph_type=gt.graphtype_id) bar ;");
+            
+            doInsertQuery("CREATE VIEW " + view_sses + " AS SELECT s.sse_id, p.pdb_id, c.chain_name, s.position_in_chain, s.dssp_start, s.dssp_end, sset.ssetype_text FROM " + tbl_sse + " s INNER JOIN " + tbl_chain + " c ON s.chain_id = c.chain_id INNER JOIN " + tbl_protein + " p ON c.pdb_id = p.pdb_id INNER JOIN " + tbl_ssetypes + " sset ON s.sse_type = sset.ssetype_id;");
+            //doInsertQuery("CREATE VIEW " + view_sses_secondat + " AS SELECT linnot_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key FROM (SELECT la.linnot_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM " + tbl_fglinnot + " la LEFT JOIN " + tbl_foldinggraph + " fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN " + tbl_proteingraph + " pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN " + tbl_chain + " c ON pg.chain_id=c.chain_id LEFT JOIN " + tbl_graphtypes + " gt ON pg.graph_type=gt.graphtype_id) bar ;");
             
             // add comments on views
             doInsertQuery("COMMENT ON VIEW " + view_ssecontacts + " IS 'Easy overview of SSE contacts.';");
@@ -2042,7 +2048,7 @@ public class DBManager {
         
         ArrayList<Long> sseDBids = new ArrayList<Long>();
         for(SSE sse : sses) {
-            Long sseID = DBManager.getDBSseID(sse.getStartDsspNum(), chain_id);
+            Long sseID = DBManager.getDBSseIDByDsspStartResidue(sse.getStartDsspNum(), chain_id);
             if(sseID > 0) {
                 sseDBids.add(sseID);
             }
@@ -2088,7 +2094,7 @@ public class DBManager {
         
         ArrayList<Long> sseDBids = new ArrayList<Long>();
         for(SSE sse : sses) {
-            Long sseID = DBManager.getDBSseID(sse.getStartDsspNum(), chain_database_id);
+            Long sseID = DBManager.getDBSseIDByDsspStartResidue(sse.getStartDsspNum(), chain_database_id);
             if(sseID > 0) {
                 sseDBids.add(sseID);
             }
@@ -2430,8 +2436,8 @@ public class DBManager {
             return (false);
         }
 
-        Long sse1_id = getDBSseID(sse1_dssp_start, db_chain_id);
-        Long sse2_id = getDBSseID(sse2_dssp_start, db_chain_id);
+        Long sse1_id = getDBSseIDByDsspStartResidue(sse1_dssp_start, db_chain_id);
+        Long sse2_id = getDBSseIDByDsspStartResidue(sse2_dssp_start, db_chain_id);
         Long tmp;
 
         // We may need to switch the IDs to make sure the 1st of them is always lower
@@ -2560,12 +2566,12 @@ public class DBManager {
 
     
     /**
-     * Retrieves the internal database SSE ID of a SSE from the DB.
+     * Retrieves the internal database SSE ID of a SSE from the DB, based on chain and DSSP start residue.
      * @param dssp_start the DSSP start residue number of the SSE
      * @param db_chain_id the DB chain ID of the chain the SSE is part of
      * @return The ID if it was found, -1 otherwise.
      */
-    private static Long getDBSseID(Integer dssp_start, Long db_chain_id) {
+    private static Long getDBSseIDByDsspStartResidue(Integer dssp_start, Long db_chain_id) {
         Long id = -1L;
         ArrayList<ArrayList<String>> rowarray = doSelectQuery("SELECT s.sse_id FROM " + tbl_sse + " s JOIN " + tbl_chain + " c ON ( s.chain_id = c.chain_id ) WHERE ( s.dssp_start = " + dssp_start + " AND c.chain_id = '" + db_chain_id + "' );");
 
@@ -2579,6 +2585,103 @@ public class DBManager {
                 return (-1L);
             }
         }
+    }
+    
+    /**
+     * Retrieves the internal database SSE ID of a SSE from the DB, based on the sequential position in the chain (N to C terminus).
+     * @param seq_pos the DSSP start residue number of the SSE
+     * @param db_chain_id the DB chain ID of the chain the SSE is part of
+     * @return The ID if it was found, -1 otherwise.
+     */
+    private static Long getDBSseIDBySequentialNumberInChain(Integer seq_pos, Long db_chain_id) {
+        Long id = -1L;
+        ArrayList<ArrayList<String>> rowarray = doSelectQuery("SELECT s.sse_id FROM " + tbl_sse + " s JOIN " + tbl_chain + " c ON ( s.chain_id = c.chain_id ) WHERE ( s.position_in_chain = " + seq_pos + " AND c.chain_id = '" + db_chain_id + "' );");
+
+        if (rowarray == null) {
+            return (-1L);
+        } else {
+            try {
+                id = Long.valueOf(rowarray.get(0).get(0));
+                return (id);
+            } catch (NumberFormatException e) {
+                return (-1L);
+            }
+        }
+    }
+    
+    /**
+     * Retrieves the list of SSEs of a chain. The SSEs are returned in an ordered list (N to C terminus), represented by their internal DB ids.
+     * @param db_chain_id the internal DB chain ID
+     * @return the list of internal SSE database IDs of the chain. The SSEs are returned in an ordered list (N to C terminus), represented by their internal DB ids.
+     */
+    private static List<Long> getOrderedSSEDBIDsOfChain(Long db_chain_id) {
+        List<Long> ids = new ArrayList<Long>();
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT s.sse_id, s.position_in_chain FROM " + tbl_sse + " s JOIN " + tbl_chain + " c ON ( s.chain_id = c.chain_id ) WHERE ( c.chain_id = ? ) ORDER BY s.position_in_chain ASC;";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, db_chain_id);
+                                
+            rs = statement.executeQuery();
+            dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "ERROR: SQL: getOrderedSSEDBIDsOfChain: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
+                dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "getOrderedSSEDBIDsOfChain: Could not close statement and reset autocommit."); }
+        }
+        
+        // convert results to Long and add to list
+        for(ArrayList<String> row : tableData) {
+            if(row.size() > 0) {
+                try {
+                    Long id = Long.valueOf(row.get(0));
+                    ids.add(id);
+                } catch (Exception e) {
+                    DP.getInstance().e("DBManager", "getOrderedSSEDBIDsOfChain: Could not cast DB id to Long, skipping.");
+                }
+            }
+        }
+        
+        return ids;
     }
 
     
