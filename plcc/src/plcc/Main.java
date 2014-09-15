@@ -1951,8 +1951,11 @@ public class Main {
                     try {
                        SSE ssej = allChainSSEs.get(j);
                        Integer ssePositionInChain = j + 1;
-                       DBManager.writeSSEToDB(pdbid, chain, ssej.getStartDsspNum(), ssej.getEndDsspNum(), ssej.getStartPdbResID(), ssej.getEndPdbResID(), ssej.getAASequence(), ssej.getSSETypeInt(), ssej.getLigandName3(), ssePositionInChain); 
+                       Long insertID = DBManager.writeSSEToDB(pdbid, chain, ssej.getStartDsspNum(), ssej.getEndDsspNum(), ssej.getStartPdbResID(), ssej.getEndPdbResID(), ssej.getAASequence(), ssej.getSSETypeInt(), ssej.getLigandName3(), ssePositionInChain); 
                        //System.out.println("  Info on SSE #" + (j + 1) + " of chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
+                       if(insertID > 0) {
+                           DBManager.writeEmptySecondatEntryForSSE(insertID);
+                       }
                     }
                     catch(Exception e) {
                         DP.getInstance().w("Could not write info on SSE # " + j + " of chain '" + chain + "' of protein '" + pdbid + "' to DB.");

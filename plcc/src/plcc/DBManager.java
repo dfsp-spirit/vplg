@@ -759,6 +759,58 @@ public class DBManager {
     }
 
     
+    /**
+     * Adds an empty secondat entry to the DB for this SSE.
+     * @param sse_db_id the SSE internal database ID
+     * @return the insert ID or -1 on failure
+     * @throws SQLException if something went wrong
+     */
+    public static Long writeEmptySecondatEntryForSSE(Long sse_db_id) throws SQLException {
+        PreparedStatement statement = null;
+
+      
+        ResultSet generatedKeys = null;
+        Long insertID = -1L;
+        
+        String query = "INSERT INTO " + tbl_secondat + " (sse_id) VALUES (?);";
+                
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+
+            statement.setLong(1, sse_db_id);
+                                
+            statement.executeUpdate();
+            dbc.commit();
+            
+            // get DB insert id
+            generatedKeys = statement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                insertID = generatedKeys.getLong(1);
+            } else {
+                DP.getInstance().e("DBManager", "Inserting empty secondat entry for SSE into DB failed, no generated key obtained.");
+            }
+
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "writeEmptySecondatEntryForSSE: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    DP.getInstance().e("DBManager", "writeEmptySecondatEntryForSSE: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    DP.getInstance().e("DBManager", "writeEmptySecondatEntryForSSE: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        }
+        return(insertID);       
+        
+    }
     
     /**
      * Writes information on a SSE to the database. Note that the protein + chain have to exist in the database already.
@@ -775,16 +827,15 @@ public class DBManager {
      * @return whether it worked out
      * @throws java.sql.SQLException if something with the DB went wrong 
      */
-    public static Boolean writeSSEToDB(String pdb_id, String chain_name, Integer dssp_start, Integer dssp_end, String pdb_start, String pdb_end, String sequence, Integer sse_type, String lig_name, Integer ssePositionInChain) throws SQLException {
+    public static Long writeSSEToDB(String pdb_id, String chain_name, Integer dssp_start, Integer dssp_end, String pdb_start, String pdb_end, String sequence, Integer sse_type, String lig_name, Integer ssePositionInChain) throws SQLException {
 
         Long chain_id = getDBChainID(pdb_id, chain_name);
 
         if (chain_id < 0) {
-            System.err.println("ERROR: writeSSEToDB: Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert SSE.");
-            return (false);
+            DP.getInstance().e("DBManager", "writeSSEToDB: Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert SSE.");
+            return (-1L);
         }
       
-        Boolean result = false;
 
         PreparedStatement statement = null;
 
@@ -803,12 +854,15 @@ public class DBManager {
          * 
          */
 
+        ResultSet generatedKeys = null;
+        Long insertID = -1L;
+        
         String query = "INSERT INTO " + tbl_sse + " (chain_id, dssp_start, dssp_end, pdb_start, pdb_end, sequence, sse_type, lig_name, position_in_chain) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
                 // chain_id + ", " + dssp_start + ", " + dssp_end + ", '" + pdb_start + "', '" + pdb_end + "', '" + sequence + "', " + sse_type + ", '" + lig_name + "');";
                 
         try {
             dbc.setAutoCommit(false);
-            statement = dbc.prepareStatement(query);
+            statement = dbc.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
             statement.setLong(1, chain_id);
             statement.setInt(2, dssp_start);
@@ -821,26 +875,36 @@ public class DBManager {
             statement.setInt(9, ssePositionInChain);
                                 
             statement.executeUpdate();
+            
+            
+            // get DB insert id
+            generatedKeys = statement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                insertID = generatedKeys.getLong(1);
+            } else {
+                DP.getInstance().e("DBManager", "Inserting SSE into DB failed, no generated key obtained.");
+            }
+            
             dbc.commit();
-            result = true;
+
         } catch (SQLException e ) {
-            System.err.println("ERROR: SQL: writeSSEToDB: '" + e.getMessage() + "'.");
+            DP.getInstance().e("DBManager", "writeSSEToDB: '" + e.getMessage() + "'.");
             if (dbc != null) {
                 try {
-                    System.err.print("ERROR: SQL: writeSSEToDB: Transaction is being rolled back.");
+                    DP.getInstance().e("DBManager", "writeSSEToDB: Transaction is being rolled back.");
                     dbc.rollback();
                 } catch(SQLException excep) {
-                    System.err.println("ERROR: SQL: writeSSEToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                    DP.getInstance().e("DBManager", "writeSSEToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
                 }
             }
-            result = false;
+
         } finally {
             if (statement != null) {
                 statement.close();
             }
             dbc.setAutoCommit(true);
         }
-        return(result);       
+        return(insertID);       
     }
     
     
