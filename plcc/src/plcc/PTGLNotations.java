@@ -70,10 +70,10 @@ public class PTGLNotations {
     public PTGLNotations(ProtGraph g) {
         
         String gt = g.getGraphType();
-        if( ! (gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALPHA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_BETA))) {
-            System.err.println("WARNING: PTGLNotations: Graph type '" + gt + "' is experimental. Please provide an alpha, beta or albe graph for stable results.");
-            //System.exit(1);
-        }
+        //if( ! (gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALPHA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_BETA))) {
+        //    System.err.println("WARNING: PTGLNotations: Graph type '" + gt + "' is experimental. Please provide an alpha, beta or albe graph for stable results.");
+        //    //System.exit(1);
+        //}
         
         this.g = g;
         this.verbose = false;

@@ -380,6 +380,14 @@ public class IO {
         return s;
     }
     
+    public static String stringListToString(List<String> ar) {
+        String s = "";
+        for(String i : ar) {
+            s += i + " ";
+        }
+        return s;
+    }
+    
     public static String intListToString(List<Integer> ar, String start, String end) {
         String s = start;
         for(Integer i : ar) {

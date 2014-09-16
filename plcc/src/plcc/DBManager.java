@@ -932,15 +932,29 @@ public class DBManager {
         }
                 
         Integer rowsAffectedTotal = 0;
+        Integer rowsAffectedThisMotif;
         Long motif_db_id;
+        
+        List<String> foundMotifsForChain = new ArrayList<String>();
         
         // check all 10 motives:
         if(DBManager.chainContainsMotif_4helix(chain_db_id)) {
             motif_db_id = 1L;   // the motif ID for 4-helix, see the plcc_motifs table
-            rowsAffectedTotal += DBManager.assignChainToMotiv(chain_db_id, motif_db_id);
+            rowsAffectedThisMotif = DBManager.assignChainToMotiv(chain_db_id, motif_db_id);
+            if(rowsAffectedThisMotif > 0) {
+                foundMotifsForChain.add(Motifs.MOTIF__FOUR_HELIX_BUNDLE);
+            }
+            rowsAffectedTotal += rowsAffectedThisMotif;
         }
         
         //TODO: check for the other motifs here
+        if(! Settings.getBoolean("plcc_B_silent")) {
+            if(foundMotifsForChain.size() > 0) {
+                System.out.println("      Found motives in all folding graph linear notations of " + pdbid + " chain " + chain + ": " + IO.stringListToString(foundMotifsForChain));
+            } else {
+                System.out.println("      Found no motives in all folding graph linear notations of " + pdbid + " chain " + chain + ".");
+            }
+        }
         
         return rowsAffectedTotal;
     }

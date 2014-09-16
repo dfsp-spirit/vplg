@@ -2342,9 +2342,9 @@ public class Main {
                 Integer numAssigned = 0;
                 try {
                     numAssigned = DBManager.checkAndAssignChainToAllMotifsInDatabase(pdbid, chain);
-                    if(! silent) {
-                        System.out.println("      Computed SSE motifs for chain " + chain + ", found " + numAssigned + " motifs in all folding graph linear notations.");
-                    }
+                    //if(! silent) {
+                    //    System.out.println("      Computed SSE motifs for chain " + chain + ", found " + numAssigned + " motifs in all folding graph linear notations.");
+                    //}
                 } catch(Exception e) {
                     DP.getInstance().e("Main", "Computing SSE motifs failed for PDB " + pdbid + " chain " + chain + ": '" + e.getMessage() + "'.");
                 }
