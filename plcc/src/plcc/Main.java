@@ -2343,7 +2343,7 @@ public class Main {
                 try {
                     numAssigned = DBManager.checkAndAssignChainToAllMotifsInDatabase(pdbid, chain);
                     if(! silent) {
-                        System.out.println("      Computed SSE motifs for chain, found " + numAssigned + " motifs in all folding graph linear notations.");
+                        System.out.println("      Computed SSE motifs for chain " + chain + ", found " + numAssigned + " motifs in all folding graph linear notations.");
                     }
                 } catch(Exception e) {
                     DP.getInstance().e("Main", "Computing SSE motifs failed for PDB " + pdbid + " chain " + chain + ": '" + e.getMessage() + "'.");
@@ -2455,10 +2455,16 @@ public class Main {
                 }
                 if(fgDbId >= 1) {
                     try {
-                        int numAssigned = DBManager.assignSSEsToFoldingGraphInOrder(fg.sseList, fgDbId);
+                        Integer[] numAssigned = DBManager.assignSSEsToFoldingGraphInOrderWithSecondat(fg.sseList, fgDbId, gt, fg_number, FoldingGraph.getFoldNameOfFoldNumber(fg_number));
                         if(! silent) {
-                            System.out.println("        Assigned " + numAssigned + " SSEs to " + gt + " folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' in the DB.");
+                            if(Objects.equals(numAssigned[0], numAssigned[1])) {
+                                System.out.println("        Assigned " + numAssigned[0] + " SSEs to " + gt + " folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' in the DB.");
+                            } else {
+                                DP.getInstance().w("Main", "SSE to folding graph assignment: " + numAssigned[0] + " SSEs assigned to fg # " + fg_number + " in sse2fg table, but " + numAssigned[1] + " in secondat table -- expected same value.");
+                            }
                         }
+                                                
+                        
                     } catch(SQLException ex) {
                        DP.getInstance().e("Main", "Could not assign SSEs to graph in the database: '" + ex.getMessage() + "'.");
                     }

@@ -91,6 +91,20 @@ public class ProtGraphs {
         }
     }
 
+    
+    /**
+     * Checks whether s is a valid graph type string (like 'alpha').
+     * @param s the graph type string to be tested
+     * @return true if it is valid, false otherwise
+     */
+    public static boolean isValidGraphTypeString(String s) {
+        Integer i = ProtGraphs.getGraphTypeCode(s);
+        if(i < 0) {
+            return false;
+        }
+        return true;
+    }
+    
     /**
      * Returns true if the given graph type string is a string representing a ligand graph (alphalig, betalig or albelig), false otherwise
      * @param graphType the graph type string, e.g., "alpha" or some constant from ProtGraphs.GRAPHTYPE_STRING_*

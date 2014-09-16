@@ -1997,6 +1997,64 @@ public class DBManager {
     }
     
     
+    /**
+     * Updates secondat data on an SSE in the database.
+     * @param sseDatabaseID the internal database ID of the SSE
+     * @param fg_graph_type the graph type of the folding graph (which is the graph type of its parent protein graph). Use ProtGraphs.GRAPHTYPE_STRING_*.
+     * @param fg_number the folding graph number
+     * @param fg_foldname the fold name
+     * @param sse_position_in_fg the position of the SSE within the folding graph
+     * @return the number of affected rows
+     * @throws SQLException if SQL stuff went wrong
+     */
+    public static Integer updateSecondatSSEInfoForGraphInDB(Long sseDatabaseID, String fg_graph_type, Integer fg_number, String fg_foldname, Integer sse_position_in_fg) throws SQLException {
+        
+        PreparedStatement statement = null;
+        
+        if( ! ProtGraphs.isValidGraphTypeString(fg_graph_type)) {
+            return 0;
+        }
+        
+        String verified_graphtype = fg_graph_type;
+        
+        String fg_number_field =  verified_graphtype + "_fg_number";
+        String fg_foldname_field =  verified_graphtype + "_fg_foldname";
+        String fg_position_field =  verified_graphtype + "_fg_position";
+
+        String query = "UPDATE " + tbl_secondat + " SET " + fg_number_field + " = ?, " + fg_foldname_field + " = ?, " + fg_position_field + " = ? WHERE sse_id = ?;";
+        Integer numRowsAffected = 0;
+        
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+            
+            statement.setInt(1, fg_number);
+            statement.setString(2, fg_foldname);
+            statement.setInt(3, sse_position_in_fg);
+            statement.setLong(4, sseDatabaseID);
+                                
+            numRowsAffected = statement.executeUpdate();
+            dbc.commit();
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "updateSecondatSSEInfoForGraphInDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    DP.getInstance().e("DBManager", "updateSecondatSSEInfoForGraphInDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    DP.getInstance().e("DBManager", "updateSecondatSSEInfoForGraphInDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        } 
+       
+        return numRowsAffected;
+        
+    }
     
     /**
      * Sets the image path for a specific folding graph representation in the database. The graph has to exist in the database already.
@@ -2183,6 +2241,7 @@ public class DBManager {
             }
         }
         
+       
 
         if(foldingGraphDbId > 0) {
             for(int i = 0; i < sseDBids.size(); i++) {
@@ -2193,6 +2252,57 @@ public class DBManager {
         }
         
         return numAssigned;
+    }
+    
+    /**
+     * Assigns the SSEs in the list to the given folding graph (identified by PDB ID, chain ID and graph type) in the database, using the order
+     * of the SSEs in the input list.
+     * @param sses a list of SSEs, in the order of the graph (N to C terminus on the chain, but some SSEs of the chain may be missing of course, depending on the graph type)
+     * @param foldingGraphDbId the database ID of the folding graph
+     * @param fg_graph_type the graph type (used for secondat only)
+     * @param fg_number the folding graph number (used for secondat only)
+     * @param fg_foldname the folding graph fold name (depends on fg_number, used for secondat only)
+     * @return an Integer array: position 0 = the number of SSEs successfully assigned to the graph in sse2fg table. position 1 = the number assigned in secondat table.
+     * @throws SQLException if something goes wrong with the database server
+     */
+    public static Integer[] assignSSEsToFoldingGraphInOrderWithSecondat(ArrayList<SSE> sses, Long foldingGraphDbId, String fg_graph_type, Integer fg_number, String fg_foldname) throws SQLException {
+        Integer numAssignedSSE2FG = 0;
+        Integer numAssignedSecondat = 0;
+        
+        if(foldingGraphDbId < 1) {
+            DP.getInstance().e("DBManager", "assignSSEsToFoldingGraphInOrder(): Folding graph database ID must be >= 1 but is  '" + foldingGraphDbId + " ', aborting.");
+            return new Integer[]{ 0, 0 };
+        }
+        
+        Long chain_database_id = DBManager.getDBChainIDofFoldingGraph(foldingGraphDbId);
+        
+        if(chain_database_id < 1) {
+            DP.getInstance().e("DBManager", "assignSSEsToFoldingGraphInOrder(): Could not find chain of folding graph with ID '" + foldingGraphDbId + " ' in database.");
+            return new Integer[]{ 0, 0 };
+        }
+        
+        ArrayList<Long> sseDBids = new ArrayList<Long>();
+        for(SSE sse : sses) {
+            Long sseID = DBManager.getDBSseIDByDsspStartResidue(sse.getStartDsspNum(), chain_database_id);
+            if(sseID > 0) {
+                sseDBids.add(sseID);
+            }
+            else {
+                DP.getInstance().e("DBManager", "assignSSEsToFoldingGraphInOrder(): SSE not found in DB, cannot assign it to graph.");
+            }
+        }
+                
+
+        if(foldingGraphDbId > 0) {
+            for(int i = 0; i < sseDBids.size(); i++) {
+                numAssignedSSE2FG += DBManager.assignSSEtoFoldingGraph(sseDBids.get(i), foldingGraphDbId, (i+1));
+                numAssignedSecondat += updateSecondatSSEInfoForGraphInDB(sseDBids.get(i), fg_graph_type, fg_number, fg_foldname, (i+1));
+            }                            
+        } else {
+            DP.getInstance().e("DBManager", "assignSSEsToFoldingGraphInOrder(): Graph not found in DB, cannot assign SSEs to it.");            
+        }
+        
+        return new Integer[]{ numAssignedSSE2FG, numAssignedSecondat };
     }
     
     
