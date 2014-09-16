@@ -633,7 +633,12 @@ public class DBManager {
             
             doInsertQuery("COMMENT ON COLUMN " + tbl_secondat + ".alpha_fg_number IS 'The number of the alpha folding graph in which this SSE occurs. Note that it can occur in 0 or 1 alpha FGs (in 0 if it is not an alpha helix, in 1 otherwise). If it does not occur in any alpha FG, this is null.';");
             doInsertQuery("COMMENT ON COLUMN " + tbl_secondat + ".alpha_fg_foldname IS 'The fold name of the alpha folding graph in which this SSE occurs. Note that it can occur in 0 or 1 alpha FGs (in 0 if it is not an alpha helix, in 1 otherwise). If it does not occur in any alpha FG, this is null.';");
-            doInsertQuery("COMMENT ON COLUMN " + tbl_secondat + ".alpha_fg_position IS 'The position of this SSE in the alpha FG defined by the field alpha_fg_number.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_secondat + ".alpha_fg_position IS 'The position of this SSE in the alpha FG defined by the field alpha_fg_number. Starts counting at 1.';");
+            
+            doInsertQuery("COMMENT ON COLUMN " + tbl_nm_ssetoproteingraph + ".position_in_graph IS 'The position of this SSE in the protein graph. Starts counting at 1.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_nm_ssetofoldinggraph + ".position_in_graph IS 'The position of this SSE in the folding graph. Starts counting at 1.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_foldinggraph + ".fg_number IS 'The connected component number within the parent protein graph. The order of the CCs is defined by the lowest vertex index (in the parent graph) of the CCs. Starts counting at 0.';");
+            
             
             // add indices
             doInsertQuery("CREATE INDEX plcc_idx_chain_insert ON " + tbl_chain + " (pdb_id, chain_name);");         // for SELECTs during data insert
@@ -737,7 +742,7 @@ public class DBManager {
             doInsertQuery("INSERT INTO " + tbl_motiftype + " (motiftype_id, motiftype_name) VALUES (3, 'alpha beta');");
             
             // alpha motifs
-            doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name, motif_abbreviation) VALUES (1, 1, 'Four Helix Bundle', '4helix');");
+            doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name, motif_abbreviation) VALUES (1, 1, 'Four Helix Bundle', '" + Motifs.MOTIF__FOUR_HELIX_BUNDLE + "');");
             doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name, motif_abbreviation) VALUES (2, 1, 'Globin Fold', 'globin');");
             // beta motifs
             doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name, motif_abbreviation) VALUES (3, 2, 'Up and Down Barrel', 'barrel');");
