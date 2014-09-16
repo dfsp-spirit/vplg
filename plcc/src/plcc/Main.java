@@ -2309,7 +2309,7 @@ public class Main {
                 /* ----------------------------------------------- Folding graphs ---------------------------------------------- */
 
                 if(Settings.getBoolean("plcc_B_folding_graphs")) {
-                    if(gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALPHA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_BETA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
+                    //if(gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALPHA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_BETA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
                         
                         if( ! Settings.getBoolean("plcc_B_silent")) {
                             System.out.println("      Computing " + gt + " folding graphs.");
@@ -2319,11 +2319,11 @@ public class Main {
                         pcr.addProteinFoldingGraphResults(gt, fgRes);
                                                 
                         
-                    } else {
-                        if( ! silent) {
-                            System.out.println("      Handling folding graphs, but skipping graph type '" + gt + "'.");
-                        }
-                    }
+                    //} else {
+                    //    if( ! silent) {
+                    //        System.out.println("      Handling folding graphs, but skipping graph type '" + gt + "'.");
+                    //    }
+                    //}
                 }
                 else {
                     if( ! silent) {
@@ -2410,9 +2410,9 @@ public class Main {
                 System.exit(1);
             }
             
-            if(fg.numVertices() < Settings.getInteger("plcc_I_min_fgraph_size_draw")) {
+            if(fg.numVertices() < Settings.getInteger("plcc_I_min_fgraph_size_write_to_db")) {
                 if(! silent) {
-                    System.out.println("       *Ignoring " + gt + " folding graph #" + j + " of size " + fg.numVertices() + " (minimum size is " + Settings.getInteger("plcc_I_min_fgraph_size_draw") + ").");
+                    System.out.println("       *Ignoring " + gt + " folding graph #" + j + " of size " + fg.numVertices() + " (minimum size is " + Settings.getInteger("plcc_I_min_fgraph_size_write_to_db") + ").");
                 }
                 continue;
             }
@@ -2474,7 +2474,7 @@ public class Main {
                 
                 
                 // atm, only alpha, beta and beta FGs are supported in the database
-                if(gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALPHA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_BETA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
+                //if(gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALPHA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_BETA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
                     //Long insertIDMultiTable = -1L;
                     Long insertIDSingleTable = -1L;
                     try {
@@ -2503,12 +2503,12 @@ public class Main {
                         }
                     }
                     
-                }
-                else {
-                    if(! silent) {
-                        System.out.println("        Linear notations of folding graph type '" + gt + "' not supported by database, skipping.");
-                    }
-                }
+                //}
+                //else {
+                //    if(! silent) {
+                //        System.out.println("        Linear notations of folding graph type '" + gt + "' not supported by database, skipping.");
+                //    }
+                //}
                 
             }
             

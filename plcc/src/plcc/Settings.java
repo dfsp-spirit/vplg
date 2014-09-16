@@ -197,6 +197,7 @@ public class Settings {
         defSet("plcc_B_graphimg_legend", "true", "Determines whether the graph images contain a legend that explains the color codes and SSE symbols. This is part of the footer.");        
         defSet("plcc_B_graphimg_legend_always_all", "false", "Determines whether the legend contains all possible edge and vertex types, i.e., even those not occurring in the current image.");        
         defSet("plcc_I_min_fgraph_size_draw", "2", "The minimum size a folding graph must have in order to be drawn. Settings this to 1 or 0 draws all of them, including isolated vertices.");
+        defSet("plcc_I_min_fgraph_size_write_to_db", "1", "The minimum size a folding graph must have in order to be written to the database. Settings this to 1 or 0 draws all of them, including isolated vertices.");
         defSet("plcc_B_ptgl_text_output", "false", "Whether the PTGL text files (e.g., those required by the bet_neo) are written. Not writing them is faster but this program cannot replace the PTGL tool 'geom_neo' anymore if this is deactivated.");
         defSet("plcc_B_ptgl_geodat_output", "false", "Whether the PTGL text files geo.dat for SSE level contacts is written to a text file.");
         defSet("plcc_B_ramachandran_plot", "false", "Whether a Ramachandran plot is drawn to a file for each chain (slower).");
