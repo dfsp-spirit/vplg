@@ -1261,6 +1261,7 @@ public class DBManager {
         
         // OK, check size of results table
         if(tableData.size() >= 1) {
+            System.out.println("DEBUG: chainContainsMotif_GlobinFold: matched linnot");
             String row_pdbid, row_chain_name;
             for(ArrayList<String> row : tableData) {
                 if(row.size() >= 2) {
@@ -1273,9 +1274,12 @@ public class DBManager {
                         
                         if(sseTypesOfChain != null) {
                             // the chain contains only alpha helices, motif found
-                            if(sseTypesOfChain.contains("H") && sseTypesOfChain.size() == 1) {
-                                return true;
-                            }                            
+                            if(sseTypesOfChain.contains("H")) {
+                                if( ! sseTypesOfChain.contains("E")) {  // note that ligands are allowed!
+                                    return true;
+                                }
+                            }
+                            
                         } else {
                             DP.getInstance().e("DBManager", "chainContainsMotif_GlobinFold: Could not determine SSE string for chain, is the albelig graph missing in the DB? Cannot detect motif.");
                         }
