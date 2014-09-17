@@ -963,9 +963,20 @@ public class DBManager {
             rowsAffectedTotal += rowsAffectedThisMotif;
         }
         
+        if(DBManager.chainContainsMotif_GlobinFold(chain_db_id)) {
+            motif_db_id = Motifs.MOTIFCODE__GLOBIN_FOLD.longValue();
+            rowsAffectedThisMotif = DBManager.assignChainToMotiv(chain_db_id, motif_db_id);
+            if(rowsAffectedThisMotif > 0) {
+                foundMotifsForChain.add(Motifs.MOTIF__GLOBIN_FOLD);
+            }
+            rowsAffectedTotal += rowsAffectedThisMotif;
+        }
+        
         
         
         //TODO: check for the other motifs here
+        
+        // OK -- all motifs tested
         if(! Settings.getBoolean("plcc_B_silent")) {
             if(foundMotifsForChain.size() > 0) {
                 System.out.println("      Found motives in all folding graph linear notations of " + pdbid + " chain " + chain + ": " + IO.stringListToString(foundMotifsForChain));
@@ -979,7 +990,7 @@ public class DBManager {
             
         
     /**
-     * Checks whether the chain contains a 4 helix motif. These checks consider the different linear notations of several graph types.
+     * Checks whether the chain contains a 4 helix bundle motif. These checks consider the different linear notations of several graph types.
      * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
      * @param chain_db_id
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
@@ -1052,14 +1063,9 @@ public class DBManager {
             } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_FourHelixBundle: Could not close statement and reset autocommit."); }
         }
         
-        // OK, check size of results table and return 1st field of 1st column
+        // OK, check size of results table
         if(tableData.size() >= 1) {
-            if(tableData.get(0).size() >= 1) {
-                return(true);
-            }
-            else {
-                return(false);
-            }
+            return true;
         }
         else {
             return(false);
@@ -1069,7 +1075,7 @@ public class DBManager {
     
     
     /**
-     * Checks whether the chain contains a 4 helix motif. These checks consider the different linear notations of several graph types.
+     * Checks whether the chain contains an up and down barrel motif. These checks consider the different linear notations of several graph types.
      * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
      * @param chain_db_id
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
@@ -1127,7 +1133,7 @@ public class DBManager {
 	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 2 AND (ln.ptgl_linnot_red LIKE '%-7a,1a,1a,1a,1a,1a,1a,1a%') ) ) ");
         
         // order
-        querySB.append("ORDER BY pdb_id, chain_name ");
+        querySB.append("GROUP BY p.pdb_id, c.chain_name ");
         
         String query = querySB.toString();
         
@@ -1172,19 +1178,117 @@ public class DBManager {
             } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_UpAndDownBarrel: Could not close statement and reset autocommit."); }
         }
         
-        // OK, check size of results table and return 1st field of 1st column
+        // OK, check size of results table
         if(tableData.size() >= 1) {
-            if(tableData.get(0).size() >= 1) {
-                return(true);
-            }
-            else {
-                return(false);
-            }
+            return true;
         }
         else {
             return(false);
         }        
 
+    }
+    
+    
+    /**
+     * Checks whether the chain contains a globin fold motif. These checks consider the different linear notations of several graph types.
+     * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
+     * @param chain_db_id
+     * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
+     */
+    public static Boolean chainContainsMotif_GlobinFold(Long chain_db_id) {
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+                
+        PreparedStatement statement = null;
+        ResultSet rs = null;             
+        
+        StringBuilder querySB = new StringBuilder();
+        
+        // globin1.pl step 1 -- find chains
+        querySB.append("SELECT p.pdb_id, c.chain_name ");
+	querySB.append("FROM plcc_fglinnot ln ");
+	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
+	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
+	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
+	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 1 AND (ln.ptgl_linnot_red LIKE '%,%,%,%,%,%,%a%' AND ln.num_sses >= 8) ) ) ");
+        querySB.append("GROUP BY p.pdb_id, c.chain_name, ln.firstvertexpos_adj ");
+        
+        
+        String query = querySB.toString();
+        
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, chain_db_id);
+                                
+            rs = statement.executeQuery();
+            dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "chainContainsMotif_GlobinFold: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_GlobinFold: Could not close statement and reset autocommit."); }
+        }
+        
+        // OK, check size of results table
+        if(tableData.size() >= 1) {
+            String row_pdbid, row_chain_name;
+            for(ArrayList<String> row : tableData) {
+                if(row.size() >= 2) {
+                    row_pdbid = row.get(0);
+                    row_chain_name = row.get(1);
+                    
+                    try {
+                        // check whether the chain contains any non-alpha helix SSEs
+                        Set<String> sseTypesOfChain = getSSETypesOfChain(row_pdbid, row_chain_name);
+                        
+                        if(sseTypesOfChain != null) {
+                            // the chain contains only alpha helices, motif found
+                            if(sseTypesOfChain.contains("H") && sseTypesOfChain.size() == 1) {
+                                return true;
+                            }                            
+                        } else {
+                            DP.getInstance().e("DBManager", "chainContainsMotif_GlobinFold: Could not determine SSE string for chain, is the albelig graph missing in the DB? Cannot detect motif.");
+                        }
+                        
+                    } catch(SQLException ex) {
+                        DP.getInstance().e("DBManager", "chainContainsMotif_GlobinFold: Could not determine SSE string for chain, is the albelig graph missing in the DB? Cannot detect motif.");
+                        return false;
+                    }
+                }                
+            }
+        }
+        
+        return(false);                
     }
     
     
@@ -3031,7 +3135,104 @@ public class DBManager {
     }
 
     
-   
+    /**
+     * Determines all SSE types which occur in a chain, basedon the sse_string property of the albelig graph in the database.
+     * @param pdb_id the PDB id
+     * @param chain_name the chain name
+     * @return a set of SSE types or null if the albelig graph was not found in the DB
+     * @throws SQLException if something went wrong with the DB
+     */
+    public static Set<String> getSSETypesOfChain(String pdb_id, String chain_name) throws SQLException {
+        String sse_string = getSSEStringOfChain(pdb_id, chain_name);
+        if(sse_string != null) {
+            Set<String> types = new HashSet<String>();
+            for(Character c : sse_string.toCharArray()) {
+                types.add("" + c);
+            }
+            return types;
+        }
+        return null;
+    }
+    
+    /**
+     * Returns the SSE string of a chain from the database.
+     * @param pdb_id the PDB id
+     * @param chain_name the chain name
+     * @return the SSE string of the chain, or null if it cannot be found in the DB
+     * @throws SQLException if something goes wrong with the DB
+     */
+    public static String getSSEStringOfChain(String pdb_id, String chain_name) throws SQLException {
+       Long db_chain_id = DBManager.getDBChainID(pdb_id, chain_name);
+       
+       if(db_chain_id < 1L) {
+           return null;
+       }
+       
+       ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT g.sse_string FROM " + tbl_proteingraph + " g INNER JOIN " + tbl_chain + " c ON g.chain_id = c.chain_id INNER JOIN " + tbl_protein + " p ON c.pdb_id = p.pdb_id WHERE (p.pdb_id = ? AND c.chain_name = ? AND g.graph_type = 6);";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setString(1, pdb_id);
+            statement.setString(2, chain_name);
+                                
+            rs = statement.executeQuery();
+            dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "getSSEStringOfChain: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
+                dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "getSSEStringOfChain: Could not close statement and reset autocommit."); }
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        if(tableData.size() == 1) {
+            if(tableData.get(0).size() == 1) {
+                return((tableData.get(0).get(0)));
+            }
+            return null;
+        }
+        else {
+            return(null);
+        }
+       
+   }
     
     /**
      * Retrieves the internal database chain ID of a chain (it's PK) from the DB. The chain is identified by (pdb_id, chain_name).
@@ -3081,7 +3282,7 @@ public class DBManager {
             }
             
         } catch (SQLException e ) {
-            System.err.println("ERROR: SQL: getDBChainID: '" + e.getMessage() + "'.");
+            DP.getInstance().e("DBManager", "getDBChainID: '" + e.getMessage() + "'.");
         } finally {
             try {
                 if (statement != null) {
@@ -3091,7 +3292,7 @@ public class DBManager {
                     rs.close();
                 }
                 dbc.setAutoCommit(true);
-            } catch(SQLException e) { DP.getInstance().w("DB: Could not close statement and reset autocommit."); }
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "getDBChainID: Could not close statement and reset autocommit."); }
         }
         
         // OK, check size of results table and return 1st field of 1st column
@@ -3157,14 +3358,14 @@ public class DBManager {
             }
             
         } catch (SQLException e ) {
-            System.err.println("ERROR: SQL: getDBChainID: '" + e.getMessage() + "'.");
+            DP.getInstance().e("DBManager", "getPDBIDandChain: '" + e.getMessage() + "'.");
         } finally {
             try {
                 if (statement != null) {
                     statement.close();
                 }
                 dbc.setAutoCommit(true);
-            } catch(SQLException e) { DP.getInstance().w("DB: Could not close statement and reset autocommit."); }
+            } catch(SQLException e) { DP.getInstance().w("DBManager", " getPDBIDandChain: Could not close statement and reset autocommit."); }
         }
         
         // OK, check size of results table and return 1st field of 1st column
@@ -3173,7 +3374,7 @@ public class DBManager {
                 return(new String[] { tableData.get(0).get(0), tableData.get(0).get(1)});
             }
             else {
-                System.err.println("ERROR: DB: getPDBIDandChain(): Result row has unexpected length.");
+                DP.getInstance().e("DBManager", "getPDBIDandChain: Result row has unexpected length.");
                 return(new String[] { "" } );
             }
         }
@@ -3182,7 +3383,7 @@ public class DBManager {
                 // no such PK, empty result list
                 return(new String[] { "" } );
             } else {
-                System.err.println("ERROR: DB: getPDBIDandChain(): Result table has unexpected length '" + tableData.size() + "'. Should be either 0 or 1.");
+                DP.getInstance().e("DBManager", "getPDBIDandChain(): Result table has unexpected length '" + tableData.size() + "'. Should be either 0 or 1.");
                 return(new String[] { "" } );
             }
             
