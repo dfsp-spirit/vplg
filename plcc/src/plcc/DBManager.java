@@ -942,15 +942,28 @@ public class DBManager {
         
         List<String> foundMotifsForChain = new ArrayList<String>();
         
-        // check all 10 motives:
-        if(DBManager.chainContainsMotif_4helix(chain_db_id)) {
-            motif_db_id = 1L;   // the motif ID for 4-helix, see the plcc_motifs table
+        // check all 10 motives: 
+        
+        // four helix bundle
+        if(DBManager.chainContainsMotif_FourHelixBundle(chain_db_id)) {
+            motif_db_id = Motifs.MOTIFCODE__FOUR_HELIX_BUNDLE.longValue();
             rowsAffectedThisMotif = DBManager.assignChainToMotiv(chain_db_id, motif_db_id);
             if(rowsAffectedThisMotif > 0) {
                 foundMotifsForChain.add(Motifs.MOTIF__FOUR_HELIX_BUNDLE);
             }
             rowsAffectedTotal += rowsAffectedThisMotif;
         }
+        
+        if(DBManager.chainContainsMotif_UpAndDownBarrel(chain_db_id)) {
+            motif_db_id = Motifs.MOTIFCODE__UP_AND_DOWN_BARREL.longValue();
+            rowsAffectedThisMotif = DBManager.assignChainToMotiv(chain_db_id, motif_db_id);
+            if(rowsAffectedThisMotif > 0) {
+                foundMotifsForChain.add(Motifs.MOTIF__UP_AND_DOWN_BARREL);
+            }
+            rowsAffectedTotal += rowsAffectedThisMotif;
+        }
+        
+        
         
         //TODO: check for the other motifs here
         if(! Settings.getBoolean("plcc_B_silent")) {
@@ -971,7 +984,7 @@ public class DBManager {
      * @param chain_db_id
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
      */
-    public static Boolean chainContainsMotif_4helix(Long chain_db_id) {
+    public static Boolean chainContainsMotif_FourHelixBundle(Long chain_db_id) {
         
         ResultSetMetaData md;
         ArrayList<String> columnHeaders;
@@ -997,7 +1010,7 @@ public class DBManager {
 	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
 	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
 	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
-	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 1 AND (ln.ptgl_linnot_red like '%1a,1a,1a,-3_%' and ln.ptgl_linnot_red not like '%-1a,1a,1a,-3_%') or (ln.ptgl_linnot_red like '%-3_,1a,1a,1a%') or (ln.ptgl_linnot_red like '%3_,1a,1a,1a%' and ln.ptgl_linnot_red not like '%-3_,1a,1a,1a%') or (ln.ptgl_linnot_red like '%-4_,1a,1a,2a%') or (ln.ptgl_linnot_red like '%2a,1a,1a,-4_%' and ln.ptgl_linnot_red not like '%-2a,1a,1a,-4_%') or (ln.ptgl_linnot_red LIKE '%1p,1a,1p%' and ln.ptgl_linnot_red not like '%-1p,1a,1p%') or (ln.ptgl_linnot_red LIKE '%1a,1a,1a%' and ln.ptgl_linnot_seq like '%1,1,1%' and ln.num_sses < 6 ) ) or (pg.graph_type = 4 AND ln.ptgl_linnot_red LIKE '[h,1ah,1ah,1ah]') )");
+	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 1 AND (ln.ptgl_linnot_red LIKE '%1a,1a,1a,-3_%' and ln.ptgl_linnot_red not LIKE '%-1a,1a,1a,-3_%') or (ln.ptgl_linnot_red LIKE '%-3_,1a,1a,1a%') or (ln.ptgl_linnot_red LIKE '%3_,1a,1a,1a%' and ln.ptgl_linnot_red not LIKE '%-3_,1a,1a,1a%') or (ln.ptgl_linnot_red LIKE '%-4_,1a,1a,2a%') or (ln.ptgl_linnot_red LIKE '%2a,1a,1a,-4_%' and ln.ptgl_linnot_red not LIKE '%-2a,1a,1a,-4_%') or (ln.ptgl_linnot_red LIKE '%1p,1a,1p%' and ln.ptgl_linnot_red not LIKE '%-1p,1a,1p%') or (ln.ptgl_linnot_red LIKE '%1a,1a,1a%' and ln.ptgl_linnot_seq LIKE '%1,1,1%' and ln.num_sses < 6 ) ) or (pg.graph_type = 4 AND ln.ptgl_linnot_red LIKE '[h,1ah,1ah,1ah]') )");
         
         String query = querySB.toString();
         
@@ -1029,14 +1042,14 @@ public class DBManager {
             }
             
         } catch (SQLException e ) {
-            DP.getInstance().e("DBManager", "SQL: chainContainsMotif_4helix: '" + e.getMessage() + "'.");
+            DP.getInstance().e("DBManager", "chainContainsMotif_FourHelixBundle: '" + e.getMessage() + "'.");
         } finally {
             try {
                 if (statement != null) {
                     statement.close();
                 }
                 dbc.setAutoCommit(true);
-            } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_4helix: Could not close statement and reset autocommit."); }
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_FourHelixBundle: Could not close statement and reset autocommit."); }
         }
         
         // OK, check size of results table and return 1st field of 1st column
@@ -1053,6 +1066,127 @@ public class DBManager {
         }        
 
     }
+    
+    
+    /**
+     * Checks whether the chain contains a 4 helix motif. These checks consider the different linear notations of several graph types.
+     * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
+     * @param chain_db_id
+     * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
+     */
+    public static Boolean chainContainsMotif_UpAndDownBarrel(Long chain_db_id) {
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+                
+        PreparedStatement statement = null;
+        ResultSet rs = null;             
+        
+        StringBuilder querySB = new StringBuilder();
+        
+        // barrel1.pl
+        querySB.append("SELECT p.pdb_id, c.chain_name ");
+	querySB.append("FROM plcc_fglinnot ln ");
+	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
+	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
+	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
+	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 2 AND (ln.ptgl_linnot_red LIKE '%1a,1a,1a,1a,1a,1a,1a,-7a%' AND ln.ptgl_linnot_red NOT LIKE '%-1a,1a,1a,1a,1a,1a,1a,-7a%') ) ) ");
+        
+        // barrel2.pl
+        querySB.append(" UNION ");
+        querySB.append("SELECT p.pdb_id, c.chain_name ");
+	querySB.append("FROM plcc_fglinnot ln ");
+	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
+	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
+	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
+	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 2 AND (ln.ptgl_linnot_red LIKE '%-1a,-1a,-1a,-1a,-1a,-1a,-1a,7a%') ) ) ");
+        
+        // barrel3.pl
+        querySB.append(" UNION ");
+        querySB.append("SELECT p.pdb_id, c.chain_name ");
+	querySB.append("FROM plcc_fglinnot ln ");
+	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
+	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
+	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
+	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 2 AND (ln.ptgl_linnot_red LIKE '%7a,-1a,-1a,-1a,-1a,-1a,-1a,-1a%' AND ln.ptgl_linnot_red NOT LIKE '%-7a,-1a,-1a,-1a,-1a,-1a,-1a,-1a%') ) ) ");
+        
+        // barrel4.pl
+        querySB.append(" UNION ");
+        querySB.append("SELECT p.pdb_id, c.chain_name ");
+	querySB.append("FROM plcc_fglinnot ln ");
+	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
+	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
+	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
+	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 2 AND (ln.ptgl_linnot_red LIKE '%-7a,1a,1a,1a,1a,1a,1a,1a%') ) ) ");
+        
+        // order
+        querySB.append("ORDER BY pdb_id, chain_name ");
+        
+        String query = querySB.toString();
+        
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, chain_db_id);
+            statement.setLong(2, chain_db_id);
+            statement.setLong(3, chain_db_id);
+            statement.setLong(4, chain_db_id);
+                                
+            rs = statement.executeQuery();
+            dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "chainContainsMotif_UpAndDownBarrel: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_UpAndDownBarrel: Could not close statement and reset autocommit."); }
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        if(tableData.size() >= 1) {
+            if(tableData.get(0).size() >= 1) {
+                return(true);
+            }
+            else {
+                return(false);
+            }
+        }
+        else {
+            return(false);
+        }        
+
+    }
+    
     
     /**
      * Returns all protein graph database IDs for the given PDB ID and chain.

@@ -25,4 +25,15 @@ public class Motifs {
     public static final String MOTIF__ROSSMAN_FOLD = "rossman";
     public static final String MOTIF__TIM_BARREL = "tim";
     
+    public static final Integer MOTIFCODE__FOUR_HELIX_BUNDLE = 1;
+    public static final Integer MOTIFCODE__GLOBIN_FOLD = 2;
+    public static final Integer MOTIFCODE__UP_AND_DOWN_BARREL = 3;
+    public static final Integer MOTIFCODE__IMMUNOGLOBIN_FOLD = 4;
+    public static final Integer MOTIFCODE__BETA_PROPELLER = 5;
+    public static final Integer MOTIFCODE__JELLY_ROLL = 6;
+    public static final Integer MOTIFCODE__UBIQUITIN_ROLL = 7;
+    public static final Integer MOTIFCODE__ALPHA_BETA_PLAIT = 8;
+    public static final Integer MOTIFCODE__ROSSMAN_FOLD = 9;
+    public static final Integer MOTIFCODE__TIM_BARREL = 10;
+    
 }
