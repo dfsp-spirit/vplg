@@ -972,6 +972,17 @@ public class DBManager {
             rowsAffectedTotal += rowsAffectedThisMotif;
         }
         
+        if(DBManager.chainContainsMotif_JellyRoll(chain_db_id)) {
+            motif_db_id = Motifs.MOTIFCODE__JELLY_ROLL.longValue();
+            rowsAffectedThisMotif = DBManager.assignChainToMotiv(chain_db_id, motif_db_id);
+            if(rowsAffectedThisMotif > 0) {
+                foundMotifsForChain.add(Motifs.MOTIF__JELLY_ROLL);
+            }
+            rowsAffectedTotal += rowsAffectedThisMotif;
+        }
+        
+        
+        
         
         
         //TODO: check for the other motifs here
@@ -992,7 +1003,7 @@ public class DBManager {
     /**
      * Checks whether the chain contains a 4 helix bundle motif. These checks consider the different linear notations of several graph types.
      * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
-     * @param chain_db_id
+     * @param chain_db_id the chain database id
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
      */
     public static Boolean chainContainsMotif_FourHelixBundle(Long chain_db_id) {
@@ -1077,7 +1088,7 @@ public class DBManager {
     /**
      * Checks whether the chain contains an up and down barrel motif. These checks consider the different linear notations of several graph types.
      * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
-     * @param chain_db_id
+     * @param chain_db_id the chain database id
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
      */
     public static Boolean chainContainsMotif_UpAndDownBarrel(Long chain_db_id) {
@@ -1188,9 +1199,112 @@ public class DBManager {
 
     }
     
+    /**
+     * Checks whether the chain contains a jelly roll motif. These checks consider the different linear notations of several graph types.
+     * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
+     * @param chain_db_id the chain database id
+     * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
+     */
+    public static Boolean chainContainsMotif_JellyRoll(Long chain_db_id) {
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+                
+        PreparedStatement statement = null;
+        ResultSet rs = null;             
+        
+        StringBuilder querySB = new StringBuilder();
+        
+        // jelly1.pl
+        querySB.append("SELECT p.pdb_id, c.chain_name ");
+	querySB.append("FROM plcc_fglinnot ln ");
+	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
+	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
+	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
+	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 2 AND (ln.ptgl_linnot_red LIKE '%-1a,2a,-3a%' ) or (ln.ptgl_linnot_red LIKE '%-1a,3a,-5a%') or (ln.ptgl_linnot_red like '%-3a,2a,-1a%' ) or (ln.ptgl_linnot_red like '%-5a,3a,-1a%') ) ) ");
+        
+        // jelly2.pl
+        querySB.append(" UNION ");        
+        querySB.append("SELECT p.pdb_id, c.chain_name ");
+	querySB.append("FROM plcc_fglinnot ln ");
+	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
+	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
+	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
+	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 2 AND (ln.ptgl_linnot_red LIKE '%3a,1a,1a,-3a,%a,%a,%a%'  or ln.ptgl_linnot_red like '%3a,-1a,-1a,3a,%a,%a,%a%') ) ) ");
+        
+        // jelly3.pl
+        querySB.append(" UNION ");        
+        querySB.append("SELECT p.pdb_id, c.chain_name ");
+	querySB.append("FROM plcc_fglinnot ln ");
+	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
+	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
+	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
+	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 2 AND ((ln.ptgl_linnot_red like '%1a,-3a,5a%' and ln.ptgl_linnot_red not like '%-1a,-3a,5a%') or (ln.ptgl_linnot_red like '%5a,-3a,1a%' and ln.ptgl_linnot_red not like '%-5a,-3a,1a%')) ) ) ");
+                
+        // order
+        querySB.append("GROUP BY p.pdb_id, c.chain_name ");
+        
+        String query = querySB.toString();
+        
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, chain_db_id);
+            statement.setLong(2, chain_db_id);
+            statement.setLong(3, chain_db_id);
+                                
+            rs = statement.executeQuery();
+            dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "chainContainsMotif_JellyRoll: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_JellyRoll: Could not close statement and reset autocommit."); }
+        }
+        
+        // OK, check size of results table
+        if(tableData.size() >= 1) {
+            return true;
+        }
+        else {
+            return(false);
+        }        
+
+    }
+    
     
     /**
-     * Checks whether the chain contains a globin fold motif. These checks consider the different linear notations of several graph types.
+     * Checks whether the chain contains a globin fold motif, like PDB 1mba does. These checks consider the different linear notations of several graph types.
      * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
      * @param chain_db_id
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
