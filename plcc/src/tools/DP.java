@@ -71,7 +71,7 @@ public class DP {
             //System.err.println("WARNING: No settings yet.");
         }
         if(doWarn) {
-            System.err.println(DP.appTag + DP.warningTag + msg);
+            System.err.println(DP.appTag + DP.warningTag + "[" + srcTag + "]" + msg);
         }
     }
     
@@ -89,7 +89,7 @@ public class DP {
      * @param msg the message to print
      */
     public void e(String srcTag, String msg) {
-        System.err.println(DP.appTag + DP.errorTag + msg);
+        System.err.println(DP.appTag + DP.errorTag + "[" + srcTag + "]" + msg);
     }
     
     /**
@@ -97,7 +97,7 @@ public class DP {
      * @param msg the message to print
      */
     public void c(String srcTag, String msg) {
-        System.err.println(DP.appTag + DP.errorTag + msg);
+        System.err.println(DP.appTag + DP.errorTag + "[" + srcTag + "]" + msg);
         System.exit(1);
     }
     
@@ -149,7 +149,7 @@ public class DP {
      * @param msg the message to print
      */
     public void i(String srcTag, String msg) {
-        System.out.println(DP.appTag + DP.infoTag + msg);
+        System.out.println(DP.appTag + DP.infoTag + "[" + srcTag + "]" + msg);
     }
     
     /**

@@ -999,21 +999,53 @@ public class DBManager {
             rowsAffectedTotal += rowsAffectedThisMotif;
         }
         
+        if(DBManager.chainContainsMotif_RossmanFold(chain_db_id)) {
+            motif_db_id = Motifs.MOTIFCODE__ROSSMAN_FOLD.longValue();
+            rowsAffectedThisMotif = DBManager.assignChainToMotiv(chain_db_id, motif_db_id);
+            if(rowsAffectedThisMotif > 0) {
+                foundMotifsForChain.add(Motifs.MOTIF__ROSSMAN_FOLD);
+            }
+            rowsAffectedTotal += rowsAffectedThisMotif;
+        }
         
+        if(DBManager.chainContainsMotif_TIMBarrel(chain_db_id)) {
+            motif_db_id = Motifs.MOTIFCODE__TIM_BARREL.longValue();
+            rowsAffectedThisMotif = DBManager.assignChainToMotiv(chain_db_id, motif_db_id);
+            if(rowsAffectedThisMotif > 0) {
+                foundMotifsForChain.add(Motifs.MOTIF__TIM_BARREL);
+            }
+            rowsAffectedTotal += rowsAffectedThisMotif;
+        }
         
+        if(DBManager.chainContainsMotif_AlphaBetaPlait(chain_db_id)) {
+            motif_db_id = Motifs.MOTIFCODE__ALPHA_BETA_PLAIT.longValue();
+            rowsAffectedThisMotif = DBManager.assignChainToMotiv(chain_db_id, motif_db_id);
+            if(rowsAffectedThisMotif > 0) {
+                foundMotifsForChain.add(Motifs.MOTIF__ALPHA_BETA_PLAIT);
+            }
+            rowsAffectedTotal += rowsAffectedThisMotif;
+        }
         
-        
-        
-        //TODO: check for the other motifs here
+        if(DBManager.chainContainsMotif_UbiquitinRoll(chain_db_id)) {
+            motif_db_id = Motifs.MOTIFCODE__UBIQUITIN_ROLL.longValue();
+            rowsAffectedThisMotif = DBManager.assignChainToMotiv(chain_db_id, motif_db_id);
+            if(rowsAffectedThisMotif > 0) {
+                foundMotifsForChain.add(Motifs.MOTIF__UBIQUITIN_ROLL);
+            }
+            rowsAffectedTotal += rowsAffectedThisMotif;
+        }
+                                        
         
         // OK -- all motifs tested
         if(! Settings.getBoolean("plcc_B_silent")) {
             if(foundMotifsForChain.size() > 0) {
-                System.out.println("      Found motives in all folding graph linear notations of " + pdbid + " chain " + chain + ": " + IO.stringListToString(foundMotifsForChain));
+                System.out.println("      Found " + foundMotifsForChain.size() + " motives in all folding graph linear notations of " + pdbid + " chain " + chain + ": " + IO.stringListToString(foundMotifsForChain));
             } else {
                 System.out.println("      Found no motives in all folding graph linear notations of " + pdbid + " chain " + chain + ".");
             }
         }
+        
+        DP.getInstance().flush();
         
         return rowsAffectedTotal;
     }
@@ -1450,6 +1482,50 @@ public class DBManager {
 
     }
     
+    
+    /**
+     * Checks whether the chain contains a rossman fold motif. These checks consider the different linear notations of several graph types.
+     * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
+     * @param chain_db_id the chain database id
+     * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
+     */
+    public static Boolean chainContainsMotif_RossmanFold(Long chain_db_id) {
+        DP.getInstance().w("DBManager", "chainContainsMotif_RossmanFold: Not implemented yet, returning false.");
+        return false;
+    }
+    
+    /**
+     * Checks whether the chain contains a TIM-barrel motif. These checks consider the different linear notations of several graph types.
+     * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
+     * @param chain_db_id the chain database id
+     * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
+     */
+    public static Boolean chainContainsMotif_TIMBarrel(Long chain_db_id) {
+        DP.getInstance().w("DBManager", "chainContainsMotif_TIMBarrel: Not implemented yet, returning false.");
+        return false;
+    }
+    
+    /**
+     * Checks whether the chain contains an alpha-beta plait motif. These checks consider the different linear notations of several graph types.
+     * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
+     * @param chain_db_id the chain database id
+     * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
+     */
+    public static Boolean chainContainsMotif_AlphaBetaPlait(Long chain_db_id) {
+        DP.getInstance().w("DBManager", "chainContainsMotif_AlphaBetaPlait: Not implemented yet, returning false.");
+        return false;
+    }
+    
+    /**
+     * Checks whether the chain contains an ubiquitin roll motif. These checks consider the different linear notations of several graph types.
+     * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
+     * @param chain_db_id the chain database id
+     * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
+     */
+    public static Boolean chainContainsMotif_UbiquitinRoll(Long chain_db_id) {
+        DP.getInstance().w("DBManager", "chainContainsMotif_UbiquitinRoll: Not implemented yet, returning false.");
+        return false;
+    }
     
     /**
      * Checks whether the chain contains a beta propeller motif. These checks consider the different linear notations of several graph types.
