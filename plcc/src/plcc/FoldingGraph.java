@@ -120,6 +120,15 @@ public class FoldingGraph extends SSEGraph {
     }
     
     /**
+     * Returns the maximum of a mapping of vertex indices in this folding graph to vertex indices in the parent PG.
+     * (See the function getVertexIndexListInParentGraph() for details.) This is used to create an ordering of the connected components of a protein graph.
+     * @return the maximum of a mapping of vertex indices in this folding graph to vertex indices in the parent PG.
+     */
+    public Integer getMaximalVertexIndexInParentGraph() {
+        return Collections.max(this.vertexIndicesInParentGraph);
+    }
+    
+    /**
      * Specifies the index of each vertex in the parent graph.
      * @param order the vertex order. At position n in the list, the position of the vertex at index n in this FG in the parent PG is given.
      */
@@ -1088,7 +1097,9 @@ public class FoldingGraph extends SSEGraph {
         super.setInfo(pdbid, chainid, graphType);
         this.metadata.put("graphclass", "folding graph");     
         this.metadata.put("foldinggraphnumber", this.foldingGraphNumber + "");     
-    }        
-
+    }       
+    
+    
+    
     
 }
