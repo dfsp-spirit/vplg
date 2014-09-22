@@ -418,35 +418,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
         }
         
         return(this.connectedComponentsREDKEY.size());
-    }
-    
-    /**
-     * Returns the full FG computation results list, i.e., a list of FGC results. Each result contains 2 folding graphs: the ADJ/SEQ graph and the RED/KEY graph.
-     * @return a list of FGC results. Each result contains 2 folding graphs: the ADJ/SEQ graph and the RED/KEY graph.
-     */
-    @Deprecated
-    public ArrayList<FoldingGraphComputationResult> getFoldingGraphComputationResults() {
-        ArrayList<FoldingGraphComputationResult> results = new ArrayList<FoldingGraphComputationResult>();
-        
-        ArrayList<FoldingGraph> fgsADJSEQ = this.getFoldingGraphsADJSEQ();
-        ArrayList<FoldingGraph> fgsREDKEY = this.getFoldingGraphsREDKEY();
-        
-        if(fgsADJSEQ.size() != fgsREDKEY.size()) {
-            DP.getInstance().w("ProtGraph", "getFoldingGraphComputationResults: sizes of lists do not match, returning empty results.");
-            return results;
-        }
-        
-        FoldingGraph adjGraph; FoldingGraph redGraph;
-        for(int i = 0; i < fgsADJSEQ.size(); i++) {
-            adjGraph = fgsADJSEQ.get(i);
-            redGraph = fgsREDKEY.get(i);
-            adjGraph.setSisterFG(redGraph);
-            redGraph.setSisterFG(adjGraph);
-            results.add(new FoldingGraphComputationResult(adjGraph, redGraph));
-        }
-        
-        return results;
-    }
+    }        
     
     
     /**
