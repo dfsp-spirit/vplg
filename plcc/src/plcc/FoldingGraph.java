@@ -89,33 +89,7 @@ public class FoldingGraph extends SSEGraph {
         super(sses);
         this.isProteinGraph = false;
     }
-    
-    public void setForADJandSEQ(Boolean b) {
-        this.isForADJandSEQNotations = b;
-    }
-    
-    @Deprecated
-    public String[] getPTGLNotationsPerl() {
-        
-        int ADJ = 0;    // array indices
-        int RED = 1;
-        int KEY = 2;
-        int SEQ = 3;
-        
-        String[] notations = new String[4];
-        Arrays.fill(notations, "");
-        
-        return notations;
-    }
-    
-    /**
-     * Determines whether this FG is suitable to compute the ADJ and SEQ notations.
-     * @return true if this FG is suitable to compute the ADJ and SEQ notations, false if is suitable for RED and KEY.
-     */ 
-    public boolean getIsForADJandSEQNotations() {
-        return this.isForADJandSEQNotations;
-    }
-    
+         
     
     /**
      * Returns all vertices of this graph.

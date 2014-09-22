@@ -80,17 +80,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
         super(sses);
         this.isProteinGraph = true;
     }
-
-    
-    
-
-    
-
-    public void computeConnectedComponents() {
-        computeConnectedComponents(false);
-    }
-    
-    
+           
     
     /**
      * Determines all connected components of this graph and writes them into the connectedComponents ArrayList.
@@ -100,22 +90,14 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
      * are added, the results are written to connectedComponentsADJSEQ (otherwise to connectedComponentsREDKEY). Technically,
      * if you set this to true, the results are NOT the connected components of the parent graph anymore.
      */
-    public void computeConnectedComponents(boolean includeADJandSEQvertices) {
+    public void computeConnectedComponents() {
         
-        if(includeADJandSEQvertices) {
-            DP.getInstance().e("ProtGraph", "computeConnectedComponents(): including ADJ and SEQ vertices is deprecated and should not be used anymore.");
-            System.exit(1);
-        }
         
         ArrayList<FoldingGraph> conComps = new ArrayList<FoldingGraph>();
 
         // If the list of SSEs is empty, there are no connected components
         if(this.size < 1) {
-            if(includeADJandSEQvertices) {
-                this.connectedComponentsADJSEQ = conComps;
-            } else {
-                this.connectedComponentsREDKEY = conComps;
-            }
+            this.connectedComponents = conComps;
             return;
         }
 
@@ -266,7 +248,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
                 vertexAddedThisStep = false;
                 inADJandSEQvertices = (j >= firstIndexOfSSEinParentGraphWhichIsPartOfFG && j <= lastIndexOfSSEinParentGraphWhichIsPartOfFG);
                 // If SSE j is marked to be part of connected component i
-                if(m[j].equals(i) || (includeADJandSEQvertices && inADJandSEQvertices)) {
+                if(m[j].equals(i) ) {
                     // ...add it to the list of SSEs for that CC.
                     tmpSSEList.add(sseList.get(j));
                     numInNewGraph[j] = numVerticesAdded;
@@ -296,13 +278,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
                     fgVertexIndicesInADJandSEQfoldingGraphs.add(fgVertexIndexInADJ[x]);
                 }
             }
-            
-            if(includeADJandSEQvertices) {
-                fg.setForADJandSEQ(true);
-            }
-            else {
-                fg.setForADJandSEQ(false);
-            }
+                      
             
             // compute proper list of indices in old graph and set it
             //System.out.println("[PG] CC #" + i + ": posInParentGraph complete: " + IO.intArrayToString(posInParentGraph));
@@ -356,21 +332,13 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
         }
         
         // now set the foldingGraphNumbers (ordered by position of the left-most vertex of the CC in the parent)
-        if(! includeADJandSEQvertices) {
-            ProtGraphs.setFoldingGraphNumbers(conComps);    // this call also sorts the CCs
-        }
-        else {
-            DP.getInstance().w("ProGraph", "Cannot set proper CC foldingGraphNumbers, makes no sense with ADJ/SEQ vertices.");
-        }
+
+        ProtGraphs.setFoldingGraphNumbers(conComps);    // this call also sorts the CCs
         
         // log computation done
-        if(includeADJandSEQvertices) {
-            this.connectedComponentsADJSEQ = conComps;
-            this.connectedComponentsComputedADJSEQ = true;
-        } else {
-            this.connectedComponentsREDKEY = conComps;
-            this.connectedComponentsComputedREDKEY = true;
-        }
+        this.connectedComponents = conComps;
+        this.connectedComponentsComputed = true;
+        
         
     }
     
@@ -382,16 +350,16 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
      * @return the CC as a FoldingGraph (or NULL if this graph has no vertices)
      */
     public FoldingGraph getLargestConnectedComponent() {
-        if(! this.connectedComponentsComputedREDKEY) {
-            this.computeConnectedComponents(false);
+        if(! this.connectedComponentsComputed) {
+            this.computeConnectedComponents();
         }
         
         Integer maxSize = 0;
         Integer indexOfLargestCC = -1;
         
         FoldingGraph fg;
-        for(Integer i = 0;  i < this.connectedComponentsREDKEY.size(); i++) {
-            fg = this.connectedComponentsREDKEY.get(i);
+        for(Integer i = 0;  i < this.connectedComponents.size(); i++) {
+            fg = this.connectedComponents.get(i);
             if(fg.getSize() >= maxSize) {
                 maxSize = fg.getSize();
                 indexOfLargestCC = i;
@@ -399,7 +367,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
         }
         
         if(indexOfLargestCC >= 0) {
-            return(this.connectedComponentsREDKEY.get(indexOfLargestCC));
+            return(this.connectedComponents.get(indexOfLargestCC));
         } else {
             return(null);
         }
@@ -411,13 +379,13 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
      * Returns the number of connected components this graph consists of, computing them first if necessary.
      * @return the number of CCs
      */
-    public Integer numConnectedComponentsREDKEY() {
+    public Integer numConnectedComponents() {
         
-        if( ! this.connectedComponentsComputedREDKEY) {
-            this.computeConnectedComponents(false);
+        if( ! this.connectedComponentsComputed) {
+            this.computeConnectedComponents();
         }
         
-        return(this.connectedComponentsREDKEY.size());
+        return(this.connectedComponents.size());
     }        
     
     
@@ -426,7 +394,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
      * @return true if it is connected, false otherwise
      */
     @Override public Boolean isConnected() {
-        return(this.numConnectedComponentsREDKEY().equals(1));
+        return(this.numConnectedComponents().equals(1));
     }        
     
     
@@ -435,32 +403,21 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
      * @return the list of CCs as graphs
      */
     public ArrayList<FoldingGraph> getConnectedComponents() {
-        if( ! this.connectedComponentsComputedREDKEY) {
-            this.computeConnectedComponents(false);            
+        if( ! this.connectedComponentsComputed) {
+            this.computeConnectedComponents();            
         }
         
-        return(this.connectedComponentsREDKEY);
+        return(this.connectedComponents);
     }
     
     /**
      * Returns the RED/KEY folding graphs as a list of graphs. Computes them first if this has not yet been done.
      * @return the list of CCs as graphs
      */
-    public ArrayList<FoldingGraph> getFoldingGraphsREDKEY() {
+    public ArrayList<FoldingGraph> getFoldingGraphs() {
         return(this.getConnectedComponents());
     }
-    
-    /**
-     * Returns the RED/KEY folding graphs as a list of graphs. Computes them first if this has not yet been done.
-     * @return the list of CCs as graphs
-     */
-    public ArrayList<FoldingGraph> getFoldingGraphsADJSEQ() {
-        if( ! this.connectedComponentsComputedADJSEQ) {
-            this.computeConnectedComponents(true);            
-        }
-        
-        return(this.connectedComponentsADJSEQ);
-    }
+       
     
     /**
      * Creates a .graph file in the notation that is used by the Perl script by Patrick. The script

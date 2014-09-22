@@ -95,14 +95,11 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
     protected Boolean isProteinGraph;             // true if this is a protein graph, false if this is a folding graph (a connected component of the protein graph)    
     protected SSEGraph parent;
        
-    protected Boolean connectedComponentsComputedREDKEY;
-    protected Boolean connectedComponentsComputedADJSEQ;
+    protected Boolean connectedComponentsComputed;
     
     protected Boolean distancesCalculated;
     /** The connected components of this graph, i.e., the RED/KEY folding graphs. */
-    protected ArrayList<FoldingGraph> connectedComponentsREDKEY;
-    /** The connected components + vertices of the parent graph in between them, i.e., the ADJ/SEQ folding graphs. */
-    protected ArrayList<FoldingGraph> connectedComponentsADJSEQ;
+    protected ArrayList<FoldingGraph> connectedComponents;
     
     
     protected String pdbid;                               // the PDB ID this graph represents, e.g. "3kmf"
@@ -160,10 +157,10 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         this.distMatrix = new Integer[size][size];      // distances in graph
         this.isProteinGraph = true;
         this.parent = null;
-        this.connectedComponentsREDKEY = new ArrayList<FoldingGraph>();
+        this.connectedComponents = new ArrayList<FoldingGraph>();
         
-        this.connectedComponentsComputedREDKEY = false;
-        this.connectedComponentsComputedADJSEQ = false;
+        this.connectedComponentsComputed = false;
+        
         
         this.distancesCalculated = false;
 
