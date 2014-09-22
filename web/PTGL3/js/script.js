@@ -114,8 +114,8 @@ $(function() {
 			numberOfChains++;
 			chains.push(this.value);
 		})		
-		if(numberOfChains > 20){
-			var r = confirm("You selected more than 20 chains. Loading could take a while. Are you sure to proceed?");
+		if(numberOfChains > 25){
+			var r = confirm("You selected more than 25 chains. Loading could take a while. Are you sure to proceed?");
 			if(r == true) {
 				$('input[type=checkbox]').each(function () {
 					$(this).prop('checked', true);

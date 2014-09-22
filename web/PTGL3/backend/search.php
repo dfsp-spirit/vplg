@@ -600,7 +600,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 	};
 	
 	
-	$q_limit = 50;
+	$q_limit = 25;
 	
 	$count_query = $query . " ) results";
 	$query .= " ) results

@@ -56,7 +56,7 @@
 		</div>
 		<div class="container" id="searchResults">
 			<h2> Search Results </h2>
-			<?php echo $tableString; ?>
+			<?php echo $tableString; /* The table string is constructed in backend/search.php, which is included by this file. */  ?>
 			</form>	
 		</div><!-- end container and searchResults -->
 	</div><!-- end container-->
