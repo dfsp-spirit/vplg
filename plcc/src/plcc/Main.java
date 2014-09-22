@@ -2536,11 +2536,19 @@ public class Main {
                     HashMap<IMAGEFORMAT, String> filesByFormatCurNotation = new HashMap<>();
                     
                     if(notation.equals(FoldingGraph.FG_NOTATION_ADJ)) {     
-                        System.out.println("######################  DRAWING FG  ###########################");
+                        //System.out.println("######################  DRAWING ADJ FG  ###########################");
                         filesByFormatCurNotation = SSEGraph.drawFoldingGraphADJ(fileNameWithoutExtension, false, formats, pnfr);                        
                     }
+                    else if(notation.equals(FoldingGraph.FG_NOTATION_RED)) {
+                        //System.out.println("######################  DRAWING RED FG  ###########################");
+                        filesByFormatCurNotation = SSEGraph.drawFoldingGraphRED(fileNameWithoutExtension, false, formats, pnfr);                                                
+                    }
+                    else if(notation.equals(FoldingGraph.FG_NOTATION_SEQ)) {
+                        //System.out.println("######################  DRAWING R FG  ###########################");
+                        filesByFormatCurNotation = SSEGraph.drawFoldingGraphSEQ(fileNameWithoutExtension, false, formats, pnfr);                                                
+                    }
                     
-                    
+                    drawingSucceeded = true;
                     
                     //if(fg.drawFoldingGraph(notation, fgFile)) {
                     if(drawingSucceeded) {

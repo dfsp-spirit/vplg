@@ -2487,6 +2487,78 @@ E	3	3	3
     }
     
     /**
+     * Draws a RED folding graph in all formats, returns a list of written files.
+     * @param baseFilePathNoExt the base file path where to put the image (without dot and file extension)
+     * @param drawBlackAndWhite whether to omit colors, only useful for non-protein graphs
+     * @param formats an array of type DrawTools.IMAGEFORMAT. Do not include SVG, this will always be drawn anyways
+     * @param pnfr
+     * @return a map of formats to the corresponding output files written to disk
+     */
+    public static HashMap<IMAGEFORMAT, String> drawFoldingGraphRED(String baseFilePathNoExt, Boolean drawBlackAndWhite, IMAGEFORMAT[] formats, PTGLNotationFoldResult pnfr) {                
+               
+        DrawResult drawRes = SSEGraph.drawFoldingGraphREDG2D(pnfr);
+        
+        //System.out.println("drawProteinGraph: Basefilepath is '" + baseFilePathNoExt + "'.");
+        String svgFilePath = baseFilePathNoExt + ".svg";
+        HashMap<IMAGEFORMAT, String> resultFilesByFormat = new HashMap<IMAGEFORMAT, String>();
+        try {
+            DrawTools.writeG2dToSVGFile(svgFilePath, drawRes);
+            resultFilesByFormat.put(IMAGEFORMAT.SVG, svgFilePath);
+            resultFilesByFormat.putAll(DrawTools.convertSVGFileToOtherFormats(svgFilePath, baseFilePathNoExt, drawRes, formats));
+        } catch (IOException ex) {
+            DP.getInstance().e("Could not write folding graph file : '" + ex.getMessage() + "'.");
+        }
+        
+        if( ! Settings.getBoolean("plcc_B_silent")) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("      Output folding graph files: ");
+            for(IMAGEFORMAT format : resultFilesByFormat.keySet()) {
+                sb.append("(").append(format.toString()).append(" => ").append(resultFilesByFormat.get(format)).append(") ");
+            }
+            System.out.println(sb.toString());
+        }
+        return resultFilesByFormat;
+    }
+    
+    /**
+     * Draws a SEQ folding graph in all formats, returns a list of written files.
+     * @param baseFilePathNoExt the base file path where to put the image (without dot and file extension)
+     * @param drawBlackAndWhite whether to omit colors, only useful for non-protein graphs
+     * @param formats an array of type DrawTools.IMAGEFORMAT. Do not include SVG, this will always be drawn anyways
+     * @param pnfr
+     * @return a map of formats to the corresponding output files written to disk
+     */
+    public static HashMap<IMAGEFORMAT, String> drawFoldingGraphSEQ(String baseFilePathNoExt, Boolean drawBlackAndWhite, IMAGEFORMAT[] formats, PTGLNotationFoldResult pnfr) {                
+               
+        DrawResult drawRes = SSEGraph.drawFoldingGraphSEQG2D(pnfr);
+        
+        //System.out.println("drawProteinGraph: Basefilepath is '" + baseFilePathNoExt + "'.");
+        String svgFilePath = baseFilePathNoExt + ".svg";
+        HashMap<IMAGEFORMAT, String> resultFilesByFormat = new HashMap<IMAGEFORMAT, String>();
+        try {
+            DrawTools.writeG2dToSVGFile(svgFilePath, drawRes);
+            resultFilesByFormat.put(IMAGEFORMAT.SVG, svgFilePath);
+            resultFilesByFormat.putAll(DrawTools.convertSVGFileToOtherFormats(svgFilePath, baseFilePathNoExt, drawRes, formats));
+        } catch (IOException ex) {
+            DP.getInstance().e("Could not write folding graph file : '" + ex.getMessage() + "'.");
+        }
+        
+        if( ! Settings.getBoolean("plcc_B_silent")) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("      Output folding graph files: ");
+            for(IMAGEFORMAT format : resultFilesByFormat.keySet()) {
+                sb.append("(").append(format.toString()).append(" => ").append(resultFilesByFormat.get(format)).append(") ");
+            }
+            System.out.println(sb.toString());
+        }
+        return resultFilesByFormat;
+    }
+    
+    
+    
+    
+    
+    /**
      * Draws the protein graph image of this graph and returns the DrawResult.
      * If 'nonProteinGraph' is true, this graph is considered a custom (=non-protein) graph and the color coding for vertices and edges is NOT used.
      * In that case, the graph is drawn black and white and the labels for the N- and C-termini are NOT drawn.
@@ -3949,7 +4021,7 @@ E	3	3	3
      * @param numVerticesInParentGraph the size of the parent FG
      * @return The parent graph vertex positions in the FG. if a parent graph vertex is NOT contained in the FG, -1 is added at that position.
      */
-    public List<Integer> computeParentGraphVertexPositionsInFoldingGraph(List<Integer> fgVertexPositionsInParent, Integer numVerticesInParentGraph) {
+    public static List<Integer> computeParentGraphVertexPositionsInFoldingGraph(List<Integer> fgVertexPositionsInParent, Integer numVerticesInParentGraph) {
         List<Integer> res = new ArrayList<Integer>();
         
         for(Integer i = 0; i < numVerticesInParentGraph; i++) {
@@ -3968,7 +4040,7 @@ E	3	3	3
 
     
     /**
-     * Draws the folding graph image of this graph and returns the DrawResult.
+     * Draws the ADJ folding graph image of this graph and returns the DrawResult.
      * If 'nonProteinGraph' is true, this graph is considered a custom (=non-protein) graph and the color coding for vertices and edges is NOT used.
      * In that case, the graph is drawn black and white and the labels for the N- and C-termini are NOT drawn.
      * 
@@ -4058,7 +4130,7 @@ E	3	3	3
             java.awt.Shape shape;
             Arc2D.Double arc;
             ig2.setStroke(new BasicStroke(2));  // thin edges
-            Integer edgeType, leftVert, rightVert, leftVertPosX, rightVertPosX, arcWidth, arcHeight, arcTopLeftX, arcTopLeftY, spacerX, spacerY, iChainID, jChainID;
+            Integer edgeType, leftVert, rightVert, leftVertPosX, rightVertPosX, arcWidth, arcHeight, arcTopLeftX, arcTopLeftY, spacerX, spacerY;
             for(Integer i = startVertexInParent; i <= endVertexInParent; i++) {
                 for(Integer j = i + 1; j <= endVertexInParent; j++) {
 
@@ -4217,8 +4289,518 @@ E	3	3	3
             DrawResult drawRes = new DrawResult(ig2, roi);
             return drawRes;                                                                         
     }
+    
+    
+    /**
+     * Draws the RED folding graph image of this graph and returns the DrawResult.
+     * If 'nonProteinGraph' is true, this graph is considered a custom (=non-protein) graph and the color coding for vertices and edges is NOT used.
+     * In that case, the graph is drawn black and white and the labels for the N- and C-termini are NOT drawn.
+     * 
+     * @param pnfr a folding graph notation result
+
+     * @return the DrawResult. You can write this to a file or whatever.
+     */
+    private static DrawResult drawFoldingGraphREDG2D(PTGLNotationFoldResult pnfr) {
+
+        FoldingGraph fg = pnfr.getFoldingGraph();
+        SSEGraph pg = fg.parent;
+        Integer startVertexInParent = fg.getMinimalVertexIndexInParentGraph();
+        Integer endVertexInParent = fg.getMaximalVertexIndexInParentGraph();
+                
+        
+        List<Integer> fgVertexPosInParent = fg.getVertexIndexListInParentGraph();
+        List<Integer> parentVertexPosInFG = ProtGraph.computeParentGraphVertexPositionsInFoldingGraph(fgVertexPosInParent, pg.size);
+        
+        // compute the shiftBack array
+        Integer[] shiftBack = new Integer[pg.size];    // how many vertices we skipped on the left at which position
+        Integer shift = 0;
+        for(int i = 0; i < parentVertexPosInFG.size(); i++) {
+            if(parentVertexPosInFG.get(i) < 0) {
+                shift++;
+            }
+            shiftBack[i] = shift;
+        }
+        
+        Integer numVerts = fg.getSize();
+
+        Boolean bw = false;                                                  
+        
+        // All these values are in pixels
+        // page setup
+        PageLayout pl = new PageLayout(numVerts);        
+        Position2D vertStart = pl.getVertStart();
+        Integer lineHeight = pl.textLineHeight;            
+        
+        
+
+            // ------------------------- Prepare stuff -------------------------
+            // TYPE_INT_ARGB specifies the image format: 8-bit RGBA packed into integer pixels
+            //BufferedImage bi = new BufferedImage(pl.getPageWidth(), pl.getPageHeight(), BufferedImage.TYPE_INT_ARGB);
+            
+            SVGGraphics2D ig2;
+            
+            
+            //if(Settings.get("plcc_S_img_output_format").equals("SVG")) {                    
+                // Apache Batik SVG library, using W3C DOM tree implementation
+                // Get a DOMImplementation.
+                DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
+                // Create an instance of org.w3c.dom.Document.
+                String svgNS = "http://www.w3.org/2000/svg";
+                Document document = domImpl.createDocument(svgNS, "svg", null);
+                // Create an instance of the SVG Generator.
+                ig2 = new SVGGraphics2D(document);
+                //ig2.getRoot(document.getDocumentElement());
+           // }
+            //else {
+            //    ig2 = (SVGGraphics2D)bi.createGraphics();
+            //}
+            
+            ig2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            // make background white
+            ig2.setPaint(Color.WHITE);
+            ig2.fillRect(0, 0, pl.getPageWidth(), pl.getPageHeight());
+            ig2.setPaint(Color.BLACK);
+
+            //pl.drawAreaOutlines(ig2);
+            // prepare font
+            Font font = pl.getStandardFont();
+            ig2.setFont(font);
+            FontMetrics fontMetrics = ig2.getFontMetrics();
+
+            // ------------------------- Draw header -------------------------
+
+            // check width of header string
+            String proteinHeader = "The RED " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
+            String notation = "RED notation: '" + pnfr.redNotation + "'";
+            //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
+            Integer stringHeight = fontMetrics.getAscent();
+            String sseNumberSeq;    // the SSE number in the primary structure, N to C terminus
+            String sseNumberFoldingGraph;  // the SSE number in this graph, 1..(this.size)
+            String sseNumberProteinGraph;  // the SSE number in the parent protein graph, 1..(this.size)
+
+            if(Settings.getBoolean("plcc_B_graphimg_header")) {
+                ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
+                ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);                
+            }
+
+            // ------------------------- Draw the graph -------------------------
+            
+            // Draw the edges as arcs
+            Integer k,l;
+            java.awt.Shape shape;
+            Arc2D.Double arc;
+            ig2.setStroke(new BasicStroke(2));  // thin edges
+            Integer edgeType, leftVert, rightVert, leftVertPosX, rightVertPosX, arcWidth, arcHeight, arcTopLeftX, arcTopLeftY, spacerX, spacerY;
+            for(Integer i = startVertexInParent; i <= endVertexInParent; i++) {
+                for(Integer j = i + 1; j <= endVertexInParent; j++) {
+
+                    
+                    k = parentVertexPosInFG.get(i);
+                    l = parentVertexPosInFG.get(j);
+                    if(k < 0 || l < 0) {
+                        continue;
+                    }
+                    
+                    // If there is a contact...
+                    if(fg.containsEdge(k, l)) {
+
+                        // determine edge type and the resulting color
+                        edgeType = fg.getContactType(k, l);
+                        if(edgeType.equals(SpatRel.PARALLEL)) { ig2.setPaint(Color.RED); }
+                        else if(edgeType.equals(SpatRel.ANTIPARALLEL)) { ig2.setPaint(Color.BLUE); }
+                        else if(edgeType.equals(SpatRel.MIXED)) { ig2.setPaint(Color.GREEN); }
+                        else if(edgeType.equals(SpatRel.LIGAND)) { ig2.setPaint(Color.MAGENTA); }
+                        else if(edgeType.equals(SpatRel.BACKBONE)) { ig2.setPaint(Color.ORANGE); }
+                        else { ig2.setPaint(Color.LIGHT_GRAY); }
+
+                        if(bw) { ig2.setPaint(Color.LIGHT_GRAY); }      // for non-protein graphs
+                                                
+
+                        // determine the center of the arc and the width of its rectangle bounding box
+                        //if(k < l) { leftVert = k; rightVert = l; }
+                        //else { leftVert = l; rightVert = k; }
+                        
+                        if(i < j) { leftVert = i; rightVert = j; }
+                        else { leftVert = j; rightVert = i; }
+                        
+                        leftVertPosX = pl.getVertStart().x + ((leftVert - shiftBack[leftVert]) * pl.vertDist);
+                        rightVertPosX = pl.getVertStart().x + ((rightVert - shiftBack[rightVert]) * pl.vertDist);
+
+                        arcWidth = rightVertPosX - leftVertPosX;
+                        arcHeight = arcWidth / 2;
+
+                        arcTopLeftX = leftVertPosX;
+                        arcTopLeftY = pl.getVertStart().y - arcHeight / 2;
+
+                        spacerX = pl.vertRadius;
+                        spacerY = 0;
+
+                        // draw it                                                
+                        arc = new Arc2D.Double(arcTopLeftX + spacerX, arcTopLeftY + spacerY, arcWidth, arcHeight, 0, 180, Arc2D.OPEN);
+                        shape = ig2.getStroke().createStrokedShape(arc);
+                        ig2.fill(shape);
+
+                    }
+                }
+            }
+
+            // Draw the vertices as circles
+            Ellipse2D.Double circle;
+            Rectangle2D.Double rect;
+            ig2.setStroke(new BasicStroke(2));
+            for(Integer i = startVertexInParent; i <= endVertexInParent; i++) {
+                
+                // pick color depending on SSE type
+                if(pg.sseList.get(i).isHelix()) { ig2.setPaint(Color.RED); }
+                else if(pg.sseList.get(i).isBetaStrand()) { ig2.setPaint(Color.BLACK); }
+                else if(pg.sseList.get(i).isLigandSSE()) { ig2.setPaint(Color.MAGENTA); }
+                else if(pg.sseList.get(i).isOtherSSE()) { ig2.setPaint(Color.GRAY); }
+                else { ig2.setPaint(Color.LIGHT_GRAY); }
+
+                Integer parentVertexPosInFoldingGraph = parentVertexPosInFG.get(i);
+                if(parentVertexPosInFoldingGraph < 0) {
+                    continue;
+                } 
+                
+                if(bw) { ig2.setPaint(Color.GRAY); }      // for non-protein graphs
+                
+                // draw a shape based on SSE type
+                                
+                
+                SSE sse = pg.getVertex(i);
+                if(sse.isBetaStrand()) {
+                    // beta strands are black, filled squares
+                    rect = new Rectangle2D.Double(vertStart.x + ((i-shiftBack[i]) * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
+                    ig2.fill(rect);
+                    
+                }
+                else if(sse.isLigandSSE()) {
+                    // ligands are magenta circles (non-filled)
+                    circle = new Ellipse2D.Double(vertStart.x + ((i-shiftBack[i]) * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
+                    //ig2.fill(circle);
+                    ig2.setStroke(new BasicStroke(3));  // this does NOT get filled, so give it a thicker border
+                    ig2.draw(circle);
+                    ig2.setStroke(new BasicStroke(2));
+                }
+                else {
+                    // helices and all others are filled circles (helices are red circles, all others are gray circles)
+                    circle = new Ellipse2D.Double(vertStart.x + ((i-shiftBack[i]) * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
+                    ig2.fill(circle);                    
+                }
+            }
+            
+            // Draw the markers for the N-terminus and C-terminus if there are any vertices in this graph            
+            ig2.setStroke(new BasicStroke(2));
+            ig2.setPaint(Color.BLACK);
+            
+            if( ! bw) {
+                if(fg.getSize() > 0) {                    
+                    ig2.drawString("N", vertStart.x - pl.vertDist, vertStart.y + 20);    // N terminus label
+                    ig2.drawString("C", vertStart.x + numVerts * pl.vertDist, vertStart.y + 20);  // C terminus label
+                }
+            }
+                        
+            // ************************************* footer **************************************
+            
+            if(Settings.getBoolean("plcc_B_graphimg_footer")) {
+            
+                // Draw the vertex numbering into the footer
+                // Determine the dist between vertices that will have their vertex number printed below them in the footer field
+                Integer printNth = 1;
+                //if(fg.getSize() > 9) { printNth = 1; }
+                if(fg.getSize() > 99) { printNth = 2; }
+                if(fg.getSize() > 999) { printNth = 3; }
+
+                // line markers: S for sequence order, G for graph order
+                
+                if(fg.getSize() > 0) {                                            
+                    ig2.drawString("FG", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (stringHeight / 4));
+                    ig2.drawString("SQ", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
+                    ig2.drawString("PG", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + lineHeight + (stringHeight / 4));
+                }
+                else {
+                    ig2.drawString("(Graph has no vertices.)", pl.getFooterStart().x, pl.getFooterStart().y);
+                }
+
+
+                for(Integer i = startVertexInParent; i <= endVertexInParent; i++) {
+                    
+                    Integer parentVertexPosInFoldingGraph = parentVertexPosInFG.get(i);
+                    if(parentVertexPosInFoldingGraph < 0) {
+                        continue;
+                    }
+                    // Draw label for every nth vertex
+                    if((i + 1) % printNth == 0) {
+                        sseNumberFoldingGraph = "" + (parentVertexPosInFG.get(i) >= 0 ? (parentVertexPosInFG.get(i) + 1) : "");
+                        sseNumberSeq = "" + (pg.sseList.get(i).getSSESeqChainNum());
+                        sseNumberProteinGraph = "" + (i + 1);
+                        //stringWidth = fontMetrics.stringWidth(sseNumberSeq);
+                        stringHeight = fontMetrics.getAscent();                                        
+
+                        ig2.drawString(sseNumberFoldingGraph, pl.getFooterStart().x + ((i-shiftBack[i]) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4));
+                        ig2.drawString(sseNumberSeq, pl.getFooterStart().x + ((i-shiftBack[i]) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + lineHeight + (stringHeight / 4));                    
+                        ig2.drawString(sseNumberProteinGraph, pl.getFooterStart().x + ((i-shiftBack[i]) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight *2) + (stringHeight / 4));                                                                    
+                    }
+                }
+
+                if(Settings.getBoolean("plcc_B_graphimg_legend")) {
+                    SSEGraph.drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4)), pl, fg);
+                }
+            
+            }
+                      
+            Rectangle2D roi = new Rectangle2D.Double(0, 0, pl.getPageWidth(), pl.getPageHeight());
+            
+            DrawResult drawRes = new DrawResult(ig2, roi);
+            return drawRes;                                                                         
+    }
 
     
+    
+    /**
+     * Draws the SEQ folding graph image of this graph and returns the DrawResult.
+     * If 'nonProteinGraph' is true, this graph is considered a custom (=non-protein) graph and the color coding for vertices and edges is NOT used.
+     * In that case, the graph is drawn black and white and the labels for the N- and C-termini are NOT drawn.
+     * 
+     * @param pnfr a folding graph notation result
+
+     * @return the DrawResult. You can write this to a file or whatever.
+     */
+    private static DrawResult drawFoldingGraphSEQG2D(PTGLNotationFoldResult pnfr) {
+
+        FoldingGraph fg = pnfr.getFoldingGraph();
+        SSEGraph pg = fg.parent;
+        Integer startVertexInParent = fg.getMinimalVertexIndexInParentGraph();
+        Integer endVertexInParent = fg.getMaximalVertexIndexInParentGraph();
+        
+        Integer shiftBack = startVertexInParent;    // how many vertices we skipped on the left, we can shift the whole image to the left by this number of vetex lengths
+        
+        List<Integer> fgVertexPosInParent = fg.getVertexIndexListInParentGraph();
+        List<Integer> parentVertexPosInFG = pg.computeParentGraphVertexPositionsInFoldingGraph(fgVertexPosInParent, pg.size);
+        
+        Integer numVerts = endVertexInParent - startVertexInParent + 1;
+
+        Boolean bw = false;                                                  
+        
+        // All these values are in pixels
+        // page setup
+        PageLayout pl = new PageLayout(numVerts);        
+        Position2D vertStart = pl.getVertStart();
+        Integer lineHeight = pl.textLineHeight;            
+        
+        
+
+            // ------------------------- Prepare stuff -------------------------
+            // TYPE_INT_ARGB specifies the image format: 8-bit RGBA packed into integer pixels
+            //BufferedImage bi = new BufferedImage(pl.getPageWidth(), pl.getPageHeight(), BufferedImage.TYPE_INT_ARGB);
+            
+            SVGGraphics2D ig2;
+            
+            
+            //if(Settings.get("plcc_S_img_output_format").equals("SVG")) {                    
+                // Apache Batik SVG library, using W3C DOM tree implementation
+                // Get a DOMImplementation.
+                DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
+                // Create an instance of org.w3c.dom.Document.
+                String svgNS = "http://www.w3.org/2000/svg";
+                Document document = domImpl.createDocument(svgNS, "svg", null);
+                // Create an instance of the SVG Generator.
+                ig2 = new SVGGraphics2D(document);
+                //ig2.getRoot(document.getDocumentElement());
+           // }
+            //else {
+            //    ig2 = (SVGGraphics2D)bi.createGraphics();
+            //}
+            
+            ig2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            // make background white
+            ig2.setPaint(Color.WHITE);
+            ig2.fillRect(0, 0, pl.getPageWidth(), pl.getPageHeight());
+            ig2.setPaint(Color.BLACK);
+
+            //pl.drawAreaOutlines(ig2);
+            // prepare font
+            Font font = pl.getStandardFont();
+            ig2.setFont(font);
+            FontMetrics fontMetrics = ig2.getFontMetrics();
+
+            // ------------------------- Draw header -------------------------
+
+            // check width of header string
+            String proteinHeader = "The SEQ " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
+            String notation = "SEQ notation: '" + pnfr.seqNotation + "' (start vertex in parent: " + pnfr.seqStart + ")";
+            //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
+            Integer stringHeight = fontMetrics.getAscent();
+            String sseNumberSeq;    // the SSE number in the primary structure, N to C terminus
+            String sseNumberFoldingGraph;  // the SSE number in this graph, 1..(this.size)
+            String sseNumberProteinGraph;  // the SSE number in the parent protein graph, 1..(this.size)
+
+            if(Settings.getBoolean("plcc_B_graphimg_header")) {
+                ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
+                ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);                
+            }
+
+            // ------------------------- Draw the graph -------------------------
+            
+            // Draw the edges as arcs
+            Integer k,l;
+            java.awt.Shape shape;
+            Arc2D.Double arc;
+            ig2.setStroke(new BasicStroke(2));  // thin edges
+            Integer edgeType, leftVert, rightVert, leftVertPosX, rightVertPosX, arcWidth, arcHeight, arcTopLeftX, arcTopLeftY, spacerX, spacerY;
+            for(Integer i = startVertexInParent; i <= endVertexInParent; i++) {
+                for(Integer j = i + 1; j <= endVertexInParent; j++) {
+
+                    
+                    k = parentVertexPosInFG.get(i);
+                    l = parentVertexPosInFG.get(j);
+                    if(k < 0 || l < 0) {
+                        continue;
+                    }
+                    
+                    // If there is a contact...
+                    if(fg.containsEdge(k, l) && (l - k == 1)) {
+
+                        // all edges are black in SEQ, no matter the edge type
+                        edgeType = fg.getContactType(k, l);
+                        ig2.setPaint(Color.BLACK);
+                                                
+
+                        // determine the center of the arc and the width of its rectangle bounding box
+                        //if(k < l) { leftVert = k; rightVert = l; }
+                        //else { leftVert = l; rightVert = k; }
+                        
+                        if(i < j) { leftVert = i; rightVert = j; }
+                        else { leftVert = j; rightVert = i; }
+                        
+                        leftVertPosX = pl.getVertStart().x + ((leftVert - shiftBack) * pl.vertDist);
+                        rightVertPosX = pl.getVertStart().x + ((rightVert - shiftBack) * pl.vertDist);
+
+                        arcWidth = rightVertPosX - leftVertPosX;
+                        arcHeight = arcWidth / 2;
+
+                        arcTopLeftX = leftVertPosX;
+                        arcTopLeftY = pl.getVertStart().y - arcHeight / 2;
+
+                        spacerX = pl.vertRadius;
+                        spacerY = 0;
+
+                        // draw it                                                
+                        arc = new Arc2D.Double(arcTopLeftX + spacerX, arcTopLeftY + spacerY, arcWidth, arcHeight, 0, 180, Arc2D.OPEN);
+                        shape = ig2.getStroke().createStrokedShape(arc);
+                        ig2.fill(shape);
+
+                    }
+                }
+            }
+
+            // Draw the vertices as circles
+            Ellipse2D.Double circle;
+            Rectangle2D.Double rect;
+            ig2.setStroke(new BasicStroke(2));
+            for(Integer i = startVertexInParent; i <= endVertexInParent; i++) {
+                
+                // pick color depending on SSE type
+                if(pg.sseList.get(i).isHelix()) { ig2.setPaint(Color.RED); }
+                else if(pg.sseList.get(i).isBetaStrand()) { ig2.setPaint(Color.BLACK); }
+                else if(pg.sseList.get(i).isLigandSSE()) { ig2.setPaint(Color.MAGENTA); }
+                else if(pg.sseList.get(i).isOtherSSE()) { ig2.setPaint(Color.GRAY); }
+                else { ig2.setPaint(Color.LIGHT_GRAY); }
+
+                Integer parentVertexPosInFoldingGraph = parentVertexPosInFG.get(i);
+                if(parentVertexPosInFoldingGraph < 0) {
+                    ig2.setPaint(Color.LIGHT_GRAY);
+                } 
+                
+                if(bw) { ig2.setPaint(Color.GRAY); }      // for non-protein graphs
+                
+                // draw a shape based on SSE type
+                                
+                
+                SSE sse = pg.getVertex(i);
+                if(sse.isBetaStrand()) {
+                    // beta strands are black, filled squares
+                    rect = new Rectangle2D.Double(vertStart.x + ((i-shiftBack) * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
+                    ig2.fill(rect);
+                    
+                }
+                else if(sse.isLigandSSE()) {
+                    // ligands are magenta circles (non-filled)
+                    circle = new Ellipse2D.Double(vertStart.x + ((i-shiftBack) * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
+                    //ig2.fill(circle);
+                    ig2.setStroke(new BasicStroke(3));  // this does NOT get filled, so give it a thicker border
+                    ig2.draw(circle);
+                    ig2.setStroke(new BasicStroke(2));
+                }
+                else {
+                    // helices and all others are filled circles (helices are red circles, all others are gray circles)
+                    circle = new Ellipse2D.Double(vertStart.x + ((i-shiftBack) * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
+                    ig2.fill(circle);                    
+                }
+            }
+            
+            // Draw the markers for the N-terminus and C-terminus if there are any vertices in this graph            
+            ig2.setStroke(new BasicStroke(2));
+            ig2.setPaint(Color.BLACK);
+            
+            if( ! bw) {
+                if(fg.getSize() > 0) {                    
+                    ig2.drawString("N", vertStart.x - pl.vertDist, vertStart.y + 20);    // N terminus label
+                    ig2.drawString("C", vertStart.x + numVerts * pl.vertDist, vertStart.y + 20);  // C terminus label
+                }
+            }
+                        
+            // ************************************* footer **************************************
+            
+            if(Settings.getBoolean("plcc_B_graphimg_footer")) {
+            
+                // Draw the vertex numbering into the footer
+                // Determine the dist between vertices that will have their vertex number printed below them in the footer field
+                Integer printNth = 1;
+                //if(fg.getSize() > 9) { printNth = 1; }
+                if(fg.getSize() > 99) { printNth = 2; }
+                if(fg.getSize() > 999) { printNth = 3; }
+
+                // line markers: S for sequence order, G for graph order
+                
+                if(fg.getSize() > 0) {                                            
+                    ig2.drawString("FG", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (stringHeight / 4));
+                    ig2.drawString("SQ", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
+                    ig2.drawString("PG", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + lineHeight + (stringHeight / 4));
+                }
+                else {
+                    ig2.drawString("(Graph has no vertices.)", pl.getFooterStart().x, pl.getFooterStart().y);
+                }
+
+
+                for(Integer i = startVertexInParent; i <= endVertexInParent; i++) {
+                    // Draw label for every nth vertex
+                    if((i + 1) % printNth == 0) {
+                        sseNumberFoldingGraph = "" + (parentVertexPosInFG.get(i) >= 0 ? (parentVertexPosInFG.get(i) + 1) : "");
+                        sseNumberSeq = "" + (pg.sseList.get(i).getSSESeqChainNum());
+                        sseNumberProteinGraph = "" + (i + 1);
+                        //stringWidth = fontMetrics.stringWidth(sseNumberSeq);
+                        stringHeight = fontMetrics.getAscent();                                        
+
+                        ig2.drawString(sseNumberFoldingGraph, pl.getFooterStart().x + ((i-shiftBack) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4));
+                        ig2.drawString(sseNumberSeq, pl.getFooterStart().x + ((i-shiftBack) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + lineHeight + (stringHeight / 4));                    
+                        ig2.drawString(sseNumberProteinGraph, pl.getFooterStart().x + ((i-shiftBack) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight *2) + (stringHeight / 4));                                                                    
+                    }
+                }
+
+                if(Settings.getBoolean("plcc_B_graphimg_legend")) {
+                    SSEGraph.drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4)), pl, fg);
+                }
+            
+            }
+                      
+            Rectangle2D roi = new Rectangle2D.Double(0, 0, pl.getPageWidth(), pl.getPageHeight());
+            
+            DrawResult drawRes = new DrawResult(ig2, roi);
+            return drawRes;                                                                         
+    }
                     
     
 
