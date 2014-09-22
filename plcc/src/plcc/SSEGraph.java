@@ -522,7 +522,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
      * @return the x coordinate in the image where the legend ends (which is the left margin + the legend width). 
      * This can be used to determine the minimal width of the total image (it has to be at least this value).
      */
-    public Integer drawLegend(SVGGraphics2D ig2, Position2D startPos, PageLayout pl) {
+    public static Integer drawLegend(SVGGraphics2D ig2, Position2D startPos, PageLayout pl, SSEGraph g) {
         
         Boolean drawAll = Settings.getBoolean("plcc_B_graphimg_legend_always_all");
         
@@ -539,7 +539,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         String label;
         
         // Edges label
-        if(this.numEdges() > 0) {
+        if(g.numEdges() > 0) {
             label = "[Edges: ";
             ig2.setPaint(Color.BLACK);
             ig2.drawString(label, pixelPosX, startPos.y);
@@ -547,35 +547,35 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         }
         
         // now go through relative orientation texts and colors        
-        if(this.containsContactTypeParallel() || drawAll) {
+        if(g.containsContactTypeParallel() || drawAll) {
             label = "parallel";
             ig2.setPaint(Color.RED);
             ig2.drawString(label, pixelPosX, startPos.y);
             pixelPosX += fontMetrics.stringWidth(label) + spacer;
         }
         
-        if(this.containsContactTypeAntiparallel() || drawAll) {
+        if(g.containsContactTypeAntiparallel() || drawAll) {
             label = "antiparallel";
             ig2.setPaint(Color.BLUE);
             ig2.drawString(label, pixelPosX, startPos.y);
             pixelPosX += fontMetrics.stringWidth(label) + spacer;
         }
         
-        if(this.containsContactTypeMixed() || drawAll) {
+        if(g.containsContactTypeMixed() || drawAll) {
             label = "mixed";
             ig2.setPaint(Color.GREEN);
             ig2.drawString(label, pixelPosX, startPos.y);
             pixelPosX += fontMetrics.stringWidth(label) + spacer;
         }
         
-        if(this.containsContactTypeLigand() || drawAll) {
+        if(g.containsContactTypeLigand() || drawAll) {
             label = "ligand";
             ig2.setPaint(Color.MAGENTA);
             ig2.drawString(label, pixelPosX, startPos.y);
             pixelPosX += fontMetrics.stringWidth(label) + spacer;
         }
         
-        if(chainEnd.size()>0 || drawAll) {
+        if(g.chainEnd.size()>0 || drawAll) {
             label = "interchain";
             ig2.setPaint(Color.PINK);
             ig2.drawString(label, pixelPosX, startPos.y);
@@ -583,7 +583,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         }
         
         // End of edges label
-        if(this.numEdges() > 0) {
+        if(g.numEdges() > 0) {
             label = "]";
             ig2.setPaint(Color.BLACK);
             ig2.drawString(label, pixelPosX, startPos.y);
@@ -591,7 +591,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         }
         
         // Vertices label
-        if(this.numVertices() > 0) {
+        if(g.numVertices() > 0) {
             label = " [Vertices: ";
             ig2.setPaint(Color.BLACK);
             ig2.drawString(label, pixelPosX, startPos.y);
@@ -599,32 +599,32 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         }
         
         // ok, now draw the SSE symbols     
-        if(this.containsSSETypeHelix() || drawAll) {
-            this.drawSymbolAlphaHelix(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+        if(g.containsSSETypeHelix() || drawAll) {
+            g.drawSymbolAlphaHelix(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
             pixelPosX += vertWidth + spacer;
             label = "helix";
             ig2.drawString(label, pixelPosX, startPos.y);
             pixelPosX += fontMetrics.stringWidth(label) + spacer;
         }
         
-        if(this.containsSSETypeBetaStrand() || drawAll) {
-            this.drawSymbolBetaStrand(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+        if(g.containsSSETypeBetaStrand() || drawAll) {
+            g.drawSymbolBetaStrand(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
             pixelPosX += vertWidth + spacer;
             label = "strand";
             ig2.drawString(label, pixelPosX, startPos.y);
             pixelPosX += fontMetrics.stringWidth(label) + spacer;
         }
         
-        if(this.containsSSETypeLigand() || drawAll) {
-            this.drawSymbolLigand(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+        if(g.containsSSETypeLigand() || drawAll) {
+            g.drawSymbolLigand(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
             pixelPosX += vertWidth + spacer;
             label = "ligand";
             ig2.drawString(label, pixelPosX, startPos.y);
             pixelPosX += fontMetrics.stringWidth(label) + spacer;
         }
         
-        if(this.containsSSETypeOther() || drawAll) {
-            this.drawSymbolOtherSSE(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+        if(g.containsSSETypeOther() || drawAll) {
+            g.drawSymbolOtherSSE(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
             pixelPosX += vertWidth + spacer;
             label = "other";
             ig2.drawString(label, pixelPosX, startPos.y);
@@ -632,7 +632,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         }
         
         // end label
-        if(this.numVertices() > 0) {
+        if(g.numVertices() > 0) {
             label = "]";
             ig2.setPaint(Color.BLACK);
             ig2.drawString(label, pixelPosX, startPos.y);
@@ -1181,9 +1181,10 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
      * @return the SSE object at the given index
      */
     public SSE getSSEBySeqPosition(Integer position) {
+        //if(position >= this.size || position < 0) {
         if(position >= this.size) {
             System.err.println("ERROR: getSSE(): Index " + position + " out of range, matrix size is " + this.size + ".");
-            System.exit(-1);
+            System.exit(1);
         }
         return(sseList.get(position));
     }
@@ -2417,16 +2418,16 @@ E	3	3	3
     }
     
     /**
-     * 
+     * Draws a protein graph in all formats, returns a list of written files.
      * @param baseFilePathNoExt the base file path where to put the image (without dot and file extension)
      * @param drawBlackAndWhite whether to omit colors, only useful for non-protein graphs
      * @param formats an array of type DrawTools.IMAGEFORMAT. Do not include SVG, this will always be drawn anyways
      * @return a map of formats to the corresponding output files written to disk
      */
-    public HashMap<IMAGEFORMAT, String> drawProteinGraph(String baseFilePathNoExt, Boolean drawBlackAndWhite, IMAGEFORMAT[] formats) {                
+    public static HashMap<IMAGEFORMAT, String> drawProteinGraph(String baseFilePathNoExt, Boolean drawBlackAndWhite, IMAGEFORMAT[] formats, ProtGraph pg) {                
                
        
-        DrawResult drawRes = this.drawProteinGraphG2D(drawBlackAndWhite);
+        DrawResult drawRes = SSEGraph.drawProteinGraphG2D(drawBlackAndWhite, pg);
         
         //System.out.println("drawProteinGraph: Basefilepath is '" + baseFilePathNoExt + "'.");
         String svgFilePath = baseFilePathNoExt + ".svg";
@@ -2436,12 +2437,47 @@ E	3	3	3
             resultFilesByFormat.put(IMAGEFORMAT.SVG, svgFilePath);
             resultFilesByFormat.putAll(DrawTools.convertSVGFileToOtherFormats(svgFilePath, baseFilePathNoExt, drawRes, formats));
         } catch (IOException ex) {
-            DP.getInstance().e("Could not write graph file : '" + ex.getMessage() + "'.");
+            DP.getInstance().e("Could not write protein graph file : '" + ex.getMessage() + "'.");
         }
         
         if( ! Settings.getBoolean("plcc_B_silent")) {
             StringBuilder sb = new StringBuilder();
-            sb.append("      Output graph files: ");
+            sb.append("      Output protein graph files: ");
+            for(IMAGEFORMAT format : resultFilesByFormat.keySet()) {
+                sb.append("(").append(format.toString()).append(" => ").append(resultFilesByFormat.get(format)).append(") ");
+            }
+            System.out.println(sb.toString());
+        }
+        return resultFilesByFormat;
+    }
+    
+    
+    /**
+     * Draws a folding graph in all formats, returns a list of written files.
+     * @param baseFilePathNoExt the base file path where to put the image (without dot and file extension)
+     * @param drawBlackAndWhite whether to omit colors, only useful for non-protein graphs
+     * @param formats an array of type DrawTools.IMAGEFORMAT. Do not include SVG, this will always be drawn anyways
+     * @param pnfr
+     * @return a map of formats to the corresponding output files written to disk
+     */
+    public static HashMap<IMAGEFORMAT, String> drawFoldingGraphADJ(String baseFilePathNoExt, Boolean drawBlackAndWhite, IMAGEFORMAT[] formats, PTGLNotationFoldResult pnfr) {                
+               
+        DrawResult drawRes = SSEGraph.drawFoldingGraphADJG2D(pnfr);
+        
+        //System.out.println("drawProteinGraph: Basefilepath is '" + baseFilePathNoExt + "'.");
+        String svgFilePath = baseFilePathNoExt + ".svg";
+        HashMap<IMAGEFORMAT, String> resultFilesByFormat = new HashMap<IMAGEFORMAT, String>();
+        try {
+            DrawTools.writeG2dToSVGFile(svgFilePath, drawRes);
+            resultFilesByFormat.put(IMAGEFORMAT.SVG, svgFilePath);
+            resultFilesByFormat.putAll(DrawTools.convertSVGFileToOtherFormats(svgFilePath, baseFilePathNoExt, drawRes, formats));
+        } catch (IOException ex) {
+            DP.getInstance().e("Could not write folding graph file : '" + ex.getMessage() + "'.");
+        }
+        
+        if( ! Settings.getBoolean("plcc_B_silent")) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("      Output folding graph files: ");
             for(IMAGEFORMAT format : resultFilesByFormat.keySet()) {
                 sb.append("(").append(format.toString()).append(" => ").append(resultFilesByFormat.get(format)).append(") ");
             }
@@ -2458,10 +2494,10 @@ E	3	3	3
      * @param nonProteinGraph whether the graph is a non-protein graph and thus does NOT contain information on the relative SSE orientation in the expected way. If so, it is drawn in gray scale because the color code becomes useless (true => gray scale, false => color).
      * @return the DrawResult. You can write this to a file or whatever.
      */
-    public DrawResult drawProteinGraphG2D(Boolean nonProteinGraph) {
+    private static DrawResult drawProteinGraphG2D(Boolean nonProteinGraph, ProtGraph pg) {
 
         
-        Integer numVerts = this.numVertices();
+        Integer numVerts = pg.numVertices();
 
         Boolean bw = nonProteinGraph;                                                  
         
@@ -2510,7 +2546,7 @@ E	3	3	3
             // ------------------------- Draw header -------------------------
 
             // check width of header string
-            String proteinHeader = "The " + this.graphType + " protein graph of PDB entry " + this.pdbid + ", chain " + this.chainid + " [V=" + this.numVertices() + ", E=" + this.numSSEContacts() + "].";
+            String proteinHeader = "The " + pg.graphType + " protein graph of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + pg.numVertices() + ", E=" + pg.numSSEContacts() + "].";
             //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
             Integer stringHeight = fontMetrics.getAscent();
             String sseNumberSeq;    // the SSE number in the primary structure, N to C terminus
@@ -2527,14 +2563,14 @@ E	3	3	3
             Arc2D.Double arc;
             ig2.setStroke(new BasicStroke(2));  // thin edges
             Integer edgeType, leftVert, rightVert, leftVertPosX, rightVertPosX, arcWidth, arcHeight, arcTopLeftX, arcTopLeftY, spacerX, spacerY, iChainID, jChainID;
-            for(Integer i = 0; i < this.sseList.size(); i++) {
-                for(Integer j = i + 1; j < this.sseList.size(); j++) {
+            for(Integer i = 0; i < pg.sseList.size(); i++) {
+                for(Integer j = i + 1; j < pg.sseList.size(); j++) {
 
                     // If there is a contact...
-                    if(this.containsEdge(i, j)) {
+                    if(pg.containsEdge(i, j)) {
 
                         // determine edge type and the resulting color
-                        edgeType = this.getContactType(i, j);
+                        edgeType = pg.getContactType(i, j);
                         if(edgeType.equals(SpatRel.PARALLEL)) { ig2.setPaint(Color.RED); }
                         else if(edgeType.equals(SpatRel.ANTIPARALLEL)) { ig2.setPaint(Color.BLUE); }
                         else if(edgeType.equals(SpatRel.MIXED)) { ig2.setPaint(Color.GREEN); }
@@ -2548,11 +2584,11 @@ E	3	3	3
                         // determine chain of SSEs
                         iChainID = -1;
                         jChainID = -1;
-                        for(Integer x = 0; x < chainEnd.size(); x++){
-                            if(i < chainEnd.get(x)) {iChainID = x; break;}
+                        for(Integer x = 0; x < pg.chainEnd.size(); x++){
+                            if(i < pg.chainEnd.get(x)) {iChainID = x; break;}
                         }
-                        for(Integer x = 0; x < chainEnd.size(); x++){
-                            if(j < chainEnd.get(x)) {jChainID = x; break;}
+                        for(Integer x = 0; x < pg.chainEnd.size(); x++){
+                            if(j < pg.chainEnd.get(x)) {jChainID = x; break;}
                         }
                         if (!Objects.equals(iChainID, jChainID)) {ig2.setPaint(Color.PINK);}
                         // ----- end complex graph specific stuff -----
@@ -2585,25 +2621,25 @@ E	3	3	3
             Ellipse2D.Double circle;
             Rectangle2D.Double rect;
             ig2.setStroke(new BasicStroke(2));
-            for(Integer i = 0; i < this.sseList.size(); i++) {
+            for(Integer i = 0; i < pg.sseList.size(); i++) {
                 
                 // pick color depending on SSE type
-                if(this.sseList.get(i).isHelix()) { ig2.setPaint(Color.RED); }
-                else if(this.sseList.get(i).isBetaStrand()) { ig2.setPaint(Color.BLACK); }
-                else if(this.sseList.get(i).isLigandSSE()) { ig2.setPaint(Color.MAGENTA); }
-                else if(this.sseList.get(i).isOtherSSE()) { ig2.setPaint(Color.GRAY); }
+                if(pg.sseList.get(i).isHelix()) { ig2.setPaint(Color.RED); }
+                else if(pg.sseList.get(i).isBetaStrand()) { ig2.setPaint(Color.BLACK); }
+                else if(pg.sseList.get(i).isLigandSSE()) { ig2.setPaint(Color.MAGENTA); }
+                else if(pg.sseList.get(i).isOtherSSE()) { ig2.setPaint(Color.GRAY); }
                 else { ig2.setPaint(Color.LIGHT_GRAY); }
 
                 if(bw) { ig2.setPaint(Color.GRAY); }      // for non-protein graphs
                 
                 // draw a shape based on SSE type
-                if(this.sseList.get(i).isBetaStrand()) {
+                if(pg.sseList.get(i).isBetaStrand()) {
                     // beta strands are black, filled squares
                     rect = new Rectangle2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
                     ig2.fill(rect);
                     
                 }
-                else if(this.sseList.get(i).isLigandSSE()) {
+                else if(pg.sseList.get(i).isLigandSSE()) {
                     // ligands are magenta circles (non-filled)
                     circle = new Ellipse2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
                     //ig2.fill(circle);
@@ -2623,9 +2659,9 @@ E	3	3	3
             ig2.setPaint(Color.BLACK);
             
             if( ! bw) {
-                if(this.sseList.size() > 0) {                    
+                if(pg.sseList.size() > 0) {                    
                     ig2.drawString("N", vertStart.x - pl.vertDist, vertStart.y + 20);    // N terminus label
-                    ig2.drawString("C", vertStart.x + this.sseList.size() * pl.vertDist, vertStart.y + 20);  // C terminus label
+                    ig2.drawString("C", vertStart.x + pg.sseList.size() * pl.vertDist, vertStart.y + 20);  // C terminus label
                 }
             }
                         
@@ -2636,13 +2672,13 @@ E	3	3	3
                 // Draw the vertex numbering into the footer
                 // Determine the dist between vertices that will have their vertex number printed below them in the footer field
                 Integer printNth = 1;
-                if(this.sseList.size() > 9) { printNth = 1; }
-                if(this.sseList.size() > 99) { printNth = 2; }
-                if(this.sseList.size() > 999) { printNth = 3; }
+                if(pg.sseList.size() > 9) { printNth = 1; }
+                if(pg.sseList.size() > 99) { printNth = 2; }
+                if(pg.sseList.size() > 999) { printNth = 3; }
 
                 // line markers: S for sequence order, G for graph order
                 Integer lineHeight = pl.textLineHeight;            
-                if(this.sseList.size() > 0) {                                            
+                if(pg.sseList.size() > 0) {                                            
                     ig2.drawString("PG", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (stringHeight / 4));
                     ig2.drawString("SQ", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
                 }
@@ -2650,11 +2686,11 @@ E	3	3	3
                     ig2.drawString("(Graph has no vertices.)", pl.getFooterStart().x, pl.getFooterStart().y);
                 }
                 iChainID = -1;
-                for(Integer i = 0; i < this.sseList.size(); i++) {
+                for(Integer i = 0; i < pg.sseList.size(); i++) {
                     // Draw label for every nth vertex
                     if((i + 1) % printNth == 0) {
                         sseNumberGraph = "" + (i + 1);
-                        sseNumberSeq = "" + (this.sseList.get(i).getSSESeqChainNum());
+                        sseNumberSeq = "" + (pg.sseList.get(i).getSSESeqChainNum());
                         //stringWidth = fontMetrics.stringWidth(sseNumberSeq);
                         stringHeight = fontMetrics.getAscent();                                        
 
@@ -2662,19 +2698,19 @@ E	3	3	3
                         ig2.drawString(sseNumberSeq, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + lineHeight + (stringHeight / 4));                    
                         
                         // determine chain of SSEs
-                        for(Integer x = 0; x < chainEnd.size(); x++){
-                            if(i < chainEnd.get(x)) {iChainID = x; break;}
+                        for(Integer x = 0; x < pg.chainEnd.size(); x++){
+                            if(i < pg.chainEnd.get(x)) {iChainID = x; break;}
                         }
-                        if(iChainID != -1) {ig2.drawString(allChains.get(iChainID).getPdbChainID(), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 2) + (stringHeight / 4));}
+                        if(iChainID != -1) {ig2.drawString(pg.allChains.get(iChainID).getPdbChainID(), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 2) + (stringHeight / 4));}
                     }
                 }
 
                 if(Settings.getBoolean("plcc_B_graphimg_legend")) {
                     if(iChainID != -1){
-                        drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + lineHeight * 3 + (stringHeight / 4)), pl);
+                        SSEGraph.drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + lineHeight * 3 + (stringHeight / 4)), pl, pg);
                     }
                     else{
-                        drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + lineHeight * 2 + (stringHeight / 4)), pl);
+                        SSEGraph.drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + lineHeight * 2 + (stringHeight / 4)), pl, pg);
                     }
                 }
             
@@ -3940,16 +3976,17 @@ E	3	3	3
 
      * @return the DrawResult. You can write this to a file or whatever.
      */
-    public DrawResult drawFoldingGraphADJG2D(PTGLNotationFoldResult pnfr) {
+    private static DrawResult drawFoldingGraphADJG2D(PTGLNotationFoldResult pnfr) {
 
         FoldingGraph fg = pnfr.getFoldingGraph();
+        SSEGraph pg = fg.parent;
         Integer startVertexInParent = fg.getMinimalVertexIndexInParentGraph();
         Integer endVertexInParent = fg.getMaximalVertexIndexInParentGraph();
         
-        Integer shiftBack = startVertexInParent;
+        Integer shiftBack = startVertexInParent;    // how many vertices we skipped on the left, we can shift the whole image to the left by this number of vetex lengths
         
         List<Integer> fgVertexPosInParent = fg.getVertexIndexListInParentGraph();
-        List<Integer> parentVertexPosInFG = this.computeParentGraphVertexPositionsInFoldingGraph(fgVertexPosInParent, this.size);
+        List<Integer> parentVertexPosInFG = pg.computeParentGraphVertexPositionsInFoldingGraph(fgVertexPosInParent, pg.size);
         
         Integer numVerts = endVertexInParent - startVertexInParent + 1;
 
@@ -4001,7 +4038,7 @@ E	3	3	3
             // ------------------------- Draw header -------------------------
 
             // check width of header string
-            String proteinHeader = "The ADJ " + this.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + this.pdbid + ", chain " + this.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
+            String proteinHeader = "The ADJ " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
             String notation = "ADJ notation: '" + pnfr.adjNotation + "'";
             //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
             Integer stringHeight = fontMetrics.getAscent();
@@ -4048,8 +4085,12 @@ E	3	3	3
                                                 
 
                         // determine the center of the arc and the width of its rectangle bounding box
-                        if(k < l) { leftVert = k; rightVert = l; }
-                        else { leftVert = l; rightVert = k; }
+                        //if(k < l) { leftVert = k; rightVert = l; }
+                        //else { leftVert = l; rightVert = k; }
+                        
+                        if(i < j) { leftVert = i; rightVert = j; }
+                        else { leftVert = j; rightVert = i; }
+                        
                         leftVertPosX = pl.getVertStart().x + ((leftVert - shiftBack) * pl.vertDist);
                         rightVertPosX = pl.getVertStart().x + ((rightVert - shiftBack) * pl.vertDist);
 
@@ -4078,16 +4119,23 @@ E	3	3	3
             for(Integer i = startVertexInParent; i <= endVertexInParent; i++) {
                 
                 // pick color depending on SSE type
-                if(this.sseList.get(i).isHelix()) { ig2.setPaint(Color.RED); }
-                else if(this.sseList.get(i).isBetaStrand()) { ig2.setPaint(Color.BLACK); }
-                else if(this.sseList.get(i).isLigandSSE()) { ig2.setPaint(Color.MAGENTA); }
-                else if(this.sseList.get(i).isOtherSSE()) { ig2.setPaint(Color.GRAY); }
+                if(pg.sseList.get(i).isHelix()) { ig2.setPaint(Color.RED); }
+                else if(pg.sseList.get(i).isBetaStrand()) { ig2.setPaint(Color.BLACK); }
+                else if(pg.sseList.get(i).isLigandSSE()) { ig2.setPaint(Color.MAGENTA); }
+                else if(pg.sseList.get(i).isOtherSSE()) { ig2.setPaint(Color.GRAY); }
                 else { ig2.setPaint(Color.LIGHT_GRAY); }
 
+                Integer parentVertexPosInFoldingGraph = parentVertexPosInFG.get(i);
+                if(parentVertexPosInFoldingGraph < 0) {
+                    ig2.setPaint(Color.LIGHT_GRAY);
+                } 
+                
                 if(bw) { ig2.setPaint(Color.GRAY); }      // for non-protein graphs
                 
                 // draw a shape based on SSE type
-                SSE sse = fg.getVertex(parentVertexPosInFG.get(i));
+                                
+                
+                SSE sse = pg.getVertex(i);
                 if(sse.isBetaStrand()) {
                     // beta strands are black, filled squares
                     rect = new Rectangle2D.Double(vertStart.x + ((i-shiftBack) * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
@@ -4116,7 +4164,7 @@ E	3	3	3
             if( ! bw) {
                 if(fg.getSize() > 0) {                    
                     ig2.drawString("N", vertStart.x - pl.vertDist, vertStart.y + 20);    // N terminus label
-                    ig2.drawString("C", vertStart.x + fg.getSize() * pl.vertDist, vertStart.y + 20);  // C terminus label
+                    ig2.drawString("C", vertStart.x + numVerts * pl.vertDist, vertStart.y + 20);  // C terminus label
                 }
             }
                         
@@ -4141,29 +4189,25 @@ E	3	3	3
                 else {
                     ig2.drawString("(Graph has no vertices.)", pl.getFooterStart().x, pl.getFooterStart().y);
                 }
-                iChainID = -1;
+
+
                 for(Integer i = startVertexInParent; i <= endVertexInParent; i++) {
                     // Draw label for every nth vertex
                     if((i + 1) % printNth == 0) {
-                        sseNumberFoldingGraph = "" + parentVertexPosInFG.get(i);
-                        sseNumberSeq = "" + (this.sseList.get(i).getSSESeqChainNum());
+                        sseNumberFoldingGraph = "" + (parentVertexPosInFG.get(i) >= 0 ? (parentVertexPosInFG.get(i) + 1) : "");
+                        sseNumberSeq = "" + (pg.sseList.get(i).getSSESeqChainNum());
                         sseNumberProteinGraph = "" + (i + 1);
                         //stringWidth = fontMetrics.stringWidth(sseNumberSeq);
                         stringHeight = fontMetrics.getAscent();                                        
 
                         ig2.drawString(sseNumberFoldingGraph, pl.getFooterStart().x + ((i-shiftBack) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4));
                         ig2.drawString(sseNumberSeq, pl.getFooterStart().x + ((i-shiftBack) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + lineHeight + (stringHeight / 4));                    
-                        ig2.drawString(sseNumberProteinGraph, pl.getFooterStart().x + ((i-shiftBack) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + lineHeight + lineHeight + (stringHeight / 4));                                                                    
+                        ig2.drawString(sseNumberProteinGraph, pl.getFooterStart().x + ((i-shiftBack) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight *2) + (stringHeight / 4));                                                                    
                     }
                 }
 
                 if(Settings.getBoolean("plcc_B_graphimg_legend")) {
-                    if(iChainID != -1){
-                        drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + lineHeight * 3 + (stringHeight / 4)), pl);
-                    }
-                    else{
-                        drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + lineHeight * 2 + (stringHeight / 4)), pl);
-                    }
+                    SSEGraph.drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4)), pl, fg);
                 }
             
             }

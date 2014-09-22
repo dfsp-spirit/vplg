@@ -149,7 +149,7 @@ public class DP {
      * @param msg the message to print
      */
     public void i(String srcTag, String msg) {
-        System.out.println(DP.appTag + DP.infoTag + "[" + srcTag + "]" + msg);
+        System.out.println(DP.appTag + DP.infoTag + "[" + srcTag + "] " + msg);
     }
     
     /**

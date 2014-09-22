@@ -1644,7 +1644,7 @@ public class Main {
 
         ProtGraph pg = ProtGraphs.fromTrivialGraphFormatFile(tgfFile);
         System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to base file '" + img + "'.");
-        pg.drawProteinGraph(img, true, formats);
+        SSEGraph.drawProteinGraph(img, true, formats, pg);
         //pg.print();
         System.out.println("  Graph image written to base file '" + img + "'.");
     }
@@ -1668,7 +1668,7 @@ public class Main {
         IMAGEFORMAT[] formats = new IMAGEFORMAT[] { DrawTools.IMAGEFORMAT.PNG };
         ProtGraph pg = ProtGraphs.fromPlccGraphFormatString(graphString);
         System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to base file '" + imgNoExt + "'.");
-        pg.drawProteinGraph(imgNoExt, false, formats); 
+        SSEGraph.drawProteinGraph(imgNoExt, false, formats, pg); 
         System.out.println("  Protein graph image written to base file '" + imgNoExt + "'.");
 
         //if(drawFoldingGraphsAsWell) {
@@ -1704,7 +1704,7 @@ public class Main {
         ProtGraph pg = ProtGraphs.fromPlccGraphFormatString(graphString);
         IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
         System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to base file '" + outputImgNoExt + "'.");
-        pg.drawProteinGraph(outputImgNoExt, false, formats);
+        SSEGraph.drawProteinGraph(outputImgNoExt, false, formats, pg);
         System.out.println("  Protein graph image written to base file '" + outputImgNoExt + "'.");
 
         //if(drawFoldingGraphsAsWell) {
@@ -2230,7 +2230,7 @@ public class Main {
                     // formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG, DrawTools.IMAGEFORMAT.PDF };                    
                     formats = Settings.getOutputImageFormats();
 
-                    HashMap<IMAGEFORMAT, String> filesByFormatCurNotation = pg.drawProteinGraph(imgFileNoExt, false, formats);
+                    HashMap<IMAGEFORMAT, String> filesByFormatCurNotation = SSEGraph.drawProteinGraph(imgFileNoExt, false, formats, pg);
                     //if(! silent) {
                     //    System.out.println("      Image of graph written to file '" + imgFile + "'.");
                     //}
@@ -2445,7 +2445,7 @@ public class Main {
                 try { 
                     fgDbId = DBManager.writeFoldingGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), fg_number, FoldingGraph.getFoldNameOfFoldNumber(fg_number), fg.getMinimalVertexIndexInParentGraph(), fg.toGraphModellingLanguageFormat(), fg.toVPLGGraphFormat(), fg.toKavoshFormat(), fg.toDOTLanguageFormat(), fg.getSSEStringSequential(), fg.containsBetaBarrel()); 
                     if(! silent) {
-                        System.out.println("        Inserted '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB, ID=" + fgDbId + ".");
+                        System.out.println("        Inserted '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB.");
                     }
                 }
                 catch(SQLException e) { 
@@ -2519,6 +2519,7 @@ public class Main {
             }
             
             // draw folding graphs            
+            Settings.set("plcc_B_draw_folding_graphs", "true"); // DEBUG
             if(Settings.getBoolean("plcc_B_draw_folding_graphs")) {
                 if(! silent) {
                     System.out.println("        -- Drawing all " + notations.size() + " notations of the " + pg.getGraphType() + " FG #" + j + "(fg_number=" + fg_number + ")--");
@@ -2526,9 +2527,23 @@ public class Main {
                 //System.out.println("          At FG #" + j + "(fg_number=" + fg_number + ").");
                 for(String notation : notations) {                                                
 
-                    String fileNameWithExtension = pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + "_" + notation + ".png";
+                    String fileNameWithoutExtension = pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + "_" + notation;
+                    String fileNameWithExtension = fileNameWithoutExtension + ".png";
                     fgFile = outputDir + System.getProperty("file.separator") + fileNameWithExtension; //Settings.get("plcc_S_img_output_fileext");
-                    if(fg.drawFoldingGraph(notation, fgFile)) {
+                    
+                    Boolean drawingSucceeded = false;
+                    IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
+                    HashMap<IMAGEFORMAT, String> filesByFormatCurNotation = new HashMap<>();
+                    
+                    if(notation.equals(FoldingGraph.FG_NOTATION_ADJ)) {     
+                        System.out.println("######################  DRAWING FG  ###########################");
+                        filesByFormatCurNotation = SSEGraph.drawFoldingGraphADJ(fileNameWithoutExtension, false, formats, pnfr);                        
+                    }
+                    
+                    
+                    
+                    //if(fg.drawFoldingGraph(notation, fgFile)) {
+                    if(drawingSucceeded) {
                         if(! silent) {
                             System.out.println("         -Folding graph #" + j + " of the " + pg.getGraphType() + " graph of chain " + pg.getChainid() + " written to file '" + fgFile + "' in " + notation + " notation.");
                         }
@@ -2544,6 +2559,9 @@ public class Main {
                             //DP.getInstance().d("dbImagePath is '" + dbImagePath + "'.");                            
 
 
+                            // TODO: update FG file names in database
+                            System.out.println("TODO: update FG file names in database");
+                    
                             try {
                                 DBManager.updateFoldingGraphImagePathInDB(fgDbId, DrawTools.IMAGEFORMAT.PNG, notation, dbImagePath);
                             } catch(SQLException e) {
@@ -2638,7 +2656,7 @@ public class Main {
                 
                 try { 
                     fgDbId = DBManager.writeFoldingGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), fg_number, fg.toGraphModellingLanguageFormat(), fg.toVPLGGraphFormat(), fg.toKavoshFormat(), fg.toDOTLanguageFormat(), fg.getNotationADJ(), fg.getNotationRED(), fg.getNotationKEY(true), fg.getNotationSEQ(), fg.getSSEStringSequential(), fg.containsBetaBarrel()); 
-                    System.out.println("        Inserted '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB, ID=" + fgDbId + ".");
+                    System.out.println("        Inserted '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB.");
                 }
                 catch(SQLException e) { 
                     DP.getInstance().e("Main", "Failed to insert '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB: '" + e.getMessage() + "'."); 
@@ -5909,7 +5927,7 @@ public class Main {
         
         if(Settings.getBoolean("plcc_B_draw_graphs")) {
             IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
-            pg.drawProteinGraph(imgFileNoExt, false, formats);
+            SSEGraph.drawProteinGraph(imgFileNoExt, false, formats, pg);
             System.out.println("    Image of complex graph written to base file '" + imgFileNoExt + "'.");
         }
         else {
