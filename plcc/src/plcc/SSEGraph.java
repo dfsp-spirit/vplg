@@ -3522,6 +3522,10 @@ E	3	3	3
             
             gmlf.append("    aa_sequence \"").append(vertex.getAASequence()).append("\"\n");
             
+            if(this.isFoldingGraph()) {
+                gmlf.append("    index_in_parent_pg \"").append(((FoldingGraph)this).getVertexIndexListInParentGraph().get(i)).append("\"\n");                
+            }
+            
             if(vertex.isLigandSSE()) {
                 gmlf.append("    lig_name \"").append(vertex.getLigandName3()).append("\"\n");
             }
