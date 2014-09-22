@@ -732,6 +732,8 @@ public class Main {
                             Settings.set("plcc_B_output_kavosh", "false");
                             Settings.set("plcc_B_output_eld", "false");
                             Settings.set("plcc_B_output_plcc", "false");
+                            Settings.set("plcc_B_output_perlfg", "false");
+                            
                             
                             // Now add the listed ones back:
                             String types = args[i+1].toLowerCase();
@@ -748,11 +750,12 @@ public class Main {
                                 if(types.contains("k")) { Settings.set("plcc_B_output_kavosh", "true"); nv++; }
                                 if(types.contains("e")) { Settings.set("plcc_B_output_eld", "true"); nv++; }
                                 if(types.contains("p")) { Settings.set("plcc_B_output_plcc", "true"); nv++; }
+                                if(types.contains("l")) { Settings.set("plcc_B_output_perlfg", "true"); nv++; }
 
                                 // sanity check
                                 if(nv != types.length()) {
                                     DP.getInstance().w("List of output formats given on command line '" + types + "' contains invalid chars (" + types.length() + " given, " + nv + " valid).");
-                                    DP.getInstance().w("Valid chars: 'g' => GML, 't' => TGF, 'd' => DOT lang, 'k' => kavosh, 'e' => edge list, p' => PLCC. Example: '-O tgp'");
+                                    DP.getInstance().w("Valid chars: 'g' => GML, 't' => TGF, 'd' => DOT lang, 'k' => kavosh, 'e' => edge list, 'p' => PLCC, 'l' => Perf FG. Example: '-O tgp'");
 
                                     if(nv <= 0) {
                                         syntaxError();
@@ -2417,11 +2420,14 @@ public class Main {
                 continue;
             }
             
+            
             // graph strings in GML format and others, does NOT include PTGL linear notations
-            writeFGGraphStrings(fg, outputDir, fg.getFoldingGraphNumber());
-            if(Settings.getBoolean("plcc_B_output_fg_linear_notations_to_file")) {
-                writeFGLinearNotationStrings(pnfr.getFoldingGraph(), outputDir, pnfr.getFoldNumber(), pnfr);
-            }                        
+            if(fg.numVertices() >= Settings.getInteger("plcc_I_min_fgraph_size_write_to_file")) {
+                writeFGGraphStrings(fg, outputDir, fg.getFoldingGraphNumber());
+                if(Settings.getBoolean("plcc_B_output_fg_linear_notations_to_file")) {
+                    writeFGLinearNotationStrings(pnfr.getFoldingGraph(), outputDir, pnfr.getFoldNumber(), pnfr);
+                }                     
+            }
                 
             // Draw all folding graphs in all notations
             //List<String> notations = Arrays.asList("KEY", "ADJ", "RED", "SEQ");
