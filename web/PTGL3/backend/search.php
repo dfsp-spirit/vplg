@@ -600,12 +600,14 @@ if (($none_set == true)) { // #TODO redefine this check...
 	};
 	
 	
+	$q_limit = 50;
+	
 	$count_query = $query . " ) results";
 	$query .= " ) results
 			  ORDER BY pdb_id, chain_name";
 
 	$count_query = str_replace("chain_id, chain_name, pdb_id, resolution, title, header", "COUNT(*)", $count_query);
-	$query .= " LIMIT 50 OFFSET ".$limit_start;
+	$query .= " LIMIT " . $q_limit . " OFFSET ".$limit_start;
   
 	$result = pg_query($db, $query); // or die($query . ' -> Query failed: ' . pg_last_error());
 	$count_result = pg_query($db, $count_query); // or die($query . ' -> Query failed: ' . pg_last_error());
@@ -620,20 +622,20 @@ if (($none_set == true)) { // #TODO redefine this check...
 
 	// begin to create pager
 	$tableString = '<div id="pager">';
-	if($limit_start >= 50) {
-		$tableString .= '<a class="changepage" href="?next='.($limit_start - 50).'"><< previous </a>  ';
+	if($limit_start >= $q_limit) {
+		$tableString .= '<a class="changepage" href="?next='.($limit_start - $q_limit).'"><< previous </a>  ';
 	}
 
 	$tableString .= '-- Showing results '.$limit_start.' to ';
 	
-	if($limit_start + 50 > $row_count){
+	if($limit_start + $q_limit > $row_count){
 		$tableString .= $row_count . ' (of '.$row_count.') -- ';
 	} else {
-		$tableString .= ($limit_start + 50) . ' (of '.$row_count.') -- ';
+		$tableString .= ($limit_start + $q_limit) . ' (of '.$row_count.') -- ';
 	}
 	
-	if(($limit_start + 50) < $row_count){
-		$tableString .= '<a class="changepage" href="?next='.($limit_start + 50).'"> next >></a>';
+	if(($limit_start + $q_limit) < $row_count){
+		$tableString .= '<a class="changepage" href="?next='.($limit_start + $q_limit).'"> next >></a>';
 	}
 	$tableString .= '</div>';
 	// EOPager
