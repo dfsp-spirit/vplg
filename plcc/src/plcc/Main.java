@@ -2522,7 +2522,7 @@ public class Main {
             Settings.set("plcc_B_draw_folding_graphs", "true"); // DEBUG
             if(Settings.getBoolean("plcc_B_draw_folding_graphs")) {
                 if(! silent) {
-                    System.out.println("        -- Drawing all " + notations.size() + " notations of the " + pg.getGraphType() + " FG #" + j + "(fg_number=" + fg_number + ")--");
+                    System.out.println("        Drawing all " + notations.size() + " notations of the " + pg.getGraphType() + " FG #" + j + " (fg_number=" + fg_number + ")");
                 }
                 //System.out.println("          At FG #" + j + "(fg_number=" + fg_number + ").");
                 for(String notation : notations) {                                                
@@ -2536,16 +2536,16 @@ public class Main {
                     HashMap<IMAGEFORMAT, String> filesByFormatCurNotation = new HashMap<>();
                     
                     if(notation.equals(FoldingGraph.FG_NOTATION_ADJ)) {     
-                        //System.out.println("######################  DRAWING ADJ FG  ###########################");
                         filesByFormatCurNotation = SSEGraph.drawFoldingGraphADJ(fileNameWithoutExtension, false, formats, pnfr);                        
                     }
                     else if(notation.equals(FoldingGraph.FG_NOTATION_RED)) {
-                        //System.out.println("######################  DRAWING RED FG  ###########################");
                         filesByFormatCurNotation = SSEGraph.drawFoldingGraphRED(fileNameWithoutExtension, false, formats, pnfr);                                                
                     }
                     else if(notation.equals(FoldingGraph.FG_NOTATION_SEQ)) {
-                        //System.out.println("######################  DRAWING R FG  ###########################");
                         filesByFormatCurNotation = SSEGraph.drawFoldingGraphSEQ(fileNameWithoutExtension, false, formats, pnfr);                                                
+                    }
+                    else if(notation.equals(FoldingGraph.FG_NOTATION_KEY)) {
+                        filesByFormatCurNotation = SSEGraph.drawFoldingGraphKEY(fileNameWithoutExtension, false, formats, pnfr);                                                
                     }
                     
                     drawingSucceeded = true;
@@ -2553,7 +2553,7 @@ public class Main {
                     //if(fg.drawFoldingGraph(notation, fgFile)) {
                     if(drawingSucceeded) {
                         if(! silent) {
-                            System.out.println("         -Folding graph #" + j + " of the " + pg.getGraphType() + " graph of chain " + pg.getChainid() + " written to file '" + fgFile + "' in " + notation + " notation.");
+                            //System.out.println("         -Folding graph #" + j + " of the " + pg.getGraphType() + " graph of chain " + pg.getChainid() + " written to file '" + fgFile + "' in " + notation + " notation.");
                         }
 
                         // save image path to database if required
@@ -2565,10 +2565,7 @@ public class Main {
                                 dbImagePath = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain) + fs + fileNameWithExtension;
                             }
                             //DP.getInstance().d("dbImagePath is '" + dbImagePath + "'.");                            
-
-
-                            // TODO: update FG file names in database
-                            System.out.println("TODO: update FG file names in database");
+                           
                     
                             try {
                                 DBManager.updateFoldingGraphImagePathInDB(fgDbId, DrawTools.IMAGEFORMAT.PNG, notation, dbImagePath);

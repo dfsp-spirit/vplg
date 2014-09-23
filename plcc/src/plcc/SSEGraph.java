@@ -2572,7 +2572,7 @@ E	3	3	3
         
         if( ! Settings.getBoolean("plcc_B_silent")) {
             StringBuilder sb = new StringBuilder();
-            sb.append("      Output ADJ folding graph files: ");
+            sb.append("        Output ADJ folding graph files: ");
             for(IMAGEFORMAT format : resultFilesByFormat.keySet()) {
                 sb.append("(").append(format.toString()).append(" => ").append(resultFilesByFormat.get(format)).append(") ");
             }
@@ -2606,7 +2606,7 @@ E	3	3	3
         
         if( ! Settings.getBoolean("plcc_B_silent")) {
             StringBuilder sb = new StringBuilder();
-            sb.append("      Output RED folding graph files: ");
+            sb.append("        Output RED folding graph files: ");
             for(IMAGEFORMAT format : resultFilesByFormat.keySet()) {
                 sb.append("(").append(format.toString()).append(" => ").append(resultFilesByFormat.get(format)).append(") ");
             }
@@ -2640,7 +2640,7 @@ E	3	3	3
         
         if( ! Settings.getBoolean("plcc_B_silent")) {
             StringBuilder sb = new StringBuilder();
-            sb.append("      Output SEQ folding graph files: ");
+            sb.append("        Output SEQ folding graph files: ");
             for(IMAGEFORMAT format : resultFilesByFormat.keySet()) {
                 sb.append("(").append(format.toString()).append(" => ").append(resultFilesByFormat.get(format)).append(") ");
             }
@@ -2681,7 +2681,7 @@ E	3	3	3
         
         if( ! Settings.getBoolean("plcc_B_silent")) {
             StringBuilder sb = new StringBuilder();
-            sb.append("      Output KEY folding graph files: ");
+            sb.append("        Output KEY folding graph files: ");
             for(IMAGEFORMAT format : resultFilesByFormat.keySet()) {
                 sb.append("(").append(format.toString()).append(" => ").append(resultFilesByFormat.get(format)).append(") ");
             }
@@ -4247,7 +4247,7 @@ E	3	3	3
 
             // check width of header string
             String proteinHeader = "The ADJ " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
-            String notation = "ADJ notation: '" + pnfr.adjNotation + "' (svip=" + pnfr.adjStart + ")";
+            String notation = "ADJ notation: '" + pnfr.adjNotation + "' (svip=" + (pnfr.adjStart + 1) + ")";
             //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
             Integer stringHeight = fontMetrics.getAscent();
             String sseNumberSeq;    // the SSE number in the primary structure, N to C terminus
@@ -4508,7 +4508,7 @@ E	3	3	3
 
             // check width of header string
             String proteinHeader = "The RED " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
-            String notation = "RED notation: '" + pnfr.redNotation + "' (svip=" + pnfr.redStart + ")";
+            String notation = "RED notation: '" + pnfr.redNotation + "' (svip=" + (pnfr.redStart + 1) + ")";
             //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
             Integer stringHeight = fontMetrics.getAscent();
             String sseNumberSeq;    // the SSE number in the primary structure, N to C terminus
@@ -4776,7 +4776,7 @@ E	3	3	3
 
             // check width of header string
             String proteinHeader = "The RED " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
-            String notation = "RED notation: '" + pnfr.redNotation + "' (svip=" + pnfr.redStart + ")";
+            String notation = "RED notation: '" + pnfr.redNotation + "' (svip=" + (pnfr.redStart + 1) + ")";
             //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
             Integer stringHeight = fontMetrics.getAscent();
             String sseNumberSeq;    // the SSE number in the primary structure, N to C terminus
@@ -5034,7 +5034,7 @@ E	3	3	3
 
             // check width of header string
             String proteinHeader = "The SEQ " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
-            String notation = "SEQ notation: '" + pnfr.seqNotation + "' (svip=" + pnfr.seqStart + ")";
+            String notation = "SEQ notation: '" + pnfr.seqNotation + "' (svip=" + (pnfr.seqStart + 1) + ")";
             //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
             Integer stringHeight = fontMetrics.getAscent();
             String sseNumberSeq;    // the SSE number in the primary structure, N to C terminus
