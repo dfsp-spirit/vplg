@@ -272,8 +272,10 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
      */
     public Integer numIsolatedLigands() {        
         Integer numIsolatedLigands = 0;
-        for(SSE s : this.sseList) {            
-            if(s.isLigandSSE() && this.degreeOfVertex(s.getSeqIndexInGraph()) == 0 ) {
+        SSE s;
+        for(int i = 0; i < this.sseList.size(); i++) {            
+            s = this.sseList.get(i);
+            if(s.isLigandSSE() && this.degreeOfVertex(i) == 0 ) {
                 numIsolatedLigands++;
             }
         }
@@ -643,13 +645,109 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
     }
     
     /**
-     * Draws the legend for the graph at the given position. This legend is not suitable for SEQ folding graphs, because their edges are different.
+     * Draws the SEQ legend for the graph at the given position. This legend is not suitable for other folding graph notations but SEQ, because their edges are different.
      * @param ig2 the SVGGraphics2D object on which to draw
      * @param startPos the start position (x, y) where to start drawing
      * @return the x coordinate in the image where the legend ends (which is the left margin + the legend width). 
      * This can be used to determine the minimal width of the total image (it has to be at least this value).
      */
     public static Integer drawLegendSEQ(SVGGraphics2D ig2, Position2D startPos, PageLayout pl, SSEGraph g) {
+        
+        Boolean drawAll = Settings.getBoolean("plcc_B_graphimg_legend_always_all");
+        
+        // prepare stuff
+        ig2.setFont(pl.getLegendFont());
+        FontMetrics fontMetrics = ig2.getFontMetrics();
+        ig2.setStroke(new BasicStroke(2));
+        ig2.setPaint(Color.BLACK);
+        
+        Integer spacer = 10;
+        Integer pixelPosX = startPos.x;
+        Integer vertWidth = pl.getVertDiameter();
+        Integer vertOffset = pl.getVertDiameter() / 4 * 3;
+        String label;
+        
+        // Edges label        
+        label = "[Edges: ";
+        ig2.setPaint(Color.BLACK);
+        ig2.drawString(label, pixelPosX, startPos.y);
+        pixelPosX += fontMetrics.stringWidth(label) + spacer;        
+        
+        
+        label = "seq_distance";
+        ig2.setPaint(Color.BLACK);
+        ig2.drawString(label, pixelPosX, startPos.y);
+        pixelPosX += fontMetrics.stringWidth(label) + spacer;
+                                        
+        
+        // End of edge labels        
+        label = "]";
+        ig2.setPaint(Color.BLACK);
+        ig2.drawString(label, pixelPosX, startPos.y);
+        pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        
+        
+        // Vertices label
+        if(g.numVertices() > 0) {
+            label = " [Vertices: ";
+            ig2.setPaint(Color.BLACK);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;        
+        }
+        
+        // ok, now draw the SSE symbols     
+        if(g.containsSSETypeHelix() || drawAll) {
+            g.drawSymbolAlphaHelix(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+            pixelPosX += vertWidth + spacer;
+            label = "helix";
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
+        
+        if(g.containsSSETypeBetaStrand() || drawAll) {
+            g.drawSymbolBetaStrand(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+            pixelPosX += vertWidth + spacer;
+            label = "strand";
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
+        
+        if(g.containsSSETypeLigand() || drawAll) {
+            g.drawSymbolLigand(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+            pixelPosX += vertWidth + spacer;
+            label = "ligand";
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
+        
+        if(g.containsSSETypeOther() || drawAll) {
+            g.drawSymbolOtherSSE(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+            pixelPosX += vertWidth + spacer;
+            label = "other";
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;        
+        }
+        
+        // end label
+        if(g.numVertices() > 0) {
+            label = "]";
+            ig2.setPaint(Color.BLACK);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;    
+        }
+        
+        return(pixelPosX);
+    }
+    
+    
+    /**
+     * Draws the KEY legend for the graph at the given position. This legend is not suitable for other folding graph notations but KEY, because their edges and SSE symbols are different.
+     * @param ig2 the SVGGraphics2D object on which to draw
+     * @param startPos the start position (x, y) where to start drawing
+     * @return the x coordinate in the image where the legend ends (which is the left margin + the legend width). 
+     * This can be used to determine the minimal width of the total image (it has to be at least this value).
+     */
+    public static Integer drawLegendKEY(SVGGraphics2D ig2, Position2D startPos, PageLayout pl, SSEGraph g) {
         
         Boolean drawAll = Settings.getBoolean("plcc_B_graphimg_legend_always_all");
         
@@ -1765,8 +1863,10 @@ E	3	3	3
     public String getNodeTypeList() {
         StringBuilder sb = new StringBuilder();
         
-        for(SSE s : this.sseList) {
-            sb.append(s.getSeqIndexInGraph() + 1);
+        SSE s;
+        for(int i = 0; i < this.sseList.size(); i++) {
+            s = this.sseList.get(i);
+            sb.append(i + 1);
             sb.append(" ");
             sb.append("SSE_type ");
             sb.append(s.getPLCCSSELabel());
@@ -2666,6 +2766,16 @@ E	3	3	3
             return resultFilesByFormat;
         }
         
+        boolean debug = true;
+        if(debug) {
+            FoldingGraph fg = pnfr.getFoldingGraph();
+            if(fg.pdbid.equals("7tim") && fg.chainid.equals("A") && fg.graphType.equals("alpha")) {
+                String file = System.getProperty("user.home") + "/fg_7tim_A_alpha_" + fg.getFoldingGraphNumber() + ".png";
+                System.out.println("DEBUG: Drawing KEY FG # " + fg.getFoldingGraphNumber() + " to '" + file + "'.");
+                fg.drawFoldingGraphKEY(file);
+            }
+        }
+        
         DrawResult drawRes = SSEGraph.drawFoldingGraphKEYG2D(pnfr);
         
         //System.out.println("drawProteinGraph: Basefilepath is '" + baseFilePathNoExt + "'.");
@@ -3212,64 +3322,7 @@ E	3	3	3
         }
         return(parts);
     }
-
-
-
-
-   /**
-   * DEPRECATED: use getArrowPolygon() instead! 
-   * Draws a simply arrow (3 lines) on the given Graphics2D context. Not used anymore.
-   * @param g The Graphics2D context to draw on
-   * @param x The x location of the "tail" of the arrow
-   * @param y The y location of the "tail" of the arrow
-   * @param xx The x location of the "head" of the arrow
-   * @param yy The y location of the "head" of the arrow
-   */
-    @Deprecated protected void drawArrow( Graphics2D g, int tailX, int tailY, int headX, int headY ) {
-        
-        //DEPRECATED: use getArrowPolygon() instead!
-        
-        float arrowWidth = 10.0f ;
-        float theta = 0.423f ;
-        int[] xPoints = new int[ 3 ] ;
-        int[] yPoints = new int[ 3 ] ;
-        float[] vecLine = new float[ 2 ] ;
-        float[] vecLeft = new float[ 2 ] ;
-        float fLength;
-        float th;
-        float ta;
-        float baseX, baseY ;
-
-        xPoints[ 0 ] = headX ;
-        yPoints[ 0 ] = headY ;
-
-        // build the line vector
-        vecLine[ 0 ] = (float)xPoints[ 0 ] - tailX ;
-        vecLine[ 1 ] = (float)yPoints[ 0 ] - tailY ;
-
-        // build the arrow base vector - normal to the line
-        vecLeft[ 0 ] = -vecLine[ 1 ] ;
-        vecLeft[ 1 ] = vecLine[ 0 ] ;
-
-        // setup length parameters
-        fLength = (float)Math.sqrt( vecLine[0] * vecLine[0] + vecLine[1] * vecLine[1] ) ;
-        th = arrowWidth / ( 2.0f * fLength ) ;
-        ta = arrowWidth / ( 2.0f * ( (float)Math.tan( theta ) / 2.0f ) * fLength ) ;
-
-        // find the base of the arrow
-        baseX = ( (float)xPoints[ 0 ] - ta * vecLine[0]);
-        baseY = ( (float)yPoints[ 0 ] - ta * vecLine[1]);
-
-        // build the points on the sides of the arrow
-        xPoints[ 1 ] = (int)( baseX + th * vecLeft[0] );
-        yPoints[ 1 ] = (int)( baseY + th * vecLeft[1] );
-        xPoints[ 2 ] = (int)( baseX - th * vecLeft[0] );
-        yPoints[ 2 ] = (int)( baseY - th * vecLeft[1] );
-
-        g.drawLine( tailX, tailY, (int)baseX, (int)baseY ) ;
-        g.fillPolygon( xPoints, yPoints, 3) ;
-    }
-  
+ 
     
     /**
      * Creates an outlined arrow (7 lines) on the given Graphics2D context, using the Polygon class. The arrow points straight up, thus headX is = tailX and does not have to be supplied.
@@ -3632,13 +3685,15 @@ E	3	3	3
     public void computeSpatialVertexOrdering() {
         this.spatOrder = this.getSpatialOrderingOfVertexIndices();
         
+        /*
         for(Integer i = 0; i < this.size; i++) {
-            this.getSSEBySeqPosition(i).setSpatialIndexInGraph(-2);
+            this.getSSEBySeqPosition(i).setSpatialIndexInGraph(-2); // This makes no sense: it is applied to the SSE, which may be part of many different graphs!
         }
         
         for(Integer i = 0; i < spatOrder.size(); i++) {
-            this.getSSEBySeqPosition(i).setSpatialIndexInGraph(spatOrder.get(i));
+            this.getSSEBySeqPosition(i).setSpatialIndexInGraph(spatOrder.get(i));   // This makes no sense: it is applied to the SSE, which may be part of many different graphs!
         }
+        */
     }
             
     /**
@@ -4698,6 +4753,9 @@ E	3	3	3
      * If 'nonProteinGraph' is true, this graph is considered a custom (=non-protein) graph and the color coding for vertices and edges is NOT used.
      * In that case, the graph is drawn black and white and the labels for the N- and C-termini are NOT drawn.
      * 
+     * See http://ptgl.uni-frankfurt.de/cgi-bin/showpict.pl?topology=a&rep=3&protlist=7timA+7timB+&nmrlist=
+     * and http://ptgl.uni-frankfurt.de/ptglhelp.html#key
+     * 
      * @param pnfr a folding graph notation result
 
      * @return the DrawResult. You can write this to a file or whatever.
@@ -4708,6 +4766,11 @@ E	3	3	3
         
         FoldingGraph fg = pnfr.getFoldingGraph();
         SSEGraph pg = fg.parent;
+        
+        if(fg.isBifurcated()) {
+            DP.getInstance().e("SSEGraph", "drawFoldingGraphKEYG2D: This FG is bifurcated, KEY notation not supported.");
+        }
+        
         Integer startVertexInParent = fg.getMinimalVertexIndexInParentGraph();
         Integer endVertexInParent = fg.getMaximalVertexIndexInParentGraph();
                 
@@ -4775,8 +4838,8 @@ E	3	3	3
             // ------------------------- Draw header -------------------------
 
             // check width of header string
-            String proteinHeader = "The RED " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
-            String notation = "RED notation: '" + pnfr.redNotation + "' (svip=" + (pnfr.redStart + 1) + ")";
+            String proteinHeader = "The KEY " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
+            String notation = "KEY notation: '" + pnfr.keyNotation + "' (svip=" + (pnfr.keyStart < 0 ? "-" : pnfr.keyStart + 1) + ")";
             //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
             Integer stringHeight = fontMetrics.getAscent();
             String sseNumberSeq;    // the SSE number in the primary structure, N to C terminus
@@ -4949,7 +5012,7 @@ E	3	3	3
                 }
 
                 if(Settings.getBoolean("plcc_B_graphimg_legend")) {
-                    SSEGraph.drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4)), pl, fg);
+                    SSEGraph.drawLegendKEY(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4)), pl, fg);
                 }
             
             }

@@ -549,22 +549,27 @@ public class SSE extends SSEGraphVertex implements java.io.Serializable  {
     
     
     /** Sets the sequential number of this SSE in its current graph (the index in the AA sequence, N to C terminus). This should be its index in the graph's SSE list and thus start with 0.
+     *  WARNING: Note that this may make no sense if the SSE is part of several graphs!
      *  It also sets inGraph=true for this SSE.
      * @param index the sequential index in the graph, i.e., the index in the AA sequence
      */
+    @Deprecated
     public void setSeqIndexInGraph(Integer index) { this.sequentialIndexInGraph = index; this.inGraph = true; }
     
     
     /** Sets the spatial number of this SSE in its current graph. 
+     *  WARNING: Note that this may make no sense if the SSE is part of several graphs!
      *  It also sets inGraph=true for this SSE.
      * @param index the spatial index in the graph
      */
+    @Deprecated
     public void setSpatialIndexInGraph(Integer index) { this.spatialIndexInGraph = index; this.inGraph = true; }
     
     
-    /** Returns the sequential number of this SSE in its current graph or -1 if it not yet part of a protein graph. 
-     * @return the sequential number of this SSE in its current graph or -1 if it not yet part of a protein graph
+    /** Returns the sequential number of this SSE in its current graph or -1 if it not yet part of a protein graph. WARNING: Note that this may make no sense if the SSE is part of several graphs!
+     * @return the sequential number of this SSE in its current graph or -1 if it not yet part of a protein graph. WARNING: Note that this may make no sense if the SSE is part of several graphs!
      */
+    @Deprecated
     public Integer getSeqIndexInGraph() { 
         if(this.inGraph) { 
             return(this.sequentialIndexInGraph);
@@ -573,20 +578,7 @@ public class SSE extends SSEGraphVertex implements java.io.Serializable  {
             return(-1);
         }
     }
-    
-    /** Returns the spatial number of this SSE in its current graph or -1 if it not yet part of a protein graph or -2 if no such ordering exists for this graph. 
-     * @return the spatial number of this SSE in its current graph or -1 if it not yet part of a protein graph or -2 if no such ordering exists for this graph 
-     */
-    public Integer getSpatialIndexInGraph() { 
-        if(this.inGraph) { 
-            return(this.spatialIndexInGraph);
-        } 
-        else {
-            return(-1);
-        }
-    }
-    
-       
+                   
     
     /**
      * Convenience function, returns the notation label for this SSE for the linear notations (SEQ, KEY, ...). E.g., "e" for a beta strand and "h" for a helix.

@@ -229,7 +229,7 @@ public class FoldingGraph extends SSEGraph {
      * @param filePath the output path of the image
      * @return true if it worked out, false otherwise
      */
-    private Boolean drawFoldingGraphKEY(String filePath) {
+    public Boolean drawFoldingGraphKEY(String filePath) {
         
        
         //--------------------------------------------------------------------------------------------------
@@ -611,7 +611,7 @@ public class FoldingGraph extends SSEGraph {
 
             // Determine the dist between vertices that will have their vertex number printed below them in the footer field
             Integer printNth = 1;
-            if(this.sseList.size() > 9) { printNth = 1; }
+            //if(this.sseList.size() > 9) { printNth = 1; }
             if(this.sseList.size() > 99) { printNth = 2; }
             if(this.sseList.size() > 999) { printNth = 3; }
 
