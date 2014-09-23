@@ -2763,9 +2763,11 @@ E	3	3	3
         
         if( pnfr.getFoldingGraph().isBifurcated()) {
             // graph is bifurcated, KEY not supported
+            System.out.println("        Output KEY folding graph files: none, FG is bifurcated -- KEY not supported.");
             return resultFilesByFormat;
         }
         
+        /*
         boolean debug = true;
         if(debug) {
             FoldingGraph fg = pnfr.getFoldingGraph();
@@ -2775,6 +2777,7 @@ E	3	3	3
                 fg.drawFoldingGraphKEY(file);
             }
         }
+        */
         
         DrawResult drawRes = SSEGraph.drawFoldingGraphKEYG2D(pnfr);
         
@@ -3119,7 +3122,7 @@ E	3	3	3
      * @param startUpwards whether to start upwards from the 2D Point (startX, startY). If this is false, downwards is used instead.
      * @return a list of Shapes that can be painted on a G2D canvas.
      */
-    public ArrayList<Shape> getArcConnector(Integer startX, Integer startY, Integer targetX, Integer targetY, Stroke stroke, Boolean startUpwards) {
+    public static ArrayList<Shape> getArcConnector(Integer startX, Integer startY, Integer targetX, Integer targetY, Stroke stroke, Boolean startUpwards) {
 
         // System.out.print("getArcConnector: startX=" + startX + ", startY=" + startY + ", targetX=" + targetX + ", targetY=" + targetY + ", startUpwards=" + startUpwards.toString() + ": ");
         
@@ -3154,7 +3157,7 @@ E	3	3	3
      * @param startUpwards whether to start upwards from the 2D Point (startX, startY). If this is false, downwards is used instead.
      * @return a list of Shapes that can be painted on a G2D canvas.
      */
-    protected ArrayList<Shape> getSimpleArcConnector(Integer startX, Integer bothY, Integer targetX, Stroke stroke, Boolean startUpwards) {
+    protected static ArrayList<Shape> getSimpleArcConnector(Integer startX, Integer bothY, Integer targetX, Stroke stroke, Boolean startUpwards) {
         
         ArrayList<Shape> parts = new ArrayList<Shape>();
         Integer leftVertPosX, rightVertPosX, arcWidth, arcHeight, vertStartY, arcTopLeftX, arcTopLeftY;
@@ -3217,7 +3220,7 @@ E	3	3	3
      * @param startUpwards whether to start upwards from the 2D Point (startX, startY). If this is false, downwards is used instead.
      * @return a list of Shapes that can be painted on a G2D canvas.
      */
-    protected ArrayList<Shape> getCrossoverArcConnector(Integer startX, Integer startY, Integer targetX, Integer targetY, Stroke stroke, Boolean startUpwards) {
+    protected static ArrayList<Shape> getCrossoverArcConnector(Integer startX, Integer startY, Integer targetX, Integer targetY, Stroke stroke, Boolean startUpwards) {
         
         Integer upwards = 0;
         Integer downwards = 180;
@@ -4762,7 +4765,7 @@ E	3	3	3
      */
     private static DrawResult drawFoldingGraphKEYG2D(PTGLNotationFoldResult pnfr) {
 
-        System.err.println("ERROR: drawFoldingGraphKEYG2D: implement me, i draw RED atm.");
+        //System.err.println("ERROR: drawFoldingGraphKEYG2D: implement me, i draw RED atm.");
         
         FoldingGraph fg = pnfr.getFoldingGraph();
         SSEGraph pg = fg.parent;
@@ -4796,7 +4799,14 @@ E	3	3	3
         // page setup
         PageLayout pl = new PageLayout(numVerts);        
         Position2D vertStart = pl.getVertStart();
-        Integer lineHeight = pl.textLineHeight;            
+        Integer lineHeight = pl.textLineHeight;      
+        
+        // drawing of objects
+        Integer vertDist = 50;                  // distance between (centers of) vertices in the drawing
+        Integer vertHeight = 80;                // height of vertex element graphics (arrow height)
+        Integer vertWidth = 40;                 // height of vertex graphics (arrow width)
+        Integer vertStartX = pl.getVertStart().x;
+        Integer vertStartY = pl.getVertStart().y;
         
         
 
@@ -4853,12 +4863,184 @@ E	3	3	3
 
             // ------------------------- Draw the graph -------------------------
             
+            
+            
+            
+            
+            // determine the headings of the vertices in the image. if two adjacent SSEs are parallel, they point in the same direction in the image. if they are antiparallel, they point into different directions.
+            Integer[] headingsSpatOrder = new Integer[fg.size];    // the heading of the vertex in the image (UP or DOWN). This is in the order of spatOrder variable, not the the original vertex list in the SSEList variable.
+            Integer[] headingsSeqOrder = new Integer[fg.size];
+            headingsSpatOrder[0] = FoldingGraph.ORIENTATION_UPWARDS;  // heading of the 1st vertex is up by definition (it has no predecessor)
+                                  
+           
+            if(fg.size > 1) {
+                
+                for(Integer spatPos = 1; spatPos < fg.size; spatPos++) {
+                    Integer sseSeqIndex = fg.getSSESeqIndexatSpatOrderPosition(spatPos);
+                    Integer lastsseSeqIndex = fg.getSSESeqIndexatSpatOrderPosition(spatPos - 1);
+                    
+                    if(sseSeqIndex == null || lastsseSeqIndex == null) {
+                        System.out.println("DEBUG: spatPos=" + spatPos + ", sseSeqIndex=" + sseSeqIndex + ", lastsseSeqIndex=" + lastsseSeqIndex + ".");
+                    }
+                    
+                    Integer spatRel = fg.getContactType(sseSeqIndex, lastsseSeqIndex);
+                    
+                    if(spatRel == SpatRel.PARALLEL) {
+                        // keep orientation
+                        headingsSpatOrder[spatPos] = headingsSpatOrder[spatPos-1];
+                    }
+                    else if(spatRel == SpatRel.NONE) {
+                        // should never happen
+                        headingsSpatOrder[spatPos] = headingsSpatOrder[spatPos-1];    // whatever
+                        //System.err.println("WARNING: Vertices at indices " + sseSeqIndex + " and " + lastsseSeqIndex + " without contact are considered neighbors in the graph.");
+                        //System.err.println("WARNING: SSE " + sseSeqIndex + ": " + this.getVertex(sseSeqIndex).longStringRep() + ", SSE " + lastsseSeqIndex + ": " + this.getVertex(lastsseSeqIndex).longStringRep() + ".");
+                        
+                        //System.exit(1);
+                    }
+                    else {
+                        // all other spatial relations, e.g. SpatRel.ANTIPARALLEL, SpatRel.LIGAND, SpatRel.BACKBONE and SpatRel.MIXED: invert orientation
+                        headingsSpatOrder[spatPos] = (headingsSpatOrder[spatPos-1] == FoldingGraph.ORIENTATION_UPWARDS ? FoldingGraph.ORIENTATION_DOWNWARDS : FoldingGraph.ORIENTATION_UPWARDS);
+                    }                
+                }
+                
+                // copy from spatOrder to seqOrder array
+                Integer seqIndex;
+                for(Integer i = 0; i < fg.getSize(); i++) {
+                    seqIndex = fg.spatOrder.get(i);
+                    headingsSeqOrder[seqIndex] = headingsSpatOrder[i];
+                }
+                
+                // DEBUG output
+                /*
+                System.out.println("DEBUG: " + this.toShortString() );
+                System.out.println("DEBUG: SpatOrder: " + IO.intArrayListToString(this.spatOrder) );
+                System.out.println("DEBUG: SpatHeadg: " + IO.intArrayToString(headingsSpatOrder) );
+                System.out.println("DEBUG: SeqHeadng: " + IO.intArrayToString(headingsSeqOrder) );                
+                String neighbors = "DEBUG: SeqDegree: ";
+                for(Integer i = 0; i < this.getSize(); i++) {
+                    neighbors += this.degreeOfVertex(i) + " ";
+                }
+                System.out.println(neighbors);
+                */
+                
+            }                                    
+            
+            
+            
+            // now draw the connectors
+            Integer edgeType, connCenterX, connCenterY, leftVertSeq, rightVertSeq, leftVertSpat, rightVertSpat, leftVertPosX, leftVertPosY, rightVertPosX, rightVertPosY, connWidth, connHeight, connTopLeftX, connTopLeftY, spacerX, spacerY;
+            Integer iSpatIndex, jSpatIndex;
+            Boolean startUpwards;
+            ig2.setStroke(new BasicStroke(1));
+            if(fg.numEdges() > 0) {                          
+                for(Integer i = 0; i < fg.sseList.size(); i++) {
+                    for(Integer j = i + 1; j < fg.sseList.size(); j++) {
+
+                        // If there is a contact...
+                        if(fg.containsEdge(i, j)) {
+
+                            // determine edge type and the resulting color
+                            edgeType = fg.getContactType(i, j);
+                            if(edgeType.equals(SpatRel.PARALLEL)) { ig2.setPaint(Color.RED); }
+                            else if(edgeType.equals(SpatRel.ANTIPARALLEL)) { ig2.setPaint(Color.BLUE); }
+                            else if(edgeType.equals(SpatRel.MIXED)) { ig2.setPaint(Color.GREEN); }
+                            else if(edgeType.equals(SpatRel.LIGAND)) { ig2.setPaint(Color.MAGENTA); }
+                            else if(edgeType.equals(SpatRel.BACKBONE)) { ig2.setPaint(Color.ORANGE); }
+                            else { ig2.setPaint(Color.LIGHT_GRAY); }
+                            
+                            if(Settings.getBoolean("plcc_B_key_foldinggraph_arcs_allways_black")) {
+                                ig2.setPaint(Color.BLACK);
+                            }
+
+                            // determine the center of the arc and the width of its rectangle bounding box
+                            //iSpatIndex = spatOrder.get(i);
+                            //jSpatIndex = spatOrder.get(j);
+                            iSpatIndex = fg.getSpatOrderIndexOfSSE(i);
+                            jSpatIndex = fg.getSpatOrderIndexOfSSE(j);
+                            
+                            // determine who is left and who is right
+                            if(iSpatIndex < jSpatIndex) { 
+                                leftVertSpat = iSpatIndex; 
+                                leftVertSeq = i; 
+                                rightVertSpat = jSpatIndex; 
+                                rightVertSeq = j;
+                            }
+                            else { 
+                                leftVertSpat = jSpatIndex; 
+                                leftVertSeq = j;
+                                rightVertSpat = iSpatIndex;
+                                rightVertSeq = i;
+                            }
+                            
+                            leftVertPosX = vertStartX + (leftVertSpat * vertDist);      // center of the left vertex object (arrow or rectangle)
+                            rightVertPosX = vertStartX + (rightVertSpat * vertDist);    // center of the right...
+
+                            connWidth = rightVertPosX - leftVertPosX;                   // total width of the connector
+                            connHeight = connWidth / 2;                                 // total height...
+
+                            connCenterX = rightVertPosX - (connWidth / 2);      // the center of the connector, here we draw the line if it is required
+                            connCenterY = vertStartY - (connHeight / 2);
+
+                            connTopLeftX = leftVertPosX;                        // the upper left point of the connector, i.e., where it is connected to the left vertex object (if that vertex has to be connected at the upper end)                                                                
+                            connTopLeftY = vertStartY - (connHeight / 2);
+
+                            spacerX = vertWidth;
+                            spacerY = 0;
+
+                            
+                            // Determine the y axis positions where the connector should start (at the left vertex) and end (at the right vertex). This depends
+                            //  on whether the respective vertex points upwards or downwards.
+                            
+                            //System.out.print("Contact " + i + "," + j + " (left is " + leftVertSeq + "[spat:" + this.getSpatOrderIndexOfSSE(leftVertSeq) + "], right is " + rightVertSeq + "[spat:" + this.getSpatOrderIndexOfSSE(rightVertSeq) + "]): ");
+                            
+                            if(headingsSeqOrder[leftVertSeq] == FoldingGraph.ORIENTATION_UPWARDS) {
+                                // the left vertex points upwards, so the arc should start at its top
+                                leftVertPosY = vertStartY - vertHeight;
+                                startUpwards = true;
+                                //System.out.print("leftVert starts upwards, ");
+                            }
+                            else {
+                                // the left vertex points downwards, so the arc should start at its bottom
+                                leftVertPosY = vertStartY;
+                                startUpwards = false;
+                                //System.out.print("leftVert starts downwards, ");
+                            }
+                            
+                            if(headingsSeqOrder[rightVertSeq] == FoldingGraph.ORIENTATION_UPWARDS) {
+                                // the right vertex points upwards, so the arc should end at its bottom
+                                rightVertPosY = vertStartY;
+                                //System.out.print("rightVert starts upwards. ");
+                            }
+                            else {
+                                // the right vertex points downwards, so the arc should end at its top
+                                rightVertPosY = vertStartY - vertHeight;
+                                //System.out.print("rightVert starts downpwards. ");
+                            }
+                            
+                            
+                            // draw it        
+                            //System.out.print("Getting arc from " + leftVertPosX + "," + leftVertPosY + " to " + rightVertPosX + "," + rightVertPosY + ".\n");
+                            ArrayList<Shape> connShapes = FoldingGraph.getArcConnector(leftVertPosX, leftVertPosY, rightVertPosX, rightVertPosY, ig2.getStroke(), startUpwards);
+                            for(Shape s : connShapes) {
+                                ig2.draw(s);
+                            }                                                        
+                        }
+                    }
+                }
+            }
+
+            
+            ig2.setStroke(new BasicStroke(1));
+
+            
+            
+            
             // Draw the edges as arcs
             Integer k,l;
             java.awt.Shape shape;
             Arc2D.Double arc;
             ig2.setStroke(new BasicStroke(2));  // thin edges
-            Integer edgeType, leftVert, rightVert, leftVertPosX, rightVertPosX, arcWidth, arcHeight, arcTopLeftX, arcTopLeftY, spacerX, spacerY;
+            Integer leftVert, rightVert, arcWidth, arcHeight, arcTopLeftX, arcTopLeftY;
             for(Integer i = startVertexInParent; i <= endVertexInParent; i++) {
                 for(Integer j = i + 1; j <= endVertexInParent; j++) {
 

@@ -46,9 +46,9 @@ import tools.DP;
 public class FoldingGraph extends SSEGraph {
     
     
-    public final Integer ORIENTATION_NONE = 0;     // no direction (because this SSE-pair does not appear in the list)
-    public final Integer ORIENTATION_UPWARDS = 1;       // direction: upwards (for the SSE symbols, e.g. arrows). Note that the direction represents the spatial relation between this SSE and its predecessor (i.e., an SSE pair), it is NOT a property of a single SSE.
-    public final Integer ORIENTATION_DOWNWARDS = 2;     // direction: downwards
+    public static final Integer ORIENTATION_NONE = 0;     // no direction (because this SSE-pair does not appear in the list)
+    public static final Integer ORIENTATION_UPWARDS = 1;       // direction: upwards (for the SSE symbols, e.g. arrows). Note that the direction represents the spatial relation between this SSE and its predecessor (i.e., an SSE pair), it is NOT a property of a single SSE.
+    public static final Integer ORIENTATION_DOWNWARDS = 2;     // direction: downwards
     
     public static final String FG_NOTATION_KEY = "KEY";
     public static final String FG_NOTATION_ADJ = "ADJ";
@@ -154,39 +154,28 @@ public class FoldingGraph extends SSEGraph {
         this.vertexIndicesInADJandSEQfgs = order;
     }
            
-    
-    
-   
-    
-    /**
-     * Returns the SSE at position spatPos (an index) in spatial ordering.
-     * @param spatPos the index in the spatial ordering list of SSEs
-     * @return the SSE at position spatPos (an index) in spatial ordering or null if this graph has no such ordering
-     */
-    private SSE getSSEatSpatOrderPosition(Integer spatPos) {
-        
-        if(this.supportsKeyNotation()) {
-            return this.getSSEBySeqPosition(spatOrder.get(spatPos));            
-        } else {
-            return null;
-        }
-    }
+                   
     
     /**
      * Returns the SSE at position spatPos (an index) in spatial ordering, defined by its sequential index.
      * @param spatPos the index in the spatial ordering list of SSEs
      * @return the SSE at position spatPos (an index) in spatial ordering or null if this graph has no such ordering
      */
-    private Integer getSSESeqIndexatSpatOrderPosition(Integer spatPos) {
+    protected Integer getSSESeqIndexatSpatOrderPosition(Integer spatPos) {
         
         if(this.supportsKeyNotation()) {
             for(Integer i = 0; i < this.getSize(); i++) {
-                if(this.spatOrder.get(i) == spatPos) {
+                if(Objects.equals(this.spatOrder.get(i), spatPos)) {
                     return i;
                 }
             }
-        } 
+        } else {
+            DP.getInstance().w("FoldingGraph", "getSSESeqIndexatSpatOrderPosition: this FG does not support KEY notation, returning null.");
+            return null;
+        }
            
+        DP.getInstance().w("FoldingGraph", "getSSESeqIndexatSpatOrderPosition: did not find spatPos " + spatPos + " in list, returning null.");
+        DP.getInstance().flush();
         return null;
         
     }
@@ -197,7 +186,7 @@ public class FoldingGraph extends SSEGraph {
      * @param seqSSEIndex the SSE, defined by its index in sequential ordering
      * @return the position of the SSE in spatOrder or null if no such SSE was found in the list / this graph has no valid spatial ordering.
      */
-    private Integer getSpatOrderIndexOfSSE(Integer seqSSEIndex) {
+    protected Integer getSpatOrderIndexOfSSE(Integer seqSSEIndex) {
         if(this.supportsKeyNotation()) {            
             return spatOrder.get(seqSSEIndex);                        
         }            
