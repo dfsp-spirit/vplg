@@ -516,7 +516,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
     
     
     /**
-     * Draws the legend for the graph at the given position.
+     * Draws the legend for the graph at the given position. This legend is not suitable for SEQ folding graphs, because their edges are different.
      * @param ig2 the SVGGraphics2D object on which to draw
      * @param startPos the start position (x, y) where to start drawing
      * @return the x coordinate in the image where the legend ends (which is the left margin + the legend width). 
@@ -589,6 +589,101 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
             ig2.drawString(label, pixelPosX, startPos.y);
             pixelPosX += fontMetrics.stringWidth(label) + spacer;
         }
+        
+        // Vertices label
+        if(g.numVertices() > 0) {
+            label = " [Vertices: ";
+            ig2.setPaint(Color.BLACK);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;        
+        }
+        
+        // ok, now draw the SSE symbols     
+        if(g.containsSSETypeHelix() || drawAll) {
+            g.drawSymbolAlphaHelix(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+            pixelPosX += vertWidth + spacer;
+            label = "helix";
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
+        
+        if(g.containsSSETypeBetaStrand() || drawAll) {
+            g.drawSymbolBetaStrand(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+            pixelPosX += vertWidth + spacer;
+            label = "strand";
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
+        
+        if(g.containsSSETypeLigand() || drawAll) {
+            g.drawSymbolLigand(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+            pixelPosX += vertWidth + spacer;
+            label = "ligand";
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
+        
+        if(g.containsSSETypeOther() || drawAll) {
+            g.drawSymbolOtherSSE(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+            pixelPosX += vertWidth + spacer;
+            label = "other";
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;        
+        }
+        
+        // end label
+        if(g.numVertices() > 0) {
+            label = "]";
+            ig2.setPaint(Color.BLACK);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;    
+        }
+        
+        return(pixelPosX);
+    }
+    
+    /**
+     * Draws the legend for the graph at the given position. This legend is not suitable for SEQ folding graphs, because their edges are different.
+     * @param ig2 the SVGGraphics2D object on which to draw
+     * @param startPos the start position (x, y) where to start drawing
+     * @return the x coordinate in the image where the legend ends (which is the left margin + the legend width). 
+     * This can be used to determine the minimal width of the total image (it has to be at least this value).
+     */
+    public static Integer drawLegendSEQ(SVGGraphics2D ig2, Position2D startPos, PageLayout pl, SSEGraph g) {
+        
+        Boolean drawAll = Settings.getBoolean("plcc_B_graphimg_legend_always_all");
+        
+        // prepare stuff
+        ig2.setFont(pl.getLegendFont());
+        FontMetrics fontMetrics = ig2.getFontMetrics();
+        ig2.setStroke(new BasicStroke(2));
+        ig2.setPaint(Color.BLACK);
+        
+        Integer spacer = 10;
+        Integer pixelPosX = startPos.x;
+        Integer vertWidth = pl.getVertDiameter();
+        Integer vertOffset = pl.getVertDiameter() / 4 * 3;
+        String label;
+        
+        // Edges label        
+        label = "[Edges: ";
+        ig2.setPaint(Color.BLACK);
+        ig2.drawString(label, pixelPosX, startPos.y);
+        pixelPosX += fontMetrics.stringWidth(label) + spacer;        
+        
+        
+        label = "seq_distance";
+        ig2.setPaint(Color.BLACK);
+        ig2.drawString(label, pixelPosX, startPos.y);
+        pixelPosX += fontMetrics.stringWidth(label) + spacer;
+                                        
+        
+        // End of edge labels        
+        label = "]";
+        ig2.setPaint(Color.BLACK);
+        ig2.drawString(label, pixelPosX, startPos.y);
+        pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        
         
         // Vertices label
         if(g.numVertices() > 0) {
@@ -2472,12 +2567,12 @@ E	3	3	3
             resultFilesByFormat.put(IMAGEFORMAT.SVG, svgFilePath);
             resultFilesByFormat.putAll(DrawTools.convertSVGFileToOtherFormats(svgFilePath, baseFilePathNoExt, drawRes, formats));
         } catch (IOException ex) {
-            DP.getInstance().e("Could not write folding graph file : '" + ex.getMessage() + "'.");
+            DP.getInstance().e("Could not write ADJ folding graph file : '" + ex.getMessage() + "'.");
         }
         
         if( ! Settings.getBoolean("plcc_B_silent")) {
             StringBuilder sb = new StringBuilder();
-            sb.append("      Output folding graph files: ");
+            sb.append("      Output ADJ folding graph files: ");
             for(IMAGEFORMAT format : resultFilesByFormat.keySet()) {
                 sb.append("(").append(format.toString()).append(" => ").append(resultFilesByFormat.get(format)).append(") ");
             }
@@ -2506,12 +2601,12 @@ E	3	3	3
             resultFilesByFormat.put(IMAGEFORMAT.SVG, svgFilePath);
             resultFilesByFormat.putAll(DrawTools.convertSVGFileToOtherFormats(svgFilePath, baseFilePathNoExt, drawRes, formats));
         } catch (IOException ex) {
-            DP.getInstance().e("Could not write folding graph file : '" + ex.getMessage() + "'.");
+            DP.getInstance().e("Could not write RED folding graph file : '" + ex.getMessage() + "'.");
         }
         
         if( ! Settings.getBoolean("plcc_B_silent")) {
             StringBuilder sb = new StringBuilder();
-            sb.append("      Output folding graph files: ");
+            sb.append("      Output RED folding graph files: ");
             for(IMAGEFORMAT format : resultFilesByFormat.keySet()) {
                 sb.append("(").append(format.toString()).append(" => ").append(resultFilesByFormat.get(format)).append(") ");
             }
@@ -2540,12 +2635,12 @@ E	3	3	3
             resultFilesByFormat.put(IMAGEFORMAT.SVG, svgFilePath);
             resultFilesByFormat.putAll(DrawTools.convertSVGFileToOtherFormats(svgFilePath, baseFilePathNoExt, drawRes, formats));
         } catch (IOException ex) {
-            DP.getInstance().e("Could not write folding graph file : '" + ex.getMessage() + "'.");
+            DP.getInstance().e("Could not write SEQ folding graph file : '" + ex.getMessage() + "'.");
         }
         
         if( ! Settings.getBoolean("plcc_B_silent")) {
             StringBuilder sb = new StringBuilder();
-            sb.append("      Output folding graph files: ");
+            sb.append("      Output SEQ folding graph files: ");
             for(IMAGEFORMAT format : resultFilesByFormat.keySet()) {
                 sb.append("(").append(format.toString()).append(" => ").append(resultFilesByFormat.get(format)).append(") ");
             }
@@ -4650,50 +4745,40 @@ E	3	3	3
             Arc2D.Double arc;
             ig2.setStroke(new BasicStroke(2));  // thin edges
             Integer edgeType, leftVert, rightVert, leftVertPosX, rightVertPosX, arcWidth, arcHeight, arcTopLeftX, arcTopLeftY, spacerX, spacerY;
-            for(Integer i = startVertexInParent; i <= endVertexInParent; i++) {
-                for(Integer j = i + 1; j <= endVertexInParent; j++) {
-
+            
+            List<Integer> fgVertexIndices = fg.getVertexIndexList();
+            Integer j;
+            for(Integer i = 0; i < fgVertexIndices.size() -1; i++) {
+                j = fgVertexIndices.get(i+1);
                     
-                    k = parentVertexPosInFG.get(i);
-                    l = parentVertexPosInFG.get(j);
-                    if(k < 0 || l < 0) {
-                        continue;
-                    }
-                    
-                    // If there is a contact...
-                    if(fg.containsEdge(k, l) && (l - k == 1)) {
+                k = fgVertexPosInParent.get(i);
+                l = fgVertexPosInParent.get(j);
 
-                        // all edges are black in SEQ, no matter the edge type
-                        edgeType = fg.getContactType(k, l);
-                        ig2.setPaint(Color.BLACK);
-                                                
+                // we don not even check for actual edges here, we just draw the computed distance!
 
-                        // determine the center of the arc and the width of its rectangle bounding box
-                        //if(k < l) { leftVert = k; rightVert = l; }
-                        //else { leftVert = l; rightVert = k; }
-                        
-                        if(i < j) { leftVert = i; rightVert = j; }
-                        else { leftVert = j; rightVert = i; }
-                        
-                        leftVertPosX = pl.getVertStart().x + ((leftVert - shiftBack) * pl.vertDist);
-                        rightVertPosX = pl.getVertStart().x + ((rightVert - shiftBack) * pl.vertDist);
+                // all edges are black in SEQ, no matter the edge type
+                ig2.setPaint(Color.BLACK);
 
-                        arcWidth = rightVertPosX - leftVertPosX;
-                        arcHeight = arcWidth / 2;
+                if(k < l) { leftVert = k; rightVert = l; }
+                else { leftVert = l; rightVert = k; }
 
-                        arcTopLeftX = leftVertPosX;
-                        arcTopLeftY = pl.getVertStart().y - arcHeight / 2;
+                leftVertPosX = pl.getVertStart().x + ((leftVert - shiftBack) * pl.vertDist);
+                rightVertPosX = pl.getVertStart().x + ((rightVert - shiftBack) * pl.vertDist);
 
-                        spacerX = pl.vertRadius;
-                        spacerY = 0;
+                arcWidth = rightVertPosX - leftVertPosX;
+                arcHeight = arcWidth / 2;
 
-                        // draw it                                                
-                        arc = new Arc2D.Double(arcTopLeftX + spacerX, arcTopLeftY + spacerY, arcWidth, arcHeight, 0, 180, Arc2D.OPEN);
-                        shape = ig2.getStroke().createStrokedShape(arc);
-                        ig2.fill(shape);
+                arcTopLeftX = leftVertPosX;
+                arcTopLeftY = pl.getVertStart().y - arcHeight / 2;
 
-                    }
-                }
+                spacerX = pl.vertRadius;
+                spacerY = 0;
+
+                // draw it                                                
+                arc = new Arc2D.Double(arcTopLeftX + spacerX, arcTopLeftY + spacerY, arcWidth, arcHeight, 0, 180, Arc2D.OPEN);
+                shape = ig2.getStroke().createStrokedShape(arc);
+                ig2.fill(shape);
+                
             }
 
             // Draw the vertices as circles
@@ -4710,7 +4795,9 @@ E	3	3	3
                 else { ig2.setPaint(Color.LIGHT_GRAY); }
 
                 Integer parentVertexPosInFoldingGraph = parentVertexPosInFG.get(i);
+                
                 if(parentVertexPosInFoldingGraph < 0) {
+                    // draw vertices which are NOT part of this FG in gray
                     ig2.setPaint(Color.LIGHT_GRAY);
                 } 
                 
@@ -4767,14 +4854,16 @@ E	3	3	3
                 
                 if(fg.getSize() > 0) {                                            
                     ig2.drawString("FG", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (stringHeight / 4));
+                    ig2.setPaint(Color.LIGHT_GRAY);
                     ig2.drawString("SQ", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
                     ig2.drawString("PG", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + lineHeight + (stringHeight / 4));
+                    ig2.setPaint(Color.BLACK);
                 }
                 else {
                     ig2.drawString("(Graph has no vertices.)", pl.getFooterStart().x, pl.getFooterStart().y);
                 }
 
-
+                ig2.setPaint(Color.BLACK);
                 for(Integer i = startVertexInParent; i <= endVertexInParent; i++) {
                     // Draw label for every nth vertex
                     if((i + 1) % printNth == 0) {
@@ -4785,13 +4874,15 @@ E	3	3	3
                         stringHeight = fontMetrics.getAscent();                                        
 
                         ig2.drawString(sseNumberFoldingGraph, pl.getFooterStart().x + ((i-shiftBack) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4));
+                        ig2.setPaint(Color.LIGHT_GRAY);
                         ig2.drawString(sseNumberSeq, pl.getFooterStart().x + ((i-shiftBack) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + lineHeight + (stringHeight / 4));                    
                         ig2.drawString(sseNumberProteinGraph, pl.getFooterStart().x + ((i-shiftBack) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight *2) + (stringHeight / 4));                                                                    
+                        ig2.setPaint(Color.BLACK);
                     }
                 }
 
                 if(Settings.getBoolean("plcc_B_graphimg_legend")) {
-                    SSEGraph.drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4)), pl, fg);
+                    SSEGraph.drawLegendSEQ(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4)), pl, fg);
                 }
             
             }
@@ -4800,6 +4891,20 @@ E	3	3	3
             
             DrawResult drawRes = new DrawResult(ig2, roi);
             return drawRes;                                                                         
+    }
+    
+    
+    
+    /**
+     * Returns a list of all vertex indices in this graph, which is trivial. It is a list of integers from 0 to (this.size-1).
+     * @return a list of all vertex indices in this graph, which is a list of integers from 0 to (this.size-1)
+     */
+    public List<Integer> getVertexIndexList() {
+        List<Integer> vertIndices = new ArrayList<Integer>();
+        for(int i = 0; i < this.size; i++) {
+            vertIndices.add(i);
+        }
+        return vertIndices;
     }
                     
     
