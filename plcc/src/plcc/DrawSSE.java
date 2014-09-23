@@ -110,13 +110,7 @@ public class DrawSSE {
     }
     
     
-    /**
-     *Determines the sequential position (index, starting with 0) of this SSE in this protein graph.
-     * @return The sequential position (index, starting with 0) of this SSE in this protein graph.
-     */ 
-    public Integer getIndexInGraph() {
-        return(this.sse.getSeqIndexInGraph());        
-    }
+    
     
     
     

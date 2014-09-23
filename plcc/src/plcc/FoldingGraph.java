@@ -718,44 +718,7 @@ public class FoldingGraph extends SSEGraph {
      * Returns the folding graph number based on the vertex position in the parent graph. See the FoldingGraphComparator class for details on the ordering to use.
      * @return the folding graph number based on the vertex position in the parent graph. See the FoldingGraphComparator class for details on the ordering to use.
      */
-    public Integer getFoldingGraphNumber() { return(this.foldingGraphNumber); }
-    
-    /**
-     * Returns the distance of the SSE pair (a, b) in the primary structure, i.e., the length of a path 
-     * between these two SSEs. Note that this number considers the direction and may thus be negative.
-     * @param a the first SSE
-     * @param b the second SSE
-     * @return the path length between the SSEs, considers the direction and may thus be negative. For example, the
-     * distance between the SSEs with indices (3, 5) is 2 and the distance of the pair (5, 3) is -2.
-     * (Think of this distance in the graph-theoretic sense, you need the 2 edges [3=>4] and [4=>5] to get
-     * from 3 to 5.)
-     */
-    public Integer getPrimarySeqSSEPairDistanceBySSEsInParentGraph(SSE a, SSE b) {
-        if(a.sameSSEas(b)) { return(0); }        
-        
-        if(this.isProteinGraph || this.parent == null) {
-            System.err.println("ERROR: getPrimarySeqSSEPairDistanceBySSEsInParentGraph(): This graph has no valid parent or it is a protein graph.");
-            System.exit(1);
-        }
-                
-        return(parent.getSeqGraphSSEPairDistanceBySSEs(a, b));
-    }
-    
-    
-    /**
-     * Returns the position of an SSE in the vertex list of the parent graph.
-     * @return The index of the SSE if it was found in the parent graph, -1 otherwise.
-     */
-    public Integer getSequentialPositionInParentGraph(SSE s) {
-        
-        if(this.isProteinGraph || this.parent == null) {
-            System.err.println("ERROR: getSequentialPositionInParentGraph(): This graph has no valid parent or it is a protein graph.");
-            System.exit(1);
-        }
-        
-        return(parent.getSSEIndex(s));
-        
-    }
+    public Integer getFoldingGraphNumber() { return(this.foldingGraphNumber); }                   
     
     
     /**

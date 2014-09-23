@@ -60,9 +60,10 @@ public class DrawSSEGraph {
         this.drawSSEs = new ArrayList<DrawSSE>();
         
         if(this.order == DrawSSEGraph.SSEGRAPHORDER_AASEQUENCE) {
-            
-            for(SSE sse : this.g.sseList) {                        
-                this.drawSSEs.add(new DrawSSE(sse, sse.getSeqIndexInGraph(), this.pl, this.style));
+            SSE sse;
+            for(int i = 0; i < this.g.sseList.size(); i++) {                        
+                sse = this.g.sseList.get(i);
+                this.drawSSEs.add(new DrawSSE(sse, i, this.pl, this.style));
             }            
             
         } else if(this.order == DrawSSEGraph.SSEGRAPHORDER_SPATIAL) {
