@@ -206,6 +206,7 @@ public class FoldingGraph extends SSEGraph {
         
         this.spatOrder = this.getSpatialOrderingOfVertexIndices();
         if(this.spatOrder.size() != this.getSize()) {
+            DP.getInstance().w("FoldingGraph", "supportsKeyNotation: spatOrder size = " + this.spatOrder.size() + ", but gaph size is " + this.getSize() + " -- KEY not supported.");
             return(false);
         }
         

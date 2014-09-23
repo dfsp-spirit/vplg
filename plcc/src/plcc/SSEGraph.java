@@ -2761,9 +2761,9 @@ E	3	3	3
                
         HashMap<IMAGEFORMAT, String> resultFilesByFormat = new HashMap<IMAGEFORMAT, String>();
         
-        if( pnfr.getFoldingGraph().isBifurcated()) {
-            // graph is bifurcated, KEY not supported
-            System.out.println("        Output KEY folding graph files: none, FG is bifurcated -- KEY not supported.");
+        if( ! pnfr.getFoldingGraph().supportsKeyNotation()) {
+            // graph is bifurcated or has no spat order, KEY not supported
+            System.out.println("        Output KEY folding graph files: none, FG does not support KEY notation.");
             return resultFilesByFormat;
         }
         

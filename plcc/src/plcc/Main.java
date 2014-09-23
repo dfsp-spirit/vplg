@@ -2535,11 +2535,11 @@ public class Main {
                         else if(notation.equals(FoldingGraph.FG_NOTATION_SEQ)) {
                             filesByFormatCurNotation = SSEGraph.drawFoldingGraphSEQ(fileNameWithoutExtension, false, formats, pnfr);                                                
                         }
-                        else if(notation.equals(FoldingGraph.FG_NOTATION_KEY)) {
-                            filesByFormatCurNotation = SSEGraph.drawFoldingGraphKEY(fileNameWithoutExtension, false, formats, pnfr);                                                
+                        else if(notation.equals(FoldingGraph.FG_NOTATION_KEY)) {                            
+                            filesByFormatCurNotation = SSEGraph.drawFoldingGraphKEY(fileNameWithoutExtension, false, formats, pnfr);                                                                            
                         }
 
-                        drawingSucceeded = true;
+                        drawingSucceeded = ( ! filesByFormatCurNotation.isEmpty());
 
                         //if(fg.drawFoldingGraph(notation, fgFile)) {
                         if(drawingSucceeded) {
