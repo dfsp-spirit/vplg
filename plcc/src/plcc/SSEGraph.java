@@ -113,8 +113,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
     protected Integer numCliquesSoFar;
     protected Boolean reportCliques;
     
-    /** the list of all SSEs of this graph which should be drawn. Not used yet. */
-    protected ArrayList<DrawSSE> sseDrawList;
+    
     
     /** This is a list of the vertices (defined by their sequential index) in this graph in spatial ordering. This means that spatOrder.get(i) returns the
         sequential index of the SSE which is at position i in the graph if it is drawn in spatial ordering. */
@@ -152,8 +151,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
      */
     SSEGraph(ArrayList<SSE> sses) {
         super();
-        this.sseList = sses;
-        this.sseDrawList = new ArrayList<DrawSSE>();
+        this.sseList = sses;        
         this.size = sseList.size();
         this.matrix = new Integer[size][size];
         this.distMatrix = new Integer[size][size];      // distances in graph
@@ -291,6 +289,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
      * Will try to compute the spatial ordering using the computeSpatialVertexOrdering() function if it is null.
      * @return the spatial contact matrix or a matrix of length[0][0] if no spatial ordering exists that can be used to compute such a matrix.
      */
+    /*
     public Integer[][] getSpatialContactMatrix() {
 
         Integer[][] noSuchMatrix = new Integer[0][0];
@@ -306,14 +305,12 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         Integer[][] spatContacts = new Integer[this.size][this.size];
         
         // init is not required because all fields are set in the next loop anyways
-        /*
-        for(Integer i = 0; i < this.size; i++) {
-            for(Integer j = 0; j < this.size; j++) {
-                spatContacts[i][j] = SpatRel.NONE;
-            }
-        }
-         * 
-         */
+        
+        //for(Integer i = 0; i < this.size; i++) {
+        //    for(Integer j = 0; j < this.size; j++) {
+        //        spatContacts[i][j] = SpatRel.NONE;
+        //    }
+        //}
         
         // fill
         Integer sseASeqIndex, sseBSeqIndex;
@@ -327,7 +324,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         
         return(spatContacts);
     }
-    
+    */
     
     /**
      * Determines whether this graph contains at least one edge of type parallel.
