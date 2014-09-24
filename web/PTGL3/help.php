@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<?php 
+include('./backend/config.php'); 
+
+$title = "Help";
+$title = $SITE_TITLE.$TITLE_SPACER.$title;
+?>
 <html>
 <head>
 	<meta charset="utf-8">
@@ -8,7 +14,7 @@
 	<meta name="author" content="">
 	<link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
 
-	<title>VPLG -- Help</title>
+	<title><?php echo $title; ?></title>
 
 
 	<!-- Mobile viewport optimized -->

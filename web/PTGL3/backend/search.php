@@ -18,15 +18,7 @@ ini_set('log_errors', TRUE);
 error_reporting(E_ERROR);
 
 // get config values
-$CONFIG			= include('./backend/config.php'); 
-$DB_HOST		= $CONFIG['host'];
-$DB_PORT		= $CONFIG['port'];
-$DB_NAME		= $CONFIG['db'];
-$DB_USER		= $CONFIG['user'];
-$DB_PASSWORD	= $CONFIG['pw'];
-$BUILD_FILE_PATH	= $CONFIG['build_file_path'];
-$IMG_ROOT_PATH		= $CONFIG['img_root_path'];
-$DEBUG			= $CONFIG['debug'];
+include('./backend/config.php'); 
 
 if($DEBUG){
 	ini_set('display_errors', 1);
@@ -190,155 +182,155 @@ if(isset($_SESSION["chains"])){
 }
 
 // check if parameters are set. If so, set the associated variable with the value
-if(isset($_POST)) {
-    if(isset($_POST["keyword"])) {
-		$keyword = $_POST["keyword"];
+if(isset($_GET)) {
+    if(isset($_GET["keyword"])) {
+		$keyword = $_GET["keyword"];
 		$_SESSION["keyword"] = $keyword;
 	} 
     
-	if(isset($_POST["pdbid"])) {
-		$pdbid = $_POST["pdbid"];
+	if(isset($_GET["pdbid"])) {
+		$pdbid = $_GET["pdbid"];
 		$_SESSION["pdbid"] = $pdbid;
 	}
 	
-    if(isset($_POST["title"])) {
-		$title = $_POST["title"];
+    if(isset($_GET["title"])) {
+		$title = $_GET["title"];
 		$_SESSION["title"] = $title;
 	}
 	
-    if(isset($_POST["hasligand"])) {
-		$hasligand = $_POST["hasligand"];
+    if(isset($_GET["hasligand"])) {
+		$hasligand = $_GET["hasligand"];
 		$_SESSION["hasligand"] = $hasligand;
 	}
 	
-    if(isset($_POST["ligandname"])) {
-		$ligandname = $_POST["ligandname"];
+    if(isset($_GET["ligandname"])) {
+		$ligandname = $_GET["ligandname"];
 		$_SESSION["ligandname"] = $ligandname;
 	}
 	
-    if(isset($_POST["molecule"])) {
-		$molecule = $_POST["molecule"];
+    if(isset($_GET["molecule"])) {
+		$molecule = $_GET["molecule"];
 		$_SESSION["molecule"] = $molecule;
 	}
 	
-    if(isset($_POST["logic"])) {
-		$logic = $_POST["logic"];
+    if(isset($_GET["logic"])) {
+		$logic = $_GET["logic"];
 		$_SESSION["logic"] = $logic;
 	}
 	
-	if(isset($_POST["linnotalphaadj"])) {
-		$linnotalphaadj = $_POST["linnotalphaadj"];
+	if(isset($_GET["linnotalphaadj"])) {
+		$linnotalphaadj = $_GET["linnotalphaadj"];
 		$_SESSION["linnotalphaadj"] = $linnotalphaadj;
 	}
-	if(isset($_POST["linnotalphared"])) {
-		$linnotalphared = $_POST["linnotalphared"];
+	if(isset($_GET["linnotalphared"])) {
+		$linnotalphared = $_GET["linnotalphared"];
 		$_SESSION["linnotalphared"] = $linnotalphared;
 	}
-	if(isset($_POST["linnotalphaseq"])) {
-		$linnotalphaseq = $_POST["linnotalphaseq"];
+	if(isset($_GET["linnotalphaseq"])) {
+		$linnotalphaseq = $_GET["linnotalphaseq"];
 		$_SESSION["linnotalphaseq"] = $linnotalphaseq;
 	}
-	if(isset($_POST["linnotalphakey"])) {
-		$linnotalphakey = $_POST["linnotalphakey"];
+	if(isset($_GET["linnotalphakey"])) {
+		$linnotalphakey = $_GET["linnotalphakey"];
 		$_SESSION["linnotalphakey"] = $linnotalphakey;
 	}
 	
-	if(isset($_POST["linnotbetaadj"])) {
-		$linnotbetaadj = $_POST["linnotbetaadj"];
+	if(isset($_GET["linnotbetaadj"])) {
+		$linnotbetaadj = $_GET["linnotbetaadj"];
 		$_SESSION["linnotbetaadj"] = $linnotbetaadj;
 	}
-	if(isset($_POST["linnotbetared"])) {
-		$linnotbetared = $_POST["linnotbetared"];
+	if(isset($_GET["linnotbetared"])) {
+		$linnotbetared = $_GET["linnotbetared"];
 		$_SESSION["linnotbetared"] = $linnotbetared;
 	}
-	if(isset($_POST["linnotbetaseq"])) {
-		$linnotbetaseq = $_POST["linnotbetaseq"];
+	if(isset($_GET["linnotbetaseq"])) {
+		$linnotbetaseq = $_GET["linnotbetaseq"];
 		$_SESSION["linnotbetaseq"] = $linnotbetaseq;
 	}
-	if(isset($_POST["linnotbetakey"])) {
-		$linnotbetakey = $_POST["linnotbetakey"];
+	if(isset($_GET["linnotbetakey"])) {
+		$linnotbetakey = $_GET["linnotbetakey"];
 		$_SESSION["linnotbetakey"] = $linnotbetakey;
 	}
 	
-	if(isset($_POST["linnotalbeadj"])) {
-		$linnotalbeadj = $_POST["linnotalbeadj"];
+	if(isset($_GET["linnotalbeadj"])) {
+		$linnotalbeadj = $_GET["linnotalbeadj"];
 		$_SESSION["linnotalbeadj"] = $linnotalbeadj;
 	}
-	if(isset($_POST["linnotalbered"])) {
-		$linnotalbered = $_POST["linnotalbered"];
+	if(isset($_GET["linnotalbered"])) {
+		$linnotalbered = $_GET["linnotalbered"];
 		$_SESSION["linnotalbered"] = $linnotalbered;
 	}
-	if(isset($_POST["linnotalbeseq"])) {
-		$linnotalbeseq = $_POST["linnotalbeseq"];
+	if(isset($_GET["linnotalbeseq"])) {
+		$linnotalbeseq = $_GET["linnotalbeseq"];
 		$_SESSION["linnotalbeseq"] = $linnotalbeseq;
 	}
-	if(isset($_POST["linnotalbekey"])) {
-		$linnotalbekey = $_POST["linnotalbekey"];
+	if(isset($_GET["linnotalbekey"])) {
+		$linnotalbekey = $_GET["linnotalbekey"];
 		$_SESSION["linnotalbekey"] = $linnotalbekey;
 	}
 	
 	// ligand versions follow:
 	
 	
-	if(isset($_POST["linnotalphaligadj"])) {
-		$linnotalphaligadj = $_POST["linnotalphaligadj"];
+	if(isset($_GET["linnotalphaligadj"])) {
+		$linnotalphaligadj = $_GET["linnotalphaligadj"];
 		$_SESSION["linnotalphaligadj"] = $linnotalphaligadj;
 	}
-	if(isset($_POST["linnotalphaligred"])) {
-		$linnotalphaligred = $_POST["linnotalphaligred"];
+	if(isset($_GET["linnotalphaligred"])) {
+		$linnotalphaligred = $_GET["linnotalphaligred"];
 		$_SESSION["linnotalphaligred"] = $linnotalphaligred;
 	}
-	if(isset($_POST["linnotalphaligseq"])) {
-		$linnotalphaligseq = $_POST["linnotalphaligseq"];
+	if(isset($_GET["linnotalphaligseq"])) {
+		$linnotalphaligseq = $_GET["linnotalphaligseq"];
 		$_SESSION["linnotalphaligseq"] = $linnotalphaligseq;
 	}
-	if(isset($_POST["linnotalphaligkey"])) {
-		$linnotalphaligkey = $_POST["linnotalphaligkey"];
+	if(isset($_GET["linnotalphaligkey"])) {
+		$linnotalphaligkey = $_GET["linnotalphaligkey"];
 		$_SESSION["linnotalphaligkey"] = $linnotalphaligkey;
 	}
 	
-	if(isset($_POST["linnotbetaligadj"])) {
-		$linnotbetaligadj = $_POST["linnotbetaligadj"];
+	if(isset($_GET["linnotbetaligadj"])) {
+		$linnotbetaligadj = $_GET["linnotbetaligadj"];
 		$_SESSION["linnotbetaligadj"] = $linnotbetaligadj;
 	}
-	if(isset($_POST["linnotbetaligred"])) {
-		$linnotbetaligred = $_POST["linnotbetaligred"];
+	if(isset($_GET["linnotbetaligred"])) {
+		$linnotbetaligred = $_GET["linnotbetaligred"];
 		$_SESSION["linnotbetaligred"] = $linnotbetaligred;
 	}
-	if(isset($_POST["linnotbetaligseq"])) {
-		$linnotbetaligseq = $_POST["linnotbetaligseq"];
+	if(isset($_GET["linnotbetaligseq"])) {
+		$linnotbetaligseq = $_GET["linnotbetaligseq"];
 		$_SESSION["linnotbetaligseq"] = $linnotbetaligseq;
 	}
-	if(isset($_POST["linnotbetaligkey"])) {
-		$linnotbetaligkey = $_POST["linnotbetaligkey"];
+	if(isset($_GET["linnotbetaligkey"])) {
+		$linnotbetaligkey = $_GET["linnotbetaligkey"];
 		$_SESSION["linnotbetaligkey"] = $linnotbetaligkey;
 	}
 	
-	if(isset($_POST["linnotalbeligadj"])) {
-		$linnotalbeligadj = $_POST["linnotalbeligadj"];
+	if(isset($_GET["linnotalbeligadj"])) {
+		$linnotalbeligadj = $_GET["linnotalbeligadj"];
 		$_SESSION["linnotalbeligadj"] = $linnotalbeligadj;
 	}
-	if(isset($_POST["linnotalbeligred"])) {
-		$linnotalbeligred = $_POST["linnotalbeligred"];
+	if(isset($_GET["linnotalbeligred"])) {
+		$linnotalbeligred = $_GET["linnotalbeligred"];
 		$_SESSION["linnotalbeligred"] = $linnotalbeligred;
 	}
-	if(isset($_POST["linnotalbeligseq"])) {
-		$linnotalbeligseq = $_POST["linnotalbeligseq"];
+	if(isset($_GET["linnotalbeligseq"])) {
+		$linnotalbeligseq = $_GET["linnotalbeligseq"];
 		$_SESSION["linnotalbeligseq"] = $linnotalbeligseq;
 	}
-	if(isset($_POST["linnotalbeligkey"])) {
-		$linnotalbeligkey = $_POST["linnotalbeligkey"];
+	if(isset($_GET["linnotalbeligkey"])) {
+		$linnotalbeligkey = $_GET["linnotalbeligkey"];
 		$_SESSION["linnotalbeligkey"] = $linnotalbeligkey;
 	}
 	
 	// motif search
-	if(isset($_POST["motif"])) {
-		$motif = $_POST["motif"];
+	if(isset($_GET["motif"])) {
+		$motif = $_GET["motif"];
 		$_SESSION["motif"] = $motif;
 	}
 	
 	
-    // if(isset($_POST["proteincomplexes"])) {$proteincomplexes = $_POST["proteincomplexes"];};
+    // if(isset($_GET["proteincomplexes"])) {$proteincomplexes = $_GET["proteincomplexes"];};
 } else {
 	// if nothing is set or the query is too short...
 	$tableString = "Sorry. Your search term is too short. <br>\n";

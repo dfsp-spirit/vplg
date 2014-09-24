@@ -1,5 +1,12 @@
 <!DOCTYPE html>
-<?php include('./backend/display_proteins.php'); ?>
+<?php 
+include('./backend/config.php'); 
+include('./backend/display_proteins.php');
+
+$title = "Search results";
+$title = $SITE_TITLE.$TITLE_SPACER.$title;
+
+?>
 <html>
 <head>
 	<meta http-equiv="cache-control" content="no-cache">
@@ -10,7 +17,7 @@
 	<meta name="author" content="">
 	<link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
 
-	<title>VPLG -- Search results</title>
+	<title><?php echo $title; ?></title>
 
 	<!-- Mobile viewport optimized -->
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scale=1.0, user-scalable=no"/>
@@ -48,7 +55,8 @@
 				<option class="downloadOption" value="pdf">PDF</option>
 				<option class="downloadOption" value="svg">SVG</option>
 				<option class="downloadOption" value="png">PNG</option>
-				<option class="downloadOption" value="gml">GML</option></select>		
+				<option class="downloadOption" value="gml">GML</option></select>
+			</span>
 			<br><br>
 			<!-- <span>Please <a href="citing.php">cite PTGL</a>, if you are using our data and images.</span> -->
 		</div>

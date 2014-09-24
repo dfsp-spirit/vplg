@@ -5,12 +5,10 @@ ini_set('display_errors',1);
 ini_set('display_startup_errors',1);
 error_reporting(-1);
 
+include('./backend/config.php'); 
 
-$db_config = include('./backend/config.php'); 
-$ENABLE_COMPLEX_GRAPHS = $db_config['enable_complex_graphs'];
-$ENABLE_MOTIF_SEARCH = $db_config['enable_motif_search'];
-$ENABLE_BLAST_SEARCH = $db_config['enable_blast_search'];
-$USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
+$title = "The Protein Topology Graph Library";
+$title = $SITE_TITLE.$TITLE_SPACER.$title;
 
 ?>
 <html>
@@ -22,7 +20,7 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 	<meta name="author" content="">
 	<link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
 
-	<title>VPLG -- The Visualization of Protein-Ligand Graphs</title>
+	<title><?php echo $title; ?></title>
 
 	<!-- Mobile viewport optimized -->
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scale=1.0, user-scalable=no"/>
@@ -74,7 +72,7 @@ $USE_LOGIC_OPERATORS = $db_config['use_logic_operators']
 		<div class="col-lg-4"></div>
 			<div class="col-lg-4">
 				<div class="input-group form-group">
-					<form class="form-inline" action="search.php" method="post">
+					<form class="form-inline" action="search.php" method="get">
 						<input type="text" class="form-control" name="keyword" id="searchInput" autocomplete="off" placeholder="Enter PDB ID or keyword...">
 						<button type="submit" id="sendit" "class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button><br>
 						<div id="advancedButton"> Advanced Search <div id="arrow"><strong class="caret"></strong></div></div>

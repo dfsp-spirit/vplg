@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <?php 
-include('./backend/config.php'); 
+include('./backend/config.php');
+include('./backend/get_linearnotations.php');
 
-$title = "Imprint";
+$title = "Linear notations";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
 ?>
 <html>
@@ -27,14 +28,13 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 	<link rel="stylesheet" type="text/css" href="css/styles.css">
 	<link rel="stylesheet" href="css/font-awesome.css"/>
 
-	 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 	<!-- Include Modernizr in the head, before any other JS -->
 	<script src="js/modernizr-2.6.2.min.js"></script>
 
 	<!-- Live Search for PDB IDs -->
 	<script src="js/livesearch.js" type="text/javascript"></script>
 </head>
-
 <body id="customBackground">
 	<noscript>
 		<META HTTP-EQUIV="Refresh" CONTENT="0;URL=errorJS.php">
@@ -43,23 +43,37 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
 	<?php include('navbar.php'); ?>
 
-	<div class="container" id="imprint">
-		<h2> Imprint </h2>
+	<div class="container" id="publications">
+		<h2> Publications related to the VPLG and PTGL</h2>
 		<br>
+		
+		<span id="multipleDownload">Download checked proteins as 
+		  <select id="multidown" name="graphtype">
+			<option class="downloadOption" value="1">Alpha</option>
+			<option class="downloadOption" value="2">Beta</option>
+			<option class="downloadOption" value="3">Alpha-Beta</option>
+			<option class="downloadOption" value="4">Alpha-Ligand</option>
+			<option class="downloadOption" value="5">Beta-Ligand</option>
+			<option class="downloadOption" value="6">Alpha-Beta-Ligand</option>
+		  </select>
+		</span>
+		
+		<span id="multipleDownload">Download checked proteins as 
+		  <select id="multidown" name="notationtype">
+			<option class="downloadOption" value="ADJ">ADJ</option>
+			<option class="downloadOption" value="RED">RED</option>
+			<option class="downloadOption" value="KEY">KEY</option>
+			<option class="downloadOption" value="SEQ">SEQ</option>
+		  </select>
+		</span>
+		
+		
+		<div class="container" id="searchResults">
+			<h2> Search Results </h2>
+			<?php echo $tableString; /* The table string is constructed in backend/search.php, which is included by this file. */  ?>
+		</div><!-- end container and searchResults -->
 
-		<div id="imprinttext">
-		Johann Wolfgang Goethe-University Frankfurt a. Main <<a href="http://www.uni-frankfurt.de">uni-frankfurt.de</a>><br>
-		<br>
-		Faculty of Computer Science and Mathematics, Dept. 12 <br>
-		Institute for Computer Science <br>
-		Molecular Bioinformatics (MBI) <<a href="http://www.bioinformatik.uni-frankfurt.de/">bioinformatik.uni-frankfurt.de</a>><br>
-		Robert-Mayer-Strasse 11-15 <br>
-		60325 Frankfurt am Main <br>
-		Germany  <br>
-		<br>
-		</div>
-
-	</div><!-- end container and contentText -->
+</div><!-- end container and contentText -->
 </div><!-- end wrapper -->
 
 <?php include('footer.php'); ?>

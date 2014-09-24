@@ -9,33 +9,37 @@
 /**
  * Returns the configuration data in an associative array
  */
-return array(
-	//---- Database settings ----//
-    'host'	=> '192.168.185.248',
-    'user'	=> 'vplg',
-    'pw'	=> 'vplg',
-    'db'	=> 'vplg',
-    'port'	=> '5432',
-    //---- End of database settings ----//
-	
-	
-	//---- Search Settings ----//
-    'enable_complex_graphs'	=> FALSE,
-    'enable_motif_search'	=> FALSE,
-	'enable_blast_search'	=> FALSE,
-	'use_logic_operators'	=> FALSE,
-	//---- End of search settings ----//
-	
-	
-	//---- File settings ----//
-	'build_file_path'	=> FALSE,
-	'img_root_path'		=> './data/',
-	//---- End of file settings ----//
-	
-	
-	//---- Debug settings ----//
-	'debug_mode' => TRUE
-	//---- End of debug settings ----//
-);
+
+//---- Database settings ----//
+$DB_HOST		= '192.168.185.248';
+$DB_USER		= 'vplg';
+$DB_PASSWORD	= 'vplg';
+$DB_NAME		= 'vplg';
+$DB_PORT		= '5432';
+//---- End of database settings ----//
+
+//---- Debug settings ----//
+$SITE_TITLE = "PTGL";
+$TITLE_SPACER = " -- ";
+//---- End of debug settings ----//	
+
+//---- Search Settings ----//
+$ENABLE_COMPLEX_GRAPHS	= FALSE;
+$ENABLE_MOTIF_SEARCH	= FALSE;
+$ENABLE_BLAST_SEARCH	= FALSE;
+$USE_LOGIC_OPERATORS	= FALSE;
+//---- End of search settings ----//
+
+
+//---- File settings ----//
+$BUILD_FILE_PATH	= FALSE;
+$IMG_ROOT_PATH		= './data/';
+//---- End of file settings ----//
+
+
+//---- Debug settings ----//
+$DEBUG_MODE = TRUE;
+//---- End of debug settings ----//
+
 //EOF
 ?>

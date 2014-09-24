@@ -12,15 +12,8 @@ ini_set('log_errors', TRUE);
 error_reporting(E_ERROR);
 
 // get config values
-$CONFIG			= require('config.php'); 
-$DB_HOST		= $CONFIG['host'];
-$DB_PORT		= $CONFIG['port'];
-$DB_NAME		= $CONFIG['db'];
-$DB_USER		= $CONFIG['user'];
-$DB_PASSWORD	= $CONFIG['pw'];
-$BUILD_FILE_PATH = $CONFIG['build_file_path'];
-$IMG_ROOT_PATH	 = $CONFIG['img_root_path'];
-$DEBUG			= $CONFIG['debug_mode'];
+require('config.php'); 
+
 
 if($DEBUG){
 	ini_set('display_errors', 1);
