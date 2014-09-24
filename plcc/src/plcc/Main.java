@@ -2495,7 +2495,7 @@ public class Main {
                     }
                     else {
                         if(! silent) {
-                            System.out.println("        Wrote PTGL linear notations for " + fg.getGraphType() + " FG # " + fg.getFoldingGraphNumber() + " to database (single linnot table).");
+                            System.out.println("        Wrote PTGL linear notations for " + fg.getGraphType() + " FG # " + fg.getFoldingGraphNumber() + " to database.");
                         }
                     } 
                 

@@ -33,7 +33,10 @@ public class PTGLNotationFoldResult {
     public Integer keySize;
     public Integer seqSize;
     
-    
+    public List<Integer> adjpos;
+    public List<Integer> redpos;
+    public List<Integer> keypos;
+    public List<Integer> seqpos;
     
     /**
      * Constructor. Does nothing but setting a name.
@@ -57,7 +60,12 @@ public class PTGLNotationFoldResult {
         this.adjSize = 0;
         this.redSize = 0;
         this.keySize = 0;
-        this.seqSize = 0;            
+        this.seqSize = 0; 
+        
+        this.adjpos = null;
+        this.redpos = null;
+        this.seqpos = null;
+        this.keypos = null;
     }
     
     

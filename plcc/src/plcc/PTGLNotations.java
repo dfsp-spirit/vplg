@@ -223,6 +223,15 @@ public class PTGLNotations {
 		redstart = ccVerts.get(0);
 		keystart = ccVerts.get(0);
 		seqstart = ccVerts.get(0);
+                
+                List<Integer> adjpos = new ArrayList<>(); adjpos.add(adjstart);
+                List<Integer> redpos = new ArrayList<>(); redpos.add(redstart);
+                List<Integer> seqpos = new ArrayList<>(); seqpos.add(seqstart);
+                List<Integer> keypos = new ArrayList<>(); keypos.add(keystart);
+                pnfr.adjpos = adjpos;
+                pnfr.redpos = redpos;
+                pnfr.seqpos = seqpos;
+                pnfr.keypos = keypos;
             } else {
                 
                 if(! isNotBifurcated) {
@@ -297,6 +306,8 @@ public class PTGLNotations {
                 //############################### ADJ #####################################
                 //#########################################################################
                 
+                List<Integer> adjpos = new ArrayList<>(); 
+                
                 // line 230 in the Perl script
                 // ----------------------------- ADJ notation ----------------------
                 if(adjverbose) {
@@ -316,6 +327,7 @@ public class PTGLNotations {
                 
                 adjstart = cur;
                 adjvisited.add(cur);
+                adjpos.add(cur);
                 //List<Integer> adjdegrees = new ArrayList<>();
                 HashMap<Integer, Integer> adjdegrees = new HashMap<>();
                 for(Integer key : degrees.keySet()) {
@@ -481,6 +493,7 @@ public class PTGLNotations {
                     if(isMultiSSETypeGraph) {
                         ADJ.append(g.getVertex(next).getLinearNotationLabel());
                     }
+                    adjpos.add(next);
                     
                     // ordering, line 352
                     if(edgeType.equals("p") || edgeType.equals("m") || edgeType.equals("l")) {
@@ -516,6 +529,8 @@ public class PTGLNotations {
                 
                 resetEdgeStatus(ccVerts);
                 
+                pnfr.adjpos = adjpos;
+                
                 if(adjverbose) {
                     System.out.println("    ADJ notation done.");
                     System.out.println("    -----------------------------.");
@@ -531,6 +546,7 @@ public class PTGLNotations {
                 
                 Integer redcur = cur;
                 HashSet<Integer> redvisited = new HashSet<>();
+                List<Integer> redpos = new ArrayList<>();
                 
                 if(isMultiSSETypeGraph) {
                     RED.append(g.getVertex(redcur).getLinearNotationLabel());
@@ -538,6 +554,7 @@ public class PTGLNotations {
                                                 
                 redstart = pos.get(redcur);
                 redvisited.add(redcur);
+                redpos.add(redcur);
                 
                 if(redverbose) {
                     System.out.println("    Start vertex is " + redcur + ", pos(recur)=" + redstart + ".");
@@ -686,10 +703,12 @@ public class PTGLNotations {
                     
                     redcur = next;
                     redvisited.add(next);
+                    redpos.add(next);
                     
                 }
                 
-                RED.append(bracketEnd);                                    
+                RED.append(bracketEnd);  
+                pnfr.redpos = redpos;
 
                 if(redverbose) {
                     System.out.println("    RED notation done.");
@@ -771,15 +790,16 @@ public class PTGLNotations {
                     }
                     
                     KEY.append(bracketEnd);
+                    pnfr.keypos = keypos;
                     // KEY done
                 }
                 else {
                     hasKeyNotation = false;
                     KEY.setLength(0);   // erase all contents in it so far -- this includes the starting bracket which has already been set
                     keystart = -1;
+                    pnfr.keypos = null;
                     if(keyverbose) {
-                        System.out.println("    No KEY notation available, vertex set bifurcated.");
-                        
+                        System.out.println("    No KEY notation available, vertex set bifurcated.");                        
                     }
                 }
                                 
@@ -791,6 +811,7 @@ public class PTGLNotations {
                 //#########################################################################
                 //############################### SEQ #####################################
                 //#########################################################################
+                List<Integer> seqpos = new ArrayList<>();
                 
                 for(int k = 1; k < ccVerts.size(); k++) {
                     if(isMultiSSETypeGraph || ( ! isMultiSSETypeGraph && k > 1)) {
@@ -803,9 +824,11 @@ public class PTGLNotations {
                     if(isMultiSSETypeGraph) {
                         SEQ.append(g.getVertex(ccVerts.get(k)).getLinearNotationLabel());
                     }                    
+                    seqpos.add(ccVerts.get(k));
                 }
                 
                 SEQ.append(bracketEnd);
+                pnfr.seqpos = seqpos;
                 
                 if(seqverbose) {
                     System.out.println("    SEQ notation done.");
@@ -847,6 +870,7 @@ public class PTGLNotations {
             pnfr.adjSize = ccVerts.size();
             pnfr.keySize = ccVerts.size();
             pnfr.seqSize = ccVerts.size();
+            
             
             if(! hasKeyNotation) {
                 pnfr.keyNotation = null;

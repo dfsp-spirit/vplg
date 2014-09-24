@@ -1800,7 +1800,7 @@ E	3	3	3
 
         if(x < 0 || x >= this.size) {
             System.err.println("ERROR: pathDistanceAllVerts(): Vertex index '" + x + "' invalid.\n");
-            System.exit(-1);
+            System.exit(1);
         }
 
         //System.out.println("      Calculating distance of all " + this.size + " vertices to vertex " + x + ".");
@@ -2793,6 +2793,13 @@ E	3	3	3
                 System.out.println("DEBUG: Drawing KEY FG # " + fg.getFoldingGraphNumber() + " to '" + file + "'.");
                 fg.drawFoldingGraphKEY(file);
             }
+        }
+        */
+        
+        /*
+        boolean debug = true;
+        if(debug) {
+            return resultFilesByFormat;
         }
         */
         
@@ -4784,6 +4791,7 @@ E	3	3	3
      */
     private static DrawResult drawFoldingGraphKEYG2D(PTGLNotationFoldResult pnfr) {
 
+        
         //System.err.println("ERROR: drawFoldingGraphKEYG2D: implement me, i draw RED atm.");
         
         FoldingGraph fg = pnfr.getFoldingGraph();
@@ -4870,6 +4878,7 @@ E	3	3	3
             // check width of header string
             String proteinHeader = "The KEY " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
             String notation = "KEY notation: '" + pnfr.keyNotation + "' (svip=" + (pnfr.keyStart < 0 ? "-" : pnfr.keyStart + 1) + ")";
+            //String order = "Order in parent:"; for(Integer i : pnfr.keypos) { order += (" " + (i + 1)); }
             //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
             Integer stringHeight = fontMetrics.getAscent();
             String sseNumberSeq;    // the SSE number in the primary structure, N to C terminus
@@ -4878,7 +4887,8 @@ E	3	3	3
 
             if(Settings.getBoolean("plcc_B_graphimg_header")) {
                 ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
-                ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);                
+                ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);
+                //ig2.drawString(order, pl.headerStart.x, pl.headerStart.y + (lineHeight * 2));
             }
 
             // ------------------------- Draw the graph -------------------------
