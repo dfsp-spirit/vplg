@@ -2765,6 +2765,12 @@ E	3	3	3
         
         if( ! pnfr.getFoldingGraph().supportsKeyNotation()) {
             // graph is bifurcated or has no spat order, KEY not supported
+            
+            // sanity check to see whether current supportsKeyNotation() function is correct and spatial ordering is required
+            if(pnfr.keyNotation != null || pnfr.keyStart >= 0) {
+                DP.getInstance().e("SSEGraph", "drawFoldingGraphKEY: FG reported to NOT support KEY notation, but a KEY notation string is set: '" + pnfr.keyNotation + "', start index is parent is " + pnfr.keyStart + ".");
+            }
+            
             System.out.println("          Output KEY folding graph files: none, FG does not support KEY notation.");
             return resultFilesByFormat;
         } 
