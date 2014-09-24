@@ -93,5 +93,5 @@ $(document).ready(function () {
  			alert("Please enter at least 3 characters!");
  		}
  	});
-	
+	 
 });

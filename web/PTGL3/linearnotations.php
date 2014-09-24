@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <?php 
 include('./backend/config.php');
@@ -44,10 +45,12 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 	<?php include('navbar.php'); ?>
 
 	<div class="container" id="publications">
-		<h2> Publications related to the VPLG and PTGL</h2>
+		<h2>Linear notations of the folding graphs</h2>
 		<br>
 		
-		<span id="multipleDownload">Download checked proteins as 
+		<form class="form-inline" action="linearnotations.php" method="get">
+			
+		<label>Select graph-type: 
 		  <select id="multidown" name="graphtype">
 			<option class="downloadOption" value="1">Alpha</option>
 			<option class="downloadOption" value="2">Beta</option>
@@ -56,20 +59,27 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			<option class="downloadOption" value="5">Beta-Ligand</option>
 			<option class="downloadOption" value="6">Alpha-Beta-Ligand</option>
 		  </select>
-		</span>
+		</label>
 		
-		<span id="multipleDownload">Download checked proteins as 
+		<label> and notation-type: 
 		  <select id="multidown" name="notationtype">
-			<option class="downloadOption" value="ADJ">ADJ</option>
-			<option class="downloadOption" value="RED">RED</option>
-			<option class="downloadOption" value="KEY">KEY</option>
-			<option class="downloadOption" value="SEQ">SEQ</option>
+			<option class="downloadOption" value="adj">ADJ</option>
+			<option class="downloadOption" value="red">RED</option>
+			<option class="downloadOption" value="key">KEY</option>
+			<option class="downloadOption" value="seq">SEQ</option>
 		  </select>
-		</span>
+		</label>
+		
+		<button type="submit" id="sendit" "class="btn btn-default">Search <span class="glyphicon glyphicon-search"></span></button><br>
+
+		</form>	
+		
+		
+
 		
 		
 		<div class="container" id="searchResults">
-			<h2> Search Results </h2>
+			<h3> Search Results </h3>
 			<?php echo $tableString; /* The table string is constructed in backend/search.php, which is included by this file. */  ?>
 		</div><!-- end container and searchResults -->
 
