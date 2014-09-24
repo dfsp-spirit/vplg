@@ -4801,8 +4801,13 @@ E	3	3	3
             DP.getInstance().e("SSEGraph", "drawFoldingGraphKEYG2D: This FG is bifurcated, KEY notation not supported.");
         }
         
-        Integer startVertexInParent = fg.getMinimalVertexIndexInParentGraph();
-        Integer endVertexInParent = fg.getMaximalVertexIndexInParentGraph();
+        Integer leftMostVertexInParent = fg.getMinimalVertexIndexInParentGraph();
+        Integer rightMostVertexInParent = fg.getMaximalVertexIndexInParentGraph();
+        
+        List<Integer> keypos = pnfr.keypos;
+        Integer keystart = pnfr.keyStart;
+        assert keystart.equals(keypos.get(0));
+        DP.getInstance().d("keystart=" + keystart + ". keypos=" + IO.intListToString(keypos));
                 
         
         List<Integer> fgVertexPosInParent = fg.getVertexIndexListInParentGraph();
@@ -5164,7 +5169,7 @@ E	3	3	3
                 }
 
 
-                for(Integer i = startVertexInParent; i <= endVertexInParent; i++) {
+                for(Integer i = leftMostVertexInParent; i <= rightMostVertexInParent; i++) {
                     
                     Integer parentVertexPosInFoldingGraph = parentVertexPosInFG.get(i);
                     if(parentVertexPosInFoldingGraph < 0) {
