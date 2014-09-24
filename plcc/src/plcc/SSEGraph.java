@@ -27,6 +27,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
@@ -62,6 +63,7 @@ import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import plcc.DrawTools.IMAGEFORMAT;
+import static plcc.FoldingGraph.ORIENTATION_DOWNWARDS;
 import tools.DP;
 
 
@@ -2672,7 +2674,7 @@ E	3	3	3
         
         if( ! Settings.getBoolean("plcc_B_silent")) {
             StringBuilder sb = new StringBuilder();
-            sb.append("        Output ADJ folding graph files: ");
+            sb.append("          Output ADJ folding graph files: ");
             for(IMAGEFORMAT format : resultFilesByFormat.keySet()) {
                 sb.append("(").append(format.toString()).append(" => ").append(resultFilesByFormat.get(format)).append(") ");
             }
@@ -2706,7 +2708,7 @@ E	3	3	3
         
         if( ! Settings.getBoolean("plcc_B_silent")) {
             StringBuilder sb = new StringBuilder();
-            sb.append("        Output RED folding graph files: ");
+            sb.append("          Output RED folding graph files: ");
             for(IMAGEFORMAT format : resultFilesByFormat.keySet()) {
                 sb.append("(").append(format.toString()).append(" => ").append(resultFilesByFormat.get(format)).append(") ");
             }
@@ -2740,7 +2742,7 @@ E	3	3	3
         
         if( ! Settings.getBoolean("plcc_B_silent")) {
             StringBuilder sb = new StringBuilder();
-            sb.append("        Output SEQ folding graph files: ");
+            sb.append("          Output SEQ folding graph files: ");
             for(IMAGEFORMAT format : resultFilesByFormat.keySet()) {
                 sb.append("(").append(format.toString()).append(" => ").append(resultFilesByFormat.get(format)).append(") ");
             }
@@ -2763,12 +2765,24 @@ E	3	3	3
         
         if( ! pnfr.getFoldingGraph().supportsKeyNotation()) {
             // graph is bifurcated or has no spat order, KEY not supported
-            System.out.println("        Output KEY folding graph files: none, FG does not support KEY notation.");
+            System.out.println("          Output KEY folding graph files: none, FG does not support KEY notation.");
             return resultFilesByFormat;
-        }
+        } 
         
         /*
         boolean debug = true;
+        
+        if(debug) {
+            FoldingGraph fg = pnfr.getFoldingGraph();
+            if(fg.supportsKeyNotation()) {
+                if(pnfr.getFoldingGraph().getSize() >= 4) {
+                    System.err.println("DEBUG: Found large KEY-supporting FG: " + fg.pdbid + " chain " + fg.chainid + " " + fg.graphType + " #" + fg.getFoldingGraphNumber() + " has size " + fg.getSize() + ".");
+                }
+            }
+        }
+        */
+        
+        /*        
         if(debug) {
             FoldingGraph fg = pnfr.getFoldingGraph();
             if(fg.pdbid.equals("7tim") && fg.chainid.equals("A") && fg.graphType.equals("alpha")) {
@@ -3338,7 +3352,7 @@ E	3	3	3
      * @param widthTail The width of the arrow at the tail
      * @param widthHead The width of the arrow at the broadest part of the head. Note that widthHead > widthTail is required if this is meant to make sense.
      */
-    protected Polygon getArrowPolygon(int headY, int tailX, int tailY, int widthTail, int widthHead, int lengthHead) {
+    protected static Polygon getArrowPolygon(int headY, int tailX, int tailY, int widthTail, int widthHead, int lengthHead) {
         
         int numPoints = 7;
         int[] xPoints = new int[numPoints] ;
@@ -3390,7 +3404,7 @@ E	3	3	3
      * @param headY The y location of the "head" of the barrel
      * @param width The width of the barrel
      */
-    protected Polygon getBarrelPolygon(int headX, int headY, int tailX, int tailY, int width) {
+    protected static Polygon getBarrelPolygon(int headX, int headY, int tailX, int tailY, int width) {
         
         int numPoints = 4;
         
@@ -3424,7 +3438,7 @@ E	3	3	3
      * Just a helper function that sets default values for the width of the barrel.
      * See getBarrelPolygon() for details on the other parameters.
      */
-    protected Polygon getDefaultBarrelPolygon(int headY, int bothX, int tailY) {
+    protected static Polygon getDefaultBarrelPolygon(int headY, int bothX, int tailY) {
         
         int defaultWidth = 10;
         
@@ -3436,7 +3450,7 @@ E	3	3	3
     /**
      * Just a helper function that sets default values for the width of the arrow. See the first 3 parameters of the drawOutlinedArrow() function for parameter explanation. 
      */
-    protected Polygon getDefaultArrowPolygon(int headY, int bothX, int tailY) {
+    protected static Polygon getDefaultArrowPolygon(int headY, int bothX, int tailY) {
         
         int defaultWidthTail = 10;
         int defaultWidthHead = 20;
@@ -4759,6 +4773,8 @@ E	3	3	3
      * See http://ptgl.uni-frankfurt.de/cgi-bin/showpict.pl?topology=a&rep=3&protlist=7timA+7timB+&nmrlist=
      * and http://ptgl.uni-frankfurt.de/ptglhelp.html#key
      * 
+     * See the KEY beta FG #3 of 1GOS chain A as an example.
+     * 
      * @param pnfr a folding graph notation result
 
      * @return the DrawResult. You can write this to a file or whatever.
@@ -4797,7 +4813,8 @@ E	3	3	3
         
         // All these values are in pixels
         // page setup
-        PageLayout pl = new PageLayout(numVerts);        
+        PageLayout pl = new PageLayout(numVerts);     
+        pl.isForKEY = true;
         Position2D vertStart = pl.getVertStart();
         Integer lineHeight = pl.textLineHeight;      
         
@@ -5030,125 +5047,86 @@ E	3	3	3
             }
 
             
-            ig2.setStroke(new BasicStroke(1));
-
+            ig2.setStroke(new BasicStroke(1));                                                      
+            // Draw the vertices as arrows or barrels (depending on the type)
+            Polygon p;
             
-            
-            
-            // Draw the edges as arcs
-            Integer k,l;
+            // prepare rotation of canvas            
+            AffineTransform origXform = ig2.getTransform();
+            AffineTransform newXform;                                
+            int rotationCenterX, rotationCenterY;
+            int angle = 180;
             java.awt.Shape shape;
-            Arc2D.Double arc;
-            ig2.setStroke(new BasicStroke(2));  // thin edges
-            Integer leftVert, rightVert, arcWidth, arcHeight, arcTopLeftX, arcTopLeftY;
-            for(Integer i = startVertexInParent; i <= endVertexInParent; i++) {
-                for(Integer j = i + 1; j <= endVertexInParent; j++) {
-
-                    
-                    k = parentVertexPosInFG.get(i);
-                    l = parentVertexPosInFG.get(j);
-                    if(k < 0 || l < 0) {
-                        continue;
-                    }
-                    
-                    // If there is a contact...
-                    if(fg.containsEdge(k, l)) {
-
-                        // determine edge type and the resulting color
-                        edgeType = fg.getContactType(k, l);
-                        if(edgeType.equals(SpatRel.PARALLEL)) { ig2.setPaint(Color.RED); }
-                        else if(edgeType.equals(SpatRel.ANTIPARALLEL)) { ig2.setPaint(Color.BLUE); }
-                        else if(edgeType.equals(SpatRel.MIXED)) { ig2.setPaint(Color.GREEN); }
-                        else if(edgeType.equals(SpatRel.LIGAND)) { ig2.setPaint(Color.MAGENTA); }
-                        else if(edgeType.equals(SpatRel.BACKBONE)) { ig2.setPaint(Color.ORANGE); }
-                        else { ig2.setPaint(Color.LIGHT_GRAY); }
-
-                        if(bw) { ig2.setPaint(Color.LIGHT_GRAY); }      // for non-protein graphs
-                                                
-
-                        // determine the center of the arc and the width of its rectangle bounding box
-                        //if(k < l) { leftVert = k; rightVert = l; }
-                        //else { leftVert = l; rightVert = k; }
-                        
-                        if(i < j) { leftVert = i; rightVert = j; }
-                        else { leftVert = j; rightVert = i; }
-                        
-                        leftVertPosX = pl.getVertStart().x + ((leftVert - shiftBack[leftVert]) * pl.vertDist);
-                        rightVertPosX = pl.getVertStart().x + ((rightVert - shiftBack[rightVert]) * pl.vertDist);
-
-                        arcWidth = rightVertPosX - leftVertPosX;
-                        arcHeight = arcWidth / 2;
-
-                        arcTopLeftX = leftVertPosX;
-                        arcTopLeftY = pl.getVertStart().y - arcHeight / 2;
-
-                        spacerX = pl.vertRadius;
-                        spacerY = 0;
-
-                        // draw it                                                
-                        arc = new Arc2D.Double(arcTopLeftX + spacerX, arcTopLeftY + spacerY, arcWidth, arcHeight, 0, 180, Arc2D.OPEN);
-                        shape = ig2.getStroke().createStrokedShape(arc);
-                        ig2.fill(shape);
-
-                    }
-                }
-            }
-
-            // Draw the vertices as circles
-            Ellipse2D.Double circle;
-            Rectangle2D.Double rect;
-            ig2.setStroke(new BasicStroke(2));
-            for(Integer i = startVertexInParent; i <= endVertexInParent; i++) {
-                
-                // pick color depending on SSE type
-                if(pg.sseList.get(i).isHelix()) { ig2.setPaint(Color.RED); }
-                else if(pg.sseList.get(i).isBetaStrand()) { ig2.setPaint(Color.BLACK); }
-                else if(pg.sseList.get(i).isLigandSSE()) { ig2.setPaint(Color.MAGENTA); }
-                else if(pg.sseList.get(i).isOtherSSE()) { ig2.setPaint(Color.GRAY); }
+            
+            
+            for(Integer s = 0; s < fg.sseList.size(); s++) {
+                Integer i = fg.spatOrder.get(s);
+                if(fg.sseList.get(i).isHelix()) { ig2.setPaint(Color.RED); }
+                else if(fg.sseList.get(i).isBetaStrand()) { ig2.setPaint(Color.BLACK); }
+                else if(fg.sseList.get(i).isLigandSSE()) { ig2.setPaint(Color.MAGENTA); }
+                else if(fg.sseList.get(i).isOtherSSE()) { ig2.setPaint(Color.GRAY); }
                 else { ig2.setPaint(Color.LIGHT_GRAY); }
-
-                Integer parentVertexPosInFoldingGraph = parentVertexPosInFG.get(i);
-                if(parentVertexPosInFoldingGraph < 0) {
-                    continue;
-                } 
                 
-                if(bw) { ig2.setPaint(Color.GRAY); }      // for non-protein graphs
+                Integer currentVertX = vertStartX + (i * vertDist);
+                Integer currentVertY = vertStartY;
                 
-                // draw a shape based on SSE type
-                                
-                
-                SSE sse = pg.getVertex(i);
-                if(sse.isBetaStrand()) {
-                    // beta strands are black, filled squares
-                    rect = new Rectangle2D.Double(vertStart.x + ((i-shiftBack[i]) * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
-                    ig2.fill(rect);
+                // draw it                                
+                if(fg.sseList.get(i).isHelix()) {
+                    //p = getDefaultArrowPolygon((vertStartY - vertHeight), currentVertX, currentVertY);
+                    p = getDefaultBarrelPolygon(vertStartY - vertHeight, vertStartX + (i * vertDist), vertStartY);
+                    //System.out.println("SSE is helix: " + this.sseList.get(i).longStringRep() + ", drawing with base position (" + (vertStartX + (i * vertDist)) + "," + vertStartY + ").");
                     
-                }
-                else if(sse.isLigandSSE()) {
-                    // ligands are magenta circles (non-filled)
-                    circle = new Ellipse2D.Double(vertStart.x + ((i-shiftBack[i]) * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
-                    //ig2.fill(circle);
-                    ig2.setStroke(new BasicStroke(3));  // this does NOT get filled, so give it a thicker border
-                    ig2.draw(circle);
-                    ig2.setStroke(new BasicStroke(2));
                 }
                 else {
-                    // helices and all others are filled circles (helices are red circles, all others are gray circles)
-                    circle = new Ellipse2D.Double(vertStart.x + ((i-shiftBack[i]) * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
-                    ig2.fill(circle);                    
+                    p = getDefaultArrowPolygon((vertStartY - vertHeight), currentVertX, currentVertY);
+                    //p = getDefaultBarrelPolygon((vertStartY - vertHeight), (vertStartX + (i * vertDist)), vertStartY);
+                    //System.out.println("SSE is NOT a helix: " + this.sseList.get(i).longStringRep() + ", drawing with base position (" + (vertStartX + (i * vertDist)) + "," + vertStartY + ").");
                 }
+                
+                shape = ig2.getStroke().createStrokedShape(p);
+                                
+                newXform = (AffineTransform)(origXform.clone());
+                // set rotation center to center of the current arrow / rectangle
+                rotationCenterX = (vertStartX + (i * vertDist));
+                rotationCenterY = vertStartY - (vertHeight / 2);
+                
+                // perform rotation
+                newXform.rotate(Math.toRadians(angle), rotationCenterX, rotationCenterY);
+                
+                if(Objects.equals(headingsSeqOrder[i], ORIENTATION_DOWNWARDS)) { 
+                    //ig2.rotate(Math.toRadians(180));                                         
+                    ig2.setTransform(newXform);
+                    //System.out.println("Rotating canvas before drawing SSE #" + i + " of the list.");
+                }
+                ig2.draw(shape);
+                if(Objects.equals(headingsSeqOrder[i], ORIENTATION_DOWNWARDS)) { 
+                    ig2.setTransform(origXform);
+                    //ig2.rotate(Math.toRadians(-180)); 
+                    //System.out.println("Rotating canvas back to normal after drawing SSE #" + i + " of the list.");
+                }
+                
+                
+                // draw the N or C terminus label under it if applicable
+                //Integer compareToTerminus = s;
+                Integer compareToTerminus = i;
+                Integer ssePos = s;
+                if( (Objects.equals(fg.closestToCTerminus(), compareToTerminus))  || (Objects.equals(fg.closestToNTerminus(), compareToTerminus)) ) {
+                    if(Objects.equals(fg.closestToCTerminus(), compareToTerminus)) {
+                        //System.out.println("    SSE # " + compareToTerminus + " (pos # " + ssePos + ") is closest to C terminus.");
+                        ig2.drawString("C", currentVertX, (currentVertY + 20));
+                    }
+                    
+                    if(Objects.equals(fg.closestToNTerminus(), compareToTerminus)) { 
+                        //System.out.println("    SSE # " + compareToTerminus + " (pos # " + ssePos + ")  is closest to N terminus.");
+                        ig2.drawString("N", currentVertX, (currentVertY + 20));
+                    }      
+                    
+                }
+                
+                
+                
             }
             
-            // Draw the markers for the N-terminus and C-terminus if there are any vertices in this graph            
-            ig2.setStroke(new BasicStroke(2));
-            ig2.setPaint(Color.BLACK);
-            
-            if( ! bw) {
-                if(fg.getSize() > 0) {                    
-                    ig2.drawString("N", vertStart.x - pl.vertDist, vertStart.y + 20);    // N terminus label
-                    ig2.drawString("C", vertStart.x + numVerts * pl.vertDist, vertStart.y + 20);  // C terminus label
-                }
-            }
                         
             // ************************************* footer **************************************
             

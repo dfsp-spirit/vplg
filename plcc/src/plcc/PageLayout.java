@@ -45,6 +45,7 @@ public class PageLayout {
     
     // must not be changed after constructor
     private Integer numVerts;
+    public Boolean isForKEY;
     
     /**
      * Constructor. The margins are no set with this constructor, unless you set them later, the defaults from
@@ -76,7 +77,7 @@ public class PageLayout {
         
         this.vertDist = Settings.getInteger("plcc_I_img_vert_dist");
         this.vertRadius = Settings.getInteger("plcc_I_img_vert_radius");
-        
+        this.isForKEY = false;
         
         
     }
@@ -154,6 +155,11 @@ public class PageLayout {
      */
     public Integer getMaxArcHeight() {
         Integer h = this.getMaxVertDist() / 4;
+        
+        if(this.isForKEY) {
+            h = 130;
+        }
+        
         Integer min = Settings.getInteger("plcc_I_img_min_arc_height");
         return(h < min ? min : h);    
     }
