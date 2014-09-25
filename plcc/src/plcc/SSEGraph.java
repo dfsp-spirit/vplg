@@ -4810,14 +4810,17 @@ E	3	3	3
         
         
         
-        /** The KEY start vertex -- this is NOT the left-most vertex. It is the vertex closest to the N-terminus with degree 1. Note that this is the index in the FG, not in the PG. */
+        /** The KEY start vertex -- this is NOT the left-most vertex. It is the vertex closest to the N-terminus with degree 1. Note that this is the index in the FG, not in the PG. */        
         Integer keystartFGIndex = pnfr.keyStart;
         fg.computeSpatialVertexOrdering();
         List<Integer> keyposFGIndicesSpatOrder = fg.spatOrder;
         
+        
         if(keyposFGIndicesSpatOrder.size() != fg.getSize()) {
             DP.getInstance().e("SSEGraph", "Spatorder size of FG does not match FG size.");
         }
+        /** The vertex closest to C */
+        Integer keyendFGIndex = keyposFGIndicesSpatOrder.get(fg.getSize() - 1);
         
         System.out.println("keyposFGIndicesSpatOrder=" + IO.intListToString(keyposFGIndicesSpatOrder));
                
@@ -4974,6 +4977,32 @@ E	3	3	3
             Integer iSpatIndex, jSpatIndex;
             Boolean startUpwards;
             ig2.setStroke(new BasicStroke(1));
+            
+            if(keyposFGIndices.size() > 1) {
+                
+                for(int i = 1; i < keyposFGIndicesSpatOrder.size(); i++) {
+                                        
+                    currentVert = keyposFGIndicesSpatOrder.get(i);
+                    lastVert = keyposFGIndicesSpatOrder.get(i-1);
+                    
+                    Integer spatRel = fg.getContactType(lastVert, currentVert);
+                    
+                    if(Objects.equals(spatRel, SpatRel.PARALLEL)) {
+                        // keep orientation
+                        orientationsSpatOrder[i] = orientationsSpatOrder[i-1];
+                        orientationsSeqOrder[currentVert] = orientationsSpatOrder[i];
+                    }                    
+                    else {                                                                
+                        // all other spatial relations, e.g. SpatRel.ANTIPARALLEL, SpatRel.LIGAND, SpatRel.BACKBONE and SpatRel.MIXED: invert orientation
+                        orientationsSpatOrder[i] = (Objects.equals(orientationsSpatOrder[i-1], FoldingGraph.ORIENTATION_UPWARDS) ? FoldingGraph.ORIENTATION_DOWNWARDS : FoldingGraph.ORIENTATION_UPWARDS);
+                        orientationsSeqOrder[currentVert] = orientationsSpatOrder[i];
+                    }
+                    
+                }                                                              
+                
+            }
+            
+            /*
             if(fg.numEdges() > 0) {                          
                 for(Integer i = 0; i < fg.sseList.size(); i++) {
                     for(Integer j = i + 1; j < fg.sseList.size(); j++) {
@@ -5070,7 +5099,7 @@ E	3	3	3
                     }
                 }
             }
-
+            */
             
             ig2.setStroke(new BasicStroke(1));                                                      
             // Draw the vertices as arrows or barrels (depending on the type)
@@ -5146,6 +5175,12 @@ E	3	3	3
                         ig2.drawString("N", currentVertX, (currentVertY + 20));
                     }      
                     
+                }
+                if(Objects.equals(s, 0)) { 
+                    //System.out.println("    SSE # " + compareToTerminus + " (pos # " + ssePos + ")  is closest to N terminus.");
+                    int spacerPotN = fontMetrics.charWidth('N') + 1; // spacer, this is to prevent drawing the N and S on top of each other if they are in the same place
+                    
+                    ig2.drawString("S", currentVertX + spacerPotN, (currentVertY + 20));
                 }
                 
                 
