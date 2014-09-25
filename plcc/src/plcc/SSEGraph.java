@@ -4804,24 +4804,29 @@ E	3	3	3
         Integer leftMostVertexInParent = fg.getMinimalVertexIndexInParentGraph();
         Integer rightMostVertexInParent = fg.getMaximalVertexIndexInParentGraph();
         
-        List<Integer> keypos = pnfr.keypos;
-        Integer keystart = pnfr.keyStart;
-        assert keystart.equals(keypos.get(0));
-        DP.getInstance().d("keystart=" + keystart + ". keypos=" + IO.intListToString(keypos));
+        List<Integer> keyposParentIndicesSeqOrder = pnfr.keypos;
+        DP.getInstance().d("keyposParentIndicesSeqOrder (size=" + keyposParentIndicesSeqOrder.size()+ "): " + IO.intListToString(keyposParentIndicesSeqOrder));
+        
+        
+        
+        
+        /** The KEY start vertex -- this is NOT the left-most vertex. It is the vertex closest to the N-terminus with degree 1. Note that this is the index in the FG, not in the PG. */
+        Integer keystartFGIndex = pnfr.keyStart;
+        fg.computeSpatialVertexOrdering();
+        List<Integer> keyposFGIndicesSpatOrder = fg.spatOrder;
+        
+        if(keyposFGIndicesSpatOrder.size() != fg.getSize()) {
+            DP.getInstance().e("SSEGraph", "Spatorder size of FG does not match FG size.");
+        }
+        
+        System.out.println("keyposFGIndicesSpatOrder=" + IO.intListToString(keyposFGIndicesSpatOrder));
+               
+
+        DP.getInstance().d("keystart(FG index)=" + keystartFGIndex + ". keypos parent seq=" + IO.intListToString(keyposParentIndicesSeqOrder));
                 
         
         List<Integer> fgVertexPosInParent = fg.getVertexIndexListInParentGraph();
-        List<Integer> parentVertexPosInFG = ProtGraph.computeParentGraphVertexPositionsInFoldingGraph(fgVertexPosInParent, pg.size);
-        
-        // compute the shiftBack array
-        Integer[] shiftBack = new Integer[pg.size];    // how many vertices we skipped on the left at which position
-        Integer shift = 0;
-        for(int i = 0; i < parentVertexPosInFG.size(); i++) {
-            if(parentVertexPosInFG.get(i) < 0) {
-                shift++;
-            }
-            shiftBack[i] = shift;
-        }
+        List<Integer> parentVertexPosInFG = ProtGraph.computeParentGraphVertexPositionsInFoldingGraph(fgVertexPosInParent, pg.size);                
         
         Integer numVerts = fg.getSize();
 
@@ -4896,69 +4901,71 @@ E	3	3	3
                 //ig2.drawString(order, pl.headerStart.x, pl.headerStart.y + (lineHeight * 2));
             }
 
+            // compute the shiftBack array
+            Integer[] shiftBack = new Integer[pg.size];    // how many vertices we skipped on the left at which position
+            Integer shift = 0;
+            for(int i = 0; i < parentVertexPosInFG.size(); i++) {
+                if(parentVertexPosInFG.get(i) < 0) {
+                    shift++;
+                }
+                shiftBack[i] = shift;
+            }
             // ------------------------- Draw the graph -------------------------
+                                                            
+            // determine the orientations of the vertices in the image (up/down). if two adjacent SSEs are parallel, they point in the same direction in the image. if they are antiparallel, they point into different directions.
+            Integer[] orientationsSpatOrder = new Integer[fg.size];    // the heading of the vertex in the image (UP or DOWN). This is in the order of spatOrder variable, not the the original vertex list in the SSEList variable.
+            Integer[] orientationsSeqOrder = new Integer[fg.size];            
             
+            List<Integer> keyposFGIndices = new ArrayList<>();
+            DP.getInstance().d("SSEGraph", "parentVertexPosInFG=" + IO.intListToString(parentVertexPosInFG) + ".");
+            Integer v;
+            for(int i = 0; i < keyposParentIndicesSeqOrder.size(); i++) {
+                v = parentVertexPosInFG.get(keyposParentIndicesSeqOrder.get(i));
+                if(v < 0) { 
+                    DP.getInstance().e("SSEGRaph", "Keypos parent index #" + i + " is " + v + ", skipping.");
+                } else {
+                    keyposFGIndices.add(v);
+                }
+            }
             
+            DP.getInstance().d("keyposFGIndices=" + IO.intListToString(keyposFGIndices));
             
+            //assert keyposFGIndices.size() == fg.size;
+            if(keyposFGIndices.size() != fg.getSize()) {
+                DP.getInstance().e("SSEGRaph", "keyposFGIndices.size()=" + keyposFGIndices.size() + ", fg.size=" + fg.size + ".");
+            }
             
-            
-            // determine the headings of the vertices in the image. if two adjacent SSEs are parallel, they point in the same direction in the image. if they are antiparallel, they point into different directions.
-            Integer[] headingsSpatOrder = new Integer[fg.size];    // the heading of the vertex in the image (UP or DOWN). This is in the order of spatOrder variable, not the the original vertex list in the SSEList variable.
-            Integer[] headingsSeqOrder = new Integer[fg.size];
-            headingsSpatOrder[0] = FoldingGraph.ORIENTATION_UPWARDS;  // heading of the 1st vertex is up by definition (it has no predecessor)
+            Integer firstVertexSpatFGIndex = keystartFGIndex;
+            orientationsSpatOrder[0] = FoldingGraph.ORIENTATION_UPWARDS;  // heading of the 1st vertex is up by definition (it has no predecessor)
+            orientationsSeqOrder[firstVertexSpatFGIndex] = FoldingGraph.ORIENTATION_UPWARDS;
                                   
-           
-            if(fg.size > 1) {
+            Integer currentVert, lastVert;
+            if(keyposFGIndices.size() > 1) {
                 
-                for(Integer spatPos = 1; spatPos < fg.size; spatPos++) {
-                    Integer sseSeqIndex = fg.getSSESeqIndexatSpatOrderPosition(spatPos);
-                    Integer lastsseSeqIndex = fg.getSSESeqIndexatSpatOrderPosition(spatPos - 1);
+                for(int i = 1; i < keyposFGIndicesSpatOrder.size(); i++) {
+                                        
+                    currentVert = keyposFGIndicesSpatOrder.get(i);
+                    lastVert = keyposFGIndicesSpatOrder.get(i-1);
                     
-                    if(sseSeqIndex == null || lastsseSeqIndex == null) {
-                        System.out.println("DEBUG: spatPos=" + spatPos + ", sseSeqIndex=" + sseSeqIndex + ", lastsseSeqIndex=" + lastsseSeqIndex + ".");
-                    }
+                    Integer spatRel = fg.getContactType(lastVert, currentVert);
                     
-                    Integer spatRel = fg.getContactType(sseSeqIndex, lastsseSeqIndex);
-                    
-                    if(spatRel == SpatRel.PARALLEL) {
+                    if(Objects.equals(spatRel, SpatRel.PARALLEL)) {
                         // keep orientation
-                        headingsSpatOrder[spatPos] = headingsSpatOrder[spatPos-1];
-                    }
-                    else if(spatRel == SpatRel.NONE) {
-                        // should never happen
-                        headingsSpatOrder[spatPos] = headingsSpatOrder[spatPos-1];    // whatever
-                        //System.err.println("WARNING: Vertices at indices " + sseSeqIndex + " and " + lastsseSeqIndex + " without contact are considered neighbors in the graph.");
-                        //System.err.println("WARNING: SSE " + sseSeqIndex + ": " + this.getVertex(sseSeqIndex).longStringRep() + ", SSE " + lastsseSeqIndex + ": " + this.getVertex(lastsseSeqIndex).longStringRep() + ".");
-                        
-                        //System.exit(1);
-                    }
-                    else {
+                        orientationsSpatOrder[i] = orientationsSpatOrder[i-1];
+                        orientationsSeqOrder[currentVert] = orientationsSpatOrder[i];
+                    }                    
+                    else {                                                                
                         // all other spatial relations, e.g. SpatRel.ANTIPARALLEL, SpatRel.LIGAND, SpatRel.BACKBONE and SpatRel.MIXED: invert orientation
-                        headingsSpatOrder[spatPos] = (headingsSpatOrder[spatPos-1] == FoldingGraph.ORIENTATION_UPWARDS ? FoldingGraph.ORIENTATION_DOWNWARDS : FoldingGraph.ORIENTATION_UPWARDS);
-                    }                
-                }
+                        orientationsSpatOrder[i] = (Objects.equals(orientationsSpatOrder[i-1], FoldingGraph.ORIENTATION_UPWARDS) ? FoldingGraph.ORIENTATION_DOWNWARDS : FoldingGraph.ORIENTATION_UPWARDS);
+                        orientationsSeqOrder[currentVert] = orientationsSpatOrder[i];
+                    }
+                    
+                }                                                              
                 
-                // copy from spatOrder to seqOrder array
-                Integer seqIndex;
-                for(Integer i = 0; i < fg.getSize(); i++) {
-                    seqIndex = fg.spatOrder.get(i);
-                    headingsSeqOrder[seqIndex] = headingsSpatOrder[i];
-                }
-                
-                // DEBUG output
-                /*
-                System.out.println("DEBUG: " + this.toShortString() );
-                System.out.println("DEBUG: SpatOrder: " + IO.intArrayListToString(this.spatOrder) );
-                System.out.println("DEBUG: SpatHeadg: " + IO.intArrayToString(headingsSpatOrder) );
-                System.out.println("DEBUG: SeqHeadng: " + IO.intArrayToString(headingsSeqOrder) );                
-                String neighbors = "DEBUG: SeqDegree: ";
-                for(Integer i = 0; i < this.getSize(); i++) {
-                    neighbors += this.degreeOfVertex(i) + " ";
-                }
-                System.out.println(neighbors);
-                */
-                
-            }                                    
+            }      
+            
+            System.out.println("orientationsSpatOrder=" + IO.intArrayToString(orientationsSpatOrder));
+            System.out.println("orientationsSeqOrder=" + IO.intArrayToString(orientationsSeqOrder));
             
             
             
@@ -5028,7 +5035,7 @@ E	3	3	3
                             
                             //System.out.print("Contact " + i + "," + j + " (left is " + leftVertSeq + "[spat:" + this.getSpatOrderIndexOfSSE(leftVertSeq) + "], right is " + rightVertSeq + "[spat:" + this.getSpatOrderIndexOfSSE(rightVertSeq) + "]): ");
                             
-                            if(headingsSeqOrder[leftVertSeq] == FoldingGraph.ORIENTATION_UPWARDS) {
+                            if(Objects.equals(orientationsSeqOrder[leftVertSeq], FoldingGraph.ORIENTATION_UPWARDS)) {
                                 // the left vertex points upwards, so the arc should start at its top
                                 leftVertPosY = vertStartY - vertHeight;
                                 startUpwards = true;
@@ -5041,7 +5048,7 @@ E	3	3	3
                                 //System.out.print("leftVert starts downwards, ");
                             }
                             
-                            if(headingsSeqOrder[rightVertSeq] == FoldingGraph.ORIENTATION_UPWARDS) {
+                            if(Objects.equals(orientationsSeqOrder[rightVertSeq], FoldingGraph.ORIENTATION_UPWARDS)) {
                                 // the right vertex points upwards, so the arc should end at its bottom
                                 rightVertPosY = vertStartY;
                                 //System.out.print("rightVert starts upwards. ");
@@ -5111,13 +5118,13 @@ E	3	3	3
                 // perform rotation
                 newXform.rotate(Math.toRadians(angle), rotationCenterX, rotationCenterY);
                 
-                if(Objects.equals(headingsSeqOrder[i], ORIENTATION_DOWNWARDS)) { 
+                if(Objects.equals(orientationsSeqOrder[i], ORIENTATION_DOWNWARDS)) { 
                     //ig2.rotate(Math.toRadians(180));                                         
                     ig2.setTransform(newXform);
                     //System.out.println("Rotating canvas before drawing SSE #" + i + " of the list.");
                 }
                 ig2.draw(shape);
-                if(Objects.equals(headingsSeqOrder[i], ORIENTATION_DOWNWARDS)) { 
+                if(Objects.equals(orientationsSeqOrder[i], ORIENTATION_DOWNWARDS)) { 
                     ig2.setTransform(origXform);
                     //ig2.rotate(Math.toRadians(-180)); 
                     //System.out.println("Rotating canvas back to normal after drawing SSE #" + i + " of the list.");

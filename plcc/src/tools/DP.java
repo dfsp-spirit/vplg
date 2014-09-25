@@ -160,6 +160,14 @@ public class DP {
         System.out.println(DP.appTag + DP.debugTag + msg);
     }
     
+    /**
+     * Prints a debug message. Newline is added at the end.
+     * @param msg the message to print
+     */
+    public void d(String srcTag, String msg) {
+        System.out.println(DP.appTag + DP.debugTag + "[" + srcTag + "] " + msg);
+    }
+    
     
     public void flush() {
         // placeholder function for backwards compatibility only, does nothing
