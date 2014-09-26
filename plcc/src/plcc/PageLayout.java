@@ -157,7 +157,7 @@ public class PageLayout {
         Integer h = this.getMaxVertDist() / 4;
         
         if(this.isForKEY) {
-            h = 130;
+            h = (this.getMaxVertDist() / 4) + 100;
         }
         
         Integer min = Settings.getInteger("plcc_I_img_min_arc_height");

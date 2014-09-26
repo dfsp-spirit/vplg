@@ -2576,7 +2576,7 @@ public class Main {
                 } else {
                     // FG too small
                     if(! silent) {
-                        System.out.println("        Not dawing any of the " + notations.size() + " notations of the " + pg.getGraphType() + " FG #" + j + " (fg_number=" + fg_number + "): size is " + fg.getSize() +", min is " + Settings.getInteger("plcc_I_min_fgraph_size_draw") + ".");
+                        System.out.println("        Not drawing any of the " + notations.size() + " notations of the " + pg.getGraphType() + " FG #" + j + " (fg_number=" + fg_number + "): size is " + fg.getSize() +", min is " + Settings.getInteger("plcc_I_min_fgraph_size_draw") + ".");
                     }
                 }
                 

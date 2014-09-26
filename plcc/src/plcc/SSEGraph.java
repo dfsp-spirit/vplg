@@ -768,11 +768,43 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         ig2.drawString(label, pixelPosX, startPos.y);
         pixelPosX += fontMetrics.stringWidth(label) + spacer;        
         
+        if(Settings.getBoolean("plcc_B_key_foldinggraph_arcs_allways_black")) {
+            label = "contact";
+            ig2.setPaint(Color.BLACK);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
+        else {
         
-        label = "seq_distance";
-        ig2.setPaint(Color.BLACK);
-        ig2.drawString(label, pixelPosX, startPos.y);
-        pixelPosX += fontMetrics.stringWidth(label) + spacer;
+            // now go through relative orientation texts and colors        
+            if(g.containsContactTypeParallel() || drawAll) {
+                label = "parallel";
+                ig2.setPaint(Color.RED);
+                ig2.drawString(label, pixelPosX, startPos.y);
+                pixelPosX += fontMetrics.stringWidth(label) + spacer;
+            }
+
+            if(g.containsContactTypeAntiparallel() || drawAll) {
+                label = "antiparallel";
+                ig2.setPaint(Color.BLUE);
+                ig2.drawString(label, pixelPosX, startPos.y);
+                pixelPosX += fontMetrics.stringWidth(label) + spacer;
+            }
+
+            if(g.containsContactTypeMixed() || drawAll) {
+                label = "mixed";
+                ig2.setPaint(Color.GREEN);
+                ig2.drawString(label, pixelPosX, startPos.y);
+                pixelPosX += fontMetrics.stringWidth(label) + spacer;
+            }
+
+            if(g.containsContactTypeLigand() || drawAll) {
+                label = "ligand";
+                ig2.setPaint(Color.MAGENTA);
+                ig2.drawString(label, pixelPosX, startPos.y);
+                pixelPosX += fontMetrics.stringWidth(label) + spacer;
+            }
+        }
                                         
         
         // End of edge labels        
@@ -783,6 +815,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         
         
         // Vertices label
+        ig2.setPaint(Color.BLACK);
         if(g.numVertices() > 0) {
             label = " [Vertices: ";
             ig2.setPaint(Color.BLACK);
@@ -792,32 +825,36 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         
         // ok, now draw the SSE symbols     
         if(g.containsSSETypeHelix() || drawAll) {
-            g.drawSymbolAlphaHelix(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
-            pixelPosX += vertWidth + spacer;
+            //g.drawSymbolAlphaHelix(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+            //pixelPosX += vertWidth + spacer;
             label = "helix";
+            ig2.setPaint(Color.RED);
             ig2.drawString(label, pixelPosX, startPos.y);
             pixelPosX += fontMetrics.stringWidth(label) + spacer;
         }
         
         if(g.containsSSETypeBetaStrand() || drawAll) {
-            g.drawSymbolBetaStrand(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
-            pixelPosX += vertWidth + spacer;
+            //g.drawSymbolBetaStrand(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+            //pixelPosX += vertWidth + spacer;
             label = "strand";
+            ig2.setPaint(Color.BLACK);
             ig2.drawString(label, pixelPosX, startPos.y);
             pixelPosX += fontMetrics.stringWidth(label) + spacer;
         }
         
         if(g.containsSSETypeLigand() || drawAll) {
-            g.drawSymbolLigand(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
-            pixelPosX += vertWidth + spacer;
+            //g.drawSymbolLigand(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+            //pixelPosX += vertWidth + spacer;
+            ig2.setPaint(Color.MAGENTA);
             label = "ligand";
             ig2.drawString(label, pixelPosX, startPos.y);
             pixelPosX += fontMetrics.stringWidth(label) + spacer;
         }
         
         if(g.containsSSETypeOther() || drawAll) {
-            g.drawSymbolOtherSSE(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
-            pixelPosX += vertWidth + spacer;
+            //g.drawSymbolOtherSSE(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+            //pixelPosX += vertWidth + spacer;
+            ig2.setPaint(Color.GRAY);
             label = "other";
             ig2.drawString(label, pixelPosX, startPos.y);
             pixelPosX += fontMetrics.stringWidth(label) + spacer;        
@@ -4329,7 +4366,7 @@ E	3	3	3
 
             // check width of header string
             String proteinHeader = "The ADJ " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
-            String notation = "ADJ notation: '" + pnfr.adjNotation + "' (svip=" + (pnfr.adjStart + 1) + ")";
+            String notation = "ADJ notation: '" + pnfr.adjNotation + "'";
             //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
             Integer stringHeight = fontMetrics.getAscent();
             String sseNumberSeq;    // the SSE number in the primary structure, N to C terminus
@@ -4590,7 +4627,7 @@ E	3	3	3
 
             // check width of header string
             String proteinHeader = "The RED " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
-            String notation = "RED notation: '" + pnfr.redNotation + "' (svip=" + (pnfr.redStart + 1) + ")";
+            String notation = "RED notation: '" + pnfr.redNotation + "'";
             //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
             Integer stringHeight = fontMetrics.getAscent();
             String sseNumberSeq;    // the SSE number in the primary structure, N to C terminus
@@ -4805,7 +4842,7 @@ E	3	3	3
         Integer rightMostVertexInParent = fg.getMaximalVertexIndexInParentGraph();
         
         List<Integer> keyposParentIndicesSeqOrder = pnfr.keypos;
-        DP.getInstance().d("keyposParentIndicesSeqOrder (size=" + keyposParentIndicesSeqOrder.size()+ "): " + IO.intListToString(keyposParentIndicesSeqOrder));
+        //DP.getInstance().d("keyposParentIndicesSeqOrder (size=" + keyposParentIndicesSeqOrder.size()+ "): " + IO.intListToString(keyposParentIndicesSeqOrder));
         
         
         
@@ -4822,7 +4859,7 @@ E	3	3	3
         /** The vertex closest to C */
         Integer keyendFGIndex = keyposFGIndicesSpatOrder.get(fg.getSize() - 1);
         
-        DP.getInstance().d("keyposFGIndicesSpatOrder=" + IO.intListToString(keyposFGIndicesSpatOrder));
+        //DP.getInstance().d("keyposFGIndicesSpatOrder=" + IO.intListToString(keyposFGIndicesSpatOrder));
         
         // compute relative key distances
         List<Integer> spatOrderseqDistToPrevious = new ArrayList<>();
@@ -4835,9 +4872,9 @@ E	3	3	3
             spatPosLast = keyposFGIndicesSpatOrder.indexOf(last);
             spatOrderseqDistToPrevious.add(spatPosCur - spatPosLast);
         }
-        DP.getInstance().d("relative spat distances: " + IO.intListToString(spatOrderseqDistToPrevious));
+        //DP.getInstance().d("relative spat distances: " + IO.intListToString(spatOrderseqDistToPrevious));
 
-        DP.getInstance().d("keystart(FG index)=" + keystartFGIndex + ". keypos parent seq=" + IO.intListToString(keyposParentIndicesSeqOrder));
+        //DP.getInstance().d("keystart(FG index)=" + keystartFGIndex + ". keypos parent seq=" + IO.intListToString(keyposParentIndicesSeqOrder));
                 
         
         List<Integer> fgVertexPosInParent = fg.getVertexIndexListInParentGraph();
@@ -4891,6 +4928,8 @@ E	3	3	3
             ig2.setPaint(Color.WHITE);
             ig2.fillRect(0, 0, pl.getPageWidth(), pl.getPageHeight());
             ig2.setPaint(Color.BLACK);
+            
+            
 
             //pl.drawAreaOutlines(ig2);
             // prepare font
@@ -4902,7 +4941,7 @@ E	3	3	3
 
             // check width of header string
             String proteinHeader = "The KEY " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
-            String notation = "KEY notation: '" + pnfr.keyNotation + "' (svip=" + (pnfr.keyStart < 0 ? "-" : pnfr.keyStart + 1) + ")";
+            String notation = "KEY notation: '" + pnfr.keyNotation + "'";
             //String order = "Order in parent:"; for(Integer i : pnfr.keypos) { order += (" " + (i + 1)); }
             //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
             Integer stringHeight = fontMetrics.getAscent();
@@ -4926,13 +4965,21 @@ E	3	3	3
                 shiftBack[i] = shift;
             }
             // ------------------------- Draw the graph -------------------------
+            
+            
+            if( ! bw) {
+                if(fg.getSize() > 0) {                    
+                    ig2.drawString("N", vertStart.x - pl.vertDist, vertStart.y + 20);    // N terminus label
+                    ig2.drawString("C", vertStart.x + numVerts * pl.vertDist, vertStart.y + 20);  // C terminus label
+                }
+            }
                                                             
             // determine the orientations of the vertices in the image (up/down). if two adjacent SSEs are parallel, they point in the same direction in the image. if they are antiparallel, they point into different directions.
             Integer[] orientationsSpatOrder = new Integer[fg.size];    // the heading of the vertex in the image (UP or DOWN). This is in the order of spatOrder variable, not the the original vertex list in the SSEList variable.
             Integer[] orientationsSeqOrder = new Integer[fg.size];            
             
             List<Integer> keyposFGIndices = new ArrayList<>();
-            DP.getInstance().d("SSEGraph", "parentVertexPosInFG=" + IO.intListToString(parentVertexPosInFG) + ".");
+            //DP.getInstance().d("SSEGraph", "parentVertexPosInFG=" + IO.intListToString(parentVertexPosInFG) + ".");
             Integer v;
             for(int i = 0; i < keyposParentIndicesSeqOrder.size(); i++) {
                 v = parentVertexPosInFG.get(keyposParentIndicesSeqOrder.get(i));
@@ -4943,7 +4990,7 @@ E	3	3	3
                 }
             }
             
-            DP.getInstance().d("keyposFGIndices=" + IO.intListToString(keyposFGIndices));
+            //DP.getInstance().d("keyposFGIndices=" + IO.intListToString(keyposFGIndices));
             
             //assert keyposFGIndices.size() == fg.size;
             if(keyposFGIndices.size() != fg.getSize()) {
@@ -4979,8 +5026,8 @@ E	3	3	3
                 
             }      
             
-            DP.getInstance().d("orientationsSpatOrder=" + IO.intArrayToString(orientationsSpatOrder));
-            DP.getInstance().d("orientationsSeqOrder=" + IO.intArrayToString(orientationsSeqOrder));
+            //DP.getInstance().d("orientationsSpatOrder=" + IO.intArrayToString(orientationsSpatOrder));
+            //DP.getInstance().d("orientationsSeqOrder=" + IO.intArrayToString(orientationsSeqOrder));
             
             
             
@@ -4999,7 +5046,7 @@ E	3	3	3
                     Integer spatRel = fg.getContactType(lastVert, currentVert);
                     relDrawDistToLast = spatOrderseqDistToPrevious.get(i);
                     
-                    DP.getInstance().d("DRAW_ARCS: i="+i+". current vert is " + currentVert + " with spatPos=" + i + " and seqPos=" + currentVert + ", lastVert is " + lastVert + " with spatPos=" + (i - 1) + " and seqPos=" + lastVert + ".spatRel = " + spatRel + ", relDrawDistToLast = " + relDrawDistToLast + ".");
+                    //DP.getInstance().d("DRAW_ARCS: i="+i+". current vert is " + currentVert + " with spatPos=" + i + " and seqPos=" + currentVert + ", lastVert is " + lastVert + " with spatPos=" + (i - 1) + " and seqPos=" + lastVert + ".spatRel = " + spatRel + ", relDrawDistToLast = " + relDrawDistToLast + ".");
                     
                     if(spatRel.equals(SpatRel.PARALLEL)) { ig2.setPaint(Color.RED); }
                     else if(spatRel.equals(SpatRel.ANTIPARALLEL)) { ig2.setPaint(Color.BLUE); }
@@ -5022,19 +5069,19 @@ E	3	3	3
                     // determine who is left and who is right
                     if(iSpatIndex < jSpatIndex) { 
                         leftVertSpat = iSpatIndex; 
-                        leftVertSeq = i; 
+                        leftVertSeq = currentVert; 
                         rightVertSpat = jSpatIndex; 
-                        rightVertSeq = j;
+                        rightVertSeq = lastVert;
                     }
                     else { 
                         leftVertSpat = jSpatIndex; 
-                        leftVertSeq = j;
+                        leftVertSeq = lastVert;
                         rightVertSpat = iSpatIndex;
-                        rightVertSeq = i;
+                        rightVertSeq = currentVert;
                     }
 
-                    leftVertPosX = vertStartX + (leftVertSpat * vertDist);      // center of the left vertex object (arrow or rectangle)
-                    rightVertPosX = vertStartX + (rightVertSpat * vertDist);    // center of the right...
+                    leftVertPosX = vertStartX + (leftVertSeq * vertDist);      // center of the left vertex object (arrow or rectangle)
+                    rightVertPosX = vertStartX + (rightVertSeq * vertDist);    // center of the right...
 
                     connWidth = rightVertPosX - leftVertPosX;                   // total width of the connector
                     connHeight = connWidth / 2;                                 // total height...
@@ -5058,24 +5105,24 @@ E	3	3	3
                         // the left vertex points upwards, so the arc should start at its top
                         leftVertPosY = vertStartY - vertHeight;
                         startUpwards = true;
-                        //System.out.print("leftVert starts upwards, ");
+                        //DP.getInstance().d("  leftVert " + leftVertSeq + " starts upwards, ");
                     }
                     else {
                         // the left vertex points downwards, so the arc should start at its bottom
                         leftVertPosY = vertStartY;
                         startUpwards = false;
-                        //System.out.print("leftVert starts downwards, ");
+                        //DP.getInstance().d("  leftVert " + leftVertSeq + " starts downwards, ");
                     }
 
                     if(Objects.equals(orientationsSeqOrder[rightVertSeq], FoldingGraph.ORIENTATION_UPWARDS)) {
                         // the right vertex points upwards, so the arc should end at its bottom
                         rightVertPosY = vertStartY;
-                        //System.out.print("rightVert starts upwards. ");
+                        //DP.getInstance().d("  rightVert " + rightVertSeq + " starts upwards. ");
                     }
                     else {
                         // the right vertex points downwards, so the arc should end at its top
                         rightVertPosY = vertStartY - vertHeight;
-                        //System.out.print("rightVert starts downpwards. ");
+                        //DP.getInstance().d("  rightVert " + rightVertSeq + " starts downpwards. ");
                     }
 
 
@@ -5089,104 +5136,7 @@ E	3	3	3
                 
             }
             
-            /*
-            if(fg.numEdges() > 0) {                          
-                for(Integer i = 0; i < fg.sseList.size(); i++) {
-                    for(Integer j = i + 1; j < fg.sseList.size(); j++) {
-
-                        // If there is a contact...
-                        if(fg.containsEdge(i, j)) {
-
-                            // determine edge type and the resulting color
-                            edgeType = fg.getContactType(i, j);
-                            if(edgeType.equals(SpatRel.PARALLEL)) { ig2.setPaint(Color.RED); }
-                            else if(edgeType.equals(SpatRel.ANTIPARALLEL)) { ig2.setPaint(Color.BLUE); }
-                            else if(edgeType.equals(SpatRel.MIXED)) { ig2.setPaint(Color.GREEN); }
-                            else if(edgeType.equals(SpatRel.LIGAND)) { ig2.setPaint(Color.MAGENTA); }
-                            else if(edgeType.equals(SpatRel.BACKBONE)) { ig2.setPaint(Color.ORANGE); }
-                            else { ig2.setPaint(Color.LIGHT_GRAY); }
-                            
-                            if(Settings.getBoolean("plcc_B_key_foldinggraph_arcs_allways_black")) {
-                                ig2.setPaint(Color.BLACK);
-                            }
-
-                            // determine the center of the arc and the width of its rectangle bounding box
-                            //iSpatIndex = spatOrder.get(i);
-                            //jSpatIndex = spatOrder.get(j);
-                            iSpatIndex = fg.getSpatOrderIndexOfSSE(i);
-                            jSpatIndex = fg.getSpatOrderIndexOfSSE(j);
-                            
-                            // determine who is left and who is right
-                            if(iSpatIndex < jSpatIndex) { 
-                                leftVertSpat = iSpatIndex; 
-                                leftVertSeq = i; 
-                                rightVertSpat = jSpatIndex; 
-                                rightVertSeq = j;
-                            }
-                            else { 
-                                leftVertSpat = jSpatIndex; 
-                                leftVertSeq = j;
-                                rightVertSpat = iSpatIndex;
-                                rightVertSeq = i;
-                            }
-                            
-                            leftVertPosX = vertStartX + (leftVertSpat * vertDist);      // center of the left vertex object (arrow or rectangle)
-                            rightVertPosX = vertStartX + (rightVertSpat * vertDist);    // center of the right...
-
-                            connWidth = rightVertPosX - leftVertPosX;                   // total width of the connector
-                            connHeight = connWidth / 2;                                 // total height...
-
-                            connCenterX = rightVertPosX - (connWidth / 2);      // the center of the connector, here we draw the line if it is required
-                            connCenterY = vertStartY - (connHeight / 2);
-
-                            connTopLeftX = leftVertPosX;                        // the upper left point of the connector, i.e., where it is connected to the left vertex object (if that vertex has to be connected at the upper end)                                                                
-                            connTopLeftY = vertStartY - (connHeight / 2);
-
-                            spacerX = vertWidth;
-                            spacerY = 0;
-
-                            
-                            // Determine the y axis positions where the connector should start (at the left vertex) and end (at the right vertex). This depends
-                            //  on whether the respective vertex points upwards or downwards.
-                            
-                            //System.out.print("Contact " + i + "," + j + " (left is " + leftVertSeq + "[spat:" + this.getSpatOrderIndexOfSSE(leftVertSeq) + "], right is " + rightVertSeq + "[spat:" + this.getSpatOrderIndexOfSSE(rightVertSeq) + "]): ");
-                            
-                            if(Objects.equals(orientationsSeqOrder[leftVertSeq], FoldingGraph.ORIENTATION_UPWARDS)) {
-                                // the left vertex points upwards, so the arc should start at its top
-                                leftVertPosY = vertStartY - vertHeight;
-                                startUpwards = true;
-                                //System.out.print("leftVert starts upwards, ");
-                            }
-                            else {
-                                // the left vertex points downwards, so the arc should start at its bottom
-                                leftVertPosY = vertStartY;
-                                startUpwards = false;
-                                //System.out.print("leftVert starts downwards, ");
-                            }
-                            
-                            if(Objects.equals(orientationsSeqOrder[rightVertSeq], FoldingGraph.ORIENTATION_UPWARDS)) {
-                                // the right vertex points upwards, so the arc should end at its bottom
-                                rightVertPosY = vertStartY;
-                                //System.out.print("rightVert starts upwards. ");
-                            }
-                            else {
-                                // the right vertex points downwards, so the arc should end at its top
-                                rightVertPosY = vertStartY - vertHeight;
-                                //System.out.print("rightVert starts downpwards. ");
-                            }
-                            
-                            
-                            // draw it        
-                            //System.out.print("Getting arc from " + leftVertPosX + "," + leftVertPosY + " to " + rightVertPosX + "," + rightVertPosY + ".\n");
-                            ArrayList<Shape> connShapes = FoldingGraph.getArcConnector(leftVertPosX, leftVertPosY, rightVertPosX, rightVertPosY, ig2.getStroke(), startUpwards);
-                            for(Shape s : connShapes) {
-                                ig2.draw(s);
-                            }                                                        
-                        }
-                    }
-                }
-            }
-            */
+            
             
             ig2.setStroke(new BasicStroke(1));                                                      
             // Draw the vertices as arrows or barrels (depending on the type)
@@ -5239,7 +5189,8 @@ E	3	3	3
                     ig2.setTransform(newXform);
                     //System.out.println("Rotating canvas before drawing SSE #" + i + " of the list.");
                 }
-                ig2.draw(shape);
+                ig2.draw(shape);    // for stroked version (border only, no fill)
+                ig2.fill(p);        // fill it completely
                 if(Objects.equals(orientationsSeqOrder[i], ORIENTATION_DOWNWARDS)) { 
                     ig2.setTransform(origXform);
                     //ig2.rotate(Math.toRadians(-180)); 
@@ -5251,6 +5202,7 @@ E	3	3	3
                 //Integer compareToTerminus = s;
                 Integer compareToTerminus = i;
                 Integer ssePos = s;
+                /*
                 if( (Objects.equals(fg.closestToCTerminus(), compareToTerminus))  || (Objects.equals(fg.closestToNTerminus(), compareToTerminus)) ) {
                     if(Objects.equals(fg.closestToCTerminus(), compareToTerminus)) {
                         //System.out.println("    SSE # " + compareToTerminus + " (pos # " + ssePos + ") is closest to C terminus.");
@@ -5263,15 +5215,18 @@ E	3	3	3
                     }      
                     
                 }
+                */
+                
                 if(Objects.equals(s, 0)) { 
+                    ig2.setPaint(Color.BLACK);
                     //System.out.println("    SSE # " + compareToTerminus + " (pos # " + ssePos + ")  is the KEY notation start (clostest to N with degee 1).");
                     int spacerPotN = fontMetrics.charWidth('N') + 1; // spacer, this is to prevent drawing the N and S on top of each other if they are in the same place
                     
-                    ig2.drawString("S", currentVertX + spacerPotN, (currentVertY + 20));
+                    ig2.drawString("S", currentVertX, (currentVertY + 20));
                 }
                 
-                // draw seq sse number
-                ig2.drawString("" + s, currentVertX, (currentVertY + 30));
+                // draw spat sse number
+                //ig2.drawString("" + s, currentVertX, (currentVertY + 40));
                 
                 
                 
@@ -5291,15 +5246,17 @@ E	3	3	3
 
                 // line markers: S for sequence order, G for graph order
                 
-                if(fg.getSize() > 0) {                                            
+                if(fg.getSize() > 0) {   
+                    ig2.setPaint(Color.BLACK);
                     ig2.drawString("FG", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (stringHeight / 4));
+                    ig2.setPaint(Color.LIGHT_GRAY);
                     ig2.drawString("SQ", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
                     ig2.drawString("PG", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + lineHeight + (stringHeight / 4));
+                    ig2.setPaint(Color.BLACK);
                 }
                 else {
                     ig2.drawString("(Graph has no vertices.)", pl.getFooterStart().x, pl.getFooterStart().y);
                 }
-
 
                 for(Integer i = leftMostVertexInParent; i <= rightMostVertexInParent; i++) {
                     
@@ -5315,9 +5272,12 @@ E	3	3	3
                         //stringWidth = fontMetrics.stringWidth(sseNumberSeq);
                         stringHeight = fontMetrics.getAscent();                                        
 
+                        ig2.setPaint(Color.BLACK);
                         ig2.drawString(sseNumberFoldingGraph, pl.getFooterStart().x + ((i-shiftBack[i]) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4));
+                        ig2.setPaint(Color.LIGHT_GRAY);
                         ig2.drawString(sseNumberSeq, pl.getFooterStart().x + ((i-shiftBack[i]) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + lineHeight + (stringHeight / 4));                    
                         ig2.drawString(sseNumberProteinGraph, pl.getFooterStart().x + ((i-shiftBack[i]) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight *2) + (stringHeight / 4));                                                                    
+                        ig2.setPaint(Color.BLACK);
                     }
                 }
 
@@ -5407,7 +5367,7 @@ E	3	3	3
 
             // check width of header string
             String proteinHeader = "The SEQ " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
-            String notation = "SEQ notation: '" + pnfr.seqNotation + "' (svip=" + (pnfr.seqStart + 1) + ")";
+            String notation = "SEQ notation: '" + pnfr.seqNotation + "'";
             //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
             Integer stringHeight = fontMetrics.getAscent();
             String sseNumberSeq;    // the SSE number in the primary structure, N to C terminus
