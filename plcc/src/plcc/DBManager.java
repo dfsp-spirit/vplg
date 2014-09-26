@@ -2773,7 +2773,8 @@ public class DBManager {
             return 0;
         }
 
-        String query = "UPDATE " + tbl_fglinnot + " SET " + graphImageFieldName + " = ? WHERE linnot_foldinggraph_id = ?;";
+        String query = "UPDATE " + tbl_fglinnot + " SET " + graphImageFieldName + " = ? WHERE linnot_foldinggraph_id = ?;";        
+        
         Integer numRowsAffected = 0;
         
         try {

@@ -2523,7 +2523,7 @@ public class Main {
                         fgFile = outputDir + System.getProperty("file.separator") + fileNameWithExtension; //Settings.get("plcc_S_img_output_fileext");
 
                         Boolean drawingSucceeded = false;
-                        IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
+                        IMAGEFORMAT[] formats = Settings.getOutputImageFormats();
                         HashMap<IMAGEFORMAT, String> filesByFormatCurNotation = new HashMap<>();
 
                         if(notation.equals(FoldingGraph.FG_NOTATION_ADJ)) {     
@@ -2539,7 +2539,7 @@ public class Main {
                             filesByFormatCurNotation = SSEGraph.drawFoldingGraphKEY(fileNameWithoutExtension, false, formats, pnfr);                                                                            
                         }
 
-                        drawingSucceeded = ( ! filesByFormatCurNotation.isEmpty());
+                        drawingSucceeded = ( ! filesByFormatCurNotation.isEmpty());                                                
 
                         //if(fg.drawFoldingGraph(notation, fgFile)) {
                         if(drawingSucceeded) {
@@ -2549,20 +2549,42 @@ public class Main {
 
                             // save image path to database if required
                             if(Settings.getBoolean("plcc_B_useDB")) {
-
-
-                                String dbImagePath = fileNameWithExtension;
-                                if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
-                                    dbImagePath = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain) + fs + fileNameWithExtension;
-                                }
+                                
                                 //DP.getInstance().d("dbImagePath is '" + dbImagePath + "'.");                            
 
-
+                                                              
+                                for(IMAGEFORMAT format : filesByFormatCurNotation.keySet()) {
+                                    String dbImagePath = fileNameWithoutExtension;
+                                    if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
+                                        dbImagePath = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain) + fs + fileNameWithoutExtension;
+                                    }
+                                    
+                                    dbImagePath += DrawTools.getFileExtensionForImageFormat(format);
+                                    
+                                    int numAff = 0;
+                                    try {
+                                        numAff = DBManager.updateFoldingGraphImagePathInDB(fgDbId, format, notation, dbImagePath);
+                                    } catch(SQLException e) {
+                                        DP.getInstance().e("Main", "Could not update format " + format + " folding graph image path in database: '" + e.getMessage() + "'.");
+                                    }
+                                    
+                                    if(numAff == 0) {
+                                        DP.getInstance().e("Main", "Could not update format " + format + " folding graph image path in database, 0 rows affected.");
+                                    }
+                                    else {
+                                        if(! silent) {
+                                            System.out.println("          Updated FG " + notation + " notation " + format + " format image path in database.");
+                                        }
+                                    }
+                                }
+                                
+                                /*
                                 try {
                                     DBManager.updateFoldingGraphImagePathInDB(fgDbId, DrawTools.IMAGEFORMAT.PNG, notation, dbImagePath);
                                 } catch(SQLException e) {
                                     DP.getInstance().e("Main", "Could not update " + notation + " notation folding graph image path in database: '" + e.getMessage() + "'.");
                                 }
+                                */
 
                             }                                                
                         }

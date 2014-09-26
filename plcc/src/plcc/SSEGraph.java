@@ -5219,9 +5219,7 @@ E	3	3	3
                 
                 if(Objects.equals(s, 0)) { 
                     ig2.setPaint(Color.BLACK);
-                    //System.out.println("    SSE # " + compareToTerminus + " (pos # " + ssePos + ")  is the KEY notation start (clostest to N with degee 1).");
-                    int spacerPotN = fontMetrics.charWidth('N') + 1; // spacer, this is to prevent drawing the N and S on top of each other if they are in the same place
-                    
+                    //System.out.println("    SSE # " + compareToTerminus + " (pos # " + ssePos + ")  is the KEY notation start (clostest to N with degee 1).");                                       
                     ig2.drawString("S", currentVertX, (currentVertY + 20));
                 }
                 
