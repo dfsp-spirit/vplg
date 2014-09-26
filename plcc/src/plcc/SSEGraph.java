@@ -4822,8 +4822,20 @@ E	3	3	3
         /** The vertex closest to C */
         Integer keyendFGIndex = keyposFGIndicesSpatOrder.get(fg.getSize() - 1);
         
-        System.out.println("keyposFGIndicesSpatOrder=" + IO.intListToString(keyposFGIndicesSpatOrder));
-               
+        DP.getInstance().d("keyposFGIndicesSpatOrder=" + IO.intListToString(keyposFGIndicesSpatOrder));
+        
+        // compute relative key distances
+        List<Integer> spatOrderseqDistToPrevious = new ArrayList<>();
+        spatOrderseqDistToPrevious.add(null); // there is no previous vertex for the first one        
+        Integer cur, last, spatPosCur, spatPosLast;
+        for(Integer i = 1; i < fg.getSize(); i++) {
+            cur = i;
+            last = i - 1;
+            spatPosCur = keyposFGIndicesSpatOrder.indexOf(cur);
+            spatPosLast = keyposFGIndicesSpatOrder.indexOf(last);
+            spatOrderseqDistToPrevious.add(spatPosCur - spatPosLast);
+        }
+        DP.getInstance().d("relative spat distances: " + IO.intListToString(spatOrderseqDistToPrevious));
 
         DP.getInstance().d("keystart(FG index)=" + keystartFGIndex + ". keypos parent seq=" + IO.intListToString(keyposParentIndicesSeqOrder));
                 
@@ -4967,15 +4979,15 @@ E	3	3	3
                 
             }      
             
-            System.out.println("orientationsSpatOrder=" + IO.intArrayToString(orientationsSpatOrder));
-            System.out.println("orientationsSeqOrder=" + IO.intArrayToString(orientationsSeqOrder));
+            DP.getInstance().d("orientationsSpatOrder=" + IO.intArrayToString(orientationsSpatOrder));
+            DP.getInstance().d("orientationsSeqOrder=" + IO.intArrayToString(orientationsSeqOrder));
             
             
             
             // now draw the connectors
             Integer edgeType, connCenterX, connCenterY, leftVertSeq, rightVertSeq, leftVertSpat, rightVertSpat, leftVertPosX, leftVertPosY, rightVertPosX, rightVertPosY, connWidth, connHeight, connTopLeftX, connTopLeftY, spacerX, spacerY;
             Integer iSpatIndex, jSpatIndex;
-            Boolean startUpwards;
+            Boolean startUpwards; Integer relDrawDistToLast;
             ig2.setStroke(new BasicStroke(1));
             
             if(keyposFGIndices.size() > 1) {
@@ -4984,20 +4996,95 @@ E	3	3	3
                                         
                     currentVert = keyposFGIndicesSpatOrder.get(i);
                     lastVert = keyposFGIndicesSpatOrder.get(i-1);
-                    
                     Integer spatRel = fg.getContactType(lastVert, currentVert);
+                    relDrawDistToLast = spatOrderseqDistToPrevious.get(i);
                     
-                    if(Objects.equals(spatRel, SpatRel.PARALLEL)) {
-                        // keep orientation
-                        orientationsSpatOrder[i] = orientationsSpatOrder[i-1];
-                        orientationsSeqOrder[currentVert] = orientationsSpatOrder[i];
-                    }                    
-                    else {                                                                
-                        // all other spatial relations, e.g. SpatRel.ANTIPARALLEL, SpatRel.LIGAND, SpatRel.BACKBONE and SpatRel.MIXED: invert orientation
-                        orientationsSpatOrder[i] = (Objects.equals(orientationsSpatOrder[i-1], FoldingGraph.ORIENTATION_UPWARDS) ? FoldingGraph.ORIENTATION_DOWNWARDS : FoldingGraph.ORIENTATION_UPWARDS);
-                        orientationsSeqOrder[currentVert] = orientationsSpatOrder[i];
+                    DP.getInstance().d("DRAW_ARCS: i="+i+". current vert is " + currentVert + " with spatPos=" + i + " and seqPos=" + currentVert + ", lastVert is " + lastVert + " with spatPos=" + (i - 1) + " and seqPos=" + lastVert + ".spatRel = " + spatRel + ", relDrawDistToLast = " + relDrawDistToLast + ".");
+                    
+                    if(spatRel.equals(SpatRel.PARALLEL)) { ig2.setPaint(Color.RED); }
+                    else if(spatRel.equals(SpatRel.ANTIPARALLEL)) { ig2.setPaint(Color.BLUE); }
+                    else if(spatRel.equals(SpatRel.MIXED)) { ig2.setPaint(Color.GREEN); }
+                    else if(spatRel.equals(SpatRel.LIGAND)) { ig2.setPaint(Color.MAGENTA); }
+                    else if(spatRel.equals(SpatRel.BACKBONE)) { ig2.setPaint(Color.ORANGE); }
+                    else { ig2.setPaint(Color.LIGHT_GRAY); }
+
+                    if(Settings.getBoolean("plcc_B_key_foldinggraph_arcs_allways_black")) {
+                        ig2.setPaint(Color.BLACK);
                     }
-                    
+
+                    // determine the center of the arc and the width of its rectangle bounding box
+                    //iSpatIndex = spatOrder.get(i);
+                    //jSpatIndex = spatOrder.get(j);
+                    iSpatIndex = i;
+                    int j = i-1;
+                    jSpatIndex = j;
+
+                    // determine who is left and who is right
+                    if(iSpatIndex < jSpatIndex) { 
+                        leftVertSpat = iSpatIndex; 
+                        leftVertSeq = i; 
+                        rightVertSpat = jSpatIndex; 
+                        rightVertSeq = j;
+                    }
+                    else { 
+                        leftVertSpat = jSpatIndex; 
+                        leftVertSeq = j;
+                        rightVertSpat = iSpatIndex;
+                        rightVertSeq = i;
+                    }
+
+                    leftVertPosX = vertStartX + (leftVertSpat * vertDist);      // center of the left vertex object (arrow or rectangle)
+                    rightVertPosX = vertStartX + (rightVertSpat * vertDist);    // center of the right...
+
+                    connWidth = rightVertPosX - leftVertPosX;                   // total width of the connector
+                    connHeight = connWidth / 2;                                 // total height...
+
+                    connCenterX = rightVertPosX - (connWidth / 2);      // the center of the connector, here we draw the line if it is required
+                    connCenterY = vertStartY - (connHeight / 2);
+
+                    connTopLeftX = leftVertPosX;                        // the upper left point of the connector, i.e., where it is connected to the left vertex object (if that vertex has to be connected at the upper end)                                                                
+                    connTopLeftY = vertStartY - (connHeight / 2);
+
+                    spacerX = vertWidth;
+                    spacerY = 0;
+
+
+                    // Determine the y axis positions where the connector should start (at the left vertex) and end (at the right vertex). This depends
+                    //  on whether the respective vertex points upwards or downwards.
+
+                    //System.out.print("Contact " + i + "," + j + " (left is " + leftVertSeq + "[spat:" + this.getSpatOrderIndexOfSSE(leftVertSeq) + "], right is " + rightVertSeq + "[spat:" + this.getSpatOrderIndexOfSSE(rightVertSeq) + "]): ");
+
+                    if(Objects.equals(orientationsSeqOrder[leftVertSeq], FoldingGraph.ORIENTATION_UPWARDS)) {
+                        // the left vertex points upwards, so the arc should start at its top
+                        leftVertPosY = vertStartY - vertHeight;
+                        startUpwards = true;
+                        //System.out.print("leftVert starts upwards, ");
+                    }
+                    else {
+                        // the left vertex points downwards, so the arc should start at its bottom
+                        leftVertPosY = vertStartY;
+                        startUpwards = false;
+                        //System.out.print("leftVert starts downwards, ");
+                    }
+
+                    if(Objects.equals(orientationsSeqOrder[rightVertSeq], FoldingGraph.ORIENTATION_UPWARDS)) {
+                        // the right vertex points upwards, so the arc should end at its bottom
+                        rightVertPosY = vertStartY;
+                        //System.out.print("rightVert starts upwards. ");
+                    }
+                    else {
+                        // the right vertex points downwards, so the arc should end at its top
+                        rightVertPosY = vertStartY - vertHeight;
+                        //System.out.print("rightVert starts downpwards. ");
+                    }
+
+
+                    // draw it        
+                    //System.out.print("Getting arc from " + leftVertPosX + "," + leftVertPosY + " to " + rightVertPosX + "," + rightVertPosY + ".\n");
+                    ArrayList<Shape> connShapes = FoldingGraph.getArcConnector(leftVertPosX, leftVertPosY, rightVertPosX, rightVertPosY, ig2.getStroke(), startUpwards);
+                    for(Shape s : connShapes) {
+                        ig2.draw(s);
+                    }                                                                                                   
                 }                                                              
                 
             }
@@ -5127,7 +5214,7 @@ E	3	3	3
                 // draw it                                
                 if(fg.sseList.get(i).isHelix()) {
                     //p = getDefaultArrowPolygon((vertStartY - vertHeight), currentVertX, currentVertY);
-                    p = getDefaultBarrelPolygon(vertStartY - vertHeight, vertStartX + (i * vertDist), vertStartY);
+                    p = getDefaultBarrelPolygon(vertStartY - vertHeight, currentVertX, vertStartY);
                     //System.out.println("SSE is helix: " + this.sseList.get(i).longStringRep() + ", drawing with base position (" + (vertStartX + (i * vertDist)) + "," + vertStartY + ").");
                     
                 }
@@ -5177,11 +5264,14 @@ E	3	3	3
                     
                 }
                 if(Objects.equals(s, 0)) { 
-                    //System.out.println("    SSE # " + compareToTerminus + " (pos # " + ssePos + ")  is closest to N terminus.");
+                    //System.out.println("    SSE # " + compareToTerminus + " (pos # " + ssePos + ")  is the KEY notation start (clostest to N with degee 1).");
                     int spacerPotN = fontMetrics.charWidth('N') + 1; // spacer, this is to prevent drawing the N and S on top of each other if they are in the same place
                     
                     ig2.drawString("S", currentVertX + spacerPotN, (currentVertY + 20));
                 }
+                
+                // draw seq sse number
+                ig2.drawString("" + s, currentVertX, (currentVertY + 30));
                 
                 
                 
