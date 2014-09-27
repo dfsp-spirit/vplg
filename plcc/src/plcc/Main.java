@@ -536,8 +536,9 @@ public class Main {
                         System.exit(0);
                     }
                     
-                    if(s.equals("-s") || s.equals("--showonscreen")) {
-                        Settings.set("plcc_B_print_contacts", "true");
+                    if(s.equals("-s") || s.equals("--draw-linnots")) {
+                        Settings.set("plcc_B_folding_graphs", "true");
+                        Settings.set("plcc_B_draw_folding_graphs", "true");
                     }
 
                     if(s.equals("-a") || s.equals("--include-coils")) {
@@ -568,7 +569,6 @@ public class Main {
                     
                     if(s.equals("-f") || s.equals("--folding-graphs")) {
                         Settings.set("plcc_B_folding_graphs", "true");
-                        Settings.set("plcc_B_draw_folding_graphs", "true");                        
                     }
                     
                     if(s.equals("-k") || s.equals("--img-dir-tree")) {
@@ -4443,7 +4443,7 @@ public class Main {
         System.out.println("     --gz-dsspfile <f>     : use gzipped input DSSP file <f>.");
         System.out.println("-e | --force-chain <c>     : only handle the chain with chain ID <c>.");
         System.out.println("-E | --separate-contacts   : separate contact computation by chain (way faster but disables all functions which require inter-chain contacts (stats, complex graphs)");
-        System.out.println("-f | --folding-graphs      : also handle foldings graphs, their linear notations and produce the images (connected components of the protein graph)");
+        System.out.println("-f | --folding-graphs      : also handle foldings graphs and compute their linear notations. See -s if you also want them drawn.");
         System.out.println("-g | --sse-graphtypes <l>  : compute only the SSE graphs in list <l>, e.g. 'abcdef' = alpha, beta, alhpabeta, alphalig, betalig and alphabetalig.");
         System.out.println("-G | --complex-graphs      : compute and output complex graphs. Disables contact separation (see -E) if used.");
         System.out.println("-h | --help                : show this help message and exit");
@@ -4464,7 +4464,7 @@ public class Main {
         System.out.println("     --gz-pdbfile <f>      : use gzipped input PDB file <f>.");
         System.out.println("-q | --fg-notations <list> : draw only the folding graph notations in <list>, e.g. 'kars' = KEY, ADJ, RED and SEQ.");
         System.out.println("-r | --recreate-tables     : drop and recreate DB statistics tables, then exit (see -u)*");
-        //System.out.println("-s | --showonscreen        : show an overview of the residue contact results on STDOUT during compuation  [DEBUG]");
+        System.out.println("-s | --draw-linnots        : not only compute the folding graph linear notations, but draw all 4 of them to image files");
         System.out.println("-S | --sim-measure <m>     : use similarity measure <m>. Valid settings include 'string_sse', 'graph_set' and 'graph_compat'.");
         System.out.println("-t | --draw-tgf-graph <f>  : read graph in TGF format from file <f> and draw it to <f>.png, then exit (pdbid will be ignored)*");
         System.out.println("-u | --use-database        : write SSE contact data to database [requires DB credentials in cfg file]");                       
@@ -4491,7 +4491,7 @@ public class Main {
         System.out.println("");
         System.out.println("NOTES: ");
         System.out.println("       -The DSSP program assumes that the input PDB file only has a single model.");
-        System.out.println("        You have to split PDB files with multiple models up BEFORE running DSSP (use 'splitpdb').");
+        System.out.println("        You have to split PDB files with multiple models up BEFORE running DSSP (use the 'splitpdb' tool).");
         System.out.println("        If you don't do this, the broken DSSP file will get this program into trouble.");
         System.out.println("       -See the config file '" + Settings.getConfigFile() + "' in your userhome to set advanced options.");
         System.out.println("       -If all the parameters above scare you try 'java -jar plcc.jar <PDBID>' for a start.");
