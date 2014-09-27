@@ -4449,7 +4449,7 @@ public class Main {
         System.out.println("-h | --help                : show this help message and exit");
         System.out.println("-H | --output-www-with-core: add HTML navigation files and core files to the subdir tree (implies -k, -W). ");
         //System.out.println("-i | --ignoreligands       : ignore ligand contacts in geom_neo format output files [DEBUG]");
-        System.out.println("-i | --aa-graphs           : compute and output amino acid-based graphs as well");        
+        System.out.println("-i | --aa-graphs           : compute and output amino acid-based graphs as well. In these graphs, each vertes is an amino acid instead of a SSE.");        
         System.out.println("-j | --ddb <p> <c> <gt> <f>: get the graph type <gt> of chain <c> of pdbid <p> from the DB and draw it to file <f> (omit the file extension)*");        
         System.out.println("-k | --output-subdir-tree  : write all output files to a PDB-style sudbir tree of the output dir (e.g., <OUTDIR>/ic/8icd/<outfile>). ");                
         System.out.println("-l | --draw-plcc-graph <f> : read graph in plcc format from file <f> and draw it to <f>.png, then exit (<pdbid> will be ignored)*");                
