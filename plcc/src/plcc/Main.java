@@ -568,6 +568,7 @@ public class Main {
                     
                     if(s.equals("-f") || s.equals("--folding-graphs")) {
                         Settings.set("plcc_B_folding_graphs", "true");
+                        Settings.set("plcc_B_draw_folding_graphs", "true");                        
                     }
                     
                     if(s.equals("-k") || s.equals("--img-dir-tree")) {
@@ -2503,10 +2504,7 @@ public class Main {
                 
             }
             
-            // draw folding graphs            
-            Settings.set("plcc_B_draw_folding_graphs", "true"); // TODO: remove this
-            System.out.println("DEBUG: ##### Overwriting Setting 'plcc_B_draw_folding_graphs' to TRUE. #####");
-            
+            // draw folding graphs                                   
             if(Settings.getBoolean("plcc_B_draw_folding_graphs")) {
                 
                 if(fg.getSize() >= Settings.getInteger("plcc_I_min_fgraph_size_draw")) {
@@ -4068,7 +4066,7 @@ public class Main {
         catch (Exception e) {
             System.err.println("ERROR: Could not write to file '" + ligFile + "'.");
             e.printStackTrace();
-            System.exit(-1);
+            System.exit(1);
         }
 
 
@@ -4089,7 +4087,7 @@ public class Main {
         } catch(Exception ex) {
             System.err.println("ERROR: Could not close FileWriter for file '" + ligFile + "'.");
             ex.printStackTrace();
-            System.exit(-1);
+            System.exit(1);
         }
 
         System.out.println("  Wrote ligand info to file '" + ligFile + "'.");
@@ -4118,12 +4116,10 @@ public class Main {
         catch (Exception e) {
             System.err.println("ERROR: Could not write to file '" + modelsFile + "'.");
             e.printStackTrace();
-            System.exit(-1);
+            System.exit(1);
         }
 
-
         // finally: write stuff
-
         for(Integer i = 0; i < modelIDs.size(); i++) {
             modelFH.printf("%s ", modelIDs.get(i));
         }
@@ -4135,13 +4131,10 @@ public class Main {
         } catch(Exception ex) {
             System.err.println("ERROR: Could not close FileWriter for file '" + modelsFile + "'.");
             ex.printStackTrace();
-            System.exit(-1);
+            System.exit(1);
         }
 
         System.out.println("  Wrote model info to file '" + modelsFile + "'.");
-
-
-
     }
 
 
@@ -4165,7 +4158,7 @@ public class Main {
         } catch (Exception ef) {
             System.err.println("ERROR: Could not copy file '" + dsspFile + "' to '" + dsspLigFile + "'.");
             ef.printStackTrace();
-            System.exit(-1);
+            System.exit(1);
         }
 
         System.out.println("  DSSP ligand output file set to '" + dsspLigFile + "', file created.");
@@ -4179,7 +4172,7 @@ public class Main {
         catch (Exception e) {
             System.err.println("ERROR: Could not write to file '" + dsspLigFile + "'.");
             e.printStackTrace();
-            System.exit(-1);
+            System.exit(1);
         }
 
         // now get and write the ligand lines
@@ -4224,7 +4217,7 @@ public class Main {
         } catch(Exception ex) {
             System.err.println("ERROR: Could not close FileWriter for file '" + dsspLigFile + "'.");
             ex.printStackTrace();
-            System.exit(-1);
+            System.exit(1);
         }
 
         System.out.println("  Wrote DSSP ligand info to file '" + dsspLigFile + "'.");
@@ -4252,9 +4245,9 @@ public class Main {
         try {
             copyFile(dFile, dligFile);
         } catch (Exception ef) {
-            System.err.println("ERROR: Could not copy file '" + dsspFile + "' to '" + dsspLigFile + "'.");
+            System.err.println("ERROR: Could not copy file '" + dsspFile + "' to '" + dsspLigFile + "': '" + ef.getMessage() + "'.");
             ef.printStackTrace();
-            System.exit(-1);
+            System.exit(1);
         }
 
         System.out.println("  DSSP ligand output file set to '" + dsspLigFile + "', file created.");
@@ -4272,9 +4265,9 @@ public class Main {
                 try {
                     insertLigandLineIntoDsspligFile(dligFile, getLastLineOfChain(dligFile, r.getChainID()), r);
                 } catch(Exception cf) {
-                    System.err.println("ERROR: Failed to insert line for ligand residue '" + r.getFancyName() + "' into dssplig file.");
+                    System.err.println("ERROR: Failed to insert line for ligand residue '" + r.getFancyName() + "' into dssplig file: '" + cf.getMessage() + "'.");
                     cf.printStackTrace();
-                    System.exit(-1);
+                    System.exit(1);
                 }
 
             }
@@ -4320,7 +4313,7 @@ public class Main {
 
         if(ln == - 1) {
             System.err.println("ERROR: getLastLineofChain(): DSSPLIG file '" + dsspligFile.getName() + "' contains no information on requested chain '" + chainID + "'.");
-            System.exit(-1);
+            System.exit(1);
         }
         else {
             //System.out.println("DEBUG: Last line of chain '" + chainID + "' in DSSPLIG file '" + dsspligFile.getName() + "' is " + ln + ".");
@@ -4440,7 +4433,7 @@ public class Main {
         System.out.println("USAGE: java -jar plcc.jar <pdbid> [OPTIONS]");
         System.out.println("       java -jar plcc.jar --help");
         System.out.println("valid OPTIONS are: ");
-        System.out.println("-a | --include-coils       : convert the SSE type of all ignored residues to C (coil) and include coils in the graphs [EXPERIMENTAL]");
+        System.out.println("-a | --include-coils       : convert the SSE type of all ignored residues to C (coil) and include coils in the graphs (may split other SSEs)");
         System.out.println("-b | --draw-plcc-fgs <f>   : read graph in plcc format from file <f> and draw it and all its folding graphs, then exit (pdbid will be ignored)*");
         System.out.println("-B | --force-backbone      : add contacts of special type 'backbone' between all SSEs of a graph in sequential order (N to C terminus)");
         System.out.println("-c | --dont-calc-graphs    : do not calculate SSEs contact graphs, stop after residue level contact computation");
@@ -4450,7 +4443,7 @@ public class Main {
         System.out.println("     --gz-dsspfile <f>     : use gzipped input DSSP file <f>.");
         System.out.println("-e | --force-chain <c>     : only handle the chain with chain ID <c>.");
         System.out.println("-E | --separate-contacts   : separate contact computation by chain (way faster but disables all functions which require inter-chain contacts (stats, complex graphs)");
-        System.out.println("-f | --folding-graphs      : also handle foldings graphs (connected components of the protein graph)");
+        System.out.println("-f | --folding-graphs      : also handle foldings graphs, their linear notations and produce the images (connected components of the protein graph)");
         System.out.println("-g | --sse-graphtypes <l>  : compute only the SSE graphs in list <l>, e.g. 'abcdef' = alpha, beta, alhpabeta, alphalig, betalig and alphabetalig.");
         System.out.println("-G | --complex-graphs      : compute and output complex graphs. Disables contact separation (see -E) if used.");
         System.out.println("-h | --help                : show this help message and exit");
