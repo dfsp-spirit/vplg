@@ -76,6 +76,63 @@ function get_linnot_query_string($linnot_type, $linnot_query_string, $query_grap
     return $res;
 }
 
+function check_valid_pdbid($str) {
+  if (preg_match('/^[A-Z0-9]{4}$/i', $str)) {
+    return true;
+  }  
+  return false;
+}
+
+function check_valid_chainid($str) {
+  if (preg_match('/^[A-Z]{1}$/i', $str)) {
+    return true;
+  }  
+  return false;
+}
+
+
+
+/**
+  * the $pdb_chain_list should be a string array, where each string is of length 5 and represents a PDB id and chain, e.g., '7timA' for PDB 7tim chain A.
+  */
+function get_multiple_PDB_select_query($pdb_chain_list) {
+
+   $valid_pdb_ids = array();
+   $valid_pdb_chains = array();
+   foreach($pdb_chain_list as $pdbchain) {
+     if(strlen($pdbchain) == 5) {
+	   $pdb_id = substr($pdbchain, 0, 4);
+	   $chain_id = substr($pdbchain, 4, 1);
+	   if(check_valid_pdbid($pdb_id) && check_valid_chainid($chain_id)) {
+	     array_push($valid_pdb_ids, $pdb_id);
+		 array_push($valid_pdb_chains, $chain_id);
+	   }	 
+	 }
+   }
+   
+   if(count($valid_pdb_ids) <= 0) {
+     return "";
+   }
+   
+   $query = "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
+				   FROM plcc_chain c
+				   INNER JOIN plcc_protein p
+				   ON p.pdb_id = c.pdb_id 
+				   WHERE ( ";
+	for($i = 0; $i < count($valid_pdb_ids); $i++) {
+	  $pdb_id = $valid_pdb_ids[$i];
+	  $chain_id = $valid_pdb_chains[$i];
+	  $query .= " ( p.pdb_id = '" . $pdb_id . "' AND c.chain_name = '" . $chain_id . "' )";
+	  if($i < count($valid_pdb_ids) - 1) {
+	    $query .= " OR "
+	  }
+	}
+	
+	$query .= " )";
+	
+	return $query;
+}
+
 /** 
   * Returns the mitif code or a value < 0 if the abbriv is invalid.
   */
@@ -162,8 +219,9 @@ if(isset($_GET["next"])) {
 		$linnotalbeligadj = $_SESSION["linnotalbeligadj"];
 		$linnotalbeligred = $_SESSION["linnotalbeligred"];
 		$linnotalbeligseq = $_SESSION["linnotalbeligseq"];
-		$linnotalbeligkey = $_SESSION["linnotalbeligkey"];
+		$linnotalbeligkey = $_SESSION["linnotalbeligkey"];		
 		$motif = $_SESSION["motif"];
+		$graphletsimilarity = $_SESSION["graphletsimilarity"];
 		
 	} else {
 		$limit_start = 0;
@@ -328,6 +386,14 @@ if(isset($_GET)) {
 		$motif = $_GET["motif"];
 		$_SESSION["motif"] = $motif;
 	}
+	
+	// graphlet similarity search
+	if(isset($_GET["graphletsimilarity"])) {
+		$graphletsimilarity = $_GET["graphletsimilarity"];
+		$_SESSION["graphletsimilarity"] = $graphletsimilarity;
+	}
+	
+	
 	
 	
     // if(isset($_GET["proteincomplexes"])) {$proteincomplexes = $_GET["proteincomplexes"];};
@@ -579,8 +645,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 		$firstQuerySet = true; 
 	};
 	
-	// motif search
-	
+	// motif search	
 	if (isset($motif) && $motif != ""){
 	
 		$motif_id = get_motif_id($motif);
@@ -590,6 +655,25 @@ if (($none_set == true)) { // #TODO redefine this check...
 			$firstQuerySet = true; 			
 		} 
 	};
+	
+	//graphletsimilarity
+	if (isset($graphletsimilarity) && $graphletsimilarity != ""){
+	
+	    $pdbchainlist = array();		
+		// TODO: fill array with similar chains based on graphlet distance here
+		
+		if(count($pdbchainlist) > 0) {
+		  if($firstQuerySet) { $query .= " UNION "; }
+			$query .= get_multiple_PDB_select_query($pdbchainlist);
+			$firstQuerySet = true;		  
+		}		
+	};
+	
+	
+	
+	
+	
+	// ---------------------------------------------------- end of dynamic query building ----------------------------------
 	
 	
 	$q_limit = 25;
