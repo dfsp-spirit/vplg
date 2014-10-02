@@ -658,15 +658,33 @@ if (($none_set == true)) { // #TODO redefine this check...
 	
 	//graphletsimilarity
 	if (isset($graphletsimilarity) && $graphletsimilarity != ""){
-	
-	    $pdbchainlist = array();		
-		// TODO: fill array with similar chains based on graphlet distance here
 		
-		if(count($pdbchainlist) > 0) {
-		  if($firstQuerySet) { $query .= " UNION "; }
-			$query .= get_multiple_PDB_select_query($pdbchainlist);
-			$firstQuerySet = true;		  
-		}		
+		// $graphletsimilarity must be set to a valid pdb id + chain, e.g., '7timA'.
+					
+		if(strlen($graphletsimilarity) == 5) {
+			$pdb_id = substr($pdbchain, 0, 4);
+			$chain_id = substr($pdbchain, 4, 1);
+			
+			if(check_valid_pdbid($pdb_id) && check_valid_chainid($chain_id)) {
+			
+				$pdbchainlist = array();
+				
+				// TODO: fill array with similar chains based on graphlet distance here:
+				//  - get graphlet counts of query protein from DB
+				//  - compare to all others using some graphlet-based score
+				// add all result proteins above a certain threshold to the $pdbchainlist
+				
+				
+				if(count($pdbchainlist) > 0) {
+				  if($firstQuerySet) { $query .= " UNION "; }
+					$query .= get_multiple_PDB_select_query($pdbchainlist);
+					$firstQuerySet = true;		  
+				}
+			
+			}
+		}
+		
+	    		
 	};
 	
 	
