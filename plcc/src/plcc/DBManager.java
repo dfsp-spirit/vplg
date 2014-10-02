@@ -4373,7 +4373,7 @@ public class DBManager {
         
 
         if (chain_db_id < 0) {
-            DP.getInstance().w("getGraphletCounts(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
+            DP.getInstance().w("DBManager", "getGraphletCounts(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
             return(null);
         }
 
@@ -4390,7 +4390,7 @@ public class DBManager {
                 + " graphlet_counts[10], graphlet_counts[11], graphlet_counts[12], graphlet_counts[13], graphlet_counts[14],"
                 + " graphlet_counts[15], graphlet_counts[16], graphlet_counts[17], graphlet_counts[18], graphlet_counts[19],"
                 + " graphlet_counts[20], graphlet_counts[21], graphlet_counts[22], graphlet_counts[23], graphlet_counts[24],"
-                + " graphlet_counts[25], graphlet_counts[26], graphlet_counts[27], graphlet_counts[28], "
+                + " graphlet_counts[25], graphlet_counts[26], graphlet_counts[27], graphlet_counts[28], graphlet_counts[29]"
                 + " FROM " + tbl_graphletcount + " WHERE (graph_id = ?);";
 
         try {
@@ -4421,7 +4421,7 @@ public class DBManager {
             }
             
         } catch (SQLException e ) {
-            System.err.println("ERROR: SQL: getGraphletCounts: Retrieval of graphlets failed: '" + e.getMessage() + "'.");
+            DP.getInstance().e("DBManager", "getGraphletCounts: Retrieval of graphlets failed: '" + e.getMessage() + "'.");
         } finally {
             if (statement != null) {
                 statement.close();
@@ -4440,18 +4440,130 @@ public class DBManager {
                         try {
                             result[i] = Integer.valueOf(rowGraphlets.get(i));
                         } catch(NumberFormatException ce) {
-                            DP.getInstance().w("DB: getGraphletCounts: Cast error. Could not cast entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "' to Integer.");
+                            DP.getInstance().w("DBManager", "getGraphletCounts: Cast error. Could not cast entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "' to Integer.");
                             return null;
                         }
                     }
                     return(result);
                 } else {
-                    DP.getInstance().w("DB: getGraphletCounts: Entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "' has wrong size.");
+                    DP.getInstance().w("DBManager", "getGraphletCounts: Entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "' has wrong size.");
                     return(null);
                 }                                
             }
             else {
-                DP.getInstance().w("DB: getGraphletCounts: No entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
+                DP.getInstance().w("DBManager", "getGraphletCounts: No entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
+                return(null);
+            }
+        }
+        else {
+            return(null);
+        }        
+    }
+    
+    
+    /**
+     * Retrieves the graphlet counts for the requested graph from the database. The graph is identified by the
+     * unique triplet (pdbid, chain_name, graph_type).
+     * @param pdb_id the requested pdb ID, e.g. "1a0s"
+     * @param chain_name the requested pdb ID, e.g. "A"
+     * @param graph_type the requested graph type, e.g. "albe"
+     * @return a Double array of the graphlet counts
+     * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
+     */
+    public static Double[] getNormalizedGraphletCounts(String pdb_id, String chain_name, String graph_type) throws SQLException {
+        
+        int numReqGraphletTypes = 29;
+        
+        Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
+        
+        Long chain_db_id = getDBChainID(pdb_id, chain_name);
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        
+
+        if (chain_db_id < 0) {
+            DP.getInstance().w("DBManager", "getNormalizedGraphletCounts(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
+            return(null);
+        }
+
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        Long graphid = DBManager.getDBProteinGraphID(pdb_id, chain_name, graph_type);
+        
+        if(graphid <= 0) {
+            return null;
+        }
+
+        String query = "SELECT graphlet_counts[0], graphlet_counts[1], graphlet_counts[2], graphlet_counts[3], graphlet_counts[4],"
+                + " graphlet_counts[5], graphlet_counts[6], graphlet_counts[7], graphlet_counts[8], graphlet_counts[9],"
+                + " graphlet_counts[10], graphlet_counts[11], graphlet_counts[12], graphlet_counts[13], graphlet_counts[14],"
+                + " graphlet_counts[15], graphlet_counts[16], graphlet_counts[17], graphlet_counts[18], graphlet_counts[19],"
+                + " graphlet_counts[20], graphlet_counts[21], graphlet_counts[22], graphlet_counts[23], graphlet_counts[24],"
+                + " graphlet_counts[25], graphlet_counts[26], graphlet_counts[27], graphlet_counts[28], graphlet_counts[29]"
+                + " FROM " + tbl_graphletcount + " WHERE (graph_id = ?);";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, graphid);
+                                
+            rs = statement.executeQuery();
+            dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "getNormalizedGraphletCounts: Retrieval of graphlets failed: '" + e.getMessage() + "'.");
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        ArrayList<String> rowGraphlets;
+        Double[] result = new Double[numReqGraphletTypes];        
+        if(tableData.size() >= 1) {
+            rowGraphlets = tableData.get(0);
+            if(rowGraphlets.size() > 0) {
+                if(rowGraphlets.size() == numReqGraphletTypes) {
+                    for(int i = 0; i < rowGraphlets.size(); i++) {
+                        try {
+                            result[i] = Double.valueOf(rowGraphlets.get(i));
+                        } catch(NumberFormatException ce) {
+                            DP.getInstance().w("DBManager", "getNormalizedGraphletCounts: Cast error. Could not cast entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "' to Integer.");
+                            return null;
+                        }
+                    }
+                    return(result);
+                } else {
+                    DP.getInstance().w("DBManager", "getNormalizedGraphletCounts: Entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "' has wrong size.");
+                    return(null);
+                }                                
+            }
+            else {
+                DP.getInstance().w("DBManager", "getNormalizedGraphletCounts: No entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
                 return(null);
             }
         }

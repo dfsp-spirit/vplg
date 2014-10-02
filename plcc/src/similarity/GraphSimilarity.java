@@ -12,9 +12,11 @@ import tools.DP;
 import algorithms.CompatGraphComputation;
 import algorithms.NeedlemanWunsch;
 import algorithms.SmithWaterman;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Set;
 import plcc.CompatGraph;
+import plcc.DBManager;
 import plcc.ProtGraph;
 import plcc.SSEGraph;
 import static similarity.SimilarityByGraphlets.getRandIntegerArray;
@@ -226,6 +228,27 @@ public class GraphSimilarity {
         System.out.println("GraphletsC: " + SimilarityByGraphlets.getVectorStringForIntegerArray(graphletsC));
         System.out.println("GraphletsD: " + SimilarityByGraphlets.getVectorStringForIntegerArray(graphletsD));
         System.out.println("RGFD(C,D) is : " + SimilarityByGraphlets.getRelativeGraphletFrequencyDistance(graphletsC, graphletsD));
+        
+        System.out.println("Comparing by relative graphlet frequency distance -- 7timA and 8icdA:");
+        Double[] graphletsE = new Double[]{ };
+        try {
+            graphletsE = DBManager.getNormalizedGraphletCounts("7tim", "A", "albe");            
+        }
+        catch(SQLException e) {
+            System.err.println("Could not get graphletsE");
+        }
+        Double[] graphletsF  = new Double[]{ };
+        try {
+            graphletsF = DBManager.getNormalizedGraphletCounts("8icd", "A", "albe");
+        }
+        catch(SQLException e) {
+            System.err.println("Could not get graphletsF");
+        }
+        
+
+        System.out.println("GraphletsE: " + SimilarityByGraphlets.getVectorStringForDoubleArray(graphletsE));
+        System.out.println("GraphletsF: " + SimilarityByGraphlets.getVectorStringForDoubleArray(graphletsF));
+        System.out.println("RGFD(E,F) is : " + SimilarityByGraphlets.getRelativeGraphletFrequencyDistanceNormalized(graphletsE, graphletsF));
         
         System.exit(0);
     }

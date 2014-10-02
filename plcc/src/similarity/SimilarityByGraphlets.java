@@ -132,6 +132,26 @@ public class SimilarityByGraphlets {
         return sb.toString();
     }
     
+    /**
+     * Formats the input array as a string in vector notation, e.g., "<0.1,1.3,3.5,3.7>".
+     * @param arr the input array
+     * @return a string representation of the input array in vector notation, e.g., "<0.1,1.3,3.5,3.7>".
+     */
+    public static String getVectorStringForDoubleArray(Double[] arr) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<");
+        
+        for (int i = 0; i < arr.length; i++) {
+            sb.append(String.format("%2f", arr[i]));
+            if(i < (arr.length - 1)) {
+                sb.append(",");
+            }
+        }
+        
+        sb.append(">");
+        return sb.toString();
+    }
+    
     
     /**
      * Mutates an integer array, i.e., substracts or adds values to each element randomly.
@@ -213,6 +233,23 @@ public class SimilarityByGraphlets {
         
         for(int i = 0; i < res.length; i++ ) {
             res[i] = rand.nextInt((maxValue - minValue) + 1) + minValue;
+        }
+        
+        return res;
+    }
+    
+    
+    /**
+     * Returns a random double array of the specified length
+     * @param length the number of elements to be added to the array
+     * @return an array of doubles, all between 0.0 and 1.0
+     */
+    public static Double[] getRandDoubleArray(int length) {
+        Double[] res = new Double[length];
+        Random rand = new Random();
+        
+        for(int i = 0; i < res.length; i++ ) {
+            res[i] = rand.nextDouble();
         }
         
         return res;
