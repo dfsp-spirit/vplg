@@ -22,7 +22,7 @@ public class SimilarityByGraphlets {
     
     
     /**
-     * Implements the relative graphlet frequency distance. This is a similarity measure to compare two
+     * Implements the relative graphlet frequency distance using Integer graphlet counts. This is a similarity measure to compare two
      * networks by the frequencies of graphlets in them.
      * For details see Pržulj N, Corneil DG, Jurisica I: Modeling Interactome, Scale-Free or Geometric?, Bioinformatics 2004, 20(18):3508-3515.
      * A pretty good explanation can be found at http://en.wikipedia.org/wiki/Graphlets#Relative_graphlet_frequency_distance as well.
@@ -53,6 +53,38 @@ public class SimilarityByGraphlets {
         return res;
     }
     
+    /**
+     * Implements the relative graphlet frequency distance using normalized graphlet counts (doubles between 0.0 and 1.0.). This is a similarity measure to compare two
+     * networks by the frequencies of graphlets in them.
+     * For details see Pržulj N, Corneil DG, Jurisica I: Modeling Interactome, Scale-Free or Geometric?, Bioinformatics 2004, 20(18):3508-3515.
+     * A pretty good explanation can be found at http://en.wikipedia.org/wiki/Graphlets#Relative_graphlet_frequency_distance as well.
+     * @param graphletCountsA the vector which contains the counts of graphlets (usually the 3-, 4- and 5-graphlets, so a total of 30) for network A, normalized (0.0 .. 1.0)
+     * @param graphletCountsB the vector of graphlet counts for network B, normalized (0.0 .. 1.0)
+     * @return the relative graphlet frequency distance between the networks A and B, a value between 0.0 and 1.0
+     */
+    public static double getRelativeGraphletFrequencyDistanceNormalized(Double[] graphletCountsA, Double[] graphletCountsB) {
+        double res = 0.0;
+        
+        Double totalInA = sumDoubleArray(graphletCountsA);
+        Double totalInB = sumDoubleArray(graphletCountsB);
+        
+        System.out.println("Sum of graphlets is " + totalInA + " for A, " + totalInB + " for B.");
+        
+        double scoreA, scoreB;
+        for(int i = 0; i < graphletCountsA.length; i++) {
+            scoreA = -Math.log(graphletCountsA[i] / totalInA);
+            scoreB = -Math.log(graphletCountsB[i] / totalInB);
+            if(Double.isInfinite(scoreA) || Double.isInfinite(scoreB)) {
+                //System.out.println("Skipping graphlet #" + i + ", lead to infinite score.");
+                continue;                
+            }                    
+            //System.out.println("Handling graphlet #" + i + ", scoreA=" + scoreA + ", scoreB=" + scoreB + ".");
+            res += Math.abs(scoreA  - scoreB);
+        }
+        
+        return res;
+    }
+    
     
     /**
      * Computes the sum of the array.
@@ -61,6 +93,19 @@ public class SimilarityByGraphlets {
      */
     private static Integer sumIntegerArray(Integer[] i) {
         Integer sum = 0;
+        for (int j = 0; j < i.length; j++) {
+            sum += i[j];            
+        }
+        return sum;
+    }
+    
+    /**
+     * Computes the sum of the array.
+     * @param i the input Integer array
+     * @return the sum of all values in i
+     */
+    private static Double sumDoubleArray(Double[] i) {
+        Double sum = 0.d;
         for (int j = 0; j < i.length; j++) {
             sum += i[j];            
         }

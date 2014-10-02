@@ -44,6 +44,19 @@ function get_cath_link($pdbid, $chain = null) {
 }
 
 /**
+  * Returns a graphlet similarity score, a value between 0.0 and 1.0. The higher the value, the large the similarity between the counts in $graphletcounts_a and $graphletcounts_b.
+  */
+function compute_graphlet_similarity($graphletcounts_a, $graphletcounts_b) {
+	if(count($graphletcounts_a) > 0) {
+	  if(count($graphletcounts_a) === count($graphletcounts_b)) {
+	  }
+	}
+	
+	return 0.0;
+}
+
+
+/**
   * Returns the SQL query string to get the linear notation of the requested type.
   * @param $linnot_type the linear notation type. This is used to create the colum name and has to be 'adj', 'red', 'key' or 'seq'.
   * @param $linnot_query_string the linear notation you are searching for (e.g., '{1h,3hp}'). You can provide a prepared statement template like '$1', but then you should set $bool_enclose_linnot_query_string_in_ticks to false.
@@ -90,6 +103,46 @@ function check_valid_chainid($str) {
   return false;
 }
 
+
+function get_proteingraph_graphlet_counts($db, $pdb_id, $chain_id, $graph_type) {
+  $data = array();
+  $query = "SELECT p.pdb_id, c.chain_name, gt.graphtype_text, array_to_json(gl.graphlet_counts) AS graphletcounts FROM plcc_graphlets gl INNER JOIN plcc_graph g ON gl.graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE (p.pdbid = '" . $pdb_id . "' AND c.chain_id = '" . $chain_id . "' AND gt.graphtype_text = '" . $graph_type . "' )";
+    
+  $result = pg_query($db, $query);
+  while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
+		$data['pdb_id'] =  $arr['pdb_id'];
+		$data['chain_name'] =  $arr['chain_name'];
+		$data['graph_type'] =  $arr['graphtype_text'];		
+		$data['graphlet_counts'] = json_decode($arr['graphlet_counts']);
+	}
+  
+  pg_free_result($result);
+  return $data;
+  
+}
+
+/**
+  * Returns the graphlet counts of all graphs of the specified type in the whole DB (all protein chains).
+  */
+function get_all_proteingraph_graphlet_counts_for_graphtype($db, $graph_type) {
+  $all_data = array();
+  
+  $query = "SELECT p.pdb_id, c.chain_name, gt.graphtype_text, array_to_json(gl.graphlet_counts) AS graphletcounts FROM plcc_graphlets gl INNER JOIN plcc_graph g ON gl.graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE ( gt.graphtype_text = '" . $graph_type . "' )";
+    
+  $result = pg_query($db, $query);
+  while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
+		$data = array();
+		$data['pdb_id'] =  $arr['pdb_id'];
+		$data['chain_name'] =  $arr['chain_name'];
+		$data['graph_type'] =  $arr['graphtype_text'];		
+		$data['graphlet_counts'] = json_decode($arr['graphlet_counts']);
+		array_push($all_data, $data);
+	}
+  
+  pg_free_result($result);
+  return $all_data;
+  
+}
 
 
 /**
@@ -663,16 +716,34 @@ if (($none_set == true)) { // #TODO redefine this check...
 					
 		if(strlen($graphletsimilarity) == 5) {
 			$pdb_id = substr($pdbchain, 0, 4);
-			$chain_id = substr($pdbchain, 4, 1);
+			$chain_id = substr($pdbchain, 4, 1);						
 			
 			if(check_valid_pdbid($pdb_id) && check_valid_chainid($chain_id)) {
+				
+				$graph_type = "albe";
 			
 				$pdbchainlist = array();
 				
-				// TODO: fill array with similar chains based on graphlet distance here:
-				//  - get graphlet counts of query protein from DB
+				//  get graphlet counts of query protein from DB
+				$query_prot_data = get_proteingraph_graphlet_counts($db, $pdb_id, $chain_id, $graph_type);
+				
+				// get graphlet counts for all protein chains
+				$all_data = get_all_proteingraph_graphlet_counts_for_graphtype($db, $graph_type);
+				
+				// TODO: fill array with similar chains based on graphlet distance here:				
 				//  - compare to all others using some graphlet-based score
 				// add all result proteins above a certain threshold to the $pdbchainlist
+				
+				// now compare scores and add best scores to $pdbchainlist
+				foreach($all_data as $chaindata) {
+					$similarity_score = compute_graphlet_similarity($query_prot_data['gaphlet_counts'], $chaindata['graphlet_counts']);
+					if($similarity_score >= 0.9) {
+						array_push($pdbchainlist, "" . $chaindata['pdb_id'] . $chaindata['chain_name']);
+					}
+				}
+				
+				
+				
 				
 				
 				if(count($pdbchainlist) > 0) {
