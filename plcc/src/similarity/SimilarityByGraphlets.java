@@ -240,6 +240,7 @@ public class SimilarityByGraphlets {
     }
     
     
+    
     /**
      * Determines the graphlet count vector for the given protein graph by the requested method.
      * @param pdb_id the PDB id

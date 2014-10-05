@@ -284,7 +284,7 @@ public class GraphSimilarity {
         
         
         if(graphletsE == null || graphletsF == null) {
-            DP.getInstance().e("Could not retrieve graphlet counts from DB, graphletsE or graphletsF is null.");
+            DP.getInstance().e("Could not retrieve graphlet counts from DB, graphletsE and/or graphletsF is null.");
         }
         
         DP.getInstance().flush();
