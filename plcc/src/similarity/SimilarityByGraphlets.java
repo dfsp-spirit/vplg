@@ -68,7 +68,7 @@ public class SimilarityByGraphlets {
         Double totalInA = sumDoubleArray(graphletCountsA);
         Double totalInB = sumDoubleArray(graphletCountsB);
         
-        System.out.println("Sum of graphlets is " + totalInA + " for A, " + totalInB + " for B.");
+        System.out.println("getRelativeGraphletFrequencyDistanceNormalized: Sum of graphlets is " + totalInA + " for A, " + totalInB + " for B.");
         
         double scoreA, scoreB;
         for(int i = 0; i < graphletCountsA.length; i++) {
@@ -154,7 +154,7 @@ public class SimilarityByGraphlets {
         for (int i = 0; i < arr.length; i++) {
             sb.append(String.format("%2f", arr[i]));
             if(i < (arr.length - 1)) {
-                sb.append(",");
+                sb.append(", ");
             }
         }
         
@@ -301,6 +301,26 @@ public class SimilarityByGraphlets {
             res[i] = rand.nextDouble();
         }
         
+        return res;
+    }
+    
+    /**
+     * Returns a uniform  double array of the specified length
+     * @param length the number of elements to be added to the array
+     * @return an array of doubles, all entries equal between 0.0 and 1.0, sum around 1.0
+     */
+    public static Double[] getUniformDoubleArraySumAround1(int length) {
+        
+        if(length <= 1) {
+            return new Double[] { 1.0 };
+        }
+        
+        Double[] res = new Double[length];
+        
+        for(int i = 0; i < res.length; i++ ) {
+            res[i] = 1.0 / (double)length;
+        }
+                      
         return res;
     }
 }

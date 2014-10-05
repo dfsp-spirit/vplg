@@ -3298,6 +3298,26 @@ public class DBManager {
     
     
     /**
+     * Formats the array for SQL insert into an array field.
+     * @param arr the input array
+     * @return the SQL String for the array, e.g., "'{0.81, 0.45}'".
+     */
+    public static String getSQLArrayString(Double[] arr) {
+        StringBuilder pgArrayString = new StringBuilder();
+        String valStr;
+        pgArrayString.append("'{");
+        for(int i = 0; i < arr.length; i++) {
+            valStr = String.format(Locale.ENGLISH, "%.2f", arr[i]);
+            pgArrayString.append(valStr);            
+            if(i < arr.length - 1) {
+                pgArrayString.append(", ");
+            }
+        }
+        pgArrayString.append("}'");
+        return pgArrayString.toString();
+    }
+    
+    /**
      * Writes information on the normalized graphlet counts for a protein graph to the database. Used by graphlet computation
      * algorithms to store the graphlets. Currently not used because this is done in a separate C++ program.
      * 
@@ -3323,25 +3343,18 @@ public class DBManager {
         }
 
         if(DBManager.graphletsExistsInDBForGraph(graph_db_id)) {
-            int numDel = DBManager.deleteGraphletsFromDBForGraph(graph_db_id);            
+            int numDel = DBManager.deleteGraphletsFromDBForGraph(graph_db_id);      
+            System.out.println("Deleted " + numDel + " graphlet counts for graph with ID " + graph_db_id + ".");
         }
 
         StringBuilder querySB = new StringBuilder();
         querySB.append("INSERT INTO " + tbl_graphletcount + " (graph_id, graphlet_counts) VALUES (");
         
-        StringBuilder pgArrayString = new StringBuilder();
-        pgArrayString.append("'{");
-        for(int i = 0; i < graphlet_counts.length; i++) {
-            pgArrayString.append(String.format("%.2f", graphlet_counts[i]));
-            if(i < graphlet_counts.length - 1) {
-                pgArrayString.append(", ");
-            }
-        }
-        pgArrayString.append("}'");
-
+        String pgArray = DBManager.getSQLArrayString(graphlet_counts);
+        
         querySB.append(graph_db_id);
         querySB.append(", ");
-        querySB.append(pgArrayString.toString());
+        querySB.append(pgArray);
         querySB.append(")");
         
         String query = querySB.toString();
@@ -4653,8 +4666,8 @@ public class DBManager {
         Long chain_db_id = getDBChainID(pdb_id, chain_name);
         ResultSetMetaData md;
         ArrayList<String> columnHeaders;
-        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
-        ArrayList<String> rowData = null;
+        ArrayList<ArrayList<Double>> tableData = new ArrayList<ArrayList<Double>>();
+        ArrayList<Double> rowData = null;
         int count;
         
 
@@ -4700,9 +4713,9 @@ public class DBManager {
 
 
             while (rs.next()) {
-                rowData = new ArrayList<String>();
+                rowData = new ArrayList<Double>();
                 for (int i = 1; i <= count; i++) {
-                    rowData.add(rs.getString(i));
+                    rowData.add(rs.getDouble(i));
                 }
                 tableData.add(rowData);
             }
@@ -4717,7 +4730,7 @@ public class DBManager {
         }
         
         // OK, check size of results table and return 1st field of 1st column
-        ArrayList<String> rowGraphlets;
+        ArrayList<Double> rowGraphlets;
         Double[] result = new Double[numReqGraphletTypes];        
         if(tableData.size() >= 1) {
             rowGraphlets = tableData.get(0);
@@ -4727,13 +4740,11 @@ public class DBManager {
                     for(int i = 0; i < rowGraphlets.size(); i++) {
                         try {
                             // old, without locale: result[i] = Double.valueOf(rowGraphlets.get(i));
-                            result[i] = nf.parse(rowGraphlets.get(i)).doubleValue();
+                            result[i] = rowGraphlets.get(i);
                         } catch(NumberFormatException ce) {
                             DP.getInstance().e("DBManager", "getNormalizedGraphletCounts: Cast error. Could not cast entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "' to Double.");
                             return null;
-                        } catch (ParseException ep) {
-                            DP.getInstance().e("DBManager", "getNormalizedGraphletCounts: parse error. Could not parse entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "' to Double.");
-                        }
+                        } 
                     }
                     return(result);
                 } else {
