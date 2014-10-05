@@ -19,6 +19,7 @@ import plcc.CompatGraph;
 import plcc.DBManager;
 import plcc.ProtGraph;
 import plcc.SSEGraph;
+import plcc.Settings;
 import static similarity.SimilarityByGraphlets.getRandIntegerArray;
 
 /**
@@ -229,22 +230,64 @@ public class GraphSimilarity {
         System.out.println("GraphletsD: " + SimilarityByGraphlets.getVectorStringForIntegerArray(graphletsD));
         System.out.println("RGFD(C,D) is : " + SimilarityByGraphlets.getRelativeGraphletFrequencyDistance(graphletsC, graphletsD));
         
+        
+        
+        
+        
         System.out.println("Comparing by relative graphlet frequency distance -- 7timA and 8icdA:");
-        Double[] graphletsE = new Double[]{ };
+        Settings.init();
+        DBManager.initUsingDefaults();
+        
+        // insert fake values into DB
+        Double[] graphletsE = SimilarityByGraphlets.getRandDoubleArray(30);
+        Double[] graphletsF  = SimilarityByGraphlets.mutateDoubleArray(graphletsE, 0.3, 0.5);
+        
+        System.out.println("GraphletsE: " + SimilarityByGraphlets.getVectorStringForDoubleArray(graphletsE));
+        System.out.println("GraphletsF: " + SimilarityByGraphlets.getVectorStringForDoubleArray(graphletsF));
+        
+        
+        System.out.println("Writing fake graphlet counts for 7tim_A and 8icd_A to DB...");
+        try {
+            if(DBManager.writeNormalizedGraphletsToDB("7tim", "A", ProtGraph.GRAPHTYPE_INT_ALBE, graphletsE)) {
+                System.out.println("  7tim_A OK.");
+            }
+            else {
+                System.out.println("  ERROR.");
+            }
+        } catch (SQLException e) { System.err.println("SQL ERROR: '" + e.getMessage() + "'."); }
+        
+        try {
+            
+            if(DBManager.writeNormalizedGraphletsToDB("8icd", "A", ProtGraph.GRAPHTYPE_INT_ALBE, graphletsF)) {
+                System.out.println("  8icd_A OK.");
+            }
+            else {
+                System.out.println("  ERROR.");
+            }
+        } catch (SQLException e) { System.err.println("SQL ERROR: '" + e.getMessage() + "'."); }
+        
+        
+        System.out.println("Retrieving graphlet counts for 7tim_A and 8icd_A from DB...");
         try {
             graphletsE = DBManager.getNormalizedGraphletCounts("7tim", "A", "albe");            
         }
         catch(SQLException e) {
-            System.err.println("Could not get graphletsE");
+            System.err.println("Could not get graphletsE: '" + e.getMessage() + "'.");
         }
-        Double[] graphletsF  = new Double[]{ };
+        
         try {
             graphletsF = DBManager.getNormalizedGraphletCounts("8icd", "A", "albe");
         }
         catch(SQLException e) {
-            System.err.println("Could not get graphletsF");
+            System.err.println("Could not get graphletsF: '" + e.getMessage() + "'.");
         }
         
+        
+        if(graphletsE == null || graphletsF == null) {
+            DP.getInstance().e("Could not retrieve graphlet counts from DB, graphletsE or graphletsF is null.");
+        }
+        
+        DP.getInstance().flush();
 
         System.out.println("GraphletsE: " + SimilarityByGraphlets.getVectorStringForDoubleArray(graphletsE));
         System.out.println("GraphletsF: " + SimilarityByGraphlets.getVectorStringForDoubleArray(graphletsF));

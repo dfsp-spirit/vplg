@@ -105,6 +105,11 @@ public class SimilarityByGraphlets {
      * @return the sum of all values in i
      */
     private static Double sumDoubleArray(Double[] i) {
+        
+        if(i == null) {
+            return 0.0;
+        }
+        
         Double sum = 0.d;
         for (int j = 0; j < i.length; j++) {
             sum += i[j];            
@@ -138,6 +143,11 @@ public class SimilarityByGraphlets {
      * @return a string representation of the input array in vector notation, e.g., "<0.1,1.3,3.5,3.7>".
      */
     public static String getVectorStringForDoubleArray(Double[] arr) {
+        
+        if(arr == null) {
+            return "<>";
+        }
+        
         StringBuilder sb = new StringBuilder();
         sb.append("<");
         
@@ -176,6 +186,45 @@ public class SimilarityByGraphlets {
                 boolean substract = rand.nextBoolean(); // if false, we add it.
                 int mutatedValue = (substract ? source[i] - mutateAmount : source[i] + mutateAmount);
                 if(mutatedValue < 0) { mutatedValue = 0; }
+                res[i] = mutatedValue;
+                numMutated++;
+            }
+            else {
+                // do not mutate, just copy original value                
+                res[i] = source[i];
+            }            
+        }
+        
+        System.out.println("Mutated " + numMutated + " values in input array of length " + source.length + ".");
+        
+        return res;
+    }
+    
+    
+    /**
+     * Mutates a double array, i.e., substracts or adds values to each element randomly.
+     * It is assured that the mutated values are between 0 and 1, and that the resulting array still follows this rule.
+     * @param source the source array, it is not modified by this function (resulting value will never go below 0.0 and above 1.0 though)
+     * @param mutateMax the max value by which the value in source should be changed
+     * @param mutationProb the mutation probability for a single element
+     * @return the new array, a mutated version of source
+     */
+    public static Double[] mutateDoubleArray(Double[] source, Double mutateMax, double mutationProb) {
+        Double[] res = new Double[source.length];
+        Random rand = new Random();
+        double mutateMin = 0.01;
+        
+        double r;
+        int numMutated = 0;
+        for (int i = 0; i < res.length; i++) {
+            r = rand.nextDouble();
+            if(r < mutationProb) {
+                // mutate the value.
+                double mutateAmount = rand.nextDouble() + mutateMin;
+                boolean substract = rand.nextBoolean(); // if false, we add it.
+                Double mutatedValue = (substract ? source[i] - mutateAmount : source[i] + mutateAmount);
+                if(mutatedValue < 0.0) { mutatedValue = 0.0; }
+                if(mutatedValue > 1.0) { mutatedValue = 1.0; }
                 res[i] = mutatedValue;
                 numMutated++;
             }

@@ -8,6 +8,8 @@
 package plcc;
 
 import java.sql.*;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -130,7 +132,10 @@ public class DBManager {
 
         Boolean conOK = connect();
         return (conOK);
-
+    }
+    
+    public static Boolean initUsingDefaults() {
+        return init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"));
     }
 
     /**
@@ -2008,6 +2013,50 @@ public class DBManager {
 
         return (count);
     }
+    
+    
+    /**
+     * Deletes all graphlet counts for the given graph from the database tables.
+     * @param graph_db_id the graph ID in the database
+     * @return The number of affected records (0 if the PDB ID was not in the database).
+     */
+    public static Integer deleteGraphletsFromDBForGraph(Long graph_db_id) {
+
+        PreparedStatement statement = null;        
+        ResultSetMetaData md;
+        int count = 0;        
+        ResultSet rs = null;
+        
+        
+        String query = "DELETE FROM " + tbl_graphletcount + " WHERE graph_id = ?;";
+        
+        
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, graph_db_id);              
+            
+            count = statement.executeUpdate();
+            dbc.commit();
+            
+            //md = rs.getMetaData();
+            //count = md.getColumnCount();
+            
+            
+        } catch (SQLException e) {
+            DP.getInstance().e("DBManager", "deleteGraphletsFromDBForGraph: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "deleteGraphletsFromDBForGraph: Could not close statement and reset autocommit."); }
+        }        
+
+        return (count);
+    }
 
     
     
@@ -3193,6 +3242,7 @@ public class DBManager {
      * @return true if the graph was inserted, false if errors occurred
      * @throws SQLException if the data could not be written or the database connection could not be closed or reset to auto commit (in the finally block)
      */
+    @Deprecated
     public static Boolean writeGraphletsToDB(String pdb_id, String chain_name, Integer graph_type, Integer[] graphlet_counts) throws SQLException {
 
         int numReqGraphletTypes = 3;
@@ -3243,6 +3293,62 @@ public class DBManager {
             }
             dbc.setAutoCommit(true);
         }
+        return(result);
+    }
+    
+    
+    /**
+     * Writes information on the normalized graphlet counts for a protein graph to the database. Used by graphlet computation
+     * algorithms to store the graphlets. Currently not used because this is done in a separate C++ program.
+     * 
+     * @param pdb_id the PDB identifier of the protein
+     * @param chain_name the PDB chain name of the chain represented by the graph_string
+     * @param graph_type the Integer representation of the graph type. use ProtGraphs.getGraphTypeCode() to get it.
+     * @param graphlet_counts an array holding the counts for the different graphlet types
+     * @return true if the graph was inserted, false if errors occurred
+     * @throws SQLException if the data could not be written or the database connection could not be closed or reset to auto commit (in the finally block)
+     */
+    public static Boolean writeNormalizedGraphletsToDB(String pdb_id, String chain_name, Integer graph_type, Double[] graphlet_counts) throws SQLException {
+
+        int numReqGraphletTypes = 30;
+        if(graphlet_counts.length != numReqGraphletTypes) {
+            System.err.println("ERROR: writeNormalizedGraphletsToDB: Invalid number of graphlet types specified (got " + graphlet_counts.length + ", required " + numReqGraphletTypes + "). Skipping graphlets.");
+            return false;
+        }                
+        
+        Long graph_db_id = DBManager.getDBProteinGraphID(pdb_id, chain_name, ProtGraphs.getGraphTypeString(graph_type));
+        if (graph_db_id < 0) {
+            System.err.println("ERROR: writeNormalizedGraphletsToDB: Could not find graph with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert graphlets.");
+            return (false);
+        }
+
+        if(DBManager.graphletsExistsInDBForGraph(graph_db_id)) {
+            int numDel = DBManager.deleteGraphletsFromDBForGraph(graph_db_id);            
+        }
+
+        StringBuilder querySB = new StringBuilder();
+        querySB.append("INSERT INTO " + tbl_graphletcount + " (graph_id, graphlet_counts) VALUES (");
+        
+        StringBuilder pgArrayString = new StringBuilder();
+        pgArrayString.append("'{");
+        for(int i = 0; i < graphlet_counts.length; i++) {
+            pgArrayString.append(String.format("%.2f", graphlet_counts[i]));
+            if(i < graphlet_counts.length - 1) {
+                pgArrayString.append(", ");
+            }
+        }
+        pgArrayString.append("}'");
+
+        querySB.append(graph_db_id);
+        querySB.append(", ");
+        querySB.append(pgArrayString.toString());
+        querySB.append(")");
+        
+        String query = querySB.toString();
+        
+        int numAffected = DBManager.doInsertQuery(query);
+        Boolean result = (numAffected > 0);
+        
         return(result);
     }
     
@@ -3846,6 +3952,74 @@ public class DBManager {
         else {
             return(false);
         }        
+    }
+    
+    
+    /**
+     * Determines whether graphlet counts for a certain graph exists in the database. Note race condition problems with this
+     * approach if run on several machines which write to the same DB.
+     * @param graph_db_id the graph database id
+     * @return true if it exists, false otherwise
+     */
+    public static synchronized Boolean graphletsExistsInDBForGraph(Long graph_db_id) {
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT graphlet_id FROM " + DBManager.tbl_graphletcount + " WHERE (graph_id = ?);";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, graph_db_id);
+                                
+            rs = statement.executeQuery();
+            dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "graphletsExistsInDBForGraph:'" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "graphletsExistsInDBForGraph: Could not close statement and reset autocommit."); }
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        if(tableData.size() >= 1) {
+            return true;
+        }
+        
+        
+        return(false);
+                
     }
     
     
@@ -4472,7 +4646,7 @@ public class DBManager {
      */
     public static Double[] getNormalizedGraphletCounts(String pdb_id, String chain_name, String graph_type) throws SQLException {
         
-        int numReqGraphletTypes = 29;
+        int numReqGraphletTypes = 30;
         
         Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
         
@@ -4485,7 +4659,7 @@ public class DBManager {
         
 
         if (chain_db_id < 0) {
-            DP.getInstance().w("DBManager", "getNormalizedGraphletCounts(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
+            DP.getInstance().e("DBManager", "getNormalizedGraphletCounts(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
             return(null);
         }
 
@@ -4494,6 +4668,7 @@ public class DBManager {
         Long graphid = DBManager.getDBProteinGraphID(pdb_id, chain_name, graph_type);
         
         if(graphid <= 0) {
+            DP.getInstance().e("DBManager", "getNormalizedGraphletCounts(): Could not find " + graph_type + " protein graph with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
             return null;
         }
 
@@ -4548,22 +4723,26 @@ public class DBManager {
             rowGraphlets = tableData.get(0);
             if(rowGraphlets.size() > 0) {
                 if(rowGraphlets.size() == numReqGraphletTypes) {
+                    NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
                     for(int i = 0; i < rowGraphlets.size(); i++) {
                         try {
-                            result[i] = Double.valueOf(rowGraphlets.get(i));
+                            // old, without locale: result[i] = Double.valueOf(rowGraphlets.get(i));
+                            result[i] = nf.parse(rowGraphlets.get(i)).doubleValue();
                         } catch(NumberFormatException ce) {
-                            DP.getInstance().w("DBManager", "getNormalizedGraphletCounts: Cast error. Could not cast entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "' to Integer.");
+                            DP.getInstance().e("DBManager", "getNormalizedGraphletCounts: Cast error. Could not cast entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "' to Double.");
                             return null;
+                        } catch (ParseException ep) {
+                            DP.getInstance().e("DBManager", "getNormalizedGraphletCounts: parse error. Could not parse entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "' to Double.");
                         }
                     }
                     return(result);
                 } else {
-                    DP.getInstance().w("DBManager", "getNormalizedGraphletCounts: Entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "' has wrong size.");
+                    DP.getInstance().e("DBManager", "getNormalizedGraphletCounts: Entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "' has wrong size (found " + rowGraphlets.size() + ", expected " + numReqGraphletTypes + ").");
                     return(null);
                 }                                
             }
             else {
-                DP.getInstance().w("DBManager", "getNormalizedGraphletCounts: No entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
+                DP.getInstance().e("DBManager", "getNormalizedGraphletCounts: No entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
                 return(null);
             }
         }
