@@ -43,6 +43,8 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		
 		<?php include('navbar.php'); ?>
 			
+		 
+		 <!-- TODO: This container should also be generated in display_proteins.php, it should only show up when the listed formats are actually available for download.     -->
 		<div class="container" id="proteinDisplay">
 		<!--
 			<b>Please note:</b> Only <a href="about.php#foldingGraph">folding graphs</a> with more than one SSE are presented. The <a href="about.php#foldingGraph">folding graphs</a> with only one SSE

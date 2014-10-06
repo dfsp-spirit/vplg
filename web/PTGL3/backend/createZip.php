@@ -55,7 +55,9 @@ function create_zip($files = array(),$destination = '',$overwrite = false) {
 		foreach($files as $file) {
 			//make sure the file exists
 			if(file_exists('.'.$IMG_ROOT_PATH.$file) && is_readable('.'.$IMG_ROOT_PATH.$file)) {
-				$valid_files[] = $file;
+				if (strpos($file, '..') === FALSE) {
+				  $valid_files[] = $file;
+				}
 			}
 		}
 	}
@@ -132,7 +134,7 @@ if(isset($_POST['proteins']) && isset($_POST['downloadType'])) {
 
 // if parameters are not set...
 } else {
-	echo "<script> alert('Error!');</script>";
+	echo "Invalid download parameters.";
 }
 // EOF
 ?>
