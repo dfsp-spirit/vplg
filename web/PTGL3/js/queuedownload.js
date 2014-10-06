@@ -14,12 +14,14 @@ $(document).ready(function() {
 			}
 		});	
 		
-		$.ajax({
-    		url: '/backend/downloadFiles.php',
-    		type: 'post',
-    		data: {queue},
-    		success: function(response) {}
-		});
+		if(queue.length > 0) {	
+		  $.ajax({
+		  url: '/backend/downloadFiles.php',
+		  type: 'post',
+		  data: {queue},
+		  success: function(response) {}
+		  });
+		}
 	});
 	
 });
