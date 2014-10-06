@@ -49,10 +49,27 @@ function get_cath_link($pdbid, $chain = null) {
 function compute_graphlet_similarity($graphletcounts_a, $graphletcounts_b) {
 	if(count($graphletcounts_a) > 0) {
 	  if(count($graphletcounts_a) === count($graphletcounts_b)) {
+	    $sum_a = array_sum($graphletcounts_a);
+	    $sum_b = array_sum($graphletcounts_b);
+	    
+	    $res = 0.0;
+	    for($i = 0; $i < count($graphletcounts_a); $i++) {
+	      $score_a = -log($graphletcounts_a[$i] / $sum_a);
+	      $score_b = -log($graphletcounts_b[$i] / $sum_b);
+	      if(is_infinite($score_a) || is_infinite($score_b)) {
+	        continue;
+	      }
+	      else {
+	        $res += abs($score_a - $score_b);
+	      }
+	    }
+	    
+	    return $res;
 	  }
 	}
-	
-	return 0.0;
+	else {
+	  return 0.0;
+	}
 }
 
 
@@ -104,9 +121,9 @@ function check_valid_chainid($str) {
 }
 
 
-function get_proteingraph_graphlet_counts($db, $pdb_id, $chain_id, $graph_type) {
+function get_proteingraph_graphlet_counts($db, $pdb_id, $chain_name, $graph_type) {
   $data = array();
-  $query = "SELECT p.pdb_id, c.chain_name, gt.graphtype_text, array_to_json(gl.graphlet_counts) AS graphletcounts FROM plcc_graphlets gl INNER JOIN plcc_graph g ON gl.graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE (p.pdbid = '" . $pdb_id . "' AND c.chain_id = '" . $chain_id . "' AND gt.graphtype_text = '" . $graph_type . "' )";
+  $query = "SELECT p.pdb_id, c.chain_name, gt.graphtype_text, array_to_json(gl.graphlet_counts) AS graphlet_counts FROM plcc_graphlets gl INNER JOIN plcc_graph g ON gl.graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE (p.pdb_id = '" . $pdb_id . "' AND c.chain_name = '" . $chain_name . "' AND gt.graphtype_text = '" . $graph_type . "' )";
     
   $result = pg_query($db, $query);
   while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
@@ -127,7 +144,7 @@ function get_proteingraph_graphlet_counts($db, $pdb_id, $chain_id, $graph_type) 
 function get_all_proteingraph_graphlet_counts_for_graphtype($db, $graph_type) {
   $all_data = array();
   
-  $query = "SELECT p.pdb_id, c.chain_name, gt.graphtype_text, array_to_json(gl.graphlet_counts) AS graphletcounts FROM plcc_graphlets gl INNER JOIN plcc_graph g ON gl.graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE ( gt.graphtype_text = '" . $graph_type . "' )";
+  $query = "SELECT p.pdb_id, c.chain_name, gt.graphtype_text, array_to_json(gl.graphlet_counts) AS graphlet_counts FROM plcc_graphlets gl INNER JOIN plcc_graph g ON gl.graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE ( gt.graphtype_text = '" . $graph_type . "' )";
     
   $result = pg_query($db, $query);
   while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
@@ -238,6 +255,9 @@ function get_motif_query_string($motif_id) {
 				   WHERE c2m.motif_id = " . $motif_id . "";
    return $res;
 }
+
+$debug_msg = "";
+
 
 if(isset($_GET["next"])) {
 	if(is_numeric($_GET["next"]) && $_GET["next"] >= 0){
@@ -457,6 +477,10 @@ if(isset($_GET)) {
 	exit;
 }
 
+
+
+$list_of_search_types = array();
+
 if (($none_set == true)) { // #TODO redefine this check...
 	$tableString = "Sorry. Your search term is too short.<br>\n";
 	$tableString .= '<a href="./index.php">Go back</a> or use the query box in the upper right corner!';
@@ -473,6 +497,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 	
 	// following: the queries for each set parameter
 	if (isset($keyword) && $keyword != "") {
+		array_push($list_of_search_types, "keyword");
 		$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
 				   FROM plcc_chain c
 				   INNER JOIN plcc_protein p
@@ -482,6 +507,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 		$firstQuerySet = true; };
 	
 	if (isset($pdbid) && $pdbid != ""){
+		array_push($list_of_search_types, "pdbid");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
 				   FROM plcc_chain c
@@ -491,6 +517,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 		$firstQuerySet = true; };
 	
 	if (isset($title) && $title != ""){
+	        array_push($list_of_search_types, "title");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
 				   FROM plcc_chain c
@@ -500,6 +527,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 		$firstQuerySet = true; };
 	
 	if (isset($hasligand) && $hasligand != "null") {
+		array_push($list_of_search_types, "hasligand");
 		if($hasligand == "1") {
 			$operator = " NOT ";
 		} else if ($hasligand == "0"){
@@ -517,6 +545,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 	};
 
 	if (isset($ligandname) && $ligandname != "") { 
+		array_push($list_of_search_types, "ligandname");
 		if($firstQuerySet) { $query .= " UNION "; }
 		/*$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
 				   FROM plcc_nm_ligandtochain l
@@ -533,6 +562,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 	};
 
 	if (isset($molecule) && $molecule != ""){
+		array_push($list_of_search_types, "molecule");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
 				   FROM plcc_chain c
@@ -545,24 +575,28 @@ if (($none_set == true)) { // #TODO redefine this check...
 	// ----- linnot alpha queries -----
 	
 	if (isset($linnotalphaadj) && $linnotalphaadj != ""){
+		array_push($list_of_search_types, "linnotalphaadj");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("adj", $linnotalphaadj, 1, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalphared) && $linnotalphared != ""){
+		array_push($list_of_search_types, "linnotalphared");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("red", $linnotalphared, 1, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalphaseq) && $linnotalphaseq != ""){
+	        array_push($list_of_search_types, "linnotalphaseq");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("seq", $linnotalphaseq, 1, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalphakey) && $linnotalphakey != ""){
+	        array_push($list_of_search_types, "linnotalphakey");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("key", $linnotalphakey, 1, true);
 		$firstQuerySet = true; 
@@ -571,24 +605,28 @@ if (($none_set == true)) { // #TODO redefine this check...
 	// ----- linnot beta queries -----
 	
 	if (isset($linnotbetaadj) && $linnotbetaadj != ""){
+	        array_push($list_of_search_types, "linnotbetaadj");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("adj", $linnotbetaadj, 2, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotbetared) && $linnotbetared != ""){
+	        array_push($list_of_search_types, "linnotbetared");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("red", $linnotbetared, 2, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotbetaseq) && $linnotbetaseq != ""){
+	        array_push($list_of_search_types, "linnotbetaseq");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("seq", $linnotbetaseq, 2, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotbetakey) && $linnotbetakey != ""){
+	        array_push($list_of_search_types, "linnotbetakey");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("key", $linnotbetakey, 2, true);
 		$firstQuerySet = true; 
@@ -597,24 +635,28 @@ if (($none_set == true)) { // #TODO redefine this check...
 	// ----- linnot albe queries -----
 	
 	if (isset($linnotalbeadj) && $linnotalbeadj != ""){
+	        array_push($list_of_search_types, "linnotalbeadj");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("adj", $linnotalbeadj, 3, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalbered) && $linnotalbered != ""){
+	        array_push($list_of_search_types, "linnotalbered");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("red", $linnotalbered, 3, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalbeseq) && $linnotalbeseq != ""){
+	        array_push($list_of_search_types, "linnotalbeseq");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("seq", $linnotalbeseq, 3, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalbekey) && $linnotalbekey != ""){
+	        array_push($list_of_search_types, "linnotalbekey");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("key", $linnotalbekey, 3, true);
 		$firstQuerySet = true; 
@@ -623,24 +665,28 @@ if (($none_set == true)) { // #TODO redefine this check...
 	// ----- linnot alphalig queries -----
 	
 	if (isset($linnotalphaligadj) && $linnotalphaligadj != ""){
+	        array_push($list_of_search_types, "linnotalphaligadj");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("adj", $linnotalphaligadj, 4, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalphaligred) && $linnotalphaligred != ""){
+	        array_push($list_of_search_types, "linnotalphaligred");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("red", $linnotalphaligred, 4, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalphaligseq) && $linnotalphaligseq != ""){
+	        array_push($list_of_search_types, "linnotalphaligseq");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("seq", $linnotalphaligseq, 4, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalphaligkey) && $linnotalphaligkey != ""){
+	        array_push($list_of_search_types, "linnotalphaligkey");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("key", $linnotalphaligkey, 4, true);
 		$firstQuerySet = true; 
@@ -649,24 +695,28 @@ if (($none_set == true)) { // #TODO redefine this check...
 	// ----- linnot betalig queries -----
 	
 	if (isset($linnotbetaligadj) && $linnotbetaligadj != ""){
+	        array_push($list_of_search_types, "linnotbetaligadj");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("adj", $linnotbetaligadj, 5, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotbetaligred) && $linnotbetaligred != ""){
+	        array_push($list_of_search_types, "linnotbetaligred");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("red", $linnotbetaligred, 5, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotbetaligseq) && $linnotbetaligseq != ""){
+	        array_push($list_of_search_types, "linnotbetaligseq");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("seq", $linnotbetaligseq, 5, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotbetaligkey) && $linnotbetaligkey != ""){
+	        array_push($list_of_search_types, "linnotbetaligkey");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("key", $linnotbetaligkey, 5, true);
 		$firstQuerySet = true; 
@@ -675,24 +725,28 @@ if (($none_set == true)) { // #TODO redefine this check...
 	// ----- linnot albelig queries -----
 	
 	if (isset($linnotalbeligadj) && $linnotalbeligadj != ""){
+	        array_push($list_of_search_types, "linnotalbeligadj");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("adj", $linnotalbeligadj, 6, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalbeligred) && $linnotalbeligred != ""){
+	        array_push($list_of_search_types, "linnotalbeligred");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("red", $linnotalbeligred, 6, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalbeligseq) && $linnotalbeligseq != ""){
+	        array_push($list_of_search_types, "linnotalbeligseq");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("seq", $linnotalbeligseq, 6, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalbeligkey) && $linnotalbeligkey != ""){
+	        array_push($list_of_search_types, "linnotalbeligkey");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("key", $linnotalbeligkey, 6, true);
 		$firstQuerySet = true; 
@@ -700,7 +754,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 	
 	// motif search	
 	if (isset($motif) && $motif != ""){
-	
+	        array_push($list_of_search_types, "motif");
 		$motif_id = get_motif_id($motif);
 		if($motif_id > 0) {
 			if($firstQuerySet) { $query .= " UNION "; }
@@ -711,47 +765,61 @@ if (($none_set == true)) { // #TODO redefine this check...
 	
 	//graphletsimilarity
 	if (isset($graphletsimilarity) && $graphletsimilarity != ""){
+	        array_push($list_of_search_types, "graphletsimilarity");
 		
-		// $graphletsimilarity must be set to a valid pdb id + chain, e.g., '7timA'.
+		// $graphletsimilarity must be set to a valid pdb id + chain, e.g., '7timA'.		
 					
 		if(strlen($graphletsimilarity) == 5) {
-			$pdb_id = substr($pdbchain, 0, 4);
-			$chain_id = substr($pdbchain, 4, 1);						
+			$pdb_id = substr($graphletsimilarity, 0, 4);
+			$chain_id = substr($graphletsimilarity, 4, 1);						
 			
 			if(check_valid_pdbid($pdb_id) && check_valid_chainid($chain_id)) {
 				
 				$graph_type = "albe";
 			
 				$pdbchainlist = array();
+				$similarity_list = array();
 				
 				//  get graphlet counts of query protein from DB
 				$query_prot_data = get_proteingraph_graphlet_counts($db, $pdb_id, $chain_id, $graph_type);
+				if(isset($query_prot_data['pdb_id'])) {
 				
-				// get graphlet counts for all protein chains
-				$all_data = get_all_proteingraph_graphlet_counts_for_graphtype($db, $graph_type);
-				
-				// TODO: fill array with similar chains based on graphlet distance here:				
-				//  - compare to all others using some graphlet-based score
-				// add all result proteins above a certain threshold to the $pdbchainlist
-				
-				// now compare scores and add best scores to $pdbchainlist
-				foreach($all_data as $chaindata) {
-					$similarity_score = compute_graphlet_similarity($query_prot_data['gaphlet_counts'], $chaindata['graphlet_counts']);
-					if($similarity_score >= 0.9) {
-						array_push($pdbchainlist, "" . $chaindata['pdb_id'] . $chaindata['chain_name']);
-					}
-				}
-				
-				
-				
-				
-				
-				if(count($pdbchainlist) > 0) {
-				  if($firstQuerySet) { $query .= " UNION "; }
-					$query .= get_multiple_PDB_select_query($pdbchainlist);
-					$firstQuerySet = true;		  
+				  // get graphlet counts for all protein chains
+				  $all_data = get_all_proteingraph_graphlet_counts_for_graphtype($db, $graph_type);
+				  
+				  // fill array with similar chains based on graphlet distance				
+				  
+				  
+				  // now compare scores and add best scores to $pdbchainlist
+				  foreach($all_data as $chaindata) {
+					  $similarity_score = compute_graphlet_similarity($query_prot_data['gaphlet_counts'], $chaindata['graphlet_counts']);
+					  //  compare to other using some graphlet-based score
+					  //if($similarity_score >= 0.9) {
+					          $found_name = "" . $chaindata['pdb_id'] . $chaindata['chain_name'];
+						  array_push($pdbchainlist, $found_name);
+						  array_push($similarity_list, $similarity_score);
+						  $debug_msg .= "  sim($found_name = $similarity_score) "; 
+					  //}
+				  }
+				  
+				  
+				  
+				  
+				  
+				  if(count($pdbchainlist) > 0) {
+				    if($firstQuerySet) { $query .= " UNION "; }
+					  $query .= get_multiple_PDB_select_query($pdbchainlist);
+					  $firstQuerySet = true;		  
+				  } else {
+				    $debug_msg .= "graphletsimilarity: No matching chains with proper similarity score based on graphlet counts found in the " . count($all_data) . " DB entries.";
+				  }
+				} else {
+				  $debug_msg .= "graphletsimilarity: No graphlet data for query graph '$pdb_id' chain '$chain_id' type '$graph_type' found.";
 				}
 			
+			}
+			else {
+			  $debug_msg .= "graphletsimilarity: invalid PDB '$pdb_id' and chain '$chain_id'.";
 			}
 		}
 		
@@ -778,7 +846,11 @@ if (($none_set == true)) { // #TODO redefine this check...
 	$count_result = pg_query($db, $count_query); // or die($query . ' -> Query failed: ' . pg_last_error());
 
 	$row_count = pg_fetch_array($count_result, NULL, PGSQL_ASSOC);
-	$row_count = $row_count["count"];
+	if(isset($row_count["count"])) {
+	  $row_count = $row_count["count"];
+	} else {
+	  $row_count = 0;
+	}
 
 	// this counter is used to display alternating table colors
 	$counter = 0;
@@ -791,10 +863,10 @@ if (($none_set == true)) { // #TODO redefine this check...
 		$tableString .= '<a class="changepage" href="?next='.($limit_start - $q_limit).'"><< previous </a>  ';
 	}
 
-	$tableString .= '-- Showing results '.$limit_start.' to ';
+	$tableString .= '-- Showing result chains '.$limit_start.' to ';
 	
 	if($limit_start + $q_limit > $row_count){
-		$tableString .= $row_count . ' (of '.$row_count.') -- ';
+		$tableString .= $row_count . ' (of ' . $row_count . ' total) -- ';
 	} else {
 		$tableString .= ($limit_start + $q_limit) . ' (of '.$row_count.') -- ';
 	}
@@ -852,7 +924,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 		$numberOfChains++;
 		
 	}
-	$tableString .= ' </div>';
+	$tableString .= ' </div>';	// the $tableString var is used in the frontend search.php page to print results
 	pg_free_result($result); // clean memory
 	pg_close($db); // close connection
 }

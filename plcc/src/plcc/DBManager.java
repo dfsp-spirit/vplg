@@ -102,6 +102,7 @@ public class DBManager {
     //static String view_fglinnotsalbelig = "plcc_view_fglinnotsalbelig";
     static String view_fglinnots = "plcc_view_fglinnots";
     static String view_secondat = "plcc_view_secondat";
+    static String view_graphlets = "plcc_view_graphlets";
 
     /**
      * Sets the database address and the credentials to access the DB.
@@ -550,6 +551,7 @@ public class DBManager {
             
             doInsertQuery("CREATE VIEW " + view_sses + " AS SELECT s.sse_id, p.pdb_id, c.chain_name, s.position_in_chain, s.dssp_start, s.dssp_end, sset.ssetype_text FROM " + tbl_sse + " s INNER JOIN " + tbl_chain + " c ON s.chain_id = c.chain_id INNER JOIN " + tbl_protein + " p ON c.pdb_id = p.pdb_id INNER JOIN " + tbl_ssetypes + " sset ON s.sse_type = sset.ssetype_id;");
             doInsertQuery("CREATE VIEW " + view_secondat + " AS SELECT s.sse_id, p.pdb_id, c.chain_name, s.position_in_chain, s.dssp_start, s.dssp_end, sset.ssetype_text, sd.alpha_fg_number, sd.alpha_fg_foldname, sd.alpha_fg_position, sd.beta_fg_number, sd.beta_fg_foldname, sd.beta_fg_position, sd.albe_fg_number, sd.albe_fg_foldname, sd.albe_fg_position, sd.alphalig_fg_number, sd.alphalig_fg_foldname, sd.alphalig_fg_position, sd.betalig_fg_number, sd.betalig_fg_foldname, sd.betalig_fg_position, sd.albelig_fg_number, sd.albelig_fg_foldname, sd.albelig_fg_position FROM " + tbl_sse + " s INNER JOIN " + tbl_chain + " c ON s.chain_id = c.chain_id INNER JOIN " + tbl_protein + " p ON c.pdb_id = p.pdb_id INNER JOIN " + tbl_ssetypes + " sset ON s.sse_type = sset.ssetype_id INNER JOIN " + tbl_secondat + " sd ON s.sse_id = sd.sse_id;");
+            doInsertQuery("CREATE VIEW " + view_graphlets + " AS SELECT p.pdb_id, c.chain_name, gt.graphtype_text, gc.graphlet_counts FROM " + tbl_graphletcount + " gc INNER JOIN " + tbl_proteingraph + " g ON gc.graph_id = g.graph_id INNER JOIN " + tbl_chain + " c ON g.chain_id = c.chain_id INNER JOIN " + tbl_protein + " p ON c.pdb_id = p.pdb_id INNER JOIN " + tbl_graphtypes + " gt ON  g.graph_type = gt.graphtype_id;");
             
             // add comments on views
             doInsertQuery("COMMENT ON VIEW " + view_ssecontacts + " IS 'Easy overview of SSE contacts.';");
@@ -558,6 +560,8 @@ public class DBManager {
             
             doInsertQuery("COMMENT ON VIEW " + view_fglinnots + " IS 'Overview of linear notation information for all graph types, includes the PDB ID, chain name, graph type and fold number.';");
             doInsertQuery("COMMENT ON VIEW " + view_secondat + " IS 'Overview of secondat info for all SSEs.';");
+            doInsertQuery("COMMENT ON VIEW " + view_graphlets + " IS 'Overview of graphlet info for all protein graphs.';");
+            
             //doInsertQuery("COMMENT ON VIEW " + view_fglinnotsalpha + " IS 'Overview of alpha linear notation information, includes the PDB ID, chain name, graph type and fold number.';");
             //doInsertQuery("COMMENT ON VIEW " + view_fglinnotsbeta + " IS 'Overview of beta linear notation information, includes the PDB ID, chain name, graph type and fold number.';");
             //doInsertQuery("COMMENT ON VIEW " + view_fglinnotsalbe + " IS 'Overview of albe linear notation information, includes the PDB ID, chain name, graph type and fold number.';");

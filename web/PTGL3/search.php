@@ -61,9 +61,22 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			</div><!-- end col-centered -->
 		</div><!-- end row -->
 		</div>
-		<div class="container" id="searchResults">
-			<h2> Search Results </h2>
-			<?php echo $tableString; /* The table string is constructed in backend/search.php, which is included by this file. */  ?>
+		<div class="container" id="searchResults">			
+			<?php 
+			    $search_type = "advanced";
+			    if(count($list_of_search_types) === 1) {
+			      $search_type = $list_of_search_types[0];
+			    }
+			    
+			    echo "<h2> Search Results -- $search_type search</h2>";
+			    
+			    
+			    echo $tableString; /* The table string is constructed in backend/search.php, which is included by this file. */  
+			    
+			    if($numberOfChains <= 4) {
+			      echo "<p>Your search returned $numberOfChains results. Please modify the query and try again. DEBUG: '$debug_msg'.</p>\n";
+			    }
+			?>
 			</form>	
 		</div><!-- end container and searchResults -->
 	</div><!-- end container-->
