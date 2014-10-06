@@ -64,10 +64,6 @@ $chains = explode(" ", trim($q));
 $conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
 $db = pg_connect($conn_string);
 
-// start to fill the html-tableString with content. This string will be echoed later
-// to display the here created HTML construct.
-$tableString = '<div id="myCarousel">
-				  <ul class="bxslider bx-prev bx-next" id="carouselSlider">';
 
 // init the variable which counts the number of loaded images. You may need this
 // if you want to restrict the number of at-once-loaded images (partially implemented)
@@ -110,70 +106,95 @@ foreach ($chains as $value){
 		$query_SSE = "SELECT * FROM plcc_sse WHERE chain_id = ".$chain_id." ORDER BY position_in_chain";
 		$result_SSE = pg_query($db, $query_SSE);
 		
-		// continue building the HTML string. Not further explained from now on.
-		$tableString .= '<li>
-						<div class="container">
-						<h4>Protein graph for '.$pdbID.', chain '.$chainName.'</h4>
-						<div class="proteingraph">
-						  <div>
-							<input type="checkbox" name="'.$pdbID.$chainName.'" value="'.$pdbID.$chainName.'"> Enqueue in Downloadlist
-						 	<span class="download-options"><a href="3Dview.php?pdbid='.$pdbID.'&chain='.$chainName.'&mode=allgraphs" target="_blank">3D-View [JMOL]</a></span>
-						  </div>	
-						  <ul id="'.$pdbID.$chainName.'" class="bxslider tada">';
-
-		// if($loaded_images < 2){		// use this to limit preloaded images
-		$tableString .= '<li><a title="Loaded_'.$loaded_images.'" href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">
-						  <img src="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" alt="" />
-						</a>
-						<a href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">Full Size Image</a>
-						<span class="download-options">Download Graph: ';
+		$base_image_exists = FALSE;
+		if(isset($data['graph_image_png']) && file_exists($IMG_ROOT_PATH.$data['graph_image_png'])) {
+			$base_image_exists = TRUE;
+		}
 		
+		
+		if($base_image_exists) {
+		
+		    $tableString = '<div id="myCarousel">
+				      <ul class="bxslider bx-prev bx-next" id="carouselSlider">';
+		    
+		    // start to fill the html-tableString with content. This string will be echoed later
+		    // to display the here created HTML construct.
+		    
 
-		// check if downloadable files exist. If so, then add link to file (4x)
-		if(isset($data['graph_image_pdf']) && file_exists($IMG_ROOT_PATH.$data['graph_image_pdf'])) {
-			$tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_pdf'].'" target="_blank">[PDF]</a>';
-		}
-		if(isset($data['graph_image_svg']) && file_exists($IMG_ROOT_PATH.$data['graph_image_svg'])){
-			$tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_svg'].'" target="_blank">[SVG]</a>';
-		}
-		if(isset($data['graph_image_png']) && file_exists($IMG_ROOT_PATH.$data['graph_image_png'])){
-			$tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">[PNG]</a>';
-		}
-		if(isset($data['filepath_graphfile_gml']) && file_exists($IMG_ROOT_PATH.$data['filepath_graphfile_gml'])){
-			$tableString .= '<a href="'.$IMG_ROOT_PATH.$data['filepath_graphfile_gml'].'" target="_blank">[GML]</a>';
-		}
-		$tableString .= '</span></li>';
+		    
+		    // continue building the HTML string. Not further explained from now on.
+		    $tableString .= '<li>
+						    <div class="container">
+						    <h4>Protein graph for '.$pdbID.', chain '.$chainName.'</h4>
+						    <div class="proteingraph">
+						      <div>
+							    <input type="checkbox" name="'.$pdbID.$chainName.'" value="'.$pdbID.$chainName.'"> Enqueue in Downloadlist
+							    <span class="download-options"><a href="3Dview.php?pdbid='.$pdbID.'&chain='.$chainName.'&mode=allgraphs" target="_blank">3D-View [JMOL]</a></span>
+						      </div>	
+						      <ul id="'.$pdbID.$chainName.'" class="bxslider tada">';
 
-		// }	// use this to limit preloaded images
+		    // if($loaded_images < 2){		// use this to limit preloaded images
+		    $tableString .= '<li><a title="Graph image" href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">
+						      <img src="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" alt="" />
+						    </a>
+						    <a href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">Full Size Image</a>
+						    <span class="download-options">Download Graph: ';
+		    
 
-		// get the rest of the dataset. Until here we used only the first dataset from the DB.
-		while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
-			$tableString .= '<li>';
-			$tableString .= '<a href="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" target="_blank">
-							   <img src="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" alt="" />
-							 </a>
-						     <a href="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" target="_blank">Full Size Image</a>
-						     <span class="download-options">Download Graph: ';
+		    // check if downloadable files exist. If so, then add link to file (4x)
+		    if(isset($data['graph_image_pdf']) && file_exists($IMG_ROOT_PATH.$data['graph_image_pdf'])) {
+			    $tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_pdf'].'" target="_blank">[PDF]</a>';
+		    }
+		    if(isset($data['graph_image_svg']) && file_exists($IMG_ROOT_PATH.$data['graph_image_svg'])){
+			    $tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_svg'].'" target="_blank">[SVG]</a>';
+		    }
+		    if(isset($data['graph_image_png']) && file_exists($IMG_ROOT_PATH.$data['graph_image_png'])){
+			    $tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">[PNG]</a>';
+		    }
+		    if(isset($data['filepath_graphfile_gml']) && file_exists($IMG_ROOT_PATH.$data['filepath_graphfile_gml'])){
+			    $tableString .= '<a href="'.$IMG_ROOT_PATH.$data['filepath_graphfile_gml'].'" target="_blank">[GML]</a>';
+		    }
+		    $tableString .= '</span></li>';
+
+		    // }	// use this to limit preloaded images
+
+		    // get the rest of the dataset. Until here we used only the first dataset from the DB.
+		    while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
+			    $tableString .= '<li>';
+			    $tableString .= '<a href="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" target="_blank">
+							      <img src="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" alt="" />
+							    </a>
+							<a href="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" target="_blank">Full Size Image</a>
+							<span class="download-options">Download Graph: ';
+				    
+				    // check if downloadable files exist. If so, then add link to file (4x)
+				    if(isset($data['graph_image_pdf']) && file_exists($IMG_ROOT_PATH.$data['graph_image_pdf'])) {
+					    $tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_pdf'].'" target="_blank">[PDF]</a>';
+				    }
+				    if(isset($data['graph_image_svg']) && file_exists($IMG_ROOT_PATH.$data['graph_image_svg'])){
+					    $tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_svg'].'" target="_blank">[SVG]</a>';
+				    }
+				    if(isset($data['graph_image_png']) && file_exists($IMG_ROOT_PATH.$data['graph_image_png'])){
+					    $tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">[PNG]</a>';
+				    }
+				    if(isset($data['filepath_graphfile_gml']) && file_exists($IMG_ROOT_PATH.$data['filepath_graphfile_gml'])){
+					    $tableString .= '<a href="'.$IMG_ROOT_PATH.$data['filepath_graphfile_gml'].'" target="_blank">[GML]</a>';
+				    }
+			    $tableString .= '</span>';
+			    $tableString .= '</li>';
+		    }
+
+		    $tableString .= '</ul>
+						    </div>';
+		    
+						  
+						
+		} else {
+		$tableString .= "No data found for protein.";
+		}
+		
 				
-				// check if downloadable files exist. If so, then add link to file (4x)
-				if(isset($data['graph_image_pdf']) && file_exists($IMG_ROOT_PATH.$data['graph_image_pdf'])) {
-					$tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_pdf'].'" target="_blank">[PDF]</a>';
-				}
-				if(isset($data['graph_image_svg']) && file_exists($IMG_ROOT_PATH.$data['graph_image_svg'])){
-					$tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_svg'].'" target="_blank">[SVG]</a>';
-				}
-				if(isset($data['graph_image_png']) && file_exists($IMG_ROOT_PATH.$data['graph_image_png'])){
-					$tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">[PNG]</a>';
-				}
-				if(isset($data['filepath_graphfile_gml']) && file_exists($IMG_ROOT_PATH.$data['filepath_graphfile_gml'])){
-					$tableString .= '<a href="'.$IMG_ROOT_PATH.$data['filepath_graphfile_gml'].'" target="_blank">[GML]</a>';
-				}
-			$tableString .= '</span>';
-			$tableString .= '</li>';
-		}
-
-		$tableString .= '</ul>
-						</div>
+				$tableString .= '
 						<div class="table-responsive" id="sse">
 						<table class="table table-condensed table-hover borderless whiteBack">
 						  <tr>
@@ -209,9 +230,11 @@ foreach ($chains as $value){
 		// create thumbails for the (inner) slider. One thumb for each graphtype
 		$result_thumbs = pg_execute($db, "getChains", array("%".$pdbID."%", "%".$chainName."%"));
 		while ($arr = pg_fetch_array($result_thumbs, NULL, PGSQL_ASSOC)){
-			$tableString .= ' <a class="thumbalign" data-slide-index="'.$c++.'" href=""><img src="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" width="100px" height="100px" />
+			if(isset($arr['graph_image_png']) && file_exists($IMG_ROOT_PATH.$arr['graph_image_png'])) {
+			    $tableString .= ' <a class="thumbalign" data-slide-index="'.$c++.'" href=""><img src="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" width="100px" height="100px" />
 								'.$graphtype_dict[$graphtypes[$c-1]].'
 							  </a>';
+			}
 		}
 		$tableString .= '</div></li>';
 	}

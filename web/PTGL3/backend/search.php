@@ -177,7 +177,7 @@ function get_multiple_PDB_select_query($pdb_chain_list) {
 	  $chain_id = $valid_pdb_chains[$i];
 	  $query .= " ( p.pdb_id = '" . $pdb_id . "' AND c.chain_name = '" . $chain_id . "' )";
 	  if($i < count($valid_pdb_ids) - 1) {
-	    $query .= " OR "
+	    $query .= " OR ";
 	  }
 	}
 	
