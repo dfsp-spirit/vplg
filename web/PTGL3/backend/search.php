@@ -10,6 +10,8 @@
  * @author Andreas Scheck <andreas.scheck.home@googlemail.com>
  *
  * Tim added options to search for folding graph linear notations, SEPT 2014.
+ * Tim added options to search for motifs, OCT 2014.
+ * Tim added options to search for graphlet-based similarity to a query protein, OCT 2014.
  */
 
 ini_set('display_errors', 0);
@@ -257,6 +259,7 @@ function get_motif_query_string($motif_id) {
 }
 
 $debug_msg = "";
+$result_comments = array();
 
 
 if(isset($_GET["next"])) {
@@ -497,7 +500,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 	
 	// following: the queries for each set parameter
 	if (isset($keyword) && $keyword != "") {
-		array_push($list_of_search_types, "keyword");
+		array_push($list_of_search_types, "keyword search");
 		$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
 				   FROM plcc_chain c
 				   INNER JOIN plcc_protein p
@@ -507,7 +510,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 		$firstQuerySet = true; };
 	
 	if (isset($pdbid) && $pdbid != ""){
-		array_push($list_of_search_types, "pdbid");
+		array_push($list_of_search_types, "PDB ID search");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
 				   FROM plcc_chain c
@@ -517,7 +520,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 		$firstQuerySet = true; };
 	
 	if (isset($title) && $title != ""){
-	        array_push($list_of_search_types, "title");
+	        array_push($list_of_search_types, "title search");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
 				   FROM plcc_chain c
@@ -527,7 +530,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 		$firstQuerySet = true; };
 	
 	if (isset($hasligand) && $hasligand != "null") {
-		array_push($list_of_search_types, "hasligand");
+		array_push($list_of_search_types, "hasligand search");
 		if($hasligand == "1") {
 			$operator = " NOT ";
 		} else if ($hasligand == "0"){
@@ -545,7 +548,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 	};
 
 	if (isset($ligandname) && $ligandname != "") { 
-		array_push($list_of_search_types, "ligandname");
+		array_push($list_of_search_types, "ligand name search");
 		if($firstQuerySet) { $query .= " UNION "; }
 		/*$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
 				   FROM plcc_nm_ligandtochain l
@@ -562,7 +565,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 	};
 
 	if (isset($molecule) && $molecule != ""){
-		array_push($list_of_search_types, "molecule");
+		array_push($list_of_search_types, "molecule search");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
 				   FROM plcc_chain c
@@ -575,28 +578,28 @@ if (($none_set == true)) { // #TODO redefine this check...
 	// ----- linnot alpha queries -----
 	
 	if (isset($linnotalphaadj) && $linnotalphaadj != ""){
-		array_push($list_of_search_types, "linnotalphaadj");
+		array_push($list_of_search_types, "search for ADJ linear notations of alpha graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("adj", $linnotalphaadj, 1, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalphared) && $linnotalphared != ""){
-		array_push($list_of_search_types, "linnotalphared");
+		array_push($list_of_search_types, "search for RED linear notations of alpha graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("red", $linnotalphared, 1, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalphaseq) && $linnotalphaseq != ""){
-	        array_push($list_of_search_types, "linnotalphaseq");
+	        array_push($list_of_search_types, "search for SEQ linear notations of alpha graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("seq", $linnotalphaseq, 1, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalphakey) && $linnotalphakey != ""){
-	        array_push($list_of_search_types, "linnotalphakey");
+	        array_push($list_of_search_types, "search for KEY linear notations of alpha graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("key", $linnotalphakey, 1, true);
 		$firstQuerySet = true; 
@@ -605,28 +608,28 @@ if (($none_set == true)) { // #TODO redefine this check...
 	// ----- linnot beta queries -----
 	
 	if (isset($linnotbetaadj) && $linnotbetaadj != ""){
-	        array_push($list_of_search_types, "linnotbetaadj");
+	        array_push($list_of_search_types, "search for ADJ linear notations of beta graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("adj", $linnotbetaadj, 2, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotbetared) && $linnotbetared != ""){
-	        array_push($list_of_search_types, "linnotbetared");
+	        array_push($list_of_search_types, "search for RED linear notations of beta graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("red", $linnotbetared, 2, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotbetaseq) && $linnotbetaseq != ""){
-	        array_push($list_of_search_types, "linnotbetaseq");
+	        array_push($list_of_search_types, "search for SEQ linear notations of beta graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("seq", $linnotbetaseq, 2, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotbetakey) && $linnotbetakey != ""){
-	        array_push($list_of_search_types, "linnotbetakey");
+	        array_push($list_of_search_types, "search for KEY linear notations of beta graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("key", $linnotbetakey, 2, true);
 		$firstQuerySet = true; 
@@ -635,28 +638,28 @@ if (($none_set == true)) { // #TODO redefine this check...
 	// ----- linnot albe queries -----
 	
 	if (isset($linnotalbeadj) && $linnotalbeadj != ""){
-	        array_push($list_of_search_types, "linnotalbeadj");
+	        array_push($list_of_search_types, "search for ADJ linear notations of albe graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("adj", $linnotalbeadj, 3, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalbered) && $linnotalbered != ""){
-	        array_push($list_of_search_types, "linnotalbered");
+	        array_push($list_of_search_types, "search for RED linear notations of albe graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("red", $linnotalbered, 3, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalbeseq) && $linnotalbeseq != ""){
-	        array_push($list_of_search_types, "linnotalbeseq");
+	        array_push($list_of_search_types, "search for SEQ linear notations of albe graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("seq", $linnotalbeseq, 3, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalbekey) && $linnotalbekey != ""){
-	        array_push($list_of_search_types, "linnotalbekey");
+	        array_push($list_of_search_types, "search for KEY linear notations of albe graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("key", $linnotalbekey, 3, true);
 		$firstQuerySet = true; 
@@ -665,28 +668,28 @@ if (($none_set == true)) { // #TODO redefine this check...
 	// ----- linnot alphalig queries -----
 	
 	if (isset($linnotalphaligadj) && $linnotalphaligadj != ""){
-	        array_push($list_of_search_types, "linnotalphaligadj");
+	        array_push($list_of_search_types, "search for ADJ linear notations of alphalig graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("adj", $linnotalphaligadj, 4, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalphaligred) && $linnotalphaligred != ""){
-	        array_push($list_of_search_types, "linnotalphaligred");
+	        array_push($list_of_search_types, "search for RED linear notations of alphalig graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("red", $linnotalphaligred, 4, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalphaligseq) && $linnotalphaligseq != ""){
-	        array_push($list_of_search_types, "linnotalphaligseq");
+	        array_push($list_of_search_types, "search for SEQ linear notations of alphalig graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("seq", $linnotalphaligseq, 4, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalphaligkey) && $linnotalphaligkey != ""){
-	        array_push($list_of_search_types, "linnotalphaligkey");
+	        array_push($list_of_search_types, "search for KEY linear notations of alphalig graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("key", $linnotalphaligkey, 4, true);
 		$firstQuerySet = true; 
@@ -695,28 +698,28 @@ if (($none_set == true)) { // #TODO redefine this check...
 	// ----- linnot betalig queries -----
 	
 	if (isset($linnotbetaligadj) && $linnotbetaligadj != ""){
-	        array_push($list_of_search_types, "linnotbetaligadj");
+	        array_push($list_of_search_types, "search for ADJ linear notations of betalig graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("adj", $linnotbetaligadj, 5, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotbetaligred) && $linnotbetaligred != ""){
-	        array_push($list_of_search_types, "linnotbetaligred");
+	        array_push($list_of_search_types, "search for RED linear notations of betalig graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("red", $linnotbetaligred, 5, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotbetaligseq) && $linnotbetaligseq != ""){
-	        array_push($list_of_search_types, "linnotbetaligseq");
+	        array_push($list_of_search_types, "search for SEQ linear notations of betalig graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("seq", $linnotbetaligseq, 5, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotbetaligkey) && $linnotbetaligkey != ""){
-	        array_push($list_of_search_types, "linnotbetaligkey");
+	        array_push($list_of_search_types, "search for KEY linear notations of betalig graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("key", $linnotbetaligkey, 5, true);
 		$firstQuerySet = true; 
@@ -725,28 +728,28 @@ if (($none_set == true)) { // #TODO redefine this check...
 	// ----- linnot albelig queries -----
 	
 	if (isset($linnotalbeligadj) && $linnotalbeligadj != ""){
-	        array_push($list_of_search_types, "linnotalbeligadj");
+	        array_push($list_of_search_types, "search for ADJ linear notations of albelig graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("adj", $linnotalbeligadj, 6, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalbeligred) && $linnotalbeligred != ""){
-	        array_push($list_of_search_types, "linnotalbeligred");
+	        array_push($list_of_search_types, "search for RED linear notations of albelig graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("red", $linnotalbeligred, 6, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalbeligseq) && $linnotalbeligseq != ""){
-	        array_push($list_of_search_types, "linnotalbeligseq");
+	        array_push($list_of_search_types, "search for SEQ linear notations of albelig graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("seq", $linnotalbeligseq, 6, true);
 		$firstQuerySet = true; 
 	};
 	
 	if (isset($linnotalbeligkey) && $linnotalbeligkey != ""){
-	        array_push($list_of_search_types, "linnotalbeligkey");
+	        array_push($list_of_search_types, "search for KEY linear notations of albelig graphs");
 		if($firstQuerySet) { $query .= " UNION "; }
 		$query .= get_linnot_query_string("key", $linnotalbeligkey, 6, true);
 		$firstQuerySet = true; 
@@ -754,7 +757,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 	
 	// motif search	
 	if (isset($motif) && $motif != ""){
-	        array_push($list_of_search_types, "motif");
+	        array_push($list_of_search_types, "motif search");
 		$motif_id = get_motif_id($motif);
 		if($motif_id > 0) {
 			if($firstQuerySet) { $query .= " UNION "; }
@@ -765,7 +768,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 	
 	//graphletsimilarity
 	if (isset($graphletsimilarity) && $graphletsimilarity != ""){
-	        array_push($list_of_search_types, "graphletsimilarity");
+	        array_push($list_of_search_types, "graphlet-based similarity search");
 		
 		// $graphletsimilarity must be set to a valid pdb id + chain, e.g., '7timA'.		
 					
@@ -809,10 +812,15 @@ if (($none_set == true)) { // #TODO redefine this check...
 				  
 				  array_multisort($similarity_list, $pdbchainlist);	// sort both by the score	
 				  
-				  $max_results = 50;
+				  $max_results = 25;
 				  if(count($similarity_list) > $max_results) {
 				    array_splice($similarity_list, $max_results);
 				    array_splice($pdbchainlist, $max_results);
+				  }
+				  
+				  // add comment, used to output the score in the table later
+				  for($i = 0; $i < count($pdbchainlist); $i++) {
+				    $result_comments[$pdbchainlist[$i]] = "Graphlet-based distance to PDB $pdb_id chain $chain_id: " . sprintf('%0.3f', $similarity_list[$i]);
 				  }
 				  
 				  
@@ -895,6 +903,11 @@ if (($none_set == true)) { // #TODO redefine this check...
 		$title = $arr["title"];
 		$header = $arr["header"];
 		$cathlink = get_cath_link($pdb_id, $chain_name);
+		$comment = "";
+		if(isset($result_comments[$pdb_id . $chain_name])) {
+		  $comment = $result_comments[$pdb_id . $chain_name];
+		}
+	
 		
 		// provides alternating blue/white tables
 		if ($counter % 2 == 0){
@@ -929,6 +942,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 						<div class="resultsChain">Chain '.$chain_name.'</div>
 						<div class="resultsChainNum"><input type=checkbox id="'.$pdb_id . $chain_name. '" class="chainCheckBox" value="'.$pdb_id . $chain_name.'"/>'.$pdb_id . $chain_name.'</div>
 						<div class="resultsCATH"><a href="'.$cathlink.'" target="_blank">CATH</a></div>
+						<div class="resultsComment">' . $comment . '</div>
 					</div>';
 		
 		$numberOfChains++;

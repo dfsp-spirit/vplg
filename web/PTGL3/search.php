@@ -68,7 +68,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			      $search_type = $list_of_search_types[0];
 			    }
 			    
-			    echo "<h2> Search Results -- $search_type search</h2>";
+			    echo "<h2> Search Results -- $search_type</h2>";
 			    
 			    
 			    echo $tableString; /* The table string is constructed in backend/search.php, which is included by this file. */  

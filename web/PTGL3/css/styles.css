@@ -669,14 +669,17 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	}
 	
 	.resultsCATH {
-		padding-left: 1%;
+		padding-left: 5%;
 		float: left;
 	}
 	
+	.resultsComment {
+		padding-left: 5%;
+		float: left;
+	}
 	
 	.chainCheckBox {
-		margin-right: 3px !important;
-		
+		margin-right: 3px !important;				
 	}
 	
 	
