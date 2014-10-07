@@ -193,6 +193,14 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		text-align: center;
 	}
 	
+	#pageintro {
+		margin-top: 30px;
+		margin-bottom: 30px;
+		margin-left: auto;
+		margin-right: auto;
+		text-align: left;
+	}
+	
 	
 	
 	

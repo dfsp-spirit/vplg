@@ -48,6 +48,14 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<h2>Linear notations of the folding graphs</h2>
 		<br>
 		
+		<div id="PageIntro">
+		<div class="container" id="pageintro">
+		On this page, you can search the linear notations of the different folding graph types (a folding graph is a connected component of a protein graph). All notations stored in the
+		database are shown. Clicking on a linear notation in the result list takes you to all protein chains which contain
+		the respective linear notation.
+		</div><!-- end container-->
+		</div><!-- end Home -->
+		
 		<form class="form-inline" action="linearnotations.php" method="get">
 			
 		<label>Select graph-type: 

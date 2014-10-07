@@ -32,6 +32,9 @@
 								<a href="content.php"><i class="fa fa-briefcase"></i> Content</a>
 							</li>
 							<li>
+								<a href="linearnotations.php"><i class="fa fa-briefcase"></i> Linear notations</a>
+							</li>
+							<li>
 								<a href="publications.php"><i class="fa fa-copy"></i> Publications</a>
 							</li>
 							<li>

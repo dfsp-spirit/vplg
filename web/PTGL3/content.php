@@ -327,12 +327,20 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
 	<div class="container" id="contentText">
 		<h2> Current holdings </h2>
+		
+		
+		<div id="PageIntro">
+		<div class="container" id="pageintro">
+		This page gives statistics on the current holdings of this database. The 3D atom data used to compute the protein graphs was retrieved from the RCSB PDB in September 2014. 
+		</div><!-- end container-->
+		</div><!-- end Home -->
+		
 		<br>
 
-		<h4><font color="red">98,161</font> PDB files</h4>
-		<h4><font color="red">274,459</font> Protein chains</h4>
-		<h4><font color="red">5,088,843</font> Secondary structure elements (SSEs)</h4>
-		<h4><font color="red">4,964,550</font> 3D contacts between SSEs of the same chain</h4>
+		<h4>98,161 PDB files</h4>
+		<h4>274,459 Protein chains</h4>
+		<h4>5,088,843 Secondary structure elements (SSEs)</h4>
+		<h4>4,964,550 3D contacts between SSEs of the same chain</h4>
 
 
 		<div class="table-responsive" id="contentTable">
