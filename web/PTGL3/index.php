@@ -62,6 +62,9 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			relative orientations between the SSEs.
 			-->
 			
+			<br /><br />
+			This web server allows you to search for protein motifs which can be detected in the graphs. It also implements graph-based similarity measures to search for protein chains which are similar to a given query protein.
+			
 		</div><!-- end container-->
 	</div><!-- end Home -->
 
