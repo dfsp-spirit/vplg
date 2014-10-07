@@ -73,9 +73,9 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			    
 			    echo $tableString; /* The table string is constructed in backend/search.php, which is included by this file. */  
 			    
-			    if($numberOfChains <= 4) {
-			      echo "<p>Your search returned $numberOfChains results. Please modify the query and try again. DEBUG: '$debug_msg'.</p>\n";
-			    }
+			    //if($numberOfChains <= 4) {
+			    //  echo "<p>Your search returned $numberOfChains results. Please modify the query and try again. DEBUG: '$debug_msg'.</p>\n";
+			    //}
 			?>
 			</form>	
 		</div><!-- end container and searchResults -->

@@ -83,6 +83,8 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 							<input type="checkbox" id="inlineCheckbox3" name="proteincomplexes" value="1"> Search for Protein Complexes
 						</label>
 						<?php } ?>
+												
+						
 
 						<div id="advancedSearch">
 
@@ -138,7 +140,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 				</div>
 				<div id="addSearchKey">
 					<dd>Use the standard search form above to search protein topologies.</dd>
-					<dd>Enter keywords known to relate to the biological macromolecules <br>
+					<dd>Enter PDB IDs or keywords known to relate to the biological macromolecules <br>
 					of interest and select the <span class="glyphicon glyphicon-search"></span>"Search" button.</dd>
 				</div>
 			</dl>

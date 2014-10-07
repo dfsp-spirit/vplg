@@ -792,7 +792,8 @@ if (($none_set == true)) { // #TODO redefine this check...
 				  
 				  // now compare scores and add best scores to $pdbchainlist
 				  foreach($all_data as $chaindata) {
-					  $similarity_score = compute_graphlet_similarity($query_prot_data['gaphlet_counts'], $chaindata['graphlet_counts']);
+				          if(isset($chaindata['pdb_id'])) {
+					  $similarity_score = compute_graphlet_similarity($query_prot_data['graphlet_counts'], $chaindata['graphlet_counts']);
 					  //  compare to other using some graphlet-based score
 					  //if($similarity_score >= 0.9) {
 					          $found_name = "" . $chaindata['pdb_id'] . $chaindata['chain_name'];
@@ -800,10 +801,19 @@ if (($none_set == true)) { // #TODO redefine this check...
 						  array_push($similarity_list, $similarity_score);
 						  $debug_msg .= "  sim($found_name = $similarity_score) "; 
 					  //}
+					  } 
+					  //else {
+					  //  $debug_msg .= "  chaindata_has_no_pdb_id "; 
+					  //}
 				  }
 				  
+				  array_multisort($similarity_list, $pdbchainlist);	// sort both by the score	
 				  
-				  
+				  $max_results = 50;
+				  if(count($similarity_list) > $max_results) {
+				    array_splice($similarity_list, $max_results);
+				    array_splice($pdbchainlist, $max_results);
+				  }
 				  
 				  
 				  if(count($pdbchainlist) > 0) {
