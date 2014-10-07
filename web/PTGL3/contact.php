@@ -127,6 +127,14 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		</div><!-- end col-sm-6 -->
 	</div><!-- end row -->
 	</div><!-- end contact -->
+	
+	
+	<div id="PageIntro">
+		<div class="container" id="pageintro">
+		<strong>Authors</strong><br>
+		The VPLG software and the database were written and designed by Tim Schäfer. The web interface was written by Daniel Bruneß, Andreas Scheck and Tim Schäfer.
+		</div><!-- end container-->
+		</div><!-- end Home -->
 
 </div><!-- end container -->
 </div><!-- end wrapper -->
