@@ -17,12 +17,19 @@ package plcc;
 public class AminoAcid {
 
     // declare class vars
-    public static final Integer CHEMPROPAA_UNKNOWN = -1;
-    public static final Integer CHEMPROPAA_SMALL_APOLAR = 0;
-    public static final Integer CHEMPROPAA_HYDROPHOBIC = 1;
-    public static final Integer CHEMPROPAA_POLAR = 2;
-    public static final Integer CHEMPROPAA_NEGATIVE_CHARGE = 3;
-    public static final Integer CHEMPROPAA_POSITIVE_CHARGE = 4;
+    public static final Integer CHEMPROPAA_INT_UNKNOWN = -1;
+    public static final Integer CHEMPROPAA_INT_SMALL_APOLAR = 0;
+    public static final Integer CHEMPROPAA_INT_HYDROPHOBIC = 1;
+    public static final Integer CHEMPROPAA_INT_POLAR = 2;
+    public static final Integer CHEMPROPAA_INT_NEGATIVE_CHARGE = 3;
+    public static final Integer CHEMPROPAA_INT_POSITIVE_CHARGE = 4;
+    
+    public static final String CHEMPROPAA_STRING_UNKNOWN = "?";
+    public static final String CHEMPROPAA_STRING_SMALL_APOLAR = "A";
+    public static final String CHEMPROPAA_STRING_HYDROPHOBIC = "H";
+    public static final String CHEMPROPAA_STRING_POLAR = "P";
+    public static final String CHEMPROPAA_STRING_NEGATIVE_CHARGE = "+";
+    public static final String CHEMPROPAA_STRING_POSITIVE_CHARGE = "-";
 
 
     /** The AAs above 20 (J, B, Z, X) are PDB / ligand specific special AAs. */    
@@ -36,8 +43,38 @@ public class AminoAcid {
     public static final Integer[] atoms = {  5,     11,    8,     8,     6,     9,     9,     4,     10,    8,     8,     9,     8,     11,    7,     6,     7,     14,    12,    7,     8,     9,     4,     10 };
     
     /** The biochemical properties of the AAs (in order of the names3/names1 arrays) */
-    public static final Integer[] chemProps = {  AminoAcid.CHEMPROPAA_SMALL_APOLAR,     AminoAcid.CHEMPROPAA_POSITIVE_CHARGE,    AminoAcid.CHEMPROPAA_POLAR,     AminoAcid.CHEMPROPAA_NEGATIVE_CHARGE,     AminoAcid.CHEMPROPAA_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_NEGATIVE_CHARGE,     AminoAcid.CHEMPROPAA_POLAR,     AminoAcid.CHEMPROPAA_SMALL_APOLAR,     AminoAcid.CHEMPROPAA_POLAR,    AminoAcid.CHEMPROPAA_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_POSITIVE_CHARGE,     AminoAcid.CHEMPROPAA_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_HYDROPHOBIC,    AminoAcid.CHEMPROPAA_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_SMALL_APOLAR,     AminoAcid.CHEMPROPAA_SMALL_APOLAR,     AminoAcid.CHEMPROPAA_HYDROPHOBIC,    AminoAcid.CHEMPROPAA_HYDROPHOBIC,    AminoAcid.CHEMPROPAA_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_UNKNOWN,     AminoAcid.CHEMPROPAA_UNKNOWN,     AminoAcid.CHEMPROPAA_UNKNOWN,     AminoAcid.CHEMPROPAA_UNKNOWN };
+    public static final Integer[] chemProps = {  AminoAcid.CHEMPROPAA_INT_SMALL_APOLAR,     AminoAcid.CHEMPROPAA_INT_POSITIVE_CHARGE,    AminoAcid.CHEMPROPAA_INT_POLAR,     AminoAcid.CHEMPROPAA_INT_NEGATIVE_CHARGE,     AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_INT_NEGATIVE_CHARGE,     AminoAcid.CHEMPROPAA_INT_POLAR,     AminoAcid.CHEMPROPAA_INT_SMALL_APOLAR,     AminoAcid.CHEMPROPAA_INT_POLAR,    AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_INT_POSITIVE_CHARGE,     AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,    AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_INT_SMALL_APOLAR,     AminoAcid.CHEMPROPAA_INT_SMALL_APOLAR,     AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,    AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,    AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_INT_UNKNOWN,     AminoAcid.CHEMPROPAA_INT_UNKNOWN,     AminoAcid.CHEMPROPAA_INT_UNKNOWN,     AminoAcid.CHEMPROPAA_INT_UNKNOWN };
 
+    
+    /**
+     * Translates a chemProp code into the respective one letter string.
+     * @param chemPropCode the code, use constants AminoAcid.CHEMPROPAA_INT_*
+     * @return the string, one of CHEMPROPAA_STRING_* (or "?" if the code is invalid)
+     */
+    public static final String getChemProp1LetterString(Integer chemPropCode) {
+        if(chemPropCode.equals(CHEMPROPAA_INT_UNKNOWN)) {
+            return CHEMPROPAA_STRING_UNKNOWN;
+        }
+        else if(chemPropCode.equals(CHEMPROPAA_INT_SMALL_APOLAR)) {
+            return CHEMPROPAA_STRING_SMALL_APOLAR;
+        }
+        else if(chemPropCode.equals(CHEMPROPAA_INT_HYDROPHOBIC)) {
+            return CHEMPROPAA_STRING_HYDROPHOBIC;
+        }
+        else if(chemPropCode.equals(CHEMPROPAA_INT_POLAR)) {
+            return CHEMPROPAA_STRING_POLAR;
+        }
+        else if(chemPropCode.equals(CHEMPROPAA_INT_NEGATIVE_CHARGE)) {
+            return CHEMPROPAA_STRING_NEGATIVE_CHARGE;
+        }
+        else if(chemPropCode.equals(CHEMPROPAA_INT_POSITIVE_CHARGE)) {
+            return CHEMPROPAA_STRING_POSITIVE_CHARGE;
+        }
+        else {
+            System.err.println("ERROR: AminoAcid: getChemProp1LetterString: Invalid code " + chemPropCode + ".");
+            return "?";
+        }
+    }
     
     /**
      * Returns the number of (non-H) atoms that the AA with the given internal ID has.
@@ -112,7 +149,7 @@ public class AminoAcid {
 
         // only hit if nothing was found
         System.err.println("ERROR: Could not find chemical properties for 3 letter amino acid code '" + name3 + "'.");
-        return(AminoAcid.CHEMPROPAA_UNKNOWN);
+        return(AminoAcid.CHEMPROPAA_INT_UNKNOWN);
     }
 
     /**

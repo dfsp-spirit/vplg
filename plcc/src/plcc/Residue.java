@@ -57,15 +57,23 @@ public class Residue implements java.io.Serializable {
     
     /**
      * Determines the chemical properties of this AA.
-     * @return the chemical property, which is one of the constants at AminoAcid.CHEMPROPAA_* (Example: ALA => AminoAcid.CHEMPROPAA_SMALL_APOLAR).
+     * @return the chemical property, which is one of the constants at AminoAcid.CHEMPROPAA_INT_* (Example: ALA => AminoAcid.CHEMPROPAA_SMALL_APOLAR).
      */
     public Integer getChemicalPropertyType() {
         if(this.isAA()) {            
             return AminoAcid.getChemPropOfAAByName3(this.resName3);
         }
         else {
-            return AminoAcid.CHEMPROPAA_UNKNOWN;            
+            return AminoAcid.CHEMPROPAA_INT_UNKNOWN;            
         }
+    }
+    
+    /**
+     * Determines the chemical properties of this AA and returns the string.
+     * @return the chemical property string, which is one of the constants at AminoAcid.CHEMPROPAA_STRING_* (Example: ALA => AminoAcid.CHEMPROPAA_SMALL_APOLAR).
+     */
+    public String getChemicalProperty1LetterString() {
+        return AminoAcid.getChemProp1LetterString(AminoAcid.getChemPropOfAAByName3(this.resName3));
     }
     
     // constructor

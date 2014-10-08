@@ -307,6 +307,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphMo
             gmlf.append("    id ").append(i).append("\n");
             gmlf.append("    label \"").append(i).append("-").append(residue.getUniquePDBName()).append("\"\n");
             gmlf.append("    residue \"").append(residue.getName3()).append("\"\n");
+            gmlf.append("    chem_prop \"").append(residue.getChemicalProperty1LetterString()).append("\"\n");
             gmlf.append("    sse \"").append(residue.getNonEmptySSEString()).append("\"\n");
             gmlf.append("    sse_type \"").append(residue.getNonEmptySSEString()).append("\"\n");   // required for graphlet analyser
             gmlf.append("    chain \"").append(residue.getChainID()).append("\"\n");            

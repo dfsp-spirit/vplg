@@ -212,15 +212,31 @@ public class SSE extends SSEGraphVertex implements java.io.Serializable  {
      * @return the amino acid sequence of this SSE
      */
     public String getAASequence() {
-        String seq = "";
+        StringBuilder seq = new StringBuilder();
 
         Residue r;
         for(Integer i = 0; i < this.residues.size(); i++) {
             r = this.residues.get(i);
-            seq += r.getAAName1();
+            seq.append(r.getAAName1());
         }
 
-        return(seq);
+        return(seq.toString());
+    }
+    
+    /**
+     * Returns the chemical properties string of all AAs of this SSE
+     * @return the chemical properties string of all AAs of this SSE
+     */
+    public String getallAAChemPropString() {
+        StringBuilder chemProps = new StringBuilder();
+
+        Residue r;
+        for(Integer i = 0; i < this.residues.size(); i++) {
+            r = this.residues.get(i);
+            chemProps.append(r.getChemicalProperty1LetterString());
+        }
+
+        return(chemProps.toString());
     }
     
     /**

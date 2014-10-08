@@ -886,7 +886,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 	if($limit_start + $q_limit > $row_count){
 		$tableString .= $row_count . ' (of ' . $row_count . ' total) -- ';
 	} else {
-		$tableString .= ($limit_start + $q_limit) . ' (of '.$row_count.') -- ';
+		$tableString .= ($limit_start + $q_limit) . ' (of '.$row_count.' total) -- ';
 	}
 	
 	if(($limit_start + $q_limit) < $row_count){
