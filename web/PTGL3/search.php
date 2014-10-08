@@ -45,7 +45,9 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 	<div class="wrapper">
 
 	<?php include('navbar.php'); ?>
-
+	         			
+		
+	
 		<div class="container">
 			<div class="row" id="load">
 			<div class="col-lg-3 col-centered">
@@ -54,14 +56,14 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 						<input type="text" class="form-control" name="q" id="loadInput" autocomplete="off" placeholder="Load proteins...">
 						<button type="submit" class="btn btn-default" id="loadButton"><span>Load Proteins</span></button>
 				<div class="additionalProteinButtons">
-					<button type="button" class="btn btn-default btnSize" id="selectAllBtn"><span>Select all (<?php echo $numberOfChains; ?>) protein-chains</span></button>
-					<button type="button" class="btn btn-default btnSize protButton" id="resetBtn"><span>Reset</span></button>
+					<button type="button" class="btn btn-default btnSize" id="selectAllBtn"><span>Select all <?php echo $numberOfChains; ?> protein chains</span></button>
+					<button type="button" class="btn btn-default btnSize protButton" id="resetBtn"><span>Deselect all</span></button>
 				</div>
 				</div><!-- end input-group and form-group -->
 			</div><!-- end col-centered -->
 		</div><!-- end row -->
 		</div>
-		<div class="container" id="searchResults">			
+		<div class="container" id="searchResults">
 			<?php 
 			    $search_type = "advanced";
 			    if(count($list_of_search_types) === 1) {
@@ -69,7 +71,13 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			    }
 			    
 			    echo "<h2> Search Results -- $search_type</h2>";
+			    ?>
 			    
+			    <div class="container" id="pageintro">
+		All protein chains which match your search are shown below. Select the ones you are interested in by clicking the checkboxes next to them, then click 'Load proteins' above. You can also select all results at once or clear the current selection using the buttons above.
+		</div><!-- end container-->
+			    
+			    <?php
 			    
 			    echo $tableString; /* The table string is constructed in backend/search.php, which is included by this file. */  
 			    
