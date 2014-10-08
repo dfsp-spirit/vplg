@@ -46,7 +46,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<h2> About </h2>
 		<h3> Table of contents </h3>
 		<ul>
-			<li class="noBullets"> <a href="#ptgl">What is VPLG?</a> </li>
+			<li class="noBullets"> <a href="#ptgl">What is <?php echo "$SITE_TITLE"; ?>?</a> </li>
 			<li class="noBullets">
 				<ul>
 					<li class="noBullets">  <a href="#proteinGraph">Protein graphs</a> </li>
@@ -84,10 +84,10 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<br>
 		<br>	
 		<a class="anchor" id="ptgl"></a>
-		<h3> What is VPLG? </h3>
+		<h3> What is <?php echo "$SITE_TITLE"; ?>? </h3>
 
 		<p>
-		VPLG is a web-based database application for the analysis protein topologies. It uses a graph-based model to describe the structure
+		<?php echo "$SITE_TITLE"; ?> is a web-based database application for the analysis protein topologies. It uses a graph-based model to describe the structure
 		of protein chains on the super-secondary structure level. A protein graph is computed from the 3D atomic coordinates of a single chain in
 		a PDB file and the secondary structure assignments of the DSSP algorithm. The computation of the protein graph is done by our software <a href="http://www.bioinformatik.uni-frankfurt.de/tools/vplg/" target="_blank">Visualization of Protein Ligand Graphs (VPLG)</a>. In a protein graph graph, vertices represent secondary
 		structure elements (SSEs, usually alpha helices and beta strands) or ligand molecules while the edges model contacts and relative orientations between

@@ -232,7 +232,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		</div><!-- end line and lineAbout -->
 
 		<div class="container" id="text">
-			<h2>About</h2>
+			<h2>Introduction</h2>
 			<!--
 				PTGL is a web-based database application for protein topologies. In order to define a mathematically unique description of protein topology
 				the secondary structure topology of a protein is described by methods of applied graph theory. The <a href="about.php#proteinGraph">Protein graph</a> is defined as an undirected
@@ -244,17 +244,22 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 				Å and a sequence length of at least 20 amino acids. The database enables the user to search for the topology of a protein or for certain
 				topologies and subtopologies using the <a href="about.php#linearNot">linear notations</a>. Additionally, it could be searched for sequence similarity in <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a> sequences.
 				-->
-				VPLG is a web-based database application for the analysis protein topologies. It uses a graph-based model to describe the structure
+				<?php echo "$SITE_TITLE"; ?> is a web-based database application for the analysis protein topologies. It uses a graph-based model to describe the structure
 		of protein chains on the super-secondary structure level. A protein graph is computed from the 3D atomic coordinates of a single chain in
 		a PDB file and the secondary structure assignments of the DSSP algorithm. In a protein graph graph, vertices represent secondary
 		structure elements (SSEs, usually alpha helices and beta strands) or ligand molecules while the edges model contacts and relative orientations between
 		them. 
-				<a href="about.php">Read more...</a>
+				<a href="about.php">Read more about <?php echo "$SITE_TITLE"; ?>...</a>
 
 
 		</div><!-- end container and text -->
 	</div><!-- end About -->
 
+	
+	<!-- I add a large space here, so that there is a difference between clicking 'About' and 'UserGuide' in the top navigation bar. -->		
+	<!-- <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+	<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br> -->
+		
 	<div id="UserGuide">
 		<div class="line" id="lineUserGuide">
 			<div class="iconPos" id="iconUserGuide">
@@ -264,6 +269,14 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
 		<div class="container" id="text">
 			<h2>User Guide</h2>
+			
+			<div id="PageIntro">
+		<div class="container" id="pageintro">
+		This user guide explains how to use the different search options. You can click the text boxes to get more detailed information.
+		<br><br>
+		If you need want to learn about protein graphs, are interested in understanding how this web server works, or need help interpreting the results, see <a href="about.php">the About page</a>.
+		</div><!-- end container-->
+		</div><!-- end Home -->
 
 
 				<div class="row" id="scroll1">

@@ -16,7 +16,7 @@
 						<a href="index.php">Home</a>
 					</li>
 					<li class="navbarFont">
-						<a href="index.php#About">About</a>
+						<a href="about.php">About</a>
 					</li>						
 					<li class="navbarFont">
 						<a href="index.php#UserGuide">User Guide</a>
