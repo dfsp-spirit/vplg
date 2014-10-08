@@ -340,7 +340,7 @@ if [ -r $FLN ]; then
 		if [ ! -f "$CHAINS_FILE" ]; then
 		       echo "$APPTAG ##### ERROR: No chains file found at '$CHAINS_FILE', is '--cluster' set as PLCC command line option?"
 	        else
-			for CHAIN in $(cat ${CHAINSFILE});
+			for CHAIN in $(cat ${CHAINS_FILE});
 			do
 				ALBE_GML_GRAPHFILE="${PLCC_OUTPUT_DIR}/${PDBID}_${CHAIN}_albe_PG.gml"
 				if [ -f "$ALBE_GML_GRAPHFILE" ]; then
