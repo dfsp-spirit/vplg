@@ -205,6 +205,49 @@ function get_multiple_PDB_select_query($pdb_chain_list) {
 	return $query;
 }
 
+function get_multiple_PDB_select_query_in_order($pdb_chain_list_in_order) {
+
+   $valid_pdb_ids = array();
+   $valid_pdb_chains = array();
+   foreach($pdb_chain_list_in_order as $pdbchain) {
+     if(strlen($pdbchain) == 5) {
+	   $pdb_id = substr($pdbchain, 0, 4);
+	   $chain_id = substr($pdbchain, 4, 1);
+	   if(check_valid_pdbid($pdb_id) && check_valid_chainid($chain_id)) {
+	     array_push($valid_pdb_ids, $pdb_id);
+		 array_push($valid_pdb_chains, $chain_id);
+	   }	 
+	 }
+   }
+   
+   if(count($valid_pdb_ids) <= 0) {
+     return "";
+   }
+   
+   $first_pdb_id = $valid_pdb_ids[0];
+   $first_chain_id = $valid_pdb_chains[0];
+   $query = "SELECT 0 as fake_order, c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
+				   FROM plcc_chain c
+				   INNER JOIN plcc_protein p
+				   ON p.pdb_id = c.pdb_id 
+				   WHERE ( p.pdb_id = '" . $first_pdb_id . "' AND c.chain_name = '" . $first_chain_id . "' ) ";
+				   
+				   
+    for($i = 1; $i < count($valid_pdb_ids); $i++) {
+      $pdb_id = $valid_pdb_ids[$i];
+      $chain_id = $valid_pdb_chains[$i];
+      $query .= " UNION SELECT " . $i . " as fake_order, c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
+				   FROM plcc_chain c
+				   INNER JOIN plcc_protein p
+				   ON p.pdb_id = c.pdb_id 
+				   WHERE ( p.pdb_id = '" . $pdb_id . "' AND c.chain_name = '" . $chain_id . "' ) ";
+    }
+    
+    //$query .= " ORDER BY order";      // the order has to be added at the very end (this may get more UNIONs from other parts!)
+    
+    return $query;
+}
+
 /** 
   * Returns the mitif code or a value < 0 if the abbriv is invalid.
   */
@@ -316,6 +359,9 @@ if(isset($_SESSION["chains"])){
 }
 
 // check if parameters are set. If so, set the associated variable with the value
+
+$result_set_has_fake_order_field = FALSE;
+
 if(isset($_GET)) {
     if(isset($_GET["keyword"])) {
 		$keyword = $_GET["keyword"];
@@ -467,6 +513,7 @@ if(isset($_GET)) {
 	if(isset($_GET["graphletsimilarity"])) {
 		$graphletsimilarity = $_GET["graphletsimilarity"];
 		$_SESSION["graphletsimilarity"] = $graphletsimilarity;
+		$result_set_has_fake_order_field = TRUE;
 	}
 	
 	
@@ -484,6 +531,7 @@ if(isset($_GET)) {
 
 $list_of_search_types = array();
 
+
 if (($none_set == true)) { // #TODO redefine this check...
 	$tableString = "Sorry. Your search term is too short.<br>\n";
 	$tableString .= '<a href="./index.php">Go back</a> or use the query box in the upper right corner!';
@@ -495,8 +543,15 @@ if (($none_set == true)) { // #TODO redefine this check...
 	
 	// later, if no query is set before, there will be no CONCAT/UNION
 	$firstQuerySet = false;
-	$query = "SELECT chain_id, chain_name, pdb_id, resolution, title, header
+	
+	if($result_set_has_fake_order_field) {
+	    $query = "SELECT fake_order, chain_id, chain_name, pdb_id, resolution, title, header
 			  FROM ( ";
+	}
+	else {
+	    $query = "SELECT chain_id, chain_name, pdb_id, resolution, title, header
+			  FROM ( ";
+	}
 	
 	// following: the queries for each set parameter
 	if (isset($keyword) && $keyword != "") {
@@ -826,7 +881,8 @@ if (($none_set == true)) { // #TODO redefine this check...
 				  
 				  if(count($pdbchainlist) > 0) {
 				    if($firstQuerySet) { $query .= " UNION "; }
-					  $query .= get_multiple_PDB_select_query($pdbchainlist);
+					  $query .= get_multiple_PDB_select_query_in_order($pdbchainlist);
+					  $result_set_has_fake_order_field = TRUE;
 					  $firstQuerySet = true;		  
 				  } else {
 				    $debug_msg .= "graphletsimilarity: No matching chains with proper similarity score based on graphlet counts found in the " . count($all_data) . " DB entries.";
@@ -854,13 +910,25 @@ if (($none_set == true)) { // #TODO redefine this check...
 	$q_limit = 25;
 	
 	$count_query = $query . " ) results";
-	$query .= " ) results
+	
+	if($result_set_has_fake_order_field) {
+	  $query .= " ) results
+			  ORDER BY fake_order ASC";
+	}
+	else {
+	  $query .= " ) results
 			  ORDER BY pdb_id, chain_name";
+	}
 
 	$count_query = str_replace("chain_id, chain_name, pdb_id, resolution, title, header", "COUNT(*)", $count_query);
 	$query .= " LIMIT " . $q_limit . " OFFSET ".$limit_start;
   
 	$result = pg_query($db, $query); // or die($query . ' -> Query failed: ' . pg_last_error());
+	
+	//if(! $result) {
+	//  die("FCK: '$query'");
+	//}
+	
 	$count_result = pg_query($db, $count_query); // or die($query . ' -> Query failed: ' . pg_last_error());
 
 	$row_count = pg_fetch_array($count_result, NULL, PGSQL_ASSOC);
