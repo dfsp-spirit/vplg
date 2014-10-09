@@ -340,6 +340,11 @@ public class Main {
                         Settings.set("plcc_B_no_warn", "true");
                     }
                     
+                    if(s.equals("--compute-whole-db-graphlet-similarities")) {
+                        Settings.set("plcc_B_useDB", "true");
+                        Settings.set("plcc_B_compute_all_graphlet_similarities", "true");                        
+                    }
+                    
                     
                     
                     
@@ -937,6 +942,26 @@ public class Main {
                 System.err.println("ERROR: Could not connect to DB, exiting.");
                 System.exit(1);
             }            
+            
+        }
+        
+        if(Settings.getBoolean("plcc_B_compute_all_graphlet_similarities")) {
+            
+            if(! silent) {
+                System.out.println("Computing pairwise graphlet similarities for all graphs in the database. This will take a lot of time and memory for large databases...");
+            }
+            
+            if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"))) {
+                Long[] res = DBManager.computeGraphletSimilarityScoresForWholeDatabaseAndStoreBest(ProtGraph.GRAPHTYPE_ALBE, 10);
+                // numChainsFound, numGraphletsFound, numScoresComputed, numScoresSaved
+                if(! silent) {
+                    System.out.println("Done. Found " + res[0] + " chains and " + res[1] + " graphlet counts for them in the DB. Computed " + res[2] + " similarity scores and saved " + res[3] + " of them to the DB.");
+                }
+                System.exit(0);
+            } else {
+                System.err.println("ERROR: Could not connect to DB, exiting.");
+                System.exit(1);
+            }   
             
         }
                 

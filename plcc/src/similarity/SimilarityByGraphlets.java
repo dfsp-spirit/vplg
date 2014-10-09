@@ -24,12 +24,16 @@ public class SimilarityByGraphlets {
     /**
      * Implements the relative graphlet frequency distance using Integer graphlet counts. This is a similarity measure to compare two
      * networks by the frequencies of graphlets in them.
+     * 
+     * DEPREDCATED: Use the Double array version for normalized graphlets instead!
+     * 
      * For details see Pržulj N, Corneil DG, Jurisica I: Modeling Interactome, Scale-Free or Geometric?, Bioinformatics 2004, 20(18):3508-3515.
      * A pretty good explanation can be found at http://en.wikipedia.org/wiki/Graphlets#Relative_graphlet_frequency_distance as well.
      * @param graphletCountsA the vector which contains the counts of graphlets (usually the 3-, 4- and 5-graphlets, so a total of 30) for network A 
      * @param graphletCountsB the vector of graphlet counts for network B
      * @return the relative graphlet frequency distance between the networks A and B, a value between 0 and 1.
      */
+    @Deprecated
     public static double getRelativeGraphletFrequencyDistance(Integer[] graphletCountsA, Integer[] graphletCountsB) {
         double res = 0.0;
         

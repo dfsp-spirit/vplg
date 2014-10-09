@@ -14,7 +14,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import plcc.DrawTools.IMAGEFORMAT;
+import similarity.SimilarityByGraphlets;
 import tools.DP;
+import tools.PlccUtilities;
 
 /**
  * A database manager class that is used to create and maintain a connection to a PostgreSQL database server.
@@ -172,6 +174,113 @@ public class DBManager {
         return (conOK);
     }
 
+    /**
+     * Computes the pairwise graphlet similarity scores between all protein chains in the DB, using the given graph type. Note that graphlet counts for all the graphs have already to exist in the database!
+     * Also note that this function is gonna take a lot of time AND use a lot of memory if you have a large DB.
+     * 
+     * @param graphType the graph type to use for comparison of the graphlet scores, currently only "albe" is supported.
+     * @param numberOfTopScoresToSavePerPair all pairwise scores are computes, but you may want to keep only the 10 most similar scores. That is what this is for. If you set it to null, all scores will be kept, which may leave you with a vast database filled with mainly useless stuff.
+     * @return a long array of size 3: first position holds the number of chains found in the DB, second holds number of graphlet counts found in DB for these chains, third holds number of computed scores (or PG pairs), fourth holds the number of scores stored in the database
+     */
+    public static Long[] computeGraphletSimilarityScoresForWholeDatabaseAndStoreBest(String graphType, Integer numberOfTopScoresToSavePerPair) {
+        
+        if(! graphType.equals(ProtGraph.GRAPHTYPE_ALBE)) {
+            DP.getInstance().w("DBManager", "computeGraphletSimilarityScoresForWholeDatabaseAndStoreBest(): Graphlets for your chose graph type '" + graphType + "' may not be in the database. By default, we compute \"albe\" graphlets only.");
+        }
+        
+        Long numScoresComputed = 0L;
+        Long numScoresSaved = 0L;
+        ArrayList<ArrayList<String>> allChains = DBManager.getAllPDBIDsandChains(); // these are more than 200,000 chains if the while PDB is in the database
+        
+        Long numChainsFound = ((Integer)allChains.size()).longValue();
+        Long numGraphletsFound = 0L;
+        
+        Double[] src_graphlets, cmp_graphlets;
+        
+        String src_pdb_id, src_chain_name, cmp_pdb_id, cmp_chain_name;
+        Double[] src_scores;
+        ArrayList<String> src_row, cmp_row;
+        for(int i = 0; i < allChains.size(); i++) {
+            src_row = allChains.get(i);
+            src_pdb_id = src_row.get(0);
+            src_chain_name = src_row.get(1);
+            src_scores = new Double[allChains.size()];
+            src_graphlets = null;
+            
+            
+            // some status output never hurts
+            if(i % 5 == 0) {
+                System.out.println("  At chain #" + i + " of " + allChains.size() + ".");
+            }
+            
+            
+            try {
+                src_graphlets = DBManager.getNormalizedGraphletCounts(src_pdb_id, src_chain_name, graphType);            
+            }
+            catch(SQLException e) {
+                DP.getInstance().e("DBManager", "Could not get src_graphlets for " + src_pdb_id + " " + src_chain_name + " " +  graphType + ": '" + e.getMessage() + "', skipping.");
+                continue;
+            }
+            
+            if(src_graphlets == null) { 
+                continue;
+            }
+            else {
+                numGraphletsFound++;
+            }
+            
+            
+            for(int j = 0; j < allChains.size(); j++) {
+                cmp_row = allChains.get(j);
+                cmp_pdb_id = cmp_row.get(0);
+                cmp_chain_name = cmp_row.get(1);
+                cmp_graphlets = null;
+                
+                try {
+                    cmp_graphlets = DBManager.getNormalizedGraphletCounts(cmp_pdb_id, cmp_chain_name, graphType);            
+                }
+                catch(SQLException e) {
+                    DP.getInstance().e("DBManager", "Could not get cmp_graphlets for " + cmp_pdb_id + " " + cmp_chain_name + " " +  graphType + ": '" + e.getMessage() + "', skipping.");                    
+                }
+                
+                if(cmp_graphlets == null) {  
+                    src_scores[j] = null; 
+                }
+                else {        
+                    numGraphletsFound++;
+                    src_scores[j] = SimilarityByGraphlets.getRelativeGraphletFrequencyDistanceNormalized(src_graphlets, cmp_graphlets);
+                    numScoresComputed++;
+                }
+            }
+            
+            // Now we have a long list of score for src_pdb_id and src_chain_name. Sort it and write best to the database.
+            String[] allPDBChains = new String[allChains.size()];
+            for(int k = 0; k < allChains.size(); k++) {
+                allPDBChains[k] = allChains.get(k).get(0) + allChains.get(k).get(1);    // add PDB id + chain, e.g., "7timA"
+            }
+            
+            //PlccUtilities.multiSortUniqueArrays(src_scores, allPDBChains);    // cannot use this, scores are not unique!
+            PlccUtilities.multiQuickSortTS(src_scores, allPDBChains);
+            
+            if(numberOfTopScoresToSavePerPair == null) {
+                numberOfTopScoresToSavePerPair = allPDBChains.length;
+            }
+            
+            if(numberOfTopScoresToSavePerPair > allPDBChains.length) {
+                numberOfTopScoresToSavePerPair = allPDBChains.length;
+            }
+            
+            System.out.println("Similarity to " + src_pdb_id + " chain " + src_chain_name + ":");
+            for(int k = 0; k < numberOfTopScoresToSavePerPair; k++) {
+                System.out.println("  #" + k + ": " + allPDBChains[k] + " with score " + src_scores[k] + ".");
+                numScoresSaved++;
+            }
+            
+        }
+        
+        return new Long[]{ numChainsFound, numGraphletsFound, numScoresComputed, numScoresSaved };
+    }
+    
     /**
      * Checks whether a DB connection exists. Tries to establish it if not.
      * @return: Whether a DB connection could be established in the end.
@@ -3904,6 +4013,63 @@ public class DBManager {
             }
             
         }        
+    }
+    
+    
+    /**
+     * Retrieves the PDB ID and the PDB chain name of all chains from the DB.
+     * @return a 2-dim ArrayList. The outer one has the size = number of chains in DB, the inner ones of length 2 contain the PDB ID at position 0 and the chain name at position 1.
+     */
+    public static ArrayList<ArrayList<String>> getAllPDBIDsandChains() {
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+               
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT pdb_id, chain_name FROM " + tbl_chain + " ;";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+            
+            rs = statement.executeQuery();
+            dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "getAllPDBIDsandChains: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "getAllPDBIDsandChains: Could not close statement and reset autocommit."); }
+        }
+        
+        return tableData;
     }
     
     
