@@ -70,6 +70,7 @@ public class DBManager {
     
     /** New table that stores linear notations for all graph types. They are distinguished by a graph_type field, like in all other tables. This tables replaces the albe, alpha and beta tables of the PTGL, which were useless from a DB design point of view. */
     static String tbl_fglinnot = "plcc_fglinnot";
+    static String tbl_graphletsimilarity = "plcc_graphletsimilarity";
     
     /** Name of the table which stores the PTGL alpha linear notation of a folding graph. */
     //static String tbl_fglinnot_alpha = "plcc_fglinnot_alpha";
@@ -103,6 +104,7 @@ public class DBManager {
     static String view_fglinnots = "plcc_view_fglinnots";
     static String view_secondat = "plcc_view_secondat";
     static String view_graphlets = "plcc_view_graphlets";
+    static String view_graphletsimilarity = "plcc_view_graphletsimilarity";
 
     /**
      * Sets the database address and the credentials to access the DB.
@@ -512,6 +514,7 @@ public class DBManager {
             //doInsertQuery("CREATE TABLE " + tbl_fglinnot_betalig + " (linnotbetalig_id serial primary key, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text);");
             //doInsertQuery("CREATE TABLE " + tbl_fglinnot_albelig + " (linnotalbelig_id serial primary key, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text);");           
             doInsertQuery("CREATE TABLE " + tbl_fglinnot + " (linnot_id serial primary key, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text, num_sses int);");
+            doInsertQuery("CREATE TABLE " + tbl_graphletsimilarity + " (graphletsimilarity_id serial primary key, graphletsimilarity_sourcegraph int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graphletsimilarity_targetgraph int not null references " + tbl_proteingraph + " ON DELETE CASCADE, score numeric);");
 
             // set constraints
             doInsertQuery("ALTER TABLE " + tbl_protein + " ADD CONSTRAINT constr_protein_uniq UNIQUE (pdb_id);");
@@ -525,6 +528,7 @@ public class DBManager {
             doInsertQuery("ALTER TABLE " + tbl_nm_ligandtochain + " ADD CONSTRAINT constr_ligtochain_uniq UNIQUE (ligandtochain_chainid, ligandtochain_ligandname3);");
             doInsertQuery("ALTER TABLE " + tbl_nm_chaintomotif + " ADD CONSTRAINT constr_chaintomotif_uniq UNIQUE (chain_id, motif_id);");
             doInsertQuery("ALTER TABLE " + tbl_secondat + " ADD CONSTRAINT constr_secondat_uniq UNIQUE (sse_id);");
+            doInsertQuery("ALTER TABLE " + tbl_graphletsimilarity + " ADD CONSTRAINT constr_graphletsimilarity_uniq UNIQUE (graphletsimilarity_sourcegraph, graphletsimilarity_targetgraph);");
             
             //doInsertQuery("ALTER TABLE " + tbl_fglinnot_alpha + " ADD CONSTRAINT constr_fglinnotalpha_uniq UNIQUE (linnot_foldinggraph_id);");
             //doInsertQuery("ALTER TABLE " + tbl_fglinnot_beta + " ADD CONSTRAINT constr_fglinnotbeta_uniq UNIQUE (linnot_foldinggraph_id);");
@@ -540,6 +544,7 @@ public class DBManager {
             doInsertQuery("CREATE VIEW " + view_ssecontacts + " AS SELECT contact_id, least(sse1_type, sse2_type) sse1_type, greatest(sse1_type, sse2_type) sse2_type, sse1_lig_name, sse2_lig_name  FROM (SELECT k.contact_id, sse1.sse_type AS sse1_type, sse2.sse_type AS sse2_type, sse1.lig_name AS sse1_lig_name, sse2.lig_name AS sse2_lig_name FROM " + tbl_ssecontact + " k LEFT JOIN " + tbl_sse + " sse1 ON k.sse1=sse1.sse_id LEFT JOIN " + tbl_sse + " sse2 ON k.sse2=sse2.sse_id) foo;");
             doInsertQuery("CREATE VIEW " + view_graphs + " AS SELECT graph_id, pdb_id, chain_name, graphtype_text, graph_string_gml, sse_string, graph_containsbetabarrel FROM (SELECT k.graph_id, gt.graphtype_text, k.graph_string_gml, k.sse_string, k.graph_containsbetabarrel, chain.chain_name AS chain_name, chain.pdb_id AS pdb_id FROM " + tbl_proteingraph + " k LEFT JOIN " + tbl_chain + " chain ON k.chain_id=chain.chain_id LEFT JOIN " + tbl_graphtypes + " gt ON k.graph_type=gt.graphtype_id) bar;");
             doInsertQuery("CREATE VIEW " + view_foldinggraphs + " AS SELECT foldinggraph_id, parent_graph_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, sse_string, graph_containsbetabarrel FROM (SELECT fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM " + tbl_foldinggraph + " fg LEFT JOIN " + tbl_proteingraph + " pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN " + tbl_chain + " c ON pg.chain_id=c.chain_id LEFT JOIN " + tbl_graphtypes + " gt ON pg.graph_type=gt.graphtype_id) bar;");
+            doInsertQuery("CREATE VIEW " + view_graphletsimilarity + " AS SELECT src_pdb_id, src_chain_name, cmp_pdb_id, cmp_chain_name, score, src_graphtype_text, cmp_graphtype_text, src_graph_id, cmp_graph_id FROM (SELECT gs.graphletsimilarity_sourcegraph as src_graph_id, gs.graphletsimilarity_targetgraph AS cmp_graph_id, gs.score, src_gt.graphtype_text AS src_graphtype_text, cmp_gt.graphtype_text AS cmp_graphtype_text, src_chain.chain_name AS src_chain_name, cmp_chain.chain_name AS cmp_chain_name, src_chain.pdb_id AS src_pdb_id, cmp_chain.pdb_id AS cmp_pdb_id FROM " + tbl_graphletsimilarity + " gs INNER JOIN " + tbl_proteingraph + " src_pg ON gs.graphletsimilarity_sourcegraph = src_pg.graph_id LEFT JOIN " + tbl_chain + " src_chain ON src_pg.chain_id = src_chain.chain_id LEFT JOIN " + tbl_graphtypes + " src_gt ON src_pg.graph_type = src_gt.graphtype_id INNER JOIN " + tbl_proteingraph + " cmp_pg ON gs.graphletsimilarity_targetgraph = cmp_pg.graph_id LEFT JOIN " + tbl_chain + " cmp_chain ON cmp_pg.chain_id = cmp_chain.chain_id LEFT JOIN " + tbl_graphtypes + " cmp_gt ON cmp_pg.graph_type = cmp_gt.graphtype_id) bar;");
             
             //doInsertQuery("CREATE VIEW " + view_fglinnotsalpha + " AS SELECT linnotalpha_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key FROM (SELECT la.linnotalpha_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM " + tbl_fglinnot_alpha + " la LEFT JOIN " + tbl_foldinggraph + " fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN " + tbl_proteingraph + " pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN " + tbl_chain + " c ON pg.chain_id=c.chain_id LEFT JOIN " + tbl_graphtypes + " gt ON pg.graph_type=gt.graphtype_id) bar ;");
             //doInsertQuery("CREATE VIEW " + view_fglinnotsbeta + " AS SELECT linnotbeta_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key FROM (SELECT la.linnotbeta_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM " + tbl_fglinnot_beta + " la LEFT JOIN " + tbl_foldinggraph + " fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN " + tbl_proteingraph + " pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN " + tbl_chain + " c ON pg.chain_id=c.chain_id LEFT JOIN " + tbl_graphtypes + " gt ON pg.graph_type=gt.graphtype_id) bar ;");
@@ -3239,6 +3244,8 @@ public class DBManager {
      * Writes information on the graphlet counts for a protein graph to the database. Used by graphlet computation
      * algorithms to store the graphlets. Currently not used because this is done in a separate C++ program.
      * 
+     * OLD VERSION, USES INTEGER FIELDS!
+     * 
      * @param pdb_id the PDB identifier of the protein
      * @param chain_name the PDB chain name of the chain represented by the graph_string
      * @param graph_type the Integer representation of the graph type. use ProtGraphs.getGraphTypeCode() to get it.
@@ -3246,6 +3253,7 @@ public class DBManager {
      * @return true if the graph was inserted, false if errors occurred
      * @throws SQLException if the data could not be written or the database connection could not be closed or reset to auto commit (in the finally block)
      */
+    /*
     @Deprecated
     public static Boolean writeGraphletsToDB(String pdb_id, String chain_name, Integer graph_type, Integer[] graphlet_counts) throws SQLException {
 
@@ -3299,7 +3307,7 @@ public class DBManager {
         }
         return(result);
     }
-    
+    */
     
     /**
      * Formats the array for SQL insert into an array field.
@@ -3334,7 +3342,7 @@ public class DBManager {
      */
     public static Boolean writeNormalizedGraphletsToDB(String pdb_id, String chain_name, Integer graph_type, Double[] graphlet_counts) throws SQLException {
 
-        int numReqGraphletTypes = 30;
+        int numReqGraphletTypes = Settings.getInteger("plcc_I_number_of_graphlets");
         if(graphlet_counts.length != numReqGraphletTypes) {
             System.err.println("ERROR: writeNormalizedGraphletsToDB: Invalid number of graphlet types specified (got " + graphlet_counts.length + ", required " + numReqGraphletTypes + "). Skipping graphlets.");
             return false;
@@ -3352,14 +3360,14 @@ public class DBManager {
         }
 
         StringBuilder querySB = new StringBuilder();
-        querySB.append("INSERT INTO " + tbl_graphletcount + " (graph_id, graphlet_counts) VALUES (");
+        querySB.append("INSERT INTO " + tbl_graphletcount + " (graph_id, graphlet_counts) VALUES ( ");
         
         String pgArray = DBManager.getSQLArrayString(graphlet_counts);
         
         querySB.append(graph_db_id);
         querySB.append(", ");
         querySB.append(pgArray);
-        querySB.append(")");
+        querySB.append(" )");
         
         String query = querySB.toString();
         
@@ -4551,7 +4559,7 @@ public class DBManager {
      */
     public static Integer[] getGraphletCounts(String pdb_id, String chain_name, String graph_type) throws SQLException {
         
-        int numReqGraphletTypes = 29;
+        int numReqGraphletTypes = Settings.getInteger("plcc_I_number_of_graphlets");
         
         Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
         
