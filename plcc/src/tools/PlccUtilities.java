@@ -108,7 +108,17 @@ public class PlccUtilities {
   
   public static void multiQuickSortTS(Double[] arr1, String[] arr2) {
     // check if the lengths are equal, break if everything is empty
-        
+      
+      if(arr1 == null || arr2 == null) {
+          //System.err.println("multiQuickSortTS: array null.");
+          return;
+      }
+      
+      if(arr1.length <= 1) {
+          //System.err.println("multiQuickSortTS: array length <= 1.");
+          return;
+      }
+      
       if(arr1.length != arr2.length) {
           System.err.println("multiQuickSortTS: array lengths are not equal.");
           return;

@@ -184,6 +184,8 @@ public class DBManager {
      */
     public static Long[] computeGraphletSimilarityScoresForWholeDatabaseAndStoreBest(String graphType, Integer numberOfTopScoresToSavePerPair) {
         
+        boolean fakeIt = true;
+        
         if(! graphType.equals(ProtGraph.GRAPHTYPE_ALBE)) {
             DP.getInstance().w("DBManager", "computeGraphletSimilarityScoresForWholeDatabaseAndStoreBest(): Graphlets for your chose graph type '" + graphType + "' may not be in the database. By default, we compute \"albe\" graphlets only.");
         }
@@ -213,6 +215,14 @@ public class DBManager {
                 System.out.println("  At chain #" + i + " of " + allChains.size() + ".");
             }
             
+            if(fakeIt) {
+                try {
+                    System.out.println("  Writing fake graphlet counts for " + src_pdb_id + " chain " + src_chain_name + " to DB.");
+                    DBManager.writeNormalizedGraphletsToDB(src_pdb_id, src_chain_name, ProtGraph.GRAPHTYPE_INT_ALBE, SimilarityByGraphlets.getRandDoubleArray(30));
+                } catch(SQLException e) {
+                    System.err.println("    FAILED, could not write fake graphlet counts.");
+                }
+            }
             
             try {
                 src_graphlets = DBManager.getNormalizedGraphletCounts(src_pdb_id, src_chain_name, graphType);            
@@ -235,6 +245,21 @@ public class DBManager {
                 cmp_pdb_id = cmp_row.get(0);
                 cmp_chain_name = cmp_row.get(1);
                 cmp_graphlets = null;
+                
+                if(i == j) {
+                    continue;
+                }
+                
+                if(fakeIt) {      
+                    
+                    try {
+                        System.out.println("  Writing fake graphlet counts for " + cmp_pdb_id + " chain " + cmp_chain_name + " to DB.");
+                        DBManager.writeNormalizedGraphletsToDB(cmp_pdb_id, cmp_chain_name, ProtGraph.GRAPHTYPE_INT_ALBE, SimilarityByGraphlets.getRandDoubleArray(30));
+                    } catch(SQLException e) {
+                        System.err.println("    FAILED, could not write fake graphlet counts.");
+                    }
+                    
+                }
                 
                 try {
                     cmp_graphlets = DBManager.getNormalizedGraphletCounts(cmp_pdb_id, cmp_chain_name, graphType);            
@@ -270,10 +295,17 @@ public class DBManager {
                 numberOfTopScoresToSavePerPair = allPDBChains.length;
             }
             
-            System.out.println("Similarity to " + src_pdb_id + " chain " + src_chain_name + ":");
+            System.out.println("Similarity of all DB chains to " + src_pdb_id + " chain " + src_chain_name + ":");
             for(int k = 0; k < numberOfTopScoresToSavePerPair; k++) {
-                System.out.println("  #" + k + ": " + allPDBChains[k] + " with score " + src_scores[k] + ".");
-                numScoresSaved++;
+                if(src_scores[k] != null) {
+                    System.out.println("  #" + k + ": " + allPDBChains[k] + " with score " + src_scores[k] + ".");
+                    try {
+                        DBManager.writeGraphletSimilarityScoreToDB(src_pdb_id, src_chain_name, allPDBChains[k].substring(0, 4), allPDBChains[k].substring(4), graphType, src_scores[k]);
+                    } catch (SQLException e) {
+                        System.err.println("Could not write graphlet similarity score to DB: '" + e.getMessage() + "'.");
+                    }
+                    numScoresSaved++;
+                }
             }
             
         }
@@ -2132,6 +2164,53 @@ public class DBManager {
         return (count);
     }
     
+    /**
+     * Deletes all graphlet similarity entries for a protein graph pair from the plcc database tables.
+     * @param source_graph_id the source graph id
+     * @param target_graph_id the target graph id
+     * @return The number of affected records (0 if the PDB ID was not in the database).
+     */
+    public static Integer deleteGraphletSimilaritiesFromDBForGraphs(Long source_graph_id, Long target_graph_id) {
+
+        PreparedStatement statement = null;        
+        ResultSetMetaData md;
+        int count = 0;        
+        ResultSet rs = null;
+        
+        
+        String query = "DELETE FROM " + tbl_graphletsimilarity + " gs WHERE ( gs.graphletsimilarity_sourcegraph = ? AND gs.graphletsimilarity_targetgraph = ? );";
+        
+        
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, source_graph_id);
+            statement.setLong(2, target_graph_id);
+              
+            
+            count = statement.executeUpdate();
+            dbc.commit();
+            
+            //md = rs.getMetaData();
+            //count = md.getColumnCount();
+            
+            
+        } catch (SQLException e) {
+            DP.getInstance().e("DBManager", "deleteGraphletSimilaritiesFromDBForGraphs: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "deleteGraphletSimilaritiesFromDBForGraphs: Could not close statement and reset autocommit."); }
+        }
+        
+
+        return (count);
+    }
+    
     
     /**
      * Deletes all graphlet counts for the given graph from the database tables.
@@ -3559,6 +3638,86 @@ public class DBManager {
         return(result);
     }
     
+    
+    /**
+     * Writes the graphlet similarity score to the DB for the given graph pair
+     * @param src_pdb_id the source graph PDB ID
+     * @param src_chain_name the source graph chain name
+     * @param tgt_pdb_id the target graph PDB ID
+     * @param tgt_chain_name the target graph chain name
+     * @param graph_type the graph type (for both of them)
+     * @param score the similarity score
+     * @return whether it worked out
+     * @throws SQLException if something went wrong
+     */
+    public static Boolean writeGraphletSimilarityScoreToDB(String src_pdb_id, String src_chain_name, String tgt_pdb_id, String tgt_chain_name, String graph_type, Double score) throws SQLException {
+        Long src_graph_id = DBManager.getDBProteinGraphID(src_pdb_id, src_chain_name, graph_type);
+        Long tgt_graph_id = DBManager.getDBProteinGraphID(tgt_pdb_id, tgt_chain_name, graph_type);
+        
+        if(src_graph_id < 0 || tgt_graph_id < 0) {
+            return false;
+        }
+        
+        return DBManager.writeGraphletSimilarityScoreToDB(src_graph_id, tgt_graph_id, score);
+    }
+    
+    /**
+     * Writes information on a graphlet similarity between two protein graphs to the DB.
+     * @param source_graph_id the first graph db id
+     * @param target_graph_id the second graph db id
+     * @param score the similarity score
+     * @return whether it worked out
+     * @throws java.sql.SQLException if something goes wrong with the DB
+     */
+    public static Boolean writeGraphletSimilarityScoreToDB(Long source_graph_id, Long target_graph_id, Double score) throws SQLException {
+
+        
+
+        if (source_graph_id < 0 || target_graph_id < 0) {            
+            return (false);
+        }
+        
+        if(DBManager.graphletSimilarityScoreExistsInDBForGraphs(source_graph_id, target_graph_id)) {
+            deleteGraphletSimilaritiesFromDBForGraphs(source_graph_id, target_graph_id);
+        }
+
+        Boolean result = false;
+        PreparedStatement statement = null;
+
+        String query = "INSERT INTO " + tbl_graphletsimilarity + " (graphletsimilarity_sourcegraph, graphletsimilarity_targetgraph, score) VALUES (?, ?, ?);";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, source_graph_id);
+            statement.setLong(2, target_graph_id);
+            statement.setDouble(3, score);
+                                
+            statement.executeUpdate();
+            dbc.commit();
+            result = true;
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: writeGraphletSimilarityScoreToDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: writeGraphletSimilarityScoreToDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: writeGraphletSimilarityScoreToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+            result = false;
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(true);
+        }
+                
+        return(result);
+    }
+    
     /**
      * Writes information on an inter-chain contact between a pair of SSEs from two different chains of a PDB file contact to the database.
      * This stores the complex graph contacts. It is used for statistical purposes only at the moment.
@@ -4379,6 +4538,82 @@ public class DBManager {
             return(false);
         }        
     }
+    
+    
+    /**
+     * Determines whether a graphlet similarity score entry exists in the DB for the given pair of protein graphs.
+     * @param source_graph_id the source graph id
+     * @param target_graph_id the target graph id
+     * @return true if it exists, false otherwise
+     */
+    public static synchronized Boolean graphletSimilarityScoreExistsInDBForGraphs(Long source_graph_id, Long target_graph_id) {
+        
+        if(source_graph_id < 0 || target_graph_id < 0) {
+            return false;
+        }
+        
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT graphletsimilarity_id FROM " + tbl_graphletsimilarity + " WHERE ( graphletsimilarity_sourcegraph = ? AND graphletsimilarity_targetgraph = ? );";
+
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, source_graph_id);
+            statement.setLong(2, target_graph_id);
+                                
+            rs = statement.executeQuery();
+            dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "graphletSimilarityScoreExistsInDBForGraphs:'" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "graphletSimilarityScoreExistsInDBForGraphs: Could not close statement and reset autocommit."); }
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        if(tableData.size() >= 1) {            
+            return(true);     
+        }
+        else {
+            return(false);
+        }        
+    }
+    
+    
+    
     
     
     /**
