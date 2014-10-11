@@ -739,6 +739,7 @@ public class Main {
                             Settings.set("plcc_B_output_eld", "false");
                             Settings.set("plcc_B_output_plcc", "false");
                             Settings.set("plcc_B_output_perlfg", "false");
+                            Settings.set("plcc_B_output_json", "false");
                             
                             
                             // Now add the listed ones back:
@@ -757,11 +758,12 @@ public class Main {
                                 if(types.contains("e")) { Settings.set("plcc_B_output_eld", "true"); nv++; }
                                 if(types.contains("p")) { Settings.set("plcc_B_output_plcc", "true"); nv++; }
                                 if(types.contains("l")) { Settings.set("plcc_B_output_perlfg", "true"); nv++; }
+                                if(types.contains("j")) { Settings.set("plcc_B_output_json", "true"); nv++; }
 
                                 // sanity check
                                 if(nv != types.length()) {
                                     DP.getInstance().w("List of output formats given on command line '" + types + "' contains invalid chars (" + types.length() + " given, " + nv + " valid).");
-                                    DP.getInstance().w("Valid chars: 'g' => GML, 't' => TGF, 'd' => DOT lang, 'k' => kavosh, 'e' => edge list, 'p' => PLCC, 'l' => Perf FG. Example: '-O tgp'");
+                                    DP.getInstance().w("Valid chars: 'g' => GML, 't' => TGF, 'd' => DOT lang, 'k' => kavosh, 'e' => edge list, 'p' => PLCC, 'l' => Perf FG, 'j' => JSON. Example: '-O tgp'");
 
                                     if(nv <= 0) {
                                         syntaxError();
@@ -2153,6 +2155,13 @@ public class Main {
                         pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_PERLFOLDINGGRAPHSCRIPT, new File(perlGraphFile));
                     }
                 }
+                if(Settings.getBoolean("plcc_B_output_json")) {
+                    String jsonGraphFile = filePathGraphs + fs + fileNameWithoutExtension + ".json";
+                    if(IO.stringToTextFile(jsonGraphFile, pg.toJSONFormat())) {
+                        graphFormatsWritten += "json "; numFormatsWritten++;
+                        pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_JSON, new File(jsonGraphFile));
+                    }
+                }
                 
                 
                 
@@ -2167,46 +2176,24 @@ public class Main {
                 */
                 
                 
-                
                 if(numFormatsWritten > 0) {
                     if(! silent) {
                         System.out.println("      Exported protein ligand graph in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + new File(filePathGraphs).getAbsolutePath() + fs + "'.");
                     }
                 }
                 
-                
-                
                 imgFile = filePathImg + fs + fileNameWithExtension;
                 String imgFileNoExt = filePathImg + fs + fileNameWithoutExtension;
-                
-                // test spatial ordering, not used for anything atm
-                // TODO: remove this, it's only a test and takes time
-                /*
-                if(pg.size > 0) {                                    
-                    ArrayList<Integer> spatOrder = pg.getSpatialOrderingOfVertexIndices();
-                    if(spatOrder.size() == pg.size && pg.size > 1) {
-                        String order = "      The " + gt + " graph of chain " + c.getPdbChainID() + " with " + pg.size + " vertices has a valid linear spatial ordering: [";
-                        for(Integer s = 0; s < spatOrder.size(); s++) {
-                            order += " " + spatOrder.get(s);
-                        }
-                        order += " ]";
-                        System.out.println(order);
-                        
-                        // if its has a spatial ordering, it has a KEY notation
-                        System.out.println("      Key notation is: '" + pg.getNotationKEY(true) + "'.");
-                    }
-                    
-                }
-                */
+                                
                 
                 // But we may need to write the graph to the database
                 if(Settings.getBoolean("plcc_B_useDB")) {
                                         
                     
                     try { 
-                        DBManager.writeProteinGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), pg.toGraphModellingLanguageFormat(), pg.toVPLGGraphFormat(), pg.toKavoshFormat(), pg.toDOTLanguageFormat(), pg.getSSEStringSequential(), pg.containsBetaBarrel()); 
+                        Boolean res = DBManager.writeProteinGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), pg.toGraphModellingLanguageFormat(), pg.toVPLGGraphFormat(), pg.toKavoshFormat(), pg.toDOTLanguageFormat(), pg.toJSONFormat(), pg.getSSEStringSequential(), pg.containsBetaBarrel()); 
                         
-                        if(! silent) {
+                        if((! silent) && res) {
                             System.out.println("      Inserted '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + chain + "' into DB.");
                         }
                     }
@@ -4484,7 +4471,7 @@ public class Main {
         System.out.println("-n | --textfiles           : write meta data, debug info and interim results like residue contacts to text files (slower)");
         System.out.println("-N | --no-warn             : do not print any warnings (intended for cluster use to reduce job output in logs).");
         System.out.println("-o | --outputdir <dir>     : write output files to directory <dir> (instead of '.', the current directory)");
-        System.out.println("-O | --outputformats <list>: write only graph output formats in <list>, where g=GML, t=TGF, d=DOT language, e=Kavosh edge list, p=PLCC. Specify 'x' for none.");
+        System.out.println("-O | --outputformats <list>: write only graph output formats in <list>, where g=GML, t=TGF, d=DOT language, e=Kavosh edge list, p=PLCC, j=json. Specify 'x' for none.");
         System.out.println("-p | --pdbfile <pdbfile>   : use input PDB file <pdbfile> (instead of assuming '<pdbid>.pdb')");
         System.out.println("     --gz-pdbfile <f>      : use gzipped input PDB file <f>.");
         System.out.println("-q | --fg-notations <list> : draw only the folding graph notations in <list>, e.g. 'kars' = KEY, ADJ, RED and SEQ.");
@@ -5675,8 +5662,16 @@ public class Main {
                             //System.out.println("Loop Contact");
                         }
                     }
+                    
                 }
+                
                 interchainContacts.add(resContacts.get(i));
+                
+                // TODO: Test by Tim: maybe we should delete the edge if it has no contacts:
+                
+                if(compGraph.numAllInteractionsMap.get(compGraph.getEdge(chainA, chainB)) == 0) {
+                    compGraph.removeEdge(compGraph.getEdge(chainA, chainB));
+                }
             }
         }
         
@@ -5722,7 +5717,8 @@ public class Main {
         //System.out.println("    ----- Done with " + graphType + " graph of chain " + c.getPdbChainID() + ". -----");
         pg.setInfo(pdbid, "ALL", "complex_" + graphType);
         pg.addMetadata(md);
-        pg.setComplexData(chainEnd, allChains);      
+        pg.setComplexData(chainEnd, allChains);
+        pg.declareComplexGraph(true);
 
         
         
@@ -5734,7 +5730,9 @@ public class Main {
             //System.out.println("  Considering coils, this may fragment SSEs.");
             coils = "_coils";
         }
-        fileNameWithoutExtension = pdbid + "_" + "complex" + "_" + "ALL" + "_" + graphType + coils + "_PG";
+        
+        
+        fileNameWithoutExtension = pdbid + "_complex_sses_" + graphType + coils + "_CG";
         fileNameWithExtension = fileNameWithoutExtension + Settings.get("plcc_S_img_output_fileext");
 
         //pg.toFile(file + ".ptg");
@@ -5762,7 +5760,7 @@ public class Main {
         // the simple complex graph (one vertex is one chain):
         File myGML = null;
         try {
-            myGML = new File(filePathGraphs + fs + pdbid + "_CompGraph.gml");
+            myGML = new File(filePathGraphs + fs + pdbid + "_complex_chains_" + graphType + "_CG.gml");
             myGML.createNewFile();
             if(compGraph.writeToFileGML(myGML)) {
                 System.out.println("    Complex graph chain-level notation written to file '" + myGML.getAbsolutePath() + "' in GML format.");
@@ -5831,7 +5829,7 @@ public class Main {
             System.out.println("    Image of complex graph written to base file '" + imgFileNoExt + "'.");
         }
         else {
-            System.out.println("    Image and graph output disabled, not drawing and writing complex graph files.");
+            System.out.println("    Image output disabled, not drawing complex graphs.");
         }              
         
         System.out.println("Complex graph computation done.");

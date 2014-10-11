@@ -89,6 +89,8 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
     /** The size of this graph, i.e., the number of vertices in it. */
     protected Integer size = null;   
     
+    protected Boolean isComplexGraph;
+    
     /** The edge matrix defining contacts and the type of spatial relation. */
     protected Integer[ ][ ] matrix;               // contacts and spatial relations between pairs of SSEs
     
@@ -163,6 +165,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         
         
         this.distancesCalculated = false;
+        this.isComplexGraph = false;
 
         adjLists = new ArrayList<ArrayList<Integer>>();
         // add one ArrayList for each SSE
@@ -1659,6 +1662,22 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
     public Boolean isBifurcated() {
         return(this.maxVertexDegree() > 2);
     }
+    
+    
+    /**
+     * Serializes this graph to a string in JSON format.
+     * @return a JSON format string representation of this graoh. Note that
+     * the JSON is the full graph including atoms and may thus be quite large.
+     */
+    public String toJSONFormat() {
+        //Gson gson = new Gson();
+        //String json = gson.toJson(this);  
+        String json = "";
+        // TODO: add google gson lib back & implement this
+        System.err.println("SSEGraph.toJSONFormat: implement me.");
+        return json;
+    }
+    
     
     
     
@@ -3855,22 +3874,42 @@ E	3	3	3
             // no settings object yet, assume not to write stuff
         }
         
-        gmlf.append("  pdb_id \"" + this.pdbid + "\"\n");
-        gmlf.append("  chain_id \"" + this.chainid + "\"\n");
-        gmlf.append("  graph_type \"" + this.graphType + "\"\n");
-        gmlf.append("  is_protein_graph " + (this.isProteinGraph ? "1" : "0") + "\n");
-        gmlf.append("  is_folding_graph " + (this.isProteinGraph ? "0" : "1") + "\n");
+        gmlf.append("  pdb_id \"").append(this.pdbid).append("\"\n");
+        gmlf.append("  chain_id \"").append(this.chainid).append("\"\n");
+        gmlf.append("  graph_type \"").append(this.graphType).append("\"\n");
+        gmlf.append("  is_protein_graph ").append(this.isProteinGraph ? "1" : "0").append("\n");
+        gmlf.append("  is_folding_graph ").append(this.isProteinGraph ? "0" : "1").append("\n");
         gmlf.append("  is_SSE_graph 1\n");
         gmlf.append("  is_AA_graph 0\n");
-        gmlf.append("  is_all_chains_graph " + (this.isComplexGraph() ? "1" : "0") + "\n");
+        gmlf.append("  is_all_chains_graph ").append(this.isComplexGraph() ? "1" : "0").append("\n");
         
         // print all nodes
         SSE vertex;
         for(Integer i = 0; i < this.size; i++) {
             vertex = this.sseList.get(i);
+            
+            String vertex_chain_name_cg = "?";
+            if(this.isComplexGraph()) {
+                // determine and set chain ID of complec graph vertex
+                int iChainID = -1;
+                for(Integer x = 0; x < this.chainEnd.size(); x++){
+                    if(i < this.chainEnd.get(x)) {iChainID = x; break;}
+                }
+                
+                if(iChainID != -1) {
+                    vertex_chain_name_cg = this.allChains.get(iChainID).getPdbChainID();
+                }
+            }
+            
             gmlf.append(startNode).append("\n");
             gmlf.append("    id ").append(i).append("\n");
-            gmlf.append("    label \"").append(i).append("-").append(vertex.getSseType()).append("\"\n");
+            
+            if(this.isComplexGraph()) {
+                // for complex graphs, add the chain of the SSE to the label to make it unique
+                gmlf.append("    label \"").append(vertex_chain_name_cg).append("-").append(i).append("-").append(vertex.getSseType()).append("\"\n");
+            } else {
+                gmlf.append("    label \"").append(i).append("-").append(vertex.getSseType()).append("\"\n");
+            }
             gmlf.append("    num_in_chain ").append(vertex.getSSESeqChainNum()).append("\n");            
             gmlf.append("    num_residues ").append(vertex.getLength()).append("\n");
             
@@ -3891,6 +3930,11 @@ E	3	3	3
             if(vertex.isLigandSSE()) {
                 gmlf.append("    lig_name \"").append(vertex.getLigandName3()).append("\"\n");
             }
+            
+            if(this.isComplexGraph()) {
+                gmlf.append("    chain_id \"").append(vertex_chain_name_cg).append("\"\n");                
+            }
+        
             
             gmlf.append("    sse_type \"").append(vertex.getSseType()).append("\"\n");
             
@@ -4005,12 +4049,22 @@ E	3	3	3
         return(dlf.toString());
     }
     
+    
+    
     /**
      * Pseudo-method, setting this info is not implemented yet. Always returns false until that is fixed.
      * @return false
      */
     public boolean isComplexGraph() {
-        return false;
+        return this.isComplexGraph;
+    }
+    
+    /**
+     * Declares this graph a complex graph (or not). This has effects on the meta data that is exported in formats like GML.
+     * @param dec whether or not this should be considered a complex graph
+     */
+    public void declareComplexGraph(Boolean dec) {
+        this.isComplexGraph = dec;
     }
     
     /**

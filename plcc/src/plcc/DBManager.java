@@ -2326,12 +2326,13 @@ public class DBManager {
      * @param graph_string_plcc the graph in plcc format
      * @param graph_string_kavosh the graph in kavosh format
      * @param graph_string_dotlanguage the graph in DOT language format
+     * @param graph_string_json the graph in JSON format
      * @param sse_string the graph in SSE string notation
      * @param containsBetaBarrel whether the graph contains a beta barrel (used for stats only)
      * @return true if the graph was inserted, false if errors occurred
      * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
      */
-    public static Boolean writeProteinGraphToDB(String pdb_id, String chain_name, Integer graph_type, String graph_string_gml, String graph_string_plcc, String graph_string_kavosh, String graph_string_dotlanguage, String sse_string, Boolean containsBetaBarrel) throws SQLException {
+    public static Boolean writeProteinGraphToDB(String pdb_id, String chain_name, Integer graph_type, String graph_string_gml, String graph_string_plcc, String graph_string_kavosh, String graph_string_dotlanguage, String graph_string_json, String sse_string, Boolean containsBetaBarrel) throws SQLException {
                
         Long chain_db_id = getDBChainID(pdb_id, chain_name);
         Boolean result = false;
@@ -2344,7 +2345,7 @@ public class DBManager {
         Integer graph_containsbetabarrel = (containsBetaBarrel ? 1 : 0);
         PreparedStatement statement = null;
 
-        String query = "INSERT INTO " + tbl_proteingraph + " (chain_id, graph_type, graph_string_gml, graph_string_plcc, graph_string_kavosh, graph_string_dotlanguage, sse_string, graph_containsbetabarrel) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO " + tbl_proteingraph + " (chain_id, graph_type, graph_string_gml, graph_string_plcc, graph_string_kavosh, graph_string_dotlanguage, graph_string_json, sse_string, graph_containsbetabarrel) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
 
         try {
             dbc.setAutoCommit(false);
@@ -2356,8 +2357,9 @@ public class DBManager {
             statement.setString(4, graph_string_plcc);
             statement.setString(5, graph_string_kavosh);
             statement.setString(6, graph_string_dotlanguage);
-            statement.setString(7, sse_string);
-            statement.setInt(8, graph_containsbetabarrel);
+            statement.setString(7, graph_string_json);
+            statement.setString(8, sse_string);
+            statement.setInt(9, graph_containsbetabarrel);
                                 
             statement.executeUpdate();
             dbc.commit();
