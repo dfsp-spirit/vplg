@@ -4,6 +4,7 @@
  * Copyright Marcus Kessler 2013. VPLG is free software, see the LICENSE and README files for details.
  *
  * @author Marcus Kessler
+ * modified by TS
  */
 package plcc;
 
@@ -30,6 +31,8 @@ public class ComplexGraph extends UAdjListGraph {
     public Map<Edge, Integer> numAllInteractionsMap;
     public Map<Edge, Integer> numDisulfidesMap;
     public Map<Vertex, String> proteinNodeMap;
+    
+    /** The RCSB PDB id this graph is based on. */
     private String pdbid;
 
     /**

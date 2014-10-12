@@ -255,7 +255,7 @@ public class Settings {
         defSet("plcc_I_img_vert_dist", "50", "The distance between two consecutive vertices in the output image, in pixels");
         defSet("plcc_I_img_vert_radius", "10", "The radius of a vertex in the output image, in pixels");
         defSet("plcc_I_img_header_height", "40", "The height of the header area in the output image, in pixels");
-        defSet("plcc_I_img_footer_height", "180", "The height of the footer area in the output image, in pixels");
+        defSet("plcc_I_img_footer_height", "180", "The height of the footer area in the output image, in pixels. The footer is used to print the legend.");
         defSet("plcc_S_img_default_font", "TimesRoman", "The default font used in output image labels. This has to be a valid font name, of course.");
         defSet("plcc_I_img_default_font_size", "16", "The default font size used in output images.");
         defSet("plcc_I_img_legend_font_size", "16", "The legend font size used in output images.");        

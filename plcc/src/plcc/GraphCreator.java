@@ -40,6 +40,14 @@ public class GraphCreator {
         return g;
     }
     
+    
+    /**
+     * Parses a protein graph from a CSV string. Note that various properties
+     * of the graph will be null, because only the SSEs and contacts are 
+     * parsed from the CSV string
+     * @param csv the CSV string
+     * @return the protein graph parsed from the CSV
+     */
     public static ProtGraph fromCSVString(String csv) {
         
         System.err.println("ERROR: ProtGraph fromGMLString() not implemented yet.");

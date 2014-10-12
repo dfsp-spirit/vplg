@@ -33,7 +33,7 @@ do
 
 	PDBID="$filename"
 	PDB_STRING_LENGTH=${#PDBID}
-	if [ PDB_STRING_LENGTH -ne 4 ]; then
+	if [ $PDB_STRING_LENGTH -ne 4 ]; then
 	  echo "$APPTAG: ERROR: Expected PDB ID of length 4 but found '$filename', the input file may not be named after the pattern '<pdbid>.pdb'. Skipping file '$fullfilename'."
 	  continue
 	fi

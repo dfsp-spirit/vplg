@@ -17,12 +17,13 @@ package plcc;
 public class AminoAcid {
 
     // declare class vars
-    public static final Integer CHEMPROPAA_INT_UNKNOWN = -1;
+    
     public static final Integer CHEMPROPAA_INT_SMALL_APOLAR = 0;
     public static final Integer CHEMPROPAA_INT_HYDROPHOBIC = 1;
     public static final Integer CHEMPROPAA_INT_POLAR = 2;
     public static final Integer CHEMPROPAA_INT_NEGATIVE_CHARGE = 3;
     public static final Integer CHEMPROPAA_INT_POSITIVE_CHARGE = 4;
+    public static final Integer CHEMPROPAA_INT_UNKNOWN = 5;
     
     public static final String CHEMPROPAA_STRING_UNKNOWN = "?";
     public static final String CHEMPROPAA_STRING_SMALL_APOLAR = "A";
@@ -30,6 +31,8 @@ public class AminoAcid {
     public static final String CHEMPROPAA_STRING_POLAR = "P";
     public static final String CHEMPROPAA_STRING_NEGATIVE_CHARGE = "+";
     public static final String CHEMPROPAA_STRING_POSITIVE_CHARGE = "-";
+    
+    public static final String[] ALL_CHEM_PROPS = new String[] { CHEMPROPAA_STRING_SMALL_APOLAR, CHEMPROPAA_STRING_HYDROPHOBIC, CHEMPROPAA_STRING_POLAR, CHEMPROPAA_STRING_NEGATIVE_CHARGE, CHEMPROPAA_STRING_POSITIVE_CHARGE, CHEMPROPAA_STRING_UNKNOWN };
 
 
     /** The AAs above 20 (J, B, Z, X) are PDB / ligand specific special AAs. */    
@@ -148,7 +151,7 @@ public class AminoAcid {
         }
 
         // only hit if nothing was found
-        System.err.println("ERROR: Could not find chemical properties for 3 letter amino acid code '" + name3 + "'.");
+        //System.err.println("ERROR: Could not find chemical properties for 3 letter amino acid code '" + name3 + "'.");
         return(AminoAcid.CHEMPROPAA_INT_UNKNOWN);
     }
 

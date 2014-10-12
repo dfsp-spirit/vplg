@@ -255,6 +255,14 @@ public class DBManager {
                     try {
                         System.out.println("  Writing fake graphlet counts for " + cmp_pdb_id + " chain " + cmp_chain_name + " to DB.");
                         DBManager.writeNormalizedGraphletsToDB(cmp_pdb_id, cmp_chain_name, ProtGraph.GRAPHTYPE_INT_ALBE, SimilarityByGraphlets.getRandDoubleArray(30));
+                        
+                        // if we write new graphlets, we should delete the old scores based on them:
+                        Long graphID = DBManager.getProteinGraphDBidsOf(src_pdb_id, src_chain_name).get(ProtGraph.GRAPHTYPE_ALBE);
+                        if(graphID > 0) {
+                            int numDelTarget = DBManager.deleteAllGraphletSimilaritiesFromDBForTargetGraph(graphID);
+                            int numDelSource = DBManager.deleteAllGraphletSimilaritiesFromDBForSourceGraph(graphID);
+                            System.out.println("  Inserted new fake graphlets and deleted old scores of the graph (" + numDelSource + " source, " + numDelTarget + " target scores).");
+                        }
                     } catch(SQLException e) {
                         System.err.println("    FAILED, could not write fake graphlet counts.");
                     }
@@ -2211,6 +2219,86 @@ public class DBManager {
         return (count);
     }
     
+    /**
+     * Deletes all graphlet similarity entries for a source protein graph from the plcc database tables. Note that this function does NOT delete the entries where this graph is the target graph.
+     * @param source_graph_id the source graph id
+     * @return The number of affected records (0 if the PDB ID was not in the database).
+     */
+    public static Integer deleteAllGraphletSimilaritiesFromDBForSourceGraph(Long source_graph_id) {
+
+        PreparedStatement statement = null;        
+        ResultSetMetaData md;
+        int count = 0;        
+        ResultSet rs = null;
+        
+        
+        String query = "DELETE FROM " + tbl_graphletsimilarity + " gs WHERE ( gs.graphletsimilarity_sourcegraph = ?);";
+        
+        
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, source_graph_id);
+            
+            count = statement.executeUpdate();
+            dbc.commit();
+                       
+            
+        } catch (SQLException e) {
+            DP.getInstance().e("DBManager", "deleteAllGraphletSimilaritiesFromDBForSourceGraph: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "deleteAllGraphletSimilaritiesFromDBForSourceGraph: Could not close statement and reset autocommit."); }
+        }
+        
+
+        return (count);
+    }
+    
+    /**
+     * Deletes all graphlet similarity entries for a target protein graph from the plcc database tables. Note that this function does NOT delete the entries where this graph is the source graph.
+     * @param target_graph_id the target graph id
+     * @return The number of affected records (0 if the PDB ID was not in the database).
+     */
+    public static Integer deleteAllGraphletSimilaritiesFromDBForTargetGraph(Long target_graph_id) {
+
+        PreparedStatement statement = null;        
+        ResultSetMetaData md;
+        int count = 0;        
+        ResultSet rs = null;
+                
+        String query = "DELETE FROM " + tbl_graphletsimilarity + " gs WHERE ( gs.graphletsimilarity_targetgraph = ? );";
+                
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, target_graph_id);
+              
+            
+            count = statement.executeUpdate();
+            dbc.commit();
+            
+        } catch (SQLException e) {
+            DP.getInstance().e("DBManager", "deleteAllGraphletSimilaritiesFromDBForTargetGraph: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "deleteAllGraphletSimilaritiesFromDBForTargetGraph: Could not close statement and reset autocommit."); }
+        }
+        
+
+        return (count);
+    }
+    
     
     /**
      * Deletes all graphlet counts for the given graph from the database tables.
@@ -2223,11 +2311,9 @@ public class DBManager {
         ResultSetMetaData md;
         int count = 0;        
         ResultSet rs = null;
-        
-        
+                
         String query = "DELETE FROM " + tbl_graphletcount + " WHERE graph_id = ?;";
-        
-        
+                
         try {
             dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);

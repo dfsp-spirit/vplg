@@ -9,7 +9,7 @@
 package plcc;
 
 /**
- * Some protein fold motifs.
+ * Some protein fold motifs. The functions to compute these are in the DBManager class.
  * @author ts
  */
 public class Motifs {

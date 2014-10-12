@@ -2366,12 +2366,21 @@ public class Main {
                 }
             }
             
+            // Testing only
+            //System.out.println("Chain allRes chemProps: " + c.getChainChemPropsStringAllResidues());
+            String[] str = c.getChainChemPropsStringSSEResiduesOnly(" ");
+            System.out.println("Chain SSE chemProps: " + str[0]);
+            System.out.println("Chain SSE sourceSSE: " + str[1]);
+            
         }
         
         // Calculate Complex Graph
         if(Settings.getBoolean("plcc_B_complex_graphs")) {
             calculateComplexGraph(allChains, resList, resContacts, pdbid, outputDir, SSEGraph.GRAPHTYPE_ALBELIG);
         }
+        
+        
+        
         
         //System.out.println("All " + allChains.size() + " chains done.");                
     }
@@ -5479,8 +5488,10 @@ public class Main {
             //System.out.println(allChains.get(i).getPdbChainID());
         }
         
-        
-        System.out.println("  Computing CG contacts.");
+        Boolean silent = Settings.getBoolean("plcc_B_silent");
+        if(! silent) {
+            System.out.println("  Computing CG contacts.");
+        }
         // create edges for all contacts
         for(Integer i = 0; i < resContacts.size(); i++) {
             ComplexGraph.Vertex chainA = compGraph.getVertexFromChain(resContacts.get(i).getResA().getChainID());
@@ -5674,33 +5685,33 @@ public class Main {
                 }
             }
         }
-        
-        try {
-            System.out.println("    All Interactions : " + compGraph.numAllInteractionsMap.values().toArray()[0]);
-            System.out.println("    HH Interactions  : " + compGraph.numHelixHelixInteractionsMap.values().toArray()[0]);
-            System.out.println("    HS Interactions  : " + compGraph.numHelixStrandInteractionsMap.values().toArray()[0]);
-            System.out.println("    HL Interactions  : " + compGraph.numHelixLoopInteractionsMap.values().toArray()[0]);
-            System.out.println("    LL Interactions  : " + compGraph.numLoopLoopInteractionsMap.values().toArray()[0]);
-            System.out.println("    SS Interactions  : " + compGraph.numSSInteractionsMap.values().toArray()[0]);
-            System.out.println("    SL Interactions  : " + compGraph.numStrandLoopInteractionsMap.values().toArray()[0]);
-            System.out.println("    Number of edges  : " + compGraph.getEdges().size());
-        } catch(java.lang.ArrayIndexOutOfBoundsException e) {
-            //nvm
+        if(! silent) {
+            try {
+                System.out.println("    All Interactions : " + compGraph.numAllInteractionsMap.values().toArray()[0]);
+                System.out.println("    HH Interactions  : " + compGraph.numHelixHelixInteractionsMap.values().toArray()[0]);
+                System.out.println("    HS Interactions  : " + compGraph.numHelixStrandInteractionsMap.values().toArray()[0]);
+                System.out.println("    HL Interactions  : " + compGraph.numHelixLoopInteractionsMap.values().toArray()[0]);
+                System.out.println("    LL Interactions  : " + compGraph.numLoopLoopInteractionsMap.values().toArray()[0]);
+                System.out.println("    SS Interactions  : " + compGraph.numSSInteractionsMap.values().toArray()[0]);
+                System.out.println("    SL Interactions  : " + compGraph.numStrandLoopInteractionsMap.values().toArray()[0]);
+                System.out.println("    Number of edges  : " + compGraph.getEdges().size());
+            } catch(java.lang.ArrayIndexOutOfBoundsException e) {
+                //nvm
+            }
         }
 
         cgr.setCompGraph(compGraph);
         
-        System.out.println("  Preparing to write complex graph files.");
+        if( ! silent) {
+            System.out.println("  Preparing to write complex graph files.");
+        }
         
         // Calculate SSE level contacts
         //System.out.println("intr" + interchainContacts);
         ContactMatrix chainCM = new ContactMatrix(allChainSSEs, pdbid);
         chainCM.restrictToChain("ALL");
         chainCM.fillFromContactList(resContacts, keepSSEs);
-        chainCM.calculateSSEContactMatrix();
-        
-        
-       
+        chainCM.calculateSSEContactMatrix();                       
         
         chainCM.calculateSSESpatialRelationMatrix(resContacts, true);                
 
@@ -5710,7 +5721,9 @@ public class Main {
 
         
         if(Settings.getBoolean("plcc_B_forceBackboneContacts")) {
-            System.out.println("      Adding backbone contacts to consecutive SSEs of the " + graphType + " graph.");
+            if( ! silent) {
+                System.out.println("      Adding backbone contacts to consecutive SSEs of the " + graphType + " graph.");
+            }
             pg.addFullBackboneContacts();            
         }
 
@@ -5719,9 +5732,7 @@ public class Main {
         pg.addMetadata(md);
         pg.setComplexData(chainEnd, allChains);
         pg.declareComplexGraph(true);
-
-        
-        
+                
         filePathImg = outputDir;
         filePathGraphs = outputDir;
         filePathHTML = outputDir;
@@ -5729,14 +5740,11 @@ public class Main {
         if(Settings.getBoolean("plcc_B_include_coils")) {
             //System.out.println("  Considering coils, this may fragment SSEs.");
             coils = "_coils";
-        }
-        
+        }        
         
         fileNameWithoutExtension = pdbid + "_complex_sses_" + graphType + coils + "_CG";
         fileNameWithExtension = fileNameWithoutExtension + Settings.get("plcc_S_img_output_fileext");
 
-        //pg.toFile(file + ".ptg");
-        //pg.print();                
         // Create the file in a subdir tree based on the protein meta data if requested
         if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
 
@@ -5771,7 +5779,6 @@ public class Main {
         } catch(IOException e){
             System.err.println("ERROR: Could not write complex graph to file '" + myGML.getAbsolutePath() + ". General I/O exception: '" + e.getMessage()+ "'.");
         }
-
         
         // the detailed complex graph (each vertex is one SSE, vertices ordered by chain):
         String graphFormatsWritten = "";        
@@ -5816,7 +5823,9 @@ public class Main {
         }
         
         if(numFormatsWritten > 0) {
-            System.out.println("    Exported complex graph in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + new File(filePathGraphs).getAbsolutePath() + fs + "'.");
+            if(! silent) {
+                System.out.println("    Exported complex graph in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + new File(filePathGraphs).getAbsolutePath() + fs + "'.");
+            }
         }
 
         String imgFileNoExt = filePathImg + fs + fileNameWithoutExtension;
@@ -5826,13 +5835,19 @@ public class Main {
         if(Settings.getBoolean("plcc_B_draw_graphs")) {
             IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
             SSEGraph.drawProteinGraph(imgFileNoExt, false, formats, pg);
-            System.out.println("    Image of complex graph written to base file '" + imgFileNoExt + "'.");
+            if(! silent) {
+                System.out.println("    Image of complex graph written to base file '" + imgFileNoExt + "'.");
+            }
         }
         else {
-            System.out.println("    Image output disabled, not drawing complex graphs.");
+            if(! silent) {
+                System.out.println("    Image output disabled, not drawing complex graphs.");
+            }
         }              
         
-        System.out.println("Complex graph computation done.");
+        if(! silent) {
+            System.out.println("Complex graph computation done.");
+        }
         
         ProteinResults.getInstance().setCompGraphRes(cgr);
     }        

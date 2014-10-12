@@ -135,6 +135,21 @@ public class SSE extends SSEGraphVertex implements java.io.Serializable  {
         }
         return(false);
     }
+    
+    public String getSSEClass() {
+        if(this.isHelix()) {
+            return "H";
+        }
+        else if(this.isBetaStrand()) {
+            return "E";
+        }
+        else if(this.isLigandSSE()) {
+            return "L";
+        }
+        else {
+            return "O";
+        }
+    }
 
     /**
      * Returns true if this SSE is a beta strand.
@@ -194,7 +209,7 @@ public class SSE extends SSEGraphVertex implements java.io.Serializable  {
      */
     public Integer getSSESeqChainNum() { return(sseSeqChainNum); }
     
-    /** Returns the DSSP SSEType string of this SSE. This is a single character, e.g., "H" for an alpha helix. */
+    /** Returns the DSSP SSEType string of this SSE. This is a single character, e.g., "T" for turn, "H" for an alpha helix. */
     public String getSseType() { return(sseType); }
     public ArrayList<Residue> getResidues() { return(residues); }
     public Chain getChain() { return(chain); }

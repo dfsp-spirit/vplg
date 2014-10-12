@@ -168,7 +168,9 @@ public class DP {
         System.out.println(DP.appTag + DP.debugTag + "[" + srcTag + "] " + msg);
     }
     
-    
+    /**
+     * Does nothing anymore in this implementation.
+     */
     public void flush() {
         // placeholder function for backwards compatibility only, does nothing
     }

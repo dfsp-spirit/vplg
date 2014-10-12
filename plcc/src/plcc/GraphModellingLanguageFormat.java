@@ -15,6 +15,7 @@ package plcc;
  */
 public interface GraphModellingLanguageFormat {
     
+    /** Exports this graph in GML format. */
     public String toGraphModellingLanguageFormat();
     
 }

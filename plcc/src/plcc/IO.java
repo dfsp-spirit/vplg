@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -126,7 +127,12 @@ public class IO {
         return true;
     }
     
-    public static String intArrayToString(Integer[] in) {
+    /**
+     * Debug function to get a string representation of an array.
+     * @param ar the array
+     * @return the string
+     */
+    public static String integerArrayToString(Integer[] in) {
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < in.length; i++) {
             sb.append(in[i]);
@@ -137,6 +143,77 @@ public class IO {
         return sb.toString();
     }
     
+    /**
+     * Debug function to get a string representation of an array.
+     * @param ar the array
+     * @return the string
+     */
+    public static String intArrayToString(int[] in) {
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < in.length; i++) {
+            sb.append(in[i]);
+            if(i < in.length - 1) {
+                sb.append(",");
+            }
+        }
+        return sb.toString();
+    }
+    
+    /**
+     * Debug function to get a string representation of an array.
+     * @param ar the array
+     * @return the string
+     */
+    public static String floatArrayToString(float[] in) {
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < in.length; i++) {
+            //sb.append(in[i]);
+            sb.append(String.format(Locale.ENGLISH, "%.2f", in[i]));
+            if(i < in.length - 1) {
+                sb.append(", ");
+            }
+        }
+        return sb.toString();
+    }
+    
+    /**
+     * Debug function to get a string representation of an array.
+     * @param ar the array
+     * @return the string
+     */
+    public static String stringArrayToString(String[] in) {
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < in.length; i++) {
+            sb.append(in[i]);
+            if(i < in.length - 1) {
+                sb.append(",");
+            }
+        }
+        return sb.toString();
+    }
+    
+    /**
+     * Debug function to get a string representation of an array.
+     * @param ar the array
+     * @return the string
+     */
+    public static String doubleArrayToString(Double[] in) {
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < in.length; i++) {
+            sb.append(in[i]);
+            if(i < in.length - 1) {
+                sb.append(",");
+            }
+        }
+        return sb.toString();
+    }
+    
+    
+    /**
+     * Debug function to get a string representation of a HashMap.
+     * @param ar the HashMap
+     * @return the string
+     */
     public static String hashMapToString(HashMap<Integer, Integer> map) {
         StringBuilder sb = new StringBuilder();
         for(Entry e : map.entrySet()) {
@@ -145,6 +222,11 @@ public class IO {
         return sb.toString();
     }
     
+    /**
+     * Debug function to get a string representation of a HashSet.
+     * @param ar the HashSet
+     * @return the string
+     */
     public static String hashSetToString(HashSet<Integer> set) {
         StringBuilder sb = new StringBuilder();
         for(Integer i : set) {
@@ -372,6 +454,11 @@ public class IO {
         return sb.toString();
     }
     
+    /**
+     * Debug function to get a string representation of a list.
+     * @param ar the list
+     * @return the string
+     */
     public static String intListToString(List<Integer> ar) {
         String s = "";
         for(Integer i : ar) {
@@ -380,6 +467,11 @@ public class IO {
         return s;
     }
     
+    /**
+     * Debug function to get a string representation of a list.
+     * @param ar the list
+     * @return the string
+     */
     public static String stringListToString(List<String> ar) {
         String s = "";
         for(String i : ar) {
@@ -388,6 +480,11 @@ public class IO {
         return s;
     }
     
+    /**
+     * Debug function to get a string representation of a list.
+     * @param ar the list
+     * @return the string
+     */
     public static String intListToString(List<Integer> ar, String start, String end) {
         String s = start;
         for(Integer i : ar) {
