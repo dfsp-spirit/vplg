@@ -33,14 +33,17 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphMo
     private String chainid;
 
     
-    /** Constructor */
+    /** Constructor
+     * @param vertices the vertex list to use for the graph */
     public AAGraph(ArrayList<Residue> vertices) {
         super(vertices);
         this.pdbid = "";
         this.chainid = "";
     }
     
-    /** Advanced Constructor, constructs the edges automatically from ResContactInfo list */
+    /** Advanced Constructor, constructs the edges automatically from ResContactInfo list
+     * @param vertices the vertex list to use
+     * @param contacts the contacts, which are used to create the edges of the graph */
     public AAGraph(ArrayList<Residue> vertices, ArrayList<ResContactInfo> contacts) {
         super(vertices);
         for(int i = 0; i < contacts.size(); i++) {
@@ -50,7 +53,11 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphMo
         this.chainid = "";
     }
     
-    /** Constructor */
+    /** Constructor
+     * @param vertices the vertex list to use
+     * @param pdbid the PDB ID of the protein chain represented by this graph (meta data)
+     * @param chainid the PDB chain name of the protein chain represented by this graph (meta data) 
+     */
     public AAGraph(ArrayList<Residue> vertices, String pdbid, String chainid) {
         super(vertices);
         this.setPdbid(pdbid);
