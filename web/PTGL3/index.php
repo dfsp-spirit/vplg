@@ -16,9 +16,9 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="">
-	<meta name="author" content="">
-	<link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
+	<meta name="description" content="VPLG PTGL protein graph database">
+	<meta name="author" content="The MolBI group">
+	<!-- <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png"> -->
 
 	<title><?php echo $title; ?></title>
 
@@ -77,7 +77,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 				<div class="input-group form-group">
 					<form class="form-inline" action="search.php" method="get">
 						<input type="text" class="form-control" name="keyword" id="searchInput" autocomplete="off" placeholder="Enter PDB ID or keyword...">
-						<button type="submit" id="sendit" "class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button><br>
+						<button type="submit" id="sendit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button><br>
 						<div id="advancedButton"> Advanced Search <div id="arrow"><strong class="caret"></strong></div></div>
 						<div id="liveSearchResults"></div>
 
@@ -135,24 +135,25 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<div class="row">
 			<div class="col-lg-3 col-lg-3-centering col-centered">
 				<div class="input-group form-group">
-					<form>
+					<form> 
 					<dl class="dl-horizontal">
 				<div id="additionalSearch">
 				<dt>SearchKey</dt>
 				<dd>Keyword search <strong class="caret" id="flipArrow" ></strong></dd>
 				</div>
 				<div id="addSearchKey">
-					<dd>Use the standard search form above to search protein topologies.</dd>
-					<dd>Enter PDB IDs or keywords known to relate to the biological macromolecules <br>
+					<dd>Use the standard search form above to search protein topologies by keyword.</dd>
+					<dd>Enter PDB IDs like '7tim' or keywords known to relate to the biological macromolecules like 'kinase' <br>
 					of interest and select the <span class="glyphicon glyphicon-search"></span>"Search" button.</dd>
 				</div>
-			</dl>
+			</dl></form>
 
 			<?php if($ENABLE_MOTIF_SEARCH) { ?>
+			<form>
 			<dl class="dl-horizontal">
 				<div id="additionalSearch2">
 				<dt>SearchMotifs</dt>
-				<dd>Search form for topological protein structure motifs <strong class="caret" id="flipArrow2" ></strong></dd>
+				<dd>Search for topological protein structure motifs <strong class="caret" id="flipArrow2" ></strong></dd>
 				</div>
 				<div id="addSearchMotif">
 				<br>
@@ -196,23 +197,47 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
 				</div>
 			</dl>
+			</form>
 			<?php } ?>
 
 			<?php if($ENABLE_BLAST_SEARCH) { ?>
+			<form class="form-inline" action="search.php" method="get">
 			<dl class="dl-horizontal">
 				<div id="additionalSearch3">
 				<dt>SearchSequence</dt>
-				<dd>Blast search for sequences <strong class="caret" id="flipArrow3" ></strong></dd>
+				<dd>BLAST search for sequences <strong class="caret" id="flipArrow3" ></strong></dd>
 				</div>
 				<div id="addSearchSequence">
 				<p>Search strings are case insensitive.</p>
 				</div>
 
-			</dl>
-			<?php } ?>			
+			</dl></form>
+			<?php } ?>
+			
+			</div><!-- end input-group and form-group -->
+			
+			<?php if($ENABLE_GRAPHLETSIMILARITY_SEARCH) { ?>
+			<div class="input-group form-group">
+			<form class="form-inline" action="search.php" method="get">
+			<dl class="dl-horizontal">
+				<div id="additionalSearch4">
+				<dt>GraphletSimilarity</dt>
+				<dd>Protein structure similarity search -- powered by Graphlets <strong class="caret" id="flipArrow4" ></strong></dd>
+				</div>
+				<div id="addSearchGraphletSimilarity">
+				<p>Enter a query PDB ID and chain, e.g., '7timA' to search for similar chains.</p>
+				
+				
+						<input type="text" class="form-control" name="graphletsimilarity" id="searchGraphlets" autocomplete="off" placeholder="Enter a query PDB ID and chain...">
+						<button type="submit" id="sendit_graphlets" class="btn btn-default" ><span class="glyphicon glyphicon-search"></span></button><br>
 
-			</form>
-				</div><!-- end input-group and form-group -->
+			</form></div>
+			</dl>
+			</div><!-- end input-group and form-group -->
+			<?php } ?>
+
+			
+				
 			</div><!-- end col-centered -->
 		</div><!-- end row -->
 
@@ -317,7 +342,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 					</div><!-- end col-centered -->
 				</div><!-- end row -->
 
-<!--
+
 				<div class="row" id="ugSearchkms">
 					<div class="col-lg-4" id="ugSearchk">
 						<h3>Search Key</h3>
@@ -350,6 +375,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 							Beta Motifs, which are composed of beta sheets and Alpha Beta Motifs, a combination of both, alpha helices and 
 							beta sheets.</p>
 					</div>
+<!--
 
 					<div class="col-lg-4" id="ugSearchs">
 						<h3>Search Sequence</h3>
@@ -369,10 +395,12 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 							<br>
 							<br>
 					</div>
+-->
+
 				</div>
 
 
-
+<!--
 
 				<div class="row" id="ugSearchkms1">
 					<div class="col-lg-4">
@@ -447,11 +475,12 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 					</div>
 				</div>
 
-
+-->
 
 				<div class="row" id="ugSearchkms2">
 					<div class="col-lg-4">
-						<h3>Alpha Motifs</h3>
+
+							<h3>Alpha Motifs</h3>
 							<h4>Four Helix Bundle</h4>
 							<p>The Four Helix Bundle is a Protein Motif which consists of 4 alpha helices which arrange in a bundle. 
 							There are two types of the Four Helix Bundle which differ in the connections between the alpha helices. 
@@ -514,7 +543,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 				</div>
 
 
-
+<!--
 
 			<div class="row" id="ugSearchkms3">
 					<div class="col-lg-4">

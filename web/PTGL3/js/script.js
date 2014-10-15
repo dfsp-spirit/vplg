@@ -12,7 +12,7 @@ $('body').scrollspy({ target: '.navbar-scrollspy' });
 $("#addSearchKey").hide();
 $('#addSearchMotif').hide();
 $('#addSearchSequence').hide();
-
+$('#addSearchGraphletSimilarity').hide();
 // if checkedChains is set
 if (!(typeof checkedChains === 'undefined')) {
 	var selectedProteins = "";
@@ -95,6 +95,11 @@ $(function() {
 	$('#additionalSearch3').click(function() {
 		$('#addSearchSequence').slideToggle();
 		$('#flipArrow3').toggleClass('rotateArrow');
+	});
+	
+	$('#additionalSearch4').click(function() {
+		$('#addSearchGraphletSimilarity').slideToggle();
+		$('#flipArrow4').toggleClass('rotateArrow');
 	});
 	
 	

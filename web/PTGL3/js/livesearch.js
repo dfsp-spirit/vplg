@@ -86,6 +86,16 @@ $(document).ready(function () {
  		}
  	});
 	
+	$('#sendit_graphlets').click(function(e) {
+ 		content = $('#searchGraphlets').val();
+		
+		
+ 		if(content.length != 5){
+ 			e.preventDefault();
+ 			alert("Please enter exactly 5 characters, e.g., '7timA' for PDB 7tim chain A.");
+ 		}
+ 	});
+	
 	$('#sendit_nav').click(function(e) {
  		content = $('#searchInput').val();
  		if(content.length < 2){
