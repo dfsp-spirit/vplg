@@ -954,7 +954,7 @@ public class Main {
             }
             
             if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"))) {
-                Long[] res = DBManager.computeGraphletSimilarityScoresForWholeDatabaseAndStoreBest(ProtGraph.GRAPHTYPE_ALBE, 10);
+                Long[] res = DBManager.computeGraphletSimilarityScoresForWholeDatabaseAndStoreBest(ProtGraph.GRAPHTYPE_ALBE, Settings.getInteger("plcc_I_compute_all_graphlet_similarities_num_to_save_in_db"));
                 // numChainsFound, numGraphletsFound, numScoresComputed, numScoresSaved
                 if(! silent) {
                     System.out.println("Done. Found " + res[0] + " chains and " + res[1] + " graphlet counts for them in the DB. Computed " + res[2] + " similarity scores and saved " + res[3] + " of them to the DB.");
