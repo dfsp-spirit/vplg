@@ -148,6 +148,18 @@ public class PlccUtilities {
     
   }
   
+  /**
+   * Replaces all null values in the array with the given replaceval, changing the input array.
+   * @param in the array that will be changed
+   * @param replaceVal the value to put instead of nulls
+   */
+  public static void replaceNullValuesInArrayWith(Double[] in, Double replaceVal) {
+      for(int i = 0; i < in.length; i++) {
+          if(in[i] == null) {
+              in[i] = replaceVal;
+          }
+      }
+  }
   
   /**
    * Implements a multi array sort (like the PHP function). This means it sorts the first array according

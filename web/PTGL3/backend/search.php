@@ -140,6 +140,21 @@ function get_proteingraph_graphlet_counts($db, $pdb_id, $chain_name, $graph_type
   
 }
 
+
+function get_proteingraph_database_id($db, $pdb_id, $chain_name, $graph_type) {
+  $data = array();
+  $query = "SELECT g.graph_id FROM plcc_graph g INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE (p.pdb_id = '" . $pdb_id . "' AND c.chain_name = '" . $chain_name . "' AND gt.graphtype_text = '" . $graph_type . "' )";
+    
+  $result = pg_query($db, $query);
+  while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
+		$data['graph_id'] =  $arr['graph_id'];
+	}
+  
+  pg_free_result($result);
+  return $data;
+}
+
+
 /**
   * Returns the graphlet counts of all graphs of the specified type in the whole DB (all protein chains).
   */
@@ -513,7 +528,16 @@ if(isset($_GET)) {
 	if(isset($_GET["graphletsimilarity"])) {
 		$graphletsimilarity = $_GET["graphletsimilarity"];
 		$_SESSION["graphletsimilarity"] = $graphletsimilarity;
+		
 		$result_set_has_fake_order_field = TRUE;
+		if($USE_PRECOMPUTED_GRAPHLET_SIMILARITY_DATA_FROM_DB) {
+		  $fake_order_field_name = "score";
+		  $show_similarity_score_from_external_list = FALSE; // we can use the score field from the query
+		}
+		else {
+		  $fake_order_field_name = "fake_order";
+		  $show_similarity_score_from_external_list = TRUE; // we need to use the similarity_list array we build in parallel
+		}
 	}
 	
 	
@@ -545,7 +569,7 @@ if (($none_set == true)) { // #TODO redefine this check...
 	$firstQuerySet = false;
 	
 	if($result_set_has_fake_order_field) {
-	    $query = "SELECT fake_order, chain_id, chain_name, pdb_id, resolution, title, header
+	    $query = "SELECT " . $fake_order_field_name . ", chain_id, chain_name, pdb_id, resolution, title, header
 			  FROM ( ";
 	}
 	else {
@@ -834,61 +858,90 @@ if (($none_set == true)) { // #TODO redefine this check...
 			if(check_valid_pdbid($pdb_id) && check_valid_chainid($chain_id)) {
 				
 				$graph_type = "albe";
-			
-				$pdbchainlist = array();
-				$similarity_list = array();
-				
-				//  get graphlet counts of query protein from DB
-				$query_prot_data = get_proteingraph_graphlet_counts($db, $pdb_id, $chain_id, $graph_type);
-				if(isset($query_prot_data['pdb_id'])) {
-				
-				  // get graphlet counts for all protein chains
-				  $all_data = get_all_proteingraph_graphlet_counts_for_graphtype($db, $graph_type);
-				  
-				  // fill array with similar chains based on graphlet distance				
-				  
-				  
-				  // now compare scores and add best scores to $pdbchainlist
-				  foreach($all_data as $chaindata) {
-				          if(isset($chaindata['pdb_id'])) {
-					  $similarity_score = compute_graphlet_similarity($query_prot_data['graphlet_counts'], $chaindata['graphlet_counts']);
-					  //  compare to other using some graphlet-based score
-					  //if($similarity_score >= 0.9) {
-					          $found_name = "" . $chaindata['pdb_id'] . $chaindata['chain_name'];
-						  array_push($pdbchainlist, $found_name);
-						  array_push($similarity_list, $similarity_score);
-						  $debug_msg .= "  sim($found_name = $similarity_score) "; 
-					  //}
-					  } 
-					  //else {
-					  //  $debug_msg .= "  chaindata_has_no_pdb_id "; 
-					  //}
-				  }
-				  
-				  array_multisort($similarity_list, $pdbchainlist);	// sort both by the score	
-				  
-				  $max_results = 25;
-				  if(count($similarity_list) > $max_results) {
-				    array_splice($similarity_list, $max_results);
-				    array_splice($pdbchainlist, $max_results);
-				  }
-				  
-				  // add comment, used to output the score in the table later
-				  for($i = 0; $i < count($pdbchainlist); $i++) {
-				    $result_comments[$pdbchainlist[$i]] = "Graphlet-based distance to PDB $pdb_id chain $chain_id: " . sprintf('%0.3f', $similarity_list[$i]);
-				  }
-				  
-				  
-				  if(count($pdbchainlist) > 0) {
-				    if($firstQuerySet) { $query .= " UNION "; }
-					  $query .= get_multiple_PDB_select_query_in_order($pdbchainlist);
-					  $result_set_has_fake_order_field = TRUE;
-					  $firstQuerySet = true;		  
-				  } else {
-				    $debug_msg .= "graphletsimilarity: No matching chains with proper similarity score based on graphlet counts found in the " . count($all_data) . " DB entries.";
-				  }
-				} else {
-				  $debug_msg .= "graphletsimilarity: No graphlet data for query graph '$pdb_id' chain '$chain_id' type '$graph_type' found.";
+						        
+			        
+			        if($USE_PRECOMPUTED_GRAPHLET_SIMILARITY_DATA_FROM_DB) {
+			              // ------------------- code to use precomputed similarity data from the database ------------- //
+			              
+			              if($firstQuerySet) { $query .= " UNION "; }
+				      
+				      $query .= "SELECT gs." . $fake_order_field_name . ", cmp_chain.chain_id, cmp_chain.chain_name, cmp_protein.pdb_id, cmp_protein.resolution, cmp_protein.title, cmp_protein.header
+						FROM plcc_graphletsimilarity gs
+						INNER JOIN  plcc_graph src_pg ON gs.graphletsimilarity_sourcegraph = src_pg.graph_id
+						LEFT JOIN plcc_chain src_chain ON src_pg.chain_id = src_chain.chain_id
+						LEFT JOIN plcc_protein src_protein ON src_chain.pdb_id = src_protein.pdb_id
+						LEFT JOIN plcc_graphtypes src_gt ON src_pg.graph_type = src_gt.graphtype_id
+						JOIN plcc_graph cmp_pg ON gs.graphletsimilarity_targetgraph = cmp_pg.graph_id
+						LEFT JOIN plcc_chain cmp_chain ON cmp_pg.chain_id = cmp_chain.chain_id
+						LEFT JOIN plcc_protein cmp_protein ON cmp_chain.pdb_id = cmp_protein.pdb_id
+						LEFT JOIN plcc_graphtypes cmp_gt ON cmp_pg.graph_type = cmp_gt.graphtype_id
+						WHERE ( src_chain.pdb_id = '" . $pdb_id . "' 
+						AND src_chain.chain_name = '" . $chain_id . "'
+						AND src_gt.graphtype_text = '" . $graph_type . "' ) ";
+				      
+				      //$result_set_has_fake_order_field = TRUE;	// already set
+				      //$fake_order_field_name = "score";		// already set
+				      $firstQuerySet = true;	
+			        }
+			        else {
+			        
+			              // ------------------------ code for live graphlet similarity computation ------------------ //
+				      $pdbchainlist = array();
+				      $similarity_list = array();
+				      
+				      //  get graphlet counts of query protein from DB
+				      $query_prot_data = get_proteingraph_graphlet_counts($db, $pdb_id, $chain_id, $graph_type);
+				      if(isset($query_prot_data['pdb_id'])) {
+				      
+					// get graphlet counts for all protein chains
+					$all_data = get_all_proteingraph_graphlet_counts_for_graphtype($db, $graph_type);
+					
+					// fill array with similar chains based on graphlet distance				
+					
+					
+					// now compare scores and add best scores to $pdbchainlist
+					foreach($all_data as $chaindata) {
+						if(isset($chaindata['pdb_id'])) {
+						$similarity_score = compute_graphlet_similarity($query_prot_data['graphlet_counts'], $chaindata['graphlet_counts']);
+						//  compare to other using some graphlet-based score
+						//if($similarity_score >= 0.9) {
+							$found_name = "" . $chaindata['pdb_id'] . $chaindata['chain_name'];
+							array_push($pdbchainlist, $found_name);
+							array_push($similarity_list, $similarity_score);
+							$debug_msg .= "  sim($found_name = $similarity_score) "; 
+						//}
+						} 
+						//else {
+						//  $debug_msg .= "  chaindata_has_no_pdb_id "; 
+						//}
+					}
+					
+					array_multisort($similarity_list, $pdbchainlist);	// sort both by the score	
+					
+					$max_results = 25;
+					if(count($similarity_list) > $max_results) {
+					  array_splice($similarity_list, $max_results);
+					  array_splice($pdbchainlist, $max_results);
+					}
+					
+					// add comment, used to output the score in the table later
+					for($i = 0; $i < count($pdbchainlist); $i++) {
+					  $result_comments[$pdbchainlist[$i]] = "Graphlet-based distance to PDB $pdb_id chain $chain_id: " . sprintf('%0.3f', $similarity_list[$i]);
+					}
+					
+					
+					if(count($pdbchainlist) > 0) {
+					  if($firstQuerySet) { $query .= " UNION "; }
+						$query .= get_multiple_PDB_select_query_in_order($pdbchainlist);
+						$result_set_has_fake_order_field = TRUE;
+						$fake_order_field_name = "fake_order";
+						$firstQuerySet = true;		  
+					} else {
+					  $debug_msg .= "graphletsimilarity: No matching chains with proper similarity score based on graphlet counts found in the " . count($all_data) . " DB entries.";
+					}
+				      } else {
+					$debug_msg .= "graphletsimilarity: No graphlet data for query graph '$pdb_id' chain '$chain_id' type '$graph_type' found.";
+				      }
 				}
 			
 			}
@@ -913,14 +966,22 @@ if (($none_set == true)) { // #TODO redefine this check...
 	
 	if($result_set_has_fake_order_field) {
 	  $query .= " ) results
-			  ORDER BY fake_order ASC";
+			  ORDER BY " . $fake_order_field_name . " ASC";
 	}
 	else {
 	  $query .= " ) results
 			  ORDER BY pdb_id, chain_name";
 	}
 
-	$count_query = str_replace("chain_id, chain_name, pdb_id, resolution, title, header", "COUNT(*)", $count_query);
+	if($result_set_has_fake_order_field) {
+	  $count_query = str_replace("$fake_order_field_name, chain_id, chain_name, pdb_id, resolution, title, header", "COUNT(*)", $count_query);
+	}
+	else {
+	  $count_query = str_replace("chain_id, chain_name, pdb_id, resolution, title, header", "COUNT(*)", $count_query);
+	}
+	
+	//print "Count query is '$count_query'";
+	
 	$query .= " LIMIT " . $q_limit . " OFFSET ".$limit_start;
   
 	$result = pg_query($db, $query); // or die($query . ' -> Query failed: ' . pg_last_error());

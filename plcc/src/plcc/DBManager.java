@@ -184,7 +184,14 @@ public class DBManager {
      */
     public static Long[] computeGraphletSimilarityScoresForWholeDatabaseAndStoreBest(String graphType, Integer numberOfTopScoresToSavePerPair) {
         
-        boolean fakeIt = true;
+        /** If you set fakeIt to true, this function will write fake graphlet degree 
+         distributions to the DB before computing scores. This is useful if you are
+         coding on a Windows machine where you cannot run graphletanalyzer to compute
+         the real graphlet distributions. */
+        boolean fakeIt = false;
+        if(fakeIt) {
+            DP.getInstance().w("DBManager", "WARNING: DEBUG mode set, writing fake graphlet distributions to database for testing purposes!");
+        }
         
         if(! graphType.equals(ProtGraph.GRAPHTYPE_ALBE)) {
             DP.getInstance().w("DBManager", "computeGraphletSimilarityScoresForWholeDatabaseAndStoreBest(): Graphlets for your chose graph type '" + graphType + "' may not be in the database. By default, we compute \"albe\" graphlets only.");
@@ -293,6 +300,8 @@ public class DBManager {
             }
             
             //PlccUtilities.multiSortUniqueArrays(src_scores, allPDBChains);    // cannot use this, scores are not unique!
+            Double scoreTooLarge = 1000.0;
+            PlccUtilities.replaceNullValuesInArrayWith(src_scores, scoreTooLarge);
             PlccUtilities.multiQuickSortTS(src_scores, allPDBChains);
             
             if(numberOfTopScoresToSavePerPair == null) {
@@ -306,13 +315,15 @@ public class DBManager {
             System.out.println("Similarity of all DB chains to " + src_pdb_id + " chain " + src_chain_name + ":");
             for(int k = 0; k < numberOfTopScoresToSavePerPair; k++) {
                 if(src_scores[k] != null) {
-                    System.out.println("  #" + k + ": " + allPDBChains[k] + " with score " + src_scores[k] + ".");
-                    try {
-                        DBManager.writeGraphletSimilarityScoreToDB(src_pdb_id, src_chain_name, allPDBChains[k].substring(0, 4), allPDBChains[k].substring(4), graphType, src_scores[k]);
-                    } catch (SQLException e) {
-                        System.err.println("Could not write graphlet similarity score to DB: '" + e.getMessage() + "'.");
+                    if(src_scores[k] < scoreTooLarge) {
+                        System.out.println("  #" + k + ": " + allPDBChains[k] + " with score " + src_scores[k] + ".");
+                        try {
+                            DBManager.writeGraphletSimilarityScoreToDB(src_pdb_id, src_chain_name, allPDBChains[k].substring(0, 4), allPDBChains[k].substring(4), graphType, src_scores[k]);
+                        } catch (SQLException e) {
+                            System.err.println("Could not write graphlet similarity score to DB: '" + e.getMessage() + "'.");
+                        }
+                        numScoresSaved++;
                     }
-                    numScoresSaved++;
                 }
             }
             
