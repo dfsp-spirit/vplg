@@ -1033,9 +1033,18 @@ if (($none_set == true)) { // #TODO redefine this check...
 		$header = $arr["header"];
 		$cathlink = get_cath_link($pdb_id, $chain_name);
 		$comment = "";
+		
+		
+		// else, the comment has already been filled in
+		
 		if(isset($result_comments[$pdb_id . $chain_name])) {
 		  $comment = $result_comments[$pdb_id . $chain_name];
 		}
+						
+		if($USE_PRECOMPUTED_GRAPHLET_SIMILARITY_DATA_FROM_DB) {
+		  $comment = "Graphlet-based distance to query chain: " . sprintf('%0.3f', $arr['score']);
+		}
+		
 	
 		
 		// provides alternating blue/white tables
