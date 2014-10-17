@@ -2,7 +2,7 @@
 /** This file provides ...####
  * 
  * @author Daniel Bruness <dbruness@gmail.com>
- * 
+ * @author Tim Schäfer
  */
 
 ini_set('display_errors', 0);
