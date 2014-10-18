@@ -35,6 +35,9 @@
 								<a href="linearnotations.php"><i class="fa fa-briefcase"></i> Linear notations</a>
 							</li>
 							<li>
+								<a href="foldinggraphs.php"><i class="fa fa-briefcase"></i> Folding graph visualization</a>
+							</li>
+							<li>
 								<a href="publications.php"><i class="fa fa-copy"></i> Publications</a>
 							</li>
 							<li>

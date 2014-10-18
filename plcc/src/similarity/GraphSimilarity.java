@@ -269,14 +269,14 @@ public class GraphSimilarity {
         
         System.out.println("Retrieving graphlet counts for 7tim_A and 8icd_A from DB...");
         try {
-            graphletsE = DBManager.getNormalizedGraphletCounts("7tim", "A", "albe");            
+            graphletsE = DBManager.getNormalizedGraphletCounts("7tim", "A", ProtGraph.GRAPHTYPE_ALBE);            
         }
         catch(SQLException e) {
             System.err.println("Could not get graphletsE: '" + e.getMessage() + "'.");
         }
         
         try {
-            graphletsF = DBManager.getNormalizedGraphletCounts("8icd", "A", "albe");
+            graphletsF = DBManager.getNormalizedGraphletCounts("8icd", "A", ProtGraph.GRAPHTYPE_ALBE);
         }
         catch(SQLException e) {
             System.err.println("Could not get graphletsF: '" + e.getMessage() + "'.");

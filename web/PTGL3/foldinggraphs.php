@@ -66,11 +66,18 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<form class="form-inline" action="foldinggraphs.php" method="get">
 			
 		<label>Enter PDB identifier and chain, e.g., '7timA':
-		<input type="text" class="form-control" name="pdbchain" id="searchInput" placeholder="Enter PDB ID and chain">
+		<?php
+		if(isset($_GET['pdbchain']) && $_GET['pdbchain'] != "") {
+		  echo '<input type="text" class="form-control" name="pdbchain" id="searchInput" placeholder="Enter PDB ID and chain" value="' . $_GET['pdbchain'] . '">';
+		}
+		else {
+		  echo '<input type="text" class="form-control" name="pdbchain" id="searchInput" placeholder="Enter PDB ID and chain">';
+		}
+		?>
 		</label>
 			
 		<label>Select graph-type: 
-		  <select id="multidown" name="graphtype">
+		  <select id="multidown" name="graphtype_int">
 			<option class="downloadOption" value="1">Alpha</option>
 			<option class="downloadOption" value="2">Beta</option>
 			<option class="downloadOption" value="3">Alpha-Beta</option>

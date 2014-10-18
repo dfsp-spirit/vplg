@@ -21,12 +21,12 @@ if($DEBUG){
 }
 
 function get_fglinnots_data_query_string($pdb_id, $chain_name, $graphtype_str) {
-   $query = "TODO";
+   $query = "SELECT linnot_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, filepath_linnot_image_adj_png, filepath_linnot_image_red_png, filepath_linnot_image_seq_png, filepath_linnot_image_key_png, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key, num_sses FROM (SELECT la.num_sses, la.linnot_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, la.filepath_linnot_image_adj_png, la.filepath_linnot_image_red_png, la.filepath_linnot_image_seq_png, la.filepath_linnot_image_key_png, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM plcc_fglinnot la LEFT JOIN plcc_foldinggraph fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN plcc_chain c ON pg.chain_id=c.chain_id LEFT JOIN plcc_graphtypes gt ON pg.graph_type=gt.graphtype_id WHERE ( graphtype_text = '" . $graphtype_str . "' AND chain_name = '" . $chain_name . "' AND pdb_id = '" . $pdb_id . "' )) bar";
    return $query;
 }
 
 function get_graphtype_string($graphtype_int){
-	switch ($graphtype){
+	switch ($graphtype_int){
 		case 1:
 			return "alpha";
 			break;
@@ -86,12 +86,15 @@ if(isset($_GET['pdbchain']) && isset($_GET['graphtype_int']) && isset($_GET['not
 
 
 if($valid_values){
+    //echo "valid";
 	// connect to DB
 	$conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
 	$db = pg_connect($conn_string);
 		
 	$graphtype_str = get_graphtype_string($graphtype_int);
 	$query = get_fglinnots_data_query_string($pdb_id, $chain_name, $graphtype_str);
+	
+	//echo "query='" . $query . "'\n";
 	
 	$result = pg_query($db, $query);
 		
@@ -111,7 +114,7 @@ if($valid_values){
 		$num_sses = $arr['num_sses'];
 		
 		$tableString .= "<div class='string_row'>";
-		$tableString .= "Fold #" . $fg_number . ", fold name is " . $fold_name . ".";
+		$tableString .= "PDB " . $pdb_id . " chain " . $chain_name . " fold #" . $fg_number . ", fold name is " . $fold_name . ". $num_sses SSEs. Images: $img_adj, $img_red, $img_seq, $img_key.";
 		$tableString .= "</div>";
 				
 	}
@@ -120,6 +123,7 @@ if($valid_values){
 
 
 } else {
+     //echo "invalid";
 	$tableString = "";
 }
 
