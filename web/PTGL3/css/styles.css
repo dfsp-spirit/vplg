@@ -991,7 +991,21 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		float: right;
 	}
 	
-	
+	table#tblfgresults {
+    width: 100%;
+    background-color: #f1f1c1;
+	} 
+	 table#tblfgresults tr:nth-child(even) {
+    background-color: #eee;
+}
+table#tblfgresults tr:nth-child(odd) {
+    background-color: #fff;
+}
+table#tblfgresults th {
+    color: white;
+    background-color: black;
+}
+
 	
 @media print {
   * { background: transparent !important; color: black !important; text-shadow: none !important; filter:none !important; -ms-filter: none !important; }

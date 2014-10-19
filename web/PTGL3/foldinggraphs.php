@@ -106,7 +106,11 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		
 		<div class="container" id="searchResults">
 			<h3> Search Results </h3>
-			<?php echo $tableString; /* The table string is constructed in backend/search.php, which is included by this file. */  ?>
+			<?php echo $tableString; /* The table string is constructed in backend/search.php, which is included by this file. */  
+			
+			      echo $img_string;
+			
+			?>
 		</div><!-- end container and searchResults -->
 
 </div><!-- end container and contentText -->

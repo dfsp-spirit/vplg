@@ -21,7 +21,7 @@ if($DEBUG){
 }
 
 function get_fglinnots_data_query_string($pdb_id, $chain_name, $graphtype_str) {
-   $query = "SELECT linnot_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, filepath_linnot_image_adj_png, filepath_linnot_image_red_png, filepath_linnot_image_seq_png, filepath_linnot_image_key_png, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key, num_sses FROM (SELECT la.num_sses, la.linnot_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, la.filepath_linnot_image_adj_png, la.filepath_linnot_image_red_png, la.filepath_linnot_image_seq_png, la.filepath_linnot_image_key_png, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM plcc_fglinnot la LEFT JOIN plcc_foldinggraph fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN plcc_chain c ON pg.chain_id=c.chain_id LEFT JOIN plcc_graphtypes gt ON pg.graph_type=gt.graphtype_id WHERE ( graphtype_text = '" . $graphtype_str . "' AND chain_name = '" . $chain_name . "' AND pdb_id = '" . $pdb_id . "' )) bar";
+   $query = "SELECT linnot_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, filepath_linnot_image_adj_png, filepath_linnot_image_red_png, filepath_linnot_image_seq_png, filepath_linnot_image_key_png, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key, num_sses, sse_string FROM (SELECT la.num_sses, la.linnot_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, la.filepath_linnot_image_adj_png, la.filepath_linnot_image_red_png, la.filepath_linnot_image_seq_png, la.filepath_linnot_image_key_png, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM plcc_fglinnot la LEFT JOIN plcc_foldinggraph fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN plcc_chain c ON pg.chain_id=c.chain_id LEFT JOIN plcc_graphtypes gt ON pg.graph_type=gt.graphtype_id WHERE ( graphtype_text = '" . $graphtype_str . "' AND chain_name = '" . $chain_name . "' AND pdb_id = '" . $pdb_id . "' )) bar ORDER BY fg_number";
    return $query;
 }
 
@@ -99,27 +99,61 @@ if($valid_values){
 	$result = pg_query($db, $query);
 		
 	
-	$tableString .= "<div>";
+	$tableString .= "<div><table id='tblfgresults'>\n";
+	$tableString .= "<caption> The $notation $graphtype_str folding graphs of PDB $pdb_id chain $chain_name </caption>\n";
+	$tableString .= "<tr>
+    <th>FG#</th>
+    <th>Fold name</th>
+    <th># SSEs</th>
+	<th>SSE string (N to C)</th>
+	<th>Notation $notation </th>
+	<th>Image available</th>
+      </tr>\n";
 		
+	$num_found = 0;
+	$img_string = "";
 	while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
 	
 		// data from foldinggraph table:
 	    $fg_number = $arr['fg_number'];	
 		$fold_name = $arr['fold_name'];
-		// data from linnot table:
-		$img_adj = $arr['filepath_linnot_image_adj_png'];
-		$img_red = $arr['filepath_linnot_image_red_png'];
-		$img_seq = $arr['filepath_linnot_image_seq_png'];
-		$img_key = $arr['filepath_linnot_image_key_png'];
+		// data from linnot table:		
 		$num_sses = $arr['num_sses'];
+        $not_string = $arr['ptgl_linnot_' . $notation];		
+		$firstvert = $arr['firstvertexpos_' . $notation];					
+		$img = $arr['filepath_linnot_image_' . $notation . '_png'];
+		$sse_string = $arr['sse_string'];
+
+		$image_exists = FALSE;
+		$img_link = "";
+		$full_img_path = $IMG_ROOT_PATH.$img;
+		if(isset($img) && $img != "" && file_exists($full_img_path)) {
+			$image_exists = TRUE;
+			$img_link = '<a href="' . "#fg_image_number_" . $fg_number . "'>Fold $fold_name</a>";
+		} else {
+		    $img_link = "-";
+		}
 		
-		$tableString .= "<div class='string_row'>";
-		$tableString .= "PDB " . $pdb_id . " chain " . $chain_name . " fold #" . $fg_number . ", fold name is " . $fold_name . ". $num_sses SSEs. Images: $img_adj, $img_red, $img_seq, $img_key.";
-		$tableString .= "</div>";
+		$tableString .= "<tr>\n";
+		$tableString .= "<td>$fg_number</td><td>$fold_name</td><td>$num_sses</td><td>$sse_string</td><td>$not_string</td><td>$img_link | $img</td>\n";
+		$tableString .= "</tr>\n";
+		
+		// prepare the image links
+		if($image_exists) {
+		    $img_string .= "<div><img src='" . $full_img_path . "'></div>\n";
+		}
+		
+
+		
+		$num_found++;
 				
 	}
 	
-	$tableString .= "</div>";
+	$tableString .= "</table></div>";
+	
+	
+	
+	
 
 
 } else {
