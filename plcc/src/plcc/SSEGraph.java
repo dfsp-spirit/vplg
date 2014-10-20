@@ -902,8 +902,12 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
             return(spatialOrder);
         }
         
+        if(this.isProteinGraph) {
+            System.err.println("WARNING: getSpatialOrderingOfVertexIndices(): You should only call this for FoldingGraphs, not for ProteinGraphs.");
+        }
+        
         if(this.numSSEContacts() != (this.numVertices() - 1)) {
-            System.err.println("WARNING: getSpatialOrderingOfVertexIndices(): Graph cannot be linear: number of edges != number of vertices -1.");
+            //System.err.println("WARNING: getSpatialOrderingOfVertexIndices(): Graph " + this.graphType + " of chain " + this.chainid + " cannot be linear: number of edges (" + this.numSSEContacts() + ") != number of vertices -1 (" + ((this.numVertices() - 1)) + ").");
             return(spatialOrder);
         }
         
@@ -2859,6 +2863,11 @@ E	3	3	3
         */
         
         DrawResult drawRes = SSEGraph.drawFoldingGraphKEYG2D(pnfr);
+        
+        if(drawRes == null) {
+            System.err.println("ERROR drawing KEY");
+            return resultFilesByFormat;
+        }
         
         //System.out.println("drawProteinGraph: Basefilepath is '" + baseFilePathNoExt + "'.");
         String svgFilePath = baseFilePathNoExt + ".svg";
@@ -4890,6 +4899,7 @@ E	3	3	3
         
         if(fg.isBifurcated()) {
             DP.getInstance().e("SSEGraph", "drawFoldingGraphKEYG2D: This FG is bifurcated, KEY notation not supported.");
+            return null;
         }
         
         Integer leftMostVertexInParent = fg.getMinimalVertexIndexInParentGraph();
@@ -4908,7 +4918,8 @@ E	3	3	3
         
         
         if(keyposFGIndicesSpatOrder.size() != fg.getSize()) {
-            DP.getInstance().e("SSEGraph", "Spatorder size " + keyposFGIndicesSpatOrder.size() + " of FG does not match FG size " + fg.getSize() + ".");
+            DP.getInstance().e("SSEGraph", "Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.chainid + " gt " + fg.graphType + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + ") does not match FG size " + fg.getSize() + ". Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ".");            
+            return null;
         }
         /** The vertex closest to C */
         //Integer keyendFGIndex = keyposFGIndicesSpatOrder.get(fg.getSize() - 1);

@@ -2335,6 +2335,7 @@ public class Main {
                             System.out.println("      Computing " + gt + " folding graphs.");
                         }
                         
+                        //System.out.println("!!!!!!calling for path '" + filePathImg + "'.");
                         ProteinFoldingGraphResults fgRes = calculateFoldingGraphsForSSEGraph(pg, filePathImg);                                    
                         pcr.addProteinFoldingGraphResults(gt, fgRes);
                                                 
@@ -2542,24 +2543,26 @@ public class Main {
                     for(String notation : notations) {                                                
 
                         String fileNameWithoutExtension = pg.getPdbid() + "_" + pg.getChainid() + "_" + pg.getGraphType() + "_FG_" + j + "_" + notation;
-                        String fileNameWithExtension = fileNameWithoutExtension + ".png";
-                        fgFile = outputDir + System.getProperty("file.separator") + fileNameWithExtension; //Settings.get("plcc_S_img_output_fileext");
+                        //String fileNameWithExtension = fileNameWithoutExtension + ".png";
+                        
+                        
+                        fgFile = outputDir + System.getProperty("file.separator") + fileNameWithoutExtension; //Settings.get("plcc_S_img_output_fileext");
 
                         Boolean drawingSucceeded = false;
                         IMAGEFORMAT[] formats = Settings.getOutputImageFormats();
                         HashMap<IMAGEFORMAT, String> filesByFormatCurNotation = new HashMap<>();
 
                         if(notation.equals(FoldingGraph.FG_NOTATION_ADJ)) {     
-                            filesByFormatCurNotation = SSEGraph.drawFoldingGraphADJ(fileNameWithoutExtension, false, formats, pnfr);                        
+                            filesByFormatCurNotation = SSEGraph.drawFoldingGraphADJ(fgFile, false, formats, pnfr);                        
                         }
                         else if(notation.equals(FoldingGraph.FG_NOTATION_RED)) {
-                            filesByFormatCurNotation = SSEGraph.drawFoldingGraphRED(fileNameWithoutExtension, false, formats, pnfr);                                                
+                            filesByFormatCurNotation = SSEGraph.drawFoldingGraphRED(fgFile, false, formats, pnfr);                                                
                         }
                         else if(notation.equals(FoldingGraph.FG_NOTATION_SEQ)) {
-                            filesByFormatCurNotation = SSEGraph.drawFoldingGraphSEQ(fileNameWithoutExtension, false, formats, pnfr);                                                
+                            filesByFormatCurNotation = SSEGraph.drawFoldingGraphSEQ(fgFile, false, formats, pnfr);                                                
                         }
                         else if(notation.equals(FoldingGraph.FG_NOTATION_KEY)) {                            
-                            filesByFormatCurNotation = SSEGraph.drawFoldingGraphKEY(fileNameWithoutExtension, false, formats, pnfr);                                                                            
+                            filesByFormatCurNotation = SSEGraph.drawFoldingGraphKEY(fgFile, false, formats, pnfr);                                                                            
                         }
 
                         drawingSucceeded = ( ! filesByFormatCurNotation.isEmpty());                                                
@@ -2625,6 +2628,11 @@ public class Main {
                     }
                 }
                 
+            }
+            else {
+                if(! silent) {
+                    System.out.println("        Not drawing folding graphs, disabled.");
+                }
             }
         }    
         return fgRes;
