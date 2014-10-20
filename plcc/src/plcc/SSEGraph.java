@@ -1671,9 +1671,10 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
      * the JSON is the full graph including atoms and may thus be quite large.
      */
     public String toJSONFormat() {
-        Gson gson = new Gson();
-        String json = gson.toJson(this);  
-        return json;
+        //Gson gson = new Gson();
+        //String json = gson.toJson(this);  
+        //return json;
+        return "";
     }
     
     
