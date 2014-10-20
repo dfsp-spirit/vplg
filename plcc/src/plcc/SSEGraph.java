@@ -903,7 +903,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         }
         
         if(this.numSSEContacts() != (this.numVertices() - 1)) {
-            //System.err.println("WARNING: getSpatialOrderingOfVertexIndices(): Graph cannot be linear: number of edges != number of vertices -1.");
+            System.err.println("WARNING: getSpatialOrderingOfVertexIndices(): Graph cannot be linear: number of edges != number of vertices -1.");
             return(spatialOrder);
         }
         

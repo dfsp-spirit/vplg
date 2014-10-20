@@ -2100,12 +2100,13 @@ public class Main {
                     }
                 }
                 
-                Boolean gmlWritten = false; String gmlFile = "";    // for DB path reconstruction later
+                Boolean gmlWritten = false; String gmlFileNoPath = "";    // for DB path reconstruction later
                 
                 String graphFormatsWritten = "";
                 Integer numFormatsWritten = 0;
                 if(Settings.getBoolean("plcc_B_output_GML")) {
-                    gmlFile = filePathGraphs + fs + fileNameWithoutExtension + ".gml";
+                    String gmlFile = filePathGraphs + fs + fileNameWithoutExtension + ".gml";
+                    gmlFileNoPath = fileNameWithoutExtension + ".gml";
                     if(IO.stringToTextFile(gmlFile, pg.toGraphModellingLanguageFormat())) {
                         graphFormatsWritten += "gml "; numFormatsWritten++; gmlWritten = true;
                         pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_GML, new File(gmlFile));
@@ -2210,13 +2211,16 @@ public class Main {
                             DP.getInstance().e("Main", "Could not find graph in database to update GML file path: '" + ex.getMessage() + "'.");
                         }
                         if(graphDBID > 0) {
-                            String gmlFileDBPath = gmlFile;
+                            String gmlFileDBPath = gmlFileNoPath;
+                            //System.out.println("#####gmlFile=" + gmlFileNoPath + ".");
 
                             if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
                                 gmlFileDBPath = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain) + fs + gmlFileDBPath;
+                                //System.out.println("#####TREE: gmlFileDBPath=" + gmlFileDBPath + ".");
                             }
                             
                             gmlFileDBPath = IO.stripTrailingShitFromPathIfThere(gmlFileDBPath);
+                            //System.out.println("#####stripped: gmlFileDBPath=" + gmlFileDBPath + ".");
                             
                             try {
                                 DBManager.updateProteinGraphTextformatPathInDB(graphDBID, "GML", gmlFileDBPath);

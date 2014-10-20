@@ -34,6 +34,8 @@ public class PLGraph<VertexSSE>  {
      */ 
     private int graphType;
     
+    private ArrayList<VertexSSE> vertices;
+    
     public PLGraph() {
         super();
         this.pdbid = "";
@@ -46,6 +48,7 @@ public class PLGraph<VertexSSE>  {
         this.pdbid = "";
         this.chain = "";
         this.graphType = PLGRAPH_TYPE_NONE;
+        this.vertices = vertices;
     }
 
     public String getPdbid() {
