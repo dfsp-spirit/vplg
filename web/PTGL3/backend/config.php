@@ -11,7 +11,7 @@
  */
 
 //---- Database settings ----//
-$DB_HOST		= '192.168.185.248';
+$DB_HOST		= '127.0.0.1';
 $DB_USER		= 'vplg';
 $DB_PASSWORD	= 'vplg';
 $DB_NAME		= 'vplg';

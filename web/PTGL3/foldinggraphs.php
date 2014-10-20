@@ -108,6 +108,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			<h3> Search Results </h3>
 			<?php echo $tableString; /* The table string is constructed in backend/search.php, which is included by this file. */  
 			
+			      echo "<br><h3> Folding graph images </h3><br><p>Note that folding graphs of size 1 (isolated vertices in the graph) are not listed here.</p>\n";
 			      echo $img_string;
 			
 			?>

@@ -106,12 +106,14 @@ if($valid_values){
     <th>Fold name</th>
     <th># SSEs</th>
 	<th>SSE string (N to C)</th>
+	<th>First vertex # in parent PG</th>
 	<th>Notation $notation </th>
 	<th>Image available</th>
       </tr>\n";
 		
 	$num_found = 0;
 	$img_string = "";
+	$html_id = "";
 	while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
 	
 		// data from foldinggraph table:
@@ -121,6 +123,7 @@ if($valid_values){
 		$num_sses = $arr['num_sses'];
         $not_string = $arr['ptgl_linnot_' . $notation];		
 		$firstvert = $arr['firstvertexpos_' . $notation];					
+		$firstvert_show = (intval($firstvert) + 1); // the value in the DB is the index, starting with 0 instead of 1
 		$img = $arr['filepath_linnot_image_' . $notation . '_png'];
 		$sse_string = $arr['sse_string'];
 
@@ -129,18 +132,22 @@ if($valid_values){
 		$full_img_path = $IMG_ROOT_PATH.$img;
 		if(isset($img) && $img != "" && file_exists($full_img_path)) {
 			$image_exists = TRUE;
-			$img_link = '<a href="' . "#fg_image_number_" . $fg_number . "'>Fold $fold_name</a>";
+			$html_id = "fg_image_number_" . $fg_number;
+			$img_link = "<a href='#" . $html_id . "'>Fold $fold_name</a>";
 		} else {
 		    $img_link = "-";
+		    //echo "File '$full_img_path' does not exist.";
 		}
 		
 		$tableString .= "<tr>\n";
-		$tableString .= "<td>$fg_number</td><td>$fold_name</td><td>$num_sses</td><td>$sse_string</td><td>$not_string</td><td>$img_link | $img</td>\n";
+		$tableString .= "<td>$fg_number</td><td>$fold_name</td><td>$num_sses</td><td>$sse_string</td><td>$firstvert_show</td><td>$not_string</td><td>$img_link</td>\n";
 		$tableString .= "</tr>\n";
 		
 		// prepare the image links
 		if($image_exists) {
-		    $img_string .= "<div><img src='" . $full_img_path . "'></div>\n";
+		    $img_string .= "<br><br><br><h4> Fold $fold_name</h4>\n";
+		    $img_string .= "The $notation $graphtype_str folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name";
+		    $img_string .= "<div id='" . $html_id . "'><img src='" . $full_img_path . "' height='600' width='800'></div><br><br>\n";
 		}
 		
 
