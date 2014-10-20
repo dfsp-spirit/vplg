@@ -12,6 +12,7 @@ package plcc;
 //import com.google.gson.Gson;
 import algorithms.CompatGraphComputation;
 import algorithms.TreeNodeData;
+import com.google.gson.Gson;
 import datastructures.Graph;
 import datastructures.SimpleAttributedGraphAdapter;
 import datastructures.SimpleGraphAdapter;
@@ -1670,11 +1671,8 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
      * the JSON is the full graph including atoms and may thus be quite large.
      */
     public String toJSONFormat() {
-        //Gson gson = new Gson();
-        //String json = gson.toJson(this);  
-        String json = "";
-        // TODO: add google gson lib back & implement this
-        System.err.println("SSEGraph.toJSONFormat: implement me.");
+        Gson gson = new Gson();
+        String json = gson.toJson(this);  
         return json;
     }
     
@@ -4909,10 +4907,10 @@ E	3	3	3
         
         
         if(keyposFGIndicesSpatOrder.size() != fg.getSize()) {
-            DP.getInstance().e("SSEGraph", "Spatorder size of FG does not match FG size.");
+            DP.getInstance().e("SSEGraph", "Spatorder size " + keyposFGIndicesSpatOrder.size() + " of FG does not match FG size " + fg.getSize() + ".");
         }
         /** The vertex closest to C */
-        Integer keyendFGIndex = keyposFGIndicesSpatOrder.get(fg.getSize() - 1);
+        //Integer keyendFGIndex = keyposFGIndicesSpatOrder.get(fg.getSize() - 1);
         
         //DP.getInstance().d("keyposFGIndicesSpatOrder=" + IO.intListToString(keyposFGIndicesSpatOrder));
         

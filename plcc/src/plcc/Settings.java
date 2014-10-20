@@ -267,7 +267,7 @@ public class Settings {
         defSet("plcc_I_img_minPageHeight", "600", "The minimum image height in pixels, used in output images.");
 
         // Folding graphs: "KEY", "ADJ", "RED", "SEQ
-        defSet("plcc_B_folding_graphs", "false", "Determines whether folding graphs (connected components of the protein graph) are handled (calculated and drawn).");
+        defSet("plcc_B_folding_graphs", "false", "Determines whether folding graphs (connected components of the protein graph) are computed. This does NOT mean they are drawn.");
         defSet("plcc_B_foldgraphtype_KEY", "true", "Determines whether KEY notation of folding graphs is calculated and drawn (only applies if 'plcc_B_folding_graphs' is 'true').");
         defSet("plcc_B_foldgraphtype_ADJ", "true", "Determines whether ADJ notation of folding graphs is calculated and drawn (only applies if 'plcc_B_folding_graphs' is 'true').");
         defSet("plcc_B_foldgraphtype_RED", "true", "Determines whether RED notation of folding graphs is calculated and drawn (only applies if 'plcc_B_folding_graphs' is 'true').");
