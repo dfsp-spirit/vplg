@@ -14,7 +14,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="description" content="">
 	<meta name="author" content="">
-	<link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
+	<link rel="shortcut icon" href="favicon.ico?v=1.0" type="image/x-icon" />
 
 	<title><?php echo $title; ?></title>
 
@@ -87,8 +87,16 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		
 		
 		<div class="container" id="searchResults">
-			<h3> Search Results </h3>
-			<?php echo $tableString; /* The table string is constructed in backend/search.php, which is included by this file. */  ?>
+			
+			<?php if($tableString !== NULL){ ?>
+				<h3> Search Results </h3>
+				<?php echo $tableString; /* The table string is constructed in backend/search.php, which is included by this file. */  ?>
+			<?php } else { ?>
+				<div id="linnot_info">
+					<div>It seems like you did not selected anything. Choose the graph-type and the notation-type and hit search!</div>
+				</div>
+			<?php } ?>
+
 		</div><!-- end container and searchResults -->
 
 </div><!-- end container and contentText -->

@@ -14,7 +14,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="description" content="PTGL folding graphs">
 	<meta name="author" content="">
-	<link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
+	<link rel="shortcut icon" href="favicon.ico?v=1.0" type="image/x-icon" />
 
 	<title><?php echo $title; ?></title>
 

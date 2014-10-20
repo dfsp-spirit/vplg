@@ -128,7 +128,7 @@ foreach ($chains as $value){
 						    <h4>Protein graph for '.$pdbID.', chain '.$chainName.'</h4>
 						    <div class="proteingraph">
 						      <div>
-							    <input type="checkbox" name="'.$pdbID.$chainName.'" value="'.$pdbID.$chainName.'"> Enqueue in Downloadlist
+							    <input type="checkbox" name="'.$pdbID.$chainName.'" value="'.$pdbID.$chainName.'"> Enqueue to downloadlist
 							    <span class="download-options"><a href="3Dview.php?pdbid='.$pdbID.'&chain='.$chainName.'&mode=allgraphs" target="_blank">3D-View [JMOL]</a></span>
 						      </div>	
 						      <ul id="'.$pdbID.$chainName.'" class="bxslider tada">';
@@ -138,21 +138,22 @@ foreach ($chains as $value){
 						      <img src="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" alt="" />
 						    </a>
 						    <a href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">Full Size Image</a>
-						    <span class="download-options">Download Graph: ';
+						    <span class="download-options">Download graph image:';
 		    
 
 		    // check if downloadable files exist. If so, then add link to file (4x)
 		    if(isset($data['graph_image_pdf']) && file_exists($IMG_ROOT_PATH.$data['graph_image_pdf'])) {
-			    $tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_pdf'].'" target="_blank">[PDF]</a>';
+			    $tableString .= ' <a href="'.$IMG_ROOT_PATH.$data['graph_image_pdf'].'" target="_blank">[PDF]</a>';
 		    }
 		    if(isset($data['graph_image_svg']) && file_exists($IMG_ROOT_PATH.$data['graph_image_svg'])){
-			    $tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_svg'].'" target="_blank">[SVG]</a>';
+			    $tableString .= ' <a href="'.$IMG_ROOT_PATH.$data['graph_image_svg'].'" target="_blank">[SVG]</a>';
 		    }
 		    if(isset($data['graph_image_png']) && file_exists($IMG_ROOT_PATH.$data['graph_image_png'])){
-			    $tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">[PNG]</a>';
+			    $tableString .= ' <a href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">[PNG]</a>';
 		    }
 		    if(isset($data['filepath_graphfile_gml']) && file_exists($IMG_ROOT_PATH.$data['filepath_graphfile_gml'])){
-			    $tableString .= '<a href="'.$IMG_ROOT_PATH.$data['filepath_graphfile_gml'].'" target="_blank">[GML]</a>';
+			    $tableString .= '<br><span class="download-options">Download graph file:
+								  <a href="'.$IMG_ROOT_PATH.$data['filepath_graphfile_gml'].'" target="_blank">[GML]</a>';
 		    }
 		    $tableString .= '</span></li>';
 
@@ -165,7 +166,7 @@ foreach ($chains as $value){
 							      <img src="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" alt="" />
 							    </a>
 							<a href="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" target="_blank">Full Size Image</a>
-							<span class="download-options">Download Graph: ';
+							<span class="download-options">Download graph image: ';
 				    
 				    // check if downloadable files exist. If so, then add link to file (4x)
 				    if(isset($data['graph_image_pdf']) && file_exists($IMG_ROOT_PATH.$data['graph_image_pdf'])) {
@@ -177,9 +178,14 @@ foreach ($chains as $value){
 				    if(isset($data['graph_image_png']) && file_exists($IMG_ROOT_PATH.$data['graph_image_png'])){
 					    $tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">[PNG]</a>';
 				    }
+					$tableString .= "</span>";
 				    if(isset($data['filepath_graphfile_gml']) && file_exists($IMG_ROOT_PATH.$data['filepath_graphfile_gml'])){
-					    $tableString .= '<a href="'.$IMG_ROOT_PATH.$data['filepath_graphfile_gml'].'" target="_blank">[GML]</a>';
+					    $tableString .= '<br><span class="download-options">Download graph file:
+										 <a href="'.$IMG_ROOT_PATH.$data['filepath_graphfile_gml'].'" target="_blank">[GML]</a>';
 				    }
+					$tableString .= '<br><span class="download-options">
+									  <a href="foldingraphs.php" target="_blank">Go to folding graphs</a>
+									 </span>';
 			    $tableString .= '</span>';
 			    $tableString .= '</li>';
 		    }
@@ -221,6 +227,7 @@ foreach ($chains as $value){
 		
 		$tableString .= '</table>
 						</div><!-- end table-responsive -->
+						
 						<div id="'.$pdbID.$chainName.'_pager" class="bx-pager-own">';
 					
 		$tableString .= '<p>- Select topology type -</p>';

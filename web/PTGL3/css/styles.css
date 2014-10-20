@@ -331,9 +331,50 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	Typography
 	-----------------------------------------------------------*/
 	
+/*	-------------------------------------------------------------
+	Linear Notations
+	-----------------------------------------------------------*/	
+
+	#linnot_table {
+		
+	}
 	
+	.string_row {
+		background-color: #f3f3f3;
+		opacity: 0.8;
+	}
+	.string_row:nth-child(odd){
+		background-color: #eee;
+		opacity: 0.8;
+	}
 	
+	.string_row:nth-child(odd):hover{
+		opacity: 1.0;
+	}	
+
+	.string_row:nth-child(even):hover{
+		opacity: 1.0;
+	}
 	
+	.string_row > a {
+		opacity: 1.0 !important;
+		color: #000;
+	}
+	
+	#linnot_info {
+		width: 540px;
+		height: 100%;
+		min-height: 200px;
+		background-position: right top;
+		background_size: 69px 68px;
+		background-repeat: no-repeat;
+		background-image: url('../images/curved_arrow-black.png');
+	}
+	
+	#linnot_info > div {
+		padding-top: 20px;
+	}
+
 /*	-------------------------------------------------------------
 	Navbar
 	-----------------------------------------------------------*/

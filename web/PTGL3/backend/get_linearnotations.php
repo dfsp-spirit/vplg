@@ -140,7 +140,7 @@ if($valid_values){
 	$tableString .= '</div>';
 	// EOPager
 	
-	$tableString .= "<div>";
+	$tableString .= "<div id='linnot_table'>";
 	
 	$parameter = "linnot".get_graphtype_abbr($graphtype).$notation;
 	
