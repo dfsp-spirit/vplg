@@ -113,7 +113,7 @@ foreach ($chains as $value){
 		
 		
 		if($base_image_exists) {
-		
+			$graphtype_int = 1;
 		    $tableString = '<div id="myCarousel">
 				      <ul class="bxslider bx-prev bx-next" id="carouselSlider">';
 		    
@@ -151,15 +151,21 @@ foreach ($chains as $value){
 		    if(isset($data['graph_image_png']) && file_exists($IMG_ROOT_PATH.$data['graph_image_png'])){
 			    $tableString .= ' <a href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">[PNG]</a>';
 		    }
+			$tableString .= '</span>';
 		    if(isset($data['filepath_graphfile_gml']) && file_exists($IMG_ROOT_PATH.$data['filepath_graphfile_gml'])){
 			    $tableString .= '<br><span class="download-options">Download graph file:
 								  <a href="'.$IMG_ROOT_PATH.$data['filepath_graphfile_gml'].'" target="_blank">[GML]</a>';
 		    }
+			$tableString .= '</span>
+							 <br><span class="download-options">
+							 <a href="foldinggraphs.php?pdbchain='.$pdbID.$chainName.'&graphtype_int='.$graphtype_int.'&notationtype=adj" target="_blank">Go to folding graphs</a>
+							 </span>';
 		    $tableString .= '</span></li>';
 
 		    // }	// use this to limit preloaded images
 
 		    // get the rest of the dataset. Until here we used only the first dataset from the DB.
+			
 		    while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
 			    $tableString .= '<li>';
 			    $tableString .= '<a href="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" target="_blank">
@@ -170,24 +176,24 @@ foreach ($chains as $value){
 				    
 				    // check if downloadable files exist. If so, then add link to file (4x)
 				    if(isset($data['graph_image_pdf']) && file_exists($IMG_ROOT_PATH.$data['graph_image_pdf'])) {
-					    $tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_pdf'].'" target="_blank">[PDF]</a>';
-				    }
-				    if(isset($data['graph_image_svg']) && file_exists($IMG_ROOT_PATH.$data['graph_image_svg'])){
-					    $tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_svg'].'" target="_blank">[SVG]</a>';
-				    }
-				    if(isset($data['graph_image_png']) && file_exists($IMG_ROOT_PATH.$data['graph_image_png'])){
-					    $tableString .= '<a href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">[PNG]</a>';
-				    }
-					$tableString .= "</span>";
-				    if(isset($data['filepath_graphfile_gml']) && file_exists($IMG_ROOT_PATH.$data['filepath_graphfile_gml'])){
-					    $tableString .= '<br><span class="download-options">Download graph file:
-										 <a href="'.$IMG_ROOT_PATH.$data['filepath_graphfile_gml'].'" target="_blank">[GML]</a>';
-				    }
-					$tableString .= '<br><span class="download-options">
-									  <a href="foldingraphs.php" target="_blank">Go to folding graphs</a>
+						$tableString .= ' <a href="'.$IMG_ROOT_PATH.$data['graph_image_pdf'].'" target="_blank">[PDF]</a>';
+					}
+					if(isset($data['graph_image_svg']) && file_exists($IMG_ROOT_PATH.$data['graph_image_svg'])){
+						$tableString .= ' <a href="'.$IMG_ROOT_PATH.$data['graph_image_svg'].'" target="_blank">[SVG]</a>';
+					}
+					if(isset($data['graph_image_png']) && file_exists($IMG_ROOT_PATH.$data['graph_image_png'])){
+						$tableString .= ' <a href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">[PNG]</a>';
+					}
+					$tableString .= '</span>';
+					if(isset($data['filepath_graphfile_gml']) && file_exists($IMG_ROOT_PATH.$data['filepath_graphfile_gml'])){
+						$tableString .= '<br><span class="download-options">Download graph file:
+										  <a href="'.$IMG_ROOT_PATH.$data['filepath_graphfile_gml'].'" target="_blank">[GML]</a>';
+					}
+					$tableString .= '</span>
+									 <br><span class="download-options">
+									 <a href="foldinggraphs.php?pdbchain='.$pdbID.$chainName.'&graphtype_int='.++$graphtype_int.'&notationtype=adj" target="_blank">Go to folding graphs</a>
 									 </span>';
-			    $tableString .= '</span>';
-			    $tableString .= '</li>';
+					$tableString .= '</span></li>';
 		    }
 
 		    $tableString .= '</ul>
