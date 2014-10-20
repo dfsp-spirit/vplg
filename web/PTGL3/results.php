@@ -140,17 +140,21 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 						}
 					})
 					
-					var dataToSend = {'downloadType' : downloadType, 'proteins[]': proteins};	
-					$.ajax({
-						type: "POST",
-						url: "./backend/createZip.php",
-						data: dataToSend,
-						cache: false,
-						success: function(html){	
-							console.log(html);
-							window.location = './backend/downloadZip.php?dl='+html;
-						}
-					});
+					if(proteins.length > 0) {
+					  var dataToSend = {'downloadType' : downloadType, 'proteins[]': proteins};	
+					  $.ajax({
+						  type: "POST",
+						  url: "./backend/createZip.php",
+						  data: dataToSend,
+						  cache: false,
+						  success: function(html){	
+							  console.log(html);
+							  window.location = './backend/downloadZip.php?dl='+html;
+						  }
+					  });
+					} else {
+					  alert("Please select one or more protein chains below.");
+					}
 				}
 			});
 
