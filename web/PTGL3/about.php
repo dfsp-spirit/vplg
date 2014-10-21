@@ -77,7 +77,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 					</li>
 					-->
 				</ul>
-			<!-- <li class="noBullets"> <a href="#linking">Linking PTGL</a> </li> -->
+			 <li class="noBullets"> <a href="#linking">Linking <?php echo "$SITE_TITLE"; ?></a> </li>
 			</li>
 		</ul>
 
@@ -329,65 +329,40 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		-->
 		
 		
-		<!--
+		
 		
 		<a class="anchor" id="linking"></a>
-		<h4> <u>Linking PTGL</u> </h4>
-		<p>You can link PTGL in two ways:</p>
-		<p><b>1.</b> Link to a certain PDB-id, chain id, <a href="#proteinGraph">graph type</a> and <a href="#linearNot">notation type</a>, e.g. PDB-id=1g3e, chain id=A, graph type=Alpha-Beta, and notation type=KEY, then the link is:</p>
-		<br>
-		<p>The encoding is the following:</p>
-		<div class="table-responsive" id="aboutTable">
-			<table class="table table-condensed table-hover borderless">
-				<tr class="tablecenter">
-					<th class="tablecenter">parameter</th>
-					<th class="tablecenter">allowed values</th>
-					<th class="tablecenter">description</th>
-					<tr class="tablecenter">
-					</tr>
-					<tr class="tablecenter">
-						<td></td>
-						<td>z</td>
-						<td><a href="#alphaBetaGraph">Alpha-Beta</td>
-					</tr>
-					<tr class="tablecenter">
-						<td>topology</td>
-						<td>a</td>
-						<td><a href="#alphaGraph">Alpha</a></td>
-					</tr>
-					<tr class="tablecenter">
-						<td></td>
-						<td>b</td>
-						<td><a href="#betaGraph">Beta</a></td>
-					</tr>
-					<tr class="tablecenter">
-						<td></td>
-						<td>1</td>
-						<td><a href="#adj">ADJ</a></td>
-					</tr>
-					<tr class="tablecenter">
-						<td>rep</td>
-						<td>2</td>
-						<td><a href="#red">RED</a></td>
-					</tr>
-					<tr class="tablecenter">
-						<td></td>
-						<td>3</td>
-						<td><a href="#key">KEY</a></td>
-					</tr>
-					<tr class="tablecenter">
-						<td></td>
-						<td>4</td>
-						<td><a href="#seq">SEQ</a></td>
-					</tr>
-				</tr>
-			</table>
-		</div>
-
-		<p><b>protlist	&#x3c;pdb-id&#x3e;&#x3c;chain-id&#x3e;	  e.g. 1g3eA</b></p>
+		<h3>Linking <?php echo "$SITE_TITLE"; ?></h3>
+		<p>You can link <?php echo "$SITE_TITLE"; ?> in several ways, depending on the kind of data you want:</p>
+		
+		<ul>
+		    <li>Link to all protein graphs of a chain:</li>
+		    <ul>
+		        <li>Format: <?php echo "$SITE_BASE_URL"; ?>/results.php?q=&lt;pdbid&gt;&lt;chain&gt;</li>
+		        <li>The allowed values for the parameters are:</li>
+		        <ul>
+		        <li>&lt;pdbid&gt;: a PDB identifier</li>
+		        <li>&lt;chain&gt;: a PDB chain name</li>
+		        </ul>
+		        <li>Example for PDB 7tim, chain A: <?php echo "$SITE_BASE_URL"; ?>/results.php?q=7timA</li>
+		    </ul>
+		    <li>Link to all folding graph linear notations of a protein graph:</li>
+		    <ul>
+		        <li>Format: <?php echo "$SITE_BASE_URL"; ?>/foldinggraphs.php?pdbchain=&lt;pdbid&gt;&lt;chain&gt;&amp;graphtype_int=&lt;graphtype_code&gt;&amp;notationtype=&lt;notation&gt;</li>
+		        <li>The allowed values for the parameters are:</li>
+		        <ul>
+		        <li>&lt;pdbid&gt;: a PDB identifier</li>
+		        <li>&lt;chain&gt;: a PDB chain name</li>
+		        <li>&lt;graphtype_code&gt;: 1=alpha, 2=beta, 3=albe, 4=alphalig, 5=betalig, 6=albelig</li>
+		        <li>&lt;notation&gt;: a notaion: adj, red, seq or key</li>
+		        </ul>
+		        <li>Example for the ADJ notation folding graphs of the alpha protein graph of PDB 7tim chain A: <?php echo "$SITE_BASE_URL"; ?>foldinggraphs.php?pdbchain=7timA&amp;graphtype_int=1&amp;notationtype=adj</li>
+		    </ul>
+		    
+		</ul>
 
 
-		-->
+		
 
 
 		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>

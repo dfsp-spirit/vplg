@@ -21,6 +21,7 @@ $DB_PORT		= '5432';
 //---- Debug settings ----//
 $SITE_TITLE = "PTGL";
 $TITLE_SPACER = " -- ";
+$SITE_BASE_URL="http://ptgl.uni-frankfurt.de";
 //---- End of debug settings ----//	
 
 //---- Search Settings ----//
