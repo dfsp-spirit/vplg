@@ -65,7 +65,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 							<li class="noBullets">  <a href="#alphaBetaLigGraph">Alpha-Beta-Ligand</a> </li>
 						</ul>
 						
-					<!--
+					
 					<li  class="noBullets">  <a href="#foldingGraph">Folding Graphs</a> </li>
 					<li class="noBullets">  <a href="#linearNot">Linear Notation</a> </li>
 					<ul>
@@ -75,8 +75,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 						<li class="noBullets">  <a href="#seq">Sequence notation</a> </li>
 					</ul>
 					</li>
-					-->
-				</ul>
+									</ul>
 			 <li class="noBullets"> <a href="#linking">Linking <?php echo "$SITE_TITLE"; ?></a> </li>
 			 <li class="noBullets"> <a href="#api">A <?php echo "$SITE_TITLE"; ?> REST API?</a> </li>
 			</li>
@@ -229,19 +228,18 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
 		
 		
-		<!--
+		
 		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
 		
 		<br>
 		<br>
 		<a class="anchor" id="foldingGraph"></a>
-		<h4> <u>Folding Graphs</u> </h4>
+		<h4>Folding Graphs</h4>
 		<p>A connected component of the <a href="#proteinGraph">Protein graph</a> is called Folding graph. Folding graphs are denoted with capital letters in alphabetical order
 		according to their occurrence in the sequence, beginning at the N-terminus.</p>
 
-		<p><a href="#proteinGraph">Protein graphs</a> are built of one or more Folding graphs. Below, you find the <a href="#rasmolbec">schematic representation</a> of the antigen receptor protein 1BEC
-		(figure from the <a href="http://www.fli-leibnitz.de/cgi-bin/ImgLib.pl?Code=1BEC">Jena Library of Biological Macromoleculs</a>). Helices are coloured red and strands blue. 1BEC is a transport membrane protein
+		<p><a href="#proteinGraph">Protein graphs</a> are built of one or more Folding graphs. Below, you find the <a href="#rasmolbec">schematic representation</a> of the antigen receptor protein 1BEC. Helices are coloured red and strands blue. 1BEC is a transport membrane protein
 		that detects foreign molecules at the cell surface. It has two domains, which are represented by the Folding graphs A and E, which are mainly
 		built by strands. The protein consists of one chain A and exhibits six Folding graphs. Two large Folding graphs (Folding graphs 1BEC_A and
 		1BEC_E), and four Folding graphs 1BEC_B, 1BEC_C, 1BEC_D, and 1BEC_F consisting only of a single helix (see <href="#alphaBeta1bec">Protein graph of 1bec</a>: helices 9,
@@ -253,22 +251,22 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<br>
 		<br>
 		<a class="anchor" id="rasmolbec"></a>
-		<h5> <u>3D structure of 1BEC</u> </h5>
+		<h5> 3D structure of 1BEC: </h5>
 			<p><img src="./images/1bec.gif" alt="3D structure of 1BEC" title="3D structure of 1BEC" class="img-responsive imgFormAboutphp"/></p>
 
 
 		<a class="anchor" id="alphaBeta1bec"></a>
-		<h5> <u>Alpha-Beta Protein graph of 1BEC</u> </h5>
+		<h5> Alpha-Beta Protein graph of 1BEC: </h5>
 			<p><img src="./images/1becA_albe.0.png" alt="Alpha-Beta Protein graph of 1BEC" title="Alpha-Beta Protein graph of 1BEC" class="img-responsive imgFormAboutphp"/></p>
-		<h5> <u>Alpha-Beta Folding graph A of 1BEC</u> </h5>
+		<h5> Alpha-Beta Folding graph A of 1BEC: </h5>
 			<p><img src="./images/1becAAa_al.0.png" alt="Alpha-Beta Folding graph A of 1BEC" title="Alpha-Beta Folding graph A of 1BEC" class="img-responsive imgFormAboutphp"/></p>
-		<h5> <u>Alpha-Beta Folding graph B of 1BEC</u> </h5>
+		<h5> Alpha-Beta Folding graph B of 1BEC: </h5>
 			<p><img src="./images/1becAEa_al.0.png" alt="Alpha-Beta Folding graph B of 1BEC" title="Alpha-Beta Folding graph B of 1BEC" class="img-responsive imgFormAboutphp"/></p>
 		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		<br>
 		<br>
 		<a class="anchor" id="linearNot"></a>
-		<h4> <u>Linear Notations</u> </h4>
+		<h4>Linear Notations </h4>
 		<p>A notation serves as a unique, canonical, and linear description and classification of structures. The notations for Folding graphs reveal to
 		the feature of protein structure as a linear sequence of amino acids, and describe the arrangement of SSEs correctly and completely.</p>
 		<p>There are two possibilities of representing Protein graphs: first, one can order the SSEs in one line according to their occurrence in sequence,
@@ -289,18 +287,18 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		are noted followed by the neighbourhood type.</p>
 		The reduced (RED) notation is the same as for ADJ notation, but only those SSEs of the considered Folding graph count. See below, the ADJ and
 		RED notations of the Beta-Folding graph E in human alpha thrombin chain B(1D3T). The beta sheet consists of six strands arranged both in
-		parallel with one additional mixed edge to helix 12. 
+		parallel with one additional mixed edge to helix 12.<br><br>
 
-		<h5> <u>ADJ Notation</u> </h5>
+		<h5> ADJ Notation </h5>
 			<p><img src="./images/1d3tBEa_albe.png" alt="Adjacent notation" title="Adjacent notation" class="img-responsive imgFormAboutphp"/></p>
-		<h5> <u>RED Notation</u> </h5>
+		<h5> RED Notation </h5>
 			<p><img src="./images/1d3tBEr_albe.png" alt="Reduced notation" title="Reduced notation" class="img-responsive imgFormAboutphp"/></p>
 		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 
 		<br>
 		<br>
 		<a class="anchor" id="key"></a>
-		<h5> <u>KEY Notation</u> </h5>
+		<h5> KEY Notation </h5>
 		The KEY notation is very close to the topology diagrams of biologists, e.g. Brändén and Tooze (1999). Topologies are described by diagrams of
 		arrows for strands and cylinders for helices. As in the <a href="#red">RED</a> notation SSEs of the considered Folding graph are taken into account. SSEs are
 		ordered spatially and are connected in sequential order. Beginning with the first SSE in the sequence and following the sequential edges,
@@ -316,7 +314,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<br>
 		<br>
 		<a class="anchor" id="seq"></a>
-		<h5> <u>SEQ Notation</u> </h5>
+		<h5> SEQ Notation </h5>
 		This notation is the same as the <a href="#adj">ADJ</a> notation, but the sequential differences are counted. Although the SEQ notation is trivial, the notation
 		can be useful, for example, searching for ψ-loops requires a special SEQ notation. 
 
@@ -327,7 +325,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		
 		
 		
-		-->
+		
 		
 		
 		
