@@ -221,8 +221,8 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			<form class="form-inline" action="search.php" method="get">
 			<dl class="dl-horizontal">
 				<div id="additionalSearch4">
-				<dt>GraphletSimilarity</dt>
-				<dd>Protein structure similarity search -- powered by Graphlets <strong class="caret" id="flipArrow4" ></strong></dd>
+				<dt>BioGraphletSimilarity</dt>
+				<dd>Protein structure similarity search powered by BioGraphlets <strong class="caret" id="flipArrow4" ></strong></dd>
 				</div>
 				<div id="addSearchGraphletSimilarity">
 				<p>Enter a query PDB ID and chain, e.g., '7timA' to search for similar chains.</p>

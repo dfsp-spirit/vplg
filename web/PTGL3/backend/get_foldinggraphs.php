@@ -147,7 +147,7 @@ if($valid_values){
 		if($image_exists) {
 		    $img_string .= "<br><br><br><h4> Fold $fold_name</h4>\n";
 		    $img_string .= "The $notation $graphtype_str folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name";
-		    $img_string .= "<div id='" . $html_id . "'><img src='" . $full_img_path . "' height='600' width='800'></div><br><br>\n";
+		    $img_string .= "<div id='" . $html_id . "'><img src='" . $full_img_path . "' width='800'></div><br><br>\n";
 		}
 		
 

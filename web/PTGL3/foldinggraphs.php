@@ -50,8 +50,8 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		
 		<div id="PageIntro">
 		<div class="container" id="pageintro">
-		Here you can search for all visualizations of the different folding graph types of a protein chain (a folding graph is a connected component of a protein graph). For each of the folding graph types (e.g., the alpha graph, which only considers alpha helices),
-		there are four different visualizations available:
+		A folding graph is a <dfn title="A set of vertices in a graph where each vertex is reachable from all other vertices.">connected component</dfn> of a protein graph. Here you can search for all visualizations of the different folding graph types of a protein chain. For each of the folding graph types (e.g., the alpha graph, which only considers alpha helices),
+		there are four different visualizations available:<br><br>
 		<ul>
 		<li>the ADJ notation: all SSEs of the protein graph are shown, order is from N-terminus (left) to C-terminus, and each edge represents a 3D contact between a pair of SSEs.</li>
 		<li>the RED notation: only SSEs of the folding graph are shown, order is from N-terminus (left) to C-terminus, and each edge represents a 3D contact between a pair of SSEs.</li>

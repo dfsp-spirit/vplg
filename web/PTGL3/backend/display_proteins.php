@@ -43,7 +43,7 @@ $graphtype_dict = array(
 // translate SSE-type abbr. into letters
 $sse_type_shortcuts = array(
     1 => "H",
-    2 => "B",
+    2 => "E",
     3 => "L",
     4 => "O"
 );
@@ -128,7 +128,7 @@ foreach ($chains as $value){
 						    <h4>Protein graph for '.$pdbID.', chain '.$chainName.'</h4>
 						    <div class="proteingraph">
 						      <div>
-							    <input type="checkbox" name="'.$pdbID.$chainName.'" value="'.$pdbID.$chainName.'"> Enqueue to downloadlist
+							    <input type="checkbox" name="'.$pdbID.$chainName.'" value="'.$pdbID.$chainName.'"> Add to download list
 							    <span class="download-options"><a href="3Dview.php?pdbid='.$pdbID.'&chain='.$chainName.'&mode=allgraphs" target="_blank">3D-View [JMOL]</a></span>
 						      </div>	
 						      <ul id="'.$pdbID.$chainName.'" class="bxslider tada">';
@@ -202,18 +202,19 @@ foreach ($chains as $value){
 						  
 						
 		} else {
-		$tableString .= "No data found for protein.";
+		$tableString .= "<h2>No data found in the database for request protein, sorry.</h2>";
 		}
 		
 				
 				$tableString .= '
 						<div class="table-responsive" id="sse">
 						<table class="table table-condensed table-hover borderless whiteBack">
+						<caption>The SSEs of the protein graph</caption>
 						  <tr>
-							<th class="tablecenter">Nr.</th>
-							<th class="tablecenter">Type</th>
-							<th class="tablecenter">Sequence</th>
-							<th class="tablecenter">from - to</th>
+							<th class="tablecenter">SSE #</th>
+							<th class="tablecenter">SSE type</th>
+							<th class="tablecenter">AA sequence</th>
+							<th class="tablecenter">residues in chain</th>
 						  </tr>';
 		
 		// counter to numerate SSEs in the table
