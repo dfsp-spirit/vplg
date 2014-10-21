@@ -78,6 +78,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 					-->
 				</ul>
 			 <li class="noBullets"> <a href="#linking">Linking <?php echo "$SITE_TITLE"; ?></a> </li>
+			 <li class="noBullets"> <a href="#api">A <?php echo "$SITE_TITLE"; ?> REST API?</a> </li>
 			</li>
 		</ul>
 
@@ -360,12 +361,21 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		    </ul>
 		    
 		</ul>
-
-
+		
+		
+		
+		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
+		
+		
+		<a class="anchor" id="api"></a>
+		<h3>A <?php echo "$SITE_TITLE"; ?> REST API?</h3>
+		<p>We are considering to make a REST API available for programmers. You will then be able to retrieve the graph files programmatically (in JSON and GML formats). At the moment, there is no such API.</p>
 		
 
 
 		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
+		
+		<br><br><br>
 
 	</div><!-- end container and contentText -->
 </div><!-- end wrapper -->
