@@ -94,7 +94,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		them. The result is an undirected, labelled graph for a single protein chain.
 		<br /><br /></p>
 		
-		<p class="imgCenter"><img src="./images/protein_graph.png" alt="Protein graph" title="Protein graph" class="img-responsive imgFormAboutphp"/></p>
+		<p class="imgCenter"><img src="./images/how_vplg_works.png" alt="Protein graph computation" title="Protein graph computation" class="img-responsive imgFormAboutphp"/></p>
 		
 		<br/>
 		
@@ -143,6 +143,8 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		According to this direction two spatial neighboured SSEs, which are connected, could have a parallel (p), anti-parallel (a), or mixed (m)
 		neighbourhood. 
 		</p>
+		
+		<p class="imgCenter"><img src="./images/protein_graph.png" alt="Protein graph" title="Protein graph" class="img-responsive imgFormAboutphp"/></p>
 		
 		<br/>
 		<a class="anchor" id="graphTypes"></a>
