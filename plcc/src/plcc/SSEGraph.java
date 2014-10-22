@@ -4906,11 +4906,13 @@ E	3	3	3
         SSEGraph pg = fg.parent;
         
         Boolean debugVerbose = false;
+        /*
         if(fg.pdbid.equals("7tim") && fg.chainid.equals("B") && fg.graphType.equals("alpha") && fg.getFoldingGraphNumber().equals(3)) {
                 debugVerbose = true;
         } else {
             debugVerbose = false;
         }
+        */
         
         if(fg.isBifurcated()) {
             DP.getInstance().e("SSEGraph", "drawFoldingGraphKEYG2D: This FG is bifurcated, KEY notation not supported.");
@@ -4938,7 +4940,7 @@ E	3	3	3
         }
         
         if(debugVerbose) {
-            DP.getInstance().d("SSEGraph", fg.getQuickIDString() + " Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.chainid + " gt " + fg.graphType + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + "). FG size " + fg.getSize() + ". Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ".");            
+            DP.getInstance().d("SSEGraph", fg.getQuickIDString() + " Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.chainid + " gt " + fg.graphType + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + "). FG size " + fg.getSize() + ". Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ". KEY='" + pnfr.keyNotation + "'.");            
         }
         
         /** The vertex closest to C */

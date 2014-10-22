@@ -175,11 +175,22 @@ public class PTGLNotations {
             //debug
             /*
             if(fg.pdbid.equals("7tim") && fg.chainid.equals("A") && fg.graphType.equals("alpha") && fg.getFoldingGraphNumber().equals(0)) {
+                System.out.println("HIT DEBUG FG NOTATION");
                 verbose = true;
                 adjverbose = true;
             } else {
                 verbose = false;
                 adjverbose = false;
+            }            
+            */
+            /*
+            if(fg.pdbid.equals("7tim") && fg.chainid.equals("B") && fg.graphType.equals("alpha") && fg.getFoldingGraphNumber().equals(3)) {
+                System.out.println("HIT DEBUG FG NOTATION");
+                verbose = true;
+                keyverbose = true;
+            } else {
+                verbose = false;
+                keyverbose = false;
             }
             */
                                                                 
@@ -516,12 +527,17 @@ public class PTGLNotations {
                     adjpos.add(next);
                     
                     // ordering, line 352
-                    if(edgeType.equals("p") || edgeType.equals("m") || edgeType.equals("l")) {
+                    //if(edgeType.equals("p") || edgeType.equals("m") || edgeType.equals("l")) {
+                    if(edgeType.equals("p")) {
+                        // they are parallel, add same order
                         order.put(next, order.get(adjcur));
-                    }else if(order.get(adjcur).equals("-")) {
-                        order.put(next, "+");
-                    }else{
-                        order.put(next, "-");
+                    } else {
+                        // they are not parallel, switch order
+                        if(order.get(adjcur).equals("-")) {
+                            order.put(next, "+");
+                        } else {
+                            order.put(next, "-");
+                        }
                     }
                     
                     if(adjverbose) {
@@ -743,7 +759,7 @@ public class PTGLNotations {
                 //#########################################################################
                 
                 if(keyverbose) {
-                    System.out.println("    KEY notation starts for fold  #" + foldNum + ".");
+                    System.out.println("    KEY notation starts for fold #" + foldNum + ".");
                 }
                 
                 
@@ -783,7 +799,7 @@ public class PTGLNotations {
                         dist = tu - tv;
                         
                         if(keyverbose) {
-                            System.out.println("      u=" + u + ", v=" + v + ", tu=" + tu + ", tv=" + tv + ", dist(tu,tv)=" + dist + ".");
+                            System.out.println("     *u=" + u + ", v=" + v + ", tu=" + tu + ", tv=" + tv + ", dist(tu,tv)=" + dist + ".");
                         }
                         
                         if((k==1 && isMultiSSETypeGraph || (k > 1))) {
@@ -798,11 +814,18 @@ public class PTGLNotations {
                         String order_posiminus1 = order.get(posiminus1);
                         
                         if(keyverbose) {
-                            System.out.println("posi=" + posi + ", posimines1=" + posiminus1 + ", order_posi=" + order_posi + ", order_posiminus1=" + order_posiminus1 + ".");
+                            System.out.println("      posi=" + posi + ", posiminus1=" + posiminus1 + ", order_posi=" + order_posi + ", order_posiminus1=" + order_posiminus1 + ".");
                         }
                         
                         if(order_posiminus1.equals(order_posi)) {
+                            if(keyverbose) {
+                                System.out.println("      Same order as last, adding 'x' (will become cross-over connector in image).");
+                            }
                             KEY.append("x");
+                        } else {
+                            if(keyverbose) {
+                                System.out.println("      Order differs from last, adding nothing (no 'x').");
+                            }
                         }
                         
                         if(isMultiSSETypeGraph) {
