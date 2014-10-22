@@ -120,14 +120,17 @@ public class Chain implements java.io.Serializable {
         }
         
         // stat stuff
-        float[] sharesH = new float[AminoAcid.ALL_CHEM_PROPS.length];
-        float[] sharesE = new float[AminoAcid.ALL_CHEM_PROPS.length];
-        for(int i = 0; i < AminoAcid.ALL_CHEM_PROPS.length; i++) {
-            sharesH[i] = (float)numResH / (float)chemPropsBySSEType[H][i];
-            sharesE[i] = (float)numResE / (float)chemPropsBySSEType[E][i];
+        Boolean doStats = false;
+        if(doStats) {
+            float[] sharesH = new float[AminoAcid.ALL_CHEM_PROPS.length];
+            float[] sharesE = new float[AminoAcid.ALL_CHEM_PROPS.length];
+            for(int i = 0; i < AminoAcid.ALL_CHEM_PROPS.length; i++) {
+                sharesH[i] = (float)numResH / (float)chemPropsBySSEType[H][i];
+                sharesE[i] = (float)numResE / (float)chemPropsBySSEType[E][i];
+            }
+            System.out.println("Chain: chemType by SSEtype[H]: totalH=" + numResH + ", shares: " + IO.floatArrayToString(sharesH));
+            System.out.println("Chain: chemType by SSEtype[E]: totalE=" + numResE + ", shares: " + IO.floatArrayToString(sharesE));
         }
-        System.out.println("Chain: chemType by SSEtype[H]: totalH=" + numResH + ", shares: " + IO.floatArrayToString(sharesH));
-        System.out.println("Chain: chemType by SSEtype[E]: totalE=" + numResE + ", shares: " + IO.floatArrayToString(sharesE));
         
         //System.out.println("Added " + numSeps + " separators.");
         return new String[] { sbChemProp.toString(), sbSSE.toString() };

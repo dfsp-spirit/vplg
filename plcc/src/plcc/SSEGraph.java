@@ -1135,8 +1135,14 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
             System.exit(-1);
         }
         
-        adjLists.get(x).add(y);
-        adjLists.get(y).add(x);
+        if( ! adjLists.get(x).contains(y)) {
+            adjLists.get(x).add(y);
+        }
+        
+        if( ! adjLists.get(y).contains(x)) {
+            adjLists.get(y).add(x);
+        }
+        
         matrix[x][y] = spatialRelation;
         matrix[y][x] = spatialRelation;
         
@@ -2827,7 +2833,9 @@ E	3	3	3
                 DP.getInstance().e("SSEGraph", "drawFoldingGraphKEY: FG reported to NOT support KEY notation, but a KEY notation string is set: '" + pnfr.keyNotation + "', start index is parent is " + pnfr.keyStart + ".");
             }
             
-            System.out.println("          Output KEY folding graph files: none, FG does not support KEY notation.");
+            if(! Settings.getBoolean("plcc_B_silent")) {
+                System.out.println("          Output KEY folding graph files: none, FG does not support KEY notation.");
+            }
             return resultFilesByFormat;
         } 
         

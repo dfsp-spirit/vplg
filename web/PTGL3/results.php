@@ -104,10 +104,10 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<script src="js/bootstrap.min.js"></script>
 		
 		<!-- Custom JS -->
-		<!-- <script src="js/script.js"></script>
+		<script src="js/script.js"></script>
 			
 		<!-- Live Search for PDB IDs -->
-		<!-- <script src="js/livesearch.js" type="text/javascript"></script>
+		<script src="js/livesearch.js" type="text/javascript"></script>
 		
 		<!-- bxSlider Javascript file -->
 		<script src="js/jquery.bxslider.min.js"></script>	

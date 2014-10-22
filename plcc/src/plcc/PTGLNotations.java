@@ -171,6 +171,14 @@ public class PTGLNotations {
                 }
             } 
             */
+            
+            if(fg.pdbid.equals("7tim") && fg.chainid.equals("A") && fg.graphType.equals("alpha") && fg.getFoldingGraphNumber().equals(0)) {
+                verbose = true;
+                adjverbose = true;
+            } else {
+                verbose = false;
+                adjverbose = false;
+            }
                                                                 
             PTGLNotationFoldResult pnfr = new PTGLNotationFoldResult(fg);
             
@@ -267,7 +275,7 @@ public class PTGLNotations {
                 }
                 else {
                     if(verbose) {
-                        System.out.println("  This is an NOT a multi SSE type graph, graph type is '" + g.getGraphType() + ".");
+                        System.out.println("  This is an NOT a multi SSE type graph, graph type is '" + g.getGraphType() + "'.");
                     }
                 }
                 
@@ -355,13 +363,18 @@ public class PTGLNotations {
                 //g.resetVertexStates();
                 resetEdgeStatus(ccVerts);
                 int numIterations = 0;
+                String addedLastIteration = "";
+                String addedThisIteration = "";
                 while( ! isFinished(adjdegrees, ccVerts) || (hc && (adjvisited.size() <= ccVerts.size()) )) {
+                    
+                    addedLastIteration = addedThisIteration;
+                    addedThisIteration = "";
                     
                     Boolean fin = isFinished(adjdegrees, ccVerts);
                     
                     if(adjverbose) {
                         System.out.println("    Fold#" + foldNum + "  ===== At iteration #" + numIterations + ", adjcur=" + adjcur + ". adjvisited.size()=" + adjvisited.size() + ", ccVerts.size()=" + ccVerts.size() + ", finished=" + fin + ". =====");
-                        System.out.println("    adjvisited (" + adjvisited.size() + " of " + ccVerts.size() + "): " + IO.hashSetToString(adjvisited));
+                        System.out.println("    adjvisited (" + adjvisited.size() + " of " + ccVerts.size() + "): " + IO.hashSetToString(adjvisited));                        
                     }                    
                     numIterations++;
                     
@@ -369,7 +382,7 @@ public class PTGLNotations {
                     Collections.sort(adjNeighbors);
                     
                     if(adjverbose) {
-                        System.out.println("    Fold#" + foldNum + "    Neighbors of " + adjcur + ": " + IO.intListToString(adjNeighbors));
+                        System.out.println("    Fold#" + foldNum + "    The " + adjNeighbors.size() + " neighbors of " + adjcur + ": " + IO.intListToString(adjNeighbors));
                     } 
                     
                     foundNextVertex = false;
@@ -436,6 +449,8 @@ public class PTGLNotations {
                         }
                         
                         ADJ.append(next - adjcur).append(edgeType.toLowerCase());
+                        addedThisIteration += (next - adjcur);
+                        addedThisIteration += edgeType.toLowerCase();
                         
                         g.setEdgeAttribute(left, right, PTGLNotations.EDGE_ATTRIBUTE_STATUS, PTGLNotations.STATUS_VISITED);
                         
@@ -471,6 +486,7 @@ public class PTGLNotations {
                             }
                             
                             ADJ.append((next - adjcur) + "z");
+                            addedThisIteration += (next - adjcur) + "z";
                             
                         } else {
                             next = getVertexDegreeGreater1(adjdegrees, ccVerts);
@@ -492,6 +508,7 @@ public class PTGLNotations {
                     
                     if(isMultiSSETypeGraph) {
                         ADJ.append(g.getVertex(next).getLinearNotationLabel());
+                        addedThisIteration += g.getVertex(next).getLinearNotationLabel();
                     }
                     adjpos.add(next);
                     
@@ -521,6 +538,7 @@ public class PTGLNotations {
                     
                     if(adjverbose) {
                         System.out.println("    ADJ Notation so far: '" + ADJ.toString() + "'.");
+                        System.out.println("    At " + numIterations + " iterations. addedThisIteration='" + addedThisIteration + "', addedLastIteration='" + addedLastIteration + "'.");
                     }
                     
                 }
