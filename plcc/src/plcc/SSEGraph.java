@@ -875,7 +875,72 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         return(pixelPosX);
     }
     
+    
+    /**
+     * Determines whether the whole graph is a single circle. Note that this does NOT check whether the graph contains ANY circle.
+     * @return true if the whole graph is a single circle, false otherwise
+     */ 
+    public Boolean isASingleCycle() {
         
+        for(int i = 0; i < this.size; i++) {
+            if(this.degreeOfVertex(i) != 2) {
+                return false;
+            }
+        }
+        
+        if(this.size != this.getEdgeList().size()) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    
+    public ArrayList<Integer> getSpatialOrderingOfVertexIndicesAllowingCycle(Integer startVertexIndex) {
+        ArrayList<Integer> spatialOrderIgnoreCyle = new ArrayList<Integer>();
+        
+        if(! this.isASingleCycle()) {
+            return new ArrayList<Integer>();
+        }
+        
+        if(this.isBifurcated() || this.isProteinGraph) {
+            return new ArrayList<Integer>();
+        }
+        
+        Integer start = startVertexIndex;
+        spatialOrderIgnoreCyle.add(start);
+        
+        if(this.size == 1) {
+            return spatialOrderIgnoreCyle;
+        }
+        
+        Integer last = start;
+        Integer next;
+        // determine the 2 neighbors of the start vertex
+        ArrayList<Integer> bothNeighborsOfStart = this.neighborsOf(start);
+        if(bothNeighborsOfStart.size() != 2) {
+            // this cannot be a cycle, error
+            return new ArrayList<Integer>();
+        }
+        
+        // This graph is a cycle, so we have to decide the direction we want to walk from
+        //  the start vertex. Let's choose the vertex with smaller index.
+        Integer cur = bothNeighborsOfStart.get(0);
+        if(bothNeighborsOfStart.get(1) < cur) {
+            cur = bothNeighborsOfStart.get(1);
+        }
+        
+        // now we have decided, just follow the edges
+        while(spatialOrderIgnoreCyle.size() < this.size) {
+            spatialOrderIgnoreCyle.add(cur);            
+            next = this.getVertexNeighborBut(cur, last);
+            last = cur;
+            cur = next;            
+        }
+        
+        return spatialOrderIgnoreCyle;
+    }
+    
     
     
     /**
@@ -4931,12 +4996,31 @@ E	3	3	3
         /** The KEY start vertex -- this is NOT the left-most vertex. It is the vertex closest to the N-terminus with degree 1. Note that this is the index in the FG, not in the PG. */        
         Integer keystartFGIndex = pnfr.keyStart;
         fg.computeSpatialVertexOrdering();
-        List<Integer> keyposFGIndicesSpatOrder = fg.spatOrder;
+        ArrayList<Integer> keyposFGIndicesSpatOrder = fg.spatOrder;
         
-        
+        // special handling of folding graphs which form a single cycle.
         if(keyposFGIndicesSpatOrder.size() != fg.getSize()) {
-            DP.getInstance().e("SSEGraph", "Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.chainid + " gt " + fg.graphType + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + ") does not match FG size " + fg.getSize() + ". Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ". KEY='" + pnfr.keyNotation + "'.");            
-            return null;
+            // Note: if this is the case, the SSEs of the FG most likely form a cycle. The KEY linnot code accepts this as a valid spatial ordering, it ignores one edge in the cycle.            
+            //DP.getInstance().e("SSEGraph", "Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.chainid + " gt " + fg.graphType + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + ") does not match FG size " + fg.getSize() + ". Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ". KEY='" + pnfr.keyNotation + "'. " + (fg.isASingleCycle() ? "FG is a single cycle." : "FG is NOT a single cycle."));            
+            
+            if(fg.isASingleCycle()) {
+                keyposFGIndicesSpatOrder = fg.getSpatialOrderingOfVertexIndicesAllowingCycle(keystartFGIndex);
+                fg.spatOrder = keyposFGIndicesSpatOrder;
+                
+                // did this fix the problem?
+                if(keyposFGIndicesSpatOrder.size() != fg.getSize()) {
+                    // if this didnt fix it, we are lost
+                    DP.getInstance().e("SSEGraph", "Could not draw KEY notation: Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.chainid + " gt " + fg.graphType + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + ") does not match FG size " + fg.getSize() + " even when allowing circles. Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ". KEY='" + pnfr.keyNotation + "'. " + (fg.isASingleCycle() ? "FG is a single cycle." : "FG is NOT a single cycle."));
+                    return null;
+                } else {
+                    //System.err.println("Single cycle handling fixed it.");
+                }
+            } else {
+                DP.getInstance().e("SSEGraph", "Could not draw KEY notation: Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.chainid + " gt " + fg.graphType + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + ") does not match FG size " + fg.getSize() + ". Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ". KEY='" + pnfr.keyNotation + "'. " + (fg.isASingleCycle() ? "FG is a single cycle." : "FG is NOT a single cycle."));
+                return null;
+            }
+            
+            
         }
         
         if(debugVerbose) {
