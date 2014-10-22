@@ -76,23 +76,54 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		?>
 		</label>
 			
+		
 		<label>Select graph-type: 
 		  <select id="multidown" name="graphtype_int">
-			<option class="downloadOption" value="1">Alpha</option>
-			<option class="downloadOption" value="2">Beta</option>
-			<option class="downloadOption" value="3">Alpha-Beta</option>
-			<option class="downloadOption" value="4">Alpha-Ligand</option>
-			<option class="downloadOption" value="5">Beta-Ligand</option>
-			<option class="downloadOption" value="6">Alpha-Beta-Ligand</option>
+		  <?php
+		     $values = array(1, 2, 3, 4, 5, 6);
+		     $labels = array("Alpha", "Beta", "Alpha-Beta", "Alpha-Ligand", "Beta-Ligand", "Alpha-Beta-Ligand");
+		     
+		     $pre_sel = 1;
+		     if(isset($_GET['graphtype_int'])) {
+		       $tmp = intval($_GET['graphtype_int']);
+		       if($tmp >= 1 && tmp <= 6) {
+		         $pre_sel = $tmp;
+		       }
+		     }
+		     
+		     for($i = 0; $i < count($values); $i++) {
+		       $sel = "";
+		       if($pre_sel === $values[$i]) {
+		         $sel = " selected='selected' ";
+		       }
+		       echo "<option class='downloadOption' $sel value='" . $values[$i] . "'>"  . $labels[$i] . "</option>";
+		     }
+		  ?>			
 		  </select>
 		</label>
 		
 		<label> and notation-type: 
 		  <select id="multidown" name="notationtype">
-			<option class="downloadOption" value="adj">ADJ</option>
-			<option class="downloadOption" value="red">RED</option>
-			<option class="downloadOption" value="key">KEY</option>
-			<option class="downloadOption" value="seq">SEQ</option>
+		  <?php
+		     $values = array("adj", "red", "seq", "key");
+		     $labels = array("ADJ", "RED", "SEQ", "KEY");
+		     
+		     $pre_sel = "adj";
+		     if(isset($_GET['notationtype'])) {
+		       $tmp = $_GET['notationtype'];
+		       if($tmp === "adj" || $tmp === "red" || $tmp === "seq" || $tmp === "key") {
+		         $pre_sel = $tmp;
+		       }
+		     }
+		     
+		     for($i = 0; $i < count($values); $i++) {
+		       $sel = "";
+		       if($pre_sel === $values[$i]) {
+		         $sel = " selected='selected' ";
+		       }
+		       echo "<option class='downloadOption' $sel value='" . $values[$i] . "'>"  . $labels[$i] . "</option>";
+		     }
+		  ?>		  
 		  </select>
 		</label>
 		

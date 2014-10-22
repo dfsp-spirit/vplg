@@ -2873,7 +2873,7 @@ E	3	3	3
         DrawResult drawRes = SSEGraph.drawFoldingGraphKEYG2D(pnfr);
         
         if(drawRes == null) {
-            System.err.println("ERROR drawing KEY");
+            //System.err.println("ERROR drawing KEY");
             return resultFilesByFormat;
         }
         
@@ -4900,10 +4900,17 @@ E	3	3	3
     private static DrawResult drawFoldingGraphKEYG2D(PTGLNotationFoldResult pnfr) {
 
         
-        //System.err.println("ERROR: drawFoldingGraphKEYG2D: implement me, i draw RED atm.");
+        
         
         FoldingGraph fg = pnfr.getFoldingGraph();
         SSEGraph pg = fg.parent;
+        
+        Boolean debugVerbose = false;
+        if(fg.pdbid.equals("7tim") && fg.chainid.equals("B") && fg.graphType.equals("alpha") && fg.getFoldingGraphNumber().equals(3)) {
+                debugVerbose = true;
+        } else {
+            debugVerbose = false;
+        }
         
         if(fg.isBifurcated()) {
             DP.getInstance().e("SSEGraph", "drawFoldingGraphKEYG2D: This FG is bifurcated, KEY notation not supported.");
@@ -4926,9 +4933,14 @@ E	3	3	3
         
         
         if(keyposFGIndicesSpatOrder.size() != fg.getSize()) {
-            DP.getInstance().e("SSEGraph", "Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.chainid + " gt " + fg.graphType + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + ") does not match FG size " + fg.getSize() + ". Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ".");            
+            DP.getInstance().e("SSEGraph", "Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.chainid + " gt " + fg.graphType + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + ") does not match FG size " + fg.getSize() + ". Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ". KEY='" + pnfr.keyNotation + "'.");            
             return null;
         }
+        
+        if(debugVerbose) {
+            DP.getInstance().d("SSEGraph", fg.getQuickIDString() + " Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.chainid + " gt " + fg.graphType + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + "). FG size " + fg.getSize() + ". Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ".");            
+        }
+        
         /** The vertex closest to C */
         //Integer keyendFGIndex = keyposFGIndicesSpatOrder.get(fg.getSize() - 1);
         

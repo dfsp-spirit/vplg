@@ -156,8 +156,11 @@ if($valid_values){
 				
 	}
 	
-	$tableString .= "</table></div>";
+	$tableString .= "</table></div>\n";
 	
+	if($num_found >= 1) {
+	  $tableString .= "<br><br><a href='results.php?q=$pdbchain'>Go to protein graph</a><br><br>";
+	}
 	
 	
 	

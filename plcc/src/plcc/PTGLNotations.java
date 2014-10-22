@@ -172,6 +172,8 @@ public class PTGLNotations {
             } 
             */
             
+            //debug
+            /*
             if(fg.pdbid.equals("7tim") && fg.chainid.equals("A") && fg.graphType.equals("alpha") && fg.getFoldingGraphNumber().equals(0)) {
                 verbose = true;
                 adjverbose = true;
@@ -179,6 +181,7 @@ public class PTGLNotations {
                 verbose = false;
                 adjverbose = false;
             }
+            */
                                                                 
             PTGLNotationFoldResult pnfr = new PTGLNotationFoldResult(fg);
             

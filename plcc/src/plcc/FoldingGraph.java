@@ -120,6 +120,14 @@ public class FoldingGraph extends SSEGraph {
     }
     
     /**
+     * Returns an identifier string of this graph for debug purposes, the string gives a unique identification of this FG (pdbid, chain, graphtype, fold number).
+     * @return a short string which is a unique identification of this FG (pdbid, chain, graphtype, fold number)
+     */
+    public String getQuickIDString() {
+        return this.pdbid + "_" + this.chainid + "_" + this.graphType + "_#" + this.foldingGraphNumber + "";
+    }
+    
+    /**
      * Returns the maximum of a mapping of vertex indices in this folding graph to vertex indices in the parent PG.
      * (See the function getVertexIndexListInParentGraph() for details.) This is used to create an ordering of the connected components of a protein graph.
      * @return the maximum of a mapping of vertex indices in this folding graph to vertex indices in the parent PG.
