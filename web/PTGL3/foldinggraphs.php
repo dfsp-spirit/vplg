@@ -56,7 +56,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<li>the ADJ notation: all SSEs of the protein graph are shown, order is from N-terminus (left) to C-terminus, and each edge represents a 3D contact between a pair of SSEs.</li>
 		<li>the RED notation: only SSEs of the folding graph are shown, order is from N-terminus (left) to C-terminus, and each edge represents a 3D contact between a pair of SSEs.</li>
 		<li>the SEQ notation: all SSEs of the protein graph are shown, order is from N-terminus (left) to C-terminus, and each edge represents the sequential order in the folding graph.</li>
-		<li>the KEY notation: only SSEs of the folding graph are shown, order is spatial, and each edge represents a 3D contact between a pair of SSEs.</li>
+		<li>the KEY notation: only SSEs of the folding graph are shown, order is spatial, and each edge represents a 3D contact between a pair of SSEs. Note that it is not possible to define a spatial ordering for <dfn title="A graph is bifurcated if any vertex in the graph has more than 2 neighbors.">bifurcated graphs</dfn>, so such graphs do not have a KEY notation.</li>
 		</ul>
 		Select the chain, folding graph type and visualization you are interested in below. You will then be able to browse all folding graphs of the selected protein graph in the respective visualization.
 		
@@ -139,7 +139,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			<h3> Search Results </h3>
 			<?php echo $tableString; /* The table string is constructed in backend/search.php, which is included by this file. */  
 			
-			      echo "<br><h3> Folding graph images </h3><br><p>The images below show the folding graphs (connected components) of the protein graph. The folding graphs and their linear notations are used to power the motif search and other features of this database server. Note that folding graphs of size 1 (isolated vertices in the graph) are not listed here. In the images, the following abbreviations are used: PG = protein graph, FG = folding graph, SQ = sequential in chain.</p>\n";
+			      echo "<br><h3> Folding graph images </h3><br><p>The images below show the folding graphs (connected components) of the protein graph. The folding graphs and their linear notations are used to power the motif search and other features of this database server. Note that folding graphs of size 1 (isolated vertices in the graph) are not listed here -- they would not be of any use. In the images, the following abbreviations are used: PG = protein graph, FG = folding graph, SQ = sequential in chain.</p>\n";
 			      echo $img_string;
 			
 			?>
