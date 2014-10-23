@@ -37,7 +37,7 @@ done
 
 echo "$APPTAG Submitted all protein graph computation jobs."
 
-$GRAPHLETSIM_JOB_SCRIPT="pbs_start_vplg_graphletsimilarity_whole_db.sh"
+GRAPHLETSIM_JOB_SCRIPT="pbs_start_vplg_graphletsimilarity_whole_db.sh"
 
 CMDGRAPHLETSIM="qsub $GRAPHLETSIM_JOB_SCRIPT"
 echo "$APPTAG Submitting job: '$CMDGRAPHLETSIM'"
