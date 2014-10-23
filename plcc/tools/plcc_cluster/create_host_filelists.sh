@@ -170,10 +170,13 @@ cd status/ && split --numeric-suffixes --suffix-length=3 --lines=$NUM_FILES_PER_
 
 echo "$APPTAG Wrote the filelists to status/ directory with basename '$FILELIST_BASENAME'."
 
+echo "$APPTAG Preparing to write files which assign the lists to the hosts..."
+
 ## Now write the files which assign the lists to the hosts
-for BIN_NUM in {1..$NUM_NODES}
+#for BIN_NUM in {1..$NUM_NODES}
+for BIN_NUM in $(seq $NUM_NODES)
 do
-   HOSTNAME=$(cat $NODE_FILE | awk "NR==$BIN_NUM {print}")
+   HOSTNAME=$(cat ../$NODE_FILE | awk "NR==$BIN_NUM {print}")
    echo "$APPTAG Preparing file list for node # ${BIN_NUM} with hostname '${HOSTNAME}'..."
 
    ## file lists start with suffix '000' (not '001'), so decrement
