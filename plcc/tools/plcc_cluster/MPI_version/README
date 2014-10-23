@@ -18,7 +18,8 @@ You should use the following steps to run the MPI version:
 0) 0.0) Copy the plcc.jar file, splitpdb.jar file and the 'lib' directory from your VPLG installation to the 'plcc_cluster/plcc_run/' subdirectory. Install dsspcmbi.
 
 1) Adapt settings in settings_statistics.cfg and the other script files (output path, plcc command line options, path to dssp, etc.).
-1.1) Run PLCC once (to make it create the config at ~/.plcc_settings) and edit the settings, e.g., database server credentials
+1.1) Run PLCC once with ''(to make it create the config at ~/.plcc_settings) and edit the settings, e.g., database server credentials, in ~/.plcc_settings
+1.2) Run PLCC again to test DB connection and create the tables: in the plcc_run/ directory, execute './plcc NONE -r'
 
 2) Update your local copy of the PDB (you can use the rsync script provided on the RCSB website).
 2.1) Optional: Update your local copy of the DSSP database (rsync script on DSSP website) and set path to it in settings_statistics.cfg
@@ -30,6 +31,10 @@ You should use the following steps to run the MPI version:
    
   The script now also splits the list into chunks automatically. The number of chunks is up to you, but if your cluster has n nodes,
   you should create at least n chunks. More wont hurt, of course. Again, see the settings section of the script.
+
+  Effects of the number of chunks:
+   * too few jobs:  if you create only 5 jobs but have 12 clsuter nodes, only 5 nodes will be used. It will be slow.
+   * too many jobs: if you create 1 job per PDB file, the PLCC binary and other stuff will be copied to the tmp_dir on the nodes for EVERY input file, which also slows things down.
  
   The files 'plcc_cluster/status/filelistMPInumXXX' should exist afterwards.
 

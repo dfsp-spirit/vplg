@@ -22,14 +22,14 @@ Here is the order in which to run the scripts and a description of what the scri
 Preparation:
 0.0) Copy the plcc.jar file, splitpdb.jar file and the 'lib' directory from your VPLG installation to the 'plcc_run' subdirectory. Install dsspcmbi.
 0.1) Edit the config file 'settings_statistics.cfg' to match your local settings, you must specify the paths to splitpdb and dsspcmbi and other stuff.
-0.2) Edit the PLCC config file (at '~/.plcc_settings', run 'plcc --create-config' once if you do not have that file yet) and configure the database server.
+0.2) Edit the PLCC config file (at '~/.plcc_settings', run 'plcc --create-config' once if you do not have that file yet) and configure the database server. Then run plcc to create the DB tables: './plcc NONE -r'.
 0.3) Get a copy of the PDB via rsync or update your copy if required. You can use the 'update_files_via_rsync.sh' script for this. Set path in settings as well.
 
 Actual Update:
 1) Run the 'update_db_from_new_pdb_files_on_a_single_machine.sh' script.
 2) Done. When the script finishes, the data should be in the database.
 
-NOTE: Processing the whole PDB database (~70,000 PDB files) takes several days (8 days on my machine) on a single desktop computer atm!
+NOTE: Processing the whole PDB database (~100,000 PDB files) takes several days (>8 days on my machine) on a single desktop computer atm!
 
 
 
