@@ -61,8 +61,9 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			represent secondary structure elements (SSEs, usually alpha helices and beta strands) or ligand molecules while the edges model contacts and 
 			relative orientations between the SSEs.
 			-->
+			<br /><br />
 			
-			<!-- <img src="./images/how_vplg_works.png"> -->
+			<p class="imgCenter"><img src="./images/ptgl_overview_trans.png" width="600"></p>
 			
 			<br /><br />
 			This web server allows you to search for protein motifs which can be detected in the graphs. It also implements graph-based similarity measures to search for protein chains which are similar to a given query protein.
