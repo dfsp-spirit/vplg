@@ -74,7 +74,7 @@ echo $APPTAG pbs job id is $PBS_JOBID
 # This tells PBS what directory to go to
 scp -r $MYHOME/software/plcc_cluster/ $TMPDIR/
 PLCC_CLUSTER_DIR="$TMPDIR/plcc_cluster"
-chmod -R ugo +rwx $TMPDIR/
+chmod -R ugo+rwx $TMPDIR/
 
 
 # test one of them to be sure

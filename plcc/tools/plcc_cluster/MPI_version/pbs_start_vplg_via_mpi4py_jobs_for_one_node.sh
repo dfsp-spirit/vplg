@@ -127,7 +127,7 @@ export PATH="/usr/lib64/mpi/gcc/openmpi/bin:$PATH"
 ## This will also coyp the graphletanalyer, which is in plcc_run/
 scp -r $MYHOME/software/plcc_cluster/ $TMPDIR/
 PLCC_CLUSTER_DIR="$TMPDIR/plcc_cluster"
-chmod -R ugo +rwx $TMPDIR/
+chmod -R ugo+rwx $TMPDIR/
 
 # we now use plcc_cluster from the global dir
 #PLCC_CLUSTER_DIR="$MYHOME/software/plcc_cluster"
