@@ -219,7 +219,7 @@ public class Settings {
         defSet("plcc_B_kavosh_format_directed", "true", "Whether to treat the graphs as directed for the Kavosh output. If set to true, each edge (a, b) will appear twice in the output file: once as (a, b) and again as (b, a).");
         defSet("plcc_B_output_plcc", "false", "Whether to save computed protein graphs to text files in PLCC format.");
         defSet("plcc_B_output_perlfg", "false", "Whether to save computed protein graphs to text files in the PTGL format used by the Perl script to compute folding graph notations.");
-        defSet("plcc_B_output_json", "false", "Whether to save computed protein graphs to text files in JSON format. Note that JSON format contains the full graph and is quite large. It is useful mainly for the web API.");
+        defSet("plcc_B_output_json", "true", "Whether to save computed protein graphs to text files in JSON format. Note that JSON format contains the full graph and is quite large. It is useful mainly for the web API.");
         
         defSet("plcc_B_output_compgraph_GML", "true", "Whether to save computed detailed complex graphs (including SSE info) to text files in Graph Modelling Language format (GML).");
         defSet("plcc_B_output_compgraph_TGF", "false", "Whether to save computed detailed complex graphs (including SSE info) to text files in Trivial Graph Format (TGF).");

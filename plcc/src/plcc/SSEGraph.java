@@ -14,6 +14,7 @@ import algorithms.CompatGraphComputation;
 import algorithms.TreeNodeData;
 import com.google.gson.Gson;
 import datastructures.Graph;
+import datastructures.PLGraph;
 import datastructures.SimpleAttributedGraphAdapter;
 import datastructures.SimpleGraphAdapter;
 import datastructures.SimpleGraphInterface;
@@ -1746,10 +1747,11 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
      * the JSON is the full graph including atoms and may thus be quite large.
      */
     public String toJSONFormat() {
-        //Gson gson = new Gson();
-        //String json = gson.toJson(this);  
-        //return json;
-        return "";
+        PLGraph plg = this.toPLGraph();
+        Gson gson = new Gson();
+        String json = gson.toJson(plg);  
+        return json;
+        //return "";
     }
     
     
@@ -5717,8 +5719,27 @@ E	3	3	3
         }
         return vertIndices;
     }
-                    
-    
+        
+    /**
+     * Returns a simple PLGraph representation of this graph. This simple graph can be converted to JSON then.
+     * @return a simplified version of this graph as a PLGraph
+     */
+    public PLGraph toPLGraph() {
+        PLGraph<String> plg = new PLGraph<>();
+        plg.setPdbid(this.pdbid);
+        plg.setChain(this.chainid);
+        plg.setGraphType(this.graphType);
+                
+        for(SSE s : this.sseList) {
+            plg.addVertex(s.shortLabel());
+        }
+        
+        for(Integer[] e : this.getEdgeList()) {
+            plg.addEdge(this.sseList.get(e[0]).shortLabel(), this.sseList.get(e[1]).shortLabel());
+        }
+        
+        return plg;
+    }
 
 }
 

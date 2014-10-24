@@ -2162,8 +2162,7 @@ public class Main {
                         graphFormatsWritten += "json "; numFormatsWritten++;
                         pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_JSON, new File(jsonGraphFile));
                     }
-                }
-                
+                }                
                 
                 
                 /*
@@ -4452,7 +4451,7 @@ public class Main {
      * Prints a short note on how to use this program to STDOUT. Called if the user runs the program without command line arguments (most likely because he does not know about them).
      */
     public static void usage_short() {
-        System.out.println("This program is part of VPLG, http://vplg.sourceforge.net. Copyright Tim Schaefer 2012.");
+        System.out.println("This program is part of VPLG, http://vplg.sourceforge.net. Copyright MolBI Group 2012 - 2014.");
         System.out.println("VPLG is free software and comes without any warranty. See LICENSE for details.");        
         System.out.println("USAGE:         java -jar plcc.jar <pdbid> [OPTIONS]");
         System.out.println("DETAILED HELP: java -jar plcc.jar --help");

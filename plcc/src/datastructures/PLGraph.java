@@ -10,14 +10,19 @@ package datastructures;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 /**
  * A protein ligand graph, which uses SSEs as vertices and has both edge and vertex types. This is a sparse
  * implementation built on adjacency lists. It is based on the SPARGEL library. You need to add SPARGEL to the PLCC dependencies.
  * @author ts
+ * @param <V> the vertex type
  */
-public class PLGraph<VertexSSE>  {
+public class PLGraph<V>  {
     
     /**
      * The RCSB identifier of this protein. A 4-letter string, e.g., '7TIM'.
@@ -32,23 +37,45 @@ public class PLGraph<VertexSSE>  {
     /**
      * The PTGL graph type as an int, see the PLGRaph.PLGRAPH_TYPE* constants.
      */ 
-    private int graphType;
+    private String graphType;
     
-    private ArrayList<VertexSSE> vertices;
+    private List<V> vertices;
+    private HashMap<V, Set<V>> edges;
     
     public PLGraph() {
         super();
         this.pdbid = "";
         this.chain = "";
-        this.graphType = PLGRAPH_TYPE_NONE;
+        this.graphType = PLGRAPH_TYPE_STRING_NONE;
+        this.vertices = new ArrayList<>();
+        this.edges = new HashMap<>();
     }    
     
-    public PLGraph(ArrayList<VertexSSE> vertices) {
+    public PLGraph(List<V> vertices) {
         //super(vertices);
         this.pdbid = "";
         this.chain = "";
-        this.graphType = PLGRAPH_TYPE_NONE;
+        this.graphType = PLGRAPH_TYPE_STRING_NONE;
         this.vertices = vertices;
+        this.edges = new HashMap<>();
+    }
+    
+    public boolean addVertex(V v) {
+        if( ! vertices.contains(v)) {
+            this.vertices.add(v);
+            this.edges.put(v, new HashSet<V>());
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean addEdge(V v1, V v2) {
+        if(vertices.contains(v1) && vertices.contains(v2)) {
+            edges.get(v1).add(v2);
+            edges.get(v2).add(v1);
+            return true;
+        }
+        return false;
     }
 
     public String getPdbid() {
@@ -67,11 +94,11 @@ public class PLGraph<VertexSSE>  {
         this.chain = chain;
     }
 
-    public int getGraphType() {
+    public String getGraphType() {
         return graphType;
     }
 
-    public void setGraphType(int graphType) {
+    public void setGraphType(String graphType) {
         this.graphType = graphType;
     }
     
@@ -83,6 +110,15 @@ public class PLGraph<VertexSSE>  {
     public static final int PLGRAPH_TYPE_ALPHALIG = 4;
     public static final int PLGRAPH_TYPE_BETALIG = 5;
     public static final int PLGRAPH_TYPE_ALBELIG = 6;
+    
+    // protein ligand graph types
+    public static final String PLGRAPH_TYPE_STRING_NONE = "none";
+    public static final String PLGRAPH_TYPE_STRING_ALPHA = "alpha";
+    public static final String PLGRAPH_TYPE_STRING_BETA = "beta";
+    public static final String PLGRAPH_TYPE_STRING_ALBE = "albe";
+    public static final String PLGRAPH_TYPE_STRING_ALPHALIG = "alphalig";
+    public static final String PLGRAPH_TYPE_STRING_BETALIG = "betalig";
+    public static final String PLGRAPH_TYPE_STRING_ALBELIG = "albelig";
     
     // vertex types (SSEs)
     public static final int VERTEX_TYPE_NONE = 0;
