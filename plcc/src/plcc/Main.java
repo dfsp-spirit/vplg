@@ -2100,7 +2100,13 @@ public class Main {
                     }
                 }
                 
-                Boolean gmlWritten = false; String gmlFileNoPath = "";    // for DB path reconstruction later
+                String gmlFileNoPath = "";    // for DB path reconstruction later
+                String jsonFileNoPath = "";
+                String dotlanguageFileNoPath = "";
+                String kavoshFileNoPath = "";
+                String plccFileNoPath = "";
+                
+                HashMap<String, String> writtenFormatsDBFilesNoPath = new HashMap<>();
                 
                 String graphFormatsWritten = "";
                 Integer numFormatsWritten = 0;
@@ -2108,7 +2114,7 @@ public class Main {
                     String gmlFile = filePathGraphs + fs + fileNameWithoutExtension + ".gml";
                     gmlFileNoPath = fileNameWithoutExtension + ".gml";
                     if(IO.stringToTextFile(gmlFile, pg.toGraphModellingLanguageFormat())) {
-                        graphFormatsWritten += "gml "; numFormatsWritten++; gmlWritten = true;
+                        graphFormatsWritten += "gml "; numFormatsWritten++; writtenFormatsDBFilesNoPath.put(GraphFormats.GRAPHFORMAT_GML, gmlFileNoPath);
                         pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_GML, new File(gmlFile));
                     }
                 }
@@ -2121,15 +2127,17 @@ public class Main {
                 }
                 if(Settings.getBoolean("plcc_B_output_DOT")) {
                     String dotLangFile = filePathGraphs + fs + fileNameWithoutExtension + ".gv";
+                    dotlanguageFileNoPath = fileNameWithoutExtension + ".gv";
                     if(IO.stringToTextFile(dotLangFile, pg.toDOTLanguageFormat())) {
-                        graphFormatsWritten += "gv "; numFormatsWritten++;
+                        graphFormatsWritten += "gv "; numFormatsWritten++; writtenFormatsDBFilesNoPath.put(GraphFormats.GRAPHFORMAT_DOTLANGUAGE, dotlanguageFileNoPath);
                         pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_DOTLANGUAGE, new File(dotLangFile));
                     }
                 }
                 if(Settings.getBoolean("plcc_B_output_kavosh")) {
                     String kavoshFile = filePathGraphs + fs + fileNameWithoutExtension + ".kavosh";
+                    kavoshFileNoPath = fileNameWithoutExtension + ".kavosh";
                     if(IO.stringToTextFile(kavoshFile, pg.toKavoshFormat())) {
-                        graphFormatsWritten += "kavosh "; numFormatsWritten++;
+                        graphFormatsWritten += "kavosh "; numFormatsWritten++; writtenFormatsDBFilesNoPath.put(GraphFormats.GRAPHFORMAT_KAVOSH, kavoshFileNoPath);
                         pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_KAVOSH, new File(kavoshFile));
                     }
                 }
@@ -2144,8 +2152,9 @@ public class Main {
                 // write the SSE info text file for the image (plcc graph format file)
                 if(Settings.getBoolean("plcc_B_output_plcc")) {
                     String plccGraphFile = filePathGraphs + fs + fileNameWithoutExtension + ".plg";
+                    plccFileNoPath = fileNameWithoutExtension + ".plg";
                     if(IO.stringToTextFile(plccGraphFile, pg.toVPLGGraphFormat())) {
-                        graphFormatsWritten += "plg "; numFormatsWritten++;
+                        graphFormatsWritten += "plg "; numFormatsWritten++; writtenFormatsDBFilesNoPath.put(GraphFormats.GRAPHFORMAT_VPLG, plccFileNoPath);
                         pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_VPLG, new File(plccGraphFile));
                     }
                 }
@@ -2158,8 +2167,9 @@ public class Main {
                 }
                 if(Settings.getBoolean("plcc_B_output_json")) {
                     String jsonGraphFile = filePathGraphs + fs + fileNameWithoutExtension + ".json";
+                    jsonFileNoPath = fileNameWithoutExtension + ".json";
                     if(IO.stringToTextFile(jsonGraphFile, pg.toJSONFormat())) {
-                        graphFormatsWritten += "json "; numFormatsWritten++;
+                        graphFormatsWritten += "json "; numFormatsWritten++; writtenFormatsDBFilesNoPath.put(GraphFormats.GRAPHFORMAT_JSON, jsonFileNoPath);
                         pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_JSON, new File(jsonGraphFile));
                     }
                 }                
@@ -2202,30 +2212,28 @@ public class Main {
                     }
                     
                     // update GML path
-                    if(gmlWritten) {
+                    if(writtenFormatsDBFilesNoPath.size() > 0) {
                         Long graphDBID = -1L;
                         try {
                             graphDBID = DBManager.getDBProteinGraphID(pdbid, chain, gt);
                         } catch(SQLException ex) {
                             DP.getInstance().e("Main", "Could not find graph in database to update GML file path: '" + ex.getMessage() + "'.");
                         }
-                        if(graphDBID > 0) {
-                            String gmlFileDBPath = gmlFileNoPath;
-                            //System.out.println("#####gmlFile=" + gmlFileNoPath + ".");
-
-                            if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
-                                gmlFileDBPath = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain) + fs + gmlFileDBPath;
-                                //System.out.println("#####TREE: gmlFileDBPath=" + gmlFileDBPath + ".");
-                            }
+                        if(graphDBID > 0) {                                                                                                               
                             
-                            gmlFileDBPath = IO.stripTrailingShitFromPathIfThere(gmlFileDBPath);
-                            //System.out.println("#####stripped: gmlFileDBPath=" + gmlFileDBPath + ".");
-                            
-                            try {
-                                DBManager.updateProteinGraphTextformatPathInDB(graphDBID, "GML", gmlFileDBPath);
-                            } catch(SQLException ex) {
-                                DP.getInstance().e("Main", "Could not update GML file path of graph in database: '" + ex.getMessage() + "'.");
-                            }
+                            for(String format : writtenFormatsDBFilesNoPath.keySet()) {
+                                String fileDBPath = writtenFormatsDBFilesNoPath.get(format);
+                                
+                                if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
+                                    fileDBPath = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain) + fs + fileDBPath;
+                                }
+                                
+                                try {
+                                    DBManager.updateProteinGraphTextformatPathInDB(graphDBID, format, IO.stripTrailingShitFromPathIfThere(fileDBPath));
+                                } catch(SQLException ex) {
+                                    DP.getInstance().e("Main", "Could not update format '" + format + "' file path of graph in database: '" + ex.getMessage() + "'.");
+                                }
+                            }                                                        
                         }
                     }
                     

@@ -632,7 +632,7 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_ssecontact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null references " + tbl_contacttypes + " ON DELETE CASCADE, check (sse1 < sse2));");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact_complexgraph + " (ssecontact_complexgraph_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, complex_contact_type int not null references " + tbl_complexcontacttypes + " ON DELETE CASCADE check (sse1 < sse2));");            
             doInsertQuery("CREATE TABLE " + tbl_complex_contact_stats + " (complex_contact_id serial primary key, chain1 int not null references " + tbl_chain + " ON DELETE CASCADE, chain2 int not null references " + tbl_chain + " ON DELETE CASCADE, contact_num_HH int not null, contact_num_HS int not null, contact_num_HL int not null, contact_num_SS int not null, contact_num_SL int not null, contact_num_LL int not null, contact_num_DS int not null);");
-            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_json text, graph_image_png text, graph_image_svg text, graph_image_pdf text, filepath_graphfile_gml text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
+            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_json text, graph_image_png text, graph_image_svg text, graph_image_pdf text, filepath_graphfile_gml text, filepath_graphfile_kavosh text, filepath_graphfile_plcc text, filepath_graphfile_dotlanguage text, filepath_graphfile_json text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, fg_number int not null, fold_name varchar(2) not null, first_vertex_position_in_parent int not null, graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_complexgraph + " (complexgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, graph_string_gml text, graph_string_kavosh text, graph_image_svg text, graph_image_png text);");
             doInsertQuery("CREATE TABLE " + tbl_motiftype + " (motiftype_id serial primary key, motiftype_name varchar(40));");
@@ -2998,8 +2998,16 @@ public class DBManager {
         PreparedStatement statement = null;
         String dbFieldNameGraphFile = "";
 
-        if(format.equals("GML")) {
-            dbFieldNameGraphFile = "filepath_graphfile_gml";
+        if(format.equals(GraphFormats.GRAPHFORMAT_GML)) {
+            dbFieldNameGraphFile = "filepath_graphfile_gml";            
+        } else if(format.equals(GraphFormats.GRAPHFORMAT_JSON)) {
+            dbFieldNameGraphFile = "filepath_graphfile_json";
+        } else if(format.equals(GraphFormats.GRAPHFORMAT_VPLG)) {
+            dbFieldNameGraphFile = "filepath_graphfile_plcc";
+        } else if(format.equals(GraphFormats.GRAPHFORMAT_DOTLANGUAGE)) {
+            dbFieldNameGraphFile = "filepath_graphfile_dotlanguage";
+        } else if(format.equals(GraphFormats.GRAPHFORMAT_KAVOSH)) {
+            dbFieldNameGraphFile = "filepath_graphfile_kavosh";
         } else {
             // TODO: create fields in DB and handle other fields here
             DP.getInstance().w("updateProteinGraphTextformatPathInDB", "Format not supported by DB scheme yet, ignoring.");
