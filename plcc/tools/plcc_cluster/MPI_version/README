@@ -9,6 +9,8 @@ This version allows you to use all cores of each node. An OpenPBS script is avai
 
 Note that the files in this directory (plcc_cluster/MPI_version/)also use scripts from the level above it (plcc_cluster/).
 
+Requirements: These scripts use mpi4py, which requires a working (Open)MPI installation and of course Python. Once you have this, you need to compile and install mpi4py.
+
 
 USING THESE SCRIPTS
 ====================

@@ -21,7 +21,7 @@
 # qsub myjobscript
 #
 # job name (default is name of pbs script file)
-#PBS -N myjob
+#PBS -N vplgjobpackage
 # standard queue is called batch
 #PBS -q batch
 #
@@ -117,10 +117,14 @@ echo "$APPTAG Loading bash modules..."
 module load gnu-openmpi
 #module load openmpi
 
-## set path to openmpi binary
+## set path to openmpi binaries, i.e., the 'mpirun' command we need in the end to execute the script
 export PATH="/usr/lib64/mpi/gcc/openmpi/bin:$PATH"
 #export LD_LIBRARY_PATH="/usr/lib64/mpi/gcc/openmpi/lib64:$LD_LIBRARY_PATH"
 
+if [ ! -f "/usr/lib64/mpi/gcc/openmpi/bin/mpirun" ]; then
+  echo "$APPTAG ERROR: mpirun binary not found."
+  exit 1
+fi
 
 ## copy my python MPI job scripts to temporary directory 
 #echo "$APPTAG Copying files to temporary directory '$TMPDIR'..."
@@ -192,14 +196,14 @@ chmod ugo+rwx $PLCC_OUTPUT_DIR || echo "$APPTAG ERROR: Could not change fs permi
 #scp -r $MYHOME/software/openmpi/mpi4py/ $TMPDIR/
 #MPI4PY_DIR="$TMPDIR/mpi4py"
 
-MPI4PY_DIR="/develop/openmpi_mpi4py/mpi4py"
+#MPI4PY_DIR="/develop/openmpi_mpi4py/mpi4py"
 #MPI4PY_SRC_DIR="$MPI4PY_DIR/src/MPI"
 
-if [ ! -d "$MPI4PY_DIR" ]; then
-    echo "$APPTAG ERROR: The mpi4py directory '$MPI4PY_DIR' does not exist."
-    echo "$APPTAG ERROR: The mpi4py directory '$MPI4PY_DIR' does not exist." >> $ERRORLOG
-    exit 1
-fi
+#if [ ! -d "$MPI4PY_DIR" ]; then
+#    echo "$APPTAG ERROR: The mpi4py directory '$MPI4PY_DIR' does not exist."
+#    echo "$APPTAG ERROR: The mpi4py directory '$MPI4PY_DIR' does not exist." >> $ERRORLOG
+#    exit 1
+#fi
 
 #if [ ! -d "$MPI4PY_SRC_DIR" ]; then
 #    echo "$APPTAG ERROR: The mpi4py source directory '$MPI4PY_SRC_DIR' does not exist. Copying seems to have failed."
@@ -209,7 +213,7 @@ fi
 #export PYTHONPATH="$MPI4PY_SRC_DIR:$PYTHONPATH"
 #export PYTHONPATH="$MPI4PY_SRC_DIR/include:$PYTHONPATH"
 #export PYTHONPATH="/develop/python2.7_site_packages/:$PYTHONPATH"
-export PYTHONPATH="$MPI4PY_DIR/build/lib.linux-x86_64-2.7:$PYTHONPATH"
+#export PYTHONPATH="$MPI4PY_DIR/build/lib.linux-x86_64-2.7:$PYTHONPATH"
 
 if [ ! -r "$INPUT_FILE" ]; then
     echo "$APPTAG ERROR: Cannot read input file '$INPUT_FILE'. This should be a file holding paths to all PDB files, one per line. Exiting."
@@ -225,8 +229,13 @@ MPI4PY_SCRIPT="mpi4py_vplg.py"
 echo "$APPTAG Running mpi4py python scripts via mpirun..."
 
 #PYTHON="python"
-PYTHON="$MPI4PY_DIR/build/exe.linux-x86_64-2.7/python2.7-mpi"
-export LD_LIBRARY_PATH="$MPI4PY_DIR/build/lib.linux-x86_64-2.7/mpi4py/:$LD_LIBRARY_PATH"
+#PYTHON="$MPI4PY_DIR/build/exe.linux-x86_64-2.7/python2.7-mpi"
+PYTHON="$(which python)"
+
+## export the path to the 'MPI.so' library file
+#export LD_LIBRARY_PATH="$MPI4PY_DIR/build/lib.linux-x86_64-2.7/mpi4py/:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="/usr/lib64/python2.7/site-packages/mpi4py/:$LD_LIBRARY_PATH"
+
 
 ## We need libmpi.so.0, but only have libmpi.so.1 at /usr/lib64/mpi/gcc/openmpi/lib64/libmpi.so.1.
 #  So we create our own lib dir and symlink it from there.
@@ -239,6 +248,8 @@ export LD_LIBRARY_PATH="$MPI4PY_DIR/build/lib.linux-x86_64-2.7/mpi4py/:$LD_LIBRA
 #ln -s /develop/openmpi_build/lib/libopen-pal.so $OPENMPI_LIBS/libopen-pal.so.0
 #ln -s /develop/openmpi_build/lib/libopen-rte.so $OPENMPI_LIBS/libopen-rte.so.0
 
+## the path to the openmpi libraries, i.e., 'libmpi.so', and many others
+#OPENMPI_LIBS="/develop/openmpi_mpi4py/openmpi/lib/"
 OPENMPI_LIBS="/develop/openmpi_mpi4py/openmpi/lib/"
 
 if [ ! -d "$OPENMPI_LIBS" ]; then
@@ -246,6 +257,13 @@ if [ ! -d "$OPENMPI_LIBS" ]; then
     echo "$APPTAG ERROR: Directory '$OPENMPI_LIBS' does not exist. This should contain the openMPI libs like libmpi.so, libopen-pal.so and libopen-rte.so. Exiting." >> $ERRORLOG
     exit 1
 fi
+
+
+if [ ! -f "$OPENMPI_LIBS/libmpi.so" ]; then
+	echo "$APPTAG ERRORO libmpi.so missing in '$OPENMPI_LIBS'."
+	exit 1
+fi
+
 
 export LD_LIBRARY_PATH="$OPENMPI_LIBS:$LD_LIBRARY_PATH"
 
@@ -257,7 +275,7 @@ OPENMPI_DEFAULT_HOSTFILE="none"
 
 
 
-cd $PLCC_CLUSTER_DIR/MPI_version/
+cd "$PLCC_CLUSTER_DIR/MPI_version/"
 MPIRUN_CMD="mpirun --default-hostfile $OPENMPI_DEFAULT_HOSTFILE -np $NUM_PROCESSORS_PER_NODE $PYTHON $MPI4PY_SCRIPT $INPUT_FILE"
 
 echo "$APPTAG Now in directory '$(pwd)'."
