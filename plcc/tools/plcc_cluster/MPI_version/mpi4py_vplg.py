@@ -13,9 +13,9 @@ import sys
 import os
 print apptag + "PATH is '" + str(sys.path) + "'.\n"
 curpath=os.getcwd()
-sys.path.append(str(curpath + '/../../mpi4py/src/MPI/'))
-sys.path.append(str(curpath + '/../../mpi4py/build/lib.linux-x86_64-2.6/mpi4py/include/'))
-print apptag + "Appended copied MPI dirs to PATH. PATH is now '" + str(sys.path) + "'.\n"
+#sys.path.append(str(curpath + '/../../mpi4py/src/MPI/'))
+#sys.path.append(str(curpath + '/../../mpi4py/build/lib.linux-x86_64-2.6/mpi4py/include/'))
+#print apptag + "Appended copied MPI dirs to PATH. PATH is now '" + str(sys.path) + "'.\n"
 from mpi4py import MPI
 from mpi4py_tools import *
 import shlex, subprocess
@@ -96,3 +96,4 @@ print apptag + "All my jobs are done."
 #       out.write(str(r)+"\n")
 #    ### </handle output>
 MPI.Finalize()
+

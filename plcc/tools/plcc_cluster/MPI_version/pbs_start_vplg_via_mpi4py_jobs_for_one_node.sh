@@ -250,7 +250,7 @@ export LD_LIBRARY_PATH="/usr/lib64/python2.7/site-packages/mpi4py/:$LD_LIBRARY_P
 
 ## the path to the openmpi libraries, i.e., 'libmpi.so', and many others
 #OPENMPI_LIBS="/develop/openmpi_mpi4py/openmpi/lib/"
-OPENMPI_LIBS="/develop/openmpi_mpi4py/openmpi/lib/"
+OPENMPI_LIBS="/usr/lib64/mpi/gcc/openmpi/lib64/"
 
 if [ ! -d "$OPENMPI_LIBS" ]; then
     echo "$APPTAG ERROR: Directory '$OPENMPI_LIBS' does not exist. This should contain the openMPI libs like libmpi.so, libopen-pal.so and libopen-rte.so. Exiting."
@@ -276,7 +276,10 @@ OPENMPI_DEFAULT_HOSTFILE="none"
 
 
 cd "$PLCC_CLUSTER_DIR/MPI_version/"
-MPIRUN_CMD="mpirun --default-hostfile $OPENMPI_DEFAULT_HOSTFILE -np $NUM_PROCESSORS_PER_NODE $PYTHON $MPI4PY_SCRIPT $INPUT_FILE"
+
+MPIRUN_BINARY=$(which mpirun)
+
+MPIRUN_CMD="$MPIRUN_BINARY --default-hostfile $OPENMPI_DEFAULT_HOSTFILE -np $NUM_PROCESSORS_PER_NODE $PYTHON $MPI4PY_SCRIPT $INPUT_FILE"
 
 echo "$APPTAG Now in directory '$(pwd)'."
 echo "$APPTAG The mpirun command to be executed is '$MPIRUN_CMD'."
