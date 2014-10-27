@@ -95,5 +95,5 @@ print apptag + "All my jobs are done."
 #    for r in all_result:
 #       out.write(str(r)+"\n")
 #    ### </handle output>
-MPI.Finalize()
+#MPI.Finalize()
 

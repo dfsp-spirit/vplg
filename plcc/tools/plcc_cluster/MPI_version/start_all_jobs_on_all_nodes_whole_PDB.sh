@@ -12,6 +12,8 @@ APPTAG="[START_ALL_MPI]"
 MYHOME="/home/ts"
 PLCC_CLUSTER_DIR="$MYHOME/software/plcc_cluster"
 
+DEBUG_START_ALL_MPI="true"
+
 ## settings
 SINGLE_JOB_SCRIPT="pbs_start_vplg_via_mpi4py_jobs_for_one_node.sh"
 
@@ -26,16 +28,25 @@ if [ ! -f "$FIRST_FILE_LIST" ]; then
 fi
 
 
-## submit a job for each file list
-for FLIST in $PLCC_CLUSTER_DIR/status/MPIfilelistnum*;
-do
-  ENV_VARIABLES="PDBFILELIST=$FLIST"
-  CMD="qsub $SINGLE_JOB_SCRIPT -v $ENV_VARIABLES"
-  echo "$APPTAG Submitting job: '$CMD'"
-  $CMD
-done
+if [ "$DEBUG_START_ALL_MPI" = "true" ]; then
+	  FLIST="$PLCC_CLUSTER_DIR/status/MPIfilelistnum001"
+	  ENV_VARIABLES="PDBFILELIST=$FLIST"
+	  CMD="qsub $SINGLE_JOB_SCRIPT -v $ENV_VARIABLES"
+	  echo "$APPTAG DEBUG: Submitting job: '$CMD'"
+	  $CMD
+	echo "$APPTAG WARNING: DEBUG active, submitted only the first job file, all others were ignored."
+else
+	## submit a job for each file list
+	for FLIST in $PLCC_CLUSTER_DIR/status/MPIfilelistnum*;
+	do
+	  ENV_VARIABLES="PDBFILELIST=$FLIST"
+	  CMD="qsub $SINGLE_JOB_SCRIPT -v $ENV_VARIABLES"
+	  echo "$APPTAG Submitting job: '$CMD'"
+	  $CMD
+	done
 
-echo "$APPTAG Submitted all protein graph computation jobs."
+	echo "$APPTAG Submitted all protein graph computation jobs."
+fi
 
 
 #GRAPHLETSIM_JOB_SCRIPT="pbs_start_vplg_graphletsimilarity_whole_db.sh"
