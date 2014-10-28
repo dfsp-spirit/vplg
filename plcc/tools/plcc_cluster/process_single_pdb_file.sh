@@ -42,7 +42,7 @@ function del_output()
 
     ## e.g. 'pdb3kmf.ent.gz'
     RAWPDBFILENAME="${PDBFILE_DL_PREFIX}${L_PDBID}${PDBFILE_DL_SUFFIX}"
-    if [ -f $RAWPDBFILENAME ]; then
+    if [ -w $RAWPDBFILENAME ]; then
 	rm -f $RAWPDBFILENAME
     fi
 
@@ -211,7 +211,7 @@ ERROR_LOG_CREATE_DSSP_FILE="/dev/null"
 
 for L_LOGFILE in $DBINSERT_LOG $ERROR_LOG_PLCC $ERROR_LOG_GET_PDB_FILE $ERROR_LOG_CREATE_DSSP_FILE
 do
-    if [ -f $L_LOGFILE ]; then
+    if [ -f $L_LOGFILE -a -w $L_LOGFILE ]; then
 	rm -f $L_LOGFILE
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG $PDBID ##### ERROR: Could not delete old logfile '$L_LOGFILE'. Check permissions."
