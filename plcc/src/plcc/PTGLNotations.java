@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import tools.DP;
 
 /**
@@ -851,6 +852,93 @@ public class PTGLNotations {
                     System.out.println("    KEY notation done.");
                     System.out.println("    -----------------------------.");
                 }
+                
+                //#########################################################################
+                //############################### KEY impl by Tim #########################
+                //#########################################################################
+                
+                
+                if(isNotBifurcated) {
+                    hasKeyNotation = true;
+                // determine the orientations of the vertices in the image (up/down). if two adjacent SSEs are parallel, they point in the same direction in the image. if they are antiparallel, they point into different directions.
+            Integer[] orientationsSpatOrder = new Integer[fg.size];    // the heading of the vertex in the image (UP or DOWN). This is in the order of spatOrder variable, not the the original vertex list in the SSEList variable.
+            Integer[] orientationsSeqOrder = new Integer[fg.size];   
+            List<Integer> keypos = new ArrayList<>();
+                    keypos.addAll(pos.keySet());
+                    Collections.sort(keypos);
+                    
+            List<Integer> keyposParentIndicesSeqOrder = keypos;
+            List<Integer> keyposFGIndices = new ArrayList<>();
+            //DP.getInstance().d("SSEGraph", "parentVertexPosInFG=" + IO.intListToString(parentVertexPosInFG) + ".");
+            
+            List<Integer> fgVertexPosInParent = fg.getVertexIndexListInParentGraph();
+        List<Integer> parentVertexPosInFG = ProtGraph.computeParentGraphVertexPositionsInFoldingGraph(fgVertexPosInParent, g.size);
+            Integer v;
+            for(int l = 0; l < keyposParentIndicesSeqOrder.size(); l++) {
+                v = parentVertexPosInFG.get(keyposParentIndicesSeqOrder.get(l));
+                if(v < 0) { 
+                    DP.getInstance().e("SSEGRaph", "Keypos parent index #" + i + " is " + v + ", skipping.");
+                } else {
+                    keyposFGIndices.add(v);
+                }
+            }
+            
+            //DP.getInstance().d("keyposFGIndices=" + IO.intListToString(keyposFGIndices));
+            
+            //assert keyposFGIndices.size() == fg.size;
+            if(keyposFGIndices.size() != fg.getSize()) {
+                DP.getInstance().e("SSEGRaph", "keyposFGIndices.size()=" + keyposFGIndices.size() + ", fg.size=" + fg.size + ".");
+            }
+            
+            Integer keystartFGIndex = keystart;
+                Integer firstVertexSpatFGIndex = keystartFGIndex;
+            orientationsSpatOrder[0] = FoldingGraph.ORIENTATION_UPWARDS;  // heading of the 1st vertex is up by definition (it has no predecessor)
+            orientationsSeqOrder[firstVertexSpatFGIndex] = FoldingGraph.ORIENTATION_UPWARDS;
+                                  
+            StringBuilder KEYNotation = new StringBuilder();
+            
+           
+            
+            KEYNotation.append(bracketStart);
+            KEYNotation.append(fg.getVertex(keystartFGIndex).getLinearNotationLabel());
+            List<Integer> keyposFGIndicesSpatOrder = keypos;
+            Integer currentVert, lastVert;
+            if(keyposFGIndices.size() > 1) {
+                
+                for(int l = 1; l < keyposFGIndicesSpatOrder.size(); l++) {
+                    
+                    if(l < (keyposFGIndicesSpatOrder.size())) {
+                        KEYNotation.append(",");
+                    }
+                    
+                    currentVert = keyposFGIndicesSpatOrder.get(l);
+                    lastVert = keyposFGIndicesSpatOrder.get(l-1);
+                    
+                    KEYNotation.append(currentVert - lastVert);
+                    
+                    Integer spatRel = fg.getContactType(lastVert, currentVert);
+                    
+                    if(Objects.equals(spatRel, SpatRel.PARALLEL)) {
+                        // keep orientation, this means crossover
+                        KEYNotation.append("x");
+                        orientationsSpatOrder[l] = orientationsSpatOrder[l-1];
+                        orientationsSeqOrder[currentVert] = orientationsSpatOrder[l];
+                    }                    
+                    else {                                                                
+                        // all other spatial relations, e.g. SpatRel.ANTIPARALLEL, SpatRel.LIGAND, SpatRel.BACKBONE and SpatRel.MIXED: invert orientation
+                        orientationsSpatOrder[l] = (Objects.equals(orientationsSpatOrder[l-1], FoldingGraph.ORIENTATION_UPWARDS) ? FoldingGraph.ORIENTATION_DOWNWARDS : FoldingGraph.ORIENTATION_UPWARDS);
+                        orientationsSeqOrder[currentVert] = orientationsSpatOrder[l];
+                    }
+                    KEYNotation.append(fg.getVertex(currentVert).getLinearNotationLabel());
+                }                                                              
+                
+            }      
+            KEYNotation.append(bracketEnd);
+            
+                System.out.println("KEY NOTATION TIM: " + KEYNotation.toString() + "");
+                
+                }
+            
                 
                 //#########################################################################
                 //############################### SEQ #####################################

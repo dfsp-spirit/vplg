@@ -5186,10 +5186,10 @@ E	3	3	3
                                   
             StringBuilder KEYNotation = new StringBuilder();
             
-            String startBracket = "{";
-            String endBracket = "}";
+            String bracketStart = "{";
+            String bracketEnd = "}";
             
-            KEYNotation.append(startBracket);
+            KEYNotation.append(bracketStart);
             KEYNotation.append(fg.getVertex(keystartFGIndex).getLinearNotationLabel());
             
             Integer currentVert, lastVert;
@@ -5223,7 +5223,7 @@ E	3	3	3
                 }                                                              
                 
             }      
-            KEYNotation.append(endBracket);
+            KEYNotation.append(bracketEnd);
             
             //DP.getInstance().d("orientationsSpatOrder=" + IO.intArrayToString(orientationsSpatOrder));
             //DP.getInstance().d("orientationsSeqOrder=" + IO.intArrayToString(orientationsSeqOrder));
