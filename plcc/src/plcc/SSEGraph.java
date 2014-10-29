@@ -4648,8 +4648,10 @@ E	3	3	3
                 
                 if(fg.getSize() > 0) {                                            
                     ig2.drawString("FG", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (stringHeight / 4));
+                    ig2.setPaint(Color.LIGHT_GRAY);
                     ig2.drawString("SQ", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
                     ig2.drawString("PG", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + lineHeight + (stringHeight / 4));
+                    ig2.setPaint(Color.BLACK);
                 }
                 else {
                     ig2.drawString("(Graph has no vertices.)", pl.getFooterStart().x, pl.getFooterStart().y);
@@ -4665,9 +4667,12 @@ E	3	3	3
                         //stringWidth = fontMetrics.stringWidth(sseNumberSeq);
                         stringHeight = fontMetrics.getAscent();                                        
 
+                        ig2.setPaint(Color.BLACK);
                         ig2.drawString(sseNumberFoldingGraph, pl.getFooterStart().x + ((i-shiftBack) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4));
+                        ig2.setPaint(Color.LIGHT_GRAY);
                         ig2.drawString(sseNumberSeq, pl.getFooterStart().x + ((i-shiftBack) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + lineHeight + (stringHeight / 4));                    
-                        ig2.drawString(sseNumberProteinGraph, pl.getFooterStart().x + ((i-shiftBack) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight *2) + (stringHeight / 4));                                                                    
+                        ig2.drawString(sseNumberProteinGraph, pl.getFooterStart().x + ((i-shiftBack) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight *2) + (stringHeight / 4));
+                        ig2.setPaint(Color.BLACK);
                     }
                 }
 
@@ -4909,8 +4914,10 @@ E	3	3	3
                 
                 if(fg.getSize() > 0) {                                            
                     ig2.drawString("FG", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (stringHeight / 4));
+                    ig2.setPaint(Color.LIGHT_GRAY);
                     ig2.drawString("SQ", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
                     ig2.drawString("PG", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + lineHeight + (stringHeight / 4));
+                    ig2.setPaint(Color.BLACK);
                 }
                 else {
                     ig2.drawString("(Graph has no vertices.)", pl.getFooterStart().x, pl.getFooterStart().y);
@@ -4931,9 +4938,12 @@ E	3	3	3
                         //stringWidth = fontMetrics.stringWidth(sseNumberSeq);
                         stringHeight = fontMetrics.getAscent();                                        
 
+                        ig2.setPaint(Color.BLACK);
                         ig2.drawString(sseNumberFoldingGraph, pl.getFooterStart().x + ((i-shiftBack[i]) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4));
+                        ig2.setPaint(Color.LIGHT_GRAY);
                         ig2.drawString(sseNumberSeq, pl.getFooterStart().x + ((i-shiftBack[i]) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + lineHeight + (stringHeight / 4));                    
                         ig2.drawString(sseNumberProteinGraph, pl.getFooterStart().x + ((i-shiftBack[i]) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight *2) + (stringHeight / 4));                                                                    
+                        ig2.setPaint(Color.BLACK);
                     }
                 }
 
