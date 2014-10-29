@@ -45,9 +45,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 	</noscript>
 	<div class="wrapper">
 
-
-	<?php include('navbar.php'); ?>
-
+            <?php include('navbar.php'); ?>
 
 	<div id="Home">
 		<div class="container" id="intro">

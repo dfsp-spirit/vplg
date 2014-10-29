@@ -8,6 +8,7 @@
  *   
  * @author Daniel Bruness <dbruness@gmail.com>
  * @author Andreas Scheck <andreas.scheck.home@googlemail.com>
+ * @author Tim Schäfer <>
  *
  * Tim added options to search for folding graph linear notations, SEPT 2014.
  * Tim added options to search for motifs, OCT 2014.
