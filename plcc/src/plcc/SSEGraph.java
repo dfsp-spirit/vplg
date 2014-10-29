@@ -5174,18 +5174,33 @@ E	3	3	3
             orientationsSpatOrder[0] = FoldingGraph.ORIENTATION_UPWARDS;  // heading of the 1st vertex is up by definition (it has no predecessor)
             orientationsSeqOrder[firstVertexSpatFGIndex] = FoldingGraph.ORIENTATION_UPWARDS;
                                   
+            StringBuilder KEYNotation = new StringBuilder();
+            
+            String startBracket = "{";
+            String endBracket = "}";
+            
+            KEYNotation.append(startBracket);
+            KEYNotation.append(fg.getVertex(keystartFGIndex).getLinearNotationLabel());
+            
             Integer currentVert, lastVert;
             if(keyposFGIndices.size() > 1) {
                 
                 for(int i = 1; i < keyposFGIndicesSpatOrder.size(); i++) {
-                                        
+                    
+                    if(i < (keyposFGIndicesSpatOrder.size())) {
+                        KEYNotation.append(",");
+                    }
+                    
                     currentVert = keyposFGIndicesSpatOrder.get(i);
                     lastVert = keyposFGIndicesSpatOrder.get(i-1);
+                    
+                    KEYNotation.append(currentVert - lastVert);
                     
                     Integer spatRel = fg.getContactType(lastVert, currentVert);
                     
                     if(Objects.equals(spatRel, SpatRel.PARALLEL)) {
-                        // keep orientation
+                        // keep orientation, this means crossover
+                        KEYNotation.append("x");
                         orientationsSpatOrder[i] = orientationsSpatOrder[i-1];
                         orientationsSeqOrder[currentVert] = orientationsSpatOrder[i];
                     }                    
@@ -5194,14 +5209,17 @@ E	3	3	3
                         orientationsSpatOrder[i] = (Objects.equals(orientationsSpatOrder[i-1], FoldingGraph.ORIENTATION_UPWARDS) ? FoldingGraph.ORIENTATION_DOWNWARDS : FoldingGraph.ORIENTATION_UPWARDS);
                         orientationsSeqOrder[currentVert] = orientationsSpatOrder[i];
                     }
-                    
+                    KEYNotation.append(fg.getVertex(currentVert).getLinearNotationLabel());
                 }                                                              
                 
             }      
+            KEYNotation.append(endBracket);
             
             //DP.getInstance().d("orientationsSpatOrder=" + IO.intArrayToString(orientationsSpatOrder));
             //DP.getInstance().d("orientationsSeqOrder=" + IO.intArrayToString(orientationsSeqOrder));
-            
+            if(fg.getFoldingGraphNumber().equals(3) && fg.chainid.equals("B") && fg.graphType.equals(ProtGraph.GRAPHTYPE_BETA)) {
+                System.out.println("MYKEY: " + KEYNotation.toString() + "");
+            }
             
             
             // now draw the connectors
