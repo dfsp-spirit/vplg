@@ -5019,6 +5019,11 @@ E	3	3	3
         
         /** The KEY start vertex -- this is NOT the left-most vertex. It is the vertex closest to the N-terminus with degree 1. Note that this is the index in the FG, not in the PG. */        
         Integer keystartFGIndex = pnfr.keyStart;
+        
+        if(keystartFGIndex == null) {
+            DP.getInstance().e("SSEGraph", "drawFoldingGraphKEYG2D: keystartFGIndex is null");
+        }
+        
         fg.computeSpatialVertexOrdering();
         ArrayList<Integer> keyposFGIndicesSpatOrder = fg.spatOrder;
         
@@ -5193,11 +5198,14 @@ E	3	3	3
                 DP.getInstance().e("SSEGRaph", "keyposFGIndices.size()=" + keyposFGIndices.size() + ", fg.size=" + fg.size + ".");
             }
             
-            Integer firstVertexSpatFGIndex = keystartFGIndex;
+            //Integer firstVertexSpatFGIndex = keystartFGIndex;
+            Integer firstVertexSpatFGIndex = fg.spatOrder.get(0);
             orientationsSpatOrder[0] = FoldingGraph.ORIENTATION_UPWARDS;  // heading of the 1st vertex is up by definition (it has no predecessor)
             orientationsSeqOrder[firstVertexSpatFGIndex] = FoldingGraph.ORIENTATION_UPWARDS;
+            System.out.println("Setting orientationsSeqOrder[" + firstVertexSpatFGIndex + "] to " + FoldingGraph.ORIENTATION_UPWARDS + ".");
                                   
-            StringBuilder KEYNotation = new StringBuilder();
+            // the following SB is only for testing, the result is not used. See the PTGLNotations class for the used implementation.
+            StringBuilder KEYNotation = new StringBuilder(); 
             
             String bracketStart = "{";
             String bracketEnd = "}";
@@ -5240,9 +5248,9 @@ E	3	3	3
             
             //DP.getInstance().d("orientationsSpatOrder=" + IO.intArrayToString(orientationsSpatOrder));
             //DP.getInstance().d("orientationsSeqOrder=" + IO.intArrayToString(orientationsSeqOrder));
-            if(fg.getFoldingGraphNumber().equals(3) && fg.chainid.equals("B") && fg.graphType.equals(ProtGraph.GRAPHTYPE_BETA)) {
-                System.out.println("MYKEY: " + KEYNotation.toString() + "");
-            }
+            //if(fg.getFoldingGraphNumber().equals(3) && fg.chainid.equals("B") && fg.graphType.equals(ProtGraph.GRAPHTYPE_BETA)) {
+            //    System.out.println("MYKEY: " + KEYNotation.toString() + "");
+            //}
             
             
             // now draw the connectors
@@ -5251,6 +5259,15 @@ E	3	3	3
             Boolean startUpwards; Integer relDrawDistToLast;
             ig2.setStroke(new BasicStroke(1));
             
+            boolean debug = false;
+            if(fg.toShortString().equals("1gos-B-alpha-FG0[4V,3E]")) {
+                debug = true;
+            }
+            if(debug) {
+                System.out.println("orientationsSeqOrder=" + IO.integerArrayToString(orientationsSeqOrder) + ", orientationsSpatOrder=" + IO.integerArrayToString(orientationsSpatOrder) );
+            }
+            
+            int numContactsDrawn = 0;
             if(keyposFGIndices.size() > 1) {
                 
                 for(int i = 1; i < keyposFGIndicesSpatOrder.size(); i++) {
@@ -5260,6 +5277,20 @@ E	3	3	3
                     Integer spatRel = fg.getContactType(lastVert, currentVert);
                     relDrawDistToLast = spatOrderseqDistToPrevious.get(i);
                     
+                    if(debug) {
+                        System.out.println("At i=" + 1 + ", currentVert=" + currentVert+ ", lastVert=" + lastVert + "");
+                    }
+                    
+                    if(spatRel.equals(SpatRel.NONE)) {
+                        if(debug) { 
+                            System.out.println("  skipping");                             
+                        }
+                        continue;
+                    }
+                    
+                    if(debug) { System.out.println("  spatRel=" + spatRel + ", drawing"); }
+                    
+                    numContactsDrawn++;
                     //DP.getInstance().d("DRAW_ARCS: i="+i+". current vert is " + currentVert + " with spatPos=" + i + " and seqPos=" + currentVert + ", lastVert is " + lastVert + " with spatPos=" + (i - 1) + " and seqPos=" + lastVert + ".spatRel = " + spatRel + ", relDrawDistToLast = " + relDrawDistToLast + ".");
                     
                     if(spatRel.equals(SpatRel.PARALLEL)) { ig2.setPaint(Color.RED); }
@@ -5269,9 +5300,9 @@ E	3	3	3
                     else if(spatRel.equals(SpatRel.BACKBONE)) { ig2.setPaint(Color.ORANGE); }
                     else { ig2.setPaint(Color.LIGHT_GRAY); }
 
-                    if(Settings.getBoolean("plcc_B_key_foldinggraph_arcs_allways_black")) {
-                        ig2.setPaint(Color.BLACK);
-                    }
+                    //if(Settings.getBoolean("plcc_B_key_foldinggraph_arcs_allways_black")) {
+                    //    ig2.setPaint(Color.BLACK);
+                    //}
 
                     // determine the center of the arc and the width of its rectangle bounding box
                     //iSpatIndex = spatOrder.get(i);
@@ -5341,12 +5372,25 @@ E	3	3	3
 
 
                     // draw it        
-                    //System.out.print("Getting arc from " + leftVertPosX + "," + leftVertPosY + " to " + rightVertPosX + "," + rightVertPosY + ".\n");
+                    if(debug) { 
+                        System.out.print("Getting arc from " + leftVertPosX + "," + leftVertPosY + " to " + rightVertPosX + "," + rightVertPosY + ".\n"); 
+                        Color old = ig2.getColor();
+                        ig2.setColor(Color.BLACK);
+                        int spacerDebugX = 10;
+                        int spacerDebugY = i * 10;
+                        ig2.drawString( "i=" + i + "(" + lastVert + "->" + currentVert + ")", leftVertPosX + spacerDebugX, leftVertPosY + spacerDebugY);
+                        //ig2.drawString(i + "|" + rightVertSeq + "(" + currentVert + "->" + lastVert + ")", rightVertPosX + spacerDebugX, rightVertPosY + spacerDebugY);
+                        ig2.setColor(old);
+                    }
                     ArrayList<Shape> connShapes = FoldingGraph.getArcConnector(leftVertPosX, leftVertPosY, rightVertPosX, rightVertPosY, ig2.getStroke(), startUpwards);
                     for(Shape s : connShapes) {
                         ig2.draw(s);
                     }                                                                                                   
-                }                                                              
+                } 
+                //System.out.println("At FG " + fg.toShortString() + ". Finished drawing " + numContactsDrawn + " contacts.");
+                if(numContactsDrawn != fg.getEdgeList().size()) {
+                    DP.getInstance().w("SSEGraph", "drawFoldingGrapgKEYG2D: drew " + numContactsDrawn + ", but FG has only " + fg.getEdgeList().size() + " edges.");
+                }
                 
             }
             

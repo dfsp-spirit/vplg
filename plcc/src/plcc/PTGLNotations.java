@@ -965,7 +965,9 @@ public class PTGLNotations {
                                 orientationsSpatOrder[l] = (Objects.equals(orientationsSpatOrder[l-1], FoldingGraph.ORIENTATION_UPWARDS) ? FoldingGraph.ORIENTATION_DOWNWARDS : FoldingGraph.ORIENTATION_UPWARDS);
                                 orientationsSeqOrder[currentVert] = orientationsSpatOrder[l];
                             }
-                            KEY.append(fg.getVertex(currentVert).getLinearNotationLabel());
+                            if(isMultiSSETypeGraph) {
+                                KEY.append(fg.getVertex(currentVert).getLinearNotationLabel());
+                            }
                         }                                                              
 
                     }      

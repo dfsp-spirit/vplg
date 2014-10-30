@@ -728,7 +728,7 @@ public class FoldingGraph extends SSEGraph {
      * @return a string in format 'PDBID-CHAIN-GRAPHTYPE-FGNUM'.
      */
     @Override public String toShortString() {
-        return(this.pdbid + "-" + this.chainid + "-" + this.graphType + "-" + "FG" + this.getFoldingGraphNumber() + "[" + this.numVertices() + "," + this.numSSEContacts() + "]");
+        return(this.pdbid + "-" + this.chainid + "-" + this.graphType + "-" + "FG" + this.getFoldingGraphNumber() + "[" + this.numVertices() + "V," + this.numSSEContacts() + "E]");
     }
     
     
