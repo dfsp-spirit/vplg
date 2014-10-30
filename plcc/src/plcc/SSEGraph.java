@@ -897,16 +897,28 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
     }
     
     
-    public ArrayList<Integer> getSpatialOrderingOfVertexIndicesAllowingCycle(Integer startVertexIndex) {
+    /**
+     * Tries to determine a valid spatial vertex ordering, assuming that the graph is a single cycle (i.e., all vertices are of degree 2).
+     * @param startVertexIndex the start vertex to use, this is to define the edge that we omit when generating the vertex ordering
+     * @return the ordering of the size of the FG, or an ordering of different size if no valid ordering exists
+     */
+    public ArrayList<Integer> getSpatialOrderingOfVertexIndicesForSingleCycleFG(Integer startVertexIndex) {
         ArrayList<Integer> spatialOrderIgnoreCyle = new ArrayList<Integer>();
         
-        if(! this.isASingleCycle()) {
-            return new ArrayList<Integer>();
+        if(this.isProteinGraph) {
+            DP.getInstance().w("SSEGraph", "getSpatialOrderingOfVertexIndicesForSingleCycleFG(): Called on protein graph but only folding graphs are supported, returning empty spatOrder list.");
+            return new ArrayList<>();
         }
         
-        if(this.isBifurcated() || this.isProteinGraph) {
-            return new ArrayList<Integer>();
+        if(! this.isASingleCycle()) {
+            return new ArrayList<>();
         }
+        
+        if(this.isBifurcated()) {
+            return new ArrayList<>();
+        }
+        
+        
         
         Integer start = startVertexIndex;
         spatialOrderIgnoreCyle.add(start);
@@ -5016,7 +5028,7 @@ E	3	3	3
             //DP.getInstance().e("SSEGraph", "Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.chainid + " gt " + fg.graphType + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + ") does not match FG size " + fg.getSize() + ". Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ". KEY='" + pnfr.keyNotation + "'. " + (fg.isASingleCycle() ? "FG is a single cycle." : "FG is NOT a single cycle."));            
             
             if(fg.isASingleCycle()) {
-                keyposFGIndicesSpatOrder = fg.getSpatialOrderingOfVertexIndicesAllowingCycle(keystartFGIndex);
+                keyposFGIndicesSpatOrder = fg.getSpatialOrderingOfVertexIndicesForSingleCycleFG(keystartFGIndex);
                 fg.spatOrder = keyposFGIndicesSpatOrder;
                 
                 // did this fix the problem?
@@ -5055,6 +5067,7 @@ E	3	3	3
             spatPosLast = keyposFGIndicesSpatOrder.indexOf(last);
             spatOrderseqDistToPrevious.add(spatPosCur - spatPosLast);
         }
+                
         //DP.getInstance().d("relative spat distances: " + IO.intListToString(spatOrderseqDistToPrevious));
 
         //DP.getInstance().d("keystart(FG index)=" + keystartFGIndex + ". keypos parent seq=" + IO.intListToString(keyposParentIndicesSeqOrder));
