@@ -204,6 +204,7 @@ public class PTGLNotations {
             
             StringBuilder RED = new StringBuilder();
             StringBuilder ADJ = new StringBuilder();
+            StringBuilder KEYold = new StringBuilder();
             StringBuilder KEY = new StringBuilder();
             StringBuilder SEQ = new StringBuilder();
         
@@ -227,18 +228,21 @@ public class PTGLNotations {
                 ADJ.append(bracketStart);
                 RED.append(bracketStart);
                 SEQ.append(bracketStart);
+                KEYold.append(bracketStart);
                 KEY.append(bracketStart);
                 
 		if(isMultiSSETypeGraph) {		     
                      ADJ.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());
                      RED.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());
                      SEQ.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());
-                     KEY.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());			
+                     KEYold.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());			
+                     KEY.append(g.getVertex(ccVerts.get(0)).getLinearNotationLabel());
 		} 
                 
                 ADJ.append(bracketEnd);
                 RED.append(bracketEnd);
                 SEQ.append(bracketEnd);
+                KEYold.append(bracketEnd);
                 KEY.append(bracketEnd);
                 
                 
@@ -279,6 +283,7 @@ public class PTGLNotations {
 		// write the opening bracket and for albe the type of the starting SSE
 		ADJ.append(bracketStart);
                 RED.append(bracketStart);
+                KEYold.append(bracketStart);
                 KEY.append(bracketStart);
                 SEQ.append(bracketStart);
                 
@@ -789,7 +794,7 @@ public class PTGLNotations {
                     }
                     
                     if(isMultiSSETypeGraph) {
-                        KEY.append(g.getVertex(keypos.get(0)).getLinearNotationLabel());
+                        KEYold.append(g.getVertex(keypos.get(0)).getLinearNotationLabel());
                     }
                     
                     int dist;
@@ -806,10 +811,10 @@ public class PTGLNotations {
                         }
                         
                         if((k==1 && isMultiSSETypeGraph || (k > 1))) {
-                            KEY.append(",");
+                            KEYold.append(",");
                         }
                         
-                        KEY.append(dist);
+                        KEYold.append(dist);
                         
                         Integer posi = keypos.get(k);
                         Integer posiminus1 = keypos.get(k-1);
@@ -824,7 +829,7 @@ public class PTGLNotations {
                             if(keyverbose) {
                                 System.out.println("      Same order as last, adding 'x' (will become cross-over connector in image).");
                             }
-                            KEY.append("x");
+                            KEYold.append("x");
                         } else {
                             if(keyverbose) {
                                 System.out.println("      Order differs from last, adding nothing (no 'x').");
@@ -832,17 +837,17 @@ public class PTGLNotations {
                         }
                         
                         if(isMultiSSETypeGraph) {
-                            KEY.append(g.getVertex(ccVerts.get(k)).getLinearNotationLabel());
+                            KEYold.append(g.getVertex(ccVerts.get(k)).getLinearNotationLabel());
                         }
                     }
                     
-                    KEY.append(bracketEnd);
+                    KEYold.append(bracketEnd);
                     pnfr.keypos = keypos;
                     // KEY done
                 }
                 else {
                     hasKeyNotation = false;
-                    KEY.setLength(0);   // erase all contents in it so far -- this includes the starting bracket which has already been set
+                    KEYold.setLength(0);   // erase all contents in it so far -- this includes the starting bracket which has already been set
                     keystart = -1;
                     pnfr.keypos = null;
                     if(keyverbose) {
@@ -901,12 +906,9 @@ public class PTGLNotations {
                     Integer firstVertexSpatFGIndex = keystartFGIndex;
                     orientationsSpatOrder[0] = FoldingGraph.ORIENTATION_UPWARDS;  // heading of the 1st vertex is up by definition (it has no predecessor)
                     orientationsSeqOrder[firstVertexSpatFGIndex] = FoldingGraph.ORIENTATION_UPWARDS;
-
-                    StringBuilder KEYNotation = new StringBuilder();
-                    KEYNotation.append(bracketStart);
                     
                     if(isMultiSSETypeGraph) {
-                        KEYNotation.append(fg.getVertex(keystartFGIndex).getLinearNotationLabel());
+                        KEY.append(fg.getVertex(keystartFGIndex).getLinearNotationLabel());
                     }
 
                     fg.computeSpatialVertexOrdering();
@@ -940,21 +942,21 @@ public class PTGLNotations {
                             //System.out.println("l=" + l + ", KEYNotation so far= " + KEYNotation.toString() + "");
 
                             if((isMultiSSETypeGraph && l == 1) || l > 1) {
-                                KEYNotation.append(",");
+                                KEY.append(",");
                             }
 
                             currentVert = keyposFGIndicesSpatOrder.get(l);
                             lastVert = keyposFGIndicesSpatOrder.get(l-1);
 
 
-                            KEYNotation.append(currentVert - lastVert);
+                            KEY.append(currentVert - lastVert);
 
                             Integer spatRel = fg.getContactType(lastVert, currentVert);
                             //System.out.println("lastVert=" + lastVert + ", currentVert=" + currentVert + ", spatRel=" + spatRel + ".");
 
                             if(Objects.equals(spatRel, SpatRel.PARALLEL)) {
                                 // keep orientation, this means crossover
-                                KEYNotation.append("x");
+                                KEY.append("x");
                                 orientationsSpatOrder[l] = orientationsSpatOrder[l-1];
                                 orientationsSeqOrder[currentVert] = orientationsSpatOrder[l];
                             }                    
@@ -963,18 +965,18 @@ public class PTGLNotations {
                                 orientationsSpatOrder[l] = (Objects.equals(orientationsSpatOrder[l-1], FoldingGraph.ORIENTATION_UPWARDS) ? FoldingGraph.ORIENTATION_DOWNWARDS : FoldingGraph.ORIENTATION_UPWARDS);
                                 orientationsSeqOrder[currentVert] = orientationsSpatOrder[l];
                             }
-                            KEYNotation.append(fg.getVertex(currentVert).getLinearNotationLabel());
+                            KEY.append(fg.getVertex(currentVert).getLinearNotationLabel());
                         }                                                              
 
                     }      
-                    KEYNotation.append(bracketEnd);            
+                    KEY.append(bracketEnd);            
                     pnfr.keypos = keypos;
 
                 
                 }
                 else {
                     hasKeyNotation = false;
-                    KEY.setLength(0);   // erase all contents in it so far -- this includes the starting bracket which has already been set
+                    KEYold.setLength(0);   // erase all contents in it so far -- this includes the starting bracket which has already been set
                     keystart = -1;
                     pnfr.keypos = null;
                     if(keyverbose) {
@@ -1029,7 +1031,7 @@ public class PTGLNotations {
             }
             
             if(keyverbose) {
-                System.out.println("    #" + foldNum + " KEY: " + KEY.toString());
+                System.out.println("    #" + foldNum + " KEY: " + KEYold.toString());
             }
             
             if(seqverbose) {    
