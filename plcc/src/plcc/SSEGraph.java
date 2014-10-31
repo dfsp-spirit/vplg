@@ -5316,9 +5316,9 @@ E	3	3	3
                     else if(spatRel.equals(SpatRel.BACKBONE)) { ig2.setPaint(Color.ORANGE); }
                     else { ig2.setPaint(Color.LIGHT_GRAY); }
 
-                    //if(Settings.getBoolean("plcc_B_key_foldinggraph_arcs_allways_black")) {
-                    //    ig2.setPaint(Color.BLACK);
-                    //}
+                    if(Settings.getBoolean("plcc_B_key_foldinggraph_arcs_allways_black")) {
+                        ig2.setPaint(Color.BLACK);
+                    }
 
                     // determine the center of the arc and the width of its rectangle bounding box
                     //iSpatIndex = spatOrder.get(i);
@@ -5419,7 +5419,13 @@ E	3	3	3
                 } 
                 //System.out.println("At FG " + fg.toShortString() + ". Finished drawing " + numContactsDrawn + " contacts.");
                 if(numContactsDrawn != fg.getEdgeList().size()) {
-                    DP.getInstance().w("SSEGraph", "drawFoldingGrapgKEYG2D: drew " + numContactsDrawn + ", but FG has only " + fg.getEdgeList().size() + " edges.");
+                    
+                    if(fg.isASingleCycle() && numContactsDrawn == (fg.getEdgeList().size() - 1)) {
+                        // all OK, we skip 1 edge of the circle to allow for a linear notation, so it is OK if 1 less is drawn
+                    }
+                    else {
+                        DP.getInstance().w("SSEGraph", "drawFoldingGrapgKEYG2D: drew " + numContactsDrawn + ", but FG " + fg.toShortString() + " has only " + fg.getEdgeList().size() + " edges. " + (fg.isASingleCycle() ? " FG is single circle." : "FG is NOT single circle."));
+                    }
                 }
                 
             }
