@@ -25,7 +25,7 @@ public class PTGLNotationFoldResult {
     
     public Integer adjStart;
     public Integer redStart;
-    public Integer keyStart;
+    public Integer keyStartFG;
     public Integer seqStart;
     
     public Integer adjSize;
@@ -54,7 +54,7 @@ public class PTGLNotationFoldResult {
         
         this.adjStart = -1;
         this.redStart = -1;
-        this.keyStart = -1;
+        this.keyStartFG = -1;
         this.seqStart = -1;
         
         this.adjSize = 0;

@@ -2908,8 +2908,8 @@ E	3	3	3
             // graph is bifurcated or has no spat order, KEY not supported
             
             // sanity check to see whether current supportsKeyNotation() function is correct and spatial ordering is required
-            if(pnfr.keyNotation != null || pnfr.keyStart >= 0) {
-                DP.getInstance().e("SSEGraph", "drawFoldingGraphKEY: FG reported to NOT support KEY notation, but a KEY notation string is set: '" + pnfr.keyNotation + "', start index is parent is " + pnfr.keyStart + ".");
+            if(pnfr.keyNotation != null || pnfr.keyStartFG >= 0) {
+                DP.getInstance().e("SSEGraph", "drawFoldingGraphKEY: FG reported to NOT support KEY notation, but a KEY notation string is set: '" + pnfr.keyNotation + "', start index is parent is " + pnfr.keyStartFG + ".");
             }
             
             if(! Settings.getBoolean("plcc_B_silent")) {
@@ -5018,7 +5018,7 @@ E	3	3	3
         
         
         /** The KEY start vertex -- this is NOT the left-most vertex. It is the vertex closest to the N-terminus with degree 1. Note that this is the index in the FG, not in the PG. */        
-        Integer keystartFGIndex = pnfr.keyStart;
+        Integer keystartFGIndex = pnfr.keyStartFG;
         
         if(keystartFGIndex == null) {
             DP.getInstance().e("SSEGraph", "drawFoldingGraphKEYG2D: keystartFGIndex is null");
@@ -5143,6 +5143,11 @@ E	3	3	3
             // check width of header string
             String proteinHeader = "The KEY " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
             String notation = "KEY notation: '" + pnfr.keyNotation + "'";
+            
+            if(Settings.getBoolean("plcc_B_graphimg_add_linnot_start_vertex")) {
+                notation += "   start=" + (pnfr.keyStartFG + 1);
+            }
+            
             //String order = "Order in parent:"; for(Integer i : pnfr.keypos) { order += (" " + (i + 1)); }
             //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
             Integer stringHeight = fontMetrics.getAscent();
@@ -5167,6 +5172,10 @@ E	3	3	3
             }
             // ------------------------- Draw the graph -------------------------
             
+            boolean debug = false;
+            if(fg.toShortString().equals("1gos-B-alpha-FG0[4V,3E]")) {
+                debug = true;
+            }
             
             if( ! bw) {
                 if(fg.getSize() > 0) {                    
@@ -5202,7 +5211,10 @@ E	3	3	3
             Integer firstVertexSpatFGIndex = fg.spatOrder.get(0);
             orientationsSpatOrder[0] = FoldingGraph.ORIENTATION_UPWARDS;  // heading of the 1st vertex is up by definition (it has no predecessor)
             orientationsSeqOrder[firstVertexSpatFGIndex] = FoldingGraph.ORIENTATION_UPWARDS;
-            System.out.println("Setting orientationsSeqOrder[" + firstVertexSpatFGIndex + "] to " + FoldingGraph.ORIENTATION_UPWARDS + ".");
+            
+            if(debug) {
+                System.out.println("Setting orientationsSeqOrder[" + firstVertexSpatFGIndex + "] to " + FoldingGraph.ORIENTATION_UPWARDS + ".");
+            }
                                   
             // the following SB is only for testing, the result is not used. See the PTGLNotations class for the used implementation.
             StringBuilder KEYNotation = new StringBuilder(); 
@@ -5246,8 +5258,13 @@ E	3	3	3
             }      
             KEYNotation.append(bracketEnd);
             
-            //DP.getInstance().d("orientationsSpatOrder=" + IO.intArrayToString(orientationsSpatOrder));
-            //DP.getInstance().d("orientationsSeqOrder=" + IO.intArrayToString(orientationsSeqOrder));
+            
+            
+            
+            if(debug) {
+                DP.getInstance().d("orientationsSpatOrder=" + IO.integerArrayToString(orientationsSpatOrder));
+                DP.getInstance().d("orientationsSeqOrder=" + IO.integerArrayToString(orientationsSeqOrder));
+            }
             //if(fg.getFoldingGraphNumber().equals(3) && fg.chainid.equals("B") && fg.graphType.equals(ProtGraph.GRAPHTYPE_BETA)) {
             //    System.out.println("MYKEY: " + KEYNotation.toString() + "");
             //}
@@ -5259,10 +5276,7 @@ E	3	3	3
             Boolean startUpwards; Integer relDrawDistToLast;
             ig2.setStroke(new BasicStroke(1));
             
-            boolean debug = false;
-            if(fg.toShortString().equals("1gos-B-alpha-FG0[4V,3E]")) {
-                debug = true;
-            }
+            
             if(debug) {
                 System.out.println("orientationsSeqOrder=" + IO.integerArrayToString(orientationsSeqOrder) + ", orientationsSpatOrder=" + IO.integerArrayToString(orientationsSpatOrder) );
             }
@@ -5288,7 +5302,7 @@ E	3	3	3
                         continue;
                     }
                     
-                    if(debug) { System.out.println("  spatRel=" + spatRel + ", drawing"); }
+                    if(debug) { System.out.println("  spatRel=" + SpatRel.getString(spatRel) + ", drawing edge " + lastVert + " => " + currentVert + "..."); }
                     
                     numContactsDrawn++;
                     //DP.getInstance().d("DRAW_ARCS: i="+i+". current vert is " + currentVert + " with spatPos=" + i + " and seqPos=" + currentVert + ", lastVert is " + lastVert + " with spatPos=" + (i - 1) + " and seqPos=" + lastVert + ".spatRel = " + spatRel + ", relDrawDistToLast = " + relDrawDistToLast + ".");
@@ -5350,24 +5364,24 @@ E	3	3	3
                         // the left vertex points upwards, so the arc should start at its top
                         leftVertPosY = vertStartY - vertHeight;
                         startUpwards = true;
-                        //DP.getInstance().d("  leftVert " + leftVertSeq + " starts upwards, ");
+                        if(debug) { DP.getInstance().d("  leftVert " + leftVertSeq + " starts upwards, "); }
                     }
                     else {
                         // the left vertex points downwards, so the arc should start at its bottom
                         leftVertPosY = vertStartY;
                         startUpwards = false;
-                        //DP.getInstance().d("  leftVert " + leftVertSeq + " starts downwards, ");
+                        if(debug) { DP.getInstance().d("  leftVert " + leftVertSeq + " starts downwards, "); }
                     }
 
                     if(Objects.equals(orientationsSeqOrder[rightVertSeq], FoldingGraph.ORIENTATION_UPWARDS)) {
                         // the right vertex points upwards, so the arc should end at its bottom
                         rightVertPosY = vertStartY;
-                        //DP.getInstance().d("  rightVert " + rightVertSeq + " starts upwards. ");
+                        if(debug) { DP.getInstance().d("  rightVert " + rightVertSeq + " starts upwards. "); }
                     }
                     else {
                         // the right vertex points downwards, so the arc should end at its top
                         rightVertPosY = vertStartY - vertHeight;
-                        //DP.getInstance().d("  rightVert " + rightVertSeq + " starts downpwards. ");
+                        if(debug) { DP.getInstance().d("  rightVert " + rightVertSeq + " starts downpwards. "); }
                     }
 
 

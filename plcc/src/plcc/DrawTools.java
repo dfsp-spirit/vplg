@@ -9,6 +9,8 @@ package plcc;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -72,8 +74,15 @@ public class DrawTools {
      * @throws IOException if something went wrong with writing the file
      */
     public static void writeG2dToSVGFile(String svgFilePath, DrawResult drawRes) throws IOException {
-        drawRes.g2d.stream(new FileWriter(svgFilePath), false);                                                    
+        // reset output stream to suppress the annoying output of the Apache batik library. Gets reset after lib call.
+        OutputStream tmp=System.out;
+        System.setOut(new PrintStream(new org.apache.commons.io.output.NullOutputStream()));
+        drawRes.g2d.stream(new FileWriter(svgFilePath), false);     
+        System.setOut(new PrintStream(tmp));
     }
+    
+
+
     
     /**
      * Converts the input SVG file to various other formats.
@@ -118,12 +127,22 @@ public class DrawTools {
 
             svgConverter.setSources(new String[]{svgInputFilePath});            
             svgConverter.setDst(new File(outputFileBasePathWithExt));
+            
+            // reset output stream to suppress the annoying output of the Apache batik library. Gets reset after lib call.
+            OutputStream tmp=System.out;
+            System.setOut(new PrintStream(new org.apache.commons.io.output.NullOutputStream()));
+        
             try {      
                 svgConverter.execute();
                 outfilesByFormat.put(format, outputFileBasePathNoExt + formatFileExt);
+                System.setOut(new PrintStream(tmp));
             } catch (SVGConverterException ex) {
+                System.setOut(new PrintStream(tmp));
                 DP.getInstance().e("Could not convert SVG file to format '" + format + "': '" + ex.getMessage() + "'. Skipping.");
+            } finally {
+                System.setOut(new PrintStream(tmp));
             }
+            
         }
         return outfilesByFormat;
     }

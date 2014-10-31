@@ -2748,7 +2748,7 @@ public class DBManager {
             statement.setString(5, pnfr.seqNotation);
             statement.setInt(6, pnfr.adjStart);
             statement.setInt(7, pnfr.redStart);
-            statement.setInt(8, pnfr.keyStart);
+            statement.setInt(8, pnfr.keyStartFG);
             statement.setInt(9, pnfr.seqStart);
             statement.setInt(10, pnfr.adjSize);
                                 

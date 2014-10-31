@@ -1047,7 +1047,7 @@ public class PTGLNotations {
             
             pnfr.redStart = redstart;
             pnfr.adjStart = adjstart;
-            pnfr.keyStart = keystart;
+            pnfr.keyStartFG = keystart;
             pnfr.seqStart = seqstart;
             
             pnfr.redSize = ccVerts.size();
@@ -1058,7 +1058,7 @@ public class PTGLNotations {
             
             if(! hasKeyNotation) {
                 pnfr.keyNotation = null;
-                pnfr.keyStart = -1;
+                pnfr.keyStartFG = -1;
                 pnfr.keySize = -1;
             }
             

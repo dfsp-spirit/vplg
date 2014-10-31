@@ -2724,7 +2724,7 @@ public class Main {
         sb.append("# line format is '<notation_type>:<start_vertex_index_in_parent_protein_graph>:<number_of_sses_in_connected_component>:<notation_string>'\n");
         sb.append("ADJ:").append(pnfr.adjStart).append(":").append(pnfr.adjSize).append(":").append(pnfr.adjNotation).append("\n");
         sb.append("RED:").append(pnfr.redStart).append(":").append(pnfr.redSize).append(":").append(pnfr.redNotation).append("\n");
-        sb.append("KEY:").append(pnfr.keyStart).append(":").append(pnfr.keySize).append(":").append(pnfr.keyNotation).append("\n");
+        sb.append("KEY:").append(pnfr.keyStartFG).append(":").append(pnfr.keySize).append(":").append(pnfr.keyNotation).append("\n");
         sb.append("SEQ:").append(pnfr.seqStart).append(":").append(pnfr.seqSize).append(":").append(pnfr.seqNotation).append("\n");
         
         String linearNotationsFile = outputDir + fs + fileNameWithoutExtension + ".ptgllinnot";

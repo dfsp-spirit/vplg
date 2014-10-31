@@ -194,6 +194,7 @@ public class Settings {
         defSet("plcc_B_write_lig_geolig", "true", "Determines whether ligand contacts are included in the <pdbid>.geolig file.");
         defSet("plcc_B_graphimg_header", "true", "Determines whether the graph images contain a header line with info on the graph type, PDBID and chain.");        
         defSet("plcc_B_graphimg_footer", "true", "Determines whether the graph images contain a footer line with info on the SSEs.");        
+        defSet("plcc_B_graphimg_add_linnot_start_vertex", "true", "Determines whether the start vertex index of the linear notation in the parent graph is written on the image. ");        
         defSet("plcc_B_graphimg_legend", "true", "Determines whether the graph images contain a legend that explains the color codes and SSE symbols. This is part of the footer.");        
         defSet("plcc_B_graphimg_legend_always_all", "false", "Determines whether the legend contains all possible edge and vertex types, i.e., even those not occurring in the current image.");        
         defSet("plcc_I_min_fgraph_size_draw", "2", "The minimum size a folding graph must have in order to be drawn. Settings this to 1 or 0 draws all of them, including isolated vertices.");
