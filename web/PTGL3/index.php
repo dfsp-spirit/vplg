@@ -78,7 +78,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 				<div class="input-group form-group">
 					<form class="form-inline" action="search.php" method="get">
 						<input type="text" class="form-control" name="keyword" id="searchInput" autocomplete="off" placeholder="Enter PDB ID or keyword...">
-						<button type="submit" id="sendit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button><br>
+						<button type="submit" id="sendit" name="st" value="keyword" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button><br>
 						<div id="advancedButton"> Advanced Search <div id="arrow"><strong class="caret"></strong></div></div>
 						<div id="liveSearchResults"></div>
 
@@ -125,7 +125,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 								<input class="advancedInput" type="text" id="molecule" name="molecule" placeholder="Molecule" size="20" maxlength="50"/>
 								<i title="Search for chains which appear in certain molecules e.g. 'MYOSINE'" style="position:absolute; right:50px;"  class="fa fa-question"></i>
 							</label>		
-							<button type="submit" class="btn btn-default advancedInput" style="margin-top:35px;"><span>Search</span></button>
+							<button type="submit" name="st" value="advanced" class="btn btn-default advancedInput" style="margin-top:35px;"><span>Search</span></button>
 						</div>
 					</form>	
 				</div><!-- end input-group and form-group -->
@@ -230,7 +230,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 				
 				
 						<input type="text" class="form-control" name="graphletsimilarity" id="searchGraphlets" autocomplete="off" placeholder="Enter a query PDB ID and chain...">
-						<button type="submit" id="sendit_graphlets" class="btn btn-default" ><span class="glyphicon glyphicon-search"></span></button><br>
+						<button type="submit" id="sendit_graphlets" name="st" value="similarity" class="btn btn-default" ><span class="glyphicon glyphicon-search"></span></button><br>
 
 			</form></div>
 			</dl>

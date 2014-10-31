@@ -64,14 +64,9 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		</div><!-- end row -->
 		</div>
 		<div class="container" id="searchResults">
-			<?php 
-			    $search_type = "advanced";
-			    if(count($list_of_search_types) === 1) {
-			      $search_type = $list_of_search_types[0];
-			    }
-			    
+			<?php
 			    echo "<h2> Search Results -- $search_type</h2>";
-			    ?>
+			?>
 			    
 			    <div class="container" id="pageintro">
 		All protein chains which match your search are shown below. Select the ones you are interested in by clicking the checkboxes next to them, then click 'Load proteins' above. You can also select all results at once or clear the current selection using the buttons above.

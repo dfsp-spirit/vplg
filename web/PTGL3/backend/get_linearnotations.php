@@ -114,7 +114,7 @@ if($valid_values){
 		
 	$query = get_query_string($graphtype, $notation, $q_limit, $limit_start);
 	$count_query = get_count_query_string($graphtype, $notation);
-	
+
 	$result = pg_query($db, $query);
 	$count_result = pg_query($db, $count_query);
 	$row_count = pg_fetch_array($count_result, NULL, PGSQL_ASSOC);
@@ -146,7 +146,7 @@ if($valid_values){
 	
 	while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
 		$linnot_string = $arr['ptgl_linnot_'.$notation];
-		
+
 		$tableString .= "<div class='string_row'>";
 		$tableString .= "<a href='search.php?".$parameter."=".$linnot_string."' >". $linnot_string . "</a>";
 		$tableString .= "</div>";
