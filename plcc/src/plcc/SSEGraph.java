@@ -5145,7 +5145,7 @@ E	3	3	3
             String notation = "KEY notation: '" + pnfr.keyNotation + "'";
             
             if(Settings.getBoolean("plcc_B_graphimg_add_linnot_start_vertex")) {
-                notation += "   start=" + (pnfr.keyStartFG + 1);
+                notation += "   start=" + (pnfr.keyStartFG);
             }
             
             //String order = "Order in parent:"; for(Integer i : pnfr.keypos) { order += (" " + (i + 1)); }
@@ -5172,10 +5172,10 @@ E	3	3	3
             }
             // ------------------------- Draw the graph -------------------------
             
-            boolean debug = false;
-            if(fg.toShortString().equals("1gos-B-alpha-FG0[4V,3E]")) {
-                debug = true;
-            }
+            boolean debugDrawingKEY = false;
+            //if(fg.toShortString().equals("1gos-B-alpha-FG0[4V,3E]")) {
+            //    debugDrawingKEY = true;
+            //}
             
             if( ! bw) {
                 if(fg.getSize() > 0) {                    
@@ -5212,7 +5212,7 @@ E	3	3	3
             orientationsSpatOrder[0] = FoldingGraph.ORIENTATION_UPWARDS;  // heading of the 1st vertex is up by definition (it has no predecessor)
             orientationsSeqOrder[firstVertexSpatFGIndex] = FoldingGraph.ORIENTATION_UPWARDS;
             
-            if(debug) {
+            if(debugDrawingKEY) {
                 System.out.println("Setting orientationsSeqOrder[" + firstVertexSpatFGIndex + "] to " + FoldingGraph.ORIENTATION_UPWARDS + ".");
             }
                                   
@@ -5261,7 +5261,7 @@ E	3	3	3
             
             
             
-            if(debug) {
+            if(debugDrawingKEY) {
                 DP.getInstance().d("orientationsSpatOrder=" + IO.integerArrayToString(orientationsSpatOrder));
                 DP.getInstance().d("orientationsSeqOrder=" + IO.integerArrayToString(orientationsSeqOrder));
             }
@@ -5277,7 +5277,7 @@ E	3	3	3
             ig2.setStroke(new BasicStroke(1));
             
             
-            if(debug) {
+            if(debugDrawingKEY) {
                 System.out.println("orientationsSeqOrder=" + IO.integerArrayToString(orientationsSeqOrder) + ", orientationsSpatOrder=" + IO.integerArrayToString(orientationsSpatOrder) );
             }
             
@@ -5291,18 +5291,20 @@ E	3	3	3
                     Integer spatRel = fg.getContactType(lastVert, currentVert);
                     relDrawDistToLast = spatOrderseqDistToPrevious.get(i);
                     
-                    if(debug) {
+                    if(debugDrawingKEY) {
                         System.out.println("At i=" + 1 + ", currentVert=" + currentVert+ ", lastVert=" + lastVert + "");
                     }
                     
                     if(spatRel.equals(SpatRel.NONE)) {
-                        if(debug) { 
+                        if(debugDrawingKEY) { 
                             System.out.println("  skipping");                             
                         }
                         continue;
                     }
                     
-                    if(debug) { System.out.println("  spatRel=" + SpatRel.getString(spatRel) + ", drawing edge " + lastVert + " => " + currentVert + "..."); }
+                    if(debugDrawingKEY) { System.out.println("  spatRel=" + SpatRel.getString(spatRel) + ", drawing edge " + lastVert + " => " + currentVert + "..."); }
+                    
+                    boolean edgeIsBackwards = (lastVert > currentVert);
                     
                     numContactsDrawn++;
                     //DP.getInstance().d("DRAW_ARCS: i="+i+". current vert is " + currentVert + " with spatPos=" + i + " and seqPos=" + currentVert + ", lastVert is " + lastVert + " with spatPos=" + (i - 1) + " and seqPos=" + lastVert + ".spatRel = " + spatRel + ", relDrawDistToLast = " + relDrawDistToLast + ".");
@@ -5331,6 +5333,7 @@ E	3	3	3
                         leftVertSeq = currentVert; 
                         rightVertSpat = jSpatIndex; 
                         rightVertSeq = lastVert;
+                        
                     }
                     else { 
                         leftVertSpat = jSpatIndex; 
@@ -5364,29 +5367,32 @@ E	3	3	3
                         // the left vertex points upwards, so the arc should start at its top
                         leftVertPosY = vertStartY - vertHeight;
                         startUpwards = true;
-                        if(debug) { DP.getInstance().d("  leftVert " + leftVertSeq + " starts upwards, "); }
+                        if(debugDrawingKEY) { DP.getInstance().d("  leftVert " + leftVertSeq + " starts upwards, "); }
                     }
                     else {
                         // the left vertex points downwards, so the arc should start at its bottom
                         leftVertPosY = vertStartY;
                         startUpwards = false;
-                        if(debug) { DP.getInstance().d("  leftVert " + leftVertSeq + " starts downwards, "); }
+                        if(debugDrawingKEY) { DP.getInstance().d("  leftVert " + leftVertSeq + " starts downwards, "); }
                     }
 
                     if(Objects.equals(orientationsSeqOrder[rightVertSeq], FoldingGraph.ORIENTATION_UPWARDS)) {
                         // the right vertex points upwards, so the arc should end at its bottom
                         rightVertPosY = vertStartY;
-                        if(debug) { DP.getInstance().d("  rightVert " + rightVertSeq + " starts upwards. "); }
+                        if(debugDrawingKEY) { DP.getInstance().d("  rightVert " + rightVertSeq + " starts upwards. "); }
                     }
                     else {
                         // the right vertex points downwards, so the arc should end at its top
                         rightVertPosY = vertStartY - vertHeight;
-                        if(debug) { DP.getInstance().d("  rightVert " + rightVertSeq + " starts downpwards. "); }
+                        if(debugDrawingKEY) { DP.getInstance().d("  rightVert " + rightVertSeq + " starts downwards. "); }
                     }
 
+                    boolean edgeIsCrossOver = (Objects.equals(orientationsSeqOrder[leftVertSeq], orientationsSeqOrder[rightVertSeq]));
 
+                    
+                    
                     // draw it        
-                    if(debug) { 
+                    if(debugDrawingKEY) { 
                         System.out.print("Getting arc from " + leftVertPosX + "," + leftVertPosY + " to " + rightVertPosX + "," + rightVertPosY + ".\n"); 
                         Color old = ig2.getColor();
                         ig2.setColor(Color.BLACK);
@@ -5394,9 +5400,19 @@ E	3	3	3
                         int spacerDebugY = i * 10;
                         ig2.drawString( "i=" + i + "(" + lastVert + "->" + currentVert + ")", leftVertPosX + spacerDebugX, leftVertPosY + spacerDebugY);
                         //ig2.drawString(i + "|" + rightVertSeq + "(" + currentVert + "->" + lastVert + ")", rightVertPosX + spacerDebugX, rightVertPosY + spacerDebugY);
+                        ig2.drawString("x" + i, leftVertPosX, leftVertPosY);
+                        ig2.drawString("y" + i, rightVertPosX, rightVertPosY);
                         ig2.setColor(old);
                     }
-                    ArrayList<Shape> connShapes = FoldingGraph.getArcConnector(leftVertPosX, leftVertPosY, rightVertPosX, rightVertPosY, ig2.getStroke(), startUpwards);
+                    
+                    ArrayList<Shape> connShapes;
+                    if(edgeIsBackwards && edgeIsCrossOver) {
+                        //System.out.println("###Edge prob: " + lastVert + " to " + currentVert + ", inverting edges.");
+                        connShapes = FoldingGraph.getArcConnector(leftVertPosX, rightVertPosY, rightVertPosX, leftVertPosY, ig2.getStroke(), ! startUpwards);                        
+                    }
+                    else {
+                        connShapes = FoldingGraph.getArcConnector(leftVertPosX, leftVertPosY, rightVertPosX, rightVertPosY, ig2.getStroke(), startUpwards);
+                    }
                     for(Shape s : connShapes) {
                         ig2.draw(s);
                     }                                                                                                   
@@ -5435,8 +5451,8 @@ E	3	3	3
                 
                 // draw it                                
                 if(fg.sseList.get(i).isHelix()) {
-                    //p = getDefaultArrowPolygon((vertStartY - vertHeight), currentVertX, currentVertY);
-                    p = getDefaultBarrelPolygon(vertStartY - vertHeight, currentVertX, vertStartY);
+                    p = getDefaultArrowPolygon((vertStartY - vertHeight), currentVertX, currentVertY);
+                    //p = getDefaultBarrelPolygon(vertStartY - vertHeight, currentVertX, vertStartY);
                     //System.out.println("SSE is helix: " + this.sseList.get(i).longStringRep() + ", drawing with base position (" + (vertStartX + (i * vertDist)) + "," + vertStartY + ").");
                     
                 }
