@@ -229,16 +229,13 @@ public class FoldingGraph extends SSEGraph {
      * @param filePath the output path of the image
      * @return true if it worked out, false otherwise
      */
+    /*
+    @Deprecated
     public Boolean drawFoldingGraphKEY(String filePath) {
         
        
         //--------------------------------------------------------------------------------------------------
-        /*
-        if(Settings.getInteger("plcc_I_debug_level") < 1) {
-            System.out.println("         -Not drawing KEY notation: WIP.");
-            return false;
-        }
-        */
+        
         //--------------------------------------------------------------------------------------------------
        
         
@@ -346,15 +343,7 @@ public class FoldingGraph extends SSEGraph {
             Integer[] headingsSeqOrder = new Integer[this.size];
             headingsSpatOrder[0] = ORIENTATION_UPWARDS;  // heading of the 1st vertex is up by definition (it has no predecessor)
             
-            /*
-             *              
-            Integer curSSE, spatPredecessorSSE;
-            if(this.size > 1) {
-                for(Integer i = 0; i < (this.getSize() - 1); i++) {
-                    curSSE = i;
-                }
-            }
-            */
+            
             
             
            
@@ -390,18 +379,6 @@ public class FoldingGraph extends SSEGraph {
                     headingsSeqOrder[seqIndex] = headingsSpatOrder[i];
                 }
                 
-                // DEBUG output
-                /*
-                System.out.println("DEBUG: " + this.toShortString() );
-                System.out.println("DEBUG: SpatOrder: " + IO.intArrayListToString(this.spatOrder) );
-                System.out.println("DEBUG: SpatHeadg: " + IO.intArrayToString(headingsSpatOrder) );
-                System.out.println("DEBUG: SeqHeadng: " + IO.intArrayToString(headingsSeqOrder) );                
-                String neighbors = "DEBUG: SeqDegree: ";
-                for(Integer i = 0; i < this.getSize(); i++) {
-                    neighbors += this.degreeOfVertex(i) + " ";
-                }
-                System.out.println(neighbors);
-                */
                 
             }                                    
             
@@ -499,7 +476,7 @@ public class FoldingGraph extends SSEGraph {
                             
                             // draw it        
                             //System.out.print("Getting arc from " + leftVertPosX + "," + leftVertPosY + " to " + rightVertPosX + "," + rightVertPosY + ".\n");
-                            ArrayList<Shape> connShapes = this.getArcConnector(leftVertPosX, leftVertPosY, rightVertPosX, rightVertPosY, ig2.getStroke(), startUpwards);
+                            ArrayList<Shape> connShapes = this.getArcConnector(leftVertPosX, leftVertPosY, rightVertPosX, rightVertPosY, ig2.getStroke(), startUpwards, 0);
                             for(Shape s : connShapes) {
                                 ig2.draw(s);
                             }                                                        
@@ -643,7 +620,7 @@ public class FoldingGraph extends SSEGraph {
 
         return(true);
     }
-    
+    */
     
     /**
      * Returns a static String that is the header for the plcc format.

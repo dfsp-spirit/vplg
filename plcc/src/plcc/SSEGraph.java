@@ -3296,9 +3296,10 @@ E	3	3	3
      * @param targetY the y coordinate of the end point
      * @param stroke the Stroke to use. You can get one from your Graphics2D instance.
      * @param startUpwards whether to start upwards from the 2D Point (startX, startY). If this is false, downwards is used instead.
+     * @param pixelsToShiftCentralLineOnYAxis the number of pixels to shift the central line on the y axis. Can be positive (for shift to the right) or negative (shift to the left), but must NOT be larger than 1/2 of the distance between the y axis start and end pixels of this connector.
      * @return a list of Shapes that can be painted on a G2D canvas.
      */
-    public static ArrayList<Shape> getArcConnector(Integer startX, Integer startY, Integer targetX, Integer targetY, Stroke stroke, Boolean startUpwards) {
+    public static ArrayList<Shape> getArcConnector(Integer startX, Integer startY, Integer targetX, Integer targetY, Stroke stroke, Boolean startUpwards, int pixelsToShiftCentralLineOnYAxis) {
 
         // System.out.print("getArcConnector: startX=" + startX + ", startY=" + startY + ", targetX=" + targetX + ", targetY=" + targetY + ", startUpwards=" + startUpwards.toString() + ": ");
         
@@ -3308,7 +3309,7 @@ E	3	3	3
         }
         else {
             // System.out.print("getting crossover connector(" + startY + " != " + targetY + ").\n");
-            return(getCrossoverArcConnector(startX, startY, targetX, targetY, stroke, startUpwards));
+            return(getCrossoverArcConnector(startX, startY, targetX, targetY, stroke, startUpwards, pixelsToShiftCentralLineOnYAxis));
         }        
     }
     
@@ -3394,9 +3395,10 @@ E	3	3	3
      * @param targetY the y coordinate of the end point
      * @param stroke the Stroke to use. You can get one from your Graphics2D instance.
      * @param startUpwards whether to start upwards from the 2D Point (startX, startY). If this is false, downwards is used instead.
+     * @param pixelsToShiftCentralLineOnYAxis the number of pixels to shift the central line on the y axis. Can be positive (for shift to the right) or negative (shift to the left), but must NOT be larger than 1/2 of the distance between the y axis start and end pixels of this connector.
      * @return a list of Shapes that can be painted on a G2D canvas.
      */
-    protected static ArrayList<Shape> getCrossoverArcConnector(Integer startX, Integer startY, Integer targetX, Integer targetY, Stroke stroke, Boolean startUpwards) {
+    protected static ArrayList<Shape> getCrossoverArcConnector(Integer startX, Integer startY, Integer targetX, Integer targetY, Stroke stroke, Boolean startUpwards, int pixelsToShiftCentralLineOnYAxis) {
         
         Integer upwards = 0;
         Integer downwards = 180;
@@ -3422,6 +3424,15 @@ E	3	3	3
         // stuff common for up/down
         vertStartY = startY;
         lineLength = Math.abs(startY - targetY);
+        
+        if(Math.abs(pixelsToShiftCentralLineOnYAxis) >= (lineLength / 2)) {
+            DP.getInstance().e("SSEGraph", "getCrossoverArcConnector(): Requested shift " + pixelsToShiftCentralLineOnYAxis + " is too large, would place the central line outside of this crossover arc. Max is " + ((lineLength / 2) - 1) + ".");
+            return parts;
+        }
+        
+        if(pixelsToShiftCentralLineOnYAxis != 0) {
+            System.err.println("SSEGraph.getCrossoverArcConnector(): I should shift the central line " + pixelsToShiftCentralLineOnYAxis + " px on the Y axis, implement this!");
+        }
         
         bothArcsSumWidth = rightVertPosX - leftVertPosX;
         leftArcWidth = rightArcWidth = bothArcsSumWidth / 2;
@@ -5406,12 +5417,25 @@ E	3	3	3
                     }
                     
                     ArrayList<Shape> connShapes;
+                    
+                    /** If the central line of the crossover-connector would cut through a vertex, we may want to shift it to the side a bit. */
+                    boolean shiftCentralConnectorLine = false;
+                    int pixelsToShiftOnYAxis = 0;
+                    if(edgeIsCrossOver) {
+                        // ... but this is only needed for dist = 2, 4, 6, ...
+                        if (relDrawDistToLast % 2 == 0) {
+                            shiftCentralConnectorLine = true;
+                            pixelsToShiftOnYAxis = pl.vertDist / 2;
+                        }
+                    }
+                        
+                    
                     if(edgeIsBackwards && edgeIsCrossOver) {
                         //System.out.println("###Edge prob: " + lastVert + " to " + currentVert + ", inverting edges.");
-                        connShapes = FoldingGraph.getArcConnector(leftVertPosX, rightVertPosY, rightVertPosX, leftVertPosY, ig2.getStroke(), ! startUpwards);                        
+                        connShapes = FoldingGraph.getArcConnector(leftVertPosX, rightVertPosY, rightVertPosX, leftVertPosY, ig2.getStroke(), (! startUpwards), pixelsToShiftOnYAxis);                        
                     }
                     else {
-                        connShapes = FoldingGraph.getArcConnector(leftVertPosX, leftVertPosY, rightVertPosX, rightVertPosY, ig2.getStroke(), startUpwards);
+                        connShapes = FoldingGraph.getArcConnector(leftVertPosX, leftVertPosY, rightVertPosX, rightVertPosY, ig2.getStroke(), startUpwards, pixelsToShiftOnYAxis);
                     }
                     for(Shape s : connShapes) {
                         ig2.draw(s);
