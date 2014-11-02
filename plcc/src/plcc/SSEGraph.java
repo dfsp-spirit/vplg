@@ -3400,6 +3400,10 @@ E	3	3	3
      */
     protected static ArrayList<Shape> getCrossoverArcConnector(Integer startX, Integer startY, Integer targetX, Integer targetY, Stroke stroke, Boolean startUpwards, int pixelsToShiftCentralLineOnYAxis) {
         
+        if(pixelsToShiftCentralLineOnYAxis != 0) {
+            return SSEGraph.getCrossoverArcConnectorShiftCenter(startX, startY, targetX, targetY, stroke, startUpwards, pixelsToShiftCentralLineOnYAxis);
+        }
+        
         Integer upwards = 0;
         Integer downwards = 180;
         
@@ -3424,15 +3428,7 @@ E	3	3	3
         // stuff common for up/down
         vertStartY = startY;
         lineLength = Math.abs(startY - targetY);
-        
-        if(Math.abs(pixelsToShiftCentralLineOnYAxis) >= (lineLength / 2)) {
-            DP.getInstance().e("SSEGraph", "getCrossoverArcConnector(): Requested shift " + pixelsToShiftCentralLineOnYAxis + " is too large, would place the central line outside of this crossover arc. Max is " + ((lineLength / 2) - 1) + ".");
-            return parts;
-        }
-        
-        if(pixelsToShiftCentralLineOnYAxis != 0) {
-            System.err.println("SSEGraph.getCrossoverArcConnector(): I should shift the central line " + pixelsToShiftCentralLineOnYAxis + " px on the Y axis, implement this!");
-        }
+                
         
         bothArcsSumWidth = rightVertPosX - leftVertPosX;
         leftArcWidth = rightArcWidth = bothArcsSumWidth / 2;
@@ -3505,6 +3501,172 @@ E	3	3	3
             // create the Shape for the right arc. it starts in upper left corner and ends in upper right corner of its bounding rectangle (looks like a 'U').
             rightArcUpperLeftX = lineEndX;
             rightArcUpperLeftY = lineEndY - (arcEllipseHeight / 2);
+            arc = new Arc2D.Double(rightArcUpperLeftX, rightArcUpperLeftY, rightArcWidth, rightArcHeight, upwards, 180, Arc2D.OPEN);
+            shape = stroke.createStrokedShape(arc);
+            parts.add(shape);
+
+        }
+        return(parts);
+    }
+    
+    
+    /**
+     * The function that implements a more complex 'S'-shaped arc connector between the 2D points (startX, startY) and (targetX, targetY) in the
+     * requested direction. Internal function, call the more general getArcConnector() function instead.
+     * 
+     * This connector consists of 3 Shapes: two half-circles and a line (think of the letter 'S').
+     * 
+     * You can choose whether the connector should start upwards or downwards from (startX, startY) using the startUpwards parameter.
+     * 
+     * upwards:                downwards:
+     *      __                     __
+     *     /  \                   /   \
+     *    |    |                  |    |
+     *    s    |                  |    t
+     *         |   t         s    |
+     *         |   |         |    |
+     *         \__/           \__/
+     * 
+     * @param startX the x coordinate of the start point
+     * @param startY the y coordinate of the start point
+     * @param targetX the x coordinate of the end point
+     * @param targetY the y coordinate of the end point
+     * @param stroke the Stroke to use. You can get one from your Graphics2D instance.
+     * @param startUpwards whether to start upwards from the 2D Point (startX, startY). If this is false, downwards is used instead.
+     * @param pixelsToShiftCentralLineOnYAxis the number of pixels to shift the central line on the y axis. Can be positive (for shift to the right) or negative (shift to the left), but must NOT be larger than 1/2 of the distance between the y axis start and end pixels of this connector:
+     *      ______        
+     *     /      \       
+     *    |        |      
+     *    s        |      
+     *             |   t  
+     *             |   |  
+     *              \__/   
+     * 
+     * @return a list of Shapes that can be painted on a G2D canvas.
+     */
+    protected static ArrayList<Shape> getCrossoverArcConnectorShiftCenter(Integer startX, Integer startY, Integer targetX, Integer targetY, Stroke stroke, Boolean startUpwards, int pixelsToShiftCentralLineOnYAxis) {
+        
+        Integer upwards = 0;
+        Integer downwards = 180;
+        
+        ArrayList<Shape> parts = new ArrayList<Shape>();
+        Integer leftVertPosX, rightVertPosX, bothArcsSumWidth, bothArcsSumHeight, vertStartY, leftArcHeight, leftArcWidth, rightArcHeight, rightArcWidth, arcWidth, arcEllipseHeight;
+        Integer leftArcUpperLeftX, leftArcUpperLeftY, centerBetweenBothArcsX, centerBetweenBothArcsY, leftArcEndX, leftArcEndY, rightArcEndX, rightArcEndY;
+        Integer leftArcLowerRightX, leftArcLowerRightY, leftArcUpperRightX, leftArcUpperRightY;
+        Integer rightArcLowerRightX, rightArcLowerRightY, rightArcUpperRightX, rightArcUpperRightY, rightArcUpperLeftX, rightArcUpperLeftY;
+        Integer lineStartX, lineStartY, lineEndX, lineEndY, lineLength;
+        Integer leftArcEllipseHeight, rightArcEllipseHeight;
+        
+        
+        // ensure left-right order
+        if(startX < targetX) { 
+            leftVertPosX = startX;
+            rightVertPosX = targetX; }
+        else
+        { 
+            leftVertPosX = targetX; 
+            rightVertPosX = startX;
+        }
+        
+        // stuff common for up/down
+        vertStartY = startY;
+        lineLength = Math.abs(startY - targetY);
+        
+        if(Math.abs(pixelsToShiftCentralLineOnYAxis) >= (lineLength / 2)) {
+            DP.getInstance().e("SSEGraph", "getCrossoverArcConnector(): Requested shift " + pixelsToShiftCentralLineOnYAxis + " is too large, would place the central line outside of this crossover arc. Max is " + ((lineLength / 2) - 1) + ".");
+            return parts;
+        }
+        
+        if(pixelsToShiftCentralLineOnYAxis != 0) {
+            System.err.println("SSEGraph.getCrossoverArcConnector(): I should shift the central line " + pixelsToShiftCentralLineOnYAxis + " px on the Y axis, implement this!");
+        }
+        
+        bothArcsSumWidth = rightVertPosX - leftVertPosX;
+        leftArcWidth = rightArcWidth = bothArcsSumWidth / 2;
+        
+        // apply the shift
+        leftArcWidth = leftArcWidth - pixelsToShiftCentralLineOnYAxis;
+        rightArcWidth = rightArcWidth + pixelsToShiftCentralLineOnYAxis;
+        
+        // correct possible rounding error by 1 px
+        if(leftArcWidth + rightArcWidth != bothArcsSumWidth) {
+            int diff = bothArcsSumWidth - (leftArcWidth + rightArcWidth);
+            if(diff > 1) { DP.getInstance().w("SSEGraph", "getCrossoverArcConnectorShiftCenter: Rounding error is " + diff + " px, but should never be > than 1 px."); }
+            // add the diff to the left arc
+            leftArcWidth += diff;
+        }
+        
+        bothArcsSumHeight = bothArcsSumWidth;
+        //bothArcsSumHeight = bothArcsSumWidth;
+        leftArcHeight = leftArcWidth;
+        rightArcHeight = rightArcWidth; //arcEllipseHeight = bothArcsSumHeight / 2;
+        leftArcEllipseHeight = leftArcHeight;
+        rightArcEllipseHeight = rightArcHeight;
+        
+        centerBetweenBothArcsX = rightVertPosX - rightArcWidth;    // this is where the upright line is created
+        centerBetweenBothArcsY = vertStartY;
+        
+        leftArcUpperLeftX = leftVertPosX;
+        leftArcUpperLeftY = vertStartY - (leftArcEllipseHeight / 2);
+        
+        leftArcLowerRightX = leftArcUpperLeftX + leftArcWidth;
+        leftArcLowerRightY = leftArcUpperLeftY + leftArcHeight - (leftArcEllipseHeight / 2);
+        
+        leftArcUpperRightX = leftArcUpperLeftX + leftArcWidth;
+        leftArcUpperRightY = leftArcUpperLeftY;
+        
+        // everything computed, now start to create the shapes based on the required arc starting angle (up or down)
+        Shape shape; Arc2D arc;
+        
+        if(startUpwards) {                  
+            
+            // left arc starts in lower left corner and ends in lower right corner of its bounding rectangle (looks like an inverted 'U')
+            leftArcEndX = leftArcLowerRightX;
+            leftArcEndY = leftArcLowerRightY;
+           
+            // create the Shape for the left arc, which starts upwards in this case
+            arc = new Arc2D.Double(leftArcUpperLeftX, leftArcUpperLeftY, leftArcWidth, leftArcHeight, upwards, 180, Arc2D.OPEN);
+            shape = stroke.createStrokedShape(arc);
+            parts.add(shape);
+            
+            // create the Shape for the line, which goes straight down
+            lineStartX = leftArcEndX;
+            lineStartY = leftArcEndY;
+            lineEndX = leftArcEndX;
+            lineEndY = leftArcEndY + lineLength;    // the line goes downwards, therefor the '+' in this case!
+            Line2D l = new Line2D.Double(lineStartX, lineStartY, lineEndX, lineEndY);
+            shape = stroke.createStrokedShape(l);
+            parts.add(shape);
+            
+            // create the Shape for the right arc. it starts in upper left corner and ends in upper right corner of its bounding rectangle (looks like a 'U').
+            rightArcUpperLeftX = lineEndX;
+            rightArcUpperLeftY = lineEndY;
+            arc = new Arc2D.Double(rightArcUpperLeftX, rightArcUpperLeftY - (rightArcEllipseHeight / 2), rightArcWidth, rightArcHeight, downwards, 180, Arc2D.OPEN);
+            shape = stroke.createStrokedShape(arc);
+            parts.add(shape);
+        }
+        else {
+            // left arc ends in upper right corner of its bounding rectangle
+            leftArcEndX = leftArcUpperRightX;
+            leftArcEndY = leftArcUpperRightY;
+            
+            // create the Shape for the left arc, which starts downwards in this case
+            arc = new Arc2D.Double(leftArcUpperLeftX, leftArcUpperLeftY, leftArcWidth, leftArcHeight, downwards, 180, Arc2D.OPEN);
+            shape = stroke.createStrokedShape(arc);
+            parts.add(shape);
+            
+            // create the Shape for the line, which goes straight up
+            lineStartX = leftArcEndX;
+            lineStartY = leftArcEndY + (leftArcEllipseHeight / 2);
+            lineEndX = leftArcEndX;
+            lineEndY = lineStartY - lineLength;    // the line goes downwards, therefor the '-' in this case!
+            Line2D l = new Line2D.Double(lineStartX, lineStartY, lineEndX, lineEndY);
+            shape = stroke.createStrokedShape(l);
+            parts.add(shape);
+            
+            // create the Shape for the right arc. it starts in upper left corner and ends in upper right corner of its bounding rectangle (looks like a 'U').
+            rightArcUpperLeftX = lineEndX;
+            rightArcUpperLeftY = lineEndY - (rightArcEllipseHeight / 2);
             arc = new Arc2D.Double(rightArcUpperLeftX, rightArcUpperLeftY, rightArcWidth, rightArcHeight, upwards, 180, Arc2D.OPEN);
             shape = stroke.createStrokedShape(arc);
             parts.add(shape);
