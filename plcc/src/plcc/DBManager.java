@@ -1665,7 +1665,7 @@ public class DBManager {
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
      */
     public static Boolean chainContainsMotif_RossmanFold(Long chain_db_id) {
-        DP.getInstance().w("DBManager", "chainContainsMotif_RossmanFold: Not implemented yet, returning false.");
+        DP.getInstance().w("DBManager", "chainContainsMotif_RossmanFold: Not implemented yet, returning false for chain with ID '" + chain_db_id + "'.");
         return false;
     }
     
@@ -1676,7 +1676,7 @@ public class DBManager {
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
      */
     public static Boolean chainContainsMotif_TIMBarrel(Long chain_db_id) {
-        DP.getInstance().w("DBManager", "chainContainsMotif_TIMBarrel: Not implemented yet, returning false.");
+        DP.getInstance().w("DBManager", "chainContainsMotif_TIMBarrel: Not implemented yet, returning false for chain with ID '" + chain_db_id + "'.");
         return false;
     }
     
@@ -1687,7 +1687,7 @@ public class DBManager {
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
      */
     public static Boolean chainContainsMotif_AlphaBetaPlait(Long chain_db_id) {
-        DP.getInstance().w("DBManager", "chainContainsMotif_AlphaBetaPlait: Not implemented yet, returning false.");
+        DP.getInstance().w("DBManager", "chainContainsMotif_AlphaBetaPlait: Not implemented yet, returning false for chain with ID '" + chain_db_id + "'.");
         return false;
     }
     
@@ -1698,7 +1698,7 @@ public class DBManager {
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
      */
     public static Boolean chainContainsMotif_UbiquitinRoll(Long chain_db_id) {
-        DP.getInstance().w("DBManager", "chainContainsMotif_UbiquitinRoll: Not implemented yet, returning false.");
+        DP.getInstance().w("DBManager", "chainContainsMotif_UbiquitinRoll: Not implemented yet, returning false for chain with ID '" + chain_db_id + "'.");
         return false;
     }
     

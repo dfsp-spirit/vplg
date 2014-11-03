@@ -3555,7 +3555,7 @@ E	3	3	3
         Integer leftArcLowerRightX, leftArcLowerRightY, leftArcUpperRightX, leftArcUpperRightY;
         Integer rightArcLowerRightX, rightArcLowerRightY, rightArcUpperRightX, rightArcUpperRightY, rightArcUpperLeftX, rightArcUpperLeftY;
         Integer lineStartX, lineStartY, lineEndX, lineEndY, lineLength;
-        Integer leftArcEllipseHeight, rightArcEllipseHeight;
+        Integer leftArcEllipseHeight, rightArcEllipseHeight;                
         
         
         // ensure left-right order
@@ -3577,9 +3577,10 @@ E	3	3	3
             return parts;
         }
         
-        if(pixelsToShiftCentralLineOnYAxis != 0) {
-            System.err.println("SSEGraph.getCrossoverArcConnector(): I should shift the central line " + pixelsToShiftCentralLineOnYAxis + " px on the Y axis, implement this!");
-        }
+        //if(pixelsToShiftCentralLineOnYAxis != 0) {
+        //    System.err.println("SSEGraph.getCrossoverArcConnector(): I should shift the central line " + pixelsToShiftCentralLineOnYAxis + " px on the Y axis, implement this!");
+        //}
+        DP.getInstance().d("SSEGraph", "Shift on axis is " +  pixelsToShiftCentralLineOnYAxis + " px.");
         
         bothArcsSumWidth = rightVertPosX - leftVertPosX;
         leftArcWidth = rightArcWidth = bothArcsSumWidth / 2;
@@ -5317,9 +5318,9 @@ E	3	3	3
             String proteinHeader = "The KEY " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
             String notation = "KEY notation: '" + pnfr.keyNotation + "'";
             
-            if(Settings.getBoolean("plcc_B_graphimg_add_linnot_start_vertex")) {
-                notation += "   start=" + (pnfr.keyStartFG);
-            }
+            //if(Settings.getBoolean("plcc_B_graphimg_add_linnot_start_vertex")) {
+            //    notation += "   start=" + (pnfr.keyStartFG);
+            //}
             
             //String order = "Order in parent:"; for(Integer i : pnfr.keypos) { order += (" " + (i + 1)); }
             //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
@@ -5462,7 +5463,8 @@ E	3	3	3
                     currentVert = keyposFGIndicesSpatOrder.get(i);
                     lastVert = keyposFGIndicesSpatOrder.get(i-1);
                     Integer spatRel = fg.getContactType(lastVert, currentVert);
-                    relDrawDistToLast = spatOrderseqDistToPrevious.get(i);
+                    //relDrawDistToLast = spatOrderseqDistToPrevious.get(i);
+                    relDrawDistToLast = currentVert - lastVert;
                     
                     if(debugDrawingKEY) {
                         System.out.println("At i=" + 1 + ", currentVert=" + currentVert+ ", lastVert=" + lastVert + "");
@@ -5580,15 +5582,30 @@ E	3	3	3
                     
                     ArrayList<Shape> connShapes;
                     
+                    boolean debugShiftArc = false;
+                    //System.out.println(fg.toShortString());
+                    if(fg.toShortString().equals("8icd-A-beta-FG1[11V,10E]")) {
+                        debugShiftArc = true;
+                    }
+                    
                     /** If the central line of the crossover-connector would cut through a vertex, we may want to shift it to the side a bit. */
-                    boolean shiftCentralConnectorLine = false;
                     int pixelsToShiftOnYAxis = 0;
                     if(edgeIsCrossOver) {
                         // ... but this is only needed for dist = 2, 4, 6, ...
                         if (relDrawDistToLast % 2 == 0) {
-                            shiftCentralConnectorLine = true;
-                            pixelsToShiftOnYAxis = pl.vertDist / 2;
+                            pixelsToShiftOnYAxis = (pl.vertDist / 4) + (relDrawDistToLast * 5);
+                            
+                            // we have to avoid that the shift geta too large, it must not cross the NEXT vertex!
+                            if(pixelsToShiftOnYAxis > (pl.vertDist * 0.8)) {
+                                pixelsToShiftOnYAxis = (pl.vertDist / 2);
+                            }
+                            if(debugShiftArc) { System.out.println("Crossover edge from " + lastVert + "->" + currentVert + " with relDist=" + relDrawDistToLast + " gets y-axis shift " + pixelsToShiftOnYAxis + " px added."); }
                         }
+                        else {
+                            if(debugShiftArc) { System.out.println("Crossover edge from " + lastVert + "->" + currentVert + " with relDist=" + relDrawDistToLast + " does NOT get shift."); }
+                        }
+                    } else {
+                        if(debugShiftArc) { System.out.println("Edge from " + lastVert + "->" + currentVert + " is not a crossover edge, adding nothing."); }
                     }
                         
                     
