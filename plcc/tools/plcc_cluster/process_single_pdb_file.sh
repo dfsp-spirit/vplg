@@ -329,10 +329,12 @@ if [ -r $FLN ]; then
 	    let NUM_SUCCESS++
 	    #del_output $PDBID
 	    ## we delete the log files if everything went fine
-	    rm -f $DBINSERT_LOG
-	    rm -f $ERROR_LOG_GET_PDB_FILE
-	    rm -f $ERROR_LOG_CREATE_DSSP_FILE
-	    rm -f $ERROR_LOG_PLCC
+	    for LF in $DBINSERT_LOG $ERROR_LOG_GET_PDB_FILE $ERROR_LOG_CREATE_DSSP_FILE $ERROR_LOG_PLCC
+    	    do
+	    	if [ -w $LF ]; then
+		    rm -f $LF
+	    	fi
+            done
 	    
             if [ "$RUN_GRAPHLETANALYSER" = "YES" ]; then
                 echo "$APPTAG Running Graphletanalyser to compute graphlets."

@@ -12,7 +12,7 @@ APPTAG="[START_ALL_MPI]"
 MYHOME="/home/ts"
 PLCC_CLUSTER_DIR="$MYHOME/software/plcc_cluster"
 
-DEBUG_START_ALL_MPI="true"
+DEBUG_START_ALL_MPI="false"
 
 ## settings
 SINGLE_JOB_SCRIPT="pbs_start_vplg_via_mpi4py_jobs_for_one_node.sh"
