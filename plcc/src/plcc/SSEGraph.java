@@ -5276,26 +5276,16 @@ E	3	3	3
         
 
             // ------------------------- Prepare stuff -------------------------
-            // TYPE_INT_ARGB specifies the image format: 8-bit RGBA packed into integer pixels
-            //BufferedImage bi = new BufferedImage(pl.getPageWidth(), pl.getPageHeight(), BufferedImage.TYPE_INT_ARGB);
             
             SVGGraphics2D ig2;
             
-            
-            //if(Settings.get("plcc_S_img_output_format").equals("SVG")) {                    
-                // Apache Batik SVG library, using W3C DOM tree implementation
-                // Get a DOMImplementation.
-                DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
-                // Create an instance of org.w3c.dom.Document.
-                String svgNS = "http://www.w3.org/2000/svg";
-                Document document = domImpl.createDocument(svgNS, "svg", null);
-                // Create an instance of the SVG Generator.
-                ig2 = new SVGGraphics2D(document);
-                //ig2.getRoot(document.getDocumentElement());
-           // }
-            //else {
-            //    ig2 = (SVGGraphics2D)bi.createGraphics();
-            //}
+            // we always use SVG now, it can be converted to other formats later using batik           
+            DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
+            // Create an instance of org.w3c.dom.Document.
+            String svgNS = "http://www.w3.org/2000/svg";
+            Document document = domImpl.createDocument(svgNS, "svg", null);
+            // Create an instance of the SVG Generator.
+            ig2 = new SVGGraphics2D(document);
             
             ig2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -5389,8 +5379,11 @@ E	3	3	3
             if(debugDrawingKEY) {
                 System.out.println("Setting orientationsSeqOrder[" + firstVertexSpatFGIndex + "] to " + FoldingGraph.ORIENTATION_UPWARDS + ".");
             }
-                                  
+                       
+            Integer currentVert, lastVert;
             // the following SB is only for testing, the result is not used. See the PTGLNotations class for the used implementation.
+            // Note that we still need the loop though, it seets orientationsSpatOrder an SeqOrder
+            
             StringBuilder KEYNotation = new StringBuilder(); 
             
             String bracketStart = "{";
@@ -5399,7 +5392,7 @@ E	3	3	3
             KEYNotation.append(bracketStart);
             KEYNotation.append(fg.getVertex(keystartFGIndex).getLinearNotationLabel());
             
-            Integer currentVert, lastVert;
+            
             if(keyposFGIndices.size() > 1) {
                 
                 for(int i = 1; i < keyposFGIndicesSpatOrder.size(); i++) {
@@ -5439,6 +5432,7 @@ E	3	3	3
                 DP.getInstance().d("orientationsSpatOrder=" + IO.integerArrayToString(orientationsSpatOrder));
                 DP.getInstance().d("orientationsSeqOrder=" + IO.integerArrayToString(orientationsSeqOrder));
             }
+            
             //if(fg.getFoldingGraphNumber().equals(3) && fg.chainid.equals("B") && fg.graphType.equals(ProtGraph.GRAPHTYPE_BETA)) {
             //    System.out.println("MYKEY: " + KEYNotation.toString() + "");
             //}
@@ -5491,9 +5485,9 @@ E	3	3	3
                     else if(spatRel.equals(SpatRel.BACKBONE)) { ig2.setPaint(Color.ORANGE); }
                     else { ig2.setPaint(Color.LIGHT_GRAY); }
 
-                    if(Settings.getBoolean("plcc_B_key_foldinggraph_arcs_allways_black")) {
+                    //if(Settings.getBoolean("plcc_B_key_foldinggraph_arcs_allways_black")) {
                         ig2.setPaint(Color.BLACK);
-                    }
+                    //}
 
                     // determine the center of the arc and the width of its rectangle bounding box
                     //iSpatIndex = spatOrder.get(i);
@@ -5608,7 +5602,7 @@ E	3	3	3
                         if(debugShiftArc) { System.out.println("Edge from " + lastVert + "->" + currentVert + " is not a crossover edge, adding nothing."); }
                     }
                         
-                    
+                                                
                     if(edgeIsBackwards && edgeIsCrossOver) {
                         //System.out.println("###Edge prob: " + lastVert + " to " + currentVert + ", inverting edges.");
                         connShapes = FoldingGraph.getArcConnector(leftVertPosX, rightVertPosY, rightVertPosX, leftVertPosY, ig2.getStroke(), (! startUpwards), pixelsToShiftOnYAxis);                        
