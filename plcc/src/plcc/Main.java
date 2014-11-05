@@ -217,7 +217,7 @@ public class Main {
             if(! pdbid.equals("NONE")) {
                 DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                 Calendar cal = Calendar.getInstance();
-                System.out.println("  Running for PDB ID '" + pdbid + "' at " + dateFormat.format(cal.getTime()) + ".");
+                System.out.println("  Starting computation for PDB ID '" + pdbid + "' at " + dateFormat.format(cal.getTime()) + ".");
             }
 
             final Integer expectedLengthPDBID = 4;
@@ -4763,7 +4763,7 @@ public class Main {
         curSSE = lastSSE = null;
 
         if(resList.size() < 1) {
-            DP.getInstance().w("createAllDsspSSEsFromResidueList() Creating empty list of SSEs: residue list is empty.");
+            DP.getInstance().w("Main", "createAllDsspSSEsFromResidueList(): Creating empty list of SSEs: residue list is empty.");
             //System.out.println("      Found " + dsspSSElist.size() + " SSEs according to DSSP definition.");
             return(dsspSSElist);
         }
@@ -4984,7 +4984,7 @@ public class Main {
 
         // If the list is emtpy we're already done. :)
         if(inputSSEs.size() < 1) {
-            System.out.println("    Creating empty list of PTGL SSEs, list of DSSP SSEs is empty.");
+            DP.getInstance().w("Main", "createAllPtglSSEsFromDsspSSEList(): Creating empty list of PTGL SSEs, list of DSSP SSEs is empty.");
             return(outputSSEs);
         }
 

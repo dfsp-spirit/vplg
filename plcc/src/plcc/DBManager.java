@@ -1944,7 +1944,7 @@ public class DBManager {
         
         // OK, check size of results table
         if(tableData.size() >= 1) {
-            System.out.println("DEBUG: chainContainsMotif_GlobinFold: matched linnot");
+            //System.out.println("DEBUG: chainContainsMotif_GlobinFold: matched linnot");
             String row_pdbid, row_chain_name;
             for(ArrayList<String> row : tableData) {
                 if(row.size() >= 2) {

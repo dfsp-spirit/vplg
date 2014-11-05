@@ -5575,12 +5575,7 @@ E	3	3	3
                     }
                     
                     ArrayList<Shape> connShapes;
-                    
-                    boolean debugShiftArc = false;
-                    //System.out.println(fg.toShortString());
-                    if(fg.toShortString().equals("8icd-A-beta-FG1[11V,10E]")) {
-                        debugShiftArc = true;
-                    }
+                                        
                     
                     /** If the central line of the crossover-connector would cut through a vertex, we may want to shift it to the side a bit. */
                     int pixelsToShiftOnYAxis = 0;
@@ -5592,14 +5587,8 @@ E	3	3	3
                             // we have to avoid that the shift geta too large, it must not cross the NEXT vertex!
                             if(pixelsToShiftOnYAxis > (pl.vertDist * 0.8)) {
                                 pixelsToShiftOnYAxis = (pl.vertDist / 2);
-                            }
-                            if(debugShiftArc) { System.out.println("Crossover edge from " + lastVert + "->" + currentVert + " with relDist=" + relDrawDistToLast + " gets y-axis shift " + pixelsToShiftOnYAxis + " px added."); }
-                        }
-                        else {
-                            if(debugShiftArc) { System.out.println("Crossover edge from " + lastVert + "->" + currentVert + " with relDist=" + relDrawDistToLast + " does NOT get shift."); }
-                        }
-                    } else {
-                        if(debugShiftArc) { System.out.println("Edge from " + lastVert + "->" + currentVert + " is not a crossover edge, adding nothing."); }
+                            }                            
+                        }                        
                     }
                         
                                                 
