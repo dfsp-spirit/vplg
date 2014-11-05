@@ -70,10 +70,10 @@ public class Settings {
     }
     
     /**
-     * Creates an array of the output image formats which are set in the settings.
-     * @return the output formats
+     * Creates an array of the output image formats for protein graphs which are set in the settings.
+     * @return the output formats, collected from settings like 'plcc_B_img_output_format_PNG'
      */
-    public static IMAGEFORMAT[] getOutputImageFormats() {
+    public static IMAGEFORMAT[] getProteinGraphOutputImageFormats() {
         ArrayList<IMAGEFORMAT> formats = new ArrayList<IMAGEFORMAT>();
         
         if(Settings.getBoolean("plcc_B_img_output_format_PNG")) {
@@ -84,6 +84,27 @@ public class Settings {
         }
         // --- ignore SVG because it is always produced ---
         //if(Settings.getBoolean("plcc_B_img_output_format_SVG")) {
+        //    formats.add(IMAGEFORMAT.SVG);
+        //}
+        
+        return (IMAGEFORMAT[])formats.toArray(new IMAGEFORMAT[formats.size()]);
+    }
+    
+    /**
+     * Creates an array of the output image formats for folding graphs which are set in the settings.
+     * @return the output formats, collected from settings like 'plcc_B_img_output_format_PNG'
+     */
+    public static IMAGEFORMAT[] getFoldingGraphOutputImageFormats() {
+        ArrayList<IMAGEFORMAT> formats = new ArrayList<IMAGEFORMAT>();
+        
+        if(Settings.getBoolean("plcc_B_img_FG_output_format_PNG")) {
+            formats.add(IMAGEFORMAT.PNG);
+        }
+        if(Settings.getBoolean("plcc_B_img_FG_output_format_PDF")) {
+            formats.add(IMAGEFORMAT.PDF);
+        }
+        // --- ignore SVG because it is always produced ---
+        //if(Settings.getBoolean("plcc_B_img_FG_output_format_SVG")) {
         //    formats.add(IMAGEFORMAT.SVG);
         //}
         
@@ -247,9 +268,12 @@ public class Settings {
         defSet("plcc_S_img_output_fileext", ".png", "file extension of output images (should fit plcc_S_img_output_format more or less, e.g. '.png', '.jpg')");
         
         // new output format settings
-        defSet("plcc_B_img_output_format_PNG", "true", "Whether to write output images in PNG format.");
-        defSet("plcc_B_img_output_format_PDF", "true", "Whether to write output images in PDF format.");
-        defSet("plcc_B_img_output_format_SVG", "true", "Whether to write output images in SVG format.");
+        defSet("plcc_B_img_output_format_PNG", "true", "Whether to write protein graph output images in PNG format.");
+        defSet("plcc_B_img_output_format_PDF", "true", "Whether to write protein graph output images in PDF format.");
+        defSet("plcc_B_img_output_format_SVG", "true", "Whether to write protein graph output images in SVG format. Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG.");
+        defSet("plcc_B_img_FG_output_format_PNG", "true", "Whether to write protein graph output images in PNG format.");
+        defSet("plcc_B_img_FG_output_format_PDF", "false", "Whether to write protein graph output images in PDF format.");
+        defSet("plcc_B_img_FG_output_format_SVG", "true", "Whether to write protein graph output images in SVG format. Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG.");
         
         defSet("plcc_I_img_margin_left", "80", "Size of the left image margin in pixels");
         defSet("plcc_I_img_margin_top", "40", "Size of the top image margin in pixels");

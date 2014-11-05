@@ -2261,7 +2261,7 @@ public class Main {
                     
                     IMAGEFORMAT[] formats;
                     // formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG, DrawTools.IMAGEFORMAT.PDF };                    
-                    formats = Settings.getOutputImageFormats();
+                    formats = Settings.getProteinGraphOutputImageFormats();
 
                     HashMap<IMAGEFORMAT, String> filesByFormatCurNotation = SSEGraph.drawProteinGraph(imgFileNoExt, false, formats, pg);
                     //if(! silent) {
@@ -2565,7 +2565,7 @@ public class Main {
                         fgFile = outputDir + System.getProperty("file.separator") + fileNameWithoutExtension; //Settings.get("plcc_S_img_output_fileext");
 
                         Boolean drawingSucceeded = false;
-                        IMAGEFORMAT[] formats = Settings.getOutputImageFormats();
+                        IMAGEFORMAT[] formats = Settings.getFoldingGraphOutputImageFormats();
                         HashMap<IMAGEFORMAT, String> filesByFormatCurNotation = new HashMap<>();
 
                         if(notation.equals(FoldingGraph.FG_NOTATION_ADJ)) {     

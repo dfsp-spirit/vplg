@@ -5582,6 +5582,7 @@ E	3	3	3
                     if(edgeIsCrossOver) {
                         // ... but this is only needed for dist = 2, 4, 6, ...
                         if (relDrawDistToLast % 2 == 0) {
+                            // shift the central line by 1/4 distance between 2 verts. but this is not enough: if multiple lines get shifted to the same position, they are all in the same spot. so shift by a constant c=5px * distance of the connected vertices.
                             pixelsToShiftOnYAxis = (pl.vertDist / 4) + (relDrawDistToLast * 5);
                             
                             // we have to avoid that the shift geta too large, it must not cross the NEXT vertex!
