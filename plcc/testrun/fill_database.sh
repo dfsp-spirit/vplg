@@ -6,9 +6,10 @@
 
 ## settings ###
 
-RUN_GRAPHLETANALYSER="YES"
-PLCC_OPTIONS="-u -f --cluster"
+RUN_GRAPHLETANALYSER="NO"
+PLCC_OPTIONS="-u -f -k -s --silent --cluster"
 DELETE_CLUSTER_CHAINS_FILE="NO"
+SILENT="YES"
 
 ### end of settings ###
 
@@ -22,11 +23,15 @@ if [ -f $NODSSP_LIST ]; then
    touch $NODSSP_LIST
 fi
 
-echo "$APPTAG Adding all PDB files in this directory to the VPLG database... (assuming they are named '<pdbid>.pdb')"
+if [ "$SILENT" = "NO" ]; then
+  echo "$APPTAG Adding all PDB files in this directory to the VPLG database... (assuming they are named '<pdbid>.pdb')"
+fi
 
-for PDBFILE in ls *.pdb;
+for PDBFILE in *.pdb;
 do
-	echo "$APPTAG Handling PDB file '$PDBFILE'"
+        if [ "$SILENT" = "NO" ]; then
+	  echo "$APPTAG Handling PDB file '$PDBFILE'"
+	fi
 	fullfilename=$(basename "$PDBFILE")
         extension=${fullfilename##*.}
 	filename=${fullfilename%.*}
@@ -46,17 +51,23 @@ do
 	fi
 	
 	if [ "$RUN_GRAPHLETANALYSER" = "YES" ]; then
-                echo "$APPTAG Running Graphletanalyser to compute graphlets for all chains of the PDB file."
+	        if [ "$SILENT" = "NO" ]; then
+                  echo "$APPTAG Running Graphletanalyser to compute graphlets for all chains of the PDB file."
+                fi
 		CHAINS_FILE="${PLCC_OUTPUT_DIR}/${PDBID}.chains"
 		if [ ! -f "$CHAINS_FILE" ]; then
 		       echo "$APPTAG ##### ERROR: No chains file found at '$CHAINS_FILE', is '--cluster' set as PLCC command line option?"
 	        else
-	                echo "$APPTAG Chains file found at '$CHAINS_FILE'."
+	                if [ "$SILENT" = "NO" ]; then
+	                  echo "$APPTAG Chains file found at '$CHAINS_FILE'."
+	                fi
 			for CHAIN in $(cat ${CHAINS_FILE});
 			do
 				ALBE_GML_GRAPHFILE="${PLCC_OUTPUT_DIR}/${PDBID}_${CHAIN}_albe_PG.gml"
 				if [ -f "$ALBE_GML_GRAPHFILE" ]; then
-				        echo "$APPTAG Running Graphletanalyser on file '$ALBE_GML_GRAPHFILE' for albe graph of $PDBID chain '$CHAIN'."
+				        if [ "$SILENT" = "NO" ]; then
+				          echo "$APPTAG Running Graphletanalyser on file '$ALBE_GML_GRAPHFILE' for albe graph of $PDBID chain '$CHAIN'."
+				        fi
 					./graphletanalyser --useDatabase $ALBE_GML_GRAPHFILE
 				else
 					echo "$APPTAG ##### ERROR:The albe GML graph file was not found at '$ALBE_GML_GRAPHFILE', cannot run graphletanalyser on it."
@@ -70,8 +81,9 @@ do
 	    fi
 done
 
-
-echo "$APPTAG All done, exiting."
+if [ "$SILENT" = "NO" ]; then
+  echo "$APPTAG All done, exiting."
+fi
 exit 0
 
 # EOF

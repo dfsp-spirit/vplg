@@ -182,6 +182,8 @@ public class Settings {
         // Output and performance
         defSet("plcc_B_separate_contacts_by_chain", "false", "Whether to compute atom contacts separated by chain. Faster but does not detect contacts between different chains and thus cannot be used for complex graph computation.");
         defSet("plcc_B_no_warn", "false", "Whether to suppress all warnings. The default is to print them.");
+        defSet("plcc_B_no_parse_warn", "true", "Whether to suppress all warnings related to parsing of atoms from and other data from the PDB and DSSP input files.");
+        defSet("plcc_B_no_not_impl_warn", "true", "Whether to suppress all warnings related to not implemented function.");
         defSet("plcc_B_silent", "false", "Whether to suppress all output. Cluster mode, not recommended for normal usage.");
         defSet("plcc_I_debug_level", "0", "Debug level. Higher value means more output.");
         defSet("plcc_B_debug_compareSSEContacts", "false", "Whether to compare the computed SSE level contacts to those in the geom_neo output file that is supplied.");

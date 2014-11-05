@@ -3580,7 +3580,7 @@ E	3	3	3
         //if(pixelsToShiftCentralLineOnYAxis != 0) {
         //    System.err.println("SSEGraph.getCrossoverArcConnector(): I should shift the central line " + pixelsToShiftCentralLineOnYAxis + " px on the Y axis, implement this!");
         //}
-        DP.getInstance().d("SSEGraph", "Shift on axis is " +  pixelsToShiftCentralLineOnYAxis + " px.");
+        //DP.getInstance().d("SSEGraph", "Shift on axis is " +  pixelsToShiftCentralLineOnYAxis + " px.");
         
         bothArcsSumWidth = rightVertPosX - leftVertPosX;
         leftArcWidth = rightArcWidth = bothArcsSumWidth / 2;

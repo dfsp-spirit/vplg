@@ -56,9 +56,6 @@ public class Atom implements java.io.Serializable {
         this.altLoc = altLoc;
     }
 
-    // constructor
-    //public Atom() {}
-
     public Boolean isLigandAtom() { return(residue.getType() == 1); }
     public Boolean isProteinAtom() { return(residue.getType() == 0); }
     public Boolean isOtherAtom() { return(residue.getType() == 2); }

@@ -544,7 +544,9 @@ public class FileParser {
 
         // Files that contain DNA or RNA are not supported atm
         if(FileParser.isDNAorRNAresidueName(resNamePDB)) {
-            DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA/RNA residue (residue 3-letter code is '" + resNamePDB + "'), skipping.");
+            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA/RNA residue (residue 3-letter code is '" + resNamePDB + "'), skipping.");
+            }
             return false;
         }
 

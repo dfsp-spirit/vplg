@@ -25,6 +25,8 @@ import java.awt.image.*;
 import java.io.*;
 import java.nio.channels.*;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -211,6 +213,12 @@ public class Main {
 
             // get pdbid from first arg
             pdbid = args[0];
+            
+            if(! pdbid.equals("NONE")) {
+                DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                Calendar cal = Calendar.getInstance();
+                System.out.println("  Running for PDB ID '" + pdbid + "' at " + dateFormat.format(cal.getTime()) + ".");
+            }
 
             final Integer expectedLengthPDBID = 4;
             if(pdbid.length() != expectedLengthPDBID) {
@@ -853,6 +861,7 @@ public class Main {
             usage_short();      // the first argument (pdbid) is required!
             System.exit(0);
         }
+        
         
         
         Boolean silent = false;
@@ -4015,7 +4024,9 @@ public class Main {
             System.exit(1);
         }
 
-        System.out.println("  Wrote chain info to file '" + chainsFile + "'.");       
+        if(! Settings.getBoolean("plcc_B_silent")) {
+            System.out.println("  Wrote chain info to file '" + chainsFile + "'.");       
+        }
 
     }
     
@@ -4907,6 +4918,8 @@ public class Main {
         
         Integer numAtoms;
         Integer numLigIgnoredAtomChecks = 0;
+        Integer numLigIgnoredAtomChecksTooFewAtoms = 0;
+        Integer numLigIgnoredAtomChecksTooManyAtoms = 0;
 
         for(Integer i = 0; i < resList.size(); i++) {
 
@@ -4916,6 +4929,12 @@ public class Main {
                 
                 numAtoms = r.getNumAtoms();
                 if( (numAtoms < ligMinAtoms) || ((numAtoms > ligMaxAtoms) && !noMax) ) {
+                    if( (numAtoms < ligMinAtoms)) {
+                        numLigIgnoredAtomChecksTooFewAtoms++;
+                    }
+                    if((numAtoms > ligMaxAtoms) && !noMax) {
+                        numLigIgnoredAtomChecksTooManyAtoms++;
+                    }
                     // Ligand did NOT pass the atom check, ignore it
                     numLigIgnoredAtomChecks++;
                     continue;
@@ -4943,7 +4962,9 @@ public class Main {
 
         //System.out.println("    Found " + ligSSElist.size() + " ligand SSEs.");
         if(numLigIgnoredAtomChecks > 0) {
-            System.out.println("    Ignored " + numLigIgnoredAtomChecks + " ligands due to atom number constraints [" + ligMinAtoms + ", " + ligMaxAtoms + "].");
+            if(! Settings.getBoolean("plcc_B_silent")) {
+                System.out.println("    Ignored " + numLigIgnoredAtomChecks + " ligands total due to atom number constraints: ligMinAtoms=" + ligMinAtoms + ", ligMaxAtoms" + ligMaxAtoms + ". " + numLigIgnoredAtomChecksTooFewAtoms + " had too few atoms, " + numLigIgnoredAtomChecksTooManyAtoms + " had too many atoms.");
+            }
         }
         
         return(ligSSElist);

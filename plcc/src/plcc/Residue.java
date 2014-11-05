@@ -300,7 +300,9 @@ public class Residue implements java.io.Serializable {
         
         int numAtomsBefore = this.atoms.size();
         if(numAtomsBefore < 1) {
-            DP.getInstance().w("Residue " + this.getFancyName() + " of chain " + this.getChainID() + " has no atoms *before* choosing alternative location PDB field.");
+            if(! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                DP.getInstance().w("Residue " + this.getFancyName() + " of chain " + this.getChainID() + " has NO atoms at all *before* choosing alternative location PDB field and deleting others.");
+            }
             return new ArrayList<Atom>();
         }                
         ArrayList<Atom> deletedAtoms;
@@ -342,9 +344,10 @@ public class Residue implements java.io.Serializable {
         Atom b = r.getCenterAtom();
 
         if(a == null || b == null) {
-            DP.getInstance().w("Could not determine distance of PDB Residues # " + pdbResNum + " and " + r.getPdbResNum() + " lacking center atoms, assuming 100.");
-            //System.exit(-1);
-            return(100);       // for the IDE ;)
+            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                DP.getInstance().w("Could not determine distance of PDB Residues # " + pdbResNum + " and " + r.getPdbResNum() + " lacking center atoms, assuming 100.");
+            }
+            return(100);      
         }
         else {
             //DEBUG
@@ -362,7 +365,7 @@ public class Residue implements java.io.Serializable {
         Atom throwAway = null;
 
         if(this.centerSphereRadius == null) {
-            // calling this function will set the variable!
+            // calling this function will set the centerSphereRadius variable!
             throwAway = this.getCenterAtom();
         }
 
@@ -370,9 +373,9 @@ public class Residue implements java.io.Serializable {
         if(this.centerSphereRadius == null) {
             
             Integer rad = 50;      // 5 A
-            
-            DP.getInstance().w("Could not determine center sphere radius of PDB residue " + this.getPdbResNum() + ", may have no atoms. Using guessed value " + rad + ".");
-            //System.exit(-1);
+            if(! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                DP.getInstance().w("Could not determine center sphere radius of PDB residue " + this.getPdbResNum() + ", may have no atoms. Using guessed value " + rad + ".");
+            }
             this.centerSphereRadius = rad;
         }
 
@@ -395,7 +398,9 @@ public class Residue implements java.io.Serializable {
         //Integer atomRadius = Settings.getInteger("plcc_I_atom_radius");
 
         if(atoms.size() < 1) {
-            DP.getInstance().w("getCenterAtom(): PDB residue " + this.pdbResNum + " chain " + this.getChainID() + " of type " + this.getName3() + " has " + atoms.size() + " atoms in default location. Aborting.");
+            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                DP.getInstance().w("getCenterAtom(): PDB residue " + this.pdbResNum + " chain " + this.getChainID() + " of type " + this.getName3() + " has " + atoms.size() + " atoms in default location, returning null.");
+            }
             return(null);
         }
 
@@ -538,7 +543,9 @@ public class Residue implements java.io.Serializable {
         try {
             dist = this.getCenterAtom().distToAtom(r.getCenterAtom());
         } catch(Exception e) {
-            DP.getInstance().w("Could not determine distance between DSSP residues " + this.getDsspResNum() + " and " + r.getDsspResNum() + ", assuming out of contact distance.");
+            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                DP.getInstance().w("Could not determine distance between DSSP residues " + this.getDsspResNum() + " and " + r.getDsspResNum() + ", assuming out of contact distance.");
+            }
             return(false);
         }
         Integer atomRadius;

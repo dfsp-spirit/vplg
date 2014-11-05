@@ -163,12 +163,27 @@ public class DBManager {
             System.exit(1);
         }
 
+        String dbProductName = null;
+        String dbProductVersion = null;
         try {
-            System.out.println("Connection to " + dbmd.getDatabaseProductName() + " " + dbmd.getDatabaseProductVersion() + " successful.");
+            dbProductName = dbmd.getDatabaseProductName();
+            dbProductVersion = dbmd.getDatabaseProductVersion();
+            conOK = true;
         } catch (SQLException e) {
             // Something didn't work out if this failed.
             System.err.println("ERROR: DB Connection failed: '" + e.getMessage() + "'.");
             conOK = false;
+        }
+        
+        if(conOK) {
+            try {
+                if(! Settings.getBoolean("plcc_B_silent")) {
+                    System.out.println("Connection to " + dbProductName + " " + dbProductVersion + " successful.");
+                }
+            } catch(Exception e) {
+                // settings may be missing and the getBoolean call may thus crash, just ignore it.
+            }
+            
         }
 
         return (conOK);
@@ -1665,7 +1680,9 @@ public class DBManager {
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
      */
     public static Boolean chainContainsMotif_RossmanFold(Long chain_db_id) {
-        DP.getInstance().w("DBManager", "chainContainsMotif_RossmanFold: Not implemented yet, returning false for chain with ID '" + chain_db_id + "'.");
+        if( ! Settings.getBoolean("plcc_B_no_not_impl_warn")) {
+            DP.getInstance().w("DBManager", "chainContainsMotif_RossmanFold: Not implemented yet, returning false for chain with ID '" + chain_db_id + "'.");
+        }
         return false;
     }
     
@@ -1676,7 +1693,9 @@ public class DBManager {
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
      */
     public static Boolean chainContainsMotif_TIMBarrel(Long chain_db_id) {
-        DP.getInstance().w("DBManager", "chainContainsMotif_TIMBarrel: Not implemented yet, returning false for chain with ID '" + chain_db_id + "'.");
+        if( ! Settings.getBoolean("plcc_B_no_not_impl_warn")) {
+            DP.getInstance().w("DBManager", "chainContainsMotif_TIMBarrel: Not implemented yet, returning false for chain with ID '" + chain_db_id + "'.");
+        }
         return false;
     }
     
@@ -1687,7 +1706,9 @@ public class DBManager {
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
      */
     public static Boolean chainContainsMotif_AlphaBetaPlait(Long chain_db_id) {
-        DP.getInstance().w("DBManager", "chainContainsMotif_AlphaBetaPlait: Not implemented yet, returning false for chain with ID '" + chain_db_id + "'.");
+        if( ! Settings.getBoolean("plcc_B_no_not_impl_warn")) {
+            DP.getInstance().w("DBManager", "chainContainsMotif_AlphaBetaPlait: Not implemented yet, returning false for chain with ID '" + chain_db_id + "'.");
+        }
         return false;
     }
     
@@ -1698,7 +1719,9 @@ public class DBManager {
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
      */
     public static Boolean chainContainsMotif_UbiquitinRoll(Long chain_db_id) {
-        DP.getInstance().w("DBManager", "chainContainsMotif_UbiquitinRoll: Not implemented yet, returning false for chain with ID '" + chain_db_id + "'.");
+        if( ! Settings.getBoolean("plcc_B_no_not_impl_warn")) {
+            DP.getInstance().w("DBManager", "chainContainsMotif_UbiquitinRoll: Not implemented yet, returning false for chain with ID '" + chain_db_id + "'.");
+        }
         return false;
     }
     
