@@ -146,7 +146,8 @@ foreach ($chains as $value){
 
 		    
 		    // continue building the HTML string. Not further explained from now on.
-		    $tableString .= '<li>
+		    $tableString .= "<li>\n";
+		    $tableString .= '
 						    <div class="container">
 						    <h4>Protein graph for '.$pdbID.', chain '.$chainName.'</h4>
 						    <div class="proteingraph">
@@ -177,13 +178,23 @@ foreach ($chains as $value){
 			$tableString .= '</span>';
 		    if(isset($data['filepath_graphfile_gml']) && file_exists($IMG_ROOT_PATH.$data['filepath_graphfile_gml'])){
 			    $tableString .= '<br><span class="download-options">Download graph file:
-								  <a href="'.$IMG_ROOT_PATH.$data['filepath_graphfile_gml'].'" target="_blank">[GML]</a>';
+								  <a href="'.$IMG_ROOT_PATH.$data['filepath_graphfile_gml'].'" target="_blank">[GML]</a></span>';
 		    }
-			$tableString .= '</span>
+			$tableString .= '
 							 <br><span class="download-options">
 							 <a href="foldinggraphs.php?pdbchain='.$pdbID.$chainName.'&graphtype_int='.$graphtype_int.'&notationtype=adj" target="_blank">Go to folding graphs</a>
 							 </span>';
-		    $tableString .= '</span></li>';
+							 
+		   if(count($motif_list_this_chain) > 0) {
+					    $tableString .= "<br><span class='download-options'>";
+					    $tableString .= "Detected motifs in this chain: ";
+					    for($i = 0; $i < count($motif_list_this_chain); $i++) {
+					      $tableString .= $motif_list_this_chain[$i] . " ";
+					    }
+					    $tableString .= "</span>";
+					}
+					
+		    $tableString .= '</li>';
 
 		    // }	// use this to limit preloaded images                // Tim says: what dis this supposed to do?!
 
@@ -207,16 +218,29 @@ foreach ($chains as $value){
 					if(isset($data['graph_image_png']) && file_exists($IMG_ROOT_PATH.$data['graph_image_png'])){
 						$tableString .= ' <a href="'.$IMG_ROOT_PATH.$data['graph_image_png'].'" target="_blank">[PNG]</a>';
 					}
-					$tableString .= '</span>';
+					$tableString .= '</span>'; // download images span ends
+					
+					
 					if(isset($data['filepath_graphfile_gml']) && file_exists($IMG_ROOT_PATH.$data['filepath_graphfile_gml'])){
 						$tableString .= '<br><span class="download-options">Download graph file:
-										  <a href="'.$IMG_ROOT_PATH.$data['filepath_graphfile_gml'].'" target="_blank">[GML]</a>';
+										  <a href="'.$IMG_ROOT_PATH.$data['filepath_graphfile_gml'].'" target="_blank">[GML]</a></span>';
 					}
-					$tableString .= '</span>
+					$tableString .= '
 									 <br><span class="download-options">
 									 <a href="foldinggraphs.php?pdbchain='.$pdbID.$chainName.'&graphtype_int='.++$graphtype_int.'&notationtype=adj" target="_blank">Go to folding graphs</a>
-									 </span>';
-					$tableString .= '</span></li>';
+									 </span>';					
+					
+					if(count($motif_list_this_chain) > 0) {
+					    $tableString .= "<br><span class='download-options'>";
+					    $tableString .= "Detected motifs in this chain: ";
+					    for($i = 0; $i < count($motif_list_this_chain); $i++) {
+					      $tableString .= $motif_list_this_chain[$i] . " ";
+					    }
+					    $tableString .= "</span>";
+					}
+					
+					
+					$tableString .= '</li>';
 		    }
 
 		    $tableString .= '</ul>
@@ -275,14 +299,7 @@ foreach ($chains as $value){
 		}
 		$tableString .= '</div></li>';
 		
-		if(count($motif_list_this_chain) > 0) {
-		  $tableString .= "<p>";
-		  $tableString .= "Detected motifs in this chain: ";
-		  for($i = 0; $i < count($motif_list_this_chain); $i++) {
-		    $tableString .= $motif_list_this_chain[$i] . " ";
-		  }
-		  $tableString .= "</p>";
-		}
+		
 	}
 	$loaded_images++;
 }
