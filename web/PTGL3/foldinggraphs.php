@@ -137,7 +137,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		
 		<div class="container" id="searchResults">
 			<h3> Search Results </h3>
-			<?php echo $tableString; /* The table string is constructed in backend/search.php, which is included by this file. */  
+			<?php echo $tableString; /* The table string is constructed in /backend/get_foldinggraphs.php, which is included by this file. */  
 			
 			      echo "<br><h3> Folding graph images </h3><br><p>The images below show the folding graphs (connected components) of the protein graph. The folding graphs and their linear notations are used to power the motif search and other features of this database server. Note that folding graphs of size 1 (isolated vertices in the graph) are not listed here -- they would not be of any use. In the images, the following abbreviations are used: PG = protein graph, FG = folding graph, SQ = sequential in chain.</p>\n";
 			      echo $img_string;

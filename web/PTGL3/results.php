@@ -63,8 +63,8 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			<p>In the <a href="about.php#key">key</a> notation only folding graphs can be shown that are <a href="">non-bifurcated</a>.</p>
 			-->
 			
-			<span id="multipleDownload">Download checked proteins as <select id="multidown" name="multipledownload">
-				<option class="downloadOption" value="null">-- Select to download --</option>
+			<span id="multipleDownload">Select protein chains you want to download below first. Then, download all selected proteins in format <select id="multidown" name="multipledownload">
+				<option class="downloadOption" value="null">-- Select format --</option>
 				<option class="downloadOption" value="pdf">PDF</option>
 				<option class="downloadOption" value="svg">SVG</option>
 				<option class="downloadOption" value="png">PNG</option>
