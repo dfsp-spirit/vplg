@@ -76,7 +76,9 @@ if(isset($_GET)) {
 
 // seperate PDB-IDs at the whitespace and remove unneccessary whitespaces at start and end
 // results into an array full of PDB-IDs.
+
 $chains = explode(" ", trim($q));
+
 
 // establish database connection
 $conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
@@ -91,6 +93,8 @@ $loaded_images = 0;
 $allChainIDs = array();
 
 $motif_data_all_chains = array();
+$tableString = '<div id="myCarousel">
+				      <ul class="bxslider bx-prev bx-next" id="carouselSlider">';
 
 // for each PDB-ID+chainname...
 foreach ($chains as $value){
@@ -137,8 +141,8 @@ foreach ($chains as $value){
 		
 		if($base_image_exists) {
 			$graphtype_int = 1;
-		    $tableString = '<div id="myCarousel">
-				      <ul class="bxslider bx-prev bx-next" id="carouselSlider">';
+		    //$tableString .= '<div id="myCarousel">
+			//	      <ul class="bxslider bx-prev bx-next" id="carouselSlider">';
 		    
 		    // start to fill the html-tableString with content. This string will be echoed later
 		    // to display the here created HTML construct.

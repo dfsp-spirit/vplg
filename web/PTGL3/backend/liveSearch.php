@@ -27,6 +27,8 @@ if($DEBUG){
 $conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
 $db = pg_connect($conn_string);
 
+echo pg_last_error($db);
+
 // Define Output HTML Formating which will be displayed in the grey box below the search field.
 $html = '';
 $html .= '<div class="result" title="IDStringTool - headerStringTool">';

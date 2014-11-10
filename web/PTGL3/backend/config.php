@@ -11,18 +11,18 @@
  */
 
 //---- Database settings ----//
-$DB_HOST		= '127.0.0.1';
+$DB_HOST		= '192.168.185.248'; // 127.0.0.1 lauscht niemand
 $DB_USER		= 'vplg';
 $DB_PASSWORD	= 'vplg';
 $DB_NAME		= 'vplg';
 $DB_PORT		= '5432';
 //---- End of database settings ----//
 
-//---- Debug settings ----//
+//---- Site settings ----//
 $SITE_TITLE = "PTGL";
 $TITLE_SPACER = " -- ";
 $SITE_BASE_URL="http://ptgl.uni-frankfurt.de";
-//---- End of debug settings ----//	
+//---- End of site settings ----//	
 
 //---- Search Settings ----//
 $ENABLE_COMPLEX_GRAPHS	= FALSE;
