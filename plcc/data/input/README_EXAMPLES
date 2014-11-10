@@ -11,6 +11,7 @@ These are example PDB and DSSP input files. Most of the are here for a special r
 * 3kmf: Example for a protein which contains the motif 'globin fold' in the chains C and G.
 * 1ave: Avidin, which contains the motif 'up and down barrel'
 * 1ad0: Human antibody part, which contains the motif 'immunoglobin fold'
+* 1b9x: Phosducin and transducin, which contains the motif 'beta propeller'
 
 
 
