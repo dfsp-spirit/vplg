@@ -1103,22 +1103,24 @@ public class Main {
         if(sulfurBridges.size() > 0) {
             if(! silent) {
                 System.out.print("    DSSP: Protein contains " + sulfurBridges.size() + " disulfide bridges: ");
-            }
-            for(Character key : sulfurBridges.keySet()) {
-                sBondString = "(";
-                ArrayList<Integer> dsspResidueIDs = sulfurBridges.get(key);
-                
-                if(dsspResidueIDs.size() != 2) {
-                    DP.getInstance().w("Disulfide bridge has " + dsspResidueIDs.size() + " member residues.");
+            
+                for(Character key : sulfurBridges.keySet()) {
+                    sBondString = "(";
+                    ArrayList<Integer> dsspResidueIDs = sulfurBridges.get(key);
+
+                    if(dsspResidueIDs.size() != 2) {
+                        DP.getInstance().w("Disulfide bridge has " + dsspResidueIDs.size() + " member residues.");
+                    }
+
+                    for(Integer dsspID : dsspResidueIDs) {
+                        sBondString += (dsspID + " ");
+                    }
+                    sBondString += ")";
+                    System.out.print(sBondString);
                 }
                 
-                for(Integer dsspID : dsspResidueIDs) {
-                    sBondString += (dsspID + " ");
-                }
-                sBondString += ")";
-                System.out.print(sBondString);
+                System.out.print("\n"); 
             }
-            System.out.print("\n");            
         } else {
             if(! silent) {
                 System.out.println("    DSSP: Protein contains no disulfide bridges.");
