@@ -14,6 +14,8 @@ These are example PDB and DSSP input files. Most of the are here for a special r
 * 1b9x: Phosducin and transducin, which contains the motif 'beta propeller'
 * 1ayn: Human rhinovirus coat protein, contains the motif 'jelly roll' (a type of beta barrel)
 * 1aar: Diubiquitin conjugate, contains the motif 'ubiquitin roll'
+* 1b4s: Nucleoside diphosphate kinase, contains the motif 'alpha-beta plait'
+
 
 
 
