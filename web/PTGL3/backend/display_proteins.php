@@ -25,6 +25,24 @@ if($DEBUG){
 	error_reporting(E_ALL);
 }
 
+
+function get_motifs_found_in_chain($db, $pdb_id, $chain_name) {
+  $data = array();
+  $query = "SELECT p.pdb_id, c.chain_name, m.motif_name FROM plcc_nm_chaintomotif c2m INNER JOIN plcc_motif m ON c2m.motif_id = m.motif_id INNER JOIN plcc_chain c ON c2m.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id WHERE p.pdb_id = '" . $pdb_id . "' AND c.chain_name = '" . $chain_name . "'";
+    
+  $result = pg_query($db, $query);
+  while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
+		array_push($data, $arr['motif_name']);		
+	}
+  
+  pg_free_result($result);
+  return $data;
+  
+}
+
+
+
+
 // the graphtype which should be displayed first. Standard: alpha-graph
 // and all other graphtypes
 $graphtype			= "alpha"; # alpha-helix is #1
@@ -72,6 +90,8 @@ $loaded_images = 0;
 // used for loading content dynamically.
 $allChainIDs = array();
 
+$motif_data_all_chains = array();
+
 // for each PDB-ID+chainname...
 foreach ($chains as $value){
 	// check for correct format (maybe check also for correct letters/numbers..?)
@@ -86,6 +106,9 @@ foreach ($chains as $value){
 		$pdb_chain = str_split($value, 4);
 		$pdbID = $pdb_chain[0];
 		$chainName = $pdb_chain[1];
+		
+		$motif_list_this_chain = get_motifs_found_in_chain($db, $pdbID, $chainName);
+		$motif_data_all_chains[$pdbID . $chainName] = $motif_list_this_chain;
 		
 		// remove previous prepared_statements from DB
 		pg_query($db, "DEALLOCATE ALL");
@@ -162,7 +185,7 @@ foreach ($chains as $value){
 							 </span>';
 		    $tableString .= '</span></li>';
 
-		    // }	// use this to limit preloaded images
+		    // }	// use this to limit preloaded images                // Tim says: what dis this supposed to do?!
 
 		    // get the rest of the dataset. Until here we used only the first dataset from the DB.
 			
@@ -251,6 +274,15 @@ foreach ($chains as $value){
 			}
 		}
 		$tableString .= '</div></li>';
+		
+		if(count($motif_list_this_chain) > 0) {
+		  $tableString .= "<p>";
+		  $tableString .= "Detected motifs in this chain: ";
+		  for($i = 0; $i < count($motif_list_this_chain); $i++) {
+		    $tableString .= $motif_list_this_chain[$i] . " ";
+		  }
+		  $tableString .= "</p>";
+		}
 	}
 	$loaded_images++;
 }
