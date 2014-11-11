@@ -20,6 +20,7 @@ source $CFG_FILE
 ERROR_LOG="/dev/stderr"
 ERROR_LOG_GET_PDB_FILE="/dev/stderr"		# may be reset below once PDB ID is known
 ERROR_LOG_CREATE_DSSP_FILE="/dev/stderr"	# may be reset below once PDB ID is known
+SILENT="YES"
 
 ################################################## functions ##################################################
 
@@ -270,7 +271,9 @@ if [ -r $FLN ]; then
 	
 	## Get the PDB file
 	GET_PDB_FILE_COMMAND="$GET_PDB_FILE_SCRIPT $PDBID"
-	echo "$APPTAG $PDBID The command to get the PDB file is '$GET_PDB_FILE_COMMAND'."
+	if [ "$SILENT" = "NO" ]; then
+	    echo "$APPTAG $PDBID The command to get the PDB file is '$GET_PDB_FILE_COMMAND'."
+	fi
 	$GET_PDB_FILE_COMMAND 1>>$DBINSERT_LOG 2>>$ERROR_LOG_GET_PDB_FILE
 	#$GET_PDB_FILE_COMMAND
 
@@ -283,7 +286,9 @@ if [ -r $FLN ]; then
 	    del_output $PDBID
 	    report_and_exit 1
 	else
-	    echo "$APPTAG $PDBID Retrieved the PDB file (unpacked, split and copied), script reported success."
+	    if [ "$SILENT" = "NO" ]; then
+	        echo "$APPTAG $PDBID Retrieved the PDB file (unpacked, split and copied), script reported success."
+	    fi
 	fi
 
 	## double-check it
@@ -294,7 +299,9 @@ if [ -r $FLN ]; then
 
 	## Now create the DSSP file
 	CREATE_DSSP_COMMAND="$CREATE_DSSP_FILE_SCRIPT $PDBFILE"
-	echo "$APPTAG $PDBID The command to create the DSSP file is '$CREATE_DSSP_COMMAND'."
+	if [ "$SILENT" = "NO" ]; then
+	    echo "$APPTAG $PDBID The command to create the DSSP file is '$CREATE_DSSP_COMMAND'."
+	fi
 	$CREATE_DSSP_COMMAND 1>>$DBINSERT_LOG 2>>$ERROR_LOG_CREATE_DSSP_FILE
 	#$CREATE_DSSP_COMMAND
 
@@ -307,7 +314,9 @@ if [ -r $FLN ]; then
 	    del_output $PDBID
 	    report_and_exit 1
 	else
-	    echo "$APPTAG $PDBID Created the DSSP file, script reported success."
+	    if [ "$SILENT" = "NO" ]; then
+	        echo "$APPTAG $PDBID Created the DSSP file, script reported success."
+	    fi
 	fi
 
 	## double-check it
@@ -319,9 +328,13 @@ if [ -r $FLN ]; then
 
 	## Ok, now call plcc to do the real work.
 	PLCC_COMMAND="./plcc $PDBID $PLCC_OPTIONS"
-	echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'."
+	
+	if [ "$SILENT" = "NO" ]; then
+	    echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'."
+	fi
 	#echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'." >>$ERROR_LOG
 	echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'." >>$DBINSERT_LOG
+	
 	$PLCC_COMMAND 1>>$DBINSERT_LOG 2>>$ERROR_LOG_PLCC
 	#$PLCC_COMMAND
 
@@ -335,7 +348,10 @@ if [ -r $FLN ]; then
 	    report_and_exit 1
 	else
 	    ## everything worked it seems
-	    echo "$APPTAG $PDBID PLCC run successfully."
+	    if [ "$SILENT" = "NO" ]; then
+	        echo "$APPTAG $PDBID PLCC run successfully."
+	    fi
+	    
 	    let NUM_SUCCESS++
 	    #del_output $PDBID
 	    ## we delete the log files if everything went fine
@@ -347,7 +363,9 @@ if [ -r $FLN ]; then
             done
 	    
             if [ "$RUN_GRAPHLETANALYSER" = "YES" ]; then
-                echo "$APPTAG Running Graphletanalyser to compute graphlets."
+                if [ "$SILENT" = "NO" ]; then
+                    echo "$APPTAG Running Graphletanalyser to compute graphlets."
+                fi
 		CHAINS_FILE="${PLCC_OUTPUT_DIR}/${PDBID}.chains"
 		if [ ! -f "$CHAINS_FILE" ]; then
 		       echo "$APPTAG ##### ERROR: No chains file found at '$CHAINS_FILE', is '--cluster' set as PLCC command line option?"
