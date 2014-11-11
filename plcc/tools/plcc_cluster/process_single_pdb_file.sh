@@ -77,6 +77,16 @@ function report_and_exit_nolog()
     exit $L_EXITCODE
 }
 
+## deletes a file unless it is a device, i.e., the name starts with /dev/
+function delete_file_unless_dev()
+{
+    FILENAME="$1"	# first parameter to this function
+    if [[ FILENAME == /dev/* ]] ;
+    then
+      rm -f $FILENAME
+    fi
+}
+
 
 ################################################## end of functions ##################################################
 
@@ -212,7 +222,7 @@ ERROR_LOG_CREATE_DSSP_FILE="/dev/null"
 for L_LOGFILE in $DBINSERT_LOG $ERROR_LOG_PLCC $ERROR_LOG_GET_PDB_FILE $ERROR_LOG_CREATE_DSSP_FILE
 do
     if [ -f $L_LOGFILE -a -w $L_LOGFILE ]; then
-	rm -f $L_LOGFILE
+	delete_file_unless_dev $L_LOGFILE
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG $PDBID ##### ERROR: Could not delete old logfile '$L_LOGFILE'. Check permissions."
 	    echo "$APPTAG $PDBID ##### ERROR: Could not delete old logfile '$L_LOGFILE'. Check permissions." >>$ERROR_LOG
@@ -332,7 +342,7 @@ if [ -r $FLN ]; then
 	    for LF in $DBINSERT_LOG $ERROR_LOG_GET_PDB_FILE $ERROR_LOG_CREATE_DSSP_FILE $ERROR_LOG_PLCC
     	    do
 	    	if [ -w $LF ]; then
-		    rm -f $LF
+		    delete_file_unless_dev $LF
 	    	fi
             done
 	    
