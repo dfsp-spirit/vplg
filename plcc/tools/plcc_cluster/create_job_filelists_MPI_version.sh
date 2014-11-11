@@ -110,6 +110,9 @@ fi
 
 echo "$APPTAG Using PDB files in sub directories of '$LOCAL_MIRRORDIR'. Assuming file extension '$REMOTE_PDB_FILE_EXTENSION'."
 
+echo "$APPTAG Deleting old file lists..."
+rm $STATUSDIR/$FILELIST_BASENAME_MPI*
+
 if [ "$1" = "all" ]; then
     DATE_FILTER=""
     echo "$APPTAG Updating all proteins in the database, even if they did not change more recently than the last update."
@@ -152,9 +155,9 @@ echo "$APPTAG Found $NUM_FILES input files, assigning $NUM_FILES_PER_BIN files t
 
 
 #cd status/ && split -d -a 3 -l $NUM_FILES_PER_BIN $DBINSERT_FILE_LIST filelistnum
-cd status/ && split --numeric-suffixes --suffix-length=3 --lines=$NUM_FILES_PER_BIN $DBINSERT_FILE_LIST_FNAME $FILELIST_BASENAME_MPI
+cd $STATUSDIR && split --numeric-suffixes --suffix-length=3 --lines=$NUM_FILES_PER_BIN $DBINSERT_FILE_LIST_FNAME $FILELIST_BASENAME_MPI
 
-echo "$APPTAG Wrote the MPI job file lists to status/ directory with basename '$FILELIST_BASENAME_MPI'."
+echo "$APPTAG Wrote the MPI job file lists to $STATUSDIR directory with basename '$FILELIST_BASENAME_MPI'."
 
 echo "$APPTAG Done, exiting."
 
