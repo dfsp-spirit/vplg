@@ -3,7 +3,7 @@
 <?php 
 include('./backend/config.php');
 
-$title = "Motif overview";
+$title = "Protein structural motif overview";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
 
@@ -73,12 +73,12 @@ function get_all_motif_names() {
 	<?php include('navbar.php'); ?>
 
 	<div class="container" id="publications">
-		<h2>Motif overview</h2>
+		<h2><?php print "$SITE_TITLE"; ?> Structural motif overview</h2>
 		<br>
 		
 		<div id="PageIntro">
 		<div class="container" id="pageintro">
-		A motif is a common supersecondary structure. A single motif may occur in protein chains with very different functions. This server implements motif
+		A motif is a common supersecondary structure. A motif consists of only a few SSEs, and it may occur in protein chains with very different functions. This server implements motif
 		detection in protein graphs based on the linear notations of folding graphs.
 		
 		</div><!-- end container-->
