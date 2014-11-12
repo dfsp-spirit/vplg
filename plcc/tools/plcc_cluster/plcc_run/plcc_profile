@@ -1,0 +1,34 @@
+#!/bin/bash
+## plcc startup script by Tim Schaefer
+# This script is for profiling the app remotely only, it requires the Remote profiling pack for the current JVM (e.g., Java JRE 7, linux64) in the path /home/ts/software/java-profiler/.
+# You also need to calibrate it by running bin/calibrate-<jvm-version>.sh in the profiling pack
+# You can than remotely attach to the app.
+
+
+APPTAG="[PLCC_STARTSCRIPT]"
+
+## check for java in PATH
+which java > /dev/null
+if [ $? -ne 0 ]; then
+    echo "$APPTAG ERROR: Could not find 'java' executable in PATH. Is the JRE installed?"
+    exit 1
+fi
+
+JAVABIN=$(which java)
+
+
+## I need my own java7 binary on the cluster because it only has java6
+CUSTOM_JAVABIN="/home/ts/software/java/jdk/bin/java"
+if [ -f $CUSTOM_JAVABIN ]; then
+    JAVABIN="$CUSTOM_JAVABIN"
+fi
+
+
+echo "$APPTAG Using java binary from '$JAVABIN'."
+
+if [ ! -d "/home/ts/software/java-profiler/" ]; then
+   echo "$APPTAG ERROR: Missing remote profiling pack for JRE at /home/ts/software/java-profiler/."
+fi
+
+## k, run
+$JAVABIN -XX:+UseLinuxPosixThreadCPUClocks -agentpath:/home/ts/software/java-profiler/lib/deployed/jdk16/linux-amd64/libprofilerinterface.so=/home/ts/software/java-profiler/lib,5140 -jar plcc.jar $@ 
