@@ -86,7 +86,7 @@ function get_all_motif_names() {
 		
 		<table id="tblmotifoverview">
 		<tr>
-		    <th>Motif</th><th>Motif abbreviation</th><th>Chains with motif in the database</th>
+		    <th>Motif</th><th>Motif abbreviation</th><th>Chains with motif in the database</th><th>Short info on motif</th>
 		</tr>
 		<?php
 		  $conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
@@ -96,10 +96,9 @@ function get_all_motif_names() {
 	          foreach($motif_names as $motif) {
 	            $motif_data = get_motif_data($db, $motif);
 	            if(isset($motif_data['motif_name']) && ( ! empty($motif_data['motif_name']))) {
-	                print "<tr><td>" . $motif_data['motif_name'] . "</td><td>" . $motif_data['motif_abbreviation'] . "</td><td><a href='search.php?motif=" . $motif_data['motif_abbreviation'] . "'>" . $motif_data['count'] . "</a></td></tr>\n";
-	            } else {
-	            
-	                print "<tr><td>" . get_motif_fullname($db, $motif) . "</td><td>" . $motif . "</td><td>0</td></tr>\n";
+	                print "<tr><td>" . $motif_data['motif_name'] . "</td><td>" . $motif_data['motif_abbreviation'] . "</td><td><a href='search.php?motif=" . $motif . "'>" . $motif_data['count'] . "</a></td><td><a href='#" . $motif_data['motif_abbreviation'] ."'>" . $motif . " info</a></td></tr>\n";
+	            } else {	            
+	                print "<tr><td>" . get_motif_fullname($db, $motif) . "</td><td>" . $motif . "</td><td>0</td><td><a href='#" . $motif ."'>" . $motif . " info</a></td></tr>\n";
 	            }
 	          }
 	          
@@ -108,6 +107,90 @@ function get_all_motif_names() {
 		
 		
 		</table>
+		
+		
+		<br><br><br><br><br><br>
+		
+		<h2>Motif info</h2>
+		
+		
+		<br><br>
+		<div id="4helix">
+		    <h3>Four Helix Bundle</h3>
+		    <p>A motif consisting only of alpha helices.</p>
+		    <p><img class="motifimage" src="./images/4helixbeide_struktur.jpg" width="300" /></p>
+		</div>
+		
+		
+		<br><br><br><br>
+		<div id="globin">
+		    <h3>Globin Fold</h3>
+		    <p>A motif consisting only of alpha helices.</p>
+		    <p><img class="motifimage" src="./images/globin_struktur.jpg" width="300" /></p>
+		</div>
+		
+		
+		<br><br><br><br>
+		<div id="barrel">
+		    <h3>Up and Down Barrel</h3>
+		    <p>A motif consisting only of beta strands.</p>
+		    <p><img class="motifimage" src="./images/barrel_struktur.jpg" width="300" /></p>
+		</div>
+		
+		
+		<br><br><br><br>
+		<div id="immuno">
+		    <h3>Immunoglobin Fold</h3>
+		    <p>A motif consisting only of beta strands.</p>
+		    <p><img class="motifimage" src="./images/immuno_struktur.jpg" width="300" /></p>
+		</div>
+		
+		
+		<br><br><br><br>
+		<div id="propeller">
+		    <h3>Beta Propeller</h3>
+		    <p>A motif consisting only of beta strands.</p>
+		    <p><img class="motifimage" src="./images/propeller_struktur.jpg" width="300" /></p>
+		</div>
+		
+		
+		<br><br><br><br>
+		<div id="jelly">
+		    <h3>Jelly Roll</h3>
+		    <p>A motif consisting only of beta strands.</p>
+		    <p><img class="motifimage" src="./images/jelly_struktur.jpg" width="300" /></p>
+		</div>
+		
+		
+		<br><br><br><br>
+		<div id="ubi">
+		    <h3>Ubiquitin Roll</h3>
+		    <p>A motif consisting only of both alpha helices and beta strands.</p>
+		    <p><img class="motifimage" src="./images/ubibeide_struktur.jpg" width="300" /></p>
+		</div>
+		
+		
+		<br><br><br><br>
+		<div id="plait">
+		    <h3>Alpha Beta Plait</h3>
+		    <p>A motif consisting only of both alpha helices and beta strands.</p>
+		    <p><img class="motifimage" src="./images/plait_struktur.jpg" width="300" /></p>
+		</div>
+		
+		
+		<br><br><br><br>
+		<div id="rossman">
+		    <h3>Rossman Fold</h3>
+		    <p>A motif consisting only of both alpha helices and beta strands.</p>
+		    <p><img class="motifimage" src="./images/rossman_struktur.jpg" width="300" /></p>
+		</div>
+		
+		<br><br><br><br>
+		<div id="tim">
+		    <h3>TIM Barrel</h3>
+		    <p>A motif consisting only of both alpha helices and beta strands.</p>
+		    <p><img class="motifimage" src="./images/tim_struktur.jpg" width="300" /></p>
+		</div>
 		
 										
 </div><!-- end container and contentText -->
