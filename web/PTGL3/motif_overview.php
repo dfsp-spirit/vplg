@@ -20,6 +20,13 @@ function get_motif_data($db, $motiv_abbreviation) {
   return $motif_data;
 }
 
+function get_total_chains_count($db) {
+  $query = "SELECT count(c.chain_id) as count FROM plcc_chain c";
+  $result = pg_query($db, $query);  
+  $arr = pg_fetch_array($result, NULL, PGSQL_ASSOC);
+  return $arr['count'];
+}
+
 function get_motif_fullname($db, $motiv_abbreviation) {
   
   $query = "SELECT m.motif_name FROM plcc_motif m WHERE m.motif_abbreviation = '" . $motiv_abbreviation . "'";
@@ -83,26 +90,28 @@ function get_all_motif_names() {
 		
 		</div><!-- end container-->
 		</div><!-- end Home -->
-		
-		<table id="tblmotifoverview">
-		<tr>
-		    <th>Motif</th><th>Motif abbreviation</th><th>Chains with motif in the database</th><th>Short info on motif</th>
-		</tr>
 		<?php
 		  $conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
 	          $db = pg_connect($conn_string);
+		?>
 		
+		<table id="tblmotifoverview">
+		<tr>
+		    <th>Motif</th><th>Motif abbreviation</th><th>Chains with motif in the database (of <?php print get_total_chains_count($db);?> chains total)</th><th>Short info on motif</th>
+		</tr>
+		<?php		  		
 	          $motif_names = get_all_motif_names();
+	          $all_motif_counts = array();
 	          foreach($motif_names as $motif) {
 	            $motif_data = get_motif_data($db, $motif);
+	            $all_motif_counts[$motif] = 0;	            
 	            if(isset($motif_data['motif_name']) && ( ! empty($motif_data['motif_name']))) {
+	                $all_motif_counts[$motif] = $motif_data['count'];
 	                print "<tr><td>" . $motif_data['motif_name'] . "</td><td>" . $motif_data['motif_abbreviation'] . "</td><td><a href='search.php?motif=" . $motif . "'>" . $motif_data['count'] . "</a></td><td><a href='#" . $motif_data['motif_abbreviation'] ."'>" . $motif . " info</a></td></tr>\n";
 	            } else {	            
 	                print "<tr><td>" . get_motif_fullname($db, $motif) . "</td><td>" . $motif . "</td><td>0</td><td><a href='#" . $motif ."'>" . $motif . " info</a></td></tr>\n";
 	            }
-	          }
-	          
-	
+	          }	          	
 		?>
 		
 		
@@ -117,7 +126,7 @@ function get_all_motif_names() {
 		<br><br>
 		<div id="4helix">
 		    <h3>Four Helix Bundle</h3>
-		    <p>A motif consisting only of alpha helices.</p>
+		    <p>A motif consisting only of alpha helices. Found <?php print $all_motif_counts['4helix'];?> times in the current database.</p>
 		    <p><img class="motifimage" src="./images/4helixbeide_struktur.jpg" width="300" /></p>
 		</div>
 		
@@ -125,7 +134,7 @@ function get_all_motif_names() {
 		<br><br><br><br>
 		<div id="globin">
 		    <h3>Globin Fold</h3>
-		    <p>A motif consisting only of alpha helices.</p>
+		    <p>A motif consisting only of alpha helices. Found <?php print $all_motif_counts['globin'];?> times in the current database.</p>
 		    <p><img class="motifimage" src="./images/globin_struktur.jpg" width="300" /></p>
 		</div>
 		
@@ -133,7 +142,7 @@ function get_all_motif_names() {
 		<br><br><br><br>
 		<div id="barrel">
 		    <h3>Up and Down Barrel</h3>
-		    <p>A motif consisting only of beta strands.</p>
+		    <p>A motif consisting only of beta strands. Found <?php print $all_motif_counts['barrel'];?> times in the current database.</p>
 		    <p><img class="motifimage" src="./images/barrel_struktur.jpg" width="300" /></p>
 		</div>
 		
@@ -141,7 +150,7 @@ function get_all_motif_names() {
 		<br><br><br><br>
 		<div id="immuno">
 		    <h3>Immunoglobin Fold</h3>
-		    <p>A motif consisting only of beta strands.</p>
+		    <p>A motif consisting only of beta strands. Found <?php print $all_motif_counts['immuno'];?> times in the current database.</p>
 		    <p><img class="motifimage" src="./images/immuno_struktur.jpg" width="300" /></p>
 		</div>
 		
@@ -149,7 +158,7 @@ function get_all_motif_names() {
 		<br><br><br><br>
 		<div id="propeller">
 		    <h3>Beta Propeller</h3>
-		    <p>A motif consisting only of beta strands.</p>
+		    <p>A motif consisting only of beta strands. Found <?php print $all_motif_counts['propeller'];?> times in the current database.</p>
 		    <p><img class="motifimage" src="./images/propeller_struktur.jpg" width="300" /></p>
 		</div>
 		
@@ -157,7 +166,7 @@ function get_all_motif_names() {
 		<br><br><br><br>
 		<div id="jelly">
 		    <h3>Jelly Roll</h3>
-		    <p>A motif consisting only of beta strands.</p>
+		    <p>A motif consisting only of beta strands. Found <?php print $all_motif_counts['jelly'];?> times in the current database.</p>
 		    <p><img class="motifimage" src="./images/jelly_struktur.jpg" width="300" /></p>
 		</div>
 		
@@ -165,7 +174,7 @@ function get_all_motif_names() {
 		<br><br><br><br>
 		<div id="ubi">
 		    <h3>Ubiquitin Roll</h3>
-		    <p>A motif consisting only of both alpha helices and beta strands.</p>
+		    <p>A motif consisting only of both alpha helices and beta strands. Found <?php print $all_motif_counts['ubi'];?> times in the current database.</p>
 		    <p><img class="motifimage" src="./images/ubibeide_struktur.jpg" width="300" /></p>
 		</div>
 		
@@ -173,7 +182,7 @@ function get_all_motif_names() {
 		<br><br><br><br>
 		<div id="plait">
 		    <h3>Alpha Beta Plait</h3>
-		    <p>A motif consisting only of both alpha helices and beta strands.</p>
+		    <p>A motif consisting only of both alpha helices and beta strands. Found <?php print $all_motif_counts['plait'];?> times in the current database.</p>
 		    <p><img class="motifimage" src="./images/plait_struktur.jpg" width="300" /></p>
 		</div>
 		
@@ -181,14 +190,14 @@ function get_all_motif_names() {
 		<br><br><br><br>
 		<div id="rossman">
 		    <h3>Rossman Fold</h3>
-		    <p>A motif consisting only of both alpha helices and beta strands.</p>
+		    <p>A motif consisting only of both alpha helices and beta strands. Found <?php print $all_motif_counts['rossman'];?> times in the current database. </p>
 		    <p><img class="motifimage" src="./images/rossman_struktur.jpg" width="300" /></p>
 		</div>
 		
 		<br><br><br><br>
 		<div id="tim">
 		    <h3>TIM Barrel</h3>
-		    <p>A motif consisting only of both alpha helices and beta strands.</p>
+		    <p>A motif consisting only of both alpha helices and beta strands. Found <?php print $all_motif_counts['tim'];?> times in the current database.</p>
 		    <p><img class="motifimage" src="./images/tim_struktur.jpg" width="300" /></p>
 		</div>
 		
