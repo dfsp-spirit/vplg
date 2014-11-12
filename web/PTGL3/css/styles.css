@@ -1047,6 +1047,21 @@ table#tblfgresults th {
     background-color: black;
 }
 
+	table#tblmotifoverview {
+    width: 100%;
+    background-color: #f1f1c1;
+	} 
+	 table#tblmotifoverview tr:nth-child(even) {
+    background-color: #eee;
+}
+table#tblmotifoverview tr:nth-child(odd) {
+    background-color: #fff;
+}
+table#tblmotifoverview th {
+    color: white;
+    background-color: black;
+}
+
 	
 @media print {
   * { background: transparent !important; color: black !important; text-shadow: none !important; filter:none !important; -ms-filter: none !important; }

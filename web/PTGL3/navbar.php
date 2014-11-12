@@ -35,7 +35,10 @@
 								<a href="linearnotations.php"><i class="fa fa-briefcase"></i> Linear notations</a>
 							</li>
 							<li>
-								<a href="foldinggraphs.php"><i class="fa fa-briefcase"></i> Folding graph visualization</a>
+								<a href="foldinggraphs.php"><i class="fa fa-briefcase"></i> Folding graphs</a>
+							</li>
+							<li>
+								<a href="motif_overview.php"><i class="fa fa-briefcase"></i> Motifs</a>
 							</li>
 							<li>
 								<a href="publications.php"><i class="fa fa-copy"></i> Publications</a>
