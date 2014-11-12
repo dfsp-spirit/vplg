@@ -160,40 +160,40 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 				<br>
 					<h4>Alpha Motifs</h4>
 					<div class="motifimagecontainer">
-					   <div class="motiftext">Four Helix Bundle (<a href="help.php#helpAlphaMotifs">?</a>)</div>
+					   <div class="motiftext">Four Helix Bundle (<a href="motif_overview.php#4helix">?</a>)</div>
 					   <a href="search.php?motif=4helix"><img class="motifimage" src="./images/4helixbeide_struktur.jpg" /></a></div>
 					<div class="motifimagecontainer">
-					   <div class="motiftext">Globin Fold (<a href="help.php#helpAlphaMotifs">?</a>)</div>
+					   <div class="motiftext">Globin Fold (<a href="motif_overview.php#globin">?</a>)</div>
 					   <a href="search.php?motif=globin"><img class="motifimage" src="./images/globin_struktur.jpg" /></a></div>
 
 
 					<h4>Beta Motifs</h4>
 					<div class="motifimagecontainer">
-					   <div class="motiftext">Up and Down Barrel (<a href="help.php#helpBetaMotifs">?</a>)</div>
+					   <div class="motiftext">Up and Down Barrel (<a href="motif_overview.php#barrel">?</a>)</div>
 					   <a href="search.php?motif=barrel"><img class="motifimage" src="./images/barrel_struktur.jpg" /></a></div>	
 					<div class="motifimagecontainer">
-					   <div class="motiftext">Immunoglobulin Fold (<a href="help.php#helpBetaMotifs">?</a>)</div>
+					   <div class="motiftext">Immunoglobulin Fold (<a href="motif_overview.php#immuno">?</a>)</div>
 					   <a href="search.php?motif=immuno"><img class="motifimage" src="./images/immuno_struktur.jpg" /></a></div>
 					<div class="motifimagecontainer">
-					   <div class="motiftext">Beta Propeller (<a href="help.php#helpBetaMotifs">?</a>)</div>
+					   <div class="motiftext">Beta Propeller (<a href="motif_overview.php#propeller">?</a>)</div>
 					   <a href="search.php?motif=propeller"><img class="motifimage" src="./images/propeller_struktur.jpg" /></a></div>	
 					<div class="motifimagecontainer">
-					   <div class="motiftext">Jelly Roll (<a href="help.php#helpBetaMotifs">?</a>)</div>
+					   <div class="motiftext">Jelly Roll (<a href="motif_overview.php#jelly">?</a>)</div>
 					   <a href="search.php?motif=jelly"><img class="motifimage" src="./images/jelly_struktur.jpg" /></a></div>		
 
 
 					<h4>Alpha Beta Motifs</h4>
 					<div class="motifimagecontainer">
-					   <div class="motiftext">Ubiquitin Roll (<a href="help.php#helpAlphaBetaMotifs">?</a>)</div>
+					   <div class="motiftext">Ubiquitin Roll (<a href="motif_overview.php#ubi">?</a>)</div>
 					   <a href="search.php?motif=ubi"><img class="motifimage" src="./images/ubibeide_struktur.jpg" /></a></div>	
 					<div class="motifimagecontainer">
-					   <div class="motiftext">Alpha-Beta Plait (<a href="help.php#helpAlphaBetaMotifs">?</a>)</div>
+					   <div class="motiftext">Alpha-Beta Plait (<a href="motif_overview.php#plait">?</a>)</div>
 					   <a href="search.php?motif=plait"><img class="motifimage" src="./images/plait_struktur.jpg" /></a></div>
 					<div class="motifimagecontainer">
-					   <div class="motiftext">Rossman Fold (<a href="help.php#helpAlphaBetaMotifs">?</a>)</div>
+					   <div class="motiftext">Rossman Fold (<a href="motif_overview.php#rossman">?</a>)</div>
 					   <a href="search.php?motif=rossman"><img class="motifimage" src="./images/rossman_struktur.jpg" /></a></div>	
 					<div class="motifimagecontainer">
-					   <div class="motiftext">TIM Barrel (<a href="help.php#helpBetaMotifs">?</a>)</div>
+					   <div class="motiftext">TIM Barrel (<a href="motif_overview.php#tim">?</a>)</div>
 					   <a href="search.php?motif=tim"><img class="motifimage" src="./images/tim_struktur.jpg" /></a></div>	
 
 				</div>
