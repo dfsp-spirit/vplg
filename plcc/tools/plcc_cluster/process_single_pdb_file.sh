@@ -9,7 +9,7 @@ CFG_FILE="settings_statistics.cfg"
 
 
 
-echo "$APPTAG ================ Processing single PDB file '$1' ==================="
+
 #echo "$APPTAG Using settings from file '$CFG_FILE'."
 
 
@@ -23,6 +23,10 @@ ERROR_LOG_CREATE_DSSP_FILE="/dev/stderr"	# may be reset below once PDB ID is kno
 SILENT="YES"
 
 ################################################## functions ##################################################
+
+if [ "$SILENT" = "NO" ]; then
+  echo "$APPTAG ================ Processing single PDB file '$1' ==================="
+fi
 
 function del_output()
 {
@@ -207,7 +211,9 @@ fi
 
 
 #echo "$APPTAG $PDBID Handling PDB file '$FLN'. Assuming file extension '$REMOTE_PDB_FILE_EXTENSION'."
-echo "$APPTAG $PDBID The log directory is '$LOGDIR'."
+if [ "$SILENT" = "NO" ]; then
+  echo "$APPTAG $PDBID The log directory is '$LOGDIR'."
+fi
 
 ## remove old protocol files. this is required because we only append to them later.
 DBINSERT_LOG="${LOGDIR}/log_proc1pdb_${PDBID}.log"
@@ -267,7 +273,10 @@ if [ -r $FLN ]; then
 	    del_output $PDBID
 	    report_and_exit 1
 	fi
-	echo "$APPTAG $PDBID Changed directory to '`pwd`'."
+	
+	if [ "$SILENT" = "NO" ]; then
+	  echo "$APPTAG $PDBID Changed directory to '`pwd`'."
+	fi
 	
 	## Get the PDB file
 	GET_PDB_FILE_COMMAND="$GET_PDB_FILE_SCRIPT $PDBID"
