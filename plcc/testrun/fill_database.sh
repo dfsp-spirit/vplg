@@ -86,7 +86,7 @@ do
 				        if [ "$SILENT" = "NO" ]; then
 				          echo "$APPTAG Running Graphletanalyser on file '$ALBE_GML_GRAPHFILE' for albe graph of $PDBID chain '$CHAIN'."
 				        fi
-					./graphletanalyser --useDatabase $ALBE_GML_GRAPHFILE
+					./graphletanalyser --silent --useDatabase $ALBE_GML_GRAPHFILE
 				else
 					echo "$APPTAG ##### ERROR:The albe GML graph file was not found at '$ALBE_GML_GRAPHFILE', cannot run graphletanalyser on it."
 				fi

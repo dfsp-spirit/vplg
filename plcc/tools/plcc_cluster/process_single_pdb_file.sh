@@ -393,7 +393,7 @@ if [ -r $FLN ]; then
 			        fi
 
 				if [ -f "$ALBE_GML_GRAPHFILE" ]; then
-					./graphletanalyser --useDatabase $ALBE_GML_GRAPHFILE
+					./graphletanalyser --silent --useDatabase $ALBE_GML_GRAPHFILE
 				else
 					echo "$APPTAG ##### ERROR:The albe GML graph file was not found at '$ALBE_GML_GRAPHFILE', cannot run graphletanalyser on it."
 				fi
