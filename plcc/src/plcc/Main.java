@@ -866,7 +866,12 @@ public class Main {
         
         Boolean silent = false;
         if(Settings.getBoolean("plcc_B_silent")) {
-            System.out.println("  Silent mode active, only errors and warnings will be printed from now on. Bye.");
+            if(Settings.getBoolean("plcc_B_no_warn")) {
+                System.out.println("  Silent mode and no-warn active, only errors will be printed from now on. Bye.");
+            } else {
+                System.out.println("  Silent mode active, only errors and warnings will be printed from now on. Bye.");
+            }
+            
             silent = true;
         }
 
@@ -2462,7 +2467,7 @@ public class Main {
             
             
             // graph strings in GML format and others, does NOT include PTGL linear notations
-            if(fg.numVertices() >= Settings.getInteger("plcc_I_min_fgraph_size_write_to_file")) {
+            if(fg.numAlphaBetaVertices() >= Settings.getInteger("plcc_I_min_fgraph_size_write_to_file")) {
                 writeFGGraphStrings(fg, outputDir, fg.getFoldingGraphNumber());
                 if(Settings.getBoolean("plcc_B_output_fg_linear_notations_to_file")) {
                     writeFGLinearNotationStrings(pnfr.getFoldingGraph(), outputDir, pnfr.getFoldNumber(), pnfr);
@@ -2482,7 +2487,7 @@ public class Main {
             Long fgDbId = -1L;
             if(Settings.getBoolean("plcc_B_useDB")) { 
                 
-                if(fg.numVertices() < Settings.getInteger("plcc_I_min_fgraph_size_write_to_db")) {
+                if(fg.numAlphaBetaVertices() < Settings.getInteger("plcc_I_min_fgraph_size_write_to_db")) {
                     if(! silent) {
                         System.out.println("       *Not writing " + gt + " folding graph #" + j + " of size " + fg.numVertices() + " to DB (minimum size is " + Settings.getInteger("plcc_I_min_fgraph_size_write_to_db") + ").");
                     }                   
@@ -2551,7 +2556,7 @@ public class Main {
             // draw folding graphs                                   
             if(Settings.getBoolean("plcc_B_draw_folding_graphs")) {
                 
-                if(fg.getSize() >= Settings.getInteger("plcc_I_min_fgraph_size_draw")) {
+                if(fg.numAlphaBetaVertices() >= Settings.getInteger("plcc_I_min_fgraph_size_draw")) {
                 
                     if(! silent) {
                         System.out.println("        Drawing all " + notations.size() + " notations of the " + pg.getGraphType() + " FG #" + j + " of size " + fg.getSize() + ".");
@@ -2642,7 +2647,7 @@ public class Main {
                 } else {
                     // FG too small
                     if(! silent) {
-                        System.out.println("        Not drawing any of the " + notations.size() + " notations of the " + pg.getGraphType() + " FG #" + j + " (fg_number=" + fg_number + "): size is " + fg.getSize() +", min is " + Settings.getInteger("plcc_I_min_fgraph_size_draw") + ".");
+                        System.out.println("        Not drawing any of the " + notations.size() + " notations of the " + pg.getGraphType() + " FG #" + j + " (fg_number=" + fg_number + "): albe size is " + fg.numAlphaBetaVertices() +", min is " + Settings.getInteger("plcc_I_min_fgraph_size_draw") + ".");
                     }
                 }
                 
@@ -3130,6 +3135,7 @@ public class Main {
      */
     public static ArrayList<ResContactInfo> calculateAllContactsLimitedByChain(ArrayList<Residue> res, String handledChain) {
         
+        Boolean silent = Settings.getBoolean("plcc_B_silent");
                 
         Residue a, b;
         Integer rs = res.size();
@@ -3150,7 +3156,9 @@ public class Main {
         Integer atomRadius = Settings.getInteger("plcc_I_atom_radius");
         Integer atomRadiusLig = Settings.getInteger("plcc_I_lig_atom_radius");
 
-        System.out.println("  " + chainTag + "Atom radius set to " + atomRadius + " for protein atoms, " + atomRadiusLig + " for ligand atoms (unit is 1/10th Angstroem).");
+        if( ! silent) {
+            System.out.println("  " + chainTag + "Atom radius set to " + atomRadius + " for protein atoms, " + atomRadiusLig + " for ligand atoms (unit is 1/10th Angstroem).");
+        }
 
         Integer globalMaxCollisionRadius = globalMaxCenterSphereRadius + atomRadius;
         Integer globalMaxCenterSphereDiameter = globalMaxCollisionRadius * 2;
@@ -3245,13 +3253,17 @@ public class Main {
         }
 
 
-        System.out.println("  " + chainTag + "Checked " + numResContactsChecked + " contacts for " + rs + " residues: " + numResContactsPossible + " possible, " + contactInfo.size() + " found, " + numResContactsImpossible + " impossible (collison spheres check).");
-        System.out.println("  " + chainTag + "Did not check " + numResPairsSkippedWrongChain + " residue pairs because they were part of different chains.");
-        System.out.println("  " + chainTag + "Did not check " + numCmpSkipped + " contacts (skipped by seq neighbors check), would have been " + (numResContactsChecked + numCmpSkipped)  + ".");
-
-        if( ! Settings.getBoolean("plcc_B_write_lig_geolig")) {
-            System.out.println("  " + chainTag + "Configured to ignore ligands, ignored " + numIgnoredLigandContacts + " ligand contacts.");
+        if( ! silent) {
+            System.out.println("  " + chainTag + "Checked " + numResContactsChecked + " contacts for " + rs + " residues: " + numResContactsPossible + " possible, " + contactInfo.size() + " found, " + numResContactsImpossible + " impossible (collison spheres check).");
+            System.out.println("  " + chainTag + "Did not check " + numResPairsSkippedWrongChain + " residue pairs because they were part of different chains.");
+            System.out.println("  " + chainTag + "Did not check " + numCmpSkipped + " contacts (skipped by seq neighbors check), would have been " + (numResContactsChecked + numCmpSkipped)  + ".");
+            
+            if( ! Settings.getBoolean("plcc_B_write_lig_geolig")) {
+                System.out.println("  " + chainTag + "Configured to ignore ligands, ignored " + numIgnoredLigandContacts + " ligand contacts.");
+            }
         }
+        
+        
 
         return(contactInfo);
 
@@ -3408,8 +3420,8 @@ public class Main {
                         contact[aIntID][bIntID][statAtomIDj][0]++;                 // total number of contacts for atom x of this AA
                         contact[bIntID][aIntID][0][statAtomIDj]++;
                     } catch(java.lang.ArrayIndexOutOfBoundsException e) {
-                        DP.getInstance().w("calculateAtomContactsBetweenResidues():Contact statistics array out of bounds. Residues with excessive number of atoms detected: " + e.getMessage() + ".");
-                        DP.getInstance().w("calculateAtomContactsBetweenResidues(): (cont.) Ignoring contacts for these atoms (aIntID=" + aIntID + ", bIntID=" + bIntID + ", statAtomIDi=" + statAtomIDi + ", statAtomIDj=" + statAtomIDj + ").");
+                        //DP.getInstance().w("calculateAtomContactsBetweenResidues():Contact statistics array out of bounds. Residues with excessive number of atoms detected: " + e.getMessage() + ".");
+                        DP.getInstance().w("calculateAtomContactsBetweenResidues(): Atom count for residues too high (" + e.getMessage() + "), ignoring contacts for these atoms (aIntID=" + aIntID + ", bIntID=" + bIntID + ", statAtomIDi=" + statAtomIDi + ", statAtomIDj=" + statAtomIDj + ").");
                         continue;
                     }
                     

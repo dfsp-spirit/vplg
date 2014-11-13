@@ -1130,6 +1130,13 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         return(this.size);
     }
     
+    /**
+     * Returns the number of SSEs of type alpha helix or beta strand of this graph.
+     * @return the number of vertices of type alpha helix or beta strand
+     */
+    public Integer numAlphaBetaVertices() {
+        return(this.numHelices() + this.numBetaStrands());
+    }
     
     /**
      * Returns the number of helices in this graph.
