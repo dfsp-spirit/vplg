@@ -873,6 +873,10 @@ public class Main {
             }
             
             silent = true;
+        } else {
+            if(Settings.getBoolean("plcc_B_no_warn")) {
+                System.out.println("  No-warn active, no warnings will be printed.");
+            }
         }
 
         // This check is rather useless and it will break PDB files that were split into multiple files (one for each
