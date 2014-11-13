@@ -725,20 +725,24 @@ public class FileParser {
      */
     private static boolean handlePdbLineTER() {
 
+        
         Integer cTerminusResNumPDB = -1;
         String cID = "";
+        String iCode = " ";
 
         try {
-            cTerminusResNumPDB = Integer.valueOf((curLinePDB.substring(23, 27)).trim());
+            cTerminusResNumPDB = Integer.valueOf((curLinePDB.substring(22, 26)).trim());
             cID = curLinePDB.substring(21, 22);
+            iCode = curLinePDB.substring(26, 27);
         } catch (Exception e) {
-            System.err.println("ERROR: Hit TER line at PDB line number " + curLineNumPDB + " but parsing the line failed.");
-            e.printStackTrace();
-            System.exit(1);
+            System.err.println("WARNING: Hit TER line at PDB line number " + curLineNumPDB + " but parsing the line failed, ignoring.");
+            //e.printStackTrace();
+            //System.exit(1);
         }
+        
 
         if(! FileParser.silent) {
-            System.out.println("    PDB: Found C Terminus of chain " + cID + " at PDB line " + curLineNumPDB + ", PDB residue number " + cTerminusResNumPDB + ".");
+            System.out.println("    PDB: Found C Terminus of chain " + cID + " at PDB line " + curLineNumPDB + ", PDB residue number " + cTerminusResNumPDB + " iCode '" + iCode + "'.");
         }
         //TODO: mark the proper residue as C terminus
 
