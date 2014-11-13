@@ -22,6 +22,9 @@ ERROR_LOG_GET_PDB_FILE="/dev/stderr"		# may be reset below once PDB ID is known
 ERROR_LOG_CREATE_DSSP_FILE="/dev/stderr"	# may be reset below once PDB ID is known
 SILENT="YES"
 
+## IMPORTANT: set this to "YES" if plcc is run with '-k' / '--output-subdir-tree'
+PLCC_RUNS_IN_SUBDIR_TREE_MODE="YES"
+
 ################################################## functions ##################################################
 
 if [ "$SILENT" = "NO" ]; then
@@ -381,7 +384,14 @@ if [ -r $FLN ]; then
 	        else
 			for CHAIN in $(cat ${CHAINS_FILE});
 			do
-				ALBE_GML_GRAPHFILE="${PLCC_OUTPUT_DIR}/${PDBID}_${CHAIN}_albe_PG.gml"
+			        if [ "$PLCC_RUNS_IN_SUBDIR_TREE_MODE" = "YES" ]; then
+			            ## extract the subdir from the pdbid (it is defined by the 2nd and 3rd letter of the id, e.g., for the pdbid '3kmf', it is 'km')
+                                    MID2PDBCHARS=${PDBID:1:2}
+			            ALBE_GML_GRAPHFILE="${PLCC_OUTPUT_DIR}/${MID2PDBCHARS}/${PDBID}/${CHAIN}/${PDBID}_${CHAIN}_albe_PG.gml"
+			        else
+			            ALBE_GML_GRAPHFILE="${PLCC_OUTPUT_DIR}/${PDBID}_${CHAIN}_albe_PG.gml"
+			        fi
+
 				if [ -f "$ALBE_GML_GRAPHFILE" ]; then
 					./graphletanalyser --useDatabase $ALBE_GML_GRAPHFILE
 				else
