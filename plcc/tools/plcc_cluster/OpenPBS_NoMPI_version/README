@@ -1,0 +1,5 @@
+This version of the update scripts runs each PDB file in a single openPBS job, and each job is given 1 core (not one cluster node!).
+
+It does NOT use MPI.
+
+It uses the full PDB file list.
