@@ -266,6 +266,7 @@ public class Settings {
         
         defSet("plcc_S_img_output_format", "PNG", "image output format (valid options: 'PNG', 'JPG')");
         defSet("plcc_S_img_output_fileext", ".png", "file extension of output images (should fit plcc_S_img_output_format more or less, e.g. '.png', '.jpg')");
+        defSet("plcc_B_skip_empty_chains", "true", "whether to completely skip chains which do not contain any DSSP SSEs (i.e., contain only ligands).");                
         
         // new output format settings
         defSet("plcc_B_img_output_format_PNG", "true", "Whether to write protein graph output images in PNG format.");

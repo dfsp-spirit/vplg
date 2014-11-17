@@ -441,6 +441,7 @@ public class SSE extends SSEGraphVertex implements java.io.Serializable  {
     
     /**
      * Returns the 3-letter ligand residue name from the PDB file name (e.g., ICT for isocitric acid) of this residue. Returns the empty string ("") if this is not a ligand SSE or if this SSE has no residues.
+     * @return a string of length 3
      */
     public String getLigandName3() {
 
@@ -451,6 +452,25 @@ public class SSE extends SSEGraphVertex implements java.io.Serializable  {
         
         if(this.residues.size() > 0) {
             return(this.residues.get(0).getName3());
+        }
+        else {
+            return("");
+        }
+    }
+    
+    /**
+     * Returns the trimmed 3-letter ligand residue name from the PDB file name (e.g., 'ICT' for isocitric acid or 'NA' for sodium ion) of this residue. Returns the empty string ("") if this is not a ligand SSE or if this SSE has no residues.
+     * @return a string of length 1 - 3
+     */
+    public String getTrimmedLigandName3() {
+
+        
+        if(! this.isLigandSSE()) {
+            return("");
+        }
+        
+        if(this.residues.size() > 0) {
+            return(this.residues.get(0).getTrimmedName3());
         }
         else {
             return("");

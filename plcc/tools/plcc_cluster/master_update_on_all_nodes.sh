@@ -1,6 +1,8 @@
 #!/bin/bash
 ## master_update_on_all_nodes.sh -- this script starts or stops the update processes on all worker nodes
 ##
+## Note that this script uses ssh + screen on the nodes, it does NOT use the openPBS queue!
+##
 ## Run it only after you updated the PDB and create the host file lists!
 ##
 ## If you use this script, DO NOT ssh to each node and DO NOT run the 'run_update_on_this_node_in_screen.sh' on any node

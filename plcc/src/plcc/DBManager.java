@@ -1020,7 +1020,7 @@ public class DBManager {
      * @param pdb_end the PDB residue string of the last residue of the SSE
      * @param pdb_start the PDB residue number of the first residue of the SSE
      * @param dssp_end the dssp residue number of the last residue of the SSE
-     * @param lig_name the ligand name in 3 letter notation if this SSE is a ligand, the empty string otherwise
+     * @param lig_name the ligand name in 3 letter notation if this SSE is a ligand, the empty string otherwise. Should be trimmed!
      * @param sse_type the SSE type as an integer, see the SSE class
      * @param sequence the AA sequence of this SSE
      * @param ssePositionInChain the position of this SSE in the SSE list of the whole chain (N to C)
@@ -1036,6 +1036,9 @@ public class DBManager {
             return (-1L);
         }
       
+        if(lig_name.contains(" ")) {
+            DP.getInstance().w("DBManager", "writeSSEToDB: The ligand_name3 '" + lig_name + "' contains spaces! Trim it before giving it to me.");
+        }
 
         PreparedStatement statement = null;
 
@@ -2110,7 +2113,7 @@ public class DBManager {
     
     /**
      * Writes data on a ligand to the database. This will NOT delete old versions in the database.
-     * @param ligand_name3 the PDB ligand abbreviation, 3 chars, e.g., "ICT" for isocitric acid. See http://ligand-expo.rcsb.org/  for details.
+     * @param ligand_name3 the PDB ligand abbreviation, 3 chars, e.g., "ICT" for isocitric acid. See http://ligand-expo.rcsb.org/  for details. Should NOT contain spaces, trim it!
      * @param ligand_longname the long name, usually chemical formular or other name, for the ligand
      * @param ligand_formula the chemical formula for the ligand, from PDB file header
      * @param ligand_synonyms the synonyms for the ligand, from PDB file header
@@ -2119,8 +2122,17 @@ public class DBManager {
      */
     public static Boolean writeLigandToDBUnlessAlreadyThere(String ligand_name3, String ligand_longname, String ligand_formula, String ligand_synonyms) throws SQLException {
         
+        if(ligand_name3.contains(" ")) {
+            DP.getInstance().w("DBManager", "writeLigandToDBUnlessAlreadyThere: The ligand_name3 '" + ligand_name3 + "' contains spaces! Trim it before giving it to me.");
+        }
+        
         if(ligandExistsInDB(ligand_name3)) {
             return false;                   
+        }                
+        
+        if(ligand_synonyms.equals("''") || ligand_synonyms.isEmpty()) {
+            DP.getInstance().w("DBManager", "writeLigandToDBUnlessAlreadyThere: Replacing ligand synonym string \"''\" with null.");
+            ligand_synonyms = null;
         }
         
         Boolean result = false;
@@ -2461,7 +2473,8 @@ public class DBManager {
         Boolean result = false;
 
         if (chain_db_id < 0) {
-            System.err.println("ERROR: writeProteinGraphToDB: Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert protein graph.");
+            DP.getInstance().e("DBManager", "riteProteinGraphToDB: Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert protein graph.");
+            //System.err.println("ERROR: writeProteinGraphToDB: Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert protein graph.");
             return (false);
         }
         
@@ -4509,7 +4522,7 @@ public class DBManager {
     /**
      * Determines whether a certain ligand2chain assignment already exists in the DB.
      * @param chainDbId the internal chain database ID
-     * @param ligName3 the ligand name, 3 letter code
+     * @param ligName3 the ligand name, 3 letter code. Should be trimmed.
      * @return true if the assignment exists, false otherwise
      */
     public static synchronized Boolean assignmentLigandToProteinChainExistsInDB(Long chainDbId, String ligName3) {
@@ -4518,11 +4531,16 @@ public class DBManager {
             return false;
         }
         else {
-            if(ligName3.length() != 3) {
-                DP.getInstance().w("DBManger", "assignmentLigandToProteinChainExistsInDB: Invalid ligand code, must consist of exactly 3 characters.");
+            if(ligName3.length() < 1 || ligName3.length() > 3) {
+                DP.getInstance().w("DBManger", "assignmentLigandToProteinChainExistsInDB: Invalid ligand code, must consist of 1 - 3 characters.");
                 return false;
             }
         }
+        
+        if(ligName3.contains(" ")) {
+            DP.getInstance().w("DBManager", "assignmentLigandToProteinChainExistsInD: The ligand_name3 '" + ligName3 + "' contains spaces! Trim it before giving it to me.");
+        }
+        
         
         ResultSetMetaData md;
         ArrayList<String> columnHeaders;
@@ -4603,10 +4621,14 @@ public class DBManager {
             return false;
         }
         else {
-            if(ligand_name3.length() != 3) {
-                DP.getInstance().w("DBManger", "ligandExistsInDB: Invalid ligand code, must consist of exactly 3 characters.");
+            if(ligand_name3.length() < 1  || ligand_name3.length() > 3) {
+                DP.getInstance().w("DBManger", "ligandExistsInDB: Invalid ligand code, must consist of 1 to 3 characters.");
                 return false;
             }
+        }
+        
+        if(ligand_name3.contains(" ")) {
+            DP.getInstance().w("DBManager", "ligandExistsInDB: The ligand_name3 '" + ligand_name3 + "' contains spaces. Trim it before giving it to me.");
         }
         
         ResultSetMetaData md;

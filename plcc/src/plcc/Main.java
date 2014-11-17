@@ -1929,7 +1929,7 @@ public class Main {
             
             
             if(Settings.getBoolean("plcc_B_useDB")) {
-                String ligName3;
+                String ligName3Trimmed;
                 try {
                     if(DBManager.writeChainToDB(chain, pdbid, pmi.getMolName(), pmi.getOrgScientific(), pmi.getOrgCommon())) {
                         if(! silent) {
@@ -1940,10 +1940,10 @@ public class Main {
                         
                         if(chainDbId > 1) {
                             for(Residue ligand : c.getAllLigandResidues()) {
-                                ligName3 = ligand.getName3();
-                                DBManager.writeLigandToDBUnlessAlreadyThere(ligName3, ligand.getLigName(), ligand.getLigFormula(), ligand.getLigSynonyms());
-                                if( ! DBManager.assignmentLigandToProteinChainExistsInDB(chainDbId, ligName3)) {
-                                    DBManager.assignLigandToProteinChain(chainDbId, ligName3);
+                                ligName3Trimmed = ligand.getTrimmedName3();
+                                DBManager.writeLigandToDBUnlessAlreadyThere(ligName3Trimmed, ligand.getLigName(), ligand.getLigFormula(), ligand.getLigSynonyms());
+                                if( ! DBManager.assignmentLigandToProteinChainExistsInDB(chainDbId, ligName3Trimmed)) {
+                                    DBManager.assignLigandToProteinChain(chainDbId, ligName3Trimmed);
                                 }
                             }
                         }
@@ -1965,6 +1965,16 @@ public class Main {
                 System.out.println("    Creating all SSEs for chain '" + chain + "' consisting of " + c.getResidues().size() + " residues.");
             }
             chainDsspSSEs = createAllDsspSSEsFromResidueList(c.getResidues());
+            
+            if(chainDsspSSEs.isEmpty()) {
+                if(Settings.getBoolean("plcc_B_skip_empty_chains")) {
+                    if(! silent) {
+                        System.out.println("  +++++ Skipping chain " + chain + " due to empty residue list. +++++");
+                        
+                    }
+                    continue;
+                }
+            }
             
             if(Settings.getInteger("plcc_I_debug_level") > 0) {
                 printSSEList(chainDsspSSEs, "DSSP");
@@ -2002,7 +2012,7 @@ public class Main {
                     try {
                        SSE ssej = allChainSSEs.get(j);
                        Integer ssePositionInChain = j + 1;
-                       Long insertID = DBManager.writeSSEToDB(pdbid, chain, ssej.getStartDsspNum(), ssej.getEndDsspNum(), ssej.getStartPdbResID(), ssej.getEndPdbResID(), ssej.getAASequence(), ssej.getSSETypeInt(), ssej.getLigandName3(), ssePositionInChain); 
+                       Long insertID = DBManager.writeSSEToDB(pdbid, chain, ssej.getStartDsspNum(), ssej.getEndDsspNum(), ssej.getStartPdbResID(), ssej.getEndPdbResID(), ssej.getAASequence(), ssej.getSSETypeInt(), ssej.getTrimmedLigandName3(), ssePositionInChain); 
                        //System.out.println("  Info on SSE #" + (j + 1) + " of chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
                        if(insertID > 0) {
                            DBManager.writeEmptySecondatEntryForSSE(insertID);
@@ -5431,9 +5441,15 @@ public class Main {
      */
     public static void calculateComplexGraph(ArrayList<Chain> allChains, ArrayList<Residue> resList, ArrayList<ResContactInfo> resContacts, String pdbid, String outputDir, String graphType) {
 
+        
+        Boolean silent = Settings.getBoolean("plcc_B_silent");
+        
         ComplexGraphResult cgr = new ComplexGraphResult();
         
-        System.out.println("Calculating complex graph (CG) of type " + graphType + ".");
+        if(! silent) {
+            System.out.println("Calculating complex graph (CG) of type " + graphType + ".");
+        }
+        
         ArrayList<ResContactInfo> interchainContacts = new ArrayList<ResContactInfo>();
         Chain c;
         ArrayList<SSE> chainDsspSSEs = new ArrayList<SSE>();
@@ -5451,7 +5467,9 @@ public class Main {
         String imgFile = null;
         String plccGraphFile = null;
 
-        System.out.println("  Calculating CG SSEs for all chains of protein " + pdbid + "...");
+        if(! silent) {
+            System.out.println("  Calculating CG SSEs for all chains of protein " + pdbid + "...");
+        }
 
         HashMap<String, String> md = FileParser.getPDBMetaData();
         Double res = -1.0;
@@ -5503,7 +5521,10 @@ public class Main {
         // Get SSEs for all chains
         for(Integer i = 0; i < allChains.size(); i++) {
             c = allChains.get(i);
-            System.out.println("   *Handling chain " + c.getPdbChainID() + ".");
+            
+            if(! silent) {
+                System.out.println("   *Handling chain " + c.getPdbChainID() + ".");
+            }
 
             ProtMetaInfo pmi = FileParser.getMetaInfo(pdbid, c.getPdbChainID());
             //pmi.print();
@@ -5517,11 +5538,13 @@ public class Main {
             
             oneChainSSEs = createAllPtglSSEsFromDsspSSEList(chainDsspSSEs);
 
-            System.out.print("    SSEs: ");
-            for(Integer j = 0; j < oneChainSSEs.size(); j++) {
-                System.out.print(oneChainSSEs.get(j).getSseType());
+            if(! silent) {
+                System.out.print("    SSEs: ");
+                for(Integer j = 0; j < oneChainSSEs.size(); j++) {
+                    System.out.print(oneChainSSEs.get(j).getSseType());
+                }
+                System.out.print("\n");
             }
-            System.out.print("\n");
 
             // SSEs have been calculated, now assign the PTGL labels and sequential numbers on the chain
             for(Integer j = 0; j < oneChainSSEs.size(); j++) {
@@ -5545,8 +5568,7 @@ public class Main {
             compGraph.proteinNodeMap.put(v, allChains.get(i).getPdbChainID());
             //System.out.println(allChains.get(i).getPdbChainID());
         }
-        
-        Boolean silent = Settings.getBoolean("plcc_B_silent");
+                
         if(! silent) {
             System.out.println("  Computing CG contacts.");
         }
@@ -5829,7 +5851,9 @@ public class Main {
             myGML = new File(filePathGraphs + fs + pdbid + "_complex_chains_" + graphType + "_CG.gml");
             myGML.createNewFile();
             if(compGraph.writeToFileGML(myGML)) {
-                System.out.println("    Complex graph chain-level notation written to file '" + myGML.getAbsolutePath() + "' in GML format.");
+                if(! silent) {
+                    System.out.println("    Complex graph chain-level notation written to file '" + myGML.getAbsolutePath() + "' in GML format.");
+                }
                 cgr.setComGraphFileGML(myGML);
             } else {
                 System.err.println("ERROR: Could not write complex graph to file '" + myGML.getAbsolutePath() + "'.");

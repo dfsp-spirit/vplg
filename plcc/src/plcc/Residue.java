@@ -599,6 +599,10 @@ public class Residue implements java.io.Serializable {
 
     // getters
     public String getName3() { return(resName3); }
+    
+    /** Returns the trimmed name3, to enter into DB. Otherwise we get stuff like ' NA' in the database, and searching for 'NA' fails.
+     * @return  the trimmed lig name (length 1 - 3 chars)*/
+    public String getTrimmedName3() { return(resName3.trim()); }
     public String getAAName1() { return(AAName1); }
     
     /** Returns the residue type: 0=AA, 1=Ligand, 2=Other. */
@@ -691,7 +695,7 @@ public class Residue implements java.io.Serializable {
             return(this.ligFormula);
         }
         else {
-            System.out.println("WARNING: getLigFormula() Called for non-ligand residue '" + this.getFancyName() + "'.");
+            System.err.println("WARNING: getLigFormula() Called for non-ligand residue '" + this.getFancyName() + "'.");
             return("NOT_A_LIGAND_SO_NO_HET_FORMULA");
         }
     }
@@ -701,7 +705,7 @@ public class Residue implements java.io.Serializable {
             return(this.ligSynonyms);
         }
         else {
-            System.out.println("WARNING: getLigSynonyms() Called for non-ligand residue '" + this.getFancyName() + "'.");
+            System.err.println("WARNING: getLigSynonyms() Called for non-ligand residue '" + this.getFancyName() + "'.");
             return("NOT_A_LIGAND_SO_NO_HET_SYNONYMS");
         }
     }
