@@ -72,29 +72,31 @@ MYHOME="/home/ts"
 NUM_PROCESSORS_PER_NODE=1
 
 ERRORLOG="/dev/stderr"
-
+SILENT="YES"
 
 ## This is now read from an environment variable which is passed to this script via the '-v' option of the 'qsub' pbs command
 INPUT_FILE=$PDBFILE
 
-# report some stuff for log file
-echo $APPTAG ----- Submitting job to pbs queue -----
-echo $APPTAG Settings:
-echo "$APPTAG -----"
-echo $APPTAG MYHOME is $MYHOME
-echo $APPTAG Working directory is $PBS_O_WORKDIR
-echo $APPTAG The tmp directory is $TMPDIR
-echo $APPTAG Environment is $ENVIRONMENT
-echo $APPTAG Running on host `hostname`
-echo $APPTAG Time is `date`
-echo $APPTAG Directory is `pwd`
-echo -n "$APPTAG This job runs on the following processors: "
-echo `cat $PBS_NODEFILE`
-echo $APPTAG A java binary is at `which java`
-echo $APPTAG Note though that the plcc shell script in plcc_run may use another java
-echo $APPTAG pbs job id is $PBS_JOBID
-echo "$APPTAG Using $NUM_PROCESSORS_PER_NODE processors"
-echo "$APPTAG Using '$INPUT_FILE' as input file."
+if [ "$SILENT" = "NO" ]; then
+    # report some stuff for log file
+    echo $APPTAG ----- Submitting job to pbs queue -----
+    echo $APPTAG Settings:
+    echo "$APPTAG -----"
+    echo $APPTAG MYHOME is $MYHOME
+    echo $APPTAG Working directory is $PBS_O_WORKDIR
+    echo $APPTAG The tmp directory is $TMPDIR
+    echo $APPTAG Environment is $ENVIRONMENT
+    echo $APPTAG Running on host `hostname`
+    echo $APPTAG Time is `date`
+    echo $APPTAG Directory is `pwd`
+    echo -n "$APPTAG This job runs on the following processors: "
+    echo `cat $PBS_NODEFILE`
+    echo $APPTAG A java binary is at `which java`
+    echo $APPTAG Note though that the plcc shell script in plcc_run may use another java
+    echo $APPTAG pbs job id is $PBS_JOBID
+    echo "$APPTAG Using $NUM_PROCESSORS_PER_NODE processors"
+    echo "$APPTAG Using '$INPUT_FILE' as input file."
+fi
 
 if [ ! -f "$INPUT_FILE" ]; then
     echo "$APPTAG ERROR: The PDB input file '$INPUT_FILE' does not exist (wd=`pwd`)."
@@ -102,8 +104,10 @@ if [ ! -f "$INPUT_FILE" ]; then
     exit 1
 fi
 
-echo "$APPTAG The input PDB file is $INPUT_FILE."
-echo "$APPTAG -----"
+if [ "$SILENT" = "NO" ]; then
+    echo "$APPTAG The input PDB file is $INPUT_FILE."
+    echo "$APPTAG -----"
+fi
  
 
 
@@ -170,7 +174,9 @@ fi
 # limited disk space.
 source $PLCC_CLUSTER_DIR/settings_statistics.cfg
 if [ ! -d $PLCC_OUTPUT_DIR ]; then
-  echo "$APPTAG Creating output directory '$PLCC_OUTPUT_DIR'."
+  if [ "$SILENT" = "NO" ]; then
+      echo "$APPTAG Creating output directory '$PLCC_OUTPUT_DIR'."
+  fi
   mkdir -p $PLCC_OUTPUT_DIR
 fi
 chmod ugo+rwx $PLCC_OUTPUT_DIR || echo "$APPTAG ERROR: Could not change fs permissions for PLCC output directory '$PLCC_OUTPUT_DIR'."
@@ -189,12 +195,32 @@ cd "$PLCC_CLUSTER_DIR"
 
 RUN_CMD="/bin/bash ./process_single_pdb_file.sh $INPUT_FILE"
 
-echo "$APPTAG Now in directory '$(pwd)'."
-echo "$APPTAG The run command to be executed is '$RUN_CMD'."
+if [ "$SILENT" = "NO" ]; then
+  echo "$APPTAG Now in directory '$(pwd)'."
+  echo "$APPTAG The run command to be executed is '$RUN_CMD'."
+fi
+
+
+
+if [ "$SILENT" = "NO" ]; then
+  echo "$APPTAG Purging old PDB files and OpenPBS job logs (output and error)."
+fi
+
+## purge PDB files which have not been accessed for 60 minutes
+find $PLCC_CLUSTER_RUN_DIR -type f -amin +60 -name "????.pdb"  -delete
+find $PLCC_CLUSTER_RUN_DIR -type f -amin +60 -name "????.dssp"  -delete
+
+## running this job script for all > 100.000 PDB files will result in absurd amount of openPBS log files, which may brake everything.
+## so we need to delete those damn files as well. The name depends on the openPBS job name, which ise set in this bash scripts (see the line starting with '#PBS -N' at the top)
+find $PLCC_CLUSTER_DIR/OpenPBS_NoMPI_version/ -type f -amin +60 -name -name "vplgsinglejob.o*"  -delete
+find $PLCC_CLUSTER_DIR/OpenPBS_NoMPI_version/ -type f -amin +60 -name -name "vplgsinglejob.e*"  -delete
+
 
 # run script
-echo -n "$APPTAG Started at: "
-date
+if [ "$SILENT" = "NO" ]; then
+  echo -n "$APPTAG Started command at: "
+  date
+fi
 
 
 ## run it!
@@ -209,5 +235,7 @@ date
 #scp -r output.file $PBS_O_HOST:$PBS_O_WORKDIR/
 #cp -r $PLCC_OUTPUT_DIR $PLCC_OUTPUT_COPY_DIR_ALL_NODES
 
-echo "$APPTAG Job done, EOF."
+if [ "$SILENT" = "NO" ]; then
+  echo "$APPTAG Job done, EOF."
+fi
 
