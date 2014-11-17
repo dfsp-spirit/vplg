@@ -25,7 +25,7 @@ echo "$APPTAG Preparing to submit all jobs to the openpbs queue..."
 
 FILE_LIST="$PLCC_CLUSTER_DIR/status/dbinsert_file_list.lst"
 
-if [ ! -f "$_FILE_LIST" ]; then
+if [ ! -f "$FILE_LIST" ]; then
     echo "$APPTAG ERROR: Could not find the PDB file list at '$FILE_LIST'. Did you run the script to generate the list?"
     exit 1
 fi
