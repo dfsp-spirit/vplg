@@ -212,8 +212,9 @@ find $PLCC_CLUSTER_RUN_DIR -type f -amin +60 -name "????.dssp"  -delete
 
 ## running this job script for all > 100.000 PDB files will result in absurd amount of openPBS log files, which may brake everything.
 ## so we need to delete those damn files as well. The name depends on the openPBS job name, which ise set in this bash scripts (see the line starting with '#PBS -N' at the top)
+## Update: delete only log files with size < 2 byte. if all scripts are in silent mode, only logs with relevant content will be kept this way.
 find $PLCC_CLUSTER_DIR/OpenPBS_NoMPI_version/ -type f -amin +60 -name "vplgsinglejob.o*" -size -2b -delete
-find $PLCC_CLUSTER_DIR/OpenPBS_NoMPI_version/ -type f -amin +60 -name "vplgsinglejob.e*" -delete
+find $PLCC_CLUSTER_DIR/OpenPBS_NoMPI_version/ -type f -amin +60 -name "vplgsinglejob.e*" -size -2b -delete
 
 
 # run script
