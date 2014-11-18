@@ -212,7 +212,7 @@ find $PLCC_CLUSTER_RUN_DIR -type f -amin +60 -name "????.dssp"  -delete
 
 ## running this job script for all > 100.000 PDB files will result in absurd amount of openPBS log files, which may brake everything.
 ## so we need to delete those damn files as well. The name depends on the openPBS job name, which ise set in this bash scripts (see the line starting with '#PBS -N' at the top)
-find $PLCC_CLUSTER_DIR/OpenPBS_NoMPI_version/ -type f -amin +60 -name "vplgsinglejob.o*" -delete
+find $PLCC_CLUSTER_DIR/OpenPBS_NoMPI_version/ -type f -amin +60 -name "vplgsinglejob.o*" -size -2b -delete
 find $PLCC_CLUSTER_DIR/OpenPBS_NoMPI_version/ -type f -amin +60 -name "vplgsinglejob.e*" -delete
 
 
@@ -226,9 +226,10 @@ fi
 ## run it!
 $RUN_CMD
 
-
-echo -n "$APPTAG The command $RUN_CMD terminated at: "
-date
+if [ "$SILENT" = "NO" ]; then
+  echo -n "$APPTAG The command $RUN_CMD terminated at: "
+  date
+fi
 
 # copy-back everything needed. $TMPDIR gets cleaning in the new cluster!
 # no need for this because we write to a permament directory directly, it is mounted via NFS
