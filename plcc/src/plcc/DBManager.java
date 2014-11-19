@@ -110,10 +110,10 @@ public class DBManager {
     static String view_graphletsimilarity = "plcc_view_graphletsimilarity";
 
     /**
-     * Sets the database address and the credentials to access the DB.
+     * Sets the database address and the credentials to access the DB, then connects by calling the connect() function.
      * @return True if the connection could be established, false otherwise.
      */
-    public static Boolean init(String db, String host, Integer port, String user, String password) {
+    public static Boolean init(String db, String host, Integer port, String user, String password, Boolean setAutoCommit) {
 
         dbName = db;
         dbHost = host;
@@ -136,24 +136,30 @@ public class DBManager {
             return false;
         }
 
-        Boolean conOK = connect();
+        Boolean conOK = connect(setAutoCommit);
         return (conOK);
     }
     
+    
+    /**
+     * Calls init, which connects to the DB, with the settings from the currently loaded settings (from cfg file or internal if no cfg file/unset in it).
+     * @return whether the connection succeeded
+     */
     public static Boolean initUsingDefaults() {
-        return init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"));
+        return init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"), false);
     }
 
     /**
      * Connects to the database using the DB address and credentials defined during the call to init().
      * @return Whether a connection to the DB could be established.
      */
-    private static Boolean connect() {
+    private static Boolean connect(Boolean setAutoCommit) {
 
         Boolean conOK = false;
 
         try {
             dbc = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
+            dbc.setAutoCommit(setAutoCommit);
             dbmd = dbc.getMetaData();
             sql = dbc.createStatement();
             conOK = true;
@@ -177,9 +183,9 @@ public class DBManager {
         }
         
         if(conOK) {
-            try {
+            try {                
                 if(! Settings.getBoolean("plcc_B_silent")) {
-                    System.out.println("Connection to " + dbProductName + " " + dbProductVersion + " successful.");
+                    System.out.println("Connection to " + dbProductName + " " + dbProductVersion + " successful. Autocommit is " + (dbc.getAutoCommit() ? "on" : "off") + ".");                    
                 }
             } catch(Exception e) {
                 // settings may be missing and the getBoolean call may thus crash, just ignore it.
@@ -190,6 +196,27 @@ public class DBManager {
         return (conOK);
     }
 
+    
+    /**
+     * Tries to set autocommit on the current DB connection.
+     * @param v the value to set autocommit to
+     * @return whether the value was set (it is not set if the dbc is null or closed)
+     */
+    public boolean setAutoCommit(boolean v) {
+        if(dbc != null) {
+            try {
+                if(! dbc.isClosed()) {
+                    dbc.setAutoCommit(v);
+                    return true;
+                }
+            } catch(SQLException e) {
+                DP.getInstance().e("DBManager", "Could not set autocommit: '" + e.getMessage() + "'.");
+                return false;
+            }
+        }
+        return false;
+    }
+    
     /**
      * Computes the pairwise graphlet similarity scores between all protein chains in the DB, using the given graph type. Note that graphlet counts for all the graphs have already to exist in the database!
      * Also note that this function is gonna take a lot of time AND use a lot of memory if you have a large DB.
@@ -352,12 +379,13 @@ public class DBManager {
      * Checks whether a DB connection exists. Tries to establish it if not.
      * @return: Whether a DB connection could be established in the end.
      */
-    private static Boolean ensureConnection() {
+    private static Boolean ensureConnection(Boolean setAutoCommit) {
 
         try {
             dbc.getMetaData();
+            dbc.setAutoCommit(setAutoCommit);
         } catch (SQLException e) {
-            return (connect());
+            return (connect(setAutoCommit));
         }
 
         return (true);
@@ -370,7 +398,7 @@ public class DBManager {
      */
     boolean supportsTransactions() throws SQLException {
 
-        ensureConnection();
+        ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
 
         return (dbc.getMetaData().supportsTransactions());
     }
@@ -383,7 +411,7 @@ public class DBManager {
      */
     public static int doInsertQuery(String query) {
 
-        ensureConnection();
+        ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
 
         PreparedStatement ps = null;
         try {
@@ -413,7 +441,7 @@ public class DBManager {
      */
     public static int doUpdateQuery(String query) {
 
-        ensureConnection();
+        ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
 
         PreparedStatement ps = null;
         try {
@@ -443,7 +471,7 @@ public class DBManager {
      */
     public static int doDeleteQuery(String query) {
 
-        ensureConnection();
+        ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
 
         PreparedStatement ps = null;
         try {
@@ -472,7 +500,7 @@ public class DBManager {
      */
     public static ArrayList<ArrayList<String>> doSelectQuery(String query) {
 
-        ensureConnection();
+        ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
 
         ResultSet rs = null;
         PreparedStatement ps = null;
@@ -529,7 +557,31 @@ public class DBManager {
     }
 
     /**
-     * Closes the DB connection.
+     * Commits pending queries. Returns true if it called commit on the connection object, false otherwise (e.g., connection was null or closed).
+     * @return true if it called commit on the connection object, false otherwise (e.g., connection was null or closed).
+     */
+    public static Boolean commit() {
+        if (dbc != null) {
+            try {
+                if ( ! dbc.isClosed()) {                    
+                    dbc.commit();                    
+                    return (true);
+                } else {
+                    return (false);        // closed
+                }
+            } catch (SQLException e) {
+                DP.getInstance().w("closeConnection(): Could not close DB connection: '" + e.getMessage() + "'.");                
+                return (false);
+            }
+        } else {
+            // there is no connection object
+            return (false);
+        }
+        
+    }
+    
+    /**
+     * Closes the DB connection and commit pending queries unless autocommit is set.
      * @return Whether the connection could be closed.
      */
     public static Boolean closeConnection() {
@@ -560,7 +612,7 @@ public class DBManager {
      * @return whether it worked out
      */
     public static Boolean dropTables() {
-        ensureConnection();
+        ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
         Boolean res = false;
 
         try {
@@ -629,7 +681,7 @@ public class DBManager {
     public static Boolean createTables() {
 
 
-        ensureConnection();
+        ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
         Boolean res = false;
 
         try {
@@ -641,9 +693,9 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_complexcontacttypes + " (complexcontacttype_id int not null primary key,  complexcontacttype_text text not null);");
             doInsertQuery("CREATE TABLE " + tbl_graphtypes + " (graphtype_id int not null primary key,  graphtype_text text not null);");
             
-            doInsertQuery("CREATE TABLE " + tbl_protein + " (pdb_id varchar(4) primary key, header varchar(200) not null, title varchar(400) not null, experiment varchar(200) not null, keywords varchar(400) not null, resolution real not null);");
-            doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(2) not null, mol_name varchar(200) not null, organism_scientific varchar(200) not null, organism_common varchar(200) not null, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, chain_isinnonredundantset smallint DEFAULT 1);");
-            doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence varchar(2000) not null, sse_type int not null references " + tbl_ssetypes + " ON DELETE CASCADE, lig_name varchar(5), position_in_chain int);");
+            doInsertQuery("CREATE TABLE " + tbl_protein + " (pdb_id varchar(4) primary key, header text not null, title text not null, experiment text not null, keywords text not null, resolution real not null);");
+            doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(2) not null, mol_name text not null, organism_scientific text not null, organism_common text not null, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, chain_isinnonredundantset smallint DEFAULT 1);");
+            doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence text not null, sse_type int not null references " + tbl_ssetypes + " ON DELETE CASCADE, lig_name varchar(5), position_in_chain int);");
             doInsertQuery("CREATE TABLE " + tbl_secondat + " (secondat_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, alpha_fg_number int, alpha_fg_foldname varchar(2), alpha_fg_position int, beta_fg_number int, beta_fg_foldname varchar(2), beta_fg_position int, albe_fg_number int, albe_fg_foldname varchar(2), albe_fg_position int, alphalig_fg_number int, alphalig_fg_foldname varchar(2), alphalig_fg_position int, betalig_fg_number int, betalig_fg_foldname varchar(2), betalig_fg_position int, albelig_fg_number int, albelig_fg_foldname varchar(2), albelig_fg_position int);");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null references " + tbl_contacttypes + " ON DELETE CASCADE, check (sse1 < sse2));");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact_complexgraph + " (ssecontact_complexgraph_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, complex_contact_type int not null references " + tbl_complexcontacttypes + " ON DELETE CASCADE check (sse1 < sse2));");            
@@ -948,6 +1000,7 @@ public class DBManager {
             doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name, motif_abbreviation) VALUES (10, 3, 'TIM Barrel', 'tim');");
             
 
+            DBManager.commit();
             res = true;      // Not really, need to check all of them. We currently leave this to the user (failed queries will at least spit error messages to STDERR).
 
         } catch (Exception e) { 
@@ -975,13 +1028,13 @@ public class DBManager {
         String query = "INSERT INTO " + tbl_secondat + " (sse_id) VALUES (?);";
                 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
             statement.setLong(1, sse_db_id);
                                 
             statement.executeUpdate();
-            dbc.commit();
+            //dbc.commit();
             
             // get DB insert id
             generatedKeys = statement.getGeneratedKeys();
@@ -1006,7 +1059,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         }
         return(insertID);       
         
@@ -1064,7 +1117,7 @@ public class DBManager {
                 // chain_id + ", " + dssp_start + ", " + dssp_end + ", '" + pdb_start + "', '" + pdb_end + "', '" + sequence + "', " + sse_type + ", '" + lig_name + "');";
                 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
             statement.setLong(1, chain_id);
@@ -1088,7 +1141,7 @@ public class DBManager {
                 DP.getInstance().e("DBManager", "Inserting SSE into DB failed, no generated key obtained.");
             }
             
-            dbc.commit();
+            //dbc.commit();
 
         } catch (SQLException e ) {
             DP.getInstance().e("DBManager", "writeSSEToDB: '" + e.getMessage() + "'.");
@@ -1105,7 +1158,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         }
         return(insertID);       
     }
@@ -1283,13 +1336,13 @@ public class DBManager {
         String query = querySB.toString();
         
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, chain_db_id);
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -1316,7 +1369,7 @@ public class DBManager {
                 if (statement != null) {
                     statement.close();
                 }
-                dbc.setAutoCommit(true);
+                //dbc.setAutoCommit(true);
             } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_FourHelixBundle: Could not close statement and reset autocommit."); }
         }
         
@@ -1395,7 +1448,7 @@ public class DBManager {
         String query = querySB.toString();
         
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, chain_db_id);
@@ -1404,7 +1457,7 @@ public class DBManager {
             statement.setLong(4, chain_db_id);
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -1431,7 +1484,7 @@ public class DBManager {
                 if (statement != null) {
                     statement.close();
                 }
-                dbc.setAutoCommit(true);
+                //dbc.setAutoCommit(true);
             } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_UpAndDownBarrel: Could not close statement and reset autocommit."); }
         }
         
@@ -1499,7 +1552,7 @@ public class DBManager {
         String query = querySB.toString();
         
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, chain_db_id);
@@ -1508,7 +1561,7 @@ public class DBManager {
             
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -1535,7 +1588,7 @@ public class DBManager {
                 if (statement != null) {
                     statement.close();
                 }
-                dbc.setAutoCommit(true);
+                //dbc.setAutoCommit(true);
             } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_JellyRoll: Could not close statement and reset autocommit."); }
         }
         
@@ -1625,7 +1678,7 @@ public class DBManager {
         String query = querySB.toString();
         
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, chain_db_id);
@@ -1636,7 +1689,7 @@ public class DBManager {
             
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -1663,7 +1716,7 @@ public class DBManager {
                 if (statement != null) {
                     statement.close();
                 }
-                dbc.setAutoCommit(true);
+                //dbc.setAutoCommit(true);
             } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_ImmunoglobinFold: Could not close statement and reset autocommit."); }
         }
         
@@ -1765,13 +1818,13 @@ public class DBManager {
         String query = querySB.toString();
         
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, chain_db_id);            
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -1798,7 +1851,7 @@ public class DBManager {
                 if (statement != null) {
                     statement.close();
                 }
-                dbc.setAutoCommit(true);
+                //dbc.setAutoCommit(true);
             } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_BetaPropeller Query1: Could not close statement and reset autocommit."); }
         }
         
@@ -1828,13 +1881,13 @@ public class DBManager {
             tableData = new ArrayList<ArrayList<String>>();
             
             try {
-                dbc.setAutoCommit(false);
+                //dbc.setAutoCommit(false);
                 statement = dbc.prepareStatement(query2);
 
                 statement.setLong(1, chain_db_id);            
 
                 rs = statement.executeQuery();
-                dbc.commit();
+                //dbc.commit();
 
                 md = rs.getMetaData();
                 count = md.getColumnCount();
@@ -1866,7 +1919,7 @@ public class DBManager {
                     if (statement != null) {
                         statement.close();
                     }
-                    dbc.setAutoCommit(true);
+                    //dbc.setAutoCommit(true);
                 } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_BetaPropeller Query2: Could not close statement and reset autocommit."); }
             }
         
@@ -1910,13 +1963,13 @@ public class DBManager {
         String query = querySB.toString();
         
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, chain_db_id);
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -1943,7 +1996,7 @@ public class DBManager {
                 if (statement != null) {
                     statement.close();
                 }
-                dbc.setAutoCommit(true);
+                //dbc.setAutoCommit(true);
             } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_GlobinFold: Could not close statement and reset autocommit."); }
         }
         
@@ -2020,14 +2073,14 @@ public class DBManager {
         String query = "INSERT INTO " + tbl_nm_chaintomotif + " (chain_id, motif_id) VALUES (?, ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
             
             statement.setLong(1, chain_db_id);
             statement.setLong(2, motif_db_id);
                                 
             numRowsAffected = statement.executeUpdate();
-            dbc.commit();
+            //dbc.commit();
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: assignChainToMotiv(): '" + e.getMessage() + "'.");
             if (dbc != null) {
@@ -2042,7 +2095,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         } 
         
         return numRowsAffected;
@@ -2077,7 +2130,7 @@ public class DBManager {
         String query = "INSERT INTO " + tbl_protein + " (pdb_id, title, header, keywords, experiment, resolution) VALUES (?, ?, ?, ?, ?, ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            ////dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setString(1, pdb_id);
@@ -2088,7 +2141,7 @@ public class DBManager {
             statement.setDouble(6, resolution);
                                 
             statement.executeUpdate();
-            dbc.commit();
+            ////dbc.commit();
             result = true;
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: writeProteinToDB: '" + e.getMessage() + "'.");
@@ -2105,7 +2158,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         }
         return(result);
 
@@ -2131,7 +2184,7 @@ public class DBManager {
         }                
         
         if(ligand_synonyms.equals("''") || ligand_synonyms.isEmpty()) {
-            DP.getInstance().w("DBManager", "writeLigandToDBUnlessAlreadyThere: Replacing ligand synonym string \"''\" with null.");
+            //DP.getInstance().w("DBManager", "writeLigandToDBUnlessAlreadyThere: Replacing ligand synonym string \"''\" with null.");
             ligand_synonyms = null;
         }
         
@@ -2142,7 +2195,7 @@ public class DBManager {
         String query = "INSERT INTO " + tbl_ligand + " (ligand_name3, ligand_longname, ligand_formula, ligand_synonyms) VALUES (?, ?, ?, ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setString(1, ligand_name3);
@@ -2151,7 +2204,7 @@ public class DBManager {
             statement.setString(4, ligand_synonyms);
                                 
             statement.executeUpdate();
-            dbc.commit();
+            //dbc.commit();
             result = true;
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: writeLigandToDB: '" + e.getMessage() + "'.");
@@ -2168,7 +2221,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         }
         return(result);
 
@@ -2184,22 +2237,20 @@ public class DBManager {
 
         PreparedStatement statement = null;        
         ResultSetMetaData md;
-        int count = 0;        
-        ResultSet rs = null;
-        
+        int count = 0;               
         
         String query = "DELETE FROM " + tbl_protein + " WHERE pdb_id = ?;";
         
         
         try {
-            dbc.setAutoCommit(false);
+            ////dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setString(1, pdb_id);
               
             
             count = statement.executeUpdate();
-            dbc.commit();
+            ////dbc.commit();
             
             //md = rs.getMetaData();
             //count = md.getColumnCount();
@@ -2212,7 +2263,7 @@ public class DBManager {
                 if (statement != null) {
                     statement.close();
                 }
-                dbc.setAutoCommit(true);
+                ////dbc.setAutoCommit(true);
             } catch(SQLException e) { DP.getInstance().w("DB: deletePdbidFromDB: Could not close statement and reset autocommit."); }
         }
         
@@ -2239,7 +2290,7 @@ public class DBManager {
         
         
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, source_graph_id);
@@ -2247,7 +2298,7 @@ public class DBManager {
               
             
             count = statement.executeUpdate();
-            dbc.commit();
+            //dbc.commit();
             
             //md = rs.getMetaData();
             //count = md.getColumnCount();
@@ -2260,7 +2311,7 @@ public class DBManager {
                 if (statement != null) {
                     statement.close();
                 }
-                dbc.setAutoCommit(true);
+                //dbc.setAutoCommit(true);
             } catch(SQLException e) { DP.getInstance().w("DBManager", "deleteGraphletSimilaritiesFromDBForGraphs: Could not close statement and reset autocommit."); }
         }
         
@@ -2285,13 +2336,13 @@ public class DBManager {
         
         
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, source_graph_id);
             
             count = statement.executeUpdate();
-            dbc.commit();
+            //dbc.commit();
                        
             
         } catch (SQLException e) {
@@ -2301,7 +2352,7 @@ public class DBManager {
                 if (statement != null) {
                     statement.close();
                 }
-                dbc.setAutoCommit(true);
+                //dbc.setAutoCommit(true);
             } catch(SQLException e) { DP.getInstance().w("DBManager", "deleteAllGraphletSimilaritiesFromDBForSourceGraph: Could not close statement and reset autocommit."); }
         }
         
@@ -2324,14 +2375,14 @@ public class DBManager {
         String query = "DELETE FROM " + tbl_graphletsimilarity + " gs WHERE ( gs.graphletsimilarity_targetgraph = ? );";
                 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, target_graph_id);
               
             
             count = statement.executeUpdate();
-            dbc.commit();
+            //dbc.commit();
             
         } catch (SQLException e) {
             DP.getInstance().e("DBManager", "deleteAllGraphletSimilaritiesFromDBForTargetGraph: '" + e.getMessage() + "'.");
@@ -2340,7 +2391,7 @@ public class DBManager {
                 if (statement != null) {
                     statement.close();
                 }
-                dbc.setAutoCommit(true);
+                //dbc.setAutoCommit(true);
             } catch(SQLException e) { DP.getInstance().w("DBManager", "deleteAllGraphletSimilaritiesFromDBForTargetGraph: Could not close statement and reset autocommit."); }
         }
         
@@ -2364,13 +2415,13 @@ public class DBManager {
         String query = "DELETE FROM " + tbl_graphletcount + " WHERE graph_id = ?;";
                 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, graph_db_id);              
             
             count = statement.executeUpdate();
-            dbc.commit();
+            //dbc.commit();
             
             //md = rs.getMetaData();
             //count = md.getColumnCount();
@@ -2383,7 +2434,7 @@ public class DBManager {
                 if (statement != null) {
                     statement.close();
                 }
-                dbc.setAutoCommit(true);
+                //dbc.setAutoCommit(true);
             } catch(SQLException e) { DP.getInstance().w("DBManager", "deleteGraphletsFromDBForGraph: Could not close statement and reset autocommit."); }
         }        
 
@@ -2415,7 +2466,7 @@ public class DBManager {
         String query = "INSERT INTO " + tbl_chain + " (chain_name, pdb_id, mol_name, organism_scientific, organism_common) VALUES (?, ?, ?, ?, ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setString(1, chain_name);
@@ -2425,7 +2476,7 @@ public class DBManager {
             statement.setString(5, orgCommon);
                                 
             statement.executeUpdate();
-            dbc.commit();
+            //dbc.commit();
             result = true;
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: writeChainToDB: '" + e.getMessage() + "'.");
@@ -2442,7 +2493,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         }
         return(result);
 
@@ -2484,7 +2535,7 @@ public class DBManager {
         String query = "INSERT INTO " + tbl_proteingraph + " (chain_id, graph_type, graph_string_gml, graph_string_plcc, graph_string_kavosh, graph_string_dotlanguage, graph_string_json, sse_string, graph_containsbetabarrel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, chain_db_id);
@@ -2498,7 +2549,7 @@ public class DBManager {
             statement.setInt(9, graph_containsbetabarrel);
                                 
             statement.executeUpdate();
-            dbc.commit();
+            //dbc.commit();
             result = true;
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: writeProteinGraphToDB: '" + e.getMessage() + "'.");
@@ -2515,7 +2566,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         }
         return(result);
     }
@@ -2577,7 +2628,7 @@ public class DBManager {
         int affectedRows = 0;
         
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
             statement.setLong(1, parent_graph_id);
@@ -2603,7 +2654,7 @@ public class DBManager {
             } else {
                 DP.getInstance().w("Inserting folding graph into DB failed, no generated key obtained.");
             }
-            dbc.commit();
+            //dbc.commit();
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: writeFoldingGraphToDB: '" + e.getMessage() + "'.");
             if (dbc != null) {
@@ -2618,7 +2669,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         }
         return(insertID);
     }
@@ -2685,7 +2736,7 @@ public class DBManager {
         int affectedRows = 0;
         
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
             statement.setLong(1, fgdbid);
@@ -2710,7 +2761,7 @@ public class DBManager {
             } else {
                 DP.getInstance().w("Inserting folding graph linear notation into DB failed, no generated key obtained.");
             }
-            dbc.commit();
+            //dbc.commit();
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: writeFoldLinearNotationsToDatabase: '" + e.getMessage() + "'.");
             if (dbc != null) {
@@ -2725,7 +2776,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         }
         return(insertID);                
     }
@@ -2775,7 +2826,7 @@ public class DBManager {
         int affectedRows = 0;
         
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
             statement.setLong(1, fgdbid);
@@ -2802,7 +2853,7 @@ public class DBManager {
             } else {
                 DP.getInstance().w("Inserting folding graph linear notation into DB failed, no generated key obtained.");
             }
-            dbc.commit();
+            //dbc.commit();
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: writeFoldLinearNotationsToDatabase: '" + e.getMessage() + "'.");
             if (dbc != null) {
@@ -2817,7 +2868,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         }
         return(insertID);                
     }
@@ -2991,7 +3042,7 @@ public class DBManager {
         Integer numRowsAffected = 0;
         
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             
@@ -2999,7 +3050,7 @@ public class DBManager {
             statement.setLong(2, graphDatabaseID);
                                 
             numRowsAffected = statement.executeUpdate();
-            dbc.commit();
+            //dbc.commit();
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: updateProteinGraphImagePathInDB: '" + e.getMessage() + "'.");
             if (dbc != null) {
@@ -3014,7 +3065,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         } 
        
         return numRowsAffected;
@@ -3056,7 +3107,7 @@ public class DBManager {
         Integer numRowsAffected = 0;
         
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             
@@ -3064,7 +3115,7 @@ public class DBManager {
             statement.setLong(2, graphDatabaseID);
                                 
             numRowsAffected = statement.executeUpdate();
-            dbc.commit();
+            //dbc.commit();
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: updateProteinGraphImagePathInDB: '" + e.getMessage() + "'.");
             if (dbc != null) {
@@ -3079,7 +3130,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         } 
        
         return numRowsAffected;
@@ -3115,7 +3166,7 @@ public class DBManager {
         Integer numRowsAffected = 0;
         
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
             
             statement.setInt(1, fg_number);
@@ -3124,7 +3175,7 @@ public class DBManager {
             statement.setLong(4, sseDatabaseID);
                                 
             numRowsAffected = statement.executeUpdate();
-            dbc.commit();
+            //dbc.commit();
         } catch (SQLException e ) {
             DP.getInstance().e("DBManager", "updateSecondatSSEInfoForGraphInDB: '" + e.getMessage() + "'.");
             if (dbc != null) {
@@ -3139,7 +3190,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         } 
        
         return numRowsAffected;
@@ -3170,7 +3221,7 @@ public class DBManager {
         Integer numRowsAffected = 0;
         
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             
@@ -3178,7 +3229,7 @@ public class DBManager {
             statement.setLong(2, foldingGraphDatabaseID);
                                 
             numRowsAffected = statement.executeUpdate();
-            dbc.commit();
+            //dbc.commit();
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: updateFoldingGraphImagePathInDB: '" + e.getMessage() + "'.");
             if (dbc != null) {
@@ -3193,7 +3244,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         } 
        
         return numRowsAffected;
@@ -3364,13 +3415,13 @@ public class DBManager {
         String query = "SELECT c.chain_id FROM " + tbl_foldinggraph + " f INNER JOIN " + tbl_proteingraph + " p ON f.parent_graph_id = p.graph_id INNER JOIN " + tbl_chain + " c ON p.chain_id = c.chain_id WHERE (f.foldinggraph_id = ?) ;";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, foldingGraphDbId);
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -3400,7 +3451,7 @@ public class DBManager {
                 if (rs != null) {
                     rs.close();
                 }
-                dbc.setAutoCommit(true);
+                //dbc.setAutoCommit(true);
             } catch(Exception e) { DP.getInstance().w("DB: getDBChainIDofFoldingGraph(): Could not close statement and reset autocommit."); }
         }
         
@@ -3444,7 +3495,7 @@ public class DBManager {
         String query = "INSERT INTO " + tbl_nm_ssetoproteingraph + " (sse_id, graph_id, position_in_graph) VALUES (?, ?, ?);";
         
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             
@@ -3453,7 +3504,7 @@ public class DBManager {
             statement.setInt(3, ssePositionInGraph);
                                 
             numRowsAffected = statement.executeUpdate();
-            dbc.commit();
+            //dbc.commit();
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: assignSSEToProteinGraph(): '" + e.getMessage() + "'.");
             if (dbc != null) {
@@ -3468,7 +3519,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         } 
         
         return numRowsAffected;
@@ -3491,7 +3542,7 @@ public class DBManager {
         String query = "INSERT INTO " + tbl_nm_ligandtochain + " (ligandtochain_chainid, ligandtochain_ligandname3) VALUES (?, ?);";
         
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             
@@ -3499,7 +3550,7 @@ public class DBManager {
             statement.setString(2, ligand_name3);
                                 
             numRowsAffected = statement.executeUpdate();
-            dbc.commit();
+            //dbc.commit();
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: assignLigandToProteinChain(): '" + e.getMessage() + "'.");
             if (dbc != null) {
@@ -3514,7 +3565,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         } 
         
         return numRowsAffected;
@@ -3543,7 +3594,7 @@ public class DBManager {
         String query = "INSERT INTO " + tbl_nm_ssetofoldinggraph + " (sse_id, foldinggraph_id, position_in_graph) VALUES (?, ?, ?);";
         
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             
@@ -3552,7 +3603,7 @@ public class DBManager {
             statement.setInt(3, ssePositionInGraph);
                                 
             numRowsAffected = statement.executeUpdate();
-            dbc.commit();
+            //dbc.commit();
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: assignSSEToFoldingGraph(): '" + e.getMessage() + "'.");
             if (dbc != null) {
@@ -3567,7 +3618,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         } 
         
         return numRowsAffected;    
@@ -3610,7 +3661,7 @@ public class DBManager {
         String query = "INSERT INTO " + tbl_graphletcount + " (chain_id, graph_type, graphlet_count_000, graphlet_count_001, graphlet_count_002) VALUES (?, ?, ?, ?, ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, chain_db_id);
@@ -3620,7 +3671,7 @@ public class DBManager {
             statement.setInt(5, graphlet_counts[2]);
                                 
             statement.executeUpdate();
-            dbc.commit();
+            //dbc.commit();
             result = true;
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: writeGraphletsToDB: '" + e.getMessage() + "'.");
@@ -3637,7 +3688,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         }
         return(result);
     }
@@ -3753,7 +3804,7 @@ public class DBManager {
         String query = "INSERT INTO " + tbl_ssecontact + " (sse1, sse2, contact_type) VALUES (?, ?, ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, sse1_id);
@@ -3761,7 +3812,7 @@ public class DBManager {
             statement.setInt(3, contact_type);
                                 
             statement.executeUpdate();
-            dbc.commit();
+            //dbc.commit();
             result = true;
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: writeContactToDB: '" + e.getMessage() + "'.");
@@ -3778,7 +3829,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         }
                 
         return(result);
@@ -3833,7 +3884,7 @@ public class DBManager {
         String query = "INSERT INTO " + tbl_graphletsimilarity + " (graphletsimilarity_sourcegraph, graphletsimilarity_targetgraph, score) VALUES (?, ?, ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, source_graph_id);
@@ -3841,7 +3892,7 @@ public class DBManager {
             statement.setDouble(3, score);
                                 
             statement.executeUpdate();
-            dbc.commit();
+            //dbc.commit();
             result = true;
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: writeGraphletSimilarityScoreToDB: '" + e.getMessage() + "'.");
@@ -3858,7 +3909,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         }
                 
         return(result);
@@ -3907,7 +3958,7 @@ public class DBManager {
         String query = "INSERT INTO " + tbl_complex_contact_stats + " (chain1, chain2, contact_num_HH, contact_num_HS, contact_num_HL, contact_num_SS, contact_num_SL, contact_num_LL, contact_num_DS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            ////dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
             
             statement.setLong(1, chain1_id);
@@ -3921,7 +3972,7 @@ public class DBManager {
             statement.setInt(9, numContactsDS);
                                 
             statement.executeUpdate();
-            dbc.commit();
+            ////dbc.commit();
             result = true;
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: writeInterchainContactsToDB: '" + e.getMessage() + "'.");
@@ -3938,7 +3989,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         }
                 
         return(result);
@@ -4009,13 +4060,13 @@ public class DBManager {
         String query = "SELECT s.sse_id, s.position_in_chain FROM " + tbl_sse + " s JOIN " + tbl_chain + " c ON ( s.chain_id = c.chain_id ) WHERE ( c.chain_id = ? ) ORDER BY s.position_in_chain ASC;";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, db_chain_id);
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -4045,7 +4096,7 @@ public class DBManager {
                 if (rs != null) {
                     rs.close();
                 }
-                dbc.setAutoCommit(true);
+                //dbc.setAutoCommit(true);
             } catch(SQLException e) { DP.getInstance().w("DBManager", "getOrderedSSEDBIDsOfChain: Could not close statement and reset autocommit."); }
         }
         
@@ -4110,14 +4161,14 @@ public class DBManager {
         String query = "SELECT g.sse_string FROM " + tbl_proteingraph + " g INNER JOIN " + tbl_chain + " c ON g.chain_id = c.chain_id INNER JOIN " + tbl_protein + " p ON c.pdb_id = p.pdb_id WHERE (p.pdb_id = ? AND c.chain_name = ? AND g.graph_type = 6);";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setString(1, pdb_id);
             statement.setString(2, chain_name);
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -4147,7 +4198,7 @@ public class DBManager {
                 if (rs != null) {
                     rs.close();
                 }
-                dbc.setAutoCommit(true);
+                //dbc.setAutoCommit(true);
             } catch(SQLException e) { DP.getInstance().w("DBManager", "getSSEStringOfChain: Could not close statement and reset autocommit."); }
         }
         
@@ -4184,14 +4235,14 @@ public class DBManager {
         String query = "SELECT chain_id FROM " + tbl_chain + " WHERE (pdb_id = ? AND chain_name = ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setString(1, pdb_id);
             statement.setString(2, chain_name);
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -4221,7 +4272,7 @@ public class DBManager {
                 if (rs != null) {
                     rs.close();
                 }
-                dbc.setAutoCommit(true);
+                //dbc.setAutoCommit(true);
             } catch(SQLException e) { DP.getInstance().w("DBManager", "getDBChainID: Could not close statement and reset autocommit."); }
         }
         
@@ -4261,13 +4312,13 @@ public class DBManager {
         String query = "SELECT pdb_id, chain_name FROM " + tbl_chain + " WHERE (chain_id = ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setInt(1, dbChainID);
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -4294,7 +4345,7 @@ public class DBManager {
                 if (statement != null) {
                     statement.close();
                 }
-                dbc.setAutoCommit(true);
+                //dbc.setAutoCommit(true);
             } catch(SQLException e) { DP.getInstance().w("DBManager", " getPDBIDandChain: Could not close statement and reset autocommit."); }
         }
         
@@ -4339,11 +4390,11 @@ public class DBManager {
         String query = "SELECT pdb_id, chain_name FROM " + tbl_chain + " ;";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
             
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -4370,7 +4421,7 @@ public class DBManager {
                 if (statement != null) {
                     statement.close();
                 }
-                dbc.setAutoCommit(true);
+                //dbc.setAutoCommit(true);
             } catch(SQLException e) { DP.getInstance().w("DBManager", "getAllPDBIDsandChains: Could not close statement and reset autocommit."); }
         }
         
@@ -4398,13 +4449,13 @@ public class DBManager {
         String query = "SELECT pdb_id FROM " + tbl_protein + " WHERE (pdb_id = ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setString(1, pdb_id);
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -4431,7 +4482,7 @@ public class DBManager {
                 if (statement != null) {
                     statement.close();
                 }
-                dbc.setAutoCommit(true);
+                //dbc.setAutoCommit(true);
             } catch(SQLException e) { DP.getInstance().w("DB: Could not close statement and reset autocommit."); }
         }
         
@@ -4471,13 +4522,13 @@ public class DBManager {
         String query = "SELECT graphlet_id FROM " + DBManager.tbl_graphletcount + " WHERE (graph_id = ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, graph_db_id);
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -4504,7 +4555,7 @@ public class DBManager {
                 if (statement != null) {
                     statement.close();
                 }
-                dbc.setAutoCommit(true);
+                //dbc.setAutoCommit(true);
             } catch(SQLException e) { DP.getInstance().w("DBManager", "graphletsExistsInDBForGraph: Could not close statement and reset autocommit."); }
         }
         
@@ -4554,14 +4605,14 @@ public class DBManager {
         String query = "SELECT ligandtochain_id FROM " + tbl_nm_ligandtochain + " WHERE (ligandtochain_chainid = ? AND ligandtochain_ligandname3 = ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, chainDbId);
             statement.setString(2, ligName3);
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -4588,7 +4639,7 @@ public class DBManager {
                 if (statement != null) {
                     statement.close();
                 }
-                dbc.setAutoCommit(true);
+                //dbc.setAutoCommit(true);
             } catch(SQLException e) { DP.getInstance().w("DBManager", "assignmentLigandToProteinChainExistsInDB: Could not close statement and reset autocommit."); }
         }
         
@@ -4643,13 +4694,13 @@ public class DBManager {
         String query = "SELECT ligand_name3 FROM " + tbl_ligand + " WHERE (ligand_name3 = ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setString(1, ligand_name3);
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -4676,7 +4727,7 @@ public class DBManager {
                 if (statement != null) {
                     statement.close();
                 }
-                dbc.setAutoCommit(true);
+                //dbc.setAutoCommit(true);
             } catch(SQLException e) { DP.getInstance().w("DBManager", "DB: ligandExistsInDB: Could not close statement and reset autocommit."); }
         }
         
@@ -4720,14 +4771,14 @@ public class DBManager {
         String query = "SELECT graphletsimilarity_id FROM " + tbl_graphletsimilarity + " WHERE ( graphletsimilarity_sourcegraph = ? AND graphletsimilarity_targetgraph = ? );";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, source_graph_id);
             statement.setLong(2, target_graph_id);
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -4754,7 +4805,7 @@ public class DBManager {
                 if (statement != null) {
                     statement.close();
                 }
-                dbc.setAutoCommit(true);
+                //dbc.setAutoCommit(true);
             } catch(SQLException e) { DP.getInstance().w("DBManager", "graphletSimilarityScoreExistsInDBForGraphs: Could not close statement and reset autocommit."); }
         }
         
@@ -4870,14 +4921,14 @@ public class DBManager {
         String query = "SELECT " + query_graph_format_field + " FROM " + tbl_proteingraph + " WHERE (chain_id = ? AND graph_type = ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, chain_db_id);
             statement.setInt(2, gtc);
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -4903,7 +4954,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         }
         
         // OK, check size of results table and return 1st field of 1st column
@@ -4955,14 +5006,14 @@ public class DBManager {
         String query = "SELECT graph_id FROM " + tbl_proteingraph + " WHERE (chain_id = ? AND graph_type = ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, chain_db_id);
             statement.setInt(2, gtc);
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -4988,7 +5039,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         }
         
         // OK, check size of results table and return 1st field of 1st column
@@ -5045,14 +5096,14 @@ public class DBManager {
         String query = "SELECT foldinggraph_id FROM " + tbl_foldinggraph + " WHERE (parent_graph_id = ? AND fg_number = ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, parentGraphID);
             statement.setInt(2, fg_number);
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -5078,7 +5129,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         }
         
         // OK, check size of results table and return 1st field of 1st column
@@ -5149,13 +5200,13 @@ public class DBManager {
                 + " FROM " + tbl_graphletcount + " WHERE (graph_id = ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, graphid);
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -5181,7 +5232,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         }
         
         // OK, check size of results table and return 1st field of 1st column
@@ -5262,13 +5313,13 @@ public class DBManager {
                 + " FROM " + tbl_graphletcount + " WHERE (graph_id = ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, graphid);
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -5294,7 +5345,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         }
         
         // OK, check size of results table and return 1st field of 1st column
@@ -5390,14 +5441,14 @@ public class DBManager {
         String query = "SELECT sse_string FROM " + tbl_proteingraph + " WHERE (chain_id = ? AND graph_type = ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, chain_db_id);
             statement.setInt(2, gtc);
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -5423,7 +5474,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         }
         
         // OK, check size of results table and return 1st field of 1st column
@@ -5487,7 +5538,7 @@ public class DBManager {
         }
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             if( ! allGraphs) {
@@ -5496,7 +5547,7 @@ public class DBManager {
             
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -5522,7 +5573,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         }
         
         // OK, check size of results table and return 1st field of 1st column
@@ -5599,14 +5650,14 @@ public class DBManager {
         String query = "SELECT graph_image_svg FROM " + tbl_proteingraph + " WHERE (chain_id = ? AND graph_type = ?);";
 
         try {
-            dbc.setAutoCommit(false);
+            //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, chain_db_id);
             statement.setInt(2, gtc);
                                 
             rs = statement.executeQuery();
-            dbc.commit();
+            //dbc.commit();
             
             md = rs.getMetaData();
             count = md.getColumnCount();
@@ -5632,7 +5683,7 @@ public class DBManager {
             if (statement != null) {
                 statement.close();
             }
-            dbc.setAutoCommit(true);
+            //dbc.setAutoCommit(true);
         }
         
         // OK, check size of results table and return 1st field of 1st column

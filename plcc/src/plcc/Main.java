@@ -416,7 +416,7 @@ public class Main {
                             Integer numRows = 0;
                             System.out.println("Deleting protein with PDB identifier '" + pdbidToDelete + "' from database...");
                             
-                            if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"))) {
+                            if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"), Settings.getBoolean("plcc_B_db_use_autocommit"))) {
                                 try {
                                     
                                     numRows = DBManager.deletePdbidFromDB(pdbidToDelete);
@@ -450,7 +450,7 @@ public class Main {
                                                         
                             System.out.println("Retrieving " + a_gt + " graph of PDB entry " + a_pdbid + ", chain " + a_chain + " from database.");
                             
-                            if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"))) {
+                            if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"), Settings.getBoolean("plcc_B_db_use_autocommit"))) {
                                 drawPlccGraphFromDB(a_pdbid, a_chain, a_gt, a_outFile + Settings.get("plcc_S_img_output_fileext"), false);
                                 System.out.println("Handled " + a_gt + " graph of PDB entry " + a_pdbid + ", chain " + a_chain + ", exiting.");
                                 System.exit(0);
@@ -519,7 +519,7 @@ public class Main {
 
                     if(s.equals("-r") || s.equals("--recreate-tables")) {
                         System.out.println("Recreating DB tables only (-r)...");
-                        if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"))) {
+                        if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"), Settings.getBoolean("plcc_B_db_use_autocommit"))) {
                             if(DBManager.dropTables()) {
                                 System.out.println("  DB: Tried to drop statistics tables (no error messages => OK).");
                             }
@@ -915,7 +915,7 @@ public class Main {
                 System.out.println("Searching for proteins similar to PDB ID '" + Settings.get("plcc_B_search_similar_PDBID") + "' chain '" + Settings.get("plcc_B_search_similar_chainID") + "' graph type '" + Settings.get("plcc_S_search_similar_graphtype") + "'.");
             }
             
-            if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"))) {
+            if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"), Settings.getBoolean("plcc_B_db_use_autocommit"))) {
                 
                 if(Settings.get("plcc_S_search_similar_method").equals(Similarity.SIMILARITYMETHOD_STRINGSSE)) {
                     if(! silent) {
@@ -971,7 +971,7 @@ public class Main {
                 System.out.println("Computing pairwise graphlet similarities for all graphs in the database. This will take a lot of time and memory for large databases...");
             }
             
-            if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"))) {
+            if(DBManager.initUsingDefaults()) {
                 Long[] res = DBManager.computeGraphletSimilarityScoresForWholeDatabaseAndStoreBest(ProtGraph.GRAPHTYPE_ALBE, Settings.getInteger("plcc_I_compute_all_graphlet_similarities_num_to_save_in_db"));
                 // numChainsFound, numGraphletsFound, numScoresComputed, numScoresSaved
                 if(! silent) {
@@ -1043,7 +1043,7 @@ public class Main {
             if(! silent) {
                 System.out.println("  Checking database connection to host '" + plcc_db_host + "' on port '" + plcc_db_port + "'...");
             }
-            if(DBManager.init(plcc_db_name, plcc_db_host, plcc_db_port, plcc_db_username, plcc_db_password)) {
+            if(DBManager.initUsingDefaults()) {
                 if(! silent) {
                     System.out.println("  -> Database connection OK.");
                 }
@@ -1348,17 +1348,7 @@ public class Main {
             for(Chain c : chains) {
                 writeResMappings(resMapFile + "_" + c.getPdbChainID() + ".resmap", c);
             }
-            
-            
-            // write residue-to-SSE-mappings file
-           
-            // EDIT: Cannot write this here because PLCC SSEs are not assigned yet
-            /*
-            System.out.println("Writing SSE mapping files for all chains...");
-            for(Chain c : chains) {
-                writeSSEMappings(sseMappingsFile + "_" + c.getPdbChainID() + ".ssemap", c, pdbid);
-            }
-            */
+                                    
 
             // write models file
             if(! silent) {
@@ -1437,7 +1427,7 @@ public class Main {
         
         if(handleChains.size() < 1) {
             DP.getInstance().w("No chains to handle found in input data (" + chains.size() + " chains total).");
-            System.exit(1);
+            Main.doExit(1);
         }
                 
         
@@ -1505,6 +1495,7 @@ public class Main {
             
             if(Settings.getBoolean("plcc_B_useDB")) {
                 writeProteinDataToDatabase(pdbid);
+                DBManager.commit();
             }
                         
             
@@ -1551,12 +1542,19 @@ public class Main {
                     
                     calculateSSEGraphsForChains(theChain, residues, cInfoThisChain, pdbid, outputDir);
                     
+                    if(Settings.getBoolean("plcc_B_useDB")) {
+                        DBManager.commit();
+                    }
+                    
                     numChainsHandled++;
                 }
             }
             else {  // no chain separation active
                 calculateSSEGraphsForChains(handleChains, residues, cInfo, pdbid, outputDir);
                 //calculateComplexGraph(handleChains, residues, cInfo, pdbid, outputDir);
+                if(Settings.getBoolean("plcc_B_useDB")) {
+                    DBManager.commit();
+                }
             }
             if(! silent) {
                 System.out.println("All " + handleChains.size() + " chains done.");
@@ -1658,6 +1656,10 @@ public class Main {
 
         // ****************************************************    all done    ********************************************************** //
         
+        if(Settings.getBoolean("plcc_B_useDB")) {
+            DBManager.commit();
+            DBManager.closeConnection();
+        }
         
         
         if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
@@ -1938,7 +1940,7 @@ public class Main {
                         
                         Long chainDbId = DBManager.getDBChainID(pdbid, chain);
                         
-                        if(chainDbId > 1) {
+                        if(chainDbId >= 1) {
                             for(Residue ligand : c.getAllLigandResidues()) {
                                 ligName3Trimmed = ligand.getTrimmedName3();
                                 DBManager.writeLigandToDBUnlessAlreadyThere(ligName3Trimmed, ligand.getLigName(), ligand.getLigFormula(), ligand.getLigSynonyms());
@@ -2474,7 +2476,7 @@ public class Main {
             PTGLNotationFoldResult pnfr = resultsPTGLNotations.get(j);
             if(!Objects.equals(pnfr.getFoldNumber(), fg_number)) {
                 DP.getInstance().e("Main", "calculateFoldingGraphsForSSEGraph(): fg_number of PTGLNotationFoldResult does not match current fg_number.");
-                System.exit(1);
+                Main.doExit(1);
             }
             
             
@@ -2885,8 +2887,8 @@ public class Main {
             keepSSEs.add("L");
         }
         else {
-            System.err.println("ERROR: calcGraphType(): Graph type '" + graphType + "' invalid.");
-            System.exit(1);
+            System.err.println("ERROR: calcGraphType(): Graph type '" + graphType + "' invalid.");            
+            Main.doExit(1);
         }
 
         // Filters have been configured, now do the actual filtering.
@@ -2981,7 +2983,7 @@ public class Main {
      */
     public static void syntaxError() {
         System.err.println("ERROR: Invalid command line. Use '-h' or --help' for info on how to run this program.");
-        System.exit(1);
+        Main.doExit(1);
     }
     
     /**
@@ -2990,7 +2992,7 @@ public class Main {
     public static void syntaxError(String hint) {
         System.err.println("ERROR: Invalid command line. Use '-h' or --help' for info on how to run this program.");
         System.err.println("ERROR: Hint: '" + hint + "'");
-        System.exit(1);
+        Main.doExit(1);
     }
 
     /**
@@ -3494,7 +3496,7 @@ public class Main {
                         else {
                             System.err.println("ERROR: Congrats, you found a bug in the atom contact type determination code (res " + a.getPdbResNum() + " atom " + i + " / res " + b.getPdbResNum() + " atom " + j + ").");
                             System.err.println("ERROR: Atom types are: i (PDB atom #" + x.getPdbAtomNum() + ") => " + x.getAtomType() + ", j (PDB atom #" + y.getPdbAtomNum() + ") => " + y.getAtomType() + ".");
-                            System.exit(1);
+                            Main.doExit(1);
                         }
 
                         // Check for H bridges separately
@@ -4027,7 +4029,7 @@ public class Main {
         catch (Exception e) {
             System.err.println("ERROR: Could not write to file '" + chainsFile + "'.");
             e.printStackTrace();
-            System.exit(1);
+            Main.doExit(1);
         }
 
 
@@ -4048,8 +4050,8 @@ public class Main {
             chainFW.close();
         } catch(Exception ex) {
             System.err.println("ERROR: Could not close FileWriter for file '" + chainsFile + "'.");
-            ex.printStackTrace();
-            System.exit(1);
+            //ex.printStackTrace();
+            //Main.doExit(1);
         }
 
         if(! Settings.getBoolean("plcc_B_silent")) {
@@ -4096,8 +4098,8 @@ public class Main {
         }
         catch (Exception e) {
             System.err.println("ERROR: Could not write to file '" + mapFile + "'.");
-            e.printStackTrace();
-            System.exit(1);
+            //e.printStackTrace();            
+            Main.doExit(1);
         }
 
 
@@ -4115,8 +4117,8 @@ public class Main {
             mapFW.close();
         } catch(Exception ex) {
             System.err.println("ERROR: Could not close FileWriter for file '" + mapFile + "'.");
-            ex.printStackTrace();
-            System.exit(1);
+            //ex.printStackTrace();
+            //System.exit(1);
         }
 
         System.out.println("  Wrote PDB/DSSP residue mapping info to file '" + mapFile + "'.");       
@@ -4145,7 +4147,7 @@ public class Main {
         catch (Exception e) {
             System.err.println("ERROR: Could not write to file '" + ligFile + "'.");
             e.printStackTrace();
-            System.exit(1);
+            Main.doExit(1);
         }
 
 
@@ -4166,7 +4168,7 @@ public class Main {
         } catch(Exception ex) {
             System.err.println("ERROR: Could not close FileWriter for file '" + ligFile + "'.");
             ex.printStackTrace();
-            System.exit(1);
+            Main.doExit(1);
         }
 
         System.out.println("  Wrote ligand info to file '" + ligFile + "'.");
@@ -4209,8 +4211,8 @@ public class Main {
             modelFW.close();
         } catch(Exception ex) {
             System.err.println("ERROR: Could not close FileWriter for file '" + modelsFile + "'.");
-            ex.printStackTrace();
-            System.exit(1);
+            //ex.printStackTrace();
+            //System.exit(1);
         }
 
         System.out.println("  Wrote model info to file '" + modelsFile + "'.");
@@ -4237,7 +4239,7 @@ public class Main {
         } catch (Exception ef) {
             System.err.println("ERROR: Could not copy file '" + dsspFile + "' to '" + dsspLigFile + "'.");
             ef.printStackTrace();
-            System.exit(1);
+            Main.doExit(1);
         }
 
         System.out.println("  DSSP ligand output file set to '" + dsspLigFile + "', file created.");
@@ -4251,7 +4253,7 @@ public class Main {
         catch (Exception e) {
             System.err.println("ERROR: Could not write to file '" + dsspLigFile + "'.");
             e.printStackTrace();
-            System.exit(1);
+            Main.doExit(1);
         }
 
         // now get and write the ligand lines
@@ -4296,7 +4298,7 @@ public class Main {
         } catch(Exception ex) {
             System.err.println("ERROR: Could not close FileWriter for file '" + dsspLigFile + "'.");
             ex.printStackTrace();
-            System.exit(1);
+            Main.doExit(1);
         }
 
         System.out.println("  Wrote DSSP ligand info to file '" + dsspLigFile + "'.");
@@ -5419,6 +5421,17 @@ public class Main {
         return(true);        
     }
     
+    
+    /**
+     * Ends plcc execution via calling System.exit(), but does maintenance work like closing open DB connections before that.
+     * @param exitCode the exit code to give to the System.exit() function
+     */
+    public static void doExit(int exitCode) {
+        if(Settings.getBoolean("plcc_B_useDB")) {
+            DBManager.closeConnection();
+        }
+        System.exit(exitCode);
+    }
     
     /**
      * Informs the user that the currently selected DEBUG settings brake the output of this program, e.g. because

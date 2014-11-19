@@ -332,6 +332,7 @@ public class Settings {
         defSet("plcc_S_db_password", "", "DB password (empty if local is TRUST for this user)");
         defSet("plcc_S_graph_image_base_path", "/srv/www/htdocs/vplgweb/data/", "The graph image base path for the database. The relative path to the path given here is used to locate the graph image on disk.");
 
+        defSet("plcc_B_db_use_autocommit", "false", "Whether the DB connection gets set to autocommit when created.");
 
         // PDB and DSSP file parsing and writing
         defSet("plcc_I_defaultModel", "1", "The default model used if multiple models exist in the PDB file");
