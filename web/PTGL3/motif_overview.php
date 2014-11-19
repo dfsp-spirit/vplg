@@ -124,7 +124,8 @@ function get_all_motif_names() {
 		
 		
 		<br><br>
-		<div id="4helix">
+		<div class="anchor" id="4helix"></div>
+		<div>
 		    <h3>Four Helix Bundle</h3>
 		    <p>A motif consisting only of alpha helices. Found <?php print $all_motif_counts['4helix'];?> times in the current database.</p>
 		    <p><img class="motifimage" src="./images/4helixbeide_struktur.jpg" width="300" /></p>
@@ -132,7 +133,8 @@ function get_all_motif_names() {
 		
 		
 		<br><br><br><br>
-		<div id="globin">
+		<div class="anchor" id="globin"></div>
+		<div>
 		    <h3>Globin Fold</h3>
 		    <p>A motif consisting only of alpha helices. Found <?php print $all_motif_counts['globin'];?> times in the current database.</p>
 		    <p><img class="motifimage" src="./images/globin_struktur.jpg" width="300" /></p>
@@ -140,7 +142,8 @@ function get_all_motif_names() {
 		
 		
 		<br><br><br><br>
-		<div id="barrel">
+		<div class="anchor" id="barrel"></div>
+		<div>
 		    <h3>Up and Down Barrel</h3>
 		    <p>A motif consisting only of beta strands. Found <?php print $all_motif_counts['barrel'];?> times in the current database.</p>
 		    <p><img class="motifimage" src="./images/barrel_struktur.jpg" width="300" /></p>
@@ -148,7 +151,8 @@ function get_all_motif_names() {
 		
 		
 		<br><br><br><br>
-		<div id="immuno">
+		<div class="anchor" id="immuno"></div>
+		<div>
 		    <h3>Immunoglobin Fold</h3>
 		    <p>A motif consisting only of beta strands. Found <?php print $all_motif_counts['immuno'];?> times in the current database.</p>
 		    <p><img class="motifimage" src="./images/immuno_struktur.jpg" width="300" /></p>
@@ -156,7 +160,8 @@ function get_all_motif_names() {
 		
 		
 		<br><br><br><br>
-		<div id="propeller">
+		<div class="anchor" id="propeller"></div>
+		<div>
 		    <h3>Beta Propeller</h3>
 		    <p>A motif consisting only of beta strands. Found <?php print $all_motif_counts['propeller'];?> times in the current database.</p>
 		    <p><img class="motifimage" src="./images/propeller_struktur.jpg" width="300" /></p>
@@ -164,7 +169,8 @@ function get_all_motif_names() {
 		
 		
 		<br><br><br><br>
-		<div id="jelly">
+		<div class="anchor" id="jelly"></div>
+		<div>
 		    <h3>Jelly Roll</h3>
 		    <p>A motif consisting only of beta strands. Found <?php print $all_motif_counts['jelly'];?> times in the current database.</p>
 		    <p><img class="motifimage" src="./images/jelly_struktur.jpg" width="300" /></p>
@@ -172,7 +178,8 @@ function get_all_motif_names() {
 		
 		
 		<br><br><br><br>
-		<div id="ubi">
+		<div class="anchor" id="ubi"></div>
+		<div>
 		    <h3>Ubiquitin Roll</h3>
 		    <p>A motif consisting only of both alpha helices and beta strands. Found <?php print $all_motif_counts['ubi'];?> times in the current database.</p>
 		    <p><img class="motifimage" src="./images/ubibeide_struktur.jpg" width="300" /></p>
@@ -180,7 +187,8 @@ function get_all_motif_names() {
 		
 		
 		<br><br><br><br>
-		<div id="plait">
+		<div class="anchor" id="plait"></div>
+		<div>
 		    <h3>Alpha Beta Plait</h3>
 		    <p>A motif consisting only of both alpha helices and beta strands. Found <?php print $all_motif_counts['plait'];?> times in the current database.</p>
 		    <p><img class="motifimage" src="./images/plait_struktur.jpg" width="300" /></p>
@@ -188,14 +196,16 @@ function get_all_motif_names() {
 		
 		
 		<br><br><br><br>
-		<div id="rossman">
+		<div class="anchor" id="rossman"></div>
+		<div>
 		    <h3>Rossman Fold</h3>
 		    <p>A motif consisting only of both alpha helices and beta strands. Found <?php print $all_motif_counts['rossman'];?> times in the current database. </p>
 		    <p><img class="motifimage" src="./images/rossman_struktur.jpg" width="300" /></p>
 		</div>
 		
 		<br><br><br><br>
-		<div id="tim">
+		<div class="anchor" id="tim"></div>
+		<div>
 		    <h3>TIM Barrel</h3>
 		    <p>A motif consisting only of both alpha helices and beta strands. Found <?php print $all_motif_counts['tim'];?> times in the current database.</p>
 		    <p><img class="motifimage" src="./images/tim_struktur.jpg" width="300" /></p>

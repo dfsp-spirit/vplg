@@ -1,12 +1,12 @@
 $(document).ready(function() {
 
-	$("#ugSearchkms").hide();
-	$("#ugSearchkms1").hide();
-	$("#ugSearchkms2").hide();
-	$("#ugSearchkms3").hide();
-	$("#ugAdvancedSearch").hide();
+	// $("#ugSearchkms").hide();
+	// $("#ugSearchkms1").hide();
+	$("#ugSearchkms2").hide(); // Hide the motif description
+	// $("#ugSearchkms3").hide();
+	// $("#ugAdvancedSearch").hide();
 	
-	
+	/*
 	$("#ugStandardSearch").click(function() {
 		$("#ugSearchkms1").fadeOut(400);
 		$("#ugSearchkms2").fadeOut(400);
@@ -16,7 +16,9 @@ $(document).ready(function() {
 		$("#ugAdvancedSearch").fadeToggle(400);
 		$("html, body").animate({ scrollTop: $('#scroll1').offset().top }, 1000)
 		});
+	*/
 	
+	/*
 	$("#ugAdvancedSearch").click(function() {
 		$("#ugSearchkms1").fadeOut(400);
 		$("#ugSearchkms2").fadeOut(400);
@@ -26,6 +28,7 @@ $(document).ready(function() {
 		
 		$("html, body").animate({ scrollTop: $('#scroll2').offset().top}, 1000)
 		});
+	*/
 	
 	$("#ugSearchk").click(function() {
 		$("#ugSearchkms2").hide();

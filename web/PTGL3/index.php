@@ -87,9 +87,9 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 							<input type="checkbox" id="inlineCheckbox3" name="proteincomplexes" value="1"> Search for Protein Complexes
 						</label>
 						<?php } ?>
-												
+					</form>							
 						
-
+					<form class="form-inline" action="search.php" method="get">
 						<div id="advancedSearch">
 
 							<?php if($USE_LOGIC_OPERATORS) { ?>

@@ -117,6 +117,10 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<!-- Dynamic ContentLoader -->
 		
 <script type="text/javascript">
+	
+		function resizeWindow(){
+			$(window).resize();
+		}
 
 		$(document).ready(function () {             
 
@@ -126,7 +130,10 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 				maxSlide: 1,
 				slideWidth: viewWidth,
 				infiniteLoop: false,
-				hideControlOnEnd: true
+				hideControlOnEnd: true /*,
+				onSliderLoad: function(){
+					setTimeout(resizeWindow,2000);
+				} */
 			});
 
 				tadas = $('.tada').bxSlider({

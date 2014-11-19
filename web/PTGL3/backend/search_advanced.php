@@ -266,37 +266,32 @@ if (isset($title) && $title != ""){
 
 if (isset($hasligand) && $hasligand != "null") {
         array_push($list_of_search_types, "hasligand search");
+		if($firstQuerySet) { $query .= " INTERSECT "; }
         if($hasligand == "1") {
-                $operator = " NOT ";
-        } else if ($hasligand == "0"){
-                $operator = " ";
-        }
-
-        if($firstQuerySet) { $query .= " INTERSECT "; }
-                $query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
+				$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
                                 FROM plcc_nm_ligandtochain l
                                 INNER JOIN plcc_chain c ON l.ligandtochain_chainid = c.chain_id
                                 INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id 
-                                WHERE l.ligandtochain_ligandname3 IS".$operator."NULL"; 
-                $firstQuerySet = true; 
-
+                                WHERE l.ligandtochain_ligandname3 IS NOT NULL"; 
+				
+        } else if ($hasligand == "0"){
+                $query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
+								FROM plcc_chain c
+								INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id
+								WHERE c.chain_id NOT IN (SELECT ligandtochain_chainid FROM plcc_nm_ligandtochain)"; 
+		}
+		$firstQuerySet = true; 
 };
 
 if (isset($ligandname) && $ligandname != "") { 
         array_push($list_of_search_types, "ligand name search");
         if($firstQuerySet) { $query .= " INTERSECT "; }
-        /*$query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
-                           FROM plcc_nm_ligandtochain l
-                           INNER JOIN plcc_chain c ON l.ligandtochain_chainid = c.chain_id
-                           INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id 
-                           WHERE l.ligandtochain_ligandname3 = '".$ligandname."'
-                           ORDER BY pdb_id, chain_name"; */
         $query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
                            FROM plcc_chain c
                            INNER JOIN plcc_nm_ligandtochain l2c ON c.chain_id = l2c.ligandtochain_chainid
                            INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id 
-                           WHERE l2c.ligandtochain_ligandname3 = $". $param_value++;
-        array_push($query_parameters, $ligandname);
+                           WHERE trim(both ' ' from l2c.ligandtochain_ligandname3) = $". $param_value++;
+        array_push($query_parameters, strtoupper($ligandname));
         $firstQuerySet = true; 	
 };
 

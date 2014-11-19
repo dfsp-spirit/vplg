@@ -196,7 +196,7 @@ $query = "SELECT chain_id, chain_name, pdb_id, resolution, title, header
 
 // following: the queries for each set parameter
 if (isset($keyword) && $keyword != "") {
-
+		$keyword = strtolower($keyword);
         $query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
                            FROM plcc_chain c
                            INNER JOIN plcc_protein p

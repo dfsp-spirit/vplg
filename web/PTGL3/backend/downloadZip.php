@@ -25,7 +25,7 @@ if(isset($_GET['dl'])){
 		
 		if(endsWith($filename, ".zip")) {
 		
-		  if(strpos($file, '..') === FALSE) {		
+		  if(strpos($filename, '..') === FALSE) {		
 		    header("Content-type: application/zip"); 
 		    header("Content-Disposition: attachment; filename=$filename");
 		    header("Content-length: " . filesize($dl));
@@ -40,6 +40,23 @@ if(isset($_GET['dl'])){
 		  echo "ERROR: Filename does not end with '.zip'.";
 		}
 	}
+}
+
+// Delete files that are older than one day
+$dir = "../temp_downloads/";
+if (is_dir($dir)) {
+    if ($dh = opendir($dir)) {
+		$now = time();
+        while (($file = readdir($dh)) !== false) {
+			$filetime = filemtime($dir.$file);
+			if(($filetime !== FALSE) && (($now - $filetime) > 24*3600)){
+				if(is_file($dir.$file)){
+					unlink($dir.$file);
+				}
+			}
+        }
+        closedir($dh);
+    }
 }
 //EOF
 ?>
