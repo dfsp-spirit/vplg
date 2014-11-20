@@ -318,9 +318,9 @@ if [ -r $FLN ]; then
 	#$CREATE_DSSP_COMMAND
 
 	if [ $? -ne 0 ]; then
-	    echo "$APPTAG $PDBID ##### ERROR: Could not create DSSP file from PDB file '$PDBFILE', skipping protein '$PDBID'."
-	    echo "$APPTAG $PDBID ##### ERROR: Could not create DSSP file from PDB file '$PDBFILE', skipping protein '$PDBID'." >>$ERROR_LOG
-	    echo "$APPTAG $PDBID ##### ERROR: Could not create DSSP file from PDB file '$PDBFILE', skipping protein '$PDBID'." >>$DBINSERT_LOG
+	    echo "$APPTAG $PDBID ##### ERROR: Could not create DSSP file from PDB file '$PDBFILE', skipping protein '$PDBID' (could be DNA only)."
+	    echo "$APPTAG $PDBID ##### ERROR: Could not create DSSP file from PDB file '$PDBFILE', skipping protein '$PDBID' (could be DNA only)." >>$ERROR_LOG
+	    echo "$APPTAG $PDBID ##### ERROR: Could not create DSSP file from PDB file '$PDBFILE', skipping protein '$PDBID' (could be DNA only)." >>$DBINSERT_LOG
 	    let NUM_TOTAL_FAIL++
 	    let NUM_DSSP_FAIL++
 	    del_output $PDBID

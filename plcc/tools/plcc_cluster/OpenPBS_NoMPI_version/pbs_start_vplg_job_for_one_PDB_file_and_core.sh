@@ -28,7 +28,7 @@
 #PBS -r n
 # resource limits: max. wall clock time during 
 # which job can be running
-#PBS -l walltime=5:00:00
+#PBS -l walltime=01:00:00
 #PBS -l nodes=1:ppn=1 
 # send me mail when job (b)egins, (e)nds or (a)borts
 ##PBS -m abe  # not used so far
