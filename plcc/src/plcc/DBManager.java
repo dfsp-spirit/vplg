@@ -36,6 +36,7 @@ public class DBManager {
     static String dbDriver;
     static Connection dbc;
     // table names
+        
     
     /** Name of the table which stores info on a PDB protein, identified by the PDB ID. */
     static String tbl_protein = "plcc_protein";
@@ -124,7 +125,7 @@ public class DBManager {
         dbUsername = user;
         dbPassword = password;
 
-        dbDriver = "org.postgresql.Driver";
+        dbDriver = "org.postgresql.Driver";               
 
         try {
             Class.forName(dbDriver);
@@ -139,6 +140,7 @@ public class DBManager {
         Boolean conOK = connect(setAutoCommit);
         return (conOK);
     }
+    
     
     
     /**
@@ -1010,7 +1012,235 @@ public class DBManager {
 
         return (res);
     }
+    
+    /**
+     * Retrieves all the internal DB ids of all SSEs of the chain (also given by internal DB id) from the database.
+     * @param chain_db_id the chain DB id
+     * @return a list of SSE DB ids
+     * @throws SQLException if DB stuff goes wrong
+     */
+    public static List<Long> getAllSSEIDsOfChain(Long chain_db_id) throws SQLException {
+        List<Long> ids = new ArrayList<>();
+        
+        if(chain_db_id <= 0L) {
+            DP.getInstance().c("DBManager", "getAllSSEIDsOfChain: Invalid chain DB id, must be > 0. Returning empty SSE list.");
+            return ids;
+        }
+        
+        String query = "SELECT s.sse_id FROM plcc_sse s WHERE s.chain_id = ?";
+                     
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        int count;
+        PreparedStatement statement = null;
+        ResultSet rs = null;        
 
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+            
+            statement.setLong(1, chain_db_id);
+            rs = statement.executeQuery();
+            //dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+            
+            while (rs.next()) {
+                ids.add(rs.getLong(0));
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "HH getAllSSEIDsOfChain: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                //dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "getAllSSEIDsOfChain: Could not close statement and reset autocommit."); }
+        }
+        return ids;
+    }
+
+    /**
+     * Writes the whole SSE list to the database in a single batch statement, also writes the secondat table entries for all the SSEs.
+     * @param pdbid the PDB identifier
+     * @param chain the PDB chain name
+     * @param allChainSSEs a list of SSE objects. These will be added to the DB. The ssePositionInChain property is determined by the order of the array (starting with 1).
+     * @return the insert count of the queries
+     * @throws SQLException if something goes wrong with the DB
+     */
+    public static int writeAllSSEsOfChainToDB(String pdb_id, String chain_name, List<SSE> allChainSSEs) throws SQLException {
+        if(allChainSSEs.isEmpty()) {
+            return 0;
+        }
+        
+        Long chain_id = getDBChainID(pdb_id, chain_name);
+
+        if (chain_id <= 0) {
+            DP.getInstance().e("DBManager", "writeAllSSEsOfChainToDB: Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert SSE.");
+            return (0);
+        }
+              
+        PreparedStatement statement = null;                        
+        String query = "INSERT INTO " + tbl_sse + " (chain_id, dssp_start, dssp_end, pdb_start, pdb_end, sequence, sse_type, lig_name, position_in_chain) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                
+        int updateCount = 0;
+        
+        
+        //TODO: also write the secondat entries
+        
+        Boolean oldAutoCommitSetting = dbc.getAutoCommit();
+        
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+            
+            for(int i = 0; i < allChainSSEs.size(); i++) {
+            
+                SSE sse = allChainSSEs.get(i);
+                statement.setLong(1, chain_id);
+                statement.setInt(2, sse.getStartDsspNum());
+                statement.setInt(3, sse.getEndDsspNum());
+                statement.setString(4, sse.getStartPdbResID());
+                statement.setString(5, sse.getEndPdbResID());
+                statement.setString(6, sse.getAASequence());
+                statement.setInt(7, sse.getSSETypeInt());
+                statement.setString(8, sse.getTrimmedLigandName3());
+                statement.setInt(9, (i+1));
+                
+                statement.addBatch();                
+            }
+            
+            int[] count = statement.executeBatch();
+            
+            
+            
+            dbc.commit();
+            
+            
+            updateCount = 0;
+            for(int i = 0; i < count.length; i++) { updateCount += count[i]; }
+
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "writeAllSSEsOfChainToDB: Batch SQL failed: '" + e.getMessage() + "'.");
+            SQLException se = e.getNextException();
+            if(se != null) {
+                DP.getInstance().e("DBManager", "writeAllSSEsOfChainToDB: Batch Exception: '" + se.getMessage() + "'.");                
+            }
+            
+            if (dbc != null) {
+                try {
+                    DP.getInstance().e("DBManager", "writeAllSSEsOfChainToDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    DP.getInstance().e("DBManager", "writeAllSSEsOfChainToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+
+        } finally {
+            if (statement != null) {
+                statement.close();
+                dbc.setAutoCommit(oldAutoCommitSetting);
+            }
+        }
+        
+        System.err.println("TODO: NEED TO WRITE SECONDAT STUFF!");
+        List<Long> sse_ids = DBManager.getAllSSEIDsOfChain(chain_id);
+        int updateCountSeconDat = DBManager.batchInsertSecondatEntriesForSSEs(sse_ids);
+        
+        if(updateCountSeconDat != sse_ids.size()) {
+            DP.getInstance().e("DBManager", "writeAllSSEsOfChainToDB: Only " + updateCountSeconDat + " of the " + sse_ids.size() + " secondat entries were written to the DB."); 
+            Main.doExit(1);
+        }
+        
+        return(updateCount);                       
+    }
+    
+    /**
+     * Batch inserts the empty secondat entries for all SSEs (defined by their internal DB ids) into the database.
+     * @param sse_ids al list of database SSE IDs
+     * @return the total update count
+     */
+    public static int batchInsertSecondatEntriesForSSEs(List<Long> sse_ids) throws SQLException {
+
+        if(sse_ids.isEmpty()) {
+            return 0;
+        }
+        
+        PreparedStatement statement = null;                
+
+        String query = "INSERT INTO " + tbl_secondat + " (sse_id) VALUES (?);";        
+
+        int updateCount = 0;
+        Boolean oldAutoCommitSetting = dbc.getAutoCommit();
+        
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+            
+            for(int i = 0; i < sse_ids.size(); i++) {            
+                statement.setLong(1, sse_ids.get(0));
+            
+                statement.addBatch();
+            }
+            
+            int[] count = statement.executeBatch();            
+            dbc.commit();            
+            
+            updateCount = 0;
+            for(int i = 0; i < count.length; i++) { updateCount += count[i]; }
+
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "batchInsertSecondatEntriesForSSEs: Batch SQL failed: '" + e.getMessage() + "'.");
+            SQLException se = e.getNextException();
+            if(se != null) {
+                DP.getInstance().e("DBManager", "batchInsertSecondatEntriesForSSEs: Batch Exception: '" + se.getMessage() + "'.");                
+            }
+            
+            if (dbc != null) {
+                try {
+                    DP.getInstance().e("DBManager", "batchInsertSecondatEntriesForSSEs: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    DP.getInstance().e("DBManager", "batchInsertSecondatEntriesForSSEs: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(oldAutoCommitSetting);
+        }
+        
+        return updateCount;
+    }
+  
+    /* batched batch code to prevent out-of-memory trouble in vast batch statement
+    String sql = "insert into employee (name, city, phone) values (?, ?, ?)";
+Connection connection = new getConnection();
+PreparedStatement ps = connection.prepareStatement(sql);
+ 
+final int batchSize = 1000;
+int count = 0;
+ 
+for (Employee employee: employees) {
+ 
+    ps.setString(1, employee.getName());
+    ps.setString(2, employee.getCity());
+    ps.setString(3, employee.getPhone());
+    ps.addBatch();
+     
+    if(++count % batchSize == 0) {
+        ps.executeBatch();
+    }
+}
+ps.executeBatch(); // insert remaining records
+ps.close();
+connection.close();
+*/
     
     /**
      * Adds an empty secondat entry to the DB for this SSE.
@@ -1081,10 +1311,10 @@ public class DBManager {
      * @throws java.sql.SQLException if something with the DB went wrong 
      */
     public static Long writeSSEToDB(String pdb_id, String chain_name, Integer dssp_start, Integer dssp_end, String pdb_start, String pdb_end, String sequence, Integer sse_type, String lig_name, Integer ssePositionInChain) throws SQLException {
-
+        
         Long chain_id = getDBChainID(pdb_id, chain_name);
 
-        if (chain_id < 0) {
+        if (chain_id <= 0L) {
             DP.getInstance().e("DBManager", "writeSSEToDB: Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert SSE.");
             return (-1L);
         }
@@ -3290,7 +3520,7 @@ public class DBManager {
             }                            
         } else {
             DP.getInstance().e("DBManager", "assignSSEsToProteinGraphInOrder(): Graph not found in DB, cannot assign SSEs to it.");            
-        }
+        }                
         
         return numAssigned;
     }
@@ -3782,7 +4012,7 @@ public class DBManager {
 
         Long db_chain_id = getDBChainID(pdb_id, chain_name);
 
-        if (db_chain_id < 0) {
+        if (db_chain_id <= 0L) {
             System.err.println("ERROR: DB: writeContactToDB(): Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert SSE.");
             return (false);
         }
@@ -3833,6 +4063,96 @@ public class DBManager {
         }
                 
         return(result);
+    }
+
+    /**
+     * Batch writes all SSE contacts to the DB in a single commit.
+     * @param pdb_id the PDB identifier of the protein
+     * @param chain_name the PDB chain name of the protein chain
+     * @param contactInfoList a list of contacts. Each entry is of length 3, and the three positions in the array are: 0=DSSP residue number of the first residue of the first SSE which is part of the SSE contact. 1=the same for the second SSE. 2=the spatial contact code.
+     * @return the total DB insert count
+     * @throws SQLException if DB stuff went wrong
+     */
+    public static int batchWriteContactsToDB(String pdb_id, String chain_name, List<Integer[]> contactInfoList) throws SQLException {
+        if(contactInfoList.isEmpty()) {
+            return 0;
+        }
+        
+        Long db_chain_id = getDBChainID(pdb_id, chain_name);
+
+        if (db_chain_id <= 0L) {
+            DP.getInstance().e("DBManager", "batchWriteContactsToDB: Could not find chain with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB, could not insert SSE.");
+            return (0);
+        }
+              
+        PreparedStatement statement = null;                
+        ResultSet generatedKeys = null;
+
+        // it is kind of ugly that we need to do this many queries to determine the SSE DB ids, may the insert could do it?
+        List<Long[]> sse_db_ids = new ArrayList<>();
+        Long tmp, sse1_id, sse2_id;
+        for(Integer[] contactInfo : contactInfoList) {
+            sse1_id = getDBSseIDByDsspStartResidue(contactInfo[0], db_chain_id);
+            sse2_id = getDBSseIDByDsspStartResidue(contactInfo[1], db_chain_id);
+            // We may need to switch the IDs to make sure the 1st of them is always lower
+            if (sse1_id > sse2_id) {
+                tmp = sse2_id;
+                sse2_id = sse1_id;
+                sse1_id = tmp;
+            }
+            sse_db_ids.add(new Long[] { sse1_id, sse2_id});
+        }               
+        
+        String query = "INSERT INTO " + tbl_ssecontact + " (sse1, sse2, contact_type) VALUES (?, ?, ?);";
+
+        int updateCount = 0;        
+        Boolean oldAutoCommitSetting = dbc.getAutoCommit();
+        
+        try {
+            dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+            
+            for(int i = 0; i < contactInfoList.size(); i++) {
+            
+                statement.setLong(1, sse_db_ids.get(i)[0]);
+                statement.setLong(2, sse_db_ids.get(i)[1]);
+                statement.setInt(3, contactInfoList.get(i)[2]);
+            
+                statement.addBatch();
+                
+            }
+            
+            int[] count = statement.executeBatch();                        
+            
+            dbc.commit();            
+            
+            updateCount = 0;
+            for(int i = 0; i < count.length; i++) { updateCount += count[i]; }
+
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "batchWriteContactsToDB: Batch SQL failed: '" + e.getMessage() + "'.");
+            SQLException se = e.getNextException();
+            if(se != null) {
+                DP.getInstance().e("DBManager", "batchWriteContactsToDB: Batch Exception: '" + se.getMessage() + "'.");                
+            }
+            
+            if (dbc != null) {
+                try {
+                    DP.getInstance().e("DBManager", "batchWriteContactsToDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    DP.getInstance().e("DBManager", "batchWriteContactsToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            dbc.setAutoCommit(oldAutoCommitSetting);
+        }
+        return(updateCount);                       
+        
     }
     
     
@@ -4003,16 +4323,33 @@ public class DBManager {
      * @return The ID if it was found, -1 otherwise.
      */
     private static Long getDBSseIDByDsspStartResidue(Integer dssp_start, Long db_chain_id) {
+        
+        if(db_chain_id <= 0L) {
+            DP.getInstance().e("DBManager", "getDBSseIDByDsspStartResidue: the provided internal database ID is <= 0 and thus invalid.");
+            return -1L;
+        }
+        
+        if(dssp_start < 0) {
+            DP.getInstance().w("DBManager", "getDBSseIDByDsspStartResidue: I am being asked for a DSSP start id of " + dssp_start + ".");
+        }
+        
         Long id = -1L;
         ArrayList<ArrayList<String>> rowarray = doSelectQuery("SELECT s.sse_id FROM " + tbl_sse + " s JOIN " + tbl_chain + " c ON ( s.chain_id = c.chain_id ) WHERE ( s.dssp_start = " + dssp_start + " AND c.chain_id = '" + db_chain_id + "' );");
 
         if (rowarray == null) {
             return (-1L);
         } else {
+            if(rowarray.isEmpty()) {
+                // no such SSE entry in database
+                return -1L;
+            }
             try {
                 id = Long.valueOf(rowarray.get(0).get(0));
                 return (id);
             } catch (NumberFormatException e) {
+                return (-1L);
+            } catch (java.lang.ArrayIndexOutOfBoundsException aob) {
+                // no such entry in DB
                 return (-1L);
             }
         }

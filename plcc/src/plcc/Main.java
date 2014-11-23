@@ -118,8 +118,10 @@ public class Main {
      */
     public static void main(String[] args) {
                 
-        System.out.println("[======================== plcc -- Protein-Ligand Contact Calculation ========================]");
-        System.out.println("Init... (Version " +  version + ")");
+        StringBuilder outputToBePrintedUnlessSilent = new StringBuilder();
+        
+        outputToBePrintedUnlessSilent.append("[======================== plcc -- Protein-Ligand Contact Calculation ========================]\n");
+        outputToBePrintedUnlessSilent.append("Init... (Version ").append(version).append(")\n");
         
         // *************************************************** load default settings from config file *************************************
 
@@ -136,8 +138,10 @@ public class Main {
             DP.getInstance().w("INFO: The Java classloader path is set to: '" + System.getProperty("java.class.path") + "'.");
         }
 
-        if(Settings.load("")) {             // Empty string means that the default file of the Settings class is used
-            //System.out.println("  Settings loaded from properties file.");
+        int numSettingsLoaded = Settings.load("");
+        if(numSettingsLoaded > 0) {             // Empty string means that the default file of the Settings class is used
+            outputToBePrintedUnlessSilent.append("  Loaded ").append(numSettingsLoaded).append(" settings from properties file.\n");
+            
         }
         else {
             DP.getInstance().w("Could not load settings from properties file, trying to create it.");
@@ -217,7 +221,7 @@ public class Main {
             if(! pdbid.equals("NONE")) {
                 DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                 Calendar cal = Calendar.getInstance();
-                System.out.println("  Starting computation for PDB ID '" + pdbid + "' at " + dateFormat.format(cal.getTime()) + ".");
+                outputToBePrintedUnlessSilent.append("  Starting computation for PDB ID '" + pdbid + "' at " + dateFormat.format(cal.getTime()) + ".\n");
             }
 
             final Integer expectedLengthPDBID = 4;
@@ -345,7 +349,13 @@ public class Main {
                     
                     if(s.equals("-Z") || s.equals("--silent")) {
                         Settings.set("plcc_B_silent", "true");
-                        Settings.set("plcc_B_no_warn", "true");
+                    }
+                    
+                    if(s.equals("--db-batch")) {
+                        Settings.set("plcc_B_db_use_batch_inserts", "true");
+                    }
+                    if(s.equals("--no-db-batch")) {
+                        Settings.set("plcc_B_db_use_batch_inserts", "false");
                     }
                     
                     if(s.equals("--compute-whole-db-graphlet-similarities")) {
@@ -866,14 +876,16 @@ public class Main {
         
         Boolean silent = false;
         if(Settings.getBoolean("plcc_B_silent")) {
-            if(Settings.getBoolean("plcc_B_no_warn")) {
-                System.out.println("  Silent mode and no-warn active, only errors will be printed from now on. Bye.");
-            } else {
-                System.out.println("  Silent mode active, only errors and warnings will be printed from now on. Bye.");
+            if(Settings.getBoolean("plcc_B_print_silent_notice")) {
+                if(Settings.getBoolean("plcc_B_no_warn")) {
+                    System.out.println("[PLCC]  Silent mode and no-warn active, only errors will be printed from now on. Bye.");
+                } else {
+                    System.out.println("[PLCC] Silent mode active, only errors and warnings will be printed from now on. Bye.");
+                }
             }
-            
             silent = true;
         } else {
+            System.out.println(outputToBePrintedUnlessSilent.toString());
             if(Settings.getBoolean("plcc_B_no_warn")) {
                 System.out.println("  No-warn active, no warnings will be printed.");
             }
@@ -1657,7 +1669,7 @@ public class Main {
         // ****************************************************    all done    ********************************************************** //
         
         if(Settings.getBoolean("plcc_B_useDB")) {
-            DBManager.commit();
+            DBManager.commit();            
             DBManager.closeConnection();
         }
         
@@ -2011,18 +2023,38 @@ public class Main {
                 allChainSSEs.get(j).setSseIDPtgl(getPtglSseIDForNum(j));
 
                 if(Settings.getBoolean("plcc_B_useDB")) {
-                    try {
-                       SSE ssej = allChainSSEs.get(j);
-                       Integer ssePositionInChain = j + 1;
-                       Long insertID = DBManager.writeSSEToDB(pdbid, chain, ssej.getStartDsspNum(), ssej.getEndDsspNum(), ssej.getStartPdbResID(), ssej.getEndPdbResID(), ssej.getAASequence(), ssej.getSSETypeInt(), ssej.getTrimmedLigandName3(), ssePositionInChain); 
-                       //System.out.println("  Info on SSE #" + (j + 1) + " of chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
-                       if(insertID > 0) {
-                           DBManager.writeEmptySecondatEntryForSSE(insertID);
-                       }
+                    
+                    if( ! Settings.getBoolean("plcc_B_db_use_batch_inserts")) {
+                                                               
+                        try {
+                           SSE ssej = allChainSSEs.get(j);
+                           Integer ssePositionInChain = j + 1;
+                           Long insertID = DBManager.writeSSEToDB(pdbid, chain, ssej.getStartDsspNum(), ssej.getEndDsspNum(), ssej.getStartPdbResID(), ssej.getEndPdbResID(), ssej.getAASequence(), ssej.getSSETypeInt(), ssej.getTrimmedLigandName3(), ssePositionInChain); 
+                           //System.out.println("  Info on SSE #" + (j + 1) + " of chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
+                           if(insertID > 0) {
+                               DBManager.writeEmptySecondatEntryForSSE(insertID);
+                           }
+                           else {
+                               DP.getInstance().w("Main", "Insert ID of SSE is < 0, insert failed. Cannot write the secondat entry for the SSE to the DB.");
+                           }
+                        }
+                        catch(Exception e) {
+                            DP.getInstance().w("Could not write info on SSE # " + j + " of chain '" + chain + "' of protein '" + pdbid + "' to DB.");
+                        }
                     }
-                    catch(Exception e) {
-                        DP.getInstance().w("Could not write info on SSE # " + j + " of chain '" + chain + "' of protein '" + pdbid + "' to DB.");
+                }
+            }
+            
+            // batch insert all SSEs at once of appropriate
+            if(Settings.getBoolean("plcc_B_useDB") &&  Settings.getBoolean("plcc_B_db_use_batch_inserts")) {
+                try {
+                    int insertCount = DBManager.writeAllSSEsOfChainToDB(pdbid, chain, allChainSSEs);
+                    if(insertCount != allChainSSEs.size()) {
+                        DP.getInstance().e("Main", "Only " + insertCount + " of the " + allChainSSEs.size() + " SSEs were written to the DB. Exiting.");
+                        Main.doExit(1);
                     }
+                } catch(SQLException e) {
+                    DP.getInstance().e("Main", "Writing all chain SSE list to DB failed: '" + e.getMessage() + "'.");
                 }
             }
 
@@ -2933,7 +2965,12 @@ public class Main {
         // We only write the SSE contacts for the albelig graph because it contains all SSEs we are interested in.
         //  Writing them for all makes them appear multiple times.
         if(Settings.getBoolean("plcc_B_useDB") && graphType.equals("albelig")) {
-            chainCM.writeContactStatisticsToDB();
+            
+            if(Settings.getBoolean("plcc_B_db_use_batch_inserts")) {
+                chainCM.batchWriteContactStatisticsToDB();
+            } else {
+                chainCM.writeContactStatisticsToDB();
+            }
         }
 
 

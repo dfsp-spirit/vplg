@@ -12,6 +12,7 @@ package plcc;
 import tools.DP;
 import java.util.ArrayList;
 import java.net.*;
+import java.util.List;
 import org.jgrapht.*;
 //import org.jgrapht.graph.*;
 
@@ -1011,7 +1012,8 @@ public class ContactMatrix {
 
 
     /**
-     * Writes the contact statistics to the database,
+     * Writes the contact statistics to the database, one by one. You should consider using the batch version instead. This method
+     * calls the DBManager.writeContactToDB() method many times (once for each contact) to do the actual DB work.
      */
     public void writeContactStatisticsToDB() {
         for(Integer i = 0; i < this.sseList.size(); i++) {
@@ -1025,8 +1027,30 @@ public class ContactMatrix {
                 }
             }
         }
-
-
+    }
+    
+    /**
+     * Writes the contact statistics to the database in a single batch commit. It collects a list of contacts, and 
+     * then calls the DBManager.batchWriteContactsToDB() method to do the actual DB work.
+     */
+    public void batchWriteContactStatisticsToDB() {
+        List<Integer[]> contactInfoList = new ArrayList<>();
+        for(Integer i = 0; i < this.sseList.size(); i++) {
+            for(Integer j = i + 1; j < this.sseList.size(); j++) {
+                if(this.sseContactExistsPos(i, j)) {
+                    contactInfoList.add(new Integer[] { sseList.get(i).getStartDsspNum(), sseList.get(j).getStartDsspNum(), spatialSSE[i][j] });
+                }
+            }
+        }
+        
+        try {
+            int updateCount = DBManager.batchWriteContactsToDB(this.pdbid, this.handleChain, contactInfoList);
+            if(updateCount != contactInfoList.size()) {
+                DP.getInstance().e("ContactMatrix", "batchWriteContactStatisticsToDB: Only " + updateCount + " of the " + contactInfoList.size() + " contacts were written to the DB.");
+            }
+        } catch(Exception e) {
+            DP.getInstance().w("ContactMatrix", "batchWriteContactStatisticsToDB: Could not reset DB state after inserting contact data.");
+        }
     }
     
     /**

@@ -128,7 +128,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		graphs.</p>
 		
 		<p>
-		A Protein graph is defined as labelled, undirected graph. The vertices correspond to the SSEs or ligands, and they are labelled with
+		A Protein graph is defined as labeled, undirected graph. The vertices correspond to the SSEs or ligands, and they are labeled with
 		the SSE type (alpha helix, beta strand or ligand). The vertices of the Protein graph are enumerated as they occur in the sequence from the N- to the C-terminus.
 		
 		
@@ -244,7 +244,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		built by strands. The protein consists of one chain A and exhibits six Folding graphs. Two large Folding graphs (Folding graphs 1BEC_A and
 		1BEC_E), and four Folding graphs 1BEC_B, 1BEC_C, 1BEC_D, and 1BEC_F consisting only of a single helix (see <href="#alphaBeta1bec">Protein graph of 1bec</a>: helices 9,
 		11, 14, and 22). Folding graphs consisting of only one SSE are found mostly at the protein surface and not in the protein core.</p>
-		Especially in beta-sheet containing Folding graphs, the maximal vertex degree of the Folding graphs is not larger than two. Thus, we distinguish
+		Especially in beta-sheet containing Folding graphs, the maximal vertex degree of the Folding graphs is rarely larger than two. Thus, we distinguish
 		between so-called bifurcated and non-bifurcated topological structures. A <a href="#proteinGraph">Protein graph</a> or a Folding graph is called bifucated, if there is any
 		vertex degree greater than 2, if not, the graph is non- bifurcated. 
 		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
@@ -323,8 +323,10 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<br>
 		<br>
 		
+		The linear notations enable you to search the <?php echo "$SITE_TITLE"; ?> for protein motifs (and arbitruary other 3D arrangements of SSEs). When you search for a motif, SQL-based string matching in the linear notation strings is used to find all folding graphs which match a query.
 		
-		
+                <br>
+		<br>
 		
 		
 		

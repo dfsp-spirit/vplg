@@ -123,9 +123,9 @@ public class Settings {
      * Loads the properties from the file 'file'. Should be called at the start of main to init the settings. These default
      * values could then be overwritten by command line arguments.
      * @param file the configuration file to load
-     * @return whether the settings could be loaded from the specified file
+     * @return the number of settings loaded
      */
-    public static Boolean load(String file) {
+    public static int load(String file) {
 
         Boolean res = false;
         
@@ -144,12 +144,10 @@ public class Settings {
             res = true;
         } catch (Exception e) {
             DP.getInstance().w("Settings: Could not load settings from properties file '" + configFile + "'." );
-            res = false;
+            return 0;
         }
-
-
-        System.out.println("  Loaded " + cfg.size() + " settings from properties file '" + configFile + "'." );
-        return(res);
+        
+        return(cfg.size());
     }
 
 
@@ -206,10 +204,12 @@ public class Settings {
         defSet("plcc_B_no_parse_warn", "true", "Whether to suppress all warnings related to parsing of atoms from and other data from the PDB and DSSP input files.");
         defSet("plcc_B_no_not_impl_warn", "true", "Whether to suppress all warnings related to not implemented function.");
         defSet("plcc_B_silent", "false", "Whether to suppress all output. Cluster mode, not recommended for normal usage.");
+        defSet("plcc_B_print_silent_notice", "false", "Whether to print a single line informing the user that silent mode is set in silent mode.");
         defSet("plcc_I_debug_level", "0", "Debug level. Higher value means more output.");
         defSet("plcc_B_debug_compareSSEContacts", "false", "Whether to compare the computed SSE level contacts to those in the geom_neo output file that is supplied.");
         defSet("plcc_S_debug_compareSSEContactsFile", "geo.dat_ptgl", "The path to the geo.dat file to use for SSE level contact comparison.");                
         defSet("plcc_B_contact_debug_dysfunct", "false", "Atom level contact debugging mode. WARNING: When this is true, plcc will abort after the first few residues and produce wrong overall results!");
+        
         
         defSet("plcc_B_split_dsspfile_warning", "true", "Whether to show a warning about splitting the DSSP file when multiple models are detected in a PDB file.");
         defSet("plcc_B_clustermode", "false", "Whether to write extra output files used only in cluster mode, like GML albe graph file list.");
@@ -331,6 +331,8 @@ public class Settings {
         defSet("plcc_S_db_username", "vplg", "DB username");
         defSet("plcc_S_db_password", "", "DB password (empty if local is TRUST for this user)");
         defSet("plcc_S_graph_image_base_path", "/srv/www/htdocs/vplgweb/data/", "The graph image base path for the database. The relative path to the path given here is used to locate the graph image on disk.");
+        defSet("plcc_B_db_use_batch_inserts", "true", "Whether inserts into the database should use batch mode instead of many single queries whenever possible.");
+        
 
         defSet("plcc_B_db_use_autocommit", "false", "Whether the DB connection gets set to autocommit when created.");
 
