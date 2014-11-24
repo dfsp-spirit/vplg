@@ -1955,6 +1955,8 @@ public class Main {
                         if(chainDbId >= 1) {
                             for(Residue ligand : c.getAllLigandResidues()) {
                                 ligName3Trimmed = ligand.getTrimmedName3();
+                                
+                                // TODO: these 3 lines are not thread-safe, running several plcc instances in parallel may lead to race conditions
                                 DBManager.writeLigandToDBUnlessAlreadyThere(ligName3Trimmed, ligand.getLigName(), ligand.getLigFormula(), ligand.getLigSynonyms());
                                 if( ! DBManager.assignmentLigandToProteinChainExistsInDB(chainDbId, ligName3Trimmed)) {
                                     DBManager.assignLigandToProteinChain(chainDbId, ligName3Trimmed);
