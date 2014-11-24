@@ -120,8 +120,9 @@ public class DBManager {
         dbHost = host;
         dbPort = port;
 
+        String appTag = "?ApplicationName=plcc";
 
-        dbURL = "jdbc:postgresql://" + host + ":" + port + "/" + db;
+        dbURL = "jdbc:postgresql://" + host + ":" + port + "/" + db + appTag;
         dbUsername = user;
         dbPassword = password;
 
@@ -949,6 +950,8 @@ public class DBManager {
             doInsertQuery("CREATE INDEX plcc_idx_fglinnotalbelig_search_key ON " + tbl_fglinnot_albelig + " (ptgl_linnot_key text_pattern_ops);");
             */
             
+            
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnot_fk ON " + tbl_fglinnot + " (linnot_foldinggraph_id);");
             doInsertQuery("CREATE INDEX plcc_idx_fglinnot_search_adj ON " + tbl_fglinnot + " (ptgl_linnot_adj text_pattern_ops);");
             doInsertQuery("CREATE INDEX plcc_idx_fglinnot_search_red ON " + tbl_fglinnot + " (ptgl_linnot_red text_pattern_ops);");
             doInsertQuery("CREATE INDEX plcc_idx_fglinnot_search_seq ON " + tbl_fglinnot + " (ptgl_linnot_seq text_pattern_ops);");
