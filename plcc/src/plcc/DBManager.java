@@ -893,8 +893,10 @@ public class DBManager {
 
             doInsertQuery("CREATE INDEX plcc_idx_chain_fk ON " + tbl_chain + " (pdb_id);");                          // for JOINs, ON CASCADE, etc. (foreign key, FK)
             doInsertQuery("CREATE INDEX plcc_idx_sse_fk ON " + tbl_sse + " (chain_id);");                            // FK
+            doInsertQuery("CREATE INDEX plcc_idx_sse_fk2 ON " + tbl_sse + " (sse_type);");
             doInsertQuery("CREATE INDEX plcc_idx_contact_fk1 ON " + tbl_ssecontact + " (sse1);");                       // FK
-            doInsertQuery("CREATE INDEX plcc_idx_contact_fk2 ON " + tbl_ssecontact + " (sse2);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_contact_fk2 ON " + tbl_ssecontact + " (sse2);");
+            doInsertQuery("CREATE INDEX plcc_idx_contact_type ON " + tbl_ssecontact + " (contact_type);");// FK
             doInsertQuery("CREATE INDEX plcc_idx_contact_complexgraph_fk1 ON " + tbl_ssecontact_complexgraph + " (sse1);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_contact_complexgraph_fk2 ON " + tbl_ssecontact_complexgraph + " (sse2);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_complex_contact_fk1 ON " + tbl_complex_contact_stats + " (chain1);");                       // FK
@@ -902,6 +904,8 @@ public class DBManager {
             doInsertQuery("CREATE INDEX plcc_idx_graph_fk ON " + tbl_proteingraph + " (chain_id);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_graph_graphtype ON " + tbl_proteingraph + " (graph_type);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_foldinggraph_fk ON " + tbl_foldinggraph + " (foldinggraph_id);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_foldinggraph_parent ON " + tbl_foldinggraph + " (parent_graph_id);");
+            doInsertQuery("CREATE INDEX plcc_idx_foldinggraph_fgnum ON " + tbl_foldinggraph + " (fg_number);");// FK
             doInsertQuery("CREATE INDEX plcc_idx_graphlets_fk ON " + tbl_graphletcount + " (graph_id);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_ssetoproteingraph_fk1 ON " + tbl_nm_ssetoproteingraph + " (sse_id);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_ssetoproteingraph_fk2 ON " + tbl_nm_ssetoproteingraph + " (graph_id);");                       // FK
@@ -909,6 +913,7 @@ public class DBManager {
             doInsertQuery("CREATE INDEX plcc_idx_ssetofoldinggraph_fk2 ON " + tbl_nm_ssetofoldinggraph + " (foldinggraph_id);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_chaintomotif_fk1 ON " + tbl_nm_chaintomotif + " (chain_id);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_chaintomotif_fk2 ON " + tbl_nm_chaintomotif + " (motif_id);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_ligand_name3 ON " + tbl_ligand + " (ligand_name3);");                       // FK
             //doInsertQuery("CREATE INDEX plcc_idx_fglinnotalpha_fk ON " + tbl_fglinnot_alpha + " (linnot_foldinggraph_id);");          // FK
             //doInsertQuery("CREATE INDEX plcc_idx_fglinnotbeta_fk ON " + tbl_fglinnot_beta + " (linnot_foldinggraph_id);");          // FK
             //doInsertQuery("CREATE INDEX plcc_idx_fglinnotalbe_fk ON " + tbl_fglinnot_albe + " (linnot_foldinggraph_id);");          // FK
@@ -961,6 +966,11 @@ public class DBManager {
             doInsertQuery("CREATE INDEX plcc_idx_motif_search_abbrev ON " + tbl_motif + " (motif_abbreviation text_pattern_ops);");
             
             doInsertQuery("CREATE INDEX plcc_idx_secondat_fk ON " + tbl_secondat + " (sse_id);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_graphletsimilarity_graph1 ON " + tbl_graphletsimilarity + " (graphletsimilarity_sourcegraph);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_graphletsimilarity_graph2 ON " + tbl_graphletsimilarity + " (graphletsimilarity_targetgraph);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_graphletsimilarity_score ON " + tbl_graphletsimilarity + " (score);");
+            doInsertQuery("CREATE INDEX plcc_idx_ligandtochain_chain ON " + tbl_nm_ligandtochain + " (ligandtochain_chainid);");
+            doInsertQuery("CREATE INDEX plcc_idx_ligandtochain_name3 ON " + tbl_nm_ligandtochain + " (ligandtochain_ligandname3);");
 
             // indices on PKs get created automatically
             
