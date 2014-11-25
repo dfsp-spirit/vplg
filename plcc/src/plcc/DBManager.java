@@ -1559,26 +1559,10 @@ connection.close();
         
         PreparedStatement statement = null;
         ResultSet rs = null;
-        
-        /*
-        "Select pdb,chain from alpha where (red like '%1a,1a,1a,-3_%' and red not  like '%-1a,1a,1a,-3_%'  ) or (red like '%-3_,1a,1a,1a%')  or (red like '%3_,1a,1a,1a%' and red not like '%-3_,1a,1a,1a%') or (red like '%-4_,1a,1a,2a%') or (red like '%2a,1a,1a,-4_%' and red not like '%-2a,1a,1a,-4_%' )  group by pdb,chain";
-       "Select pdb,chain from alpha where (red like '%-1a,-1a,-1a,3_%') or (red like '%3_,-1a,-1a,-1a%' and red not like '%-3_,-1a,-1a,-1a%')   group by pdb,chain";
-	   "Select pdb,chain from alpha where red LIKE '%1p,1a,1p%' and red not like '%-1p,1a,1p%' group by pdb,chain";
-	   "Select pdb,chain from alpha where red LIKE '%1a,1a,1a%' and seq like '%1,1,1%' and sse < 6 group by pdb,chain";
-	   "Select pdb,chain from albe where  (red LIKE '[h,1ah,1ah,1ah]') group by pdb,chain";
-        */
+              
         
         StringBuilder querySB = new StringBuilder();
-        /**
-         * This old query looks for chain and PDBID; which is not required. Speed it up by selecting linnot_id only, 2 less joins.
-        querySB.append("SELECT p.pdb_id, c.chain_name ");
-	querySB.append("FROM plcc_fglinnot ln ");
-	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
-	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
-	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
-	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
-	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 1 AND (ln.ptgl_linnot_red LIKE '%1a,1a,1a,-3_%' and ln.ptgl_linnot_red not LIKE '%-1a,1a,1a,-3_%') or (ln.ptgl_linnot_red LIKE '%-3_,1a,1a,1a%') or (ln.ptgl_linnot_red LIKE '%3_,1a,1a,1a%' and ln.ptgl_linnot_red not LIKE '%-3_,1a,1a,1a%') or (ln.ptgl_linnot_red LIKE '%-4_,1a,1a,2a%') or (ln.ptgl_linnot_red LIKE '%2a,1a,1a,-4_%' and ln.ptgl_linnot_red not LIKE '%-2a,1a,1a,-4_%') or (ln.ptgl_linnot_red LIKE '%1p,1a,1p%' and ln.ptgl_linnot_red not LIKE '%-1p,1a,1p%') or (ln.ptgl_linnot_red LIKE '%1a,1a,1a%' and ln.ptgl_linnot_seq LIKE '%1,1,1%' and ln.num_sses < 6 ) ) or (pg.graph_type = 4 AND ln.ptgl_linnot_red LIKE '[h,1ah,1ah,1ah]') )");
-        */
+        
         
         querySB.append("SELECT ln.linnot_id ");
 	querySB.append("FROM plcc_fglinnot ln ");
