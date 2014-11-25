@@ -313,6 +313,9 @@ public class Settings {
         defSet("plcc_B_graphtype_betalig", "true", "Determines whether alpha-beta graphs with ligands are drawn");
         defSet("plcc_S_output_dir", ".", "output directory");
         
+        // motifs
+        defSet("plcc_B_compute_motifs", "false", "Whether to search for motifs in the FG linear notations (after computing and writing them to the DB).");
+        
         
         // complex graphs: same, mere
         defSet("plcc_B_complex_graphs", "false" , "Whether or not complex graphs are drawn.");

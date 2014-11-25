@@ -351,6 +351,13 @@ public class Main {
                         Settings.set("plcc_B_silent", "true");
                     }
                     
+                    if(s.equals("--motifs")) {
+                        Settings.set("plcc_B_compute_motifs", "true");
+                    }
+                    if(s.equals("--no-motifs")) {
+                        Settings.set("plcc_B_compute_motifs", "false");
+                    }
+                    
                     if(s.equals("--db-batch")) {
                         Settings.set("plcc_B_db_use_batch_inserts", "true");
                     }
@@ -2432,7 +2439,7 @@ public class Main {
                 System.out.println("  +++++ All " + graphTypes.size() + " protein graphs of chain " + c.getPdbChainID() + " handled. +++++");
             }
             
-            if(Settings.getBoolean("plcc_B_useDB") && Settings.getBoolean("plcc_B_folding_graphs")) {
+            if(Settings.getBoolean("plcc_B_useDB") && Settings.getBoolean("plcc_B_folding_graphs") && Settings.getBoolean("plcc_B_compute_motifs")) {
                 Integer numAssigned = 0;
                 try {
                     numAssigned = DBManager.checkAndAssignChainToAllMotifsInDatabase(pdbid, chain);
