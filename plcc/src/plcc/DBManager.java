@@ -1418,6 +1418,7 @@ connection.close();
     public static Integer checkAndAssignChainToAllMotifsInDatabase(String pdbid, String chain) throws SQLException {
         Long chain_db_id = DBManager.getDBChainID(pdbid, chain);
         if(chain_db_id < 1L) {
+            DP.getInstance().w("DBManager", "checkAndAssignChainToAllMotifsInDatabase(): Entry for chain " + chain + " of PDB " + pdbid + " not found in DB, skipping motif.");
             return 0;
         }
         
@@ -1568,6 +1569,8 @@ connection.close();
         */
         
         StringBuilder querySB = new StringBuilder();
+        /**
+         * This old query looks for chain and PDBID; which is not required. Speed it up by selecting linnot_id only, 2 less joins.
         querySB.append("SELECT p.pdb_id, c.chain_name ");
 	querySB.append("FROM plcc_fglinnot ln ");
 	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
@@ -1575,6 +1578,13 @@ connection.close();
 	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
 	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
 	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 1 AND (ln.ptgl_linnot_red LIKE '%1a,1a,1a,-3_%' and ln.ptgl_linnot_red not LIKE '%-1a,1a,1a,-3_%') or (ln.ptgl_linnot_red LIKE '%-3_,1a,1a,1a%') or (ln.ptgl_linnot_red LIKE '%3_,1a,1a,1a%' and ln.ptgl_linnot_red not LIKE '%-3_,1a,1a,1a%') or (ln.ptgl_linnot_red LIKE '%-4_,1a,1a,2a%') or (ln.ptgl_linnot_red LIKE '%2a,1a,1a,-4_%' and ln.ptgl_linnot_red not LIKE '%-2a,1a,1a,-4_%') or (ln.ptgl_linnot_red LIKE '%1p,1a,1p%' and ln.ptgl_linnot_red not LIKE '%-1p,1a,1p%') or (ln.ptgl_linnot_red LIKE '%1a,1a,1a%' and ln.ptgl_linnot_seq LIKE '%1,1,1%' and ln.num_sses < 6 ) ) or (pg.graph_type = 4 AND ln.ptgl_linnot_red LIKE '[h,1ah,1ah,1ah]') )");
+        */
+        
+        querySB.append("SELECT ln.linnot_id ");
+	querySB.append("FROM plcc_fglinnot ln ");
+	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
+	querySB.append("WHERE ( pg.chain_id = ? AND (pg.graph_type = 1 AND (ln.ptgl_linnot_red LIKE '%1a,1a,1a,-3_%' and ln.ptgl_linnot_red not LIKE '%-1a,1a,1a,-3_%') or (ln.ptgl_linnot_red LIKE '%-3_,1a,1a,1a%') or (ln.ptgl_linnot_red LIKE '%3_,1a,1a,1a%' and ln.ptgl_linnot_red not LIKE '%-3_,1a,1a,1a%') or (ln.ptgl_linnot_red LIKE '%-4_,1a,1a,2a%') or (ln.ptgl_linnot_red LIKE '%2a,1a,1a,-4_%' and ln.ptgl_linnot_red not LIKE '%-2a,1a,1a,-4_%') or (ln.ptgl_linnot_red LIKE '%1p,1a,1p%' and ln.ptgl_linnot_red not LIKE '%-1p,1a,1p%') or (ln.ptgl_linnot_red LIKE '%1a,1a,1a%' and ln.ptgl_linnot_seq LIKE '%1,1,1%' and ln.num_sses < 6 ) or (pg.graph_type = 4 AND ln.ptgl_linnot_red LIKE '[h,1ah,1ah,1ah]') ) )");
         
         String query = querySB.toString();
         
