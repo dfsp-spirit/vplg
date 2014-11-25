@@ -314,7 +314,7 @@ public class Settings {
         defSet("plcc_S_output_dir", ".", "output directory");
         
         // motifs
-        defSet("plcc_B_compute_motifs", "false", "Whether to search for motifs in the FG linear notations (after computing and writing them to the DB).");
+        defSet("plcc_B_compute_motifs", "true", "Whether to search for motifs in the FG linear notations (after computing and writing them to the DB).");
         
         
         // complex graphs: same, mere
