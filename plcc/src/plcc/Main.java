@@ -536,7 +536,8 @@ public class Main {
 
                     if(s.equals("-r") || s.equals("--recreate-tables")) {
                         System.out.println("Recreating DB tables only (-r)...");
-                        if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"), Settings.getBoolean("plcc_B_db_use_autocommit"))) {
+                        if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"), true)) {
+                            
                             if(DBManager.dropTables()) {
                                 System.out.println("  DB: Tried to drop statistics tables (no error messages => OK).");
                             }
@@ -563,7 +564,7 @@ public class Main {
                         }
                         // exit
                         System.out.println("Done recreating DB tables, exiting.");
-                        System.exit(0);
+                        Main.doExit(0);
                     }
                     
                     if(s.equals("-s") || s.equals("--draw-linnots")) {
@@ -1514,7 +1515,9 @@ public class Main {
             
             if(Settings.getBoolean("plcc_B_useDB")) {
                 writeProteinDataToDatabase(pdbid);
-                DBManager.commit();
+                if( ! DBManager.getAutoCommit()) {
+                    DBManager.commit();
+                }
             }
                         
             
@@ -1562,7 +1565,9 @@ public class Main {
                     calculateSSEGraphsForChains(theChain, residues, cInfoThisChain, pdbid, outputDir);
                     
                     if(Settings.getBoolean("plcc_B_useDB")) {
-                        DBManager.commit();
+                        if( ! DBManager.getAutoCommit()) {
+                            DBManager.commit();
+                        }
                     }
                     
                     numChainsHandled++;
@@ -1572,7 +1577,9 @@ public class Main {
                 calculateSSEGraphsForChains(handleChains, residues, cInfo, pdbid, outputDir);
                 //calculateComplexGraph(handleChains, residues, cInfo, pdbid, outputDir);
                 if(Settings.getBoolean("plcc_B_useDB")) {
-                    DBManager.commit();
+                    if( ! DBManager.getAutoCommit()) {
+                        DBManager.commit();
+                    }
                 }
             }
             if(! silent) {
@@ -1676,7 +1683,9 @@ public class Main {
         // ****************************************************    all done    ********************************************************** //
         
         if(Settings.getBoolean("plcc_B_useDB")) {
-            DBManager.commit();            
+            if( ! DBManager.getAutoCommit()) {
+                DBManager.commit();            
+            }
             DBManager.closeConnection();
         }
         

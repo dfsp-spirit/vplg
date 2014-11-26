@@ -401,7 +401,7 @@ public class DBManager {
      */
     boolean supportsTransactions() throws SQLException {
 
-        ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
+        //ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
 
         return (dbc.getMetaData().supportsTransactions());
     }
@@ -414,7 +414,7 @@ public class DBManager {
      */
     public static int doInsertQuery(String query) {
 
-        ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
+        //ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
 
         PreparedStatement ps = null;
         try {
@@ -444,7 +444,7 @@ public class DBManager {
      */
     public static int doUpdateQuery(String query) {
 
-        ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
+        //ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
 
         PreparedStatement ps = null;
         try {
@@ -474,7 +474,7 @@ public class DBManager {
      */
     public static int doDeleteQuery(String query) {
 
-        ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
+        //ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
 
         PreparedStatement ps = null;
         try {
@@ -503,7 +503,7 @@ public class DBManager {
      */
     public static ArrayList<ArrayList<String>> doSelectQuery(String query) {
 
-        ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
+        //ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
 
         ResultSet rs = null;
         PreparedStatement ps = null;
@@ -573,7 +573,7 @@ public class DBManager {
                     return (false);        // closed
                 }
             } catch (SQLException e) {
-                DP.getInstance().w("closeConnection(): Could not close DB connection: '" + e.getMessage() + "'.");                
+                DP.getInstance().w("commit(): Could not commit: '" + e.getMessage() + "'.");                
                 return (false);
             }
         } else {
@@ -592,8 +592,13 @@ public class DBManager {
         if (dbc != null) {
             try {
                 if (!dbc.isClosed()) {
-                    if (!dbc.getAutoCommit()) {
-                        dbc.commit();
+                    try {
+                        if ( ! dbc.getAutoCommit()) {
+                            dbc.commit();
+                        } 
+                    } catch (SQLException e2) {
+                        DP.getInstance().w("closeConnection(): Commit: '" + e2.getMessage() + "'.");                
+                        return (false);
                     }
                     dbc.close();
                     return (true);
@@ -615,7 +620,7 @@ public class DBManager {
      * @return whether it worked out
      */
     public static Boolean dropTables() {
-        ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
+        //ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
         Boolean res = false;
 
         try {
@@ -679,12 +684,14 @@ public class DBManager {
      * psql> \q
      * postgre@srv>
      * 
+     * Also ensure that the user vplg is allowed to connect using password in pg_hba.conf.
+     * 
      * @return Whether they could be created.
      */
     public static Boolean createTables() {
 
 
-        ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
+        //ensureConnection(Settings.getBoolean("plcc_B_db_use_autocommit"));
         Boolean res = false;
 
         try {
@@ -889,6 +896,7 @@ public class DBManager {
             
             // add indices
             doInsertQuery("CREATE INDEX plcc_idx_chain_insert ON " + tbl_chain + " (pdb_id, chain_name);");         // for SELECTs during data insert
+            doInsertQuery("CREATE INDEX plcc_idx_chain_pdb ON " + tbl_chain + " (pdb_id);");         // for SELECTs during data insert
             doInsertQuery("CREATE INDEX plcc_idx_sse_insert ON " + tbl_sse + " (dssp_start, chain_id);");           // for SELECTs during data insert
 
             doInsertQuery("CREATE INDEX plcc_idx_chain_fk ON " + tbl_chain + " (pdb_id);");                          // for JOINs, ON CASCADE, etc. (foreign key, FK)
@@ -1015,7 +1023,10 @@ public class DBManager {
             doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name, motif_abbreviation) VALUES (10, 3, 'TIM Barrel', 'tim');");
             
 
-            DBManager.commit();
+            if( ! DBManager.getAutoCommit()) {
+                DBManager.commit();
+            }
+            
             res = true;      // Not really, need to check all of them. We currently leave this to the user (failed queries will at least spit error messages to STDERR).
 
         } catch (Exception e) { 
@@ -1024,6 +1035,22 @@ public class DBManager {
         }
 
         return (res);
+    }
+    
+    
+    /**
+     * Tries to determine the autocommit setting of the current connection.
+     * @return the autocommit setting. If an SQL exception occurs trying to determine it an error is printed and true is returned. Other exceptions are not caught (e.g., connection is null), ensure this yourself.
+     */
+    public static Boolean getAutoCommit() {
+        Boolean ac = true;
+        try {
+            ac = dbc.getAutoCommit();
+        }
+        catch(SQLException e) {
+            DP.getInstance().e("DBManager", "getAutoCommit: '" + e.getMessage() + "'.");
+        }
+        return ac;
     }
     
     /**
