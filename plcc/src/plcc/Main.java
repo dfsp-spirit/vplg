@@ -2042,7 +2042,7 @@ public class Main {
 
                 if(Settings.getBoolean("plcc_B_useDB")) {
                     
-                    if( ! Settings.getBoolean("plcc_B_db_use_batch_inserts")) {
+                    //if( ! Settings.getBoolean("plcc_B_db_use_batch_inserts")) {
                                                                
                         try {
                            SSE ssej = allChainSSEs.get(j);
@@ -2059,11 +2059,12 @@ public class Main {
                         catch(Exception e) {
                             DP.getInstance().w("Could not write info on SSE # " + j + " of chain '" + chain + "' of protein '" + pdbid + "' to DB.");
                         }
-                    }
+                    //}
                 }
             }
             
             // batch insert all SSEs at once of appropriate
+            /*
             if(Settings.getBoolean("plcc_B_useDB") &&  Settings.getBoolean("plcc_B_db_use_batch_inserts")) {
                 try {
                     int insertCount = DBManager.writeAllSSEsOfChainToDB(pdbid, chain, allChainSSEs);
@@ -2075,6 +2076,7 @@ public class Main {
                     DP.getInstance().e("Main", "Writing all chain SSE list to DB failed: '" + e.getMessage() + "'.");
                 }
             }
+            */
 
 
             //printSSEList(chainDsspSSEs, "DSSP SSEs of chain '" + c.getPdbChainID() + "'");

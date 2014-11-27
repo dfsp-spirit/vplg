@@ -2444,7 +2444,11 @@ connection.close();
             DP.getInstance().w("DBManager", "writeLigandToDBUnlessAlreadyThere: The ligand_name3 '" + ligand_name3 + "' contains spaces! Trim it before giving it to me.");
         }
         
+        Boolean autoCommitOldSetting = dbc.getAutoCommit();
+        dbc.setAutoCommit(false);
+        
         if(ligandExistsInDB(ligand_name3)) {
+            dbc.setAutoCommit(autoCommitOldSetting);
             return false;                   
         }                
         
@@ -2452,6 +2456,8 @@ connection.close();
             //DP.getInstance().w("DBManager", "writeLigandToDBUnlessAlreadyThere: Replacing ligand synonym string \"''\" with null.");
             ligand_synonyms = null;
         }
+        
+        
         
         Boolean result = false;
 
@@ -2469,7 +2475,7 @@ connection.close();
             statement.setString(4, ligand_synonyms);
                                 
             statement.executeUpdate();
-            //dbc.commit();
+            dbc.commit();
             result = true;
         } catch (SQLException e ) {
             System.err.println("ERROR: SQL: writeLigandToDB: '" + e.getMessage() + "'.");
@@ -2483,6 +2489,7 @@ connection.close();
             }
             result = false;
         } finally {
+            dbc.setAutoCommit(autoCommitOldSetting);
             if (statement != null) {
                 statement.close();
             }
