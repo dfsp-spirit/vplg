@@ -78,7 +78,7 @@ else if((isset($_GET["linnotalphaadj"])) && ($_GET["linnotalphaadj"] != "") ||
         (isset($_GET["linnotalbeligred"])) && ($_GET["linnotalbeligred"] != "") ||
         (isset($_GET["linnotalbeligkey"])) && ($_GET["linnotalbeligkey"] != "") ||
         (isset($_GET["linnotalbeligseq"])) && ($_GET["linnotalbeligseq"] != "") ) {
-    $search_type = "linnear notation";
+    $search_type = "linear notation";
     include('search_linnot.php');
 }
 
