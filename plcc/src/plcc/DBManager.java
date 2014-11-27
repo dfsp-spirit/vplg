@@ -2799,6 +2799,8 @@ connection.close();
 
         String query = "INSERT INTO " + tbl_proteingraph + " (chain_id, graph_type, graph_string_gml, graph_string_plcc, graph_string_kavosh, graph_string_dotlanguage, graph_string_json, sse_string, graph_containsbetabarrel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
+        //System.out.println("########################## length of gml string is " + graph_string_gml.length() + " ##################" );
+        
         try {
             //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);

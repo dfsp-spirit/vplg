@@ -18,8 +18,8 @@ public class NeedlemanWunsch {
     
     private Integer[][] scoringMatrix;
     private Integer[][] dynPrgMatrix;
-    private String stringA;
-    private String stringB;
+    private final String stringA;
+    private final String stringB;
     private String alphabet;
     private Integer gapPenalty;
     private Boolean matrixComputed;

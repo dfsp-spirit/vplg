@@ -32,21 +32,21 @@ public class AminoAcid {
     public static final String CHEMPROPAA_STRING_NEGATIVE_CHARGE = "+";
     public static final String CHEMPROPAA_STRING_POSITIVE_CHARGE = "-";
     
-    public static final String[] ALL_CHEM_PROPS = new String[] { CHEMPROPAA_STRING_SMALL_APOLAR, CHEMPROPAA_STRING_HYDROPHOBIC, CHEMPROPAA_STRING_POLAR, CHEMPROPAA_STRING_NEGATIVE_CHARGE, CHEMPROPAA_STRING_POSITIVE_CHARGE, CHEMPROPAA_STRING_UNKNOWN };
+    protected static final String[] ALL_CHEM_PROPS = new String[] { CHEMPROPAA_STRING_SMALL_APOLAR, CHEMPROPAA_STRING_HYDROPHOBIC, CHEMPROPAA_STRING_POLAR, CHEMPROPAA_STRING_NEGATIVE_CHARGE, CHEMPROPAA_STRING_POSITIVE_CHARGE, CHEMPROPAA_STRING_UNKNOWN };
 
 
     /** The AAs above 20 (J, B, Z, X) are PDB / ligand specific special AAs. */    
-    public static final String[] names3 = { "ALA", "ARG", "ASN", "ASP", "CYS", "GLU", "GLN", "GLY", "HIS", "ILE", "LEU", "LYS", "MET", "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL", "LIG", "_B_", "_Z_", "_X_" };
+    protected static final String[] names3 = { "ALA", "ARG", "ASN", "ASP", "CYS", "GLU", "GLN", "GLY", "HIS", "ILE", "LEU", "LYS", "MET", "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL", "LIG", "_B_", "_Z_", "_X_" };
     // quick find line, index:               0      1      2      3      4      5      6      7      8      9      10     11     12     13     14     15     16     17     18     19     20     21     22     23    
     
     /** One letter AA code. */
-    public static final String[] names1 = { "A",    "R",  "N",   "D",    "C",  "E",   "Q",   "G",   "H",   "I",   "L",   "K",   "M",   "F",   "P",   "S",   "T",   "W",   "Y",   "V",   "J",   "B",   "Z",   "X" };
+    protected static final String[] names1 = { "A",    "R",  "N",   "D",    "C",  "E",   "Q",   "G",   "H",   "I",   "L",   "K",   "M",   "F",   "P",   "S",   "T",   "W",   "Y",   "V",   "J",   "B",   "Z",   "X" };
 
     /** The number of atoms the AAs have (in order of the names3/names1 arrays) */
-    public static final Integer[] atoms = {  5,     11,    8,     8,     6,     9,     9,     4,     10,    8,     8,     9,     8,     11,    7,     6,     7,     14,    12,    7,     8,     9,     4,     10 };
+    protected static final Integer[] atoms = {  5,     11,    8,     8,     6,     9,     9,     4,     10,    8,     8,     9,     8,     11,    7,     6,     7,     14,    12,    7,     8,     9,     4,     10 };
     
     /** The biochemical properties of the AAs (in order of the names3/names1 arrays) */
-    public static final Integer[] chemProps = {  AminoAcid.CHEMPROPAA_INT_SMALL_APOLAR,     AminoAcid.CHEMPROPAA_INT_POSITIVE_CHARGE,    AminoAcid.CHEMPROPAA_INT_POLAR,     AminoAcid.CHEMPROPAA_INT_NEGATIVE_CHARGE,     AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_INT_NEGATIVE_CHARGE,     AminoAcid.CHEMPROPAA_INT_POLAR,     AminoAcid.CHEMPROPAA_INT_SMALL_APOLAR,     AminoAcid.CHEMPROPAA_INT_POLAR,    AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_INT_POSITIVE_CHARGE,     AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,    AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_INT_SMALL_APOLAR,     AminoAcid.CHEMPROPAA_INT_SMALL_APOLAR,     AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,    AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,    AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_INT_UNKNOWN,     AminoAcid.CHEMPROPAA_INT_UNKNOWN,     AminoAcid.CHEMPROPAA_INT_UNKNOWN,     AminoAcid.CHEMPROPAA_INT_UNKNOWN };
+    protected static final Integer[] chemProps = {  AminoAcid.CHEMPROPAA_INT_SMALL_APOLAR,     AminoAcid.CHEMPROPAA_INT_POSITIVE_CHARGE,    AminoAcid.CHEMPROPAA_INT_POLAR,     AminoAcid.CHEMPROPAA_INT_NEGATIVE_CHARGE,     AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_INT_NEGATIVE_CHARGE,     AminoAcid.CHEMPROPAA_INT_POLAR,     AminoAcid.CHEMPROPAA_INT_SMALL_APOLAR,     AminoAcid.CHEMPROPAA_INT_POLAR,    AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_INT_POSITIVE_CHARGE,     AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,    AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_INT_SMALL_APOLAR,     AminoAcid.CHEMPROPAA_INT_SMALL_APOLAR,     AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,    AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,    AminoAcid.CHEMPROPAA_INT_HYDROPHOBIC,     AminoAcid.CHEMPROPAA_INT_UNKNOWN,     AminoAcid.CHEMPROPAA_INT_UNKNOWN,     AminoAcid.CHEMPROPAA_INT_UNKNOWN,     AminoAcid.CHEMPROPAA_INT_UNKNOWN };
 
     
     /**
@@ -81,6 +81,8 @@ public class AminoAcid {
     
     /**
      * Returns the number of (non-H) atoms that the AA with the given internal ID has.
+     * @param id the internal AA ID
+     * @return the number of atoms or -1 if an invalid ID was given
      */
     public static Integer atomCountOfID(Integer id) {
         if(id <= names3.length && id >= 1) {
@@ -88,7 +90,6 @@ public class AminoAcid {
         }
         else{
             System.err.println("ERROR: No AA with internal ID " + id + " exists.");
-            System.exit(-1);
             return(-1);
         }
         
@@ -174,15 +175,17 @@ public class AminoAcid {
         }
 
         // only hit if nothing was found
-        System.err.println("ERROR: Could not convert 1 letter amino acid code '" + name1 + "' to 3 letter code, not found.");
-        System.exit(-1);
+        System.err.println("ERROR: Could not convert 1 letter amino acid code '" + name1 + "' to 3 letter code, not found.");        
         return("");             // for the IDE
     }
 
 
-    // Returns the internal number assigned to each AA.
-    // Needed for compatibility of the output with the old geom_neo because
-    //  it prints its internal AA numbers into the output file 'con.set'.
+    /** Returns the internal number assigned to each AA.
+     * Needed for compatibility of the output with the old geom_neo because
+     * it prints its internal AA numbers into the output file 'con.set'.
+     * @param name3 the AA name
+     * @return the internal ID
+     */
     public static Integer name3ToID(String name3) {
         if( name3.equals("ALA") ) return 1;
         if( name3.equals("ARG") ) return 2;

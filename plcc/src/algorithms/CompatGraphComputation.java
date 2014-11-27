@@ -9,6 +9,7 @@ package algorithms;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -30,17 +31,21 @@ import plcc.SpatRel;
  */
 public class CompatGraphComputation {
     
-    private SSEGraph graph1;
-    private SSEGraph graph2;
+    private final SSEGraph graph1;
+    private final SSEGraph graph2;
     
-    private Integer VERTEX1 = 0;
-    private Integer VERTEX2 = 1;
+    private final Integer VERTEX1 = 0;
+    private final Integer VERTEX2 = 1;
     
     /** The source vertices in the Graphs G1 and G2 which led to the creation of the edge in the compatibility graph G. */
     //private Integer[][] sourceVertexOfEdgeFromGraph1;
     //private Integer[][] sourceVertexofEdgeFromGraph2;
     
-    
+    /**
+     * The source vertices in the Graphs G1 and G2 which led to the creation of the edge in the compatibility graph G.
+     * @param g1 the 1st graph
+     * @param g2 the 2nd graph
+     */
     public CompatGraphComputation(SSEGraph g1, SSEGraph g2) {
         this.graph1 = g1;
         this.graph2 = g2;
@@ -188,7 +193,7 @@ public class CompatGraphComputation {
      * @return true if the edges are the same, false otherwise
      */
     public static Boolean sameEdges(Integer e1v1, Integer e1v2, Integer e2v1, Integer e2v2) {
-        if( (e1v1 == e2v1 || e1v1 == e2v2) && (e1v2 == e2v1 || e1v2 == e2v2) ) {
+        if( (Objects.equals(e1v1, e2v1) || Objects.equals(e1v1, e2v2)) && (Objects.equals(e1v2, e2v1) || Objects.equals(e1v2, e2v2)) ) {
             return(true);
         } else {
             return(false);
@@ -265,7 +270,7 @@ public class CompatGraphComputation {
         for(Integer i = 0; i < h.numVertices(); i++) {
             for(Integer j = 0; j < h.numVertices(); j++) {
                 
-                if(i == j) {
+                if(Objects.equals(i, j)) {
                     continue;
                 }
                 
@@ -319,13 +324,19 @@ public class CompatGraphComputation {
         return("[V(H)::e1(G1)=" + vertex[VERTEX1] + ", e2(G2)=" + vertex[VERTEX2] + "]");
     }
     
-    
+
+    /**
+     * Tests the Bron Kerbosch implementation
+     * @param args ignored
+     */
     public static void main(String[] args) {
         CompatGraphComputation.testBronKerbosch();
         //CompatGraphComputation.testTrees();
     }
         
-     
+    /**
+     * Tests the trees
+     */
     public static void testTrees() {
         
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(new TreeNodeData("0"));
@@ -368,11 +379,15 @@ public class CompatGraphComputation {
         drawTree(root, sb, 0);
         return sb.toString();
     }
+
     
+    /**
+     * Bron Kerbosch test
+     */
     public static void testBronKerbosch() {
         
         // test clique detection
-        ArrayList<SSE> sses = new ArrayList<SSE>();
+        ArrayList<SSE> sses = new ArrayList<>();
         for(int i = 0; i < 4; i++) {
             SSE s = new SSE(SSE.SSECLASS_HELIX);
             sses.add(s);
@@ -392,7 +407,7 @@ public class CompatGraphComputation {
             sb.append("Found clique: ");
             for (Iterator<Integer> it = c.iterator(); it.hasNext(); ) {
                 Integer f = it.next();
-                sb.append(" " + f);
+                sb.append(" ").append(f);
             }
             sb.append("\n");
         }
