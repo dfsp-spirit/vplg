@@ -900,7 +900,7 @@ public class Main {
             }
             silent = true;
         } else {
-            System.out.println(outputToBePrintedUnlessSilent.toString());
+            System.out.print(outputToBePrintedUnlessSilent.toString());
             if(Settings.getBoolean("plcc_B_no_warn")) {
                 System.out.println("  No-warn active, no warnings will be printed.");
             }
