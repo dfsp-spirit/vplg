@@ -4811,6 +4811,61 @@ connection.close();
     
     
     /**
+     * Retrieves the PDB ID  of all proteins that are currently in the DB.
+     * @return a list of PDB IDs
+     */
+    public static List<String> getAllPDBIDsInTheDB() {
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        List<String> tableData = new ArrayList<>();
+        ArrayList<String> rowData = null;
+        int count;
+               
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT pdb_id FROM " + tbl_protein + " ;";
+
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+            
+            rs = statement.executeQuery();
+            //dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                for (int i = 1; i <= count; i++) {
+                    tableData.add(rs.getString(i));
+                }
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "getAllPDBIDsInTheDB: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                //dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "getAllPDBIDsInTheDB: Could not close statement and reset autocommit."); }
+        }
+        
+        return tableData;
+    }
+    
+    
+    /**
      * Determines whether a protein exists in the database. Note race condition problems with this
      * approach if run on several machines which write to the same DB.
      * @param pdb_id the PDB ID of the protein

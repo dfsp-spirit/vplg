@@ -322,6 +322,11 @@ public class Main {
                     }
 
                     
+                    if(s.equals("--report-db-proteins")) {
+                        useFileFromCommandline = false;
+                        Settings.set("plcc_B_report_db_proteins", "true");
+                    }
+                    
                     if(s.equals("-p") || s.equals("--pdbfile")) {
                         if(args.length <= i+1 ) {
                             syntaxError();
@@ -333,6 +338,7 @@ public class Main {
                     
                     
                     if(s.equals("-C") || s.equals("--create-config")) {
+                        useFileFromCommandline = false;
                         // The config file has already been created before parsing the command line if it did not exist, so we just do nothing here.
                         // We intentionally keep this option so we do not need to run other commands to get a config.
                         System.out.println("Tried to create PLCC config file at '" + Settings.getDefaultConfigFilePath() + "' (see above). Exiting.");
@@ -366,6 +372,7 @@ public class Main {
                     }
                     
                     if(s.equals("--compute-whole-db-graphlet-similarities")) {
+                        useFileFromCommandline = false;
                         Settings.set("plcc_B_useDB", "true");
                         Settings.set("plcc_B_compute_all_graphlet_similarities", "true");                        
                     }
@@ -921,7 +928,9 @@ public class Main {
         
         if(useFileFromCommandline) {
             if(! silent) {
-                System.out.println("  Using PDB file '" + pdbFile + "', dssp file '" + dsspFile + "', output directory '" + outputDir + "'.");
+                if( ! pdbid.toUpperCase().equals("NONE")) {
+                    System.out.println("  Using PDB file '" + pdbFile + "', dssp file '" + dsspFile + "', output directory '" + outputDir + "'.");
+                }
             }
         }
         
@@ -997,6 +1006,32 @@ public class Main {
                 if(! silent) {
                     System.out.println("Done. Found " + res[0] + " chains and " + res[1] + " graphlet counts for them in the DB. Computed " + res[2] + " similarity scores and saved " + res[3] + " of them to the DB.");
                 }
+                System.exit(0);
+            } else {
+                System.err.println("ERROR: Could not connect to DB, exiting.");
+                System.exit(1);
+            }   
+            
+        }
+        
+        if(Settings.getBoolean("plcc_B_report_db_proteins")) {
+            String reportFileName = "db_contents_proteins.txt";
+            if(! silent) {                
+                System.out.println("Reporting list of proteins which are currently in the database to file '" + reportFileName + "'.");
+            }
+            
+            if(DBManager.initUsingDefaults()) {
+                List<String> pdbids = DBManager.getAllPDBIDsInTheDB();
+                if(IO.stringToTextFile(reportFileName, IO.stringListToString(pdbids, " "))) {
+                    if(! silent) {
+                        System.out.println("Done. Reported " + pdbids.size() + " proteins in file.");
+                    }
+                }
+                else {
+                    System.err.println("ERROR: Writing output file failed.");
+                }
+                // numChainsFound, numGraphletsFound, numScoresComputed, numScoresSaved
+                
                 System.exit(0);
             } else {
                 System.err.println("ERROR: Could not connect to DB, exiting.");

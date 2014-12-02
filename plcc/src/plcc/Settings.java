@@ -336,6 +336,9 @@ public class Settings {
         defSet("plcc_S_graph_image_base_path", "/srv/www/htdocs/vplgweb/data/", "The graph image base path for the database. The relative path to the path given here is used to locate the graph image on disk.");
         defSet("plcc_B_db_use_batch_inserts", "false", "Whether inserts into the database should use batch mode instead of many single queries whenever possible. Only implemented for a few queries for which it may make sense.");
         
+        
+        // short report stuff
+        defSet("plcc_B_report_db_proteins", "false", "Write a list of PDB IDs which are currently in the database to the file 'db_content_proteins.txt', then exit.");
 
         defSet("plcc_B_db_use_autocommit", "false", "Whether the DB connection gets set to autocommit when created.");
 

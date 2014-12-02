@@ -457,27 +457,54 @@ public class IO {
     /**
      * Debug function to get a string representation of a list.
      * @param ar the list
+     * @param fs the field separator (e.g., " ")
      * @return the string
      */
-    public static String intListToString(List<Integer> ar) {
-        String s = "";
-        for(Integer i : ar) {
-            s += i + " ";
+    public static String intListToString(List<Integer> ar, String fs) {
+        StringBuilder s = new StringBuilder();
+        for(int i = 0; i < ar.size(); i++) {
+            s.append(ar.get(i));
+            if(i < ar.size() - 1) {
+                s.append(fs);
+            }
         }
-        return s;
+        return s.toString();
+    }
+    
+    /**
+     * Debug function to get a string representation of a list, using space as the separator.
+     * @param ar the list
+     * @return the string
+     */
+    public static String intListToString(List<Integer> ar) {        
+        return IO.intListToString(ar, " ");
     }
     
     /**
      * Debug function to get a string representation of a list.
      * @param ar the list
+     * @param fs the field separator (e.g., " ")
+     * @return the resulting string
+     */
+    public static String stringListToString(List<String> ar, String fs) {
+        StringBuilder s = new StringBuilder();
+        for(int i = 0; i < ar.size(); i++) {
+            s.append(ar.get(i));
+            if(i < ar.size() - 1) {
+                s.append(fs);
+            }
+        }
+        return s.toString();
+    }
+    
+    
+    /**
+     * Debug function to get a string representation of a list, using space as the separator.
+     * @param ar the list
      * @return the string
      */
-    public static String stringListToString(List<String> ar) {
-        String s = "";
-        for(String i : ar) {
-            s += i + " ";
-        }
-        return s;
+    public static String stringListToString(List<String> ar) {        
+        return IO.stringListToString(ar, " ");
     }
     
     /**
