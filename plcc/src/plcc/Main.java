@@ -2348,7 +2348,7 @@ public class Main {
                                 }
                                 
                                 try {
-                                    DBManager.updateProteinGraphTextformatPathInDB(graphDBID, format, IO.stripTrailingShitFromPathIfThere(fileDBPath));
+                                    DBManager.updateProteinGraphTextformatPathInDB(graphDBID, format, IO.pathToWebPath(IO.stripTrailingShitFromPathIfThere(fileDBPath)));
                                 } catch(SQLException ex) {
                                     DP.getInstance().e("Main", "Could not update format '" + format + "' file path of graph in database: '" + ex.getMessage() + "'.");
                                 }
@@ -2405,7 +2405,7 @@ public class Main {
 
 
                                 try {
-                                    DBManager.updateProteinGraphImagePathInDB(graphDBID, format, dbImagePath);
+                                    DBManager.updateProteinGraphImagePathInDB(graphDBID, format, IO.pathToWebPath(dbImagePath));
                                 } catch(SQLException e) {
                                     DP.getInstance().e("Main", "Could not update graph image path in database: '" + e.getMessage() + "'.");
                                 }
@@ -2715,7 +2715,7 @@ public class Main {
                                     
                                     int numAff = 0;
                                     try {
-                                        numAff = DBManager.updateFoldingGraphImagePathInDB(fgDbId, format, notation, dbImagePath);
+                                        numAff = DBManager.updateFoldingGraphImagePathInDB(fgDbId, format, notation, IO.pathToWebPath(dbImagePath));
                                     } catch(SQLException e) {
                                         DP.getInstance().e("Main", "Could not update format " + format + " folding graph image path in database: '" + e.getMessage() + "'.");
                                     }

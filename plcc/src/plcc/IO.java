@@ -46,6 +46,17 @@ import tools.DP;
  */
 public class IO {
    
+    /**
+     * Transforms a path into a web server path. Currently, this replaces the Windows file separator '\' with the unix/web file separator '/' in the input string and returns the result as a new string.
+     * Note that the original string is NOT altered.
+     * @param path the input path
+     * @return the modified web path version
+     */
+    public static String pathToWebPath(String path) {
+        if(path == null) { return null; }
+        String copy = path.replace("\\", "/");
+        return copy; 
+    }
     
     /**
      * Converts an area of interest within an input SVG image to PNG format and writes it to the specified file system location.
