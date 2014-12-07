@@ -15,6 +15,7 @@ use Getopt::Std;
 my $num_vertices = 150;
 my $edge_probability = 0.1;
 my $outfile = "random_graph.plg";
+my $format = "plcc";
 
 ## ----------------------------------------------------------------------
 ## ------------ Internal global vars, don't mess with these -------------
@@ -36,6 +37,7 @@ sub usage {
     print "$apptag     -v <num_vertices>     : Number of vertices the graph should have (positive integer). Default=100.\n";
     print "$apptag     -p <edge_probability> : Probability that an edge is created between a pair of vertices (positive float between 0 and 1). Default=0.1.\n";
     print "$apptag     -o <outfile>          : Path where to write the output file. Default='random_graph.dpg'.\n";
+	print "$apptag     -f <format>           : The output graph format. Options include 'gml' and 'plcc'. Default='plcc'.\n";
     print "$apptag   EXAMPLE : rpg.pl -v 100 -p 0.1 -o random_graph_100_01.plg\n";
     exit(1);
 }
@@ -102,6 +104,126 @@ sub we_are_lucky {
     }
 }
 
+sub get_footer_string {
+    my $format = $_[0];
+	my $pdbid = $_[1];
+	my $chain = $_[2];
+	my $graphtype = $_[3];
+	
+	my $footer = "";
+	
+	if($format == "gml") {
+	    $footer .= "]\n";
+	}
+	else if ($format == "plcc") {
+	}
+	else {
+	  die("get_footer_string: invalid output format\n");
+	}
+	return $footer;
+}
+
+sub get_vertex_sting {
+    my $format = $_[0];
+	my $pdbid = $_[1];
+	my $chain = $_[2];
+	my $graphtype = $_[3];
+	my $sse_id = $_[4];
+	my $sse_seq_num = $_[5];
+	my $sse_type = $_[6];
+	my $dssp_start = $_[7];
+	my $dssp_end = $_[8];
+	my $pdb_start = $_[9];
+	my $pdb_end = $_[10];
+	my $sequence = $_[11];
+   
+    my $vertex = "";
+	
+	if($format == "gml") {
+	    $vertex = "  node [\n";
+		$vertex = "    id $sse_id\n";
+        $vertex = "    label \"$sse_id-$sse_type\"\n";
+        $vertex = "    num_in_chain $sse_seq_num\n";
+        $vertex = "    num_residues 5\n";
+        $vertex = "    pdb_res_start \"$pdb_start\"\n";
+        $vertex = "    pdb_res_end \"$pdb_end\"\n";
+        $vertex = "    dssp_res_start $dssp_start\n";
+        $vertex = "    dssp_res_end $dssp_end\n";
+        $vertex = "    pdb_residues_full \"A-15- ,A-16- ,A-17- \"\n";
+        $vertex = "    aa_sequence \"$sequence\"\n";
+        $vertex = "    sse_type \"$sse_type\"\n";
+		$vertex = "  ]\n";
+    }	
+	else if ($format == "plcc") {
+	    $vertex .= "| $pdbid | $chain | $graphtype | $sse_id | $sse_seq_num | $sse_type | $dssp_start | $dssp_end | $pdb_start | $pdb_end | $sequence\n";
+	} 
+	else {
+	    die("get_vertex_string: invalid output format\n");
+	}
+	return $vertex;
+}
+
+
+sub get_edge_string {
+    my $format = $_[0];
+	my $source = $_[1];
+	my $target = $_[2];
+	my $spatial = $_[2];
+	
+	my $edge = "";	
+	if($format == "gml") {
+	    $edge .= "  edge [\n";
+        $edge .= "    source $source\n";
+        $edge .= "    target $target\n";
+        $edge .= "    label \"$spatial\"\n";
+        $edge .= "    spatial \"$spatial\"\n";
+	    $edge .= "  ]\n";  
+	}
+	else if($format == "plcc") {
+	    $edge .= "= $sse1 = $contact_type = $sse2\n";
+	}
+	else {
+	    die("get_edge_string: invalid output format\n");
+	}
+	return $edge;  
+}
+
+sub get_header_string {
+    my $format = $_[0];
+	my $pdbid = $_[1];
+	my $chain = $_[2];
+	my $graphtype = $_[3];
+	
+	my $header = "";
+	
+	if($format == "gml") {
+		$header .= "graph [\n";
+		$header .= "  id 1\n";
+		$header .= "  label \"VPLG Protein Graph\"\n";
+		$header .= "  comment \"pdbid=$pdbid|chainid=$chain|graphtype=$graphtype\"\n";
+		$header .= "  directed 0\n";
+		$header .= "  isplanar 0\n";
+		$header .= "  creator \"RPG\"\n";
+		$header .= "  pdb_id \"$pdbid\"\n";
+		$header .= "  chain_id \"$chain\"\n";
+		$header .= "  graph_type \"$graphtype\"\n";
+		$header .= "  is_protein_graph 1\n";
+		$header .= "  is_folding_graph 0\n";
+		$header .= "  is_SSE_graph 1\n";
+		$header .= "  is_AA_graph 0\n";
+		$header .= "  is_all_chains_graph 0\n";	
+	}
+	else if ($format == "plcc") {
+	    $header .= "> format_version > 2\n";
+        $header .= "> pdbid > $pdbid\n";
+        $header .= "> chainid > $chain\n";
+        $header .= "> graphtype > $graphtype\n";
+	}
+	else {
+	  die("get_header_string: invalid output format\n");
+	}
+	return $header;
+}
 
 
 ## ----------------------------------------------------------------------
@@ -121,12 +243,21 @@ getopts("hv:p:o:", \%options) or &usage;
 $num_vertices = $options{"v"} if(defined $options{"v"});
 $edge_probability = $options{"p"} if(defined $options{"p"});
 $outfile = $options{"o"} if(defined $options{"o"});
+$format = $options{"f"} if(defined $options{"f"});
 
 ## Let's go
 
 print "$apptag Generating undirected graph with $num_vertices edges and an edge probability of $edge_probability.\n";
 
-&usage if ($num_vertices < 0 || $edge_probability < 0 || $edge_probability > 1);
+if ($num_vertices < 0 || $edge_probability < 0 || $edge_probability > 1) {
+    print "Invalid parameters given for edge probability and/or number of vertices.\n";
+    &usage; 
+}
+
+if( ! ($format == "plcc" || $format == "gml")) {
+    print "Invalid parameter given for format.\n";
+    &usage; 
+}
 
 ## Generate the graph file
 
@@ -192,11 +323,11 @@ for(my $i = 0; $i < $num_vertices; $i++) {
 	$sse1 = $i + 1;
 	$sse2 = $j + 1;
 	
-	if(&we_are_lucky()) {
-	    $contact_type = &get_random_contact_type($sse_type_dict{ "$sse1" }, $sse_type_dict{ "$sse2" });
-	    print OUTFILE "= $sse1 = $contact_type = $sse2\n";
-	    $num_edges++;
-	}	
+		if(&we_are_lucky()) {
+			$contact_type = &get_random_contact_type($sse_type_dict{ "$sse1" }, $sse_type_dict{ "$sse2" });
+			print OUTFILE "= $sse1 = $contact_type = $sse2\n";
+			$num_edges++;
+		}	
     }
 }
 
