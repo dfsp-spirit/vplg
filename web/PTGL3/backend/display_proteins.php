@@ -40,6 +40,22 @@ function get_motifs_found_in_chain($db, $pdb_id, $chain_name) {
   
 }
 
+function get_motif_abbreviation($motif_name) {
+	$motif_abbr = array("Four Helix Bundle" => "4helix",
+						"Globin Fold" => "globin",
+						"Up and Down Barrel" => "barrel",
+						"Immunoglobin Fold" => "immuno",
+						"Beta Propeller" => "propeller",
+						"Jelly Roll" =>	"jelly",
+						"Ubiquitin Roll" => "ubi",
+						"Alpha Beta Plait" => "plait",
+						"Rossman Fold" => "rossman",
+						"TIM Barrel" => "tim"
+						);
+	
+	return $motif_abbr[$motif_name];
+}
+
 
 
 
@@ -193,7 +209,7 @@ foreach ($chains as $value){
 					    $tableString .= "<br><span class='download-options'>";
 					    $tableString .= "Detected motifs in this chain: ";
 					    for($i = 0; $i < count($motif_list_this_chain); $i++) {
-					      $tableString .= $motif_list_this_chain[$i] . " ";
+					      $tableString .= "<a href='search.php?motif=" . get_motif_abbreviation($motif_list_this_chain[$i]) . "' target='_blank'>" . $motif_list_this_chain[$i] . "<a/> ";
 					    }
 					    $tableString .= "</span>";
 					}
