@@ -177,14 +177,41 @@ EOT;
     'chain' => '[a-zA-Z0-9]{1}',
     'graphtype' => 'alpha|beta|albe|alphalig|betalig|albelig',
     'linnot' => 'adj|red|key|seq',
-    'fold' => '[0-9]{1,}'
+    'fold' => '[0-9]{1,}',
+    'graphformat' => 'json|gml'
 ));
+
+// get db connection
+include('../backend/config.php');
+$conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
+$db = pg_connect($conn_string);
+
+if(!$db) {
+  echo "<p><b>ERROR --------------------- No DB connection.</b></p>\n";
+}
+//else {
+//  echo "Connected to database $DB_NAME at host $DB_HOST.\n";
+//}
 
 // ----------------- define the GET routes we need ---------------------
 
 // get a single protein graph
-$app->get('/pg/:pdbid/:chain/:graphtype', function ($pdbid, $chain, $graphtype) {
-    echo "You requested the $graphtype graph of PDB $pdbid chain $chain.\n";
+$app->get('/pg/:pdbid/:chain/:graphtype/:graphformat', function ($pdbid, $chain, $graphtype, $graphformat) use($db) {
+    //echo "You requested the $graphtype graph of PDB $pdbid chain $chain.\n";
+    $query = "SELECT g.graph_id, g.graph_string_json, g.graph_string_gml FROM plcc_graph g INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype'";
+    $result = pg_query($db, $query);
+    
+    $num_res = 0;
+    while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
+	$num_res++;
+	if($graphformat === "gml") {
+          echo $arr['graph_string_gml'];
+        }
+        if($graphformat === "json") {
+          echo $arr['graph_string_json'];
+        }
+    }
+    //echo "Found $num_res graphs.\n";
 });
 
 // get all protein graphs of a chain
