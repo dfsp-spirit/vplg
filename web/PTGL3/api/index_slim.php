@@ -39,7 +39,7 @@ $app->get(
     <html>
         <head>
             <meta charset="utf-8"/>
-            <title>PTGL API</title>
+            <title>Slim Framework for PHP 5</title>
             <style>
                 html,body,div,span,object,iframe,
                 h1,h2,h3,h4,h5,h6,p,blockquote,pre,
@@ -85,83 +85,44 @@ $app->get(
         </head>
         <body>
             <header>
-                <title>PTGL API</title>
+                <a href="http://www.slimframework.com"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHIAAAA6CAYAAABs1g18AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAABRhJREFUeNrsXY+VsjAMR98twAo6Ao4gI+gIOIKOgCPICDoCjCAjXFdgha+5C3dcv/QfFB5i8h5PD21Bfk3yS9L2VpGnlGW5kS9wJMTHNRxpmjYRy6SycgRvL18OeMQOTYQ8HvIoJKiiz43hgHkq1zvK/h6e/TyJQXeV/VyWBOSHA4C5RvtMAiCc4ZB9FPjgRI8+YuKcrySO515a1hoAY3nc4G2AH52BZsn+MjaAEwIJICKAIR889HljMCcyrR0QE4v/q/BVBQva7Q1tAczG18+x+PvIswHEAslLbfGrMZKiXEOMAMy6LwlisQCJLPFMfKdBtli5dIihRyH7A627Iaiq5sJ1ThP9xoIgSdWSNVIHYmrTQgOgRyRNqm/M5PnrFFopr3F6B41cd8whRUSufUBU5EL4U93AYRnIWimCIiSI1wAaAZpJ9bPnxx8eyI3Gt4QybwWa6T/BvbQECUMQFkhd3jSkPFgrxwcynuBaNT/u6eJIlbGOBWSNIUDFEIwPZFAtBfYrfeIOSRSXuUYCsprCXwUIZWYnmEhJFMIocMDWjn206c2EsGLCJd42aWSyBNMnHxLEq7niMrY2qyDbQUbqrrTbwUPtxN1ZZCitQV4ZSd6DyoxhmRD6OFjuRUS/KdLGRHYowJZaqYgjt9Lchmi3QYA/cXBsHK6VfWNR5jgA1DLhwfFe4HqfODBpINEECCLO47LT/+HSvSd/OCOgQ8qE0DbHQUBqpC4BkKMPYPkFY4iAJXhGAYr1qmaqQDbECCg5A2NMchzR567aA4xcRKclI405Bmt46vYD7/Gcjqfk6GP/kh1wovIDSHDfiAs/8bOCQ4cf4qMt7eH5Cucr3S0aWGFfjdLHD8EhCFvXQlSqRrY5UV2O9cfZtk77jUFMXeqzCEZqSK4ICkSin2tE12/3rbVcE41OBjBjBPSdJ1N5lfYQpIuhr8axnyIy5KvXmkYnw8VbcwtTNj7fDNCmT2kPQXA+bxpEXkB21HlnSQq0gD67jnfh5KavVJa/XQYEFSaagWwbgjNA+ywstLpEWTKgc5gwVpsyO1bTII+tA6B7BPS+0PiznuM9gPKsPVXbFdADMtwbJxSmkXWfRh6AZhyyzBjIHoDmnCGaMZAKjd5hyNJYCBGDOVcg28AXQ5atAVDO3c4dSALQnYblfa3M4kc/cyA7gMIUBQCTyl4kugIpy8yA7ACqK8Uwk30lIFGOEV3rPDAELwQkr/9YjkaCPDQhCcsrAYlF1v8W8jAEYeQDY7qn6tNGWudfq+YUEr6uq6FZzBpJMUfWFDatLHMCciw2mRC+k81qCCA1DzK4aUVfrJpxnloZWCPVnOgYy8L3GvKjE96HpweQoy7iwVQclVutLOEKJxA8gaRCjSzgNI2zhh3bQhzBCQQPIHGaHaUd96GJbZz3Smmjy16u6j3FuKyNxcBarxqWWfYFE0tVVO1Rl3t1Mb05V00MQCJ71YHpNaMcsjWAfkQvPPkaNC7LqTG7JAhGXTKYf+VDeXAX9IvURoAwtTFHvyYIxtnd5tPkywrPafcwbeSuGVwFau3b76NO7SHQrvqhfFE8kM0Wvpv8gVYiYBlxL+fW/34bgP6bIC7JR7YPDubcHCPzIp4+cum7U6NlhZgK7lua3KGLeFwE2m+HblDYWSHG2SAfINuwBBfxbJEIuWZbBH4fAExD7cvaGVyXyH0dhiAYc92z3ZDfUVv+jgb8HrHy7WVO/8BFcy9vuTz+nwADAGnOR39Yg/QkAAAAAElFTkSuQmCC" alt="Slim"/></a>
             </header>
-            <h1>Welcome to the PTGL 3.0 API</h1>
+            <h1>Welcome to Slim!</h1>
             <p>
-                The PTGL Advanced Programming Interface allows you to retrieve data from the PTGL programatically. This page explains
-                the very basics of how to use the API.
-                
+                Congratulations! Your Slim application is running. If this is
+                your first time using Slim, start with this <a href="http://www.slimframework.com/learn" target="_blank">"Hello World" Tutorial</a>.
             </p>
             <section>
-                <h2>Basics</h2>
-                This is a REST API, and you can query it with any HTTP client. There are specialized REST clients, but something like curl will do in principle.
+                <h2>Get Started</h2>
+                <ol>
+                    <li>The application code is in <code>index.php</code></li>
+                    <li>Read the <a href="http://docs.slimframework.com/" target="_blank">online documentation</a></li>
+                    <li>Follow <a href="http://www.twitter.com/slimphp" target="_blank">@slimphp</a> on Twitter</li>
+                </ol>
             </section>
             <section>
-                <h2>Data available via the API</h2>
+                <h2>Slim Framework Community</h2>
+
+                <h3>Support Forum and Knowledge Base</h3>
                 <p>
-                You can retrieve protein graph and folding graph data in GML and JSON formats. You can also retrieve the linear notation of a folding graph as a string.
+                    Visit the <a href="http://help.slimframework.com" target="_blank">Slim support forum and knowledge base</a>
+                    to read announcements, chat with fellow Slim users, ask questions, help others, or show off your cool
+                    Slim Framework apps.
                 </p>
+
+                <h3>Twitter</h3>
                 <p>
-                The PTGL is a protein topology database which works
-                mainly on the level of a protein chain: a protein graph includes all the secondary structure elements (SSEs) of a chain. (Which SSEs types
-                are included is determined by the graph type, e.g., the alpha graph only contains alpha helices, while the alpha-beta graph contains both alpha helices and beta strands.)
+                    Follow <a href="http://www.twitter.com/slimphp" target="_blank">@slimphp</a> on Twitter to receive the very latest news
+                    and updates about the framework.
                 </p>
             </section>
-            <section>
-                <h2>Addressing data</h2>
+            <section style="padding-bottom: 20px">
+                <h2>Slim Framework Extras</h2>
                 <p>
-                Since the data is computed from PDB files and the SSE assignments of the DSSP algorithm, the data is addressed by the following information for a <b>Protein graph</b>:
-                <ul>
-                <li>a PDB identifier (4 letter RCSB PDB protein code, e.g., 7tim)</li>
-                <li>a PDB chain name (1 letter RCSB PDB chain name, e.g., A)</li>
-                <li>a graph type (PTGL graph type name. The following 6 values are valid: alpha, beta, albe, alphalig, betalig, albelig)</li>
-                </ul>
-                
-                A <b>Folding graph</b> (FG) is a single connected component of a protein graph (PG). To address a folding graph, you need:
-                <ul>
-                <li>all the data for a protein graph (see above) and</li>
-                <li>the fold number (an integer equal to or greater than zero)</li>
-                </ul>
-                
-                A folding graph can be described by 4 different <b>linear notation</b> strings. To address a linear notation, you need:
-                <ul>
-                <li>all the data for a folding graph (see above) and</li>
-                <li>the linear notation name (The following 4 values are valid: adj, red, seq, key)</li>
-                </ul>
-                
-                Note that the KEY notation is not defined for bifurcated graphs and may thus return 'null'.
-                
+                    Custom View classes for Smarty, Twig, Mustache, and other template
+                    frameworks are available online in a separate repository.
                 </p>
-                
-                
-            </section>
-            
-            <section style="padding-bottom: 20px">
-                <h2>Usage examples</h2>
-                <p>
-                    Here are some example queries against the API, assuming <i>PTGL3_BASE</i> is the base URL of the PTGL3:
-                    <ul>
-		    <li><i>http://PTGL3_BASE/api/get/7tim/A/albe</i> retrieves the alpha-beta graph of PDB 7TIM, chain A in JSON format </li>
-		    <li><i>http://PTGL3_BASE/api/get/7tim/A/albe?format=GML</i> retrieves the alpha-beta graph of PDB 7TIM, chain A in GML format </li>
-		    <li><i>http://PTGL3_BASE/api/get/7tim/A/albe/0</i> retrieves the folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A in GML format </li>
-		    <li><i>http://PTGL3_BASE/api/get/7tim/A/albe/0/ADJ</i> retrieves the ADJ linear notation of folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A in GML format </li>
-		    </ul>
-                </p>                
-            </section>
-            
-            <section style="padding-bottom: 20px">
-                <h2>Comments, questions, bug reports, getting more help</h2>
-                <p>
-                   The PTGL and the data this API serves are based on the VPLG software. If you need more help, you should use the VPLG help options listed at the <a href="https://sourceforge.net/p/vplg/" target="_blank">VPLG sourceforge project page</a>. There is a ticket system and a forum.
-                </p>                
-            </section>
-            
-            <section style="padding-bottom: 20px">
-                <h2>Author</h2>
-                <p>
-                    This API was written by Tim Schäfer.
-                </p>                
+                <p><a href="https://github.com/codeguy/Slim-Extras" target="_blank">Browse the Extras Repository</a></p>
             </section>
         </body>
     </html>
