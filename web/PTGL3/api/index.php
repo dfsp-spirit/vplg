@@ -20,6 +20,7 @@ require 'Slim/Slim.php';
  * of setting names and values into the application constructor.
  */
 $app = new \Slim\Slim();
+$app->setName('ptgl3api');
 
 /**
  * Step 3: Define the Slim application routes
@@ -170,35 +171,67 @@ EOT;
     }
 );
 
+// set application-wide route conditions
+\Slim\Route::setDefaultConditions(array(
+    'pdbid' => '[a-zA-Z0-9]{4}',
+    'chain' => '[a-zA-Z0-9]{1}',
+    'graphtype' => 'alpha|beta|albe|alphalig|betalig|albelig',
+    'linnot' => 'adj|red|key|seq',
+    'fold' => '[0-9]{1,}'
+));
+
+// ----------------- define the GET routes we need ---------------------
+
+// get a single protein graph
+$app->get('/pg/:pdbid/:chain/:graphtype', function ($pdbid, $chain, $graphtype) {
+    echo "You requested the $graphtype graph of PDB $pdbid chain $chain.\n";
+});
+
+// get all protein graphs of a chain
+$app->get('/pg/:pdbid/:chain', function ($name) {
+    echo "You requested all 6 graph types of of PDB $pdbid chain $chain.\n";
+});
+
+
+// ----------------- no other routes (adding, editing) are currently used -----------------
+
+
 // POST route
+/*
 $app->post(
     '/post',
     function () {
         echo 'This is a POST route';
     }
 );
+*/
 
 // PUT route
+/*
 $app->put(
     '/put',
     function () {
         echo 'This is a PUT route';
     }
 );
+*/
 
 // PATCH route
+/*
 $app->patch('/patch', function () {
     echo 'This is a PATCH route';
 });
+*/
 
 // DELETE route
+/*
 $app->delete(
     '/delete',
     function () {
         echo 'This is a DELETE route';
     }
 );
-
+*/
 /**
  * Step 4: Run the Slim application
  *
