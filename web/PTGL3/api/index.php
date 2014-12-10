@@ -188,8 +188,28 @@ $app->get('/pg/:pdbid/:chain/:graphtype', function ($pdbid, $chain, $graphtype) 
 });
 
 // get all protein graphs of a chain
-$app->get('/pg/:pdbid/:chain', function ($name) {
+$app->get('/pg/:pdbid/:chain', function ($pdbid, $chain) {
     echo "You requested all 6 graph types of of PDB $pdbid chain $chain.\n";
+});
+
+// get a specific folding graph
+$app->get('/fg/:pdbid/:chain/:graphtype/:fold', function ($pdbid, $chain, $graphtype, $fold) {
+    echo "You requested the folding graph of fold # $fold of the $graphtype protein graph of PDB $pdbid chain $chain.\n";
+});
+
+// get all folding graphs of a protein graph
+$app->get('/fg/:pdbid/:chain/:graphtype', function ($pdbid, $chain, $graphtype) {
+    echo "You requested all folding graphs of the $graphtype protein graph of PDB $pdbid chain $chain.\n";
+});
+
+// get a specific linear notation of a folding graph
+$app->get('/fg/:pdbid/:chain/:graphtype/:fold/:linnot', function ($pdbid, $chain, $graphtype, $fold, $linnot) {
+    echo "You requested the $linnot notation of fold # $fold of the $graphtype protein graph of PDB $pdbid chain $chain.\n";
+});
+
+// get all chain names of a protein (PDB file)
+$app->get('/chains/:pdbid', function ($pdbid) {
+    echo "You requested all chain names of PDB $pdbid.\n";
 });
 
 
