@@ -70,7 +70,7 @@ $app->get(
                 hr{display:block;height:1px;border:0;border-top:1px solid #cccccc;margin:1em 0;padding:0;}
                 input,select{vertical-align:middle;}
                 html{ background: #EDEDED; height: 100%; }
-                body{background:#FFF;margin:0 auto;min-height:100%;padding:0 30px;width:440px;color:#666;font:14px/23px Arial,Verdana,sans-serif;}
+                body{background:#FFF;margin:0 auto;min-height:100%;padding:0 30px;width:600px;color:#666;font:14px/23px Arial,Verdana,sans-serif;}
                 h1,h2,h3,p,ul,ol,form,section{margin:0 0 20px 0;}
                 h1{color:#333;font-size:20px;}
                 h2,h3{color:#333;font-size:14px;}
@@ -91,7 +91,7 @@ $app->get(
             <h1>Welcome to the PTGL 3.0 API</h1>
             <p>
                 The PTGL Advanced Programming Interface allows you to retrieve data from the PTGL programatically. This page explains
-                the very basics of how to use the API.
+                how to use the API.
                 
             </p>
             <section>
@@ -141,13 +141,35 @@ $app->get(
             <section style="padding-bottom: 20px">
                 <h2>Usage examples</h2>
                 <p>
-                    Here are some example queries against the API, assuming <i>PTGL3_BASE</i> is the base URL of the PTGL3:
-                    <ul>
-		    <li><i>http://PTGL3_BASE/api/get/7tim/A/albe</i> retrieves the alpha-beta graph of PDB 7TIM, chain A in JSON format </li>
-		    <li><i>http://PTGL3_BASE/api/get/7tim/A/albe?format=GML</i> retrieves the alpha-beta graph of PDB 7TIM, chain A in GML format </li>
-		    <li><i>http://PTGL3_BASE/api/get/7tim/A/albe/0</i> retrieves the folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A in GML format </li>
-		    <li><i>http://PTGL3_BASE/api/get/7tim/A/albe/0/ADJ</i> retrieves the ADJ linear notation of folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A in GML format </li>
-		    </ul>
+                    Here are some example queries against the API:<br><br>
+					
+                        Protein graphs:
+					    <ul>
+		                    <li><i><a href="http://127.0.0.1/api/index.php/pg/7tim/A/albe/json" target="_blank">/api/index.php/pg/7tim/A/albe/json</a></i> retrieves the albe (alpha-beta) graph of PDB 7TIM, chain A in JSON format. </li>
+			                <li><i><a href="http://127.0.0.1/api/index.php/pg/7tim/A/albe/gml" target="_blank">/api/index.php/pg/7tim/A/albe/gml</a></i> retrieves the same protein graph in GML format. </li>
+			            </ul>
+						
+						
+		                Folding graphs:
+					    <ul>
+						<li><i><a href="http://127.0.0.1/api/index.php/fg/7tim/A/albe/0/json" target="_blank">/api/index.php/fg/7tim/A/albe/0/json</a></i> retrieves the folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A in JSON format. </li>
+		                <li><i><a href="http://127.0.0.1/api/index.php/fg/7tim/A/albe/0/gml" target="_blank">/api/index.php/fg/7tim/A/albe/0/gml</a></i> retrieves the same folding graph in GML format. </li>
+						</ul>
+			
+			            Linear notations:
+					    <ul>
+		                <li><i><a href="http://127.0.0.1/api/index.php/linnot/7tim/A/albe/0/adj"  target="_blank">api/index.php/linnot/7tim/A/albe/0/adj</a></i> retrieves the ADJ linear notation of folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A. This is a string in JSON format. </li>
+			            </ul>
+						
+						To automatically process all data of a certain type, it is very handy to be able to know which data is available. For example, you may want to process all chains of a protein -- but how do you know how many chains it has? The same applies to the 
+						number of connected components (=folding graphs) of a protein graph. We also provide some methods to get this information:
+						<br><br>
+						
+			            Chains:
+					    <ul>
+			            <li><i><a href="http://127.0.0.1/api/index.php/chains/7tim" target="_blank">/api/index.php/chains/7tim/</a></i> retrieves the chain names of all chains of 7tim. This is a list of strings, the format is always JSON.</li>
+						</ul>
+		            
                 </p>                
             </section>
             
@@ -161,15 +183,18 @@ $app->get(
             <section style="padding-bottom: 20px">
                 <h2>Author</h2>
                 <p>
-                    This API was written by Tim Schäfer.
+                    This API was written by Tim Schäfer.					
                 </p>                
-            </section>
+            </section>					
+			
         </body>
     </html>
 EOT;
         echo $template;
     }
 );
+
+
 
 // set application-wide route conditions
 \Slim\Route::setDefaultConditions(array(
@@ -215,28 +240,66 @@ $app->get('/pg/:pdbid/:chain/:graphtype/:graphformat', function ($pdbid, $chain,
 });
 
 // get all protein graphs of a chain
-$app->get('/pg/:pdbid/:chain', function ($pdbid, $chain) {
+$app->get('/pg/:pdbid/:chain', function ($pdbid, $chain) use($db) {
     echo "You requested all 6 graph types of of PDB $pdbid chain $chain.\n";
 });
 
 // get a specific folding graph
-$app->get('/fg/:pdbid/:chain/:graphtype/:fold', function ($pdbid, $chain, $graphtype, $fold) {
-    echo "You requested the folding graph of fold # $fold of the $graphtype protein graph of PDB $pdbid chain $chain.\n";
+$app->get('/fg/:pdbid/:chain/:graphtype/:fold/:graphformat', function ($pdbid, $chain, $graphtype, $fold, $graphformat) use($db) {
+    $query = "SELECT fg.foldinggraph_id, fg.graph_string_json, fg.graph_string_gml FROM plcc_foldinggraph fg INNER JOIN plcc_graph g ON fg.parent_graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype' AND fg.fg_number = $fold";
+    $result = pg_query($db, $query);
+    
+    $num_res = 0;
+    while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
+	    $num_res++;
+	    if($graphformat === "gml") {
+	        echo $arr['graph_string_gml'];
+	    } 
+        if($graphformat === "json") {
+          echo $arr['graph_string_json'];
+        }		
+    }
+    //echo "You requested the folding graph of fold # $fold of the $graphtype protein graph of PDB $pdbid chain $chain. Found $num_res results.\n";
 });
 
 // get all folding graphs of a protein graph
-$app->get('/fg/:pdbid/:chain/:graphtype', function ($pdbid, $chain, $graphtype) {
+$app->get('/fg/:pdbid/:chain/:graphtype', function ($pdbid, $chain, $graphtype) use($db) {
     echo "You requested all folding graphs of the $graphtype protein graph of PDB $pdbid chain $chain.\n";
 });
 
 // get a specific linear notation of a folding graph
-$app->get('/fg/:pdbid/:chain/:graphtype/:fold/:linnot', function ($pdbid, $chain, $graphtype, $fold, $linnot) {
-    echo "You requested the $linnot notation of fold # $fold of the $graphtype protein graph of PDB $pdbid chain $chain.\n";
+$app->get('/linnot/:pdbid/:chain/:graphtype/:fold/:linnot', function ($pdbid, $chain, $graphtype, $fold, $linnot) use($db) {
+    $query = "SELECT ln.linnot_id, ln.ptgl_linnot_adj, ln.ptgl_linnot_red, ln.ptgl_linnot_seq, ln.ptgl_linnot_key FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph g ON fg.parent_graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype' AND fg.fg_number = $fold";
+    $result = pg_query($db, $query);
+    
+    $num_res = 0;
+    while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
+	    $num_res++;
+		$req_linnot = 'ptgl_linnot_' . $linnot;
+	    echo '"' . $arr[$req_linnot] . '"';
+    }
+    //echo "You requested the $linnot notation of fold # $fold of the $graphtype protein graph of PDB $pdbid chain $chain.\n";
 });
 
 // get all chain names of a protein (PDB file)
-$app->get('/chains/:pdbid', function ($pdbid) {
-    echo "You requested all chain names of PDB $pdbid.\n";
+$app->get('/chains/:pdbid', function ($pdbid) use($db) {
+    $query = "SELECT c.chain_name FROM plcc_chain c INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id WHERE c.pdb_id = '$pdbid' ORDER BY chain_name ";
+    $result = pg_query($db, $query);
+    
+    $num_res = 0;
+	//["somestring1", "somestring2"]
+	$json = "[";
+	$array = pg_fetch_all($result);
+    for($i = 0; $i < count($array); $i++){
+        $row = $array[$i];
+		$json .= '"' . $row['chain_name'] . '"';
+		if($i < count($array) - 1) {
+		    $json .= ", ";
+		}
+	}
+	$json .= "]";
+	echo $json;
+    //echo "You requested all chain names of PDB $pdbid.\n";
 });
 
 
