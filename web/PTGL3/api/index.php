@@ -90,7 +90,7 @@ $app->get(
             </header>
             <h1>Welcome to the PTGL 3.0 API</h1>
 			
-			<a href=#basics">Basics</a> | <a href="#addressing">Addressing data</a> | <a href="#examples">Usage Examples</a> | <a href="#metadata">Metadata queries</a> | <a href="#help">Help, comments</a> | <a href="#author">Author</a>
+			<a href=#basics">Basics</a> | <a href="#addressing">Addressing data</a> | <a href="#examples">Usage Examples</a> | <a href="#metadata">Metadata queries</a> | <a href="#example_restclient_code">Example API client code</a> | <a href="#help">Help, comments</a> | <a href="#author">Author</a>
 			
             <p>
 			    <br>
@@ -103,8 +103,9 @@ $app->get(
 			<a name="basics"></a>
             <section>
                 <h2>Basics</h2>
-                This is a REST API, and you can query it with any HTTP client. There are specialized REST clients, but something like curl will do in principle.
-				All data is served in JavaScript Object Notation (JSON) format. For graph data, you can chose between Graph Modelling Language (GML) format and JSON format.
+                This is a REST API, and you can query it with any HTTP client. There are specialized REST clients, but something like curl will do in principle. Of course, you can query this API with a programming language of your choice.
+				<br><br>
+				All data is served in JavaScript Object Notation (JSON) format. For graph data, you can chose between Graph Modelling Language (GML) format and JSON format.				 								
             </section>
             <section>
                 <h2>Data available via the API</h2>
@@ -218,6 +219,56 @@ $app->get(
                 </p>                
             </section>
 			
+			
+						<a name="example_restclient_code"></a>
+			<section style="padding-bottom: 20px">
+			<h2>Example code to access this API in PHP</h2>
+                <p>
+                    Here is some simple example code which queries this API from PHP, using curl. Feel free to use and extend it.
+                </p>              
+
+            <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></td><td><pre style="margin: 0; line-height: 125%"><span style="color: #557799">&lt;?php</span>
+<span style="color: #996633">&#36;url_linnot</span> <span style="color: #333333">=</span> <span style="background-color: #fff0f0">&#39;http://127.0.0.1/api/index.php/linnot/7tim/A/albe/0/adj&#39;</span>;
+<span style="color: #996633">&#36;curl</span> <span style="color: #333333">=</span> <span style="color: #007020">curl_init</span>();
+<span style="color: #007020">curl_setopt</span>(<span style="color: #996633">&#36;curl</span>, CURLOPT_URL, <span style="color: #996633">&#36;url_linnot</span>);
+<span style="color: #007020">curl_setopt</span>(<span style="color: #996633">&#36;curl</span>, CURLOPT_RETURNTRANSFER, <span style="color: #0000DD; font-weight: bold">1</span>);
+<span style="color: #007020">curl_setopt</span>(<span style="color: #996633">&#36;curl</span>, CURLOPT_FAILONERROR, <span style="color: #0000DD; font-weight: bold">1</span>);
+
+<span style="color: #996633">&#36;result</span> <span style="color: #333333">=</span> <span style="color: #007020">curl_exec</span>(<span style="color: #996633">&#36;curl</span>);
+
+<span style="color: #008800; font-weight: bold">if</span>(<span style="color: #007020">curl_errno</span>(<span style="color: #996633">&#36;curl</span>)) {
+    <span style="color: #888888">// TODO: handle error here</span>
+    <span style="color: #008800; font-weight: bold">echo</span> <span style="background-color: #fff0f0">&#39;ERROR: &#39;</span> <span style="color: #333333">.</span> <span style="color: #007020">curl_error</span>(<span style="color: #996633">&#36;curl</span>);
+}
+<span style="color: #008800; font-weight: bold">else</span> {
+    <span style="color: #888888">// TODO: do something with the result here</span>
+    <span style="color: #888888">// the result will be &quot;{h,3ph,-2me,-3pe,-2pe,-2pe,-2pe,18pe,-2pe,-4pe,-3pe,2zh,3ph,2me}&quot;</span>
+    <span style="color: #008800; font-weight: bold">echo</span> <span style="background-color: #fff0f0">&quot;OK. result: &quot;</span> <span style="color: #333333">.</span> <span style="color: #996633">&#36;result</span>;    
+}
+<span style="color: #557799">?&gt;</span>
+</pre></td></tr></table></div>
+ 
+        </section>
+
+			
             <a name="help"></a>
             <section style="padding-bottom: 20px">
                 <h2>Comments, questions, bug reports, getting more help</h2>
@@ -232,7 +283,10 @@ $app->get(
                 <p>
                     The <a href="../" target="_blank">PTGL 3.0</a> REST API was written by <a href="http://rcmd.org/ts/" target="_blank">Tim Schäfer</a> at the <a href="http://www.bioinformatik.uni-frankfurt.de/" target="_blank">MolBI group at Uni Frankfurt, Germany</a>.					
                 </p>                
-            </section>					
+            </section>	
+			
+			
+			
 			
         </body>
     </html>
