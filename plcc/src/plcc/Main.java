@@ -2598,7 +2598,7 @@ public class Main {
                 else {
                                 
                     try { 
-                        fgDbId = DBManager.writeFoldingGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), fg_number, FoldingGraph.getFoldNameOfFoldNumber(fg_number), fg.getMinimalVertexIndexInParentGraph(), fg.toGraphModellingLanguageFormat(), fg.toVPLGGraphFormat(), fg.toKavoshFormat(), fg.toDOTLanguageFormat(), fg.getSSEStringSequential(), fg.containsBetaBarrel()); 
+                        fgDbId = DBManager.writeFoldingGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), fg_number, FoldingGraph.getFoldNameOfFoldNumber(fg_number), fg.getMinimalVertexIndexInParentGraph(), fg.toGraphModellingLanguageFormat(), fg.toVPLGGraphFormat(), fg.toKavoshFormat(), fg.toDOTLanguageFormat(), fg.toJSONFormat(), fg.getSSEStringSequential(), fg.containsBetaBarrel()); 
                         if(! silent) {
                             System.out.println("        Inserted '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB.");
                         }
