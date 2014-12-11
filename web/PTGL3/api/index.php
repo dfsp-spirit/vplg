@@ -161,13 +161,18 @@ $app->get(
 		                <li><i><a href="http://127.0.0.1/api/index.php/linnot/7tim/A/albe/0/adj"  target="_blank">api/index.php/linnot/7tim/A/albe/0/adj</a></i> retrieves the ADJ linear notation of folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A. This is a string in JSON format. </li>
 			            </ul>
 						
-						To automatically process all data of a certain type, it is very handy to be able to know which data is available. For example, you may want to process all chains of a protein -- but how do you know how many chains it has? The same applies to the 
+						To automatically process all data of a certain type, it is very handy to know which data is available. For example, you may want to process all chains of a protein -- but how do you know how many chains it has? The same applies to the 
 						number of connected components (=folding graphs) of a protein graph. We also provide some methods to get this information:
 						<br><br>
 						
 			            Chains:
 					    <ul>
-			            <li><i><a href="http://127.0.0.1/api/index.php/chains/7tim" target="_blank">/api/index.php/chains/7tim/</a></i> retrieves the chain names of all chains of 7tim. This is a list of strings, the format is always JSON.</li>
+			            <li><i><a href="http://127.0.0.1/api/index.php/chains/7tim" target="_blank">/api/index.php/chains/7tim/</a></i> retrieves all available chain names of all chains of 7tim. This is a list of strings, the format is always JSON.</li>
+						</ul>
+						
+						Folds:
+					    <ul>
+			            <li><i><a href="http://127.0.0.1/api/index.php/folds/7tim/A/albe" target="_blank">/api/index.php/folds/7tim/A/albe</a></i> retrieves all available fold numbers of the albe graph of 7tim chain A. This is a list of integers, the format is always JSON.</li>
 						</ul>
 		            
                 </p>                
@@ -262,9 +267,23 @@ $app->get('/fg/:pdbid/:chain/:graphtype/:fold/:graphformat', function ($pdbid, $
     //echo "You requested the folding graph of fold # $fold of the $graphtype protein graph of PDB $pdbid chain $chain. Found $num_res results.\n";
 });
 
-// get all folding graphs of a protein graph
-$app->get('/fg/:pdbid/:chain/:graphtype', function ($pdbid, $chain, $graphtype) use($db) {
-    echo "You requested all folding graphs of the $graphtype protein graph of PDB $pdbid chain $chain.\n";
+// get all fold names of a protein graph
+$app->get('/folds/:pdbid/:chain/:graphtype', function ($pdbid, $chain, $graphtype) use($db) {
+
+    $query = "SELECT fg.fg_number FROM plcc_foldinggraph fg INNER JOIN plcc_graph g ON fg.parent_graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype' ORDER BY fg_number";
+    $result = pg_query($db, $query);
+	$json = "[";
+	$array = pg_fetch_all($result);
+    for($i = 0; $i < count($array); $i++){
+        $row = $array[$i];
+		$json .= $row['fg_number'];
+		if($i < count($array) - 1) {
+		    $json .= ", ";
+		}
+	}
+	$json .= "]";
+	echo $json;
+    //echo "You requested all fold names of the $graphtype protein graph of PDB $pdbid chain $chain.\n";
 });
 
 // get a specific linear notation of a folding graph
