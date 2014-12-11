@@ -89,14 +89,22 @@ $app->get(
                 <title>PTGL API</title>
             </header>
             <h1>Welcome to the PTGL 3.0 API</h1>
+			
+			<a href=#basics">Basics</a> | <a href="#addressing">Addressing data</a> | <a href="#examples">Usage Examples</a> | <a href="#metadata">Metadata queries</a> | <a href="#help">Help, comments</a> | <a href="#author">Author</a>
+			
             <p>
+			    <br>
                 The PTGL Advanced Programming Interface allows you to retrieve data from the PTGL programatically. This page explains
                 how to use the API.
+				<br><br>
+				If you are not a programmer, you may prefer the <a href="../" target="_blank">web interface of the PTGL 3</a>.
                 
             </p>
+			<a name="basics"></a>
             <section>
                 <h2>Basics</h2>
                 This is a REST API, and you can query it with any HTTP client. There are specialized REST clients, but something like curl will do in principle.
+				All data is served in JavaScript Object Notation (JSON) format. For graph data, you can chose between Graph Modelling Language (GML) format and JSON format.
             </section>
             <section>
                 <h2>Data available via the API</h2>
@@ -108,36 +116,55 @@ $app->get(
                 mainly on the level of a protein chain: a protein graph includes all the secondary structure elements (SSEs) of a chain. (Which SSEs types
                 are included is determined by the graph type, e.g., the alpha graph only contains alpha helices, while the alpha-beta graph contains both alpha helices and beta strands.)
                 </p>
+				<p>
+				You may have guessed it, but all methods provided are GET. You cannot alter (insert, update, delete) any data on the server using this API.
+				</p>
             </section>
+			<a name="addressing"></a>
             <section>
                 <h2>Addressing data</h2>
                 <p>
-                Since the data is computed from PDB files and the SSE assignments of the DSSP algorithm, the data is addressed by the following information for a <b>Protein graph</b>:
+				
+                The data is addressed by the following information for a <b>Protein graph</b>:
+				<br><br>
+				<i>/pg/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;/&lt;format&gt;</i>
+				<br>
+				 
                 <ul>
-                <li>a PDB identifier (4 letter RCSB PDB protein code, e.g., 7tim)</li>
-                <li>a PDB chain name (1 letter RCSB PDB chain name, e.g., A)</li>
-                <li>a graph type (PTGL graph type name. The following 6 values are valid: alpha, beta, albe, alphalig, betalig, albelig)</li>
+                <li>&lt;pdbid&gt; an RCSB PDB identifier for a protein (4 letter RCSB PDB protein code, e.g., 7tim)</li>
+                <li>&lt;chain&gt; a PDB chain name (1 letter RCSB PDB chain name, e.g., A). See the <a href="#metadata">metadata section</a> to learn how to find all valid chain names for a certain protein.</li>
+                <li>&lt;graphtype&gt; a graph type (PTGL graph type name. The following 6 values are valid: alpha, beta, albe, alphalig, betalig, albelig)</li>
+				<li>&lt;format&gt; a file format (The following 2 values are valid: gml, json)</li>
                 </ul>
-                
+								
+                <br><br>
                 A <b>Folding graph</b> (FG) is a single connected component of a protein graph (PG). To address a folding graph, you need:
+				Folding graph query format: 
+				<br><br>
+				<i>/fg/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;/&lt;fold&gt;/&lt;format&gt;</i> 
+				<br><br>
                 <ul>
                 <li>all the data for a protein graph (see above) and</li>
-                <li>the fold number (an integer equal to or greater than zero)</li>
+                <li>&lt;fold&gt; the fold number, an integer equal to or greater than zero. See the <a href="#metadata">metadata section</a> to learn how to find all valid chain names for a certain protein.</li>
                 </ul>
                 
+				<br><br>
                 A folding graph can be described by 4 different <b>linear notation</b> strings. To address a linear notation, you need:
+				<br><br>
+				<i>/linnot/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;/&lt;fold&gt;/&lt;linnot&gt;</i> 
+				<br><br>
                 <ul>
                 <li>all the data for a folding graph (see above) and</li>
-                <li>the linear notation name (The following 4 values are valid: adj, red, seq, key)</li>
+                <li>&lt;linnot&gt; the linear notation name (The following 4 values are valid: adj, red, seq, key)</li>
                 </ul>
                 
-                Note that the KEY notation is not defined for bifurcated graphs and may thus return 'null'.
+                Note that the KEY notation is not defined for bifurcated graphs and may thus return the empty string for a fold.
                 
                 </p>
                 
                 
             </section>
-            
+            <a name="examples"></a>
             <section style="padding-bottom: 20px">
                 <h2>Usage examples</h2>
                 <p>
@@ -161,23 +188,37 @@ $app->get(
 		                <li><i><a href="http://127.0.0.1/api/index.php/linnot/7tim/A/albe/0/adj"  target="_blank">api/index.php/linnot/7tim/A/albe/0/adj</a></i> retrieves the ADJ linear notation of folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A. This is a string in JSON format. </li>
 			            </ul>
 						
-						To automatically process all data of a certain type, it is very handy to know which data is available. For example, you may want to process all chains of a protein -- but how do you know how many chains it has? The same applies to the 
-						number of connected components (=folding graphs) of a protein graph. We also provide some methods to get this information:
-						<br><br>
 						
-			            Chains:
-					    <ul>
-			            <li><i><a href="http://127.0.0.1/api/index.php/chains/7tim" target="_blank">/api/index.php/chains/7tim/</a></i> retrieves all available chain names of all chains of 7tim. This is a list of strings, the format is always JSON.</li>
-						</ul>
-						
-						Folds:
-					    <ul>
-			            <li><i><a href="http://127.0.0.1/api/index.php/folds/7tim/A/albe" target="_blank">/api/index.php/folds/7tim/A/albe</a></i> retrieves all available fold numbers of the albe graph of 7tim chain A. This is a list of integers, the format is always JSON.</li>
-						</ul>
 		            
                 </p>                
             </section>
-            
+			
+			<a name="metadata"></a>
+            <section style="padding-bottom: 20px">
+                <h2>Metadata queries</h2>
+                <p>
+				    To automatically process all data of a certain type, it is very handy to know which data is available. For example, you may want to process all chains of a protein -- but how do you know the chain names? The same applies to the 
+						number of connected components (folding graphs) of a protein graph -- how do you know how many connected components a protein graph has? We also provide methods to get this information:
+						<br><br>
+						
+			            All chains of a protein:
+						
+					    <ul>
+						<li>format: <i>/chains/&lt;pdbid&gt;</i> </li>
+			            <li>example: <i><a href="http://127.0.0.1/api/index.php/chains/7tim" target="_blank">/api/index.php/chains/7tim/</a></i> retrieves all available chain names of all chains of 7tim. This is a list of strings, the format is always JSON.</li>
+						</ul>
+						
+						All folding graph numbers of a protein graph:
+						<br>
+					    <ul>
+						<li>format: <i>/folds/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;</i></li>
+			            <li>example: <i><a href="http://127.0.0.1/api/index.php/folds/7tim/A/albe" target="_blank">/api/index.php/folds/7tim/A/albe</a></i> retrieves all available fold numbers of the albe graph of 7tim chain A. This is a list of integers, the format is always JSON.</li>
+						</ul>
+
+                </p>                
+            </section>
+			
+            <a name="help"></a>
             <section style="padding-bottom: 20px">
                 <h2>Comments, questions, bug reports, getting more help</h2>
                 <p>
@@ -185,10 +226,11 @@ $app->get(
                 </p>                
             </section>
             
+			<a name="author"></a>
             <section style="padding-bottom: 20px">
                 <h2>Author</h2>
                 <p>
-                    This API was written by Tim Schäfer.					
+                    The <a href="../" target="_blank">PTGL 3.0</a> REST API was written by <a href="http://rcmd.org/ts/" target="_blank">Tim Schäfer</a> at the <a href="http://www.bioinformatik.uni-frankfurt.de/" target="_blank">MolBI group at Uni Frankfurt, Germany</a>.					
                 </p>                
             </section>					
 			
@@ -244,10 +286,6 @@ $app->get('/pg/:pdbid/:chain/:graphtype/:graphformat', function ($pdbid, $chain,
     //echo "Found $num_res graphs.\n";
 });
 
-// get all protein graphs of a chain
-$app->get('/pg/:pdbid/:chain', function ($pdbid, $chain) use($db) {
-    echo "You requested all 6 graph types of of PDB $pdbid chain $chain.\n";
-});
 
 // get a specific folding graph
 $app->get('/fg/:pdbid/:chain/:graphtype/:fold/:graphformat', function ($pdbid, $chain, $graphtype, $fold, $graphformat) use($db) {
