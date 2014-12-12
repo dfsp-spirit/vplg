@@ -371,12 +371,12 @@ $app->get('/pg/:pdbid/:chain/:graphtype/:graphformat', function ($pdbid, $chain,
 
 // get a single protein graph visualization as an image
 $app->get('/pgvis/:pdbid/:chain/:graphtype/:imageformat', function ($pdbid, $chain, $graphtype, $imageformat) use($db, $app) {    
-    //echo "You requested the $graphtype graph of PDB $pdbid chain $chain.\n";
 	$pdbid = strtolower($pdbid);
     $query = "SELECT g.graph_id, g.graph_image_png, g.graph_image_svg FROM plcc_graph g INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype'";
     $result = pg_query($db, $query);
     
     $num_res = 0;
+	$image_path = "";
     while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
 		$num_res++;
 		$image_path = "";
@@ -414,6 +414,53 @@ $app->get('/fg/:pdbid/:chain/:graphtype/:fold/:graphformat', function ($pdbid, $
         }		
     }
     //echo "You requested the folding graph of fold # $fold of the $graphtype protein graph of PDB $pdbid chain $chain. Found $num_res results.\n";
+});
+
+
+// get a single folding graph visualization as an image -- this is a convenience method only, it is the same as requesting the adj linnot visualization of the FG
+$app->get('/fgvis/:pdbid/:chain/:graphtype/:fold/:imageformat', function ($pdbid, $chain, $graphtype, $fold, $imageformat) use($db, $app) {        
+	$pdbid = strtolower($pdbid);
+	$linnot = 'adj';
+	$query = "SELECT ln.linnot_id, ln.filepath_linnot_image_adj_svg, ln.filepath_linnot_image_adj_png,  ln.filepath_linnot_image_red_svg, ln.filepath_linnot_image_red_png, ln.filepath_linnot_image_seq_svg, ln.filepath_linnot_image_seq_png, ln.filepath_linnot_image_key_svg, ln.filepath_linnot_image_key_png FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph g ON fg.parent_graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype' AND fg.fg_number = $fold";
+    $result = pg_query($db, $query);
+    
+    $num_res = 0;
+	$img_field_name = 'filepath_linnot_image_' . $linnot . '_' . $imageformat;
+	$image_path = "";
+    while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
+		$num_res++;
+		$image_path = "";
+        $image_path = $arr[$img_field_name];        
+    }
+	if( ! empty($image_path)) {
+	    $image = file_get_contents("../data/" . $image_path);
+		$finfo = new finfo(FILEINFO_MIME_TYPE);
+		$app->response->header('Content-Type', 'content-type: ' . $finfo->buffer($image));
+		echo $image;
+	}
+});
+
+
+// get a single folding graph linnot visualization as an image
+$app->get('/linnotvis/:pdbid/:chain/:graphtype/:fold/:linnot/:imageformat', function ($pdbid, $chain, $graphtype, $fold, $linnot, $imageformat) use($db, $app) {        
+	$pdbid = strtolower($pdbid);
+	$query = "SELECT ln.linnot_id, ln.filepath_linnot_image_adj_svg, ln.filepath_linnot_image_adj_png,  ln.filepath_linnot_image_red_svg, ln.filepath_linnot_image_red_png, ln.filepath_linnot_image_seq_svg, ln.filepath_linnot_image_seq_png, ln.filepath_linnot_image_key_svg, ln.filepath_linnot_image_key_png FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph g ON fg.parent_graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype' AND fg.fg_number = $fold";
+    $result = pg_query($db, $query);
+    
+    $num_res = 0;
+	$img_field_name = 'filepath_linnot_image_' . $linnot . '_' . $imageformat;
+	$image_path = "";
+    while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
+		$num_res++;
+		$image_path = "";
+        $image_path = $arr[$img_field_name];        
+    }
+	if( ! empty($image_path)) {
+	    $image = file_get_contents("../data/" . $image_path);
+		$finfo = new finfo(FILEINFO_MIME_TYPE);
+		$app->response->header('Content-Type', 'content-type: ' . $finfo->buffer($image));
+		echo $image;
+	}
 });
 
 // get all fold names of a protein graph
