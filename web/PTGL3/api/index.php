@@ -306,8 +306,34 @@ EOT;
     'graphtype' => 'alpha|beta|albe|alphalig|betalig|albelig',
     'linnot' => 'adj|red|key|seq',
     'fold' => '[0-9]{1,}',
-    'graphformat' => 'json|gml'
+    'graphformat' => 'json|gml',
+	'imageformat' => 'png|svg'
 ));
+
+/**
+ * Convert JSON to XML -- requires PEAR XML_Serializer
+ * @param string    - json
+ * @return string   - XML
+ */
+function json_to_xml($json) {
+    include_once("XML/Serializer.php");
+
+    $options = array (
+      'addDecl' => TRUE,
+      'encoding' => 'UTF-8',
+      'indent' => '  ',
+      'rootName' => 'json',
+      'mode' => 'simplexml'
+    );
+
+    $serializer = new XML_Serializer($options);
+    $obj = json_decode($json);
+    if ($serializer->serialize($obj)) {
+        return $serializer->getSerializedData();
+    } else {
+        return null;
+    }
+}
 
 // get db connection
 include('../backend/config.php');
@@ -324,7 +350,7 @@ if(!$db) {
 // ----------------- define the GET routes we need ---------------------
 
 // get a single protein graph
-$app->get('/pg/:pdbid/:chain/:graphtype/:graphformat', function ($pdbid, $chain, $graphtype, $graphformat) use($db) {
+$app->get('/pg/:pdbid/:chain/:graphtype/:graphformat', function ($pdbid, $chain, $graphtype, $graphformat) use($db) {    
     //echo "You requested the $graphtype graph of PDB $pdbid chain $chain.\n";
 	$pdbid = strtolower($pdbid);
     $query = "SELECT g.graph_id, g.graph_string_json, g.graph_string_gml FROM plcc_graph g INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype'";
@@ -332,8 +358,8 @@ $app->get('/pg/:pdbid/:chain/:graphtype/:graphformat', function ($pdbid, $chain,
     
     $num_res = 0;
     while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
-	$num_res++;
-	if($graphformat === "gml") {
+		$num_res++;
+		if($graphformat === "gml") {
           echo $arr['graph_string_gml'];
         }
         if($graphformat === "json") {
@@ -342,6 +368,33 @@ $app->get('/pg/:pdbid/:chain/:graphtype/:graphformat', function ($pdbid, $chain,
     }
     //echo "Found $num_res graphs.\n";
 });
+
+// get a single protein graph visualization as an image
+$app->get('/pgvis/:pdbid/:chain/:graphtype/:imageformat', function ($pdbid, $chain, $graphtype, $imageformat) use($db, $app) {    
+    //echo "You requested the $graphtype graph of PDB $pdbid chain $chain.\n";
+	$pdbid = strtolower($pdbid);
+    $query = "SELECT g.graph_id, g.graph_image_png, g.graph_image_svg FROM plcc_graph g INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype'";
+    $result = pg_query($db, $query);
+    
+    $num_res = 0;
+    while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
+		$num_res++;
+		$image_path = "";
+		if($imageformat === "png") {
+          $image_path = $arr['graph_image_png'];
+        }
+        if($imageformat === "svg") {
+		    $image_path = $arr['graph_image_svg'];
+        }
+    }
+	if( ! empty($image_path)) {
+	    $image = file_get_contents("../data/" . $image_path);
+		$finfo = new finfo(FILEINFO_MIME_TYPE);
+		$app->response->header('Content-Type', 'content-type: ' . $finfo->buffer($image));
+		echo $image;
+	}
+});
+
 
 
 // get a specific folding graph
