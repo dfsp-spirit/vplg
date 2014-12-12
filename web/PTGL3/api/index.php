@@ -94,10 +94,12 @@ $app->get(
 			
             <p>
 			    <br>
-                The PTGL Advanced Programming Interface allows you to retrieve data from the PTGL programatically. This page explains
+                The PTGL Application Programming Interface (API) allows you to quickly retrieve data from the PTGL programmatically. This page explains
                 how to use the API.
 				<br><br>
-				If you are not a programmer, you may prefer the <a href="../" target="_blank">web interface of the PTGL 3</a>.
+				A typical use case is that you want more data than you are willing to download manually by clicking in your web browser. You may, for example, have a list of 250 PDB chains, and you want the albe protein graphs for all of them in GML format.
+				<br><br>
+				If you are not a programmer, you may prefer the <a href="../" target="_blank">HTML interface of the PTGL 3</a>.
                 
             </p>
 			<a name="basics"></a>
@@ -132,7 +134,7 @@ $app->get(
 				<br>
 				 
                 <ul>
-                <li>&lt;pdbid&gt; an RCSB PDB identifier for a protein (4 letter RCSB PDB protein code, e.g., 7tim)</li>
+                <li>&lt;pdbid&gt; an <a href="http://www.rcsb.org/pdb/" target="_blank">RCSB PDB</a> identifier for a protein (4 letter RCSB PDB protein code, e.g., <a href="http://www.rcsb.org/pdb/explore/explore.do?structureId=7tim" target="_blank">7tim</a>.)</li>
                 <li>&lt;chain&gt; a PDB chain name (1 letter RCSB PDB chain name, e.g., A). See the <a href="#metadata">metadata section</a> to learn how to find all valid chain names for a certain protein.</li>
                 <li>&lt;graphtype&gt; a graph type (PTGL graph type name. The following 6 values are valid: alpha, beta, albe, alphalig, betalig, albelig)</li>
 				<li>&lt;format&gt; a file format (The following 2 values are valid: gml, json)</li>
@@ -224,7 +226,7 @@ $app->get(
 			<section style="padding-bottom: 20px">
 			<h2>Example code to access this API in PHP</h2>
                 <p>
-                    Here is some simple example code which queries this API from PHP, using curl. Feel free to use and extend it.
+                    Here is some simple example code which queries this API from PHP, using <a href="http://curl.haxx.se/" target="_blank">libcurl</a>. The code retrieves the ADJ linear notation string of the albe graph of 7tim chain A. Feel free to use and extend it.
                 </p>              
 
             <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%"> 1
@@ -261,7 +263,7 @@ $app->get(
 <span style="color: #008800; font-weight: bold">else</span> {
     <span style="color: #888888">// TODO: do something with the result here</span>
     <span style="color: #888888">// the result will be &quot;{h,3ph,-2me,-3pe,-2pe,-2pe,-2pe,18pe,-2pe,-4pe,-3pe,2zh,3ph,2me}&quot;</span>
-    <span style="color: #008800; font-weight: bold">echo</span> <span style="background-color: #fff0f0">&quot;OK. result: &quot;</span> <span style="color: #333333">.</span> <span style="color: #996633">&#36;result</span>;    
+    <span style="color: #008800; font-weight: bold">echo</span> <span style="background-color: #fff0f0">&quot;OK. adj string: &quot;</span> <span style="color: #333333">.</span> <span style="color: #008800; font-weight: bold">json_decode</span>(<span style="color: #996633">&#36;result</span>);    
 }
 <span style="color: #557799">?&gt;</span>
 </pre></td></tr></table></div>
@@ -281,7 +283,7 @@ $app->get(
             <section style="padding-bottom: 20px">
                 <h2>Author</h2>
                 <p>
-                    The <a href="../" target="_blank">PTGL 3.0</a> REST API was written by <a href="http://rcmd.org/ts/" target="_blank">Tim Schäfer</a> at the <a href="http://www.bioinformatik.uni-frankfurt.de/" target="_blank">MolBI group at Uni Frankfurt, Germany</a>.					
+                    The <a href="../" target="_blank">PTGL 3.0</a> REST API was written by <a href="http://rcmd.org/ts/" target="_blank">Tim Schäfer</a> at the <a href="http://www.bioinformatik.uni-frankfurt.de/" target="_blank">MolBI group at Uni Frankfurt, Germany</a>. <br><br><br><a href="../imprint.php" target="_blank">Imprint.</a>					
                 </p>                
             </section>	
 			
@@ -324,6 +326,7 @@ if(!$db) {
 // get a single protein graph
 $app->get('/pg/:pdbid/:chain/:graphtype/:graphformat', function ($pdbid, $chain, $graphtype, $graphformat) use($db) {
     //echo "You requested the $graphtype graph of PDB $pdbid chain $chain.\n";
+	$pdbid = strtolower($pdbid);
     $query = "SELECT g.graph_id, g.graph_string_json, g.graph_string_gml FROM plcc_graph g INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype'";
     $result = pg_query($db, $query);
     
@@ -343,6 +346,7 @@ $app->get('/pg/:pdbid/:chain/:graphtype/:graphformat', function ($pdbid, $chain,
 
 // get a specific folding graph
 $app->get('/fg/:pdbid/:chain/:graphtype/:fold/:graphformat', function ($pdbid, $chain, $graphtype, $fold, $graphformat) use($db) {
+    $pdbid = strtolower($pdbid);
     $query = "SELECT fg.foldinggraph_id, fg.graph_string_json, fg.graph_string_gml FROM plcc_foldinggraph fg INNER JOIN plcc_graph g ON fg.parent_graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype' AND fg.fg_number = $fold";
     $result = pg_query($db, $query);
     
@@ -361,7 +365,7 @@ $app->get('/fg/:pdbid/:chain/:graphtype/:fold/:graphformat', function ($pdbid, $
 
 // get all fold names of a protein graph
 $app->get('/folds/:pdbid/:chain/:graphtype', function ($pdbid, $chain, $graphtype) use($db) {
-
+    $pdbid = strtolower($pdbid);
     $query = "SELECT fg.fg_number FROM plcc_foldinggraph fg INNER JOIN plcc_graph g ON fg.parent_graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype' ORDER BY fg_number";
     $result = pg_query($db, $query);
 	$json = "[";
@@ -380,6 +384,7 @@ $app->get('/folds/:pdbid/:chain/:graphtype', function ($pdbid, $chain, $graphtyp
 
 // get a specific linear notation of a folding graph
 $app->get('/linnot/:pdbid/:chain/:graphtype/:fold/:linnot', function ($pdbid, $chain, $graphtype, $fold, $linnot) use($db) {
+    $pdbid = strtolower($pdbid);
     $query = "SELECT ln.linnot_id, ln.ptgl_linnot_adj, ln.ptgl_linnot_red, ln.ptgl_linnot_seq, ln.ptgl_linnot_key FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph g ON fg.parent_graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype' AND fg.fg_number = $fold";
     $result = pg_query($db, $query);
     
@@ -394,6 +399,7 @@ $app->get('/linnot/:pdbid/:chain/:graphtype/:fold/:linnot', function ($pdbid, $c
 
 // get all chain names of a protein (PDB file)
 $app->get('/chains/:pdbid', function ($pdbid) use($db) {
+    $pdbid = strtolower($pdbid);
     $query = "SELECT c.chain_name FROM plcc_chain c INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id WHERE c.pdb_id = '$pdbid' ORDER BY chain_name ";
     $result = pg_query($db, $query);
     

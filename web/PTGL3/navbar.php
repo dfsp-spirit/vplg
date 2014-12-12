@@ -41,6 +41,9 @@
 								<a href="motif_overview.php"><i class="fa fa-briefcase"></i> Motifs</a>
 							</li>
 							<li>
+								<a href="ptgl_api.php"><i class="fa fa-briefcase"></i> REST API</a>
+							</li>
+							<li>
 								<a href="publications.php"><i class="fa fa-copy"></i> Publications</a>
 							</li>
 							<li>
