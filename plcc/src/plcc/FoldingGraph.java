@@ -40,7 +40,7 @@ import org.w3c.dom.Document;
 import tools.DP;
 
 /**
- *
+ * A folding graph is a connected component of a protein graph.
  * @author ts
  */
 public class FoldingGraph extends SSEGraph {
@@ -54,6 +54,7 @@ public class FoldingGraph extends SSEGraph {
     public static final String FG_NOTATION_ADJ = "ADJ";
     public static final String FG_NOTATION_RED = "RED";
     public static final String FG_NOTATION_SEQ = "SEQ";
+    public static final String FG_NOTATION_DEF = "DEF";
 
     /** Names for the folds (folding graphs) by index of the CC. The first CC is called 'A', the second 'B', and so on. */
     public static final String foldNames = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
@@ -78,8 +79,7 @@ public class FoldingGraph extends SSEGraph {
     private ArrayList<Integer> vertexIndicesInParentGraph = null;
     private ArrayList<Integer> vertexIndicesInADJandSEQfgs = null;
     
-    /** Whether this FG contains the additional vertices required for ADJ and SEQ notations (as opposed to those vertices for RED and KEY). */
-    private Boolean isForADJandSEQNotations;
+    
     
     /**
      * Constructor. Requires a list of SSEs that will be represented by the vertices of the graph.

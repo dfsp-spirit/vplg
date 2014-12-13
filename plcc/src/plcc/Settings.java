@@ -300,6 +300,7 @@ public class Settings {
         defSet("plcc_B_foldgraphtype_ADJ", "true", "Determines whether ADJ notation of folding graphs is calculated and drawn (only applies if 'plcc_B_folding_graphs' is 'true').");
         defSet("plcc_B_foldgraphtype_RED", "true", "Determines whether RED notation of folding graphs is calculated and drawn (only applies if 'plcc_B_folding_graphs' is 'true').");
         defSet("plcc_B_foldgraphtype_SEQ", "true", "Determines whether SEQ notation of folding graphs is calculated and drawn (only applies if 'plcc_B_folding_graphs' is 'true').");
+        defSet("plcc_B_foldgraphtype_DEF", "true", "Determines whether DEF notation of folding graphs is calculated and drawn (only applies if 'plcc_B_folding_graphs' is 'true').");
         
         // SSE graphs: alpha, beta, albe (=alpha+beta), alphalig, betalig, albelig
         defSet("plcc_B_calc_draw_graphs", "true", "Whether the SSE graphs are calculated.");

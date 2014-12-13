@@ -2585,6 +2585,7 @@ public class Main {
             if(Settings.getBoolean("plcc_B_foldgraphtype_ADJ")) { notations.add(FoldingGraph.FG_NOTATION_ADJ); }
             if(Settings.getBoolean("plcc_B_foldgraphtype_RED")) { notations.add(FoldingGraph.FG_NOTATION_RED); }
             if(Settings.getBoolean("plcc_B_foldgraphtype_SEQ")) { notations.add(FoldingGraph.FG_NOTATION_SEQ); }                                                                        
+            if(Settings.getBoolean("plcc_B_foldgraphtype_SEQ")) { notations.add(FoldingGraph.FG_NOTATION_DEF); }
             
             // We may need to write the folding graph to the database
             Long fgDbId = -1L;
@@ -2689,6 +2690,9 @@ public class Main {
                         }
                         else if(notation.equals(FoldingGraph.FG_NOTATION_KEY)) {                            
                             filesByFormatCurNotation = SSEGraph.drawFoldingGraphKEY(fgFile, false, formats, pnfr);                                                                            
+                        }
+                        else if(notation.equals(FoldingGraph.FG_NOTATION_DEF)) {                            
+                            filesByFormatCurNotation = SSEGraph.drawFoldingGraphDEF(fgFile, false, formats, pnfr);                                                                            
                         }
 
                         drawingSucceeded = ( ! filesByFormatCurNotation.isEmpty());                                                

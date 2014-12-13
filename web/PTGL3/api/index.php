@@ -106,13 +106,15 @@ $app->get(
             <section>
                 <h2>Basics</h2>
                 This is a REST API, and you can query it with any HTTP client. There are specialized REST clients, but something like curl will do in principle. Of course, you can query this API with a programming language of your choice.
+				We have <a href="#example_restclient_code">some example PHP code to access the API here</a>. 
 				<br><br>
 				All data is served in JavaScript Object Notation (JSON) format. For graph data, you can chose between Graph Modelling Language (GML) format and JSON format.				 								
             </section>
             <section>
                 <h2>Data available via the API</h2>
                 <p>
-                You can retrieve protein graph and folding graph data in GML and JSON formats. You can also retrieve the linear notation of a folding graph as a string.
+                You can retrieve protein graph (PG) and folding graph (FG) data in GML and JSON formats. You can also retrieve the linear notations (linnots) of a folding graph as a string. It is also possible to retrieve
+				the graph images -- both the PG visualization and the 4 different linnot visualizations.
                 </p>
                 <p>
                 The PTGL is a protein topology database which works
@@ -128,6 +130,7 @@ $app->get(
                 <h2>Addressing data</h2>
                 <p>
 				
+				<h3>Protein graphs and their visualization</h3>
                 The data is addressed by the following information for a <b>Protein graph</b>:
 				<br><br>
 				<i>/pg/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;/&lt;format&gt;</i>
@@ -141,6 +144,7 @@ $app->get(
                 </ul>
 								
                 <br><br>
+				<h3>Folding graphs and their visualization</h3>
                 A <b>Folding graph</b> (FG) is a single connected component of a protein graph (PG). To address a folding graph, you need:
 				Folding graph query format: 
 				<br><br>
@@ -152,7 +156,8 @@ $app->get(
                 </ul>
                 
 				<br><br>
-                A folding graph can be described by 4 different <b>linear notation</b> strings. To address a linear notation, you need:
+				<h3>Linear notations and their visualizations</h3>
+                There exist 4 different <b>linear notation</b> strings to describe the same folding graph. Each of them has a diffenerent visualization. To address a linear notation, you need:
 				<br><br>
 				<i>/linnot/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;/&lt;fold&gt;/&lt;linnot&gt;</i> 
 				<br><br>
@@ -208,14 +213,14 @@ $app->get(
 						
 					    <ul>
 						<li>format: <i>/chains/&lt;pdbid&gt;</i> </li>
-			            <li>example: <i><a href="http://127.0.0.1/api/index.php/chains/7tim" target="_blank">/api/index.php/chains/7tim/</a></i> retrieves all available chain names of all chains of 7tim. This is a list of strings, the format is always JSON.</li>
+			            <li>example: <i><a href="http://127.0.0.1/api/index.php/chains/7tim" target="_blank">/api/index.php/chains/7tim/</a></i> retrieves all available chain names of all chains of 7tim. This is a list of strings, the format is always JSON. Output would be ["A", "B"] for this example.</li>
 						</ul>
 						
 						All folding graph numbers of a protein graph:
 						<br>
 					    <ul>
 						<li>format: <i>/folds/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;</i></li>
-			            <li>example: <i><a href="http://127.0.0.1/api/index.php/folds/7tim/A/albe" target="_blank">/api/index.php/folds/7tim/A/albe</a></i> retrieves all available fold numbers of the albe graph of 7tim chain A. This is a list of integers, the format is always JSON.</li>
+			            <li>example: <i><a href="http://127.0.0.1/api/index.php/folds/7tim/A/albe" target="_blank">/api/index.php/folds/7tim/A/albe</a></i> retrieves all available fold numbers of the albe graph of 7tim chain A. This is a list of integers, the format is always JSON. Output would be [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] for this example.</li>
 						</ul>
 
                 </p>                
