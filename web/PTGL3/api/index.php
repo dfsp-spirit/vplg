@@ -129,43 +129,75 @@ $app->get(
             <section>
                 <h2>Addressing data</h2>
                 <p>
+				Learn howto address: <a href=#address_pg">Protein graphs</a> |  <a href="#address_fg">Folding graphs</a> | <a href="#address_linnot">Linear notations</a>
+				<br>
 				
-				<h3>Protein graphs and their visualization</h3>
+				<a name="address_pg"></a>
+				<h3>Addressing Protein graphs and their visualization</h3>
                 The data is addressed by the following information for a <b>Protein graph</b>:
 				<br><br>
-				<i>/pg/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;/&lt;format&gt;</i>
-				<br>
-				 
+				<i>/<b>pg</b>/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;/&lt;graphformat&gt;</i>
+				<br><br>				 
                 <ul>
                 <li>&lt;pdbid&gt; an <a href="http://www.rcsb.org/pdb/" target="_blank">RCSB PDB</a> identifier for a protein (4 letter RCSB PDB protein code, e.g., <a href="http://www.rcsb.org/pdb/explore/explore.do?structureId=7tim" target="_blank">7tim</a>.)</li>
                 <li>&lt;chain&gt; a PDB chain name (1 letter RCSB PDB chain name, e.g., A). See the <a href="#metadata">metadata section</a> to learn how to find all valid chain names for a certain protein.</li>
                 <li>&lt;graphtype&gt; a graph type (PTGL graph type name. The following 6 values are valid: alpha, beta, albe, alphalig, betalig, albelig)</li>
-				<li>&lt;format&gt; a file format (The following 2 values are valid: gml, json)</li>
+				<li>&lt;graphformat&gt; a graph file format (The following 2 values are valid: gml, json)</li>
                 </ul>
-								
+				<br>You can also get the <b>visualization of a protein graph</b> as an image:
+				<br><br>
+				<i>/<b>pgvis</b>/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;/&lt;imageformat&gt;</i>
+				<br>
+				<br> You need all the info from the PG except for the &lt;graphformat&gt;, plus the following extra information:
+				<ul>
+				<li>&lt;imageformat&gt; an image file format (The following 2 values are valid: png, svg)</li>
+                </ul>
+							
+
+							
                 <br><br>
-				<h3>Folding graphs and their visualization</h3>
+				<a name="address_fg"></a>
+				<h3>Addressing Folding graphs and their visualization</h3>
                 A <b>Folding graph</b> (FG) is a single connected component of a protein graph (PG). To address a folding graph, you need:
 				Folding graph query format: 
 				<br><br>
-				<i>/fg/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;/&lt;fold&gt;/&lt;format&gt;</i> 
+				<i>/<b>fg</b>/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;/&lt;fold&gt;/&lt;graphformat&gt;</i> 
 				<br><br>
                 <ul>
                 <li>all the data for a protein graph (see above) and</li>
                 <li>&lt;fold&gt; the fold number, an integer equal to or greater than zero. See the <a href="#metadata">metadata section</a> to learn how to find all valid chain names for a certain protein.</li>
                 </ul>
-                
+                <br>You can also get the <b>visualization of a folding graph</b> as an image:
 				<br><br>
-				<h3>Linear notations and their visualizations</h3>
+				<i>/<b>fgvis</b>/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;/&lt;fold&gt;/&lt;imageformat&gt;</i>
+				<br>
+				<br> You need all the info from the FG except for the &lt;graphformat&gt;, plus the following extra information:
+				<ul>
+				<li>&lt;imageformat&gt; an image file format (The following 2 values are valid: png, svg)</li>
+                </ul>
+				
+				
+				
+				
+				<br><br>
+				<a name="address_linnot"></a>
+				<h3>Addressing Linear notations and their visualizations</h3>
                 There exist 4 different <b>linear notation</b> strings to describe the same folding graph. Each of them has a diffenerent visualization. To address a linear notation, you need:
 				<br><br>
-				<i>/linnot/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;/&lt;fold&gt;/&lt;linnot&gt;</i> 
+				<i>/<b>linnot</b>/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;/&lt;fold&gt;/&lt;linnot&gt;</i> 
 				<br><br>
                 <ul>
                 <li>all the data for a folding graph (see above) and</li>
                 <li>&lt;linnot&gt; the linear notation name (The following 4 values are valid: adj, red, seq, key)</li>
                 </ul>
-                
+                <br>You can also get the <b>visualization of a linear notation</b> as an image:
+				<br><br>
+				<i>/<b>linnotvis</b>/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;/&lt;fold&gt;/&lt;linnot&gt;/&lt;imageformat&gt;</i>
+				<br>
+				<br> You need all the info from the linnot, plus the following extra information:
+				<ul>
+				<li>&lt;imageformat&gt; an image file format (The following 2 values are valid: png, svg)</li>
+                </ul>
                 Note that the KEY notation is not defined for bifurcated graphs and may thus return the empty string for a fold.
                 
                 </p>
@@ -182,6 +214,7 @@ $app->get(
 					    <ul>
 		                    <li><i><a href="http://127.0.0.1/api/index.php/pg/7tim/A/albe/json" target="_blank">/api/index.php/pg/7tim/A/albe/json</a></i> retrieves the albe (alpha-beta) graph of PDB 7TIM, chain A in JSON format. </li>
 			                <li><i><a href="http://127.0.0.1/api/index.php/pg/7tim/A/albe/gml" target="_blank">/api/index.php/pg/7tim/A/albe/gml</a></i> retrieves the same protein graph in GML format. </li>
+							<li><i><a href="http://127.0.0.1/api/index.php/pgvis/7tim/A/albe/png" target="_blank">/api/index.php/pgvis/7tim/A/albe/png</a></i> retrieves the same protein graph's visualization in PNG format. </li>
 			            </ul>
 						
 						
@@ -189,11 +222,13 @@ $app->get(
 					    <ul>
 						<li><i><a href="http://127.0.0.1/api/index.php/fg/7tim/A/albe/0/json" target="_blank">/api/index.php/fg/7tim/A/albe/0/json</a></i> retrieves the folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A in JSON format. </li>
 		                <li><i><a href="http://127.0.0.1/api/index.php/fg/7tim/A/albe/0/gml" target="_blank">/api/index.php/fg/7tim/A/albe/0/gml</a></i> retrieves the same folding graph in GML format. </li>
+						<li><i><a href="http://127.0.0.1/api/index.php/fgvis/7tim/A/albe/0/png" target="_blank">/api/index.php/fgvis/7tim/A/albe/0/png</a></i> retrieves the same folding graph's visualization in PNG format. </li>
 						</ul>
 			
 			            Linear notations:
 					    <ul>
 		                <li><i><a href="http://127.0.0.1/api/index.php/linnot/7tim/A/albe/0/adj"  target="_blank">api/index.php/linnot/7tim/A/albe/0/adj</a></i> retrieves the ADJ linear notation of folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A. This is a string in JSON format. </li>
+						<li><i><a href="http://127.0.0.1/api/index.php/linnotvis/7tim/A/albe/0/adj/png"  target="_blank">api/index.php/linnotvis/7tim/A/albe/0/adj/png</a></i> retrieves the visualization of the ADJ linear notation of folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A. This is an image in PNG format. </li>
 			            </ul>
 						
 						
@@ -422,11 +457,11 @@ $app->get('/fg/:pdbid/:chain/:graphtype/:fold/:graphformat', function ($pdbid, $
 });
 
 
-// get a single folding graph visualization as an image -- this is a convenience method only, it is the same as requesting the adj linnot visualization of the FG
+// get a single folding graph visualization as an image -- this requests the DEF linnot visualization of the FG
 $app->get('/fgvis/:pdbid/:chain/:graphtype/:fold/:imageformat', function ($pdbid, $chain, $graphtype, $fold, $imageformat) use($db, $app) {        
 	$pdbid = strtolower($pdbid);
-	$linnot = 'adj';
-	$query = "SELECT ln.linnot_id, ln.filepath_linnot_image_adj_svg, ln.filepath_linnot_image_adj_png,  ln.filepath_linnot_image_red_svg, ln.filepath_linnot_image_red_png, ln.filepath_linnot_image_seq_svg, ln.filepath_linnot_image_seq_png, ln.filepath_linnot_image_key_svg, ln.filepath_linnot_image_key_png FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph g ON fg.parent_graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype' AND fg.fg_number = $fold";
+	$linnot = 'def';
+	$query = "SELECT ln.linnot_id, ln.filepath_linnot_image_def_svg, ln.filepath_linnot_image_def_png FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph g ON fg.parent_graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype' AND fg.fg_number = $fold";
     $result = pg_query($db, $query);
     
     $num_res = 0;

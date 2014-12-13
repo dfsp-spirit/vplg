@@ -4992,7 +4992,7 @@ E	3	3	3
 
             // check width of header string
             String proteinHeader = "The DEF " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
-            //String notation = "ADJ notation: '" + pnfr.adjNotation + "'";
+            String defNote = "Vertices and edges drawn in gray belong to the parent protein graph.";
             //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
             Integer stringHeight = fontMetrics.getAscent();
             String sseNumberSeq;    // the SSE number in the primary structure, N to C terminus
@@ -5001,7 +5001,7 @@ E	3	3	3
 
             if(Settings.getBoolean("plcc_B_graphimg_header")) {
                 ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
-                //ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);                
+                ig2.drawString(defNote, pl.headerStart.x, pl.headerStart.y + lineHeight);                
             }
 
             // ------------------------- Draw the graph -------------------------
