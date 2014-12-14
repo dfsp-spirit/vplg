@@ -40,7 +40,7 @@ $app->get(
     <html>
         <head>
             <meta charset="utf-8"/>
-            <title>PTGL API</title>
+            <title>PTGL 3.0 REST API</title>
             <style>
                 html,body,div,span,object,iframe,
                 h1,h2,h3,h4,h5,h6,p,blockquote,pre,
@@ -108,7 +108,7 @@ $app->get(
                 This is a REST API, and you can query it with any HTTP client. There are specialized REST clients, but something like curl will do in principle. Of course, you can query this API with a programming language of your choice.
 				We have <a href="#example_restclient_code">some example PHP code to access the API here</a>. 
 				<br><br>
-				All data is served in JavaScript Object Notation (JSON) format. For graph data, you can chose between Graph Modelling Language (GML) format and JSON format.				 								
+				All data is served in JavaScript Object Notation (JSON) format. For graph data, you can chose between Graph Modelling Language (GML) format and JSON format. Images are available in PNG and SVG formats.				 								
             </section>
             <section>
                 <h2>Data available via the API</h2>
@@ -129,6 +129,8 @@ $app->get(
             <section>
                 <h2>Addressing data</h2>
                 <p>
+				All data must be retrieved via GET. Atm, no authentication is required to access the API.
+				<br><br>
 				Learn howto address: <a href=#address_pg">Protein graphs</a> |  <a href="#address_fg">Folding graphs</a> | <a href="#address_linnot">Linear notations</a>
 				<br>
 				
@@ -167,7 +169,8 @@ $app->get(
                 <li>all the data for a protein graph (see above) and</li>
                 <li>&lt;fold&gt; the fold number, an integer equal to or greater than zero. See the <a href="#metadata">metadata section</a> to learn how to find all valid chain names for a certain protein.</li>
                 </ul>
-                <br>You can also get the <b>visualization of a folding graph</b> as an image:
+                <br>You can also get the <b>visualization of a folding graph</b> as an image. This will return the new DEF folding graph visualization, which shows the folding graph within the parent protein graph: the
+				vertices and edges of the FG are colored, while the other (PG-only) vertices and edges are drawn in gray. See <a href="#address_linnot">addressing Linear notations</a> below if you want the ADJ, RED, SEQ or KEY notation visualization of the FG instead.
 				<br><br>
 				<i>/<b>fgvis</b>/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;/&lt;fold&gt;/&lt;imageformat&gt;</i>
 				<br>
@@ -222,7 +225,7 @@ $app->get(
 					    <ul>
 						<li><i><a href="http://127.0.0.1/api/index.php/fg/7tim/A/albe/0/json" target="_blank">/api/index.php/fg/7tim/A/albe/0/json</a></i> retrieves the folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A in JSON format. </li>
 		                <li><i><a href="http://127.0.0.1/api/index.php/fg/7tim/A/albe/0/gml" target="_blank">/api/index.php/fg/7tim/A/albe/0/gml</a></i> retrieves the same folding graph in GML format. </li>
-						<li><i><a href="http://127.0.0.1/api/index.php/fgvis/7tim/A/albe/0/png" target="_blank">/api/index.php/fgvis/7tim/A/albe/0/png</a></i> retrieves the same folding graph's visualization in PNG format. </li>
+						<li><i><a href="http://127.0.0.1/api/index.php/fgvis/7tim/A/albe/0/png" target="_blank">/api/index.php/fgvis/7tim/A/albe/0/png</a></i> retrieves the same folding graph's DEF visualization in PNG format. </li>
 						</ul>
 			
 			            Linear notations:

@@ -518,6 +518,25 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         ig2.fill(circle);
     }
     
+    /**
+     * Draws the 3 symbols for parent graph SSEs (gray alpha/strand/ligand).
+     * @param ig2 the SVGGraphics2D object on which to draw
+     * @param startPos the start position where to draw
+     * @param pl the PageLayout to use (determines the width and height)
+     */
+    protected void drawSymbolsParentSSEs(SVGGraphics2D ig2, Position2D startPos, PageLayout pl) {
+        ig2.setStroke(new BasicStroke(2));
+        ig2.setPaint(Color.GRAY);
+        Ellipse2D.Double circle = new Ellipse2D.Double(startPos.x, startPos.y, pl.getVertDiameter(), pl.getVertDiameter());
+        ig2.fill(circle);
+        Rectangle2D.Double rect = new Rectangle2D.Double(startPos.x + 25, startPos.y, pl.getVertDiameter(), pl.getVertDiameter());
+        ig2.fill(rect);
+        ig2.setStroke(new BasicStroke(3));
+        Ellipse2D.Double circle2 = new Ellipse2D.Double(startPos.x + 50, startPos.y, pl.getVertDiameter(), pl.getVertDiameter());
+        ig2.draw(circle2);
+        ig2.setStroke(new BasicStroke(2));
+    }
+    
     
     
     
@@ -636,6 +655,149 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
             ig2.drawString(label, pixelPosX, startPos.y);
             pixelPosX += fontMetrics.stringWidth(label) + spacer;        
         }
+        
+        // end label
+        if(g.numVertices() > 0) {
+            label = "]";
+            ig2.setPaint(Color.BLACK);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;    
+        }
+        
+        return(pixelPosX);
+    }
+    
+    /**
+     * Draws the legend for the graph at the given position. This legend is not suitable for SEQ folding graphs, because their edges are different.
+     * This is a special version for DEF and ADJ graphs, which adds the gray vertices and labels them as parent graph vertices.
+     * @param ig2 the SVGGraphics2D object on which to draw
+     * @param startPos the start position (x, y) where to start drawing
+     * @return the x coordinate in the image where the legend ends (which is the left margin + the legend width). 
+     * This can be used to determine the minimal width of the total image (it has to be at least this value).
+     */
+    public static Integer drawLegendDEF(SVGGraphics2D ig2, Position2D startPos, PageLayout pl, SSEGraph g) {
+        
+        Boolean drawAll = Settings.getBoolean("plcc_B_graphimg_legend_always_all");
+        
+        // prepare stuff
+        ig2.setFont(pl.getLegendFont());
+        FontMetrics fontMetrics = ig2.getFontMetrics();
+        ig2.setStroke(new BasicStroke(2));
+        ig2.setPaint(Color.BLACK);
+        
+        Integer spacer = 10;
+        Integer pixelPosX = startPos.x;
+        Integer vertWidth = pl.getVertDiameter();
+        Integer vertOffset = pl.getVertDiameter() / 4 * 3;
+        String label;
+        
+        // Edges label
+        if(g.numEdges() > 0) {
+            label = "[Edges: ";
+            ig2.setPaint(Color.BLACK);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;        
+        }
+        
+        // now go through relative orientation texts and colors        
+        if(g.containsContactTypeParallel() || drawAll) {
+            label = "parallel";
+            ig2.setPaint(Color.RED);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
+        
+        if(g.containsContactTypeAntiparallel() || drawAll) {
+            label = "antiparallel";
+            ig2.setPaint(Color.BLUE);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
+        
+        if(g.containsContactTypeMixed() || drawAll) {
+            label = "mixed";
+            ig2.setPaint(Color.GREEN);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
+        
+        if(g.containsContactTypeLigand() || drawAll) {
+            label = "ligand";
+            ig2.setPaint(Color.MAGENTA);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
+        
+        //if(g.containsContactTypeLigand() || drawAll) {
+            label = "parent";
+            ig2.setPaint(Color.GRAY);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        //}
+        
+        if(g.chainEnd.size()>0 || drawAll) {
+            label = "interchain";
+            ig2.setPaint(Color.PINK);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
+        
+        // End of edges label
+        if(g.numEdges() > 0) {
+            label = "]";
+            ig2.setPaint(Color.BLACK);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
+        
+        // Vertices label
+        if(g.numVertices() > 0) {
+            label = " [Vertices: ";
+            ig2.setPaint(Color.BLACK);
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;        
+        }
+        
+        // ok, now draw the SSE symbols     
+        if(g.containsSSETypeHelix() || drawAll) {
+            g.drawSymbolAlphaHelix(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+            pixelPosX += vertWidth + spacer;
+            label = "helix";
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
+        
+        if(g.containsSSETypeBetaStrand() || drawAll) {
+            g.drawSymbolBetaStrand(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+            pixelPosX += vertWidth + spacer;
+            label = "strand";
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
+        
+        if(g.containsSSETypeLigand() || drawAll) {
+            g.drawSymbolLigand(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+            pixelPosX += vertWidth + spacer;
+            label = "ligand";
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        }
+        
+        if(g.containsSSETypeOther() || drawAll) {
+            g.drawSymbolOtherSSE(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+            pixelPosX += vertWidth + spacer;
+            label = "other";
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;        
+        }
+        
+        //if(g.containsSSETypeOther() || drawAll) {
+            g.drawSymbolsParentSSEs(ig2, new Position2D(pixelPosX, startPos.y - vertOffset), pl);
+            pixelPosX += vertWidth + spacer + 50;   // the last added constant is because these are 3 symbols instead of 1
+            label = "parent";
+            ig2.drawString(label, pixelPosX, startPos.y);
+            pixelPosX += fontMetrics.stringWidth(label) + spacer;        
+        //}
         
         // end label
         if(g.numVertices() > 0) {
@@ -4992,7 +5154,7 @@ E	3	3	3
 
             // check width of header string
             String proteinHeader = "The DEF " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
-            String defNote = "Vertices and edges drawn in gray belong to the parent protein graph.";
+            //String defNote = "Vertices and edges drawn in gray belong to the parent protein graph.";
             //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
             Integer stringHeight = fontMetrics.getAscent();
             String sseNumberSeq;    // the SSE number in the primary structure, N to C terminus
@@ -5001,7 +5163,7 @@ E	3	3	3
 
             if(Settings.getBoolean("plcc_B_graphimg_header")) {
                 ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
-                ig2.drawString(defNote, pl.headerStart.x, pl.headerStart.y + lineHeight);                
+                //ig2.drawString(defNote, pl.headerStart.x, pl.headerStart.y + lineHeight);                
             }
 
             // ------------------------- Draw the graph -------------------------
@@ -5199,7 +5361,7 @@ E	3	3	3
                 }
 
                 if(Settings.getBoolean("plcc_B_graphimg_legend")) {
-                    SSEGraph.drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4)), pl, fg);
+                    SSEGraph.drawLegendDEF(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4)), pl, fg);
                 }
             
             }
