@@ -1648,6 +1648,31 @@ connection.close();
 
     }
     
+    public static void main(String[] argv) {
+        Boolean silent = false;
+        Settings.init();
+        int numSettingsLoaded = Settings.load("");
+        if(DBManager.initUsingDefaults()) {
+                if(! silent) {
+                    System.out.println("  -> Database connection OK.");
+                    
+                    Long chainDBID = DBManager.getDBChainID("7tim", "A");
+                    if(DBManager.chainContainsMotif_RossmanFold(chainDBID)) {
+                        System.out.println("its in there!");
+                    }
+                    else {
+                        System.out.println("Nope");
+                    }
+                    
+                }
+            }
+            else {
+                System.out.println("  -> Database connection FAILED.");
+                DP.getInstance().w("Could not establish database connection, not writing anything to the DB.");
+                Settings.set("plcc_B_useDB", "false");
+            }
+        System.out.println("Hello");
+    }
     
     /**
      * Checks whether the chain contains an up and down barrel motif. These checks consider the different linear notations of several graph types.

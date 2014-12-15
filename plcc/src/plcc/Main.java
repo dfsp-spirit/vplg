@@ -138,6 +138,7 @@ public class Main {
             DP.getInstance().w("INFO: The Java classloader path is set to: '" + System.getProperty("java.class.path") + "'.");
         }
 
+        
         int numSettingsLoaded = Settings.load("");
         if(numSettingsLoaded > 0) {             // Empty string means that the default file of the Settings class is used
             outputToBePrintedUnlessSilent.append("  Loaded ").append(numSettingsLoaded).append(" settings from properties file.\n");

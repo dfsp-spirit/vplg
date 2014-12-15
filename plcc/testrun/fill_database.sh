@@ -9,7 +9,7 @@
 RUN_GRAPHLETANALYSER="YES"
 
 
-PLCC_OPTIONS="-u -f -k -s --silent --cluster"
+PLCC_OPTIONS="-u -f -k -s"
 PLCC_RUNS_IN_SUBDIR_TREE_MODE="YES"
 ## IMPORTANT: set this to "YES" if plcc is run with '-k' / '--output-subdir-tree'
 
