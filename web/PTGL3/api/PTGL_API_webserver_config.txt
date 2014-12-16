@@ -1,0 +1,29 @@
+You need:
+ * Apache2 with 
+     - mod_php5 
+     - mod_rewrite
+     
+ * The .htaccess file present in the base dir (api/), which sets stuff for Slim (see Slim docs or here):
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [QSA,L]
+     
+  * Allow setting rewriteEngine commands in the director (in the apache2 system cfg files)   
+  <Directory "/path/to/my_ptgl3_web_dir/api">
+        AllowOverride All
+        Order allow,deny
+        Allow from all
+    </Directory>
+     
+  Ensure the Apache mods are enabled:
+    # a2enmod rewrite
+    ...
+    
+  Also check in sysconfig:
+    # grep "^APACHE_MODULES" /etc/sysconfig/apache2
+    
+  Then restart apache2:
+    # service apache2 restart
+    
+    
+ This is based on Slim docs at http://docs.slimframework.com/

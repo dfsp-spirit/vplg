@@ -31,16 +31,21 @@ $app->setName('ptgl3api');
  * is an anonymous function.
  */
 
+//$ptgl_base_url = "http://ptgl.uni-frankfurt.de";
+$server_name = "PTGL";
+$ptgl_base_url = "http://127.0.0.1/~ts/PTGL3";
+$ptgl_api_url = $ptgl_base_url . "/api/index.php";
+ 
 // GET route
 $app->get(
     '/',
-    function () {
+    function () use($server_name, $ptgl_base_url, $ptgl_api_url) {
         $template = <<<EOT
 <!DOCTYPE html>
     <html>
         <head>
             <meta charset="utf-8"/>
-            <title>PTGL 3.0 REST API</title>
+            <title>$server_name REST API</title>
             <style>
                 html,body,div,span,object,iframe,
                 h1,h2,h3,h4,h5,h6,p,blockquote,pre,
@@ -86,20 +91,20 @@ $app->get(
         </head>
         <body>
             <header>
-                <title>PTGL API</title>
+                <title>$server_name API</title>
             </header>
-            <h1>Welcome to the PTGL 3.0 API</h1>
+            <h1>Welcome to the $server_name API</h1>
 			
 			<a href=#basics">Basics</a> | <a href="#addressing">Addressing data</a> | <a href="#examples">Usage Examples</a> | <a href="#metadata">Metadata queries</a> | <a href="#example_restclient_code">Example API client code</a> | <a href="#help">Help, comments</a> | <a href="#author">Author</a>
 			
             <p>
 			    <br>
-                The PTGL Application Programming Interface (API) allows you to quickly retrieve data from the PTGL programmatically. This page explains
+                The $server_name Application Programming Interface (API) allows you to quickly retrieve data from the $server_name programmatically. This page explains
                 how to use the API.
 				<br><br>
 				A typical use case is that you want more data than you are willing to download manually by clicking in your web browser. You may, for example, have a list of 250 PDB chains, and you want the albe protein graphs for all of them in GML format.
 				<br><br>
-				If you are not a programmer, you may prefer the <a href="../" target="_blank">HTML interface of the PTGL 3</a>.
+				If you are not a programmer, you may prefer the <a href="../" target="_blank">HTML interface of the $server_name</a>.
                 
             </p>
 			<a name="basics"></a>
@@ -117,7 +122,7 @@ $app->get(
 				the graph images -- both the PG visualization and the 4 different linnot visualizations.
                 </p>
                 <p>
-                The PTGL is a protein topology database which works
+                The $server_name is a protein topology database which works
                 mainly on the level of a protein chain: a protein graph includes all the secondary structure elements (SSEs) of a chain. (Which SSEs types
                 are included is determined by the graph type, e.g., the alpha graph only contains alpha helices, while the alpha-beta graph contains both alpha helices and beta strands.)
                 </p>
@@ -143,7 +148,7 @@ $app->get(
                 <ul>
                 <li>&lt;pdbid&gt; an <a href="http://www.rcsb.org/pdb/" target="_blank">RCSB PDB</a> identifier for a protein (4 letter RCSB PDB protein code, e.g., <a href="http://www.rcsb.org/pdb/explore/explore.do?structureId=7tim" target="_blank">7tim</a>.)</li>
                 <li>&lt;chain&gt; a PDB chain name (1 letter RCSB PDB chain name, e.g., A). See the <a href="#metadata">metadata section</a> to learn how to find all valid chain names for a certain protein.</li>
-                <li>&lt;graphtype&gt; a graph type (PTGL graph type name. The following 6 values are valid: alpha, beta, albe, alphalig, betalig, albelig)</li>
+                <li>&lt;graphtype&gt; a graph type ($server_name graph type name. The following 6 values are valid: alpha, beta, albe, alphalig, betalig, albelig)</li>
 				<li>&lt;graphformat&gt; a graph file format (The following 2 values are valid: gml, json)</li>
                 </ul>
 				<br>You can also get the <b>visualization of a protein graph</b> as an image:
@@ -215,23 +220,23 @@ $app->get(
 					
                         Protein graphs:
 					    <ul>
-		                    <li><i><a href="http://127.0.0.1/api/index.php/pg/7tim/A/albe/json" target="_blank">/api/index.php/pg/7tim/A/albe/json</a></i> retrieves the albe (alpha-beta) graph of PDB 7TIM, chain A in JSON format. </li>
-			                <li><i><a href="http://127.0.0.1/api/index.php/pg/7tim/A/albe/gml" target="_blank">/api/index.php/pg/7tim/A/albe/gml</a></i> retrieves the same protein graph in GML format. </li>
-							<li><i><a href="http://127.0.0.1/api/index.php/pgvis/7tim/A/albe/png" target="_blank">/api/index.php/pgvis/7tim/A/albe/png</a></i> retrieves the same protein graph's visualization in PNG format. </li>
+		                    <li><i><a href="$ptgl_api_url/pg/7tim/A/albe/json" target="_blank">/api/index.php/pg/7tim/A/albe/json</a></i> retrieves the albe (alpha-beta) graph of PDB 7TIM, chain A in JSON format. </li>
+			                <li><i><a href="$ptgl_api_url/pg/7tim/A/albe/gml" target="_blank">/api/index.php/pg/7tim/A/albe/gml</a></i> retrieves the same protein graph in GML format. </li>
+							<li><i><a href="$ptgl_api_url/pgvis/7tim/A/albe/png" target="_blank">/api/index.php/pgvis/7tim/A/albe/png</a></i> retrieves the same protein graph's visualization in PNG format. </li>
 			            </ul>
 						
 						
 		                Folding graphs:
 					    <ul>
-						<li><i><a href="http://127.0.0.1/api/index.php/fg/7tim/A/albe/0/json" target="_blank">/api/index.php/fg/7tim/A/albe/0/json</a></i> retrieves the folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A in JSON format. </li>
-		                <li><i><a href="http://127.0.0.1/api/index.php/fg/7tim/A/albe/0/gml" target="_blank">/api/index.php/fg/7tim/A/albe/0/gml</a></i> retrieves the same folding graph in GML format. </li>
-						<li><i><a href="http://127.0.0.1/api/index.php/fgvis/7tim/A/albe/0/png" target="_blank">/api/index.php/fgvis/7tim/A/albe/0/png</a></i> retrieves the same folding graph's DEF visualization in PNG format. </li>
+						<li><i><a href="$ptgl_api_url/fg/7tim/A/albe/0/json" target="_blank">/api/index.php/fg/7tim/A/albe/0/json</a></i> retrieves the folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A in JSON format. </li>
+		                <li><i><a href="$ptgl_api_url/fg/7tim/A/albe/0/gml" target="_blank">/api/index.php/fg/7tim/A/albe/0/gml</a></i> retrieves the same folding graph in GML format. </li>
+						<li><i><a href="$ptgl_api_url/fgvis/7tim/A/albe/0/png" target="_blank">/api/index.php/fgvis/7tim/A/albe/0/png</a></i> retrieves the same folding graph's DEF visualization in PNG format. </li>
 						</ul>
 			
 			            Linear notations:
 					    <ul>
-		                <li><i><a href="http://127.0.0.1/api/index.php/linnot/7tim/A/albe/0/adj"  target="_blank">api/index.php/linnot/7tim/A/albe/0/adj</a></i> retrieves the ADJ linear notation of folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A. This is a string in JSON format. </li>
-						<li><i><a href="http://127.0.0.1/api/index.php/linnotvis/7tim/A/albe/0/adj/png"  target="_blank">api/index.php/linnotvis/7tim/A/albe/0/adj/png</a></i> retrieves the visualization of the ADJ linear notation of folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A. This is an image in PNG format. </li>
+		                <li><i><a href="$ptgl_api_url/linnot/7tim/A/albe/0/adj"  target="_blank">api/index.php/linnot/7tim/A/albe/0/adj</a></i> retrieves the ADJ linear notation of folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A. This is a string in JSON format. </li>
+						<li><i><a href="$ptgl_api_url/linnotvis/7tim/A/albe/0/adj/png"  target="_blank">api/index.php/linnotvis/7tim/A/albe/0/adj/png</a></i> retrieves the visualization of the ADJ linear notation of folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A. This is an image in PNG format. </li>
 			            </ul>
 						
 						
@@ -251,14 +256,14 @@ $app->get(
 						
 					    <ul>
 						<li>format: <i>/chains/&lt;pdbid&gt;</i> </li>
-			            <li>example: <i><a href="http://127.0.0.1/api/index.php/chains/7tim" target="_blank">/api/index.php/chains/7tim/</a></i> retrieves all available chain names of all chains of 7tim. This is a list of strings, the format is always JSON. Output would be ["A", "B"] for this example.</li>
+			            <li>example: <i><a href="$ptgl_api_url/chains/7tim" target="_blank">/api/index.php/chains/7tim/</a></i> retrieves all available chain names of all chains of 7tim. This is a list of strings, the format is always JSON. Output would be ["A", "B"] for this example.</li>
 						</ul>
 						
 						All folding graph numbers of a protein graph:
 						<br>
 					    <ul>
 						<li>format: <i>/folds/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;</i></li>
-			            <li>example: <i><a href="http://127.0.0.1/api/index.php/folds/7tim/A/albe" target="_blank">/api/index.php/folds/7tim/A/albe</a></i> retrieves all available fold numbers of the albe graph of 7tim chain A. This is a list of integers, the format is always JSON. Output would be [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] for this example.</li>
+			            <li>example: <i><a href="$ptgl_api_url/folds/7tim/A/albe" target="_blank">/api/index.php/folds/7tim/A/albe</a></i> retrieves all available fold numbers of the albe graph of 7tim chain A. This is a list of integers, the format is always JSON. Output would be [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] for this example.</li>
 						</ul>
 
                 </p>                
@@ -291,7 +296,7 @@ $app->get(
 17
 18
 19</pre></td><td><pre style="margin: 0; line-height: 125%"><span style="color: #557799">&lt;?php</span>
-<span style="color: #996633">&#36;url_linnot</span> <span style="color: #333333">=</span> <span style="background-color: #fff0f0">&#39;http://127.0.0.1/api/index.php/linnot/7tim/A/albe/0/adj&#39;</span>;
+<span style="color: #996633">&#36;url_linnot</span> <span style="color: #333333">=</span> <span style="background-color: #fff0f0">&#39;$ptgl_api_url/linnot/7tim/A/albe/0/adj&#39;</span>;
 <span style="color: #996633">&#36;curl</span> <span style="color: #333333">=</span> <span style="color: #007020">curl_init</span>();
 <span style="color: #007020">curl_setopt</span>(<span style="color: #996633">&#36;curl</span>, CURLOPT_URL, <span style="color: #996633">&#36;url_linnot</span>);
 <span style="color: #007020">curl_setopt</span>(<span style="color: #996633">&#36;curl</span>, CURLOPT_RETURNTRANSFER, <span style="color: #0000DD; font-weight: bold">1</span>);
@@ -318,15 +323,15 @@ $app->get(
             <section style="padding-bottom: 20px">
                 <h2>Comments, questions, bug reports, getting more help</h2>
                 <p>
-                   The PTGL and the data this API serves are based on the VPLG software. If you need more help, you should use the VPLG help options listed at the <a href="https://sourceforge.net/p/vplg/" target="_blank">VPLG sourceforge project page</a>. There is a ticket system and a forum.
+                   The <a href="../" target="_blank">$server_name</a> and the data this API serves are based on the <a href="http://www.bioinformatik.uni-frankfurt.de/tools/vplg/" target="_blank">VPLG software</a>. If you need more help, you should use the VPLG help options listed at the <a href="https://sourceforge.net/p/vplg/" target="_blank">VPLG sourceforge project page</a>. There is a ticket system and a forum.
                 </p>                
             </section>
             
 			<a name="author"></a>
             <section style="padding-bottom: 20px">
-                <h2>Author</h2>
+                <h2>Author, Citing, Contact and Imprint</h2>
                 <p>
-                    The <a href="../" target="_blank">PTGL 3.0</a> REST API was written by <a href="http://rcmd.org/ts/" target="_blank">Tim Schäfer</a> at the <a href="http://www.bioinformatik.uni-frankfurt.de/" target="_blank">MolBI group at Uni Frankfurt, Germany</a>. <br><br><br><a href="../imprint.php" target="_blank">Imprint.</a>					
+                    The <a href="../" target="_blank">$server_name</a> REST API was written by <a href="http://rcmd.org/ts/" target="_blank">Tim Schäfer</a> at the <a href="http://www.bioinformatik.uni-frankfurt.de/" target="_blank">MolBI group at Uni Frankfurt, Germany</a>. <br><br>Please <a href="../citing.php" target="_blank">cite the $server_name</a> if you use this API for scientific work. <br><br><a href="../imprint.php" target="_blank">Imprint.</a>
                 </p>                
             </section>	
 			
