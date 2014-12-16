@@ -63,6 +63,21 @@ function get_query_string($graphtype, $notation, $q_limit, $limit_start){
 	return $query;			
 }
 
+function get_query_string_fast($graphtype, $notation, $q_limit, $limit_start){
+	$query =   "SELECT fglin.ptgl_linnot_%s
+				FROM plcc_fglinnot fglin
+				INNER JOIN plcc_foldinggraph fg
+				  ON fglin.linnot_foldinggraph_id = fg.foldinggraph_id
+				INNER JOIN plcc_graph g
+				  ON fg.parent_graph_id = g.graph_id
+				WHERE g.graph_type = %s
+				ORDER BY fglin.linnot_id ASC
+				LIMIT %d OFFSET %d";
+	
+	$query = sprintf($query, $notation, $graphtype, $q_limit, $limit_start);
+	return $query;			
+}
+
 function get_count_query_string($graphtype, $notation){
 	$query =   "SELECT COUNT(DISTINCT fglin.ptgl_linnot_%s)
 				FROM plcc_fglinnot fglin
@@ -73,6 +88,19 @@ function get_count_query_string($graphtype, $notation){
 				WHERE g.graph_type = %s";
 	
 	$query = sprintf($query, $notation, $graphtype, $notation);
+	return $query;			
+}
+
+function get_count_query_string_fast($graphtype, $notation){
+	$query =   "SELECT COUNT(fglin.ptgl_linnot_%s)
+				FROM plcc_fglinnot fglin
+				INNER JOIN plcc_foldinggraph fg
+				  ON fglin.linnot_foldinggraph_id = fg.foldinggraph_id
+				INNER JOIN plcc_graph g
+				  ON fg.parent_graph_id = g.graph_id
+				WHERE g.graph_type = %s";
+	
+	$query = sprintf($query, $notation, $graphtype);
 	return $query;			
 }
 
@@ -113,14 +141,16 @@ if($valid_values){
 	$conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
 	$db = pg_connect($conn_string);
 		
-	$query = get_query_string($graphtype, $notation, $q_limit, $limit_start);
-	$count_query = get_count_query_string($graphtype, $notation);
+	//$query = get_query_string($graphtype, $notation, $q_limit, $limit_start);
+	//$count_query = get_count_query_string($graphtype, $notation);
+	$query = get_query_string_fast($graphtype, $notation, $q_limit, $limit_start);
+	$count_query = get_count_query_string_fast($graphtype, $notation);
 
 	
 	$count_result = pg_query($db, $count_query);
-	$row_count = pg_fetch_array($count_result, NULL, PGSQL_ASSOC);
-	$row_count = $row_count["count"];
-	
+	//$row_count = pg_fetch_array($count_result, NULL, PGSQL_ASSOC);
+	//$row_count = $row_count["count"];
+	$row_count = 100;
 	$result = pg_query($db, $query);
 	
 	// begin to create pager
