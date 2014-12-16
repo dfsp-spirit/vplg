@@ -10,6 +10,7 @@ ini_set('display_startup_errors', 0);
 ini_set('log_errors', TRUE);
 error_reporting(E_ERROR);
 
+$valid_values = FALSE;
 // get config values
 include('./backend/config.php'); 
 

@@ -22,6 +22,7 @@ if($DEBUG){
 
 // how many notations on one page?...
 $q_limit = 50;
+$valid_values = FALSE;
 
 
 function get_graphtype_abbr($graphtype){
