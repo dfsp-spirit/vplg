@@ -132,7 +132,15 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 	<div id="PageIntro">
 		<div class="container" id="pageintro">
 		<strong>Authors</strong><br>
-		The VPLG software and the database were written and designed by Tim Schäfer. The web interface was written by Daniel Bruneß, Andreas Scheck and Tim Schäfer.
+		The VPLG software, PTGL API and the database were written and designed by Tim Schäfer. The web frontend was written by Daniel Bruneß, Andreas Scheck and Tim Schäfer.
+		
+		<br><br>
+		<strong>Acknowledgement</strong><br>
+
+Calculations on the Odysseus Cluster of the Goethe University - funded
+by the DFG (Deutsche Forschungsgemeinschaft) and OCCB (Organic Chemistry
+and Chemical Biology) - were conducted for this research.<br><br>
+		
 		</div><!-- end container-->
 		</div><!-- end Home -->
 
