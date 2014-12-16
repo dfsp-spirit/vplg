@@ -19,6 +19,8 @@ You need:
     # a2enmod rewrite
     ...
     
+  For the images served by the API, you need the php fileinfo package installed: zypper in php5-fileinfo
+    
   Also check in sysconfig:
     # grep "^APACHE_MODULES" /etc/sysconfig/apache2
     

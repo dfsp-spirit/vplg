@@ -116,10 +116,12 @@ if($valid_values){
 	$query = get_query_string($graphtype, $notation, $q_limit, $limit_start);
 	$count_query = get_count_query_string($graphtype, $notation);
 
-	$result = pg_query($db, $query);
+	
 	$count_result = pg_query($db, $count_query);
 	$row_count = pg_fetch_array($count_result, NULL, PGSQL_ASSOC);
 	$row_count = $row_count["count"];
+	
+	$result = pg_query($db, $query);
 	
 	// begin to create pager
 	$tableString = '<div id="pager">';
