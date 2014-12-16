@@ -177,6 +177,15 @@ if($valid_values){
 	
 	$parameter = "linnot".get_graphtype_abbr($graphtype).$notation;
 	
+	$all_data = pg_fetch_all($result);
+	foreach($all_data as $arr) {
+		$linnot_string = $arr['ptgl_linnot_'.$notation];
+		$tableString .= "<div class='string_row'>";
+		$tableString .= "<a href='search.php?".$parameter."=".$linnot_string."' >". $linnot_string . "</a>";
+		$tableString .= "</div>";
+	}
+	
+	/*
 	while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
 		$linnot_string = $arr['ptgl_linnot_'.$notation];
 
@@ -185,6 +194,7 @@ if($valid_values){
 		$tableString .= "</div>";
 				
 	}
+	*/
 	
 	$tableString .= "</div>";
 
