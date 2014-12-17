@@ -65,7 +65,7 @@ function get_linnot_query_string($linnot_type, $linnot_query_string, $query_grap
 				   INNER JOIN plcc_protein p
 				   ON p.pdb_id = c.pdb_id 
 				   WHERE ( ln.ptgl_linnot_" . $linnot_type . " = " . $tick . "$1" . $tick . " AND pg.graph_type = " . $query_graph_type_int . " )";
-				   
+    echo "wuff";				   
     return $res;
 }
 
