@@ -50,8 +50,8 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 	<div id="Home">
 		<div class="container" id="intro">
 		<!-- Intro message -->
-			The Visualization of Protein-Ligand Graphs (VPLG) web server provides a database of protein secondary structure topologies. It is based on protein ligand graphs computed
-			by the <a href="http://www.bioinformatik.uni-frankfurt.de/tools/vplg/" target="_blank">VPLG software</a>. VPLG uses a graph-based model to describe the structure of proteins on the super-secondary structure level.
+			The <?php echo $SITE_TITLE; ?> web server provides a database of protein secondary structure topologies. It is based on protein ligand graphs computed
+			by the <a href="http://www.bioinformatik.uni-frankfurt.de/tools/vplg/" target="_blank">VPLG software</a>. The <?php echo $SITE_TITLE; ?> uses a graph-based model to describe the structure of proteins on the super-secondary structure level.
 			
 			<!--
 			A protein ligand graph is
@@ -64,7 +64,11 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			<p class="imgCenter"><img src="./images/ptgl_overview_trans.png" width="600"></p>
 			
 			<br /><br />
-			This web server allows you to search for protein motifs which can be detected in the graphs. It also implements graph-based similarity measures to search for protein chains which are similar to a given query protein.
+			This web server allows you to search for protein motifs which can be detected in the graphs. 
+			
+			<?php if($ENABLE_GRAPHLETSIMILARITY_SEARCH) { ?>
+			It also implements graph-based similarity measures to search for protein chains which are similar to a given query protein.
+			<?php } ?>
 			
 		</div><!-- end container-->
 	</div><!-- end Home -->

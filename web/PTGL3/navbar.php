@@ -9,7 +9,7 @@
 				<span class="icon-bar"></span>
 			</button>
 
-			<a href="index.php" class="navbar-brand"><img src="./images/molbi.png" alt="PTGL Logo"></a>
+			<!-- <a href="index.php" class="navbar-brand"><img src="./images/molbi.png" alt="PTGL Logo"></a> -->
 			<div class="nav-collapse collapse navbar-responsive-collapse">
 				<ul class="nav navbar-nav">
 					<li  class="navbarFont">
