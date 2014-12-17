@@ -64,7 +64,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			<p class="imgCenter"><img src="./images/ptgl_overview_trans.png" width="600"></p>
 			
 			<br /><br />
-			This web server allows you to search for protein motifs which can be detected in the graphs. 
+			This web server allows you to search for protein motifs which can be detected in the graphs. It also provides standardized visualizations of protein graphs and folding graphs.
 			
 			<?php if($ENABLE_GRAPHLETSIMILARITY_SEARCH) { ?>
 			It also implements graph-based similarity measures to search for protein chains which are similar to a given query protein.
@@ -185,11 +185,14 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 					   <div class="motiftext">Jelly Roll (<a href="motif_overview.php#jelly">?</a>)</div>
 					   <a href="search.php?motif=jelly"><img class="motifimage" src="./images/jelly_struktur.jpg" /></a></div>		
 
-
+<!--
 					<h4>Alpha Beta Motifs</h4>
+					
 					<div class="motifimagecontainer">
 					   <div class="motiftext">Ubiquitin Roll (<a href="motif_overview.php#ubi">?</a>)</div>
 					   <a href="search.php?motif=ubi"><img class="motifimage" src="./images/ubibeide_struktur.jpg" /></a></div>	
+					
+					
 					<div class="motifimagecontainer">
 					   <div class="motiftext">Alpha-Beta Plait (<a href="motif_overview.php#plait">?</a>)</div>
 					   <a href="search.php?motif=plait"><img class="motifimage" src="./images/plait_struktur.jpg" /></a></div>
@@ -199,6 +202,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 					<div class="motifimagecontainer">
 					   <div class="motiftext">TIM Barrel (<a href="motif_overview.php#tim">?</a>)</div>
 					   <a href="search.php?motif=tim"><img class="motifimage" src="./images/tim_struktur.jpg" /></a></div>	
+					   -->
 
 				</div>
 			</dl>
