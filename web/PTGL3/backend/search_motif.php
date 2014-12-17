@@ -219,7 +219,7 @@ $numberOfChains = 0;
 // begin to create pager
 $tableString = '<div id="pager">';
 if($limit_start >= $q_limit) {
-        $tableString .= '<a class="changepage" href="?next='.($limit_start - $q_limit).'"><< previous </a>  ';
+        $tableString .= '<a class="changepage" href="?motif=' . $motif . '&next='.($limit_start - $q_limit).'"><< previous </a>  ';
 }
 
 $tableString .= '-- Showing result chains '.$limit_start.' to ';
@@ -231,7 +231,7 @@ if($limit_start + $q_limit > $row_count){
 }
 
 if(($limit_start + $q_limit) < $row_count){
-        $tableString .= '<a class="changepage" href="?next='.($limit_start + $q_limit).'"> next >></a>';
+        $tableString .= '<a class="changepage" href="?motif=' . $motif . '&next='.($limit_start + $q_limit).'"> next >></a>';
 }
 $tableString .= '</div>';
 // EOPager
