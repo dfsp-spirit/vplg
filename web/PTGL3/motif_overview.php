@@ -107,7 +107,7 @@ function get_all_motif_names() {
 	          
 	            if( ! $ENABLE_MOTIF_SEARCH_ALPHABETA) {
 	             
-	              if($motif === "propeller" || $motif === "ubi" || $motif === "tim" || $motif === "rossman") {
+	              if($motif === "plait" || $motif === "ubi" || $motif === "tim" || $motif === "rossman") {
 	                  continue;
 	              }
 	            }
