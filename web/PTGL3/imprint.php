@@ -49,13 +49,13 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<br>
 
 		<div id="imprinttext">
-		Johann Wolfgang Goethe-University Frankfurt a. Main <<a href="http://www.uni-frankfurt.de">uni-frankfurt.de</a>><br>
+		Johann Wolfgang Goethe-University Frankfurt am Main <<a href="http://www.uni-frankfurt.de">www.uni-frankfurt.de</a>><br>
 		<br>
 		Faculty of Computer Science and Mathematics, Dept. 12 <br>
 		Institute for Computer Science <br>
-		Molecular Bioinformatics (MBI) <<a href="http://www.bioinformatik.uni-frankfurt.de/">bioinformatik.uni-frankfurt.de</a>><br>
+		Molecular Bioinformatics (MolBI) <<a href="http://www.bioinformatik.uni-frankfurt.de/">www.bioinformatik.uni-frankfurt.de</a>><br>
 		Robert-Mayer-Strasse 11-15 <br>
-		60325 Frankfurt am Main <br>
+		D-60325 Frankfurt am Main <br>
 		Germany  <br>
 		<br>
 		</div>

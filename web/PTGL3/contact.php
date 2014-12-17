@@ -70,11 +70,11 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 				<br>
 				Institute for Computer Science
 				<br>
-				Molecular Bioinformatics (MBI)
+				Molecular Bioinformatics (MolBI)
 				<br>
 				Robert-Mayer-Strasse 11-15
 				<br>
-				60325 Frankfurt am Main
+				D-60325 Frankfurt am Main
 				<br>
 				Germany
 			</div><!-- end leftColumn -->
@@ -105,11 +105,11 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 				<br>
 				Institute for Computer Science
 				<br>
-				Molecular Bioinformatics (MBI)
+				Molecular Bioinformatics (MolBI)
 				<br>
 				Robert-Mayer-Strasse 11-15
 				<br>
-				60325 Frankfurt am Main
+				D-60325 Frankfurt am Main
 				<br>
 				Germany
 			</div><!-- end leftColumn -->

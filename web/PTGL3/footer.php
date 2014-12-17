@@ -18,7 +18,7 @@
 			</div>
 			
 			<div class="col-sm-2">
-				<a class="footerLink" href="http://www.bioinformatik.uni-frankfurt.de" target="_blank">MolBi - Group</a>
+				<a class="footerLink" href="http://www.bioinformatik.uni-frankfurt.de" target="_blank">MolBI Group</a>
 			</div>
 			
 			<div class="col-sm-2">
