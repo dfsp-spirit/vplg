@@ -33,9 +33,11 @@
 							<li>
 								<a href="content.php"><i class="fa fa-briefcase"></i> Content</a>
 							</li>
+							<!--
 							<li>
 								<a href="linearnotations.php"><i class="fa fa-briefcase"></i> Linear notations</a>
 							</li>
+							-->
 							<li>
 								<a href="foldinggraphs.php"><i class="fa fa-briefcase"></i> Folding graph images</a>
 							</li>
