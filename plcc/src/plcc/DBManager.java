@@ -1671,7 +1671,7 @@ connection.close();
                 DP.getInstance().w("Could not establish database connection, not writing anything to the DB.");
                 Settings.set("plcc_B_useDB", "false");
             }
-        System.out.println("Hello");
+       
     }
     
     /**
@@ -2028,11 +2028,95 @@ connection.close();
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
      */
     public static Boolean chainContainsMotif_RossmanFold(Long chain_db_id) {
-        if( ! Settings.getBoolean("plcc_B_no_not_impl_warn")) {
+       /** if( ! Settings.getBoolean("plcc_B_no_not_impl_warn")) {
             DP.getInstance().w("DBManager", "chainContainsMotif_RossmanFold: Not implemented yet, returning false for chain with ID '" + chain_db_id + "'.");
         }
         return false;
+        **/
+        
+    
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+                
+        PreparedStatement statement = null;
+        ResultSet rs = null;             
+        
+        StringBuilder querySB = new StringBuilder();
+       
+        // rossman1.pl
+        querySB.append("SELECT p.pdb_id, c.chain_name, adj, adjpos, red ");
+	querySB.append("FROM plcc_fglinnot ln ");
+	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
+	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
+	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
+	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 2 AND (ln.ptgl_linnot_red LIKE '%3p,-1p,-1p%'  and ln.ptgl_linnot_red not like '%-3p,-1p,-1p%') ) ) ");
+        
+        
+        // order
+        querySB.append("GROUP BY p.pdb_id, c.chain_name, adj, adjpos, red ");
+        
+        String query = querySB.toString();
+        
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, chain_db_id);
+            statement.setLong(2, chain_db_id);
+            statement.setLong(3, chain_db_id);
+            statement.setLong(4, chain_db_id);
+            statement.setLong(5, chain_db_id);
+            
+                                
+            rs = statement.executeQuery();
+            //dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "chainContainsMotif_RossmanFold: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                //dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_RossmanFold: Could not close statement and reset autocommit."); }
+        }
+        
+        // OK, check size of results table
+        if(tableData.size() >= 1) {
+            return true;
+        }
+        else {
+            return(false);
+        }        
+
     }
+    
+    
+    
+    
     
     /**
      * Checks whether the chain contains a TIM-barrel motif. These checks consider the different linear notations of several graph types.
