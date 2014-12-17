@@ -9,12 +9,14 @@
 				<span class="icon-bar"></span>
 			</button>
 
-			<!-- <a href="index.php" class="navbar-brand"><img src="./images/molbi.png" alt="PTGL Logo"></a> -->
+			<!-- <a href="index.php" class="navbar-brand"><img src="./images/ptgl.png" alt="PTGL Logo"></a> -->
 			<div class="nav-collapse collapse navbar-responsive-collapse">
 				<ul class="nav navbar-nav">
+				        
 					<li  class="navbarFont">
 						<a href="index.php">Home</a>
 					</li>
+					
 					<li class="navbarFont">
 						<a href="about.php">About</a>
 					</li>						
@@ -35,7 +37,7 @@
 								<a href="linearnotations.php"><i class="fa fa-briefcase"></i> Linear notations</a>
 							</li>
 							<li>
-								<a href="foldinggraphs.php"><i class="fa fa-briefcase"></i> Folding graphs</a>
+								<a href="foldinggraphs.php"><i class="fa fa-briefcase"></i> Folding graph images</a>
 							</li>
 							<li>
 								<a href="motif_overview.php"><i class="fa fa-briefcase"></i> Motifs</a>
