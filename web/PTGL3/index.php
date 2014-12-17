@@ -185,7 +185,8 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 					   <div class="motiftext">Jelly Roll (<a href="motif_overview.php#jelly">?</a>)</div>
 					   <a href="search.php?motif=jelly"><img class="motifimage" src="./images/jelly_struktur.jpg" /></a></div>		
 
-<!--
+                                        <?php if($ENABLE_MOTIF_SEARCH_ALPHABETA) { ?>
+					   
 					<h4>Alpha Beta Motifs</h4>
 					
 					<div class="motifimagecontainer">
@@ -202,7 +203,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 					<div class="motifimagecontainer">
 					   <div class="motiftext">TIM Barrel (<a href="motif_overview.php#tim">?</a>)</div>
 					   <a href="search.php?motif=tim"><img class="motifimage" src="./images/tim_struktur.jpg" /></a></div>	
-					   -->
+					   <?php } ?>
 
 				</div>
 			</dl>

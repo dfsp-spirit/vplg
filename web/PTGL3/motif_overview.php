@@ -104,8 +104,17 @@ function get_all_motif_names() {
 	          $motif_names = get_all_motif_names();
 	          $all_motif_counts = array();
 	          foreach($motif_names as $motif) {
+	          
+	            if( ! $ENABLE_MOTIF_SEARCH_ALPHABETA) {
+	             
+	              if($motif === "propeller" || $motif === "ubi" || $motif === "tim" || $motif === "rossman") {
+	                  continue;
+	              }
+	            }
+	            
 	            $motif_data = get_motif_data($db, $motif);
-	            $all_motif_counts[$motif] = 0;	            
+	            $all_motif_counts[$motif] = 0;	      	            	            
+	            
 	            if(isset($motif_data['motif_name']) && ( ! empty($motif_data['motif_name']))) {
 	                $all_motif_counts[$motif] = $motif_data['count'];
 	                print "<tr><td>" . $motif_data['motif_name'] . "</td><td>" . $motif_data['motif_abbreviation'] . "</td><td><a href='search.php?motif=" . $motif . "'>" . $motif_data['count'] . "</a></td><td><a href='#" . $motif_data['motif_abbreviation'] ."'>" . $motif . " info</a></td></tr>\n";
@@ -177,7 +186,7 @@ function get_all_motif_names() {
 		    <p><img class="motifimage" src="./images/jelly_struktur.jpg" width="300" /></p>
 		</div>
 		
-		
+		<?php if($ENABLE_MOTIF_SEARCH_ALPHABETA) { ?>
 		<br><br><br><br>
 		<div class="anchor" id="ubi"></div>
 		<div>
@@ -211,6 +220,8 @@ function get_all_motif_names() {
 		    <p>A motif consisting only of both alpha helices and beta strands. Found <?php print $all_motif_counts['tim'];?> times in the current database.</p>
 		    <p><img class="motifimage" src="./images/tim_struktur.jpg" width="300" /></p>
 		</div>
+		
+		<?php } ?>
 		
 										
 </div><!-- end container and contentText -->
