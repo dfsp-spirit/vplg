@@ -30,7 +30,7 @@
 			</div>
 			
 			<div class="col-sm-2">
-				<a href="about.php#linking" class="footerLink">Linking VPLG</a>
+				<a href="about.php#linking" class="footerLink">Linking PTGL</a>
 			</div>
 			
 			<!--
