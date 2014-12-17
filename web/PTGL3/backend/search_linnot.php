@@ -65,7 +65,6 @@ function get_linnot_query_string($linnot_type, $linnot_query_string, $query_grap
 				   INNER JOIN plcc_protein p
 				   ON p.pdb_id = c.pdb_id 
 				   WHERE ( ln.ptgl_linnot_" . $linnot_type . " = " . $tick . "$1" . $tick . " AND pg.graph_type = " . $query_graph_type_int . " )";
-    echo "wuff";				   
     return $res;
 }
 
@@ -427,8 +426,10 @@ pg_query($db, "DEALLOCATE ALL");
 pg_prepare($db, "searchlinnot", $query);
 $result = pg_execute($db, "searchlinnot", $query_parameters);
 
+
 pg_prepare($db, "searchlinnotCount", $count_query);
-$count_result = pg_query($db, "searchlinnotCount", $query_parameters);
+$count_result = pg_execute($db, "searchlinnotCount", $query_parameters);
+
 
 $row_count = pg_fetch_array($count_result, NULL, PGSQL_ASSOC);
 if(isset($row_count["count"])) {
