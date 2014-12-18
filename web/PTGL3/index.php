@@ -70,6 +70,13 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			It also implements graph-based similarity measures to search for protein chains which are similar to a given query protein.
 			<?php } ?>
 			
+			<?php
+			  $tmp_file_dir = './temp_downloads/';
+			  if ( ! is_writable($tmp_file_dir)) {
+			      echo "<p style=\"color:red\">ERROR: Installation incomplete. The temporary file directory is not writable. ZIP file downloads disabled. The server admin needs to fix this.</p>\n";
+			  }
+			?>
+			
 		</div><!-- end container-->
 	</div><!-- end Home -->
 
