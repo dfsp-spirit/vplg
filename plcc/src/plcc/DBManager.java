@@ -2028,12 +2028,12 @@ connection.close();
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
      */
     public static Boolean chainContainsMotif_RossmanFold(Long chain_db_id) {
-       /** if( ! Settings.getBoolean("plcc_B_no_not_impl_warn")) {
+        if( ! Settings.getBoolean("plcc_B_no_not_impl_warn")) {
             DP.getInstance().w("DBManager", "chainContainsMotif_RossmanFold: Not implemented yet, returning false for chain with ID '" + chain_db_id + "'.");
         }
         return false;
-        **/
         
+        /**
     
         ResultSetMetaData md;
         ArrayList<String> columnHeaders;
@@ -2047,7 +2047,7 @@ connection.close();
         StringBuilder querySB = new StringBuilder();
        
         // rossman1.pl
-        querySB.append("SELECT p.pdb_id, c.chain_name, adj, adjpos, red ");
+        querySB.append("SELECT p.pdb_id, c.chain_name, ln.firstvertexpos_adj, ln.ptgl_linnot_adj, ln.ptgl_linnot_red ");
 	querySB.append("FROM plcc_fglinnot ln ");
 	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
 	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
@@ -2057,7 +2057,7 @@ connection.close();
         
         
         // order
-        querySB.append("GROUP BY p.pdb_id, c.chain_name, adj, adjpos, red ");
+        querySB.append("GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red ");
         
         String query = querySB.toString();
         
@@ -2111,7 +2111,9 @@ connection.close();
         else {
             return(false);
         }        
-
+               
+                    
+        }**/
     }
     
     
