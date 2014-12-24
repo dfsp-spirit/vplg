@@ -34,6 +34,7 @@ $USE_LOGIC_OPERATORS	= FALSE;
 $USE_PRECOMPUTED_GRAPHLET_SIMILARITY_DATA_FROM_DB = TRUE;
 //---- End of search settings ----//
 
+$CHECK_INSTALL_ON_FRONTPAGE = TRUE;
 
 //---- File settings ----//
 $BUILD_FILE_PATH	= FALSE;

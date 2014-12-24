@@ -1062,6 +1062,17 @@ table#tblmotifoverview th {
     background-color: black;
 }
 
+
+.boxedgray {
+  border: 1px solid gray;
+  color: gray;
+}
+
+.boxedred {
+  border: 1px solid red;
+  color: red;
+}
+
 	
 @media print {
   * { background: transparent !important; color: black !important; text-shadow: none !important; filter:none !important; -ms-filter: none !important; }

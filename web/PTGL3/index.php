@@ -10,6 +10,12 @@ include('./backend/config.php');
 $title = "The Protein Topology Graph Library";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
+
+function check_install($db)  {
+    
+
+}
+
 ?>
 <html>
 <head>
@@ -70,11 +76,44 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			It also implements graph-based similarity measures to search for protein chains which are similar to a given query protein.
 			<?php } ?>
 			
+			<br>
 			<?php
-			  $tmp_file_dir = './temp_downloads/';
-			  if ( ! is_writable($tmp_file_dir)) {
-			      echo "<p style=\"color:red\">ERROR: Installation incomplete. The temporary file directory is not writable. ZIP file downloads disabled. The server admin needs to fix this.</p>\n";
+			  if($CHECK_INSTALL_ON_FRONTPAGE) {
+			      $conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
+			      $db = pg_connect($conn_string);                          
+			      
+			      $db_ok = $db;
+			      $tmp_dir_ok = is_writable('./temp_downloads/');
+			      $data_ok = is_dir($IMG_ROOT_PATH);
+			      
+			      $num_errors_occured = 0;
+			      if(!$db_ok) { $num_errors_occured++; }
+			      if(!$tmp_dir_ok) { $num_errors_occured++; }
+			      if(!$data_ok) { $num_errors_occured++; }
+			      
+			      			      
+			      if($num_errors_occured > 0) {
+				  echo "\n" . '<br><div class="boxedred">' . "\n<ul>\n";
+				  echo "<p><b>ERROR:</b> Server Installation incomplete,  the server admin needs to fix this. The following $num_errors_occured errors were detected:</p>";
+				
+				  if(! $db_ok) {
+				      echo "<li>The database connection is not configured properly.</li>\n";
+				  }
+				  
+				  // check whether tmp download dir (where the zip files are stored for download) is writable
+				  if ( ! $tmp_dir_ok) {
+				      echo "<li>The temporary file directory is not writable, ZIP file downloads disabled.</li>\n";
+				  }
+				  
+				  // check for existence of image data directory
+				  if ( ! $data_ok) {
+				      echo "<li>The data directory does not exist, graph images and other data missing.</li>\n";
+				  }
+				  
+				  echo "</ul></div><br>\n";
+			      }
 			  }
+	
 			?>
 			
 		</div><!-- end container-->
