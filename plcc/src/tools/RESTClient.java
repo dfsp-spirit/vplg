@@ -70,9 +70,9 @@ public class RESTClient {
      * @return 
      * @throws java.io.IOException 
      */
-    public String doPOSTREQUEST(Map<String,Object> postBody) throws IOException {                
+    public String doRequestPOST(Map<String,Object> postBody, MediaType resultMediaType) throws IOException {                
         
-        ClientResponse response = service.accept(MediaType.APPLICATION_JSON_TYPE).type(MediaType.APPLICATION_JSON_TYPE).post(ClientResponse.class, postBody);
+        ClientResponse response = service.accept(resultMediaType).type(resultMediaType).post(ClientResponse.class, postBody);
 
         // check response status code
         if (response.getStatus() != 200) {
@@ -83,26 +83,25 @@ public class RESTClient {
         return resp;
     }
     
+    
+    /**
+     * Test main class
+     * @param args ignored
+     */
     public static void main(String[] args) {
         
         RESTClient c = new RESTClient("http://ptgl.uni-frankfurt.de", "/api/index.php/");
         
         // test GET
+        String res1 = null;
         try {
-            String res1 = c.doRequestGET("pg/7tim/A/albe/json", MediaType.APPLICATION_JSON_TYPE);
+            res1 = c.doRequestGET("pg/7tim/A/albe/json", MediaType.APPLICATION_JSON_TYPE);
         } catch(IOException e) {
             System.err.println("GET ERROR: " + e.getMessage());
         }
+        System.out.println("GET response was: '" + res1 + "'.");
         
-        // test POST
-        Map<String, Object> postBody = new HashMap<>();
-        postBody.put ("name1", "val1");
-        postBody.put("name2", "val2");
-        try {
-        String res2 = c.doPOSTREQUEST(postBody);
-        } catch(IOException e) {
-            System.err.println("POST ERROR: " + e.getMessage());
-        }
+        
     }
 
 }
