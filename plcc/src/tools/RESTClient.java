@@ -66,7 +66,7 @@ public class RESTClient {
     
     /**
      * 
-     * @param postBody
+     * @param postBody a map of parameters (key/value) for the query
      * @return 
      * @throws java.io.IOException 
      */
@@ -103,6 +103,8 @@ public class RESTClient {
         
         
     }
+    
+    
 
 }
 
