@@ -14,10 +14,11 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- *
+ * A simple demo content handler which counts occurrences of local names and prints them at the
+ * and of the document. Adapted from the official JAX documentation example to learn JAX.
  * @author spirit
  */
-public class XMLContentHandlerPDBDomainList extends DefaultHandler {
+public class XMLContentHandlerCountLocalNames extends DefaultHandler {
     
     private Hashtable<String, Object> tags;
 
