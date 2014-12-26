@@ -19,7 +19,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * A JAX-based XML parser. This one is suitable if you do not need to edit/re-use the
+ * A wrapper around a JAX-based XML parser. This one is suitable if you do not need to edit/re-use the
  * document and thus do not need the whole DOM tree in memory at any time. It is an event-based read-once and
  * use instantly parser. We need it to parse XML received by calling web services like the RCSB PDB REST API.
  * @author spirit
@@ -59,7 +59,7 @@ public class XMLParserJAX {
         try {
             p = new XMLParserJAX();
             p.setErrorHandler(new XMLErrorHandlerJAX(System.err));
-            p.getListFromXML(xml, new XMLContentHandlerPDBDomainList());
+            p.getListFromXML(xml, new XMLContentHandlerCountLocalNames());
             
         } catch(ParserConfigurationException | SAXException e) {
             System.err.println("ERROR: " + e.getMessage());
