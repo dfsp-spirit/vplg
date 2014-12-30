@@ -7,8 +7,10 @@
  */
 package tools;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -18,44 +20,62 @@ import org.xml.sax.helpers.DefaultHandler;
  * This is the sequence cluster 40 API call.
  * @author spirit
  */
-public class XMLContentHandlerSequenceClusterList  extends DefaultHandler {
+public class XMLContentHandlerSequenceClusterList extends DefaultHandler {
     
-    private Hashtable<String, Object> tags;
+    public List<String> pdbChains;
+    private boolean doneParsing = false;
 
     @Override
     public void startDocument() throws SAXException {
-        tags = new Hashtable<>();
+        doneParsing = false;
+        pdbChains = new ArrayList<>();
     }
     
     @Override
-    public void startElement(String namespaceURI,
-                         String localName,
-                         String qName, 
-                         Attributes atts)
-    throws SAXException {
+    public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
 
-    String key = localName;
-    Object value = tags.get(key);
-
-    if (value == null) {
-        tags.put(key, new Integer(1));
-    } 
-    else {
-        int count = ((Integer)value).intValue();
-        count++;
-        tags.put(key, new Integer(count));
+        String key = localName;
+        if(key.equals("sequenceCluster")) {
+            System.out.println("Found a seq cluster.");
+        }
+        else if(key.equals("pdbChain")) {
+            System.out.print("Found a PDB chain: namespaceURI=" + namespaceURI + ", localName=" + localName + ", qName=" + qName + ". Attributes: ");
+            for(int i = 0; i < atts.getLength(); i++) {
+                String attribute = atts.getLocalName(i);
+                if(attribute.equals("name")) {
+                    System.out.print("PDB chain=" + atts.getValue(attribute));
+                    pdbChains.add(atts.getValue(attribute));
+                }
+                if(attribute.equals("rank")) {
+                    System.out.print("rank=" + atts.getValue(attribute));
+                }
+                
+                if(i < atts.getLength() - 1) {
+                    System.out.print(", ");
+                }
+            }
+            System.out.print("\n");
+        }
+    
     }
-}
+    
+    public List<String> getPdbChainList() {
+        if( ! doneParsing) {
+            throw new java.lang.RuntimeException("XML Handler ERROR: XMLContentHandlerSequenceClusterList: Not finished parsing the document yet, but being asked for results.");
+        }
+        else {
+            return pdbChains;
+        }
+    }
+
 
     @Override
     public void endDocument() throws SAXException {
-        Enumeration e = tags.keys();
-        while (e.hasMoreElements()) {
-            String tag = (String)e.nextElement();
-            int count = ((Integer)tags.get(tag)).intValue();
-            System.out.println("Local Name \"" + tag + "\" occurs " 
-                               + count + " times");
-        }    
+        for (String pdbChain : pdbChains) {
+            System.out.println("Found PDB chain: " + pdbChain);
+        }
+        System.out.println("Found " + pdbChains.size() + " chains total.");
+        doneParsing = true;
     }
     
 }

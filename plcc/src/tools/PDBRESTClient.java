@@ -86,7 +86,7 @@ public class PDBRESTClient extends RESTClient {
         try {
             p = new XMLParserJAX();
             p.setErrorHandler(new XMLErrorHandlerJAX(System.err));
-            p.getListFromXML(xml, new XMLContentHandlerCountLocalNames());
+            p.handleXML(xml, new XMLContentHandlerCountLocalNames());
             
         } catch(ParserConfigurationException | IOException | SAXException e) {
             System.err.println("XML ERROR: " + e.getMessage());

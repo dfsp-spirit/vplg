@@ -9,6 +9,8 @@ package tools;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -40,10 +42,17 @@ public class XMLParserJAX {
         xmlReader.setErrorHandler(new XMLErrorHandlerJAX(System.err));        
     }
     
-    public void getListFromXML(String xml, DefaultHandler handler) throws SAXException, IOException {
+    public void handleXML(String xml, DefaultHandler handler) throws SAXException, IOException {        
         saxParser.parse(new InputSource(new StringReader(xml)), handler);
     }
     
+    
+    
+    /**
+     * Main class for testing only
+     * @param args ignored
+     * @throws IOException 
+     */
     public static void main(String[] args) throws IOException {
         
         String xml = "<sequenceCluster clusterNr=\"4\" clusterPercID=\"40\">\n" +
@@ -59,7 +68,10 @@ public class XMLParserJAX {
         try {
             p = new XMLParserJAX();
             p.setErrorHandler(new XMLErrorHandlerJAX(System.err));
-            p.getListFromXML(xml, new XMLContentHandlerCountLocalNames());
+            XMLContentHandlerSequenceClusterList handler = new XMLContentHandlerSequenceClusterList();            
+            p.handleXML(xml, handler);
+            List<String> pdbChains = handler.getPdbChainList();
+            System.out.println("Received a list of " + pdbChains.size() + " chains from handler.");
             
         } catch(ParserConfigurationException | SAXException e) {
             System.err.println("ERROR: " + e.getMessage());

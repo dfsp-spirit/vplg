@@ -20,7 +20,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class XMLContentHandlerCountLocalNames extends DefaultHandler {
     
-    private Hashtable<String, Object> tags;
+    private Hashtable<String, Object> tags;     
 
     @Override
     public void startDocument() throws SAXException {
