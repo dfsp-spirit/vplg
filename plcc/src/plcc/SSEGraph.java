@@ -672,10 +672,13 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
      * This is a special version for DEF and ADJ graphs, which adds the gray vertices and labels them as parent graph vertices.
      * @param ig2 the SVGGraphics2D object on which to draw
      * @param startPos the start position (x, y) where to start drawing
+     * @param pl the page layout
+     * @param g tge sse graph
+     * @param includeParentEdge whether to draw the symbol fro parent edges (only DEF graphs need this, but not ADJ graphs)
      * @return the x coordinate in the image where the legend ends (which is the left margin + the legend width). 
      * This can be used to determine the minimal width of the total image (it has to be at least this value).
      */
-    public static Integer drawLegendDEF(SVGGraphics2D ig2, Position2D startPos, PageLayout pl, SSEGraph g) {
+    public static Integer drawLegendDEFADJ(SVGGraphics2D ig2, Position2D startPos, PageLayout pl, SSEGraph g, Boolean includeParentEdge) {
         
         Boolean drawAll = Settings.getBoolean("plcc_B_graphimg_legend_always_all");
         
@@ -5066,7 +5069,7 @@ E	3	3	3
                 }
 
                 if(Settings.getBoolean("plcc_B_graphimg_legend")) {
-                    SSEGraph.drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4)), pl, fg);
+                    SSEGraph.drawLegendDEFADJ(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4)), pl, fg, false);
                 }
             
             }
@@ -5361,7 +5364,7 @@ E	3	3	3
                 }
 
                 if(Settings.getBoolean("plcc_B_graphimg_legend")) {
-                    SSEGraph.drawLegendDEF(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4)), pl, fg);
+                    SSEGraph.drawLegendDEFADJ(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4)), pl, fg, true);
                 }
             
             }
@@ -6513,6 +6516,13 @@ E	3	3	3
     }
     
     
+    /**
+     * Converts this graph (i.e., it's distance matrix) to a string in Parek NET format. See http://gephi.github.io/users/supported-graph-formats/pajek-net-format/. Note though that vertices start with 1 (not 0).
+     * @return a string in Parek NET format representing the graph
+     */
+    public String toPajekNETFormat() {
+        return IO.intMatrixToPajekFormat(matrix);
+    }
     
     /**
      * Returns a list of all vertex indices in this graph, which is trivial. It is a list of integers from 0 to (this.size-1).

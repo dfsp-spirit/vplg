@@ -53,23 +53,24 @@ public class RESTClient {
 
 
     /**
-     * 
-     * @param resourcePath
-     * @param resultMediaType
-     * @return
+     * Function to perform GET queries.
+     * @param resourcePath the path to the resource on the server (URL), relative to base URL
+     * @param resultMediaType the media type
+     * @return the result string
      * @throws ClientProtocolException
      * @throws IOException 
      */
     public String doRequestGET(String resourcePath, MediaType resultMediaType) throws ClientProtocolException, IOException {
-        String result = service. path(this.restPath).path(resourcePath).accept(resultMediaType).get(String.class);
+        String result = service.path(this.restPath).path(resourcePath).accept(resultMediaType).get(String.class);
         return result;
 
     }
     
     
     /**
-     * 
+     * Untested, need adaptation to expected media types
      * @param postBody a map of parameters (key/value) for the query
+     * @param resultMediaType
      * @return 
      * @throws java.io.IOException 
      */

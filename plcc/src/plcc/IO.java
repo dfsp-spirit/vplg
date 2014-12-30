@@ -749,6 +749,35 @@ public class IO {
         }
         return found;
     }
+    
+    
+    /**
+     * Converts a matrix to a string in Parek NET format. See http://gephi.github.io/users/supported-graph-formats/pajek-net-format/. Note though that vertices start with 1 (not 0).
+     * @param matrix the input matrix (a graph). The 2 dimensions must be equal (length of outer and inner matrix). It must not be null.
+     * @return a string in Parek NET format representing the graph
+     */
+    public static String intMatrixToPajekFormat(Integer[][] matrix) {
+        
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append("*Vertices ").append(matrix.length).append("\n");
+        
+        // We do not print the vertex list since we do not have vertex labels in the int[][] matrix and the number of verts in enough to know.         
+        //for(int i = 0; i < matrix.length; i++) {
+        //    sb.append("").append(i+1).append("\n");
+        //}
+        
+        // So go with the edges:        
+        for(int i = 0; i < matrix.length; i++) {
+            for(int j = i+1; j < matrix.length; j++) {
+                if(matrix[i][j] > 0) {
+                    sb.append("").append(i+1).append(" ").append(j+1).append("\n");
+                }
+            }
+        }
+        
+        return sb.toString();
+    }
 
     
 }
