@@ -255,7 +255,13 @@ foreach ($chains as $value){
 				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".json";
 				if(file_exists($full_file)){
 				    $tableString .= ' <a href="' . $full_file .'" target="_blank">[JSON]</a>';
-				}				
+				}		
+                // edge list with separate label file				
+				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".el_edges";
+				$full_file2 = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".el_ntl";
+				if(file_exists($full_file) && file_exists($full_file2)){
+				    $tableString .= ' [EL: <a href="' . $full_file .'" target="_blank">edges</a> <a href="' . $full_file2 .'" target="_blank">labels</a>]';
+				}		
 				
 				$tableString .= '</span>';
 		    }
