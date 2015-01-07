@@ -129,6 +129,7 @@ if($valid_values){
 	<th>First vertex # in parent PG</th>
 	<th>Notation $notation </th>
 	<th>Image available</th>
+	<th>Linnot overview page</th>
       </tr>\n";
 		
 	$num_found = 0;
@@ -173,7 +174,8 @@ if($valid_values){
 		}
 		
 		$tableString .= "<tr>\n";
-		$tableString .= "<td>$fg_number</td><td>$fold_name</td><td>$num_sses</td><td>$sse_string</td><td>$firstvert_show</td><td>$not_string</td><td>$img_link</td>\n";
+		$tableString .= "<td>$fg_number</td><td>$fold_name</td><td>$num_sses</td><td>$sse_string</td><td>$firstvert_show</td><td>$not_string</td><td>$img_link</td>";
+		$tableString .= "<td><a href='./linnots_of_foldinggraph.php?pdbchain=" . $pdbchain . '&graphtype_int=' . $graphtype_int . '&fold_number=' . $fg_number . "' alt='Show all linear notations of this FG'>Go to linnots<a></td>\n";
 		$tableString .= "</tr>\n";
 		
 		// prepare the image links

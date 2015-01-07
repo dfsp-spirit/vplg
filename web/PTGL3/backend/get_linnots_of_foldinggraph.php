@@ -108,6 +108,7 @@ if(isset($_GET['pdbchain']) && isset($_GET['graphtype_int'])){
 }
 
 $num_found = 0;
+$num_linnot_images_for_this_fold = 0;
 
 if($valid_values){
     //echo "valid";
@@ -167,6 +168,7 @@ if($valid_values){
 			$image_exists_def = TRUE;
 			$img_link_def = "yes";
 			if($fg_number === $current_fold_number) {
+			    $num_linnot_images_for_this_fold++;
 			    $img_link_def = '<a href="#def">yes</a>';				
 				$img_string .= "<h3>DEF notation</h3>The DEF notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
 		        $img_string .= "<div id='def'><img src='" . $full_img_path_def . "' width='800'></div><br><br>\n";
@@ -181,6 +183,7 @@ if($valid_values){
 			$image_exists_adj = TRUE;
 			$img_link_adj = "yes";
 			if($fg_number === $current_fold_number) {
+			    $num_linnot_images_for_this_fold++;
 			    $img_link_adj = '<a href="#adj">yes</a>';
 				$img_string .= "<h3>ADJ notation</h3>The ADJ notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
 		        $img_string .= "<div id='adj'><img src='" . $full_img_path_adj . "' width='800'></div><br><br>\n";
@@ -195,6 +198,7 @@ if($valid_values){
 			$image_exists_red = TRUE;
 			$img_link_red = "yes";
 			if($fg_number === $current_fold_number) {
+			    $num_linnot_images_for_this_fold++;
 			    $img_link_red = '<a href="#red">yes</a>';
 				$img_string .= "<h3>RED notation</h3>The RED notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
 		        $img_string .= "<div id='red'><img src='" . $full_img_path_red . "' width='800'></div><br><br>\n";
@@ -209,6 +213,7 @@ if($valid_values){
 			$image_exists_seq = TRUE;
 			$img_link_seq = "yes";
 			if($fg_number === $current_fold_number) {
+			    $num_linnot_images_for_this_fold++;
 			    $img_link_seq = '<a href="#seq">yes</a>';
 				$img_string .= "<h3>SEQ notation</h3>The SEQ notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
 		        $img_string .= "<div id='seq'><img src='" . $full_img_path_seq . "' width='800'></div><br><br>\n";
@@ -223,6 +228,7 @@ if($valid_values){
 			$image_exists_key = TRUE;
 			$img_link_key = "yes";
 			if($fg_number === $current_fold_number) {
+			    $num_linnot_images_for_this_fold++;
 			    $img_link_key = '<a href="#key">yes</a>';
 				$img_string .= "<h3>KEY notation</h3>The KEY notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
 		        $img_string .= "<div id='key'><img src='" . $full_img_path_key . "' width='800'></div><br><br>\n";
@@ -235,7 +241,7 @@ if($valid_values){
 		if($fg_number === $current_fold_number) {
 		    $tableString .= "<td><i>this page</i></td>\n";
 		} else {
-		    $tableString .= "<td><a href='./linnots_of_foldinggraph.php?pdbchain=" . $pdbchain . '&graphtype_int=' . $graphtype_int . '&fold_number=' . $fg_number . "' alt='Show other fold'>Fold $fg_number<a></td>\n";
+		    $tableString .= "<td><a href='./linnots_of_foldinggraph.php?pdbchain=" . $pdbchain . '&graphtype_int=' . $graphtype_int . '&fold_number=' . $fg_number . "' alt='Show other fold'>Go to fold $fg_number<a></td>\n";
 		}
 		
 		$tableString .= "</tr>\n";
