@@ -12,16 +12,19 @@ package tools;
 import java.io.IOException;
 
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriBuilder;
 import org.apache.http.client.ClientProtocolException;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriBuilder;
 
 
 /**
@@ -30,8 +33,9 @@ import javax.ws.rs.core.MultivaluedMap;
  */
 public class RESTClient {
     
-    String restUrl;
+    String restHost;
     String restPath;
+    String scheme;
     ClientConfig config;
     Client client;
     WebResource service;
@@ -39,18 +43,21 @@ public class RESTClient {
     
     /**
      * Creates a new REST client
-     * @param restUrl the URL, like http://www.server.com
+     * @param scheme the scheme, like "http"
+     * @param restHost the URL, like www.server.com
      * @param restPath the path, like "/api/"
      */
-    public RESTClient(String restUrl, String restPath) {
-        this.restPath = restPath;
-        this.restUrl = restUrl;
+    public RESTClient(String scheme, String restHost, String restPath) {
+        this.scheme = scheme;
+        this.restHost = restHost;
+        this.restPath = restPath;        
         
         config = new DefaultClientConfig();
         client = Client.create(config);
-        service = client.resource(UriBuilder.fromUri(restUrl).build());
+        service = client.resource(UriBuilder.fromPath(restHost).scheme(scheme).path(restPath).build());
+        System.out.println("Created service with URI '" + service.getURI() + "'.");
     }
-
+    
 
     /**
      * Function to perform GET queries.
@@ -60,9 +67,24 @@ public class RESTClient {
      * @throws ClientProtocolException
      * @throws IOException 
      */
-    public String doRequestGET(String resourcePath, MediaType resultMediaType) throws ClientProtocolException, IOException {
-        String result = service.path(this.restPath).path(resourcePath).accept(resultMediaType).get(String.class);
-        return result;
+    public String doRequestGET(URI uri, MediaType resultMediaType) throws ClientProtocolException, IOException {        
+        ClientResponse response = null;
+        Integer status = -1;
+        try {
+            response = service.uri(uri).accept(resultMediaType).get(ClientResponse.class);
+            status = response.getStatus();
+            System.out.println("GET HTTP request result was " + status + ".");
+            if(status < 200 || status > 299) {
+                System.err.println("ERROR: web service returned status code " + status + ".");
+            }
+        } catch(UniformInterfaceException | ClientHandlerException e) {
+            System.err.println("REST ERROR: doRequestGET: '" + e.getMessage() + "'.");
+        }
+        
+        //System.out.println("Queried URI: " + service.path(this.restPath).path(resourcePath).getURI() + ".");
+        
+        //return service.path(this.restPath).path(resourcePath).accept(resultMediaType).get(String.class);
+        return service.uri(uri).accept(resultMediaType).get(String.class);
 
     }
     
@@ -87,6 +109,23 @@ public class RESTClient {
         return resp;
     }
     
+    public URI getURIForRelativePath(String appendPath) {
+        UriBuilder builder = UriBuilder.fromPath(restHost).scheme(scheme).path(restPath).path(appendPath);
+        System.out.println("restHost is " + restHost);
+        //builder.host(restHost);
+        URI uri = builder.build();
+        
+        /*
+        URI uri = null;
+        try {
+            uri = new URI("http://ptgl.uni-frankfurt.de/api/index.php/");
+        }
+        catch(Exception e) {
+            System.err.println("OHNO: " + e.getMessage());
+        }
+        */
+        return uri;
+    }
     
     /**
      * Test main class
@@ -94,13 +133,15 @@ public class RESTClient {
      */
     public static void main(String[] args) {
         
-        RESTClient c = new RESTClient("http://ptgl.uni-frankfurt.de", "/api/index.php/");
+        RESTClient c = new RESTClient("http", "ptgl.uni-frankfurt.de", "/api/index.php/");
         
         // test GET
         String res1 = null;
         try {
-            res1 = c.doRequestGET("pg/7tim/A/albe/json", MediaType.APPLICATION_JSON_TYPE);
-        } catch(IOException e) {
+            URI uri = c.getURIForRelativePath("pg/7tim/A/albe/json");
+            System.out.println("uri is " + uri);
+            res1 = c.doRequestGET(uri, MediaType.APPLICATION_JSON_TYPE);
+        } catch(Exception e) {
             System.err.println("GET ERROR: " + e.getMessage());
         }
         System.out.println("GET response was: '" + res1 + "'.");

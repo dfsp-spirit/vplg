@@ -9,7 +9,9 @@
 package tools;
 
 import java.io.IOException;
+import java.net.URI;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
@@ -19,15 +21,16 @@ import org.xml.sax.SAXException;
  */
 public class PDBRESTClient extends RESTClient {
     
-    public static final String defaultRestUrl = "http://www.rcsb.org";
+    public static final String defaultScheme = "http";
+    public static final String defaultRestUrl = "www.rcsb.org";
     public static final String defaultRestPath = "/pdb/rest/";
 
-    public PDBRESTClient(String restUrl, String restPath) {
-        super(restUrl, restPath);
+    public PDBRESTClient(String scheme, String restUrl, String restPath) {
+        super(scheme, restUrl, restPath);
     }
     
     public PDBRESTClient() {
-        super(PDBRESTClient.defaultRestUrl, PDBRESTClient.defaultRestPath);
+        super(PDBRESTClient.defaultScheme, PDBRESTClient.defaultRestUrl, PDBRESTClient.defaultRestPath);
     }
         
     private static String getQueryStringPfamOfChain(String pdbid) {
@@ -38,17 +41,15 @@ public class PDBRESTClient extends RESTClient {
         return "representativeDomains?structureId=" + pdbid + "." + chain;
     }
     
-    private static String getQueryStringSeqCluster40OfChain(String pdbid, String chain) {
-        Integer cluster = 40;
-        return "sequenceCluster?cluster=" + cluster + "&structureId=" + pdbid + "." + chain;
+    private URI getQueryStringSeqCluster40OfChain(String pdbid, String chain) {        
+        UriBuilder builder = UriBuilder.fromPath(restHost).queryParam("cluster", 40).queryParam("structureId", pdbid + "." + chain);    
+        URI uri = builder.build();
+        return uri;
     }
     
-    public String doSeqCluster40QueryXML(String pdbid, String chain) throws IOException {
-        System.out.println("restPath: "  + restPath);
-        System.out.println("restURL: "  + restUrl);
-        String query = PDBRESTClient.getQueryStringSeqCluster40OfChain(pdbid, chain);
-        System.out.println("query: " + query);
-        return doRequestGET(query, MediaType.APPLICATION_XML_TYPE);
+    public String doSeqCluster40QueryXML(String pdbid, String chain) throws IOException {        
+        URI uri = getQueryStringSeqCluster40OfChain(pdbid, chain);        
+        return doRequestGET(uri, MediaType.APPLICATION_XML_TYPE);
     }
     
     public static String getQueryStringGOTermsOfChain(String pdbid, String chain) {
@@ -61,12 +62,15 @@ public class PDBRESTClient extends RESTClient {
         String pdbid = "7tim";
         String chain = "A";
         
+        System.out.println("Querying PDB REST web service for " + pdbid + " chain " + chain + "...");
+        
         PDBRESTClient c = new PDBRESTClient();
         String xml = null;
         try {
             xml = c.doSeqCluster40QueryXML(pdbid, chain);
         } catch (IOException e) {
             System.err.println("REST ERROR: " + e.getMessage());
+            System.exit(1);
         }
         
         //System.out.println("xml: " + xml);
@@ -82,6 +86,8 @@ public class PDBRESTClient extends RESTClient {
                 "</sequenceCluster>\n";
         */
         
+        System.out.println("Query result received, parsing XML...");
+        
         XMLParserJAX p;
         try {
             p = new XMLParserJAX();
@@ -91,5 +97,7 @@ public class PDBRESTClient extends RESTClient {
         } catch(ParserConfigurationException | IOException | SAXException e) {
             System.err.println("XML ERROR: " + e.getMessage());
         }
+        
+        System.out.println("All done.");
     }
 }

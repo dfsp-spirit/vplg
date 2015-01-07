@@ -56,8 +56,42 @@ function get_motif_abbreviation($motif_name) {
 	return $motif_abbr[$motif_name];
 }
 
+function get_graphtype_string_from_int($gt_int) {
+   if($gt_int === 1){
+     return "alpha";
+   }
+   else if($gt_int === 2){
+     return "beta";
+   }
+   else if($gt_int === 3){
+     return "albe";
+   }
+   else if($gt_int === 4){
+     return "alphalig";
+   }
+   else if($gt_int === 5){
+     return "betalig";
+   }
+   else if($gt_int === 6){
+     return "albelig";
+   }
+   return "unknown_gt";
+}
 
+function get_protein_graph_file_name_no_ext($pdbid, $chain, $graphtype_string) {
+  return $pdbid . "_" . $chain . "_" . $graphtype_string . "_PG";
+}
 
+function get_path_to($pdbid, $chain) {
+  $mid2chars = substr($pdbid, 1, 2);
+  return $mid2chars . "/" . $pdbid . "/". $chain . "/";
+}
+
+function get_protein_graph_path_and_file_name_no_ext($pdbid, $chain, $graphtype_string) {
+  $path = get_path_to($pdbid, $chain);
+  $fname = get_protein_graph_file_name_no_ext($pdbid, $chain, $graphtype_string);
+  return $path . $fname;
+}
 
 // the graphtype which should be displayed first. Standard: alpha-graph
 // and all other graphtypes
@@ -132,7 +166,7 @@ foreach ($chains as $value){
 		
 		// remove previous prepared_statements from DB
 		pg_query($db, "DEALLOCATE ALL");
-		$query = "SELECT c.chain_id, g.graph_image_png, g.graph_image_pdf, g.graph_image_svg, g.filepath_graphfile_gml 
+		$query = "SELECT c.chain_id, g.graph_image_png, g.graph_image_pdf, g.graph_image_svg, g.filepath_graphfile_gml, g.graph_type 
 				  FROM plcc_chain c, plcc_graph g 
 				  WHERE c.pdb_id LIKE $1 
 				  AND c.chain_name LIKE $2 
@@ -157,6 +191,7 @@ foreach ($chains as $value){
 		
 		if($base_image_exists) {
 			$graphtype_int = 1;
+			$graphtype_string = get_graphtype_string_from_int($graphtype_int);
 		    //$tableString .= '<div id="myCarousel">
 			//	      <ul class="bxslider bx-prev bx-next" id="carouselSlider">';
 		    
@@ -198,7 +233,31 @@ foreach ($chains as $value){
 			$tableString .= '</span>';
 		    if(isset($data['filepath_graphfile_gml']) && file_exists($IMG_ROOT_PATH.$data['filepath_graphfile_gml'])){
 			    $tableString .= '<br><span class="download-options">Download graph file:
-								  <a href="'.$IMG_ROOT_PATH.$data['filepath_graphfile_gml'].'" target="_blank">[GML]</a></span>';
+								  <a href="'.$IMG_ROOT_PATH.$data['filepath_graphfile_gml'].'" target="_blank">[GML]</a>';
+				// check for other formats. The paths to these are not yet saved in the database.
+				$graph_file_name_no_ext = get_protein_graph_path_and_file_name_no_ext($pdbID, $chainName, $graphtype_string);
+				// tgf
+				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".tgf";
+				if(file_exists($full_file)){
+				    $tableString .= ' <a href="' . $full_file .'" target="_blank">[TGF]</a>';
+				}
+                // gv
+				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".gv";
+				if(file_exists($full_file)){
+				    $tableString .= ' <a href="' . $full_file .'" target="_blank">[GV]</a>';
+				}
+				// kavosh
+				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".kavosh";
+				if(file_exists($full_file)){
+				    $tableString .= ' <a href="' . $full_file .'" target="_blank">[Kavosh]</a>';
+				}
+                // json
+				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".json";
+				if(file_exists($full_file)){
+				    $tableString .= ' <a href="' . $full_file .'" target="_blank">[JSON]</a>';
+				}				
+				
+				$tableString .= '</span>';
 		    }
 			$tableString .= '
 							 <br><span class="download-options">

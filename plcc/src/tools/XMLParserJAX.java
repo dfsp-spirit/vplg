@@ -65,13 +65,22 @@ public class XMLParserJAX {
                 "</sequenceCluster>\n";
         
         XMLParserJAX p;
+        String[] sep;
         try {
             p = new XMLParserJAX();
             p.setErrorHandler(new XMLErrorHandlerJAX(System.err));
             XMLContentHandlerSequenceClusterList handler = new XMLContentHandlerSequenceClusterList();            
             p.handleXML(xml, handler);
             List<String> pdbChains = handler.getPdbChainList();
-            System.out.println("Received a list of " + pdbChains.size() + " chains from handler.");
+            System.out.println("Received a list of " + pdbChains.size() + " chains from handler:");
+            for(String ic : pdbChains) {
+                sep = PlccUtilities.parsePdbidAndChain(ic);
+                if(sep != null) {
+                    System.out.println("PDB ID: " + sep[0] + ", chain " + sep[1] + "");
+                } else {
+                    System.out.println("Result could not be parsed.");
+                }
+            }
             
         } catch(ParserConfigurationException | SAXException e) {
             System.err.println("ERROR: " + e.getMessage());

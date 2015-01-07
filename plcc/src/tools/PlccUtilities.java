@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 import plcc.IO;
 
 /**
@@ -332,6 +333,58 @@ public class PlccUtilities {
       PlccUtilities.testMultiQuickSortTS();
       System.out.println("");
       PlccUtilities.testMultiQuickSort();
+  }
+  
+  
+  /**
+   * Parses a PDB API format PDB ID + chain string.
+   * @param pdbAPIformatIdandChain an input string like "7tim.A", representing PDBID 7tim and chain A
+   * @return an array of length 2, position 0 holds PDB ID (always lowercase) and position 1 holds chain (case left intact from input). Or null if the input string was invalid.
+   */
+  public static String[] parsePdbidAndChain(String pdbAPIformatIdandChain) {
+      String pdbid, chain;
+      if(pdbAPIformatIdandChain != null) {
+          if(pdbAPIformatIdandChain.length() == 6) {
+              if(pdbAPIformatIdandChain.charAt(4) == '.') {                
+                  pdbid = pdbAPIformatIdandChain.substring(0, 4);
+                  chain = pdbAPIformatIdandChain.substring(5, 6);
+                  if(PlccUtilities.isValidPDBID(pdbid) && PlccUtilities.isValidChainID(chain)) {
+                      return new String[] { pdbid.toLowerCase(), chain };
+                  }
+              }
+          }
+      }
+      return null;
+  }
+  
+  /**
+   * Checks whether s could be a valid PDB ID.
+   * @param s the string to test
+   * @return true for something like "7tim" or "8ICD"
+   */
+  public static boolean isValidPDBID(String s) {
+      if( s != null) {
+          if(s.length() == 4) {
+            Pattern p = Pattern.compile("[a-zA-Z0-9]");
+            return p.matcher(s).find();
+          }
+      }            
+      return false;
+  }
+  
+  /**
+   * Checks whether s could be a valid chain ID.
+   * @param s the string to test
+   * @return true for something like "A" or "Z"
+   */
+  public static boolean isValidChainID(String s) {
+      if( s != null) {
+          if(s.length() == 1) {
+            Pattern p = Pattern.compile("[a-zA-Z0-9]");
+            return p.matcher(s).find();
+          }
+      }            
+      return false;
   }
     
 }

@@ -9,7 +9,9 @@
 package tools;
 
 import java.io.IOException;
+import java.net.URI;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
 
 /**
  *
@@ -17,18 +19,19 @@ import javax.ws.rs.core.MediaType;
  */
 public class PTGL3RESTClient extends RESTClient {
 
-    public static final String defaultRestUrl = "http://ptgl.uni-frankfurt.de";
+    public static final String defaultScheme = "http";
+    public static final String defaultRestUrl = "ptgl.uni-frankfurt.de";
     public static final String defaultRestPath = "/api/index.php/";
    
     /**
      * Constructor which uses the default URL and path for the PTGL3 web service.
      */
     public PTGL3RESTClient() {
-        super(PTGL3RESTClient.defaultRestUrl, PTGL3RESTClient.defaultRestPath);
+        super(PTGL3RESTClient.defaultScheme, PTGL3RESTClient.defaultRestUrl, PTGL3RESTClient.defaultRestPath);
     }
     
-    public PTGL3RESTClient(String restUrl, String restPath) {
-        super(restUrl, restPath);
+    public PTGL3RESTClient(String scheme, String restUrl, String restPath) {
+        super(scheme, restUrl, restPath);
     }
             
     /**
@@ -40,7 +43,7 @@ public class PTGL3RESTClient extends RESTClient {
      * @throws IOException 
      */
     public String doProteinGraphQueryJSON(String pdbid, String chain, String graphType) throws IOException {
-        return doRequestGET(PTGL3RESTClient.getQueryStringProteinGraph(pdbid, chain, graphType, "json"), MediaType.APPLICATION_JSON_TYPE);
+        return doRequestGET(getQueryStringProteinGraph(pdbid, chain, graphType, "json"), MediaType.APPLICATION_JSON_TYPE);
     }
             
     /**
@@ -49,10 +52,12 @@ public class PTGL3RESTClient extends RESTClient {
      * @param chain
      * @param graphType
      * @param graphFormat
-     * @return 
+     * @return the URI
      */
-    private static String getQueryStringProteinGraph(String pdbid, String chain, String graphType, String graphFormat) {
-        return "pg/" + pdbid + "/" + chain + "/" + graphType + "/" + graphFormat;
+    private URI getQueryStringProteinGraph(String pdbid, String chain, String graphType, String graphFormat) {
+        UriBuilder builder = UriBuilder.fromPath(restHost).path("pg/" + pdbid + "/" + chain + "/" + graphType + "/" + graphFormat);    
+        URI uri = builder.build();
+        return uri;
     }
     
     /**
@@ -62,10 +67,12 @@ public class PTGL3RESTClient extends RESTClient {
      * @param graphType
      * @param foldNumber
      * @param graphFormat
-     * @return 
+     * @return the URI
      */
-    private static String getQueryStringFoldingGraph(String pdbid, String chain, String graphType, Integer foldNumber, String graphFormat) {
-        return "fg/" + pdbid + "/" + chain + "/" + graphType + "/" + foldNumber + "/" + graphFormat;
+    private URI getQueryStringFoldingGraph(String pdbid, String chain, String graphType, Integer foldNumber, String graphFormat) {
+        UriBuilder builder = UriBuilder.fromPath(restHost).path("fg/" + pdbid + "/" + chain + "/" + graphType + "/" + foldNumber + "/" + graphFormat);    
+        URI uri = builder.build();
+        return uri;
     }
     
     /**
