@@ -39,7 +39,10 @@
 							</li>
 							-->
 							<li>
-								<a href="foldinggraphs.php"><i class="fa fa-briefcase"></i> Folding graph images</a>
+								<a href="foldinggraphs.php"><i class="fa fa-briefcase"></i> All Folding graphs of a PG</a>
+							</li>
+							<li>
+								<a href="linnots_of_foldinggraph.php"><i class="fa fa-briefcase"></i> All linear notations of a FG</a>
 							</li>
 							<li>
 								<a href="motif_overview.php"><i class="fa fa-briefcase"></i> Motifs</a>

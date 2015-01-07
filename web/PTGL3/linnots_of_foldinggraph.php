@@ -122,7 +122,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 				      echo $tableString; /* The table string is constructed in /backend/get_linnots_of_foldinggraph.php, which is included by this file. */  
 				
 				      if($num_found > 0) {
-					echo "<br><h3> Linear notation images </h3><br><p>The images below show the linear notations of the current folding graph. The linear notation strings are used to power the motif search and other features of this database server. Note that folding graphs of size 1 (isolated vertices in the graph) are not listed here -- they would not be of any use. In the images, the following abbreviations are used: PG = protein graph, FG = folding graph, SQ = sequential in chain.</p>\n";
+					echo "<br><h3> Linear notation images </h3><br><p>The images below show the linear notations of the current folding graph. The linear notation strings are used to power the motif search and other features of this database server. Note that images for very small folding graphs are not available -- they would not be of any use. In the images, the following abbreviations are used: PG = protein graph, FG = folding graph, SQ = sequential in chain.</p>\n";
 					echo $img_string;
 				      }
 				      else {

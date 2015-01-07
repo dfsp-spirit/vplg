@@ -166,6 +166,9 @@ if($valid_values){
 		if(isset($img_def) && $img_def != "" && file_exists($full_img_path_def)) {
 			$image_exists_def = TRUE;
 			$img_link_def = "yes";
+			if($fg_number === $current_fold_number) {
+			    $img_link_def = '<a href="#def">yes</a>';
+			}
 		}
 		
 		// ADJ
@@ -175,6 +178,9 @@ if($valid_values){
 		if(isset($img_adj) && $img_adj != "" && file_exists($full_img_path_adj)) {
 			$image_exists_adj = TRUE;
 			$img_link_adj = "yes";
+			if($fg_number === $current_fold_number) {
+			    $img_link_adj = '<a href="#adj">yes</a>';
+			}
 		}
 		
 		// RED
@@ -184,6 +190,9 @@ if($valid_values){
 		if(isset($img_red) && $img_red != "" && file_exists($full_img_path_red)) {
 			$image_exists_red = TRUE;
 			$img_link_red = "yes";
+			if($fg_number === $current_fold_number) {
+			    $img_link_red = '<a href="#red">yes</a>';
+			}
 		}
 		
 		// SEQ
@@ -193,6 +202,9 @@ if($valid_values){
 		if(isset($img_seq) && $img_seq != "" && file_exists($full_img_path_seq)) {
 			$image_exists_seq = TRUE;
 			$img_link_seq = "yes";
+			if($fg_number === $current_fold_number) {
+			    $img_link_seq = '<a href="#seq">yes</a>';
+			}
 		}
 		
 		// KEY
@@ -202,6 +214,9 @@ if($valid_values){
 		if(isset($img_key) && $img_key != "" && file_exists($full_img_path_key)) {
 			$image_exists_key = TRUE;
 			$img_link_key = "yes";
+			if($fg_number === $current_fold_number) {
+			    $img_link_key = '<a href="#key">yes</a>';
+			}
 		}
 		
 		
@@ -211,7 +226,6 @@ if($valid_values){
 		    $tableString .= "<td><i>this page</i></td>\n";
 		} else {
 		    $tableString .= "<td><a href='./linnots_of_foldinggraph.php?pdbchain=" . $pdbchain . '&graphtype_int=' . $graphtype_int . '&fold_number=' . $fg_number . "' alt='Show other fold'>Fold $fg_number<a></td>\n";
-			echo "TAGTAG fg_number = $fg_number, current_fold_number = $current_fold_number";
 		}
 		
 		$tableString .= "</tr>\n";
