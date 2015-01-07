@@ -22,8 +22,7 @@ if($DEBUG){
 }
 
 function get_fglinnots_data_query_string($pdb_id, $chain_name, $graphtype_str) {
-   $query = "SELECT linnot_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, filepath_linnot_image_adj_png, filepath_linnot_image_red_png, filepath_linnot_image_seq_png, filepath_linnot_image_key_png, filepath_linnot_image_adj_svg, filepath_linnot_image_red_svg, filepath_linnot_image_seq_svg, filepath_linnot_image_key_svg, filepath_linnot_image_adj_pdf, filepath_linnot_image_red_pdf, filepath_linnot_image_seq_pdf, filepath_linnot_image_key_pdf, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key, num_sses, sse_string FROM (SELECT la.num_sses, la.linnot_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, la.filepath_linnot_image_adj_png, la.filepath_linnot_image_red_png, la.filepath_linnot_image_seq_png, la.filepath_linnot_image_key_png, la.filepath_linnot_image_adj_svg, la.filepath_
-linnot_image_red_svg, la.filepath_linnot_image_seq_svg, la.filepath_linnot_image_key_svg, la.filepath_linnot_image_adj_pdf, la.filepath_linnot_image_red_pdf, la.filepath_linnot_image_seq_pdf, la.filepath_linnot_image_key_pdf, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM plcc_fglinnot la LEFT JOIN plcc_foldinggraph fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN plcc_chain c ON pg.chain_id=c.chain_id LEFT JOIN plcc_graphtypes gt ON pg.graph_type=gt.graphtype_id WHERE ( graphtype_text = '" . $graphtype_str . "' AND chain_name = '" . $chain_name . "' AND pdb_id = '" . $pdb_id . "' )) bar ORDER BY fg_number";
+   $query = "SELECT linnot_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, filepath_linnot_image_adj_png, filepath_linnot_image_red_png, filepath_linnot_image_seq_png, filepath_linnot_image_key_png, filepath_linnot_image_adj_svg, filepath_linnot_image_red_svg, filepath_linnot_image_seq_svg, filepath_linnot_image_key_svg, filepath_linnot_image_adj_pdf, filepath_linnot_image_red_pdf, filepath_linnot_image_seq_pdf, filepath_linnot_image_key_pdf, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key, num_sses, sse_string FROM (SELECT la.num_sses, la.linnot_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, la.filepath_linnot_image_adj_png, la.filepath_linnot_image_red_png, la.filepath_linnot_image_seq_png, la.filepath_linnot_image_key_png, la.filepath_linnot_image_adj_svg, la.filepath_linnot_image_red_svg, la.filepath_linnot_image_seq_svg, la.filepath_linnot_image_key_svg, la.filepath_linnot_image_adj_pdf, la.filepath_linnot_image_red_pdf, la.filepath_linnot_image_seq_pdf, la.filepath_linnot_image_key_pdf, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM plcc_fglinnot la LEFT JOIN plcc_foldinggraph fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN plcc_chain c ON pg.chain_id=c.chain_id LEFT JOIN plcc_graphtypes gt ON pg.graph_type=gt.graphtype_id WHERE ( graphtype_text = '" . $graphtype_str . "' AND chain_name = '" . $chain_name . "' AND pdb_id = '" . $pdb_id . "' )) bar ORDER BY fg_number";
    return $query;
 }
 
@@ -64,6 +63,21 @@ function check_valid_chainid($str) {
   return false;
 }
 
+function get_folding_graph_file_name_no_ext($pdbid, $chain, $graphtype_string, $fg_number) {
+  return $pdbid . "_" . $chain . "_" . $graphtype_string . "_FG_" . $fg_number;
+}
+
+function get_path_to($pdbid, $chain) {
+  $mid2chars = substr($pdbid, 1, 2);
+  return $mid2chars . "/" . $pdbid . "/". $chain . "/";
+}
+
+function get_folding_graph_path_and_file_name_no_ext($pdbid, $chain, $graphtype_string, $fg_number) {
+  $path = get_path_to($pdbid, $chain);
+  $fname = get_folding_graph_file_name_no_ext($pdbid, $chain, $graphtype_string, $fg_number);
+  return $path . $fname;
+}
+
 $pageload_was_search = FALSE;
 
 if(isset($_GET['pdbchain']) && isset($_GET['graphtype_int']) && isset($_GET['notationtype'])){
@@ -95,14 +109,15 @@ if($valid_values){
 	// connect to DB
 	$conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
 	$db = pg_connect($conn_string);
-		
+	if(! $db) { echo "NO_DB"; }
+	
 	$graphtype_str = get_graphtype_string($graphtype_int);
 	$query = get_fglinnots_data_query_string($pdb_id, $chain_name, $graphtype_str);
 	
 	//echo "query='" . $query . "'\n";
 	
 	$result = pg_query($db, $query);
-		
+    if(! $result) { echo "NO_RESULT: " .  pg_last_error($db) . "."; }
 	
 	$tableString .= "<div><table id='tblfgresults'>\n";
 	$tableString .= "<caption> The $notation $graphtype_str folding graphs of PDB $pdb_id chain $chain_name </caption>\n";
@@ -120,7 +135,6 @@ if($valid_values){
 	$img_string = "";
 	$html_id = "";
 	while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
-	
 		// data from foldinggraph table:
 	    $fg_number = $arr['fg_number'];	
 		$fold_name = $arr['fold_name'];
@@ -163,15 +177,29 @@ if($valid_values){
 		$tableString .= "</tr>\n";
 		
 		// prepare the image links
-		if($image_exists_png) {
-		    $img_string .= "<br><br><br><h4> Fold $fold_name</h4>\n";
+		$img_string .= "<br><br><br><h4> Fold number $fg_number (fold name: $fold_name)</h4>\n";
+		if($image_exists_png) {		    
 		    $img_string .= "The $notation $graphtype_str folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
 		    $img_string .= "<div id='" . $html_id . "'><img src='" . $full_img_path_png . "' width='800'></div><br><br>\n";
+		} else {
+		    $reason = "";
+			if($num_sses <= 3) { 
+			    $reason = " because it only has $num_sses SSE"; 
+				if($num_sses != 1) {
+				    $reason .= "s";
+                }				
+			}
+			
+		    $img_string .= "<b>Image not available:</b> <i>The $notation $graphtype_str folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name is not available" . $reason . ".</i>";
 		}
 		
 		// add download links for other formats than PNG (they can directly d/l this from the browser image)
-		if($image_exists_svg || $image_exists_pdf) {
-		  $img_string .= "Download the visualization of fold $fold_name in other formats: ";
+		if($image_exists_svg || $image_exists_pdf || $image_exists_png) {
+		  $img_string .= "Download the visualization of fold $fold_name in formats: ";
+		  
+		  if($image_exists_png) {
+		    $img_string .= ' <a href="' . $full_img_path_png .'" target="_blank">[PNG]</a>';
+		  }
 		  
 		  if($image_exists_svg) {
 		    $img_string .= ' <a href="' . $full_img_path_svg .'" target="_blank">[SVG]</a>';
@@ -182,17 +210,60 @@ if($valid_values){
 		  }
 		  $img_string .= "<br/><br/>";
 		  
+		}				
+		
+		// check for graph text files. note that these do NOT exist once per linear notation, but only once per folding graph, so we add them here.
+	    // The paths to these are not yet saved in the database.
+	    $graph_file_name_no_ext = get_folding_graph_path_and_file_name_no_ext($pdb_id, $chain_name, $graphtype_str, $fg_number);
+	
+		// GML
+		$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".gml";
+		if(file_exists($full_file)){		    
+			$img_string .= "Download the graph file of fold $fold_name in formats: ";
+			
+			$img_string .= ' <a href="' . $full_file .'" target="_blank">[GML]</a>';
+			
+			// we only check for other formats if GML exists:
+			
+			// check for TGF
+			$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".tgf";
+			if(file_exists($full_file)){		    
+			    $img_string .= ' <a href="' . $full_file .'" target="_blank">[TGF]</a>';
+			}
+			// gv
+				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".gv";
+				if(file_exists($full_file)){
+				    $img_string .= ' <a href="' . $full_file .'" target="_blank">[GV]</a>';
+				}
+				// kavosh
+				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".kavosh";
+				if(file_exists($full_file)){
+				    $img_string .= ' <a href="' . $full_file .'" target="_blank">[Kavosh]</a>';
+				}
+                // json
+				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".json";
+				if(file_exists($full_file)){
+				    $img_string .= ' <a href="' . $full_file .'" target="_blank">[JSON]</a>';
+				}		
+                // edge list with separate label file				
+				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".el_edges";
+				$full_file2 = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".el_ntl";
+				if(file_exists($full_file) && file_exists($full_file2)){
+				    $img_string .= ' [EL: <a href="' . $full_file .'" target="_blank">edges</a> <a href="' . $full_file2 .'" target="_blank">labels</a>]';
+				}		
+			
+			$img_string .= '<br><br>';
 		}
-
+		
 		
 		$num_found++;
 				
-	}
+	}		
 	
 	$tableString .= "</table></div>\n";
 	
 	if($num_found >= 1) {
-	  $tableString .= "<br><br><a href='results.php?q=$pdbchain'>Go to protein graph</a><br><br>";
+	    $tableString .= "<br><br><a href='results.php?q=$pdbchain'>Go to protein graph</a><br><br>";	  	           		 		 
 	}
 	
 	
