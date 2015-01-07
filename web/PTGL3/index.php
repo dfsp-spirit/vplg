@@ -70,10 +70,12 @@ function check_install($db)  {
 			<p class="imgCenter"><img src="./images/ptgl_overview_trans.png" width="600"></p>
 			
 			<br /><br />
-			This web server allows you to search for protein motifs which can be detected in the graphs. It also provides standardized visualizations of protein graphs and folding graphs.
+			This web server allows you to search for <b>protein motifs</b> which can be detected in the graphs. It also provides <b>standardized 2D visualizations</b> of protein graphs and folding graphs.
+			In contrast to the manually curated <a href="http://www.cathdb.info/" target="_blank">CATH</a> and <a href="http://scop.mrc-lmb.cam.ac.uk/scop/" target="_blank">SCOP</a> databases, the method used by this server is fully automated.
+			Similar servers, which also support substructure search, include <a href="http://prodata.swmed.edu/prosmos/" target="_blank">ProSMoS</a> and <a href="http://munk.csse.unimelb.edu.au/pro-origami/" target="_blank">Pro-Origami</a>.
 			
 			<?php if($ENABLE_GRAPHLETSIMILARITY_SEARCH) { ?>
-			It also implements graph-based similarity measures to search for protein chains which are similar to a given query protein.
+			Additionally, this server implements graph-based similarity measures to search for protein chains which are similar to a given query protein.
 			<?php } ?>
 			
 			<br>
