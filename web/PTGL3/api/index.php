@@ -95,7 +95,7 @@ $app->get(
             </header>
             <h1>Welcome to the $server_name API</h1>
 			
-			<a href=#basics">Basics</a> | <a href="#addressing">Addressing data</a> | <a href="#examples">Usage Examples</a> | <a href="#metadata">Metadata queries</a> | <a href="#example_restclient_code">Example API client code</a> | <a href="#help">Help, comments</a> | <a href="#author">Author</a>
+			<a href=#basics">Basics</a> | <a href="#addressing">Addressing data</a> | <a href="#examples">Usage Examples</a> | <a href="#metadata">Metadata queries</a> | <a href="#collection">Collection queries</a> | <a href="#example_restclient_code">Example API client code</a> | <a href="#help">Help, comments</a> | <a href="#author">Author</a>
 			
             <p>
 			    <br>
@@ -252,19 +252,53 @@ $app->get(
 						number of connected components (folding graphs) of a protein graph -- how do you know how many connected components a protein graph has? We also provide methods to get this information:
 						<br><br>
 						
-			            All chains of a protein:
+			            All chain names of a protein:
 						
 					    <ul>
-						<li>format: <i>/chains/&lt;pdbid&gt;</i> </li>
+						<li>format: <i>/<b>chains</b>/&lt;pdbid&gt;</i> </li>
 			            <li>example: <i><a href="$ptgl_api_url/chains/7tim" target="_blank">/api/index.php/chains/7tim/</a></i> retrieves all available chain names of all chains of 7tim. This is a list of strings, the format is always JSON. Output would be ["A", "B"] for this example.</li>
 						</ul>
 						
 						All folding graph numbers of a protein graph:
 						<br>
 					    <ul>
-						<li>format: <i>/folds/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;</i></li>
+						<li>format: <i>/<b>folds</b>/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;</i></li>
 			            <li>example: <i><a href="$ptgl_api_url/folds/7tim/A/albe" target="_blank">/api/index.php/folds/7tim/A/albe</a></i> retrieves all available fold numbers of the albe graph of 7tim chain A. This is a list of integers, the format is always JSON. Output would be [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] for this example.</li>
 						</ul>
+
+                </p>                
+            </section>
+			
+			
+			<a name="collection"></a>
+            <section style="padding-bottom: 20px">
+                <h2>Collection queries</h2>
+                <p>
+				    All queries presented so far were entity queries, i.e., they return data on a single object. We also provide some collection queries, which return some handy lists of objects. All of these return data in JSON format only:
+						<br><br>
+						
+			            A JSON list of all protein graph types (alpha, beta, ...) of a protein chain:
+						
+					    <ul>
+						<li>format: <i>/<b>pgs</b>/&lt;pdbid&gt;/&lt;chain&gt;/json</i> </li>
+			            <li>example: <i><a href="$ptgl_api_url/pgs/7tim/A/json" target="_blank">/api/index.php/pgs/7tim/A/json</a></i> retrieves a list of protein graphs in JSON format.</li>
+						</ul>
+						<br>
+						
+						A JSON list of all folding graphs of a protein graph (the number of FGs depends on the count of connected components of the PG):
+						<br>
+					    <ul>
+						<li>format: <i>/<b>fgs</b>/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;/json</i></li>
+			            <li>example: <i><a href="$ptgl_api_url/fgs/7tim/A/albe/json" target="_blank">/api/index.php/fgs/7tim/A/albe/json</a></i> retrieves a list of folding graphs in JSON format.</li>
+						</ul>
+						<br>
+						
+						A JSON list of all linear notation strings of a folding graph:
+						<br>
+					    <ul>
+						<li>format: <i>/<b>linnots</b>/&lt;pdbid&gt;/&lt;chain&gt;/&lt;graphtype&gt;/&lt;fold&gt;/json</i></li>
+			            <li>example: <i><a href="$ptgl_api_url/linnots/7tim/A/albe/0/json" target="_blank">/api/index.php/linnots/7tim/A/albe/0/json</a></i> retrieves a list of all linear notation strings in JSON format.</li>
+						</ul>												
 
                 </p>                
             </section>
@@ -355,6 +389,7 @@ EOT;
     'linnot' => 'adj|red|key|seq',
     'fold' => '[0-9]{1,}',
     'graphformat' => 'json|gml',
+	'graphformat_json' => 'json',
 	'imageformat' => 'png|svg'
 ));
 
@@ -417,6 +452,28 @@ $app->get('/pg/:pdbid/:chain/:graphtype/:graphformat', function ($pdbid, $chain,
     //echo "Found $num_res graphs.\n";
 });
 
+// get all protein graphs of a chain -- JSON list only
+$app->get('/pgs/:pdbid/:chain/:graphformat_json', function ($pdbid, $chain) use($db) {    
+    //echo "You requested the $graphtype graph of PDB $pdbid chain $chain.\n";
+	$pdbid = strtolower($pdbid);
+    $query = "SELECT g.graph_id, g.graph_string_json, g.graph_string_gml FROM plcc_graph g INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain'";
+    $result = pg_query($db, $query);
+    
+    $num_res = 0;
+	$json_list_string = "[ ";
+	$all_rows = pg_fetch_all($result);
+    for($i = 0; $i < count($all_rows); $i++) {
+	    $arr = $all_rows[$i];
+		$num_res++;
+        $json_list_string .= $arr['graph_string_json'];
+        if($i < count($all_rows) - 1) {
+		    $json_list_string .= ", ";
+		}
+    }
+	$json_list_string .= "]";
+    echo $json_list_string;
+});
+
 // get a single protein graph visualization as an image
 $app->get('/pgvis/:pdbid/:chain/:graphtype/:imageformat', function ($pdbid, $chain, $graphtype, $imageformat) use($db, $app) {    
 	$pdbid = strtolower($pdbid);
@@ -462,6 +519,29 @@ $app->get('/fg/:pdbid/:chain/:graphtype/:fold/:graphformat', function ($pdbid, $
         }		
     }
     //echo "You requested the folding graph of fold # $fold of the $graphtype protein graph of PDB $pdbid chain $chain. Found $num_res results.\n";
+});
+
+
+// get all folding graphs of a PG
+$app->get('/fgs/:pdbid/:chain/:graphtype/:graphformat_json', function ($pdbid, $chain, $graphtype) use($db) {
+    $pdbid = strtolower($pdbid);
+    $query = "SELECT fg.foldinggraph_id, fg.graph_string_json, fg.graph_string_gml FROM plcc_foldinggraph fg INNER JOIN plcc_graph g ON fg.parent_graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype'";
+    $result = pg_query($db, $query);
+    
+    $num_res = 0;
+	$json_list_string = "[ ";
+	$all_rows = pg_fetch_all($result);
+    for($i = 0; $i < count($all_rows); $i++) {
+	    $arr = $all_rows[$i];
+		$num_res++;
+        $json_list_string .= $arr['graph_string_json'];
+        if($i < count($all_rows) - 1) {
+		    $json_list_string .= ", ";
+		}
+    }
+	$json_list_string .= "]";
+    echo $json_list_string;
+
 });
 
 
@@ -542,6 +622,32 @@ $app->get('/linnot/:pdbid/:chain/:graphtype/:fold/:linnot', function ($pdbid, $c
 		$req_linnot = 'ptgl_linnot_' . $linnot;
 	    echo '"' . $arr[$req_linnot] . '"';
     }
+    //echo "You requested the $linnot notation of fold # $fold of the $graphtype protein graph of PDB $pdbid chain $chain.\n";
+});
+
+// get all linear notation strings of a folding graph
+$app->get('/linnots/:pdbid/:chain/:graphtype/:fold', function ($pdbid, $chain, $graphtype, $fold) use($db) {
+    $pdbid = strtolower($pdbid);
+    $query = "SELECT ln.linnot_id, ln.ptgl_linnot_adj, ln.ptgl_linnot_red, ln.ptgl_linnot_seq, ln.ptgl_linnot_key FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph g ON fg.parent_graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype' AND fg.fg_number = $fold";
+    $result = pg_query($db, $query);
+    
+    $num_res = 0;
+	$json = "[";
+	$array = pg_fetch_all($result);
+	for($i = 0; $i < count($array); $i++){
+	    $row = $array[$i];
+	    $num_res++;
+		$all_linnots = array('ptgl_linnot_adj', 'ptgl_linnot_red', 'ptgl_linnot_seq', 'ptgl_linnot_key');
+		for($j = 0; $j < count($all_linnots); $j++) {
+		    $req_linnot = $all_linnots[$j];
+	        $json .= $row[$req_linnot];
+			if($i < count($all_linnots) - 1) {
+		        $json .= ", ";
+		    }
+		}
+    }
+	$json .= "]";
+	echo $json;
     //echo "You requested the $linnot notation of fold # $fold of the $graphtype protein graph of PDB $pdbid chain $chain.\n";
 });
 
