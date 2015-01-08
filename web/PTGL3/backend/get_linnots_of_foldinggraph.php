@@ -159,6 +159,13 @@ if($valid_values){
 		$img_red = $arr['filepath_linnot_image_red_png'];
 		$img_seq = $arr['filepath_linnot_image_seq_png'];
 		$img_key = $arr['filepath_linnot_image_key_png'];
+		
+		$str_def = $arr['ptgl_linnot_adj'];
+		$str_adj = $arr['ptgl_linnot_adj'];
+		$str_red = $arr['ptgl_linnot_red'];
+		$str_seq = $arr['ptgl_linnot_seq'];
+		$str_key = $arr['ptgl_linnot_key'];
+		
 
 		// DEF
 		$image_exists_def = FALSE;
@@ -170,7 +177,7 @@ if($valid_values){
 			if($fg_number === $current_fold_number) {
 			    $num_linnot_images_for_this_fold++;
 			    $img_link_def = '<a href="#def">yes</a>';				
-				$img_string .= "<h3>DEF notation</h3>The DEF notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
+				$img_string .= "<h3>Overview</h3>Visualization of the folding graph $fold_name (#$fg_number) within the protein graph: ";
 		        $img_string .= "<div id='def'><img src='" . $full_img_path_def . "' width='800'></div><br><br>\n";
 			}
 		}
@@ -185,7 +192,7 @@ if($valid_values){
 			if($fg_number === $current_fold_number) {
 			    $num_linnot_images_for_this_fold++;
 			    $img_link_adj = '<a href="#adj">yes</a>';
-				$img_string .= "<h3>ADJ notation</h3>The ADJ notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
+				$img_string .= "<h3>ADJ notation</h3>ADJ string: $str_adj<br>Visualization of the ADJ notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
 		        $img_string .= "<div id='adj'><img src='" . $full_img_path_adj . "' width='800'></div><br><br>\n";
 			}
 		}
@@ -200,7 +207,7 @@ if($valid_values){
 			if($fg_number === $current_fold_number) {
 			    $num_linnot_images_for_this_fold++;
 			    $img_link_red = '<a href="#red">yes</a>';
-				$img_string .= "<h3>RED notation</h3>The RED notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
+				$img_string .= "<h3>RED notation</h3>RED string: $str_red<br>Visualization of the RED notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
 		        $img_string .= "<div id='red'><img src='" . $full_img_path_red . "' width='800'></div><br><br>\n";
 			}
 		}
@@ -215,7 +222,7 @@ if($valid_values){
 			if($fg_number === $current_fold_number) {
 			    $num_linnot_images_for_this_fold++;
 			    $img_link_seq = '<a href="#seq">yes</a>';
-				$img_string .= "<h3>SEQ notation</h3>The SEQ notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
+				$img_string .= "<h3>SEQ notation</h3>SEQ string: $str_seq<br>Visualization of the SEQ notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
 		        $img_string .= "<div id='seq'><img src='" . $full_img_path_seq . "' width='800'></div><br><br>\n";
 			}
 		}
@@ -230,7 +237,7 @@ if($valid_values){
 			if($fg_number === $current_fold_number) {
 			    $num_linnot_images_for_this_fold++;
 			    $img_link_key = '<a href="#key">yes</a>';
-				$img_string .= "<h3>KEY notation</h3>The KEY notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
+				$img_string .= "<h3>KEY notation</h3>KEY string: $str_key<br>Visualization of the KEY notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
 		        $img_string .= "<div id='key'><img src='" . $full_img_path_key . "' width='800'></div><br><br>\n";
 			}
 		}

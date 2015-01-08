@@ -118,7 +118,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			      if($pageload_was_search) {
 			          if($valid_values) {
 				      echo "<h3> Search Results </h3>\n";
-				  
+				      echo "<p>All linear notation images of folding graph #$current_fold_number are shown below. The following table gives an overview of the other folding graphs of the same protein graph. </p>\n";
 				      echo $tableString; /* The table string is constructed in /backend/get_linnots_of_foldinggraph.php, which is included by this file. */  
 				
 				      if($num_linnot_images_for_this_fold > 0) {
