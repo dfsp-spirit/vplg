@@ -21,8 +21,14 @@ if($DEBUG){
 	error_reporting(E_ALL);
 }
 
+
 function get_fglinnots_data_query_string($pdb_id, $chain_name, $graphtype_str) {
    $query = "SELECT linnot_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, filepath_linnot_image_adj_png, filepath_linnot_image_red_png, filepath_linnot_image_seq_png, filepath_linnot_image_key_png, filepath_linnot_image_adj_svg, filepath_linnot_image_red_svg, filepath_linnot_image_seq_svg, filepath_linnot_image_key_svg, filepath_linnot_image_adj_pdf, filepath_linnot_image_red_pdf, filepath_linnot_image_seq_pdf, filepath_linnot_image_key_pdf, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key, num_sses, sse_string FROM (SELECT la.num_sses, la.linnot_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, la.filepath_linnot_image_adj_png, la.filepath_linnot_image_red_png, la.filepath_linnot_image_seq_png, la.filepath_linnot_image_key_png, la.filepath_linnot_image_adj_svg, la.filepath_linnot_image_red_svg, la.filepath_linnot_image_seq_svg, la.filepath_linnot_image_key_svg, la.filepath_linnot_image_adj_pdf, la.filepath_linnot_image_red_pdf, la.filepath_linnot_image_seq_pdf, la.filepath_linnot_image_key_pdf, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, c.pdb_id AS pdb_id FROM plcc_fglinnot la LEFT JOIN plcc_foldinggraph fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN plcc_chain c ON pg.chain_id=c.chain_id LEFT JOIN plcc_graphtypes gt ON pg.graph_type=gt.graphtype_id WHERE ( graphtype_text = '" . $graphtype_str . "' AND chain_name = '" . $chain_name . "' AND pdb_id = '" . $pdb_id . "' )) bar ORDER BY fg_number";
+   return $query;
+}
+
+function get_fglinnots_data_query_string_denormalized($pdb_id, $chain_name, $graphtype_str) {
+   $query = "SELECT linnot_id, pdb_id, chain_name, graphtype_text, fg_number, fold_name, filepath_linnot_image_adj_png, filepath_linnot_image_red_png, filepath_linnot_image_seq_png, filepath_linnot_image_key_png, filepath_linnot_image_adj_svg, filepath_linnot_image_red_svg, filepath_linnot_image_seq_svg, filepath_linnot_image_key_svg, filepath_linnot_image_adj_pdf, filepath_linnot_image_red_pdf, filepath_linnot_image_seq_pdf, filepath_linnot_image_key_pdf, ptgl_linnot_adj, ptgl_linnot_red, ptgl_linnot_key, ptgl_linnot_seq, firstvertexpos_adj, firstvertexpos_red, firstvertexpos_seq, firstvertexpos_key, num_sses, sse_string FROM (SELECT la.num_sses, la.linnot_id, la.ptgl_linnot_adj, la.ptgl_linnot_red, la.ptgl_linnot_key, la.ptgl_linnot_seq, la.firstvertexpos_adj, la.firstvertexpos_red, la.firstvertexpos_seq, la.firstvertexpos_key, la.filepath_linnot_image_adj_png, la.filepath_linnot_image_red_png, la.filepath_linnot_image_seq_png, la.filepath_linnot_image_key_png, la.filepath_linnot_image_adj_svg, la.filepath_linnot_image_red_svg, la.filepath_linnot_image_seq_svg, la.filepath_linnot_image_key_svg, la.filepath_linnot_image_adj_pdf, la.filepath_linnot_image_red_pdf, la.filepath_linnot_image_seq_pdf, la.filepath_linnot_image_key_pdf, fg.foldinggraph_id, fg.fg_number, fg.parent_graph_id, fg.fold_name, fg.sse_string, fg.graph_containsbetabarrel, gt.graphtype_text, fg.graph_string_gml, c.chain_name AS chain_name, la.chain_name AS des_chain_name, c.pdb_id AS pdb_id, la.graph_type AS des_graph_type, la.pdb_id as des_pdb_id FROM plcc_fglinnot la LEFT JOIN plcc_foldinggraph fg ON la.linnot_foldinggraph_id = fg.foldinggraph_id LEFT JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id LEFT JOIN plcc_chain c ON pg.chain_id=c.chain_id LEFT JOIN plcc_graphtypes gt ON pg.graph_type=gt.graphtype_id WHERE ( gt.graphtype_text = '" . $graphtype_str . "' AND c.chain_name = '" . $chain_name . "' AND c.pdb_id = '" . $pdb_id . "' )) bar ORDER BY fg_number";
    return $query;
 }
 
@@ -112,7 +118,11 @@ if($valid_values){
 	if(! $db) { echo "NO_DB"; }
 	
 	$graphtype_str = get_graphtype_string($graphtype_int);
-	$query = get_fglinnots_data_query_string($pdb_id, $chain_name, $graphtype_str);
+	if($USE_DENORMALIZED_DB_FIELDS) {
+	    $query = get_fglinnots_data_query_string_denormalized($pdb_id, $chain_name, $graphtype_str);
+	} else {
+	    $query = get_fglinnots_data_query_string($pdb_id, $chain_name, $graphtype_str);
+	}
 	
 	//echo "query='" . $query . "'\n";
 	

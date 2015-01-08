@@ -4,7 +4,7 @@
 include('./backend/config.php');
 include('./backend/get_linearnotations.php');
 
-$title = "Linear notations";
+$title = "List of all Linear notations";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
 ?>
 <html>
@@ -45,12 +45,12 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 	<?php include('navbar.php'); ?>
 
 	<div class="container" id="publications">
-		<h2>Linear notations of the folding graphs</h2>
+		<h2>List of all linear notations of the folding graphs</h2>
 		<br>
 		
 		<div id="PageIntro">
 		<div class="container" id="pageintro">
-		On this page, you can search the linear notations of the different folding graph types (a folding graph is a connected component of a protein graph). All notations stored in the
+		On this page, you can browse all linear notations of the different folding graph types (a folding graph is a connected component of a protein graph). All notations stored in the
 		database are shown. Clicking on a linear notation in the result list takes you to all protein chains which contain
 		the respective linear notation.
 		</div><!-- end container-->
@@ -93,7 +93,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 				<?php echo $tableString; /* The table string is constructed in backend/search.php, which is included by this file. */  ?>
 			<?php } else { ?>
 				<div id="linnot_info">
-					<div>It seems like you did not selected anything. Choose the graph-type and the notation-type and hit search!</div>
+					<div>It seems like you did not selected anything. Choose the graph type and the notation type and hit search!</div>
 				</div>
 			<?php } ?>
 

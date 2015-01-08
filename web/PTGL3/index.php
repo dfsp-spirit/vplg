@@ -56,30 +56,15 @@ function check_install($db)  {
 	<div id="Home">
 		<div class="container" id="intro">
 		<!-- Intro message -->
-			The <?php echo $SITE_TITLE; ?> web server provides a database of protein secondary structure topologies. It is based on protein ligand graphs computed
-			by the <a href="http://www.bioinformatik.uni-frankfurt.de/tools/vplg/" target="_blank">VPLG software</a>. The <?php echo $SITE_TITLE; ?> uses a graph-based model to describe the structure of proteins on the super-secondary structure level.
+		
+		    <?php
 			
-			<!--
-			A protein ligand graph is
-			computed from the atomic coordinates in a PDB file and the secondary structure assignments of the DSSP algorithm. In this graph, vertices
-			represent secondary structure elements (SSEs, usually alpha helices and beta strands) or ligand molecules while the edges model contacts and 
-			relative orientations between the SSEs.
-			-->
-			<br /><br />
+			  if($SHOW_MAINTENANCE_MESSAGE_ON_FRONTPAGE) {
+			      echo "\n" . '<br><div class="boxedred"><p><br>&nbsp;&nbsp;' . "\n";
+				  echo $MAINTENANCE_MESSAGE;
+				  echo "</p></div><br>\n";
+			  }
 			
-			<p class="imgCenter"><img src="./images/ptgl_overview_trans.png" width="600"></p>
-			
-			<br /><br />
-			This web server allows you to search for <b>protein motifs</b> which can be detected in the graphs. It also provides <b>standardized 2D visualizations</b> of protein graphs and folding graphs.
-			In contrast to the manually curated <a href="http://www.cathdb.info/" target="_blank">CATH</a> and <a href="http://scop.mrc-lmb.cam.ac.uk/scop/" target="_blank">SCOP</a> databases, the method used by this server is fully automated.
-			Similar servers, which also support substructure search, include <a href="http://prodata.swmed.edu/prosmos/" target="_blank">ProSMoS</a> and <a href="http://munk.csse.unimelb.edu.au/pro-origami/" target="_blank">Pro-Origami</a>.
-			
-			<?php if($ENABLE_GRAPHLETSIMILARITY_SEARCH) { ?>
-			Additionally, this server implements graph-based similarity measures to search for protein chains which are similar to a given query protein.
-			<?php } ?>
-			
-			<br>
-			<?php
 			  if($CHECK_INSTALL_ON_FRONTPAGE) {
 			      $conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
 			      $db = pg_connect($conn_string);                          
@@ -117,6 +102,33 @@ function check_install($db)  {
 			  }
 	
 			?>
+			
+			
+			
+			The <?php echo $SITE_TITLE; ?> web server provides a database of protein secondary structure topologies. It is based on protein ligand graphs computed
+			by the <a href="http://www.bioinformatik.uni-frankfurt.de/tools/vplg/" target="_blank">VPLG software</a>. The <?php echo $SITE_TITLE; ?> uses a graph-based model to describe the structure of proteins on the super-secondary structure level.
+			
+			<!--
+			A protein ligand graph is
+			computed from the atomic coordinates in a PDB file and the secondary structure assignments of the DSSP algorithm. In this graph, vertices
+			represent secondary structure elements (SSEs, usually alpha helices and beta strands) or ligand molecules while the edges model contacts and 
+			relative orientations between the SSEs.
+			-->
+			<br /><br />
+			
+			<p class="imgCenter"><img src="./images/ptgl_overview_trans.png" width="600"></p>
+			
+			<br /><br />
+			This web server allows you to search for <b>protein motifs</b> which can be detected in the graphs. It also provides <b>standardized 2D visualizations</b> of protein graphs and folding graphs.
+			In contrast to the manually curated <a href="http://www.cathdb.info/" target="_blank">CATH</a> and <a href="http://scop.mrc-lmb.cam.ac.uk/scop/" target="_blank">SCOP</a> databases, the method used by this server is fully automated.
+			Similar servers, which also support substructure search, include <a href="http://prodata.swmed.edu/prosmos/" target="_blank">ProSMoS</a> and <a href="http://munk.csse.unimelb.edu.au/pro-origami/" target="_blank">Pro-Origami</a>.
+			
+			<?php if($ENABLE_GRAPHLETSIMILARITY_SEARCH) { ?>
+			Additionally, this server implements graph-based similarity measures to search for protein chains which are similar to a given query protein.
+			<?php } ?>
+			
+			<br>
+			
 			
 		</div><!-- end container-->
 	</div><!-- end Home -->
