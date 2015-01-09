@@ -85,9 +85,11 @@ This section roughly explains how VPLG works. See the paper for details.<br />
 <br />
 <br />
 <br />
-<a name="Fileformat" id="Fileformat"></a> <strong>The <em>plg</em> File format</strong><br />
+<a name="Fileformat" id="Fileformat"></a> <strong>Output file formats</strong><br />
 <br />
-When VPLG is run for a protein, it writes a human-readable protein-ligand graph file in ASCII format (PLG file, file extension <em>.plg</em>) in addition to the image files. The file format was designed to be easily parsable. VPLG can read these files and visualize protein graphs from them directly, so if you have a PLG file the PDB and DSSP files are NOT required to draw the graph. An example for a file in PLG format is given below:<br />
+VPLG can save the output graphs in a variety of standard graph file formats, including <a href="http://en.wikipedia.org/wiki/Graph_Modelling_Language" target="_blank">GML</a>, <a href="http://en.wikipedia.org/wiki/Trivial_Graph_Format" target="_blank">TGF</a>, and its own PLG format.
+These formats can be opened by standard graph software like Gephi, Cytoscape or GraphViz.
+An example for a file in PLG format is given below:<br /><br />
 <pre>
 # This is the plcc SSE info file for the albelig graph of PDB entry 2hhb, chain A.
 > format_version > 2
@@ -178,8 +180,8 @@ Note on parsing these files: You can savely remove all whitespace from a line be
 The source code is included in the src/ directory of your VPLG release.
 <br />
 <br />
-The latest version of the VPLG code is managed in our non-public subversion repository atm. We are working on moving it to our public, read-only <a href="http://sourceforge.net/p/vplg/code/">Sourceforge SVN</a> in the near future. If you are interested in the
-development of VPLG, please contact the author to get write access.
+The latest version of the VPLG code is managed in our subversion repository at Sourceforge atm. If you are interested in the
+development of VPLG, please contact Tim Schäfer or another member of the team to get write access.
 </p>
 <br />
 <br />
@@ -190,7 +192,7 @@ development of VPLG, please contact the author to get write access.
 <br />
 <a name="Contact" id="Contact"></a>
 <p class="big">Contact &amp; Citing VPLG</p>
-<p class="text">VPLG was written by Tim Schäfer at the Molecular Bioinformatics group of Ina Koch at Goethe-University Frankfurt, Germany. It is based on earlier work by Ina Koch and Patrick May. Contact information is <a href="http://www.bioinformatik.uni-frankfurt.de/about_us.html" target="_blank">available here</a>.
+<p class="text">VPLG was written by <a href="http://rcmd.org/ts/" target="_blank">Tim Schäfer</a> at the <a href="http://www.bioinformatik.uni-frankfurt.de/about_us.html" target="_blank">Molecular Bioinformatics group of Ina Koch</a> at Goethe-University Frankfurt, Germany. It is based on earlier work by Ina Koch and Patrick May. Contact information is <a href="http://www.bioinformatik.uni-frankfurt.de/about_us.html" target="_blank">available here</a>.
 <br /><br />
 Information on <a href="https://sourceforge.net/p/vplg/wiki/Citing/">how to cite VPLG is available here</a>.
 <br /><br />
