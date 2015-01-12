@@ -194,7 +194,7 @@ function get_linnots_filename($graphtype_int, $notation) {
 		    <p>You need to provide your admin ID and the your secret admin token to start tasks.</p>		    
 		    <br><br>
 		    <p>
-		    <b>Linnot list</b> -- generate new linear notations file from the database.
+		    <b>Linnot list</b> -- generate new linear notations file from the database.</p>
 		     <form action="maintenance.php" method="POST">
 		     Admin ID:
                      <input type="input" name="admin_id" value="">                     
@@ -203,7 +203,7 @@ function get_linnots_filename($graphtype_int, $notation) {
                      <input type="hidden" name="task" value="linnot_list">
                      <input type="submit" value="Start linnot task" onclick="return confirm('This may take some time, it also places load on the server. Are you sure?')">
                      </form> 
-		   </p>
+		   
 		   
 		   
 		   <br><br>		   
@@ -260,9 +260,9 @@ function get_linnots_filename($graphtype_int, $notation) {
 		   
 		   
 		   ?>
-		   </p>
+		   </p><br><br><br>
 		   
-			
+		</div>	
 		
 	</div>
 
