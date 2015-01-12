@@ -204,8 +204,12 @@ if($valid_values){
 			$img_link_adj = "yes";
 			if($fg_number === $current_fold_number) {
 			    $num_linnot_images_for_this_fold++;
+				$link_others_same_linnot_adj = "";
+				if(strlen($str_adj) > 0) {
+				    $link_others_same_linnot_adj = "Show all chains with this $graphtype_str ADJ linear notation: <a href='./search.php?linnot" . $graphtype_str . "adj=$str_adj'>Search</a><br>";
+				} 
 			    $img_link_adj = '<a href="#adj">yes</a>';
-				$img_string .= "<h3>ADJ notation</h3>ADJ string: $str_adj<br>Visualization of the ADJ notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
+				$img_string .= "<h3>ADJ notation</h3>ADJ string: $str_adj<br>$link_others_same_linnot_adj Visualization of the ADJ notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
 		        $img_string .= "<div id='adj'><img src='" . $full_img_path_adj . "' width='800'></div><br><br>\n";
 			}
 		}
@@ -219,8 +223,12 @@ if($valid_values){
 			$img_link_red = "yes";
 			if($fg_number === $current_fold_number) {
 			    $num_linnot_images_for_this_fold++;
+				$link_others_same_linnot_red = "";
+				if(strlen($str_red) > 0) {
+				    $link_others_same_linnot_red = "Show all chains with this $graphtype_str RED linear notation: <a href='./search.php?linnot" . $graphtype_str . "red=$str_red'>Search</a><br>";
+				}
 			    $img_link_red = '<a href="#red">yes</a>';
-				$img_string .= "<h3>RED notation</h3>RED string: $str_red<br>Visualization of the RED notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
+				$img_string .= "<h3>RED notation</h3>RED string: $str_red<br>$link_others_same_linnot_red Visualization of the RED notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
 		        $img_string .= "<div id='red'><img src='" . $full_img_path_red . "' width='800'></div><br><br>\n";
 			}
 		}
@@ -234,8 +242,12 @@ if($valid_values){
 			$img_link_seq = "yes";
 			if($fg_number === $current_fold_number) {
 			    $num_linnot_images_for_this_fold++;
+				$link_others_same_linnot_seq = "";
+				if(strlen($str_seq) > 0) {
+				    $link_others_same_linnot_seq = "Show all chains with this $graphtype_str SEQ linear notation: <a href='./search.php?linnot" . $graphtype_str . "seq=$str_seq'>Search</a><br>";
+				}
 			    $img_link_seq = '<a href="#seq">yes</a>';
-				$img_string .= "<h3>SEQ notation</h3>SEQ string: $str_seq<br>Visualization of the SEQ notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
+				$img_string .= "<h3>SEQ notation</h3>SEQ string: $str_seq<br>$link_others_same_linnot_seq Visualization of the SEQ notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
 		        $img_string .= "<div id='seq'><img src='" . $full_img_path_seq . "' width='800'></div><br><br>\n";
 			}
 		}
@@ -249,8 +261,12 @@ if($valid_values){
 			$img_link_key = "yes";
 			if($fg_number === $current_fold_number) {
 			    $num_linnot_images_for_this_fold++;
+				$link_others_same_linnot_key = "";
+				if(strlen($str_key) > 0) {
+				    $link_others_same_linnot_key = "Show all chains with this $graphtype_str KEY linear notation: <a href='./search.php?linnot" . $graphtype_str . "key=$str_key'>Search</a><br>";
+				}
 			    $img_link_key = '<a href="#key">yes</a>';
-				$img_string .= "<h3>KEY notation</h3>KEY string: $str_key<br>Visualization of the KEY notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
+				$img_string .= "<h3>KEY notation</h3>KEY string: $str_key<br>$link_others_same_linnot_key Visualization of the KEY notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
 		        $img_string .= "<div id='key'><img src='" . $full_img_path_key . "' width='800'></div><br><br>\n";
 			}
 		}
