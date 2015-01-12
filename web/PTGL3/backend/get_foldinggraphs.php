@@ -115,7 +115,8 @@ if($valid_values){
 	// connect to DB
 	$conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
 	$db = pg_connect($conn_string);
-	if(! $db) { echo "NO_DB"; }
+	if(! $db) { array_push($SHOW_ERROR_LIST, "Database connection failed."); }
+	//if(! $db) { echo "NO_DB"; }
 	
 	$graphtype_str = get_graphtype_string($graphtype_int);
 	if($USE_DENORMALIZED_DB_FIELDS) {
@@ -127,7 +128,8 @@ if($valid_values){
 	//echo "query='" . $query . "'\n";
 	
 	$result = pg_query($db, $query);
-    if(! $result) { echo "NO_RESULT: " .  pg_last_error($db) . "."; }
+    //if(! $result) { echo "NO_RESULT: " .  pg_last_error($db) . "."; }
+	if(! $result) { array_push($SHOW_ERROR_LIST, "Database query failed: '" . pg_last_error($db) . "'"); }
 	
 	$tableString .= "<div><table id='tblfgresults'>\n";
 	$tableString .= "<caption> The $notation $graphtype_str folding graphs of PDB $pdb_id chain $chain_name </caption>\n";

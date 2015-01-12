@@ -2,7 +2,11 @@
 <!DOCTYPE html>
 <?php 
 include('./backend/config.php');
+$SHOW_ERROR_LIST = array();
 include('./backend/get_foldinggraphs.php');
+include('./common.php');
+$DO_SHOW_ERROR_LIST = $DEBUG_MODE;
+
 
 $title = "Folding graphs";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
@@ -163,6 +167,13 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
 </div><!-- end container and contentText -->
 </div><!-- end wrapper -->
+
+<?php
+// show red error bar on bottom of screen if enabled and error list is non-empty
+if($DO_SHOW_ERROR_LIST) {
+  show_the_errors($SHOW_ERROR_LIST);  
+}
+?>
 
 <?php include('footer.php'); ?>
 	<!-- All Javascript at the bottom of the page for faster page loading -->

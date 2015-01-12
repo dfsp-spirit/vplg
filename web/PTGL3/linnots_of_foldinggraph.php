@@ -148,10 +148,10 @@ $DO_SHOW_ERROR_LIST = $DEBUG_MODE;
 </div><!-- end wrapper -->
 
 <?php
+// show red error bar on bottom of screen if enabled and error list is non-empty
 if($DO_SHOW_ERROR_LIST) {
   show_the_errors($SHOW_ERROR_LIST);  
 }
-
 ?>
 
 <?php include('footer.php'); ?>

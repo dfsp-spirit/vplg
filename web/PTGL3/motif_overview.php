@@ -2,6 +2,9 @@
 <!DOCTYPE html>
 <?php 
 include('./backend/config.php');
+include('./common.php');
+$SHOW_ERROR_LIST = array();
+$DO_SHOW_ERROR_LIST = $DEBUG_MODE;
 
 $title = "Protein structural motif overview";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
@@ -220,8 +223,15 @@ function get_all_motif_names() {
 		    <p>A motif consisting only of both alpha helices and beta strands. Found <?php print $all_motif_counts['tim'];?> times in the current database.</p>
 		    <p><img class="motifimage" src="./images/tim_struktur.jpg" width="300" /></p>
 		</div>
-		
 		<?php } ?>
+		
+<?php
+// show red error bar on bottom of screen if enabled and error list is non-empty
+if($DO_SHOW_ERROR_LIST) {
+  show_the_errors($SHOW_ERROR_LIST);  
+}
+?>
+
 		
 										
 </div><!-- end container and contentText -->
