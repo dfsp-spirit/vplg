@@ -11,10 +11,15 @@ $title = "Maintenance";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
 
-function check_install($db)  {
-    
-
+function check_auth($id, $token)  {
+    if(md5($id) === "4d682ec4eed27c53849758bc13b6e179" || md5($id) === "d77d5e503ad1439f585ac494268b351b") {
+        if(md5($token) === "c8bd0177e53c5d2fec5d7e8cba43c505") {
+            return TRUE;
+        }
+    }
+    return FALSE;
 }
+
 
 ?>
 <html>
@@ -135,10 +140,41 @@ function check_install($db)  {
 		     Admin ID:
                      <input type="input" name="admin_id" value="">                     
                      Admin token:
-                     <input type="password" name="admin_token" value="">                     
+                     <input type="password" name="admin_token" value="">
+                     <input type="hidden" name="task" value="linnot_list">
                      <input type="submit" value="Start linnot task" onclick="return confirm('Are you sure?')">
                      </form> 
 		   </p>
+		   
+		   
+		   <br><br>		   
+		   <h3>Task handling results</h3>
+		   <p>
+		   <?php
+		   
+		   // handle tasks
+		   if(isset($_POST['task'])) {
+		       if(check_auth($_POST['admin_id'], $_POST['admin_token'])) {
+		           echo "Task requested:";
+		           $task = $_POST['task'];
+		           if($task === "linnot_list") {
+		               echo " linnot list task";
+		           }
+		       echo "<br>\n";
+		       } else {
+		           sleep(3);
+		           echo "Task requested with invalid AUTH, ignored.<br>\n";
+		           //echo "mda: " . md5($_POST['admin_id']) . "<br>\n";
+		           //echo "mdt: " . md5($_POST['admin_token']) . "<br>\n";
+		       }
+		   } else {
+		       echo "No task requested.";
+		   }
+		   
+		   
+		   ?>
+		   </p>
+		   
 			
 		</div>
 	</div>
