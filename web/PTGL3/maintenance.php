@@ -11,6 +11,29 @@ $title = "Maintenance";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
 
+function get_graphtype_abbr($graphtype_int){
+	switch ($graphtype_int){
+		case 1:
+			return "alpha";
+			break;
+		case 2:
+			return "beta";
+			break;
+		case 3:
+			return "albe";
+			break;
+		case 4:
+			return "alphalig";
+			break;
+		case 5:
+			return "betalig";
+			break;
+		case 6:
+			return "albelig";
+			break;
+	}
+}
+
 function check_auth($id, $token)  {
     if(md5($id) === "4d682ec4eed27c53849758bc13b6e179" || md5($id) === "d77d5e503ad1439f585ac494268b351b") {
         if(md5($token) === "c8bd0177e53c5d2fec5d7e8cba43c505") {
@@ -18,6 +41,35 @@ function check_auth($id, $token)  {
         }
     }
     return FALSE;
+}
+
+function get_all_linnots_query_string($graphtype_int, $notation){
+$query = "SELECT DISTINCT fglin.ptgl_linnot_%s
+FROM plcc_fglinnot fglin
+INNER JOIN plcc_foldinggraph fg
+ON fglin.linnot_foldinggraph_id = fg.foldinggraph_id
+INNER JOIN plcc_graph g
+ON fg.parent_graph_id = g.graph_id
+WHERE g.graph_type = %s
+ORDER BY fglin.ptgl_linnot_%s ASC";
+$query = sprintf($query, $notation, $graphtype_int, $notation);
+return $query;	
+} 
+
+
+function get_all_linnots_query_string_denormalized($graphtype_int, $notation){
+	$query =   "SELECT DISTINCT fglin.ptgl_linnot_%s
+				FROM plcc_fglinnot fglin				
+				WHERE fglin.graph_type = %s
+				ORDER BY fglin.linnot_id ASC";
+	
+	$query = sprintf($query, $notation, $graphtype_int);
+	return $query;			
+}
+
+function get_linnots_filename($graphtype_int, $notation) {
+    $graphtype = get_graphtype_abbr($graphtype_int);
+    return "linnots_" . $notation . "_" . $graphtype . ".lst";
 }
 
 
@@ -141,8 +193,9 @@ function check_auth($id, $token)  {
                      <input type="input" name="admin_id" value="">                     
                      Admin token:
                      <input type="password" name="admin_token" value="">
+                     Linnot type:
                      <input type="hidden" name="task" value="linnot_list">
-                     <input type="submit" value="Start linnot task" onclick="return confirm('Are you sure?')">
+                     <input type="submit" value="Start linnot task" onclick="return confirm('This may take some time, it also places load on the server. Are you sure?')">
                      </form> 
 		   </p>
 		   
@@ -155,10 +208,36 @@ function check_auth($id, $token)  {
 		   // handle tasks
 		   if(isset($_POST['task'])) {
 		       if(check_auth($_POST['admin_id'], $_POST['admin_token'])) {
-		           echo "Task requested:";
+		           echo "Task requested: ";
 		           $task = $_POST['task'];
 		           if($task === "linnot_list") {
-		               echo " linnot list task";
+		               echo "Linnot list task...<br>";
+		               $notations = array("adj", "red", "seq", "key");
+		               $graphtypes_int = array(1, 2, 3, 4, 5, 6);
+		               
+		               foreach($notations as $notation) {
+		                      foreach($graphtypes_int as $graphtype_int) {
+					  if($USE_DENORMALIZED_DB_FIELDS) {
+					      $query = get_all_linnots_query_string_denormalized($graphtype_int, $notation);
+					  } else {
+					      $query = get_all_linnots_query_string($graphtype_int, $notation);
+					  }
+					  $result = pg_query($db, $query);
+					  $all_data = pg_fetch_all($result);
+		    
+					  if(! $all_data) { echo "ERROR: '" . pg_last_error() . "'."; }
+					  
+					  $result_string = "";
+					  
+					  foreach($all_data as $row) {
+						  $result_string .= $row['ptgl_linnot_'.$notation] . "\n";
+					  }
+					  $filename = "./temp_data/" . get_linnots_filename($graphtype_int, $notation);
+					  $num_bytes_written = file_put_contents($filename, $result_string);
+					  echo "Wrote $num_bytes_written bytes to file $filename.<br>\n";
+				      }
+			      }
+	
 		           }
 		       echo "<br>\n";
 		       } else {
@@ -168,7 +247,7 @@ function check_auth($id, $token)  {
 		           //echo "mdt: " . md5($_POST['admin_token']) . "<br>\n";
 		       }
 		   } else {
-		       echo "No task requested.";
+		       echo "<i>No task requested.</i>";
 		   }
 		   
 		   

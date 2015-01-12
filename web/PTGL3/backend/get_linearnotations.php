@@ -25,8 +25,8 @@ $q_limit = 50;
 $valid_values = FALSE;
 
 
-function get_graphtype_abbr($graphtype){
-	switch ($graphtype){
+function get_graphtype_abbr($graphtype_int){
+	switch ($graphtype_int){
 		case 1:
 			return "alpha";
 			break;
@@ -48,7 +48,7 @@ function get_graphtype_abbr($graphtype){
 	}
 }
 
-function get_query_string($graphtype, $notation, $q_limit, $limit_start){
+function get_query_string($graphtype_int, $notation, $q_limit, $limit_start){
 $query = "SELECT DISTINCT fglin.ptgl_linnot_%s
 FROM plcc_fglinnot fglin
 INNER JOIN plcc_foldinggraph fg
@@ -58,40 +58,40 @@ ON fg.parent_graph_id = g.graph_id
 WHERE g.graph_type = %s
 ORDER BY fglin.ptgl_linnot_%s ASC
 LIMIT %d OFFSET %d";
-$query = sprintf($query, $notation, $graphtype, $notation, $q_limit, $limit_start);
+$query = sprintf($query, $notation, $graphtype_int, $notation, $q_limit, $limit_start);
 return $query;	
 } 
 
 
-function get_query_string_denormalized($graphtype, $notation, $q_limit, $limit_start){
-	$query =   "SELECT fglin.ptgl_linnot_%s
+function get_query_string_denormalized($graphtype_int, $notation, $q_limit, $limit_start){
+	$query =   "SELECT DISTINCT fglin.ptgl_linnot_%s
 				FROM plcc_fglinnot fglin				
 				WHERE fglin.graph_type = %s
 				ORDER BY fglin.linnot_id ASC
 				LIMIT %d OFFSET %d";
 	
-	$query = sprintf($query, $notation, $graphtype, $q_limit, $limit_start);
+	$query = sprintf($query, $notation, $graphtype_int, $q_limit, $limit_start);
 	return $query;			
 }
-function get_count_query_string($graphtype, $notation){
-$query = "SELECT COUNT(fglin.ptgl_linnot_%s)
+function get_count_query_string($graphtype_int, $notation){
+$query = "SELECT COUNT(DISTINCT fglin.ptgl_linnot_%s)
 FROM plcc_fglinnot fglin
 INNER JOIN plcc_foldinggraph fg
 ON fglin.linnot_foldinggraph_id = fg.foldinggraph_id
 INNER JOIN plcc_graph g
 ON fg.parent_graph_id = g.graph_id
 WHERE g.graph_type = %s";
-$query = sprintf($query, $notation, $graphtype);
+$query = sprintf($query, $notation, $graphtype_int);
 return $query;	
 } 
 
 
-function get_count_query_string_denormalized($graphtype, $notation){
+function get_count_query_string_denormalized($graphtype_int, $notation){
 	$query =   "SELECT COUNT(fglin.ptgl_linnot_%s)
 				FROM plcc_fglinnot fglin				
 				WHERE fglin.graph_type = %s";
 	
-	$query = sprintf($query, $notation, $graphtype);
+	$query = sprintf($query, $notation, $graphtype_int);
 	return $query;			
 }
 
@@ -174,6 +174,9 @@ if($valid_values){
 	$parameter = "linnot".get_graphtype_abbr($graphtype).$notation;
 	
 	$all_data = pg_fetch_all($result);
+	
+	if(! $all_data) { echo "ERROR: '" . pg_last_error() . "'."; }
+	
 	foreach($all_data as $arr) {
 		$linnot_string = $arr['ptgl_linnot_'.$notation];
 		$tableString .= "<div class='string_row'>";

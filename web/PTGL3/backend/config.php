@@ -11,9 +11,9 @@
  */
 
 //---- Database settings ----//
-$DB_HOST		= '127.0.0.1'; // 127.0.0.1 lauscht niemand
+$DB_HOST		= '127.0.0.1';
 $DB_USER		= 'vplg';
-$DB_PASSWORD	= 'vplg';
+$DB_PASSWORD		= 'vplg';
 $DB_NAME		= 'vplg';
 $DB_PORT		= '5432';
 //---- End of database settings ----//
@@ -34,7 +34,7 @@ $USE_LOGIC_OPERATORS	= FALSE;
 $USE_PRECOMPUTED_GRAPHLET_SIMILARITY_DATA_FROM_DB = TRUE;
 //---- End of search settings ----//
 
-$USE_DENORMALIZED_DB_FIELDS = TRUE;
+$USE_DENORMALIZED_DB_FIELDS = FALSE;
 $CHECK_INSTALL_ON_FRONTPAGE = TRUE;
 $CHECK_INSTALL_ON_MAINTENANCEPAGE = TRUE;
 $SHOW_MAINTENANCE_MESSAGE_ON_FRONTPAGE = FALSE;
