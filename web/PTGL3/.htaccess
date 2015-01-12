@@ -1,3 +1,11 @@
+#AuthUserFile /home/ts/develop/vplg-full-sf/trunk/web/auth/ptgl3
+#AuthName "Maintenance"
+#AuthType Basic
+#<Files "maintenance.php">
+#  require valid-user
+#</Files>
+
+
 <IfModule mod_expires.c>
 # Enable expirations
 ExpiresActive On 
