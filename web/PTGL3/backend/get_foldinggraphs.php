@@ -204,8 +204,9 @@ if($valid_values){
                 }				
 			}
 			
-		    $img_string .= "<b>Image not available:</b> <i>The $notation $graphtype_str folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name is not available" . $reason . ".</i>";
+		    $img_string .= "<b>Image not available:</b> <i>The $notation $graphtype_str folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name is not available" . $reason . ".</i>";			
 		}
+		$img_string .= ($num_sses == 1 ? "<br>SSE number of fold in parent graph: $firstvert_show<br>" : "<br>Number of first SSE of fold in parent graph: $firstvert_show<br>");
 		
 		// add download links for other formats than PNG (they can directly d/l this from the browser image)
 		if($image_exists_svg || $image_exists_pdf || $image_exists_png) {
@@ -222,7 +223,7 @@ if($valid_values){
 		  if($image_exists_pdf) {
 		    $img_string .= ' <a href="' . $full_img_path_pdf .'" target="_blank">[PDF]</a>';
 		  }
-		  $img_string .= "<br/><br/>";
+		  $img_string .= "<br/>";
 		  
 		}				
 		
