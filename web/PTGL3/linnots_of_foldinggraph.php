@@ -2,10 +2,17 @@
 <!DOCTYPE html>
 <?php 
 include('./backend/config.php');
+include('./common.php');
+$SHOW_ERROR_LIST = array();
 include('./backend/get_linnots_of_foldinggraph.php');
 
 $title = "All linear notations of a folding graph";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
+$DO_SHOW_ERROR_LIST = $DEBUG_MODE;
+
+
+
+
 ?>
 <html>
 <head>
@@ -139,6 +146,13 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
 </div><!-- end container and contentText -->
 </div><!-- end wrapper -->
+
+<?php
+if($DO_SHOW_ERROR_LIST) {
+  show_the_errors($SHOW_ERROR_LIST);  
+}
+
+?>
 
 <?php include('footer.php'); ?>
 	<!-- All Javascript at the bottom of the page for faster page loading -->

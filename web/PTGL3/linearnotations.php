@@ -102,6 +102,8 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 </div><!-- end container and contentText -->
 </div><!-- end wrapper -->
 
+
+
 <?php include('footer.php'); ?>
 	<!-- All Javascript at the bottom of the page for faster page loading -->
 	<!-- also needed for the dropdown menus etc. ... -->

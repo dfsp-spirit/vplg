@@ -1073,6 +1073,17 @@ table#tblmotifoverview th {
   color: red;
 }
 
+.bottom-bar {
+    border: 1px solid black;
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    text-align: center;
+	color: black;
+	background-color: red;
+	z-index: 1000;
+}
 	
 @media print {
   * { background: transparent !important; color: black !important; text-shadow: none !important; filter:none !important; -ms-filter: none !important; }
