@@ -147,11 +147,13 @@ function get_linnots_filename($graphtype_int, $notation) {
 			      
 			      $db_ok = $db;
 			      $tmp_dir_ok = is_writable('./temp_downloads/');
+			      $tmp_data_dir_ok = is_writable('./temp_data/');
 			      $data_ok = is_dir($IMG_ROOT_PATH);
 			      
 			      $num_errors_occured = 0;
 			      if(!$db_ok) { $num_errors_occured++; }
 			      if(!$tmp_dir_ok) { $num_errors_occured++; }
+			      if(!$tmp_data_dir_ok) { $num_errors_occured++; }
 			      if(!$data_ok) { $num_errors_occured++; }
 			      
 			      			      
@@ -165,7 +167,12 @@ function get_linnots_filename($graphtype_int, $notation) {
 				  
 				  // check whether tmp download dir (where the zip files are stored for download) is writable
 				  if ( ! $tmp_dir_ok) {
-				      echo "<li>The temporary file directory is not writable, ZIP file downloads disabled.</li>\n";
+				      echo "<li>The temporary download file directory is not writable, ZIP file downloads disabled.</li>\n";
+				  }
+				  
+				  // check whether tmp download dir (where the zip files are stored for download) is writable
+				  if ( ! $tmp_data_dir_ok) {
+				      echo "<li>The temporary data directory is not writable, cannot update linnot files.</li>\n";
 				  }
 				  
 				  // check for existence of image data directory
@@ -193,7 +200,6 @@ function get_linnots_filename($graphtype_int, $notation) {
                      <input type="input" name="admin_id" value="">                     
                      Admin token:
                      <input type="password" name="admin_token" value="">
-                     Linnot type:
                      <input type="hidden" name="task" value="linnot_list">
                      <input type="submit" value="Start linnot task" onclick="return confirm('This may take some time, it also places load on the server. Are you sure?')">
                      </form> 
@@ -225,16 +231,18 @@ function get_linnots_filename($graphtype_int, $notation) {
 					  $result = pg_query($db, $query);
 					  $all_data = pg_fetch_all($result);
 		    
-					  if(! $all_data) { echo "ERROR: '" . pg_last_error() . "'."; }
-					  
-					  $result_string = "";
-					  
-					  foreach($all_data as $row) {
-						  $result_string .= $row['ptgl_linnot_'.$notation] . "\n";
+					  if(! $all_data) { 
+					      echo "ERROR: '" . pg_last_error() . "'.";
+					  } else {					  
+					      $result_string = "";
+					      
+					      foreach($all_data as $row) {
+						      $result_string .= $row['ptgl_linnot_'.$notation] . "\n";
+					      }
+					      $filename = "./temp_data/" . get_linnots_filename($graphtype_int, $notation);
+					      $num_bytes_written = file_put_contents($filename, $result_string);
+					      echo "Wrote $num_bytes_written bytes (" . count($all_data) . " linnots) to file $filename.<br>\n";
 					  }
-					  $filename = "./temp_data/" . get_linnots_filename($graphtype_int, $notation);
-					  $num_bytes_written = file_put_contents($filename, $result_string);
-					  echo "Wrote $num_bytes_written bytes to file $filename.<br>\n";
 				      }
 			      }
 	
@@ -255,7 +263,7 @@ function get_linnots_filename($graphtype_int, $notation) {
 		   </p>
 		   
 			
-		</div>
+		
 	</div>
 
 </div><!-- end wrapper -->
