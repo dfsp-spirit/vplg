@@ -341,7 +341,7 @@ foreach ($chains as $value){
 				$tableString .= '
 						<div class="table-responsive" id="sse">
 						<table class="table table-condensed table-hover borderless whiteBack">
-						<caption>The SSEs of the protein graph</caption>
+						<caption>The SSEs of the chain</caption>
 						  <tr>
 							<th class="tablecenter">SSE #</th>
 							<th class="tablecenter">SSE type</th>
