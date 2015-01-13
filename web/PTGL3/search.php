@@ -1,8 +1,12 @@
 <?php session_start(); ?>
 <!DOCTYPE html>
 <?php 
+$SHOW_ERROR_LIST = array();
 include('./backend/config.php'); 
 include('./backend/search.php');
+include('./common.php');
+$DO_SHOW_ERROR_LIST = $DEBUG_MODE;
+
 
 $title = "Search for proteins";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
@@ -85,6 +89,14 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		</div><!-- end container and searchResults -->
 	</div><!-- end container-->
 	</div><!-- end wrapper -->
+
+<?php
+// show red error bar on bottom of screen if enabled and error list is non-empty
+if($DO_SHOW_ERROR_LIST) {
+  show_the_errors($SHOW_ERROR_LIST);  
+}
+
+?>
 
 <?php include('footer.php'); ?>
 	<!-- All Javascript at the bottom of the page for faster page loading -->

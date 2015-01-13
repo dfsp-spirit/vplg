@@ -14,7 +14,7 @@
 				<ul class="nav navbar-nav">
 				        
 					<li  class="navbarFont">
-						<a href="index.php">Home</a>
+						<a href="index.php">Search</a>
 					</li>
 					
 					<li class="navbarFont">
@@ -25,30 +25,42 @@
 					</li>
 					<li class="dropdown">
 						<!-- <strong>caret</strong> creates the little triangle/arrow -->
-						<a href="#"  class="navbarFont dropdown-toggle" data-toggle="dropdown"> Services <strong class="caret"></strong></a>
+						<a href="#"  class="navbarFont dropdown-toggle" data-toggle="dropdown"> Retrieve <strong class="caret"></strong></a>
 						<ul class="dropdown-menu">
-							<li>
-								<a href="about.php"><span class="fa fa-info"></span> About</a>
-							</li>
-							<li>
-								<a href="content.php"><i class="fa fa-briefcase"></i> Content</a>
-							</li>
-							<!--
-							<li>
-								<a href="linearnotations.php"><i class="fa fa-briefcase"></i> Linear notations</a>
-							</li>
-							-->
 							<li>
 								<a href="foldinggraphs.php"><i class="fa fa-briefcase"></i> All Folding graphs of a PG</a>
 							</li>
 							<li>
 								<a href="linnots_of_foldinggraph.php"><i class="fa fa-briefcase"></i> All linear notations of a FG</a>
 							</li>
+							
+						</ul><!-- end dropdown menu -->
+					</li><!-- end dropdown -->
+					<li class="dropdown">
+						<!-- <strong>caret</strong> creates the little triangle/arrow -->
+						<a href="#"  class="navbarFont dropdown-toggle" data-toggle="dropdown"> Database <strong class="caret"></strong></a>
+						<ul class="dropdown-menu">
 							<li>
-								<a href="motif_overview.php"><i class="fa fa-briefcase"></i> Motifs</a>
+								<a href="content.php"><i class="fa fa-briefcase"></i> Content overview</a>
 							</li>
 							<li>
+								<a href="linearnotations.php"><i class="fa fa-briefcase"></i> All Linear notations</a>
+							</li>
+							<li>
+								<a href="motif_overview.php"><i class="fa fa-briefcase"></i> Motif overview</a>
+							</li>
+
+							<li>
 								<a href="ptgl_api.php"><i class="fa fa-briefcase"></i> REST API</a>
+							</li>
+						</ul><!-- end dropdown menu -->
+					</li><!-- end dropdown -->
+					<li class="dropdown">
+						<!-- <strong>caret</strong> creates the little triangle/arrow -->
+						<a href="#"  class="navbarFont dropdown-toggle" data-toggle="dropdown"> Services <strong class="caret"></strong></a>
+						<ul class="dropdown-menu">
+							<li>
+								<a href="about.php"><span class="fa fa-info"></span> About</a>
 							</li>
 							<li>
 								<a href="publications.php"><i class="fa fa-copy"></i> Publications</a>

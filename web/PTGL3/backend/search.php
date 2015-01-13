@@ -21,7 +21,7 @@ ini_set('log_errors', TRUE);
 error_reporting(E_ERROR);
 
 // get config values
-include('./backend/config.php'); 
+include('./backend/config.php');
 
 if($DEBUG){
 	ini_set('display_errors', 1);

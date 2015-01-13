@@ -261,7 +261,7 @@ $query_parameters = array();
 // establish database connection
 $conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
 $db = pg_connect($conn_string);
-
+if(! $db) { array_push($SHOW_ERROR_LIST, "Database connection failed."); }
 
 if($result_set_has_fake_order_field) {
     $query = "SELECT " . $fake_order_field_name . ", chain_id, chain_name, pdb_id, resolution, title, header
@@ -426,9 +426,12 @@ pg_query($db, "DEALLOCATE ALL");
 pg_prepare($db, "searchlinnot", $query);
 $result = pg_execute($db, "searchlinnot", $query_parameters);
 
+if(! $result) { array_push($SHOW_ERROR_LIST, "Query failed: '" . pg_last_error($db) . "'"); }
 
 pg_prepare($db, "searchlinnotCount", $count_query);
 $count_result = pg_execute($db, "searchlinnotCount", $query_parameters);
+
+if(! $count_result) { array_push($SHOW_ERROR_LIST, "Count query failed: '" . pg_last_error($db) . "'"); }
 
 
 $row_count = pg_fetch_array($count_result, NULL, PGSQL_ASSOC);
