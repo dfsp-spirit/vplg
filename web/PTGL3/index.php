@@ -317,14 +317,14 @@ function check_install($db)  {
 				<p>Select the graph type and notation, then enter a query linear notation string, e.g., 'h,2ph,3ph'. Note that this searches the whole database and may take some minutes.</p>
 				
 				                Search the 
-				                <select class="notation" name="notation">
+				                <select class="notation">
 						  <option value="adj">ADJ</option>
 						  <option value="red">RED</option>
 						  <option value="seq">SEQ</option>
 						  <option value="key">KEY</option>
 						</select> 
 				                notation of all 
-				                <select class="graphtype" name="graphtype">
+				                <select class="graphtype">
 						  <option value="alpha">alpha</option>
 						  <option value="beta">beta</option>
 						  <option value="albe">albe</option>
@@ -333,7 +333,7 @@ function check_install($db)  {
 						  <option value="albelig">albelig</option>
 						</select> 
 						graphs in the database for: 
-						<input type="text" class="form-control" name="linnots" id="searchLinnots" autocomplete="off" placeholder="Enter query notation string...">
+						<input type="text" class="form-control" id="searchLinnots" autocomplete="off" placeholder="Enter query notation string...">
 						<button type="submit" id="sendit_linnots" name="linnotalphaadj" value="linnotalphared" class="btn btn-default" ><span class="glyphicon glyphicon-search"></span></button><br>
 
 			</form></div>

@@ -41,6 +41,13 @@ $('.graphtype').change(function(){
     $('#sendit_linnots').attr('name', value);
 })
 
+$('#searchLinnots').change(function(){
+    string = $('#searchLinnots').val();
+    $('#sendit_linnots').attr('value', string);
+})
+
+
+
 function fill_input_field(chains){
 	var oldChainText = $('#loadInput').val();
 	if(!(oldChainText == "")){
