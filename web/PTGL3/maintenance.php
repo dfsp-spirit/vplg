@@ -132,11 +132,12 @@ function get_linnots_filename($graphtype_int, $notation) {
 			        echo "<p>This server is NOT in maintenance mode atm.</p>\n";
 			  }
 			  
-			  $debug_text = "off";
 			  if($DEBUG_MODE) {
-			      $debug_text = "on";
+			      echo "<p><span style='color:darkorange;'>This server is in debug mode atm.</span></p>\n";
 			  }
-			  echo "<p>Debug mode is $debug_text.</p>\n";
+			  else {
+			      echo "<p>This server is NOT in debug mode atm.</p>\n";
+			  }
 			  
 			  
 			  $conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
