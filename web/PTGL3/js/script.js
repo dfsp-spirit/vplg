@@ -27,6 +27,20 @@ if (!(typeof checkedChains === 'undefined')) {
 	}
 }
 
+$('.notation').change(function(){
+    notation = $('.notation').val();
+    graphtype = $('.graphtype').val();
+    value = "linnot" + graphtype + notation;
+    $('#sendit_linnots').attr('name', value);
+})
+
+$('.graphtype').change(function(){
+    notation = $('.notation').val();
+    graphtype = $('.graphtype').val();
+    value = "linnot" + graphtype + notation;
+    $('#sendit_linnots').attr('name', value);
+})
+
 function fill_input_field(chains){
 	var oldChainText = $('#loadInput').val();
 	if(!(oldChainText == "")){
