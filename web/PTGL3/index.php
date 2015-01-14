@@ -295,11 +295,46 @@ function check_install($db)  {
 				<dd>Protein structure similarity search powered by BioGraphlets <strong class="caret" id="flipArrow4" ></strong></dd>
 				</div>
 				<div id="addSearchGraphletSimilarity">
-				<p>Enter a query PDB ID and chain, e.g., '7timA' to search for similar chains.</p>
-				
-				
+				<p>Enter a query PDB ID and chain, e.g., '7timA' to search for similar chains.</p>								                 
 						<input type="text" class="form-control" name="graphletsimilarity" id="searchGraphlets" autocomplete="off" placeholder="Enter a query PDB ID and chain...">
 						<button type="submit" id="sendit_graphlets" name="st" value="similarity" class="btn btn-default" ><span class="glyphicon glyphicon-search"></span></button><br>
+
+			</form></div>
+			</dl>
+			</div><!-- end input-group and form-group -->
+			<?php } ?>
+			
+			
+			<?php if($ENABLE_CUSTOMLINNOT_SEARCH) { ?>
+			<div class="input-group form-group">
+			<form class="form-inline" action="search.php" method="get">
+			<dl class="dl-horizontal">
+				<div id="additionalSearch5">
+				<dt>Custom linnot</dt>
+				<dd>Search for folding graph linear notation strings <strong class="caret" id="flipArrow5" ></strong></dd>
+				</div>
+				<div id="addSearchCustomLinnots">
+				<p>Select the graph type and notation, then enter a query linear notation string, e.g., 'h,2ph,3ph'. Note that this searches the whole database and may take some minutes.</p>
+				
+				                Search the 
+				                <select name="notation">
+						  <option value="adj">ADJ</option>
+						  <option value="red">RED</option>
+						  <option value="seq">SEQ</option>
+						  <option value="key">KEY</option>
+						</select> 
+				                notation of all 
+				                <select name="graphtype">
+						  <option value="alpha">alpha</option>
+						  <option value="beta">beta</option>
+						  <option value="albe">albe</option>
+						  <option value="alphalig">alphalig</option>
+						  <option value="betalig">betalig</option>
+						  <option value="albelig">albelig</option>
+						</select> 
+						graphs in the database for: 
+						<input type="text" class="form-control" name="linnots" id="searchLinnots" autocomplete="off" placeholder="Enter query notation string...">
+						<button type="submit" id="sendit_linnots" name="st" value="linnotalphared" class="btn btn-default" ><span class="glyphicon glyphicon-search"></span></button><br>
 
 			</form></div>
 			</dl>

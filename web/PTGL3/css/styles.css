@@ -463,6 +463,10 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	#searchGraphlets {
 		width: 301px;
 		}
+		
+	#searchLinnots {
+		width: 301px;
+		}
 	
 	#searchInputMain {
 		width: 301px;
@@ -584,6 +588,10 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		text-align: center;
 	}
 	
+	#addSearchCustomLinnots {
+		text-align: center;
+	}
+	
 	
 	#flipArrow {
 		margin-left: 3px;
@@ -601,6 +609,11 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	}
 	
 	#flipArrow4 {
+		margin-left: 3px;
+		transform: rotate(-90deg);
+	}
+	
+	#flipArrow5 {
 		margin-left: 3px;
 		transform: rotate(-90deg);
 	}

@@ -13,6 +13,7 @@ $("#addSearchKey").hide();
 $('#addSearchMotif').hide();
 $('#addSearchSequence').hide();
 $('#addSearchGraphletSimilarity').hide();
+$('#addSearchCustomLinnots').hide();
 // if checkedChains is set
 if (!(typeof checkedChains === 'undefined')) {
 	var selectedProteins = "";
@@ -102,6 +103,10 @@ $(function() {
 		$('#flipArrow4').toggleClass('rotateArrow');
 	});
 	
+	$('#additionalSearch5').click(function() {
+		$('#addSearchCustomLinnots').slideToggle();
+		$('#flipArrow5').toggleClass('rotateArrow');
+	});
 	
 	$('.chainCheckBox').click( function() {
 		var chains = [];
