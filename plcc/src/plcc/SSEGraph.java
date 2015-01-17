@@ -1927,14 +1927,27 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
     
     /**
      * Serializes this graph to a string in JSON format.
-     * @return a JSON format string representation of this graoh. Note that
-     * the JSON is the full graph including atoms and may thus be quite large.
+     * @return a JSON format string representation of this graph. Note that
+     * the JSON is NOT the full graph (including all atoms etc), is is a PLGraph version of this graph and
+     * basically only contains the verts, edges and basic meta data.
      */
     public String toJSONFormat() {
         PLGraph plg = this.toPLGraph();
         Gson gson = new Gson();
         String json = gson.toJson(plg);  
         return json;
+        //return "";
+    }
+    
+    /**
+     * Serializes this graph to a string in XML format.
+     * @return an XML format string representation of this graph.  Note that
+     * the XML is NOT the full graph (including all atoms etc), is is a PLGraph version of this graph and
+     * basically only contains the verts, edges and basic meta data.
+     */
+    public String toXMLFormat() {
+        PLGraph plg = this.toPLGraph();
+        return plg.toXMLFormat();
         //return "";
     }
     

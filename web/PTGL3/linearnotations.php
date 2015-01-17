@@ -2,7 +2,10 @@
 <!DOCTYPE html>
 <?php 
 include('./backend/config.php');
+$SHOW_ERROR_LIST = array();
 include('./backend/get_linearnotations.php');
+include('./common.php');
+$DO_SHOW_ERROR_LIST = $DEBUG_MODE;
 
 $title = "List of all Linear notations";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
@@ -45,7 +48,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 	<?php include('navbar.php'); ?>
 
 	<div class="container" id="publications">
-		<h2>List of all linear notations of the folding graphs</h2>
+		<h2>List of all linear notations of the folding graphs in the database</h2>
 		<br>
 		
 		<div id="PageIntro">
@@ -102,7 +105,12 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 </div><!-- end container and contentText -->
 </div><!-- end wrapper -->
 
-
+<?php
+// show red error bar on bottom of screen if enabled and error list is non-empty
+if($DO_SHOW_ERROR_LIST) {
+  show_the_errors($SHOW_ERROR_LIST);  
+}
+?>
 
 <?php include('footer.php'); ?>
 	<!-- All Javascript at the bottom of the page for faster page loading -->

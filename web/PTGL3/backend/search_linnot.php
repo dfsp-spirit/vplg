@@ -40,7 +40,7 @@ function get_cath_link($pdbid, $chain = null) {
   * @param $query_graph_type_int the graph type. 1=alpha, 2=beta, 3=albe, 4=alphalig, 5=betalig, 6=albelig.
   * @param $bool_enclose_linnot_query_string_in_ticks whether whether to enclose the linnot_query_string in ticks ('). The ticks must not be there if this is used in a prepared statement, where $linnot_query_string is set to something like '$3'.
   */
-function get_linnot_query_string($linnot_type, $linnot_query_string, $query_graph_type_int, $bool_enclose_linnot_query_string_in_ticks = true) {
+function get_linnot_query_string($linnot_type, $linnot_query_string, $query_graph_type_int, $bool_enclose_linnot_query_string_in_ticks = TRUE, $bool_use_like_matching = FALSE) {
     // $linnot_query_string is unused due to parameter for prepared statement
     $bool_enclose_linnot_query_string_in_ticks = false;  //ticks don't work with the prepared statement?? #TimMussGucken
     
@@ -65,6 +65,22 @@ function get_linnot_query_string($linnot_type, $linnot_query_string, $query_grap
 				   INNER JOIN plcc_protein p
 				   ON p.pdb_id = c.pdb_id 
 				   WHERE ( ln.ptgl_linnot_" . $linnot_type . " = " . $tick . "$1" . $tick . " AND pg.graph_type = " . $query_graph_type_int . " )";
+				   
+	if($bool_use_like_matching) {
+	
+	    $res = "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
+				   FROM plcc_fglinnot ln
+				   INNER JOIN plcc_foldinggraph fg
+				   ON ln.linnot_foldinggraph_id = fg.foldinggraph_id
+				   INNER JOIN plcc_graph pg
+				   ON fg.parent_graph_id = pg.graph_id
+				   INNER JOIN plcc_chain c
+				   ON pg.chain_id = c.chain_id
+				   INNER JOIN plcc_protein p
+				   ON p.pdb_id = c.pdb_id 
+				   WHERE ( ln.ptgl_linnot_" . $linnot_type . " LIKE " . $tick . "$1" . $tick . " AND pg.graph_type = " . $query_graph_type_int . " )";
+	
+	}
     return $res;
 }
 
@@ -274,137 +290,149 @@ else {
 
 // ----- linnot alpha queries -----
 
+
+
+$prefix = "";
+$suffix = "";
+$do_use_like = FALSE;
+$do_use_ticks = FALSE; // we use prepared statements now
+if(isset($use_like_matching)) {
+   $do_use_like = TRUE;
+   $prefix = "%";
+   $suffix = "%";
+}
+
 if (isset($linnotalphaadj) && $linnotalphaadj != ""){
         array_push($query_parameters, $linnotalphaadj);
-        $query .= get_linnot_query_string("adj", $linnotalphaadj, 1, true); 
+        $query .= get_linnot_query_string("adj", $prefix . $linnotalphaadj . $suffix, 1, $do_use_ticks, $do_use_like); 
 };
 
 if (isset($linnotalphared) && $linnotalphared != ""){
         array_push($query_parameters, $query_parameters);
-        $query .= get_linnot_query_string("red", $linnotalphared, 1, true);
+        $query .= get_linnot_query_string("red", $prefix . $linnotalphared . $suffix, 1, $do_use_ticks, $do_use_like);
 };
 
 if (isset($linnotalphaseq) && $linnotalphaseq != ""){
         array_push($query_parameters, $linnotalphaseq);
-        $query .= get_linnot_query_string("seq", $linnotalphaseq, 1, true);
+        $query .= get_linnot_query_string("seq", $prefix . $linnotalphaseq . $suffix, 1, $do_use_ticks, $do_use_like);
 };
 
 if (isset($linnotalphakey) && $linnotalphakey != ""){
         array_push($query_parameters, $linnotalphakey);
-        $query .= get_linnot_query_string("key", $linnotalphakey, 1, true);
+        $query .= get_linnot_query_string("key", $prefix . $linnotalphakey . $suffix, 1, $do_use_ticks, $do_use_like);
 };
 
 // ----- linnot beta queries -----
 
 if (isset($linnotbetaadj) && $linnotbetaadj != ""){
         array_push($query_parameters, $linnotbetaadj);      
-        $query .= get_linnot_query_string("adj", $linnotbetaadj, 2, true);        
+        $query .= get_linnot_query_string("adj", $prefix . $linnotbetaadj . $suffix, 2, $do_use_ticks, $do_use_like);        
 };
 
 if (isset($linnotbetared) && $linnotbetared != ""){
         array_push($query_parameters, $linnotbetared);
-        $query .= get_linnot_query_string("red", $linnotbetared, 2, true);
+        $query .= get_linnot_query_string("red", $prefix . $linnotbetared . $suffix, 2, $do_use_ticks, $do_use_like);
         
 };
 
 if (isset($linnotbetaseq) && $linnotbetaseq != ""){
         array_push($query_parameters, $linnotbetaseq);
-        $query .= get_linnot_query_string("seq", $linnotbetaseq, 2, true);
+        $query .= get_linnot_query_string("seq", $prefix . $linnotbetaseq . $suffix, 2, $do_use_ticks, $do_use_like);
         
 };
 
 if (isset($linnotbetakey) && $linnotbetakey != ""){
         array_push($query_parameters, $linnotbetakey);
-        $query .= get_linnot_query_string("key", $linnotbetakey, 2, true);
+        $query .= get_linnot_query_string("key", $prefix . $linnotbetakey . $suffix, 2, $do_use_ticks, $do_use_like);
 };
 
 // ----- linnot albe queries -----
 
 if (isset($linnotalbeadj) && $linnotalbeadj != ""){
         array_push($query_parameters, $linnotalbeadj);
-        $query .= get_linnot_query_string("adj", $linnotalbeadj, 3, true);     
+        $query .= get_linnot_query_string("adj", $prefix . $linnotalbeadj . $suffix, 3, $do_use_ticks, $do_use_like);     
 };
 
 if (isset($linnotalbered) && $linnotalbered != ""){
         array_push($query_parameters, $linnotalbered);
-        $query .= get_linnot_query_string("red", $linnotalbered, 3, true);
+        $query .= get_linnot_query_string("red", $prefix . $linnotalbered . $suffix, 3, $do_use_ticks, $do_use_like);
         
 };
 
 if (isset($linnotalbeseq) && $linnotalbeseq != ""){
         array_push($query_parameters, $linnotalbeseq);
-        $query .= get_linnot_query_string("seq", $linnotalbeseq, 3, true);
+        $query .= get_linnot_query_string("seq", $prefix . $linnotalbeseq . $suffix, 3, $do_use_ticks, $do_use_like);
 };
 
 if (isset($linnotalbekey) && $linnotalbekey != ""){
         array_push($query_parameters, $linnotalbekey);   
-        $query .= get_linnot_query_string("key", $linnotalbekey, 3, true);   
+        $query .= get_linnot_query_string("key", $prefix . $linnotalbekey . $suffix, 3, $do_use_ticks, $do_use_like);   
 };
 
 // ----- linnot alphalig queries -----
 
 if (isset($linnotalphaligadj) && $linnotalphaligadj != ""){
         array_push($query_parameters, $linnotalphaligadj);       
-        $query .= get_linnot_query_string("adj", $linnotalphaligadj, 4, true);       
+        $query .= get_linnot_query_string("adj", $prefix . $linnotalphaligadj . $suffix, 4, $do_use_ticks, $do_use_like);       
 };
 
 if (isset($linnotalphaligred) && $linnotalphaligred != ""){
         array_push($query_parameters, $linnotalphaligred);        
-        $query .= get_linnot_query_string("red", $linnotalphaligred, 4, true);      
+        $query .= get_linnot_query_string("red", $prefix . $linnotalphaligred . $suffix, 4, $do_use_ticks, $do_use_like);      
 };
 
 if (isset($linnotalphaligseq) && $linnotalphaligseq != ""){
         array_push($query_parameters, $linnotalphaligseq);      
-        $query .= get_linnot_query_string("seq", $linnotalphaligseq, 4, true);      
+        $query .= get_linnot_query_string("seq", $prefix . $linnotalphaligseq . $suffix, 4, $do_use_ticks, $do_use_like);      
 };
 
 if (isset($linnotalphaligkey) && $linnotalphaligkey != ""){
         array_push($query_parameters, $linnotalphaligkey);       
-        $query .= get_linnot_query_string("key", $linnotalphaligkey, 4, true);       
+        $query .= get_linnot_query_string("key", $prefix . $linnotalphaligkey . $suffix, 4, $do_use_ticks, $do_use_like);       
 };
 
 // ----- linnot betalig queries -----
 
 if (isset($linnotbetaligadj) && $linnotbetaligadj != ""){
         array_push($query_parameters, $linnotbetaligadj);        
-        $query .= get_linnot_query_string("adj", $linnotbetaligadj, 5, true);        
+        $query .= get_linnot_query_string("adj", $prefix . $linnotbetaligadj . $suffix, 5, $do_use_ticks, $do_use_like);        
 };
 
 if (isset($linnotbetaligred) && $linnotbetaligred != ""){
         array_push($query_parameters, $linnotbetaligred);        
-        $query .= get_linnot_query_string("red", $linnotbetaligred, 5, true);        
+        $query .= get_linnot_query_string("red", $prefix . $linnotbetaligred . $suffix, 5, $do_use_ticks, $do_use_like);        
 };
 
 if (isset($linnotbetaligseq) && $linnotbetaligseq != ""){
         array_push($query_parameters, $linnotbetaligseq);     
-        $query .= get_linnot_query_string("seq", $linnotbetaligseq, 5, true);       
+        $query .= get_linnot_query_string("seq", $prefix . $linnotbetaligseq . $suffix, 5, $do_use_ticks, $do_use_like);       
 };
 
 if (isset($linnotbetaligkey) && $linnotbetaligkey != ""){
         array_push($query_parameters, $linnotbetaligkey);        
-        $query .= get_linnot_query_string("key", $linnotbetaligkey, 5, true);
+        $query .= get_linnot_query_string("key", $prefix . $linnotbetaligkey . $suffix, 5, $do_use_ticks, $do_use_like);
 };
 
 // ----- linnot albelig queries -----
 
 if (isset($linnotalbeligadj) && $linnotalbeligadj != ""){
         array_push($query_parameters, $linnotalbeligadj);      
-        $query .= get_linnot_query_string("adj", $linnotalbeligadj, 6, true);
+        $query .= get_linnot_query_string("adj", $prefix . $linnotalbeligadj . $suffix, 6, $do_use_ticks, $do_use_like);
 };
 
 if (isset($linnotalbeligred) && $linnotalbeligred != ""){
         array_push($query_parameters, $linnotalbeligred);      
-        $query .= get_linnot_query_string("red", $linnotalbeligred, 6, true);       
+        $query .= get_linnot_query_string("red", $prefix . $linnotalbeligred . $suffix, 6, $do_use_ticks, $do_use_like);       
 };
 
 if (isset($linnotalbeligseq) && $linnotalbeligseq != ""){
         array_push($query_parameters, $linnotalbeligseq);     
-        $query .= get_linnot_query_string("seq", $linnotalbeligseq, 6, true);      
+        $query .= get_linnot_query_string("seq", $prefix . $linnotalbeligseq . $suffix, 6, $do_use_ticks, $do_use_like);      
 };
 
 if (isset($linnotalbeligkey) && $linnotalbeligkey != ""){
         array_push($query_parameters, $linnotalbeligkey);      
-        $query .= get_linnot_query_string("key", $linnotalbeligkey, 6, true);      
+        $query .= get_linnot_query_string("key", $prefix . $linnotalbeligkey . $suffix, 6, $do_use_ticks, $do_use_like);      
 };
 
 // ---------------------------------------------------- end of dynamic query building ----------------------------------

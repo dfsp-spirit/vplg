@@ -102,6 +102,10 @@ public class PLGraph<V>  {
         this.graphType = graphType;
     }
     
+    public Set<V> getNeighborsOfVertex(V v) {
+        return edges.get(v);
+    }
+    
     // protein ligand graph types
     public static final int PLGRAPH_TYPE_NONE = 0;
     public static final int PLGRAPH_TYPE_ALPHA = 1;
@@ -133,4 +137,30 @@ public class PLGraph<V>  {
     public static final int EDGE_TYPE_PARALLEL = 2;
     public static final int EDGE_TYPE_ANTIPARALLEL= 3;
     public static final int EDGE_TYPE_LIGAND = 4;   
+    
+    public String toXMLFormat() {
+        StringBuilder xml = new StringBuilder();
+        xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        xml.append("<proteingraph>\n");
+        xml.append("<pdbid>"  + pdbid + "</pdbid>\n");
+        xml.append("<chain>"  + chain + "</chain>\n");
+        xml.append("<graphType>"  + graphType + "</graphType>\n");
+        
+        xml.append("<vertices>\n");
+        for(V v : vertices) {
+            xml.append("<vertex>" + v.toString() + "</vertex>\n");
+        }
+        xml.append("</vertices>\n");
+        
+        xml.append("<edges>\n");
+        for(V v : vertices) {
+            for(V n : getNeighborsOfVertex(v)) {
+                xml.append("<edge>" + v.toString() + "</edge>\n");
+            }
+        }
+        xml.append("</edges>\n");
+        
+        xml.append("</proteingraph>\n");
+        return xml.toString();
+    }
 }

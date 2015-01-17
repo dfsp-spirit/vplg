@@ -66,11 +66,11 @@ return $query;
 function get_query_string_denormalized($graphtype_int, $notation, $q_limit, $limit_start){
 	$query =   "SELECT DISTINCT fglin.ptgl_linnot_%s
 				FROM plcc_fglinnot fglin				
-				WHERE fglin.graph_type = %s
-				ORDER BY fglin.linnot_id ASC
+				WHERE fglin.denorm_graph_type = %s
+				ORDER BY fglin.ptgl_linnot_%s ASC
 				LIMIT %d OFFSET %d";
 	
-	$query = sprintf($query, $notation, $graphtype_int, $q_limit, $limit_start);
+	$query = sprintf($query, $notation, $graphtype_int, $notation, $q_limit, $limit_start);
 	return $query;			
 }
 function get_count_query_string($graphtype_int, $notation){
@@ -87,9 +87,9 @@ return $query;
 
 
 function get_count_query_string_denormalized($graphtype_int, $notation){
-	$query =   "SELECT COUNT(fglin.ptgl_linnot_%s)
+	$query =   "SELECT COUNT(DISTINCT fglin.ptgl_linnot_%s)
 				FROM plcc_fglinnot fglin				
-				WHERE fglin.graph_type = %s";
+				WHERE fglin.denorm_graph_type = %s";
 	
 	$query = sprintf($query, $notation, $graphtype_int);
 	return $query;			
@@ -131,6 +131,7 @@ if($valid_values){
 	// connect to DB
 	$conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
 	$db = pg_connect($conn_string);
+	if(! $db) { array_push($SHOW_ERROR_LIST, "Database connection failed."); }
 		
 	//$query = get_query_string($graphtype, $notation, $q_limit, $limit_start);
 	//$count_query = get_count_query_string($graphtype, $notation);
@@ -144,10 +145,12 @@ if($valid_values){
 
 	
 	$count_result = pg_query($db, $count_query);
+	if(! $count_result) { array_push($SHOW_ERROR_LIST, "Database count query failed: '" . pg_last_error($db) . "'"); }
 	$row_count = pg_fetch_array($count_result, NULL, PGSQL_ASSOC);
 	$row_count = $row_count["count"];
 	//$row_count = 100;
 	$result = pg_query($db, $query);
+	if(! $result) { array_push($SHOW_ERROR_LIST, "Database query failed: '" . pg_last_error($db) . "'"); }
 	
 	// begin to create pager
 	$tableString = '<div id="pager">';

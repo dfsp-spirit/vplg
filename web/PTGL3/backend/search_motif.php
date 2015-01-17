@@ -145,6 +145,7 @@ $list_of_search_types = array();
 // establish database connection
 $conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
 $db = pg_connect($conn_string);
+if(! $db) { array_push($SHOW_ERROR_LIST, "Database connection failed."); }
 
 // later, if no query is set before, there will be no CONCAT/UNION
 
@@ -198,11 +199,15 @@ $query .= " LIMIT " . $q_limit . " OFFSET ".$limit_start;
 $motif_id = get_motif_id($motif);
 
 pg_query($db, "DEALLOCATE ALL"); 
-pg_prepare($db, "searchmotif", $query);
+$prep_result = pg_prepare($db, "searchmotif", $query);
+if(! $prep_result) { array_push($SHOW_ERROR_LIST, "Preparing query failed: '" . pg_last_error($db) . "'"); }
 $result = pg_execute($db, "searchmotif", array($motif_id)); 
+if(! $result) { array_push($SHOW_ERROR_LIST, "Query failed: '" . pg_last_error($db) . "'"); }
 
-pg_prepare($db, "searchmotifCount", $count_query);
+$prep_count_result = pg_prepare($db, "searchmotifCount", $count_query);
+if(! $prep_count_result) { array_push($SHOW_ERROR_LIST, "Preparing count query failed: '" . pg_last_error($db) . "'"); }
 $count_result = pg_execute($db, "searchmotifCount", array($motif_id)); 
+if(! $count_result) { array_push($SHOW_ERROR_LIST, "Count query failed: '" . pg_last_error($db) . "'"); }
 
 $row_count = pg_fetch_array($count_result, NULL, PGSQL_ASSOC);
 if(isset($row_count["count"])) {

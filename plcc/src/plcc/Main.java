@@ -774,6 +774,7 @@ public class Main {
                             Settings.set("plcc_B_output_plcc", "false");
                             Settings.set("plcc_B_output_perlfg", "false");
                             Settings.set("plcc_B_output_json", "false");
+                            Settings.set("plcc_B_output_xml", "false");
                             
                             
                             // Now add the listed ones back:
@@ -793,11 +794,12 @@ public class Main {
                                 if(types.contains("p")) { Settings.set("plcc_B_output_plcc", "true"); nv++; }
                                 if(types.contains("l")) { Settings.set("plcc_B_output_perlfg", "true"); nv++; }
                                 if(types.contains("j")) { Settings.set("plcc_B_output_json", "true"); nv++; }
+                                if(types.contains("m")) { Settings.set("plcc_B_output_xml", "true"); nv++; }
 
                                 // sanity check
                                 if(nv != types.length()) {
                                     DP.getInstance().w("List of output formats given on command line '" + types + "' contains invalid chars (" + types.length() + " given, " + nv + " valid).");
-                                    DP.getInstance().w("Valid chars: 'g' => GML, 't' => TGF, 'd' => DOT lang, 'k' => kavosh, 'e' => edge list, 'p' => PLCC, 'l' => Perf FG, 'j' => JSON. Example: '-O tgp'");
+                                    DP.getInstance().w("Valid chars: 'g' => GML, 't' => TGF, 'd' => DOT lang, 'k' => kavosh, 'e' => edge list, 'p' => PLCC, 'l' => Perf FG, 'j' => JSON, 'm' => XML. Example: '-O tgp'");
 
                                     if(nv <= 0) {
                                         syntaxError();
@@ -2222,6 +2224,7 @@ public class Main {
                 
                 String gmlFileNoPath = "";    // for DB path reconstruction later
                 String jsonFileNoPath = "";
+                String xmlFileNoPath = "";
                 String dotlanguageFileNoPath = "";
                 String kavoshFileNoPath = "";
                 String plccFileNoPath = "";
@@ -2292,7 +2295,15 @@ public class Main {
                         graphFormatsWritten += "json "; numFormatsWritten++; writtenFormatsDBFilesNoPath.put(GraphFormats.GRAPHFORMAT_JSON, jsonFileNoPath);
                         pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_JSON, new File(jsonGraphFile));
                     }
-                }                
+                }
+                if(Settings.getBoolean("plcc_B_output_xml")) {
+                    String xmlGraphFile = filePathGraphs + fs + fileNameWithoutExtension + ".xml";
+                    xmlFileNoPath = fileNameWithoutExtension + ".xml";
+                    if(IO.stringToTextFile(xmlGraphFile, pg.toXMLFormat())) {
+                        graphFormatsWritten += "xml "; numFormatsWritten++; writtenFormatsDBFilesNoPath.put(GraphFormats.GRAPHFORMAT_XML, xmlFileNoPath);
+                        pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_XML, new File(xmlGraphFile));
+                    }
+                }
                 
                 
                 /*
@@ -2818,7 +2829,19 @@ public class Main {
             if(IO.stringToTextFile(plccGraphFile, fg.toVPLGGraphFormat())) {
                 graphFormatsWritten += "plg "; numFormatsWritten++;
             }
-        }                                                                                    
+        }
+        if(Settings.getBoolean("plcc_B_output_json")) {
+            String jsonGraphFile = outputDir + fs + fileNameWithoutExtension + ".json";
+            if(IO.stringToTextFile(jsonGraphFile, fg.toJSONFormat())) {
+                graphFormatsWritten += "json "; numFormatsWritten++;
+            }
+        }
+        if(Settings.getBoolean("plcc_B_output_xml")) {
+            String xmlGraphFile = outputDir + fs + fileNameWithoutExtension + ".xml";
+            if(IO.stringToTextFile(xmlGraphFile, fg.toXMLFormat())) {
+                graphFormatsWritten += "xml "; numFormatsWritten++;
+            }
+        }
 
 
         if(numFormatsWritten > 0) {

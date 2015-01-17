@@ -21,5 +21,6 @@ public class GraphFormats {
     public static final String GRAPHFORMAT_TGF = "tgf";
     public static final String GRAPHFORMAT_PERLFOLDINGGRAPHSCRIPT = "perlfg";
     public static final String GRAPHFORMAT_JSON = "json";
+    public static final String GRAPHFORMAT_XML = "xml";
     
 }
