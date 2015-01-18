@@ -138,27 +138,42 @@ public class PLGraph<V>  {
     public static final int EDGE_TYPE_ANTIPARALLEL= 3;
     public static final int EDGE_TYPE_LIGAND = 4;   
     
+    /**
+     * Returns the graph in XGMML, an XML graph format based on GML.
+     * See http://cgi7.cs.rpi.edu/research/groups/pb/punin/public_html/XGMML/ for general info on XGMML, and 
+     * see http://cgi7.cs.rpi.edu/research/groups/pb/punin/public_html/XGMML/XGMML_EXP/example1.gr for an example graph.
+     * @return 
+     */
     public String toXMLFormat() {
+        ff
+        String label = "protein graph";
+        
         StringBuilder xml = new StringBuilder();
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        xml.append("<proteingraph>\n");
-        xml.append("<pdbid>"  + pdbid + "</pdbid>\n");
-        xml.append("<chain>"  + chain + "</chain>\n");
-        xml.append("<graphType>"  + graphType + "</graphType>\n");
-        
+        xml.append("<graph label=\"" + label + "\" \n" +
+"    xmlns:dc=\"http://purl.org/dc/elements/1.1/\" \n" +
+"    xmlns:xlink=\"http://www.w3.org/1999/xlink\" \n" +
+"    xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" \n" +
+"    xmlns=\"http://www.cs.rpi.edu/XGMML\"  \n" +
+"    directed=\"0\"  \n");
+        xml.append("    graphClass=\"proteingraph\" \n");
+        xml.append("    pdbid=\"" + pdbid + "\" \n");
+        xml.append("    chain=\""  + chain + "\" \n");
+        xml.append("    graphType=\""  + graphType + "\" \n");
+        xml.append("    >\n");
         xml.append("<vertices>\n");
         for(V v : vertices) {
-            xml.append("<vertex>" + v.toString() + "</vertex>\n");
+            xml.append("<node label=\"" + v.toString() + "\" id=\"" + v.toString() + "\"\n");
+            //xml.append("<att name=\"size\" type=\"integer\" value=\"24\"/>");
+            xml.append("</node>\n");
         }
-        xml.append("</vertices>\n");
+
         
-        xml.append("<edges>\n");
         for(V v : vertices) {
             for(V n : getNeighborsOfVertex(v)) {
                 xml.append("<edge>" + v.toString() + "</edge>\n");
             }
         }
-        xml.append("</edges>\n");
         
         xml.append("</proteingraph>\n");
         return xml.toString();
