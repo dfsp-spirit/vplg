@@ -149,7 +149,7 @@ $app->get(
                 <li>&lt;pdbid&gt; an <a href="http://www.rcsb.org/pdb/" target="_blank">RCSB PDB</a> identifier for a protein (4 letter RCSB PDB protein code, e.g., <a href="http://www.rcsb.org/pdb/explore/explore.do?structureId=7tim" target="_blank">7tim</a>.)</li>
                 <li>&lt;chain&gt; a PDB chain name (1 letter RCSB PDB chain name, e.g., A). See the <a href="#metadata">metadata section</a> to learn how to find all valid chain names for a certain protein.</li>
                 <li>&lt;graphtype&gt; a graph type ($server_name graph type name. The following 6 values are valid: alpha, beta, albe, alphalig, betalig, albelig)</li>
-				<li>&lt;graphformat&gt; a graph file format (The following 2 values are valid: gml, json)</li>
+				<li>&lt;graphformat&gt; a graph file format (The following 3 values are valid: gml, json, xml. For more information on these formats, search the web for Graph Modelling Language (gml), JavaScript Object Notation (json), or Extensible Markup Language (XML). For the XML, we are not using some home-brew XML, but the the eXtensible Graph Markup and Modeling Language (XGMML).)</li>
                 </ul>
 				<br>You can also get the <b>visualization of a protein graph</b> as an image:
 				<br><br>
@@ -221,7 +221,8 @@ $app->get(
                         Protein graphs:
 					    <ul>
 		                    <li><i><a href="$ptgl_api_url/pg/7tim/A/albe/json" target="_blank">/api/index.php/pg/7tim/A/albe/json</a></i> retrieves the albe (alpha-beta) graph of PDB 7TIM, chain A in JSON format. </li>
-			                <li><i><a href="$ptgl_api_url/pg/7tim/A/albe/gml" target="_blank">/api/index.php/pg/7tim/A/albe/gml</a></i> retrieves the same protein graph in GML format. </li>
+			                <li><i><a href="$ptgl_api_url/pg/7tim/A/albe/gml" target="_blank">/api/index.php/pg/7tim/A/albe/gml</a></i> retrieves the same protein graph in Graph Modelling Language (GML) format. </li>
+							<li><i><a href="$ptgl_api_url/pg/7tim/A/albe/xml" target="_blank">/api/index.php/pg/7tim/A/albe/gml</a></i> retrieves the same protein graph in XGMML, an XML-based graph format based on GML. </li>
 							<li><i><a href="$ptgl_api_url/pgvis/7tim/A/albe/png" target="_blank">/api/index.php/pgvis/7tim/A/albe/png</a></i> retrieves the same protein graph's visualization in PNG format. </li>
 			            </ul>
 						
@@ -230,6 +231,7 @@ $app->get(
 					    <ul>
 						<li><i><a href="$ptgl_api_url/fg/7tim/A/albe/0/json" target="_blank">/api/index.php/fg/7tim/A/albe/0/json</a></i> retrieves the folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A in JSON format. </li>
 		                <li><i><a href="$ptgl_api_url/fg/7tim/A/albe/0/gml" target="_blank">/api/index.php/fg/7tim/A/albe/0/gml</a></i> retrieves the same folding graph in GML format. </li>
+						<li><i><a href="$ptgl_api_url/fg/7tim/A/albe/0/xml" target="_blank">/api/index.php/fg/7tim/A/albe/0/xml</a></i> retrieves the same folding graph in XGMML (XML) format. </li>
 						<li><i><a href="$ptgl_api_url/fgvis/7tim/A/albe/0/png" target="_blank">/api/index.php/fgvis/7tim/A/albe/0/png</a></i> retrieves the same folding graph's DEF visualization in PNG format. </li>
 						</ul>
 			
