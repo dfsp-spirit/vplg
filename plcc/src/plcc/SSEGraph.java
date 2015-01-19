@@ -147,7 +147,10 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
     public static final Integer GRAPHTYPE_INT_BETALIG = 5;    
     public static final Integer GRAPHTYPE_INT_ALBELIG = 6;
     
-    
+    public static final String GRAPHCLASS_PROTEINGRAPH = "proteingraph";
+    public static final String GRAPHCLASS_FOLDINGGRAPH = "foldinggraph";
+    public static final String GRAPHCLASS_COMPLEXGRAPH = "complexgraph";
+    public static final String GRAPHCLASS_AAGRAPH = "aminoacidgraph";
     
     /**
      * Constructor. Requires a list of SSEs that will be represented by the vertices of the graph.
@@ -6564,7 +6567,7 @@ E	3	3	3
         }
         
         for(Integer[] e : this.getEdgeList()) {
-            plg.addEdge(this.sseList.get(e[0]).shortLabel(), this.sseList.get(e[1]).shortLabel());
+            plg.addEdge(this.sseList.get(e[0]).shortLabel(), this.sseList.get(e[1]).shortLabel(), getEdgeLabel(e[0], e[1]));
         }
         
         return plg;
