@@ -3829,7 +3829,7 @@ E	3	3	3
      * The function that implements a more complex 'S'-shaped arc connector between the 2D points (startX, startY) and (targetX, targetY) in the
      * requested direction. Internal function, call the more general getArcConnector() function instead.
      * 
-     * NOTE: This is an alternate version, favored by Ina. The Crossover connectors of this version will cut through the other SSE symbols.
+     * NOTE: This is an alternate version, favored by Ina, implemented using arcs and lines. The Crossover connectors of this version will cut through the other SSE symbols.
      * 
      * You can choose whether the connector should start upwards or downwards from (startX, startY) using the startUpwards parameter.
      * 
@@ -3848,10 +3848,156 @@ E	3	3	3
      * @param targetY the y coordinate of the end point
      * @param stroke the Stroke to use. You can get one from your Graphics2D instance.
      * @param startUpwards whether to start upwards from the 2D Point (startX, startY). If this is false, downwards is used instead.
-     * @param pixelsToShiftCentralLineOnYAxis the number of pixels to shift the central line on the y axis. Can be positive (for shift to the right) or negative (shift to the left), but must NOT be larger than 1/2 of the distance between the y axis start and end pixels of this connector.
+     * @param pixelsToShiftCentralLineOnYAxis ignored in this alternative implementation.
      * @return a list of Shapes that can be painted on a G2D canvas.
      */
     protected static ArrayList<Shape> getCrossoverArcConnectorAlternative(Integer startX, Integer startY, Integer targetX, Integer targetY, Stroke stroke, Boolean startUpwards, int pixelsToShiftCentralLineOnYAxis) {
+                     
+        Boolean useBezierImplementation = true;
+        if(useBezierImplementation) {
+            return getCrossoverArcConnectorAlternativeBezierVersion(startX, startY, targetX, targetY, stroke, startUpwards, pixelsToShiftCentralLineOnYAxis);
+        }
+        
+        Integer upwards = 0;
+        Integer downwards = 180;
+        
+        ArrayList<Shape> parts = new ArrayList<Shape>();
+        Integer leftVertPosX, rightVertPosX, bothArcsXDistance, bothArcsSumHeight, vertStartY, leftArcHeight, leftArcWidth, rightArcHeight, rightArcWidth, arcWidth, arcEllipseHeight;
+        Integer leftArcUpperLeftX, leftArcUpperLeftY, centerBetweenBothArcsX, centerBetweenBothArcsY, leftArcEndX, leftArcEndY, rightArcEndX, rightArcEndY;
+        Integer leftArcLowerRightX, leftArcLowerRightY, leftArcUpperRightX, leftArcUpperRightY;
+        Integer rightArcLowerRightX, rightArcLowerRightY, rightArcUpperRightX, rightArcUpperRightY, rightArcUpperLeftX, rightArcUpperLeftY;
+        Integer lineStartX, lineStartY, lineEndX, lineEndY, lineLength;
+        
+        
+        // ensure left-right order
+        if(startX < targetX) { 
+            leftVertPosX = startX;
+            rightVertPosX = targetX; }
+        else
+        { 
+            leftVertPosX = targetX; 
+            rightVertPosX = startX;
+        }
+        
+        // stuff common for up/down
+        vertStartY = startY;
+        lineLength = Math.abs(startY - targetY);
+                
+        
+        bothArcsXDistance = rightVertPosX - leftVertPosX;
+        leftArcWidth = rightArcWidth = 10;
+        
+        bothArcsSumHeight = leftArcWidth + rightArcWidth;
+        //bothArcsSumHeight = bothArcsSumWidth;
+        leftArcHeight = rightArcHeight = arcEllipseHeight = bothArcsSumHeight / 2;
+        
+        //centerBetweenBothArcsX = rightVertPosX - (bothArcsXDistance / 2);    // this is where the upright line is created
+        //centerBetweenBothArcsY = vertStartY;
+        
+        leftArcUpperLeftX = leftVertPosX;
+        leftArcUpperLeftY = vertStartY - (arcEllipseHeight / 2);
+        
+        leftArcLowerRightX = leftArcUpperLeftX + leftArcWidth;
+        leftArcLowerRightY = leftArcUpperLeftY + leftArcHeight - (arcEllipseHeight / 2);
+        
+        leftArcUpperRightX = leftArcUpperLeftX + leftArcWidth;
+        leftArcUpperRightY = leftArcUpperLeftY;
+        
+        // everything computed, now start to create the shapes based on the required arc starting angle (up or down)
+        Shape shape; Arc2D arc;
+        
+        
+        if(startUpwards) {                  
+            
+            // left arc starts in lower left corner and ends in lower right corner of its bounding rectangle (looks like an inverted 'U')
+            leftArcEndX = leftArcLowerRightX;
+            leftArcEndY = leftArcLowerRightY;
+           
+            // create the Shape for the left arc, which starts upwards in this case
+            arc = new Arc2D.Double(leftArcUpperLeftX, leftArcUpperLeftY, leftArcWidth, leftArcHeight, upwards, 180, Arc2D.OPEN);
+            shape = stroke.createStrokedShape(arc);
+            parts.add(shape);
+            
+            
+            rightArcUpperLeftX = rightVertPosX - rightArcWidth;
+            rightArcUpperLeftY = targetY;
+            
+            // create the Shape for the line, which goes straight down
+            lineStartX = leftArcEndX;
+            lineStartY = leftArcEndY;
+            lineEndX = rightArcUpperLeftX;
+            lineEndY = rightArcUpperLeftY;    // the line goes downwards, therefor the '+' in this case!
+            Line2D l = new Line2D.Double(lineStartX, lineStartY, lineEndX, lineEndY);
+            shape = stroke.createStrokedShape(l);
+            parts.add(shape);
+            
+            // create the Shape for the right arc. it starts in upper left corner and ends in upper right corner of its bounding rectangle (looks like a 'U').
+            
+            
+            arc = new Arc2D.Double(rightArcUpperLeftX, rightArcUpperLeftY - (arcEllipseHeight / 2), rightArcWidth, rightArcHeight, downwards, 180, Arc2D.OPEN);
+            shape = stroke.createStrokedShape(arc);
+            parts.add(shape);
+        }
+        else {
+            // left arc ends in upper right corner of its bounding rectangle, looks like a 'U'
+            //System.err.println("OTHER_WAY_ROUND!!!!!!!!!!!!!!!!!!!"); // See 8icd A, beta FG #1 (fold name "B") for an example that includes this arc type
+            leftArcEndX = leftArcUpperRightX;
+            leftArcEndY = leftArcUpperRightY;
+            
+            // create the Shape for the left arc, which starts downwards in this case
+            arc = new Arc2D.Double(leftArcUpperLeftX, leftArcUpperLeftY, leftArcWidth, leftArcHeight, downwards, 180, Arc2D.OPEN);
+            shape = stroke.createStrokedShape(arc);
+            parts.add(shape);
+            
+            rightArcUpperLeftX = rightVertPosX - rightArcWidth;
+            rightArcUpperLeftY = targetY - (arcEllipseHeight / 2);
+            
+            // create the Shape for the line, which goes straight up
+            lineStartX = leftArcEndX;
+            lineStartY = leftArcEndY + (arcEllipseHeight / 2);
+            lineEndX = rightArcUpperLeftX;
+            lineEndY = rightArcUpperLeftY + (arcEllipseHeight / 2);
+            Line2D l = new Line2D.Double(lineStartX, lineStartY, lineEndX, lineEndY);
+            shape = stroke.createStrokedShape(l);
+            parts.add(shape);
+            
+            // create the Shape for the right arc. it starts in upper left corner and ends in upper right corner of its bounding rectangle (looks like an inverted 'U').
+            
+            arc = new Arc2D.Double(rightArcUpperLeftX, rightArcUpperLeftY, rightArcWidth, rightArcHeight, upwards, 180, Arc2D.OPEN);
+            shape = stroke.createStrokedShape(arc);
+            parts.add(shape);
+
+        }
+        return(parts);
+    }
+    
+    /**
+     * The function that implements a more complex 'S'-shaped arc connector between the 2D points (startX, startY) and (targetX, targetY) in the
+     * requested direction. Internal function, call the more general getArcConnector() function instead.
+     * 
+     * NOTE: This is an alternate version, favored by Ina, implemented using Bezier curves. The Crossover connectors of this version will cut through the other SSE symbols.
+     * 
+     * You can choose whether the connector should start upwards or downwards from (startX, startY) using the startUpwards parameter.
+     * 
+     * upwards:                downwards:
+     *      __                           __
+     *     /  \                         /  \
+     *    |    \                       /    |
+     *    s     \                     /     t
+     *           \   t         s     /
+     *            \  |         |    /
+     *             \_/          \__/
+     * 
+     * @param startX the x coordinate of the start point
+     * @param startY the y coordinate of the start point
+     * @param targetX the x coordinate of the end point
+     * @param targetY the y coordinate of the end point
+     * @param stroke the Stroke to use. You can get one from your Graphics2D instance.
+     * @param startUpwards whether to start upwards from the 2D Point (startX, startY). If this is false, downwards is used instead.
+     * @param pixelsToShiftCentralLineOnYAxis ignored in this alternative implementation.
+     * @return a list of Shapes that can be painted on a G2D canvas.
+     */
+    protected static ArrayList<Shape> getCrossoverArcConnectorAlternativeBezierVersion(Integer startX, Integer startY, Integer targetX, Integer targetY, Stroke stroke, Boolean startUpwards, int pixelsToShiftCentralLineOnYAxis) {
                      
         Integer upwards = 0;
         Integer downwards = 180;
@@ -3900,6 +4046,9 @@ E	3	3	3
         
         // everything computed, now start to create the shapes based on the required arc starting angle (up or down)
         Shape shape; Arc2D arc;
+        
+        // TODO: we could draw these arcs using Quadratic and Cubic Curves (QuadCurve2D and CubicCurve2D).
+        //       See the docs at http://docs.oracle.com/javase/tutorial/2d/overview/primitives.html for examples.
         
         if(startUpwards) {                  
             
