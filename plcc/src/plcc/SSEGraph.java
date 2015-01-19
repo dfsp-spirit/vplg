@@ -3852,16 +3852,12 @@ E	3	3	3
      * @return a list of Shapes that can be painted on a G2D canvas.
      */
     protected static ArrayList<Shape> getCrossoverArcConnectorAlternative(Integer startX, Integer startY, Integer targetX, Integer targetY, Stroke stroke, Boolean startUpwards, int pixelsToShiftCentralLineOnYAxis) {
-        
-        if(pixelsToShiftCentralLineOnYAxis != 0) {
-            return SSEGraph.getCrossoverArcConnectorShiftCenter(startX, startY, targetX, targetY, stroke, startUpwards, pixelsToShiftCentralLineOnYAxis);
-        }
-        
+                     
         Integer upwards = 0;
         Integer downwards = 180;
         
         ArrayList<Shape> parts = new ArrayList<Shape>();
-        Integer leftVertPosX, rightVertPosX, bothArcsSumWidth, bothArcsSumHeight, vertStartY, leftArcHeight, leftArcWidth, rightArcHeight, rightArcWidth, arcWidth, arcEllipseHeight;
+        Integer leftVertPosX, rightVertPosX, bothArcsXDistance, bothArcsSumHeight, vertStartY, leftArcHeight, leftArcWidth, rightArcHeight, rightArcWidth, arcWidth, arcEllipseHeight;
         Integer leftArcUpperLeftX, leftArcUpperLeftY, centerBetweenBothArcsX, centerBetweenBothArcsY, leftArcEndX, leftArcEndY, rightArcEndX, rightArcEndY;
         Integer leftArcLowerRightX, leftArcLowerRightY, leftArcUpperRightX, leftArcUpperRightY;
         Integer rightArcLowerRightX, rightArcLowerRightY, rightArcUpperRightX, rightArcUpperRightY, rightArcUpperLeftX, rightArcUpperLeftY;
@@ -3883,15 +3879,15 @@ E	3	3	3
         lineLength = Math.abs(startY - targetY);
                 
         
-        bothArcsSumWidth = rightVertPosX - leftVertPosX;
-        leftArcWidth = rightArcWidth = bothArcsSumWidth / 2;
+        bothArcsXDistance = rightVertPosX - leftVertPosX;
+        leftArcWidth = rightArcWidth = 10;
         
-        bothArcsSumHeight = bothArcsSumWidth;
+        bothArcsSumHeight = leftArcWidth + rightArcWidth;
         //bothArcsSumHeight = bothArcsSumWidth;
         leftArcHeight = rightArcHeight = arcEllipseHeight = bothArcsSumHeight / 2;
         
-        centerBetweenBothArcsX = rightVertPosX - (bothArcsSumWidth / 2);    // this is where the upright line is created
-        centerBetweenBothArcsY = vertStartY;
+        //centerBetweenBothArcsX = rightVertPosX - (bothArcsXDistance / 2);    // this is where the upright line is created
+        //centerBetweenBothArcsY = vertStartY;
         
         leftArcUpperLeftX = leftVertPosX;
         leftArcUpperLeftY = vertStartY - (arcEllipseHeight / 2);
@@ -3916,18 +3912,22 @@ E	3	3	3
             shape = stroke.createStrokedShape(arc);
             parts.add(shape);
             
+            
+            rightArcUpperLeftX = rightVertPosX - rightArcWidth;
+            rightArcUpperLeftY = targetY;
+            
             // create the Shape for the line, which goes straight down
             lineStartX = leftArcEndX;
             lineStartY = leftArcEndY;
-            lineEndX = leftArcEndX;
-            lineEndY = leftArcEndY + lineLength;    // the line goes downwards, therefor the '+' in this case!
+            lineEndX = rightArcUpperLeftX;
+            lineEndY = rightArcUpperLeftY;    // the line goes downwards, therefor the '+' in this case!
             Line2D l = new Line2D.Double(lineStartX, lineStartY, lineEndX, lineEndY);
             shape = stroke.createStrokedShape(l);
             parts.add(shape);
             
             // create the Shape for the right arc. it starts in upper left corner and ends in upper right corner of its bounding rectangle (looks like a 'U').
-            rightArcUpperLeftX = lineEndX;
-            rightArcUpperLeftY = lineEndY;
+            
+            
             arc = new Arc2D.Double(rightArcUpperLeftX, rightArcUpperLeftY - (arcEllipseHeight / 2), rightArcWidth, rightArcHeight, downwards, 180, Arc2D.OPEN);
             shape = stroke.createStrokedShape(arc);
             parts.add(shape);
@@ -6343,11 +6343,23 @@ E	3	3	3
                                                 
                     if(edgeIsBackwards && edgeIsCrossOver) {
                         //System.out.println("###Edge prob: " + lastVert + " to " + currentVert + ", inverting edges.");
-                        connShapes = FoldingGraph.getArcConnector(leftVertPosX, rightVertPosY, rightVertPosX, leftVertPosY, ig2.getStroke(), (! startUpwards), pixelsToShiftOnYAxis);                        
+                        if(Settings.getBoolean("plcc_B_key_use_alternate_arcs")) {
+                            connShapes = FoldingGraph.getArcConnectorAlternative(leftVertPosX, rightVertPosY, rightVertPosX, leftVertPosY, ig2.getStroke(), (! startUpwards), pixelsToShiftOnYAxis);
+                        }
+                        else {
+                            connShapes = FoldingGraph.getArcConnector(leftVertPosX, rightVertPosY, rightVertPosX, leftVertPosY, ig2.getStroke(), (! startUpwards), pixelsToShiftOnYAxis);                        
+                        }
                     }
                     else {
-                        connShapes = FoldingGraph.getArcConnector(leftVertPosX, leftVertPosY, rightVertPosX, rightVertPosY, ig2.getStroke(), startUpwards, pixelsToShiftOnYAxis);
+                        if(Settings.getBoolean("plcc_B_key_use_alternate_arcs")) {
+                            connShapes = FoldingGraph.getArcConnectorAlternative(leftVertPosX, leftVertPosY, rightVertPosX, rightVertPosY, ig2.getStroke(), startUpwards, pixelsToShiftOnYAxis);
+                        }
+                        else {
+                            connShapes = FoldingGraph.getArcConnector(leftVertPosX, leftVertPosY, rightVertPosX, rightVertPosY, ig2.getStroke(), startUpwards, pixelsToShiftOnYAxis);
+                        }
                     }
+                    
+                    
                     for(Shape s : connShapes) {
                         ig2.draw(s);
                     }                                                                                                   
