@@ -3933,7 +3933,8 @@ E	3	3	3
             parts.add(shape);
         }
         else {
-            // left arc ends in upper right corner of its bounding rectangle
+            // left arc ends in upper right corner of its bounding rectangle, looks like a 'U'
+            //System.err.println("OTHER_WAY_ROUND!!!!!!!!!!!!!!!!!!!"); // See 8icd A, beta FG #1 (fold name "B") for an example that includes this arc type
             leftArcEndX = leftArcUpperRightX;
             leftArcEndY = leftArcUpperRightY;
             
@@ -3942,18 +3943,20 @@ E	3	3	3
             shape = stroke.createStrokedShape(arc);
             parts.add(shape);
             
+            rightArcUpperLeftX = rightVertPosX - rightArcWidth;
+            rightArcUpperLeftY = targetY - (arcEllipseHeight / 2);
+            
             // create the Shape for the line, which goes straight up
             lineStartX = leftArcEndX;
             lineStartY = leftArcEndY + (arcEllipseHeight / 2);
-            lineEndX = leftArcEndX;
-            lineEndY = lineStartY - lineLength;    // the line goes downwards, therefor the '-' in this case!
+            lineEndX = rightArcUpperLeftX;
+            lineEndY = rightArcUpperLeftY + (arcEllipseHeight / 2);
             Line2D l = new Line2D.Double(lineStartX, lineStartY, lineEndX, lineEndY);
             shape = stroke.createStrokedShape(l);
             parts.add(shape);
             
-            // create the Shape for the right arc. it starts in upper left corner and ends in upper right corner of its bounding rectangle (looks like a 'U').
-            rightArcUpperLeftX = lineEndX;
-            rightArcUpperLeftY = lineEndY - (arcEllipseHeight / 2);
+            // create the Shape for the right arc. it starts in upper left corner and ends in upper right corner of its bounding rectangle (looks like an inverted 'U').
+            
             arc = new Arc2D.Double(rightArcUpperLeftX, rightArcUpperLeftY, rightArcWidth, rightArcHeight, upwards, 180, Arc2D.OPEN);
             shape = stroke.createStrokedShape(arc);
             parts.add(shape);
