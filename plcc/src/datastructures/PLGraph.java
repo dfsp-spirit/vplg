@@ -217,9 +217,9 @@ public class PLGraph<V>  {
         StringBuilder xml = new StringBuilder();
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         xml.append("<graph label=\"").append(label).append("\" \n" +
-"    xmlns:dc=\"http://purl.org/dc/elements/1.1/\" \n" +
-"    xmlns:xlink=\"http://www.w3.org/1999/xlink\" \n" +
-"    xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" \n" +
+//"    xmlns:dc=\"http://purl.org/dc/elements/1.1/\" \n" +
+//"    xmlns:xlink=\"http://www.w3.org/1999/xlink\" \n" +
+//"    xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" \n" +
 "    xmlns=\"http://www.cs.rpi.edu/XGMML\"  \n" +
 "    directed=\"0\">  \n");
         xml.append("    <att name=\"graphClass\" type=\"string\" value=\"").append(this.graphClass).append("\"/>\n");
