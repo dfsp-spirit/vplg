@@ -710,8 +710,8 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_ssecontact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null references " + tbl_contacttypes + " ON DELETE CASCADE, check (sse1 < sse2));");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact_complexgraph + " (ssecontact_complexgraph_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, complex_contact_type int not null references " + tbl_complexcontacttypes + " ON DELETE CASCADE check (sse1 < sse2));");            
             doInsertQuery("CREATE TABLE " + tbl_complex_contact_stats + " (complex_contact_id serial primary key, chain1 int not null references " + tbl_chain + " ON DELETE CASCADE, chain2 int not null references " + tbl_chain + " ON DELETE CASCADE, contact_num_HH int not null, contact_num_HS int not null, contact_num_HL int not null, contact_num_SS int not null, contact_num_SL int not null, contact_num_LL int not null, contact_num_DS int not null);");
-            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_json text, graph_image_png text, graph_image_svg text, graph_image_pdf text, filepath_graphfile_gml text, filepath_graphfile_kavosh text, filepath_graphfile_plcc text, filepath_graphfile_dotlanguage text, filepath_graphfile_json text, filepath_graphfile_xml text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
-            doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, fg_number int not null, fold_name varchar(2) not null, first_vertex_position_in_parent int not null, graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_json text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
+            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_json text, graph_string_xml text, graph_image_png text, graph_image_svg text, graph_image_pdf text, filepath_graphfile_gml text, filepath_graphfile_kavosh text, filepath_graphfile_plcc text, filepath_graphfile_dotlanguage text, filepath_graphfile_json text, filepath_graphfile_xml text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
+            doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, fg_number int not null, fold_name varchar(2) not null, first_vertex_position_in_parent int not null, graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_json text, graph_string_xml text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_complexgraph + " (complexgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, graph_string_gml text, graph_string_kavosh text, graph_image_svg text, graph_image_png text);");
             doInsertQuery("CREATE TABLE " + tbl_motiftype + " (motiftype_id serial primary key, motiftype_name varchar(40));");
             doInsertQuery("CREATE TABLE " + tbl_motif + " (motif_id serial primary key, motiftype_id int not null references " + tbl_motiftype + " ON DELETE CASCADE, motif_name varchar(40), motif_abbreviation varchar(9));");
@@ -971,6 +971,12 @@ public class DBManager {
             doInsertQuery("CREATE INDEX plcc_idx_fglinnot_search_red ON " + tbl_fglinnot + " (ptgl_linnot_red text_pattern_ops);");
             doInsertQuery("CREATE INDEX plcc_idx_fglinnot_search_seq ON " + tbl_fglinnot + " (ptgl_linnot_seq text_pattern_ops);");
             doInsertQuery("CREATE INDEX plcc_idx_fglinnot_search_key ON " + tbl_fglinnot + " (ptgl_linnot_key text_pattern_ops);");
+            
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnot_denormpdbid ON " + tbl_fglinnot + " (denorm_pdb_id);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnot_denormchain ON " + tbl_fglinnot + " (denorm_chain_name);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnot_denormgraphtypeint ON " + tbl_fglinnot + " (denorm_graph_type);");
+            doInsertQuery("CREATE INDEX plcc_idx_fglinnot_denormgraphtypestring ON " + tbl_fglinnot + " (denorm_graph_type_string);");
+            
             
             doInsertQuery("CREATE INDEX plcc_idx_motif_search_name ON " + tbl_motif + " (motif_name text_pattern_ops);");
             doInsertQuery("CREATE INDEX plcc_idx_motif_search_abbrev ON " + tbl_motif + " (motif_abbreviation text_pattern_ops);");
@@ -2897,12 +2903,13 @@ connection.close();
      * @param graph_string_kavosh the graph in kavosh format
      * @param graph_string_dotlanguage the graph in DOT language format
      * @param graph_string_json the graph in JSON format
+     * @param graph_string_xml the graph in XML format
      * @param sse_string the graph in SSE string notation
      * @param containsBetaBarrel whether the graph contains a beta barrel (used for stats only)
      * @return true if the graph was inserted, false if errors occurred
      * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
      */
-    public static Boolean writeProteinGraphToDB(String pdb_id, String chain_name, Integer graph_type, String graph_string_gml, String graph_string_plcc, String graph_string_kavosh, String graph_string_dotlanguage, String graph_string_json, String sse_string, Boolean containsBetaBarrel) throws SQLException {
+    public static Boolean writeProteinGraphToDB(String pdb_id, String chain_name, Integer graph_type, String graph_string_gml, String graph_string_plcc, String graph_string_kavosh, String graph_string_dotlanguage, String graph_string_json, String graph_string_xml, String sse_string, Boolean containsBetaBarrel) throws SQLException {
                
         Long chain_db_id = getDBChainID(pdb_id, chain_name);
         Boolean result = false;
@@ -2916,7 +2923,7 @@ connection.close();
         Integer graph_containsbetabarrel = (containsBetaBarrel ? 1 : 0);
         PreparedStatement statement = null;
 
-        String query = "INSERT INTO " + tbl_proteingraph + " (chain_id, graph_type, graph_string_gml, graph_string_plcc, graph_string_kavosh, graph_string_dotlanguage, graph_string_json, sse_string, graph_containsbetabarrel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO " + tbl_proteingraph + " (chain_id, graph_type, graph_string_gml, graph_string_plcc, graph_string_kavosh, graph_string_dotlanguage, graph_string_json, graph_string_xml, sse_string, graph_containsbetabarrel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
         //System.out.println("########################## length of gml string is " + graph_string_gml.length() + " ##################" );
         
@@ -2931,8 +2938,9 @@ connection.close();
             statement.setString(5, graph_string_kavosh);
             statement.setString(6, graph_string_dotlanguage);
             statement.setString(7, graph_string_json);
-            statement.setString(8, sse_string);
-            statement.setInt(9, graph_containsbetabarrel);
+            statement.setString(8, graph_string_xml);
+            statement.setString(9, sse_string);
+            statement.setInt(10, graph_containsbetabarrel);
                                 
             statement.executeUpdate();
             //dbc.commit();
@@ -2978,12 +2986,13 @@ connection.close();
      * @param graph_string_kavosh the graph in kavosh format
      * @param graph_string_dotlanguage the graph in DOT language format
      * @param graph_string_json the graph in JSON format
+     * @param graph_string_xml the graph in XML format
      * @param sse_string the graph in SSE string notation
      * @param containsBetaBarrel whether the graph contains a beta barrel (used for stats only)
      * @return the database insert ID or a value smaller than 1 if something went wrong
      * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
      */
-    public static Long writeFoldingGraphToDB(String pdb_id, String chain_name, Integer graph_type, Integer fg_number, String fold_name, Integer first_vertex_position_in_parent, String graph_string_gml, String graph_string_plcc, String graph_string_kavosh, String graph_string_dotlanguage, String graph_string_json, String sse_string, Boolean containsBetaBarrel) throws SQLException {
+    public static Long writeFoldingGraphToDB(String pdb_id, String chain_name, Integer graph_type, Integer fg_number, String fold_name, Integer first_vertex_position_in_parent, String graph_string_gml, String graph_string_plcc, String graph_string_kavosh, String graph_string_dotlanguage, String graph_string_json, String graph_string_xml, String sse_string, Boolean containsBetaBarrel) throws SQLException {
                
         
         if(fg_number < 0) {
@@ -3011,7 +3020,7 @@ connection.close();
 
         PreparedStatement statement = null;
 
-        String query = "INSERT INTO " + tbl_foldinggraph + " (parent_graph_id, fg_number, fold_name, first_vertex_position_in_parent, graph_string_gml, graph_string_plcc, graph_string_kavosh, graph_string_dotlanguage, graph_string_json, sse_string, graph_containsbetabarrel) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO " + tbl_foldinggraph + " (parent_graph_id, fg_number, fold_name, first_vertex_position_in_parent, graph_string_gml, graph_string_plcc, graph_string_kavosh, graph_string_dotlanguage, graph_string_json, graph_string_xml, sse_string, graph_containsbetabarrel) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         int affectedRows = 0;
         
         try {
@@ -3027,8 +3036,9 @@ connection.close();
             statement.setString(7, graph_string_kavosh);
             statement.setString(8, graph_string_dotlanguage);
             statement.setString(9, graph_string_json);
-            statement.setString(10, sse_string);
-            statement.setInt(11, graph_containsbetabarrel);
+            statement.setString(10, graph_string_xml);
+            statement.setString(11, sse_string);
+            statement.setInt(12, graph_containsbetabarrel);
                                 
             affectedRows = statement.executeUpdate();
             if (affectedRows == 0) {

@@ -1943,8 +1943,8 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
     }
     
     /**
-     * Serializes this graph to a string in XML format.
-     * @return an XML format string representation of this graph.  Note that
+     * Serializes this graph to a string in XGMML, an XML-based graph format similar to GML. See 
+     * @return an XML (XGMML, to be precise) format string representation of this graph.  Note that
      * the XML is NOT the full graph (including all atoms etc), is is a PLGraph version of this graph and
      * basically only contains the verts, edges and basic meta data.
      */

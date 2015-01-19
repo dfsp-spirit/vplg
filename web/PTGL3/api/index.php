@@ -388,16 +388,17 @@ EOT;
     'graphtype' => 'alpha|beta|albe|alphalig|betalig|albelig',
     'linnot' => 'adj|red|key|seq',
     'fold' => '[0-9]{1,}',
-    'graphformat' => 'json|gml',
+    'graphformat' => 'json|gml|xml',
 	'graphformat_json' => 'json',
 	'imageformat' => 'png|svg'
 ));
 
 /**
- * Convert JSON to XML -- requires PEAR XML_Serializer
+ * Convert JSON to XML -- requires PEAR XML_Serializer. UNUSED.
  * @param string    - json
  * @return string   - XML
  */
+ /*
 function json_to_xml($json) {
     include_once("XML/Serializer.php");
 
@@ -417,6 +418,7 @@ function json_to_xml($json) {
         return null;
     }
 }
+*/
 
 // get db connection
 include('../backend/config.php');
@@ -436,7 +438,7 @@ if(!$db) {
 $app->get('/pg/:pdbid/:chain/:graphtype/:graphformat', function ($pdbid, $chain, $graphtype, $graphformat) use($db) {    
     //echo "You requested the $graphtype graph of PDB $pdbid chain $chain.\n";
 	$pdbid = strtolower($pdbid);
-    $query = "SELECT g.graph_id, g.graph_string_json, g.graph_string_gml FROM plcc_graph g INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype'";
+    $query = "SELECT g.graph_id, g.graph_string_json, g.graph_string_gml, g.graph_string_xml FROM plcc_graph g INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype'";
     $result = pg_query($db, $query);
     
     $num_res = 0;
@@ -447,6 +449,9 @@ $app->get('/pg/:pdbid/:chain/:graphtype/:graphformat', function ($pdbid, $chain,
         }
         if($graphformat === "json") {
           echo $arr['graph_string_json'];
+        }
+		if($graphformat === "xml") {
+          echo $arr['graph_string_xml'];
         }
     }
     //echo "Found $num_res graphs.\n";
@@ -505,7 +510,7 @@ $app->get('/pgvis/:pdbid/:chain/:graphtype/:imageformat', function ($pdbid, $cha
 // get a specific folding graph
 $app->get('/fg/:pdbid/:chain/:graphtype/:fold/:graphformat', function ($pdbid, $chain, $graphtype, $fold, $graphformat) use($db) {
     $pdbid = strtolower($pdbid);
-    $query = "SELECT fg.foldinggraph_id, fg.graph_string_json, fg.graph_string_gml FROM plcc_foldinggraph fg INNER JOIN plcc_graph g ON fg.parent_graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype' AND fg.fg_number = $fold";
+    $query = "SELECT fg.foldinggraph_id, fg.graph_string_json, fg.graph_string_gml, fg.graph_string_xml FROM plcc_foldinggraph fg INNER JOIN plcc_graph g ON fg.parent_graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype' AND fg.fg_number = $fold";
     $result = pg_query($db, $query);
     
     $num_res = 0;
@@ -516,6 +521,9 @@ $app->get('/fg/:pdbid/:chain/:graphtype/:fold/:graphformat', function ($pdbid, $
 	    } 
         if($graphformat === "json") {
           echo $arr['graph_string_json'];
+        }
+		if($graphformat === "xml") {
+          echo $arr['graph_string_xml'];
         }		
     }
     //echo "You requested the folding graph of fold # $fold of the $graphtype protein graph of PDB $pdbid chain $chain. Found $num_res results.\n";

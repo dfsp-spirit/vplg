@@ -259,7 +259,12 @@ if($valid_values){
 				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".json";
 				if(file_exists($full_file)){
 				    $img_string .= ' <a href="' . $full_file .'" target="_blank">[JSON]</a>';
-				}		
+				}
+				// XML / XGMML
+				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".xml";
+				if(file_exists($full_file)){
+				    $img_string .= ' <a href="' . $full_file .'" target="_blank">[XML (XGMML)]</a>';
+				}				
                 // edge list with separate label file				
 				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".el_edges";
 				$full_file2 = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".el_ntl";
