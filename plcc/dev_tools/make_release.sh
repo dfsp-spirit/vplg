@@ -15,10 +15,11 @@ fi
 ## Settings
 RELEASE_DIR="$UHOME/vplg_release"
 TMP_EXPORT_DIR="$UHOME/tmp_svn_export"
-REPO_DIR_PLCC="$UHOME/develop/vplg/plcc"
-REPO_DIR_SPLITPDB="$UHOME/develop/vplg/splitpdb"
-REPO_DIR_VPG="$UHOME/develop/vplg/vpg"
+REPO_DIR_PLCC="$UHOME/develop/vplg-full-sf/trunk/plcc"
+REPO_DIR_SPLITPDB="$UHOME/develop/vplg-full-sf/trunk/splitpdb"
+REPO_DIR_VPG="$UHOME/develop/vplg/-full-sf/trunk/vpg"
 
+INCLUDE_VPG="NO"
 
 if [ "$OS" = "Windows_NT" ]; then
    TMP_EXPORT_DIR="C:\Users\spirit\tmp_svn_export"
@@ -28,7 +29,11 @@ fi
 echo "$APPTAG === Preparing VPLG release, using target directory '$RELEASE_DIR'. ==="
 echo "$APPTAG Assuming the PLCC SVN repo is at '$REPO_DIR_PLCC'"
 echo "$APPTAG Assuming the SPLITPDB SVN repo is at '$REPO_DIR_SPLITPDB'"
-echo "$APPTAG Assuming the VPG SVN repo is at '$REPO_DIR_VPG'"
+if [ "$INCLUDE_VPG" = "YES" ]; then
+    echo "$APPTAG Assuming the VPG SVN repo is at '$REPO_DIR_VPG'"
+else
+    echo "$APPTAG Not including the VPG GUI, disabled in settings."
+fi
 echo "$APPTAG Assuming the temporary SVN export dir should be created at '$TMP_EXPORT_DIR'"
 
 ## Check and prepare stuff
@@ -56,8 +61,11 @@ cp $REPO_DIR_PLCC/testrun/plcc $RELEASE_DIR/vplg/
 cp $REPO_DIR_SPLITPDB/dist/splitpdb.jar $RELEASE_DIR/vplg/
 cp $REPO_DIR_SPLITPDB/testrun/splitpdb $RELEASE_DIR/vplg/
 
-cp $REPO_DIR_VPG/dist/vpg.jar $RELEASE_DIR/vplg/
-cp $REPO_DIR_VPG/testrun/vpg $RELEASE_DIR/vplg/
+
+if [ "$INCLUDE_VPG" = "YES" ]; then
+    cp $REPO_DIR_VPG/dist/vpg.jar $RELEASE_DIR/vplg/
+    cp $REPO_DIR_VPG/testrun/vpg $RELEASE_DIR/vplg/
+fi
 
 cp $REPO_DIR_PLCC/tools/rpg.pl $RELEASE_DIR/vplg/
 
@@ -65,7 +73,9 @@ cp $REPO_DIR_PLCC/tools/rpg.pl $RELEASE_DIR/vplg/
 echo "$APPTAG Copying libraries..."
 cp $REPO_DIR_PLCC/lib/*.jar $RELEASE_DIR/vplg/lib/
 #cp $REPO_DIR_SPLITPDB/lib/*.jar $RELEASE_DIR/vplg/lib/
-#cp $REPO_DIR_VPG/lib/*.jar $RELEASE_DIR/vplg/lib/
+#if [ "$INCLUDE_VPG" = "YES" ]; then
+#    cp $REPO_DIR_VPG/lib/*.jar $RELEASE_DIR/vplg/lib/
+#fi
 
 ## 3: documentation
 echo "$APPTAG Copying documentation..."
@@ -86,7 +96,10 @@ cp $REPO_DIR_VPG/doc/README_vpg $RELEASE_DIR/vplg/doc/
 echo "$APPTAG Copying source code..."
 cd $REPO_DIR_PLCC && svn export src/ $TMP_EXPORT_DIR/plcc-src/ && cd $TMP_EXPORT_DIR && zip -r plcc-src.zip plcc-src/ && mv plcc-src.zip $RELEASE_DIR/vplg/src/ && cd $CUR_DIR
 cd $REPO_DIR_SPLITPDB && svn export src/ $TMP_EXPORT_DIR/splitpdb-src/ && cd $TMP_EXPORT_DIR && zip -r splitpdb-src.zip splitpdb-src/ && mv splitpdb-src.zip $RELEASE_DIR/vplg/src/ && cd $CUR_DIR
-cd $REPO_DIR_VPG && svn export src/ $TMP_EXPORT_DIR/vpg-src/ && cd $TMP_EXPORT_DIR && zip -r vpg-src.zip vpg-src/ && mv vpg-src.zip $RELEASE_DIR/vplg/src/ && cd $CUR_DIR
+
+if [ "$INCLUDE_VPG" = "YES" ]; then
+    cd $REPO_DIR_VPG && svn export src/ $TMP_EXPORT_DIR/vpg-src/ && cd $TMP_EXPORT_DIR && zip -r vpg-src.zip vpg-src/ && mv vpg-src.zip $RELEASE_DIR/vplg/src/ && cd $CUR_DIR
+fi
 
 ## 5: example data
 echo "$APPTAG Copying example data..."

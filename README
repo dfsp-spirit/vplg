@@ -4,7 +4,8 @@ This is a checkout of the the sourceforge.net source code repository of VPLG.
    ---------------------------------------------------------------------------------
                                !!!!! WARNING !!!!!
 
-    Atm this repository does NOT contain the latest version of the development code!
+    Atm this repository may NOT contain the latest version of the development code.
+    We have another internal repo.
 
     The code for a certain release is always included in the src/ directory.
 
@@ -25,5 +26,5 @@ The official VPLG website is at http://vplg.sourceforge.net/.
 VPLG is free software and comes WITHOUT ANY WARRANTY. See the LICENSE file for details.
 
 --
-ts
+Tim Schäfer
 
