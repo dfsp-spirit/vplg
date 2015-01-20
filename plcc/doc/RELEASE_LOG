@@ -121,6 +121,21 @@ Updates from version 2012-10-11 to 2013-03-25:
 * VPG (new version 0.24):
   - the log file is now written to the user home (instead of a subdir which may not exist at that time)
 
+Updates from version 2013-03-25 to 2015-01-20:
+================================================
+* PLCC
+  - tons of changes and fixes, the code base may have doubled. some are given in the following list, more are forgotten already.
+  - support for computing folding graphs (connected components of protein graphs)
+  - support for computing linear notation strings for all 4 FG notations
+  - support for drawing all 4 FG notations
+  - database schema changed (a lot!), index optimization, denormalization for performance reasons for very large DBs (whole PDB)
+  - proper silent mode
+  - cluster mode, which keeps the chains file for GraphletAnalyzer and other stuff
+  - new output formats: GXMML (XML), JSON, and others
+  - ...
+* VPG
+  - the VPG GUI is very outdated and has been removed. We will redesign it from scratch and add a new version once its ready.
+
 
 --
 ts
