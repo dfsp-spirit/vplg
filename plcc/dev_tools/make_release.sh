@@ -17,7 +17,7 @@ RELEASE_DIR="$UHOME/vplg_release"
 TMP_EXPORT_DIR="$UHOME/tmp_svn_export"
 REPO_DIR_PLCC="$UHOME/develop/vplg-full-sf/trunk/plcc"
 REPO_DIR_SPLITPDB="$UHOME/develop/vplg-full-sf/trunk/splitpdb"
-REPO_DIR_VPG="$UHOME/develop/vplg/-full-sf/trunk/vpg"
+REPO_DIR_VPG="$UHOME/develop/vplg-full-sf/trunk/vpg"
 
 INCLUDE_VPG="NO"
 
@@ -90,7 +90,11 @@ cp $REPO_DIR_PLCC/doc/RELEASE_LOG $RELEASE_DIR/vplg/doc/
 cp $REPO_DIR_PLCC/doc/plcc_settings.txt $RELEASE_DIR/vplg/doc/
 cp $REPO_DIR_PLCC/doc/vplg_explanation_short.pdf $RELEASE_DIR/vplg/doc/
 cp $REPO_DIR_SPLITPDB/doc/README_splitpdb $RELEASE_DIR/vplg/doc/
-cp $REPO_DIR_VPG/doc/README_vpg $RELEASE_DIR/vplg/doc/
+
+if [ "$INCLUDE_VPG" = "YES" ]; then
+    cp $REPO_DIR_VPG/doc/README_vpg $RELEASE_DIR/vplg/doc/
+fi
+
 
 ## 4: source code
 echo "$APPTAG Copying source code..."
