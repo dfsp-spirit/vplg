@@ -32,6 +32,7 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -4003,6 +4004,7 @@ E	3	3	3
         Integer downwards = 180;
         
         ArrayList<Shape> parts = new ArrayList<Shape>();
+        ArrayList<Shape> partsPath = new ArrayList<Shape>();
         Integer leftVertPosX, rightVertPosX, bothArcsXDistance, bothArcsSumHeight, vertStartY, leftArcHeight, leftArcWidth, rightArcHeight, rightArcWidth, arcWidth, arcEllipseHeight;
         Integer leftArcUpperLeftX, leftArcUpperLeftY, centerBetweenBothArcsX, centerBetweenBothArcsY, leftArcEndX, leftArcEndY, rightArcEndX, rightArcEndY;
         Integer leftArcLowerRightX, leftArcLowerRightY, leftArcUpperRightX, leftArcUpperRightY;
@@ -4046,6 +4048,8 @@ E	3	3	3
         
         // everything computed, now start to create the shapes based on the required arc starting angle (up or down)
         Shape shape; Arc2D arc;
+        GeneralPath path = new GeneralPath();
+        path.moveTo(startX, startY);
         
         // TODO: we could draw these arcs using Quadratic and Cubic Curves (QuadCurve2D and CubicCurve2D).
         //       See the docs at http://docs.oracle.com/javase/tutorial/2d/overview/primitives.html for examples.
@@ -4061,6 +4065,7 @@ E	3	3	3
             shape = stroke.createStrokedShape(arc);
             parts.add(shape);
             
+            path.curveTo(startX, (startY - leftArcHeight), leftArcEndX, (leftArcEndY - leftArcHeight), leftArcEndX, leftArcEndY);
             
             rightArcUpperLeftX = rightVertPosX - rightArcWidth;
             rightArcUpperLeftY = targetY;
@@ -4111,7 +4116,8 @@ E	3	3	3
             parts.add(shape);
 
         }
-        return(parts);
+        return new ArrayList<>(partsPath);
+        //return(parts);
     }
     
     

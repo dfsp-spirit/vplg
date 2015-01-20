@@ -66,7 +66,7 @@ public class ComplexGraph extends UAdjListGraph {
 
     public String getPDBID() {
         return this.pdbid;
-    }
+    }        
 
     /**
      * Writes this complex graph to the file 'file' in GML format. Note that

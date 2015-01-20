@@ -123,6 +123,7 @@ Updates from version 2012-10-11 to 2013-03-25:
 
 Updates from version 2013-03-25 to 2015-01-20:
 ================================================
+* ALL: license changed to GPL 2.0
 * PLCC
   - tons of changes and fixes, the code base may have doubled. some are given in the following list, more are forgotten already.
   - support for computing folding graphs (connected components of protein graphs)
