@@ -87,8 +87,10 @@ This section roughly explains how VPLG works. See the paper for details.<br />
 <br />
 <a name="Fileformat" id="Fileformat"></a> <strong>Output file formats</strong><br />
 <br />
-VPLG can save the output graphs in a variety of standard graph file formats, including <a href="http://en.wikipedia.org/wiki/Graph_Modelling_Language" target="_blank">GML</a>, <a href="http://en.wikipedia.org/wiki/Trivial_Graph_Format" target="_blank">TGF</a>, and its own PLG format.
+VPLG can save the output graphs in a variety of standard graph file formats, including <a href="http://en.wikipedia.org/wiki/Graph_Modelling_Language" target="_blank">GML</a>, <a href="http://en.wikipedia.org/wiki/Trivial_Graph_Format" target="_blank">TGF</a>, JSON, <a href="http://en.wikipedia.org/wiki/XGMML" target="_blank">XGMML</a>, and its own PLG format.
 These formats can be opened by standard graph software like Gephi, Cytoscape or GraphViz.
+
+<!--
 An example for a file in PLG format is given below:<br /><br />
 <pre>
 # This is the plcc SSE info file for the albelig graph of PDB entry 2hhb, chain A.
@@ -154,6 +156,8 @@ Contact lines describe a spatial contact between a pair <em>(A, B)</em> of SSEs.
 <li><strong>sequential SSE number of SSE B</strong>: The sequential SSE number of the second SSE involved in this contact (see field 4 of the SSE line description). Example: <em>2</em>.</li>
 </ul>
 Note on parsing these files: You can savely remove all whitespace from a line before splitting it.<br />
+-->
+
 <br />
 <br />
 <a name="Screenshots" id="Screenshots"></a>
