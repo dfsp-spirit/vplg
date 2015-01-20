@@ -31,9 +31,11 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
+import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -4004,9 +4006,11 @@ E	3	3	3
         Integer downwards = 180;
         
         ArrayList<Shape> parts = new ArrayList<Shape>();
-        ArrayList<Shape> partsPath = new ArrayList<Shape>();
-        Integer leftVertPosX, rightVertPosX, bothArcsXDistance, bothArcsSumHeight, vertStartY, leftArcHeight, leftArcWidth, rightArcHeight, rightArcWidth, arcWidth, arcEllipseHeight;
+        //ArrayList<Shape> partsPath = new ArrayList<Shape>();
+        Integer leftVertPosX, leftVertPosY, rightVertPosX, rightVertPosY, bothArcsXDistance, bothArcsSumHeight, vertStartY, leftArcHeight, leftArcWidth, rightArcHeight, rightArcWidth, arcWidth, arcEllipseHeight;
         Integer leftArcUpperLeftX, leftArcUpperLeftY, centerBetweenBothArcsX, centerBetweenBothArcsY, leftArcEndX, leftArcEndY, rightArcEndX, rightArcEndY;
+        Integer leftCurveStartX, leftCurveStartY, leftCurveEndX, leftCurveEndY;
+        Integer rightCurveStartX, rightCurveStartY, rightCurveEndX, rightCurveEndY;
         Integer leftArcLowerRightX, leftArcLowerRightY, leftArcUpperRightX, leftArcUpperRightY;
         Integer rightArcLowerRightX, rightArcLowerRightY, rightArcUpperRightX, rightArcUpperRightY, rightArcUpperLeftX, rightArcUpperLeftY;
         Integer lineStartX, lineStartY, lineEndX, lineEndY, lineLength;
@@ -4015,15 +4019,20 @@ E	3	3	3
         // ensure left-right order
         if(startX < targetX) { 
             leftVertPosX = startX;
-            rightVertPosX = targetX; }
+            leftVertPosY = startY;
+            rightVertPosX = targetX;
+            rightVertPosY = targetY;
+        }
         else
         { 
-            leftVertPosX = targetX; 
+            leftVertPosX = targetX;
+            leftVertPosY = targetY;
             rightVertPosX = startX;
+            rightVertPosY = startY;
         }
         
         // stuff common for up/down
-        vertStartY = startY;
+        vertStartY = leftVertPosY;
         lineLength = Math.abs(startY - targetY);
                 
         
@@ -4034,8 +4043,12 @@ E	3	3	3
         //bothArcsSumHeight = bothArcsSumWidth;
         leftArcHeight = rightArcHeight = arcEllipseHeight = bothArcsSumHeight / 2;
         
-        //centerBetweenBothArcsX = rightVertPosX - (bothArcsXDistance / 2);    // this is where the upright line is created
-        //centerBetweenBothArcsY = vertStartY;
+        centerBetweenBothArcsX = rightVertPosX - (bothArcsXDistance / 2);    // this is where the upright line is created
+        if(startUpwards) {
+            centerBetweenBothArcsY = vertStartY - 40;   // 40 is half of the height of the drawn SSEs (arrow/barrel)
+        } else {
+            centerBetweenBothArcsY = vertStartY + 40;
+        }
         
         leftArcUpperLeftX = leftVertPosX;
         leftArcUpperLeftY = vertStartY - (arcEllipseHeight / 2);
@@ -4047,9 +4060,9 @@ E	3	3	3
         leftArcUpperRightY = leftArcUpperLeftY;
         
         // everything computed, now start to create the shapes based on the required arc starting angle (up or down)
-        Shape shape; Arc2D arc;
-        GeneralPath path = new GeneralPath();
-        path.moveTo(startX, startY);
+        Shape shape, shape2; Arc2D arc;
+        //GeneralPath path = new GeneralPath();
+        //path.moveTo(startX, startY);
         
         // TODO: we could draw these arcs using Quadratic and Cubic Curves (QuadCurve2D and CubicCurve2D).
         //       See the docs at http://docs.oracle.com/javase/tutorial/2d/overview/primitives.html for examples.
@@ -4061,30 +4074,50 @@ E	3	3	3
             leftArcEndY = leftArcLowerRightY;
            
             // create the Shape for the left arc, which starts upwards in this case
-            arc = new Arc2D.Double(leftArcUpperLeftX, leftArcUpperLeftY, leftArcWidth, leftArcHeight, upwards, 180, Arc2D.OPEN);
-            shape = stroke.createStrokedShape(arc);
+            //arc = new Arc2D.Double(leftArcUpperLeftX, leftArcUpperLeftY, leftArcWidth, leftArcHeight, upwards, 180, Arc2D.OPEN);
+            leftCurveEndX = centerBetweenBothArcsX;
+            leftCurveEndY = centerBetweenBothArcsY;
+            shape = new CubicCurve2D.Double(startX, startY, startX, (startY - leftArcHeight), leftArcEndX, (leftArcEndY - leftArcHeight), leftCurveEndX, leftCurveEndY);
+            shape = stroke.createStrokedShape(shape);
             parts.add(shape);
             
-            path.curveTo(startX, (startY - leftArcHeight), leftArcEndX, (leftArcEndY - leftArcHeight), leftArcEndX, leftArcEndY);
+            Boolean debugStartUp = false;
+            if(debugStartUp) {            
+                int startPointX = startX - 15;
+                int startPointY = startY;
+                parts.add(stroke.createStrokedShape(new Line2D.Double(startPointX, startPointY, startPointX, startPointY)));
+                
+                int targetPointX = targetX + 15;
+                int targetPointY = targetY;
+                parts.add(stroke.createStrokedShape(new Line2D.Double(targetPointX, targetPointY, targetPointX, targetPointY)));
+            }
+            //path.curveTo(startX, (startY - leftArcHeight), leftArcEndX, (leftArcEndY - leftArcHeight), leftArcEndX, leftArcEndY);
             
-            rightArcUpperLeftX = rightVertPosX - rightArcWidth;
-            rightArcUpperLeftY = targetY;
+            //rightArcUpperLeftX = rightVertPosX - rightArcWidth;
+            //rightArcUpperLeftY = targetY;
             
-            // create the Shape for the line, which goes straight down
-            lineStartX = leftArcEndX;
-            lineStartY = leftArcEndY;
-            lineEndX = rightArcUpperLeftX;
-            lineEndY = rightArcUpperLeftY;    // the line goes downwards, therefor the '+' in this case!
-            Line2D l = new Line2D.Double(lineStartX, lineStartY, lineEndX, lineEndY);
-            shape = stroke.createStrokedShape(l);
-            parts.add(shape);
+            // there is no central line, this version consists of 2 bezier quad curves
+            //lineStartX = leftArcEndX;
+            //lineStartY = leftArcEndY;
+            //lineEndX = rightArcUpperLeftX;
+            //lineEndY = rightArcUpperLeftY;    // the line goes downwards, therefor the '+' in this case!
+            //Line2D l = new Line2D.Double(lineStartX, lineStartY, lineEndX, lineEndY);
+            //shape = stroke.createStrokedShape(l);            
+            //parts.add(shape2);
+
             
             // create the Shape for the right arc. it starts in upper left corner and ends in upper right corner of its bounding rectangle (looks like a 'U').
             
             
-            arc = new Arc2D.Double(rightArcUpperLeftX, rightArcUpperLeftY - (arcEllipseHeight / 2), rightArcWidth, rightArcHeight, downwards, 180, Arc2D.OPEN);
-            shape = stroke.createStrokedShape(arc);
-            parts.add(shape);
+            //arc = new Arc2D.Double(rightArcUpperLeftX, rightArcUpperLeftY - (arcEllipseHeight / 2), rightArcWidth, rightArcHeight, downwards, 180, Arc2D.OPEN);
+            //shape = stroke.createStrokedShape(arc);
+            rightCurveStartX = leftCurveEndX;
+            rightCurveStartY = leftCurveEndY;
+            rightArcEndX = targetX;
+            rightArcEndY = targetY;
+            shape2 = new CubicCurve2D.Double(rightCurveStartX, rightCurveStartY, rightCurveStartX, (rightCurveStartY + rightArcHeight), rightArcEndX, (rightArcEndY + rightArcHeight), rightArcEndX, rightArcEndY);
+            shape2 = stroke.createStrokedShape(shape2);
+            parts.add(shape2);
         }
         else {
             // left arc ends in upper right corner of its bounding rectangle, looks like a 'U'
@@ -4092,32 +4125,56 @@ E	3	3	3
             leftArcEndX = leftArcUpperRightX;
             leftArcEndY = leftArcUpperRightY;
             
-            // create the Shape for the left arc, which starts downwards in this case
-            arc = new Arc2D.Double(leftArcUpperLeftX, leftArcUpperLeftY, leftArcWidth, leftArcHeight, downwards, 180, Arc2D.OPEN);
-            shape = stroke.createStrokedShape(arc);
+            leftCurveEndX = centerBetweenBothArcsX;
+            leftCurveEndY = centerBetweenBothArcsY;
+            shape = new CubicCurve2D.Double(startX, startY, startX, (startY + leftArcHeight), leftArcEndX, (leftArcEndY - leftArcHeight), leftCurveEndX, leftCurveEndY);
+            shape = stroke.createStrokedShape(shape);
             parts.add(shape);
             
-            rightArcUpperLeftX = rightVertPosX - rightArcWidth;
-            rightArcUpperLeftY = targetY - (arcEllipseHeight / 2);
+            Boolean debugStartDown = true;
+            if(debugStartDown) {            
+                int startPointX = startX - 15;
+                int startPointY = startY;
+                parts.add(stroke.createStrokedShape(new Line2D.Double(startPointX, startPointY, startPointX, startPointY)));
+                
+                int targetPointX = targetX + 15;
+                int targetPointY = targetY;
+                parts.add(stroke.createStrokedShape(new Line2D.Double(targetPointX, targetPointY, targetPointX, targetPointY)));
+            }
+            
+            // create the Shape for the left arc, which starts downwards in this case
+            //arc = new Arc2D.Double(leftArcUpperLeftX, leftArcUpperLeftY, leftArcWidth, leftArcHeight, downwards, 180, Arc2D.OPEN);
+            //shape = stroke.createStrokedShape(arc);
+            //parts.add(shape);
+            
+            //rightArcUpperLeftX = rightVertPosX - rightArcWidth;
+            //rightArcUpperLeftY = targetY - (arcEllipseHeight / 2);
             
             // create the Shape for the line, which goes straight up
-            lineStartX = leftArcEndX;
-            lineStartY = leftArcEndY + (arcEllipseHeight / 2);
-            lineEndX = rightArcUpperLeftX;
-            lineEndY = rightArcUpperLeftY + (arcEllipseHeight / 2);
-            Line2D l = new Line2D.Double(lineStartX, lineStartY, lineEndX, lineEndY);
-            shape = stroke.createStrokedShape(l);
-            parts.add(shape);
+            //lineStartX = leftArcEndX;
+            //lineStartY = leftArcEndY + (arcEllipseHeight / 2);
+            //lineEndX = rightArcUpperLeftX;
+            //lineEndY = rightArcUpperLeftY + (arcEllipseHeight / 2);
+            //Line2D l = new Line2D.Double(lineStartX, lineStartY, lineEndX, lineEndY);
+            //shape = stroke.createStrokedShape(l);
+            //parts.add(shape);
             
             // create the Shape for the right arc. it starts in upper left corner and ends in upper right corner of its bounding rectangle (looks like an inverted 'U').
             
-            arc = new Arc2D.Double(rightArcUpperLeftX, rightArcUpperLeftY, rightArcWidth, rightArcHeight, upwards, 180, Arc2D.OPEN);
-            shape = stroke.createStrokedShape(arc);
-            parts.add(shape);
+            //arc = new Arc2D.Double(rightArcUpperLeftX, rightArcUpperLeftY, rightArcWidth, rightArcHeight, upwards, 180, Arc2D.OPEN);
+            //shape = stroke.createStrokedShape(arc);
+            //parts.add(shape);
+            rightCurveStartX = leftCurveEndX;
+            rightCurveStartY = leftCurveEndY;
+            rightArcEndX = targetX;
+            rightArcEndY = targetY;
+            shape2 = new CubicCurve2D.Double(rightCurveStartX, rightCurveStartY, rightCurveStartX, (rightCurveStartY - rightArcHeight), rightArcEndX, (rightArcEndY - rightArcHeight), rightArcEndX, rightArcEndY);
+            shape2 = stroke.createStrokedShape(shape2);
+            parts.add(shape2);
 
         }
-        return new ArrayList<>(partsPath);
-        //return(parts);
+        //return new ArrayList<Shape>(path);
+        return(parts);
     }
     
     
@@ -6589,7 +6646,7 @@ E	3	3	3
                     //System.out.println("Rotating canvas before drawing SSE #" + i + " of the list.");
                 }
                 ig2.draw(shape);    // for stroked version (border only, no fill)
-                ig2.fill(p);        // fill it completely
+                //ig2.fill(p);        // fill it completely
                 if(Objects.equals(orientationsSeqOrder[i], ORIENTATION_DOWNWARDS)) { 
                     ig2.setTransform(origXform);
                     //ig2.rotate(Math.toRadians(-180)); 
