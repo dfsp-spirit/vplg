@@ -334,6 +334,7 @@ function check_install($db)  {
 						</select> 
 						graphs in the database for: 
 						<input type="text" class="form-control" id="searchLinnots" autocomplete="off" placeholder="Enter query notation string...">
+						<input type="checkbox" name="matching" value="like"> and similar 
 						<button type="submit" id="sendit_linnots" name="linnotalphaadj" value="linnotalphared" class="btn btn-default" ><span class="glyphicon glyphicon-search"></span></button><br>
 
 			</form></div>
