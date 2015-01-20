@@ -314,11 +314,11 @@ function check_install($db)  {
 				<dd>Search for folding graph linear notation strings <strong class="caret" id="flipArrow5" ></strong></dd>
 				</div>
 				<div id="addSearchCustomLinnots">
-				<p>Select the graph type and notation, then enter a query linear notation string, e.g., 'h,2ph,3ph'. Note that this searches the whole database and may take some minutes.</p>
+				<p>Select the graph type and notation, then enter a query linear notation string, e.g., 'h,2ph'. Note that this searches the whole database and may take some minutes.</p>
 				
 				                Search the 
 				                <select class="notation">
-						  <option value="adj">ADJ</option>
+						  <option value="adj" selected>ADJ</option>
 						  <option value="red">RED</option>
 						  <option value="seq">SEQ</option>
 						  <option value="key">KEY</option>
@@ -330,12 +330,12 @@ function check_install($db)  {
 						  <option value="albe">albe</option>
 						  <option value="alphalig">alphalig</option>
 						  <option value="betalig">betalig</option>
-						  <option value="albelig">albelig</option>
+						  <option value="albelig" selected>albelig</option>
 						</select> 
 						graphs in the database for: 
 						<input type="text" class="form-control" id="searchLinnots" autocomplete="off" placeholder="Enter query notation string...">
 						<input type="checkbox" name="matching" value="like"> and similar 
-						<button type="submit" id="sendit_linnots" name="linnotalphaadj" value="linnotalphared" class="btn btn-default" ><span class="glyphicon glyphicon-search"></span></button><br>
+						<button type="submit" id="sendit_linnots" name="linnotalbeligadj" value="linnotalbeligadj" class="btn btn-default" ><span class="glyphicon glyphicon-search"></span></button><br>
 
 			</form></div>
 			</dl>
