@@ -27,6 +27,9 @@
 						<!-- <strong>caret</strong> creates the little triangle/arrow -->
 						<a href="#"  class="navbarFont dropdown-toggle" data-toggle="dropdown"> Retrieve <strong class="caret"></strong></a>
 						<ul class="dropdown-menu">
+						        <li>
+								<a href="proteingraphs.php"><i class="fa fa-briefcase"></i> All protein graphs of a chain</a>
+							</li>
 							<li>
 								<a href="foldinggraphs.php"><i class="fa fa-briefcase"></i> All Folding graphs of a PG</a>
 							</li>
