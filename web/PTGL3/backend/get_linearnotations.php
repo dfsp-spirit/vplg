@@ -48,21 +48,25 @@ function get_graphtype_abbr($graphtype_int){
 	}
 }
 
+// Obsolete: Now we take linear notations from file..
+/* 
 function get_query_string($graphtype_int, $notation, $q_limit, $limit_start){
-$query = "SELECT DISTINCT fglin.ptgl_linnot_%s
-FROM plcc_fglinnot fglin
-INNER JOIN plcc_foldinggraph fg
-ON fglin.linnot_foldinggraph_id = fg.foldinggraph_id
-INNER JOIN plcc_graph g
-ON fg.parent_graph_id = g.graph_id
-WHERE g.graph_type = %s
-ORDER BY fglin.ptgl_linnot_%s ASC
-LIMIT %d OFFSET %d";
-$query = sprintf($query, $notation, $graphtype_int, $notation, $q_limit, $limit_start);
-return $query;	
+    $query = "SELECT DISTINCT fglin.ptgl_linnot_%s
+    FROM plcc_fglinnot fglin
+    INNER JOIN plcc_foldinggraph fg
+    ON fglin.linnot_foldinggraph_id = fg.foldinggraph_id
+    INNER JOIN plcc_graph g
+    ON fg.parent_graph_id = g.graph_id
+    WHERE g.graph_type = %s
+    ORDER BY fglin.ptgl_linnot_%s ASC
+    LIMIT %d OFFSET %d";
+    $query = sprintf($query, $notation, $graphtype_int, $notation, $q_limit, $limit_start);
+    return $query;	
 } 
+*/
 
-
+// Obsolete: Now we take linear notations from file..
+/* 
 function get_query_string_denormalized($graphtype_int, $notation, $q_limit, $limit_start){
 	$query =   "SELECT DISTINCT fglin.ptgl_linnot_%s
 				FROM plcc_fglinnot fglin				
@@ -73,19 +77,25 @@ function get_query_string_denormalized($graphtype_int, $notation, $q_limit, $lim
 	$query = sprintf($query, $notation, $graphtype_int, $notation, $q_limit, $limit_start);
 	return $query;			
 }
+*/
+
+// Obsolete: Now we take linear notations from file..
+/* 
 function get_count_query_string($graphtype_int, $notation){
-$query = "SELECT COUNT(DISTINCT fglin.ptgl_linnot_%s)
-FROM plcc_fglinnot fglin
-INNER JOIN plcc_foldinggraph fg
-ON fglin.linnot_foldinggraph_id = fg.foldinggraph_id
-INNER JOIN plcc_graph g
-ON fg.parent_graph_id = g.graph_id
-WHERE g.graph_type = %s";
-$query = sprintf($query, $notation, $graphtype_int);
-return $query;	
+    $query = "SELECT COUNT(DISTINCT fglin.ptgl_linnot_%s)
+    FROM plcc_fglinnot fglin
+    INNER JOIN plcc_foldinggraph fg
+    ON fglin.linnot_foldinggraph_id = fg.foldinggraph_id
+    INNER JOIN plcc_graph g
+    ON fg.parent_graph_id = g.graph_id
+    WHERE g.graph_type = %s";
+    $query = sprintf($query, $notation, $graphtype_int);
+    return $query;	
 } 
+*/
 
-
+// Obsolete: Now we take linear notations from file..
+/* 
 function get_count_query_string_denormalized($graphtype_int, $notation){
 	$query =   "SELECT COUNT(DISTINCT fglin.ptgl_linnot_%s)
 				FROM plcc_fglinnot fglin				
@@ -93,6 +103,48 @@ function get_count_query_string_denormalized($graphtype_int, $notation){
 	
 	$query = sprintf($query, $notation, $graphtype_int);
 	return $query;			
+}
+*/
+
+function getLinnotFromFile($graphtype, $notation, $offset, $limit) {
+    
+    $linnots = Array();
+    $graphtype = get_graphtype_abbr($graphtype);
+    
+    $directory = "./temp_data/";
+    $filename = "linnots_" . $notation . "_" . $graphtype . ".lst";
+    
+    if(file_exists($directory . $filename)){
+        $file = new SplFileObject($directory . $filename);
+        $file->seek($offset); // seek to line 50 (0 based)
+        
+        for($i = 0; $i <= $limit; $i++){
+            if(! $file->eof()){
+                array_push($linnots, $file->current());
+                $file->next();
+            }
+        }
+    }
+    
+    return $linnots;   
+}
+
+function getLineCount($graphtype, $notation){
+    $directory = "./temp_data/";
+    $graphtype = get_graphtype_abbr($graphtype);
+    $filename = "linnots_" . $notation . "_" . $graphtype . ".lst";
+    
+    $file = $directory . $filename ;
+    $linecount = 0;
+    $handle = fopen($file, "r");
+        
+    while(!feof($handle)){
+        $line = fgets($handle);
+        $linecount++;
+    }
+
+    fclose($handle);
+    return $linecount;
 }
 
 if(isset($_GET["next"])) {
@@ -128,7 +180,8 @@ if(isset($_GET['graphtype']) && isset($_GET['notationtype'])){
 
 
 if($valid_values){
-	// connect to DB
+	// connect to DB !obsolete
+        /*
 	$conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
 	$db = pg_connect($conn_string);
 	if(! $db) { array_push($SHOW_ERROR_LIST, "Database connection failed."); }
@@ -151,23 +204,27 @@ if($valid_values){
 	//$row_count = 100;
 	$result = pg_query($db, $query);
 	if(! $result) { array_push($SHOW_ERROR_LIST, "Database query failed: '" . pg_last_error($db) . "'"); }
-	
+	*/
+        
+        $row_count = getLineCount($graphtype, $notation);
+        $linnotArray = getLinnotFromFile($graphtype, $notation, $limit_start, $q_limit);
+    
 	// begin to create pager
 	$tableString = '<div id="pager">';
 	if($limit_start >= $q_limit) {
-		$tableString .= '<a class="changepage" href="?next='.($limit_start - $q_limit).'"><< previous </a>  ';
+            $tableString .= '<a class="changepage" href="?next='.($limit_start - $q_limit).'"><< previous </a>  ';
 	}
 
 	$tableString .= '-- Showing results '.$limit_start.' to ';
 	
 	if($limit_start + $q_limit > $row_count){
-		$tableString .= $row_count . ' (of '.$row_count.') -- ';
+            $tableString .= $row_count . ' (of '.$row_count.') -- ';
 	} else {
-		$tableString .= ($limit_start + $q_limit) . ' (of '.$row_count.') -- ';
+            $tableString .= ($limit_start + $q_limit) . ' (of '.$row_count.') -- ';
 	}
 	
 	if(($limit_start + $q_limit) < $row_count){
-		$tableString .= '<a class="changepage" href="?next='.($limit_start + $q_limit).'"> next >></a>';
+            $tableString .= '<a class="changepage" href="?next='.($limit_start + $q_limit).'"> next >></a>';
 	}
 	$tableString .= '</div>';
 	// EOPager
@@ -176,12 +233,12 @@ if($valid_values){
 	
 	$parameter = "linnot".get_graphtype_abbr($graphtype).$notation;
 	
-	$all_data = pg_fetch_all($result);
+	//$all_data = pg_fetch_all($result);
 	
-	if(! $all_data) { echo "ERROR: '" . pg_last_error() . "'."; }
+	if(! $linnotArray) { echo "ERROR: '" . pg_last_error() . "'."; }
 	
-	foreach($all_data as $arr) {
-		$linnot_string = $arr['ptgl_linnot_'.$notation];
+	foreach($linnotArray as $arr) {
+		$linnot_string = $arr;
 		$tableString .= "<div class='string_row'>";
 		$tableString .= "<a href='search.php?".$parameter."=".$linnot_string."' >". $linnot_string . "</a>";
 		$tableString .= "</div>";
@@ -199,8 +256,6 @@ if($valid_values){
 	*/
 	
 	$tableString .= "</div>";
-
-
 }
 
 //EOF

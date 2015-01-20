@@ -44,15 +44,15 @@ function check_auth($id, $token)  {
 }
 
 function get_all_linnots_query_string($graphtype_int, $notation){
-$query = "SELECT DISTINCT fglin.ptgl_linnot_%s
-FROM plcc_fglinnot fglin
-INNER JOIN plcc_foldinggraph fg
-ON fglin.linnot_foldinggraph_id = fg.foldinggraph_id
-INNER JOIN plcc_graph g
-ON fg.parent_graph_id = g.graph_id
-WHERE g.graph_type = %s
-ORDER BY fglin.ptgl_linnot_%s ASC";
-$query = sprintf($query, $notation, $graphtype_int, $notation);
+    $query = "SELECT DISTINCT fglin.ptgl_linnot_%s
+    FROM plcc_fglinnot fglin
+    INNER JOIN plcc_foldinggraph fg
+    ON fglin.linnot_foldinggraph_id = fg.foldinggraph_id
+    INNER JOIN plcc_graph g
+    ON fg.parent_graph_id = g.graph_id
+    WHERE g.denorm_graph_type = %s
+    ORDER BY fglin.ptgl_linnot_%s ASC";
+    $query = sprintf($query, $notation, $graphtype_int, $notation);
 return $query;	
 } 
 
@@ -60,10 +60,10 @@ return $query;
 function get_all_linnots_query_string_denormalized($graphtype_int, $notation){
 	$query =   "SELECT DISTINCT fglin.ptgl_linnot_%s
 				FROM plcc_fglinnot fglin				
-				WHERE fglin.graph_type = %s
-				ORDER BY fglin.linnot_id ASC";
+				WHERE fglin.denorm_graph_type = %s
+				ORDER BY fglin.ptgl_linnot_%s ASC";
 	
-	$query = sprintf($query, $notation, $graphtype_int);
+	$query = sprintf($query, $notation, $graphtype_int, $notation);
 	return $query;			
 }
 
