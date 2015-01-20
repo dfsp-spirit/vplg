@@ -1,0 +1,7 @@
+VPG is a Swing-based graphical user interface (GUI) for the PLCC command line software.
+
+It runs PLCC in the background. All it does is construct the proper command line from the options you click in the GUI.
+
+-- 
+TS
+
