@@ -3534,6 +3534,19 @@ E	3	3	3
         }
         else {
             // System.out.print("getting crossover connector(" + startY + " != " + targetY + ").\n");
+            
+            // for the cross-over arcs, we can check whether the supplied up/down setting is correct (for the others, we cannot)
+            Boolean computedStartUpwards;
+            if(startY < targetY) {
+                computedStartUpwards = true;
+            }
+            else {
+                computedStartUpwards = false;
+            }
+            
+            if(!Objects.equals(computedStartUpwards, startUpwards)) {
+                System.err.println("DrawTools: WARNING: You startUpwards value " + startUpwards.toString() + " for the crossover arc from (" + startX + "," + startY + ") to (" + targetX + "," + targetY + ") seems questionable.");
+            }
             return(getCrossoverArcConnector(startX, startY, targetX, targetY, stroke, startUpwards, pixelsToShiftCentralLineOnYAxis));
         }        
     }
@@ -3730,7 +3743,7 @@ E	3	3	3
         Integer leftVertPosX, rightVertPosX, bothArcsSumWidth, bothArcsSumHeight, vertStartY, leftArcHeight, leftArcWidth, rightArcHeight, rightArcWidth, arcWidth, arcEllipseHeight;
         Integer leftArcUpperLeftX, leftArcUpperLeftY, centerBetweenBothArcsX, centerBetweenBothArcsY, leftArcEndX, leftArcEndY, rightArcEndX, rightArcEndY;
         Integer leftArcLowerRightX, leftArcLowerRightY, leftArcUpperRightX, leftArcUpperRightY;
-        Integer rightArcLowerRightX, rightArcLowerRightY, rightArcUpperRightX, rightArcUpperRightY, rightArcUpperLeftX, rightArcUpperLeftY;
+        Integer rightArcLowerRightX, rightArcLowerRightY, rightArcUpperRightX, rightArcUpperRightY, rightArcUpperLeftX, rightArcUpperLeftY, tmp;
         Integer lineStartX, lineStartY, lineEndX, lineEndY, lineLength;
         
         
@@ -3742,6 +3755,9 @@ E	3	3	3
         { 
             leftVertPosX = targetX; 
             rightVertPosX = startX;
+            tmp = startY;
+            startY = targetY;
+            targetY = tmp;
         }
         
         // stuff common for up/down
@@ -7444,6 +7460,12 @@ E	3	3	3
         }
         
         // --------------- done --------------
+        
+        ig2.setPaint(Color.GREEN);
+        drawLabeledCrossAt(ig2, new Position2D(250, 440), "250,440", DrawTools.ORIENTATION_BELOW);
+        ig2.setPaint(Color.ORANGE);
+        drawLabeledCrossAt(ig2, new Position2D(200, 360), "200,360", DrawTools.ORIENTATION_ABOVE);
+        ig2.setPaint(Color.BLACK);
         
         Rectangle2D roi = new Rectangle2D.Double(0, 0, 800, 600);
         DrawResult drawRes = new DrawResult(ig2, roi);
