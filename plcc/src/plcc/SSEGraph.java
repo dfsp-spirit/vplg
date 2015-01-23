@@ -3828,6 +3828,8 @@ E	3	3	3
         return(parts);
     }
     
+    
+    
     /**
      * The function that implements a more complex 'S'-shaped arc connector between the 2D points (startX, startY) and (targetX, targetY) in the
      * requested direction. Internal function, call the more general getArcConnector() function instead.
@@ -4355,6 +4357,8 @@ E	3	3	3
      * @param headY The y location of the "head" of the arrow
      * @param widthTail The width of the arrow at the tail
      * @param widthHead The width of the arrow at the broadest part of the head. Note that widthHead > widthTail is required if this is meant to make sense.
+     * @param lengthHead the length of the arrow head
+     * @return the polygon
      */
     protected static Polygon getArrowPolygon(int headY, int tailX, int tailY, int widthTail, int widthHead, int lengthHead) {
         
@@ -4453,6 +4457,10 @@ E	3	3	3
     
     /**
      * Just a helper function that sets default values for the width of the arrow. See the first 3 parameters of the drawOutlinedArrow() function for parameter explanation. 
+     * @param headY the Y axis position of the head
+     * @param bothX the X axis position (for whole polygon, the arrow is always straight up)
+     * @param tailY the Y axis position of the tail
+     * @return the polygon
      */
     protected static Polygon getDefaultArrowPolygon(int headY, int bothX, int tailY) {
         
@@ -6746,6 +6754,9 @@ E	3	3	3
             DrawResult drawRes = new DrawResult(ig2, roi);
             return drawRes;                                                                         
     }
+    
+    
+    
 
     
     
@@ -7029,6 +7040,173 @@ E	3	3	3
         }
         
         return plg;
+    }
+    
+    
+    public static void main(String [] args) {
+        System.out.println("Testing drawing functions...");
+        drawTest("test");
+        System.out.println("Done.");
+    }
+    
+    public static void drawTest(String baseFile) {
+        String svgFilePath = baseFile + ".svg";
+        DrawResult drawRes = SSEGraph.drawTestG2D();
+        try {
+            DrawTools.writeG2dToSVGFile(svgFilePath, drawRes);
+            System.out.println("Test image file written to '" + new File(svgFilePath).getAbsolutePath() + "'.");
+        } catch (IOException ex) {
+            System.err.println("Could not write test image file to '" + new File(svgFilePath).getAbsolutePath() + "': '" + ex.getMessage() + "'.");
+        }
+        
+    }
+    
+    /**
+     * Draws a cross at the given position
+     * @param ig2 where to draw
+     * @param pos the position to draw at
+     */
+    private static void drawCrossAt(SVGGraphics2D ig2, Position2D pos) {
+        int l = 5;
+        Shape line1 = new Line2D.Double(pos.x - l, pos.y - l, pos.x + l, pos.y + l);
+        Shape line2 = new Line2D.Double(pos.x - l, pos.y + l, pos.x + l, pos.y - l);
+        ig2.draw(line1);
+        ig2.draw(line2);
+    }
+    
+    /**
+     * Draws a cross at the given position
+     * @param ig2 where to draw
+     * @param pos the position to draw at
+     * @param label the label string to draw (currently it is assumed that this is very short, like 2 chars)
+     * @param labelPos the relative label orientation. 0 = above the cross, 1 = right of the cross, 2 = below the cross, 3 = left of the cross
+     */
+    private static void drawLabeledCrossAt(SVGGraphics2D ig2, Position2D pos, String label, int labelPos) {
+        drawCrossAt(ig2, pos);
+        Integer labelPosX = pos.x;
+        Integer labelPosY = pos.y;
+        if(labelPos == 0) {     // above
+            labelPosY -= 6;
+            labelPosX -= 4;
+        }
+        else if(labelPos == 1) {    // right
+            labelPosX += 8;
+            labelPosY += 4;
+        }
+        else if(labelPos == 2) {    // below
+            labelPosY += 17;
+            labelPosX -= 5;
+        }
+        else if(labelPos == 3) {    // left
+            labelPosX -= 22;
+            labelPosY += 5;
+        }
+        
+        ig2.drawString(label, labelPosX, labelPosY);
+    }
+    
+    /**
+     * Draws a grid starting at upperLeftPos
+     * @param ig2
+     * @param upperLeftPos start position
+     * @param cellWidth width of a grid cell
+     * @param cellHeight height of a grid cell
+     * @param cellsPerRow number of cells in a row
+     * @param cellsPerColumn number of cells in a column
+     */
+    private static void drawGrid(SVGGraphics2D ig2, Position2D upperLeftPos, Integer cellWidth, Integer cellHeight, Integer cellsPerRow, Integer cellsPerColumn) {
+        Shape line;
+        // draw horizontal lines
+        for(int i = 0; i <= cellsPerColumn; i++) {
+            line = new Line2D.Double(upperLeftPos.x, (upperLeftPos.y + i * cellHeight), (upperLeftPos.x + (cellsPerRow * cellWidth)), (upperLeftPos.y + i * cellHeight));
+            ig2.draw(line);
+        }
+        
+        for(int i = 0; i <= cellsPerRow; i++) {
+            line = new Line2D.Double((upperLeftPos.x + i * cellWidth), upperLeftPos.y, (upperLeftPos.x + (i * cellWidth)), (upperLeftPos.y + cellsPerColumn * cellHeight));
+            ig2.draw(line);
+        }               
+    }
+    
+    private static DrawResult drawTestG2D() {
+
+      
+     
+        Boolean bw = false;                                                  
+        
+        // All these values are in pixels
+        // page setup
+        Position2D vertStart = new Position2D(50, 50);
+        Integer lineHeight = 12;
+        
+        // drawing of objects
+        Integer vertDist = 50;                  // distance between (centers of) vertices in the drawing
+        Integer vertHeight = 80;                // height of vertex element graphics (arrow height)
+        Integer vertWidth = 40;                 // height of vertex graphics (arrow width)
+        Integer vertStartX = 100;
+        Integer vertStartY = 200 + vertHeight;  // this marks the LOWER part of the vertex
+        
+        
+
+        // ------------------------- Prepare stuff -------------------------
+
+        SVGGraphics2D ig2;
+
+        // we always use SVG now, it can be converted to other formats later using batik           
+        DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
+        // Create an instance of org.w3c.dom.Document.
+        String svgNS = "http://www.w3.org/2000/svg";
+        Document document = domImpl.createDocument(svgNS, "svg", null);
+        // Create an instance of the SVG Generator.
+        ig2 = new SVGGraphics2D(document);
+
+        ig2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // make background white
+        ig2.setPaint(Color.WHITE);
+        ig2.fillRect(0, 0, 800, 600);
+        ig2.setPaint(Color.BLACK);
+
+
+
+        //pl.drawAreaOutlines(ig2);
+        // prepare font
+        Font font = new Font("Verdana", Font.PLAIN, 12);
+        ig2.setFont(font);
+        FontMetrics fontMetrics = ig2.getFontMetrics();
+
+        // ------------------------- Draw header -------------------------
+
+        // check width of header string
+        String proteinHeader = "Test image";
+        Integer currentPosX = vertStartX;
+        Integer currentPosY = vertStartY;
+        
+        int ABOVE = 0;
+        int RIGHT_OF = 1;
+        int BELOW = 2;
+        int LEFT_OF = 3;
+        
+        ig2.setPaint(Color.GRAY);
+        drawGrid(ig2, new Position2D(vertStartX, vertStartY - vertHeight * 2), vertDist, vertHeight, 5, 3);
+        ig2.setPaint(Color.BLACK);
+                
+        ig2.setPaint(Color.RED);
+        drawLabeledCrossAt(ig2, new Position2D(vertStartX + (0 * vertDist), vertStartY), "1A", ABOVE);
+        drawLabeledCrossAt(ig2, new Position2D(vertStartX + (1 * vertDist), vertStartY), "2R", RIGHT_OF);
+        drawLabeledCrossAt(ig2, new Position2D(vertStartX + (2 * vertDist), vertStartY), "3B", BELOW);
+        drawLabeledCrossAt(ig2, new Position2D(vertStartX + (3 * vertDist), vertStartY), "4L", LEFT_OF);
+        ig2.setPaint(Color.BLACK);
+        
+        for(int i = 0; i < 5; i++) {
+            Polygon p = getDefaultArrowPolygon((vertStartY - vertHeight), currentPosX + i * vertDist, currentPosY);
+            Shape s = ig2.getStroke().createStrokedShape(p);
+            ig2.draw(s);            
+        }
+
+        Rectangle2D roi = new Rectangle2D.Double(0, 0, 800, 600);
+        DrawResult drawRes = new DrawResult(ig2, roi);
+        return drawRes;                                                                         
     }
 
 }
