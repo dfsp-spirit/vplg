@@ -4360,7 +4360,7 @@ E	3	3	3
      * @param lengthHead the length of the arrow head
      * @return the polygon
      */
-    protected static Polygon getArrowPolygon(int headY, int tailX, int tailY, int widthTail, int widthHead, int lengthHead) {
+    protected static Polygon getArrowPolygonUp(int headY, int tailX, int tailY, int widthTail, int widthHead, int lengthHead) {
         
         int numPoints = 7;
         int[] xPoints = new int[numPoints] ;
@@ -4384,7 +4384,7 @@ E	3	3	3
         xPoints[3] = tailX + (widthHead / 2);
         yPoints[3] = headY + lengthHead;
         
-        // The arrow tip
+        // The arrow tip at the top
         xPoints[4] = tailX;
         yPoints[4] = headY;
         
@@ -4395,6 +4395,59 @@ E	3	3	3
         // The left point of the start of the head.
         xPoints[6] = tailX - (widthTail / 2);
         yPoints[6] = headY + lengthHead;
+        
+        // The line closing the polygon (between the last we just set and the first point) is automatically inserted to close the Polygon
+        return(new Polygon(xPoints, yPoints, numPoints));     
+    }
+    
+    /**
+     * Creates an outlined arrow (7 lines) on the given Graphics2D context, using the Polygon class. The arrow points straight down, thus headX is = tailX and does not have to be supplied.
+     * You can transform this is you want to change its angle. It's a shape so you can stroke or fill it, too.
+     * You should also check out getDefaultArrowPolygon() for an easy way to get arrows with the same width, length and head length.
+     *
+     * @param tailX The x location of the center of the "tail" of the arrow
+     * @param tailY The y location of the center of the "tail" of the arrow
+     * @param headY The y location of the "head" of the arrow
+     * @param widthTail The width of the arrow at the tail
+     * @param widthHead The width of the arrow at the broadest part of the head. Note that widthHead > widthTail is required if this is meant to make sense.
+     * @param lengthHead the length of the arrow head
+     * @return the polygon
+     */
+    protected static Polygon getArrowPolygonDown(int tailY, int tailX, int headY, int widthTail, int widthHead, int lengthHead) {
+        
+        int numPoints = 7;
+        int[] xPoints = new int[numPoints] ;
+        int[] yPoints = new int[numPoints] ;
+     
+        // Create all points of the arrow.
+        
+        //Start at the left point of the tail (the upper left point when the arrow is pointing downwards) and add the other points counter-clockwise.
+        xPoints[0] = tailX - (widthTail / 2);
+        yPoints[0] = tailY;
+        
+        // The right point of the tail.
+        xPoints[1] = tailX + (widthTail / 2);
+        yPoints[1] = tailY;
+        
+        // The right point of the start of the head.
+        xPoints[2] = tailX + (widthTail / 2);
+        yPoints[2] = headY - lengthHead;
+        
+        // The right-most point of the head.
+        xPoints[3] = tailX + (widthHead / 2);
+        yPoints[3] = headY - lengthHead;
+        
+        // The arrow tip at the bottom
+        xPoints[4] = tailX;
+        yPoints[4] = headY;
+        
+        // The left-most point of the head.
+        xPoints[5] = tailX - (widthHead / 2);
+        yPoints[5] = headY - lengthHead;
+        
+        // The left point of the start of the head.
+        xPoints[6] = tailX - (widthTail / 2);
+        yPoints[6] = headY - lengthHead;
         
         // The line closing the polygon (between the last we just set and the first point) is automatically inserted to close the Polygon
         return(new Polygon(xPoints, yPoints, numPoints));     
@@ -4462,13 +4515,60 @@ E	3	3	3
      * @param tailY the Y axis position of the tail
      * @return the polygon
      */
-    protected static Polygon getDefaultArrowPolygon(int headY, int bothX, int tailY) {
+    protected static Polygon getDefaultArrowPolygonUp(int headY, int bothX, int tailY) {
         
         int defaultWidthTail = 10;
         int defaultWidthHead = 20;
         int defaultLengthHead = 20;
         
-        return(getArrowPolygon(headY, bothX, tailY, defaultWidthTail, defaultWidthHead, defaultLengthHead));
+        return(getArrowPolygonUp(headY, bothX, tailY, defaultWidthTail, defaultWidthHead, defaultLengthHead));
+    }
+    
+    /**
+     * Just a helper function that sets default values for the width of the arrow. See the first 3 parameters of the drawOutlinedArrow() function for parameter explanation. 
+     * @param headY the Y axis position of the head
+     * @param bothX the X axis position (for whole polygon, the arrow is always straight up)
+     * @param tailY the Y axis position of the tail
+     * @return the polygon
+     */
+    protected static Polygon getDefaultArrowPolygonUpwardsLowestPointAt(int x, int y) {
+        
+        int defaultWidthTail = 10;
+        int defaultWidthHead = 20;
+        int defaultLengthHead = 20;
+        int defaultHeight = 80;
+        
+        return(getArrowPolygonUp(y - defaultHeight, x, y, defaultWidthTail, defaultWidthHead, defaultLengthHead));
+    }
+    
+    protected static Polygon getDefaultArrowPolygonLowestPointAt(int x, int y, Integer direction) {
+        if(direction.equals(DrawTools.DIRECTION_UPWARDS)) {
+            return getDefaultArrowPolygonUpwardsLowestPointAt(x, y);
+        }
+        else if(direction.equals(DrawTools.DIRECTION_DOWNWARDS)){
+            return getDefaultArrowPolygonDownwardsLowestPointAt(x, y);
+        }
+        else {
+            System.err.println("Invalid direction given.");
+            return null;
+        }
+    }
+    
+    /**
+     * Just a helper function that sets default values for the width of the arrow. See the first 3 parameters of the drawOutlinedArrow() function for parameter explanation. 
+     * @param headY the Y axis position of the head
+     * @param bothX the X axis position (for whole polygon, the arrow is always straight up)
+     * @param tailY the Y axis position of the tail
+     * @return the polygon
+     */
+    protected static Polygon getDefaultArrowPolygonDownwardsLowestPointAt(int x, int y) {
+        
+        int defaultWidthTail = 10;
+        int defaultWidthHead = 20;
+        int defaultLengthHead = 20;
+        int defaultHeight = 80;
+        
+        return(getArrowPolygonDown(y - defaultHeight, x, y, defaultWidthTail, defaultWidthHead, defaultLengthHead));
     }
     
     
@@ -6627,13 +6727,13 @@ E	3	3	3
                 
                 // draw it                                
                 if(fg.sseList.get(i).isHelix()) {
-                    p = getDefaultArrowPolygon((vertStartY - vertHeight), currentVertX, currentVertY);
+                    p = getDefaultArrowPolygonUp((vertStartY - vertHeight), currentVertX, currentVertY);
                     //p = getDefaultBarrelPolygon(vertStartY - vertHeight, currentVertX, vertStartY);
                     //System.out.println("SSE is helix: " + this.sseList.get(i).longStringRep() + ", drawing with base position (" + (vertStartX + (i * vertDist)) + "," + vertStartY + ").");
                     
                 }
                 else {
-                    p = getDefaultArrowPolygon((vertStartY - vertHeight), currentVertX, currentVertY);
+                    p = getDefaultArrowPolygonUp((vertStartY - vertHeight), currentVertX, currentVertY);
                     //p = getDefaultBarrelPolygon((vertStartY - vertHeight), (vertStartX + (i * vertDist)), vertStartY);
                     //System.out.println("SSE is NOT a helix: " + this.sseList.get(i).longStringRep() + ", drawing with base position (" + (vertStartX + (i * vertDist)) + "," + vertStartY + ").");
                 }
@@ -7181,29 +7281,170 @@ E	3	3	3
         String proteinHeader = "Test image";
         Integer currentPosX = vertStartX;
         Integer currentPosY = vertStartY;
-        
-        int ABOVE = 0;
-        int RIGHT_OF = 1;
-        int BELOW = 2;
-        int LEFT_OF = 3;
-        
+               
         ig2.setPaint(Color.GRAY);
-        drawGrid(ig2, new Position2D(vertStartX, vertStartY - vertHeight * 2), vertDist, vertHeight, 5, 3);
+        drawGrid(ig2, new Position2D(vertStartX, vertStartY - vertHeight * 2), vertDist, vertHeight, 8, 4);
         ig2.setPaint(Color.BLACK);
                 
-        ig2.setPaint(Color.RED);
-        drawLabeledCrossAt(ig2, new Position2D(vertStartX + (0 * vertDist), vertStartY), "1A", ABOVE);
-        drawLabeledCrossAt(ig2, new Position2D(vertStartX + (1 * vertDist), vertStartY), "2R", RIGHT_OF);
-        drawLabeledCrossAt(ig2, new Position2D(vertStartX + (2 * vertDist), vertStartY), "3B", BELOW);
-        drawLabeledCrossAt(ig2, new Position2D(vertStartX + (3 * vertDist), vertStartY), "4L", LEFT_OF);
+      
+        // ----------------------------------------------------- draw top row of SSEs --------------------------------------------
+        
         ig2.setPaint(Color.BLACK);
         
-        for(int i = 0; i < 5; i++) {
-            Polygon p = getDefaultArrowPolygon((vertStartY - vertHeight), currentPosX + i * vertDist, currentPosY);
+        Integer[] directions = new Integer[] { DrawTools.DIRECTION_UPWARDS, DrawTools.DIRECTION_DOWNWARDS, DrawTools.DIRECTION_UPWARDS, DrawTools.DIRECTION_UPWARDS, DrawTools.DIRECTION_DOWNWARDS, DrawTools.DIRECTION_DOWNWARDS, DrawTools.DIRECTION_DOWNWARDS, DrawTools.DIRECTION_UPWARDS  };
+        for(int i = 0; i < directions.length; i++) {
+            //Polygon p = getDefaultArrowPolygonUp((vertStartY - vertHeight), currentPosX + i * vertDist, currentPosY);
+            Polygon p = getDefaultArrowPolygonLowestPointAt(currentPosX + i * vertDist, currentPosY, directions[i]);            
             Shape s = ig2.getStroke().createStrokedShape(p);
             ig2.draw(s);            
+        }        
+        
+        // draw arc from 1 to 2 at top (no crossover)
+        Integer arcStartX = vertStartX + (0 * vertDist);
+        Integer arcStartY = vertStartY - vertHeight;
+        Integer arcEndX = vertStartX + (1 * vertDist);
+        Integer arcEndY = vertStartY - vertHeight;        
+        // mark start and end
+        ig2.setPaint(Color.RED);
+        drawLabeledCrossAt(ig2, new Position2D(arcStartX , arcStartY), "1S", DrawTools.ORIENTATION_LEFT_OF);
+        drawLabeledCrossAt(ig2, new Position2D(arcEndX , arcEndY), "1E", DrawTools.ORIENTATION_RIGHT_OF);
+        ig2.setPaint(Color.BLACK);
+        // go
+        List<Shape> arc1 = getArcConnector(arcStartX, arcStartY, arcEndX, arcEndY, ig2.getStroke(), true, 0);
+        for(Shape s : arc1) {
+            ig2.draw(s);
         }
-
+        
+        // draw arc from 3 top to 4 low (crossover)
+        arcStartX = vertStartX + (2 * vertDist);
+        arcStartY = vertStartY - vertHeight;
+        arcEndX = vertStartX + (3 * vertDist);
+        arcEndY = vertStartY;
+        // mark start and end
+        ig2.setPaint(Color.RED);
+        drawLabeledCrossAt(ig2, new Position2D(arcStartX , arcStartY), "2S", DrawTools.ORIENTATION_LEFT_OF);
+        drawLabeledCrossAt(ig2, new Position2D(arcEndX , arcEndY), "2E", DrawTools.ORIENTATION_RIGHT_OF);
+        ig2.setPaint(Color.BLACK);
+        // go
+        arc1 = getArcConnector(arcStartX, arcStartY, arcEndX, arcEndY, ig2.getStroke(), true, 0);
+        for(Shape s : arc1) {
+            ig2.draw(s);
+        }
+        
+        // draw arc from 5 low to 6 top (crossover)
+        arcStartX = vertStartX + (4 * vertDist);
+        arcStartY = vertStartY;
+        arcEndX = vertStartX + (5 * vertDist);
+        arcEndY = vertStartY - vertHeight;
+        // mark start and end
+        ig2.setPaint(Color.RED);
+        drawLabeledCrossAt(ig2, new Position2D(arcStartX , arcStartY), "3S", DrawTools.ORIENTATION_LEFT_OF);
+        drawLabeledCrossAt(ig2, new Position2D(arcEndX , arcEndY), "3E", DrawTools.ORIENTATION_RIGHT_OF);
+        ig2.setPaint(Color.BLACK);
+        // go
+        arc1 = getArcConnector(arcStartX, arcStartY, arcEndX, arcEndY, ig2.getStroke(), false, 0);
+        for(Shape s : arc1) {
+            ig2.draw(s);
+        }
+        
+        
+        // draw arc from 7 to 8 at bottom (no crossover)
+        arcStartX = vertStartX + (6 * vertDist);
+        arcStartY = vertStartY;
+        arcEndX = vertStartX + (7 * vertDist);
+        arcEndY = vertStartY;        
+        // mark start and end
+        ig2.setPaint(Color.RED);
+        drawLabeledCrossAt(ig2, new Position2D(arcStartX , arcStartY), "4S", DrawTools.ORIENTATION_LEFT_OF);
+        drawLabeledCrossAt(ig2, new Position2D(arcEndX , arcEndY), "4E", DrawTools.ORIENTATION_RIGHT_OF);
+        ig2.setPaint(Color.BLACK);
+        // go
+        arc1 = getArcConnector(arcStartX, arcStartY, arcEndX, arcEndY, ig2.getStroke(), false, 0);
+        for(Shape s : arc1) {
+            ig2.draw(s);
+        }
+        
+        
+        // ----------------------------------------------------- draw bottom row of SSEs --------------------------------------------
+        
+        currentPosX = vertStartX;
+        currentPosY = vertStartY + 2 * vertHeight;
+        
+        directions = new Integer[] { DrawTools.DIRECTION_DOWNWARDS, DrawTools.DIRECTION_UPWARDS, DrawTools.DIRECTION_DOWNWARDS, DrawTools.DIRECTION_DOWNWARDS, DrawTools.DIRECTION_UPWARDS, DrawTools.DIRECTION_UPWARDS, DrawTools.DIRECTION_UPWARDS, DrawTools.DIRECTION_DOWNWARDS };
+        for(int i = 0; i < directions.length; i++) {
+            //Polygon p = getDefaultArrowPolygonUp((vertStartY - vertHeight), currentPosX + i * vertDist, currentPosY);
+            Polygon p = getDefaultArrowPolygonLowestPointAt(currentPosX + i * vertDist, currentPosY, directions[i]);            
+            Shape s = ig2.getStroke().createStrokedShape(p);
+            ig2.draw(s);            
+        }     
+        
+        
+        // draw arc from 10 to 9 at top (no crossover)
+        arcStartX = currentPosX + (1 * vertDist);
+        arcStartY = currentPosY - vertHeight;
+        arcEndX = currentPosX + (0 * vertDist);
+        arcEndY = currentPosY - vertHeight;        
+        // mark start and end
+        ig2.setPaint(Color.RED);
+        drawLabeledCrossAt(ig2, new Position2D(arcStartX , arcStartY), "5S", DrawTools.ORIENTATION_RIGHT_OF);
+        drawLabeledCrossAt(ig2, new Position2D(arcEndX , arcEndY), "5E", DrawTools.ORIENTATION_LEFT_OF);
+        ig2.setPaint(Color.BLACK);
+        // go
+        arc1 = getArcConnector(arcStartX, arcStartY, arcEndX, arcEndY, ig2.getStroke(), true, 0);
+        for(Shape s : arc1) {
+            ig2.draw(s);
+        }
+        
+        // draw arc from 12 to 11 at bottom (crossover)
+        arcStartX = currentPosX + (3 * vertDist);
+        arcStartY = currentPosY;
+        arcEndX = currentPosX + (2 * vertDist);
+        arcEndY = currentPosY - vertHeight;        
+        // mark start and end
+        ig2.setPaint(Color.RED);
+        drawLabeledCrossAt(ig2, new Position2D(arcStartX , arcStartY), "6S", DrawTools.ORIENTATION_RIGHT_OF);
+        drawLabeledCrossAt(ig2, new Position2D(arcEndX , arcEndY), "6E", DrawTools.ORIENTATION_LEFT_OF);
+        ig2.setPaint(Color.BLACK);
+        // go
+        arc1 = getArcConnector(arcStartX, arcStartY, arcEndX, arcEndY, ig2.getStroke(), false, 0);
+        for(Shape s : arc1) {
+            ig2.draw(s);
+        }
+        
+        // draw arc from 14 to 13 at top (crossover)
+        arcStartX = currentPosX + (5 * vertDist);
+        arcStartY = currentPosY - vertHeight;
+        arcEndX = currentPosX + (4 * vertDist);
+        arcEndY = currentPosY;        
+        // mark start and end
+        ig2.setPaint(Color.RED);
+        drawLabeledCrossAt(ig2, new Position2D(arcStartX , arcStartY), "7S", DrawTools.ORIENTATION_RIGHT_OF);
+        drawLabeledCrossAt(ig2, new Position2D(arcEndX , arcEndY), "7E", DrawTools.ORIENTATION_LEFT_OF);
+        ig2.setPaint(Color.BLACK);
+        // go
+        arc1 = getArcConnector(arcStartX, arcStartY, arcEndX, arcEndY, ig2.getStroke(), true, 0);
+        for(Shape s : arc1) {
+            ig2.draw(s);
+        }
+        
+        // draw arc from 16 to 15 at bottom (no crossover)
+        arcStartX = currentPosX + (7 * vertDist);
+        arcStartY = currentPosY;
+        arcEndX = currentPosX + (6 * vertDist);
+        arcEndY = currentPosY;        
+        // mark start and end
+        ig2.setPaint(Color.RED);
+        drawLabeledCrossAt(ig2, new Position2D(arcStartX , arcStartY), "8S", DrawTools.ORIENTATION_RIGHT_OF);
+        drawLabeledCrossAt(ig2, new Position2D(arcEndX , arcEndY), "8E", DrawTools.ORIENTATION_LEFT_OF);
+        ig2.setPaint(Color.BLACK);
+        // go
+        arc1 = getArcConnector(arcStartX, arcStartY, arcEndX, arcEndY, ig2.getStroke(), false, 0);
+        for(Shape s : arc1) {
+            ig2.draw(s);
+        }
+        
+        // --------------- done --------------
+        
         Rectangle2D roi = new Rectangle2D.Double(0, 0, 800, 600);
         DrawResult drawRes = new DrawResult(ig2, roi);
         return drawRes;                                                                         

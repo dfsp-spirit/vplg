@@ -32,6 +32,14 @@ public class DrawTools {
     public static final String FORMAT_PDF = "PDF";
     public static final String FORMAT_JPEG = "JPEG";
     
+    public static final Integer DIRECTION_UPWARDS = 0;
+    public static final Integer DIRECTION_DOWNWARDS = 1;
+    
+    public static final Integer ORIENTATION_ABOVE = 0;
+    public static final Integer ORIENTATION_RIGHT_OF = 1;
+    public static final Integer ORIENTATION_BELOW = 2;
+    public static final Integer ORIENTATION_LEFT_OF = 3;
+    
     public static final String DEFAULT_FORMAT_BITMAP = FORMAT_PNG;
     public static final String DEFAULT_FORMAT_VECTOR = FORMAT_SVG;
     
