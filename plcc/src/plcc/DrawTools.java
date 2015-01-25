@@ -859,7 +859,8 @@ public class DrawTools {
             rightArcEndX = targetX;
             rightArcEndY = targetY;
             //shape2 = new CubicCurve2D.Double(rightCurveStartX, rightCurveStartY, rightCurveStartX, rightArcEndY, rightArcEndX, rightArcEndY + rightArcHeight, rightArcEndX, rightArcEndY);
-            shape2 = new CubicCurve2D.Double(rightArcEndX, rightArcEndY, rightArcEndX, rightArcEndY + rightArcHeight, rightCurveStartX, rightArcEndY, rightCurveStartX, rightCurveStartY);
+            shape2 = new CubicCurve2D.Double(rightCurveStartX, rightCurveStartY, rightArcEndX - rightArcWidth, rightArcEndY + rightArcHeight, rightArcEndX, rightArcEndY + rightArcHeight, rightArcEndX, rightArcEndY);
+            //shape2 = new CubicCurve2D.Double(rightArcEndX, rightArcEndY, rightArcEndX, rightArcEndY + rightArcHeight, rightCurveStartX, rightArcEndY, rightCurveStartX, rightCurveStartY);
             shape2 = stroke.createStrokedShape(shape2);
             parts.add(shape2);
             
