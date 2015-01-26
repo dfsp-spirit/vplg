@@ -5490,9 +5490,9 @@ E	3	3	3
                     else if(spatRel.equals(SpatRel.BACKBONE)) { ig2.setPaint(Color.ORANGE); }
                     else { ig2.setPaint(Color.LIGHT_GRAY); }
 
-                    //if(Settings.getBoolean("plcc_B_key_foldinggraph_arcs_allways_black")) {
+                    if(Settings.getBoolean("plcc_B_key_foldinggraph_arcs_allways_black")) {
                         ig2.setPaint(Color.BLACK);
-                    //}
+                    }
 
                     // determine the center of the arc and the width of its rectangle bounding box
                     //iSpatIndex = spatOrder.get(i);
@@ -5897,7 +5897,8 @@ E	3	3	3
 
                 // we don not even check for actual edges here, we just draw the computed distance!
 
-                // all edges are black in SEQ, no matter the edge type
+                // all edges are black in SEQ, no matter the edge type. This is because the edge are seq distances between vertices in this notaiton, they
+                // do NOT represent contacts (and thus have no orientation).
                 ig2.setPaint(Color.BLACK);
 
                 if(k < l) { leftVert = k; rightVert = l; }
@@ -5918,8 +5919,7 @@ E	3	3	3
                 // draw it                                                
                 arc = new Arc2D.Double(arcTopLeftX + spacerX, arcTopLeftY + spacerY, arcWidth, arcHeight, 0, 180, Arc2D.OPEN);
                 shape = ig2.getStroke().createStrokedShape(arc);
-                ig2.fill(shape);
-                
+                ig2.fill(shape);                
             }
 
             // Draw the vertices as circles

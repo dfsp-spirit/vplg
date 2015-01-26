@@ -90,7 +90,7 @@ public class DrawTools {
      */
     public static ArrayList<Shape> getArcConnectorAlternative(Integer startX, Integer startY, Integer targetX, Integer targetY, Stroke stroke, Boolean startUpwardsInCaseOfSimpleArc, int pixelsToShiftCentralLineOnYAxis) {
         if (startY.equals(targetY)) {
-            return getSimpleArcConnectorAlternative(startX, startY, targetX, stroke, startUpwardsInCaseOfSimpleArc);
+            return getSimpleArcConnector(startX, startY, targetX, stroke, startUpwardsInCaseOfSimpleArc);
         } else {
             Boolean computedStartUpwards;
             if (startY < targetY) {
@@ -101,7 +101,8 @@ public class DrawTools {
             if (!Objects.equals(computedStartUpwards, startUpwardsInCaseOfSimpleArc)) {
                 System.err.println("DrawTools: WARNING: You startUpwards value " + startUpwardsInCaseOfSimpleArc.toString() + " for the crossover arc from (" + startX + "," + startY + ") to (" + targetX + "," + targetY + ") seems questionable.");
             }
-            return getCrossoverArcConnectorAlternative(startX, startY, targetX, targetY, stroke, startUpwardsInCaseOfSimpleArc, pixelsToShiftCentralLineOnYAxis);
+            return getCrossoverArcConnectorAlternativeBezierVersion(startX, startY, targetX, targetY, stroke, computedStartUpwards, 0);
+            //return getCrossoverArcConnectorAlternative(startX, startY, targetX, targetY, stroke, startUpwardsInCaseOfSimpleArc, pixelsToShiftCentralLineOnYAxis);
         }
     }
     
@@ -111,58 +112,7 @@ public class DrawTools {
         System.out.println("Done.");
     }
 
-    /**
-     * The function that implements a simple half circle-shaped arc connector between the 2D points (startX, startY) and (targetX, targetY) in the
-     * requested direction. Internal function, call the more general getArcConnector() function instead.
-     *
-     * You can choose whether the connector should start upwards or downwards from (startX, startY) using the startUpwards parameter.
-     *
-     * upwards:                downwards:
-     *
-     * __                   s    t
-     * /  \                  |    |
-     * |    |                  \__/
-     * s    t
-     *
-     * @param startX the x coordinate of the start point
-     * @param bothY the y coordinate of both the start point and the end point
-     * @param targetX the x coordinate of the end point
-     * @param stroke the Stroke to use. You can get one from your Graphics2D instance.
-     * @param startUpwards whether to start upwards from the 2D Point (startX, startY). If this is false, downwards is used instead.
-     * @return a list of Shapes that can be painted on a G2D canvas.
-     */
-    protected static ArrayList<Shape> getSimpleArcConnectorAlternative(Integer startX, Integer bothY, Integer targetX, Stroke stroke, Boolean startUpwards) {
-        ArrayList<Shape> parts = new ArrayList<Shape>();
-        Integer leftVertPosX;
-        Integer rightVertPosX;
-        Integer arcWidth;
-        Integer arcHeight;
-        Integer vertStartY;
-        Integer arcTopLeftX;
-        Integer arcTopLeftY;
-        if (startX < targetX) {
-            leftVertPosX = startX;
-            rightVertPosX = targetX;
-        } else {
-            leftVertPosX = targetX;
-            rightVertPosX = startX;
-        }
-        vertStartY = bothY;
-        arcWidth = rightVertPosX - leftVertPosX;
-        arcHeight = arcWidth / 2;
-        arcTopLeftX = leftVertPosX;
-        arcTopLeftY = vertStartY - arcHeight / 2;
-        Arc2D arc;
-        if (startUpwards) {
-            arc = new Arc2D.Double(arcTopLeftX, arcTopLeftY, arcWidth, arcHeight, 0, 180, Arc2D.OPEN);
-        } else {
-            arc = new Arc2D.Double(arcTopLeftX, arcTopLeftY, arcWidth, arcHeight, 180, 180, Arc2D.OPEN);
-        }
-        Shape shape = stroke.createStrokedShape(arc);
-        parts.add(shape);
-        return parts;
-    }
-
+   
     /**
      *
      * @param x the value of x
@@ -216,136 +166,7 @@ public class DrawTools {
             System.err.println("Could not write test image file to '" + new File(svgFilePath).getAbsolutePath() + "': '" + ex.getMessage() + "'.");
         }
     }
-
-    /**
-     * The function that implements a more complex 'S'-shaped arc connector between the 2D points (startX, startY) and (targetX, targetY) in the
-     * requested direction. Internal function, call the more general getArcConnector() function instead.
-     *
-     * NOTE: This is an alternate version, favored by Ina, implemented using arcs and lines. The Crossover connectors of this version will cut through the other SSE symbols.
-     *
-     * You can choose whether the connector should start upwards or downwards from (startX, startY) using the startUpwards parameter.
-     *
-     * upwards:                downwards:
-     * __                           __
-     * /  \                         /  \
-     * |    \                       /    |
-     * s     \                     /     t
-     * \   t         s     /
-     * \  |         |    /
-     * \_/          \__/
-     *
-     * @param startX the x coordinate of the start point
-     * @param startY the y coordinate of the start point
-     * @param targetX the x coordinate of the end point
-     * @param targetY the y coordinate of the end point
-     * @param stroke the Stroke to use. You can get one from your Graphics2D instance.
-     * @param startUpwards whether to start upwards from the 2D Point (startX, startY). If this is false, downwards is used instead.
-     * @param pixelsToShiftCentralLineOnYAxis ignored in this alternative implementation.
-     * @return a list of Shapes that can be painted on a G2D canvas.
-     */
-    protected static ArrayList<Shape> getCrossoverArcConnectorAlternative(Integer startX, Integer startY, Integer targetX, Integer targetY, Stroke stroke, Boolean startUpwards, int pixelsToShiftCentralLineOnYAxis) {
-        Boolean useBezierImplementation = true;
-        if (useBezierImplementation) {
-            return getCrossoverArcConnectorAlternativeBezierVersion(startX, startY, targetX, targetY, stroke, startUpwards, 0);
-        }
-        Integer upwards = 0;
-        Integer downwards = 180;
-        ArrayList<Shape> parts = new ArrayList<Shape>();
-        Integer leftVertPosX;
-        Integer rightVertPosX;
-        Integer bothArcsXDistance;
-        Integer bothArcsSumHeight;
-        Integer vertStartY;
-        Integer leftArcHeight;
-        Integer leftArcWidth;
-        Integer rightArcHeight;
-        Integer rightArcWidth;
-        Integer arcWidth;
-        Integer arcEllipseHeight;
-        Integer leftArcUpperLeftX;
-        Integer leftArcUpperLeftY;
-        Integer centerBetweenBothArcsX;
-        Integer centerBetweenBothArcsY;
-        Integer leftArcEndX;
-        Integer leftArcEndY;
-        Integer rightArcEndX;
-        Integer rightArcEndY;
-        Integer leftArcLowerRightX;
-        Integer leftArcLowerRightY;
-        Integer leftArcUpperRightX;
-        Integer leftArcUpperRightY;
-        Integer rightArcLowerRightX;
-        Integer rightArcLowerRightY;
-        Integer rightArcUpperRightX;
-        Integer rightArcUpperRightY;
-        Integer rightArcUpperLeftX;
-        Integer rightArcUpperLeftY;
-        Integer lineStartX;
-        Integer lineStartY;
-        Integer lineEndX;
-        Integer lineEndY;
-        Integer lineLength;
-        if (startX < targetX) {
-            leftVertPosX = startX;
-            rightVertPosX = targetX;
-        } else {
-            leftVertPosX = targetX;
-            rightVertPosX = startX;
-        }
-        vertStartY = startY;
-        lineLength = Math.abs(startY - targetY);
-        bothArcsXDistance = rightVertPosX - leftVertPosX;
-        leftArcWidth = rightArcWidth = 10;
-        bothArcsSumHeight = leftArcWidth + rightArcWidth;
-        leftArcHeight = rightArcHeight = arcEllipseHeight = bothArcsSumHeight / 2;
-        leftArcUpperLeftX = leftVertPosX;
-        leftArcUpperLeftY = vertStartY - (arcEllipseHeight / 2);
-        leftArcLowerRightX = leftArcUpperLeftX + leftArcWidth;
-        leftArcLowerRightY = leftArcUpperLeftY + leftArcHeight - (arcEllipseHeight / 2);
-        leftArcUpperRightX = leftArcUpperLeftX + leftArcWidth;
-        leftArcUpperRightY = leftArcUpperLeftY;
-        Shape shape;
-        Arc2D arc;
-        if (startUpwards) {
-            leftArcEndX = leftArcLowerRightX;
-            leftArcEndY = leftArcLowerRightY;
-            arc = new Arc2D.Double(leftArcUpperLeftX, leftArcUpperLeftY, leftArcWidth, leftArcHeight, upwards, 180, Arc2D.OPEN);
-            shape = stroke.createStrokedShape(arc);
-            parts.add(shape);
-            rightArcUpperLeftX = rightVertPosX - rightArcWidth;
-            rightArcUpperLeftY = targetY;
-            lineStartX = leftArcEndX;
-            lineStartY = leftArcEndY;
-            lineEndX = rightArcUpperLeftX;
-            lineEndY = rightArcUpperLeftY;
-            Line2D l = new Line2D.Double(lineStartX, lineStartY, lineEndX, lineEndY);
-            shape = stroke.createStrokedShape(l);
-            parts.add(shape);
-            arc = new Arc2D.Double(rightArcUpperLeftX, rightArcUpperLeftY - (arcEllipseHeight / 2), rightArcWidth, rightArcHeight, downwards, 180, Arc2D.OPEN);
-            shape = stroke.createStrokedShape(arc);
-            parts.add(shape);
-        } else {
-            leftArcEndX = leftArcUpperRightX;
-            leftArcEndY = leftArcUpperRightY;
-            arc = new Arc2D.Double(leftArcUpperLeftX, leftArcUpperLeftY, leftArcWidth, leftArcHeight, downwards, 180, Arc2D.OPEN);
-            shape = stroke.createStrokedShape(arc);
-            parts.add(shape);
-            rightArcUpperLeftX = rightVertPosX - rightArcWidth;
-            rightArcUpperLeftY = targetY - (arcEllipseHeight / 2);
-            lineStartX = leftArcEndX;
-            lineStartY = leftArcEndY + (arcEllipseHeight / 2);
-            lineEndX = rightArcUpperLeftX;
-            lineEndY = rightArcUpperLeftY + (arcEllipseHeight / 2);
-            Line2D l = new Line2D.Double(lineStartX, lineStartY, lineEndX, lineEndY);
-            shape = stroke.createStrokedShape(l);
-            parts.add(shape);
-            arc = new Arc2D.Double(rightArcUpperLeftX, rightArcUpperLeftY, rightArcWidth, rightArcHeight, upwards, 180, Arc2D.OPEN);
-            shape = stroke.createStrokedShape(arc);
-            parts.add(shape);
-        }
-        return parts;
-    }
-
+    
     /**
      * Just a helper function that sets default values for the width of the arrow. See the first 3 parameters of the drawOutlinedArrow() function for parameter explanation.
      *
@@ -512,24 +333,25 @@ public class DrawTools {
      */
     public static ArrayList<Shape> getArcConnector(Integer startX, Integer startY, Integer targetX, Integer targetY, Stroke stroke, Boolean startUpwardsInCaseOfSimpleArc, int pixelsToShiftCentralLineOnYAxis) {
         
-        Boolean useAlternate = true;
+        Boolean useAlternate = Settings.getBoolean("plcc_B_key_use_alternate_arcs");
         if(useAlternate) {
             return getArcConnectorAlternative(startX, startY, targetX, targetY, stroke, startUpwardsInCaseOfSimpleArc, pixelsToShiftCentralLineOnYAxis);
         }
-        
-        if (startY.equals(targetY)) {
-            return getSimpleArcConnector(startX, startY, targetX, stroke, startUpwardsInCaseOfSimpleArc);
-        } else {
-            Boolean computedStartUpwards;
-            if (startY < targetY) {
-                computedStartUpwards = true;
+        else {
+            if (startY.equals(targetY)) {
+                return getSimpleArcConnector(startX, startY, targetX, stroke, startUpwardsInCaseOfSimpleArc);
             } else {
-                computedStartUpwards = false;
+                Boolean computedStartUpwards;
+                if (startY < targetY) {
+                    computedStartUpwards = true;
+                } else {
+                    computedStartUpwards = false;
+                }
+                if (!Objects.equals(computedStartUpwards, startUpwardsInCaseOfSimpleArc)) {
+                    System.err.println("DrawTools: WARNING: You startUpwards value " + startUpwardsInCaseOfSimpleArc.toString() + " for the crossover arc from (" + startX + "," + startY + ") to (" + targetX + "," + targetY + ") seems questionable.");
+                }
+                return getCrossoverArcConnector(startX, startY, targetX, targetY, stroke, startUpwardsInCaseOfSimpleArc, pixelsToShiftCentralLineOnYAxis);
             }
-            if (!Objects.equals(computedStartUpwards, startUpwardsInCaseOfSimpleArc)) {
-                System.err.println("DrawTools: WARNING: You startUpwards value " + startUpwardsInCaseOfSimpleArc.toString() + " for the crossover arc from (" + startX + "," + startY + ") to (" + targetX + "," + targetY + ") seems questionable.");
-            }
-            return getCrossoverArcConnector(startX, startY, targetX, targetY, stroke, startUpwardsInCaseOfSimpleArc, pixelsToShiftCentralLineOnYAxis);
         }
     }
 
@@ -996,7 +818,7 @@ public class DrawTools {
     }
 
     /**
-     *
+     * Draws a grid with some KEY arcs on it. Then uses all possible arc types to connect them. This is a debug-only function.
      */
     private static DrawResult drawTestG2D() {
         Boolean bw = false;
@@ -1019,7 +841,6 @@ public class DrawTools {
         Font font = new Font("Verdana", Font.PLAIN, 12);
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();
-        String proteinHeader = "Test image";
         Integer currentPosX = vertStartX;
         Integer currentPosY = vertStartY;
         ig2.setPaint(Color.GRAY);
