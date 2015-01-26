@@ -5431,8 +5431,7 @@ E	3	3	3
 
 
         Integer[] newOrientations = new Integer[fg.spatOrder.size()];
-        Arrays.fill(newOrientations, DrawTools.DIRECTION_UPWARDS);
-        
+        Arrays.fill(newOrientations, FoldingGraph.ORIENTATION_UPWARDS);       
        
         
         Integer vertexIndexInFGSequential;
@@ -5443,30 +5442,38 @@ E	3	3	3
             vertexIndexInFGSequential = fg.spatOrder.get(i);
             p = new Position2D(vertStartX + (i * vertDist) + pl.vertRadius / 2, vertStartY);
             
-            Integer contactType = null;
+            Integer contactTypeInt = null;
             if(i > 0) {
-                contactType = fg.getContactType(fg.spatOrder.get(i-1), vertexIndexInFGSequential);
-                Integer lastOrientation = newOrientations[i-1];
-                if(contactType.equals(SpatRel.PARALLEL)) {
-                    // parallel means crossover, so keep the old orientation
-                    newOrientations[i] = lastOrientation;
+                contactTypeInt = fg.getContactType(fg.spatOrder.get(i-1), fg.spatOrder.get(i));
+                if(debug) {
+                    System.out.println("i=" + i + ", contact type between " + fg.spatOrder.get(i-1) + " and " + fg.spatOrder.get(i) + " is " + SpatRel.getString(contactTypeInt) + ".");
+                }
+                if(contactTypeInt.equals(SpatRel.PARALLEL)) {
+                    newOrientations[i] = newOrientations[i-1];
+                    if(debug) {
+                        System.out.println("  i=" + i + ", parallel contact. Keeping orientation " + newOrientations[i-1] + " from last one, set to " + newOrientations[i] + ".");
+                    }
                 }
                 else {
-                    newOrientations[i] = (lastOrientation.equals(DrawTools.DIRECTION_UPWARDS) ? DrawTools.DIRECTION_DOWNWARDS : DrawTools.DIRECTION_UPWARDS);
+                    newOrientations[i] = (newOrientations[i-1] == FoldingGraph.ORIENTATION_UPWARDS ? FoldingGraph.ORIENTATION_DOWNWARDS : FoldingGraph.ORIENTATION_UPWARDS);
+                    if(debug) {
+                        System.out.println("  i=" + i + ", NOT a parallel contact. Switched orientation " + newOrientations[i-1] + " from last one, set to " + newOrientations[i] + ".");
+                    }
                 }
-            } else {
-                newOrientations[0] = DrawTools.DIRECTION_UPWARDS;   // first is upwards by definition
+                
             }
             
+            
+            
             if(fg.getVertex(vertexIndexInFGSequential).isBetaStrand()) {                
-                pol = DrawTools.getDefaultArrowPolygonLowestPointAt(p.x, p.y, newOrientations[vertexIndexInFGSequential]);                                
+                pol = DrawTools.getDefaultArrowPolygonLowestPointAt(p.x, p.y, newOrientations[i]);                                
             } 
             else {
                 pol = DrawTools.getDefaultBarrelPolygonLowestPointAt(p.x, p.y);
             }
             ig2.draw(pol);
             ig2.drawString((vertexIndexInFGSequential+1) + "", p.x, p.y + 50);
-            ig2.drawString((i) + "", p.x, p.y + 60);
+            ig2.drawString("i=" + (i) + "", p.x, p.y + 70);
             
             if(vertexIndexInFGSequential.equals(0)) {
                 ig2.drawString("N", p.x, p.y + 20);  // C terminus label

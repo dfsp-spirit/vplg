@@ -52,8 +52,8 @@ public class DrawTools {
     public static final String FORMAT_PDF = "PDF";
     public static final String FORMAT_JPEG = "JPEG";
     
-    public static final Integer DIRECTION_UPWARDS = 0;
-    public static final Integer DIRECTION_DOWNWARDS = 1;
+    //public static final Integer DIRECTION_UPWARDS = 0;
+    //public static final Integer DIRECTION_DOWNWARDS = 1;
     
     public static final Integer ORIENTATION_ABOVE = 0;
     public static final Integer ORIENTATION_RIGHT_OF = 1;
@@ -117,15 +117,15 @@ public class DrawTools {
      *
      * @param x the value of x
      * @param y the value of y
-     * @param direction the value of direction
+     * @param direction the value of direction, use FoldingGraph.ORIENTATION_*
      */
     protected static Polygon getDefaultArrowPolygonLowestPointAt(int x, int y, Integer direction) {
-        if (direction.equals(DrawTools.DIRECTION_UPWARDS)) {
+        if (direction.equals(FoldingGraph.ORIENTATION_UPWARDS)) {
             return getDefaultArrowPolygonUpwardsLowestPointAt(x, y);
-        } else if (direction.equals(DrawTools.DIRECTION_DOWNWARDS)) {
+        } else if (direction.equals(FoldingGraph.ORIENTATION_DOWNWARDS)) {
             return getDefaultArrowPolygonDownwardsLowestPointAt(x, y);
         } else {
-            System.err.println("Invalid direction given.");
+            System.err.println("DrawTools: getDefaultArrowPolygonLowestPointAt(): Invalid direction given: '" + direction + "'.");
             return null;
         }
     }
@@ -853,7 +853,7 @@ public class DrawTools {
         drawGrid(ig2, new Position2D(vertStartX, vertStartY - vertHeight * 2), vertDist, vertHeight, 8, 4);
         ig2.setPaint(Color.BLACK);
         ig2.setPaint(Color.BLACK);
-        Integer[] directions = new Integer[]{DrawTools.DIRECTION_UPWARDS, DrawTools.DIRECTION_DOWNWARDS, DrawTools.DIRECTION_UPWARDS, DrawTools.DIRECTION_UPWARDS, DrawTools.DIRECTION_DOWNWARDS, DrawTools.DIRECTION_DOWNWARDS, DrawTools.DIRECTION_DOWNWARDS, DrawTools.DIRECTION_UPWARDS};
+        Integer[] directions = new Integer[]{FoldingGraph.ORIENTATION_UPWARDS, FoldingGraph.ORIENTATION_DOWNWARDS, FoldingGraph.ORIENTATION_UPWARDS, FoldingGraph.ORIENTATION_UPWARDS, FoldingGraph.ORIENTATION_DOWNWARDS, FoldingGraph.ORIENTATION_DOWNWARDS, FoldingGraph.ORIENTATION_DOWNWARDS, FoldingGraph.ORIENTATION_UPWARDS};
         for (int i = 0; i < directions.length; i++) {
             Polygon p = getDefaultArrowPolygonLowestPointAt(currentPosX + i * vertDist, currentPosY, directions[i]);
             Shape s = ig2.getStroke().createStrokedShape(p);
@@ -909,7 +909,7 @@ public class DrawTools {
         }
         currentPosX = vertStartX;
         currentPosY = vertStartY + 2 * vertHeight;
-        directions = new Integer[]{DrawTools.DIRECTION_DOWNWARDS, DrawTools.DIRECTION_UPWARDS, DrawTools.DIRECTION_DOWNWARDS, DrawTools.DIRECTION_DOWNWARDS, DrawTools.DIRECTION_UPWARDS, DrawTools.DIRECTION_UPWARDS, DrawTools.DIRECTION_UPWARDS, DrawTools.DIRECTION_DOWNWARDS};
+        directions = new Integer[]{FoldingGraph.ORIENTATION_DOWNWARDS, FoldingGraph.ORIENTATION_UPWARDS, FoldingGraph.ORIENTATION_DOWNWARDS, FoldingGraph.ORIENTATION_DOWNWARDS, FoldingGraph.ORIENTATION_UPWARDS, FoldingGraph.ORIENTATION_UPWARDS, FoldingGraph.ORIENTATION_UPWARDS, FoldingGraph.ORIENTATION_DOWNWARDS};
         for (int i = 0; i < directions.length; i++) {
             Polygon p = getDefaultArrowPolygonLowestPointAt(currentPosX + i * vertDist, currentPosY, directions[i]);
             Shape s = ig2.getStroke().createStrokedShape(p);
