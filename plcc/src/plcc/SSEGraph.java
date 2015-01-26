@@ -5437,7 +5437,7 @@ E	3	3	3
         Integer vertexIndexInFGSequential;
         List<Shape> connShapes;
         Polygon pol;
-        Position2D p;
+        Position2D p, lastP;
         for(int i = 0; i < fg.spatOrder.size(); i++) {
             vertexIndexInFGSequential = fg.spatOrder.get(i);
             p = new Position2D(vertStartX + (i * vertDist) + pl.vertRadius / 2, vertStartY);
@@ -5472,8 +5472,8 @@ E	3	3	3
                 pol = DrawTools.getDefaultBarrelPolygonLowestPointAt(p.x, p.y);
             }
             ig2.draw(pol);
-            ig2.drawString((vertexIndexInFGSequential+1) + "", p.x, p.y + 50);
-            ig2.drawString("i=" + (i) + "", p.x, p.y + 70);
+            ig2.drawString((vertexIndexInFGSequential + 1) + "", p.x, p.y + 50);
+            //ig2.drawString("i=" + (i) + "", p.x, p.y + 70);
             //sseNumberSeqInChain = "" + (pg.sseList.get(i).getSSESeqChainNum());
             List<Integer> parentMapping = fg.getVertexIndexListInParentGraph();
             sseNumberProteinGraph = "" + parentMapping.get(vertexIndexInFGSequential);
@@ -5483,8 +5483,42 @@ E	3	3	3
             ig2.drawString(sseNumberProteinGraph, p.x, p.y + 150);
             ig2.setColor(Color.BLACK);
             
+            // draw the arc from last one to current one
+            List<Shape> shapes;
+            if(i > 0) {
+                lastP = new Position2D(vertStartX + ((i-1) * vertDist) + pl.vertRadius / 2, vertStartY);
+                Integer lastOrientation = newOrientations[i-1];
+                Integer currentOrientation = newOrientations[i];
+                
+                if(lastOrientation.equals(currentOrientation)) {
+                    // we need a crossover arc
+                    if(lastOrientation.equals(FoldingGraph.ORIENTATION_UPWARDS)) {
+                        shapes = DrawTools.getCrossoverArcConnector(lastP.x, lastP.y - 80, p.x, p.y, ig2.getStroke(), true, 0);
+                    }
+                    else {
+                        shapes = DrawTools.getCrossoverArcConnector(lastP.x, lastP.y, p.x, p.y  - 80, ig2.getStroke(), false, 0);
+                    }
+                    
+                }
+                else {
+                    // we need a simple arc, and thus we need to set the proper starting direction
+                    if(currentOrientation.equals(FoldingGraph.ORIENTATION_UPWARDS)) {
+                        shapes = DrawTools.getArcConnector(lastP.x, lastP.y - 80, p.x, p.y - 80, ig2.getStroke(), true, 0);
+                    }
+                    else {
+                        shapes = DrawTools.getArcConnector(lastP.x, lastP.y, p.x, p.y, ig2.getStroke(), false, 0);
+                    }
+                    
+                }
+                
+                // draw arc
+                for(Shape s : shapes) {
+                    ig2.draw(s);
+                }
+            }
+            
             if(vertexIndexInFGSequential.equals(0)) {
-                ig2.drawString("N", p.x, p.y + 20);  // C terminus label
+                ig2.drawString("N", p.x, p.y + 20);  // N terminus label
             }
             if(vertexIndexInFGSequential.equals(fg.spatOrder.size() - 1)) {
                 ig2.drawString("C", p.x, p.y + 20);  // C terminus label
