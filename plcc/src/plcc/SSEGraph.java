@@ -5328,7 +5328,7 @@ E	3	3	3
         //String order = "Order in parent:"; for(Integer i : pnfr.keypos) { order += (" " + (i + 1)); }
         //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
         Integer stringHeight = fontMetrics.getAscent();
-        String sseNumberSeq;    // the SSE number in the primary structure, N to C terminus
+        String sseNumberSeqInChain;    // the SSE number in the primary structure, N to C terminus
         String sseNumberFoldingGraph;  // the SSE number in this graph, 1..(this.size)
         String sseNumberProteinGraph;  // the SSE number in the parent protein graph, 1..(this.size)
 
@@ -5474,6 +5474,14 @@ E	3	3	3
             ig2.draw(pol);
             ig2.drawString((vertexIndexInFGSequential+1) + "", p.x, p.y + 50);
             ig2.drawString("i=" + (i) + "", p.x, p.y + 70);
+            //sseNumberSeqInChain = "" + (pg.sseList.get(i).getSSESeqChainNum());
+            List<Integer> parentMapping = fg.getVertexIndexListInParentGraph();
+            sseNumberProteinGraph = "" + parentMapping.get(vertexIndexInFGSequential);
+            sseNumberSeqInChain = "" + (pg.getSSEBySeqPosition(parentMapping.get(vertexIndexInFGSequential)).getSSESeqChainNum());
+            ig2.setColor(Color.LIGHT_GRAY);
+            ig2.drawString(sseNumberSeqInChain, p.x, p.y + 110);
+            ig2.drawString(sseNumberProteinGraph, p.x, p.y + 150);
+            ig2.setColor(Color.BLACK);
             
             if(vertexIndexInFGSequential.equals(0)) {
                 ig2.drawString("N", p.x, p.y + 20);  // C terminus label
