@@ -234,6 +234,12 @@ public class DrawTools {
         int defaultWidth = 10;
         return getBarrelPolygon(bothX, headY, bothX, tailY, defaultWidth);
     }
+    
+    protected static Polygon getDefaultBarrelPolygonLowestPointAt(int x, int y) {
+        int defaultWidth = 10;
+        int defaultHeight = 80;
+        return getBarrelPolygon(x, y - defaultHeight, x, y, defaultWidth);
+    }
 
     /**
      * Just a helper function that sets default values for the width of the arrow. See the first 3 parameters of the drawOutlinedArrow() function for parameter explanation.

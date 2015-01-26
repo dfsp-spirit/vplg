@@ -5152,7 +5152,7 @@ E	3	3	3
     
     
     /**
-     * Draws the KEY folding graph image of this graph and returns the DrawResult.
+     * Draws the KEY folding graph image of this graph and returns the DrawResult. This is the new version, started JAN 2015.
      * If 'nonProteinGraph' is true, this graph is considered a custom (=non-protein) graph and the color coding for vertices and edges is NOT used.
      * In that case, the graph is drawn black and white and the labels for the N- and C-termini are NOT drawn.
      * 
@@ -5166,6 +5166,395 @@ E	3	3	3
      * @return the DrawResult. You can write this to a file or whatever.
      */
     private static DrawResult drawFoldingGraphKEYG2D(PTGLNotationFoldResult pnfr) {
+
+        
+        
+        
+        FoldingGraph fg = pnfr.getFoldingGraph();
+        SSEGraph pg = fg.parent;
+        
+        boolean debug = false;
+        if(pg.pdbid.equals("8icd") && pg.chainid.equals("A")) {
+            if(fg.graphType.equals("beta") && fg.getFoldingGraphNumber().equals(1)) {
+                debug = true;
+            }
+        }
+                 
+        
+        if(debug) {
+            System.out.println("******************** START *********************");
+        }
+        
+        if(fg.isBifurcated()) {
+            DP.getInstance().e("SSEGraph", "drawFoldingGraphKEYG2D: This FG is bifurcated, KEY notation not supported.");
+            return null;
+        }
+        
+        Integer leftMostVertexInParent = fg.getMinimalVertexIndexInParentGraph();
+        Integer rightMostVertexInParent = fg.getMaximalVertexIndexInParentGraph();
+        
+        List<Integer> keyposParentIndicesSeqOrder = pnfr.keypos;
+        //DP.getInstance().d("keyposParentIndicesSeqOrder (size=" + keyposParentIndicesSeqOrder.size()+ "): " + IO.intListToString(keyposParentIndicesSeqOrder));
+        
+        
+        
+        
+        /** The KEY start vertex -- this is NOT the left-most vertex. It is the vertex closest to the N-terminus with degree 1. Note that this is the index in the FG, not in the PG. */        
+        Integer keystartFGIndex = pnfr.keyStartFG;
+        
+        if(keystartFGIndex == null) {
+            DP.getInstance().e("SSEGraph", "drawFoldingGraphKEYG2D: keystartFGIndex is null");
+        }
+        
+        fg.computeSpatialVertexOrdering();
+        ArrayList<Integer> keyposFGIndicesSpatOrder = fg.spatOrder;
+        
+        // special handling of folding graphs which form a single cycle.
+        if(keyposFGIndicesSpatOrder.size() != fg.getSize()) {
+            // Note: if this is the case, the SSEs of the FG most likely form a cycle. The KEY linnot code accepts this as a valid spatial ordering, it ignores one edge in the cycle.            
+            //DP.getInstance().e("SSEGraph", "Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.chainid + " gt " + fg.graphType + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + ") does not match FG size " + fg.getSize() + ". Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ". KEY='" + pnfr.keyNotation + "'. " + (fg.isASingleCycle() ? "FG is a single cycle." : "FG is NOT a single cycle."));            
+            
+            if(fg.isASingleCycle()) {
+                keyposFGIndicesSpatOrder = fg.getSpatialOrderingOfVertexIndicesForSingleCycleFG(keystartFGIndex);
+                fg.spatOrder = keyposFGIndicesSpatOrder;
+                
+                // did this fix the problem?
+                if(keyposFGIndicesSpatOrder.size() != fg.getSize()) {
+                    // if this didnt fix it, we are lost
+                    DP.getInstance().e("SSEGraph", "Could not draw KEY notation: Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.chainid + " gt " + fg.graphType + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + ") does not match FG size " + fg.getSize() + " even when allowing circles. Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ". KEY='" + pnfr.keyNotation + "'. " + (fg.isASingleCycle() ? "FG is a single cycle." : "FG is NOT a single cycle."));
+                    return null;
+                } else {
+                    //System.err.println("Single cycle handling fixed it.");
+                }
+            } else {
+                DP.getInstance().e("SSEGraph", "Could not draw KEY notation: Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.chainid + " gt " + fg.graphType + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + ") does not match FG size " + fg.getSize() + ". Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ". KEY='" + pnfr.keyNotation + "'. " + (fg.isASingleCycle() ? "FG is a single cycle." : "FG is NOT a single cycle."));
+                return null;
+            }
+            
+            
+        }
+        
+       
+        
+        /** The vertex closest to C */
+        Integer keyendFGIndex = keyposFGIndicesSpatOrder.get(fg.getSize() - 1);
+        if(!keystartFGIndex.equals(keyposFGIndicesSpatOrder.get(0))) {
+            System.err.println("WARNING: Draw folding graph KEY notation: spatial ordering does no start with KEY start vertex.");
+        }
+        
+        if(debug) {
+            DP.getInstance().d("keyposFGIndicesSpatOrder=" + IO.intListToString(keyposFGIndicesSpatOrder));
+        }
+        
+        // compute relative key distances
+        List<Integer> spatOrderseqDistToPrevious = new ArrayList<>();
+        spatOrderseqDistToPrevious.add(null); // there is no previous vertex for the first one        
+        Integer cur, last, spatPosCur, spatPosLast;
+        for(Integer i = 1; i < fg.getSize(); i++) {
+            cur = i;
+            last = i - 1;
+            spatPosCur = keyposFGIndicesSpatOrder.indexOf(cur);
+            spatPosLast = keyposFGIndicesSpatOrder.indexOf(last);
+            spatOrderseqDistToPrevious.add(spatPosCur - spatPosLast);
+        }
+                
+        //DP.getInstance().d("relative spat distances: " + IO.intListToString(spatOrderseqDistToPrevious));
+
+        //DP.getInstance().d("keystart(FG index)=" + keystartFGIndex + ". keypos parent seq=" + IO.intListToString(keyposParentIndicesSeqOrder));
+                
+        
+        List<Integer> fgVertexPosInParent = fg.getVertexIndexListInParentGraph();
+        List<Integer> parentVertexPosInFG = ProtGraph.computeParentGraphVertexPositionsInFoldingGraph(fgVertexPosInParent, pg.size);                
+        
+        Integer numVerts = fg.getSize();
+
+        Boolean bw = false;                                                  
+        
+        // All these values are in pixels
+        // page setup
+        PageLayout pl = new PageLayout(numVerts);     
+        pl.isForKEY = true;
+        Position2D vertStart = pl.getVertStart();
+        Integer lineHeight = pl.textLineHeight;      
+        
+        // drawing of objects
+        Integer vertDist = 50;                  // distance between (centers of) vertices in the drawing
+        Integer vertHeight = 80;                // height of vertex element graphics (arrow height)
+        Integer vertWidth = 40;                 // height of vertex graphics (arrow width)
+        Integer vertStartX = pl.getVertStart().x;
+        Integer vertStartY = pl.getVertStart().y;
+        
+        
+
+        // ------------------------- Prepare stuff -------------------------
+
+        SVGGraphics2D ig2;
+
+        // we always use SVG now, it can be converted to other formats later using batik           
+        DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
+        // Create an instance of org.w3c.dom.Document.
+        String svgNS = "http://www.w3.org/2000/svg";
+        Document document = domImpl.createDocument(svgNS, "svg", null);
+        // Create an instance of the SVG Generator.
+        ig2 = new SVGGraphics2D(document);
+
+        ig2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // make background white
+        ig2.setPaint(Color.WHITE);
+        ig2.fillRect(0, 0, pl.getPageWidth(), pl.getPageHeight());
+        ig2.setPaint(Color.BLACK);
+
+
+
+        //pl.drawAreaOutlines(ig2);
+        // prepare font
+        Font font = pl.getStandardFont();
+        ig2.setFont(font);
+        FontMetrics fontMetrics = ig2.getFontMetrics();
+
+        // ------------------------- Draw header -------------------------
+
+        // check width of header string
+        String proteinHeader = "The KEY " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
+        String notation = "KEY notation: '" + pnfr.keyNotation + "'";
+
+        if(debug) { DP.getInstance().d("Notation: " + notation); }
+        
+        //if(Settings.getBoolean("plcc_B_graphimg_add_linnot_start_vertex")) {
+        //    notation += "   start=" + (pnfr.keyStartFG);
+        //}
+
+        //String order = "Order in parent:"; for(Integer i : pnfr.keypos) { order += (" " + (i + 1)); }
+        //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
+        Integer stringHeight = fontMetrics.getAscent();
+        String sseNumberSeq;    // the SSE number in the primary structure, N to C terminus
+        String sseNumberFoldingGraph;  // the SSE number in this graph, 1..(this.size)
+        String sseNumberProteinGraph;  // the SSE number in the parent protein graph, 1..(this.size)
+
+        if(Settings.getBoolean("plcc_B_graphimg_header")) {
+            ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
+            ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);
+            //ig2.drawString(order, pl.headerStart.x, pl.headerStart.y + (lineHeight * 2));
+        }
+
+        // compute the shiftBack array
+        Integer[] shiftBack = new Integer[pg.size];    // how many vertices we skipped on the left at which position
+        Integer shift = 0;
+        for(int i = 0; i < parentVertexPosInFG.size(); i++) {
+            if(parentVertexPosInFG.get(i) < 0) {
+                shift++;
+            }
+            shiftBack[i] = shift;
+        }
+        // ------------------------- Draw the graph -------------------------
+
+        boolean debugDrawingKEY = false;
+        //if(fg.toShortString().equals("1gos-B-alpha-FG0[4V,3E]")) {
+
+        // determine the orientations of the vertices in the image (up/down). if two adjacent SSEs are parallel, they point in the same direction in the image. if they are antiparallel, they point into different directions.
+        Integer[] orientationsSpatOrder = new Integer[fg.size];    // the heading of the vertex in the image (UP or DOWN). This is in the order of spatOrder variable, not the the original vertex list in the SSEList variable.
+        Integer[] orientationsSeqOrder = new Integer[fg.size];            
+
+        List<Integer> keyposFGIndices = new ArrayList<>();
+        //DP.getInstance().d("SSEGraph", "parentVertexPosInFG=" + IO.intListToString(parentVertexPosInFG) + ".");
+        Integer v;
+        for(int i = 0; i < keyposParentIndicesSeqOrder.size(); i++) {
+            v = parentVertexPosInFG.get(keyposParentIndicesSeqOrder.get(i));
+            if(v < 0) { 
+                DP.getInstance().e("SSEGRaph", "Keypos parent index #" + i + " is " + v + ", skipping.");
+            } else {
+                keyposFGIndices.add(v);
+            }
+        }
+
+        //DP.getInstance().d("keyposFGIndices=" + IO.intListToString(keyposFGIndices));
+
+        //assert keyposFGIndices.size() == fg.size;
+        if(keyposFGIndices.size() != fg.getSize()) {
+            DP.getInstance().e("SSEGRaph", "keyposFGIndices.size()=" + keyposFGIndices.size() + ", fg.size=" + fg.size + ".");
+        }
+
+        //Integer firstVertexSpatFGIndex = keystartFGIndex;
+        Integer firstVertexSpatFGIndex = fg.spatOrder.get(0);
+        orientationsSpatOrder[0] = FoldingGraph.ORIENTATION_UPWARDS;  // heading of the 1st vertex is up by definition (it has no predecessor)
+        orientationsSeqOrder[firstVertexSpatFGIndex] = FoldingGraph.ORIENTATION_UPWARDS;
+
+        if(debugDrawingKEY) {
+            System.out.println("Setting orientationsSeqOrder[" + firstVertexSpatFGIndex + "] to " + FoldingGraph.ORIENTATION_UPWARDS + ".");
+        }
+
+        Integer currentVert, lastVert;
+        // the following SB is only for testing, the result is not used. See the PTGLNotations class for the used implementation.
+        // Note that we still need the loop though, it seets orientationsSpatOrder an SeqOrder
+
+        StringBuilder KEYNotation = new StringBuilder(); 
+
+        String bracketStart = "{";
+        String bracketEnd = "}";
+
+        KEYNotation.append(bracketStart);
+        KEYNotation.append(fg.getVertex(keystartFGIndex).getLinearNotationLabel());
+
+
+        if(keyposFGIndices.size() > 1) {
+
+            for(int i = 1; i < keyposFGIndicesSpatOrder.size(); i++) {
+
+                if(i < (keyposFGIndicesSpatOrder.size())) {
+                    KEYNotation.append(",");
+                }
+
+                currentVert = keyposFGIndicesSpatOrder.get(i);
+                lastVert = keyposFGIndicesSpatOrder.get(i-1);
+
+                KEYNotation.append(currentVert - lastVert);
+
+                Integer spatRel = fg.getContactType(lastVert, currentVert);
+
+                if(Objects.equals(spatRel, SpatRel.PARALLEL)) {
+                    // keep orientation, this means crossover
+                    KEYNotation.append("x");
+                    orientationsSpatOrder[i] = orientationsSpatOrder[i-1];
+                    orientationsSeqOrder[currentVert] = orientationsSpatOrder[i];
+                }                    
+                else {                                                                
+                    // all other spatial relations, e.g. SpatRel.ANTIPARALLEL, SpatRel.LIGAND, SpatRel.BACKBONE and SpatRel.MIXED: invert orientation
+                    orientationsSpatOrder[i] = (Objects.equals(orientationsSpatOrder[i-1], FoldingGraph.ORIENTATION_UPWARDS) ? FoldingGraph.ORIENTATION_DOWNWARDS : FoldingGraph.ORIENTATION_UPWARDS);
+                    orientationsSeqOrder[currentVert] = orientationsSpatOrder[i];
+                }
+                KEYNotation.append(fg.getVertex(currentVert).getLinearNotationLabel());
+            }                                                              
+
+        }      
+        KEYNotation.append(bracketEnd);
+
+
+        Integer[] newOrientations = new Integer[fg.spatOrder.size()];
+        Arrays.fill(newOrientations, DrawTools.DIRECTION_UPWARDS);
+        
+       
+        
+        Integer vertexIndexInFGSequential;
+        List<Shape> connShapes;
+        Polygon pol;
+        Position2D p;
+        for(int i = 0; i < fg.spatOrder.size(); i++) {
+            vertexIndexInFGSequential = fg.spatOrder.get(i);
+            p = new Position2D(vertStartX + (i * vertDist) + pl.vertRadius / 2, vertStartY);
+            
+            Integer contactType = null;
+            if(i > 0) {
+                contactType = fg.getContactType(fg.spatOrder.get(i-1), vertexIndexInFGSequential);
+                Integer lastOrientation = newOrientations[i-1];
+                if(contactType.equals(SpatRel.PARALLEL)) {
+                    // parallel means crossover, so keep the old orientation
+                    newOrientations[i] = lastOrientation;
+                }
+                else {
+                    newOrientations[i] = (lastOrientation.equals(DrawTools.DIRECTION_UPWARDS) ? DrawTools.DIRECTION_DOWNWARDS : DrawTools.DIRECTION_UPWARDS);
+                }
+            } else {
+                newOrientations[0] = DrawTools.DIRECTION_UPWARDS;   // first is upwards by definition
+            }
+            
+            if(fg.getVertex(vertexIndexInFGSequential).isBetaStrand()) {                
+                pol = DrawTools.getDefaultArrowPolygonLowestPointAt(p.x, p.y, newOrientations[vertexIndexInFGSequential]);                                
+            } 
+            else {
+                pol = DrawTools.getDefaultBarrelPolygonLowestPointAt(p.x, p.y);
+            }
+            ig2.draw(pol);
+            ig2.drawString((vertexIndexInFGSequential+1) + "", p.x, p.y + 50);
+            ig2.drawString((i) + "", p.x, p.y + 60);
+            
+            if(vertexIndexInFGSequential.equals(0)) {
+                ig2.drawString("N", p.x, p.y + 20);  // C terminus label
+            }
+            if(vertexIndexInFGSequential.equals(fg.spatOrder.size() - 1)) {
+                ig2.drawString("C", p.x, p.y + 20);  // C terminus label
+            }
+        }
+
+
+
+        // ************************************* footer **************************************
+
+        if(Settings.getBoolean("plcc_B_graphimg_footer")) {
+
+            // Draw the vertex numbering into the footer
+            // Determine the dist between vertices that will have their vertex number printed below them in the footer field                               
+
+            if(fg.getSize() > 0) {   
+                ig2.setPaint(Color.BLACK);
+                ig2.drawString("FG", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (stringHeight / 4));
+                ig2.setPaint(Color.LIGHT_GRAY);
+                ig2.drawString("SQ", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
+                ig2.drawString("PG", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + lineHeight + (stringHeight / 4));
+                ig2.setPaint(Color.BLACK);
+            }
+            else {
+                ig2.drawString("(Graph has no vertices.)", pl.getFooterStart().x, pl.getFooterStart().y);
+            }
+
+            /*
+            for(Integer i = leftMostVertexInParent; i <= rightMostVertexInParent; i++) {
+
+                Integer parentVertexPosInFoldingGraph = parentVertexPosInFG.get(i);
+                if(parentVertexPosInFoldingGraph < 0) {
+                    continue;
+                }
+                // Draw label for every nth vertex
+                if((i + 1) % printNth == 0) {
+                    sseNumberFoldingGraph = "" + (parentVertexPosInFG.get(i) >= 0 ? (parentVertexPosInFG.get(i) + 1) : "");
+                    sseNumberSeq = "" + (pg.sseList.get(i).getSSESeqChainNum());
+                    sseNumberProteinGraph = "" + (i + 1);
+                    //stringWidth = fontMetrics.stringWidth(sseNumberSeq);
+                    stringHeight = fontMetrics.getAscent();                                        
+
+                    ig2.setPaint(Color.BLACK);
+                    ig2.drawString(sseNumberFoldingGraph, pl.getFooterStart().x + ((i-shiftBack[i]) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4));
+                    ig2.setPaint(Color.LIGHT_GRAY);
+                    ig2.drawString(sseNumberSeq, pl.getFooterStart().x + ((i-shiftBack[i]) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + lineHeight + (stringHeight / 4));                    
+                    ig2.drawString(sseNumberProteinGraph, pl.getFooterStart().x + ((i-shiftBack[i]) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight *2) + (stringHeight / 4));                                                                    
+                    ig2.setPaint(Color.BLACK);
+                }
+            }
+            */
+
+            if(Settings.getBoolean("plcc_B_graphimg_legend")) {
+                SSEGraph.drawLegendKEY(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4)), pl, fg);
+            }
+
+        }
+
+        Rectangle2D roi = new Rectangle2D.Double(0, 0, pl.getPageWidth(), pl.getPageHeight());
+
+        DrawResult drawRes = new DrawResult(ig2, roi);
+        
+        if(debug) {
+            System.out.println("******************** END *********************");
+        }
+        
+        return drawRes;                                                                         
+    }
+    
+    /**
+     * Draws the KEY folding graph image of this graph and returns the DrawResult.
+     * If 'nonProteinGraph' is true, this graph is considered a custom (=non-protein) graph and the color coding for vertices and edges is NOT used.
+     * In that case, the graph is drawn black and white and the labels for the N- and C-termini are NOT drawn.
+     * 
+     * See http://ptgl.uni-frankfurt.de/cgi-bin/showpict.pl?topology=a&rep=3&protlist=7timA+7timB+&nmrlist=
+     * and http://ptgl.uni-frankfurt.de/ptglhelp.html#key
+     * 
+     * See the KEY beta FG #3 of 1GOS chain A as an example.
+     * 
+     * @param pnfr a folding graph notation result
+
+     * @return the DrawResult. You can write this to a file or whatever.
+     */
+    @Deprecated
+    private static DrawResult drawFoldingGraphKEYG2DOld(PTGLNotationFoldResult pnfr) {
 
         
         
@@ -5346,12 +5735,7 @@ E	3	3	3
             //    debugDrawingKEY = true;
             //}
             
-            if( ! bw) {
-                if(fg.getSize() > 0) {                    
-                    ig2.drawString("N", vertStart.x - pl.vertDist, vertStart.y + 20);    // N terminus label
-                    ig2.drawString("C", vertStart.x + numVerts * pl.vertDist, vertStart.y + 20);  // C terminus label
-                }
-            }
+            
                                                             
             // determine the orientations of the vertices in the image (up/down). if two adjacent SSEs are parallel, they point in the same direction in the image. if they are antiparallel, they point into different directions.
             Integer[] orientationsSpatOrder = new Integer[fg.size];    // the heading of the vertex in the image (UP or DOWN). This is in the order of spatOrder variable, not the the original vertex list in the SSEList variable.
@@ -5718,7 +6102,12 @@ E	3	3	3
                 if(Objects.equals(s, 0)) { 
                     ig2.setPaint(Color.BLACK);
                     //System.out.println("    SSE # " + compareToTerminus + " (pos # " + ssePos + ")  is the KEY notation start (clostest to N with degee 1).");                                       
-                    ig2.drawString("S", currentVertX, (currentVertY + 20));
+                    ig2.drawString("N", currentVertX, (currentVertY + 20));
+                }
+                if(Objects.equals(s, fg.numVertices() - 1)) { 
+                    ig2.setPaint(Color.BLACK);
+                    //System.out.println("    SSE # " + compareToTerminus + " (pos # " + ssePos + ")  is the KEY notation start (clostest to N with degee 1).");                                       
+                    ig2.drawString("C", currentVertX, (currentVertY + 20));
                 }
                 
                 // draw spat sse number
@@ -5735,10 +6124,7 @@ E	3	3	3
             
                 // Draw the vertex numbering into the footer
                 // Determine the dist between vertices that will have their vertex number printed below them in the footer field
-                Integer printNth = 1;
-                //if(fg.getSize() > 9) { printNth = 1; }
-                if(fg.getSize() > 99) { printNth = 2; }
-                if(fg.getSize() > 999) { printNth = 3; }
+                Integer printNth = 1;               
 
                 // line markers: S for sequence order, G for graph order
                 
@@ -5754,15 +6140,20 @@ E	3	3	3
                     ig2.drawString("(Graph has no vertices.)", pl.getFooterStart().x, pl.getFooterStart().y);
                 }
 
+                String sseNumberFoldingGraphKEY;
+                                
+                
+                
                 for(Integer i = leftMostVertexInParent; i <= rightMostVertexInParent; i++) {
                     
                     Integer parentVertexPosInFoldingGraph = parentVertexPosInFG.get(i);
                     if(parentVertexPosInFoldingGraph < 0) {
                         continue;
                     }
-                    // Draw label for every nth vertex
+                    // Draw label for every nth vertex (for KEY, we set n = 1 always, so all labels are drawn)
                     if((i + 1) % printNth == 0) {
                         sseNumberFoldingGraph = "" + (parentVertexPosInFG.get(i) >= 0 ? (parentVertexPosInFG.get(i) + 1) : "");
+                        sseNumberFoldingGraphKEY = fg.spatOrder.indexOf(i) + "";
                         sseNumberSeq = "" + (pg.sseList.get(i).getSSESeqChainNum());
                         sseNumberProteinGraph = "" + (i + 1);
                         //stringWidth = fontMetrics.stringWidth(sseNumberSeq);
@@ -5776,6 +6167,7 @@ E	3	3	3
                         ig2.setPaint(Color.BLACK);
                     }
                 }
+                
 
                 if(Settings.getBoolean("plcc_B_graphimg_legend")) {
                     SSEGraph.drawLegendKEY(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4)), pl, fg);
