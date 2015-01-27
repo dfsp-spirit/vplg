@@ -107,6 +107,7 @@ public class DrawTools {
     }
     
     public static void main(String [] args) {
+        Settings.init();
         System.out.println("Testing drawing functions...");
         DrawTools.drawTest("test");
         System.out.println("Done.");
@@ -338,7 +339,7 @@ public class DrawTools {
      * @return a list of Shapes that can be painted on a G2D canvas.
      */
     public static ArrayList<Shape> getArcConnector(Integer startX, Integer startY, Integer targetX, Integer targetY, Stroke stroke, Boolean startUpwardsInCaseOfSimpleArc, int pixelsToShiftCentralLineOnYAxis) {
-        
+                
         Boolean useAlternate = Settings.getBoolean("plcc_B_key_use_alternate_arcs");
         if(useAlternate) {
             return getArcConnectorAlternative(startX, startY, targetX, targetY, stroke, startUpwardsInCaseOfSimpleArc, pixelsToShiftCentralLineOnYAxis);

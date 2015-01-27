@@ -944,6 +944,13 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         ig2.drawString(label, pixelPosX, startPos.y);
         pixelPosX += fontMetrics.stringWidth(label) + spacer;        
         
+        label = "sequential";
+        ig2.setPaint(Color.BLACK);
+        ig2.drawString(label, pixelPosX, startPos.y);
+        pixelPosX += fontMetrics.stringWidth(label) + spacer;
+        
+        
+        /*
         if(Settings.getBoolean("plcc_B_key_foldinggraph_arcs_allways_black")) {
             label = "contact";
             ig2.setPaint(Color.BLACK);
@@ -981,6 +988,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
                 pixelPosX += fontMetrics.stringWidth(label) + spacer;
             }
         }
+        */
                                         
         
         // End of edge labels        
@@ -5166,10 +5174,7 @@ E	3	3	3
      * @return the DrawResult. You can write this to a file or whatever.
      */
     private static DrawResult drawFoldingGraphKEYG2D(PTGLNotationFoldResult pnfr) {
-
-        
-        
-        
+                        
         FoldingGraph fg = pnfr.getFoldingGraph();
         SSEGraph pg = fg.parent;
         
@@ -5178,8 +5183,7 @@ E	3	3	3
             if(fg.graphType.equals("beta") && fg.getFoldingGraphNumber().equals(1)) {
                 debug = true;
             }
-        }
-                 
+        }                 
         
         if(debug) {
             System.out.println("******************** START *********************");
@@ -5194,10 +5198,7 @@ E	3	3	3
         Integer rightMostVertexInParent = fg.getMaximalVertexIndexInParentGraph();
         
         List<Integer> keyposParentIndicesSeqOrder = pnfr.keypos;
-        //DP.getInstance().d("keyposParentIndicesSeqOrder (size=" + keyposParentIndicesSeqOrder.size()+ "): " + IO.intListToString(keyposParentIndicesSeqOrder));
-        
-        
-        
+        //DP.getInstance().d("keyposParentIndicesSeqOrder (size=" + keyposParentIndicesSeqOrder.size()+ "): " + IO.intListToString(keyposParentIndicesSeqOrder));                        
         
         /** The KEY start vertex -- this is NOT the left-most vertex. It is the vertex closest to the N-terminus with degree 1. Note that this is the index in the FG, not in the PG. */        
         Integer keystartFGIndex = pnfr.keyStartFG;
@@ -5229,12 +5230,9 @@ E	3	3	3
             } else {
                 DP.getInstance().e("SSEGraph", "Could not draw KEY notation: Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.chainid + " gt " + fg.graphType + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + ") does not match FG size " + fg.getSize() + ". Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ". KEY='" + pnfr.keyNotation + "'. " + (fg.isASingleCycle() ? "FG is a single cycle." : "FG is NOT a single cycle."));
                 return null;
-            }
-            
-            
+            }                       
         }
-        
-       
+               
         
         /** The vertex closest to C */
         Integer keyendFGIndex = keyposFGIndicesSpatOrder.get(fg.getSize() - 1);
@@ -5431,79 +5429,117 @@ E	3	3	3
 
 
         Integer[] newOrientations = new Integer[fg.spatOrder.size()];
-        Arrays.fill(newOrientations, FoldingGraph.ORIENTATION_UPWARDS);       
+        Arrays.fill(newOrientations, FoldingGraph.ORIENTATION_NONE);       
        
         
-        Integer vertexIndexInFGSequential;
+        Integer currentVertexIndexInFGSequential;
         List<Shape> connShapes;
         Polygon pol;
         Position2D p, lastP;
         for(int i = 0; i < fg.spatOrder.size(); i++) {
-            vertexIndexInFGSequential = fg.spatOrder.get(i);
+            currentVertexIndexInFGSequential = fg.spatOrder.get(i);
             p = new Position2D(vertStartX + (i * vertDist) + pl.vertRadius / 2, vertStartY);
             
             Integer contactTypeInt = null;
             if(i > 0) {
                 contactTypeInt = fg.getContactType(fg.spatOrder.get(i-1), fg.spatOrder.get(i));
-                if(debug) {
-                    System.out.println("i=" + i + ", contact type between " + fg.spatOrder.get(i-1) + " and " + fg.spatOrder.get(i) + " is " + SpatRel.getString(contactTypeInt) + ".");
-                }
+                //if(debug) {
+                //    System.out.println("i=" + i + ", contact type between " + fg.spatOrder.get(i-1) + " and " + fg.spatOrder.get(i) + " is " + SpatRel.getString(contactTypeInt) + ".");
+                //}
                 if(contactTypeInt.equals(SpatRel.PARALLEL)) {
                     newOrientations[i] = newOrientations[i-1];
-                    if(debug) {
-                        System.out.println("  i=" + i + ", parallel contact. Keeping orientation " + newOrientations[i-1] + " from last one, set to " + newOrientations[i] + ".");
-                    }
+                    //if(debug) {
+                    //    System.out.println("  i=" + i + ", parallel contact. Keeping orientation " + newOrientations[i-1] + " from last one, set to " + newOrientations[i] + ".");
+                    //}
                 }
                 else {
-                    newOrientations[i] = (newOrientations[i-1] == FoldingGraph.ORIENTATION_UPWARDS ? FoldingGraph.ORIENTATION_DOWNWARDS : FoldingGraph.ORIENTATION_UPWARDS);
-                    if(debug) {
-                        System.out.println("  i=" + i + ", NOT a parallel contact. Switched orientation " + newOrientations[i-1] + " from last one, set to " + newOrientations[i] + ".");
-                    }
+                    newOrientations[i] = (Objects.equals(newOrientations[i-1], FoldingGraph.ORIENTATION_UPWARDS) ? FoldingGraph.ORIENTATION_DOWNWARDS : FoldingGraph.ORIENTATION_UPWARDS);
+                    //if(debug) {
+                    //    System.out.println("  i=" + i + ", NOT a parallel contact. Switched orientation " + newOrientations[i-1] + " from last one, set to " + newOrientations[i] + ".");
+                    //}
                 }
                 
+            } else {
+                newOrientations[i] = FoldingGraph.ORIENTATION_UPWARDS;  // first is up by definition
             }
             
             
             
-            if(fg.getVertex(vertexIndexInFGSequential).isBetaStrand()) {                
+            if(fg.getVertex(currentVertexIndexInFGSequential).isBetaStrand()) {                
                 pol = DrawTools.getDefaultArrowPolygonLowestPointAt(p.x, p.y, newOrientations[i]);                                
             } 
             else {
                 pol = DrawTools.getDefaultBarrelPolygonLowestPointAt(p.x, p.y);
             }
             ig2.draw(pol);
-            ig2.drawString((vertexIndexInFGSequential + 1) + "", p.x, p.y + 50);
+            ig2.drawString((currentVertexIndexInFGSequential + 1) + "", p.x, p.y + 50);
             //ig2.drawString("i=" + (i) + "", p.x, p.y + 70);
             //sseNumberSeqInChain = "" + (pg.sseList.get(i).getSSESeqChainNum());
             List<Integer> parentMapping = fg.getVertexIndexListInParentGraph();
-            sseNumberProteinGraph = "" + parentMapping.get(vertexIndexInFGSequential);
-            sseNumberSeqInChain = "" + (pg.getSSEBySeqPosition(parentMapping.get(vertexIndexInFGSequential)).getSSESeqChainNum());
+            sseNumberProteinGraph = "" + parentMapping.get(currentVertexIndexInFGSequential);
+            sseNumberSeqInChain = "" + (pg.getSSEBySeqPosition(parentMapping.get(currentVertexIndexInFGSequential)).getSSESeqChainNum());
             ig2.setColor(Color.LIGHT_GRAY);
             ig2.drawString(sseNumberSeqInChain, p.x, p.y + 110);
             ig2.drawString(sseNumberProteinGraph, p.x, p.y + 150);
             ig2.setColor(Color.BLACK);
+        }
             
+        if(debug) {
+            System.out.print("Orientations: ");
+            for(Integer o : newOrientations) {
+                System.out.print(FoldingGraph.getOrientationString(o) + " ");
+            }
+            System.out.println("");
+        }
+        
+        // draw the edges
+        for(int i = 0; i < fg.spatOrder.size(); i++) {
+            currentVertexIndexInFGSequential = fg.spatOrder.get(i);
+            p = new Position2D(vertStartX + (i * vertDist) + pl.vertRadius / 2, vertStartY);
             // draw the arc from last one to current one
+            Integer previousVertexIndexInFGSequential;
+            Integer previousVertexIndexSpatial, currentVertexIndexSpatial;
             List<Shape> shapes;
-            if(i > 0) {
-                lastP = new Position2D(vertStartX + ((i-1) * vertDist) + pl.vertRadius / 2, vertStartY);
-                Integer lastOrientation = newOrientations[i-1];
-                Integer currentOrientation = newOrientations[i];
+            if(currentVertexIndexInFGSequential > 0) {
+                previousVertexIndexInFGSequential = currentVertexIndexInFGSequential - 1;
+                currentVertexIndexSpatial = fg.spatOrder.indexOf(currentVertexIndexInFGSequential);
+                previousVertexIndexSpatial = fg.spatOrder.indexOf(previousVertexIndexInFGSequential);
+                if(debug) {
+                    System.out.println("EDGE (i=" + i + ") This is vert " + currentVertexIndexInFGSequential + " at position " + fg.spatOrder.indexOf(currentVertexIndexInFGSequential) + ", last vert sequential was " + previousVertexIndexInFGSequential + " at position " + previousVertexIndexSpatial + ".");
+                }
+                lastP = new Position2D(vertStartX + (previousVertexIndexSpatial * vertDist) + pl.vertRadius / 2, vertStartY);
+                //lastP = new Position2D(vertStartX + (fg.spatOrder.indexOf(i-1) * vertDist) + pl.vertRadius / 2, vertStartY);
+                Integer lastOrientation = newOrientations[previousVertexIndexSpatial];
+                Integer currentOrientation = newOrientations[currentVertexIndexSpatial];
+                
+                if(debug) {
+                    System.out.println("  lastOrientation was: " + FoldingGraph.getOrientationString(lastOrientation) + ", current is " + FoldingGraph.getOrientationString(currentOrientation) + ".");
+                }
                 
                 if(lastOrientation.equals(currentOrientation)) {
                     // we need a crossover arc
                     if(lastOrientation.equals(FoldingGraph.ORIENTATION_UPWARDS)) {
-                        shapes = DrawTools.getCrossoverArcConnector(lastP.x, lastP.y - 80, p.x, p.y, ig2.getStroke(), true, 0);
+                        if(Settings.getBoolean("plcc_B_key_use_alternate_arcs")) {
+                            shapes = DrawTools.getCrossoverArcConnectorAlternativeBezierVersion(lastP.x, lastP.y - vertHeight, p.x, p.y, ig2.getStroke(), true, 0);
+                        }
+                        else {
+                            shapes = DrawTools.getCrossoverArcConnector(lastP.x, lastP.y - vertHeight, p.x, p.y, ig2.getStroke(), true, 0);
+                        }
                     }
                     else {
-                        shapes = DrawTools.getCrossoverArcConnector(lastP.x, lastP.y, p.x, p.y  - 80, ig2.getStroke(), false, 0);
+                        if(Settings.getBoolean("plcc_B_key_use_alternate_arcs")) {
+                            shapes = DrawTools.getCrossoverArcConnector(lastP.x, lastP.y, p.x, p.y  - vertHeight, ig2.getStroke(), false, 0);
+                        }
+                        else {
+                            shapes = DrawTools.getCrossoverArcConnectorAlternativeBezierVersion(lastP.x, lastP.y, p.x, p.y  - vertHeight, ig2.getStroke(), false, 0);
+                        }
                     }
                     
                 }
                 else {
                     // we need a simple arc, and thus we need to set the proper starting direction
                     if(currentOrientation.equals(FoldingGraph.ORIENTATION_UPWARDS)) {
-                        shapes = DrawTools.getArcConnector(lastP.x, lastP.y - 80, p.x, p.y - 80, ig2.getStroke(), true, 0);
+                        shapes = DrawTools.getArcConnector(lastP.x, lastP.y - vertHeight, p.x, p.y - 80, ig2.getStroke(), true, 0);
                     }
                     else {
                         shapes = DrawTools.getArcConnector(lastP.x, lastP.y, p.x, p.y, ig2.getStroke(), false, 0);
@@ -5517,10 +5553,10 @@ E	3	3	3
                 }
             }
             
-            if(vertexIndexInFGSequential.equals(0)) {
+            if(currentVertexIndexInFGSequential.equals(0)) {
                 ig2.drawString("N", p.x, p.y + 20);  // N terminus label
             }
-            if(vertexIndexInFGSequential.equals(fg.spatOrder.size() - 1)) {
+            if(currentVertexIndexInFGSequential.equals(fg.spatOrder.size() - 1)) {
                 ig2.drawString("C", p.x, p.y + 20);  // C terminus label
             }
         }
@@ -5915,17 +5951,17 @@ E	3	3	3
                     
                     numContactsDrawn++;
                     //DP.getInstance().d("DRAW_ARCS: i="+i+". current vert is " + currentVert + " with spatPos=" + i + " and seqPos=" + currentVert + ", lastVert is " + lastVert + " with spatPos=" + (i - 1) + " and seqPos=" + lastVert + ".spatRel = " + spatRel + ", relDrawDistToLast = " + relDrawDistToLast + ".");
-                    
+                    /*
                     if(spatRel.equals(SpatRel.PARALLEL)) { ig2.setPaint(Color.RED); }
                     else if(spatRel.equals(SpatRel.ANTIPARALLEL)) { ig2.setPaint(Color.BLUE); }
                     else if(spatRel.equals(SpatRel.MIXED)) { ig2.setPaint(Color.GREEN); }
                     else if(spatRel.equals(SpatRel.LIGAND)) { ig2.setPaint(Color.MAGENTA); }
                     else if(spatRel.equals(SpatRel.BACKBONE)) { ig2.setPaint(Color.ORANGE); }
                     else { ig2.setPaint(Color.LIGHT_GRAY); }
-
-                    if(Settings.getBoolean("plcc_B_key_foldinggraph_arcs_allways_black")) {
+                    */
+                    //if(Settings.getBoolean("plcc_B_key_foldinggraph_arcs_allways_black")) {
                         ig2.setPaint(Color.BLACK);
-                    }
+                    //}
 
                     // determine the center of the arc and the width of its rectangle bounding box
                     //iSpatIndex = spatOrder.get(i);

@@ -55,6 +55,23 @@ public class FoldingGraph extends SSEGraph {
     public static final String FG_NOTATION_RED = "RED";
     public static final String FG_NOTATION_SEQ = "SEQ";
     public static final String FG_NOTATION_DEF = "DEF";
+    
+    /**
+     * Translate orientation int to string
+     * @param o the orientation, use FoldingGraph.ORIENTATION_*
+     * @return the string, like "UP" or "DOWN"
+     */
+    public static String getOrientationString(Integer o) {
+        if(o.equals(FoldingGraph.ORIENTATION_UPWARDS)) {
+            return "UP";
+        }
+        else if(o.equals(FoldingGraph.ORIENTATION_DOWNWARDS)){
+            return "DOWN";
+        }
+        else {
+            return "NONE";
+        }
+    }
 
     /** Names for the folds (folding graphs) by index of the CC. The first CC is called 'A', the second 'B', and so on. */
     public static final String foldNames = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890";
