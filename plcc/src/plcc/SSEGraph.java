@@ -5493,6 +5493,7 @@ E	3	3	3
         }
         
         // draw the edges
+        // FFFFFFFFFFFF
         for(int i = 0; i < fg.spatOrder.size(); i++) {
             currentVertexIndexInFGSequential = fg.spatOrder.get(i);
             p = new Position2D(vertStartX + (i * vertDist) + pl.vertRadius / 2, vertStartY);
@@ -5517,8 +5518,9 @@ E	3	3	3
                 }
                 
                 if(lastOrientation.equals(currentOrientation)) {
-                    // we need a crossover arc
+                    // same orientations, so we need a crossover arc
                     if(lastOrientation.equals(FoldingGraph.ORIENTATION_UPWARDS)) {
+                        if(debug) { ig2.setColor(Color.RED); }
                         if(Settings.getBoolean("plcc_B_key_use_alternate_arcs")) {
                             shapes = DrawTools.getCrossoverArcConnectorAlternativeBezierVersion(lastP.x, lastP.y - vertHeight, p.x, p.y, ig2.getStroke(), true, 0);
                         }
@@ -5527,11 +5529,12 @@ E	3	3	3
                         }
                     }
                     else {
+                        if(debug) { ig2.setColor(Color.ORANGE); }
                         if(Settings.getBoolean("plcc_B_key_use_alternate_arcs")) {
-                            shapes = DrawTools.getCrossoverArcConnector(lastP.x, lastP.y, p.x, p.y  - vertHeight, ig2.getStroke(), false, 0);
+                            shapes = DrawTools.getCrossoverArcConnectorAlternativeBezierVersion(lastP.x, lastP.y, p.x, p.y  - vertHeight, ig2.getStroke(), false, 0);
                         }
                         else {
-                            shapes = DrawTools.getCrossoverArcConnectorAlternativeBezierVersion(lastP.x, lastP.y, p.x, p.y  - vertHeight, ig2.getStroke(), false, 0);
+                            shapes = DrawTools.getCrossoverArcConnector(lastP.x, lastP.y, p.x, p.y  - vertHeight, ig2.getStroke(), false, 0);
                         }
                     }
                     
@@ -5539,10 +5542,14 @@ E	3	3	3
                 else {
                     // we need a simple arc, and thus we need to set the proper starting direction
                     if(currentOrientation.equals(FoldingGraph.ORIENTATION_UPWARDS)) {
-                        shapes = DrawTools.getArcConnector(lastP.x, lastP.y - vertHeight, p.x, p.y - 80, ig2.getStroke(), true, 0);
+                        // orientations differ, and the current one is upwards. so the last one was downwards.
+                        if(debug) { ig2.setColor(Color.BLUE); }
+                        shapes = DrawTools.getArcConnector(lastP.x, lastP.y, p.x, p.y, ig2.getStroke(), false, 0);
                     }
                     else {
-                        shapes = DrawTools.getArcConnector(lastP.x, lastP.y, p.x, p.y, ig2.getStroke(), false, 0);
+                        if(debug) { ig2.setColor(Color.GREEN); }
+                        // orientations differ, and the current one is upwards. so the last one was downwards.
+                        shapes = DrawTools.getArcConnector(lastP.x, lastP.y - vertHeight, p.x, p.y - vertHeight, ig2.getStroke(), true, 0);
                     }
                     
                 }
@@ -5551,6 +5558,7 @@ E	3	3	3
                 for(Shape s : shapes) {
                     ig2.draw(s);
                 }
+                ig2.setColor(Color.BLACK);
             }
             
             if(currentVertexIndexInFGSequential.equals(0)) {
