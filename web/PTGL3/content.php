@@ -68,13 +68,13 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
   // creates a bar chart
   function do_plot_js_bar($context_name = "ctx", $dataset_var_name = "data", $result_assign_var_name = "myChart") {
-    $res = 'var ' . $result_assign_var_name . ' = new Chart(' . $context_name . ').Bar(' . $dataset_var_name . ', { scaleBeginAtZero : true, scaleStartValue: 0 }' . ');' . "\n";
+    $res = 'var ' . $result_assign_var_name . ' = new Chart(' . $context_name . ').Bar(' . $dataset_var_name . ', { scaleBeginAtZero: true, scaleShowGridLines : true }' . ');' . "\n";
     return $res;
   }
   
   // creates a pe chart
   function do_plot_js_pie($context_name = "ctx", $dataset_var_name = "data", $result_assign_var_name = "myChart") {
-    $res = 'var ' . $result_assign_var_name . ' = new Chart(' . $context_name . ').Pie(' . $dataset_var_name . ', { tooltipTemplate : "<%if (label){%><%=label%>: <%}%><%= value %> f", animation: false }' . ');' . "\n";
+    $res = 'var ' . $result_assign_var_name . ' = new Chart(' . $context_name . ').Pie(' . $dataset_var_name . ', { tooltipTemplate: "<%if (label){%><%=label%>: <%}%><%= value %> f", animation: false }' . ');' . "\n";
     //$res .= 'var legend = ' . $result_assign_var_name . '.generateLegend();' . "\n";
     //$res .= '$("#legend").html(legend);' . "\n";
     return $res;
@@ -82,7 +82,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
   
   // creates a doughnut chart
   function do_plot_js_doughnut($context_name = "ctx", $dataset_var_name = "data", $result_assign_var_name = "myChart") {
-    $res = 'var ' . $result_assign_var_name . ' = new Chart(' . $context_name . ').Doughnut(' . $dataset_var_name . ', { tooltipTemplate : "<%if (label){%><%=label%>: <%}%><%= value %> f", animation: false }' . ');' . "\n";
+    $res = 'var ' . $result_assign_var_name . ' = new Chart(' . $context_name . ').Doughnut(' . $dataset_var_name . ', { tooltipTemplate: "<%if (label){%><%=label%>: <%}%><%= value %> f", animation: false }' . ');' . "\n";
     //$res .= 'var legend = ' . $result_assign_var_name . '.generateLegend();' . "\n";
     //$res .= '$("#legend").html(legend);' . "\n";
     return $res;
@@ -300,20 +300,47 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
 <?php
 
-  $table_data = array();    
-  $row_alpha = array("Alpha", 247454, 0, 2357932);
-  $row_beta = array("Beta", 247452, 169500, 2094599);
-  $row_albe = array("Alpha-Beta", 247459, 169542, 4452531);
-  $row_alphalig = array("Alphalig", 247454, 0, 2988890);
-  $row_betalig = array("Betalig", 247452, 169560, 2723377);
-  $row_albelig = array("Alpha-Betalig", 247459, 169542, 5099843);
+      // ------------------------- data for the plots ---------------------------
+      
+    $last_update_month_and_year = "January 2015";
+      
+    $num_pdb_files = 98161;
+    $num_protein_chains = 274459;
+    $num_sses = 5088843;
+    $num_intrachain_contacts = 4964550;
+    
+    $sses_in_graphtypes_labels = array("Alpha", "Beta", "Alpha-Beta", "Alphalig", "Betalig", "Alpha-Betalig");
+    $sses_in_graphtype_alpha = array("Alpha", 247454, 0, 2357932);
+    $sses_in_graphtype_beta = array("Beta", 247452, 169500, 2094599);
+    $sses_in_graphtype_albe = array("Alpha-Beta", 247459, 169542, 4452531);
+    $sses_in_graphtype_alphalig = array("Alphalig", 247454, 0, 2988890);
+    $sses_in_graphtype_betalig = array("Betalig", 247452, 169560, 2723377);
+    $sses_in_graphtype_albelig = array("Alpha-Betalig", 247459, 169542, 5099843);
   
-  array_push($table_data, $row_alpha);
-  array_push($table_data, $row_beta);
-  array_push($table_data, $row_albe);
-  array_push($table_data, $row_alphalig);
-  array_push($table_data, $row_betalig);
-  array_push($table_data, $row_albelig);
+    
+    $sses_by_type_labels = array("Helix", "Strand", "Ligand");
+    $sses_by_type = array(2357932, 2094599, 636312);
+    
+    $total_contacts_by_type_labels = array("Mixed", "Parallel", "Antiparallel", "Ligand");
+    $total_contacts_by_type = array(1232714, 776965, 1553370, 1391501);
+    
+    $protein_functions_labels = array("Transcription", "Unknown", "Immune system", "Lyase", "Oxidureductase", "Transferase", "Hydrolase");
+    $protein_functions = array(2302, 2394, 2609, 3257, 8892, 11330, 14696);
+    
+    $source_organisms_labels = array("Bos taurus", "Saccharomyces cerevisia", "Mus musculus", "Thermus thermophilus", "Unknown", "Escherichia coli", "Homo sapiens");
+    $source_organisms = array(5219, 8822, 9349, 11464, 19161, 21117, 53667);
+
+
+
+
+
+  $table_data = array();      
+  array_push($table_data, $sses_in_graphtype_alpha);
+  array_push($table_data, $sses_in_graphtype_beta);
+  array_push($table_data, $sses_in_graphtype_albe);
+  array_push($table_data, $sses_in_graphtype_alphalig);
+  array_push($table_data, $sses_in_graphtype_betalig);
+  array_push($table_data, $sses_in_graphtype_albelig);
 
 ?>
 
@@ -332,16 +359,16 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		
 		<div id="PageIntro">
 		<div class="container" id="pageintro">
-		This page gives statistics on the current holdings of this database. The 3D atom data used to compute the protein graphs was retrieved from the RCSB PDB in December 2014.
+		This page gives statistics on the current holdings of this database. The 3D atom data used to compute the protein graphs was retrieved from the RCSB PDB in <?php echo $last_update_month_and_year; ?>.
 		</div><!-- end container-->
 		</div><!-- end Home -->
 		
 		<br>
 
-		<h4>98,161 PDB files</h4>
-		<h4>274,459 Protein chains</h4>
-		<h4>5,088,843 Secondary structure elements (SSEs)</h4>
-		<h4>4,964,550 3D contacts between SSEs of the same chain</h4>
+		<h4><?php echo $num_pdb_files; ?> PDB files</h4>
+		<h4><?php echo $num_protein_chains; ?> Protein chains</h4>
+		<h4><?php echo $num_sses; ?> Secondary structure elements (SSEs)</h4>
+		<h4><?php echo $num_intrachain_contacts; ?> 3D contacts between SSEs of the same chain</h4>
 
 
 		<div class="table-responsive" id="contentTable">
@@ -381,17 +408,24 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		</div><!-- end table-responsive -->
 		
 <?php
+                  
+                  
 		  // ------------------------------ plots -----------------------------------
+		  
+		  
+		  
+		  
+		  //
 		
 		  // ----- SSEs in graphs -----
-		  $labels = array("Alpha", "Beta", "Alpha-Beta", "Alphalig", "Betalig", "Alpha-Betalig");
+		  //$sses_in_graphtypes_labels = array("Alpha", "Beta", "Alpha-Beta", "Alphalig", "Betalig", "Alpha-Betalig");
 		  $datasets = array();
-		  $dataset1 = array($table_data[0][3], $table_data[1][3], $table_data[2][3], $table_data[3][3], $table_data[4][3], $table_data[5][3]);
-		  array_push($datasets, $dataset1);
+		  $sses_in_graphtypes = array($table_data[0][3], $table_data[1][3], $table_data[2][3], $table_data[3][3], $table_data[4][3], $table_data[5][3]);
+		  array_push($datasets, $sses_in_graphtypes);
 		  $plot_type = "bar"; // "bar", "pie", "doughnut" or "line" are supported atm
 		  //$plot_type = "pie";
 		  
-		  $code = get_plot_code("1", $plot_type, $labels, $datasets);		  
+		  $code = get_plot_code("1", $plot_type, $sses_in_graphtypes_labels, $datasets);		  
 		  
 		  echo "<h4>Number of SSEs in graphs</h4>\n" . $code . "\n\n";
 		  
@@ -400,13 +434,13 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		  
 		  // ----- total SSEs by type -----
 		  
-		  $labels = array("Helix", "Strand", "Ligand");
+		  //$sses_by_type_labels = array("Helix", "Strand", "Ligand");
 		  $datasets = array();
-		  $dataset1 = array(2357932, 2094599, 636312);
-		  array_push($datasets, $dataset1);
+		  //
+		  array_push($datasets, $sses_by_type);
 		  
 		  $plot_type = "bar";		  
-		  $code = get_plot_code("2", $plot_type, $labels, $datasets);		  
+		  $code = get_plot_code("2", $plot_type, $sses_by_type_labels, $datasets);		  
 		  
 		  echo "<h4>Number of SSEs by type</h4>\n" . $code . "\n\n";
 		  
@@ -417,13 +451,13 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		  
 		  // ----- total contacts by type -----
 		  
-		  $labels = array("Mixed", "Parallel", "Antiparallel", "Ligand");
+		  //$total_contacts_by_type_labels = array("Mixed", "Parallel", "Antiparallel", "Ligand");
 		  $datasets = array();
-		  $dataset1 = array(1232714, 776965, 1553370, 1391501);
-		  array_push($datasets, $dataset1);
+		  //$total_contacts_by_type = array(1232714, 776965, 1553370, 1391501);
+		  array_push($datasets, $total_contacts_by_type);
 		  
 		  $plot_type = "bar";		  
-		  $code = get_plot_code("3", $plot_type, $labels, $datasets);		  
+		  $code = get_plot_code("3", $plot_type, $total_contacts_by_type_labels, $datasets);		  
 		  
 		  echo "<h4>Number of contacts by type</h4>\n" . $code . "\n\n";
 		  
@@ -432,13 +466,13 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		  
 		  // ----- protein functions -----
 		  
-		  $labels = array("Transcription", "Unknown", "Immune system", "Lyase", "Oxidureductase", "Transferase", "Hydrolase");
+		  //$protein_functions_labels = array("Transcription", "Unknown", "Immune system", "Lyase", "Oxidureductase", "Transferase", "Hydrolase");
 		  $datasets = array();
-		  $dataset1 = array(2302, 2394, 2609, 3257, 8892, 11330, 14696);
-		  array_push($datasets, $dataset1);
+		  //$protein_functions = array(2302, 2394, 2609, 3257, 8892, 11330, 14696);
+		  array_push($datasets, $protein_functions);
 		  
 		  $plot_type = "bar";		  
-		  $code = get_plot_code("4", $plot_type, $labels, $datasets);		  
+		  $code = get_plot_code("4", $plot_type, $protein_functions_labels, $datasets);		  
 		  
 		  echo "<h4>Most common protein functions</h4>\n" . $code . "\n\n";
 		  
@@ -447,13 +481,13 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		  
 		  // ----- source organism -----
 		  
-		  $labels = array("Bos taurus", "Saccharomyces cerevisia", "Mus musculus", "Thermus thermophilus", "Unknown", "Escherichia coli", "Homo sapiens");
+		  //$source_organisms_labels = array("Bos taurus", "Saccharomyces cerevisia", "Mus musculus", "Thermus thermophilus", "Unknown", "Escherichia coli", "Homo sapiens");
 		  $datasets = array();
-		  $dataset1 = array(5219, 8822, 9349, 11464, 19161, 21117, 53667);
-		  array_push($datasets, $dataset1);
+		  //$source_organisms = array(5219, 8822, 9349, 11464, 19161, 21117, 53667);
+		  array_push($datasets, $source_organisms);
 		  
 		  $plot_type = "bar";		  
-		  $code = get_plot_code("5", $plot_type, $labels, $datasets);		  
+		  $code = get_plot_code("5", $plot_type, $source_organisms_labels, $datasets);		  
 		  
 		  echo "<h4>Most common source organisms</h4>\n" . $code . "\n\n";
 		  
