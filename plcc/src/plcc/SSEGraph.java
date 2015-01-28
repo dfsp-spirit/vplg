@@ -5179,11 +5179,13 @@ E	3	3	3
         SSEGraph pg = fg.parent;
         
         boolean debug = false;
+        /*
         if(pg.pdbid.equals("8icd") && pg.chainid.equals("A")) {
             if(fg.graphType.equals("beta") && fg.getFoldingGraphNumber().equals(1)) {
                 debug = true;
             }
-        }                 
+        } 
+        */
         
         if(debug) {
             System.out.println("******************** START *********************");
@@ -5472,15 +5474,18 @@ E	3	3	3
                 pol = DrawTools.getDefaultBarrelPolygonLowestPointAt(p.x, p.y);
             }
             ig2.draw(pol);
-            ig2.drawString((currentVertexIndexInFGSequential + 1) + "", p.x, p.y + 50);
+            //pl.getFooterStart().x + ((i-shiftBack[i]) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4)
+            ig2.drawString((currentVertexIndexInFGSequential + 1) + "", pl.getFooterStart().x + (i * vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4));
             //ig2.drawString("i=" + (i) + "", p.x, p.y + 70);
             //sseNumberSeqInChain = "" + (pg.sseList.get(i).getSSESeqChainNum());
             List<Integer> parentMapping = fg.getVertexIndexListInParentGraph();
             sseNumberProteinGraph = "" + parentMapping.get(currentVertexIndexInFGSequential);
             sseNumberSeqInChain = "" + (pg.getSSEBySeqPosition(parentMapping.get(currentVertexIndexInFGSequential)).getSSESeqChainNum());
             ig2.setColor(Color.LIGHT_GRAY);
-            ig2.drawString(sseNumberSeqInChain, p.x, p.y + 110);
-            ig2.drawString(sseNumberProteinGraph, p.x, p.y + 150);
+            //ig2.drawString(sseNumberSeq, pl.getFooterStart().x + ((i-shiftBack[i]) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
+            //ig2.drawString(sseNumberProteinGraph, pl.getFooterStart().x + ((i-shiftBack[i]) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight *2) + (stringHeight / 4));
+            ig2.drawString(sseNumberSeqInChain, pl.getFooterStart().x + (i * vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
+            ig2.drawString(sseNumberProteinGraph, pl.getFooterStart().x + (i * vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight *2) + (stringHeight / 4));
             ig2.setColor(Color.BLACK);
         }
             
@@ -5493,7 +5498,6 @@ E	3	3	3
         }
         
         // draw the edges
-        // FFFFFFFFFFFF
         for(int i = 0; i < fg.spatOrder.size(); i++) {
             currentVertexIndexInFGSequential = fg.spatOrder.get(i);
             p = new Position2D(vertStartX + (i * vertDist) + pl.vertRadius / 2, vertStartY);
