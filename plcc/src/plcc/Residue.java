@@ -678,7 +678,7 @@ public class Residue implements java.io.Serializable {
     public String getUniqueString() { return("(" + chainID + "-" + pdbResNum + "-" + iCode + ")"); }
     public Float getPhi() { if(this.isAA()) { return(phi); } else { return(0.0f); } }
     public Float getPsi() { if(this.isAA()) { return(psi); } else { return(0.0f); } }
-    
+    public String getResName3() { return resName3;}
 
     public String getLigName() {
         if(this.isLigand()) {

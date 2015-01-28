@@ -608,7 +608,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         
         if(g.chainEnd.size()>0 || drawAll) {
             label = "interchain";
-            ig2.setPaint(Color.PINK);
+            ig2.setPaint(Color.BLACK);
             ig2.drawString(label, pixelPosX, startPos.y);
             pixelPosX += fontMetrics.stringWidth(label) + spacer;
         }
@@ -746,7 +746,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         
         if(g.chainEnd.size()>0 || drawAll) {
             label = "interchain";
-            ig2.setPaint(Color.PINK);
+            ig2.setPaint(Color.BLACK);
             ig2.drawString(label, pixelPosX, startPos.y);
             pixelPosX += fontMetrics.stringWidth(label) + spacer;
         }
@@ -3292,9 +3292,12 @@ E	3	3	3
             Arc2D.Double arc;
             ig2.setStroke(new BasicStroke(2));  // thin edges
             Integer edgeType, leftVert, rightVert, leftVertPosX, rightVertPosX, arcWidth, arcHeight, arcTopLeftX, arcTopLeftY, spacerX, spacerY, iChainID, jChainID;
+            
+            
             for(Integer i = 0; i < pg.sseList.size(); i++) {
                 for(Integer j = i + 1; j < pg.sseList.size(); j++) {
 
+                   
                     // If there is a contact...
                     if(pg.containsEdge(i, j)) {
 
@@ -3305,6 +3308,7 @@ E	3	3	3
                         else if(edgeType.equals(SpatRel.MIXED)) { ig2.setPaint(Color.GREEN); }
                         else if(edgeType.equals(SpatRel.LIGAND)) { ig2.setPaint(Color.MAGENTA); }
                         else if(edgeType.equals(SpatRel.BACKBONE)) { ig2.setPaint(Color.ORANGE); }
+                        else if(edgeType.equals(SpatRel.COMPLEX)) { ig2.setPaint(Color.BLACK); }
                         else { ig2.setPaint(Color.LIGHT_GRAY); }
 
                         if(bw) { ig2.setPaint(Color.LIGHT_GRAY); }      // for non-protein graphs
@@ -3319,7 +3323,9 @@ E	3	3	3
                         for(Integer x = 0; x < pg.chainEnd.size(); x++){
                             if(j < pg.chainEnd.get(x)) {jChainID = x; break;}
                         }
-                        if (!Objects.equals(iChainID, jChainID)) {ig2.setPaint(Color.PINK);}
+                        if (!Objects.equals(iChainID, jChainID)) {
+                            ig2.setPaint(Color.BLACK);
+                        }
                         // ----- end complex graph specific stuff -----
 
                         // determine the center of the arc and the width of its rectangle bounding box

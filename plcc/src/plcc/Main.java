@@ -108,8 +108,9 @@ public class Main {
     /** Whether the PDB file name given on the command line is used. This is not the case for command lines which only operate on the database or which need no input file (e.g., --recreate-tables). */
     static Boolean useFileFromCommandline = true;
 
-
-
+    
+    /** The threshold for interchain contacts in complex graphs. Chains with less contacts then the threshold won't be considered as interchain contacts.  */
+    static Integer chainComplexGraphContactThreshold = 10;
 
 
 
@@ -5699,21 +5700,83 @@ public class Main {
                 
         // create vertices for all chains
         ComplexGraph compGraph = new ComplexGraph(pdbid);
+        compGraph.chainResAASeq = new String[allChains.size()];
         for(Integer i = 0; i < allChains.size(); i++) {
             ComplexGraph.Vertex v = compGraph.createVertex();
             compGraph.proteinNodeMap.put(v, allChains.get(i).getPdbChainID());
+
+            // get AA sequence string for each chain
+            String key = allChains.get(i).getPdbChainID();
+            for(Residue resi : allChains.get(i).getResidues()){
+                
+                compGraph.chainResAASeq[i] = compGraph.chainResAASeq[i] + resi.getAAName1();
+                //String existing = compGraph.chainResAASeq.get(key);
+                //String newContent = 
+                //compGraph.chainResAASeq.put(key, existing == null ? newContent : existing + newContent);
+            }
             //System.out.println(allChains.get(i).getPdbChainID());
         }
-                
+        
+        // initialize homologues matrix
+        compGraph.homologueChains = new Integer[allChains.size()][allChains.size()];
+        compGraph.numChainInteractions = new Integer[allChains.size()][allChains.size()];
+        
         if(! silent) {
             System.out.println("  Computing CG contacts.");
         }
+        
+        //check for homologue chains
+        if(allChains.size() > 1){
+            for(Integer i = 0; i < allChains.size(); i++){
+                String curVal = compGraph.chainResAASeq[i];
+                for(Integer j = 0; j < allChains.size(); j++){
+                    String compareVal = compGraph.chainResAASeq[j];
+                    // make sure no chain is matched with itself
+                    if((curVal.equals(compareVal)) && (i != j)){ compGraph.homologueChains[i][j] = 1;
+                    } else {compGraph.homologueChains[i][j] = 0;}
+                }
+            }
+        }
+        
+        // calculate sum of interchain contacts
+        for(Integer i = 0; i < resContacts.size(); i++){
+            ComplexGraph.Vertex chainA = compGraph.getVertexFromChain(resContacts.get(i).getResA().getChainID());
+            ComplexGraph.Vertex chainB = compGraph.getVertexFromChain(resContacts.get(i).getResB().getChainID());
+           
+            Integer chainAint = Integer.parseInt(chainA.toString());
+            Integer chainBint = Integer.parseInt(chainB.toString());
+            
+            // We only want interchain contacts
+            if (!chainA.equals(chainB)){
+                if(compGraph.numChainInteractions[chainAint][chainBint] == null){
+                    compGraph.numChainInteractions[chainAint][chainBint] = 1;
+                } else {
+                    compGraph.numChainInteractions[chainAint][chainBint]++;
+                }
+            }
+        }
+        
+        
         // create edges for all contacts
         for(Integer i = 0; i < resContacts.size(); i++) {
             ComplexGraph.Vertex chainA = compGraph.getVertexFromChain(resContacts.get(i).getResA().getChainID());
             ComplexGraph.Vertex chainB = compGraph.getVertexFromChain(resContacts.get(i).getResB().getChainID());
+           
+            
+            Integer chainAint = Integer.parseInt(chainA.toString());
+            Integer chainBint = Integer.parseInt(chainB.toString());
+            
             // We only want interchain contacts
-            if (!chainA.equals(chainB)){
+            if (compGraph.chainsHaveEnoughContacts(chainAint, chainBint)){
+                
+                /*
+                if(compGraph.numChainInteractions[chainAint][chainBint] == null){
+                    compGraph.numChainInteractions[chainAint][chainBint] = 1;
+                } else {
+                    compGraph.numChainInteractions[chainAint][chainBint]++;
+                }
+              */
+                
                 if (compGraph.getEdge(chainA, chainB) == null){
                     // We don't have an edge yet, but need one, so create an edge
                     ComplexGraph.Edge e1 = compGraph.createEdge(chainA, chainB);
@@ -5899,6 +5962,8 @@ public class Main {
                 if(compGraph.numAllInteractionsMap.get(compGraph.getEdge(chainA, chainB)) == 0) {
                     compGraph.removeEdge(compGraph.getEdge(chainA, chainB));
                 }
+            } else {
+                compGraph.neglectedEdges++;
             }
         }
         if(! silent) {
@@ -6048,8 +6113,14 @@ public class Main {
 
         String imgFileNoExt = filePathImg + fs + fileNameWithoutExtension;
         //imgFile = filePathImg + fs + fileNameWithExtension;
-
         
+        //TESTING
+       
+        
+        IMAGEFORMAT[] formatsx = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
+        ComplexGraph.drawComplexGraph(imgFileNoExt, false, formatsx, compGraph);
+        
+        /*
         if(Settings.getBoolean("plcc_B_draw_graphs")) {
             IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
             SSEGraph.drawProteinGraph(imgFileNoExt, false, formats, pg);
@@ -6062,7 +6133,7 @@ public class Main {
                 System.out.println("    Image output disabled, not drawing complex graphs.");
             }
         }              
-        
+        */
         if(! silent) {
             System.out.println("Complex graph computation done.");
         }
