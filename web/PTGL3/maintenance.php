@@ -11,6 +11,40 @@ $title = "Maintenance";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
 
+function get_string_var_line($name, $value) {
+    return '$' . $name . ' = "' . $value . '";' . "\n";
+}
+
+function get_int_var_line($name, $value) {
+    return '$' . $name . ' = ' . $value . ';' . "\n";
+}
+
+function get_int_array_line($name, $values = array()) {
+    $str = '$' . $name . ' = array(';
+    for($i = 0; $i < count($values); $i++) {
+        $v = $values[$i];
+        $str .= $v;
+        if($i < count($values) - 1) {
+            $str .= ",";
+        }
+    }
+    $str .= ');' . "\n";
+    return $str;
+}
+
+function get_string_array_line($name, $values = array()) {
+    $str = '$' . $name . ' = array(';
+    for($i = 0; $i < count($values); $i++) {
+        $v = $values[$i];
+        $str .= '"' . $v . '"';
+        if($i < count($values) - 1) {
+            $str .= ", ";
+        }
+    }
+    $str .= ');' . "\n";
+    return $str;
+}
+
 function get_graphtype_abbr($graphtype_int){
 	switch ($graphtype_int){
 		case 1:
@@ -202,7 +236,19 @@ function get_linnots_filename($graphtype_int, $notation) {
                      Admin token:
                      <input type="password" name="admin_token" value="">
                      <input type="hidden" name="task" value="linnot_list">
-                     <input type="submit" value="Start linnot task" onclick="return confirm('This may take some time, it also places load on the server. Are you sure?')">
+                     <input type="submit" value="Start linnot task" onclick="return confirm('Linear Notations Task: This may take some time, it also places load on the server. Are you sure?')">
+                     </form> 
+                     
+                     <br><br>
+                     <b>Content stats</b> -- generate new statistics on the contents of the whole database for the content page.
+                     
+                     <form action="maintenance.php" method="POST">
+		     Admin ID:
+                     <input type="input" name="admin_id" value="">                     
+                     Admin token:
+                     <input type="password" name="admin_token" value="">
+                     <input type="hidden" name="task" value="content_stats">
+                     <input type="submit" value="Start content stats task" onclick="return confirm('Content Stats Task: This may take some time, it also places load on the server. Are you sure?')">
                      </form> 
 		   
 		   
@@ -248,6 +294,20 @@ function get_linnots_filename($graphtype_int, $notation) {
 			      }
 	
 		           }
+		           
+		           if($task === "content_stats") {
+		               echo "Content statistics task...<br>";
+		               $filename = "./temp_data/content_data2.php";
+		               $result_string_stats = '<?php' . "\n";
+		               $result_string_stats .= get_string_var_line("a", "b");
+		               $result_string_stats .= get_int_var_line("b", 1244);
+		               $result_string_stats .= get_int_array_line("b", array(1244, 343, 3243, 577));
+		               $result_string_stats .= get_string_array_line("b", array("hal", "lo", "du", "held"));
+		               $result_string_stats .= '?>' . "\n";
+			       $num_bytes_written = file_put_contents($filename, $result_string_stats);
+			       echo "Wrote $num_bytes_written bytes to file $filename.<br>\n";
+		           }
+		           
 		       echo "<br>\n";
 		       } else {
 		           sleep(3);
