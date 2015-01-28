@@ -302,6 +302,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
       // ------------------------- data for the plots ---------------------------
       
+    /*
     $last_update_month_and_year = "January 2015";
       
     $num_pdb_files = 98161;
@@ -329,7 +330,9 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
     
     $source_organisms_labels = array("Bos taurus", "Saccharomyces cerevisia", "Mus musculus", "Thermus thermophilus", "Unknown", "Escherichia coli", "Homo sapiens");
     $source_organisms = array(5219, 8822, 9349, 11464, 19161, 21117, 53667);
-
+    */
+    
+    include('./temp_data/content_data.php'); 
 
 
 
