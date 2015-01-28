@@ -502,6 +502,13 @@ if(($limit_start + $q_limit) < $row_count){
 $tableString .= '</div>';
 // EOPager
 
+// some queries know that they expect at least one result, e.g., because they have been send from the list of all linnots
+if(isset($_GET["exp"])) {
+    if($row_count <= 0 && $result) {
+        array_push($SHOW_ERROR_LIST, "Linnot search expecting result found nothing. The server admin needs to run the linnot update maintenance task.");
+    }
+}
+
 while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
         // set protein/chain information for readability		
         $pdb_id =  $arr['pdb_id'];
