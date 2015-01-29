@@ -419,6 +419,9 @@ function get_linnots_filename($graphtype_int, $notation) {
 		                   $all_queries_ok = FALSE;
 		               }
 		               
+		               
+		               // ===================================== SSEs ===================================
+		               
 		               // get the counts for all 3 SSE types
 		               // ----- get the number of helices in the database -----
 		               $res = array();
@@ -519,6 +522,54 @@ function get_linnots_filename($graphtype_int, $notation) {
 		                   array_push($SHOW_ERROR_LIST, "SSEs in albelig graphs count database query failed: '" . $res[0] . "'");
 		                   $all_queries_ok = FALSE;
 		               }
+		               
+		               // ===================================== contacts ===================================
+		               
+		               // ----- get the number of mixed (intrachain) contacts -----
+		               $res = array();
+		               $res = handle_fixed_query_one_result($db, "SELECT count(contact_id) as num_contacts from plcc_contact where contact_type = 1;", array("num_contacts"));
+		               if(is_array($res)) {
+		                   $num_contacts_mixed = $res["num_contacts"];
+		                   $result_string_stats .= get_int_var_line("num_contacts_mixed", $num_contacts_mixed);
+		               } else {
+		                   array_push($SHOW_ERROR_LIST, "Mixed contacts count database query failed: '" . $res[0] . "'");
+		                   $all_queries_ok = FALSE;
+		               }
+		               
+		               
+		               // ----- get the number of parallel (intrachain) contacts -----
+		               $res = array();
+		               $res = handle_fixed_query_one_result($db, "SELECT count(contact_id) as num_contacts from plcc_contact where contact_type = 2;", array("num_contacts"));
+		               if(is_array($res)) {
+		                   $num_contacts_parallel = $res["num_contacts"];
+		                   $result_string_stats .= get_int_var_line("num_contacts_parallel", $num_contacts_parallel);
+		               } else {
+		                   array_push($SHOW_ERROR_LIST, "Parallel contacts count database query failed: '" . $res[0] . "'");
+		                   $all_queries_ok = FALSE;
+		               }
+		               
+		               // ----- get the number of anti-parallel (intrachain) contacts -----
+		               $res = array();
+		               $res = handle_fixed_query_one_result($db, "SELECT count(contact_id) as num_contacts from plcc_contact where contact_type = 3;", array("num_contacts"));
+		               if(is_array($res)) {
+		                   $num_contacts_antiparallel = $res["num_contacts"];
+		                   $result_string_stats .= get_int_var_line("num_contacts_antiparallel", $num_contacts_antiparallel);
+		               } else {
+		                   array_push($SHOW_ERROR_LIST, "Antiparallel contacts count database query failed: '" . $res[0] . "'");
+		                   $all_queries_ok = FALSE;
+		               }
+		               
+		               // ----- get the number of ligand (intrachain) contacts -----
+		               $res = array();
+		               $res = handle_fixed_query_one_result($db, "SELECT count(contact_id) as num_contacts from plcc_contact where contact_type = 4;", array("num_contacts"));
+		               if(is_array($res)) {
+		                   $num_contacts_ligand = $res["num_contacts"];
+		                   $result_string_stats .= get_int_var_line("num_contacts_ligand", $num_contacts_ligand);
+		               } else {
+		                   array_push($SHOW_ERROR_LIST, "Ligand contacts count database query failed: '" . $res[0] . "'");
+		                   $all_queries_ok = FALSE;
+		               }
+		               
 		               
 		               
 		               
