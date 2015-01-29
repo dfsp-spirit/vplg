@@ -6,19 +6,66 @@ ini_set('display_startup_errors',1);
 error_reporting(-1);
 
 include('./backend/config.php'); 
+$SHOW_ERROR_LIST = array();
+include('./common.php');
+$DO_SHOW_ERROR_LIST = $DEBUG_MODE;
+
 
 $title = "Maintenance";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
 
+/**
+  * Runs the given query, which MUST be secured, i.e., not contain any user supplied parts. ONLY USE THIS FOR INTERNAL QUERIES, OR IT WILL ALLOW SQL INJECTION!
+  * The query is expected to return a single result (one row with one field), like a count query does.
+  * @param $db the db connection to run the query on
+  * @param $sql_query the SQL query, something like "SELECT count(field_a) from table_b"
+  * @return a result array if the query was executed successfully. if an error occured, a string containing an error message is returned instead.
+  */
+function handle_fixed_query_one_result($db, $sql_query, $result_field_names = array()) {
+    if(! $db) {
+        return "ERROR: Database connection failed.";
+    }
+    $ret = array();
+    $result = pg_query($db, $sql_query);    
+
+    $ret = array();
+    
+    if(! $result) { 
+        $ret = "DB ERROR: '" . pg_last_error($db) . "'";
+    } 
+    else {				
+        $all_data = pg_fetch_all($result);
+        if(count($all_data) == 1) {
+            $row = $all_data[0];
+            if(count($row) == 1) {
+                $ret = array();
+                foreach($result_field_names as $f) {
+                    $ret[$f] = $row[$f];
+                }
+            }
+        }
+    }
+    return $ret;
+}
+
+/**
+ * Returns a line of php code with a var of the given name with the given value.
+ */
 function get_string_var_line($name, $value) {
     return '$' . $name . ' = "' . $value . '";' . "\n";
 }
 
+/**
+ * Returns a line of php code with a var of the given name with the given value.
+ */
 function get_int_var_line($name, $value) {
     return '$' . $name . ' = ' . $value . ';' . "\n";
 }
 
+/**
+ * Returns a line of php code with a var of the given name with the given value.
+ */
 function get_int_array_line($name, $values = array()) {
     $str = '$' . $name . ' = array(';
     for($i = 0; $i < count($values); $i++) {
@@ -32,6 +79,9 @@ function get_int_array_line($name, $values = array()) {
     return $str;
 }
 
+/**
+ * Returns a line of php code with a var of the given name with the given value.
+ */
 function get_string_array_line($name, $values = array()) {
     $str = '$' . $name . ' = array(';
     for($i = 0; $i < count($values); $i++) {
@@ -45,6 +95,10 @@ function get_string_array_line($name, $values = array()) {
     return $str;
 }
 
+
+/**
+ * Translates the graph type int constant to the string, e.g., 1 => alpha, 2 => beta, ...
+ */
 function get_graphtype_abbr($graphtype_int){
 	switch ($graphtype_int){
 		case 1:
@@ -68,6 +122,9 @@ function get_graphtype_abbr($graphtype_int){
 	}
 }
 
+/**
+  * Checks the given credentials (both of which are expected to be MD5 encoded).
+  */
 function check_auth($id, $token)  {
     if(md5($id) === "4d682ec4eed27c53849758bc13b6e179" || md5($id) === "d77d5e503ad1439f585ac494268b351b") {
         if(md5($token) === "c8bd0177e53c5d2fec5d7e8cba43c505") {
@@ -77,6 +134,10 @@ function check_auth($id, $token)  {
     return FALSE;
 }
 
+
+/**
+ * Builds and returns an SQL query string for the linear notations of the given graph type and notation.
+ */
 function get_all_linnots_query_string($graphtype_int, $notation){
     $query = "SELECT DISTINCT fglin.ptgl_linnot_%s
     FROM plcc_fglinnot fglin
@@ -90,7 +151,9 @@ function get_all_linnots_query_string($graphtype_int, $notation){
 return $query;	
 } 
 
-
+/**
+ * Builds and returns an SQL query string for the linear notations of the given graph type and notation, making use of the new denormalized DB fields. Should thus be faster than the other version.
+ */
 function get_all_linnots_query_string_denormalized($graphtype_int, $notation){
 	$query =   "SELECT DISTINCT fglin.ptgl_linnot_%s
 				FROM plcc_fglinnot fglin				
@@ -101,6 +164,12 @@ function get_all_linnots_query_string_denormalized($graphtype_int, $notation){
 	return $query;			
 }
 
+/**
+  * Builds the filename of the linear notation $notation of the given graph type.
+  * @param $graphtype_int the graph type as an integer (1=alpha, 2=beta, ...)
+  * @param $notation the notation as a string, e.g., "adj" or "key"
+  * @return the filne name, including file extension but with no path
+  */
 function get_linnots_filename($graphtype_int, $notation) {
     $graphtype = get_graphtype_abbr($graphtype_int);
     return "linnots_" . $notation . "_" . $graphtype . ".lst";
@@ -207,7 +276,7 @@ function get_linnots_filename($graphtype_int, $notation) {
 				  
 				  // check whether tmp download dir (where the zip files are stored for download) is writable
 				  if ( ! $tmp_data_dir_ok) {
-				      echo "<li>The temporary data directory is not writable, cannot update linnot files.</li>\n";
+				      echo "<li>The temporary data directory is not writable, cannot update linnot files and stats by running admin tasks.</li>\n";
 				  }
 				  
 				  // check for existence of image data directory
@@ -297,15 +366,37 @@ function get_linnots_filename($graphtype_int, $notation) {
 		           
 		           if($task === "content_stats") {
 		               echo "Content statistics task...<br>";
+		               
 		               $filename = "./temp_data/content_data2.php";
 		               $result_string_stats = '<?php' . "\n";
-		               $result_string_stats .= get_string_var_line("a", "b");
-		               $result_string_stats .= get_int_var_line("b", 1244);
-		               $result_string_stats .= get_int_array_line("b", array(1244, 343, 3243, 577));
-		               $result_string_stats .= get_string_array_line("b", array("hal", "lo", "du", "held"));
+		               
+		               $all_queries_ok = TRUE;
+		               
+		               $res = array();
+		               $res = handle_fixed_query_one_result($db, "SELECT count(pdb_id) as cnt from plcc_protein;", array("cnt"));
+		               if(is_array($res)) {
+		                   $num_pdb_files = $res["cnt"];
+		                   echo "yes, $num_pdb_files PDB files.";
+		                   $result_string_stats .= get_int_var_line("num_pdb_files", $num_pdb_files);
+		               } else {
+		                   array_push($SHOW_ERROR_LIST, "Database query failed: '" . $res[0] . "'");
+		                   $all_queries_ok = FALSE;
+		               }
+		               
+		               
+		               //$result_string_stats .= get_string_var_line("a", "b");
+		               //$result_string_stats .= get_int_var_line("b", 1244);
+		               //$result_string_stats .= get_int_array_line("b", array(1244, 343, 3243, 577));
+		               //$result_string_stats .= get_string_array_line("b", array("hal", "lo", "du", "held"));
+		               
 		               $result_string_stats .= '?>' . "\n";
-			       $num_bytes_written = file_put_contents($filename, $result_string_stats);
-			       echo "Wrote $num_bytes_written bytes to file $filename.<br>\n";
+		               if($all_queries_ok) {
+			           $num_bytes_written = file_put_contents($filename, $result_string_stats);
+			           echo "Wrote $num_bytes_written bytes to file '$filename'.<br>\n";
+			       }
+			       else {
+			           echo "ERROR: Some queries failed, did NOT write any results to file '$filename'.<br>\n";
+			       }
 		           }
 		           
 		       echo "<br>\n";
@@ -328,6 +419,13 @@ function get_linnots_filename($graphtype_int, $notation) {
 	</div>
 
 </div><!-- end wrapper -->
+
+<?php
+// show red error bar on bottom of screen if enabled and error list is non-empty
+if($DO_SHOW_ERROR_LIST) {
+  show_the_errors($SHOW_ERROR_LIST);  
+}
+?>
 
 
 <?php include('footer.php'); ?>
