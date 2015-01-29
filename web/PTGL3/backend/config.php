@@ -45,6 +45,8 @@ $MAINTENANCE_MESSAGE = "<b>INFO:</b> We are currently doing some maintenance on 
 //---- File settings ----//
 $BUILD_FILE_PATH	= FALSE;
 $IMG_ROOT_PATH		= './data/';
+$TMP_DATA_DIR		= './temp_data/';
+$TMP_DOWNLOAD_DIR	= './temp_downloads/';
 //---- End of file settings ----//
 
 
