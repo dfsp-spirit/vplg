@@ -4,6 +4,7 @@
  *   
  * @author Daniel Bruness <dbruness@gmail.com>
  * @author Andreas Scheck <andreas.scheck.home@googlemail.com>
+ * @author Tim Schäfer
  */
 
 /**

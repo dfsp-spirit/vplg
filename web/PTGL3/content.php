@@ -484,7 +484,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		  
 		  echo "<br/><br/><br/><br/>\n";
 		  
-		  
+		  /*
 		  // ----- protein functions -----
 		  
 		  //$protein_functions_labels = array("Transcription", "Unknown", "Immune system", "Lyase", "Oxidureductase", "Transferase", "Hydrolase");
@@ -513,6 +513,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		  echo "<h4>Most common source organisms</h4>\n" . $code . "\n\n";
 		  
 		  echo "<br/><br/><br/><br/>\n";
+		  */
 		  
 ?>
 		
