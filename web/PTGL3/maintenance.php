@@ -372,16 +372,42 @@ function get_linnots_filename($graphtype_int, $notation) {
 		               
 		               $all_queries_ok = TRUE;
 		               
+		               
+		               // ----- get the number of PDB files in the database -----
 		               $res = array();
 		               $res = handle_fixed_query_one_result($db, "SELECT count(pdb_id) as cnt from plcc_protein;", array("cnt"));
 		               if(is_array($res)) {
 		                   $num_pdb_files = $res["cnt"];
-		                   echo "yes, $num_pdb_files PDB files.";
+		                   //echo "yes, $num_pdb_files PDB files.";
 		                   $result_string_stats .= get_int_var_line("num_pdb_files", $num_pdb_files);
 		               } else {
-		                   array_push($SHOW_ERROR_LIST, "Database query failed: '" . $res[0] . "'");
+		                   array_push($SHOW_ERROR_LIST, "PDB file count database query failed: '" . $res[0] . "'");
 		                   $all_queries_ok = FALSE;
 		               }
+		               
+		               // ----- get the number of PDB chains in the database -----
+		               $res = array();
+		               $res = handle_fixed_query_one_result($db, "SELECT count(chain_id) as cnt from plcc_chain;", array("cnt"));
+		               if(is_array($res)) {
+		                   $num_pdb_chains = $res["cnt"];
+		                   $result_string_stats .= get_int_var_line("num_pdb_chains", $num_pdb_chains);
+		               } else {
+		                   array_push($SHOW_ERROR_LIST, "PDB chain count database query failed: '" . $res[0] . "'");
+		                   $all_queries_ok = FALSE;
+		               }
+		               
+		               // ----- get the number of SSEs in the database -----
+		               $res = array();
+		               $res = handle_fixed_query_one_result($db, "SELECT count(sse_id) as cnt from plcc_sse;", array("cnt"));
+		               if(is_array($res)) {
+		                   $num_sses = $res["cnt"];
+		                   $result_string_stats .= get_int_var_line("num_sses", $num_sses);
+		               } else {
+		                   array_push($SHOW_ERROR_LIST, "SSE count database query failed: '" . $res[0] . "'");
+		                   $all_queries_ok = FALSE;
+		               }
+		               
+		               
 		               
 		               
 		               //$result_string_stats .= get_string_var_line("a", "b");
