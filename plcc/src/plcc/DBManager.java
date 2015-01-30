@@ -155,7 +155,7 @@ public class DBManager {
         for(String[] pdbChain : pdbChains) {
             pdb_id = pdbChain[0];
             chain = pdbChain[1];
-            numUpdatedInDB += DBManager.markChainRepresentative(pdb_id, chain, Boolean.TRUE);
+            numUpdatedInDB += DBManager.markChainRepresentative(pdb_id, chain, true);
         }
         
         return new Integer[] { pdbChains.size(), numUpdatedInDB };
@@ -169,7 +169,7 @@ public class DBManager {
      * @return the number of updated rows in the DB
      * @throws SQLException if DB stuff goes wrong
      */
-    public static Integer markChainRepresentative(String pdb_id, String chain, Boolean targetValue) throws SQLException {
+    public static Integer markChainRepresentative(String pdb_id, String chain, boolean targetValue) throws SQLException {
         
         String query = "UPDATE " + tbl_chain + " SET chain_isinnonredundantset = ? WHERE pdb_id = ? AND chain_name = ?;";        
         
@@ -179,7 +179,7 @@ public class DBManager {
         try {
             statement = dbc.prepareStatement(query);
             
-            statement.setInt(1, (targetValue.equals(true) ? 1 : 0));
+            statement.setInt(1, (targetValue == true ? 1 : 0));
             statement.setString(2, pdb_id);
             statement.setString(3, chain);
                                 

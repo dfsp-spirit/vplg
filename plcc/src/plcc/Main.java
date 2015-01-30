@@ -1027,6 +1027,9 @@ public class Main {
                 if(! silent) {
                     System.out.println("Done. Found " + res[0] + " chains and " + res[1] + " graphlet counts for them in the DB. Computed " + res[2] + " similarity scores and saved " + res[3] + " of them to the DB.");
                 }
+                if( ! DBManager.getAutoCommit()) {
+                    DBManager.commit();
+                }
                 System.exit(0);
             } else {
                 System.err.println("ERROR: Could not connect to DB, exiting.");
@@ -1042,6 +1045,7 @@ public class Main {
             
             if(! silent) {
                 System.out.println("Marking all representative PDB chains in the database from data in XML file '" + Settings.get("plcc_S_representative_chains_xml_file") + "'...");
+                System.out.println("  Parsing XML file...");
             }
             
             if( ! (xmlFile.isFile() && xmlFile.canRead())) {
@@ -1067,7 +1071,7 @@ public class Main {
                 XMLContentHandlerPDBRepresentatives handler = new XMLContentHandlerPDBRepresentatives();            
                 p.handleXML(xml, handler);
                 List<String> pdbChains = handler.getPdbChainList();
-                System.out.println("Received a list of " + pdbChains.size() + " chains from handler:");
+                System.out.println("Received a list of " + pdbChains.size() + " chains from XML parser. Writing data to DB...");
                 for(String ic : pdbChains) {
                     sep = PlccUtilities.parsePdbidAndChain(ic);
                     if(sep != null) {
@@ -1096,6 +1100,9 @@ public class Main {
                 catch(SQLException e) {
                     System.err.println("ERROR: Updating representatives in DB failed: '" + e.getMessage() + "'.");
                     System.exit(1);
+                }
+                if( ! DBManager.getAutoCommit()) {
+                    DBManager.commit();
                 }
                 System.exit(0);
             } else {
