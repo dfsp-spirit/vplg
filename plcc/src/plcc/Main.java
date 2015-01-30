@@ -31,6 +31,7 @@ import java.util.*;
 import java.util.Locale;
 import java.util.logging.Level;
 import javax.imageio.ImageIO;
+import javax.xml.parsers.ParserConfigurationException;
 //import java.net.*;
 //import org.jgrapht.*;
 //import org.jgrapht.graph.*;
@@ -43,10 +44,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 import plcc.DrawTools.IMAGEFORMAT;
 import similarity.CompareOneToDB;
 import similarity.Similarity;
 import tools.DP;
+import tools.PlccUtilities;
+import tools.XMLContentHandlerPDBRepresentatives;
+import tools.XMLErrorHandlerJAX;
+import tools.XMLParserJAX;
 
 /**
  * This is the Main class of plcc.
@@ -272,7 +278,7 @@ public class Main {
                         }
                     }
                     
-                            
+                    
                     
                     if(s.equals("--gz-dsspfile")) {
                         if(args.length <= i+1 ) {
@@ -379,6 +385,17 @@ public class Main {
                         Settings.set("plcc_B_compute_all_graphlet_similarities", "true");                        
                     }
                     
+                    if(s.equals("--set-pdb-representative-chains")) {
+                        if(args.length <= i+1 ) {
+                            syntaxError("The --set-pdb-representative-chains option requires an XML file to read the data from.");
+                        }
+                        else {
+                            useFileFromCommandline = false;                                                        
+                            Settings.set("plcc_B_useDB", "true");
+                            Settings.set("plcc_B_set_pdb_representative_chains", "true");
+                            Settings.set("plcc_S_representative_chains_xml_file", args[i+1]);
+                        }
+                    }
                     
                     
                     
@@ -1017,6 +1034,77 @@ public class Main {
             }   
             
         }
+        
+        // mark the rep chains in the DB, then exit
+        if(Settings.getBoolean("plcc_B_set_pdb_representative_chains")) {
+            
+            File xmlFile = new File(Settings.get("plcc_S_representative_chains_xml_file"));
+            
+            if(! silent) {
+                System.out.println("Marking all representative PDB chains in the database from data in XML file '" + Settings.get("plcc_S_representative_chains_xml_file") + "'...");
+            }
+            
+            if( ! (xmlFile.isFile() && xmlFile.canRead())) {
+                System.err.println("ERROR: Cannot read XML file '" + xmlFile.getAbsolutePath() + "' or not a normal file.");
+                System.exit(1);
+            }
+            
+            // get list by parsing XML
+            List<String[]> repChains = new ArrayList<>();
+            XMLParserJAX p;
+            String[] sep;
+            String xml = null;
+            try {
+                xml = FileParser.slurpFileToString(xmlFile.getAbsolutePath());
+            }
+            catch(IOException e) {
+                System.err.println("ERROR: Failed to read XML file '" + xmlFile.getAbsolutePath() + "', exiting.");
+            }
+            
+            try {
+                p = new XMLParserJAX();
+                p.setErrorHandler(new XMLErrorHandlerJAX(System.err));
+                XMLContentHandlerPDBRepresentatives handler = new XMLContentHandlerPDBRepresentatives();            
+                p.handleXML(xml, handler);
+                List<String> pdbChains = handler.getPdbChainList();
+                System.out.println("Received a list of " + pdbChains.size() + " chains from handler:");
+                for(String ic : pdbChains) {
+                    sep = PlccUtilities.parsePdbidAndChain(ic);
+                    if(sep != null) {
+                        repChains.add(sep);
+                        //System.out.println("PDB ID: " + sep[0] + ", chain " + sep[1] + "");
+                    } else {
+                        System.err.println("WARNING: Result from XML parsing could not be plsit into PDB ID and chain, skipping.");
+                    }
+                }
+
+            } catch(ParserConfigurationException | SAXException | IOException e) {
+                System.err.println("ERROR: '" + e.getMessage() + "'. Could not parse XML file, aborting.");
+                System.exit(1);
+            }
+            
+            // let the DB manager handle the list
+            if(DBManager.initUsingDefaults()) {
+                Integer[] res;
+                try {
+                    res = DBManager.markAllRepresentativeChainsFromList(repChains);
+                    // numChainsInList, numChainsUpdatedInDB
+                    if(! silent) {
+                        System.out.println("Done. Found and updated " + res[1] + " of the " + res[0] + " chains in the DB.");
+                    }
+                }
+                catch(SQLException e) {
+                    System.err.println("ERROR: Updating representatives in DB failed: '" + e.getMessage() + "'.");
+                    System.exit(1);
+                }
+                System.exit(0);
+            } else {
+                System.err.println("ERROR: Could not connect to DB, exiting.");
+                System.exit(1);
+            }   
+            
+        }
+        
         
         if(Settings.getBoolean("plcc_B_report_db_proteins")) {
             String reportFileName = "db_contents_proteins.txt";

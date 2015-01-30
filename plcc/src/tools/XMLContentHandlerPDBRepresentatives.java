@@ -25,6 +25,7 @@ public class XMLContentHandlerPDBRepresentatives extends DefaultHandler {
     public List<String> pdbChains;
     private boolean doneParsing = false;
     protected String tag = "[SAX-CH] ";
+    private final boolean verbose = false;
 
     @Override
     public void startDocument() throws SAXException {
@@ -37,27 +38,18 @@ public class XMLContentHandlerPDBRepresentatives extends DefaultHandler {
 
         String key = localName;
         if(key.equals("representatives")) {
-            System.out.println(tag + "Found representatives list.");
+            if(verbose) {
+                System.out.println(tag + "Found representatives list.");
+            }
         }
         else if(key.equals("pdbChain")) {
-            System.out.print(tag + "Found a PDB chain: namespaceURI=" + namespaceURI + ", localName=" + localName + ", qName=" + qName + ". Attributes: ");
             for(int i = 0; i < atts.getLength(); i++) {
                 String attribute = atts.getLocalName(i);
                 if(attribute.equals("name")) {
-                    System.out.print(tag + "PDB chain=" + atts.getValue(attribute));
                     pdbChains.add(atts.getValue(attribute));
-                }
-                if(attribute.equals("rank")) {
-                    System.out.print(tag + "rank=" + atts.getValue(attribute));
-                }
-                
-                if(i < atts.getLength() - 1) {
-                    System.out.print(", ");
-                }
+                }                
             }
-            System.out.print("\n");
-        }
-    
+        }    
     }
     
     public List<String> getPdbChainList() {
@@ -72,10 +64,10 @@ public class XMLContentHandlerPDBRepresentatives extends DefaultHandler {
 
     @Override
     public void endDocument() throws SAXException {
-        for (String pdbChain : pdbChains) {
-            System.out.println(tag + "Found PDB chain: " + pdbChain);
-        }
-        System.out.println(tag + "Found " + pdbChains.size() + " chains total.");
+        //for (String pdbChain : pdbChains) {
+        //    System.out.println(tag + "Found PDB chain: " + pdbChain);
+        //}
+        //System.out.println(tag + "Found " + pdbChains.size() + " chains total.");
         doneParsing = true;
     }
     

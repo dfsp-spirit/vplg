@@ -142,7 +142,66 @@ public class DBManager {
         return (conOK);
     }
     
+    /**
+     * This function sets the attribute that marks a chain as part of the representative chains set for all chains in the given list.
+     * @param pdbChains a list of PDB chains, each String array in the list has length 2 and looks like ["7tim", "A"].
+     * @return an array of numbers, each position logs a count. 0 = number of chains in input list. 1 = number of chains updated in DB.
+     * @throws SQLException if DB stuff goes wrong
+     */
+    public static Integer[] markAllRepresentativeChainsFromList(List<String[]> pdbChains) throws SQLException {
+        Integer numUpdatedInDB = 0;
+        
+        String pdb_id, chain;
+        for(String[] pdbChain : pdbChains) {
+            pdb_id = pdbChain[0];
+            chain = pdbChain[1];
+            numUpdatedInDB += DBManager.markChainRepresentative(pdb_id, chain, Boolean.TRUE);
+        }
+        
+        return new Integer[] { pdbChains.size(), numUpdatedInDB };
+    }
     
+    /**
+     * Updates the part of representative chain set status of the given chain.
+     * @param pdb_id the PDB ID, e.g., "7tim"
+     * @param chain the chain name, e.g., "A"
+     * @param targetValue true for chains which are part of the set, false otherwise
+     * @return the number of updated rows in the DB
+     * @throws SQLException if DB stuff goes wrong
+     */
+    public static Integer markChainRepresentative(String pdb_id, String chain, Boolean targetValue) throws SQLException {
+        
+        String query = "UPDATE " + tbl_chain + " SET chain_isinnonredundantset = ? WHERE pdb_id = ? AND chain_name = ?;";        
+        
+        Integer numRowsAffected = 0;
+        PreparedStatement statement = null;
+        
+        try {
+            statement = dbc.prepareStatement(query);
+            
+            statement.setInt(1, (targetValue.equals(true) ? 1 : 0));
+            statement.setString(2, pdb_id);
+            statement.setString(3, chain);
+                                
+            numRowsAffected = statement.executeUpdate();
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: markChainRepresentative: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: markChainRepresentative: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: markChainRepresentative: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+        } 
+       
+        return numRowsAffected;
+    }
     
     /**
      * Calls init, which connects to the DB, with the settings from the currently loaded settings (from cfg file or internal if no cfg file/unset in it).
@@ -704,7 +763,7 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_graphtypes + " (graphtype_id int not null primary key,  graphtype_text text not null);");
             
             doInsertQuery("CREATE TABLE " + tbl_protein + " (pdb_id varchar(4) primary key, header text not null, title text not null, experiment text not null, keywords text not null, resolution real not null);");
-            doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(2) not null, mol_name text not null, organism_scientific text not null, organism_common text not null, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, chain_isinnonredundantset smallint DEFAULT 1);");
+            doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(2) not null, mol_name text not null, organism_scientific text not null, organism_common text not null, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, chain_isinnonredundantset smallint DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence text not null, sse_type int not null references " + tbl_ssetypes + " ON DELETE CASCADE, lig_name varchar(5), position_in_chain int);");
             doInsertQuery("CREATE TABLE " + tbl_secondat + " (secondat_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, alpha_fg_number int, alpha_fg_foldname varchar(2), alpha_fg_position int, beta_fg_number int, beta_fg_foldname varchar(2), beta_fg_position int, albe_fg_number int, albe_fg_foldname varchar(2), albe_fg_position int, alphalig_fg_number int, alphalig_fg_foldname varchar(2), alphalig_fg_position int, betalig_fg_number int, betalig_fg_foldname varchar(2), betalig_fg_position int, albelig_fg_number int, albelig_fg_foldname varchar(2), albelig_fg_position int);");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null references " + tbl_contacttypes + " ON DELETE CASCADE, check (sse1 < sse2));");

@@ -22,7 +22,7 @@ public class XMLErrorHandlerJAX implements ErrorHandler {
     
     final private PrintStream out;
 
-    XMLErrorHandlerJAX(PrintStream out) {
+    public XMLErrorHandlerJAX(PrintStream out) {
         this.out = out;
     }
 
