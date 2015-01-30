@@ -85,6 +85,7 @@ function get_folding_graph_path_and_file_name_no_ext($pdbid, $chain, $graphtype_
 }
 
 $pageload_was_search = FALSE;
+$valid_values = FALSE;
 
 if(isset($_GET['pdbchain']) && isset($_GET['graphtype_int']) && isset($_GET['notationtype'])){
         $pageload_was_search = TRUE;

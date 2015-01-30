@@ -49,7 +49,7 @@ public class XMLParserJAX {
     
     
     /**
-     * Main class for testing only
+     * Main class for testing only. Currently test the SequenceCluster handler.
      * @param args ignored
      * @throws IOException 
      */

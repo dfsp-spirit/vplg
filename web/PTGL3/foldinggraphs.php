@@ -10,6 +10,15 @@ $DO_SHOW_ERROR_LIST = $DEBUG_MODE;
 
 $title = "Folding graphs";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
+
+function get_total_foldinggraphs_count($db) {
+  $query = "SELECT count(fg.foldinggraph_id) as count FROM plcc_foldinggraph fg";
+  $result = pg_query($db, $query);  
+  $arr = pg_fetch_array($result, NULL, PGSQL_ASSOC);
+  return $arr['count'];
+}
+
+
 ?>
 <html>
 <head>
@@ -154,7 +163,15 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 					echo $img_string;
 				      }
 				      else {
-					echo "<br><h3> No Folding graph images found for your query</h3><br><p>Sorry, your query returned no results.</p>\n";
+				      
+				        $conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
+                                        $db = pg_connect($conn_string);
+                                        $num_fgraphs = 0;
+                                        if($db) {
+                                          $num_fgraphs = get_total_foldinggraphs_count($db);
+                                        }
+
+					echo "<br><h3> No Folding graph images found for your query</h3><br><p>Sorry, your query returned no results. (There are $num_fgraphs folding graphs in the database.)</p>\n";
 				      }
 				  }
 				  else {
