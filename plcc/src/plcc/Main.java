@@ -386,14 +386,24 @@ public class Main {
                     }
                     
                     if(s.equals("--set-pdb-representative-chains")) {
-                        if(args.length <= i+1 ) {
-                            syntaxError("The --set-pdb-representative-chains option requires an XML file to read the data from.");
+                        if(args.length <= i+2 ) {
+                            syntaxError("The --set-pdb-representative-chains option requires an XML file to read the data from AND the info whether to remove old labels. For the latter, valid values are 'keep' or 'remove'.");
                         }
                         else {
                             useFileFromCommandline = false;                                                        
                             Settings.set("plcc_B_useDB", "true");
                             Settings.set("plcc_B_set_pdb_representative_chains", "true");
                             Settings.set("plcc_S_representative_chains_xml_file", args[i+1]);
+                            if(args[i+2].equals("keep")) {
+                                Settings.set("plcc_B_set_pdb_representative_chains_remove_old_labels", "false");
+                            }
+                            else if(args[i+2].equals("remove")) {
+                                Settings.set("plcc_B_set_pdb_representative_chains_remove_old_labels", "true");
+                            }
+                            else {
+                                syntaxError("The --set-pdb-representative-chains option requires an XML file to read the data from AND the info whether to remove old labels. For the latter, valid values are 'keep' or 'remove'.");
+                            }
+                            
                         }
                     }
                     
@@ -1078,7 +1088,7 @@ public class Main {
                         repChains.add(sep);
                         //System.out.println("PDB ID: " + sep[0] + ", chain " + sep[1] + "");
                     } else {
-                        System.err.println("WARNING: Result from XML parsing could not be plsit into PDB ID and chain, skipping.");
+                        System.err.println("WARNING: Result from XML parsing could not be split into PDB ID and chain, skipping.");
                     }
                 }
 
@@ -1090,11 +1100,33 @@ public class Main {
             // let the DB manager handle the list
             if(DBManager.initUsingDefaults()) {
                 Integer[] res;
+                Integer numOldLabelsRemoved = 0;
+                
+                Integer numChainsInDB = DBManager.countChainsInDB();
+                
+                // remove the old marking if required
+                if(Settings.getBoolean("plcc_B_set_pdb_representative_chains_remove_old_labels")) {
+                    try {
+                        numOldLabelsRemoved = DBManager.markAllChainsAsNonRepresentative();
+                        if( ! DBManager.getAutoCommit()) {
+                            DBManager.commit();
+                        }
+                        // numChainsInList, numChainsUpdatedInDB
+                        if(! silent) {
+                            System.out.println("  Removed " + numOldLabelsRemoved + " old labels from the " + numChainsInDB + " chains in the DB.");
+                        }
+                    }
+                    catch(SQLException e) {
+                        System.err.println("ERROR: Removing old representative labels in DB failed: '" + e.getMessage() + "'.");
+                        System.exit(1);
+                    }
+                }
+                
                 try {
                     res = DBManager.markAllRepresentativeChainsFromList(repChains);
                     // numChainsInList, numChainsUpdatedInDB
                     if(! silent) {
-                        System.out.println("Done. Found and updated " + res[1] + " of the " + res[0] + " chains in the DB.");
+                        System.out.println("Done. Found and updated " + res[1] + " of the " + res[0] + " labels from the XML file in the DB. (The DB contains " + numChainsInDB + " chains atm.)");
                     }
                 }
                 catch(SQLException e) {

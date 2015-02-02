@@ -161,6 +161,45 @@ public class DBManager {
         return new Integer[] { pdbChains.size(), numUpdatedInDB };
     }
     
+    
+    /**
+     * Marks all chains which are currently in the DB as NOT part of the representative 40 set. This
+     * function can be called before labeling those in a list of representative, to ensure that an
+     * already existing labeling is removed before applying the new one.
+     * @return the number of updated rows in the DB
+     * @throws SQLException if DB stuff goes wrong
+     */
+    public static Integer markAllChainsAsNonRepresentative() throws SQLException {
+        
+        String query = "UPDATE " + tbl_chain + " SET chain_isinnonredundantset = 0;";        
+        
+        Integer numRowsAffected = 0;
+        PreparedStatement statement = null;
+        
+        try {
+            statement = dbc.prepareStatement(query);
+                                
+            numRowsAffected = statement.executeUpdate();
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: markAllChainsAsNonRepresentative: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: markAllChainsAsNonRepresentative: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: markAllChainsAsNonRepresentative: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+        } 
+       
+        return numRowsAffected;
+    }
+    
+    
     /**
      * Updates the part of representative chain set status of the given chain.
      * @param pdb_id the PDB ID, e.g., "7tim"
@@ -555,6 +594,30 @@ public class DBManager {
         }
     }
 
+    
+    /**
+     * Determines the number of chains in the database.
+     * @return the chain count
+     */
+    public static Integer countChainsInDB() {
+        String query = "SELECT count(*) FROM plcc_chain";
+        ArrayList<ArrayList<String>> tableData = DBManager.doSelectQuery(query);
+        
+        if(tableData == null) {
+            System.err.println("ERROR: Could not count chains in database.");
+            return -1;
+        }
+        else {
+            Integer num = -1;
+            try {
+                num = Integer.parseInt(tableData.get(0).get(0));
+            } catch(Exception e) {
+                System.err.println("ERROR: Database count result parsing failed '" + e.getMessage() + "'.");
+            }
+            return num;
+        }
+    }
+    
     /**
      * Executes a select query. WARNING: This does not do any checks on the input so do not expose this to user input.
      * @param query the SQL query
