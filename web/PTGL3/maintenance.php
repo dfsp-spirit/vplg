@@ -400,6 +400,17 @@ function get_linnots_filename($graphtype_int, $notation) {
 		                   $all_queries_ok = FALSE;
 		               }
 		               
+		               // ----- get the number of PDB chains in the database which are part of non-redundant set-----
+		               $res = array();
+		               $res = handle_fixed_query_one_result($db, "SELECT count(chain_id) as cnt from plcc_chain WHERE chain_isinnonredundantset = 1;", array("cnt"));
+		               if(is_array($res)) {
+		                   $num_protein_chains_nonredundant = $res["cnt"];
+		                   $result_string_stats .= get_int_var_line("num_protein_chains_nonredundant", $num_protein_chains_nonredundant);
+		               } else {
+		                   array_push($SHOW_ERROR_LIST, "PDB nonredundant chain count database query failed: '" . $res[0] . "'");
+		                   $all_queries_ok = FALSE;
+		               }
+		               
 		               // ----- get the number of SSEs in the database -----
 		               $res = array();
 		               $res = handle_fixed_query_one_result($db, "SELECT count(sse_id) as cnt from plcc_sse;", array("cnt"));
