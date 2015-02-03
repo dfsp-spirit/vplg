@@ -175,7 +175,7 @@ private static DrawResult drawProteinGraphG2D(Boolean nonProteinGraph, ComplexGr
 
     if(Settings.getBoolean("plcc_B_graphimg_header")) {
         ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
-        ig2.drawString(addInfo, pl.headerStart.x, pl.headerStart.y + pl.textLineHeight);
+        //i2.drawString(addInfo, pl.headerStart.x, pl.headerStart.y + pl.textLineHeight);
     }
 
     // ------------------------- Draw the graph -------------------------
@@ -314,20 +314,22 @@ private static DrawResult drawProteinGraphG2D(Boolean nonProteinGraph, ComplexGr
         for(Integer j = 0; j < cg.getVertices().size(); j++){
             
             // if chain has an homologue partner...
-            if(cg.homologueChains[i][j] == 1){         
-                // if homologue partner wasn't colored before..
-                if(cg.savedVertexColors[i] == 0){
-                    h = cg.getUniqueColor(numVerts); //get unique color
-                    cg.savedVertexColors[i] = h;
-                    cg.savedVertexColors[j] = h;
-                    
-                } else {
-                    h = cg.savedVertexColors[i];
-                }
-                ig2.setPaint(Color.getHSBColor(h, s, b));
-                colorSet = true;
-                //cg.homologueChains[j][i] = 0; // otherwise every vertices gets a different color. OR: don't create a symmetrical matrix?!
-            } 
+            if(cg.homologueChains[i][j] != null){ 
+                if(cg.homologueChains[i][j] == 1){         
+                    // if homologue partner wasn't colored before..
+                    if(cg.savedVertexColors[i] == 0){
+                        h = cg.getUniqueColor(numVerts); //get unique color
+                        cg.savedVertexColors[i] = h;
+                        cg.savedVertexColors[j] = h;
+
+                    } else {
+                        h = cg.savedVertexColors[i];
+                    }
+                    ig2.setPaint(Color.getHSBColor(h, s, b));
+                    colorSet = true;
+                    //cg.homologueChains[j][i] = 0; // otherwise every vertices gets a different color. OR: don't create a symmetrical matrix?!
+                } 
+            }
         }
         
         // if no homologue chains occur
@@ -386,9 +388,14 @@ private static DrawResult drawProteinGraphG2D(Boolean nonProteinGraph, ComplexGr
             if((i + 1) % printNth == 0) {
                 sseNumberGraph = "" + (i + 1);
                 //sseNumberSeq = "" + (cg.proteinNodeMap.get(i));
-                
                 Integer foundIndex = edgesString.indexOf(i.toString() + "=");
-                String chainId = edgesString.substring(foundIndex + 2, foundIndex + 3);
+                String chainId;
+                if(i < 10){
+                    chainId = edgesString.substring(foundIndex + 2, foundIndex + 3);
+                } else {
+                    chainId = edgesString.substring(foundIndex + 3, foundIndex + 4);
+                }
+                
                 sseNumberSeq = "" + chainId;
                 //stringWidth = fontMetrics.stringWidth(sseNumberSeq);
                 stringHeight = fontMetrics.getAscent();                                        

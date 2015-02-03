@@ -23,6 +23,7 @@ import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.*;
 import java.io.*;
+import static java.lang.System.exit;
 import java.nio.channels.*;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -5843,6 +5844,7 @@ public class Main {
             }
             //System.out.println(allChains.get(i).getPdbChainID());
         }
+
         
         // initialize homologues matrix
         compGraph.homologueChains = new Integer[allChains.size()][allChains.size()];
@@ -6090,7 +6092,7 @@ public class Main {
                     compGraph.removeEdge(compGraph.getEdge(chainA, chainB));
                 }
             } else {
-                compGraph.neglectedEdges++;
+                compGraph.neglectedEdges++; // TODO so wrong...
             }
         }
         if(! silent) {
@@ -6247,7 +6249,7 @@ public class Main {
         IMAGEFORMAT[] formatsx = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
         ComplexGraph.drawComplexGraph(imgFileNoExt, false, formatsx, compGraph);
         
-        /*
+        
         if(Settings.getBoolean("plcc_B_draw_graphs")) {
             IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
             SSEGraph.drawProteinGraph(imgFileNoExt, false, formats, pg);
@@ -6260,7 +6262,7 @@ public class Main {
                 System.out.println("    Image output disabled, not drawing complex graphs.");
             }
         }              
-        */
+        
         if(! silent) {
             System.out.println("Complex graph computation done.");
         }
