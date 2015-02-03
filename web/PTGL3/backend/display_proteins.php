@@ -150,7 +150,8 @@ $tableString = '<div id="myCarousel">
 foreach ($chains as $value){
 	// check for correct format (maybe check also for correct letters/numbers..?)
 	if (!(strlen($value) == 5)) {
-		echo "<br />'" . $value . "' has a wrong PDB-ID format\n<br />";
+		//echo "<br />'" . $value . "' has a wrong PDB-ID format\n<br />";
+		array_push($SHOW_ERROR_LIST, "PDB chain '" . $value . "' has a wrong PDB-ID and chain format, expected something like '7timA'.");
 	}
 	// if everything is fine..
 	else {

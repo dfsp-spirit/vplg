@@ -37,7 +37,6 @@ if(((isset($_GET["st"])) && ($_GET["st"] != "")) || (isset($_SESSION["st"]))){
     } else {
         $st = $_GET["st"];
     }
-    
     if($st === "keyword"){
         $search_type = "keyword search";
         include('search_keyword.php');
@@ -49,11 +48,16 @@ if(((isset($_GET["st"])) && ($_GET["st"] != "")) || (isset($_SESSION["st"]))){
     if($st === "similarity"){
         $search_type = "BioGraphletSimilarity";
         include('search_similarity.php');
-    }     
+    }
+    if($st === "random"){
+        $search_type = "Random";
+        include('search_random.php');
+    }
 } else if(((isset($_GET["motif"])) && ($_GET["motif"] != "")) || (isset($_SESSION["motif"]))) {
     $search_type = "motif search";
     include('search_motif.php');
 }
+
 
 else if(((isset($_GET["linnotalphaadj"])) && ($_GET["linnotalphaadj"] != "")) || (isset($_SESSION["linnotalphaadj"])) ||
         ((isset($_GET["linnotalphared"])) && ($_GET["linnotalphared"] != "")) || (isset($_SESSION["linnotalphared"])) ||

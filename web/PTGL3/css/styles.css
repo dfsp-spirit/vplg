@@ -618,6 +618,11 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		transform: rotate(-90deg);
 	}
 	
+	#flipArrow6 {
+		margin-left: 3px;
+		transform: rotate(-90deg);
+	}
+	
 	
 	/* Search results page */
 	

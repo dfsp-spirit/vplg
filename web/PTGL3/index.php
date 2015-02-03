@@ -341,6 +341,24 @@ function check_install($db)  {
 			</dl>
 			</div><!-- end input-group and form-group -->
 			<?php } ?>
+			
+			
+			<?php if($ENABLE_RANDOM_SEARCH) { ?>
+			<div class="input-group form-group">
+			<form class="form-inline" action="search.php" method="get">
+			<dl class="dl-horizontal">
+				<div id="additionalSearch6">
+				<dt>Random</dt>
+				<dd>Selects a few random protein chains to explore.<strong class="caret" id="flipArrow6" ></strong></dd>
+				</div>
+				<div id="addSearchRandom">
+				<p>Selects and loads five random protein chains from the database.</p>
+				<button type="submit" id="sendit_random" name="st" value="random" class="btn btn-default" ><span class="glyphicon glyphicon-search"></span></button><br>
+
+			</form></div>
+			</dl>
+			</div><!-- end input-group and form-group -->
+			<?php } ?>
 
 			
 				

@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <?php 
-include('./backend/config.php'); 
+$SHOW_ERROR_LIST = array();
+include('./backend/config.php');
+include('./common.php');
+$DO_SHOW_ERROR_LIST = $DEBUG_MODE;
 include('./backend/display_proteins.php');
 
 $title = "Search results";
@@ -81,6 +84,15 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		</div><!-- end wrapper -->
 		
 		<div id="downloadfile"></div>
+		
+	<?php
+	// show red error bar on bottom of screen if enabled and error list is non-empty
+	if($DO_SHOW_ERROR_LIST) {
+	  show_the_errors($SHOW_ERROR_LIST);  
+	}
+
+	?>
+		
 	<?php include('footer.php'); ?>
 		
 		<!-- All Javascript at the bottom of the page for faster page loading -->
