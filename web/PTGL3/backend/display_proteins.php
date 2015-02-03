@@ -340,7 +340,7 @@ foreach ($chains as $value){
 						  
 						
 		} else {
-		$tableString .= "<h2>No data found in the database for request protein, sorry.</h2>";
+		$tableString .= "<h3>No data found in the database for request protein $pdbID chain $chainName, sorry.</h3>";
 		}
 		
 				
