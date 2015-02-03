@@ -340,59 +340,61 @@ foreach ($chains as $value){
 						  
 						
 		} else {
-		$tableString .= "<h3>No data found in the database for request protein $pdbID chain $chainName, sorry.</h3>";
+		$tableString .= "<li><h3>No data found in the database for request protein $pdbID chain $chainName, sorry.</h3>";
 		}
-		
-				
-				$tableString .= '
-						<div class="table-responsive" id="sse">
-						<table class="table table-condensed table-hover borderless whiteBack">
-						<caption>The SSEs of the chain</caption>
-						  <tr>
-							<th class="tablecenter">SSE #</th>
-							<th class="tablecenter">SSE type</th>
-							<th class="tablecenter">AA sequence</th>
-							<th class="tablecenter">residues in chain</th>
-						  </tr>';
-		
-		// counter to numerate SSEs in the table
-		$counter = 1;	
-		// create SSE table (displayed to the right of protein graph)
-		while ($arr = pg_fetch_array($result_SSE, NULL, PGSQL_ASSOC)){
-			$pdb_start = str_replace("-", "", substr($arr["pdb_start"], 1));
-			$pdb_end = str_replace("-", "", substr($arr["pdb_end"], 1));
-			$tableString .= '<tr class="tablecenter">
-									<td>'.$counter.'</td>
-									<td>'.$sse_type_shortcuts[$arr["sse_type"]].'</td>
-									<td>'.$arr["sequence"].'</td>
-									<td>'.$pdb_start.' - '.$pdb_end.'</td>
-								</tr>';
-			$counter++;
-		}
-		
-		$tableString .= '</table>
-						</div><!-- end table-responsive -->
-						
-						<div id="'.$pdbID.$chainName.'_pager" class="bx-pager-own">';
-					
-		$tableString .= '<p>- Select topology type -</p>';
-		
-		// counter for the data-slide-index property of the bxSlider.
-		$c = 0;					
-		// create thumbails for the (inner) slider. One thumb for each graphtype
-		$result_thumbs = pg_execute($db, "getChains", array("%".$pdbID."%", "%".$chainName."%"));
-		while ($arr = pg_fetch_array($result_thumbs, NULL, PGSQL_ASSOC)){
-			if(isset($arr['graph_image_png']) && file_exists($IMG_ROOT_PATH.$arr['graph_image_png'])) {
-			    $tableString .= ' <a class="thumbalign" data-slide-index="'.$c++.'" href=""><img src="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" width="100px" height="100px" />
-								'.$graphtype_dict[$graphtypes[$c-1]].'
-							  </a>';
-			}
-		}
-		$tableString .= '</div></li>';
-		
-		
-	}
-	$loaded_images++;
+		if($base_image_exists){				
+                                    $tableString .= '
+                                                    <div class="table-responsive" id="sse">
+                                                    <table class="table table-condensed table-hover borderless whiteBack">
+                                                    <caption>The SSEs of the chain</caption>
+                                                      <tr>
+                                                            <th class="tablecenter">SSE #</th>
+                                                            <th class="tablecenter">SSE type</th>
+                                                            <th class="tablecenter">AA sequence</th>
+                                                            <th class="tablecenter">residues in chain</th>
+                                                      </tr>';
+
+                    // counter to numerate SSEs in the table
+                    $counter = 1;	
+                    // create SSE table (displayed to the right of protein graph)
+                    while ($arr = pg_fetch_array($result_SSE, NULL, PGSQL_ASSOC)){
+                            $pdb_start = str_replace("-", "", substr($arr["pdb_start"], 1));
+                            $pdb_end = str_replace("-", "", substr($arr["pdb_end"], 1));
+                            $tableString .= '<tr class="tablecenter">
+                                                                            <td>'.$counter.'</td>
+                                                                            <td>'.$sse_type_shortcuts[$arr["sse_type"]].'</td>
+                                                                            <td>'.$arr["sequence"].'</td>
+                                                                            <td>'.$pdb_start.' - '.$pdb_end.'</td>
+                                                                    </tr>';
+                            $counter++;
+                    }
+
+                    $tableString .= '</table>
+                                                    </div><!-- end table-responsive -->
+
+                                                    <div id="'.$pdbID.$chainName.'_pager" class="bx-pager-own">';
+
+                    $tableString .= '<p>- Select topology type -</p>';
+
+                    // counter for the data-slide-index property of the bxSlider.
+                    $c = 0;					
+                    // create thumbails for the (inner) slider. One thumb for each graphtype
+                    $result_thumbs = pg_execute($db, "getChains", array("%".$pdbID."%", "%".$chainName."%"));
+                    while ($arr = pg_fetch_array($result_thumbs, NULL, PGSQL_ASSOC)){
+                            if(isset($arr['graph_image_png']) && file_exists($IMG_ROOT_PATH.$arr['graph_image_png'])) {
+                                $tableString .= ' <a class="thumbalign" data-slide-index="'.$c++.'" href=""><img src="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" width="100px" height="100px" />
+                                                                    '.$graphtype_dict[$graphtypes[$c-1]].'
+                                                              </a>';
+                            }
+                    }
+                    $tableString .= '</div>';
+                }
+                $tableString .= '</li>';
+
+
+            }
+            $loaded_images++;
+           
 }
 // last entry for the tableString
 $tableString .= '</ul></div>';				
