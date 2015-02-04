@@ -5485,7 +5485,7 @@ E	3	3	3
             //ig2.drawString("i=" + (i) + "", p.x, p.y + 70);
             //sseNumberSeqInChain = "" + (pg.sseList.get(i).getSSESeqChainNum());
             List<Integer> parentMapping = fg.getVertexIndexListInParentGraph();
-            sseNumberProteinGraph = "" + parentMapping.get(currentVertexIndexInFGSequential);
+            sseNumberProteinGraph = "" + (parentMapping.get(currentVertexIndexInFGSequential) + 1);
             sseNumberSeqInChain = "" + (pg.getSSEBySeqPosition(parentMapping.get(currentVertexIndexInFGSequential)).getSSESeqChainNum());
             ig2.setColor(Color.LIGHT_GRAY);
             //ig2.drawString(sseNumberSeq, pl.getFooterStart().x + ((i-shiftBack[i]) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
