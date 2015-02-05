@@ -1,5 +1,4 @@
 <?php session_start(); ?>
-<!DOCTYPE html>
 <?php 
 $SHOW_ERROR_LIST = array();
 include('./backend/config.php'); 
@@ -12,6 +11,7 @@ $title = "Search for proteins";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
 ?>
+<!DOCTYPE html>
 <html>
 <head>
 	<meta charset="utf-8">

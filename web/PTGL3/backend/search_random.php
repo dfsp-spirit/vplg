@@ -83,7 +83,10 @@ if(! $result) { array_push($SHOW_ERROR_LIST, "Query failed: '" . pg_last_error($
 
 
 $q_limit = 10;
-$row_count = 10;
+
+$all_rows = pg_fetch_all($result);
+
+$row_count = count($all_rows);
 
 // this counter is used to display alternating table colors
 $counter = 0;
@@ -96,7 +99,7 @@ if($limit_start >= $q_limit) {
         $tableString .= '<a class="changepage" href="?next='.($limit_start - $q_limit).'"><< previous </a>  ';
 }
 
-$tableString .= '-- Showing result chains '.($limit_start + 1).' to ';
+$tableString .= '-- Showing result chains '.($row_count == 0 ? 0 : $limit_start + 1).' to ';
 
 if($limit_start + $q_limit > $row_count){
         $tableString .= $row_count . ' (of ' . $row_count . ' total) -- ';
@@ -112,7 +115,8 @@ $tableString .= '</div>';
 
 
 
-while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
+//while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
+foreach($all_rows as $arr) {
         // set protein/chain information for readability		
         $pdb_id =  $arr['pdb_id'];
         $chain_name = $arr['chain_name'];
