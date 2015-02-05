@@ -189,7 +189,7 @@ function check_install($db)  {
 								<input class="advancedInput" type="text" id="molecule" name="molecule" placeholder="Molecule" size="20" maxlength="50"/>
 								<i title="Search for chains which appear in certain molecules e.g. 'MYOSINE'" style="position:absolute; right:50px;"  class="fa fa-question"></i>
 							</label>		
-							<button type="submit" name="st" value="advanced" class="btn btn-default advancedInput" style="margin-top:35px;"><span>Search</span></button>
+							<button type="submit" id="sendit_advanced" name="st" value="advanced" class="btn btn-default advancedInput" style="margin-top:35px;"><span>Search</span></button>
 						</div>
 					</form>	
 				</div><!-- end input-group and form-group -->

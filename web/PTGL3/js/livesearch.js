@@ -72,16 +72,19 @@ $(document).ready(function () {
 		}
 	});
 	
-	$('#sendit').click(function(e) {
+	$('#sendit_advanced').click(function(e) {
  		content = $('#searchInput').val();
 		pdb_content = $('#pdbid').val();
 		title_content = $('#title').val();
 		ligandname_con = $('#ligandname').val();
 		molecule_con = $('#molecule').val();
 		
- 		if(content.length < 3 && pdb_content.length < 3 && 
+                if(pdb_content.length > 0 && pdb_content.length < 4){
+                    e.preventDefault();
+                    alert("PDB ID must be 4 characters long!");
+                } else if(content.length < 3 && pdb_content.length < 3 && 
 		   title_content.length < 3 && ligandname_con.length < 3 && 
-		   molecule_con < 3){
+		   molecule_con.length < 3){
  			e.preventDefault();
  			alert("Please enter at least 3 characters!");
  		}
