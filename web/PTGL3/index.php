@@ -182,7 +182,7 @@ function check_install($db)  {
 								<i title="Choose whether the protein has a ligand or not." style="position:absolute; right:50px;"  class="fa fa-question"></i>
 							</label>
 							<label class="advancedLabel">Ligand Name
-								<input class="advancedInput" type="text" id="ligandname" name="ligandname" placeholder="Ligand Name" size="20" maxlength="50"/>
+								<input class="advancedInput" type="text" id="ligandname" name="ligandname" placeholder="Ligand Name" size="20" maxlength="3"/>
 								<i title="Search for proteins which contain a special ligand. Use the 3-letter ligand codes from RCSB Ligand Expo, e.g., 'FAD'. You can also use parts of the ligands long name." style="position:absolute; right:50px;"  class="fa fa-question"></i>
 							</label>	
 							<label class="advancedLabel">Molecule
