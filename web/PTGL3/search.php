@@ -5,11 +5,8 @@ include('./backend/config.php');
 include('./backend/search.php');
 include('./common.php');
 $DO_SHOW_ERROR_LIST = $DEBUG_MODE;
-
-
 $title = "Search for proteins";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
-
 ?>
 <!DOCTYPE html>
 <html>

@@ -68,12 +68,20 @@ if(! $db) { array_push($SHOW_ERROR_LIST, "Database connection failed."); }
 $count_query = $query . " ) results";
 
 
+$q_limit = 10;
+if(isset($_GET['num_random']) && is_numeric($_GET['num_random'])) {
+    $param_limit = intval($_GET['num_random']);
+    if($param_limit > 0 && $param_limit < 1000) {
+        $q_limit = $param_limit;
+    }
+}
+
 $query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
                             FROM plcc_chain c
                             INNER JOIN plcc_protein p
                             ON p.pdb_id = c.pdb_id
                             ORDER BY random()
-                            LIMIT 10;";
+                            LIMIT " . $q_limit . ";";
 
 pg_query($db, "DEALLOCATE ALL"); 
 pg_prepare($db, "searchrandom", $query);
@@ -82,7 +90,7 @@ $result = pg_execute($db, "searchrandom", $query_parameters);
 if(! $result) { array_push($SHOW_ERROR_LIST, "Query failed: '" . pg_last_error($db) . "'"); }
 
 
-$q_limit = 10;
+
 
 $all_rows = pg_fetch_all($result);
 
