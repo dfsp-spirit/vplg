@@ -353,7 +353,15 @@ function check_install($db)  {
 				</div>
 				<div id="addSearchRandom">
 				Selects and loads some random protein chains from the database. 
-				<input type="hidden" name="num_random" id="num_random" value="10">
+				<!-- <input type="hidden" name="num_random" id="num_random" value="10"> -->
+				<select name="num_random">
+				  <option value="5">5</option>
+				  <option value="10" selected>10</option>
+				  <option value="20">20</option>
+				  <option value="30">30</option>
+				  <option value="40">40</option>
+				  <option value="50">50</option>
+				</select> 
 				<button type="submit" id="sendit_random" name="st" value="random" class="btn btn-default" ><span class="glyphicon glyphicon-search"></span></button><br>
 
 			</form></div>
