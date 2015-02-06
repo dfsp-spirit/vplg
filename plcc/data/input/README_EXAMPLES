@@ -18,6 +18,9 @@ These are example PDB and DSSP input files. Most of the are here for a special r
 * 1b4s: Nucleoside diphosphate kinase, contains the motif 'alpha-beta plait', see http://www.cathdb.info/version/latest/domain/1b4sA00
 * 1a77: FLAP endonuclease, contains the motif 'rossman fold', see http://www.cathdb.info/version/latest/domain/1a77A01
 * 1aw1: TIM of Vibrio Marinus, very similar to 7tim but bigger. Used for GraphletSimilarity tests.
+* 1nr0: Contains a beta propeller motif.
+* 1hzh: Antibody, should contain immunoglobin fold
+* 1igt: Antibody, should contain immunoglobin fold
 
 
 
