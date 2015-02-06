@@ -82,10 +82,10 @@ function get_total_foldinggraphs_count($db) {
 		<label>Enter PDB identifier and chain, e.g., '7timA':
 		<?php
 		if(isset($_GET['pdbchain']) && $_GET['pdbchain'] != "") {
-		  echo '<input type="text" class="form-control" name="pdbchain" id="searchInput" placeholder="Enter PDB ID and chain" value="' . $_GET['pdbchain'] . '">';
+		  echo '<input type="text" class="form-control" name="pdbchain" maxlength="5" id="search_fgs_of_pg_pdbchain" placeholder="Enter PDB ID and chain" value="' . $_GET['pdbchain'] . '">';
 		}
 		else {
-		  echo '<input type="text" class="form-control" name="pdbchain" id="searchInput" placeholder="Enter PDB ID and chain">';
+		  echo '<input type="text" class="form-control" name="pdbchain" maxlength="5" id="search_fgs_of_pg_pdbchain" placeholder="Enter PDB ID and chain">';
 		}
 		?>
 		</label>
@@ -141,7 +141,7 @@ function get_total_foldinggraphs_count($db) {
 		  </select>
 		</label>
 		
-		<button type="submit" id="sendit" "class="btn btn-default">Search <span class="glyphicon glyphicon-search"></span></button><br>
+		<button type="submit" id="sendit_all_fgs_of_pg" "class="btn btn-default">Search <span class="glyphicon glyphicon-search"></span></button><br>
 
 		</form>	
 		

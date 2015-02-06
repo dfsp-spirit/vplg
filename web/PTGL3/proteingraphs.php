@@ -71,11 +71,11 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			
 		<label>Enter PDB identifier and chain, e.g., '7timA':
 		<?php
-		  echo '<input type="text" class="form-control" name="q" id="searchInput" placeholder="Enter PDB ID and chain">';		
+		  echo '<input type="text" class="form-control" maxlength="5" name="q" id="search_pgs_of_chain_pdbchain" placeholder="Enter PDB ID and chain">';		
 		?>
 		</label>
 							
-		<button type="submit" id="sendit" "class="btn btn-default">Search <span class="glyphicon glyphicon-search"></span></button><br>
+		<button type="submit" id="sendit_all_pgs_of_chain" "class="btn btn-default">Search <span class="glyphicon glyphicon-search"></span></button><br>
 
 		</form>	
 							

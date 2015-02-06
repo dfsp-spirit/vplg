@@ -76,10 +76,10 @@ $DO_SHOW_ERROR_LIST = $DEBUG_MODE;
 		<label>Enter PDB identifier and chain, e.g., '7timA':
 		<?php
 		if(isset($_GET['pdbchain']) && $_GET['pdbchain'] != "") {
-		  echo '<input type="text" class="form-control" name="pdbchain" id="searchInput" placeholder="Enter PDB ID and chain" value="' . $_GET['pdbchain'] . '">';
+		  echo '<input type="text" class="form-control" maxlength="5" name="pdbchain" id="search_vis_of_fg_pdbchain" placeholder="Enter PDB ID and chain" value="' . $_GET['pdbchain'] . '">';
 		}
 		else {
-		  echo '<input type="text" class="form-control" name="pdbchain" id="searchInput" placeholder="Enter PDB ID and chain">';
+		  echo '<input type="text" class="form-control" maxlength="5" name="pdbchain" id="search_vis_of_fg_pdbchain" placeholder="Enter PDB ID and chain">';
 		}
 		?>
 		</label>
@@ -111,7 +111,7 @@ $DO_SHOW_ERROR_LIST = $DEBUG_MODE;
 		</label>
 			
 		
-		<button type="submit" id="sendit" "class="btn btn-default">Search <span class="glyphicon glyphicon-search"></span></button><br>
+		<button type="submit" id="sendit_all_vis_of_fg" "class="btn btn-default">Search <span class="glyphicon glyphicon-search"></span></button><br>
 
 		</form>	
 		

@@ -107,5 +107,34 @@ $(document).ready(function () {
  			alert("Please enter at least 3 characters!");
  		}
  	});
+	
+	/* The button on the 'Retrieve -> All PGs of chain' page.        */
+	$('#sendit_all_pgs_of_chain').click(function(e) {
+ 		content = $('#search_pgs_of_chain_pdbchain').val();
+ 		if(content.length != 5){
+ 			e.preventDefault();
+ 			alert("Please enter exactly 5 characters, e.g., '7timA' to query for PDB ID 7tim chain A.");
+ 		}
+ 	});
+
+        /* The button on the 'Retrieve -> All FGs of a PG' page.        */
+	$('#sendit_all_fgs_of_pg').click(function(e) {
+ 		content = $('#search_fgs_of_pg_pdbchain').val();
+ 		if(content.length != 5){
+ 			e.preventDefault();
+ 			alert("Please enter exactly 5 characters, e.g., '7timA' to query for PDB ID 7tim chain A.");
+ 		}
+ 	});
+
+	/* The button on the 'Retrieve -> All visualizations of FG' page.        */
+	$('#sendit_all_vis_of_fg').click(function(e) {
+ 		content = $('#search_vis_of_fg_pdbchain').val();
+ 		if(content.length != 5){
+ 			e.preventDefault();
+ 			alert("Please enter exactly 5 characters, e.g., '7timA' to query for PDB ID 7tim chain A.");
+ 		}
+ 	});	
+	
+	
 	 
 });
