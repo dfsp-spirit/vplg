@@ -222,7 +222,7 @@ $app->get(
 					    <ul>
 		                    <li><i><a href="$ptgl_api_url/pg/7tim/A/albe/json" target="_blank">/api/index.php/pg/7tim/A/albe/json</a></i> retrieves the albe (alpha-beta) graph of PDB 7TIM, chain A in JSON format. </li>
 			                <li><i><a href="$ptgl_api_url/pg/7tim/A/albe/gml" target="_blank">/api/index.php/pg/7tim/A/albe/gml</a></i> retrieves the same protein graph in Graph Modelling Language (GML) format. </li>
-							<li><i><a href="$ptgl_api_url/pg/7tim/A/albe/xml" target="_blank">/api/index.php/pg/7tim/A/albe/gml</a></i> retrieves the same protein graph in XGMML, an XML-based graph format based on GML. </li>
+							<li><i><a href="$ptgl_api_url/pg/7tim/A/albe/xml" target="_blank">/api/index.php/pg/7tim/A/albe/xml</a></i> retrieves the same protein graph in XGMML, an XML-based graph format based on GML. </li>
 							<li><i><a href="$ptgl_api_url/pgvis/7tim/A/albe/png" target="_blank">/api/index.php/pgvis/7tim/A/albe/png</a></i> retrieves the same protein graph's visualization in PNG format. </li>
 			            </ul>
 						
