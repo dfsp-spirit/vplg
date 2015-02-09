@@ -458,7 +458,7 @@ public static HashMap<DrawTools.IMAGEFORMAT, String> drawComplexGraph(String bas
 
     if( ! Settings.getBoolean("plcc_B_silent")) {
         StringBuilder sb = new StringBuilder();
-        sb.append("      Output protein graph files: ");
+        sb.append("      Output complex graph files: ");
         for(DrawTools.IMAGEFORMAT format : resultFilesByFormat.keySet()) {
             sb.append("(").append(format.toString()).append(" => ").append(resultFilesByFormat.get(format)).append(") ");
         }

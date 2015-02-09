@@ -3416,7 +3416,7 @@ E	3	3	3
                 if(pg.sseList.size() > 0) {                                            
                     ig2.drawString("PG", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (stringHeight / 4));
                     ig2.drawString("SQ", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
-                    ig2.drawString("CH", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + lineHeight + (stringHeight / 4));
+                    //ig2.drawString("CH", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + lineHeight + (stringHeight / 4));
                 }
                 else {
                     ig2.drawString("(Graph has no vertices.)", pl.getFooterStart().x, pl.getFooterStart().y);
@@ -3450,15 +3450,7 @@ E	3	3	3
                     }
                 }
             
-            }
-            
-            // all done, write the image to disk
-            //if(Settings.get("plcc_S_img_output_format").equals("SVG")) {
-            
-            //boolean useCSS = true;
-            //FileOutputStream fos = new FileOutputStream(new File("/tmp/mySVG.svg"));
-            //Writer out = new OutputStreamWriter(fos, "UTF-8");
-            //ig2.stream(out, useCSS); 
+            }                 
             
             Rectangle2D roi = new Rectangle2D.Double(0, 0, pl.getPageWidth(), pl.getPageHeight());
             

@@ -13,7 +13,7 @@ PLCC_OPTIONS="-u -f -k -s"
 PLCC_RUNS_IN_SUBDIR_TREE_MODE="YES"
 ## IMPORTANT: set this to "YES" if plcc is run with '-k' / '--output-subdir-tree'
 
-DELETE_CLUSTER_CHAINS_FILE="NO"
+DELETE_CLUSTER_CHAINS_FILE="YES"
 SILENT="YES"
 
 ### end of settings ###
