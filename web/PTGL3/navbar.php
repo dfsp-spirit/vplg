@@ -60,11 +60,13 @@
 					</li><!-- end dropdown -->
 					<li class="dropdown">
 						<!-- <strong>caret</strong> creates the little triangle/arrow -->
-						<a href="#"  class="navbarFont dropdown-toggle" data-toggle="dropdown"> Services <strong class="caret"></strong></a>
+						<a href="#"  class="navbarFont dropdown-toggle" data-toggle="dropdown"> Meta <strong class="caret"></strong></a>
 						<ul class="dropdown-menu">
+						
 							<li>
 								<a href="about.php"><span class="fa fa-info"></span> About</a>
 							</li>
+							
 							<li>
 								<a href="publications.php"><i class="fa fa-copy"></i> Publications</a>
 							</li>
@@ -76,6 +78,9 @@
 							<li class="dropdown-header"></li>
 							<li>
 								<a href="contact.php"><i class="fa fa-user"></i> Contact Us</a>
+							</li>
+							<li>
+								<a href="imprint.php"><i class="fa fa-user"></i> Imprint</a>
 							</li>
 							<li>
 								<!-- <a href="help.php"><i class="fa fa-question"></i> Help</a> -->

@@ -46,7 +46,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
                     To use the full functionality of our site we ask you to activate JavaScript
                     and to go back to the main page.</p>
                 <p>Thank you!</p>
-                <a href="http://ptgl.uni-frankfurt.de" title="Home">PTGL main page</a>
+                <a href="./index.php" title="Home">PTGL main page</a>
                 </div><br><br>
             </div>    
             
