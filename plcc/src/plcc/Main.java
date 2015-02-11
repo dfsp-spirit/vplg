@@ -117,7 +117,7 @@ public class Main {
 
     
     /** The threshold for interchain contacts in complex graphs. Chains with less contacts then the threshold won't be considered as interchain contacts.  */
-    static Integer chainComplexGraphContactThreshold = 10;
+    static Integer chainComplexGraphContactThreshold = 1; // set to 1 to act like deactivated..
 
 
 
@@ -5867,6 +5867,7 @@ public class Main {
             }
         }
         
+        
         // calculate sum of interchain contacts
         for(Integer i = 0; i < resContacts.size(); i++){
             ComplexGraph.Vertex chainA = compGraph.getVertexFromChain(resContacts.get(i).getResA().getChainID());
@@ -5874,6 +5875,8 @@ public class Main {
            
             Integer chainAint = Integer.parseInt(chainA.toString());
             Integer chainBint = Integer.parseInt(chainB.toString());
+            
+            
             
             // We only want interchain contacts
             if (!chainA.equals(chainB)){
@@ -5885,26 +5888,48 @@ public class Main {
             }
         }
         
-        
+
+        ArrayList<String> conInfo = new ArrayList<String>();
+        conInfo.add("ChainA;ChainB;ResNameA;ResNameB;resTypeA;resTypeB;BB;BC;BL;CB;CL;CC;HB1;HB2;LB;LC;LL");
         // create edges for all contacts
         for(Integer i = 0; i < resContacts.size(); i++) {
             ComplexGraph.Vertex chainA = compGraph.getVertexFromChain(resContacts.get(i).getResA().getChainID());
             ComplexGraph.Vertex chainB = compGraph.getVertexFromChain(resContacts.get(i).getResB().getChainID());
-           
             
             Integer chainAint = Integer.parseInt(chainA.toString());
             Integer chainBint = Integer.parseInt(chainB.toString());
             
-            // We only want interchain contacts
+            // We only want interchain contacts with a certain threshold of contacts
             if (compGraph.chainsHaveEnoughContacts(chainAint, chainBint)){
                 
-                /*
-                if(compGraph.numChainInteractions[chainAint][chainBint] == null){
-                    compGraph.numChainInteractions[chainAint][chainBint] = 1;
-                } else {
-                    compGraph.numChainInteractions[chainAint][chainBint]++;
-                }
-              */
+                ResContactInfo curRes = resContacts.get(i);
+                
+                String chainAString = curRes.getResA().getChainID().toString();
+                String chainBString = curRes.getResB().getChainID().toString();
+                String resNameA = curRes.getResName3A();
+                String resNameB = curRes.getResName3B();
+                String resTypeA = curRes.getResA().getSSETypePlcc();
+                String resTypeB = curRes.getResB().getSSETypePlcc();
+                
+                String BBAtomA = curRes.getBBContactAtomNumA().toString();
+                
+                String numBB = curRes.getNumContactsBB().toString();
+                String numBC = curRes.getNumContactsBC().toString();
+                String numBL = curRes.getNumContactsBL().toString();
+                String numCB = curRes.getNumContactsCB().toString();
+                String numCL = curRes.getNumContactsCL().toString();
+                String numCC = curRes.getNumContactsCC().toString();
+                String numHB1 = curRes.getNumContactsHB1().toString();
+                String numHB2 = curRes.getNumContactsHB2().toString();
+                String numLB = curRes.getNumContactsLB().toString();
+                String numLC = curRes.getNumContactsLC().toString();
+                String numLL = curRes.getNumContactsLL().toString();
+
+                conInfo.add(chainAString + ";" + chainBString + ";" + resNameA + ";" + resNameB + ";" + 
+                            resTypeA + ";" + resTypeB + ";" + numBB + ";" + numBC + ";" + numBL + ";" + 
+                            numCB + ";" + numCL + ";" + numCC + ";" + numHB1 + ";" + numHB2 + ";" + 
+                            numLB + ";" + numLC + ";" + numLL + ";" + BBAtomA);
+                
                 
                 if (compGraph.getEdge(chainA, chainB) == null){
                     // We don't have an edge yet, but need one, so create an edge
@@ -6092,7 +6117,7 @@ public class Main {
                     compGraph.removeEdge(compGraph.getEdge(chainA, chainB));
                 }
             } else {
-                compGraph.neglectedEdges++; // TODO so wrong...
+                compGraph.neglectedEdges++; // TODO: so wrong...
             }
         }
         if(! silent) {
@@ -6114,6 +6139,19 @@ public class Main {
         
         if( ! silent) {
             System.out.println("  Preparing to write complex graph files.");
+        }
+        
+        //write Residue contact info to csv.
+        try {
+            FileWriter writer = new FileWriter(pdbid+"_contact_info.csv");
+            for(String x : conInfo){
+                writer.append(x);
+                writer.append("\n");
+            }
+            writer.flush();
+	    writer.close();   
+        } catch(IOException e){
+            
         }
         
         // Calculate SSE level contacts

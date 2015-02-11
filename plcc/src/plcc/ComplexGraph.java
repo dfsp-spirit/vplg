@@ -309,8 +309,8 @@ private static DrawResult drawProteinGraphG2D(Boolean nonProteinGraph, ComplexGr
         // set hue, saturation, brighness
         float h = (float) 0.5;
         float s = (float) 1.0;
-        float b = (float) 1.0;
-        
+        float b = (float) 1.0; 
+       
         for(Integer j = 0; j < cg.getVertices().size(); j++){
             
             // if chain has an homologue partner...
