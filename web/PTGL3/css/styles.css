@@ -365,10 +365,6 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		width: 540px;
 		height: 100%;
 		min-height: 200px;
-		background-position: right top;
-		background_size: 69px 68px;
-		background-repeat: no-repeat;
-		background-image: url('../images/curved_arrow-black.png');
 	}
 	
 	#linnot_info > div {

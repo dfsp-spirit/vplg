@@ -194,6 +194,7 @@ foreach ($chains as $value){
             $content_available = TRUE;
             // get unique DB chain ID
             $chain_id = (int) $arr['chain_id'];
+            $graphtype_int = $arr["graph_type"];
             $query_SSE = "SELECT * FROM plcc_sse WHERE chain_id = ".$chain_id." ORDER BY position_in_chain";
             $result_SSE = pg_query($db, $query_SSE);
             
@@ -276,7 +277,7 @@ foreach ($chains as $value){
                     $tableString .= "<br><span class='download-options'>";
                     $tableString .= "Detected motifs in this chain: ";
                     for($i = 0; $i < count($motif_list_this_chain); $i++) {
-                      $tableString .= "<a href='search.php?motif=" . get_motif_abbreviation($motif_list_this_chain[$i]) . "' target='_blank'>" . $motif_list_this_chain[$i] . "<a/> ";
+                      $tableString .= "<a href='search.php?motif=" . get_motif_abbreviation($motif_list_this_chain[$i]) . "' target='_blank'>" . $motif_list_this_chain[$i] . "</a> ";
                     }
                     $tableString .= "</span>";
                 }

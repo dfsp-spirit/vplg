@@ -71,6 +71,15 @@ $(document).ready(function () {
 			$('input#searchInput').val(selectedElement);
 		}
 	});
+        
+        $('#sendit').click(function(e) {
+ 		content = $('#searchInput').val();
+		
+		if(content.length < 3) {
+ 			e.preventDefault();
+ 			alert("Please enter at least 3 characters!");
+ 		}
+ 	});
 	
 	$('#sendit_advanced').click(function(e) {
  		content = $('#searchInput').val();

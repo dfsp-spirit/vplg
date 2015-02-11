@@ -60,28 +60,47 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		</div><!-- end Home -->
 		
 		<form class="form-inline" action="linearnotations.php" method="get">
-			
+		<?php 
+                    if(isset($_SESSION["graphtype"])){
+                        $graphtype = $_SESSION["graphtype"];
+                    } else {
+                        $graphtype = 1;
+                    }
+                    
+                    if(isset($_SESSION["notation"])){
+                        $notation_type = $_SESSION["notation"];
+                    } else {
+                        $notation_type = "adj";
+                    }
+                
+                    $graphtypes = array("Alpha", "Beta", "Alpha-Beta", "Alpha-Ligand",
+                                   "Beta-Ligand", "Alpha-Beta-Ligand");
+                    $notationtypes = array("adj", "red", "key", "seq");
+                    
+                ?>	
 		<label>Select graph-type: 
 		  <select id="multidown" name="graphtype">
-			<option class="downloadOption" value="1">Alpha</option>
-			<option class="downloadOption" value="2">Beta</option>
-			<option class="downloadOption" value="3">Alpha-Beta</option>
-			<option class="downloadOption" value="4">Alpha-Ligand</option>
-			<option class="downloadOption" value="5">Beta-Ligand</option>
-			<option class="downloadOption" value="6">Alpha-Beta-Ligand</option>
+                      <?php 
+                        for($i = 1; $i <= 6; $i++){
+                            if($i == $graphtype) {$selected = " selected ";} else {$selected = "";}
+                            echo "<option class='downloadOption' value='".$i."'".$selected.">".$graphtypes[($i-1)]."</option>\n";
+                        }
+                      ?>
 		  </select>
 		</label>
 		
 		<label> and notation-type: 
 		  <select id="multidown" name="notationtype">
-			<option class="downloadOption" value="adj">ADJ</option>
-			<option class="downloadOption" value="red">RED</option>
-			<option class="downloadOption" value="key">KEY</option>
-			<option class="downloadOption" value="seq">SEQ</option>
+                      <?php 
+                        foreach($notationtypes as $nt){
+                            if($nt == $notation_type) {$selected = " selected ";} else {$selected = "";}
+                            echo "<option class='downloadOption' value='".$nt."'".$selected.">".  strtoupper($nt)."</option>\n";
+                        }
+                      ?>
 		  </select>
 		</label>
 		
-		<button type="submit" id="sendit" "class="btn btn-default">Search <span class="glyphicon glyphicon-search"></span></button><br>
+		<button type="submit" id="senditlinnots" class="btn btn-default">Search <span class="glyphicon glyphicon-search"></span></button><br>
 
 		</form>	
 		

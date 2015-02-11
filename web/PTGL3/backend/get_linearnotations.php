@@ -118,7 +118,7 @@ function getLinnotFromFile($graphtype, $notation, $offset, $limit) {
         $file = new SplFileObject($directory . $filename);
         $file->seek($offset); // seek to line 50 (0 based)
         
-        for($i = 0; $i <= $limit; $i++){
+        for($i = 0; $i < $limit; $i++){
             if(! $file->eof()){
                 array_push($linnots, $file->current());
                 $file->next();
@@ -215,7 +215,7 @@ if($valid_values){
             $tableString .= '<a class="changepage" href="?next='.($limit_start - $q_limit).'"><< previous </a>  ';
 	}
 
-	$tableString .= '-- Showing results '.$limit_start.' to ';
+	$tableString .= '-- Showing results '. ($row_count == 0 ? 0 : $limit_start + 1) .' to ';
 	
 	if($limit_start + $q_limit > $row_count){
             $tableString .= $row_count . ' (of '.$row_count.') -- ';

@@ -33,7 +33,7 @@ $app->setName('ptgl3api');
 
 //$ptgl_base_url = "http://ptgl.uni-frankfurt.de";
 $server_name = "PTGL";
-$ptgl_base_url = "http://127.0.0.1/~ts/PTGL3";
+$ptgl_base_url = "http://localhost/~daniello/vplg";
 $ptgl_api_url = $ptgl_base_url . "/api/index.php";
  
 // GET route

@@ -345,6 +345,7 @@ $counter = 0;
 $createdHeadlines = Array();
 $numberOfChains = 0;
 
+if($row_count != 0){
 // begin to create pager
 $tableString = '<div id="pager">';
 if($limit_start >= $q_limit) {
@@ -416,8 +417,15 @@ while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
 
 }
 $tableString .= ' </div>';	// the $tableString var is used in the frontend search.php page to print results
+
+} else {
+    $tableString .= "<h3>Unfortunately there are no search results for your query.</h3>";
+    $tableString .= "Please <a href='index.php' title='PTGL'>go back</a> and try an other query.";
+}
+
 pg_free_result($result); // clean memory
 pg_close($db); // close connection
+
 
 //EOF
 ?>
