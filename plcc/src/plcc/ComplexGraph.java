@@ -441,6 +441,14 @@ private static DrawResult drawProteinGraphG2D(Boolean nonProteinGraph, ComplexGr
 }
     
   
+/**
+ * Draw a complex graph to an image file in the requested format.
+ * @param baseFilePathNoExt the img base file name, no file extension
+ * @param drawBlackAndWhite whether to draw in grayscale only
+ * @param formats a list of img formats to write
+ * @param cg the complex graph to draw
+ * @return a list of file names that were written to disk, (as a map of formats to file names)
+ */
 public static HashMap<DrawTools.IMAGEFORMAT, String> drawComplexGraph(String baseFilePathNoExt, Boolean drawBlackAndWhite, DrawTools.IMAGEFORMAT[] formats, ComplexGraph cg) {                
     
     DrawResult drawRes = ComplexGraph.drawProteinGraphG2D(drawBlackAndWhite, cg);
@@ -460,7 +468,8 @@ public static HashMap<DrawTools.IMAGEFORMAT, String> drawComplexGraph(String bas
         StringBuilder sb = new StringBuilder();
         sb.append("      Output complex graph files: ");
         for(DrawTools.IMAGEFORMAT format : resultFilesByFormat.keySet()) {
-            sb.append("(").append(format.toString()).append(" => ").append(resultFilesByFormat.get(format)).append(") ");
+            String ffile = new File(resultFilesByFormat.get(format)).getName();
+            sb.append("(").append(format.toString()).append(" => ").append(ffile).append(") ");
         }
         System.out.println(sb.toString());
     }

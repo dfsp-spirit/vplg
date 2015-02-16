@@ -834,7 +834,7 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_complex_contact_stats + " (complex_contact_id serial primary key, chain1 int not null references " + tbl_chain + " ON DELETE CASCADE, chain2 int not null references " + tbl_chain + " ON DELETE CASCADE, contact_num_HH int not null, contact_num_HS int not null, contact_num_HL int not null, contact_num_SS int not null, contact_num_SL int not null, contact_num_LL int not null, contact_num_DS int not null);");
             doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_json text, graph_string_xml text, graph_image_png text, graph_image_svg text, graph_image_pdf text, filepath_graphfile_gml text, filepath_graphfile_kavosh text, filepath_graphfile_plcc text, filepath_graphfile_dotlanguage text, filepath_graphfile_json text, filepath_graphfile_xml text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, fg_number int not null, fold_name varchar(2) not null, first_vertex_position_in_parent int not null, graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_json text, graph_string_xml text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
-            doInsertQuery("CREATE TABLE " + tbl_complexgraph + " (complexgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, graph_string_gml text, graph_string_kavosh text, graph_image_svg text, graph_image_png text);");
+            doInsertQuery("CREATE TABLE " + tbl_complexgraph + " (complexgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, ssegraph_string_gml text, chaingraph_string_gml text, ssegraph_string_xml text, chaingraph_string_xml text, ssegraph_string_kavosh text, chaingraph_string_kavosh text, filepath_ssegraph_image_svg text, filepath_chaingraph_image_svg text, filepath_ssegraph_image_png text, filepath_chaingraph_image_png text);");
             doInsertQuery("CREATE TABLE " + tbl_motiftype + " (motiftype_id serial primary key, motiftype_name varchar(40));");
             doInsertQuery("CREATE TABLE " + tbl_motif + " (motif_id serial primary key, motiftype_id int not null references " + tbl_motiftype + " ON DELETE CASCADE, motif_name varchar(40), motif_abbreviation varchar(9));");
                         
@@ -3089,6 +3089,70 @@ connection.close();
     
     
     /**
+     * Writes data on a complex gaph to the database. The data includes graph strings in different formats and the paths to the graph visualizations (both chain level and SSE level).
+     * @param pdb_id the PDB identifier
+     * @param ssegraph_string_gml GML format string representation of the SSE level CG
+     * @param chaingraph_string_gml GML format string representation of the chain level CG
+     * @param ssegraph_string_xml XML format string representation of the SSE level CG
+     * @param chaingraph_string_xml XML format string representation of the chain level CG
+     * @param ssegraph_string_kavosh Kavosh format string representation of the SSE level CG
+     * @param chaingraph_string_kavosh Kavosh format string representation of the chain level CG
+     * @param ssegraph_image_svg path to the SVG image of the SSE graph
+     * @param chaingraph_image_svg path to the SVG image of the chain graph
+     * @param ssegraph_image_png path to the PNG image of the SSE graph
+     * @param chaingraph_image_png path to the PNG image of the chain graph
+     * @return true if it worked out
+     * @throws SQLException if DB stuff went wrong
+     */
+    public static Boolean writeComplexGraphToDB(String pdb_id, String ssegraph_string_gml, String chaingraph_string_gml, String ssegraph_string_xml, String chaingraph_string_xml, String ssegraph_string_kavosh, String chaingraph_string_kavosh, String ssegraph_image_svg, String chaingraph_image_svg, String ssegraph_image_png, String chaingraph_image_png) throws SQLException {
+                       
+        PreparedStatement statement = null;
+        Boolean result;
+
+        String query = "INSERT INTO " + tbl_complexgraph + " (pdb_id, ssegraph_string_gml, chaingraph_string_gml, ssegraph_string_xml, chaingraph_string_xml, ssegraph_string_kavosh, chaingraph_string_kavosh, ssegraph_image_svg, chaingraph_image_svg, ssegraph_image_png, chaingraph_image_png) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+
+        
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setString(1, pdb_id);
+            statement.setString(2, ssegraph_string_gml);
+            statement.setString(3, chaingraph_string_gml);
+            statement.setString(4, ssegraph_string_xml);
+            statement.setString(5, chaingraph_string_xml);
+            statement.setString(6, ssegraph_string_kavosh);
+            statement.setString(7, chaingraph_string_kavosh);
+            statement.setString(8, ssegraph_image_svg);
+            statement.setString(9, chaingraph_image_svg);
+            statement.setString(10, ssegraph_image_png);
+            statement.setString(11, chaingraph_image_svg);
+                                
+            statement.executeUpdate();
+            //dbc.commit();
+            result = true;
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: writeComplexGraphToDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: writeComplexGraphToDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: writeComplexGraphToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+            result = false;
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            //dbc.setAutoCommit(true);
+        }
+        return(result);
+    }
+    
+    
+    /**
      * Writes information on a folding graph to the database. This includes a string representing the folding
      * graph in VPLG format. Note that the chain and the parent protein graph has to exist in the database already. You can set the path to
      * the graph images later using the updateFoldingGraphImage... functions. The PTGL linear notations get added to separate tables.
@@ -3426,7 +3490,50 @@ connection.close();
         
         return fieldName;
     }
+    
+    /**
+     * Determines proper database field name for a chainlevel CG.
+     * @param format the image format
+     * @return the field name or null if no field for that format exists
+     */
+    public static String getFieldnameForChainLevelComplexGraphImageType(String format) {
+        String fieldName = null;
         
+        if(format.equals(DrawTools.FORMAT_PNG)) {            
+            fieldName = "filepath_chaingraph_image_png";
+        }
+        else if(format.equals(DrawTools.FORMAT_SVG)) { 
+            fieldName = "filepath_chaingraph_image_svg";
+        }
+        else if(format.equals(DrawTools.FORMAT_PDF)) {
+            fieldName = "filepath_chaingraph_image_pdf";
+        }
+        
+        return fieldName;
+    }
+    
+    
+    /**
+     * Determines proper database field name for a SSE level CG.
+     * @param format the image format
+     * @return the field name or null if no field for that format exists
+     */
+    public static String getFieldnameForSSELevelComplexGraphImageType(String format) {
+        String fieldName = null;
+        
+        if(format.equals(DrawTools.FORMAT_PNG)) {            
+            fieldName = "filepath_ssegraph_image_png";
+        }
+        else if(format.equals(DrawTools.FORMAT_SVG)) { 
+            fieldName = "filepath_ssegraph_image_svg";
+        }
+        else if(format.equals(DrawTools.FORMAT_PDF)) {
+            fieldName = "filepath_ssegraph_image_pdf";
+        }
+        
+        return fieldName;
+    }
+    
     
     /**
      * Determines DB field name. Name of the field that stores the path to the graph image in given format and representation.
@@ -3775,6 +3882,112 @@ connection.close();
                     dbc.rollback();
                 } catch(SQLException excep) {
                     System.err.println("ERROR: SQL: updateFoldingGraphImagePathInDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            //dbc.setAutoCommit(true);
+        } 
+       
+        return numRowsAffected;
+        
+    }
+    
+    /**
+     * Sets the chain level image path for a specific complex graph in the database. The graph has to exist in the database already.
+     * 
+     * @param pdb_id the PDB ID, e.g., '7tim'
+     * @param format The image format, see DrawTools.IMAGEFORMAT
+     * @param relativeImagePath the relative image path to set in the database for the specified representation
+     * @return the number of rows affected by the SQL query
+     * @throws SQLException if something goes wrong with the database
+     */        
+    public static Integer updateComplexGraphChainLevelImagePathInDB(String pdb_id, IMAGEFORMAT format, String relativeImagePath) throws SQLException {
+    
+        
+        PreparedStatement statement = null;
+        String graphImageFieldName = DBManager.getFieldnameForChainLevelComplexGraphImageType(format.toString());
+        if(graphImageFieldName == null) {
+            DP.getInstance().e("DBManager", "updateComplexGraphChainLevelImagePathInDB: Invalid image type or not supported in DB yet, skipping.");
+            return 0;
+        }
+
+        String query = "UPDATE " + tbl_complexgraph + " SET " + graphImageFieldName + " = ? WHERE pdb_id = ?;";        
+        
+        Integer numRowsAffected = 0;
+        
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+            
+            statement.setString(1, relativeImagePath);
+            statement.setString(2, pdb_id);
+                                
+            numRowsAffected = statement.executeUpdate();
+            //dbc.commit();
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "updateComplexGraphChainLevelImagePathInDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    DP.getInstance().e("DBManager", "updateComplexGraphChainLevelImagePathInDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    DP.getInstance().e("DBManager", "updateFoldingGraphImagePathInDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            //dbc.setAutoCommit(true);
+        } 
+       
+        return numRowsAffected;
+        
+    }
+    
+    /**
+     * Sets the SSE level image path for a specific complex graph in the database. The graph has to exist in the database already.
+     * 
+     * @param pdb_id the PDB ID, e.g., '7tim'
+     * @param format The image format, see DrawTools.IMAGEFORMAT
+     * @param relativeImagePath the relative image path to set in the database for the specified representation
+     * @return the number of rows affected by the SQL query
+     * @throws SQLException if something goes wrong with the database
+     */        
+    public static Integer updateComplexGraphSSELevelImagePathInDB(String pdb_id, IMAGEFORMAT format, String relativeImagePath) throws SQLException {
+    
+        
+        PreparedStatement statement = null;
+        String graphImageFieldName = DBManager.getFieldnameForSSELevelComplexGraphImageType(format.toString());
+        if(graphImageFieldName == null) {
+            DP.getInstance().e("DBManager", "updateComplexGraphSSELevelImagePathInDB: Invalid image type or not supported in DB yet, skipping.");
+            return 0;
+        }
+
+        String query = "UPDATE " + tbl_complexgraph + " SET " + graphImageFieldName + " = ? WHERE pdb_id = ?;";        
+        
+        Integer numRowsAffected = 0;
+        
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+            
+            statement.setString(1, relativeImagePath);
+            statement.setString(2, pdb_id);
+                                
+            numRowsAffected = statement.executeUpdate();
+            //dbc.commit();
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "updateComplexGraphChainLevelImagePathInDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    DP.getInstance().e("DBManager", "updateComplexGraphChainLevelImagePathInDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    DP.getInstance().e("DBManager", "updateFoldingGraphImagePathInDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
                 }
             }
         } finally {

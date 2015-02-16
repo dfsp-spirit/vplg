@@ -5724,13 +5724,13 @@ public class Main {
         ArrayList<Integer> chainEnd = new ArrayList<Integer>();
         HashMap<String, ArrayList<SSE>> chainSSEMap = new HashMap<String, ArrayList<SSE>>();
         String fs = System.getProperty("file.separator");
-        String fileNameWithExtension = null;
-        String fileNameWithoutExtension = null;
+        String fileNameSSELevelWithExtension = null;
+        String fileNameSSELevelWithoutExtension = null;
         String filePathImg = null;
         String filePathGraphs = null;
         String filePathHTML = null;
         String imgFile = null;
-        String plccGraphFile = null;
+        String plccGraphFileSSELevel = null;
 
         if(! silent) {
             System.out.println("  Calculating CG SSEs for all chains of protein " + pdbid + "...");
@@ -6165,7 +6165,7 @@ public class Main {
 
         // This graph is still required because it is used for drawing the VPLG-style picture
         ProtGraph pg = chainCM.toProtGraph();
-        pg.declareProteinGraph();
+        pg.declareProteinGraph();        
 
         
         if(Settings.getBoolean("plcc_B_forceBackboneContacts")) {
@@ -6190,13 +6190,15 @@ public class Main {
             coils = "_coils";
         }        
         
-        fileNameWithoutExtension = pdbid + "_complex_sses_" + graphType + coils + "_CG";
-        fileNameWithExtension = fileNameWithoutExtension + Settings.get("plcc_S_img_output_fileext");
+        fileNameSSELevelWithoutExtension = pdbid + "_complex_sses_" + graphType + coils + "_CG";
+        String fileNameChainLevelWithoutExtension = pdbid + "_complex_chains_" + graphType + coils + "_CG";
+        fileNameSSELevelWithExtension = fileNameSSELevelWithoutExtension + Settings.get("plcc_S_img_output_fileext");
 
         // Create the file in a subdir tree based on the protein meta data if requested
+        File targetDir = null;
         if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
 
-            File targetDir = IO.generatePDBstyleSubdirTreeName(new File(outputDir), pdbid, "ALL");
+            targetDir = IO.generatePDBstyleSubdirTreeName(new File(outputDir), pdbid, "ALL");
             if(targetDir != null) {
                 ArrayList<String> errors = IO.createDirIfItDoesntExist(targetDir);
                 if( ! errors.isEmpty()) {
@@ -6212,82 +6214,104 @@ public class Main {
                 System.err.println("ERROR: Could not determine PDB-style subdir path name.");
             }
         }
-
-        // the simple complex graph (one vertex is one chain):
-        File myGML = null;
-        try {
-            myGML = new File(filePathGraphs + fs + pdbid + "_complex_chains_" + graphType + "_CG.gml");
-            myGML.createNewFile();
-            if(compGraph.writeToFileGML(myGML)) {
-                if(! silent) {
-                    System.out.println("    Complex graph chain-level notation written to file '" + myGML.getAbsolutePath() + "' in GML format.");
-                }
-                cgr.setComGraphFileGML(myGML);
-            } else {
-                System.err.println("ERROR: Could not write complex graph to file '" + myGML.getAbsolutePath() + "'.");
-            }
-        } catch(IOException e){
-            System.err.println("ERROR: Could not write complex graph to file '" + myGML.getAbsolutePath() + ". General I/O exception: '" + e.getMessage()+ "'.");
+        
+        //System.out.println("CG TARGET DIR IS " + targetDir + "." );
+        String dbImagePathCGNoExt = fileNameSSELevelWithoutExtension;
+        if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
+            dbImagePathCGNoExt = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, "ALL") + fs + fileNameSSELevelWithoutExtension;
         }
         
+        // ------------- chain level complex graphs -----------
+        // the simple complex graph (one vertex is one chain):
+        File gmlFileChainLevel = null;
+        String gmlFileNameChainLevel = null;
+        try {
+            gmlFileChainLevel = new File(filePathGraphs + fs + pdbid + "_complex_chains_" + graphType + "_CG.gml");
+            gmlFileChainLevel.createNewFile();
+            if(compGraph.writeToFileGML(gmlFileChainLevel)) {
+                if(! silent) {
+                    System.out.println("    Complex graph chain-level notation written to file '" + gmlFileChainLevel.getName() + "' in GML format.");
+                }
+                cgr.setComGraphFileGML(gmlFileChainLevel);
+                gmlFileNameChainLevel = fileNameChainLevelWithoutExtension + ".gml";
+            } else {
+                System.err.println("ERROR: Could not write complex graph to file '" + gmlFileChainLevel.getAbsolutePath() + "'.");
+            }
+        } catch(IOException e){
+            System.err.println("ERROR: Could not write complex graph to file '" + gmlFileChainLevel.getAbsolutePath() + ". General I/O exception: '" + e.getMessage()+ "'.");
+        }
+        
+        // ------------------ write the SSE level graphs -----------
+        
         // the detailed complex graph (each vertex is one SSE, vertices ordered by chain):
-        String graphFormatsWritten = "";        
-        Integer numFormatsWritten = 0;
+        String graphFormatsWrittenSSELevel = "";        
+        Integer numFormatsWrittenSSELevel = 0;
         if(Settings.getBoolean("plcc_B_output_compgraph_GML")) {
-            String gmlfFile = filePathGraphs + fs + fileNameWithoutExtension + ".gml";
-            if(IO.stringToTextFile(gmlfFile, pg.toGraphModellingLanguageFormat())) {
-                graphFormatsWritten += "gml "; numFormatsWritten++;
+            String gmlfFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".gml";                       
+            if(IO.stringToTextFile(gmlfFileSSELevel, pg.toGraphModellingLanguageFormat())) {
+                graphFormatsWrittenSSELevel += "gml "; numFormatsWrittenSSELevel++;
             }
         }
         if(Settings.getBoolean("plcc_B_output_compgraph_TGF")) {
-            String tgfFile = filePathGraphs + fs + fileNameWithoutExtension + ".tgf";
-            if(IO.stringToTextFile(tgfFile, pg.toTrivialGraphFormat())) {
-                graphFormatsWritten += "tgf "; numFormatsWritten++;
+            String tgfFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".tgf";
+            if(IO.stringToTextFile(tgfFileSSELevel, pg.toTrivialGraphFormat())) {
+                graphFormatsWrittenSSELevel += "tgf "; numFormatsWrittenSSELevel++;
             }
         }
         if(Settings.getBoolean("plcc_B_output_compgraph_DOT")) {
-            String dotLangFile = filePathGraphs + fs + fileNameWithoutExtension + ".gv";
-            if(IO.stringToTextFile(dotLangFile, pg.toDOTLanguageFormat())) {
-                graphFormatsWritten += "gv "; numFormatsWritten++;
+            String dotLangFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".gv";
+            if(IO.stringToTextFile(dotLangFileSSELevel, pg.toDOTLanguageFormat())) {
+                graphFormatsWrittenSSELevel += "gv "; numFormatsWrittenSSELevel++;
             }
         }
         if(Settings.getBoolean("plcc_B_output_compgraph_kavosh")) {
-            String kavoshFile = filePathGraphs + fs + fileNameWithoutExtension + ".kavosh";
-            if(IO.stringToTextFile(kavoshFile, pg.toKavoshFormat())) {
-                graphFormatsWritten += "kavosh "; numFormatsWritten++;
+            String kavoshFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".kavosh";
+            if(IO.stringToTextFile(kavoshFileSSELevel, pg.toKavoshFormat())) {
+                graphFormatsWrittenSSELevel += "kavosh "; numFormatsWrittenSSELevel++;
+            }
+        }
+        if(Settings.getBoolean("plcc_B_output_compgraph_XML")) {
+            String xmlFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".xml";
+            if(IO.stringToTextFile(xmlFileSSELevel, pg.toXMLFormat())) {
+                graphFormatsWrittenSSELevel += "xml "; numFormatsWrittenSSELevel++;
+            }
+        }
+        if(Settings.getBoolean("plcc_B_output_compgraph_JSON")) {
+            String jsonFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".json";
+            if(IO.stringToTextFile(jsonFileSSELevel, pg.toJSONFormat())) {
+                graphFormatsWrittenSSELevel += "json "; numFormatsWrittenSSELevel++;
             }
         }
         if(Settings.getBoolean("plcc_B_output_compgraph_eld")) {
-            String elFile = filePathGraphs + fs + fileNameWithoutExtension + ".el_edges";
-            String nodeTypeListFile = filePathGraphs + fs + fileNameWithoutExtension + ".el_ntl";
-            if(IO.stringToTextFile(elFile, pg.toEdgeList()) && IO.stringToTextFile(nodeTypeListFile, pg.getNodeTypeList())) {
-                graphFormatsWritten += "el "; numFormatsWritten++;
+            String elFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".el_edges";
+            String nodeTypeListFile = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".el_ntl";
+            if(IO.stringToTextFile(elFileSSELevel, pg.toEdgeList()) && IO.stringToTextFile(nodeTypeListFile, pg.getNodeTypeList())) {
+                graphFormatsWrittenSSELevel += "el "; numFormatsWrittenSSELevel++;
             }
         }
         // write the SSE info text file for the image (plcc graph format file)
         if(Settings.getBoolean("plcc_B_output_compgraph_plcc")) {
-            plccGraphFile = filePathGraphs + fs + fileNameWithoutExtension + ".plg";
-            if(IO.stringToTextFile(plccGraphFile, pg.toVPLGGraphFormat())) {
-                graphFormatsWritten += "plg "; numFormatsWritten++;
+            plccGraphFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".plg";
+            if(IO.stringToTextFile(plccGraphFileSSELevel, pg.toVPLGGraphFormat())) {
+                graphFormatsWrittenSSELevel += "plg "; numFormatsWrittenSSELevel++;
             }
         }
         
-        if(numFormatsWritten > 0) {
+        if(numFormatsWrittenSSELevel > 0) {
             if(! silent) {
-                System.out.println("    Exported complex graph in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + new File(filePathGraphs).getAbsolutePath() + fs + "'.");
+                System.out.println("    Exported complex graph in " + numFormatsWrittenSSELevel + " formats (" + graphFormatsWrittenSSELevel + ") to '" + new File(filePathGraphs).getAbsolutePath() + fs + "'.");
             }
         }
 
-        String imgFileNoExt = filePathImg + fs + fileNameWithoutExtension;
+        String imgFileNoExt = filePathImg + fs + fileNameSSELevelWithoutExtension;
         //imgFile = filePathImg + fs + fileNameWithExtension;
         
-        //TESTING
-       
-        
         IMAGEFORMAT[] formatsx = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
-        ComplexGraph.drawComplexGraph(imgFileNoExt, false, formatsx, compGraph);
-        
-        
+        HashMap<DrawTools.IMAGEFORMAT, String> drawnFormats = ComplexGraph.drawComplexGraph(imgFileNoExt, false, formatsx, compGraph);
+        for(IMAGEFORMAT f : drawnFormats.keySet()) {
+            System.out.println("  Complex graph drawn in format " + f + " to file '" + drawnFormats.get(f) + "'.") ;
+        }
+                
         if(Settings.getBoolean("plcc_B_draw_graphs")) {
             IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
             SSEGraph.drawProteinGraph(imgFileNoExt, false, formats, pg);
@@ -6301,12 +6325,29 @@ public class Main {
             }
         }              
         
+        // database
+        if(Settings.getBoolean("plcc_B_useDB")) {
+            String dbImagePathCG = fileNameSSELevelWithoutExtension;
+            if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
+                dbImagePathCG = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, "ALL") + fs + fileNameSSELevelWithoutExtension;
+            }
+            System.out.println("dbImagePathCG = '" + dbImagePathCG + "'");
+            //dbImagePath += DrawTools.getFileExtensionForImageFormat(format);
+            try {
+                DBManager.writeComplexGraphToDB(pdbid, pg.toGraphModellingLanguageFormat(), null, pg.toXMLFormat(), null, pg.toKavoshFormat(), null, null, null, null, null);
+                if(! silent) {
+                    System.out.println("Wrote complex graph of " + pdbid + " to DB.");
+                }
+            } catch(SQLException e) {
+                DP.getInstance().w("Main", "Could not write complex graph to DB: '" + e.getMessage() + "'.");
+            }
+        } 
+        
         if(! silent) {
             System.out.println("Complex graph computation done.");
         }
-        
+                
         ProteinResults.getInstance().setCompGraphRes(cgr);
-    }        
-    
+    }            
     
 }
