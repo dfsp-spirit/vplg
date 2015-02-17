@@ -42,7 +42,7 @@ fi
 ## graphs
 if [ "$CLEAN_GRAPHS" = "YES" ]; then
   echo "$APPTAG Cleaning graphs..."
-  rm *.tgf *.gv *.gml *.plg *.fg *.kavosh *.el *.el_ntl *.json *.el_edges *.graph
+  rm *.tgf *.gv *.gml *.plg *.fg *.kavosh *.el *.el_ntl *.json *.el_edges *.graph *.xml
 fi
 
 ## meta data

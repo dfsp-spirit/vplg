@@ -5890,7 +5890,8 @@ public class Main {
         
 
         ArrayList<String> conInfo = new ArrayList<String>();
-        conInfo.add("ChainA;ChainB;ResNameA;ResNameB;resTypeA;resTypeB;BB;BC;BL;CB;CL;CC;HB1;HB2;LB;LC;LL");
+        conInfo.add("ChainA;ChainB;ResNameA;ResNameB;resTypeA;resTypeB;BB;BC;BL;CB;CL;CC;HB1;HB2;LB;LC;LL;"
+                  + "BBDist;BCDist;BLDist;CBDist;CLDist;CCDist;HB1Dist;HB2Dist;LBDist;LCDist;LLDist");
         // create edges for all contacts
         for(Integer i = 0; i < resContacts.size(); i++) {
             ComplexGraph.Vertex chainA = compGraph.getVertexFromChain(resContacts.get(i).getResA().getChainID());
@@ -5911,8 +5912,18 @@ public class Main {
                 String resTypeA = curRes.getResA().getSSETypePlcc();
                 String resTypeB = curRes.getResB().getSSETypePlcc();
                 
-                String BBAtomA = curRes.getBBContactAtomNumA().toString();
-                
+                String BBDist = curRes.getBBContactDist().toString();
+                String BCDist = curRes.getBCContactDist().toString();
+                String BLDist = curRes.getBLContactDist().toString();
+                String CBDist = curRes.getCBContactDist().toString();
+                String CLDist = curRes.getCLContactDist().toString();
+                String CCDist = curRes.getCCContactDist().toString();
+                String HB1Dist = curRes.getHB1Dist().toString();
+                String HB2Dist = curRes.getHB2Dist().toString();
+                String LBDist = curRes.getLBContactDist().toString();
+                String LCDist = curRes.getLCContactDist().toString();
+                String LLDist = curRes.getLLContactDist().toString();
+                                
                 String numBB = curRes.getNumContactsBB().toString();
                 String numBC = curRes.getNumContactsBC().toString();
                 String numBL = curRes.getNumContactsBL().toString();
@@ -5928,7 +5939,9 @@ public class Main {
                 conInfo.add(chainAString + ";" + chainBString + ";" + resNameA + ";" + resNameB + ";" + 
                             resTypeA + ";" + resTypeB + ";" + numBB + ";" + numBC + ";" + numBL + ";" + 
                             numCB + ";" + numCL + ";" + numCC + ";" + numHB1 + ";" + numHB2 + ";" + 
-                            numLB + ";" + numLC + ";" + numLL + ";" + BBAtomA);
+                            numLB + ";" + numLC + ";" + numLL + ";" + BBDist + ";" + BCDist + ";" + 
+                            BLDist + ";" + CBDist + ";" + CLDist + ";" + CCDist + ";" + HB1Dist + ";" + 
+                            HB2Dist + ";" + LBDist + ";" + LCDist + ";" + LLDist);
                 
                 
                 if (compGraph.getEdge(chainA, chainB) == null){
