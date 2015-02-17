@@ -1,9 +1,12 @@
-<?php session_start(); ?>
 <?php 
+if(!session_id()) {session_start();} 
+//echo "<pre>";
+//print_r($_SESSION);
+//echo "</pre>";
 $SHOW_ERROR_LIST = array();
 include('./backend/config.php'); 
-include('./backend/search.php');
 include('./common.php');
+include('./backend/search.php');
 $DO_SHOW_ERROR_LIST = $DEBUG_MODE;
 $title = "Search for proteins";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;

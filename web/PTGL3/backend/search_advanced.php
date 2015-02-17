@@ -135,6 +135,11 @@ function get_multiple_PDB_select_query_in_order($pdb_chain_list_in_order) {
 $debug_msg = "";
 $result_comments = array();
 
+ini_set('display_errors', 1);
+	ini_set('display_startup_errors', 1);
+	ini_set('log_errors', TRUE);
+	error_reporting(E_ALL);
+
 
 if(isset($_GET["next"])) {
 	if(is_numeric($_GET["next"]) && $_GET["next"] >= 0){
