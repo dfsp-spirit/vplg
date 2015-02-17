@@ -334,7 +334,9 @@ function check_install($db)  {
 						</select> 
 						graphs in the database for: 
 						<input type="text" class="form-control" id="searchLinnots" autocomplete="off" placeholder="Enter query notation string...">
-						<input type="checkbox" name="matching" value="like"> and similar 
+						<!-- <input type="checkbox" name="matching" value="like"> contains -->
+						<input type="radio" name="matching" value="like" checked> as substring
+						<input type="radio" name="matching" value="exact" checked> exact
 						<button type="submit" id="sendit_linnots" name="linnotalbeligadj" value="linnotalbeligadj" class="btn btn-default" ><span class="glyphicon glyphicon-search"></span></button><br>
 
 			</form></div>
@@ -357,10 +359,9 @@ function check_install($db)  {
 				<select name="num_random">
 				  <option value="5">5</option>
 				  <option value="10" selected>10</option>
+				  <option value="15">15</option>
 				  <option value="20">20</option>
-				  <option value="30">30</option>
-				  <option value="40">40</option>
-				  <option value="50">50</option>
+				  <option value="25">25</option>
 				</select> 
 				<button type="submit" id="sendit_random" name="st" value="random" class="btn btn-default" ><span class="glyphicon glyphicon-search"></span></button><br>
 

@@ -32,8 +32,11 @@ $app->setName('ptgl3api');
  */
 
 //$ptgl_base_url = "http://ptgl.uni-frankfurt.de";
-$server_name = "PTGL";
-$ptgl_base_url = "http://localhost/~daniello/vplg";
+
+include("../backend/config.php");
+
+$server_name = $SITE_TITLE;
+$ptgl_base_url = $SITE_BASE_URL;
 $ptgl_api_url = $ptgl_base_url . "/api/index.php";
  
 // GET route
@@ -237,7 +240,7 @@ $app->get(
 			
 			            Linear notations:
 					    <ul>
-		                <li><i><a href="$ptgl_api_url/linnot/7tim/A/albe/0/adj"  target="_blank">api/index.php/linnot/7tim/A/albe/0/adj</a></i> retrieves the ADJ linear notation of folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A. This is a string in JSON format. </li>
+		                <li><i><a href="$ptgl_api_url/linnot/7tim/A/albe/0/adj"  target="_blank">api/index.php/linnot/7tim/A/albe/0/adj</a></i> retrieves the ADJ linear notation of folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A. This is a string in plain text format (not JSON!). </li>
 						<li><i><a href="$ptgl_api_url/linnotvis/7tim/A/albe/0/adj/png"  target="_blank">api/index.php/linnotvis/7tim/A/albe/0/adj/png</a></i> retrieves the visualization of the ADJ linear notation of folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A. This is an image in PNG format. </li>
 			            </ul>
 						
@@ -391,8 +394,10 @@ EOT;
     'linnot' => 'adj|red|key|seq',
     'fold' => '[0-9]{1,}',
     'graphformat' => 'json|gml|xml',
-	'graphformat_json' => 'json',
-	'imageformat' => 'png|svg'
+    'graphformat_json' => 'json',
+    'textformat_plain' => 'plain',
+    'textformat_json' => 'json',
+    'imageformat' => 'png|svg'
 ));
 
 /**
@@ -630,13 +635,13 @@ $app->get('/linnot/:pdbid/:chain/:graphtype/:fold/:linnot', function ($pdbid, $c
     while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
 	    $num_res++;
 		$req_linnot = 'ptgl_linnot_' . $linnot;
-	    echo '"' . $arr[$req_linnot] . '"';
+	    echo $arr[$req_linnot];
     }
     //echo "You requested the $linnot notation of fold # $fold of the $graphtype protein graph of PDB $pdbid chain $chain.\n";
 });
 
 // get all linear notation strings of a folding graph
-$app->get('/linnots/:pdbid/:chain/:graphtype/:fold', function ($pdbid, $chain, $graphtype, $fold) use($db) {
+$app->get('/linnots/:pdbid/:chain/:graphtype/:fold/:textformat_json', function ($pdbid, $chain, $graphtype, $fold) use($db) {
     $pdbid = strtolower($pdbid);
     $query = "SELECT ln.linnot_id, ln.ptgl_linnot_adj, ln.ptgl_linnot_red, ln.ptgl_linnot_seq, ln.ptgl_linnot_key FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph g ON fg.parent_graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype' AND fg.fg_number = $fold";
     $result = pg_query($db, $query);
@@ -650,8 +655,17 @@ $app->get('/linnots/:pdbid/:chain/:graphtype/:fold', function ($pdbid, $chain, $
 		$all_linnots = array('ptgl_linnot_adj', 'ptgl_linnot_red', 'ptgl_linnot_seq', 'ptgl_linnot_key');
 		for($j = 0; $j < count($all_linnots); $j++) {
 		    $req_linnot = $all_linnots[$j];
-	        $json .= $row[$req_linnot];
-			if($i < count($all_linnots) - 1) {
+		    
+		    $str = json_encode($row[$req_linnot]);
+		    //if($str === "null") {
+		    //    $json .= '""';		      
+		    //}
+		    //else {
+		        $json .= $str;
+		    //}
+			
+		    
+		    if($j < count($all_linnots) - 1) {
 		        $json .= ", ";
 		    }
 		}
