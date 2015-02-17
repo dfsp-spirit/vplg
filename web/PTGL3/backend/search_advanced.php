@@ -303,7 +303,7 @@ if (isset($molecule) && $molecule != ""){
                            INNER JOIN plcc_protein p
                            ON p.pdb_id = c.pdb_id 
                            WHERE c.mol_name LIKE $". $param_value++;
-        array_push($query_parameters, "%".$ligandname."%");
+        array_push($query_parameters, "%".$molecule."%");
         $firstQuerySet = true; 
 };
 
