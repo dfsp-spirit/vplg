@@ -57,6 +57,8 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		Robert-Mayer-Strasse 11-15 <br>
 		D-60325 Frankfurt am Main <br>
 		Germany  <br>
+		Tel: +49 69/798-24651 <br>
+                Fax: +49 69/798-24650 <br>
 		<br>
 		</div>
 

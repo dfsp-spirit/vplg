@@ -98,7 +98,7 @@ $app->get(
             </header>
             <h1>Welcome to the $server_name API</h1>
 			
-			<a href=#basics">Basics</a> | <a href="#addressing">Addressing data</a> | <a href="#examples">Usage Examples</a> | <a href="#metadata">Metadata queries</a> | <a href="#collection">Collection queries</a> | <a href="#example_restclient_code">Example API client code</a> | <a href="#help">Help, comments</a> | <a href="#author">Author</a>
+			<a href=#basics">Basics</a> | <a href="#addressing">Addressing data</a> | <a href="#examples">Usage Examples</a> | <a href="#metadata">Metadata queries</a> | <a href="#collection">Collection queries</a> | <a href="#example_restclient_code">Example API client code</a> | <a href="#help">Help, comments</a> | <a href="#author">Author, Imprint</a>
 			
             <p>
 			    <br>
@@ -240,7 +240,7 @@ $app->get(
 			
 			            Linear notations:
 					    <ul>
-		                <li><i><a href="$ptgl_api_url/linnot/7tim/A/albe/0/adj"  target="_blank">api/index.php/linnot/7tim/A/albe/0/adj</a></i> retrieves the ADJ linear notation of folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A. This is a string in plain text format (not JSON!). </li>
+		                <li><i><a href="$ptgl_api_url/linnot/7tim/A/albe/0/adj/json"  target="_blank">api/index.php/linnot/7tim/A/albe/0/adj/json</a></i> retrieves the ADJ linear notation of folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A. This is a string in JSON format. </li>
 						<li><i><a href="$ptgl_api_url/linnotvis/7tim/A/albe/0/adj/png"  target="_blank">api/index.php/linnotvis/7tim/A/albe/0/adj/png</a></i> retrieves the visualization of the ADJ linear notation of folding graph #0 of the alpha-beta graph of PDB 7TIM, chain A. This is an image in PNG format. </li>
 			            </ul>
 						
@@ -505,7 +505,7 @@ $app->get('/pgvis/:pdbid/:chain/:graphtype/:imageformat', function ($pdbid, $cha
         }
     }
 	if( ! empty($image_path)) {
-	    $image = file_get_contents("../data/" . $image_path);
+	    $image = file_get_contents(".." . $IMG_ROOT_PATH . $image_path);
 		$finfo = new finfo(FILEINFO_MIME_TYPE);
 		$app->response->header('Content-Type', 'content-type: ' . $finfo->buffer($image));
 		echo $image;
@@ -625,8 +625,8 @@ $app->get('/folds/:pdbid/:chain/:graphtype', function ($pdbid, $chain, $graphtyp
     //echo "You requested all fold names of the $graphtype protein graph of PDB $pdbid chain $chain.\n";
 });
 
-// get a specific linear notation of a folding graph
-$app->get('/linnot/:pdbid/:chain/:graphtype/:fold/:linnot', function ($pdbid, $chain, $graphtype, $fold, $linnot) use($db) {
+// get a specific linear notation string of a folding graph
+$app->get('/linnot/:pdbid/:chain/:graphtype/:fold/:linnot/:textformat_json', function ($pdbid, $chain, $graphtype, $fold, $linnot) use($db) {
     $pdbid = strtolower($pdbid);
     $query = "SELECT ln.linnot_id, ln.ptgl_linnot_adj, ln.ptgl_linnot_red, ln.ptgl_linnot_seq, ln.ptgl_linnot_key FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph g ON fg.parent_graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype' AND fg.fg_number = $fold";
     $result = pg_query($db, $query);
@@ -635,7 +635,7 @@ $app->get('/linnot/:pdbid/:chain/:graphtype/:fold/:linnot', function ($pdbid, $c
     while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
 	    $num_res++;
 		$req_linnot = 'ptgl_linnot_' . $linnot;
-	    echo $arr[$req_linnot];
+	    echo json_encode($arr[$req_linnot]);
     }
     //echo "You requested the $linnot notation of fold # $fold of the $graphtype protein graph of PDB $pdbid chain $chain.\n";
 });
