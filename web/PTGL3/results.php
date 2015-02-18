@@ -52,7 +52,8 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<div class="container" id="pageintro">
 		<h2>Search Results</h2>
 		All protein graphs of a chain are shown here. You can switch the active graph type in the thumbnail slider below. You can have a look at the next
-		result chain using the arrows on the left and right of the screen if you loaded more than one chain.<br><br>The secondary structure element (SSE) type abbreviations are: H = helix, E = beta strand, L = ligand.
+		result chain using the arrows on the left and right of the screen if you loaded more than one chain.<br>
+		<!-- <br>The secondary structure element (SSE) type abbreviations are: H = helix, E = beta strand, L = ligand. -->
 		</div><!-- end container-->
 		</div><!-- end Home -->
 			

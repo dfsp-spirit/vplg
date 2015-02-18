@@ -170,6 +170,7 @@ if($valid_values){
 	$all_rows = pg_fetch_all($result);
 	
 	//echo "TAGTAG Found " . count($all_rows) . " rows total.\n";
+	if($all_rows) {
 	
 	foreach($all_rows as $arr) {
 		// data from foldinggraph table:
@@ -298,7 +299,8 @@ if($valid_values){
 		
 		$num_found++;
 				
-	}		
+	}	
+	}
 	
 	$tableString .= "</table></div>\n";
 	

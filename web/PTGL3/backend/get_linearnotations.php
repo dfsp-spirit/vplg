@@ -240,7 +240,7 @@ if($valid_values){
 	foreach($linnotArray as $arr) {
 		$linnot_string = $arr;
 		$tableString .= "<div class='string_row'>";
-		$tableString .= "<a href='search.php?".$parameter."=".$linnot_string."&exp=1' >". $linnot_string . "</a>";
+		$tableString .= "<a href='search.php?st=customlinnot&".$parameter."=".$linnot_string."&exp=1' >". $linnot_string . "</a>";
 		$tableString .= "</div>";
 	}
 	

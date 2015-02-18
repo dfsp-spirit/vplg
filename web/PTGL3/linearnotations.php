@@ -99,7 +99,6 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
                       ?>
 		  </select>
 		</label>
-		
 		<button type="submit" id="senditlinnots" class="btn btn-default">Search <span class="glyphicon glyphicon-search"></span></button><br>
 
 		</form>	
@@ -110,12 +109,12 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		
 		<div class="container" id="searchResults">
 			
-			<?php if($tableString !== NULL){ ?>
+			<?php if(isset($tableString)){ ?>
 				<h3> Search Results </h3>
 				<?php echo $tableString; /* The table string is constructed in backend/search.php, which is included by this file. */  ?>
 			<?php } else { ?>
 				<div id="linnot_info">
-					<div>It seems like you did not selected anything. Choose the graph type and the notation type and hit search!</div>
+					<div>It seems like you did not selected anything yet. Choose the graph type and the notation type above and click the search button.</div>
 				</div>
 			<?php } ?>
 

@@ -49,7 +49,7 @@ if (strlen($search_string) >= 1 && $search_string !== ' ') {
 	$data = pg_fetch_all($result);
 
 	// check if we have results
-	if (isset($data)) {
+	if (isset($data) && $data) {
 		foreach ($data as $entry) {
 			// format output strings and hightlight matches
 			$search_string = strtolower($search_string);
