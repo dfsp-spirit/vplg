@@ -445,6 +445,7 @@ if (isset($linnotalbeligkey) && $linnotalbeligkey != ""){
 
 
 $q_limit = 25;
+$numberOfChains = 0;
 
 $count_query = $query . " ) results";
 
@@ -480,7 +481,7 @@ if(isset($row_count["count"])) {
 // this counter is used to display alternating table colors
 $counter = 0;
 $createdHeadlines = Array();
-$numberOfChains = 0;
+
 
 // begin to create pager
 $tableString = '<div id="pager">';

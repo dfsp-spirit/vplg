@@ -2,14 +2,17 @@
 <?php
 
 ini_set('display_errors',1);
-ini_set('display_startup_errors',1);
-error_reporting(-1);
+ini_set('display_startup_errors', 1);
+ini_set('log_errors', TRUE);
+error_reporting(E_ALL);
 
 include('./backend/config.php'); 
 
 $title = "The Protein Topology Graph Library";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
+session_unset();
+session_destroy();
 
 function check_install($db)  {
     
@@ -225,25 +228,25 @@ function check_install($db)  {
 					<h4>Alpha Motifs</h4>
 					<div class="motifimagecontainer">
 					   <div class="motiftext">Four Helix Bundle (<a href="motif_overview.php#4helix">?</a>)</div>
-					   <a href="search.php?motif=4helix"><img class="motifimage" src="./images/4helixbeide_struktur.jpg" /></a></div>
+					   <a href="search.php?motif=4helix&st=motif"><img class="motifimage" src="./images/4helixbeide_struktur.jpg" /></a></div>
 					<div class="motifimagecontainer">
 					   <div class="motiftext">Globin Fold (<a href="motif_overview.php#globin">?</a>)</div>
-					   <a href="search.php?motif=globin"><img class="motifimage" src="./images/globin_struktur.jpg" /></a></div>
+					   <a href="search.php?motif=globin&st=motif"><img class="motifimage" src="./images/globin_struktur.jpg" /></a></div>
 
 
 					<h4>Beta Motifs</h4>
 					<div class="motifimagecontainer">
 					   <div class="motiftext">Up and Down Barrel (<a href="motif_overview.php#barrel">?</a>)</div>
-					   <a href="search.php?motif=barrel"><img class="motifimage" src="./images/barrel_struktur.jpg" /></a></div>	
+					   <a href="search.php?motif=barrel&st=motif"><img class="motifimage" src="./images/barrel_struktur.jpg" /></a></div>	
 					<div class="motifimagecontainer">
 					   <div class="motiftext">Immunoglobulin Fold (<a href="motif_overview.php#immuno">?</a>)</div>
-					   <a href="search.php?motif=immuno"><img class="motifimage" src="./images/immuno_struktur.jpg" /></a></div>
+					   <a href="search.php?motif=immuno&st=motif"><img class="motifimage" src="./images/immuno_struktur.jpg" /></a></div>
 					<div class="motifimagecontainer">
 					   <div class="motiftext">Beta Propeller (<a href="motif_overview.php#propeller">?</a>)</div>
-					   <a href="search.php?motif=propeller"><img class="motifimage" src="./images/propeller_struktur.jpg" /></a></div>	
+					   <a href="search.php?motif=propeller&st=motif"><img class="motifimage" src="./images/propeller_struktur.jpg" /></a></div>	
 					<div class="motifimagecontainer">
 					   <div class="motiftext">Jelly Roll (<a href="motif_overview.php#jelly">?</a>)</div>
-					   <a href="search.php?motif=jelly"><img class="motifimage" src="./images/jelly_struktur.jpg" /></a></div>		
+					   <a href="search.php?motif=jelly&st=motif"><img class="motifimage" src="./images/jelly_struktur.jpg" /></a></div>		
 
                                         <?php if($ENABLE_MOTIF_SEARCH_ALPHABETA) { ?>
 					   
@@ -251,18 +254,18 @@ function check_install($db)  {
 					
 					<div class="motifimagecontainer">
 					   <div class="motiftext">Ubiquitin Roll (<a href="motif_overview.php#ubi">?</a>)</div>
-					   <a href="search.php?motif=ubi"><img class="motifimage" src="./images/ubibeide_struktur.jpg" /></a></div>	
+					   <a href="search.php?motif=ubi&st=motif"><img class="motifimage" src="./images/ubibeide_struktur.jpg" /></a></div>	
 					
 					
 					<div class="motifimagecontainer">
 					   <div class="motiftext">Alpha-Beta Plait (<a href="motif_overview.php#plait">?</a>)</div>
-					   <a href="search.php?motif=plait"><img class="motifimage" src="./images/plait_struktur.jpg" /></a></div>
+					   <a href="search.php?motif=plait&st=motif"><img class="motifimage" src="./images/plait_struktur.jpg" /></a></div>
 					<div class="motifimagecontainer">
 					   <div class="motiftext">Rossman Fold (<a href="motif_overview.php#rossman">?</a>)</div>
-					   <a href="search.php?motif=rossman"><img class="motifimage" src="./images/rossman_struktur.jpg" /></a></div>	
+					   <a href="search.php?motif=rossman&st=motif"><img class="motifimage" src="./images/rossman_struktur.jpg" /></a></div>	
 					<div class="motifimagecontainer">
 					   <div class="motiftext">TIM Barrel (<a href="motif_overview.php#tim">?</a>)</div>
-					   <a href="search.php?motif=tim"><img class="motifimage" src="./images/tim_struktur.jpg" /></a></div>	
+					   <a href="search.php?motif=tim&st=motif"><img class="motifimage" src="./images/tim_struktur.jpg" /></a></div>	
 					   <?php } ?>
 
 				</div>
@@ -335,8 +338,9 @@ function check_install($db)  {
 						graphs in the database for: 
 						<input type="text" class="form-control" id="searchLinnots" autocomplete="off" placeholder="Enter query notation string...">
 						<!-- <input type="checkbox" name="matching" value="like"> contains -->
+						<input type="hidden" name="st" value="customlinnot">
 						<input type="radio" name="matching" value="like" checked> as substring
-						<input type="radio" name="matching" value="exact" checked> exact
+						<input type="radio" name="matching" value="exact"> exact
 						<button type="submit" id="sendit_linnots" name="linnotalbeligadj" value="linnotalbeligadj" class="btn btn-default" ><span class="glyphicon glyphicon-search"></span></button><br>
 
 			</form></div>

@@ -55,6 +55,7 @@ $TMP_DOWNLOAD_DIR	= './temp_downloads/';
 
 //---- Debug settings ----//
 $DEBUG_MODE = TRUE;
+$DEBUG = $DEBUG_MODE;
 //---- End of debug settings ----//
 
 //EOF

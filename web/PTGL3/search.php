@@ -1,4 +1,8 @@
 <?php 
+ini_set('display_errors',1);
+ini_set('display_startup_errors', 1);
+ini_set('log_errors', TRUE);
+error_reporting(E_ALL);
 if(!session_id()) {session_start();} 
 //echo "<pre>";
 //print_r($_SESSION);

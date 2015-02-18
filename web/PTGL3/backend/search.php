@@ -20,6 +20,7 @@ ini_set('display_startup_errors', 0);
 ini_set('log_errors', TRUE);
 error_reporting(E_ERROR);
 
+
 // get config values
 include('./backend/config.php');
 
@@ -31,69 +32,45 @@ if($DEBUG){
 }
 
 
-if(((isset($_GET["st"])) && ($_GET["st"] != "")) || (isset($_SESSION["st"]))){
-    if(isset($_SESSION["st"])){
-        $st = $_SESSION["st"];
-    } else {
-        $st = $_GET["st"];
-    }
-    if($st === "keyword"){
-        $search_type = "keyword search";
-        include('search_keyword.php');
-    }
-    if($st === "advanced"){
-        $search_type = "advanced search";
-        include('search_advanced.php');
-    }
-    if($st === "similarity"){
-        $search_type = "BioGraphletSimilarity";
-        include('search_similarity.php');
-    }
-    if($st === "random"){
-        $search_type = "Random";
-        include('search_random.php');
-    }
-} else if(((isset($_GET["motif"])) && ($_GET["motif"] != "")) || (isset($_SESSION["motif"]))) {
-    $search_type = "motif search";
+if(isset($_GET["st"]) && ($_GET["st"] != "")) {
+    $st = $_GET["st"];    
+}
+else if (isset($_SESSION["st"])){
+    $st = $_SESSION["st"];
+}
+else {
+    $st = "";    // wrong input, caught below
+}
+
+
+if($st === "keyword"){
+    $search_type = "Keyword search";
+    include('search_keyword.php');
+}
+else if($st === "advanced"){
+    $search_type = "Advanced search";
+    include('search_advanced.php');
+}
+else if($st === "similarity"){
+    $search_type = "BioGraphletSimilarity";
+    include('search_similarity.php');
+}
+else if($st === "random"){
+    $search_type = "Random search";
+    include('search_random.php');
+}
+else if($st === "motif"){
+    $search_type = "Motif search";
     include('search_motif.php');
 }
-
-
-else if(((isset($_GET["linnotalphaadj"])) && ($_GET["linnotalphaadj"] != "")) || (isset($_SESSION["linnotalphaadj"])) ||
-        ((isset($_GET["linnotalphared"])) && ($_GET["linnotalphared"] != "")) || (isset($_SESSION["linnotalphared"])) ||
-        ((isset($_GET["linnotalphakey"])) && ($_GET["linnotalphakey"] != "")) || (isset($_SESSION["linnotalphakey"])) ||
-        ((isset($_GET["linnotalphaseq"])) && ($_GET["linnotalphaseq"] != "")) || (isset($_SESSION["linnotalphaseq"])) ||
-        
-        ((isset($_GET["linnotbetaadj"])) && ($_GET["linnotbetaadj"] != "")) || (isset($_SESSION["linnotbetaadj"])) ||
-        ((isset($_GET["linnotbetared"])) && ($_GET["linnotbetared"] != "")) || (isset($_SESSION["linnotbetared"])) ||
-        ((isset($_GET["linnotbetakey"])) && ($_GET["linnotbetakey"] != "")) || (isset($_SESSION["linnotbetakey"])) ||
-        ((isset($_GET["linnotbetaseq"])) && ($_GET["linnotbetaseq"] != "")) || (isset($_SESSION["linnotbetaseq"])) ||
-        
-        ((isset($_GET["linnotalbeadj"])) && ($_GET["linnotalbeadj"] != "")) || (isset($_SESSION["linnotalbeadj"])) ||
-        ((isset($_GET["linnotalbered"])) && ($_GET["linnotalbered"] != "")) || (isset($_SESSION["linnotalbered"])) ||
-        ((isset($_GET["linnotalbekey"])) && ($_GET["linnotalbekey"] != "")) || (isset($_SESSION["linnotalbekey"])) ||
-        ((isset($_GET["linnotalbeseq"])) && ($_GET["linnotalbeseq"] != "")) || (isset($_SESSION["linnotalbeseq"])) ||
-        
-        ((isset($_GET["linnotalphaligadj"])) && ($_GET["linnotalphaligadj"] != "")) || (isset($_SESSION["linnotalphaligadj"])) ||
-        ((isset($_GET["linnotalphaligred"])) && ($_GET["linnotalphaligred"] != "")) || (isset($_SESSION["linnotalphaligred"])) ||
-        ((isset($_GET["linnotalphaligkey"])) && ($_GET["linnotalphaligkey"] != "")) || (isset($_SESSION["linnotalphaligkey"])) ||
-        ((isset($_GET["linnotalphaligseq"])) && ($_GET["linnotalphaligseq"] != "")) || (isset($_SESSION["linnotalphaligseq"])) ||
-        
-        ((isset($_GET["linnotbetaligadj"])) && ($_GET["linnotbetaligadj"] != "")) || (isset($_SESSION["linnotbetaligadj"])) ||
-        ((isset($_GET["linnotbetaligred"])) && ($_GET["linnotbetaligred"] != "")) || (isset($_SESSION["linnotbetaligred"])) ||
-        ((isset($_GET["linnotbetaligkey"])) && ($_GET["linnotbetaligkey"] != "")) || (isset($_SESSION["linnotbetaligkey"])) ||
-        ((isset($_GET["linnotbetaligseq"])) && ($_GET["linnotbetaligseq"] != "")) || (isset($_SESSION["linnotbetaligseq"])) ||
-        
-        ((isset($_GET["linnotalbeligadj"])) && ($_GET["linnotalbeligadj"] != "")) || (isset($_SESSION["linnotalbeligadj"])) ||
-        ((isset($_GET["linnotalbeligred"])) && ($_GET["linnotalbeligred"] != "")) || (isset($_SESSION["linnotalbeligred"])) ||
-        ((isset($_GET["linnotalbeligkey"])) && ($_GET["linnotalbeligkey"] != "")) || (isset($_SESSION["linnotalbeligkey"])) ||
-        ((isset($_GET["linnotalbeligseq"])) && ($_GET["linnotalbeligseq"] != "")) || (isset($_SESSION["linnotalbeligseq"])) ) {
-    $search_type = "linear notation";
+else if($st === "customlinnot"){
+    $search_type = "Linear notation search";
     include('search_linnot.php');
 }
-
 else {
     $search_type = "wrong input :(";
 }
+
+
 //EOF
 ?>

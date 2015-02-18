@@ -65,8 +65,6 @@ $db = pg_connect($conn_string);
 if(! $db) { array_push($SHOW_ERROR_LIST, "Database connection failed."); }
 
 
-$count_query = $query . " ) results";
-
 
 $q_limit = 10;
 if(isset($_GET['num_random']) && is_numeric($_GET['num_random'])) {
@@ -76,6 +74,7 @@ if(isset($_GET['num_random']) && is_numeric($_GET['num_random'])) {
     }
 }
 
+$query = "";
 $query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
                             FROM plcc_chain c
                             INNER JOIN plcc_protein p
