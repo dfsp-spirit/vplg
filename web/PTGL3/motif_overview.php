@@ -120,7 +120,7 @@ function get_all_motif_names() {
 	            
 	            if(isset($motif_data['motif_name']) && ( ! empty($motif_data['motif_name']))) {
 	                $all_motif_counts[$motif] = $motif_data['count'];
-	                print "<tr><td>" . $motif_data['motif_name'] . "</td><td>" . $motif_data['motif_abbreviation'] . "</td><td><a href='search.php?motif=" . $motif . "'>" . $motif_data['count'] . "</a></td><td><a href='#" . $motif_data['motif_abbreviation'] ."'>" . $motif . " info</a></td></tr>\n";
+	                print "<tr><td>" . $motif_data['motif_name'] . "</td><td>" . $motif_data['motif_abbreviation'] . "</td><td><a href='search.php?st=motif&motif=" . $motif . "'>" . $motif_data['count'] . "</a></td><td><a href='#" . $motif_data['motif_abbreviation'] ."'>" . $motif . " info</a></td></tr>\n";
 	            } else {	            
 	                print "<tr><td>" . get_motif_fullname($db, $motif) . "</td><td>" . $motif . "</td><td>0</td><td><a href='#" . $motif ."'>" . $motif . " info</a></td></tr>\n";
 	            }

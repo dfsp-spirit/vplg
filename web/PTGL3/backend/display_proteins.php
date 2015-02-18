@@ -78,7 +78,7 @@ function get_graphtype_string_from_int($gt_int) {
    else if($gt_int === 6){
      return "albelig";
    }
-   return "unknown_gt";
+   return "INVALIDGRAPHTYPE";
 }
 
 function get_protein_graph_file_name_no_ext($pdbid, $chain, $graphtype_string) {
@@ -194,7 +194,7 @@ foreach ($chains as $value){
             $content_available = TRUE;
             // get unique DB chain ID
             $chain_id = (int) $arr['chain_id'];
-            $graphtype_int = $arr["graph_type"];
+            $graphtype_int = intval($arr["graph_type"]);
             $query_SSE = "SELECT * FROM plcc_sse WHERE chain_id = ".$chain_id." ORDER BY position_in_chain";
             $result_SSE = pg_query($db, $query_SSE);
             
@@ -202,7 +202,7 @@ foreach ($chains as $value){
             if(isset($arr['graph_image_png']) && file_exists($IMG_ROOT_PATH.$arr['graph_image_png'])) {
                 $base_image_exists = TRUE;
             }
-            $graphtype_string = get_graphtype_string_from_int($arr['graph_type']);
+            $graphtype_string = get_graphtype_string_from_int($graphtype_int);
                        
             if($base_image_exists) {
                              
@@ -238,7 +238,7 @@ foreach ($chains as $value){
                     $full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".tgf";
                     if(file_exists($full_file)){
                         $tableString .= ' <a href="' . $full_file .'" target="_blank">[TGF]</a>';
-                    }
+                    }                    
                 // gv
                     $full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".gv";
                     if(file_exists($full_file)){
@@ -277,7 +277,7 @@ foreach ($chains as $value){
                     $tableString .= "<br><span class='download-options'>";
                     $tableString .= "Detected motifs in this chain: ";
                     for($i = 0; $i < count($motif_list_this_chain); $i++) {
-                      $tableString .= "<a href='search.php?motif=" . get_motif_abbreviation($motif_list_this_chain[$i]) . "' target='_blank'>" . $motif_list_this_chain[$i] . "</a> ";
+                      $tableString .= "<a href='search.php?st=motif&motif=" . get_motif_abbreviation($motif_list_this_chain[$i]) . "' target='_blank'>" . $motif_list_this_chain[$i] . "</a> ";
                     }
                     $tableString .= "</span>";
                 }
