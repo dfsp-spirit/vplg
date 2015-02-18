@@ -454,7 +454,7 @@ public static HashMap<DrawTools.IMAGEFORMAT, String> drawComplexGraph(String bas
     DrawResult drawRes = ComplexGraph.drawProteinGraphG2D(drawBlackAndWhite, cg);
 
     //System.out.println("drawProteinGraph: Basefilepath is '" + baseFilePathNoExt + "'.");
-    String svgFilePath = baseFilePathNoExt + "_CHAINS.svg";
+    String svgFilePath = baseFilePathNoExt + ".svg";
     HashMap<DrawTools.IMAGEFORMAT, String> resultFilesByFormat = new HashMap<DrawTools.IMAGEFORMAT, String>();
     try {
         DrawTools.writeG2dToSVGFile(svgFilePath, drawRes);

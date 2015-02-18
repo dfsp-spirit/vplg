@@ -3104,12 +3104,11 @@ connection.close();
      * @return true if it worked out
      * @throws SQLException if DB stuff went wrong
      */
-    public static Boolean writeComplexGraphToDB(String pdb_id, String ssegraph_string_gml, String chaingraph_string_gml, String ssegraph_string_xml, String chaingraph_string_xml, String ssegraph_string_kavosh, String chaingraph_string_kavosh, String ssegraph_image_svg, String chaingraph_image_svg, String ssegraph_image_png, String chaingraph_image_png) throws SQLException {
+    public static Boolean writeComplexGraphToDB(String pdb_id, String ssegraph_string_gml, String chaingraph_string_gml, String ssegraph_string_xml, String chaingraph_string_xml, String ssegraph_string_kavosh, String chaingraph_string_kavosh, String ssegraph_image_svg, String chaingraph_image_svg, String ssegraph_image_png, String chaingraph_image_png, String ssegraph_image_pdf, String chaingraph_image_pdf) throws SQLException {
                        
         PreparedStatement statement = null;
         Boolean result;
-
-        String query = "INSERT INTO " + tbl_complexgraph + " (pdb_id, ssegraph_string_gml, chaingraph_string_gml, ssegraph_string_xml, chaingraph_string_xml, ssegraph_string_kavosh, chaingraph_string_kavosh, ssegraph_image_svg, chaingraph_image_svg, ssegraph_image_png, chaingraph_image_png) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO " + tbl_complexgraph + " (pdb_id, ssegraph_string_gml, chaingraph_string_gml, ssegraph_string_xml, chaingraph_string_xml, ssegraph_string_kavosh, chaingraph_string_kavosh, filepath_ssegraph_image_svg, filepath_chaingraph_image_svg, filepath_ssegraph_image_png, filepath_chaingraph_image_png, filepath_ssegraph_image_pdf, filepath_chaingraph_image_pdf) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
         
         try {
@@ -3127,6 +3126,8 @@ connection.close();
             statement.setString(9, chaingraph_image_svg);
             statement.setString(10, ssegraph_image_png);
             statement.setString(11, chaingraph_image_svg);
+            statement.setString(12, ssegraph_image_pdf);
+            statement.setString(13, chaingraph_image_pdf);
                                 
             statement.executeUpdate();
             //dbc.commit();
