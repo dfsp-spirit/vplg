@@ -5283,13 +5283,13 @@ E	3	3	3
         SSEGraph pg = fg.parent;
         
         boolean debug = false;
-        /*
+        
         if(pg.pdbid.equals("8icd") && pg.chainid.equals("A")) {
             if(fg.graphType.equals("beta") && fg.getFoldingGraphNumber().equals(1)) {
                 debug = true;
             }
         } 
-        */
+        
         
         if(debug) {
             System.out.println("******************** START *********************");
@@ -5423,7 +5423,9 @@ E	3	3	3
         String proteinHeader = "The KEY " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
         String notation = "KEY notation: '" + pnfr.keyNotation + "'";
 
-        if(debug) { DP.getInstance().d("Notation: " + notation); }
+        if(debug) { 
+            DP.getInstance().d("Notation from PNFR: " + notation);
+        }
         
         //if(Settings.getBoolean("plcc_B_graphimg_add_linnot_start_vertex")) {
         //    notation += "   start=" + (pnfr.keyStartFG);
@@ -5533,6 +5535,9 @@ E	3	3	3
         }      
         KEYNotation.append(bracketEnd);
 
+        if(debug) { 
+            DP.getInstance().d("Notation from this func: " + KEYNotation.toString());
+        }
 
         Integer[] newOrientations = new Integer[fg.spatOrder.size()];
         Arrays.fill(newOrientations, FoldingGraph.ORIENTATION_NONE);       
@@ -5602,6 +5607,11 @@ E	3	3	3
             System.out.println("");
         }
         
+        StringBuilder fuckNewKEY = new StringBuilder();
+        fuckNewKEY.append(bracketStart);
+        String[] newKey = new String[fg.size];
+        Arrays.fill(newKey, "");
+        
         // draw the edges
         for(int i = 0; i < fg.spatOrder.size(); i++) {
             currentVertexIndexInFGSequential = fg.spatOrder.get(i);
@@ -5609,13 +5619,16 @@ E	3	3	3
             // draw the arc from last one to current one
             Integer previousVertexIndexInFGSequential;
             Integer previousVertexIndexSpatial, currentVertexIndexSpatial;
+            Integer relDist;
             List<Shape> shapes;
             if(currentVertexIndexInFGSequential > 0) {
                 previousVertexIndexInFGSequential = currentVertexIndexInFGSequential - 1;
                 currentVertexIndexSpatial = fg.spatOrder.indexOf(currentVertexIndexInFGSequential);
                 previousVertexIndexSpatial = fg.spatOrder.indexOf(previousVertexIndexInFGSequential);
+                relDist = currentVertexIndexSpatial - previousVertexIndexSpatial;
+                newKey[currentVertexIndexSpatial] = relDist + "";
                 if(debug) {
-                    System.out.println("EDGE (i=" + i + ") This is vert " + currentVertexIndexInFGSequential + " at position " + fg.spatOrder.indexOf(currentVertexIndexInFGSequential) + ", last vert sequential was " + previousVertexIndexInFGSequential + " at position " + previousVertexIndexSpatial + ".");
+                    System.out.println("EDGE (i=" + i + ") This is vert " + currentVertexIndexInFGSequential + " at position " + currentVertexIndexSpatial + ", last vert sequential was " + previousVertexIndexInFGSequential + " at position " + previousVertexIndexSpatial + ".");
                 }
                 lastP = new Position2D(vertStartX + (previousVertexIndexSpatial * vertDist) + pl.vertRadius / 2, vertStartY);
                 //lastP = new Position2D(vertStartX + (fg.spatOrder.indexOf(i-1) * vertDist) + pl.vertRadius / 2, vertStartY);
@@ -5678,6 +5691,13 @@ E	3	3	3
             }
         }
 
+        for(int i = 0; i < newKey.length; i++) {
+            fuckNewKEY.append(newKey[i]+ ", ");
+        }
+        fuckNewKEY.append(bracketEnd);
+        if(debug) {
+            System.out.println("newKEY = " + fuckNewKEY.toString());
+        }
 
 
         // ************************************* footer **************************************
