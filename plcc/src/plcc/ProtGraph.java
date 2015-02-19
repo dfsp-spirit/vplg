@@ -389,6 +389,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
     }        
     
     
+    
     /**
      * Determines whether this graph is connected, i.e. consists of a single connected component.
      * @return true if it is connected, false otherwise

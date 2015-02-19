@@ -23,7 +23,7 @@ public interface SimpleGraphInterface {
     
     public Boolean containsEdge(Integer i, Integer j);
     
-    public ArrayList<Integer> neighborsOf(Integer i);
+    public List<Integer> neighborsOf(Integer i);
     
     public Character getVertexLabelChar(Integer i);
     

@@ -2662,19 +2662,11 @@ E	3	3	3
 
         return(max);
     }
-    
-    
-
-
-
-
-
-    
+        
     
     public Boolean isProteinGraph() { return(this.isProteinGraph); }
     public Boolean isFoldingGraph() { return( ! this.isProteinGraph); }
-    
-    
+        
     
     /**
      * Uses Dijkstra's algorithm to compute the distance matrix of this graph, i.e. all pairwise distances between vertices.
@@ -2697,6 +2689,120 @@ E	3	3	3
         this.distancesCalculated = true;
     }
     
+    /**
+     * The eccentricity e(v) of a vertex v is the greatest geodesic distance between v and any other vertex.
+     * @param v
+     * @return 
+     */
+    public Integer getEccentricityOfVertex(int v) {
+        if(this.size == 0) {
+            return null;
+        }
+        
+        if(this.isConnected()) {
+            if( ! this.distancesCalculated) {
+                this.calculateDistancesWithinGraph();
+            }
+                
+            Integer e = 0;
+            for(int i = 0; i < this.size; i++) {
+                if(i == v) {
+                    continue;
+                }
+                if(distMatrix[i][v] > e) {
+                    e = distMatrix[i][v];
+                }
+            }
+            
+            if(e.equals(0)) {
+                return null;
+            }
+            return e;
+            
+        }
+        else {
+            return null;
+        }
+    }
+    
+    
+    /**
+     * The radius r of a graph is the minimum eccentricity of any vertex.
+     * @return the graph radius or null if this graph is not connected or empty
+     */
+    public Integer getGraphRadius() {
+        if(this.size == 0) {
+            return null;
+        }
+        
+        if(this.isConnected()) {
+            Integer minEcc = Integer.MAX_VALUE;
+            for(int i = 0; i < this.getSize(); i++) {
+                Integer e = this.getEccentricityOfVertex(i);
+                if(e != null) {
+                    if(e < minEcc) {
+                        minEcc = e;
+                    }
+                }
+            }
+            return minEcc;
+        }
+        else {
+            return null;
+        }
+    }
+    
+    /**
+     * The diameter d of a graph is the maximum eccentricity of any vertex.
+     * @return the graph diameter or null if this graph is not connected or empty
+     */
+    public Integer getGraphDiameter() {
+        if(this.size == 0) {
+            return null;
+        }
+        
+        if(this.isConnected()) {
+            Integer maxEcc = 0;
+            for(int i = 0; i < this.getSize(); i++) {
+                Integer e = this.getEccentricityOfVertex(i);
+                if(e != null) {
+                    if(e > maxEcc) {
+                        maxEcc = e;
+                    }
+                }
+            }
+            return maxEcc;
+        }
+        else {
+            return null;
+        }
+    }
+    
+    
+    /**
+     * Computes the average shortest path distance within the graph.
+     * @return the average shortest path distance, or null if the graph is not connected
+     */
+    public Double getAverageShortestPathDistance() {
+        if(this.isConnected()) {
+            if( ! this.distancesCalculated) {
+                this.calculateDistancesWithinGraph();
+            }
+            
+            Double d = .0d;
+            Integer numDist = 0;
+            for(int i = 0; i < this.size; i++) {
+                for(int j = i+1; j < this.size; j++) {
+                    d += distMatrix[i][j];
+                    numDist++;
+                }                
+            }
+            return d / numDist.doubleValue();
+        }
+        else {
+            return null;
+        }
+    }
     
     /**
      * A wrapper around computePaths() which only fills out the distance matrix for the vertex sourceVertex. Note that you need to

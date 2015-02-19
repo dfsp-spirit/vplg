@@ -321,6 +321,9 @@ public class Settings {
         defSet("plcc_B_graphtype_betalig", "true", "Determines whether alpha-beta graphs with ligands are drawn");
         defSet("plcc_S_output_dir", ".", "output directory");
         
+        // graph metrics and advanced statistics
+        defSet("plcc_B_compute_graph_metrics", "false", "Whether to compute graph metrics like cluster coefficient for PGs. Slower!");
+        
         // motifs
         defSet("plcc_B_compute_motifs", "true", "Whether to search for motifs in the FG linear notations (after computing and writing them to the DB).");
         

@@ -10,6 +10,7 @@
 package plcc;
 
 // imports
+import algorithms.GraphMetrics;
 import datastructures.AAGraph;
 import htmlgen.CssGenerator;
 import htmlgen.HtmlGenerator;
@@ -385,6 +386,11 @@ public class Main {
                         Settings.set("plcc_B_useDB", "true");
                         Settings.set("plcc_B_compute_all_graphlet_similarities", "true");                        
                     }
+                    
+                    if(s.equals("--compute-graph-metrics")) {
+                        Settings.set("plcc_B_compute_graph_metrics", "true");
+                    }
+                    
                     
                     if(s.equals("--set-pdb-representative-chains")) {
                         if(args.length <= i+2 ) {
@@ -1144,7 +1150,7 @@ public class Main {
             }   
             
         }
-        
+                
         
         if(Settings.getBoolean("plcc_B_report_db_proteins")) {
             String reportFileName = "db_contents_proteins.txt";
@@ -2312,9 +2318,50 @@ public class Main {
                     }
                 }
                 
-                // DEBUG: calculate distance matrix of the graph
-                //pg.calculateDistancesWithinGraph();
-                //pg.printDistMatrix();
+                if(Settings.getBoolean("plcc_B_compute_graph_metrics")) {
+                    
+                    pg.computeConnectedComponents();
+                    FoldingGraph fg = pg.getLargestConnectedComponent();
+                    
+                    // ----- number of vertices -----
+                    Integer numVertsPG = pg.getSize();
+                    Integer numVertsLargestCC = fg.getSize();
+                    
+                    // ----- average network cluster coefficient -----
+                    Double anccGraph = GraphMetrics.averageNetworkClusterCoefficient(pg);
+                    Double anccLargestCC = GraphMetrics.averageNetworkClusterCoefficient(fg);
+                    
+                    Integer numCCGraph = pg.connectedComponents.size();
+                    Integer numCCLargestCC = 1;
+                    
+                    // ----- average shortest path length -----
+                    Double asplGraph = pg.getAverageShortestPathDistance();
+                    Double asplLargestCC = fg.getAverageShortestPathDistance();
+                    
+                    // ----- diameter -----
+                    Integer diamGraph = pg.getGraphDiameter();
+                    Integer diamLargestCC = fg.getGraphDiameter();
+                    
+                    // ----- radius -----
+                    Integer radiusGraph = pg.getGraphRadius();
+                    Integer radiusLargestCC = fg.getGraphRadius();
+                    
+                    
+                    System.out.println("      Stats for the " + gt + " graph of " + pdbid + " chain " + chain + ":");
+                    System.out.println("       *number of vertices PG = " + numVertsPG + "");
+                    System.out.println("       *number of vertices FG = " + numVertsLargestCC + "");
+                    System.out.println("       *number of connected components PG = " + numCCGraph + "");
+                    System.out.println("       *number of connected components FG = " + numCCLargestCC + "");
+                    System.out.println("       *diameter of PG = " + diamGraph + "");
+                    System.out.println("       *diameter of FG = " + diamLargestCC + "");
+                    System.out.println("       *radius of PG = " + radiusGraph + "");
+                    System.out.println("       *radius of FG = " + radiusLargestCC + "");
+                    System.out.format("       *average network cluster coefficient PG = %.4f\n", anccGraph);
+                    System.out.format("       *average network cluster coefficient FG = %.4f\n", anccLargestCC);
+                    System.out.format("       *average shortest path length of PG = %.4f\n", asplGraph);
+                    System.out.format("       *average shortest path length of FG = %.4f\n", asplLargestCC);
+                
+                }
 
                 // draw the protein graph image
 
@@ -4810,6 +4857,7 @@ public class Main {
         System.out.println("-Y | --skip-vast <atoms>   : abort program execution for PDB files with more than <atoms> atoms before contact computation (for cluster mode, try 80000).");        
         System.out.println("-z | --ramaplot            : draw a ramachandran plot of each chain to the file '<pdbid>_<chain>_plot.svg'");        
         System.out.println("-Z | --silent              : silent mode. do not write output to STDOUT.");        
+        System.out.println("   --compute-graph-metrics : compute graph metrics like cluster coefficient for PGs. Slower!");
         System.out.println("");
         System.out.println("EXAMPLES: java -jar plcc.jar 8icd");
         System.out.println("          java -jar plcc.jar 8icd -D 2 -d /tmp/dssp/8icd.dssp -p /tmp/pdb/8icd.pdb");
