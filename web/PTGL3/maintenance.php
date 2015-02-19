@@ -244,7 +244,8 @@ function get_linnots_filename($graphtype_int, $notation) {
 			  
 			  
 			  $conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
-			  $db = pg_connect($conn_string);                          
+			  $db = pg_connect($conn_string);       
+			  if(! $db) { echo "ERROR: DB CONN FAILED."; }
 			
 			  if($CHECK_INSTALL_ON_MAINTENANCEPAGE) {
 			      
@@ -348,7 +349,7 @@ function get_linnots_filename($graphtype_int, $notation) {
 					  $all_data = pg_fetch_all($result);
 		    
 					  if(! $all_data) { 
-					      echo "ERROR: '" . pg_last_error() . "'.";
+					      echo "DB/SQL ERROR: '" . pg_last_error($db) . "'.<br>";
 					  } else {					  
 					      $result_string = "";
 					      

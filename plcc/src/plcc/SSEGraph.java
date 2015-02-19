@@ -5494,7 +5494,7 @@ E	3	3	3
 
         StringBuilder KEYNotation = new StringBuilder(); 
 
-        String bracketStart = "{";
+        String bracketStart = "{";  // Note: This KEY string should not be used, since brackets are not done correctly. use the one from the PNFR instead.
         String bracketEnd = "}";
 
         KEYNotation.append(bracketStart);
@@ -5578,6 +5578,7 @@ E	3	3	3
                 pol = DrawTools.getDefaultBarrelPolygonLowestPointAt(p.x, p.y);
             }
             ig2.draw(pol);
+            ig2.fill(pol);
             //pl.getFooterStart().x + ((i-shiftBack[i]) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4)
             ig2.drawString((currentVertexIndexInFGSequential + 1) + "", pl.getFooterStart().x + (i * vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4));
             //ig2.drawString("i=" + (i) + "", p.x, p.y + 70);
