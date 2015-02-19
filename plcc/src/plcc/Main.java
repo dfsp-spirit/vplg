@@ -2327,6 +2327,12 @@ public class Main {
                     Integer numVertsPG = pg.getSize();
                     Integer numVertsLargestCC = fg.getSize();
                     
+                    // we do not print largest connected component data if it is equal to whole graph data anyway
+                    Boolean pcc = true;
+                    if(numVertsPG.equals(numVertsLargestCC)) {
+                        pcc = false;
+                    }
+                    
                     // ----- average network cluster coefficient -----
                     Double anccGraph = GraphMetrics.averageNetworkClusterCoefficient(pg);
                     Double anccLargestCC = GraphMetrics.averageNetworkClusterCoefficient(fg);
@@ -2347,19 +2353,20 @@ public class Main {
                     Integer radiusLargestCC = fg.getGraphRadius();
                     
                     
-                    System.out.println("      Stats for the " + gt + " graph of " + pdbid + " chain " + chain + ":");
-                    System.out.println("       *number of vertices PG = " + numVertsPG + "");
-                    System.out.println("       *number of vertices FG = " + numVertsLargestCC + "");
+                    System.out.println("      Stats for the " + gt + " graph of " + pdbid + " chain " + chain + ":");                    
+                    if(pcc) { System.out.println("       PG is not connected, also printing data for its largest connected component (FG)."); }
                     System.out.println("       *number of connected components PG = " + numCCGraph + "");
-                    System.out.println("       *number of connected components FG = " + numCCLargestCC + "");
+                    if(pcc) { System.out.println("       *number of connected components FG = " + numCCLargestCC + ""); }
+                    System.out.println("       *number of vertices PG = " + numVertsPG + "");
+                    if(pcc) { System.out.println("       *number of vertices FG = " + numVertsLargestCC + ""); }
                     System.out.println("       *diameter of PG = " + diamGraph + "");
-                    System.out.println("       *diameter of FG = " + diamLargestCC + "");
+                    if(pcc) { System.out.println("       *diameter of FG = " + diamLargestCC + ""); }
                     System.out.println("       *radius of PG = " + radiusGraph + "");
-                    System.out.println("       *radius of FG = " + radiusLargestCC + "");
+                    if(pcc) { System.out.println("       *radius of FG = " + radiusLargestCC + ""); }
                     System.out.format("       *average network cluster coefficient PG = %.4f\n", anccGraph);
-                    System.out.format("       *average network cluster coefficient FG = %.4f\n", anccLargestCC);
+                    if(pcc) { System.out.format("       *average network cluster coefficient FG = %.4f\n", anccLargestCC); }
                     System.out.format("       *average shortest path length of PG = %.4f\n", asplGraph);
-                    System.out.format("       *average shortest path length of FG = %.4f\n", asplLargestCC);
+                    if(pcc) { System.out.format("       *average shortest path length of FG = %.4f\n", asplLargestCC); }
                 
                 }
 
