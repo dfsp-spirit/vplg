@@ -32,10 +32,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Locale;
 import java.util.logging.Level;
-import javafx.util.Pair;
 import javax.imageio.ImageIO;
 import javax.xml.parsers.ParserConfigurationException;
-import net.sourceforge.spargel.datastructures.UAdjListGraph;
 //import java.net.*;
 //import org.jgrapht.*;
 //import org.jgrapht.graph.*;
@@ -5951,6 +5949,7 @@ public class Main {
         ArrayList<String> conInfo = new ArrayList<String>();
         conInfo.add("ChainA;ChainB;ResNameA;ResNameB;resTypeA;resTypeB;BB;BC;BL;CB;CL;CC;HB1;HB2;LB;LC;LL;"
                   + "BBDist;BCDist;BLDist;CBDist;CLDist;CCDist;HB1Dist;HB2Dist;LBDist;LCDist;LLDist");
+        
         // create edges for all contacts
         for(Integer i = 0; i < resContacts.size(); i++) {
             ComplexGraph.Vertex chainA = compGraph.getVertexFromChain(resContacts.get(i).getResA().getChainID());
@@ -5963,7 +5962,8 @@ public class Main {
             if (compGraph.chainsHaveEnoughContacts(chainAint, chainBint)){
                 
                 ResContactInfo curRes = resContacts.get(i);
-                                
+                
+                // Die Datenkrake
                 String chainAString = curRes.getResA().getChainID().toString();
                 String chainBString = curRes.getResB().getChainID().toString();
                 String resNameA = curRes.getResName3A();
@@ -5994,7 +5994,31 @@ public class Main {
                 String numLB = curRes.getNumContactsLB().toString();
                 String numLC = curRes.getNumContactsLC().toString();
                 String numLL = curRes.getNumContactsLL().toString();
+                
+                
+                // Only if both residues belong to a SSE
+                if(curRes.getResA().getSSE() != null && curRes.getResB().getSSE() != null){
+                    Integer ResASseDsspNum = curRes.getResA().getSSE().getStartDsspNum();
+                    Integer ResBSseDsspNum = curRes.getResB().getSSE().getStartDsspNum();
+                    
+                    Integer tmp;
+                    if (ResASseDsspNum > ResBSseDsspNum) {
+                        tmp = ResBSseDsspNum;
+                        ResBSseDsspNum = ResASseDsspNum;
+                        ResASseDsspNum = tmp;
+                    }
+                    
+                    List<Integer> SSEPair = Arrays.asList(ResASseDsspNum, ResBSseDsspNum);
 
+                    if(compGraph.numSSEContacts.get(SSEPair) == null) {
+                        compGraph.numSSEContacts.put(SSEPair, 1);
+                    } else {
+                        compGraph.numSSEContacts.put(SSEPair, compGraph.numSSEContacts.get(SSEPair) + 1);
+                    }
+                }
+                      
+                                
+                //This is for CSV output only. Like the most of the code above.
                 conInfo.add(chainAString + ";" + chainBString + ";" + resNameA + ";" + resNameB + ";" + 
                             resTypeA + ";" + resTypeB + ";" + numBB + ";" + numBC + ";" + numBL + ";" + 
                             numCB + ";" + numCL + ";" + numCC + ";" + numHB1 + ";" + numHB2 + ";" + 
@@ -6196,21 +6220,26 @@ public class Main {
             }
         }
         
-        if(Settings.getBoolean("plcc_B_useDB")) {
-            if(! silent) {
-                System.out.print("    Writing chain contact info to DB...");
-            }
         
-            if(compGraph.writeComplexContactInfoToDB(pdbid)){
-                if(! silent) {
-                    System.out.println(" successful!");
-                }
+        if(Settings.getBoolean("plcc_B_useDB")) {
+            if(! silent) {System.out.print("    Writing chain complex contact info to DB...");}
+        
+            if(compGraph.writeChainComplexContactInfoToDB(pdbid)){
+                if(! silent) { System.out.println(" successfull!");}
             } else {
-                if(! silent) {
-                    System.out.println(" FAILED!");
-                }
+                if(! silent) { System.out.println(" FAILED!"); }
             }
         }
+     
+        if(Settings.getBoolean("plcc_B_useDB")) {
+            if(! silent) {System.out.print("    Writing SSE complex contact info to DB...");}
+        
+            if(compGraph.writeSSEComplexContactInfoToDB(pdbid)){
+                if(! silent) { System.out.println(" successfull!");}
+            } else {
+                if(! silent) { System.out.println(" FAILED!"); }
+            }
+        }        
                 
         if(! silent) {
             try {
