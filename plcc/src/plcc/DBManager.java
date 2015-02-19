@@ -4513,6 +4513,71 @@ connection.close();
         return(result);
     }
     
+    /**
+     * 
+     * @param pdb_id
+     * @param chainA
+     * @param chainB
+     * @return
+     * @throws SQLException 
+     */
+    public static Boolean writeComplexContactToDB(String pdbid, String chainA, String chainB, Integer[] interactionNums) throws SQLException {
+        
+        
+        Long db_chain1_id = DBManager.getDBChainID(pdbid, chainA);
+        Long db_chain2_id = DBManager.getDBChainID(pdbid, chainB);
+        Long tmp;
+
+        // We may need to switch the IDs to make sure the 1st of them is always lower
+        if (db_chain1_id > db_chain2_id) {
+            tmp = db_chain2_id;
+            db_chain2_id = db_chain1_id;
+            db_chain1_id = tmp;
+        }
+
+        Boolean result = false;
+        PreparedStatement statement = null;
+        
+        String query = "INSERT INTO " + tbl_complex_contact_stats + " (chain1, chain2, contact_num_hh, contact_num_hs, contact_num_hl, contact_num_ss, contact_num_sl, contact_num_ll, contact_num_ds) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, db_chain1_id);
+            statement.setLong(2, db_chain2_id);
+            statement.setInt(3, interactionNums[0]); //  contact_num_hh
+            statement.setInt(4, interactionNums[1]); //  contact_num_hs 
+            statement.setInt(5, interactionNums[2]); //  contact_num_hl
+            statement.setInt(6, interactionNums[3]); //  contact_num_ss 
+            statement.setInt(7, interactionNums[4]); //  contact_num_sl 
+            statement.setInt(8, interactionNums[5]); //  contact_num_ll 
+            statement.setInt(9, interactionNums[6]); //  contact_num_ds 
+                                
+            statement.executeUpdate();
+            //dbc.commit();
+            result = true;
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: writeChainComplexContactToDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: writeChainComplexContactToDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: writeChainComplexContactToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+            result = false;
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            //dbc.setAutoCommit(true);
+        }
+                
+        return(result);
+    }
+    
 
     /**
      * Writes information on a SSE contact to the database.

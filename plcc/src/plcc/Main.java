@@ -32,8 +32,10 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Locale;
 import java.util.logging.Level;
+import javafx.util.Pair;
 import javax.imageio.ImageIO;
 import javax.xml.parsers.ParserConfigurationException;
+import net.sourceforge.spargel.datastructures.UAdjListGraph;
 //import java.net.*;
 //import org.jgrapht.*;
 //import org.jgrapht.graph.*;
@@ -5945,7 +5947,7 @@ public class Main {
             }
         }
         
-
+        
         ArrayList<String> conInfo = new ArrayList<String>();
         conInfo.add("ChainA;ChainB;ResNameA;ResNameB;resTypeA;resTypeB;BB;BC;BL;CB;CL;CC;HB1;HB2;LB;LC;LL;"
                   + "BBDist;BCDist;BLDist;CBDist;CLDist;CCDist;HB1Dist;HB2Dist;LBDist;LCDist;LLDist");
@@ -5961,7 +5963,7 @@ public class Main {
             if (compGraph.chainsHaveEnoughContacts(chainAint, chainBint)){
                 
                 ResContactInfo curRes = resContacts.get(i);
-                
+                                
                 String chainAString = curRes.getResA().getChainID().toString();
                 String chainBString = curRes.getResB().getChainID().toString();
                 String resNameA = curRes.getResName3A();
@@ -5999,11 +6001,13 @@ public class Main {
                             numLB + ";" + numLC + ";" + numLL + ";" + BBDist + ";" + BCDist + ";" + 
                             BLDist + ";" + CBDist + ";" + CLDist + ";" + CCDist + ";" + HB1Dist + ";" + 
                             HB2Dist + ";" + LBDist + ";" + LCDist + ";" + LLDist);
-                
+
+                String[] chainPair = {chainAString, chainBString};
                 
                 if (compGraph.getEdge(chainA, chainB) == null){
                     // We don't have an edge yet, but need one, so create an edge
                     ComplexGraph.Edge e1 = compGraph.createEdge(chainA, chainB);
+                    compGraph.chainNamesInEdge.put(e1, chainPair);
                     compGraph.numAllInteractionsMap.put(e1, 1);
                     compGraph.numHelixHelixInteractionsMap.put(e1, 0);
                     compGraph.numHelixStrandInteractionsMap.put(e1, 0);
@@ -6085,6 +6089,7 @@ public class Main {
                                     //System.out.println("Other Contact");
                                     break;
                             }
+
                         }
                         else{
                             compGraph.numLoopLoopInteractionsMap.put(e1, 1);
@@ -6190,8 +6195,26 @@ public class Main {
                 compGraph.neglectedEdges++; // TODO: so wrong...
             }
         }
+        
+        if(Settings.getBoolean("plcc_B_useDB")) {
+            if(! silent) {
+                System.out.print("    Writing chain contact info to DB...");
+            }
+        
+            if(compGraph.writeComplexContactInfoToDB(pdbid)){
+                if(! silent) {
+                    System.out.println(" successful!");
+                }
+            } else {
+                if(! silent) {
+                    System.out.println(" FAILED!");
+                }
+            }
+        }
+                
         if(! silent) {
             try {
+                //Actually only the values of the first edge...                 
                 System.out.println("    All Interactions : " + compGraph.numAllInteractionsMap.values().toArray()[0]);
                 System.out.println("    HH Interactions  : " + compGraph.numHelixHelixInteractionsMap.values().toArray()[0]);
                 System.out.println("    HS Interactions  : " + compGraph.numHelixStrandInteractionsMap.values().toArray()[0]);
@@ -6205,7 +6228,7 @@ public class Main {
             }
         }
 
-        cgr.setCompGraph(compGraph);
+        cgr.setCompGraph(compGraph);     
         
         if( ! silent) {
             System.out.println("  Preparing to write complex graph files.");
@@ -6260,7 +6283,7 @@ public class Main {
             coils = "_coils";
         }        
         
-        fileNameSSELevelWithoutExtension = pdbid + "_complex_sses" + coils + "_CG";
+        fileNameSSELevelWithoutExtension = pdbid + "_complex_sses_" + graphType + coils + "_CG";
         fileNameChainLevelWithoutExtension = pdbid + "_complex_chains" + coils + "_CG";
         fileNameSSELevelWithExtension = fileNameSSELevelWithoutExtension + Settings.get("plcc_S_img_output_fileext");
         fileNameChainLevelWithExtension = fileNameChainLevelWithoutExtension + Settings.get("plcc_S_img_output_fileext");
@@ -6378,10 +6401,7 @@ public class Main {
         String imgFileNoExt = filePathImg + fs + fileNameSSELevelWithoutExtension;
         String imgFileChainComplexNoExt = filePathImg + fs + fileNameChainLevelWithoutExtension;
         //imgFile = filePathImg + fs + fileNameWithExtension;
-        
-        System.out.println(fileNameSSELevelWithoutExtension);
-        System.out.println(fileNameChainLevelWithoutExtension);
-        
+                
         if(Settings.getBoolean("plcc_B_draw_graphs")) {
             IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG, DrawTools.IMAGEFORMAT.PDF };
             SSEGraph.drawProteinGraph(imgFileNoExt, false, formats, pg);
@@ -6392,10 +6412,9 @@ public class Main {
             HashMap<DrawTools.IMAGEFORMAT, String> drawnFormats = ComplexGraph.drawComplexGraph(imgFileChainComplexNoExt, false, formats, compGraph);
             if(! silent) {
                 for(IMAGEFORMAT f : drawnFormats.keySet()) {
-                    System.out.println("  Complex graph drawn in format " + f + " to file '" + drawnFormats.get(f) + "'.") ;
+                    System.out.println("    Complex graph drawn in format " + f + " to file '" + drawnFormats.get(f) + "'.") ;
                 }
             }
-            
         }
         else {
             if(! silent) {
@@ -6411,8 +6430,8 @@ public class Main {
                 dbImagePathCG = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, "ALL") + fs + fileNameSSELevelWithoutExtension;
                 dbImagePathChainCG = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, "ALL") + fs + fileNameChainLevelWithoutExtension;
             }
-            System.out.println("dbImagePathCG = '" + dbImagePathCG + "'");
-            System.out.println("dbImagePathChainCG = '" + dbImagePathChainCG + "'");
+            //System.out.println("dbImagePathCG = '" + dbImagePathCG + "'");
+            //System.out.println("dbImagePathChainCG = '" + dbImagePathChainCG + "'");
             //dbImagePath += DrawTools.getFileExtensionForImageFormat(format);
             try {
                 

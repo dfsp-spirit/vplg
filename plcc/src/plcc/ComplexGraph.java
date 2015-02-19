@@ -19,9 +19,13 @@ import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.util.Pair;
 import net.sourceforge.spargel.datastructures.UAdjListGraph;
 import net.sourceforge.spargel.writers.GMLWriter;
 import org.apache.batik.dom.GenericDOMImplementation;
@@ -36,6 +40,7 @@ import tools.DP;
  */
 public class ComplexGraph extends UAdjListGraph {
 
+    public Map<Edge, String[]> chainNamesInEdge;
     public Map<Edge, Integer> numHelixHelixInteractionsMap;
     public Map<Edge, Integer> numHelixStrandInteractionsMap;
     public Map<Edge, Integer> numHelixLoopInteractionsMap;
@@ -73,6 +78,8 @@ public class ComplexGraph extends UAdjListGraph {
         numAllInteractionsMap = createEdgeMap();
         numDisulfidesMap = createEdgeMap();
         proteinNodeMap = createVertexMap();
+        chainNamesInEdge = createEdgeMap();
+        
         lastColorStep = 0;
         neglectedEdges = 0;
     }
@@ -104,6 +111,71 @@ public Boolean chainsHaveEnoughContacts(Integer A, Integer B){
     } else {
         return false;
     }
+}
+
+/** Calls DBManager
+ * 
+ * @param pdbid
+ * @param chainA
+ * @param chainB
+ * @return 
+ */
+public boolean writeComplexContactInfoToDB(String pdbid){
+    
+    
+    
+    String chainA;
+    String chainB;
+    
+    Integer numHelixHelixInteractions;
+    Integer numHelixStrandInteractions;
+    Integer numHelixLoopInteractions;
+    Integer numSSInteractions;
+    Integer numStrandLoopInteractions;
+    Integer numLoopLoopInteractions;
+    Integer numAllInteractions;
+    Integer numDisulfides;
+    
+    for (Map.Entry pair : this.chainNamesInEdge.entrySet()) {
+        
+        Edge curEdge = (Edge)pair.getKey();
+        String[] chainPair = (String[])pair.getValue();
+        
+
+        chainA = chainPair[0];
+        chainB = chainPair[1];
+
+        numHelixHelixInteractions = this.numHelixHelixInteractionsMap.get(curEdge);
+        numHelixStrandInteractions = this.numHelixStrandInteractionsMap.get(curEdge);
+        numHelixLoopInteractions = this.numHelixLoopInteractionsMap.get(curEdge);
+        numSSInteractions = this.numSSInteractionsMap.get(curEdge);
+        numStrandLoopInteractions = this.numStrandLoopInteractionsMap.get(curEdge);
+        numLoopLoopInteractions = this.numLoopLoopInteractionsMap.get(curEdge);
+        numDisulfides = this.numDisulfidesMap.get(curEdge);
+        numAllInteractions = this.numAllInteractionsMap.get(curEdge);
+        
+        Integer[] interactionNums = {numHelixHelixInteractions, numHelixStrandInteractions, numHelixLoopInteractions,
+                                    numSSInteractions, numStrandLoopInteractions, numLoopLoopInteractions, 
+                                    numDisulfides, numAllInteractions};
+        
+        // make sure no entry is null or something shitty
+        
+        for(int i = 0; i < interactionNums.length; i++){
+            if(interactionNums[i] == null) {
+                interactionNums[i] = 0;
+            }
+        }
+        
+        try {
+            DBManager.writeComplexContactToDB(pdbid, chainA, chainB, interactionNums);
+            //it.remove(); // avoids a ConcurrentModificationException
+        } catch (SQLException ex) {
+            Logger.getLogger(ComplexGraph.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("    Writing chain contact info to DB FAILED!");
+            return false;
+        }
+    }
+    return true;
 }
     
 private float getUniqueColor(Integer numVertices) {
