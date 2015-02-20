@@ -5495,12 +5495,30 @@ E	3	3	3
         // Note that we still need the loop though, it seets orientationsSpatOrder an SeqOrder
 
         StringBuilder KEYNotation = new StringBuilder(); 
+        
+        // only append SSE type characters for graph types in which they are not fixed anyways
+        Boolean appendSSEType = true;
+        String fgGraphtType = pnfr.getFoldingGraph().graphType;
+        if(fgGraphtType.equals(SSEGraph.GRAPHTYPE_ALPHA) || fgGraphtType.equals(SSEGraph.GRAPHTYPE_BETA)) {
+            //appendSSEType = false;  // these graph types only contain one type of SSE, so the label can be omitted
+        }
 
-        String bracketStart = "{";  // Note: This KEY string should not be used, since brackets are not done correctly. use the one from the PNFR instead.
-        String bracketEnd = "}";
+        String bracketStart = "[";  // Note: This KEY string should not be used, since brackets are not done correctly. use the one from the PNFR instead.
+        String bracketEnd = "]";
+        
+        if(fg.isBifurcated()) {
+            bracketStart = "{";
+            bracketEnd = "}";
+        }
+        else if(fg.isASingleCycle()) {
+            bracketStart = "(";
+            bracketEnd = ")";
+        }
 
         KEYNotation.append(bracketStart);
-        KEYNotation.append(fg.getVertex(keystartFGIndex).getLinearNotationLabel());
+        if(appendSSEType) { // we acutally skip the first vertex entirely for alpha (and beta) graphs, it is obvious that it is 'h' (or 'e')
+            KEYNotation.append(fg.getVertex(keystartFGIndex).getLinearNotationLabel());
+        }
 
 
         if(keyposFGIndices.size() > 1) {
@@ -5508,7 +5526,12 @@ E	3	3	3
             for(int i = 1; i < keyposFGIndicesSpatOrder.size(); i++) {
 
                 if(i < (keyposFGIndicesSpatOrder.size())) {
-                    KEYNotation.append(",");
+                    if(! appendSSEType && i == 1) {
+                        // the first vertex (#0) has been omitted, so we do not need the comma
+                    }
+                    else {
+                        KEYNotation.append(",");
+                    }
                 }
 
                 currentVert = keyposFGIndicesSpatOrder.get(i);
@@ -5529,7 +5552,10 @@ E	3	3	3
                     orientationsSpatOrder[i] = (Objects.equals(orientationsSpatOrder[i-1], FoldingGraph.ORIENTATION_UPWARDS) ? FoldingGraph.ORIENTATION_DOWNWARDS : FoldingGraph.ORIENTATION_UPWARDS);
                     orientationsSeqOrder[currentVert] = orientationsSpatOrder[i];
                 }
-                KEYNotation.append(fg.getVertex(currentVert).getLinearNotationLabel());
+                
+                if(appendSSEType) {
+                    KEYNotation.append(fg.getVertex(currentVert).getLinearNotationLabel());
+                }
             }                                                              
 
         }      
@@ -5607,10 +5633,9 @@ E	3	3	3
             System.out.println("");
         }
         
-        StringBuilder fuckNewKEY = new StringBuilder();
-        fuckNewKEY.append(bracketStart);
-        String[] newKey = new String[fg.size];
-        Arrays.fill(newKey, "");
+        StringBuilder testKEY = new StringBuilder();
+        String[] newKey = new String[fg.size - 1];
+        Arrays.fill(newKey, "?");   // all fields get overwritten later anyway
         
         // draw the edges
         for(int i = 0; i < fg.spatOrder.size(); i++) {
@@ -5619,14 +5644,18 @@ E	3	3	3
             // draw the arc from last one to current one
             Integer previousVertexIndexInFGSequential;
             Integer previousVertexIndexSpatial, currentVertexIndexSpatial;
-            Integer relDist;
+            Integer relDist; String relDistString;
             List<Shape> shapes;
             if(currentVertexIndexInFGSequential > 0) {
                 previousVertexIndexInFGSequential = currentVertexIndexInFGSequential - 1;
                 currentVertexIndexSpatial = fg.spatOrder.indexOf(currentVertexIndexInFGSequential);
                 previousVertexIndexSpatial = fg.spatOrder.indexOf(previousVertexIndexInFGSequential);
                 relDist = currentVertexIndexSpatial - previousVertexIndexSpatial;
-                newKey[currentVertexIndexSpatial] = relDist + "";
+                relDistString = relDist + "";
+                if(appendSSEType) {
+                    relDistString += fg.getVertex(currentVertexIndexInFGSequential).getLinearNotationLabel();
+                }
+                newKey[previousVertexIndexInFGSequential] = relDistString;
                 if(debug) {
                     System.out.println("EDGE (i=" + i + ") This is vert " + currentVertexIndexInFGSequential + " at position " + currentVertexIndexSpatial + ", last vert sequential was " + previousVertexIndexInFGSequential + " at position " + previousVertexIndexSpatial + ".");
                 }
@@ -5636,7 +5665,7 @@ E	3	3	3
                 Integer currentOrientation = newOrientations[currentVertexIndexSpatial];
                 
                 if(debug) {
-                    System.out.println("  lastOrientation was: " + FoldingGraph.getOrientationString(lastOrientation) + ", current is " + FoldingGraph.getOrientationString(currentOrientation) + ".");
+                    System.out.println("  lastOrientation was: " + FoldingGraph.getOrientationString(lastOrientation) + ", current is " + FoldingGraph.getOrientationString(currentOrientation) + ". relDist(" + previousVertexIndexSpatial + " to " + currentVertexIndexSpatial + ")=" + relDist + ".");
                 }
                 
                 if(lastOrientation.equals(currentOrientation)) {
@@ -5691,14 +5720,27 @@ E	3	3	3
             }
         }
 
-        for(int i = 0; i < newKey.length; i++) {
-            fuckNewKEY.append(newKey[i]+ ", ");
+
+        testKEY.append(bracketStart);
+        if(appendSSEType) {
+            testKEY.append(fg.getVertex(fg.spatOrder.get(0)).getLinearNotationLabel());
+            testKEY.append(",");
         }
-        fuckNewKEY.append(bracketEnd);
+        for(int i = 0; i < newKey.length; i++) {
+            //if( (! appendSSEType) && i == 0 ) {
+            //    continue;       // skip 1st SSE and comma
+            //}
+            testKEY.append(newKey[i]);
+            if(i < ( newKey.length - 1)) {
+                testKEY.append(",");
+            }
+        }
+        testKEY.append(bracketEnd);
         if(debug) {
-            System.out.println("newKEY = " + fuckNewKEY.toString());
+            System.out.println("newKEY = " + testKEY.toString());
         }
 
+        ig2.drawString("KEY notation: '" + testKEY.toString() + "'", pl.headerStart.x, pl.headerStart.y + (lineHeight * 2));
 
         // ************************************* footer **************************************
 
