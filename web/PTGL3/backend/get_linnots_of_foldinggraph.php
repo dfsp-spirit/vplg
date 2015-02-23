@@ -218,7 +218,7 @@ if($valid_values){
 			    $num_linnot_images_for_this_fold++;
 				$link_others_same_linnot_adj = "";
 				if(strlen($str_adj) > 0) {
-				    $link_others_same_linnot_adj = "Show all chains with this $graphtype_str ADJ linear notation: <a href='./search.php?linnot" . $graphtype_str . "adj=$str_adj'>Search</a><br>";
+				    $link_others_same_linnot_adj = "Show all chains with this $graphtype_str ADJ linear notation: <a href='./search.php?st=customlinnot&linnot" . $graphtype_str . "adj=$str_adj'>Search</a><br>";
 				} 
 			    $img_link_adj = '<a href="#adj">yes</a>';
 				$img_string .= "<h3>ADJ notation</h3>ADJ string: $str_adj<br>$link_others_same_linnot_adj Visualization of the ADJ notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";

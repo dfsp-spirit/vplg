@@ -4,12 +4,17 @@ if(!session_id()) {session_start();}
 //print_r($_SESSION);
 //echo "</pre>";
 $SHOW_ERROR_LIST = array();
+$numberOfChains = 0;
+$tableString = "";
+
 include('./backend/config.php'); 
 include('./common.php');
 include('./backend/search.php');
 $DO_SHOW_ERROR_LIST = $DEBUG_MODE;
 $title = "Search for proteins";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
+
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -74,7 +79,14 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			?>
 			    
 			    <div class="container" id="pageintro">
-		All protein chains which match your search are shown below. Select the ones you are interested in by clicking the checkboxes next to them, then click 'Load proteins' above. You can also select all results at once or clear the current selection using the buttons above.
+			
+			<?php
+			if($tableString) {
+		echo "All protein chains which match your search are shown below. Select the ones you are interested in by clicking the checkboxes next to them, then click 'Load proteins' above. You can also select all results at once or clear the current selection using the buttons above.";
+		} else {
+		    echo "Missing query data. Please <a href='./index.php'>try a new search</a>.";
+		}
+		?>
 		</div><!-- end container-->
 			    
 			    <?php
