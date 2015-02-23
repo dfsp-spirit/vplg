@@ -81,8 +81,8 @@ public class ComplexGraph extends UAdjListGraph {
         numDisulfidesMap = createEdgeMap();
         proteinNodeMap = createVertexMap();
         chainNamesInEdge = createEdgeMap();
-        numSSEContacts = new HashMap();
-        numSSEContactChainNames = new HashMap();
+        numSSEContacts = new HashMap<>();
+        numSSEContactChainNames = new HashMap<>();
 
         lastColorStep = 0;
         neglectedEdges = 0;
@@ -135,9 +135,9 @@ public class ComplexGraph extends UAdjListGraph {
 
         int countInsert = 0;
         int countFail = 0;
-        for (Map.Entry pair : this.numSSEContacts.entrySet()) {
+        for (Map.Entry<List<Integer>, Integer> pair : this.numSSEContacts.entrySet()) {
 
-            List curSSEs = (List<Integer>) pair.getKey();
+            List<Integer> curSSEs = (List<Integer>) pair.getKey();
             chainA = this.numSSEContactChainNames.get(curSSEs).get(0);
             chainB = this.numSSEContactChainNames.get(curSSEs).get(1);
             
