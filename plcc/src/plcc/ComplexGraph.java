@@ -51,6 +51,7 @@ public class ComplexGraph extends UAdjListGraph {
     public Map<Edge, Integer> numDisulfidesMap;
     public Map<Vertex, String> proteinNodeMap;
     public Map<List<Integer>, Integer> numSSEContacts;
+    public Map<List<Integer>, List<String>> numSSEContactChainNames;
 
     public Integer[][] numChainInteractions;
     public Integer[][] homologueChains;
@@ -81,6 +82,7 @@ public class ComplexGraph extends UAdjListGraph {
         proteinNodeMap = createVertexMap();
         chainNamesInEdge = createEdgeMap();
         numSSEContacts = new HashMap();
+        numSSEContactChainNames = new HashMap();
 
         lastColorStep = 0;
         neglectedEdges = 0;
@@ -134,13 +136,13 @@ public class ComplexGraph extends UAdjListGraph {
         for (Map.Entry pair : this.numSSEContacts.entrySet()) {
 
             List curSSEs = (List<Integer>) pair.getKey();
+            chainA = this.numSSEContactChainNames.get(curSSEs).get(0);
+            chainB = this.numSSEContactChainNames.get(curSSEs).get(1);
+            
             Integer sse1_dssp_start = (Integer)curSSEs.get(0);
             Integer sse2_dssp_start = (Integer)curSSEs.get(1);
             Integer contactCount = (Integer)pair.getValue();
             
-            // TESTING!!!! remove
-            chainA = "A";
-            chainB = "B";
           
             try {
                 DBManager.writeSSEComplexContactToDB(pdbid, chainA, chainB, sse1_dssp_start, sse2_dssp_start, contactCount);

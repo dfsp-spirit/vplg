@@ -5996,20 +5996,28 @@ public class Main {
                 String numLL = curRes.getNumContactsLL().toString();
                 
                 
-                // Only if both residues belong to a SSE
+                // Only if both residues belong to a SSE..
                 if(curRes.getResA().getSSE() != null && curRes.getResB().getSSE() != null){
                     Integer ResASseDsspNum = curRes.getResA().getSSE().getStartDsspNum();
                     Integer ResBSseDsspNum = curRes.getResB().getSSE().getStartDsspNum();
                     
                     Integer tmp;
+                    String tmpName;
                     if (ResASseDsspNum > ResBSseDsspNum) {
                         tmp = ResBSseDsspNum;
+                        tmpName = chainBString;
+                        
                         ResBSseDsspNum = ResASseDsspNum;
+                        chainBString = chainAString;
+                        
                         ResASseDsspNum = tmp;
+                        chainAString = tmpName;
                     }
                     
                     List<Integer> SSEPair = Arrays.asList(ResASseDsspNum, ResBSseDsspNum);
+                    List<String> NamePair = Arrays.asList(chainAString, chainBString);
 
+                    compGraph.numSSEContactChainNames.put(SSEPair, NamePair);
                     if(compGraph.numSSEContacts.get(SSEPair) == null) {
                         compGraph.numSSEContacts.put(SSEPair, 1);
                     } else {
