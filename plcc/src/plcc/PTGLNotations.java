@@ -1042,8 +1042,15 @@ public class PTGLNotations {
             
             pnfr.redNotation = RED.toString();
             pnfr.adjNotation = ADJ.toString();
-            pnfr.keyNotation = KEY.toString();
+            pnfr.keyNotation = KEYold.toString();
             pnfr.seqNotation = SEQ.toString();
+            
+            /*
+            if(fg.graphType.equals("beta") && fg.getFoldingGraphNumber().equals(1)) {
+                System.out.println("PTGLNotations: KEYold: " + KEYold.toString());
+                System.out.println("PTGLNotations: KEYtim: " + KEY.toString());
+            }
+            */
             
             pnfr.redStart = redstart;
             pnfr.adjStart = adjstart;
