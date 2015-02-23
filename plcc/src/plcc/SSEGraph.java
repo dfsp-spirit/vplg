@@ -4521,7 +4521,9 @@ E	3	3	3
 
             if(Settings.getBoolean("plcc_B_graphimg_header")) {
                 ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
-                ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);                
+                if(Settings.getBoolean("plcc_B_print_notations_on_fg_images")) {
+                    ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);                
+                }
             }
 
             // ------------------------- Draw the graph -------------------------
@@ -5082,7 +5084,9 @@ E	3	3	3
 
             if(Settings.getBoolean("plcc_B_graphimg_header")) {
                 ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
-                ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);                
+                if(Settings.getBoolean("plcc_B_print_notations_on_fg_images")) {
+                    ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);                
+                }
             }
 
             // ------------------------- Draw the graph -------------------------
@@ -5284,11 +5288,13 @@ E	3	3	3
         
         boolean debug = false;
         
+        /*
         if(pg.pdbid.equals("8icd") && pg.chainid.equals("A")) {
             if(fg.graphType.equals("beta") && fg.getFoldingGraphNumber().equals(1)) {
                 debug = true;
             }
-        } 
+        }
+        */
         
         
         if(debug) {
@@ -5440,7 +5446,9 @@ E	3	3	3
 
         if(Settings.getBoolean("plcc_B_graphimg_header")) {
             ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
-            ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);
+            //if(Settings.getBoolean("plcc_B_print_notations_on_fg_images")) {
+            //    ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);
+            //}
             //ig2.drawString(order, pl.headerStart.x, pl.headerStart.y + (lineHeight * 2));
         }
 
@@ -5740,7 +5748,12 @@ E	3	3	3
             System.out.println("newKEY = " + testKEY.toString());
         }
 
-        ig2.drawString("KEY notation: '" + testKEY.toString() + "'", pl.headerStart.x, pl.headerStart.y + (lineHeight * 2));
+        if(Settings.getBoolean("plcc_B_graphimg_header")) {
+            if(Settings.getBoolean("plcc_B_print_notations_on_fg_images")) {
+                ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);
+                ig2.drawString("KEY notation: '" + testKEY.toString() + "'", pl.headerStart.x, pl.headerStart.y + (lineHeight * 2));
+            }
+        }
 
         // ************************************* footer **************************************
 
@@ -6531,7 +6544,9 @@ E	3	3	3
 
             if(Settings.getBoolean("plcc_B_graphimg_header")) {
                 ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
-                ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);                
+                if(Settings.getBoolean("plcc_B_print_notations_on_fg_images")) {
+                    ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);                
+                }
             }
 
             // ------------------------- Draw the graph -------------------------

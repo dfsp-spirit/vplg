@@ -2703,6 +2703,8 @@ public class Main {
             
         }
         
+        DBManager.commit();
+        
         // Calculate Complex Graph
         if(Settings.getBoolean("plcc_B_complex_graphs")) {
             calculateComplexGraph(allChains, resList, resContacts, pdbid, outputDir, SSEGraph.GRAPHTYPE_ALBELIG);

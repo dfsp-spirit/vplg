@@ -133,6 +133,8 @@ public class ComplexGraph extends UAdjListGraph {
         Integer numAllInteractions;
         Integer numDisulfides;
 
+        int countInsert = 0;
+        int countFail = 0;
         for (Map.Entry pair : this.numSSEContacts.entrySet()) {
 
             List curSSEs = (List<Integer>) pair.getKey();
@@ -144,14 +146,23 @@ public class ComplexGraph extends UAdjListGraph {
             Integer contactCount = (Integer)pair.getValue();
             
           
+            Boolean res = false;
             try {
-                DBManager.writeSSEComplexContactToDB(pdbid, chainA, chainB, sse1_dssp_start, sse2_dssp_start, contactCount);
+                res = DBManager.writeSSEComplexContactToDB(pdbid, chainA, chainB, sse1_dssp_start, sse2_dssp_start, contactCount);
                 //it.remove(); // avoids a ConcurrentModificationException
+                if(res) {
+                    countInsert++;
+                }
+                else {
+                    countFail++;
+                    System.err.println("Could not write complex contact between " + chainA + " SSE " + sse1_dssp_start + " and " + chainB + " SSE " + sse2_dssp_start + " to DB.");
+                }
             } catch (SQLException ex) {
                 Logger.getLogger(ComplexGraph.class.getName()).log(Level.SEVERE, null, ex);
                 return false;
             }
         }
+        System.out.println("SSE Contacts written to DB: " + countInsert + " inserted, " + countFail + " failed.");
         return true;
     }
 

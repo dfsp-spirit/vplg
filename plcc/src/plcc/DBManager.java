@@ -830,7 +830,7 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence text not null, sse_type int not null references " + tbl_ssetypes + " ON DELETE CASCADE, lig_name varchar(5), position_in_chain int);");
             doInsertQuery("CREATE TABLE " + tbl_secondat + " (secondat_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, alpha_fg_number int, alpha_fg_foldname varchar(2), alpha_fg_position int, beta_fg_number int, beta_fg_foldname varchar(2), beta_fg_position int, albe_fg_number int, albe_fg_foldname varchar(2), albe_fg_position int, alphalig_fg_number int, alphalig_fg_foldname varchar(2), alphalig_fg_position int, betalig_fg_number int, betalig_fg_foldname varchar(2), betalig_fg_position int, albelig_fg_number int, albelig_fg_foldname varchar(2), albelig_fg_position int);");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null references " + tbl_contacttypes + " ON DELETE CASCADE, check (sse1 < sse2));");
-            doInsertQuery("CREATE TABLE " + tbl_ssecontact_complexgraph + " (ssecontact_complexgraph_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, complex_contact_count int not null references " + tbl_complexcontacttypes + " ON DELETE CASCADE check (sse1 < sse2));");            
+            doInsertQuery("CREATE TABLE " + tbl_ssecontact_complexgraph + " (ssecontact_complexgraph_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, complex_contact_count int not null, complex_contact_type int not null references " + tbl_complexcontacttypes + " ON DELETE CASCADE check (sse1 < sse2));");            
             doInsertQuery("CREATE TABLE " + tbl_complex_contact_stats + " (complex_contact_id serial primary key, chain1 int not null references " + tbl_chain + " ON DELETE CASCADE, chain2 int not null references " + tbl_chain + " ON DELETE CASCADE, contact_num_HH int not null, contact_num_HS int not null, contact_num_HL int not null, contact_num_SS int not null, contact_num_SL int not null, contact_num_LL int not null, contact_num_DS int not null);");
             doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_json text, graph_string_xml text, graph_image_png text, graph_image_svg text, graph_image_pdf text, filepath_graphfile_gml text, filepath_graphfile_kavosh text, filepath_graphfile_plcc text, filepath_graphfile_dotlanguage text, filepath_graphfile_json text, filepath_graphfile_xml text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, fg_number int not null, fold_name varchar(2) not null, first_vertex_position_in_parent int not null, graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_json text, graph_string_xml text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
@@ -4523,6 +4523,9 @@ connection.close();
             return (false);
         }
         */
+        /** TODO: implement different types */
+        
+        Integer contact_type = 1;
 
         Long db_chain_idA = getDBChainID(pdb_id, chain_nameA);
         Long db_chain_idB = getDBChainID(pdb_id, chain_nameB);
@@ -4536,9 +4539,20 @@ connection.close();
             return (false);
         }        
         
-
+        
+        
         Long sse1_id = getDBSseIDByDsspStartResidue(sse1_dssp_start, db_chain_idA);
         Long sse2_id = getDBSseIDByDsspStartResidue(sse2_dssp_start, db_chain_idB);
+        
+        if(sse1_id <= 0L) {
+            DP.getInstance().e("DBManager", "writeSSEComplexContactToDB: Could not find SSE of chain " + chain_nameA + " with DSSP start '" + sse1_dssp_start + "' in DB.");
+            return false;
+        }
+        if(sse2_id <= 0L) {
+            DP.getInstance().e("DBManager", "writeSSEComplexContactToDB: Could not find SSE of chain " + chain_nameB + " with DSSP start '" + sse2_dssp_start + "' in DB.");
+            return false;
+        }
+        
         Long tmp;
 
         // We may need to switch the IDs to make sure the 1st of them is always lower
@@ -4551,7 +4565,7 @@ connection.close();
         Boolean result = false;
         PreparedStatement statement = null;
 
-        String query = "INSERT INTO " + tbl_ssecontact_complexgraph + " (sse1, sse2, complex_contact_count) VALUES (?, ?, ?);";
+        String query = "INSERT INTO " + tbl_ssecontact_complexgraph + " (sse1, sse2, complex_contact_count, complex_contact_type) VALUES (?, ?, ?, ?);";
 
         try {
             //dbc.setAutoCommit(false);
@@ -4560,6 +4574,7 @@ connection.close();
             statement.setLong(1, sse1_id);
             statement.setLong(2, sse2_id);
             statement.setInt(3, contact_count);
+            statement.setInt(4, contact_type);
                                 
             statement.executeUpdate();
             //dbc.commit();
