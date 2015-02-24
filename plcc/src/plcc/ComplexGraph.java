@@ -116,8 +116,7 @@ public class ComplexGraph extends UAdjListGraph {
         }
     }
 
-// Work here..
-// TODO : get Chain name... somehow
+
     public boolean writeSSEComplexContactInfoToDB(String pdbid) {
 
     //DBManager.writeSSEComplexContactToDB()
@@ -135,6 +134,7 @@ public class ComplexGraph extends UAdjListGraph {
 
         int countInsert = 0;
         int countFail = 0;
+        Boolean retVal = false;
         for (Map.Entry<List<Integer>, Integer> pair : this.numSSEContacts.entrySet()) {
 
             List<Integer> curSSEs = (List<Integer>) pair.getKey();
@@ -147,23 +147,28 @@ public class ComplexGraph extends UAdjListGraph {
             
           
             Boolean res = false;
+            
+            
+            // this action could result in an error due to the definition of a PTGL SSE
+            // e.g. the SSE is too short and is merged to another SSE or not defined in the DB
             try {
                 res = DBManager.writeSSEComplexContactToDB(pdbid, chainA, chainB, sse1_dssp_start, sse2_dssp_start, contactCount);
                 //it.remove(); // avoids a ConcurrentModificationException
                 if(res) {
                     countInsert++;
+                    retVal = true;
                 }
                 else {
                     countFail++;
-                    System.err.println("Could not write complex contact between " + chainA + " SSE " + sse1_dssp_start + " and " + chainB + " SSE " + sse2_dssp_start + " to DB.");
+                    retVal = false;
                 }
             } catch (SQLException ex) {
                 Logger.getLogger(ComplexGraph.class.getName()).log(Level.SEVERE, null, ex);
                 return false;
             }
         }
-        System.out.println("SSE Contacts written to DB: " + countInsert + " inserted, " + countFail + " failed.");
-        return true;
+        System.out.println("    SSE Contacts written to DB: " + countInsert + " inserted, " + countFail + " failed.");
+        return retVal;
     }
 
     /**

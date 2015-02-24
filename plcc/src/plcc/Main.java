@@ -5963,68 +5963,77 @@ public class Main {
             // We only want interchain contacts with a certain threshold of contacts
             if (compGraph.chainsHaveEnoughContacts(chainAint, chainBint)){
                 
-                ResContactInfo curRes = resContacts.get(i);
+                ResContactInfo curResCon = resContacts.get(i);
                 
                 // Die Datenkrake
-                String chainAString = curRes.getResA().getChainID().toString();
-                String chainBString = curRes.getResB().getChainID().toString();
-                String resNameA = curRes.getResName3A();
-                String resNameB = curRes.getResName3B();
-                String resTypeA = curRes.getResA().getSSETypePlcc();
-                String resTypeB = curRes.getResB().getSSETypePlcc();
+                String chainAString = curResCon.getResA().getChainID().toString();
+                String chainBString = curResCon.getResB().getChainID().toString();
+                String resNameA = curResCon.getResName3A();
+                String resNameB = curResCon.getResName3B();
+                String resTypeA = curResCon.getResA().getSSETypePlcc();
+                String resTypeB = curResCon.getResB().getSSETypePlcc();
                 
-                String BBDist = curRes.getBBContactDist().toString();
-                String BCDist = curRes.getBCContactDist().toString();
-                String BLDist = curRes.getBLContactDist().toString();
-                String CBDist = curRes.getCBContactDist().toString();
-                String CLDist = curRes.getCLContactDist().toString();
-                String CCDist = curRes.getCCContactDist().toString();
-                String HB1Dist = curRes.getHB1Dist().toString();
-                String HB2Dist = curRes.getHB2Dist().toString();
-                String LBDist = curRes.getLBContactDist().toString();
-                String LCDist = curRes.getLCContactDist().toString();
-                String LLDist = curRes.getLLContactDist().toString();
+                String BBDist = curResCon.getBBContactDist().toString();
+                String BCDist = curResCon.getBCContactDist().toString();
+                String BLDist = curResCon.getBLContactDist().toString();
+                String CBDist = curResCon.getCBContactDist().toString();
+                String CLDist = curResCon.getCLContactDist().toString();
+                String CCDist = curResCon.getCCContactDist().toString();
+                String HB1Dist = curResCon.getHB1Dist().toString();
+                String HB2Dist = curResCon.getHB2Dist().toString();
+                String LBDist = curResCon.getLBContactDist().toString();
+                String LCDist = curResCon.getLCContactDist().toString();
+                String LLDist = curResCon.getLLContactDist().toString();
                                 
-                String numBB = curRes.getNumContactsBB().toString();
-                String numBC = curRes.getNumContactsBC().toString();
-                String numBL = curRes.getNumContactsBL().toString();
-                String numCB = curRes.getNumContactsCB().toString();
-                String numCL = curRes.getNumContactsCL().toString();
-                String numCC = curRes.getNumContactsCC().toString();
-                String numHB1 = curRes.getNumContactsHB1().toString();
-                String numHB2 = curRes.getNumContactsHB2().toString();
-                String numLB = curRes.getNumContactsLB().toString();
-                String numLC = curRes.getNumContactsLC().toString();
-                String numLL = curRes.getNumContactsLL().toString();
+                String numBB = curResCon.getNumContactsBB().toString();
+                String numBC = curResCon.getNumContactsBC().toString();
+                String numBL = curResCon.getNumContactsBL().toString();
+                String numCB = curResCon.getNumContactsCB().toString();
+                String numCL = curResCon.getNumContactsCL().toString();
+                String numCC = curResCon.getNumContactsCC().toString();
+                String numHB1 = curResCon.getNumContactsHB1().toString();
+                String numHB2 = curResCon.getNumContactsHB2().toString();
+                String numLB = curResCon.getNumContactsLB().toString();
+                String numLC = curResCon.getNumContactsLC().toString();
+                String numLL = curResCon.getNumContactsLL().toString();
                 
                 
                 // Only if both residues belong to a SSE..
-                if(curRes.getResA().getSSE() != null && curRes.getResB().getSSE() != null){
-                    Integer ResASseDsspNum = curRes.getResA().getSSE().getStartDsspNum();
-                    Integer ResBSseDsspNum = curRes.getResB().getSSE().getStartDsspNum();
-                    
-                    Integer tmp;
-                    String tmpName;
-                    if (ResASseDsspNum > ResBSseDsspNum) {
-                        tmp = ResBSseDsspNum;
-                        tmpName = chainBString;
-                        
-                        ResBSseDsspNum = ResASseDsspNum;
-                        chainBString = chainAString;
-                        
-                        ResASseDsspNum = tmp;
-                        chainAString = tmpName;
-                    }
-                    
-                    List<Integer> SSEPair = Arrays.asList(ResASseDsspNum, ResBSseDsspNum);
-                    List<String> NamePair = Arrays.asList(chainAString, chainBString);
+                if (curResCon.getResA().getSSE() != null && curResCon.getResB().getSSE() != null) {
+                    //.. and are of type helix or strand
+                    if ((curResCon.getResA().getSSE().getSSETypeInt() != SSE.SSECLASS_NONE
+                            && curResCon.getResA().getSSE().getSSETypeInt() != SSE.SSECLASS_OTHER)
+                            && (curResCon.getResB().getSSE().getSSETypeInt() != SSE.SSECLASS_NONE
+                            && curResCon.getResB().getSSE().getSSETypeInt() != SSE.SSECLASS_OTHER)) {
 
-                    compGraph.numSSEContactChainNames.put(SSEPair, NamePair);
-                    if(compGraph.numSSEContacts.get(SSEPair) == null) {
-                        compGraph.numSSEContacts.put(SSEPair, 1);
-                    } else {
-                        compGraph.numSSEContacts.put(SSEPair, compGraph.numSSEContacts.get(SSEPair) + 1);
+                        Integer ResASseDsspNum = curResCon.getResA().getSSE().getStartDsspNum();
+                        Integer ResBSseDsspNum = curResCon.getResB().getSSE().getStartDsspNum();
+
+                        
+                        Integer tmp;
+                        String tmpName;
+                        if (ResASseDsspNum > ResBSseDsspNum) {
+                            tmp = ResBSseDsspNum;
+                            tmpName = chainBString;
+
+                            ResBSseDsspNum = ResASseDsspNum;
+                            chainBString = chainAString;
+
+                            ResASseDsspNum = tmp;
+                            chainAString = tmpName;
+                        }
+
+                        List<Integer> SSEPair = Arrays.asList(ResASseDsspNum, ResBSseDsspNum);
+                        List<String> NamePair = Arrays.asList(chainAString, chainBString);
+
+                        compGraph.numSSEContactChainNames.put(SSEPair, NamePair);
+                        if (compGraph.numSSEContacts.get(SSEPair) == null) {
+                            compGraph.numSSEContacts.put(SSEPair, 1);
+                        } else {
+                            compGraph.numSSEContacts.put(SSEPair, compGraph.numSSEContacts.get(SSEPair) + 1);
+                        }
                     }
+
                 }
                       
                                 
@@ -6242,12 +6251,12 @@ public class Main {
         }
      
         if(Settings.getBoolean("plcc_B_useDB")) {
-            if(! silent) {System.out.print("    Writing SSE complex contact info to DB...");}
+            if(! silent) {System.out.println("    Writing SSE complex contact info to DB...");}
         
             if(compGraph.writeSSEComplexContactInfoToDB(pdbid)){
-                if(! silent) { System.out.println(" successfull!");}
+                //if(! silent) { System.out.println("    Writing SSE complex contact info to DB... successfull");}
             } else {
-                if(! silent) { System.out.println(" FAILED!"); }
+                //if(! silent) { System.out.println(" FAILED!"); }
             }
         }        
                 
