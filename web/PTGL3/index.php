@@ -71,7 +71,7 @@ function check_install($db)  {
 			  if($CHECK_INSTALL_ON_FRONTPAGE) {
 			      $conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
 			      $db = pg_connect($conn_string);                          
-			      
+                              
 			      $db_ok = $db;
 			      $tmp_dir_ok = is_writable('./temp_downloads/');
 			      $data_ok = is_dir($IMG_ROOT_PATH);
