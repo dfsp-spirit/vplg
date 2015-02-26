@@ -11,6 +11,7 @@ package plcc;
 
 // imports
 import algorithms.GraphMetrics;
+import algorithms.SmithWaterman;
 import datastructures.AAGraph;
 import htmlgen.CssGenerator;
 import htmlgen.HtmlGenerator;
@@ -5893,10 +5894,16 @@ public class Main {
             compGraph.proteinNodeMap.put(v, allChains.get(i).getPdbChainID());
 
             // get AA sequence string for each chain
-            String key = allChains.get(i).getPdbChainID();
             for(Residue resi : allChains.get(i).getResidues()){
                 
-                compGraph.chainResAASeq[i] = compGraph.chainResAASeq[i] + resi.getAAName1();
+                if (!"J".equals(resi.getAAName1())) {  // Skip ligands to preserve sequence identity. What to do with "_B_", "_Z_", "_X_" (B,Z,X)?
+                    if (compGraph.chainResAASeq[i] != null) {
+                        compGraph.chainResAASeq[i] = compGraph.chainResAASeq[i] + resi.getAAName1();
+                    } else {
+                        compGraph.chainResAASeq[i] = resi.getAAName1();
+                    }
+                }
+                
                 //String existing = compGraph.chainResAASeq.get(key);
                 //String newContent = 
                 //compGraph.chainResAASeq.put(key, existing == null ? newContent : existing + newContent);
@@ -5913,19 +5920,23 @@ public class Main {
             System.out.println("  Computing CG contacts.");
         }
         
+        
         //check for homologue chains
         if(allChains.size() > 1){
             for(Integer i = 0; i < allChains.size(); i++){
                 String curVal = compGraph.chainResAASeq[i];
                 for(Integer j = 0; j < allChains.size(); j++){
                     String compareVal = compGraph.chainResAASeq[j];
-                    // make sure no chain is matched with itself
+                    // make sure no chain is matched with itself    
+                    System.out.println("Chain " + allChains.get(i).getPdbChainID() + " with Chain " + allChains.get(j).getPdbChainID());
+                    System.out.println(curVal);
+                    System.out.println(compareVal);
+                    System.out.println("");
                     if((curVal.equals(compareVal)) && (i != j)){ compGraph.homologueChains[i][j] = 1;
                     } else {compGraph.homologueChains[i][j] = 0;}
                 }
             }
         }
-        
         
         // calculate sum of interchain contacts
         for(Integer i = 0; i < resContacts.size(); i++){

@@ -433,32 +433,44 @@ public class ComplexGraph extends UAdjListGraph {
             float b = (float) 1.0;
 
             for (Integer j = 0; j < cg.getVertices().size(); j++) {
-
                 // if chain has an homologue partner...
                 if (cg.homologueChains[i][j] != null) {
                     if (cg.homologueChains[i][j] == 1) {
                         // if homologue partner wasn't colored before..
-                        if (cg.savedVertexColors[i] == 0) {
+                        if (cg.savedVertexColors[i] == 0) {                      
                             h = cg.getUniqueColor(numVerts); //get unique color
-                            cg.savedVertexColors[i] = h;
-                            cg.savedVertexColors[j] = h;
-
+                            
+                            System.out.println("homo length " + cg.homologueChains.length);
+                            
+                            for(int x = i; x < cg.homologueChains.length; x++){
+                                for(int y = j; y < cg.homologueChains.length; y++){
+                                    System.out.println(x + " and " + y);
+                                    if(cg.homologueChains[x][y] == 1){
+                                        cg.savedVertexColors[x] = h;
+                                        cg.savedVertexColors[y] = h;
+                                    }
+                                }
+                            }
+                            colorSet = true;
+                            
                         } else {
                             h = cg.savedVertexColors[i];
                         }
                         ig2.setPaint(Color.getHSBColor(h, s, b));
                         colorSet = true;
-                        //cg.homologueChains[j][i] = 0; // otherwise every vertices gets a different color. OR: don't create a symmetrical matrix?!
                     }
                 }
             }
-
+           
             // if no homologue chains occur
-            if (!colorSet) {
+            if (!colorSet) { 
                 h = cg.getUniqueColor(numVerts); //get unique color
                 cg.savedVertexColors[i] = h;
                 ig2.setPaint(Color.getHSBColor(h, s, b));
             }
+            colorSet = false;
+
+            
         // pick color depending on SSE type
 
             // draw a shape based on SSE type
