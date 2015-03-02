@@ -1174,20 +1174,24 @@ public class FileParser {
             pLine = pdbLines.get(i);
 
             if(pLine.startsWith("COMPND  ")) {
-                if(pLine.substring(11, 17).equals("CHAIN:")){
-                    chainLine = pLine.substring(18, pLine.indexOf(";"));
-                    chainLine = chainLine.replaceAll(" ", "");
-                    curChains = chainLine.split(",");
-                    for(String chain : curChains){
-                        
-                        ArrayList<String> homologueChains = new ArrayList<>();
-                        for(String hChain : curChains){
-                            if(!chain.equals(hChain)){
-                                homologueChains.add(hChain);
+                try {
+                    if(pLine.substring(11, 17).equals("CHAIN:")){
+                        chainLine = pLine.substring(18, pLine.indexOf(";"));
+                        chainLine = chainLine.replaceAll(" ", "");
+                        curChains = chainLine.split(",");
+                        for(String chain : curChains){
+
+                            ArrayList<String> homologueChains = new ArrayList<>();
+                            for(String hChain : curChains){
+                                if(!chain.equals(hChain)){
+                                    homologueChains.add(hChain);
+                                }
                             }
+                            homologuesMap.put(chain, homologueChains);
                         }
-                        homologuesMap.put(chain, homologueChains);
                     }
+                } catch(Exception e ) {
+                    System.err.println("Hit errenous COMPND line at line #" + pLineNum + "', could not add homologues entry.");
                 }
             }             
         }
@@ -1215,7 +1219,7 @@ public class FileParser {
                 } catch(Exception e) {
                     System.err.println("ERROR: Hit broken MODEL line at PDB line number " + pLineNum + " while looking for Chains.");
                     e.printStackTrace();
-                    System.exit(-1);
+                    System.exit(1);
                 }
             }
 
