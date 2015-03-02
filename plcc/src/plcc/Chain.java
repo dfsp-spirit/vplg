@@ -24,6 +24,7 @@ public class Chain implements java.io.Serializable {
     private ArrayList<Residue> residues = null;          // a list of all Residues of the Chain
     private String modelID = null;
     private Model model = null;                 // the Model of this Chain
+    private ArrayList<String> homologues = null; // a list of homologue chains (defined by PDB COMPND)
 
     // constructor
     public Chain(String ci) { pdbChainID = ci; residues = new ArrayList<Residue>(); }
@@ -35,6 +36,7 @@ public class Chain implements java.io.Serializable {
     public String getModelID() { return(modelID); }
     public Model getModel() { return(model); }
     public ArrayList<Residue> getResidues() { return(residues); }
+    public ArrayList<String> getHomologues() { return(homologues); }
     
     /**
      * Returns a list of all ligand residues in this chain.
@@ -56,6 +58,12 @@ public class Chain implements java.io.Serializable {
     public void setDsspChainID(String s) { dsspChainID = s; }
     public void setModelID(String s) { modelID = s; }
     public void setModel(Model m) { model = m; }
+    public void setHomologues(ArrayList<String> h) { homologues = h; }
+    public void addHomologue(String s) {
+        if(!homologues.contains(s)){
+            homologues.add(s);
+        }
+    }
 
     /**
      * Returns the chemical property string for this chain, i.e., a concatenation of all chemProps of all the chain residues.

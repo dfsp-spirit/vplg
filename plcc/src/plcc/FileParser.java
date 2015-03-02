@@ -47,6 +47,7 @@ public class FileParser {
     static ArrayList<Atom> s_atoms = null;
     static ArrayList<SSE> s_dsspSSEs = null;             // all SSEs according to DSSP definition
     static ArrayList<SSE> s_ptglSSEs = null;                // the modified SSE list the PTGL uses
+    static HashMap<String, ArrayList<String>> homologuesMap = null;
     
     // The list of sulfur bridges (aka disulfide bridges) from the DSSP file. The key is the DSSP sulfur bridge
     // id (an arbitrary character, starting with 'a' for the first bridge usually). The list in the value part contains
@@ -103,6 +104,8 @@ public class FileParser {
         s_atoms = new ArrayList<Atom>();
         s_dsspSSEs = new ArrayList<SSE>();
         s_ptglSSEs = new ArrayList<SSE>();
+        
+        homologuesMap = new HashMap<>();
 
         // resIndexPDB = new Integer[maxResidues];      // Removed because some PDB files have negative residue numbers, they break this. :/ So we
         //                                              //  have to go through the whole list (which is slow and stupid, bah).
@@ -313,6 +316,11 @@ public class FileParser {
             System.out.println("ERROR: Found > 1 model (" + s_models.size() + " to be precise) models in the parsed PDB file lines, something went wrong. Exiting.");
             System.exit(1);
         }
+        
+        if(! FileParser.silent) {
+            System.out.println("  Setting chain homologues...");
+        }
+        setHomologuesOfChains();   // fills homologuesMap     
 
         if(! FileParser.silent) {
             System.out.println("  Creating all Chains...");
@@ -1153,6 +1161,37 @@ public class FileParser {
         return false;
     }
 
+    private static void setHomologuesOfChains() {
+
+        Integer pLineNum = 0;
+        String pLine = "";
+        String chainLine = "";
+        String[] curChains;
+          
+        for(Integer i = 0; i < pdbLines.size(); i++) {
+          
+            pLineNum = i + 1;
+            pLine = pdbLines.get(i);
+
+            if(pLine.startsWith("COMPND  ")) {
+                if(pLine.substring(11, 17).equals("CHAIN:")){
+                    chainLine = pLine.substring(18, pLine.indexOf(";"));
+                    chainLine = chainLine.replaceAll(" ", "");
+                    curChains = chainLine.split(",");
+                    for(String chain : curChains){
+                        
+                        ArrayList<String> homologueChains = new ArrayList<>();
+                        for(String hChain : curChains){
+                            if(!chain.equals(hChain)){
+                                homologueChains.add(hChain);
+                            }
+                        }
+                        homologuesMap.put(chain, homologueChains);
+                    }
+                }
+            }             
+        }
+    }
 
     private static void createAllChainsFromPdbData() {
 
@@ -1207,10 +1246,13 @@ public class FileParser {
                 
                 if(! cAlreadyExists) {
                     c = new Chain(cID);
-
+                    
+                    
                     if(modelID != null) {
                         c.setModelID(modelID);       // left at null otherwise, which is fine
                     }
+                    
+                    c.setHomologues(homologuesMap.get(cID));
 
                     s_chains.add(c);
 

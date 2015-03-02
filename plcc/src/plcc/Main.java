@@ -5921,27 +5921,22 @@ public class Main {
         }
         
         
-        //check for homologue chains
-        //BLOSUM80
-        Integer[][] scMatrix = new Integer[][] {{5, -2, -2, -2, -1, -1, -1, 0, -2, -2, -2, -1, -1, -3, -1, 1, 0, -3, -2, 0}, {-2, 6, -1, -2, -4, 1, -1, -3, 0, -3, -3, 2, -2, -4, -2, -1, -1, -4, -3, -3}, {-2, -1, 6, 1, -3, 0, -1, -1, 0, -4, -4, 0, -3, -4, -3, 0, 0, -4, -3, -4}, {-2, -2, 1, 6, -4, -1, 1, -2, -2, -4, -5, -1, -4, -4, -2, -1, -1, -6, -4, -4}, {-1, -4, -3, -4, 9, -4, -5, -4, -4, -2, -2, -4, -2, -3, -4, -2, -1, -3, -3, -1}, {-1, 1, 0, -1, -4, 6, 2, -2, 1, -3, -3, 1, 0, -4, -2, 0, -1, -3, -2, -3}, {-1, -1, -1, 1, -5, 2, 6, -3, 0, -4, -4, 1, -2, -4, -2, 0, -1, -4, -3, -3}, {0, -3, -1, -2, -4, -2, -3, 6, -3, -5, -4, -2, -4, -4, -3, -1, -2, -4, -4, -4}, {-2, 0, 0, -2, -4, 1, 0, -3, 8, -4, -3, -1, -2, -2, -3, -1, -2, -3, 2, -4}, {-2, -3, -4, -4, -2, -3, -4, -5, -4, 5, 1, -3, 1, -1, -4, -3, -1, -3, -2, 3}, {-2, -3, -4, -5, -2, -3, -4, -4, -3, 1, 4, -3, 2, 0, -3, -3, -2, -2, -2, 1}, {-1, 2, 0, -1, -4, 1, 1, -2, -1, -3, -3, 5, -2, -4, -1, -1, -1, -4, -3, -3}, {-1, -2, -3, -4, -2, 0, -2, -4, -2, 1, 2, -2, 6, 0, -3, -2, -1, -2, -2, 1}, {-3, -4, -4, -4, -3, -4, -4, -4, -2, -1, 0, -4, 0, 6, -4, -3, -2, 0, 3, -1}, {-1, -2, -3, -2, -4, -2, -2, -3, -3, -4, -3, -1, -3, -4, 8, -1, -2, -5, -4, -3}, {1, -1, 0, -1, -2, 0, 0, -1, -1, -3, -3, -1, -2, -3, -1, 5, 1, -4, -2, -2}, {0, -1, 0, -1, -1, -1, -1, -2, -2, -1, -2, -1, -1, -2, -2, 1, 5, -4, -2, 0}, {-3, -4, -4, -6, -3, -3, -4, -4, -3, -3, -2, -4, -2, 0, -5, -4, -4, 11, 2, -3}, {-2, -3, -3, -4, -3, -2, -3, -4, 2, -2, -2, -3, -2, 3, -4, -2, -2, 2, 7, -2}, {0, -3, -4, -4, -1, -3, -3, -4, -4, 3, 1, -3, 1, -1, -3, -2, 0, -3, -2, 4}};        
-        String[] alignment;
+        //create homologueChains matrix
         if(allChains.size() > 1){
             for(Integer i = 0; i < allChains.size(); i++){
-                String curVal = compGraph.chainResAASeq[i];
                 for(Integer j = 0; j < allChains.size(); j++){
-                    String compareVal = compGraph.chainResAASeq[j];
-                    NeedlemanWunsch sw = new NeedlemanWunsch(curVal, compareVal);                    
-                    sw.setAlphabet("ARNDCQEGHILKMFPSTWYV");
-                    sw.setScoringMatrix(scMatrix);
-                    Integer score = sw.computeAlignmentScore();
-                    alignment = sw.getAlignment();
-                    
-                    // make sure no chain is matched with itself  
-                    if((curVal.equals(compareVal)) && (i != j)){ compGraph.homologueChains[i][j] = 1;
-                    } else {compGraph.homologueChains[i][j] = 0;}
+
+                    String compareChainID = allChains.get(j).getPdbChainID();
+                    // make sure no chain is matched with itself 
+                    if((allChains.get(i).getHomologues().contains(compareChainID)) && (i != j)){
+                        compGraph.homologueChains[i][j] = 1;
+                    } else {
+                        compGraph.homologueChains[i][j] = 0;
+                    }
                 }
             }
         }
+
         
         // calculate sum of interchain contacts
         for(Integer i = 0; i < resContacts.size(); i++){
