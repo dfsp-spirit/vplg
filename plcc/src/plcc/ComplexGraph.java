@@ -429,32 +429,33 @@ public class ComplexGraph extends UAdjListGraph {
 
             // set hue, saturation, brighness
             float h = (float) 0.5;
-            float s = (float) 1.0;
-            float b = (float) 1.0;
+            float s = (float) 1.0; // change this for saturation (higher = more saturated)
+            float b = (float) 0.8; // change this for brightness (0.0 -> Dark/Black)
             
             for (Integer j = 0; j < cg.getVertices().size(); j++) {
                 // if chain has an homologue partner...
+                if (cg.homologueChains[i][j] != null) {
+                    if (cg.homologueChains[i][j] == 1) {
+                        // if homologue partner wasn't colored before..
+                        if (cg.savedVertexColors[i] == 0) {
+                            h = cg.getUniqueColor(numVerts); //get unique color
 
-                if (cg.homologueChains[i][j] == 1) {
-                    // if homologue partner wasn't colored before..
-                    if (cg.savedVertexColors[i] == 0) {
-                        h = cg.getUniqueColor(numVerts); //get unique color
+                            for (int y = j; y < cg.homologueChains.length; y++) {
 
-                        for (int y = j; y < cg.homologueChains.length; y++) {
-
-                            if (cg.homologueChains[i][y] == 1) {
-                                cg.savedVertexColors[i] = h;
-                                cg.savedVertexColors[y] = h;
+                                if (cg.homologueChains[i][y] == 1) {
+                                    cg.savedVertexColors[i] = h;
+                                    cg.savedVertexColors[y] = h;
+                                }
                             }
+
+                            colorSet = true;
+
+                        } else {
+                            h = cg.savedVertexColors[i];
                         }
-
+                        ig2.setPaint(Color.getHSBColor(h, s, b));
                         colorSet = true;
-
-                    } else {
-                        h = cg.savedVertexColors[i];
                     }
-                    ig2.setPaint(Color.getHSBColor(h, s, b));
-                    colorSet = true;
                 }
             }
            

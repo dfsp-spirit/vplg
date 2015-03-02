@@ -11,7 +11,6 @@ package plcc;
 
 // imports
 import algorithms.GraphMetrics;
-import algorithms.NeedlemanWunsch;
 import datastructures.AAGraph;
 import htmlgen.CssGenerator;
 import htmlgen.HtmlGenerator;
@@ -5922,14 +5921,18 @@ public class Main {
         
         
         //create homologueChains matrix
-        if(allChains.size() > 1){
-            for(Integer i = 0; i < allChains.size(); i++){
-                for(Integer j = 0; j < allChains.size(); j++){
+        if (allChains.size() > 1) {
+            for (Integer i = 0; i < allChains.size(); i++) {
+                for (Integer j = 0; j < allChains.size(); j++) {
 
                     String compareChainID = allChains.get(j).getPdbChainID();
                     // make sure no chain is matched with itself 
-                    if((allChains.get(i).getHomologues().contains(compareChainID)) && (i != j)){
-                        compGraph.homologueChains[i][j] = 1;
+                    if (allChains.get(i).getHomologues() != null) {
+                        if ((allChains.get(i).getHomologues().contains(compareChainID)) && (i != j)) {
+                            compGraph.homologueChains[i][j] = 1;
+                        } else {
+                            compGraph.homologueChains[i][j] = 0;
+                        }
                     } else {
                         compGraph.homologueChains[i][j] = 0;
                     }
