@@ -659,7 +659,7 @@ public class DBManager {
             }
             return (tableData);
         } catch (SQLException e) {
-            DP.getInstance().w("doDeleteQuery(): SQL statement '" + query + "' failed.: '" + e.getMessage() + "'.");
+            DP.getInstance().w("doSelectQuery(): SQL statement '" + query + "' failed.: '" + e.getMessage() + "'.");
             System.exit(1);
             return (null);
         } finally {
@@ -2160,89 +2160,146 @@ connection.close();
         if( ! Settings.getBoolean("plcc_B_no_not_impl_warn")) {
             DP.getInstance().w("DBManager", "chainContainsMotif_RossmanFold: Not implemented yet, returning false for chain with ID '" + chain_db_id + "'.");
         }
+        
+        ArrayList<ArrayList<String>> rowsStrandsBeta = DBManager.doSelectQuery("Select pdb,chain,adj,adjpos,red from beta where red LIKE '%3p,-1p,-1p%' and red not LIKE '%-3p,-1p,-1p%'  group by pdb,chain,adj,adjpos,red");
+        
+       
+        Integer[] pattern = new Integer[] {3, -1, -1};
+        
+        List<String> all_pdb_ids = new ArrayList<>();
+        List<String> all_chains = new ArrayList<>();
+        List<Integer> all_firstHelixPositionMinInBetaGraph = new ArrayList<>();
+        List<Integer> all_firstHelixPositionMaxInBetaGraph = new ArrayList<>();
+        List<Integer> all_secondHelixPositionMinInBetaGraph = new ArrayList<>();
+        List<Integer> all_secondHelixPositionMaxInBetaGraph = new ArrayList<>();
+        List<Integer> all_firstHelixPositionMinInAlbeGraph = new ArrayList<>();
+        List<Integer> all_firstHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        List<Integer> all_secondHelixPositionMinInAlbeGraph = new ArrayList<>();
+        List<Integer> all_secondHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        
+        String pdb_id, chain, adj, red, pdbAndChain;
+        Integer adjpos;
+        for(int i = 0; i < rowsStrandsBeta.size(); i++) {
+            // gather data from row
+            ArrayList<String> rowStrandBeta = rowsStrandsBeta.get(i);
+            pdb_id = rowStrandBeta.get(0);
+            chain = rowStrandBeta.get(1).isEmpty() ? "_" : rowStrandBeta.get(1);
+            pdbAndChain = pdb_id + chain;
+            adj = rowStrandBeta.get(2);
+            adjpos = Integer.parseInt(rowStrandBeta.get(3));
+            red = rowStrandBeta.get(2);
+            
+            Integer[] relDistancesRED = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(red);
+            Integer[] relDistancesADJ = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(adj);
+            
+            int patternPositionInRED = MotifSearchTools.findSubArray(relDistancesRED, pattern);
+            
+            Integer firstHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer firstHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer secondHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer secondHelixPositionMaxInAlphaOrBetaGraph = -1;
+            
+            if(patternPositionInRED >= 0) {
+                // The strand pattern occurs, but we need to check whether helices lie between the strands.
+                // Note that we queried the beta graph above, so they are NOT part of this graph anyway, and we need to have a look at other graph types.                
+                // The motif was found in the RED string. In the ADJ string, there may be spaces inbetween the strands of the pattern for the helices. Let us first determine the positions where the helices should be in the ADJ string.
+                
+                // We are looking for the positions of the helices:
+                     // first helix after the first strand
+                firstHelixPositionMinInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED; j++) {
+                    firstHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                firstHelixPositionMaxInAlphaOrBetaGraph = firstHelixPositionMinInAlphaOrBetaGraph;
+                firstHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 1];     // the index has to exist in the array, since of pattern of length 3 was found starting at patternPositionInRED                
+                
+                // second helix
+                
+                secondHelixPositionMinInAlphaOrBetaGraph = firstHelixPositionMaxInAlphaOrBetaGraph;
+                secondHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 1];    // the index has to exist in the array, since of pattern of length 3 was found starting at patternPositionInRED
+                
+                secondHelixPositionMaxInAlphaOrBetaGraph = secondHelixPositionMinInAlphaOrBetaGraph;
+                secondHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 2];    // the index has to exist in the array, since of pattern of length 3 was found starting at patternPositionInRED
+                
+            }
+            
+            // collect the data in the lists for all DB result rows
+            all_pdb_ids.add(pdb_id);
+            all_chains.add(chain);
+            all_firstHelixPositionMinInBetaGraph.add(firstHelixPositionMinInAlphaOrBetaGraph);
+            all_firstHelixPositionMaxInBetaGraph.add(firstHelixPositionMaxInAlphaOrBetaGraph);
+            all_secondHelixPositionMinInBetaGraph.add(secondHelixPositionMinInAlphaOrBetaGraph);
+            all_secondHelixPositionMaxInBetaGraph.add(secondHelixPositionMaxInAlphaOrBetaGraph);
+        }
+        
+        
+        // now get the positions in the albe (instead of the beta) graph:
+        int indexAlbeNumber = 3;
+        ArrayList<ArrayList<String>> rowsStrandsAlbe;
+        for(int i = 0; i < all_pdb_ids.size(); i++) {
+            
+            // firstHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'E' and a_b_nr = " + all_firstHelixPositionMinInBetaGraph.get(i) + "  group by pdb,chain,sse_type,albe_nr");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_firstHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsBeta.get(0).get(indexAlbeNumber)));
+            } else {
+                all_firstHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // firstHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'E' and a_b_nr = " + all_firstHelixPositionMaxInBetaGraph.get(i) + "  group by pdb,chain,sse_type,albe_nr");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_firstHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsBeta.get(0).get(indexAlbeNumber)));
+            } else {
+                all_firstHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // secondHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'E' and a_b_nr = " + all_secondHelixPositionMinInBetaGraph.get(i) + "  group by pdb,chain,sse_type,albe_nr");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_secondHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsBeta.get(0).get(indexAlbeNumber)));
+            } else {
+                all_secondHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // secondHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'E' and a_b_nr = " + all_secondHelixPositionMaxInBetaGraph.get(i) + "  group by pdb,chain,sse_type,albe_nr");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_secondHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsBeta.get(0).get(indexAlbeNumber)));
+            } else {
+                all_secondHelixPositionMaxInAlbeGraph.add(-1);
+            }
+        
+        
+        
+            // OK, now get the positions of the helices (instead of strands) in the albe graph:
+            ArrayList<ArrayList<String>> rowsHelicesAlbe;
+            rowsHelicesAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'H'  group by pdb,chain,sse_type,albe_nr");
+
+            List<String> uglyStringListForAllHelices = new ArrayList<>();
+            ArrayList<String> rowHelixAlbe;
+            String pdbidOfHelix, chainOfHelix, pdbAndChainOfHelix, sseTypeOfHelix, uglyString;
+            Integer albeNumberOfHelix;
+            for(int j = 0; j < rowsHelicesAlbe.size(); j++) {
+                rowHelixAlbe = rowsHelicesAlbe.get(j);
+
+                pdbidOfHelix = rowHelixAlbe.get(0);
+                chainOfHelix = rowHelixAlbe.get(1).isEmpty() ? "_" : rowHelixAlbe.get(1);
+                sseTypeOfHelix = rowHelixAlbe.get(2);   // should be "H", right? ;)
+                pdbAndChainOfHelix = pdbidOfHelix + chainOfHelix;
+                albeNumberOfHelix = Integer.parseInt(rowHelixAlbe.get(3));
+                uglyString = pdbAndChainOfHelix + ";" + sseTypeOfHelix + ";" + albeNumberOfHelix;
+                
+                uglyStringListForAllHelices.add(uglyString);
+            }
+            
+            
+        }
+        
+        // TODO: check the other possible motifs in a loop above (like '-3, 1, 1')
         return false;
         
-        /**
-    
-        ResultSetMetaData md;
-        ArrayList<String> columnHeaders;
-        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
-        ArrayList<String> rowData = null;
-        int count;
-                
-        PreparedStatement statement = null;
-        ResultSet rs = null;             
-        
-        StringBuilder querySB = new StringBuilder();
-       
-        // rossman1.pl
-        querySB.append("SELECT p.pdb_id, c.chain_name, ln.firstvertexpos_adj, ln.ptgl_linnot_adj, ln.ptgl_linnot_red ");
-	querySB.append("FROM plcc_fglinnot ln ");
-	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
-	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
-	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
-	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
-	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 2 AND (ln.ptgl_linnot_red LIKE '%3p,-1p,-1p%'  and ln.ptgl_linnot_red not like '%-3p,-1p,-1p%') ) ) ");
-        
-        
-        // order
-        querySB.append("GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red ");
-        
-        String query = querySB.toString();
-        
-        try {
-            //dbc.setAutoCommit(false);
-            statement = dbc.prepareStatement(query);
-
-            statement.setLong(1, chain_db_id);
-            statement.setLong(2, chain_db_id);
-            statement.setLong(3, chain_db_id);
-            statement.setLong(4, chain_db_id);
-            statement.setLong(5, chain_db_id);
-            
-                                
-            rs = statement.executeQuery();
-            //dbc.commit();
-            
-            md = rs.getMetaData();
-            count = md.getColumnCount();
-
-            columnHeaders = new ArrayList<String>();
-
-            for (int i = 1; i <= count; i++) {
-                columnHeaders.add(md.getColumnName(i));
-            }
-
-
-            while (rs.next()) {
-                rowData = new ArrayList<String>();
-                for (int i = 1; i <= count; i++) {
-                    rowData.add(rs.getString(i));
-                }
-                tableData.add(rowData);
-            }
-            
-        } catch (SQLException e ) {
-            DP.getInstance().e("DBManager", "chainContainsMotif_RossmanFold: '" + e.getMessage() + "'.");
-        } finally {
-            try {
-                if (statement != null) {
-                    statement.close();
-                }
-                //dbc.setAutoCommit(true);
-            } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_RossmanFold: Could not close statement and reset autocommit."); }
-        }
-        
-        // OK, check size of results table
-        if(tableData.size() >= 1) {
-            return true;
-        }
-        else {
-            return(false);
-        }        
-               
-                    
-        }**/
     }
     
     
