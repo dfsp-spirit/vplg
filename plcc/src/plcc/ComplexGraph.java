@@ -284,7 +284,7 @@ public class ComplexGraph extends UAdjListGraph {
 
     // ------------------------- Draw header -------------------------
         // check width of header string
-        String proteinHeader = "The chain complex graph of PDB entry " + cg.pdbid + " [V=" + cg.getVertices().size() + ", E=" + cg.getEdges() + "].";
+        String proteinHeader = "The chain complex graph of PDB entry " + cg.pdbid + " [V=" + cg.getVertices().size() + ", E=" + cg.getEdges().size() + "].";
         String addInfo = "(Interchain contact threshold is set to " + Main.chainComplexGraphContactThreshold + ". Neglected edges: " + cg.neglectedEdges + ")";
         //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
         Integer stringHeight = fontMetrics.getAscent();
@@ -417,7 +417,7 @@ public class ComplexGraph extends UAdjListGraph {
         Ellipse2D.Double circle;
         Rectangle2D.Double rect;
         ig2.setStroke(new BasicStroke(2));
-
+        
         boolean colorSet = false;
         cg.savedVertexColors = new float[cg.getVertices().size()];
         for (Integer i = 0; i < cg.getVertices().size(); i++) {

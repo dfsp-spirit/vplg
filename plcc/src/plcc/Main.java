@@ -5923,6 +5923,7 @@ public class Main {
         //create homologueChains matrix
         if (allChains.size() > 1) {
             for (Integer i = 0; i < allChains.size(); i++) {
+                
                 for (Integer j = 0; j < allChains.size(); j++) {
 
                     String compareChainID = allChains.get(j).getPdbChainID();

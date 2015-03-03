@@ -1167,30 +1167,46 @@ public class FileParser {
         String pLine = "";
         String chainLine = "";
         String[] curChains;
+        Boolean nextLineContinuesChainList = false;
           
         for(Integer i = 0; i < pdbLines.size(); i++) {
           
             pLineNum = i + 1;
             pLine = pdbLines.get(i);
 
-            if(pLine.startsWith("COMPND  ")) {
+                
+            if (pLine.startsWith("COMPND  ")) {
                 try {
-                    if(pLine.substring(11, 17).equals("CHAIN:")){
-                        chainLine = pLine.substring(18, pLine.indexOf(";"));
-                        chainLine = chainLine.replaceAll(" ", "");
-                        curChains = chainLine.split(",");
-                        for(String chain : curChains){
+                    if (pLine.substring(11, 17).equals("CHAIN:") || nextLineContinuesChainList) {
+                       
+                        if (nextLineContinuesChainList) {                      
+                            chainLine = chainLine + pLine.substring(11, pLine.length());
+                            nextLineContinuesChainList = false;
+                        } else {                          
+                            chainLine = pLine.substring(18, pLine.length());                           
+                        }
+                        
+                        //when end of chain list is not reached
+                        if (!chainLine.contains(";")) {
+                            nextLineContinuesChainList = true;
+                        } 
 
-                            ArrayList<String> homologueChains = new ArrayList<>();
-                            for(String hChain : curChains){
-                                if(!chain.equals(hChain)){
-                                    homologueChains.add(hChain);
+                        // do this not before chain list is complete
+                        if (!nextLineContinuesChainList) {
+                            chainLine = chainLine.replaceAll(" ", "").replace(";", "");
+                            curChains = chainLine.split(",");
+                            for (String chain : curChains) {
+                                ArrayList<String> homologueChains = new ArrayList<>();
+                                for (String hChain : curChains) {
+                                    if (!chain.equals(hChain)) {
+                                        homologueChains.add(hChain);
+                                    }
                                 }
+                                homologuesMap.put(chain, homologueChains);
                             }
-                            homologuesMap.put(chain, homologueChains);
                         }
                     }
-                } catch(Exception e ) {
+                } catch (Exception e) {
                     System.err.println("Hit errenous COMPND line at line #" + pLineNum + "', could not add homologues entry.");
                 }
             }             
