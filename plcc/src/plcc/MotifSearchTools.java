@@ -22,25 +22,25 @@ public class MotifSearchTools {
      * @param in the input string, this is not changed
      * @return the modified output string with brackets removed
      */
-    public static String removePTGLBRacketsFromString(String in) {
+    public static String removePTGLBracketsAndCommaFromString(String in) {
         if(in == null || in.length() == 0) {
             return in;
         }
-        String out = in.replaceAll("[\\{\\}\\[\\]\\(\\)]", "");                
+        String out = in.replaceAll("[\\{\\}\\[\\]\\(\\)\\,]", "");                
         return out;
     }
     
     /**
-     * Removes all occurrences of the sse types e h and the brackets {} () [] from a copy of input String, and returns the modified copy.
+     * Removes all occurrences of the sse types e h l, the comma and the brackets {} () [] from a copy of input String, and returns the modified copy.
      * @param in the input string, this is not changed
      * @return the modified output string with brackets removed
      */
-    public static String removePTGLBRacketsAndSSETypesFromString(String in) {
+    public static String removePTGLBracketsAndSSETypesFromString(String in) {
         if(in == null || in.length() == 0) {
             return in;
         }
-        String tmp = MotifSearchTools.removePTGLBRacketsFromString(in);
-        String out = tmp.replaceAll("[eh]", "");
+        String tmp = MotifSearchTools.removePTGLBracketsAndCommaFromString(in);
+        String out = tmp.replaceAll("[ehl]", "");
         return out;
     }
     
@@ -79,6 +79,29 @@ public class MotifSearchTools {
         return Collections.indexOfSubList(Arrays.asList(array), Arrays.asList(subArray));
     }
     
+    
+    /**
+     * Parses a PTGL linear notation ADJ or RED string, and returns an array of the relative distances (in the order they appear in the string).
+     * @param linnotString, like '{3ph,1ph,-2ph}'
+     * @return an array of the numbers in the string, like {3, 1, -2}. Or null if the input string is empty or null.
+     */
+    public static Integer[] getRelativeDistancesArrayFromPTGLRedAdjString(String linnotString) {
+        if(linnotString == null || linnotString.isEmpty()) {
+            return null;
+        }
+        String noBrackets = MotifSearchTools.removePTGLBracketsAndSSETypesFromString(linnotString); // leaves us with something like '3p1p-2p}'
+        String commata = MotifSearchTools.replacePTGLRelativeOrientationsInStringWith(noBrackets, ",");
+        String[] strArray = commata.split("\\,", -1);
+        Integer[] res = new Integer[strArray.length];
+        Arrays.fill(res, 0);
+        
+        for(int i = 0; i < strArray.length; i++) {
+            res[i] = Integer.parseInt(strArray[i]);
+        }
+        
+        return res;
+    }   
+    
     /**
      * Runs some tests only.
      * @param args ignored
@@ -97,7 +120,7 @@ public class MotifSearchTools {
         
         // test removePTGLBRacketsFromString
         in = "{3p,1p,1p,-4p,6p}";
-        out = MotifSearchTools.removePTGLBRacketsFromString(in);
+        out = MotifSearchTools.removePTGLBracketsAndCommaFromString(in);
         System.out.println("In was '" + in + "', out is '" + out + "'.");
         if(out.equals("3p,1p,1p,-4p,6p")) {
             System.out.println("Test 1 OK.");
@@ -107,7 +130,7 @@ public class MotifSearchTools {
         }
         
         in = "[3p,1p,1p,-4p,6p]";
-        out = MotifSearchTools.removePTGLBRacketsFromString(in);
+        out = MotifSearchTools.removePTGLBracketsAndCommaFromString(in);
         System.out.println("In was '" + in + "', out is '" + out + "'.");
         if(out.equals("3p,1p,1p,-4p,6p")) {
             System.out.println("Test 2 OK.");
@@ -117,7 +140,7 @@ public class MotifSearchTools {
         }
         
         in = "(3p,1p,1p,-4p,6p)";
-        out = MotifSearchTools.removePTGLBRacketsFromString(in);
+        out = MotifSearchTools.removePTGLBracketsAndCommaFromString(in);
         System.out.println("In was '" + in + "', out is '" + out + "'.");
         if(out.equals("3p,1p,1p,-4p,6p")) {
             System.out.println("Test 3 OK.");
@@ -127,7 +150,7 @@ public class MotifSearchTools {
         }
         
         in = "";
-        out = MotifSearchTools.removePTGLBRacketsFromString(in);
+        out = MotifSearchTools.removePTGLBracketsAndCommaFromString(in);
         System.out.println("In was '" + in + "', out is '" + out + "'.");
         if(out.equals("")) {
             System.out.println("Test 4 OK.");
@@ -137,7 +160,7 @@ public class MotifSearchTools {
         }
         
         in = null;
-        out = MotifSearchTools.removePTGLBRacketsFromString(in);
+        out = MotifSearchTools.removePTGLBracketsAndCommaFromString(in);
         System.out.println("In was '" + in + "', out is '" + out + "'.");
         if(out != null) {
             System.err.println("Test 5 FAILED.");
@@ -147,7 +170,7 @@ public class MotifSearchTools {
         }
         
         in = "(h,3ph,1pe,1pe,-4ph,6ph)";
-        out = MotifSearchTools.removePTGLBRacketsAndSSETypesFromString(in);
+        out = MotifSearchTools.removePTGLBracketsAndSSETypesFromString(in);
         System.out.println("In was '" + in + "', out is '" + out + "'.");
         if(out.equals(",3p,1p,1p,-4p,6p")) {
             System.out.println("Test 6 OK.");
