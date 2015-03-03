@@ -2294,10 +2294,17 @@ connection.close();
                 uglyStringListForAllHelices.add(uglyString);
             }
             
+            // join ugly strings here -- or rather not, we will just have to unjoin them later anyways ~~~
+            
             
         }
         
-        // TODO: check the other possible motifs in a loop above (like '-3, 1, 1')
+        // TODO here: unjoin string and extract $adjpos_sse1, which is the list of the positions of all helices in the albe graph.
+        
+        
+        // TODO here: check whether the determined helix positions lie within the min and max positions determined earlier.
+        //            If so, this chain contains the motif. Otherwise, not.
+        
         return false;
         
     }
