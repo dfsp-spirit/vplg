@@ -122,7 +122,7 @@ public class MotifSearchTools {
         in = "{3p,1p,1p,-4p,6p}";
         out = MotifSearchTools.removePTGLBracketsAndCommaFromString(in);
         System.out.println("In was '" + in + "', out is '" + out + "'.");
-        if(out.equals("3p,1p,1p,-4p,6p")) {
+        if(out.equals("3p1p1p-4p6p")) {
             System.out.println("Test 1 OK.");
         }
         else {
@@ -132,7 +132,7 @@ public class MotifSearchTools {
         in = "[3p,1p,1p,-4p,6p]";
         out = MotifSearchTools.removePTGLBracketsAndCommaFromString(in);
         System.out.println("In was '" + in + "', out is '" + out + "'.");
-        if(out.equals("3p,1p,1p,-4p,6p")) {
+        if(out.equals("3p1p1p-4p6p")) {
             System.out.println("Test 2 OK.");
         }
         else {
@@ -142,7 +142,7 @@ public class MotifSearchTools {
         in = "(3p,1p,1p,-4p,6p)";
         out = MotifSearchTools.removePTGLBracketsAndCommaFromString(in);
         System.out.println("In was '" + in + "', out is '" + out + "'.");
-        if(out.equals("3p,1p,1p,-4p,6p")) {
+        if(out.equals("3p1p1p-4p6p")) {
             System.out.println("Test 3 OK.");
         }
         else {
@@ -172,7 +172,7 @@ public class MotifSearchTools {
         in = "(h,3ph,1pe,1pe,-4ph,6ph)";
         out = MotifSearchTools.removePTGLBracketsAndSSETypesFromString(in);
         System.out.println("In was '" + in + "', out is '" + out + "'.");
-        if(out.equals(",3p,1p,1p,-4p,6p")) {
+        if(out.equals("3p1p1p-4p6p")) {
             System.out.println("Test 6 OK.");
         }
         else {
