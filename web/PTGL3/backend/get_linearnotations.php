@@ -136,7 +136,15 @@ function getLineCount($graphtype, $notation){
     
     $file = $directory . $filename ;
     $linecount = 0;
-    $handle = fopen($file, "r");
+	
+	$handle = FALSE;
+	if(file_exists($file)) {	
+		$handle = fopen($file, "r");
+	}
+	
+	if(! $handle) {
+		return $linecount;
+	}
         
     while(!feof($handle)){
         $line = fgets($handle);
@@ -235,8 +243,8 @@ if($valid_values){
 	
 	//$all_data = pg_fetch_all($result);
 	
-	if(! $linnotArray) { echo "ERROR: '" . pg_last_error() . "'."; }
-	
+	//if(! $linnotArray) { echo "ERROR: '" . pg_last_error() . "'."; }
+		
 	foreach($linnotArray as $arr) {
 		$linnot_string = $arr;
 		$tableString .= "<div class='string_row'>";

@@ -131,7 +131,7 @@ if($valid_values){
 	$result = pg_query($db, $query);
     //if(! $result) { echo "NO_RESULT: " .  pg_last_error($db) . "."; }
 	if(! $result) { array_push($SHOW_ERROR_LIST, "Database query failed: '" . pg_last_error($db) . "'"); }
-	
+	$tableString = "";
 	$tableString .= "<div><table id='tblfgresults'>\n";
 	$tableString .= "<caption> The $notation $graphtype_str folding graphs of PDB $pdb_id chain $chain_name </caption>\n";
 	$tableString .= "<tr>
