@@ -40,7 +40,7 @@ function check_valid_pdbid($str) {
 }
 
 function check_valid_chainid($str) {
-  if (preg_match('/^[A-Z]{1}$/i', $str)) {
+  if (preg_match('/^[A-Z0-9]{1}$/i', $str)) {
     return true;
   }  
   return false;
