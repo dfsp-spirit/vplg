@@ -2161,6 +2161,10 @@ connection.close();
             DP.getInstance().w("DBManager", "chainContainsMotif_RossmanFold: Not implemented yet, returning false for chain with ID '" + chain_db_id + "'.");
         }
         
+        if(chain_db_id > -1000 ) {
+            return false;   // ================== DISABLES FUNCTION --------- the if is required to prevent netbeans from showing unreachable statement errors ------
+        }
+        
         ArrayList<ArrayList<String>> rowsStrandsBeta = DBManager.doSelectQuery("Select pdb,chain,adj,adjpos,red from beta where red LIKE '%3p,-1p,-1p%' and red not LIKE '%-3p,-1p,-1p%'  group by pdb,chain,adj,adjpos,red");
         
        

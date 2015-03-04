@@ -11,8 +11,10 @@ include('./backend/config.php');
 $title = "The Protein Topology Graph Library";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
-session_unset();
-session_destroy();
+if (session_id()) {
+	session_unset();
+	session_destroy();
+}
 
 function check_install($db)  {
     
