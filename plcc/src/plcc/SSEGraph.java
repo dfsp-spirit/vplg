@@ -5609,15 +5609,27 @@ E	3	3	3
             }
             
             
-            
+            ig2.setColor(Color.BLACK);
             if(fg.getVertex(currentVertexIndexInFGSequential).isBetaStrand()) {                
+                ig2.setColor(Color.BLACK);
                 pol = DrawTools.getDefaultArrowPolygonLowestPointAt(p.x, p.y, newOrientations[i]);                                
-            } 
+            }
+            else if(fg.getVertex(currentVertexIndexInFGSequential).isHelix()) {
+                ig2.setColor(Color.RED);
+                pol = DrawTools.getDefaultBarrelPolygonLowestPointAt(p.x, p.y);
+            }
+            else if(fg.getVertex(currentVertexIndexInFGSequential).isLigandSSE()) {
+                ig2.setColor(Color.MAGENTA);
+                pol = DrawTools.getDefaultBarrelPolygonLowestPointAt(p.x, p.y);
+            }
             else {
+                ig2.setColor(Color.LIGHT_GRAY);
                 pol = DrawTools.getDefaultBarrelPolygonLowestPointAt(p.x, p.y);
             }
             ig2.draw(pol);
             ig2.fill(pol);
+            
+            ig2.setColor(Color.BLACK);
             //pl.getFooterStart().x + ((i-shiftBack[i]) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4)
             ig2.drawString((currentVertexIndexInFGSequential + 1) + "", pl.getFooterStart().x + (i * vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4));
             //ig2.drawString("i=" + (i) + "", p.x, p.y + 70);
@@ -5646,6 +5658,7 @@ E	3	3	3
         Arrays.fill(newKey, "?");   // all fields get overwritten later anyway
         
         // draw the edges
+        ig2.setColor(Color.BLACK);
         for(int i = 0; i < fg.spatOrder.size(); i++) {
             currentVertexIndexInFGSequential = fg.spatOrder.get(i);
             p = new Position2D(vertStartX + (i * vertDist) + pl.vertRadius / 2, vertStartY);
@@ -5721,9 +5734,11 @@ E	3	3	3
             }
             
             if(currentVertexIndexInFGSequential.equals(0)) {
+                ig2.setColor(Color.BLACK);
                 ig2.drawString("N", p.x, p.y + 20);  // N terminus label
             }
             if(currentVertexIndexInFGSequential.equals(fg.spatOrder.size() - 1)) {
+                ig2.setColor(Color.BLACK);
                 ig2.drawString("C", p.x, p.y + 20);  // C terminus label
             }
         }
