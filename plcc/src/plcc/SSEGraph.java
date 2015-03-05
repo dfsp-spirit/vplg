@@ -4505,6 +4505,7 @@ E	3	3	3
             //pl.drawAreaOutlines(ig2);
             // prepare font
             Font font = pl.getStandardFont();
+            Font fontBold = pl.getStandardFontBold();
             ig2.setFont(font);
             FontMetrics fontMetrics = ig2.getFontMetrics();
 
@@ -4637,9 +4638,11 @@ E	3	3	3
             ig2.setPaint(Color.BLACK);
             
             if( ! bw) {
-                if(fg.getSize() > 0) {                    
+                if(fg.getSize() > 0) {    
+                    ig2.setFont(fontBold);
                     ig2.drawString("N", vertStart.x - pl.vertDist, vertStart.y + 20);    // N terminus label
                     ig2.drawString("C", vertStart.x + numVerts * pl.vertDist, vertStart.y + 20);  // C terminus label
+                    ig2.setFont(font);
                 }
             }
                         
@@ -4768,6 +4771,7 @@ E	3	3	3
             //pl.drawAreaOutlines(ig2);
             // prepare font
             Font font = pl.getStandardFont();
+            Font fontBold = pl.getStandardFontBold();
             ig2.setFont(font);
             FontMetrics fontMetrics = ig2.getFontMetrics();
 
@@ -4932,9 +4936,11 @@ E	3	3	3
             ig2.setPaint(Color.BLACK);
             
             if( ! bw) {
-                if(fg.getSize() > 0) {                    
+                if(fg.getSize() > 0) {  
+                    ig2.setFont(fontBold);
                     ig2.drawString("N", vertStart.x - pl.vertDist, vertStart.y + 20);    // N terminus label
                     ig2.drawString("C", vertStart.x + numVerts * pl.vertDist, vertStart.y + 20);  // C terminus label
+                    ig2.setFont(font);
                 }
             }
                         
@@ -5068,6 +5074,7 @@ E	3	3	3
             //pl.drawAreaOutlines(ig2);
             // prepare font
             Font font = pl.getStandardFont();
+            Font fontBold = pl.getStandardFontBold();
             ig2.setFont(font);
             FontMetrics fontMetrics = ig2.getFontMetrics();
 
@@ -5200,9 +5207,11 @@ E	3	3	3
             ig2.setPaint(Color.BLACK);
             
             if( ! bw) {
-                if(fg.getSize() > 0) {                    
+                if(fg.getSize() > 0) {  
+                    ig2.setFont(fontBold);
                     ig2.drawString("N", vertStart.x - pl.vertDist, vertStart.y + 20);    // N terminus label
                     ig2.drawString("C", vertStart.x + numVerts * pl.vertDist, vertStart.y + 20);  // C terminus label
+                    ig2.setFont(font);
                 }
             }
                         
@@ -6554,6 +6563,7 @@ E	3	3	3
             //pl.drawAreaOutlines(ig2);
             // prepare font
             Font font = pl.getStandardFont();
+            Font fontBold = pl.getStandardFontBold();
             ig2.setFont(font);
             FontMetrics fontMetrics = ig2.getFontMetrics();
 
@@ -6671,9 +6681,11 @@ E	3	3	3
             ig2.setPaint(Color.BLACK);
             
             if( ! bw) {
-                if(fg.getSize() > 0) {                    
+                if(fg.getSize() > 0) {   
+                    ig2.setFont(fontBold);
                     ig2.drawString("N", vertStart.x - pl.vertDist, vertStart.y + 20);    // N terminus label
                     ig2.drawString("C", vertStart.x + numVerts * pl.vertDist, vertStart.y + 20);  // C terminus label
+                    ig2.setFont(font);
                 }
             }
                         
