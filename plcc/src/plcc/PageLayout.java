@@ -191,11 +191,19 @@ public class PageLayout {
     
             
     /**
-     * Returns the standard font which can be set in the config file.
+     * Returns the standard font which can be set in the config file, in plain type.
      * @return the font as java.awt.Font.
      */
     public Font getStandardFont() {
         return(new Font(Settings.get("plcc_S_img_default_font"), Font.PLAIN, Settings.getInteger("plcc_I_img_default_font_size")));
+    }
+    
+    /**
+     * Returns the standard font which can be set in the config file, in bold type.
+     * @return the font as java.awt.Font.
+     */
+    public Font getStandardFontBold() {
+        return(new Font(Settings.get("plcc_S_img_default_font"), Font.BOLD, Settings.getInteger("plcc_I_img_default_font_size")));
     }
     
     

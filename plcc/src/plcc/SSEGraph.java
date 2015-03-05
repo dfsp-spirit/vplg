@@ -5420,6 +5420,7 @@ E	3	3	3
         //pl.drawAreaOutlines(ig2);
         // prepare font
         Font font = pl.getStandardFont();
+        Font fontBold = pl.getStandardFontBold();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();
 
@@ -5733,14 +5734,24 @@ E	3	3	3
                 ig2.setColor(Color.BLACK);
             }
             
+            Integer terminusCurrentVertexIndexSpatial = fg.spatOrder.indexOf(currentVertexIndexInFGSequential);
+            Integer terminusCurrentOrientation = newOrientations[terminusCurrentVertexIndexSpatial];
+            ig2.setFont(fontBold);
             if(currentVertexIndexInFGSequential.equals(0)) {
-                ig2.setColor(Color.BLACK);
-                ig2.drawString("N", p.x, p.y + 20);  // N terminus label
+                ig2.setColor(Color.BLACK);                
+                ig2.drawString("N", p.x -5 , p.y + 25);  // N terminus label, always nelow first SSE (because 1st SSE starts upwards by definition)
             }
             if(currentVertexIndexInFGSequential.equals(fg.spatOrder.size() - 1)) {
                 ig2.setColor(Color.BLACK);
-                ig2.drawString("C", p.x, p.y + 20);  // C terminus label
+                if(terminusCurrentOrientation.equals(FoldingGraph.ORIENTATION_UPWARDS)) {
+                    ig2.drawString("C", p.x - 5, p.y - 90);  // C terminus label, above the last arrow pointing upwards
+                }
+                else {
+                    ig2.drawString("C", p.x - 5, p.y + 25);  // C terminus label, below the last arrow pointing downwards
+                }
+                
             }
+            ig2.setFont(font);
         }
 
 
