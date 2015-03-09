@@ -99,7 +99,6 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		
 		<br/>
 		
-		<br />
 		<!--
 		The most common and important SSEs in proteins are alpha helices and beta strands, and some structures in the PDB also contain ligands.
 		So the PTGL contains 6 different graph types, which differ in the considered secondary structure elements (SSE). The three base graph types are the <a href="#alphaGraph">Alpha graph</a>, the <a href="#betaGraph">Beta graph</a>,
@@ -116,7 +115,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		topologies and subtopologies using the <a href="#linearNot">linear notations</a>. Additionally, it could be searched for sequence similarity in <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a> sequences.
 		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		-->
-		<br>
+
 		<br>
 		<a class="anchor" id="proteinGraph"></a>
 		<h3> Protein Graphs </h3>
@@ -145,7 +144,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		neighbourhood. 
 		</p>
 		
-		<p class="imgCenter"><img src="./images/protein_graph.png" alt="Protein graph" title="Protein graph" class="img-responsive imgFormAboutphp"/></p>
+		<p class="imgCenter"><img src="./images/protein_graph.png" alt="Protein graph" title="Protein graph" class="img-responsive imgFormAboutphp2"/></p>
 		
 		<br/>
 		<a class="anchor" id="graphTypes"></a>
@@ -171,7 +170,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		parallel, green for mixed, blue for anti-parallel, and magenta for ligand neighbourhood. Here is the key for the images:
 		</p>
 		
-		<p class="imgCenter"><img src="./images/vplg_legend.png" alt="PTGL graph image key" title="PTGL graph image key" class="img-responsive imgFormAboutphp"/></p>
+		<p class="imgCenter"><img src="./images/vplg_legend.png" alt="PTGL graph image key" title="PTGL graph image key" class="img-responsive imgFormAboutphp2"/></p>
 		
 		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 
@@ -183,7 +182,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<a class="anchor" id="alphaGraph"></a>
 		<h5> <u>Alpha Graph</u> </h5>
 		The Alpha-Graph of the protein 7TIM chain A consisting only of 13 helices.
-		<p class="imgCenter"><img src="./images/7tim_A_alpha_PG.png" alt="Alpha Graph of 7timA" title="Alpha Graph of 7timA" class="img-responsive imgFormAboutphp"/></p>		
+		<p class="imgCenter"><img src="./images/7tim_A_alpha_PG.png" alt="Alpha Graph of 7timA" title="Alpha Graph of 7timA" class="img-responsive imgFormAboutphp2"/></p>		
 
 
 		<br>
@@ -191,21 +190,21 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<a class="anchor" id="betaGraph"></a>
 		<h5> <u>Beta Graph</u> </h5>
 		The Beta-Graph of the protein 7TIM chain A consisting only of 8 strands.  Note the beta barrel in the protein, which is clearly visible as a circle of parallel beta-strands in this graph.
-		<p class="imgCenter"><img src="./images/7tim_A_beta_PG.png" alt="Alpha Graph of 7timA" title="Alpha Graph of 7timA" class="img-responsive imgFormAboutphp"/></p>
+		<p class="imgCenter"><img src="./images/7tim_A_beta_PG.png" alt="Alpha Graph of 7timA" title="Alpha Graph of 7timA" class="img-responsive imgFormAboutphp2"/></p>
 
 		<br>
 		<br>
 		<a class="anchor" id="alphaBetaGraph"></a>
 		<h5> <u>Alpha-Beta Graph</u> </h5>
 		The Alpha-Beta Graph of the protein 7TIM chain A consisting of 21 SSEs (13 helices and 8 strands). 
-		<p class="imgCenter"><img class="img-responsive imgFormAboutphp" src="./images/7tim_A_albe_PG.png" alt="Alpha-Beta Graph of 7timA" title="Alpha-Beta Graph of 7timA"></p>
+		<p class="imgCenter"><img class="img-responsive imgFormAboutphp2" src="./images/7tim_A_albe_PG.png" alt="Alpha-Beta Graph of 7timA" title="Alpha-Beta Graph of 7timA"></p>
 		
 		<br>
 		<br>
 		<a class="anchor" id="alphaLigGraph"></a>
 		<h5> <u>Alpha-Ligand Graph</u> </h5>
 		The Alpha-Ligand Graph of the protein 7TIM chain A consisting of 13 helices and 1 ligand.
-		<p class="imgCenter"><img src="./images/7tim_A_alphalig_PG.png" alt="Alpha-Ligand Graph of 7timA" title="Alpha-Ligand Graph of 7timA" class="img-responsive imgFormAboutphp"/></p>
+		<p class="imgCenter"><img src="./images/7tim_A_alphalig_PG.png" alt="Alpha-Ligand Graph of 7timA" title="Alpha-Ligand Graph of 7timA" class="img-responsive imgFormAboutphp2"/></p>
 
 
 		<br>
@@ -213,14 +212,14 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<a class="anchor" id="betaLigGraph"></a>
 		<h5> <u>Beta-Ligand Graph</u> </h5>
 		The Beta-Ligand-Graph of the protein 7TIM chain A consisting of 8 strands and 1 ligand.
-		<p class="imgCenter"><img src="./images/7tim_A_betalig_PG.png" alt="Beta-Ligand Graph of 7timA" title="Beta Graph of 7timA" class="img-responsive imgFormAboutphp"/></p>
+		<p class="imgCenter"><img src="./images/7tim_A_betalig_PG.png" alt="Beta-Ligand Graph of 7timA" title="Beta Graph of 7timA" class="img-responsive imgFormAboutphp2"/></p>
 
 		<br>
 		<br>
 		<a class="anchor" id="alphaBetaLigGraph"></a>
 		<h5> <u>Alpha-Beta-Ligand Graph</u> </h5>
 		The Alpha-Beta-Ligand Graph of the protein 7TIM chain A consisting of 22 SSEs (13 helices, 8 strands and 1 ligand). 
-		<p class="imgCenter"><img class="img-responsive imgFormAboutphp" src="./images/7tim_A_albelig_PG.png" alt="Alpha-Beta-Ligand Graph of 7timA" title="Alpha-Beta Graph of 7timA"></p>
+		<p class="imgCenter"><img class="img-responsive imgFormAboutphp2" src="./images/7tim_A_albelig_PG.png" alt="Alpha-Beta-Ligand Graph of 7timA" title="Alpha-Beta Graph of 7timA"></p>
 		
 		
 		
@@ -253,16 +252,16 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<br>
 		<a class="anchor" id="rasmolbec"></a>
 		<h5> 3D structure of 1BEC: </h5>
-			<p><img src="./images/1bec.gif" alt="3D structure of 1BEC" title="3D structure of 1BEC" class="img-responsive imgFormAboutphp"/></p>
+			<p><img src="./images/1bec.gif" alt="3D structure of 1BEC" title="3D structure of 1BEC" class="img-responsive imgFormAboutphp2"/></p>
 
 
 		<a class="anchor" id="alphaBeta1bec"></a>
 		<h5> Alpha-Beta Protein graph of 1BEC: </h5>
-			<p><img src="./images/1becA_albe.0.png" alt="Alpha-Beta Protein graph of 1BEC" title="Alpha-Beta Protein graph of 1BEC" class="img-responsive imgFormAboutphp"/></p>
+			<p><img src="./images/1becA_albe.0.png" alt="Alpha-Beta Protein graph of 1BEC" title="Alpha-Beta Protein graph of 1BEC" class="img-responsive imgFormAboutphp2"/></p>
 		<h5> Alpha-Beta Folding graph A of 1BEC: </h5>
-			<p><img src="./images/1becAAa_al.0.png" alt="Alpha-Beta Folding graph A of 1BEC" title="Alpha-Beta Folding graph A of 1BEC" class="img-responsive imgFormAboutphp"/></p>
+			<p><img src="./images/1becAAa_al.0.png" alt="Alpha-Beta Folding graph A of 1BEC" title="Alpha-Beta Folding graph A of 1BEC" class="img-responsive imgFormAboutphp2"/></p>
 		<h5> Alpha-Beta Folding graph B of 1BEC: </h5>
-			<p><img src="./images/1becAEa_al.0.png" alt="Alpha-Beta Folding graph B of 1BEC" title="Alpha-Beta Folding graph B of 1BEC" class="img-responsive imgFormAboutphp"/></p>
+			<p><img src="./images/1becAEa_al.0.png" alt="Alpha-Beta Folding graph B of 1BEC" title="Alpha-Beta Folding graph B of 1BEC" class="img-responsive imgFormAboutphp2"/></p>
 		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		<br>
 		<br>
@@ -291,9 +290,9 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		parallel with one additional mixed edge to helix 12.<br><br>
 
 		<h5> ADJ Notation </h5>
-			<p><img src="./images/1d3tBEa_albe.png" alt="Adjacent notation" title="Adjacent notation" class="img-responsive imgFormAboutphp"/></p>
+			<p><img src="./images/1d3tBEa_albe.png" alt="Adjacent notation" title="Adjacent notation" class="img-responsive imgFormAboutphp2"/></p>
 		<h5> RED Notation </h5>
-			<p><img src="./images/1d3tBEr_albe.png" alt="Reduced notation" title="Reduced notation" class="img-responsive imgFormAboutphp"/></p>
+			<p><img src="./images/1d3tBEr_albe.png" alt="Reduced notation" title="Reduced notation" class="img-responsive imgFormAboutphp2"/></p>
 		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 
 		<br>
@@ -310,7 +309,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		B of the histocompatibility antigen (1IEB). The Folding graph consists of 3 helices and 4 strands. This topology exhibits one cross over
 		connection from helix 6 to helix 7 and forms an <a href="#alphaBetaGraph">Alpha-Beta</a> barrel structure. 
 
-		<p><img src="./images/1iebBk.png" alt="Key notation" title="Key notation" class="img-responsive imgFormAboutphp"/></p>
+		<p><img src="./images/1iebBk.png" alt="Key notation" title="Key notation" class="img-responsive imgFormAboutphp2"/></p>
 		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		<br>
 		<br>
@@ -319,7 +318,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		This notation is the same as the <a href="#adj">ADJ</a> notation, but the sequential differences are counted. Although the SEQ notation is trivial, the notation
 		can be useful, for example, searching for ψ-loops requires a special SEQ notation. 
 
-		<p><img src="./images/1ars_Bs_beta.png" alt="Sequence notation" title="Sequence notation" class="img-responsive imgFormAboutphp"/></p>
+		<p><img src="./images/1ars_Bs_beta.png" alt="Sequence notation" title="Sequence notation" class="img-responsive imgFormAboutphp2"/></p>
 		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		<br>
 		<br>

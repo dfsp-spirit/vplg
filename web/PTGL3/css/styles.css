@@ -249,6 +249,7 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		}
 		
 	#ugSearchkms {
+                overflow: hidden;
 		
 		}
 		
@@ -262,6 +263,8 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		cursor: pointer;
 		cursor: hand;
 		border-radius: 4px;
+                margin-bottom: -99999px;
+                padding-bottom: 99999px;
 		}
 	
 	#ugSearchkms2 {
@@ -274,6 +277,8 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 		cursor: pointer;
 		cursor: hand;
 		border-radius: 4px;
+                margin-bottom: -99999px;
+                padding-bottom: 99999px;
 		}
 	
 	#ugSearchkms3 {
@@ -908,11 +913,18 @@ Notes: 		Hand coded for www.ptgl.uni-frankfurt.de
 	
 
 	.imgFormAboutphp {
-		width: 450px;
+		width: 650px;
 		border: solid;
 		border-width: 1px;
 		margin: 10px;
 		}
+                
+        .imgFormAboutphp2 {
+		width: 500px;
+		border: solid;
+		border-width: 1px;
+		margin: 10px;
+		}       
 	
 	
 	.imgCenter {

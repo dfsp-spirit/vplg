@@ -95,7 +95,23 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 	}<br>
   </div>
   <br>
-		<p>Please use this BibTeX-entry for citing.</p>
+  
+  <div id="bibtex">
+        @article{May01012010,<br>
+        author = {May, Patrick and Kreuchwig, Annika and Steinke, Thomas and Koch, Ina}, <br>
+        title = {PTGL: a database for secondary structure-based protein topologies},<br>
+        volume = {38}, <br>
+        number = {suppl 1}, <br>
+        pages = {D326-D330}, <br>
+        year = {2010}, <br>
+        doi = {10.1093/nar/gkp980}, <br>
+        URL = {http://nar.oxfordjournals.org/content/38/suppl_1/D326.abstract}, <br>
+        eprint = {http://nar.oxfordjournals.org/content/38/suppl_1/D326.full.pdf+html}, <br>
+        journal = {Nucleic Acids Research} <br>
+        }<br>
+  </div>
+  <br>
+		<p>Please use one of this BibTeX-entries for citing.</p>
 
 
 	

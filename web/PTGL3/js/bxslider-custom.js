@@ -11,7 +11,7 @@ $(document).ready(function() {
 	});
 	
 	$('.tada').bxSlider({
-		startSlide: 0,
+		startSlide: 2,
 		controls: false,
 		minSlide: 1,
 		maxSlide: 1,
