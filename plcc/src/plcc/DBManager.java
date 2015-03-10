@@ -2191,7 +2191,7 @@ connection.close();
             pdbAndChain = pdb_id + chain;
             adj = rowStrandBeta.get(2);
             adjpos = Integer.parseInt(rowStrandBeta.get(3));
-            red = rowStrandBeta.get(2);
+            red = rowStrandBeta.get(2);   //4?
             
             Integer[] relDistancesRED = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(red);
             Integer[] relDistancesADJ = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(adj);
@@ -2220,6 +2220,12 @@ connection.close();
                 
                 // second helix
                 
+                //?
+                // secondHelixPositionMinInAlphaOrBetaGraph = firstHelixPositionMaxInAlphaOrBetaGraph
+                // -> no further calculation
+                
+                
+                
                 secondHelixPositionMinInAlphaOrBetaGraph = firstHelixPositionMaxInAlphaOrBetaGraph;
                 secondHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 1];    // the index has to exist in the array, since of pattern of length 3 was found starting at patternPositionInRED
                 
@@ -2246,6 +2252,10 @@ connection.close();
             // firstHelixPositionMin
             rowsStrandsAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'E' and a_b_nr = " + all_firstHelixPositionMinInBetaGraph.get(i) + "  group by pdb,chain,sse_type,albe_nr");
             if(rowsStrandsAlbe.size() == 1) {
+                
+                //?
+                // rowsStrandsBeta.get(0)? -> shouldn't it be rowsStrandsAlbe.get(0)?
+                
                 all_firstHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsBeta.get(0).get(indexAlbeNumber)));
             } else {
                 all_firstHelixPositionMinInAlbeGraph.add(-1);
