@@ -1785,7 +1785,7 @@ connection.close();
                 if(! silent) {
                     System.out.println("  -> Database connection OK.");
                     
-                    Long chainDBID = DBManager.getDBChainID("7tim", "A");
+                    Long chainDBID = DBManager.getDBChainID("1a77", "A");
                     if(DBManager.chainContainsMotif_RossmanFold(chainDBID)) {
                         System.out.println("its in there!");
                     }
@@ -2164,10 +2164,8 @@ connection.close();
         if(chain_db_id > -1000 ) {
             return false;   // ================== DISABLES FUNCTION --------- the if is required to prevent netbeans from showing unreachable statement errors ------
         }
-        
-        ArrayList<ArrayList<String>> rowsStrandsBeta = DBManager.doSelectQuery("Select pdb,chain,adj,adjpos,red from beta where red LIKE '%3p,-1p,-1p%' and red not LIKE '%-3p,-1p,-1p%'  group by pdb,chain,adj,adjpos,red");
-        
-       
+        //ArrayList<ArrayList<String>> rowsStrandsBeta = DBManager.doSelectQuery("Select pdb,chain,adj,adjpos,red from beta where red LIKE '%3p,-1p,-1p%' and red not LIKE '%-3p,-1p,-1p%'  group by pdb,chain,adj,adjpos,red");
+        ArrayList<ArrayList<String>> rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE ln.ptgl_linnot_red LIKE '%3p,-1p,-1p%' and ln.ptgl_linnot_red NOT LIKE '%-3p,-1p,-1p%' GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
         Integer[] pattern = new Integer[] {3, -1, -1};
         
         List<String> all_pdb_ids = new ArrayList<>();
@@ -2191,11 +2189,11 @@ connection.close();
             pdbAndChain = pdb_id + chain;
             adj = rowStrandBeta.get(2);
             adjpos = Integer.parseInt(rowStrandBeta.get(3));
-            red = rowStrandBeta.get(2);   //4?
+            red = rowStrandBeta.get(4);   //4? was 2 before
             
             Integer[] relDistancesRED = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(red);
             Integer[] relDistancesADJ = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(adj);
-            
+
             int patternPositionInRED = MotifSearchTools.findSubArray(relDistancesRED, pattern);
             
             Integer firstHelixPositionMinInAlphaOrBetaGraph = -1;
@@ -2243,16 +2241,19 @@ connection.close();
             all_secondHelixPositionMaxInBetaGraph.add(secondHelixPositionMaxInAlphaOrBetaGraph);
         }
         
-        
+
         // now get the positions in the albe (instead of the beta) graph:
         int indexAlbeNumber = 3;
         ArrayList<ArrayList<String>> rowsStrandsAlbe;
         for(int i = 0; i < all_pdb_ids.size(); i++) {
             
             // firstHelixPositionMin
-            rowsStrandsAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'E' and a_b_nr = " + all_firstHelixPositionMinInBetaGraph.get(i) + "  group by pdb,chain,sse_type,albe_nr");
+            //rowsStrandsAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'E' and a_b_nr = " + all_firstHelixPositionMinInBetaGraph.get(i) + "  group by pdb,chain,sse_type,albe_nr");
+            
+            // sse_type = 2 equals E -> needs to be integrated in the sql-statement?
+            
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_firstHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
             if(rowsStrandsAlbe.size() == 1) {
-                
                 //?
                 // rowsStrandsBeta.get(0)? -> shouldn't it be rowsStrandsAlbe.get(0)?
                 

@@ -95,7 +95,8 @@ public class MotifSearchTools {
         Integer[] res = new Integer[strArray.length];
         Arrays.fill(res, 0);
         
-        for(int i = 0; i < strArray.length; i++) {
+        //replacePTGLRelativeOrientationInStringWith(noBrackets, ","); leaves a "," at the end, making the string one element longer
+        for(int i = 0; i < strArray.length - 1; i++) {
             res[i] = Integer.parseInt(strArray[i]);
         }
         
