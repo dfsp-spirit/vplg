@@ -2164,7 +2164,11 @@ connection.close();
         if(chain_db_id > -1000 ) {
             return false;   // ================== DISABLES FUNCTION --------- the if is required to prevent netbeans from showing unreachable statement errors ------
         }
+        
         //ArrayList<ArrayList<String>> rowsStrandsBeta = DBManager.doSelectQuery("Select pdb,chain,adj,adjpos,red from beta where red LIKE '%3p,-1p,-1p%' and red not LIKE '%-3p,-1p,-1p%'  group by pdb,chain,adj,adjpos,red");
+        
+        //?
+        // add chain_db_id to the SQL-statement --> prepared statement needs to be done
         ArrayList<ArrayList<String>> rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE ln.ptgl_linnot_red LIKE '%3p,-1p,-1p%' and ln.ptgl_linnot_red NOT LIKE '%-3p,-1p,-1p%' GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
         Integer[] pattern = new Integer[] {3, -1, -1};
         
@@ -2245,43 +2249,45 @@ connection.close();
         // now get the positions in the albe (instead of the beta) graph:
         int indexAlbeNumber = 3;
         ArrayList<ArrayList<String>> rowsStrandsAlbe;
+        ArrayList<List<Integer>> all_albeNumberOfHelix = new ArrayList<>();
         for(int i = 0; i < all_pdb_ids.size(); i++) {
             
             // firstHelixPositionMin
             //rowsStrandsAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'E' and a_b_nr = " + all_firstHelixPositionMinInBetaGraph.get(i) + "  group by pdb,chain,sse_type,albe_nr");
             
             // sse_type = 2 equals E -> needs to be integrated in the sql-statement?
-            
+
             rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_firstHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
             if(rowsStrandsAlbe.size() == 1) {
                 //?
                 // rowsStrandsBeta.get(0)? -> shouldn't it be rowsStrandsAlbe.get(0)?
+                // is rowsStrandsAlbe.get(0) sufficient or would you have to look at other chains, fg_positions if one doesn't find a rossman fold?
                 
-                all_firstHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsBeta.get(0).get(indexAlbeNumber)));
+                all_firstHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
             } else {
                 all_firstHelixPositionMinInAlbeGraph.add(-1);
             }
             
             // firstHelixPositionMax
-            rowsStrandsAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'E' and a_b_nr = " + all_firstHelixPositionMaxInBetaGraph.get(i) + "  group by pdb,chain,sse_type,albe_nr");
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_firstHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
             if(rowsStrandsAlbe.size() == 1) {
-                all_firstHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsBeta.get(0).get(indexAlbeNumber)));
+                all_firstHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
             } else {
                 all_firstHelixPositionMaxInAlbeGraph.add(-1);
             }
             
             // secondHelixPositionMin
-            rowsStrandsAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'E' and a_b_nr = " + all_secondHelixPositionMinInBetaGraph.get(i) + "  group by pdb,chain,sse_type,albe_nr");
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_secondHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
             if(rowsStrandsAlbe.size() == 1) {
-                all_secondHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsBeta.get(0).get(indexAlbeNumber)));
+                all_secondHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
             } else {
                 all_secondHelixPositionMinInAlbeGraph.add(-1);
             }
             
             // secondHelixPositionMax
-            rowsStrandsAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'E' and a_b_nr = " + all_secondHelixPositionMaxInBetaGraph.get(i) + "  group by pdb,chain,sse_type,albe_nr");
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_secondHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
             if(rowsStrandsAlbe.size() == 1) {
-                all_secondHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsBeta.get(0).get(indexAlbeNumber)));
+                all_secondHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
             } else {
                 all_secondHelixPositionMaxInAlbeGraph.add(-1);
             }
@@ -2290,12 +2296,15 @@ connection.close();
         
             // OK, now get the positions of the helices (instead of strands) in the albe graph:
             ArrayList<ArrayList<String>> rowsHelicesAlbe;
-            rowsHelicesAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'H'  group by pdb,chain,sse_type,albe_nr");
+            //rowsHelicesAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'H'  group by pdb,chain,sse_type,albe_nr");
+            rowsHelicesAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '" + all_chains.get(i) + "' AND sse.sse_type = " + 1 + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
 
             List<String> uglyStringListForAllHelices = new ArrayList<>();
             ArrayList<String> rowHelixAlbe;
             String pdbidOfHelix, chainOfHelix, pdbAndChainOfHelix, sseTypeOfHelix, uglyString;
             Integer albeNumberOfHelix;
+            
+            List<Integer> tmp_albeNumberOfHelix = new ArrayList<>();
             for(int j = 0; j < rowsHelicesAlbe.size(); j++) {
                 rowHelixAlbe = rowsHelicesAlbe.get(j);
 
@@ -2306,12 +2315,15 @@ connection.close();
                 albeNumberOfHelix = Integer.parseInt(rowHelixAlbe.get(3));
                 uglyString = pdbAndChainOfHelix + ";" + sseTypeOfHelix + ";" + albeNumberOfHelix;
                 
+                tmp_albeNumberOfHelix.add(albeNumberOfHelix);
+                
                 uglyStringListForAllHelices.add(uglyString);
             }
+            all_albeNumberOfHelix.add(tmp_albeNumberOfHelix);
             
             // join ugly strings here -- or rather not, we will just have to unjoin them later anyways ~~~
             
-            
+       
         }
         
         // TODO here: unjoin string and extract $adjpos_sse1, which is the list of the positions of all helices in the albe graph.
@@ -2319,7 +2331,18 @@ connection.close();
         
         // TODO here: check whether the determined helix positions lie within the min and max positions determined earlier.
         //            If so, this chain contains the motif. Otherwise, not.
-        
+        for (int i = 0; i < all_pdb_ids.size(); i++) {
+            for (int a = 0; a < all_albeNumberOfHelix.get(i).size(); a++) {
+                for (int b = 0; b < all_albeNumberOfHelix.get(i).size(); b++) {
+                    if (all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMaxInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) < all_secondHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) > all_secondHelixPositionMaxInAlbeGraph.get(i)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        }
+
         return false;
         
     }
