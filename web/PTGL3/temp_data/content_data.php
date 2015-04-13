@@ -3,7 +3,7 @@
 $last_update_month_and_year = "February 2015";
 $num_pdb_files = 27;
 $num_protein_chains = 103;
-$num_protein_chains_nonredundant = 4;
+$num_protein_chains_nonredundant = 0;
 $num_sses = 2339;
 $num_intrachain_contacts = 2264;
 $num_helices = 1185;
