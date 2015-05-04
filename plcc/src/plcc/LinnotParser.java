@@ -34,7 +34,7 @@ public class LinnotParser {
         return "?";
     }
 
-    protected static List<String> getSSETypesFromTokenList(String[] tokens, String graphType) {
+    public static List<String> getSSETypesFromTokenList(String[] tokens, String graphType) {
         List<String> types = new ArrayList<>();
         for (String t : tokens) {
             types.add(LinnotParser.getSSETypeFromToken(t, graphType));
@@ -63,7 +63,7 @@ public class LinnotParser {
         }
     }
 
-    protected static List<Integer> getRelDistsFromTokenList(String[] tokens, String graphType) {
+    public static List<Integer> getRelDistsFromTokenList(String[] tokens, String graphType) {
         List<Integer> dists = new ArrayList<>();
         for (String t : tokens) {
             dists.add(LinnotParser.getRelDistFromToken(t));
@@ -71,7 +71,7 @@ public class LinnotParser {
         return dists;
     }
 
-    protected static String[] getTokensFromLinnot(String linnot) {
+    public static String[] getTokensFromLinnot(String linnot) {
         linnot = LinnotParser.stripAllBrackets(linnot);
         String[] tokens = linnot.split(",");
         return tokens;
@@ -95,7 +95,7 @@ public class LinnotParser {
         return token;
     }
 
-    protected static List<String> getContactTypesFromTokenList(String[] tokens) {
+    public static List<String> getContactTypesFromTokenList(String[] tokens) {
         List<String> types = new ArrayList<>();
         for (String t : tokens) {
             types.add(LinnotParser.getContactTypeFromToken(t));

@@ -38,7 +38,7 @@ public class LinnotDrawer {
         List<String> contactTypes = LinnotParser.getContactTypesFromTokenList(tokens);
         List<Integer> relDists = LinnotParser.getRelDistsFromTokenList(tokens, graphType);
         
-        int numVerts = sseTypes.size();
+        int numVerts = tokens.length;
         
         // --------------- prepare stuff ---------------
         
