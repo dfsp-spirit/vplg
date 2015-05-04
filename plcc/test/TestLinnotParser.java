@@ -7,6 +7,7 @@
 
 import java.util.List;
 import junit.framework.TestCase;
+import plcc.ILinnotParser;
 import plcc.LinnotParser;
 import plcc.SSEGraph;
 
@@ -31,12 +32,9 @@ public class TestLinnotParser extends TestCase {
      * Tests whether the SSE is of the correct type.
      */
     @org.junit.Test public void test7timNumSSEs() {     
-        String[] tokens = LinnotParser.getTokensFromLinnot(linnot);
-        List<String> sseTypes = LinnotParser.getSSETypesFromTokenList(tokens, graphType);
-        List<String> contactTypes = LinnotParser.getContactTypesFromTokenList(tokens);
-        List<Integer> relDists = LinnotParser.getRelDistsFromTokenList(tokens, graphType);
+        ILinnotParser lnp = new LinnotParser(linnot, graphType);
+        int numSSEs = lnp.getNumSSEs();
         
-        int numSSEs = tokens.length;
         assertEquals(numSSEs, 3);
     }
     

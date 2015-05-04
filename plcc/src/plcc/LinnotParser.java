@@ -14,9 +14,24 @@ import java.util.List;
  * A utility class to parse linear notation strings.
  * @author ts
  */
-public class LinnotParser {
+public class LinnotParser implements ILinnotParser {
+    
+    private final String linnot;
+    private final String[] tokens;
+    private final String graphType;
+    
+    public LinnotParser(String linnot, String graphType) {
+        this.linnot = linnot;
+        this.tokens = LinnotParser.getTokensFromLinnot(linnot);
+        this.graphType = graphType;
+    }
+    
+    @Override
+    public Integer getNumSSEs() {
+        return tokens.length;
+    }
 
-    protected static String stripSSETypes(String token) {
+    private static String stripSSETypes(String token) {
         String[] knownTypes = new String[]{SSEGraph.notationLabelHelix, SSEGraph.notationLabelStrand, SSEGraph.notationLabelLigand};
         for (String s : knownTypes) {
             token = token.replace(s, "");
@@ -24,7 +39,7 @@ public class LinnotParser {
         return token;
     }
 
-    protected static String getDefaultSSE(String graphType) {
+    private static String getDefaultSSE(String graphType) {
         if (graphType.equals(SSEGraph.GRAPHTYPE_ALPHA)) {
             return SSEGraph.notationLabelHelix;
         }
@@ -34,7 +49,16 @@ public class LinnotParser {
         return "?";
     }
 
-    public static List<String> getSSETypesFromTokenList(String[] tokens, String graphType) {
+    private static List<String> getSSETypesFromTokenList(String[] tokens, String graphType) {
+        List<String> types = new ArrayList<>();
+        for (String t : tokens) {
+            types.add(LinnotParser.getSSETypeFromToken(t, graphType));
+        }
+        return types;
+    }
+    
+    @Override
+    public List<String> getSSETypesList() {
         List<String> types = new ArrayList<>();
         for (String t : tokens) {
             types.add(LinnotParser.getSSETypeFromToken(t, graphType));
@@ -63,6 +87,12 @@ public class LinnotParser {
         }
     }
 
+    
+    @Override
+    public List<Integer> getRelDistList() {
+        return LinnotParser.getRelDistsFromTokenList(this.tokens, this.graphType);
+    }
+    
     public static List<Integer> getRelDistsFromTokenList(String[] tokens, String graphType) {
         List<Integer> dists = new ArrayList<>();
         for (String t : tokens) {
@@ -96,6 +126,15 @@ public class LinnotParser {
     }
 
     public static List<String> getContactTypesFromTokenList(String[] tokens) {
+        List<String> types = new ArrayList<>();
+        for (String t : tokens) {
+            types.add(LinnotParser.getContactTypeFromToken(t));
+        }
+        return types;
+    }
+    
+    @Override
+    public List<String> getContactTypesList() {
         List<String> types = new ArrayList<>();
         for (String t : tokens) {
             types.add(LinnotParser.getContactTypeFromToken(t));

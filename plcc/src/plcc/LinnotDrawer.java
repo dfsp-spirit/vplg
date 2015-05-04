@@ -32,13 +32,13 @@ public class LinnotDrawer {
     public static DrawResult drawLinnotStringADJ(String linnot, String graphType) {
         
         // the default SSE type to assume if not SSE type is given in vertex descriptor string (the 'h' can be omitted for alpha graphs in the linnot string).
-        String defaultSSEType = LinnotParser.getDefaultSSE(graphType);
-        String[] tokens = LinnotParser.getTokensFromLinnot(linnot);
-        List<String> sseTypes = LinnotParser.getSSETypesFromTokenList(tokens, graphType);
-        List<String> contactTypes = LinnotParser.getContactTypesFromTokenList(tokens);
-        List<Integer> relDists = LinnotParser.getRelDistsFromTokenList(tokens, graphType);
+        ILinnotParser lnp = new LinnotParser(linnot, graphType);
+
+        List<String> sseTypes = lnp.getSSETypesList();
+        List<String> contactTypes = lnp.getContactTypesList();
+        List<Integer> relDists = lnp.getRelDistList();
         
-        int numVerts = tokens.length;
+        int numVerts = lnp.getNumSSEs();
         
         // --------------- prepare stuff ---------------
         
