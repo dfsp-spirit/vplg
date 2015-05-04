@@ -31,7 +31,7 @@ public class SpatRel {
     public static final String STRING_MIXED = "m";
     public static final String STRING_PARALLEL = "p";
     public static final String STRING_ANTIPARALLEL = "a";
-    public static final String STRING_LIGAND = "l";
+    public static final String STRING_LIGAND = "j";
     public static final String STRING_BACKBONE = "b";
     public static final String STRING_DISULFIDE = "d";
     public static final String STRING_COMPLEX = "c";
@@ -40,7 +40,7 @@ public class SpatRel {
     public static final Character CHAR_MIXED = 'm';
     public static final Character CHAR_PARALLEL = 'p';
     public static final Character CHAR_ANTIPARALLEL = 'a';
-    public static final Character CHAR_LIGAND = 'l';
+    public static final Character CHAR_LIGAND = 'j';
     public static final Character CHAR_BACKBONE = 'b';
     public static final Character CHAR_DISULFIDE = 'd';
     public static final Character CHAR_COMPLEX = 'c';
