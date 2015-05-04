@@ -28,7 +28,22 @@ public class LinnotParser implements ILinnotParser {
     
     @Override
     public Integer getNumSSEs() {
-        return tokens.length;
+        return tokens.length - getNumBackEdges();
+    }
+    
+    @Override
+    public Integer getNumEdges() {
+        return tokens.length - 1;
+    }
+    
+    private Integer getNumBackEdges() {
+        int num = 0;
+        for(String t : tokens) {
+            if(LinnotParser.isBackwardsEdge(t)) {
+                num++;
+            }
+        }
+        return num;
     }
 
     private static String stripSSETypes(String token) {
@@ -109,7 +124,7 @@ public class LinnotParser implements ILinnotParser {
         return tokens;
     }
 
-    protected static String getContactTypeFromToken(String token) {
+    private static String getContactTypeFromToken(String token) {
         String[] knownTypes = new String[]{SpatRel.STRING_PARALLEL, SpatRel.STRING_MIXED, SpatRel.STRING_ANTIPARALLEL, SpatRel.STRING_LIGAND};
         for (String s : knownTypes) {
             if (token.contains(s)) {
@@ -117,6 +132,13 @@ public class LinnotParser implements ILinnotParser {
             }
         }
         return "?";
+    }
+    
+    private static Boolean isBackwardsEdge(String token) {
+        if (token.contains("z")) {
+            return true;
+        }
+        return false;   
     }
 
     protected static String stripContactTypes(String token) {

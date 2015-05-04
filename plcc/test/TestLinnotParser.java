@@ -37,6 +37,13 @@ public class TestLinnotParser extends TestCase {
         assertEquals(numSSEs, 3);
     }
     
+    @org.junit.Test public void test7timNumEdges() {     
+        ILinnotParser lnp = new LinnotParser(linnot, graphType);
+        int numEdges = lnp.getNumEdges();
+        
+        assertEquals(numEdges, 2);
+    }
+    
     
     @org.junit.Test public void test7timSSETypes() {     
         ILinnotParser lnp = new LinnotParser(linnot, graphType);
