@@ -25,55 +25,24 @@ import org.w3c.dom.Document;
  */
 public class LinnotDrawer {
     
-    private static String getDefaultSSE(String graphType) {
-        if(graphType.equals(SSEGraph.GRAPHTYPE_ALPHA)) {
-            return SSEGraph.notationLabelHelix;
-        }
-        if(graphType.equals(SSEGraph.GRAPHTYPE_BETA)) {
-            return SSEGraph.notationLabelStrand;
-        }
-        return "?";
-    }
     
-    private static String stripAllBrackets(String linnot) {
-        linnot = linnot.replace("(", "");
-        linnot = linnot.replace(")", "");
-        linnot = linnot.replace("[", "");
-        linnot = linnot.replace("]", "");
-        linnot = linnot.replace("{", "");
-        linnot = linnot.replace("}", "");
-        return linnot;
-    }
     
-    private static String[] getTokensFromLinnot(String linnot) {
-        linnot = LinnotDrawer.stripAllBrackets(linnot);
-        String[] tokens = linnot.split(",");
-        return tokens;
-    }
     
-    private static String getSSETypeFromToken(String token, String graphType) {
-        String[] knownTypes = new String [] { "h", "e", "l"  };
-        for(String s : knownTypes) {
-            if(token.contains(s)) {
-                return s;
-            }
-        }
-        return LinnotDrawer.getDefaultSSE(graphType);        
-    }
-    
-    private static List<String> getSSETypesFromLinnot(String linnot) {
-        List<String> types = new ArrayList<String>();
-        return types;
-    }
     
     public static DrawResult drawLinnotStringADJ(String linnot, String graphType) {
         
         // the default SSE type to assume if not SSE type is given in vertex descriptor string (the 'h' can be omitted for alpha graphs in the linnot string).
-        String defaultSSEType = LinnotDrawer.getDefaultSSE(graphType);
+        String defaultSSEType = LinnotParser.getDefaultSSE(graphType);
+        String[] tokens = LinnotParser.getTokensFromLinnot(linnot);
+        List<String> sseTypes = LinnotParser.getSSETypesFromTokenList(tokens, graphType);
+        List<String> contactTypes = LinnotParser.getContactTypesFromTokenList(tokens);
+        List<Integer> relDists = LinnotParser.getRelDistsFromTokenList(tokens, graphType);
+        
+        int numVerts = sseTypes.size();
         
         // --------------- prepare stuff ---------------
         
-        PageLayout pl = new PageLayout(5);  // 5 is num of verts
+        PageLayout pl = new PageLayout(numVerts);
         Rectangle2D roi = new Rectangle2D.Double(0, 0, pl.getPageWidth(), pl.getPageHeight());
         SVGGraphics2D ig2;                                   
         DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
