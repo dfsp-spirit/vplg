@@ -5,6 +5,7 @@
  */
 
 
+import java.util.ArrayList;
 import java.util.List;
 import junit.framework.TestCase;
 import plcc.ILinnotParser;
@@ -28,14 +29,50 @@ public class TestLinnotParser extends TestCase {
         graphType = SSEGraph.GRAPHTYPE_ALBELIG;
     }
     
-    /**
-     * Tests whether the SSE is of the correct type.
-     */
+    
     @org.junit.Test public void test7timNumSSEs() {     
         ILinnotParser lnp = new LinnotParser(linnot, graphType);
         int numSSEs = lnp.getNumSSEs();
         
         assertEquals(numSSEs, 3);
+    }
+    
+    
+    @org.junit.Test public void test7timSSETypes() {     
+        ILinnotParser lnp = new LinnotParser(linnot, graphType);
+        List<String> types = lnp.getSSETypesList();
+        
+        List<String> expected = new ArrayList<>();
+        expected.add(SSEGraph.notationLabelHelix);
+        expected.add(SSEGraph.notationLabelHelix);
+        expected.add(SSEGraph.notationLabelStrand);
+        
+        assertEquals(types, expected);
+    }
+    
+    
+    @org.junit.Test public void test7timContactTypes() {     
+        ILinnotParser lnp = new LinnotParser(linnot, graphType);
+        List<String> types = lnp.getContactTypesList();
+        
+        List<String> expected = new ArrayList<>();
+        expected.add("?");
+        expected.add("?");
+        expected.add("?");
+        
+        assertEquals(types, expected);
+    }
+    
+    
+    @org.junit.Test public void test7timRelDists() {     
+        ILinnotParser lnp = new LinnotParser(linnot, graphType);
+        List<Integer> dists = lnp.getRelDistList();
+        
+        List<Integer> expected = new ArrayList<>();
+        expected.add(-2);
+        expected.add(3);
+        
+        assertEquals(dists, expected);
     }
     
 }

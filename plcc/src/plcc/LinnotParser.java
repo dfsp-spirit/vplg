@@ -95,7 +95,9 @@ public class LinnotParser implements ILinnotParser {
     
     public static List<Integer> getRelDistsFromTokenList(String[] tokens, String graphType) {
         List<Integer> dists = new ArrayList<>();
-        for (String t : tokens) {
+        for (int i = 0; i < tokens.length; i++) {
+            if(i == 0) { continue; }
+            String t = tokens[i];
             dists.add(LinnotParser.getRelDistFromToken(t));
         }
         return dists;
