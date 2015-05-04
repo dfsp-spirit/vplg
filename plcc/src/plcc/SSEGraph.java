@@ -3113,6 +3113,13 @@ E	3	3	3
         try {
             DrawTools.writeG2dToSVGFile(svgFilePath, drawRes);
             resultFilesByFormat.put(IMAGEFORMAT.SVG, svgFilePath);
+            /*
+            System.out.print("ADJ FG: formats= ");
+            for(IMAGEFORMAT f : formats) {
+                System.out.print(f.toString() + " ");
+            }
+            System.out.println("");
+            */
             resultFilesByFormat.putAll(DrawTools.convertSVGFileToOtherFormats(svgFilePath, baseFilePathNoExt, drawRes, formats));
         } catch (IOException ex) {
             DP.getInstance().e("Could not write ADJ folding graph file : '" + ex.getMessage() + "'.");

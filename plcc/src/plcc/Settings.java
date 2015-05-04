@@ -281,7 +281,7 @@ public class Settings {
         defSet("plcc_B_img_output_format_PDF", "true", "Whether to write protein graph output images in PDF format.");
         defSet("plcc_B_img_output_format_SVG", "true", "Whether to write protein graph output images in SVG format. Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG.");
         defSet("plcc_B_img_FG_output_format_PNG", "true", "Whether to write protein graph output images in PNG format.");
-        defSet("plcc_B_img_FG_output_format_PDF", "false", "Whether to write protein graph output images in PDF format.");
+        defSet("plcc_B_img_FG_output_format_PDF", "true", "Whether to write protein graph output images in PDF format.");
         defSet("plcc_B_img_FG_output_format_SVG", "true", "Whether to write protein graph output images in SVG format. Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG.");
         
         defSet("plcc_I_img_margin_left", "80", "Size of the left image margin in pixels");

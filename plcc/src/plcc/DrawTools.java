@@ -1197,7 +1197,8 @@ public class DrawTools {
         for(IMAGEFORMAT format : formats) {           
 
             if(format.equals(IMAGEFORMAT.PNG)) {                
-                svgConverter.setDestinationType(DestinationType.PNG);                
+                svgConverter.setDestinationType(DestinationType.PNG);
+                //System.out.println("Handling PNG: input file='" + svgInputFilePath + "', output file ='" + outputFileBasePathNoExt + "'.");
                 formatFileExt = DestinationType.PNG_EXTENSION;
             } else if(format.equals(IMAGEFORMAT.JPEG)) {
                 svgConverter.setDestinationType(DestinationType.JPEG);
@@ -1207,6 +1208,7 @@ public class DrawTools {
                 svgConverter.setDestinationType(DestinationType.TIFF);                
                 formatFileExt = DestinationType.TIFF_EXTENSION;
             } else if(format.equals(IMAGEFORMAT.PDF)) {
+                //System.out.println("Handling PDF: input file='" + svgInputFilePath + "', output file ='" + outputFileBasePathNoExt + "'.");
                 svgConverter.setDestinationType(DestinationType.PDF);
                 formatFileExt = DestinationType.PDF_EXTENSION;
             } else {
