@@ -1895,7 +1895,7 @@ public class Main {
 
         ProtGraph pg = ProtGraphs.fromTrivialGraphFormatFile(tgfFile);
         System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to base file '" + img + "'.");
-        SSEGraph.drawProteinGraph(img, true, formats, pg);
+        ProteinGraphDrawer.drawProteinGraph(img, true, formats, pg);
         //pg.print();
         System.out.println("  Graph image written to base file '" + img + "'.");
     }
@@ -1919,7 +1919,7 @@ public class Main {
         IMAGEFORMAT[] formats = new IMAGEFORMAT[] { DrawTools.IMAGEFORMAT.PNG };
         ProtGraph pg = ProtGraphs.fromPlccGraphFormatString(graphString);
         System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to base file '" + imgNoExt + "'.");
-        SSEGraph.drawProteinGraph(imgNoExt, false, formats, pg); 
+        ProteinGraphDrawer.drawProteinGraph(imgNoExt, false, formats, pg); 
         System.out.println("  Protein graph image written to base file '" + imgNoExt + "'.");
 
         //if(drawFoldingGraphsAsWell) {
@@ -1955,7 +1955,7 @@ public class Main {
         ProtGraph pg = ProtGraphs.fromPlccGraphFormatString(graphString);
         IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
         System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to base file '" + outputImgNoExt + "'.");
-        SSEGraph.drawProteinGraph(outputImgNoExt, false, formats, pg);
+        ProteinGraphDrawer.drawProteinGraph(outputImgNoExt, false, formats, pg);
         System.out.println("  Protein graph image written to base file '" + outputImgNoExt + "'.");
 
         //if(drawFoldingGraphsAsWell) {
@@ -2571,7 +2571,7 @@ public class Main {
                     // formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG, DrawTools.IMAGEFORMAT.PDF };                    
                     formats = Settings.getProteinGraphOutputImageFormats();
 
-                    HashMap<IMAGEFORMAT, String> filesByFormatCurNotation = SSEGraph.drawProteinGraph(imgFileNoExt, false, formats, pg);
+                    HashMap<IMAGEFORMAT, String> filesByFormatCurNotation = ProteinGraphDrawer.drawProteinGraph(imgFileNoExt, false, formats, pg);
                     //if(! silent) {
                     //    System.out.println("      Image of graph written to file '" + imgFile + "'.");
                     //}
@@ -2880,19 +2880,19 @@ public class Main {
                         HashMap<IMAGEFORMAT, String> filesByFormatCurNotation = new HashMap<>();
 
                         if(notation.equals(FoldingGraph.FG_NOTATION_ADJ)) {     
-                            filesByFormatCurNotation = SSEGraph.drawFoldingGraphADJ(fgFile, false, formats, pnfr);                        
+                            filesByFormatCurNotation = ProteinGraphDrawer.drawFoldingGraphADJ(fgFile, false, formats, pnfr);                        
                         }
                         else if(notation.equals(FoldingGraph.FG_NOTATION_RED)) {
-                            filesByFormatCurNotation = SSEGraph.drawFoldingGraphRED(fgFile, false, formats, pnfr);                                                
+                            filesByFormatCurNotation = ProteinGraphDrawer.drawFoldingGraphRED(fgFile, false, formats, pnfr);                                                
                         }
                         else if(notation.equals(FoldingGraph.FG_NOTATION_SEQ)) {
-                            filesByFormatCurNotation = SSEGraph.drawFoldingGraphSEQ(fgFile, false, formats, pnfr);                                                
+                            filesByFormatCurNotation = ProteinGraphDrawer.drawFoldingGraphSEQ(fgFile, false, formats, pnfr);                                                
                         }
                         else if(notation.equals(FoldingGraph.FG_NOTATION_KEY)) {                            
-                            filesByFormatCurNotation = SSEGraph.drawFoldingGraphKEY(fgFile, false, formats, pnfr);                                                                            
+                            filesByFormatCurNotation = ProteinGraphDrawer.drawFoldingGraphKEY(fgFile, false, formats, pnfr);                                                                            
                         }
                         else if(notation.equals(FoldingGraph.FG_NOTATION_DEF)) {                            
-                            filesByFormatCurNotation = SSEGraph.drawFoldingGraphDEF(fgFile, false, formats, pnfr);                                                                            
+                            filesByFormatCurNotation = ProteinGraphDrawer.drawFoldingGraphDEF(fgFile, false, formats, pnfr);                                                                            
                         }
 
                         drawingSucceeded = ( ! filesByFormatCurNotation.isEmpty());                                                
@@ -6467,7 +6467,7 @@ public class Main {
                 
         if(Settings.getBoolean("plcc_B_draw_graphs")) {
             IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG, DrawTools.IMAGEFORMAT.PDF };
-            SSEGraph.drawProteinGraph(imgFileNoExt, false, formats, pg);
+            ProteinGraphDrawer.drawProteinGraph(imgFileNoExt, false, formats, pg);
             if(! silent) {
                 System.out.println("    Image of complex graph written to base file '" + imgFileNoExt + "'.");
             }
