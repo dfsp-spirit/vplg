@@ -17,7 +17,7 @@ import java.util.List;
 public interface IDrawableGraph {
     
     public String getPropertyString(String name);
-    public List<IDrawableEdge> getEdges();
-    public List<IDrawableVertex> getVertices();
+    public List<IDrawableEdge> getDrawableEdges();
+    public List<IDrawableVertex> getDrawableVertices();
     
 }

@@ -4116,7 +4116,7 @@ connection.close();
      * @return the number of SSEs successfully assigned to the graph
      * @throws SQLException if something goes wrong with the database server
      */
-    public static Integer assignSSEsToProteinGraphInOrder(ArrayList<SSE> sses, String pdb_id, String chain_name, Integer graph_type) throws SQLException {
+    public static Integer assignSSEsToProteinGraphInOrder(List<SSE> sses, String pdb_id, String chain_name, Integer graph_type) throws SQLException {
         Integer numAssigned = 0;
         
         Long chain_id = getDBChainID(pdb_id, chain_name);
@@ -4206,7 +4206,7 @@ connection.close();
      * @return an Integer array: position 0 = the number of SSEs successfully assigned to the graph in sse2fg table. position 1 = the number assigned in secondat table.
      * @throws SQLException if something goes wrong with the database server
      */
-    public static Integer[] assignSSEsToFoldingGraphInOrderWithSecondat(ArrayList<SSE> sses, Long foldingGraphDbId, String fg_graph_type, Integer fg_number, String fg_foldname) throws SQLException {
+    public static Integer[] assignSSEsToFoldingGraphInOrderWithSecondat(List<SSE> sses, Long foldingGraphDbId, String fg_graph_type, Integer fg_number, String fg_foldname) throws SQLException {
         Integer numAssignedSSE2FG = 0;
         Integer numAssignedSecondat = 0;
         

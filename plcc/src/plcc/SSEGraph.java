@@ -80,10 +80,10 @@ import tools.DP;
  * 
  * @author spirit
  */
-public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements VPLGGraphFormat, GraphModellingLanguageFormat, TrivialGraphFormat, DOTLanguageFormat, KavoshFormat, SimpleGraphInterface {
+public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements VPLGGraphFormat, GraphModellingLanguageFormat, TrivialGraphFormat, DOTLanguageFormat, KavoshFormat, SimpleGraphInterface, IDrawableGraph {
     
     /** the list of all SSEs of this graph */
-    protected ArrayList<SSE> sseList;
+    protected List<SSE> sseList;
     
     /** Contains the number of the last SSE which is part of a certain chain*/
     protected ArrayList<Integer> chainEnd = new ArrayList<Integer>();
@@ -1007,6 +1007,28 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
             for(Integer j = i+1; j < this.size; j++) {
                 if(this.containsEdge(i, j)) {
                     edges.add(new Integer[] {i, j});
+                }            
+            }            
+        }
+        
+        return(edges);
+    }
+    
+    /**
+     * Returns the list of edges of this graph.
+     * @return the list of edges
+     */
+    public List<SSEGraphEdge> getSSEGraphEdgeList() {
+        List<SSEGraphEdge> edges = new ArrayList<>();
+        
+        if(this.getSize() < 2) {
+            return edges;
+        }
+        
+        for(Integer i = 0; i < this.size; i++) {
+            for(Integer j = i+1; j < this.size; j++) {
+                if(this.containsEdge(i, j)) {
+                    edges.add(new SSEGraphEdge(new Integer[] {i, j}, this.getContactTypeString(i, j)));
                 }            
             }            
         }
@@ -3343,6 +3365,38 @@ E	3	3	3
         }
         
         return plg;
+    }
+
+    @Override
+    public String getPropertyString(String name) {
+        if(name.equals("pdbid")) {
+            return this.pdbid;
+        }
+        if(name.equals("chainid")) {
+            return this.chainid;
+        }
+        if(name.equals("graphtype")) {
+            return this.graphType;
+        }
+        return null;
+    }
+
+    @Override
+    public List<IDrawableEdge> getDrawableEdges() {
+        List<IDrawableEdge> l = new ArrayList<>();
+        for(SSEGraphEdge e : this.getSSEGraphEdgeList()) {
+            l.add(e);
+        }
+        return l;
+    }
+
+    @Override
+    public List<IDrawableVertex> getDrawableVertices() {
+        List<IDrawableVertex> l = new ArrayList<>();
+        for(SSE s : this.sseList) {
+            l.add(s);
+        }
+        return l;
     }
     
     

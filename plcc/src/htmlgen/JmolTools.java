@@ -8,6 +8,7 @@
 package htmlgen;
 
 import java.util.ArrayList;
+import java.util.List;
 import plcc.Position3D;
 import plcc.Residue;
 import plcc.SSE;
@@ -217,7 +218,7 @@ public class JmolTools {
      * @param forceReload whether to force a reload of the PDB file before starting the coloring commands
      * @return the jmol command string
      */
-    public static String visualizeGraphSubsetSSEsInBlue(SSEGraph g, ArrayList<SSE> ssesToColor, boolean hideOtherChains, boolean forceReload) {
+    public static String visualizeGraphSubsetSSEsInBlue(SSEGraph g, List<SSE> ssesToColor, boolean hideOtherChains, boolean forceReload) {
         ArrayList<Residue> allResidues = new ArrayList<Residue>();
         for(SSE sse : ssesToColor) {
             for(Residue r : sse.getResidues()) {

@@ -12,5 +12,5 @@ package plcc;
  * @author spirit
  */
 public interface IDrawableVertex {
-    public String getSSEType();    
+    public String getSseFgNotation();    
 }
