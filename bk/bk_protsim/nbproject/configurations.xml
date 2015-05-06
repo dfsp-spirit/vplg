@@ -4,6 +4,8 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>Graph.h</itemPath>
+      <itemPath>ProductGraph.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -12,6 +14,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>ProductGraph.cpp</itemPath>
       <itemPath>main.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -35,7 +38,17 @@
         <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
+        <ccTool>
+          <commandlineTool>g++</commandlineTool>
+          <commandLine>-std=c++11</commandLine>
+        </ccTool>
       </compileType>
+      <item path="Graph.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ProductGraph.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ProductGraph.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
@@ -59,6 +72,12 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
+      <item path="Graph.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ProductGraph.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ProductGraph.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
