@@ -19,12 +19,12 @@ public:
     ProductGraph(const ProductGraph&);
     ~ProductGraph();
     
-    Graph_p* getProductGraph();
+    Graph_p getProductGraph();
 
 private:
     const Graph& fstGraph;
     const Graph& secGraph;
-    Graph_p *prodGraph;
+    Graph_p prodGraph;
     void computePrdGraph();
 };
 

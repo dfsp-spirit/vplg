@@ -11,19 +11,22 @@
 ProductGraph::ProductGraph() : fstGraph(0), secGraph(0), prodGraph(0) { }
 
 ProductGraph::ProductGraph(const Graph& fstGraph, const Graph& secGraph) : fstGraph(fstGraph), secGraph(secGraph) {
-    this->prodGraph = new Graph_p(num_vertices(fstGraph)*num_vertices(secGraph));
+    //upper bound for maximum number of vertices in the product graph is |E1| * |E2| 
+    this->prodGraph = Graph_p(num_vertices(fstGraph)*num_vertices(secGraph)); 
+    //save the id of the original graphs as the label of the product graph
+    this->prodGraph[boost::graph_bundle].label = std::to_string(fstGraph[boost::graph_bundle].id)  + "$" +
+                                                                               std::to_string(secGraph[boost::graph_bundle].id) 
     computePrdGraph();
+    //todo fill other properties
 }
 
 ProductGraph::ProductGraph(const ProductGraph&) : fstGraph(0), secGraph(0), prodGraph(0) {
     std::cerr << "not implemented";
 }
 
-ProductGraph::~ProductGraph() {
-    delete prodGraph;
-}
+ProductGraph::~ProductGraph() {}
 
-Graph_p* ProductGraph::getProductGraph() {
+Graph_p ProductGraph::getProductGraph() {
     return prodGraph;
 }
 
@@ -31,20 +34,22 @@ void ProductGraph::computePrdGraph() {
     //the vertices of the product graph get computed by paring every edge of the first graph with every edge 
     // of the second. If the edges are compatible a new vertex is added to the product graph
     
-    int count =0; //counter to assign an id to created vertices 
+    VertexIterator_p current, end;
+    tie (current, end) = vertices(prodGraph); // dummy vertices in product graph
     
     //iterating through all edge pairs
     EdgeIterator eiFst, eiEndFst ;
-    EdgeIterator eiSec, eiEndSec ;
-    for (tie(eiFst, eiEndFst) = edges(fstGraph); eiFst != eiEndFst; ++eiFst) {
-        for (tie(eiSec, eiEndSec) = edges(secGraph); eiSec != eiEndSec; ++eiSec) {
+    EdgeIterator eiSec, eiEndSec;
+    for ( tie(eiFst, eiEndFst) = edges(fstGraph); eiFst != eiEndFst; ++eiFst) {
+        VertexDescriptor v1Fst, v2Fst;
+        v1Fst = source(*eiFst, fstGraph);
+        v2Fst = target (*eiFst, fstGraph);
+        for ( tie(eiSec, eiEndSec) = edges(secGraph); eiSec != eiEndSec; ++eiSec) {
             
             //getting the vertices of the current edges
-            VertexDescriptor v1Fst, v2Fst, v1Sec, v2Sec;
-            v1Fst = source(*eiFst, *prodGraph);
-            v2Fst = target (*eiFst, *prodGraph);
-            v1Sec = source(*eiSec,*prodGraph);
-            v2Sec = target (*eiSec,*prodGraph);
+            VertexDescriptor v1Sec, v2Sec;
+            v1Sec = source(*eiSec,secGraph);
+            v2Sec = target (*eiSec,secGraph);
             
             //check for compatibility of the edges (identity of edge labels and target/source vertex labels)
             bool labelCompatible = fstGraph[*eiFst].label == secGraph[*eiSec].label;
@@ -53,57 +58,27 @@ void ProductGraph::computePrdGraph() {
                                                        ((fstGraph[v1Fst].label == secGraph[v2Sec].label)  &&
                                                         (fstGraph[v2Fst].label == secGraph[v1Sec].label)) ;
             
-            //add a new vertex to the product graph and save the original edges as properties
+            //edit the properties of the new vertex
             if (labelCompatible && verticesCompatible)     {  
-                
-                
-                vertex_info_p* temp = new vertex_info_p;
-                temp->id = count++;
-                temp->label = "";
-                temp->comment = "";
-                temp->sources["fs"]  =fstGraph[*eiFst].source;
-                temp->sources["ft"]  =fstGraph[*eiFst].target;
-                temp->sources["ss"]  =secGraph[*eiSec].source;
-                temp->sources["st"]  =secGraph[*eiSec].target;
-                add_vertex(*temp, *prodGraph); 
-
-
+                prodGraph[*current].id = *current;
+                prodGraph[*current].label = ;
+                prodGraph[*current].edgeFst = *eiFst;
+                prodGraph[*current].edgeSec = *eiSec;
+                ++current; //increment for the next loop.
             } //if compatible
-           
         } // for second edge
     } // for first edge      
     
+    //todo: get rid of the remaining vertices between current and end... not sure how 
+    //"current" points to the first unused vertex. the range "current -> end" is all unused
+    
     //iterate through all vertex pairs in the new product graph
-    VertexIterator_p vi1Prod, vi2Prod, viEndProd ;
-    for (tie(vi1Prod, viEndProd) = vertices(*prodGraph); vi1Prod != viEndProd; ++vi1Prod) {
-        for (vi2Prod = vi1Prod; vi2Prod != viEndProd; ++vi2Prod) {
-             
-            /*
-            bool fIdentity = false, sIdentity = false, fNeighbours = false, sNeighbours  = false;
-            unsigned short fIdents = 0, sIdents = 0;
-            std::string fLabel, sLabel;
+    VertexIterator_p vi1P, vi2P, viEndP ;
+    for (tie(vi1P, viEndP) = vertices(prodGraph); vi1P != viEndP; ++vi1P) {
+        for (vi2P = vi1P; vi2P != viEndP; ++vi2P) {
             
-            
-            VertexDescriptor f1Source, f1Target, s1Source, s1Target, f2Source, f2Target, s2Source, s2Target;
-            
-            if ((*prodGraph)[*vi1Prod].sources["fs"] == (*prodGraph)[*vi2Prod].sources["fs"]) { 
-                ++fIdents; 
-            }
-            if (*prodGraph[*vi1Prod]->sources["fs"] == *prodGraph[*vi2Prod]->sources["ft"]) { ++fIdents; }
-            if (*prodGraph[*vi1Prod]->sources["ft"] == *prodGraph[*vi2Prod]->sources["fs"]) { ++fIdents; }
-            if (*prodGraph[*vi1Prod]->sources["ft"] == *prodGraph[*vi2Prod]->sources["ft"]) { ++fIdents; }
-            
-            if (*prodGraph[*vi1Prod]->sources["ss"] == *prodGraph[*vi2Prod]->sources["ss"]) { ++sIdents; }
-            if (*prodGraph[*vi1Prod]->sources["ss"] == *prodGraph[*vi2Prod]->sources["st"]) { ++sIdents; }
-            if (*prodGraph[*vi1Prod]->sources["st"] == *prodGraph[*vi2Prod]->sources["ss"]) { ++sIdents; }
-            if (*prodGraph[*vi1Prod]->sources["st"] == *prodGraph[*vi2Prod]->sources["st"]) { ++sIdents; }
-            
-            if ( (fIdents == sIdents) && (fIdents != 2) )
-            */
+            //todo: add edges between compatible vertices
 
-           
-            
-            
         } // for second vertex
     } // for first vertex
 }

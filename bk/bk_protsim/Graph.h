@@ -56,8 +56,8 @@ struct vertex_info_p {
     int id;
     std::string label;
     std::string comment;
-    EdgeDescriptor first;
-    EdgeDescriptor second;
+    EdgeDescriptor edgeFst;
+    EdgeDescriptor edgeSec;
 }; 
 
 typedef boost::adjacency_list<boost::listS, boost::vecS, boost::undirectedS,
