@@ -19,9 +19,10 @@ public:
     ProductGraph(const ProductGraph&);
     ~ProductGraph();
     
-    Graph_p getProductGraph();
+    Graph_p& getProductGraph();
 
 private:
+    std::pair<bool,bool> verticesCompatible(VertexIterator_p vi1, VertexIterator_p vi2);
     const Graph& fstGraph;
     const Graph& secGraph;
     Graph_p prodGraph;

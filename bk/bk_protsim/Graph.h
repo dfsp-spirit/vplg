@@ -21,7 +21,7 @@ struct graph_info {
     int id;
     int directed;
     std::string label;
-    std::string commment;   
+    std::string comment;    //###################################### was commment inform ben
     std::unordered_map<std::string, std::string> properties; // used to store an arbitrary number of properties
 };
 
