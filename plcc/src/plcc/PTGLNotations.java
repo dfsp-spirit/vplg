@@ -415,6 +415,7 @@ public class PTGLNotations {
                         adjv = adjNeighbors.get(k);
                         
                         if(hc && adjvisited.size() == ccVerts.size()) {
+                            // we have a circle in these vertices, and visited each vertex already. This is the edge that closes the circle.
                             foundNextVertex = true;
                             next = adjv;
                             hc = false;                            
@@ -488,13 +489,13 @@ public class PTGLNotations {
                             System.out.println("    Fold#" + foldNum + ": Found next vertex. Set adjdegree of " + adjcur + " to " + adjdegrees.get(adjcur) + " (was " + adjcurDegree + ")" + ", set adjdegree of " + next + " to " + adjdegrees.get(next) + " (was " + nextDegree + ").");
                         }
                     }
-                    else {  // not found
+                    else {  // not found, this means there is no neighbor left to visit from the current vertex.
                         
                         if(adjverbose) {
                             System.out.println("    Fold#" + foldNum + ": Did NOT find next vertex, end of path.");
                         }
                         
-                        // end of the path
+                        // try to find a 
                         next = getVertexDegree1(adjdegrees, ccVerts);
                         if(next != null) {
                             if(adjverbose) {
