@@ -60,7 +60,7 @@ struct vertex_info_p {
     EdgeDescriptor edgeSec;
 }; 
 
-typedef boost::adjacency_list<boost::listS, boost::vecS, boost::undirectedS,
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
                               vertex_info_p, edge_info, graph_info, boost::listS> Graph_p;
 typedef boost::graph_traits<Graph_p>::vertex_descriptor VertexDescriptor_p;
 typedef boost::graph_traits<Graph_p>::edge_descriptor EdgeDescriptor_p;
