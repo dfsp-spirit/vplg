@@ -10,8 +10,8 @@ package htmlgen;
 import java.util.ArrayList;
 import java.util.List;
 import plcc.Position3D;
-import plcc.Residue;
-import plcc.SSE;
+import proteinstructure.Residue;
+import proteinstructure.SSE;
 import plcc.SSEGraph;
 import plcc.SpatRel;
 

@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 import plcc.ProtGraph;
 import plcc.ProtGraphs;
-import plcc.SSE;
+import proteinstructure.SSE;
 import plcc.SpatRel;
 
 /**

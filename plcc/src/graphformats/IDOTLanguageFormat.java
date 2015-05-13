@@ -5,14 +5,14 @@
  *
  * @author ts
  */
-package plcc;
+package graphformats;
 
 /**
  * The DOT language interface, used to output graphs in DOT language format. See 
  * http://en.wikipedia.org/wiki/DOT_language for details.
  * @author ts
  */
-public interface DOTLanguageFormat {
+public interface IDOTLanguageFormat {
     
     /**
      * DOT language output support. See 

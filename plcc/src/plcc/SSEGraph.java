@@ -10,6 +10,16 @@
 package plcc;
 
 //import com.google.gson.Gson;
+import graphformats.IKavoshFormat;
+import graphdrawing.IDrawableEdge;
+import graphdrawing.IDrawableGraph;
+import graphdrawing.IDrawableVertex;
+import graphformats.IDOTLanguageFormat;
+import graphformats.IVPLGGraphFormat;
+import graphformats.ITrivialGraphFormat;
+import graphformats.IGraphModellingLanguageFormat;
+import proteinstructure.Chain;
+import proteinstructure.SSE;
 import algorithms.CompatGraphComputation;
 import algorithms.TreeNodeData;
 import com.google.gson.Gson;
@@ -67,7 +77,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
-import plcc.DrawTools.IMAGEFORMAT;
+import graphdrawing.DrawTools.IMAGEFORMAT;
 import static plcc.FoldingGraph.ORIENTATION_DOWNWARDS;
 import tools.DP;
 
@@ -80,16 +90,16 @@ import tools.DP;
  * 
  * @author spirit
  */
-public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements VPLGGraphFormat, GraphModellingLanguageFormat, TrivialGraphFormat, DOTLanguageFormat, KavoshFormat, SimpleGraphInterface, IDrawableGraph {
+public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements IVPLGGraphFormat, IGraphModellingLanguageFormat, ITrivialGraphFormat, IDOTLanguageFormat, IKavoshFormat, SimpleGraphInterface, IDrawableGraph {
     
     /** the list of all SSEs of this graph */
     protected List<SSE> sseList;
     
     /** Contains the number of the last SSE which is part of a certain chain*/
-    protected ArrayList<Integer> chainEnd = new ArrayList<Integer>();
+    private List<Integer> chainEnds = new ArrayList<>();
     
     /** Contains a list of all chains*/
-    protected ArrayList<Chain> allChains = new ArrayList<Chain>();
+    private List<Chain> allChains = new ArrayList<>();
     
     /** The size of this graph, i.e., the number of vertices in it. */
     protected Integer size = null;   
@@ -124,7 +134,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
     
     /** This is a list of the vertices (defined by their sequential index) in this graph in spatial ordering. This means that spatOrder.get(i) returns the
         sequential index of the SSE which is at position i in the graph if it is drawn in spatial ordering. */
-    protected ArrayList<Integer> spatOrder;
+    private List<Integer> spatOrder;
     
     protected ArrayList<ArrayList<Integer>> adjLists;
     protected ArrayList<Set<Integer>> cliques;    // for Bron-Kerbosch algorithm
@@ -824,7 +834,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         matrix[x][y] = spatialRelation;
         matrix[y][x] = spatialRelation;
         
-        this.spatOrder = null;      // spatOrder has to be re-computed!
+        this.setSpatOrder(null);      // spatOrder has to be re-computed!
     }
 
     /**
@@ -836,7 +846,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements V
         adjLists.get(x).remove(y);
         adjLists.get(y).remove(x);
         
-        this.spatOrder = null;      // spatOrder has to be re-computed!
+        this.setSpatOrder(null);      // spatOrder has to be re-computed!
     }
 
     
@@ -2402,8 +2412,8 @@ E	3	3	3
     }
     
     public void setComplexData(ArrayList<Integer> chainEnd, ArrayList<Chain> allChains){
-        this.allChains = allChains;
-        this.chainEnd = chainEnd;
+        this.setAllChains(allChains);
+        this.setChainEnds(chainEnd);
     }
     
     
@@ -2578,11 +2588,11 @@ E	3	3	3
      */
     public Boolean hasSpatialOrdering() {
         
-        if(this.spatOrder == null) {        
+        if(this.getSpatOrder() == null) {        
             this.computeSpatialVertexOrdering();
         }
         
-        if(this.spatOrder.size() == this.size) {
+        if(this.getSpatOrder().size() == this.size) {
             return(true);
         } else {
             return(false);
@@ -2720,8 +2730,8 @@ E	3	3	3
         
         if(this.hasSpatialOrdering()) {
             
-            for(Integer i = 0; i < this.spatOrder.size(); i++) {
-                seqIndexCurrentSSE = this.spatOrder.get(i);
+            for(Integer i = 0; i < this.getSpatOrder().size(); i++) {
+                seqIndexCurrentSSE = this.getSpatOrder().get(i);
                 spatSSEString += this.sseList.get(seqIndexCurrentSSE).getSseType();
             }
         }
@@ -2742,7 +2752,7 @@ E	3	3	3
      * 
      */
     public void computeSpatialVertexOrdering() {
-        this.spatOrder = this.getSpatialOrderingOfVertexIndices();
+        this.setSpatOrder(this.getSpatialOrderingOfVertexIndices());
         
         /*
         for(Integer i = 0; i < this.size; i++) {
@@ -2868,12 +2878,12 @@ E	3	3	3
             if(this.isComplexGraph()) {
                 // determine and set chain ID of complec graph vertex
                 int iChainID = -1;
-                for(Integer x = 0; x < this.chainEnd.size(); x++){
-                    if(i < this.chainEnd.get(x)) {iChainID = x; break;}
+                for(Integer x = 0; x < this.getChainEnds().size(); x++){
+                    if(i < this.getChainEnds().get(x)) {iChainID = x; break;}
                 }
                 
                 if(iChainID != -1) {
-                    vertex_chain_name_cg = this.allChains.get(iChainID).getPdbChainID();
+                    vertex_chain_name_cg = this.getAllChains().get(iChainID).getPdbChainID();
                 }
             }
             
@@ -3068,6 +3078,10 @@ E	3	3	3
     public SSE getVertex(int index) {
         return this.getSSEBySeqPosition(index);
     } 
+    
+    public List<SSE> getVertices() {
+        return this.sseList;
+    }
     
     
     /**
@@ -3397,6 +3411,48 @@ E	3	3	3
             l.add(s);
         }
         return l;
+    }
+
+    /**
+     * @return the spatOrder
+     */
+    public List<Integer> getSpatOrder() {
+        return spatOrder;
+    }
+
+    /**
+     * @param spatOrder the spatOrder to set
+     */
+    public void setSpatOrder(List<Integer> spatOrder) {
+        this.spatOrder = spatOrder;
+    }
+
+    /**
+     * @return the chainEnds
+     */
+    public List<Integer> getChainEnds() {
+        return chainEnds;
+    }
+
+    /**
+     * @param chainEnds the chainEnds to set
+     */
+    public void setChainEnds(List<Integer> chainEnds) {
+        this.chainEnds = chainEnds;
+    }
+
+    /**
+     * @return the allChains
+     */
+    public List<Chain> getAllChains() {
+        return allChains;
+    }
+
+    /**
+     * @param allChains the allChains to set
+     */
+    public void setAllChains(List<Chain> allChains) {
+        this.allChains = allChains;
     }
     
     

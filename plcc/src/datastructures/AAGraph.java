@@ -9,10 +9,10 @@ package datastructures;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import plcc.AminoAcid;
-import plcc.GraphModellingLanguageFormat;
+import proteinstructure.AminoAcid;
+import graphformats.IGraphModellingLanguageFormat;
 import plcc.ResContactInfo;
-import plcc.Residue;
+import proteinstructure.Residue;
 
 /**
  * An undirected, adjacency list based amino acid graph. Suitable for large, sparse graphs. 
@@ -20,7 +20,7 @@ import plcc.Residue;
  * 
  * @author ts
  */
-public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements GraphModellingLanguageFormat {
+public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphModellingLanguageFormat {
     
     
     public static final String CHAINID_ALL_CHAINS = "ALL_CHAINS";

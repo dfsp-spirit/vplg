@@ -9,6 +9,8 @@
 package plcc;
 
 
+import proteinstructure.Residue;
+import proteinstructure.SSE;
 import tools.DP;
 import java.io.*;
 import java.util.*;

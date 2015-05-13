@@ -6,7 +6,7 @@
  * @author ts
  */
 
-package plcc;
+package proteinstructure;
 
 // imports
 import java.util.ArrayList;

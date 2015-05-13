@@ -6,9 +6,13 @@
  * @author ts
  */
 
-package plcc;
+package proteinstructure;
 
 // imports
+
+import plcc.Position3D;
+import plcc.Settings;
+
 
 /**
  * Represents an Atom, based on information in a PDB file.

@@ -5,6 +5,8 @@
  */
 package plcc;
 
+import graphdrawing.IDrawableEdge;
+
 /**
  *
  * @author spirit

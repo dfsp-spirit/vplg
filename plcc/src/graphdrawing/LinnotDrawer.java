@@ -5,7 +5,7 @@
  *
  * @author ts
  */
-package plcc;
+package graphdrawing;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -18,6 +18,8 @@ import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
+import plcc.ILinnotParser;
+import plcc.LinnotParser;
 
 /**
  * This is a utility class, which draws linear notationss of FGs based on the linnot string (instead of based on the PG + FG datastructures).

@@ -5,7 +5,7 @@
  *
  * @author ts
  */
-package plcc;
+package graphformats;
 
 /**
  * The Graph Modelling Language Format (not to be confused with GraphML) this one
@@ -13,7 +13,7 @@ package plcc;
  * and is described at http://en.wikipedia.org/wiki/Graph_Modelling_Language.
  * @author ts
  */
-public interface GraphModellingLanguageFormat {
+public interface IGraphModellingLanguageFormat {
     
     /** Exports this graph in GML format. */
     public String toGraphModellingLanguageFormat();

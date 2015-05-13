@@ -6,11 +6,13 @@
  * @author ts
  */
 
-package plcc;
+package proteinstructure;
 
 // imports
+import proteinstructure.SSE;
 import java.util.ArrayList;
 import java.util.Arrays;
+import plcc.IO;
 
 /**
  * Represents a protein chain in a PDB file.

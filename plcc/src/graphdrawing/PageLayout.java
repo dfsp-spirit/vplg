@@ -6,12 +6,14 @@
  * @author ts
  */
 
-package plcc;
+package graphdrawing;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import plcc.Position2D;
+import plcc.Settings;
 
 /**
  * A page layout that holds all non-SSE-specific information about the drawing process, e.g. the
@@ -53,7 +55,7 @@ public class PageLayout {
      * 
      * @param numVerts the number of vertices in the graph, this is required to determine the width and height of the image area and thus the entire image.
      */
-    PageLayout(Integer numVerts) {
+    public PageLayout(Integer numVerts) {
         
         this.numVerts = numVerts;
         this.minImgHeight = Settings.getInteger("plcc_I_img_min_img_height");

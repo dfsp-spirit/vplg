@@ -7,6 +7,8 @@
  */
 package plcc;
 
+import proteinstructure.Residue;
+import proteinstructure.SSE;
 import java.awt.Rectangle;
 import java.io.File;
 import java.util.ArrayList;

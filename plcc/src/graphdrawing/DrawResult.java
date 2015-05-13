@@ -6,7 +6,7 @@
  * @author ts
  */
 
-package plcc;
+package graphdrawing;
 
 import java.awt.geom.Rectangle2D;
 import org.apache.batik.svggen.SVGGraphics2D;
@@ -24,7 +24,7 @@ public class DrawResult {
     /** The region of interest, i.e., the part of the canvas you should write to a file. */
     public Rectangle2D roi;    
     
-    DrawResult(SVGGraphics2D g2d, Rectangle2D roi) {
+    public DrawResult(SVGGraphics2D g2d, Rectangle2D roi) {
         this.g2d = g2d;
         this.roi = roi;
     }

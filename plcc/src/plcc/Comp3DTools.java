@@ -7,6 +7,7 @@
  */
 package plcc;
 
+import proteinstructure.Atom;
 import java.util.ArrayList;
 import tools.DP;
 

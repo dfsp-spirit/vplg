@@ -11,9 +11,9 @@ package datastructures;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import plcc.GraphMLFormat;
+import graphformats.IGraphMLFormat;
 import plcc.IO;
-import plcc.TrivialGraphFormat;
+import graphformats.ITrivialGraphFormat;
 
 /**
  * An undirected sparse graph. Uses index based access to vertices and

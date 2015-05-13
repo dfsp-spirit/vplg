@@ -5,7 +5,7 @@
  *
  * @author ts
  */
-package plcc;
+package graphformats;
 
 import java.io.IOException;
 import org.xml.sax.SAXException;
@@ -14,7 +14,7 @@ import org.xml.sax.SAXException;
  *
  * @author ts
  */
-public interface GraphMLFormat {
+public interface IGraphMLFormat {
     
     /**
      * Returns a string representation of this object in GraphML format. This is an XML-based format,

@@ -5,8 +5,9 @@
  *
  * @author ts
  */
-package plcc;
+package graphdrawing;
 
+import proteinstructure.SSE;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -36,6 +37,14 @@ import org.apache.xmlgraphics.java2d.GraphicContext;
 import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
+import plcc.FoldingGraph;
+import plcc.IO;
+import plcc.PTGLNotationFoldResult;
+import plcc.Position2D;
+import plcc.ProtGraph;
+import plcc.SSEGraph;
+import plcc.Settings;
+import plcc.SpatRel;
 import tools.DP;
 
 /**
@@ -127,12 +136,12 @@ public class ProteinGraphDrawer {
      */
     private static DrawResult drawFoldingGraphADJG2D(PTGLNotationFoldResult pnfr) {
         FoldingGraph fg = pnfr.getFoldingGraph();
-        SSEGraph pg = fg.parent;
+        SSEGraph pg = fg.getParent();
         Integer startVertexInParent = fg.getMinimalVertexIndexInParentGraph();
         Integer endVertexInParent = fg.getMaximalVertexIndexInParentGraph();
         Integer shiftBack = startVertexInParent;
         List<Integer> fgVertexPosInParent = fg.getVertexIndexListInParentGraph();
-        List<Integer> parentVertexPosInFG = pg.computeParentGraphVertexPositionsInFoldingGraph(fgVertexPosInParent, pg.size);
+        List<Integer> parentVertexPosInFG = pg.computeParentGraphVertexPositionsInFoldingGraph(fgVertexPosInParent, pg.getSize());
         Integer numVerts = endVertexInParent - startVertexInParent + 1;
         Boolean bw = false;
         PageLayout pl = new PageLayout(numVerts);
@@ -151,7 +160,7 @@ public class ProteinGraphDrawer {
         Font fontBold = pl.getStandardFontBold();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();
-        String proteinHeader = "The ADJ " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
+        String proteinHeader = "The ADJ " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
         String notation = "ADJ notation: '" + pnfr.adjNotation + "'";
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
@@ -229,13 +238,13 @@ public class ProteinGraphDrawer {
         Rectangle2D.Double rect;
         ig2.setStroke(new BasicStroke(2));
         for (Integer i = startVertexInParent; i <= endVertexInParent; i++) {
-            if (pg.sseList.get(i).isHelix()) {
+            if (pg.getVertex(i).isHelix()) {
                 ig2.setPaint(Color.RED);
-            } else if (pg.sseList.get(i).isBetaStrand()) {
+            } else if (pg.getVertex(i).isBetaStrand()) {
                 ig2.setPaint(Color.BLACK);
-            } else if (pg.sseList.get(i).isLigandSSE()) {
+            } else if (pg.getVertex(i).isLigandSSE()) {
                 ig2.setPaint(Color.MAGENTA);
-            } else if (pg.sseList.get(i).isOtherSSE()) {
+            } else if (pg.getVertex(i).isOtherSSE()) {
                 ig2.setPaint(Color.GRAY);
             } else {
                 ig2.setPaint(Color.LIGHT_GRAY);
@@ -291,7 +300,7 @@ public class ProteinGraphDrawer {
             for (Integer i = startVertexInParent; i <= endVertexInParent; i++) {
                 if ((i + 1) % printNth == 0) {
                     sseNumberFoldingGraph = "" + (parentVertexPosInFG.get(i) >= 0 ? (parentVertexPosInFG.get(i) + 1) : "");
-                    sseNumberSeq = "" + (pg.sseList.get(i).getSSESeqChainNum());
+                    sseNumberSeq = "" + (pg.getVertex(i).getSSESeqChainNum());
                     sseNumberProteinGraph = "" + (i + 1);
                     stringHeight = fontMetrics.getAscent();
                     ig2.setPaint(Color.BLACK);
@@ -485,7 +494,7 @@ public class ProteinGraphDrawer {
      */
     private static DrawResult drawFoldingGraphKEYG2DOld(PTGLNotationFoldResult pnfr) {
         FoldingGraph fg = pnfr.getFoldingGraph();
-        SSEGraph pg = fg.parent;
+        SSEGraph pg = fg.getParent();
         Boolean debugVerbose = false;
         if (fg.isBifurcated()) {
             DP.getInstance().e("SSEGraph", "drawFoldingGraphKEYG2D: This FG is bifurcated, KEY notation not supported.");
@@ -499,24 +508,24 @@ public class ProteinGraphDrawer {
             DP.getInstance().e("SSEGraph", "drawFoldingGraphKEYG2D: keystartFGIndex is null");
         }
         fg.computeSpatialVertexOrdering();
-        ArrayList<Integer> keyposFGIndicesSpatOrder = fg.spatOrder;
+        List<Integer> keyposFGIndicesSpatOrder = fg.getSpatOrder();
         if (keyposFGIndicesSpatOrder.size() != fg.getSize()) {
             if (fg.isASingleCycle()) {
                 keyposFGIndicesSpatOrder = fg.getSpatialOrderingOfVertexIndicesForSingleCycleFG(keystartFGIndex);
-                fg.spatOrder = keyposFGIndicesSpatOrder;
+                fg.setSpatOrder(keyposFGIndicesSpatOrder);
                 if (keyposFGIndicesSpatOrder.size() != fg.getSize()) {
-                    DP.getInstance().e("SSEGraph", "Could not draw KEY notation: Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.chainid + " gt " + fg.graphType + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + ") does not match FG size " + fg.getSize() + " even when allowing circles. Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ". KEY='" + pnfr.keyNotation + "'. " + (fg.isASingleCycle() ? "FG is a single cycle." : "FG is NOT a single cycle."));
+                    DP.getInstance().e("SSEGraph", "Could not draw KEY notation: Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.getChainid() + " gt " + fg.getGraphType() + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + ") does not match FG size " + fg.getSize() + " even when allowing circles. Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ". KEY='" + pnfr.keyNotation + "'. " + (fg.isASingleCycle() ? "FG is a single cycle." : "FG is NOT a single cycle."));
                     return null;
                 } else {
                     //System.err.println("Single cycle handling fixed it.");
                 }
             } else {
-                DP.getInstance().e("SSEGraph", "Could not draw KEY notation: Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.chainid + " gt " + fg.graphType + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + ") does not match FG size " + fg.getSize() + ". Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ". KEY='" + pnfr.keyNotation + "'. " + (fg.isASingleCycle() ? "FG is a single cycle." : "FG is NOT a single cycle."));
+                DP.getInstance().e("SSEGraph", "Could not draw KEY notation: Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.getChainid() + " gt " + fg.getGraphType() + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + ") does not match FG size " + fg.getSize() + ". Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ". KEY='" + pnfr.keyNotation + "'. " + (fg.isASingleCycle() ? "FG is a single cycle." : "FG is NOT a single cycle."));
                 return null;
             }
         }
         if (debugVerbose) {
-            DP.getInstance().d("SSEGraph", fg.getQuickIDString() + " Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.chainid + " gt " + fg.graphType + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + "). FG size " + fg.getSize() + ". Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ". KEY='" + pnfr.keyNotation + "'.");
+            DP.getInstance().d("SSEGraph", fg.getQuickIDString() + " Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.getChainid() + " gt " + fg.getGraphType() + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + "). FG size " + fg.getSize() + ". Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ". KEY='" + pnfr.keyNotation + "'.");
         }
         List<Integer> spatOrderseqDistToPrevious = new ArrayList<>();
         spatOrderseqDistToPrevious.add(null);
@@ -532,7 +541,7 @@ public class ProteinGraphDrawer {
             spatOrderseqDistToPrevious.add(spatPosCur - spatPosLast);
         }
         List<Integer> fgVertexPosInParent = fg.getVertexIndexListInParentGraph();
-        List<Integer> parentVertexPosInFG = ProtGraph.computeParentGraphVertexPositionsInFoldingGraph(fgVertexPosInParent, pg.size);
+        List<Integer> parentVertexPosInFG = ProtGraph.computeParentGraphVertexPositionsInFoldingGraph(fgVertexPosInParent, pg.getSize());
         Integer numVerts = fg.getSize();
         Boolean bw = false;
         PageLayout pl = new PageLayout(numVerts);
@@ -556,7 +565,7 @@ public class ProteinGraphDrawer {
         Font font = pl.getStandardFont();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();
-        String proteinHeader = "The KEY " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
+        String proteinHeader = "The KEY " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
         String notation = "KEY notation: '" + pnfr.keyNotation + "'";
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
@@ -566,7 +575,7 @@ public class ProteinGraphDrawer {
             ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
             ig2.drawString(notation, pl.headerStart.x, pl.headerStart.y + lineHeight);
         }
-        Integer[] shiftBack = new Integer[pg.size];
+        Integer[] shiftBack = new Integer[pg.getSize()];
         Integer shift = 0;
         for (int i = 0; i < parentVertexPosInFG.size(); i++) {
             if (parentVertexPosInFG.get(i) < 0) {
@@ -578,8 +587,8 @@ public class ProteinGraphDrawer {
         //if(fg.toShortString().equals("1gos-B-alpha-FG0[4V,3E]")) {
         //    debugDrawingKEY = true;
         //}
-        Integer[] orientationsSpatOrder = new Integer[fg.size];
-        Integer[] orientationsSeqOrder = new Integer[fg.size];
+        Integer[] orientationsSpatOrder = new Integer[fg.getSize()];
+        Integer[] orientationsSeqOrder = new Integer[fg.getSize()];
         List<Integer> keyposFGIndices = new ArrayList<>();
         Integer v;
         for (int i = 0; i < keyposParentIndicesSeqOrder.size(); i++) {
@@ -591,9 +600,9 @@ public class ProteinGraphDrawer {
             }
         }
         if (keyposFGIndices.size() != fg.getSize()) {
-            DP.getInstance().e("SSEGRaph", "keyposFGIndices.size()=" + keyposFGIndices.size() + ", fg.size=" + fg.size + ".");
+            DP.getInstance().e("SSEGRaph", "keyposFGIndices.size()=" + keyposFGIndices.size() + ", fg.size=" + fg.getSize() + ".");
         }
-        Integer firstVertexSpatFGIndex = fg.spatOrder.get(0);
+        Integer firstVertexSpatFGIndex = fg.getSpatOrder().get(0);
         orientationsSpatOrder[0] = FoldingGraph.ORIENTATION_UPWARDS;
         orientationsSeqOrder[firstVertexSpatFGIndex] = FoldingGraph.ORIENTATION_UPWARDS;
         if (debugDrawingKEY) {
@@ -781,22 +790,22 @@ public class ProteinGraphDrawer {
         int rotationCenterY;
         int angle = 180;
         Shape shape;
-        for (Integer s = 0; s < fg.sseList.size(); s++) {
-            Integer i = fg.spatOrder.get(s);
-            if (fg.sseList.get(i).isHelix()) {
+        for (Integer s = 0; s < fg.getSize(); s++) {
+            Integer i = fg.getSpatOrder().get(s);
+            if (fg.getVertex(i).isHelix()) {
                 ig2.setPaint(Color.RED);
-            } else if (fg.sseList.get(i).isBetaStrand()) {
+            } else if (fg.getVertex(i).isBetaStrand()) {
                 ig2.setPaint(Color.BLACK);
-            } else if (fg.sseList.get(i).isLigandSSE()) {
+            } else if (fg.getVertex(i).isLigandSSE()) {
                 ig2.setPaint(Color.MAGENTA);
-            } else if (fg.sseList.get(i).isOtherSSE()) {
+            } else if (fg.getVertex(i).isOtherSSE()) {
                 ig2.setPaint(Color.GRAY);
             } else {
                 ig2.setPaint(Color.LIGHT_GRAY);
             }
             Integer currentVertX = vertStartX + (i * vertDist);
             Integer currentVertY = vertStartY;
-            if (fg.sseList.get(i).isHelix()) {
+            if (fg.getVertex(i).isHelix()) {
                 p = DrawTools.getDefaultArrowPolygonUp(vertStartY - vertHeight, currentVertX, currentVertY);
             } else {
                 p = DrawTools.getDefaultArrowPolygonUp(vertStartY - vertHeight, currentVertX, currentVertY);
@@ -844,8 +853,8 @@ public class ProteinGraphDrawer {
                 }
                 if ((i + 1) % printNth == 0) {
                     sseNumberFoldingGraph = "" + (parentVertexPosInFG.get(i) >= 0 ? (parentVertexPosInFG.get(i) + 1) : "");
-                    sseNumberFoldingGraphKEY = fg.spatOrder.indexOf(i) + "";
-                    sseNumberSeq = "" + (pg.sseList.get(i).getSSESeqChainNum());
+                    sseNumberFoldingGraphKEY = fg.getSpatOrder().indexOf(i) + "";
+                    sseNumberSeq = "" + (pg.getVertex(i).getSSESeqChainNum());
                     sseNumberProteinGraph = "" + (i + 1);
                     stringHeight = fontMetrics.getAscent();
                     ig2.setPaint(Color.BLACK);
@@ -875,12 +884,12 @@ public class ProteinGraphDrawer {
      */
     private static DrawResult drawFoldingGraphREDG2D(PTGLNotationFoldResult pnfr) {
         FoldingGraph fg = pnfr.getFoldingGraph();
-        SSEGraph pg = fg.parent;
+        SSEGraph pg = fg.getParent();
         Integer startVertexInParent = fg.getMinimalVertexIndexInParentGraph();
         Integer endVertexInParent = fg.getMaximalVertexIndexInParentGraph();
         List<Integer> fgVertexPosInParent = fg.getVertexIndexListInParentGraph();
-        List<Integer> parentVertexPosInFG = ProtGraph.computeParentGraphVertexPositionsInFoldingGraph(fgVertexPosInParent, pg.size);
-        Integer[] shiftBack = new Integer[pg.size];
+        List<Integer> parentVertexPosInFG = ProtGraph.computeParentGraphVertexPositionsInFoldingGraph(fgVertexPosInParent, pg.getSize());
+        Integer[] shiftBack = new Integer[pg.getSize()];
         Integer shift = 0;
         for (int i = 0; i < parentVertexPosInFG.size(); i++) {
             if (parentVertexPosInFG.get(i) < 0) {
@@ -906,7 +915,7 @@ public class ProteinGraphDrawer {
         Font fontBold = pl.getStandardFontBold();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();
-        String proteinHeader = "The RED " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
+        String proteinHeader = "The RED " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
         String notation = "RED notation: '" + pnfr.redNotation + "'";
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
@@ -984,13 +993,13 @@ public class ProteinGraphDrawer {
         Rectangle2D.Double rect;
         ig2.setStroke(new BasicStroke(2));
         for (Integer i = startVertexInParent; i <= endVertexInParent; i++) {
-            if (pg.sseList.get(i).isHelix()) {
+            if (pg.getVertex(i).isHelix()) {
                 ig2.setPaint(Color.RED);
-            } else if (pg.sseList.get(i).isBetaStrand()) {
+            } else if (pg.getVertex(i).isBetaStrand()) {
                 ig2.setPaint(Color.BLACK);
-            } else if (pg.sseList.get(i).isLigandSSE()) {
+            } else if (pg.getVertex(i).isLigandSSE()) {
                 ig2.setPaint(Color.MAGENTA);
-            } else if (pg.sseList.get(i).isOtherSSE()) {
+            } else if (pg.getVertex(i).isOtherSSE()) {
                 ig2.setPaint(Color.GRAY);
             } else {
                 ig2.setPaint(Color.LIGHT_GRAY);
@@ -1050,7 +1059,7 @@ public class ProteinGraphDrawer {
                 }
                 if ((i + 1) % printNth == 0) {
                     sseNumberFoldingGraph = "" + (parentVertexPosInFG.get(i) >= 0 ? (parentVertexPosInFG.get(i) + 1) : "");
-                    sseNumberSeq = "" + (pg.sseList.get(i).getSSESeqChainNum());
+                    sseNumberSeq = "" + (pg.getVertex(i).getSSESeqChainNum());
                     sseNumberProteinGraph = "" + (i + 1);
                     stringHeight = fontMetrics.getAscent();
                     ig2.setPaint(Color.BLACK);
@@ -1084,12 +1093,12 @@ public class ProteinGraphDrawer {
      */
     private static DrawResult drawFoldingGraphDEFG2D(PTGLNotationFoldResult pnfr) {
         FoldingGraph fg = pnfr.getFoldingGraph();
-        SSEGraph pg = fg.parent;
+        SSEGraph pg = fg.getParent();
         Integer startVertexInParent = 0;
-        Integer endVertexInParent = pg.size - 1;
+        Integer endVertexInParent = pg.getSize() - 1;
         Integer shiftBack = startVertexInParent;
         List<Integer> fgVertexPosInParent = fg.getVertexIndexListInParentGraph();
-        List<Integer> parentVertexPosInFG = pg.computeParentGraphVertexPositionsInFoldingGraph(fgVertexPosInParent, pg.size);
+        List<Integer> parentVertexPosInFG = pg.computeParentGraphVertexPositionsInFoldingGraph(fgVertexPosInParent, pg.getSize());
         Integer numVerts = endVertexInParent - startVertexInParent + 1;
         Boolean bw = false;
         PageLayout pl = new PageLayout(numVerts);
@@ -1108,7 +1117,7 @@ public class ProteinGraphDrawer {
         Font fontBold = pl.getStandardFontBold();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();
-        String proteinHeader = "The DEF " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
+        String proteinHeader = "The DEF " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
         String sseNumberFoldingGraph;
@@ -1209,13 +1218,13 @@ public class ProteinGraphDrawer {
         Rectangle2D.Double rect;
         ig2.setStroke(new BasicStroke(2));
         for (Integer i = startVertexInParent; i <= endVertexInParent; i++) {
-            if (pg.sseList.get(i).isHelix()) {
+            if (pg.getVertex(i).isHelix()) {
                 ig2.setPaint(Color.RED);
-            } else if (pg.sseList.get(i).isBetaStrand()) {
+            } else if (pg.getVertex(i).isBetaStrand()) {
                 ig2.setPaint(Color.BLACK);
-            } else if (pg.sseList.get(i).isLigandSSE()) {
+            } else if (pg.getVertex(i).isLigandSSE()) {
                 ig2.setPaint(Color.MAGENTA);
-            } else if (pg.sseList.get(i).isOtherSSE()) {
+            } else if (pg.getVertex(i).isOtherSSE()) {
                 ig2.setPaint(Color.GRAY);
             } else {
                 ig2.setPaint(Color.LIGHT_GRAY);
@@ -1271,7 +1280,7 @@ public class ProteinGraphDrawer {
             for (Integer i = startVertexInParent; i <= endVertexInParent; i++) {
                 if ((i + 1) % printNth == 0) {
                     sseNumberFoldingGraph = "" + (parentVertexPosInFG.get(i) >= 0 ? (parentVertexPosInFG.get(i) + 1) : "");
-                    sseNumberSeq = "" + (pg.sseList.get(i).getSSESeqChainNum());
+                    sseNumberSeq = "" + (pg.getVertex(i).getSSESeqChainNum());
                     sseNumberProteinGraph = "" + (i + 1);
                     stringHeight = fontMetrics.getAscent();
                     ig2.setPaint(Color.BLACK);
@@ -1347,7 +1356,7 @@ public class ProteinGraphDrawer {
         ig2.setPaint(Color.GRAY);
         ig2.drawString(label, pixelPosX, startPos.y);
         pixelPosX += fontMetrics.stringWidth(label) + spacer;
-        if (g.chainEnd.size() > 0 || drawAll) {
+        if (g.getChainEnds().size() > 0 || drawAll) {
             label = "interchain";
             ig2.setPaint(Color.BLACK);
             ig2.drawString(label, pixelPosX, startPos.y);
@@ -1432,7 +1441,7 @@ public class ProteinGraphDrawer {
         Font font = pl.getStandardFont();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();
-        String proteinHeader = "The " + pg.graphType + " protein graph of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + pg.numVertices() + ", E=" + pg.numSSEContacts() + "].";
+        String proteinHeader = "The " + pg.getGraphType() + " protein graph of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + " [V=" + pg.numVertices() + ", E=" + pg.numSSEContacts() + "].";
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
         String sseNumberGraph;
@@ -1455,8 +1464,8 @@ public class ProteinGraphDrawer {
         Integer spacerY;
         Integer iChainID;
         Integer jChainID;
-        for (Integer i = 0; i < pg.sseList.size(); i++) {
-            for (Integer j = i + 1; j < pg.sseList.size(); j++) {
+        for (Integer i = 0; i < pg.getSize(); i++) {
+            for (Integer j = i + 1; j < pg.getSize(); j++) {
                 if (pg.containsEdge(i, j)) {
                     edgeType = pg.getContactType(i, j);
                     if (edgeType.equals(SpatRel.PARALLEL)) {
@@ -1479,14 +1488,14 @@ public class ProteinGraphDrawer {
                     }
                     iChainID = -1;
                     jChainID = -1;
-                    for (Integer x = 0; x < pg.chainEnd.size(); x++) {
-                        if (i < pg.chainEnd.get(x)) {
+                    for (Integer x = 0; x < pg.getChainEnds().size(); x++) {
+                        if (i < pg.getChainEnds().get(x)) {
                             iChainID = x;
                             break;
                         }
                     }
-                    for (Integer x = 0; x < pg.chainEnd.size(); x++) {
-                        if (j < pg.chainEnd.get(x)) {
+                    for (Integer x = 0; x < pg.getChainEnds().size(); x++) {
+                        if (j < pg.getChainEnds().get(x)) {
                             jChainID = x;
                             break;
                         }
@@ -1518,14 +1527,14 @@ public class ProteinGraphDrawer {
         Ellipse2D.Double circle;
         Rectangle2D.Double rect;
         ig2.setStroke(new BasicStroke(2));
-        for (Integer i = 0; i < pg.sseList.size(); i++) {
-            if (pg.sseList.get(i).isHelix()) {
+        for (Integer i = 0; i < pg.getSize(); i++) {
+            if (pg.getVertex(i).isHelix()) {
                 ig2.setPaint(Color.RED);
-            } else if (pg.sseList.get(i).isBetaStrand()) {
+            } else if (pg.getVertex(i).isBetaStrand()) {
                 ig2.setPaint(Color.BLACK);
-            } else if (pg.sseList.get(i).isLigandSSE()) {
+            } else if (pg.getVertex(i).isLigandSSE()) {
                 ig2.setPaint(Color.MAGENTA);
-            } else if (pg.sseList.get(i).isOtherSSE()) {
+            } else if (pg.getVertex(i).isOtherSSE()) {
                 ig2.setPaint(Color.GRAY);
             } else {
                 ig2.setPaint(Color.LIGHT_GRAY);
@@ -1533,10 +1542,10 @@ public class ProteinGraphDrawer {
             if (bw) {
                 ig2.setPaint(Color.GRAY);
             }
-            if (pg.sseList.get(i).isBetaStrand()) {
+            if (pg.getVertex(i).isBetaStrand()) {
                 rect = new Rectangle2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
                 ig2.fill(rect);
-            } else if (pg.sseList.get(i).isLigandSSE()) {
+            } else if (pg.getVertex(i).isLigandSSE()) {
                 circle = new Ellipse2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
                 ig2.setStroke(new BasicStroke(3));
                 ig2.draw(circle);
@@ -1549,45 +1558,45 @@ public class ProteinGraphDrawer {
         ig2.setStroke(new BasicStroke(2));
         ig2.setPaint(Color.BLACK);
         if (!bw) {
-            if (pg.sseList.size() > 0) {
+            if (pg.getSize() > 0) {
                 ig2.drawString("N", vertStart.x - pl.vertDist, vertStart.y + 20);
-                ig2.drawString("C", vertStart.x + pg.sseList.size() * pl.vertDist, vertStart.y + 20);
+                ig2.drawString("C", vertStart.x + pg.getSize() * pl.vertDist, vertStart.y + 20);
             }
         }
         if (Settings.getBoolean("plcc_B_graphimg_footer")) {
             Integer printNth = 1;
-            if (pg.sseList.size() > 9) {
+            if (pg.getSize() > 9) {
                 printNth = 1;
             }
-            if (pg.sseList.size() > 99) {
+            if (pg.getSize() > 99) {
                 printNth = 2;
             }
-            if (pg.sseList.size() > 999) {
+            if (pg.getSize() > 999) {
                 printNth = 3;
             }
             Integer lineHeight = pl.textLineHeight;
-            if (pg.sseList.size() > 0) {
+            if (pg.getSize() > 0) {
                 ig2.drawString("PG", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (stringHeight / 4));
                 ig2.drawString("SQ", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
             } else {
                 ig2.drawString("(Graph has no vertices.)", pl.getFooterStart().x, pl.getFooterStart().y);
             }
             iChainID = -1;
-            for (Integer i = 0; i < pg.sseList.size(); i++) {
+            for (Integer i = 0; i < pg.getSize(); i++) {
                 if ((i + 1) % printNth == 0) {
                     sseNumberGraph = "" + (i + 1);
-                    sseNumberSeq = "" + (pg.sseList.get(i).getSSESeqChainNum());
+                    sseNumberSeq = "" + (pg.getVertex(i).getSSESeqChainNum());
                     stringHeight = fontMetrics.getAscent();
                     ig2.drawString(sseNumberGraph, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4));
                     ig2.drawString(sseNumberSeq, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
-                    for (Integer x = 0; x < pg.chainEnd.size(); x++) {
-                        if (i < pg.chainEnd.get(x)) {
+                    for (Integer x = 0; x < pg.getChainEnds().size(); x++) {
+                        if (i < pg.getChainEnds().get(x)) {
                             iChainID = x;
                             break;
                         }
                     }
                     if (iChainID != -1) {
-                        ig2.drawString(pg.allChains.get(iChainID).getPdbChainID(), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 2) + (stringHeight / 4));
+                        ig2.drawString(pg.getAllChains().get(iChainID).getPdbChainID(), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 2) + (stringHeight / 4));
                     }
                 }
             }
@@ -1689,7 +1698,7 @@ public class ProteinGraphDrawer {
             ig2.drawString(label, pixelPosX, startPos.y);
             pixelPosX += fontMetrics.stringWidth(label) + spacer;
         }
-        if (g.chainEnd.size() > 0 || drawAll) {
+        if (g.getChainEnds().size() > 0 || drawAll) {
             label = "interchain";
             ig2.setPaint(Color.BLACK);
             ig2.drawString(label, pixelPosX, startPos.y);
@@ -1784,12 +1793,12 @@ public class ProteinGraphDrawer {
      */
     private static DrawResult drawFoldingGraphSEQG2D(PTGLNotationFoldResult pnfr) {
         FoldingGraph fg = pnfr.getFoldingGraph();
-        SSEGraph pg = fg.parent;
+        SSEGraph pg = fg.getParent();
         Integer startVertexInParent = fg.getMinimalVertexIndexInParentGraph();
         Integer endVertexInParent = fg.getMaximalVertexIndexInParentGraph();
         Integer shiftBack = startVertexInParent;
         List<Integer> fgVertexPosInParent = fg.getVertexIndexListInParentGraph();
-        List<Integer> parentVertexPosInFG = pg.computeParentGraphVertexPositionsInFoldingGraph(fgVertexPosInParent, pg.size);
+        List<Integer> parentVertexPosInFG = pg.computeParentGraphVertexPositionsInFoldingGraph(fgVertexPosInParent, pg.getSize());
         Integer numVerts = endVertexInParent - startVertexInParent + 1;
         Boolean bw = false;
         PageLayout pl = new PageLayout(numVerts);
@@ -1808,7 +1817,7 @@ public class ProteinGraphDrawer {
         Font fontBold = pl.getStandardFontBold();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();
-        String proteinHeader = "The SEQ " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
+        String proteinHeader = "The SEQ " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
         String notation = "SEQ notation: '" + pnfr.seqNotation + "'";
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
@@ -1866,13 +1875,13 @@ public class ProteinGraphDrawer {
         Rectangle2D.Double rect;
         ig2.setStroke(new BasicStroke(2));
         for (Integer i = startVertexInParent; i <= endVertexInParent; i++) {
-            if (pg.sseList.get(i).isHelix()) {
+            if (pg.getVertex(i).isHelix()) {
                 ig2.setPaint(Color.RED);
-            } else if (pg.sseList.get(i).isBetaStrand()) {
+            } else if (pg.getVertex(i).isBetaStrand()) {
                 ig2.setPaint(Color.BLACK);
-            } else if (pg.sseList.get(i).isLigandSSE()) {
+            } else if (pg.getVertex(i).isLigandSSE()) {
                 ig2.setPaint(Color.MAGENTA);
-            } else if (pg.sseList.get(i).isOtherSSE()) {
+            } else if (pg.getVertex(i).isOtherSSE()) {
                 ig2.setPaint(Color.GRAY);
             } else {
                 ig2.setPaint(Color.LIGHT_GRAY);
@@ -1929,7 +1938,7 @@ public class ProteinGraphDrawer {
             for (Integer i = startVertexInParent; i <= endVertexInParent; i++) {
                 if ((i + 1) % printNth == 0) {
                     sseNumberFoldingGraph = "" + (parentVertexPosInFG.get(i) >= 0 ? (parentVertexPosInFG.get(i) + 1) : "");
-                    sseNumberSeq = "" + (pg.sseList.get(i).getSSESeqChainNum());
+                    sseNumberSeq = "" + (pg.getVertex(i).getSSESeqChainNum());
                     sseNumberProteinGraph = "" + (i + 1);
                     stringHeight = fontMetrics.getAscent();
                     ig2.drawString(sseNumberFoldingGraph, pl.getFooterStart().x + ((i - shiftBack) * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4));
@@ -2005,7 +2014,7 @@ public class ProteinGraphDrawer {
      */
     private static DrawResult drawFoldingGraphKEYG2D(PTGLNotationFoldResult pnfr) {
         FoldingGraph fg = pnfr.getFoldingGraph();
-        SSEGraph pg = fg.parent;
+        SSEGraph pg = fg.getParent();
         boolean debug = false;
         /*
         if(pg.pdbid.equals("8icd") && pg.chainid.equals("A")) {
@@ -2029,19 +2038,19 @@ public class ProteinGraphDrawer {
             DP.getInstance().e("SSEGraph", "drawFoldingGraphKEYG2D: keystartFGIndex is null");
         }
         fg.computeSpatialVertexOrdering();
-        ArrayList<Integer> keyposFGIndicesSpatOrder = fg.spatOrder;
+        List<Integer> keyposFGIndicesSpatOrder = fg.getSpatOrder();
         if (keyposFGIndicesSpatOrder.size() != fg.getSize()) {
             if (fg.isASingleCycle()) {
                 keyposFGIndicesSpatOrder = fg.getSpatialOrderingOfVertexIndicesForSingleCycleFG(keystartFGIndex);
-                fg.spatOrder = keyposFGIndicesSpatOrder;
+                fg.setSpatOrder(keyposFGIndicesSpatOrder);
                 if (keyposFGIndicesSpatOrder.size() != fg.getSize()) {
-                    DP.getInstance().e("SSEGraph", "Could not draw KEY notation: Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.chainid + " gt " + fg.graphType + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + ") does not match FG size " + fg.getSize() + " even when allowing circles. Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ". KEY='" + pnfr.keyNotation + "'. " + (fg.isASingleCycle() ? "FG is a single cycle." : "FG is NOT a single cycle."));
+                    DP.getInstance().e("SSEGraph", "Could not draw KEY notation: Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.getChainid() + " gt " + fg.getGraphType() + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + ") does not match FG size " + fg.getSize() + " even when allowing circles. Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ". KEY='" + pnfr.keyNotation + "'. " + (fg.isASingleCycle() ? "FG is a single cycle." : "FG is NOT a single cycle."));
                     return null;
                 } else {
                     //System.err.println("Single cycle handling fixed it.");
                 }
             } else {
-                DP.getInstance().e("SSEGraph", "Could not draw KEY notation: Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.chainid + " gt " + fg.graphType + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + ") does not match FG size " + fg.getSize() + ". Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ". KEY='" + pnfr.keyNotation + "'. " + (fg.isASingleCycle() ? "FG is a single cycle." : "FG is NOT a single cycle."));
+                DP.getInstance().e("SSEGraph", "Could not draw KEY notation: Spatorder size " + keyposFGIndicesSpatOrder.size() + " of chain " + fg.getChainid() + " gt " + fg.getGraphType() + " FG " + fg.getFoldingGraphFoldName() + " (#" + fg.getFoldingGraphNumber() + ") does not match FG size " + fg.getSize() + ". Parent verts of FG: " + IO.intListToString(fg.getVertexIndexListInParentGraph()) + ". KEY='" + pnfr.keyNotation + "'. " + (fg.isASingleCycle() ? "FG is a single cycle." : "FG is NOT a single cycle."));
                 return null;
             }
         }
@@ -2066,7 +2075,7 @@ public class ProteinGraphDrawer {
             spatOrderseqDistToPrevious.add(spatPosCur - spatPosLast);
         }
         List<Integer> fgVertexPosInParent = fg.getVertexIndexListInParentGraph();
-        List<Integer> parentVertexPosInFG = ProtGraph.computeParentGraphVertexPositionsInFoldingGraph(fgVertexPosInParent, pg.size);
+        List<Integer> parentVertexPosInFG = ProtGraph.computeParentGraphVertexPositionsInFoldingGraph(fgVertexPosInParent, pg.getSize());
         Integer numVerts = fg.getSize();
         Boolean bw = false;
         PageLayout pl = new PageLayout(numVerts);
@@ -2091,7 +2100,7 @@ public class ProteinGraphDrawer {
         Font fontBold = pl.getStandardFontBold();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();
-        String proteinHeader = "The KEY " + pg.graphType + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.pdbid + ", chain " + pg.chainid + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
+        String proteinHeader = "The KEY " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
         String notation = "KEY notation: '" + pnfr.keyNotation + "'";
         if (debug) {
             DP.getInstance().d("Notation from PNFR: " + notation);
@@ -2103,7 +2112,7 @@ public class ProteinGraphDrawer {
         if (Settings.getBoolean("plcc_B_graphimg_header")) {
             ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
         }
-        Integer[] shiftBack = new Integer[pg.size];
+        Integer[] shiftBack = new Integer[pg.getSize()];
         Integer shift = 0;
         for (int i = 0; i < parentVertexPosInFG.size(); i++) {
             if (parentVertexPosInFG.get(i) < 0) {
@@ -2113,8 +2122,8 @@ public class ProteinGraphDrawer {
         }
         boolean debugDrawingKEY = false;
         //if(fg.toShortString().equals("1gos-B-alpha-FG0[4V,3E]")) {
-        Integer[] orientationsSpatOrder = new Integer[fg.size];
-        Integer[] orientationsSeqOrder = new Integer[fg.size];
+        Integer[] orientationsSpatOrder = new Integer[fg.getSize()];
+        Integer[] orientationsSeqOrder = new Integer[fg.getSize()];
         List<Integer> keyposFGIndices = new ArrayList<>();
         Integer v;
         for (int i = 0; i < keyposParentIndicesSeqOrder.size(); i++) {
@@ -2126,9 +2135,9 @@ public class ProteinGraphDrawer {
             }
         }
         if (keyposFGIndices.size() != fg.getSize()) {
-            DP.getInstance().e("SSEGRaph", "keyposFGIndices.size()=" + keyposFGIndices.size() + ", fg.size=" + fg.size + ".");
+            DP.getInstance().e("SSEGRaph", "keyposFGIndices.size()=" + keyposFGIndices.size() + ", fg.size=" + fg.getSize() + ".");
         }
-        Integer firstVertexSpatFGIndex = fg.spatOrder.get(0);
+        Integer firstVertexSpatFGIndex = fg.getSpatOrder().get(0);
         orientationsSpatOrder[0] = FoldingGraph.ORIENTATION_UPWARDS;
         orientationsSeqOrder[firstVertexSpatFGIndex] = FoldingGraph.ORIENTATION_UPWARDS;
         if (debugDrawingKEY) {
@@ -2138,7 +2147,7 @@ public class ProteinGraphDrawer {
         Integer lastVert;
         StringBuilder KEYNotation = new StringBuilder();
         Boolean appendSSEType = true;
-        String fgGraphtType = pnfr.getFoldingGraph().graphType;
+        String fgGraphtType = pnfr.getFoldingGraph().getGraphType();
         if (fgGraphtType.equals(SSEGraph.GRAPHTYPE_ALPHA) || fgGraphtType.equals(SSEGraph.GRAPHTYPE_BETA)) {
         }
         String bracketStart = "[";
@@ -2183,19 +2192,19 @@ public class ProteinGraphDrawer {
         if (debug) {
             DP.getInstance().d("Notation from this func: " + KEYNotation.toString());
         }
-        Integer[] newOrientations = new Integer[fg.spatOrder.size()];
+        Integer[] newOrientations = new Integer[fg.getSpatOrder().size()];
         Arrays.fill(newOrientations, FoldingGraph.ORIENTATION_NONE);
         Integer currentVertexIndexInFGSequential;
         List<Shape> connShapes;
         Polygon pol;
         Position2D p;
         Position2D lastP;
-        for (int i = 0; i < fg.spatOrder.size(); i++) {
-            currentVertexIndexInFGSequential = fg.spatOrder.get(i);
+        for (int i = 0; i < fg.getSpatOrder().size(); i++) {
+            currentVertexIndexInFGSequential = fg.getSpatOrder().get(i);
             p = new Position2D(vertStartX + (i * vertDist) + pl.vertRadius / 2, vertStartY);
             Integer contactTypeInt = null;
             if (i > 0) {
-                contactTypeInt = fg.getContactType(fg.spatOrder.get(i - 1), fg.spatOrder.get(i));
+                contactTypeInt = fg.getContactType(fg.getSpatOrder().get(i - 1), fg.getSpatOrder().get(i));
                 if (contactTypeInt.equals(SpatRel.PARALLEL)) {
                     newOrientations[i] = newOrientations[i - 1];
                 } else {
@@ -2238,11 +2247,11 @@ public class ProteinGraphDrawer {
             System.out.println("");
         }
         StringBuilder testKEY = new StringBuilder();
-        String[] newKey = new String[fg.size - 1];
+        String[] newKey = new String[fg.getSize() - 1];
         Arrays.fill(newKey, "?");
         ig2.setColor(Color.BLACK);
-        for (int i = 0; i < fg.spatOrder.size(); i++) {
-            currentVertexIndexInFGSequential = fg.spatOrder.get(i);
+        for (int i = 0; i < fg.getSpatOrder().size(); i++) {
+            currentVertexIndexInFGSequential = fg.getSpatOrder().get(i);
             p = new Position2D(vertStartX + (i * vertDist) + pl.vertRadius / 2, vertStartY);
             Integer previousVertexIndexInFGSequential;
             Integer previousVertexIndexSpatial;
@@ -2252,8 +2261,8 @@ public class ProteinGraphDrawer {
             List<Shape> shapes;
             if (currentVertexIndexInFGSequential > 0) {
                 previousVertexIndexInFGSequential = currentVertexIndexInFGSequential - 1;
-                currentVertexIndexSpatial = fg.spatOrder.indexOf(currentVertexIndexInFGSequential);
-                previousVertexIndexSpatial = fg.spatOrder.indexOf(previousVertexIndexInFGSequential);
+                currentVertexIndexSpatial = fg.getSpatOrder().indexOf(currentVertexIndexInFGSequential);
+                previousVertexIndexSpatial = fg.getSpatOrder().indexOf(previousVertexIndexInFGSequential);
                 relDist = currentVertexIndexSpatial - previousVertexIndexSpatial;
                 relDistString = relDist + "";
                 if (appendSSEType) {
@@ -2307,14 +2316,14 @@ public class ProteinGraphDrawer {
                 }
                 ig2.setColor(Color.BLACK);
             }
-            Integer terminusCurrentVertexIndexSpatial = fg.spatOrder.indexOf(currentVertexIndexInFGSequential);
+            Integer terminusCurrentVertexIndexSpatial = fg.getSpatOrder().indexOf(currentVertexIndexInFGSequential);
             Integer terminusCurrentOrientation = newOrientations[terminusCurrentVertexIndexSpatial];
             ig2.setFont(fontBold);
             if (currentVertexIndexInFGSequential.equals(0)) {
                 ig2.setColor(Color.BLACK);
                 ig2.drawString("N", p.x - 5, p.y + 25);
             }
-            if (currentVertexIndexInFGSequential.equals(fg.spatOrder.size() - 1)) {
+            if (currentVertexIndexInFGSequential.equals(fg.getSpatOrder().size() - 1)) {
                 ig2.setColor(Color.BLACK);
                 if (terminusCurrentOrientation.equals(FoldingGraph.ORIENTATION_UPWARDS)) {
                     ig2.drawString("C", p.x - 5, p.y - 90);
@@ -2326,7 +2335,7 @@ public class ProteinGraphDrawer {
         }
         testKEY.append(bracketStart);
         if (appendSSEType) {
-            testKEY.append(fg.getVertex(fg.spatOrder.get(0)).getLinearNotationLabel());
+            testKEY.append(fg.getVertex(fg.getSpatOrder().get(0)).getLinearNotationLabel());
             testKEY.append(",");
         }
         for (int i = 0; i < newKey.length; i++) {

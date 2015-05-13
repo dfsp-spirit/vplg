@@ -12,6 +12,7 @@ package plcc;
 
 //import com.google.gson.Gson;
 
+import proteinstructure.SSE;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;

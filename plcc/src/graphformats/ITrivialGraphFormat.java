@@ -5,13 +5,13 @@
  *
  * @author ts
  */
-package plcc;
+package graphformats;
 
 /**
  *
  * @author ts
  */
-public interface TrivialGraphFormat {
+public interface ITrivialGraphFormat {
     
     /**
      * Returns a string representation of this object in trivial graph format (TGF).

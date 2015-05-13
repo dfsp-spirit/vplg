@@ -6,11 +6,16 @@
  * @author ts
  */
 
-package plcc;
+package proteinstructure;
 
 
 // imports
 import java.util.ArrayList;
+import plcc.Comp3DTools;
+import graphdrawing.IDrawableVertex;
+import plcc.Position3D;
+import plcc.SSEGraph;
+import plcc.SSEGraphVertex;
 import tools.DP;
 
 /**

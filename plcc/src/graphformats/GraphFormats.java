@@ -5,7 +5,7 @@
  *
  * @author ts
  */
-package plcc;
+package graphformats;
 
 /**
  * Some graph formats.

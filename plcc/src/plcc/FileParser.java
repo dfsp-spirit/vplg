@@ -10,6 +10,12 @@ package plcc;
 
 
 // imports
+import proteinstructure.Model;
+import proteinstructure.Residue;
+import proteinstructure.Chain;
+import proteinstructure.AminoAcid;
+import proteinstructure.Atom;
+import proteinstructure.SSE;
 import tools.DP;
 import java.util.ArrayList;
 import java.util.HashMap;

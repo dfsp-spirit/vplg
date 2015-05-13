@@ -9,6 +9,7 @@
 
 package plcc;
 
+import proteinstructure.SSE;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -86,10 +87,12 @@ public class FoldingGraph extends SSEGraph {
         }
     }
     
-    private FoldingGraph sisterFG = null;
+    //private FoldingGraph sisterFG = null;
    
  
-    
+    public SSEGraph getParent() {
+        return this.parent;
+    }
        
     private Integer foldingGraphNumber = null;
     /** Mapping of vertex indices in this folding graph to vertex indices in the parent PG. At position n in the list, the position of the vertex at index n in this FG in the parent PG is given. */
@@ -190,7 +193,7 @@ public class FoldingGraph extends SSEGraph {
         
         if(this.supportsKeyNotation()) {
             for(Integer i = 0; i < this.getSize(); i++) {
-                if(Objects.equals(this.spatOrder.get(i), spatPos)) {
+                if(Objects.equals(this.getSpatOrder().get(i), spatPos)) {
                     return i;
                 }
             }
@@ -213,7 +216,7 @@ public class FoldingGraph extends SSEGraph {
      */
     protected Integer getSpatOrderIndexOfSSE(Integer seqSSEIndex) {
         if(this.supportsKeyNotation()) {            
-            return spatOrder.get(seqSSEIndex);                        
+            return getSpatOrder().get(seqSSEIndex);                        
         }            
         return null;        
     }
@@ -230,7 +233,7 @@ public class FoldingGraph extends SSEGraph {
         }
         
         
-        this.spatOrder = this.getSpatialOrderingOfVertexIndices();
+        this.setSpatOrder(this.getSpatialOrderingOfVertexIndices());
         //if(this.spatOrder.size() != this.getSize()) {
         //    DP.getInstance().w("FoldingGraph", "supportsKeyNotation: spatOrder size = " + this.spatOrder.size() + ", but gaph size is " + this.getSize() + " -- KEY not supported.");
         //    return(false);

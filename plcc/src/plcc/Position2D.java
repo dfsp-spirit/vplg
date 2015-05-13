@@ -30,7 +30,7 @@ public class Position2D {
      * @param x the x coordinate
      * @param y the y coordinate
      */
-    Position2D(Integer x, Integer y) {
+    public Position2D(Integer x, Integer y) {
         this.x = x;
         this.y = y;
     }
@@ -39,7 +39,7 @@ public class Position2D {
     /**
      * Position constructor. Creates a new position with default coordinates (0,0).
      */ 
-    Position2D() {
+    public Position2D() {
         this.x = 0;
         this.y = 0;
     }

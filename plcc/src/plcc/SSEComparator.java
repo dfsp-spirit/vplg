@@ -8,6 +8,7 @@
 
 package plcc;
 
+import proteinstructure.SSE;
 import java.util.*;
 
 /** 

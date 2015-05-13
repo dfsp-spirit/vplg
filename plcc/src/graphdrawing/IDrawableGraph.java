@@ -5,7 +5,7 @@
  *
  * @author ts
  */
-package plcc;
+package graphdrawing;
 
 import java.util.List;
 

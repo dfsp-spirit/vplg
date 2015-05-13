@@ -10,6 +10,15 @@
 package plcc;
 
 // imports
+import graphdrawing.ProteinGraphDrawer;
+import graphdrawing.DrawTools;
+import graphformats.GraphFormats;
+import proteinstructure.Model;
+import proteinstructure.Residue;
+import proteinstructure.Chain;
+import proteinstructure.AminoAcid;
+import proteinstructure.Atom;
+import proteinstructure.SSE;
 import algorithms.GraphMetrics;
 import datastructures.AAGraph;
 import htmlgen.CssGenerator;
@@ -47,7 +56,7 @@ import org.apache.logging.log4j.Logger;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
-import plcc.DrawTools.IMAGEFORMAT;
+import graphdrawing.DrawTools.IMAGEFORMAT;
 import similarity.CompareOneToDB;
 import similarity.Similarity;
 import tools.DP;

@@ -17,7 +17,7 @@ import javax.swing.tree.TreeNode;
 import plcc.CompatGraph;
 import plcc.IO;
 import plcc.ProtGraph;
-import plcc.SSE;
+import proteinstructure.SSE;
 import plcc.SSEGraph;
 import plcc.SpatRel;
 

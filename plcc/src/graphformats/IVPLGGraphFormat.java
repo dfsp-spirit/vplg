@@ -5,13 +5,13 @@
  *
  * @author ts
  */
-package plcc;
+package graphformats;
 
 /**
  *
  * @author ts
  */
-public interface VPLGGraphFormat {
+public interface IVPLGGraphFormat {
     
     /**
      * Returns a string representation of this object in VPLG graph format.

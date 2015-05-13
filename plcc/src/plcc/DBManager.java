@@ -7,13 +7,16 @@
  */
 package plcc;
 
+import graphdrawing.DrawTools;
+import graphformats.GraphFormats;
+import proteinstructure.SSE;
 import java.sql.*;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import plcc.DrawTools.IMAGEFORMAT;
+import graphdrawing.DrawTools.IMAGEFORMAT;
 import similarity.SimilarityByGraphlets;
 import tools.DP;
 import tools.PlccUtilities;

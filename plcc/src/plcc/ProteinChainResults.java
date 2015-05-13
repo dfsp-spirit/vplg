@@ -7,11 +7,13 @@
  */
 package plcc;
 
+import graphdrawing.DrawTools;
+import graphformats.GraphFormats;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import plcc.DrawTools.IMAGEFORMAT;
+import graphdrawing.DrawTools.IMAGEFORMAT;
 
 /**
  * A data structure to store the PLCC results for a chain, i.e., all the graphs and their output files.

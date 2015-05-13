@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import plcc.DrawTools.IMAGEFORMAT;
+import graphdrawing.DrawTools.IMAGEFORMAT;
 import tools.DP;
 
 /**

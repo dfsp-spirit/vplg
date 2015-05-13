@@ -914,7 +914,7 @@ public class PTGLNotations {
 
                     fg.computeSpatialVertexOrdering();
 
-                    ArrayList<Integer> keyposFGIndicesSpatOrder = fg.spatOrder;
+                    List<Integer> keyposFGIndicesSpatOrder = fg.getSpatOrder();
 
                     // special handling of folding graphs which form a single cycle.
                     if(keyposFGIndicesSpatOrder.size() != fg.getSize()) {
@@ -923,7 +923,7 @@ public class PTGLNotations {
 
                         if(fg.isASingleCycle()) {
                             keyposFGIndicesSpatOrder = fg.getSpatialOrderingOfVertexIndicesForSingleCycleFG(keystartFGIndex);
-                            fg.spatOrder = keyposFGIndicesSpatOrder;
+                            fg.setSpatOrder(keyposFGIndicesSpatOrder);
                         }
 
                         // if still no valid ordering was found, it is an error

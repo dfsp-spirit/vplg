@@ -5,12 +5,12 @@
  *
  * @author ts
  */
-package plcc;
+package graphdrawing;
 
 /**
- * An edge that can be drawn using the protein graph drawing method of the PTGL.
+ * A vertex that can be drawn using the protein graph drawing method of the PTGL.
  * @author spirit
  */
-public interface IDrawableEdge {
-    public String getSpatRel();
+public interface IDrawableVertex {
+    public String getSseFgNotation();    
 }

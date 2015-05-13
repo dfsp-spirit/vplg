@@ -7,14 +7,14 @@
  */
 package datastructures;
 
-import plcc.GraphModellingLanguageFormat;
+import graphformats.IGraphModellingLanguageFormat;
 import plcc.ResContactInfo;
 
 /**
  * Edge information for an amino acid (AA) graph.
  * @author ts
  */
-public class AAEdgeInfo implements GraphModellingLanguageFormat {
+public class AAEdgeInfo implements IGraphModellingLanguageFormat {
     
     /** Information about the contacts between this residue pair. */
     protected ResContactInfo rci;

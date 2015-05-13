@@ -20,7 +20,7 @@ import plcc.IO;
 import plcc.ProtMetaInfo;
 import plcc.ProteinChainResults;
 import plcc.ProteinResults;
-import plcc.SSE;
+import proteinstructure.SSE;
 import plcc.SSEGraph;
 import plcc.Settings;
 

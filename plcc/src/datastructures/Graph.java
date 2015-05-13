@@ -12,8 +12,8 @@ import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import plcc.GraphMLFormat;
-import plcc.TrivialGraphFormat;
+import graphformats.IGraphMLFormat;
+import graphformats.ITrivialGraphFormat;
 
 import java.io.*;
 
@@ -32,7 +32,7 @@ import org.xml.sax.helpers.*;
  * 
  * @author ts
  */
-public abstract class Graph<V> implements TrivialGraphFormat, GraphMLFormat {
+public abstract class Graph<V> implements ITrivialGraphFormat, IGraphMLFormat {
     
     /** Some vertices. Graphs like them. */
     protected ArrayList<V> vertices;

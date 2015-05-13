@@ -32,8 +32,9 @@ public class Position3D {
      * Position constructor.
      * @param x the x coordinate
      * @param y the y coordinate
+     * @param z the z coordinate
      */
-    Position3D(float x, float y, float z) {
+    public Position3D(float x, float y, float z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -43,7 +44,7 @@ public class Position3D {
     /**
      * Position constructor. Creates a new position with default coordinates (0,0).
      */ 
-    Position3D() {
+    public Position3D() {
         this.x = 0;
         this.y = 0;
         this.z = 0;

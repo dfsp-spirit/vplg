@@ -8,6 +8,7 @@
 
 package plcc;
 
+import proteinstructure.Residue;
 import java.util.Arrays;
 
 

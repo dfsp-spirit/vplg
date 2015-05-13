@@ -6,13 +6,16 @@
  * @author ts
  */
 
-package plcc;
+package proteinstructure;
 
 // imports
+import proteinstructure.SSE;
 import tools.DP;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
+import plcc.Main;
+import plcc.Settings;
 
 
 /**

@@ -6,13 +6,13 @@
  * @author ts
  */
 
-package plcc;
+package graphformats;
 
 /**
  *
  * @author ts
  */
-public interface KavoshFormat {
+public interface IKavoshFormat {
     
     /**
      * Returns a string representation of this object in Kavosh format. This line-based format is very simple: 
