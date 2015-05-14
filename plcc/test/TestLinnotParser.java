@@ -26,7 +26,7 @@ public class TestLinnotParser extends TestCase {
      * Sets up the test environment and object.
      */
     @Override @org.junit.Before public void setUp() {
-        linnot = "[h,-1h,2e]";
+        linnot = "[h,-1mh,2pe]";
         graphType = SSEGraph.GRAPHTYPE_ALBELIG;
     }
     
@@ -64,9 +64,8 @@ public class TestLinnotParser extends TestCase {
         List<String> types = lnp.getContactTypesList();
         
         List<String> expected = new ArrayList<>();
-        expected.add("?");
-        expected.add("?");
-        expected.add("?");
+        expected.add("m");
+        expected.add("p");
         
         assertEquals(expected, types);
     }
@@ -110,7 +109,7 @@ public class TestLinnotParser extends TestCase {
         List<Integer[]> olist = lnp.getNonZEdges();
         List<Integer[]> expected = new ArrayList<>();
         expected.add(new Integer [] {0, -1, SpatRel.MIXED});
-        expected.add(new Integer [] {-1, 1, SpatRel.MIXED});
+        expected.add(new Integer [] {-1, 1, SpatRel.PARALLEL});
         
         assertEquals(expected, olist);
     }

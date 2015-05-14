@@ -250,7 +250,11 @@ public class LinnotParser implements ILinnotParser {
     @Override
     public List<String> getContactTypesList() {
         List<String> types = new ArrayList<>();
-        for (String t : tokens) {
+        if(tokens.length < 2) {
+            return types;
+        }
+        for (int i = 1; i < tokens.length; i++) {
+            String t = tokens[i];
             types.add(LinnotParser.getContactTypeFromToken(t));
         }
         return types;
