@@ -40,7 +40,7 @@ public class LinnotDrawer {
         List<String> contactTypes = lnp.getContactTypesList();
         List<Integer> relDists = lnp.getRelDistList();
         
-        int numVerts = lnp.getNumSSEs();
+        int numVerts = lnp.getNumParsedSSEs();
         
         // --------------- prepare stuff ---------------
         

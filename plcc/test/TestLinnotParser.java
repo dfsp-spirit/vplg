@@ -11,6 +11,7 @@ import junit.framework.TestCase;
 import plcc.ILinnotParser;
 import plcc.LinnotParser;
 import plcc.SSEGraph;
+import plcc.SpatRel;
 
 /**
  *
@@ -25,14 +26,14 @@ public class TestLinnotParser extends TestCase {
      * Sets up the test environment and object.
      */
     @Override @org.junit.Before public void setUp() {
-        linnot = "[h,-2h,3e]";
+        linnot = "[h,-1h,2e]";
         graphType = SSEGraph.GRAPHTYPE_ALBELIG;
     }
     
     
     @org.junit.Test public void test7timNumSSEs() {     
         ILinnotParser lnp = new LinnotParser(linnot, graphType);
-        int numSSEs = lnp.getNumSSEs();
+        int numSSEs = lnp.getNumParsedSSEs();
         
         assertEquals(numSSEs, 3);
     }
@@ -54,7 +55,7 @@ public class TestLinnotParser extends TestCase {
         expected.add(SSEGraph.notationLabelHelix);
         expected.add(SSEGraph.notationLabelStrand);
         
-        assertEquals(types, expected);
+        assertEquals(expected, types);
     }
     
     
@@ -67,7 +68,7 @@ public class TestLinnotParser extends TestCase {
         expected.add("?");
         expected.add("?");
         
-        assertEquals(types, expected);
+        assertEquals(expected, types);
     }
     
     
@@ -76,10 +77,42 @@ public class TestLinnotParser extends TestCase {
         List<Integer> dists = lnp.getRelDistList();
         
         List<Integer> expected = new ArrayList<>();
-        expected.add(-2);
-        expected.add(3);
+        expected.add(-1);
+        expected.add(2);
         
-        assertEquals(dists, expected);
+        assertEquals(expected, dists);
+    }
+    
+    @org.junit.Test public void test7timVisitPath() {     
+        ILinnotParser lnp = new LinnotParser(linnot, graphType);
+        List<Integer> path = lnp.getVisitPath();
+        List<Integer> expected = new ArrayList<>();
+        expected.add(0);
+        expected.add(-1);
+        expected.add(1);
+        
+        assertEquals(expected, path);
+    }
+    
+    @org.junit.Test public void test7timVisitedVertices() {     
+        ILinnotParser lnp = new LinnotParser(linnot, graphType);
+        List<Integer> olist = lnp.getAllVisitedVertices();
+        List<Integer> expected = new ArrayList<>();
+        expected.add(-1);
+        expected.add(0);
+        expected.add(1);
+        
+        assertEquals(expected, olist);
+    }
+    
+    @org.junit.Test public void testNonZEdges() {     
+        ILinnotParser lnp = new LinnotParser(linnot, graphType);
+        List<Integer[]> olist = lnp.getNonZEdges();
+        List<Integer[]> expected = new ArrayList<>();
+        expected.add(new Integer [] {0, -1, SpatRel.MIXED});
+        expected.add(new Integer [] {-1, 1, SpatRel.MIXED});
+        
+        assertEquals(expected, olist);
     }
     
 }

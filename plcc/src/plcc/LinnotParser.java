@@ -30,9 +30,9 @@ public class LinnotParser implements ILinnotParser {
     }
     
     @Override
-    public Integer getNumSSEs() {
-        // TODO: this is broken, verts may be visited more than once!
-        return tokens.length - getNumBackEdges();
+    public Integer getNumParsedSSEs() {
+        
+        return tokens.length;
     }
     
     @Override
@@ -53,6 +53,14 @@ public class LinnotParser implements ILinnotParser {
 
     private static String stripSSETypes(String token) {
         String[] knownTypes = new String[]{SSEGraph.notationLabelHelix, SSEGraph.notationLabelStrand, SSEGraph.notationLabelLigand};
+        for (String s : knownTypes) {
+            token = token.replace(s, "");
+        }
+        return token;
+    }
+    
+    private static String stripZEdgeLabelFromToken(String token) {
+        String[] knownTypes = new String[]{ "z" };
         for (String s : knownTypes) {
             token = token.replace(s, "");
         }
@@ -86,7 +94,7 @@ public class LinnotParser implements ILinnotParser {
         return types;
     }
 
-    protected static String stripAllBrackets(String linnot) {
+    protected static String stripAllBracketsFromLinnot(String linnot) {
         linnot = linnot.replace("(", "");
         linnot = linnot.replace(")", "");
         linnot = linnot.replace("[", "");
@@ -99,6 +107,7 @@ public class LinnotParser implements ILinnotParser {
     protected static Integer getRelDistFromToken(String token) {
         token = LinnotParser.stripContactTypes(token);
         token = LinnotParser.stripSSETypes(token);
+        token = LinnotParser.stripZEdgeLabelFromToken(token);
         if (token.isEmpty()) {
             return 1;
         } else {
@@ -108,13 +117,16 @@ public class LinnotParser implements ILinnotParser {
     }
     
     /**
-     * Returns the path of visited vertices, relative distances. Starts with the vertex visited first, which is given the value 0. All distances are relative to this one.
+     * Returns the path of visited vertices. Starts with the vertex visited first, which is given the value 0. All distances are relative to this one.     
      * @return 
      */
-    public List<Integer> getVisitPath(List<Integer> relDistList) {
-        List<Integer> p = new ArrayList<>();
-
+    @Override
+    public List<Integer> getVisitPath() {
+        List<Integer> relDistList = this.getRelDistList();
+        List<Integer> p = new ArrayList<>();        
+        
         Integer current = 0;
+        p.add(current);
         for(Integer rel : relDistList) {
             current += rel;
             p.add(current);
@@ -123,7 +135,29 @@ public class LinnotParser implements ILinnotParser {
         return p;
     }
     
-    public List<Integer> getAllVisitedVertices(List<Integer> visitPath) {        
+    /**
+     * Returns how much left of the starting vertex the left-most vertex is.
+     * @return 
+     */
+    @Override
+    public Integer getMaxShiftLeft() {
+        List<Integer> relDistList = this.getRelDistList();
+        Integer min = 0;
+        Integer current = 0;
+        for(Integer rel : relDistList) {
+            current += rel;
+            if(current < min) {
+                min = current;
+            }
+        }
+                        
+        return min;
+    }
+    
+    /** Returns a sorted list of all visited vertices. This is NOT the visiting order (and vertices visited several times only appear once in this list).  */
+    @Override
+    public List<Integer> getAllVisitedVertices() {      
+        List<Integer> visitPath = this.getVisitPath();
         Set<Integer> s = new HashSet<>(visitPath);
         List<Integer> l = new ArrayList<>(s);
         Collections.sort(l);
@@ -131,6 +165,10 @@ public class LinnotParser implements ILinnotParser {
     }
 
     
+    /**
+     * Returns the list of relative distances, parsed from the token list.
+     * @return 
+     */
     @Override
     public List<Integer> getRelDistList() {
         return LinnotParser.getRelDistsFromTokenList(this.tokens, this.graphType);
@@ -147,7 +185,7 @@ public class LinnotParser implements ILinnotParser {
     }
 
     public static String[] getTokensFromLinnot(String linnot) {
-        linnot = LinnotParser.stripAllBrackets(linnot);
+        linnot = LinnotParser.stripAllBracketsFromLinnot(linnot);
         String[] tokens = linnot.split(",");
         return tokens;
     }
@@ -183,6 +221,30 @@ public class LinnotParser implements ILinnotParser {
             types.add(LinnotParser.getContactTypeFromToken(t));
         }
         return types;
+    }
+    
+    @Override
+    public List<Integer[]> getNonZEdges() {
+        List<Integer[]> edges = new ArrayList<>();
+        List<Integer> visitPath = this.getVisitPath();
+        
+        if(visitPath.size() < 2) {
+            return edges;   // empty
+        }
+        
+        Integer last = 0;
+        Integer current = null;
+        Integer edgeType = SpatRel.stringToInt(SpatRel.STRING_MIXED);
+        for (int i = 1; i < visitPath.size(); i++) {
+            current = visitPath.get(i);
+            if( ! LinnotParser.isBackwardsEdge(tokens[i])) {
+                edgeType = SpatRel.stringToInt(LinnotParser.getContactTypeFromToken(tokens[i]));
+                edges.add(new Integer[] { last, current, edgeType });
+            }
+            last = current;
+        }
+        
+        return edges;
     }
     
     @Override
