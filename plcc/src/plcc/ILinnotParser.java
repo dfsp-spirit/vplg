@@ -16,5 +16,6 @@ public interface ILinnotParser {
     public List<String> getSSETypesList();
     public List<Integer> getRelDistList();
     public Integer getNumSSEs();
-    public Integer getNumEdges();
+    public Integer getNumParsedEdges();
+    public Integer getNumBackEdges();
 }

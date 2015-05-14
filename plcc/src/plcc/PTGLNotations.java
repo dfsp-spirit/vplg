@@ -385,6 +385,9 @@ public class PTGLNotations {
                 int numIterations = 0;
                 String addedLastIteration = "";
                 String addedThisIteration = "";
+                
+                // outer loop: run until degrees of all vertices have been decreased to 0 (all edges visited).
+                //             if the vertices contain a cycle, 
                 while( ! isFinished(adjdegrees, ccVerts) || (hc && (adjvisited.size() <= ccVerts.size()) )) {
                     
                     addedLastIteration = addedThisIteration;

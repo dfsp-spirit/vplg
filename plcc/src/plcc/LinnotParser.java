@@ -8,10 +8,13 @@
 package plcc;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
- * A utility class to parse linear notation strings.
+ * A utility class to parse RED linear notation strings of FGs.
  * @author ts
  */
 public class LinnotParser implements ILinnotParser {
@@ -28,15 +31,17 @@ public class LinnotParser implements ILinnotParser {
     
     @Override
     public Integer getNumSSEs() {
+        // TODO: this is broken, verts may be visited more than once!
         return tokens.length - getNumBackEdges();
     }
     
     @Override
-    public Integer getNumEdges() {
+    public Integer getNumParsedEdges() {
         return tokens.length - 1;
     }
     
-    private Integer getNumBackEdges() {
+    @Override
+    public Integer getNumBackEdges() {
         int num = 0;
         for(String t : tokens) {
             if(LinnotParser.isBackwardsEdge(t)) {
@@ -100,6 +105,29 @@ public class LinnotParser implements ILinnotParser {
             Integer i = Integer.parseInt(token);
             return i;
         }
+    }
+    
+    /**
+     * Returns the path of visited vertices, relative distances. Starts with the vertex visited first, which is given the value 0. All distances are relative to this one.
+     * @return 
+     */
+    public List<Integer> getVisitPath(List<Integer> relDistList) {
+        List<Integer> p = new ArrayList<>();
+
+        Integer current = 0;
+        for(Integer rel : relDistList) {
+            current += rel;
+            p.add(current);
+        }
+                        
+        return p;
+    }
+    
+    public List<Integer> getAllVisitedVertices(List<Integer> visitPath) {        
+        Set<Integer> s = new HashSet<>(visitPath);
+        List<Integer> l = new ArrayList<>(s);
+        Collections.sort(l);
+        return l;
     }
 
     

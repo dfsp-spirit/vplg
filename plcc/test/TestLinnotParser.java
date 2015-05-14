@@ -39,7 +39,7 @@ public class TestLinnotParser extends TestCase {
     
     @org.junit.Test public void test7timNumEdges() {     
         ILinnotParser lnp = new LinnotParser(linnot, graphType);
-        int numEdges = lnp.getNumEdges();
+        int numEdges = lnp.getNumParsedEdges();
         
         assertEquals(numEdges, 2);
     }
