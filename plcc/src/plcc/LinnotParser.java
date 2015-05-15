@@ -9,8 +9,10 @@ package plcc;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -152,6 +154,14 @@ public class LinnotParser implements ILinnotParser {
         }
                         
         return min;
+    }
+    
+    public List<String> getVertexTypesNtoC() {
+        List<String> vtypes = new ArrayList<>();
+        Integer maxShift = this.getMaxShiftLeft();
+        Map<Integer, String> m = new HashMap<>();
+        
+        return vtypes;
     }
     
     /** Returns a sorted list of all visited vertices. This is NOT the visiting order (and vertices visited several times only appear once in this list).  */
