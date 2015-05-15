@@ -7,8 +7,10 @@
 
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.Assert;
 import junit.framework.TestCase;
 import plcc.ILinnotParser;
+import plcc.IO;
 import plcc.LinnotParser;
 import plcc.SSEGraph;
 import plcc.SpatRel;
@@ -111,7 +113,21 @@ public class TestLinnotParser extends TestCase {
         expected.add(new Integer [] {0, -1, SpatRel.MIXED});
         expected.add(new Integer [] {-1, 1, SpatRel.PARALLEL});
         
-        assertEquals(expected, olist);
+        //System.out.println(IO.listOfintegerArraysToString(olist));
+        
+        for(int i = 0; i < expected.size(); i++) {
+            Integer[] e = expected.get(i);
+            Integer[] f = olist.get(i);
+            Assert.assertArrayEquals(e, f);
+        }
+        assertEquals(expected.size(), olist.size());        
     }
+    
+    @org.junit.Test public void test7timMaxShiftLeft() { 
+        ILinnotParser lnp = new LinnotParser(linnot, graphType);
+        Integer expected = -1;
+        assertEquals(expected, lnp.getMaxShiftLeft());
+    }
+    
     
 }

@@ -7,7 +7,7 @@
  */
 
 import junit.framework.TestCase;
-import plcc.SSE;
+import proteinstructure.SSE;
 
 /**
  * Unit test class.

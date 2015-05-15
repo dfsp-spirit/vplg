@@ -138,6 +138,21 @@ public class IO {
         return true;
     }
     
+    public static String listOfintegerArraysToString(List<Integer[]> list) {
+        StringBuilder sb = new StringBuilder();
+        for(Integer[] in : list) {
+            sb.append("[");
+            for(int i = 0; i < in.length; i++) {
+                sb.append(in[i]);
+                if(i < in.length - 1) {
+                    sb.append(",");
+                }
+            }
+            sb.append("]");
+        }
+        return sb.toString();
+    }
+    
     /**
      * Debug function to get a string representation of an array.
      * @param ar the array
