@@ -156,12 +156,48 @@ public class LinnotParser implements ILinnotParser {
         return min;
     }
     
+    @Override
     public List<String> getVertexTypesNtoC() {
         List<String> vtypes = new ArrayList<>();
         Integer maxShift = this.getMaxShiftLeft();
+        List<Integer> visited = this.getVisitPath();
+        int numVerts = this.getAllVisitedVertices().size();
         Map<Integer, String> m = new HashMap<>();
         
+        //System.out.println("visited " + visited.size() + ". maxShift = " + maxShift + "." );
+        
+        Integer indexNtoC;
+        Integer reltoStartPos;
+        for(int i = 0; i < visited.size(); i++) {
+            reltoStartPos = visited.get(i);
+            String vtype = LinnotParser.getSSETypeFromToken(tokens[i], SSEGraph.GRAPHTYPE_ALBELIG);
+            indexNtoC = reltoStartPos - maxShift;
+            //System.out.println("indexNtoC=" + indexNtoC);
+            m.put(indexNtoC, vtype);
+        }
+        
+        for(int i = 0; i < numVerts; i++) {
+            vtypes.add(m.get(i));
+        }                
+        
         return vtypes;
+    }
+    
+    @Override
+    public List<Integer> getNtoCPositionsOfVisitPath() {
+        Integer maxShift = this.getMaxShiftLeft();
+        List<Integer> visited = this.getVisitPath();
+        List<Integer> nToCPositions = new ArrayList<>();
+              
+        Integer indexNtoC;
+        Integer reltoStartPos;
+        for(int i = 0; i < visited.size(); i++) {
+            reltoStartPos = visited.get(i);
+            indexNtoC = reltoStartPos - maxShift;
+            nToCPositions.add(indexNtoC);
+        }
+                
+        return nToCPositions;
     }
     
     /** Returns a sorted list of all visited vertices. This is NOT the visiting order (and vertices visited several times only appear once in this list).  */
@@ -256,6 +292,23 @@ public class LinnotParser implements ILinnotParser {
         
         return edges;
     }
+    
+    
+    @Override
+    public List<Integer[]> getOutGraphEdges() {
+        List<Integer[]> shiftedEdges = this.getNonZEdges();
+        List<Integer[]> finalEdges = new ArrayList<>();
+        Integer maxShift = this.getMaxShiftLeft();
+                       
+        Integer [] oe;
+        for(Integer[] e : shiftedEdges) {
+            oe = new Integer[]{ e[0] - maxShift, e[1] - maxShift, e[2] };
+            finalEdges.add(oe);
+        }
+        
+        return finalEdges;
+    }
+    
     
     @Override
     public List<String> getContactTypesList() {

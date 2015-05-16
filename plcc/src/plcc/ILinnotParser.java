@@ -1,7 +1,9 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This file is part of the Visualization of Protein Ligand Graphs (VPLG) software package.
+ *
+ * Copyright Tim Schäfer 2015. VPLG is free software, see the LICENSE and README files for details.
+ *
+ * @author ts
  */
 package plcc;
 
@@ -22,4 +24,7 @@ public interface ILinnotParser {
     public Integer getMaxShiftLeft();
     public List<Integer> getVisitPath();
     public List<Integer[]> getNonZEdges();
+    public List<String> getVertexTypesNtoC();
+    public List<Integer> getNtoCPositionsOfVisitPath();
+    public List<Integer[]> getOutGraphEdges();
 }

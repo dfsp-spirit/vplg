@@ -1,7 +1,9 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This file is part of the Visualization of Protein Ligand Graphs (VPLG) software package.
+ *
+ * Copyright Tim Schäfer 2015. VPLG is free software, see the LICENSE and README files for details.
+ *
+ * @author ts
  */
 
 
@@ -14,6 +16,7 @@ import plcc.IO;
 import plcc.LinnotParser;
 import plcc.SSEGraph;
 import plcc.SpatRel;
+import proteinstructure.SSE;
 
 /**
  *
@@ -23,6 +26,7 @@ public class TestLinnotParser extends TestCase {
     
     private String linnot;
     private String graphType;
+    ILinnotParser lnp;
     
     /**
      * Sets up the test environment and object.
@@ -30,26 +34,23 @@ public class TestLinnotParser extends TestCase {
     @Override @org.junit.Before public void setUp() {
         linnot = "[h,-1mh,2pe]";
         graphType = SSEGraph.GRAPHTYPE_ALBELIG;
+        lnp = new LinnotParser(linnot, graphType);
     }
     
     
     @org.junit.Test public void test7timNumSSEs() {     
-        ILinnotParser lnp = new LinnotParser(linnot, graphType);
-        int numSSEs = lnp.getNumParsedSSEs();
         
+        int numSSEs = lnp.getNumParsedSSEs();        
         assertEquals(numSSEs, 3);
     }
     
     @org.junit.Test public void test7timNumEdges() {     
-        ILinnotParser lnp = new LinnotParser(linnot, graphType);
-        int numEdges = lnp.getNumParsedEdges();
-        
+        int numEdges = lnp.getNumParsedEdges();        
         assertEquals(numEdges, 2);
     }
     
     
     @org.junit.Test public void test7timSSETypes() {     
-        ILinnotParser lnp = new LinnotParser(linnot, graphType);
         List<String> types = lnp.getSSETypesList();
         
         List<String> expected = new ArrayList<>();
@@ -62,7 +63,6 @@ public class TestLinnotParser extends TestCase {
     
     
     @org.junit.Test public void test7timContactTypes() {     
-        ILinnotParser lnp = new LinnotParser(linnot, graphType);
         List<String> types = lnp.getContactTypesList();
         
         List<String> expected = new ArrayList<>();
@@ -74,7 +74,6 @@ public class TestLinnotParser extends TestCase {
     
     
     @org.junit.Test public void test7timRelDists() {     
-        ILinnotParser lnp = new LinnotParser(linnot, graphType);
         List<Integer> dists = lnp.getRelDistList();
         
         List<Integer> expected = new ArrayList<>();
@@ -85,7 +84,6 @@ public class TestLinnotParser extends TestCase {
     }
     
     @org.junit.Test public void test7timVisitPath() {     
-        ILinnotParser lnp = new LinnotParser(linnot, graphType);
         List<Integer> path = lnp.getVisitPath();
         List<Integer> expected = new ArrayList<>();
         expected.add(0);
@@ -96,7 +94,6 @@ public class TestLinnotParser extends TestCase {
     }
     
     @org.junit.Test public void test7timVisitedVertices() {     
-        ILinnotParser lnp = new LinnotParser(linnot, graphType);
         List<Integer> olist = lnp.getAllVisitedVertices();
         List<Integer> expected = new ArrayList<>();
         expected.add(-1);
@@ -107,7 +104,6 @@ public class TestLinnotParser extends TestCase {
     }
     
     @org.junit.Test public void testNonZEdges() {     
-        ILinnotParser lnp = new LinnotParser(linnot, graphType);
         List<Integer[]> olist = lnp.getNonZEdges();
         List<Integer[]> expected = new ArrayList<>();
         expected.add(new Integer [] {0, -1, SpatRel.MIXED});
@@ -124,9 +120,42 @@ public class TestLinnotParser extends TestCase {
     }
     
     @org.junit.Test public void test7timMaxShiftLeft() { 
-        ILinnotParser lnp = new LinnotParser(linnot, graphType);
         Integer expected = -1;
         assertEquals(expected, lnp.getMaxShiftLeft());
+    }
+    
+    @org.junit.Test public void test7timVertexTypesNtoC() { 
+        List<String> expected = new ArrayList<>();
+        expected.add("h");
+        expected.add("h");
+        expected.add("e");
+        
+        assertEquals(expected, lnp.getVertexTypesNtoC());
+    }
+    
+    @org.junit.Test public void test7timNtoCOfVisitPath() { 
+        List<Integer> expected = new ArrayList<>();
+        expected.add(1);
+        expected.add(0);
+        expected.add(2);
+        
+        assertEquals(expected, lnp.getNtoCPositionsOfVisitPath());
+    }            
+    
+    
+    @org.junit.Test public void test7timOutEdges() { 
+        List<Integer[]> edges = lnp.getOutGraphEdges();
+        
+        List<Integer[]> expected = new ArrayList<>();
+        expected.add(new Integer [] {1, 0, SpatRel.MIXED});
+        expected.add(new Integer [] {0, 2, SpatRel.PARALLEL});
+        
+        for(int i = 0; i < expected.size(); i++) {
+            Integer[] e = expected.get(i);
+            Integer[] f = edges.get(i);
+            Assert.assertArrayEquals(e, f);
+        }
+        assertEquals(expected.size(), edges.size()); 
     }
     
     
