@@ -77,7 +77,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
      * Constructor. Requires a list of SSEs that will be represented by the vertices of the graph.
      * @param sses a list of SSEs which make up this folding graph. The contacts have to be added later (or there will be none).
      */
-    public ProtGraph(ArrayList<SSE> sses) {
+    public ProtGraph(List<SSE> sses) {
         super(sses);
         this.isProteinGraph = true;
     }

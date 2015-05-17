@@ -87,6 +87,15 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
         else { return("o"); }
     }
     
+    public static Integer sseClassFromFgNotation(String n) {
+        if(n.equals("h")) {
+            return SSE.SSECLASS_HELIX;
+        }
+        else if(n.equals("e")) { return SSE.SSECLASS_BETASTRAND; }
+        else if(n.equals("l")) { return SSE.SSECLASS_LIGAND; }
+        else {return SSE.SSECLASS_OTHER;} 
+    }
+    
     /**
      * Constructor that sets the SSE type by the SSE class 'sseClass'. Use SSE.SSECLASS_* constants.
      */

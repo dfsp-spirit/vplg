@@ -8,6 +8,7 @@
 package linnottograph;
 
 import graphdrawing.IDrawableEdge;
+import graphdrawing.IDrawableGraph;
 import graphdrawing.IDrawableVertex;
 import java.util.List;
 
@@ -18,5 +19,6 @@ import java.util.List;
 public interface ILinnotToGraph {
     public List<IDrawableEdge> getEdges();
     public List<IDrawableVertex> getVertices();
+    public IDrawableGraph getGraph();
     
 }

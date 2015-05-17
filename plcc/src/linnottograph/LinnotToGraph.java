@@ -8,10 +8,13 @@
 package linnottograph;
 
 import graphdrawing.DrawableEdge;
+import graphdrawing.DrawableGraph;
 import graphdrawing.DrawableVertex;
 import graphdrawing.IDrawableEdge;
+import graphdrawing.IDrawableGraph;
 import graphdrawing.IDrawableVertex;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -58,6 +61,12 @@ public class LinnotToGraph implements ILinnotToGraph {
         }
         
         return outEdges;
+    }
+    
+    @Override
+    public IDrawableGraph getGraph() {
+        IDrawableGraph g = new DrawableGraph(this.getVertices(), this.getEdges(), new HashMap<String, String>());
+        return g;
     }
     
 }

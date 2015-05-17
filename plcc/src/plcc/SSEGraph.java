@@ -169,7 +169,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements I
      * Constructor. Requires a list of SSEs that will be represented by the vertices of the graph.
      * @param sses a list of SSEs which make up this folding graph. The contacts have to be added later (or there will be none).
      */
-    SSEGraph(ArrayList<SSE> sses) {
+    SSEGraph(List<SSE> sses) {
         super();
         this.sseList = sses;        
         this.size = sseList.size();

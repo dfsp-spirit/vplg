@@ -7,12 +7,16 @@
  */
 package plcc;
 
+import graphdrawing.IDrawableEdge;
+import graphdrawing.IDrawableGraph;
+import graphdrawing.IDrawableVertex;
 import proteinstructure.Residue;
 import proteinstructure.SSE;
 import java.awt.Rectangle;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import tools.DP;
@@ -215,6 +219,45 @@ public class GraphCreator {
         return Collections.max(values);
     }
     
+    
+    /**
+     * This is a temp method to create SSEGraphs from DrawableGraphs. The long-term goal is to make all
+     * drawing functions work on the IDrawableGraph Interface instead.
+     * @param dg a DrawableGraph
+     * @return a ProtGraph
+     */
+    public ProtGraph fromDrawableGraph(IDrawableGraph dg) {
+        ProtGraph g;
+        
+        List<SSE> vertices = new ArrayList<>();
+        
+        // add vertices
+        SSE sse;
+        Integer vClass;
+        for(int i = 0; i < dg.getDrawableVertices().size(); i++) {
+            IDrawableVertex v = dg.getDrawableVertices().get(i);
+            vClass = SSE.sseClassFromFgNotation(v.getSseFgNotation());
+            sse = new SSE(vClass);    
+            Residue r = new Residue(i, i);
+            r.setAAName1("A");
+            r.setChainID("A");
+            r.setiCode("");
+            sse.addResidue(r);
+            if(vClass.equals(SSE.SSECLASS_LIGAND)) {
+                r.setResName3("LIG");
+            }
+            sse.setSeqSseChainNum(i);            
+            vertices.add(sse);
+        }
+        
+        g = new ProtGraph(vertices);
+        g.setInfo("rand", "A", "albelig");
+        
+        // TODO: add edges here
+        System.err.println("ProtGraph fromDrawableGraph !!!! NOT ADDING ANY EDGES!!!");
+        
+        return g;
+    }
     
     /**
      * Generates a random protein ligand graph with the specified number of vertices and the specified edge probability.
