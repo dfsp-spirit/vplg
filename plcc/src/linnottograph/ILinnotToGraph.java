@@ -5,15 +5,18 @@
  *
  * @author ts
  */
-package graphdrawing;
+package linnottograph;
 
-import java.util.Set;
+import graphdrawing.IDrawableEdge;
+import graphdrawing.IDrawableVertex;
+import java.util.List;
 
 /**
- * An edge that can be drawn using the protein graph drawing method of the PTGL.
+ *
  * @author spirit
  */
-public interface IDrawableEdge {
-    public String getSpatRel();
-    public Set<Integer> getVertPairIndicesNtoC();
+public interface ILinnotToGraph {
+    public List<IDrawableEdge> getEdges();
+    public List<IDrawableVertex> getVertices();
+    
 }

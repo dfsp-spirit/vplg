@@ -12,5 +12,5 @@ package graphdrawing;
  * @author spirit
  */
 public interface IDrawableVertex {
-    public String getSseFgNotation();    
+    public String getSseFgNotation();
 }

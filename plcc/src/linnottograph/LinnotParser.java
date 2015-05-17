@@ -5,7 +5,7 @@
  *
  * @author ts
  */
-package plcc;
+package linnottograph;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +14,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import plcc.SSEGraph;
+import plcc.SpatRel;
 
 /**
  * A utility class to parse RED linear notation strings of FGs.

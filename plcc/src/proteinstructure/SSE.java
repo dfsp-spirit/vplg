@@ -646,6 +646,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
         else if(this.isLigandSSE()) { return(SSEGraph.notationLabelLigand); } 
         else { return(SSEGraph.notationLabelOther); }            
     }
+
     
     
     

@@ -5,7 +5,7 @@
  *
  * @author ts
  */
-package plcc;
+package linnottograph;
 
 import java.util.List;
 
