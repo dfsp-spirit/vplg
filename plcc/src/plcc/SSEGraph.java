@@ -2691,6 +2691,10 @@ E	3	3	3
         return(SpatRel.getCharacter(this.matrix[i][j]));
     }
     
+    public String getSpatRelOfEdge(Integer i, Integer j) {
+        return SpatRel.getString(matrix[i][j]);
+    }
+    
     /**
      * Returns the PTGL .graph file contact type string for the contact between the SSEs with indices i and j.
      * Note that .graph is the input format for Patrick's PTGL notation Perl script.

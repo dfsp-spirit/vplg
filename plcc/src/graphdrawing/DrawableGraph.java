@@ -9,6 +9,7 @@ package graphdrawing;
 
 import java.util.List;
 import java.util.Map;
+import plcc.SpatRel;
 
 /**
  *
@@ -39,6 +40,30 @@ public class DrawableGraph implements IDrawableGraph {
     @Override
     public List<IDrawableVertex> getDrawableVertices() {
         return this.drawableVertices;
+    }
+    
+    private Boolean isEdgeFromTo(IDrawableEdge e, Integer i, Integer j) {
+        if(e == null) {
+            return false;
+        }
+        List<Integer> l = e.getVertPairIndicesNtoC();
+        if(l.get(0).equals(i) && l.get(1).equals(j)) {
+            return true;
+        }
+        if(l.get(0).equals(j) && l.get(1).equals(i)) {
+            return true;
+        }
+        return false;
+    }
+    
+    
+    public String getSpatRelOfEdge(Integer i, Integer j) {
+        for(IDrawableEdge e : this.drawableEdges) {
+            if(isEdgeFromTo(e, i, j)) {
+                return e.getSpatRel();
+            }
+        }
+        return SpatRel.STRING_NONE;
     }
     
 }

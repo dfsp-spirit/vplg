@@ -7,6 +7,7 @@
  */
 package graphdrawing;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -15,5 +16,5 @@ import java.util.Set;
  */
 public interface IDrawableEdge {
     public String getSpatRel();
-    public Set<Integer> getVertPairIndicesNtoC();
+    public List<Integer> getVertPairIndicesNtoC();
 }

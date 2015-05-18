@@ -6,8 +6,10 @@
 package plcc;
 
 import graphdrawing.IDrawableEdge;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -18,12 +20,12 @@ public class SSEGraphEdge implements IDrawableEdge {
     
     private Integer[] vertIndices;
     private String spatRel;
-    Set<Integer> vertIndicesNtoC;
+    List<Integer> vertIndicesNtoC;
     
     SSEGraphEdge(Integer[] vertIndices, String spatRel) {
         this.vertIndices = vertIndices;
         this.spatRel = spatRel;
-        this.vertIndicesNtoC = new HashSet<>();
+        this.vertIndicesNtoC = new ArrayList<>();
         Collections.addAll(vertIndicesNtoC, vertIndices);
     }
     
@@ -33,7 +35,7 @@ public class SSEGraphEdge implements IDrawableEdge {
     }
 
     @Override
-    public Set<Integer> getVertPairIndicesNtoC() {
+    public List<Integer> getVertPairIndicesNtoC() {
         return vertIndicesNtoC;
     }
     

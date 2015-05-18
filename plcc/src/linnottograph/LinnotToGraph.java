@@ -50,10 +50,10 @@ public class LinnotToGraph implements ILinnotToGraph {
         List<IDrawableEdge> outEdges = new ArrayList<>();
         List<Integer[]> parsedEdges = lnp.getOutGraphEdges();
         
-        Set<Integer> vertIndices;
+        List<Integer> vertIndices;
         String spatRel;
         for(Integer[] e : parsedEdges) {
-            vertIndices = new HashSet<>();
+            vertIndices = new ArrayList<>();
             vertIndices.add(e[0]);
             vertIndices.add(e[1]);
             spatRel = SpatRel.getString(e[2]);

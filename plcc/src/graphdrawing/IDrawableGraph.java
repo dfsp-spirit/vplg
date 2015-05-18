@@ -19,5 +19,6 @@ public interface IDrawableGraph {
     public String getPropertyString(String name);
     public List<IDrawableEdge> getDrawableEdges();
     public List<IDrawableVertex> getDrawableVertices();
+    public String getSpatRelOfEdge(Integer i, Integer j);
     
 }

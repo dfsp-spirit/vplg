@@ -234,27 +234,22 @@ public class GraphCreator {
         // add vertices
         SSE sse;
         Integer vClass;
+        SSECreator ssec = new SSECreator();
         for(int i = 0; i < dg.getDrawableVertices().size(); i++) {
             IDrawableVertex v = dg.getDrawableVertices().get(i);
             vClass = SSE.sseClassFromFgNotation(v.getSseFgNotation());
-            sse = new SSE(vClass);    
-            Residue r = new Residue(i, i);
-            r.setAAName1("A");
-            r.setChainID("A");
-            r.setiCode("");
-            sse.addResidue(r);
-            if(vClass.equals(SSE.SSECLASS_LIGAND)) {
-                r.setResName3("LIG");
-            }
-            sse.setSeqSseChainNum(i);            
+            sse = ssec.createDefaultSSE(vClass, i);    
             vertices.add(sse);
         }
         
         g = new ProtGraph(vertices);
         g.setInfo("rand", "A", "albelig");
         
-        // TODO: add edges here
-        System.err.println("ProtGraph fromDrawableGraph !!!! NOT ADDING ANY EDGES!!!");
+        // add edges
+        for(int i = 0; i < dg.getDrawableEdges().size(); i++) {
+            IDrawableEdge e = dg.getDrawableEdges().get(i);
+            g.addContact(e.getVertPairIndicesNtoC().get(0), e.getVertPairIndicesNtoC().get(1), SpatRel.stringToInt(e.getSpatRel()));
+        }
         
         return g;
     }

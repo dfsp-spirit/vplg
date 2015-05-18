@@ -7,6 +7,7 @@
  */
 package graphdrawing;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -17,9 +18,9 @@ import java.util.Set;
 public class DrawableEdge implements IDrawableEdge {
     
     private final String spatRel;
-    private final Set<Integer> vertPairIndicesNtoC;
+    private final List<Integer> vertPairIndicesNtoC;
     
-    public DrawableEdge(String spatRel, Set<Integer> vertPairIndicesNtoC) {
+    public DrawableEdge(String spatRel, List<Integer> vertPairIndicesNtoC) {
         this.spatRel = spatRel;
         this.vertPairIndicesNtoC = vertPairIndicesNtoC;
     }
@@ -69,7 +70,7 @@ public class DrawableEdge implements IDrawableEdge {
      * @return the vertPairIndicesNtoC
      */
     @Override
-    public Set<Integer> getVertPairIndicesNtoC() {
+    public List<Integer> getVertPairIndicesNtoC() {
         return vertPairIndicesNtoC;
     }
     
