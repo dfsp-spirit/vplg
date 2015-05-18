@@ -7,6 +7,7 @@
  */
 package graphdrawing;
 
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -27,10 +28,47 @@ public class DrawableEdge implements IDrawableEdge {
     public String getSpatRel() {
         return this.spatRel;
     }
+    
+    @Override
+    public String toString() {
+        String s = "[" + this.spatRel + "{";
+        for(Integer se : vertPairIndicesNtoC) {
+            s += se + " ";
+        }
+        s += "}]";
+        return s;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 31 * hash + Objects.hashCode(this.spatRel);
+        hash = 31 * hash + Objects.hashCode(this.vertPairIndicesNtoC);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final DrawableEdge other = (DrawableEdge) obj;
+        if (!Objects.equals(this.spatRel, other.spatRel)) {
+            return false;
+        }
+        if (!Objects.equals(this.vertPairIndicesNtoC, other.vertPairIndicesNtoC)) {
+            return false;
+        }
+        return true;
+    }
 
     /**
      * @return the vertPairIndicesNtoC
      */
+    @Override
     public Set<Integer> getVertPairIndicesNtoC() {
         return vertPairIndicesNtoC;
     }
