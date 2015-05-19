@@ -78,6 +78,7 @@ import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import graphdrawing.DrawTools.IMAGEFORMAT;
+import graphdrawing.IComplexGraph;
 import static plcc.FoldingGraph.ORIENTATION_DOWNWARDS;
 import tools.DP;
 
@@ -90,7 +91,7 @@ import tools.DP;
  * 
  * @author spirit
  */
-public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements IVPLGGraphFormat, IGraphModellingLanguageFormat, ITrivialGraphFormat, IDOTLanguageFormat, IKavoshFormat, SimpleGraphInterface, IDrawableGraph {
+public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements IVPLGGraphFormat, IGraphModellingLanguageFormat, ITrivialGraphFormat, IDOTLanguageFormat, IKavoshFormat, SimpleGraphInterface, IDrawableGraph, IComplexGraph {
     
     /** the list of all SSEs of this graph */
     protected List<SSE> sseList;
@@ -3433,9 +3434,24 @@ E	3	3	3
 
     /**
      * @return the chainEnds
-     */
+     */   
     public List<Integer> getChainEnds() {
         return chainEnds;
+    }
+    
+    @Override
+    public String getChainNameOfSSE(Integer sseIndex) {
+        Integer iChainID = -1;
+        for (Integer x = 0; x < this.getChainEnds().size(); x++) {
+            if (sseIndex < this.getChainEnds().get(x)) {
+                iChainID = x;
+                break;
+            }
+        }
+        if( ! iChainID.equals(-1)) {
+            return this.getAllChains().get(iChainID).getPdbChainID();
+        }
+        return "?";
     }
 
     /**
