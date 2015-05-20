@@ -10,19 +10,22 @@
 
 #include "Graph.h"
 #include <set>
+#include <forward_list>
 
 class BronKerbosch {
 public:
     BronKerbosch();
     ~BronKerbosch();
     
-    void run(const Graph_p& g);
+    std::forward_list<std::set<VertexDescriptor_p>>  run(const Graph_p& g);
     
 private:
-    void graphToSets();
-    void findCliques(std::set<VertexIterator_p> C, std::set<VertexIterator_p> P, std::set<VertexIterator_p> D,
-                                 std::set<VertexIterator_p> S, const Graph_p& g);
-    bool is_neighbour_in_set(VertexIterator_p v, VertexIterator_p w, const std::set<VertexIterator_p>& s);
+    std::forward_list<std::set<VertexDescriptor_p>> result;
+    std::set<VertexDescriptor_p>& graphToSets(std::set<VertexDescriptor_p>& r, const Graph_p& g);
+    void findCliques(std::set<VertexDescriptor_p>& C, std::set<VertexDescriptor_p>& P, std::set<VertexDescriptor_p>& D,
+                                 std::set<VertexDescriptor_p>& S, const Graph_p& g);
+    bool zPath(VertexDescriptor_p v, VertexDescriptor_p w, const std::set<VertexDescriptor_p>& s, const Graph_p& g);
+    bool zCon(VertexDescriptor_p v, VertexDescriptor_p w, const Graph_p& g);
 };
         
 
