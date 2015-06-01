@@ -100,7 +100,7 @@ function get_total_foldinggraphs_count($db) {
 		     $pre_sel = 1;
 		     if(isset($_GET['graphtype_int'])) {
 		       $tmp = intval($_GET['graphtype_int']);
-		       if($tmp >= 1 && tmp <= 6) {
+		       if($tmp >= 1 && $tmp <= 6) {
 		         $pre_sel = $tmp;
 		       }
 		     }
