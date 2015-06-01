@@ -390,7 +390,9 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
 		<h4><?php echo $num_pdb_files; ?> PDB files</h4>
 		<h4><?php echo $num_protein_chains; ?> Protein chains</h4>
-		<h4><?php echo $num_protein_chains_nonredundant; ?> Non-redundant protein chains</h4>
+		<?php if($num_protein_chains_nonredundant > 0) { echo "<h4>$num_protein_chains_nonredundant Non-redundant protein chains</h4>";
+		} 
+		?> 
 		<h4><?php echo $num_sses; ?> Secondary structure elements (SSEs)</h4>
 		<h4><?php echo $num_intrachain_contacts; ?> 3D contacts between SSEs of the same chain</h4>
 
