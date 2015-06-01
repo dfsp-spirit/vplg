@@ -7,7 +7,7 @@
 
 #include "ProductGraph.h"
 #include <tuple>
-#include <list>
+#include <forward_list>
 
 
 ProductGraph::ProductGraph() : fstGraph(0), secGraph(0) {
@@ -41,9 +41,13 @@ void ProductGraph::computePrdGraph() {
      * They are compatible if they, and their source/target vertices have the same labels.
      * All vertices get first added to a temporary list and then copied over into the graph to avoid the
      * time complexity of continually adding elements to a vecS
+     * 
+     * an edge between two vertices is added if the edge pairings they represent are compatible.
+     * they are compatible if either the edge pairs in either of the graphs share no common vertex, 
+     * or both of them share a vertex with the same label in both graphs.
      */
 
-    std::list<vertex_info_p> vertexList;
+    std::forward_list<vertex_info_p> vertexList;
     int count = 0;
 
     //iterating through all edge pairs
@@ -74,10 +78,10 @@ void ProductGraph::computePrdGraph() {
                 temp.label = "";
                 temp.edgeFst =*eiFst;
                 temp.edgeSec =*eiSec;
-                vertexList.push_back(temp);
-            } //if compatible
-        } // for second edge
-    } // for first edge
+                vertexList.push_front(temp);
+            } 
+        }//end for all edges in the second graph
+    }//end for all edges in the first graph
 
     //copy the values from the list to the graph
     this->prodGraph = Graph_p(count);
@@ -92,73 +96,72 @@ void ProductGraph::computePrdGraph() {
         }
     }
 
+    
     //Add the edges to the graph
-
     //iterate through all vertex pairs in the new product graph
-    VertexIterator_p vi1P, vi2P, viEndP ;
+    VertexIterator_p vi1P, vi2P, viEndP, vi2EndP;
     for (boost::tie(vi1P, viEndP) = vertices(prodGraph); vi1P != viEndP; ++vi1P) {
-        for (vi2P = vi1P,++vi2P; vi2P != viEndP; ++vi2P) {  //avoid computing every edge twice( (v1, v2) and (v2, v1) )
+//        for (vi2P = vi1P,++vi2P; vi2P != viEndP; ++vi2P) {  //avoid computing every edge twice( (v1, v2) and (v2, v1) )
+        for (boost::tie(vi2P, vi2EndP) = vertices(prodGraph); vi2P != vi2EndP; ++vi2P) {  //avoid computing every edge twice( (v1, v2) and (v2, v1) )
             bool comp, z;
             std::tie(comp, z) = verticesCompatible(vi1P, vi2P);
             if (comp) {
                 EdgeDescriptor_p tmp; bool flag;
-                std::tie(tmp, flag) = add_edge(*vi1P, *vi2P, prodGraph);
+                std::tie(tmp, flag) = addEdge(*vi1P, *vi2P, prodGraph);
                 if (flag) { //check if the edge already exists 
                     prodGraph[tmp].label = z ? "z":"u";
                     prodGraph[tmp].source = prodGraph[*vi1P].id;
                     prodGraph[tmp].target = prodGraph[*vi2P].id;
                     prodGraph[tmp].comment = "";
-                } else { std::cerr << "wait what? that was not supposed to be possible!";} //for-loop nesting should ensure this never happens
+                } 
             }
         } // for second vertex
     } // for first vertex
 } // void ProductGraph::computePrdGraph()
 
-std::pair<bool, bool> ProductGraph::verticesCompatible(VertexIterator_p vi1, VertexIterator_p vi2) {
-    bool edgeIdentityFst = 0, edgeIdentitySec = 0;
-    bool neighbouredFst = 0, neighbouredSec = 0; // is only necessary to avoid a false positive with empty vertex labels
-    std::string labelFst = "", labelSec = "";
+std::pair<bool, bool> ProductGraph::verticesCompatible(VertexIterator_p p1, VertexIterator_p p2) {
+    bool neighbouredFst = false, neighbouredSec = false; // is only necessary to avoid a false positive with empty vertex labels
+    std::string labelFst = "", labelSec = ""; //save the labels the common vertex of the edges (if it exists)
+    VertexDescriptor_p s1,t1,s2,t2; //hold the source/target vertices of edges to be compared
 
-    //first graph
-    //identity check+ check for a common vertex in both edges and if it exists aquire its label
-    if (source(prodGraph[*vi1].edgeFst, fstGraph) == source(prodGraph[*vi2].edgeFst, fstGraph)) {
-        if (target(prodGraph[*vi1].edgeFst, fstGraph) == target(prodGraph[*vi2].edgeFst, fstGraph)) {
-            edgeIdentityFst = true;
-        } else {
-            neighbouredFst =  true;
-            labelFst = fstGraph[source(prodGraph[*vi1].edgeFst, fstGraph)].label;
+    // if the edges in either of the graphs are identical return false.
+    if (prodGraph[*p1].edgeFst == prodGraph[*p2].edgeFst || prodGraph[*p1].edgeSec == prodGraph[*p2].edgeSec) {
+        return std::make_pair(0,0);
+    }
+    
+    // check for a common vertex between the edges of the first graph
+    // if it exists aquire its label for later comparison with the second graph
+    s1= source(prodGraph[*p1].edgeFst, fstGraph);
+    t1 = target(prodGraph[*p1].edgeFst, fstGraph);
+    s2 = source(prodGraph[*p2].edgeFst, fstGraph);
+    t2 = target(prodGraph[*p2].edgeFst, fstGraph);
+    
+    if (s1 == s2 || s1 == t2) {
+        labelFst = fstGraph[s1].label;
+        neighbouredFst = true;
+    } else {
+        if (t1 == t2 || t1 == s2) {
+            labelFst = fstGraph[t1].label;
+            neighbouredFst = true;
         }
     }
-
-    if (source(prodGraph[*vi1].edgeFst, fstGraph) == target(prodGraph[*vi2].edgeFst, fstGraph)) {
-        if (target(prodGraph[*vi1].edgeFst, fstGraph) == source(prodGraph[*vi2].edgeFst, fstGraph)) {
-            edgeIdentityFst = true;
-        } else {
-            neighbouredFst =  true;
-            labelFst = fstGraph[source(prodGraph[*vi1].edgeFst, fstGraph)].label;
+    
+    // repeat for the second graph
+    s1= source(prodGraph[*p1].edgeSec, secGraph);
+    t1 = target(prodGraph[*p1].edgeSec, secGraph);
+    s2 = source(prodGraph[*p2].edgeSec, secGraph);
+    t2 = target(prodGraph[*p2].edgeSec, secGraph);
+    
+    if (s1 == s2 || s1 == t2) {
+        labelSec = secGraph[s1].label;
+        neighbouredSec = true;
+    } else {
+        if (t1 == t2 || t1 == s2) {
+            labelSec = secGraph[t1].label;
+            neighbouredSec = true;
         }
     }
-
-    //second graph
-    if (source(prodGraph[*vi1].edgeSec, secGraph) == source(prodGraph[*vi2].edgeSec, secGraph)) {
-        if (target(prodGraph[*vi1].edgeSec, secGraph) == target(prodGraph[*vi2].edgeSec, secGraph)) {
-            edgeIdentitySec = true;
-        } else {
-            neighbouredSec =  true;
-            labelSec = secGraph[source(prodGraph[*vi1].edgeSec, secGraph)].label;
-        }
-    }
-
-    if (source(prodGraph[*vi1].edgeSec, secGraph) == target(prodGraph[*vi2].edgeSec, secGraph)) {
-        if (target(prodGraph[*vi1].edgeSec, secGraph) == source(prodGraph[*vi2].edgeSec, secGraph)) {
-            edgeIdentitySec = true;
-        } else {
-            neighbouredSec =  true;
-            labelSec = secGraph[source(prodGraph[*vi1].edgeSec, secGraph)].label;
-        }
-    }
+    
     bool z = (neighbouredFst && neighbouredSec) && (labelFst == labelSec);
-
-    return std::make_pair(!(edgeIdentityFst || edgeIdentitySec) && (neighbouredFst == neighbouredSec) &&
-                                (labelFst == labelSec),    z );
-} //bool ProductGraph::verticesCompatible(VertexIterator_p vi1, VertexIterator_p vi2)
+    return std::make_pair( z || !(neighbouredFst || neighbouredSec),    z );
+} //end bool ProductGraph::verticesCompatible(VertexIterator_p p1, VertexIterator_p p2)

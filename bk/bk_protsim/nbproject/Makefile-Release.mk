@@ -37,7 +37,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 OBJECTFILES= \
 	${OBJECTDIR}/BronKerbosch.o \
 	${OBJECTDIR}/ProductGraph.o \
-	${OBJECTDIR}/main.o
+	${OBJECTDIR}/newmain.o
 
 
 # C Compiler Flags
@@ -74,10 +74,10 @@ ${OBJECTDIR}/ProductGraph.o: ProductGraph.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ProductGraph.o ProductGraph.cpp
 
-${OBJECTDIR}/main.o: main.cpp 
+${OBJECTDIR}/newmain.o: newmain.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/newmain.o newmain.cpp
 
 # Subprojects
 .build-subprojects:

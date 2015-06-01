@@ -17,7 +17,7 @@
                    projectFiles="true">
       <itemPath>BronKerbosch.cpp</itemPath>
       <itemPath>ProductGraph.cpp</itemPath>
-      <itemPath>main.cpp</itemPath>
+      <itemPath>newmain.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -55,7 +55,7 @@
       </item>
       <item path="ProductGraph.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      <item path="newmain.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -88,7 +88,7 @@
       </item>
       <item path="ProductGraph.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      <item path="newmain.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
   </confs>

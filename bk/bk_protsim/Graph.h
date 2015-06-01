@@ -21,7 +21,7 @@ struct graph_info {
     int id;
     int directed;
     std::string label;
-    std::string comment;    //###################################### was commment inform ben
+    std::string comment;    
     std::unordered_map<std::string, std::string> properties; // used to store an arbitrary number of properties
 };
 
@@ -68,6 +68,24 @@ typedef boost::graph_traits<Graph_p>::vertex_iterator VertexIterator_p;
 typedef boost::graph_traits<Graph_p>::edge_iterator EdgeIterator_p;
 typedef boost::graph_traits<Graph_p>::adjacency_iterator AdjacencyIterator_p;
 
+
+/*
+ * behaves exactly as boost::add_edge is supposed to (but doesn't)
+ * makes sure no parallel edges are added to the undirected graph
+ * returns an EdgeDescriptor to the added Edge and a boolean flag.
+ * if the flag is false the edge already existed and no new one was added.
+ * in that case the EdgeDescriptor points to this edge 
+ */
+
+inline std::pair<EdgeDescriptor_p, bool> addEdge(VertexDescriptor_p u,VertexDescriptor_p v, Graph_p& g ) {
+    std::pair<EdgeDescriptor_p, bool>r = boost::edge(u, v, g);
+    return r.second ? std::pair<EdgeDescriptor_p, bool>(r.first, false) : boost::add_edge(u, v, g);
+}
+
+inline std::pair<EdgeDescriptor, bool> addEdge(VertexDescriptor u,VertexDescriptor v, Graph& g ) {
+    std::pair<EdgeDescriptor, bool>r = boost::edge(u, v, g);
+     return r.second ? std::pair<EdgeDescriptor, bool>(r.first, false) : boost::add_edge(u, v, g);
+}
 
 
 #endif    /* GRAPH_H */

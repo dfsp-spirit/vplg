@@ -21,7 +21,8 @@ public:
     
 private:
     std::forward_list<std::set<VertexDescriptor_p>> result;
-    std::set<VertexDescriptor_p>& graphToSets(std::set<VertexDescriptor_p>& r, const Graph_p& g);
+    std::set<VertexDescriptor_p> T;
+    
     void findCliques(std::set<VertexDescriptor_p>& C, std::set<VertexDescriptor_p>& P, std::set<VertexDescriptor_p>& D,
                                  std::set<VertexDescriptor_p>& S, const Graph_p& g);
     bool zPath(VertexDescriptor_p v, VertexDescriptor_p w, const std::set<VertexDescriptor_p>& s, const Graph_p& g);
