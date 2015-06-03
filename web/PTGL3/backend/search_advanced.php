@@ -283,7 +283,8 @@ if (isset($hasligand) && $hasligand != "null") {
                 $query .= "SELECT c.chain_id, c.chain_name, p.pdb_id, p.resolution, p.title, p.header
 								FROM plcc_chain c
 								INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id
-								WHERE c.chain_id NOT IN (SELECT ligandtochain_chainid FROM plcc_nm_ligandtochain)"; 
+								LEFT JOIN plcc_nm_ligandtochain l2c ON c.chain_id = l2c.ligandtochain_chainid
+								WHERE l2c.ligandtochain_chainid IS NULL"; 
 		}
 		$firstQuerySet = true; 
 };
