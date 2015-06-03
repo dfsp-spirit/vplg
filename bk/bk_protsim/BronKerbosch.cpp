@@ -7,7 +7,7 @@
 
 
 #include "BronKerbosch.h"
-
+int rec;
 /*
  * default constructor. does nothing.
  */
@@ -28,16 +28,17 @@ BronKerbosch::~BronKerbosch() {
  * The used algorithm uses an unspecified Pivot element and discriminates between z and u edges when building the cliques.
  * Returns a list of sets containing the VertexDescriptors of the vertices of the cliques.
  * Each set is a unique Clique in the graph.
- * If the graph g is modified by any other sources, and therefor invalidates the VertexDescriptors, while this function is running it will lead to wrong results.
+ * If the graph g is modified by any other sources (invalidating the VertexDescriptors), while this function is 
+ * running it will lead to wrong results and in the worst case segfaults!!
  * The graph will only ever be read and never written to.
  */
-std::forward_list<std::set<VertexDescriptor_p>>  BronKerbosch::run(const Graph_p& g) {
+void BronKerbosch::run(const Graph_p& g) {
     /* 
      * this function works as an initializer for the recursive findCliques function.
      * It will start the findClique function n times for n vertices in the graph.
      * Each time it will pass a different, single vertex as the set C and its neighbours in the sets D, P or S.
      */
-    
+    rec = 0;
     this -> result.clear();
     this -> T.clear();
     
@@ -45,6 +46,7 @@ std::forward_list<std::set<VertexDescriptor_p>>  BronKerbosch::run(const Graph_p
     
     VertexIterator_p vi, ve;
     for (boost::tie(vi,ve) = vertices(g); vi != ve; ++vi) { //iterate over all vertices in g
+        std::cout << "[IN]    vertex " << *vi+1 <<" of " << *ve << "\n"; 
         VertexDescriptor_p v = vertex(*vi,g);
         C.insert(v);
         std::set<VertexDescriptor_p> D;
@@ -71,10 +73,60 @@ std::forward_list<std::set<VertexDescriptor_p>>  BronKerbosch::run(const Graph_p
         C.clear();
         this->T.insert(v);
     }//end for all vertices
-    return this->result;
 }// end run
 
+/*
+ * Clears the stored results from the last time run was called. 
+ * This function is only useful if you want to reuse the same BronKerbosch object multiple times and want to 
+ * minimize the used memory between the uses.
+ */
+void BronKerbosch::clear_results() {
+    this->result.clear();
+}
 
+/*
+ * Returns the complete list of all calculated Cliques.
+ * If run(...) was not called before this function the result will be an empty list.
+ */
+std::forward_list<std::set<VertexDescriptor_p>>  BronKerbosch::get_result_list() {
+        return this->result;
+    }
+
+/*
+ * Returns a vector with the number of occurrences of Cliques of each size.  A value x at position i indicates x cliques of size i were found.
+ * If run(...) was not called before this function the result will be an empty vector.
+ */
+ std::vector<int>  BronKerbosch::get_result_pattern() {
+        std::vector<int> pattern;
+        for (std::set<VertexDescriptor_p> s : this->result) {
+            while (pattern.size() <= s.size() ) {
+                pattern.push_back(0);
+            }
+            ++pattern[s.size()];
+        }
+        return pattern;
+    }
+ 
+/*
+ * Returns a list of all Cliques of maximum size
+ * If run(...) was not called before this function the result will be an empty list.
+ */
+ std::forward_list<std::set<VertexDescriptor_p>> BronKerbosch::get_result_largest(){
+     std::forward_list<std::set<VertexDescriptor_p>> list;
+     int largest = 0;
+     for (std::set<VertexDescriptor_p> s : this->result) {
+         if (s.size() > largest) {
+             largest = s.size();
+             list.clear();
+         } else {
+             if (s.size() == largest) {
+                 list.push_front(s);
+             }
+         }
+     }
+     return list;
+ }
+ 
 /*
  * Private function to do the actual work.
  * It is initialized by the run function, giving it a single vertex in the set C.
@@ -84,7 +136,9 @@ std::forward_list<std::set<VertexDescriptor_p>>  BronKerbosch::run(const Graph_p
 void BronKerbosch::findCliques(std::set<VertexDescriptor_p>& C, std::set<VertexDescriptor_p>& P, std::set<VertexDescriptor_p>& D,
                                                      std::set<VertexDescriptor_p>& S, const Graph_p& g) {
     if (P.empty() && S.empty()) {
-        this->result.push_front(C); //add the found clique to the result list
+        this->result.push_front(C);//add the found clique to the result list
+        //std::cout << "[BK]    found Clique of size : " << C.size() <<" #-#-#\n";
+
     } else {
         std::set<VertexDescriptor_p> P1 = P;
         std::set<VertexDescriptor_p> S1 = S;
@@ -94,11 +148,17 @@ void BronKerbosch::findCliques(std::set<VertexDescriptor_p>& C, std::set<VertexD
         piv = P.empty()  ? *S.begin() : *P.begin();
         //start of main algorithm
         //iterates over all vertices connected to every vertex in C by a z-edge
+        
+        int count = 0;
+        int siz = P.size();
         for (VertexDescriptor_p ui : P) {
+            std::cout << "[BK]        ";
+            for (int stuff = 0; stuff < rec; ++stuff) {std::cout << "    ";}
+            std::cout << "vertex " << ++count <<" of " << siz << "\n";
             std::pair<EdgeDescriptor_p, bool> e = edge(piv, ui, g); 
             //check for edge between piv and ui. every vertex connected to piv can be skiped, as every Clique 
             //containing this vertex and the pivot have already been found
-            if (!e.second || zPath(piv, ui, D, g)) {
+            if ((!S.empty() &&!e.second) || (!S.empty() && zPath(piv, ui, D, g)) || S.empty()) {
                 //create new sets for the next recursion
                 
                 std::set<VertexDescriptor_p> P2;
@@ -109,29 +169,36 @@ void BronKerbosch::findCliques(std::set<VertexDescriptor_p>& C, std::set<VertexD
                 AdjacencyIterator_p ai, ae;
                 for (boost::tie(ai,ae)=adjacent_vertices(ui,g); ai!=ae;++ai) {
                     VertexDescriptor_p v = vertex(*ai,g);
+                    //std::cout << "[BK]    current n : " << v << "\n"; 
                     if (P1.find(v) != P1.end()) { //if v is in P
                         P2.insert(v);
+                        //std::cout << "[BK]    v in p1 -> p2.insert\n"; 
                     } else {
                         if (D.find(v) != D.end()) { //if v is in D
                             if (zCon(v,ui,g)) {//if c-edge between v and ui
-                                if (this->T.find(v) != this->T.end())   { S2.insert(v);} 
-                                else   { P2.insert(v);}
-                            } else { D2.insert(v); } // end if v and ui z-connected 
+                                if (this->T.find(v) != this->T.end())   { S2.insert(v); /*std::cout << "[BK]    v in D, zcon, T -> S2.insert\n"; */} 
+                                else   { P2.insert(v); /*std::cout << "[BK]    v in D,  zcon -> P2.insert\n";*/}
+                            } else { D2.insert(v); /*std::cout << "[BK]    v in D, not zcon -> D2.insert\n";*/} // end if v and ui z-connected 
                         } else {
-                            if (S1.find(v) != S1.end())   { S2.insert(v); } 
+                            if (S1.find(v) != S1.end())   { S2.insert(v); /*std::cout << "[BK]    v in not D, S1-> S2.insert\n";*/} 
                         } //end if v  in D
                     }//end if v in P
                 }// end for neigbours of ui
-                auto cPos = C.insert(ui).first;
+                C.insert(ui);
+                //std::cout << "[BK]    before recursion\n";
+                //std::cout << "[BK]    recursion " << ++rec << "\n";
+                ++rec;
                 findCliques(C, P2, D2, S2, g);
-                C.erase(cPos);
+                --rec;
+                //std::cout << "[BK]    recursion " << --rec << "-----------------------\n";
+                //std::cout << "[BK]    after recursion\n";
+                C.erase(C.find(ui));
                 P1.erase(P1.find(ui));
                 S1.insert(ui);
             }//end if ui adjacent to piv || z-path exists
         }//end for vertices in P
     }//end if P and S not empty
 }// end findCliques()
-
 
 /*
  * returns true if the two vertices v and w are connected by a z marked edge in the graph g.

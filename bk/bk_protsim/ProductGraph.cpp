@@ -31,8 +31,23 @@ ProductGraph::ProductGraph(const ProductGraph&) : fstGraph(0), secGraph(0), prod
 
 ProductGraph::~ProductGraph() {}
 
-Graph_p& ProductGraph::getProductGraph() {
-    return prodGraph;
+Graph_p& ProductGraph::getProductGraph() { return prodGraph;}
+//maybe remove the const prefix depending on usage of the functions
+const Graph& ProductGraph::getFirstGraph() { return fstGraph;}
+const Graph& ProductGraph::getSecondGraph() { return secGraph;}
+
+/*
+ * Returns the original edges in the graphs that were used to construct the object, that are represented by the Vertices in the passed set.
+ * If the set does not contain Vertices from the ProductGraph, the result will be nonsensical.
+ * The returned list contains pairs of edges, where p.first will yeld an edge from the first graph (obtainable by calling getFirstGraph) and
+ * p.second an edge from the second graph (obtainable by calling getSecondGraph)
+ */
+std::forward_list<std::pair<EdgeDescriptor, EdgeDescriptor>> ProductGraph::resultmapping(std::set<VertexDescriptor_p>& S) {
+    std::forward_list<std::pair<EdgeDescriptor, EdgeDescriptor>> result;
+    for (VertexDescriptor_p v : S) {
+        result.push_front(std::make_pair(prodGraph[v].edgeFst,prodGraph[v].edgeSec));
+    }
+    return result;
 }
 
 void ProductGraph::computePrdGraph() {
@@ -119,6 +134,10 @@ void ProductGraph::computePrdGraph() {
     } // for first vertex
 } // void ProductGraph::computePrdGraph()
 
+/*
+ * Function to check if two vertices in the product graph can be connected by an edge.
+ * returns a pari of 2 bools. the first is true if there can be an edge at all, the second is true if that edge is a z-edge
+ */
 std::pair<bool, bool> ProductGraph::verticesCompatible(VertexIterator_p p1, VertexIterator_p p2) {
     bool neighbouredFst = false, neighbouredSec = false; // is only necessary to avoid a false positive with empty vertex labels
     std::string labelFst = "", labelSec = ""; //save the labels the common vertex of the edges (if it exists)
