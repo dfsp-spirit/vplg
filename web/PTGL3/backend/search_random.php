@@ -176,7 +176,9 @@ foreach($all_rows as $arr) {
 
 }
 $tableString .= ' </div>';	// the $tableString var is used in the frontend search.php page to print results
-pg_free_result($result); // clean memory
+if($result) {
+  pg_free_result($result); // clean memory
+}
 pg_close($db); // close connection
 
 //EOF

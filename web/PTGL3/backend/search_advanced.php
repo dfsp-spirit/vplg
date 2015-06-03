@@ -332,17 +332,21 @@ pg_query($db, "DEALLOCATE ALL");
 pg_prepare($db, "searchadvanced", $query);
 $result = pg_execute($db, "searchadvanced", $query_parameters);  
 
-//if(! $result) {
-//  die("FCK: '$query'");
-//}
+if(! $result) { array_push($SHOW_ERROR_LIST, "Query failed: '" . pg_last_error($db) . "'"); }
+
 pg_prepare($db, "searchadvancedCount", $count_query);
 $count_result = pg_execute($db, "searchadvancedCount", $query_parameters);
 
-$row_count = pg_fetch_array($count_result, NULL, PGSQL_ASSOC);
-if(isset($row_count["count"])) {
-  $row_count = $row_count["count"];
-} else {
-  $row_count = 0;
+if($count_result) {
+  $row_count = pg_fetch_array($count_result, NULL, PGSQL_ASSOC);
+  if(isset($row_count["count"])) {
+    $row_count = $row_count["count"];
+  } else {
+    $row_count = 0;
+  }
+}
+else {
+    $row_count = 0;
 }
 
 // this counter is used to display alternating table colors
@@ -428,7 +432,9 @@ $tableString .= ' </div>';	// the $tableString var is used in the frontend searc
     $tableString .= "Please <a href='index.php' title='PTGL'>go back</a> and try an other query.";
 }
 
-pg_free_result($result); // clean memory
+if($result) {
+  pg_free_result($result); // clean memory
+}
 pg_close($db); // close connection
 
 
