@@ -387,7 +387,7 @@ public class PTGLNotations {
                 String addedThisIteration = "";
                 
                 // outer loop: run until degrees of all vertices have been decreased to 0 (all edges visited).
-                //             if the vertices contain a cycle, 
+                //             if the vertices contain a cycle, we need to run once more to hit the edge closing the circle
                 while( ! isFinished(adjdegrees, ccVerts) || (hc && (adjvisited.size() <= ccVerts.size()) )) {
                     
                     addedLastIteration = addedThisIteration;
@@ -402,7 +402,7 @@ public class PTGLNotations {
                     numIterations++;
                     
                     adjNeighbors = g.neighborsOf(adjcur);
-                    Collections.sort(adjNeighbors);
+                    Collections.sort(adjNeighbors); // sort neighbors, note that this will sort them sequential N to C
                     
                     if(adjverbose) {
                         System.out.println("    Fold#" + foldNum + "    The " + adjNeighbors.size() + " neighbors of " + adjcur + ": " + IO.intListToString(adjNeighbors));
@@ -412,18 +412,21 @@ public class PTGLNotations {
                     next = -1;
                     
                     // line 271 of Perl script   
-                    // Determine the next vertex
+                    // Determine the next vertex from the neighbors of the current one: the neighbors are ordered from N to C in the list already.
                     for(int k = 0; k < adjNeighbors.size(); k++) {
                         
+                        // just grep the next neighbor (we start closest to N)
                         adjv = adjNeighbors.get(k);
                         
                         if(hc && adjvisited.size() == ccVerts.size()) {
-                            // we have a circle in these vertices, and visited each vertex already. This is the edge that closes the circle.
+                            // we have a circle in these vertices, and visited each vertex already. This is the vertex that closes the circle (it has been visited already, as the first vertex. But the edge to it has not been visited yet).
                             foundNextVertex = true;
                             next = adjv;
-                            hc = false;                            
+                            hc = false;  // we resolved the circle by using this vertex a second time, remove circle label
                         }
                         
+                        
+                        // check whether the edge has already been visited (edges are saved left too right, so assure this for verts first)
                         left = adjcur;
                         right = adjv;
                         
@@ -431,21 +434,22 @@ public class PTGLNotations {
                             left = adjv;
                             right = adjcur;
                         }
-                        
-                        
-                        
+                       
                         String edgeStatus = g.getEdgeAttribute(left, right, PTGLNotations.EDGE_ATTRIBUTE_STATUS);
                         if(edgeStatus != null) {
                             if(edgeStatus.equals(PTGLNotations.STATUS_VISITED)) {
+                                // skip visiting the vertex if the edge has already been used
                                 continue;
                             }
                         }
                         
                         if(adjdegrees.get(adjv) <= 0) {
+                            // skip visiting vertex if it has no unvisited incoming edges 
                             continue;
                         }
                         
                         if(! foundNextVertex) {
+                            // use the next neighbor (unless the circle rule already matched)
                             next = adjv;
                             foundNextVertex = true;
                             break;
@@ -454,6 +458,9 @@ public class PTGLNotations {
                     
                     // line 304 in Perl script
                     if(foundNextVertex) {
+                        // we found a vertex to visit in the neighbors of the vertex.
+                        
+                        // determine the edge type (and thus ptgl edge label) to append it to notation
                         left = adjcur;
                         right = next;
                         
@@ -476,8 +483,10 @@ public class PTGLNotations {
                         addedThisIteration += (next - adjcur);
                         addedThisIteration += edgeType.toLowerCase();
                         
+                        // mark the edge we just used as visited
                         g.setEdgeAttribute(left, right, PTGLNotations.EDGE_ATTRIBUTE_STATUS, PTGLNotations.STATUS_VISITED);
                         
+                        // decrease the degrees of both vertices by 1 (mark vertices as visited)
                         Integer adjcurDegree = adjdegrees.get(adjcur);
                         Integer nextDegree = adjdegrees.get(next);
                         
@@ -498,9 +507,11 @@ public class PTGLNotations {
                             System.out.println("    Fold#" + foldNum + ": Did NOT find next vertex, end of path. Looking where to go next...");
                         }
                         
-                        // try to find a 
+                        // check whether we can jump to an unvisited vertex with degree 1 from here (jump = go there even though no (unvisited) edge exists)
+                        // note that we jump to the leftmost if multiple exist
                         next = getVertexDegree1(adjdegrees, ccVerts);
                         if(next != null) {
+                            // we found a vertex with degree 1, jump there...
                             if(adjverbose) {
                                 System.out.println("    Fold#" + foldNum + ": Found vertex with degree 1, it is " + next + ".");
                             }
@@ -509,10 +520,12 @@ public class PTGLNotations {
                                 ADJ.append(",");
                             }
                             
+                            // we did not use a real edge, so mark this as a fake edge ("z" edge)
                             ADJ.append((next - adjcur) + "z");
                             addedThisIteration += (next - adjcur) + "z";
                             
                         } else {
+                            // there was no vertex with degree 1 to jump to, so we jump to a vertex with higher degree now (leftmost first)
                             next = getVertexDegreeGreater1(adjdegrees, ccVerts);
                             if(next != null) {
                                 if(adjverbose) {
@@ -523,13 +536,15 @@ public class PTGLNotations {
                                 }
                             }
                             else {
-                                // next is still null, this makes no sense
+                                // next is still null, this makes no sense (because we kept track of the degrees, and we finish if there is no 
+                                //   vertex left to visit
                                 System.err.println("ERROR: ADJ notation: could not find next vertex in path, this makes no sense.");
                                 System.exit(1);
                             }
                         }
                     }
                     
+                    // we only added the edge label to the notation so far, now edd the vertex label:
                     if(isMultiSSETypeGraph) {
                         ADJ.append(g.getVertex(next).getLinearNotationLabel());
                         addedThisIteration += g.getVertex(next).getLinearNotationLabel();
@@ -554,7 +569,7 @@ public class PTGLNotations {
                         System.out.println("    Set order of vertex next=" + next + " to '" + order.get(next) + "'. adjcur=" + adjcur + ".");
                     }
                     
-                    adjcur = next;
+                    adjcur = next;    // continue at the vertex we just arrived at
                     
                     if(tvertexList.size() < ccVerts.size()) {
                         adjct++;
@@ -563,6 +578,7 @@ public class PTGLNotations {
                         tvertex.put(adjcur, adjct);
                     }
                     
+                    // mark vertex we just arrived at as visited
                     adjvisited.add(next);
                     
                     if(adjverbose) {
@@ -572,6 +588,7 @@ public class PTGLNotations {
                     
                 }
                 
+                // all done, close notation
                 ADJ.append(bracketEnd);
                 
                 resetEdgeStatus(ccVerts);
