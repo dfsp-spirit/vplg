@@ -226,7 +226,7 @@ public class GraphCreator {
      * @param dg a DrawableGraph
      * @return a ProtGraph
      */
-    public ProtGraph fromDrawableGraph(IDrawableGraph dg) {
+    public static ProtGraph fromDrawableGraph(IDrawableGraph dg) {
         ProtGraph g;
         
         List<SSE> vertices = new ArrayList<>();

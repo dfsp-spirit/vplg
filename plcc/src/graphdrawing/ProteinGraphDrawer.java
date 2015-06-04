@@ -2055,9 +2055,7 @@ public class ProteinGraphDrawer {
             }
         }
         Integer keyendFGIndex = keyposFGIndicesSpatOrder.get(fg.getSize() - 1);
-        if (!keystartFGIndex.equals(keyposFGIndicesSpatOrder.get(0))) {
-            System.err.println("WARNING: Draw folding graph KEY notation: spatial ordering does no start with KEY start vertex.");
-        }
+        
         if (debug) {
             DP.getInstance().d("keyposFGIndicesSpatOrder=" + IO.intListToString(keyposFGIndicesSpatOrder));
         }

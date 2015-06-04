@@ -513,7 +513,7 @@ public class PTGLNotations {
                         if(next != null) {
                             // we found a vertex with degree 1, jump there...
                             if(adjverbose) {
-                                System.out.println("    Fold#" + foldNum + ": Found vertex with degree 1, it is " + next + ".");
+                                System.out.println("    Fold#" + foldNum + ": Jump1: Found vertex with degree 1, it is " + next + ".");
                             }
                             if(isMultiSSETypeGraph || (! isMultiSSETypeGraph && adjvisited.size() > 1)) {
                             //if(g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) || ( ! g.getGraphType().equals(ProtGraphs.GRAPHTYPE_STRING_ALBE) && adjvisited.size() > 1)) {
@@ -529,11 +529,16 @@ public class PTGLNotations {
                             next = getVertexDegreeGreater1(adjdegrees, ccVerts);
                             if(next != null) {
                                 if(adjverbose) {
-                                    System.out.println("    Fold#" + foldNum + ": Found vertex with degree GREATER 1 (z-vertex), it is " + next + " with degree " + adjdegrees.get(next) + ".");
+                                    System.out.println("    Fold#" + foldNum + ": Jump2: Found vertex with degree GREATER 1 (z-vertex), it is " + next + " with degree " + adjdegrees.get(next) + ".");
+                                    System.out.println("    (cont.): Jump2: " + g.getPdbid() + " " + g.getChainid() + " " + g.getGraphType());
                                 }
                                 if(isMultiSSETypeGraph || ( ! isMultiSSETypeGraph && adjvisited.size() > 1)) {
                                     ADJ.append(",");
                                 }
+                                
+                                // we did not use a real edge, so mark this as a fake edge ("z" edge)
+                                ADJ.append((next - adjcur) + "z");
+                                addedThisIteration += (next - adjcur) + "z";
                             }
                             else {
                                 // next is still null, this makes no sense (because we kept track of the degrees, and we finish if there is no 
@@ -738,7 +743,7 @@ public class PTGLNotations {
                                 RED.append(",");
                             }
                             
-                            RED.append((pos.get(next) - pos.get(redcur)) + "z");
+                            RED.append(pos.get(next) - pos.get(redcur)).append("z");
                             
                         } else {
                             next = getVertexDegreeGreater1(reddegrees, ccVerts);
@@ -751,7 +756,7 @@ public class PTGLNotations {
                                     RED.append(",");
                                 }
                                 
-                                RED.append((pos.get(next) - pos.get(redcur)) + "z");
+                                RED.append(pos.get(next) - pos.get(redcur)).append("z");
                             }
                             else {
                                 // next is still null, this makes no sense
