@@ -1,5 +1,6 @@
 
 import graphdrawing.IDrawableEdge;
+import graphdrawing.IDrawableGraph;
 import graphdrawing.IDrawableVertex;
 import java.util.List;
 import static junit.framework.Assert.assertEquals;
@@ -47,6 +48,10 @@ public class TestLinnotToGraph {
     @org.junit.Test public void test7timVertices() {             
         List<IDrawableVertex> verts = ltg.getVertices();
         assertEquals(3, verts.size());
+    }
+    
+    @org.junit.Test public void test7timGraph() {             
+        IDrawableGraph dg = ltg.getGraph();
     }
     
 }

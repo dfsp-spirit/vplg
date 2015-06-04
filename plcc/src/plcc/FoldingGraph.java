@@ -105,7 +105,7 @@ public class FoldingGraph extends SSEGraph {
      * Constructor. Requires a list of SSEs that will be represented by the vertices of the graph.
      * @param sses a list of SSEs which make up this folding graph. The contacts have to be added later (or there will be none).
      */
-    FoldingGraph(ArrayList<SSE> sses) {
+    FoldingGraph(List<SSE> sses) {
         super(sses);
         this.isProteinGraph = false;
     }

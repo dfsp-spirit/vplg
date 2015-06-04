@@ -43,7 +43,7 @@ public class ContactMatrix {
     private Integer[ ][ ] resContSSE;   // holds the number of residue level contacts
     private Integer[ ][ ] spatialSSE;   // spatial relations between pairs of SSEs
     private Integer[ ][ ] dblDif;       // double difference used to calculate spatial relations
-    private ArrayList<SSE> sseList;
+    private List<SSE> sseList;
    
 
     // Constructor

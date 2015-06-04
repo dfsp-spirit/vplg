@@ -209,7 +209,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
 
             // For each CC, create a graph with all SSEs that are marked with this connected component number.
             // We need to get all SSEs first because we need to pass the list to the constructor:
-            ArrayList<SSE> tmpSSEList = new ArrayList<SSE>();
+            List<SSE> tmpSSEList = new ArrayList<SSE>();
             
             // Determine last SSE in parent graph which is part of the FG. We need this because for ADJ and SEQ notations, we need
             //  to add vertices which are NOT part of the CC as well (all vertices between first and last vertex of the CC).

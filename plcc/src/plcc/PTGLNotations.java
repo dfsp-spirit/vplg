@@ -495,7 +495,7 @@ public class PTGLNotations {
                     else {  // not found, this means there is no neighbor left to visit from the current vertex.
                         
                         if(adjverbose) {
-                            System.out.println("    Fold#" + foldNum + ": Did NOT find next vertex, end of path.");
+                            System.out.println("    Fold#" + foldNum + ": Did NOT find next vertex, end of path. Looking where to go next...");
                         }
                         
                         // try to find a 

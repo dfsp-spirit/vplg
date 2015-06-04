@@ -2744,7 +2744,8 @@ public class Main {
         Collections.sort(foldingGraphs, new FoldingGraphComparator());
         
         PTGLNotations p = new PTGLNotations(pg);
-        p.stfu();
+        //p.stfu();
+        p.blare();
         List<PTGLNotationFoldResult> resultsPTGLNotations = p.getResults();
 
         
