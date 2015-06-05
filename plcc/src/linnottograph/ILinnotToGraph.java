@@ -19,6 +19,6 @@ import java.util.List;
 public interface ILinnotToGraph {
     public List<IDrawableEdge> getEdges();
     public List<IDrawableVertex> getVertices();
-    public IDrawableGraph getGraph();
+    public IDrawableGraph getDrawableGraph();
     
 }

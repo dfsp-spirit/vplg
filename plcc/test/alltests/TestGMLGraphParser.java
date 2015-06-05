@@ -66,7 +66,7 @@ public class TestGMLGraphParser extends TestCase {
     
     @org.junit.Test public void testNumEdgesAndVerts() {                     
         assertEquals(3, p.getEdges().size());
-        assertEquals(3, p.getVerts().size());
+        assertEquals(3, p.getVertices().size());
     }
     
 }

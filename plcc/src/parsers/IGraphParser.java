@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface IGraphParser {
     public List<ParsedEdgeInfo> getEdges();    
-    public List<ParsedVertexInfo> getVerts();    
+    public List<ParsedVertexInfo> getVertices();    
     public ParsedGraphInfo getGraphInfo();
     
 }

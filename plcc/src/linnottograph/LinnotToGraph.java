@@ -12,6 +12,7 @@ import graphdrawing.DrawableGraph;
 import graphdrawing.DrawableVertex;
 import graphdrawing.IDrawableEdge;
 import graphdrawing.IDrawableGraph;
+import graphdrawing.IDrawableGraphProvider;
 import graphdrawing.IDrawableVertex;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ import plcc.SpatRel;
  *
  * @author spirit
  */
-public class LinnotToGraph implements ILinnotToGraph {
+public class LinnotToGraph implements ILinnotToGraph, IDrawableGraphProvider {
     
     
     private final ILinnotParser lnp;
@@ -64,7 +65,7 @@ public class LinnotToGraph implements ILinnotToGraph {
     }
     
     @Override
-    public IDrawableGraph getGraph() {
+    public IDrawableGraph getDrawableGraph() {
         IDrawableGraph g = new DrawableGraph(this.getVertices(), this.getEdges(), new HashMap<String, String>());
         return g;
     }

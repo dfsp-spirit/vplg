@@ -8,7 +8,14 @@
 package parsers;
 
 
+import graphdrawing.DrawableGraph;
+import graphdrawing.DrawableVertex;
+import graphdrawing.IDrawableEdge;
+import graphdrawing.IDrawableGraph;
+import graphdrawing.IDrawableGraphProvider;
+import graphdrawing.IDrawableVertex;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import plcc.ProtGraph;
 
@@ -16,7 +23,7 @@ import plcc.ProtGraph;
  *
  * @author spirit
  */
-public class GMLGraphParser implements IGraphParser {
+public class GMLGraphParser implements IGraphParser, IDrawableGraphProvider {
     
     private final String gml;
     private final List<ParsedEdgeInfo> outEdges;
@@ -37,15 +44,36 @@ public class GMLGraphParser implements IGraphParser {
     }
     
     @Override
-    public List<ParsedVertexInfo> getVerts() {
+    public List<ParsedVertexInfo> getVertices() {
         return this.outVerts;
+    }
+    
+    private List<IDrawableVertex> getDrawableVertices() {
+        List<IDrawableVertex> dv = new ArrayList<>();
+        for(ParsedVertexInfo pvi : this.outVerts) {
+            dv.add((IDrawableVertex) pvi);
+        }
+        return dv;
+    }
+    
+    private List<IDrawableEdge> getDrawableEdges() {
+        List<IDrawableEdge> dv = new ArrayList<>();
+        for(ParsedEdgeInfo pvi : this.outEdges) {
+            dv.add((IDrawableEdge) pvi);
+        }
+        return dv;
     }
     
     @Override
     public ParsedGraphInfo getGraphInfo() {
         return this.gInfo;
     }
-            
+           
+    @Override
+    public IDrawableGraph getDrawableGraph() {
+        IDrawableGraph g = new DrawableGraph(this.getDrawableVertices(), this.getDrawableEdges(), this.gInfo.getMap());
+        return g;
+    }
     
     private void parse() {
 

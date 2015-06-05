@@ -30,4 +30,8 @@ public class ParsedGraphInfo {
         return this.edgeProps.get(key);
     }
     
+    public Map<String, String> getMap() {
+        return this.edgeProps;
+    }
+    
 }

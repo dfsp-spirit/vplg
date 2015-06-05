@@ -60,20 +60,20 @@ public class TestLinnotToGraph {
     }
     
     @org.junit.Test public void testGraph() {             
-        IDrawableGraph dg = ltg.getGraph();
+        IDrawableGraph dg = ltg.getDrawableGraph();
         ProtGraph pg = GraphCreator.fromDrawableGraph(dg);
         assertEquals(3, pg.getVertices().size());
     }
     
     @org.junit.Test public void testResGraphFG() {             
-        IDrawableGraph dg = ltg.getGraph();
+        IDrawableGraph dg = ltg.getDrawableGraph();
         ProtGraph pg = GraphCreator.fromDrawableGraph(dg);
         ArrayList<FoldingGraph> fgs = pg.getFoldingGraphs();
         assertEquals(1, fgs.size());
     }
     
     @org.junit.Test public void testResGraphLinnotRed() {             
-        IDrawableGraph dg = ltg.getGraph();
+        IDrawableGraph dg = ltg.getDrawableGraph();
         ProtGraph pg = GraphCreator.fromDrawableGraph(dg);
         PTGLNotations p = new PTGLNotations(pg);
         List<PTGLNotationFoldResult> linnots = p.getResults();
@@ -87,7 +87,7 @@ public class TestLinnotToGraph {
     }
     
     @org.junit.Test public void testResGraphLinnotAdj() {             
-        IDrawableGraph dg = ltg.getGraph();
+        IDrawableGraph dg = ltg.getDrawableGraph();
         ProtGraph pg = GraphCreator.fromDrawableGraph(dg);
         PTGLNotations p = new PTGLNotations(pg);
         List<PTGLNotationFoldResult> linnots = p.getResults();
