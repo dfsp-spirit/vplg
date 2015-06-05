@@ -1,3 +1,5 @@
+package alltests;
+
 
 import graphdrawing.IDrawableEdge;
 import graphdrawing.IDrawableGraph;

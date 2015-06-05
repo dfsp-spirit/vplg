@@ -1,3 +1,5 @@
+package alltests;
+
 /*
  * This file is part of the Visualization of Protein Ligand Graphs (VPLG) software package.
  *

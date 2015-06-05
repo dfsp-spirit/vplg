@@ -1,3 +1,7 @@
+package alltests;
+
+import junit.framework.TestCase;
+
 /*
  * This file is part of the Visualization of Protein Ligand Graphs (VPLG) software package.
  *
@@ -10,6 +14,6 @@
  *
  * @author ts
  */
-public class TestGraphCreator {
+public class TestGraphCreator extends TestCase {
     
 }

@@ -28,23 +28,7 @@ import tools.DP;
 public class GraphCreator {
     
     
-    public static ProtGraph fromGMLString(String gml) {
-        System.err.println("ERROR: ProtGraph fromGMLString() not implemented yet.");
-        System.exit(1);
-        
-        ProtGraph g;
-        
-        // parse data and prepare the list of SSEs for the graph
-        ArrayList<SSE> sseList = new ArrayList<SSE>();
-        
-        
-        
-        // now create the graph from the SSE list
-        g = new ProtGraph(sseList);
-        
-        // add some edges here
-        return g;
-    }
+    
     
     
     /**
@@ -54,10 +38,7 @@ public class GraphCreator {
      * @param csv the CSV string
      * @return the protein graph parsed from the CSV
      */
-    public static ProtGraph fromCSVString(String csv) {
-        
-        System.err.println("ERROR: ProtGraph fromGMLString() not implemented yet.");
-        System.exit(1);
+    public static ProtGraph fromCSVString(String csv) {                
         
         String fs = ",";    // field separator
         String commentLineStartString = "#";
@@ -260,7 +241,7 @@ public class GraphCreator {
      * @param edgeProb the edge probability (for each edge pair)
      * @return the resulting protein ligand graph
      */
-    public ProtGraph createRandom(int numVertices, double edgeProb) {
+    public static ProtGraph createRandom(int numVertices, double edgeProb) {
         ProtGraph g;
         
         System.out.println(" Creating random protein ligand graph.");
@@ -400,14 +381,14 @@ public class GraphCreator {
     public static void main(String[] argv) {
         // preparations
         String fs = File.separator;
-        GraphCreator cg = new GraphCreator();
+        //GraphCreator cg = new GraphCreator();
         
         // graph settings
         int numVertices = 30;
         double edgeProb = 0.05;
         
         // create the random protein ligand graph
-        SSEGraph g = cg.createRandom(numVertices, edgeProb);
+        SSEGraph g = GraphCreator.createRandom(numVertices, edgeProb);
 
         // write it to a file in GML format
         String gmlFile = System.getProperty("user.home") + fs + "random_protein_ligand_graph_" + numVertices + "V.gml";
