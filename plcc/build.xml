@@ -10,6 +10,10 @@
 <project name="plcc" default="default" basedir=".">
     <description>Builds, tests, and runs the project plcc.</description>
     <import file="nbproject/build-impl.xml"/>
+	
+	<!-- Continuous Integration target added by TS for Jenkins. Builds and runs the tests. -->
+	<target depends="test,jar,javadoc" description="Build and test distribution, continous integration target for Jenkins CI server." name="ci"/>
+	
     <!--
 
     There exist several targets which are by default empty and which can be 
