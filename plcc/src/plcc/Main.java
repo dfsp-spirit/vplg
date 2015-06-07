@@ -57,6 +57,10 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 import graphdrawing.DrawTools.IMAGEFORMAT;
+import graphdrawing.DrawableGraph;
+import graphdrawing.IDrawableGraph;
+import parsers.GMLGraphParser;
+import parsers.IGraphParser;
 import similarity.CompareOneToDB;
 import similarity.Similarity;
 import tools.DP;
@@ -890,6 +894,28 @@ public class Main {
                             drawTGFGraph(args[i+1], args[i+1], formats);
                             System.out.println("Done drawing TGF graph, exiting.");
                             System.exit(1);
+                        }
+                    }
+                    
+                    if(s.equals("--draw-gml-graph")) {
+                        if(args.length <= i+1 ) {
+                            syntaxError();
+                        }
+                        else {
+                            Settings.set("plcc_B_graphimg_header", "false");
+                            System.out.println("Drawing custom graph in GML format from file '" + args[i+1] + "'.");
+                            IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
+                            try {
+                                IGraphParser p = new GMLGraphParser(FileParser.slurpFileToString(args[i+1]));
+                                IDrawableGraph g = new DrawableGraph(p., g.getDrawableEdges(), new HashMap<String, String>());
+                                ProteinGraphDrawer.drawDrawableGraph(dsspFile, formats, null);
+                                drawTGFGraph(args[i+1], args[i+1], formats);
+                                System.out.println("Done drawing GML graph, exiting.");
+                            } catch (Exception e) {
+                                System.err.println("Could not read file: " + e.getMessage());
+                                System.exit(1);
+                            }
+                            System.exit(0);
                         }
                     }
                     
@@ -1896,18 +1922,20 @@ public class Main {
     /**
      * Draws the image of a graph from the file 'tpgFile' (which is expected to contain a graph in the Trivial Graph Format) and writes it to the PNG file img.
      * @param tgfFile the path to the TGF file which contains the graph to draw
-     * @param img the output path where the resulting image should be written
+     * @param imgFilePathNoExt the output path where the resulting image should be written
+     * @param formats a list of image formats
      */
-    public static void drawTGFGraph(String tgfFile, String img, IMAGEFORMAT[] formats) {
+    public static void drawTGFGraph(String tgfFile, String imgFilePathNoExt, IMAGEFORMAT[] formats) {
 
         //System.out.println("Testing tgf implementation using file '" + tgfFile + "'.");
 
         ProtGraph pg = ProtGraphs.fromTrivialGraphFormatFile(tgfFile);
-        System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to base file '" + img + "'.");
-        ProteinGraphDrawer.drawProteinGraph(img, true, formats, pg);
+        System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to base file '" + imgFilePathNoExt + "'.");
+        ProteinGraphDrawer.drawProteinGraph(imgFilePathNoExt, true, formats, pg);
         //pg.print();
-        System.out.println("  Graph image written to base file '" + img + "'.");
+        System.out.println("  Graph image written to base file '" + imgFilePathNoExt + "'.");
     }
+    
     
     
     /**
@@ -6330,22 +6358,22 @@ public class Main {
         chainCM.calculateSSESpatialRelationMatrix(resContacts, true);                
 
         // This graph is still required because it is used for drawing the VPLG-style picture
-        ProtGraph pg = chainCM.toProtGraph();
-        pg.declareProteinGraph();        
+        ProtGraph cg = chainCM.toProtGraph();
+        cg.declareProteinGraph();        
 
         
         if(Settings.getBoolean("plcc_B_forceBackboneContacts")) {
             if( ! silent) {
                 System.out.println("      Adding backbone contacts to consecutive SSEs of the " + graphType + " graph.");
             }
-            pg.addFullBackboneContacts();            
+            cg.addFullBackboneContacts();            
         }
 
         //System.out.println("    ----- Done with " + graphType + " graph of chain " + c.getPdbChainID() + ". -----");
-        pg.setInfo(pdbid, "ALL", "complex_" + graphType);
-        pg.addMetadata(md);
-        pg.setComplexData(chainEnd, allChains);
-        pg.declareComplexGraph(true);
+        cg.setInfo(pdbid, "ALL", "complex_" + graphType);
+        cg.addMetadata(md);
+        cg.setComplexData(chainEnd, allChains);
+        cg.declareComplexGraph(true);
                 
         filePathImg = outputDir;
         filePathGraphs = outputDir;
@@ -6415,51 +6443,51 @@ public class Main {
         Integer numFormatsWrittenSSELevel = 0;
         if(Settings.getBoolean("plcc_B_output_compgraph_GML")) {
             String gmlfFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".gml";                       
-            if(IO.stringToTextFile(gmlfFileSSELevel, pg.toGraphModellingLanguageFormat())) {
+            if(IO.stringToTextFile(gmlfFileSSELevel, cg.toGraphModellingLanguageFormat())) {
                 graphFormatsWrittenSSELevel += "gml "; numFormatsWrittenSSELevel++;
             }
         }
         if(Settings.getBoolean("plcc_B_output_compgraph_TGF")) {
             String tgfFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".tgf";
-            if(IO.stringToTextFile(tgfFileSSELevel, pg.toTrivialGraphFormat())) {
+            if(IO.stringToTextFile(tgfFileSSELevel, cg.toTrivialGraphFormat())) {
                 graphFormatsWrittenSSELevel += "tgf "; numFormatsWrittenSSELevel++;
             }
         }
         if(Settings.getBoolean("plcc_B_output_compgraph_DOT")) {
             String dotLangFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".gv";
-            if(IO.stringToTextFile(dotLangFileSSELevel, pg.toDOTLanguageFormat())) {
+            if(IO.stringToTextFile(dotLangFileSSELevel, cg.toDOTLanguageFormat())) {
                 graphFormatsWrittenSSELevel += "gv "; numFormatsWrittenSSELevel++;
             }
         }
         if(Settings.getBoolean("plcc_B_output_compgraph_kavosh")) {
             String kavoshFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".kavosh";
-            if(IO.stringToTextFile(kavoshFileSSELevel, pg.toKavoshFormat())) {
+            if(IO.stringToTextFile(kavoshFileSSELevel, cg.toKavoshFormat())) {
                 graphFormatsWrittenSSELevel += "kavosh "; numFormatsWrittenSSELevel++;
             }
         }
         if(Settings.getBoolean("plcc_B_output_compgraph_XML")) {
             String xmlFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".xml";
-            if(IO.stringToTextFile(xmlFileSSELevel, pg.toXMLFormat())) {
+            if(IO.stringToTextFile(xmlFileSSELevel, cg.toXMLFormat())) {
                 graphFormatsWrittenSSELevel += "xml "; numFormatsWrittenSSELevel++;
             }
         }
         if(Settings.getBoolean("plcc_B_output_compgraph_JSON")) {
             String jsonFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".json";
-            if(IO.stringToTextFile(jsonFileSSELevel, pg.toJSONFormat())) {
+            if(IO.stringToTextFile(jsonFileSSELevel, cg.toJSONFormat())) {
                 graphFormatsWrittenSSELevel += "json "; numFormatsWrittenSSELevel++;
             }
         }
         if(Settings.getBoolean("plcc_B_output_compgraph_eld")) {
             String elFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".el_edges";
             String nodeTypeListFile = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".el_ntl";
-            if(IO.stringToTextFile(elFileSSELevel, pg.toEdgeList()) && IO.stringToTextFile(nodeTypeListFile, pg.getNodeTypeList())) {
+            if(IO.stringToTextFile(elFileSSELevel, cg.toEdgeList()) && IO.stringToTextFile(nodeTypeListFile, cg.getNodeTypeList())) {
                 graphFormatsWrittenSSELevel += "el "; numFormatsWrittenSSELevel++;
             }
         }
         // write the SSE info text file for the image (plcc graph format file)
         if(Settings.getBoolean("plcc_B_output_compgraph_plcc")) {
             plccGraphFileSSELevel = filePathGraphs + fs + fileNameSSELevelWithoutExtension + ".plg";
-            if(IO.stringToTextFile(plccGraphFileSSELevel, pg.toVPLGGraphFormat())) {
+            if(IO.stringToTextFile(plccGraphFileSSELevel, cg.toVPLGGraphFormat())) {
                 graphFormatsWrittenSSELevel += "plg "; numFormatsWrittenSSELevel++;
             }
         }
@@ -6477,7 +6505,7 @@ public class Main {
                 
         if(Settings.getBoolean("plcc_B_draw_graphs")) {
             IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG, DrawTools.IMAGEFORMAT.PDF };
-            ProteinGraphDrawer.drawProteinGraph(imgFileNoExt, false, formats, pg);
+            ProteinGraphDrawer.drawProteinGraph(imgFileNoExt, false, formats, cg);
             if(! silent) {
                 System.out.println("    Image of complex graph written to base file '" + imgFileNoExt + "'.");
             }
@@ -6508,7 +6536,7 @@ public class Main {
             //dbImagePath += DrawTools.getFileExtensionForImageFormat(format);
             try {
                 
-                DBManager.writeComplexGraphToDB(pdbid, pg.toGraphModellingLanguageFormat(), null, pg.toXMLFormat(), null, pg.toKavoshFormat(), null, dbImagePathCG + ".svg", dbImagePathChainCG + ".svg", dbImagePathCG + ".png", dbImagePathChainCG + ".png", dbImagePathCG + ".pdf", dbImagePathChainCG + ".pdf");
+                DBManager.writeComplexGraphToDB(pdbid, cg.toGraphModellingLanguageFormat(), null, cg.toXMLFormat(), null, cg.toKavoshFormat(), null, dbImagePathCG + ".svg", dbImagePathChainCG + ".svg", dbImagePathCG + ".png", dbImagePathChainCG + ".png", dbImagePathCG + ".pdf", dbImagePathChainCG + ".pdf");
                 if(! silent) {
                     System.out.println("Wrote complex graph of " + pdbid + " to DB.");
                 }

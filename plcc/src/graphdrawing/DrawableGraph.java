@@ -57,6 +57,7 @@ public class DrawableGraph implements IDrawableGraph {
     }
     
     
+    @Override
     public String getSpatRelOfEdge(Integer i, Integer j) {
         for(IDrawableEdge e : this.drawableEdges) {
             if(isEdgeFromTo(e, i, j)) {
@@ -64,6 +65,16 @@ public class DrawableGraph implements IDrawableGraph {
             }
         }
         return SpatRel.STRING_NONE;
+    }
+
+    @Override
+    public Boolean containsEdge(Integer i, Integer j) {
+        for(IDrawableEdge e : this.drawableEdges) {
+            if(isEdgeFromTo(e, i, j)) {
+                return true;
+            }
+        }
+        return false;
     }
     
 }
