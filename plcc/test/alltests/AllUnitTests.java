@@ -17,7 +17,7 @@ import junit.framework.TestSuite;
  *
  * @author ts
  */
-public class UnitTests extends TestCase {
+public class AllUnitTests extends TestCase {
 
 	/**
 	 * Creates a test suite containing all unit tests
@@ -30,6 +30,11 @@ public class UnitTests extends TestCase {
 		
 		// Add tests here:
 		suite.addTestSuite(SSETest.class);
+                suite.addTestSuite(TestGMLGraphParser.class);
+                suite.addTestSuite(TestGraphCreator.class);
+                suite.addTestSuite(TestLinnotParser.class);
+                suite.addTestSuite(TestLinnotToGraph.class);
+                suite.addTestSuite(TestPTGLNotations.class);
 		
 		return suite;
 	}

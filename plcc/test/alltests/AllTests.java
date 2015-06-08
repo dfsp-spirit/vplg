@@ -23,9 +23,9 @@ public class AllTests extends TestCase {
         final TestSuite suite = new TestSuite();
         
         //unit tests
-        suite.addTest(UnitTests.suite());
+        suite.addTest(AllUnitTests.suite());
         
-        // other test may follow here (e.g., stress tests)
+        // other test may follow here (e.g., acceptance tests)
         
         
         return suite;

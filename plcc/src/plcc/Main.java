@@ -906,10 +906,9 @@ public class Main {
                             System.out.println("Drawing custom graph in GML format from file '" + args[i+1] + "'.");
                             IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
                             try {
-                                IGraphParser p = new GMLGraphParser(FileParser.slurpFileToString(args[i+1]));
-                                IDrawableGraph g = new DrawableGraph(p., g.getDrawableEdges(), new HashMap<String, String>());
+                                GMLGraphParser p = new GMLGraphParser(FileParser.slurpFileToString(args[i+1]));                                
+                                IDrawableGraph g = p.getDrawableGraph();
                                 ProteinGraphDrawer.drawDrawableGraph(dsspFile, formats, null);
-                                drawTGFGraph(args[i+1], args[i+1], formats);
                                 System.out.println("Done drawing GML graph, exiting.");
                             } catch (Exception e) {
                                 System.err.println("Could not read file: " + e.getMessage());

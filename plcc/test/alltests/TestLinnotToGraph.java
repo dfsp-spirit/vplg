@@ -1,5 +1,12 @@
 package alltests;
 
+/*
+ * This file is part of the Visualization of Protein Ligand Graphs (VPLG) software package.
+ *
+ * Copyright Tim Schäfer 2015. VPLG is free software, see the LICENSE and README files for details.
+ *
+ * @author ts
+ */
 
 import graphdrawing.IDrawableEdge;
 import graphdrawing.IDrawableGraph;
@@ -21,19 +28,13 @@ import plcc.PTGLNotations;
 import plcc.ProtGraph;
 
 
-/*
- * This file is part of the Visualization of Protein Ligand Graphs (VPLG) software package.
- *
- * Copyright Tim Schäfer 2015. VPLG is free software, see the LICENSE and README files for details.
- *
- * @author ts
- */
+
 
 /**
  *
  * @author spirit
  */
-public class TestLinnotToGraph {
+public class TestLinnotToGraph extends TestCase {
     
     private String linnot;
     private String graphType;
@@ -42,7 +43,8 @@ public class TestLinnotToGraph {
     /**
      * Sets up the test environment and object.
      */
-     @org.junit.Before public void setUp() {
+     @org.junit.Before@Override
+ public void setUp() {
         linnot = "[h,-1mh,2pe]";
         graphType = SSEGraph.GRAPHTYPE_ALBELIG;
         ltg = new LinnotToGraph(linnot, graphType);
