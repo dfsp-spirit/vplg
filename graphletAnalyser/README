@@ -1,0 +1,128 @@
+About GraphletAnalyser and Graphlets
+-------------------------------------
+GraphletAnalyser reads graphs in graph modeling language (GML) format and counts all
+connected 3-, 4- and 5-graphlets in them. Graphlets are small connected subgraphs. An
+n-graphlet has n vertices:
+
+ -an example for a 3-graphlet is a triangle (= a circle with 3 vertices) 
+ -an example for a 4-graphlet is a path of length 3 (4 vertices connected by 3 edges)
+ -an example for a 5-graphlet is the result of drawing the House of Santa Claus (a German drawing game for children)
+
+Graphlets can be used for network analysis and comparison. They were introduced by 
+Nataša Pržulj et al., 2004. The algorithm which we use to compute the unlabeled graphlets is adapted
+from Shervashidze et al., 2009.
+
+GraphletAnalyser can also compute some biologically motivated labeled graphlets. This C++ implementation was written by
+Tatiana Bakirova and Tim Schäfer at the MolBI group of Goethe-University Frankfurt am Main, Germany.
+
+
+
+
+Authors
+--------
+The initial version, including the graphlet couting algorithm and GML parser, was written by Tatiana Bakirova. 
+Tim Schaefer added config file support, database support and many other options later.
+
+This program is maintained by Tim Schäfer. See http://www.bioinformatik.uni-frankfurt.de/ or http://rcmd.org/ts/ for contact info.
+
+
+
+
+License
+--------
+This is free software, released under the Artistic License 2.0.
+
+
+
+Citing
+-------
+GraphletAnalyser is part of the Visualization of Protein Ligand Graphs (VPLG) software package. If you use it, please cite VPLG.
+
+A publication explaining the method in detail has been published in the Proceedings of the German Conference on Bioinformatics (GCB) 2012 and is available here at the Dagstuhl Research Online Publication Server (Open Access) at:
+http://drops.dagstuhl.de/opus/frontdoor.php?source_opus=3722
+
+BibTeX - Entry:
+
+    @InProceedings{schfer_et_al:OASIcs:2012:3722,
+        author =    {Tim Sch{\"a}fer and Patrick May and Ina Koch},
+        title = {{Computation and Visualization of Protein Topology Graphs Including Ligand Information}},
+        booktitle = {German Conference on Bioinformatics 2012},
+        pages = {108--118},
+        series =    {OpenAccess Series in Informatics (OASIcs)},
+        ISBN =  {978-3-939897-44-6},
+        ISSN =  {2190-6807},
+        year =  {2012},
+        volume =    {26},
+        editor =    {Sebastian B{\"o}cker and Franziska Hufsky and Kerstin Scheubert and Jana Schleicher and Stefan Schuster},
+        publisher = {Schloss Dagstuhl--Leibniz-Zentrum fuer Informatik},
+        address =   {Dagstuhl, Germany},
+        URL =       {http://drops.dagstuhl.de/opus/volltexte/2012/3722},
+        URN =       {urn:nbn:de:0030-drops-37226},
+        doi =       {http://dx.doi.org/10.4230/OASIcs.GCB.2012.108},
+        annote =    {Keywords: protein structure, graph theory, ligand, secondary structure, protein ligang graph}
+    }
+
+    
+    
+    
+
+How to build GraphletAnalyser
+------------------------------
+
+First: these instructions are for Linux and I cannot help with Windows. (I guess your best option is to use cygwin under Windows, but I'm not sure.)
+
+1) Install libs:
+   --The Boost Library >= 1.53, see: http://www.boost.org/doc/libs/1_53_0/more/getting_started/unix-variants.html
+     You need boost_graph and boost_regex (including the devel versions if you take them from your package system).
+   --The pgxx library (C++ database lib for PostgreSQL) and libpq, which is the C version (the C++ version is a wrapper around the C version and thus needs it).
+     They are also available from the packaging system for modern linux distros.
+     
+   Example: command to install all required libs under Open-SuSE 13.1 from the package system:
+     
+       zypper in libpq5 libpqxx-4_0 libpqxx-devel postgresql-devel libboost_graph1_53_0 libboost_regex1_53_0 boost-devel
+       
+   To build the unit tests, you also need cppunit:
+   
+       zypper in cppunit libcppunit-devel
+
+2) Build project (compile + link a graphletAnalyser binary from the source):
+   You can do this from within NetBeans (a NetBeans project file is included) or from the command line. In NetBeans, open the project, right-click it and choose 'Clean and build'. Make sure 
+   to install the C++ plugin for NetBeans though, otherwise you will not be able to open the project (the source directory will not even be recognized as a project).
+   
+   On the command line, just change to the graphletAnalyser code directory and run 'make'.   
+   (The 'make' command will use the Makefile which was created by NetBeans, but you do not need NetBeans for this to work.)
+   
+Done.
+
+
+Creating a new NetBeans C++ project from the source code
+---------------------------------------------------------
+   
+The full NetBeans project configuration is included with the release. If you need to create a new project from existing sources for GraphletAnalyser for some reason (e.g., incompatible NetBeans version), you
+should do the following to get the GraphletAnalyser to compile with NetBeans:
+   
+   A1) Create NetBeans C++ project with the existing GraphletAnalyser sources and add libraries:
+	  Project Properties -> Linker -> Libraries .. <add> libboost_regex, libboost_graph, pqxx, pq
+ 
+      This will add something like '-lboost_regex -lboost_graph -lpqxx -lpq' to your linker command line.
+
+   A2) If you installed the libs from packaging system, the include files should be in /usr/include/ and they will be found automatically. If not, you must also add the proper include dir in Netbeans.
+
+   This will add something like '-I /usr/include/' to your compiler (g++) command line.
+
+
+Running the program -- configuration and usage
+-----------------------------------------------
+You can set most options on the command line, run './graphletanalyser --help' for details.
+
+Since JUL 2014, the program can also read the configuration from a config file. An example file is in
+the testrun/ directory of the source. The file must be named  'graphletanalyser.cfg' and be located
+in the directory where you run GraphletAnalyser.
+
+
+
+Versions of this README file
+------------------------------
+DEC 2013: Initial version by Tatiana Bakirova.
+JUL 2014: Updated for new version and database support by Tim Schäfer. Also added some explanations and details. Added info on configuration options and usage. Added license.
+
