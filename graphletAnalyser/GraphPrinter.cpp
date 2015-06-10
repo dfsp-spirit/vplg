@@ -211,3 +211,92 @@ void GraphPrinter::saveInSimpleFormat() {
     }
 };
 
+/* Saves absolute graphlet counts to a file.
+ * @param <vector<vector<int>>> absolute counts
+ * @param <vector<float>>> labeled counts
+ * @param <bool> include labeled graphlets */
+void GraphPrinter::saveABSGraphletCountsSummary(vector<vector<int>> abs_counts, vector<float> labeled_counts) {
+    ofstream summaryFile;
+    const string summaryFileName = output_path + "counts.plain";
+    
+
+    
+    std::string graphName = service.getName();
+
+    summaryFile.open(summaryFileName.c_str(), std::ios_base::app);
+    if (!summaryFile.is_open()) {
+        cout << apptag << "ERROR: could not open summary file at '" << summaryFileName << "'.\n";
+    } else {
+        summaryFile << graphName;
+        
+
+
+        summaryFile << setw(6) << "[g3] " << setiosflags(ios::fixed) << setprecision(4) << abs_counts[1][0];
+        for (int i = 1; i < abs_counts[1].size(); i++) summaryFile << ", " << setiosflags(ios::fixed) << setprecision(4) << abs_counts[1][i];
+        
+        summaryFile << setw(6) << "[g4] " << setiosflags(ios::fixed) << setprecision(4) << abs_counts[2][0];
+        for (int i = 1; i < abs_counts[2].size(); i++) summaryFile << ", " << setiosflags(ios::fixed) << setprecision(4) << abs_counts[2][i];
+        
+        summaryFile << setw(6) << "[g5] " << setiosflags(ios::fixed) << setprecision(4) << abs_counts[3][0];
+        for (int i = 1; i < abs_counts[3].size(); i++) summaryFile << ", " << setiosflags(ios::fixed) << setprecision(4) << abs_counts[3][i];
+        
+        if (!labeled_counts.empty()) {
+            summaryFile << setw(10) << " [labeled] " << setiosflags(ios::fixed) << setprecision(4) << labeled_counts[0];
+            for (int i = 1; i < labeled_counts.size(); i++) summaryFile << ", " << setiosflags(ios::fixed) << setprecision(4) << labeled_counts[i];
+        }
+
+        summaryFile << "\n\n";
+        summaryFile.close();
+        
+        if( ! silent) {
+            cout << apptag << "    The summary over all computed counts is in \"" << summaryFileName << "\".\n";
+        }
+    }
+    
+    
+}
+
+/* Saves normalized graphlet counts to a file.
+ * @param <vector<vector<float>>> normalized counts
+ * @param <vector<float>>> labeled counts
+ * @param <bool> include labeled graphlets */
+void GraphPrinter::saveNormalizedGraphletCountsSummary(vector<vector<float>> norm_counts, vector<float> labeled_counts) {
+    ofstream summaryFile;
+    const string summaryFileName = output_path + "counts.plain";
+    
+
+    
+    std::string graphName = service.getName();
+
+    summaryFile.open(summaryFileName.c_str(), std::ios_base::app);
+    if (!summaryFile.is_open()) {
+        cout << apptag << "ERROR: could not open summary file at '" << summaryFileName << "'.\n";
+    } else {
+        summaryFile << graphName;
+        
+
+
+        summaryFile << setw(6) << "[g3] " << setiosflags(ios::fixed) << setprecision(4) << norm_counts[1][0];
+        for (int i = 1; i < norm_counts[1].size(); i++) summaryFile << ", " << setiosflags(ios::fixed) << setprecision(4) << norm_counts[1][i];
+        
+        summaryFile << setw(6) << "[g4] " << setiosflags(ios::fixed) << setprecision(4) << norm_counts[2][0];
+        for (int i = 1; i < norm_counts[2].size(); i++) summaryFile << ", " << setiosflags(ios::fixed) << setprecision(4) << norm_counts[2][i];
+        
+        summaryFile << setw(6) << "[g5] " << setiosflags(ios::fixed) << setprecision(4) << norm_counts[3][0];
+        for (int i = 1; i < norm_counts[3].size(); i++) summaryFile << ", " << setiosflags(ios::fixed) << setprecision(4) << norm_counts[3][i];
+        
+        if (!labeled_counts.empty()) {
+            summaryFile << setw(10) << " [labeled] " << setiosflags(ios::fixed) << setprecision(4) << labeled_counts[0];
+            for (int i = 1; i < labeled_counts.size(); i++) summaryFile << ", " << setiosflags(ios::fixed) << setprecision(4) << labeled_counts[i];
+        }
+
+        summaryFile << "\n\n";
+        summaryFile.close();
+        
+        if( ! silent) {
+            cout << apptag << "    The summary over all computed counts is in \"" << summaryFileName << "\".\n";
+        }
+    }
+    
+    
+}

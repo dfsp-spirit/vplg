@@ -49,6 +49,10 @@ GraphletCounts::GraphletCounts() {
     graphlet5CountsNormalized = tmp5;
     vector<float> tmpl (26);
     cl = tmpl;
+    vector<int> tmpl1 (26);
+    labeled_abs_counts = tmpl1;
+    vector<float> tmpl2 (26);
+    labeled_norm_counts = tmpl2;
     
     
     int numOrbits = 73;
@@ -65,7 +69,11 @@ GraphletCounts::GraphletCounts() {
     
     print = verbose;
     printGraphletDetails = saveGraphletDetails;
-    countsComputed = false;
+    all_counts_computed = false;
+    abs_counts_computed = false;
+    norm_counts_computed = false;
+    labeled_abs_counts_computed = false;
+    labeled_norm_counts_computed = false;
 }
 
 GraphletCounts::GraphletCounts(Graph& graph) { 
@@ -154,10 +162,56 @@ GraphletCounts::GraphletCounts(Graph& graph) {
     
     print = verbose;
     printGraphletDetails = saveGraphletDetails;
-    countsComputed = false;
+    all_counts_computed = false;
 }
 
-void GraphletCounts::compute_all_counts(bool withLabeled) {
+void GraphletCounts::compute_abs_counts(bool withLabeled) {
+    graphlet2CountsABS = count_connected_2_graphlets(memberGraph, withLabeled);
+    graphlet3CountsABS = count_connected_3_graphlets(memberGraph, withLabeled);
+    graphlet4CountsABS = count_connected_4_graphlets(memberGraph, withLabeled);
+    graphlet5CountsABS = count_connected_5_graphlets(memberGraph, withLabeled);
+    
+    abs_counts_computed = true;
+    if (withLabeled) {labeled_abs_counts_computed = true;}
+    
+}
+
+void GraphletCounts::compute_norm_counts(bool withLabeled) {
+        
+    graphlet2CountsNormalized = normalize_counts(graphlet2CountsABS, withLabeled);
+    graphlet3CountsNormalized = normalize_counts(graphlet3CountsABS, withLabeled);
+    graphlet4CountsNormalized = normalize_counts(graphlet4CountsABS, withLabeled);
+    graphlet5CountsNormalized = normalize_counts(graphlet5CountsABS, withLabeled);
+    
+    norm_counts_computed = true;
+    if (withLabeled) {labeled_norm_counts_computed = true;}
+}
+
+void GraphletCounts::compute_labeled_counts() {
+    
+    count_connected_2_graphlets(memberGraph, true);
+    count_connected_3_graphlets(memberGraph, true);
+    count_connected_4_graphlets(memberGraph, true);
+    
+    labeled_abs_counts[24] = 0;
+    labeled_abs_counts[25] = 0;        
+    VertexIterator i, i_last;        
+    for (tie(i, i_last) = vertices(memberGraph); i != i_last; ++i) { 
+        if      (memberGraph[*i].properties["sse_type"] == "H") {
+            labeled_abs_counts[24]++; 
+        }
+        else if (memberGraph[*i].properties["sse_type"] == "E") { 
+            labeled_abs_counts[25]++;
+        }
+        else {
+            cout << apptag << "WARNING: Unknown SSE type '" << memberGraph[*i].properties["sse_type"] << "' encountered while counting the number of H and E labels, skipping.\n";
+        }
+    }
+   
+    
+}
+
+void GraphletCounts::compute_all_counts() {
     const string logFileName = logs_path + "count_graphlets_" + graphName + ".log";
     
     if( ! silent) {
@@ -171,33 +225,12 @@ void GraphletCounts::compute_all_counts(bool withLabeled) {
         }
     }
     
-    graphlet2CountsABS = count_connected_2_graphlets(memberGraph, withLabeled);
-    graphlet3CountsABS = count_connected_3_graphlets(memberGraph, withLabeled);
-    graphlet4CountsABS = count_connected_4_graphlets(memberGraph, withLabeled);
-    graphlet5CountsABS = count_connected_5_graphlets(memberGraph, withLabeled);
-    // cl[0..21] were computed while the unlabeled graphlet counting above
-    
-    graphlet2CountsNormalized = normalize_counts(graphlet2CountsABS,withLabeled);
-    graphlet3CountsNormalized = normalize_counts(graphlet3CountsABS,withLabeled);
-    graphlet4CountsNormalized = normalize_counts(graphlet4CountsABS,withLabeled);
-    graphlet5CountsNormalized = normalize_counts(graphlet5CountsABS,withLabeled);
-    
-    if (withLabeled) {
-        cl[24] = 0;
-        cl[25] = 0;        
-        VertexIterator i, i_last;        
-        for (tie(i, i_last) = vertices(memberGraph); i != i_last; ++i) { 
-            if      (memberGraph[*i].properties["sse_type"] == "H") {
-                cl[24]++; 
-            }
-            else if (memberGraph[*i].properties["sse_type"] == "E") { 
-                cl[25]++;
-            }
-            else {
-                cout << apptag << "WARNING: Unknown SSE type '" << memberGraph[*i].properties["sse_type"] << "' encountered while counting the number of H and E labels, skipping.\n";
-            }
-        }
-    }
+    compute_abs_counts(true);
+    compute_norm_counts(true);
+
+
+ 
+   
     
     if (print) { logFile.close(); }
     
@@ -205,13 +238,12 @@ void GraphletCounts::compute_all_counts(bool withLabeled) {
         cout << apptag << "    Graphlet counts for the protein graph " << graphName << " computed.\n";   
     }
     long unsigned int numGraphletsTypesCounted;
-    
-    if(withLabeled) {
-        numGraphletsTypesCounted = graphlet3CountsABS.size() + graphlet4CountsABS.size() + graphlet5CountsABS.size() + cl.size();
-        if( ! silent) {
-            cout << apptag << "    Counted " << graphlet3CountsABS.size() << " different 3-graphlets, " << graphlet4CountsABS.size() << " different 4-graphlets, " << graphlet5CountsABS.size() << " different 5-graphlets and " << cl.size() << " different labeled graphlets (" << numGraphletsTypesCounted << " total).\n";           
-        }
+
+    numGraphletsTypesCounted = graphlet3CountsABS.size() + graphlet4CountsABS.size() + graphlet5CountsABS.size() + cl.size();
+    if( ! silent) {
+        cout << apptag << "    Counted " << graphlet3CountsABS.size() << " different 3-graphlets, " << graphlet4CountsABS.size() << " different 4-graphlets, " << graphlet5CountsABS.size() << " different 5-graphlets and " << cl.size() << " different labeled graphlets (" << numGraphletsTypesCounted << " total).\n";           
     }
+
     else {
         numGraphletsTypesCounted = graphlet3CountsABS.size() + graphlet4CountsABS.size() + graphlet5CountsABS.size();
         if( ! silent) {
@@ -219,7 +251,7 @@ void GraphletCounts::compute_all_counts(bool withLabeled) {
         }
     }
     
-    countsComputed = true;
+    all_counts_computed = true;
 }
 
 /**
@@ -227,9 +259,11 @@ void GraphletCounts::compute_all_counts(bool withLabeled) {
  * graphlet counts by the absolute amount of counted graphlets.
  * Otherwise it normalizes the the unlabeled graphlets only by the 
  * counts of the unlabeled graphlets.
- * @param withLabeled whether to consider labeled gaphlets
+ * @param <bool> withLabeled  to consider labeled graphlets
  */
 vector<float> GraphletCounts::normalize_counts(vector<int> absCounts, bool withLabeled) {
+    
+    // calculate the normalization for the given unlabeled vector
 
     int total_unlabeled = 0;
     vector<float> normalizedCounts = vector<float>();
@@ -242,15 +276,19 @@ vector<float> GraphletCounts::normalize_counts(vector<int> absCounts, bool withL
         float x = float (absCounts[i]);
         normalizedCounts.push_back(x/total_unlabeled);
     }
+    
+    //when withLabeled is true, calculate th3e normalization for all graphlets
+    //in the memberGraph and use that data to calculate the normalization for
+    //the vector which corresponds to labeled graphlets
 
 
     if(withLabeled) {
         float total_labeled = 0;
         float total = 0;
         
-        graphlet3CountsABS = count_connected_3_graphlets(memberGraph, false);
-        graphlet4CountsABS = count_connected_4_graphlets(memberGraph, false);
-        graphlet5CountsABS = count_connected_5_graphlets(memberGraph, false);
+        graphlet3CountsABS = count_connected_3_graphlets(memberGraph, withLabeled);
+        graphlet4CountsABS = count_connected_4_graphlets(memberGraph, withLabeled);
+        graphlet5CountsABS = count_connected_5_graphlets(memberGraph, withLabeled);
         
         
         //calculate the sum of unlabeled graphlet counts
@@ -267,28 +305,28 @@ vector<float> GraphletCounts::normalize_counts(vector<int> absCounts, bool withL
         }
     
         // calculate the sum of labeled graphlet counts
-        for (int i = 0; i < cl.size(); i++){
-            total_labeled += cl[i];
+        for (int i = 0; i < labeled_abs_counts.size(); i++){
+            total_labeled += labeled_abs_counts[i];
         }
         
         total = total_labeled + total_unlabeled;
         
         if(total != 0){
 
-            for (int i = 0; i < cl.size(); i++){
-                cl[i] = cl[i] / total;
+            for (int i = 0; i < labeled_abs_counts.size(); i++){
+                labeled_norm_counts[i] = float (labeled_abs_counts[i]) / float (total);
             }
 
             for (int i = 0; i < graphlet3CountsNormalized.size(); i++) {
-                graphlet3CountsNormalized[i] = float (graphlet3CountsABS[i]) / total;
+                graphlet3CountsNormalized[i] = float (graphlet3CountsABS[i]) / float (total);
             }
 
             for (int i = 0; i < graphlet4CountsNormalized.size(); i++) {
-                graphlet4CountsNormalized[i] = float (graphlet4CountsABS[i]) / total;
+                graphlet4CountsNormalized[i] = float (graphlet4CountsABS[i]) / float (total);
             }
 
             for (int i = 0; i < graphlet5CountsNormalized.size(); i++) {
-                graphlet5CountsNormalized[i] = float (graphlet5CountsABS[i]) / total;
+                graphlet5CountsNormalized[i] = float (graphlet5CountsABS[i]) / float (total);
             }
         }
     } 
@@ -308,8 +346,8 @@ void GraphletCounts::saveCountsSummary(bool withLabeled) {
     ofstream summaryFile;
     const string summaryFileName = output_path + "counts.plain";
     
-    if (!countsComputed) {
-        compute_all_counts(withLabeled);
+    if (!all_counts_computed) {
+        compute_all_counts();
     }
 
     summaryFile.open(summaryFileName.c_str(), std::ios_base::app);
@@ -433,8 +471,8 @@ int GraphletCounts::saveCountsToDatabasePGXX(bool withLabeled) {
     Database db = Database::getInstance();
     string connection_string = db.get_connect_string();
     
-    if (!countsComputed) {
-        compute_all_counts(withLabeled);
+    if (!all_counts_computed) {
+        compute_all_counts();
     }
     
     if(graphtype <= 0 || graphtype >= 7) {
@@ -636,8 +674,8 @@ void GraphletCounts::saveCountsAsMatlabVariable(bool withLabeled) {
     const string countsMatlabFileName = output_path + "countsMatlabFormat.m";
     int pos;
     
-    if (!countsComputed) {
-        compute_all_counts(withLabeled);
+    if (!all_counts_computed) {
+        compute_all_counts();
     }
 
     countsMatlabFile.open(countsMatlabFileName.c_str(), std::ios_base::app);    
@@ -684,8 +722,8 @@ void GraphletCounts::saveCountsInNovaFormat(bool withLabeled) {
     int pos;
     int numberOfGraphlets;
     
-    if (!countsComputed) {
-        compute_all_counts(withLabeled);
+    if (!all_counts_computed) {
+        compute_all_counts();
     }
 
     countsNovaFormatFile.open(countsNovaFormatFileName.c_str(), std::ios_base::app);    
@@ -763,6 +801,8 @@ vector<int> GraphletCounts::count_connected_3_graphlets(Graph& g, bool withLabel
     c3 = vector<float>(2);
     float count[] = { 0.0, 0.0 };
     float w[]     = { 1/6.0, 1/2.0 };
+    
+    memberGraph = g;
     
     print = false; // printing might disturb tests
 
@@ -939,9 +979,13 @@ vector<int> GraphletCounts::count_connected_3_graphlets(Graph& g, bool withLabel
     if (withLabeled) {
         for (int i = 0; i < 10; i++) {
             cl[i] = lcount[i] * lw[i];
+            labeled_abs_counts[i] = int (floor (cl[i]));
         }
         cl[20] = lcount[10] * lw[10];
         cl[21] = lcount[11] * lw[11];
+        
+        labeled_abs_counts[20] = int (floor (cl[20]));
+        labeled_abs_counts[21] = int (floor (cl[21]));
 
     }
     
@@ -952,6 +996,7 @@ vector<int> GraphletCounts::count_connected_3_graphlets(Graph& g, bool withLabel
     for (auto i = c3.begin(); i != c3.end(); i++) {
         int count = int (floor(*i));
         graphlet3Counts.push_back(count);
+        
     }
     
     if (print) logFile << "\n"
@@ -975,6 +1020,8 @@ vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g, bool withLabel
     c2 = vector<float>(1);   // The only 2-graphlet is a path of length 1 (one edge).
     float count[] = { 0.0 };
     float w[]     = { 1/2.0 };  // each edge will be found twice (from both vertices it connects))
+    
+    memberGraph = g;
     
     int numelem = 3;
     float lcount[numelem];
@@ -1052,6 +1099,7 @@ vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g, bool withLabel
     if (withLabeled) {
         for (int i = 0; i < numelem; i++) {
             cl[i] = lcount[i] * lw[i];
+            labeled_abs_counts[i] = int (floor (cl[i]));
         }
     }
     
@@ -1098,6 +1146,8 @@ vector<int> GraphletCounts::count_connected_4_graphlets(Graph& g, bool withLabel
      * The algorithm seems to work nonetheless
      * 
      *  */
+    
+    memberGraph = g;
     
     print = false; // printing might disturb tests
     
@@ -1267,9 +1317,14 @@ vector<int> GraphletCounts::count_connected_4_graphlets(Graph& g, bool withLabel
     if (withLabeled) {
         for (int i = 0; i < 10; i++) {
             cl[i + 10] = lcount[i] * lw[i];
+            labeled_abs_counts[i+10] = int (floor(cl[i+10]));
         }
+        
         cl[22] = lcount[10] * lw[10];
         cl[23] = lcount[11] * lw[11];
+        
+        labeled_abs_counts[22] = int (floor (cl[22]));
+        labeled_abs_counts[23] = int (floor (cl[23]));
     }
 
     vector<int> graphlet4Counts;
@@ -1298,6 +1353,8 @@ vector<int> GraphletCounts::count_connected_4_graphlets(Graph& g, bool withLabel
  */
 
 vector<int> GraphletCounts::count_connected_5_graphlets(Graph& g, bool withLabeled) {    
+    
+    memberGraph = g;
     
     print = false; // printing might disturb tests
     
@@ -1629,3 +1686,50 @@ vector<int> GraphletCounts::count_connected_5_graphlets(Graph& g, bool withLabel
     return graphlet5Counts; 
 }
 
+
+vector<vector<int>> GraphletCounts::get_abs_counts() {
+    
+    vector<vector<int>> abs_counts_vector = vector<vector<int>>();
+    
+    if (!all_counts_computed) {
+        compute_all_counts();
+    }
+    
+    abs_counts_vector.push_back(graphlet2CountsABS);
+    abs_counts_vector.push_back(graphlet3CountsABS);
+    abs_counts_vector.push_back(graphlet4CountsABS);
+    abs_counts_vector.push_back(graphlet5CountsABS);
+    
+    return abs_counts_vector;
+    
+}
+
+vector<vector<float>> GraphletCounts::get_normalized_counts() {
+    
+    vector<vector<float>> norm_counts_vector = vector<vector<float>>();
+    
+    if (!all_counts_computed) {
+        compute_all_counts();
+    }
+    
+    norm_counts_vector.push_back(graphlet2CountsNormalized);
+    norm_counts_vector.push_back(graphlet3CountsNormalized);
+    norm_counts_vector.push_back(graphlet4CountsNormalized);
+    norm_counts_vector.push_back(graphlet5CountsNormalized);
+    
+    return norm_counts_vector;
+}
+
+vector<float> GraphletCounts::get_labeled_norm_counts() {
+    
+    if (!labeled_norm_counts_computed) {compute_norm_counts(true);}
+    
+    return labeled_norm_counts;
+}
+
+vector<int> GraphletCounts::get_labeled_abs_counts() {
+    
+    if (!labeled_abs_counts_computed) {compute_abs_counts(true);}
+    
+    return labeled_abs_counts;
+}

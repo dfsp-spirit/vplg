@@ -28,11 +28,11 @@ void newtestclass2::setUp() {
     xi.id = 4;
 
     
-    GraphletCounts counter(fiveNodesGraph);
+    GraphletCounts counter();
     
-    // fourth graph for counting 5-graphlets
-    // graph will be initialized as a complete graph
-    // edges will be deleted in testing methods successively
+    // graph for counting graphlets
+    // graph will be initialized as a only with nodes
+    // edges will be added in testing methods successively
     
     t = add_vertex(ti, fiveNodesGraph);
     u = add_vertex(ui, fiveNodesGraph);

@@ -37,6 +37,8 @@ private:
     
     
     std::vector<float> cl;  // counts for labeled graphlets
+    std::vector<int> labeled_abs_counts; // absolute counts for labeled graphlets
+    std::vector<float> labeled_norm_counts; // normalized counts for labeled graphlets
    
     std::vector< std::vector<float> > graphletDegreeDistribution;
     
@@ -44,7 +46,19 @@ private:
     bool printGraphletDetails;
     std::ofstream logFile;
     
-    bool countsComputed; // check whether compute_all_counts has already been called
+    bool all_counts_computed; // check whether compute_all_counts has already been called
+    bool abs_counts_computed;
+    bool norm_counts_computed;
+    
+    bool labeled_norm_counts_computed;
+    bool labeled_abs_counts_computed;
+    
+    
+    void compute_all_counts();
+    void compute_abs_counts(bool);
+    void compute_norm_counts(bool);
+    void compute_labeled_counts();
+    
 
 public:
     // constructors
@@ -52,7 +66,11 @@ public:
     GraphletCounts(Graph&);
     
     // methods
-    void compute_all_counts(bool); 
+    
+    std::vector<std::vector<int>> get_abs_counts();
+    vector<vector<float>> get_normalized_counts();
+    std::vector<float> get_labeled_norm_counts();
+    std::vector<int> get_labeled_abs_counts();
     vector<float> normalize_counts(vector<int>,bool);
     void saveCountsSummary(bool);
     void saveCountsAsMatlabVariable(bool);

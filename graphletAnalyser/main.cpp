@@ -386,14 +386,21 @@ int main(int argc, char** argv) {
             withLabeled = false;
         }
         
-        gc.compute_all_counts(withLabeled);
+        vector<vector<float>> norm_counts = gc.get_normalized_counts();
 	     
         if( ! silent) {
             cout << apptag << "  Saving results.\n";
         }
 		
         if(options["output_counts_summary"] == "yes") {
-                gc.saveCountsSummary(withLabeled);
+            
+            if (withLabeled) {
+                vector<float> labeled_counts = gc.get_labeled_norm_counts();
+                printer.saveNormalizedGraphletCountsSummary(norm_counts, labeled_counts);
+            } else {
+                vector<float> labeled_counts = vector<float>();
+                printer.saveNormalizedGraphletCountsSummary(norm_counts, labeled_counts);
+            }
         }
 
         if(options["output_counts_database"] == "yes") {

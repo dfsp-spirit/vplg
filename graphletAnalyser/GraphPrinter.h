@@ -11,6 +11,7 @@
 #include "Graph.h"
 #include "global.h"
 #include "GraphService.h"
+#include "GraphletCounts.h"
 
 using namespace boost;
 
@@ -24,7 +25,7 @@ protected:
         //attributes
         Graph g; // a graph
         GraphService service; // a service object to get data from the graph
-    
+        GraphletCounts counter;
 public:
     
     //constructors
@@ -39,7 +40,8 @@ public:
     void saveAsMatlabVariable(int& number); // saves the graphs as a matlab file
     void saveGraphStatisticsAsMatlabVariable(); // saves the output of printGraphInfo to a matlab file
     void saveInSimpleFormat(); // save the edges of the graph to a file
-    
+    void saveABSGraphletCountsSummary(vector<vector<int>> abs_counts, vector<float> labeled_counts);
+    void saveNormalizedGraphletCountsSummary(vector<vector<float>> norm_counts, vector<float> labeled_counts);
 };
 
 #endif	/* GRAPHPRINTER_H */
