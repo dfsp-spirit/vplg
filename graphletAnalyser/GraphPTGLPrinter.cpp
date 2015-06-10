@@ -9,16 +9,14 @@
 
 /* default constructor */
 GraphPTGLPrinter::GraphPTGLPrinter() {
-    Graph g_tmp;
     GraphService service_tmp;
-    g = g_tmp;
+
     service = service_tmp;
 };
 
 
-GraphPTGLPrinter::GraphPTGLPrinter(const Graph& graph) {
-  g = graph;
-  service = GraphService(g);
+GraphPTGLPrinter::GraphPTGLPrinter(GraphService& serv) {
+  service = serv;
 };
 
 /*
@@ -26,6 +24,9 @@ GraphPTGLPrinter::GraphPTGLPrinter(const Graph& graph) {
  * CAUTION: only applicable to ptgl protein graphs */
 std::string GraphPTGLPrinter::printVertices() {
     VertexIterator vi, vi_end, next; // create vertex iterator objects
+    
+    Graph g = service.getGraph();
+    
     tie(vi, vi_end) = vertices(g); // that belong to the graph
     stringstream sstream; // to be saved in a string
     
@@ -48,6 +49,7 @@ std::string GraphPTGLPrinter::printEdges() {
     EdgeIterator ei, ei_end;
     stringstream sstream;
     
+    Graph g = service.getGraph();
     
     sstream << "Iterate over the edges and print their properties:\n";
     if (formatted) {
@@ -94,6 +96,9 @@ string GraphPTGLPrinter::printGraphString() {
     // define iterators
     VertexIterator vi, vi_end, next;
     EdgeIterator ei, ei_end;
+    
+    Graph g = service.getGraph();
+    
     tie(vi, vi_end) = vertices(g);
     
     // set up the string stream

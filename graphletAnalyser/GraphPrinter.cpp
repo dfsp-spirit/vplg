@@ -10,17 +10,14 @@
 /*
  * Default constructor */
 GraphPrinter::GraphPrinter() {
-    Graph g_tmp;
     GraphService gService_tmp;
-    g = g_tmp;
     service = gService_tmp;
 };
 
 
 
-GraphPrinter::GraphPrinter(const Graph& graph) {
-    g = graph;
-    service = GraphService(g);
+GraphPrinter::GraphPrinter(GraphService& serv) {
+    service = serv;
 };
 
 
@@ -29,6 +26,8 @@ GraphPrinter::GraphPrinter(const Graph& graph) {
 std::string GraphPrinter::printAdjacent(int i) {
     AdjacencyIterator first, last;
     stringstream sstream;
+    
+    Graph g = service.getGraph();
     
     // iterate over adjacent vertices and print their ids to a string
     sstream << "  " << setw(2) << vertex(i,g) << ": "; 
@@ -44,8 +43,10 @@ std::string GraphPrinter::printAdjacent(int i) {
 std::string GraphPrinter::printAdjacentAll() {
     stringstream sstream;
     
+    int n = service.getNumVertices();
+    
     sstream << "Iterate over the vertices and print their adjacent vertices:\n"; 
-    for (int i = 0; i < num_vertices(g); i++) {
+    for (int i = 0; i < n; i++) {
         sstream << printAdjacent(i);
     }
     sstream << endl;
@@ -98,6 +99,8 @@ void GraphPrinter::saveAsMatlabVariable(int& number) {
     AdjacencyIterator first, last;
     ofstream matlabFile;
     const string matlabFileName = output_path + "graphsMatlabFormat.m"; // make output file
+    
+    Graph g = service.getGraph();
     
     // open the file
     matlabFile.open(matlabFileName.c_str(), std::ios_base::app);
@@ -197,6 +200,9 @@ void GraphPrinter::saveGraphStatisticsAsMatlabVariable() {
  * The name of the file will be of the form "simple_format_graphname.graph".
  * In simple format, the graph will be represented by its edges. */
 void GraphPrinter::saveInSimpleFormat() {
+    
+    Graph g = service.getGraph();
+    
     EdgeIterator ei, ei_end;
     const string outFileName = output_path + "simple_format_" + service.getName() + ".graph";
     ofstream outFile;
@@ -259,7 +265,7 @@ void GraphPrinter::saveABSGraphletCountsSummary(vector<vector<int>> abs_counts, 
 /* Saves normalized graphlet counts to a file.
  * @param <vector<vector<float>>> normalized counts
  * @param <vector<float>>> labeled counts
- * @param <bool> include labeled graphlets */
+ *  */
 void GraphPrinter::saveNormalizedGraphletCountsSummary(vector<vector<float>> norm_counts, vector<float> labeled_counts) {
     ofstream summaryFile;
     const string summaryFileName = output_path + "counts.plain";
@@ -299,4 +305,90 @@ void GraphPrinter::saveNormalizedGraphletCountsSummary(vector<vector<float>> nor
     }
     
     
+}
+
+/**
+ * Saves the normalized graphlet counts in MATLAB format to the MATLAB output file. If the file does already exist,
+ * the data for this graph gets appended to it. Ignores 2-graphlets.
+ * @param <vector<vector<float>>> unlabeled counts
+ * @param <veector<float>> labeled counts
+ */
+void GraphPrinter::save_normalized_counts_as_matlab_variable(vector<vector<float>> unlabeled_counts, vector<float> labeled_counts) {    
+    ofstream countsMatlabFile;
+    const string countsMatlabFileName = output_path + "countsMatlabFormat.m";
+    int pos;
+
+
+    countsMatlabFile.open(countsMatlabFileName.c_str(), std::ios_base::app);    
+    if (!countsMatlabFile.is_open()) {
+        cout << apptag << "ERROR: could not open matlab counts file.\n";
+    } else {
+        pos = countsMatlabFile.tellp();
+        if (pos == 0) {
+            countsMatlabFile << "myCounts = ([\n";
+        } else {
+            /* optional TODO: overwrite last 3 characters
+             *                to substitute  "]);" by "],\n"
+             *                otherwise, you have to do this manually 
+             */
+        }
+            
+        countsMatlabFile << "[" << unlabeled_counts[1][0];
+        for (int i = 1; i < unlabeled_counts[1].size(); i++) countsMatlabFile << ", " << unlabeled_counts[1][i];
+        for (int i = 0; i < unlabeled_counts[2].size(); i++) countsMatlabFile << ", " << unlabeled_counts[2][i];
+        for (int i = 0; i < unlabeled_counts[3].size(); i++) countsMatlabFile << ", " << unlabeled_counts[3][i];
+        if (!labeled_counts.empty()) {
+            for (int i = 0; i < labeled_counts.size(); i++) countsMatlabFile << ", " << labeled_counts[i];
+        }
+        
+        countsMatlabFile << "],\n";
+        countsMatlabFile.close();
+        
+        if( ! silent) {
+            cout << apptag << "    The counts were added to the \"" << countsMatlabFileName << "\".\n";
+        }
+    }
+}
+
+/**
+ * Saves the absolute graphlet counts in MATLAB format to the MATLAB output file. If the file does already exist,
+ * the data for this graph gets appended to it. Ignores 2-graphlets.
+ * @param <vector<vector<float>>> unlabeled counts
+ * @param <veector<float>> labeled counts
+ */
+void GraphPrinter::save_absolute_counts_as_matlab_variable(vector<vector<int>> unlabeled_counts, vector<int> labeled_counts) {    
+    ofstream countsMatlabFile;
+    const string countsMatlabFileName = output_path + "countsMatlabFormat.m";
+    int pos;
+
+
+    countsMatlabFile.open(countsMatlabFileName.c_str(), std::ios_base::app);    
+    if (!countsMatlabFile.is_open()) {
+        cout << apptag << "ERROR: could not open matlab counts file.\n";
+    } else {
+        pos = countsMatlabFile.tellp();
+        if (pos == 0) {
+            countsMatlabFile << "myCounts = ([\n";
+        } else {
+            /* optional TODO: overwrite last 3 characters
+             *                to substitute  "]);" by "],\n"
+             *                otherwise, you have to do this manually 
+             */
+        }
+            
+        countsMatlabFile << "[" << unlabeled_counts[1][0];
+        for (int i = 1; i < unlabeled_counts[1].size(); i++) countsMatlabFile << ", " << unlabeled_counts[1][i];
+        for (int i = 0; i < unlabeled_counts[2].size(); i++) countsMatlabFile << ", " << unlabeled_counts[2][i];
+        for (int i = 0; i < unlabeled_counts[3].size(); i++) countsMatlabFile << ", " << unlabeled_counts[3][i];
+        if (!labeled_counts.empty()) {
+            for (int i = 0; i < labeled_counts.size(); i++) countsMatlabFile << ", " << labeled_counts[i];
+        }
+        
+        countsMatlabFile << "],\n";
+        countsMatlabFile.close();
+        
+        if( ! silent) {
+            cout << apptag << "    The counts were added to the \"" << countsMatlabFileName << "\".\n";
+        }
+    }
 }

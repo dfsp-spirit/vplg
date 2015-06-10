@@ -664,50 +664,7 @@ long GraphletCounts::getGraphDatabaseID(string pdbid, string chain, int graphTyp
 }
 
 
-/**
- * Saves the graphlet counts in MATLAB format to the MATLAB output file. If the file does already exist,
- * the data for this graph gets appended to it.
- * @param withLabeled whether to write labeled graphlet info as well
- */
-void GraphletCounts::saveCountsAsMatlabVariable(bool withLabeled) {    
-    ofstream countsMatlabFile;
-    const string countsMatlabFileName = output_path + "countsMatlabFormat.m";
-    int pos;
-    
-    if (!all_counts_computed) {
-        compute_all_counts();
-    }
 
-    countsMatlabFile.open(countsMatlabFileName.c_str(), std::ios_base::app);    
-    if (!countsMatlabFile.is_open()) {
-        cout << apptag << "ERROR: could not open matlab counts file.\n";
-    } else {
-        pos = countsMatlabFile.tellp();
-        if (pos == 0) {
-            countsMatlabFile << "myCounts = ([\n";
-        } else {
-            /* optional TODO: overwrite last 3 characters
-             *                to substitute  "]);" by "],\n"
-             *                otherwise, you have to do this manually 
-             */
-        }
-            
-        countsMatlabFile << "[" << graphlet3CountsNormalized[0];
-        for (int i = 1; i < graphlet3CountsNormalized.size(); i++) countsMatlabFile << ", " << graphlet3CountsNormalized[i];
-        for (int i = 0; i < graphlet4CountsNormalized.size(); i++) countsMatlabFile << ", " << graphlet4CountsNormalized[i];
-        for (int i = 0; i < graphlet5CountsNormalized.size(); i++) countsMatlabFile << ", " << graphlet5CountsNormalized[i];
-        if (withLabeled) {
-            for (int i = 0; i < cl.size(); i++) countsMatlabFile << ", " << cl[i];
-        }
-        
-        countsMatlabFile << "],\n";
-        countsMatlabFile.close();
-        
-        if( ! silent) {
-            cout << apptag << "    The counts were added to the \"" << countsMatlabFileName << "\".\n";
-        }
-    }
-}
 
 
 /**
@@ -1691,8 +1648,8 @@ vector<vector<int>> GraphletCounts::get_abs_counts() {
     
     vector<vector<int>> abs_counts_vector = vector<vector<int>>();
     
-    if (!all_counts_computed) {
-        compute_all_counts();
+    if (!abs_counts_computed) {
+        compute_abs_counts(false);
     }
     
     abs_counts_vector.push_back(graphlet2CountsABS);
@@ -1708,8 +1665,8 @@ vector<vector<float>> GraphletCounts::get_normalized_counts() {
     
     vector<vector<float>> norm_counts_vector = vector<vector<float>>();
     
-    if (!all_counts_computed) {
-        compute_all_counts();
+    if (!norm_counts_computed) {
+        compute_norm_counts(false);
     }
     
     norm_counts_vector.push_back(graphlet2CountsNormalized);

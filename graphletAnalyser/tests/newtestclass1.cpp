@@ -49,7 +49,9 @@ void newtestclass1::setUp() {
     
     // defining the test string and the printer
     testStringAdjacent = "   0:   1   2  ";
-    printer = GraphPrinter(threeNodesGraph);
+    service = GraphService(threeNodesGraph);
+    
+    GraphPrinter printer(service);
     
 }
 

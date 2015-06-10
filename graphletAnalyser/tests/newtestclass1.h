@@ -10,6 +10,7 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 #include "../GraphPrinter.h"
+#include "../GraphService.h"
 
 class newtestclass1 : public CPPUNIT_NS::TestFixture {
     CPPUNIT_TEST_SUITE(newtestclass1);
@@ -29,7 +30,10 @@ public:
 private:
     
     Graph threeNodesGraph;
+    GraphService service;
+    
     GraphPrinter printer;
+    
     VertexDescriptor u,v,w;
     vertex_info vi,ui,wi;
     edge_info ei,fi,gi;

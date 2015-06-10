@@ -73,7 +73,6 @@ public:
     std::vector<int> get_labeled_abs_counts();
     vector<float> normalize_counts(vector<int>,bool);
     void saveCountsSummary(bool);
-    void saveCountsAsMatlabVariable(bool);
     void saveCountsInNovaFormat(bool);
     int saveCountsToDatabasePGXX(bool);
     int databaseContainsGraphletsForGraph(unsigned long int);

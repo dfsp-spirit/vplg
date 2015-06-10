@@ -23,14 +23,13 @@ class GraphPrinter {
     
 protected:
         //attributes
-        Graph g; // a graph
         GraphService service; // a service object to get data from the graph
         GraphletCounts counter;
 public:
     
     //constructors
     GraphPrinter();
-    GraphPrinter(const Graph& graph);
+    GraphPrinter(GraphService& serv);
     
     //methods, doing what their name says
     
@@ -42,6 +41,8 @@ public:
     void saveInSimpleFormat(); // save the edges of the graph to a file
     void saveABSGraphletCountsSummary(vector<vector<int>> abs_counts, vector<float> labeled_counts);
     void saveNormalizedGraphletCountsSummary(vector<vector<float>> norm_counts, vector<float> labeled_counts);
+    void save_normalized_counts_as_matlab_variable(vector<vector<float>>,vector<float>);
+    void save_absolute_counts_as_matlab_variable(vector<vector<int>>,vector<int>);
 };
 
 #endif	/* GRAPHPRINTER_H */

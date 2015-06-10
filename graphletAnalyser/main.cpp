@@ -349,7 +349,7 @@ int main(int argc, char** argv) {
         GMLptglProteinParser Parser(files[i]);
         Graph graph = Parser.getGraph();
         GraphService service(graph);
-        GraphPTGLPrinter printer(graph);
+        GraphPTGLPrinter printer(service);
         
         if(service.getNumVertices() <= 0) {
             if( ! silent) {
@@ -387,6 +387,9 @@ int main(int argc, char** argv) {
         }
         
         vector<vector<float>> norm_counts = gc.get_normalized_counts();
+        vector<float> norm_labeled_counts = vector<float>();
+        
+        if (withLabeled) {norm_labeled_counts = gc.get_labeled_norm_counts();}
 	     
         if( ! silent) {
             cout << apptag << "  Saving results.\n";
@@ -408,7 +411,7 @@ int main(int argc, char** argv) {
         }
 
         if(options["output_counts_matlab"] == "yes") {
-            gc.saveCountsAsMatlabVariable(withLabeled);
+            printer.save_normalized_counts_as_matlab_variable(norm_counts, norm_labeled_counts);
         }
 
         if(options["output_counts_nova"] == "yes") {
