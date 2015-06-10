@@ -89,6 +89,13 @@ void BronKerbosch::run() {
 }// end run
 
 /*
+ * Returns a const reference to the graph on which the Bron-Kerbosch algorithm was used on. 
+ */
+const Graph_p& BronKerbosch::get_Product_Graph() const{
+    return this->g;
+}
+
+/*
  * Clears the stored results from the last time run was called. 
  * This function is only useful if you want to reuse the same BronKerbosch object multiple times and want to 
  * minimize the used memory between the uses.
@@ -102,45 +109,10 @@ void BronKerbosch::clear_results() {
  * Returns the complete list of all calculated Cliques.
  * If run(...) was not called before this function the result will be an empty list.
  */
-std::forward_list<std::list<VertexDescriptor_p>>  BronKerbosch::get_result_list() {
+std::list<std::list<VertexDescriptor_p>>  BronKerbosch::get_result_list() const{
         return this->result;
     }
 
-/*
- * Returns a vector with the number of occurrences of Cliques of each size.  A value x at position i indicates x cliques of size i were found.
- * If run(...) was not called before this function the result will be an empty vector.
- */
- std::vector<int>  BronKerbosch::get_result_pattern() {
-        std::vector<int> pattern;
-        for (std::list<VertexDescriptor_p> c : this->result) {
-            while (pattern.size() <= c.size() ) {
-                pattern.push_back(0);
-            }
-            ++pattern[c.size()];
-        }
-        return pattern;
-    }
- 
-/*
- * Returns a list of all Cliques of maximum size
- * If run(...) was not called before this function the result will be an empty list.
- */
- std::forward_list<std::list<VertexDescriptor_p>> BronKerbosch::get_result_largest(){
-     std::forward_list<std::list<VertexDescriptor_p>> list;
-     int largest = 0;
-     for (std::list<VertexDescriptor_p> c : this->result) {
-         if (c.size() > largest) {
-             largest = c.size();
-             list.clear();
-         } else {
-             if (c.size() == largest) {
-                 list.push_front(c);
-             }
-         }
-     }
-     return list;
- }
- 
 /*
  * Private function to do the actual work.
  * It is initialized by the run function, giving it a single vertex in the set C.

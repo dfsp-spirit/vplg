@@ -10,7 +10,6 @@
 
 
 #include "Graph.h"
-#include <forward_list>
 
 
 class ProductGraph {
@@ -20,10 +19,10 @@ public:
     ProductGraph(const ProductGraph&);
     ~ProductGraph();
     
-    std::forward_list<std::pair<EdgeDescriptor, EdgeDescriptor>> resultmapping(std::set<VertexDescriptor_p>& S);
     Graph_p& getProductGraph();
-    const Graph& getFirstGraph();
-    const Graph& getSecondGraph();
+    const Graph_p& getProductGraph() const;
+    const Graph& getFirstGraph() const;
+    const Graph& getSecondGraph() const;
 
 private:
     std::pair<bool,bool> verticesCompatible(VertexIterator_p vi1, VertexIterator_p vi2);

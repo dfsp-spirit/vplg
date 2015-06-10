@@ -35,8 +35,10 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/BK_Output.o \
 	${OBJECTDIR}/BronKerbosch.o \
 	${OBJECTDIR}/GMLptglProteinParser.o \
+	${OBJECTDIR}/PG_Output.o \
 	${OBJECTDIR}/ProductGraph.o \
 	${OBJECTDIR}/newmain.o
 
@@ -71,6 +73,11 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/bk_protsim: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/bk_protsim ${OBJECTFILES} ${LDLIBSOPTIONS}
 
+${OBJECTDIR}/BK_Output.o: BK_Output.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/BK_Output.o BK_Output.cpp
+
 ${OBJECTDIR}/BronKerbosch.o: BronKerbosch.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
@@ -80,6 +87,11 @@ ${OBJECTDIR}/GMLptglProteinParser.o: GMLptglProteinParser.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GMLptglProteinParser.o GMLptglProteinParser.cpp
+
+${OBJECTDIR}/PG_Output.o: PG_Output.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/PG_Output.o PG_Output.cpp
 
 ${OBJECTDIR}/ProductGraph.o: ProductGraph.cpp 
 	${MKDIR} -p ${OBJECTDIR}
@@ -113,6 +125,19 @@ ${TESTDIR}/tests/newtestrunner.o: tests/newtestrunner.cpp
 	$(COMPILE.cc) -g `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner.o tests/newtestrunner.cpp
 
 
+${OBJECTDIR}/BK_Output_nomain.o: ${OBJECTDIR}/BK_Output.o BK_Output.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/BK_Output.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/BK_Output_nomain.o BK_Output.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/BK_Output.o ${OBJECTDIR}/BK_Output_nomain.o;\
+	fi
+
 ${OBJECTDIR}/BronKerbosch_nomain.o: ${OBJECTDIR}/BronKerbosch.o BronKerbosch.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	@NMOUTPUT=`${NM} ${OBJECTDIR}/BronKerbosch.o`; \
@@ -137,6 +162,19 @@ ${OBJECTDIR}/GMLptglProteinParser_nomain.o: ${OBJECTDIR}/GMLptglProteinParser.o 
 	    $(COMPILE.cc) -g -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GMLptglProteinParser_nomain.o GMLptglProteinParser.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/GMLptglProteinParser.o ${OBJECTDIR}/GMLptglProteinParser_nomain.o;\
+	fi
+
+${OBJECTDIR}/PG_Output_nomain.o: ${OBJECTDIR}/PG_Output.o PG_Output.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/PG_Output.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/PG_Output_nomain.o PG_Output.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/PG_Output.o ${OBJECTDIR}/PG_Output_nomain.o;\
 	fi
 
 ${OBJECTDIR}/ProductGraph_nomain.o: ${OBJECTDIR}/ProductGraph.o ProductGraph.cpp 

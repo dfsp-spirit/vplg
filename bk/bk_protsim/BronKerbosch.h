@@ -10,7 +10,6 @@
 
 #include "Graph.h"
 #include <set>
-#include <forward_list>
 
 /*
  * struct to handle the membership of vertices to sets. 
@@ -39,10 +38,8 @@ public:
     
     void  run();
     void clear_results();
-    std::forward_list<std::list<VertexDescriptor_p>>  get_result_list();
-    std::vector<int>  get_result_pattern();
-    std::forward_list<std::list<VertexDescriptor_p>> get_result_largest();
-    
+    std::list<std::list<VertexDescriptor_p>>  get_result_list() const;
+    const Graph_p& get_Product_Graph() const;
     
 private:
     //members needed to find the cliques in a recursive function (work like global variables).
@@ -52,9 +49,9 @@ private:
     object* set_array;
     object* vertex_array;
     std::set<VertexDescriptor_p> T;
-    
+   
     //stores the results 
-    std::forward_list<std::list<VertexDescriptor_p>> result;
+    std::list<std::list<VertexDescriptor_p>> result;
     
     //convertes the results from the internal format into a std container
     std::list<VertexDescriptor_p> output_clique(int s);
