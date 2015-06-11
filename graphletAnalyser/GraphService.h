@@ -21,7 +21,6 @@
 
 
 #include "Graph.h"
-using namespace std;
 
 /*This Headerfile is meant to define functions for supporting several graph services,
  * including:   Creation of GML files from graphs,
@@ -84,16 +83,19 @@ public:
     //methods
     
     GraphService(); // default constructor
-    GraphService(const Graph graph); // constructor
+    GraphService(Graph graph); // constructor
     Graph getGraph(); // returns the graph
-    string getName(); // returns the graph's label
-    vector<string> getGraphProperties(); //Returns property keys
-    string getPropertyValue(string prop); // returns value for a property
+    std::string get_label(); // returns the graph's label
+    std::vector<std::string> getGraphProperties(); //Returns property keys
+    std::string getPropertyValue(std::string prop); // returns value for a property
     int getNumVertices(); // number of vertices
     int getNumEdges(); //number of edges
-    vector<int> getVertices(); 
-    vector<pair<int, int>> getEdges();
-    vector<int>computeDegreeDist(); // compute node degree distribution
+    std::vector<int> getVertices(); 
+    std::vector<std::pair<int, int>> getEdges();
+    std::vector<int> computeDegreeDist(); // compute node degree distribution
+    std::vector<int> get_adjacent(int i); // get all vertices adjacent to i as a vector
+    std::vector<std::vector<int>> get_adjacent_all(); // call get_adjacent on all vertices
+
 };
 
 

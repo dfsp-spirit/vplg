@@ -11,23 +11,6 @@
 //using namespace boost;
 
 
-///** Returns the PDB id string parsed from the GML, e.g., "7tim". */
-//string Graph::getPdbid() {
-//    string s = g[graph_bundle].pdb_id;
-//    return s;
-//}
-//
-///**
-//  *  Returns the graph type code which is computed from the graph type string (which was parsed from GML). 
-//  *  The codes are:
-//  * 1 = 'alpha'
-//  * 2 = 'beta'
-//  * 3 = 'albe'
-//  * 4 = 'alphalig'
-//  * 5 = 'betalig'
-//  * 6 = 'albelig'
-//  * 7 = 'aa_graph' 
-//  */
 
 //
 ///** Returns the PDB chain id string parsed from the GML, e.g., "A". */
@@ -43,21 +26,6 @@
 //}
 //
 
-
-///* 
-// *  access vertices via vertex iterator
-// */
-////string Graph::printVertices() {
-////    c
-////}
-//
-///* 
-// *  iterate over all edges and print their properties
-// */
-//
-//
-///* 
-// *  for all vertices iterate over adjacent vertices
 
 //
 //

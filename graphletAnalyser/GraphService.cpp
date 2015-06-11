@@ -9,7 +9,6 @@
 #include <unordered_map>
 #include <utility>
 
-using namespace std;
 using namespace boost;
 
 /* This Service Class is meant for graphs which were parsed from a GML file.
@@ -53,7 +52,7 @@ GraphService::GraphService() {
     g = g_tmp;
 };
 
-GraphService::GraphService(const Graph graph) {
+GraphService::GraphService(Graph graph) {
     g = graph;
 };
 
@@ -65,10 +64,10 @@ Graph GraphService::getGraph() {
 /* Return the keys i.e. the property names of a given graph
  * @param graph g
  * @return vector<string> properties */
-vector<string> GraphService::getGraphProperties() {
-    std::unordered_map<string, string> propertyMap = g[graph_bundle].properties;
+std::vector<std::string> GraphService::getGraphProperties() {
+    std::unordered_map<std::string, std::string> propertyMap = g[graph_bundle].properties;
     
-    vector<string> keys;
+    std::vector<string> keys;
     keys.reserve(propertyMap.size());
 
     for(auto kv : propertyMap) {
@@ -84,8 +83,9 @@ vector<string> GraphService::getGraphProperties() {
  * @param1 graph g - the graph
  * @param2 string prop - the property
  * @return string property */
-string GraphService::getPropertyValue(string prop) {
-    string propValue = g[graph_bundle].properties[prop];
+std::string GraphService::getPropertyValue(std::string prop) {
+    
+    std::string propValue = g[graph_bundle].properties[prop];
     return propValue;
 }; 
     
@@ -109,14 +109,14 @@ int GraphService::getNumEdges() {
 
 /* Return a vector, containing the vertex indices for a given graph
  * @return vector<int> vertices */
-vector<int> GraphService::getVertices() {
+std::vector<int> GraphService::getVertices() {
 
 
-    vector<int> vertexVector;
+    std::vector<int> vertexVector;
     vertexVector.reserve(num_vertices(g));   
     typedef property_map<Graph,vertex_index_t>::type IndexMap;
     IndexMap index = get(vertex_index, g);
-    pair<VertexIterator, VertexIterator> vertexPair;
+    std::pair<VertexIterator, VertexIterator> vertexPair;
     for (vertexPair = vertices(g); vertexPair.first != vertexPair.second; ++vertexPair.first)
         vertexVector.push_back(index[*vertexPair.first]);
     return vertexVector;
@@ -125,12 +125,12 @@ vector<int> GraphService::getVertices() {
 
 /* Return the a vector, containing the edges as integer pairs.
  * @return vector<pair<int, int>> edgeVector -- a vector containing the edges */
-vector<pair<int, int>> GraphService::getEdges() {
+std::vector<std::pair<int, int>> GraphService::getEdges() {
     
     // create the vector and the pair
-    vector<pair<int, int>> edgeVector;
+    std::vector<std::pair<int, int>> edgeVector;
     edgeVector.reserve(num_edges(g));
-    pair<int, int> edgePair;
+    std::pair<int, int> edgePair;
     
     // create a map, so the graph properties can be read
     typedef property_map<Graph, vertex_index_t>::type IndexMap;
@@ -155,20 +155,24 @@ vector<pair<int, int>> GraphService::getEdges() {
 
 /* Compute the node degree distribution
  * @return vector<int> degDist -- the node degree distribution */
-vector<int> GraphService::computeDegreeDist() {
+std::vector<int> GraphService::computeDegreeDist() {
     
     // create the vector and a variable for the degree
     int degree;
-    vector<int> degDist (num_vertices(getGraph()));
+    std::vector<int> degDist (num_vertices(getGraph()));
     
     // iterate over the vertices
     VertexIterator vi, vi_end, next;
     tie(vi, vi_end) = vertices(g);
+    int i = 0;
+    
     
     for (next = vi; vi != vi_end; vi = next) {
         ++next;
         degree = out_degree(*vi, g); // store their degree
-        degDist[degree]++; // and put it into the vector
+        degDist[i] = degree; // and put it into the vector
+        i++;
+        
     }
     return degDist;
   
@@ -176,8 +180,40 @@ vector<int> GraphService::computeDegreeDist() {
 
 /* Returns the graph's label
  * @return string name -- the graph's name */
-string GraphService::getName() {
-    string name = g[graph_bundle].label;
+std::string GraphService::get_label() {
+    std::string name = g[graph_bundle].label;
     return name;
     
 };
+
+std::vector<int> GraphService::get_adjacent(int i) {
+    AdjacencyIterator first, last;
+    std::vector<int> vertex_vector;
+    vertex_vector.push_back(i);
+    
+    
+    
+    
+    for (tie(first,last) = adjacent_vertices(i,g); first != last; ++first) {
+                
+        vertex_vector.push_back(g[*first].id);
+    }
+        
+    return vertex_vector;
+}
+
+std::vector<std::vector<int>> GraphService::get_adjacent_all() {
+    
+    std::vector<std::vector<int>> adj_all_vector = std::vector<std::vector<int>>();
+    
+    int n = getNumVertices();
+    
+    for (int i = 0; i < n; i++) {
+        vector<int> adj_vector = get_adjacent(i);
+        
+        adj_all_vector.push_back(adj_vector);
+    }
+    
+    return adj_all_vector;
+    
+}

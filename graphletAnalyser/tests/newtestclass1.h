@@ -35,6 +35,7 @@ private:
     GraphPrinter printer;
     
     VertexDescriptor u,v,w;
+    EdgeDescriptor ed,fd,gd;
     vertex_info vi,ui,wi;
     edge_info ei,fi,gi;
     std::string testStringAdjacent;

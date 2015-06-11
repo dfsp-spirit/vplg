@@ -57,7 +57,8 @@ private:
     void compute_all_counts();
     void compute_abs_counts(bool);
     void compute_norm_counts(bool);
-    void compute_labeled_counts();
+    void compute_labeled_abs_counts();
+    void compute_labeled_norm_counts();
     
 
 public:

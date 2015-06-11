@@ -187,7 +187,7 @@ void GraphletCounts::compute_norm_counts(bool withLabeled) {
     if (withLabeled) {labeled_norm_counts_computed = true;}
 }
 
-void GraphletCounts::compute_labeled_counts() {
+void GraphletCounts::compute_labeled_abs_counts() {
     
     count_connected_2_graphlets(memberGraph, true);
     count_connected_3_graphlets(memberGraph, true);
@@ -207,7 +207,13 @@ void GraphletCounts::compute_labeled_counts() {
             cout << apptag << "WARNING: Unknown SSE type '" << memberGraph[*i].properties["sse_type"] << "' encountered while counting the number of H and E labels, skipping.\n";
         }
     }
-   
+    
+    labeled_abs_counts_computed = true;
+}
+
+void GraphletCounts::compute_labeled_norm_counts() {
+    
+    compute_all_counts();
     
 }
 
@@ -252,6 +258,7 @@ void GraphletCounts::compute_all_counts() {
     }
     
     all_counts_computed = true;
+    labeled_norm_counts_computed = true;
 }
 
 /**
@@ -760,6 +767,11 @@ vector<int> GraphletCounts::count_connected_3_graphlets(Graph& g, bool withLabel
     float w[]     = { 1/6.0, 1/2.0 };
     
     memberGraph = g;
+    abs_counts_computed = false;
+    norm_counts_computed = false;
+    labeled_norm_counts_computed = false;
+    labeled_abs_counts_computed = false;
+    all_counts_computed = false;
     
     print = false; // printing might disturb tests
 
@@ -979,6 +991,17 @@ vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g, bool withLabel
     float w[]     = { 1/2.0 };  // each edge will be found twice (from both vertices it connects))
     
     memberGraph = g;
+    abs_counts_computed = false;
+    norm_counts_computed = false;
+    labeled_norm_counts_computed = false;
+    labeled_abs_counts_computed = false;
+    all_counts_computed = false;
+    
+    
+    
+    
+    
+    
     
     int numelem = 3;
     float lcount[numelem];
@@ -1085,26 +1108,15 @@ vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g, bool withLabel
 vector<int> GraphletCounts::count_connected_4_graphlets(Graph& g, bool withLabeled) {    
     
     
-    /* 
-     * NOTE by ben:
-     * 
-     * There are several differences to the graphlet counting algorithm by
-     * shervashidze in here.
-     * 
-     * -    graphlet counts are added to the count array without the adding the
-     *      corresponding value from the weight array w
-     * 
-     * -    in the nested for loop (lines 1250 -  1271) the implementation
-     *      doesn't check if the edges exist, but only if the index of one
-     *      edge is bigger than the index of the other whereas the if clauses
-     *      should only yield true if there are no edges between the three 
-     *      vertices over which the function iterates
-     * 
-     * The algorithm seems to work nonetheless
-     * 
-     *  */
-    
+
+    // resetting class attributes
     memberGraph = g;
+    abs_counts_computed = false;
+    norm_counts_computed = false;
+    labeled_norm_counts_computed = false;
+    labeled_abs_counts_computed = false;
+    all_counts_computed = false;
+    
     
     print = false; // printing might disturb tests
     
@@ -1311,7 +1323,14 @@ vector<int> GraphletCounts::count_connected_4_graphlets(Graph& g, bool withLabel
 
 vector<int> GraphletCounts::count_connected_5_graphlets(Graph& g, bool withLabeled) {    
     
+    // resetting class attributes
     memberGraph = g;
+    abs_counts_computed = false;
+    norm_counts_computed = false;
+    labeled_norm_counts_computed = false;
+    labeled_abs_counts_computed = false;
+    all_counts_computed = false;
+    
     
     print = false; // printing might disturb tests
     

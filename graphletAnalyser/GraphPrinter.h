@@ -24,12 +24,11 @@ class GraphPrinter {
 protected:
         //attributes
         GraphService service; // a service object to get data from the graph
-        GraphletCounts counter;
 public:
     
     //constructors
     GraphPrinter();
-    GraphPrinter(GraphService& serv);
+    GraphPrinter(GraphService serv);
     
     //methods, doing what their name says
     

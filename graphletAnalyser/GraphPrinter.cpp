@@ -16,7 +16,7 @@ GraphPrinter::GraphPrinter() {
 
 
 
-GraphPrinter::GraphPrinter(GraphService& serv) {
+GraphPrinter::GraphPrinter(GraphService serv) {
     service = serv;
 };
 
@@ -24,15 +24,15 @@ GraphPrinter::GraphPrinter(GraphService& serv) {
 /* Print vertices adjacent to a given vertex i to a string
  * @param int i -- the vertex id */
 std::string GraphPrinter::printAdjacent(int i) {
-    AdjacencyIterator first, last;
     stringstream sstream;
     
-    Graph g = service.getGraph();
+    
+    std::vector<int> vertex_vector = service.get_adjacent(i);
     
     // iterate over adjacent vertices and print their ids to a string
-    sstream << "  " << setw(2) << vertex(i,g) << ": "; 
-    for (tie(first, last) = adjacent_vertices(i,g); first != last; ++first) {
-        sstream << setw(3) << g[*first].id << " ";
+    sstream << "  " << setw(2) << i << ": "; 
+    for (auto it = vertex_vector.begin(); it != vertex_vector.end(); it++) {
+        sstream << setw(3) << *it << " ";
     }
     sstream << endl;
     
@@ -115,7 +115,7 @@ void GraphPrinter::saveAsMatlabVariable(int& number) {
                       << "% of each protein graph\n\n";
         }
         // write the name of the graph
-        matlabFile << "graphs(" << number + 1 << ").name = \'" << service.getName() << "\';\n";
+        matlabFile << "graphs(" << number + 1 << ").name = \'" << service.get_label() << "\';\n";
         
         matlabFile << "graphs(" << number + 1 << ").am = [ ";
         for (int j = 0; j < num_vertices(g); j++) {
@@ -204,7 +204,7 @@ void GraphPrinter::saveInSimpleFormat() {
     Graph g = service.getGraph();
     
     EdgeIterator ei, ei_end;
-    const string outFileName = output_path + "simple_format_" + service.getName() + ".graph";
+    const string outFileName = output_path + "simple_format_" + service.get_label() + ".graph";
     ofstream outFile;
 
     outFile.open(outFileName.c_str());
@@ -227,7 +227,7 @@ void GraphPrinter::saveABSGraphletCountsSummary(vector<vector<int>> abs_counts, 
     
 
     
-    std::string graphName = service.getName();
+    std::string graphName = service.get_label();
 
     summaryFile.open(summaryFileName.c_str(), std::ios_base::app);
     if (!summaryFile.is_open()) {
@@ -272,7 +272,7 @@ void GraphPrinter::saveNormalizedGraphletCountsSummary(vector<vector<float>> nor
     
 
     
-    std::string graphName = service.getName();
+    std::string graphName = service.get_label();
 
     summaryFile.open(summaryFileName.c_str(), std::ios_base::app);
     if (!summaryFile.is_open()) {
