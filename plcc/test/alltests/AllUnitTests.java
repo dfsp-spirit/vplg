@@ -32,8 +32,8 @@ public class AllUnitTests extends TestCase {
 		suite.addTestSuite(SSETest.class);
                 suite.addTestSuite(TestGMLGraphParser.class);
                 suite.addTestSuite(TestGraphCreator.class);
-                suite.addTestSuite(TestLinnotParser.class);
-                suite.addTestSuite(TestLinnotToGraph.class);
+                suite.addTestSuite(TestLinnotParserRED.class);
+                suite.addTestSuite(TestLinnotREDToGraph.class);
                 suite.addTestSuite(TestPTGLNotations.class);
 		
 		return suite;

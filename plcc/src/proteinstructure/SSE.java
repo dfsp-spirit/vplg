@@ -43,6 +43,11 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     public static final Integer SSECLASS_BETASTRAND = 2;
     public static final Integer SSECLASS_LIGAND = 3;
     public static final Integer SSECLASS_OTHER = 4;
+    
+    public static final String SSE_FGNOTATION_HELIX = "h";
+    public static final String SSE_FGNOTATION_STRAND = "e";
+    public static final String SSE_FGNOTATION_LIGAND = "l";
+    public static final String SSE_FGNOTATION_OTHER = "o";
 
     // Test for SSE adj graph
     /** The sequential index of this SSE in the graph (the index in the AA sequence, N to C terminus). Starts with 0. Negative value means unset. */
@@ -67,33 +72,42 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     private String betaSheetLabel = null;
 
     /**
-     * Constructor that sets the SSE type to 'sseType'. It should be "H", "E", ... etc. Use SSE.SSE_TYPE_* constants.
+     * Constructor that sets the SSE type to 'sseType'. 
+     * @param sseType It should be "H", "E", ... etc. Use SSE.SSE_TYPE_* constants.
      */
     public SSE(String sseType) {
         super();
         this.sseType = sseType;
-        residues = new ArrayList<Residue>();
+        residues = new ArrayList<>();
     }
     
     /**
      * Returns the PTGL string notation for folding graphs for this sse type (like "e" for strand).
-     * @return 
+     * @return "h" forlhelix, etc (helo)
      */
+    @Override
     public String getSseFgNotation() {
-        if(this.isHelix()) { return("h"); }
-        else if(this.isBetaStrand()) { return("e"); }
-        else if(this.isLigandSSE()) { return("l"); }
-        else if(this.isOtherSSE()) { return("o"); }
-        else { return("o"); }
+        if(this.isHelix()) { return(SSE.SSE_FGNOTATION_HELIX); }
+        else if(this.isBetaStrand()) { return(SSE.SSE_FGNOTATION_STRAND); }
+        else if(this.isLigandSSE()) { return(SSE.SSE_FGNOTATION_LIGAND); }
+        else if(this.isOtherSSE()) { return(SSE.SSE_FGNOTATION_OTHER); }
+        else {
+            DP.getInstance().w("SSE", "getSseFgNotation: SSE is none of the check types, assuming SS_FGNOTATION_OTHER.");
+            return(SSE.SSE_FGNOTATION_OTHER); 
+        }
     }
     
     public static Integer sseClassFromFgNotation(String n) {
+        if(null == n) {
+            DP.getInstance().w("SSE", "sseClassFromFgNotation: given notation is null. Assuming SSECLASS_OTHER.");
+            return SSE.SSECLASS_OTHER;
+        }
         if(n.equals("h")) {
             return SSE.SSECLASS_HELIX;
         }
         else if(n.equals("e")) { return SSE.SSECLASS_BETASTRAND; }
         else if(n.equals("l")) { return SSE.SSECLASS_LIGAND; }
-        else {return SSE.SSECLASS_OTHER;} 
+        else { return SSE.SSECLASS_OTHER; } 
     }
     
     /**

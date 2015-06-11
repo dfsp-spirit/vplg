@@ -17,69 +17,29 @@ import graphdrawing.IDrawableVertex;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import plcc.EdgeProperty;
 import plcc.ProtGraph;
+import plcc.VertexProperty;
+import tools.DP;
 
 /**
  *
  * @author spirit
  */
-public class GMLGraphParser implements IGraphParser, IDrawableGraphProvider {
+public class GMLGraphParser extends GraphParser implements IGraphParser, IDrawableGraphProvider {
     
-    private final String gml;
-    private final List<ParsedEdgeInfo> outEdges;
-    private final List<ParsedVertexInfo> outVerts;
-    private final ParsedGraphInfo gInfo;
     
     public GMLGraphParser(String gml) {
-        this.gml = gml;
-        this.outEdges = new ArrayList<>();
-        this.outVerts = new ArrayList<>();
-        gInfo = new ParsedGraphInfo();
+        super(gml);
         this.parse();
     }
+            
     
     @Override
-    public List<ParsedEdgeInfo> getEdges() {
-        return this.outEdges;
-    }
-    
-    @Override
-    public List<ParsedVertexInfo> getVertices() {
-        return this.outVerts;
-    }
-    
-    private List<IDrawableVertex> getDrawableVertices() {
-        List<IDrawableVertex> dv = new ArrayList<>();
-        for(ParsedVertexInfo pvi : this.outVerts) {
-            dv.add((IDrawableVertex) pvi);
-        }
-        return dv;
-    }
-    
-    private List<IDrawableEdge> getDrawableEdges() {
-        List<IDrawableEdge> dv = new ArrayList<>();
-        for(ParsedEdgeInfo pvi : this.outEdges) {
-            dv.add((IDrawableEdge) pvi);
-        }
-        return dv;
-    }
-    
-    @Override
-    public ParsedGraphInfo getGraphInfo() {
-        return this.gInfo;
-    }
-           
-    @Override
-    public IDrawableGraph getDrawableGraph() {
-        IDrawableGraph g = new DrawableGraph(this.getDrawableVertices(), this.getDrawableEdges(), this.gInfo.getMap());
-        return g;
-    }
-    
-    private void parse() {
+    protected void parse() {
 
-        String[] lines = gml.split("\\r?\\n");
-        String[] tokens;
-        ProtGraph g;
+        String[] lines = input.split("\\r?\\n");
+        
         
         // parse data and prepare the list of SSEs for the graph
         
@@ -127,7 +87,7 @@ public class GMLGraphParser implements IGraphParser, IDrawableGraphProvider {
             }
             
             // handle key-value lines
-            String[] kv = GMLGraphParser.getKeyValue(line);
+            String[] kv = ParserTools.getKeyValue(line);
             String key = kv[0];
             String value = kv[1];
             
@@ -137,11 +97,15 @@ public class GMLGraphParser implements IGraphParser, IDrawableGraphProvider {
             
             if(inEdge) {
                 e.setEdgeProperty(key, value);
-                if(key.equals("source")) {
+                
+                if(key.equals(EdgeProperty.SOURCE)) {
                     e.setStartVertexID(Integer.valueOf(value));
                 }
-                if(key.equals("target")) {
+                if(key.equals(EdgeProperty.TARGET)) {
                     e.setEndVertexID(Integer.valueOf(value));
+                }
+                if(key.equals(EdgeProperty.SPATREL)) {
+                    e.setSpatRel(value);
                 }
 
             }
@@ -149,30 +113,17 @@ public class GMLGraphParser implements IGraphParser, IDrawableGraphProvider {
             if(inVertex) {
                 v.setVertexProperty(key, value);
                 
-                if(key.equals("id")) {
-                    v.setVertexID(Integer.valueOf(value));
+                if(key.equals(VertexProperty.VERTEXID)) {
+                    v.setVertexID(Integer.valueOf(value));                                     
+                }
+                if(key.equals(VertexProperty.FGNOTATIONLABEL)) {
+                    v.setSseFgNotation(value);                                     
                 }
 
             }
-        }                 
+        }      
+        this.parsed = true;
     }
     
-    /**
-     * Parses key-value lines in format "<key> <value>", where <value> may be enclosed in "".
-     * @param s
-     * @return 
-     */
-    public static String[] getKeyValue(String s) {
-        s = s.trim();
-        if(s.contains("\"")) {
-            int idx = s.indexOf(" ");   // find first space, this one separates key and value
-            String key = s.substring(0, idx);   // get key: everything up tp the space (excluding the space)
-            String value = s.substring(idx + 1, (s.length() - 1));  // get value: everything after the space
-            return new String[] { key, value };
-        }
-        else {
-            return s.split(" ");    // just split at space
-        }
-    }
     
 }

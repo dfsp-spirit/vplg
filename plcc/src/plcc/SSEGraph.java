@@ -79,6 +79,7 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import graphdrawing.DrawTools.IMAGEFORMAT;
 import graphdrawing.IComplexGraph;
+import graphformats.ISimpleProteinGraphFormat;
 import static plcc.FoldingGraph.ORIENTATION_DOWNWARDS;
 import tools.DP;
 
@@ -91,7 +92,7 @@ import tools.DP;
  * 
  * @author spirit
  */
-public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements IVPLGGraphFormat, IGraphModellingLanguageFormat, ITrivialGraphFormat, IDOTLanguageFormat, IKavoshFormat, SimpleGraphInterface, IDrawableGraph, IComplexGraph {
+public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements IVPLGGraphFormat, IGraphModellingLanguageFormat, ITrivialGraphFormat, IDOTLanguageFormat, IKavoshFormat, ISimpleProteinGraphFormat, SimpleGraphInterface, IDrawableGraph, IComplexGraph {
     
     /** the list of all SSEs of this graph */
     protected List<SSE> sseList;
@@ -217,6 +218,17 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements I
      */
     public Boolean isClosestToN(Integer sseIndex) {
         return(sseIndex == 0);
+    }
+    
+    @Override public String getFGNotationOfVertex(Integer i) {
+        IDrawableVertex v = this.getDrawableVertices().get(i);
+        String fgnot = v.getSseFgNotation();
+        if(fgnot == null) {
+            DP.getInstance().w("SSEGraph", "Vertex " + i + " has invalid fgNotation (null). Assuming OTHER.");
+            return SSE.SSE_FGNOTATION_OTHER;
+            
+        }
+        return fgnot;
     }
     
     /**
@@ -1443,6 +1455,35 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements I
         }
 
         return(tgf.toString());
+    }
+    
+    
+    /**
+     * Writes the graph to a string in stupid protein graph format.
+     * @return the SPGF string of this graph
+     */
+    public String toStupidProteinGraphFormat() {
+
+        StringBuilder spgf = new StringBuilder();
+
+        // add vertices
+        for(Integer i = 0; i < this.sseList.size(); i++) {
+            spgf.append(sseList.get(i).getLinearNotationLabel());
+        }
+
+        // separator to indicate that edges follow
+        spgf.append(";");
+
+        // edges
+        for(Integer i = 0; i < this.sseList.size(); i++) {
+            for(Integer j = i + 1; j < this.sseList.size(); j++) {
+                if(this.containsEdge(i, j)) {                   
+                    spgf.append(i).append(this.getSpatRelOfEdge(i, j)).append(j);
+                }
+            }
+        }
+
+        return(spgf.toString());
     }
     
     
@@ -2692,6 +2733,7 @@ E	3	3	3
         return(SpatRel.getCharacter(this.matrix[i][j]));
     }
     
+    @Override
     public String getSpatRelOfEdge(Integer i, Integer j) {
         return SpatRel.getString(matrix[i][j]);
     }
@@ -2929,6 +2971,8 @@ E	3	3	3
             
             gmlf.append("    sse_type \"").append(vertex.getSseType()).append("\"\n");
             
+            gmlf.append("    ").append(VertexProperty.FGNOTATIONLABEL).append(" \"").append(vertex.getLinearNotationLabel()).append("\"\n");
+           
             gmlf.append(endNode).append("\n");
         }
         
@@ -2945,7 +2989,7 @@ E	3	3	3
             
             //gmlf += "    label \"(" + src + ", " + tgt + ":" + this.getEdgeLabel(src, tgt) +  ")\"\n";
             gmlf.append("    label \"").append(this.getEdgeLabel(src, tgt)).append("\"\n");
-            gmlf.append("    spatial \"").append(this.getEdgeLabel(src, tgt)).append("\"\n");
+            gmlf.append("    ").append(EdgeProperty.SPATREL).append(" \"").append(this.getEdgeLabel(src, tgt)).append("\"\n");            
             
             gmlf.append(endEdge).append("\n");
         }

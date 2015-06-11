@@ -16,20 +16,23 @@ import java.util.Map;
 import java.util.Set;
 import plcc.SSEGraph;
 import plcc.SpatRel;
+import tools.DP;
 
 /**
- * A utility class to parse RED linear notation strings of FGs.
+ * A utility class to parse RED linear notation strings of FGs. Note that this parses a linnot string,
+ * but constructs a PG (not an FG) from it. You can use the PG function to compute FGs in order to get
+ * an FG from it (there will only be a single FG obviously).
  * @author ts
  */
-public class LinnotParser implements ILinnotParser {
+public class LinnotParserRED implements ILinnotParser {
     
-    private final String linnot;
-    private final String[] tokens;
-    private final String graphType;
+    protected final String linnot;
+    protected final String[] tokens;
+    protected final String graphType;
     
-    public LinnotParser(String linnot, String graphType) {
+    public LinnotParserRED(String linnot, String graphType) {
         this.linnot = linnot;
-        this.tokens = LinnotParser.getTokensFromLinnot(linnot);
+        this.tokens = LinnotParserTools.getTokensFromLinnot(linnot);
         this.graphType = graphType;
     }
     
@@ -48,77 +51,23 @@ public class LinnotParser implements ILinnotParser {
     public Integer getNumBackEdges() {
         int num = 0;
         for(String t : tokens) {
-            if(LinnotParser.isBackwardsEdge(t)) {
+            if(LinnotParserTools.isBackwardsEdge(t)) {
                 num++;
             }
         }
         return num;
     }
 
-    private static String stripSSETypes(String token) {
-        String[] knownTypes = new String[]{SSEGraph.notationLabelHelix, SSEGraph.notationLabelStrand, SSEGraph.notationLabelLigand};
-        for (String s : knownTypes) {
-            token = token.replace(s, "");
-        }
-        return token;
-    }
-    
-    private static String stripZEdgeLabelFromToken(String token) {
-        String[] knownTypes = new String[]{ "z" };
-        for (String s : knownTypes) {
-            token = token.replace(s, "");
-        }
-        return token;
-    }
-
-    private static String getDefaultSSE(String graphType) {
-        if (graphType.equals(SSEGraph.GRAPHTYPE_ALPHA)) {
-            return SSEGraph.notationLabelHelix;
-        }
-        if (graphType.equals(SSEGraph.GRAPHTYPE_BETA)) {
-            return SSEGraph.notationLabelStrand;
-        }
-        return "?";
-    }
-
-    private static List<String> getSSETypesFromTokenList(String[] tokens, String graphType) {
-        List<String> types = new ArrayList<>();
-        for (String t : tokens) {
-            types.add(LinnotParser.getSSETypeFromToken(t, graphType));
-        }
-        return types;
-    }
     
     @Override
     public List<String> getSSETypesList() {
         List<String> types = new ArrayList<>();
         for (String t : tokens) {
-            types.add(LinnotParser.getSSETypeFromToken(t, graphType));
+            types.add(LinnotParserTools.getSSETypeFromToken(t, graphType));
         }
         return types;
     }
 
-    protected static String stripAllBracketsFromLinnot(String linnot) {
-        linnot = linnot.replace("(", "");
-        linnot = linnot.replace(")", "");
-        linnot = linnot.replace("[", "");
-        linnot = linnot.replace("]", "");
-        linnot = linnot.replace("{", "");
-        linnot = linnot.replace("}", "");
-        return linnot;
-    }
-
-    protected static Integer getRelDistFromToken(String token) {
-        token = LinnotParser.stripContactTypes(token);
-        token = LinnotParser.stripSSETypes(token);
-        token = LinnotParser.stripZEdgeLabelFromToken(token);
-        if (token.isEmpty()) {
-            return 1;
-        } else {
-            Integer i = Integer.parseInt(token);
-            return i;
-        }
-    }
     
     /**
      * Returns the path of visited vertices. Starts with the vertex visited first, which is given the value 0. All distances are relative to this one.     
@@ -157,6 +106,27 @@ public class LinnotParser implements ILinnotParser {
                         
         return min;
     }
+    protected Integer getMaxShiftRight() {
+        List<Integer> relDistList = this.getRelDistList();
+        Integer max = 0;
+        Integer current = 0;
+        for(Integer rel : relDistList) {
+            current += rel;
+            if(current > max) {
+                max = current;
+            }
+        }
+                        
+        return max;
+    }
+    
+    @Override
+    public Boolean distancesMakeSense() {
+        Integer min = this.getMaxShiftLeft();
+        Integer max = this.getMaxShiftRight();
+        Integer numVertsExpected = Math.abs(min) + Math.abs(max) + 1;
+        return(numVertsExpected.equals(this.getVertexTypesNtoC().size()));
+    }
     
     @Override
     public List<String> getVertexTypesNtoC() {
@@ -172,7 +142,7 @@ public class LinnotParser implements ILinnotParser {
         Integer reltoStartPos;
         for(int i = 0; i < visited.size(); i++) {
             reltoStartPos = visited.get(i);
-            String vtype = LinnotParser.getSSETypeFromToken(tokens[i], SSEGraph.GRAPHTYPE_ALBELIG);
+            String vtype = LinnotParserTools.getSSETypeFromToken(tokens[i], SSEGraph.GRAPHTYPE_ALBELIG);
             indexNtoC = reltoStartPos - maxShift;
             //System.out.println("indexNtoC=" + indexNtoC);
             m.put(indexNtoC, vtype);
@@ -181,6 +151,7 @@ public class LinnotParser implements ILinnotParser {
         for(int i = 0; i < numVerts; i++) {
             vtypes.add(m.get(i));
         }                
+        
         
         return vtypes;
     }
@@ -219,54 +190,14 @@ public class LinnotParser implements ILinnotParser {
      */
     @Override
     public List<Integer> getRelDistList() {
-        return LinnotParser.getRelDistsFromTokenList(this.tokens, this.graphType);
+        return LinnotParserTools.getRelDistsFromTokenList(this.tokens, this.graphType);
     }
     
-    public static List<Integer> getRelDistsFromTokenList(String[] tokens, String graphType) {
-        List<Integer> dists = new ArrayList<>();
-        for (int i = 0; i < tokens.length; i++) {
-            if(i == 0) { continue; }
-            String t = tokens[i];
-            dists.add(LinnotParser.getRelDistFromToken(t));
-        }
-        return dists;
-    }
-
-    public static String[] getTokensFromLinnot(String linnot) {
-        linnot = LinnotParser.stripAllBracketsFromLinnot(linnot);
-        String[] tokens = linnot.split(",");
-        return tokens;
-    }
-
-    private static String getContactTypeFromToken(String token) {
-        String[] knownTypes = new String[]{SpatRel.STRING_PARALLEL, SpatRel.STRING_MIXED, SpatRel.STRING_ANTIPARALLEL, SpatRel.STRING_LIGAND};
-        for (String s : knownTypes) {
-            if (token.contains(s)) {
-                return s;
-            }
-        }
-        return "?";
-    }
-    
-    private static Boolean isBackwardsEdge(String token) {
-        if (token.contains("z")) {
-            return true;
-        }
-        return false;   
-    }
-
-    protected static String stripContactTypes(String token) {
-        String[] knownTypes = new String[]{SpatRel.STRING_PARALLEL, SpatRel.STRING_MIXED, SpatRel.STRING_ANTIPARALLEL, SpatRel.STRING_LIGAND};
-        for (String s : knownTypes) {
-            token = token.replace(s, "");
-        }
-        return token;
-    }
 
     public static List<String> getContactTypesFromTokenList(String[] tokens) {
         List<String> types = new ArrayList<>();
         for (String t : tokens) {
-            types.add(LinnotParser.getContactTypeFromToken(t));
+            types.add(LinnotParserTools.getContactTypeFromToken(t));
         }
         return types;
     }
@@ -285,8 +216,8 @@ public class LinnotParser implements ILinnotParser {
         Integer edgeType = SpatRel.stringToInt(SpatRel.STRING_MIXED);
         for (int i = 1; i < visitPath.size(); i++) {
             current = visitPath.get(i);
-            if( ! LinnotParser.isBackwardsEdge(tokens[i])) {
-                edgeType = SpatRel.stringToInt(LinnotParser.getContactTypeFromToken(tokens[i]));
+            if( ! LinnotParserTools.isBackwardsEdge(tokens[i])) {
+                edgeType = SpatRel.stringToInt(LinnotParserTools.getContactTypeFromToken(tokens[i]));
                 edges.add(new Integer[] { last, current, edgeType });
             }
             last = current;
@@ -308,6 +239,9 @@ public class LinnotParser implements ILinnotParser {
             finalEdges.add(oe);
         }
         
+        if(! this.distancesMakeSense()) {
+            DP.getInstance().w("LinnotParserRED", "getOutGraphEdges: Distances make no sense, linnot may not be a valid RED linnot string.");
+        }
         return finalEdges;
     }
     
@@ -320,19 +254,10 @@ public class LinnotParser implements ILinnotParser {
         }
         for (int i = 1; i < tokens.length; i++) {
             String t = tokens[i];
-            types.add(LinnotParser.getContactTypeFromToken(t));
+            types.add(LinnotParserTools.getContactTypeFromToken(t));
         }
         return types;
     }
 
-    protected static String getSSETypeFromToken(String token, String graphType) {
-        String[] knownTypes = new String[]{SSEGraph.notationLabelHelix, SSEGraph.notationLabelStrand, SSEGraph.notationLabelLigand};
-        for (String s : knownTypes) {
-            if (token.contains(s)) {
-                return s;
-            }
-        }
-        return LinnotParser.getDefaultSSE(graphType);
-    }
     
 }

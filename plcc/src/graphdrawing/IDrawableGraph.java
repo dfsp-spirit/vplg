@@ -21,5 +21,6 @@ public interface IDrawableGraph {
     public List<IDrawableVertex> getDrawableVertices();
     public Boolean containsEdge(Integer i, Integer j);
     public String getSpatRelOfEdge(Integer i, Integer j);
+    public String getFGNotationOfVertex(Integer i);
     
 }

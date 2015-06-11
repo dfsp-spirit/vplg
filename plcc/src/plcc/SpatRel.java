@@ -8,6 +8,8 @@
 
 package plcc;
 
+import tools.DP;
+
 
 /**
  * A spatial relation which describes the relative orientation of an SSE contact 
@@ -26,6 +28,7 @@ public class SpatRel {
     public static final Integer BACKBONE = 5;             // backbone (sequential N to C terminus)
     public static final Integer DISULFIDE = 6;            // disulfide bridge
     public static final Integer COMPLEX = 7;              // inter-chain contact
+    public static final Integer OTHER = 8;                // other, for non-protein graphs etc
     
     public static final String STRING_NONE = "-";
     public static final String STRING_MIXED = "m";
@@ -35,6 +38,7 @@ public class SpatRel {
     public static final String STRING_BACKBONE = "b";
     public static final String STRING_DISULFIDE = "d";
     public static final String STRING_COMPLEX = "c";
+    public static final String STRING_OTHER = "o";
     
     public static final Character CHAR_NONE = '-';
     public static final Character CHAR_MIXED = 'm';
@@ -44,12 +48,20 @@ public class SpatRel {
     public static final Character CHAR_BACKBONE = 'b';
     public static final Character CHAR_DISULFIDE = 'd';
     public static final Character CHAR_COMPLEX = 'c';
+    public static final Character CHAR_OTHER = 'o';
 
     /** 
      * Returns the String representation for a contact with Integer id 'i'. Each string representation is a single
      * lowercase letter, e.g. "m" for 1 (meaning 'mixed').
+     * @param i a SpatRel Integer constant, like SpatRel.MIXED
+     * @return the respective String constant, like SpatRel.STRING_MIXED
      */
     public static String getString(Integer i) {
+        if(null == i) {
+            System.err.println("ERROR: Spatial relation integer must not be null.");
+            System.exit(1);
+        }
+        
         if(i.equals(SpatRel.NONE)) {
             return(SpatRel.STRING_NONE);
         }
@@ -74,6 +86,9 @@ public class SpatRel {
         else if(i.equals(SpatRel.COMPLEX)) {
             return(SpatRel.STRING_COMPLEX);
         }
+        else if(i.equals(SpatRel.OTHER)) {
+            return(SpatRel.STRING_OTHER);
+        }
         else {
             System.err.println("ERROR: Spatial relation integer " + i + " is invalid.");
             System.exit(1);
@@ -86,6 +101,11 @@ public class SpatRel {
      * lowercase letter, e.g. 'm' for 1 (meaning 'mixed').
      */
     public static Character getCharacter(Integer i) {
+        if(null == i) {
+            System.err.println("ERROR: Spatial relation integer must not be null.");
+            System.exit(1);
+        }
+        
         if(i.equals(SpatRel.NONE)) {
             return(SpatRel.CHAR_NONE);
         }
@@ -110,6 +130,9 @@ public class SpatRel {
         else if(i.equals(SpatRel.COMPLEX)) {
             return(SpatRel.CHAR_COMPLEX);
         }
+        else if(i.equals(SpatRel.OTHER)) {
+            return(SpatRel.CHAR_OTHER);
+        }
         else {
             System.err.println("ERROR: Spatial relation integer " + i + " is invalid.");
             System.exit(1);
@@ -119,8 +142,14 @@ public class SpatRel {
 
     /**
      * Returns the Integer representation of the contact String (e.g., 1 for "m").
+     * @param s a spatrel string, use the SpatRel.STRING_* constants, e.g., SpatRel.STRING_MIXED
+     * @return a spatrel integer constant, like SpatRel.MIXED
      */
     public static Integer stringToInt(String s) {
+        if(null == s) {
+            DP.getInstance().w("SpatRel", "stringToInt: Spatial relation string is null.");
+        }
+        
         if(s.equals(SpatRel.STRING_NONE)) {
             return(SpatRel.NONE);
         }
@@ -145,8 +174,12 @@ public class SpatRel {
         else if(s.equals(SpatRel.STRING_COMPLEX)) {
             return(SpatRel.COMPLEX);
         }
+        else if(s.equals(SpatRel.STRING_OTHER)) {
+            return(SpatRel.OTHER);
+        }
+        
         else {
-            System.err.println("ERROR: Spatial relation string '" + s + "' is invalid.");
+            DP.getInstance().e("SpatRel", "stringToInt: Spatial relation string '" + s + "' is invalid.");
             System.exit(1);
             return(-1);
         }

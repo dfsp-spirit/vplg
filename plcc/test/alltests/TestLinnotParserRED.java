@@ -15,7 +15,7 @@ import org.junit.Assert;
 import junit.framework.TestCase;
 import linnottograph.ILinnotParser;
 import plcc.IO;
-import linnottograph.LinnotParser;
+import linnottograph.LinnotParserRED;
 import plcc.SSEGraph;
 import plcc.SpatRel;
 import proteinstructure.SSE;
@@ -24,7 +24,7 @@ import proteinstructure.SSE;
  *
  * @author ts
  */
-public class TestLinnotParser extends TestCase {
+public class TestLinnotParserRED extends TestCase {
     
     private String linnot;
     private String graphType;
@@ -36,23 +36,23 @@ public class TestLinnotParser extends TestCase {
     @Override @org.junit.Before public void setUp() {
         linnot = "[h,-1mh,2pe]";
         graphType = SSEGraph.GRAPHTYPE_ALBELIG;
-        lnp = new LinnotParser(linnot, graphType);
+        lnp = new LinnotParserRED(linnot, graphType);
     }
     
     
-    @org.junit.Test public void test7timNumSSEs() {     
+    @org.junit.Test public void testNumSSEs() {     
         
         int numSSEs = lnp.getNumParsedSSEs();        
         assertEquals(numSSEs, 3);
     }
     
-    @org.junit.Test public void test7timNumEdges() {     
+    @org.junit.Test public void testNumEdges() {     
         int numEdges = lnp.getNumParsedEdges();        
         assertEquals(numEdges, 2);
     }
     
     
-    @org.junit.Test public void test7timSSETypes() {     
+    @org.junit.Test public void testSSETypes() {     
         List<String> types = lnp.getSSETypesList();
         
         List<String> expected = new ArrayList<>();
@@ -64,7 +64,7 @@ public class TestLinnotParser extends TestCase {
     }
     
     
-    @org.junit.Test public void test7timContactTypes() {     
+    @org.junit.Test public void testContactTypes() {     
         List<String> types = lnp.getContactTypesList();
         
         List<String> expected = new ArrayList<>();
@@ -75,7 +75,7 @@ public class TestLinnotParser extends TestCase {
     }
     
     
-    @org.junit.Test public void test7timRelDists() {     
+    @org.junit.Test public void testRelDists() {     
         List<Integer> dists = lnp.getRelDistList();
         
         List<Integer> expected = new ArrayList<>();
@@ -85,7 +85,7 @@ public class TestLinnotParser extends TestCase {
         assertEquals(expected, dists);
     }
     
-    @org.junit.Test public void test7timVisitPath() {     
+    @org.junit.Test public void testVisitPath() {     
         List<Integer> path = lnp.getVisitPath();
         List<Integer> expected = new ArrayList<>();
         expected.add(0);
@@ -95,7 +95,7 @@ public class TestLinnotParser extends TestCase {
         assertEquals(expected, path);
     }
     
-    @org.junit.Test public void test7timVisitedVertices() {     
+    @org.junit.Test public void testVisitedVertices() {     
         List<Integer> olist = lnp.getAllVisitedVertices();
         List<Integer> expected = new ArrayList<>();
         expected.add(-1);
@@ -121,12 +121,12 @@ public class TestLinnotParser extends TestCase {
         assertEquals(expected.size(), olist.size());        
     }
     
-    @org.junit.Test public void test7timMaxShiftLeft() { 
+    @org.junit.Test public void testMaxShiftLeft() { 
         Integer expected = -1;
         assertEquals(expected, lnp.getMaxShiftLeft());
     }
     
-    @org.junit.Test public void test7timVertexTypesNtoC() { 
+    @org.junit.Test public void testVertexTypesNtoC() { 
         List<String> expected = new ArrayList<>();
         expected.add("h");
         expected.add("h");
@@ -135,7 +135,7 @@ public class TestLinnotParser extends TestCase {
         assertEquals(expected, lnp.getVertexTypesNtoC());
     }
     
-    @org.junit.Test public void test7timNtoCOfVisitPath() { 
+    @org.junit.Test public void testNtoCOfVisitPath() { 
         List<Integer> expected = new ArrayList<>();
         expected.add(1);
         expected.add(0);
@@ -145,7 +145,7 @@ public class TestLinnotParser extends TestCase {
     }            
     
     
-    @org.junit.Test public void test7timOutEdges() { 
+    @org.junit.Test public void testOutEdges() { 
         List<Integer[]> edges = lnp.getOutGraphEdges();
         
         List<Integer[]> expected = new ArrayList<>();
@@ -159,6 +159,11 @@ public class TestLinnotParser extends TestCase {
         }
         assertEquals(expected.size(), edges.size()); 
     }
+    
+    @org.junit.Test public void testDistancesMakeSense() {
+        assertTrue(lnp.distancesMakeSense());
+    } 
+
     
     
 }

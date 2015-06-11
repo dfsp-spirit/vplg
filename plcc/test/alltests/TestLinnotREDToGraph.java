@@ -14,7 +14,7 @@ import graphdrawing.IDrawableVertex;
 import java.util.ArrayList;
 import java.util.List;
 import static junit.framework.Assert.assertEquals;
-import linnottograph.LinnotParser;
+import linnottograph.LinnotParserRED;
 import plcc.SSEGraph;
 import org.junit.Assert;
 import junit.framework.TestCase;
@@ -34,20 +34,22 @@ import plcc.ProtGraph;
  *
  * @author spirit
  */
-public class TestLinnotToGraph extends TestCase {
+public class TestLinnotREDToGraph extends TestCase {
     
     private String linnot;
     private String graphType;
+    private String linnotType;
     private ILinnotToGraph ltg;
     
     /**
      * Sets up the test environment and object.
      */
      @org.junit.Before@Override
- public void setUp() {
+    public void setUp() {
         linnot = "[h,-1mh,2pe]";
         graphType = SSEGraph.GRAPHTYPE_ALBELIG;
-        ltg = new LinnotToGraph(linnot, graphType);
+        linnotType = FoldingGraph.FG_NOTATION_RED;
+        ltg = new LinnotToGraph(linnot, linnotType, graphType);
     }
     
      

@@ -1711,6 +1711,8 @@ public class ProteinGraphDrawer {
                         ig2.setPaint(Color.ORANGE);
                     } else if (edgeType.equals(SpatRel.COMPLEX)) {
                         ig2.setPaint(Color.BLACK);
+                    } else if (edgeType.equals(SpatRel.OTHER)) {
+                        ig2.setPaint(Color.LIGHT_GRAY);
                     } else {
                         ig2.setPaint(Color.LIGHT_GRAY);
                     }
@@ -1795,7 +1797,7 @@ public class ProteinGraphDrawer {
             Integer lineHeight = pl.textLineHeight;
             if (pg.getDrawableVertices().size() > 0) {
                 ig2.drawString("PG", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (stringHeight / 4));
-                ig2.drawString("SQ", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
+                //ig2.drawString("SQ", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
             } else {
                 ig2.drawString("(Graph has no vertices.)", pl.getFooterStart().x, pl.getFooterStart().y);
             }

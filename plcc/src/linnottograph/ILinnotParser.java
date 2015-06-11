@@ -27,4 +27,5 @@ public interface ILinnotParser {
     public List<String> getVertexTypesNtoC();
     public List<Integer> getNtoCPositionsOfVisitPath();
     public List<Integer[]> getOutGraphEdges();
+    public Boolean distancesMakeSense();
 }

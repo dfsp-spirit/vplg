@@ -10,6 +10,8 @@ package graphdrawing;
 import java.util.List;
 import java.util.Map;
 import plcc.SpatRel;
+import proteinstructure.SSE;
+import tools.DP;
 
 /**
  *
@@ -56,12 +58,27 @@ public class DrawableGraph implements IDrawableGraph {
         return false;
     }
     
+    @Override public String getFGNotationOfVertex(Integer i) {
+        IDrawableVertex v = this.drawableVertices.get(i);
+        String fgnot = v.getSseFgNotation();
+        if(fgnot == null) {
+            DP.getInstance().w("DrawableGraph", "Vertex " + i + " has invalid fgNotation (null). Assuming OTHER.");
+            return SSE.SSE_FGNOTATION_OTHER;
+            
+        }
+        return fgnot;
+    }
     
     @Override
-    public String getSpatRelOfEdge(Integer i, Integer j) {
+    public String getSpatRelOfEdge(Integer i, Integer j) { 
         for(IDrawableEdge e : this.drawableEdges) {
             if(isEdgeFromTo(e, i, j)) {
-                return e.getSpatRel();
+                String s = e.getSpatRel();
+                if(s == null) {
+                    DP.getInstance().w("DrawableGraph", "Edge (" + i + ", " + j + ") has invalid SpatRel (null). Assuming SpatRel.STRING_OTHER.");
+                    return SpatRel.STRING_OTHER;
+                }
+                return s;
             }
         }
         return SpatRel.STRING_NONE;

@@ -169,7 +169,7 @@ public class FileParser {
             BufferedReader in = new BufferedReader(new FileReader(file));
             String line = null;
             while ((line = in.readLine()) != null) {
-                lines += line;
+                lines += line + "\n";
             }
 	//} 
         /*catch (IOException e) {

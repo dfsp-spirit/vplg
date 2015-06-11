@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import plcc.EdgeProperty;
 
 /**
  *
@@ -28,6 +29,13 @@ public class ParsedEdgeInfo implements IDrawableEdge {
         this.edgeProps = new HashMap<>();
     }
     
+    public ParsedEdgeInfo(Integer startVI, Integer endVI, String spatRel) {
+        this.edgeProps = new HashMap<>();
+        this.setStartVertexID(startVI);
+        this.setEndVertexID(endVI);
+        this.setSpatRel(spatRel);
+    }
+    
     public void setEdgeProperty(String key, String value) {
         this.edgeProps.put(key, value);
     }
@@ -40,9 +48,13 @@ public class ParsedEdgeInfo implements IDrawableEdge {
         return !(null == this.endVertexID || this.startVertexID == null);
     }
 
+    public void setSpatRel(String s) {
+        this.edgeProps.put(EdgeProperty.SPATREL, s);
+    }
+    
     @Override
     public String getSpatRel() {
-        return this.edgeProps.get("spatRel");
+        return this.edgeProps.get(EdgeProperty.SPATREL);
     }
 
     @Override

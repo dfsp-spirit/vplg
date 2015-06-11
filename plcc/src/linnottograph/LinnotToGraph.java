@@ -19,7 +19,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import plcc.FoldingGraph;
 import plcc.SpatRel;
+import tools.DP;
 
 /**
  *
@@ -30,8 +32,19 @@ public class LinnotToGraph implements ILinnotToGraph, IDrawableGraphProvider {
     
     private final ILinnotParser lnp;
     
-    public LinnotToGraph(String linnot, String graphType) {
-        lnp = new LinnotParser(linnot, graphType);
+    // should make linnot an interface + 4 classes for subtypes, refactor this to a factory and get rid of linnotType
+    public LinnotToGraph(String linnot, String linnotType, String graphType) {
+        if(linnotType.equals(FoldingGraph.FG_NOTATION_RED)) {
+            lnp = new LinnotParserRED(linnot, graphType);
+        }
+        else if(linnotType.equals(FoldingGraph.FG_NOTATION_ADJ)) {
+            lnp = new LinnotParserADJ(linnot, graphType);
+        }
+        else {
+            DP.getInstance().e("LinnotToGraph", "constructor: Parsing of linnot type " + linnotType + " NOT supported.");
+            lnp = null;
+            System.exit(1);
+        }
     }
     
     @Override

@@ -905,15 +905,22 @@ public class Main {
                             Settings.set("plcc_B_graphimg_header", "false");
                             System.out.println("Drawing custom graph in GML format from file '" + args[i+1] + "'.");
                             IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
+                            String gml = null;
+                            
                             try {
-                                GMLGraphParser p = new GMLGraphParser(FileParser.slurpFileToString(args[i+1]));                                
-                                IDrawableGraph g = p.getDrawableGraph();
-                                ProteinGraphDrawer.drawDrawableGraph(dsspFile, formats, null);
-                                System.out.println("Done drawing GML graph, exiting.");
+                                gml = FileParser.slurpFileToString(args[i+1]);  
+                                System.out.println("Received String: " + gml);
                             } catch (Exception e) {
-                                System.err.println("Could not read file: " + e.getMessage());
+                                System.err.println("Could not read GML graph file: " + e.getMessage());
                                 System.exit(1);
                             }
+                            GMLGraphParser p = new GMLGraphParser(gml);
+                            IDrawableGraph g = p.getDrawableGraph();
+                            System.out.println("Received graph with " + g.getDrawableVertices().size() + " vertices and " + g.getDrawableEdges().size() + " edges.");
+                            String outFilePathNoExt = args[i+1]; // the image extension will be appended to this
+                            ProteinGraphDrawer.drawDrawableGraph(outFilePathNoExt, formats, g);
+                            System.out.println("Done drawing GML graph to base file '" + outFilePathNoExt + "', exiting.");
+                            
                             System.exit(0);
                         }
                     }
@@ -4893,6 +4900,7 @@ public class Main {
         System.out.println("-s | --draw-linnots        : not only compute the folding graph linear notations, but draw all 4 of them to image files");
         System.out.println("-S | --sim-measure <m>     : use similarity measure <m>. Valid settings include 'string_sse', 'graph_set' and 'graph_compat'.");
         System.out.println("-t | --draw-tgf-graph <f>  : read graph in TGF format from file <f> and draw it to <f>.png, then exit (pdbid will be ignored)*");
+        System.out.println("     --draw-gml-graph <f>  : read graph in GML format from file <f> and draw it to <f>.png, then exit (pdbid will be ignored)*");
         System.out.println("-u | --use-database        : write SSE contact data to database [requires DB credentials in cfg file]");                       
         System.out.println("-v | --del-db-protein <p>  : delete the protein chain with PDBID <p> from the database [requires DB credentials in cfg file]");
         System.out.println("-w | --dont-write-images   : do not draw the SSE graphs and write them to image files [DEBUG]");                             

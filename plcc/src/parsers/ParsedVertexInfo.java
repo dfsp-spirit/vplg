@@ -10,6 +10,7 @@ package parsers;
 import graphdrawing.IDrawableVertex;
 import java.util.HashMap;
 import java.util.Map;
+import plcc.VertexProperty;
 
 /**
  *
@@ -22,6 +23,11 @@ public class ParsedVertexInfo implements IDrawableVertex {
     
     public ParsedVertexInfo() {
         vertexProps = new HashMap<>();
+    }
+    
+    public ParsedVertexInfo(String sseFgNotation) {
+        vertexProps = new HashMap<>();
+        this.vertexProps.put(VertexProperty.FGNOTATIONLABEL, sseFgNotation);
     }
     
     public void setVertexID(Integer id) {
@@ -42,7 +48,11 @@ public class ParsedVertexInfo implements IDrawableVertex {
 
     @Override
     public String getSseFgNotation() {
-        return this.getVertexProperty("sseFgNotation");
+        return this.getVertexProperty(VertexProperty.FGNOTATIONLABEL);
+    }
+    
+    public void setSseFgNotation(String f) {
+        this.vertexProps.put(VertexProperty.FGNOTATIONLABEL, f);
     }
     
     public Boolean verify() {
