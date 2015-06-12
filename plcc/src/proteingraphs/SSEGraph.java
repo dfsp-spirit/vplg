@@ -834,8 +834,8 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements I
     public void addContact(Integer x, Integer y, Integer spatialRelation) {
         
         if(x >= adjLists.size() || y >= adjLists.size()) {
-            System.err.println("ERROR: addContact(): Cannot add contact between SSEs with indeces " + x + " and " + y + ", list size is " + adjLists.size() + ".");
-            System.exit(-1);
+            DP.getInstance().e("SSEGraph", "addContact: Cannot add contact between SSEs with indeces " + x + " and " + y + ", list size is " + adjLists.size() + ".");
+            System.exit(1);
         }
         
         if( ! adjLists.get(x).contains(y)) {

@@ -10,7 +10,7 @@ package linnottograph;
 import java.util.List;
 
 /**
- *
+ * Internal interface, for testing only. Could be removed later.
  * @author ts
  */
 public interface ILinnotParser {

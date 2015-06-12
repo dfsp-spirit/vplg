@@ -30,7 +30,7 @@ import tools.DP;
 public class LinnotToGraph implements ILinnotToGraph, IDrawableGraphProvider {
     
     
-    private final ILinnotParser lnp;
+    private final ILinnotParserExt lnp;
     
     // should make linnot an interface + 4 classes for subtypes, refactor this to a factory and get rid of linnotType
     public LinnotToGraph(String linnot, String linnotType, String graphType) {
@@ -50,7 +50,7 @@ public class LinnotToGraph implements ILinnotToGraph, IDrawableGraphProvider {
     @Override
     public List<IDrawableVertex> getVertices() {
         List<IDrawableVertex> outVerts = new ArrayList<>();
-        List<String> parsedVertTypes = lnp.getVertexTypesNtoC();
+        List<String> parsedVertTypes = lnp.getResultVertices();
         
         for(String p : parsedVertTypes) {
             outVerts.add(new DrawableVertex(p));
@@ -62,7 +62,7 @@ public class LinnotToGraph implements ILinnotToGraph, IDrawableGraphProvider {
     @Override
     public List<IDrawableEdge> getEdges() {
         List<IDrawableEdge> outEdges = new ArrayList<>();
-        List<Integer[]> parsedEdges = lnp.getOutGraphEdges();
+        List<Integer[]> parsedEdges = lnp.getResultEdges();
         
         List<Integer> vertIndices;
         String spatRel;

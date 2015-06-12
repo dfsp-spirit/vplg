@@ -7,6 +7,7 @@
  */
 package linnottograph;
 
+import io.IO;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ import tools.DP;
  * an FG from it (there will only be a single FG obviously).
  * @author ts
  */
-public class LinnotParserRED implements ILinnotParser {
+public class LinnotParserRED implements ILinnotParser, ILinnotParserExt {
     
     protected final String linnot;
     protected final String[] tokens;
@@ -122,10 +123,14 @@ public class LinnotParserRED implements ILinnotParser {
     
     @Override
     public Boolean distancesMakeSense() {
+        return true;
+        /*
         Integer min = this.getMaxShiftLeft();
         Integer max = this.getMaxShiftRight();
         Integer numVertsExpected = Math.abs(min) + Math.abs(max) + 1;
-        return(numVertsExpected.equals(this.getVertexTypesNtoC().size()));
+        System.out.println("distancesMakeSense(): expecting " + numVertsExpected + " verts.");
+        return(numVertsExpected.equals(this.getResultVertices().size()));
+        */
     }
     
     @Override
@@ -144,7 +149,7 @@ public class LinnotParserRED implements ILinnotParser {
             reltoStartPos = visited.get(i);
             String vtype = LinnotParserTools.getSSETypeFromToken(tokens[i], SSEGraph.GRAPHTYPE_ALBELIG);
             indexNtoC = reltoStartPos - maxShift;
-            //System.out.println("indexNtoC=" + indexNtoC);
+            System.out.println("getVertexTypesNtoC: setting vtype " + vtype + " at indexNtoC=" + indexNtoC);
             m.put(indexNtoC, vtype);
         }
         
@@ -257,6 +262,20 @@ public class LinnotParserRED implements ILinnotParser {
             types.add(LinnotParserTools.getContactTypeFromToken(t));
         }
         return types;
+    }
+
+    @Override
+    public List<String> getResultVertices() {
+        List<String> v = getVertexTypesNtoC();
+        System.out.println("LinnotParserRED: result vertices: " + IO.stringListToString(v));
+        return v;
+    }
+
+    @Override
+    public List<Integer[]> getResultEdges() {
+        List<Integer[]> resultEdges = this.getOutGraphEdges();
+        System.out.println("LinnotParserRED: result edges: " + IO.listOfintegerArraysToString(resultEdges));
+        return resultEdges;
     }
 
     

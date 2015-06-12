@@ -37,6 +37,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     public static final String SSE_TYPE_HTURN = "T";                    // hydrogen-bonded turn
     public static final String SSE_TYPE_BEND = "S";                     // bend
     public static final String SSE_TYPE_COIL = "C";                     // never assigned by DSSP, it calls these " "
+    public static final String SSE_TYPE_OTHER = "O";                     // never assigned by DSSP, it calls these " "
 
     public static final Integer SSECLASS_NONE = 0;
     public static final Integer SSECLASS_HELIX = 1;
@@ -123,8 +124,11 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
         else if(sseClass.equals(SSE.SSECLASS_LIGAND)) {
             this.sseType = SSE.SSE_TYPE_LIGAND;
         }
+        else if(sseClass.equals(SSE.SSECLASS_OTHER)) {
+            this.sseType = SSE.SSE_TYPE_OTHER;
+        }
         else {
-            System.err.println("WARNING: Creating SSE of invalid class '" + sseClass + "' not possible. Assuming alpha helix.");
+            DP.getInstance().w("SSE", "<constructor>: Creating SSE of invalid class '" + sseClass + "' not possible. Assuming alpha helix.");
             this.sseType = SSE.SSE_TYPE_ALPHA_HELIX;
         }
         residues = new ArrayList<Residue>();
