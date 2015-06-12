@@ -27,6 +27,7 @@ import tools.DP;
 public class LinnotParserADJ extends LinnotParserRED implements ILinnotParser, ILinnotParserExt {
     
     private List<String> vertexTypesNtoC; 
+    private Map<Integer, String> vertexTypesMapNtoC;
     private List<Integer[]> outGraphEdges;
     
     private List<String> resultVertices; 
@@ -35,31 +36,15 @@ public class LinnotParserADJ extends LinnotParserRED implements ILinnotParser, I
     public LinnotParserADJ(String linnot, String graphType) {
         super(linnot, graphType);
         this.vertexTypesNtoC = this.getVertexTypesNtoC();
+        vertexTypesMapNtoC = getVertexTypesMapNtoC();
         this.outGraphEdges = this.getOutGraphEdges();
         
         this.resultVertices = null;
         this.resultEdges = null;
         this.considerNonCCVertices(); // fills in this.resultVertices and this.resultEdges
     }
-    
-    
-    protected Map<Integer, Integer> getVertexShiftsFromVertexInsertMap(Integer[] vertInsertMap) {
-        Map<Integer, Integer> shifts = new HashMap<>();
-        System.err.println("correctEdgesForVertexInserts: not implemented yet.");
-        Integer totalShift = 0;
-        for(int i = 0; i < vertInsertMap.length; i++) { // not done yet!!!!
-            totalShift += vertInsertMap[i];
-            shifts.put(i, totalShift);
-        }
-        return shifts;
-    }
-    
-    protected List<Integer[]> correctEdgesForVertexInserts(List<Integer[]> inEdges, Integer[] vertInsertMap) {
-        List<Integer[]> correctedEdges = new ArrayList<>();
-        correctedEdges.addAll(inEdges);
-        System.err.println("correctEdgesForVertexInserts: not implemented yet.");
-        return correctedEdges;
-    }
+            
+     
     
     /**
      * Returns an array which tells you whether the vertex at the respective position in the N to C list has been inserted afterwards (i.e., whether it does NOT originate from the folding graph, but from the parent PG).
@@ -72,6 +57,7 @@ public class LinnotParserADJ extends LinnotParserRED implements ILinnotParser, I
         System.out.println("vPathNtoC: " + IO.intListToString(vPathNtoC));
         List<Integer> relDistsVisitPath = getRelDistList();
         System.out.println("relDistsvPath: " + IO.intListToString(relDistsVisitPath));
+        
         List<Integer> unvisited = getUnvisitedVerticesNtoC();
         System.out.println("unvisited: " + IO.intListToString(unvisited));
         Integer[] vim = new Integer[vPath.size() + unvisited.size()];
@@ -103,9 +89,28 @@ public class LinnotParserADJ extends LinnotParserRED implements ILinnotParser, I
         
         this.resultVertices = new ArrayList<>();
         System.out.println("considerNonCCVertices: vertexTypesNtoC = " + IO.stringListToString(this.vertexTypesNtoC));
-        for(String s : this.vertexTypesNtoC) {
-            this.resultVertices.add(s);
+        
+        System.out.print("considerNonCCVertices: vertexTypesMapNtoC= ");
+        for(Integer key : vertexTypesMapNtoC.keySet()) {           
+            System.out.print(key + "=" + vertexTypesMapNtoC.get(key) + " ");
         }
+        System.out.print("\n");
+        
+        List<Integer> keysSorted = new ArrayList<>();
+        keysSorted.addAll(vertexTypesMapNtoC.keySet());
+        Collections.sort(keysSorted);
+        
+        String v;
+        for(Integer k : keysSorted) {
+            v = vertexTypesMapNtoC.get(k);
+            if(null != v) {
+                this.resultVertices.add(v);
+            }
+        }
+        
+        //for(String s : this.vertexTypesNtoC) {
+        //    this.resultVertices.add(s);
+        //}
         
         this.resultEdges = new ArrayList<>();
         for(Integer [] e : this.outGraphEdges) {
@@ -130,9 +135,11 @@ public class LinnotParserADJ extends LinnotParserRED implements ILinnotParser, I
      */
     private void insertVertexIntoResultLists(Integer positionOfNewNtoC, String fglinnot) {
         // fix vertex list
-        System.out.println("insertVertexIntoResultLists: before: " + IO.stringListToString(this.resultVertices));
+        System.out.println("### insertVertexIntoResultLists: before adding vertex: " + IO.stringListToString(this.resultVertices));
         this.resultVertices.add(positionOfNewNtoC, fglinnot);
-        System.out.println("insertVertexIntoResultLists: after: " + IO.stringListToString(this.resultVertices));
+        System.out.println("### insertVertexIntoResultLists: after adding vertex: " + IO.stringListToString(this.resultVertices));
+        
+        System.out.println("### insertVertexIntoResultLists: before shifting edges: " + IO.listOfintegerArraysToString(this.resultEdges));
         
         // fix edge list
         for(int i = 0; i < this.resultEdges.size(); i++) {
@@ -144,6 +151,7 @@ public class LinnotParserADJ extends LinnotParserRED implements ILinnotParser, I
                 e[1]++;
             }
         }
+        System.out.println("### insertVertexIntoResultLists: after shifting edges: " + IO.listOfintegerArraysToString(this.resultEdges));
     }
     
     @Override

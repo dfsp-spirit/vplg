@@ -161,6 +161,26 @@ public class LinnotParserRED implements ILinnotParser, ILinnotParserExt {
         return vtypes;
     }
     
+    public Map<Integer, String> getVertexTypesMapNtoC() {
+        Integer maxShift = this.getMaxShiftLeft();
+        List<Integer> visited = this.getVisitPath();
+        int numVerts = this.getAllVisitedVertices().size();
+        Map<Integer, String> m = new HashMap<>();
+        
+        //System.out.println("visited " + visited.size() + ". maxShift = " + maxShift + "." );
+        
+        Integer indexNtoC;
+        Integer reltoStartPos;
+        for(int i = 0; i < visited.size(); i++) {
+            reltoStartPos = visited.get(i);
+            String vtype = LinnotParserTools.getSSETypeFromToken(tokens[i], SSEGraph.GRAPHTYPE_ALBELIG);
+            indexNtoC = reltoStartPos - maxShift;
+            System.out.println("getVertexTypesNtoC: setting vtype " + vtype + " at indexNtoC=" + indexNtoC);
+            m.put(indexNtoC, vtype);
+        }
+        return m;
+    }
+    
     @Override
     public List<Integer> getNtoCPositionsOfVisitPath() {
         Integer maxShift = this.getMaxShiftLeft();
