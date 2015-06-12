@@ -8,7 +8,7 @@
 package datastructures;
 
 import graphformats.IGraphModellingLanguageFormat;
-import plcc.ResContactInfo;
+import proteingraphs.ResContactInfo;
 
 /**
  * Edge information for an amino acid (AA) graph.

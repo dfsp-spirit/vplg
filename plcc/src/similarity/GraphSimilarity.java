@@ -15,10 +15,10 @@ import algorithms.SmithWaterman;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Set;
-import plcc.CompatGraph;
-import plcc.DBManager;
-import plcc.ProtGraph;
-import plcc.SSEGraph;
+import proteingraphs.CompatGraph;
+import io.DBManager;
+import proteingraphs.ProtGraph;
+import proteingraphs.SSEGraph;
 import plcc.Settings;
 import static similarity.SimilarityByGraphlets.getRandIntegerArray;
 

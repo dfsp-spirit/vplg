@@ -9,7 +9,7 @@ package datastructures;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import plcc.IO;
+import io.IO;
 
 /**
  * An undirected graph. This can be used as is or extended. It is based on the abstract Graph class.

@@ -10,7 +10,7 @@ package similarity;
 
 import algorithms.NeedlemanWunsch;
 import algorithms.SmithWaterman;
-import plcc.SSEGraph;
+import proteingraphs.SSEGraph;
 
 /**
  * This class provides various methods to compare two protein graphs by their string representations,

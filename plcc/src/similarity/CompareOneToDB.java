@@ -13,9 +13,9 @@ import algorithms.SmithWaterman;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import plcc.DBManager;
-import plcc.ProtGraph;
-import plcc.ProtGraphs;
+import io.DBManager;
+import proteingraphs.ProtGraph;
+import proteingraphs.ProtGraphs;
 import plcc.Settings;
 
 /**

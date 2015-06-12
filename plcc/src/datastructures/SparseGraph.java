@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import graphformats.IGraphMLFormat;
-import plcc.IO;
+import io.IO;
 import graphformats.ITrivialGraphFormat;
 
 /**

@@ -12,10 +12,10 @@ import java.util.List;
 import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
-import plcc.PTGLNotationFoldResult;
-import plcc.PTGLNotations;
-import plcc.ProtGraph;
-import plcc.ProtGraphs;
+import resultcontainers.PTGLNotationFoldResult;
+import proteingraphs.PTGLNotations;
+import proteingraphs.ProtGraph;
+import proteingraphs.ProtGraphs;
 
 /**
  *

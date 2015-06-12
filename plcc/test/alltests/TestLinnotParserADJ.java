@@ -13,7 +13,7 @@ import junit.framework.TestCase;
 import static junit.framework.TestCase.assertEquals;
 import linnottograph.ILinnotParser;
 import linnottograph.LinnotParserRED;
-import plcc.SSEGraph;
+import proteingraphs.SSEGraph;
 
 /**
  *

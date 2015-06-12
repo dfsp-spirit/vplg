@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import proteinstructure.AminoAcid;
 import graphformats.IGraphModellingLanguageFormat;
-import plcc.ResContactInfo;
+import proteingraphs.ResContactInfo;
 import proteinstructure.Residue;
 
 /**

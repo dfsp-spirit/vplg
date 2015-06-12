@@ -38,8 +38,8 @@ import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
-import plcc.FoldingGraph;
-import plcc.Position2D;
+import proteingraphs.FoldingGraph;
+import proteingraphs.Position2D;
 import plcc.Settings;
 import tools.DP;
 

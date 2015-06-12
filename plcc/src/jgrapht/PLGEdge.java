@@ -9,7 +9,7 @@ package jgrapht;
 
 import java.util.BitSet;
 import java.util.HashMap;
-import plcc.SpatRel;
+import proteingraphs.SpatRel;
 
 /**
  * Ab edge for a protein ligand graph. This edge in undirected, and it holds information on the 

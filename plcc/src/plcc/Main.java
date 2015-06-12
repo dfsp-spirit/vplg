@@ -10,6 +10,25 @@
 package plcc;
 
 // imports
+import proteingraphs.PTGLNotations;
+import resultcontainers.ProteinResults;
+import resultcontainers.PTGLNotationFoldResult;
+import resultcontainers.ProteinFoldingGraphResults;
+import resultcontainers.ProteinChainResults;
+import resultcontainers.ComplexGraphResult;
+import io.IO;
+import io.FileParser;
+import io.DBManager;
+import proteinstructure.ProtMetaInfo;
+import proteingraphs.FoldingGraphComparator;
+import proteingraphs.ResContactInfo;
+import proteingraphs.ComplexGraph;
+import proteingraphs.ProtGraphs;
+import proteingraphs.SSEComparator;
+import proteingraphs.SSEGraph;
+import proteingraphs.ContactMatrix;
+import proteingraphs.ProtGraph;
+import proteingraphs.FoldingGraph;
 import graphdrawing.ProteinGraphDrawer;
 import graphdrawing.DrawTools;
 import graphformats.GraphFormats;
@@ -131,7 +150,7 @@ public class Main {
 
     
     /** The threshold for interchain contacts in complex graphs. Chains with less contacts then the threshold won't be considered as interchain contacts.  */
-    static Integer chainComplexGraphContactThreshold = 1; // set to 1 to act like deactivated..
+    public static Integer chainComplexGraphContactThreshold = 1; // set to 1 to act like deactivated..
 
 
 
@@ -2380,7 +2399,7 @@ public class Main {
                     Double anccGraph = GraphMetrics.averageNetworkClusterCoefficient(pg);
                     Double anccLargestCC = GraphMetrics.averageNetworkClusterCoefficient(fg);
                     
-                    Integer numCCGraph = pg.connectedComponents.size();
+                    Integer numCCGraph = pg.getConnectedComponents().size();
                     Integer numCCLargestCC = 1;
                     
                     // ----- average shortest path length -----
@@ -2599,7 +2618,7 @@ public class Main {
                     
                     // assign SSEs in database
                     try {
-                        int numAssigned = DBManager.assignSSEsToProteinGraphInOrder(pg.sseList, pdbid, chain, ProtGraphs.getGraphTypeCode(gt));
+                        int numAssigned = DBManager.assignSSEsToProteinGraphInOrder(pg.getVertices(), pdbid, chain, ProtGraphs.getGraphTypeCode(gt));
                         if(! silent) {
                             System.out.println("      Assigned " + numAssigned + " SSEs to " + gt + " graph of PDB ID '" + pdbid + "' chain '" + chain + "' in the DB.");
                         }
@@ -2686,7 +2705,7 @@ public class Main {
                 if(Settings.getBoolean("plcc_B_Jmol_graph_vis_resblue_commands")) {                                        
                     
                     String graphVisualizationResBlueFileJmolCommands = filePathGraphs + fs + fileNameWithoutExtension + "_resblue" + ".jmol";
-                    if(IO.stringToTextFile(graphVisualizationResBlueFileJmolCommands, JmolTools.visualizeGraphSubsetSSEsInBlue(pg, pg.sseList, true, true))) {
+                    if(IO.stringToTextFile(graphVisualizationResBlueFileJmolCommands, JmolTools.visualizeGraphSubsetSSEsInBlue(pg, pg.getVertices(), true, true))) {
                         if(Settings.getBoolean("plcc_B_output_textfiles_dir_tree_html")) {
                             pcr.addProteinGraphVisResBlueJmolCommandFile(gt, new File(graphVisualizationResBlueFileJmolCommands));
                         }
@@ -2795,14 +2814,14 @@ public class Main {
 
         //System.out.println("Found " + ccs.size() + " connected components in " + graphType + " graph of chain " + c.getPdbChainID() + ".");
         if(! silent) {
-            System.out.println("      --- Handling all " + foldingGraphs.size() + " " + pg.graphType + " folding graphs of the " + pg.graphType + " protein graph ---");
+            System.out.println("      --- Handling all " + foldingGraphs.size() + " " + pg.getGraphType() + " folding graphs of the " + pg.getGraphType() + " protein graph ---");
         }
         for(Integer j = 0; j < foldingGraphs.size(); j++) {            
             fg = foldingGraphs.get(j);
             Integer fg_number = fg.getFoldingGraphNumber();
-            String pdbid = fg.pdbid;
-            String chain = fg.chainid;
-            String gt = fg.graphType;
+            String pdbid = fg.getPdbid();
+            String chain = fg.getChainid();
+            String gt = fg.getGraphType();
 
             PTGLNotationFoldResult pnfr = resultsPTGLNotations.get(j);
             if(!Objects.equals(pnfr.getFoldNumber(), fg_number)) {
@@ -2861,7 +2880,7 @@ public class Main {
                     }
                     if(fgDbId >= 1) {
                         try {
-                            Integer[] numAssigned = DBManager.assignSSEsToFoldingGraphInOrderWithSecondat(fg.sseList, fgDbId, gt, fg_number, FoldingGraph.getFoldNameOfFoldNumber(fg_number));
+                            Integer[] numAssigned = DBManager.assignSSEsToFoldingGraphInOrderWithSecondat(fg.getVertices(), fgDbId, gt, fg_number, FoldingGraph.getFoldNameOfFoldNumber(fg_number));
                             if(! silent) {
                                 if(Objects.equals(numAssigned[0], numAssigned[1])) {
                                     System.out.println("        Assigned " + numAssigned[0] + " SSEs to " + gt + " folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' in the DB.");

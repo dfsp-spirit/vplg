@@ -8,7 +8,7 @@
 package htmlgen;
 
 import java.io.File;
-import plcc.IO;
+import io.IO;
 
 /**
  * A rather stupid CSS generator. Does nothing but create strings.

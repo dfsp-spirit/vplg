@@ -14,12 +14,12 @@ import java.util.Set;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
-import plcc.CompatGraph;
-import plcc.IO;
-import plcc.ProtGraph;
+import proteingraphs.CompatGraph;
+import io.IO;
+import proteingraphs.ProtGraph;
 import proteinstructure.SSE;
-import plcc.SSEGraph;
-import plcc.SpatRel;
+import proteingraphs.SSEGraph;
+import proteingraphs.SpatRel;
 
 /**
  * Defines methods to compute the edge compatibility graph of two protein graphs.

@@ -37,14 +37,14 @@ import org.apache.xmlgraphics.java2d.GraphicContext;
 import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
-import plcc.FoldingGraph;
-import plcc.IO;
-import plcc.PTGLNotationFoldResult;
-import plcc.Position2D;
-import plcc.ProtGraph;
-import plcc.SSEGraph;
+import proteingraphs.FoldingGraph;
+import io.IO;
+import resultcontainers.PTGLNotationFoldResult;
+import proteingraphs.Position2D;
+import proteingraphs.ProtGraph;
+import proteingraphs.SSEGraph;
 import plcc.Settings;
-import plcc.SpatRel;
+import proteingraphs.SpatRel;
 import tools.DP;
 
 /**

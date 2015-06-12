@@ -12,7 +12,7 @@ package proteinstructure;
 import proteinstructure.SSE;
 import java.util.ArrayList;
 import java.util.Arrays;
-import plcc.IO;
+import io.IO;
 
 /**
  * Represents a protein chain in a PDB file.

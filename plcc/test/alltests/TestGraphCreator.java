@@ -1,11 +1,11 @@
 package alltests;
 
 import junit.framework.TestCase;
-import plcc.GraphCreator;
-import plcc.SSEGraph;
+import proteingraphs.GraphCreator;
+import proteingraphs.SSEGraph;
 import org.junit.Test;
-import plcc.GraphCreator;
-import plcc.ProtGraph;
+import proteingraphs.GraphCreator;
+import proteingraphs.ProtGraph;
 
 
 /*

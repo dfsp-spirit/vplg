@@ -15,13 +15,13 @@ import java.util.HashMap;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import plcc.ComplexGraph;
-import plcc.IO;
-import plcc.ProtMetaInfo;
-import plcc.ProteinChainResults;
-import plcc.ProteinResults;
+import proteingraphs.ComplexGraph;
+import io.IO;
+import proteinstructure.ProtMetaInfo;
+import resultcontainers.ProteinChainResults;
+import resultcontainers.ProteinResults;
 import proteinstructure.SSE;
-import plcc.SSEGraph;
+import proteingraphs.SSEGraph;
 import plcc.Settings;
 
 public class HtmlGenerator {

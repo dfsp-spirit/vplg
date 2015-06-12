@@ -11,11 +11,11 @@ package proteinstructure;
 
 // imports
 import java.util.ArrayList;
-import plcc.Comp3DTools;
+import tools.Comp3DTools;
 import graphdrawing.IDrawableVertex;
-import plcc.Position3D;
-import plcc.SSEGraph;
-import plcc.SSEGraphVertex;
+import proteingraphs.Position3D;
+import proteingraphs.SSEGraph;
+import proteingraphs.SSEGraphVertex;
 import tools.DP;
 
 /**

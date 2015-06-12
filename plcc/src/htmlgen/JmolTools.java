@@ -9,11 +9,11 @@ package htmlgen;
 
 import java.util.ArrayList;
 import java.util.List;
-import plcc.Position3D;
+import proteingraphs.Position3D;
 import proteinstructure.Residue;
 import proteinstructure.SSE;
-import plcc.SSEGraph;
-import plcc.SpatRel;
+import proteingraphs.SSEGraph;
+import proteingraphs.SpatRel;
 
 /**
  * Some helper functions which generate the Jmol commands to visualize stuff.

@@ -11,7 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import plcc.SSEGraph;
+import io.IO;
+import proteingraphs.SSEGraph;
 import tools.DP;
 
 /**
@@ -55,6 +56,31 @@ public class LinnotParserADJ extends LinnotParserRED implements ILinnotParser {
         return vtypes;
     }
     
+    protected Map<Integer, Integer> getVertexShiftsFromVertexInsertMap(Integer[] vertInsertMap) {
+        Map<Integer, Integer> shifts = new HashMap<>();
+        System.err.println("correctEdgesForVertexInserts: not implemented yet.");
+        Integer totalShift = 0;
+        for(int i = 0; i < vertInsertMap.length; i++) { // not done yet!!!!
+            totalShift += vertInsertMap[i];
+            shifts.put(i, totalShift);
+        }
+        return shifts;
+    }
+    
+    protected List<Integer[]> correctEdgesForVertexInserts(List<Integer[]> inEdges, Integer[] vertInsertMap) {
+        List<Integer[]> correctedEdges = new ArrayList<>();
+        correctedEdges.addAll(inEdges);
+        System.err.println("correctEdgesForVertexInserts: not implemented yet.");
+        return correctedEdges;
+    }
+    
+    protected Integer[] getVertexInsertMap() {
+        Integer[] vim = new Integer[2];
+        List<Integer> vPathNtoC = getNtoCPositionsOfVisitPath();
+        System.out.println("vPath: " + IO.intListToString(vPathNtoC));
+        return vim;
+    }
+    
     @Override
     public List<Integer[]> getOutGraphEdges() {
         List<Integer[]> shiftedEdges = this.getNonZEdges();
@@ -66,6 +92,11 @@ public class LinnotParserADJ extends LinnotParserRED implements ILinnotParser {
             oe = new Integer[]{ e[0] - maxShift, e[1] - maxShift, e[2] };
             finalEdges.add(oe);
         }
+        
+        // ------------ fix ADJ verts from the parent FG ---------------
+        Integer[] vim = this.getVertexInsertMap();
+        List<Integer[]> correctedEdges = this.correctEdgesForVertexInserts(finalEdges, vim);
+        finalEdges = correctedEdges;
         
         if(! this.distancesMakeSense()) {
             DP.getInstance().w("LinnotParserADJ", "getOutGraphEdges: Distances make no sense, linnot may not be a valid ADJ linnot string.");

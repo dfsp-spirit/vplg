@@ -19,8 +19,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import plcc.FoldingGraph;
-import plcc.SpatRel;
+import proteingraphs.FoldingGraph;
+import proteingraphs.SpatRel;
 import tools.DP;
 
 /**

@@ -9,8 +9,8 @@ package linnottograph;
 
 import java.util.ArrayList;
 import java.util.List;
-import plcc.SSEGraph;
-import plcc.SpatRel;
+import proteingraphs.SSEGraph;
+import proteingraphs.SpatRel;
 
 /**
  * Utility class which holds some static methods.

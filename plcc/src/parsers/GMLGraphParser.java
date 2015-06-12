@@ -17,9 +17,9 @@ import graphdrawing.IDrawableVertex;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import plcc.EdgeProperty;
-import plcc.ProtGraph;
-import plcc.VertexProperty;
+import proteingraphs.EdgeProperty;
+import proteingraphs.ProtGraph;
+import proteingraphs.VertexProperty;
 import tools.DP;
 
 /**

@@ -9,7 +9,7 @@ package graphdrawing;
 
 import java.util.List;
 import java.util.Map;
-import plcc.SpatRel;
+import proteingraphs.SpatRel;
 import proteinstructure.SSE;
 import tools.DP;
 

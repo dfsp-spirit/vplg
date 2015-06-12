@@ -9,7 +9,7 @@ package similarity;
 
 import java.sql.SQLException;
 import java.util.Random;
-import plcc.DBManager;
+import io.DBManager;
 import tools.DP;
 
 /**

@@ -15,17 +15,17 @@ import java.util.ArrayList;
 import java.util.List;
 import static junit.framework.Assert.assertEquals;
 import linnottograph.LinnotParserRED;
-import plcc.SSEGraph;
+import proteingraphs.SSEGraph;
 import org.junit.Assert;
 import junit.framework.TestCase;
 import linnottograph.ILinnotToGraph;
 import linnottograph.LinnotToGraph;
 import static org.junit.Assert.fail;
-import plcc.FoldingGraph;
-import plcc.GraphCreator;
-import plcc.PTGLNotationFoldResult;
-import plcc.PTGLNotations;
-import plcc.ProtGraph;
+import proteingraphs.FoldingGraph;
+import proteingraphs.GraphCreator;
+import resultcontainers.PTGLNotationFoldResult;
+import proteingraphs.PTGLNotations;
+import proteingraphs.ProtGraph;
 
 
 

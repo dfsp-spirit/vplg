@@ -14,8 +14,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import plcc.SSEGraph;
-import plcc.SpatRel;
+import proteingraphs.SSEGraph;
+import proteingraphs.SpatRel;
 import tools.DP;
 
 /**
@@ -159,13 +159,13 @@ public class LinnotParserRED implements ILinnotParser {
     @Override
     public List<Integer> getNtoCPositionsOfVisitPath() {
         Integer maxShift = this.getMaxShiftLeft();
-        List<Integer> visited = this.getVisitPath();
+        List<Integer> visitPath = this.getVisitPath();
         List<Integer> nToCPositions = new ArrayList<>();
               
         Integer indexNtoC;
         Integer reltoStartPos;
-        for(int i = 0; i < visited.size(); i++) {
-            reltoStartPos = visited.get(i);
+        for(int i = 0; i < visitPath.size(); i++) {
+            reltoStartPos = visitPath.get(i);
             indexNtoC = reltoStartPos - maxShift;
             nToCPositions.add(indexNtoC);
         }

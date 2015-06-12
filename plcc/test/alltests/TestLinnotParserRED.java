@@ -14,10 +14,10 @@ import java.util.List;
 import org.junit.Assert;
 import junit.framework.TestCase;
 import linnottograph.ILinnotParser;
-import plcc.IO;
+import io.IO;
 import linnottograph.LinnotParserRED;
-import plcc.SSEGraph;
-import plcc.SpatRel;
+import proteingraphs.SSEGraph;
+import proteingraphs.SpatRel;
 import proteinstructure.SSE;
 
 /**

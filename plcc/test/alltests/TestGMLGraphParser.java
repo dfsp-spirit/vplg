@@ -17,7 +17,7 @@ import linnottograph.LinnotParserRED;
 import parsers.GMLGraphParser;
 import parsers.IGraphParser;
 import parsers.ParserTools;
-import plcc.SSEGraph;
+import proteingraphs.SSEGraph;
 
 
 /**

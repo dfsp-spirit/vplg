@@ -10,7 +10,7 @@ package proteinstructure;
 
 // imports
 
-import plcc.Position3D;
+import proteingraphs.Position3D;
 import plcc.Settings;
 
 

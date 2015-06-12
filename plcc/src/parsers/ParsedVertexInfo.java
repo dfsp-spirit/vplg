@@ -10,7 +10,7 @@ package parsers;
 import graphdrawing.IDrawableVertex;
 import java.util.HashMap;
 import java.util.Map;
-import plcc.VertexProperty;
+import proteingraphs.VertexProperty;
 
 /**
  *

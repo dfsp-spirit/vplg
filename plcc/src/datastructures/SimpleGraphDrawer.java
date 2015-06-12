@@ -16,10 +16,10 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import plcc.ProtGraph;
-import plcc.ProtGraphs;
+import proteingraphs.ProtGraph;
+import proteingraphs.ProtGraphs;
 import proteinstructure.SSE;
-import plcc.SpatRel;
+import proteingraphs.SpatRel;
 
 /**
  * A class to draw a graph on the console (text-based). Will draw the vertices in a column on the left screen side,
