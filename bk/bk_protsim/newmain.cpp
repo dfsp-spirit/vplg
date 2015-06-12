@@ -5,13 +5,13 @@
  * Created on May 29, 2015, 12:29 PM
  */
 
-#include <cstdlib>
 #include <iostream>
 #include "Graph.h"
+#include "GMLptglProteinParser.h"
 #include "ProductGraph.h"
 #include "BronKerbosch.h"
 #include "BK_Output.h"
-#include "GMLptglProteinParser.h"
+#include "PG_Output.h"
 
 
 using namespace std;
@@ -20,31 +20,39 @@ using namespace std;
  * 
  */
 int main(int argc, char** argv) {
-    
+   /* 
     //testdata/2pol.gml
     //testdata/1bib.gml
     GMLptglProteinParser pa1 = GMLptglProteinParser("testdata/1bib.gml");
     GMLptglProteinParser pa2 = GMLptglProteinParser("testdata/2pol.gml");
     Graph fst = pa1.graph;
     Graph sec = pa2.graph;
-    
-    
-    
+    */
     
     /*
-    Graph fst(4);
-    fst[0].label = "e";fst[1].label = "e";fst[2].label = "e";fst[3].label = "e";
+    Graph fst(3);
+    fst[0].label = "e";fst[1].label = "e";fst[2].label = "e";
+    fst[addEdge(0,1,fst).first].label = "p";
+    fst[addEdge(1,2,fst).first].label = "m";
+    Graph sec(5);
+    sec[0].label = "e";sec[1].label = "e";sec[2].label = "e";sec[3].label = "e";sec[4].label = "e";
+    sec[addEdge(0,1,sec).first].label = "m";
+    sec[addEdge(1,2,sec).first].label = "p";
+    sec[addEdge(0,3,sec).first].label = "m";
+    sec[addEdge(3,4,sec).first].label = "m";
+     */
+
+    Graph fst(3);
+    fst[0].label = "e";fst[1].label = "e";fst[2].label = "e";
     fst[addEdge(0,1,fst).first].label = "m";
     fst[addEdge(1,2,fst).first].label = "m";
-    fst[addEdge(2,3,fst).first].label = "m";
-    fst[addEdge(3,0,fst).first].label = "m";
-    Graph sec(4);
-    sec[0].label = "e";sec[1].label = "e";sec[2].label = "e";sec[3].label = "e";
+    fst[addEdge(2,0,fst).first].label = "m";
+    Graph sec(3);
+    sec[0].label = "e";sec[1].label = "e";sec[2].label = "e";
     sec[addEdge(0,1,sec).first].label = "m";
     sec[addEdge(1,2,sec).first].label = "m";
-    sec[addEdge(2,3,sec).first].label = "m";
-    sec[addEdge(3,0,sec).first].label = "m";
-    */ 
+    sec[addEdge(2,0,sec).first].label = "m";
+     
    
    
     ProductGraph prd = ProductGraph(fst,sec);
@@ -64,6 +72,7 @@ int main(int argc, char** argv) {
              << "\n";
     }
     */
+    
  
     
     BronKerbosch bk(p);
@@ -80,8 +89,20 @@ int main(int argc, char** argv) {
         ++x;
     }
     
+    
     cout << "\n\n";
     cout << BK_Output::get_JSON_largest(bk);
+    
+    cout << "\n\n";
+    for(list<unsigned long>& x : bk.get_result_list()) {
+        for (unsigned long l : x) {
+            cout << l << " , ";
+        }
+        cout << "\n";
+    }
+    
+    
+    
     
     return 0;
 }

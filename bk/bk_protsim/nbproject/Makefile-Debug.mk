@@ -47,7 +47,10 @@ TESTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}/tests
 
 # Test Files
 TESTFILES= \
-	${TESTDIR}/TestFiles/f1
+	${TESTDIR}/TestFiles/f1 \
+	${TESTDIR}/TestFiles/f3 \
+	${TESTDIR}/TestFiles/f2 \
+	${TESTDIR}/TestFiles/f4
 
 # C Compiler Flags
 CFLAGS=
@@ -108,21 +111,69 @@ ${OBJECTDIR}/newmain.o: newmain.cpp
 
 # Build Test Targets
 .build-tests-conf: .build-conf ${TESTFILES}
-${TESTDIR}/TestFiles/f1: ${TESTDIR}/tests/newtestclass.o ${TESTDIR}/tests/newtestrunner.o ${OBJECTFILES:%.o=%_nomain.o}
+${TESTDIR}/TestFiles/f1: ${TESTDIR}/tests/Test_BK_Output.o ${TESTDIR}/tests/testrunner_BK_Output.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc}   -o ${TESTDIR}/TestFiles/f1 $^ ${LDLIBSOPTIONS} `cppunit-config --libs`   
 
+${TESTDIR}/TestFiles/f3: ${TESTDIR}/tests/Test_BronKerbosch.o ${TESTDIR}/tests/testrunner_BronKerbosch.o ${OBJECTFILES:%.o=%_nomain.o}
+	${MKDIR} -p ${TESTDIR}/TestFiles
+	${LINK.cc}   -o ${TESTDIR}/TestFiles/f3 $^ ${LDLIBSOPTIONS} `cppunit-config --libs`   
 
-${TESTDIR}/tests/newtestclass.o: tests/newtestclass.cpp 
+${TESTDIR}/TestFiles/f2: ${TESTDIR}/tests/Test_PG_Output.o ${TESTDIR}/tests/testrunner_PG_Output.o ${OBJECTFILES:%.o=%_nomain.o}
+	${MKDIR} -p ${TESTDIR}/TestFiles
+	${LINK.cc}   -o ${TESTDIR}/TestFiles/f2 $^ ${LDLIBSOPTIONS} `cppunit-config --libs`   
+
+${TESTDIR}/TestFiles/f4: ${TESTDIR}/tests/Test_ProductGraph.o ${TESTDIR}/tests/testrunner_ProductGraph.o ${OBJECTFILES:%.o=%_nomain.o}
+	${MKDIR} -p ${TESTDIR}/TestFiles
+	${LINK.cc}   -o ${TESTDIR}/TestFiles/f4 $^ ${LDLIBSOPTIONS} `cppunit-config --libs`   
+
+
+${TESTDIR}/tests/Test_BK_Output.o: tests/Test_BK_Output.cpp 
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
-	$(COMPILE.cc) -g `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestclass.o tests/newtestclass.cpp
+	$(COMPILE.cc) -g `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/Test_BK_Output.o tests/Test_BK_Output.cpp
 
 
-${TESTDIR}/tests/newtestrunner.o: tests/newtestrunner.cpp 
+${TESTDIR}/tests/testrunner_BK_Output.o: tests/testrunner_BK_Output.cpp 
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
-	$(COMPILE.cc) -g `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner.o tests/newtestrunner.cpp
+	$(COMPILE.cc) -g `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/testrunner_BK_Output.o tests/testrunner_BK_Output.cpp
+
+
+${TESTDIR}/tests/Test_BronKerbosch.o: tests/Test_BronKerbosch.cpp 
+	${MKDIR} -p ${TESTDIR}/tests
+	${RM} "$@.d"
+	$(COMPILE.cc) -g `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/Test_BronKerbosch.o tests/Test_BronKerbosch.cpp
+
+
+${TESTDIR}/tests/testrunner_BronKerbosch.o: tests/testrunner_BronKerbosch.cpp 
+	${MKDIR} -p ${TESTDIR}/tests
+	${RM} "$@.d"
+	$(COMPILE.cc) -g `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/testrunner_BronKerbosch.o tests/testrunner_BronKerbosch.cpp
+
+
+${TESTDIR}/tests/Test_PG_Output.o: tests/Test_PG_Output.cpp 
+	${MKDIR} -p ${TESTDIR}/tests
+	${RM} "$@.d"
+	$(COMPILE.cc) -g `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/Test_PG_Output.o tests/Test_PG_Output.cpp
+
+
+${TESTDIR}/tests/testrunner_PG_Output.o: tests/testrunner_PG_Output.cpp 
+	${MKDIR} -p ${TESTDIR}/tests
+	${RM} "$@.d"
+	$(COMPILE.cc) -g `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/testrunner_PG_Output.o tests/testrunner_PG_Output.cpp
+
+
+${TESTDIR}/tests/Test_ProductGraph.o: tests/Test_ProductGraph.cpp 
+	${MKDIR} -p ${TESTDIR}/tests
+	${RM} "$@.d"
+	$(COMPILE.cc) -g `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/Test_ProductGraph.o tests/Test_ProductGraph.cpp
+
+
+${TESTDIR}/tests/testrunner_ProductGraph.o: tests/testrunner_ProductGraph.cpp 
+	${MKDIR} -p ${TESTDIR}/tests
+	${RM} "$@.d"
+	$(COMPILE.cc) -g `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/testrunner_ProductGraph.o tests/testrunner_ProductGraph.cpp
 
 
 ${OBJECTDIR}/BK_Output_nomain.o: ${OBJECTDIR}/BK_Output.o BK_Output.cpp 
@@ -208,6 +259,9 @@ ${OBJECTDIR}/newmain_nomain.o: ${OBJECTDIR}/newmain.o newmain.cpp
 	@if [ "${TEST}" = "" ]; \
 	then  \
 	    ${TESTDIR}/TestFiles/f1 || true; \
+	    ${TESTDIR}/TestFiles/f3 || true; \
+	    ${TESTDIR}/TestFiles/f2 || true; \
+	    ${TESTDIR}/TestFiles/f4 || true; \
 	else  \
 	    ./${TEST} || true; \
 	fi

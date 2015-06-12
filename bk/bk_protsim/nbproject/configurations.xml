@@ -30,12 +30,36 @@
                    projectFiles="false"
                    kind="TEST_LOGICAL_FOLDER">
       <logicalFolder name="f1"
-                     displayName="New CppUnit Test"
+                     displayName="Test_BK_Output"
                      projectFiles="true"
                      kind="TEST">
-        <itemPath>tests/newtestclass.cpp</itemPath>
-        <itemPath>tests/newtestclass.h</itemPath>
-        <itemPath>tests/newtestrunner.cpp</itemPath>
+        <itemPath>tests/Test_BK_Output.cpp</itemPath>
+        <itemPath>tests/Test_BK_Output.h</itemPath>
+        <itemPath>tests/testrunner_BK_Output.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f3"
+                     displayName="Test_BronKerbosch"
+                     projectFiles="true"
+                     kind="TEST">
+        <itemPath>tests/Test_BronKerbosch.cpp</itemPath>
+        <itemPath>tests/Test_BronKerbosch.h</itemPath>
+        <itemPath>tests/testrunner_BronKerbosch.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f2"
+                     displayName="Test_PG_Output"
+                     projectFiles="true"
+                     kind="TEST">
+        <itemPath>tests/Test_PG_Output.cpp</itemPath>
+        <itemPath>tests/Test_PG_Output.h</itemPath>
+        <itemPath>tests/testrunner_PG_Output.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f4"
+                     displayName="Test_ProductGraph"
+                     projectFiles="true"
+                     kind="TEST">
+        <itemPath>tests/Test_ProductGraph.cpp</itemPath>
+        <itemPath>tests/Test_ProductGraph.h</itemPath>
+        <itemPath>tests/testrunner_ProductGraph.cpp</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -95,13 +119,73 @@
           </linkerLibItems>
         </linkerTool>
       </folder>
+      <folder path="TestFiles/f2">
+        <cTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </cTool>
+        <ccTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f2</output>
+          <linkerLibItems>
+            <linkerOptionItem>`cppunit-config --libs`</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
+      <folder path="TestFiles/f3">
+        <cTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </cTool>
+        <ccTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f3</output>
+          <linkerLibItems>
+            <linkerOptionItem>`cppunit-config --libs`</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
+      <folder path="TestFiles/f4">
+        <cTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </cTool>
+        <ccTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f4</output>
+          <linkerLibItems>
+            <linkerOptionItem>`cppunit-config --libs`</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
       <item path="newmain.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="tests/newtestclass.cpp" ex="false" tool="1" flavor2="0">
+      <item path="tests/Test_BK_Output.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="tests/newtestclass.h" ex="false" tool="3" flavor2="0">
+      <item path="tests/Test_BK_Output.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="tests/newtestrunner.cpp" ex="false" tool="1" flavor2="0">
+      <item path="tests/Test_BronKerbosch.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/Test_BronKerbosch.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="tests/Test_PG_Output.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/Test_PG_Output.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="tests/Test_ProductGraph.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/Test_ProductGraph.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="tests/testrunner_BK_Output.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/testrunner_BronKerbosch.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/testrunner_PG_Output.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/testrunner_ProductGraph.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -160,13 +244,73 @@
           </linkerLibItems>
         </linkerTool>
       </folder>
+      <folder path="TestFiles/f2">
+        <cTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </cTool>
+        <ccTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f2</output>
+          <linkerLibItems>
+            <linkerOptionItem>`cppunit-config --libs`</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
+      <folder path="TestFiles/f3">
+        <cTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </cTool>
+        <ccTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f3</output>
+          <linkerLibItems>
+            <linkerOptionItem>`cppunit-config --libs`</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
+      <folder path="TestFiles/f4">
+        <cTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </cTool>
+        <ccTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f4</output>
+          <linkerLibItems>
+            <linkerOptionItem>`cppunit-config --libs`</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
       <item path="newmain.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="tests/newtestclass.cpp" ex="false" tool="1" flavor2="0">
+      <item path="tests/Test_BK_Output.cpp" ex="false" tool="1" flavor2="0">
       </item>
-      <item path="tests/newtestclass.h" ex="false" tool="3" flavor2="0">
+      <item path="tests/Test_BK_Output.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="tests/newtestrunner.cpp" ex="false" tool="1" flavor2="0">
+      <item path="tests/Test_BronKerbosch.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/Test_BronKerbosch.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="tests/Test_PG_Output.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/Test_PG_Output.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="tests/Test_ProductGraph.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/Test_ProductGraph.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="tests/testrunner_BK_Output.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/testrunner_BronKerbosch.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/testrunner_PG_Output.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/testrunner_ProductGraph.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
   </confs>

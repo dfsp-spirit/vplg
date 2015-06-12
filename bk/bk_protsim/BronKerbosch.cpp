@@ -10,6 +10,8 @@
 
 
 
+BronKerbosch::BronKerbosch():g(0), result(), T(),vertex_array(0), set_array(0){}
+
 /*
  * Constructor
  */
@@ -320,4 +322,11 @@ std::list<VertexDescriptor_p> BronKerbosch::output_clique(int s) {
         o = o->next_vertex;
     }
     return res;
+}
+
+/*
+ * Sets the internal result storage to the new value. only for testing purposes, should not be in the distributed version.
+ */
+void BronKerbosch::set_result(std::list<std::list<VertexDescriptor_p>> value) {
+    this->result = value;    
 }

@@ -9,11 +9,17 @@
 #include <tuple>
 #include <forward_list>
 
-
+/*
+ * default constructor. Assigns 0-Values.
+ */
 ProductGraph::ProductGraph() : fstGraph(0), secGraph(0) {
     prodGraph = Graph_p(0);
 }
 
+/*
+ * Produces a ProductGraph object from the two passed graphs. The construction already calculates the product graph,
+ * the resulting graph can be obtained by the getProductGraph function.
+ */
 ProductGraph::ProductGraph(const Graph& fstGraph, const Graph& secGraph) : fstGraph(fstGraph), secGraph(secGraph) {
     computePrdGraph();
     prodGraph[boost::graph_bundle].id = 0; // maybe include parameter for the constructor or has to be changed manually later
@@ -25,6 +31,9 @@ ProductGraph::ProductGraph(const Graph& fstGraph, const Graph& secGraph) : fstGr
                                                                                std::to_string(secGraph[boost::graph_bundle].id);
 }
 
+/*
+ * Copy constructor. Not implemented yet.
+ */
 ProductGraph::ProductGraph(const ProductGraph&) : fstGraph(0), secGraph(0), prodGraph(0) {
     std::cerr << "not implemented";
 }
@@ -36,34 +45,35 @@ const Graph_p& ProductGraph::getProductGraph() const { return prodGraph;}
 const Graph& ProductGraph::getFirstGraph() const { return fstGraph;}
 const Graph& ProductGraph::getSecondGraph() const { return secGraph;}
 
+/*
+ * Main Algorithm to compute the compatibility graph.
+ * the vertices of the product graph get computed by paring every edge of the first graph with every edge
+ * of the second. If the edges are compatible a new vertex is added to the product graph.
+ * They are compatible if they, and their source/target vertices have the same labels.
+ * All vertices get first added to a temporary list and then copied over into the graph to avoid the
+ * time complexity of continually adding elements to a vecS
+ * 
+ * an edge between two vertices is added if the edge pairings they represent are compatible.
+ * they are compatible if either the edge pairs in either of the graphs share no common vertex, 
+ * or both of them share a vertex with the same label in both graphs.
+ */
 void ProductGraph::computePrdGraph() {
-    /*the vertices of the product graph get computed by paring every edge of the first graph with every edge
-     * of the second. If the edges are compatible a new vertex is added to the product graph.
-     * They are compatible if they, and their source/target vertices have the same labels.
-     * All vertices get first added to a temporary list and then copied over into the graph to avoid the
-     * time complexity of continually adding elements to a vecS
-     * 
-     * an edge between two vertices is added if the edge pairings they represent are compatible.
-     * they are compatible if either the edge pairs in either of the graphs share no common vertex, 
-     * or both of them share a vertex with the same label in both graphs.
-     */
-
     std::list<vertex_info_p> vertexList;
     int count = 0;
 
     //iterating through all edge pairs
     EdgeIterator eiFst, eiEndFst ;
     EdgeIterator eiSec, eiEndSec;
-    for ( boost::tie(eiFst, eiEndFst) = edges(fstGraph); eiFst != eiEndFst; ++eiFst) {
+    for ( boost::tie(eiFst, eiEndFst) = boost::edges(fstGraph); eiFst != eiEndFst; ++eiFst) {
         VertexDescriptor v1Fst, v2Fst;
-        v1Fst = source(*eiFst, fstGraph);
-        v2Fst = target (*eiFst, fstGraph);
-        for ( boost::tie(eiSec, eiEndSec) = edges(secGraph); eiSec != eiEndSec; ++eiSec) {
+        v1Fst = boost::source(*eiFst, fstGraph);
+        v2Fst = boost::target (*eiFst, fstGraph);
+        for ( boost::tie(eiSec, eiEndSec) = boost::edges(secGraph); eiSec != eiEndSec; ++eiSec) {
 
             //getting the vertices of the current edges
             VertexDescriptor v1Sec, v2Sec;
-            v1Sec = source(*eiSec,secGraph);
-            v2Sec = target (*eiSec,secGraph);
+            v1Sec = boost::source(*eiSec,secGraph);
+            v2Sec = boost::target (*eiSec,secGraph);
 
             //check for compatibility of the edges (identity of edge labels and target/source vertex labels)
             bool labelCompatible = fstGraph[*eiFst].label == secGraph[*eiSec].label;
@@ -75,11 +85,12 @@ void ProductGraph::computePrdGraph() {
             //edit the properties of the new vertex and adds it to the list
             if (labelCompatible && verticesCompatible)     {
                 vertex_info_p temp;
-                temp.id = count++;
                 temp.label = "";
+                temp.comment = "";
                 temp.edgeFst =*eiFst;
                 temp.edgeSec =*eiSec;
                 vertexList.push_front(temp);
+                ++count;
             } 
         }//end for all edges in the second graph
     }//end for all edges in the first graph
@@ -87,10 +98,11 @@ void ProductGraph::computePrdGraph() {
     //copy the values from the list to the graph
     this->prodGraph = Graph_p(count);
     VertexIterator_p vi, viEnd;
-    boost::tie(vi, viEnd) = vertices(prodGraph);
+    boost::tie(vi, viEnd) = boost::vertices(prodGraph);
     for (vertex_info_p& elem : vertexList) {
         if (vi != viEnd) {
             prodGraph[*vi] = elem;
+            prodGraph[*vi].id = *vi;
             ++vi;
         } else {
             std::cerr << "List -> Graph size disparity.";
@@ -101,19 +113,19 @@ void ProductGraph::computePrdGraph() {
     //Add the edges to the graph
     //iterate through all vertex pairs in the new product graph
     VertexIterator_p vi1P, vi2P, viEndP, vi2EndP;
-    for (boost::tie(vi1P, viEndP) = vertices(prodGraph); vi1P != viEndP; ++vi1P) {
+    for (boost::tie(vi1P, viEndP) = boost::vertices(prodGraph); vi1P != viEndP; ++vi1P) {
 //        for (vi2P = vi1P,++vi2P; vi2P != viEndP; ++vi2P) {  //avoid computing every edge twice( (v1, v2) and (v2, v1) )
-        for (boost::tie(vi2P, vi2EndP) = vertices(prodGraph); vi2P != vi2EndP; ++vi2P) {  //avoid computing every edge twice( (v1, v2) and (v2, v1) )
+        for (boost::tie(vi2P, vi2EndP) = boost::vertices(prodGraph); vi2P != vi2EndP; ++vi2P) {  //avoid computing every edge twice( (v1, v2) and (v2, v1) )
             bool comp, z;
             std::tie(comp, z) = verticesCompatible(vi1P, vi2P);
             if (comp) {
-                EdgeDescriptor_p tmp; bool flag;
-                std::tie(tmp, flag) = addEdge(*vi1P, *vi2P, prodGraph);
+                EdgeDescriptor_p new_edge; bool flag;
+                std::tie(new_edge, flag) = addEdge(*vi1P, *vi2P, prodGraph);
                 if (flag) { //check if the edge already exists 
-                    prodGraph[tmp].label = z ? "z":"u";
-                    prodGraph[tmp].source = prodGraph[*vi1P].id;
-                    prodGraph[tmp].target = prodGraph[*vi2P].id;
-                    prodGraph[tmp].comment = "";
+                    prodGraph[new_edge].label = z ? "z":"u";
+                    prodGraph[new_edge].source = prodGraph[*vi1P].id;
+                    prodGraph[new_edge].target = prodGraph[*vi2P].id;
+                    prodGraph[new_edge].comment = "";
                 } 
             }
         } // for second vertex
@@ -170,3 +182,14 @@ std::pair<bool, bool> ProductGraph::verticesCompatible(VertexIterator_p p1, Vert
     bool z = (neighbouredFst && neighbouredSec) && (labelFst == labelSec);
     return std::make_pair( z || !(neighbouredFst || neighbouredSec),    z );
 } //end bool ProductGraph::verticesCompatible(VertexIterator_p p1, VertexIterator_p p2)
+
+
+
+
+
+/*
+ * only for testing purposes, should not be distributed.
+ */
+void ProductGraph::setProductGraph(Graph_p& pg) {
+    this->prodGraph = pg;
+}

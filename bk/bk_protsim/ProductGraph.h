@@ -23,6 +23,9 @@ public:
     const Graph_p& getProductGraph() const;
     const Graph& getFirstGraph() const;
     const Graph& getSecondGraph() const;
+    
+
+    void setProductGraph(Graph_p& pg); // only for test purposes, should never be distributed.
 
 private:
     std::pair<bool,bool> verticesCompatible(VertexIterator_p vi1, VertexIterator_p vi2);

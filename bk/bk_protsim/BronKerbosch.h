@@ -33,6 +33,7 @@ struct object {
  */
 class BronKerbosch {
 public:
+    BronKerbosch();
     BronKerbosch(const Graph_p& graph);
     ~BronKerbosch();
     
@@ -40,6 +41,7 @@ public:
     void clear_results();
     std::list<std::list<VertexDescriptor_p>>  get_result_list() const;
     const Graph_p& get_Product_Graph() const;
+    void set_result(std::list<std::list<VertexDescriptor_p>> value);  //only for test purposes , should be removed before final distribution
     
 private:
     //members needed to find the cliques in a recursive function (work like global variables).

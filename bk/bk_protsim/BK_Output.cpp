@@ -8,21 +8,24 @@
 #include "BK_Output.h"
 
 /*
- * 
+ * returns a JSON string of an array of arrays of integers representing the vertices in all cliques found.
+ * each inner array is one Clique, each integer is one vertex in that clique.
  */
 std::string BK_Output::get_JSON_all( const BronKerbosch& bk){
     return cliques_to_JSON(get_result_all(bk));
 }
 
 /*
- * 
+ * returns a JSON string of an array of arrays of integers representing the vertices in all cliques of maximal size found.
+ * each inner array is one Clique, each integer is one vertex in that clique.
  */
 std::string BK_Output::get_JSON_largest( const BronKerbosch& bk){
     return cliques_to_JSON(get_result_largest(bk));
 }
 
 /*
- * 
+ * returns a JSON string of an array of arrays of integers representing the vertices in all cliques larger than the given size found.
+ * each inner array is one Clique, each integer is one vertex in that clique.
  */
 std::string BK_Output::get_JSON_larger_than( const BronKerbosch& bk, int size){
     return cliques_to_JSON(get_result_larger_than(bk, size));
@@ -34,7 +37,7 @@ std::string BK_Output::get_JSON_larger_than( const BronKerbosch& bk, int size){
 std::vector<int> BK_Output::get_formated_pattern( const BronKerbosch& bk){
     std::vector<int> pattern;
     std::list<std::list<unsigned long>> result = bk.get_result_list();
-        for (std::list<unsigned long> c : result) {
+        for (std::list<unsigned long>& c : result) {
             while (pattern.size() <= c.size() ) {
                 pattern.push_back(0);
             }
@@ -56,13 +59,15 @@ std::list<std::list<unsigned long>> BK_Output::get_result_all( const BronKerbosc
 std::list< std::list<unsigned long>> BK_Output::get_result_largest( const BronKerbosch& bk){
     std::list<std::list<unsigned long>> list;
      int largest = 0;
-     for (std::list<unsigned long> c : bk.get_result_list()) {
+     std::list<std::list<unsigned long>> bk_result = bk.get_result_list();
+     for (std::list<unsigned long>& c : bk_result) {
          if (c.size() > largest) {
              largest = c.size();
              list.clear();
+             list.push_back(c);
          } else {
              if (c.size() == largest) {
-                 list.push_front(c);
+                 list.push_back(c);
              }
          }
      }
@@ -74,7 +79,7 @@ std::list< std::list<unsigned long>> BK_Output::get_result_largest( const BronKe
  */
 std::list< std::list<unsigned long>> BK_Output::get_result_larger_than( const BronKerbosch& bk, int size){
     std::list<std::list<unsigned long>> list;
-     for (std::list<unsigned long> c : bk.get_result_list()) {
+     for (std::list<unsigned long>& c : bk.get_result_list()) {
          if (c.size() > size) {
              list.push_front(c);
          }
