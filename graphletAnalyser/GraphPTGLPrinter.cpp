@@ -15,8 +15,8 @@ GraphPTGLPrinter::GraphPTGLPrinter() {
 };
 
 
-GraphPTGLPrinter::GraphPTGLPrinter(GraphService& serv) {
-  service = serv;
+GraphPTGLPrinter::GraphPTGLPrinter(Graph g) {
+  service = GraphService(g);
 };
 
 /*

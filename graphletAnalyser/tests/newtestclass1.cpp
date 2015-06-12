@@ -48,10 +48,12 @@ void newtestclass1::setUp() {
     
     
     // defining the test string and the printer
-    testStringAdjacent = "   0:   1   2  ";
+    testStringAdjacent = "   0:   1   2 \n";
+    
+    
     service = GraphService(threeNodesGraph);
     
-    GraphPrinter printer(service);
+    printer = GraphPrinter(threeNodesGraph);
     
 }
 
@@ -62,17 +64,14 @@ void newtestclass1::tearDown() {
 
 void newtestclass1::test_printAdjacent() {
     
-    
     std::string loeres = printer.printAdjacent(0);
-    std::vector<int> v = std::vector<int>();
-    v.push_back(1);
-    v.push_back(2);
+
+
     
+    CPPUNIT_ASSERT(loeres.compare(testStringAdjacent) == 0);
     
+
     
-    //CPPUNIT_ASSERT(v == service.get_adjacent(0));
-    
-    CPPUNIT_ASSERT(true);
     
 }
 

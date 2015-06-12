@@ -12,13 +12,13 @@
 GraphPrinter::GraphPrinter() {
     GraphService gService_tmp;
     service = gService_tmp;
-};
+}
 
 
 
-GraphPrinter::GraphPrinter(GraphService serv) {
-    service = serv;
-};
+GraphPrinter::GraphPrinter(Graph g) {
+    service = GraphService(g);
+}
 
 
 /* Print vertices adjacent to a given vertex i to a string
@@ -28,6 +28,7 @@ std::string GraphPrinter::printAdjacent(int i) {
     
     
     std::vector<int> vertex_vector = service.get_adjacent(i);
+    vertex_vector.erase(vertex_vector.begin());
     
     // iterate over adjacent vertices and print their ids to a string
     sstream << "  " << setw(2) << i << ": "; 

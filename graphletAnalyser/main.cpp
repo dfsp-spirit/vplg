@@ -349,7 +349,7 @@ int main(int argc, char** argv) {
         GMLptglProteinParser Parser(files[i]);
         Graph graph = Parser.getGraph();
         GraphService service(graph);
-        GraphPTGLPrinter printer(service);
+        GraphPTGLPrinter printer(graph);
         
         if(service.getNumVertices() <= 0) {
             if( ! silent) {

@@ -28,7 +28,7 @@ public:
     
     //constructors
     GraphPrinter();
-    GraphPrinter(GraphService serv);
+    GraphPrinter(Graph g);
     
     //methods, doing what their name says
     

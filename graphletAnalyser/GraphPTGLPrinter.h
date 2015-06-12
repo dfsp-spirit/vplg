@@ -17,7 +17,7 @@ class GraphPTGLPrinter : public GraphPrinter {
     public:
         // constructors
         GraphPTGLPrinter();
-        GraphPTGLPrinter(GraphService& serv);
+        GraphPTGLPrinter(Graph g);
         
         // methods, only applicable to graphs in ptgl format
         void printGraphInfo();
