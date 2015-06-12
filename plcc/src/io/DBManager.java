@@ -2400,13 +2400,13 @@ connection.close();
                 
                 // We are looking for the positions of the helices:
                      // first helix after the first strand
-                firstHelixPositionMinInAlphaOrBetaGraph = adjpos;
+                secondHelixPositionMinInAlphaOrBetaGraph = adjpos;
                 for(int j = 0; j <= patternPositionInRED; j++) {
-                    firstHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[j];
+                    secondHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[j];
                 }
                 
-                firstHelixPositionMaxInAlphaOrBetaGraph = firstHelixPositionMinInAlphaOrBetaGraph;
-                firstHelixPositionMaxInAlphaOrBetaGraph -= relDistancesADJ[patternPositionInRED];     // the index has to exist in the array, since of pattern of length 3 was found starting at patternPositionInRED                
+                secondHelixPositionMaxInAlphaOrBetaGraph = secondHelixPositionMinInAlphaOrBetaGraph;
+                secondHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED+1];     // the index has to exist in the array, since of pattern of length 3 was found starting at patternPositionInRED                
                 
                 // second helix
                 
@@ -2416,11 +2416,10 @@ connection.close();
                 
                 
                 
-                secondHelixPositionMinInAlphaOrBetaGraph = firstHelixPositionMaxInAlphaOrBetaGraph;
-                secondHelixPositionMinInAlphaOrBetaGraph -= relDistancesADJ[patternPositionInRED];    // the index has to exist in the array, since of pattern of length 3 was found starting at patternPositionInRED
+                firstHelixPositionMaxInAlphaOrBetaGraph = secondHelixPositionMinInAlphaOrBetaGraph;
                 
-                secondHelixPositionMaxInAlphaOrBetaGraph = secondHelixPositionMinInAlphaOrBetaGraph;
-                secondHelixPositionMaxInAlphaOrBetaGraph -= relDistancesADJ[patternPositionInRED - 1];    // the index has to exist in the array, since of pattern of length 3 was found starting at patternPositionInRED
+                firstHelixPositionMinInAlphaOrBetaGraph = firstHelixPositionMaxInAlphaOrBetaGraph;
+                firstHelixPositionMinInAlphaOrBetaGraph -= relDistancesADJ[patternPositionInRED];    // the index has to exist in the array, since of pattern of length 3 was found starting at patternPositionInRED
                 
             }
             
@@ -2520,7 +2519,7 @@ connection.close();
         for (int i = 0; i < all_pdb_ids.size(); i++) {
             for (int a = 0; a < all_albeNumberOfHelix.get(i).size(); a++) {
                 for (int b = 0; b < all_albeNumberOfHelix.get(i).size(); b++) {
-                    if (all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMaxInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) < all_secondHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) > all_secondHelixPositionMaxInAlbeGraph.get(i)) {
+                    if (all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMaxInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) > all_secondHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) < all_secondHelixPositionMaxInAlbeGraph.get(i)) {
                         return true;
                     } else {
                         return false;
