@@ -25,6 +25,7 @@ public:
     void tearDown();
 
 private:
+    Graph_p p;
     void testRun();
 
 };

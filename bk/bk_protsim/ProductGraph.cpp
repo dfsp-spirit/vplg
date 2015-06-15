@@ -21,14 +21,7 @@ ProductGraph::ProductGraph() : fstGraph(0), secGraph(0) {
  * the resulting graph can be obtained by the getProductGraph function.
  */
 ProductGraph::ProductGraph(const Graph& fstGraph, const Graph& secGraph) : fstGraph(fstGraph), secGraph(secGraph) {
-    computePrdGraph();
-    prodGraph[boost::graph_bundle].id = 0; // maybe include parameter for the constructor or has to be changed manually later
-    prodGraph[boost::graph_bundle].directed = 0; //i hope 0 is undirected
-    //save the id of the original graphs as the label of the product graph
-    prodGraph[boost::graph_bundle].label = std::to_string(fstGraph[boost::graph_bundle].id)  + "$" +
-                                                                               std::to_string(secGraph[boost::graph_bundle].id) ;
-    prodGraph[boost::graph_bundle].comment = "Compatibility graph of "+ std::to_string(fstGraph[boost::graph_bundle].id)  + " and " +
-                                                                               std::to_string(secGraph[boost::graph_bundle].id);
+    prodGraph = Graph_p(0);
 }
 
 /*
@@ -36,6 +29,7 @@ ProductGraph::ProductGraph(const Graph& fstGraph, const Graph& secGraph) : fstGr
  */
 ProductGraph::ProductGraph(const ProductGraph&) : fstGraph(0), secGraph(0), prodGraph(0) {
     std::cerr << "not implemented";
+    exit(1);
 }
 
 ProductGraph::~ProductGraph() {}
@@ -57,7 +51,7 @@ const Graph& ProductGraph::getSecondGraph() const { return secGraph;}
  * they are compatible if either the edge pairs in either of the graphs share no common vertex, 
  * or both of them share a vertex with the same label in both graphs.
  */
-void ProductGraph::computePrdGraph() {
+void ProductGraph::run() {
     std::list<vertex_info_p> vertexList;
     int count = 0;
 
@@ -96,7 +90,14 @@ void ProductGraph::computePrdGraph() {
     }//end for all edges in the first graph
 
     //copy the values from the list to the graph
-    this->prodGraph = Graph_p(count);
+    prodGraph = Graph_p(count);
+    prodGraph[boost::graph_bundle].id = 0;
+    prodGraph[boost::graph_bundle].directed = 0; //i hope 0 is undirected
+    //save the id of the original graphs as the label of the product graph
+    prodGraph[boost::graph_bundle].label = std::to_string(fstGraph[boost::graph_bundle].id)  + "$" +
+                                                                               std::to_string(secGraph[boost::graph_bundle].id) ;
+    prodGraph[boost::graph_bundle].comment = "Compatibility graph of "+ std::to_string(fstGraph[boost::graph_bundle].id)  + " and " +
+                                                                               std::to_string(secGraph[boost::graph_bundle].id);
     VertexIterator_p vi, viEnd;
     boost::tie(vi, viEnd) = boost::vertices(prodGraph);
     for (vertex_info_p& elem : vertexList) {

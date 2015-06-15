@@ -17,29 +17,48 @@ Test_PG_Output::~Test_PG_Output() {
 }
 
 void Test_PG_Output::setUp() {
-    Graph fst(3);
-    fst[0].label = "e";fst[1].label = "e";fst[2].label = "e";
+    Graph fst(4);
+    fst[0].label = "h";fst[1].label = "e";fst[2].label = "e";fst[3].label = "e";
     fst[addEdge(0,1,fst).first].label = "p";
     fst[addEdge(1,2,fst).first].label = "m";
+    fst[addEdge(2,3,fst).first].label = "m";
+    fst[addEdge(3,0,fst).first].label = "m";
     this->f = fst;
     
     Graph sec(5);
-    sec[0].label = "e";sec[1].label = "e";sec[2].label = "e";sec[3].label = "e";sec[4].label = "e";
-    sec[addEdge(0,1,sec).first].label = "m";
-    sec[addEdge(1,2,sec).first].label = "p";
-    sec[addEdge(0,3,sec).first].label = "m";
-    sec[addEdge(3,4,sec).first].label = "m";
+    sec[0].label = "h";sec[1].label = "e";sec[2].label = "e";sec[3].label = "e";sec[4].label = "e";
+    sec[addEdge(0,1,sec).first].label = "p";
+    sec[addEdge(1,2,sec).first].label = "m";
+    sec[addEdge(2,3,sec).first].label = "m";
+    sec[addEdge(3,0,sec).first].label = "m";
+    sec[addEdge(4,2,sec).first].label = "m";
     this->s = sec;
     
-    Graph_p pro(4);
-    pro[0].edgeFst = boost::edge(1,2,f).first; pro[0].edgeSec = boost::edge(0,1,s).first;
-    pro[1].edgeFst = boost::edge(0,1,f).first; pro[1].edgeSec = boost::edge(1,2,s).first;
-    pro[2].edgeFst = boost::edge(0,3,f).first; pro[2].edgeSec = boost::edge(1,2,s).first;
-    pro[3].edgeFst = boost::edge(3,4,f).first; pro[3].edgeSec = boost::edge(1,2,s).first;
-    pro[addEdge(0,1,pro).first].label = "z";
+    Graph_p pro(8);
+    pro[0].edgeFst = boost::edge(3,0,fst).first; pro[0].edgeSec = boost::edge(3,0,sec).first;
+    pro[1].edgeFst = boost::edge(2,3,fst).first; pro[1].edgeSec = boost::edge(4,2,sec).first;
+    pro[2].edgeFst = boost::edge(2,3,fst).first; pro[2].edgeSec = boost::edge(2,3,sec).first;
+    pro[3].edgeFst = boost::edge(2,3,fst).first; pro[3].edgeSec = boost::edge(1,2,sec).first;
+    pro[4].edgeFst = boost::edge(1,2,fst).first; pro[4].edgeSec = boost::edge(4,2,sec).first;
+    pro[5].edgeFst = boost::edge(1,2,fst).first; pro[5].edgeSec = boost::edge(2,3,sec).first;
+    pro[6].edgeFst = boost::edge(1,2,fst).first; pro[6].edgeSec = boost::edge(1,2,sec).first;
+    pro[7].edgeFst = boost::edge(0,1,fst).first; pro[7].edgeSec = boost::edge(0,1,sec).first;
+    pro[addEdge(0,2,pro).first].label = "z";
+    pro[addEdge(0,4,pro).first].label = "u";
+    pro[addEdge(0,6,pro).first].label = "u";
+    pro[addEdge(0,7,pro).first].label = "z";
+    pro[addEdge(1,5,pro).first].label = "z";
+    pro[addEdge(1,6,pro).first].label = "z";
+    pro[addEdge(1,7,pro).first].label = "u";
+    pro[addEdge(2,4,pro).first].label = "z";
+    pro[addEdge(2,6,pro).first].label = "z";
+    pro[addEdge(2,7,pro).first].label = "u";
+    pro[addEdge(3,4,pro).first].label = "z";
+    pro[addEdge(3,5,pro).first].label = "z";
+    pro[addEdge(6,7,pro).first].label = "z";
     this->p = pro;
     
-    this->clique = {0,1};
+    this->clique = {0,2,4};
 }
 
 void Test_PG_Output::tearDown() {
@@ -49,8 +68,8 @@ void Test_PG_Output::testGet_common_first() {
     ProductGraph pg(f,s);
     pg.setProductGraph(p);
     std::list<unsigned long> result = PG_Output::get_common_first(pg, clique);
-    std::list<unsigned long> check = {0,1,2};
-    result.sort(); check.sort();
+    result.sort();
+    std::list<unsigned long> check = {0,1,2,3};
     CPPUNIT_ASSERT(result == check);
 }
 
@@ -58,8 +77,8 @@ void Test_PG_Output::testGet_common_second() {
     ProductGraph pg(f,s);
     pg.setProductGraph(p);
     std::list<unsigned long> result = PG_Output::get_common_second(pg, clique);
-    std::list<unsigned long> check = {0,1,2};
-    result.sort(); check.sort();
+    result.sort();
+    std::list<unsigned long> check = {0,2,3,4};
     CPPUNIT_ASSERT(result == check);
 }
 

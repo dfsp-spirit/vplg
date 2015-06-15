@@ -79,9 +79,9 @@ std::list< std::list<unsigned long>> BK_Output::get_result_largest( const BronKe
  */
 std::list< std::list<unsigned long>> BK_Output::get_result_larger_than( const BronKerbosch& bk, int size){
     std::list<std::list<unsigned long>> list;
-     for (std::list<unsigned long>& c : bk.get_result_list()) {
+     for (std::list<unsigned long> c : bk.get_result_list()) {
          if (c.size() > size) {
-             list.push_front(c);
+             list.push_back(c);
          }
      }
      return list;

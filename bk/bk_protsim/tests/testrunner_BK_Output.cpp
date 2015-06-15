@@ -1,5 +1,5 @@
 /*
- * File:   newtestrunner.cpp
+ * File:   testrunner_BK_Output.cpp
  * Author: julian
  *
  * Created on Jun 12, 2015, 12:08:29 PM

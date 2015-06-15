@@ -51,7 +51,7 @@ void BronKerbosch::run() {
     int C = new_set();
     VertexIterator_p vi, ve;
     for (boost::tie(vi,ve) = boost::vertices(this->g); vi != ve; ++vi) { //iterate over all vertices in g
-        std::cout << "[IN]    vertex " << *vi+1 <<" of " << *ve << "\n"; 
+        //std::cout << "[IN]    vertex " << *vi+1 <<" of " << *ve << "\n"; 
         VertexDescriptor_p v = boost::vertex(*vi, this->g);
         insert_vertex(v,C);
         int P = new_set();

@@ -14,7 +14,7 @@
 class Test_ProductGraph : public CPPUNIT_NS::TestFixture {
     CPPUNIT_TEST_SUITE(Test_ProductGraph);
 
-    CPPUNIT_TEST(testProductGraph);
+    CPPUNIT_TEST(testRun);
 
     CPPUNIT_TEST_SUITE_END();
 
@@ -25,7 +25,8 @@ public:
     void tearDown();
 
 private:
-    void testProductGraph();
+    Graph s,f;
+    void testRun();
 
 };
 

@@ -1,5 +1,5 @@
 /*
- * File:   newtestrunner1.cpp
+ * File:   testrunner_PG_output.cpp
  * Author: julian
  *
  * Created on Jun 12, 2015, 1:57:00 PM

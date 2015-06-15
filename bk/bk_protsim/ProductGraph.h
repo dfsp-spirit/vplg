@@ -19,6 +19,8 @@ public:
     ProductGraph(const ProductGraph&);
     ~ProductGraph();
     
+    void run();
+    
     Graph_p& getProductGraph();
     const Graph_p& getProductGraph() const;
     const Graph& getFirstGraph() const;
@@ -32,7 +34,6 @@ private:
     const Graph& fstGraph;
     const Graph& secGraph;
     Graph_p prodGraph;
-    void computePrdGraph();
 };
 
 
