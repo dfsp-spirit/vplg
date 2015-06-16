@@ -842,6 +842,8 @@ public class Main {
                             Settings.set("plcc_B_output_perlfg", "false");
                             Settings.set("plcc_B_output_json", "false");
                             Settings.set("plcc_B_output_xml", "false");
+                            Settings.set("plcc_B_output_gexf", "false");
+                            
                             
                             
                             // Now add the listed ones back:
@@ -862,11 +864,13 @@ public class Main {
                                 if(types.contains("l")) { Settings.set("plcc_B_output_perlfg", "true"); nv++; }
                                 if(types.contains("j")) { Settings.set("plcc_B_output_json", "true"); nv++; }
                                 if(types.contains("m")) { Settings.set("plcc_B_output_xml", "true"); nv++; }
+                                if(types.contains("f")) { Settings.set("plcc_B_output_gexf", "true"); nv++; }
+                                
 
                                 // sanity check
                                 if(nv != types.length()) {
                                     DP.getInstance().w("List of output formats given on command line '" + types + "' contains invalid chars (" + types.length() + " given, " + nv + " valid).");
-                                    DP.getInstance().w("Valid chars: 'g' => GML, 't' => TGF, 'd' => DOT lang, 'k' => kavosh, 'e' => edge list, 'p' => PLCC, 'l' => Perf FG, 'j' => JSON, 'm' => XML. Example: '-O tgp'");
+                                    DP.getInstance().w("Valid chars: 'g' => GML, 't' => TGF, 'd' => DOT lang, 'k' => kavosh, 'e' => edge list, 'p' => PLCC, 'l' => Perf FG, 'j' => JSON, 'm' => XML, 'f' => GEXF. Example: '-O tgp'");
 
                                     if(nv <= 0) {
                                         syntaxError();
@@ -2473,6 +2477,7 @@ public class Main {
                 String dotlanguageFileNoPath = "";
                 String kavoshFileNoPath = "";
                 String plccFileNoPath = "";
+                String gexfFileNoPath = "";
                 
                 HashMap<String, String> writtenFormatsDBFilesNoPath = new HashMap<>();
                 
@@ -2539,6 +2544,14 @@ public class Main {
                     if(IO.stringToTextFile(jsonGraphFile, pg.toJSONFormat())) {
                         graphFormatsWritten += "json "; numFormatsWritten++; writtenFormatsDBFilesNoPath.put(GraphFormats.GRAPHFORMAT_JSON, jsonFileNoPath);
                         pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_JSON, new File(jsonGraphFile));
+                    }
+                }
+                if(Settings.getBoolean("plcc_B_output_gexf")) {
+                    String gexfGraphFile = filePathGraphs + fs + fileNameWithoutExtension + ".gexf";
+                    gexfFileNoPath = fileNameWithoutExtension + ".gexf";
+                    if(IO.stringToTextFile(gexfGraphFile, pg.toGEXFFormat())) {
+                        graphFormatsWritten += "gexf "; numFormatsWritten++; writtenFormatsDBFilesNoPath.put(GraphFormats.GRAPHFORMAT_GEXF, gexfFileNoPath);
+                        pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_GEXF, new File(gexfGraphFile));
                     }
                 }
                 if(Settings.getBoolean("plcc_B_output_xml")) {
@@ -3085,6 +3098,12 @@ public class Main {
             String jsonGraphFile = outputDir + fs + fileNameWithoutExtension + ".json";
             if(IO.stringToTextFile(jsonGraphFile, fg.toJSONFormat())) {
                 graphFormatsWritten += "json "; numFormatsWritten++;
+            }
+        }
+        if(Settings.getBoolean("plcc_B_output_gexf")) {
+            String gexfGraphFile = outputDir + fs + fileNameWithoutExtension + ".gexf";
+            if(IO.stringToTextFile(gexfGraphFile, fg.toGEXFFormat())) {
+                graphFormatsWritten += "gexf "; numFormatsWritten++;
             }
         }
         if(Settings.getBoolean("plcc_B_output_xml")) {

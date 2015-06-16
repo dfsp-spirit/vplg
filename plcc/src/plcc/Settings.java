@@ -250,6 +250,7 @@ public class Settings {
         defSet("plcc_B_output_perlfg", "false", "Whether to save computed protein graphs to text files in the PTGL format used by the Perl script to compute folding graph notations.");
         defSet("plcc_B_output_json", "true", "Whether to save computed protein graphs to text files in JSON format.");
         defSet("plcc_B_output_xml", "true", "Whether to save computed protein graphs to text files in XML format.");
+        defSet("plcc_B_output_gexf", "false", "Whether to save computed protein graphs to text files in GEXF format.");
         
         defSet("plcc_B_output_compgraph_GML", "true", "Whether to save computed detailed complex graphs (including SSE info) to text files in Graph Modelling Language format (GML).");
         defSet("plcc_B_output_compgraph_TGF", "false", "Whether to save computed detailed complex graphs (including SSE info) to text files in Trivial Graph Format (TGF).");

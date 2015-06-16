@@ -23,5 +23,6 @@ public class GraphFormats {
     public static final String GRAPHFORMAT_JSON = "json";
     public static final String GRAPHFORMAT_XML = "xml";
     public static final String GRAPHFORMAT_SIMPLEPROTEINGRAPH = "spg";
+    public static final String GRAPHFORMAT_GEXF = "gexf";
     
 }

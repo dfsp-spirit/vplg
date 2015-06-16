@@ -79,6 +79,7 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import graphdrawing.DrawTools.IMAGEFORMAT;
 import graphdrawing.IComplexGraph;
+import graphformats.IGEXFFormat;
 import graphformats.ISimpleProteinGraphFormat;
 import io.IO;
 import plcc.Settings;
@@ -94,7 +95,7 @@ import tools.DP;
  * 
  * @author spirit
  */
-public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements IVPLGGraphFormat, IGraphModellingLanguageFormat, ITrivialGraphFormat, IDOTLanguageFormat, IKavoshFormat, ISimpleProteinGraphFormat, SimpleGraphInterface, IDrawableGraph, IComplexGraph {
+public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements IVPLGGraphFormat, IGraphModellingLanguageFormat, ITrivialGraphFormat, IDOTLanguageFormat, IKavoshFormat, ISimpleProteinGraphFormat, SimpleGraphInterface, IDrawableGraph, IComplexGraph, IGEXFFormat {
     
     /** the list of all SSEs of this graph */
     protected List<SSE> sseList;
@@ -3114,7 +3115,7 @@ E	3	3	3
 
         for(Integer i = 0; i < this.getSize(); i++) {
             for(Integer j = 0 ; j < this.getSize(); j++) {
-                if(this.containsEdge(i, j) && i != j) {
+                if(this.containsEdge(i, j) && !Objects.equals(i, j)) {
                     sb.append(i+1);
                     sb.append(" ");
                     sb.append(j+1);
@@ -3149,7 +3150,7 @@ E	3	3	3
 
             for(Integer i = 0; i < this.getSize(); i++) {
                 for(Integer j = 0 ; j < this.getSize(); j++) {
-                    if(this.containsEdge(i, j) && i != j) {
+                    if(this.containsEdge(i, j) && !Objects.equals(i, j)) {
                         kf.append(i+1).append(" ").append(j+1).append("\n");
                     }            
                 }            
@@ -3169,7 +3170,74 @@ E	3	3	3
         }
         
         return kf.toString();
-    }                  
+    }
+    
+    /**
+     * Generates a string representation of this graph in GEXF format (see http://gefx.net/format/). 
+     * @return the gexf format graph string
+     */
+    public String toGEXFFormat() {
+        StringBuilder gexf = new StringBuilder();
+        
+        
+        gexf.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append("\n");
+        gexf.append("<gexf xmlns=\"http://www.gexf.net/1.2draft\" version=\"1.2\">").append("\n");
+        gexf.append("  <meta lastmodifieddate=\"2015-03-20\">").append("\n");
+        gexf.append("    <creator>VPLG</creator>").append("\n");
+        gexf.append("    <description>A protein graph created by the VPLG software.</description>").append("\n");
+        gexf.append("  </meta>").append("\n");
+        gexf.append("  <graph mode=\"static\" defaultedgetype=\"undirected\">").append("\n");
+        gexf.append("    <attributes class=\"node\">").append("\n");
+        gexf.append("      <attribute id=\"0\" title=\"sse_type\" type=\"string\">").append("\n");
+        gexf.append("        <default>\"o\"</default>").append("\n");
+        gexf.append("      </attribute>").append("\n");
+        gexf.append("    <attributes>").append("\n");
+        gexf.append("    <attributes class=\"edge\">").append("\n");
+        gexf.append("      <attribute id=\"0\" title=\"spatial\" type=\"string\">").append("\n");
+        gexf.append("        <default>\"o\"</default>").append("\n");
+        gexf.append("      </attribute>").append("\n");
+        gexf.append("    <attributes>").append("\n");
+        
+        gexf.append("    <nodes>").append("\n");
+        
+        String sse_type;
+        for(Integer i = 0; i < this.getSize(); i++) {
+            sse_type = this.getFGNotationOfVertex(i);
+            gexf.append("      <node id=\"" + i + "\" label=\"" + ( i + sse_type) + "\">").append("\n");
+            gexf.append("        <attvalues>").append("\n");
+            gexf.append("          <attvalue for=\"0\" value=\"" + sse_type + "\"/>").append("\n");
+            gexf.append("        </attvalues>").append("\n");
+            gexf.append("      </node>").append("\n");
+        }
+        
+        gexf.append("    </nodes>").append("\n");
+        gexf.append("    <edges>").append("\n");
+        
+
+        int edgeID = 0;
+        String edge_type;
+        for(Integer i = 0; i < this.getSize(); i++) {
+            for(Integer j = 0 ; j < this.getSize(); j++) {
+                if(this.containsEdge(i, j) && !Objects.equals(i, j)) {
+                    edge_type = this.getEdgeLabel(i, j);
+                    gexf.append("      <edge id=\"").append(edgeID).append("\" source=\"").append(i).append("\" target=\"").append(j).append("\"").append(">\n");
+                    gexf.append("        <attvalues>").append("\n");
+                    gexf.append("          <attvalue for=\"0\" value=\"").append(edge_type).append("\"/>").append("\n");
+                    gexf.append("        </attvalues>").append("\n");
+                    gexf.append("      </edge>").append("\n");
+                    edgeID++;
+                }            
+            }            
+        }
+        
+        gexf.append("    </edges>").append("\n");
+        
+        gexf.append("  </graph>").append("\n");
+        gexf.append("</gexf>").append("\n");
+        
+        
+        return gexf.toString();
+    }
     
     
     public ProteinLigandGraph<VertexSSE, PLGEdge> toProteinLigandGraph() {
