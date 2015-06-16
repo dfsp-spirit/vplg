@@ -17,5 +17,6 @@ public class EdgeProperty {
     public static final String TARGET = "target";
     public static final String SPATREL = "spatial";
     public static final String LABEL = "label";
+    public static final String COLOR = "color";
     
 }

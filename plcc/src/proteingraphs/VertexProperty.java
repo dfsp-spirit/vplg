@@ -16,5 +16,6 @@ public class VertexProperty {
     public static final String FGNOTATIONLABEL = "fg_notation_label";
     public static final String LABEL = "label";
     public static final String VERTEXID = "id";
+    public static final String COLOR = "color";
     
 }
