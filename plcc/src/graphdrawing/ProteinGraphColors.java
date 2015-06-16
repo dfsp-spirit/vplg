@@ -7,6 +7,8 @@
  */
 package graphdrawing;
 
+import java.util.HashMap;
+import java.util.Map;
 import proteingraphs.FoldingGraph;
 import proteingraphs.SSEGraph;
 import proteingraphs.SpatRel;
@@ -31,6 +33,43 @@ public class ProteinGraphColors {
     public static final String EDGECOLOR_MIXED = "#20FF20";  // green
     public static final String EDGECOLOR_LIGAND = "#FF00FF";   // magenta
     public static final String EDGECOLOR_OTHER = "#808080";  // gray
+    
+    private static final Map<String, String> vertexTypeColorMap;
+    static {
+        vertexTypeColorMap = new HashMap<>();
+        vertexTypeColorMap.put(FoldingGraph.notationLabelHelix, ProteinGraphColors.VERTEXCOLOR_HELIX);
+        vertexTypeColorMap.put(FoldingGraph.notationLabelStrand, ProteinGraphColors.VERTEXCOLOR_STRAND);
+        vertexTypeColorMap.put(FoldingGraph.notationLabelLigand, ProteinGraphColors.VERTEXCOLOR_LIGAND);
+        vertexTypeColorMap.put(FoldingGraph.notationLabelOther, ProteinGraphColors.VERTEXCOLOR_OTHER);        
+    }
+    
+    private static final Map<String, String> edgeTypeColorMap;
+    static {
+        edgeTypeColorMap = new HashMap<>();
+        edgeTypeColorMap.put(SpatRel.STRING_ANTIPARALLEL, ProteinGraphColors.EDGECOLOR_ANTIPARALLEL);
+        edgeTypeColorMap.put(SpatRel.STRING_PARALLEL, ProteinGraphColors.EDGECOLOR_PARALLEL);
+        edgeTypeColorMap.put(SpatRel.STRING_MIXED, ProteinGraphColors.EDGECOLOR_MIXED);
+        edgeTypeColorMap.put(SpatRel.STRING_LIGAND, ProteinGraphColors.EDGECOLOR_LIGAND);
+        edgeTypeColorMap.put(SpatRel.STRING_OTHER, ProteinGraphColors.EDGECOLOR_OTHER);
+    }
+    
+    /**
+     * Returns a map which maps vertex types (linnot labels, e.g., "e" for beta strand) to colors for drawing the graph.
+     * This is the default color map used by the PTGL to color protein ligand graphs.
+     * @return the vertex type to color-map
+     */
+    public static Map<String, String> getVertexTypeColorMap() {
+        return vertexTypeColorMap;
+    }
+    
+    /**
+     * Returns a map which maps edge types (spatial relation labels, e.g., "p" for parallel) to colors for drawing the graph.
+     * This is the default color map used by the PTGL to color protein ligand graphs.
+     * @return the edge type to color-map
+     */
+    public static Map<String, String> getEdgeTypeColorMap() {
+        return edgeTypeColorMap;
+    }
     
     
     public static String getHexColorStringForVertexFGLinnot(String vfgl) {
