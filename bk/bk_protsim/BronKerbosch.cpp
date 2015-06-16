@@ -16,7 +16,8 @@ BronKerbosch::BronKerbosch():g(0), result(), T(),vertex_array(0), set_array(0){}
  * Constructor
  */
 BronKerbosch::BronKerbosch(const Graph_p& graph): g(graph), result(), T(), vertex_array(0), set_array(0) {
-    this->MAX_SETS = boost::num_vertices(this->g)*8;
+    this->MAX_VERTICES = boost::num_vertices(this->g);
+    this->MAX_SETS = MAX_VERTICES*8;
     this-> num_sets =0;
 }
 
@@ -30,10 +31,10 @@ BronKerbosch::~BronKerbosch() {
 
 /*
  * runs a modified Bron-Kerbosch algorithm on a boost::adjacency_list type graph
- * The edge_info struct has to contain a std::string attribute "label", containing either "z" or "u" for each edge to mark z-edges and u-edges. 
+ * The edge_info struct has to contain a std::string attribute "label", containing  "z" (case sensitive) to mark z-Edges.
+ * All other labels will be interpreted as u-Edges.
  * The used algorithm uses an unspecified Pivot element and discriminates between z and u edges when building the cliques.
- * Returns a list of sets containing the VertexDescriptors of the vertices of the cliques.
- * Each set is a unique Clique in the graph.
+ * To access the result it is advised use the static BK_Output class functions.
  * If the graph g is modified by any other sources (invalidating the VertexDescriptors), while this function is 
  * running it will lead to wrong results and in the worst case segfaults!!
  * The graph will only ever be read and never written to.
@@ -45,8 +46,8 @@ void BronKerbosch::run() {
      * Each time it will pass a different, single vertex as the set C and its neighbours in the sets D, P or S.
      */
     
-    this-> vertex_array = new object[boost::num_vertices(this->g)]();
-    this-> set_array = new object[MAX_SETS](); // 8 migth be to mutch must investigate further
+    this-> vertex_array = new object[MAX_VERTICES]();
+    this-> set_array = new object[MAX_SETS]();
     
     int C = new_set();
     VertexIterator_p vi, ve;

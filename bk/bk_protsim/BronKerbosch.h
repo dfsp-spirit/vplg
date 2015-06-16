@@ -26,10 +26,12 @@ struct object {
 
 /*
  * This class finds all Cliques in a Graph using a modified version of the Bron-Kerbosch algorithm.
- * To do so simply pass a boost::adjacency_list type Graph to the run(...) method.
- * The result of the search will be stored in the class object and can be accessed by the get_result_...() functions.
- * As the cliques are stored as Vertex_Descriptors, any change to the graph (invalidating Descriptors and Iterators)
- *  will also invalidate the results, so avoid altering the graph between calculating the cliques and using the results.
+ * All calculation is done by the run() function, so instantiation and calculation can be separated.
+ * The result of the search will be stored in the class object and should in most cases be accessed using the static
+ * member functions of the BK_Output class.
+ * As the cliques are stored as Vertex_Descriptors, any change to the graph that invalidates Descriptors and Iterators
+ * will also invalidate the results, so avoid altering the graph between calculating the cliques and using the results.
+ * The graph will only ever be read and never written to.
  */
 class BronKerbosch {
 public:
@@ -38,7 +40,6 @@ public:
     ~BronKerbosch();
     
     void  run();
-    void clear_results();
     std::list<std::list<VertexDescriptor_p>>  get_result_list() const;
     const Graph_p& get_Product_Graph() const;
     void set_result(std::list<std::list<VertexDescriptor_p>> value);  //only for test purposes , should be removed before final distribution
@@ -47,6 +48,7 @@ private:
     //members needed to find the cliques in a recursive function (work like global variables).
     const Graph_p& g;
     int num_sets;
+    int MAX_VERTICES;
     int MAX_SETS;
     object* set_array;
     object* vertex_array;

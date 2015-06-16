@@ -10,6 +10,11 @@
 
 #include "BronKerbosch.h"
 
+/*
+ * Class to handle and format the results of a BronKerbosch object.
+ * All member functions are static so there is no reason to create an instance of BK_Output.
+ * 
+ */
 class BK_Output {
 public:
     static std::string get_JSON_all( const BronKerbosch& bk) ;
@@ -23,8 +28,8 @@ public:
     static std::list< std::list<unsigned long>> get_result_larger_than( const BronKerbosch& bk, int size);
     
 private:
-    static std::string int_list_to_JSON( std::list<unsigned long> clique);
-    static std::string cliques_to_JSON( std::list<std::list<unsigned long>> cliques);
+    static std::string int_list_to_JSON( const std::list<unsigned long>& clique);
+    static std::string cliques_to_JSON( const std::list<std::list<unsigned long>>& cliques);
 };
 
 #endif	/* BK_OUTPUT_H */

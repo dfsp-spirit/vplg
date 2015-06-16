@@ -8,31 +8,34 @@
 #include "BK_Output.h"
 
 /*
- * returns a JSON string of an array of arrays of integers representing the vertices in all cliques found.
- * each inner array is one Clique, each integer is one vertex in that clique.
+ * Returns a JSON representation of an array containing all cliques.
+ * Each inner array is one Clique, each integer is one vertex in that clique.
+ * The indices are indices to vertices in the boost::adjacency_list graph that was passed to the BronKerbosch object.
  */
 std::string BK_Output::get_JSON_all( const BronKerbosch& bk){
     return cliques_to_JSON(get_result_all(bk));
 }
 
 /*
- * returns a JSON string of an array of arrays of integers representing the vertices in all cliques of maximal size found.
- * each inner array is one Clique, each integer is one vertex in that clique.
+ * Returns a JSON representation of an array containing all cliques of maximum size.
+ * Each inner array is one Clique, each integer is one vertex in that clique.
+ * The indices are indices to vertices in the boost::adjacency_list graph that was passed to the BronKerbosch object.
  */
 std::string BK_Output::get_JSON_largest( const BronKerbosch& bk){
     return cliques_to_JSON(get_result_largest(bk));
 }
 
 /*
- * returns a JSON string of an array of arrays of integers representing the vertices in all cliques larger than the given size found.
- * each inner array is one Clique, each integer is one vertex in that clique.
+ * Returns a JSON representation of an array containing all cliques larger than the given size.
+ * Each inner array is one Clique, each integer is one vertex in that clique.
+ * The indices are indices to vertices in the boost::adjacency_list graph that was passed to the BronKerbosch object.
  */
 std::string BK_Output::get_JSON_larger_than( const BronKerbosch& bk, int size){
     return cliques_to_JSON(get_result_larger_than(bk, size));
 }
 
 /*
- * Returns a vector with the number of occurrences of Cliques of each size.  A value x at position i indicates x cliques of size i were found.
+ * Returns a vector with the number of Cliques of each size.  A value x at position i indicates x cliques of size i were found.
  */
 std::vector<int> BK_Output::get_formated_pattern( const BronKerbosch& bk){
     std::vector<int> pattern;
@@ -47,14 +50,16 @@ std::vector<int> BK_Output::get_formated_pattern( const BronKerbosch& bk){
 }
 
 /*
- * return a list of all found cliques. Each clique is a list of vertex indices of the product graph.
+ * Returns a list of all found cliques. Each Clique is a inner list of vertex indices.
+ * The indices are indices to vertices in the boost::adjacency_list graph that was passed to the BronKerbosch object.
  */
 std::list<std::list<unsigned long>> BK_Output::get_result_all( const BronKerbosch& bk){
     return bk.get_result_list();
 }
 
 /*
- * return a list of all cliques of maximum size. Each clique is a list of vertex indices of the product graph.
+ * Returns a list of all cliques of maximum size. Each Clique is a inner list of vertex indices.
+ * The indices are indices to vertices in the boost::adjacency_list graph that was passed to the BronKerbosch object.
  */
 std::list< std::list<unsigned long>> BK_Output::get_result_largest( const BronKerbosch& bk){
     std::list<std::list<unsigned long>> list;
@@ -75,7 +80,8 @@ std::list< std::list<unsigned long>> BK_Output::get_result_largest( const BronKe
 }
 
 /*
- * Returns a list of all Cliques larger than the given integer. Each clique is a list of vertex indices of the product graph.
+ * Returns a list of all Cliques larger than the given integer. Each Clique is a inner list of vertex indices.
+ * The indices are indices to vertices in the boost::adjacency_list graph that was passed to the BronKerbosch object.
  */
 std::list< std::list<unsigned long>> BK_Output::get_result_larger_than( const BronKerbosch& bk, int size){
     std::list<std::list<unsigned long>> list;
@@ -88,12 +94,12 @@ std::list< std::list<unsigned long>> BK_Output::get_result_larger_than( const Br
 }
 
 /*
- * Returns a hopefully correct representation of a list in JSON
+ * Returns a JSON representation of a list of integers to be used as an element in a JSON list of lists.
  */
-std::string BK_Output::int_list_to_JSON( std::list<unsigned long> list){
+std::string BK_Output::int_list_to_JSON( const std::list<unsigned long>& list){
     std::stringstream sstream;
     sstream << "\t[\n";
-    for (std::list<unsigned long>::iterator i = list.begin(), ie = list.end(); i != ie; ++i) {
+    for (std::list<unsigned long>::const_iterator i = list.begin(), ie = list.end(); i != ie; ++i) {
         sstream << "\t\t" << *i;
         if (std::next(i) != ie) {
             sstream <<",\n";
@@ -104,12 +110,12 @@ std::string BK_Output::int_list_to_JSON( std::list<unsigned long> list){
 }
 
 /*
- * returns a list of lists in JSON
+ * Returns a JSON representation of a list of lists of integers.
  */
-std::string BK_Output::cliques_to_JSON( std::list<std::list<unsigned long>> clique_list) {
+std::string BK_Output::cliques_to_JSON( const std::list<std::list<unsigned long>>& clique_list) {
     std::stringstream sstream;
     sstream << "[\n";
-    for (std::list<std::list<unsigned long>>::iterator i = clique_list.begin(), ie = clique_list.end(); i != ie; ++i) {
+    for (std::list<std::list<unsigned long>>::const_iterator i = clique_list.begin(), ie = clique_list.end(); i != ie; ++i) {
         sstream << int_list_to_JSON(*i);
         if (std::next(i) != ie) {
             sstream << ",\n";
