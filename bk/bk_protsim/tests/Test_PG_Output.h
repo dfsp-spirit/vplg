@@ -16,6 +16,10 @@ class Test_PG_Output : public CPPUNIT_NS::TestFixture {
 
     CPPUNIT_TEST(testGet_common_first);
     CPPUNIT_TEST(testGet_common_second);
+    CPPUNIT_TEST(testGet_vertex_ids_first);
+    CPPUNIT_TEST(testGet_vertex_ids_second);
+    CPPUNIT_TEST(testGet_JSON_vertex_ids_first);
+    CPPUNIT_TEST(testGet_JSON_vertex_ids_second);
 
     CPPUNIT_TEST_SUITE_END();
 
@@ -33,6 +37,12 @@ private:
     
     void testGet_common_first();
     void testGet_common_second();
+    
+    void testGet_vertex_ids_first();
+    void testGet_vertex_ids_second();
+    
+    void testGet_JSON_vertex_ids_first();
+    void testGet_JSON_vertex_ids_second();
 
 };
 

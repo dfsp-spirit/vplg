@@ -19,6 +19,7 @@ Test_PG_Output::~Test_PG_Output() {
 void Test_PG_Output::setUp() {
     Graph fst(4);
     fst[0].label = "h";fst[1].label = "e";fst[2].label = "e";fst[3].label = "e";
+    fst[0].id = 10;fst[1].id = 20;fst[2].id = 30;fst[3].id = 40;
     fst[addEdge(0,1,fst).first].label = "p";
     fst[addEdge(1,2,fst).first].label = "m";
     fst[addEdge(2,3,fst).first].label = "m";
@@ -27,6 +28,7 @@ void Test_PG_Output::setUp() {
     
     Graph sec(5);
     sec[0].label = "h";sec[1].label = "e";sec[2].label = "e";sec[3].label = "e";sec[4].label = "e";
+    sec[0].id = 11;sec[1].id = 22;sec[2].id = 33;sec[3].id = 44;sec[4].id = 55;
     sec[addEdge(0,1,sec).first].label = "p";
     sec[addEdge(1,2,sec).first].label = "m";
     sec[addEdge(2,3,sec).first].label = "m";
@@ -82,3 +84,36 @@ void Test_PG_Output::testGet_common_second() {
     CPPUNIT_ASSERT(result == check);
 }
 
+void Test_PG_Output::testGet_vertex_ids_first() {
+    ProductGraph pg(f,s);
+    pg.setProductGraph(p);
+    std::list<int> result = PG_Output::get_vertex_ids_first(pg, clique);
+    result.sort();
+    std::list<int> check = {10,20,30,40};
+    CPPUNIT_ASSERT(result == check);
+}
+    
+void Test_PG_Output::testGet_vertex_ids_second() {
+    ProductGraph pg(f,s);
+    pg.setProductGraph(p);
+    std::list<int> result = PG_Output::get_vertex_ids_second(pg, clique);
+    result.sort();
+    std::list<int> check = {11,33,44,55};
+    CPPUNIT_ASSERT(result == check);
+}
+
+void Test_PG_Output::testGet_JSON_vertex_ids_first() {
+   ProductGraph pg(f,s);
+    pg.setProductGraph(p);
+    std::string result = PG_Output::get_JSON_vertex_ids_first(pg, clique);
+    std::string check = "[\n\t10,\n\t20,\n\t30,\n\t40\n]";
+    CPPUNIT_ASSERT(result == check);
+}
+
+void Test_PG_Output::testGet_JSON_vertex_ids_second() {
+   ProductGraph pg(f,s);
+    pg.setProductGraph(p);
+    std::string result = PG_Output::get_JSON_vertex_ids_second(pg, clique);
+    std::string check = "[\n\t11,\n\t33,\n\t44,\n\t55\n]";
+    CPPUNIT_ASSERT(result == check);
+}

@@ -20,7 +20,7 @@ using namespace std;
  * 
  */
 int main(int argc, char** argv) {
-   /* 
+    /*
     //testdata/2pol.gml
     //testdata/1bib.gml
     GMLptglProteinParser pa1 = GMLptglProteinParser("testdata/1bib.gml");
@@ -29,21 +29,24 @@ int main(int argc, char** argv) {
     Graph sec = pa2.graph;
     */
     
-Graph fst(4);
-fst[0].label = "h";fst[1].label = "e";fst[2].label = "e";fst[3].label = "e";
-fst[addEdge(0,1,fst).first].label = "p";
-fst[addEdge(1,2,fst).first].label = "m";
-fst[addEdge(2,3,fst).first].label = "m";
-fst[addEdge(3,0,fst).first].label = "m";
+    
+    Graph fst(4);
+    fst[0].label = "h";fst[1].label = "e";fst[2].label = "e";fst[3].label = "e";
+    fst[0].id = 10;fst[1].id = 20;fst[2].id = 30;fst[3].id = 40;
+    fst[addEdge(0,1,fst).first].label = "p";
+    fst[addEdge(1,2,fst).first].label = "m";
+    fst[addEdge(2,3,fst).first].label = "m";
+    fst[addEdge(3,0,fst).first].label = "m";
 
-Graph sec(5);
-sec[0].label = "h";sec[1].label = "e";sec[2].label = "e";sec[3].label = "e";sec[4].label = "e";
-sec[addEdge(0,1,sec).first].label = "p";
-sec[addEdge(1,2,sec).first].label = "m";
-sec[addEdge(2,3,sec).first].label = "m";
-sec[addEdge(3,0,sec).first].label = "m";
-sec[addEdge(4,2,sec).first].label = "m";
-
+    Graph sec(5);
+    sec[0].label = "h";sec[1].label = "e";sec[2].label = "e";sec[3].label = "e";sec[4].label = "e";
+    sec[0].id = 11;sec[1].id = 22;sec[2].id = 33;sec[3].id = 44;sec[4].id = 55;
+    sec[addEdge(0,1,sec).first].label = "p";
+    sec[addEdge(1,2,sec).first].label = "m";
+    sec[addEdge(2,3,sec).first].label = "m";
+    sec[addEdge(3,0,sec).first].label = "m";
+    sec[addEdge(4,2,sec).first].label = "m";
+    
    
     ProductGraph prd = ProductGraph(fst,sec);
     prd.run();
@@ -76,8 +79,9 @@ sec[addEdge(4,2,sec).first].label = "m";
     }
     
     cout << "\n\n";
-    cout << BK_Output::get_JSON_all(bk);
-
+    cout << PG_Output::get_JSON_vertex_ids_first(prd, BK_Output::get_result_largest(bk).front());
+    cout << "\n\n";
+    cout << PG_Output::get_JSON_vertex_ids_second(prd, BK_Output::get_result_largest(bk).front());
     return 0;
 }
 
@@ -212,6 +216,7 @@ RUN FINISHED; exit value 0; real time: 1s; user: 20ms; system: 1s
 
 Graph fst(4);
 fst[0].label = "h";fst[1].label = "e";fst[2].label = "e";fst[3].label = "e";
+fst[0].id = 10;fst[1].id = 20;fst[2].id = 30;fst[3].id = 40;
 fst[addEdge(0,1,fst).first].label = "p";
 fst[addEdge(1,2,fst).first].label = "m";
 fst[addEdge(2,3,fst).first].label = "m";
@@ -219,6 +224,7 @@ fst[addEdge(3,0,fst).first].label = "m";
 
 Graph sec(5);
 sec[0].label = "h";sec[1].label = "e";sec[2].label = "e";sec[3].label = "e";sec[4].label = "e";
+sec[0].id = 11;sec[1].id = 22;sec[2].id = 33;sec[3].id = 44;sec[4].id = 55;
 sec[addEdge(0,1,sec).first].label = "p";
 sec[addEdge(1,2,sec).first].label = "m";
 sec[addEdge(2,3,sec).first].label = "m";

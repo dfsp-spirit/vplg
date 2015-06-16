@@ -117,5 +117,4 @@ std::string BK_Output::cliques_to_JSON( std::list<std::list<unsigned long>> cliq
     }
     sstream << "\n]\n";
     return sstream.str();
-
 }
