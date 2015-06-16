@@ -3196,7 +3196,7 @@ E	3	3	3
         gexf.append("      <attribute id=\"1\" title=\"color\" type=\"string\">").append("\n");
         gexf.append("        <default>\"#808080\"</default>").append("\n");
         gexf.append("      </attribute>").append("\n");        
-        gexf.append("    <attributes>").append("\n");
+        gexf.append("    </attributes>").append("\n");
         gexf.append("    <attributes class=\"edge\">").append("\n");
         gexf.append("      <attribute id=\"0\" title=\"spatial\" type=\"string\">").append("\n");
         gexf.append("        <default>\"o\"</default>").append("\n");
@@ -3204,8 +3204,7 @@ E	3	3	3
         gexf.append("      <attribute id=\"1\" title=\"color\" type=\"string\">").append("\n");
         gexf.append("        <default>\"#808080\"</default>").append("\n");
         gexf.append("      </attribute>").append("\n");        
-
-        gexf.append("    <attributes>").append("\n");
+        gexf.append("    </attributes>").append("\n");
         
         gexf.append("    <nodes>").append("\n");
         

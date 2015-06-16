@@ -57,6 +57,8 @@ public class ProteinGraphDrawer {
      * Draws the SEQ legend for the graph at the given position. This legend is not suitable for other folding graph notations but SEQ, because their edges are different.
      * @param ig2 the SVGGraphics2D object on which to draw
      * @param startPos the start position (x, y) where to start drawing
+     * @param pl the page layout that defined the starting positions and borders of the elements on the canvas
+     * @param g the graph to draw
      * @return the x coordinate in the image where the legend ends (which is the left margin + the legend width).
      * This can be used to determine the minimal width of the total image (it has to be at least this value).
      */
