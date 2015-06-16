@@ -52,19 +52,19 @@ void BronKerbosch::run() {
     int C = new_set();
     VertexIterator_p vi, ve;
     for (boost::tie(vi,ve) = boost::vertices(this->g); vi != ve; ++vi) { //iterate over all vertices in g
-        //std::cout << "[IN]    vertex " << *vi+1 <<" of " << *ve << "\n"; 
+        //std::cout << "[IN]    vertex " << *vi+1 <<" of " << *ve << "\n"; //if not commented the unitTests will do strange things
         VertexDescriptor_p v = boost::vertex(*vi, this->g);
         insert_vertex(v,C);
         int P = new_set();
         int D = new_set();
         int S = new_set();
         
-        AdjacencyIterator_p ai, ae; //construct the neighbour set
+        AdjacencyIterator_p ai, ae;
         for (boost::tie(ai,ae)=boost::adjacent_vertices(v, this->g); ai!=ae;++ai) { //iterate over all neighbours of v
             VertexDescriptor_p a = boost::vertex(*ai, this->g);
             //if this neighbour is connected by a u-edge it is added to D, otherwise to S or P, 
             //if it was already used to initialize the algorithm once (if it is already in T) it will be added to S otherwise to P.
-            //by adding already used vertices to S every Clique will be found exactly one and never multiple times.
+            //by adding already used vertices to S every Clique will be found exactly once and never multiple times.
             if (zCon(v,a)) {
                 if (T.find(a) != T.end()) {
                     insert_vertex(a,S);
@@ -89,7 +89,7 @@ void BronKerbosch::run() {
     this-> T.clear();
     delete[] this->vertex_array; this->vertex_array = nullptr;
     delete[] this->set_array;      this->set_array = nullptr;
-}// end run
+}// end run()
 
 /*
  * Returns a const reference to the graph on which the Bron-Kerbosch algorithm was used on. 
@@ -99,18 +99,8 @@ const Graph_p& BronKerbosch::get_Product_Graph() const{
 }
 
 /*
- * Clears the stored results from the last time run was called. 
- * This function is only useful if you want to reuse the same BronKerbosch object multiple times and want to 
- * minimize the used memory between the uses.
- */
-void BronKerbosch::clear_results() {
-    this->result.clear();
-    this->T.clear();
-}
-
-/*
  * Returns the complete list of all calculated Cliques.
- * If run(...) was not called before this function the result will be an empty list.
+ * If run() was not called before this function the result will be an empty list.
  */
 std::list<std::list<VertexDescriptor_p>>  BronKerbosch::get_result_list() const{
         return this->result;
@@ -143,7 +133,7 @@ void BronKerbosch::findCliques(int C, int P, int D, int S) {
         while (op) {
             VertexDescriptor_p ui = op->vertex;
             std::pair<EdgeDescriptor_p, bool> e = boost::edge(piv, ui, this->g); 
-            //check for edge between piv and ui. every vertex connected to piv can be skiped, as every Clique 
+            //check for edge between piv and ui. every vertex connected to piv can be skipped, as every Clique 
             //containing this vertex and the pivot have already been found
             if ((os && !e.second) || (os && zPath(piv, ui, D)) || !os) {
                 //create new sets for the next recursion
@@ -155,7 +145,7 @@ void BronKerbosch::findCliques(int C, int P, int D, int S) {
                 
 
                 AdjacencyIterator_p ai, ae;
-                for (boost::tie(ai,ae)=boost::adjacent_vertices(ui, this->g); ai!=ae;++ai) {
+                for (boost::tie(ai,ae)=boost::adjacent_vertices(ui, this->g); ai!=ae;++ai) { //iterate over all neighbours of ui
                     VertexDescriptor_p n = boost::vertex(*ai, this->g);
                     if (is_vertex_in_set(n,P1)) { //if n is in P
                         insert_vertex(n, P2);
@@ -193,7 +183,7 @@ void BronKerbosch::findCliques(int C, int P, int D, int S) {
 }// end findCliques()
 
 /*
- * returns true if the two vertices v and w are connected by a z marked edge in the graph g.
+ * Returns true if the two vertices v and w are connected by a z marked edge.
  */
 bool BronKerbosch::zCon(VertexDescriptor_p v, VertexDescriptor_p w) {
     EdgeDescriptor_p e; bool flag;
@@ -202,16 +192,16 @@ bool BronKerbosch::zCon(VertexDescriptor_p v, VertexDescriptor_p w) {
 }//end zCon()
 
 /*
- * returns true if vertex start is neighbour of one vertex in set S, which is not connected to v
+ * Returns true if vertex start is a neighbour of one vertex in set S, which is not connected to v
  */
 bool BronKerbosch::zPath(VertexDescriptor_p v, VertexDescriptor_p start, int s) {
     object* o = set_array[s].next_vertex;
-        while (o) {
-            VertexDescriptor n = o->vertex;
-            if (boost::edge(start,n, this->g).second && n!=v) { return true;}
-            o = o->next_vertex;
-        }
-        return false;
+    while (o) {
+        VertexDescriptor n = o->vertex;
+        if (boost::edge(start,n, this->g).second && n!=v) { return true;}
+        o = o->next_vertex;
+    }
+    return false;
 }//end zPath()
 
 /*
@@ -241,7 +231,7 @@ void BronKerbosch::remove_set(int s){
 }
     
 /*
- * removes a vertex v from set s
+ * Removes a vertex v from set s
  */
 void BronKerbosch::remove_vertex(int v, int s){
     object* o= vertex_array[v].next_set;
@@ -264,7 +254,7 @@ void BronKerbosch::copy_set(int s1, int s2){
 }
     
 /*
- * creates a new object and inserts it into the pointer chains starting at vertex_array[v] and set_array[s]
+ * Creates a new object and inserts it into the pointer chains starting at vertex_array[v] and set_array[s]
  */
 void BronKerbosch::insert_vertex(int v, int s){
     object *o = new object();
@@ -289,7 +279,7 @@ void BronKerbosch::insert_vertex(int v, int s){
 }
     
 /*
- * returns true if vertex v is found in the set s
+ * Returns true if vertex v is found in the set s
  */
 bool BronKerbosch::is_vertex_in_set(int v, int s){
     object* o = vertex_array[v].next_set;
@@ -313,7 +303,7 @@ int BronKerbosch::new_set(){
 }
     
 /*
- *  writes all vertices from a set to a std::list
+ *  Writes all vertices from a set to a std::list
  */
 std::list<VertexDescriptor_p> BronKerbosch::output_clique(int s) {
     std::list<VertexDescriptor_p> res;

@@ -23,6 +23,7 @@
       <itemPath>GMLptglProteinParser.cpp</itemPath>
       <itemPath>PG_Output.cpp</itemPath>
       <itemPath>ProductGraph.cpp</itemPath>
+      <itemPath>main.cpp</itemPath>
       <itemPath>newmain.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -161,6 +162,8 @@
           </linkerLibItems>
         </linkerTool>
       </folder>
+      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="newmain.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="tests/Test_BK_Output.cpp" ex="false" tool="1" flavor2="0">
@@ -286,6 +289,8 @@
           </linkerLibItems>
         </linkerTool>
       </folder>
+      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="newmain.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="tests/Test_BK_Output.cpp" ex="false" tool="1" flavor2="0">

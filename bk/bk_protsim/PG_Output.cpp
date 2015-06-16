@@ -8,7 +8,7 @@
 #include "PG_Output.h"
 
 /*
- * returns a list of all vertices form the first graph that are represented by the product graph edges in the clique. 
+ * Returns a list of all vertices form the first graph that are represented by the product graph vertices in the passed list.
  */
 std::list<unsigned long> PG_Output::get_common_first(const ProductGraph& pg, std::list<unsigned long> clique) {
     std::set<unsigned long> result_set; //set to ensure unique vertices. otherwise each vertex would be added n-1 times for a n-clique
@@ -21,7 +21,7 @@ std::list<unsigned long> PG_Output::get_common_first(const ProductGraph& pg, std
 }
 
 /*
- * returns a list of all vertices form the second graph that are represented by the product graph edges in the clique.
+ * Returns a list of all vertices form the second graph that are represented by the product graph vertices in the passed list.
  */
 std::list<unsigned long> PG_Output::get_common_second(const ProductGraph& pg, std::list<unsigned long> clique) {
     std::set<unsigned long> result_set; //set to ensure unique vertices. otherwise each vertex would be added n-1 times for a n-clique
@@ -62,14 +62,14 @@ std::list<int> PG_Output::get_vertex_ids_second(const ProductGraph& pg, std::lis
 }
 
 /*
- * Returns a JSON list of the original (gml parsed) vertex ids, of all vertices in the specified clique in the first graph.
+ * Returns a JSON list of the original (gml parsed) vertex IDs, of all vertices in the specified clique in the first graph.
  */
 std::string PG_Output::get_JSON_vertex_ids_first(const ProductGraph& pg, std::list<unsigned long> clique) {
     return PG_Output::int_list_to_JSON(PG_Output::get_vertex_ids_first(pg,  clique));
 }
 
 /*
- * Returns a JSON list of the original (gml parsed) vertex ids, of all vertices in the specified clique in the second graph.
+ * Returns a JSON list of the original (gml parsed) vertex IDs, of all vertices in the specified clique in the second graph.
  */
 std::string PG_Output::get_JSON_vertex_ids_second(const ProductGraph& pg, std::list<unsigned long> clique) {
     return PG_Output::int_list_to_JSON(PG_Output::get_vertex_ids_second(pg,  clique));

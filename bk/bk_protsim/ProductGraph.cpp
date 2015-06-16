@@ -17,8 +17,8 @@ ProductGraph::ProductGraph() : fstGraph(0), secGraph(0) {
 }
 
 /*
- * Produces a ProductGraph object from the two passed graphs. The construction already calculates the product graph,
- * the resulting graph can be obtained by the getProductGraph function.
+ * Constructor for a ProductGraph object. No calculation will be done here. To get the Compatibility-Graph, invoke the
+ * run() function on the created object and access the graph via getProductGraph().
  */
 ProductGraph::ProductGraph(const Graph& fstGraph, const Graph& secGraph) : fstGraph(fstGraph), secGraph(secGraph) {
     prodGraph = Graph_p(0);
@@ -44,14 +44,13 @@ const Graph& ProductGraph::getSecondGraph() const { return secGraph;}
  * the vertices of the product graph get computed by paring every edge of the first graph with every edge
  * of the second. If the edges are compatible a new vertex is added to the product graph.
  * They are compatible if they, and their source/target vertices have the same labels.
- * All vertices get first added to a temporary list and then copied over into the graph to avoid the
- * time complexity of continually adding elements to a vecS
- * 
  * an edge between two vertices is added if the edge pairings they represent are compatible.
  * they are compatible if either the edge pairs in either of the graphs share no common vertex, 
  * or both of them share a vertex with the same label in both graphs.
  */
 void ProductGraph::run() {
+    //All vertices get first added to a temporary list and then copied over into the graph to avoid the
+    // time complexity of continually adding elements to a vector
     std::list<vertex_info_p> vertexList;
     int count = 0;
 
@@ -89,7 +88,7 @@ void ProductGraph::run() {
         }//end for all edges in the second graph
     }//end for all edges in the first graph
 
-    //copy the values from the list to the graph
+    //create the graph, now that the number of vertices in known
     prodGraph = Graph_p(count);
     prodGraph[boost::graph_bundle].id = 0;
     prodGraph[boost::graph_bundle].directed = 0; //i hope 0 is undirected
@@ -98,6 +97,7 @@ void ProductGraph::run() {
                                                                                std::to_string(secGraph[boost::graph_bundle].id) ;
     prodGraph[boost::graph_bundle].comment = "Compatibility graph of "+ std::to_string(fstGraph[boost::graph_bundle].id)  + " and " +
                                                                                std::to_string(secGraph[boost::graph_bundle].id);
+    //copy the values from the list to the graph
     VertexIterator_p vi, viEnd;
     boost::tie(vi, viEnd) = boost::vertices(prodGraph);
     for (vertex_info_p& elem : vertexList) {
@@ -113,10 +113,10 @@ void ProductGraph::run() {
     
     //Add the edges to the graph
     //iterate through all vertex pairs in the new product graph
-    VertexIterator_p vi1P, vi2P, viEndP, vi2EndP;
+    VertexIterator_p vi1P, vi2P, viEndP;
     for (boost::tie(vi1P, viEndP) = boost::vertices(prodGraph); vi1P != viEndP; ++vi1P) {
-//        for (vi2P = vi1P,++vi2P; vi2P != viEndP; ++vi2P) {  //avoid computing every edge twice( (v1, v2) and (v2, v1) )
-        for (boost::tie(vi2P, vi2EndP) = boost::vertices(prodGraph); vi2P != vi2EndP; ++vi2P) {  //avoid computing every edge twice( (v1, v2) and (v2, v1) )
+        for (vi2P = vi1P,++vi2P; vi2P != viEndP; ++vi2P) {  //avoid computing every edge twice( (v1, v2) and (v2, v1) )
+        //for (boost::tie(vi2P, vi2EndP) = boost::vertices(prodGraph); vi2P != vi2EndP; ++vi2P) {
             bool comp, z;
             std::tie(comp, z) = verticesCompatible(vi1P, vi2P);
             if (comp) {
@@ -134,8 +134,8 @@ void ProductGraph::run() {
 } // void ProductGraph::computePrdGraph()
 
 /*
- * Function to check if two vertices in the product graph can be connected by an edge.
- * returns a pari of 2 bools. the first is true if there can be an edge at all, the second is true if that edge is a z-edge
+ * Checks if two vertices in the product graph can be connected by an edge.
+ * Returns a pair of 2 bools. The first is true if there can be an edge at all, the second is true if that edge is a z-edge
  */
 std::pair<bool, bool> ProductGraph::verticesCompatible(VertexIterator_p p1, VertexIterator_p p2) {
     bool neighbouredFst = false, neighbouredSec = false; // is only necessary to avoid a false positive with empty vertex labels

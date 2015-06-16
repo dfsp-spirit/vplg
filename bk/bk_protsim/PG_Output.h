@@ -10,7 +10,10 @@
 
 #include "ProductGraph.h"
 
-
+/*
+ * Class to handle and format results of ProductGraph object.
+ * All member functions are static so there is no reason to create an instance of PG_Output.
+ */
 class PG_Output {
 public:
     static std::list<unsigned long> get_common_first(const ProductGraph& pg, std::list<unsigned long> clique);

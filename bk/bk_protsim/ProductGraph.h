@@ -11,7 +11,14 @@
 
 #include "Graph.h"
 
-
+/*
+ * Class to compute and store a Compatibility-Graph of two graphs.
+ * All calculation is done by the run() function, so instantiation and calculation can be separated.
+ * The resulting graph will be stored in the class object and can be accessed by getProductGraph() function.
+ * The Graph will be returned as a reference so the lifetime of this graph is the same as the 
+ * one of the ProductGraph object that produced it.
+ * The input Graphs will only ever be read and never written to.
+ */
 class ProductGraph {
 public:
     ProductGraph();

@@ -40,6 +40,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/GMLptglProteinParser.o \
 	${OBJECTDIR}/PG_Output.o \
 	${OBJECTDIR}/ProductGraph.o \
+	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/newmain.o
 
 # Test Directory
@@ -100,6 +101,11 @@ ${OBJECTDIR}/ProductGraph.o: ProductGraph.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ProductGraph.o ProductGraph.cpp
+
+${OBJECTDIR}/main.o: main.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
 
 ${OBJECTDIR}/newmain.o: newmain.cpp 
 	${MKDIR} -p ${OBJECTDIR}
@@ -239,6 +245,19 @@ ${OBJECTDIR}/ProductGraph_nomain.o: ${OBJECTDIR}/ProductGraph.o ProductGraph.cpp
 	    $(COMPILE.cc) -O2 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ProductGraph_nomain.o ProductGraph.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/ProductGraph.o ${OBJECTDIR}/ProductGraph_nomain.o;\
+	fi
+
+${OBJECTDIR}/main_nomain.o: ${OBJECTDIR}/main.o main.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/main.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O2 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main_nomain.o main.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/main.o ${OBJECTDIR}/main_nomain.o;\
 	fi
 
 ${OBJECTDIR}/newmain_nomain.o: ${OBJECTDIR}/newmain.o newmain.cpp 
