@@ -79,6 +79,7 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import graphdrawing.DrawTools.IMAGEFORMAT;
 import graphdrawing.IComplexGraph;
+import graphdrawing.ProteinGraphColors;
 import graphformats.IGEXFFormat;
 import graphformats.ISimpleProteinGraphFormat;
 import io.IO;
@@ -233,6 +234,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements I
         }
         return fgnot;
     }
+    
     
     /**
      * Checks whether the SSE at index 'sseIndex' is the SSE closest to the C terminus in this graph.
@@ -3191,21 +3193,30 @@ E	3	3	3
         gexf.append("      <attribute id=\"0\" title=\"sse_type\" type=\"string\">").append("\n");
         gexf.append("        <default>\"o\"</default>").append("\n");
         gexf.append("      </attribute>").append("\n");
+        gexf.append("      <attribute id=\"1\" title=\"color\" type=\"string\">").append("\n");
+        gexf.append("        <default>\"#808080\"</default>").append("\n");
+        gexf.append("      </attribute>").append("\n");        
         gexf.append("    <attributes>").append("\n");
         gexf.append("    <attributes class=\"edge\">").append("\n");
         gexf.append("      <attribute id=\"0\" title=\"spatial\" type=\"string\">").append("\n");
         gexf.append("        <default>\"o\"</default>").append("\n");
         gexf.append("      </attribute>").append("\n");
+        gexf.append("      <attribute id=\"1\" title=\"color\" type=\"string\">").append("\n");
+        gexf.append("        <default>\"#808080\"</default>").append("\n");
+        gexf.append("      </attribute>").append("\n");        
+
         gexf.append("    <attributes>").append("\n");
         
         gexf.append("    <nodes>").append("\n");
         
-        String sse_type;
+        String sse_type, sse_color;
         for(Integer i = 0; i < this.getSize(); i++) {
             sse_type = this.getFGNotationOfVertex(i);
+            sse_color = ProteinGraphColors.getHexColorStringForVertexFGLinnot(sse_type);
             gexf.append("      <node id=\"" + i + "\" label=\"" + ( i + sse_type) + "\">").append("\n");
             gexf.append("        <attvalues>").append("\n");
             gexf.append("          <attvalue for=\"0\" value=\"" + sse_type + "\"/>").append("\n");
+            gexf.append("          <attvalue for=\"1\" value=\"" + sse_color + "\"/>").append("\n");
             gexf.append("        </attvalues>").append("\n");
             gexf.append("      </node>").append("\n");
         }
@@ -3215,14 +3226,16 @@ E	3	3	3
         
 
         int edgeID = 0;
-        String edge_type;
+        String edge_type, edge_color;
         for(Integer i = 0; i < this.getSize(); i++) {
             for(Integer j = 0 ; j < this.getSize(); j++) {
                 if(this.containsEdge(i, j) && !Objects.equals(i, j)) {
                     edge_type = this.getEdgeLabel(i, j);
+                    edge_color = ProteinGraphColors.getHexColorStringForEdgeFGLinnot(edge_type);
                     gexf.append("      <edge id=\"").append(edgeID).append("\" source=\"").append(i).append("\" target=\"").append(j).append("\"").append(">\n");
                     gexf.append("        <attvalues>").append("\n");
                     gexf.append("          <attvalue for=\"0\" value=\"").append(edge_type).append("\"/>").append("\n");
+                    gexf.append("          <attvalue for=\"1\" value=\"").append(edge_color).append("\"/>").append("\n");
                     gexf.append("        </attvalues>").append("\n");
                     gexf.append("      </edge>").append("\n");
                     edgeID++;
