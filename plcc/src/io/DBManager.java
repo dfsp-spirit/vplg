@@ -3596,19 +3596,2760 @@ connection.close();
         
         
         
+        // ============== tim3.pl ==============
+        
+        //ArrayList<ArrayList<String>> rowsStrandsBeta = DBManager.doSelectQuery("Select pdb,chain,adj,adjpos,red from beta where red LIKE '%3p,-1p,-1p%' and red not LIKE '%-3p,-1p,-1p%'  group by pdb,chain,adj,adjpos,red");
+        
+        //?
+        // add chain_db_id to the SQL-statement --> prepared statement needs to be done
+        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE ln.ptgl_linnot_red LIKE '%-1_,7_,-1_,-1_,-1_,-1_,-1_%' GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
+        pattern = new Integer[] {-1, 7, -1, -1, -1, -1, -1};
+        
+        all_pdb_ids = new ArrayList<>();
+        all_chains = new ArrayList<>();
+        all_firstHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_firstHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_secondHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_secondHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_thirdHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_thirdHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_fourthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_fourthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_fifthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_fifthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_sixthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_sixthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_seventhHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_seventhHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_firstHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_firstHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_secondHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_secondHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_thirdHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_thirdHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_fourthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_fourthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_fifthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_fifthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_sixthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_sixthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_seventhHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_seventhHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        
+        for(int i = 0; i < rowsStrandsBeta.size(); i++) {
+            // gather data from row
+            ArrayList<String> rowStrandBeta = rowsStrandsBeta.get(i);
+            pdb_id = rowStrandBeta.get(0);
+            chain = rowStrandBeta.get(1).isEmpty() ? "_" : rowStrandBeta.get(1);
+            pdbAndChain = pdb_id + chain;
+            adj = rowStrandBeta.get(2);
+            adjpos = Integer.parseInt(rowStrandBeta.get(3));
+            red = rowStrandBeta.get(4);
+            
+            Integer[] relDistancesRED = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(red);
+            Integer[] relDistancesADJ = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(adj);
+
+            int patternPositionInRED = MotifSearchTools.findSubArray(relDistancesRED, pattern);
+            
+            Integer firstHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer firstHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer secondHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer secondHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer thirdHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer thirdHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer fourthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer fourthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer fifthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer fifthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer sixthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer sixthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer seventhHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer seventhHelixPositionMaxInAlphaOrBetaGraph = -1;
+            
+            if(patternPositionInRED >= 0) {
+                // The strand pattern occurs, but we need to check whether helices lie between the strands.
+                // Note that we queried the beta graph above, so they are NOT part of this graph anyway, and we need to have a look at other graph types.                
+                // The motif was found in the RED string. In the ADJ string, there may be spaces inbetween the strands of the pattern for the helices. Let us first determine the positions where the helices should be in the ADJ string.
+                
+                // We are looking for the positions of the helices:
+                     // first helix after the first strand
+                firstHelixPositionMinInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED; j++) {
+                    firstHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                firstHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j < patternPositionInRED; j++) {
+                    firstHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];     // the index has to exist in the array, since of pattern of length 3 was found starting at patternPositionInRED                
+                }
+                
+                
+                // seventh helix
+                seventhHelixPositionMaxInAlphaOrBetaGraph = firstHelixPositionMinInAlphaOrBetaGraph;
+                seventhHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 1];
+                
+                seventhHelixPositionMinInAlphaOrBetaGraph = firstHelixPositionMaxInAlphaOrBetaGraph;
+                seventhHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 2];
+                
+                // sixth helix
+                sixthHelixPositionMaxInAlphaOrBetaGraph = seventhHelixPositionMinInAlphaOrBetaGraph;
+                
+                sixthHelixPositionMinInAlphaOrBetaGraph = sixthHelixPositionMaxInAlphaOrBetaGraph;
+                sixthHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 3];
+                
+                // fifth helix
+                fifthHelixPositionMaxInAlphaOrBetaGraph = sixthHelixPositionMinInAlphaOrBetaGraph;
+                
+                fifthHelixPositionMinInAlphaOrBetaGraph = fifthHelixPositionMaxInAlphaOrBetaGraph;
+                fifthHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 4];
+                
+                // fourth helix
+                fourthHelixPositionMaxInAlphaOrBetaGraph = fifthHelixPositionMinInAlphaOrBetaGraph;
+                
+                fourthHelixPositionMinInAlphaOrBetaGraph = fourthHelixPositionMaxInAlphaOrBetaGraph;
+                fourthHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 5];
+                
+                // third helix
+                thirdHelixPositionMaxInAlphaOrBetaGraph = fourthHelixPositionMinInAlphaOrBetaGraph;
+                
+                thirdHelixPositionMinInAlphaOrBetaGraph = thirdHelixPositionMaxInAlphaOrBetaGraph;
+                thirdHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 6];
+                
+                // second helix
+                secondHelixPositionMaxInAlphaOrBetaGraph = thirdHelixPositionMinInAlphaOrBetaGraph;
+                
+                secondHelixPositionMinInAlphaOrBetaGraph = firstHelixPositionMaxInAlphaOrBetaGraph;
+            }
+            
+            // collect the data in the lists for all DB result rows
+            all_pdb_ids.add(pdb_id);
+            all_chains.add(chain);
+            all_firstHelixPositionMinInBetaGraph.add(firstHelixPositionMinInAlphaOrBetaGraph);
+            all_firstHelixPositionMaxInBetaGraph.add(firstHelixPositionMaxInAlphaOrBetaGraph);
+            all_secondHelixPositionMinInBetaGraph.add(secondHelixPositionMinInAlphaOrBetaGraph);
+            all_secondHelixPositionMaxInBetaGraph.add(secondHelixPositionMaxInAlphaOrBetaGraph);
+            all_thirdHelixPositionMinInBetaGraph.add(thirdHelixPositionMinInAlphaOrBetaGraph);
+            all_thirdHelixPositionMaxInBetaGraph.add(thirdHelixPositionMaxInAlphaOrBetaGraph);
+            all_fourthHelixPositionMinInBetaGraph.add(fourthHelixPositionMinInAlphaOrBetaGraph);
+            all_fourthHelixPositionMinInBetaGraph.add(fourthHelixPositionMaxInAlphaOrBetaGraph);
+            all_fifthHelixPositionMinInBetaGraph.add(fifthHelixPositionMinInAlphaOrBetaGraph);
+            all_fifthHelixPositionMaxInBetaGraph.add(fifthHelixPositionMaxInAlphaOrBetaGraph);
+            all_sixthHelixPositionMinInBetaGraph.add(sixthHelixPositionMinInAlphaOrBetaGraph);
+            all_sixthHelixPositionMaxInBetaGraph.add(sixthHelixPositionMaxInAlphaOrBetaGraph);
+            all_seventhHelixPositionMinInBetaGraph.add(seventhHelixPositionMinInAlphaOrBetaGraph);
+            all_seventhHelixPositionMaxInBetaGraph.add(seventhHelixPositionMaxInAlphaOrBetaGraph);
+        }
+        
+
+        // now get the positions in the albe (instead of the beta) graph:
+        indexAlbeNumber = 3;
+        all_albeNumberOfHelix = new ArrayList<>();
+        for(int i = 0; i < all_pdb_ids.size(); i++) {
+            
+            // firstHelixPositionMin
+            // sse_type = 2 equals E -> needs to be integrated in the sql-statement?
+
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_firstHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                //?
+                // rowsStrandsBeta.get(0)? -> shouldn't it be rowsStrandsAlbe.get(0)?
+                // is rowsStrandsAlbe.get(0) sufficient or would you have to look at other chains, fg_positions if one doesn't find a rossman fold?
+                
+                all_firstHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_firstHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // firstHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_firstHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_firstHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_firstHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // secondHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_secondHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_secondHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_secondHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // secondHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_secondHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_secondHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_secondHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // thirdHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_thirdHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_thirdHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_thirdHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // thirdHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_thirdHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_thirdHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_thirdHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // fourthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fourthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fourthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fourthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // fourthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fourthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fourthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fourthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // fifthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fifthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fifthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fifthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // fifthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fifthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fifthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fifthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // sixthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_sixthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_sixthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_sixthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // sixthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_sixthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_sixthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_sixthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // seventhHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_seventhHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_seventhHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_seventhHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // seventhHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_seventhHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_seventhHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_seventhHelixPositionMaxInAlbeGraph.add(-1);
+            }
         
         
         
+            // OK, now get the positions of the helices (instead of strands) in the albe graph:
+            ArrayList<ArrayList<String>> rowsHelicesAlbe;
+            //rowsHelicesAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'H'  group by pdb,chain,sse_type,albe_nr");
+            rowsHelicesAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '" + all_chains.get(i) + "' AND sse.sse_type = " + 1 + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+
+            List<String> uglyStringListForAllHelices = new ArrayList<>();
+            ArrayList<String> rowHelixAlbe;
+            String pdbidOfHelix, chainOfHelix, pdbAndChainOfHelix, sseTypeOfHelix, uglyString;
+            Integer albeNumberOfHelix;
+            
+            List<Integer> tmp_albeNumberOfHelix = new ArrayList<>();
+            for(int j = 0; j < rowsHelicesAlbe.size(); j++) {
+                rowHelixAlbe = rowsHelicesAlbe.get(j);
+
+                pdbidOfHelix = rowHelixAlbe.get(0);
+                chainOfHelix = rowHelixAlbe.get(1).isEmpty() ? "_" : rowHelixAlbe.get(1);
+                sseTypeOfHelix = rowHelixAlbe.get(2);   // should be "H", right? ;)
+                pdbAndChainOfHelix = pdbidOfHelix + chainOfHelix;
+                albeNumberOfHelix = Integer.parseInt(rowHelixAlbe.get(3));
+                uglyString = pdbAndChainOfHelix + ";" + sseTypeOfHelix + ";" + albeNumberOfHelix;
+                
+                tmp_albeNumberOfHelix.add(albeNumberOfHelix);
+                
+                uglyStringListForAllHelices.add(uglyString);
+            }
+            all_albeNumberOfHelix.add(tmp_albeNumberOfHelix);
+        }
+        
+        
+        // Check whether the determined helix positions lie within the min and max positions determined earlier.
+        //            If so, this chain contains the motif. Otherwise, not.
+        for (int i = 0; i < all_pdb_ids.size(); i++) {
+            for (int a = 0; a < all_albeNumberOfHelix.get(i).size(); a++) {
+                for (int b = 0; b < all_albeNumberOfHelix.get(i).size(); b++) {
+                    for(int c = 0; c < all_albeNumberOfHelix.get(i).size(); c++) {
+                        for(int d = 0; d < all_albeNumberOfHelix.get(i).size(); d++) {
+                            for(int e = 0; e < all_albeNumberOfHelix.get(i).size(); e++) {
+                                for(int f = 0; f < all_albeNumberOfHelix.get(i).size(); f++) {
+                                    for(int g = 0; g < all_albeNumberOfHelix.get(i).size(); g++) {
+                                        if (all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMinInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMaxInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(b) > all_secondHelixPositionMinInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(b) < all_secondHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(c) > all_thirdHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(c) < all_thirdHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(d) > all_fourthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(d) < all_fourthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(e) > all_fifthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(e) < all_fifthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(f) > all_sixthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(f) < all_sixthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(g) > all_seventhHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(g) < all_seventhHelixPositionMaxInAlbeGraph.get(i)) {
+                                            
+                                            return true;
+                } else {
+                        return false;
+                    }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        
+        
+        
+        // ============== tim4.pl ==============
+        
+        //ArrayList<ArrayList<String>> rowsStrandsBeta = DBManager.doSelectQuery("Select pdb,chain,adj,adjpos,red from beta where red LIKE '%3p,-1p,-1p%' and red not LIKE '%-3p,-1p,-1p%'  group by pdb,chain,adj,adjpos,red");
+        
+        //?
+        // add chain_db_id to the SQL-statement --> prepared statement needs to be done
+        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE ln.ptgl_linnot_red LIKE '%7_,-1_,-1_,-1_,-1_,-1_,-1_%' AND ln.ptgl_linnot_red NOT LIKE '%-7_,-1_,-1_,-1_,-1_,-1_,-1_%' GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
+        pattern = new Integer[] {7, -1, -1, -1, -1, -1, -1};
+        
+        all_pdb_ids = new ArrayList<>();
+        all_chains = new ArrayList<>();
+        all_firstHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_firstHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_secondHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_secondHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_thirdHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_thirdHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_fourthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_fourthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_fifthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_fifthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_sixthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_sixthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_seventhHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_seventhHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_firstHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_firstHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_secondHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_secondHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_thirdHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_thirdHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_fourthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_fourthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_fifthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_fifthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_sixthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_sixthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_seventhHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_seventhHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        
+        for(int i = 0; i < rowsStrandsBeta.size(); i++) {
+            // gather data from row
+            ArrayList<String> rowStrandBeta = rowsStrandsBeta.get(i);
+            pdb_id = rowStrandBeta.get(0);
+            chain = rowStrandBeta.get(1).isEmpty() ? "_" : rowStrandBeta.get(1);
+            pdbAndChain = pdb_id + chain;
+            adj = rowStrandBeta.get(2);
+            adjpos = Integer.parseInt(rowStrandBeta.get(3));
+            red = rowStrandBeta.get(4);
+            
+            Integer[] relDistancesRED = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(red);
+            Integer[] relDistancesADJ = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(adj);
+
+            int patternPositionInRED = MotifSearchTools.findSubArray(relDistancesRED, pattern);
+            
+            Integer firstHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer firstHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer secondHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer secondHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer thirdHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer thirdHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer fourthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer fourthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer fifthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer fifthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer sixthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer sixthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer seventhHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer seventhHelixPositionMaxInAlphaOrBetaGraph = -1;
+            
+            if(patternPositionInRED >= 0) {
+                // The strand pattern occurs, but we need to check whether helices lie between the strands.
+                // Note that we queried the beta graph above, so they are NOT part of this graph anyway, and we need to have a look at other graph types.                
+                // The motif was found in the RED string. In the ADJ string, there may be spaces inbetween the strands of the pattern for the helices. Let us first determine the positions where the helices should be in the ADJ string.
+                
+                // We are looking for the positions of the helices:
+                     // first helix after the first strand (only min here, max at the bottom)
+                firstHelixPositionMinInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j < patternPositionInRED; j++) {
+                    firstHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                
+                // seventh helix
+                seventhHelixPositionMaxInAlphaOrBetaGraph = firstHelixPositionMinInAlphaOrBetaGraph;
+                seventhHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED];
+                
+                seventhHelixPositionMinInAlphaOrBetaGraph = firstHelixPositionMaxInAlphaOrBetaGraph;
+                seventhHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 1];
+                
+                // sixth helix
+                sixthHelixPositionMaxInAlphaOrBetaGraph = seventhHelixPositionMinInAlphaOrBetaGraph;
+                
+                sixthHelixPositionMinInAlphaOrBetaGraph = sixthHelixPositionMaxInAlphaOrBetaGraph;
+                sixthHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 2];
+                
+                // fifth helix
+                fifthHelixPositionMaxInAlphaOrBetaGraph = sixthHelixPositionMinInAlphaOrBetaGraph;
+                
+                fifthHelixPositionMinInAlphaOrBetaGraph = fifthHelixPositionMaxInAlphaOrBetaGraph;
+                fifthHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 3];
+                
+                // fourth helix
+                fourthHelixPositionMaxInAlphaOrBetaGraph = fifthHelixPositionMinInAlphaOrBetaGraph;
+                
+                fourthHelixPositionMinInAlphaOrBetaGraph = fourthHelixPositionMaxInAlphaOrBetaGraph;
+                fourthHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 4];
+                
+                // third helix
+                thirdHelixPositionMaxInAlphaOrBetaGraph = fourthHelixPositionMinInAlphaOrBetaGraph;
+                
+                thirdHelixPositionMinInAlphaOrBetaGraph = thirdHelixPositionMaxInAlphaOrBetaGraph;
+                thirdHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 5];
+                
+                // second helix
+                secondHelixPositionMaxInAlphaOrBetaGraph = thirdHelixPositionMinInAlphaOrBetaGraph;
+                
+                secondHelixPositionMinInAlphaOrBetaGraph = secondHelixPositionMaxInAlphaOrBetaGraph;
+                secondHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 6];
+                
+                // first helix max
+                firstHelixPositionMaxInAlphaOrBetaGraph = secondHelixPositionMinInAlphaOrBetaGraph;
+            }
+            
+            // collect the data in the lists for all DB result rows
+            all_pdb_ids.add(pdb_id);
+            all_chains.add(chain);
+            all_firstHelixPositionMinInBetaGraph.add(firstHelixPositionMinInAlphaOrBetaGraph);
+            all_firstHelixPositionMaxInBetaGraph.add(firstHelixPositionMaxInAlphaOrBetaGraph);
+            all_secondHelixPositionMinInBetaGraph.add(secondHelixPositionMinInAlphaOrBetaGraph);
+            all_secondHelixPositionMaxInBetaGraph.add(secondHelixPositionMaxInAlphaOrBetaGraph);
+            all_thirdHelixPositionMinInBetaGraph.add(thirdHelixPositionMinInAlphaOrBetaGraph);
+            all_thirdHelixPositionMaxInBetaGraph.add(thirdHelixPositionMaxInAlphaOrBetaGraph);
+            all_fourthHelixPositionMinInBetaGraph.add(fourthHelixPositionMinInAlphaOrBetaGraph);
+            all_fourthHelixPositionMinInBetaGraph.add(fourthHelixPositionMaxInAlphaOrBetaGraph);
+            all_fifthHelixPositionMinInBetaGraph.add(fifthHelixPositionMinInAlphaOrBetaGraph);
+            all_fifthHelixPositionMaxInBetaGraph.add(fifthHelixPositionMaxInAlphaOrBetaGraph);
+            all_sixthHelixPositionMinInBetaGraph.add(sixthHelixPositionMinInAlphaOrBetaGraph);
+            all_sixthHelixPositionMaxInBetaGraph.add(sixthHelixPositionMaxInAlphaOrBetaGraph);
+            all_seventhHelixPositionMinInBetaGraph.add(seventhHelixPositionMinInAlphaOrBetaGraph);
+            all_seventhHelixPositionMaxInBetaGraph.add(seventhHelixPositionMaxInAlphaOrBetaGraph);
+        }
+        
+
+        // now get the positions in the albe (instead of the beta) graph:
+        indexAlbeNumber = 3;
+        all_albeNumberOfHelix = new ArrayList<>();
+        for(int i = 0; i < all_pdb_ids.size(); i++) {
+            
+            // firstHelixPositionMin
+            // sse_type = 2 equals E -> needs to be integrated in the sql-statement?
+
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_firstHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                //?
+                // rowsStrandsBeta.get(0)? -> shouldn't it be rowsStrandsAlbe.get(0)?
+                // is rowsStrandsAlbe.get(0) sufficient or would you have to look at other chains, fg_positions if one doesn't find a rossman fold?
+                
+                all_firstHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_firstHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // firstHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_firstHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_firstHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_firstHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // secondHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_secondHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_secondHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_secondHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // secondHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_secondHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_secondHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_secondHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // thirdHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_thirdHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_thirdHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_thirdHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // thirdHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_thirdHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_thirdHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_thirdHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // fourthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fourthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fourthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fourthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // fourthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fourthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fourthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fourthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // fifthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fifthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fifthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fifthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // fifthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fifthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fifthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fifthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // sixthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_sixthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_sixthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_sixthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // sixthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_sixthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_sixthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_sixthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // seventhHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_seventhHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_seventhHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_seventhHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // seventhHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_seventhHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_seventhHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_seventhHelixPositionMaxInAlbeGraph.add(-1);
+            }
+        
+        
+        
+            // OK, now get the positions of the helices (instead of strands) in the albe graph:
+            ArrayList<ArrayList<String>> rowsHelicesAlbe;
+            //rowsHelicesAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'H'  group by pdb,chain,sse_type,albe_nr");
+            rowsHelicesAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '" + all_chains.get(i) + "' AND sse.sse_type = " + 1 + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+
+            List<String> uglyStringListForAllHelices = new ArrayList<>();
+            ArrayList<String> rowHelixAlbe;
+            String pdbidOfHelix, chainOfHelix, pdbAndChainOfHelix, sseTypeOfHelix, uglyString;
+            Integer albeNumberOfHelix;
+            
+            List<Integer> tmp_albeNumberOfHelix = new ArrayList<>();
+            for(int j = 0; j < rowsHelicesAlbe.size(); j++) {
+                rowHelixAlbe = rowsHelicesAlbe.get(j);
+
+                pdbidOfHelix = rowHelixAlbe.get(0);
+                chainOfHelix = rowHelixAlbe.get(1).isEmpty() ? "_" : rowHelixAlbe.get(1);
+                sseTypeOfHelix = rowHelixAlbe.get(2);   // should be "H", right? ;)
+                pdbAndChainOfHelix = pdbidOfHelix + chainOfHelix;
+                albeNumberOfHelix = Integer.parseInt(rowHelixAlbe.get(3));
+                uglyString = pdbAndChainOfHelix + ";" + sseTypeOfHelix + ";" + albeNumberOfHelix;
+                
+                tmp_albeNumberOfHelix.add(albeNumberOfHelix);
+                
+                uglyStringListForAllHelices.add(uglyString);
+            }
+            all_albeNumberOfHelix.add(tmp_albeNumberOfHelix);
+        }
+        
+        
+        // Check whether the determined helix positions lie within the min and max positions determined earlier.
+        //            If so, this chain contains the motif. Otherwise, not.
+        for (int i = 0; i < all_pdb_ids.size(); i++) {
+            for (int a = 0; a < all_albeNumberOfHelix.get(i).size(); a++) {
+                for (int b = 0; b < all_albeNumberOfHelix.get(i).size(); b++) {
+                    for(int c = 0; c < all_albeNumberOfHelix.get(i).size(); c++) {
+                        for(int d = 0; d < all_albeNumberOfHelix.get(i).size(); d++) {
+                            for(int e = 0; e < all_albeNumberOfHelix.get(i).size(); e++) {
+                                for(int f = 0; f < all_albeNumberOfHelix.get(i).size(); f++) {
+                                    for(int g = 0; g < all_albeNumberOfHelix.get(i).size(); g++) {
+                                        if (all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMinInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMaxInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(b) > all_secondHelixPositionMinInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(b) < all_secondHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(c) > all_thirdHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(c) < all_thirdHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(d) > all_fourthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(d) < all_fourthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(e) > all_fifthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(e) < all_fifthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(f) > all_sixthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(f) < all_sixthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(g) > all_seventhHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(g) < all_seventhHelixPositionMaxInAlbeGraph.get(i)) {
+                                            
+                                            return true;
+                } else {
+                        return false;
+                    }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        
+        
+        
+        
+        
+        // ============== tim5.pl ==============
+        
+        //ArrayList<ArrayList<String>> rowsStrandsBeta = DBManager.doSelectQuery("Select pdb,chain,adj,adjpos,red from beta where red LIKE '%3p,-1p,-1p%' and red not LIKE '%-3p,-1p,-1p%'  group by pdb,chain,adj,adjpos,red");
+        
+        //?
+        // add chain_db_id to the SQL-statement --> prepared statement needs to be done
+        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE ln.ptgl_linnot_red LIKE '%-1_,-1_,7_,-1_,-1_,-1_,-1_%' GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
+        pattern = new Integer[] {-1, -1, 7, -1, -1, -1, -1};
+        
+        all_pdb_ids = new ArrayList<>();
+        all_chains = new ArrayList<>();
+        all_firstHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_firstHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_secondHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_secondHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_thirdHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_thirdHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_fourthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_fourthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_fifthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_fifthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_sixthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_sixthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_seventhHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_seventhHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_firstHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_firstHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_secondHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_secondHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_thirdHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_thirdHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_fourthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_fourthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_fifthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_fifthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_sixthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_sixthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_seventhHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_seventhHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        
+        for(int i = 0; i < rowsStrandsBeta.size(); i++) {
+            // gather data from row
+            ArrayList<String> rowStrandBeta = rowsStrandsBeta.get(i);
+            pdb_id = rowStrandBeta.get(0);
+            chain = rowStrandBeta.get(1).isEmpty() ? "_" : rowStrandBeta.get(1);
+            pdbAndChain = pdb_id + chain;
+            adj = rowStrandBeta.get(2);
+            adjpos = Integer.parseInt(rowStrandBeta.get(3));
+            red = rowStrandBeta.get(4);
+            
+            Integer[] relDistancesRED = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(red);
+            Integer[] relDistancesADJ = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(adj);
+
+            int patternPositionInRED = MotifSearchTools.findSubArray(relDistancesRED, pattern);
+            
+            Integer firstHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer firstHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer secondHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer secondHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer thirdHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer thirdHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer fourthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer fourthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer fifthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer fifthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer sixthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer sixthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer seventhHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer seventhHelixPositionMaxInAlphaOrBetaGraph = -1;
+            
+            if(patternPositionInRED >= 0) {
+                // The strand pattern occurs, but we need to check whether helices lie between the strands.
+                // Note that we queried the beta graph above, so they are NOT part of this graph anyway, and we need to have a look at other graph types.                
+                // The motif was found in the RED string. In the ADJ string, there may be spaces inbetween the strands of the pattern for the helices. Let us first determine the positions where the helices should be in the ADJ string.
+                
+                // We are looking for the positions of the helices:
+                     // first helix after the first strand
+                firstHelixPositionMinInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED + 1; j++) {
+                    firstHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                firstHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED; j++) {
+                    firstHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                // second helix
+                secondHelixPositionMinInAlphaOrBetaGraph = firstHelixPositionMaxInAlphaOrBetaGraph;
+                
+                secondHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j < patternPositionInRED; j++) {
+                    secondHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                
+                // seventh helix
+                seventhHelixPositionMaxInAlphaOrBetaGraph = firstHelixPositionMinInAlphaOrBetaGraph;
+                seventhHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 2];
+                
+                seventhHelixPositionMinInAlphaOrBetaGraph = firstHelixPositionMaxInAlphaOrBetaGraph;
+                seventhHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 3];
+                
+                // sixth helix
+                sixthHelixPositionMaxInAlphaOrBetaGraph = seventhHelixPositionMinInAlphaOrBetaGraph;
+                
+                sixthHelixPositionMinInAlphaOrBetaGraph = sixthHelixPositionMaxInAlphaOrBetaGraph;
+                sixthHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 4];
+                
+                // fifth helix
+                fifthHelixPositionMaxInAlphaOrBetaGraph = sixthHelixPositionMinInAlphaOrBetaGraph;
+                
+                fifthHelixPositionMinInAlphaOrBetaGraph = fifthHelixPositionMaxInAlphaOrBetaGraph;
+                fifthHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 5];
+                
+                // fourth helix
+                fourthHelixPositionMaxInAlphaOrBetaGraph = fifthHelixPositionMinInAlphaOrBetaGraph;
+                
+                fourthHelixPositionMinInAlphaOrBetaGraph = fourthHelixPositionMaxInAlphaOrBetaGraph;
+                fourthHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 6];
+                
+                // third helix
+                thirdHelixPositionMaxInAlphaOrBetaGraph = fourthHelixPositionMinInAlphaOrBetaGraph;
+                
+                thirdHelixPositionMinInAlphaOrBetaGraph = secondHelixPositionMaxInAlphaOrBetaGraph;
+            }
+            
+            // collect the data in the lists for all DB result rows
+            all_pdb_ids.add(pdb_id);
+            all_chains.add(chain);
+            all_firstHelixPositionMinInBetaGraph.add(firstHelixPositionMinInAlphaOrBetaGraph);
+            all_firstHelixPositionMaxInBetaGraph.add(firstHelixPositionMaxInAlphaOrBetaGraph);
+            all_secondHelixPositionMinInBetaGraph.add(secondHelixPositionMinInAlphaOrBetaGraph);
+            all_secondHelixPositionMaxInBetaGraph.add(secondHelixPositionMaxInAlphaOrBetaGraph);
+            all_thirdHelixPositionMinInBetaGraph.add(thirdHelixPositionMinInAlphaOrBetaGraph);
+            all_thirdHelixPositionMaxInBetaGraph.add(thirdHelixPositionMaxInAlphaOrBetaGraph);
+            all_fourthHelixPositionMinInBetaGraph.add(fourthHelixPositionMinInAlphaOrBetaGraph);
+            all_fourthHelixPositionMinInBetaGraph.add(fourthHelixPositionMaxInAlphaOrBetaGraph);
+            all_fifthHelixPositionMinInBetaGraph.add(fifthHelixPositionMinInAlphaOrBetaGraph);
+            all_fifthHelixPositionMaxInBetaGraph.add(fifthHelixPositionMaxInAlphaOrBetaGraph);
+            all_sixthHelixPositionMinInBetaGraph.add(sixthHelixPositionMinInAlphaOrBetaGraph);
+            all_sixthHelixPositionMaxInBetaGraph.add(sixthHelixPositionMaxInAlphaOrBetaGraph);
+            all_seventhHelixPositionMinInBetaGraph.add(seventhHelixPositionMinInAlphaOrBetaGraph);
+            all_seventhHelixPositionMaxInBetaGraph.add(seventhHelixPositionMaxInAlphaOrBetaGraph);
+        }
+        
+
+        // now get the positions in the albe (instead of the beta) graph:
+        indexAlbeNumber = 3;
+        all_albeNumberOfHelix = new ArrayList<>();
+        for(int i = 0; i < all_pdb_ids.size(); i++) {
+            
+            // firstHelixPositionMin
+            // sse_type = 2 equals E -> needs to be integrated in the sql-statement?
+
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_firstHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                //?
+                // rowsStrandsBeta.get(0)? -> shouldn't it be rowsStrandsAlbe.get(0)?
+                // is rowsStrandsAlbe.get(0) sufficient or would you have to look at other chains, fg_positions if one doesn't find a rossman fold?
+                
+                all_firstHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_firstHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // firstHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_firstHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_firstHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_firstHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // secondHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_secondHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_secondHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_secondHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // secondHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_secondHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_secondHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_secondHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // thirdHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_thirdHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_thirdHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_thirdHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // thirdHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_thirdHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_thirdHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_thirdHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // fourthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fourthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fourthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fourthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // fourthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fourthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fourthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fourthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // fifthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fifthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fifthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fifthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // fifthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fifthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fifthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fifthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // sixthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_sixthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_sixthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_sixthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // sixthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_sixthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_sixthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_sixthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // seventhHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_seventhHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_seventhHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_seventhHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // seventhHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_seventhHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_seventhHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_seventhHelixPositionMaxInAlbeGraph.add(-1);
+            }
+        
+        
+        
+            // OK, now get the positions of the helices (instead of strands) in the albe graph:
+            ArrayList<ArrayList<String>> rowsHelicesAlbe;
+            //rowsHelicesAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'H'  group by pdb,chain,sse_type,albe_nr");
+            rowsHelicesAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '" + all_chains.get(i) + "' AND sse.sse_type = " + 1 + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+
+            List<String> uglyStringListForAllHelices = new ArrayList<>();
+            ArrayList<String> rowHelixAlbe;
+            String pdbidOfHelix, chainOfHelix, pdbAndChainOfHelix, sseTypeOfHelix, uglyString;
+            Integer albeNumberOfHelix;
+            
+            List<Integer> tmp_albeNumberOfHelix = new ArrayList<>();
+            for(int j = 0; j < rowsHelicesAlbe.size(); j++) {
+                rowHelixAlbe = rowsHelicesAlbe.get(j);
+
+                pdbidOfHelix = rowHelixAlbe.get(0);
+                chainOfHelix = rowHelixAlbe.get(1).isEmpty() ? "_" : rowHelixAlbe.get(1);
+                sseTypeOfHelix = rowHelixAlbe.get(2);   // should be "H", right? ;)
+                pdbAndChainOfHelix = pdbidOfHelix + chainOfHelix;
+                albeNumberOfHelix = Integer.parseInt(rowHelixAlbe.get(3));
+                uglyString = pdbAndChainOfHelix + ";" + sseTypeOfHelix + ";" + albeNumberOfHelix;
+                
+                tmp_albeNumberOfHelix.add(albeNumberOfHelix);
+                
+                uglyStringListForAllHelices.add(uglyString);
+            }
+            all_albeNumberOfHelix.add(tmp_albeNumberOfHelix);
+        }
+        
+        
+        // Check whether the determined helix positions lie within the min and max positions determined earlier.
+        //            If so, this chain contains the motif. Otherwise, not.
+        for (int i = 0; i < all_pdb_ids.size(); i++) {
+            for (int a = 0; a < all_albeNumberOfHelix.get(i).size(); a++) {
+                for (int b = 0; b < all_albeNumberOfHelix.get(i).size(); b++) {
+                    for(int c = 0; c < all_albeNumberOfHelix.get(i).size(); c++) {
+                        for(int d = 0; d < all_albeNumberOfHelix.get(i).size(); d++) {
+                            for(int e = 0; e < all_albeNumberOfHelix.get(i).size(); e++) {
+                                for(int f = 0; f < all_albeNumberOfHelix.get(i).size(); f++) {
+                                    for(int g = 0; g < all_albeNumberOfHelix.get(i).size(); g++) {
+                                        if (all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMinInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMaxInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(b) > all_secondHelixPositionMinInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(b) < all_secondHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(c) > all_thirdHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(c) < all_thirdHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(d) > all_fourthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(d) < all_fourthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(e) > all_fifthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(e) < all_fifthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(f) > all_sixthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(f) < all_sixthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(g) > all_seventhHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(g) < all_seventhHelixPositionMaxInAlbeGraph.get(i)) {
+                                            
+                                            return true;
+                } else {
+                        return false;
+                    }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        
+        
+        
+        
+        // ============== tim6.pl ==============
+        
+        //ArrayList<ArrayList<String>> rowsStrandsBeta = DBManager.doSelectQuery("Select pdb,chain,adj,adjpos,red from beta where red LIKE '%3p,-1p,-1p%' and red not LIKE '%-3p,-1p,-1p%'  group by pdb,chain,adj,adjpos,red");
+        
+        //?
+        // add chain_db_id to the SQL-statement --> prepared statement needs to be done
+        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE ln.ptgl_linnot_red LIKE '%-1_,-1_,-1_,7_,-1_,-1_,-1_%' GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
+        pattern = new Integer[] {-1, -1, -1, 7, -1, -1, -1};
+        
+        all_pdb_ids = new ArrayList<>();
+        all_chains = new ArrayList<>();
+        all_firstHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_firstHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_secondHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_secondHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_thirdHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_thirdHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_fourthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_fourthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_fifthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_fifthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_sixthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_sixthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_seventhHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_seventhHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_firstHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_firstHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_secondHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_secondHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_thirdHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_thirdHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_fourthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_fourthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_fifthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_fifthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_sixthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_sixthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_seventhHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_seventhHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        
+        for(int i = 0; i < rowsStrandsBeta.size(); i++) {
+            // gather data from row
+            ArrayList<String> rowStrandBeta = rowsStrandsBeta.get(i);
+            pdb_id = rowStrandBeta.get(0);
+            chain = rowStrandBeta.get(1).isEmpty() ? "_" : rowStrandBeta.get(1);
+            pdbAndChain = pdb_id + chain;
+            adj = rowStrandBeta.get(2);
+            adjpos = Integer.parseInt(rowStrandBeta.get(3));
+            red = rowStrandBeta.get(4);
+            
+            Integer[] relDistancesRED = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(red);
+            Integer[] relDistancesADJ = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(adj);
+
+            int patternPositionInRED = MotifSearchTools.findSubArray(relDistancesRED, pattern);
+            
+            Integer firstHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer firstHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer secondHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer secondHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer thirdHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer thirdHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer fourthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer fourthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer fifthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer fifthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer sixthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer sixthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer seventhHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer seventhHelixPositionMaxInAlphaOrBetaGraph = -1;
+            
+            if(patternPositionInRED >= 0) {
+                // The strand pattern occurs, but we need to check whether helices lie between the strands.
+                // Note that we queried the beta graph above, so they are NOT part of this graph anyway, and we need to have a look at other graph types.                
+                // The motif was found in the RED string. In the ADJ string, there may be spaces inbetween the strands of the pattern for the helices. Let us first determine the positions where the helices should be in the ADJ string.
+                
+                // We are looking for the positions of the helices:
+                     // first helix after the first strand
+                firstHelixPositionMinInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED + 2; j++) {
+                    firstHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                firstHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED + 1; j++) {
+                    firstHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                // second helix
+                secondHelixPositionMinInAlphaOrBetaGraph = firstHelixPositionMaxInAlphaOrBetaGraph;
+                
+                secondHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED; j++) {
+                    secondHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                // third helix
+                thirdHelixPositionMinInAlphaOrBetaGraph = secondHelixPositionMaxInAlphaOrBetaGraph;
+                
+                thirdHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j < patternPositionInRED; j++) {
+                    thirdHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                
+                // seventh helix
+                seventhHelixPositionMaxInAlphaOrBetaGraph = firstHelixPositionMinInAlphaOrBetaGraph;
+                seventhHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 3];
+                
+                seventhHelixPositionMinInAlphaOrBetaGraph = firstHelixPositionMaxInAlphaOrBetaGraph;
+                seventhHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 4];
+                
+                // sixth helix
+                sixthHelixPositionMaxInAlphaOrBetaGraph = seventhHelixPositionMinInAlphaOrBetaGraph;
+                
+                sixthHelixPositionMinInAlphaOrBetaGraph = sixthHelixPositionMaxInAlphaOrBetaGraph;
+                sixthHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 5];
+                
+                // fifth helix
+                fifthHelixPositionMaxInAlphaOrBetaGraph = sixthHelixPositionMinInAlphaOrBetaGraph;
+                
+                fifthHelixPositionMinInAlphaOrBetaGraph = fifthHelixPositionMaxInAlphaOrBetaGraph;
+                fifthHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 6];
+                
+                // fourth helix
+                fourthHelixPositionMaxInAlphaOrBetaGraph = fifthHelixPositionMinInAlphaOrBetaGraph;
+                
+                fourthHelixPositionMinInAlphaOrBetaGraph = thirdHelixPositionMaxInAlphaOrBetaGraph;
+            }
+            
+            // collect the data in the lists for all DB result rows
+            all_pdb_ids.add(pdb_id);
+            all_chains.add(chain);
+            all_firstHelixPositionMinInBetaGraph.add(firstHelixPositionMinInAlphaOrBetaGraph);
+            all_firstHelixPositionMaxInBetaGraph.add(firstHelixPositionMaxInAlphaOrBetaGraph);
+            all_secondHelixPositionMinInBetaGraph.add(secondHelixPositionMinInAlphaOrBetaGraph);
+            all_secondHelixPositionMaxInBetaGraph.add(secondHelixPositionMaxInAlphaOrBetaGraph);
+            all_thirdHelixPositionMinInBetaGraph.add(thirdHelixPositionMinInAlphaOrBetaGraph);
+            all_thirdHelixPositionMaxInBetaGraph.add(thirdHelixPositionMaxInAlphaOrBetaGraph);
+            all_fourthHelixPositionMinInBetaGraph.add(fourthHelixPositionMinInAlphaOrBetaGraph);
+            all_fourthHelixPositionMinInBetaGraph.add(fourthHelixPositionMaxInAlphaOrBetaGraph);
+            all_fifthHelixPositionMinInBetaGraph.add(fifthHelixPositionMinInAlphaOrBetaGraph);
+            all_fifthHelixPositionMaxInBetaGraph.add(fifthHelixPositionMaxInAlphaOrBetaGraph);
+            all_sixthHelixPositionMinInBetaGraph.add(sixthHelixPositionMinInAlphaOrBetaGraph);
+            all_sixthHelixPositionMaxInBetaGraph.add(sixthHelixPositionMaxInAlphaOrBetaGraph);
+            all_seventhHelixPositionMinInBetaGraph.add(seventhHelixPositionMinInAlphaOrBetaGraph);
+            all_seventhHelixPositionMaxInBetaGraph.add(seventhHelixPositionMaxInAlphaOrBetaGraph);
+        }
+        
+
+        // now get the positions in the albe (instead of the beta) graph:
+        indexAlbeNumber = 3;
+        all_albeNumberOfHelix = new ArrayList<>();
+        for(int i = 0; i < all_pdb_ids.size(); i++) {
+            
+            // firstHelixPositionMin
+            // sse_type = 2 equals E -> needs to be integrated in the sql-statement?
+
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_firstHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                //?
+                // rowsStrandsBeta.get(0)? -> shouldn't it be rowsStrandsAlbe.get(0)?
+                // is rowsStrandsAlbe.get(0) sufficient or would you have to look at other chains, fg_positions if one doesn't find a rossman fold?
+                
+                all_firstHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_firstHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // firstHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_firstHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_firstHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_firstHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // secondHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_secondHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_secondHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_secondHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // secondHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_secondHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_secondHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_secondHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // thirdHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_thirdHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_thirdHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_thirdHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // thirdHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_thirdHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_thirdHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_thirdHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // fourthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fourthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fourthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fourthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // fourthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fourthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fourthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fourthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // fifthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fifthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fifthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fifthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // fifthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fifthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fifthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fifthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // sixthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_sixthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_sixthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_sixthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // sixthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_sixthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_sixthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_sixthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // seventhHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_seventhHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_seventhHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_seventhHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // seventhHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_seventhHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_seventhHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_seventhHelixPositionMaxInAlbeGraph.add(-1);
+            }
+        
+        
+        
+            // OK, now get the positions of the helices (instead of strands) in the albe graph:
+            ArrayList<ArrayList<String>> rowsHelicesAlbe;
+            //rowsHelicesAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'H'  group by pdb,chain,sse_type,albe_nr");
+            rowsHelicesAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '" + all_chains.get(i) + "' AND sse.sse_type = " + 1 + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+
+            List<String> uglyStringListForAllHelices = new ArrayList<>();
+            ArrayList<String> rowHelixAlbe;
+            String pdbidOfHelix, chainOfHelix, pdbAndChainOfHelix, sseTypeOfHelix, uglyString;
+            Integer albeNumberOfHelix;
+            
+            List<Integer> tmp_albeNumberOfHelix = new ArrayList<>();
+            for(int j = 0; j < rowsHelicesAlbe.size(); j++) {
+                rowHelixAlbe = rowsHelicesAlbe.get(j);
+
+                pdbidOfHelix = rowHelixAlbe.get(0);
+                chainOfHelix = rowHelixAlbe.get(1).isEmpty() ? "_" : rowHelixAlbe.get(1);
+                sseTypeOfHelix = rowHelixAlbe.get(2);   // should be "H", right? ;)
+                pdbAndChainOfHelix = pdbidOfHelix + chainOfHelix;
+                albeNumberOfHelix = Integer.parseInt(rowHelixAlbe.get(3));
+                uglyString = pdbAndChainOfHelix + ";" + sseTypeOfHelix + ";" + albeNumberOfHelix;
+                
+                tmp_albeNumberOfHelix.add(albeNumberOfHelix);
+                
+                uglyStringListForAllHelices.add(uglyString);
+            }
+            all_albeNumberOfHelix.add(tmp_albeNumberOfHelix);
+        }
+        
+        
+        // Check whether the determined helix positions lie within the min and max positions determined earlier.
+        //            If so, this chain contains the motif. Otherwise, not.
+        for (int i = 0; i < all_pdb_ids.size(); i++) {
+            for (int a = 0; a < all_albeNumberOfHelix.get(i).size(); a++) {
+                for (int b = 0; b < all_albeNumberOfHelix.get(i).size(); b++) {
+                    for(int c = 0; c < all_albeNumberOfHelix.get(i).size(); c++) {
+                        for(int d = 0; d < all_albeNumberOfHelix.get(i).size(); d++) {
+                            for(int e = 0; e < all_albeNumberOfHelix.get(i).size(); e++) {
+                                for(int f = 0; f < all_albeNumberOfHelix.get(i).size(); f++) {
+                                    for(int g = 0; g < all_albeNumberOfHelix.get(i).size(); g++) {
+                                        if (all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMinInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMaxInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(b) > all_secondHelixPositionMinInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(b) < all_secondHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(c) > all_thirdHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(c) < all_thirdHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(d) > all_fourthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(d) < all_fourthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(e) > all_fifthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(e) < all_fifthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(f) > all_sixthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(f) < all_sixthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(g) > all_seventhHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(g) < all_seventhHelixPositionMaxInAlbeGraph.get(i)) {
+                                            
+                                            return true;
+                } else {
+                        return false;
+                    }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        
+        
+        
+        
+        // ============== tim7.pl ==============
+        
+        //ArrayList<ArrayList<String>> rowsStrandsBeta = DBManager.doSelectQuery("Select pdb,chain,adj,adjpos,red from beta where red LIKE '%3p,-1p,-1p%' and red not LIKE '%-3p,-1p,-1p%'  group by pdb,chain,adj,adjpos,red");
+        
+        //?
+        // add chain_db_id to the SQL-statement --> prepared statement needs to be done
+        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE ln.ptgl_linnot_red LIKE '%-1_,-1_,-1_,-1_,7_,-1_,-1_%' GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
+        pattern = new Integer[] {-1, -1, -1, -1, 7, -1, -1};
+        
+        all_pdb_ids = new ArrayList<>();
+        all_chains = new ArrayList<>();
+        all_firstHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_firstHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_secondHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_secondHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_thirdHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_thirdHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_fourthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_fourthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_fifthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_fifthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_sixthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_sixthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_seventhHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_seventhHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_firstHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_firstHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_secondHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_secondHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_thirdHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_thirdHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_fourthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_fourthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_fifthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_fifthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_sixthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_sixthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_seventhHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_seventhHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        
+        for(int i = 0; i < rowsStrandsBeta.size(); i++) {
+            // gather data from row
+            ArrayList<String> rowStrandBeta = rowsStrandsBeta.get(i);
+            pdb_id = rowStrandBeta.get(0);
+            chain = rowStrandBeta.get(1).isEmpty() ? "_" : rowStrandBeta.get(1);
+            pdbAndChain = pdb_id + chain;
+            adj = rowStrandBeta.get(2);
+            adjpos = Integer.parseInt(rowStrandBeta.get(3));
+            red = rowStrandBeta.get(4);
+            
+            Integer[] relDistancesRED = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(red);
+            Integer[] relDistancesADJ = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(adj);
+
+            int patternPositionInRED = MotifSearchTools.findSubArray(relDistancesRED, pattern);
+            
+            Integer firstHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer firstHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer secondHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer secondHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer thirdHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer thirdHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer fourthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer fourthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer fifthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer fifthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer sixthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer sixthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer seventhHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer seventhHelixPositionMaxInAlphaOrBetaGraph = -1;
+            
+            if(patternPositionInRED >= 0) {
+                // The strand pattern occurs, but we need to check whether helices lie between the strands.
+                // Note that we queried the beta graph above, so they are NOT part of this graph anyway, and we need to have a look at other graph types.                
+                // The motif was found in the RED string. In the ADJ string, there may be spaces inbetween the strands of the pattern for the helices. Let us first determine the positions where the helices should be in the ADJ string.
+                
+                // We are looking for the positions of the helices:
+                     // first helix after the first strand
+                firstHelixPositionMinInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED + 3; j++) {
+                    firstHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                firstHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED + 2; j++) {
+                    firstHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                // second helix
+                secondHelixPositionMinInAlphaOrBetaGraph = firstHelixPositionMaxInAlphaOrBetaGraph;
+                
+                secondHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED + 1; j++) {
+                    secondHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                // third helix
+                thirdHelixPositionMinInAlphaOrBetaGraph = secondHelixPositionMaxInAlphaOrBetaGraph;
+                
+                thirdHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED; j++) {
+                    thirdHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                // fourth helix
+                fourthHelixPositionMinInAlphaOrBetaGraph = thirdHelixPositionMaxInAlphaOrBetaGraph;
+                
+                fourthHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j < patternPositionInRED; j++) {
+                    fourthHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                
+                // seventh helix
+                seventhHelixPositionMaxInAlphaOrBetaGraph = firstHelixPositionMinInAlphaOrBetaGraph;
+                seventhHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 4];
+                
+                seventhHelixPositionMinInAlphaOrBetaGraph = firstHelixPositionMaxInAlphaOrBetaGraph;
+                seventhHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 5];
+                
+                // sixth helix
+                sixthHelixPositionMaxInAlphaOrBetaGraph = seventhHelixPositionMinInAlphaOrBetaGraph;
+                
+                sixthHelixPositionMinInAlphaOrBetaGraph = sixthHelixPositionMaxInAlphaOrBetaGraph;
+                sixthHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 6];
+                
+                // fifth helix
+                fifthHelixPositionMaxInAlphaOrBetaGraph = sixthHelixPositionMinInAlphaOrBetaGraph;
+                
+                fifthHelixPositionMinInAlphaOrBetaGraph = fourthHelixPositionMaxInAlphaOrBetaGraph;
+            }
+            
+            // collect the data in the lists for all DB result rows
+            all_pdb_ids.add(pdb_id);
+            all_chains.add(chain);
+            all_firstHelixPositionMinInBetaGraph.add(firstHelixPositionMinInAlphaOrBetaGraph);
+            all_firstHelixPositionMaxInBetaGraph.add(firstHelixPositionMaxInAlphaOrBetaGraph);
+            all_secondHelixPositionMinInBetaGraph.add(secondHelixPositionMinInAlphaOrBetaGraph);
+            all_secondHelixPositionMaxInBetaGraph.add(secondHelixPositionMaxInAlphaOrBetaGraph);
+            all_thirdHelixPositionMinInBetaGraph.add(thirdHelixPositionMinInAlphaOrBetaGraph);
+            all_thirdHelixPositionMaxInBetaGraph.add(thirdHelixPositionMaxInAlphaOrBetaGraph);
+            all_fourthHelixPositionMinInBetaGraph.add(fourthHelixPositionMinInAlphaOrBetaGraph);
+            all_fourthHelixPositionMinInBetaGraph.add(fourthHelixPositionMaxInAlphaOrBetaGraph);
+            all_fifthHelixPositionMinInBetaGraph.add(fifthHelixPositionMinInAlphaOrBetaGraph);
+            all_fifthHelixPositionMaxInBetaGraph.add(fifthHelixPositionMaxInAlphaOrBetaGraph);
+            all_sixthHelixPositionMinInBetaGraph.add(sixthHelixPositionMinInAlphaOrBetaGraph);
+            all_sixthHelixPositionMaxInBetaGraph.add(sixthHelixPositionMaxInAlphaOrBetaGraph);
+            all_seventhHelixPositionMinInBetaGraph.add(seventhHelixPositionMinInAlphaOrBetaGraph);
+            all_seventhHelixPositionMaxInBetaGraph.add(seventhHelixPositionMaxInAlphaOrBetaGraph);
+        }
+        
+
+        // now get the positions in the albe (instead of the beta) graph:
+        indexAlbeNumber = 3;
+        all_albeNumberOfHelix = new ArrayList<>();
+        for(int i = 0; i < all_pdb_ids.size(); i++) {
+            
+            // firstHelixPositionMin
+            // sse_type = 2 equals E -> needs to be integrated in the sql-statement?
+
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_firstHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                //?
+                // rowsStrandsBeta.get(0)? -> shouldn't it be rowsStrandsAlbe.get(0)?
+                // is rowsStrandsAlbe.get(0) sufficient or would you have to look at other chains, fg_positions if one doesn't find a rossman fold?
+                
+                all_firstHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_firstHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // firstHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_firstHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_firstHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_firstHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // secondHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_secondHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_secondHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_secondHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // secondHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_secondHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_secondHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_secondHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // thirdHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_thirdHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_thirdHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_thirdHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // thirdHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_thirdHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_thirdHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_thirdHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // fourthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fourthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fourthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fourthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // fourthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fourthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fourthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fourthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // fifthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fifthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fifthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fifthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // fifthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fifthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fifthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fifthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // sixthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_sixthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_sixthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_sixthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // sixthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_sixthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_sixthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_sixthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // seventhHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_seventhHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_seventhHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_seventhHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // seventhHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_seventhHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_seventhHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_seventhHelixPositionMaxInAlbeGraph.add(-1);
+            }
+        
+        
+        
+            // OK, now get the positions of the helices (instead of strands) in the albe graph:
+            ArrayList<ArrayList<String>> rowsHelicesAlbe;
+            //rowsHelicesAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'H'  group by pdb,chain,sse_type,albe_nr");
+            rowsHelicesAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '" + all_chains.get(i) + "' AND sse.sse_type = " + 1 + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+
+            List<String> uglyStringListForAllHelices = new ArrayList<>();
+            ArrayList<String> rowHelixAlbe;
+            String pdbidOfHelix, chainOfHelix, pdbAndChainOfHelix, sseTypeOfHelix, uglyString;
+            Integer albeNumberOfHelix;
+            
+            List<Integer> tmp_albeNumberOfHelix = new ArrayList<>();
+            for(int j = 0; j < rowsHelicesAlbe.size(); j++) {
+                rowHelixAlbe = rowsHelicesAlbe.get(j);
+
+                pdbidOfHelix = rowHelixAlbe.get(0);
+                chainOfHelix = rowHelixAlbe.get(1).isEmpty() ? "_" : rowHelixAlbe.get(1);
+                sseTypeOfHelix = rowHelixAlbe.get(2);   // should be "H", right? ;)
+                pdbAndChainOfHelix = pdbidOfHelix + chainOfHelix;
+                albeNumberOfHelix = Integer.parseInt(rowHelixAlbe.get(3));
+                uglyString = pdbAndChainOfHelix + ";" + sseTypeOfHelix + ";" + albeNumberOfHelix;
+                
+                tmp_albeNumberOfHelix.add(albeNumberOfHelix);
+                
+                uglyStringListForAllHelices.add(uglyString);
+            }
+            all_albeNumberOfHelix.add(tmp_albeNumberOfHelix);
+        }
+        
+        
+        // Check whether the determined helix positions lie within the min and max positions determined earlier.
+        //            If so, this chain contains the motif. Otherwise, not.
+        for (int i = 0; i < all_pdb_ids.size(); i++) {
+            for (int a = 0; a < all_albeNumberOfHelix.get(i).size(); a++) {
+                for (int b = 0; b < all_albeNumberOfHelix.get(i).size(); b++) {
+                    for(int c = 0; c < all_albeNumberOfHelix.get(i).size(); c++) {
+                        for(int d = 0; d < all_albeNumberOfHelix.get(i).size(); d++) {
+                            for(int e = 0; e < all_albeNumberOfHelix.get(i).size(); e++) {
+                                for(int f = 0; f < all_albeNumberOfHelix.get(i).size(); f++) {
+                                    for(int g = 0; g < all_albeNumberOfHelix.get(i).size(); g++) {
+                                        if (all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMinInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMaxInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(b) > all_secondHelixPositionMinInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(b) < all_secondHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(c) > all_thirdHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(c) < all_thirdHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(d) > all_fourthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(d) < all_fourthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(e) > all_fifthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(e) < all_fifthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(f) > all_sixthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(f) < all_sixthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(g) > all_seventhHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(g) < all_seventhHelixPositionMaxInAlbeGraph.get(i)) {
+                                            
+                                            return true;
+                } else {
+                        return false;
+                    }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        
+        
+        
+        
+        // ============== tim8.pl ==============
+        
+        //ArrayList<ArrayList<String>> rowsStrandsBeta = DBManager.doSelectQuery("Select pdb,chain,adj,adjpos,red from beta where red LIKE '%3p,-1p,-1p%' and red not LIKE '%-3p,-1p,-1p%'  group by pdb,chain,adj,adjpos,red");
+        
+        //?
+        // add chain_db_id to the SQL-statement --> prepared statement needs to be done
+        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE ln.ptgl_linnot_red LIKE '%-1_,-1_,-1_,-1_,-1_,7_,-1_%' GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
+        pattern = new Integer[] {-1, -1, -1, -1, -1, 7, -1};
+        
+        all_pdb_ids = new ArrayList<>();
+        all_chains = new ArrayList<>();
+        all_firstHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_firstHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_secondHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_secondHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_thirdHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_thirdHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_fourthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_fourthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_fifthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_fifthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_sixthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_sixthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_seventhHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_seventhHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_firstHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_firstHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_secondHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_secondHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_thirdHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_thirdHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_fourthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_fourthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_fifthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_fifthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_sixthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_sixthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_seventhHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_seventhHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        
+        for(int i = 0; i < rowsStrandsBeta.size(); i++) {
+            // gather data from row
+            ArrayList<String> rowStrandBeta = rowsStrandsBeta.get(i);
+            pdb_id = rowStrandBeta.get(0);
+            chain = rowStrandBeta.get(1).isEmpty() ? "_" : rowStrandBeta.get(1);
+            pdbAndChain = pdb_id + chain;
+            adj = rowStrandBeta.get(2);
+            adjpos = Integer.parseInt(rowStrandBeta.get(3));
+            red = rowStrandBeta.get(4);
+            
+            Integer[] relDistancesRED = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(red);
+            Integer[] relDistancesADJ = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(adj);
+
+            int patternPositionInRED = MotifSearchTools.findSubArray(relDistancesRED, pattern);
+            
+            Integer firstHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer firstHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer secondHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer secondHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer thirdHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer thirdHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer fourthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer fourthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer fifthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer fifthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer sixthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer sixthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer seventhHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer seventhHelixPositionMaxInAlphaOrBetaGraph = -1;
+            
+            if(patternPositionInRED >= 0) {
+                // The strand pattern occurs, but we need to check whether helices lie between the strands.
+                // Note that we queried the beta graph above, so they are NOT part of this graph anyway, and we need to have a look at other graph types.                
+                // The motif was found in the RED string. In the ADJ string, there may be spaces inbetween the strands of the pattern for the helices. Let us first determine the positions where the helices should be in the ADJ string.
+                
+                // We are looking for the positions of the helices:
+                     // first helix after the first strand
+                firstHelixPositionMinInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED + 4; j++) {
+                    firstHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                firstHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED + 3; j++) {
+                    firstHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                // second helix
+                secondHelixPositionMinInAlphaOrBetaGraph = firstHelixPositionMaxInAlphaOrBetaGraph;
+                
+                secondHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED + 2; j++) {
+                    secondHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                // third helix
+                thirdHelixPositionMinInAlphaOrBetaGraph = secondHelixPositionMaxInAlphaOrBetaGraph;
+                
+                thirdHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED + 1; j++) {
+                    thirdHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                // fourth helix
+                fourthHelixPositionMinInAlphaOrBetaGraph = thirdHelixPositionMaxInAlphaOrBetaGraph;
+                
+                fourthHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED; j++) {
+                    fourthHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                // fifth helix
+                fifthHelixPositionMinInAlphaOrBetaGraph = fourthHelixPositionMaxInAlphaOrBetaGraph;
+                
+                fifthHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j < patternPositionInRED; j++) {
+                    fifthHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                
+                // seventh helix
+                seventhHelixPositionMaxInAlphaOrBetaGraph = firstHelixPositionMinInAlphaOrBetaGraph;
+                seventhHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 5];
+                
+                seventhHelixPositionMinInAlphaOrBetaGraph = firstHelixPositionMaxInAlphaOrBetaGraph;
+                seventhHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 6];
+                
+                // sixth helix
+                sixthHelixPositionMaxInAlphaOrBetaGraph = seventhHelixPositionMinInAlphaOrBetaGraph;
+                
+                sixthHelixPositionMinInAlphaOrBetaGraph = fifthHelixPositionMaxInAlphaOrBetaGraph;
+            }
+            
+            // collect the data in the lists for all DB result rows
+            all_pdb_ids.add(pdb_id);
+            all_chains.add(chain);
+            all_firstHelixPositionMinInBetaGraph.add(firstHelixPositionMinInAlphaOrBetaGraph);
+            all_firstHelixPositionMaxInBetaGraph.add(firstHelixPositionMaxInAlphaOrBetaGraph);
+            all_secondHelixPositionMinInBetaGraph.add(secondHelixPositionMinInAlphaOrBetaGraph);
+            all_secondHelixPositionMaxInBetaGraph.add(secondHelixPositionMaxInAlphaOrBetaGraph);
+            all_thirdHelixPositionMinInBetaGraph.add(thirdHelixPositionMinInAlphaOrBetaGraph);
+            all_thirdHelixPositionMaxInBetaGraph.add(thirdHelixPositionMaxInAlphaOrBetaGraph);
+            all_fourthHelixPositionMinInBetaGraph.add(fourthHelixPositionMinInAlphaOrBetaGraph);
+            all_fourthHelixPositionMinInBetaGraph.add(fourthHelixPositionMaxInAlphaOrBetaGraph);
+            all_fifthHelixPositionMinInBetaGraph.add(fifthHelixPositionMinInAlphaOrBetaGraph);
+            all_fifthHelixPositionMaxInBetaGraph.add(fifthHelixPositionMaxInAlphaOrBetaGraph);
+            all_sixthHelixPositionMinInBetaGraph.add(sixthHelixPositionMinInAlphaOrBetaGraph);
+            all_sixthHelixPositionMaxInBetaGraph.add(sixthHelixPositionMaxInAlphaOrBetaGraph);
+            all_seventhHelixPositionMinInBetaGraph.add(seventhHelixPositionMinInAlphaOrBetaGraph);
+            all_seventhHelixPositionMaxInBetaGraph.add(seventhHelixPositionMaxInAlphaOrBetaGraph);
+        }
+        
+
+        // now get the positions in the albe (instead of the beta) graph:
+        indexAlbeNumber = 3;
+        all_albeNumberOfHelix = new ArrayList<>();
+        for(int i = 0; i < all_pdb_ids.size(); i++) {
+            
+            // firstHelixPositionMin
+            // sse_type = 2 equals E -> needs to be integrated in the sql-statement?
+
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_firstHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                //?
+                // rowsStrandsBeta.get(0)? -> shouldn't it be rowsStrandsAlbe.get(0)?
+                // is rowsStrandsAlbe.get(0) sufficient or would you have to look at other chains, fg_positions if one doesn't find a rossman fold?
+                
+                all_firstHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_firstHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // firstHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_firstHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_firstHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_firstHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // secondHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_secondHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_secondHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_secondHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // secondHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_secondHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_secondHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_secondHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // thirdHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_thirdHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_thirdHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_thirdHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // thirdHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_thirdHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_thirdHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_thirdHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // fourthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fourthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fourthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fourthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // fourthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fourthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fourthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fourthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // fifthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fifthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fifthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fifthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // fifthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fifthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fifthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fifthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // sixthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_sixthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_sixthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_sixthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // sixthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_sixthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_sixthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_sixthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // seventhHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_seventhHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_seventhHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_seventhHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // seventhHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_seventhHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_seventhHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_seventhHelixPositionMaxInAlbeGraph.add(-1);
+            }
+        
+        
+        
+            // OK, now get the positions of the helices (instead of strands) in the albe graph:
+            ArrayList<ArrayList<String>> rowsHelicesAlbe;
+            //rowsHelicesAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'H'  group by pdb,chain,sse_type,albe_nr");
+            rowsHelicesAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '" + all_chains.get(i) + "' AND sse.sse_type = " + 1 + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+
+            List<String> uglyStringListForAllHelices = new ArrayList<>();
+            ArrayList<String> rowHelixAlbe;
+            String pdbidOfHelix, chainOfHelix, pdbAndChainOfHelix, sseTypeOfHelix, uglyString;
+            Integer albeNumberOfHelix;
+            
+            List<Integer> tmp_albeNumberOfHelix = new ArrayList<>();
+            for(int j = 0; j < rowsHelicesAlbe.size(); j++) {
+                rowHelixAlbe = rowsHelicesAlbe.get(j);
+
+                pdbidOfHelix = rowHelixAlbe.get(0);
+                chainOfHelix = rowHelixAlbe.get(1).isEmpty() ? "_" : rowHelixAlbe.get(1);
+                sseTypeOfHelix = rowHelixAlbe.get(2);   // should be "H", right? ;)
+                pdbAndChainOfHelix = pdbidOfHelix + chainOfHelix;
+                albeNumberOfHelix = Integer.parseInt(rowHelixAlbe.get(3));
+                uglyString = pdbAndChainOfHelix + ";" + sseTypeOfHelix + ";" + albeNumberOfHelix;
+                
+                tmp_albeNumberOfHelix.add(albeNumberOfHelix);
+                
+                uglyStringListForAllHelices.add(uglyString);
+            }
+            all_albeNumberOfHelix.add(tmp_albeNumberOfHelix);
+        }
+        
+        
+        // Check whether the determined helix positions lie within the min and max positions determined earlier.
+        //            If so, this chain contains the motif. Otherwise, not.
+        for (int i = 0; i < all_pdb_ids.size(); i++) {
+            for (int a = 0; a < all_albeNumberOfHelix.get(i).size(); a++) {
+                for (int b = 0; b < all_albeNumberOfHelix.get(i).size(); b++) {
+                    for(int c = 0; c < all_albeNumberOfHelix.get(i).size(); c++) {
+                        for(int d = 0; d < all_albeNumberOfHelix.get(i).size(); d++) {
+                            for(int e = 0; e < all_albeNumberOfHelix.get(i).size(); e++) {
+                                for(int f = 0; f < all_albeNumberOfHelix.get(i).size(); f++) {
+                                    for(int g = 0; g < all_albeNumberOfHelix.get(i).size(); g++) {
+                                        if (all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMinInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMaxInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(b) > all_secondHelixPositionMinInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(b) < all_secondHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(c) > all_thirdHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(c) < all_thirdHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(d) > all_fourthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(d) < all_fourthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(e) > all_fifthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(e) < all_fifthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(f) > all_sixthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(f) < all_sixthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(g) > all_seventhHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(g) < all_seventhHelixPositionMaxInAlbeGraph.get(i)) {
+                                            
+                                            return true;
+                } else {
+                        return false;
+                    }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        
+        
+        
+        
+        // ============== tim9.pl ==============
+        
+        //ArrayList<ArrayList<String>> rowsStrandsBeta = DBManager.doSelectQuery("Select pdb,chain,adj,adjpos,red from beta where red LIKE '%3p,-1p,-1p%' and red not LIKE '%-3p,-1p,-1p%'  group by pdb,chain,adj,adjpos,red");
+        
+        //?
+        // add chain_db_id to the SQL-statement --> prepared statement needs to be done
+        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE ln.ptgl_linnot_red LIKE '%-1_,-1_,-1_,-1_,-1_,-1_,7_%' GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
+        pattern = new Integer[] {-1, -1, -1, -1, -1, -1, 7};
+        
+        all_pdb_ids = new ArrayList<>();
+        all_chains = new ArrayList<>();
+        all_firstHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_firstHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_secondHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_secondHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_thirdHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_thirdHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_fourthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_fourthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_fifthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_fifthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_sixthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_sixthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_seventhHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_seventhHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_firstHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_firstHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_secondHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_secondHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_thirdHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_thirdHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_fourthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_fourthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_fifthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_fifthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_sixthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_sixthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_seventhHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_seventhHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        
+        for(int i = 0; i < rowsStrandsBeta.size(); i++) {
+            // gather data from row
+            ArrayList<String> rowStrandBeta = rowsStrandsBeta.get(i);
+            pdb_id = rowStrandBeta.get(0);
+            chain = rowStrandBeta.get(1).isEmpty() ? "_" : rowStrandBeta.get(1);
+            pdbAndChain = pdb_id + chain;
+            adj = rowStrandBeta.get(2);
+            adjpos = Integer.parseInt(rowStrandBeta.get(3));
+            red = rowStrandBeta.get(4);
+            
+            Integer[] relDistancesRED = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(red);
+            Integer[] relDistancesADJ = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(adj);
+
+            int patternPositionInRED = MotifSearchTools.findSubArray(relDistancesRED, pattern);
+            
+            Integer firstHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer firstHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer secondHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer secondHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer thirdHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer thirdHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer fourthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer fourthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer fifthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer fifthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer sixthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer sixthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer seventhHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer seventhHelixPositionMaxInAlphaOrBetaGraph = -1;
+            
+            if(patternPositionInRED >= 0) {
+                // The strand pattern occurs, but we need to check whether helices lie between the strands.
+                // Note that we queried the beta graph above, so they are NOT part of this graph anyway, and we need to have a look at other graph types.                
+                // The motif was found in the RED string. In the ADJ string, there may be spaces inbetween the strands of the pattern for the helices. Let us first determine the positions where the helices should be in the ADJ string.
+                
+                // We are looking for the positions of the helices:
+                     // first helix after the first strand
+                firstHelixPositionMinInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED + 5; j++) {
+                    firstHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                firstHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED + 4; j++) {
+                    firstHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                // second helix
+                secondHelixPositionMinInAlphaOrBetaGraph = firstHelixPositionMaxInAlphaOrBetaGraph;
+                
+                secondHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED + 3; j++) {
+                    secondHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                // third helix
+                thirdHelixPositionMinInAlphaOrBetaGraph = secondHelixPositionMaxInAlphaOrBetaGraph;
+                
+                thirdHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED + 2; j++) {
+                    thirdHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                // fourth helix
+                fourthHelixPositionMinInAlphaOrBetaGraph = thirdHelixPositionMaxInAlphaOrBetaGraph;
+                
+                fourthHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED + 1; j++) {
+                    fourthHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                // fifth helix
+                fifthHelixPositionMinInAlphaOrBetaGraph = fourthHelixPositionMaxInAlphaOrBetaGraph;
+                
+                fifthHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED; j++) {
+                    fifthHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                // sixth helix
+                sixthHelixPositionMinInAlphaOrBetaGraph = fifthHelixPositionMaxInAlphaOrBetaGraph;
+                
+                sixthHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j < patternPositionInRED; j++) {
+                    sixthHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                
+                // seventh helix
+                seventhHelixPositionMaxInAlphaOrBetaGraph = firstHelixPositionMinInAlphaOrBetaGraph;
+                seventhHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 6];
+                
+                seventhHelixPositionMinInAlphaOrBetaGraph = sixthHelixPositionMaxInAlphaOrBetaGraph;
+            }
+            
+            // collect the data in the lists for all DB result rows
+            all_pdb_ids.add(pdb_id);
+            all_chains.add(chain);
+            all_firstHelixPositionMinInBetaGraph.add(firstHelixPositionMinInAlphaOrBetaGraph);
+            all_firstHelixPositionMaxInBetaGraph.add(firstHelixPositionMaxInAlphaOrBetaGraph);
+            all_secondHelixPositionMinInBetaGraph.add(secondHelixPositionMinInAlphaOrBetaGraph);
+            all_secondHelixPositionMaxInBetaGraph.add(secondHelixPositionMaxInAlphaOrBetaGraph);
+            all_thirdHelixPositionMinInBetaGraph.add(thirdHelixPositionMinInAlphaOrBetaGraph);
+            all_thirdHelixPositionMaxInBetaGraph.add(thirdHelixPositionMaxInAlphaOrBetaGraph);
+            all_fourthHelixPositionMinInBetaGraph.add(fourthHelixPositionMinInAlphaOrBetaGraph);
+            all_fourthHelixPositionMinInBetaGraph.add(fourthHelixPositionMaxInAlphaOrBetaGraph);
+            all_fifthHelixPositionMinInBetaGraph.add(fifthHelixPositionMinInAlphaOrBetaGraph);
+            all_fifthHelixPositionMaxInBetaGraph.add(fifthHelixPositionMaxInAlphaOrBetaGraph);
+            all_sixthHelixPositionMinInBetaGraph.add(sixthHelixPositionMinInAlphaOrBetaGraph);
+            all_sixthHelixPositionMaxInBetaGraph.add(sixthHelixPositionMaxInAlphaOrBetaGraph);
+            all_seventhHelixPositionMinInBetaGraph.add(seventhHelixPositionMinInAlphaOrBetaGraph);
+            all_seventhHelixPositionMaxInBetaGraph.add(seventhHelixPositionMaxInAlphaOrBetaGraph);
+        }
+        
+
+        // now get the positions in the albe (instead of the beta) graph:
+        indexAlbeNumber = 3;
+        all_albeNumberOfHelix = new ArrayList<>();
+        for(int i = 0; i < all_pdb_ids.size(); i++) {
+            
+            // firstHelixPositionMin
+            // sse_type = 2 equals E -> needs to be integrated in the sql-statement?
+
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_firstHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                //?
+                // rowsStrandsBeta.get(0)? -> shouldn't it be rowsStrandsAlbe.get(0)?
+                // is rowsStrandsAlbe.get(0) sufficient or would you have to look at other chains, fg_positions if one doesn't find a rossman fold?
+                
+                all_firstHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_firstHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // firstHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_firstHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_firstHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_firstHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // secondHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_secondHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_secondHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_secondHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // secondHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_secondHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_secondHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_secondHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // thirdHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_thirdHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_thirdHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_thirdHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // thirdHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_thirdHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_thirdHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_thirdHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // fourthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fourthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fourthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fourthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // fourthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fourthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fourthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fourthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // fifthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fifthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fifthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fifthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // fifthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fifthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fifthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fifthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // sixthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_sixthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_sixthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_sixthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // sixthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_sixthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_sixthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_sixthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // seventhHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_seventhHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_seventhHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_seventhHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // seventhHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_seventhHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_seventhHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_seventhHelixPositionMaxInAlbeGraph.add(-1);
+            }
+        
+        
+        
+            // OK, now get the positions of the helices (instead of strands) in the albe graph:
+            ArrayList<ArrayList<String>> rowsHelicesAlbe;
+            //rowsHelicesAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'H'  group by pdb,chain,sse_type,albe_nr");
+            rowsHelicesAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '" + all_chains.get(i) + "' AND sse.sse_type = " + 1 + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+
+            List<String> uglyStringListForAllHelices = new ArrayList<>();
+            ArrayList<String> rowHelixAlbe;
+            String pdbidOfHelix, chainOfHelix, pdbAndChainOfHelix, sseTypeOfHelix, uglyString;
+            Integer albeNumberOfHelix;
+            
+            List<Integer> tmp_albeNumberOfHelix = new ArrayList<>();
+            for(int j = 0; j < rowsHelicesAlbe.size(); j++) {
+                rowHelixAlbe = rowsHelicesAlbe.get(j);
+
+                pdbidOfHelix = rowHelixAlbe.get(0);
+                chainOfHelix = rowHelixAlbe.get(1).isEmpty() ? "_" : rowHelixAlbe.get(1);
+                sseTypeOfHelix = rowHelixAlbe.get(2);   // should be "H", right? ;)
+                pdbAndChainOfHelix = pdbidOfHelix + chainOfHelix;
+                albeNumberOfHelix = Integer.parseInt(rowHelixAlbe.get(3));
+                uglyString = pdbAndChainOfHelix + ";" + sseTypeOfHelix + ";" + albeNumberOfHelix;
+                
+                tmp_albeNumberOfHelix.add(albeNumberOfHelix);
+                
+                uglyStringListForAllHelices.add(uglyString);
+            }
+            all_albeNumberOfHelix.add(tmp_albeNumberOfHelix);
+        }
+        
+        
+        // Check whether the determined helix positions lie within the min and max positions determined earlier.
+        //            If so, this chain contains the motif. Otherwise, not.
+        for (int i = 0; i < all_pdb_ids.size(); i++) {
+            for (int a = 0; a < all_albeNumberOfHelix.get(i).size(); a++) {
+                for (int b = 0; b < all_albeNumberOfHelix.get(i).size(); b++) {
+                    for(int c = 0; c < all_albeNumberOfHelix.get(i).size(); c++) {
+                        for(int d = 0; d < all_albeNumberOfHelix.get(i).size(); d++) {
+                            for(int e = 0; e < all_albeNumberOfHelix.get(i).size(); e++) {
+                                for(int f = 0; f < all_albeNumberOfHelix.get(i).size(); f++) {
+                                    for(int g = 0; g < all_albeNumberOfHelix.get(i).size(); g++) {
+                                        if (all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMinInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMaxInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(b) > all_secondHelixPositionMinInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(b) < all_secondHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(c) > all_thirdHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(c) < all_thirdHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(d) > all_fourthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(d) < all_fourthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(e) > all_fifthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(e) < all_fifthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(f) > all_sixthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(f) < all_sixthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(g) > all_seventhHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(g) < all_seventhHelixPositionMaxInAlbeGraph.get(i)) {
+                                            
+                                            return true;
+                } else {
+                        return false;
+                    }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        
+        
+        
+        // ============== tim10.pl ==============
+        
+        //ArrayList<ArrayList<String>> rowsStrandsBeta = DBManager.doSelectQuery("Select pdb,chain,adj,adjpos,red from beta where red LIKE '%3p,-1p,-1p%' and red not LIKE '%-3p,-1p,-1p%'  group by pdb,chain,adj,adjpos,red");
+        
+        //?
+        // add chain_db_id to the SQL-statement --> prepared statement needs to be done
+        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE ln.ptgl_linnot_red LIKE '%1_,1_,1_,1_,1_,-7_,1_%' AND  ln.ptgl_linnot_red NOT LIKE'%-1_,1_,1_,1_,1_,-7_,1_%' GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
+        pattern = new Integer[] {1, 1, 1, 1, 1, -7, 1};
+        
+        all_pdb_ids = new ArrayList<>();
+        all_chains = new ArrayList<>();
+        all_firstHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_firstHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_secondHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_secondHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_thirdHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_thirdHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_fourthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_fourthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_fifthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_fifthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_sixthHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_sixthHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_seventhHelixPositionMinInBetaGraph = new ArrayList<>();
+        all_seventhHelixPositionMaxInBetaGraph = new ArrayList<>();
+        all_firstHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_firstHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_secondHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_secondHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_thirdHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_thirdHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_fourthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_fourthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_fifthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_fifthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_sixthHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_sixthHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        all_seventhHelixPositionMinInAlbeGraph = new ArrayList<>();
+        all_seventhHelixPositionMaxInAlbeGraph = new ArrayList<>();
+        
+        for(int i = 0; i < rowsStrandsBeta.size(); i++) {
+            // gather data from row
+            ArrayList<String> rowStrandBeta = rowsStrandsBeta.get(i);
+            pdb_id = rowStrandBeta.get(0);
+            chain = rowStrandBeta.get(1).isEmpty() ? "_" : rowStrandBeta.get(1);
+            pdbAndChain = pdb_id + chain;
+            adj = rowStrandBeta.get(2);
+            adjpos = Integer.parseInt(rowStrandBeta.get(3));
+            red = rowStrandBeta.get(4);
+            
+            Integer[] relDistancesRED = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(red);
+            Integer[] relDistancesADJ = MotifSearchTools.getRelativeDistancesArrayFromPTGLRedAdjString(adj);
+
+            int patternPositionInRED = MotifSearchTools.findSubArray(relDistancesRED, pattern);
+            
+            Integer firstHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer firstHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer secondHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer secondHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer thirdHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer thirdHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer fourthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer fourthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer fifthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer fifthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer sixthHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer sixthHelixPositionMaxInAlphaOrBetaGraph = -1;
+            Integer seventhHelixPositionMinInAlphaOrBetaGraph = -1;
+            Integer seventhHelixPositionMaxInAlphaOrBetaGraph = -1;
+            
+            if(patternPositionInRED >= 0) {
+                // The strand pattern occurs, but we need to check whether helices lie between the strands.
+                // Note that we queried the beta graph above, so they are NOT part of this graph anyway, and we need to have a look at other graph types.                
+                // The motif was found in the RED string. In the ADJ string, there may be spaces inbetween the strands of the pattern for the helices. Let us first determine the positions where the helices should be in the ADJ string.
+                
+                // We are looking for the positions of the helices:
+                     // first helix after the first strand
+                firstHelixPositionMinInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j <= patternPositionInRED + 5; j++) {
+                    firstHelixPositionMinInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                firstHelixPositionMaxInAlphaOrBetaGraph = firstHelixPositionMinInAlphaOrBetaGraph;
+                firstHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 6];
+                
+                
+                // second helix
+                secondHelixPositionMinInAlphaOrBetaGraph = firstHelixPositionMaxInAlphaOrBetaGraph;
+                
+                secondHelixPositionMaxInAlphaOrBetaGraph = adjpos;
+                for(int j = 0; j < patternPositionInRED; j++) {
+                    secondHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[j];
+                }
+                
+                // third helix 
+                thirdHelixPositionMinInAlphaOrBetaGraph = secondHelixPositionMaxInAlphaOrBetaGraph;
+                
+                thirdHelixPositionMaxInAlphaOrBetaGraph = thirdHelixPositionMinInAlphaOrBetaGraph;
+                thirdHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED];
+                
+                // fourth helix
+                fourthHelixPositionMinInAlphaOrBetaGraph = thirdHelixPositionMaxInAlphaOrBetaGraph;
+                
+                fourthHelixPositionMaxInAlphaOrBetaGraph = fourthHelixPositionMinInAlphaOrBetaGraph;
+                fourthHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 1];
+                
+                // fifth helix
+                fifthHelixPositionMinInAlphaOrBetaGraph = fourthHelixPositionMaxInAlphaOrBetaGraph;
+                
+                fifthHelixPositionMaxInAlphaOrBetaGraph = fifthHelixPositionMinInAlphaOrBetaGraph;
+                fifthHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 2];
+                
+                // sixth helix
+                sixthHelixPositionMinInAlphaOrBetaGraph = fifthHelixPositionMaxInAlphaOrBetaGraph;
+                
+                sixthHelixPositionMaxInAlphaOrBetaGraph = sixthHelixPositionMinInAlphaOrBetaGraph;
+                sixthHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 3];
+                
+                // seventh helix
+                seventhHelixPositionMinInAlphaOrBetaGraph = sixthHelixPositionMaxInAlphaOrBetaGraph;
+                
+                seventhHelixPositionMaxInAlphaOrBetaGraph = seventhHelixPositionMinInAlphaOrBetaGraph;
+                seventhHelixPositionMaxInAlphaOrBetaGraph += relDistancesADJ[patternPositionInRED + 4];
+                
+            }
+            
+            // collect the data in the lists for all DB result rows
+            all_pdb_ids.add(pdb_id);
+            all_chains.add(chain);
+            all_firstHelixPositionMinInBetaGraph.add(firstHelixPositionMinInAlphaOrBetaGraph);
+            all_firstHelixPositionMaxInBetaGraph.add(firstHelixPositionMaxInAlphaOrBetaGraph);
+            all_secondHelixPositionMinInBetaGraph.add(secondHelixPositionMinInAlphaOrBetaGraph);
+            all_secondHelixPositionMaxInBetaGraph.add(secondHelixPositionMaxInAlphaOrBetaGraph);
+            all_thirdHelixPositionMinInBetaGraph.add(thirdHelixPositionMinInAlphaOrBetaGraph);
+            all_thirdHelixPositionMaxInBetaGraph.add(thirdHelixPositionMaxInAlphaOrBetaGraph);
+            all_fourthHelixPositionMinInBetaGraph.add(fourthHelixPositionMinInAlphaOrBetaGraph);
+            all_fourthHelixPositionMinInBetaGraph.add(fourthHelixPositionMaxInAlphaOrBetaGraph);
+            all_fifthHelixPositionMinInBetaGraph.add(fifthHelixPositionMinInAlphaOrBetaGraph);
+            all_fifthHelixPositionMaxInBetaGraph.add(fifthHelixPositionMaxInAlphaOrBetaGraph);
+            all_sixthHelixPositionMinInBetaGraph.add(sixthHelixPositionMinInAlphaOrBetaGraph);
+            all_sixthHelixPositionMaxInBetaGraph.add(sixthHelixPositionMaxInAlphaOrBetaGraph);
+            all_seventhHelixPositionMinInBetaGraph.add(seventhHelixPositionMinInAlphaOrBetaGraph);
+            all_seventhHelixPositionMaxInBetaGraph.add(seventhHelixPositionMaxInAlphaOrBetaGraph);
+        }
+        
+
+        // now get the positions in the albe (instead of the beta) graph:
+        indexAlbeNumber = 3;
+        all_albeNumberOfHelix = new ArrayList<>();
+        for(int i = 0; i < all_pdb_ids.size(); i++) {
+            
+            // firstHelixPositionMin
+            // sse_type = 2 equals E -> needs to be integrated in the sql-statement?
+
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_firstHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                //?
+                // rowsStrandsBeta.get(0)? -> shouldn't it be rowsStrandsAlbe.get(0)?
+                // is rowsStrandsAlbe.get(0) sufficient or would you have to look at other chains, fg_positions if one doesn't find a rossman fold?
+                
+                all_firstHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_firstHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // firstHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_firstHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_firstHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_firstHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // secondHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_secondHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_secondHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_secondHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // secondHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_secondHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_secondHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_secondHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // thirdHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_thirdHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_thirdHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_thirdHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // thirdHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_thirdHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_thirdHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_thirdHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // fourthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fourthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fourthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fourthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // fourthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fourthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fourthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fourthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // fifthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fifthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fifthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fifthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // fifthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_fifthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_fifthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_fifthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // sixthHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_sixthHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_sixthHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_sixthHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // sixthHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_sixthHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_sixthHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_sixthHelixPositionMaxInAlbeGraph.add(-1);
+            }
+            
+            // seventhHelixPositionMin
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_seventhHelixPositionMinInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_seventhHelixPositionMinInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_seventhHelixPositionMinInAlbeGraph.add(-1);
+            }
+            
+            // seventhHelixPositionMax
+            rowsStrandsAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '"+ all_chains.get(i) + "' AND sse.sse_type = " + 2 + " AND sd.beta_fg_position = " + all_seventhHelixPositionMaxInBetaGraph.get(i) + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+            if(rowsStrandsAlbe.size() == 1) {
+                all_seventhHelixPositionMaxInAlbeGraph.add(Integer.parseInt(rowsStrandsAlbe.get(0).get(indexAlbeNumber)));
+            } else {
+                all_seventhHelixPositionMaxInAlbeGraph.add(-1);
+            }
+        
+        
+        
+            // OK, now get the positions of the helices (instead of strands) in the albe graph:
+            ArrayList<ArrayList<String>> rowsHelicesAlbe;
+            //rowsHelicesAlbe = DBManager.doSelectQuery("Select pdb,chain,sse_type,albe_nr from secon_dat where pdb= '$pdb[$d]' and chain = '$chain[$d]' and sse_type = 'H'  group by pdb,chain,sse_type,albe_nr");
+            rowsHelicesAlbe = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position FROM plcc_secondat sd INNER JOIN plcc_sse sse ON sd.sse_id = sse.sse_id INNER JOIN plcc_chain c ON sse.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE p.pdb_id = '" + all_pdb_ids.get(i) + "' AND c.chain_name = '" + all_chains.get(i) + "' AND sse.sse_type = " + 1 + " GROUP BY p.pdb_id, c.chain_name, sse.sse_type, sd.albe_fg_position");
+
+            List<String> uglyStringListForAllHelices = new ArrayList<>();
+            ArrayList<String> rowHelixAlbe;
+            String pdbidOfHelix, chainOfHelix, pdbAndChainOfHelix, sseTypeOfHelix, uglyString;
+            Integer albeNumberOfHelix;
+            
+            List<Integer> tmp_albeNumberOfHelix = new ArrayList<>();
+            for(int j = 0; j < rowsHelicesAlbe.size(); j++) {
+                rowHelixAlbe = rowsHelicesAlbe.get(j);
+
+                pdbidOfHelix = rowHelixAlbe.get(0);
+                chainOfHelix = rowHelixAlbe.get(1).isEmpty() ? "_" : rowHelixAlbe.get(1);
+                sseTypeOfHelix = rowHelixAlbe.get(2);   // should be "H", right? ;)
+                pdbAndChainOfHelix = pdbidOfHelix + chainOfHelix;
+                albeNumberOfHelix = Integer.parseInt(rowHelixAlbe.get(3));
+                uglyString = pdbAndChainOfHelix + ";" + sseTypeOfHelix + ";" + albeNumberOfHelix;
+                
+                tmp_albeNumberOfHelix.add(albeNumberOfHelix);
+                
+                uglyStringListForAllHelices.add(uglyString);
+            }
+            all_albeNumberOfHelix.add(tmp_albeNumberOfHelix);
+        }
+        
+        
+        // Check whether the determined helix positions lie within the min and max positions determined earlier.
+        //            If so, this chain contains the motif. Otherwise, not.
+        for (int i = 0; i < all_pdb_ids.size(); i++) {
+            for (int a = 0; a < all_albeNumberOfHelix.get(i).size(); a++) {
+                for (int b = 0; b < all_albeNumberOfHelix.get(i).size(); b++) {
+                    for(int c = 0; c < all_albeNumberOfHelix.get(i).size(); c++) {
+                        for(int d = 0; d < all_albeNumberOfHelix.get(i).size(); d++) {
+                            for(int e = 0; e < all_albeNumberOfHelix.get(i).size(); e++) {
+                                for(int f = 0; f < all_albeNumberOfHelix.get(i).size(); f++) {
+                                    for(int g = 0; g < all_albeNumberOfHelix.get(i).size(); g++) {
+                                        if (all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMinInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMaxInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(b) > all_secondHelixPositionMinInAlbeGraph.get(i) 
+                                                && all_albeNumberOfHelix.get(i).get(b) < all_secondHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(c) > all_thirdHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(c) < all_thirdHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(d) > all_fourthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(d) < all_fourthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(e) > all_fifthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(e) < all_fifthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(f) > all_sixthHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(f) < all_sixthHelixPositionMaxInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(g) > all_seventhHelixPositionMinInAlbeGraph.get(i)
+                                                && all_albeNumberOfHelix.get(i).get(g) < all_seventhHelixPositionMaxInAlbeGraph.get(i)) {
+                                            
+                                            return true;
+                } else {
+                        return false;
+                    }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         return false;
     }
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     
