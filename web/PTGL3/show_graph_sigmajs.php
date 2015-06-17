@@ -1,5 +1,6 @@
 <html>
 <head>
+<title>PTGL3 -- SigmaJS Protein graph visualization test</title>
 <style type="text/css">
   #sigma-container {
     max-width: 800px;
@@ -11,6 +12,7 @@
 </head>
 <body>
 <div id="sigma-container"></div>
+<p>The albe graph of 7TIM, chain A.</p>
 <script src="./js/sigmajs/sigma.min.js"></script>
 <script src="./js/sigmajs/plugins/sigma.parsers.gexf.min.js"></script>
 <script src="./js/sigmajs/plugins/sigma.layout.forceAtlas2.min.js"></script>
