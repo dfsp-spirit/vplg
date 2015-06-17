@@ -72,6 +72,44 @@ public class ProteinGraphColors {
     }
     
     
+    public static Integer[] getRGBColorArrayForVertexFGLinnot(String vfgl) {
+        if(vfgl.equals(FoldingGraph.notationLabelHelix)) {
+            return new Integer[] { 255, 0, 0 };
+        }
+        else if(vfgl.equals(FoldingGraph.notationLabelStrand)) {
+            return new Integer[] { 0, 0, 0 };
+        }
+        else if(vfgl.equals(FoldingGraph.notationLabelLigand)) {
+            return new Integer[] { 255, 0, 255 };
+        }
+        else if(vfgl.equals(FoldingGraph.notationLabelOther)) {
+            return new Integer[] { 127, 127, 127 };
+        }
+        else {
+            DP.getInstance().w("ProteinGraphColors", "getRGBColorArrayForVertexFGLinnot: unknown vertex linear notation label.");
+            return new Integer[] { 127, 127, 127 };
+        }
+    }
+    
+    public static String getShapeStringForVertexFGLinnot(String vfgl) {
+        if(vfgl.equals(FoldingGraph.notationLabelHelix)) {
+            return "disc";
+        }
+        else if(vfgl.equals(FoldingGraph.notationLabelStrand)) {
+            return "square";
+        }
+        else if(vfgl.equals(FoldingGraph.notationLabelLigand)) {
+            return "triangle";
+        }
+        else if(vfgl.equals(FoldingGraph.notationLabelOther)) {
+            return "diamond";
+        }
+        else {
+            DP.getInstance().w("ProteinGraphColors", "getHexColorStringForVertexFGLinnot: unknown vertex linear notation label, returning VERTEXCOLOR_OTHER.");
+            return "diamond";
+        }
+    }
+    
     public static String getHexColorStringForVertexFGLinnot(String vfgl) {
         if(vfgl.equals(FoldingGraph.notationLabelHelix)) {
             return ProteinGraphColors.VERTEXCOLOR_HELIX;
@@ -110,6 +148,28 @@ public class ProteinGraphColors {
         else {
             DP.getInstance().w("ProteinGraphColors", "getHexColorStringForEdgeFGLinnot: unknown edge linear notation label, returning EDGECOLOR_OTHER.");
             return "#808080";
+        }
+    }
+    
+    public static Integer[] getRGBColorArrayForEdgeFGLinnot(String efgl) {
+        if(efgl.equals(SpatRel.STRING_ANTIPARALLEL)) {
+            return new Integer[] { 0, 0, 255 };
+        }
+        else if(efgl.equals(SpatRel.STRING_PARALLEL)) {
+            return new Integer[] { 255, 0, 0 };
+        }
+        else if(efgl.equals(SpatRel.STRING_MIXED)) {
+            return new Integer[] { 0, 255, 0 };
+        }
+        else if(efgl.equals(SpatRel.STRING_LIGAND)) {
+            return new Integer[] { 255, 0, 255 };
+        }
+        else if(efgl.equals(SpatRel.STRING_OTHER)) {
+            return new Integer[] { 127, 127, 127 };
+        }
+        else {
+            DP.getInstance().w("ProteinGraphColors", "getgetRGBColorArrayForEdgeFGLinnot: unknown edge linear notation label.");
+            return new Integer[] { 127, 127, 127 };
         }
     }
     

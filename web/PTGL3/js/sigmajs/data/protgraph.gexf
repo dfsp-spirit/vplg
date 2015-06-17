@@ -22,111 +22,133 @@
           <viz:position x="10.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="0" g="0" b="0"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="square"></viz:node-shape>
       </node>
       <node id="1" label="1h">
           <viz:position x="20.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="255" g="0" b="0"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="disc"></viz:node-shape>
       </node>
       <node id="2" label="2e">
           <viz:position x="30.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="0" g="0" b="0"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="square"></viz:node-shape>
       </node>
       <node id="3" label="3h">
           <viz:position x="40.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="255" g="0" b="0"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="disc"></viz:node-shape>
       </node>
       <node id="4" label="4e">
           <viz:position x="50.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="0" g="0" b="0"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="square"></viz:node-shape>
       </node>
       <node id="5" label="5h">
           <viz:position x="60.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="255" g="0" b="0"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="disc"></viz:node-shape>
       </node>
       <node id="6" label="6e">
           <viz:position x="70.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="0" g="0" b="0"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="square"></viz:node-shape>
       </node>
       <node id="7" label="7h">
           <viz:position x="80.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="255" g="0" b="0"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="disc"></viz:node-shape>
       </node>
       <node id="8" label="8h">
           <viz:position x="90.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="255" g="0" b="0"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="disc"></viz:node-shape>
       </node>
       <node id="9" label="9e">
           <viz:position x="100.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="0" g="0" b="0"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="square"></viz:node-shape>
       </node>
       <node id="10" label="10h">
           <viz:position x="110.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="255" g="0" b="0"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="disc"></viz:node-shape>
       </node>
       <node id="11" label="11h">
           <viz:position x="120.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="255" g="0" b="0"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="disc"></viz:node-shape>
       </node>
       <node id="12" label="12e">
           <viz:position x="130.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="0" g="0" b="0"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="square"></viz:node-shape>
       </node>
       <node id="13" label="13h">
           <viz:position x="140.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="255" g="0" b="0"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="disc"></viz:node-shape>
       </node>
       <node id="14" label="14h">
           <viz:position x="150.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="255" g="0" b="0"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="disc"></viz:node-shape>
       </node>
       <node id="15" label="15h">
           <viz:position x="160.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="255" g="0" b="0"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="disc"></viz:node-shape>
       </node>
       <node id="16" label="16e">
           <viz:position x="170.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="0" g="0" b="0"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="square"></viz:node-shape>
       </node>
       <node id="17" label="17h">
           <viz:position x="180.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="255" g="0" b="0"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="disc"></viz:node-shape>
       </node>
       <node id="18" label="18e">
           <viz:position x="190.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="0" g="0" b="0"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="square"></viz:node-shape>
       </node>
       <node id="19" label="19h">
           <viz:position x="200.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="255" g="0" b="0"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="disc"></viz:node-shape>
       </node>
       <node id="20" label="20h">
           <viz:position x="210.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="255" g="0" b="0"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="disc"></viz:node-shape>
       </node>
       <node id="21" label="21l">
           <viz:position x="220.0" y="10.0" z="0.0"></viz:position>
           <viz:color r="255" g="0" b="255"></viz:color>
           <viz:size value="1.0"></viz:size>
+          <viz:node-shape value="triangle"></viz:node-shape>
       </node>
     </nodes>
     <edges>

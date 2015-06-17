@@ -116,7 +116,7 @@ public class Settings {
      * @return the PLCC version
      */
     public static String getVersion() {
-        return("0.97");
+        return("0.98");
     }
 
     /**
@@ -251,6 +251,7 @@ public class Settings {
         defSet("plcc_B_output_json", "true", "Whether to save computed protein graphs to text files in JSON format.");
         defSet("plcc_B_output_xml", "true", "Whether to save computed protein graphs to text files in XML format.");
         defSet("plcc_B_output_gexf", "false", "Whether to save computed protein graphs to text files in GEXF format.");
+        defSet("plcc_S_gexf_format_version", "1.1", "The version of the GEFX file format to use. Supported are '1.1' and '1.2'.");
         
         defSet("plcc_B_output_compgraph_GML", "true", "Whether to save computed detailed complex graphs (including SSE info) to text files in Graph Modelling Language format (GML).");
         defSet("plcc_B_output_compgraph_TGF", "false", "Whether to save computed detailed complex graphs (including SSE info) to text files in Trivial Graph Format (TGF).");

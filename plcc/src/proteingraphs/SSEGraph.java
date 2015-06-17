@@ -3174,11 +3174,27 @@ E	3	3	3
         return kf.toString();
     }
     
+    
+    @Override
+    public String toGEXFFormat() {
+        String version = Settings.get("plcc_S_gexf_format_version");
+        if(version.equals("1.2")) {
+            return this.toGEXFFormatDraft12();
+        }
+        else if(version.equals("1.1")) {
+            return this.toGEXFFormat11();
+        }
+        else {
+            DP.getInstance().e("SSEGRaph", "toGEXFFormat: Unsupported version of GEXF format given. Supported versions are '1.1' and '1.2' atm. Returning empty string.");
+            return "";
+        }
+    }
+    
     /**
-     * Generates a string representation of this graph in GEXF format (see http://gefx.net/format/). 
+     * Generates a string representation of this graph in GEXF format version Draft 1.2 (see http://gefx.net/format/). 
      * @return the gexf format graph string
      */
-    public String toGEXFFormat() {
+    private String toGEXFFormatDraft12() {
         StringBuilder gexf = new StringBuilder();
         
         
@@ -3236,6 +3252,97 @@ E	3	3	3
                     gexf.append("          <attvalue for=\"0\" value=\"").append(edge_type).append("\"/>").append("\n");
                     gexf.append("          <attvalue for=\"1\" value=\"").append(edge_color).append("\"/>").append("\n");
                     gexf.append("        </attvalues>").append("\n");
+                    gexf.append("      </edge>").append("\n");
+                    edgeID++;
+                }            
+            }            
+        }
+        
+        gexf.append("    </edges>").append("\n");
+        
+        gexf.append("  </graph>").append("\n");
+        gexf.append("</gexf>").append("\n");
+        
+        
+        return gexf.toString();
+    }
+    
+    
+    /**
+     * Generates a string representation of this graph in GEXF format version 1.1 (see http://gefx.net/format/). 
+     * @return the gexf format graph string
+     */
+    private String toGEXFFormat11() {
+        StringBuilder gexf = new StringBuilder();
+        
+        
+        gexf.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append("\n");
+        gexf.append("<gexf xmlns=\"http://www.gexf.net/1.2draft\" version=\"1.2\" xmlns:viz=\"http://www.gexf.net/1.2draft/viz\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd\">").append("\n");
+        gexf.append("  <meta lastmodifieddate=\"2015-03-20\">").append("\n");
+        gexf.append("    <creator>VPLG</creator>").append("\n");
+        gexf.append("    <description>A protein graph created by the VPLG software.</description>").append("\n");
+        gexf.append("  </meta>").append("\n");
+        gexf.append("  <graph mode=\"static\" defaultedgetype=\"undirected\">").append("\n");
+        gexf.append("    <attributes class=\"node\"  mode=\"static\">").append("\n");
+        gexf.append("      <attribute id=\"sse_type\" title=\"sse_type\" type=\"string\">").append("\n");
+        //gexf.append("        <default>\"o\"</default>").append("\n");
+        gexf.append("      </attribute>").append("\n");
+        gexf.append("      <attribute id=\"color\" title=\"color\" type=\"string\">").append("\n");
+        //gexf.append("        <default>\"#808080\"</default>").append("\n");
+        gexf.append("      </attribute>").append("\n");        
+        gexf.append("    </attributes>").append("\n");
+        gexf.append("    <attributes class=\"edge\" mode=\"static\">").append("\n");
+        gexf.append("      <attribute id=\"spatial\" title=\"spatial\" type=\"string\">").append("\n");
+        //gexf.append("        <default>\"o\"</default>").append("\n");
+        gexf.append("      </attribute>").append("\n");
+        gexf.append("      <attribute id=\"color\" title=\"color\" type=\"string\">").append("\n");
+        //gexf.append("        <default>\"#808080\"</default>").append("\n");
+        gexf.append("      </attribute>").append("\n");        
+        gexf.append("    </attributes>").append("\n");
+        
+        gexf.append("    <nodes>").append("\n");
+        
+        String sse_type, sse_color, sse_label, sse_shape;
+        Integer[] vertex_color_rgb;
+        for(Integer i = 0; i < this.getSize(); i++) {
+            sse_type = this.getFGNotationOfVertex(i);
+            sse_color = ProteinGraphColors.getHexColorStringForVertexFGLinnot(sse_type);
+            sse_shape = ProteinGraphColors.getShapeStringForVertexFGLinnot(sse_type);
+            vertex_color_rgb = ProteinGraphColors.getRGBColorArrayForVertexFGLinnot(sse_type);
+            sse_label = ( i + sse_type);
+            gexf.append("      <node id=\"" + i + "\" label=\"" + sse_label + "\">").append("\n");
+            //gexf.append("        <attvalues>").append("\n");
+            //gexf.append("          <attvalue for=\"sse_type\" value=\"" + sse_type + "\"></attvalue>").append("\n");
+            //gexf.append("          <attvalue for=\"color\" value=\"" + sse_color + "\"></attvalue>").append("\n");
+            //gexf.append("        </attvalues>").append("\n");
+            //gexf.append("        <viz:color r=\"255\" g=\"50\" b=\"50\" ></viz:color>").append("\n");
+            gexf.append("          <viz:position x=\"" + ((i+1) * 10.0) + "\" y=\"10.0\" z=\"0.0\"></viz:position>").append("\n");
+            gexf.append("          <viz:color r=\"" + vertex_color_rgb[0] + "\" g=\"" + vertex_color_rgb[1] + "\" b=\"" + vertex_color_rgb[2] + "\"></viz:color>").append("\n");
+            gexf.append("          <viz:size value=\"1.0\"></viz:size>").append("\n");
+            gexf.append("          <viz:node-shape value=\"" + sse_shape + "\"></viz:node-shape>").append("\n");            
+            gexf.append("      </node>").append("\n");
+        }
+        
+        gexf.append("    </nodes>").append("\n");
+        gexf.append("    <edges>").append("\n");
+        
+
+        int edgeID = 0;
+        String edge_type, edge_color, edge_label;
+        Integer[] edge_color_rgb;
+        for(Integer i = 0; i < this.getSize(); i++) {
+            for(Integer j = 0 ; j < this.getSize(); j++) {
+                if(this.containsEdge(i, j) && !Objects.equals(i, j)) {
+                    edge_type = this.getEdgeLabel(i, j);
+                    edge_color = ProteinGraphColors.getHexColorStringForEdgeFGLinnot(edge_type);
+                    edge_label = i + edge_type + j;
+                    edge_color_rgb = ProteinGraphColors.getRGBColorArrayForEdgeFGLinnot(edge_type);
+                    gexf.append("      <edge id=\"").append(edgeID).append("\" source=\"").append(i).append("\" target=\"").append(j).append("\" label=\"").append(edge_label).append("\"").append(">\n");
+                    //gexf.append("        <attvalues>").append("\n");
+                    //gexf.append("          <attvalue for=\"edge_type\" value=\"").append(edge_type).append("\"></attvalue>").append("\n");
+                    //gexf.append("          <attvalue for=\"color\" value=\"").append(edge_color).append("\"></attvalue>").append("\n");
+                    //gexf.append("        </attvalues>").append("\n");
+                    gexf.append("        <viz:color r=\"" + edge_color_rgb[0] + "\" g=\"" + edge_color_rgb[1] + "\" b=\"" + edge_color_rgb[2] + "\" ></viz:color>").append("\n");
                     gexf.append("      </edge>").append("\n");
                     edgeID++;
                 }            

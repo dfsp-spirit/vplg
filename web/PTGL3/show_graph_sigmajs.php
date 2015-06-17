@@ -16,6 +16,8 @@
 <script src="./js/sigmajs/sigma.min.js"></script>
 <script src="./js/sigmajs/plugins/sigma.parsers.gexf.min.js"></script>
 <script src="./js/sigmajs/plugins/sigma.layout.forceAtlas2.min.js"></script>
+<script src="./js/sigmajs/plugins/sigma.renderers.customShapes.min.js"></script>
+
 <script>
   sigma.parsers.gexf(
      './js/sigmajs/data/protgraph.gexf',
@@ -34,9 +36,11 @@
       // graph is displayed, with "s" the related
       // sigma instance.
       //s.startForceAtlas2();
+      CustomShapes.init(s);
       s.graph.nodes().forEach(function(node, i, a) {
   node.x = Math.cos(Math.PI * 2 * i / a.length);
   node.y = Math.sin(Math.PI * 2 * i / a.length);
+  node.type = 'square';
 });
       s.refresh();
     }
