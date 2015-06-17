@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gexf xmlns="http://www.gexf.net/1.2draft" version="1.2" xmlns:viz="http://www.gexf.net/1.2draft/viz" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd">
+  <meta lastmodifieddate="2015-03-20">
+    <creator>VPLG</creator>
+    <description>A protein graph created by the VPLG software.</description>
+  </meta>
+  <graph mode="static" defaultedgetype="undirected">
+    <attributes class="node"  mode="static">
+      <attribute id="sse_type" title="sse_type" type="string">
+      </attribute>
+      <attribute id="color" title="color" type="string">
+      </attribute>
+    </attributes>
+    <attributes class="edge" mode="static">
+      <attribute id="spatial" title="spatial" type="string">
+      </attribute>
+      <attribute id="color" title="color" type="string">
+      </attribute>
+    </attributes>
+    <nodes>
+      <node id="0" label="0e">
+          <viz:position x="10.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="0" g="0" b="0"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+      <node id="1" label="1h">
+          <viz:position x="20.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="255" g="0" b="0"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+      <node id="2" label="2e">
+          <viz:position x="30.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="0" g="0" b="0"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+      <node id="3" label="3h">
+          <viz:position x="40.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="255" g="0" b="0"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+      <node id="4" label="4e">
+          <viz:position x="50.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="0" g="0" b="0"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+      <node id="5" label="5h">
+          <viz:position x="60.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="255" g="0" b="0"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+      <node id="6" label="6e">
+          <viz:position x="70.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="0" g="0" b="0"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+      <node id="7" label="7h">
+          <viz:position x="80.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="255" g="0" b="0"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+      <node id="8" label="8h">
+          <viz:position x="90.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="255" g="0" b="0"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+      <node id="9" label="9e">
+          <viz:position x="100.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="0" g="0" b="0"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+      <node id="10" label="10h">
+          <viz:position x="110.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="255" g="0" b="0"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+      <node id="11" label="11h">
+          <viz:position x="120.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="255" g="0" b="0"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+      <node id="12" label="12e">
+          <viz:position x="130.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="0" g="0" b="0"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+      <node id="13" label="13h">
+          <viz:position x="140.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="255" g="0" b="0"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+      <node id="14" label="14h">
+          <viz:position x="150.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="255" g="0" b="0"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+      <node id="15" label="15h">
+          <viz:position x="160.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="255" g="0" b="0"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+      <node id="16" label="16e">
+          <viz:position x="170.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="0" g="0" b="0"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+      <node id="17" label="17h">
+          <viz:position x="180.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="255" g="0" b="0"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+      <node id="18" label="18e">
+          <viz:position x="190.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="0" g="0" b="0"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+      <node id="19" label="19h">
+          <viz:position x="200.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="255" g="0" b="0"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+      <node id="20" label="20h">
+          <viz:position x="210.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="255" g="0" b="0"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+      <node id="21" label="21l">
+          <viz:position x="220.0" y="10.0" z="0.0"></viz:position>
+          <viz:color r="255" g="0" b="255"></viz:color>
+          <viz:size value="1.0"></viz:size>
+      </node>
+    </nodes>
+    <edges>
+      <edge id="0" source="0" target="2" label="0p2">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="1" source="0" target="18" label="0p18">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="2" source="0" target="21" label="0j21">
+        <viz:color r="255" g="0" b="255" ></viz:color>
+      </edge>
+      <edge id="3" source="1" target="3" label="1p3">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="4" source="2" target="0" label="2p0">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="5" source="2" target="4" label="2p4">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="6" source="3" target="1" label="3p1">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="7" source="4" target="2" label="4p2">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="8" source="4" target="6" label="4p6">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="9" source="6" target="4" label="6p4">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="10" source="6" target="9" label="6p9">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="11" source="7" target="21" label="7j21">
+        <viz:color r="255" g="0" b="255" ></viz:color>
+      </edge>
+      <edge id="12" source="8" target="11" label="8p11">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="13" source="9" target="6" label="9p6">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="14" source="9" target="11" label="9m11">
+        <viz:color r="0" g="255" b="0" ></viz:color>
+      </edge>
+      <edge id="15" source="9" target="12" label="9p12">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="16" source="9" target="21" label="9j21">
+        <viz:color r="255" g="0" b="255" ></viz:color>
+      </edge>
+      <edge id="17" source="11" target="8" label="11p8">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="18" source="11" target="9" label="11m9">
+        <viz:color r="0" g="255" b="0" ></viz:color>
+      </edge>
+      <edge id="19" source="11" target="14" label="11p14">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="20" source="12" target="9" label="12p9">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="21" source="12" target="16" label="12p16">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="22" source="13" target="21" label="13j21">
+        <viz:color r="255" g="0" b="255" ></viz:color>
+      </edge>
+      <edge id="23" source="14" target="11" label="14p11">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="24" source="14" target="16" label="14m16">
+        <viz:color r="0" g="255" b="0" ></viz:color>
+      </edge>
+      <edge id="25" source="16" target="12" label="16p12">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="26" source="16" target="14" label="16m14">
+        <viz:color r="0" g="255" b="0" ></viz:color>
+      </edge>
+      <edge id="27" source="16" target="18" label="16p18">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="28" source="18" target="0" label="18p0">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="29" source="18" target="16" label="18p16">
+        <viz:color r="255" g="0" b="0" ></viz:color>
+      </edge>
+      <edge id="30" source="18" target="21" label="18j21">
+        <viz:color r="255" g="0" b="255" ></viz:color>
+      </edge>
+      <edge id="31" source="19" target="21" label="19j21">
+        <viz:color r="255" g="0" b="255" ></viz:color>
+      </edge>
+      <edge id="32" source="21" target="0" label="21j0">
+        <viz:color r="255" g="0" b="255" ></viz:color>
+      </edge>
+      <edge id="33" source="21" target="7" label="21j7">
+        <viz:color r="255" g="0" b="255" ></viz:color>
+      </edge>
+      <edge id="34" source="21" target="9" label="21j9">
+        <viz:color r="255" g="0" b="255" ></viz:color>
+      </edge>
+      <edge id="35" source="21" target="13" label="21j13">
+        <viz:color r="255" g="0" b="255" ></viz:color>
+      </edge>
+      <edge id="36" source="21" target="18" label="21j18">
+        <viz:color r="255" g="0" b="255" ></viz:color>
+      </edge>
+      <edge id="37" source="21" target="19" label="21j19">
+        <viz:color r="255" g="0" b="255" ></viz:color>
+      </edge>
+    </edges>
+  </graph>
+</gexf>
