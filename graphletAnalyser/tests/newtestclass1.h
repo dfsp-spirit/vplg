@@ -16,6 +16,7 @@ class newtestclass1 : public CPPUNIT_NS::TestFixture {
     CPPUNIT_TEST_SUITE(newtestclass1);
     
     CPPUNIT_TEST(test_printAdjacent);
+    CPPUNIT_TEST(test_printAdjacentAll);
  
     
     
@@ -42,6 +43,7 @@ private:
     std::string testStringAdjacentAll; 
     
     void test_printAdjacent();
+    void test_printAdjacentAll();
 
 
 };

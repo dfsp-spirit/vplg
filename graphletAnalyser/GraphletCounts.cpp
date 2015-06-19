@@ -193,6 +193,7 @@ void GraphletCounts::compute_labeled_abs_counts() {
     count_connected_3_graphlets(memberGraph, true);
     count_connected_4_graphlets(memberGraph, true);
     
+    
     labeled_abs_counts[24] = 0;
     labeled_abs_counts[25] = 0;        
     VertexIterator i, i_last;        
@@ -760,7 +761,7 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
  * @param withLabeled whether to count labeled graphlets as well
  * @return a vector of graphlet counts (how often each graphlet was found)
  */
-vector<int> GraphletCounts::count_connected_3_graphlets(Graph& g, bool withLabeled) { 
+ vector<int> GraphletCounts::count_connected_3_graphlets(Graph& g, bool withLabeled) { 
     vector<float> c3;
     c3 = vector<float>(2);
     float count[] = { 0.0, 0.0 };

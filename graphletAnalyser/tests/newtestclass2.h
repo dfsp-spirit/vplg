@@ -57,8 +57,34 @@ class newtestclass2 : public CPPUNIT_NS::TestFixture {
     
     CPPUNIT_TEST(test_normalize_counts);
     
+    CPPUNIT_TEST(test_labeled_counts0);
+    CPPUNIT_TEST(test_labeled_counts1);
+    CPPUNIT_TEST(test_labeled_counts2);
+    CPPUNIT_TEST(test_labeled_counts3);
+    CPPUNIT_TEST(test_labeled_counts4);
+    CPPUNIT_TEST(test_labeled_counts5);
+    CPPUNIT_TEST(test_labeled_counts6);
+    CPPUNIT_TEST(test_labeled_counts7);
+    CPPUNIT_TEST(test_labeled_counts8);
+    CPPUNIT_TEST(test_labeled_counts8);
+    CPPUNIT_TEST(test_labeled_counts10);
+    CPPUNIT_TEST(test_labeled_counts11);
+    CPPUNIT_TEST(test_labeled_counts12);
+    CPPUNIT_TEST(test_labeled_counts13);
+    CPPUNIT_TEST(test_labeled_counts14);
+    CPPUNIT_TEST(test_labeled_counts15);
+    CPPUNIT_TEST(test_labeled_counts16);
+    CPPUNIT_TEST(test_labeled_counts17);
+    CPPUNIT_TEST(test_labeled_counts18);
+    CPPUNIT_TEST(test_labeled_counts19);
+    CPPUNIT_TEST(test_labeled_counts20);
+    CPPUNIT_TEST(test_labeled_counts21);
+    CPPUNIT_TEST(test_labeled_counts22);
+    CPPUNIT_TEST(test_labeled_counts23);
+    CPPUNIT_TEST(test_labeled_counts24);
+    CPPUNIT_TEST(test_labeled_counts25);
     
-
+    
     CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -82,6 +108,12 @@ private:
     
     vector<float> testNormalizeVector;
     vector<int> testNormalizeVectorInt;
+    
+    
+    string g0_vertex_patterns[];
+    string g1_vertex_patterns[];
+    string g2_vertex_patterns[];
+    string g2_bio_patterns[];
   
 
     
@@ -130,6 +162,36 @@ private:
     void test_count_connected_5_graphlets20();
     
     void test_normalize_counts();
+    
+    void test_labeled_counts0();
+    void test_labeled_counts1();
+    void test_labeled_counts2();
+    void test_labeled_counts3();
+    void test_labeled_counts4();
+    void test_labeled_counts5();
+    void test_labeled_counts6();
+    void test_labeled_counts7();
+    void test_labeled_counts8();
+    void test_labeled_counts9();
+    void test_labeled_counts10();
+    void test_labeled_counts11();
+    void test_labeled_counts12();
+    void test_labeled_counts13();
+    void test_labeled_counts14();
+    void test_labeled_counts15();
+    void test_labeled_counts16();
+    void test_labeled_counts17();
+    void test_labeled_counts18();
+    void test_labeled_counts19();
+    void test_labeled_counts20();
+    void test_labeled_counts21();
+    void test_labeled_counts22();
+    void test_labeled_counts23();
+    void test_labeled_counts24();
+    void test_labeled_counts25();
+    
+    
+    
 };
 
 #endif	/* NEWTESTCLASS2_H */

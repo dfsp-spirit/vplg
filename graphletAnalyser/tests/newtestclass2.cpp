@@ -73,6 +73,29 @@ void newtestclass2::setUp() {
     testNormalizeVector = vector<float>();
     testNormalizeVectorInt = vector<int>();
     
+    
+    
+        // all possible labeling of g1 graphlet (triangle) concerning the symmetry
+    g1_vertex_patterns = { "HHH","HHE","HEE","EEE" };
+    
+    // all possible labeling of g2 graphlet (2-path) concerning the symmetry
+    g2_vertex_patterns = { "HHH","HHE","EHE","HEH","HEE","EEE" };
+    
+    // bio-motivated labeling of graphlets
+    // currently implemented are the beta-alpha-beta and beta-beta-beta motifs
+    // NOTE: also check if its composing vertices are adjacent
+    g2_bio_patterns    = { "EaHaE",    // beta-alpha-beta motif
+                                    "EaEaE" };  // beta-beta-beta motif
+    
+    g0_vertex_patterns = { "HH", "EH", "HE", "EE" };
+    
+    /*
+     * NOTE the correspondence 
+     *   lcount[0..3]   := g1_vertex_patterns[0..3] 
+     *   lcount[4..9]   := g2_vertex_patterns[0..6]
+     *   lcount[10..11] := g2_bio_patterns[0..1]
+     */
+    
 }
 
 void newtestclass2::tearDown() {
@@ -664,4 +687,325 @@ void newtestclass2::test_normalize_counts() {
     
     CPPUNIT_ASSERT(testVector == testNormalizeVector);
     
+}
+
+
+
+/*  // all possible labeling of g1 graphlet (triangle) concerning the symmetry
+    string g1_vertex_patterns[] = { "HHH","HHE","HEE","EEE" };
+    
+    // all possible labeling of g2 graphlet (2-path) concerning the symmetry
+    string g2_vertex_patterns[] = { "HHH","HHE","EHE","HEH","HEE","EEE" };
+    
+    // bio-motivated labeling of graphlets
+    // currently implemented are the beta-alpha-beta and beta-beta-beta motifs
+    // NOTE: also check if its composing vertices are adjacent
+    string g2_bio_patterns[]    = { "EaHaE",    // beta-alpha-beta motif
+                                    "EaEaE" }; */
+
+
+
+void newtestclass2::test_labeled_counts0() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    
+    ai.properties["sse_type"] = "H";
+    bi.properties["sse_type"] = "H";
+    gi.properties["sse_type"] = "H";
+    
+    ad = add_edge(t,u,ai,testGraph).first;
+    bd = add_edge(u,v,bi,testGraph).first;
+    gd = add_edge(t,v,gi,testGraph).first;
+    
+    counter.count_connected_3_graphlets(fiveNodesGraph, true);
+    testVector = counter.get_labeled_abs_counts();
+    
+    
+    cout << endl << testVector[0] << endl << testVector[1] << endl << testVector[2] << endl << testVector[3]  << endl;
+    
+    CPPUNIT_ASSERT(testVector[0] == 1);
+    
+    
+}
+
+void newtestclass2::test_labeled_counts1() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    
+    ai.properties["sse_type"] = "H";
+    bi.properties["sse_type"] = "H";
+    gi.properties["sse_type"] = "E";
+    
+    ad = add_edge(t,u,ai,testGraph).first;
+    bd = add_edge(u,v,bi,testGraph).first;
+    gd = add_edge(t,v,gi,testGraph).first;
+    
+    counter.count_connected_3_graphlets(fiveNodesGraph, true);
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(testVector[1] == 1);
+}
+
+void newtestclass2::test_labeled_counts2() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    
+    ai.properties["sse_type"] = "H";
+    bi.properties["sse_type"] = "E";
+    gi.properties["sse_type"] = "E";
+    
+    ad = add_edge(t,u,ai,testGraph).first;
+    bd = add_edge(u,v,bi,testGraph).first;
+    gd = add_edge(t,v,gi,testGraph).first;
+    
+    counter.count_connected_3_graphlets(fiveNodesGraph, true);
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(testVector[2] == 1);
+}
+
+void newtestclass2::test_labeled_counts3() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    
+    ai.properties["sse_type"] = "E";
+    bi.properties["sse_type"] = "E";
+    gi.properties["sse_type"] = "E";
+    
+    ad = add_edge(t,u,ai,testGraph).first;
+    bd = add_edge(u,v,bi,testGraph).first;
+    gd = add_edge(t,v,gi,testGraph).first;
+    
+    counter.count_connected_3_graphlets(fiveNodesGraph, true);
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(testVector[3] == 1);
+}
+
+void newtestclass2::test_labeled_counts4() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass2::test_labeled_counts5() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass2::test_labeled_counts6() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass2::test_labeled_counts7() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass2::test_labeled_counts8() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass2::test_labeled_counts9() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass2::test_labeled_counts10() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass2::test_labeled_counts11() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass2::test_labeled_counts12() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass2::test_labeled_counts13() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass2::test_labeled_counts14() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass2::test_labeled_counts15() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass2::test_labeled_counts16() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass2::test_labeled_counts17() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass2::test_labeled_counts18() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass2::test_labeled_counts19() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass2::test_labeled_counts20() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass2::test_labeled_counts21() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass2::test_labeled_counts22() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass2::test_labeled_counts23() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass2::test_labeled_counts24() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass2::test_labeled_counts25() {
+    
+    Graph testGraph = fiveNodesGraph;
+    vector<int> testVector = vector<int>();
+    
+    testVector = counter.get_labeled_abs_counts();
+    
+    CPPUNIT_ASSERT(true);
 }

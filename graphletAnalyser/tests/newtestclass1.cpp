@@ -49,6 +49,7 @@ void newtestclass1::setUp() {
     
     // defining the test string and the printer
     testStringAdjacent = "   0:   1   2 \n";
+    testStringAdjacentAll = "Iterate over the vertices and print their adjacent vertices:\n   0:   1   2 \n   1:   0   2 \n   2:   1   0 \n\n";
     
     
     service = GraphService(threeNodesGraph);
@@ -69,9 +70,13 @@ void newtestclass1::test_printAdjacent() {
 
     
     CPPUNIT_ASSERT(loeres.compare(testStringAdjacent) == 0);
-    
+        
+}
 
+void newtestclass1::test_printAdjacentAll() {
     
     
+    
+    CPPUNIT_ASSERT(printer.printAdjacentAll().compare(testStringAdjacentAll) == 0);
 }
 
