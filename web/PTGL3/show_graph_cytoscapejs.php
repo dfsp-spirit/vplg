@@ -63,7 +63,10 @@ $('#cy').cytoscape({
         'source-arrow-shape': 'none',
         'line-color': 'data(faveColor)',
         'source-arrow-color': 'data(faveColor)',
-        'target-arrow-color': 'data(faveColor)'
+        'target-arrow-color': 'data(faveColor)',
+		'curve-style': 'unbundled-bezier',
+        'control-point-distance': '200px',
+        'control-point-weight': '0.5'
       })
     .selector('edge.questionable')
       .css({
@@ -92,6 +95,8 @@ $('#cy').cytoscape({
   
   ready: function(){
     window.cy = this;
+	var layout = cy.makeLayout({ name: 'random' });
+	layout.run();
     
     // giddy up
   }
