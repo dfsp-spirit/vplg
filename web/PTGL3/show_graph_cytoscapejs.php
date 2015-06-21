@@ -3,7 +3,7 @@
 <head>
   <link href="style.css" rel="stylesheet" />
   <meta charset=utf-8 />
-  <title>Visual style</title>
+  <title>PTGL3 -- CytoscapeJS Protein graph visualization</title>
 <style type="text/css">
    body { 
   font: 14px helvetica neue, helvetica, arial, sans-serif;
@@ -30,7 +30,7 @@ $(function(){ // on dom ready
 
 $('#cy').cytoscape({
   layout: {
-    name: 'cose',
+    name: 'preset',
     padding: 10
   },
   
@@ -59,13 +59,13 @@ $('#cy').cytoscape({
       .css({
         'opacity': 0.666,
         'width': 'mapData(strength, 70, 100, 2, 6)',
-        'target-arrow-shape': 'triangle',
+        'target-arrow-shape': 'none',
         'source-arrow-shape': 'none',
         'line-color': 'data(faveColor)',
         'source-arrow-color': 'data(faveColor)',
         'target-arrow-color': 'data(faveColor)',
 		'curve-style': 'unbundled-bezier',
-        'control-point-distance': '200px',
+        'control-point-distance': '-200px',
         'control-point-weight': '0.5'
       })
     .selector('edge.questionable')
@@ -81,10 +81,10 @@ $('#cy').cytoscape({
   
   elements: {
     nodes: [
-      { data: { id: '0', name: 'H1', weight: 10, faveColor: '#FF0000', faveShape: 'ellipse' } },
-      { data: { id: '1', name: 'H2', weight: 10, faveColor: '#FF0000', faveShape: 'ellipse' } },
-      { data: { id: '2', name: 'E3', weight: 10, faveColor: '#000000', faveShape: 'rectangle' } },
-      { data: { id: '3', name: 'L4', weight: 10, faveColor: '#FF00FF', faveShape: 'ellipse' } }
+      { data: { id: '0', name: 'H1', weight: 10, faveColor: '#FF0000', faveShape: 'ellipse' }, position: { x: 100, y: 50 } },
+      { data: { id: '1', name: 'H2', weight: 10, faveColor: '#FF0000', faveShape: 'ellipse' }, position: { x: 200, y: 50 } },
+      { data: { id: '2', name: 'E3', weight: 10, faveColor: '#000000', faveShape: 'rectangle' }, position: { x: 300, y: 50 } },
+      { data: { id: '3', name: 'L4', weight: 10, faveColor: '#FF00FF', faveShape: 'ellipse' }, position: { x: 400, y: 50 } }
     ],
     edges: [
       { data: { source: '0', target: '1', faveColor: '#00FF00', strength: 10 } },
@@ -94,11 +94,7 @@ $('#cy').cytoscape({
   },
   
   ready: function(){
-    window.cy = this;
-	var layout = cy.makeLayout({ name: 'random' });
-	layout.run();
-    
-    // giddy up
+    window.cy = this;	
   }
 });
 
