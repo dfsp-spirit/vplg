@@ -113,7 +113,7 @@ $('#cy').cytoscape({
         'source-arrow-color': '#FF0000',
         'target-arrow-color': '#FF0000',
 		'curve-style': 'unbundled-bezier',
-        'control-point-distance': '-200px',
+        'control-point-distance': 'data(edgeHeight)',
         'control-point-weight': '0.5'
     })
 	.selector('.edgeparallel')
@@ -163,10 +163,10 @@ $('#cy').cytoscape({
       { data: { id: '15', name: '16h' }, position: { x: 850, y: 50 }, classes: 'sse helix' }
     ],
     edges: [
-      { data: { source: '0', target: '1' }, classes: 'pgedge edgeparallel' },
-      { data: { source: '0', target: '2' }, classes: 'pgedge edgeantiparallel' },
-      { data: { source: '2', target: '3' }, classes: 'pgedge edgeparallel' },
-	  { data: { source: '2', target: '6' }, classes: 'pgedge edgemixed' }
+      { data: { source: '0', target: '1', edgeHeight: '-200px' }, classes: 'pgedge edgeparallel' },
+      { data: { source: '0', target: '2', edgeHeight: '-200px' }, classes: 'pgedge edgeantiparallel' },
+      { data: { source: '2', target: '3', edgeHeight: '-400px' }, classes: 'pgedge edgeparallel' },
+	  { data: { source: '2', target: '6', edgeHeight: '-200px' }, classes: 'pgedge edgemixed' }
     ]
   },
   
