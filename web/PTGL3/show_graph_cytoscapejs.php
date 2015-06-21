@@ -41,7 +41,6 @@ $('#cy').cytoscape({
         'width': 20,
 		'height': 20,
         'content': 'data(name)',
-        'text-valign': 'center',
         'text-outline-width': 1,
         'text-outline-color': 'data(faveColor)',
         'background-color': 'data(faveColor)',
@@ -74,7 +73,6 @@ $('#cy').cytoscape({
         'width': 20,
 		'height': 20,
         'content': 'data(name)',
-        'text-valign': 'center',
         'text-outline-width': 1,
         'text-outline-color': '#000000',
         'background-color': '#000000',
@@ -107,7 +105,7 @@ $('#cy').cytoscape({
 	.selector('.pgedge')
      .css({
         'opacity': 0.666,
-        'target-arrow-shape': 'none',
+        'target-arrow-shape': 'triangle',
         'source-arrow-shape': 'none',
         'line-color': '#FF0000',
         'source-arrow-color': '#FF0000',
@@ -120,25 +118,25 @@ $('#cy').cytoscape({
       .css({
         'line-color': '#FF0000',
         'source-arrow-color': '#FF0000',
-        'target-arrow-color': '#FF0000',
+        'target-arrow-color': '#FF0000'
       })
 	.selector('.edge_type_a')
       .css({
         'line-color': '#0000FF',
         'source-arrow-color': '#0000FF',
-        'target-arrow-color': '#0000FF',
+        'target-arrow-color': '#0000FF'
       })
 	.selector('.edge_type_m')
       .css({
         'line-color': '#00FF00',
         'source-arrow-color': '#00FF00',
-        'target-arrow-color': '#00FF00',
+        'target-arrow-color': '#00FF00'
       })
 	.selector('.edge_type_j')
       .css({
         'line-color': '#FF00FF',
         'source-arrow-color': '#FF00FF',
-        'target-arrow-color': '#FF00FF',
+        'target-arrow-color': '#FF00FF'
       })
     ,
 	  
@@ -187,11 +185,9 @@ $('#cy').cytoscape({
       { data: { source: '14', target: '16', edgeHeight: '-50px' }, classes: 'pgedge edge_type_m' },
       { data: { source: '16', target: '18', edgeHeight: '-50px' }, classes: 'pgedge edge_type_p' },
       { data: { source: '18', target: '21', edgeHeight: '-75px' }, classes: 'pgedge edge_type_j' },
-      { data: { source: '19', target: '21', edgeHeight: '-50px' }, classes: 'pgedge edge_type_j' },
+      { data: { source: '19', target: '21', edgeHeight: '-50px' }, classes: 'pgedge edge_type_j' }
     ]
-  }
-
-  
+  }  
   ,
   
   ready: function(){
