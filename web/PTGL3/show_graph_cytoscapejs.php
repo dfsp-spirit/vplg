@@ -168,7 +168,8 @@ $('#cy').cytoscape({
       { data: { source: '2', target: '3', edgeHeight: '-400px' }, classes: 'pgedge edgeparallel' },
 	  { data: { source: '2', target: '6', edgeHeight: '-200px' }, classes: 'pgedge edgemixed' }
     ]
-  },
+  }
+  ,
   
   ready: function(){
     window.cy = this;	
