@@ -843,6 +843,7 @@ public class Main {
                             Settings.set("plcc_B_output_json", "false");
                             Settings.set("plcc_B_output_xml", "false");
                             Settings.set("plcc_B_output_gexf", "false");
+                            Settings.set("plcc_B_output_cytoscapejs", "false");
                             
                             
                             
@@ -865,12 +866,13 @@ public class Main {
                                 if(types.contains("j")) { Settings.set("plcc_B_output_json", "true"); nv++; }
                                 if(types.contains("m")) { Settings.set("plcc_B_output_xml", "true"); nv++; }
                                 if(types.contains("f")) { Settings.set("plcc_B_output_gexf", "true"); nv++; }
-                                
+                                if(types.contains("c")) { Settings.set("plcc_B_output_cytoscapejs", "true"); nv++; }
+                                                                                                
 
                                 // sanity check
                                 if(nv != types.length()) {
                                     DP.getInstance().w("List of output formats given on command line '" + types + "' contains invalid chars (" + types.length() + " given, " + nv + " valid).");
-                                    DP.getInstance().w("Valid chars: 'g' => GML, 't' => TGF, 'd' => DOT lang, 'k' => kavosh, 'e' => edge list, 'p' => PLCC, 'l' => Perf FG, 'j' => JSON, 'm' => XML, 'f' => GEXF. Example: '-O tgp'");
+                                    DP.getInstance().w("Valid chars: 'g' => GML, 't' => TGF, 'd' => DOT lang, 'k' => kavosh, 'e' => edge list, 'p' => PLCC, 'l' => Perf FG, 'j' => JSON, 'm' => XML, 'f' => GEXF, 'c' => CytoscapeJS. Example: '-O tgp'");
 
                                     if(nv <= 0) {
                                         syntaxError();
@@ -2478,6 +2480,7 @@ public class Main {
                 String kavoshFileNoPath = "";
                 String plccFileNoPath = "";
                 String gexfFileNoPath = "";
+                String cytoscapejsFileNoPath = "";
                 
                 HashMap<String, String> writtenFormatsDBFilesNoPath = new HashMap<>();
                 
@@ -2563,6 +2566,14 @@ public class Main {
                     }
                     else {
                         DP.getInstance().w("Main", "Failed to write PG file in XML format.");
+                    }
+                }
+                if(Settings.getBoolean("plcc_B_output_cytoscapejs")) {
+                    String cytoscapejsGraphFile = filePathGraphs + fs + fileNameWithoutExtension + ".cyjs";
+                    cytoscapejsFileNoPath = fileNameWithoutExtension + ".cyjs";
+                    if(IO.stringToTextFile(cytoscapejsGraphFile, pg.toCytoscapeJSFormat())) {
+                        graphFormatsWritten += "cyjs "; numFormatsWritten++; writtenFormatsDBFilesNoPath.put(GraphFormats.GRAPHFORMAT_CYTOSCAPEJS, cytoscapejsFileNoPath);
+                        pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_CYTOSCAPEJS, new File(cytoscapejsGraphFile));
                     }
                 }
                 

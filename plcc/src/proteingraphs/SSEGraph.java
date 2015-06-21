@@ -3190,6 +3190,95 @@ E	3	3	3
         }
     }
     
+    
+    public String toCytoscapeJSFormat() {
+        /*
+        elements: {
+    nodes: [
+      { data: { id: '0', name: '1e' }, position: { x: 100, y: 50 }, classes: 'sse strand' },
+      { data: { id: '1', name: '2h' }, position: { x: 150, y: 50 }, classes: 'sse helix' },
+      { data: { id: '2', name: '3e' }, position: { x: 200, y: 50 }, classes: 'sse strand' },
+      { data: { id: '3', name: '4h' }, position: { x: 250, y: 50 }, classes: 'sse helix' },
+	  { data: { id: '4', name: '5e' }, position: { x: 300, y: 50 }, classes: 'sse strand' },
+      { data: { id: '5', name: '6h' }, position: { x: 350, y: 50 }, classes: 'sse helix' },
+      { data: { id: '6', name: '7e' }, position: { x: 400, y: 50 }, classes: 'sse strand' },
+      { data: { id: '7', name: '8h' }, position: { x: 450, y: 50 }, classes: 'sse helix' },
+	  { data: { id: '8', name: '9h' }, position: { x: 500, y: 50 }, classes: 'sse helix' },
+      { data: { id: '9', name: '10e' }, position: { x: 550, y: 50 }, classes: 'sse strand' },
+      { data: { id: '10', name: '11h' }, position: { x: 600, y: 50 }, classes: 'sse helix' },
+      { data: { id: '11', name: '12h' }, position: { x: 650, y: 50 }, classes: 'sse helix' },
+	  { data: { id: '12', name: '13e' }, position: { x: 700, y: 50 }, classes: 'sse strand' },
+      { data: { id: '13', name: '14h' }, position: { x: 750, y: 50 }, classes: 'sse helix' },
+      { data: { id: '14', name: '15h' }, position: { x: 800, y: 50 }, classes: 'sse helix' },
+      { data: { id: '15', name: '16h' }, position: { x: 850, y: 50 }, classes: 'sse helix' }
+    ],
+    edges: [
+      { data: { source: '0', target: '1', edgeHeight: '-200px' }, classes: 'pgedge edgeparallel' },
+      { data: { source: '0', target: '2', edgeHeight: '-200px' }, classes: 'pgedge edgeantiparallel' },
+      { data: { source: '2', target: '3', edgeHeight: '-400px' }, classes: 'pgedge edgeparallel' },
+	  { data: { source: '2', target: '6', edgeHeight: '-200px' }, classes: 'pgedge edgemixed' }
+    ]
+  }
+        
+        
+        */
+        StringBuilder sb = new StringBuilder();
+        sb.append("  elements: {").append("\n");
+        sb.append("    nodes: [").append("\n");
+        
+        int posX = 100; int stepX = 50;
+        String comma;
+        int posY = 50;
+        String sse_type, longSSEClass;
+        for(Integer i = 0; i < this.getSize(); i++) {
+            if(i < this.getSize() - 1) {
+                comma = ",";
+            }
+            else {
+                comma = "";
+            }
+            sse_type = this.getFGNotationOfVertex(i);
+            // the color is defined by the 'longSSEClass', this is done in the CSS of the CytoscapeJS lib by reading the classes
+            longSSEClass = "sse_type_" + sse_type;
+            // { data: { id: '0', name: '1e' }, position: { x: 100, y: 50 }, classes: 'sse strand' },
+            sb.append("      { data: { id: '" + i + "', name='" + ( (i + 1) + sse_type) + "' }, position: { x: " + posX + ", y: " + posY + " }, classes: 'sse " + longSSEClass + "' }").append(comma).append("\n");
+            posX += stepX;
+        }
+        
+        sb.append("    ]").append("\n");
+        sb.append("    ,").append("\n");
+        sb.append("    edges: [").append("\n");
+        
+        
+        int edgeID = 0; int edge_height;
+        String edge_type, long_edge_class;
+        comma = ",";
+        for(Integer i = 0; i < this.getSize(); i++) {
+            for(Integer j = i+1 ; j < this.getSize(); j++) {
+                if(this.containsEdge(i, j) && !Objects.equals(i, j)) {
+                    edge_type = this.getEdgeLabel(i, j);
+                    long_edge_class = "edge_type" + edge_type;
+                    edge_height = 50 * (j - i);
+                    // { data: { source: '0', target: '1', edgeHeight: '-200px' }, classes: 'pgedge edgeparallel' },
+                    sb.append("      { data: { source: '" + i + "', target= '" + j + "', edgeHeight='-" + edge_height + "px' }, classes: 'pgedge " + long_edge_class + "' }").append(comma).append("\n");
+                    edgeID++;                    
+                }
+            }
+        }
+        
+        if(edgeID > 0) {
+            // remove last comma if we added any edges
+            if(sb.charAt(sb.length() - 1) == ',') {
+                sb.replace(sb.length() - 1, sb.length() - 1, "");
+            }
+        }
+        
+        sb.append("    ]").append("\n");
+        sb.append("  }").append("\n");
+        
+        return sb.toString();
+    }
+    
     /**
      * Generates a string representation of this graph in GEXF format version Draft 1.2 (see http://gefx.net/format/). 
      * @return the gexf format graph string
