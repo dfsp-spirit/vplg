@@ -38,17 +38,21 @@ $('#cy').cytoscape({
     .selector('node')
       .css({
         'shape': 'data(faveShape)',
-        'width': 'mapData(weight, 40, 80, 20, 60)',
+        'width': 20,
+		'height': 20,
         'content': 'data(name)',
         'text-valign': 'center',
-        'text-outline-width': 2,
+        'text-outline-width': 1,
         'text-outline-color': 'data(faveColor)',
         'background-color': 'data(faveColor)',
-        'color': '#fff'
+        'color': '#808080',
+		'text-valign' : 'center',
+        'text-halign' : 'center',
+		'font-size': '8px'
       })
     .selector(':selected')
       .css({
-        'border-width': 3,
+        'border-width': 2,
         'border-color': '#333'
       })
     .selector('edge')
@@ -56,7 +60,7 @@ $('#cy').cytoscape({
         'opacity': 0.666,
         'width': 'mapData(strength, 70, 100, 2, 6)',
         'target-arrow-shape': 'triangle',
-        'source-arrow-shape': 'circle',
+        'source-arrow-shape': 'none',
         'line-color': 'data(faveColor)',
         'source-arrow-color': 'data(faveColor)',
         'target-arrow-color': 'data(faveColor)'
@@ -74,24 +78,15 @@ $('#cy').cytoscape({
   
   elements: {
     nodes: [
-      { data: { id: 'j', name: 'Jerry', weight: 65, faveColor: '#6FB1FC', faveShape: 'triangle' } },
-      { data: { id: 'e', name: 'Elaine', weight: 45, faveColor: '#EDA1ED', faveShape: 'ellipse' } },
-      { data: { id: 'k', name: 'Kramer', weight: 75, faveColor: '#86B342', faveShape: 'octagon' } },
-      { data: { id: 'g', name: 'George', weight: 70, faveColor: '#F5A45D', faveShape: 'rectangle' } }
+      { data: { id: '0', name: 'H1', weight: 10, faveColor: '#FF0000', faveShape: 'ellipse' } },
+      { data: { id: '1', name: 'H2', weight: 10, faveColor: '#FF0000', faveShape: 'ellipse' } },
+      { data: { id: '2', name: 'E3', weight: 10, faveColor: '#000000', faveShape: 'rectangle' } },
+      { data: { id: '3', name: 'L4', weight: 10, faveColor: '#FF00FF', faveShape: 'ellipse' } }
     ],
     edges: [
-      { data: { source: 'j', target: 'e', faveColor: '#6FB1FC', strength: 90 } },
-      { data: { source: 'j', target: 'k', faveColor: '#6FB1FC', strength: 70 } },
-      { data: { source: 'j', target: 'g', faveColor: '#6FB1FC', strength: 80 } },
-     
-      { data: { source: 'e', target: 'j', faveColor: '#EDA1ED', strength: 95 } },
-      { data: { source: 'e', target: 'k', faveColor: '#EDA1ED', strength: 60 }, classes: 'questionable' },
-      
-      { data: { source: 'k', target: 'j', faveColor: '#86B342', strength: 100 } },
-      { data: { source: 'k', target: 'e', faveColor: '#86B342', strength: 100 } },
-      { data: { source: 'k', target: 'g', faveColor: '#86B342', strength: 100 } },
-      
-      { data: { source: 'g', target: 'j', faveColor: '#F5A45D', strength: 90 } }
+      { data: { source: '0', target: '1', faveColor: '#00FF00', strength: 10 } },
+      { data: { source: '0', target: '2', faveColor: '#FF0000', strength: 10 } },
+      { data: { source: '2', target: '3', faveColor: '#FF00FF', strength: 10 } },
     ]
   },
   

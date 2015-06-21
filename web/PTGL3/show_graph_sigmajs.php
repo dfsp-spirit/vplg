@@ -18,33 +18,69 @@
 <script src="./js/sigmajs/plugins/sigma.layout.forceAtlas2.min.js"></script>
 <script src="./js/sigmajs/plugins/sigma.renderers.customShapes.min.js"></script>
 
+
 <script>
-  sigma.parsers.gexf(
-     './js/sigmajs/data/protgraph.gexf',
-    // './data/simplegraph.gexf',
-    // './data/LesMiserables.gexf',
-    //'./data/les-miserables.gexf',
-    { // Here is the ID of the DOM element that
-      // will contain the graph:
-      container: 'sigma-container',
-      settings: {
-	defaultNodeColor: '#808080'
-      }
-    },
-    function(s) {
-      // This function will be executed when the
-      // graph is displayed, with "s" the related
-      // sigma instance.
-      //s.startForceAtlas2();
-      CustomShapes.init(s);
-      s.graph.nodes().forEach(function(node, i, a) {
+   s = new sigma({
+  
+});
+CustomShapes.init(s);
+
+  var actualGraph;
+
+function showGraph(pathToFile) {
+
+    if (actualGraph) {
+        sigma.parsers.gexf( 
+            pathToFile,
+            actualGraph,
+            function(s) {
+               
+			   s.graph.nodes().forEach(function(node, i, a) {
   node.x = Math.cos(Math.PI * 2 * i / a.length);
   node.y = Math.sin(Math.PI * 2 * i / a.length);
-  node.type = 'square';
-});
-      s.refresh();
-    }
-  );
+  node.type = 'square';  
+	});
+	  var edges = s.graph.edges(); 
+
+	//Using for loop
+	for (var i = 0; i < edges.length; i += 1){
+		edges[i].type = 'curve';
+	}
+	s.refresh();
+	
+            }
+        );    
+    } else {    
+        sigma.parsers.gexf(
+            pathToFile,
+            {container: 'sigma-container'},
+            function(s) {
+                actualGraph = s;
+							   s.graph.nodes().forEach(function(node, i, a) {
+  node.x = Math.cos(Math.PI * 2 * i / a.length);
+  node.y = Math.sin(Math.PI * 2 * i / a.length);
+  node.type = 'square';  
+	});
+		
+		  var edges = s.graph.edges(); 
+
+	//Using for loop
+	for (var i = 0; i < edges.length; i += 1){
+		edges[i].type = 'curve';
+		edges[i].label = 'curve';
+	}
+	  
+	  
+	s.refresh();
+            }
+        );
+    }   
+}
+
+  var inputFile = './js/sigmajs/data/protgraph.gexf';
+  showGraph(inputFile);
+      	
+
 </script>
 </body>
 </html>
