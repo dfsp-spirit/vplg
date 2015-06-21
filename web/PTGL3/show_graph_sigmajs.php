@@ -1,12 +1,12 @@
 <html>
 <head>
-<title>PTGL3 -- SigmaJS Protein graph visualization test</title>
+<title>PTGL3 -- SigmaJS Protein graph visualization</title>
 <style type="text/css">
   #sigma-container {
     max-width: 800px;
     height: 600px;
     margin: auto;
-    border: 1px solid black;
+   border: 0px solid black;
   }
 </style>
 </head>
