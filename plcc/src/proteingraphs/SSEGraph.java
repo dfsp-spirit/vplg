@@ -3241,7 +3241,7 @@ E	3	3	3
             // the color is defined by the 'longSSEClass', this is done in the CSS of the CytoscapeJS lib by reading the classes
             longSSEClass = "sse_type_" + sse_type;
             // { data: { id: '0', name: '1e' }, position: { x: 100, y: 50 }, classes: 'sse strand' },
-            sb.append("      { data: { id: '" + i + "', name='" + ( (i + 1) + sse_type) + "' }, position: { x: " + posX + ", y: " + posY + " }, classes: 'sse " + longSSEClass + "' }").append(comma).append("\n");
+            sb.append("      { data: { id: '" + i + "', name: '" + ( (i + 1) + sse_type) + "' }, position: { x: " + posX + ", y: " + posY + " }, classes: 'sse " + longSSEClass + "' }").append(comma).append("\n");
             posX += stepX;
         }
         
@@ -3257,10 +3257,10 @@ E	3	3	3
             for(Integer j = i+1 ; j < this.getSize(); j++) {
                 if(this.containsEdge(i, j) && !Objects.equals(i, j)) {
                     edge_type = this.getEdgeLabel(i, j);
-                    long_edge_class = "edge_type" + edge_type;
-                    edge_height = 50 * (j - i);
+                    long_edge_class = "edge_type_" + edge_type;
+                    edge_height = Math.abs(50 * (j - i) / 2);
                     // { data: { source: '0', target: '1', edgeHeight: '-200px' }, classes: 'pgedge edgeparallel' },
-                    sb.append("      { data: { source: '" + i + "', target= '" + j + "', edgeHeight='-" + edge_height + "px' }, classes: 'pgedge " + long_edge_class + "' }").append(comma).append("\n");
+                    sb.append("      { data: { source: '" + i + "', target: '" + j + "', edgeHeight: '-" + edge_height + "px' }, classes: 'pgedge " + long_edge_class + "' }").append(comma).append("\n");
                     edgeID++;                    
                 }
             }
@@ -3269,7 +3269,7 @@ E	3	3	3
         if(edgeID > 0) {
             // remove last comma if we added any edges
             if(sb.charAt(sb.length() - 1) == ',') {
-                sb.replace(sb.length() - 1, sb.length() - 1, "");
+                sb.replace(sb.length() - 1, sb.length(), "");
             }
         }
         
