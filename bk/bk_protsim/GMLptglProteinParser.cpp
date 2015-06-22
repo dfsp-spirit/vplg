@@ -28,7 +28,7 @@ string input_path = "./";
 string input_files_list = "";
 string output_path = "/home/julian/develop/vplg-full-sf/trunk/bk/bk_protsim/testdata/";
 string logs_path = "/home/julian/develop/vplg-full-sf/trunk/bk/bk_protsim/testdata/";
-string apptag = "[GA] ";
+string apptag = "[BK] ";
 std::map<std::string, std::string> options;
 
 /*

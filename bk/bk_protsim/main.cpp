@@ -16,16 +16,23 @@
  * 
  */
 int main(int argc, char** argv) {
+    
+    std::string apptag = "[BK] ";
+    
+    std::cout << apptag << "Bron Kerbosch-based graph similarity\n";
+    std::cout << apptag << "=====================================\n";
+    std::cout << apptag << "written by Julian\n";
+    
     if (argc < 3) {
-        std::cout << "insufficient parameters \n";
-        std::cout << "use Filename1.gml Filename2.gml output_parameter \n";
-        std::cout << "The output parameter can be \"-a\" ,\"-l\", \"-s number\" (not case sensitive)\n";
-        std::cout << "\t-a: Output all Cliques\n";
-        std::cout << "\t-l: Output only the Cliques of maximum size\n";
-        std::cout << "\t-s: Output all Cliques larger than a given size. Has to be followed by a number (e.g. ...-s 5)\n";
-        std::cout << "If no output paramter is given -a will be used.\n";
-        std::cout << "exampel call: " << argv[0] << " example1.gml example2.gml -s 8\n";
-        std::cout << "This will output all cliques larger than 8 Vertices\n";
+        std::cout << apptag << "insufficient parameters \n";
+        std::cout << apptag << "use Filename1.gml Filename2.gml output_parameter \n";
+        std::cout << apptag << "The output parameter can be \"-a\" ,\"-l\", \"-s number\" (not case sensitive)\n";
+        std::cout << apptag << "\t-a: Output all Cliques\n";
+        std::cout << apptag << "\t-l: Output only the Cliques of maximum size\n";
+        std::cout << apptag << "\t-s: Output all Cliques larger than a given size. Has to be followed by a number (e.g. ...-s 5)\n";
+        std::cout << apptag << "If no output paramter is given -a will be used.\n";
+        std::cout << apptag << "exampel call: " << argv[0] << " example1.gml example2.gml -s 8\n";
+        std::cout << apptag << "This will output all cliques larger than 8 Vertices\n";
         return 1;
     }
     
@@ -67,10 +74,16 @@ int main(int argc, char** argv) {
     //format the output
     std::stringstream result;
     for (std::list<unsigned long>& clique : result_list) {
+        /*
         result << "{\n";
         result << "\t\"first\":\n" << PG_Output::get_JSON_vertex_ids_first(pg, clique) << ",\n";
         result << "\t\"second\":\n" << PG_Output::get_JSON_vertex_ids_second(pg, clique) << "\n";
         result << "}\n";
+         */
+        result << "{ ";
+        result << " \"first\": " << PG_Output::get_JSON_vertex_ids_first(pg, clique) << ", ";
+        result << " \"second\": " << PG_Output::get_JSON_vertex_ids_second(pg, clique) << " ";
+        result << "} \n";
     }//end format loop
     
     //output

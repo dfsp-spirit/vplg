@@ -80,14 +80,16 @@ std::string PG_Output::get_JSON_vertex_ids_second(const ProductGraph& pg, std::l
  * Returns a JSON representation of a list of int
  */
 std::string PG_Output::int_list_to_JSON(std::list<int> clique){
+    std::string lsep = " "; // line separator "\n"
+    std::string esep = ""; // element separator "\t"
     std::stringstream sstream;
-    sstream << "[\n";
+    sstream << "[" << lsep;
     for (std::list<int>::iterator i = clique.begin(), ie = clique.end(); i != ie; ++i) {
-        sstream << "\t" << *i;
+        sstream << esep << *i;
         if (std::next(i) != ie) {
-            sstream <<",\n";
+            sstream << "," << lsep;
         }
     }
-    sstream << "\n]";
+    sstream << lsep << "]";
     return sstream.str();
 }
