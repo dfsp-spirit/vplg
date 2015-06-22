@@ -18,7 +18,8 @@
 }
 </style>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-  <script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script>
+  <!-- <script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script> -->
+  <script src="./js/cytoscapejs-snapshot/build/cytoscape.min.js"></script>
   <script src="code.js"></script>
 </head>
   
