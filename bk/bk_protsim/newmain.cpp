@@ -17,9 +17,9 @@
 using namespace std;
 
 /*
- * 
+ * old main used for debugging
  */
-int main(int argc, char** argv) {
+int main2(int argc, char** argv) {
     /*
     //testdata/2pol.gml
     //testdata/1bib.gml
