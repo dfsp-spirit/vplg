@@ -24,6 +24,20 @@
 </head>
   
 <body>
+  <div id="wrapper_sselist">
+      <p>SSE list:</p>
+      <ul id="sselist">
+	    <li id="1e">1e</li>
+		<li id="2h">2h</li>
+	  </ul>
+  </div>
+  <div id="wrapper_edgelist">
+      <p>Edge list:</p>
+      <ul id="edgelist">
+	    <li id="1p3">1p3</li>
+		<li id="2p4">2p4</li>
+	  </ul>
+  </div>
   <div id="cy"></div>
 
 <script>
@@ -105,7 +119,7 @@ $('#cy').cytoscape({
       })
 	.selector('.pgedge')
      .css({
-        'opacity': 0.666,
+        'opacity': 1.0,
         'target-arrow-shape': 'none',
         'source-arrow-shape': 'none',
         'line-color': '#FF0000',
@@ -193,7 +207,21 @@ $('#cy').cytoscape({
   
   ready: function(){
     window.cy = this;	
-  }
+	
+	
+  cy.on('select', 'node', function(event){
+    console.log("Node selected.");
+	/* $("#h1").html("HAHA!"); */
+	$( "#sselist li:first" ).clone().appendTo( "#sselist" );
+  });
+  
+  cy.on('select', 'edge', function(event){
+    console.log("Edge selected.");
+	/* $("#h1").html("HAHA!"); */
+	$( "#edgelist li:first" ).clone().appendTo( "#edgelist" );
+  });
+  
+ } // ready
 });
 
 }); // on dom ready
