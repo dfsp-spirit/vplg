@@ -106,7 +106,7 @@ $('#cy').cytoscape({
 	.selector('.pgedge')
      .css({
         'opacity': 0.666,
-        'target-arrow-shape': 'triangle',
+        'target-arrow-shape': 'none',
         'source-arrow-shape': 'none',
         'line-color': '#FF0000',
         'source-arrow-color': '#FF0000',
