@@ -943,7 +943,7 @@ public class Main {
                             IDrawableGraph g = p.getDrawableGraph();
                             System.out.println("Received graph with " + g.getDrawableVertices().size() + " vertices and " + g.getDrawableEdges().size() + " edges.");
                             String outFilePathNoExt = args[i+1]; // the image extension will be appended to this
-                            ProteinGraphDrawer.drawDrawableGraph(outFilePathNoExt, formats, g);
+                            ProteinGraphDrawer.drawDrawableGraph(outFilePathNoExt, formats, g, new HashMap<Integer, String>());
                             System.out.println("Done drawing GML graph to base file '" + outFilePathNoExt + "', exiting.");
                             
                             System.exit(0);

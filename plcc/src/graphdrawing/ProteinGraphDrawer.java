@@ -367,8 +367,8 @@ public class ProteinGraphDrawer {
      * @param pg the graph to draw
      * @return a list of written files
      */
-    public static HashMap<DrawTools.IMAGEFORMAT, String> drawDrawableGraph(String baseFilePathNoExt, DrawTools.IMAGEFORMAT[] formats, IDrawableGraph pg) {
-        DrawResult drawRes = ProteinGraphDrawer.drawDrawableGraphG2D(pg);
+    public static HashMap<DrawTools.IMAGEFORMAT, String> drawDrawableGraph(String baseFilePathNoExt, DrawTools.IMAGEFORMAT[] formats, IDrawableGraph pg, HashMap<Integer, String> vertexMarkings) {
+        DrawResult drawRes = ProteinGraphDrawer.drawDrawableGraphG2D(pg, vertexMarkings);
         String svgFilePath = baseFilePathNoExt + ".svg";
         HashMap<DrawTools.IMAGEFORMAT, String> resultFilesByFormat = new HashMap<DrawTools.IMAGEFORMAT, String>();
         try {
@@ -1712,7 +1712,7 @@ public class ProteinGraphDrawer {
      *
      * @return the DrawResult. You can write this to a file or whatever.
      */
-    private static DrawResult drawDrawableGraphG2D(IDrawableGraph pg) {
+    private static DrawResult drawDrawableGraphG2D(IDrawableGraph pg, HashMap<Integer, String> vertexMarkings) {
         Integer numVerts = pg.getDrawableVertices().size();
         Boolean bw = false;
         
@@ -1804,8 +1804,8 @@ public class ProteinGraphDrawer {
                 }
             }
         }
-        Ellipse2D.Double circle;
-        Rectangle2D.Double rect;
+        Ellipse2D.Double circle; Ellipse2D.Double markingCircle;
+        Rectangle2D.Double rect; Rectangle2D.Double markingRect;
         ig2.setStroke(new BasicStroke(2));
         Integer sseClass;
         for (Integer i = 0; i < pg.getDrawableVertices().size(); i++) {
@@ -1825,18 +1825,56 @@ public class ProteinGraphDrawer {
             if (bw) {
                 ig2.setPaint(Color.GRAY);
             }
+            
+            String vMarking = vertexMarkings.get(i);
+            Color markingBorderColor = Color.GRAY;
+            Color markingLabelColor = Color.GRAY;
+            int markingWidth = 4;
+            int markingOffsetY = 25;
+            
             if (sseClass.equals(SSE.SSECLASS_BETASTRAND)) {
-                rect = new Rectangle2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
+                rect = new Rectangle2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());                                
                 ig2.fill(rect);
+                if(vMarking != null) {
+                    //System.out.println("#####Found marking for strand vertex " + i + ".");
+                    markingRect = new Rectangle2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter() + (0 * markingWidth), pl.getVertDiameter() + (0 * markingWidth));
+                    ig2.setColor(markingBorderColor);
+                    ig2.setStroke(new BasicStroke(markingWidth));
+                    ig2.draw(markingRect);
+                    ig2.setColor(markingLabelColor);
+                    ig2.drawString(vMarking, new Double(markingRect.getMinX()).intValue() + (pl.vertRadius / 2), new Double(markingRect.getCenterY()).intValue() + markingOffsetY);
+                }
             } else if (sseClass.equals(SSE.SSECLASS_LIGAND)) {
-                circle = new Ellipse2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
-                ig2.setStroke(new BasicStroke(3));
+                int outerStrokeWidth = 4;
+                int halfouterStrokeWidth = outerStrokeWidth / 2;
+                circle = new Ellipse2D.Double(vertStart.x + (i * pl.vertDist) + halfouterStrokeWidth, vertStart.y + halfouterStrokeWidth, pl.getVertDiameter() - outerStrokeWidth, pl.getVertDiameter() - outerStrokeWidth);
+                ig2.setStroke(new BasicStroke(outerStrokeWidth));
                 ig2.draw(circle);
                 ig2.setStroke(new BasicStroke(2));
+                if(vMarking != null) {
+                    //System.out.println("#####Found marking for ligand vertex " + i + ".");
+                    markingCircle = new Ellipse2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter() + (0 * markingWidth), pl.getVertDiameter() + (0 * markingWidth));
+                    ig2.setColor(markingBorderColor);
+                    ig2.setStroke(new BasicStroke(markingWidth));
+                    ig2.draw(markingCircle);
+                    ig2.setColor(markingLabelColor);
+                    ig2.drawString(vMarking, new Double(markingCircle.getMinX()).intValue() + (pl.vertRadius / 2), new Double(markingCircle.getCenterY()).intValue() + markingOffsetY);
+                }
             } else {
                 circle = new Ellipse2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
                 ig2.fill(circle);
+                if(vMarking != null) {
+                    //System.out.println("#####Found marking for other vertex " + i + ".");
+                    markingCircle = new Ellipse2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter() + (0 * markingWidth), pl.getVertDiameter() + (0 * markingWidth));
+                    ig2.setColor(markingBorderColor);
+                    ig2.setStroke(new BasicStroke(markingWidth));
+                    ig2.draw(markingCircle);
+                    ig2.setColor(markingLabelColor);
+                    ig2.drawString(vMarking, new Double(markingCircle.getMinX()).intValue() + (pl.vertRadius / 2), new Double(markingCircle.getCenterY()).intValue() + markingOffsetY);
+                }
             }
+            
+        
         }
         ig2.setStroke(new BasicStroke(2));
         ig2.setPaint(Color.BLACK);
