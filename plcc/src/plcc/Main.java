@@ -916,7 +916,7 @@ public class Main {
                             Settings.set("plcc_B_graphimg_header", "false");
                             System.out.println("Drawing custom graph in TGF format from file '" + args[i+1] + "'.");
                             IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
-                            drawTGFGraph(args[i+1], args[i+1], formats);
+                            drawTGFGraph(args[i+1], args[i+1], formats, new HashMap<Integer, String>());
                             System.out.println("Done drawing TGF graph, exiting.");
                             System.exit(1);
                         }
@@ -1956,13 +1956,13 @@ public class Main {
      * @param imgFilePathNoExt the output path where the resulting image should be written
      * @param formats a list of image formats
      */
-    public static void drawTGFGraph(String tgfFile, String imgFilePathNoExt, IMAGEFORMAT[] formats) {
+    public static void drawTGFGraph(String tgfFile, String imgFilePathNoExt, IMAGEFORMAT[] formats, HashMap<Integer, String> vertexMarkings) {
 
         //System.out.println("Testing tgf implementation using file '" + tgfFile + "'.");
 
         ProtGraph pg = ProtGraphs.fromTrivialGraphFormatFile(tgfFile);
         System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to base file '" + imgFilePathNoExt + "'.");
-        ProteinGraphDrawer.drawProteinGraph(imgFilePathNoExt, true, formats, pg);
+        ProteinGraphDrawer.drawProteinGraph(imgFilePathNoExt, true, formats, pg, vertexMarkings);
         //pg.print();
         System.out.println("  Graph image written to base file '" + imgFilePathNoExt + "'.");
     }
@@ -1987,7 +1987,7 @@ public class Main {
         IMAGEFORMAT[] formats = new IMAGEFORMAT[] { DrawTools.IMAGEFORMAT.PNG };
         ProtGraph pg = ProtGraphs.fromPlccGraphFormatString(graphString);
         System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to base file '" + imgNoExt + "'.");
-        ProteinGraphDrawer.drawProteinGraph(imgNoExt, false, formats, pg); 
+        ProteinGraphDrawer.drawProteinGraph(imgNoExt, false, formats, pg, new HashMap<Integer, String>()); 
         System.out.println("  Protein graph image written to base file '" + imgNoExt + "'.");
 
         //if(drawFoldingGraphsAsWell) {
@@ -2023,7 +2023,7 @@ public class Main {
         ProtGraph pg = ProtGraphs.fromPlccGraphFormatString(graphString);
         IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
         System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to base file '" + outputImgNoExt + "'.");
-        ProteinGraphDrawer.drawProteinGraph(outputImgNoExt, false, formats, pg);
+        ProteinGraphDrawer.drawProteinGraph(outputImgNoExt, false, formats, pg, new HashMap<Integer, String>());
         System.out.println("  Protein graph image written to base file '" + outputImgNoExt + "'.");
 
         //if(drawFoldingGraphsAsWell) {
@@ -2657,7 +2657,7 @@ public class Main {
                     // formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG, DrawTools.IMAGEFORMAT.PDF };                    
                     formats = Settings.getProteinGraphOutputImageFormats();
 
-                    HashMap<IMAGEFORMAT, String> filesByFormatCurNotation = ProteinGraphDrawer.drawProteinGraph(imgFileNoExt, false, formats, pg);
+                    HashMap<IMAGEFORMAT, String> filesByFormatCurNotation = ProteinGraphDrawer.drawProteinGraph(imgFileNoExt, false, formats, pg, new HashMap<Integer, String>());
                     //if(! silent) {
                     //    System.out.println("      Image of graph written to file '" + imgFile + "'.");
                     //}
@@ -6561,7 +6561,7 @@ public class Main {
                 
         if(Settings.getBoolean("plcc_B_draw_graphs")) {
             IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG, DrawTools.IMAGEFORMAT.PDF };
-            ProteinGraphDrawer.drawProteinGraph(imgFileNoExt, false, formats, cg);
+            ProteinGraphDrawer.drawProteinGraph(imgFileNoExt, false, formats, cg, new HashMap<Integer, String>());
             if(! silent) {
                 System.out.println("    Image of complex graph written to base file '" + imgFileNoExt + "'.");
             }

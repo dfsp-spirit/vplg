@@ -39,6 +39,7 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import proteingraphs.FoldingGraph;
 import io.IO;
+import java.util.Map;
 import resultcontainers.PTGLNotationFoldResult;
 import proteingraphs.Position2D;
 import proteingraphs.ProtGraph;
@@ -327,10 +328,17 @@ public class ProteinGraphDrawer {
      * @param baseFilePathNoExt the base file path where to put the image (without dot and file extension)
      * @param drawBlackAndWhite whether to omit colors, only useful for non-protein graphs
      * @param formats an array of type DrawTools.IMAGEFORMAT. Do not include SVG, this will always be drawn anyways
+     * @param pg the graph to draw
      * @return a map of formats to the corresponding output files written to disk
      */
-    public static HashMap<DrawTools.IMAGEFORMAT, String> drawProteinGraph(String baseFilePathNoExt, Boolean drawBlackAndWhite, DrawTools.IMAGEFORMAT[] formats, ProtGraph pg) {
-        DrawResult drawRes = ProteinGraphDrawer.drawProteinGraphG2D(drawBlackAndWhite, pg);
+    public static HashMap<DrawTools.IMAGEFORMAT, String> drawProteinGraph(String baseFilePathNoExt, Boolean drawBlackAndWhite, DrawTools.IMAGEFORMAT[] formats, ProtGraph pg, Map<Integer, String> vertexMarkings) {
+        //Map<Integer, String> vertexMarkings = new HashMap<>();
+        //for(Integer i : pg.getVertexIndexList()) {
+        //    vertexMarkings.put(i, i + "");
+        //}
+        //System.out.println("####SETTING MARKING####");
+        
+        DrawResult drawRes = ProteinGraphDrawer.drawProteinGraphG2D(drawBlackAndWhite, pg, vertexMarkings);
         String svgFilePath = baseFilePathNoExt + ".svg";
         HashMap<DrawTools.IMAGEFORMAT, String> resultFilesByFormat = new HashMap<DrawTools.IMAGEFORMAT, String>();
         try {
@@ -1448,15 +1456,32 @@ public class ProteinGraphDrawer {
         return pixelPosX;
     }
 
+    
     /**
      * Draws the protein graph image of this graph and returns the DrawResult.
      * If 'nonProteinGraph' is true, this graph is considered a custom (=non-protein) graph and the color coding for vertices and edges is NOT used.
      * In that case, the graph is drawn black and white and the labels for the N- and C-termini are NOT drawn.
      *
      * @param nonProteinGraph whether the graph is a non-protein graph and thus does NOT contain information on the relative SSE orientation in the expected way. If so, it is drawn in gray scale because the color code becomes useless (true => gray scale, false => color).
+     * @param pg the graph to draw
      * @return the DrawResult. You can write this to a file or whatever.
      */
     private static DrawResult drawProteinGraphG2D(Boolean nonProteinGraph, ProtGraph pg) {
+        Map<Integer, String> vertexMarkings = new HashMap<>();
+        return ProteinGraphDrawer.drawProteinGraphG2D(nonProteinGraph, pg, vertexMarkings);
+    }
+    
+    /**
+     * Draws the protein graph image of this graph and returns the DrawResult.
+     * If 'nonProteinGraph' is true, this graph is considered a custom (=non-protein) graph and the color coding for vertices and edges is NOT used.
+     * In that case, the graph is drawn black and white and the labels for the N- and C-termini are NOT drawn.
+     *
+     * @param nonProteinGraph whether the graph is a non-protein graph and thus does NOT contain information on the relative SSE orientation in the expected way. If so, it is drawn in gray scale because the color code becomes useless (true => gray scale, false => color).
+     * @param pg the graph to draw
+     * @param vertexMarkings a map of special markings for vertices, supply an empty Map if no vertices should be marked in output image. This can be used to visually emphasize subsets of vertices in the graph.
+     * @return the DrawResult. You can write this to a file or whatever.
+     */
+    private static DrawResult drawProteinGraphG2D(Boolean nonProteinGraph, ProtGraph pg, Map<Integer, String> vertexMarkings) {
         Integer numVerts = pg.numVertices();
         Boolean bw = nonProteinGraph;
         PageLayout pl = new PageLayout(numVerts);
@@ -1556,8 +1581,8 @@ public class ProteinGraphDrawer {
                 }
             }
         }
-        Ellipse2D.Double circle;
-        Rectangle2D.Double rect;
+        Ellipse2D.Double circle, markingCircle;
+        Rectangle2D.Double rect, markingRect;
         ig2.setStroke(new BasicStroke(2));
         for (Integer i = 0; i < pg.getSize(); i++) {
             if (pg.getVertex(i).isHelix()) {
@@ -1574,17 +1599,53 @@ public class ProteinGraphDrawer {
             if (bw) {
                 ig2.setPaint(Color.GRAY);
             }
+            
+            String vMarking = vertexMarkings.get(i);
+            Color markingBorderColor = Color.GRAY;
+            Color markingLabelColor = Color.GRAY;
+            int markingWidth = 4;
+            int markingOffsetY = 25;
+            
             if (pg.getVertex(i).isBetaStrand()) {
-                rect = new Rectangle2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
+                rect = new Rectangle2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());                                
                 ig2.fill(rect);
+                if(vMarking != null) {
+                    //System.out.println("#####Found marking for strand vertex " + i + ".");
+                    markingRect = new Rectangle2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter() + (0 * markingWidth), pl.getVertDiameter() + (0 * markingWidth));
+                    ig2.setColor(markingBorderColor);
+                    ig2.setStroke(new BasicStroke(markingWidth));
+                    ig2.draw(markingRect);
+                    ig2.setColor(markingLabelColor);
+                    ig2.drawString(vMarking, new Double(markingRect.getMinX()).intValue() + (pl.vertRadius / 2), new Double(markingRect.getCenterY()).intValue() + markingOffsetY);
+                }
             } else if (pg.getVertex(i).isLigandSSE()) {
-                circle = new Ellipse2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
-                ig2.setStroke(new BasicStroke(3));
+                int outerStrokeWidth = 4;
+                int halfouterStrokeWidth = outerStrokeWidth / 2;
+                circle = new Ellipse2D.Double(vertStart.x + (i * pl.vertDist) + halfouterStrokeWidth, vertStart.y + halfouterStrokeWidth, pl.getVertDiameter() - outerStrokeWidth, pl.getVertDiameter() - outerStrokeWidth);
+                ig2.setStroke(new BasicStroke(outerStrokeWidth));
                 ig2.draw(circle);
                 ig2.setStroke(new BasicStroke(2));
+                if(vMarking != null) {
+                    //System.out.println("#####Found marking for ligand vertex " + i + ".");
+                    markingCircle = new Ellipse2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter() + (0 * markingWidth), pl.getVertDiameter() + (0 * markingWidth));
+                    ig2.setColor(markingBorderColor);
+                    ig2.setStroke(new BasicStroke(markingWidth));
+                    ig2.draw(markingCircle);
+                    ig2.setColor(markingLabelColor);
+                    ig2.drawString(vMarking, new Double(markingCircle.getMinX()).intValue() + (pl.vertRadius / 2), new Double(markingCircle.getCenterY()).intValue() + markingOffsetY);
+                }
             } else {
                 circle = new Ellipse2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
                 ig2.fill(circle);
+                if(vMarking != null) {
+                    //System.out.println("#####Found marking for other vertex " + i + ".");
+                    markingCircle = new Ellipse2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter() + (0 * markingWidth), pl.getVertDiameter() + (0 * markingWidth));
+                    ig2.setColor(markingBorderColor);
+                    ig2.setStroke(new BasicStroke(markingWidth));
+                    ig2.draw(markingCircle);
+                    ig2.setColor(markingLabelColor);
+                    ig2.drawString(vMarking, new Double(markingCircle.getMinX()).intValue() + (pl.vertRadius / 2), new Double(markingCircle.getCenterY()).intValue() + markingOffsetY);
+                }
             }
         }
         ig2.setStroke(new BasicStroke(2));
@@ -1619,8 +1680,8 @@ public class ProteinGraphDrawer {
                     sseNumberGraph = "" + (i + 1);
                     sseNumberSeq = "" + (pg.getVertex(i).getSSESeqChainNum());
                     stringHeight = fontMetrics.getAscent();
-                    ig2.drawString(sseNumberGraph, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4));
-                    ig2.drawString(sseNumberSeq, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
+                    ig2.drawString(sseNumberGraph, pl.getFooterStart().x + (i * pl.vertDist) + (pl.vertRadius / 2), pl.getFooterStart().y + (stringHeight / 4));
+                    ig2.drawString(sseNumberSeq, pl.getFooterStart().x + (i * pl.vertDist) + (pl.vertRadius / 2), pl.getFooterStart().y + lineHeight + (stringHeight / 4));
                     for (Integer x = 0; x < pg.getChainEnds().size(); x++) {
                         if (i < pg.getChainEnds().get(x)) {
                             iChainID = x;
