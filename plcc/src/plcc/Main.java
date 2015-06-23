@@ -934,16 +934,31 @@ public class Main {
                             
                             try {
                                 gml = FileParser.slurpFileToString(args[i+1]);  
-                                System.out.println("Received String: " + gml);
+                                System.out.println("Received GML string: " + gml);
                             } catch (Exception e) {
                                 System.err.println("Could not read GML graph file: " + e.getMessage());
                                 System.exit(1);
                             }
+                            
+                            Map<Integer, String> vertexMappings = new HashMap<>();
+                            // read vertex mappings from file if a file has been specified
+                            if(args.length > i+2) {
+                                System.out.println("Parsing vertex mappings file...");
+                                try {
+                                    vertexMappings = IO.parseMappingsFile(args[i+2]);
+                                } catch (Exception e) {
+                                    System.err.println("Could not read vertex mappings file: " + e.getMessage());
+                                    System.exit(1);
+                                }
+                                System.out.println("Received " + vertexMappings.keySet().size() + " vertex mappings.");
+                            }
+                            
+                            
                             GMLGraphParser p = new GMLGraphParser(gml);
                             IDrawableGraph g = p.getDrawableGraph();
                             System.out.println("Received graph with " + g.getDrawableVertices().size() + " vertices and " + g.getDrawableEdges().size() + " edges.");
                             String outFilePathNoExt = args[i+1]; // the image extension will be appended to this
-                            ProteinGraphDrawer.drawDrawableGraph(outFilePathNoExt, formats, g, new HashMap<Integer, String>());
+                            ProteinGraphDrawer.drawDrawableGraph(outFilePathNoExt, formats, g, vertexMappings);
                             System.out.println("Done drawing GML graph to base file '" + outFilePathNoExt + "', exiting.");
                             
                             System.exit(0);

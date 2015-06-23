@@ -367,7 +367,7 @@ public class ProteinGraphDrawer {
      * @param pg the graph to draw
      * @return a list of written files
      */
-    public static HashMap<DrawTools.IMAGEFORMAT, String> drawDrawableGraph(String baseFilePathNoExt, DrawTools.IMAGEFORMAT[] formats, IDrawableGraph pg, HashMap<Integer, String> vertexMarkings) {
+    public static HashMap<DrawTools.IMAGEFORMAT, String> drawDrawableGraph(String baseFilePathNoExt, DrawTools.IMAGEFORMAT[] formats, IDrawableGraph pg, Map<Integer, String> vertexMarkings) {
         DrawResult drawRes = ProteinGraphDrawer.drawDrawableGraphG2D(pg, vertexMarkings);
         String svgFilePath = baseFilePathNoExt + ".svg";
         HashMap<DrawTools.IMAGEFORMAT, String> resultFilesByFormat = new HashMap<DrawTools.IMAGEFORMAT, String>();
@@ -1712,7 +1712,7 @@ public class ProteinGraphDrawer {
      *
      * @return the DrawResult. You can write this to a file or whatever.
      */
-    private static DrawResult drawDrawableGraphG2D(IDrawableGraph pg, HashMap<Integer, String> vertexMarkings) {
+    private static DrawResult drawDrawableGraphG2D(IDrawableGraph pg, Map<Integer, String> vertexMarkings) {
         Integer numVerts = pg.getDrawableVertices().size();
         Boolean bw = false;
         

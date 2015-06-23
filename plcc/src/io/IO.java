@@ -22,7 +22,9 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
@@ -56,6 +58,31 @@ public class IO {
         if(path == null) { return null; }
         String copy = path.replace("\\", "/");
         return copy; 
+    }
+    
+    
+    /**
+     * Parses a property file, assumes that all keys are integer values and that all values are strings. Stores them in a map and returns it.
+     * @param mappingsFile the input file name
+     * @return the result map
+     * @throws IOException if IO stuff goes wrong
+     */
+    public static Map<Integer, String> parseMappingsFile(String mappingsFile) throws IOException {
+        Map<Integer, String> m = new HashMap<>();
+        
+        Properties mappings = new Properties();
+
+        BufferedInputStream stream = new BufferedInputStream(new FileInputStream(mappingsFile));
+        mappings.load(stream);
+        stream.close();
+
+         for (Map.Entry<Object, Object> entry : mappings.entrySet()) {
+            String key = (String)entry.getKey();
+            String value = (String)entry.getValue();
+            m.put(Integer.valueOf(key), value);
+        }     
+        
+        return m;
     }
     
     /**
