@@ -60,6 +60,11 @@ int main(int argc, char** argv) {
     //parse input files
     Graph f = GMLptglProteinParser(argv[1]).graph;
     Graph s = GMLptglProteinParser(argv[2]).graph;
+    
+    std::cout << apptag << "Graph from file " << argv[1] << " has " << f.vertex_set().size() << " vertices.\n";
+    std::cout << apptag << "Graph from file " << argv[2] << " has " << s.vertex_set().size() << " vertices.\n";
+   
+    
     //compute product graph
     ProductGraph pg(f,s);
     pg.run();
