@@ -180,8 +180,8 @@ GraphletCounts::GraphletCounts(Graph& graph) {
 }
 
 void GraphletCounts::compute_abs_counts(bool withLabeled) {
-    graphlet2CountsABS = count_connected_2_graphlets(memberGraph, size_2_labels);
-    graphlet3CountsABS = count_connected_3_graphlets(memberGraph, withLabeled);
+    graphlet2CountsABS = count_connected_2_graphlets(memberGraph, "", size_2_labels);
+    graphlet3CountsABS = count_connected_3_graphlets(memberGraph,"", size_3_labels);
     graphlet4CountsABS = count_connected_4_graphlets(memberGraph, withLabeled);
     graphlet5CountsABS = count_connected_5_graphlets(memberGraph, withLabeled);
     
@@ -203,8 +203,8 @@ void GraphletCounts::compute_norm_counts(bool withLabeled) {
 
 void GraphletCounts::compute_labeled_abs_counts() {
     
-    count_connected_2_graphlets(memberGraph, size_2_labels);
-    count_connected_3_graphlets(memberGraph, true);
+    count_connected_2_graphlets(memberGraph,"", size_2_labels);
+    count_connected_3_graphlets(memberGraph,"", size_3_labels);
     count_connected_4_graphlets(memberGraph, true);
     
     
@@ -308,7 +308,7 @@ vector<float> GraphletCounts::normalize_counts(vector<int> absCounts, bool withL
         float total_labeled = 0;
         float total = 0;
         
-        graphlet3CountsABS = count_connected_3_graphlets(memberGraph, withLabeled);
+        graphlet3CountsABS = count_connected_3_graphlets(memberGraph, "", size_3_labels);
         graphlet4CountsABS = count_connected_4_graphlets(memberGraph, withLabeled);
         graphlet5CountsABS = count_connected_5_graphlets(memberGraph, withLabeled);
         
@@ -734,7 +734,7 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
  * @param withLabeled whether to count labeled graphlets as well
  * @return a vector of graphlet counts (how often each graphlet was found)
  */
- vector<int> GraphletCounts::count_connected_3_graphlets(Graph& g, bool withLabeled) { 
+ vector<int> GraphletCounts::count_connected_3_graphlets(Graph& g, std::string label, std::vector<std::vector<string>> labelVector) { 
     vector<float> c3;
     c3 = vector<float>(2);
     float count[] = { 0.0, 0.0 };
@@ -746,6 +746,7 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
     labeled_norm_counts_computed = false;
     labeled_abs_counts_computed = false;
     all_counts_computed = false;
+    size_3_labels = labelVector;
     
     print = false; // printing might disturb tests
 
@@ -762,24 +763,19 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
     EdgeDescriptor e;
     string pattern;
     
-    // all possible labeling of g1 graphlet (triangle) concerning the symmetry
-    string g1_vertex_patterns[] = { "HHH","HHE","HEE","EEE" };
+    std::vector<std::vector<float>> labeled_3_counts_float = vector<vector<float>>();
     
-    // all possible labeling of g2 graphlet (2-path) concerning the symmetry
-    string g2_vertex_patterns[] = { "HHH","HHE","EHE","HEH","HEE","EEE" };
+    // set space for vector with labeled counts
+    for (auto i : labelVector) {
+        std::vector<float> fcount = std::vector<float>(i.size());
+        for (int k = 0; k< i.size(); k++) {
+            fcount[k] = 0.0;
+        }
+        labeled_3_counts_float.push_back(fcount);
+        
+        
+    }
     
-    // bio-motivated labeling of graphlets
-    // currently implemented are the beta-alpha-beta and beta-beta-beta motifs
-    // NOTE: also check if its composing vertices are adjacent
-    string g2_bio_patterns[]    = { "EaHaE",    // beta-alpha-beta motif
-                                    "EaEaE" };  // beta-beta-beta motif
-    
-    /*
-     * NOTE the correspondence 
-     *   lcount[0..3]   := g1_vertex_patterns[0..3] 
-     *   lcount[4..9]   := g2_vertex_patterns[0..6]
-     *   lcount[10..11] := g2_bio_patterns[0..1]
-     */
     
 	
 	int printDetails = 0; // might disturb tests, therefore set to zero
@@ -807,106 +803,61 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
 						if(printDetails) { cout << apptag << "Found G0: " << g[*i].properties["label"] << "-" << g[*j].properties["label"] << "-" << g[*k].properties["label"] << ".\n"; }
                         if (print) { logFile << "-------------------> g1\n"; }
                         
-                        if (withLabeled) {                           
+                        if (!labelVector.empty()) {                           
                             pattern = "";
-                            pattern = pattern + g[*i].properties["sse_type"] + g[*j].properties["sse_type"] + g[*k].properties["sse_type"];
+                            pattern = pattern + g[*i].properties[label] + g[*j].properties[label] + g[*k].properties[label];
                             
-							// ---------------- triangle patterns -----------------
-                            //cout             << setw(3)  << *i << setw(3) << *j << setw(3) << *k << "  " << pattern << "  ";                           
-                            if (print) { logFile << setw(26) << *i << setw(3) << *j << setw(3) << *k << "  " << pattern << "  "; }
+                            std::vector<std::string> labels = labelVector[0];
                             
-                            if (pattern == g1_vertex_patterns[0]) { 
-                                lcount[0]++;
+                            for (int i = 0; i < labels.size(); i++) {
+                                
+                                std::set<std::string> cats = compute_CAT(labels[i]);
+                                
+                                for (auto k : cats) {
+                                    
+                                    if (pattern.compare(k) == 0) {
+                                        
+                                        labeled_3_counts_float[0][i] += w[0];
+                                    }
+                                }
                             }
-                            else if (pattern == g1_vertex_patterns[1]) { 								
-                                lcount[1]++;
-                            }
-                            else if (pattern == g1_vertex_patterns[2]) { 
-                                lcount[2]++;
-                                if(saveGraphletDetails) {									
-                                    string residueInfo = "";
-                                    string vsep = ";";
-                                    residueInfo += g[*i].properties["pdb_residues_full"] + vsep + g[*j].properties["pdb_residues_full"] + vsep + g[*k].properties["pdb_residues_full"];
-                                    cout << apptag << "Found labeled graphlet triangle H-E-E:" << residueInfo << "\n";
-				    cout << apptag << "Vertices are: " << g[*i].properties["sse_type"] << "," << g[*j].properties["sse_type"] << "," << g[*k].properties["sse_type"] << "." << std::endl;
-				    cout << apptag << "Pattern is '" << pattern << "', and we compare it to '" << g1_vertex_patterns[2] << "'.\n";
-                                }							
-                            }
-                            else if (pattern == g1_vertex_patterns[3]) { 
-                                lcount[3]++;   
-                            }
+                            
+                            
+                            
                             
                             // NOTE: optional part, can be for further bio-graphlets
                             pattern = "";
                             e = edge(*i, *j, g).first;
-                            pattern = pattern + g[*i].properties["sse_type"] + g[e].properties["spatial"];
+                            pattern = pattern + g[*i].properties[label] + g[e].properties[label];
                             e = edge(*j, *k, g).first;
-                            pattern = pattern + g[*j].properties["sse_type"] + g[e].properties["spatial"] + g[*k].properties["sse_type"];
+                            pattern = pattern + g[*j].properties[label] + g[e].properties["spatial"] + g[*k].properties[label];
                             
                             //cout             << pattern << " \n";                           
                             if (print) { logFile << pattern << " \n"; }
                          }                       
                     } else {
                         count[1]++;
-						if(printDetails) { cout << apptag << "Found G1: " << g[*i].properties["label"] << "-" << g[*j].properties["label"] << "-" << g[*k].properties["label"] << ".\n"; }
-                        if (print) logFile << "-------------------> g2\n";
+						
                         
-                        if (withLabeled) {                            
+                        if (!labelVector.empty()) {                            
                             pattern = "";
-                            pattern = pattern + g[*i].properties["sse_type"] + g[*j].properties["sse_type"] + g[*k].properties["sse_type"];
+                            pattern = pattern + g[*i].properties[label] + g[*j].properties[label] + g[*k].properties[label];
                             
-							// ------------------ path of length 2 (3 vetices, 2 edges) ---------------
-                            //cout             << setw(3)  << *i << setw(3) << *j << setw(3) << *k << "  " << pattern << "  ";                           
-                            if (print) logFile << setw(26) << *i << setw(3) << *j << setw(3) << *k << "  " << pattern << "  ";
+                            std::vector<string> path_labels = labelVector[1];
                             
-                            if      (pattern == g2_vertex_patterns[0]) { 
-                                lcount[4]++;
+                            for (int i = 0; i < path_labels.size(); i++) {
+                                
+                                std::set<std::string> cats = compute_CAT(path_labels[i]);
+                                
+                                for (auto k : cats) {
+                                    
+                                    if (pattern.compare(k) == 0) {
+                                        
+                                        labeled_3_counts_float[1][i] += w[1];
+                                    }
+                                }
                             }
-                            else if (pattern == g2_vertex_patterns[1]) {
-                                lcount[5]++;
-                                //if(saveGraphletDetails) {									
-                                //	string residueInfo = "";
-                                //	string vsep = ";";
-                                //	residueInfo += g[*i].pdb_residues_full + vsep + g[*j].pdb_residues_full + vsep + g[*k].pdb_residues_full;
-                                //	cout << "Found labeled graphlet path H-H-E:" << residueInfo << "\n";
-                                //}
-                            }
-                            else if (pattern == g2_vertex_patterns[2]) {
-                                lcount[6]++;                            
-                            }
-                            else if (pattern == g2_vertex_patterns[3]) {
-                                lcount[7]++;
-                            }
-                            else if (pattern == g2_vertex_patterns[4]) {
-                                lcount[8]++;
-                                //if(saveGraphletDetails) {									
-                                //		string residueInfo = "";
-                                //		string vsep = ";";
-                                //		residueInfo += g[*i].pdb_residues_full + vsep + g[*j].pdb_residues_full + vsep + g[*k].pdb_residues_full;
-                                //		cout << "Found labeled graphlet path H-E-E:" << residueInfo << "\n";
-                                //	}
-                            }
-                            else if (pattern == g2_vertex_patterns[5]) {
-								lcount[9]++;
-							}
-                            
-                            pattern = "";
-                            e = edge(*i, *j, g).first;
-                            pattern = pattern + g[*i].properties["sse_type"] + g[e].properties["spatial"];
-                            e = edge(*j, *k, g).first;
-                            pattern = pattern + g[*j].properties["sse_type"] + g[e].properties["spatial"] + g[*k].properties["sse_type"];                          
-                            
-                            if (((*k - *j) == 1) && ((*j - *i) == 1) && (pattern == g2_bio_patterns[0])) {
-                                lcount[10]++;
-                                if (print) logFile << "beta-alpha-beta motif: ";                               
-                            } 
-                            if (((*k - *j) == 1) && ((*j - *i) == 1) && (pattern == g2_bio_patterns[1])) {
-                                lcount[11]++;
-                                if (print) logFile << "beta-beta-beta motif: ";                               
-                            }  
-                            
-                            //cout             << pattern << " \n";                           
-                            if (print) logFile << pattern << " \n";
+
                         }
                     }
                 }
@@ -919,7 +870,7 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
     
     
 
-    if (withLabeled) {
+    if (!labelVector.empty()) {
         for (int i = 0; i < 10; i++) {
             cl[i] = lcount[i] * lw[i];
             labeled_abs_counts[i] = int (floor (cl[i]));
@@ -929,6 +880,17 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
         
         labeled_abs_counts[20] = int (floor (cl[20]));
         labeled_abs_counts[21] = int (floor (cl[21]));
+        
+        for (int i = 0; i<labeled_3_counts_float[0].size(); i++) {
+            vector<int> vec = vector<int>();
+            vec.push_back(int (floor (labeled_3_counts_float[0][i])));
+            labeled_3_countsABS.push_back(vec);
+        }
+        for (int i = 0; i<labeled_3_counts_float[1].size(); i++) {
+            vector<int> vec = vector<int>();
+            vec.push_back(int (floor (labeled_3_counts_float[1][i])));
+            labeled_3_countsABS.push_back(vec);
+        }
 
     }
     
@@ -941,6 +903,12 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
         graphlet3Counts.push_back(count);
         
     }
+    
+    
+    
+
+    
+
     
     if (print) logFile << "\n"
                        << "Number of 3-graphlets:\n"
@@ -958,7 +926,7 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
  * @return a vector of graphlet counts (how often each graphlet was found)
  */
 
-vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g, vector<string> label_vector) { 
+vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g,std::string label, vector<string> label_vector) { 
     vector<float> c2;
     c2 = vector<float>(1);   // The only 2-graphlet is a path of length 1 (one edge).
     float count[] = { 0.0 };
@@ -1016,7 +984,7 @@ vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g, vector<string>
 
                     if (!label_vector.empty()) {                           
                         pattern = "";
-                        pattern = pattern + g[*i].properties["sse_type"] + g[*j].properties["sse_type"];
+                        pattern = pattern + g[*i].properties[label] + g[*j].properties[label];
 
   
                         for (int i = 0; i < label_vector.size(); i++) {
@@ -1032,35 +1000,7 @@ vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g, vector<string>
                                 }
                                 
                             }
-                            
-                            
-                            
                         }
-                        
-                        
-                        
-                        
-                        //if (print) logFile << setw(26) << *i << setw(3) << *j << "  " << pattern << "  ";
-//
-//                        if (pattern == g0_vertex_patterns[0]) { 
-//                            lcount[0]++;
-//                        }
-//                        else if (pattern == g0_vertex_patterns[1]) { 								
-//                            lcount[1]++;
-//                        }
-//                        else if (pattern == g0_vertex_patterns[2]) { 
-//                            lcount[2]++;
-//                        }
-//                        else if (pattern == g0_vertex_patterns[3]) { 
-//                            lcount[3]++;   
-//                        }
-//
-//                        //NOTE: optional part, can be for further bio-graphlets
-//                        pattern = "";
-//                        e = edge(*i, *j, g).first;
-//                        pattern = pattern + g[*i].properties["sse_type"] + g[e].properties["spatial"] + g[*j].properties["sse_type"];
-//
-//                        cout             << pattern << " \n";                           
                         if (print) logFile << pattern << " \n";
                      }                       
                 } 
@@ -1707,18 +1647,18 @@ vector<int> GraphletCounts::get_labeled_abs_counts() {
     return labeled_abs_counts;
 }
 
-vector<int> GraphletCounts::get_labeled_2_countsABS(std::vector<std::string> label_vector) {
+vector<int> GraphletCounts::get_labeled_2_countsABS(std::string label, std::vector<std::string> label_vector) {
     
     std::vector<int> count_vector;
     
     if (size_2_labels == label_vector) {
         
         if (labeled_2_countsABS.empty()) {
-            count_connected_2_graphlets(memberGraph, label_vector);
+            count_connected_2_graphlets(memberGraph, label, label_vector);
         }
             
     } else {
-            count_connected_2_graphlets(memberGraph, label_vector);
+            count_connected_2_graphlets(memberGraph,label, label_vector);
     }
     
     return labeled_2_countsABS;
@@ -1739,4 +1679,18 @@ set<string> GraphletCounts::compute_CAT(string word) {
     }
     
     return words;
+}
+
+vector<vector<int>> GraphletCounts::get_labeled_3_countsABS(std::string label, std::vector<std::vector<std::string>> label_vector) {
+    
+    if (size_3_labels == label_vector) {
+        
+        if (labeled_3_countsABS.empty()) {
+            count_connected_3_graphlets(memberGraph, label, label_vector);
+        }
+    } else {
+        count_connected_3_graphlets(memberGraph, label, label_vector);
+    }
+
+    return labeled_3_countsABS;
 }

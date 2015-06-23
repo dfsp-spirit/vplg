@@ -173,7 +173,7 @@ void newtestclass2::test_count_connected_2_graphlets() {
     
     vector<string> label_vector = vector<string>();
     
-    testVector = counter.count_connected_2_graphlets(testGraph, label_vector);
+    testVector = counter.count_connected_2_graphlets(testGraph, "", label_vector);
     
     CPPUNIT_ASSERT(testVector[0] == 3);
     
@@ -184,12 +184,13 @@ void newtestclass2::test_count_connected_3_graphlets0() {
     
     Graph testGraph = fiveNodesGraph;
     vector<int> testVector = vector<int>();
+    vector<vector<string>> str_vec = vector<vector<string>>();
     
     bd = add_edge(u,v,bi,testGraph).first;
     cd = add_edge(v,w,ci,testGraph).first;
     id = add_edge(u,w,ii,testGraph).first;
     
-    testVector = counter.count_connected_3_graphlets(testGraph, false);
+    testVector = counter.count_connected_3_graphlets(testGraph, "", str_vec);
     
     CPPUNIT_ASSERT(testVector[0] == 1);
 
@@ -201,11 +202,11 @@ void newtestclass2::test_count_connected_3_graphlets1() {
     
     Graph testGraph = fiveNodesGraph;
     vector<int> testVector = vector<int>();
-    
+    vector<vector<string>> str_vec = vector<vector<string>>();
     bd = add_edge(u,v,bi,testGraph).first;
     cd = add_edge(v,w,ci,testGraph).first;
     
-    testVector = counter.count_connected_3_graphlets(testGraph, false);
+    testVector = counter.count_connected_3_graphlets(testGraph, "", str_vec);
     
     CPPUNIT_ASSERT(testVector[1] == 1);
 
@@ -804,8 +805,8 @@ void newtestclass2::test_labeled_counts_2() {
     
     
     
-    counter.count_connected_2_graphlets(testGraph, label_vector);
-    testVector = counter.get_labeled_2_countsABS(label_vector);
+    counter.count_connected_2_graphlets(testGraph, "sse_type", label_vector);
+    testVector = counter.get_labeled_2_countsABS("sse_type", label_vector);
     
     
     
@@ -815,41 +816,79 @@ void newtestclass2::test_labeled_counts_2() {
     
 }
 
+void newtestclass2::test_labeled_counts_3() {
+    
+    Graph testGraph;
+    
+    ti.id = 0;
+    ui.id = 1;
+    vi.id = 2;
+    wi.id = 3;
+    xi.id = 4;
+
+    
+    ti.properties["sse_type"] = "H";
+    ui.properties["sse_type"] = "E";
+    vi.properties["sse_type"] = "E";
+    wi.properties["sse_type"] = "H";
+    xi.properties["sse_type"] = "H";
+    
+    
+    t = add_vertex(ti, testGraph);
+    u = add_vertex(ui, testGraph);
+    v = add_vertex(vi, testGraph);
+    w = add_vertex(wi, testGraph);
+    x = add_vertex(xi, testGraph);
+
+    vector<vector<int>> testVector = vector<vector<int>>();
+    vector<int> test_vector2 = vector<int>();
+    vector<vector<int>> test_vector3 = vector<vector<int>>();
+    test_vector2.push_back(1);
+    test_vector3.push_back(test_vector2);
+    vector<int> test_vector4 = vector<int>();
+    test_vector4.push_back(3);
+    test_vector3.push_back(test_vector4);
+    
+    ai.source = 0;
+    ai.target = 1;
+    bi.source = 1;
+    bi.target = 2;
+    ci.source = 2;
+    ci.target = 3;
+    di.source = 4;
+    di.target = 0;
+    ei.source = 4;
+    ei.target = 1;
+    
+    ad = add_edge(t,u,ai,testGraph).first;
+    bd = add_edge(u,v,bi,testGraph).first;
+    cd = add_edge(v,w,ci,testGraph).first;
+    dd = add_edge(x,t,di,testGraph).first;
+    ed = add_edge(x,u,ei,testGraph).first;
+    
+    vector<string> label_vector = vector<string>();
+    vector<vector<string>> labels = vector<vector<string>>();
+    label_vector.push_back("HHE");
+    labels.push_back(label_vector);
+    label_vector = vector<string>();
+    label_vector.push_back("HEE");
+    labels.push_back(label_vector);
+    
+    
+    counter.count_connected_3_graphlets(testGraph, "sse_type", labels);
+    testVector = counter.get_labeled_3_countsABS("sse_type", labels);
+
+    
+    CPPUNIT_ASSERT(testVector == test_vector3);
+    
+    
+}
 
 
 
 
 
 
-//void newtestclass2::test_labeled_counts4() {
-//    
-//    Graph testGraph = fiveNodesGraph;
-//    vector<int> testVector = vector<int>();
-//    
-//    testVector = counter.get_labeled_abs_counts();
-//    
-//    CPPUNIT_ASSERT(true);
-//}
-//
-//void newtestclass2::test_labeled_counts5() {
-//    
-//    Graph testGraph = fiveNodesGraph;
-//    vector<int> testVector = vector<int>();
-//    
-//    testVector = counter.get_labeled_abs_counts();
-//    
-//    CPPUNIT_ASSERT(true);
-//}
-//
-//void newtestclass2::test_labeled_counts6() {
-//    
-//    Graph testGraph = fiveNodesGraph;
-//    vector<int> testVector = vector<int>();
-//    
-//    testVector = counter.get_labeled_abs_counts();
-//    
-//    CPPUNIT_ASSERT(true);
-//}
 //
 //void newtestclass2::test_labeled_counts7() {
 //    

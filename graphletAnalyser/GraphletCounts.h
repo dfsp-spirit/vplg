@@ -31,12 +31,12 @@ private:
     std::vector<int> graphlet5CountsABS; // counts for 5-graphlets absolute
     
     std::vector<string> size_2_labels;
-    std::vector<std::vector<std::string>> size_3_label_vector;
+    std::vector<std::vector<std::string>> size_3_labels;
     std::vector<std::vector<std::string>> size_4_label_vector;
     
     
     std::vector<int> labeled_2_countsABS; // counts for 2-graphlets absolute
-    std::vector<int> labeled_graphlet3CountsABS; // counts for 3-graphlets absolute
+    std::vector<std::vector<int>> labeled_3_countsABS; // counts for 3-graphlets absolute
     std::vector<int> labeled_graphlet4CountsABS; // counts for 4-graphlets absolute
     std::vector<int> labeled_graphlet5CountsABS; // counts for 5-graphlets absolute
     
@@ -97,11 +97,12 @@ public:
     long getGraphDatabaseID(std::string, std::string, int);
     int testDatabasePGXX();
     
-    std::vector<int> get_labeled_2_countsABS(std::vector<std::string>);
+    std::vector<int> get_labeled_2_countsABS(std::string, std::vector<std::string>);
+    std::vector<vector<int>> get_labeled_3_countsABS(std::string, std::vector<std::vector<std::string>>);
 
     /******* Graphlet Counting Algorithms by N. Shervashidze ********/
-    std::vector<int> count_connected_2_graphlets(Graph&, std::vector<std::string>);
-    std::vector<int> count_connected_3_graphlets(Graph&, bool);
+    std::vector<int> count_connected_2_graphlets(Graph&, std::string, std::vector<std::string>);
+    std::vector<int> count_connected_3_graphlets(Graph&, std::string, std::vector<std::vector<std::string>>);
     std::vector<int> count_connected_4_graphlets(Graph&, bool);
     std::vector<int> count_connected_5_graphlets(Graph&, bool);
 };

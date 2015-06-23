@@ -58,7 +58,7 @@ class newtestclass2 : public CPPUNIT_NS::TestFixture {
     CPPUNIT_TEST(test_normalize_counts);
     
     CPPUNIT_TEST(test_labeled_counts_2);
-    
+    CPPUNIT_TEST(test_labeled_counts_3);
     
     
     
@@ -169,7 +169,7 @@ private:
     
     void test_labeled_counts_2();
 
-//    void test_labeled_counts4();
+    void test_labeled_counts_3();
 //    void test_labeled_counts5();
 //    void test_labeled_counts6();
 //    void test_labeled_counts7();
