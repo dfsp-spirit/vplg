@@ -6,11 +6,28 @@
  */
 
 #include <iostream>
+#include <fstream>
 #include "GMLptglProteinParser.h"
 #include "ProductGraph.h"
 #include "BronKerbosch.h"
 #include "BK_Output.h"
 #include "PG_Output.h"
+
+
+int stringToTextFile(std::string fname, std::string contents) {
+    std::ofstream file;
+    
+    // write to the file
+    file.open(fname.c_str(), std::ios_base::trunc);    
+    if (!file.is_open()) {
+        std::cerr << "ERROR: could not open file '" << fname << "'.\n";
+        return 0;
+    } else {        
+        file << contents;
+        file.close();        
+        return 1;
+    }
+}
 
 /*
  * 
@@ -109,14 +126,30 @@ int main(int argc, char** argv) {
         res.unique();
         std::cout << apptag << "Found " << num_before_filter << " possible vertex mappings. Filtered permutations, " << res.size() << " elements remaining.\n";
         
+        int idx = 0;
         for (std::pair<std::list<int>, std::list<int>> pair : res) {
             fresult << "{ ";
             fresult << " \"first\": " << PG_Output::int_list_to_JSON(pair.first) << ", ";
             fresult << " \"second\": " << PG_Output::int_list_to_JSON(pair.second) << " ";
             fresult << "} \n";
+            
+            std::stringstream ss1;            
+            ss1 << "results_" << idx << "_first.txt";
+            std::string firstMappingsFileName = ss1.str();
+            
+            std::stringstream ss2;            
+            ss2 << "results_" << idx << "_second.txt";
+            std::string secondMappingsFileName = ss2.str();
+
+            
+            stringToTextFile(firstMappingsFileName, PG_Output::int_list_to_plcc_vertex_mapping_string(pair.first));
+            stringToTextFile(secondMappingsFileName, PG_Output::int_list_to_plcc_vertex_mapping_string(pair.second));
+            
+            idx++;
         }
         
         std::cout << fresult.str()<< "\n";
+        
     }
     else {
         //format the output

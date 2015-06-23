@@ -25,6 +25,7 @@ public:
     static std::string get_JSON_vertex_ids_first(const ProductGraph& pg, std::list<unsigned long> clique);
     static std::string get_JSON_vertex_ids_second(const ProductGraph& pg, std::list<unsigned long> clique);
     static std::string int_list_to_JSON(std::list<int> clique);
+    static std::string int_list_to_plcc_vertex_mapping_string(std::list<int> clique);
 private:
     
 };
