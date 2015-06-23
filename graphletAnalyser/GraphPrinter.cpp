@@ -393,3 +393,71 @@ void GraphPrinter::save_absolute_counts_as_matlab_variable(vector<vector<int>> u
         }
     }
 }
+
+
+/* Saves the counts in NOVA format. The last vector of counts is reserved for 
+ * labeled counts. The counts are saved to a file with the suffix
+ * countsNovaFormat.csv. I don't really get why they should be saved this way...
+ * 
+ * @param counts - vector containing the counts
+ * @param withLabeld - b whether labeled counts are part of the vector */
+void GraphPrinter::save_counts_in_nova_format(string graphName, vector<vector<int>> counts, bool withLabeled) {
+    ofstream countsNovaFormatFile;
+    const string countsNovaFormatFileName = output_path + "countsNovaFormat.csv";
+    int pos;
+    int numberOfGraphlets;
+
+
+    countsNovaFormatFile.open(countsNovaFormatFileName.c_str(), std::ios_base::app);    
+    if (!countsNovaFormatFile.is_open()) {
+        cout << apptag << "ERROR: could not open counts file in NOVA format.\n";
+    } else {
+        pos = countsNovaFormatFile.tellp();
+        if (pos == 0) {
+            countsNovaFormatFile << "ID,Group";
+            
+            
+            // in an earlier version, numberOfGraphlets only counted the
+            // size of the vectors
+            
+            numberOfGraphlets = 0;
+            
+            for (auto i : counts) {
+                
+                vector<int> g_counts = i;
+                
+                numberOfGraphlets = g_counts.size();
+
+            }
+
+            for (int i = 1; i <= numberOfGraphlets; i++) {
+                countsNovaFormatFile << ",Graphlet" << i;
+            }        
+            countsNovaFormatFile << "\n";
+        }
+        countsNovaFormatFile << graphName << ",A";             
+       
+        
+        
+        for (auto i : counts) {
+            
+            vector<int> g_counts = i;
+            
+            for (auto k : g_counts) {
+                
+                countsNovaFormatFile << "," << k;
+                
+            }
+        }
+        
+        
+        countsNovaFormatFile << "\n";
+        countsNovaFormatFile.close();
+    
+        if( ! silent) {
+            cout << apptag << "    The counts were added to the \"" << countsNovaFormatFileName << "\".\n"; 
+        }
+    }    
+    
+    
+}

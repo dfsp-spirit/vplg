@@ -42,6 +42,10 @@ public:
     void saveNormalizedGraphletCountsSummary(vector<vector<float>> norm_counts, vector<float> labeled_counts);
     void save_normalized_counts_as_matlab_variable(vector<vector<float>>,vector<float>);
     void save_absolute_counts_as_matlab_variable(vector<vector<int>>,vector<int>);
+    void save_counts_in_nova_format(string,vector<vector<int>>, bool);
+    void save_abs_counts_as_matlab_variable();
+    void save_norm_counts_as_matlab_variable();
+    void save_counts_to_db_PGXX();
 };
 
 #endif	/* GRAPHPRINTER_H */

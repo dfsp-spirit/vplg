@@ -30,11 +30,26 @@ private:
     std::vector<int> graphlet4CountsABS; // counts for 4-graphlets absolute
     std::vector<int> graphlet5CountsABS; // counts for 5-graphlets absolute
     
+    std::vector<string> size_2_labels;
+    std::vector<std::vector<std::string>> size_3_label_vector;
+    std::vector<std::vector<std::string>> size_4_label_vector;
+    
+    
+    std::vector<int> labeled_2_countsABS; // counts for 2-graphlets absolute
+    std::vector<int> labeled_graphlet3CountsABS; // counts for 3-graphlets absolute
+    std::vector<int> labeled_graphlet4CountsABS; // counts for 4-graphlets absolute
+    std::vector<int> labeled_graphlet5CountsABS; // counts for 5-graphlets absolute
+    
+    
     std::vector<float> graphlet2CountsNormalized;  // counts for 2-graphlets - normalized
     std::vector<float> graphlet3CountsNormalized;  // counts for 3-graphlets - normalized
     std::vector<float> graphlet4CountsNormalized;  // counts for 4-graphlets - normailzed
     std::vector<float> graphlet5CountsNormalized;  // counts for 5-graphlets - normalized
     
+    std::vector<float> labeled_graphlet2CountsNormalized;  // counts for 2-graphlets - normalized
+    std::vector<float> labeled_graphlet3CountsNormalized;  // counts for 3-graphlets - normalized
+    std::vector<float> labeled_graphlet4CountsNormalized;  // counts for 4-graphlets - normailzed
+    std::vector<float> labeled_graphlet5CountsNormalized;
     
     std::vector<float> cl;  // counts for labeled graphlets
     std::vector<int> labeled_abs_counts; // absolute counts for labeled graphlets
@@ -59,6 +74,7 @@ private:
     void compute_norm_counts(bool);
     void compute_labeled_abs_counts();
     void compute_labeled_norm_counts();
+    std::set<std::string> compute_CAT(std::string);
     
 
 public:
@@ -73,7 +89,6 @@ public:
     std::vector<float> get_labeled_norm_counts();
     std::vector<int> get_labeled_abs_counts();
     vector<float> normalize_counts(vector<int>,bool);
-    void saveCountsSummary(bool);
     void saveCountsInNovaFormat(bool);
     int saveCountsToDatabasePGXX(bool);
     int databaseContainsGraphletsForGraph(unsigned long int);
@@ -81,9 +96,11 @@ public:
     std::string print_counts(std::vector<int>&, bool);
     long getGraphDatabaseID(std::string, std::string, int);
     int testDatabasePGXX();
+    
+    std::vector<int> get_labeled_2_countsABS(std::vector<std::string>);
 
     /******* Graphlet Counting Algorithms by N. Shervashidze ********/
-    std::vector<int> count_connected_2_graphlets(Graph&, bool);
+    std::vector<int> count_connected_2_graphlets(Graph&, std::vector<std::string>);
     std::vector<int> count_connected_3_graphlets(Graph&, bool);
     std::vector<int> count_connected_4_graphlets(Graph&, bool);
     std::vector<int> count_connected_5_graphlets(Graph&, bool);

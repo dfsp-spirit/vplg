@@ -20,6 +20,16 @@ using namespace std;
 using namespace boost;
 using namespace pqxx;
 
+//-----------------------------------------------------------------------------------------
+
+/* Questions:
+ * Which graphlets shall be considered?  ->  labeled 4-graphlets only refers to 3-path
+ * labeled 3-graphlets referes to all possible graphlets
+ *  */
+
+//-----------------------------------------------------------------------------------------
+
+
 
 GraphletCounts::GraphletCounts() {
     Graph g_tmp;
@@ -53,6 +63,10 @@ GraphletCounts::GraphletCounts() {
     labeled_abs_counts = tmpl1;
     vector<float> tmpl2 (26);
     labeled_norm_counts = tmpl2;
+    
+    
+    
+    
     
     
     int numOrbits = 73;
@@ -166,7 +180,7 @@ GraphletCounts::GraphletCounts(Graph& graph) {
 }
 
 void GraphletCounts::compute_abs_counts(bool withLabeled) {
-    graphlet2CountsABS = count_connected_2_graphlets(memberGraph, withLabeled);
+    graphlet2CountsABS = count_connected_2_graphlets(memberGraph, size_2_labels);
     graphlet3CountsABS = count_connected_3_graphlets(memberGraph, withLabeled);
     graphlet4CountsABS = count_connected_4_graphlets(memberGraph, withLabeled);
     graphlet5CountsABS = count_connected_5_graphlets(memberGraph, withLabeled);
@@ -189,7 +203,7 @@ void GraphletCounts::compute_norm_counts(bool withLabeled) {
 
 void GraphletCounts::compute_labeled_abs_counts() {
     
-    count_connected_2_graphlets(memberGraph, true);
+    count_connected_2_graphlets(memberGraph, size_2_labels);
     count_connected_3_graphlets(memberGraph, true);
     count_connected_4_graphlets(memberGraph, true);
     
@@ -347,47 +361,6 @@ vector<float> GraphletCounts::normalize_counts(vector<int> absCounts, bool withL
 
 
 
-/**
- * Saves graphlet count summary to output_path + "counts.plain".
- */
-void GraphletCounts::saveCountsSummary(bool withLabeled) {
-    ofstream summaryFile;
-    const string summaryFileName = output_path + "counts.plain";
-    
-    if (!all_counts_computed) {
-        compute_all_counts();
-    }
-
-    summaryFile.open(summaryFileName.c_str(), std::ios_base::app);
-    if (!summaryFile.is_open()) {
-        cout << apptag << "ERROR: could not open summary file at '" << summaryFileName << "'.\n";
-    } else {
-        summaryFile << graphName;
-        
-
-
-        summaryFile << setw(6) << "[g3] " << setiosflags(ios::fixed) << setprecision(4) << graphlet3CountsNormalized[0];
-        for (int i = 1; i < graphlet3CountsNormalized.size(); i++) summaryFile << ", " << setiosflags(ios::fixed) << setprecision(4) << graphlet3CountsNormalized[i];
-        
-        summaryFile << setw(6) << "[g4] " << setiosflags(ios::fixed) << setprecision(4) << graphlet4CountsNormalized[0];
-        for (int i = 1; i < graphlet4CountsNormalized.size(); i++) summaryFile << ", " << setiosflags(ios::fixed) << setprecision(4) << graphlet4CountsNormalized[i];
-        
-        summaryFile << setw(6) << "[g5] " << setiosflags(ios::fixed) << setprecision(4) << graphlet5CountsNormalized[0];
-        for (int i = 1; i < graphlet5CountsNormalized.size(); i++) summaryFile << ", " << setiosflags(ios::fixed) << setprecision(4) << graphlet5CountsNormalized[i];
-        
-        if (withLabeled) {
-            summaryFile << setw(10) << " [labeled] " << setiosflags(ios::fixed) << setprecision(4) << cl[0];
-            for (int i = 1; i < cl.size(); i++) summaryFile << ", " << setiosflags(ios::fixed) << setprecision(4) << cl[i];
-        }
-
-        summaryFile << "\n\n";
-        summaryFile.close();
-        
-        if( ! silent) {
-            cout << apptag << "    The summary over all computed counts is in \"" << summaryFileName << "\".\n";
-        }
-    }
-}
 
 int GraphletCounts::testDatabasePGXX() {
 
@@ -985,11 +958,13 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
  * @return a vector of graphlet counts (how often each graphlet was found)
  */
 
-vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g, bool withLabeled) { 
+vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g, vector<string> label_vector) { 
     vector<float> c2;
     c2 = vector<float>(1);   // The only 2-graphlet is a path of length 1 (one edge).
     float count[] = { 0.0 };
     float w[]     = { 1/2.0 };  // each edge will be found twice (from both vertices it connects))
+    
+    
     
     memberGraph = g;
     abs_counts_computed = false;
@@ -997,8 +972,8 @@ vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g, bool withLabel
     labeled_norm_counts_computed = false;
     labeled_abs_counts_computed = false;
     all_counts_computed = false;
-    
-    
+    size_2_labels = label_vector;
+    labeled_2_countsABS = vector<int>(label_vector.size());
     
     
     
@@ -1039,33 +1014,53 @@ vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g, bool withLabel
                     count[0]++;
                     if (print) logFile << "-------------------> g0\n";
 
-                    if (withLabeled) {                           
+                    if (!label_vector.empty()) {                           
                         pattern = "";
                         pattern = pattern + g[*i].properties["sse_type"] + g[*j].properties["sse_type"];
 
-                        //---------------- g0-patterns (a single edge, 2 vertices) -----------------
-                        //cout             << setw(3)  << *i << setw(3) << *j << setw(3) << *k << "  " << pattern << "  ";                           
-                        if (print) logFile << setw(26) << *i << setw(3) << *j << "  " << pattern << "  ";
-
-                        if (pattern == g0_vertex_patterns[0]) { 
-                            lcount[0]++;
+  
+                        for (int i = 0; i < label_vector.size(); i++) {
+                            
+                            std::set<string> cats = compute_CAT(label_vector[i]);
+                            
+                            for (auto k : cats) {
+                                
+                                
+                                if (pattern.compare(k) == 0) {
+                                    labeled_2_countsABS[i] += 1;
+                                    
+                                }
+                                
+                            }
+                            
+                            
+                            
                         }
-                        else if (pattern == g0_vertex_patterns[1]) { 								
-                            lcount[1]++;
-                        }
-                        else if (pattern == g0_vertex_patterns[2]) { 
-                            lcount[2]++;
-                        }
-                        else if (pattern == g0_vertex_patterns[3]) { 
-                            lcount[3]++;   
-                        }
-
-                        //NOTE: optional part, can be for further bio-graphlets
-                        pattern = "";
-                        e = edge(*i, *j, g).first;
-                        pattern = pattern + g[*i].properties["sse_type"] + g[e].properties["spatial"] + g[*j].properties["sse_type"];
-
-                        cout             << pattern << " \n";                           
+                        
+                        
+                        
+                        
+                        //if (print) logFile << setw(26) << *i << setw(3) << *j << "  " << pattern << "  ";
+//
+//                        if (pattern == g0_vertex_patterns[0]) { 
+//                            lcount[0]++;
+//                        }
+//                        else if (pattern == g0_vertex_patterns[1]) { 								
+//                            lcount[1]++;
+//                        }
+//                        else if (pattern == g0_vertex_patterns[2]) { 
+//                            lcount[2]++;
+//                        }
+//                        else if (pattern == g0_vertex_patterns[3]) { 
+//                            lcount[3]++;   
+//                        }
+//
+//                        //NOTE: optional part, can be for further bio-graphlets
+//                        pattern = "";
+//                        e = edge(*i, *j, g).first;
+//                        pattern = pattern + g[*i].properties["sse_type"] + g[e].properties["spatial"] + g[*j].properties["sse_type"];
+//
+//                        cout             << pattern << " \n";                           
                         if (print) logFile << pattern << " \n";
                      }                       
                 } 
@@ -1077,10 +1072,11 @@ vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g, bool withLabel
     
     
 
-    if (withLabeled) {
+    if (!label_vector.empty()) {
         for (int i = 0; i < numelem; i++) {
             cl[i] = lcount[i] * lw[i];
             labeled_abs_counts[i] = int (floor (cl[i]));
+            labeled_2_countsABS[i] = labeled_2_countsABS[i]/2;
         }
     }
     
@@ -1709,4 +1705,38 @@ vector<int> GraphletCounts::get_labeled_abs_counts() {
     if (!labeled_abs_counts_computed) {compute_abs_counts(true);}
     
     return labeled_abs_counts;
+}
+
+vector<int> GraphletCounts::get_labeled_2_countsABS(std::vector<std::string> label_vector) {
+    
+    std::vector<int> count_vector;
+    
+    if (size_2_labels == label_vector) {
+        
+        if (labeled_2_countsABS.empty()) {
+            count_connected_2_graphlets(memberGraph, label_vector);
+        }
+            
+    } else {
+            count_connected_2_graphlets(memberGraph, label_vector);
+    }
+    
+    return labeled_2_countsABS;
+    
+}
+
+/* Finds all cyclic permutations for a given word */
+set<string> GraphletCounts::compute_CAT(string word) {
+    
+    std::set<std::string> words = std::set<std::string>();
+    string word2 = word + word;
+    string cat_word = "";
+    
+    for (int i = 0; i < word.size(); i++) {
+        cat_word = word2.substr (i, word.size());
+                
+        words.insert(cat_word);
+    }
+    
+    return words;
 }
