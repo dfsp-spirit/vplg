@@ -19,7 +19,7 @@ using namespace std;
 using namespace boost;
 
 int verbose = 0;
-int silent = 0;
+int silent = 1;
 int inputFilesAsList = 0;
 //int useDatabase = 0;
 //int saveGraphletDetails = 0;

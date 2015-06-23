@@ -32,6 +32,7 @@ int main(int argc, char** argv) {
         std::cout << apptag << "Output parameters:\n";
         std::cout << apptag << "\t-a     : Output all cliques (default)\n";
         std::cout << apptag << "\t-l     : Output only largest cliques\n";
+        std::cout << apptag << "\t-f     : Filter permutations for STDOUT, i.e., print unique cliques only.\n";
         std::cout << apptag << "\t-s <n> : Output only cliques with minimum size <n> vertices.\n";        
         std::cout << apptag << "Example call: " << argv[0] << " example1.gml example2.gml -s 8\n";
         std::cout << apptag << "  This will output all cliques larger than 8 vertices.\n";
@@ -78,8 +79,18 @@ int main(int argc, char** argv) {
     
     
     int filter_permutations = 0; // TODO: get from settings. requires a settings objects and better command line parsing in the first place.
+    if (argc >= 4) {
+        if ((strcmp(argv[3],"-f") == 0) || (strcmp(argv[3],"-F") == 0) ) {
+            filter_permutations = 1;
+        }
+    }
     if (argc >= 5) {
         if ((strcmp(argv[4],"-f") == 0) || (strcmp(argv[4],"-F") == 0) ) {
+            filter_permutations = 1;
+        }
+    }
+    if (argc >= 6) {
+        if ((strcmp(argv[5],"-f") == 0) || (strcmp(argv[5],"-F") == 0) ) {
             filter_permutations = 1;
         }
     }
@@ -96,7 +107,7 @@ int main(int argc, char** argv) {
         int num_before_filter = res.size();
         res.sort();
         res.unique();
-        std::cout << "Found " << num_before_filter << " possible vertex mappings. Filtered permutations, " << res.size() << " elements remaining.\n";
+        std::cout << apptag << "Found " << num_before_filter << " possible vertex mappings. Filtered permutations, " << res.size() << " elements remaining.\n";
         
         for (std::pair<std::list<int>, std::list<int>> pair : res) {
             fresult << "{ ";
