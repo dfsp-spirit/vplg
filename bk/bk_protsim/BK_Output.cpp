@@ -79,6 +79,8 @@ std::list< std::list<unsigned long>> BK_Output::get_result_largest( const BronKe
      return list;
 }
 
+
+
 /*
  * Returns a list of all Cliques larger than the given integer. Each Clique is a inner list of vertex indices.
  * The indices are indices to vertices in the boost::adjacency_list graph that was passed to the BronKerbosch object.
