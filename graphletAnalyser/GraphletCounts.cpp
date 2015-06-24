@@ -20,14 +20,7 @@ using namespace std;
 using namespace boost;
 using namespace pqxx;
 
-//-----------------------------------------------------------------------------------------
 
-/* Questions:
- * Which graphlets shall be considered?  ->  labeled 4-graphlets only refers to 3-path
- * labeled 3-graphlets referes to all possible graphlets
- *  */
-
-//-----------------------------------------------------------------------------------------
 
 
 

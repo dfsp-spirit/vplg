@@ -35,10 +35,10 @@ private:
     std::vector<std::vector<std::string>> size_4_labels;
     
     
-    std::vector<int> labeled_2_countsABS; // counts for 2-graphlets absolute
-    std::vector<std::vector<int>> labeled_3_countsABS; // counts for 3-graphlets absolute
-    std::vector<std::vector<int>> labeled_4_countsABS; // counts for 4-graphlets absolute
-    std::vector<int> labeled_graphlet5CountsABS; // counts for 5-graphlets absolute
+    std::vector<int> labeled_2_countsABS; // counts for labeled 2-graphlets absolute
+    std::vector<std::vector<int>> labeled_3_countsABS; // counts for labeled 3-graphlets absolute
+    std::vector<std::vector<int>> labeled_4_countsABS; // counts for labeled 4-graphlets absolute
+    std::vector<int> labeled_graphlet5CountsABS; // counts for labeled 5-graphlets absolute NOT SUPPORTED YET
     
     
     std::vector<float> graphlet2CountsNormalized;  // counts for 2-graphlets - normalized

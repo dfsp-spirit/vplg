@@ -467,6 +467,21 @@ void GraphPrinter::save_counts_in_nova_format(string graphName, vector<vector<in
  * @param <vector> vec - a vector of integers */
 std::string GraphPrinter::printIntVectorAsJSON(std::vector<int> vec) {
     
+    std::string str_vector = "[";
     
+    for (int i = 0; i < vec.size(); i++) {
+        
+        str_vector = str_vector + std::to_string(vec[i]);
+        
+        if (i != (vec.size() - 1)) {
+            str_vector = str_vector + ",";
+        }
+        
+    }
+    
+    str_vector.append("]");
+    
+    
+    return str_vector;
     
 }
