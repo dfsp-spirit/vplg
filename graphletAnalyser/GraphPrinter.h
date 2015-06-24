@@ -46,6 +46,7 @@ public:
     void save_abs_counts_as_matlab_variable();
     void save_norm_counts_as_matlab_variable();
     void save_counts_to_db_PGXX();
+    std::string printIntVectorAsJSON(std::vector<int>);
 };
 
 #endif	/* GRAPHPRINTER_H */

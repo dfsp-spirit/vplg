@@ -461,3 +461,12 @@ void GraphPrinter::save_counts_in_nova_format(string graphName, vector<vector<in
     
     
 }
+
+
+/* Print any vector of integers to a string in JSON format
+ * @param <vector> vec - a vector of integers */
+std::string GraphPrinter::printIntVectorAsJSON(std::vector<int> vec) {
+    
+    
+    
+}

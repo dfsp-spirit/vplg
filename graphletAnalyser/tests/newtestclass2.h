@@ -60,6 +60,7 @@ class newtestclass2 : public CPPUNIT_NS::TestFixture {
     CPPUNIT_TEST(test_labeled_counts_2);
     CPPUNIT_TEST(test_labeled_counts_3);
     CPPUNIT_TEST(test_labeled_counts_31);
+    CPPUNIT_TEST(test_labeled_counts_4);
     
     
     
@@ -151,28 +152,8 @@ private:
 
     void test_labeled_counts_3();
     void test_labeled_counts_31();
-//    void test_labeled_counts5();
-//    void test_labeled_counts6();
-//    void test_labeled_counts7();
-//    void test_labeled_counts8();
-//    void test_labeled_counts9();
-//    void test_labeled_counts10();
-//    void test_labeled_counts11();
-//    void test_labeled_counts12();
-//    void test_labeled_counts13();
-//    void test_labeled_counts14();
-//    void test_labeled_counts15();
-//    void test_labeled_counts16();
-//    void test_labeled_counts17();
-//    void test_labeled_counts18();
-//    void test_labeled_counts19();
-//    void test_labeled_counts20();
-//    void test_labeled_counts21();
-//    void test_labeled_counts22();
-//    void test_labeled_counts23();
-//    void test_labeled_counts24();
-//    void test_labeled_counts25();
-    
+    void test_labeled_counts_4();
+
     
     
 };

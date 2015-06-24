@@ -28,7 +28,6 @@
       <itemPath>GraphPrinter.cpp</itemPath>
       <itemPath>GraphService.cpp</itemPath>
       <itemPath>GraphletCounts.cpp</itemPath>
-      <itemPath>ProteinGraph.cpp</itemPath>
       <itemPath>ProteinGraphService.cpp</itemPath>
       <itemPath>main.cpp</itemPath>
     </logicalFolder>
@@ -130,8 +129,6 @@
       <item path="GraphletCounts.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="GraphletCounts.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="ProteinGraph.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ProteinGraphService.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -273,8 +270,6 @@
       <item path="GraphletCounts.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="GraphletCounts.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="ProteinGraph.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="ProteinGraphService.cpp" ex="false" tool="1" flavor2="0">
       </item>

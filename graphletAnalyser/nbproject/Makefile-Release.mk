@@ -41,7 +41,6 @@ OBJECTFILES= \
 	${OBJECTDIR}/GraphPrinter.o \
 	${OBJECTDIR}/GraphService.o \
 	${OBJECTDIR}/GraphletCounts.o \
-	${OBJECTDIR}/ProteinGraph.o \
 	${OBJECTDIR}/ProteinGraphService.o \
 	${OBJECTDIR}/main.o
 
@@ -107,11 +106,6 @@ ${OBJECTDIR}/GraphletCounts.o: GraphletCounts.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GraphletCounts.o GraphletCounts.cpp
-
-${OBJECTDIR}/ProteinGraph.o: ProteinGraph.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ProteinGraph.o ProteinGraph.cpp
 
 ${OBJECTDIR}/ProteinGraphService.o: ProteinGraphService.cpp 
 	${MKDIR} -p ${OBJECTDIR}
@@ -253,19 +247,6 @@ ${OBJECTDIR}/GraphletCounts_nomain.o: ${OBJECTDIR}/GraphletCounts.o GraphletCoun
 	    $(COMPILE.cc) -O2 -Werror -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GraphletCounts_nomain.o GraphletCounts.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/GraphletCounts.o ${OBJECTDIR}/GraphletCounts_nomain.o;\
-	fi
-
-${OBJECTDIR}/ProteinGraph_nomain.o: ${OBJECTDIR}/ProteinGraph.o ProteinGraph.cpp 
-	${MKDIR} -p ${OBJECTDIR}
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/ProteinGraph.o`; \
-	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
-	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
-	then  \
-	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -O2 -Werror -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ProteinGraph_nomain.o ProteinGraph.cpp;\
-	else  \
-	    ${CP} ${OBJECTDIR}/ProteinGraph.o ${OBJECTDIR}/ProteinGraph_nomain.o;\
 	fi
 
 ${OBJECTDIR}/ProteinGraphService_nomain.o: ${OBJECTDIR}/ProteinGraphService.o ProteinGraphService.cpp 

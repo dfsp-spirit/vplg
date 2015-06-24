@@ -182,7 +182,7 @@ GraphletCounts::GraphletCounts(Graph& graph) {
 void GraphletCounts::compute_abs_counts(bool withLabeled) {
     graphlet2CountsABS = count_connected_2_graphlets(memberGraph, "", size_2_labels);
     graphlet3CountsABS = count_connected_3_graphlets(memberGraph,"", size_3_labels);
-    graphlet4CountsABS = count_connected_4_graphlets(memberGraph, withLabeled);
+    graphlet4CountsABS = count_connected_4_graphlets(memberGraph, "", size_4_labels);
     graphlet5CountsABS = count_connected_5_graphlets(memberGraph, withLabeled);
     
     abs_counts_computed = true;
@@ -205,7 +205,7 @@ void GraphletCounts::compute_labeled_abs_counts() {
     
     count_connected_2_graphlets(memberGraph,"", size_2_labels);
     count_connected_3_graphlets(memberGraph,"", size_3_labels);
-    count_connected_4_graphlets(memberGraph, true);
+    count_connected_4_graphlets(memberGraph, "", size_4_labels);
     
     
     labeled_abs_counts[24] = 0;
@@ -309,7 +309,7 @@ vector<float> GraphletCounts::normalize_counts(vector<int> absCounts, bool withL
         float total = 0;
         
         graphlet3CountsABS = count_connected_3_graphlets(memberGraph, "", size_3_labels);
-        graphlet4CountsABS = count_connected_4_graphlets(memberGraph, withLabeled);
+        graphlet4CountsABS = count_connected_4_graphlets(memberGraph, "", size_4_labels);
         graphlet5CountsABS = count_connected_5_graphlets(memberGraph, withLabeled);
         
         
@@ -730,8 +730,10 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
 /**
  * Graphlet counting algorithm for connected 3-graphlets by N. Shervashidze, implementation by Tatiana.
  * Extensions for labeled graphlet and bio-graphlets by Tatiana.
- * @param g the input graph
- * @param withLabeled whether to count labeled graphlets as well
+ * Revised for support of more labeled graphlets by ben.
+ * @param <Graph> g - the input graph
+ * @param <string> label - the property under which the labels are stored
+ * @param <vector<string>> label_vector - vector containing the labels to look for
  * @return a vector of graphlet counts (how often each graphlet was found)
  */
  vector<int> GraphletCounts::count_connected_3_graphlets(Graph& g, std::string label, std::vector<std::vector<string>> labelVector) { 
@@ -934,8 +936,10 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
 /**
  * Graphlet counting algorithm for the connected 2-graphlet, implementation by Tim.
  * Extensions for labeled graphlet and bio-graphlets by Tim.
- * @param g the input graph
- * @param withLabeled whether to count labeled graphlets as well
+ * Revised for support of more labeled graphlets by ben.
+ * @param <Graph>g the input graph
+ * @param <string> label - the property in which the labels of the label_vector are stored
+ * @param <vector<string>> label_vector - vector, containing the labels to look for
  * @return a vector of graphlet counts (how often each graphlet was found)
  */
 
@@ -1051,11 +1055,13 @@ vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g,std::string lab
 /**
  * Graphlet counting algorithm for connected 4-graphlets by N. Shervashidze, implementation by Tatiana.
  * Extensions for labeled graphlet and bio-graphlets by Tatiana.
+ * Revised by ben.
  * @param g the input graph
- * @param withLabeled whether to count labeled graphlets as well
+ * @param <string> label - the property in which the labels of the label_vector are stored
+ * @param <vector<string>> label_vector - vector, containing the labels to look for
  * @return a vector of graphlet counts (how often each graphlet was found)
  */
-vector<int> GraphletCounts::count_connected_4_graphlets(Graph& g, bool withLabeled) {    
+vector<int> GraphletCounts::count_connected_4_graphlets(Graph& g, std::string label, std::vector<std::vector<std::string>> label_vector) {    
     
     
 
@@ -1066,6 +1072,7 @@ vector<int> GraphletCounts::count_connected_4_graphlets(Graph& g, bool withLabel
     labeled_norm_counts_computed = false;
     labeled_abs_counts_computed = false;
     all_counts_computed = false;
+    size_4_labels = label_vector;
     
     
     print = false; // printing might disturb tests
@@ -1106,6 +1113,20 @@ vector<int> GraphletCounts::count_connected_4_graphlets(Graph& g, bool withLabel
      *   lcount[0..9] := g6_vertex_patterns[0..5]
      *   lcount[10]   := g6_bio_patterns[0]
      */
+    
+    
+    std::vector<std::string> pathlabels = label_vector[5];
+    std::vector<std::set<std::string>>  mirrored_labels = std::vector<std::set<std::string>>();
+    std::set<std::string> mir = std::set<std::string>();
+    
+    for (int i = 0; i < pathlabels.size(); i++) {
+        
+        mir = reverse_string(pathlabels[i]);
+        mirrored_labels.push_back(mir);
+        
+    }
+    
+    
     
     if (print) logFile << "Iterations for 4-graphlet counting:\n";
     VertexIterator    i, i_last;
@@ -1152,33 +1173,33 @@ vector<int> GraphletCounts::count_connected_4_graphlets(Graph& g, bool withLabel
                                     count[5]++;
                                     if (print) logFile << "--------------------------> g6\n";
                                         
-                                    if (withLabeled) {
+                                    if (!label_vector.empty()) {
                                         pattern = "";
-                                        pattern = pattern + g[*i].properties["sse_type"] + g[*j].properties["sse_type"] + g[*k].properties["sse_type"] + g[*l].properties["sse_type"];
+                                        pattern = pattern + g[*i].properties[label] + g[*j].properties[label] + g[*k].properties[label] + g[*l].properties[label];
+                                        
+                                        std::set<std::string> mirl; 
+                                        
+                                        for (int i = 0; i < mirrored_labels.size(); i++) {
+                                            
+                                            mirl = mirrored_labels[i];
+                                            
+                                            for (auto k : mirl) {
+                                                
+                                                if (pattern.compare(k) == 0) {
+                                                    labeled_4_countsABS[5][i] +=1;
+                                                }
+                                            }
+                                            
+                                        }
 
-                                        //cout               << setw(3)  << *i << setw(3) << *j 
-                                        //                   << setw(3)  << *k << setw(3) << *l << "  " << pattern << "  ";                         
-                                        if (print) logFile << setw(32) << *i << setw(3) << *j 
-                                                           << setw(3)  << *k << setw(3) << *l << "  " << pattern << "  ";
-
-                                        if      (pattern == g6_vertex_patterns[0]) lcount[0]++;
-                                        else if (pattern == g6_vertex_patterns[1]) lcount[1]++;
-                                        else if (pattern == g6_vertex_patterns[2]) lcount[2]++;
-                                        else if (pattern == g6_vertex_patterns[3]) lcount[3]++;
-                                        else if (pattern == g6_vertex_patterns[4]) lcount[4]++;
-                                        else if (pattern == g6_vertex_patterns[5]) lcount[5]++;
-                                        else if (pattern == g6_vertex_patterns[6]) lcount[6]++;
-                                        else if (pattern == g6_vertex_patterns[7]) lcount[7]++;
-                                        else if (pattern == g6_vertex_patterns[8]) lcount[8]++;
-                                        else if (pattern == g6_vertex_patterns[9]) lcount[9]++;
 
                                         pattern = "";
                                         e = edge(*i, *j, g).first;
-                                        pattern = pattern + g[*i].properties["sse_type"] + g[e].properties["spatial"];
+                                        pattern = pattern + g[*i].properties[label] + g[e].properties["spatial"];
                                         e = edge(*j, *k, g).first;
-                                        pattern = pattern + g[*j].properties["sse_type"] + g[e].properties["spatial"];
+                                        pattern = pattern + g[*j].properties[label] + g[e].properties["spatial"];
                                         e = edge(*k, *l, g).first;
-                                        pattern = pattern + g[*k].properties["sse_type"] + g[e].properties["spatial"] + g[*l].properties["sse_type"];
+                                        pattern = pattern + g[*k].properties[label] + g[e].properties["spatial"] + g[*l].properties[label];
 
                                         if (((*i - *l) == 1) && ((*l - *k) == 1) && ((*k - *j) == 1) && (pattern == g6_bio_patterns[0])) {
                                             lcount[10]++;
@@ -1233,7 +1254,7 @@ vector<int> GraphletCounts::count_connected_4_graphlets(Graph& g, bool withLabel
         c4[i] = count[i] * w[i];;
     }
 
-    if (withLabeled) {
+    if (!label_vector.empty()) {
         for (int i = 0; i < 10; i++) {
             cl[i + 10] = lcount[i] * lw[i];
             labeled_abs_counts[i+10] = int (floor(cl[i+10]));
@@ -1707,6 +1728,22 @@ vector<vector<int>> GraphletCounts::get_labeled_3_countsABS(std::string label, s
 
     return labeled_3_countsABS;
 }
+
+vector<vector<int>> GraphletCounts::get_labeled_4_countsABS(std::string label, std::vector<std::vector<std::string>> label_vector) {
+    
+    if (size_4_labels == label_vector) {
+        
+        if (labeled_4_countsABS.empty()) {
+            count_connected_3_graphlets(memberGraph, label, label_vector);
+        }
+    } else {
+        count_connected_3_graphlets(memberGraph, label, label_vector);
+    }
+
+    return labeled_4_countsABS;
+}
+
+
 
 std::set<std::string> GraphletCounts::reverse_string(std::string word) {
     
