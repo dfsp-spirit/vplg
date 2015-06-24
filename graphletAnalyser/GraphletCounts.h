@@ -75,6 +75,7 @@ private:
     void compute_labeled_abs_counts();
     void compute_labeled_norm_counts();
     std::set<std::string> compute_CAT(std::string);
+    std::set<std::string> reverse_string(std::string);
     
 
 public:

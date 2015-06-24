@@ -885,7 +885,82 @@ void newtestclass2::test_labeled_counts_3() {
 }
 
 
+void newtestclass2::test_labeled_counts_31() {
+    
+    Graph testGraph;
+    
+    ti.id = 0;
+    ui.id = 1;
+    vi.id = 2;
+    wi.id = 3;
+    xi.id = 4;
 
+    
+    ti.properties["sse_type"] = "H";
+    ui.properties["sse_type"] = "E";
+    vi.properties["sse_type"] = "E";
+    wi.properties["sse_type"] = "E";
+    xi.properties["sse_type"] = "E";
+    
+    
+    t = add_vertex(ti, testGraph);
+    u = add_vertex(ui, testGraph);
+    v = add_vertex(vi, testGraph);
+    w = add_vertex(wi, testGraph);
+    x = add_vertex(xi, testGraph);
+
+    vector<vector<int>> testVector = vector<vector<int>>();
+    vector<int> test_vector2 = vector<int>();
+    vector<vector<int>> test_vector3 = vector<vector<int>>();
+    test_vector3.push_back(test_vector2);
+    vector<int> test_vector4 = vector<int>();
+    test_vector4.push_back(2);
+    test_vector4.push_back(2);
+    test_vector3.push_back(test_vector4);
+    
+    ai.source = 0;
+    ai.target = 1;
+    bi.source = 1;
+    bi.target = 2;
+    ci.source = 2;
+    ci.target = 3;
+    di.source = 4;
+    di.target = 0;
+    ei.source = 4;
+    ei.target = 3;
+    
+    ad = add_edge(t,u,ai,testGraph).first;
+    bd = add_edge(u,v,bi,testGraph).first;
+    cd = add_edge(v,w,ci,testGraph).first;
+    dd = add_edge(x,t,di,testGraph).first;
+    ed = add_edge(x,w,ei,testGraph).first;
+    
+    vector<string> label_vector = vector<string>();
+    vector<vector<string>> labels = vector<vector<string>>();
+    labels.push_back(label_vector);
+    label_vector.push_back("HEE");
+    label_vector.push_back("EEE");
+    labels.push_back(label_vector);
+    
+    
+    counter.count_connected_3_graphlets(testGraph, "sse_type", labels);
+    testVector = counter.get_labeled_3_countsABS("sse_type", labels);
+    
+//    for (int i = 0; i<testVector.size();i++) {
+//        
+//        vector<int> vec = testVector[i];
+//        for (int k = 0; k < vec.size();k++) {
+//            
+//            cout << "At pos. " << i << " in vector" << " and " << k << "in inside vector, found " << testVector[i][k] << endl; 
+//        }
+//        
+//    }
+
+    
+    CPPUNIT_ASSERT(testVector == test_vector3);
+    
+    
+}
 
 
 

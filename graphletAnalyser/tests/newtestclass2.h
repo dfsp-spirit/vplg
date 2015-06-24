@@ -59,32 +59,12 @@ class newtestclass2 : public CPPUNIT_NS::TestFixture {
     
     CPPUNIT_TEST(test_labeled_counts_2);
     CPPUNIT_TEST(test_labeled_counts_3);
+    CPPUNIT_TEST(test_labeled_counts_31);
     
     
     
     
-//    CPPUNIT_TEST(test_labeled_counts4);
-//    CPPUNIT_TEST(test_labeled_counts5);
-//    CPPUNIT_TEST(test_labeled_counts6);
-//    CPPUNIT_TEST(test_labeled_counts7);
-//    CPPUNIT_TEST(test_labeled_counts8);
-//    CPPUNIT_TEST(test_labeled_counts8);
-//    CPPUNIT_TEST(test_labeled_counts10);
-//    CPPUNIT_TEST(test_labeled_counts11);
-//    CPPUNIT_TEST(test_labeled_counts12);
-//    CPPUNIT_TEST(test_labeled_counts13);
-//    CPPUNIT_TEST(test_labeled_counts14);
-//    CPPUNIT_TEST(test_labeled_counts15);
-//    CPPUNIT_TEST(test_labeled_counts16);
-//    CPPUNIT_TEST(test_labeled_counts17);
-//    CPPUNIT_TEST(test_labeled_counts18);
-//    CPPUNIT_TEST(test_labeled_counts19);
-//    CPPUNIT_TEST(test_labeled_counts20);
-//    CPPUNIT_TEST(test_labeled_counts21);
-//    CPPUNIT_TEST(test_labeled_counts22);
-//    CPPUNIT_TEST(test_labeled_counts23);
-//    CPPUNIT_TEST(test_labeled_counts24);
-//    CPPUNIT_TEST(test_labeled_counts25);
+
     
     
     CPPUNIT_TEST_SUITE_END();
@@ -170,6 +150,7 @@ private:
     void test_labeled_counts_2();
 
     void test_labeled_counts_3();
+    void test_labeled_counts_31();
 //    void test_labeled_counts5();
 //    void test_labeled_counts6();
 //    void test_labeled_counts7();

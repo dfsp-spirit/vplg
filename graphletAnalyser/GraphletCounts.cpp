@@ -776,6 +776,14 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
         
     }
     
+    std::vector<std::string> triangle_labels;
+    std::vector<std::string> path_labels;
+    
+    
+    if (!labelVector.empty()) {
+        triangle_labels = labelVector[0];
+        path_labels = labelVector[1];
+    }
     
 	
 	int printDetails = 0; // might disturb tests, therefore set to zero
@@ -807,11 +815,11 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
                             pattern = "";
                             pattern = pattern + g[*i].properties[label] + g[*j].properties[label] + g[*k].properties[label];
                             
-                            std::vector<std::string> labels = labelVector[0];
                             
-                            for (int i = 0; i < labels.size(); i++) {
+                            
+                            for (int i = 0; i < triangle_labels.size(); i++) {
                                 
-                                std::set<std::string> cats = compute_CAT(labels[i]);
+                                std::set<std::string> cats = compute_CAT(triangle_labels[i]);
                                 
                                 for (auto k : cats) {
                                     
@@ -843,13 +851,13 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
                             pattern = "";
                             pattern = pattern + g[*i].properties[label] + g[*j].properties[label] + g[*k].properties[label];
                             
-                            std::vector<string> path_labels = labelVector[1];
+                            ;
                             
                             for (int i = 0; i < path_labels.size(); i++) {
                                 
-                                std::set<std::string> cats = compute_CAT(path_labels[i]);
+                                std::set<std::string> words = reverse_string(path_labels[i]);
                                 
-                                for (auto k : cats) {
+                                for (auto k : words) {
                                     
                                     if (pattern.compare(k) == 0) {
                                         
@@ -868,29 +876,34 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
     c3[0] = count[0] * w[0];
     c3[1] = count[1] * w[1];
     
-    
-
+    vector<int> vec0 = vector<int>();
+    vector<int> vec1 = vector<int>();
     if (!labelVector.empty()) {
-        for (int i = 0; i < 10; i++) {
-            cl[i] = lcount[i] * lw[i];
-            labeled_abs_counts[i] = int (floor (cl[i]));
-        }
-        cl[20] = lcount[10] * lw[10];
-        cl[21] = lcount[11] * lw[11];
+//        for (int i = 0; i < 10; i++) {
+//            cl[i] = lcount[i] * lw[i];
+//            labeled_abs_counts[i] = int (floor (cl[i]));
+//        }
+//        cl[20] = lcount[10] * lw[10];
+//        cl[21] = lcount[11] * lw[11];
+//        
+//        labeled_abs_counts[20] = int (floor (cl[20]));
+//        labeled_abs_counts[21] = int (floor (cl[21]));
+//        
         
-        labeled_abs_counts[20] = int (floor (cl[20]));
-        labeled_abs_counts[21] = int (floor (cl[21]));
-        
+        // pushing the computed values into the vector
         for (int i = 0; i<labeled_3_counts_float[0].size(); i++) {
-            vector<int> vec = vector<int>();
-            vec.push_back(int (floor (labeled_3_counts_float[0][i])));
-            labeled_3_countsABS.push_back(vec);
+            vec0.push_back(int (floor (labeled_3_counts_float[0][i])));
         }
+        
+        labeled_3_countsABS.push_back(vec0);
+        
         for (int i = 0; i<labeled_3_counts_float[1].size(); i++) {
-            vector<int> vec = vector<int>();
-            vec.push_back(int (floor (labeled_3_counts_float[1][i])));
-            labeled_3_countsABS.push_back(vec);
+            
+            vec1.push_back(int (floor (labeled_3_counts_float[1][i])));
+            
         }
+        
+        labeled_3_countsABS.push_back(vec1);
 
     }
     
@@ -1693,4 +1706,20 @@ vector<vector<int>> GraphletCounts::get_labeled_3_countsABS(std::string label, s
     }
 
     return labeled_3_countsABS;
+}
+
+std::set<std::string> GraphletCounts::reverse_string(std::string word) {
+    
+    std::set<std::string> words = std::set<std::string>();
+    words.insert(word);
+    std::string word2 = "";
+    
+   
+    
+    for (auto i = word.rbegin(); i != word.rend(); ++i) {
+        word2 = word2 + *i;
+    }
+    words.insert(word2);
+    return words;
+    
 }
