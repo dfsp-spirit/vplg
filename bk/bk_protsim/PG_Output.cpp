@@ -94,11 +94,11 @@ std::string PG_Output::int_list_to_JSON(std::list<int> clique){
     return sstream.str();
 }
 
-std::string PG_Output::int_list_to_plcc_vertex_mapping_string(std::list<int> clique){
+std::string PG_Output::int_list_to_plcc_vertex_mapping_string(std::list<int> clique, std::string prefix){
     std::stringstream sstream;
     int idx = 0;
     for (std::list<int>::iterator i = clique.begin(), ie = clique.end(); i != ie; ++i) {
-            sstream << *i << "=" << idx << "\n";
+            sstream << *i << "=" << prefix << idx << "\n";
             idx++;
 
     }

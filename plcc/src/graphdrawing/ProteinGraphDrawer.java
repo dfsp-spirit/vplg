@@ -384,7 +384,7 @@ public class ProteinGraphDrawer {
             for (DrawTools.IMAGEFORMAT format : resultFilesByFormat.keySet()) {
                 sb.append("(").append(format.toString()).append(" => ").append(resultFilesByFormat.get(format)).append(") ");
             }
-            System.out.println(sb.toString());
+            DP.getInstance().p(sb.toString());
         }
         return resultFilesByFormat;
     }

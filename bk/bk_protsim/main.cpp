@@ -101,6 +101,8 @@ int main(int argc, char** argv) {
     
     
     int filter_permutations = 0; // TODO: get from settings. requires a settings objects and better command line parsing in the first place.
+    int write_result_text_files = 1;    // TODO: get from settings
+    
     if (argc >= 4) {
         if ((strcmp(argv[3],"-f") == 0) || (strcmp(argv[3],"-F") == 0) ) {
             filter_permutations = 1;
@@ -133,27 +135,30 @@ int main(int argc, char** argv) {
         
         int idx = 0;
         for (std::pair<std::list<int>, std::list<int>> pair : res) {
-            fresult << "{ ";
+            fresult << apptag << "{ ";
             fresult << " \"first\": " << PG_Output::int_list_to_JSON(pair.first) << ", ";
             fresult << " \"second\": " << PG_Output::int_list_to_JSON(pair.second) << " ";
             fresult << "} \n";
             
-            std::stringstream ss1;            
-            ss1 << "results_" << idx << "_first.txt";
-            std::string firstMappingsFileName = ss1.str();
-            
-            std::stringstream ss2;            
-            ss2 << "results_" << idx << "_second.txt";
-            std::string secondMappingsFileName = ss2.str();
+            if(write_result_text_files) {
+                std::stringstream ss1;            
+                ss1 << "results_" << idx << "_first.txt";
+                std::string firstMappingsFileName = ss1.str();
 
-            
-            stringToTextFile(firstMappingsFileName, PG_Output::int_list_to_plcc_vertex_mapping_string(pair.first));
-            stringToTextFile(secondMappingsFileName, PG_Output::int_list_to_plcc_vertex_mapping_string(pair.second));
+                std::stringstream ss2;            
+                ss2 << "results_" << idx << "_second.txt";
+                std::string secondMappingsFileName = ss2.str();
+
+                stringToTextFile(firstMappingsFileName, PG_Output::int_list_to_plcc_vertex_mapping_string(pair.first, "A"));
+                stringToTextFile(secondMappingsFileName, PG_Output::int_list_to_plcc_vertex_mapping_string(pair.second, "B"));
+                
+                std::cout << apptag << "Wrote result mapping pair # " << idx << " to files '" << firstMappingsFileName << "' and '" << secondMappingsFileName <<  "'.\n";
+            }
             
             idx++;
         }
         
-        std::cout << fresult.str()<< "\n";
+        std::cout << fresult.str();
         
     }
     else {
