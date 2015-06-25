@@ -12,7 +12,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
 function get_motif_data($db, $motiv_abbreviation) {
   $motif_data = array();
-  $query = "SELECT count(c2m.chaintomotif_id) as count, m.motif_name, m.motif_abbreviation FROM plcc_nm_chaintomotif c2m INNER JOIN plcc_motif m ON c2m.motif_id=m.motif_id WHERE m.motif_abbreviation = '" . $motiv_abbreviation . "' GROUP BY m.motif_name, m.motif_abbreviation";
+  $query = "SELECT count(c2m.chaintomotif_id) as count, m.motif_name, t.motiftype_name, m.motif_abbreviation FROM plcc_nm_chaintomotif c2m INNER JOIN plcc_motif m ON c2m.motif_id=m.motif_id INNER JOIN plcc_motiftype t ON m.motiftype_id = t.motiftype_id WHERE m.motif_abbreviation = '" . $motiv_abbreviation . "' GROUP BY m.motif_name, m.motif_abbreviation, t.motiftype_name;";
   $result = pg_query($db, $query);
   
   $arr = pg_fetch_array($result, NULL, PGSQL_ASSOC);
@@ -101,7 +101,7 @@ function get_all_motif_names() {
 		
 		<table id="tblmotifoverview">
 		<tr>
-		    <th>Motif</th><th>Motif abbreviation</th><th>Chains with motif in the database (of <?php print get_total_chains_count($db);?> chains total)</th><th>Short info on motif</th>
+		    <th>Motif</th><th>Type</th><th>Motif abbreviation</th><th>Chains with motif in the database (of <?php print get_total_chains_count($db);?> chains total)</th><th>Short info on motif</th>
 		</tr>
 		<?php		  		
 	          $motif_names = get_all_motif_names();
@@ -120,7 +120,7 @@ function get_all_motif_names() {
 	            
 	            if(isset($motif_data['motif_name']) && ( ! empty($motif_data['motif_name']))) {
 	                $all_motif_counts[$motif] = $motif_data['count'];
-	                print "<tr><td>" . $motif_data['motif_name'] . "</td><td>" . $motif_data['motif_abbreviation'] . "</td><td><a href='search.php?st=motif&motif=" . $motif . "'>" . $motif_data['count'] . "</a></td><td><a href='#" . $motif_data['motif_abbreviation'] ."'>" . $motif . " info</a></td></tr>\n";
+	                print "<tr><td>" . $motif_data['motif_name'] . "</td><td>" . $motif_data['motiftype_name'] . "</td><td>" . $motif_data['motif_abbreviation'] . "</td><td><a href='search.php?st=motif&motif=" . $motif . "'>" . $motif_data['count'] . "</a></td><td><a href='#" . $motif_data['motif_abbreviation'] ."'>" . $motif . " info</a></td></tr>\n";
 	            } else {	            
 	                print "<tr><td>" . get_motif_fullname($db, $motif) . "</td><td>" . $motif . "</td><td>0</td><td><a href='#" . $motif ."'>" . $motif . " info</a></td></tr>\n";
 	            }
