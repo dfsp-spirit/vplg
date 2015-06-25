@@ -20,6 +20,17 @@ if($DEBUG){
 }
 
 
+function get_protein_graph_file_name_no_ext($pdbid, $chain, $graphtype_string) {
+  return $pdbid . "_" . $chain . "_" . $graphtype_string . "_PG";
+}
+
+
+function get_protein_graph_path_and_file_name_no_ext($pdbid, $chain, $graphtype_string) {
+  $path = get_path_to($pdbid, $chain);
+  $fname = get_protein_graph_file_name_no_ext($pdbid, $chain, $graphtype_string);
+  return $path . $fname;
+}
+
 
 function get_graphtype_string($graphtype_int){
 	switch ($graphtype_int){
@@ -118,27 +129,33 @@ if(isset($_GET['first_pdbchain']) && isset($_GET['first_graphtype_int']) &&  iss
 }
 
 $num_found = 0;
+$tableString = "";
+$gml_files_available = FALSE;
 
 if($valid_values){    	
 	// check for the GML files
 	$first_graphtype_str = get_graphtype_string($first_graphtype_int);	
 	$first_graph_file_name_no_ext = get_protein_graph_path_and_file_name_no_ext($first_pdb_id, $first_chain_name, $first_graphtype_str);
 	$first_full_file = $IMG_ROOT_PATH . $first_graph_file_name_no_ext . ".gml";
-	if(file_exists($first_full_file)){
-		echo "First GML file found";
-	}
+	
 
 	$second_graphtype_str = get_graphtype_string($second_graphtype_int);	
 	$second_graph_file_name_no_ext = get_protein_graph_path_and_file_name_no_ext($second_pdb_id, $second_chain_name, $second_graphtype_str);
 	$second_full_file = $IMG_ROOT_PATH . $second_graph_file_name_no_ext . ".gml";
-	if(file_exists($second_full_file)){
-		echo "Second GML file found";
+	if(file_exists($first_full_file) && file_exists($second_full_file)){
+	    $gml_files_available = TRUE;
+	    $tableString .= "GML files found, running bk.";
+		
+	    $stdoutput = "";
+		//exec("./bk_web/bk_protsim $first_full_file $second_full_file -l -f", $stdoutput);
+		
+	}
+	else {
+	    $tableString .= "GML files for PDB chains not available.";
 	}	
 
+	
 
-} else {
-     //echo "invalid";
-	$tableString = "";
 }
 
 //EOF

@@ -157,6 +157,8 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			<?php 
 			      if($pageload_was_search) {
 			          if($valid_values) {
+					    if($gml_files_available) {
+						
 				      echo "<h3> Search Results </h3>\n";
 				  
 				      echo $tableString; /* The table string is constructed in /bk_web/run_bk.php, which is included by this file. */  
@@ -171,6 +173,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
 					echo "<br><h3> No common substructures found between the graphs.</h3><br><p>Note that very small structures (< size 3) are ignored.</p>\n";
 				      }
+					  } else { echo "<br><h3> Graph data not available.</h3><br><p>Sorry, the protein graph data for the chains and graph types you requested could not be found on the server.</p>\n"; }
 				  }
 				  else {
 				       echo "<br><h3> Invalid query</h3><br><p>Sorry, some fields contained invalid data. Please try again. (Hint: Did you fill out both PDB ID and chain fields properly?)</p>\n";
