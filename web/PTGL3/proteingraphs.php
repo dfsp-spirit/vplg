@@ -62,7 +62,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<li>the the alpha-beta-ligand graph: Also known as the albelig graph. Contains all helices, strands, and ligands of the chain and their 3D contacts.</li>
 
 		</ul>
-		Enter the PDB and chain below. You will then be able to browse all protein graphs types.
+		Enter the PDB and chain below. You will then be able to browse all protein graph types.
 		
 		</div><!-- end container-->
 		</div><!-- end Home -->
