@@ -18,6 +18,7 @@ function get_motif_data($db, $motiv_abbreviation) {
   $arr = pg_fetch_array($result, NULL, PGSQL_ASSOC);
   $motif_data['count'] = $arr['count'];
   $motif_data['motif_name'] = $arr['motif_name'];
+  $motif_data['motiftype_name'] = $arr['motiftype_name'];
   $motif_data['motif_abbreviation'] = $arr['motif_abbreviation'];
   
   return $motif_data;
