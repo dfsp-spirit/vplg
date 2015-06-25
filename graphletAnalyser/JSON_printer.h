@@ -8,13 +8,17 @@
 #ifndef JSON_PRINTER_H
 #define	JSON_PRINTER_H
 
+
+/* Provides Interface for printing stuff in JSON format */
 class JSON_printer {
     
     
     
-public:
-    virtual std::string print_vector() = 0;
-    virtual std::string print_vec_vector() = 0;
+    public:
+        std::string print_int_vector(std::vector<int>);
+        std::string print_int_vec_vector(std::vector<vector<int>>);
+        std::string print_float_vector(std::vector<float>);
+        std::string print_float_vec_vector(std::vector<std::vector<float>>);
     
     
 };

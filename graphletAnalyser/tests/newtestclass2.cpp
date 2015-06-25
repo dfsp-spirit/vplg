@@ -954,7 +954,6 @@ void newtestclass2::test_labeled_counts_31() {
 }
 
 void newtestclass2::test_labeled_counts_4() {
-    
     Graph testGraph;
     
     ti.id = 0;
@@ -995,16 +994,16 @@ void newtestclass2::test_labeled_counts_4() {
     bi.target = 2;
     ci.source = 2;
     ci.target = 3;
-    di.source = 4;
-    di.target = 0;
+    di.source = 3;
+    di.target = 4;
     ei.source = 4;
-    ei.target = 3;
+    ei.target = 0;
     
     ad = add_edge(t,u,ai,testGraph).first;
     bd = add_edge(u,v,bi,testGraph).first;
     cd = add_edge(v,w,ci,testGraph).first;
-    dd = add_edge(x,t,di,testGraph).first;
-    ed = add_edge(x,w,ei,testGraph).first;
+    dd = add_edge(w,x,di,testGraph).first;
+    ed = add_edge(x,t,ei,testGraph).first;
     
     vector<string> label_vector = vector<string>();
     vector<vector<string>> labels = vector<vector<string>>(6);
@@ -1021,7 +1020,6 @@ void newtestclass2::test_labeled_counts_4() {
     counter.count_connected_4_graphlets(testGraph, "sse_type", labels);
     testVector = counter.get_labeled_4_countsABS("sse_type", labels);
 
-    
     CPPUNIT_ASSERT(testVector == testVec);
     
     

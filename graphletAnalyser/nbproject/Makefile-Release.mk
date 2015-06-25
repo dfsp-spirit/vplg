@@ -41,6 +41,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/GraphPrinter.o \
 	${OBJECTDIR}/GraphService.o \
 	${OBJECTDIR}/GraphletCounts.o \
+	${OBJECTDIR}/JSON_printer.o \
 	${OBJECTDIR}/ProteinGraphService.o \
 	${OBJECTDIR}/main.o
 
@@ -51,7 +52,8 @@ TESTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}/tests
 TESTFILES= \
 	${TESTDIR}/TestFiles/f3 \
 	${TESTDIR}/TestFiles/f2 \
-	${TESTDIR}/TestFiles/f1
+	${TESTDIR}/TestFiles/f1 \
+	${TESTDIR}/TestFiles/f4
 
 # C Compiler Flags
 CFLAGS=
@@ -107,6 +109,11 @@ ${OBJECTDIR}/GraphletCounts.o: GraphletCounts.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GraphletCounts.o GraphletCounts.cpp
 
+${OBJECTDIR}/JSON_printer.o: JSON_printer.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -Werror -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/JSON_printer.o JSON_printer.cpp
+
 ${OBJECTDIR}/ProteinGraphService.o: ProteinGraphService.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
@@ -133,6 +140,10 @@ ${TESTDIR}/TestFiles/f2: ${TESTDIR}/tests/newtestclass1.o ${TESTDIR}/tests/newte
 ${TESTDIR}/TestFiles/f1: ${TESTDIR}/tests/newtestclass.o ${TESTDIR}/tests/newtestrunner.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc}   -o ${TESTDIR}/TestFiles/f1 $^ ${LDLIBSOPTIONS} `cppunit-config --libs`   
+
+${TESTDIR}/TestFiles/f4: ${TESTDIR}/tests/newtestclass3.o ${TESTDIR}/tests/newtestrunner3.o ${OBJECTFILES:%.o=%_nomain.o}
+	${MKDIR} -p ${TESTDIR}/TestFiles
+	${LINK.cc}   -o ${TESTDIR}/TestFiles/f4 $^ ${LDLIBSOPTIONS} `cppunit-config --libs`   
 
 
 ${TESTDIR}/tests/newtestclass2.o: tests/newtestclass2.cpp 
@@ -169,6 +180,18 @@ ${TESTDIR}/tests/newtestrunner.o: tests/newtestrunner.cpp
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -Werror `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner.o tests/newtestrunner.cpp
+
+
+${TESTDIR}/tests/newtestclass3.o: tests/newtestclass3.cpp 
+	${MKDIR} -p ${TESTDIR}/tests
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -Werror `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestclass3.o tests/newtestclass3.cpp
+
+
+${TESTDIR}/tests/newtestrunner3.o: tests/newtestrunner3.cpp 
+	${MKDIR} -p ${TESTDIR}/tests
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -Werror `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner3.o tests/newtestrunner3.cpp
 
 
 ${OBJECTDIR}/Database_nomain.o: ${OBJECTDIR}/Database.o Database.cpp 
@@ -249,6 +272,19 @@ ${OBJECTDIR}/GraphletCounts_nomain.o: ${OBJECTDIR}/GraphletCounts.o GraphletCoun
 	    ${CP} ${OBJECTDIR}/GraphletCounts.o ${OBJECTDIR}/GraphletCounts_nomain.o;\
 	fi
 
+${OBJECTDIR}/JSON_printer_nomain.o: ${OBJECTDIR}/JSON_printer.o JSON_printer.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/JSON_printer.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O2 -Werror -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/JSON_printer_nomain.o JSON_printer.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/JSON_printer.o ${OBJECTDIR}/JSON_printer_nomain.o;\
+	fi
+
 ${OBJECTDIR}/ProteinGraphService_nomain.o: ${OBJECTDIR}/ProteinGraphService.o ProteinGraphService.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	@NMOUTPUT=`${NM} ${OBJECTDIR}/ProteinGraphService.o`; \
@@ -282,6 +318,7 @@ ${OBJECTDIR}/main_nomain.o: ${OBJECTDIR}/main.o main.cpp
 	    ${TESTDIR}/TestFiles/f3 || true; \
 	    ${TESTDIR}/TestFiles/f2 || true; \
 	    ${TESTDIR}/TestFiles/f1 || true; \
+	    ${TESTDIR}/TestFiles/f4 || true; \
 	else  \
 	    ./${TEST} || true; \
 	fi

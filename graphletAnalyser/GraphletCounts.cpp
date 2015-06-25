@@ -1269,6 +1269,11 @@ vector<int> GraphletCounts::count_connected_4_graphlets(Graph& g, std::string la
         
         labeled_abs_counts[22] = int (floor (cl[22]));
         labeled_abs_counts[23] = int (floor (cl[23]));
+        
+        for (int i = 0; i < labeled_4_countsABS[5].size(); i++) {
+            labeled_4_countsABS[5][i] = labeled_4_countsABS[5][i]/2;
+        }
+        
     }
 
     vector<int> graphlet4Counts;
@@ -1738,10 +1743,10 @@ vector<vector<int>> GraphletCounts::get_labeled_4_countsABS(std::string label, s
     if (size_4_labels == label_vector) {
         
         if (labeled_4_countsABS.empty()) {
-            count_connected_3_graphlets(memberGraph, label, label_vector);
+            count_connected_4_graphlets(memberGraph, label, label_vector);
         }
     } else {
-        count_connected_3_graphlets(memberGraph, label, label_vector);
+        count_connected_4_graphlets(memberGraph, label, label_vector);
     }
 
     return labeled_4_countsABS;

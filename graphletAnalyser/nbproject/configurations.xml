@@ -13,8 +13,6 @@
       <itemPath>GraphService.h</itemPath>
       <itemPath>GraphletCounts.h</itemPath>
       <itemPath>JSON_printer.h</itemPath>
-      <itemPath>JSON_printer_float.h</itemPath>
-      <itemPath>JSON_printer_int.h</itemPath>
       <itemPath>ProteinGraphService.h</itemPath>
       <itemPath>global.h</itemPath>
     </logicalFolder>
@@ -31,6 +29,7 @@
       <itemPath>GraphPrinter.cpp</itemPath>
       <itemPath>GraphService.cpp</itemPath>
       <itemPath>GraphletCounts.cpp</itemPath>
+      <itemPath>JSON_printer.cpp</itemPath>
       <itemPath>ProteinGraphService.cpp</itemPath>
       <itemPath>main.cpp</itemPath>
     </logicalFolder>
@@ -61,6 +60,14 @@
         <itemPath>tests/newtestclass.cpp</itemPath>
         <itemPath>tests/newtestclass.h</itemPath>
         <itemPath>tests/newtestrunner.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f4"
+                     displayName="JSON_printer_Test"
+                     projectFiles="true"
+                     kind="TEST">
+        <itemPath>tests/newtestclass3.cpp</itemPath>
+        <itemPath>tests/newtestclass3.h</itemPath>
+        <itemPath>tests/newtestrunner3.cpp</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -133,11 +140,9 @@
       </item>
       <item path="GraphletCounts.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="JSON_printer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="JSON_printer.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="JSON_printer_float.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="JSON_printer_int.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="ProteinGraphService.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -201,6 +206,20 @@
           </linkerLibItems>
         </linkerTool>
       </folder>
+      <folder path="TestFiles/f4">
+        <cTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </cTool>
+        <ccTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f4</output>
+          <linkerLibItems>
+            <linkerOptionItem>`cppunit-config --libs`</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
       <item path="global.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
@@ -217,11 +236,17 @@
       </item>
       <item path="tests/newtestclass2.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="tests/newtestclass3.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/newtestclass3.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="tests/newtestrunner.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="tests/newtestrunner1.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="tests/newtestrunner2.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/newtestrunner3.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -280,11 +305,9 @@
       </item>
       <item path="GraphletCounts.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="JSON_printer.cpp" ex="false" tool="1" flavor2="0">
+      </item>
       <item path="JSON_printer.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="JSON_printer_float.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="JSON_printer_int.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="ProteinGraphService.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -332,6 +355,20 @@
           </linkerLibItems>
         </linkerTool>
       </folder>
+      <folder path="TestFiles/f4">
+        <cTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </cTool>
+        <ccTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f4</output>
+          <linkerLibItems>
+            <linkerOptionItem>`cppunit-config --libs`</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
       <item path="global.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
@@ -348,11 +385,17 @@
       </item>
       <item path="tests/newtestclass2.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="tests/newtestclass3.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/newtestclass3.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="tests/newtestrunner.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="tests/newtestrunner1.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="tests/newtestrunner2.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/newtestrunner3.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
   </confs>
