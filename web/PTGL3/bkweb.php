@@ -1,7 +1,14 @@
 <?php session_start(); ?>
 <!DOCTYPE html>
 <?php 
+/** 
+ * @author Tim Schäfer
+ */
 include('./backend/config.php');
+$SHOW_ERROR_LIST = array();
+include('./bk_web/run_bk.php');
+include('./common.php');
+$DO_SHOW_ERROR_LIST = $DEBUG_MODE;
 $SHOW_ERROR_LIST = array();
 
 
@@ -142,6 +149,36 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<button type="submit" id="sendit_all_pgs_of_chain" "class="btn btn-default">Run comparison algorithm <span class="glyphicon glyphicon-search"></span></button><br>
 
 		</form>	
+		
+		
+		
+		<div class="container" id="searchResults">
+			
+			<?php 
+			      if($pageload_was_search) {
+			          if($valid_values) {
+				      echo "<h3> Search Results </h3>\n";
+				  
+				      echo $tableString; /* The table string is constructed in /bk_web/run_bk.php, which is included by this file. */  
+				
+				      if($num_found > 0) {
+					echo "<br><h3> Folding graph images </h3><br><p>The images below show the folding graphs (connected components) of the protein graph. The folding graphs and their linear notations are used to power the motif search and other features of this database server. Note that folding graphs of size 1 (isolated vertices in the graph) are not listed here -- they would not be of any use. In the images, the following abbreviations are used: PG = protein graph, FG = folding graph, SQ = sequential in chain.</p>\n";
+					echo $img_string;
+				      }
+				      else {
+				      
+				      
+
+					echo "<br><h3> No common substructures found between the graphs.</h3><br><p>Note that very small structures (< size 3) are ignored.</p>\n";
+				      }
+				  }
+				  else {
+				       echo "<br><h3> Invalid query</h3><br><p>Sorry, some fields contained invalid data. Please try again. (Hint: Did you fill out both PDB ID and chain fields properly?)</p>\n";
+				  }
+			      }
+			
+			?>
+		</div><!-- end container and searchResults -->
 							
 
 </div><!-- end container and contentText -->
