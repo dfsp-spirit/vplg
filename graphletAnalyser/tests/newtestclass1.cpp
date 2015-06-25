@@ -80,17 +80,3 @@ void newtestclass1::test_printAdjacentAll() {
     CPPUNIT_ASSERT(printer.printAdjacentAll().compare(testStringAdjacentAll) == 0);
 }
 
-void newtestclass1::test_printIntVectorAsJSON() {
-    
-    std::vector<int> vec = std::vector<int>();
-    vec.push_back(1);
-    vec.push_back(2);
-    vec.push_back(3);
-    
-    std::string test_string = "[1,2,3]";
-    std::string tst;
-    
-    tst = printer.printIntVectorAsJSON(vec);
-    
-    CPPUNIT_ASSERT(tst.compare(test_string) == 0);
-}

@@ -1108,16 +1108,27 @@ vector<int> GraphletCounts::count_connected_4_graphlets(Graph& g, std::string la
      */
     
     
-    std::vector<std::string> pathlabels = label_vector[5];
-    std::vector<std::set<std::string>>  mirrored_labels = std::vector<std::set<std::string>>();
-    std::set<std::string> mir = std::set<std::string>();
+    std::vector<std::string> pathlabels;
+    std::vector<std::set<std::string>>  mirrored_labels;
+    std::set<std::string> mir;
     
-    for (int i = 0; i < pathlabels.size(); i++) {
+    if (!label_vector.empty()) {
+        labeled_4_countsABS = std::vector<std::vector<int>>(6);
+        pathlabels = label_vector[5];
+        mirrored_labels = std::vector<std::set<std::string>>();
+        mir = std::set<std::string>();
+        std::vector<int> vec = std::vector<int>(pathlabels.size());
+        labeled_4_countsABS[5] = vec;
+        for (int i = 0; i < pathlabels.size(); i++) {
         
-        mir = reverse_string(pathlabels[i]);
-        mirrored_labels.push_back(mir);
-        
+            mir = reverse_string(pathlabels[i]);
+            mirrored_labels.push_back(mir);
+            
+        }
     }
+    
+    
+    
     
     
     

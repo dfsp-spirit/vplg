@@ -1006,8 +1006,8 @@ void newtestclass2::test_labeled_counts_4() {
     dd = add_edge(x,t,di,testGraph).first;
     ed = add_edge(x,w,ei,testGraph).first;
     
-    vector<string> label_vector = vector<string>(6);
-    vector<vector<string>> labels = vector<vector<string>>();
+    vector<string> label_vector = vector<string>();
+    vector<vector<string>> labels = vector<vector<string>>(6);
     labels[0] = label_vector;
     labels[1] = label_vector;
     labels[2] = label_vector;

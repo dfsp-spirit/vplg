@@ -12,6 +12,9 @@
       <itemPath>GraphPrinter.h</itemPath>
       <itemPath>GraphService.h</itemPath>
       <itemPath>GraphletCounts.h</itemPath>
+      <itemPath>JSON_printer.h</itemPath>
+      <itemPath>JSON_printer_float.h</itemPath>
+      <itemPath>JSON_printer_int.h</itemPath>
       <itemPath>ProteinGraphService.h</itemPath>
       <itemPath>global.h</itemPath>
     </logicalFolder>
@@ -129,6 +132,12 @@
       <item path="GraphletCounts.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="GraphletCounts.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="JSON_printer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="JSON_printer_float.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="JSON_printer_int.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="ProteinGraphService.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -270,6 +279,12 @@
       <item path="GraphletCounts.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="GraphletCounts.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="JSON_printer.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="JSON_printer_float.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="JSON_printer_int.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="ProteinGraphService.cpp" ex="false" tool="1" flavor2="0">
       </item>

@@ -17,7 +17,6 @@ class newtestclass1 : public CPPUNIT_NS::TestFixture {
     
     CPPUNIT_TEST(test_printAdjacent);
     CPPUNIT_TEST(test_printAdjacentAll);
-    CPPUNIT_TEST(test_printIntVectorAsJSON);
  
     
     
@@ -45,7 +44,6 @@ private:
     
     void test_printAdjacent();
     void test_printAdjacentAll();
-    void test_printIntVectorAsJSON();
 
 
 };
