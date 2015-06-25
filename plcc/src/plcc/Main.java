@@ -2793,6 +2793,7 @@ public class Main {
                     //}
                 } catch(Exception e) {
                     DP.getInstance().e("Main", "Computing SSE motifs failed for PDB " + pdbid + " chain " + chain + ": '" + e.getMessage() + "'.");
+                    e.printStackTrace();
                 }
             }
             

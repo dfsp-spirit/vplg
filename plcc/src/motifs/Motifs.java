@@ -24,6 +24,7 @@ public class Motifs {
     public static final String MOTIF__ALPHA_BETA_PLAIT = "plait";
     public static final String MOTIF__ROSSMAN_FOLD = "rossman";
     public static final String MOTIF__TIM_BARREL = "tim";
+    public static final String MOTIF__FERREDOXIN_FOLD = "ferre";
     
     public static final Integer MOTIFCODE__FOUR_HELIX_BUNDLE = 1;
     public static final Integer MOTIFCODE__GLOBIN_FOLD = 2;
@@ -35,5 +36,6 @@ public class Motifs {
     public static final Integer MOTIFCODE__ALPHA_BETA_PLAIT = 8;
     public static final Integer MOTIFCODE__ROSSMAN_FOLD = 9;
     public static final Integer MOTIFCODE__TIM_BARREL = 10;
+    public static final Integer MOTIFCODE__FERREDOXIN_FOLD = 11;
     
 }

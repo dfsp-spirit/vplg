@@ -1146,7 +1146,8 @@ public class DBManager {
             
             doInsertQuery("INSERT INTO " + tbl_motiftype + " (motiftype_id, motiftype_name) VALUES (1, 'alpha');");
             doInsertQuery("INSERT INTO " + tbl_motiftype + " (motiftype_id, motiftype_name) VALUES (2, 'beta');");
-            doInsertQuery("INSERT INTO " + tbl_motiftype + " (motiftype_id, motiftype_name) VALUES (3, 'alpha beta');");
+            doInsertQuery("INSERT INTO " + tbl_motiftype + " (motiftype_id, motiftype_name) VALUES (3, 'alpha/beta');");
+            doInsertQuery("INSERT INTO " + tbl_motiftype + " (motiftype_id, motiftype_name) VALUES (4, 'alpha+beta');");
             
             // alpha motifs
             doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name, motif_abbreviation) VALUES (1, 1, 'Four Helix Bundle', '" + Motifs.MOTIF__FOUR_HELIX_BUNDLE + "');");
@@ -1161,6 +1162,7 @@ public class DBManager {
             doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name, motif_abbreviation) VALUES (8, 3, 'Alpha Beta Plait', 'plait');");
             doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name, motif_abbreviation) VALUES (9, 3, 'Rossman Fold', 'rossman');");
             doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name, motif_abbreviation) VALUES (10, 3, 'TIM Barrel', 'tim');");
+            doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name, motif_abbreviation) VALUES (10, 4, 'Ferredoxin Fold', 'ferre');");
             
 
             if( ! DBManager.getAutoCommit()) {
@@ -1693,6 +1695,17 @@ connection.close();
             }
             rowsAffectedTotal += rowsAffectedThisMotif;
         }
+        
+        if(DBManager.chainContainsMotif_FerredoxinFold(chain_db_id)) {
+            motif_db_id = Motifs.MOTIFCODE__FERREDOXIN_FOLD.longValue();
+            rowsAffectedThisMotif = DBManager.assignChainToMotiv(chain_db_id, motif_db_id);
+            if(rowsAffectedThisMotif > 0) {
+                foundMotifsForChain.add(Motifs.MOTIF__FERREDOXIN_FOLD);
+            }
+            rowsAffectedTotal += rowsAffectedThisMotif;
+        }
+        
+        
                                         
         
         // OK -- all motifs tested
@@ -7834,6 +7847,85 @@ connection.close();
                     }
                 }                
             }
+        }
+        
+        return(false);                
+    }
+    
+    
+    /**
+     * Checks whether the chain contains a ferredoxin fold motifThese checks consider the different linear notations of several graph types.
+     * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
+     * @param chain_db_id
+     * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
+     */
+    public static Boolean chainContainsMotif_FerredoxinFold(Long chain_db_id) {
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+                
+        PreparedStatement statement = null;
+        ResultSet rs = null;             
+        
+        StringBuilder querySB = new StringBuilder();
+                
+        // find chains
+        querySB.append("SELECT p.pdb_id, c.chain_name ");
+	querySB.append("FROM plcc_fglinnot ln ");
+	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
+	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
+	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
+	querySB.append("WHERE ( c.chain_id = ? AND ((ln.ptgl_linnot_seq LIKE '%e,1h,1e,1e,1h,1e%') AND ( ln.ptgl_linnot_adj LIKE '%e,3ae,-1ae%' )) ) ");
+        querySB.append("GROUP BY p.pdb_id, c.chain_name, ln.firstvertexpos_adj ");
+        
+        
+        String query = querySB.toString();
+        
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, chain_db_id);
+                                
+            rs = statement.executeQuery();
+            //dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "chainContainsMotif_FerredoxinFold: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                //dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_FerredoxinFold: Could not close statement and reset autocommit."); }
+        }
+        
+        // OK, check size of results table
+        if(tableData.size() >= 1) {
+            return true;
         }
         
         return(false);                
