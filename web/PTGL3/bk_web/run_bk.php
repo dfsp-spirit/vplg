@@ -171,12 +171,20 @@ if($valid_values){
            }
         }
 		$num_found = count($results);
-		$tableString .= "<table id='bktable'><tr><th>File name</th><th>Substructure size</th><th>Action</th></tr>";
+		$tableString .= "<form  method='POST' action='your_action'>";
+		$tableString .= "<table id='bktable'><tr><th>Result ID</th><th>File name</th><th>Substructure size</th><th>Select substructure</th></tr>";
+		$idx = 0;
 		foreach($results as $file) {
 		  $num_lines = $lines = count(file('bk_web/tmp_output/' . $file));
-		  $tableString .= "<tr><td>$file</td><td>$num_lines</td><td>Visualize substructure</td></tr>";
+		  $result_id = $idx; // TODO: should parse from file name!
+		  $checked_string = "";
+		  if($idx === 0) { $checked_string = " checked='checked'"; }
+		  $tableString .= "<tr><td>$result_id</td><td>$file</td><td>$num_lines</td><td><input type='radio' name='result_id' value='$result_id' $checked_string><br></td></tr>";
+		  $idx++;
 		}
 		$tableString .= "</table>";
+		$tableString .= "<button type='submit' id='sendit_visualize' name='sendit_visualize' class='btn btn-default' style='margin-top:35px;'><span>Visualize selected substructure</span></button>";
+		$tableString .= "</form>";
 	}
 	else {
 	    $tableString .= "GML files for PDB chains not available ($first_full_file and $second_full_file).";

@@ -159,7 +159,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			          if($valid_values) {
 					    if($gml_files_available) {
 						
-				      echo "<h3> Substructure mappings </h3>\n";
+				      echo "<h3> Possible substructure mappings </h3>\n";
 				  
 				
 				      if($num_found > 0) {
