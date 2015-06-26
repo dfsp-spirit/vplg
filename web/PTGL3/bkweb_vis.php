@@ -195,14 +195,14 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		    echo '<h3>OK</h3>';
 		    $first_graphtype_str = get_graphtype_string($first_graphtype_int);	
 		    $first_graph_file_name_no_ext = get_protein_graph_path_and_file_name_no_ext($first_pdb_id, $first_chain_name, $first_graphtype_str);
-		    $first_full_file = $IMG_ROOT_PATH . $first_graph_file_name_no_ext . ".gml";
+		    $first_full_gml_file = $IMG_ROOT_PATH . $first_graph_file_name_no_ext . ".gml";
 	
 
 			$second_graphtype_str = get_graphtype_string($second_graphtype_int);	
 			$second_graph_file_name_no_ext = get_protein_graph_path_and_file_name_no_ext($second_pdb_id, $second_chain_name, $second_graphtype_str);
-			$second_full_file = $IMG_ROOT_PATH . $second_graph_file_name_no_ext . ".gml";
+			$second_full_gml_file = $IMG_ROOT_PATH . $second_graph_file_name_no_ext . ".gml";
 		
-			if(file_exists($first_full_file) && file_exists($second_full_file)){
+			if(file_exists($first_full_gml_file) && file_exists($second_full_gml_file)){
 				$gml_files_available = TRUE;
 				echo "GML files found.<br>";
 				
@@ -216,6 +216,13 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 				echo "BK result file should be '$bk_mapping_result_file_first' and '$bk_mapping_result_file_second'.<br>";
 				if(file_exists($bk_mapping_result_file_first_full) && file_exists($bk_mapping_result_file_second_full)) {
 				    echo "Both BK result files found.<br>";
+					
+					// run plcc for first graph
+					$stdoutput_first = "";
+		           //exec("java -jar plcc.jar NONE --draw-gml-graph  $first_full_gml_file $bk_mapping_result_file_first_full", $stdoutput_first);
+				   
+				   $stdoutput_second = "";
+				   //exec("java -jar plcc.jar NONE --draw-gml-graph  $second_full_gml_file $bk_mapping_result_file_second_full", $stdoutput_second);
 				}
 				else {
 				    echo "Could not read BK result files.<br>";
