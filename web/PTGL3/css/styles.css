@@ -1110,6 +1110,21 @@ table#tblmotifoverview th {
 	background-color: red;
 	z-index: 1000;
 }
+
+table#bktable {
+   border: 1px solid black;
+}
+table#bktable th {
+   border: 1px solid black;
+}
+table#bktable td  {
+   border: 1px solid black;
+   padding: 10px;
+}
+table#bktable th  {
+   border: 1px solid black;
+   padding: 10px;
+} 
 	
 @media print {
   * { background: transparent !important; color: black !important; text-shadow: none !important; filter:none !important; -ms-filter: none !important; }

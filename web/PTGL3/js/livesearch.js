@@ -109,6 +109,23 @@ $(document).ready(function () {
  		}
  	});
 	
+	
+	/* Buttons on the bkweb search form */
+	$('#sendit_bkweb').click(function(e) {
+	    content1 = $('#first_pdbchain').val();
+ 		content2 = $('#second_pdbchain').val();
+				
+ 		if(content1.length != 5){
+ 			e.preventDefault();
+ 			alert("First graph: Please enter exactly 5 characters, e.g., '7timA' for PDB 7tim chain A.");
+ 		}
+		if(content2.length != 5){
+ 			e.preventDefault();
+ 			alert("Second graph: Please enter exactly 5 characters, e.g., '7timB' for PDB 7tim chain B.");
+ 		}
+ 	});
+	
+	
 	$('#sendit_nav').click(function(e) {
  		content = $('#searchInput').val();
  		if(content.length < 3){

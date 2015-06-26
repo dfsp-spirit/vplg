@@ -146,7 +146,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		Note: Submitting the search will gather the graph data, compute a compatibility graph and run a variant of the Bron-Kerbosch algorithm on it. This may take some time, depending on the graph sizes. You will be presented a list of common substructures when the algorithm has finished.
 		<br><br>
 							
-		<button type="submit" id="sendit_all_pgs_of_chain" "class="btn btn-default">Run comparison algorithm <span class="glyphicon glyphicon-search"></span></button><br>
+		<button type="submit" id="sendit_bkweb" "class="btn btn-default">Run comparison algorithm <span class="glyphicon glyphicon-search"></span></button><br>
 
 		</form>	
 		
@@ -159,7 +159,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			          if($valid_values) {
 					    if($gml_files_available) {
 						
-				      echo "<h3> Search Results </h3>\n";
+				      echo "<h3> Substructure mappings </h3>\n";
 				  
 				
 				      if($num_found > 0) {
