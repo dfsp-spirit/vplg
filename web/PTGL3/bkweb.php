@@ -151,6 +151,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		</form>	
 		
 		
+		<br><br>
 		
 		<div class="container" id="searchResults">
 			

@@ -180,7 +180,7 @@ if($valid_values){
 		
 		// TODO: we could check whether both arrays have the same length, and throw an error if not
 		
-		$tableString .= "<form  method='POST' action='your_action'>";
+		$tableString .= "<form  method='POST' action='bkweb_vis.php' target='_blank'>";
 		$tableString .= "<table id='bktable'><tr><th>Result ID</th><th>File names</th><th>Preview</th><th>Substructure size</th><th>Select substructure</th></tr>";
 
 		for($i = 0; $i < count($results); $i++) {
@@ -197,7 +197,14 @@ if($valid_values){
 		  if($i === 0) { $checked_string = " checked='checked'"; }
 		  $tableString .= "<tr><td>$result_id</td><td>$file_first <br> $file_second</td><td>$preview</td><td>$num_lines</td><td><input type='radio' name='result_id' value='$result_id' $checked_string><br></td></tr>";
 		}
-		$tableString .= "</table>";
+		$tableString .= "</table>";		
+		//$tableString .= "<input type='hidden' name='gml_file_first' value='$file_first'>";
+		//$tableString .= "<input type='hidden' name='gml_file_second' value='$file_second'>";
+		$tableString .= "<input type='hidden' name='first_graphtype_int' value='$first_graphtype_int'>";
+		$tableString .= "<input type='hidden' name='second_graphtype_int' value='$second_graphtype_int'>";
+		$tableString .= "<input type='hidden' name='first_pdbchain' value='$first_pdbchain'>";
+		$tableString .= "<input type='hidden' name='second_pdbchain' value='$second_pdbchain'>";			
+		
 		$tableString .= "<button type='submit' id='sendit_visualize' name='sendit_visualize' class='btn btn-default' style='margin-top:35px;'><span>Visualize selected substructure</span></button>";
 		$tableString .= "</form>";
 	}
