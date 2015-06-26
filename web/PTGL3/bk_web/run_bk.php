@@ -145,7 +145,8 @@ if($valid_values){
 	if(file_exists($first_full_file) && file_exists($second_full_file)){
 	    $gml_files_available = TRUE;
 	    //$tableString .= "GML files found, running bk.<br>";
-		$random_tag = "bkrun" . rand(10000, 99999) . "_";
+		$bk_random_tag = rand(10000, 99999);
+		$outfile_prefix = "bkrun" . $bk_random_tag . "_";
 		
 		//DEBUG:
 		$outfile_prefix = "bkrun12345_";
@@ -203,7 +204,8 @@ if($valid_values){
 		$tableString .= "<input type='hidden' name='first_graphtype_int' value='$first_graphtype_int'>";
 		$tableString .= "<input type='hidden' name='second_graphtype_int' value='$second_graphtype_int'>";
 		$tableString .= "<input type='hidden' name='first_pdbchain' value='$first_pdbchain'>";
-		$tableString .= "<input type='hidden' name='second_pdbchain' value='$second_pdbchain'>";			
+		$tableString .= "<input type='hidden' name='second_pdbchain' value='$second_pdbchain'>";
+		$tableString .= "<input type='hidden' name='bk_random_tag' value='$bk_random_tag'>";		
 		
 		$tableString .= "<button type='submit' id='sendit_visualize' name='sendit_visualize' class='btn btn-default' style='margin-top:35px;'><span>Visualize selected substructure</span></button>";
 		$tableString .= "</form>";

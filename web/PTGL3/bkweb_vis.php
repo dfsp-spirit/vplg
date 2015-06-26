@@ -146,7 +146,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		$valid_values = FALSE;
 		$pageload_was_search = FALSE;
 
-		if(isset($_POST['first_pdbchain']) && isset($_POST['first_graphtype_int']) &&  isset($_POST['second_pdbchain']) && isset($_POST['second_graphtype_int']) && isset($_POST['result_id'])){
+		if(isset($_POST['first_pdbchain']) && isset($_POST['first_graphtype_int']) &&  isset($_POST['second_pdbchain']) && isset($_POST['second_graphtype_int']) && isset($_POST['result_id']) && isset($_POST['bk_random_tag'])){
 			$pageload_was_search = TRUE;
 			$valid_values = FALSE;
 			
@@ -155,6 +155,8 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			$first_graphtype_int = $_POST["first_graphtype_int"];
 			$second_graphtype_int = $_POST["second_graphtype_int"];
 			$int_result_id = intval($_POST['result_id']);
+			$bk_random_tag = intval($_POST['bk_random_tag']); // the random number part of the prefix of the bk run, e.g., 12345 for a prefix of 'bkrun12345_'
+			$bk_outfile_prefix = "bkrun" . $bk_random_tag . "_"; // the prefix of the bk run, e.g., 'bkrun12345_'
 
 			$valid_values_first = FALSE;
 			if($first_graphtype_int === "1" || $first_graphtype_int === "2" || $first_graphtype_int === "3" || 
@@ -202,10 +204,25 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		
 			if(file_exists($first_full_file) && file_exists($second_full_file)){
 				$gml_files_available = TRUE;
-				echo "GML files found";
+				echo "GML files found.<br>";
+				
+				// constrcut file names like 'bkrunXXXXX_results_0_first.txt', where the 0 can be any number and XXXXX is a random number prefix.
+				$bk_mapping_result_file_first = $bk_outfile_prefix . "results_" . $int_result_id . "_first.txt";
+				$bk_mapping_result_file_first_full = "./tmp_output/" . $bk_mapping_result_file_first;
+				
+				$bk_mapping_result_file_second = $bk_outfile_prefix . "results_" . $int_result_id . "_second.txt";
+				$bk_mapping_result_file_second_full = "./tmp_output/" . $bk_mapping_result_file_second;
+				
+				echo "BK result file should be '$bk_mapping_result_file_first' and '$bk_mapping_result_file_second'.<br>";
+				if(file_exists($bk_mapping_result_file_first_full) && file_exists($bk_mapping_result_file_second_full)) {
+				    echo "Both BK result files found.<br>";
+				}
+				else {
+				    echo "Could not read BK result files.<br>";
+				}
 			}
 			else {
-				echo "No GML files found.";
+				echo "<h3>Required input data not available.</h3><p>No GML files found for the graphs you requested, sorry.</p>";
 			}
 		}		
 		else {
