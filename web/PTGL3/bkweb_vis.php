@@ -224,17 +224,22 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 					$second_full_gml_file_changed_rel = '../' . $second_full_gml_file;
 					$bk_mapping_result_file_first_full_changed_rel = "./tmp_output/" . $bk_mapping_result_file_first;
 					$bk_mapping_result_file_second_full_changed_rel = "./tmp_output/" . $bk_mapping_result_file_second;	
+					
+					$plcc_first_output_image_rel_no_file_extension = "./tmp_output/" . "plccrun" . $bk_random_tag . "_first_vis";
+					$plcc_second_output_image_rel_no_file_extension = "./tmp_output/" . "plccrun" . $bk_random_tag . "_second_vis";
 
+					$stdoutput_first = "";
+					$stdoutput_second = "";
 					if(file_exists($first_full_gml_file_changed_rel) && file_exists($second_full_gml_file_changed_rel)) {
 						if(file_exists($bk_mapping_result_file_first_full_changed_rel) && file_exists($bk_mapping_result_file_second_full_changed_rel)) {
 							echo "Running plcc for first graph and result mappings...<br>";
 							// run plcc for first graph
-							$stdoutput_first = "";
-						   //exec("java -jar plcc.jar NONE --draw-gml-graph  $first_full_gml_file_changed_rel $bk_mapping_result_file_first_full_changed_rel", $stdoutput_first);
+							
+						   //exec("java -jar plcc.jar NONE --draw-gml-graph  $first_full_gml_file_changed_rel $bk_mapping_result_file_first_full_changed_rel $plcc_first_output_image_rel_no_file_extension", $stdoutput_first);
 						   
 						   echo "Running plcc for second graph and result mappings...<br>";
-						   $stdoutput_second = "";
-						   //exec("java -jar plcc.jar NONE --draw-gml-graph  $second_full_gml_file_changed_rel $bk_mapping_result_file_second_full_changed_rel", $stdoutput_second);
+						   
+						   //exec("java -jar plcc.jar NONE --draw-gml-graph  $second_full_gml_file_changed_rel $bk_mapping_result_file_second_full_changed_rel $plcc_second_output_image_rel_no_file_extension", $stdoutput_second);
 					   }
 					   else {
 						   echo "Could not find BK result files after changing dir.<br>";
@@ -245,6 +250,21 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 				   }
 				   
 				   chdir('..');
+				   
+				   $plcc_first_output_image = "./bk_web/tmp_output/" . "plccrun" . $bk_random_tag . "_first_vis.png";
+				   $plcc_second_output_image = "./bk_web/tmp_output/" . "plccrun" . $bk_random_tag . "_second_vis.png";
+				   
+				   if(file_exists($plcc_first_output_image) && file_exists($plcc_second_output_image)) {
+				       echo "<h3>Visualization of the substructure in the two graphs</h3>";
+				       echo "<img src='$plcc_first_output_image' alt='Substructure highlighted in the first graph' style='max-width:600px;'><br>";
+					   echo "<img src='$plcc_second_output_image' alt='Substructure highlighted in the second graph' style='max-width:600px;'><br>";
+				   }
+				   else {
+				       echo "Could not find PLCC output files, visualization failed. Sorry.<br>";
+					   echo "First PLCC run said: '$stdoutput_first'<br>";
+					   echo "Second PLCC run said: '$stdoutput_second'<br>";
+				   }
+				   
 				}
 				else {
 				    echo "Could not read BK result files.<br>";
