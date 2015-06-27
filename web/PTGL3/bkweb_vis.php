@@ -204,25 +204,47 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		
 			if(file_exists($first_full_gml_file) && file_exists($second_full_gml_file)){
 				$gml_files_available = TRUE;
-				echo "GML files found.<br>";
+				echo "GML graph files found.<br>";
+				echo "Checking for BK result files. BK random tag is '$bk_random_tag'.<br>";
 				
 				// constrcut file names like 'bkrunXXXXX_results_0_first.txt', where the 0 can be any number and XXXXX is a random number prefix.
 				$bk_mapping_result_file_first = $bk_outfile_prefix . "results_" . $int_result_id . "_first.txt";
-				$bk_mapping_result_file_first_full = "./tmp_output/" . $bk_mapping_result_file_first;
+				$bk_mapping_result_file_first_full = "./bk_web/tmp_output/" . $bk_mapping_result_file_first;
 				
 				$bk_mapping_result_file_second = $bk_outfile_prefix . "results_" . $int_result_id . "_second.txt";
-				$bk_mapping_result_file_second_full = "./tmp_output/" . $bk_mapping_result_file_second;
+				$bk_mapping_result_file_second_full = "./bk_web/tmp_output/" . $bk_mapping_result_file_second;
 				
-				echo "BK result file should be '$bk_mapping_result_file_first' and '$bk_mapping_result_file_second'.<br>";
+				echo "BK result file should be '$bk_mapping_result_file_first_full' and '$bk_mapping_result_file_second_full'.<br>";
 				if(file_exists($bk_mapping_result_file_first_full) && file_exists($bk_mapping_result_file_second_full)) {
-				    echo "Both BK result files found.<br>";
+				    echo "Both BK result files found. Changing dir...<br>";
 					
-					// run plcc for first graph
-					$stdoutput_first = "";
-		           //exec("java -jar plcc.jar NONE --draw-gml-graph  $first_full_gml_file $bk_mapping_result_file_first_full", $stdoutput_first);
+					
+					chdir('bk_web');
+					$first_full_gml_file_changed_rel = '../' . $first_full_gml_file;
+					$second_full_gml_file_changed_rel = '../' . $second_full_gml_file;
+					$bk_mapping_result_file_first_full_changed_rel = "./tmp_output/" . $bk_mapping_result_file_first;
+					$bk_mapping_result_file_second_full_changed_rel = "./tmp_output/" . $bk_mapping_result_file_second;	
+
+					if(file_exists($first_full_gml_file_changed_rel) && file_exists($second_full_gml_file_changed_rel)) {
+						if(file_exists($bk_mapping_result_file_first_full_changed_rel) && file_exists($bk_mapping_result_file_second_full_changed_rel)) {
+							echo "Running plcc for first graph and result mappings...<br>";
+							// run plcc for first graph
+							$stdoutput_first = "";
+						   //exec("java -jar plcc.jar NONE --draw-gml-graph  $first_full_gml_file_changed_rel $bk_mapping_result_file_first_full_changed_rel", $stdoutput_first);
+						   
+						   echo "Running plcc for second graph and result mappings...<br>";
+						   $stdoutput_second = "";
+						   //exec("java -jar plcc.jar NONE --draw-gml-graph  $second_full_gml_file_changed_rel $bk_mapping_result_file_second_full_changed_rel", $stdoutput_second);
+					   }
+					   else {
+						   echo "Could not find BK result files after changing dir.<br>";
+					   }
+				   } 
+				   else {
+				       echo "Could not find GML files after changing dir.<br>";
+				   }
 				   
-				   $stdoutput_second = "";
-				   //exec("java -jar plcc.jar NONE --draw-gml-graph  $second_full_gml_file $bk_mapping_result_file_second_full", $stdoutput_second);
+				   chdir('..');
 				}
 				else {
 				    echo "Could not read BK result files.<br>";
