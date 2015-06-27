@@ -235,11 +235,11 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 							echo "Running plcc for first graph and result mappings...<br>";
 							// run plcc for first graph
 							
-						   //exec("java -jar plcc.jar NONE --draw-gml-graph  $first_full_gml_file_changed_rel $bk_mapping_result_file_first_full_changed_rel $plcc_first_output_image_rel_no_file_extension", $stdoutput_first);
+						   exec("java -jar plcc.jar NONE --draw-gml-graph  $first_full_gml_file_changed_rel $bk_mapping_result_file_first_full_changed_rel $plcc_first_output_image_rel_no_file_extension", $stdoutput_first);
 						   
 						   echo "Running plcc for second graph and result mappings...<br>";
 						   
-						   //exec("java -jar plcc.jar NONE --draw-gml-graph  $second_full_gml_file_changed_rel $bk_mapping_result_file_second_full_changed_rel $plcc_second_output_image_rel_no_file_extension", $stdoutput_second);
+						   exec("java -jar plcc.jar NONE --draw-gml-graph  $second_full_gml_file_changed_rel $bk_mapping_result_file_second_full_changed_rel $plcc_second_output_image_rel_no_file_extension", $stdoutput_second);
 					   }
 					   else {
 						   echo "Could not find BK result files after changing dir.<br>";
@@ -255,14 +255,17 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 				   $plcc_second_output_image = "./bk_web/tmp_output/" . "plccrun" . $bk_random_tag . "_second_vis.png";
 				   
 				   if(file_exists($plcc_first_output_image) && file_exists($plcc_second_output_image)) {
-				       echo "<h3>Visualization of the substructure in the two graphs</h3>";
-				       echo "<img src='$plcc_first_output_image' alt='Substructure highlighted in the first graph' style='max-width:600px;'><br>";
-					   echo "<img src='$plcc_second_output_image' alt='Substructure highlighted in the second graph' style='max-width:600px;'><br>";
+				       echo "<h3>Visualization of the selected substructure in the two graphs</h3>";
+					   echo "<p>The following image shows the first graph, vertices and edges of the substructure shared with the second graph are marked in gray. The marked vertices that can be mapped to equivalent vertices in the second graph are also given a label, e.g., 'A0'.";
+				       echo "<img src='$plcc_first_output_image' alt='Substructure highlighted in the first graph' style='max-width:800px;'><br>";
+					   echo "<br><br>The following image shows the second graph. A vertex labeld as 'A0' in the first graph was mapped to the vertex labeld 'B0' in this graph by the mapping.<br><br>";
+					   echo "<img src='$plcc_second_output_image' alt='Substructure highlighted in the second graph' style='max-width:800px;'><br>";
+					   echo "</p>";
 				   }
 				   else {
 				       echo "Could not find PLCC output files, visualization failed. Sorry.<br>";
-					   echo "First PLCC run said: '$stdoutput_first'<br>";
-					   echo "Second PLCC run said: '$stdoutput_second'<br>";
+					   echo "First PLCC run said: <br>"; foreach($stdoutput_first as $s) { echo " $s <br>\n"; } echo "<br>\n";
+					   echo "Second PLCC run said: <br>"; foreach($stdoutput_second as $s) { echo " $s <br>\n"; } echo "<br>\n";
 				   }
 				   
 				}
