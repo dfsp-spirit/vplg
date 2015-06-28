@@ -136,7 +136,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		
 		<div id="PageIntro">
 		<div class="container" id="pageintro">
-		This service allows you to visualize substructures of graphs.
+		<p>This service allows you to visualize common substructures in protein ligand graphs.</p>
 		
 		</div><!-- end container-->
 		</div><!-- end Home -->
@@ -218,10 +218,23 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 				if(file_exists($bk_mapping_result_file_first_full) && file_exists($bk_mapping_result_file_second_full)) {
 				    echo "Both BK result files found. Changing dir...<br>";
 					
+					if(! is_dir('bk_web')) {
+						echo "ERROR: The required bk_web directory was not found. Aborting.<br>";
+						die();
+					}
 					
-					chdir('bk_web');
+					if( ! chdir('bk_web')) {
+						die("Could not change into BK run directory. Aborting.");
+					}
+					
 					$first_full_gml_file_changed_rel = '../' . $first_full_gml_file;
 					$second_full_gml_file_changed_rel = '../' . $second_full_gml_file;
+					
+					if( ! is_writable("./tmp_output/")) {
+					    echo "ERROR: Temporary directory not writeable, exiting. The server admin needs to fix this. Aborting.<br>";
+						die();
+					}
+					
 					$bk_mapping_result_file_first_full_changed_rel = "./tmp_output/" . $bk_mapping_result_file_first;
 					$bk_mapping_result_file_second_full_changed_rel = "./tmp_output/" . $bk_mapping_result_file_second;	
 					
@@ -249,18 +262,22 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 				       echo "Could not find GML files after changing dir.<br>";
 				   }
 				   
-				   chdir('..');
+				   if( ! chdir('..')) {
+						die("Could not leave BK run directory. Aborting.");
+					}
+
 				   
 				   $plcc_first_output_image = "./bk_web/tmp_output/" . "plccrun" . $bk_random_tag . "_first_vis.png";
 				   $plcc_second_output_image = "./bk_web/tmp_output/" . "plccrun" . $bk_random_tag . "_second_vis.png";
 				   
 				   if(file_exists($plcc_first_output_image) && file_exists($plcc_second_output_image)) {
 				       echo "<h3>Visualization of the selected substructure in the two graphs</h3>";
-					   echo "<p>The following image shows the first graph, vertices and edges of the substructure shared with the second graph are marked in gray. The marked vertices that can be mapped to equivalent vertices in the second graph are also given a label, e.g., 'A0'.";
+					   echo "<p>The following image shows the common substructure in the first graph. Vertices and edges of the substructure shared with the second graph are marked in gray. The marked vertices that can be mapped to equivalent vertices in the second graph are also given a label, e.g., 'A0'.";
 				       echo "<img src='$plcc_first_output_image' alt='Substructure highlighted in the first graph' style='max-width:800px;'><br>";
-					   echo "<br><br>The following image shows the second graph. A vertex labeld as 'A0' in the first graph was mapped to the vertex labeld 'B0' in this graph by the mapping.<br><br>";
+					   echo "<br><br>The following image shows the common substructure in the second graph. A vertex labeld as 'A0' in the first graph was mapped to the vertex labeld 'B0' in this graph.<br><br>";
 					   echo "<img src='$plcc_second_output_image' alt='Substructure highlighted in the second graph' style='max-width:800px;'><br>";
 					   echo "</p>";
+					   //echo "<h3>Where to go from here</h3><p>";
 				   }
 				   else {
 				       echo "Could not find PLCC output files, visualization failed. Sorry.<br>";
