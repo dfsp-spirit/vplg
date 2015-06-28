@@ -941,6 +941,8 @@ public class Main {
                             }
                             
                             Map<Integer, String> vertexMappings = new HashMap<>();
+                            String outFilePathNoExt = args[i+1]; // Use the name of the input file as output. Note that the image extension will be appended to this.
+                            
                             // read vertex mappings from file if a file has been specified
                             if(args.length > i+2) {
                                 DP.getInstance().i("Parsing vertex mappings file...");
@@ -951,13 +953,17 @@ public class Main {
                                     System.exit(1);
                                 }
                                 DP.getInstance().i("Received " + vertexMappings.keySet().size() + " vertex mappings.");
-                            }
+                            }                            
                             
+                            if(args.length > i+3) {
+                                outFilePathNoExt = args[i+3];
+                                DP.getInstance().i("Using custom image output base file path '" + outFilePathNoExt + "'.");
+                            }
                             
                             GMLGraphParser p = new GMLGraphParser(gml);
                             IDrawableGraph g = p.getDrawableGraph();
                             DP.getInstance().i("Received graph with " + g.getDrawableVertices().size() + " vertices and " + g.getDrawableEdges().size() + " edges.");
-                            String outFilePathNoExt = args[i+1]; // the image extension will be appended to this
+                            
                             ProteinGraphDrawer.drawDrawableGraph(outFilePathNoExt, formats, g, vertexMappings);
                             DP.getInstance().i("Done drawing GML graph to base file '" + outFilePathNoExt + "', exiting.");
                             
