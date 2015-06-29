@@ -2919,11 +2919,7 @@ connection.close();
      * @param chain_db_id the chain database id
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
      */
-    public static Boolean chainContainsMotif_TIMBarrel(Long chain_db_id) {
-        if( ! Settings.getBoolean("plcc_B_no_not_impl_warn")) {
-            DP.getInstance().w("DBManager", "chainContainsMotif_TIMBarrel: Not implemented yet, returning false for chain with ID '" + chain_db_id + "'.");
-        }
-        
+    public static Boolean chainContainsMotif_TIMBarrel(Long chain_db_id) {        
         
         
         // ============== tim1.pl ==============
@@ -3256,8 +3252,8 @@ connection.close();
                                                 && all_albeNumberOfHelix.get(i).get(g) < all_seventhHelixPositionMaxInAlbeGraph.get(i)) {
                                             
                                             return true;
-                } else {
-                        return false;
+                } else {                        
+                        //return false; // Line removed by Tim. Note: If you return false here, you skip the other tests later!
                     }
                                     }
                                 }
@@ -3594,7 +3590,7 @@ connection.close();
                                             
                                             return true;
                 } else {
-                        return false;
+                        //return false; // Line removed by Tim. Note: If you return false here, you skip the other tests later!
                     }
                                     }
                                 }
@@ -3935,7 +3931,7 @@ connection.close();
                                             
                                             return true;
                 } else {
-                        return false;
+                        //return false; // Line removed by Tim. Note: If you return false here, you skip the other tests later!
                     }
                                     }
                                 }
@@ -4274,7 +4270,7 @@ connection.close();
                                             
                                             return true;
                 } else {
-                        return false;
+                        //return false; // Line removed by Tim. Note: If you return false here, you skip the other tests later!
                     }
                                     }
                                 }
@@ -4618,7 +4614,7 @@ connection.close();
                                             
                                             return true;
                 } else {
-                        return false;
+                        //return false; // Line removed by Tim. Note: If you return false here, you skip the other tests later!
                     }
                                     }
                                 }
@@ -4963,7 +4959,7 @@ connection.close();
                                             
                                             return true;
                 } else {
-                        return false;
+                        //return false; // Line removed by Tim. Note: If you return false here, you skip the other tests later!
                     }
                                     }
                                 }
@@ -5310,7 +5306,7 @@ connection.close();
                                             
                                             return true;
                 } else {
-                        return false;
+                        //return false; // Line removed by Tim. Note: If you return false here, you skip the other tests later!
                     }
                                     }
                                 }
@@ -5659,7 +5655,7 @@ connection.close();
                                             
                                             return true;
                 } else {
-                        return false;
+                        //return false; // Line removed by Tim. Note: If you return false here, you skip the other tests later!
                     }
                                     }
                                 }
@@ -6010,7 +6006,7 @@ connection.close();
                                             
                                             return true;
                 } else {
-                        return false;
+                        //return false; // Line removed by Tim. Note: If you return false here, you skip the other tests later!
                     }
                                     }
                                 }
@@ -6351,7 +6347,7 @@ connection.close();
                                             
                                             return true;
                 } else {
-                        return false;
+                        //return false; // Line removed by Tim. Note: If you return false here, you skip the other tests later!
                     }
                                     }
                                 }
@@ -6374,9 +6370,7 @@ connection.close();
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
      */
     public static Boolean chainContainsMotif_AlphaBetaPlait(Long chain_db_id) {
-        if( ! Settings.getBoolean("plcc_B_no_not_impl_warn")) {
-            DP.getInstance().w("DBManager", "chainContainsMotif_AlphaBetaPlait: Not implemented yet, returning false for chain with ID '" + chain_db_id + "'.");
-        }
+        
         
         // ============== plait1.pl ==============
         
@@ -6541,7 +6535,7 @@ connection.close();
                     if (all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMaxInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) > all_secondHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) < all_secondHelixPositionMaxInAlbeGraph.get(i)) {
                         return true;
                     } else {
-                        return false;
+                        //return false; // Line removed by Tim. Note: If you return false here, you skip the other tests later!
                     }
                 }
             }
@@ -6707,7 +6701,7 @@ connection.close();
                     if (all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMaxInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) > all_secondHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) < all_secondHelixPositionMaxInAlbeGraph.get(i)) {
                         return true;
                     } else {
-                        return false;
+                        //return false; // Line removed by Tim. Note: If you return false here, you skip the other tests later!
                     }
                 }
             }
@@ -6716,7 +6710,7 @@ connection.close();
         
         // ============== plait3.pl ==============
         
-        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE (ln.ptgl_linnot_red LIKE '%3a,-2p,1a% OR ln.ptgl_linnot_red LIKE '%3a,-2a,1a%') AND ln.ptgl_linnot_red NOT LIKE '-3a,-2_,1a$' GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
+        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE (ln.ptgl_linnot_red LIKE '%3a,-2p,1a% OR ln.ptgl_linnot_red LIKE '%3a,-2a,1a%' AND ln.ptgl_linnot_red NOT LIKE '-3a,-2_,1a%') GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
         pattern = new Integer[] {3, -2, 1};
         
         all_pdb_ids = new ArrayList<>();
@@ -6871,7 +6865,7 @@ connection.close();
                     if (all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMaxInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) > all_secondHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) < all_secondHelixPositionMaxInAlbeGraph.get(i)) {
                         return true;
                     } else {
-                        return false;
+                        //return false; // Line removed by Tim. Note: If you return false here, you skip the other tests later!
                     }
                 }
             }
@@ -7035,7 +7029,7 @@ connection.close();
                     if (all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMaxInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) > all_secondHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) < all_secondHelixPositionMaxInAlbeGraph.get(i)) {
                         return true;
                     } else {
-                        return false;
+                        //return false; // Line removed by Tim. Note: If you return false here, you skip the other tests later!
                     }
                 }
             }
