@@ -2844,7 +2844,7 @@ public class Main {
         
         PTGLNotations p = new PTGLNotations(pg);
         p.stfu();
-        p.adjverbose = true;
+        //p.adjverbose = true;
         List<PTGLNotationFoldResult> resultsPTGLNotations = p.getResults();
 
         
