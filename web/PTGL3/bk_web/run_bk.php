@@ -167,7 +167,7 @@ if($valid_values){
 		}
 		$first_full_file_changed_rel = '../' . $first_full_file;
 		$second_full_file_changed_rel = '../' . $second_full_file;
-		//exec("./bk_protsim $first_full_file_changed_rel $second_full_file_changed_rel -l -f --output-dir tmp_output --output-prefix $outfile_prefix", $stdoutput);
+		exec("./bk_protsim -f $first_full_file_changed_rel -s $second_full_file_changed_rel -r largest --filter-permutations -o tmp_output -p $outfile_prefix", $stdoutput);
 		if( ! chdir('..')) {
 		    die("Could not leave BK run directory. Aborting.");
 		}

@@ -1,7 +1,7 @@
 /* 
  * File:   main.cpp
  * Author: julian
- *
+ *         Tim Schaefer
  * Created on June 16, 2015, 2:56 PM
  */
 
@@ -28,6 +28,14 @@ int stringToTextFile(std::string fname, std::string contents) {
         file << contents;
         file.close();        
         return 1;
+    }
+}
+
+bool hasEnding (std::string const &fullString, std::string const &ending) {
+    if (fullString.length() >= ending.length()) {
+        return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
+    } else {
+        return false;
     }
 }
 
@@ -70,7 +78,7 @@ void fill_settings_default() {
     options["output_path"] = "";
     options["silent"] = "no";
     options["verbose"] = "no";
-    options["filter_duplicates"] = "no";
+    options["filter_permutations"] = "no";
     options["min_clique_output_size"] = "3";
     options["result_type"] = "all";
     options["write_result_text_files"] = "yes";
@@ -84,7 +92,7 @@ void usage() {
     std::cout << apptag << " -r <result_type>      : The result type to output, valid values are 'largest', 'minsize' and 'all' (default).\n";
     std::cout << apptag << " -p <prefix>           : Set the prefix for output file names to <prefix>. Default is empty string.\n";
     std::cout << apptag << " --min-clique-size <s> : Set the minimum clique output size to <s>. Only used if --result-type is 'minsize'. Default is 3.\n";
-    std::cout << apptag << " --filter-duplicates   : Filter duplicate cliques in output. Also writes filtered results to text files.\n";
+    std::cout << apptag << " --filter-permutations : Filter permutations of vertex lists in output. Also writes filtered results to text files.\n";
     std::cout << apptag << " -o <path>             : Set the output path for files to <path>. Has to exist. Defaults to empty string, i.e., the current directory.\n";
     std::cout << apptag << " --verbose             : Additional output on stdout.\n";
     std::cout << apptag << "Example call: " << "bk_protsim" << " -f example1.gml -s example2.gml\n";
@@ -164,7 +172,7 @@ int main(int argc, char** argv) {
     // These are set by getopt later
     int silent_flag;
     int verbose_flag;
-    int filter_duplicates_flag;
+    int filter_permutations_flag;
     int min_clique_output_size = atoi(options["min_clique_output_size"].c_str());
     std::string output_path;
     std::string first_graph_file;    
@@ -177,7 +185,7 @@ int main(int argc, char** argv) {
             /* These options set a flag. */
             {"silent",          no_argument, &silent_flag,          1},
             {"verbose",          no_argument, &verbose_flag,          1},
-            {"filter-duplicates",          no_argument, &filter_duplicates_flag,          1},
+            {"filter-permutations",          no_argument, &filter_permutations_flag,          1},
 
          
             /* These options don't set a flag 
@@ -215,7 +223,9 @@ int main(int argc, char** argv) {
             case 'o':
                 //cout << "option -o with the argument " << optarg << endl;
                 output_path = optarg;
-                output_path.append("/");
+				if( ! hasEnding(output_path, "/")) {
+					output_path.append("/");
+				}
                 options["output_path"] = output_path;
                 break;   
             case 'f':
@@ -254,6 +264,12 @@ int main(int argc, char** argv) {
         }
     }
     
+	// check for invalid outfile prefix
+	std::size_t found = options["outfile_prefix"].find("..");
+    if (found != std::string::npos) {
+	    std:cerr << apptag << "ERROR: Invalid outfile prefix, must not contain '..'. Set the output dir instead.\n";
+		exit(1);
+	}
   
     if (verbose_flag) {
         options["verbose"] = "yes";
@@ -271,15 +287,15 @@ int main(int argc, char** argv) {
         std::cout << apptag << "  Starting at time " << currentDateTime() << std::endl;
     }
     
-    if(filter_duplicates_flag) {
-        options["filter_duplicates"] = "yes";
+    if(filter_permutations_flag) {
+        options["filter_permutations"] = "yes";
     }
     
     if (verbose_flag) {
         std::cout << apptag << "Settings: first_graph_file is '" << first_graph_file << "'.\n";
         std::cout << apptag << "Settings: second_graph_file is '" << second_graph_file << "'.\n";
         std::cout << apptag << "Settings: min_clique_output_size is '" << min_clique_output_size << "'.\n";
-        std::cout << apptag << "Settings: filter_duplicates_flag is '" << filter_duplicates_flag << "'.\n";
+        std::cout << apptag << "Settings: filter_permutations_flag is '" << filter_permutations_flag << "'.\n";
         std::cout << apptag << "Settings: output_path is '" << options["output_path"] << "'.\n";
         std::cout << apptag << "Settings: result_type is '" << options["result_type"] << "'.\n";
     }
@@ -327,7 +343,7 @@ int main(int argc, char** argv) {
     // we may need to filter permutations here
     
     
-    int filter_permutations = ( options["filter_duplicates"] == "yes" ? 1 : 0 );
+    int filter_permutations = ( options["filter_permutations"] == "yes" ? 1 : 0 );
     int write_result_text_files = ( options["write_result_text_files"] == "yes" ? 1 : 0 );
        
     if(filter_permutations) {
