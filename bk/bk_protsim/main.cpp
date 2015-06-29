@@ -79,13 +79,12 @@ void fill_settings_default() {
 void usage() {
     std::cout << apptag << "Usage:\n";
     std::cout << apptag << "bk_protsim" << " -f <graphFile1.gml> -s <graphFile2.gml> [<output_parameters>] \n";
-    std::cout << apptag << "Output parameters:\n";
-    std::cout << apptag << "\t--filter-duplicates : Filter duplicate cliques in output\n";
-    std::cout << apptag << "\t--result-type <t> : Results to output, valid values are 'largest', and 'all' (default).\n";
-    std::cout << apptag << "\t-f     : Filter permutations for STDOUT, i.e., print unique cliques only.\n";
-    std::cout << apptag << "\t-s <n> : Output only cliques with minimum size <n> vertices.\n";        
-    std::cout << apptag << "Example call: " << "bk_protsim" << " example1.gml example2.gml -s 8\n";
-    std::cout << apptag << "  This will output all cliques larger than 8 vertices.\n";    
+    std::cout << apptag << "Output parameters:\n";    
+    std::cout << apptag << " -r <result_type>      : The result type to output, valid values are 'largest', 'minsize' and 'all' (default).\n";
+    std::cout << apptag << " --min-clique-size <s> : Set the minimum clique output size to <s>. Only used if --result-type is 'minsize'. Default is 3.\n";
+    std::cout << apptag << " --filter-duplicates   : Filter duplicate cliques in output. Also writes filtered results to text files.\n";
+    std::cout << apptag << " --verbose             : Additional output.\n";
+    std::cout << apptag << "Example call: " << "bk_protsim" << " -f example1.gml -s example2.gml\n";
 }
 
 const std::string currentDateTime() {
@@ -153,7 +152,7 @@ int main(int argc, char** argv) {
             std::cout << apptag << "  Parsing config file from '" << config_file_name.c_str() <<  "'.\n";
             parse(configFile);
         } else {		
-                std::cout << apptag << "WARNING: Could not read config file '" << config_file_name << "' in current dir or '." << config_file_name << "' in user home. Using internal default settings.\n";
+                std::cout << apptag << "  Could not read config file '" << config_file_name << "' in current dir or '." << config_file_name << "' in user home. Using internal default settings.\n";
         }
     }
     
@@ -167,7 +166,7 @@ int main(int argc, char** argv) {
     std::string output_path;
     std::string first_graph_file;    
     std::string second_graph_file;
-    std::string result_type = options["result_type"];
+    std::string result_type;
 
     while (1) {
         static struct option long_options[] = {
@@ -190,7 +189,7 @@ int main(int argc, char** argv) {
         
         int option_index = 0;
         
-        opt = getopt_long(argc, argv, "hf:s:o:m:r:", long_options, &option_index);  // the colon ':' behind a parameter tells getopt to look for an argument to it
+        opt = getopt_long(argc, argv, "hf:s:m:o:r:", long_options, &option_index);  // the colon ':' behind a parameter tells getopt to look for an argument to it
         if (opt == -1) {
             break;  // end of options hit
         }
@@ -227,11 +226,15 @@ int main(int argc, char** argv) {
             case 'm':
                 //cout << "option -o with the argument " << optarg << endl;                
                 options["min_clique_output_size"] = optarg;
+                //std::cout << apptag <<  "Setting clique size...\n";
                 min_clique_output_size = atoi(optarg);
                 break;   
             case 'r':
-                //cout << "option -o with the argument " << optarg << endl;                
-                options["result_type"] = optarg;
+                //std::cout << "option -r \n";   
+                result_type = optarg;
+                //std::cout << apptag << "Setting result_type to " << result_type << ".\n";
+                options["result_type"] = result_type;
+                
                 break;   
             default:
                 std::cerr << apptag << "ERROR: Some command line options are invalid.\n";
@@ -241,6 +244,10 @@ int main(int argc, char** argv) {
     }
     
   
+    if (verbose_flag) {
+        options["verbose"] = "yes";
+    }
+    
     if (silent_flag) {
         options["silent"] = "yes";
         options["verbose"] = "no";
@@ -257,12 +264,14 @@ int main(int argc, char** argv) {
         options["filter_duplicates"] = "yes";
     }
     
-    std::cout << apptag << "first_graph_file is " << first_graph_file << "\n";
-    std::cout << apptag << "second_graph_file is " << second_graph_file << "\n";
-    std::cout << apptag << "min_clique_output_size is " << min_clique_output_size << "\n";
-    std::cout << apptag << "filter_duplicates_flag is " << filter_duplicates_flag << "\n";
-    std::cout << apptag << "output_path is " << options["output_path"] << "\n";
-    
+    if (verbose_flag) {
+        std::cout << apptag << "Settings: first_graph_file is '" << first_graph_file << "'.\n";
+        std::cout << apptag << "Settings: second_graph_file is '" << second_graph_file << "'.\n";
+        std::cout << apptag << "Settings: min_clique_output_size is '" << min_clique_output_size << "'.\n";
+        std::cout << apptag << "Settings: filter_duplicates_flag is '" << filter_duplicates_flag << "'.\n";
+        std::cout << apptag << "Settings: output_path is '" << options["output_path"] << "'.\n";
+        std::cout << apptag << "Settings: result_type is '" << options["result_type"] << "'.\n";
+    }
     
     
     if (argc < 5) {
