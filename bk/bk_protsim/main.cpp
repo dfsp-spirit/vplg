@@ -67,7 +67,8 @@ void parse(std::ifstream & cfgfile)
   * These defaults can later be overwritten by config file contents or command line arguments.
   */
 void fill_settings_default() {
-	options["output_path"] = "./";
+    options["output_path"] = "./";
+    options["silent"] = "no";
 }
 
 void usage() {
@@ -88,16 +89,50 @@ void usage() {
 int main(int argc, char** argv) {
     
     //std::string apptag = "[BK] ";
+    std::string startOutput = "";
     
     std::cout << apptag << "=== Bron Kerbosch-based graph similarity ===\n";
     std::cout << apptag << "= Searches maximum common substructures in a pair (G1, G2) of graphs.\n";
     std::cout << apptag << "= Constructs a compatibility graph GC from G1 and G2 and runs a variant of the Bron-Kerbosch algorithm on it.\n";
     std::cout << apptag << "= The cliques in GC correspond to common substructures (compatible vertex mappings) between G1 and G2.\n";
+    std::cout << apptag << "= This is free software, and it comes without any warranty. See the LICENSE file for details.\n";
     std::cout << apptag << "= Written by Julian Gruber-Roet at MolBI group, 2015.\n";
     std::cout << apptag << "\n";
     
     
     fill_settings_default();
+    
+    // assume the config file is in the current directory by default
+    std::string config_file_name = "bk_protsim.cfg";
+    // test whether cfg file is in HOME, use it from there if it exists. otherwise, the code above applies and it is searched in the local dir
+    bool cfg_parsed_from_home = false;
+    std::string home_path = getenv("HOME");
+    if ( ! home_path.empty()) {
+        //printf ("The user home is: '%s'.\n", home_path.c_str());
+        std::string config_file_name_home = home_path.append("/.bk_protsim.cfg");
+        std::ifstream configFileHome(config_file_name_home.c_str());
+        if (configFileHome.is_open()) {
+            startOutput.append(apptag).append("  Parsing config file from user home at '").append(config_file_name_home.c_str()).append("'.\n");
+            parse(configFileHome);
+            cfg_parsed_from_home = true;
+        } else {
+            std::cout << apptag << "  No config file found in user home at '" << config_file_name_home.c_str() <<  "', checking current dir.\n";
+        }
+    }
+    else {
+        std::cout << apptag << "  Could not determine user home directory to search for config file, $HOME is not set in the environment.\n";
+    }
+    
+    // now the default settings may be overwritten by stuff in the config file
+    if( ! cfg_parsed_from_home) {
+        std::ifstream configFile(config_file_name.c_str());
+        if (configFile.is_open()) {
+            std::cout << apptag << "  Parsing config file from '" << config_file_name.c_str() <<  "'.\n";
+            parse(configFile);
+        } else {		
+                std::cout << apptag << "WARNING: Could not read config file '" << config_file_name << "' in current dir or '." << config_file_name << "' in user home. Using internal default settings.\n";
+        }
+    }
     
     if (argc < 3) {
         usage();
