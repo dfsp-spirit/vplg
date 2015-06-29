@@ -1,0 +1,5 @@
+The XML files contains the representative chains at 40% seq similarity. It was retrieved from the PDB REST API:
+
+  http://www.rcsb.org/pdb/rest/representatives?cluster=40
+  
+You should get the up-to-date version of this file and re-run 'plcc NONE --set-pdb-representative-chains <xml_file> remove' to re-set the representative chains for the whole database if you updated the data in the DB.
