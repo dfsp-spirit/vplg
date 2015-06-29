@@ -12,6 +12,8 @@
 #include "BronKerbosch.h"
 #include "BK_Output.h"
 #include "PG_Output.h"
+#include "common.h"
+#include <getopt.h>
 
 
 int stringToTextFile(std::string fname, std::string contents) {
@@ -29,12 +31,63 @@ int stringToTextFile(std::string fname, std::string contents) {
     }
 }
 
+/**
+  * Parses a config file in 'key = value' line format. All lines starting with '#' are considered comments and skipped.
+  * The resulting settings are stored as strings in the global map<string, string> options.
+  */
+void parse(std::ifstream & cfgfile)
+{
+    std::string id, eq, val;
+    
+    int numComments = 0;
+    int numLinesParsedOk = 0;    
+
+    while(cfgfile >> id >> eq >> val)
+    {
+      if (id[0] == '#') {          
+          numComments++;
+          continue;  // skip comments
+      }
+      
+      if (eq != "=") { 
+          //throw std::runtime_error("Parse error");
+          std::cerr << apptag << "ERROR: Could not parse config file line, skipping line.\n";
+          continue;
+      }
+
+      options[id] = val;
+      //std::cout << "    Parsed config line: '" << id << "' => '" << val << "'\n";
+      numLinesParsedOk++;
+    }
+    //std::cout << "  Parsed " << numLinesParsedOk << " settings from config file.\n";
+}
+
+/**
+  * Writes default values to the global settings stored in the options map.
+  * These defaults can later be overwritten by config file contents or command line arguments.
+  */
+void fill_settings_default() {
+	options["output_path"] = "./";
+}
+
+void usage() {
+    std::cout << apptag << "Usage:\n";
+    std::cout << apptag << "bk_protsim" << " <graphFile1.gml> <graphFile2.gml> <output_parameters> \n";
+    std::cout << apptag << "Output parameters:\n";
+    std::cout << apptag << "\t-a     : Output all cliques (default)\n";
+    std::cout << apptag << "\t-l     : Output only largest cliques\n";
+    std::cout << apptag << "\t-f     : Filter permutations for STDOUT, i.e., print unique cliques only.\n";
+    std::cout << apptag << "\t-s <n> : Output only cliques with minimum size <n> vertices.\n";        
+    std::cout << apptag << "Example call: " << "bk_protsim" << " example1.gml example2.gml -s 8\n";
+    std::cout << apptag << "  This will output all cliques larger than 8 vertices.\n";    
+}
+
 /*
  * 
  */
 int main(int argc, char** argv) {
     
-    std::string apptag = "[BK] ";
+    //std::string apptag = "[BK] ";
     
     std::cout << apptag << "=== Bron Kerbosch-based graph similarity ===\n";
     std::cout << apptag << "= Searches maximum common substructures in a pair (G1, G2) of graphs.\n";
@@ -43,16 +96,11 @@ int main(int argc, char** argv) {
     std::cout << apptag << "= Written by Julian Gruber-Roet at MolBI group, 2015.\n";
     std::cout << apptag << "\n";
     
+    
+    fill_settings_default();
+    
     if (argc < 3) {
-        std::cout << apptag << "Usage:\n";
-        std::cout << apptag << argv[0] << " <graphFile1.gml> <graphFile2.gml> <output_parameters> \n";
-        std::cout << apptag << "Output parameters:\n";
-        std::cout << apptag << "\t-a     : Output all cliques (default)\n";
-        std::cout << apptag << "\t-l     : Output only largest cliques\n";
-        std::cout << apptag << "\t-f     : Filter permutations for STDOUT, i.e., print unique cliques only.\n";
-        std::cout << apptag << "\t-s <n> : Output only cliques with minimum size <n> vertices.\n";        
-        std::cout << apptag << "Example call: " << argv[0] << " example1.gml example2.gml -s 8\n";
-        std::cout << apptag << "  This will output all cliques larger than 8 vertices.\n";
+        usage();
         return 1;
     }
     
