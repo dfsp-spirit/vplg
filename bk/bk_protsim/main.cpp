@@ -67,27 +67,50 @@ void parse(std::ifstream & cfgfile)
   * These defaults can later be overwritten by config file contents or command line arguments.
   */
 void fill_settings_default() {
-    options["output_path"] = "./";
+    options["output_path"] = "";
     options["silent"] = "no";
+    options["verbose"] = "no";
+    options["filter_duplicates"] = "no";
+    options["min_clique_output_size"] = "3";
+    options["result_type"] = "all";
+    options["write_result_text_files"] = "yes";
 }
 
 void usage() {
     std::cout << apptag << "Usage:\n";
-    std::cout << apptag << "bk_protsim" << " <graphFile1.gml> <graphFile2.gml> <output_parameters> \n";
+    std::cout << apptag << "bk_protsim" << " -f <graphFile1.gml> -s <graphFile2.gml> [<output_parameters>] \n";
     std::cout << apptag << "Output parameters:\n";
-    std::cout << apptag << "\t-a     : Output all cliques (default)\n";
-    std::cout << apptag << "\t-l     : Output only largest cliques\n";
+    std::cout << apptag << "\t--filter-duplicates : Filter duplicate cliques in output\n";
+    std::cout << apptag << "\t--result-type <t> : Results to output, valid values are 'largest', and 'all' (default).\n";
     std::cout << apptag << "\t-f     : Filter permutations for STDOUT, i.e., print unique cliques only.\n";
     std::cout << apptag << "\t-s <n> : Output only cliques with minimum size <n> vertices.\n";        
     std::cout << apptag << "Example call: " << "bk_protsim" << " example1.gml example2.gml -s 8\n";
     std::cout << apptag << "  This will output all cliques larger than 8 vertices.\n";    
 }
 
+const std::string currentDateTime() {
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    // Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
+    // for more information about date/time format
+    strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
+
+    return buf;
+}
+
+
+// global vars
+std::string apptag = "[BK] ";
+std::map<std::string, std::string> options;
+
+
 /*
  * 
  */
 int main(int argc, char** argv) {
-    
+       
     //std::string apptag = "[BK] ";
     std::string startOutput = "";
     
@@ -134,18 +157,126 @@ int main(int argc, char** argv) {
         }
     }
     
-    if (argc < 3) {
+    
+    int opt;
+    // These are set by getopt later
+    int silent_flag;
+    int verbose_flag;
+    int filter_duplicates_flag;
+    int min_clique_output_size = atoi(options["min_clique_output_size"].c_str());
+    std::string output_path;
+    std::string first_graph_file;    
+    std::string second_graph_file;
+    std::string result_type = options["result_type"];
+
+    while (1) {
+        static struct option long_options[] = {
+            /* These options set a flag. */
+            {"silent",          no_argument, &silent_flag,          1},
+            {"verbose",          no_argument, &verbose_flag,          1},
+            {"filter-duplicates",          no_argument, &filter_duplicates_flag,          1},
+
+         
+            /* These options don't set a flag 
+             * and will be distinguished by their indices. */
+            {"help",             no_argument,        0, 'h'},
+            {"first-graph",       required_argument,  0, 'f'},
+            {"second-graph",       required_argument,  0, 's'},
+            {"min-clique-size",       optional_argument,  0, 'm'},
+            {"output-path",      optional_argument,  0, 'o'},
+            {"result-type",      optional_argument,  0, 'r'},
+            {0, 0, 0, 0}
+        };
+        
+        int option_index = 0;
+        
+        opt = getopt_long(argc, argv, "hf:s:o:m:r:", long_options, &option_index);  // the colon ':' behind a parameter tells getopt to look for an argument to it
+        if (opt == -1) {
+            break;  // end of options hit
+        }
+        
+        switch (opt) {
+            case 0:
+                /* If this option sets a flag, do nothing else now. */
+                if (long_options[option_index].flag != 0)
+                    break;
+                //cout << "option" << long_options[option_index].name;
+                if (optarg)
+                    //cout << " with arg " << optarg;
+                //cout << endl;
+                break;         
+            case 'h':
+                usage();
+                return 0;        
+            case 'o':
+                //cout << "option -o with the argument " << optarg << endl;
+                output_path = optarg;
+                output_path.append("/");
+                options["output_path"] = output_path;
+                break;   
+            case 'f':
+                //cout << "option -o with the argument " << optarg << endl;
+                first_graph_file = optarg;
+                options["first_graph_file"] = first_graph_file;
+                break;   
+            case 's':
+                //cout << "option -o with the argument " << optarg << endl;
+                second_graph_file = optarg;
+                options["second_graph_file"] = second_graph_file;
+                break;   
+            case 'm':
+                //cout << "option -o with the argument " << optarg << endl;                
+                options["min_clique_output_size"] = optarg;
+                min_clique_output_size = atoi(optarg);
+                break;   
+            case 'r':
+                //cout << "option -o with the argument " << optarg << endl;                
+                options["result_type"] = optarg;
+                break;   
+            default:
+                std::cerr << apptag << "ERROR: Some command line options are invalid.\n";
+                usage();
+                return 1;                
+        }
+    }
+    
+  
+    if (silent_flag) {
+        options["silent"] = "yes";
+        options["verbose"] = "no";
+    }
+    else {
+        std::cout << startOutput;
+    }
+    
+    if(! silent_flag) {
+        std::cout << apptag << "  Starting at time " << currentDateTime() << std::endl;
+    }
+    
+    if(filter_duplicates_flag) {
+        options["filter_duplicates"] = "yes";
+    }
+    
+    std::cout << apptag << "first_graph_file is " << first_graph_file << "\n";
+    std::cout << apptag << "second_graph_file is " << second_graph_file << "\n";
+    std::cout << apptag << "min_clique_output_size is " << min_clique_output_size << "\n";
+    std::cout << apptag << "filter_duplicates_flag is " << filter_duplicates_flag << "\n";
+    std::cout << apptag << "output_path is " << options["output_path"] << "\n";
+    
+    
+    
+    if (argc < 5) {
         usage();
         return 1;
     }
     
     //main algorithms. All calculations are done here
     //parse input files
-    Graph f = GMLptglProteinParser(argv[1]).graph;
-    Graph s = GMLptglProteinParser(argv[2]).graph;
+    Graph f = GMLptglProteinParser(first_graph_file).graph;
+    Graph s = GMLptglProteinParser(second_graph_file).graph;
     
-    std::cout << apptag << "Graph from file " << argv[1] << " has " << f.vertex_set().size() << " vertices.\n";
-    std::cout << apptag << "Graph from file " << argv[2] << " has " << s.vertex_set().size() << " vertices.\n";
+    std::cout << apptag << "Graph from file " << first_graph_file << " has " << f.vertex_set().size() << " vertices.\n";
+    std::cout << apptag << "Graph from file " << second_graph_file << " has " << s.vertex_set().size() << " vertices.\n";
    
     
     //compute product graph
@@ -157,50 +288,28 @@ int main(int argc, char** argv) {
 
     //parse output parameter, get list of found cliques
     std::list<std::list<unsigned long>> result_list;
-    if (argc >= 4) {
-        if ((strcmp(argv[3],"-l") == 0) || (strcmp(argv[3],"-L") == 0) ) {
-            result_list = BK_Output::get_result_largest(bk);
-        } //end -l
-        else if ((strcmp(argv[3],"-s") == 0) || (strcmp(argv[3],"-S") == 0) ) {
-            int size = 0;
-            if (argc >= 5) {size = atoi(argv[4]);} else { std::cout << apptag << "No size given for parameter '-s', assuming 0.\n"; }
-            result_list = BK_Output::get_result_larger_than(bk, size);
-        }//end -s
-        else if ((strcmp(argv[3],"-a") == 0) || (strcmp(argv[3],"-A") == 0) ) {
-            result_list = BK_Output::get_result_all(bk);
-        }//end -a
-        else {
-            std::cout << apptag << "Unknown output parameter, using default (all cliques).\n";
-            result_list = BK_Output::get_result_all(bk);
-        }//end default
-    } //end output param exists
-    else {
-        std::cout << apptag << "No output parameter given, using default (all cliques).\n";
+    
+    if(options["result_type"] == "largest") {
+        result_list = BK_Output::get_result_largest(bk);
+    }    
+    else if(options["result_type"] == "minsize") {        
+        result_list = BK_Output::get_result_larger_than(bk, atoi(options["min_clique_output_size"].c_str()));
+    }
+    else if(options["result_type"] == "all") {        
         result_list = BK_Output::get_result_all(bk);
-    } //end no output param
+    }
+    else {
+        std::cout << apptag << "Result type option invalid, assuming 'all'.\n";    
+        result_list = BK_Output::get_result_all(bk);
+    }
     
-    
+   
     // we may need to filter permutations here
     
     
-    int filter_permutations = 0; // TODO: get from settings. requires a settings objects and better command line parsing in the first place.
-    int write_result_text_files = 1;    // TODO: get from settings
-    
-    if (argc >= 4) {
-        if ((strcmp(argv[3],"-f") == 0) || (strcmp(argv[3],"-F") == 0) ) {
-            filter_permutations = 1;
-        }
-    }
-    if (argc >= 5) {
-        if ((strcmp(argv[4],"-f") == 0) || (strcmp(argv[4],"-F") == 0) ) {
-            filter_permutations = 1;
-        }
-    }
-    if (argc >= 6) {
-        if ((strcmp(argv[5],"-f") == 0) || (strcmp(argv[5],"-F") == 0) ) {
-            filter_permutations = 1;
-        }
-    }
+    int filter_permutations = ( options["filter_duplicates"] == "yes" ? 1 : 0 );
+    int write_result_text_files = ( options["write_result_text_files"] == "yes" ? 1 : 0 );
+       
     if(filter_permutations) {
         
         std::stringstream fresult;

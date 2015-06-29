@@ -13,9 +13,7 @@
 /*
  *  global variables
  */
-extern int silent;
-extern int verbose;
-extern std::string output_path;
+
 extern std::string apptag;
 extern std::map<std::string, std::string> options;
 
