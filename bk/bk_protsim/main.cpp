@@ -74,6 +74,7 @@ void fill_settings_default() {
     options["min_clique_output_size"] = "3";
     options["result_type"] = "all";
     options["write_result_text_files"] = "yes";
+    options["outfile_prefix"] = "";
 }
 
 void usage() {
@@ -81,9 +82,11 @@ void usage() {
     std::cout << apptag << "bk_protsim" << " -f <graphFile1.gml> -s <graphFile2.gml> [<output_parameters>] \n";
     std::cout << apptag << "Output parameters:\n";    
     std::cout << apptag << " -r <result_type>      : The result type to output, valid values are 'largest', 'minsize' and 'all' (default).\n";
+    std::cout << apptag << " -p <prefix>           : Set the prefix for output file names to <prefix>. Default is empty string.\n";
     std::cout << apptag << " --min-clique-size <s> : Set the minimum clique output size to <s>. Only used if --result-type is 'minsize'. Default is 3.\n";
     std::cout << apptag << " --filter-duplicates   : Filter duplicate cliques in output. Also writes filtered results to text files.\n";
-    std::cout << apptag << " --verbose             : Additional output.\n";
+    std::cout << apptag << " -o <path>             : Set the output path for files to <path>. Has to exist. Defaults to empty string, i.e., the current directory.\n";
+    std::cout << apptag << " --verbose             : Additional output on stdout.\n";
     std::cout << apptag << "Example call: " << "bk_protsim" << " -f example1.gml -s example2.gml\n";
 }
 
@@ -167,6 +170,7 @@ int main(int argc, char** argv) {
     std::string first_graph_file;    
     std::string second_graph_file;
     std::string result_type;
+    std::string outfile_prefix;
 
     while (1) {
         static struct option long_options[] = {
@@ -184,12 +188,13 @@ int main(int argc, char** argv) {
             {"min-clique-size",       optional_argument,  0, 'm'},
             {"output-path",      optional_argument,  0, 'o'},
             {"result-type",      optional_argument,  0, 'r'},
+            {"outfile-prefix",      optional_argument,  0, 'p'},
             {0, 0, 0, 0}
         };
         
         int option_index = 0;
         
-        opt = getopt_long(argc, argv, "hf:s:m:o:r:", long_options, &option_index);  // the colon ':' behind a parameter tells getopt to look for an argument to it
+        opt = getopt_long(argc, argv, "hf:s:m:o:r:p:", long_options, &option_index);  // the colon ':' behind a parameter tells getopt to look for an argument to it
         if (opt == -1) {
             break;  // end of options hit
         }
@@ -233,9 +238,15 @@ int main(int argc, char** argv) {
                 //std::cout << "option -r \n";   
                 result_type = optarg;
                 //std::cout << apptag << "Setting result_type to " << result_type << ".\n";
-                options["result_type"] = result_type;
-                
+                options["result_type"] = result_type;                
                 break;   
+            case 'p':
+                //std::cout << "option -r \n";   
+                outfile_prefix = optarg;
+                //std::cout << apptag << "Setting result_type to " << result_type << ".\n";
+                options["outfile_prefix"] = outfile_prefix;
+                break;   
+                
             default:
                 std::cerr << apptag << "ERROR: Some command line options are invalid.\n";
                 usage();
@@ -343,11 +354,11 @@ int main(int argc, char** argv) {
             
             if(write_result_text_files) {
                 std::stringstream ss1;            
-                ss1 << "results_" << idx << "_first.txt";
+                ss1 << options["output_path"] << options["outfile_prefix"] << "results_" << idx << "_first.txt";
                 std::string firstMappingsFileName = ss1.str();
 
                 std::stringstream ss2;            
-                ss2 << "results_" << idx << "_second.txt";
+                ss2 << options["output_path"] << options["outfile_prefix"] << "results_" << idx << "_second.txt";
                 std::string secondMappingsFileName = ss2.str();
 
                 stringToTextFile(firstMappingsFileName, PG_Output::int_list_to_plcc_vertex_mapping_string(pair.first, "A"));
