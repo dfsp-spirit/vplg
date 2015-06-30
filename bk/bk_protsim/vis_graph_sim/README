@@ -1,0 +1,11 @@
+vis_graph_sim.sh -- compute and visualize common substructures in (protein ligand) graphs
+
+This script runs the bk_protsim and plcc applications on a pair of input protein graphs, and visualizes the computed maximum common substructures in both graphs.
+
+This is part of the bk_protsim software package. Written by Tim Schaefer, 2015.
+
+
+USAGE: ./vis_graph_sim.sh <graph1> <graph2> [<index_of_substructure_to_visualize>] 
+
+EXAMPLE: ./vis_prot_sim.sh 7tim_A_albe_PG.gml 7tim_A_albelig_PG.gml 0
+
