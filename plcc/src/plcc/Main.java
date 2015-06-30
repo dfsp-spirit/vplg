@@ -170,7 +170,9 @@ public class Main {
         //  by command line arguments.
         Settings.init();
         
-        // Check library dir, warn if not there
+        // Check library dir, warn if not there        
+        // NOTE: This is not necessary anymore, because we can store the libs inside the JAR using the jar-for-store target added in the build.xml file. Run 'ant ci' to generate the file, it will then be in store/plcc.jar.
+        /*
         File libDir = new File("lib");
         if( ! libDir.exists()) {
             DP.getInstance().w("Library directory '" + libDir.toString() + "' not found. Libraries missing, will crash if functionality of them is required during this run.");
@@ -178,6 +180,7 @@ public class Main {
             DP.getInstance().w("INFO: The Java library path is set to: '" + System.getProperty("java.library.path") + "'.");
             DP.getInstance().w("INFO: The Java classloader path is set to: '" + System.getProperty("java.class.path") + "'.");
         }
+        */
 
         
         int numSettingsLoaded = Settings.load("");
@@ -4988,6 +4991,9 @@ public class Main {
         System.out.println("-z | --ramaplot            : draw a ramachandran plot of each chain to the file '<pdbid>_<chain>_plot.svg'");        
         System.out.println("-Z | --silent              : silent mode. do not write output to STDOUT.");        
         System.out.println("   --compute-graph-metrics : compute graph metrics like cluster coefficient for PGs. Slower!");
+        System.out.println("");
+        System.out.println("The following options only make sense for database maintenance:");
+        System.out.println("--set-pdb-representative-chains <file> <k> : Set non-redundant chain status for all chains in DB from XML file <file>. <k> determines what to do with existing flags, valid options are 'keep' or 'remove'.");
         System.out.println("");
         System.out.println("EXAMPLES: java -jar plcc.jar 8icd");
         System.out.println("          java -jar plcc.jar 8icd -D 2 -d /tmp/dssp/8icd.dssp -p /tmp/pdb/8icd.pdb");
