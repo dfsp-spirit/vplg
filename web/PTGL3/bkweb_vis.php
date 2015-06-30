@@ -192,7 +192,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		}
 		
 		if($valid_values) {
-		    echo '<h3>OK</h3>';
+		    echo '<h4>Query OK</h4>';
 		    $first_graphtype_str = get_graphtype_string($first_graphtype_int);	
 		    $first_graph_file_name_no_ext = get_protein_graph_path_and_file_name_no_ext($first_pdb_id, $first_chain_name, $first_graphtype_str);
 		    $first_full_gml_file = $IMG_ROOT_PATH . $first_graph_file_name_no_ext . ".gml";
@@ -205,7 +205,8 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			if(file_exists($first_full_gml_file) && file_exists($second_full_gml_file)){
 				$gml_files_available = TRUE;
 				echo "GML graph files found.<br>";
-				echo "Checking for BK result files. BK random tag is '$bk_random_tag'.<br>";
+				echo "Visualizing mapping with result identifier '$int_result_id'.<br>\n";
+				//echo "Checking for BK result files. BK random tag is '$bk_random_tag'.<br>";
 				
 				// constrcut file names like 'bkrunXXXXX_results_0_first.txt', where the 0 can be any number and XXXXX is a random number prefix.
 				$bk_mapping_result_file_first = $bk_outfile_prefix . "results_" . $int_result_id . "_first.txt";
@@ -214,9 +215,9 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 				$bk_mapping_result_file_second = $bk_outfile_prefix . "results_" . $int_result_id . "_second.txt";
 				$bk_mapping_result_file_second_full = "./bk_web/tmp_output/" . $bk_mapping_result_file_second;
 				
-				echo "BK result file should be '$bk_mapping_result_file_first_full' and '$bk_mapping_result_file_second_full'.<br>";
+				//echo "BK result file should be '$bk_mapping_result_file_first_full' and '$bk_mapping_result_file_second_full'.<br>";
 				if(file_exists($bk_mapping_result_file_first_full) && file_exists($bk_mapping_result_file_second_full)) {
-				    echo "Both BK result files found. Changing dir...<br>";
+				    //echo "Both BK result files found. Changing dir...<br>";
 					
 					if(! is_dir('bk_web')) {
 						echo "ERROR: The required bk_web directory was not found. Aborting.<br>";
@@ -245,12 +246,12 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 					$stdoutput_second = "";
 					if(file_exists($first_full_gml_file_changed_rel) && file_exists($second_full_gml_file_changed_rel)) {
 						if(file_exists($bk_mapping_result_file_first_full_changed_rel) && file_exists($bk_mapping_result_file_second_full_changed_rel)) {
-							echo "Running plcc for first graph and result mappings...<br>";
+							//echo "Running plcc for first graph and result mappings...<br>";
 							// run plcc for first graph
 							
 						   exec("java -jar plcc.jar NONE --draw-gml-graph  $first_full_gml_file_changed_rel $bk_mapping_result_file_first_full_changed_rel $plcc_first_output_image_rel_no_file_extension", $stdoutput_first);
 						   
-						   echo "Running plcc for second graph and result mappings...<br>";
+						   //echo "Running plcc for second graph and result mappings...<br>";
 						   
 						   exec("java -jar plcc.jar NONE --draw-gml-graph  $second_full_gml_file_changed_rel $bk_mapping_result_file_second_full_changed_rel $plcc_second_output_image_rel_no_file_extension", $stdoutput_second);
 					   }
@@ -274,7 +275,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 				       echo "<h3>Visualization of the selected substructure in the two graphs</h3>";
 					   echo "<p>The following image shows the common substructure in the first graph. Vertices and edges of the substructure shared with the second graph are marked in gray. The marked vertices that can be mapped to equivalent vertices in the second graph are also given a label, e.g., 'A0'.";
 				       echo "<img src='$plcc_first_output_image' alt='Substructure highlighted in the first graph' style='max-width:800px;'><br>";
-					   echo "<br><br>The following image shows the common substructure in the second graph. A vertex labeld as 'A0' in the first graph was mapped to the vertex labeld 'B0' in this graph.<br><br>";
+					   echo "<br><br>The following image shows the common substructure in the second graph. A vertex labeled 'A0' in the first graph was mapped to the vertex labeled 'B0' in this graph.<br><br>";
 					   echo "<img src='$plcc_second_output_image' alt='Substructure highlighted in the second graph' style='max-width:800px;'><br>";
 					   echo "</p>";
 					   //echo "<h3>Where to go from here</h3><p>";

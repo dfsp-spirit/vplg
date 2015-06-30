@@ -167,10 +167,10 @@ if($valid_values){
 		
 		
 		$bk_protsim_command = "./bk_protsim -f $first_full_file_changed_rel -s $second_full_file_changed_rel -r largest --filter-permutations -o tmp_output -p $outfile_prefix";
-		echo "Running bk_protsim command: '$bk_protsim_command'.<br>";
+		//echo "Running bk_protsim command: '$bk_protsim_command'.<br>";
 		exec("$bk_protsim_command", $stdoutput);
 		
-		echo "First PLCC run said: <br>"; foreach($stdoutput as $s) { echo " $s <br>\n"; } echo "<br>\n";
+		//echo "First PLCC run said: <br>"; foreach($stdoutput as $s) { echo " $s <br>\n"; } echo "<br>\n";
 		
 		if( ! chdir('..')) {
 		    die("Could not leave BK run directory. Aborting.");
@@ -188,28 +188,34 @@ if($valid_values){
             if(preg_match('#^' . $outfile_prefix . '(results_)[^\s]*_first(\.(txt))#', $file)) {
               // add to our file array for later use
               $results[] = $file;
-              echo "adding result file '$file'.<br>\n";
+              //echo "adding result file '$file'.<br>\n";
             }
             else {
-              echo "Skipping file '$file'.<br>\n";
+              //echo "Skipping file '$file'.<br>\n";
             }
 			
 			// find file names like 'bkrunXXXXX_results_0_second.txt', where the 0 can be any number and XXXXX is a random number prefix.
 			if(preg_match('#^' . $outfile_prefix . '(results_)[^\s]*_second(\.(txt))#', $file)) {
               // add to our file array for later use
               $results_second[] = $file;
-              echo "adding result file '$file'.<br>\n";
+              //echo "adding result file '$file'.<br>\n";
             }
             else {
-              echo "Skipping file '$file'.<br>\n";
+              //echo "Skipping file '$file'.<br>\n";
             }
 			
            }
         }
+		sort($results);
+		sort($results_second);
+		
 		$num_found = count($results);
 		$num_found_second = count($results_second);
 		
-		// TODO: we could check whether both arrays have the same length, and throw an error if not
+		// check whether both arrays have the same length, and throw an error if not
+		if( count($num_found) != count($num_found_second) ) {
+		    die("ERROR: The lengths of the two mapping arrays do not match, aborting.<br>\n");
+		}				
 		
 		$tableString .= "<form  method='POST' action='bkweb_vis.php' target='_blank'>";
 		$tableString .= "<table id='bktable'><tr><th>Result ID</th><th>File names</th><th>Preview</th><th>Substructure size</th><th>Select substructure</th></tr>";
@@ -218,7 +224,30 @@ if($valid_values){
 		  $file_first = $results[$i];
 		  $file_second = $results_second[$i];
 		  $num_lines = count(file('bk_web/tmp_output/' . $file_first));
-		  $result_id = $i; // TODO: should parse from file name instead of simply incrementing!
+		  $result_id = $i; // Assumed ID, because the arrays were sorted. We also parse it from the file names below to verify
+		  
+		  $match_first = array();
+		  preg_match('#^' . $outfile_prefix . '(results_)(?<tag_id>[^\s]*)_first(\.(txt))$#', $file_first, $match_first);
+		  $matched_result_id_first = intval($match_first['tag_id']);
+		  //echo "at i=$i: matched_result_id_first='$matched_result_id_first'<br>\n";
+		  
+		  $match_second = array();
+		  preg_match('#^' . $outfile_prefix . '(results_)(?<tag_id>[^\s]*)_second(\.(txt))$#', $file_second, $match_second);
+		  $matched_result_id_second = intval($match_second['tag_id']);
+		  //echo "at i=$i: matched_result_id_first='$matched_result_id_first'<br>\n";
+		  
+		  if( ! ($matched_result_id_first === $matched_result_id_second)) {
+		      echo "ERROR: Parsed result IDs of the two result files mismatch! Aborting.<br>\n";
+		      die();
+		  }
+		  
+		  // compare assumed id (from incrementing) with the parsed ones
+		  if( ! ($matched_result_id_first === $result_id)) {
+		      echo "WARNING: Parsed result IDs mistmatch with computed result ID! Using parsed ID.<br>\n";
+		      $result_id = $matched_result_id_first; // $matched_result_id_first is same as $matched_result_id_second, we checked above!
+		  }
+		  
+		  
 		  $checked_string = "";
 		  $file_content_first = file_get_contents('bk_web/tmp_output/' . $file_first);
 		  $file_content_second = file_get_contents('bk_web/tmp_output/' . $file_second);
