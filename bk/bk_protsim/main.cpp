@@ -1,3 +1,14 @@
+/*
+ *   This file is part of:
+ * 
+ *   bk_protsim Copyright (C) 2015  Molecular Bioinformatics group, Goethe-University Frankfurt
+ * 
+ *   Written by Julian Gruber-Roet, maintained by Tim Schaefer.
+ *   This program comes with ABSOLUTELY NO WARRANTY.
+ *    This is free software, and you are welcome to redistribute it
+ *   under certain conditions, see the LICENSE file for details.
+ */
+
 /* 
  * File:   main.cpp
  * Author: julian
@@ -264,12 +275,17 @@ int main(int argc, char** argv) {
         }
     }
     
-	// check for invalid outfile prefix
-	std::size_t found = options["outfile_prefix"].find("..");
-    if (found != std::string::npos) {
-	    std:cerr << apptag << "ERROR: Invalid outfile prefix, must not contain '..'. Set the output dir instead.\n";
-		exit(1);
-	}
+    // check for invalid outfile prefixes
+    std::size_t foundDots = options["outfile_prefix"].find("..");
+    if (foundDots != std::string::npos) {
+        std::cerr << apptag << "ERROR: Invalid outfile prefix, must not contain '..'. Set the output dir instead.\n";
+        exit(1);
+    }
+    std::size_t foundSlash = options["outfile_prefix"].find("/");
+    if (foundSlash != std::string::npos) {
+        std::cerr << apptag << "ERROR: Invalid outfile prefix, must not contain '/'. Set the output dir instead.\n";
+        exit(1);
+    }
   
     if (verbose_flag) {
         options["verbose"] = "yes";

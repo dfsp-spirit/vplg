@@ -1,1 +1,12 @@
-This is the Bron-Kerbosch project dir of Julian.
+This is the Bron-Kerbosch Protein Similarity (bk_protsim) project repo.
+
+bk_protsim was mainly written by Julian Gruber-Roet during an internship at the Molecular Bioinformatics group of Ina Koch at Goethe-University Frankfurt, Germany. It has been extended and is maintainded by Tim Schaefer, http://rcmd.org/ts/.
+
+bk_protsim is free software and comes without any warranty, see the LICENSE file for details.
+
+Copyright MolBI 2015.
+
+http://www.bioinformatik.uni-frankfurt.de
+
+
+

@@ -1,7 +1,16 @@
+/*
+ *   This file is part of:
+ * 
+ *   bk_protsim Copyright (C) 2015  Molecular Bioinformatics group, Goethe-University Frankfurt
+ * 
+ *   Written by Julian Gruber-Roet, maintained by Tim Schaefer.
+ *   This program comes with ABSOLUTELY NO WARRANTY.
+ *    This is free software, and you are welcome to redistribute it
+ *   under certain conditions, see the LICENSE file for details.
+ */
+
 /* 
  * 
-#include "GMLptglProteinParser.h"
-#include "GMLptglProteinParser.h"File:   GMLptglProteinParser.cpp
  * Author: ben
  * 
  * Created on May 8, 2015, 2:18 PM
