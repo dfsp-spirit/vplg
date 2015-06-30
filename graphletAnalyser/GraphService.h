@@ -9,18 +9,10 @@
 #define	GRAPHSERVICE_H
 
 
-/*
- * TODO:
- * ask for Matlab inclusion
- * ask for method: parse_value_string
- * Separation of Parser and Graph Constructor
-
- * 
- * 
-*/
 
 
 #include "Graph.h"
+#include "GraphletCounts.h"
 
 /*This Headerfile is meant to define functions for supporting several graph services,
  * including:   Creation of GML files from graphs,
@@ -74,8 +66,10 @@ class GraphService {
 private:    
     //attributes
     Graph g;
+    GraphletCounts gc;
+    std::string graphlet_identifier;
+    std::vector<std::string> graphlet_patterns();
     
-
     
     
 public:
@@ -95,7 +89,12 @@ public:
     std::vector<int> computeDegreeDist(); // compute node degree distribution
     std::vector<int> get_adjacent(int i); // get all vertices adjacent to i as a vector
     std::vector<std::vector<int>> get_adjacent_all(); // call get_adjacent on all vertices
-
+    std::vector<std::vector<int>> get_abs_counts();
+    std::vector<std::vector<float>> get_norm_counts();
+    std::unordered_map<std::string, std::vector<int>> get_labeled_abs_counts(std::string id, std::vector<std::string> patterns);
+    std::unordered_map<std::string, std::vector<float>> get_labeled_norm_counts(std::string id, std::vector<std::string> patterns);
+    std::string get_graphlet_identifier();
+    std::vector<std::string> get_patterns();
 };
 
 

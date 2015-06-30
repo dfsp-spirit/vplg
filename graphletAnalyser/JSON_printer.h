@@ -9,7 +9,7 @@
 #define	JSON_PRINTER_H
 
 
-/* Provides Interface for printing stuff in JSON format */
+/* printing vectors in JSON format */
 class JSON_printer {
     
     
@@ -19,6 +19,9 @@ class JSON_printer {
         std::string print_int_vec_vector(std::vector<vector<int>>);
         std::string print_float_vector(std::vector<float>);
         std::string print_float_vec_vector(std::vector<std::vector<float>>);
+        std::string print_vectors_with_info(std::string graph_name, std::string graphlet_info, 
+                                           std::vector<std::vector<float>> rel_counts, 
+                                           std::vector<std::vector<int>> abs_counts);
     
     
 };

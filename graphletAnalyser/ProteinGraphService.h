@@ -9,6 +9,7 @@
 #define	PROTEINGRAPHSERVICE_H
 
 #include "Graph.h"
+#include "GraphletCounts.h"
 using namespace std;
 
 /* This class only exists so the old function getGraphTypeInt is stored in a good
@@ -19,6 +20,7 @@ class ProteinGraphService: public GraphService {
         
         //attributes
         Graph g;
+        GraphletCounts gc;
     
     public:
         //methods

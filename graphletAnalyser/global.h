@@ -1,7 +1,7 @@
 /* 
  * File:   includes.h
  * Author: tatiana
- *
+ * Edits: Ben
  * Created on April 30, 2013, 2:55 PM
  */
 
@@ -86,12 +86,12 @@ const std::string greeting_message_long =
         "*   This tool is an extendable graphlet features extraction framework          *\n"
         "*   which currently allows:                                                    *\n"
         "*                                                                              *\n"
-        "*   - to compute the relative frequencies of                                   *\n"
+        "*   - to compute the relative and absolute frequencies of                      *\n"
         "*               - unlabeled graphlets and                                      *\n"
         "*               - some types of labeled graphlets                              *\n"
         "*     for input graphs in GML format;                                          *\n"
         "*                                                                              *\n"
-        "*   - to store these counts in different formats (plain, Matlab, NOVA).        *\n"
+        "*   - to store these counts in different formats (plain, Matlab, NOVA, JSON).  *\n"
         "*                                                                              *\n"
         "*------------------------------------------------------------------------------*\n";
 

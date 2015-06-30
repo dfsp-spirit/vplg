@@ -54,6 +54,7 @@ GraphService::GraphService() {
 
 GraphService::GraphService(Graph graph) {
     g = graph;
+    gc(g);
 };
 
 
@@ -215,5 +216,44 @@ std::vector<std::vector<int>> GraphService::get_adjacent_all() {
     }
     
     return adj_all_vector;
+    
+}
+
+std::vector<std::vector<int>> GraphService::get_abs_counts() {
+    std::vector<std::vector<int>> out_vec = gc.get_abs_counts();
+    
+    return out_vec;
+}
+
+std::vector<std::vector<float>> GraphService::get_norm_counts() {
+    std::vector<std::vector<float>> out_vec = gc.get_abs_counts();
+    
+    return out_vec;
+}
+
+std::unordered_map<std::string, std::vector<int>> GraphService::get_labeled_abs_counts(std::string id, std::vector<std::string> patterns) {
+    std::unordered_map<std::string,std::vector<int>> map = std::unordered_map<std::string, std::vector<int>>();
+    graphlet_identifier = id;
+    
+    return map;
+}
+
+
+std::unordered_map<std::string, std::vector<float>> GraphService::get_labeled_norm_counts(std::string id, std::vector<std::string> patterns) {
+    std::unordered_map<std::string,std::vector<float>> map = std::unordered_map<std::string, std::vector<float>>();
+    
+    
+    
+    graphlet_identifier = id;
+    
+    
+    return map;
+}
+
+std::string GraphService::get_graphlet_identifier() {
+    return graphlet_identifier;
+}
+
+std::vector<std::string> GraphService::get_patterns() {
     
 }

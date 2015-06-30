@@ -45,7 +45,6 @@ public:
     void save_counts_in_nova_format(string,vector<vector<int>>, bool);
     void save_abs_counts_as_matlab_variable();
     void save_norm_counts_as_matlab_variable();
-    void save_counts_to_db_PGXX();
     
 };
 

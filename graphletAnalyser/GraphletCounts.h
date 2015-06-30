@@ -55,7 +55,6 @@ private:
     std::vector<int> labeled_abs_counts; // absolute counts for labeled graphlets
     std::vector<float> labeled_norm_counts; // normalized counts for labeled graphlets
    
-    std::vector< std::vector<float> > graphletDegreeDistribution;
     
     bool print;
     bool printGraphletDetails;

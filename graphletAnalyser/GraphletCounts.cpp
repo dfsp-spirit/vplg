@@ -57,23 +57,6 @@ GraphletCounts::GraphletCounts() {
     vector<float> tmpl2 (26);
     labeled_norm_counts = tmpl2;
     
-    
-    
-    
-    
-    
-    int numOrbits = 73;
-    int numDegrees = 20;
-    vector< vector<float> > tmpgdd(numOrbits);
-    graphletDegreeDistribution = tmpgdd;
-    
-    // fill the vector with vectors of zeros
-    for(int i = 0; i < numOrbits; i++){
-        for(int j = 0; j < numDegrees; j++) {
-            graphletDegreeDistribution[i].push_back(0);
-        }
-    }
-    
     print = verbose;
     printGraphletDetails = saveGraphletDetails;
     all_counts_computed = false;

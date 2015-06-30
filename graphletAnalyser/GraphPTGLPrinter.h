@@ -9,9 +9,12 @@
 #define	GRAPHPTGLPRINTER_H
 
 #include "GraphPrinter.h"
+#include "ProteinGraphService.h"
 
 class GraphPTGLPrinter : public GraphPrinter {
     
+    private:
+        ProteinGraphService service;
 
     
     public:
@@ -26,6 +29,7 @@ class GraphPTGLPrinter : public GraphPrinter {
         std::string printGraphString();
         std::string printChainID();
         std::string printGraphTypeString();
+        int saveCountsToDatabasePGXX();
     
 };
 
