@@ -53,9 +53,13 @@ mkdir -p $TMP_EXPORT_DIR
 CUR_DIR=`pwd`
 
 
+## Added June 2015: build the software, including unit tests and the JAR which contains all libs already
+echo "$APPTAG Building plcc with target 'ci'..."
+cd $REPO_DIR_PLCC && ant ci && cd $CUR_DIR
+
 ## Copy the files 1: binaries
 echo "$APPTAG Copying binaries and scripts..."
-cp $REPO_DIR_PLCC/dist/plcc.jar $RELEASE_DIR/vplg/
+cp $REPO_DIR_PLCC/store/plcc.jar $RELEASE_DIR/vplg/
 cp $REPO_DIR_PLCC/testrun/plcc $RELEASE_DIR/vplg/
 
 cp $REPO_DIR_SPLITPDB/dist/splitpdb.jar $RELEASE_DIR/vplg/
@@ -70,8 +74,9 @@ fi
 cp $REPO_DIR_PLCC/tools/rpg.pl $RELEASE_DIR/vplg/
 
 ## 2: libraries
-echo "$APPTAG Copying libraries..."
-cp $REPO_DIR_PLCC/lib/*.jar $RELEASE_DIR/vplg/lib/
+## UPDATE Jule 2015: This is not needed anymore, the JAR from the 'ci' build target already contains them
+#echo "$APPTAG Copying libraries..."
+#cp $REPO_DIR_PLCC/lib/*.jar $RELEASE_DIR/vplg/lib/
 #cp $REPO_DIR_SPLITPDB/lib/*.jar $RELEASE_DIR/vplg/lib/
 #if [ "$INCLUDE_VPG" = "YES" ]; then
 #    cp $REPO_DIR_VPG/lib/*.jar $RELEASE_DIR/vplg/lib/
