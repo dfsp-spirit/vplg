@@ -17,6 +17,7 @@
  */
 
 #include "ProductGraph.h"
+#include "common.h"
 #include <tuple>
 #include <forward_list>
 
@@ -39,7 +40,7 @@ ProductGraph::ProductGraph(const Graph& fstGraph, const Graph& secGraph) : fstGr
  * Copy constructor. Not implemented yet.
  */
 ProductGraph::ProductGraph(const ProductGraph&) : fstGraph(0), secGraph(0), prodGraph(0) {
-    std::cerr << "not implemented";
+    std::cerr << "ERROR: ProductGraph: Copy constructor not implemented.\n";
     exit(1);
 }
 
@@ -117,7 +118,7 @@ void ProductGraph::run() {
             prodGraph[*vi].id = *vi;
             ++vi;
         } else {
-            std::cerr << "List -> Graph size disparity.";
+            std::cerr << "ERROR: ProductGraph::run List -> Graph size disparity.\n";
         }
     }
 
@@ -190,6 +191,11 @@ std::pair<bool, bool> ProductGraph::verticesCompatible(VertexIterator_p p1, Vert
             neighbouredSec = true;
         }
     }
+    
+    // debug
+    //if(labelFst == labelSec) {
+    //    std::cout << apptag << "DEBUG: ProductGraph::verticesCompatible: Vertex labels identical: '" << labelFst << "' and '" << labelSec << "'.\n";
+    //}
     
     bool z = (neighbouredFst && neighbouredSec) && (labelFst == labelSec);
     return std::make_pair( z || !(neighbouredFst || neighbouredSec),    z );
