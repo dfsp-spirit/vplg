@@ -12,7 +12,7 @@ $DO_SHOW_ERROR_LIST = $DEBUG_MODE;
 $SHOW_ERROR_LIST = array();
 
 
-$title = "BKweb -- Protein graph comparison";
+$title = "BKweb -- Protein ligand graph substructure comparison";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
 ?>
 <html>
@@ -54,7 +54,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 	<?php include('navbar.php'); ?>
 
 	<div class="container" id="publications">
-		<h2>Protein ligand graph comparison</h2>
+		<h2>Protein ligand graph substructure comparison</h2>
 		<br>
 		
 		<div id="PageIntro">

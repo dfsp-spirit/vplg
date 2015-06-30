@@ -84,6 +84,23 @@ function get_folding_graph_path_and_file_name_no_ext($pdbid, $chain, $graphtype_
   return $path . $fname;
 }
 
+function delete_old_files($directory, $older_than_num_secs) {
+  $num_del = 0;
+  $files = glob($directory . "/*");
+  $now   = time();
+
+  foreach ($files as $file) {
+    if (is_file($file)) { // also to exclude '.' and '..'
+      if ($now - filemtime($file) >= intval($older_than_num_secs)) {
+        unlink($file);
+        $num_del++;
+      }
+    }
+  }
+  
+  return $num_del;
+}
+
 $pageload_was_search = FALSE;
 $valid_values = FALSE;
 
@@ -133,6 +150,9 @@ $tableString = "";
 $gml_files_available = FALSE;
 
 if($valid_values){    	
+        // delete files older than 2h from tmp out dir
+        delete_old_files('bk_web/tmp_output/', 60*60*2);
+
 	// check for the GML files
 	$first_graphtype_str = get_graphtype_string($first_graphtype_int);	
 	$first_graph_file_name_no_ext = get_protein_graph_path_and_file_name_no_ext($first_pdb_id, $first_chain_name, $first_graphtype_str);
@@ -265,6 +285,8 @@ if($valid_values){
 		$tableString .= "<input type='hidden' name='first_pdbchain' value='$first_pdbchain'>";
 		$tableString .= "<input type='hidden' name='second_pdbchain' value='$second_pdbchain'>";
 		$tableString .= "<input type='hidden' name='bk_random_tag' value='$bk_random_tag'>";		
+		
+		$tableString .= "<br>To visualize the selected substructure in both graphs in a new browser tab, click the button below. Note that you can come back to this tab and visualize another substructure later! (We delete the results after 2 hours.)<br>\n";
 		
 		$tableString .= "<button type='submit' id='sendit_visualize' name='sendit_visualize' class='btn btn-default' style='margin-top:35px;'><span>Visualize selected substructure</span></button>";
 		$tableString .= "</form>";
