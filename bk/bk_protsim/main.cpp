@@ -94,6 +94,7 @@ void fill_settings_default() {
     options["result_type"] = "all";
     options["write_result_text_files"] = "yes";
     options["outfile_prefix"] = "";
+    options["check_home_for_config_file"] = "no";
 }
 
 void usage() {
@@ -150,23 +151,26 @@ int main(int argc, char** argv) {
     std::string config_file_name = "bk_protsim.cfg";
     // test whether cfg file is in HOME, use it from there if it exists. otherwise, the code above applies and it is searched in the local dir
     bool cfg_parsed_from_home = false;
-    std::string home_path = getenv("HOME");
-    if ( ! home_path.empty()) {
-        //printf ("The user home is: '%s'.\n", home_path.c_str());
-        std::string config_file_name_home = home_path.append("/.bk_protsim.cfg");
-        std::ifstream configFileHome(config_file_name_home.c_str());
-        if (configFileHome.is_open()) {
-            startOutput.append(apptag).append("  Parsing config file from user home at '").append(config_file_name_home.c_str()).append("'.\n");
-            parse(configFileHome);
-            cfg_parsed_from_home = true;
-        } else {
-            std::cout << apptag << "  No config file found in user home at '" << config_file_name_home.c_str() <<  "', checking current dir.\n";
+    
+    if(options["check_home_for_config_file"] == "yes") {
+    
+        std::string home_path = getenv("HOME");
+        if ( ! home_path.empty()) {
+            //printf ("The user home is: '%s'.\n", home_path.c_str());
+            std::string config_file_name_home = home_path.append("/.bk_protsim.cfg");
+            std::ifstream configFileHome(config_file_name_home.c_str());
+            if (configFileHome.is_open()) {
+                startOutput.append(apptag).append("  Parsing config file from user home at '").append(config_file_name_home.c_str()).append("'.\n");
+                parse(configFileHome);
+                cfg_parsed_from_home = true;
+            } else {
+                std::cout << apptag << "  No config file found in user home at '" << config_file_name_home.c_str() <<  "', checking current dir.\n";
+            }
+        }
+        else {
+            std::cout << apptag << "  Could not determine user home directory to search for config file, $HOME is not set in the environment.\n";
         }
     }
-    else {
-        std::cout << apptag << "  Could not determine user home directory to search for config file, $HOME is not set in the environment.\n";
-    }
-    
     // now the default settings may be overwritten by stuff in the config file
     if( ! cfg_parsed_from_home) {
         std::ifstream configFile(config_file_name.c_str());
@@ -174,7 +178,7 @@ int main(int argc, char** argv) {
             std::cout << apptag << "  Parsing config file from '" << config_file_name.c_str() <<  "'.\n";
             parse(configFile);
         } else {		
-                std::cout << apptag << "  Could not read config file '" << config_file_name << "' in current dir or '." << config_file_name << "' in user home. Using internal default settings.\n";
+                std::cout << apptag << "  Could not read config file '" << config_file_name << "' in current dir. Using internal default settings.\n";
         }
     }
     

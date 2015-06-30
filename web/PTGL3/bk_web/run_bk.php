@@ -145,14 +145,11 @@ if($valid_values){
 	if(file_exists($first_full_file) && file_exists($second_full_file)){
 	    $gml_files_available = TRUE;
 	    //$tableString .= "GML files found, running bk.<br>";
-		//$bk_random_tag = rand(10000, 99999);
-		$bk_random_tag = 12345;
+		$bk_random_tag = rand(10000, 99999);
+		//$bk_random_tag = 12345;  // DEBUG
 		$outfile_prefix = "bkrun" . $bk_random_tag . "_";
-		
-		//DEBUG:
-		$outfile_prefix = "bkrun12345_";
-		
-	    $stdoutput = "";
+				
+		$stdoutput = "";
 		
 		if(! is_dir('bk_web')) {
 			echo "ERROR: The required bk_web directory was not found. Aborting.<br>";
@@ -167,7 +164,14 @@ if($valid_values){
 		}
 		$first_full_file_changed_rel = '../' . $first_full_file;
 		$second_full_file_changed_rel = '../' . $second_full_file;
-		exec("./bk_protsim -f $first_full_file_changed_rel -s $second_full_file_changed_rel -r largest --filter-permutations -o tmp_output -p $outfile_prefix", $stdoutput);
+		
+		
+		$bk_protsim_command = "./bk_protsim -f $first_full_file_changed_rel -s $second_full_file_changed_rel -r largest --filter-permutations -o tmp_output -p $outfile_prefix";
+		echo "Running bk_protsim command: '$bk_protsim_command'.<br>";
+		exec("$bk_protsim_command", $stdoutput);
+		
+		echo "First PLCC run said: <br>"; foreach($stdoutput as $s) { echo " $s <br>\n"; } echo "<br>\n";
+		
 		if( ! chdir('..')) {
 		    die("Could not leave BK run directory. Aborting.");
 		}
@@ -184,12 +188,20 @@ if($valid_values){
             if(preg_match('#^' . $outfile_prefix . '(results_)[^\s]*_first(\.(txt))#', $file)) {
               // add to our file array for later use
               $results[] = $file;
+              echo "adding result file '$file'.<br>\n";
+            }
+            else {
+              echo "Skipping file '$file'.<br>\n";
             }
 			
 			// find file names like 'bkrunXXXXX_results_0_second.txt', where the 0 can be any number and XXXXX is a random number prefix.
 			if(preg_match('#^' . $outfile_prefix . '(results_)[^\s]*_second(\.(txt))#', $file)) {
               // add to our file array for later use
               $results_second[] = $file;
+              echo "adding result file '$file'.<br>\n";
+            }
+            else {
+              echo "Skipping file '$file'.<br>\n";
             }
 			
            }
