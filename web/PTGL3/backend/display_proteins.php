@@ -26,6 +26,13 @@ if($DEBUG){
 }
 
 
+function get_ligand_expo_link($ligand_name3) {
+    if(strlen($ligand_name3) === 3) {
+      return "http://ligand-expo.rcsb.org/pyapps/ldHandler.py?formid=cc-index-search&target=" . $ligand_name3 . "&operation=ccid";
+    }
+    return false;    
+}
+
 function get_motifs_found_in_chain($db, $pdb_id, $chain_name) {
     
 
@@ -313,10 +320,24 @@ foreach ($chains as $value){
 
                 $pdb_start = str_replace("-", "", substr($arrSSE["pdb_start"], 1));
                 $pdb_end = str_replace("-", "", substr($arrSSE["pdb_end"], 1));
+                
+                // show the ligand name instead of the AA string for ligands
+                $AA_seq_or_ligand_name3 = $arrSSE["sequence"];
+                if($AA_seq_or_ligand_name3 === "J") { // "J" means it is a ligand
+                    $lig_name = trim($arrSSE["lig_name"]);
+                    $ligexpo_link = get_ligand_expo_link($lig_name);
+                    if($ligexpo_link) {
+                        $AA_seq_or_ligand_name3 = "ligand: <a href='" . $ligexpo_link . "' target='_blank'>" . $lig_name . "</a>";
+                    }
+                    else {
+                        $AA_seq_or_ligand_name3 = "ligand: " . $lig_name;
+                    }
+                }
+                
                 $tableString .= '<tr class="tablecenter">
                                     <td>'.$counter.'</td>
-                                    <td>'.$sse_type_shortcuts[$arrSSE["sse_type"]].'</td>
-                                    <td>'.$arrSSE["sequence"].'</td>
+                                    <td>'.$sse_type_shortcuts[$arrSSE["sse_type"]].'</td>                                                                        
+                                    <td>'.$AA_seq_or_ligand_name3.'</td>
                                     <td>'.$pdb_start.' - '.$pdb_end.'</td>
                                  </tr>';
                 $counter++;
