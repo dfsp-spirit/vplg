@@ -33,6 +33,23 @@ function get_ligand_expo_link($ligand_name3) {
     return false;    
 }
 
+
+// sse_type must be "H", "E", "L" or "O"
+function get_sse_tooltip_div_for($sse_type) {
+    if($sse_type === "H") {
+        return '<div title="Helix">' . $sse_type . '</div>';
+    }
+    else if($sse_type === "E") {
+        return '<div title="Beta strand">' . $sse_type . '</div>';
+    }
+    else if($sse_type === "L") {
+        return '<div title="Ligand">' . $sse_type . '</div>';
+    }
+    else {
+        return '<div title="Other SSE">' . $sse_type . '</div>';
+    }
+}
+
 function get_motifs_found_in_chain($db, $pdb_id, $chain_name) {
     
 
@@ -125,6 +142,52 @@ $sse_type_shortcuts = array(
     3 => "L",
     4 => "O"
 );
+
+$aa_names_1_to_full = array(
+    "A" => "Alanine",
+    "R" => "Arginine",
+    "N" => "Asparagine",
+    "D" => "Aspartic_acid",
+    "C" => "Cysteine",
+    "E" => "Glutamic_acid",
+    "Q" => "Glutamine",
+    "G" => "Glycine",
+    "H" => "Histidine",
+    "I" => "Isoleucine",
+    "L" => "Leucine",
+    "K" => "Lysine",
+    "M" => "Methionine",
+    "F" => "Phenylalanine",
+    "P" => "Proline",
+    "S" => "Serine",
+    "T" => "Threonine",
+    "W" => "Tryptophan",
+    "Y" => "Tyrosine",
+    "V" => "Valine"
+);
+
+
+function get_AA_tooltip_div_for_single_AA_name_one_letter($aa) {
+global $aa_names_1_to_full;
+    if($aa_names_1_to_full[$aa]) {
+        return '<span title=' . $aa_names_1_to_full[$aa] . '>' . $aa . '</span>';
+    }
+    else {
+        return "$aa";
+    }   
+}
+
+
+// adds a tooltip with the full AA name to each character (AA 1-letter name) in the string
+function get_full_tooltip_AA_html_from_seq($aa_seq) {
+    $str_arr = str_split($aa_seq);
+    $res = "";
+    foreach($str_arr as $aa) {
+        $res .= get_AA_tooltip_div_for_single_AA_name_one_letter($aa);
+    }
+    return $res;
+}
+
 
 // if _GET is set and contains the parameter 'q' then..
 if(isset($_GET)) {
@@ -333,12 +396,18 @@ foreach ($chains as $value){
                         $AA_seq_or_ligand_name3 = "ligand: " . $lig_name;
                     }
                 }
+                else {
+                     $AA_seq_or_ligand_name3 = get_full_tooltip_AA_html_from_seq($AA_seq_or_ligand_name3);
+                }
+                
+                // show a tooltip of the SSE type in the table
+                $sse_type_text = get_sse_tooltip_div_for($sse_type_shortcuts[intval($arrSSE["sse_type"])]);
                 
                 $tableString .= '<tr class="tablecenter">
-                                    <td>'.$counter.'</td>
-                                    <td>'.$sse_type_shortcuts[$arrSSE["sse_type"]].'</td>                                                                        
-                                    <td>'.$AA_seq_or_ligand_name3.'</td>
-                                    <td>'.$pdb_start.' - '.$pdb_end.'</td>
+                                    <td>' . $counter . '</td>
+                                    <td>' . $sse_type_text . '</td>
+                                    <td>' . $AA_seq_or_ligand_name3 . '</td>
+                                    <td>' . $pdb_start . ' - ' . $pdb_end . '</td>
                                  </tr>';
                 $counter++;
             }
