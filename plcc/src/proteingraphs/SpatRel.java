@@ -35,6 +35,7 @@ public class SpatRel {
     public static final String STRING_PARALLEL = "p";
     public static final String STRING_ANTIPARALLEL = "a";
     public static final String STRING_LIGAND = "j";
+    public static final String DEPRECATED_STRING_LIGAND = "l";
     public static final String STRING_BACKBONE = "b";
     public static final String STRING_DISULFIDE = "d";
     public static final String STRING_COMPLEX = "c";
@@ -176,6 +177,10 @@ public class SpatRel {
         }
         else if(s.equals(SpatRel.STRING_OTHER)) {
             return(SpatRel.OTHER);
+        }
+        else if(s.equals(SpatRel.DEPRECATED_STRING_LIGAND)) {
+            DP.getInstance().w("SpatRel", "stringToInt: Spatial relation string '" + s + "' for ligands is deprecated, use '" + SpatRel.STRING_LIGAND + "' instead. Assuming 'ligand'.");
+            return(SpatRel.LIGAND);
         }
         
         else {
