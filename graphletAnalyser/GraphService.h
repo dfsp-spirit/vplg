@@ -68,7 +68,7 @@ private:
     Graph g;
     GraphletCounts gc;
     std::string graphlet_identifier;
-    std::vector<std::string> graphlet_patterns();
+    std::vector<std::string> graphlet_patterns;
     
     
     
@@ -78,6 +78,7 @@ public:
     
     GraphService(); // default constructor
     GraphService(Graph graph); // constructor
+    GraphService(Graph& graph);
     Graph getGraph(); // returns the graph
     std::string get_label(); // returns the graph's label
     std::vector<std::string> getGraphProperties(); //Returns property keys

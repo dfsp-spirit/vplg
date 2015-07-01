@@ -9,7 +9,6 @@
 #define	GMLPARSER_H
 
 #include "Graph.h"
-using namespace std;
 
 
 /*

@@ -46,21 +46,32 @@ using namespace boost;
  * ]
  * 
  */
-
-GraphService::GraphService() {
-    Graph g_tmp;
-    g = g_tmp;
-};
+//
+//GraphService::GraphService() {
+//    Graph g_tmp;
+//    g = g_tmp;
+//    gc(g);
+//    graphlet_identifier = "";
+//    graphlet_patterns = std::vector<std::string>();
+//}
 
 GraphService::GraphService(Graph graph) {
     g = graph;
     gc(g);
-};
+    graphlet_identifier = "";
+    graphlet_patterns = std::vector<std::string>();
+}
 
+GraphService::GraphService(Graph& graph) {
+    g = graph;
+    gc(g);
+    graphlet_identifier = "";
+    graphlet_patterns = std::vector<std::string>();
+}
 
 Graph GraphService::getGraph() {
   return g;  
-};
+}
 
 /* Return the keys i.e. the property names of a given graph
  * @param graph g

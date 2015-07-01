@@ -166,39 +166,9 @@ int GraphPTGLPrinter::saveCountsToDatabasePGXX() {
     //TODO: implement function get--counts in graphservice
     //      so that the labeled counts can be written into the database
     
-    std::vector<float> cl; 
+    std::vector<float> cl = service.get_norm_ptgl_counts();
     
-        // all possible labeling of g1 graphlet (triangle) concerning the symmetry
-    std::string g1_vertex_patterns[] = { "HHH","HHE","HEE","EEE" };
     
-    // all possible labeling of g2 graphlet (2-path) concerning the symmetry
-    std::string g2_vertex_patterns[] = { "HHH","HHE","EHE","HEH","HEE","EEE" };
-    
-    // bio-motivated labeling of graphlets
-    // currently implemented are the beta-alpha-beta and beta-beta-beta motifs
-    // NOTE: also check if its composing vertices are adjacent
-    std::string g2_bio_patterns[]    = { "EaHaE",    // beta-alpha-beta motif
-                                    "EaEaE" };  // beta-beta-beta motif
-    
-        // all possible labeling of g6 graphlet (3-path) concerning the symmetry
-    std::string g6_vertex_patterns[] = { "HHHH","HHHE",       "EHHE",
-                                    "HHEH","HHEE","EHEH","EHEE",
-                                    "HEEH","HEEE",       "EEEE"};
-    std::string g6_bio_patterns[]    = { "EaEaEaE",  // greek key
-                                    "EpEpEpE"}; // 4-beta-barrel, non-adjacent
-    // all possible labeling of edge (2-vertex path of length 1) graphlet (triangle) concerning the symmetry
-    std::string g0_vertex_patterns[] = { "HH", "EH", "HE", "EE" };
-
-    
-    /*
-     * NOTE the correspondence 
-     *   lcount[0..3]   := g1_vertex_patterns[0..3] 
-     *   lcount[4..9]   := g2_vertex_patterns[0..6]
-     *   lcount[10..11] := g2_bio_patterns[0..1]
-     *   lcount[12..21] := g6_vertex_patterns[0..9]
-     *   lcount[22,23] := g6_bio_patterns[0,1]
-     */
-
     
     
     if(graphtype <= 0 || graphtype >= 7) {
@@ -272,24 +242,18 @@ int GraphPTGLPrinter::saveCountsToDatabasePGXX() {
              string strVal;
             
             std::vector<float> allGraphletcounts;
-            if(withLabeled) {
-                allGraphletcounts.reserve(graphlet3CountsNormalized.size() + graphlet4CountsNormalized.size() + graphlet5CountsNormalized.size() + cl.size());
-                allGraphletcounts.insert(allGraphletcounts.end(), graphlet3CountsNormalized.begin(), graphlet3CountsNormalized.end());
-                allGraphletcounts.insert(allGraphletcounts.end(), graphlet4CountsNormalized.begin(), graphlet4CountsNormalized.end());
-                allGraphletcounts.insert(allGraphletcounts.end(), graphlet5CountsNormalized.begin(), graphlet5CountsNormalized.end());
-                allGraphletcounts.insert(allGraphletcounts.end(), cl.begin(), cl.end());
-            }
-            else {
-                allGraphletcounts.reserve(graphlet3CountsNormalized.size() + graphlet4CountsNormalized.size() + graphlet5CountsNormalized.size());
-                allGraphletcounts.insert(allGraphletcounts.end(), graphlet3CountsNormalized.begin(), graphlet3CountsNormalized.end());
-                allGraphletcounts.insert(allGraphletcounts.end(), graphlet4CountsNormalized.begin(), graphlet4CountsNormalized.end());
-                allGraphletcounts.insert(allGraphletcounts.end(), graphlet5CountsNormalized.begin(), graphlet5CountsNormalized.end());
-            }
+
+            allGraphletcounts.reserve(graphlet3CountsNormalized.size() + graphlet4CountsNormalized.size() + graphlet5CountsNormalized.size() + cl.size());
+            allGraphletcounts.insert(allGraphletcounts.end(), graphlet3CountsNormalized.begin(), graphlet3CountsNormalized.end());
+            allGraphletcounts.insert(allGraphletcounts.end(), graphlet4CountsNormalized.begin(), graphlet4CountsNormalized.end());
+            allGraphletcounts.insert(allGraphletcounts.end(), graphlet5CountsNormalized.begin(), graphlet5CountsNormalized.end());
+            allGraphletcounts.insert(allGraphletcounts.end(), cl.begin(), cl.end());
+
             
             // check stuff
-            int numExpected = 55;
-            if(! withLabeled) {
-                numExpected = 55 - 26;
+            int numExpected = 67;
+            if(cl.empty()) {
+                numExpected = 67 - 38;
             }
             
             
@@ -316,21 +280,21 @@ int GraphPTGLPrinter::saveCountsToDatabasePGXX() {
             }
             
             
-            // fill the remaining fields if there is no data on labeled graphlets
-            if( ! withLabeled) {
-                float valueForMissing = -1.0f;
-                cout << apptag << "WARNING: Writing graphlets to database but missing data on labeled graphlets, setting count " << valueForMissing << " for them.\n";
-                int numMissingValues = (55  - allGraphletcounts.size());                
-                for (int i = 0; i < numMissingValues; i++) {
-                    std::stringstream ssVal;
-                    ssVal << std::fixed << std::setprecision(4) << valueForMissing;
-                    strVal = ssVal.str();
-                    query += W.esc(strVal);
-                    if(i < numMissingValues - 1) {
-                        query += ", ";
-                    }
-                }                
-            }
+//            // fill the remaining fields if there is no data on labeled graphlets
+//            if( ! withLabeled) {
+//                float valueForMissing = -1.0f;
+//                cout << apptag << "WARNING: Writing graphlets to database but missing data on labeled graphlets, setting count " << valueForMissing << " for them.\n";
+//                int numMissingValues = (55  - allGraphletcounts.size());                
+//                for (int i = 0; i < numMissingValues; i++) {
+//                    std::stringstream ssVal;
+//                    ssVal << std::fixed << std::setprecision(4) << valueForMissing;
+//                    strVal = ssVal.str();
+//                    query += W.esc(strVal);
+//                    if(i < numMissingValues - 1) {
+//                        query += ", ";
+//                    }
+//                }                
+//            }
             
             
             query += "}');";
@@ -351,6 +315,171 @@ int GraphPTGLPrinter::saveCountsToDatabasePGXX() {
 
     } catch (const std::exception &e) {
         cerr << apptag << "SQL trouble when trying to save graphlets to DB: '" << e.what() << "'." << endl;
+        return 1;
+    }
+}
+
+long GraphPTGLPrinter::getGraphDatabaseID(string pdbid, string chain, int graphType) {
+    
+    long id = -1;
+    
+    stringstream ssgt;
+    ssgt << graphType;
+    string graphTypeStr = ssgt.str();
+    
+    try {
+        connection C("dbname=vplg user=vplg host=localhost port=5432 connect_timeout=10 password=vplg");
+        //cout << "      Connected to database '" << C.dbname() << "'.\n";
+        work W(C);
+        result R = W.exec("SELECT g.graph_id FROM plcc_graph g INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON  p.pdb_id = c.pdb_id WHERE (c.chain_name = '" + W.esc(chain) + "' AND g.graph_type = " + W.esc(graphTypeStr) + " AND p.pdb_id = '" + W.esc(pdbid) + "');");
+
+        //cout << "      Found " << R.size() << " graphs of type " << graphType << " for PDB " << pdbid << " chain " << chain << "." << endl;
+
+        if(R.size() == 1) {
+                result::const_iterator r = R.begin();
+                id = atol(r[0].c_str());	// cast string to long and return
+                return id;
+        }
+
+        //for (result::const_iterator r = R.begin(); r != R.end(); ++r) {
+        //	cout << r[0].c_str() << endl;
+        //}
+
+    } catch (const std::exception &e) {
+        cerr << apptag << "ERROR: SQL trouble when trying to retrieve graph PK from DB: '" << e.what() << "'." << endl;
+        return -1;
+    }
+    
+    return id;
+}
+
+int GraphPTGLPrinter::databaseContainsGraphletsForGraph(unsigned long int databaseIDofGraph) {
+
+    Database db = Database::getInstance();
+    string connection_string = db.get_connect_string();
+    
+    stringstream ssdbpk;
+    ssdbpk << databaseIDofGraph;
+    string dbpkStr = ssdbpk.str();
+
+    try {
+        connection C(connection_string);
+        work W(C);
+        result R = W.exec("SELECT g.graphlet_id FROM plcc_graphlets g WHERE g.graph_id = " + W.esc(dbpkStr) + ";");
+
+        int count = R.size();
+        return count;		
+        
+    } catch (const std::exception &e) {
+        cerr << apptag << "SQL trouble when checking for graphlet entry for graph in DB: '" << e.what() << "'." << endl;
+        return -1;
+    }
+}
+
+
+/**
+ * Saves the graphlet counts in NOVA format to the NOVA output file. If the file does already exist,
+ * the data for this graph gets appended to it. This format is basically CSV.
+ * See http://www.bioinformatik.uni-frankfurt.de/tools/nova/ for more info on NOVA.
+ * @param withLabeled whether to write labeled graphlet info as well
+ */
+void GraphPTGLPrinter::saveCountsInNovaFormat(std::vector<std::vector<float>> norm_counts, bool withLabeled) {
+    ofstream countsNovaFormatFile;
+    const string countsNovaFormatFileName = output_path + "countsNovaFormat.csv";
+    int pos;
+    int numberOfGraphlets;
+    
+    std::vector<float> graphlet3CountsNormalized = norm_counts[1];
+    std::vector<float> graphlet4CountsNormalized = norm_counts[2];
+    std::vector<float> graphlet5CountsNormalized = norm_counts[3];
+    std::vector<float> cl;
+    std::string graphName = service.get_label();
+
+    countsNovaFormatFile.open(countsNovaFormatFileName.c_str(), std::ios_base::app);    
+    if (!countsNovaFormatFile.is_open()) {
+        cout << apptag << "ERROR: could not open counts file in NOVA format.\n";
+    } else {
+        pos = countsNovaFormatFile.tellp();
+        if (pos == 0) {
+            countsNovaFormatFile << "ID,Group";
+            
+            if (withLabeled){ cl = norm_counts[4]; numberOfGraphlets = graphlet3CountsNormalized.size() + graphlet4CountsNormalized.size() + graphlet5CountsNormalized.size() + cl.size(); }                      
+            else             {numberOfGraphlets = graphlet3CountsNormalized.size() + graphlet4CountsNormalized.size() + graphlet5CountsNormalized.size();}
+                       
+            for (int i = 1; i <= numberOfGraphlets; i++) {
+                countsNovaFormatFile << ",Graphlet" << i;
+            }        
+            countsNovaFormatFile << "\n";
+        }
+        countsNovaFormatFile << graphName << ",A";             
+        //countsNovaFormatFile << graphName << ",B";             
+        for (int i = 0; i < graphlet3CountsNormalized.size(); i++) countsNovaFormatFile << "," << graphlet3CountsNormalized[i];
+        for (int i = 0; i < graphlet4CountsNormalized.size(); i++) countsNovaFormatFile << "," << graphlet4CountsNormalized[i];
+        for (int i = 0; i < graphlet5CountsNormalized.size(); i++) countsNovaFormatFile << "," << graphlet5CountsNormalized[i];
+        if (withLabeled) {
+            for (int i = 0; i < cl.size(); i++) countsNovaFormatFile << "," << cl[i];
+        }
+        countsNovaFormatFile << "\n";
+        countsNovaFormatFile.close();
+    
+        if( ! silent) {
+            cout << apptag << "    The counts were added to the \"" << countsNovaFormatFileName << "\".\n"; 
+        }
+    }
+}
+
+void GraphPTGLPrinter::deleteGraphletCountEntryForGraph(unsigned long int databaseIDofGraph) {
+    Database db = Database::getInstance();
+    string connection_string = db.get_connect_string();
+    
+    stringstream ssdbpk;
+    ssdbpk << databaseIDofGraph;
+    string dbpkStr = ssdbpk.str();
+
+    try {
+        connection C(connection_string);
+        work W(C);
+        result R = W.exec("DELETE FROM plcc_graphlets g WHERE g.graph_id = " + W.esc(dbpkStr) + ";");        
+        int count = R.affected_rows();
+        if( ! silent) {
+            cout << apptag << "      Deleted " << count << " graphlet count entries.\n";
+        }
+        W.commit();                        
+    } catch (const std::exception &e) {
+        cerr << apptag << "SQL trouble when checking for graphlet entry for graph in DB: '" << e.what() << "'." << endl;
+    }
+}
+int GraphPTGLPrinter::testDatabasePGXX() {
+
+    if( ! silent) {
+        cout << apptag << "    Testing PostgreSQL database connection.\n";
+    }
+    Database db = Database::getInstance();
+    string connection_string = db.get_connect_string();
+    if( ! silent) {
+        cout << apptag << "    Database connection string is '" << connection_string << "'.\n";
+    }
+    try {
+        connection C(connection_string);
+        if( ! silent) {
+            cout << apptag << "      Connected to database '" << C.dbname() << "'.\n";
+        }
+        work W(C);
+        result R = W.exec("SELECT p.pdb_id FROM plcc_protein p");
+
+        if( ! silent) {
+            cout << apptag << "      Found " << R.size() << " proteins in the DB:" << endl;
+        }
+
+        for (result::const_iterator r = R.begin(); r != R.end(); ++r) {
+            if( ! silent) {
+                cout << apptag << "      PDB ID: " << r[0].c_str() << endl;
+            }
+        }
+
+        return 0;		
+    } catch (const std::exception &e) {
+        cerr << apptag << "SQL trouble when testing DB: '" << e.what() << "'." << endl;
         return 1;
     }
 }

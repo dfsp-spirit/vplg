@@ -2,11 +2,49 @@
 
 ProteinGraphService::ProteinGraphService() {
    Graph g_tmp;
-   g = g_tmp;  
+   g = g_tmp;
+   gc(g);
 };
 
 ProteinGraphService::ProteinGraphService(const Graph graph) {
     g = graph;
+    sse_graphlets_2p = std::vector<std::string>();
+    sse_graphlets_3p = std::vector<std::string>();
+    sse_graphlets_tri = std::vector<std::string>();
+    
+    sse_graphlets_2p.push_back("HH");
+    sse_graphlets_2p.push_back("HE");
+    sse_graphlets_2p.push_back("HL");
+    sse_graphlets_2p.push_back("EE");
+    sse_graphlets_2p.push_back("EL");
+    sse_graphlets_2p.push_back("LL");
+    
+    sse_graphlets_3p.push_back("HHH");
+    sse_graphlets_3p.push_back("HHE");
+    sse_graphlets_3p.push_back("HHL");
+    sse_graphlets_3p.push_back("HEH");
+    sse_graphlets_3p.push_back("HLH");
+    sse_graphlets_3p.push_back("EEE");
+    sse_graphlets_3p.push_back("EEH");
+    sse_graphlets_3p.push_back("EEL");
+    sse_graphlets_3p.push_back("EHE");
+    sse_graphlets_3p.push_back("ELE");
+    sse_graphlets_3p.push_back("EHE");
+    sse_graphlets_3p.push_back("LLL");
+    sse_graphlets_3p.push_back("LLH");
+    sse_graphlets_3p.push_back("LLE");
+    sse_graphlets_3p.push_back("LHL");
+    sse_graphlets_3p.push_back("LEL");
+    
+    sse_graphlets_tri = sse_graphlets_3p;
+    
+    /* NOTE:
+     * length of labeled 2 path vector:    6
+     * length of labeled 3 path vector:   16
+     * length of labeled triangle vector: 16
+     * combined length:                   38 */
+    
+    
 };
 
 /* 
@@ -37,3 +75,39 @@ int ProteinGraphService::getGraphTypeInt(string graphType) {
     return -1;  
 };
 
+std::vector<int> ProteinGraphService::get_abs_ptgl_counts() {
+    
+    std::vector<std::vector<string>> patterns = std::vector<std::vector<std::string>>();
+    patterns.push_back(sse_graphlets_3p);
+    patterns.push_back(sse_graphlets_tri);
+    
+    abs_ptgl_counts = gc.get_labeled_3_countsABS("sse_type",patterns);
+    
+    
+    return abs_ptgl_counts;
+    
+    
+}
+
+std::vector<float> ProteinGraphService::get_norm_ptgl_counts() {
+    
+    abs_ptgl_counts = get_abs_ptgl_counts();
+    norm_ptgl_counts = gc.normalize_counts(abs_ptgl_counts);
+    
+    
+    return norm_ptgl_counts;
+}
+
+std::string ProteinGraphService::getPdbid() {
+    return g[graph_bundle].properties["pdb_id"];
+}
+
+std::string ProteinGraphService::getChainID() {
+    
+    return g[graph_bundle].properties["chain_id"];
+}
+
+std::string ProteinGraphService::getGraphTypeString() {
+    
+    return g[graph_bundle].properties["graph_type"];
+}

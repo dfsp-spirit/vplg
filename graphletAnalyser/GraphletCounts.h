@@ -30,7 +30,7 @@ private:
     std::vector<int> graphlet4CountsABS; // counts for 4-graphlets absolute
     std::vector<int> graphlet5CountsABS; // counts for 5-graphlets absolute
     
-    std::vector<string> size_2_labels;
+    std::vector<std::string> size_2_labels;
     std::vector<std::vector<std::string>> size_3_labels;
     std::vector<std::vector<std::string>> size_4_labels;
     
@@ -85,21 +85,19 @@ public:
     // methods
     
     std::vector<std::vector<int>> get_abs_counts();
-    vector<vector<float>> get_normalized_counts();
+    std::vector<std::vector<float>> get_normalized_counts();
     std::vector<float> get_labeled_norm_counts();
     std::vector<int> get_labeled_abs_counts();
-    vector<float> normalize_counts(vector<int>,bool);
-    void saveCountsInNovaFormat(bool);
-    int saveCountsToDatabasePGXX(bool);
-    int databaseContainsGraphletsForGraph(unsigned long int);
-    void deleteGraphletCountEntryForGraph(unsigned long int);
+    std::vector<float> normalize_counts(std::vector<int>,bool);
+    
+    
+    
     std::string print_counts(std::vector<int>&, bool);
-    long getGraphDatabaseID(std::string, std::string, int);
-    int testDatabasePGXX();
+    
     
     std::vector<int> get_labeled_2_countsABS(std::string, std::vector<std::string>);
-    std::vector<vector<int>> get_labeled_3_countsABS(std::string, std::vector<std::vector<std::string>>);
-    std::vector<vector<int>> get_labeled_4_countsABS(std::string, std::vector<std::vector<std::string>>);
+    std::vector<std::vector<int>> get_labeled_3_countsABS(std::string, std::vector<std::vector<std::string>>);
+    std::vector<std::vector<int>> get_labeled_4_countsABS(std::string, std::vector<std::vector<std::string>>);
 
     /******* Graphlet Counting Algorithms by N. Shervashidze ********/
     std::vector<int> count_connected_2_graphlets(Graph&, std::string, std::vector<std::string>);

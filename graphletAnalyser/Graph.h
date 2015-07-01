@@ -10,7 +10,6 @@
 
 #include "global.h"
 #include <unordered_map>
-using namespace std;
 
 
 // The following structs store data on the graph itself and its elements i.e.
@@ -19,24 +18,24 @@ using namespace std;
 struct graph_info {     
     int id;
     int directed;
-    string label;
-    string commment;   
-    unordered_map<string, string> properties; // used to store an arbitrary number of properties
+    std::string label;
+    std::string commment;   
+    std::unordered_map<std::string, std::string> properties; // used to store an arbitrary number of properties
 };
 
 struct vertex_info {
     int id;
-    string label;
-    string comment;
-    unordered_map<string, string> properties; 
+    std::string label;
+    std::string comment;
+    std::unordered_map<std::string, std::string> properties; 
 };
 
 struct edge_info {
     int source;   
     int target;
-    string label;
-    string comment;
-    unordered_map<string, string> properties;
+    std::string label;
+    std::string comment;
+    std::unordered_map<std::string, std::string> properties;
 };
 
 // Renaming of BGL contents for better readability

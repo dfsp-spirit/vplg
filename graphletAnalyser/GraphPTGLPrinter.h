@@ -30,7 +30,11 @@ class GraphPTGLPrinter : public GraphPrinter {
         std::string printChainID();
         std::string printGraphTypeString();
         int saveCountsToDatabasePGXX();
-    
+        long getGraphDatabaseID(std::string, std::string, int);
+        int databaseContainsGraphletsForGraph(unsigned long int);
+        void saveCountsInNovaFormat(std::vector<std::vector<float>>,bool);
+        void deleteGraphletCountEntryForGraph(unsigned long int);
+        int testDatabasePGXX();
 };
 
 
