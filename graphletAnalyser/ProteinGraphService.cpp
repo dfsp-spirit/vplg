@@ -38,6 +38,9 @@ ProteinGraphService::ProteinGraphService(const Graph graph) {
     
     sse_graphlets_tri = sse_graphlets_3p;
     
+    abs_ptgl_counts = std::vector<std::vector<int>>();
+    norm_ptgl_counts = std::vector<std::vector<float>>();
+    
     /* NOTE:
      * length of labeled 2 path vector:    6
      * length of labeled 3 path vector:   16
@@ -78,10 +81,19 @@ int ProteinGraphService::getGraphTypeInt(string graphType) {
 std::vector<std::vector<int>> ProteinGraphService::get_abs_ptgl_counts() {
     
     std::vector<std::vector<string>> patterns = std::vector<std::vector<std::string>>();
+    std::vector<int> counts2p = gc.get_labeled_2_countsABS("sse_type", sse_graphlets_2p);
+    
+    
     patterns.push_back(sse_graphlets_3p);
     patterns.push_back(sse_graphlets_tri);
     
-    abs_ptgl_counts = gc.get_labeled_3_countsABS("sse_type",patterns);
+    std::vector<std::vector<int>> abs = gc.get_labeled_3_countsABS("sse_type",patterns);
+    
+    abs_ptgl_counts.push_back(counts2p);
+    abs_ptgl_counts.push_back(abs[0]);
+    abs_ptgl_counts.push_back(abs[1]);
+    
+    
     
     
     return abs_ptgl_counts;
@@ -89,11 +101,18 @@ std::vector<std::vector<int>> ProteinGraphService::get_abs_ptgl_counts() {
     
 }
 
-std::vector<float> ProteinGraphService::get_norm_ptgl_counts() {
+std::vector<std::vector<float>> ProteinGraphService::get_norm_ptgl_counts() {
     
     abs_ptgl_counts = get_abs_ptgl_counts();
-    norm_ptgl_counts = gc.normalize_counts(abs_ptgl_counts,false);
+    float total = float (gc.get_total_counts());
     
+    std::vector<float> norm2 = gc.normalize_counts(abs_ptgl_counts[0], total);
+    std::vector<float> norm3p = gc.normalize_counts(abs_ptgl_counts[1],total);
+    std::vector<float> norm3t = gc.normalize_counts(abs_ptgl_counts[2],total);
+    
+    norm_ptgl_counts.push_back(norm2);
+    norm_ptgl_counts.push_back(norm3p);
+    norm_ptgl_counts.push_back(norm3t);
     
     return norm_ptgl_counts;
 }

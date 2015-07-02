@@ -226,7 +226,7 @@ std::vector<std::vector<int>> GraphService::get_adjacent_all() {
 }
 
 std::vector<std::vector<int>> GraphService::get_abs_counts() {
-    std::vector<std::vector<int>> out_vec = gc.get_abs_counts();
+    std::vector<std::vector<int>> out_vec = gc.get_unlabeled_abs_counts();
     
     return out_vec;
 }

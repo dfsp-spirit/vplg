@@ -16,12 +16,12 @@ using namespace pqxx;
 GraphPTGLPrinter::GraphPTGLPrinter() {
     ProteinGraphService service_tmp;
 
-    ProteinGraphService service();
+    service = ProteinGraphService();
 };
 
 
 GraphPTGLPrinter::GraphPTGLPrinter(Graph g) {
-    ProteinGraphService service(g);
+    service = ProteinGraphService(g);
 };
 
 /*
@@ -166,8 +166,18 @@ int GraphPTGLPrinter::saveCountsToDatabasePGXX() {
     //TODO: implement function get--counts in graphservice
     //      so that the labeled counts can be written into the database
     
-    std::vector<float> cl = service.get_norm_ptgl_counts();
+    std::vector<float> cl = std::vector<float>();
+    std::vector<std::vector<float>> lab_counts = service.get_norm_ptgl_counts();
     
+    for (int i = 0; i<lab_counts.size(); i++) {
+        std::vector<float> vec = lab_counts[i];
+        
+        for (int k = 0; k<vec.size(); k++) {
+            cl.push_back(vec[k]);
+        }
+        
+        
+    }
     
     
     

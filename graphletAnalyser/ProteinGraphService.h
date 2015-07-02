@@ -10,7 +10,10 @@
 
 #include "Graph.h"
 #include "GraphletCounts.h"
+
+
 using namespace std;
+using namespace boost;
 
 /* This class only exists so the old function getGraphTypeInt is stored in a good
  * place */
@@ -26,7 +29,7 @@ class ProteinGraphService: public GraphService {
         std::vector<std::string> sse_graphlets_tri; // all possible labels for triangles
         
         std::vector<std::vector<int>> abs_ptgl_counts;
-        std::vector<float> norm_ptgl_counts;
+        std::vector<std::vector<float>> norm_ptgl_counts;
     
     public:
         //methods
@@ -37,7 +40,7 @@ class ProteinGraphService: public GraphService {
         string getChainID();
         string getGraphTypeString();
         std::vector<std::vector<int>> get_abs_ptgl_counts();
-        std::vector<float> get_norm_ptgl_counts();
+        std::vector<std::vector<float>> get_norm_ptgl_counts();
     
 };
 

@@ -67,8 +67,8 @@ void GraphPrinter::saveGraphStatistics() {
 
     // get the graph statistics, i.e. Node-Degreee-Distribution, number of vertices, number of edges
     std::vector<int> degDist = service.computeDegreeDist();
-    int n = num_vertices(service.getGraph());
-    int m = num_edges(service.getGraph());
+    int n = service.getNumVertices();
+    int m = service.getNumEdges();
     /* NOTE:
      * p is the ratio of (number of edges in graph) to (maximal possible number of edges given n vertices) */
     float p = 2.0 * m / (n * (n - 1.0));  
@@ -102,7 +102,7 @@ void GraphPrinter::saveAsMatlabVariable(int& number) {
     std::ofstream matlabFile;
     const std::string matlabFileName = output_path + "graphsMatlabFormat.m"; // make output file
     
-    Graph g = service.getGraph();
+    const Graph& g = service.getGraph();
     
     // open the file
     matlabFile.open(matlabFileName.c_str(), std::ios_base::app);

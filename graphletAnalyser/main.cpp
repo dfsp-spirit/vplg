@@ -407,7 +407,7 @@ int main(int argc, char** argv) {
         }
 
         if(options["output_counts_database"] == "yes") {
-            int db_res = gc.saveCountsToDatabasePGXX(withLabeled);
+            int db_res = printer.saveCountsToDatabasePGXX();
         }
 
         if(options["output_counts_matlab"] == "yes") {
@@ -415,7 +415,7 @@ int main(int argc, char** argv) {
         }
 
         if(options["output_counts_nova"] == "yes") {
-                gc.saveCountsInNovaFormat(withLabeled);
+                printer.saveCountsInNovaFormat(gc.get_normalized_counts(),withLabeled);
         }
 
         if( ! silent) {

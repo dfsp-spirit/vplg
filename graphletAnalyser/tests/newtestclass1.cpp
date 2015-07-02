@@ -6,6 +6,7 @@
  */
 
 #include "newtestclass1.h"
+#include "../GraphService.h"
 using namespace boost;
 
 
