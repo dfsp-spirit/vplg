@@ -46,30 +46,25 @@ using namespace boost;
  * ]
  * 
  */
-//
-//GraphService::GraphService() {
-//    Graph g_tmp;
-//    g = g_tmp;
-//    gc(g);
-//    graphlet_identifier = "";
-//    graphlet_patterns = std::vector<std::string>();
-//}
 
-GraphService::GraphService(Graph graph) {
-    g = graph;
-    gc(g);
+GraphService::GraphService() {
+    Graph g_tmp(1);
+    g = g_tmp;
+    gc = GraphletCounts(g);
     graphlet_identifier = "";
     graphlet_patterns = std::vector<std::string>();
 }
 
 GraphService::GraphService(Graph& graph) {
     g = graph;
-    gc(g);
+    gc = GraphletCounts(g);
     graphlet_identifier = "";
     graphlet_patterns = std::vector<std::string>();
 }
 
-Graph GraphService::getGraph() {
+
+
+Graph GraphService::getGraph() const {
   return g;  
 }
 
@@ -79,7 +74,7 @@ Graph GraphService::getGraph() {
 std::vector<std::string> GraphService::getGraphProperties() {
     std::unordered_map<std::string, std::string> propertyMap = g[graph_bundle].properties;
     
-    std::vector<string> keys;
+    std::vector<std::string> keys = std::vector<std::string>();
     keys.reserve(propertyMap.size());
 
     for(auto kv : propertyMap) {
@@ -221,7 +216,7 @@ std::vector<std::vector<int>> GraphService::get_adjacent_all() {
     int n = getNumVertices();
     
     for (int i = 0; i < n; i++) {
-        vector<int> adj_vector = get_adjacent(i);
+        std::vector<int> adj_vector = get_adjacent(i);
         
         adj_all_vector.push_back(adj_vector);
     }
@@ -237,7 +232,7 @@ std::vector<std::vector<int>> GraphService::get_abs_counts() {
 }
 
 std::vector<std::vector<float>> GraphService::get_norm_counts() {
-    std::vector<std::vector<float>> out_vec = gc.get_abs_counts();
+    std::vector<std::vector<float>> out_vec = gc.get_normalized_counts();
     
     return out_vec;
 }
@@ -267,4 +262,16 @@ std::string GraphService::get_graphlet_identifier() {
 
 std::vector<std::string> GraphService::get_patterns() {
     
+}
+
+GraphService & GraphService::operator =(const GraphService & serv) {
+    
+    if (this == &serv) {
+        return *this;
+    }
+    g = serv.getGraph();
+    gc = GraphletCounts(g);
+    graphlet_identifier = "";
+    graphlet_patterns = std::vector<std::string>();
+    return *this;
 }

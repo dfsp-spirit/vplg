@@ -77,9 +77,8 @@ public:
     //methods
     
     GraphService(); // default constructor
-    GraphService(Graph graph); // constructor
-    GraphService(Graph& graph);
-    Graph getGraph(); // returns the graph
+    GraphService(Graph& graph); // constructor
+    Graph getGraph() const; // returns the graph
     std::string get_label(); // returns the graph's label
     std::vector<std::string> getGraphProperties(); //Returns property keys
     std::string getPropertyValue(std::string prop); // returns value for a property
@@ -96,6 +95,7 @@ public:
     std::unordered_map<std::string, std::vector<float>> get_labeled_norm_counts(std::string id, std::vector<std::string> patterns);
     std::string get_graphlet_identifier();
     std::vector<std::string> get_patterns();
+    GraphService & operator=(const GraphService & serv);
 };
 
 

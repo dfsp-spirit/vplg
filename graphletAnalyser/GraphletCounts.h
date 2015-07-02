@@ -89,6 +89,7 @@ public:
     std::vector<float> get_labeled_norm_counts();
     std::vector<int> get_labeled_abs_counts();
     std::vector<float> normalize_counts(std::vector<int>,bool);
+    Graph get_graph() const;
     
     
     
@@ -104,6 +105,7 @@ public:
     std::vector<int> count_connected_3_graphlets(Graph&, std::string, std::vector<std::vector<std::string>>);
     std::vector<int> count_connected_4_graphlets(Graph&, std::string, std::vector<std::vector<std::string>>);
     std::vector<int> count_connected_5_graphlets(Graph&, bool);
+    GraphletCounts & operator=(const GraphletCounts &);
 };
 
 #endif	/* GRAPHLETCOUNTS_H */

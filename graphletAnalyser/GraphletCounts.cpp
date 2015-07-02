@@ -91,28 +91,28 @@ GraphletCounts::GraphletCounts(Graph& graph) {
     if (memberGraph[graph_bundle].properties.count("graph_type") == 1) {
         std::string graphType = memberGraph[graph_bundle].properties["graph_type"];
         if(graphType == "alpha") {
-        return 1;
+        graphtype = 1;
         }
         else if(graphType == "beta") {
-            return 2;
+            graphtype = 2;
         }
         else if(graphType == "albe") {
-            return 3;
+            graphtype = 3;
         }
         else if(graphType == "alphalig") {
-            return 4;
+            graphtype = 4;
         }
         else if(graphType == "betalig") {
-            return 5;
+            graphtype = 5;
         }
         else if(graphType == "albelig") {
-            return 6;
+            graphtype = 6;
         }
         else if(graphType == "aa_graph") {
-            return 7;
+            graphtype = 7;
         }
         cerr << "WARNING: Invalid graph type string, cannot translate it to graph type int code.\n";
-        return -1;  
+        graphtype = -1;  
     } else {
         graphtypestr = "no_graph_type";
         graphtype = -1;
@@ -146,27 +146,7 @@ GraphletCounts::GraphletCounts(Graph& graph) {
     vector<float> tmpl (26);
     cl = tmpl;
     
-    // extension code to implement graphlet degree distribution. for this,
-    // we use an outer vector of size 64 for the 64 different orbits.
-    // Each orbit contains a vector of size n which lists how often a the respective
-    // orbit is touched by n nodes (or edges).
-    int numOrbits = 73;
-    int numDegrees = 20; //TODO: use size of the graph?
-    
-    float gdd[numOrbits][numDegrees];
-    for(int i = 0; i < numOrbits; i++) {
-        memset(gdd[i], 0.0, sizeof(gdd[i]));
-    }
-    
-    vector< vector<float> > tmpgdd(numOrbits);
-    graphletDegreeDistribution = tmpgdd;
-    
-    // fill the vector with vectors of zeros
-    for(int i = 0; i < numOrbits; i++){
-        for(int j = 0; j < numDegrees; j++) {
-            graphletDegreeDistribution[i].push_back(0);
-        }
-    }
+
        
     
     print = verbose;
@@ -278,12 +258,12 @@ void GraphletCounts::compute_all_counts() {
  * counts of the unlabeled graphlets.
  * @param <bool> withLabeled  to consider labeled graphlets
  */
-vector<float> GraphletCounts::normalize_counts(vector<int> absCounts) {
+std::vector<float> GraphletCounts::normalize_counts(std::vector<int> absCounts, bool withLabeled) {
     
     // calculate the normalization for the given unlabeled vector
 
     int total_unlabeled = 0;
-    vector<float> normalizedCounts = vector<float>();
+    std::vector<float> normalizedCounts = std::vector<float>();
     
     for (int i = 0; i<absCounts.size();i++) {
         total_unlabeled += absCounts[i];
@@ -1449,4 +1429,105 @@ std::set<std::string> GraphletCounts::reverse_string(std::string word) {
     words.insert(word2);
     return words;
     
+}
+
+
+GraphletCounts & GraphletCounts::operator=(const GraphletCounts & counter) {
+    
+    if (this == &counter) {
+        return *this;
+    }
+    
+    memberGraph = counter.get_graph();
+    
+    if (memberGraph[graph_bundle].properties.count("label") == 1) {
+        graphName = memberGraph[graph_bundle].properties["label"];
+    } else {
+        graphName = "unnamed";
+    }
+    
+    if (memberGraph[graph_bundle].properties.count("pdb_id") == 1) {
+        pdbid = memberGraph[graph_bundle].properties["pdb_id"];
+    } else {
+        pdbid = "no_pdb_id";
+    }
+    
+    if (memberGraph[graph_bundle].properties.count("chain_id") == 1) {
+        chain = memberGraph[graph_bundle].properties["chain_id"];
+    } else {
+        chain = "no_chain_id";
+    }
+    
+    if (memberGraph[graph_bundle].properties.count("graph_type") == 1) {
+        std::string graphType = memberGraph[graph_bundle].properties["graph_type"];
+        if(graphType == "alpha") {
+        graphtype = 1;
+        }
+        else if(graphType == "beta") {
+            graphtype = 2;
+        }
+        else if(graphType == "albe") {
+            graphtype = 3;
+        }
+        else if(graphType == "alphalig") {
+            graphtype = 4;
+        }
+        else if(graphType == "betalig") {
+            graphtype = 5;
+        }
+        else if(graphType == "albelig") {
+            graphtype = 6;
+        }
+        else if(graphType == "aa_graph") {
+            graphtype = 7;
+        }
+        cerr << "WARNING: Invalid graph type string, cannot translate it to graph type int code.\n";
+        graphtype = -1;  
+    } else {
+        graphtypestr = "no_graph_type";
+        graphtype = -1;
+        
+    }
+
+    
+    
+
+    // the default graphlet count vectors
+    vector<int> tmp21 (1);
+    graphlet2CountsABS = tmp21;
+    vector<int> tmp31 (2);
+    graphlet3CountsABS = tmp31;
+    vector<int> tmp41 (6);
+    graphlet4CountsABS = tmp41;
+    vector<int> tmp51 (21);
+    graphlet5CountsABS = tmp51;
+    
+    vector<float> tmp2 (1);
+    graphlet2CountsNormalized = tmp2;
+    vector<float> tmp3 (2);
+    graphlet3CountsNormalized = tmp3;
+    vector<float> tmp4 (6);
+    graphlet4CountsNormalized = tmp4;
+    vector<float> tmp5 (21);
+    graphlet5CountsNormalized = tmp5;
+
+    
+    // vectors for counting labeled graphlets
+    vector<float> tmpl (26);
+    cl = tmpl;
+    
+
+       
+    
+    print = verbose;
+    printGraphletDetails = saveGraphletDetails;
+    all_counts_computed = false;
+    
+    return *this;
+    
+}
+
+Graph GraphletCounts::get_graph() const {
+    
+    return memberGraph;
 }

@@ -11,7 +11,7 @@
 /*
  * Default constructor */
 GraphPrinter::GraphPrinter() {
-    Graph g_tmp;
+    Graph g_tmp(0);
     service = GraphService(g_tmp);
 }
 

@@ -74,7 +74,7 @@ std::string JSON_printer::print_int_vector(std::vector<int> vec) {
     
 }
 
-std::string JSON_printer::print_int_vec_vector(std::vector<vector<int>> vec) {
+std::string JSON_printer::print_int_vec_vector(std::vector<std::vector<int>> vec) {
     std::string out_string = "[";
     
     for (int i = 0; i < vec.size(); i++) {

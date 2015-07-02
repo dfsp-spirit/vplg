@@ -3,7 +3,7 @@
 ProteinGraphService::ProteinGraphService() {
    Graph g_tmp;
    g = g_tmp;
-   gc(g);
+   gc = GraphletCounts(g);
 };
 
 ProteinGraphService::ProteinGraphService(const Graph graph) {
@@ -75,7 +75,7 @@ int ProteinGraphService::getGraphTypeInt(string graphType) {
     return -1;  
 };
 
-std::vector<int> ProteinGraphService::get_abs_ptgl_counts() {
+std::vector<std::vector<int>> ProteinGraphService::get_abs_ptgl_counts() {
     
     std::vector<std::vector<string>> patterns = std::vector<std::vector<std::string>>();
     patterns.push_back(sse_graphlets_3p);
@@ -92,7 +92,7 @@ std::vector<int> ProteinGraphService::get_abs_ptgl_counts() {
 std::vector<float> ProteinGraphService::get_norm_ptgl_counts() {
     
     abs_ptgl_counts = get_abs_ptgl_counts();
-    norm_ptgl_counts = gc.normalize_counts(abs_ptgl_counts);
+    norm_ptgl_counts = gc.normalize_counts(abs_ptgl_counts,false);
     
     
     return norm_ptgl_counts;
