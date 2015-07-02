@@ -249,11 +249,13 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 							//echo "Running plcc for first graph and result mappings...<br>";
 							// run plcc for first graph
 							
-						   exec("java -jar plcc.jar NONE --draw-gml-graph  $first_full_gml_file_changed_rel $bk_mapping_result_file_first_full_changed_rel $plcc_first_output_image_rel_no_file_extension", $stdoutput_first);
+						   $plcc_command_first = "java -jar plcc.jar NONE --draw-gml-graph  $first_full_gml_file_changed_rel $bk_mapping_result_file_first_full_changed_rel $plcc_first_output_image_rel_no_file_extension";
+						   exec($plcc_command_first, $stdoutput_first);
 						   
 						   //echo "Running plcc for second graph and result mappings...<br>";
 						   
-						   exec("java -jar plcc.jar NONE --draw-gml-graph  $second_full_gml_file_changed_rel $bk_mapping_result_file_second_full_changed_rel $plcc_second_output_image_rel_no_file_extension", $stdoutput_second);
+						   $plcc_command_second = "java -jar plcc.jar NONE --draw-gml-graph  $second_full_gml_file_changed_rel $bk_mapping_result_file_second_full_changed_rel $plcc_second_output_image_rel_no_file_extension";
+						   exec($plcc_command_second, $stdoutput_second);
 					   }
 					   else {
 						   echo "Could not find BK result files after changing dir.<br>";
@@ -282,7 +284,9 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 				   }
 				   else {
 				       echo "Could not find PLCC output files, visualization failed. Sorry.<br>";
+				           echo "First PLCC command was: '$plcc_command_first'<br>\n";
 					   echo "First PLCC run said: <br>"; foreach($stdoutput_first as $s) { echo " $s <br>\n"; } echo "<br>\n";
+					   echo "Second PLCC command was: '$plcc_command_second'<br>\n";
 					   echo "Second PLCC run said: <br>"; foreach($stdoutput_second as $s) { echo " $s <br>\n"; } echo "<br>\n";
 				   }
 				   

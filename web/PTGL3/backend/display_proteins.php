@@ -27,7 +27,7 @@ if($DEBUG){
 
 
 function get_ligand_expo_link($ligand_name3) {
-    if(strlen($ligand_name3) === 3) {
+    if(strlen($ligand_name3) === 3 || strlen($ligand_name3) === 2 || strlen($ligand_name3) === 1) {
       return "http://ligand-expo.rcsb.org/pyapps/ldHandler.py?formid=cc-index-search&target=" . $ligand_name3 . "&operation=ccid";
     }
     return false;    
@@ -163,7 +163,15 @@ $aa_names_1_to_full = array(
     "T" => "Threonine",
     "W" => "Tryptophan",
     "Y" => "Tyrosine",
-    "V" => "Valine"
+    "V" => "Valine",
+    // the following are not AAs, just to prevent php warnings
+    "X" => "X",
+    "B" => "B",
+    "J" => "J",
+    "N" => "N",
+    "O" => "O",
+    "U" => "U",
+    "Z" => "Z"
 );
 
 
