@@ -80,8 +80,6 @@ private:
     void compute_all_counts();
     void compute_unlabeled_abs_counts();
     void compute_unlabeled_norm_counts();
-    void compute_labeled_abs_counts();
-    void compute_labeled_norm_counts();
     std::set<std::string> compute_CAT(std::string);
     std::set<std::string> reverse_string(std::string);
     
@@ -96,7 +94,6 @@ public:
     int get_total_counts();
     std::vector<std::vector<int>> get_unlabeled_abs_counts();
     std::vector<std::vector<float>> get_normalized_counts();
-    std::vector<float> get_labeled_norm_counts();
     std::vector<int> get_labeled_abs_counts();
     std::vector<float> normalize_counts(std::vector<int>,float);
     Graph get_graph() const;

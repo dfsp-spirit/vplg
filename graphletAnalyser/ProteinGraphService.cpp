@@ -117,6 +117,26 @@ std::vector<std::vector<float>> ProteinGraphService::get_norm_ptgl_counts() {
     return norm_ptgl_counts;
 }
 
+
+std::vector<float> ProteinGraphService::get_norm_ptgl_counts_1dim() {
+    
+    std::vector<std::vector<float>> fvec = get_norm_ptgl_counts();
+    std::vector<float> vec1dim = std::vector<float>();
+    
+    for (int i = 0; i< fvec.size(); i++) {
+        
+        std::vector<float> vec = fvec[i];
+        
+        for (int k = 0; k<vec.size();k++) {
+            
+            vec1dim.push_back(vec[k]);
+            
+        }
+    }
+    
+    return vec1dim;
+}
+
 std::string ProteinGraphService::getPdbid() {
     return g[graph_bundle].properties["pdb_id"];
 }

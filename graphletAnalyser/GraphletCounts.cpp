@@ -1245,13 +1245,6 @@ vector<vector<float>> GraphletCounts::get_normalized_counts() {
     return norm_counts_vector;
 }
 
-vector<float> GraphletCounts::get_labeled_norm_counts() {
-    
-    if (!labeled_norm_counts_computed) {compute_unlabeled_norm_counts();}
-    
-    return labeled_norm_counts;
-}
-
 
 vector<int> GraphletCounts::get_labeled_2_countsABS(std::string label, std::vector<std::string> label_vector) {
     

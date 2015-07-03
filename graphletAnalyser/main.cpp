@@ -11,7 +11,7 @@
 #include "Graph.h"
 #include "GraphletCounts.h"
 #include "time.h"
-#include "GraphService.h"
+#include "ProteinGraphService.h"
 #include "GMLptglProteinParser.h"
 #include "GraphPTGLPrinter.h"
 
@@ -328,6 +328,12 @@ int main(int argc, char** argv) {
     
     
     
+    //TODO:
+    //Add JSON as output format
+    //
+    //modify get_norm_counts in way that enables them to be returned in a readable and
+    //understandable way
+    
     /*----------------------------------------------------
      *           process the input files
      *---------------------------------------------------*/    
@@ -348,7 +354,7 @@ int main(int argc, char** argv) {
         // construct protein graph by parsing gml file
         GMLptglProteinParser Parser(files[i]);
         Graph graph = Parser.getGraph();
-        GraphService service(graph);
+        ProteinGraphService service(graph);
         GraphPTGLPrinter printer(graph);
         
         if(service.getNumVertices() <= 0) {
@@ -389,7 +395,7 @@ int main(int argc, char** argv) {
         vector<vector<float>> norm_counts = gc.get_normalized_counts();
         vector<float> norm_labeled_counts = vector<float>();
         
-        if (withLabeled) {norm_labeled_counts = gc.get_labeled_norm_counts();}
+        if (withLabeled) {norm_labeled_counts = service.get_norm_ptgl_counts_1dim();}
 	     
         if( ! silent) {
             cout << apptag << "  Saving results.\n";
@@ -398,7 +404,7 @@ int main(int argc, char** argv) {
         if(options["output_counts_summary"] == "yes") {
             
             if (withLabeled) {
-                vector<float> labeled_counts = gc.get_labeled_norm_counts();
+                vector<float> labeled_counts = service.get_norm_ptgl_counts_1dim();
                 printer.saveNormalizedGraphletCountsSummary(norm_counts, labeled_counts);
             } else {
                 vector<float> labeled_counts = vector<float>();

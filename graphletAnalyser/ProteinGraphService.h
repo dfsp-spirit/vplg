@@ -41,6 +41,7 @@ class ProteinGraphService: public GraphService {
         string getGraphTypeString();
         std::vector<std::vector<int>> get_abs_ptgl_counts();
         std::vector<std::vector<float>> get_norm_ptgl_counts();
+        std::vector<float> get_norm_ptgl_counts_1dim();
     
 };
 
