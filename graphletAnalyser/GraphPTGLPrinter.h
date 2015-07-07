@@ -14,13 +14,13 @@
 class GraphPTGLPrinter : public GraphPrinter {
     
     private:
-        ProteinGraphService service;
+        ProteinGraphService pservice;
 
     
     public:
         // constructors
         GraphPTGLPrinter();
-        GraphPTGLPrinter(Graph g);
+        GraphPTGLPrinter(const Graph g);
         
         // methods, only applicable to graphs in ptgl format
         void printGraphInfo();
@@ -32,7 +32,7 @@ class GraphPTGLPrinter : public GraphPrinter {
         int saveCountsToDatabasePGXX();
         long getGraphDatabaseID(std::string, std::string, int);
         int databaseContainsGraphletsForGraph(unsigned long int);
-        void saveCountsInNovaFormat(std::vector<std::vector<float>>,bool);
+        void saveCountsInNovaFormat(std::vector<std::vector<float>>,std::vector<float>);
         void deleteGraphletCountEntryForGraph(unsigned long int);
         int testDatabasePGXX();
 };

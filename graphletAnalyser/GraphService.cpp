@@ -55,7 +55,7 @@ GraphService::GraphService() {
     graphlet_patterns = std::vector<std::string>();
 }
 
-GraphService::GraphService(Graph& graph) {
+GraphService::GraphService(const Graph& graph) {
     g = graph;
     gc = GraphletCounts(g);
     graphlet_identifier = "";
@@ -63,7 +63,7 @@ GraphService::GraphService(Graph& graph) {
 }
 
 
-
+/* Returns the graph */
 Graph GraphService::getGraph() const {
   return g;  
 }
@@ -166,7 +166,9 @@ std::vector<int> GraphService::computeDegreeDist() {
     
     // create the vector and a variable for the degree
     int degree;
-    std::vector<int> degDist (num_vertices(getGraph()));
+    std::vector<int> degDist (num_vertices(g));
+    
+    
     
     // iterate over the vertices
     VertexIterator vi, vi_end, next;
@@ -193,6 +195,9 @@ std::string GraphService::get_label() {
     
 };
 
+/* Returns a vector of vertices adjacent to the vertex with the given id i
+ * @param <int> the vertex id
+ * @return <vector<int>> all vertices adjacent to i */
 std::vector<int> GraphService::get_adjacent(int i) {
     AdjacencyIterator first, last;
     std::vector<int> vertex_vector;
@@ -209,6 +214,11 @@ std::vector<int> GraphService::get_adjacent(int i) {
     return vertex_vector;
 }
 
+
+/* Returns a nested vector containing vector which store the id of each 
+ * vertex adjacent to the vertex with the id that corresponds to the position
+ * in the vector
+ * @return <vector<vector<int>>  */
 std::vector<std::vector<int>> GraphService::get_adjacent_all() {
     
     std::vector<std::vector<int>> adj_all_vector = std::vector<std::vector<int>>();
@@ -225,21 +235,34 @@ std::vector<std::vector<int>> GraphService::get_adjacent_all() {
     
 }
 
+/* Returns a nested vector containing the absloute counts of all graphlets in
+ * graph g
+ * @return <vector<vector<int>> the counts of all graphlets */
 std::vector<std::vector<int>> GraphService::get_abs_counts() {
     std::vector<std::vector<int>> out_vec = gc.get_unlabeled_abs_counts();
     
     return out_vec;
 }
 
+
+/* Returns a nested vector containing the normalized counts of all graphlets in
+ * graph g
+ * @return <vector<vector<float>> */
 std::vector<std::vector<float>> GraphService::get_norm_counts() {
     std::vector<std::vector<float>> out_vec = gc.get_normalized_counts();
     
     return out_vec;
 }
 
+
+
 std::unordered_map<std::string, std::vector<int>> GraphService::get_labeled_abs_counts(std::string id, std::vector<std::string> patterns) {
     std::unordered_map<std::string,std::vector<int>> map = std::unordered_map<std::string, std::vector<int>>();
     graphlet_identifier = id;
+    
+    
+    
+    
     
     return map;
 }
@@ -269,6 +292,8 @@ GraphService & GraphService::operator =(const GraphService & serv) {
     if (this == &serv) {
         return *this;
     }
+    //copy_graph(serv.getGraph(),g);
+    
     g = serv.getGraph();
     gc = GraphletCounts(g);
     graphlet_identifier = "";

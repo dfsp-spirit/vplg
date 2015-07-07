@@ -101,7 +101,7 @@ void fill_settings_default() {
 	options["dbpassword"] = "vplg";
 	options["dbtimeout"] = "10";
 	options["dbport"] = "5432";
-        options["compute_labeled_graphlet_counts"] = "yes";
+        options["compute_labeled_graphlet_counts"] = "yes"; // adding a field for ptgl_counts and removing this field might be a good idea
 	options["output_graph_matlab"] = "no";
 	options["output_graph_stats"] = "yes";
 	options["output_graph_stats_matlab"] = "no";
@@ -109,6 +109,7 @@ void fill_settings_default() {
 	options["output_counts_matlab"] = "no";
 	options["output_counts_nova"] = "yes";
 	options["output_counts_database"] = "no";
+        options["graph_vertex_type_field"] = "sse_type";
 }
 
 /*********************************************************
@@ -353,9 +354,20 @@ int main(int argc, char** argv) {
         
         // construct protein graph by parsing gml file
         GMLptglProteinParser Parser(files[i]);
-        Graph graph = Parser.getGraph();
-        ProteinGraphService service(graph);
-        GraphPTGLPrinter printer(graph);
+        Graph graph;
+        graph = Parser.getGraph();
+        ProteinGraphService service;
+        service = ProteinGraphService(graph);
+       
+        
+        
+        
+        GraphPTGLPrinter printer;
+        printer = GraphPTGLPrinter(graph);
+        
+        
+        
+        
         
         if(service.getNumVertices() <= 0) {
             if( ! silent) {
@@ -392,10 +404,58 @@ int main(int argc, char** argv) {
             withLabeled = false;
         }
         
-        vector<vector<float>> norm_counts = gc.get_normalized_counts();
+        ;
         vector<float> norm_labeled_counts = vector<float>();
         
-        if (withLabeled) {norm_labeled_counts = service.get_norm_ptgl_counts_1dim();}
+        
+        std::vector<std::string> evec1 = std::vector<std::string>();
+        std::vector<std::vector<std::string>> evec = std::vector<std::vector<std::string>>();
+        
+        
+        std::vector<int> counts2 = gc.count_connected_2_graphlets(graph, "", evec1);
+        std::vector<int> counts3 = gc.count_connected_3_graphlets(graph,"",evec);
+        std::vector<int> counts4 = gc.count_connected_4_graphlets(graph,"",evec);
+        std::vector<int> counts5 = gc.count_connected_5_graphlets(graph);
+        
+        int total = gc.get_total_counts();
+        
+        
+        vector<vector<float>> norm_counts = vector<vector<float>>();
+        
+        std::vector<float> ncounts2 = gc.normalize_counts(counts2,total);
+        std::vector<float> ncounts3 = gc.normalize_counts(counts3,total);
+        std::vector<float> ncounts4 = gc.normalize_counts(counts4,total);
+        std::vector<float> ncounts5 = gc.normalize_counts(counts5,total);
+        
+        norm_counts.push_back(ncounts2);
+        norm_counts.push_back(ncounts3);
+        norm_counts.push_back(ncounts4);
+        norm_counts.push_back(ncounts5);
+        
+        if (withLabeled) {
+            
+            
+            std::vector<std::string> lab2vec = service.get_2_sse_labels();
+            std::vector<std::vector<std::string>> lab3vec = service.get_3_sse_labels();
+            
+            std::vector<int> lab2c = gc.get_labeled_2_countsABS("sse_type",lab2vec);
+            std::vector<std::vector<int>> lab3c = gc.get_labeled_3_countsABS("sse_type",lab3vec);
+            
+            
+            std::vector<int> lab23vec = lab2c;
+            
+            for (int i = 0; i<lab3c[0].size();i++) {
+                lab23vec.push_back(lab3c[0][i]);
+            }
+            
+            for (int i = 0; i<lab3c[1].size();i++) {
+                lab23vec.push_back(lab3c[1][i]);
+            }
+            
+            int total = gc.get_total_counts();
+            
+            std::vector<float> norm_labeled_counts = gc.normalize_counts(lab23vec,total);
+        }
 	     
         if( ! silent) {
             cout << apptag << "  Saving results.\n";
@@ -403,13 +463,10 @@ int main(int argc, char** argv) {
 		
         if(options["output_counts_summary"] == "yes") {
             
-            if (withLabeled) {
-                vector<float> labeled_counts = service.get_norm_ptgl_counts_1dim();
-                printer.saveNormalizedGraphletCountsSummary(norm_counts, labeled_counts);
-            } else {
-                vector<float> labeled_counts = vector<float>();
-                printer.saveNormalizedGraphletCountsSummary(norm_counts, labeled_counts);
-            }
+            
+                
+            printer.saveNormalizedGraphletCountsSummary(norm_counts, norm_labeled_counts);
+            
         }
 
         if(options["output_counts_database"] == "yes") {
@@ -421,7 +478,7 @@ int main(int argc, char** argv) {
         }
 
         if(options["output_counts_nova"] == "yes") {
-                printer.saveCountsInNovaFormat(gc.get_normalized_counts(),withLabeled);
+                printer.saveCountsInNovaFormat(norm_counts,norm_labeled_counts);
         }
 
         if( ! silent) {

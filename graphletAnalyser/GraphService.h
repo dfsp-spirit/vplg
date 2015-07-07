@@ -63,7 +63,7 @@
 
 class GraphService {
     
-private:    
+protected:    
     //attributes
     Graph g;
     GraphletCounts gc;
@@ -77,7 +77,7 @@ public:
     //methods
     
     GraphService(); // default constructor
-    GraphService(Graph& graph); // constructor
+    GraphService(const Graph& graph); // constructor
     Graph getGraph() const; // returns the graph
     std::string get_label(); // returns the graph's label
     std::vector<std::string> getGraphProperties(); //Returns property keys

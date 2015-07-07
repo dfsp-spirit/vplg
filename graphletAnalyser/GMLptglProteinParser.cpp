@@ -20,7 +20,7 @@ using namespace boost;
  * Default constructor */
 GMLptglProteinParser::GMLptglProteinParser() {
     
-};
+}
 
 /*
  * Constructor for the Parser, creates graph Objects from GML files in the
@@ -31,14 +31,14 @@ GMLptglProteinParser::GMLptglProteinParser(const string& gmlFile) {
     
     string name = gmlFile;        
     const string logFileName = logs_path + "parse_" + name + ".log";
-    
-    ofstream logFile;
-    if (print) {
-        logFile.open(logFileName.c_str());
-        if (!logFile.is_open()) {
-            cerr << apptag << "ERROR: ProteinGraph::parse_gml -- Could not open log file.\n";
-        }
-    }
+    graph = Graph();
+//    ofstream logFile;
+//    if (print) {
+//        logFile.open(logFileName.c_str());
+//        if (!logFile.is_open()) {
+//            cerr << apptag << "ERROR: ProteinGraph::parse_gml -- Could not open log file.\n";
+//        }
+//    }
     
     const int PART_GRAPH = 1;
     const int PART_VERTEX = 2;
@@ -65,13 +65,14 @@ GMLptglProteinParser::GMLptglProteinParser(const string& gmlFile) {
     bool graph_sub_elem_open = false;   // whether an element section (vertex or edge) in the GML is currently open
     int lineNum = 0;
     
-    if (print) { 
-        logFile << "Parsing input GML file '" << gmlFile  << "' and constructing a protein graph.\n"; 
-    }
+//    if (print) { 
+//        logFile << "Parsing input GML file '" << gmlFile  << "' and constructing a protein graph.\n"; 
+//    }
     
     inputFile.open(gmlFile.c_str());
     if (! inputFile.is_open()) {
-        logFile << "ERROR: ProteinGraph::parse_gml -- Unable to open GML graph input file!\n";
+        //logFile << "ERROR: ProteinGraph::parse_gml -- Unable to open GML graph input file!\n";
+        std::cerr << "ERROR: ProteinGraph::parse_gml -- Unable to open GML graph input file!\n";
     } 
     else {
         while (inputFile.good()) {    
@@ -102,9 +103,9 @@ GMLptglProteinParser::GMLptglProteinParser(const string& gmlFile) {
                 switch (part) {
                     case PART_GRAPH:						// --------------- graph props --------------
                         if (key == "label") {
-                            graph[graph_bundle].properties["label"] = parse_value_string(line);                            
+                            graph[graph_bundle].label = parse_value_string(line);                            
                             if (print) {
-                                logFile << "  Graph property label " << graph[graph_bundle].label << " was added." << endl;
+                                //logFile << "  Graph property label " << graph[graph_bundle].label << " was added." << endl;
                             }                         
                         }
                         else if(key == "pdb_id") {
@@ -171,7 +172,7 @@ GMLptglProteinParser::GMLptglProteinParser(const string& gmlFile) {
                                 if(graph_sub_elem_open) {
                                     v = add_vertex(vi, graph);
                                     if (print) {
-                                        logFile << "  " << vi.properties["sse_type"] << " node with id " << vi.properties["id"] << " was added" << endl;
+                                        //logFile << "  " << vi.properties["sse_type"] << " node with id " << vi.properties["id"] << " was added" << endl;
                                     }
                                     graph_sub_elem_open = false;
                                     if(print) {
@@ -212,7 +213,7 @@ GMLptglProteinParser::GMLptglProteinParser(const string& gmlFile) {
                                     u = vertex(ei.target, graph);
                                     add_edge(v, u, ei, graph);
                                     if (print) { 
-                                        logFile << "  " << ei.properties["spatial"] << " edge (" << ei.source << ", " << ei.target << ") was added" << endl;
+                                        //logFile << "  " << ei.properties["spatial"] << " edge (" << ei.source << ", " << ei.target << ") was added" << endl;
                                     }
                                     if(print) {
                                         cout << apptag << "Closing edge (" << ei.source << ", " << ei.target << ") in line #" << lineNum << ".\n";
@@ -246,11 +247,11 @@ GMLptglProteinParser::GMLptglProteinParser(const string& gmlFile) {
     if( ! silent) {
         cout << apptag << "  Parsed input graph.\n"
              << apptag << "    The input gml file \""  << gmlFile  <<"\" was parsed and protein graph was constructed.\n"
-             << apptag << "    This graph has " << num_vertices(graph) << " vertices and " << num_edges(graph) << " edges.\n"
-             << apptag << "    The parser log file is \"" << logFileName << "\".\n";
+             << apptag << "    This graph has " << num_vertices(graph) << " vertices and " << num_edges(graph) << " edges.\n";
+             //<< apptag << "    The parser log file is \"" << logFileName << "\".\n";
     }
 
-};
+}
 
 /*
  * Checks whether there is a closing bracket in the read line i.e. the end of a node
@@ -264,7 +265,7 @@ bool GMLptglProteinParser::isElementClosingLine(const string& line) {
         return true;
     }
     return false;
-};
+}
 
 
 /*

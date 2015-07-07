@@ -74,7 +74,7 @@ GraphletCounts::GraphletCounts() {
     num5 = 0;
 }
 
-GraphletCounts::GraphletCounts(Graph& graph) { 
+GraphletCounts::GraphletCounts(const Graph& graph) { 
     memberGraph = graph;
     
     // Testing for existence of ptgl graph properties
@@ -120,7 +120,7 @@ GraphletCounts::GraphletCounts(Graph& graph) {
         else if(graphType == "aa_graph") {
             graphtype = 7;
         }
-        cerr << "WARNING: Invalid graph type string, cannot translate it to graph type int code.\n";
+        cerr << "WARNING: Invalid graph type string, cannot translate it to graph type int code in GraphletCounts.\n";
         graphtype = -1;  
     } else {
         graphtypestr = "no_graph_type";
@@ -253,7 +253,7 @@ std::vector<float> GraphletCounts::normalize_counts(std::vector<int> absCounts, 
     
     // calculate the normalization for the given unlabeled vector
     std::vector<float> normalizedCounts = std::vector<float>();
-    
+    if (max == 0.0) {std::cerr << "WARNING: division by zero!!";}
     
     for (int i = 0; i<absCounts.size(); i++) {
         
@@ -318,6 +318,10 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
     
     print = false; // printing might disturb tests
 
+    
+    
+    
+    
     
     int numelem = 12;
     float lcount[numelem];
@@ -391,6 +395,8 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
                                 
                                 for (auto k : cats) {
                                     
+                                    
+                                    if (k.size() != 3) {std::cerr << "WARNING: pattern of wrong length detected. Length should be 3, but is " << k.size(); }
                                     if (pattern.compare(k) == 0) {
                                         
                                         labeled_3_counts_float[0][i] += w[0];
@@ -531,7 +537,7 @@ vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g,std::string lab
     
     
     
-    int numelem = 3;
+    int numelem = label_vector.size();
     float lcount[numelem];
     memset(lcount, 0.0, sizeof lcount);
     
@@ -577,7 +583,7 @@ vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g,std::string lab
                             
                             for (auto k : cats) {
                                 
-                                
+                                if (k.size() != 2) {std::cerr << "WARNING: pattern of wrong length detected. Length should be 2, but is " << k.size(); }
                                 if (pattern.compare(k) == 0) {
                                     labeled_2_countsABS[i] += 1;
                                     
@@ -599,7 +605,7 @@ vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g,std::string lab
     if (!label_vector.empty()) {
         for (int i = 0; i < numelem; i++) {
             cl[i] = lcount[i] * lw[i];
-            labeled_abs_counts[i] = int (floor (cl[i]));
+            //labeled_abs_counts[i] = int (floor (cl[i]));
             labeled_2_countsABS[i] = labeled_2_countsABS[i]/2;
         }
     }
@@ -765,6 +771,7 @@ vector<int> GraphletCounts::count_connected_4_graphlets(Graph& g, std::string la
                                             
                                             for (auto k : mirl) {
                                                 
+                                                if (k.size() != 4) {std::cerr << "WARNING: pattern of wrong length detected. Length should be 4, but is " << k.size(); }
                                                 if (pattern.compare(k) == 0) {
                                                     labeled_4_countsABS[5][i] +=1;
                                                 }
@@ -1332,7 +1339,9 @@ GraphletCounts & GraphletCounts::operator=(const GraphletCounts & counter) {
         return *this;
     }
     
-    memberGraph = counter.get_graph();
+    copy_graph(counter.get_graph(), memberGraph);
+    
+    //memberGraph = counter.get_graph();
     
     if (memberGraph[graph_bundle].properties.count("label") == 1) {
         graphName = memberGraph[graph_bundle].properties["label"];

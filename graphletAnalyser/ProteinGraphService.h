@@ -19,11 +19,10 @@ using namespace boost;
  * place */
 class ProteinGraphService: public GraphService {
     
-    private:
+    protected:
         
         //attributes
-        Graph g;
-        GraphletCounts gc;
+        
         std::vector<std::string> sse_graphlets_2p; // all possible labels for edges
         std::vector<std::string> sse_graphlets_3p; // all possible labels for 2-paths
         std::vector<std::string> sse_graphlets_tri; // all possible labels for triangles
@@ -34,7 +33,7 @@ class ProteinGraphService: public GraphService {
     public:
         //methods
         ProteinGraphService();
-        ProteinGraphService(const Graph graph);
+        ProteinGraphService(const Graph& graph);
         int getGraphTypeInt(string graphType);
         string getPdbid();
         string getChainID();
@@ -42,6 +41,9 @@ class ProteinGraphService: public GraphService {
         std::vector<std::vector<int>> get_abs_ptgl_counts();
         std::vector<std::vector<float>> get_norm_ptgl_counts();
         std::vector<float> get_norm_ptgl_counts_1dim();
+        ProteinGraphService & operator=(const ProteinGraphService & serv);
+        std::vector<std::string> get_2_sse_labels();
+        std::vector<std::vector<std::string>> get_3_sse_labels();
     
 };
 

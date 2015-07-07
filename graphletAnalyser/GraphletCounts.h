@@ -88,7 +88,7 @@ private:
 public:
     // constructors
     GraphletCounts();
-    GraphletCounts(Graph&);
+    GraphletCounts(const Graph&);
     
     // methods
     int get_total_counts();

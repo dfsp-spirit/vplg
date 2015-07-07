@@ -21,14 +21,14 @@ using namespace boost;
  *                           */
 class GraphPrinter {
     
-protected:
+private:
         //attributes
         GraphService service; // a service object to get data from the graph
 public:
     
     //constructors
     GraphPrinter();
-    GraphPrinter(Graph g);
+    GraphPrinter(const Graph g);
     
     //methods, doing what their name says
     
@@ -45,6 +45,7 @@ public:
     void save_counts_in_nova_format(std::string,std::vector<std::vector<int>>, bool);
     void save_abs_counts_as_matlab_variable();
     void save_norm_counts_as_matlab_variable();
+    //GraphPrinter & operator=(const GraphPrinter & printer);
     
 };
 

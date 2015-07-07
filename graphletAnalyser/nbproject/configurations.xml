@@ -53,6 +53,14 @@
         <itemPath>tests/newtestclass1.h</itemPath>
         <itemPath>tests/newtestrunner1.cpp</itemPath>
       </logicalFolder>
+      <logicalFolder name="f6"
+                     displayName="GraphPTGLPrinterTest"
+                     projectFiles="true"
+                     kind="TEST">
+        <itemPath>tests/newtestclass5.cpp</itemPath>
+        <itemPath>tests/newtestclass5.h</itemPath>
+        <itemPath>tests/newtestrunner5.cpp</itemPath>
+      </logicalFolder>
       <logicalFolder name="f1"
                      displayName="GraphServiceTest"
                      projectFiles="true"
@@ -68,6 +76,14 @@
         <itemPath>tests/newtestclass3.cpp</itemPath>
         <itemPath>tests/newtestclass3.h</itemPath>
         <itemPath>tests/newtestrunner3.cpp</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f5"
+                     displayName="ProteinGraphServiceTest"
+                     projectFiles="true"
+                     kind="TEST">
+        <itemPath>tests/newtestclass4.cpp</itemPath>
+        <itemPath>tests/newtestclass4.h</itemPath>
+        <itemPath>tests/newtestrunner4.cpp</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -220,6 +236,34 @@
           </linkerLibItems>
         </linkerTool>
       </folder>
+      <folder path="TestFiles/f5">
+        <cTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </cTool>
+        <ccTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f5</output>
+          <linkerLibItems>
+            <linkerOptionItem>`cppunit-config --libs`</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
+      <folder path="TestFiles/f6">
+        <cTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </cTool>
+        <ccTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f6</output>
+          <linkerLibItems>
+            <linkerOptionItem>`cppunit-config --libs`</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
       <item path="global.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
@@ -240,6 +284,14 @@
       </item>
       <item path="tests/newtestclass3.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="tests/newtestclass4.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/newtestclass4.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="tests/newtestclass5.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/newtestclass5.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="tests/newtestrunner.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="tests/newtestrunner1.cpp" ex="false" tool="1" flavor2="0">
@@ -247,6 +299,10 @@
       <item path="tests/newtestrunner2.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="tests/newtestrunner3.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/newtestrunner4.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/newtestrunner5.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -369,6 +425,34 @@
           </linkerLibItems>
         </linkerTool>
       </folder>
+      <folder path="TestFiles/f5">
+        <cTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </cTool>
+        <ccTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f5</output>
+          <linkerLibItems>
+            <linkerOptionItem>`cppunit-config --libs`</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
+      <folder path="TestFiles/f6">
+        <cTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </cTool>
+        <ccTool>
+          <commandLine>`cppunit-config --cflags`</commandLine>
+        </ccTool>
+        <linkerTool>
+          <output>${TESTDIR}/TestFiles/f6</output>
+          <linkerLibItems>
+            <linkerOptionItem>`cppunit-config --libs`</linkerOptionItem>
+          </linkerLibItems>
+        </linkerTool>
+      </folder>
       <item path="global.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
@@ -389,6 +473,14 @@
       </item>
       <item path="tests/newtestclass3.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="tests/newtestclass4.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/newtestclass4.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="tests/newtestclass5.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/newtestclass5.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="tests/newtestrunner.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="tests/newtestrunner1.cpp" ex="false" tool="1" flavor2="0">
@@ -396,6 +488,10 @@
       <item path="tests/newtestrunner2.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="tests/newtestrunner3.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/newtestrunner4.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="tests/newtestrunner5.cpp" ex="false" tool="1" flavor2="0">
       </item>
     </conf>
   </confs>

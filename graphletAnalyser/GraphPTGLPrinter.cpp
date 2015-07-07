@@ -16,13 +16,13 @@ using namespace pqxx;
 GraphPTGLPrinter::GraphPTGLPrinter() {
     ProteinGraphService service_tmp;
 
-    service = ProteinGraphService();
-};
+    pservice = ProteinGraphService();
+}
 
 
-GraphPTGLPrinter::GraphPTGLPrinter(Graph g) {
-    service = ProteinGraphService(g);
-};
+GraphPTGLPrinter::GraphPTGLPrinter(const Graph g) {
+    pservice = ProteinGraphService(g);
+}
 
 /*
  * prints vertices and their sse types to a string
@@ -30,7 +30,7 @@ GraphPTGLPrinter::GraphPTGLPrinter(Graph g) {
 std::string GraphPTGLPrinter::printVertices() {
     VertexIterator vi, vi_end, next; // create vertex iterator objects
     
-    Graph g = service.getGraph();
+    Graph g = pservice.getGraph();
     
     tie(vi, vi_end) = vertices(g); // that belong to the graph
     stringstream sstream; // to be saved in a string
@@ -54,7 +54,7 @@ std::string GraphPTGLPrinter::printEdges() {
     EdgeIterator ei, ei_end;
     stringstream sstream;
     
-    Graph g = service.getGraph();
+    Graph g = pservice.getGraph();
     
     sstream << "Iterate over the edges and print their properties:\n";
     if (formatted) {
@@ -102,7 +102,7 @@ string GraphPTGLPrinter::printGraphString() {
     VertexIterator vi, vi_end, next;
     EdgeIterator ei, ei_end;
     
-    Graph g = service.getGraph();
+    Graph g = pservice.getGraph();
     
     tie(vi, vi_end) = vertices(g);
     
@@ -150,24 +150,23 @@ int GraphPTGLPrinter::saveCountsToDatabasePGXX() {
     string connection_string = db.get_connect_string();
  
     
-    std::string pdbid = service.getPdbid();
-    std::string chain = service.getChainID();
-    std::string label = service.get_label();
-    std::string graphtypestr = service.getGraphTypeString();
-    int graphtype = service.getGraphTypeInt(graphtypestr);
-    std::vector<std::vector<float>> norm_counts = service.get_norm_counts();
+    std::string pdbid = pservice.getPdbid();
+    std::string chain = pservice.getChainID();
+    std::string label = pservice.get_label();
+    std::string graphtypestr = pservice.getGraphTypeString();
+    int graphtype = pservice.getGraphTypeInt(graphtypestr);
+    std::vector<std::vector<float>> norm_counts = pservice.get_norm_counts();
     std::vector<float> graphlet3CountsNormalized = norm_counts[1];
     std::vector<float> graphlet4CountsNormalized = norm_counts[2];
     std::vector<float> graphlet5CountsNormalized = norm_counts[3];
-    std::string id = service.get_graphlet_identifier();
-    std::vector<std::string> patterns = service.get_patterns();
-    std::unordered_map<std::string, std::vector<float>> labeled_counts_map = service.get_labeled_norm_counts(id, patterns);
+    std::string id = pservice.get_graphlet_identifier();
+    std::vector<std::string> patterns = pservice.get_patterns();
     
     //TODO: implement function get--counts in graphservice
     //      so that the labeled counts can be written into the database
     
     std::vector<float> cl = std::vector<float>();
-    std::vector<std::vector<float>> lab_counts = service.get_norm_ptgl_counts();
+    std::vector<std::vector<float>> lab_counts = pservice.get_norm_ptgl_counts();
     
     for (int i = 0; i<lab_counts.size(); i++) {
         std::vector<float> vec = lab_counts[i];
@@ -261,9 +260,9 @@ int GraphPTGLPrinter::saveCountsToDatabasePGXX() {
 
             
             // check stuff
-            int numExpected = 67;
+            int numExpected = 62;
             if(cl.empty()) {
-                numExpected = 67 - 38;
+                numExpected = 62 - 31;
             }
             
             
@@ -393,7 +392,7 @@ int GraphPTGLPrinter::databaseContainsGraphletsForGraph(unsigned long int databa
  * See http://www.bioinformatik.uni-frankfurt.de/tools/nova/ for more info on NOVA.
  * @param withLabeled whether to write labeled graphlet info as well
  */
-void GraphPTGLPrinter::saveCountsInNovaFormat(std::vector<std::vector<float>> norm_counts, bool withLabeled) {
+void GraphPTGLPrinter::saveCountsInNovaFormat(std::vector<std::vector<float>> norm_counts, std::vector<float> lab_counts) {
     ofstream countsNovaFormatFile;
     const string countsNovaFormatFileName = output_path + "countsNovaFormat.csv";
     int pos;
@@ -403,7 +402,7 @@ void GraphPTGLPrinter::saveCountsInNovaFormat(std::vector<std::vector<float>> no
     std::vector<float> graphlet4CountsNormalized = norm_counts[2];
     std::vector<float> graphlet5CountsNormalized = norm_counts[3];
     std::vector<float> cl;
-    std::string graphName = service.get_label();
+    std::string graphName = pservice.get_label();
 
     countsNovaFormatFile.open(countsNovaFormatFileName.c_str(), std::ios_base::app);    
     if (!countsNovaFormatFile.is_open()) {
@@ -413,7 +412,8 @@ void GraphPTGLPrinter::saveCountsInNovaFormat(std::vector<std::vector<float>> no
         if (pos == 0) {
             countsNovaFormatFile << "ID,Group";
             
-            if (withLabeled){ cl = norm_counts[4]; numberOfGraphlets = graphlet3CountsNormalized.size() + graphlet4CountsNormalized.size() + graphlet5CountsNormalized.size() + cl.size(); }                      
+            if (!lab_counts.empty()){ cl = lab_counts;
+                              numberOfGraphlets = graphlet3CountsNormalized.size() + graphlet4CountsNormalized.size() + graphlet5CountsNormalized.size() + cl.size(); }                      
             else             {numberOfGraphlets = graphlet3CountsNormalized.size() + graphlet4CountsNormalized.size() + graphlet5CountsNormalized.size();}
                        
             for (int i = 1; i <= numberOfGraphlets; i++) {
@@ -426,7 +426,7 @@ void GraphPTGLPrinter::saveCountsInNovaFormat(std::vector<std::vector<float>> no
         for (int i = 0; i < graphlet3CountsNormalized.size(); i++) countsNovaFormatFile << "," << graphlet3CountsNormalized[i];
         for (int i = 0; i < graphlet4CountsNormalized.size(); i++) countsNovaFormatFile << "," << graphlet4CountsNormalized[i];
         for (int i = 0; i < graphlet5CountsNormalized.size(); i++) countsNovaFormatFile << "," << graphlet5CountsNormalized[i];
-        if (withLabeled) {
+        if (!lab_counts.empty()) {
             for (int i = 0; i < cl.size(); i++) countsNovaFormatFile << "," << cl[i];
         }
         countsNovaFormatFile << "\n";

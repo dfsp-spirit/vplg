@@ -17,7 +17,7 @@ GraphPrinter::GraphPrinter() {
 
 
 
-GraphPrinter::GraphPrinter(Graph g) {
+GraphPrinter::GraphPrinter(const Graph g) {
     service = GraphService(g);
 }
 
@@ -72,6 +72,8 @@ void GraphPrinter::saveGraphStatistics() {
     /* NOTE:
      * p is the ratio of (number of edges in graph) to (maximal possible number of edges given n vertices) */
     float p = 2.0 * m / (n * (n - 1.0));  
+    
+    std::cout << "Size of degdist   " << degDist.size() << "   " << std::endl;
     
     // open the file
     summaryFile.open(summaryFileName.c_str(), std::ios_base::app);

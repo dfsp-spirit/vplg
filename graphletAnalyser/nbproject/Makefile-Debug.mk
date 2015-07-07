@@ -52,8 +52,10 @@ TESTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}/tests
 TESTFILES= \
 	${TESTDIR}/TestFiles/f3 \
 	${TESTDIR}/TestFiles/f2 \
+	${TESTDIR}/TestFiles/f6 \
 	${TESTDIR}/TestFiles/f1 \
-	${TESTDIR}/TestFiles/f4
+	${TESTDIR}/TestFiles/f4 \
+	${TESTDIR}/TestFiles/f5
 
 # C Compiler Flags
 CFLAGS=
@@ -137,6 +139,10 @@ ${TESTDIR}/TestFiles/f2: ${TESTDIR}/tests/newtestclass1.o ${TESTDIR}/tests/newte
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc}   -o ${TESTDIR}/TestFiles/f2 $^ ${LDLIBSOPTIONS} -L/usr/lib64 -lboost_graph -lboost_regex -lpq -lpqxx `cppunit-config --libs`   
 
+${TESTDIR}/TestFiles/f6: ${TESTDIR}/tests/newtestclass5.o ${TESTDIR}/tests/newtestrunner5.o ${OBJECTFILES:%.o=%_nomain.o}
+	${MKDIR} -p ${TESTDIR}/TestFiles
+	${LINK.cc}   -o ${TESTDIR}/TestFiles/f6 $^ ${LDLIBSOPTIONS} -L/usr/lib64 -lboost_graph -lboost_regex -lpq -lpqxx `cppunit-config --libs`   
+
 ${TESTDIR}/TestFiles/f1: ${TESTDIR}/tests/newtestclass.o ${TESTDIR}/tests/newtestrunner.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc}   -o ${TESTDIR}/TestFiles/f1 $^ ${LDLIBSOPTIONS} -L/usr/lib64 -lboost_graph -lboost_regex -lpq -lpqxx `cppunit-config --libs`   
@@ -144,6 +150,10 @@ ${TESTDIR}/TestFiles/f1: ${TESTDIR}/tests/newtestclass.o ${TESTDIR}/tests/newtes
 ${TESTDIR}/TestFiles/f4: ${TESTDIR}/tests/newtestclass3.o ${TESTDIR}/tests/newtestrunner3.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc}   -o ${TESTDIR}/TestFiles/f4 $^ ${LDLIBSOPTIONS} -L/usr/lib64 -lboost_graph -lboost_regex -lpq -lpqxx `cppunit-config --libs`   
+
+${TESTDIR}/TestFiles/f5: ${TESTDIR}/tests/newtestclass4.o ${TESTDIR}/tests/newtestrunner4.o ${OBJECTFILES:%.o=%_nomain.o}
+	${MKDIR} -p ${TESTDIR}/TestFiles
+	${LINK.cc}   -o ${TESTDIR}/TestFiles/f5 $^ ${LDLIBSOPTIONS} -L/usr/lib64 -lboost_graph -lboost_regex -lpq -lpqxx `cppunit-config --libs`   
 
 
 ${TESTDIR}/tests/newtestclass2.o: tests/newtestclass2.cpp 
@@ -170,6 +180,18 @@ ${TESTDIR}/tests/newtestrunner1.o: tests/newtestrunner1.cpp
 	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner1.o tests/newtestrunner1.cpp
 
 
+${TESTDIR}/tests/newtestclass5.o: tests/newtestclass5.cpp 
+	${MKDIR} -p ${TESTDIR}/tests
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestclass5.o tests/newtestclass5.cpp
+
+
+${TESTDIR}/tests/newtestrunner5.o: tests/newtestrunner5.cpp 
+	${MKDIR} -p ${TESTDIR}/tests
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner5.o tests/newtestrunner5.cpp
+
+
 ${TESTDIR}/tests/newtestclass.o: tests/newtestclass.cpp 
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
@@ -192,6 +214,18 @@ ${TESTDIR}/tests/newtestrunner3.o: tests/newtestrunner3.cpp
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner3.o tests/newtestrunner3.cpp
+
+
+${TESTDIR}/tests/newtestclass4.o: tests/newtestclass4.cpp 
+	${MKDIR} -p ${TESTDIR}/tests
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestclass4.o tests/newtestclass4.cpp
+
+
+${TESTDIR}/tests/newtestrunner4.o: tests/newtestrunner4.cpp 
+	${MKDIR} -p ${TESTDIR}/tests
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner4.o tests/newtestrunner4.cpp
 
 
 ${OBJECTDIR}/Database_nomain.o: ${OBJECTDIR}/Database.o Database.cpp 
@@ -317,8 +351,10 @@ ${OBJECTDIR}/main_nomain.o: ${OBJECTDIR}/main.o main.cpp
 	then  \
 	    ${TESTDIR}/TestFiles/f3 || true; \
 	    ${TESTDIR}/TestFiles/f2 || true; \
+	    ${TESTDIR}/TestFiles/f6 || true; \
 	    ${TESTDIR}/TestFiles/f1 || true; \
 	    ${TESTDIR}/TestFiles/f4 || true; \
+	    ${TESTDIR}/TestFiles/f5 || true; \
 	else  \
 	    ./${TEST} || true; \
 	fi
