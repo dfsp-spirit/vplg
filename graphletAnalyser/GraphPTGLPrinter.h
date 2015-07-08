@@ -13,26 +13,24 @@
 
 class GraphPTGLPrinter : public GraphPrinter {
     
-    private:
-        ProteinGraphService pservice;
 
     
     public:
         // constructors
         GraphPTGLPrinter();
-        GraphPTGLPrinter(const Graph g);
+        
         
         // methods, only applicable to graphs in ptgl format
-        void printGraphInfo();
-        std::string printVertices();
-        std::string printEdges();
-        std::string printGraphString();
-        std::string printChainID();
-        std::string printGraphTypeString();
-        int saveCountsToDatabasePGXX();
-        long getGraphDatabaseID(std::string, std::string, int);
-        int databaseContainsGraphletsForGraph(unsigned long int);
-        void saveCountsInNovaFormat(std::vector<std::vector<float>>,std::vector<float>);
+        void printGraphInfo(const Graph&) const;
+        std::string printVertices(const Graph& g) const;
+        std::string printEdges(const Graph& g) const;
+        std::string printGraphString(const Graph& g) const;
+        std::string printChainID() const;
+        std::string printGraphTypeString() const;
+        int saveCountsToDatabasePGXX(int,std::vector<std::string>,std::vector<std::vector<float>>, std::vector<float>);
+        long getGraphDatabaseID(std::string, std::string, int) const;
+        int databaseContainsGraphletsForGraph(unsigned long int) const;
+        void saveCountsInNovaFormat(std::string,std::vector<std::vector<float>>,std::vector<float>) const;
         void deleteGraphletCountEntryForGraph(unsigned long int);
         int testDatabasePGXX();
 };

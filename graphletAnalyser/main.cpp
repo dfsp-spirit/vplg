@@ -363,7 +363,7 @@ int main(int argc, char** argv) {
         
         
         GraphPTGLPrinter printer;
-        printer = GraphPTGLPrinter(graph);
+        printer = GraphPTGLPrinter();
         
         
         
@@ -377,24 +377,28 @@ int main(int argc, char** argv) {
         }
         
         if(verbose) {
-            cout << apptag << "Printing graph: " << printer.printGraphString() << "\n"; 
+            cout << apptag << "Printing graph: " << printer.printGraphString(graph) << "\n"; 
         }
         
+        int n = num_vertices(graph);
+        int m = num_edges(graph);
         // save graph in different formats
 		if(options["output_graph_matlab"] == "yes") {
-			printer.saveAsMatlabVariable(i);
+			printer.saveAsMatlabVariable(graph);
 		}
         
         // save graph statistics
 		if(options["output_graph_stats"] == "yes") {
-			printer.saveGraphStatistics();
+                    std::vector<int> degDist = service.computeDegreeDist();
+	            printer.saveGraphStatistics(degDist, n,m);
 		}
 		if(options["output_graph_stats_matlab"] == "yes") {
-			printer.saveGraphStatisticsAsMatlabVariable();
+                    std::vector<int> degDist = service.computeDegreeDist();
+	            printer.saveGraphStatisticsAsMatlabVariable(degDist, n,m);
 		}
         
         // optionally print graph info
-        if (verbose) { printer.printGraphInfo(); }
+        if (verbose) { printer.printGraphInfo(graph); }
         
         // count graphlets and save these counts
         GraphletCounts gc(graph);
@@ -465,12 +469,22 @@ int main(int argc, char** argv) {
             
             
                 
-            printer.saveNormalizedGraphletCountsSummary(norm_counts, norm_labeled_counts);
+            printer.saveNormalizedGraphletCountsSummary(graph[graph_bundle].label, norm_counts, norm_labeled_counts);
             
         }
 
         if(options["output_counts_database"] == "yes") {
-            int db_res = printer.saveCountsToDatabasePGXX();
+            
+            std::vector<std::string> id_vec = std::vector<std::string>();
+            id_vec.push_back(service.getPdbid());
+            id_vec.push_back(service.getChainID());
+            id_vec.push_back(service.get_label());
+            std::string graphtype = service.getGraphTypeString();
+            id_vec.push_back(graphtype);
+            int graphtype_int = service.getGraphTypeInt(graphtype);
+            
+            
+            int db_res = printer.saveCountsToDatabasePGXX(graphtype_int, id_vec, norm_counts, norm_labeled_counts);
         }
 
         if(options["output_counts_matlab"] == "yes") {
@@ -478,7 +492,7 @@ int main(int argc, char** argv) {
         }
 
         if(options["output_counts_nova"] == "yes") {
-                printer.saveCountsInNovaFormat(norm_counts,norm_labeled_counts);
+                printer.saveCountsInNovaFormat(graph[graph_bundle].label, norm_counts,norm_labeled_counts);
         }
 
         if( ! silent) {

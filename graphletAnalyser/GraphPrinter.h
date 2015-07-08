@@ -21,28 +21,26 @@ using namespace boost;
  *                           */
 class GraphPrinter {
     
-private:
-        //attributes
-        GraphService service; // a service object to get data from the graph
+protected:
+        
 public:
     
     //constructors
     GraphPrinter();
-    GraphPrinter(const Graph g);
     
     //methods, doing what their name says
     
-    std::string printAdjacent(int i); 
-    std::string printAdjacentAll(); 
-    void saveGraphStatistics(); // saves the number of vertices and edges and the node-degree-distribution
-    void saveAsMatlabVariable(int& number); // saves the graphs as a matlab file
-    void saveGraphStatisticsAsMatlabVariable(); // saves the output of printGraphInfo to a matlab file
-    void saveInSimpleFormat(); // save the edges of the graph to a file
-    void saveABSGraphletCountsSummary(std::vector<std::vector<int>> abs_counts, std::vector<float> labeled_counts);
-    void saveNormalizedGraphletCountsSummary(std::vector<std::vector<float>> norm_counts, std::vector<float> labeled_counts);
+    std::string printAdjacent(std::vector<int> vertex_vector) const; 
+    std::string printAdjacentAll(std::vector<std::vector<int>> vertex_vector) const; 
+    void saveGraphStatistics(std::vector<int> degDist, int n, int m); // saves the number of vertices and edges and the node-degree-distribution
+    void saveAsMatlabVariable(const Graph& g); // saves the graphs as a matlab file
+    void saveGraphStatisticsAsMatlabVariable(std::vector<int> degDist, int n, int m); // saves the output of printGraphInfo to a matlab file
+    void saveInSimpleFormat(Graph& g); // save the edges of the graph to a file
+    void saveABSGraphletCountsSummary(std::string graphName, std::vector<std::vector<int>> abs_counts, std::vector<float> labeled_counts);
+    void saveNormalizedGraphletCountsSummary(std::string graphName, std::vector<std::vector<float>> norm_counts, std::vector<float> labeled_counts);
     void save_normalized_counts_as_matlab_variable(std::vector<std::vector<float>>,std::vector<float>);
     void save_absolute_counts_as_matlab_variable(std::vector<std::vector<int>>,std::vector<int>);
-    void save_counts_in_nova_format(std::string,std::vector<std::vector<int>>, bool);
+    void save_counts_in_nova_format(std::string,std::vector<std::vector<int>>);
     void save_abs_counts_as_matlab_variable();
     void save_norm_counts_as_matlab_variable();
     //GraphPrinter & operator=(const GraphPrinter & printer);

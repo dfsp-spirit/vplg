@@ -200,7 +200,7 @@ std::string GraphService::get_label() {
  * @return <vector<int>> all vertices adjacent to i */
 std::vector<int> GraphService::get_adjacent(int i) {
     AdjacencyIterator first, last;
-    std::vector<int> vertex_vector;
+    std::vector<int> vertex_vector = std::vector<int>();
     vertex_vector.push_back(i);
     
     

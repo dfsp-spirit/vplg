@@ -11,24 +11,18 @@
 /*
  * Default constructor */
 GraphPrinter::GraphPrinter() {
-    Graph g_tmp(0);
-    service = GraphService(g_tmp);
+
 }
 
 
-
-GraphPrinter::GraphPrinter(const Graph g) {
-    service = GraphService(g);
-}
 
 
 /* Print vertices adjacent to a given vertex i to a string
  * @param int i -- the vertex id */
-std::string GraphPrinter::printAdjacent(int i) {
+std::string GraphPrinter::printAdjacent(std::vector<int> vertex_vector) const {
     std::stringstream sstream;
     
-    
-    std::vector<int> vertex_vector = service.get_adjacent(i);
+    int i = vertex_vector[0];
     vertex_vector.erase(vertex_vector.begin());
     
     // iterate over adjacent vertices and print their ids to a string
@@ -42,14 +36,13 @@ std::string GraphPrinter::printAdjacent(int i) {
 };
 
 /* Iterate over the vertices and print their adjacent vertices */
-std::string GraphPrinter::printAdjacentAll() {
+std::string GraphPrinter::printAdjacentAll(std::vector<std::vector<int>> vertex_vector) const {
     std::stringstream sstream;
     
-    int n = service.getNumVertices();
-    
+    int n = vertex_vector.size();
     sstream << "Iterate over the vertices and print their adjacent vertices:\n"; 
     for (int i = 0; i < n; i++) {
-        sstream << printAdjacent(i);
+        sstream << printAdjacent(vertex_vector[i]);
     }
     sstream << std::endl;
     
@@ -59,16 +52,18 @@ std::string GraphPrinter::printAdjacentAll() {
 
 
 
-/* Save the graph statistics to a csv file */
-void GraphPrinter::saveGraphStatistics() {
+/* Save the graph statistics to a csv file.
+ * @param <vector<int>> degDist - node degree distribution
+ * @param <int> n - number of vertices
+ * @param <int> m - number of edges
+ * @return <void> */
+void GraphPrinter::saveGraphStatistics(std::vector<int> degDist, int n, int m) {
     std::ofstream summaryFile;
     const std::string summaryFileName = output_path + "graphsStatistics.csv"; // make the file
     
 
     // get the graph statistics, i.e. Node-Degreee-Distribution, number of vertices, number of edges
-    std::vector<int> degDist = service.computeDegreeDist();
-    int n = service.getNumVertices();
-    int m = service.getNumEdges();
+    
     /* NOTE:
      * p is the ratio of (number of edges in graph) to (maximal possible number of edges given n vertices) */
     float p = 2.0 * m / (n * (n - 1.0));  
@@ -96,15 +91,17 @@ void GraphPrinter::saveGraphStatistics() {
             std::cout << apptag << "    The statistics were saved to the summary in \"" << summaryFileName << "\".\n";
         }
     }
-};
+}
 
-/* Stores all graphs in a matlab file */
-void GraphPrinter::saveAsMatlabVariable(int& number) {    
+/* Stores one graph in a matlab file
+ * @param <Graph> the graph
+ * @return <void> */
+void GraphPrinter::saveAsMatlabVariable(const Graph& g) {    
     AdjacencyIterator first, last;
     std::ofstream matlabFile;
     const std::string matlabFileName = output_path + "graphsMatlabFormat.m"; // make output file
     
-    const Graph& g = service.getGraph();
+    std::string label = g[graph_bundle].label;
     
     // open the file
     matlabFile.open(matlabFileName.c_str(), std::ios_base::app);
@@ -119,9 +116,9 @@ void GraphPrinter::saveAsMatlabVariable(int& number) {
                       << "% of each protein graph\n\n";
         }
         // write the name of the graph
-        matlabFile << "graphs(" << number + 1 << ").name = \'" << service.get_label() << "\';\n";
+        matlabFile << "graph.name = \'" << label << "\';\n";
         
-        matlabFile << "graphs(" << number + 1 << ").am = [ ";
+        matlabFile << "graph.am = [ ";
         for (int j = 0; j < num_vertices(g); j++) {
                 matlabFile << (edge(0, j, g).second) << " ";
         }
@@ -133,7 +130,7 @@ void GraphPrinter::saveAsMatlabVariable(int& number) {
         }
         matlabFile << "];\n";
 
-        matlabFile << "graphs(" << number + 1 << ").al = {[ ";  
+        matlabFile << "graph.al = {[ ";  
         for (tie(first, last) = adjacent_vertices(0, g); first != last; ++first) {
             matlabFile << g[*first].id + 1 << " ";
         }
@@ -152,17 +149,18 @@ void GraphPrinter::saveAsMatlabVariable(int& number) {
     }
 };
 
-/* Save the graph statistics in a matlab file, i.e. node-degree-distribution, number of vertices and edges */
-void GraphPrinter::saveGraphStatisticsAsMatlabVariable() {
+/* Save the graph statistics in a matlab file,
+ * i.e. node-degree-distribution, number of vertices and edges
+ * @param <vector<int>> degDist - node degree distribution
+ * @param <int> n - number of vertices
+ * @param <int> m - number of edges */
+void GraphPrinter::saveGraphStatisticsAsMatlabVariable(std::vector<int> degDist, int n, int m) {
     // create the file    
     std::ofstream summaryMatlabFile;
     const std::string summaryMatlabFileName = output_path + "graphsStatisticsMatlabFormat.m";
     int pos;
     
-    // compute graph statistics
-    std::vector<int> degDist = service.computeDegreeDist();
-    int n = num_vertices(service.getGraph());
-    int m = num_edges(service.getGraph());
+   
     /* NOTE:
      * p is the ratio of (number of edges in graph) to (maximal possible number of edges given n vertices) */
     float p = 2.0 * m / (n * (n - 1.0)); 
@@ -203,12 +201,12 @@ void GraphPrinter::saveGraphStatisticsAsMatlabVariable() {
 /* Save the graph in simple format.
  * The name of the file will be of the form "simple_format_graphname.graph".
  * In simple format, the graph will be represented by its edges. */
-void GraphPrinter::saveInSimpleFormat() {
+void GraphPrinter::saveInSimpleFormat(Graph& g) {
     
-    Graph g = service.getGraph();
+    
     
     EdgeIterator ei, ei_end;
-    const std::string outFileName = output_path + "simple_format_" + service.get_label() + ".graph";
+    const std::string outFileName = output_path + "simple_format_" + g[graph_bundle].label + ".graph";
     std::ofstream outFile;
 
     outFile.open(outFileName.c_str());
@@ -222,16 +220,17 @@ void GraphPrinter::saveInSimpleFormat() {
 };
 
 /* Saves absolute graphlet counts to a file.
+ * @param <string> graphName - name of the graph
  * @param <vector<vector<int>>> absolute counts
  * @param <vector<float>>> labeled counts
  * @param <bool> include labeled graphlets */
-void GraphPrinter::saveABSGraphletCountsSummary(std::vector<std::vector<int>> abs_counts, std::vector<float> labeled_counts) {
+void GraphPrinter::saveABSGraphletCountsSummary(std::string graphName,std::vector<std::vector<int>> abs_counts, std::vector<float> labeled_counts) {
     std::ofstream summaryFile;
     const std::string summaryFileName = output_path + "counts.plain";
     
 
     
-    std::string graphName = service.get_label();
+   
 
     summaryFile.open(summaryFileName.c_str(), std::ios_base::app);
     if (!summaryFile.is_open()) {
@@ -267,16 +266,16 @@ void GraphPrinter::saveABSGraphletCountsSummary(std::vector<std::vector<int>> ab
 }
 
 /* Saves normalized graphlet counts to a file.
+ * @param <string> graphName 
  * @param <vector<vector<float>>> normalized counts
  * @param <vector<float>>> labeled counts
  *  */
-void GraphPrinter::saveNormalizedGraphletCountsSummary(std::vector<std::vector<float>> norm_counts, std::vector<float> labeled_counts) {
+void GraphPrinter::saveNormalizedGraphletCountsSummary(std::string graphName, std::vector<std::vector<float>> norm_counts, std::vector<float> labeled_counts) {
     std::ofstream summaryFile;
     const std::string summaryFileName = output_path + "counts.plain";
     
 
     
-    std::string graphName = service.get_label();
 
     summaryFile.open(summaryFileName.c_str(), std::ios_base::app);
     if (!summaryFile.is_open()) {
@@ -401,10 +400,10 @@ void GraphPrinter::save_absolute_counts_as_matlab_variable(std::vector<std::vect
 /* Saves the counts in NOVA format. The last vector of counts is reserved for 
  * labeled counts. The counts are saved to a file with the suffix
  * countsNovaFormat.csv. I don't really get why they should be saved this way...
- * 
- * @param counts - vector containing the counts
- * @param withLabeld - b whether labeled counts are part of the vector */
-void GraphPrinter::save_counts_in_nova_format(std::string graphName, std::vector<std::vector<int>> counts, bool withLabeled) {
+ * @param <string> graphName
+ * @param <vector<vector<int>>> counts - vector containing the counts
+  */
+void GraphPrinter::save_counts_in_nova_format(std::string graphName, std::vector<std::vector<int>> counts) {
     std::ofstream countsNovaFormatFile;
     const std::string countsNovaFormatFileName = output_path + "countsNovaFormat.csv";
     int pos;

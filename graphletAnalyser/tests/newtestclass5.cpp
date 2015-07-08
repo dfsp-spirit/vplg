@@ -24,7 +24,7 @@ void newtestclass5::setUp() {
     vi.properties["sse_type"] = "H";
     vd = add_vertex(vi,g);
     
-    printer = GraphPTGLPrinter(g);
+    printer = GraphPTGLPrinter();
     teststring0 = "Iterate over the vertices and print their properties:\n  vertex  0 has  sse_type = H\n\n";
     
 }
@@ -34,7 +34,9 @@ void newtestclass5::tearDown() {
 
 void newtestclass5::test_printVertices() {
     
-    std::string tst = printer.printVertices();
+    
+    
+    std::string tst = printer.printVertices(g);
     
     
     CPPUNIT_ASSERT(tst.compare(teststring0) == 0);

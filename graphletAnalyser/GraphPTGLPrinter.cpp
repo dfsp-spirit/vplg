@@ -14,32 +14,31 @@ using namespace pqxx;
 
 /* default constructor */
 GraphPTGLPrinter::GraphPTGLPrinter() {
-    ProteinGraphService service_tmp;
 
-    pservice = ProteinGraphService();
 }
 
 
-GraphPTGLPrinter::GraphPTGLPrinter(const Graph g) {
-    pservice = ProteinGraphService(g);
-}
 
 /*
  * prints vertices and their sse types to a string
  * CAUTION: only applicable to ptgl protein graphs */
-std::string GraphPTGLPrinter::printVertices() {
+std::string GraphPTGLPrinter::printVertices(const Graph& g) const {
     VertexIterator vi, vi_end, next; // create vertex iterator objects
     
-    Graph g = pservice.getGraph();
     
     tie(vi, vi_end) = vertices(g); // that belong to the graph
     stringstream sstream; // to be saved in a string
+    
     
     sstream << "Iterate over the vertices and print their properties:\n";
     for (next = vi; vi != vi_end; vi = next) { // iterate over the vertices
         ++next;
         // and print them with their sse type
-        sstream << "  vertex " << setw(2) << *vi << " has  sse_type = " << g[*vi].properties["sse_type"] << endl;
+        
+        std::unordered_map<std::string, std::string> map = g[*vi].properties;
+        
+        sstream << "  vertex " << setw(2) << *vi << " has  sse_type = " << map["sse_type"] << endl;
+        //sstream << "  vertex " << setw(2) << *vi << " has  sse_type = " << g[*vi].properties["sse_type"] << endl;
     }
     sstream << endl;
     
@@ -49,29 +48,35 @@ std::string GraphPTGLPrinter::printVertices() {
 /*
  * print edges with their spatial (protein related) relationships to a string
  * CAUTION: only applicable to ptgl protein graphs */
-std::string GraphPTGLPrinter::printEdges() {
+std::string GraphPTGLPrinter::printEdges(const Graph& g) const {
     bool formatted = true;
     EdgeIterator ei, ei_end;
     stringstream sstream;
     
-    Graph g = pservice.getGraph();
+    
     
     sstream << "Iterate over the edges and print their properties:\n";
     if (formatted) {
         for (tie(ei, ei_end) = edges(g); ei != ei_end; ++ei) { // iterate over edges
+            
+            std::unordered_map<std::string, std::string> map = g[*ei].properties;
+            
+            
             sstream << "  edge ("
                     << setw(2) << g[*ei].source
                     << ","
                     << setw(2) << g[*ei].target
                     << ") is "
-                    << g[*ei].properties["spatial"] << endl; // add their spatial relationships
+                    << map["spatial"] << endl; // add their spatial relationships
         }       
     } else {
         for (tie(ei, ei_end) = edges(g); ei != ei_end; ++ei) {
+            
+            std::unordered_map<std::string, std::string> map = g[*ei].properties;
             sstream << "  edge number " << *ei
                     << " has: source = " << g[*ei].source
                     << ", target = " << g[*ei].target
-                    << ", spatial = " << g[*ei].properties["spatial"] << endl;
+                    << ", spatial = " << map["spatial"] << endl;
         }
     }
     sstream << endl;
@@ -82,101 +87,113 @@ std::string GraphPTGLPrinter::printEdges() {
 /* Print all vertices, then all edges, and then then all adjacent vertices for
  * each vertex
  * CAUTION: only applicable to ptgl protein graphs */
-void GraphPTGLPrinter::printGraphInfo() {
-        stringstream sstream;
+void GraphPTGLPrinter::printGraphInfo(const Graph& g) const {
+    stringstream sstream;
+        
+    
+    
+    std::vector<std::vector<int>> adj_all_vector = std::vector<std::vector<int>>();
+    
+    int n = num_vertices(g);
+    
+    for (int i = 0; i < n; i++) {
+        std::vector<int> adj_vector = std::vector<int>();
+        adj_vector.push_back(i);
+        AdjacencyIterator first, last;
+        for (tie(first,last) = adjacent_vertices(i,g); first != last; ++first) {
+            adj_vector.push_back(g[*first].id);
+        }
+        
+        
+        adj_all_vector.push_back(adj_vector);
+    }
+        
 
     sstream << "[GRAPH INFO]\n"
-            << printVertices()
-            << printEdges() 
-            << printAdjacentAll();
+            << printVertices(g)
+            << printEdges(g) 
+            << printAdjacentAll(adj_all_vector);
     
     cout << sstream.str();
 
-};
+}
 
 /* Get the vertices with their sse types, aa residues, and the number of residues,
  * and the edges with their protein-related spatial relationships
  */
-string GraphPTGLPrinter::printGraphString() {
+string GraphPTGLPrinter::printGraphString(const Graph& g) const {
     // define iterators
     VertexIterator vi, vi_end, next;
     EdgeIterator ei, ei_end;
     
-    Graph g = pservice.getGraph();
     
     tie(vi, vi_end) = vertices(g);
     
     // set up the string stream
     stringstream sstream;
     
+    
+    
     // add vertices with their info
     sstream << "Vertices:\n";
     for (next = vi; vi != vi_end; vi = next) {
         ++next;
-        sstream << "  Vertex " << setw(2) << *vi << ": id=" << g[*vi].id << ", label=" << g[*vi].label << ", sse_type=" << g[*vi].properties["sse_type"] << ", num_residues=" << g[*vi].properties["num_residues"] << ", aa_sequence=" << g[*vi].properties["aa_sequence"] << "." << endl;
+        std::unordered_map<std::string, std::string> map = g[*vi].properties;
+        sstream << "  Vertex " << setw(2) << *vi << ": id=" << g[*vi].id << ", label=" << g[*vi].label << ", sse_type=" << map["sse_type"] << ", num_residues=" << map["num_residues"] << ", aa_sequence=" << map["aa_sequence"] << "." << endl;
     }
     sstream << endl;
     
     // add edges with their info
     sstream << "Edges:\n";
     for (tie(ei, ei_end) = edges(g); ei != ei_end; ++ei) {
+        
+        std::unordered_map<std::string, std::string> map = g[*ei].properties;
         sstream << "  edge ("
                 << setw(2) << g[*ei].source
                 << ","
                 << setw(2) << g[*ei].target
                 << ") is "
-                << g[*ei].properties["spatial"] << endl;
+                << map["spatial"] << endl;
     }
     
     return sstream.str();
-};
+}
 
 
 /** 
  * Uses the pgxx library to connect to a postgresql database server.
  * For this, you will need to link against lpq and lpqxx and include the proper headers.
  * 
- * 
- * @param <vector<string>> graph_properties:    contains the following elements:
- *                                              0: pdbid
- *                                              1: chain
- *                                              2: label - for which labeled graphlets were searched
- *                                              
- *
+ * @param <int> graphtype_int -> the graphtype as an integer taken for ProteinGraphService
+ * @param <vector<sting>> ids -  an arry of length 4 containing the identifiers of the                                              
+ *                          at the following positions:
+ *                          0 -> PDB ID
+ *                          1 -> Chain ID
+ *                          2 -> Label
+ *                          3 -> Graph type as string
+ * @param <vector<vector<float>> normalized graphlet counts
+ * @param <vector<vector<float>> normalized ptgl counts
  */
-int GraphPTGLPrinter::saveCountsToDatabasePGXX() {
+int GraphPTGLPrinter::saveCountsToDatabasePGXX(int graphtype_int, std::vector<std::string> ids, std::vector<std::vector<float>> norm_counts, std::vector<float> lab_counts) {
     
     Database db = Database::getInstance();
     string connection_string = db.get_connect_string();
  
+    if (ids.size() != 4) {std::cerr << "Invalid number of Identifiers";}
     
-    std::string pdbid = pservice.getPdbid();
-    std::string chain = pservice.getChainID();
-    std::string label = pservice.get_label();
-    std::string graphtypestr = pservice.getGraphTypeString();
-    int graphtype = pservice.getGraphTypeInt(graphtypestr);
-    std::vector<std::vector<float>> norm_counts = pservice.get_norm_counts();
+    std::string pdbid = ids[0];
+    std::string chain = ids[1];
+    std::string label = ids[2];
+    std::string graphtypestr = ids[3];
+    int graphtype = graphtype_int;
     std::vector<float> graphlet3CountsNormalized = norm_counts[1];
     std::vector<float> graphlet4CountsNormalized = norm_counts[2];
     std::vector<float> graphlet5CountsNormalized = norm_counts[3];
-    std::string id = pservice.get_graphlet_identifier();
-    std::vector<std::string> patterns = pservice.get_patterns();
     
     //TODO: implement function get--counts in graphservice
     //      so that the labeled counts can be written into the database
     
-    std::vector<float> cl = std::vector<float>();
-    std::vector<std::vector<float>> lab_counts = pservice.get_norm_ptgl_counts();
-    
-    for (int i = 0; i<lab_counts.size(); i++) {
-        std::vector<float> vec = lab_counts[i];
-        
-        for (int k = 0; k<vec.size(); k++) {
-            cl.push_back(vec[k]);
-        }
-        
-        
-    }
+    std::vector<float> cl = lab_counts;
     
     
     
@@ -328,7 +345,7 @@ int GraphPTGLPrinter::saveCountsToDatabasePGXX() {
     }
 }
 
-long GraphPTGLPrinter::getGraphDatabaseID(string pdbid, string chain, int graphType) {
+long GraphPTGLPrinter::getGraphDatabaseID(string pdbid, string chain, int graphType) const {
     
     long id = -1;
     
@@ -362,7 +379,7 @@ long GraphPTGLPrinter::getGraphDatabaseID(string pdbid, string chain, int graphT
     return id;
 }
 
-int GraphPTGLPrinter::databaseContainsGraphletsForGraph(unsigned long int databaseIDofGraph) {
+int GraphPTGLPrinter::databaseContainsGraphletsForGraph(unsigned long int databaseIDofGraph) const {
 
     Database db = Database::getInstance();
     string connection_string = db.get_connect_string();
@@ -390,9 +407,11 @@ int GraphPTGLPrinter::databaseContainsGraphletsForGraph(unsigned long int databa
  * Saves the graphlet counts in NOVA format to the NOVA output file. If the file does already exist,
  * the data for this graph gets appended to it. This format is basically CSV.
  * See http://www.bioinformatik.uni-frankfurt.de/tools/nova/ for more info on NOVA.
- * @param withLabeled whether to write labeled graphlet info as well
+ * @param <string> graphname
+ * @param <vector<vector<float>> normalized counts
+ * @param <vector<float>> normalized labeled counts
  */
-void GraphPTGLPrinter::saveCountsInNovaFormat(std::vector<std::vector<float>> norm_counts, std::vector<float> lab_counts) {
+void GraphPTGLPrinter::saveCountsInNovaFormat(std::string graphName, std::vector<std::vector<float>> norm_counts, std::vector<float> lab_counts) const {
     ofstream countsNovaFormatFile;
     const string countsNovaFormatFileName = output_path + "countsNovaFormat.csv";
     int pos;
@@ -402,7 +421,6 @@ void GraphPTGLPrinter::saveCountsInNovaFormat(std::vector<std::vector<float>> no
     std::vector<float> graphlet4CountsNormalized = norm_counts[2];
     std::vector<float> graphlet5CountsNormalized = norm_counts[3];
     std::vector<float> cl;
-    std::string graphName = pservice.get_label();
 
     countsNovaFormatFile.open(countsNovaFormatFileName.c_str(), std::ios_base::app);    
     if (!countsNovaFormatFile.is_open()) {
