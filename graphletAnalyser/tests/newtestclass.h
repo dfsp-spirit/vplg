@@ -24,6 +24,12 @@ class newtestclass : public CPPUNIT_NS::TestFixture {
     CPPUNIT_TEST(test_computeDegreeDist);
     CPPUNIT_TEST(test_get_adjacent);
     CPPUNIT_TEST(test_get_adjacent_all);
+    CPPUNIT_TEST(test_get_abs_counts);
+    CPPUNIT_TEST(test_get_norm_counts);
+    CPPUNIT_TEST(test_get_labeled_abs_counts);
+    CPPUNIT_TEST(test_get_labeled_norm_counts);
+    CPPUNIT_TEST(test_get_graphlet_identifier);
+    CPPUNIT_TEST(test_get_patterns);
     
     CPPUNIT_TEST_SUITE_END();
 
@@ -47,6 +53,8 @@ private:
     std::vector<std::string> test_prop_vector;
     std::vector<int> test_adjacent_vector,test_adjacent_vector1,test_adjacent_vector2;
     std::vector<std::vector<int>> test_adj_all_vector;
+    std::vector<std::vector<int>> test_count_vector_int;
+    std::vector<std::vector<float>> test_count_vector_float;
 
     void test_get_label();
     void test_getPropertyValue();
@@ -58,6 +66,12 @@ private:
     void test_computeDegreeDist();
     void test_get_adjacent();
     void test_get_adjacent_all();
+    void test_get_abs_counts();
+    void test_get_norm_counts();
+    void test_get_labeled_abs_counts();
+    void test_get_labeled_norm_counts();
+    void test_get_graphlet_identifier();
+    void test_get_patterns();
 };
 
 #endif	/* NEWTESTCLASS_H */

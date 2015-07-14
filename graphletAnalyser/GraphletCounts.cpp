@@ -185,6 +185,7 @@ void GraphletCounts::compute_unlabeled_abs_counts() {
 
 void GraphletCounts::compute_unlabeled_norm_counts() {
     
+    if (!unlabeled_abs_counts_computed) {compute_unlabeled_abs_counts();}
     float total = float (get_total_counts());
     
     graphlet2CountsNormalized = normalize_counts(graphlet2CountsABS,total);
@@ -1225,6 +1226,7 @@ std::vector<std::vector<int>> GraphletCounts::get_unlabeled_abs_counts() {
     
     if (!unlabeled_abs_counts_computed) {
         compute_unlabeled_abs_counts();
+        
     }
     
     abs_counts_vector.push_back(graphlet2CountsABS);

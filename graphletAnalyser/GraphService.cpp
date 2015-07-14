@@ -255,13 +255,60 @@ std::vector<std::vector<float>> GraphService::get_norm_counts() {
 }
 
 
-
+/* Get a unordered_map containing the patterns spcified in the argument patterns as keys
+ * and their corresponding counts as values.
+ * @param <string> id - the property of the vertex info for which grahlet patterns shpuld be counted
+ * @param <vector<string>> - the patterns which should be counted
+ * @return <unorded_map<string, vector<int>>> - a map where the absolute labeled counts can be accessed by their pattern */
 std::unordered_map<std::string, std::vector<int>> GraphService::get_labeled_abs_counts(std::string id, std::vector<std::string> patterns) {
+    //TODO: finish support for returning graphlet counts map
+    
+    
     std::unordered_map<std::string,std::vector<int>> map = std::unordered_map<std::string, std::vector<int>>();
     graphlet_identifier = id;
+    std::vector<std::string> patterns2 = std::vector<std::string>();
+    std::vector<std::string> patterns3 = std::vector<std::string>();
+    std::vector<std::string> patterns4 = std::vector<std::string>();
+    std::vector<std::string> patterns5 = std::vector<std::string>();
     
+    std::vector<int> abs_counts2;
+    std::vector<std::vector<int>> abs_counts3;
+    std::vector<std::vector<int>> abs_counts4;
     
+    std::vector<std::string> pat_vec2 = std::vector<std::string>();
+    std::vector<std::string> pat_vec3 = std::vector<std::string>();
+    std::vector<std::string> pat_vec4 = std::vector<std::string>();
     
+    std::vector<std::vector<std::string>> pat_vecvec3 = std::vector<std::vector<std::string>>(2);
+    std::vector<std::vector<std::string>> pat_vecvec4 = std::vector<std::vector<std::string>>();
+    
+    for (int i = 0; i < patterns.size(); i++) {
+        
+        std::string str = patterns[i];
+        
+        if (str.length() == 2) {
+            pat_vec2.push_back(str);
+            
+        } else if (str.length() == 3) {
+            pat_vec3.push_back(str);
+            
+            
+        } else if (str.length() == 4) {
+            pat_vec4.push_back(str);
+            
+            
+        } else {
+            std::cerr << "WARNING: Trying to look for graphlet of unsupported size > 4" << std::endl;
+        }
+        
+    }
+    
+    pat_vecvec3[0] = pat_vec3;
+    pat_vecvec3[1] = pat_vec3;
+    pat_vecvec4[5] = pat_vec4;
+    
+    abs_counts2 = gc.get_labeled_2_countsABS(graphlet_identifier, pat_vec2);
+    abs_counts3 = gc.get_labeled_3_countsABS(graphlet_identifier, pat_vecvec3);
     
     
     return map;

@@ -52,8 +52,11 @@ void newtestclass::setUp() {
     
     
     ui3.id = 0;
+    ui3.properties["prp"] = "H";
     vi3.id = 1;
+    vi3.properties["prp"] = "E";
     wi3.id = 2;
+    wi3.properties["prp"] = "H";
     
     ei3.source = 0;
     ei3.target = 1;
@@ -94,6 +97,49 @@ void newtestclass::setUp() {
     test_adj_all_vector.push_back(test_adjacent_vector1);
     test_adj_all_vector.push_back(test_adjacent_vector2);
     
+    std::vector<int> vec2 = std::vector<int>(1);
+    vec2[0] = 3;
+    
+    std::vector<int> vec3 = std::vector<int>(2);
+    std::vector<int> vec4 = std::vector<int>(6);
+    std::vector<int> vec5 = std::vector<int>(21);
+    
+    std::vector<float> vec2f = std::vector<float>(1);
+    vec2f[0] = 0.75;
+    
+    std::vector<float> vec3f = std::vector<float>(2);
+    std::vector<float> vec4f = std::vector<float>(6);
+    std::vector<float> vec5f = std::vector<float>(21);
+    
+    for (int i = 0; i <= 21; i++) {
+        
+        if (i < 2) {
+            vec3[i] = 0;
+            vec3f[i] = 0.;
+            if (i == 0) {
+                vec3[i] = 1;
+                vec3f[i] = 0.25;
+            }
+        }
+        
+        if (i < 6) {
+            vec4[i] = 0;
+            vec4f[i] = 0.;
+        }
+        
+        vec5[i] = 0;
+        vec5f[i] = 0.;
+    }
+    
+    test_count_vector_int.push_back(vec2);
+    test_count_vector_int.push_back(vec3);
+    test_count_vector_int.push_back(vec4);
+    test_count_vector_int.push_back(vec5);
+    
+    test_count_vector_float.push_back(vec2f);
+    test_count_vector_float.push_back(vec3f);
+    test_count_vector_float.push_back(vec4f);
+    test_count_vector_float.push_back(vec5f);
 }
 
 void newtestclass::tearDown() {
@@ -186,4 +232,43 @@ void newtestclass::test_get_adjacent() {
 void newtestclass::test_get_adjacent_all() {
     
     CPPUNIT_ASSERT(service2.get_adjacent_all() == test_adj_all_vector);
+}
+
+void newtestclass::test_get_abs_counts() {
+    
+    
+    
+    CPPUNIT_ASSERT(service2.get_abs_counts() == test_count_vector_int);
+}
+
+void newtestclass::test_get_norm_counts() {
+    
+    std::vector<std::vector<float>> vec = service2.get_norm_counts();
+    
+    for (int i = 0; i< vec.size(); i ++) {
+        
+        std::vector<float> vvec = vec[i];
+        for (int k = 0; k < vvec.size(); k++) {
+            std::cout << " " << vvec[k];
+        }
+        
+    }
+    
+    CPPUNIT_ASSERT(service2.get_norm_counts() == test_count_vector_float);
+}
+
+void newtestclass::test_get_labeled_abs_counts() {
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass::test_get_labeled_norm_counts() {
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass::test_get_graphlet_identifier() {
+    CPPUNIT_ASSERT(true);
+}
+
+void newtestclass::test_get_patterns() {
+    CPPUNIT_ASSERT(true);
 }
