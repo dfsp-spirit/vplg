@@ -19,6 +19,8 @@ newtestclass4::~newtestclass4() {
 void newtestclass4::setUp() {
     
     g[graph_bundle].properties["graph_type"] = "albe";
+    vi.id = 0;
+    add_vertex(vi, g);
     testNumber = 3;
     teststring0 = "albe";
     serv = ProteinGraphService(g);
@@ -37,6 +39,5 @@ void newtestclass4::test_getGraphTypeStr() {
 
 void newtestclass4::test_getGraphTypeInt() {
     
-    //CPPUNIT_ASSERT(true);
     CPPUNIT_ASSERT(serv.getGraphTypeInt(teststring0) == testNumber);
 }

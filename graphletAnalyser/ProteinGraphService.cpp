@@ -62,6 +62,7 @@ ProteinGraphService::ProteinGraphService(const Graph& graph) {
 /* 
  * Return an integer corresponding to a protein-chain-type */
 int ProteinGraphService::getGraphTypeInt(string graphType) {
+    
   if(graphType.compare("alpha") == 0) {
         return 1;
     }
@@ -83,7 +84,9 @@ int ProteinGraphService::getGraphTypeInt(string graphType) {
   else if(graphType.compare("aa_graph") == 0) {
         return 7;
     }
-    //cerr << "WARNING: Invalid graph type string, cannot translate it to graph type int code.\n";
+  else { 
+        cerr << "WARNING: Invalid graph type string, cannot translate it to graph type int code.\n";
+    }
     return -1;  
 }
 

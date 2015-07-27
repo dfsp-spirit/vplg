@@ -108,10 +108,10 @@ public:
     std::vector<std::vector<int>> get_labeled_4_countsABS(std::string, std::vector<std::vector<std::string>>);
 
     /******* Graphlet Counting Algorithms by N. Shervashidze ********/
-    std::vector<int> count_connected_2_graphlets(Graph&, std::string, std::vector<std::string>);
-    std::vector<int> count_connected_3_graphlets(Graph&, std::string, std::vector<std::vector<std::string>>);
-    std::vector<int> count_connected_4_graphlets(Graph&, std::string, std::vector<std::vector<std::string>>);
-    std::vector<int> count_connected_5_graphlets(Graph&);
+    std::vector<int> count_connected_2_graphlets(std::string, std::vector<std::string>);
+    std::vector<int> count_connected_3_graphlets(std::string, std::vector<std::vector<std::string>>);
+    std::vector<int> count_connected_4_graphlets(std::string, std::vector<std::vector<std::string>>);
+    std::vector<int> count_connected_5_graphlets();
     GraphletCounts & operator=(const GraphletCounts &);
 };
 

@@ -416,10 +416,10 @@ int main(int argc, char** argv) {
         std::vector<std::vector<std::string>> evec = std::vector<std::vector<std::string>>();
         
         
-        std::vector<int> counts2 = gc.count_connected_2_graphlets(graph, "", evec1);
-        std::vector<int> counts3 = gc.count_connected_3_graphlets(graph,"",evec);
-        std::vector<int> counts4 = gc.count_connected_4_graphlets(graph,"",evec);
-        std::vector<int> counts5 = gc.count_connected_5_graphlets(graph);
+        std::vector<int> counts2 = gc.count_connected_2_graphlets("", evec1);
+        std::vector<int> counts3 = gc.count_connected_3_graphlets("",evec);
+        std::vector<int> counts4 = gc.count_connected_4_graphlets("",evec);
+        std::vector<int> counts5 = gc.count_connected_5_graphlets();
         
         int total = gc.get_total_counts();
         

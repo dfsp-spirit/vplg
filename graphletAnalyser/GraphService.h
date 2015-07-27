@@ -69,6 +69,7 @@ protected:
     GraphletCounts gc;
     std::string graphlet_identifier;
     std::vector<std::string> graphlet_patterns;
+    int total_counts;
     
     
     

@@ -257,20 +257,23 @@ std::vector<std::vector<float>> GraphService::get_norm_counts() {
 
 /* Get a unordered_map containing the patterns spcified in the argument patterns as keys
  * and their corresponding counts as values.
- * @param <string> id - the property of the vertex info for which grahlet patterns shpuld be counted
+ * @param <string> id - the property of the vertex info for which grahlet patterns should be counted
  * @param <vector<string>> - the patterns which should be counted
  * @return <unorded_map<string, vector<int>>> - a map where the absolute labeled counts can be accessed by their pattern */
 std::unordered_map<std::string, std::vector<int>> GraphService::get_labeled_abs_counts(std::string id, std::vector<std::string> patterns) {
     //TODO: finish support for returning graphlet counts map
     
-    
+    // define the map to be filled
     std::unordered_map<std::string,std::vector<int>> map = std::unordered_map<std::string, std::vector<int>>();
-    graphlet_identifier = id;
-    std::vector<std::string> patterns2 = std::vector<std::string>();
-    std::vector<std::string> patterns3 = std::vector<std::string>();
-    std::vector<std::string> patterns4 = std::vector<std::string>();
-    std::vector<std::string> patterns5 = std::vector<std::string>();
     
+    // copying graphlet identifier to field
+    graphlet_identifier = id;
+    
+    
+    //setting total counts
+    total_counts = 0;
+    
+    //initialising vectors to store data
     std::vector<int> abs_counts2;
     std::vector<std::vector<int>> abs_counts3;
     std::vector<std::vector<int>> abs_counts4;
@@ -282,6 +285,8 @@ std::unordered_map<std::string, std::vector<int>> GraphService::get_labeled_abs_
     std::vector<std::vector<std::string>> pat_vecvec3 = std::vector<std::vector<std::string>>(2);
     std::vector<std::vector<std::string>> pat_vecvec4 = std::vector<std::vector<std::string>>();
     
+    
+    // separating patterns by size and copying them into vectors
     for (int i = 0; i < patterns.size(); i++) {
         
         std::string str = patterns[i];
@@ -298,7 +303,8 @@ std::unordered_map<std::string, std::vector<int>> GraphService::get_labeled_abs_
             
             
         } else {
-            std::cerr << "WARNING: Trying to look for graphlet of unsupported size > 4" << std::endl;
+            std::cerr << "WARNING: Trying to look for graphlet of unsupported size. " << std::endl
+                    << "Only labeled graphlets of with 2,3 or 4 vertices are supported." <<std::endl;
         }
         
     }
@@ -307,8 +313,35 @@ std::unordered_map<std::string, std::vector<int>> GraphService::get_labeled_abs_
     pat_vecvec3[1] = pat_vec3;
     pat_vecvec4[5] = pat_vec4;
     
+    // computing lableled graphlet counts
     abs_counts2 = gc.get_labeled_2_countsABS(graphlet_identifier, pat_vec2);
     abs_counts3 = gc.get_labeled_3_countsABS(graphlet_identifier, pat_vecvec3);
+    abs_counts4 = gc.get_labeled_4_countsABS(graphlet_identifier, pat_vecvec4);
+    
+
+    // copying graphlet counts into map
+    for (int i = 0; i< pat_vec2.size(); i++) {
+        map[pat_vec2[i]] = abs_counts2;
+        
+    }
+    for (int i = 0; i< pat_vec3.size(); i++) {
+
+            
+            std::vector<int> counts_for_1_label = std::vector<int>();
+            counts_for_1_label.push_back(abs_counts3[0][i]);
+            counts_for_1_label.push_back(abs_counts3[1][i]);
+                    
+            map[pat_vec3[i]] = counts_for_1_label;
+        
+    }
+    for (int i = 0; i < pat_vecvec4[5].size(); i++) {
+        
+        std::vector<int> vec5graphlets = std::vector<int>();
+        vec5graphlets.push_back(abs_counts4[5][i]);
+        
+        map[pat_vecvec4[5][i]] = vec5graphlets;
+    }
+    
     
     
     return map;
@@ -318,6 +351,7 @@ std::unordered_map<std::string, std::vector<int>> GraphService::get_labeled_abs_
 std::unordered_map<std::string, std::vector<float>> GraphService::get_labeled_norm_counts(std::string id, std::vector<std::string> patterns) {
     std::unordered_map<std::string,std::vector<float>> map = std::unordered_map<std::string, std::vector<float>>();
     
+    std::unordered_map<std::string, std::vector<int>> imap = get_labeled_abs_counts(id, patterns);
     
     
     graphlet_identifier = id;

@@ -10,13 +10,13 @@
 
 #include "Graph.h"
 #include "GraphletCounts.h"
+#include "GraphService.h"
 
 
 using namespace std;
 using namespace boost;
 
-/* This class only exists so the old function getGraphTypeInt is stored in a good
- * place */
+
 class ProteinGraphService: public GraphService {
     
     protected:

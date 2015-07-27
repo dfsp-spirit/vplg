@@ -33,6 +33,7 @@ private:
     Graph g;
     std::string teststring0;
     int testNumber;
+    vertex_info vi;
     
     void test_getGraphTypeInt();
     void test_getGraphTypeStr();

@@ -122,10 +122,10 @@ GraphletCounts::GraphletCounts(const Graph& graph) {
             graphtype = 7;
         }
         else {
-            cerr << "WARNING: Invalid graph type string '" << graphType << "', cannot translate it to graph type int code in GraphletCounts.\n";
-            graphtypestr = "no_graph_type";
-            graphtype = -1;
+        cerr << "WARNING: Invalid graph type string, cannot translate it to graph type int code in GraphletCounts.\n";
+        graphtype = -1;
         }
+        
     } else {
         graphtypestr = "no_graph_type";
         graphtype = -1;
@@ -178,10 +178,10 @@ GraphletCounts::GraphletCounts(const Graph& graph) {
 }
 
 void GraphletCounts::compute_unlabeled_abs_counts() {
-    graphlet2CountsABS = count_connected_2_graphlets(memberGraph, "", size_2_labels);
-    graphlet3CountsABS = count_connected_3_graphlets(memberGraph,"", size_3_labels);
-    graphlet4CountsABS = count_connected_4_graphlets(memberGraph, "", size_4_labels);
-    graphlet5CountsABS = count_connected_5_graphlets(memberGraph);
+    graphlet2CountsABS = count_connected_2_graphlets("", size_2_labels);
+    graphlet3CountsABS = count_connected_3_graphlets("", size_3_labels);
+    graphlet4CountsABS = count_connected_4_graphlets( "", size_4_labels);
+    graphlet5CountsABS = count_connected_5_graphlets();
     
     unlabeled_abs_counts_computed = true;
     
@@ -307,13 +307,13 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
  * @param <vector<string>> label_vector - vector containing the labels to look for
  * @return a vector of graphlet counts (how often each graphlet was found)
  */
- vector<int> GraphletCounts::count_connected_3_graphlets(Graph& g, std::string label, std::vector<std::vector<string>> labelVector) { 
+ vector<int> GraphletCounts::count_connected_3_graphlets(std::string label, std::vector<std::vector<string>> labelVector) { 
     vector<float> c3;
     c3 = vector<float>(2);
     float count[] = { 0.0, 0.0 };
     float w[]     = { 1/6.0, 1/2.0 };
     
-    memberGraph = g;
+    labeled_3_countsABS = std::vector<std::vector<int>>();
     unlabeled_abs_counts_computed = false;
     norm_counts_computed = false;
     labeled_norm_counts_computed = false;
@@ -371,26 +371,26 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
     AdjacencyIterator j, j_last, 
                       k, k_last; 
     
-    for (tie(i, i_last) = vertices(g); i != i_last; ++i) { 
+    for (tie(i, i_last) = vertices(memberGraph); i != i_last; ++i) { 
         if (print) logFile << "i = " << *i << endl;
         
         // counting graphlets that have path of length 3
-        for (tie(j, j_last) = adjacent_vertices(*i, g); j != j_last; ++j) {
+        for (tie(j, j_last) = adjacent_vertices(*i, memberGraph); j != j_last; ++j) {
             if (print) logFile << "----- j = " << *j << endl;
             
-            for (tie(k, k_last) = adjacent_vertices(*j, g); k != k_last; ++k) {
+            for (tie(k, k_last) = adjacent_vertices(*j, memberGraph); k != k_last; ++k) {
 
                 if (*k != *i) {
                     if (print) logFile << "----------- k = " << *k << endl;
 
-                    if (edge(*i, *k, g).second) {
+                    if (edge(*i, *k, memberGraph).second) {
                         count[0]++;
-						if(printDetails) { cout << apptag << "Found G0: " << g[*i].properties["label"] << "-" << g[*j].properties["label"] << "-" << g[*k].properties["label"] << ".\n"; }
+						if(printDetails) { cout << apptag << "Found G0: " << memberGraph[*i].properties["label"] << "-" << memberGraph[*j].properties["label"] << "-" << memberGraph[*k].properties["label"] << ".\n"; }
                         if (print) { logFile << "-------------------> g1\n"; }
                         
                         if (!labelVector.empty()) {                           
                             pattern = "";
-                            pattern = pattern + g[*i].properties[label] + g[*j].properties[label] + g[*k].properties[label];
+                            pattern = pattern + memberGraph[*i].properties[label] + memberGraph[*j].properties[label] + memberGraph[*k].properties[label];
                             
                             
                             
@@ -414,10 +414,10 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
                             
                             // NOTE: optional part, can be for further bio-graphlets
                             pattern = "";
-                            e = edge(*i, *j, g).first;
-                            pattern = pattern + g[*i].properties[label] + g[e].properties[label];
-                            e = edge(*j, *k, g).first;
-                            pattern = pattern + g[*j].properties[label] + g[e].properties["spatial"] + g[*k].properties[label];
+                            e = edge(*i, *j, memberGraph).first;
+                            pattern = pattern + memberGraph[*i].properties[label] + memberGraph[e].properties[label];
+                            e = edge(*j, *k, memberGraph).first;
+                            pattern = pattern + memberGraph[*j].properties[label] + memberGraph[e].properties["spatial"] + memberGraph[*k].properties[label];
                             
                             //cout             << pattern << " \n";                           
                             if (print) { logFile << pattern << " \n"; }
@@ -428,7 +428,7 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
                         
                         if (!labelVector.empty()) {                            
                             pattern = "";
-                            pattern = pattern + g[*i].properties[label] + g[*j].properties[label] + g[*k].properties[label];
+                            pattern = pattern + memberGraph[*i].properties[label] + memberGraph[*j].properties[label] + memberGraph[*k].properties[label];
                             
                             ;
                             
@@ -522,7 +522,7 @@ string GraphletCounts::print_counts(vector<int>& c, bool asVector) {
  * @return a vector of graphlet counts (how often each graphlet was found)
  */
 
-vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g,std::string label, vector<string> label_vector) { 
+vector<int> GraphletCounts::count_connected_2_graphlets(std::string label, vector<string> label_vector) { 
     vector<float> c2;
     c2 = vector<float>(1);   // The only 2-graphlet is a path of length 1 (one edge).
     float count[] = { 0.0 };
@@ -530,7 +530,6 @@ vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g,std::string lab
     
     
     
-    memberGraph = g;
     unlabeled_abs_counts_computed = false;
     norm_counts_computed = false;
     all_counts_computed = false;
@@ -559,13 +558,13 @@ vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g,std::string lab
     VertexIterator    i, i_last;
     AdjacencyIterator j, j_last; 
     
-    for (tie(i, i_last) = vertices(g); i != i_last; ++i) { 
+    for (tie(i, i_last) = vertices(memberGraph); i != i_last; ++i) { 
         if (print) {
             logFile << "i = " << *i << endl;
         }
         
         //counting graphlets that have path of length 3
-        for (tie(j, j_last) = adjacent_vertices(*i, g); j != j_last; ++j) {
+        for (tie(j, j_last) = adjacent_vertices(*i, memberGraph); j != j_last; ++j) {
             
             if (print) {
                 logFile << "----- j = " << *j << endl;                                    
@@ -573,13 +572,13 @@ vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g,std::string lab
             
             if (*j != *i) {
 
-                if (edge(*i, *j, g).second) {
+                if (edge(*i, *j, memberGraph).second) {
                     count[0]++;
                     if (print) logFile << "-------------------> g0\n";
 
                     if (!label_vector.empty()) {                           
                         pattern = "";
-                        pattern = pattern + g[*i].properties[label] + g[*j].properties[label];
+                        pattern = pattern + memberGraph[*i].properties[label] + memberGraph[*j].properties[label];
 
   
                         for (int i = 0; i < label_vector.size(); i++) {
@@ -642,12 +641,11 @@ vector<int> GraphletCounts::count_connected_2_graphlets(Graph& g,std::string lab
  * @param <vector<string>> label_vector - vector, containing the labels to look for
  * @return a vector of graphlet counts (how often each graphlet was found)
  */
-vector<int> GraphletCounts::count_connected_4_graphlets(Graph& g, std::string label, std::vector<std::vector<std::string>> label_vector) {    
+vector<int> GraphletCounts::count_connected_4_graphlets(std::string label, std::vector<std::vector<std::string>> label_vector) {    
     
     
 
     // resetting class attributes
-    memberGraph = g;
     unlabeled_abs_counts_computed = false;
     norm_counts_computed = false;
     labeled_norm_counts_computed = false;
@@ -725,23 +723,23 @@ vector<int> GraphletCounts::count_connected_4_graphlets(Graph& g, std::string la
                       k, k_last, 
                       l, l_last;
 
-    for (tie(i, i_last) = vertices(g); i != i_last; ++i) { 
+    for (tie(i, i_last) = vertices(memberGraph); i != i_last; ++i) { 
         if (print) logFile << "i = " << *i << endl;
         
         // counting graphlets that have path of length 3
-        for (tie(j, j_last) = adjacent_vertices(*i, g); j != j_last; ++j) {
+        for (tie(j, j_last) = adjacent_vertices(*i, memberGraph); j != j_last; ++j) {
             if (print) logFile << "----- j = " << *j << endl;
             
-            for (tie(k, k_last) = adjacent_vertices(*j, g); k != k_last; ++k) {
+            for (tie(k, k_last) = adjacent_vertices(*j, memberGraph); k != k_last; ++k) {
 
                 if (*k != *i) {
                     if (print) logFile << "----------- k = " << *k << endl;
 
-                    for (tie(l, l_last) = adjacent_vertices(*k, g); l != l_last; ++l) {
+                    for (tie(l, l_last) = adjacent_vertices(*k, memberGraph); l != l_last; ++l) {
 
                         if ((*l != *i) && (*l != *j)) {
                             if (print) logFile << "------------------ l = " << *l << endl;
-                            aux = edge(*i, *k, g).second + edge(*i, *l, g).second + edge(*j, *l, g).second;
+                            aux = edge(*i, *k, memberGraph).second + edge(*i, *l, memberGraph).second + edge(*j, *l, memberGraph).second;
                             switch (aux) {
                                 case 3:
                                     count[0]++;
@@ -752,7 +750,7 @@ vector<int> GraphletCounts::count_connected_4_graphlets(Graph& g, std::string la
                                     if (print) logFile << "--------------------------> g2\n";
                                     break;
                                 case 1:
-                                    if (edge(*i, *l, g).second) {
+                                    if (edge(*i, *l, memberGraph).second) {
                                         count[4]++;
                                         if (print) logFile << "--------------------------> g5\n";                                     
                                     } else {
@@ -766,7 +764,7 @@ vector<int> GraphletCounts::count_connected_4_graphlets(Graph& g, std::string la
                                         
                                     if (!label_vector.empty()) {
                                         pattern = "";
-                                        pattern = pattern + g[*i].properties[label] + g[*j].properties[label] + g[*k].properties[label] + g[*l].properties[label];
+                                        pattern = pattern + memberGraph[*i].properties[label] + memberGraph[*j].properties[label] + memberGraph[*k].properties[label] + memberGraph[*l].properties[label];
                                         
                                         std::set<std::string> mirl; 
                                         
@@ -786,12 +784,12 @@ vector<int> GraphletCounts::count_connected_4_graphlets(Graph& g, std::string la
 
 
                                         pattern = "";
-                                        e = edge(*i, *j, g).first;
-                                        pattern = pattern + g[*i].properties[label] + g[e].properties["spatial"];
-                                        e = edge(*j, *k, g).first;
-                                        pattern = pattern + g[*j].properties[label] + g[e].properties["spatial"];
-                                        e = edge(*k, *l, g).first;
-                                        pattern = pattern + g[*k].properties[label] + g[e].properties["spatial"] + g[*l].properties[label];
+                                        e = edge(*i, *j, memberGraph).first;
+                                        pattern = pattern + memberGraph[*i].properties[label] + memberGraph[e].properties["spatial"];
+                                        e = edge(*j, *k, memberGraph).first;
+                                        pattern = pattern + memberGraph[*j].properties[label] + memberGraph[e].properties["spatial"];
+                                        e = edge(*k, *l, memberGraph).first;
+                                        pattern = pattern + memberGraph[*k].properties[label] + memberGraph[e].properties["spatial"] + memberGraph[*l].properties[label];
 
                                         if (((*i - *l) == 1) && ((*l - *k) == 1) && ((*k - *j) == 1) && (pattern == g6_bio_patterns[0])) {
                                             lcount[10]++;
@@ -819,16 +817,16 @@ vector<int> GraphletCounts::count_connected_4_graphlets(Graph& g, std::string la
         
         // counting "star"-graphlets
         // NOTE: loop boundaries were modified
-        for (tie(j, j_last) = adjacent_vertices(*i, g); j != j_last; ++j) {
+        for (tie(j, j_last) = adjacent_vertices(*i, memberGraph); j != j_last; ++j) {
 
-            for (tie(k, k_last) = adjacent_vertices(*i, g); k != k_last; ++k) {
+            for (tie(k, k_last) = adjacent_vertices(*i, memberGraph); k != k_last; ++k) {
 
                 if (*k > *j) {
 
-                    for (tie(l, l_last) = adjacent_vertices(*i, g); l != l_last; ++l) {
+                    for (tie(l, l_last) = adjacent_vertices(*i, memberGraph); l != l_last; ++l) {
 
                         if ((*l > *j) && (*l > *k)) {
-                            aux = edge(*j, *k, g).second + edge(*k, *l, g).second + edge(*l, *j, g).second;
+                            aux = edge(*j, *k, memberGraph).second + edge(*k, *l, memberGraph).second + edge(*l, *j, memberGraph).second;
                             
                             if (aux == 0) {
                                 count[3]++;
@@ -881,10 +879,9 @@ vector<int> GraphletCounts::count_connected_4_graphlets(Graph& g, std::string la
  * @return a vector of graphlet counts (how often each graphlet was found)
  */
 
-vector<int> GraphletCounts::count_connected_5_graphlets(Graph& g) {    
+vector<int> GraphletCounts::count_connected_5_graphlets() {    
     
     // resetting class attributes
-    memberGraph = g;
     unlabeled_abs_counts_computed = false;
     norm_counts_computed = false;
     labeled_norm_counts_computed = false;
@@ -936,37 +933,37 @@ vector<int> GraphletCounts::count_connected_5_graphlets(Graph& g) {
     
     if (print) logFile << "Iterations for 5-graphlet counting:\n";
 
-    for (tie(i, i_last) = vertices(g); i != i_last; ++i) { 
+    for (tie(i, i_last) = vertices(memberGraph); i != i_last; ++i) { 
         if (print) logFile << "i = " << *i << endl;
         
         // counting graphlets that have path of length 4
-        for (tie(j, j_last) = adjacent_vertices(*i, g); j != j_last; ++j) {
+        for (tie(j, j_last) = adjacent_vertices(*i, memberGraph); j != j_last; ++j) {
             if (print) logFile << "----- j = " << *j << endl;
             
-            for (tie(k, k_last) = adjacent_vertices(*j, g); k != k_last; ++k) {
+            for (tie(k, k_last) = adjacent_vertices(*j, memberGraph); k != k_last; ++k) {
 
                 if (*k != *i) {
                     if (print) logFile << "----------- k = " << *k << endl;
 
-                    for (tie(l, l_last) = adjacent_vertices(*k, g); l != l_last; ++l) {
+                    for (tie(l, l_last) = adjacent_vertices(*k, memberGraph); l != l_last; ++l) {
 
                         if ((*l != *i) && (*l != *j)) {
                             if (print) logFile << "------------------ l = " << *l << endl;
 
-                            for (tie(m, m_last) = adjacent_vertices(*l, g); m != m_last; ++m) {
+                            for (tie(m, m_last) = adjacent_vertices(*l, memberGraph); m != m_last; ++m) {
 
                                 if ((*m != *i) && (*m != *j) && (*m != *k)) {
                                     if (print) logFile << "------------------------- m = " << *m << endl;
 
-                                    aux = edge(*i, *k, g).second + edge(*i, *l, g).second + edge(*i, *m, g).second +
-                                          edge(*j, *l, g).second + edge(*j, *m, g).second + edge(*k, *m, g).second;
+                                    aux = edge(*i, *k, memberGraph).second + edge(*i, *l, memberGraph).second + edge(*i, *m, memberGraph).second +
+                                          edge(*j, *l, memberGraph).second + edge(*j, *m, memberGraph).second + edge(*k, *m, memberGraph).second;
                                     
                                     // NOTE: nodes degree computation and comparison were slightly modified        
-                                    deg_unsort[0] = edge(*i, *k, g).second + edge(*i, *l, g).second + edge(*i, *m, g).second + 1;
-                                    deg_unsort[1] = edge(*j, *l, g).second + edge(*j, *m, g).second + 2;
-                                    deg_unsort[2] = edge(*k, *i, g).second + edge(*k, *m, g).second + 2;
-                                    deg_unsort[3] = edge(*l, *i, g).second + edge(*l, *j, g).second + 2;
-                                    deg_unsort[4] = edge(*m, *i, g).second + edge(*m, *j, g).second + edge(*m, *k, g).second + 1;
+                                    deg_unsort[0] = edge(*i, *k, memberGraph).second + edge(*i, *l, memberGraph).second + edge(*i, *m, memberGraph).second + 1;
+                                    deg_unsort[1] = edge(*j, *l, memberGraph).second + edge(*j, *m, memberGraph).second + 2;
+                                    deg_unsort[2] = edge(*k, *i, memberGraph).second + edge(*k, *m, memberGraph).second + 2;
+                                    deg_unsort[3] = edge(*l, *i, memberGraph).second + edge(*l, *j, memberGraph).second + 2;
+                                    deg_unsort[4] = edge(*m, *i, memberGraph).second + edge(*m, *j, memberGraph).second + edge(*m, *k, memberGraph).second + 1;
                                     
                                     memcpy(deg, deg_unsort, sizeof (deg_unsort));
                                     sort(deg, deg + 5);
@@ -1060,9 +1057,9 @@ vector<int> GraphletCounts::count_connected_5_graphlets(Graph& g) {
                                                     case 4:  index2 = *m; break;                                                    
                                                     default: logFile << "ERROR while index2 computation in g7, g15\n";
                                                 }
-                                                if (print) logFile << "edge " << edge(index1, index2, g).first << "? " 
-                                                                << edge(index1, index2, g).second;
-                                               if (edge(index1, index2, g).second) { // --> g7
+                                                if (print) logFile << "edge " << edge(index1, index2, memberGraph).first << "? " 
+                                                                << edge(index1, index2, memberGraph).second;
+                                               if (edge(index1, index2, memberGraph).second) { // --> g7
                                                     count[6]++;
                                                     if (print) logFile << " --> g7\n";
                                                 } else { // --> g15
@@ -1102,9 +1099,9 @@ vector<int> GraphletCounts::count_connected_5_graphlets(Graph& g) {
                                                     case 4:  index1 = *m; break;                                                    
                                                     default: logFile << "ERROR while index2 computation in g12, g17\n";
                                                 }
-                                                if (print) logFile << "edge " << edge(index1, index2, g).first << "? " 
-                                                                << edge(index1, index2, g).second;
-                                                if (edge(index1, index2, g).second) { // --> g17
+                                                if (print) logFile << "edge " << edge(index1, index2, memberGraph).first << "? " 
+                                                                << edge(index1, index2, memberGraph).second;
+                                                if (edge(index1, index2, memberGraph).second) { // --> g17
                                                     count[16]++;
                                                     if (print) logFile << " --> g17\n";
                                                 } else { // --> g12
@@ -1131,23 +1128,23 @@ vector<int> GraphletCounts::count_connected_5_graphlets(Graph& g) {
         }
         
         // counting g20
-        for (tie(j, j_last) = adjacent_vertices(*i, g); j != j_last; ++j) {
+        for (tie(j, j_last) = adjacent_vertices(*i, memberGraph); j != j_last; ++j) {
             if (print) logFile << "----- j = " << *j << endl;
             
-            for (tie(k, k_last) = adjacent_vertices(*j, g); k != k_last; ++k) {
+            for (tie(k, k_last) = adjacent_vertices(*j, memberGraph); k != k_last; ++k) {
 
-                if ((*k != *i) && (!edge(*i, *k, g).second)) {
+                if ((*k != *i) && (!edge(*i, *k, memberGraph).second)) {
                     if (print) logFile << "----------- k = " << *k << endl;
 
-                    for (tie(l, l_last) = adjacent_vertices(*k, g); l != l_last; ++l) {
+                    for (tie(l, l_last) = adjacent_vertices(*k, memberGraph); l != l_last; ++l) {
 
-                        if ((*l != *i) && (*l != *j) && (!edge(*i, *l, g).second) && (!edge(*j, *l, g).second)) {
+                        if ((*l != *i) && (*l != *j) && (!edge(*i, *l, memberGraph).second) && (!edge(*j, *l, memberGraph).second)) {
                             if (print) logFile << "------------------ l = " << *l << endl;
 
-                            for (tie(m, m_last) = adjacent_vertices(*k, g); m != m_last; ++m) {
+                            for (tie(m, m_last) = adjacent_vertices(*k, memberGraph); m != m_last; ++m) {
 
                                 if ((*m != *i) && (*m != *j) && (*m != *l)
-                                               && (!edge(*i, *m, g).second) && (!edge(*j, *m, g).second) && (!edge(*l, *m, g).second)) {
+                                               && (!edge(*i, *m, memberGraph).second) && (!edge(*j, *m, memberGraph).second) && (!edge(*l, *m, memberGraph).second)) {
                                     if (print) logFile << "------------------------- m = " << *m << endl;
                                     if (print) logFile << "--------------------------------------> g20\n";
                                     count[19]++;
@@ -1161,22 +1158,22 @@ vector<int> GraphletCounts::count_connected_5_graphlets(Graph& g) {
         
         // counting g19 and g21
         // NOTE: loop borders were modified
-        for (tie(j, j_last) = adjacent_vertices(*i, g); j != j_last; ++j) {
+        for (tie(j, j_last) = adjacent_vertices(*i, memberGraph); j != j_last; ++j) {
 
-            for (tie(k, k_last) = adjacent_vertices(*i, g); k != k_last; ++k) {
+            for (tie(k, k_last) = adjacent_vertices(*i, memberGraph); k != k_last; ++k) {
 
                 if (*k > *j) {
 
-                    for (tie(l, l_last) = adjacent_vertices(*i, g); l != l_last; ++l) {
+                    for (tie(l, l_last) = adjacent_vertices(*i, memberGraph); l != l_last; ++l) {
 
                         if ((*l > *j) && (*l > *k)) {
                             
-                            for (tie(m, m_last) = adjacent_vertices(*i, g); m != m_last; ++m) {
+                            for (tie(m, m_last) = adjacent_vertices(*i, memberGraph); m != m_last; ++m) {
 
                                 if ((*m > *j) && (*m > *k) && (*m > *l)) {
 
-                                    aux = edge(*j, *k, g).second + edge(*j, *l, g).second + edge(*j, *m, g).second +
-                                          edge(*k, *l, g).second + edge(*k, *m, g).second + edge(*l, *m, g).second;
+                                    aux = edge(*j, *k, memberGraph).second + edge(*j, *l, memberGraph).second + edge(*j, *m, memberGraph).second +
+                                          edge(*k, *l, memberGraph).second + edge(*k, *m, memberGraph).second + edge(*l, *m, memberGraph).second;
                                     
                                     if (aux == 1) { // --> g19
                                         count[18]++;
@@ -1265,11 +1262,11 @@ vector<int> GraphletCounts::get_labeled_2_countsABS(std::string label, std::vect
     if (size_2_labels == label_vector) {
         
         if (labeled_2_countsABS.empty()) {
-            count_connected_2_graphlets(memberGraph, label, label_vector);
+            count_connected_2_graphlets(label, label_vector);
         }
             
     } else {
-            count_connected_2_graphlets(memberGraph,label, label_vector);
+            count_connected_2_graphlets(label, label_vector);
     }
     
     return labeled_2_countsABS;
@@ -1297,10 +1294,10 @@ vector<vector<int>> GraphletCounts::get_labeled_3_countsABS(std::string label, s
     if (size_3_labels == label_vector) {
         
         if (labeled_3_countsABS.empty()) {
-            count_connected_3_graphlets(memberGraph, label, label_vector);
+            count_connected_3_graphlets(label, label_vector);
         }
     } else {
-        count_connected_3_graphlets(memberGraph, label, label_vector);
+        count_connected_3_graphlets(label, label_vector);
     }
 
     return labeled_3_countsABS;
@@ -1311,10 +1308,10 @@ vector<vector<int>> GraphletCounts::get_labeled_4_countsABS(std::string label, s
     if (size_4_labels == label_vector) {
         
         if (labeled_4_countsABS.empty()) {
-            count_connected_4_graphlets(memberGraph, label, label_vector);
+            count_connected_4_graphlets(label, label_vector);
         }
     } else {
-        count_connected_4_graphlets(memberGraph, label, label_vector);
+        count_connected_4_graphlets(label, label_vector);
     }
 
     return labeled_4_countsABS;
@@ -1449,10 +1446,10 @@ int GraphletCounts::get_total_counts() {
     std::vector<std::vector<std::string>> vecvec = std::vector<std::vector<std::string>>();
     
     
-    if (!two_counts) count_connected_2_graphlets(memberGraph, "", vec0);
-    if (!three_counts) count_connected_3_graphlets(memberGraph,"", vecvec);
-    if (!four_counts) count_connected_4_graphlets(memberGraph,"",vecvec);
-    if (!five_counts) count_connected_5_graphlets(memberGraph);
+    if (!two_counts) count_connected_2_graphlets( "", vec0);
+    if (!three_counts) count_connected_3_graphlets("", vecvec);
+    if (!four_counts) count_connected_4_graphlets("",vecvec);
+    if (!five_counts) count_connected_5_graphlets();
     
     int counts = num2 + num3 + num4 + num5;
     return counts;

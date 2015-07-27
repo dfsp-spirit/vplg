@@ -140,6 +140,7 @@ void newtestclass::setUp() {
     test_count_vector_float.push_back(vec3f);
     test_count_vector_float.push_back(vec4f);
     test_count_vector_float.push_back(vec5f);
+    
 }
 
 void newtestclass::tearDown() {

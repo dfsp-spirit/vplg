@@ -173,7 +173,9 @@ void newtestclass2::test_count_connected_2_graphlets() {
     
     vector<string> label_vector = vector<string>();
     
-    testVector = counter.count_connected_2_graphlets(testGraph, "", label_vector);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_2_graphlets( "", label_vector);
     
     CPPUNIT_ASSERT(testVector[0] == 3);
     
@@ -189,8 +191,9 @@ void newtestclass2::test_count_connected_3_graphlets0() {
     bd = add_edge(u,v,bi,testGraph).first;
     cd = add_edge(v,w,ci,testGraph).first;
     id = add_edge(u,w,ii,testGraph).first;
+    counter = GraphletCounts(testGraph);
     
-    testVector = counter.count_connected_3_graphlets(testGraph, "", str_vec);
+    testVector = counter.count_connected_3_graphlets("", str_vec);
     
     CPPUNIT_ASSERT(testVector[0] == 1);
 
@@ -205,8 +208,9 @@ void newtestclass2::test_count_connected_3_graphlets1() {
     vector<vector<string>> str_vec = vector<vector<string>>();
     bd = add_edge(u,v,bi,testGraph).first;
     cd = add_edge(v,w,ci,testGraph).first;
+    counter = GraphletCounts(testGraph);
     
-    testVector = counter.count_connected_3_graphlets(testGraph, "", str_vec);
+    testVector = counter.count_connected_3_graphlets("", str_vec);
     
     CPPUNIT_ASSERT(testVector[1] == 1);
 
@@ -226,8 +230,9 @@ void newtestclass2::test_count_connected_4_graphlets0() {
     hd = add_edge(u,x,hi,testGraph).first;
     id = add_edge(u,w,ii,testGraph).first;
     jd = add_edge(v,x,ji,testGraph).first;
+    counter = GraphletCounts(testGraph);
     
-    testVector = counter.count_connected_4_graphlets(testGraph, "",lab);
+    testVector = counter.count_connected_4_graphlets("",lab);
     
     CPPUNIT_ASSERT(testVector[0] == 1);
     
@@ -245,7 +250,9 @@ void newtestclass2::test_count_connected_4_graphlets1() {
     hd = add_edge(u,x,hi,testGraph).first;
     id = add_edge(u,w,ii,testGraph).first;
     
-    testVector = counter.count_connected_4_graphlets(testGraph, "", lab);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_4_graphlets("", lab);
     
     CPPUNIT_ASSERT(testVector[1] == 1);
     
@@ -264,7 +271,9 @@ void newtestclass2::test_count_connected_4_graphlets2() {
     dd = add_edge(w,x,di,testGraph).first;
     id = add_edge(u,w,ii,testGraph).first;
     
-    testVector = counter.count_connected_4_graphlets(testGraph, "", lab);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_4_graphlets("", lab);
     
     CPPUNIT_ASSERT(testVector[2] == 1);
     
@@ -282,7 +291,9 @@ void newtestclass2::test_count_connected_4_graphlets3() {
     dd = add_edge(w,x,di,testGraph).first;
     id = add_edge(u,w,ii,testGraph).first;
     
-    testVector = counter.count_connected_4_graphlets(testGraph, "", lab);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_4_graphlets("", lab);
     
     CPPUNIT_ASSERT(testVector[3] == 1);
     
@@ -300,7 +311,9 @@ void newtestclass2::test_count_connected_4_graphlets4() {
     dd = add_edge(w,x,di,testGraph).first;
     hd = add_edge(u,x,hi,testGraph).first;
     
-    testVector = counter.count_connected_4_graphlets(testGraph, "",lab);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_4_graphlets("",lab);
     
     CPPUNIT_ASSERT(testVector[4] == 1);
 
@@ -316,7 +329,9 @@ void newtestclass2::test_count_connected_4_graphlets5() {
     cd = add_edge(v,w,ci,testGraph).first;
     dd = add_edge(w,x,di,testGraph).first;
     
-    testVector = counter.count_connected_4_graphlets(testGraph, "",lab);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_4_graphlets("",lab);
     
     CPPUNIT_ASSERT(testVector[5] == 1);
 
@@ -338,8 +353,9 @@ void newtestclass2::test_count_connected_5_graphlets0() {
     ad = add_edge(t,u,ai,testGraph).first;
     cd = add_edge(v,w,ci,testGraph).first;
     
+    counter = GraphletCounts(testGraph);
     
-    testVector = counter.count_connected_5_graphlets(testGraph);
+    testVector = counter.count_connected_5_graphlets();
     
     CPPUNIT_ASSERT(testVector[0] == 1);
 
@@ -361,7 +377,9 @@ void newtestclass2::test_count_connected_5_graphlets1() {
     bd = add_edge(v,w,bi,testGraph).first;
     ad = add_edge(t,u,ai,testGraph).first;
     
-    testVector = counter.count_connected_5_graphlets(testGraph);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_5_graphlets();
     
     CPPUNIT_ASSERT(testVector[1] == 1);
 }
@@ -382,7 +400,9 @@ void newtestclass2::test_count_connected_5_graphlets2() {
     bd = add_edge(u,v,bi,testGraph).first;
     
     
-    testVector = counter.count_connected_5_graphlets(testGraph);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_5_graphlets();
     
     CPPUNIT_ASSERT(testVector[2] == 1);
 }
@@ -402,7 +422,9 @@ void newtestclass2::test_count_connected_5_graphlets3() {
     ed = add_edge(x,t,ei,testGraph).first;
     ad = add_edge(t,u,ai,testGraph).first;
     
-    testVector = counter.count_connected_5_graphlets(testGraph);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_5_graphlets();
     
     CPPUNIT_ASSERT(testVector[3] == 1);
 }
@@ -421,8 +443,9 @@ void newtestclass2::test_count_connected_5_graphlets4() {
     dd = add_edge(w,x,di,testGraph).first;
     bd = add_edge(u,v,bi,testGraph).first;
     
-    testVector = counter.count_connected_5_graphlets(testGraph);
+    counter = GraphletCounts(testGraph);
     
+    testVector = counter.count_connected_5_graphlets();    
     CPPUNIT_ASSERT(testVector[4] == 1);
 }
 
@@ -441,7 +464,9 @@ void newtestclass2::test_count_connected_5_graphlets5() {
     ed = add_edge(x,t,ei,testGraph).first;
     
     
-    testVector = counter.count_connected_5_graphlets(testGraph);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_5_graphlets();
     
     CPPUNIT_ASSERT(testVector[5] == 1);
 }
@@ -460,7 +485,9 @@ void newtestclass2::test_count_connected_5_graphlets6() {
     dd = add_edge(w,x,di,testGraph).first;
     
     
-    testVector = counter.count_connected_5_graphlets(testGraph);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_5_graphlets();
     
     CPPUNIT_ASSERT(testVector[6] == 1);
 }
@@ -480,7 +507,9 @@ void newtestclass2::test_count_connected_5_graphlets7() {
     
     
     
-    testVector = counter.count_connected_5_graphlets(testGraph);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_5_graphlets();
     
     CPPUNIT_ASSERT(testVector[7] == 1);
 }
@@ -500,7 +529,9 @@ void newtestclass2::test_count_connected_5_graphlets8() {
     hd = add_edge(u,x,hi,testGraph).first;
     
     
-    testVector = counter.count_connected_5_graphlets(testGraph);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_5_graphlets();
     
     CPPUNIT_ASSERT(testVector[8] == 1);
 }
@@ -519,7 +550,9 @@ void newtestclass2::test_count_connected_5_graphlets9() {
     id = add_edge(u,w,ii,testGraph).first;
     
     
-    testVector = counter.count_connected_5_graphlets(testGraph);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_5_graphlets();
     
     CPPUNIT_ASSERT(testVector[9] == 1);
 }
@@ -539,7 +572,9 @@ void newtestclass2::test_count_connected_5_graphlets10() {
 
     
     
-    testVector = counter.count_connected_5_graphlets(testGraph);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_5_graphlets();
     
     CPPUNIT_ASSERT(testVector[10] == 1);
 }
@@ -557,7 +592,9 @@ void newtestclass2::test_count_connected_5_graphlets11() {
     jd = add_edge(v,x,ji,testGraph).first;
 
     
-    testVector = counter.count_connected_5_graphlets(testGraph);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_5_graphlets();
     
     CPPUNIT_ASSERT(testVector[11] == 1);
 }
@@ -574,7 +611,9 @@ void newtestclass2::test_count_connected_5_graphlets12() {
     dd = add_edge(w,x,di,testGraph).first;
     
     
-    testVector = counter.count_connected_5_graphlets(testGraph);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_5_graphlets();
     
     CPPUNIT_ASSERT(testVector[12] == 1);
 }
@@ -594,7 +633,9 @@ void newtestclass2::test_count_connected_5_graphlets13() {
     dd = add_edge(w,x,di,testGraph).first;
     cd = add_edge(v,w,ci,testGraph).first;
     
-    testVector = counter.count_connected_5_graphlets(testGraph);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_5_graphlets();
     
     CPPUNIT_ASSERT(testVector[13] == 1);
 }
@@ -613,7 +654,9 @@ void newtestclass2::test_count_connected_5_graphlets14() {
     dd = add_edge(w,x,di,testGraph).first;
     
     
-    testVector = counter.count_connected_5_graphlets(testGraph);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_5_graphlets();
     
     CPPUNIT_ASSERT(testVector[14] == 1);
 }
@@ -632,7 +675,9 @@ void newtestclass2::test_count_connected_5_graphlets15() {
     gd = add_edge(t,v,gi,testGraph).first;
     
     
-    testVector = counter.count_connected_5_graphlets(testGraph);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_5_graphlets();
     
     CPPUNIT_ASSERT(testVector[15] == 1);
 }
@@ -650,7 +695,9 @@ void newtestclass2::test_count_connected_5_graphlets16() {
     bd = add_edge(u,v,bi,testGraph).first;
     jd = add_edge(v,x,ji,testGraph).first;
     
-    testVector = counter.count_connected_5_graphlets(testGraph);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_5_graphlets();
     
     CPPUNIT_ASSERT(testVector[16] == 1);
 }
@@ -667,7 +714,9 @@ void newtestclass2::test_count_connected_5_graphlets17() {
     dd = add_edge(w,x,di,testGraph).first;
     bd = add_edge(u,v,bi,testGraph).first;
     
-    testVector = counter.count_connected_5_graphlets(testGraph);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_5_graphlets();
     
     CPPUNIT_ASSERT(testVector[17] == 1);
 }
@@ -687,7 +736,9 @@ void newtestclass2::test_count_connected_5_graphlets18() {
     
     
     
-    testVector = counter.count_connected_5_graphlets(testGraph);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_5_graphlets();
     
     CPPUNIT_ASSERT(testVector[18] == 1);
 }
@@ -707,7 +758,9 @@ void newtestclass2::test_count_connected_5_graphlets19() {
     
     
     
-    testVector = counter.count_connected_5_graphlets(testGraph);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_5_graphlets();
     
     CPPUNIT_ASSERT(testVector[19] == 1);
 }
@@ -726,7 +779,9 @@ void newtestclass2::test_count_connected_5_graphlets20() {
     
     
     
-    testVector = counter.count_connected_5_graphlets(testGraph);
+    counter = GraphletCounts(testGraph);
+    
+    testVector = counter.count_connected_5_graphlets();
     
     CPPUNIT_ASSERT(testVector[20] == 1);
 }
@@ -807,8 +862,9 @@ void newtestclass2::test_labeled_counts_2() {
     label_vector.push_back("HE");
     
     
+    counter = GraphletCounts(testGraph);
     
-    counter.count_connected_2_graphlets(testGraph, "sse_type", label_vector);
+    counter.count_connected_2_graphlets("sse_type", label_vector);
     testVector = counter.get_labeled_2_countsABS("sse_type", label_vector);
     
     
@@ -878,7 +934,8 @@ void newtestclass2::test_labeled_counts_3() {
     labels.push_back(label_vector);
     
     
-    counter.count_connected_3_graphlets(testGraph, "sse_type", labels);
+    counter = GraphletCounts(testGraph);
+    counter.count_connected_3_graphlets("sse_type", labels);
     testVector = counter.get_labeled_3_countsABS("sse_type", labels);
 
     
@@ -945,8 +1002,9 @@ void newtestclass2::test_labeled_counts_31() {
     label_vector.push_back("EEE");
     labels.push_back(label_vector);
     
+    counter = GraphletCounts(testGraph);
     
-    counter.count_connected_3_graphlets(testGraph, "sse_type", labels);
+    counter.count_connected_3_graphlets("sse_type", labels);
     testVector = counter.get_labeled_3_countsABS("sse_type", labels);
 
     
@@ -1019,7 +1077,9 @@ void newtestclass2::test_labeled_counts_4() {
     labels[5] = label_vector;
     
     
-    counter.count_connected_4_graphlets(testGraph, "sse_type", labels);
+    counter = GraphletCounts(testGraph);
+    
+    counter.count_connected_4_graphlets("sse_type", labels);
     testVector = counter.get_labeled_4_countsABS("sse_type", labels);
 
     CPPUNIT_ASSERT(testVector == testVec);
