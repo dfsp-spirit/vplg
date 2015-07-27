@@ -99,6 +99,7 @@ GraphletCounts::GraphletCounts(const Graph& graph) {
     
     if (memberGraph[graph_bundle].properties.count("graph_type") == 1) {
         std::string graphType = memberGraph[graph_bundle].properties["graph_type"];
+        
         if(graphType == "alpha") {
         graphtype = 1;
         }
@@ -120,8 +121,11 @@ GraphletCounts::GraphletCounts(const Graph& graph) {
         else if(graphType == "aa_graph") {
             graphtype = 7;
         }
-        cerr << "WARNING: Invalid graph type string, cannot translate it to graph type int code in GraphletCounts.\n";
-        graphtype = -1;  
+        else {
+            cerr << "WARNING: Invalid graph type string '" << graphType << "', cannot translate it to graph type int code in GraphletCounts.\n";
+            graphtypestr = "no_graph_type";
+            graphtype = -1;
+        }
     } else {
         graphtypestr = "no_graph_type";
         graphtype = -1;
@@ -1386,8 +1390,11 @@ GraphletCounts & GraphletCounts::operator=(const GraphletCounts & counter) {
         else if(graphType == "aa_graph") {
             graphtype = 7;
         }
-        cerr << "WARNING: Invalid graph type string, cannot translate it to graph type int code.\n";
-        graphtype = -1;  
+        else {
+            cerr << "WARNING: Invalid graph type string '" << graphType << "', cannot translate it to graph type int code.\n";
+            graphtypestr = "no_graph_type";
+            graphtype = -1;  
+        }
     } else {
         graphtypestr = "no_graph_type";
         graphtype = -1;
