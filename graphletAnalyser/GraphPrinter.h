@@ -12,6 +12,7 @@
 #include "global.h"
 #include "GraphService.h"
 #include "GraphletCounts.h"
+#include "JSON_printer.h"
 
 using namespace boost;
 
@@ -23,6 +24,8 @@ class GraphPrinter {
     
 protected:
         
+    JSON_printer j_print;
+    
 public:
     
     //constructors
@@ -43,6 +46,7 @@ public:
     void save_counts_in_nova_format(std::string,std::vector<std::vector<int>>);
     void save_abs_counts_as_matlab_variable();
     void save_norm_counts_as_matlab_variable();
+    void save_statistics_as_json(std::string graphname, int num_vertices, int num_edges,std::vector<std::vector<int>> abs_counts, std::vector<std::vector<float>> rel_counts);
     //GraphPrinter & operator=(const GraphPrinter & printer);
     
 };

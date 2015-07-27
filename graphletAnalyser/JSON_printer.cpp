@@ -153,7 +153,7 @@ std::string JSON_printer::print_vectors_with_info(std::string graph_name, int nu
         norm_str += "\"5-graphlets\" : " + print_float_vector(five_graphletsNORM) + "}";
     }
     
-    out_str += norm_str; + "}";
+    out_str += norm_str + "}";
     
     return out_str;
 }

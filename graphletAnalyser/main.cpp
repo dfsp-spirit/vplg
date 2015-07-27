@@ -110,6 +110,7 @@ void fill_settings_default() {
 	options["output_counts_nova"] = "yes";
 	options["output_counts_database"] = "no";
         options["graph_vertex_type_field"] = "sse_type";
+        options["output_counts_JSON"] = "yes";
 }
 
 /*********************************************************
@@ -408,8 +409,7 @@ int main(int argc, char** argv) {
             withLabeled = false;
         }
         
-        ;
-        vector<float> norm_labeled_counts = vector<float>();
+        
         
         
         std::vector<std::string> evec1 = std::vector<std::string>();
@@ -420,6 +420,14 @@ int main(int argc, char** argv) {
         std::vector<int> counts3 = gc.count_connected_3_graphlets("",evec);
         std::vector<int> counts4 = gc.count_connected_4_graphlets("",evec);
         std::vector<int> counts5 = gc.count_connected_5_graphlets();
+        
+        std::vector<std::vector<int>> abs_counts = std::vector<std::vector<int>>();
+        
+        abs_counts.push_back(counts2);
+        abs_counts.push_back(counts3);
+        abs_counts.push_back(counts4);
+        abs_counts.push_back(counts5);
+        
         
         int total = gc.get_total_counts();
         
@@ -436,29 +444,11 @@ int main(int argc, char** argv) {
         norm_counts.push_back(ncounts4);
         norm_counts.push_back(ncounts5);
         
+        std::vector<float> norm_labeled_counts = std::vector<float>();
+        
         if (withLabeled) {
             
-            
-            std::vector<std::string> lab2vec = service.get_2_sse_labels();
-            std::vector<std::vector<std::string>> lab3vec = service.get_3_sse_labels();
-            
-            std::vector<int> lab2c = gc.get_labeled_2_countsABS("sse_type",lab2vec);
-            std::vector<std::vector<int>> lab3c = gc.get_labeled_3_countsABS("sse_type",lab3vec);
-            
-            
-            std::vector<int> lab23vec = lab2c;
-            
-            for (int i = 0; i<lab3c[0].size();i++) {
-                lab23vec.push_back(lab3c[0][i]);
-            }
-            
-            for (int i = 0; i<lab3c[1].size();i++) {
-                lab23vec.push_back(lab3c[1][i]);
-            }
-            
-            int total = gc.get_total_counts();
-            
-            std::vector<float> norm_labeled_counts = gc.normalize_counts(lab23vec,total);
+            norm_labeled_counts = service.get_norm_ptgl_counts_1dim();
         }
 	     
         if( ! silent) {
@@ -492,7 +482,11 @@ int main(int argc, char** argv) {
         }
 
         if(options["output_counts_nova"] == "yes") {
-                printer.saveCountsInNovaFormat(graph[graph_bundle].label, norm_counts,norm_labeled_counts);
+                printer.saveCountsInNovaFormat(graph[graph_bundle].label, norm_counts, norm_labeled_counts);
+        }
+        
+        if (options["output_counts_JSON"] == "yes") {
+            printer.save_statistics_as_json(graph[graph_bundle].label, n, m, abs_counts, norm_counts);
         }
 
         if( ! silent) {

@@ -11,6 +11,7 @@
 /*
  * Default constructor */
 GraphPrinter::GraphPrinter() {
+    j_print= JSON_printer();
 
 }
 
@@ -419,8 +420,7 @@ void GraphPrinter::save_counts_in_nova_format(std::string graphName, std::vector
             countsNovaFormatFile << "ID,Group";
             
             
-            // in an earlier version, numberOfGraphlets only counted the
-            // size of the vectors
+           
             
             numberOfGraphlets = 0;
             
@@ -460,6 +460,30 @@ void GraphPrinter::save_counts_in_nova_format(std::string graphName, std::vector
             std::cout << apptag << "    The counts were added to the \"" << countsNovaFormatFileName << "\".\n"; 
         }
     }    
+    
+    
+}
+
+void GraphPrinter::save_statistics_as_json(std::string graphname, int num_vertices, int num_edges, std::vector<std::vector<int> > abs_counts, std::vector<std::vector<float> > rel_counts) {
+    std::ofstream counts_JSON_file;
+    const std::string counts_JSON_filename = output_path + "countsJSON.json";
+    int pos;
+    
+    
+    std::string json_string = j_print.print_vectors_with_info(graphname, num_vertices, num_edges, rel_counts, abs_counts);
+    
+    counts_JSON_file.open(counts_JSON_filename, std::ios_base::app);
+    if (!counts_JSON_file.is_open()) {
+        std::cerr << "ERROR: could not open JSON file." << std::endl;
+    } else {
+        pos = counts_JSON_file.tellp();
+        if (pos == 0) {
+            counts_JSON_file << json_string;
+        }
+        
+    }
+    
+    counts_JSON_file.close();
     
     
 }

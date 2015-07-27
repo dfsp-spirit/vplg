@@ -175,6 +175,11 @@ GraphletCounts::GraphletCounts(const Graph& graph) {
     three_counts = false;
     four_counts = false;
     five_counts = false;
+    
+    num2 = 0;
+    num3 = 0;
+    num4 = 0;
+    num5 = 0;
 }
 
 void GraphletCounts::compute_unlabeled_abs_counts() {

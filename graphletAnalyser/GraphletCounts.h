@@ -38,7 +38,7 @@ private:
     std::vector<int> labeled_2_countsABS; // counts for labeled 2-graphlets absolute
     std::vector<std::vector<int>> labeled_3_countsABS; // counts for labeled 3-graphlets absolute
     std::vector<std::vector<int>> labeled_4_countsABS; // counts for labeled 4-graphlets absolute
-    std::vector<int> labeled_graphlet5CountsABS; // counts for labeled 5-graphlets absolute NOT SUPPORTED YET
+    std::vector<int> labeled_5_countsABS; // counts for labeled 5-graphlets absolute NOT SUPPORTED YET
     
     
     std::vector<float> graphlet2CountsNormalized;  // counts for 2-graphlets - normalized
@@ -46,9 +46,9 @@ private:
     std::vector<float> graphlet4CountsNormalized;  // counts for 4-graphlets - normailzed
     std::vector<float> graphlet5CountsNormalized;  // counts for 5-graphlets - normalized
     
-    std::vector<float> labeled_graphlet2CountsNormalized;  // counts for 2-graphlets - normalized
-    std::vector<float> labeled_graphlet3CountsNormalized;  // counts for 3-graphlets - normalized
-    std::vector<float> labeled_graphlet4CountsNormalized;  // counts for 4-graphlets - normailzed
+    std::vector<float> labeled_2_countsNORM;  // counts for 2-graphlets - normalized
+    std::vector<float> labeled_3_countsNORM;  // counts for 3-graphlets - normalized
+    std::vector<float> labeled_4_countsNORM;  // counts for 4-graphlets - normailzed
     
     std::vector<float> cl;  // counts for labeled graphlets
     std::vector<int> labeled_abs_counts; // absolute counts for labeled graphlets
