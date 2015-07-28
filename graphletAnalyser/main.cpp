@@ -111,6 +111,7 @@ void fill_settings_default() {
 	options["output_counts_database"] = "no";
         options["graph_vertex_type_field"] = "sse_type";
         options["output_counts_JSON"] = "yes";
+        options["output_labeled_counts_JSON"] = "yes";
 }
 
 /*********************************************************
@@ -486,7 +487,18 @@ int main(int argc, char** argv) {
         }
         
         if (options["output_counts_JSON"] == "yes") {
-            printer.save_statistics_as_json(graph[graph_bundle].label, n, m, abs_counts, norm_counts);
+            printer.save_counts_as_json(graph[graph_bundle].label, n, m, abs_counts, norm_counts);
+        }
+        
+        if (options["output_labeled_counts_JSON"] == "yes") {
+            std::vector<std::string> lab_vec = service.get_2_sse_labels();
+            std::vector<std::vector<std::string>> lab_3_vec = service.get_3_sse_labels();
+            lab_vec.insert(lab_vec.end(), lab_3_vec[0].begin(), lab_3_vec[0].end());
+            
+            
+            std::unordered_map<std::string, std::vector<int>> map = service.get_labeled_abs_counts("sse_type", lab_vec);
+            printer.save_labeled_counts_as_json(graph[graph_bundle].label, n, m, map);
+            
         }
 
         if( ! silent) {

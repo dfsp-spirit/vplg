@@ -464,7 +464,7 @@ void GraphPrinter::save_counts_in_nova_format(std::string graphName, std::vector
     
 }
 
-void GraphPrinter::save_statistics_as_json(std::string graphname, int num_vertices, int num_edges, std::vector<std::vector<int> > abs_counts, std::vector<std::vector<float> > rel_counts) {
+void GraphPrinter::save_counts_as_json(std::string graphname, int num_vertices, int num_edges, std::vector<std::vector<int> > abs_counts, std::vector<std::vector<float> > rel_counts) {
     std::ofstream counts_JSON_file;
     const std::string counts_JSON_filename = output_path + "countsJSON.json";
     int pos;
@@ -488,7 +488,26 @@ void GraphPrinter::save_statistics_as_json(std::string graphname, int num_vertic
     
 }
 
-
+void GraphPrinter::save_labeled_counts_as_json(std::string graphname, int num_vertices, int num_edges, std::unordered_map<std::string, std::vector<int>> map) {
+    std::ofstream lab_counts_JSON_file;
+    const std::string lab_counts_JSON_filename = output_path + "lab_countsJSON.json";
+    int pos;
+    
+    std::string json_string = j_print.print_labeled_counts(graphname, num_vertices, num_edges, map);
+    
+    lab_counts_JSON_file.open(lab_counts_JSON_filename, std::ios_base::app);
+    if (! lab_counts_JSON_file.is_open()) {
+        std::cerr << "ERROR: could not open JSON file." << std::endl;
+        
+    } else {
+        pos = lab_counts_JSON_file.tellp();
+        if (pos == 0) {
+            lab_counts_JSON_file << json_string;
+        }
+    }
+    
+    
+}
 
 
 

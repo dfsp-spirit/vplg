@@ -44,6 +44,7 @@ class ProteinGraphService: public GraphService {
         ProteinGraphService & operator=(const ProteinGraphService & serv);
         std::vector<std::string> get_2_sse_labels();
         std::vector<std::vector<std::string>> get_3_sse_labels();
+        
     
 };
 

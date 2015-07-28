@@ -46,7 +46,8 @@ public:
     void save_counts_in_nova_format(std::string,std::vector<std::vector<int>>);
     void save_abs_counts_as_matlab_variable();
     void save_norm_counts_as_matlab_variable();
-    void save_statistics_as_json(std::string graphname, int num_vertices, int num_edges,std::vector<std::vector<int>> abs_counts, std::vector<std::vector<float>> rel_counts);
+    void save_counts_as_json(std::string graphname, int num_vertices, int num_edges,std::vector<std::vector<int>> abs_counts, std::vector<std::vector<float>> rel_counts);
+    void save_labeled_counts_as_json(std::string graphname, int num_vertices, int num_edges, std::unordered_map<std::string, std::vector<int>> map);
     //GraphPrinter & operator=(const GraphPrinter & printer);
     
 };

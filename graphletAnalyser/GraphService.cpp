@@ -283,7 +283,7 @@ std::unordered_map<std::string, std::vector<int>> GraphService::get_labeled_abs_
     std::vector<std::string> pat_vec4 = std::vector<std::string>();
     
     std::vector<std::vector<std::string>> pat_vecvec3 = std::vector<std::vector<std::string>>(2);
-    std::vector<std::vector<std::string>> pat_vecvec4 = std::vector<std::vector<std::string>>();
+    std::vector<std::vector<std::string>> pat_vecvec4 = std::vector<std::vector<std::string>>(6);
     
     
     // separating patterns by size and copying them into vectors
@@ -321,7 +321,9 @@ std::unordered_map<std::string, std::vector<int>> GraphService::get_labeled_abs_
 
     // copying graphlet counts into map
     for (int i = 0; i< pat_vec2.size(); i++) {
-        map[pat_vec2[i]] = abs_counts2;
+        std::vector<int> vec2 = std::vector<int>();
+        vec2.push_back(abs_counts2[i]);
+        map[pat_vec2[i]] = vec2;
         
     }
     for (int i = 0; i< pat_vec3.size(); i++) {

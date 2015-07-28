@@ -22,6 +22,7 @@ class JSON_printer {
         std::string print_vectors_with_info(std::string graph_name, int num_nodes, int num_edges,  
                                            std::vector<std::vector<float>> rel_counts, 
                                            std::vector<std::vector<int>> abs_counts);
+        std::string print_labeled_counts(std::string graph_name, int num_nodes, int num_edges, std::unordered_map<std::string, std::vector<int>>);
     
     
 };

@@ -123,7 +123,7 @@ std::string JSON_printer::print_vectors_with_info(std::string graph_name, int nu
         abs_str += "\"4-graphlets\" : " + print_int_vector(four_graphletsABS) + ", ";
     }
     if (five_graphletsABS.empty()) {
-        abs_str += "\"5-graphlets\" : null, ";
+        abs_str += "\"5-graphlets\" : null}";
     } else {
         abs_str += "\"5-graphlets\" : " + print_int_vector(five_graphletsABS) + "}, ";
     }
@@ -148,12 +148,36 @@ std::string JSON_printer::print_vectors_with_info(std::string graph_name, int nu
         norm_str += "\"4-graphlets\" : " + print_float_vector(four_graphletsNORM) + ", ";
     }
     if (two_graphletsNORM.empty()) {
-        norm_str += "\"5-graphlets\" : null, ";
+        norm_str += "\"5-graphlets\" : null}";
     } else {
         norm_str += "\"5-graphlets\" : " + print_float_vector(five_graphletsNORM) + "}";
     }
     
     out_str += norm_str + "}";
+    
+    return out_str;
+}
+
+std::string JSON_printer::print_labeled_counts(std::string graph_name, int num_nodes, int num_edges, std::unordered_map<std::string, std::vector<int>> map) {
+    
+    
+    std::string out_str = "{ \"Graphname\" : " + graph_name + ", \"Number of vertices\" : " +  std::to_string(num_nodes) + ", ";
+    out_str = out_str + "\"Number of edges\" : " + std::to_string(num_edges) + ", ";
+    out_str += "\"Labeled Counts \" : { ";
+    
+    
+    
+    for (auto k : map) {
+        
+        
+        out_str += "\"" + k.first + "\" : ";
+        out_str += print_int_vector(k.second);
+        out_str += ", ";
+                
+    }
+    out_str.erase(out_str.size() - 3, 2);
+    out_str += "}}";
+    
     
     return out_str;
 }

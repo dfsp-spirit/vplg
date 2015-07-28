@@ -47,6 +47,9 @@ ProteinGraphService::ProteinGraphService(const Graph& graph) {
     sse_graphlets_tri.push_back(sse_graphlets_3p[12]);
     sse_graphlets_tri.push_back(sse_graphlets_3p[13]);
     
+    
+    
+    
     abs_ptgl_counts = std::vector<std::vector<int>>();
     norm_ptgl_counts = std::vector<std::vector<float>>();
     
