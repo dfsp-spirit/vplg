@@ -1,20 +1,14 @@
-This is a checkout of the the sourceforge.net source code repository of VPLG.
+This is a checkout of the the GitHub source code repository of VPLG.
 
 
-   ---------------------------------------------------------------------------------
-                               !!!!! WARNING !!!!!
+   ------------------------------------------------------------------------------------
 
-    Atm this repository may NOT contain the latest version of the development code.
-    We have another internal repo.
+    The code for a certain release is always included in the src/ directory of the zip.
 
-    The code for a certain release is always included in the src/ directory.
-
-    Do NOT send me patches against the version in this repo! If you are interested
-    in VPLG development, contact me via email.
-
-   ---------------------------------------------------------------------------------
+   -----------------------------------------------------------------------------------
    
-This is just the README for the SVN repository, see the doc/ subdirectory for help
+   
+This is just the README for the code repository, see the doc/ subdirectory for help
 with the software in this repo.
 
 Note that both the 'splitpdb' and the 'plcc' directories contain not only the
@@ -23,8 +17,10 @@ them directly if you use the Netbeans IDE.
 
 The official VPLG website is at http://vplg.sourceforge.net/.
 
+The source is at GiHub, at https://github.com/dfsp-spirit/vplg/.
+
 VPLG is free software and comes WITHOUT ANY WARRANTY. See the LICENSE file for details.
 
 --
-Tim Schäfer
+TS
 
