@@ -277,9 +277,9 @@ int GraphPTGLPrinter::saveCountsToDatabasePGXX(int graphtype_int, std::vector<st
 
             
             // check stuff
-            int numExpected = 62;
+            int numExpected = 67;
             if(cl.empty()) {
-                numExpected = 62 - 31;
+                numExpected = 67 - 38;
             }
             
             

@@ -98,7 +98,8 @@ const std::string greeting_message_long =
 
 const std::string greeting_message =
         "[GA] === graphletAnalyser -- compute graphlet counts in networks ===\n"
-        "[GA] === (c) Tatiana Bakirova and Tim Schaefer, 2014.            ===\n";
+        "[GA] === (c) MolBI group, 2014-2015.            ===\n"
+        "[GA] === written by Tatiana Bakirova, Ben Haladik and Tim Schaefer ===\n";
 
 
 const std::string usage_message = "\n"
