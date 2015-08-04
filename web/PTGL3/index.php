@@ -341,8 +341,11 @@ function check_install($db)  {
 						<input type="text" class="form-control" id="searchLinnots" autocomplete="off" placeholder="Enter query notation string...">
 						<!-- <input type="checkbox" name="matching" value="like"> contains -->
 						<input type="hidden" name="st" value="customlinnot">
+						<!--
 						<input type="radio" name="matching" value="like"> as substring
 						<input type="radio" name="matching" value="exact" checked> exact
+						-->
+						<input type="hidden" name="matching" value="exact">
 						<button type="submit" id="sendit_linnots" name="linnotalbeligadj" value="linnotalbeligadj" class="btn btn-default" ><span class="glyphicon glyphicon-search"></span></button><br>
 
 			</form></div>
