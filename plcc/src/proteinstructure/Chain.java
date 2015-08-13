@@ -68,21 +68,33 @@ public class Chain implements java.io.Serializable {
     }
 
     /**
-     * Returns the chemical property string for this chain, i.e., a concatenation of all chemProps of all the chain residues.
-     * @return the chemical property string
+     * Returns the chemical property string for this chain according to the 5 types system, i.e., a concatenation of all chemProps of all the chain residues.
+     * @return the chemical property string, 5 types system
      */
-    public String getChainChemPropsStringAllResidues() {
+    public String getChainChemProps5StringAllResidues() {
         StringBuilder sb = new StringBuilder();        
         for(Residue r : this.residues) {
-            sb.append(r.getChemicalProperty1LetterString());            
+            sb.append(r.getChemicalProperty5OneLetterString());            
         }        
         return sb.toString();
     }
     
     /**
-     * Returns the chemical property string for this chain, but considers only AA residues which are part of an SSE (ignores ligands and AAs in coiled regions).
+     * Returns the chemical property string for this chain according to the 3 types system, i.e., a concatenation of all chemProps of all the chain residues.
+     * @return the chemical property string, 3 types system
+     */
+    public String getChainChemProps3StringAllResidues() {
+        StringBuilder sb = new StringBuilder();        
+        for(Residue r : this.residues) {
+            sb.append(r.getChemicalProperty3OneLetterString());            
+        }        
+        return sb.toString();
+    }
+    
+    /**
+     * Returns the chemical property string for this chain in the 5 types system, but considers only AA residues which are part of an SSE (ignores ligands and AAs in coiled regions).
      * @param sseSeparator the String (most likely a single character) to add between two SSEs. You can specify the empty String if you do not want anything inserted, of course.
-     * @return the chemical property string
+     * @return the chemical property string, 5 types system
      */
     public String[] getChainChemPropsStringSSEResiduesOnly(String sseSeparator) {
         StringBuilder sbChemProp = new StringBuilder();        
@@ -95,7 +107,7 @@ public class Chain implements java.io.Serializable {
         // some basic stat stuff, just a quick test
         int numSSETypes = 2; int H = 0; int E = 1; // helix and strand
         int numResH = 0; int numResE = 0;
-        Integer[][] chemPropsBySSEType = new Integer[numSSETypes][AminoAcid.ALL_CHEM_PROPS.length];
+        Integer[][] chemPropsBySSEType = new Integer[numSSETypes][AminoAcid.ALL_CHEM_PROPS5.length];
         for(int i = 0; i < numSSETypes; i++) {
             Arrays.fill(chemPropsBySSEType[i], 0);
         }
@@ -114,14 +126,14 @@ public class Chain implements java.io.Serializable {
                         sbSSE.append(sseSeparator);
                         numSeps++;
                     }
-                    sbChemProp.append(r.getChemicalProperty1LetterString());
+                    sbChemProp.append(r.getChemicalProperty5OneLetterString());
                     if(sseString.equals("H")) {
                         numResH++;
-                        chemPropsBySSEType[H][r.getChemicalPropertyType()]++;
+                        chemPropsBySSEType[H][r.getChemicalProperty5Type()]++;
                     }
                     if(sseString.equals("E")) {
                         numResE++;
-                        chemPropsBySSEType[E][r.getChemicalPropertyType()]++;
+                        chemPropsBySSEType[E][r.getChemicalProperty5Type()]++;
                     }
                     sbSSE.append(s.getSSEClass());
                 }
@@ -132,9 +144,9 @@ public class Chain implements java.io.Serializable {
         // stat stuff
         Boolean doStats = false;
         if(doStats) {
-            float[] sharesH = new float[AminoAcid.ALL_CHEM_PROPS.length];
-            float[] sharesE = new float[AminoAcid.ALL_CHEM_PROPS.length];
-            for(int i = 0; i < AminoAcid.ALL_CHEM_PROPS.length; i++) {
+            float[] sharesH = new float[AminoAcid.ALL_CHEM_PROPS5.length];
+            float[] sharesE = new float[AminoAcid.ALL_CHEM_PROPS5.length];
+            for(int i = 0; i < AminoAcid.ALL_CHEM_PROPS5.length; i++) {
                 sharesH[i] = (float)numResH / (float)chemPropsBySSEType[H][i];
                 sharesE[i] = (float)numResE / (float)chemPropsBySSEType[E][i];
             }

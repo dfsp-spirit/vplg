@@ -2812,7 +2812,7 @@ public class Main {
             }
             
             // Testing only
-            //System.out.println("Chain allRes chemProps: " + c.getChainChemPropsStringAllResidues());
+            //System.out.println("Chain allRes chemProps: " + c.getChainChemProps5StringAllResidues());
             //String[] str = c.getChainChemPropsStringSSEResiduesOnly(" ");
             //System.out.println("Chain SSE chemProps: " + str[0]);
             //System.out.println("Chain SSE sourceSSE: " + str[1]);

@@ -59,24 +59,45 @@ public class Residue implements java.io.Serializable {
 
     
     /**
-     * Determines the chemical properties of this AA.
-     * @return the chemical property, which is one of the constants at AminoAcid.CHEMPROPAA_INT_* (Example: ALA => AminoAcid.CHEMPROPAA_SMALL_APOLAR).
+     * Determines the chemical properties of this AA, according to the 5 types system.
+     * @return the chemical property, which is one of the constants at AminoAcid.CHEMPROP5_AA_INT_* (Example: ALA => AminoAcid.CHEMPROP5_AA_INT_SMALL_APOLAR).
      */
-    public Integer getChemicalPropertyType() {
+    public Integer getChemicalProperty5Type() {
         if(this.isAA()) {            
-            return AminoAcid.getChemPropOfAAByName3(this.resName3);
+            return AminoAcid.getChemProp5OfAAByName3(this.resName3);
         }
         else {
-            return AminoAcid.CHEMPROPAA_INT_UNKNOWN;            
+            return AminoAcid.CHEMPROP5_AA_INT_UNKNOWN;            
         }
     }
     
     /**
-     * Determines the chemical properties of this AA and returns the string.
-     * @return the chemical property string, which is one of the constants at AminoAcid.CHEMPROPAA_STRING_* (Example: ALA => AminoAcid.CHEMPROPAA_SMALL_APOLAR).
+     * Determines the chemical properties of this AA, according to the 3 types system.
+     * @return the chemical property, which is one of the constants at AminoAcid.CHEMPROP3_AA_INT_* (Example: ALA => AminoAcid.CHEMPROP3_AA_INT_HYDROPHOBIC).
      */
-    public String getChemicalProperty1LetterString() {
-        return AminoAcid.getChemProp1LetterString(AminoAcid.getChemPropOfAAByName3(this.resName3));
+    public Integer getChemicalProperty3Type() {
+        if(this.isAA()) {            
+            return AminoAcid.getChemProp3OfAAByName3(this.resName3);
+        }
+        else {
+            return AminoAcid.CHEMPROP3_AA_INT_UNKNOWN;            
+        }
+    }
+    
+    /**
+     * Determines the chemical properties of this AA in the 5 types system and returns the string.
+     * @return the chemical property string, which is one of the constants at AminoAcid.CHEMPROP5_AA_STRING_* (Example: ALA => AminoAcid.CHEMPROP5_AA_SMALL_APOLAR).
+     */
+    public String getChemicalProperty5OneLetterString() {
+        return AminoAcid.getChemProp5_OneLetterString(AminoAcid.getChemProp5OfAAByName3(this.resName3));
+    }
+    
+    /**
+     * Determines the chemical properties of this AA in the 3 types system and returns the string.
+     * @return the chemical property string, which is one of the constants at AminoAcid.CHEMPROP3_AA_STRING_* (Example: ALA => CHEMPROP3_AA_STRING_HYDROPHOBIC).
+     */
+    public String getChemicalProperty3OneLetterString() {
+        return AminoAcid.getChemProp3_OneLetterString(AminoAcid.getChemProp3OfAAByName3(this.resName3));
     }
     
     // constructor

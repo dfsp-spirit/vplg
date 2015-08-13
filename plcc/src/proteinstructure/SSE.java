@@ -271,16 +271,32 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     }
     
     /**
-     * Returns the chemical properties string of all AAs of this SSE
-     * @return the chemical properties string of all AAs of this SSE
+     * Returns the chemical properties string of all AAs of this SSE, according to the 5 types system
+     * @return the chemical properties string of all AAs of this SSE, according to the 5 types system
      */
-    public String getallAAChemPropString() {
+    public String getallAAChemProp5String() {
         StringBuilder chemProps = new StringBuilder();
 
         Residue r;
         for(Integer i = 0; i < this.residues.size(); i++) {
             r = this.residues.get(i);
-            chemProps.append(r.getChemicalProperty1LetterString());
+            chemProps.append(r.getChemicalProperty5OneLetterString());
+        }
+
+        return(chemProps.toString());
+    }
+    
+    /**
+     * Returns the chemical properties string of all AAs of this SSE, according to the 3 types system
+     * @return the chemical properties string of all AAs of this SSE, according to the 3 types system
+     */
+    public String getallAAChemProp3String() {
+        StringBuilder chemProps = new StringBuilder();
+
+        Residue r;
+        for(Integer i = 0; i < this.residues.size(); i++) {
+            r = this.residues.get(i);
+            chemProps.append(r.getChemicalProperty3OneLetterString());
         }
 
         return(chemProps.toString());

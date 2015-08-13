@@ -314,7 +314,8 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
             gmlf.append("    id ").append(i).append("\n");
             gmlf.append("    label \"").append(i).append("-").append(residue.getUniquePDBName()).append("\"\n");
             gmlf.append("    residue \"").append(residue.getName3()).append("\"\n");
-            gmlf.append("    chem_prop \"").append(residue.getChemicalProperty1LetterString()).append("\"\n");
+            gmlf.append("    chem_prop5 \"").append(residue.getChemicalProperty5OneLetterString()).append("\"\n");
+            gmlf.append("    chem_prop3 \"").append(residue.getChemicalProperty3OneLetterString()).append("\"\n");
             gmlf.append("    sse \"").append(residue.getNonEmptySSEString()).append("\"\n");
             gmlf.append("    sse_type \"").append(residue.getNonEmptySSEString()).append("\"\n");   // required for graphlet analyser
             gmlf.append("    chain \"").append(residue.getChainID()).append("\"\n");            
