@@ -3611,15 +3611,29 @@ public class Main {
         Integer globalMaxCenterSphereDiameter = globalMaxCollisionRadius * 2;
         Integer numIgnoredLigandContacts = 0;
         Integer numResPairsSkippedWrongChain = 0;
-
+        
+        Boolean includeLigandsFromOtherChains = Settings.getBoolean("plcc_B_consider_all_ligands_for_each_chain");
+        if(includeLigandsFromOtherChains) {
+            if(!silent) {
+                DP.getInstance().i("Main", "calculateAllContactsLimitedByChain: Also considering valid 3D ligand contacts from ligands associated to other chains in PDB file.");
+            }
+        }
+        
+        int numLigandsFromOtherChainsKept = 0;
+        
+        
         for(Integer i = 0; i < rs; i++) {
 
             a = res.get(i);
             numResToSkip = 0;
             
             if( ! a.getChainID().equals(handledChain)) {
-                numResPairsSkippedWrongChain += (rs - i);   // skipped all this_atom -- other pairs
-                continue;
+                if( ! (includeLigandsFromOtherChains && a.isLigand())) {
+                    numResPairsSkippedWrongChain += (rs - i);   // skipped all this_atom -- other pairs
+                    continue;
+                } else {
+                    numLigandsFromOtherChainsKept++;
+                }
             }
 
             
@@ -3628,8 +3642,10 @@ public class Main {
 
                 b = res.get(j);
                 if( ! b.getChainID().equals(handledChain)) {
-                    numResPairsSkippedWrongChain++;
-                    continue;
+                    if( ! (includeLigandsFromOtherChains && b.isLigand())) {
+                        numResPairsSkippedWrongChain++;
+                        continue;
+                    } 
                 }
                 
                 // DEBUG
@@ -3659,7 +3675,7 @@ public class Main {
                         }
                         else {
                             // We should ignore ligand contacts
-                            if(a.getType().equals(1) || b.getType().equals(1)) {
+                            if(a.getType().equals(Residue.RESIDUE_TYPE_LIGAND) || b.getType().equals(Residue.RESIDUE_TYPE_LIGAND)) {
                                 // This IS a ligand contact so ignore it
                                 numIgnoredLigandContacts++;
                                 // System.out.println("  Ignored ligand contact between DSSP residues " + a.getDsspResNum() + " and " + b.getDsspResNum() + ".");
@@ -3704,6 +3720,11 @@ public class Main {
             System.out.println("  " + chainTag + "Checked " + numResContactsChecked + " contacts for " + rs + " residues: " + numResContactsPossible + " possible, " + contactInfo.size() + " found, " + numResContactsImpossible + " impossible (collison spheres check).");
             System.out.println("  " + chainTag + "Did not check " + numResPairsSkippedWrongChain + " residue pairs because they were part of different chains.");
             System.out.println("  " + chainTag + "Did not check " + numCmpSkipped + " contacts (skipped by seq neighbors check), would have been " + (numResContactsChecked + numCmpSkipped)  + ".");
+            if(includeLigandsFromOtherChains) {
+                System.out.println("  " + chainTag + "Checked residues of this chain for contacts with " + numLigandsFromOtherChainsKept + " ligands from other chains.");
+            } else {
+                System.out.println("  " + chainTag + "Ignored ligands assigned to other chains in the PDB file when computing contacts of residues of this chain.");
+            }
             
             if( ! Settings.getBoolean("plcc_B_write_lig_geolig")) {
                 System.out.println("  " + chainTag + "Configured to ignore ligands, ignored " + numIgnoredLigandContacts + " ligand contacts.");
