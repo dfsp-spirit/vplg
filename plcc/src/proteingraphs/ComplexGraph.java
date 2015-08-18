@@ -49,10 +49,14 @@ public class ComplexGraph extends UAdjListGraph {
     public Map<Edge, String[]> chainNamesInEdge;
     public Map<Edge, Integer> numHelixHelixInteractionsMap;
     public Map<Edge, Integer> numHelixStrandInteractionsMap;
-    public Map<Edge, Integer> numHelixLoopInteractionsMap;
-    public Map<Edge, Integer> numSSInteractionsMap;
-    public Map<Edge, Integer> numStrandLoopInteractionsMap;
-    public Map<Edge, Integer> numLoopLoopInteractionsMap;
+    public Map<Edge, Integer> numHelixCoilInteractionsMap;
+    public Map<Edge, Integer> numHelixLigandInteractionsMap;
+    public Map<Edge, Integer> numStrandStrandInteractionsMap;
+    public Map<Edge, Integer> numStrandCoilInteractionsMap;
+    public Map<Edge, Integer> numStrandLigandInteractionsMap;
+    public Map<Edge, Integer> numCoilCoilInteractionsMap;
+    public Map<Edge, Integer> numCoilLigandInteractionsMap;
+    public Map<Edge, Integer> numLigandLigandInteractionsMap;
     public Map<Edge, Integer> numAllInteractionsMap;
     public Map<Edge, Integer> numDisulfidesMap;
     public Map<Vertex, String> proteinNodeMap;
@@ -79,10 +83,14 @@ public class ComplexGraph extends UAdjListGraph {
 
         numHelixHelixInteractionsMap = createEdgeMap();
         numHelixStrandInteractionsMap = createEdgeMap();
-        numHelixLoopInteractionsMap = createEdgeMap();
-        numSSInteractionsMap = createEdgeMap();
-        numStrandLoopInteractionsMap = createEdgeMap();
-        numLoopLoopInteractionsMap = createEdgeMap();
+        numHelixCoilInteractionsMap = createEdgeMap();
+        numHelixLigandInteractionsMap = createEdgeMap();
+        numStrandStrandInteractionsMap = createEdgeMap();
+        numStrandCoilInteractionsMap = createEdgeMap();
+        numStrandLigandInteractionsMap = createEdgeMap();
+        numCoilCoilInteractionsMap = createEdgeMap();
+        numCoilLigandInteractionsMap = createEdgeMap();
+        numLigandLigandInteractionsMap = createEdgeMap();
         numAllInteractionsMap = createEdgeMap();
         numDisulfidesMap = createEdgeMap();
         proteinNodeMap = createVertexMap();
@@ -192,7 +200,7 @@ public class ComplexGraph extends UAdjListGraph {
         Integer numHelixHelixInteractions;
         Integer numHelixStrandInteractions;
         Integer numHelixLoopInteractions;
-        Integer numSSInteractions;
+        Integer numStrandStrandInteractions;
         Integer numStrandLoopInteractions;
         Integer numLoopLoopInteractions;
         Integer numAllInteractions;
@@ -206,17 +214,18 @@ public class ComplexGraph extends UAdjListGraph {
             chainA = chainPair[0];
             chainB = chainPair[1];
 
+            // interactions with ligands are NOT yet written to the database!
             numHelixHelixInteractions = this.numHelixHelixInteractionsMap.get(curEdge);
             numHelixStrandInteractions = this.numHelixStrandInteractionsMap.get(curEdge);
-            numHelixLoopInteractions = this.numHelixLoopInteractionsMap.get(curEdge);
-            numSSInteractions = this.numSSInteractionsMap.get(curEdge);
-            numStrandLoopInteractions = this.numStrandLoopInteractionsMap.get(curEdge);
-            numLoopLoopInteractions = this.numLoopLoopInteractionsMap.get(curEdge);
+            numHelixLoopInteractions = this.numHelixCoilInteractionsMap.get(curEdge);
+            numStrandStrandInteractions = this.numStrandStrandInteractionsMap.get(curEdge);
+            numStrandLoopInteractions = this.numStrandCoilInteractionsMap.get(curEdge);
+            numLoopLoopInteractions = this.numCoilCoilInteractionsMap.get(curEdge);
             numDisulfides = this.numDisulfidesMap.get(curEdge);
             numAllInteractions = this.numAllInteractionsMap.get(curEdge);
 
             Integer[] interactionNums = {numHelixHelixInteractions, numHelixStrandInteractions, numHelixLoopInteractions,
-                numSSInteractions, numStrandLoopInteractions, numLoopLoopInteractions,
+                numStrandStrandInteractions, numStrandLoopInteractions, numLoopLoopInteractions,
                 numDisulfides, numAllInteractions};
 
             // make sure no entry is null or something shitty
@@ -669,18 +678,15 @@ public class ComplexGraph extends UAdjListGraph {
 
         });
 
-        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
-                "num_HH_contacts", numHelixHelixInteractionsMap));
-        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
-                "num_HS_contacts", numHelixStrandInteractionsMap));
-        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
-                "num_HL_contacts", numHelixLoopInteractionsMap));
-        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
-                "num_SS_contacts", numSSInteractionsMap));
-        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
-                "num_SL_contacts", numStrandLoopInteractionsMap));
-        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>(
-                "num_LL_contacts", numLoopLoopInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixhelix_contacts", numHelixHelixInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixstrand_contacts", numHelixStrandInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixligand_contacts", numHelixLigandInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_helixcoil_contacts", numHelixCoilInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_strandstrand_contacts", numStrandStrandInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_strandcoil_contacts", numStrandCoilInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_strandligand_contacts", numStrandLigandInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_coilcoil_contacts", numCoilCoilInteractionsMap));
+        gw.addEdgeAttrWriter(new GMLWriter.MapAttrWriter<>("num_coilligand_contacts", numCoilLigandInteractionsMap));
 
         FileOutputStream fop = null;
         boolean allOK = true;
