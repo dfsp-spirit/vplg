@@ -2190,10 +2190,10 @@ public class Main {
         
         //System.out.println("calculateSSEGraphsForChains: outputDir='" + outputDir + "'.");
         Chain c;
-        ArrayList<SSE> chainDsspSSEs = new ArrayList<>();
-        ArrayList<SSE> chainLigSSEs = new ArrayList<>();
-        ArrayList<SSE> chainPtglSSEs = new ArrayList<>();
-        ArrayList<SSE> allChainSSEs = new ArrayList<>();
+        List<SSE> chainDsspSSEs = new ArrayList<>();
+        List<SSE> chainLigSSEs = new ArrayList<>();
+        List<SSE> chainPtglSSEs = new ArrayList<>();
+        List<SSE> allChainSSEs = new ArrayList<>();
         String fs = System.getProperty("file.separator");
                
         HashMap<String, String> md = FileParser.getPDBMetaData();
@@ -3270,7 +3270,7 @@ public class Main {
      * @param pdbid the PDBID of the protein the chain c belongs to
      * @return the resulting protein graph
      */
-    public static ProtGraph calcGraphType(String graphType, ArrayList<SSE> allChainSSEs, Chain c, ArrayList<ResContactInfo> resContacts, String pdbid) {
+    public static ProtGraph calcGraphType(String graphType, List<SSE> allChainSSEs, Chain c, List<ResContactInfo> resContacts, String pdbid) {
 
         ContactMatrix chainCM;
         Boolean silent = Settings.getBoolean("plcc_B_silent");
@@ -3279,8 +3279,8 @@ public class Main {
             System.out.println("    ----- Calculating " + graphType + " graph of chain " + c.getPdbChainID() + ". -----");
         }
 
-        ArrayList<String> keepSSEs = new ArrayList<String>();
-        ArrayList<SSE> filteredChainSSEs;
+        List<String> keepSSEs = new ArrayList<String>();
+        List<SSE> filteredChainSSEs;
 
         // Check whether coils should be kept
         if(Settings.getBoolean("plcc_B_include_coils")) {
@@ -3392,7 +3392,7 @@ public class Main {
      * @param keepSSEs the list of types to keep
      * @return A filtered list of SSEs.
      */
-    public static ArrayList<SSE> filterAllSSEsButList(ArrayList<SSE> sses, ArrayList<String> keepSSEs) {
+    public static List<SSE> filterAllSSEsButList(List<SSE> sses, List<String> keepSSEs) {
         
         ArrayList<SSE> kept = new ArrayList<SSE>();
 
@@ -5383,9 +5383,9 @@ public class Main {
      * @param dsspSSElist the list of all SSEs according to DSSP definition
      * @return a list of all ligand SSEs that are created from the ligand residues in the residue list.
      */
-    private static ArrayList<SSE> createAllLigandSSEsFromResidueList(ArrayList<Residue> resList, ArrayList<SSE> dsspSSElist) {
+    private static List<SSE> createAllLigandSSEsFromResidueList(List<Residue> resList, List<SSE> dsspSSElist) {
 
-        ArrayList<SSE> ligSSElist = new ArrayList<SSE>();
+        List<SSE> ligSSElist = new ArrayList<SSE>();
         Residue r;
         SSE s;
         Integer ligSSECount = 1;
@@ -5466,7 +5466,7 @@ public class Main {
      * which are too short and all SSEs which are not of interest for the PTGL (those which are neither helices nor beta-strands).
      * @param inputSSEs the list of input SSEs, i.e., all SSEs of this chain which are 
      */
-    private static ArrayList<SSE> createAllPtglSSEsFromDsspSSEList(ArrayList<SSE> inputSSEs) {
+    private static ArrayList<SSE> createAllPtglSSEsFromDsspSSEList(List<SSE> inputSSEs) {
 
         ArrayList<SSE> outputSSEs = new ArrayList<SSE>();
 
@@ -5477,8 +5477,8 @@ public class Main {
         }
 
         // Let's do some pre-filtering to get all the SSEs we don't want out of there first
-        ArrayList<SSE> impSSEs = getImportantSSETypes(inputSSEs);
-        ArrayList<SSE> consideredSSEs = removeShortSSEs(impSSEs, Settings.getInteger("plcc_I_min_SSE_length"));
+        List<SSE> impSSEs = getImportantSSETypes(inputSSEs);
+        List<SSE> consideredSSEs = removeShortSSEs(impSSEs, Settings.getInteger("plcc_I_min_SSE_length"));
         
         if(Settings.getInteger("plcc_I_debug_level") > 0) {
             printSSEList(consideredSSEs, "Considered");
@@ -5584,9 +5584,9 @@ public class Main {
      * By default, it filters SSEs of type "B" (residue in isolated beta-bridge), "S" (bend) and "T" (hydrogen bonded turn).
      *
      */
-    private static ArrayList<SSE> getImportantSSETypes(ArrayList<SSE> list) {
+    private static List<SSE> getImportantSSETypes(List<SSE> list) {
 
-        ArrayList<SSE> filteredList = new ArrayList<SSE>();
+        List<SSE> filteredList = new ArrayList<SSE>();
 
         SSE s = null;
         String sT = null;
@@ -5619,9 +5619,9 @@ public class Main {
      * @param minLength the minimal length of the SSEs to keep, in residues
      * @return a new list which is a filtered version of the old one
      */
-    private static ArrayList<SSE> removeShortSSEs(ArrayList<SSE> list, Integer minLength) {
+    private static List<SSE> removeShortSSEs(List<SSE> list, Integer minLength) {
 
-        ArrayList<SSE> filteredList = new ArrayList<SSE>();
+        List<SSE> filteredList = new ArrayList<SSE>();
 
         for(SSE s : list) {
             if(s.getLength() >= minLength) {
@@ -5638,7 +5638,7 @@ public class Main {
      * @param sl the list of SSEs
      * @param title the title to use for the output 
      */
-    public static void printSSEList(ArrayList<SSE> sl, String title) {
+    public static void printSSEList(List<SSE> sl, String title) {
 
         // just a counting aid
         System.out.println("---[ " + title + " ] (" + sl.size() + " SSEs) ---");
@@ -5671,9 +5671,10 @@ public class Main {
      * Merges 2 lists of SSEs and returns a new list containing all SSEs from both lists.
      * @param listA the first SSE list
      * @param listB the second SSE list
+     * @return the merged list
      */
-    public static ArrayList<SSE> mergeSSEs(ArrayList<SSE> listA, ArrayList<SSE> listB) {
-        ArrayList<SSE> listMerged = new ArrayList<SSE>();
+    public static List<SSE> mergeSSEs(List<SSE> listA, List<SSE> listB) {
+        List<SSE> listMerged = new ArrayList<>();
 
         for(Integer i = 0; i < listA.size(); i++) {
             listMerged.add(listA.get(i));
@@ -5924,12 +5925,12 @@ public class Main {
         
         ArrayList<ResContactInfo> interchainContacts = new ArrayList<ResContactInfo>();
         Chain c;
-        ArrayList<SSE> chainDsspSSEs = new ArrayList<SSE>();
-        ArrayList<SSE> chainPtglSSEs = new ArrayList<SSE>();
-        ArrayList<SSE> allChainSSEs = new ArrayList<SSE>();
-        ArrayList<SSE> oneChainSSEs = new ArrayList<SSE>();
-        ArrayList<Integer> chainEnd = new ArrayList<Integer>();
-        HashMap<String, ArrayList<SSE>> chainSSEMap = new HashMap<String, ArrayList<SSE>>();
+        List<SSE> chainDsspSSEs = new ArrayList<SSE>();
+        List<SSE> chainPtglSSEs = new ArrayList<SSE>();
+        List<SSE> allChainSSEs = new ArrayList<SSE>();
+        List<SSE> oneChainSSEs = new ArrayList<SSE>();
+        List<Integer> chainEnd = new ArrayList<Integer>();
+        HashMap<String, List<SSE>> chainSSEMap = new HashMap<>();
         String fs = System.getProperty("file.separator");
         String fileNameSSELevelWithExtension = null;
         String fileNameSSELevelWithoutExtension = null;
@@ -5955,8 +5956,8 @@ public class Main {
             
         }
         
-        ArrayList<String> keepSSEs = new ArrayList<String>();
-        ArrayList<SSE> filteredChainSSEs;
+        List<String> keepSSEs = new ArrayList<String>();
+        List<SSE> filteredChainSSEs;
 
         // Check whether coils should be kept
         if(Settings.getBoolean("plcc_B_include_coils")) {
@@ -6011,13 +6012,17 @@ public class Main {
             chainDsspSSEs = createAllDsspSSEsFromResidueList(c.getResidues());
             
             oneChainSSEs = createAllPtglSSEsFromDsspSSEList(chainDsspSSEs);
+            
+            List<SSE> chainLigSSEs =  createAllLigandSSEsFromResidueList(c.getResidues(), chainDsspSSEs);
+            allChainSSEs = mergeSSEs(chainPtglSSEs, chainLigSSEs);
 
             if(! silent) {
-                System.out.print("    SSEs: ");
+                StringBuilder sb = new StringBuilder();
+                sb.append("    SSEs: ");
                 for(Integer j = 0; j < oneChainSSEs.size(); j++) {
-                    System.out.print(oneChainSSEs.get(j).getSseType());
+                    sb.append(oneChainSSEs.get(j).getSseType());
                 }
-                System.out.print("\n");
+                System.out.println(sb.toString());
             }
 
             // SSEs have been calculated, now assign the PTGL labels and sequential numbers on the chain

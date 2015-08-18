@@ -1843,9 +1843,9 @@ public class FileParser {
         if(pmi.isReady()) {
             //System.out.println("    Extracted MOL_ID '" + mol_id + "' for chain '" + chainid + "' from PDB header.");
             if(pmi.getAllMetaData(pdbLines)) {
-                if(! FileParser.silent) {
-                    System.out.println("    Retrieved all meta data for chain '" + chainid + "' from PDB header.");
-                }
+                //if(! FileParser.silent) {
+                //    System.out.println("    Retrieved all meta data for chain '" + chainid + "' from PDB header.");
+                //}
             }
         }
         else {

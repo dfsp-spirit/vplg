@@ -2458,7 +2458,7 @@ E	3	3	3
         this.metadata = md;
     }
     
-    public void setComplexData(ArrayList<Integer> chainEnd, ArrayList<Chain> allChains){
+    public void setComplexData(List<Integer> chainEnd, ArrayList<Chain> allChains){
         this.setAllChains(allChains);
         this.setChainEnds(chainEnd);
     }

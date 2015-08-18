@@ -49,7 +49,7 @@ public class ContactMatrix {
    
 
     // Constructor
-    public ContactMatrix(ArrayList<SSE> sses, String pdbid) {
+    public ContactMatrix(List<SSE> sses, String pdbid) {
         this.pdbid = pdbid;
         this.sseList = sses;
         size = sseList.size();
@@ -88,7 +88,7 @@ public class ContactMatrix {
      * @param contList a list of residue level contacts
      * @param keepSSEs a list of SSE type Strings that holds all SSE types which should be kept. All others will be filtered. For an albe graph, this list would be ["H", "E"].
      */
-    public void fillFromContactList(ArrayList<ResContactInfo> contList, ArrayList<String> keepSSEs) {
+    public void fillFromContactList(List<ResContactInfo> contList, List<String> keepSSEs) {
 
         ResContactInfo rc;
         Residue resA, resB;
@@ -750,7 +750,7 @@ public class ContactMatrix {
      *        slows the process down, therefore it should be set to 'false' if in doubt.
      * 
      */
-    public void calculateSSESpatialRelationMatrix(ArrayList<ResContactInfo> contList, Boolean computeAll) {
+    public void calculateSSESpatialRelationMatrix(List<ResContactInfo> contList, Boolean computeAll) {
 
         SSE sseA, sseB;
         Residue resA, resB;
