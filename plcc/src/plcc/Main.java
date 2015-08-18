@@ -2822,7 +2822,11 @@ public class Main {
         
         // Calculate Complex Graph
         if(Settings.getBoolean("plcc_B_complex_graphs")) {
+            // calculate ALBELIG CG
             calculateComplexGraph(allChains, resList, resContacts, pdbid, outputDir, SSEGraph.GRAPHTYPE_ALBELIG);
+            
+            // test: also calculate ALBE CG
+            calculateComplexGraph(allChains, resList, resContacts, pdbid, outputDir, SSEGraph.GRAPHTYPE_ALBE);
         }
         
         
@@ -6622,7 +6626,7 @@ public class Main {
         }        
         
         fileNameSSELevelWithoutExtension = pdbid + "_complex_sses_" + graphType + coils + "_CG";
-        fileNameChainLevelWithoutExtension = pdbid + "_complex_chains" + coils + "_CG";
+        fileNameChainLevelWithoutExtension = pdbid + "_complex_chains_" + graphType + coils + "_CG";
         fileNameSSELevelWithExtension = fileNameSSELevelWithoutExtension + Settings.get("plcc_S_img_output_fileext");
         fileNameChainLevelWithExtension = fileNameChainLevelWithoutExtension + Settings.get("plcc_S_img_output_fileext");
 
@@ -6658,7 +6662,7 @@ public class Main {
         File gmlFileChainLevel = null;
         String gmlFileNameChainLevel = null;
         try {
-            gmlFileChainLevel = new File(filePathGraphs + fs + pdbid + "_complex_chains_CG.gml");
+            gmlFileChainLevel = new File(filePathGraphs + fs + pdbid + "_complex_chains_ " + graphType + "_CG.gml");
             gmlFileChainLevel.createNewFile();
             if(compGraph.writeToFileGML(gmlFileChainLevel)) {
                 if(! silent) {
@@ -6670,7 +6674,7 @@ public class Main {
                 System.err.println("ERROR: Could not write complex graph to file '" + gmlFileChainLevel.getAbsolutePath() + "'.");
             }
         } catch(IOException e){
-            System.err.println("ERROR: Could not write complex graph to file '" + gmlFileChainLevel.getAbsolutePath() + ". General I/O exception: '" + e.getMessage()+ "'.");
+            System.err.println("ERROR: Could not write complex graph to file '" + gmlFileChainLevel.getAbsolutePath() + ": '" + e.getMessage()+ "'.");
         }
         
         // ------------------ write the SSE level graphs -----------
