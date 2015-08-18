@@ -1516,8 +1516,8 @@ public class Main {
         ProteinResults.getInstance().setPdbid(pdbid);
         
         if(separateContactsByChain) {
-            cInfoThisChain = new ArrayList<ResContactInfo>();
-            cInfo = null;
+            cInfoThisChain = new ArrayList<ResContactInfo>();   // will be computed separately for each chain later
+            cInfo = null;                                       // will not be used in this case (separateContactsByChain=on)
         } else {        
             cInfo = calculateAllContacts(residues);
             if(! silent) {
@@ -2183,7 +2183,6 @@ public class Main {
      * @param resContacts a list of residue contacts
      * @param pdbid the PDBID of the protein, required to name files properly etc.
      * @param outputDir where to write the output files. the filenames are deduced from graph type and pdbid.
-     * @param allowDeletionOfExistingProteinFromDB whether this function should try to delete old versions of the protein (not chain!) from the database.
      */
     public static void calculateSSEGraphsForChains(ArrayList<Chain> allChains, ArrayList<Residue> resList, ArrayList<ResContactInfo> resContacts, String pdbid, String outputDir) {
 
@@ -2191,10 +2190,10 @@ public class Main {
         
         //System.out.println("calculateSSEGraphsForChains: outputDir='" + outputDir + "'.");
         Chain c;
-        ArrayList<SSE> chainDsspSSEs = new ArrayList<SSE>();
-        ArrayList<SSE> chainLigSSEs = new ArrayList<SSE>();
-        ArrayList<SSE> chainPtglSSEs = new ArrayList<SSE>();
-        ArrayList<SSE> allChainSSEs = new ArrayList<SSE>();
+        ArrayList<SSE> chainDsspSSEs = new ArrayList<>();
+        ArrayList<SSE> chainLigSSEs = new ArrayList<>();
+        ArrayList<SSE> chainPtglSSEs = new ArrayList<>();
+        ArrayList<SSE> allChainSSEs = new ArrayList<>();
         String fs = System.getProperty("file.separator");
                
         HashMap<String, String> md = FileParser.getPDBMetaData();
@@ -3389,6 +3388,8 @@ public class Main {
     /**
      * Filters a list of SSEs by type, returning a list containing all SSEs that have of the SSE types defined
      * in keepSSEs.
+     * @param sses the input list
+     * @param keepSSEs the list of types to keep
      * @return A filtered list of SSEs.
      */
     public static ArrayList<SSE> filterAllSSEsButList(ArrayList<SSE> sses, ArrayList<String> keepSSEs) {
@@ -5908,6 +5909,7 @@ public class Main {
      * @param resContacts a list of residue contacts
      * @param pdbid the PDBID of the protein, required to name files properly etc.
      * @param outputDir where to write the output files. the filenames are deduced from graph type and pdbid.
+     * @param graphType the graph type, one of the constants like SSEGraph.GRAPHTYPE_ALBE 
      */
     public static void calculateComplexGraph(ArrayList<Chain> allChains, ArrayList<Residue> resList, ArrayList<ResContactInfo> resContacts, String pdbid, String outputDir, String graphType) {
 
@@ -5963,27 +5965,27 @@ public class Main {
 
         // Filter SSEs depending on the requested graph type
         if(graphType.equals(SSEGraph.GRAPHTYPE_ALBE)) {
-            keepSSEs.add("E");
-            keepSSEs.add("H");
+            keepSSEs.add(SSE.SSECLASS_STRING_STRAND);
+            keepSSEs.add(SSE.SSECLASS_STRING_HELIX);
         }
         else if(graphType.equals(SSEGraph.GRAPHTYPE_ALPHA)) {
-            keepSSEs.add("H");
+            keepSSEs.add(SSE.SSECLASS_STRING_HELIX);
         }
         else if(graphType.equals(SSEGraph.GRAPHTYPE_BETA)) {
-            keepSSEs.add("E");            
+            keepSSEs.add(SSE.SSECLASS_STRING_STRAND);            
         }
         else if(graphType.equals(SSEGraph.GRAPHTYPE_ALBELIG)) {
-            keepSSEs.add("E");
-            keepSSEs.add("H");
-            keepSSEs.add("L");
+            keepSSEs.add(SSE.SSECLASS_STRING_STRAND);
+            keepSSEs.add(SSE.SSECLASS_STRING_HELIX);
+            keepSSEs.add(SSE.SSECLASS_STRING_LIGAND);
         }
         else if(graphType.equals(SSEGraph.GRAPHTYPE_ALPHALIG)) {
-            keepSSEs.add("H");
-            keepSSEs.add("L");
+            keepSSEs.add(SSE.SSECLASS_STRING_HELIX);
+            keepSSEs.add(SSE.SSECLASS_STRING_LIGAND);
         }
         else if(graphType.equals(SSEGraph.GRAPHTYPE_BETALIG)) {
-            keepSSEs.add("E");
-            keepSSEs.add("L");
+            keepSSEs.add(SSE.SSECLASS_STRING_STRAND);
+            keepSSEs.add(SSE.SSECLASS_STRING_LIGAND);
         }
         else {
             System.err.println("ERROR: calculateComplexGraph(): Graph type '" + graphType + "' invalid. Skipping.");
@@ -6043,7 +6045,7 @@ public class Main {
             // get AA sequence string for each chain
             for(Residue resi : allChains.get(i).getResidues()){
                 
-                if (!"J".equals(resi.getAAName1())) {  // Skip ligands to preserve sequence identity. What to do with "_B_", "_Z_", "_X_" (B,Z,X)?
+                if ( ! Settings.get("plcc_S_ligAACode").equals(resi.getAAName1())) {  // Skip ligands to preserve sequence identity. What to do with "_B_", "_Z_", "_X_" (B,Z,X)?
                     if (compGraph.chainResAASeq[i] != null) {
                         compGraph.chainResAASeq[i] = compGraph.chainResAASeq[i] + resi.getAAName1();
                     } else {
@@ -6077,7 +6079,7 @@ public class Main {
                     String compareChainID = allChains.get(j).getPdbChainID();
                     // make sure no chain is matched with itself 
                     if (allChains.get(i).getHomologues() != null) {
-                        if ((allChains.get(i).getHomologues().contains(compareChainID)) && (i != j)) {
+                        if ((allChains.get(i).getHomologues().contains(compareChainID)) && (!Objects.equals(i, j))) {
                             compGraph.homologueChains[i][j] = 1;
                         } else {
                             compGraph.homologueChains[i][j] = 0;
@@ -6164,10 +6166,10 @@ public class Main {
                 // Only if both residues belong to a SSE..
                 if (curResCon.getResA().getSSE() != null && curResCon.getResB().getSSE() != null) {
                     //.. and are of type helix or strand
-                    if ((curResCon.getResA().getSSE().getSSETypeInt() != SSE.SSECLASS_NONE
-                            && curResCon.getResA().getSSE().getSSETypeInt() != SSE.SSECLASS_OTHER)
-                            && (curResCon.getResB().getSSE().getSSETypeInt() != SSE.SSECLASS_NONE
-                            && curResCon.getResB().getSSE().getSSETypeInt() != SSE.SSECLASS_OTHER)) {
+                    if ((!Objects.equals(curResCon.getResA().getSSE().getSSETypeInt(), SSE.SSECLASS_NONE)
+                            && !Objects.equals(curResCon.getResA().getSSE().getSSETypeInt(), SSE.SSECLASS_OTHER))
+                            && (!Objects.equals(curResCon.getResB().getSSE().getSSETypeInt(), SSE.SSECLASS_NONE)
+                            && !Objects.equals(curResCon.getResB().getSSE().getSSETypeInt(), SSE.SSECLASS_OTHER))) {
 
                         Integer ResASseDsspNum = curResCon.getResA().getSSE().getStartDsspNum();
                         Integer ResBSseDsspNum = curResCon.getResB().getSSE().getStartDsspNum();

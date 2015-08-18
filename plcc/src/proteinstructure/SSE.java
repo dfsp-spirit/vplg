@@ -45,6 +45,11 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     public static final Integer SSECLASS_LIGAND = 3;
     public static final Integer SSECLASS_OTHER = 4;
     
+    public static final String SSECLASS_STRING_HELIX = "H";
+    public static final String SSECLASS_STRING_STRAND = "E";
+    public static final String SSECLASS_STRING_LIGAND = "L";
+    public static final String SSECLASS_STRING_OTHER = "O";
+    
     public static final String SSE_FGNOTATION_HELIX = "h";
     public static final String SSE_FGNOTATION_STRAND = "e";
     public static final String SSE_FGNOTATION_LIGAND = "l";
@@ -98,21 +103,28 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
         }
     }
     
+    
+    /**
+     * Transforms an SSE fg notation string (e.g.,SSE.SSE_FGNOTATION_STRAND) into an SSE class code (e.g., SSE.SSECLASS_BETASTRAND).
+     * @param n an SSE fg notation string (e.g.,SSE.SSE_FGNOTATION_STRAND)
+     * @return an SSE class code (e.g., SSE.SSECLASS_BETASTRAND)
+     */
     public static Integer sseClassFromFgNotation(String n) {
         if(null == n) {
             DP.getInstance().w("SSE", "sseClassFromFgNotation: given notation is null. Assuming SSECLASS_OTHER.");
             return SSE.SSECLASS_OTHER;
         }
-        if(n.equals("h")) {
+        if(n.equals(SSE_FGNOTATION_HELIX)) {
             return SSE.SSECLASS_HELIX;
         }
-        else if(n.equals("e")) { return SSE.SSECLASS_BETASTRAND; }
-        else if(n.equals("l")) { return SSE.SSECLASS_LIGAND; }
+        else if(n.equals(SSE_FGNOTATION_STRAND)) { return SSE.SSECLASS_BETASTRAND; }
+        else if(n.equals(SSE_FGNOTATION_LIGAND)) { return SSE.SSECLASS_LIGAND; }
         else { return SSE.SSECLASS_OTHER; } 
     }
     
     /**
      * Constructor that sets the SSE type by the SSE class 'sseClass'. Use SSE.SSECLASS_* constants.
+     * @param sseClass the SSE class 'sseClass'. Use SSE.SSECLASS_* constants.
      */
     public SSE(Integer sseClass) {
         if(sseClass.equals(SSE.SSECLASS_HELIX)) {
@@ -168,23 +180,28 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
         return(false);
     }
     
+    /**
+     * Determines the SSE class string of this SSE, e.g., SSE.SSECLASS_STRING_HELIX.
+     * @return the SSE class String, e.g., SSE.SSECLASS_HELIX (which currently is "H")
+     */
     public String getSSEClass() {
         if(this.isHelix()) {
-            return "H";
+            return SSE.SSECLASS_STRING_HELIX;
         }
         else if(this.isBetaStrand()) {
-            return "E";
+            return SSE.SSECLASS_STRING_STRAND;
         }
         else if(this.isLigandSSE()) {
-            return "L";
+            return SSE.SSECLASS_STRING_LIGAND;
         }
         else {
-            return "O";
+            return SSE.SSECLASS_STRING_OTHER;
         }
     }
 
     /**
-     * Returns true if this SSE is a beta strand.
+     * Returns true if this SSE is a beta strand, i.e., whether type is SSE.SSE_TYPE_BETASTRAND or SSE.SSE_TYPE_ISOLATED_BETA
+     * @return true if this SSE is a beta strand, false otherwise
      */
     public Boolean isBetaStrand() {
         if(sseType.equals(SSE.SSE_TYPE_BETASTRAND) || sseType.equals(SSE.SSE_TYPE_ISOLATED_BETA)) {
@@ -196,6 +213,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     /**
      *
      * Returns true if this is not a helix, beta strand or ligand SSE.
+     * @return true if the SSE type is SSE.SSE_TYPE_HTURN, SSE.SSE_TYPE_BEND or SSE.SSE_TYPE_COIL
      */
     public Boolean isOtherSSE() {
         if(sseType.equals(SSE.SSE_TYPE_HTURN) || sseType.equals(SSE.SSE_TYPE_BEND) || sseType.equals(SSE.SSE_TYPE_COIL)) {
@@ -205,18 +223,18 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     }
     
     /**
-     * Returns the PLCC SSE type label (e.g., "H" for a helic, "L" for a ligand" SSE).
-     * @return the PLCC SSE type label (e.g., "H" for a helic, "L" for a ligand" SSE).
+     * Returns the PLCC SSE type label (e.g., "H" for a helix, "L" for a ligand" SSE). Uses the SSE class strings (like SSE.SSECLASS_STRING_HELIX) now, should me merged with that function.
+     * @return the PLCC SSE type label (e.g., "H" for a helix, "L" for a ligand" SSE).
      */
     public String getPLCCSSELabel() {
         if(this.isHelix()) {
-            return "H";
+            return SSE.SSECLASS_STRING_HELIX;
         } else if(this.isBetaStrand()) {
-            return "E";
+            return SSE.SSECLASS_STRING_STRAND;
         } else if(this.isLigandSSE()) {
-            return "L";
+            return SSE.SSECLASS_STRING_LIGAND;
         } else {
-            return "O";
+            return SSE.SSECLASS_STRING_OTHER;
         }
     }
 
@@ -489,7 +507,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     
     /**
      * Returns the 3-letter ligand residue name from the PDB file name (e.g., ICT for isocitric acid) of this residue. Returns the empty string ("") if this is not a ligand SSE or if this SSE has no residues.
-     * @return a string of length 3
+     * @return a string of length 3, or the empty string if this is not a ligand SSE
      */
     public String getLigandName3() {
 
