@@ -196,7 +196,7 @@ public class JmolTools {
         
         // edges first (lines)
         for(Integer[] edge : g.getEdgeList()) {
-            sb.append(JmolTools.visualizeContactCommands(g.getVertex(edge[0]), g.getVertex(edge[1]), g.getContactType(edge[0], edge[1])));
+            sb.append(JmolTools.visualizeContactCommands(g.getVertex(edge[0]), g.getVertex(edge[1]), g.getContactSpatRel(edge[0], edge[1])));
         }
         // now the vertices (SSE circles)
         for(int i = 0; i < g.numVertices(); i++) {

@@ -372,7 +372,7 @@ public class FoldingGraph extends SSEGraph {
                 for(Integer spatPos = 1; spatPos < this.size; spatPos++) {
                     Integer sseSeqIndex = this.getSSESeqIndexatSpatOrderPosition(spatPos);
                     Integer lastsseSeqIndex = this.getSSESeqIndexatSpatOrderPosition(spatPos - 1);
-                    Integer spatRel = this.getContactType(sseSeqIndex, lastsseSeqIndex);
+                    Integer spatRel = this.getContactSpatRel(sseSeqIndex, lastsseSeqIndex);
                     
                     if(spatRel == SpatRel.PARALLEL) {
                         // keep orientation
@@ -416,7 +416,7 @@ public class FoldingGraph extends SSEGraph {
                         if(this.containsEdge(i, j)) {
 
                             // determine edge type and the resulting color
-                            edgeType = this.getContactType(i, j);
+                            edgeType = this.getContactSpatRel(i, j);
                             if(edgeType.equals(SpatRel.PARALLEL)) { ig2.setPaint(Color.RED); }
                             else if(edgeType.equals(SpatRel.ANTIPARALLEL)) { ig2.setPaint(Color.BLUE); }
                             else if(edgeType.equals(SpatRel.MIXED)) { ig2.setPaint(Color.GREEN); }

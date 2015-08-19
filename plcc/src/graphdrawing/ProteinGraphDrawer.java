@@ -199,7 +199,7 @@ public class ProteinGraphDrawer {
                     continue;
                 }
                 if (fg.containsEdge(k, l)) {
-                    edgeType = fg.getContactType(k, l);
+                    edgeType = fg.getContactSpatRel(k, l);
                     if (edgeType.equals(SpatRel.PARALLEL)) {
                         ig2.setPaint(Color.RED);
                     } else if (edgeType.equals(SpatRel.ANTIPARALLEL)) {
@@ -663,7 +663,7 @@ public class ProteinGraphDrawer {
                 currentVert = keyposFGIndicesSpatOrder.get(i);
                 lastVert = keyposFGIndicesSpatOrder.get(i - 1);
                 KEYNotation.append(currentVert - lastVert);
-                Integer spatRel = fg.getContactType(lastVert, currentVert);
+                Integer spatRel = fg.getContactSpatRel(lastVert, currentVert);
                 if (Objects.equals(spatRel, SpatRel.PARALLEL)) {
                     KEYNotation.append("x");
                     orientationsSpatOrder[i] = orientationsSpatOrder[i - 1];
@@ -710,7 +710,7 @@ public class ProteinGraphDrawer {
             for (int i = 1; i < keyposFGIndicesSpatOrder.size(); i++) {
                 currentVert = keyposFGIndicesSpatOrder.get(i);
                 lastVert = keyposFGIndicesSpatOrder.get(i - 1);
-                Integer spatRel = fg.getContactType(lastVert, currentVert);
+                Integer spatRel = fg.getContactSpatRel(lastVert, currentVert);
                 relDrawDistToLast = currentVert - lastVert;
                 if (debugDrawingKEY) {
                     System.out.println("At i=" + 1 + ", currentVert=" + currentVert + ", lastVert=" + lastVert + "");
@@ -991,7 +991,7 @@ public class ProteinGraphDrawer {
                     continue;
                 }
                 if (fg.containsEdge(k, l)) {
-                    edgeType = fg.getContactType(k, l);
+                    edgeType = fg.getContactSpatRel(k, l);
                     if (edgeType.equals(SpatRel.PARALLEL)) {
                         ig2.setPaint(Color.RED);
                     } else if (edgeType.equals(SpatRel.ANTIPARALLEL)) {
@@ -1215,7 +1215,7 @@ public class ProteinGraphDrawer {
                     }
                 } else {
                     if (fg.containsEdge(k, l)) {
-                        edgeType = fg.getContactType(k, l);
+                        edgeType = fg.getContactSpatRel(k, l);
                         if (edgeType.equals(SpatRel.PARALLEL)) {
                             ig2.setPaint(Color.RED);
                         } else if (edgeType.equals(SpatRel.ANTIPARALLEL)) {
@@ -1521,10 +1521,13 @@ public class ProteinGraphDrawer {
         Integer spacerY;
         Integer iChainID;
         Integer jChainID;
+        
+        float[] dashPattern = { 10, 20, 10, 20 }; // dash pattern for dashed lines: alternating lengths of transparent (even index) and opaque (uneven index) line segement lengths to draw
+        
         for (Integer i = 0; i < pg.getSize(); i++) {
             for (Integer j = i + 1; j < pg.getSize(); j++) {
                 if (pg.containsEdge(i, j)) {
-                    edgeType = pg.getContactType(i, j);
+                    edgeType = pg.getContactSpatRel(i, j);
                     if (edgeType.equals(SpatRel.PARALLEL)) {
                         ig2.setPaint(Color.RED);
                     } else if (edgeType.equals(SpatRel.ANTIPARALLEL)) {
@@ -1537,12 +1540,25 @@ public class ProteinGraphDrawer {
                         ig2.setPaint(Color.ORANGE);
                     } else if (edgeType.equals(SpatRel.COMPLEX)) {
                         ig2.setPaint(Color.BLACK);
+                        
+                        // draw ligand inter-chain contact dark purple
+                        if(pg.getVertex(i).isLigandSSE() || pg.getVertex(j).isLigandSSE()) {
+                            ig2.setPaint(new Color(128, 0, 128));
+                        }
                     } else {
                         ig2.setPaint(Color.LIGHT_GRAY);
                     }
                     if (bw) {
                         ig2.setPaint(Color.LIGHT_GRAY);
                     }
+                    
+                    if(edgeType.equals(SpatRel.COMPLEX)) {
+                        ig2.setStroke(new BasicStroke(2, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
+                    }
+                    else {
+                        ig2.setStroke(new BasicStroke(2));
+                    }
+                    
                     iChainID = -1;
                     jChainID = -1;
                     for (Integer x = 0; x < pg.getChainEnds().size(); x++) {
@@ -1577,7 +1593,7 @@ public class ProteinGraphDrawer {
                     spacerY = 0;
                     arc = new Arc2D.Double(arcTopLeftX + spacerX, arcTopLeftY + spacerY, arcWidth, arcHeight, 0, 180, Arc2D.OPEN);
                     shape = ig2.getStroke().createStrokedShape(arc);
-                    ig2.fill(shape);
+                    ig2.draw(shape);
                 }
             }
         }
@@ -1662,10 +1678,10 @@ public class ProteinGraphDrawer {
                 printNth = 1;
             }
             if (pg.getSize() > 99) {
-                printNth = 2;
+                printNth = 1;
             }
             if (pg.getSize() > 999) {
-                printNth = 3;
+                printNth = 2;
             }
             Integer lineHeight = pl.textLineHeight;
             if (pg.getSize() > 0) {
@@ -2597,7 +2613,7 @@ public class ProteinGraphDrawer {
                 currentVert = keyposFGIndicesSpatOrder.get(i);
                 lastVert = keyposFGIndicesSpatOrder.get(i - 1);
                 KEYNotation.append(currentVert - lastVert);
-                Integer spatRel = fg.getContactType(lastVert, currentVert);
+                Integer spatRel = fg.getContactSpatRel(lastVert, currentVert);
                 if (Objects.equals(spatRel, SpatRel.PARALLEL)) {
                     KEYNotation.append("x");
                     orientationsSpatOrder[i] = orientationsSpatOrder[i - 1];
@@ -2627,7 +2643,7 @@ public class ProteinGraphDrawer {
             p = new Position2D(vertStartX + (i * vertDist) + pl.vertRadius / 2, vertStartY);
             Integer contactTypeInt = null;
             if (i > 0) {
-                contactTypeInt = fg.getContactType(fg.getSpatOrder().get(i - 1), fg.getSpatOrder().get(i));
+                contactTypeInt = fg.getContactSpatRel(fg.getSpatOrder().get(i - 1), fg.getSpatOrder().get(i));
                 if (contactTypeInt.equals(SpatRel.PARALLEL)) {
                     newOrientations[i] = newOrientations[i - 1];
                 } else {

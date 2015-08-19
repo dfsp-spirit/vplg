@@ -136,7 +136,7 @@ public class CompatGraphComputation {
         if(graph1.containsEdge(v1, v2) && graph2.containsEdge(v1, v2)) {
             
             // If they exist, do the edge labels match?
-            if(graph1.getContactType(v1, v2) == graph2.getContactType(v1, v2)) {
+            if(graph1.getContactSpatRel(v1, v2) == graph2.getContactSpatRel(v1, v2)) {
                 
                 // Do the vertex labels of v1 match?
                 if(graph1.getSSEBySeqPosition(v1).getSseType().equals(graph2.getSSEBySeqPosition(v1).getSseType())) {

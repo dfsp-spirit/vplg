@@ -17,6 +17,7 @@ import java.net.*;
 import java.util.List;
 import org.jgrapht.*;
 import io.DBManager;
+import java.util.Objects;
 import plcc.Settings;
 //import org.jgrapht.graph.*;
 
@@ -895,7 +896,7 @@ public class ContactMatrix {
                     }
                     
                     // just a sanity test...
-                    if(largestAntip == smallestParallel) {
+                    if(Objects.equals(largestAntip, smallestParallel)) {
                         DP.getInstance().w("Double difference calculation borders are equal, should differ.");
                     }
                     // ... and another one

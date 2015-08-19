@@ -115,6 +115,9 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements I
     /** The edge matrix defining contacts and the type of spatial relation. */
     protected Integer[ ][ ] matrix;               // contacts and spatial relations between pairs of SSEs
     
+    /** The edge matrix defining the intra- or interchain type of a contact. */
+    protected Integer[ ][ ] intraInterMatrix;
+    
     /** The matrix holding distances of vertices in the graph (shortest paths between them). */
     protected Integer[ ][ ] distMatrix;           // distances of the vertices within this graph
     protected Boolean isProteinGraph;             // true if this is a protein graph, false if this is a folding graph (a connected component of the protein graph)    
@@ -136,7 +139,14 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements I
     protected Integer numCliquesSoFar;
     protected Boolean reportCliques;
     
+    /** SSE contact of chain type 'NONE', i.e., no contact. */
+    public static final Integer SSECT_NONE = 0; 
     
+    /** SSE contact of chain type INTRACHAIN, i.e., between SSEs of the same chain. */
+    public static final Integer SSECT_INTRACHAIN = 1;
+    
+    /** SSE contact of chain type INTERCHAIN, i.e., between SSEs of 2 different chains. */
+    public static final Integer SSECT_INTERCHAIN = 2;
     
     /** This is a list of the vertices (defined by their sequential index) in this graph in spatial ordering. This means that spatOrder.get(i) returns the
         sequential index of the SSE which is at position i in the graph if it is drawn in spatial ordering. */
@@ -180,6 +190,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements I
         this.sseList = sses;        
         this.size = sseList.size();
         this.matrix = new Integer[size][size];
+        this.intraInterMatrix = new Integer[size][size];
         this.distMatrix = new Integer[size][size];      // distances in graph
         this.isProteinGraph = true;
         this.parent = null;
@@ -357,7 +368,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements I
             sseASeqIndex = this.spatOrder.get(i);
             for(Integer j = 0; j < this.size; j++) {
                 sseBSeqIndex = this.spatOrder.get(j);
-                spatContacts[i][j] = this.getContactType(sseASeqIndex, sseBSeqIndex);
+                spatContacts[i][j] = this.getContactSpatRel(sseASeqIndex, sseBSeqIndex);
             }
         }
         
@@ -873,7 +884,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements I
      * types encoded by the Integers. Atm, the following contacts are defined: 0=no contact, 1=mixed, 2=parallel, 3=antiparallel, 4=ligand.
      * You can also call SpatRel.getString(i) to get the string representation of some Integer i.
      */
-    public Integer getContactType(Integer x, Integer y) {
+    public Integer getContactSpatRel(Integer x, Integer y) {
 
         if(x < 0 || y < 0) {
             System.err.println("ERROR: getContactType(): Contact " + x + "/" + y + " out of range (graph has " + this.sseList.size() + " vertices), no negative values allowed.");
@@ -1195,10 +1206,11 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements I
      * Inits the arrays, removing all edges from this graph.
      */
     protected void init() {
-        for(Integer i = 0; i < size; i++) {
-            for(Integer j = 0; j < size; j++) {
-                matrix[i][j] = SpatRel.NONE;
-                distMatrix[i][j] = Integer.MAX_VALUE;
+        for(Integer i = 0; i < this.size; i++) {
+            for(Integer j = 0; j < this.size; j++) {
+                this.matrix[i][j] = SpatRel.NONE;
+                this.distMatrix[i][j] = Integer.MAX_VALUE;
+                this.intraInterMatrix[i][j] = SSEGraph.SSECT_NONE;
             }
         }
     }
@@ -1453,8 +1465,8 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements I
         for(Integer i = 0; i < this.sseList.size(); i++) {
             for(Integer j = i + 1; j < this.sseList.size(); j++) {
                 if(this.containsEdge(i, j)) {
-                    //tgf += (i + 1) + " " + (j + 1) + " " + SpatRel.getString(this.getContactType(i, j)) + "\n";
-                    tgf.append(i + 1).append(" ").append(j + 1).append(" (").append(i + 1).append("-").append(SpatRel.getString(this.getContactType(i, j))).append("-").append(j + 1).append(")\n");
+                    //tgf += (i + 1) + " " + (j + 1) + " " + SpatRel.getString(this.getContactSpatRel(i, j)) + "\n";
+                    tgf.append(i + 1).append(" ").append(j + 1).append(" (").append(i + 1).append("-").append(SpatRel.getString(this.getContactSpatRel(i, j))).append("-").append(j + 1).append(")\n");
                 }
             }
         }
@@ -1549,7 +1561,7 @@ E	3	3	3
                 if(this.containsEdge(i, j)) {
                     sseA = this.getVertex(i);
                     sseB = this.getVertex(j);
-                    pf.append((i + 1) + " " + (j + 1) + " " + (SpatRel.getString(this.getContactType(i, j))).toUpperCase() + " " + sseA.getPLCCSSELabel() + sseB.getPLCCSSELabel() + "\n");
+                    pf.append((i + 1) + " " + (j + 1) + " " + (SpatRel.getString(this.getContactSpatRel(i, j))).toUpperCase() + " " + sseA.getPLCCSSELabel() + sseB.getPLCCSSELabel() + "\n");
                 }
             }
         }
@@ -1739,7 +1751,7 @@ E	3	3	3
      * @return true if the two SSEs are parallel, false otherwise
      */ 
     public Boolean isCrossoverConnection(Integer x, Integer y) {
-        if(this.getContactType(x, y) == SpatRel.PARALLEL) {
+        if(this.getContactSpatRel(x, y) == SpatRel.PARALLEL) {
             return(true);
         }
         return(false);
@@ -3071,12 +3083,12 @@ E	3	3	3
             
             colorModifier = lineModifier = "";
             edgeLabel = "label=\"" + this.getContactTypeString(src, tgt) + "\"";
-            if(this.getContactType(src, tgt) == SpatRel.NONE) { continue; }
-            else if(this.getContactType(src, tgt) == SpatRel.PARALLEL) { colorModifier = " color=red"; }
-            else if(this.getContactType(src, tgt) == SpatRel.ANTIPARALLEL) { colorModifier = " color=blue"; }
-            else if(this.getContactType(src, tgt) == SpatRel.MIXED) { colorModifier = " color=green"; }
-            else if(this.getContactType(src, tgt) == SpatRel.LIGAND) { colorModifier = " color=magenta"; }
-            else if(this.getContactType(src, tgt) == SpatRel.BACKBONE) { colorModifier = " color=orange"; lineModifier = " style=dotted"; }
+            if(this.getContactSpatRel(src, tgt) == SpatRel.NONE) { continue; }
+            else if(this.getContactSpatRel(src, tgt) == SpatRel.PARALLEL) { colorModifier = " color=red"; }
+            else if(this.getContactSpatRel(src, tgt) == SpatRel.ANTIPARALLEL) { colorModifier = " color=blue"; }
+            else if(this.getContactSpatRel(src, tgt) == SpatRel.MIXED) { colorModifier = " color=green"; }
+            else if(this.getContactSpatRel(src, tgt) == SpatRel.LIGAND) { colorModifier = " color=magenta"; }
+            else if(this.getContactSpatRel(src, tgt) == SpatRel.BACKBONE) { colorModifier = " color=orange"; lineModifier = " style=dotted"; }
             else { colorModifier = " color=gray"; lineModifier=""; edgeLabel=""; }
                                         
             dlf.append("    ").append(src).append(" -- ").append(tgt).append(" [").append(edgeLabel).append(colorModifier).append(lineModifier).append("]" + ";\n");

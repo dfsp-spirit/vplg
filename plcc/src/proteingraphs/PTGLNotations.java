@@ -984,7 +984,7 @@ public class PTGLNotations {
 
                             KEY.append(currentVert - lastVert);
 
-                            Integer spatRel = fg.getContactType(lastVert, currentVert);
+                            Integer spatRel = fg.getContactSpatRel(lastVert, currentVert);
                             //System.out.println("lastVert=" + lastVert + ", currentVert=" + currentVert + ", spatRel=" + spatRel + ".");
 
                             if(Objects.equals(spatRel, SpatRel.PARALLEL)) {

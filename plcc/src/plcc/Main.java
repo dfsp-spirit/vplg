@@ -3337,7 +3337,6 @@ public class Main {
         //chainCM.printSSEMatrix();
         
         Boolean computeAll = false;
-        computeAll = true;  // DEBUG
         
         chainCM.calculateSSESpatialRelationMatrix(resContacts, computeAll);
         //chainCM.printSpatialRelationMatrix();
@@ -6001,9 +6000,9 @@ public class Main {
         for(Integer i = 0; i < allChains.size(); i++) {
             c = allChains.get(i);
             
-            if(! silent) {
-                System.out.println("   *Handling chain " + c.getPdbChainID() + ".");
-            }
+            //if(! silent) {
+            //    System.out.println("   *Handling chain " + c.getPdbChainID() + ".");
+            //}
 
             ProtMetaInfo pmi = FileParser.getMetaInfo(pdbid, c.getPdbChainID());
             //pmi.print();
@@ -6026,7 +6025,7 @@ public class Main {
                 for(Integer j = 0; j < oneChainSSEs.size(); j++) {
                     sb.append(oneChainSSEs.get(j).getSseType());
                 }
-                System.out.println(sb.toString());
+                //System.out.println(sb.toString());
             }
 
             // SSEs have been calculated, now assign the PTGL labels and sequential numbers on the chain
@@ -6573,7 +6572,7 @@ public class Main {
         cgr.setCompGraph(compGraph);     
         
         if( ! silent) {
-            System.out.println("  Preparing to write complex graph files. CG verts / edges : " + compGraph.getVertices().size() + " / " + compGraph.getEdges().size() +  ".");
+            System.out.println("  Preparing to write complex graph files (CG verts / edges : " + compGraph.getVertices().size() + " / " + compGraph.getEdges().size() +  ").");
         }
         
         //write Residue contact info to csv.
@@ -6589,6 +6588,8 @@ public class Main {
             DP.getInstance().e("Main", "Failed to write complex graph contact info CSV file: '" + e.getMessage() + "'.");
         }
         
+        System.out.println("    Contact info CSV written.");
+        
         // Calculate SSE level contacts
         //System.out.println("intr" + interchainContacts);
         ContactMatrix chainCM = new ContactMatrix(allChainSSEs, pdbid);
@@ -6596,11 +6597,17 @@ public class Main {
         chainCM.fillFromContactList(resContacts, keepSSEs);
         chainCM.calculateSSEContactMatrix();                       
         
-        chainCM.calculateSSESpatialRelationMatrix(resContacts, true);                
+        System.out.println("    SSE contact matrix calculated.");
+        
+        chainCM.calculateSSESpatialRelationMatrix(resContacts, false);                
 
+        System.out.println("    Spatial relation matrix calculated.");
+        
         // This graph is still required because it is used for drawing the VPLG-style picture
-        ProtGraph cg = chainCM.toProtGraph();
+        ProtGraph cg = chainCM.toProtGraph();                        
         cg.declareProteinGraph();        
+        
+        System.out.println("    Graph created and declared a CG.");
 
         
         if(Settings.getBoolean("plcc_B_forceBackboneContacts")) {
@@ -6610,7 +6617,7 @@ public class Main {
             cg.addFullBackboneContacts();            
         }
 
-        //System.out.println("    ----- Done with " + graphType + " graph of chain " + c.getPdbChainID() + ". -----");
+        System.out.println("    ----- Done with " + graphType + " CG. -----");
         cg.setInfo(pdbid, "ALL", "complex_" + graphType);
         cg.addMetadata(md);
         cg.setComplexData(chainEnd, allChains);
@@ -6678,6 +6685,7 @@ public class Main {
         }
         
         // ------------------ write the SSE level graphs -----------
+        System.out.println("    Writing SSE level graph text files...");
         
         // the detailed complex graph (each vertex is one SSE, vertices ordered by chain):
         String graphFormatsWrittenSSELevel = "";        
