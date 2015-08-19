@@ -37,7 +37,7 @@ include("../backend/config.php");
 
 $server_name = $SITE_TITLE;
 $ptgl_base_url = $SITE_BASE_URL;
-$ptgl_api_url = $ptgl_base_url . "/api/index.php";
+$ptgl_api_url = rtrim($ptgl_base_url,"/") . "/api/index.php";
  
 // GET route
 $app->get(
