@@ -97,6 +97,7 @@
 /* DIRECTION CONTROLS (NEXT / PREV) */
 
 
+/*
 .bx-wrapper .bx-prev {
 	left: 10px;
 	background: url(../images/controls.png) no-repeat 0 -32px;
@@ -115,16 +116,34 @@
 .bx-wrapper .bx-next:hover {
 	background-position: -43px 0;
 }
+*/
+
+.bx-wrapper .bx-prev {
+	left: 10px;
+	background: url(../images/controls_large.png) no-repeat 0 -64px;
+}
+
+.bx-wrapper .bx-next {
+	right: 10px;
+	background: url(../images/controls_large.png) no-repeat -86px -64px;
+}
 
 
+.bx-wrapper .bx-prev:hover {
+	background-position: 0 0;
+}
+
+.bx-wrapper .bx-next:hover {
+	background-position: -86px 0;
+}
 
 .bx-wrapper .bx-controls-direction a {
 	position: fixed;
 	top: 50%;
-	margin-top: -16px;
+	margin-top: -32px;
 	outline: 0;
-	width: 32px;
-	height: 32px;
+	width: 64px;
+	height: 64px;
 	text-indent: -9999px;
 	z-index: 9999;
 }
@@ -148,7 +167,7 @@
 	width: 10px;
 	height: 11px;
 	outline: 0;
-	background: url(../images/controls.png) -86px -11px no-repeat;
+	background: url(../images/controls_large.png) -172px -22px no-repeat;
 	margin: 0 3px;
 }
 
@@ -163,7 +182,7 @@
 	width: 9px;
 	height: 11px;
 	outline: 0;
-	background: url(../images/controls.png) -86px -44px no-repeat;
+	background: url(../images/controls_large.png) -172px -88px no-repeat;
 	margin: 0 3px;
 }
 
