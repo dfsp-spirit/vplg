@@ -52,6 +52,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 				<ul>
 					<li class="noBullets">  <a href="#proteinGraph">Protein graphs</a> </li>
 					<ul>
+					    <li class="noBullets">  <a href="#contacts">Atom and SSE contacts</a> </li>
 					    <li class="noBullets">  <a href="#graphTypes">Graph types</a> </li>
 					</ul>
 					<li class="noBullets">  <a href="#explainImages">Interpreting the graph images</a> </li>
@@ -145,6 +146,49 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		</p>
 		
 		<p class="imgCenter"><img src="./images/protein_graph.png" alt="Protein graph" title="Protein graph" class="img-responsive imgFormAboutphp2"/></p>
+		
+		
+		<br/>
+		<a class="anchor" id="contacts"></a>
+		<h4> Atom contacts and SSE contacts </h4>
+		<p>
+		Protein graphs are based on contacts between SSEs. Here, we explain how an SSE contact is defined in the PTGL. The computation of SSE contacts is a 2-step process: first, the atom contacts for the residues are computed, and the residues are assigned to SSEs. Then, a ruleset is used to determine whether enough atom contacts exist between a pair of SSEs to define this as a contact on the SSE level.
+		</p>
+		<p>
+		
+		<b>Atom level contacts</b>
+		We use a hard-sphere model to compute atom contacts. Atom positions are parsed from PDB files, and a collision sphere with radius 2 Angstroem is assigned to each protein atom (hydrogens are ignored). For ligand atoms, the radius is 3 Angstroem.
+		If the collision spheres of 2 atoms from different residues overlap, this is considered an atom level contact.
+		<br/>
+		The different atoms of a residue are backbone atoms or side chain atoms. Based on this differentation, each atom level contact is assigned to one of the following types:
+		
+		<ul>
+		  <li>BB: backbone - backbone contact</li>
+		  <li>BC: backbone - side chain contact</li>
+		  <li>CC: side chain - side chain contact</li>
+		  <li>LB: ligand - backbone contact</li>
+		  <li>LC: ligand - side chain contact</li>
+		  <li>LL: ligand - ligand contact</li>
+		  <li>LX: ligand - non-ligand contact, i.e., LX = LB or LC</li>
+		</ul>
+		
+		</p>
+		
+		<b>SSE level contacts</b>
+		Based on the atom level contacts, a rule set is applied to decide whether or not a pair of SSEs is in contact. The rules depend on the SSE types, and are as follows:
+		<table>
+		<th><td>SSE 1 type</td><td>SSE 2 type</td><td>Required contacts</td><th>
+		<tr><td>Beta strand</td><td>Beta strand</td><td>BB &gt; 1 or CC &gt; 2</td><tr>
+		<tr><td>Helix</td><td>Beta strand</td><td>(BB &gt; 1 and BC &gt; 3) or CC &gt; 3</td><tr>
+		<tr><td>Helix</td><td>Helix</td><td>BC &gt; 3 or CC &gt; 3</td><tr>
+		<tr><td>Ligand</td><td><i>Any type</i></td><td>LX &gt;= 1</td><tr>
+		</table>
+		</p>
+		
+		
+		<p>
+		Protein graphs are based on contacts between SSEs. Here, we explain how an SSE contact is defined in the PTGL. The computation of SSE contacts is a 2-step process: first, the atom contacts for the residues are computed, and the residues are assigned to SSEs. Then, a ruleset is used to determine whether enough atom contacts exist between a pair of SSEs to define this as a contact on the SSE level.
+		</p>
 		
 		<br/>
 		<a class="anchor" id="graphTypes"></a>
