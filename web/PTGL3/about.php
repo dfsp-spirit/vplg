@@ -153,6 +153,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<h4> Atom contacts and SSE contacts </h4>
 		<p>
 		Protein graphs are based on contacts between SSEs. Here, we explain how an SSE contact is defined in the PTGL. The computation of SSE contacts is a 2-step process: first, the atom contacts for the residues are computed, and the residues are assigned to SSEs. Then, a ruleset is used to determine whether enough atom contacts exist between a pair of SSEs to define this as a contact on the SSE level.
+		For more details, please see the following publication: Schäfer T, May P, Koch I (2012). <i>Computation and Visualization of Protein Topology Graphs Including Ligand Information.</i> German Conference on Bioinformatics 2012; 108-118.
 		</p>
 		<p>
 		
