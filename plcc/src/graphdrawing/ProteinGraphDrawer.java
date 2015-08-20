@@ -47,6 +47,7 @@ import proteingraphs.SSEGraph;
 import plcc.Settings;
 import proteingraphs.SpatRel;
 import tools.DP;
+import tools.PlccUtilities;
 
 /**
  *
@@ -1522,6 +1523,20 @@ public class ProteinGraphDrawer {
         Integer iChainID;
         Integer jChainID;
         
+        Color C_PARALLEL = Color.RED;
+        Color C_MIXED = Color.GREEN;
+        Color C_ANTIPARALLEL = Color.BLUE;
+        Color C_LIGAND = Color.MAGENTA;
+        Color C_BACKBONE = Color.ORANGE;
+        Color C_OTHER = Color.LIGHT_GRAY;
+        
+        Color C_INTERCHAIN_PARALLEL = PlccUtilities.mutateColor(C_PARALLEL, 50, 50, 50);
+        Color C_INTERCHAIN_MIXED = PlccUtilities.mutateColor(C_MIXED, 50, 50, 50);
+        Color C_INTERCHAIN_ANTIPARALLEL = PlccUtilities.mutateColor(C_ANTIPARALLEL, 50, 50, 50);
+        Color C_INTERCHAIN_LIGAND = PlccUtilities.mutateColor(C_LIGAND, 50, 50, 50);
+        Color C_INTERCHAIN_BACKBONE = PlccUtilities.mutateColor(C_BACKBONE, 50, 50, 50); // does not really make sense (backbone interchain)
+        Color C_INTERCHAIN_OTHER = PlccUtilities.mutateColor(C_OTHER, 50, 50, 50);
+        
         float[] dashPattern = { 10, 20, 10, 20 }; // dash pattern for dashed lines: alternating lengths of transparent (even index) and opaque (uneven index) line segement lengths to draw
         
         for (Integer i = 0; i < pg.getSize(); i++) {
@@ -1529,35 +1544,24 @@ public class ProteinGraphDrawer {
                 if (pg.containsEdge(i, j)) {
                     edgeType = pg.getContactSpatRel(i, j);
                     if (edgeType.equals(SpatRel.PARALLEL)) {
-                        ig2.setPaint(Color.RED);
+                        ig2.setPaint(C_PARALLEL);
                     } else if (edgeType.equals(SpatRel.ANTIPARALLEL)) {
-                        ig2.setPaint(Color.BLUE);
+                        ig2.setPaint(C_ANTIPARALLEL);
                     } else if (edgeType.equals(SpatRel.MIXED)) {
-                        ig2.setPaint(Color.GREEN);
+                        ig2.setPaint(C_MIXED);
                     } else if (edgeType.equals(SpatRel.LIGAND)) {
-                        ig2.setPaint(Color.MAGENTA);
+                        ig2.setPaint(C_LIGAND);
                     } else if (edgeType.equals(SpatRel.BACKBONE)) {
-                        ig2.setPaint(Color.ORANGE);
+                        ig2.setPaint(C_BACKBONE);
                     } else if (edgeType.equals(SpatRel.COMPLEX)) {
-                        ig2.setPaint(Color.BLACK);
-                        
-                        // draw ligand inter-chain contact dark purple
-                        if(pg.getVertex(i).isLigandSSE() || pg.getVertex(j).isLigandSSE()) {
-                            ig2.setPaint(new Color(128, 0, 128));
-                        }
+                        ig2.setPaint(Color.BLACK);  // not really used, the color for interchain gets mutated from the spatRel color below            
                     } else {
-                        ig2.setPaint(Color.LIGHT_GRAY);
+                        ig2.setPaint(C_OTHER);
                     }
                     if (bw) {
-                        ig2.setPaint(Color.LIGHT_GRAY);
+                        ig2.setPaint(C_OTHER);
                     }
-                    
-                    if(edgeType.equals(SpatRel.COMPLEX)) {
-                        ig2.setStroke(new BasicStroke(2, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
-                    }
-                    else {
-                        ig2.setStroke(new BasicStroke(2));
-                    }
+                                        
                     
                     iChainID = -1;
                     jChainID = -1;
@@ -1573,9 +1577,32 @@ public class ProteinGraphDrawer {
                             break;
                         }
                     }
+                    
+                    // ------- set color for interchain (complex) contacts ------------
                     if (!Objects.equals(iChainID, jChainID)) {
-                        ig2.setPaint(Color.BLACK);
+                        // interchain contact
+                        ig2.setStroke(new BasicStroke(2, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
+                        if (edgeType.equals(SpatRel.PARALLEL)) {
+                            ig2.setPaint(C_INTERCHAIN_PARALLEL);
+                        } else if (edgeType.equals(SpatRel.ANTIPARALLEL)) {
+                            ig2.setPaint(C_INTERCHAIN_ANTIPARALLEL);
+                        } else if (edgeType.equals(SpatRel.MIXED)) {
+                            ig2.setPaint(C_INTERCHAIN_MIXED);
+                        } else if (edgeType.equals(SpatRel.LIGAND)) {
+                            ig2.setPaint(C_INTERCHAIN_LIGAND);
+                        } else if (edgeType.equals(SpatRel.BACKBONE)) {
+                            DP.getInstance().w("ProteinGraphDrawer", "Interchain backbone contact found, this makes no sense.");
+                            ig2.setPaint(C_INTERCHAIN_BACKBONE);
+                        } else {
+                            ig2.setPaint(C_INTERCHAIN_OTHER);
+                        }
                     }
+                    else {
+                        // intrachain contact
+                        ig2.setStroke(new BasicStroke(2));
+                    }
+                    
+                    
                     if (i < j) {
                         leftVert = i;
                         rightVert = j;
@@ -1707,6 +1734,12 @@ public class ProteinGraphDrawer {
                     if (iChainID != -1) {
                         ig2.drawString(pg.getAllChains().get(iChainID).getPdbChainID(), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 2) + (stringHeight / 4));
                     }
+                    
+                    // DEBUG: draw residuen number
+                    //Boolean drawResNumLabel = true;
+                    //if(drawResNumLabel) {
+                    //    ig2.drawString(pg.getAllChains().get(iChainID).getPdbChainID() + pg.getVertex(i).shortLabel(), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4));                        
+                    //}
                 }
             }
             if (Settings.getBoolean("plcc_B_graphimg_legend")) {

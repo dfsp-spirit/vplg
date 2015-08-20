@@ -5380,7 +5380,7 @@ public class Main {
 
 
     /**
-     * Creates all the ligand SSEs and adds them to the list of SSEs. Assumes that the ligands
+     * Creates all the ligand SSEs and adds them to the output list of ligand SSEs (the input list is not changed, it is only required to determine the SSE numbers for the new ligand SSEs). Assumes that the ligands
      * are already in the list of residues (i.e., createAllLigandResiduesFromPdbData() has already been called).
      * @param resList the residue list
      * @param dsspSSElist the list of all SSEs according to DSSP definition
@@ -5432,12 +5432,12 @@ public class Main {
                 }
 
                 ligSSECount++;
-                s = new SSE("L");
+                s = new SSE(SSE.SSECLASS_STRING_LIGAND);
 
                 // set SSE properties
                 s.addResidue(r);
                 s.setSeqSseNumDssp(dsspSSElist.size() + ligSSECount);
-                s.setSseType("L");
+                s.setSseType(SSE.SSECLASS_STRING_LIGAND);
 
                 // set Residue properties
                 r.setSSE(s);

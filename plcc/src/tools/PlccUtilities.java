@@ -17,12 +17,35 @@ import java.util.regex.Pattern;
 import org.json.JSONObject;
 import org.json.XML;
 import io.IO;
+import java.awt.Color;
 
 /**
  *
  * @author ts
  */
 public class PlccUtilities {
+    
+    /**
+     * Returns a new Color, based on given one. Values of all 3 channels (R,G,B) are changed by changeVal.
+     * @param c the inout color, this is left unchanged
+     * @param changeVal the amount to change (0 to 255 makes sense, the function assures that max is 255. negative is also fine, function assures result is at least 0)
+     * @return the new color
+     */
+    public static Color mutateColor(Color c, int changeVal) {
+        return new Color(Math.max(Math.min(c.getRed() + changeVal, 255), 0), Math.max(Math.min(c.getGreen() + changeVal, 255),0), Math.max(Math.min(c.getBlue() + changeVal, 255),0));
+    }
+    
+    /**
+     * Returns a new Color, based on given one. Values of all 3 channels (R,G,B) are changed by the 3 given changeValues.
+     * @param c the inout color, this is left unchanged
+     * @param changeValRed the amount to change red channel (0 to 255 makes sense, the function assures that max is 255. negative is also fine, function assures result is at least 0)
+     * @param changeValGreen the amount to change red channel (0 to 255 makes sense, the function assures that max is 255. negative is also fine, function assures result is at least 0)
+     * @param changeValBlue the amount to change red channel (0 to 255 makes sense, the function assures that max is 255. negative is also fine, function assures result is at least 0)
+     * @return the new color
+     */
+    public static Color mutateColor(Color c, int changeValRed, int changeValGreen, int changeValBlue) {
+        return new Color(Math.max(Math.min(c.getRed() + changeValRed, 255), 0), Math.max(Math.min(c.getGreen() + changeValGreen, 255),0), Math.max(Math.min(c.getBlue() + changeValBlue, 255),0));
+    }
     
     /**
      * Returns a pseudo-random number between min and max, inclusive.
