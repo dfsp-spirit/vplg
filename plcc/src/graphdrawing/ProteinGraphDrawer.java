@@ -332,14 +332,14 @@ public class ProteinGraphDrawer {
      * @param pg the graph to draw
      * @return a map of formats to the corresponding output files written to disk
      */
-    public static HashMap<DrawTools.IMAGEFORMAT, String> drawProteinGraph(String baseFilePathNoExt, Boolean drawBlackAndWhite, DrawTools.IMAGEFORMAT[] formats, ProtGraph pg, Map<Integer, String> vertexMarkings) {
+    public static HashMap<DrawTools.IMAGEFORMAT, String> drawProteinGraph(String baseFilePathNoExt, Boolean drawBlackAndWhite, DrawTools.IMAGEFORMAT[] formats, ProtGraph pg, Map<Integer, String> vertexMarkings, List<String> ignoreChains) {
         //Map<Integer, String> vertexMarkings = new HashMap<>();
         //for(Integer i : pg.getVertexIndexList()) {
         //    vertexMarkings.put(i, i + "");
         //}
         //System.out.println("####SETTING MARKING####");
         
-        DrawResult drawRes = ProteinGraphDrawer.drawProteinGraphG2D(drawBlackAndWhite, pg, vertexMarkings);
+        DrawResult drawRes = ProteinGraphDrawer.drawProteinGraphG2D(drawBlackAndWhite, pg, vertexMarkings, ignoreChains);
         String svgFilePath = baseFilePathNoExt + ".svg";
         HashMap<DrawTools.IMAGEFORMAT, String> resultFilesByFormat = new HashMap<DrawTools.IMAGEFORMAT, String>();
         try {
@@ -1469,7 +1469,8 @@ public class ProteinGraphDrawer {
      */
     private static DrawResult drawProteinGraphG2D(Boolean nonProteinGraph, ProtGraph pg) {
         Map<Integer, String> vertexMarkings = new HashMap<>();
-        return ProteinGraphDrawer.drawProteinGraphG2D(nonProteinGraph, pg, vertexMarkings);
+        List<String> ignoreChains = new ArrayList<>();
+        return ProteinGraphDrawer.drawProteinGraphG2D(nonProteinGraph, pg, vertexMarkings, ignoreChains);
     }
     
     /**
@@ -1482,7 +1483,7 @@ public class ProteinGraphDrawer {
      * @param vertexMarkings a map of special markings for vertices, supply an empty Map if no vertices should be marked in output image. This can be used to visually emphasize subsets of vertices in the graph.
      * @return the DrawResult. You can write this to a file or whatever.
      */
-    private static DrawResult drawProteinGraphG2D(Boolean nonProteinGraph, ProtGraph pg, Map<Integer, String> vertexMarkings) {
+    private static DrawResult drawProteinGraphG2D(Boolean nonProteinGraph, ProtGraph pg, Map<Integer, String> vertexMarkings, List<String> ignoreChains) {
         Integer numVerts = pg.numVertices();
         Boolean bw = nonProteinGraph;
         PageLayout pl = new PageLayout(numVerts);
@@ -1498,8 +1499,8 @@ public class ProteinGraphDrawer {
         ig2.setPaint(Color.BLACK);
         Font font = pl.getStandardFont();
         ig2.setFont(font);
-        FontMetrics fontMetrics = ig2.getFontMetrics();
-        String proteinHeader = "The " + pg.getGraphType() + " protein graph of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + " [V=" + pg.numVertices() + ", E=" + pg.numSSEContacts() + "].";
+        FontMetrics fontMetrics = ig2.getFontMetrics();        
+        String proteinHeader = "The " + pg.getGraphType() + " " + (pg.isComplexGraph() ? "complex" : "protein") + " graph of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + " [V=" + pg.numVertices() + ", E=" + pg.numSSEContacts() + "].";
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
         String sseNumberGraph;
@@ -1542,6 +1543,12 @@ public class ProteinGraphDrawer {
         for (Integer i = 0; i < pg.getSize(); i++) {
             for (Integer j = i + 1; j < pg.getSize(); j++) {
                 if (pg.containsEdge(i, j)) {
+                    
+                    // skip edges of ignored chains
+                    if(ignoreChains.contains(pg.getChainNameOfSSE(i)) || ignoreChains.contains(pg.getChainNameOfSSE(j))) {
+                        continue;
+                    }
+                    
                     edgeType = pg.getContactSpatRel(i, j);
                     if (edgeType.equals(SpatRel.PARALLEL)) {
                         ig2.setPaint(C_PARALLEL);
@@ -1628,6 +1635,12 @@ public class ProteinGraphDrawer {
         Rectangle2D.Double rect, markingRect;
         ig2.setStroke(new BasicStroke(2));
         for (Integer i = 0; i < pg.getSize(); i++) {
+            
+            // skip vertices of ignored chains
+            if(ignoreChains.contains(pg.getChainNameOfSSE(i))) {
+                continue;
+            }
+            
             if (pg.getVertex(i).isHelix()) {
                 ig2.setPaint(Color.RED);
             } else if (pg.getVertex(i).isBetaStrand()) {
@@ -1735,7 +1748,7 @@ public class ProteinGraphDrawer {
                         ig2.drawString(pg.getAllChains().get(iChainID).getPdbChainID(), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 2) + (stringHeight / 4));
                     }
                     
-                    // DEBUG: draw residuen number
+                    // DEBUG: draw residue number
                     //Boolean drawResNumLabel = true;
                     //if(drawResNumLabel) {
                     //    ig2.drawString(pg.getAllChains().get(iChainID).getPdbChainID() + pg.getVertex(i).shortLabel(), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4));                        

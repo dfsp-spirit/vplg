@@ -1986,7 +1986,7 @@ public class Main {
 
         ProtGraph pg = ProtGraphs.fromTrivialGraphFormatFile(tgfFile);
         System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to base file '" + imgFilePathNoExt + "'.");
-        ProteinGraphDrawer.drawProteinGraph(imgFilePathNoExt, true, formats, pg, vertexMarkings);
+        ProteinGraphDrawer.drawProteinGraph(imgFilePathNoExt, true, formats, pg, vertexMarkings, new ArrayList<String>());
         //pg.print();
         System.out.println("  Graph image written to base file '" + imgFilePathNoExt + "'.");
     }
@@ -2011,7 +2011,7 @@ public class Main {
         IMAGEFORMAT[] formats = new IMAGEFORMAT[] { DrawTools.IMAGEFORMAT.PNG };
         ProtGraph pg = ProtGraphs.fromPlccGraphFormatString(graphString);
         System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to base file '" + imgNoExt + "'.");
-        ProteinGraphDrawer.drawProteinGraph(imgNoExt, false, formats, pg, new HashMap<Integer, String>()); 
+        ProteinGraphDrawer.drawProteinGraph(imgNoExt, false, formats, pg, new HashMap<Integer, String>(), new ArrayList<String>()); 
         System.out.println("  Protein graph image written to base file '" + imgNoExt + "'.");
 
         //if(drawFoldingGraphsAsWell) {
@@ -2047,7 +2047,7 @@ public class Main {
         ProtGraph pg = ProtGraphs.fromPlccGraphFormatString(graphString);
         IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
         System.out.println("  Loaded graph with " + pg.numVertices() + " vertices and " + pg.numEdges() + " edges, drawing to base file '" + outputImgNoExt + "'.");
-        ProteinGraphDrawer.drawProteinGraph(outputImgNoExt, false, formats, pg, new HashMap<Integer, String>());
+        ProteinGraphDrawer.drawProteinGraph(outputImgNoExt, false, formats, pg, new HashMap<Integer, String>(), new ArrayList<String>());
         System.out.println("  Protein graph image written to base file '" + outputImgNoExt + "'.");
 
         //if(drawFoldingGraphsAsWell) {
@@ -2680,7 +2680,7 @@ public class Main {
                     // formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG, DrawTools.IMAGEFORMAT.PDF };                    
                     formats = Settings.getProteinGraphOutputImageFormats();
 
-                    HashMap<IMAGEFORMAT, String> filesByFormatCurNotation = ProteinGraphDrawer.drawProteinGraph(imgFileNoExt, false, formats, pg, new HashMap<Integer, String>());
+                    HashMap<IMAGEFORMAT, String> filesByFormatCurNotation = ProteinGraphDrawer.drawProteinGraph(imgFileNoExt, false, formats, pg, new HashMap<Integer, String>(), new ArrayList<String>());
                     //if(! silent) {
                     //    System.out.println("      Image of graph written to file '" + imgFile + "'.");
                     //}
@@ -6760,7 +6760,7 @@ public class Main {
                 
         if(Settings.getBoolean("plcc_B_draw_graphs")) {
             IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG, DrawTools.IMAGEFORMAT.PDF };
-            ProteinGraphDrawer.drawProteinGraph(imgFileNoExt, false, formats, cg, new HashMap<Integer, String>());
+            ProteinGraphDrawer.drawProteinGraph(imgFileNoExt, false, formats, cg, new HashMap<Integer, String>(), new ArrayList<String>());
             if(! silent) {
                 System.out.println("    Image of complex graph written to base file '" + imgFileNoExt + "'.");
             }
@@ -6794,7 +6794,7 @@ public class Main {
             }
             
             if(! silent) {
-                System.out.println("     Found " + ligandsAllChains.size() + " ligand SSEs total.");
+                System.out.println("     Found " + ligandsAllChains.size() + " ligand SSEs total in the " + cg.getAllChains().size() + " chains.");
             }
             
             String ligimgFileNoExt, ligName;
@@ -6809,6 +6809,12 @@ public class Main {
                 // determine all chains the ligand has contacts with (based on the SSEs it has contacts with):
                 Integer ligIndex = cg.getSSEIndex(ligandSSE);
                 List<String> ligContactChains = new ArrayList<>();
+                
+                List<String> ignoreChains = new ArrayList<>();
+                for(Chain ic : cg.getAllChains()) {
+                    ignoreChains.add(ic.getPdbChainID()); // we will delete the ones we are interested in later, see below
+                }
+                
                 if(ligIndex < 0) {
                     DP.getInstance().e("Main", "Could not get index of ligand SSE '" + ligName + "' from complex graph for ligand-centered graph computation, skipping CLG.");
                     continue;
@@ -6820,6 +6826,10 @@ public class Main {
                     if( ! ligContactChains.contains(contactChainName)) { ligContactChains.add(contactChainName); }
                 }
                 
+                for(String relChainName : ligContactChains) {
+                    ignoreChains.remove(relChainName);  // remove the chains which are relevant for this ligand from the ignore list (which contained all chains before)
+                }
+                
                 // TODO: now we need to restrict the following graphs so that they only consider the chains we determined
                 if(! silent) {
                     List<String> contactSSENames = new ArrayList<>();
@@ -6828,13 +6838,17 @@ public class Main {
                     }
                     System.out.println("     *Ligand '" + ligName + "' is in contact with the following " + contactSSENames.size() + " SSEs: '" + IO.stringListToString(contactSSENames) + "'.");
                     System.out.println("      Ligand '" + ligName + "' is in contact with the following " + ligContactChains.size() + " chains: '" + IO.stringListToString(ligContactChains) + "'.");
+                    System.out.println("      Ligand '" + ligName + "' LCG ignores the following " + ignoreChains.size() + " chains: '" + IO.stringListToString(ignoreChains) + "'.");
                 }
+                
+                
+                
                 
                 String ligfileNameSSELevelWithoutExtension = pdbid + "_ligand_complex_sses_" + ligName + "_" + graphType + coils + "_LCG";
                 ligimgFileNoExt = filePathImg + fs + ligfileNameSSELevelWithoutExtension;
 
                 IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG, DrawTools.IMAGEFORMAT.PDF };
-                ProteinGraphDrawer.drawProteinGraph(ligimgFileNoExt, false, formats, cg, new HashMap<Integer, String>());
+                ProteinGraphDrawer.drawProteinGraph(ligimgFileNoExt, false, formats, cg, new HashMap<Integer, String>(), ignoreChains);
                 if(! silent) {
                     System.out.println("      Image of ligand-centered complex graph for ligand '" + ligName + "' written to base file '" + imgFileNoExt + "'.");
                 }                        
