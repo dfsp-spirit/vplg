@@ -33,6 +33,7 @@ public class Chain implements java.io.Serializable {
 
 
     // getters
+    /** Returns the chain ID (chain name) from PDB file. Something like "A". */
     public String getPdbChainID() { return(pdbChainID); }
     public String getDsspChainID() { return(dsspChainID); }
     public String getModelID() { return(modelID); }

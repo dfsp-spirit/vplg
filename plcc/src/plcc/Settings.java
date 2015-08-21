@@ -199,6 +199,7 @@ public class Settings {
         //  used automatically though, it's just a reminder.
 
         defSet("plcc_B_consider_all_ligands_for_each_chain", "true", "Whether to ignore the assignement of a ligand to a chain in the PDB file, and assign a ligand to each chain it has contacts with.");
+        defSet("plcc_B_draw_ligandcomplexgraphs", "true", "Whether to draw ligand-centered complex graphs. This means one graph for each ligans in a PDB file, each showing all SSEs (regardless of chain) the ligand is in contact with. Experimental.");
         // Output and performance
         defSet("plcc_B_separate_contacts_by_chain", "false", "Whether to compute atom contacts separated by chain. Faster but does not detect contacts between different chains and thus cannot be used for complex graph computation.");
         defSet("plcc_B_no_warn", "false", "Whether to suppress all warnings. The default is to print them.");

@@ -115,9 +115,6 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements I
     /** The edge matrix defining contacts and the type of spatial relation. */
     protected Integer[ ][ ] matrix;               // contacts and spatial relations between pairs of SSEs
     
-    /** The edge matrix defining the intra- or interchain type of a contact. */
-    protected Integer[ ][ ] intraInterMatrix;
-    
     /** The matrix holding distances of vertices in the graph (shortest paths between them). */
     protected Integer[ ][ ] distMatrix;           // distances of the vertices within this graph
     protected Boolean isProteinGraph;             // true if this is a protein graph, false if this is a folding graph (a connected component of the protein graph)    
@@ -190,7 +187,6 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements I
         this.sseList = sses;        
         this.size = sseList.size();
         this.matrix = new Integer[size][size];
-        this.intraInterMatrix = new Integer[size][size];
         this.distMatrix = new Integer[size][size];      // distances in graph
         this.isProteinGraph = true;
         this.parent = null;
@@ -1210,7 +1206,6 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements I
             for(Integer j = 0; j < this.size; j++) {
                 this.matrix[i][j] = SpatRel.NONE;
                 this.distMatrix[i][j] = Integer.MAX_VALUE;
-                this.intraInterMatrix[i][j] = SSEGraph.SSECT_NONE;
             }
         }
     }

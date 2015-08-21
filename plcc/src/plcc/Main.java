@@ -5438,6 +5438,7 @@ public class Main {
                 s.addResidue(r);
                 s.setSeqSseNumDssp(dsspSSElist.size() + ligSSECount);
                 s.setSseType(SSE.SSECLASS_STRING_LIGAND);
+                s.setChain(r.getChain());
 
                 // set Residue properties
                 r.setSSE(s);
@@ -6019,14 +6020,15 @@ public class Main {
             List<SSE> chainLigSSEs =  createAllLigandSSEsFromResidueList(c.getResidues(), chainDsspSSEs);
             oneChainSSEs = mergeSSEs(oneChainSSEs, chainLigSSEs);
 
+            /*
             if(! silent) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("    SSEs: ");
                 for(Integer j = 0; j < oneChainSSEs.size(); j++) {
                     sb.append(oneChainSSEs.get(j).getSseType());
                 }
-                //System.out.println(sb.toString());
             }
+            */
 
             // SSEs have been calculated, now assign the PTGL labels and sequential numbers on the chain
             for(Integer j = 0; j < oneChainSSEs.size(); j++) {
@@ -6037,8 +6039,12 @@ public class Main {
 
             // Filter SSEs.
             filteredChainSSEs = filterAllSSEsButList(oneChainSSEs, keepSSEs);
-            if(chainEnd.size()>0) chainEnd.add(chainEnd.get(chainEnd.size() - 1) + filteredChainSSEs.size());
-            else chainEnd.add(filteredChainSSEs.size());
+            if(chainEnd.size()>0) {
+                chainEnd.add(chainEnd.get(chainEnd.size() - 1) + filteredChainSSEs.size());
+            }
+            else {
+                chainEnd.add(filteredChainSSEs.size());
+            }
             allChainSSEs.addAll(filteredChainSSEs);
             chainSSEMap.put(c.getPdbChainID(), oneChainSSEs);
         }
@@ -6224,7 +6230,7 @@ public class Main {
                     // We don't have an edge yet, but need one, so create an edge
                     ComplexGraph.Edge e1 = compGraph.createEdge(chainA, chainB);
                     compGraph.chainNamesInEdge.put(e1, chainPair);
-                    compGraph.numAllInteractionsMap.put(e1, 1);
+                    compGraph.numAllInteractionsMap.put(e1, 1); // rather weird: 1 is added here, therefore the first contact is skipped later. We will have to change this and sum up the others in the end, (which of them depending on the graph type)
                     compGraph.numHelixHelixInteractionsMap.put(e1, 0);
                     compGraph.numHelixStrandInteractionsMap.put(e1, 0);
                     compGraph.numHelixCoilInteractionsMap.put(e1, 0);
@@ -6617,7 +6623,7 @@ public class Main {
             cg.addFullBackboneContacts();            
         }
 
-        System.out.println("    ----- Done with " + graphType + " CG. -----");
+        System.out.println("    ----- Done creating SSE-level " + graphType + " CG. -----");
         cg.setInfo(pdbid, "ALL", "complex_" + graphType);
         cg.addMetadata(md);
         cg.setComplexData(chainEnd, allChains);
@@ -6633,7 +6639,7 @@ public class Main {
         }        
         
         fileNameSSELevelWithoutExtension = pdbid + "_complex_sses_" + graphType + coils + "_CG";
-        fileNameChainLevelWithoutExtension = pdbid + "_complex_chains_" + graphType + coils + "_CG";
+        fileNameChainLevelWithoutExtension = pdbid + "_complex_chains"  + coils + "_CG";    // the chain-level graph always uses the full contact data, no need to differentiate by graphType (could be implemented of course)
         fileNameSSELevelWithExtension = fileNameSSELevelWithoutExtension + Settings.get("plcc_S_img_output_fileext");
         fileNameChainLevelWithExtension = fileNameChainLevelWithoutExtension + Settings.get("plcc_S_img_output_fileext");
 
@@ -6770,7 +6776,76 @@ public class Main {
             if(! silent) {
                 System.out.println("    Image output disabled, not drawing complex graphs.");
             }
-        }              
+        } 
+        
+        if(Settings.getBoolean("plcc_B_draw_graphs") && Settings.getBoolean("plcc_B_draw_ligandcomplexgraphs") && graphType.equals(SSEGraph.GRAPHTYPE_ALBELIG)) {
+            if(! silent) {
+                System.out.println("    Drawing ligand-centered complex graphs...");
+            }
+            
+            
+            
+            // Determine all ligands of all chains
+            List<SSE> ligandsAllChains = new ArrayList<>();            
+            for(SSE s : allChainSSEs) {
+                if( s.isLigandSSE()) {
+                    ligandsAllChains.add(s);
+                }
+            }
+            
+            if(! silent) {
+                System.out.println("     Found " + ligandsAllChains.size() + " ligand SSEs total.");
+            }
+            
+            String ligimgFileNoExt, ligName;
+            for(SSE ligandSSE : ligandsAllChains) {
+                // OK, now we handle the ligands
+                Chain lc = ligandSSE.getChain();
+                String ligChainName = ligandSSE.getChain().getPdbChainID();
+                Integer ligRes = ligandSSE.getStartResidue().getPdbResNum();
+                String lign3 = ligandSSE.getTrimmedLigandName3();
+                ligName = ligChainName + "-" + ligRes + "-" + lign3;  // something like "A-234-ICT", meaning isocitric acid, PDB residue 234 of chain A
+                
+                // determine all chains the ligand has contacts with (based on the SSEs it has contacts with):
+                Integer ligIndex = cg.getSSEIndex(ligandSSE);
+                List<String> ligContactChains = new ArrayList<>();
+                if(ligIndex < 0) {
+                    DP.getInstance().e("Main", "Could not get index of ligand SSE '" + ligName + "' from complex graph for ligand-centered graph computation, skipping CLG.");
+                    continue;
+                }
+                List<Integer> contactSSEIndices = cg.neighborsOf(ligIndex);
+                
+                for(Integer sseIndex : contactSSEIndices) {
+                    String contactChainName = cg.getChainNameOfSSE(sseIndex);                    
+                    if( ! ligContactChains.contains(contactChainName)) { ligContactChains.add(contactChainName); }
+                }
+                
+                // TODO: now we need to restrict the following graphs so that they only consider the chains we determined
+                if(! silent) {
+                    List<String> contactSSENames = new ArrayList<>();
+                    for(Integer sseIndex : contactSSEIndices) {
+                        contactSSENames.add(cg.getChainNameOfSSE(sseIndex) + "-" + cg.getVertex(sseIndex).getSSESeqChainNum() + "-" +  cg.getVertex(sseIndex).getSSEClass());    // something like "A-1-H", meaning the first SSE of chain A, a helix
+                    }
+                    System.out.println("     *Ligand '" + ligName + "' is in contact with the following " + contactSSENames.size() + " SSEs: '" + IO.stringListToString(contactSSENames) + "'.");
+                    System.out.println("      Ligand '" + ligName + "' is in contact with the following " + ligContactChains.size() + " chains: '" + IO.stringListToString(ligContactChains) + "'.");
+                }
+                
+                String ligfileNameSSELevelWithoutExtension = pdbid + "_ligand_complex_sses_" + ligName + "_" + graphType + coils + "_LCG";
+                ligimgFileNoExt = filePathImg + fs + ligfileNameSSELevelWithoutExtension;
+
+                IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG, DrawTools.IMAGEFORMAT.PDF };
+                ProteinGraphDrawer.drawProteinGraph(ligimgFileNoExt, false, formats, cg, new HashMap<Integer, String>());
+                if(! silent) {
+                    System.out.println("      Image of ligand-centered complex graph for ligand '" + ligName + "' written to base file '" + imgFileNoExt + "'.");
+                }                        
+            }
+        }
+            
+        else {
+            if(! silent) {
+                System.out.println("    Not drawing ligand-centered complex graphs (" + graphType + ").");
+            }
+        }
         
         // database
         if(Settings.getBoolean("plcc_B_useDB")) {
