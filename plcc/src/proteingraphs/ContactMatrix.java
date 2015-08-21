@@ -863,7 +863,6 @@ public class ContactMatrix {
 
                         }
                         else {
-                            // This is essential to prevent calculations for residues which are not part of this SSE pair
                             continue;                              
                         }
 
@@ -896,36 +895,36 @@ public class ContactMatrix {
                     }
                     
                     // just a sanity test...
-                    if(Objects.equals(largestAntip, smallestParallel)) {
-                        DP.getInstance().w("Double difference calculation borders are equal, should differ.");
-                    }
+                    //if(Objects.equals(largestAntip, smallestParallel)) {
+                    //    DP.getInstance().w("Double difference calculation borders are equal, should differ.");
+                    //}
                     // ... and another one
-                    if(largestAntip > smallestParallel) {
-                        DP.getInstance().w("Double difference calculation borders are inverted: anti-parallel value should be larger than parallel value but it is vice versa.");
-                    }
+                    //if(largestAntip > smallestParallel) {
+                    //    DP.getInstance().w("Double difference calculation borders are inverted: anti-parallel value should be larger than parallel value but it is vice versa.");
+                    //}
                     
                     
                     if(doubleDifference <= largestAntip) {
                         spatialSSE[i][j] = SpatRel.ANTIPARALLEL;
                         spatialSSE[j][i] = SpatRel.ANTIPARALLEL;
-                        if(Settings.getInteger("plcc_I_debug_level") > 0) {
-                            System.out.println("    SSEs " + i + " and " + j + " are antiparallel (DD=" + doubleDifference + ")." + sseA + ", " + sseB);
-                        }
+                        //if(Settings.getInteger("plcc_I_debug_level") > 0) {
+                        //    System.out.println("    SSEs " + i + " and " + j + " are antiparallel (DD=" + doubleDifference + ")." + sseA + ", " + sseB);
+                        //}
                     }
                     else if(doubleDifference >= smallestParallel) {
                         spatialSSE[i][j] = SpatRel.PARALLEL;
                         spatialSSE[j][i] = SpatRel.PARALLEL;
-                        if(Settings.getInteger("plcc_I_debug_level") > 0) {
-                            System.out.println("    SSEs " + i + " and " + j + " are parallel (DD=" + doubleDifference + ")." + sseA + ", " + sseB);
-                        }
+                        //if(Settings.getInteger("plcc_I_debug_level") > 0) {
+                        //    System.out.println("    SSEs " + i + " and " + j + " are parallel (DD=" + doubleDifference + ")." + sseA + ", " + sseB);
+                        //}
                     }
                     else {
                         // DD = 0
                         spatialSSE[i][j] = SpatRel.MIXED;
                         spatialSSE[j][i] = SpatRel.MIXED;
-                        if(Settings.getInteger("plcc_I_debug_level") > 0) {
-                            System.out.println("    SSEs " + i + " and " + j + " are mixed (DD=" + doubleDifference + ")." + sseA + ", " + sseB);
-                        }
+                        //if(Settings.getInteger("plcc_I_debug_level") > 0) {
+                        //    System.out.println("    SSEs " + i + " and " + j + " are mixed (DD=" + doubleDifference + ")." + sseA + ", " + sseB);
+                        //}
                     }
                     
                     // ----- end of DD interpretations -----

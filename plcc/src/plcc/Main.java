@@ -2826,7 +2826,7 @@ public class Main {
             calculateComplexGraph(allChains, resList, resContacts, pdbid, outputDir, SSEGraph.GRAPHTYPE_ALBELIG);
             
             // test: also calculate ALBE CG
-            calculateComplexGraph(allChains, resList, resContacts, pdbid, outputDir, SSEGraph.GRAPHTYPE_ALBE);
+            //calculateComplexGraph(allChains, resList, resContacts, pdbid, outputDir, SSEGraph.GRAPHTYPE_ALBE);
         }
         
         
@@ -6623,7 +6623,7 @@ public class Main {
             cg.addFullBackboneContacts();            
         }
 
-        System.out.println("    ----- Done creating SSE-level " + graphType + " CG. -----");
+        //System.out.println("    Done creating SSE-level " + graphType + " CG.");
         cg.setInfo(pdbid, "ALL", "complex_" + graphType);
         cg.addMetadata(md);
         cg.setComplexData(chainEnd, allChains);
@@ -6848,7 +6848,13 @@ public class Main {
                 ligimgFileNoExt = filePathImg + fs + ligfileNameSSELevelWithoutExtension;
 
                 IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG, DrawTools.IMAGEFORMAT.PDF };
-                ProteinGraphDrawer.drawProteinGraph(ligimgFileNoExt, false, formats, cg, new HashMap<Integer, String>(), ignoreChains);
+                Map<Integer, String> sseDrawLabels = new HashMap<Integer, String>();
+                sseDrawLabels.put(ligIndex, lign3 + "-" + ligRes);
+                
+                // change graph info, this is so that the label on the image gets set properly
+                cg.setInfo(pdbid, "ALL", "ligand_complex_" + lign3 + "-" + ligRes);
+                
+                ProteinGraphDrawer.drawProteinGraph(ligimgFileNoExt, false, formats, cg, sseDrawLabels, ignoreChains); // draw ligand-based complex graph
                 if(! silent) {
                     System.out.println("      Image of ligand-centered complex graph for ligand '" + ligName + "' written to base file '" + imgFileNoExt + "'.");
                 }                        

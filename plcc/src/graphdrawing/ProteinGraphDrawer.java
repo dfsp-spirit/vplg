@@ -1485,9 +1485,20 @@ public class ProteinGraphDrawer {
      * @return the DrawResult. You can write this to a file or whatever.
      */
     private static DrawResult drawProteinGraphG2D(Boolean nonProteinGraph, ProtGraph pg, Map<Integer, String> vertexMarkings, List<String> ignoreChains) {
+        
+        // generate a list of ignored SSEs from the list of ignored chains
+        List<Integer> ignoredSSEIndices = new ArrayList<>();
+        for(int i = 0; i < pg.getSize(); i++) {
+            SSE s = pg.getVertex(i);
+            if(ignoreChains.contains(pg.getChainNameOfSSE(i))) {
+                ignoredSSEIndices.add(i);
+            }
+        }
+        int numDrawnVertices = pg.getSize() - ignoredSSEIndices.size();
+                
         Integer numVerts = pg.numVertices();
         Boolean bw = nonProteinGraph;
-        PageLayout pl = new PageLayout(numVerts);
+        PageLayout pl = new PageLayout(numDrawnVertices);
         Position2D vertStart = pl.getVertStart();
         SVGGraphics2D ig2;
         DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
@@ -1501,7 +1512,7 @@ public class ProteinGraphDrawer {
         Font font = pl.getStandardFont();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();        
-        String proteinHeader = "The " + pg.getGraphType() + " " + (pg.isComplexGraph() ? "complex" : "protein") + " graph of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + " [V=" + pg.numVertices() + ", E=" + pg.numSSEContacts() + "].";
+        String proteinHeader = "The " + pg.getGraphType() + " protein graph of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + " [V=" + pg.numVertices() + ", E=" + pg.numSSEContacts() + "].";
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
         String sseNumberGraph;
@@ -1539,18 +1550,9 @@ public class ProteinGraphDrawer {
         Color C_INTERCHAIN_BACKBONE = PlccUtilities.mutateColor(C_BACKBONE, 50, 50, 50); // does not really make sense (backbone interchain)
         Color C_INTERCHAIN_OTHER = PlccUtilities.mutateColor(C_OTHER, 50, 50, 50);
         
-        // generate a list of ignored SSEs from the list of ignored chains
-        List<SSE> ignoredSSEs = new ArrayList<>();
-        List<Integer> ignoredSSEIndices = new ArrayList<>();
-        for(int i = 0; i < pg.getSize(); i++) {
-            SSE s = pg.getVertex(i);
-            if(ignoreChains.contains(pg.getChainNameOfSSE(i))) {
-                ignoredSSEs.add(s);
-                ignoredSSEIndices.add(i);
-            }
-        }
         
-        DP.getInstance().i("ProteinGraphDrawer", "Ignoring " + ignoreChains.size() + " chains (" + ignoredSSEIndices.size() + " of " + pg.getSize() + " SSEs).");
+        
+        //DP.getInstance().i("ProteinGraphDrawer", "Ignoring " + ignoreChains.size() + " chains (" + ignoredSSEIndices.size() + " of " + pg.getSize() + " SSEs).");
         
         // Compute the draw position array. This defines the position of each vertex (given by index in the graph) in the drawing order (the drawing order may be  shifted to the left due to ignored vertices, so that SSE n is drawn at a position < n).
         int[] drawPos = new int[pg.getSize()];
@@ -1566,7 +1568,7 @@ public class ProteinGraphDrawer {
             }
         }
         
-        DP.getInstance().i("ProteinGraphDrawer", "The drawPos array is: '" + IO.intArrayToString(drawPos) + "'.");
+        //DP.getInstance().i("ProteinGraphDrawer", "The drawPos array is: '" + IO.intArrayToString(drawPos) + "'.");
         
         float[] dashPattern = { 10, 20, 10, 20 }; // dash pattern for dashed lines: alternating lengths of transparent (even index) and opaque (uneven index) line segement lengths to draw
         
@@ -1647,8 +1649,8 @@ public class ProteinGraphDrawer {
                         leftVert = j;
                         rightVert = i;
                     }
-                    leftVertPosX = pl.getVertStart().x + (leftVert * pl.vertDist);
-                    rightVertPosX = pl.getVertStart().x + (rightVert * pl.vertDist);
+                    leftVertPosX = pl.getVertStart().x + (drawPos[leftVert] * pl.vertDist);
+                    rightVertPosX = pl.getVertStart().x + (drawPos[rightVert] * pl.vertDist);
                     arcWidth = rightVertPosX - leftVertPosX;
                     arcHeight = arcWidth / 2;
                     arcTopLeftX = leftVertPosX;
@@ -1693,11 +1695,11 @@ public class ProteinGraphDrawer {
             int markingOffsetY = 25;
             
             if (pg.getVertex(i).isBetaStrand()) {
-                rect = new Rectangle2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());                                
+                rect = new Rectangle2D.Double(vertStart.x + (drawPos[i] * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());                                
                 ig2.fill(rect);
                 if(vMarking != null) {
                     //System.out.println("#####Found marking for strand vertex " + i + ".");
-                    markingRect = new Rectangle2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter() + (0 * markingWidth), pl.getVertDiameter() + (0 * markingWidth));
+                    markingRect = new Rectangle2D.Double(vertStart.x + (drawPos[i] * pl.vertDist), vertStart.y, pl.getVertDiameter() + (0 * markingWidth), pl.getVertDiameter() + (0 * markingWidth));
                     ig2.setColor(markingBorderColor);
                     ig2.setStroke(new BasicStroke(markingWidth));
                     ig2.draw(markingRect);
@@ -1707,13 +1709,13 @@ public class ProteinGraphDrawer {
             } else if (pg.getVertex(i).isLigandSSE()) {
                 int outerStrokeWidth = 4;
                 int halfouterStrokeWidth = outerStrokeWidth / 2;
-                circle = new Ellipse2D.Double(vertStart.x + (i * pl.vertDist) + halfouterStrokeWidth, vertStart.y + halfouterStrokeWidth, pl.getVertDiameter() - outerStrokeWidth, pl.getVertDiameter() - outerStrokeWidth);
+                circle = new Ellipse2D.Double(vertStart.x + (drawPos[i] * pl.vertDist) + halfouterStrokeWidth, vertStart.y + halfouterStrokeWidth, pl.getVertDiameter() - outerStrokeWidth, pl.getVertDiameter() - outerStrokeWidth);
                 ig2.setStroke(new BasicStroke(outerStrokeWidth));
                 ig2.draw(circle);
                 ig2.setStroke(new BasicStroke(2));
                 if(vMarking != null) {
                     //System.out.println("#####Found marking for ligand vertex " + i + ".");
-                    markingCircle = new Ellipse2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter() + (0 * markingWidth), pl.getVertDiameter() + (0 * markingWidth));
+                    markingCircle = new Ellipse2D.Double(vertStart.x + (drawPos[i] * pl.vertDist), vertStart.y, pl.getVertDiameter() + (0 * markingWidth), pl.getVertDiameter() + (0 * markingWidth));
                     ig2.setColor(markingBorderColor);
                     ig2.setStroke(new BasicStroke(markingWidth));
                     ig2.draw(markingCircle);
@@ -1721,11 +1723,11 @@ public class ProteinGraphDrawer {
                     ig2.drawString(vMarking, new Double(markingCircle.getMinX()).intValue() + (pl.vertRadius / 2), new Double(markingCircle.getCenterY()).intValue() + markingOffsetY);
                 }
             } else {
-                circle = new Ellipse2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
+                circle = new Ellipse2D.Double(vertStart.x + (drawPos[i] * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
                 ig2.fill(circle);
                 if(vMarking != null) {
                     //System.out.println("#####Found marking for other vertex " + i + ".");
-                    markingCircle = new Ellipse2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter() + (0 * markingWidth), pl.getVertDiameter() + (0 * markingWidth));
+                    markingCircle = new Ellipse2D.Double(vertStart.x + (drawPos[i] * pl.vertDist), vertStart.y, pl.getVertDiameter() + (0 * markingWidth), pl.getVertDiameter() + (0 * markingWidth));
                     ig2.setColor(markingBorderColor);
                     ig2.setStroke(new BasicStroke(markingWidth));
                     ig2.draw(markingCircle);
@@ -1737,9 +1739,9 @@ public class ProteinGraphDrawer {
         ig2.setStroke(new BasicStroke(2));
         ig2.setPaint(Color.BLACK);
         if (!bw) {
-            if (pg.getSize() > 0) {
+            if (pg.getSize() > 0 && (! pg.isComplexGraph())) {
                 ig2.drawString("N", vertStart.x - pl.vertDist, vertStart.y + 20);
-                ig2.drawString("C", vertStart.x + pg.getSize() * pl.vertDist, vertStart.y + 20);
+                ig2.drawString("C", vertStart.x + numDrawnVertices * pl.vertDist, vertStart.y + 20);
             }
         }
         if (Settings.getBoolean("plcc_B_graphimg_footer")) {
@@ -1763,19 +1765,21 @@ public class ProteinGraphDrawer {
             iChainID = -1;
             for (Integer i = 0; i < pg.getSize(); i++) {
                 if ((i + 1) % printNth == 0) {
-                    sseNumberGraph = "" + (i + 1);
+                    sseNumberGraph = "" + (drawPos[i] + 1);
                     sseNumberSeq = "" + (pg.getVertex(i).getSSESeqChainNum());
                     stringHeight = fontMetrics.getAscent();
-                    ig2.drawString(sseNumberGraph, pl.getFooterStart().x + (i * pl.vertDist) + (pl.vertRadius / 2), pl.getFooterStart().y + (stringHeight / 4));
-                    ig2.drawString(sseNumberSeq, pl.getFooterStart().x + (i * pl.vertDist) + (pl.vertRadius / 2), pl.getFooterStart().y + lineHeight + (stringHeight / 4));
+                    if(drawPos[i] >= 0){
+                        ig2.drawString(sseNumberGraph, pl.getFooterStart().x + (drawPos[i] * pl.vertDist) + (pl.vertRadius / 2), pl.getFooterStart().y + (stringHeight / 4));
+                        ig2.drawString(sseNumberSeq, pl.getFooterStart().x + (drawPos[i] * pl.vertDist) + (pl.vertRadius / 2), pl.getFooterStart().y + lineHeight + (stringHeight / 4));
+                    }
                     for (Integer x = 0; x < pg.getChainEnds().size(); x++) {
                         if (i < pg.getChainEnds().get(x)) {
                             iChainID = x;
                             break;
                         }
                     }
-                    if (iChainID != -1) {
-                        ig2.drawString(pg.getAllChains().get(iChainID).getPdbChainID(), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 2) + (stringHeight / 4));
+                    if (iChainID != -1 && drawPos[i] >= 0) {
+                        ig2.drawString(pg.getAllChains().get(iChainID).getPdbChainID(), pl.getFooterStart().x + (drawPos[i] * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 2) + (stringHeight / 4));
                     }
                     
                     // DEBUG: draw residue number
