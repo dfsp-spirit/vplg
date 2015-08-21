@@ -46,6 +46,7 @@ import proteingraphs.ProtGraph;
 import proteingraphs.SSEGraph;
 import plcc.Settings;
 import proteingraphs.SpatRel;
+import proteinstructure.Chain;
 import tools.DP;
 import tools.PlccUtilities;
 
@@ -1537,6 +1538,35 @@ public class ProteinGraphDrawer {
         Color C_INTERCHAIN_LIGAND = PlccUtilities.mutateColor(C_LIGAND, 50, 50, 50);
         Color C_INTERCHAIN_BACKBONE = PlccUtilities.mutateColor(C_BACKBONE, 50, 50, 50); // does not really make sense (backbone interchain)
         Color C_INTERCHAIN_OTHER = PlccUtilities.mutateColor(C_OTHER, 50, 50, 50);
+        
+        // generate a list of ignored SSEs from the list of ignored chains
+        List<SSE> ignoredSSEs = new ArrayList<>();
+        List<Integer> ignoredSSEIndices = new ArrayList<>();
+        for(int i = 0; i < pg.getSize(); i++) {
+            SSE s = pg.getVertex(i);
+            if(ignoreChains.contains(pg.getChainNameOfSSE(i))) {
+                ignoredSSEs.add(s);
+                ignoredSSEIndices.add(i);
+            }
+        }
+        
+        DP.getInstance().i("ProteinGraphDrawer", "Ignoring " + ignoreChains.size() + " chains (" + ignoredSSEIndices.size() + " of " + pg.getSize() + " SSEs).");
+        
+        // Compute the draw position array. This defines the position of each vertex (given by index in the graph) in the drawing order (the drawing order may be  shifted to the left due to ignored vertices, so that SSE n is drawn at a position < n).
+        int[] drawPos = new int[pg.getSize()];
+        int shiftLeft = 0;
+        final int DP_NONE = -1;
+        for(int i = 0; i < pg.getSize(); i++) {
+            if(ignoredSSEIndices.contains(i)) {
+                drawPos[i] = DP_NONE;
+                shiftLeft++;
+            }
+            else {                
+                drawPos[i] = (i - shiftLeft);
+            }
+        }
+        
+        DP.getInstance().i("ProteinGraphDrawer", "The drawPos array is: '" + IO.intArrayToString(drawPos) + "'.");
         
         float[] dashPattern = { 10, 20, 10, 20 }; // dash pattern for dashed lines: alternating lengths of transparent (even index) and opaque (uneven index) line segement lengths to draw
         
