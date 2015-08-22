@@ -6675,7 +6675,7 @@ public class Main {
         File gmlFileChainLevel = null;
         String gmlFileNameChainLevel = null;
         try {
-            gmlFileChainLevel = new File(filePathGraphs + fs + pdbid + "_complex_chains_ " + graphType + "_CG.gml");
+            gmlFileChainLevel = new File(filePathGraphs + fs + pdbid + "_complex_chains_" + graphType + "_CG.gml");
             gmlFileChainLevel.createNewFile();
             if(compGraph.writeToFileGML(gmlFileChainLevel)) {
                 if(! silent) {
@@ -6839,10 +6839,12 @@ public class Main {
                     System.out.println("     *Ligand '" + ligName + "' is in contact with the following " + contactSSENames.size() + " SSEs: '" + IO.stringListToString(contactSSENames) + "'.");
                     System.out.println("      Ligand '" + ligName + "' is in contact with the following " + ligContactChains.size() + " chains: '" + IO.stringListToString(ligContactChains) + "'.");
                     System.out.println("      Ligand '" + ligName + "' LCG ignores the following " + ignoreChains.size() + " chains: '" + IO.stringListToString(ignoreChains) + "'.");
-                }
-                
-                
-                
+                    
+                    if(ligContactChains.size() < 2) {
+                        System.out.println("      Ligand '" + ligName + "' only has contacts to a single chain, skipping its ligand-centered complex graph (just use the normal albelig graph).");
+                        continue;
+                    }
+                }                                                
                 
                 String ligfileNameSSELevelWithoutExtension = pdbid + "_ligand_complex_sses_" + ligName + "_" + graphType + coils + "_LCG";
                 ligimgFileNoExt = filePathImg + fs + ligfileNameSSELevelWithoutExtension;

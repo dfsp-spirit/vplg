@@ -17,6 +17,8 @@ import java.net.*;
 import java.util.List;
 import org.jgrapht.*;
 import io.DBManager;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import plcc.Settings;
 //import org.jgrapht.graph.*;
@@ -744,6 +746,8 @@ public class ContactMatrix {
     /**
      * Calculates the spatial relations between all SSEs and writes them to the matrix spatialSSE[][].
      * 
+     * Note that this function has a massive impact on performance for large proteins (especially for complex graphs, where it gets really slow).
+     * 
      * @param contList a list of residue level contacts that are used to determine SSE contacts
      * @param computeAll whether the spatial relation of SSE pairs which have too few residue level contacts 
      *        to be counted as an SSE contact (according to the definitions of this program) should also be computed.
@@ -753,11 +757,33 @@ public class ContactMatrix {
      */
     public void calculateSSESpatialRelationMatrix(List<ResContactInfo> contList, Boolean computeAll) {
 
+        // Turn list into map to speed up stuff afterwards. The map has as key the residue unique string, and as value a list of all contacts of that residue. This is done only once,
+        //   and saves us from sequentially iterating through the contact list to find the ones for the current residue (|R|^2) times later.
+        Map<Integer, List<ResContactInfo>> rcMap = new HashMap<>();
+        Integer resASSEPos, resBSSEPos;
+        for(ResContactInfo rci : contList) {
+            resASSEPos = getSSEPosOfDsspResidue(rci.getResA().getDsspResNum());
+            resBSSEPos = getSSEPosOfDsspResidue(rci.getResB().getDsspResNum());
+            
+            // init lists if required
+            if( ! rcMap.containsKey(resASSEPos)) {
+                rcMap.put(resASSEPos, new ArrayList<ResContactInfo>());
+            }
+            if( ! rcMap.containsKey(resBSSEPos)) {
+                rcMap.put(resBSSEPos, new ArrayList<ResContactInfo>());
+            }
+            
+            // add data
+            rcMap.get(resASSEPos).add(rci);
+            rcMap.get(resBSSEPos).add(rci);
+        }
+        
+        
         SSE sseA, sseB;
         Residue resA, resB;
         sseA = sseB = null;
         resA = resB = null;
-        Integer sumMax, sumMin, difMax, difMin, tmp, resASSEPos, resBSSEPos;
+        Integer sumMax, sumMin, difMax, difMin, tmp;
         sumMax = difMax = tmp = Integer.MIN_VALUE;               // something small...
         sumMin = difMin = Integer.MAX_VALUE;               // & something laaarge :)
         
@@ -812,10 +838,16 @@ public class ContactMatrix {
                     }
 
                     // Compute the doubleDistance over all contact pairs of sseA and sseB
-                    for(Integer k = 0; k < contList.size(); k++) {
+                    List<ResContactInfo> contListAB = new ArrayList<>();
+                    if(rcMap.containsKey(i)) { contListAB.addAll(rcMap.get(i)); }
+                    if(rcMap.containsKey(j)) { contListAB.addAll(rcMap.get(j)); }
+                    
+                    List<ResContactInfo> usedContList = contListAB;
+                    
+                    for(Integer k = 0; k < usedContList.size(); k++) {
 
-                        resA = contList.get(k).getResA();
-                        resB = contList.get(k).getResB();                                                       
+                        resA = usedContList.get(k).getResA();
+                        resB = usedContList.get(k).getResB();                                                       
 
                         // Get the SSEs
                         resASSEPos = getSSEPosOfDsspResidue(resA.getDsspResNum());
@@ -831,7 +863,7 @@ public class ContactMatrix {
                         if((resASSEPos.equals(i) && resBSSEPos.equals(j)) || (resASSEPos.equals(j) && resBSSEPos.equals(i))) {
 
                             // check for new sumMax
-                            tmp = contList.get(k).getDsspResNumResA() + contList.get(k).getDsspResNumResB();
+                            tmp = usedContList.get(k).getDsspResNumResA() + usedContList.get(k).getDsspResNumResB();
                             if(tmp > sumMax) {
                                 sumMax = tmp;
                             }
@@ -842,7 +874,7 @@ public class ContactMatrix {
                             }
 
                             // check for new difMax
-                            tmp = Math.abs(contList.get(k).getDsspResNumResA() - contList.get(k).getDsspResNumResB());
+                            tmp = Math.abs(usedContList.get(k).getDsspResNumResA() - usedContList.get(k).getDsspResNumResB());
                             
                             // The following code is wrong! We now take the absolute value (see above) instead of the smaller one!
                             // (a - b) != (b - a), therefore always consider the smaller of these two results

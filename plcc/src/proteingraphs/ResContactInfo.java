@@ -128,8 +128,13 @@ public class ResContactInfo {
     }
 
 
-    // getters for overview
+    /** Returns a string indicating whether residue A is a protein residue ("PRT"), a ligand ("LIG"), or something else ("OTH").
+     * @return  a string indicating whether residue B is a protein residue ("PRT"), a ligand ("LIG"), or something else ("OTH").  
+     */
     public String getResTypeStringA() {  if(this.resA.isAA()) { return("PRT"); } else if(this.resA.isLigand()) { return("LIG"); } else { return("OTH"); } }
+    /** Returns a string indicating whether residue B is a protein residue ("PRT"), a ligand ("LIG"), or something else ("OTH").
+     * @return  a string indicating whether residue B is a protein residue ("PRT"), a ligand ("LIG"), or something else ("OTH").
+     */
     public String getResTypeStringB() {  if(this.resB.isAA()) { return("PRT"); } else if(this.resB.isLigand()) { return("LIG"); } else { return("OTH"); } }
 
 
