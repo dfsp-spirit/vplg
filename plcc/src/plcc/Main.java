@@ -6836,12 +6836,16 @@ public class Main {
                     for(Integer sseIndex : contactSSEIndices) {
                         contactSSENames.add(cg.getChainNameOfSSE(sseIndex) + "-" + cg.getVertex(sseIndex).getSSESeqChainNum() + "-" +  cg.getVertex(sseIndex).getSSEClass());    // something like "A-1-H", meaning the first SSE of chain A, a helix
                     }
-                    System.out.println("     *Ligand '" + ligName + "' is in contact with the following " + contactSSENames.size() + " SSEs: '" + IO.stringListToString(contactSSENames) + "'.");
-                    System.out.println("      Ligand '" + ligName + "' is in contact with the following " + ligContactChains.size() + " chains: '" + IO.stringListToString(ligContactChains) + "'.");
-                    System.out.println("      Ligand '" + ligName + "' LCG ignores the following " + ignoreChains.size() + " chains: '" + IO.stringListToString(ignoreChains) + "'.");
+                    if(! silent) {
+                        System.out.println("     *Ligand '" + ligName + "' is in contact with the following " + contactSSENames.size() + " SSEs: '" + IO.stringListToString(contactSSENames) + "'.");
+                        System.out.println("      Ligand '" + ligName + "' is in contact with the following " + ligContactChains.size() + " chains: '" + IO.stringListToString(ligContactChains) + "'.");
+                        System.out.println("      Ligand '" + ligName + "' LCG ignores the following " + ignoreChains.size() + " chains: '" + IO.stringListToString(ignoreChains) + "'.");
+                    }
                     
                     if(ligContactChains.size() < 2) {
-                        System.out.println("      Ligand '" + ligName + "' only has contacts to a single chain, skipping its ligand-centered complex graph (just use the normal albelig graph).");
+                        if(! silent) {
+                            System.out.println("      Ligand '" + ligName + "' only has contacts to a single chain, skipping its ligand-centered complex graph (just use the normal albelig graph).");
+                        }
                         continue;
                     }
                 }                                                
