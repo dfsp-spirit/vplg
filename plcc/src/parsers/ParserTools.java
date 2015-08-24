@@ -17,8 +17,8 @@ public class ParserTools {
 
     /**
      * Parses key-value lines in format "<key> <value>", where <value> may be enclosed in "".
-     * @param s
-     * @return
+     * @param s the input string
+     * @return string array of length 2, at position 0 is the key, at 1 is the value
      */
     public static String[] getKeyValue(String s) {
         s = s.trim();

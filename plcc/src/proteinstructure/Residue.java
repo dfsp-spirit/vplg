@@ -657,7 +657,7 @@ public class Residue implements java.io.Serializable {
     
     /**
      * Returns the PTGL internal ID for this residue type (AA-type based).
-     * @return 
+     * @return the PTGL internal ID for this residue type
      */
     public Integer getInternalAAID() { return(AminoAcid.name3ToID(resName3)); }
     

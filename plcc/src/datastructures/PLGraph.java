@@ -208,7 +208,7 @@ public class PLGraph<V>  {
      * Returns the graph in XGMML, an XML graph format based on GML.
      * See http://cgi7.cs.rpi.edu/research/groups/pb/punin/public_html/XGMML/ for general info on XGMML, and 
      * see http://cgi7.cs.rpi.edu/research/groups/pb/punin/public_html/XGMML/XGMML_EXP/example1.gr for an example graph.
-     * @return 
+     * @return the graph in XGMML format
      */
     public String toXMLFormat() {
         

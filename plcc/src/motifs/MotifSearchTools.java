@@ -82,7 +82,7 @@ public class MotifSearchTools {
     
     /**
      * Parses a PTGL linear notation ADJ or RED string, and returns an array of the relative distances (in the order they appear in the string).
-     * @param linnotString, like '{3ph,1ph,-2ph}'
+     * @param linnotString the linnot string, like '{3ph,1ph,-2ph}'
      * @return an array of the numbers in the string, like {3, 1, -2}. Or null if the input string is empty or null.
      */
     public static Integer[] getRelativeDistancesArrayFromPTGLRedAdjString(String linnotString) {

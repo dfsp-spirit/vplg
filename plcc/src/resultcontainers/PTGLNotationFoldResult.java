@@ -41,8 +41,7 @@ public class PTGLNotationFoldResult {
     
     /**
      * Constructor. Does nothing but setting a name.
-     * @param foldNumber the sequential fold number (CC number)
-     * @param foldName the PTGL fold name. This is "A" for the first connected component of a PG, then "B", and so on.
+     * @param fg the folding graph
      */
     public PTGLNotationFoldResult(FoldingGraph fg) {
                 

@@ -4636,7 +4636,7 @@ public class Main {
     /**
      * Writes the model file.
      * @param modelsFile the output file path
-     * @param the PDB ID of the current protein
+     * @param pdbid the PDB ID of the current protein
      * @param modelIDs a list of String which represent the IDs of all models contained in the current PDB file
      */
     public static void writeModels(String modelsFile, String pdbid, ArrayList<String> modelIDs) {
@@ -5697,7 +5697,8 @@ public class Main {
      * file but consider our SSE modifications. Still, the plot shows more about DSSP than about plcc.
      * 
      * @param filePath the output path of the image without extension
-     * @param the Residues, in an ArrayList
+     * @param residues the Residues, in an ArrayList
+     * @param label the label
      * @return true if the file was written, false otherwise
      */
     public static Boolean drawRamachandranPlot(String filePath, ArrayList<Residue> residues, String label) {

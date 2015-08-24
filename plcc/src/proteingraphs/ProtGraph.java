@@ -86,10 +86,6 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
     /**
      * Determines all connected components of this graph and writes them into the connectedComponents ArrayList.
      * See Cormen et al. 2001, Introduction to Algorithms.
-     * @param includeADJandSEQvertices Whether we compute an ADJ or SEQ folding graph, and thus 
-     * need to include vertices which are NOT part of the connected component. If these vertices
-     * are added, the results are written to connectedComponentsADJSEQ (otherwise to connectedComponentsREDKEY). Technically,
-     * if you set this to true, the results are NOT the connected components of the parent graph anymore.
      */
     public void computeConnectedComponents() {
         

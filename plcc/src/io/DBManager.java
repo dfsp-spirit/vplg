@@ -1247,8 +1247,8 @@ public class DBManager {
 
     /**
      * Writes the whole SSE list to the database in a single batch statement, also writes the secondat table entries for all the SSEs.
-     * @param pdbid the PDB identifier
-     * @param chain the PDB chain name
+     * @param pdb_id the PDB identifier
+     * @param chain_name the PDB chain name
      * @param allChainSSEs a list of SSE objects. These will be added to the DB. The ssePositionInChain property is determined by the order of the array (starting with 1).
      * @return the insert count of the queries
      * @throws SQLException if something goes wrong with the DB
@@ -8346,7 +8346,7 @@ connection.close();
      * @param molName the molName record of the respective PDB header field
      * @param orgScientific the orgScientific record of the respective PDB header field
      * @param orgCommon the orgCommon record of the respective PDB header field
-     * @return
+     * @return whether an excpetion wwas thrown. unused, use the exception instead
      * @throws SQLException if the DB could not be reset or closed properly
      */
     public static Boolean writeChainToDB(String chain_name, String pdb_id, String molName, String orgScientific, String orgCommon) throws SQLException {
@@ -9993,7 +9993,7 @@ connection.close();
      * @param chainA
      * @param chainB
      * @param interactionNums
-     * @return
+     * @return whether it worked out, but use exception instead
      * @throws SQLException 
      */
     public static Boolean writeChainComplexContactToDB(String pdbid, String chainA, String chainB, Integer[] interactionNums) throws SQLException {
@@ -10693,7 +10693,7 @@ connection.close();
     
     /**
      * Retrieves the PDB ID and the PDB chain name from the DB. The chain is identified by its PK.
-     * @param pk the primary key of the chain in the db (e.g., from the graphs table)
+     * @param dbChainID the primary key of the chain in the db (e.g., from the graphs table)
      * @return an array of length 2 that contains the PDB ID at position 0 and the chain name at position 1. If no chain with the requested PK exists, the array has a length != 2.
      */
     public static String[] getPDBIDandChain(Integer dbChainID) {

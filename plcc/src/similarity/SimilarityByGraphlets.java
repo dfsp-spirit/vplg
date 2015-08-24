@@ -251,7 +251,7 @@ public class SimilarityByGraphlets {
      * @param chain_name the chain id
      * @param graph_type the graph type, e.g., "albe"
      * @param method choose one from the enum SimilarityByGraphlets.GraphletDeterminationMethod
-     * @return 
+     * @return the graphlet count vector
      */
     private static Integer[] getGraphletVectorForProteinGraph(String pdb_id, String chain_name, String graph_type, GraphletDeterminationMethod method) {
         

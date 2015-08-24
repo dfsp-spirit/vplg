@@ -31,9 +31,8 @@ public class ComparisonResult {
      * Constructor. Initializes this comparison result with the properties of the first graph. Use setTarget() to define
      * the second graph and setMethod() to set the comparison method and results.
      * 
-     * @param pdbidSource the PDB ID of the first graph
-     * @param chainNameSource the chain name of the first graph
-     * @param graphTypeSource  the graph type of the first graph
+     * @param similarityMethod the similarity method
+     * @param similarityScore the similarity score
      */
     public ComparisonResult(String similarityMethod, Integer similarityScore) {
         this.similarityMethod = similarityMethod;

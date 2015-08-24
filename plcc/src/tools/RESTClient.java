@@ -61,7 +61,7 @@ public class RESTClient {
 
     /**
      * Function to perform GET queries.
-     * @param resourcePath the path to the resource on the server (URL), relative to base URL
+     * @param uri the path to the resource on the server (URI), relative to base URL
      * @param resultMediaType the media type
      * @return the result string
      * @throws ClientProtocolException
@@ -93,7 +93,7 @@ public class RESTClient {
      * Untested, need adaptation to expected media types
      * @param postBody a map of parameters (key/value) for the query
      * @param resultMediaType
-     * @return 
+     * @return the result string
      * @throws java.io.IOException 
      */
     public String doRequestPOST(Map<String,Object> postBody, MediaType resultMediaType) throws IOException {                

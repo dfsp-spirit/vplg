@@ -65,7 +65,8 @@ public class JmolTools {
      * Generates the command to draw a circle around the given atom.
      * Example command: 'draw mycircle3 color green diameter 7.0 circle {4 4 4};'
      * @param refName the name to assign to the drawn object
-     * @param atomNum the atom number in the data file
+     * @param position the atom position in 3D
+     * @param diameter the diameter
      * @param color the color (try 'red' or 'green')
      * @return the Jmol command to draw the circle
      */

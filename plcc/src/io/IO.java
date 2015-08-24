@@ -182,7 +182,7 @@ public class IO {
     
     /**
      * Debug function to get a string representation of an array.
-     * @param ar the array
+     * @param in the array
      * @return the string
      */
     public static String integerArrayToString(Integer[] in) {
@@ -198,7 +198,7 @@ public class IO {
     
     /**
      * Debug function to get a string representation of an array.
-     * @param ar the array
+     * @param in the array
      * @return the string
      */
     public static String intArrayToString(int[] in) {
@@ -214,7 +214,7 @@ public class IO {
     
     /**
      * Debug function to get a string representation of an array.
-     * @param ar the array
+     * @param in the array
      * @return the string
      */
     public static String floatArrayToString(float[] in) {
@@ -231,7 +231,7 @@ public class IO {
     
     /**
      * Debug function to get a string representation of an array.
-     * @param ar the array
+     * @param in the array
      * @return the string
      */
     public static String stringArrayToString(String[] in) {
@@ -247,7 +247,7 @@ public class IO {
     
     /**
      * Debug function to get a string representation of an array.
-     * @param ar the array
+     * @param in the array
      * @return the string
      */
     public static String doubleArrayToString(Double[] in) {
@@ -264,7 +264,7 @@ public class IO {
     
     /**
      * Debug function to get a string representation of a HashMap.
-     * @param ar the HashMap
+     * @param map the HashMap
      * @return the string
      */
     public static String hashMapToString(HashMap<Integer, Integer> map) {
@@ -277,7 +277,7 @@ public class IO {
     
     /**
      * Debug function to get a string representation of a HashSet.
-     * @param ar the HashSet
+     * @param set the HashSet
      * @return the string
      */
     public static String hashSetToString(HashSet<Integer> set) {
@@ -392,7 +392,7 @@ public class IO {
      * @throws IOException 
      * @throws FileNotFoundException
      *  
-     * @return  The {@File} with the ungzipped content.
+     * @return  The file with the ungzipped content.
      */
     public static File unGzip(final File inputFile, final File outputDir) throws FileNotFoundException, IOException {
 

@@ -368,7 +368,7 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     
     /**
      * Determines whether this SSE currently has at least one residue with at least one atom.
-     * @return 
+     * @return whether this SSE currently has at least one residue with at least one atom
      */
     public boolean hasResidueWithAtoms() {
         if(this.residues.size() > 0) {

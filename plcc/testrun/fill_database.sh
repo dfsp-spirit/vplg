@@ -9,7 +9,7 @@
 RUN_GRAPHLETANALYSER="NO"
 
 
-PLCC_OPTIONS="-f -k -s"
+PLCC_OPTIONS="-f -u -k -s --complex-graphs --aa-graphs"
 PLCC_RUNS_IN_SUBDIR_TREE_MODE="YES"
 ## IMPORTANT: set this to "YES" if plcc is run with '-k' / '--output-subdir-tree'
 

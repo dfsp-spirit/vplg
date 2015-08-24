@@ -1361,8 +1361,8 @@ public class HtmlGenerator {
     
     /**
      * Generates the JS code for a popup window. Use the popupWindowLink() function to access this.
-     * @param title
-     * @return 
+     * @param title the title
+     * @return the JS string
      */
     public static String jsFunctionPopupWindow(String title) {
         StringBuilder sb = new StringBuilder();
@@ -1380,7 +1380,7 @@ public class HtmlGenerator {
     
     /**
      * A popup link which uses the JS created by jsFunctionPopupWindow() function.
-     * @param title the window title
+     * @param linkTitle the window title
      * @param stuffToPopup the URL to popup, can be an image file
      * @return the link string
      */
@@ -1418,7 +1418,7 @@ public class HtmlGenerator {
      * See http://wiki.jmol.org/index.php/Jmol_JavaScript_Object for info.
      * You need to copy jsmol to $WEBROOT/jsmol/ for this to work.
      * @param webPathToJmolFolder
-     * @return 
+     * @return the JS code
      */
     public static String jsFunctionJSmolInit(String webPathToJmolFolder) {
         StringBuilder sb = new StringBuilder();

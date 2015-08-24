@@ -461,7 +461,7 @@ public class ContactMatrix {
      * @param type the contact type string, e.g. "BB" for backbone-backbone contact or "LB" for ligand-backbone contact
      * @param x the SSE index of the first SSE of the pair
      * @param y the SSE index of the first SSE of the pair
-     * @return 
+     * @return the number of contacts of that type
      */
     public Integer getContacts(String type, Integer x, Integer y) {
 

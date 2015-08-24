@@ -831,7 +831,7 @@ public class ProtGraphs {
     
     /**
      * Sets the folding graph numbers based on the vertex positions in the parent graph.
-     * @param conComps all folding graphs of the same parent protein graph
+     * @param foldingGraphs all folding graphs of the same parent protein graph
      */
     public static void setFoldingGraphNumbers(List<FoldingGraph> foldingGraphs) {
         

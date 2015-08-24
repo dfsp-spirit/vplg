@@ -21,6 +21,7 @@ import java.io.*;
 //import org.apache.xml.serialize.*;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer.*;
 import java.util.HashMap;
+import java.util.Objects;
 import javax.xml.stream.XMLStreamWriter;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;
@@ -89,7 +90,7 @@ public abstract class Graph<V> implements ITrivialGraphFormat, IGraphMLFormat {
     
     /**
      * Adds an edge to this graph.
-     * @param e 
+     * @param e the edge
      */
     public void addEdge(Edge e) {
         this.edgeMatrix[e.getStartVertex()][e.getEndVertex()] = e.getType();
@@ -120,12 +121,12 @@ public abstract class Graph<V> implements ITrivialGraphFormat, IGraphMLFormat {
     
     /**
      * Determines whether an edge exists between the vertices v1 and v2.
-     * @param v1
-     * @param v2
+     * @param i vertex index
+     * @param j vertex index
      * @return true if it does
      */
     public Boolean hasEdge(Integer i, Integer j) {
-        return(this.edgeMatrix[i][j] != EDGETYPE_NONE);
+        return(!Objects.equals(this.edgeMatrix[i][j], EDGETYPE_NONE));
     }
     
     

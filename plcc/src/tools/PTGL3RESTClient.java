@@ -39,7 +39,7 @@ public class PTGL3RESTClient extends RESTClient {
      * @param pdbid
      * @param chain
      * @param graphType
-     * @return
+     * @return the response
      * @throws IOException 
      */
     public String doProteinGraphQueryJSON(String pdbid, String chain, String graphType) throws IOException {

@@ -34,8 +34,8 @@ public class CompatGraph extends Graph<Integer[]>{
     private Boolean edgesInited;
     
     /**
-     * Creates a graph with 0 vertices (and 0 edges). Use addVertex() to add vertices, then add edges.
-     * @param numVertices 
+     * Creates a graph with the given vertices (and 0 edges). Use addVertex() to add vertices, then add edges.
+     * @param vertices the vertices
      */
     public CompatGraph(ArrayList<Integer[]> vertices) {        
         super(vertices);

@@ -72,7 +72,7 @@ public class LinnotParserRED implements ILinnotParser, ILinnotParserExt {
     
     /**
      * Returns the path of visited vertices. Starts with the vertex visited first, which is given the value 0. All distances are relative to this one.     
-     * @return 
+     * @return a list of indices indicating the visit path (in order)
      */
     @Override
     public List<Integer> getVisitPath() {
@@ -91,7 +91,7 @@ public class LinnotParserRED implements ILinnotParser, ILinnotParserExt {
     
     /**
      * Returns how much left of the starting vertex the left-most vertex is.
-     * @return 
+     * @return how much left of the starting vertex the left-most vertex is
      */
     @Override
     public Integer getMaxShiftLeft() {
@@ -198,7 +198,8 @@ public class LinnotParserRED implements ILinnotParser, ILinnotParserExt {
         return nToCPositions;
     }
     
-    /** Returns a sorted list of all visited vertices. This is NOT the visiting order (and vertices visited several times only appear once in this list).  */
+    /** Returns a sorted list of all visited vertices. This is NOT the visiting order (and vertices visited several times only appear once in this list).
+     * @return  list of visited verts*/
     @Override
     public List<Integer> getAllVisitedVertices() {      
         List<Integer> visitPath = this.getVisitPath();
@@ -211,7 +212,7 @@ public class LinnotParserRED implements ILinnotParser, ILinnotParserExt {
     
     /**
      * Returns the list of relative distances, parsed from the token list.
-     * @return 
+     * @return the list of relative distances
      */
     @Override
     public List<Integer> getRelDistList() {

@@ -174,9 +174,8 @@ public class DrawTools {
     /**
      * Just a helper function that sets default values for the width of the arrow. See the first 3 parameters of the drawOutlinedArrow() function for parameter explanation.
      *
-     * @param headY the Y axis position of the head
-     * @param bothX the X axis position (for whole polygon, the arrow is always straight up)
-     * @param tailY the Y axis position of the tail
+     * @param x the x position
+     * @param y the y position (coord)
      * @return the polygon
      */
     protected static Polygon getDefaultArrowPolygonDownwardsLowestPointAt(int x, int y) {
@@ -190,9 +189,8 @@ public class DrawTools {
     /**
      * Just a helper function that sets default values for the width of the arrow. See the first 3 parameters of the drawOutlinedArrow() function for parameter explanation.
      *
-     * @param headY the Y axis position of the head
-     * @param bothX the X axis position (for whole polygon, the arrow is always straight up)
-     * @param tailY the Y axis position of the tail
+     * @param x the x position
+     * @param y the y position
      * @return the polygon
      */
     protected static Polygon getDefaultArrowPolygonUpwardsLowestPointAt(int x, int y) {

@@ -2185,7 +2185,7 @@ public class ProteinGraphDrawer {
      * @param ig2
      * @param startPos
      * @param pl
-     * @return 
+     * @return the x pixel position after drawing (with in pixels)
      */
     public static Integer drawLegend(SVGGraphics2D ig2, Position2D startPos, PageLayout pl) {
         Boolean drawAll = Settings.getBoolean("plcc_B_graphimg_legend_always_all");

@@ -54,7 +54,7 @@ public class CompatGraphComputation {
 
     /**
      * Return the size (number of vertices) of the larger graph of (graph1, graph2).
-     * @return 
+     * @return the size (number of vertices) of the larger graph
      */
     private Integer largerGraphSize() {
         if(this.graph1.numVertices() > this.graph2.numVertices()) {
