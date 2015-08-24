@@ -103,6 +103,8 @@ function get_total_complexgraphs_count($db) {
 			          if($valid_values) {
 				      echo "<h3> Search Results </h3>\n";
 				  
+				      echo "<h4> Chain contained in the PDB file </h4>\n";
+				      // the table listing all chains of the protein
 				      echo $tableString; /* The table string is constructed in /backend/get_complexgraphs.php, which is included by this file. */  
 				
 				      if($num_found > 0) {
