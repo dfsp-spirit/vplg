@@ -32,7 +32,7 @@ function get_all_chains_of_pdb_query($pdb_id) {
 }
 
 function get_all_ligands_of_pdb_query($pdb_id) {
-  $query = "SELECT c.chain_name, c.organism_scientific, c.mol_name FROM plcc_chain c WHERE ( c.pdb_id = '" . $pdb_id . "' )";
+  $query = "SELECT s.lig_name, s.pdb_start, s.pdb_end, s.dssp_start, s.dssp_end, c.chain_name, c.pdb_id FROM plcc_sse s INNER JOIN plcc_chain c ON s.chain_id = c.chain_id WHERE ( c.pdb_id = '" . $pdb_id . "' AND s.sse_type = 3 ) ";
   return $query;
 }
 
@@ -155,19 +155,21 @@ if($valid_values){
 	// determine all ligands (single ligand molecules from SSEs (ligand residues, not ligand types. This means something like ICT-485, not ICT)
 	$ligands_query = get_all_ligands_of_pdb_query($pdb_id);
 	$ligands_result = pg_query($db, $ligands_query);
-	$ligtableString = "<div><table id='tblligresults' class='results'><tr><th>Ligand</th><th>Chain</th><th>PDB start residue</th><th>PDB end residue</th><th>Go to ligand complex graph</th></tr>\n";
-	while ($ligand_arr = pg_fetch_array($chains_result, NULL, PGSQL_ASSOC)){
+	$ligtableString = "<div><table id='tblligresults' class='results'><tr><th>Ligand</th><th>Chain</th><th>1st PDB residue</th><th>1st DSSP residue</th><th>Go to ligand complex graph</th></tr>\n";
+	while ($ligand_arr = pg_fetch_array($ligands_result, NULL, PGSQL_ASSOC)){
 		// data from SSE table (not from ligands table):
 	        $lig_name = $ligand_arr['lig_name'];
 	        $lig_chain_name = $ligand_arr['chain_name'];
 	        $lig_pdb_start = $ligand_arr['pdb_start'];
 	        $lig_pdb_end = $ligand_arr['pdb_end'];
+	        $lig_dssp_start = $ligand_arr['dssp_start'];
+	        $lig_dssp_end = $ligand_arr['dssp_end'];
 	        $lig_unique_name = $lig_chain_name . "-" . $lig_pdb_start . "-" . $lig_name;
 	        
 	        $num_lig_found++;
 	        
 	        $ligtableString .= "<tr>\n";
-		$ligtableString .= "<td>$lig_name</td><td>$lig_chain_name</td><td>$lig_pdb_start</td><td>$lig_pdb_end</td>";
+		$ligtableString .= "<td>$lig_name</td><td>$lig_chain_name</td><td>$lig_pdb_start</td><td>$lig_dssp_start</td>";
 		$ligtableString .= "<td><a href='./ligcomplexgraphs.php?pdb=" . $pdb_id . "' alt='Show ligand complex graphs of this ligand'>LCG of ligand " . $lig_unique_name ."</a></td>\n";
 		$ligtableString .= "</tr>\n";
 		
