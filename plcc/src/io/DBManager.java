@@ -8485,6 +8485,8 @@ connection.close();
      * @param chaingraph_image_svg path to the SVG image of the chain graph
      * @param ssegraph_image_png path to the PNG image of the SSE graph
      * @param chaingraph_image_png path to the PNG image of the chain graph
+     * @param ssegraph_image_pdf path to the PNG image of the SSE graph
+     * @param chaingraph_image_pdf path to the PNG image of the chain graph
      * @return true if it worked out
      * @throws SQLException if DB stuff went wrong
      */
@@ -8509,7 +8511,7 @@ connection.close();
             statement.setString(8, ssegraph_image_svg);
             statement.setString(9, chaingraph_image_svg);
             statement.setString(10, ssegraph_image_png);
-            statement.setString(11, chaingraph_image_svg);
+            statement.setString(11, chaingraph_image_png);
             statement.setString(12, ssegraph_image_pdf);
             statement.setString(13, chaingraph_image_pdf);
                                 
