@@ -6545,11 +6545,7 @@ public class Main {
         if(Settings.getBoolean("plcc_B_useDB")) {
             if(! silent) {System.out.println("    Writing SSE complex contact info to DB...");}
         
-            if(compGraph.writeSSEComplexContactInfoToDB(pdbid)){
-                //if(! silent) { System.out.println("    Writing SSE complex contact info to DB... successfull");}
-            } else {
-                DP.getInstance().e("Main", "Writing SSE complex contact info to database FAILED!"); 
-            }
+            compGraph.writeSSEComplexContactInfoToDB(pdbid);
         }        
            
         /*

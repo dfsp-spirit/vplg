@@ -9882,7 +9882,7 @@ connection.close();
         }
 
         StringBuilder querySB = new StringBuilder();
-        querySB.append("INSERT INTO " + tbl_graphletcount + " (graph_id, graphlet_counts) VALUES ( ");
+        querySB.append("INSERT INTO ").append(tbl_graphletcount).append(" (graph_id, graphlet_counts) VALUES ( ");
         
         String pgArray = DBManager.getSQLArrayString(graphlet_counts);
         
@@ -9900,7 +9900,18 @@ connection.close();
     }
     
 
-    //work here
+    
+    /**
+     * Writes complex contact to the database. Currently the contacts can contain coiled regions, and for those, errors are thrown, which makes little sense.
+     * @param pdb_id the PDB id
+     * @param chain_nameA chain name of first chain of contact
+     * @param chain_nameB chain name of 2nd chain of contact
+     * @param sse1_dssp_start the dssp number of the first residue of the 1st contact SSE
+     * @param sse2_dssp_start the dssp number of the first residue of the 2nd contact SSE
+     * @param contact_count the contact number (atom contacts)
+     * @return whether it worked out, use exception instead
+     * @throws SQLException if stuff went wrong
+     */
     public static Boolean writeSSEComplexContactToDB(String pdb_id, String chain_nameA, String chain_nameB, Integer sse1_dssp_start, Integer sse2_dssp_start, Integer contact_count) throws SQLException {
 
         // Just abort if this is not a valid contact type. Note that 0 is CONTACT_NONE.
@@ -9909,7 +9920,7 @@ connection.close();
             return (false);
         }
         */
-        /** TODO: implement different types */
+        /** TODO: implement different types (vdW versus disulfide)*/
         
         Integer contact_type = 1;
 
@@ -9931,11 +9942,13 @@ connection.close();
         Long sse2_id = getDBSseIDByDsspStartResidue(sse2_dssp_start, db_chain_idB);
         
         if(sse1_id <= 0L) {
-            DP.getInstance().e("DBManager", "writeSSEComplexContactToDB: Could not find SSE of chain " + chain_nameA + " with DSSP start '" + sse1_dssp_start + "' in DB.");
+            // the warning below is given for coiled regions
+            //DP.getInstance().w("DBManager", "writeSSEComplexContactToDB: Could not find SSE of chain " + pdb_id + " " + chain_nameA + " (db_chain_id='" + db_chain_idA + "') with DSSP start '" + sse1_dssp_start + "' in DB.");
             return false;
         }
         if(sse2_id <= 0L) {
-            DP.getInstance().e("DBManager", "writeSSEComplexContactToDB: Could not find SSE of chain " + chain_nameB + " with DSSP start '" + sse2_dssp_start + "' in DB.");
+            // the warning below is given for coiled regions
+            //DP.getInstance().w("DBManager", "writeSSEComplexContactToDB: Could not find SSE of chain " + pdb_id + " " + chain_nameB + " (db_chain_id='" + db_chain_idB + "') with DSSP start '" + sse2_dssp_start + "' in DB.");
             return false;
         }
         

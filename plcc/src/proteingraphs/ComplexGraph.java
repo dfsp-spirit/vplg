@@ -131,7 +131,7 @@ public class ComplexGraph extends UAdjListGraph {
     }
 
 
-    public boolean writeSSEComplexContactInfoToDB(String pdbid) {
+    public void writeSSEComplexContactInfoToDB(String pdbid) {
 
     //DBManager.writeSSEComplexContactToDB()
         String chainA;
@@ -177,12 +177,11 @@ public class ComplexGraph extends UAdjListGraph {
                     retVal = false;
                 }
             } catch (SQLException ex) {
+                DP.getInstance().e("ComplexGraph", "writeSSEComplexContactInfoToDB: SQL exception: '" + ex.getMessage() + "'.");
                 Logger.getLogger(ComplexGraph.class.getName()).log(Level.SEVERE, null, ex);
-                return false;
             }
         }
-        System.out.println("    SSE Contacts written to DB: " + countInsert + " inserted, " + countFail + " failed.");
-        return retVal;
+        System.out.println("    SSE Contacts written to DB: " + countInsert + " inserted, " + countFail + " skipped (contact involved coils).");
     }
 
     /**
