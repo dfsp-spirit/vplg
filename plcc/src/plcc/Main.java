@@ -6595,7 +6595,9 @@ public class Main {
             DP.getInstance().e("Main", "Failed to write complex graph contact info CSV file: '" + e.getMessage() + "'.");
         }
         
-        System.out.println("    Contact info CSV written.");
+        if( ! silent) {
+            System.out.println("    Contact info CSV written.");
+        }
         
         // Calculate SSE level contacts
         //System.out.println("intr" + interchainContacts);
@@ -6604,17 +6606,23 @@ public class Main {
         chainCM.fillFromContactList(resContacts, keepSSEs);
         chainCM.calculateSSEContactMatrix();                       
         
-        System.out.println("    SSE contact matrix calculated.");
+        if( ! silent) {
+            System.out.println("    SSE contact matrix calculated.");
+        }
         
         chainCM.calculateSSESpatialRelationMatrix(resContacts, false);                
 
-        System.out.println("    Spatial relation matrix calculated.");
+        if( ! silent) {
+            System.out.println("    Spatial relation matrix calculated.");
+        }
         
         // This graph is still required because it is used for drawing the VPLG-style picture
         ProtGraph cg = chainCM.toProtGraph();                        
         cg.declareProteinGraph();        
         
-        System.out.println("    Graph created and declared a CG.");
+        if( ! silent) {
+            System.out.println("    Graph created and declared a CG.");
+        }
 
         
         if(Settings.getBoolean("plcc_B_forceBackboneContacts")) {
@@ -6692,7 +6700,9 @@ public class Main {
         }
         
         // ------------------ write the SSE level graphs -----------
-        System.out.println("    Writing SSE level graph text files...");
+        if( ! silent) {
+            System.out.println("    Writing SSE level graph text files...");
+        }
         
         // the detailed complex graph (each vertex is one SSE, vertices ordered by chain):
         String graphFormatsWrittenSSELevel = "";        
