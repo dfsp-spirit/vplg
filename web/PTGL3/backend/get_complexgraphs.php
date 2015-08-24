@@ -169,6 +169,7 @@ if($valid_values){
 		$chain_img_svg = $arr['filepath_chaingraph_image_svg'];
 
 
+		// ------------------------------------- handle SSE-level complex graph images ---------------------------
 		$sse_image_exists_png = FALSE;
 		$sse_img_link = "";
 		$full_sse_img_path_png = $IMG_ROOT_PATH . $sse_img_png;
@@ -193,10 +194,10 @@ if($valid_values){
 		// prepare the image links
 		$img_string .= "<br><br><br><h4> SSE level complex graph</h4>\n";
 		if($sse_image_exists_png) {		    
-		    $img_string .= "The SSE level complex graph: ";
+		    
 		    $img_string .= "<div id='sse_cg'><img src='" . $full_sse_img_path_png . "' width='800'></div><br><br>\n";
 		} else {
-		    $img_string .= "<b>Image not available:</b> <i>The complex graph is not available yet.</i>";			
+		    $img_string .= "<b>Image not available:</b> <i>The SSE-level complex graph is not available yet.</i>";			
 		}
 		
 		// add download links for other formats than PNG (they can directly d/l this from the browser image)
@@ -216,7 +217,62 @@ if($valid_values){
 		  }
 		  $img_string .= "<br/>";
 		  
-		}				
+		}
+		
+		
+		// ------------------------------------- handle chain-level complex graph images ---------------------------
+		$chain_image_exists_png = FALSE;
+		$chain_img_link = "";
+		$full_chain_img_path_png = $IMG_ROOT_PATH . $chain_img_png;
+		if(isset($chain_img_png) && $chain_img_png != "" && file_exists($full_chain_img_path_png)) {
+			$chain_image_exists_png = TRUE;
+		} else {
+		    //echo "File '$full_img_path_png' does not exist.";
+		}
+		
+		$chain_image_exists_pdf = FALSE;
+		$full_chain_img_path_pdf = $IMG_ROOT_PATH . $chain_img_pdf;
+		if(isset($chain_img_pdf) && $chain_img_pdf != "" && file_exists($full_chain_img_path_pdf)) {
+			$chain_image_exists_pdf = TRUE;
+		}
+		
+		$chain_image_exists_svg = FALSE;
+		$full_chain_img_path_svg = $IMG_ROOT_PATH . $chain_img_svg;
+		if(isset($chain_img_svg) && $chain_img_svg != "" && file_exists($full_chain_img_path_svg)) {
+			$chain_image_exists_svg = TRUE;
+		}
+				
+		// prepare the image links
+		$img_string .= "<br><br><br><h4> Chain level complex graph</h4>\n";
+		if($chain_image_exists_png) {		    
+		    
+		    $img_string .= "<div id='chain_cg'><img src='" . $full_chain_img_path_png . "' width='800'></div><br><br>\n";
+		} else {
+		    $img_string .= "<b>Image not available:</b> <i>The chain-level complex graph is not available yet.</i>";			
+		}
+		
+		// add download links for other formats than PNG (they can directly d/l this from the browser image)
+		if($chain_image_exists_svg || $chain_image_exists_pdf || $chain_image_exists_png) {
+		  $img_string .= "Download the visualization in formats: ";
+		  
+		  if($chain_image_exists_png) {
+		    $img_string .= ' <a href="' . $full_chain_img_path_png .'" target="_blank">[PNG]</a>';
+		  }
+		  
+		  if($chain_image_exists_svg) {
+		    $img_string .= ' <a href="' . $full_chain_img_path_svg .'" target="_blank">[SVG]</a>';
+		  }
+		  
+		  if($chain_image_exists_pdf) {
+		    $img_string .= ' <a href="' . $full_chain_img_path_pdf .'" target="_blank">[PDF]</a>';
+		  }
+		  $img_string .= "<br/>";
+		  
+		}
+		
+		
+		
+		// --------------------------------------- handle graph text files ---------------------------------
 		
 		// check for graph text files. note that these do NOT exist once per linear notation, but only once per folding graph, so we add them here.
 	    // The paths to these are not yet saved in the database.
