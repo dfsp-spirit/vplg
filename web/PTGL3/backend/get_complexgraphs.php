@@ -22,10 +22,14 @@ if($DEBUG){
 
 
 function get_complexgraph_query_string($pdb_id, $graphtype_str) {
-   $query = "SELECT complexgraph_id, pdb_id, filepath_ssegraph_image_png, filepath_ssegraph_image_svg, filepath_ssegraph_image_pdf, filepath_chaingraph_image_png, filepath_chaingraph_image_svg, filepath_chaingraph_image_pdf FROM (SELECT cg.filepath_ssegraph_image_png, cg.filepath_ssegraph_image_svg, cg.filepath_ssegraph_image_pdf, cg.filepath_chaingraph_image_png, cg.filepath_chaingraph_image_svg, cg.filepath_chaingraph_image_pdf, c.pdb_id AS pdb_id FROM plcc_complexgraph cg LEFT JOIN plcc_protein p ON cg.pdb_id = p.pdb_id WHERE ( pdb_id = '" . $pdb_id . "' )) bar ORDER BY complexgraph_id";
+   $query = "SELECT complexgraph_id, pdb_id, filepath_ssegraph_image_png, filepath_ssegraph_image_svg, filepath_ssegraph_image_pdf, filepath_chaingraph_image_png, filepath_chaingraph_image_svg, filepath_chaingraph_image_pdf FROM (SELECT cg.complexgraph_id, cg.filepath_ssegraph_image_png, cg.filepath_ssegraph_image_svg, cg.filepath_ssegraph_image_pdf, cg.filepath_chaingraph_image_png, cg.filepath_chaingraph_image_svg, cg.filepath_chaingraph_image_pdf, cg.pdb_id AS pdb_id FROM plcc_complexgraph cg WHERE ( cg.pdb_id = '" . $pdb_id . "' )) bar ORDER BY complexgraph_id";
    return $query;
 }
 
+function get_all_chains_of_pdb_query($pdb_id) {
+  $query = "SELECT c.chain_name FROM plcc_chain c WHERE ( c.pdb_id = '" . $pdb_id . "' )";
+  return $query;
+}
 
 
 function get_graphtype_string($graphtype_int){
@@ -120,14 +124,33 @@ if($valid_values){
 	//if(! $db) { echo "NO_DB"; }
 	
 	$graphtype_str = get_graphtype_string($graphtype_int);
+	
+	// determine all chains
+	$chains_query = get_all_chains_of_pdb_query($pdb_id);
+	$chains_result = pg_query($db, $chains_query);
+	$chains = array();
+	$tableString = "<div><table><tr><th>PDB ID</th><th>Chain</th><th>Go to protein graph</th></tr>";
+	while ($chains_arr = pg_fetch_array($chains_result, NULL, PGSQL_ASSOC)){
+		// data from chains table:
+	        $cg_chain_name = $chains_arr['chain_name'];
+	        array_push($chains, $cg_chain_name);
+	        $pdbchain = $pdb_id . $cg_chain_name;
+	        $tableString .= "<tr>\n";
+		$tableString .= "<td>$pdb_id</td><td>$cg_chain_name</td>";
+		$tableString .= "<td><a href='./results.php?q=" . $pdbchain . "' alt='Show protein graph of this chain'>PG of " . $pdb_id . " chain " . $cg_chain_name . "<a></td>\n";
+		$tableString .= "</tr>\n";
+	}
+	
+	
+	// TODO: determine all ligands (from SSEs, not ligand types)
+	
+	
 	$query = get_complexgraph_query_string($pdb_id, $graphtype_str);
 	
 	//echo "query='" . $query . "'\n";
 	
 	$result = pg_query($db, $query);
-    //if(! $result) { echo "NO_RESULT: " .  pg_last_error($db) . "."; }
 	if(! $result) { array_push($SHOW_ERROR_LIST, "Database query failed: '" . pg_last_error($db) . "'"); }
-	$tableString = "";
 		
 	$num_found = 0;
 	$img_string = "";
@@ -164,44 +187,30 @@ if($valid_values){
 		if(isset($sse_img_svg) && $sse_img_svg != "" && file_exists($full_sse_img_path_svg)) {
 			$sse_image_exists_svg = TRUE;
 		}
-		
-		$tableString .= "<tr>\n";
-		$tableString .= "<td>$fg_number</td><td>$fold_name</td><td>$num_sses</td><td>$sse_string</td><td>$firstvert_show</td><td>$not_string</td><td>$img_link</td>";
-		$tableString .= "<td><a href='./linnots_of_foldinggraph.php?pdbchain=" . $pdbchain . '&graphtype_int=' . $graphtype_int . '&fold_number=' . $fg_number . "' alt='Show all linear notations of this FG'>Go to linnots<a></td>\n";
-		$tableString .= "</tr>\n";
-		
+				
 		// prepare the image links
-		$img_string .= "<br><br><br><h4> Fold number $fg_number (fold name: $fold_name)</h4>\n";
-		if($image_exists_png) {		    
-		    $img_string .= "The $notation $graphtype_str folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
-		    $img_string .= "<div id='" . $html_id . "'><img src='" . $full_img_path_png . "' width='800'></div><br><br>\n";
+		$img_string .= "<br><br><br><h4> SSE level complex graph</h4>\n";
+		if($sse_image_exists_png) {		    
+		    $img_string .= "The SSE level complex graph: ";
+		    $img_string .= "<div id='sse_cg'><img src='" . $full_sse_img_path_png . "' width='800'></div><br><br>\n";
 		} else {
-		    $reason = "";
-			if($num_sses <= 3) { 
-			    $reason = " because it only has $num_sses SSE"; 
-				if($num_sses != 1) {
-				    $reason .= "s";
-                }				
-			}
-			
-		    $img_string .= "<b>Image not available:</b> <i>The $notation $graphtype_str folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name is not available" . $reason . ".</i>";			
+		    $img_string .= "<b>Image not available:</b> <i>The complex graph is not available yet.</i>";			
 		}
-		$img_string .= ($num_sses == 1 ? "<br>SSE number of fold in parent graph: $firstvert_show<br>" : "<br>Number of first SSE of fold in parent graph: $firstvert_show<br>");
 		
 		// add download links for other formats than PNG (they can directly d/l this from the browser image)
-		if($image_exists_svg || $image_exists_pdf || $image_exists_png) {
-		  $img_string .= "Download the visualization of fold $fold_name in formats: ";
+		if($sse_image_exists_svg || $sse_image_exists_pdf || $sse_image_exists_png) {
+		  $img_string .= "Download the visualization in formats: ";
 		  
-		  if($image_exists_png) {
-		    $img_string .= ' <a href="' . $full_img_path_png .'" target="_blank">[PNG]</a>';
+		  if($sse_image_exists_png) {
+		    $img_string .= ' <a href="' . $full_sse_img_path_png .'" target="_blank">[PNG]</a>';
 		  }
 		  
-		  if($image_exists_svg) {
-		    $img_string .= ' <a href="' . $full_img_path_svg .'" target="_blank">[SVG]</a>';
+		  if($sse_image_exists_svg) {
+		    $img_string .= ' <a href="' . $full_sse_img_path_svg .'" target="_blank">[SVG]</a>';
 		  }
 		  
-		  if($image_exists_pdf) {
-		    $img_string .= ' <a href="' . $full_img_path_pdf .'" target="_blank">[PDF]</a>';
+		  if($sse_image_exists_pdf) {
+		    $img_string .= ' <a href="' . $full_sse_img_path_pdf .'" target="_blank">[PDF]</a>';
 		  }
 		  $img_string .= "<br/>";
 		  
@@ -209,12 +218,12 @@ if($valid_values){
 		
 		// check for graph text files. note that these do NOT exist once per linear notation, but only once per folding graph, so we add them here.
 	    // The paths to these are not yet saved in the database.
-	    $graph_file_name_no_ext = get_folding_graph_path_and_file_name_no_ext($pdb_id, $chain_name, $graphtype_str, $fg_number);
+	    $graph_file_name_no_ext = get_complex_sse_graph_file_name_no_ext($pdb_id, $graphtype_str);
 	
 		// GML
 		$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".gml";
 		if(file_exists($full_file)){		    
-			$img_string .= "Download the graph file of fold $fold_name in formats: ";
+			$img_string .= "Download the complex graph file in formats: ";
 			
 			$img_string .= ' <a href="' . $full_file .'" target="_blank">[GML]</a>';
 			
@@ -261,10 +270,6 @@ if($valid_values){
 	}		
 	
 	$tableString .= "</table></div>\n";
-	
-	if($num_found >= 1) {
-	    $tableString .= "<br><br><a href='results.php?q=$pdbchain'>Go to protein graph</a><br><br>";	  	           		 		 
-	}
 	
 	
 	

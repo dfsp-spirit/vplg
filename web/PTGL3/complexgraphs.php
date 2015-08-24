@@ -67,12 +67,12 @@ function get_total_complexgraphs_count($db) {
 		A complex graph is a is a graph that considers all chains of a multi-chain protein, or, in general, all protein chains contained in a PDB file. This is especially useful for the analysis of protein complexes.
 		It is also of great help when looking at ligands which have contacts with several different chains.
 		<br><br>
-		Select the PDB IF you are interested in below. You will then be able to see the respective complex graph visualization.
+		Enter the PDB identifier you are interested in below. You will then be able to see the respective complex graph visualization.
 		
 		</div><!-- end container-->
 		</div><!-- end Home -->
 		
-		<form class="form-inline" action="foldinggraphs.php" method="get">
+		<form class="form-inline" action="complexgraphs.php" method="get">
 			
 		<label>Enter PDB identifier, e.g., '7tim' or '4a97':
 		<?php
