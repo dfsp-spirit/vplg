@@ -31,6 +31,11 @@ function get_all_chains_of_pdb_query($pdb_id) {
   return $query;
 }
 
+function get_all_ligands_of_pdb_query($pdb_id) {
+  $query = "SELECT c.chain_name, c.organism_scientific, c.mol_name FROM plcc_chain c WHERE ( c.pdb_id = '" . $pdb_id . "' )";
+  return $query;
+}
+
 
 function get_graphtype_string($graphtype_int){
 	switch ($graphtype_int){
@@ -114,6 +119,7 @@ if(isset($_GET['pdb'])){
 }
 
 $num_found = 0;
+$num_lig_found = 0;
 
 if($valid_values){
     //echo "valid";
@@ -129,7 +135,7 @@ if($valid_values){
 	$chains_query = get_all_chains_of_pdb_query($pdb_id);
 	$chains_result = pg_query($db, $chains_query);
 	$chains = array();
-	$tableString = "<div><table id='tblfgresults'><tr><th>PDB ID</th><th>Chain</th><th>Molecule</th><th>Organism</th><th>Go to protein graph</th></tr>";
+	$tableString = "<div><table id='tblfgresults'><tr><th>PDB ID</th><th>Chain</th><th>Molecule</th><th>Organism</th><th>Go to protein graph</th></tr>\n";
 	while ($chains_arr = pg_fetch_array($chains_result, NULL, PGSQL_ASSOC)){
 		// data from chains table:
 	        $cg_chain_name = $chains_arr['chain_name'];
@@ -139,13 +145,34 @@ if($valid_values){
 	        $pdbchain = $pdb_id . $cg_chain_name;
 	        $tableString .= "<tr>\n";
 		$tableString .= "<td>$pdb_id</td><td>$cg_chain_name</td><td>$mol_name</td><td>$organism</td>";
-		$tableString .= "<td><a href='./results.php?q=" . $pdbchain . "' alt='Show protein graph of this chain'>PG of " . $pdb_id . " chain " . $cg_chain_name . "<a></td>\n";
+		$tableString .= "<td><a href='./results.php?q=" . $pdbchain . "' alt='Show protein graph of this chain'>PG of " . $pdb_id . " chain " . $cg_chain_name . "</a></td>\n";
 		$tableString .= "</tr>\n";
+		
 	}
+	$tableString .= "</table></div>\n";
 	
 	
-	// TODO: determine all ligands (from SSEs, not ligand types)
-	
+	// determine all ligands (single ligand molecules from SSEs (ligand residues, not ligand types. This means something like ICT-485, not ICT)
+	$ligands_query = get_all_ligands_of_pdb_query($pdb_id);
+	$ligands_result = pg_query($db, $ligands_query);
+	$ligtableString = "<div><table id='tblligresults' class='results'><tr><th>Ligand</th><th>Chain</th><th>PDB start residue</th><th>PDB end residue</th><th>Go to ligand complex graph</th></tr>\n";
+	while ($ligand_arr = pg_fetch_array($chains_result, NULL, PGSQL_ASSOC)){
+		// data from SSE table (not from ligands table):
+	        $lig_name = $ligand_arr['lig_name'];
+	        $lig_chain_name = $ligand_arr['chain_name'];
+	        $lig_pdb_start = $ligand_arr['pdb_start'];
+	        $lig_pdb_end = $ligand_arr['pdb_end'];
+	        $lig_unique_name = $lig_chain_name . "-" . $lig_pdb_start . "-" . $lig_name;
+	        
+	        $num_lig_found++;
+	        
+	        $ligtableString .= "<tr>\n";
+		$ligtableString .= "<td>$lig_name</td><td>$lig_chain_name</td><td>$lig_pdb_start</td><td>$lig_pdb_end</td>";
+		$ligtableString .= "<td><a href='./ligcomplexgraphs.php?pdb=" . $pdb_id . "' alt='Show ligand complex graphs of this ligand'>LCG of ligand " . $lig_unique_name ."</a></td>\n";
+		$ligtableString .= "</tr>\n";
+		
+	}
+	$ligtableString .= "</table></div>\n";
 	
 	$query = get_complexgraph_query_string($pdb_id, $graphtype_str);
 	
@@ -197,7 +224,7 @@ if($valid_values){
 		    
 		    $img_string .= "<div id='sse_cg'><img src='" . $full_sse_img_path_png . "' width='800'></div><br><br>\n";
 		} else {
-		    $img_string .= "<b>Image not available:</b> <i>The SSE-level complex graph is not available yet.</i>";			
+		    $img_string .= "<b>Image not available:</b> <i>The SSE-level complex graph is not available.</i>";			
 		}
 		
 		// add download links for other formats than PNG (they can directly d/l this from the browser image)
@@ -248,7 +275,7 @@ if($valid_values){
 		    
 		    $img_string .= "<div id='chain_cg'><img src='" . $full_chain_img_path_png . "' width='800'></div><br><br>\n";
 		} else {
-		    $img_string .= "<b>Image not available:</b> <i>The chain-level complex graph is not available yet.</i>";			
+		    $img_string .= "<b>Image not available:</b> <i>The chain-level complex graph is not available.</i>";			
 		}
 		
 		// add download links for other formats than PNG (they can directly d/l this from the browser image)
@@ -327,7 +354,7 @@ if($valid_values){
 				
 	}		
 	
-	$tableString .= "</table></div>\n";
+	
 	
 	
 	

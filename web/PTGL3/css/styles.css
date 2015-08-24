@@ -1073,6 +1073,21 @@ table#tblfgresults th {
     background-color: black;
 }
 
+	.results table {
+    width: 100%;
+    background-color: #f1f1c1;
+	} 
+	.results table tr:nth-child(even) {
+    background-color: #eee;
+}
+.results table tr:nth-child(odd) {
+    background-color: #fff;
+}
+.results table th {
+    color: white;
+    background-color: black;
+}
+
 	table#tblmotifoverview {
     width: 100%;
     background-color: #f1f1c1;

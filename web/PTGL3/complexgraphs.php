@@ -103,13 +103,21 @@ function get_total_complexgraphs_count($db) {
 			          if($valid_values) {
 				      echo "<h3> Search Results </h3>\n";
 				  
-				      echo "<h4> Chain contained in the PDB file </h4>\n";
+				      echo "<h4> Chains contained in the PDB file </h4>\n";
 				      // the table listing all chains of the protein
 				      echo $tableString; /* The table string is constructed in /backend/get_complexgraphs.php, which is included by this file. */  
 				
 				      if($num_found > 0) {
 					echo "<br><h3> Complex graph images </h3><br><p>The images below show the complex graph of all chains of the selected PDB file.</p>\n";
 					echo $img_string;
+					
+					echo "<br><br><h3> Ligand-centered complex graphs</h3>";
+					if($num_lig_found > 0) {					  
+					  echo $ligtableString;
+					}
+					else {
+					  echo "<p>No ligands contained in PDB file.</p>\n";
+					}
 				      }
 				      else {
 				      
