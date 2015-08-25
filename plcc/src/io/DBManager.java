@@ -85,6 +85,10 @@ public class DBManager {
     static String tbl_fglinnot = "plcc_fglinnot";
     static String tbl_graphletsimilarity = "plcc_graphletsimilarity";
     
+    /** Stores info on ligand-centered complex graphs. */
+    static String tbl_ligandcenteredgraph = "plcc_ligandcenteredgraph";
+    static String tbl_nm_lcg_to_chain = "plcc_nm_lcgtochain";
+    
     /** Name of the table which stores the PTGL alpha linear notation of a folding graph. */
     //static String tbl_fglinnot_alpha = "plcc_fglinnot_alpha";
     
@@ -886,8 +890,12 @@ public class DBManager {
             //doInsertQuery("CREATE TABLE " + tbl_fglinnot_albelig + " (linnotalbelig_id serial primary key, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text);");           
             doInsertQuery("CREATE TABLE " + tbl_fglinnot + " (linnot_id serial primary key, denorm_pdb_id varchar(4) not null, denorm_chain_name varchar(2) not null, denorm_graph_type int not null, denorm_graph_type_string text not null, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text, filepath_linnot_image_def_svg text, filepath_linnot_image_def_png text, filepath_linnot_image_def_pdf text, num_sses int);");
             doInsertQuery("CREATE TABLE " + tbl_graphletsimilarity + " (graphletsimilarity_id serial primary key, graphletsimilarity_sourcegraph int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graphletsimilarity_targetgraph int not null references " + tbl_proteingraph + " ON DELETE CASCADE, score numeric);");
+            
+            doInsertQuery("CREATE TABLE " + tbl_ligandcenteredgraph + " (ligandcenteredgraph_id serial primary key, lig_sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, filepath_lcg_svg text, filepath_lcg_png text, filepath_lcg_pdf text);");
+            doInsertQuery("CREATE TABLE " + tbl_nm_lcg_to_chain + " (lcg2c_id serial primary key, lcg2c_ligandcenteredgraph_id int not null references " + tbl_ligandcenteredgraph + " ON DELETE CASCADE, lcg2c_chain_id int not null references " + tbl_chain + " ON DELETE CASCADE);");
 
             // set constraints
+            doInsertQuery("ALTER TABLE " + tbl_ligandcenteredgraph + " ADD CONSTRAINT constr_ligcg_uniq UNIQUE (lig_sse_id);");
             doInsertQuery("ALTER TABLE " + tbl_protein + " ADD CONSTRAINT constr_protein_uniq UNIQUE (pdb_id);");
             doInsertQuery("ALTER TABLE " + tbl_chain + " ADD CONSTRAINT constr_chain_uniq UNIQUE (chain_name, pdb_id);");
             doInsertQuery("ALTER TABLE " + tbl_sse + " ADD CONSTRAINT constr_sse_uniq UNIQUE (chain_id, dssp_start, dssp_end);");
@@ -1119,6 +1127,9 @@ public class DBManager {
             doInsertQuery("CREATE INDEX plcc_idx_graphletsimilarity_score ON " + tbl_graphletsimilarity + " (score);");
             doInsertQuery("CREATE INDEX plcc_idx_ligandtochain_chain ON " + tbl_nm_ligandtochain + " (ligandtochain_chainid);");
             doInsertQuery("CREATE INDEX plcc_idx_ligandtochain_name3 ON " + tbl_nm_ligandtochain + " (ligandtochain_ligandname3);");
+            doInsertQuery("CREATE INDEX plcc_idx_lcg_sse ON " + tbl_ligandcenteredgraph + " (lig_sse_id);");
+            doInsertQuery("CREATE INDEX plcc_idx_lcg2c_graphid ON " + tbl_nm_lcg_to_chain + " (lcg2c_ligandcenteredgraph_id);");
+            doInsertQuery("CREATE INDEX plcc_idx_lcg2c_chainid ON " + tbl_nm_lcg_to_chain + " (lcg2c_chain_id);");
 
             // indices on PKs get created automatically
             
