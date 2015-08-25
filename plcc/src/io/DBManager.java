@@ -784,6 +784,8 @@ public class DBManager {
             doDeleteQuery("DROP TABLE " + tbl_fglinnot + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_secondat + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_graphletsimilarity + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_ligandcenteredgraph + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_nm_lcg_to_chain + " CASCADE;");
             
             //doDeleteQuery("DROP TABLE " + tbl_fglinnot_alpha + " CASCADE;");
             //doDeleteQuery("DROP TABLE " + tbl_fglinnot_beta + " CASCADE;");
@@ -10811,6 +10813,83 @@ connection.close();
         }        
     }
     
+    
+
+    /**
+     * Retrieves the DB id of the SSE identified by chain and dssp start residue
+     * @param chain_db_id internal DB chain id
+     * @param dssp_start_res the DSSP number of the start residue of the SSE
+     * @return  the internal DB id of the SSE, or -1 if no such SSE was found
+     */
+    public static Long getSSEDBID(Long chain_db_id, Integer dssp_start_res) {
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT sse_id FROM " + tbl_sse + " WHERE (chain_id = ? AND dssp_start = ?);";
+
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, chain_db_id);
+            statement.setInt(2, dssp_start_res);
+                                
+            rs = statement.executeQuery();
+            //dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "getSSEDBID: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
+                //dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "getSSEDBID: Could not close statement and reset autocommit."); }
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        if(tableData.size() >= 1) {
+            if(tableData.get(0).size() >= 1) {
+                return(Long.valueOf(tableData.get(0).get(0)));
+            }
+            else {
+                DP.getInstance().e("DBManager", "DB: SSE with dssp start '" + dssp_start_res + "' of PDB chain with internal database ID '" + chain_db_id + "' not in DB.");
+                return(-1L);
+            }
+        }
+        else {
+            return(-1L);
+        }        
+    }
     
     
     /**

@@ -6847,15 +6847,15 @@ public class Main {
                         System.out.println("     *Ligand '" + ligName + "' is in contact with the following " + contactSSENames.size() + " SSEs: '" + IO.stringListToString(contactSSENames) + "'.");
                         System.out.println("      Ligand '" + ligName + "' is in contact with the following " + ligContactChains.size() + " chains: '" + IO.stringListToString(ligContactChains) + "'.");
                         System.out.println("      Ligand '" + ligName + "' LCG ignores the following " + ignoreChains.size() + " chains: '" + IO.stringListToString(ignoreChains) + "'.");
+                    }                                        
+                }    
+                
+                if(ligContactChains.size() < 2) {
+                    if(! silent) {
+                        System.out.println("      Ligand '" + ligName + "' only has contacts to a single chain, skipping its ligand-centered complex graph (just use the normal albelig graph).");
                     }
-                    
-                    if(ligContactChains.size() < 2) {
-                        if(! silent) {
-                            System.out.println("      Ligand '" + ligName + "' only has contacts to a single chain, skipping its ligand-centered complex graph (just use the normal albelig graph).");
-                        }
-                        continue;
-                    }
-                }                                                
+                    continue;
+                }
                 
                 String ligfileNameSSELevelWithoutExtension = pdbid + "_ligand_complex_sses_" + ligName + "_" + graphType + coils + "_LCG";
                 ligimgFileNoExt = filePathImg + fs + ligfileNameSSELevelWithoutExtension;
@@ -6867,10 +6867,39 @@ public class Main {
                 // change graph info, this is so that the label on the image gets set properly
                 cg.setInfo(pdbid, "ALL", "ligand_complex_" + lign3 + "-" + ligRes);
                 
-                ProteinGraphDrawer.drawProteinGraph(ligimgFileNoExt, false, formats, cg, sseDrawLabels, ignoreChains); // draw ligand-based complex graph
+                HashMap<DrawTools.IMAGEFORMAT, String> outCLGImages = ProteinGraphDrawer.drawProteinGraph(ligimgFileNoExt, false, formats, cg, sseDrawLabels, ignoreChains); // draw ligand-based complex graph
                 if(! silent) {
                     System.out.println("      Image of ligand-centered complex graph for ligand '" + ligName + "' written to base file '" + imgFileNoExt + "'.");
-                }                        
+                }      
+                
+                // database
+                if(Settings.getBoolean("plcc_B_useDB")) {
+                    String dbImagePathLCG = ligimgFileNoExt;
+                    if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
+                        dbImagePathLCG = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, "ALL") + fs + ligfileNameSSELevelWithoutExtension;
+                    }
+
+                    Long chain_db_id = DBManager.getDBChainID(pdbid, ligChainName);
+                    if(chain_db_id <= 0L) { 
+                        DP.getInstance().e("Main", "Chain " + ligChainName + " of PDB " + pdbid + " not found in DB, cannot write LCG info to DB.");
+                        continue;
+                    }
+                    Long sse_db_id = DBManager.getSSEDBID(chain_db_id, ligandSSE.getStartDsspNum());
+                    if(sse_db_id <= 0L) { 
+                        DP.getInstance().e("Main", "SSE with DSSP start " + ligandSSE.getStartDsspNum() + " of PDB " + pdbid + " chain " + ligChainName + " not found in DB, cannot write LCG info to DB.");
+                        continue;
+                    }
+                    
+                    try {
+
+                        DBManager.writeLigandCenteredComplexGraphToDB(pdbid, sse_db_id, dbImagePathLCG + ".svg", dbImagePathLCG + ".png", dbImagePathLCG + ".pdf");
+                        if(! silent) {
+                            System.out.println("      Wrote ligand-centered complex graph of ligand " + ligName + " (PDB " + pdbid + ") to DB.");
+                        }
+                    } catch(SQLException e) {
+                        DP.getInstance().w("Main", "Could not write ligand-centered omplex graph to DB: '" + e.getMessage() + "'.");
+                    }
+                } 
             }
         }
             
