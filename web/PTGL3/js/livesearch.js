@@ -125,6 +125,16 @@ $(document).ready(function () {
  		}
  	});
 	
+	/* Buttons on the complex graph search form */
+	$('#sendit_complex').click(function(e) {
+	    content1 = $('#pdb').val();
+				
+ 		if(content1.length != 4){
+ 			e.preventDefault();
+ 			alert("PDB ID: Please enter exactly 4 characters, e.g., '7tim' for PDB 7tim.");
+ 		}
+ 	});
+	
 	
 	$('#sendit_nav').click(function(e) {
  		content = $('#searchInput').val();

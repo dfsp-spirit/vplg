@@ -67,7 +67,7 @@ function get_total_complexgraphs_count($db) {
 		A complex graph is a is a graph that considers all chains of a multi-chain protein, or, in general, all protein chains contained in a PDB file. This is especially useful for the analysis of protein complexes.
 		It is also of great help when looking at ligands which have contacts with several different chains.
 		<br><br>
-		Enter the PDB identifier you are interested in below. You will then be able to see the respective complex graph visualization.
+		Enter the PDB identifier you are interested in below to see the respective complex graph.
 		
 		</div><!-- end container-->
 		</div><!-- end Home -->
@@ -77,18 +77,19 @@ function get_total_complexgraphs_count($db) {
 		<label>Enter PDB identifier, e.g., '7tim' or '4a97':
 		<?php
 		if(isset($_GET['pdb']) && $_GET['pdb'] != "") {
-		  echo '<input type="text" class="form-control" name="pdb" maxlength="4" id="search_complex_graphs_of_pdbid" placeholder="Enter PDB ID" value="' . $_GET['pdb'] . '">';
+		  echo '<input type="text" class="form-control" name="pdb" maxlength="4" id="pdb" autocomplete="off" placeholder="Enter PDB ID" value="' . $_GET['pdb'] . '">';
 		}
 		else {
-		  echo '<input type="text" class="form-control" name="pdb" maxlength="4" id="search_complex_graphs_of_pdbid" placeholder="Enter PDB ID">';
+		  echo '<input type="text" class="form-control" name="pdb" maxlength="4" id="pdb" autocomplete="off" placeholder="Enter PDB ID">';
 		}
+		echo '<div id="liveSearchResultsComplex"></div>' . "\n";
 		echo '<input type="hidden" name="graphtype_int" value="6">';
 		?>
 		</label>
 			
 		
 		
-		<button type="submit" id="sendit_all_cgs_of_pdb" "class="btn btn-default">Search <span class="glyphicon glyphicon-search"></span></button><br>
+		<button type="submit" id="sendit_complex" "class="btn btn-default">Search <span class="glyphicon glyphicon-search"></span></button><br>
 
 		</form>	
 		

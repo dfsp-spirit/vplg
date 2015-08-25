@@ -1,5 +1,5 @@
 <?php
-/** This file retrieces complex graphs from the database, based on a query for a PDB ID.
+/** This file retrieves ligand-centered complex graphs from the database, based on a query for a PDB ID.
  * 
  * @author Tim Schäfer
  */
@@ -33,7 +33,7 @@ function get_complexgraph_query_string($pdb_id, $graphtype_str) {
 }
 
 function get_all_chains_of_pdb_query($pdb_id) {
-  $query = "SELECT c.chain_name, c.organism_scientific, c.mol_name FROM plcc_chain c WHERE ( c.pdb_id = '" . $pdb_id . "' )";
+  $query = "SELECT c.chain_id, c.chain_name, c.organism_scientific, c.mol_name FROM plcc_chain c WHERE ( c.pdb_id = '" . $pdb_id . "' )";
   return $query;
 }
 
@@ -147,6 +147,7 @@ if($valid_values){
 	        $cg_chain_name = $chains_arr['chain_name'];
 	        $mol_name = $chains_arr['mol_name'];
 	        $organism = $chains_arr['organism_scientific'];
+	        $db_chain_id = $chains_arr['chain_id'];
 	        array_push($chains, $cg_chain_name);
 	        $pdbchain = $pdb_id . $cg_chain_name;
 	        $tableString .= "<tr>\n";
