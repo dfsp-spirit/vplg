@@ -38,7 +38,7 @@ function get_all_chains_of_pdb_query($pdb_id) {
 }
 
 function get_all_ligands_of_pdb_query($pdb_id) {
-  $query = "SELECT s.lig_name, s.pdb_start, s.pdb_end, s.dssp_start, s.dssp_end, c.chain_name, c.pdb_id FROM plcc_sse s INNER JOIN plcc_chain c ON s.chain_id = c.chain_id WHERE ( c.pdb_id = '" . $pdb_id . "' AND s.sse_type = 3 ) ORDER BY s.dssp_start";
+  $query = "SELECT s.sse_id, s.lig_name, s.pdb_start, s.pdb_end, s.dssp_start, s.dssp_end, c.chain_name, c.pdb_id FROM plcc_sse s INNER JOIN plcc_chain c ON s.chain_id = c.chain_id WHERE ( c.pdb_id = '" . $pdb_id . "' AND s.sse_type = 3 ) ORDER BY s.dssp_start";
   return $query;
 }
 
@@ -171,7 +171,7 @@ if($valid_values){
 	        $lig_pdb_end = $ligand_arr['pdb_end'];
 	        $lig_dssp_start = $ligand_arr['dssp_start'];
 	        $lig_dssp_end = $ligand_arr['dssp_end'];
-	        
+	        $lig_sse_db_id = $ligand_arr['sse_id'];
 	        $num_lig_found++;
 	        
 	        $lig_name = trim($lig_name);
@@ -241,7 +241,7 @@ if($valid_values){
 		    
 		    $img_string .= "<div id='sse_cg'><img src='" . $full_sse_img_path_png . "' width='800'></div><br><br>\n";
 		} else {
-		    $img_string .= "<b>Image not available:</b> <i>The SSE-level complex graph is not available.</i>";			
+		    $img_string .= "<b>Image not available:</b> <i>The ligand-centered complex graph for this ligand is not available.</i>";
 		}
 		
 		// add download links for other formats than PNG (they can directly d/l this from the browser image)
@@ -262,110 +262,6 @@ if($valid_values){
 		  $img_string .= "<br/>";
 		  
 		}
-		
-		
-		// ------------------------------------- handle chain-level complex graph images ---------------------------
-		$chain_image_exists_png = FALSE;
-		$chain_img_link = "";
-		$full_chain_img_path_png = $IMG_ROOT_PATH . $chain_img_png;
-		if(isset($chain_img_png) && $chain_img_png != "" && file_exists($full_chain_img_path_png)) {
-			$chain_image_exists_png = TRUE;
-		} else {
-		    //echo "File '$full_img_path_png' does not exist.";
-		}
-		
-		$chain_image_exists_pdf = FALSE;
-		$full_chain_img_path_pdf = $IMG_ROOT_PATH . $chain_img_pdf;
-		if(isset($chain_img_pdf) && $chain_img_pdf != "" && file_exists($full_chain_img_path_pdf)) {
-			$chain_image_exists_pdf = TRUE;
-		}
-		
-		$chain_image_exists_svg = FALSE;
-		$full_chain_img_path_svg = $IMG_ROOT_PATH . $chain_img_svg;
-		if(isset($chain_img_svg) && $chain_img_svg != "" && file_exists($full_chain_img_path_svg)) {
-			$chain_image_exists_svg = TRUE;
-		}
-				
-		// prepare the image links
-		$img_string .= "<br><br><br><h4> Chain level complex graph</h4>\n";
-		if($chain_image_exists_png) {		    
-		    
-		    $img_string .= "<div id='chain_cg'><img src='" . $full_chain_img_path_png . "' width='800'></div><br><br>\n";
-		} else {
-		    $img_string .= "<b>Image not available:</b> <i>The chain-level complex graph is not available.</i>";			
-		}
-		
-		// add download links for other formats than PNG (they can directly d/l this from the browser image)
-		if($chain_image_exists_svg || $chain_image_exists_pdf || $chain_image_exists_png) {
-		  $img_string .= "Download the visualization in formats: ";
-		  
-		  if($chain_image_exists_png) {
-		    $img_string .= ' <a href="' . $full_chain_img_path_png .'" target="_blank">[PNG]</a>';
-		  }
-		  
-		  if($chain_image_exists_svg) {
-		    $img_string .= ' <a href="' . $full_chain_img_path_svg .'" target="_blank">[SVG]</a>';
-		  }
-		  
-		  if($chain_image_exists_pdf) {
-		    $img_string .= ' <a href="' . $full_chain_img_path_pdf .'" target="_blank">[PDF]</a>';
-		  }
-		  $img_string .= "<br/>";
-		  
-		}
-		
-		
-		
-		// --------------------------------------- handle graph text files ---------------------------------
-		
-		// check for graph text files. note that these do NOT exist once per linear notation, but only once per folding graph, so we add them here.
-	    // The paths to these are not yet saved in the database.
-	    $graph_file_name_no_ext = get_complex_sse_graph_file_name_no_ext($pdb_id, $graphtype_str);
-	
-		// GML
-		$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".gml";
-		if(file_exists($full_file)){		    
-			$img_string .= "Download the complex graph file in formats: ";
-			
-			$img_string .= ' <a href="' . $full_file .'" target="_blank">[GML]</a>';
-			
-			// we only check for other formats if GML exists:
-			
-			// check for TGF
-			$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".tgf";
-			if(file_exists($full_file)){		    
-			    $img_string .= ' <a href="' . $full_file .'" target="_blank">[TGF]</a>';
-			}
-			// gv
-				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".gv";
-				if(file_exists($full_file)){
-				    $img_string .= ' <a href="' . $full_file .'" target="_blank">[GV]</a>';
-				}
-				// kavosh
-				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".kavosh";
-				if(file_exists($full_file)){
-				    $img_string .= ' <a href="' . $full_file .'" target="_blank">[Kavosh]</a>';
-				}
-                // json
-				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".json";
-				if(file_exists($full_file)){
-				    $img_string .= ' <a href="' . $full_file .'" target="_blank">[JSON]</a>';
-				}
-				// XML / XGMML
-				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".xml";
-				if(file_exists($full_file)){
-				    $img_string .= ' <a href="' . $full_file .'" target="_blank">[XML (XGMML)]</a>';
-				}				
-                // edge list with separate label file				
-				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".el_edges";
-				$full_file2 = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".el_ntl";
-				if(file_exists($full_file) && file_exists($full_file2)){
-				    $img_string .= ' [EL: <a href="' . $full_file .'" target="_blank">edges</a> <a href="' . $full_file2 .'" target="_blank">labels</a>]';
-				}		
-			
-			$img_string .= '<br><br>';
-		}
-		
 		
 		$num_found++;
 				
