@@ -10814,6 +10814,77 @@ connection.close();
     }
     
     
+    /**
+     * Retrieves DB id of a ligand-centered graph, based on the internal database ID of the ligand sse
+     * @param ligand_sse_db_id the internal database ID of the ligand sse
+     * @return the database id of a ligand-centered graph
+     */
+    public static Long getDBLCGID(Long ligand_sse_db_id) {
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT ligandcenteredgraph_id FROM " + tbl_ligandcenteredgraph + " WHERE (lig_sse_id = ?);";
+
+        try {
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, ligand_sse_db_id);
+                                
+            rs = statement.executeQuery();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "getDBLCGID: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
+                //dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "getDBLCGID: Could not close statement and reset autocommit."); }
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        if(tableData.size() >= 1) {
+            if(tableData.get(0).size() >= 1) {
+                return(Long.valueOf(tableData.get(0).get(0)));
+            }
+            else {
+                DP.getInstance().w("DBManager", "getDBLCGID: LCG with ligand SSE '" + ligand_sse_db_id + "' not in DB.");
+                return(-1L);
+            }
+        }
+        else {
+            return(-1L);
+        }        
+    }
 
     /**
      * Retrieves the DB id of the SSE identified by chain and dssp start residue

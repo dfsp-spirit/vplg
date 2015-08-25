@@ -6874,6 +6874,8 @@ public class Main {
                 
                 // database
                 if(Settings.getBoolean("plcc_B_useDB")) {
+                    
+                    // write info on the graph itself to the DB
                     String dbImagePathLCG = ligimgFileNoExt;
                     if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
                         dbImagePathLCG = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, "ALL") + fs + ligfileNameSSELevelWithoutExtension;
@@ -6890,14 +6892,41 @@ public class Main {
                         continue;
                     }
                     
+                    Boolean graphOK = false;
                     try {
-
                         DBManager.writeLigandCenteredComplexGraphToDB(pdbid, sse_db_id, dbImagePathLCG + ".svg", dbImagePathLCG + ".png", dbImagePathLCG + ".pdf");
+                        graphOK = true;
                         if(! silent) {
                             System.out.println("      Wrote ligand-centered complex graph of ligand " + ligName + " (PDB " + pdbid + ") to DB.");
                         }
                     } catch(SQLException e) {
                         DP.getInstance().w("Main", "Could not write ligand-centered omplex graph to DB: '" + e.getMessage() + "'.");
+                    }
+                    
+                    // assign all chains to the graph in the DB (only makes sense if graph was entered)
+                    if(graphOK) {
+                        Long lcg_db_id = DBManager.getDBLCGID(sse_db_id);
+                        if(lcg_db_id <= 0L) { 
+                            DP.getInstance().e("Main", "Ligand-centered complex graph of ligand " + ligName + ", identified by database SSE ID " + sse_db_id + ", not found in DB, cannot assign LCG to chain in DB.");
+                            continue;
+                        }
+                        
+                        for(String contactChainName : ligContactChains) {
+                            Long contact_chain_db_id = DBManager.getDBChainID(pdbid, contactChainName);
+                            if(contact_chain_db_id <= 0L) { 
+                                DP.getInstance().e("Main", "Chain " + contactChainName + " of PDB " + pdbid + " not found in DB, cannot assign LCG to chain " + contactChainName + " in DB.");
+                                continue;
+                            }
+                            
+                            try {
+                                DBManager.assignLigandCenteredComplexGraphToChain(lcg_db_id, contact_chain_db_id);
+                                if(! silent) {
+                                    System.out.println("        Assigned ligand-centered complex graph of ligand " + ligName + " to chain " + contactChainName + " in DB.");
+                                }
+                            } catch(SQLException e) {
+                                DP.getInstance().e("Main", "Could not assign ligand-centered complex graph of ligand " + ligName + " to chain " + ligChainName + " in DB: '" + e.getMessage() + "'.");
+                            }
+                        }
                     }
                 } 
             }
