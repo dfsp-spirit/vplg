@@ -891,7 +891,7 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_fglinnot + " (linnot_id serial primary key, denorm_pdb_id varchar(4) not null, denorm_chain_name varchar(2) not null, denorm_graph_type int not null, denorm_graph_type_string text not null, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text, filepath_linnot_image_def_svg text, filepath_linnot_image_def_png text, filepath_linnot_image_def_pdf text, num_sses int);");
             doInsertQuery("CREATE TABLE " + tbl_graphletsimilarity + " (graphletsimilarity_id serial primary key, graphletsimilarity_sourcegraph int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graphletsimilarity_targetgraph int not null references " + tbl_proteingraph + " ON DELETE CASCADE, score numeric);");
             
-            doInsertQuery("CREATE TABLE " + tbl_ligandcenteredgraph + " (ligandcenteredgraph_id serial primary key, lig_sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, filepath_lcg_svg text, filepath_lcg_png text, filepath_lcg_pdf text);");
+            doInsertQuery("CREATE TABLE " + tbl_ligandcenteredgraph + " (ligandcenteredgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, lig_sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, filepath_lcg_svg text, filepath_lcg_png text, filepath_lcg_pdf text);");
             doInsertQuery("CREATE TABLE " + tbl_nm_lcg_to_chain + " (lcg2c_id serial primary key, lcg2c_ligandcenteredgraph_id int not null references " + tbl_ligandcenteredgraph + " ON DELETE CASCADE, lcg2c_chain_id int not null references " + tbl_chain + " ON DELETE CASCADE);");
 
             // set constraints
@@ -1128,6 +1128,7 @@ public class DBManager {
             doInsertQuery("CREATE INDEX plcc_idx_ligandtochain_chain ON " + tbl_nm_ligandtochain + " (ligandtochain_chainid);");
             doInsertQuery("CREATE INDEX plcc_idx_ligandtochain_name3 ON " + tbl_nm_ligandtochain + " (ligandtochain_ligandname3);");
             doInsertQuery("CREATE INDEX plcc_idx_lcg_sse ON " + tbl_ligandcenteredgraph + " (lig_sse_id);");
+            doInsertQuery("CREATE INDEX plcc_idx_lcg_pdb ON " + tbl_ligandcenteredgraph + " (pdb_id);");
             doInsertQuery("CREATE INDEX plcc_idx_lcg2c_graphid ON " + tbl_nm_lcg_to_chain + " (lcg2c_ligandcenteredgraph_id);");
             doInsertQuery("CREATE INDEX plcc_idx_lcg2c_chainid ON " + tbl_nm_lcg_to_chain + " (lcg2c_chain_id);");
 
@@ -8537,6 +8538,101 @@ connection.close();
                     dbc.rollback();
                 } catch(SQLException excep) {
                     System.err.println("ERROR: SQL: writeComplexGraphToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+            result = false;
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            //dbc.setAutoCommit(true);
+        }
+        return(result);
+    }
+    
+    
+
+    /**
+     * Writes the ligand-centered complex graph to the database.
+     * @param pdb_id the PDB id (foreign key)
+     * @param lig_sse_db_id the database ID of the SSE (foreign key)
+     * @param lcg_image_svg filepath (relative, to image base dir) to SVG image
+     * @param lcg_image_png filepath (relative, to image base dir) to PNG image
+     * @param lcg_image_pdf filepath (relative, to image base dir) to PDF image
+     * @return use exception
+     * @throws SQLException if stuff goes wrong
+     */
+    public static Boolean writeLigandCenteredComplexGraphToDB(String pdb_id, Long lig_sse_db_id, String lcg_image_svg, String lcg_image_png, String lcg_image_pdf) throws SQLException {
+                       
+        PreparedStatement statement = null;
+        Boolean result;
+        String query = "INSERT INTO " + tbl_ligandcenteredgraph + " (pdb_id, lig_sse_id, filepath_lcg_svg, filepath_lcg_png, filepath_lcg_pdf) VALUES (?, ?, ?, ?, ?);";
+
+        
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setString(1, pdb_id);
+            statement.setLong(2, lig_sse_db_id);
+            statement.setString(3, lcg_image_svg);
+            statement.setString(4, lcg_image_png);
+            statement.setString(5, lcg_image_pdf);
+                                
+            statement.executeUpdate();
+            //dbc.commit();
+            result = true;
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: writeLigandCenteredComplexGraphToDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: writeLigandCenteredComplexGraphToDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: writeLigandCenteredComplexGraphToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+            result = false;
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            //dbc.setAutoCommit(true);
+        }
+        return(result);
+    }
+
+    
+    /**
+     * Assign an existing ligand-centered complex graph in the database to a chain.
+     * @param ligandcenteredgraph_db_id the db id of the lcg
+     * @param chain_db_id the db id of the chain
+     * @return use exception instead
+     * @throws SQLException if stuff goes wrong
+     */
+    public static Boolean assignLigandCenteredComplexGraphToChain(Long ligandcenteredgraph_db_id, Long chain_db_id) throws SQLException {
+                       
+        PreparedStatement statement = null;
+        Boolean result;
+        String query = "INSERT INTO " + tbl_nm_lcg_to_chain + " (lcg2c_ligandcenteredgraph_id, lcg2c_chain_id) VALUES (?, ?);";
+
+        
+        try {
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, ligandcenteredgraph_db_id);
+            statement.setLong(2, chain_db_id);
+                                
+            statement.executeUpdate();
+            result = true;
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: assignLigandCenteredComplexGraphToChain: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: assignLigandCenteredComplexGraphToChain: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: assignLigandCenteredComplexGraphToChain: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
                 }
             }
             result = false;
