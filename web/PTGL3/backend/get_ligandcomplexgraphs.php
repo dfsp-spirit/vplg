@@ -33,6 +33,27 @@ function get_ligandcomplexgraph_query_string($pdb_id) {
    return $query;
 }
 
+function get_contact_chains_for_ligand($db, $lig_sse_db_id) {
+  $lig_contact_chains = array();
+  $query = "SELECT c.chain_name, lcg2c.lcg2c_ligandcenteredgraph_id, lcg2c.lcg2c_chain_id FROM plcc_nm_lcgtochain lcg2c INNER JOIN plcc_chain c ON lcg2c.lcg2c_chain_id = c.chain_id INNER JOIN plcc_ligandcenteredgraph lcg ON lcg2c.lcg2c_ligandcenteredgraph_id = lcg.ligandcenteredgraph_id WHERE ( lcg.lig_sse_id = " . $lig_sse_db_id . " );";
+  $result = pg_query($db, $query);
+  while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
+    array_push($lig_contact_chains, $arr['chain_name']);
+  }
+  return $lig_contact_chains;
+}
+
+function get_lcg_ids_for_ligand($db, $lig_sse_db_id) {
+  $lcg_ids = array();
+  $query = "SELECT lcg.ligandcenteredgraph_id FROM plcc_ligandcenteredgraph lcg  WHERE ( lcg.lig_sse_id = " . $lig_sse_db_id . " );";
+  $result = pg_query($db, $query);
+  while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
+    array_push($lcg_ids, $arr['ligandcenteredgraph_id']);
+  }
+  return $lcg_ids;
+}
+
+
 function get_all_chains_of_pdb_query($pdb_id) {
   $query = "SELECT c.chain_id, c.chain_name, c.organism_scientific, c.mol_name FROM plcc_chain c WHERE ( c.pdb_id = '" . $pdb_id . "' )";
   return $query;
@@ -149,7 +170,7 @@ if($valid_values){
 	// determine all ligands (single ligand molecules from SSEs (ligand residues, not ligand types. This means something like ICT-485, not ICT)
 	$ligands_query = get_all_ligands_of_pdb_query($pdb_id);
 	$ligands_result = pg_query($db, $ligands_query);
-	$ligtableString = "<div><table id='tblligresults' class='results'><tr><th>Ligand type</th><th>Chain</th><th>1st PDB residue</th><th>1st DSSP residue</th><th>Go to ligand complex graph</th></tr>\n";
+	$ligtableString = "<div><table id='tblligresults' class='results'><tr><th>Ligand type</th><th>Chain</th><th>1st PDB residue</th><th>1st DSSP residue</th><th>Contact chains</th><th>Go to ligand complex graph</th></tr>\n";
 	while ($ligand_arr = pg_fetch_array($ligands_result, NULL, PGSQL_ASSOC)){
 		// data from SSE table (not from ligands table):
 	        $lig_name = $ligand_arr['lig_name'];
@@ -169,10 +190,31 @@ if($valid_values){
 		else {
 		    $lig_name_link = $lig_name;
 		}
+		
+		$contact_chains = get_contact_chains_for_ligand($db, $lig_sse_db_id);
+		$lcg_ids = get_lcg_ids_for_ligand($db, $lig_sse_db_id);
+		if(! $contact_chains) {echo "FU: $lig_sse_db_id '" . pg_last_error($db) . "' "; }
+		$lig_has_lcg = (count($lcg_ids) >= 1);
 	        
 	        $ligtableString .= "<tr>\n";
 		$ligtableString .= "<td>$lig_name_link</td><td>$lig_chain_name</td><td>$lig_pdb_start</td><td>$lig_dssp_start</td>";
-		$ligtableString .= "<td><a href='./ligcomplexgraphs.php?pdb=" . $pdb_id . "' alt='Show ligand complex graphs of this ligand'>LCG of ligand " . $lig_name ." (PDB residue " . $lig_pdb_start . ")</a></td>\n";
+		
+		if($lig_has_lcg) {
+		    $ligtableString .= "<td>";
+		    foreach($contact_chains as $cc) {
+		      $ligtableString .= " " . $cc;
+		    }
+		} else {
+		    $ligtableString .= "<td>" . $lig_chain_name . "</td>\n";
+		}
+		
+		
+		if($lig_has_lcg) {
+		    $ligtableString .= "<td><a href='./ligcomplexgraphs.php?pdb=" . $pdb_id . "' alt='Show ligand complex graphs for this ligand'>LCG of ligand " . $lig_name ." (PDB residue " . $lig_pdb_start . ")</a></td>\n";
+		} else {
+		    $ligtableString .= "<td><a href='./results.php?q=" . $pdb_id . $lig_chain_name ."' alt='Show protein graph for chain of this ligand'>PG of the ligand chain " . $lig_chain_name . "</a></td>\n";
+		}
+		
 		$ligtableString .= "</tr>\n";
 		
 	}
