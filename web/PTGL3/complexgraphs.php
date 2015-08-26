@@ -89,7 +89,7 @@ function get_total_complexgraphs_count($db) {
 			
 		
 		
-		<button type="submit" id="sendit_complex" "class="btn btn-default">Search <span class="glyphicon glyphicon-search"></span></button><br>
+		<button type="submit" id="sendit_complex" class="btn btn-default">Search <span class="glyphicon glyphicon-search"></span></button><br>
 
 		</form>	
 		
@@ -112,7 +112,7 @@ function get_total_complexgraphs_count($db) {
 					echo "<br><h3> Complex graph images </h3><br><p>The images below show the complex graph of all chains of the selected PDB file.</p>\n";
 					echo $img_string;
 					
-					echo "<br><br><h3> Ligand-centered complex graphs</h3>";
+					echo "<br><br><h3> Ligands contained in the PDB file</h3>";
 					if($num_lig_found > 0) {					  
 					  echo $ligtableString;
 					}
@@ -124,7 +124,7 @@ function get_total_complexgraphs_count($db) {
 				      
 				        $conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
                                         $db = pg_connect($conn_string);
-                                        $num_fgraphs = 0;
+                                        $num_cgraphs = 0;
                                         if($db) {
                                           $num_cgraphs = get_total_complexgraphs_count($db);
                                         }

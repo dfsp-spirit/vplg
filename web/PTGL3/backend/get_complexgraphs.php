@@ -184,7 +184,7 @@ if($valid_values){
 	        
 	        $ligtableString .= "<tr>\n";
 		$ligtableString .= "<td>$lig_name_link</td><td>$lig_chain_name</td><td>$lig_pdb_start</td><td>$lig_dssp_start</td>";
-		$ligtableString .= "<td><a href='./ligcomplexgraphs.php?pdb=" . $pdb_id . "' alt='Show ligand complex graphs of this ligand'>LCG of ligand " . $lig_name ." (PDB residue " . $lig_pdb_start . ")</a></td>\n";
+		$ligtableString .= "<td><a href='./ligandcenteredgraphs.php?pdb=" . $pdb_id . "' alt='Show ligand complex graphs of PDB file'>LCGs of PDB " . $pdb_id . "</a></td>\n";
 		$ligtableString .= "</tr>\n";
 		
 	}

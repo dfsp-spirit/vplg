@@ -27,8 +27,9 @@ function get_ligand_expo_link($ligand_name3) {
     return false;    
 }
 
-function get_complexgraph_query_string($pdb_id, $graphtype_str) {
-   $query = "SELECT complexgraph_id, pdb_id, filepath_ssegraph_image_png, filepath_ssegraph_image_svg, filepath_ssegraph_image_pdf, filepath_chaingraph_image_png, filepath_chaingraph_image_svg, filepath_chaingraph_image_pdf FROM (SELECT cg.complexgraph_id, cg.filepath_ssegraph_image_png, cg.filepath_ssegraph_image_svg, cg.filepath_ssegraph_image_pdf, cg.filepath_chaingraph_image_png, cg.filepath_chaingraph_image_svg, cg.filepath_chaingraph_image_pdf, cg.pdb_id AS pdb_id FROM plcc_complexgraph cg WHERE ( cg.pdb_id = '" . $pdb_id . "' )) bar ORDER BY complexgraph_id";
+
+function get_ligandcomplexgraph_query_string($pdb_id) {
+   $query = "SELECT lcg.ligandcenteredgraph_id, lcg.pdb_id, lcg.lig_sse_id, lcg.filepath_lcg_png, lcg.filepath_lcg_svg, lcg.filepath_lcg_pdf FROM plcc_ligandcenteredgraph lcg WHERE ( lcg.pdb_id = '" . $pdb_id . "' ) ORDER BY lcg.lig_sse_id";
    return $query;
 }
 
@@ -103,24 +104,12 @@ $pageload_was_search = FALSE;
 $valid_values = FALSE;
 
 if(isset($_GET['pdb'])){
-
-        if(isset($_GET['graphtype_int'])) {
-          $graphtype_int = $_GET["graphtype_int"];
-        }
-        else {
-          $graphtype_int = 6;
-        }
         
         $pageload_was_search = TRUE;
 	$valid_values = FALSE;
 	$pdb_id = $_GET["pdb"];
-	if(($graphtype_int === "1" || $graphtype_int === "2" || $graphtype_int === "3" || 
-	    $graphtype_int === "4" || $graphtype_int === "5" || $graphtype_int === "6") ) { 
-
-	    if(check_valid_pdbid($pdb_id)) {
-		    $valid_values = TRUE;				  
-	    }
-		
+	if(check_valid_pdbid($pdb_id)) {
+		$valid_values = TRUE;				  
 	}
 }
 
@@ -134,9 +123,7 @@ if($valid_values){
 	$db = pg_connect($conn_string);
 	if(! $db) { array_push($SHOW_ERROR_LIST, "Database connection failed."); }
 	//if(! $db) { echo "NO_DB"; }
-	
-	$graphtype_str = get_graphtype_string($graphtype_int);
-	
+		
 	// determine all chains
 	$chains_query = get_all_chains_of_pdb_query($pdb_id);
 	$chains_result = pg_query($db, $chains_query);
@@ -191,7 +178,7 @@ if($valid_values){
 	}
 	$ligtableString .= "</table></div>\n";
 	
-	$query = get_complexgraph_query_string($pdb_id, $graphtype_str);
+	$query = get_ligandcomplexgraph_query_string($pdb_id);
 	
 	//echo "query='" . $query . "'\n";
 	
@@ -203,17 +190,15 @@ if($valid_values){
 	$html_id = "";
 	while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
 		// data from complexgraph table:
-	        $complexgraph_id = $arr['complexgraph_id'];	
-	        $cg_pdb_id = $arr['pdb_id'];
-		$sse_img_png = $arr['filepath_ssegraph_image_png']; // the PNG format image
-		$sse_img_pdf = $arr['filepath_ssegraph_image_pdf'];
-		$sse_img_svg = $arr['filepath_ssegraph_image_svg'];
-		$chain_img_png = $arr['filepath_chaingraph_image_png']; // the PNG format image
-		$chain_img_pdf = $arr['filepath_chaingraph_image_pdf'];
-		$chain_img_svg = $arr['filepath_chaingraph_image_svg'];
+	        $lcg_id = $arr['ligandcenteredgraph_id'];	
+	        $lcg_pdb_id = $arr['pdb_id'];
+	        $lcg_lig_sse_id = $arr['lig_sse_id'];
+		$sse_img_png = $arr['filepath_lcg_png']; // the PNG format image
+		$sse_img_pdf = $arr['filepath_lcg_pdf'];
+		$sse_img_svg = $arr['filepath_lcg_svg'];
 
 
-		// ------------------------------------- handle SSE-level complex graph images ---------------------------
+		// ------------------------------------- handle ligand-centered complex graph images ---------------------------
 		$sse_image_exists_png = FALSE;
 		$sse_img_link = "";
 		$full_sse_img_path_png = $IMG_ROOT_PATH . $sse_img_png;
@@ -236,10 +221,10 @@ if($valid_values){
 		}
 				
 		// prepare the image links
-		$img_string .= "<br><br><br><h4> SSE level complex graph</h4>\n";
+		$img_string .= "<br><br><br><h4> Ligand-centered graphs</h4>\n";
 		if($sse_image_exists_png) {		    
 		    
-		    $img_string .= "<div id='sse_cg'><img src='" . $full_sse_img_path_png . "' width='800'></div><br><br>\n";
+		    $img_string .= "<div id='sse_cg'><p>Graph for ligand with DSSP identifier " . $lcg_lig_sse_id . ":</p><img src='" . $full_sse_img_path_png . "' width='800'></div><br><br>\n";
 		} else {
 		    $img_string .= "<b>Image not available:</b> <i>The ligand-centered complex graph for this ligand is not available.</i>";
 		}
