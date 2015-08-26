@@ -37,6 +37,15 @@
 								<a href="linnots_of_foldinggraph.php"><i class="fa fa-briefcase"></i> All linear notations of a FG</a>
 							</li>
 							
+							<?php if($ENABLE_COMPLEX_GRAPHS) { ?>
+							<li>
+								<a href="complexgraphs.php"><i class="fa fa-briefcase"></i> The complex graph of a multi-chain protein</a>
+							</li>
+							<li>
+								<a href="ligandcenteredgraphs.php"><i class="fa fa-briefcase"></i> Ligand-centered graphs of all ligands of a multi-chain protein</a>
+							</li>
+							<?php } ?>
+							
 						</ul><!-- end dropdown menu -->
 					</li><!-- end dropdown -->
 					<li class="dropdown">

@@ -151,11 +151,7 @@ function check_install($db)  {
 						<div id="advancedButton"> Advanced Search <div id="arrow"><strong class="caret"></strong></div></div>
 						<div id="liveSearchResults"></div>
 
-						<?php if($ENABLE_COMPLEX_GRAPHS) { ?>
-						<label class="checkboxFont">
-							<input type="checkbox" id="inlineCheckbox3" name="proteincomplexes" value="1"> Search for Protein Complexes
-						</label>
-						<?php } ?>
+						
 					</form>							
 						
 					<form class="form-inline" action="search.php" method="get">
