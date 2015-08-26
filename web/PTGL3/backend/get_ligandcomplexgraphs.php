@@ -136,6 +136,8 @@ if(isset($_GET['pdb'])){
 
 $num_found = 0;
 $num_lig_found = 0;
+$num_lig_nolcg_found = 0;
+$no_lcg_table_string = "";
 
 if($valid_values){
     //echo "valid";
@@ -170,7 +172,15 @@ if($valid_values){
 	// determine all ligands (single ligand molecules from SSEs (ligand residues, not ligand types. This means something like ICT-485, not ICT)
 	$ligands_query = get_all_ligands_of_pdb_query($pdb_id);
 	$ligands_result = pg_query($db, $ligands_query);
-	$ligtableString = "<div><table id='tblligresults' class='results'><tr><th>Ligand type</th><th>Chain</th><th>1st PDB residue</th><th>1st DSSP residue</th><th>Contact chains</th><th>Go to ligand complex graph</th></tr>\n";
+	$ligtableString = "<div><table id='tblligresults' class='results'><tr><th>Ligand index</th><th>Ligand type</th><th>Chain</th><th>1st PDB residue</th><th>1st DSSP residue</th><th>Contact chains</th><th>Go to ligand complex graph</th></tr>\n";
+	
+	$ligand_names = array();
+	$ligand_chains = array(); // the chain a ligand is assigned to (in PDB/DSSP data), by index
+	$lig_indices_by_sse_id = array();
+	
+	$no_lcg_indices = array();	// indices of all ligands which do not have a dedicated LCG, because they have contacts only to their own chain
+	
+	$lig_idx = 0;
 	while ($ligand_arr = pg_fetch_array($ligands_result, NULL, PGSQL_ASSOC)){
 		// data from SSE table (not from ligands table):
 	        $lig_name = $ligand_arr['lig_name'];
@@ -183,6 +193,13 @@ if($valid_values){
 	        $num_lig_found++;
 	        
 	        $lig_name = trim($lig_name);
+	        
+	        $tag_name = "ligand" . $lig_idx;
+	        $ligand_names[$lig_idx] = $lig_name;
+	        $ligand_chains[$lig_idx] = $lig_chain_name;
+	        $lig_indices_by_sse_id[$lig_sse_db_id] = $lig_idx;
+	        
+	        
                 $ligexpo_link = get_ligand_expo_link($lig_name);
 		if($ligexpo_link) {
 		    $lig_name_link = "<a href='" . $ligexpo_link . "' target='_blank'>" . $lig_name . "</a>";
@@ -196,7 +213,7 @@ if($valid_values){
 		$lig_has_lcg = (count($lcg_ids) >= 1);
 	        
 	        $ligtableString .= "<tr>\n";
-		$ligtableString .= "<td>$lig_name_link</td><td>$lig_chain_name</td><td>$lig_pdb_start</td><td>$lig_dssp_start</td>";
+		$ligtableString .= "<td>$lig_idx</td><td>$lig_name_link</td><td>$lig_chain_name</td><td>$lig_pdb_start</td><td>$lig_dssp_start</td>";
 		
 		if($lig_has_lcg) {
 		    $ligtableString .= "<td>";
@@ -207,20 +224,43 @@ if($valid_values){
 		      }
 		    }
 		} else {
+		    array_push($no_lcg_indices, $lig_idx);
 		    $ligtableString .= "<td>" . $lig_chain_name . "</td>\n";
 		}
 		
 		
 		if($lig_has_lcg) {
-		    $ligtableString .= "<td><a href='./ligcomplexgraphs.php?pdb=" . $pdb_id . "' alt='Show ligand complex graphs for this ligand'>LCG of ligand " . $lig_name ." (PDB residue " . $lig_pdb_start . ")</a></td>\n";
+		    $ligtableString .= "<td><a href='#" . $tag_name . "' alt='Show ligand complex graphs for this ligand'>LCG of ligand " . $lig_name ." (PDB residue " . $lig_pdb_start . ")</a></td>\n";
 		} else {
 		    $ligtableString .= "<td><a href='./results.php?q=" . $pdb_id . $lig_chain_name ."' alt='Show protein graph for chain of this ligand'>PG of the ligand chain " . $lig_chain_name . "</a></td>\n";
 		}
 		
 		$ligtableString .= "</tr>\n";
+		$lig_idx++;
 		
 	}
 	$ligtableString .= "</table></div>\n";
+	
+	
+	
+	$num_lig_nolcg_found = count($no_lcg_indices);
+	if($num_lig_nolcg_found > 0) {
+	  $no_lcg_table_string = "<br><br><h4>Ligands which only have contacts to their own chain</h4>";
+	  $no_lcg_table_string .= "<p>These ligands do not need a special ligand-centered graph, use the albelig protein graph instead.</p>";
+	  
+	  // print HTML jump labels (these are for users entering the page with a link that includes the ligand index)
+	  foreach($no_lcg_indices as $ligand_index) {
+	    $no_lcg_table_string .= "<a name='#ligand" . $ligand_index . "></a>\n";
+	  }
+	  
+	  $no_lcg_table_string .= "<table class='results'><tr><th>Ligand index</th><th>Name</th><th>Chain</th><th>Contact chains</th><th>Link</th></tr>\n";
+	  foreach($no_lcg_indices as $ligand_index) {
+	    $ch = $ligand_chains[$ligand_index];
+	    $no_lcg_table_string .= "<tr><td>" . $ligand_index . "</td><td>" . $ligand_names[$ligand_index] . "</td><td>". $ch . "</td><td>" . $ch . "</td><td>" . "<a href='results.php?q=" . $pdb_id . $ch . "'>PG of " . $pdb_id . " chain " . $ch . "</a></td></tr>\n";
+	  }
+	  $no_lcg_table_string .= "</table>\n";
+	}
+	
 	
 	$query = get_ligandcomplexgraph_query_string($pdb_id);
 	
@@ -266,9 +306,10 @@ if($valid_values){
 				
 		// prepare the image links
 		$img_string .= "<br><br><br><h4> Ligand-centered graphs</h4>\n";
+		$this_lig_idx = $lig_indices_by_sse_id[$lcg_lig_sse_id];
 		if($sse_image_exists_png) {		    
 		    
-		    $img_string .= "<div id='sse_cg'><p>Graph for ligand with DSSP identifier " . $lcg_lig_sse_id . ":</p><img src='" . $full_sse_img_path_png . "' width='800'></div><br><br>\n";
+		    $img_string .= "<div id='sse_cg'><a name='ligand" . $this_lig_idx . "'></a><p>Graph for ligand no. " . $this_lig_idx . " with DSSP identifier " . $lcg_lig_sse_id . ":</p><img src='" . $full_sse_img_path_png . "' width='800'></div><br><br>\n";
 		} else {
 		    $img_string .= "<b>Image not available:</b> <i>The ligand-centered complex graph for this ligand is not available.</i>";
 		}
