@@ -192,8 +192,7 @@ if($valid_values){
 		}
 		
 		$contact_chains = get_contact_chains_for_ligand($db, $lig_sse_db_id);
-		$lcg_ids = get_lcg_ids_for_ligand($db, $lig_sse_db_id);
-		if(! $contact_chains) {echo "FU: $lig_sse_db_id '" . pg_last_error($db) . "' "; }
+		$lcg_ids = get_lcg_ids_for_ligand($db, $lig_sse_db_id);		
 		$lig_has_lcg = (count($lcg_ids) >= 1);
 	        
 	        $ligtableString .= "<tr>\n";
@@ -201,8 +200,11 @@ if($valid_values){
 		
 		if($lig_has_lcg) {
 		    $ligtableString .= "<td>";
-		    foreach($contact_chains as $cc) {
-		      $ligtableString .= " " . $cc;
+		    for($i = 0; $i < count($contact_chains); $i++) {
+		      $ligtableString .= "" . $contact_chains[$i];
+		      if($i < (count($contact_chains) - 1)) {
+		        $ligtableString .= ", ";
+		      }
 		    }
 		} else {
 		    $ligtableString .= "<td>" . $lig_chain_name . "</td>\n";
