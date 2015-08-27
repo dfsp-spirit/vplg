@@ -60,6 +60,59 @@ public class IO {
         return copy; 
     }
     
+    /**
+     * Determines whether a string (repr. a path) ends with / or \
+     * @param baseOutputDir the input path
+     * @return whether it ends with / or \
+     */
+    public static Boolean pathEndsWithFsAlready(String baseOutputDir) {
+        if(baseOutputDir.length() == 0) {
+            return false;
+        }
+        else {
+            if(baseOutputDir.endsWith("/") || baseOutputDir.endsWith("\\")) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    }
+    
+    /**
+     * Generates PDB-style subdir tree for PDB ID and chain ('ic/8icd/A'), creates required dir if it does not exist, and returns relative path to it.
+     * @param baseOutputDir the base output dir to work from, e.g., "." or "data"
+     * @param pdbid the PDB ID, e.g., "8icd"
+     * @param chain the chain name, e.g., "A"
+     * @return the path of the subdir tree, without (=excluding) the baseOutputDir. So if you gave a baseOutputDir="data/", pdbid="8icd" and chain="A", if will return "ic/8icd/A/". If the directory could NOT be created, it will return null.
+     */
+    public static String createSubDirTreeDir(String baseOutputDir, String pdbid, String chain) {
+        File targetDir = IO.generatePDBstyleSubdirTreeName(new File(baseOutputDir), pdbid, chain);
+        String expDir = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, chain);  // something like 'ic/8icd/A'
+        if(targetDir != null) {
+            ArrayList<String> errors = IO.createDirIfItDoesntExist(targetDir);
+            if( ! errors.isEmpty()) {
+                for(String err : errors) {
+                    DP.getInstance().e("IO", "dirOrDie: " + err);
+                }
+            } else {                
+                String fsOrNot = File.separator;
+                if(IO.pathEndsWithFsAlready(baseOutputDir)) { fsOrNot = ""; }
+                String expDirRelToOutputDir = fsOrNot + expDir + File.separator;
+                String expDirRelToWorkDir = baseOutputDir + fsOrNot + expDir + File.separator;
+                File expDirFile = new File(expDirRelToWorkDir);
+                if(expDirFile != null) {
+                    if(expDirFile.canRead() && expDirFile.isDirectory()) {
+                        return expDirRelToOutputDir;
+                    }
+                }
+            }                    
+        } else {
+            DP.getInstance().e("IO", "dirOrDie: Could not determine PDB-style subdir path name.");                
+        }
+        return null;
+    }
+    
     
     /**
      * Parses a property file, assumes that all keys are integer values and that all values are strings. Stores them in a map and returns it.
@@ -312,14 +365,25 @@ public class IO {
     
     
     /**
-     * Ugly hack to remove a trailing "./" or ".\" from a string.
+     * Ugly hack to remove the prefix "./" or ".\" from a string (if it exists).
      * @param path the input string, which may or may not start with "./" or ".\"
-     * @return if the input string starts with one of the mentioned patterns, the input string with the trailing pattern removed. Otherwise, the output string is the input string.
+     * @return if the input string starts with one of the mentioned patterns, returns the input string with the pattern removed. Otherwise, the output string is the input string.
      */
     public static String stripTrailingShitFromPathIfThere(String path) {
         String np = path;
         if(np.startsWith("./") || np.startsWith(".\\")) {
             np = np.substring(2);
+        }
+        return np;
+    }
+    
+    public static String removeSlashAtEndIfThere(String path) {
+        String np = path;
+        if(np.length() == 0) {
+            return np;
+        }
+        if(np.endsWith("/") || np.endsWith("\\")) {
+            np = np.substring(0, np.length() - 1);
         }
         return np;
     }

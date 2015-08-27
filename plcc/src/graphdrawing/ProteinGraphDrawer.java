@@ -1620,7 +1620,7 @@ public class ProteinGraphDrawer {
                     // ------- set color for interchain (complex) contacts ------------
                     if (!Objects.equals(iChainID, jChainID)) {
                         // interchain contact
-                        ig2.setStroke(new BasicStroke(2, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
+                        //ig2.setStroke(new BasicStroke(2, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
                         if (edgeType.equals(SpatRel.PARALLEL)) {
                             ig2.setPaint(C_INTERCHAIN_PARALLEL);
                         } else if (edgeType.equals(SpatRel.ANTIPARALLEL)) {

@@ -1739,8 +1739,17 @@ public class Main {
                 aag.setPdbid(pdbid);
                 aag.setChainid(AAGraph.CHAINID_ALL_CHAINS);
                 
+                String subDirTree = "";
+                if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
+                    subDirTree = IO.createSubDirTreeDir(outputDir, pdbid, "ALL");
+                    if(subDirTree == null) { 
+                        DP.getInstance().e("Main", "Could not create subdir tree (outputDir='" + outputDir + "', pdbid='" + pdbid + "'). Missing file system level access rights?"); 
+                        System.exit(1); 
+                    }
+                }
+                
                 // write the AA graph
-                String aagFile = outputDir + fs + pdbid + "_aagraph.gml";
+                String aagFile = outputDir + fs + subDirTree + pdbid + "_aagraph.gml";
                 if(writeStringToFile(aagFile, aag.toGraphModellingLanguageFormat())) {
                     if(! silent) {
                         System.out.println("  AAGraph for all chains written to file '" + aagFile + "'.");
@@ -1751,7 +1760,7 @@ public class Main {
                 }
                 
                 // write the AA contact statistics matrix (by AA type, not single AA)
-                String aaMatrixFile = outputDir + fs + pdbid + "_aatypematrix.gml";
+                String aaMatrixFile = outputDir + fs + subDirTree + pdbid + "_aatypematrix.gml";
                 if(writeStringToFile(aaMatrixFile, aag.getAminoAcidTypeInteractionMatrixGML())) {
                     if(! silent) {
                         System.out.println("  AA type contact stats matrix for all chains written to file '" + aaMatrixFile + "'.");
@@ -6578,22 +6587,25 @@ public class Main {
             System.out.println("  Preparing to write complex graph files (CG verts / edges : " + compGraph.getVertices().size() + " / " + compGraph.getEdges().size() +  ").");
         }
         
-        //write Residue contact info to csv.
-        try {
-            FileWriter writer = new FileWriter(pdbid+"_contact_info.csv");
-            for(String x : conInfo){
-                writer.append(x);
-                writer.append("\n");
+        //write Residue contact info to csv. 
+        if(Settings.getBoolean("plcc_B_writeComplexContactCSV")) {
+            try {
+                FileWriter writer = new FileWriter(pdbid+"_contact_info.csv");  // TODO: This does not respect a possible subdir tree ('/ti/7tim/...') setting yet
+                for(String x : conInfo){
+                    writer.append(x);
+                    writer.append("\n");
+                }
+                writer.flush();
+                writer.close();   
+                if( ! silent) {
+                    System.out.println("    Contact info CSV written.");
+                }
+            } catch(IOException e){
+                DP.getInstance().e("Main", "Failed to write complex graph contact info CSV file: '" + e.getMessage() + "'.");
             }
-            writer.flush();
-	    writer.close();   
-        } catch(IOException e){
-            DP.getInstance().e("Main", "Failed to write complex graph contact info CSV file: '" + e.getMessage() + "'.");
         }
         
-        if( ! silent) {
-            System.out.println("    Contact info CSV written.");
-        }
+        
         
         // Calculate SSE level contacts
         //System.out.println("intr" + interchainContacts);
