@@ -347,17 +347,20 @@ foreach ($chains as $value){
                     $tableString .= '</span>';
                 }
                 $tableString .= '
-                                <br><span class="download-options">
+                                <br>
                                 <a href="foldinggraphs.php?pdbchain='.$pdbID.$chainName.'&graphtype_int='.$graphtype_int.'&notationtype=adj" target="_blank">Go to folding graphs</a>
-                                </span>';
+                                ';
 
                 if(count($motif_list_this_chain) > 0) {
-                    $tableString .= "<br><span class='download-options'>";
+                    $tableString .= "<br>";
                     $tableString .= "Detected motifs in this chain: ";
                     for($i = 0; $i < count($motif_list_this_chain); $i++) {
-                      $tableString .= "<a href='search.php?st=motif&motif=" . get_motif_abbreviation($motif_list_this_chain[$i]) . "' target='_blank'>" . $motif_list_this_chain[$i] . "</a> ";
+                      $tableString .= "<a href='search.php?st=motif&motif=" . get_motif_abbreviation($motif_list_this_chain[$i]) . "' target='_blank'>" . $motif_list_this_chain[$i] . "</a>";
+                      if($i < count($motif_list_this_chain) - 1) {
+                        $tableString .= ", ";
+                      }
                     }
-                    $tableString .= "</span>";
+                    $tableString .= "<br>";
                 }
 
                 $tableString .= '</li> <!-- closing inner slider element -->';
