@@ -85,9 +85,9 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			<!-- <span>Please <a href="citing.php">cite PTGL</a>, if you are using our data and images.</span> -->
 		</div>
 		
-		<!--BEGIN CAROUSEL -->
+		<!--BEGIN CAROUSEL string build in backend -->
 		<?php echo $tableString; ?>
-		<!--END CAROUSEL -->
+		<!--END CAROUSEL string build in backend -->
 
 		</div><!-- end wrapper -->
 		

@@ -22,7 +22,10 @@ if (!(typeof checkedChains === 'undefined')) {
     for(var i = 0; i < window.checkedChains.length; i++){
 		chain = window.checkedChains[i];
 		console.log(chain);
-		selectedProteins += chain + " ";
+		selectedProteins += chain;
+		if(i < window.checkedChains.length -1) {
+		  selectedProteins += " ";
+		}
 		
 		$('input:checkbox[value=' + chain + ']').prop('checked', true);
 		$('#loadInput').val(selectedProteins);

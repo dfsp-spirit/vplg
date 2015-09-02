@@ -220,7 +220,8 @@ $db = pg_connect($conn_string);
 $allChainIDs = array();
 
 $motif_data_all_chains = array();
-$tableString = '<div id="myCarousel">
+$tableString = '<div id="myCarousel"> 
+                    <!-- start outer slider, the one that changes between chains -->
                     <ul class="bxslider bx-prev bx-next" id="carouselSlider">';
 
 // for each PDB-ID+chainname...
@@ -231,6 +232,7 @@ foreach ($chains as $value){
     if (!(strlen($value) == 5)) {
             //echo "<br />'" . $value . "' has a wrong PDB-ID format\n<br />";
             array_push($SHOW_ERROR_LIST, "PDB chain '" . $value . "' has a wrong PDB-ID and chain format, expected something like '7timA'.");
+            continue;
     }
     // if everything is fine..
     else {
@@ -257,7 +259,7 @@ foreach ($chains as $value){
         $result = pg_execute($db, "getChains", array("%".$pdbID."%", "%".$chainName."%"));  
       
         $tableString .= '
-                        <li> <!-- start element outer slider-->
+                        <li> <!-- start element of outer slider, a chain -->
                         <div class="container">
                         <h4>Protein graph for '.$pdbID.', chain '.$chainName.'</h4>
                         <div class="proteingraph">
@@ -265,7 +267,7 @@ foreach ($chains as $value){
                             <input type="checkbox" name="'.$pdbID.$chainName.'" value="'.$pdbID.$chainName.'"> Add to download list
                             <span class="download-options"><a href="3Dview.php?pdbid='.$pdbID.'&chain='.$chainName.'&mode=allgraphs" target="_blank">3D-View [JMOL]</a></span>
                           </div>	
-                          <ul id="'.$pdbID.$chainName.'" class="bxslider tada"> <!-- starting inner slider-->';
+                          <ul id="'.$pdbID.$chainName.'" class="bxslider tada"> <!-- start inner slider, the ones that changes between graph types -->' . "\n";
         
         $content_available = FALSE;
         while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
@@ -289,7 +291,7 @@ foreach ($chains as $value){
 
                 // continue building the HTML string. Not further explained from now on.
 
-                $tableString .= '<li> <!-- start element inner slider -->
+                $tableString .= '<li> <!-- start element of inner slider, a graph type -->' . "\n" .'
                                     <a title="Graph image" href="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" target="_blank">
                                         <img src="'.$IMG_ROOT_PATH.$arr['graph_image_png'].'" alt="" />
                                     </a>
@@ -363,7 +365,7 @@ foreach ($chains as $value){
                     $tableString .= "<br>";
                 }
 
-                $tableString .= '</li> <!-- closing inner slider element -->';
+                $tableString .= '</li> <!-- closing inner slider element -->' . "\n";
 
             } else {
                 $tableString .= "<li><h3>No data found in the database for request protein $pdbID chain $chainName, sorry.</h3>";
@@ -424,7 +426,7 @@ foreach ($chains as $value){
             }
 
             $tableString .= '</table>
-                             </div><!-- end table-responsive -->';
+                             </div><!-- end table-responsive -->' . "\n";
 
 
             $tableString .= '<div id="'.$pdbID.$chainName.'_pager" class="bx-pager-own">';
@@ -444,7 +446,7 @@ foreach ($chains as $value){
         } else {
             $tableString .= "<div><h2>No data found in the database for request protein $pdbID chain $chainName, sorry.</h2></div>";
         }            
-            $tableString .= '</div>';
+            $tableString .= '</div> <!-- end pager -->' . "\n";
             $tableString .= '</li> <!-- end of outer slider element -->';
 
     } //end if pdb id is correct..
