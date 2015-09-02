@@ -63,8 +63,8 @@ $DO_SHOW_ERROR_LIST = $DEBUG_MODE;
 		<ul>
 		<li>the ADJ notation: all SSEs of the protein graph are shown, order is from N-terminus (left) to C-terminus, and each edge represents a 3D contact between a pair of SSEs.</li>
 		<li>the RED notation: only SSEs of the folding graph are shown, order is from N-terminus (left) to C-terminus, and each edge represents a 3D contact between a pair of SSEs.</li>
-		<li>the SEQ notation: all SSEs of the protein graph are shown, order is from N-terminus (left) to C-terminus, and each edge represents the sequential order in the folding graph.</li>
-		<li>the KEY notation: only SSEs of the folding graph are shown, order is spatial, and each edge represents a 3D contact between a pair of SSEs. Note that it is not possible to define a spatial ordering for <dfn title="A graph is bifurcated if any vertex in the graph has more than 2 neighbors.">bifurcated graphs</dfn>, so such graphs do not have a KEY notation.</li>
+		<li>the SEQ notation: all SSEs of the protein graph are shown, order is from N-terminus (left) to C-terminus, and each edge represents the sequential order in the folding graph (edges do NOT represent contacts).</li>
+		<li>the KEY notation: only SSEs of the folding graph are shown, order is spatial, and edges travel along the sequence (edges do NOT represent contacts). Note that it is not possible to define a spatial ordering for <dfn title="A graph is bifurcated if any vertex in the graph has more than 2 neighbors.">bifurcated graphs</dfn>, so such graphs do not have a KEY notation.</li>
 		</ul>
 		Select the chain and folding graph type you are interested in below. You will then be able to browse all linear notations of the respective folding graphs.
 		

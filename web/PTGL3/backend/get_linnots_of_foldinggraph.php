@@ -237,7 +237,7 @@ if($valid_values){
 			    $num_linnot_images_for_this_fold++;
 				$link_others_same_linnot_red = "";
 				if(strlen($str_red) > 0) {
-				    $link_others_same_linnot_red = "Show all chains with this $graphtype_str RED linear notation: <a href='./search.php?linnot" . $graphtype_str . "red=$str_red'>Search</a><br>";
+				    $link_others_same_linnot_red = "Show all chains with this $graphtype_str RED linear notation: <a href='./search.php?st=customlinnot&linnot" . $graphtype_str . "red=$str_red'>Search</a><br>";
 				}
 			    $img_link_red = '<a href="#red">yes</a>';
 				$img_string .= "<h3>RED notation</h3>RED string: $str_red<br>$link_others_same_linnot_red Visualization of the RED notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
@@ -256,7 +256,7 @@ if($valid_values){
 			    $num_linnot_images_for_this_fold++;
 				$link_others_same_linnot_seq = "";
 				if(strlen($str_seq) > 0) {
-				    $link_others_same_linnot_seq = "Show all chains with this $graphtype_str SEQ linear notation: <a href='./search.php?linnot" . $graphtype_str . "seq=$str_seq'>Search</a><br>";
+				    $link_others_same_linnot_seq = "Show all chains with this $graphtype_str SEQ linear notation: <a href='./search.php?st=customlinnot&linnot" . $graphtype_str . "seq=$str_seq'>Search</a><br>";
 				}
 			    $img_link_seq = '<a href="#seq">yes</a>';
 				$img_string .= "<h3>SEQ notation</h3>SEQ string: $str_seq<br>$link_others_same_linnot_seq Visualization of the SEQ notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
@@ -275,7 +275,7 @@ if($valid_values){
 			    $num_linnot_images_for_this_fold++;
 				$link_others_same_linnot_key = "";
 				if(strlen($str_key) > 0) {
-				    $link_others_same_linnot_key = "Show all chains with this $graphtype_str KEY linear notation: <a href='./search.php?linnot" . $graphtype_str . "key=$str_key'>Search</a><br>";
+				    $link_others_same_linnot_key = "Show all chains with this $graphtype_str KEY linear notation: <a href='./search.php?st=customlinnot&linnot" . $graphtype_str . "key=$str_key'>Search</a><br>";
 				}
 			    $img_link_key = '<a href="#key">yes</a>';
 				$img_string .= "<h3>KEY notation</h3>KEY string: $str_key<br>$link_others_same_linnot_key Visualization of the KEY notation of folding graph $fold_name (#$fg_number) of PDB $pdb_id chain $chain_name: ";
