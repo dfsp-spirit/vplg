@@ -83,7 +83,11 @@ function fill_input_field(chains){
 		} else {
 			chainText += uniqueChains[i] + " ";
 		}
+		
 	}
+	// ensure there is no trailing space
+	chainText = chainText.trim();
+	//alert(chainText);
 	
 	$('#loadInput').val(chainText);
 }
