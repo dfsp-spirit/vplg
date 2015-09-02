@@ -374,8 +374,8 @@ foreach ($chains as $value){
         } // end fetch chain data (images etc..)
         
         if($content_available){
-            $tableString .= '</ul> <!-- closing inner slider -->';
-            $tableString .= '</div> <!-- closing inner slider -->'; 
+            $tableString .= '</ul> <!-- closing inner slider list -->' . "\n";
+            $tableString .= '</div> <!-- closing inner slider div -->' . "\n"; 
 
             $tableString .= '
                         <div class="table-responsive" id="sse">
@@ -426,7 +426,7 @@ foreach ($chains as $value){
             }
 
             $tableString .= '</table>
-                             </div><!-- end table-responsive -->' . "\n";
+                             </div><!-- end table-responsive div -->' . "\n";
 
 
             $tableString .= '<div id="'.$pdbID.$chainName.'_pager" class="bx-pager-own">';
@@ -446,8 +446,10 @@ foreach ($chains as $value){
         } else {
             $tableString .= "<div><h2>No data found in the database for request protein $pdbID chain $chainName, sorry.</h2></div>";
         }            
-            $tableString .= '</div> <!-- end pager -->' . "\n";
-            $tableString .= '</li> <!-- end of outer slider element -->';
+            $tableString .= '</div> <!-- end pager div, the one to select graph type -->' . "\n";
+            $tableString .= '</div> <!-- end proteingraph div -->' . "\n";
+            //$tableString .= '</div> <!-- end container div -->' . "\n";
+            $tableString .= '</li> <!-- end of outer slider element -->' . "\n";
 
     } //end if pdb id is correct..
 } // for each chain
