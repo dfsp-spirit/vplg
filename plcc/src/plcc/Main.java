@@ -5910,6 +5910,8 @@ public class Main {
             
             // all done, write the image to disk
             ImageIO.write(bi, "PNG", new File(filePath + ".png"));
+            //String writerNames[] = ImageIO.getWriterFormatNames();
+            //System.out.println("Available format writers: " + IO.stringArrayToString(writerNames));
             //ig2.stream(new FileWriter(filePath + ".svg"), false);
             ig2.dispose();
 
