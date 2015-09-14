@@ -1722,11 +1722,19 @@ public class Main {
         if(drawRPlots) {
             for(Chain c : handleChains) {
                 plotPath = outputDir + fs + pdbid + "_" + c.getPdbChainID() + "_plot";
-                label = "Ramachandran plot of PDB entry " + pdbid + ", chain " + c.getPdbChainID() + "";
+                label = "Ramachandran plot of PDB " + pdbid + ", chain " + c.getPdbChainID() + "";
                 drawRamachandranPlot(plotPath, c.getResidues(), label);
             }
         }
         
+        // write a Ramachandran plot for all chains if appropriate
+        if(drawRPlots) {
+                plotPath = outputDir + fs + pdbid + "_ALL" + "_plot";
+                label = "Ramachandran plot of PDB " + pdbid + ", all chains";
+                drawRamachandranPlot(plotPath, residues, label);
+        }
+
+        // ****************************** aa graphs ****************************
         
         if(Settings.getBoolean("plcc_B_AAgraph_allchainscombined")) {
             if(separateContactsByChain || cInfo == null) {
@@ -1768,7 +1776,7 @@ public class Main {
                 }
                 else {
                     System.err.println("ERROR: Could not write AA type contact stats matrix for all chains to file '" + aaMatrixFile + "'.");
-                }
+                }                                
                 
                 
             }
@@ -5727,10 +5735,10 @@ public class Main {
 
         // All these values are in pixels
         // page setup
-        Integer marginLeft = 40;
-        Integer marginRight = 40;
-        Integer marginTop = 40;
-        Integer marginBottom = 40;
+        Integer marginLeft = 80;
+        Integer marginRight = 80;
+        Integer marginTop = 80;
+        Integer marginBottom = 80;
 
         // The header that contains the text describing of the graph.
         Integer headerHeight = 40;
@@ -5774,13 +5782,13 @@ public class Main {
                     RenderingHints.VALUE_ANTIALIAS_ON);
 
             // make background 
-            ig2.setPaint(Color.LIGHT_GRAY);
+            ig2.setPaint(Color.WHITE);
             ig2.fillRect(0, 0, pageWidth, pageHeight);            
             ig2.setPaint(Color.BLACK);
 
 
-            // prepare font
-            Font font = new Font("TimesRoman", Font.PLAIN, 20);
+            // prepare font for header
+            Font font = new Font("TimesRoman", Font.PLAIN, 28);
             ig2.setFont(font);
             FontMetrics fontMetrics = ig2.getFontMetrics();
             
@@ -5797,7 +5805,7 @@ public class Main {
             ig2.drawString(plotHeader, headerStartX, headerStartY);
             // draw axis labels
             
-            font = new Font("TimesRoman", Font.PLAIN, 16);
+            font = new Font("TimesRoman", Font.PLAIN, 24);  // font for axis labels
             ig2.setFont(font);
             
             Integer xAxisLabelStartY = headerStartY + 30;
@@ -5817,22 +5825,22 @@ public class Main {
             ig2.drawString("0°", yAxisLabelStartX, xAxisLabelStartY + (plotHeight / 2));
             ig2.drawString("-psi", yAxisLabelStartX, headerStartX + (plotHeight * 3/4));
             ig2.drawString("-180°", yAxisLabelStartX, headerStartX + plotHeight);
-            
-            // footer
-            ig2.drawString("Color codes indicate SSE type of residues: red=helix, black=beta strand, gray=coil/other.", footerStartX, footerStartY);
+                        
             
             // ------------------------- Draw area and the borders around the drawing area ----------------------------
             ig2.setPaint(Color.WHITE);
-            ig2.fillRect(imgStartX, imgStartY, plotWidth, plotHeight);
+            ig2.fillRect(imgStartX, imgStartY, plotWidth, plotHeight); // not directly needed anymore. the background of the whole image was gray earlier.
             
-            // draw it                        
-            ig2.setStroke(new BasicStroke(1));
+            // draw frame around plot
+            ig2.setPaint(Color.BLACK);
+            ig2.setStroke(new BasicStroke(2));
             Rectangle2D border = new Rectangle2D.Double(imgStartX, imgStartY, plotWidth, plotHeight);
             shape = ig2.getStroke().createStrokedShape(border);
             ig2.draw(shape);
             
-            // draw x and y axis
-            ig2.setPaint(Color.LIGHT_GRAY);
+            // draw x and y axis (2 lines crossing in center of plot)
+            ig2.setStroke(new BasicStroke(1));
+            ig2.setPaint(Color.BLACK);
             ig2.drawLine(imgStartX, imgStartY + (plotHeight / 2), imgStartX + plotWidth, imgStartY +  + (plotWidth / 2)); // y
             ig2.drawLine(imgStartX + (plotWidth / 2), imgStartY, imgStartX + (plotWidth / 2), imgStartY + plotHeight); // x
             
@@ -5840,26 +5848,34 @@ public class Main {
             // ------------------------- Draw the plot -------------------------
             
             // Draw the edges as arcs
-            Double dotWidth = 1.0;
-            Double dotHeight = 1.0;
+            Double dotWidth = 2.0;
+            Double dotHeight = 2.0;
                 
             Rectangle2D.Double dot;
             Residue res;
+            Integer numHelixDrawn = 0;
+            Integer numStrandDrawn = 0;
+            Integer numOtherDrawn = 0;
             Integer edgeType, arcCenterX, arcCenterY, leftVert, rightVert, leftVertPosX, rightVertPosX, arcWidth, arcHeight, arcTopLeftX, arcTopLeftY, spacerX, spacerY;
             for(Integer i = 0; i < residues.size(); i++) {
                 res = residues.get(i);
 
-                // Choose color
-                if(res.getSSEString().equals("H")) { ig2.setPaint(Color.RED); }
-                else if(res.getSSEString().equals("E")) { ig2.setPaint(Color.BLACK); }
-                else if(res.getSSEString().equals("L")) { ig2.setPaint(Color.MAGENTA); }
-                else if(res.getSSEString().equals("C")) { ig2.setPaint(Color.GRAY); }                
-                else { ig2.setPaint(Color.LIGHT_GRAY); }
-                
                 // skip ligands and other non-AAs
                 if(! res.isAA()) {
                     continue;
                 }
+                
+                // Choose color
+                if(res.getSSEString().equals("H")) { ig2.setPaint(Color.RED); numHelixDrawn++; }
+                else if(res.getSSEString().equals("E")) { ig2.setPaint(Color.BLACK); numStrandDrawn++; }
+                else if(res.getSSEString().equals("L")) { ig2.setPaint(Color.MAGENTA); }    // should never happen, see AA-check above
+                else if(res.getSSEString().equals("C")) { ig2.setPaint(Color.GRAY); numOtherDrawn++; }                
+                else { ig2.setPaint(Color.LIGHT_GRAY); numOtherDrawn++; }
+                
+                
+                
+                // TODO: SHould we also skip the first and last residues of a chain?
+                
 
                 // determine the position of the dot within the drawing area
                 
@@ -5879,9 +5895,7 @@ public class Main {
                 Double posDrawY = psi * (imgHeight / 2);        
                 Double posCanvasX = plotCenterX + posDrawX;   // note that imgStartX and Y are the start of the plot area
                 Double posCanvasY = plotCenterY - posDrawY;     // look at the weird way coord system is setup to understand why this is "-" instead of "+"
-                
-                dotWidth = 1.0;
-                dotHeight = 1.0;
+                                
                 
                 // DEBUG
                 /*
@@ -5906,7 +5920,14 @@ public class Main {
 
             }
             
-
+            Integer numTotalDrawn = numHelixDrawn + numStrandDrawn + numOtherDrawn;
+            
+            // footer
+            ig2.setPaint(Color.BLACK);
+            font = new Font("TimesRoman", Font.PLAIN, 20);  // font for footer
+            ig2.setFont(font);
+            ig2.drawString("Color indicates SSE type of residues: red=helix, black=beta strand, gray=coil/other.", footerStartX, footerStartY);
+            ig2.drawString("Drew " + numTotalDrawn + " dihedral angle pairs total (" + numHelixDrawn + " helix, " + numStrandDrawn + " strand, " + numOtherDrawn + " other).", footerStartX, footerStartY + 30);
             
             // all done, write the image to disk
             ImageIO.write(bi, "PNG", new File(filePath + ".png"));
