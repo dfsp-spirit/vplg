@@ -5751,7 +5751,9 @@ public class Main {
     
         // the image area: the part where the vertices and arcs are drawn
         Integer imgWidth = plotWidth;
-        Integer imgHeight = plotHeight;              
+        Integer imgHeight = plotHeight;     
+        Integer plotCenterX = imgStartX + (plotWidth / 2);
+        Integer plotCenterY = imgStartY + (plotHeight / 2);
 
         // where to start drawing the vertices
         Integer footerStartY = imgStartY + plotHeight + 40;
@@ -5838,7 +5840,9 @@ public class Main {
             // ------------------------- Draw the plot -------------------------
             
             // Draw the edges as arcs
-            
+            Double dotWidth = 1.0;
+            Double dotHeight = 1.0;
+                
             Rectangle2D.Double dot;
             Residue res;
             Integer edgeType, arcCenterX, arcCenterY, leftVert, rightVert, leftVertPosX, rightVertPosX, arcWidth, arcHeight, arcTopLeftX, arcTopLeftY, spacerX, spacerY;
@@ -5858,17 +5862,40 @@ public class Main {
                 }
 
                 // determine the position of the dot within the drawing area
-                Double phiNorm = (res.getPhi() + 180.0) / 360.0;
-                Double psiNorm = (res.getPsi() + 180.0) / 360.0;
-                Double posDrawX = phiNorm * imgWidth;
-                Double posDrawY = psiNorm * imgHeight;
                 
+                // The angles given by DSSP range from -180 to +180 degrees. Normalize to angles from 0 to +360 degrees.
+                // NOTE: The normalization is not used anymore, look at the coord system, which is now -180 to +180 instead of 0 to 360 to understand this
+                //Double phiNorm = (res.getPhi() + 180.0) / 360.0;
+                //Double psiNorm = (res.getPsi() + 180.0) / 360.0;
+                //Double posDrawX = phiNorm * imgWidth;   // note that imgWidth and imHeight are width and height of the plot area
+                //Double posDrawY = psiNorm * imgHeight;        
                 // now determine the absolute position in the canvas
-                Double posCanvasX = imgStartX + posDrawX;
-                Double posCanvasY = imgStartY + posDrawY;
+                //Double posCanvasX = imgStartX + posDrawX;   // note that imgStartX and Y are the start of the plot area
+                //Double posCanvasY = imgStartY + posDrawY;
+
+                Double phi = res.getPhi() / 180.0;
+                Double psi = res.getPsi() / 180.0;
+                Double posDrawX = phi * (imgWidth / 2);   // note that imgWidth and imHeight are width and height of the plot area
+                Double posDrawY = psi * (imgHeight / 2);        
+                Double posCanvasX = plotCenterX + posDrawX;   // note that imgStartX and Y are the start of the plot area
+                Double posCanvasY = plotCenterY - posDrawY;     // look at the weird way coord system is setup to understand why this is "-" instead of "+"
                 
-                Double dotWidth = 1.0;
-                Double dotHeight = 1.0;
+                dotWidth = 1.0;
+                dotHeight = 1.0;
+                
+                // DEBUG
+                /*
+                if(res.getSSEString().equals("E")) {
+                    System.out.println("DEBUG: Residue " + res.getSSEString() + " " + res.getDsspResNum() + " has phi/psi angles (" + res.getPhi() + "/" + res.getPsi() + "), normalized to (" + phi + "/" + psi + "), drawn at (" + posCanvasX + "/" + posCanvasY + ") in image.");
+                    if(res.getDsspResNum().equals(20)) {
+                        ig2.drawString("" + phi + "/" + psi, posCanvasX.intValue(), posCanvasY.intValue());
+                        System.out.println("DEBUG: ### Marking position of residue with phi/psi angles " + res.getPhi() + "/" + res.getPsi() + " (range -180 to +180) . ###");
+                        dotWidth = 5.0;
+                        dotHeight = 5.0;
+                    }
+                }
+                */
+                
                 
 
                 // draw it                        
