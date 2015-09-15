@@ -5925,7 +5925,7 @@ public class Main {
                 ig2.setPaint(Color.DARK_GRAY);
                 if(addAreaLabels) {
                     ig2.drawString("RH \u03b1", (new Double(0.41 * imgWidth).intValue() + imgStartX), (new Double(0.65 * imgHeight).intValue() + imgStartY)); // left-handed alpha
-                    ig2.drawString("LH \u03b1", (new Double(0.73 * imgWidth).intValue() + imgStartX), (new Double(0.35 * imgHeight).intValue() + imgStartY)); // right-handed alpha
+                    ig2.drawString("LH \u03b1", (new Double(0.72 * imgWidth).intValue() + imgStartX), (new Double(0.35 * imgHeight).intValue() + imgStartY)); // right-handed alpha
                     ig2.drawString("\u03b2", (new Double(0.33 * imgWidth).intValue() + imgStartX), (new Double(0.35 * imgHeight).intValue() + imgStartY)); // beta
                 }
             }
