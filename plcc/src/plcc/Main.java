@@ -5844,7 +5844,19 @@ public class Main {
                 ig2.setStroke(new BasicStroke(1));
                                                 
                 
-                // --------------- the lower poly for beta strands -----------------
+                // --------------- the upper outer poly for beta strands -----------------
+                xPol = new double[] { 0.00, 0.40, 0.40, 0.25, 0.07, 0.00 };  // the poly points as relative position in the plot width
+                yPol = new double[] { 0.00, 0.00, 0.20, 0.45, 0.45, 0.35 };   // the poly points as relative position in the plot height
+                xPolInt = new int[xPol.length];
+                yPolInt = new int[xPol.length];
+                for(int i = 0; i < xPol.length; i++) {
+                    xPolInt[i] = new Double(xPol[i] * imgWidth).intValue() + imgStartX;
+                    yPolInt[i] = new Double(yPol[i] * imgHeight).intValue()  + imgStartY;
+                }
+                Polygon betaStrandUpperLower = new Polygon(xPolInt, yPolInt, xPol.length);
+                ig2.fillPolygon(betaStrandUpperLower);
+                
+                // --------------- the lower outer poly for beta strands -----------------
                 xPol = new double[] { 0.00, 0.35, 0.40, 0.00 };  // the poly points as relative position in the plot width
                 yPol = new double[] { 0.95, 0.95, 1.00, 1.00 };   // the poly points as relative position in the plot height
                 xPolInt = new int[xPol.length];
@@ -5857,8 +5869,20 @@ public class Main {
                 ig2.fillPolygon(betaStrandPolyLower);
                 
                 
+                // --------------- the outer poly for right-handed helices -----------------
+                xPol = new double[] { 0.00, 0.20, 0.25, 0.40, 0.40, 0.00 };  // the poly points as relative position in the plot width
+                yPol = new double[] { 0.60, 0.60, 0.55, 0.55, 0.70, 0.70 };   // the poly points as relative position in the plot height
+                xPolInt = new int[xPol.length];
+                yPolInt = new int[xPol.length];
+                for(int i = 0; i < xPol.length; i++) {
+                    xPolInt[i] = new Double(xPol[i] * imgWidth).intValue() + imgStartX;
+                    yPolInt[i] = new Double(yPol[i] * imgHeight).intValue()  + imgStartY;
+                }
+                Polygon alphaPolyRightOuter = new Polygon(xPolInt, yPolInt, xPol.length);
+                ig2.fillPolygon(alphaPolyRightOuter);
                 
-                // --------------- the poly for left-handed alpha helices -----------------
+                
+                // --------------- the poly for left-handed alpha helices (only has outer) -----------------
                 xPol = new double[] { 0.65, 0.70, 0.70, 0.65 };  // the poly points as relative position in the plot width
                 yPol = new double[] { 0.30, 0.25, 0.45, 0.40 };   // the poly points as relative position in the plot height
                 xPolInt = new int[xPol.length];
@@ -5882,20 +5906,20 @@ public class Main {
                     xPolInt[i] = new Double(xPol[i] * imgWidth).intValue() + imgStartX;
                     yPolInt[i] = new Double(yPol[i] * imgHeight).intValue()  + imgStartY;
                 }
-                Polygon betaStrandPolyUpper = new Polygon(xPolInt, yPolInt, xPol.length);
-                ig2.fillPolygon(betaStrandPolyUpper);
+                Polygon betaStrandCore = new Polygon(xPolInt, yPolInt, xPol.length);
+                ig2.fillPolygon(betaStrandCore);
                 
                 // --------------- the CORE poly for right-handed alpha helices -----------------
-                xPol = new double[] { 0.25, 0.40, 0.40, 0.10, 0.10, 0.20 };  // the poly points as relative position in the plot width
-                yPol = new double[] { 0.60, 0.60, 0.70, 0.70, 0.65, 0.65 };   // the poly points as relative position in the plot height
+                xPol = new double[] { 0.25, 0.38, 0.38, 0.10, 0.10, 0.20 };  // the poly points as relative position in the plot width
+                yPol = new double[] { 0.57, 0.57, 0.67, 0.67, 0.62, 0.62 };   // the poly points as relative position in the plot height
                 xPolInt = new int[xPol.length];
                 yPolInt = new int[xPol.length];
                 for(int i = 0; i < xPol.length; i++) {
                     xPolInt[i] = new Double(xPol[i] * imgWidth).intValue() + imgStartX;
                     yPolInt[i] = new Double(yPol[i] * imgHeight).intValue()  + imgStartY;
                 }
-                Polygon rightHandedAlpha = new Polygon(xPolInt, yPolInt, xPol.length);
-                ig2.fillPolygon(rightHandedAlpha);
+                Polygon rightHandedAlphaCore = new Polygon(xPolInt, yPolInt, xPol.length);
+                ig2.fillPolygon(rightHandedAlphaCore);
             }
             
             // draw frame around plot
