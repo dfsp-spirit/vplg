@@ -5771,7 +5771,8 @@ public class Main {
         Integer pageWidth = marginLeft + imgWidth + marginRight;
         Integer pageHeight = marginTop + headerHeight + imgHeight + footerHeight + marginBottom;
 
-        Boolean highlightExpectedSSEAreas = true;
+        Boolean highlightExpectedSSEAreas = Settings.getBoolean("plcc_B_ramaplot_highlight_areas");
+        Boolean addAreaLabels = Settings.getBoolean("plcc_B_ramaplot_area_labels");
         
         try {
 
@@ -5824,7 +5825,7 @@ public class Main {
             ig2.drawString("+180°", yAxisLabelStartX, xAxisLabelStartY);
             ig2.drawString("+psi", yAxisLabelStartX, xAxisLabelStartY  + (plotHeight / 4));
             ig2.drawString("0°", yAxisLabelStartX, xAxisLabelStartY + (plotHeight / 2));
-            ig2.drawString("-psi", yAxisLabelStartX, headerStartX + (plotHeight * 3/4));
+            ig2.drawString("-psi", yAxisLabelStartX, headerStartX + (plotHeight * 3/4));                        
             ig2.drawString("-180°", yAxisLabelStartX, headerStartX + plotHeight);
                         
             
@@ -5920,6 +5921,13 @@ public class Main {
                 }
                 Polygon rightHandedAlphaCore = new Polygon(xPolInt, yPolInt, xPol.length);
                 ig2.fillPolygon(rightHandedAlphaCore);
+                
+                ig2.setPaint(Color.DARK_GRAY);
+                if(addAreaLabels) {
+                    ig2.drawString("RH \u03b1", (new Double(0.41 * imgWidth).intValue() + imgStartX), (new Double(0.65 * imgHeight).intValue() + imgStartY)); // left-handed alpha
+                    ig2.drawString("LH \u03b1", (new Double(0.73 * imgWidth).intValue() + imgStartX), (new Double(0.35 * imgHeight).intValue() + imgStartY)); // right-handed alpha
+                    ig2.drawString("\u03b2", (new Double(0.33 * imgWidth).intValue() + imgStartX), (new Double(0.35 * imgHeight).intValue() + imgStartY)); // beta
+                }
             }
             
             // draw frame around plot
