@@ -78,6 +78,7 @@ import org.xml.sax.SAXException;
 import graphdrawing.DrawTools.IMAGEFORMAT;
 import graphdrawing.DrawableGraph;
 import graphdrawing.IDrawableGraph;
+import java.awt.Polygon;
 import parsers.GMLGraphParser;
 import parsers.IGraphParser;
 import similarity.CompareOneToDB;
@@ -5770,7 +5771,7 @@ public class Main {
         Integer pageWidth = marginLeft + imgWidth + marginRight;
         Integer pageHeight = marginTop + headerHeight + imgHeight + footerHeight + marginBottom;
 
-
+        Boolean highlightExpectedSSEAreas = true;
         
         try {
 
@@ -5831,6 +5832,72 @@ public class Main {
             ig2.setPaint(Color.WHITE);
             ig2.fillRect(imgStartX, imgStartY, plotWidth, plotHeight); // not directly needed anymore. the background of the whole image was gray earlier.
             
+            // highligth areas where SSEs usually are, if required
+            if(highlightExpectedSSEAreas) {
+                
+                double[] xPol;
+                double[] yPol;
+                int[] xPolInt;
+                int[] yPolInt;
+                
+                ig2.setPaint(new Color(230, 230, 230));
+                ig2.setStroke(new BasicStroke(1));
+                                                
+                
+                // --------------- the lower poly for beta strands -----------------
+                xPol = new double[] { 0.00, 0.35, 0.40, 0.00 };  // the poly points as relative position in the plot width
+                yPol = new double[] { 0.95, 0.95, 1.00, 1.00 };   // the poly points as relative position in the plot height
+                xPolInt = new int[xPol.length];
+                yPolInt = new int[xPol.length];
+                for(int i = 0; i < xPol.length; i++) {
+                    xPolInt[i] = new Double(xPol[i] * imgWidth).intValue() + imgStartX;
+                    yPolInt[i] = new Double(yPol[i] * imgHeight).intValue()  + imgStartY;
+                }
+                Polygon betaStrandPolyLower = new Polygon(xPolInt, yPolInt, xPol.length);
+                ig2.fillPolygon(betaStrandPolyLower);
+                
+                
+                
+                // --------------- the poly for left-handed alpha helices -----------------
+                xPol = new double[] { 0.65, 0.70, 0.70, 0.65 };  // the poly points as relative position in the plot width
+                yPol = new double[] { 0.30, 0.25, 0.45, 0.40 };   // the poly points as relative position in the plot height
+                xPolInt = new int[xPol.length];
+                yPolInt = new int[xPol.length];
+                for(int i = 0; i < xPol.length; i++) {
+                    xPolInt[i] = new Double(xPol[i] * imgWidth).intValue() + imgStartX;
+                    yPolInt[i] = new Double(yPol[i] * imgHeight).intValue()  + imgStartY;
+                }
+                Polygon leftHandedAlpha = new Polygon(xPolInt, yPolInt, xPol.length);
+                ig2.fillPolygon(leftHandedAlpha);
+                
+                // set new color for the core polys
+                ig2.setPaint(new Color(210, 210, 210));
+                
+                // --------------- the CORE poly for beta strands -----------------
+                xPol = new double[] { 0.10, 0.35, 0.35, 0.30, 0.05, 0.05 };  // the poly points as relative position in the plot width
+                yPol = new double[] { 0.00, 0.00, 0.20, 0.25, 0.25, 0.10 };   // the poly points as relative position in the plot height
+                xPolInt = new int[xPol.length];
+                yPolInt = new int[xPol.length];
+                for(int i = 0; i < xPol.length; i++) {
+                    xPolInt[i] = new Double(xPol[i] * imgWidth).intValue() + imgStartX;
+                    yPolInt[i] = new Double(yPol[i] * imgHeight).intValue()  + imgStartY;
+                }
+                Polygon betaStrandPolyUpper = new Polygon(xPolInt, yPolInt, xPol.length);
+                ig2.fillPolygon(betaStrandPolyUpper);
+                
+                // --------------- the CORE poly for right-handed alpha helices -----------------
+                xPol = new double[] { 0.25, 0.40, 0.40, 0.10, 0.10, 0.20 };  // the poly points as relative position in the plot width
+                yPol = new double[] { 0.60, 0.60, 0.70, 0.70, 0.65, 0.65 };   // the poly points as relative position in the plot height
+                xPolInt = new int[xPol.length];
+                yPolInt = new int[xPol.length];
+                for(int i = 0; i < xPol.length; i++) {
+                    xPolInt[i] = new Double(xPol[i] * imgWidth).intValue() + imgStartX;
+                    yPolInt[i] = new Double(yPol[i] * imgHeight).intValue()  + imgStartY;
+                }
+                Polygon rightHandedAlpha = new Polygon(xPolInt, yPolInt, xPol.length);
+                ig2.fillPolygon(rightHandedAlpha);
+            }
+            
             // draw frame around plot
             ig2.setPaint(Color.BLACK);
             ig2.setStroke(new BasicStroke(2));
@@ -5869,8 +5936,7 @@ public class Main {
                 if(res.getSSEString().equals("H")) { ig2.setPaint(Color.RED); numHelixDrawn++; }
                 else if(res.getSSEString().equals("E")) { ig2.setPaint(Color.BLACK); numStrandDrawn++; }
                 else if(res.getSSEString().equals("L")) { ig2.setPaint(Color.MAGENTA); }    // should never happen, see AA-check above
-                else if(res.getSSEString().equals("C")) { ig2.setPaint(Color.GRAY); numOtherDrawn++; }                
-                else { ig2.setPaint(Color.LIGHT_GRAY); numOtherDrawn++; }
+                else { ig2.setPaint(Color.GRAY); numOtherDrawn++; }
                 
                 
                 
