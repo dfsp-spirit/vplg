@@ -1635,7 +1635,7 @@ public class ProteinGraphDrawer {
                         iChainMolID = pg.getMolIDOfSSE(i);
                         jChainMolID = pg.getMolIDOfSSE(j);
                         if( ! Objects.equals(iChainMolID, jChainMolID)) {
-                            System.out.println("CGIC-D: Interchain contact between SSEs " + i + " and " + j + " is a contact between different macromolecules, MOL_IDs " + iChainMolID + " and " + iChainMolID + ".");
+                            System.out.println("CGIC-D: Interchain contact between SSEs " + i + " and " + j + " is a contact between chains " + pg.getAllChains().get(iChainID).getPdbChainID() + " and " + pg.getAllChains().get(jChainID).getPdbChainID() + " of different macromolecules, MOL_IDs " + iChainMolID + " and " + jChainMolID + ".");
                             //ig2.setStroke(new BasicStroke(2, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
                             if (edgeType.equals(SpatRel.PARALLEL)) {
                                 ig2.setPaint(C_INTERCHAIN_DIFFMOL_PARALLEL);
@@ -1653,7 +1653,7 @@ public class ProteinGraphDrawer {
                             }
                         }
                         else {
-                            System.out.println("CGIC-S: Interchain contact between SSEs " + i + " and " + j + " is a contact between different chains of the same macromolecule, MOL_IDs " + iChainMolID + " and " + iChainMolID + ".");
+                            System.out.println("CGIC-S: Interchain contact between SSEs " + i + " and " + j + " is a contact between chains " + pg.getAllChains().get(iChainID).getPdbChainID() + " and " + pg.getAllChains().get(jChainID).getPdbChainID() + " belonging to the same macromolecule, MOL_IDs " + iChainMolID + " and " + iChainMolID + ".");
                             //ig2.setStroke(new BasicStroke(2, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
                             if (edgeType.equals(SpatRel.PARALLEL)) {
                                 ig2.setPaint(C_INTERCHAIN_PARALLEL);
