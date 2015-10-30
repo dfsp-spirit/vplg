@@ -24,6 +24,8 @@ public class Chain implements java.io.Serializable {
     private String pdbChainID = null;           // chain ID from PDB file
     private String dsspChainID = null;          // chain ID from DSSP file
     private ArrayList<Residue> residues = null;          // a list of all Residues of the Chain
+    private String macromolID = null;             // the macromolecule ID of the chain in the PDB file, defines chains forming a single macromolecule
+    private String macromolName = null;         // the macromol name from the PDB file
     private String modelID = null;
     private Model model = null;                 // the Model of this Chain
     private ArrayList<String> homologues = null; // a list of homologue chains (defined by PDB COMPND)
@@ -37,6 +39,8 @@ public class Chain implements java.io.Serializable {
     public String getPdbChainID() { return(pdbChainID); }
     public String getDsspChainID() { return(dsspChainID); }
     public String getModelID() { return(modelID); }
+    public String getMacromolID() { return(macromolID); }
+    public String getMacromolName() { return(macromolName); }
     public Model getModel() { return(model); }
     public ArrayList<Residue> getResidues() { return(residues); }
     public ArrayList<String> getHomologues() { return(homologues); }
@@ -46,7 +50,7 @@ public class Chain implements java.io.Serializable {
      * @return a list of all ligand residues in this chain
      */
     public ArrayList<Residue> getAllLigandResidues() {
-        ArrayList<Residue> ligands = new ArrayList<Residue>();
+        ArrayList<Residue> ligands = new ArrayList<>();
         for(Residue r : this.residues) {
             if(r.isLigand()) {
                 ligands.add(r);
@@ -59,6 +63,8 @@ public class Chain implements java.io.Serializable {
     public void addResidue(Residue r) { residues.add(r); }
     public void setPdbChainID(String s) { pdbChainID = s; }
     public void setDsspChainID(String s) { dsspChainID = s; }
+    public void setMacromolID(String s) { macromolID = s; }
+    public void setMacromolName(String s) { macromolName = s; }
     public void setModelID(String s) { modelID = s; }
     public void setModel(Model m) { model = m; }
     public void setHomologues(ArrayList<String> h) { homologues = h; }

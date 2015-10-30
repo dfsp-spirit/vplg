@@ -1547,8 +1547,15 @@ public class ProteinGraphDrawer {
         Color C_INTERCHAIN_MIXED = PlccUtilities.mutateColor(C_MIXED, 50, 50, 50);
         Color C_INTERCHAIN_ANTIPARALLEL = PlccUtilities.mutateColor(C_ANTIPARALLEL, 50, 50, 50);
         Color C_INTERCHAIN_LIGAND = PlccUtilities.mutateColor(C_LIGAND, 50, 50, 50);
-        Color C_INTERCHAIN_BACKBONE = PlccUtilities.mutateColor(C_BACKBONE, 50, 50, 50); // does not really make sense (backbone interchain)
+        Color C_INTERCHAIN_BACKBONE = PlccUtilities.mutateColor(C_BACKBONE, 50, 50, 50); // contact type does not really make sense (backbone interchain)
         Color C_INTERCHAIN_OTHER = PlccUtilities.mutateColor(C_OTHER, 50, 50, 50);
+        
+        Color C_INTERCHAIN_DIFFMOL_PARALLEL = PlccUtilities.mutateColor(C_PARALLEL, 100, 100, 100);
+        Color C_INTERCHAIN_DIFFMOL_MIXED = PlccUtilities.mutateColor(C_MIXED, 100, 100, 100);
+        Color C_INTERCHAIN_DIFFMOL_ANTIPARALLEL = PlccUtilities.mutateColor(C_ANTIPARALLEL, 100, 100, 100);
+        Color C_INTERCHAIN_DIFFMOL_LIGAND = PlccUtilities.mutateColor(C_LIGAND, 100, 100, 100);
+        Color C_INTERCHAIN_DIFFMOL_BACKBONE = PlccUtilities.mutateColor(C_BACKBONE, 100, 100, 100); // contact type does not really make sense (backbone interchain)
+        Color C_INTERCHAIN_DIFFMOL_OTHER = PlccUtilities.mutateColor(C_OTHER, 100, 100, 100);
         
         
         
@@ -1604,12 +1611,14 @@ public class ProteinGraphDrawer {
                     
                     iChainID = -1;
                     jChainID = -1;
+                    String iChainMolID, jChainMolID;
                     for (Integer x = 0; x < pg.getChainEnds().size(); x++) {
                         if (i < pg.getChainEnds().get(x)) {
                             iChainID = x;
                             break;
                         }
                     }
+                    
                     for (Integer x = 0; x < pg.getChainEnds().size(); x++) {
                         if (j < pg.getChainEnds().get(x)) {
                             jChainID = x;
@@ -1619,22 +1628,50 @@ public class ProteinGraphDrawer {
                     
                     // ------- set color for interchain (complex) contacts ------------
                     if (!Objects.equals(iChainID, jChainID)) {
-                        // interchain contact
-                        //ig2.setStroke(new BasicStroke(2, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
-                        if (edgeType.equals(SpatRel.PARALLEL)) {
-                            ig2.setPaint(C_INTERCHAIN_PARALLEL);
-                        } else if (edgeType.equals(SpatRel.ANTIPARALLEL)) {
-                            ig2.setPaint(C_INTERCHAIN_ANTIPARALLEL);
-                        } else if (edgeType.equals(SpatRel.MIXED)) {
-                            ig2.setPaint(C_INTERCHAIN_MIXED);
-                        } else if (edgeType.equals(SpatRel.LIGAND)) {
-                            ig2.setPaint(C_INTERCHAIN_LIGAND);
-                        } else if (edgeType.equals(SpatRel.BACKBONE)) {
-                            DP.getInstance().w("ProteinGraphDrawer", "Interchain backbone contact found, this makes no sense.");
-                            ig2.setPaint(C_INTERCHAIN_BACKBONE);
-                        } else {
-                            ig2.setPaint(C_INTERCHAIN_OTHER);
+                        
+                        // interchain contact!
+                        
+                        // check whether this is an interchain contact between SSEs which belong to different macromolecules
+                        iChainMolID = pg.getMolIDOfSSE(i);
+                        jChainMolID = pg.getMolIDOfSSE(j);
+                        if( ! Objects.equals(iChainMolID, jChainMolID)) {
+                            System.out.println("CGIC-D: Interchain contact between SSEs " + i + " and " + j + " is a contact between different macromolecules, MOL_IDs " + iChainMolID + " and " + iChainMolID + ".");
+                            //ig2.setStroke(new BasicStroke(2, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
+                            if (edgeType.equals(SpatRel.PARALLEL)) {
+                                ig2.setPaint(C_INTERCHAIN_DIFFMOL_PARALLEL);
+                            } else if (edgeType.equals(SpatRel.ANTIPARALLEL)) {
+                                ig2.setPaint(C_INTERCHAIN_DIFFMOL_ANTIPARALLEL);
+                            } else if (edgeType.equals(SpatRel.MIXED)) {
+                                ig2.setPaint(C_INTERCHAIN_DIFFMOL_MIXED);
+                            } else if (edgeType.equals(SpatRel.LIGAND)) {
+                                ig2.setPaint(C_INTERCHAIN_DIFFMOL_LIGAND);
+                            } else if (edgeType.equals(SpatRel.BACKBONE)) {
+                                DP.getInstance().w("ProteinGraphDrawer", "Interchain backbone contact found, this makes no sense.");
+                                ig2.setPaint(C_INTERCHAIN_DIFFMOL_BACKBONE);
+                            } else {
+                                ig2.setPaint(C_INTERCHAIN_DIFFMOL_OTHER);
+                            }
                         }
+                        else {
+                            System.out.println("CGIC-S: Interchain contact between SSEs " + i + " and " + j + " is a contact between different chains of the same macromolecule, MOL_IDs " + iChainMolID + " and " + iChainMolID + ".");
+                            //ig2.setStroke(new BasicStroke(2, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
+                            if (edgeType.equals(SpatRel.PARALLEL)) {
+                                ig2.setPaint(C_INTERCHAIN_PARALLEL);
+                            } else if (edgeType.equals(SpatRel.ANTIPARALLEL)) {
+                                ig2.setPaint(C_INTERCHAIN_ANTIPARALLEL);
+                            } else if (edgeType.equals(SpatRel.MIXED)) {
+                                ig2.setPaint(C_INTERCHAIN_MIXED);
+                            } else if (edgeType.equals(SpatRel.LIGAND)) {
+                                ig2.setPaint(C_INTERCHAIN_LIGAND);
+                            } else if (edgeType.equals(SpatRel.BACKBONE)) {
+                                DP.getInstance().w("ProteinGraphDrawer", "Interchain backbone contact found, this makes no sense.");
+                                ig2.setPaint(C_INTERCHAIN_BACKBONE);
+                            } else {
+                                ig2.setPaint(C_INTERCHAIN_OTHER);
+                            }
+                        }
+                        
+                        
                     }
                     else {
                         // intrachain contact

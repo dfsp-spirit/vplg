@@ -1258,7 +1258,7 @@ public class FileParser {
                 } catch(Exception e) {
                     System.err.println("ERROR: Could not parse Chain ID colum of PDB line " + pLineNum + ".");
                     e.printStackTrace();
-                    System.exit(-1);
+                    System.exit(1);
                 }
 
                 if(cID.equals(" ")) {

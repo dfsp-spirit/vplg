@@ -78,7 +78,6 @@ import org.xml.sax.SAXException;
 import graphdrawing.DrawTools.IMAGEFORMAT;
 import graphdrawing.DrawableGraph;
 import graphdrawing.IDrawableGraph;
-import java.awt.Polygon;
 import parsers.GMLGraphParser;
 import parsers.IGraphParser;
 import similarity.CompareOneToDB;
@@ -1723,19 +1722,11 @@ public class Main {
         if(drawRPlots) {
             for(Chain c : handleChains) {
                 plotPath = outputDir + fs + pdbid + "_" + c.getPdbChainID() + "_plot";
-                label = "Ramachandran plot of PDB " + pdbid + ", chain " + c.getPdbChainID() + "";
+                label = "Ramachandran plot of PDB entry " + pdbid + ", chain " + c.getPdbChainID() + "";
                 drawRamachandranPlot(plotPath, c.getResidues(), label);
             }
         }
         
-        // write a Ramachandran plot for all chains if appropriate
-        if(drawRPlots) {
-                plotPath = outputDir + fs + pdbid + "_ALL" + "_plot";
-                label = "Ramachandran plot of PDB " + pdbid + ", all chains";
-                drawRamachandranPlot(plotPath, residues, label);
-        }
-
-        // ****************************** aa graphs ****************************
         
         if(Settings.getBoolean("plcc_B_AAgraph_allchainscombined")) {
             if(separateContactsByChain || cInfo == null) {
@@ -1777,7 +1768,7 @@ public class Main {
                 }
                 else {
                     System.err.println("ERROR: Could not write AA type contact stats matrix for all chains to file '" + aaMatrixFile + "'.");
-                }                                
+                }
                 
                 
             }
@@ -2216,6 +2207,9 @@ public class Main {
                
         HashMap<String, String> md = FileParser.getPDBMetaData();
 
+        // check which chains belong to the same macro molecule
+        Map<String, List<String>> macroMoleculesOfPDBfile = new HashMap<>();    // key of the map is the MOL_ID
+       
         
         // handle all chains
         ProteinChainResults pcr;
@@ -2228,9 +2222,23 @@ public class Main {
 
             ProtMetaInfo pmi = FileParser.getMetaInfo(pdbid, chain);
             //pmi.print();
+            
+            
+            c.setMacromolID(pmi.getMacromolID());
+            c.setMacromolName(pmi.getMolName());
             md.put("pdb_mol_name", pmi.getMolName());
             md.put("pdb_org_sci", pmi.getOrgScientific());
             md.put("pdb_org_common", pmi.getOrgCommon());
+            
+            if(! silent) {
+                System.out.println("    Chain '" + chain + "' MOL_ID is '" + pmi.getMacromolID() + "', MOL_NAME is '" + pmi.getMolName() + "'.");
+            }
+            
+            // keep track of mm
+            if( ! macroMoleculesOfPDBfile.containsKey(pmi.getMacromolID())) {
+                macroMoleculesOfPDBfile.put(pmi.getMacromolID(), new ArrayList<String>());
+            }
+            macroMoleculesOfPDBfile.get(pmi.getMacromolID()).add(allChains.get(i).getPdbChainID());
             
             pcr = new ProteinChainResults(c.getPdbChainID());
             // register results for chain
@@ -2396,7 +2404,7 @@ public class Main {
                 //System.out.println("SSEs: " + allChainSSEs);                
 
                 ProtGraph pg = calcGraphType(gt, allChainSSEs, c, resContacts, pdbid);
-                pg.setInfo(pdbid, chain, gt);
+                pg.setInfo(pdbid, chain, c.getMacromolID(), gt);
                 pg.addMetadata(md);
                 
                 pcr.addProteinGraph(pg, gt);
@@ -2837,6 +2845,15 @@ public class Main {
         }
         
         DBManager.commit();
+        
+        if( ! silent) {
+            System.out.print("The following macromolecules exist in the PDB file (format: MOL_ID(list of chains) ...):");
+            for(String key : macroMoleculesOfPDBfile.keySet()) {
+                System.out.print(" " + key + "(");
+                System.out.print(IO.stringListToString(macroMoleculesOfPDBfile.get(key)) + ")");
+            }
+            System.out.print("\n");
+        }
         
         // Calculate Complex Graph
         if(Settings.getBoolean("plcc_B_complex_graphs")) {
@@ -5736,10 +5753,10 @@ public class Main {
 
         // All these values are in pixels
         // page setup
-        Integer marginLeft = 80;
-        Integer marginRight = 80;
-        Integer marginTop = 80;
-        Integer marginBottom = 80;
+        Integer marginLeft = 40;
+        Integer marginRight = 40;
+        Integer marginTop = 40;
+        Integer marginBottom = 40;
 
         // The header that contains the text describing of the graph.
         Integer headerHeight = 40;
@@ -5760,9 +5777,7 @@ public class Main {
     
         // the image area: the part where the vertices and arcs are drawn
         Integer imgWidth = plotWidth;
-        Integer imgHeight = plotHeight;     
-        Integer plotCenterX = imgStartX + (plotWidth / 2);
-        Integer plotCenterY = imgStartY + (plotHeight / 2);
+        Integer imgHeight = plotHeight;              
 
         // where to start drawing the vertices
         Integer footerStartY = imgStartY + plotHeight + 40;
@@ -5771,8 +5786,7 @@ public class Main {
         Integer pageWidth = marginLeft + imgWidth + marginRight;
         Integer pageHeight = marginTop + headerHeight + imgHeight + footerHeight + marginBottom;
 
-        Boolean highlightExpectedSSEAreas = Settings.getBoolean("plcc_B_ramaplot_highlight_areas");
-        Boolean addAreaLabels = Settings.getBoolean("plcc_B_ramaplot_area_labels");
+
         
         try {
 
@@ -5784,13 +5798,13 @@ public class Main {
                     RenderingHints.VALUE_ANTIALIAS_ON);
 
             // make background 
-            ig2.setPaint(Color.WHITE);
+            ig2.setPaint(Color.LIGHT_GRAY);
             ig2.fillRect(0, 0, pageWidth, pageHeight);            
             ig2.setPaint(Color.BLACK);
 
 
-            // prepare font for header
-            Font font = new Font("TimesRoman", Font.PLAIN, 28);
+            // prepare font
+            Font font = new Font("TimesRoman", Font.PLAIN, 20);
             ig2.setFont(font);
             FontMetrics fontMetrics = ig2.getFontMetrics();
             
@@ -5807,7 +5821,7 @@ public class Main {
             ig2.drawString(plotHeader, headerStartX, headerStartY);
             // draw axis labels
             
-            font = new Font("TimesRoman", Font.PLAIN, 24);  // font for axis labels
+            font = new Font("TimesRoman", Font.PLAIN, 16);
             ig2.setFont(font);
             
             Integer xAxisLabelStartY = headerStartY + 30;
@@ -5825,121 +5839,24 @@ public class Main {
             ig2.drawString("+180°", yAxisLabelStartX, xAxisLabelStartY);
             ig2.drawString("+psi", yAxisLabelStartX, xAxisLabelStartY  + (plotHeight / 4));
             ig2.drawString("0°", yAxisLabelStartX, xAxisLabelStartY + (plotHeight / 2));
-            ig2.drawString("-psi", yAxisLabelStartX, headerStartX + (plotHeight * 3/4));                        
+            ig2.drawString("-psi", yAxisLabelStartX, headerStartX + (plotHeight * 3/4));
             ig2.drawString("-180°", yAxisLabelStartX, headerStartX + plotHeight);
-                        
+            
+            // footer
+            ig2.drawString("Color codes indicate SSE type of residues: red=helix, black=beta strand, gray=coil/other.", footerStartX, footerStartY);
             
             // ------------------------- Draw area and the borders around the drawing area ----------------------------
             ig2.setPaint(Color.WHITE);
-            ig2.fillRect(imgStartX, imgStartY, plotWidth, plotHeight); // not directly needed anymore. the background of the whole image was gray earlier.
+            ig2.fillRect(imgStartX, imgStartY, plotWidth, plotHeight);
             
-            // highligth areas where SSEs usually are, if required
-            if(highlightExpectedSSEAreas) {
-                
-                double[] xPol;
-                double[] yPol;
-                int[] xPolInt;
-                int[] yPolInt;
-                
-                ig2.setPaint(new Color(230, 230, 230));
-                ig2.setStroke(new BasicStroke(1));
-                                                
-                
-                // --------------- the upper outer poly for beta strands -----------------
-                xPol = new double[] { 0.00, 0.40, 0.40, 0.25, 0.07, 0.00 };  // the poly points as relative position in the plot width
-                yPol = new double[] { 0.00, 0.00, 0.20, 0.45, 0.45, 0.35 };   // the poly points as relative position in the plot height
-                xPolInt = new int[xPol.length];
-                yPolInt = new int[xPol.length];
-                for(int i = 0; i < xPol.length; i++) {
-                    xPolInt[i] = new Double(xPol[i] * imgWidth).intValue() + imgStartX;
-                    yPolInt[i] = new Double(yPol[i] * imgHeight).intValue()  + imgStartY;
-                }
-                Polygon betaStrandUpperLower = new Polygon(xPolInt, yPolInt, xPol.length);
-                ig2.fillPolygon(betaStrandUpperLower);
-                
-                // --------------- the lower outer poly for beta strands -----------------
-                xPol = new double[] { 0.00, 0.35, 0.40, 0.00 };  // the poly points as relative position in the plot width
-                yPol = new double[] { 0.95, 0.95, 1.00, 1.00 };   // the poly points as relative position in the plot height
-                xPolInt = new int[xPol.length];
-                yPolInt = new int[xPol.length];
-                for(int i = 0; i < xPol.length; i++) {
-                    xPolInt[i] = new Double(xPol[i] * imgWidth).intValue() + imgStartX;
-                    yPolInt[i] = new Double(yPol[i] * imgHeight).intValue()  + imgStartY;
-                }
-                Polygon betaStrandPolyLower = new Polygon(xPolInt, yPolInt, xPol.length);
-                ig2.fillPolygon(betaStrandPolyLower);
-                
-                
-                // --------------- the outer poly for right-handed helices -----------------
-                xPol = new double[] { 0.00, 0.20, 0.25, 0.40, 0.40, 0.00 };  // the poly points as relative position in the plot width
-                yPol = new double[] { 0.60, 0.60, 0.55, 0.55, 0.70, 0.70 };   // the poly points as relative position in the plot height
-                xPolInt = new int[xPol.length];
-                yPolInt = new int[xPol.length];
-                for(int i = 0; i < xPol.length; i++) {
-                    xPolInt[i] = new Double(xPol[i] * imgWidth).intValue() + imgStartX;
-                    yPolInt[i] = new Double(yPol[i] * imgHeight).intValue()  + imgStartY;
-                }
-                Polygon alphaPolyRightOuter = new Polygon(xPolInt, yPolInt, xPol.length);
-                ig2.fillPolygon(alphaPolyRightOuter);
-                
-                
-                // --------------- the poly for left-handed alpha helices (only has outer) -----------------
-                xPol = new double[] { 0.65, 0.70, 0.70, 0.65 };  // the poly points as relative position in the plot width
-                yPol = new double[] { 0.30, 0.25, 0.45, 0.40 };   // the poly points as relative position in the plot height
-                xPolInt = new int[xPol.length];
-                yPolInt = new int[xPol.length];
-                for(int i = 0; i < xPol.length; i++) {
-                    xPolInt[i] = new Double(xPol[i] * imgWidth).intValue() + imgStartX;
-                    yPolInt[i] = new Double(yPol[i] * imgHeight).intValue()  + imgStartY;
-                }
-                Polygon leftHandedAlpha = new Polygon(xPolInt, yPolInt, xPol.length);
-                ig2.fillPolygon(leftHandedAlpha);
-                
-                // set new color for the core polys
-                ig2.setPaint(new Color(210, 210, 210));
-                
-                // --------------- the CORE poly for beta strands -----------------
-                xPol = new double[] { 0.10, 0.35, 0.35, 0.30, 0.05, 0.05 };  // the poly points as relative position in the plot width
-                yPol = new double[] { 0.00, 0.00, 0.20, 0.25, 0.25, 0.10 };   // the poly points as relative position in the plot height
-                xPolInt = new int[xPol.length];
-                yPolInt = new int[xPol.length];
-                for(int i = 0; i < xPol.length; i++) {
-                    xPolInt[i] = new Double(xPol[i] * imgWidth).intValue() + imgStartX;
-                    yPolInt[i] = new Double(yPol[i] * imgHeight).intValue()  + imgStartY;
-                }
-                Polygon betaStrandCore = new Polygon(xPolInt, yPolInt, xPol.length);
-                ig2.fillPolygon(betaStrandCore);
-                
-                // --------------- the CORE poly for right-handed alpha helices -----------------
-                xPol = new double[] { 0.25, 0.38, 0.38, 0.10, 0.10, 0.20 };  // the poly points as relative position in the plot width
-                yPol = new double[] { 0.57, 0.57, 0.67, 0.67, 0.62, 0.62 };   // the poly points as relative position in the plot height
-                xPolInt = new int[xPol.length];
-                yPolInt = new int[xPol.length];
-                for(int i = 0; i < xPol.length; i++) {
-                    xPolInt[i] = new Double(xPol[i] * imgWidth).intValue() + imgStartX;
-                    yPolInt[i] = new Double(yPol[i] * imgHeight).intValue()  + imgStartY;
-                }
-                Polygon rightHandedAlphaCore = new Polygon(xPolInt, yPolInt, xPol.length);
-                ig2.fillPolygon(rightHandedAlphaCore);
-                
-                ig2.setPaint(Color.DARK_GRAY);
-                if(addAreaLabels) {
-                    ig2.drawString("RH \u03b1", (new Double(0.41 * imgWidth).intValue() + imgStartX), (new Double(0.65 * imgHeight).intValue() + imgStartY)); // left-handed alpha
-                    ig2.drawString("LH \u03b1", (new Double(0.72 * imgWidth).intValue() + imgStartX), (new Double(0.35 * imgHeight).intValue() + imgStartY)); // right-handed alpha
-                    ig2.drawString("\u03b2", (new Double(0.33 * imgWidth).intValue() + imgStartX), (new Double(0.35 * imgHeight).intValue() + imgStartY)); // beta
-                }
-            }
-            
-            // draw frame around plot
-            ig2.setPaint(Color.BLACK);
-            ig2.setStroke(new BasicStroke(2));
+            // draw it                        
+            ig2.setStroke(new BasicStroke(1));
             Rectangle2D border = new Rectangle2D.Double(imgStartX, imgStartY, plotWidth, plotHeight);
             shape = ig2.getStroke().createStrokedShape(border);
             ig2.draw(shape);
             
-            // draw x and y axis (2 lines crossing in center of plot)
-            ig2.setStroke(new BasicStroke(1));
-            ig2.setPaint(Color.BLACK);
+            // draw x and y axis
+            ig2.setPaint(Color.LIGHT_GRAY);
             ig2.drawLine(imgStartX, imgStartY + (plotHeight / 2), imgStartX + plotWidth, imgStartY +  + (plotWidth / 2)); // y
             ig2.drawLine(imgStartX + (plotWidth / 2), imgStartY, imgStartX + (plotWidth / 2), imgStartY + plotHeight); // x
             
@@ -5947,67 +5864,37 @@ public class Main {
             // ------------------------- Draw the plot -------------------------
             
             // Draw the edges as arcs
-            Double dotWidth = 2.0;
-            Double dotHeight = 2.0;
-                
+            
             Rectangle2D.Double dot;
             Residue res;
-            Integer numHelixDrawn = 0;
-            Integer numStrandDrawn = 0;
-            Integer numOtherDrawn = 0;
             Integer edgeType, arcCenterX, arcCenterY, leftVert, rightVert, leftVertPosX, rightVertPosX, arcWidth, arcHeight, arcTopLeftX, arcTopLeftY, spacerX, spacerY;
             for(Integer i = 0; i < residues.size(); i++) {
                 res = residues.get(i);
 
+                // Choose color
+                if(res.getSSEString().equals("H")) { ig2.setPaint(Color.RED); }
+                else if(res.getSSEString().equals("E")) { ig2.setPaint(Color.BLACK); }
+                else if(res.getSSEString().equals("L")) { ig2.setPaint(Color.MAGENTA); }
+                else if(res.getSSEString().equals("C")) { ig2.setPaint(Color.GRAY); }                
+                else { ig2.setPaint(Color.LIGHT_GRAY); }
+                
                 // skip ligands and other non-AAs
                 if(! res.isAA()) {
                     continue;
                 }
-                
-                // Choose color
-                if(res.getSSEString().equals("H")) { ig2.setPaint(Color.RED); numHelixDrawn++; }
-                else if(res.getSSEString().equals("E")) { ig2.setPaint(Color.BLACK); numStrandDrawn++; }
-                else if(res.getSSEString().equals("L")) { ig2.setPaint(Color.MAGENTA); }    // should never happen, see AA-check above
-                else { ig2.setPaint(Color.GRAY); numOtherDrawn++; }
-                
-                
-                
-                // TODO: SHould we also skip the first and last residues of a chain?
-                
 
                 // determine the position of the dot within the drawing area
+                Double phiNorm = (res.getPhi() + 180.0) / 360.0;
+                Double psiNorm = (res.getPsi() + 180.0) / 360.0;
+                Double posDrawX = phiNorm * imgWidth;
+                Double posDrawY = psiNorm * imgHeight;
                 
-                // The angles given by DSSP range from -180 to +180 degrees. Normalize to angles from 0 to +360 degrees.
-                // NOTE: The normalization is not used anymore, look at the coord system, which is now -180 to +180 instead of 0 to 360 to understand this
-                //Double phiNorm = (res.getPhi() + 180.0) / 360.0;
-                //Double psiNorm = (res.getPsi() + 180.0) / 360.0;
-                //Double posDrawX = phiNorm * imgWidth;   // note that imgWidth and imHeight are width and height of the plot area
-                //Double posDrawY = psiNorm * imgHeight;        
                 // now determine the absolute position in the canvas
-                //Double posCanvasX = imgStartX + posDrawX;   // note that imgStartX and Y are the start of the plot area
-                //Double posCanvasY = imgStartY + posDrawY;
-
-                Double phi = res.getPhi() / 180.0;
-                Double psi = res.getPsi() / 180.0;
-                Double posDrawX = phi * (imgWidth / 2);   // note that imgWidth and imHeight are width and height of the plot area
-                Double posDrawY = psi * (imgHeight / 2);        
-                Double posCanvasX = plotCenterX + posDrawX;   // note that imgStartX and Y are the start of the plot area
-                Double posCanvasY = plotCenterY - posDrawY;     // look at the weird way coord system is setup to understand why this is "-" instead of "+"
-                                
+                Double posCanvasX = imgStartX + posDrawX;
+                Double posCanvasY = imgStartY + posDrawY;
                 
-                // DEBUG
-                /*
-                if(res.getSSEString().equals("E")) {
-                    System.out.println("DEBUG: Residue " + res.getSSEString() + " " + res.getDsspResNum() + " has phi/psi angles (" + res.getPhi() + "/" + res.getPsi() + "), normalized to (" + phi + "/" + psi + "), drawn at (" + posCanvasX + "/" + posCanvasY + ") in image.");
-                    if(res.getDsspResNum().equals(20)) {
-                        ig2.drawString("" + phi + "/" + psi, posCanvasX.intValue(), posCanvasY.intValue());
-                        System.out.println("DEBUG: ### Marking position of residue with phi/psi angles " + res.getPhi() + "/" + res.getPsi() + " (range -180 to +180) . ###");
-                        dotWidth = 5.0;
-                        dotHeight = 5.0;
-                    }
-                }
-                */
-                
+                Double dotWidth = 1.0;
+                Double dotHeight = 1.0;
                 
 
                 // draw it                        
@@ -6018,19 +5905,10 @@ public class Main {
 
             }
             
-            Integer numTotalDrawn = numHelixDrawn + numStrandDrawn + numOtherDrawn;
-            
-            // footer
-            ig2.setPaint(Color.BLACK);
-            font = new Font("TimesRoman", Font.PLAIN, 20);  // font for footer
-            ig2.setFont(font);
-            ig2.drawString("Color indicates SSE type of residues: red=helix, black=beta strand, gray=coil/other.", footerStartX, footerStartY);
-            ig2.drawString("Drew " + numTotalDrawn + " dihedral angle pairs total (" + numHelixDrawn + " helix, " + numStrandDrawn + " strand, " + numOtherDrawn + " other).", footerStartX, footerStartY + 30);
+
             
             // all done, write the image to disk
             ImageIO.write(bi, "PNG", new File(filePath + ".png"));
-            //String writerNames[] = ImageIO.getWriterFormatNames();
-            //System.out.println("Available format writers: " + IO.stringArrayToString(writerNames));
             //ig2.stream(new FileWriter(filePath + ".svg"), false);
             ig2.dispose();
 
@@ -6789,7 +6667,7 @@ public class Main {
         }
 
         //System.out.println("    Done creating SSE-level " + graphType + " CG.");
-        cg.setInfo(pdbid, "ALL", "complex_" + graphType);
+        cg.setInfo(pdbid, "ALL", "ALL", "complex_" + graphType);
         cg.addMetadata(md);
         cg.setComplexData(chainEnd, allChains);
         cg.declareComplexGraph(true);
@@ -7025,7 +6903,7 @@ public class Main {
                 sseDrawLabels.put(ligIndex, lign3 + "-" + ligRes);
                 
                 // change graph info, this is so that the label on the image gets set properly
-                cg.setInfo(pdbid, "ALL", "ligand_complex_" + lign3 + "-" + ligRes);
+                cg.setInfo(pdbid, "ALL", "ALL", "ligand_complex_" + lign3 + "-" + ligRes);
                 
                 HashMap<DrawTools.IMAGEFORMAT, String> outCLGImages = ProteinGraphDrawer.drawProteinGraph(ligimgFileNoExt, false, formats, cg, sseDrawLabels, ignoreChains); // draw ligand-based complex graph
                 if(! silent) {

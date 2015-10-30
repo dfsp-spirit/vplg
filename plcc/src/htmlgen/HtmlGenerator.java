@@ -915,7 +915,7 @@ public class HtmlGenerator {
         if(pcr != null) {
             ProtMetaInfo pmi = pcr.getChainMetaData();
             if(pmi != null) {
-                sb.append("Molecule ID: ").append(pmi.getMolID()).append(HtmlTools.brAndNewline());
+                sb.append("Molecule ID: ").append(pmi.getMacromolID()).append(HtmlTools.brAndNewline());
                 sb.append("Molecule name: ").append(pmi.getMolName()).append(HtmlTools.brAndNewline());
                 sb.append("Organims (common): ").append(pmi.getOrgCommon()).append(HtmlTools.brAndNewline());
                 sb.append("Organims (scientific): ").append(pmi.getOrgScientific()).append(HtmlTools.brAndNewline());

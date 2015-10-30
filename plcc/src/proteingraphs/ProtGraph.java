@@ -324,7 +324,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
             //tpg.print();
             fg.declareFoldingGraphOf(this); // Each connected component of a protein graph is a folding graph
             fg.setFoldingGraphNumber(i);   // will be set properly for RED/KEY CCs after this computation, see below
-            fg.setInfo(this.pdbid, this.chainid, this.graphType);            
+            fg.setInfo(this.pdbid, this.chainid, this.chainMolid, this.graphType);            
             conComps.add(fg);
         }
         

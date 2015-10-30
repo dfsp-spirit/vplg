@@ -733,10 +733,11 @@ public class FoldingGraph extends SSEGraph {
      * Sets the info fields of this graph, defining the PDB ID as 'pdbid', the chain id as 'chainid' and the graph type as 'graphType'. Also sets the meta data.
      * @param pdbid the PDB identifier, e.g., "8icd"
      * @param chainid the PDB chain ID, e.g., "A"
+     * @param chainMolid the macromolecule ID of the chain in the PDB file, e.g., "1". Defines which chains belong to same macromoelcue.
      * @param graphType the graph type, e.g., "albe"
      */
-    @Override public void setInfo(String pdbid, String chainid, String graphType) {
-        super.setInfo(pdbid, chainid, graphType);
+    @Override public void setInfo(String pdbid, String chainid, String chainMolid, String graphType) {
+        super.setInfo(pdbid, chainid, chainMolid, graphType);
         this.metadata.put("graphclass", "folding graph");     
         this.metadata.put("foldinggraphnumber", this.foldingGraphNumber + "");     
     }       

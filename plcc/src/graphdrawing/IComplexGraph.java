@@ -16,8 +16,15 @@ import java.util.List;
 public interface IComplexGraph {
     /**
      * Determines protein chain ends.
+     * @param sseIndex the SSE index in the graph
      * @return a list of the indices of the SSEs (N to C in seq.), where the chains end.
      */
     public String getChainNameOfSSE(Integer sseIndex);
     
+    /**
+     * Determines macromol ID of the (chain of the) SSE.
+     * @param sseIndex the SSE index
+     * @return the macromol ID of the parent chain of the SSE (MOL_ID field from PBD file, e.g., "1")
+     */
+    public String getMolIDOfSSE(Integer sseIndex);
 }

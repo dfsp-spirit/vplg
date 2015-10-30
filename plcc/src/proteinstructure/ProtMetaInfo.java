@@ -22,7 +22,7 @@ public class ProtMetaInfo {
 
     private String pdbid;
     private String chainid;
-    private String molID;                   // MOL_ID token used in SOURCE and COMPND fields of the PDB file
+    private String macromolID;                   // MOL_ID token used in SOURCE and COMPND fields of the PDB file
     private String molName;                 // PDB file MOLECULE record
     private String orgScientific;           //          SOURCE record, ORGANISM_SCIENTIFIC line
     private String orgCommon;               //          SOURCE record, ORGANISM_COMMON line
@@ -41,14 +41,14 @@ public class ProtMetaInfo {
         this.orgScientific = "UNKNOWN";
         this.orgCommon = "UNKNOWN";
         this.orgTaxid = "UNKNOWN";
-        this.molID = "UNKNOWN";
+        this.macromolID = "UNKNOWN";
     }
 
     /**
      * Returns true if this object has been initialized properly and found the MOL_ID of its chain in the PDB file.
      */
     public Boolean isReady() {
-        return( ! this.molID.equals("UNKNOWN"));
+        return( ! this.macromolID.equals("UNKNOWN"));
     }
 
     /**
@@ -138,7 +138,7 @@ public class ProtMetaInfo {
                     if(cur_chain_list.indexOf(this.chainid) >= 0) {
                         // The chain we are looking for is part of this chain list, so the current MOL_ID is the correct one.
                         mol_id = cur_mol_id;
-                        this.molID = mol_id;
+                        this.macromolID = mol_id;
                         return(mol_id);
                     }
                     
@@ -155,7 +155,7 @@ public class ProtMetaInfo {
         }
 
         DP.getInstance().w("setYourMolID(): Could not find MOL_ID token of chain '" + this.chainid + "' in COMPND record of PDB file.");
-        this.molID = mol_id;
+        this.macromolID = mol_id;
         return(mol_id);
     }
 
@@ -209,7 +209,7 @@ public class ProtMetaInfo {
                         continue;
                     }
 
-                    if(cur_mol_id.equals(this.getMolID())) {
+                    if(cur_mol_id.equals(this.getMacromolID())) {
                         //System.out.println("DEBUG:  correct MOL_ID " + cur_mol_id + ".");
                         correctMolIDCOMPND = true;
                     }
@@ -263,7 +263,7 @@ public class ProtMetaInfo {
                         continue;
                     }
 
-                    if(cur_mol_id.equals(this.getMolID())) {
+                    if(cur_mol_id.equals(this.getMacromolID())) {
                         correctMolIDSOURCE = true;
                     }
                     else {
@@ -336,14 +336,16 @@ public class ProtMetaInfo {
      */
     public void print() {
         System.out.println("| Printing data on ProtMetaInfo for protein " + this.pdbid + ", chain " + this.chainid + ".");
-        System.out.println("| molID=" + this.molID + ", molName=" + this.molName + ", orgScientific=" + this.orgScientific);
+        System.out.println("| molID=" + this.macromolID + ", molName=" + this.molName + ", orgScientific=" + this.orgScientific);
         System.out.println("| orgCommon=" + this.orgCommon + ", orgTaxid=" + this.orgTaxid);
     }
 
 
     // setters and getters
     public String getMolName() { return(this.molName); }
-    public String getMolID() { return(this.molID); }
+    
+    /** Returns the macromolecule id (MOL_ID field) of the PDB file. */
+    public String getMacromolID() { return(this.macromolID); }
     public String getOrgScientific() { return(this.orgScientific); }
     public String getOrgCommon() { return(this.orgCommon); }
     public String getOrgTaxid() { return(this.orgTaxid); }
@@ -352,7 +354,7 @@ public class ProtMetaInfo {
     public String getChainid() { return(this.chainid); }
 
     public void setMolName(String s) { this.molName = s; }
-    public void setMolID(String s) { this.molID = s; }
+    public void setMacromolID(String s) { this.macromolID = s; }
     public void setOrgScientific(String s) { this.orgScientific = s; }
     public void setOrgCommon(String s) { this.orgCommon = s; }
     public void setOrgTaxid(String s) { this.orgTaxid = s; }

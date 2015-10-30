@@ -21,6 +21,7 @@ These are example PDB and DSSP input files. Most of the are here for a special r
 * 1nr0: Contains a beta propeller motif.
 * 1hzh: Antibody, should contain immunoglobin fold
 * 1igt: Antibody, should contain immunoglobin fold
+* 5ahu: Contains 2 polymers which two chains each, used to test interchain contacts and distinguish between same-polymer and different-polymer contacts. Also useful to test chain-level visualization of CGs, where chains belonging to same polymer should be marked.
 
 
 

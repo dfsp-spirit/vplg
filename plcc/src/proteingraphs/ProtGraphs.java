@@ -257,7 +257,7 @@ public class ProtGraphs {
                     }
                     
                     pg = new ProtGraph(sses);
-                    pg.setInfo("<NONE>", "<NONE>", "custom");
+                    pg.setInfo("<NONE>", "<NONE>", "1", "custom");
                     //System.out.println("DEBUG: fromTrivialGraphFormatString: Found vertex set / edge set separator '#' in line " + curLine + ".");
                     continue;
                 }
@@ -636,7 +636,7 @@ public class ProtGraphs {
         }
         
         pg = new ProtGraph(sses);
-        pg.setInfo(pdbid, chain, graphType);
+        pg.setInfo(pdbid, chain, "?", graphType);
         
         // Now create all edges
         curLine = 0;
@@ -796,7 +796,7 @@ public class ProtGraphs {
         
         // create PG
         ProtGraph pg = new ProtGraph(vertices);
-        pg.setInfo(pdbid, chain, graphType);
+        pg.setInfo(pdbid, chain, "?", graphType);
         
         
         // add the edges
@@ -883,7 +883,7 @@ public class ProtGraphs {
         
         // create PG
         ProtGraph pg = new ProtGraph(vertices);
-        pg.setInfo(pdbid, chain, graphType);
+        pg.setInfo(pdbid, chain, "1", graphType);
         
         pg.addContact(0, 2, SpatRel.PARALLEL);
         pg.addContact(0, 18, SpatRel.PARALLEL);

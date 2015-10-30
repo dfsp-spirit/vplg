@@ -225,7 +225,7 @@ public class GraphCreator {
         }
         
         g = new ProtGraph(vertices);
-        g.setInfo("rand", "A", "albelig");
+        g.setInfo("rand", "A", "1", "albelig");
         
         // add edges
         for(int i = 0; i < dg.getDrawableEdges().size(); i++) {
@@ -272,7 +272,7 @@ public class GraphCreator {
         }
         
         g = new ProtGraph(vertices);
-        g.setInfo("rand", "A", "albelig");
+        g.setInfo("rand", "A", "1", "albelig");
         
         System.out.println("  Added all " + g.getSize() + " vertices to the graph.");
         // add all edges

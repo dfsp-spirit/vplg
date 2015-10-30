@@ -101,10 +101,10 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements I
     /** the list of all SSEs of this graph */
     protected List<SSE> sseList;
     
-    /** Contains the number of the last SSE which is part of a certain chain*/
+    /** Contains the number of the last SSE which is part of a certain chain. Ugly hack by Marcus to abuse protein graphs as complex graphs. */
     private List<Integer> chainEnds = new ArrayList<>();
     
-    /** Contains a list of all chains*/
+    /** Contains a list of all chains. Ugly hack by Marcus to abuse protein graphs as complex graphs. */
     private List<Chain> allChains = new ArrayList<>();
     
     /** The size of this graph, i.e., the number of vertices in it. */
@@ -129,6 +129,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements I
     
     protected String pdbid;                               // the PDB ID this graph represents, e.g. "3kmf"
     protected String chainid;                             // the chain ID in the PDB file, e.g. "A"
+    protected String chainMolid;                             // the macromolecule ID of the chain in the PDB file, e.g. "1". This defines which chains belong to a single (protein) macromolecule.
     protected String graphType;                           // the graph type, e.g. "albe"
     
     protected HashMap<String, String> metadata;
@@ -2465,6 +2466,11 @@ E	3	3	3
         this.metadata = md;
     }
     
+    /**
+     * Set complex graph-specific data.
+     * @param chainEnd a list if SSE indices. Each index of an SSE in the total list is the last SSE of a chain. So chainEnd[2] is the position of the last SSE of the third chain.
+     * @param allChains a list of all chains which are included in this CG 
+     */
     public void setComplexData(List<Integer> chainEnd, ArrayList<Chain> allChains){
         this.setAllChains(allChains);
         this.setChainEnds(chainEnd);
@@ -2570,11 +2576,13 @@ E	3	3	3
      * Sets the info fields of this graph, defining the PDB ID as 'pdbid', the chain id as 'chainid' and the graph type as 'graphType'. Also sets the meta data.
      * @param pdbid the PDB identifier, e.g., "8icd"
      * @param chainid the PDB chain ID, e.g., "A"
+     * @param chainMolid the PDB macromolecule ID of the chain within the PDB file, e.g., "1". Defines which chains belong to the same macromolecule.
      * @param graphType the graph type, e.g., "albe"
      */
-    public void setInfo(String pdbid, String chainid, String graphType) {
+    public void setInfo(String pdbid, String chainid, String chainMolid, String graphType) {
         this.pdbid = pdbid;
         this.chainid = chainid;
+        this.chainMolid = chainMolid;
         this.graphType = graphType;
         
         this.metadata.put("pdbid", pdbid);
@@ -3779,6 +3787,21 @@ E	3	3	3
         }
         if( ! iChainID.equals(-1)) {
             return this.getAllChains().get(iChainID).getPdbChainID();
+        }
+        return "?";
+    }
+    
+    @Override
+    public String getMolIDOfSSE(Integer sseIndex) {
+        Integer iChainID = -1;
+        for (Integer x = 0; x < this.getChainEnds().size(); x++) {
+            if (sseIndex < this.getChainEnds().get(x)) {
+                iChainID = x;
+                break;
+            }
+        }
+        if( ! iChainID.equals(-1)) {
+            return this.getAllChains().get(iChainID).getMacromolID();
         }
         return "?";
     }
