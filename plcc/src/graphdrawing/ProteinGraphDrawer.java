@@ -1578,6 +1578,7 @@ public class ProteinGraphDrawer {
         //DP.getInstance().i("ProteinGraphDrawer", "The drawPos array is: '" + IO.intArrayToString(drawPos) + "'.");
         
         float[] dashPattern = { 10, 20, 10, 20 }; // dash pattern for dashed lines: alternating lengths of transparent (even index) and opaque (uneven index) line segement lengths to draw
+        float[] dashPatternDiffMol = { 20, 40, 20, 40 };
         
         for (Integer i = 0; i < pg.getSize(); i++) {
             for (Integer j = i + 1; j < pg.getSize(); j++) {
@@ -1636,7 +1637,7 @@ public class ProteinGraphDrawer {
                         jChainMolID = pg.getMolIDOfSSE(j);
                         if( ! Objects.equals(iChainMolID, jChainMolID)) {
                             System.out.println("CGIC-D: Interchain contact between SSEs " + i + " and " + j + " is a contact between chains " + pg.getAllChains().get(iChainID).getPdbChainID() + " and " + pg.getAllChains().get(jChainID).getPdbChainID() + " of different macromolecules, MOL_IDs " + iChainMolID + " and " + jChainMolID + ".");
-                            //ig2.setStroke(new BasicStroke(2, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
+                            ig2.setStroke(new BasicStroke(2, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
                             if (edgeType.equals(SpatRel.PARALLEL)) {
                                 ig2.setPaint(C_INTERCHAIN_DIFFMOL_PARALLEL);
                             } else if (edgeType.equals(SpatRel.ANTIPARALLEL)) {
@@ -1653,8 +1654,8 @@ public class ProteinGraphDrawer {
                             }
                         }
                         else {
-                            System.out.println("CGIC-S: Interchain contact between SSEs " + i + " and " + j + " is a contact between chains " + pg.getAllChains().get(iChainID).getPdbChainID() + " and " + pg.getAllChains().get(jChainID).getPdbChainID() + " belonging to the same macromolecule, MOL_IDs " + iChainMolID + " and " + iChainMolID + ".");
-                            //ig2.setStroke(new BasicStroke(2, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10, dashPattern, 0));
+                            System.out.println("CGIC-S: Interchain contact between SSEs " + i + " and " + j + " is a contact between chains " + pg.getAllChains().get(iChainID).getPdbChainID() + " and " + pg.getAllChains().get(jChainID).getPdbChainID() + " belonging to the same macromolecule (MOL_IDs " + iChainMolID + " and " + iChainMolID + ").");
+                            ig2.setStroke(new BasicStroke(2, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10, dashPatternDiffMol, 0));
                             if (edgeType.equals(SpatRel.PARALLEL)) {
                                 ig2.setPaint(C_INTERCHAIN_PARALLEL);
                             } else if (edgeType.equals(SpatRel.ANTIPARALLEL)) {
@@ -1816,7 +1817,9 @@ public class ProteinGraphDrawer {
                         }
                     }
                     if (iChainID != -1 && drawPos[i] >= 0) {
+                        // draw chain name and molecule ID for CGs
                         ig2.drawString(pg.getAllChains().get(iChainID).getPdbChainID(), pl.getFooterStart().x + (drawPos[i] * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 2) + (stringHeight / 4));
+                        ig2.drawString(pg.getAllChains().get(iChainID).getMacromolID(), pl.getFooterStart().x + (drawPos[i] * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 3) + (stringHeight / 4));
                     }
                     
                     // DEBUG: draw residue number
@@ -1826,9 +1829,16 @@ public class ProteinGraphDrawer {
                     //}
                 }
             }
+            
+            // draw "CH" and "ML" strings for complex graphs
+            if (iChainID != -1) {
+                ig2.drawString("CH", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight * 2 + (stringHeight / 4));
+                ig2.drawString("ML", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight * 3 + (stringHeight / 4));
+            }
+            
             if (Settings.getBoolean("plcc_B_graphimg_legend")) {
                 if (iChainID != -1) {
-                    ProteinGraphDrawer.drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + lineHeight * 3 + (stringHeight / 4)), pl, pg);
+                    ProteinGraphDrawer.drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + lineHeight * 4 + (stringHeight / 4)), pl, pg);                    
                 } else {
                     ProteinGraphDrawer.drawLegend(ig2, new Position2D(pl.getFooterStart().x, pl.getFooterStart().y + lineHeight * 2 + (stringHeight / 4)), pl, pg);
                 }

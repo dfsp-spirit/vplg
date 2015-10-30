@@ -2942,6 +2942,7 @@ E	3	3	3
             vertex = this.sseList.get(i);
             
             String vertex_chain_name_cg = "?";
+            String vertex_mol_id_cg = "?";
             if(this.isComplexGraph()) {
                 // determine and set chain ID of complec graph vertex
                 int iChainID = -1;
@@ -2951,6 +2952,7 @@ E	3	3	3
                 
                 if(iChainID != -1) {
                     vertex_chain_name_cg = this.getAllChains().get(iChainID).getPdbChainID();
+                    vertex_mol_id_cg = this.getAllChains().get(iChainID).getMacromolID();
                 }
             }
             
@@ -2985,7 +2987,8 @@ E	3	3	3
             }
             
             if(this.isComplexGraph()) {
-                gmlf.append("    chain_id \"").append(vertex_chain_name_cg).append("\"\n");                
+                gmlf.append("    chain_id \"").append(vertex_chain_name_cg).append("\"\n");
+                gmlf.append("    mol_id \"").append(vertex_mol_id_cg).append("\"\n");                                
             }
         
             
