@@ -843,7 +843,7 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_complexcontacttypes + " (complexcontacttype_id int not null primary key,  complexcontacttype_text text not null);");
             doInsertQuery("CREATE TABLE " + tbl_graphtypes + " (graphtype_id int not null primary key,  graphtype_text text not null);");            
             doInsertQuery("CREATE TABLE " + tbl_protein + " (pdb_id varchar(4) primary key, header text not null, title text not null, experiment text not null, keywords text not null, resolution real not null);");
-            doInsertQuery("CREATE TABLE " + tbl_macromolecule + " (macromolecule_id serial primary key,  mol_id_pdb text not null, mol_name text not null, mol_ec_number text, mol_organism_scientific text, mol_organism_common text, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE);");
+            doInsertQuery("CREATE TABLE " + tbl_macromolecule + " (macromolecule_id serial primary key,  mol_id_pdb text not null, mol_name text not null, mol_ec_number text, mol_organism_scientific text, mol_organism_common text, mol_chains text, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE);");
             doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(2) not null, mol_id_pdb text not null, mol_name text not null, organism_scientific text not null, organism_common text not null, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, chain_isinnonredundantset smallint DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence text not null, sse_type int not null references " + tbl_ssetypes + " ON DELETE CASCADE, lig_name varchar(5), position_in_chain int);");
             doInsertQuery("CREATE TABLE " + tbl_secondat + " (secondat_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, alpha_fg_number int, alpha_fg_foldname varchar(2), alpha_fg_position int, beta_fg_number int, beta_fg_foldname varchar(2), beta_fg_position int, albe_fg_number int, albe_fg_foldname varchar(2), albe_fg_position int, alphalig_fg_number int, alphalig_fg_foldname varchar(2), alphalig_fg_position int, betalig_fg_number int, betalig_fg_foldname varchar(2), betalig_fg_position int, albelig_fg_number int, albelig_fg_foldname varchar(2), albelig_fg_position int);");
@@ -8363,10 +8363,11 @@ connection.close();
      * @param molECNumber the EC number from the PDB header, can be null (the PDB field is optional, not all macromolecules have one)
      * @param orgScientific the orgScientific record of the respective PDB header field
      * @param orgCommon the orgCommon record of the respective PDB header field
+     * @param chainString the chain line from PDB COMPND record 
      * @return whether an exception was thrown. unused, use the exception instead
      * @throws SQLException if the DB could not be reset or closed properly
      */
-    public static Boolean writeMacromoleculeToDB(String pdb_id, String molIDPDBfile, String molName, String molECNumber, String orgScientific, String orgCommon) throws SQLException {
+    public static Boolean writeMacromoleculeToDB(String pdb_id, String molIDPDBfile, String molName, String molECNumber, String orgScientific, String orgCommon, String chainString) throws SQLException {
         
         if(! proteinExistsInDB(pdb_id)) {
             return(false);
@@ -8376,7 +8377,7 @@ connection.close();
 
         PreparedStatement statement = null;
 
-        String query = "INSERT INTO " + tbl_macromolecule + " (pdb_id, mol_id_pdb, mol_name, mol_ec_number, mol_organism_scientific, mol_organism_common) VALUES (?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO " + tbl_macromolecule + " (pdb_id, mol_id_pdb, mol_name, mol_ec_number, mol_organism_scientific, mol_organism_common, mol_chains) VALUES (?, ?, ?, ?, ?, ?, ?);";
 
         try {
             //dbc.setAutoCommit(false);
@@ -8388,6 +8389,7 @@ connection.close();
             statement.setString(4, molECNumber);
             statement.setString(5, orgScientific);
             statement.setString(6, orgCommon);
+            statement.setString(7, chainString);
                                 
             statement.executeUpdate();
             //dbc.commit();

@@ -2208,7 +2208,8 @@ public class Main {
         HashMap<String, String> md = FileParser.getPDBMetaData();
 
         // check which chains belong to the same macro molecule
-        Map<String, List<String>> macroMoleculesOfPDBfile = new HashMap<>();    // key of the map is the MOL_ID
+        Map<String, List<String>> macroMoleculesOfPDBfileToChains = new HashMap<>();    // key of the map is the MOL_ID
+        Map<String, Map<String, String>> macroMolecules = new HashMap<>();   // each inner hashmap contains the properties of a macromolecule, "name" => the_name, "id" => MOL_ID, .... The outer string is the mol_ID
        
         
         // handle all chains
@@ -2226,19 +2227,34 @@ public class Main {
             
             c.setMacromolID(pmi.getMacromolID());
             c.setMacromolName(pmi.getMolName());
+            
+            // collect macromol data, will be used to write MM to database after this chain loop
+            Map<String, String> tmpMacroMol = new HashMap<>();
+            tmpMacroMol.put("pdb_mol_id", pmi.getMacromolID()); // not strictly needed, it is also put as the key for this MM later
+            tmpMacroMol.put("pdb_mol_name", pmi.getMolName());
+            tmpMacroMol.put("pdb_org_sci", pmi.getOrgScientific());
+            tmpMacroMol.put("pdb_org_common", pmi.getOrgCommon());
+            tmpMacroMol.put("pdb_all_chains", pmi.getAllMolChains());
+            tmpMacroMol.put("pdb_ec_number", pmi.getECNumber());
+            
+            macroMolecules.put(pmi.getMacromolID(), tmpMacroMol);
+            
+            md.put("pdb_mol_id", pmi.getMacromolID());
             md.put("pdb_mol_name", pmi.getMolName());
             md.put("pdb_org_sci", pmi.getOrgScientific());
             md.put("pdb_org_common", pmi.getOrgCommon());
+            md.put("pdb_all_chains", pmi.getAllMolChains());
+            md.put("pdb_ec_number", pmi.getECNumber());
             
             if(! silent) {
                 System.out.println("    Chain '" + chain + "' MOL_ID is '" + pmi.getMacromolID() + "', MOL_NAME is '" + pmi.getMolName() + "'.");
             }
             
             // keep track of mm
-            if( ! macroMoleculesOfPDBfile.containsKey(pmi.getMacromolID())) {
-                macroMoleculesOfPDBfile.put(pmi.getMacromolID(), new ArrayList<String>());
+            if( ! macroMoleculesOfPDBfileToChains.containsKey(pmi.getMacromolID())) {
+                macroMoleculesOfPDBfileToChains.put(pmi.getMacromolID(), new ArrayList<String>());
             }
-            macroMoleculesOfPDBfile.get(pmi.getMacromolID()).add(allChains.get(i).getPdbChainID());
+            macroMoleculesOfPDBfileToChains.get(pmi.getMacromolID()).add(allChains.get(i).getPdbChainID());
             
             pcr = new ProteinChainResults(c.getPdbChainID());
             // register results for chain
@@ -2848,11 +2864,32 @@ public class Main {
         
         if( ! silent) {
             System.out.print("The following macromolecules exist in the PDB file (format: MOL_ID(list of chains) ...):");
-            for(String key : macroMoleculesOfPDBfile.keySet()) {
+            for(String key : macroMoleculesOfPDBfileToChains.keySet()) {
                 System.out.print(" " + key + "(");
-                System.out.print(IO.stringListToString(macroMoleculesOfPDBfile.get(key)) + ")");
+                System.out.print(IO.stringListToString(macroMoleculesOfPDBfileToChains.get(key)) + ")");
             }
             System.out.print("\n");
+        }
+        
+        // we may need to write the macromolecules to the DB
+        if(Settings.getBoolean("plcc_B_useDB")) {
+            for(String molID : macroMolecules.keySet()) {
+                Map<String, String> mol = macroMolecules.get(molID);
+                //String pdb_id, String molIDPDBfile, String molName, String molECNumber, String orgScientific, String orgCommon
+                //tmpMacroMol.put("pdb_mol_id", pmi.getMacromolID()); // not strictly needed, it is also put as the key for this MM later
+                //tmpMacroMol.put("pdb_mol_name", pmi.getMolName());
+                //tmpMacroMol.put("pdb_org_sci", pmi.getOrgScientific());
+                //tmpMacroMol.put("pdb_org_common", pmi.getOrgCommon());
+                //tmpMacroMol.put("pdb_all_chains", pmi.getAllMolChains());
+                //tmpMacroMol.put("pdb_ec_number", pmi.getECNumber());
+                try {
+                    DBManager.writeMacromoleculeToDB(pdbid, mol.get("pdb_mol_id"), mol.get("pdb_mol_name"), mol.get("pdb_ec_number"), mol.get("pdb_org_sci"), mol.get("pdb_org_common"), mol.get("pdb_all_chains"));
+                    System.out.println("  Macromolecule '" + mol.get("pdb_mol_name") + "' with PDB MOL_ID '" + mol.get("pdb_mol_id") + "' written to database. Consists of chains '" + mol.get("pdb_all_chains") + "'.");
+                } catch(Exception e) {
+                    DP.getInstance().e("Main", "Failed to write macromolecule to database: '" + e.getMessage() + "'.");
+                }
+            }
+            DBManager.commit();
         }
         
         // Calculate Complex Graph

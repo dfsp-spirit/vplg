@@ -27,6 +27,8 @@ public class ProtMetaInfo {
     private String orgScientific;           //          SOURCE record, ORGANISM_SCIENTIFIC line
     private String orgCommon;               //          SOURCE record, ORGANISM_COMMON line
     private String orgTaxid;                //          SOURCE record, ORGANISM_TAXID line
+    private String ecnumber;
+    private String allmolchains;
 
 
     /**
@@ -36,12 +38,13 @@ public class ProtMetaInfo {
     public ProtMetaInfo(String pdbid, String chainid) {
         this.pdbid = pdbid;
         this.chainid = chainid;
-
         this.molName = "UNKNOWN";
         this.orgScientific = "UNKNOWN";
         this.orgCommon = "UNKNOWN";
         this.orgTaxid = "UNKNOWN";
         this.macromolID = "UNKNOWN";
+        this.ecnumber = "";
+        this.allmolchains = "";
     }
 
     /**
@@ -236,6 +239,38 @@ public class ProtMetaInfo {
                         }                        
                     }
                 }
+                else if(line.indexOf("EC:") >= 0) {
+                    // We hit an EC line, parse it if we are currently in the correct MOL_ID
+                    if(correctMolIDCOMPND) {
+                        indexColon = line.indexOf(":");
+                        indexLastChar = line.length() - 1;
+                        
+                        if(indexColon < 0 || indexLastChar < 0 || indexColon >= indexLastChar) {
+                            // Not found, this line is broken it seems. Ignore it.
+                            DP.getInstance().w("Could not parse EC number from COMPND line containing this token.");
+                            continue;
+                        }
+                        else {
+                            this.setECNumber(line.substring(indexColon + 1, indexLastChar).trim().replaceAll(";", ""));
+                        }                        
+                    }
+                }
+                else if(line.indexOf("CHAIN:") >= 0) {
+                    // We hit a CHAIN line, parse it if we are currently in the correct MOL_ID
+                    if(correctMolIDCOMPND) {
+                        indexColon = line.indexOf(":");
+                        indexLastChar = line.length() - 1;
+                        
+                        if(indexColon < 0 || indexLastChar < 0 || indexColon >= indexLastChar) {
+                            // Not found, this line is broken it seems. Ignore it.
+                            DP.getInstance().w("Could not parse CHAIN line from COMPND line containing this token.");
+                            continue;
+                        }
+                        else {
+                            this.setAllMolChains(line.substring(indexColon + 1, indexLastChar).trim().replaceAll(";", ""));
+                        }                        
+                    }
+                }
             }
             else if(line.startsWith("SOURCE")) {
                 
@@ -349,6 +384,8 @@ public class ProtMetaInfo {
     public String getOrgScientific() { return(this.orgScientific); }
     public String getOrgCommon() { return(this.orgCommon); }
     public String getOrgTaxid() { return(this.orgTaxid); }
+    public String getECNumber() { return(this.ecnumber); }
+    public String getAllMolChains() { return(this.allmolchains); }
     
     public String getPdbid() { return(this.pdbid); }
     public String getChainid() { return(this.chainid); }
@@ -356,6 +393,8 @@ public class ProtMetaInfo {
     public void setMolName(String s) { this.molName = s; }
     public void setMacromolID(String s) { this.macromolID = s; }
     public void setOrgScientific(String s) { this.orgScientific = s; }
+    public void setECNumber(String s) { this.ecnumber = s; }
+    public void setAllMolChains(String s) { this.allmolchains = s; }
     public void setOrgCommon(String s) { this.orgCommon = s; }
     public void setOrgTaxid(String s) { this.orgTaxid = s; }
 
