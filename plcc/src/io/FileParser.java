@@ -1834,6 +1834,9 @@ public class FileParser {
 
     /**
      * Parses all lines of the PDB file and extracts the source organism of the macromolecular structure with chain ID 'chain'.
+     * @param pdbid the PDB ID
+     * @param chainid the chain ID
+     * @return  the PMI
      */
     public static ProtMetaInfo getMetaInfo(String pdbid, String chainid) {
 

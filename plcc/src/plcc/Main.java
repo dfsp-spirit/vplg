@@ -2251,7 +2251,7 @@ public class Main {
             if(Settings.getBoolean("plcc_B_useDB")) {
                 String ligName3Trimmed;
                 try {
-                    if(DBManager.writeChainToDB(chain, pdbid, pmi.getMolName(), pmi.getOrgScientific(), pmi.getOrgCommon())) {
+                    if(DBManager.writeChainToDB(chain, pdbid, pmi.getMacromolID(), pmi.getMolName(), pmi.getOrgScientific(), pmi.getOrgCommon())) {
                         if(! silent) {
                             System.out.println("    Info on chain '" + chain + "' of protein '" + pdbid + "' written to DB.");
                         }
