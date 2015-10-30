@@ -8371,7 +8371,7 @@ connection.close();
         
         if(! proteinExistsInDB(pdb_id)) {
             return(false);
-        }
+        }                
         
         Boolean result = false;
 
@@ -8386,9 +8386,9 @@ connection.close();
             statement.setString(1, pdb_id);
             statement.setString(2, molIDPDBfile);
             statement.setString(3, molName);
-            statement.setString(4, molECNumber);
-            statement.setString(5, orgScientific);
-            statement.setString(6, orgCommon);
+            statement.setString(4, (molECNumber.isEmpty() ? null : molECNumber));
+            statement.setString(5, (orgScientific.isEmpty() ? null : orgScientific));
+            statement.setString(6, (orgCommon.isEmpty() ? null : orgCommon));
             statement.setString(7, chainString);
                                 
             statement.executeUpdate();

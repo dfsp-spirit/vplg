@@ -29,7 +29,7 @@ public class ProtMetaInfo {
     private String orgTaxid;                //          SOURCE record, ORGANISM_TAXID line
     private String ecnumber;
     private String allmolchains;
-
+    private static final String UNKNOWN = "";
 
     /**
      * Constructor. Creates an empty Protein Meta Info object for chain 'chainid' of protein 'pdbid'. All info fields
@@ -38,20 +38,20 @@ public class ProtMetaInfo {
     public ProtMetaInfo(String pdbid, String chainid) {
         this.pdbid = pdbid;
         this.chainid = chainid;
-        this.molName = "UNKNOWN";
-        this.orgScientific = "UNKNOWN";
-        this.orgCommon = "UNKNOWN";
-        this.orgTaxid = "UNKNOWN";
-        this.macromolID = "UNKNOWN";
-        this.ecnumber = "";
-        this.allmolchains = "";
+        this.molName = ProtMetaInfo.UNKNOWN;
+        this.orgScientific = ProtMetaInfo.UNKNOWN;
+        this.orgCommon = ProtMetaInfo.UNKNOWN;
+        this.orgTaxid = ProtMetaInfo.UNKNOWN;
+        this.macromolID = ProtMetaInfo.UNKNOWN;
+        this.ecnumber = ProtMetaInfo.UNKNOWN;
+        this.allmolchains = ProtMetaInfo.UNKNOWN;
     }
 
     /**
      * Returns true if this object has been initialized properly and found the MOL_ID of its chain in the PDB file.
      */
     public Boolean isReady() {
-        return( ! this.macromolID.equals("UNKNOWN"));
+        return( ! this.macromolID.equals(ProtMetaInfo.UNKNOWN));
     }
 
     /**
@@ -73,9 +73,9 @@ public class ProtMetaInfo {
      *
      */
     public String setYourMolID(ArrayList<String> pdbLines) {
-        String mol_id = "UNKNOWN";
-        String cur_mol_id = "UNKNOWN";
-        String cur_chain_list = "UNKNOWN";
+        String mol_id = ProtMetaInfo.UNKNOWN;
+        String cur_mol_id = ProtMetaInfo.UNKNOWN;
+        String cur_chain_list = ProtMetaInfo.UNKNOWN;
         String line = null;
 
         Integer indexColon, indexSemicolon;
@@ -108,7 +108,7 @@ public class ProtMetaInfo {
                     if(cur_mol_id.isEmpty()) {
                         // weirdo line, ignore it
                         // DP.getInstance().w("setYourMolID(): Could not parse empty MOL_ID line, skipping.");
-                        cur_mol_id = "UNKNOWN";
+                        cur_mol_id = ProtMetaInfo.UNKNOWN;
                         continue;
                     }
                 }
@@ -168,13 +168,13 @@ public class ProtMetaInfo {
      * @return True if the info has been parsed (which does not mean that all of it could be retrived, these fields are then 'UNKNOWN'). False if the
      * info could not be parsed because the MOL_ID of this chain is not known yet (getYourMOL_ID has not been called yet or it could not be determined).
      */
-    public Boolean getAllMetaData(ArrayList<String> pdbLines) {
+    public Boolean parseAllMetaData(ArrayList<String> pdbLines) {
         if( ! this.isReady()) {
             DP.getInstance().w("getAllMetaData(): PMI instance not ready, MOL_ID of chain '" + chainid + "' not known yet.");
             return(false);
         }
 
-        String cur_mol_id = "UNKNOWN";
+        String cur_mol_id = ProtMetaInfo.UNKNOWN;
         String line = null;
 
         Integer indexColon, indexLastChar;
@@ -208,7 +208,7 @@ public class ProtMetaInfo {
                     if(cur_mol_id.isEmpty()) {
                         // weirdo line, ignore it
                         DP.getInstance().w("Could not parse MOL_ID from COMPND line containing this token.");
-                        cur_mol_id = "UNKNOWN";
+                        cur_mol_id = ProtMetaInfo.UNKNOWN;
                         continue;
                     }
 
@@ -294,7 +294,7 @@ public class ProtMetaInfo {
                     if(cur_mol_id.isEmpty()) {
                         // weirdo line, ignore it
                         DP.getInstance().w("Could not parse MOL_ID from SOURCE line containing this token.");
-                        cur_mol_id = "UNKNOWN";
+                        cur_mol_id = ProtMetaInfo.UNKNOWN;
                         continue;
                     }
 
@@ -362,10 +362,38 @@ public class ProtMetaInfo {
             }
         }
 
+        resetShitValues();
         return(true);
     }
 
 
+    private void resetShitValues() {
+        if(this.ecnumber != null) {
+            if(this.ecnumber.equals(ProtMetaInfo.UNKNOWN)) {
+                this.ecnumber = "";
+            }
+        }
+        
+        if(this.orgCommon != null) {
+            if(this.orgCommon.equals(ProtMetaInfo.UNKNOWN)) {
+                this.orgCommon = "";
+            }
+        }
+        
+        if(this.orgScientific != null) {
+            if(this.orgScientific.equals(ProtMetaInfo.UNKNOWN)) {
+                this.orgScientific = "";
+            }
+        }
+        
+        if(this.orgTaxid != null) {
+            if(this.orgTaxid.equals(ProtMetaInfo.UNKNOWN)) {
+                this.orgTaxid = "";
+            }
+        }        
+    }
+    
+    
     /**
      * Prints the currently known meta data to stdout. A debug function only.
      */
