@@ -52,6 +52,7 @@ public class DBManager {
     static String tbl_protein = "plcc_protein";
     static String tbl_macromolecule = "plcc_macromolecule";
     static String tbl_chain = "plcc_chain";
+    static String tbl_nm_chaintomacromolecule = "plcc_nm_chaintomacromolecule";
     static String tbl_sse = "plcc_sse";
     static String tbl_proteingraph = "plcc_graph";
     static String tbl_foldinggraph = "plcc_foldinggraph";
@@ -788,6 +789,8 @@ public class DBManager {
             doDeleteQuery("DROP TABLE " + tbl_graphletsimilarity + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_ligandcenteredgraph + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_nm_lcg_to_chain + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_nm_chaintomacromolecule + " CASCADE;");            
+            
             
             //doDeleteQuery("DROP TABLE " + tbl_fglinnot_alpha + " CASCADE;");
             //doDeleteQuery("DROP TABLE " + tbl_fglinnot_beta + " CASCADE;");
@@ -846,6 +849,7 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_macromolecule + " (macromolecule_id serial primary key,  pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, mol_id_pdb text not null, mol_name text not null, mol_ec_number text, mol_organism_scientific text, mol_organism_common text, mol_chains text);");
             doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(2) not null, mol_id_pdb text not null, mol_name text not null, organism_scientific text not null, organism_common text not null, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, chain_isinnonredundantset smallint DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence text not null, sse_type int not null references " + tbl_ssetypes + " ON DELETE CASCADE, lig_name varchar(5), position_in_chain int);");
+            doInsertQuery("CREATE TABLE " + tbl_nm_chaintomacromolecule + " (chaintomacromol_id serial primary key, chaintomacromol_chainid int not null references " + tbl_chain + " ON DELETE CASCADE, chaintomacromol_macromolid int not null references " + tbl_macromolecule + " ON DELETE CASCADE);");
             doInsertQuery("CREATE TABLE " + tbl_secondat + " (secondat_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, alpha_fg_number int, alpha_fg_foldname varchar(2), alpha_fg_position int, beta_fg_number int, beta_fg_foldname varchar(2), beta_fg_position int, albe_fg_number int, albe_fg_foldname varchar(2), albe_fg_position int, alphalig_fg_number int, alphalig_fg_foldname varchar(2), alphalig_fg_position int, betalig_fg_number int, betalig_fg_foldname varchar(2), betalig_fg_position int, albelig_fg_number int, albelig_fg_foldname varchar(2), albelig_fg_position int);");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null references " + tbl_contacttypes + " ON DELETE CASCADE, check (sse1 < sse2));");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact_complexgraph + " (ssecontact_complexgraph_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, complex_contact_count int not null, complex_contact_type int not null references " + tbl_complexcontacttypes + " ON DELETE CASCADE check (sse1 < sse2));");            
@@ -900,6 +904,7 @@ public class DBManager {
 
             // set constraints
             doInsertQuery("ALTER TABLE " + tbl_ligandcenteredgraph + " ADD CONSTRAINT constr_ligcg_uniq UNIQUE (lig_sse_id);");
+            doInsertQuery("ALTER TABLE " + tbl_macromolecule + " ADD CONSTRAINT constr_macromolid_uniq UNIQUE (pdb_id, mol_id_pdb);");            
             doInsertQuery("ALTER TABLE " + tbl_protein + " ADD CONSTRAINT constr_protein_uniq UNIQUE (pdb_id);");
             doInsertQuery("ALTER TABLE " + tbl_chain + " ADD CONSTRAINT constr_chain_uniq UNIQUE (chain_name, pdb_id);");
             doInsertQuery("ALTER TABLE " + tbl_sse + " ADD CONSTRAINT constr_sse_uniq UNIQUE (chain_id, dssp_start, dssp_end);");
@@ -972,7 +977,7 @@ public class DBManager {
             doInsertQuery("COMMENT ON TABLE " + tbl_graphletcount + " IS 'Stores the graphlet counts for the different graphlets for a certain graph defined by pdbid, chain and graph type.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_nm_ssetoproteingraph + " IS 'Assigns SSEs to protein graphs. An SSE may be part of multiple graphs, e.g., alpha, alphalig, and albe.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_nm_ssetofoldinggraph + " IS 'Assigns SSEs to folding graphs. An SSE may be part of multiple folding graphs, e.g., alpha, alphalig, and albe. It cannot be part of multiple alpha folding graphs though.';");
-            
+            doInsertQuery("COMMENT ON TABLE " + tbl_macromolecule + " IS 'Stores data on a macromolecule in a PDB file, which may consist of one or more chains. Note that a single PDB file can contain several macromolecules.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_ligand + " IS 'Stores information on a ligand. This is something like ICT in general.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_nm_ligandtochain + " IS 'Assigns a certain ligand to a protein chain, meaning that the chain contains a ligand of that type.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_nm_chaintomotif + " IS 'Assigns a certain motif to a protein chain, meaning that the chain contains that motif.';");
@@ -992,6 +997,7 @@ public class DBManager {
             //doInsertQuery("COMMENT ON TABLE " + tbl_fglinnot_albelig + " IS 'Stores the PTGL linear notation strings ADJ, RED, KEY and SEQ for a single fold of some albelig protein graph. Also stores file system paths to graph images.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_fglinnot + " IS 'Stores the PTGL linear notation strings ADJ, RED, KEY and SEQ for a single fold (all graph types). Also stores file system paths to graph images.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_secondat + " IS 'Stores the position of a certain SSE in the folding graphs. For each graph type, the FG number (and name) in which the SSE occurs and its position in that fg are given. This table is ugly and does not follow good DB design rules, it is required for historical reasons though.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_nm_chaintomacromolecule + " IS 'Defines which PDB chains belong together, i.e., to a single macromolecule.';");
             
             
             // add comments for specific fields
@@ -999,6 +1005,8 @@ public class DBManager {
             doInsertQuery("COMMENT ON COLUMN " + tbl_ssecontact + ".contact_type IS '1=mixed, 2=parallel, 3=antiparallel, 4=ligand, 5=backbone';");
             doInsertQuery("COMMENT ON COLUMN " + tbl_sse + ".lig_name IS 'The 3-letter ligand name from the PDB file and the RCSB ligand expo website. If this SSE is not a ligand SSE, this is null.';");
             doInsertQuery("COMMENT ON COLUMN " + tbl_proteingraph + ".graph_type IS '1=alpha, 2=beta, 3=albe, 4=alphalig, 5=betalig, 6=albelig';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_macromolecule + ".mol_id_pdb IS 'Parsed from the MOL_ID field in the PDB file, section COMPND.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_macromolecule + ".mol_chains IS 'Metadata parsed from PDB file. Do NOT use this to determine chains, there is a proper n-to-m table which assigns chains to macromolecules.';");
             doInsertQuery("COMMENT ON COLUMN " + tbl_proteingraph + ".graph_string_gml IS 'The graph string in GML format';");
             doInsertQuery("COMMENT ON COLUMN " + tbl_proteingraph + ".graph_string_kavosh IS 'The graph string in Kavosh format format';");
             doInsertQuery("COMMENT ON COLUMN " + tbl_proteingraph + ".graph_image_svg IS 'The path to the SVG format file of the protein graph image, relative to plcc_S_graph_image_base_path';");
@@ -1135,6 +1143,13 @@ public class DBManager {
             doInsertQuery("CREATE INDEX plcc_idx_lcg_pdb ON " + tbl_ligandcenteredgraph + " (pdb_id);");
             doInsertQuery("CREATE INDEX plcc_idx_lcg2c_graphid ON " + tbl_nm_lcg_to_chain + " (lcg2c_ligandcenteredgraph_id);");
             doInsertQuery("CREATE INDEX plcc_idx_lcg2c_chainid ON " + tbl_nm_lcg_to_chain + " (lcg2c_chain_id);");
+            doInsertQuery("CREATE INDEX plcc_idx_macromolecule_pdbid ON " + tbl_macromolecule + " (pdb_id);");
+            doInsertQuery("CREATE INDEX plcc_idx_macromolecule_molname ON " + tbl_macromolecule + " (mol_name);");
+            doInsertQuery("CREATE INDEX plcc_idx_macromolecule_molidpdb ON " + tbl_macromolecule + " (mol_id_pdb);");
+            doInsertQuery("CREATE INDEX plcc_idx_chaintomacromol_chainid ON " + tbl_nm_chaintomacromolecule + " (chaintomacromol_chainid);");
+            doInsertQuery("CREATE INDEX plcc_idx_chaintomacromol_macromolid ON " + tbl_nm_chaintomacromolecule + " (chaintomacromol_macromolid);");
+            
+                    
 
             // indices on PKs get created automatically
             
@@ -8356,7 +8371,7 @@ connection.close();
     
     
     /**
-     * Writes data on a macromolecule or complex (MOL_ID pdb field in COMPND record) to the database.
+     * Writes data on a macromolecule or complex (MOL_ID pdb field in COMPND record) to the database. Note that this function will insert empty fields for EC number and organism sci + common as 'null' into the database.
      * @param pdb_id the PDB id of the protein this chain belongs to. The protein has to exist in the DB already.
      * @param molIDPDBfile the MOL_ID of the chain in the PDB file (e.g., "1"). This is NOT the id in the database!
      * @param molName the molName record of the respective PDB header field
