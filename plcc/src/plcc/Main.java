@@ -125,7 +125,7 @@ public class Main {
     public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES = 12;
 
     /**
-     * The contacts of a chain. The 4 fields are: AA 1 index, AA 2 index, atom index in AA 1, atom index in chain 2.
+     * The contacts of a chainName. The 4 fields are: AA 1 index, AA 2 index, atom index in AA 1, atom index in chainName 2.
      */
     static Integer[][][][] contact;
 
@@ -1183,7 +1183,7 @@ public class Main {
                     sep = PlccUtilities.parsePdbidAndChain(ic);
                     if(sep != null) {
                         repChains.add(sep);
-                        //System.out.println("PDB ID: " + sep[0] + ", chain " + sep[1] + "");
+                        //System.out.println("PDB ID: " + sep[0] + ", chainName " + sep[1] + "");
                     } else {
                         System.err.println("WARNING: Result from XML parsing could not be split into PDB ID and chain, skipping.");
                     }
@@ -1305,7 +1305,7 @@ public class Main {
         chainsFile = output_dir + fs + pdbid.toLowerCase() + ".chains";
         ligandsFile = output_dir + fs + pdbid.toLowerCase() + ".ligands";
         modelsFile = output_dir + fs + pdbid.toLowerCase() + ".models";
-        resMapFile = output_dir + fs + pdbid.toLowerCase();         // chain and file extension is added later 
+        resMapFile = output_dir + fs + pdbid.toLowerCase();         // chainName and file extension is added later 
 
         if(Settings.getBoolean("plcc_B_ptgl_text_output")) {
             if(! silent) {
@@ -1419,7 +1419,7 @@ public class Main {
             }
         }
 
-        // This is now done, separate for each chain, by a function in Main.java below
+        // This is now done, separate for each chainName, by a function in Main.java below
         // dsspSSEs = FileParser.getDsspSSEs(); 
         // ptglSSEs = FileParser.getPtglSSEs();
         
@@ -1452,7 +1452,7 @@ public class Main {
 
             // ... and the maximal distance between neighbors in the AA sequence.
             // Note that this is a lot less useful with ligands enabled since they are always listed at the 
-            //  end of the chain and may be far (in 3D) from their predecessor in the sequence.
+            //  end of the chainName and may be far (in 3D) from their predecessor in the sequence.
             globalMaxSeqNeighborResDist = getGlobalMaxSeqNeighborResDist(residues);     
             if(! silent) {
                 System.out.println("  Maximal distance between residues that are sequence neighbors is " + globalMaxSeqNeighborResDist + ".");
@@ -1516,7 +1516,7 @@ public class Main {
         ProteinResults.getInstance().setPdbid(pdbid);
         
         if(separateContactsByChain) {
-            cInfoThisChain = new ArrayList<ResContactInfo>();   // will be computed separately for each chain later
+            cInfoThisChain = new ArrayList<ResContactInfo>();   // will be computed separately for each chainName later
             cInfo = null;                                       // will not be used in this case (separateContactsByChain=on)
         } else {        
             cInfo = calculateAllContacts(residues);
@@ -1798,11 +1798,11 @@ public class Main {
                 ArrayList<Chain> theChain;
                 int numChainsHandled = 0;
                 for(Chain c : handleChains) {
-                    // add current chain
-                    theChain = new ArrayList<Chain>();   // it is a list, but only contains this single chain
+                    // add current chainName
+                    theChain = new ArrayList<Chain>();   // it is a list, but only contains this single chainName
                     theChain.add(c);
                     
-                    // compute chain contacts
+                    // compute chainName contacts
                     cInfoThisChain = calculateAllContactsLimitedByChain(residues, c.getPdbChainID());
                     
                     if(Settings.getBoolean("plcc_B_AAgraph_perchain")) {
@@ -1845,7 +1845,7 @@ public class Main {
                     numChainsHandled++;
                 }
             }
-            else {  // no chain separation active
+            else {  // no chainName separation active
                 calculateSSEGraphsForChains(handleChains, residues, cInfo, pdbid, outputDir);
                 //calculateComplexGraph(handleChains, residues, cInfo, pdbid, outputDir);
                 if(Settings.getBoolean("plcc_B_useDB")) {
@@ -2035,7 +2035,7 @@ public class Main {
     /**
      * Draws the image of a graph from the file 'plccGraphFile' (which is expected to contain a graph in PLCC format) and writes it to the PNG file 'img'.
      * @param g_pdbid the PDB id
-     * @param g_chainid the chain ID
+     * @param g_chainid the chainName ID
      * @param drawFoldingGraphsAsWell whether to draw FGs
      * @param g_graphtype the graph type
      * @param outputImgNoExt the path where to write the output image (without the file extension)
@@ -2187,7 +2187,7 @@ public class Main {
     
     /**
      * Calculates all SSE graph types which are configured in the config file for all given chains.
-     * @param allChains a list of chains, each chain will be handled separately
+     * @param allChains a list of chains, each chainName will be handled separately
      * @param resList a list of residues
      * @param resContacts a list of residue contacts
      * @param pdbid the PDBID of the protein, required to name files properly etc.
@@ -2228,7 +2228,7 @@ public class Main {
             c.setMacromolID(pmi.getMacromolID());
             c.setMacromolName(pmi.getMolName());
             
-            // collect macromol data, will be used to write MM to database after this chain loop
+            // collect macromol data, will be used to write MM to database after this chainName loop
             Map<String, String> tmpMacroMol = new HashMap<>();
             tmpMacroMol.put("pdb_mol_id", pmi.getMacromolID()); // not strictly needed, it is also put as the key for this MM later
             tmpMacroMol.put("pdb_mol_name", pmi.getMolName());
@@ -2257,7 +2257,7 @@ public class Main {
             macroMoleculesOfPDBfileToChains.get(pmi.getMacromolID()).add(allChains.get(i).getPdbChainID());
             
             pcr = new ProteinChainResults(c.getPdbChainID());
-            // register results for chain
+            // register results for chainName
             ProteinResults.getInstance().addProteinChainResults(pcr, chain);
             pcr.setChainMetaData(pmi);
 
@@ -2298,7 +2298,7 @@ public class Main {
                 }
             }
 
-            // determine SSEs for this chain
+            // determine SSEs for this chainName
             if(! silent) {
                 System.out.println("    Creating all SSEs for chain '" + chain + "' consisting of " + c.getResidues().size() + " residues.");
             }
@@ -2341,9 +2341,9 @@ public class Main {
                 System.out.print("\n");
             }
             
-            // SSEs have been calculated, now assign the PTGL labels and sequential numbers on the chain
+            // SSEs have been calculated, now assign the PTGL labels and sequential numbers on the chainName
             for(Integer j = 0; j < allChainSSEs.size(); j++) {
-                allChainSSEs.get(j).setSeqSseChainNum(j + 1);   // This is the correct value, determined from the list of all valid SSEs of this chain
+                allChainSSEs.get(j).setSeqSseChainNum(j + 1);   // This is the correct value, determined from the list of all valid SSEs of this chainName
                 allChainSSEs.get(j).setSseIDPtgl(getPtglSseIDForNum(j));
 
                 if(Settings.getBoolean("plcc_B_useDB")) {
@@ -2354,7 +2354,7 @@ public class Main {
                            SSE ssej = allChainSSEs.get(j);
                            Integer ssePositionInChain = j + 1;
                            Long insertID = DBManager.writeSSEToDB(pdbid, chain, ssej.getStartDsspNum(), ssej.getEndDsspNum(), ssej.getStartPdbResID(), ssej.getEndPdbResID(), ssej.getAASequence(), ssej.getSSETypeInt(), ssej.getTrimmedLigandName3(), ssePositionInChain); 
-                           //System.out.println("  Info on SSE #" + (j + 1) + " of chain '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
+                           //System.out.println("  Info on SSE #" + (j + 1) + " of chainName '" + c.getPdbChainID() + "' of protein '" + pdbid + "' written to DB.");
                            if(insertID > 0) {
                                DBManager.writeEmptySecondatEntryForSSE(insertID);
                            }
@@ -2373,22 +2373,22 @@ public class Main {
             /*
             if(Settings.getBoolean("plcc_B_useDB") &&  Settings.getBoolean("plcc_B_db_use_batch_inserts")) {
                 try {
-                    int insertCount = DBManager.writeAllSSEsOfChainToDB(pdbid, chain, allChainSSEs);
+                    int insertCount = DBManager.writeAllSSEsOfChainToDB(pdbid, chainName, allChainSSEs);
                     if(insertCount != allChainSSEs.size()) {
                         DP.getInstance().e("Main", "Only " + insertCount + " of the " + allChainSSEs.size() + " SSEs were written to the DB. Exiting.");
                         Main.doExit(1);
                     }
                 } catch(SQLException e) {
-                    DP.getInstance().e("Main", "Writing all chain SSE list to DB failed: '" + e.getMessage() + "'.");
+                    DP.getInstance().e("Main", "Writing all chainName SSE list to DB failed: '" + e.getMessage() + "'.");
                 }
             }
             */
 
 
-            //printSSEList(chainDsspSSEs, "DSSP SSEs of chain '" + c.getPdbChainID() + "'");
-            //printSSEList(chainPtglSSEs, "PTGL SSEs of chain '" + c.getPdbChainID() + "'");
-            //printSSEList(chainLigSSEs, "Ligand SSEs of chain '" + c.getPdbChainID() + "'");
-            //printSSEList(allChainSSEs, "All SSEs of chain '" + c.getPdbChainID() + "'");
+            //printSSEList(chainDsspSSEs, "DSSP SSEs of chainName '" + c.getPdbChainID() + "'");
+            //printSSEList(chainPtglSSEs, "PTGL SSEs of chainName '" + c.getPdbChainID() + "'");
+            //printSSEList(chainLigSSEs, "Ligand SSEs of chainName '" + c.getPdbChainID() + "'");
+            //printSSEList(allChainSSEs, "All SSEs of chainName '" + c.getPdbChainID() + "'");
 
 
             // ************* Calculate the different graph types *************** //
@@ -2889,7 +2889,35 @@ public class Main {
                     DP.getInstance().e("Main", "Failed to write macromolecule to database: '" + e.getMessage() + "'.");
                 }
             }
+            
             DBManager.commit();
+            
+            // now assign the chains to their respective macromolecule
+            int numAssigned = 0;
+            for(Integer i = 0; i < allChains.size(); i++) {
+                c = allChains.get(i);
+                String chainName = c.getPdbChainID();
+                Long chain_db_id = DBManager.getDBChainID(pdbid, chainName);
+                Long mm_db_id = DBManager.getDBMacromoleculeID(pdbid, c.getMacromolID());
+                if(chain_db_id >= 1L && mm_db_id >= 1L) {
+                    try {
+                        DBManager.assignChainToMacromolecule(chain_db_id, mm_db_id);
+                        numAssigned++;
+                    }catch(SQLException e) {
+                        DP.getInstance().e("Main", "SQL error while assigning a chain to a macromolecule: '" + e.getMessage() + "'.");
+                    }
+                }
+                else {
+                    DP.getInstance().e("Main", "Assigning chain '" + chainName + "' to macromolecule with PDB file MOL_ID '" + c.getMacromolID() + "' failed. Chain or MM not in database.");
+                }
+            }
+            
+            if( ! silent) {
+                System.out.println("  Assigned the " + numAssigned + " chains in the PDB data to the " + macroMolecules.keySet().size() + " different macromolecules.");
+            }
+            
+            DBManager.commit();
+            
         }
         
         // Calculate Complex Graph
@@ -2917,7 +2945,7 @@ public class Main {
      * @return the protein folding graph results, which gives access to the graphs and output files
      */
     public static ProteinFoldingGraphResults calculateFoldingGraphsForSSEGraph(ProtGraph pg, String outputDir) {
-        //System.out.println("Searching connected components in " + graphType + " graph of chain " + c.getPdbChainID() + ".");
+        //System.out.println("Searching connected components in " + graphType + " graph of chainName " + c.getPdbChainID() + ".");
         boolean silent = Settings.getBoolean("plcc_B_silent");
         //ArrayList<FoldingGraphComputationResult> fgcs = pg.getFoldingGraphComputationResults();
         //ArrayList<FoldingGraph> ccs = pg.getConnectedComponents();
@@ -2941,7 +2969,7 @@ public class Main {
         String fgFile = null;
         String fs = System.getProperty("file.separator");
 
-        //System.out.println("Found " + ccs.size() + " connected components in " + graphType + " graph of chain " + c.getPdbChainID() + ".");
+        //System.out.println("Found " + ccs.size() + " connected components in " + graphType + " graph of chainName " + c.getPdbChainID() + ".");
         if(! silent) {
             System.out.println("      --- Handling all " + foldingGraphs.size() + " " + pg.getGraphType() + " folding graphs of the " + pg.getGraphType() + " protein graph ---");
         }
@@ -3092,7 +3120,7 @@ public class Main {
                         //if(fg.drawFoldingGraph(notation, fgFile)) {
                         if(drawingSucceeded) {
                             if(! silent) {
-                                //System.out.println("         -Folding graph #" + j + " of the " + pg.getGraphType() + " graph of chain " + pg.getChainid() + " written to file '" + fgFile + "' in " + notation + " notation.");
+                                //System.out.println("         -Folding graph #" + j + " of the " + pg.getGraphType() + " graph of chainName " + pg.getChainid() + " written to file '" + fgFile + "' in " + notation + " notation.");
                             }
 
                             // save image path to database if required
@@ -3338,12 +3366,12 @@ public class Main {
 
     
     /**
-     * Calculates the requested type of protein graph for the given list of SSEs (usually all SSEss of a chain) and residue contacts.
+     * Calculates the requested type of protein graph for the given list of SSEs (usually all SSEss of a chainName) and residue contacts.
      * @param graphType the requested graph type
-     * @param allChainSSEs the SSEs of a chain
-     * @param c the chain
+     * @param allChainSSEs the SSEs of a chainName
+     * @param c the chainName
      * @param resContacts a list of residue contacts (between residues of c)
-     * @param pdbid the PDBID of the protein the chain c belongs to
+     * @param pdbid the PDBID of the protein the chainName c belongs to
      * @return the resulting protein graph
      */
     public static ProtGraph calcGraphType(String graphType, List<SSE> allChainSSEs, Chain c, List<ResContactInfo> resContacts, String pdbid) {
@@ -3453,7 +3481,7 @@ public class Main {
             pg.addFullBackboneContacts();            
         }
 
-        //System.out.println("    ----- Done with " + graphType + " graph of chain " + c.getPdbChainID() + ". -----");
+        //System.out.println("    ----- Done with " + graphType + " graph of chainName " + c.getPdbChainID() + ". -----");
         return(pg);
 
     }
@@ -3882,7 +3910,7 @@ public class Main {
         }
 
         // We assume that the first 5 atoms (index 0..4) in a residue that is an AA are backbone atoms,
-        //  while all other (6..END) are assumed to be side chain atoms.
+        //  while all other (6..END) are assumed to be side chainName atoms.
         //  The backbone atoms should have atom names ' N  ', ' CA ', ' C  ' and ' O  ' but we don't check
         //  this atm because geom_neo doesn't do that and we want to stay compatible.
         //  Of course, all of this only makes sense for resides that are AAs, not for ligands. We care for that.
@@ -3988,7 +4016,7 @@ public class Main {
 
                         }
                         else if(i > numOfLastBackboneAtomInResidue && j <= numOfLastBackboneAtomInResidue) {
-                            // to be precise, this is a chain - backbone contact
+                            // to be precise, this is a chainName - backbone contact
                             numPairContacts[ResContactInfo.CB]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
@@ -4000,7 +4028,7 @@ public class Main {
 
                         }
                         else if(i <= numOfLastBackboneAtomInResidue && j > numOfLastBackboneAtomInResidue) {
-                            // to be precise, this is a backbone - chain contact
+                            // to be precise, this is a backbone - chainName contact
                             numPairContacts[ResContactInfo.BC]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
@@ -4011,8 +4039,8 @@ public class Main {
                             }
                         }
                         else if(i > numOfLastBackboneAtomInResidue && j > numOfLastBackboneAtomInResidue) {
-                            // to be precise, this is a chain - chain contact
-                            numPairContacts[ResContactInfo.CC]++;          // 'C' instead of 'S' for side chain pays off
+                            // to be precise, this is a chainName - chainName contact
+                            numPairContacts[ResContactInfo.CC]++;          // 'C' instead of 'S' for side chainName pays off
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
                             if((minContactDistances[ResContactInfo.CC] < 0) || dist < minContactDistances[ResContactInfo.CC]) {
@@ -4062,7 +4090,7 @@ public class Main {
 
                         }
                         else {
-                            // to be precise, this is a side chain - ligand contact
+                            // to be precise, this is a side chainName - ligand contact
                             numPairContacts[ResContactInfo.CL]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
@@ -4092,7 +4120,7 @@ public class Main {
 
                         }
                         else {
-                            // to be precise, this is a ligand - side chain contact
+                            // to be precise, this is a ligand - side chainName contact
                             numPairContacts[ResContactInfo.LC]++;
 
                             // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
@@ -4538,7 +4566,7 @@ public class Main {
 
 
     /**
-     * Writes the chains file, a file containing a list of all chain identifiers, separated by spaces.
+     * Writes the chains file, a file containing a list of all chainName identifiers, separated by spaces.
      * @param chainsFile the path to the output file
      * @param pdbid the PDB ID of the protein, required for output only
      * @param chains a list of Chain objects, should be all chains of this protein
@@ -4590,9 +4618,9 @@ public class Main {
     
     
     /**
-     * Writes the residue info file that maps PDB residue IDs to DSSP residue IDs for all residues of the given chain. 
+     * Writes the residue info file that maps PDB residue IDs to DSSP residue IDs for all residues of the given chainName. 
      * @param mapFile the path to the output file
-     * @param c the chain to consider (all residues of this chain will be used)
+     * @param c the chainName to consider (all residues of this chainName will be used)
      */
     public static void writeSSEMappings(String mapFile, Chain c, String pdbid) {
         String s = "# SSE mappings for protein " + pdbid + " chain " + c.getPdbChainID() + " follow in format <PDB res number> <DSSP res number> <DSSP assignment> <PLCC assignment>";
@@ -4608,9 +4636,9 @@ public class Main {
     
     
     /**
-     * Writes the residue info file that maps PDB residue IDs to DSSP residue IDs for all residues of the given chain. 
+     * Writes the residue info file that maps PDB residue IDs to DSSP residue IDs for all residues of the given chainName. 
      * @param mapFile the path to the output file
-     * @param c the chain to consider (all residues of this chain will be used)
+     * @param c the chainName to consider (all residues of this chainName will be used)
      */
     public static void writeResMappings(String mapFile, Chain c) {
 
@@ -4799,7 +4827,7 @@ public class Main {
                 //         #  RESIDUE AA STRUCTURE BP1 BP2  ACC     N-H-->O    O-->H-N    N-H-->O    O-->H-N    TCO  KAPPA ALPHA  PHI   PSI    X-CA   Y-CA   Z-CA
                 //      '   47   47 A E  E    S-c   29   0A  71    -19,-1.8   -17,-2.8     2,-0.0     2,-0.3  -0.981  70.4-156.7-136.2 150.2   43.9  -12.9   14.8'
 
-                // Print DSSP residue number, PDB residue number, chain, AA name in 1 letter code and SSE summary letter for ligand
+                // Print DSSP residue number, PDB residue number, chainName, AA name in 1 letter code and SSE summary letter for ligand
                 //      '   47   47 A E  E'
                 dsspLigFH.printf(loc, "  %3d  %3d %1s %1s  %1s", r.getDsspResNum(), r.getPdbResNum(), r.getChainID(), r.getAAName1(), Settings.get("plcc_S_ligSSECode"));
 
@@ -4838,7 +4866,7 @@ public class Main {
     
     /**
      * Writes an ordered dssplig file. Ordered means that the ligand residues are not simply appended to the end of the file, but each ligand is inserted as the
-     * last residue of the chain it is associated with. This is required for PTGL compatibility (don't ask).
+ last residue of the chainName it is associated with. This is required for PTGL compatibility (don't ask).
      * @param dsspFile the input DSSP file that will be parsed for info
      * @param dsspLigFile the output path of the DSSPLig file, which is generated by this function by adding ligand info lines to the DSSP data
      * @param res the residues to consider
@@ -4888,10 +4916,10 @@ public class Main {
 
 
     /**
-     * Determines the last line number in a DSSP file that contains information on a residue that is part of chain 'chainID' (i.e., on the last residue of that chain).
+     * Determines the last line number in a DSSP file that contains information on a residue that is part of chainName 'chainID' (i.e., on the last residue of that chainName).
      * @param dsspligFile the DSSPLig file to parse
-     * @param chainID the chain ID to consider
-     * @return the line number of the last line belonging to chain chainID
+     * @param chainID the chainName ID to consider
+     * @return the line number of the last line belonging to chainName chainID
      */
     public static Integer getLastLineOfChain(File dsspligFile, String chainID) {
 
@@ -4925,7 +4953,7 @@ public class Main {
             System.exit(1);
         }
         else {
-            //System.out.println("DEBUG: Last line of chain '" + chainID + "' in DSSPLIG file '" + dsspligFile.getName() + "' is " + ln + ".");
+            //System.out.println("DEBUG: Last line of chainName '" + chainID + "' in DSSPLIG file '" + dsspligFile.getName() + "' is " + ln + ".");
         }
         return(ln);
     }
@@ -4968,7 +4996,7 @@ public class Main {
             //         #  RESIDUE AA STRUCTURE BP1 BP2  ACC     N-H-->O    O-->H-N    N-H-->O    O-->H-N    TCO  KAPPA ALPHA  PHI   PSI    X-CA   Y-CA   Z-CA
             //      '   47   47 A E  E    S-c   29   0A  71    -19,-1.8   -17,-2.8     2,-0.0     2,-0.3  -0.981  70.4-156.7-136.2 150.2   43.9  -12.9   14.8'
 
-            // Print DSSP residue number, PDB residue number, chain, AA name in 1 letter code and SSE summary letter for ligand
+            // Print DSSP residue number, PDB residue number, chainName, AA name in 1 letter code and SSE summary letter for ligand
             //      '   47   47 A E  E'
             out.printf(loc, "  %3d  %3d %1s %1s  %1s", r.getDsspResNum(), r.getPdbResNum(), r.getChainID(), r.getAAName1(), Settings.get("plcc_S_ligSSECode"));
 
@@ -5303,7 +5331,7 @@ public class Main {
                 }
 
                 // That's it for this ligand.
-                // System.out.println("Ligand " + r.getFancyName() + " (chain " + r.getChainID() + ") has " + ligCont.size() + " contacts on residue level.");
+                // System.out.println("Ligand " + r.getFancyName() + " (chainName " + r.getChainID() + ") has " + ligCont.size() + " contacts on residue level.");
 
             }
         }
@@ -5431,9 +5459,9 @@ public class Main {
 
     
     /**
-     * Returns a list containing all residues from resList that are part of chain cID.
+     * Returns a list containing all residues from resList that are part of chainName cID.
      * @param resList the residue list
-     * @param cID the chain ID
+     * @param cID the chainName ID
      * @return the filtered list of residues
      */
     public static ArrayList<Residue> filterResidueListByChain(ArrayList<Residue> resList, String cID) {
@@ -5540,7 +5568,7 @@ public class Main {
     /**
      * This function creates a modified list of SSEs for the PTGL. It does this by filtering all SSEs
      * which are too short and all SSEs which are not of interest for the PTGL (those which are neither helices nor beta-strands).
-     * @param inputSSEs the list of input SSEs, i.e., all SSEs of this chain which are 
+     * @param inputSSEs the list of input SSEs, i.e., all SSEs of this chainName which are 
      */
     private static ArrayList<SSE> createAllPtglSSEsFromDsspSSEList(List<SSE> inputSSEs) {
 
@@ -5982,7 +6010,7 @@ public class Main {
     
     /**
      * Calculates complex graph types which are configured in the config file for all given chains.
-     * @param allChains a list of chains, each chain will be handled separately
+     * @param allChains a list of chains, each chainName will be handled separately
      * @param resList a list of residues
      * @param resContacts a list of residue contacts
      * @param pdbid the PDBID of the protein, required to name files properly etc.
@@ -6075,7 +6103,7 @@ public class Main {
             c = allChains.get(i);
             
             //if(! silent) {
-            //    System.out.println("   *Handling chain " + c.getPdbChainID() + ".");
+            //    System.out.println("   *Handling chainName " + c.getPdbChainID() + ".");
             //}
 
             ProtMetaInfo pmi = FileParser.getMetaInfo(pdbid, c.getPdbChainID());
@@ -6084,8 +6112,8 @@ public class Main {
             md.put("pdb_org_sci", pmi.getOrgScientific());
             md.put("pdb_org_common", pmi.getOrgCommon());
 
-            // determine SSEs for this chain
-            //System.out.println("    Creating all SSEs for chain '" + c.getPdbChainID() + "' consisting of " + c.getResidues().size() + " residues.");
+            // determine SSEs for this chainName
+            //System.out.println("    Creating all SSEs for chainName '" + c.getPdbChainID() + "' consisting of " + c.getResidues().size() + " residues.");
             chainDsspSSEs = createAllDsspSSEsFromResidueList(c.getResidues());
             
             oneChainSSEs = createAllPtglSSEsFromDsspSSEList(chainDsspSSEs);
@@ -6103,9 +6131,9 @@ public class Main {
             }
             */
 
-            // SSEs have been calculated, now assign the PTGL labels and sequential numbers on the chain
+            // SSEs have been calculated, now assign the PTGL labels and sequential numbers on the chainName
             for(Integer j = 0; j < oneChainSSEs.size(); j++) {
-                oneChainSSEs.get(j).setSeqSseChainNum(j + 1);   // This is the correct value, determined from the list of all valid SSEs of this chain
+                oneChainSSEs.get(j).setSeqSseChainNum(j + 1);   // This is the correct value, determined from the list of all valid SSEs of this chainName
                 oneChainSSEs.get(j).setSseIDPtgl(getPtglSseIDForNum(j));
             }
 
@@ -6129,7 +6157,7 @@ public class Main {
             ComplexGraph.Vertex v = compGraph.createVertex();
             compGraph.proteinNodeMap.put(v, allChains.get(i).getPdbChainID());
 
-            // get AA sequence string for each chain
+            // get AA sequence string for each chainName
             for(Residue resi : allChains.get(i).getResidues()){
                 
                 if ( ! Settings.get("plcc_S_ligAACode").equals(resi.getAAName1())) {  // Skip ligands to preserve sequence identity. What to do with "_B_", "_Z_", "_X_" (B,Z,X)?
@@ -6164,7 +6192,7 @@ public class Main {
                 for (Integer j = 0; j < allChains.size(); j++) {
 
                     String compareChainID = allChains.get(j).getPdbChainID();
-                    // make sure no chain is matched with itself 
+                    // make sure no chainName is matched with itself 
                     if (allChains.get(i).getHomologues() != null) {
                         if ((allChains.get(i).getHomologues().contains(compareChainID)) && (!Objects.equals(i, j))) {
                             compGraph.homologueChains[i][j] = 1;
@@ -6450,7 +6478,7 @@ public class Main {
                             //System.out.println("Loop-loop Contact");
                         }
                     }
-                    //System.out.println("Contact found between chain " + resContacts.get(i).getResA().getChainID() + " and chain " + resContacts.get(i).getResB().getChainID());
+                    //System.out.println("Contact found between chainName " + resContacts.get(i).getResA().getChainID() + " and chainName " + resContacts.get(i).getResB().getChainID());
                 }
                 else{
                     // We already have an edge, just adjust values
@@ -6719,7 +6747,7 @@ public class Main {
         }        
         
         fileNameSSELevelWithoutExtension = pdbid + "_complex_sses_" + graphType + coils + "_CG";
-        fileNameChainLevelWithoutExtension = pdbid + "_complex_chains"  + coils + "_CG";    // the chain-level graph always uses the full contact data, no need to differentiate by graphType (could be implemented of course)
+        fileNameChainLevelWithoutExtension = pdbid + "_complex_chains"  + coils + "_CG";    // the chainName-level graph always uses the full contact data, no need to differentiate by graphType (could be implemented of course)
         fileNameSSELevelWithExtension = fileNameSSELevelWithoutExtension + Settings.get("plcc_S_img_output_fileext");
         fileNameChainLevelWithExtension = fileNameChainLevelWithoutExtension + Settings.get("plcc_S_img_output_fileext");
 
@@ -6750,8 +6778,8 @@ public class Main {
             dbImagePathCGNoExt = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, "ALL") + fs + fileNameSSELevelWithoutExtension;
         }
         
-        // ------------- chain level complex graphs -----------
-        // the simple complex graph (one vertex is one chain):
+        // ------------- chainName level complex graphs -----------
+        // the simple complex graph (one vertex is one chainName):
         File gmlFileChainLevel = null;
         String gmlFileNameChainLevel = null;
         try {
@@ -6775,7 +6803,7 @@ public class Main {
             System.out.println("    Writing SSE level graph text files...");
         }
         
-        // the detailed complex graph (each vertex is one SSE, vertices ordered by chain):
+        // the detailed complex graph (each vertex is one SSE, vertices ordered by chainName):
         String graphFormatsWrittenSSELevel = "";        
         Integer numFormatsWrittenSSELevel = 0;
         if(Settings.getBoolean("plcc_B_output_compgraph_GML")) {
@@ -6886,7 +6914,7 @@ public class Main {
                 String ligChainName = ligandSSE.getChain().getPdbChainID();
                 Integer ligRes = ligandSSE.getStartResidue().getPdbResNum();
                 String lign3 = ligandSSE.getTrimmedLigandName3();
-                ligName = ligChainName + "-" + ligRes + "-" + lign3;  // something like "A-234-ICT", meaning isocitric acid, PDB residue 234 of chain A
+                ligName = ligChainName + "-" + ligRes + "-" + lign3;  // something like "A-234-ICT", meaning isocitric acid, PDB residue 234 of chainName A
                 
                 // determine all chains the ligand has contacts with (based on the SSEs it has contacts with):
                 Integer ligIndex = cg.getSSEIndex(ligandSSE);
@@ -6916,7 +6944,7 @@ public class Main {
                 if(! silent) {
                     List<String> contactSSENames = new ArrayList<>();
                     for(Integer sseIndex : contactSSEIndices) {
-                        contactSSENames.add(cg.getChainNameOfSSE(sseIndex) + "-" + cg.getVertex(sseIndex).getSSESeqChainNum() + "-" +  cg.getVertex(sseIndex).getSSEClass());    // something like "A-1-H", meaning the first SSE of chain A, a helix
+                        contactSSENames.add(cg.getChainNameOfSSE(sseIndex) + "-" + cg.getVertex(sseIndex).getSSESeqChainNum() + "-" +  cg.getVertex(sseIndex).getSSEClass());    // something like "A-1-H", meaning the first SSE of chainName A, a helix
                     }
                     if(! silent) {
                         System.out.println("     *Ligand '" + ligName + "' is in contact with the following " + contactSSENames.size() + " SSEs: '" + IO.stringListToString(contactSSENames) + "'.");

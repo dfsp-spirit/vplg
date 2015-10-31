@@ -8022,6 +8022,52 @@ connection.close();
         
     }
     
+     /**
+     * Assigns a chain to a macromolecule in the database.
+     * @param chain_db_id the chain database ID
+     * @param macromol_db_id the motif database ID
+     * @return the number of affected rows
+     * @throws SQLException if SQL stuff goes bad
+     */
+    public static Integer assignChainToMacromolecule(Long chain_db_id, Long macromol_db_id) throws SQLException {
+        Integer numRowsAffected = 0;        
+        PreparedStatement statement = null;
+        
+        String query = "INSERT INTO " + tbl_nm_chaintomacromolecule + " (chaintomacromol_chainid, chaintomacromol_macromolid) VALUES (?, ?);";
+
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+            
+            statement.setLong(1, chain_db_id);
+            statement.setLong(2, macromol_db_id);
+                                
+            numRowsAffected = statement.executeUpdate();
+            //dbc.commit();
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: assignChainToMacromolecule(): '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: assignChainToMacromolecule(): Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: assignChainToMacromolecule(): Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            //dbc.setAutoCommit(true);
+        } 
+        
+        return numRowsAffected;
+        
+    }
+    
+    
+    
+    
     /**
      * Writes data on a protein to the database. This will delete old versions in the database.
      * @param pdb_id the PDB id of the protein
@@ -10885,6 +10931,83 @@ connection.close();
             }
             else {
                 DP.getInstance().w("DB: Chain '" + chain_name + "' of PDB ID '" + pdb_id + "' not in DB.");
+                return(-1L);
+            }
+        }
+        else {
+            return(-1L);
+        }        
+    }
+    
+    
+    /**
+     * Retrieves the internal database chain ID of a chain (it's PK) from the DB. The chain is identified by (pdb_id, chain_name).
+     * @param pdb_id the PDB ID of the chain
+     * @param  mol_id the PDB MOL_ID string from the COMPND header field, e.g. "1"
+     * @return the internal database chain id (its primary key, e.g. '2352365175365'). This is NOT the pdb chain name.
+     */
+    public static Long getDBMacromoleculeID(String pdb_id, String mol_id) {
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT macromolecule_id FROM " + tbl_macromolecule + " WHERE (pdb_id = ? AND mol_id_pdb = ?);";
+
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setString(1, pdb_id);
+            statement.setString(2, mol_id);
+                                
+            rs = statement.executeQuery();
+            //dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "getDBMacromoleculeID: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
+                //dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "getDBMacromoleculeID: Could not close statement and reset autocommit."); }
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        if(tableData.size() >= 1) {
+            if(tableData.get(0).size() >= 1) {
+                return(Long.valueOf(tableData.get(0).get(0)));
+            }
+            else {
+                DP.getInstance().w("DB: Macromolecule with MOL_ID '" + mol_id + "' of PDB ID '" + pdb_id + "' not in DB.");
                 return(-1L);
             }
         }
