@@ -289,7 +289,7 @@ function check_install($db)  {
 			
 			<?php if($ENABLE_COMPLEX_GRAPHS) { ?>
 			<div class="input-group form-group">
-			<form class="form-inline" action="search_complex.php" method="get">
+			<form class="form-inline" action="complexgraphs.php" method="get">
 			<dl class="dl-horizontal">
 				<div id="additionalSearchComplex">
 				<dt>Complex graphs</dt>
@@ -297,7 +297,8 @@ function check_install($db)  {
 				</div>
 				<div id="addSearchComplex">
 				<p>Enter a query PDB ID, e.g., '4a97' to display complex information for that PDB file.</p>								                 
-						<input type="text" class="form-control" name="searchComplex" id="searchComplex" autocomplete="off" placeholder="Enter a query PDB ID...">
+						<input type="text" class="form-control" name="pdb" id="searchComplex" autocomplete="off" placeholder="Enter a query PDB ID...">
+						<input type="hidden" name="graphtype_int" value="6">
 						<button type="submit" id="sendit_complex" name="stc" value="complex_pdbid" class="btn btn-default" ><span class="glyphicon glyphicon-search"></span></button><br>
 
 			</form></div>

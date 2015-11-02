@@ -29,47 +29,6 @@ function check_valid_pdbid($str) {
     return false;
 }
 
-function check_valid_chainid($str) {
-    if (preg_match('/^[A-Z0-9]{1}$/i', $str)) {
-        return true;
-    }
-    return false;
-}
-
-function get_proteingraph_database_id($db, $pdb_id, $chain_name, $graph_type) {
-    $data = array();
-    $query = "SELECT g.graph_id FROM plcc_graph g INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE (p.pdb_id = '" . $pdb_id . "' AND c.chain_name = '" . $chain_name . "' AND gt.graphtype_text = '" . $graph_type . "' )";
-
-    $result = pg_query($db, $query);
-    while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)) {
-        $data['graph_id'] = $arr['graph_id'];
-    }
-
-    pg_free_result($result);
-    return $data;
-}
-
-/**
- * Returns the graphlet counts of all graphs of the specified type in the whole DB (all protein chains).
- */
-function get_all_proteingraph_graphlet_counts_for_graphtype($db, $graph_type) {
-    $all_data = array();
-
-    $query = "SELECT p.pdb_id, c.chain_name, gt.graphtype_text, array_to_json(gl.graphlet_counts) AS graphlet_counts FROM plcc_graphlets gl INNER JOIN plcc_graph g ON gl.graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE ( gt.graphtype_text = '" . $graph_type . "' )";
-
-    $result = pg_query($db, $query);
-    while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)) {
-        $data = array();
-        $data['pdb_id'] = $arr['pdb_id'];
-        $data['chain_name'] = $arr['chain_name'];
-        $data['graph_type'] = $arr['graphtype_text'];
-        $data['graphlet_counts'] = json_decode($arr['graphlet_counts']);
-        array_push($all_data, $data);
-    }
-
-    pg_free_result($result);
-    return $all_data;
-}
 
 /**
  * the $pdb_chain_list should be a string array, where each string is of length 5 and represents a PDB id and chain, e.g., '7timA' for PDB 7tim chain A.
@@ -131,20 +90,17 @@ if (isset($_GET)) {
 } else {
     // if nothing is set or the query is too short...
     $tableString = "Sorry. Your search term is too short. <br>\n";
-    $tableString .= '<a href="./index.php">Go back</a> or use the query box in the upper right corner!';
+    $tableString .= '<a href="./index.php">Go back</a> to the search page.';
     exit;
 }
 
 
 
-$list_of_search_types = array();
 
 // establish database connection
 $conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER . " password=" . $DB_PASSWORD;
 $db = pg_connect($conn_string);
 
-// later, if no query is set before, there will be no CONCAT/UNION
-$firstQuerySet = false;
 
 $query = "SELECT cg.complexgraph_id, cg.pdb_id, p.title, p.header FROM plcc_complexgraph cg INNER JOIN plcc_protein p ON cg.pdb_id = p.pdb_id WHERE cg.pdb_id = $1 ORDER BY pdb_id";
 
@@ -164,17 +120,17 @@ if($result) {
 
   if ($row_count != 0) {
   // begin to create pager
-  $tableString = "<table><tr><th>PDB ID</th><th>Title</th><th>Header</th></tr>";
+  $tableString = "<table class='results'>\n<tr><th>PDB ID</th><th>Title</th><th>Header</th><th>Load</th></tr>\n";
   
       foreach ($all_results as $arr) {
 	  // set protein/chain information for readability		
 	  $pdb_id = $arr['pdb_id'];
 	  $title = $arr["title"];
 	  $header = $arr["header"];
-	  $tableString .= "<tr><td>$pdb_id</td><td>$title</td><td>$header</td></tr>";
+	  $tableString .= "<tr><td>$pdb_id</td><td>$title</td><td>$header</td></tr>\n";
 
       }
-      $tableString .= '</table>'; // the $tableString var is used in the frontend search.php page to print results
+      $tableString .= "</table>\n"; // the $tableString var is used in the frontend search.php page to print results
   } else {
       $tableString .= "<h3>Unfortunately there are no search results for your query.</h3>";
       $tableString .= "Please <a href='index.php' title='PTGL'>go back</a> and try an other query.";

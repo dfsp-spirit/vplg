@@ -78,8 +78,8 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			    
 			    echo $tableString; /* The table string is constructed in backend/search_complex_backend.php, which is included by this file. */  
 			?>
-			</form>	
-		</div><!-- end container and searchResults -->
+				
+		
 	</div><!-- end container-->
 	</div><!-- end wrapper -->
 
