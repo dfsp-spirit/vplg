@@ -252,8 +252,16 @@ public class ComplexGraph extends UAdjListGraph {
         return hue;
     }
 
-    private static DrawResult drawProteinGraphG2D(Boolean nonProteinGraph, ComplexGraph cg) {
-
+    /**
+     * Draws a complex graph
+     * @param nonProteinGraph whether the graph is a non-protein graph and should be drawn black and white
+     * @param cg the complex graph
+     * @param molInfoForChains info mapping chain IDs (like "A") to their macromolecule (MOL_ID in PDB file, e.g., "1"). Give an empty one if you dont know
+     * @return a draw result
+     */
+    private static DrawResult drawChainLevelComplexGraphG2D(Boolean nonProteinGraph, ComplexGraph cg, Map<String, String> molInfoForChains) {
+        
+        
         Integer numVerts = cg.getVertices().size();
 
         Boolean bw = nonProteinGraph;
@@ -302,8 +310,8 @@ public class ComplexGraph extends UAdjListGraph {
         String addInfo = "(Interchain contact threshold is set to " + Main.chainComplexGraphContactThreshold + ". Neglected edges: " + cg.neglectedEdges + ")";
         //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
         Integer stringHeight = fontMetrics.getAscent();
-        String sseNumberSeq;    // the SSE number in the primary structure, N to C terminus
-        String sseNumberGraph;  // the SSE number in this graph, 1..(this.size)
+        String chainName;    // the SSE number in the primary structure, N to C terminus
+        String chainNumber;  // the SSE number in this graph, 1..(this.size)
 
         if (Settings.getBoolean("plcc_B_graphimg_header")) {
             ig2.drawString(proteinHeader, pl.headerStart.x, pl.headerStart.y);
@@ -519,17 +527,21 @@ public class ComplexGraph extends UAdjListGraph {
             Integer lineHeight = pl.textLineHeight;
             if (cg.getVertices().size() > 0) {
                 ig2.drawString("C#", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (stringHeight / 4));
+                ig2.drawString("CN", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
+                ig2.drawString("ML", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + (lineHeight *2) + (stringHeight / 4));
             } else {
                 ig2.drawString("(Graph has no vertices.)", pl.getFooterStart().x, pl.getFooterStart().y);
             }
             iChainID = -1;
             String edgesString = cg.proteinNodeMap.toString();
+            System.out.println("DrawChainLevelCG: edgesString is '" + edgesString + "'.");
+            
+            
 
-            for (Integer i = 0; i < cg.getVertices().size(); i++) {
-                ig2.drawString("CN", pl.getFooterStart().x - pl.vertDist, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
+            for (Integer i = 0; i < cg.getVertices().size(); i++) {                
                 // Draw label for every nth vertex
                 if ((i + 1) % printNth == 0) {
-                    sseNumberGraph = "" + (i + 1);
+                    chainNumber = "" + (i + 1);
                     //sseNumberSeq = "" + (cg.proteinNodeMap.get(i));
                     Integer foundIndex = edgesString.indexOf(i.toString() + "=");
                     String chainId;
@@ -539,12 +551,13 @@ public class ComplexGraph extends UAdjListGraph {
                         chainId = edgesString.substring(foundIndex + 3, foundIndex + 4);
                     }
 
-                    sseNumberSeq = "" + chainId;
+                    chainName = "" + chainId;
                     //stringWidth = fontMetrics.stringWidth(sseNumberSeq);
                     stringHeight = fontMetrics.getAscent();
 
-                    ig2.drawString(sseNumberGraph, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4));
-                    ig2.drawString(sseNumberSeq, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + lineHeight + (stringHeight / 4));
+                    ig2.drawString(chainNumber, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (stringHeight / 4));
+                    ig2.drawString(chainName, pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 1) + (stringHeight / 4));
+                    ig2.drawString(molInfoForChains.get(chainName), pl.getFooterStart().x + (i * pl.vertDist) + pl.vertRadius / 2, pl.getFooterStart().y + (lineHeight * 2) + (stringHeight / 4));
 
                 // determine chain of SSEs
                 /*for(Integer x = 0; x < cg.getVertices().size(); x++){
@@ -587,12 +600,13 @@ public class ComplexGraph extends UAdjListGraph {
      * @param drawBlackAndWhite whether to draw in grayscale only
      * @param formats a list of img formats to write
      * @param cg the complex graph to draw
+     * @param molInfoForChains info mapping chain IDs (like "A") to their macromolecule (MOL_ID in PDB file, e.g., "1"). Give an empty one if you dont know
      * @return a list of file names that were written to disk, (as a map of
      * formats to file names)
      */
-    public static HashMap<DrawTools.IMAGEFORMAT, String> drawComplexGraph(String baseFilePathNoExt, Boolean drawBlackAndWhite, DrawTools.IMAGEFORMAT[] formats, ComplexGraph cg) {
+    public static HashMap<DrawTools.IMAGEFORMAT, String> drawComplexGraph(String baseFilePathNoExt, Boolean drawBlackAndWhite, DrawTools.IMAGEFORMAT[] formats, ComplexGraph cg, Map<String, String> molInfoForChains) {
 
-        DrawResult drawRes = ComplexGraph.drawProteinGraphG2D(drawBlackAndWhite, cg);
+        DrawResult drawRes = ComplexGraph.drawChainLevelComplexGraphG2D(drawBlackAndWhite, cg, molInfoForChains);
 
         //System.out.println("drawProteinGraph: Basefilepath is '" + baseFilePathNoExt + "'.");
         String svgFilePath = baseFilePathNoExt + ".svg";

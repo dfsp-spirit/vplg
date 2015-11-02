@@ -6875,7 +6875,12 @@ public class Main {
                 System.out.println("    Image of complex graph written to base file '" + imgFileNoExt + "'.");
             }
             
-            HashMap<DrawTools.IMAGEFORMAT, String> drawnFormats = ComplexGraph.drawComplexGraph(imgFileChainComplexNoExt, false, formats, compGraph);
+            Map<String, String> molInfoForChains = new HashMap<>();
+            for(Chain tc : cg.getAllChains()) {
+                molInfoForChains.put(tc.getPdbChainID(), tc.getMacromolID());
+            }
+            
+            HashMap<DrawTools.IMAGEFORMAT, String> drawnFormats = ComplexGraph.drawComplexGraph(imgFileChainComplexNoExt, false, formats, compGraph, molInfoForChains);
             if(! silent) {
                 for(IMAGEFORMAT f : drawnFormats.keySet()) {
                     System.out.println("    Complex graph drawn in format " + f + " to file '" + drawnFormats.get(f) + "'.") ;
