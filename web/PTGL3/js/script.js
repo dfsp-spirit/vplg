@@ -15,6 +15,7 @@ $('#addSearchSequence').hide();
 $('#addSearchGraphletSimilarity').hide();
 $('#addSearchCustomLinnots').hide();
 $('#addSearchRandom').hide();
+$('#addSearchComplex').hide();
 
 // if checkedChains is set
 if (!(typeof checkedChains === 'undefined')) {
@@ -141,6 +142,10 @@ $(function() {
 	$('#additionalSearch6').click(function() {
 		$('#addSearchRandom').slideToggle();
 		$('#flipArrow6').toggleClass('rotateArrow');
+	});
+	$('#additionalSearchComplex').click(function() {
+		$('#addSearchComplex').slideToggle();
+		$('#flipArrowComplex').toggleClass('rotateArrow');
 	});
 	
 	$('.chainCheckBox').click( function() {

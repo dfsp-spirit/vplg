@@ -287,6 +287,25 @@ function check_install($db)  {
 			
 			</div><!-- end input-group and form-group -->
 			
+			<?php if($ENABLE_COMPLEX_GRAPHS) { ?>
+			<div class="input-group form-group">
+			<form class="form-inline" action="search_complex.php" method="get">
+			<dl class="dl-horizontal">
+				<div id="additionalSearchComplex">
+				<dt>Complex graphs</dt>
+				<dd>Search for protein complexes <strong class="caret" id="flipArrowComplex" ></strong></dd>
+				</div>
+				<div id="addSearchComplex">
+				<p>Enter a query PDB ID, e.g., '4a97' to display complex information for that PDB file.</p>								                 
+						<input type="text" class="form-control" name="searchComplex" id="searchComplex" autocomplete="off" placeholder="Enter a query PDB ID...">
+						<button type="submit" id="sendit_complex" name="stc" value="complex_pdbid" class="btn btn-default" ><span class="glyphicon glyphicon-search"></span></button><br>
+
+			</form></div>
+			</dl>
+			</div><!-- end input-group and form-group -->
+			<?php } ?>
+			
+			
 			<?php if($ENABLE_GRAPHLETSIMILARITY_SEARCH) { ?>
 			<div class="input-group form-group">
 			<form class="form-inline" action="search.php" method="get">
