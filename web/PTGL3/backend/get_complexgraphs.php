@@ -33,7 +33,7 @@ function get_complexgraph_query_string($pdb_id, $graphtype_str) {
 }
 
 function get_all_chains_of_pdb_query($pdb_id) {
-  $query = "SELECT c.chain_name, c.organism_scientific, c.mol_name FROM plcc_chain c WHERE ( c.pdb_id = '" . $pdb_id . "' )";
+  $query = "SELECT c.chain_name, c.organism_scientific, c.mol_name, c.mol_id_pdb FROM plcc_chain c WHERE ( c.pdb_id = '" . $pdb_id . "' )";
   return $query;
 }
 
@@ -141,16 +141,17 @@ if($valid_values){
 	$chains_query = get_all_chains_of_pdb_query($pdb_id);
 	$chains_result = pg_query($db, $chains_query);
 	$chains = array();
-	$tableString = "<div><table id='tblfgresults'><tr><th>PDB ID</th><th>Chain</th><th>Molecule</th><th>Organism</th><th>Go to protein graph</th></tr>\n";
+	$tableString = "<div><table id='tblfgresults'><tr><th>PDB ID</th><th>Chain</th><th>Molecule</th><th>Mol ID</th><th>Organism</th><th>Go to protein graph</th></tr>\n";
 	while ($chains_arr = pg_fetch_array($chains_result, NULL, PGSQL_ASSOC)){
 		// data from chains table:
 	        $cg_chain_name = $chains_arr['chain_name'];
 	        $mol_name = $chains_arr['mol_name'];
+	        $mol_id_pdb = $chains_arr['mol_id_pdb'];
 	        $organism = $chains_arr['organism_scientific'];
 	        array_push($chains, $cg_chain_name);
 	        $pdbchain = $pdb_id . $cg_chain_name;
 	        $tableString .= "<tr>\n";
-		$tableString .= "<td>$pdb_id</td><td>$cg_chain_name</td><td>$mol_name</td><td>$organism</td>";
+		$tableString .= "<td>$pdb_id</td><td>$cg_chain_name</td><td>$mol_name</td><td>$mol_id_pdb</td><td>$organism</td>";
 		$tableString .= "<td><a href='./results.php?q=" . $pdbchain . "' alt='Show protein graph of this chain'>PG of " . $pdb_id . " chain " . $cg_chain_name . "</a></td>\n";
 		$tableString .= "</tr>\n";
 		
