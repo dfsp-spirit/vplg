@@ -58,6 +58,7 @@ public class DBManager {
     static String tbl_foldinggraph = "plcc_foldinggraph";
     static String tbl_complexgraph = "plcc_complexgraph";
     static String tbl_graphletcount = "plcc_graphlets";
+    static String tbl_graphletcount_complex = "plcc_complex_graphlets";    
     static String tbl_motif = "plcc_motif";
     static String tbl_motiftype = "plcc_motiftype";
     static String tbl_ligand = "plcc_ligand";
@@ -86,6 +87,7 @@ public class DBManager {
     /** New table that stores linear notations for all graph types. They are distinguished by a graph_type field, like in all other tables. This tables replaces the albe, alpha and beta tables of the PTGL, which were useless from a DB design point of view. */
     static String tbl_fglinnot = "plcc_fglinnot";
     static String tbl_graphletsimilarity = "plcc_graphletsimilarity";
+    static String tbl_graphletsimilarity_complex = "plcc_complex_graphletsimilarity";
     
     /** Stores info on ligand-centered complex graphs. */
     static String tbl_ligandcenteredgraph = "plcc_ligandcenteredgraph";
@@ -773,6 +775,7 @@ public class DBManager {
             doDeleteQuery("DROP TABLE " + tbl_foldinggraph + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_complexgraph + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_graphletcount + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_graphletcount_complex + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_nm_ssetoproteingraph + ";");
             doDeleteQuery("DROP TABLE " + tbl_nm_ssetofoldinggraph + ";");
             doDeleteQuery("DROP TABLE " + tbl_graphtypes + " CASCADE;");
@@ -787,6 +790,7 @@ public class DBManager {
             doDeleteQuery("DROP TABLE " + tbl_fglinnot + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_secondat + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_graphletsimilarity + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_graphletsimilarity_complex + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_ligandcenteredgraph + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_nm_lcg_to_chain + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_nm_chaintomacromolecule + " CASCADE;");            
@@ -883,6 +887,7 @@ public class DBManager {
              *
              */
             doInsertQuery("CREATE TABLE " + tbl_graphletcount + " (graphlet_id serial primary key, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graphlet_counts decimal[55] not null);");
+            doInsertQuery("CREATE TABLE " + tbl_graphletcount_complex + " (complex_graphlet_id serial primary key, complexgraph_id int not null references " + tbl_complexgraph + " ON DELETE CASCADE, complex_graphlet_counts decimal[55] not null);");
             doInsertQuery("CREATE TABLE " + tbl_nm_ssetoproteingraph + " (ssetoproteingraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, position_in_graph int not null);");
             doInsertQuery("CREATE TABLE " + tbl_nm_ssetofoldinggraph + " (ssetofoldinggraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, position_in_graph int not null);");
             doInsertQuery("CREATE TABLE " + tbl_nm_chaintomotif + " (chaintomotif_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, motif_id int not null references " + tbl_motif + " ON DELETE CASCADE);");
@@ -898,6 +903,7 @@ public class DBManager {
             //doInsertQuery("CREATE TABLE " + tbl_fglinnot_albelig + " (linnotalbelig_id serial primary key, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text);");           
             doInsertQuery("CREATE TABLE " + tbl_fglinnot + " (linnot_id serial primary key, denorm_pdb_id varchar(4) not null, denorm_chain_name varchar(2) not null, denorm_graph_type int not null, denorm_graph_type_string text not null, linnot_foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, ptgl_linnot_adj text, ptgl_linnot_red text, ptgl_linnot_key text, ptgl_linnot_seq text, firstvertexpos_adj int, firstvertexpos_red int, firstvertexpos_key int, firstvertexpos_seq int, filepath_linnot_image_adj_svg text, filepath_linnot_image_adj_png text, filepath_linnot_image_adj_pdf text, filepath_linnot_image_red_svg text, filepath_linnot_image_red_png text, filepath_linnot_image_red_pdf text, filepath_linnot_image_key_svg text, filepath_linnot_image_key_png text, filepath_linnot_image_key_pdf text, filepath_linnot_image_seq_svg text, filepath_linnot_image_seq_png text, filepath_linnot_image_seq_pdf text, filepath_linnot_image_def_svg text, filepath_linnot_image_def_png text, filepath_linnot_image_def_pdf text, num_sses int);");
             doInsertQuery("CREATE TABLE " + tbl_graphletsimilarity + " (graphletsimilarity_id serial primary key, graphletsimilarity_sourcegraph int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graphletsimilarity_targetgraph int not null references " + tbl_proteingraph + " ON DELETE CASCADE, score numeric);");
+            doInsertQuery("CREATE TABLE " + tbl_graphletsimilarity_complex + " (complexgraphletsimilarity_id serial primary key, complexgraphletsimilarity_sourcegraph int not null references " + tbl_complexgraph + " ON DELETE CASCADE, complexgraphletsimilarity_targetgraph int not null references " + tbl_complexgraph + " ON DELETE CASCADE, score numeric);");
             
             doInsertQuery("CREATE TABLE " + tbl_ligandcenteredgraph + " (ligandcenteredgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, lig_sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, filepath_lcg_svg text, filepath_lcg_png text, filepath_lcg_pdf text);");
             doInsertQuery("CREATE TABLE " + tbl_nm_lcg_to_chain + " (lcg2c_id serial primary key, lcg2c_ligandcenteredgraph_id int not null references " + tbl_ligandcenteredgraph + " ON DELETE CASCADE, lcg2c_chain_id int not null references " + tbl_chain + " ON DELETE CASCADE);");
@@ -913,10 +919,12 @@ public class DBManager {
             doInsertQuery("ALTER TABLE " + tbl_proteingraph + " ADD CONSTRAINT constr_graph_uniq UNIQUE (chain_id, graph_type);");
             doInsertQuery("ALTER TABLE " + tbl_foldinggraph + " ADD CONSTRAINT constr_foldgraph_uniq UNIQUE (parent_graph_id, fg_number);");
             doInsertQuery("ALTER TABLE " + tbl_graphletcount + " ADD CONSTRAINT constr_graphlet_uniq UNIQUE (graph_id);");
+            doInsertQuery("ALTER TABLE " + tbl_graphletcount_complex + " ADD CONSTRAINT constr_complexgraphlet_uniq UNIQUE (complexgraph_id);");
             doInsertQuery("ALTER TABLE " + tbl_nm_ligandtochain + " ADD CONSTRAINT constr_ligtochain_uniq UNIQUE (ligandtochain_chainid, ligandtochain_ligandname3);");
             doInsertQuery("ALTER TABLE " + tbl_nm_chaintomotif + " ADD CONSTRAINT constr_chaintomotif_uniq UNIQUE (chain_id, motif_id);");
             doInsertQuery("ALTER TABLE " + tbl_secondat + " ADD CONSTRAINT constr_secondat_uniq UNIQUE (sse_id);");
             doInsertQuery("ALTER TABLE " + tbl_graphletsimilarity + " ADD CONSTRAINT constr_graphletsimilarity_uniq UNIQUE (graphletsimilarity_sourcegraph, graphletsimilarity_targetgraph);");
+            doInsertQuery("ALTER TABLE " + tbl_graphletsimilarity_complex + " ADD CONSTRAINT constr_complexgraphletsimilarity_uniq UNIQUE (complexgraphletsimilarity_sourcegraph, complexgraphletsimilarity_targetgraph);");
             
             //doInsertQuery("ALTER TABLE " + tbl_fglinnot_alpha + " ADD CONSTRAINT constr_fglinnotalpha_uniq UNIQUE (linnot_foldinggraph_id);");
             //doInsertQuery("ALTER TABLE " + tbl_fglinnot_beta + " ADD CONSTRAINT constr_fglinnotbeta_uniq UNIQUE (linnot_foldinggraph_id);");
@@ -974,7 +982,8 @@ public class DBManager {
             doInsertQuery("COMMENT ON TABLE " + tbl_proteingraph + " IS 'Stores descriptions of the protein graph of a protein chain. Multiple of these exist for a chain due to alpha, beta, alphabeta, alphalig, betalig and alphabetalig versions.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_foldinggraph + " IS 'Stores descriptions of a folding graph, which is a connected component of a protein graph.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_complexgraph + " IS 'Stores descriptions of a complex graph.';");
-            doInsertQuery("COMMENT ON TABLE " + tbl_graphletcount + " IS 'Stores the graphlet counts for the different graphlets for a certain graph defined by pdbid, chain and graph type.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_graphletcount + " IS 'Stores the graphlet counts for the different graphlets for a certain protein graph.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_graphletcount_complex + " IS 'Stores the graphlet counts for the different graphlets for a certain complex graph.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_nm_ssetoproteingraph + " IS 'Assigns SSEs to protein graphs. An SSE may be part of multiple graphs, e.g., alpha, alphalig, and albe.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_nm_ssetofoldinggraph + " IS 'Assigns SSEs to folding graphs. An SSE may be part of multiple folding graphs, e.g., alpha, alphalig, and albe. It cannot be part of multiple alpha folding graphs though.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_macromolecule + " IS 'Stores data on a macromolecule in a PDB file, which may consist of one or more chains. Note that a single PDB file can contain several macromolecules.';");
@@ -1068,6 +1077,7 @@ public class DBManager {
             doInsertQuery("CREATE INDEX plcc_idx_foldinggraph_parent ON " + tbl_foldinggraph + " (parent_graph_id);");
             doInsertQuery("CREATE INDEX plcc_idx_foldinggraph_fgnum ON " + tbl_foldinggraph + " (fg_number);");// FK
             doInsertQuery("CREATE INDEX plcc_idx_graphlets_fk ON " + tbl_graphletcount + " (graph_id);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_complexgraphlets_fk ON " + tbl_graphletcount_complex + " (complexgraph_id);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_ssetoproteingraph_fk1 ON " + tbl_nm_ssetoproteingraph + " (sse_id);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_ssetoproteingraph_fk2 ON " + tbl_nm_ssetoproteingraph + " (graph_id);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_ssetofoldinggraph_fk1 ON " + tbl_nm_ssetofoldinggraph + " (sse_id);");                       // FK
@@ -1137,6 +1147,9 @@ public class DBManager {
             doInsertQuery("CREATE INDEX plcc_idx_graphletsimilarity_graph1 ON " + tbl_graphletsimilarity + " (graphletsimilarity_sourcegraph);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_graphletsimilarity_graph2 ON " + tbl_graphletsimilarity + " (graphletsimilarity_targetgraph);");                       // FK
             doInsertQuery("CREATE INDEX plcc_idx_graphletsimilarity_score ON " + tbl_graphletsimilarity + " (score);");
+            doInsertQuery("CREATE INDEX plcc_idx_complexgraphletsimilarity_graph1 ON " + tbl_graphletsimilarity_complex + " (complexgraphletsimilarity_sourcegraph);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_complexgraphletsimilarity_graph2 ON " + tbl_graphletsimilarity_complex + " (complexgraphletsimilarity_targetgraph);");                       // FK
+            doInsertQuery("CREATE INDEX plcc_idx_complexgraphletsimilarity_score ON " + tbl_graphletsimilarity_complex + " (score);");
             doInsertQuery("CREATE INDEX plcc_idx_ligandtochain_chain ON " + tbl_nm_ligandtochain + " (ligandtochain_chainid);");
             doInsertQuery("CREATE INDEX plcc_idx_ligandtochain_name3 ON " + tbl_nm_ligandtochain + " (ligandtochain_ligandname3);");
             doInsertQuery("CREATE INDEX plcc_idx_lcg_sse ON " + tbl_ligandcenteredgraph + " (lig_sse_id);");
