@@ -42,6 +42,11 @@ function get_all_ligands_of_pdb_query($pdb_id) {
   return $query;
 }
 
+function get_all_macromolecules_of_pdb_query($pdb_id) {
+  $query = "SELECT m.macromolecule_id, m.pdb_id, m.mol_id_pdb, m.mol_name, m.mol_ec_number, m.mol_organism_scientific, m.mol_organism_common, m.mol_chains FROM plcc_macromolecule m WHERE ( m.pdb_id = '" . $pdb_id . "') ORDER BY m.mol_id_pdb";
+  return $query;
+}
+
 
 function get_graphtype_string($graphtype_int){
 	switch ($graphtype_int){
@@ -126,6 +131,7 @@ if(isset($_GET['pdb'])){
 
 $num_found = 0;
 $num_lig_found = 0;
+$mmtableString = "";
 
 if($valid_values){
     //echo "valid";
@@ -157,7 +163,29 @@ if($valid_values){
 		
 	}
 	$tableString .= "</table></div>\n";
+	$tableString .= "<br/><br/>\n";
 	
+	$macromol_query = get_all_macromolecules_of_pdb_query($pdb_id);
+	$macromol_result = pg_query($db, $macromol_query);
+	if($macromol_result) {
+	  $macromolecules = array();
+	  $mmtableString = "<div><table id='tblmmgresults' class='results'><tr><th>MOL_ID</th><th>Name</th><th>EC number</th><th>Organism</th><th>Chains</th></tr>\n";
+	  while ($mm_arr = pg_fetch_array($macromol_result, NULL, PGSQL_ASSOC)){
+		  // data from chains table:
+		  $mol_id_pdb = $mm_arr['mol_id_pdb'];
+		  $mol_name = $mm_arr['mol_name'];
+		  $mol_ec_number = $mm_arr['mol_ec_number'];
+		  $mol_organism_scientific = $mm_arr['mol_organism_scientific'];
+		  $mol_organism_common = $mm_arr['mol_organism_common'];
+		  $mol_chains = $mm_arr['mol_chains'];
+		  $mmtableString  .= "<tr>\n";
+		  $mmtableString  .= "<td>$mol_id_pdb</td><td>$mol_name</td><td>$mol_ec_number</td><td>$mol_organism_scientific</td>";
+		  $mmtableString  .= "<td>$mol_chains</td>\n";
+		  $mmtableString .= "</tr>\n";
+		  
+	  }
+	  $mmtableString .= "</table></div>\n";
+	}
 	
 	// determine all ligands (single ligand molecules from SSEs (ligand residues, not ligand types. This means something like ICT-485, not ICT)
 	$ligands_query = get_all_ligands_of_pdb_query($pdb_id);

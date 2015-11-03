@@ -1077,7 +1077,7 @@ table#tblfgresults th {
     width: 100%;
     background-color: #f1f1c1;
 	} 
-	.results table tr:nth-child(even) {
+	 .results table tr:nth-child(even) {
     background-color: #eee;
 }
 .results table tr:nth-child(odd) {
@@ -1087,6 +1087,7 @@ table#tblfgresults th {
     color: white;
     background-color: black;
 }
+
 
 	table#tblmotifoverview {
     width: 100%;

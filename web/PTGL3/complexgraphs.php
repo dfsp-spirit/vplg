@@ -112,6 +112,9 @@ function get_total_complexgraphs_count($db) {
 				      // the table listing all chains of the protein
 				      echo $tableString; /* The table string is constructed in /backend/get_complexgraphs.php, which is included by this file. */  
 				
+				      echo "<h4> Macromolecules contained in the PDB file </h4>\n";
+				      echo $mmtableString;
+				      
 				      if($num_found > 0) {
 					echo "<br><h3> Complex graph images </h3><br><p>The images below show the complex graph of all chains of the selected PDB file.</p>\n";
 					echo $img_string;
