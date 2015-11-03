@@ -84,7 +84,7 @@ function get_complex_sse_graph_file_name_no_ext($pdbid, $graphtype_string) {
 }
 
 function get_complex_chains_graph_file_name_no_ext($pdbid, $graphtype_string) {
-  return $pdbid . "_complex_chains_CG";
+  return $pdbid . "_complex_chains_" . $graphtype_string . "_CG";
 }
 
 function get_path_to($pdbid, $chain) {
@@ -93,13 +93,13 @@ function get_path_to($pdbid, $chain) {
 }
 
 function get_complex_sse_graph_path_and_file_name_no_ext($pdbid, $graphtype_string) {
-  $path = get_path_to($pdbid, $chain);
+  $path = get_path_to($pdbid, "ALL");
   $fname = get_complex_sse_graph_file_name_no_ext($pdbid, $graphtype_string);
   return $path . $fname;
 }
 
 function get_complex_chains_graph_path_and_file_name_no_ext($pdbid, $graphtype_string) {
-  $path = get_path_to($pdbid, $chain);
+  $path = get_path_to($pdbid, "ALL");
   $fname = get_complex_chains_graph_file_name_no_ext($pdbid, $graphtype_string);
   return $path . $fname;
 }
@@ -175,6 +175,7 @@ if($valid_values){
 		  $mol_id_pdb = $mm_arr['mol_id_pdb'];
 		  $mol_name = $mm_arr['mol_name'];
 		  $mol_ec_number = $mm_arr['mol_ec_number'];
+		  if(strlen($mol_ec_number) === 0) { $mol_ec_number = '-'; }
 		  $mol_organism_scientific = $mm_arr['mol_organism_scientific'];
 		  $mol_organism_common = $mm_arr['mol_organism_common'];
 		  $mol_chains = $mm_arr['mol_chains'];
@@ -291,6 +292,58 @@ if($valid_values){
 		  
 		}
 		
+				// --------------------------------------- handle SSE level graph text files ---------------------------------
+		
+		// check for graph text files. note that these do NOT exist once per linear notation, but only once per folding graph, so we add them here.
+	    // The paths to these are not yet saved in the database.
+	    $graph_file_name_no_ext = get_complex_sse_graph_file_name_no_ext($pdb_id, $graphtype_str);
+	    $subdir = get_path_to($pdb_id, "ALL");
+	
+		// GML
+		$full_file = $IMG_ROOT_PATH . $subdir . $graph_file_name_no_ext . ".gml";
+		if(file_exists($full_file)){		    
+			$img_string .= "Download the SSE level complex graph file in formats: ";
+			
+			$img_string .= ' <a href="' . $full_file .'" target="_blank">[GML]</a>';
+			
+			// we only check for other formats if GML exists:
+			
+			// check for TGF
+			$full_file = $IMG_ROOT_PATH . $subdir . $graph_file_name_no_ext . ".tgf";
+			if(file_exists($full_file)){		    
+			    $img_string .= ' <a href="' . $full_file .'" target="_blank">[TGF]</a>';
+			}
+			// gv
+				$full_file = $IMG_ROOT_PATH . $subdir . $graph_file_name_no_ext . ".gv";
+				if(file_exists($full_file)){
+				    $img_string .= ' <a href="' . $full_file .'" target="_blank">[GV]</a>';
+				}
+				// kavosh
+				$full_file = $IMG_ROOT_PATH . $subdir . $graph_file_name_no_ext . ".kavosh";
+				if(file_exists($full_file)){
+				    $img_string .= ' <a href="' . $full_file .'" target="_blank">[Kavosh]</a>';
+				}
+                // json
+				$full_file = $IMG_ROOT_PATH . $subdir . $graph_file_name_no_ext . ".json";
+				if(file_exists($full_file)){
+				    $img_string .= ' <a href="' . $full_file .'" target="_blank">[JSON]</a>';
+				}
+				// XML / XGMML
+				$full_file = $IMG_ROOT_PATH . $subdir . $graph_file_name_no_ext . ".xml";
+				if(file_exists($full_file)){
+				    $img_string .= ' <a href="' . $full_file .'" target="_blank">[XML (XGMML)]</a>';
+				}				
+                // edge list with separate label file				
+				$full_file = $IMG_ROOT_PATH . $subdir . $graph_file_name_no_ext . ".el_edges";
+				$full_file2 = $IMG_ROOT_PATH . $subdir . $graph_file_name_no_ext . ".el_ntl";
+				if(file_exists($full_file) && file_exists($full_file2)){
+				    $img_string .= ' [EL: <a href="' . $full_file .'" target="_blank">edges</a> <a href="' . $full_file2 .'" target="_blank">labels</a>]';
+				}		
+			
+			$img_string .= '<br><br>';
+		} 
+
+		
 		
 		// ------------------------------------- handle chain-level complex graph images ---------------------------
 		$chain_image_exists_png = FALSE;
@@ -344,54 +397,57 @@ if($valid_values){
 		
 		
 		
-		// --------------------------------------- handle graph text files ---------------------------------
+		// --------------------------------------- handle chain level graph text files ---------------------------------
 		
 		// check for graph text files. note that these do NOT exist once per linear notation, but only once per folding graph, so we add them here.
 	    // The paths to these are not yet saved in the database.
-	    $graph_file_name_no_ext = get_complex_sse_graph_file_name_no_ext($pdb_id, $graphtype_str);
+	    $graph_file_name_no_ext = get_complex_chains_graph_file_name_no_ext($pdb_id, $graphtype_str);
+	    $subdir = get_path_to($pdb_id, "ALL");
 	
 		// GML
-		$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".gml";
+		$full_file = $IMG_ROOT_PATH . $subdir . $graph_file_name_no_ext . ".gml";
 		if(file_exists($full_file)){		    
-			$img_string .= "Download the complex graph file in formats: ";
+			$img_string .= "Download the chain level complex graph file in formats: ";
 			
 			$img_string .= ' <a href="' . $full_file .'" target="_blank">[GML]</a>';
 			
 			// we only check for other formats if GML exists:
 			
 			// check for TGF
-			$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".tgf";
+			$full_file = $IMG_ROOT_PATH . $subdir . $graph_file_name_no_ext . ".tgf";
 			if(file_exists($full_file)){		    
 			    $img_string .= ' <a href="' . $full_file .'" target="_blank">[TGF]</a>';
 			}
 			// gv
-				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".gv";
+				$full_file = $IMG_ROOT_PATH . $subdir . $graph_file_name_no_ext . ".gv";
 				if(file_exists($full_file)){
 				    $img_string .= ' <a href="' . $full_file .'" target="_blank">[GV]</a>';
 				}
 				// kavosh
-				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".kavosh";
+				$full_file = $IMG_ROOT_PATH . $subdir . $graph_file_name_no_ext . ".kavosh";
 				if(file_exists($full_file)){
 				    $img_string .= ' <a href="' . $full_file .'" target="_blank">[Kavosh]</a>';
 				}
                 // json
-				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".json";
+				$full_file = $IMG_ROOT_PATH . $subdir . $graph_file_name_no_ext . ".json";
 				if(file_exists($full_file)){
 				    $img_string .= ' <a href="' . $full_file .'" target="_blank">[JSON]</a>';
 				}
 				// XML / XGMML
-				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".xml";
+				$full_file = $IMG_ROOT_PATH . $subdir . $graph_file_name_no_ext . ".xml";
 				if(file_exists($full_file)){
 				    $img_string .= ' <a href="' . $full_file .'" target="_blank">[XML (XGMML)]</a>';
 				}				
                 // edge list with separate label file				
-				$full_file = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".el_edges";
-				$full_file2 = $IMG_ROOT_PATH . $graph_file_name_no_ext . ".el_ntl";
+				$full_file = $IMG_ROOT_PATH . $subdir . $graph_file_name_no_ext . ".el_edges";
+				$full_file2 = $IMG_ROOT_PATH . $subdir . $graph_file_name_no_ext . ".el_ntl";
 				if(file_exists($full_file) && file_exists($full_file2)){
 				    $img_string .= ' [EL: <a href="' . $full_file .'" target="_blank">edges</a> <a href="' . $full_file2 .'" target="_blank">labels</a>]';
 				}		
 			
 			$img_string .= '<br><br>';
+		} else {
+			$img_string .= "DEBUG: Missing chain level file '$full_file'.";
 		}
 		
 		
