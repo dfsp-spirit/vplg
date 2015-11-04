@@ -47,6 +47,19 @@ function get_all_macromolecules_of_pdb_query($pdb_id) {
   return $query;
 }
 
+function is_valid_EC_number($ec) {
+  return true;
+}
+
+function get_link_BRENDA($ec_number, $link_label) {
+  if(is_valid_EC_number($ec_number)) {
+    return "<a href='http://www.brenda-enzymes.info/enzyme.php?ecno=$ec_number' target='_blank'>$link_label</a>";
+  }
+  else {
+    return "";
+  }
+}
+
 
 function get_graphtype_string($graphtype_int){
 	switch ($graphtype_int){
@@ -175,12 +188,12 @@ if($valid_values){
 		  $mol_id_pdb = $mm_arr['mol_id_pdb'];
 		  $mol_name = $mm_arr['mol_name'];
 		  $mol_ec_number = $mm_arr['mol_ec_number'];
-		  if(strlen($mol_ec_number) === 0) { $mol_ec_number = '-'; }
+		  if(strlen($mol_ec_number) === 0) { $mol_ec_link = '-'; } else { $mol_ec_link = get_link_BRENDA($mol_ec_number, $mol_ec_number); }
 		  $mol_organism_scientific = $mm_arr['mol_organism_scientific'];
 		  $mol_organism_common = $mm_arr['mol_organism_common'];
 		  $mol_chains = $mm_arr['mol_chains'];
 		  $mmtableString  .= "<tr>\n";
-		  $mmtableString  .= "<td>$mol_id_pdb</td><td>$mol_name</td><td>$mol_ec_number</td><td>$mol_organism_scientific</td>";
+		  $mmtableString  .= "<td>$mol_id_pdb</td><td>$mol_name</td><td>$mol_ec_link</td><td>$mol_organism_scientific</td>";
 		  $mmtableString  .= "<td>$mol_chains</td>\n";
 		  $mmtableString .= "</tr>\n";
 		  
