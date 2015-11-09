@@ -1726,74 +1726,7 @@ public class Main {
                 drawRamachandranPlot(plotPath, c.getResidues(), label);
             }
         }
-        
-        
-        if(Settings.getBoolean("plcc_B_AAgraph_allchainscombined")) {
-            if(separateContactsByChain || cInfo == null) {
-                System.err.println("Cannot compute amino acid level contact graph for all chains combined, contact separation is on.");
-            } else {
-                if(! silent) {
-                    System.out.println("Computing amino acid level contact graph for all chains combined.");
-                }
-                
-                //DEBUG
-                //for(Residue r : residues) {
-                //    if(r.isOtherRes()) {System.out.println("##########OTHER! type="+ r.getType() ); }
-                //    else { System.out.println("###########SSE: " + r.getNonEmptySSEString() + " type=" + r.getType()); }
-                //}
-                
-                AAGraph aag = new AAGraph(residues, cInfo);
-                aag.setPdbid(pdbid);
-                aag.setChainid(AAGraph.CHAINID_ALL_CHAINS);
-                
-                String subDirTree = "";
-                if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
-                    subDirTree = IO.createSubDirTreeDir(outputDir, pdbid, "ALL");
-                    if(subDirTree == null) { 
-                        DP.getInstance().e("Main", "Could not create subdir tree (outputDir='" + outputDir + "', pdbid='" + pdbid + "'). Missing file system level access rights?"); 
-                        System.exit(1); 
-                    }
-                }
-                
-                if(Settings.getBoolean("plcc_B_useDB")) {
-                    try {
-                        DBManager.writeAminoAcidGraphToDB(pdbid, AAGraph.CHAINID_ALL_CHAINS, aag.toGraphModellingLanguageFormat());
-                        if(! silent) {
-                            System.out.println("Wrote all chains AA graph of " + pdbid + " to DB.");
-                        }
-                    } catch(SQLException e) {
-                        DP.getInstance().w("Main", "Could not write all chains AA graph to DB: '" + e.getMessage() + "'.");
-                    }
-                } 
                         
-                
-                // write the AA graph to disc
-                String aagFile = outputDir + fs + subDirTree + pdbid + "_aagraph.gml";
-                if(writeStringToFile(aagFile, aag.toGraphModellingLanguageFormat())) {
-                    if(! silent) {
-                        System.out.println("  AAGraph for all chains written to file '" + aagFile + "'.");
-                    }
-                }
-                else {
-                    System.err.println("ERROR: Could not write AAGraph for all chains to file '" + aagFile + "'.");
-                }
-                
-                // write the AA contact statistics matrix (by AA type, not single AA)
-                String aaMatrixFile = outputDir + fs + subDirTree + pdbid + "_aatypematrix.gml";
-                if(writeStringToFile(aaMatrixFile, aag.getAminoAcidTypeInteractionMatrixGML())) {
-                    if(! silent) {
-                        System.out.println("  AA type contact stats matrix for all chains written to file '" + aaMatrixFile + "'.");
-                    }
-                }
-                else {
-                    System.err.println("ERROR: Could not write AA type contact stats matrix for all chains to file '" + aaMatrixFile + "'.");
-                }
-                
-                
-            }
-            
-            
-        }
         
 
         // ********************************************** SSE stuff and graph computation ******************************************//
@@ -1809,6 +1742,73 @@ public class Main {
                 if( ! DBManager.getAutoCommit()) {
                     DBManager.commit();
                 }
+            }
+            
+            if(Settings.getBoolean("plcc_B_AAgraph_allchainscombined")) {
+                if(separateContactsByChain || cInfo == null) {
+                    System.err.println("Cannot compute amino acid level contact graph for all chains combined, contact separation is on.");
+                } else {
+                    if(! silent) {
+                        System.out.println("Computing amino acid level contact graph for all chains combined.");
+                    }
+
+                    //DEBUG
+                    //for(Residue r : residues) {
+                    //    if(r.isOtherRes()) {System.out.println("##########OTHER! type="+ r.getType() ); }
+                    //    else { System.out.println("###########SSE: " + r.getNonEmptySSEString() + " type=" + r.getType()); }
+                    //}
+
+                    AAGraph aag = new AAGraph(residues, cInfo);
+                    aag.setPdbid(pdbid);
+                    aag.setChainid(AAGraph.CHAINID_ALL_CHAINS);
+
+                    String subDirTree = "";
+                    if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
+                        subDirTree = IO.createSubDirTreeDir(outputDir, pdbid, "ALL");
+                        if(subDirTree == null) { 
+                            DP.getInstance().e("Main", "Could not create subdir tree (outputDir='" + outputDir + "', pdbid='" + pdbid + "'). Missing file system level access rights?"); 
+                            System.exit(1); 
+                        }
+                    }
+
+                    if(Settings.getBoolean("plcc_B_useDB")) {
+                        try {
+                            DBManager.writeAminoAcidGraphToDB(pdbid, AAGraph.CHAINID_ALL_CHAINS, aag.toGraphModellingLanguageFormat());
+                            if(! silent) {
+                                System.out.println("Wrote all chains AA graph of " + pdbid + " to DB.");
+                            }
+                        } catch(SQLException e) {
+                            DP.getInstance().w("Main", "Could not write all chains AA graph to DB: '" + e.getMessage() + "'.");
+                        }
+                    } 
+
+
+                    // write the AA graph to disc
+                    String aagFile = outputDir + fs + subDirTree + pdbid + "_aagraph.gml";
+                    if(writeStringToFile(aagFile, aag.toGraphModellingLanguageFormat())) {
+                        if(! silent) {
+                            System.out.println("  AAGraph for all chains written to file '" + aagFile + "'.");
+                        }
+                    }
+                    else {
+                        System.err.println("ERROR: Could not write AAGraph for all chains to file '" + aagFile + "'.");
+                    }
+
+                    // write the AA contact statistics matrix (by AA type, not single AA)
+                    String aaMatrixFile = outputDir + fs + subDirTree + pdbid + "_aatypematrix.gml";
+                    if(writeStringToFile(aaMatrixFile, aag.getAminoAcidTypeInteractionMatrixGML())) {
+                        if(! silent) {
+                            System.out.println("  AA type contact stats matrix for all chains written to file '" + aaMatrixFile + "'.");
+                        }
+                    }
+                    else {
+                        System.err.println("ERROR: Could not write AA type contact stats matrix for all chains to file '" + aaMatrixFile + "'.");
+                    }
+
+
+                }
+
+
             }
                         
             
