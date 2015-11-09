@@ -1735,6 +1735,13 @@ public class Main {
                 if(! silent) {
                     System.out.println("Computing amino acid level contact graph for all chains combined.");
                 }
+                
+                //DEBUG
+                //for(Residue r : residues) {
+                //    if(r.isOtherRes()) {System.out.println("##########OTHER! type="+ r.getType() ); }
+                //    else { System.out.println("###########SSE: " + r.getNonEmptySSEString() + " type=" + r.getType()); }
+                //}
+                
                 AAGraph aag = new AAGraph(residues, cInfo);
                 aag.setPdbid(pdbid);
                 aag.setChainid(AAGraph.CHAINID_ALL_CHAINS);
@@ -5341,7 +5348,7 @@ public class Main {
 
     
     /**
-     * Creates all SSEs according to DSSP definition from a list of residues. The list is expected to be ordered like in the DSSP file.
+     * Creates all SSEs according to DSSP definition from a list of residues. The list is expected to be ordered like in the DSSP file. (Note that residues which are no alpha helix or beta strand are not assigned to any SSE default. You can change this in the settings by settings, see the 'plcc_B_include_coils' option.)
      * @param resList the residue list to consider
      * @return a list of secondary structure elements (SSEs)
      */

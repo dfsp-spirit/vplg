@@ -296,6 +296,10 @@ public class FileParser {
     }
 
 
+    /**
+     * Parses all data, goes through all the lines and calls the appropriate function to handle each line.
+     * @return ignore
+     */
     private static Boolean parseData() {
 
         if(! FileParser.silent) {
@@ -457,7 +461,10 @@ public class FileParser {
     
 
 
-    // handle PDB MODEL lines
+    /**
+     * Handles PDB MODEL lines.
+     * @return ignored
+     */
     private static boolean handlePdbLineMODEL() {
         // Now handled by function createAllModelsFromPdbData() because the models have to exist
         //  before we create the other stuff (atoms, residues, etc.) so we can assign the models to them.
@@ -1302,6 +1309,9 @@ public class FileParser {
     }
 
 
+    /**
+     * Parses the DSSP data and creates the residue list from it.
+     */
     private static void createAllResiduesFromDsspData() {
 
         String dLine;
@@ -1384,7 +1394,7 @@ public class FileParser {
                         }
                     }
                 } catch (Exception e) {
-                    DP.getInstance().w("Something is fishy with residue in line " + dLineNum + " of the DSSP file: '" + e.getMessage() + "'.");
+                    DP.getInstance().w("Something is fishy with residue in line " + dLineNum + " of the DSSP file: '" + e.getMessage() + "'. Sulfur bridge trouble?");
                 }
                 
 
@@ -1442,6 +1452,9 @@ public class FileParser {
         }
     }
 
+    /**
+     * Parses the PDB data and creates the ligand list from it.
+     */
     private static Integer createAllLigandResiduesFromPdbData() {
 
         Integer curLigNum = 0;
