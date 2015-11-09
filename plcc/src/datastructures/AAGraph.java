@@ -23,7 +23,7 @@ import proteinstructure.Residue;
 public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphModellingLanguageFormat {
     
     
-    public static final String CHAINID_ALL_CHAINS = "ALL_CHAINS";
+    public static final String CHAINID_ALL_CHAINS = "ALL";
     
     /** PDB identifier. */
     private String pdbid;

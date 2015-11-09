@@ -8706,6 +8706,54 @@ connection.close();
         return(result);
     }
     
+
+    
+    /**
+     * Writes an Amino acid graph to the database. Currently only writes few fields, can be extended later.
+     * @param pdb_id the PDB ID
+     * @param chain_description a chain description. "ALL" for all-chains graph, the chain name otherwise.
+     * @param aagraph_string_gml the GML string of the graph
+     * @return ignore
+     * @throws SQLException if DB stuff went wrong
+     */
+    public static Boolean writeAminoAcidGraphToDB(String pdb_id, String chain_description, String aagraph_string_gml) throws SQLException {
+                       
+        PreparedStatement statement = null;
+        Boolean result;
+        String query = "INSERT INTO " + tbl_aagraph + " (pdb_id, chain_description, aagraph_string_gml) VALUES (?, ?, ?);";
+
+        
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setString(1, pdb_id);
+            statement.setString(2, chain_description);
+            statement.setString(3, aagraph_string_gml);
+                                
+            statement.executeUpdate();
+            //dbc.commit();
+            result = true;
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: writeAminoAcidGraphToDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: writeAminoAcidGraphToDB Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: writeAminoAcidGraphToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+            result = false;
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            //dbc.setAutoCommit(true);
+        }
+        return(result);
+    }
+    
     
 
     /**

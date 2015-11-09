@@ -1755,7 +1755,19 @@ public class Main {
                     }
                 }
                 
-                // write the AA graph
+                if(Settings.getBoolean("plcc_B_useDB")) {
+                    try {
+                        DBManager.writeAminoAcidGraphToDB(pdbid, AAGraph.CHAINID_ALL_CHAINS, aag.toGraphModellingLanguageFormat());
+                        if(! silent) {
+                            System.out.println("Wrote all chains AA graph of " + pdbid + " to DB.");
+                        }
+                    } catch(SQLException e) {
+                        DP.getInstance().w("Main", "Could not write all chains AA graph to DB: '" + e.getMessage() + "'.");
+                    }
+                } 
+                        
+                
+                // write the AA graph to disc
                 String aagFile = outputDir + fs + subDirTree + pdbid + "_aagraph.gml";
                 if(writeStringToFile(aagFile, aag.toGraphModellingLanguageFormat())) {
                     if(! silent) {
@@ -1816,6 +1828,17 @@ public class Main {
                         AAGraph aag = new AAGraph(c.getResidues(), cInfoThisChain);
                         aag.setPdbid(pdbid);
                         aag.setChainid(c.getPdbChainID());
+                        
+                        if(Settings.getBoolean("plcc_B_useDB")) {
+                            try {
+                                DBManager.writeAminoAcidGraphToDB(pdbid, c.getPdbChainID(), aag.toGraphModellingLanguageFormat());
+                                if(! silent) {
+                                    System.out.println("Wrote chain '" + c.getPdbChainID() + "' AA graph of " + pdbid + " to DB.");
+                                }
+                            } catch(SQLException e) {
+                                DP.getInstance().w("Main", "Could not write chain '" + c.getPdbChainID() + "' AA graph to DB: '" + e.getMessage() + "'.");
+                            }
+                        } 
                         
                         // write AA graph
                         String aagFile = outputDir + fs + pdbid + "_aagraph_chain_" + c.getPdbChainID() + ".gml";
