@@ -345,6 +345,12 @@ int GraphPTGLPrinter::saveCountsToDatabasePGXX(int graphtype_int, std::vector<st
     }
 }
 
+
+/* Retrieves the ID of the graph from the ptgl
+ * @param <string> PDB-ID
+ * @param <string> Chain
+ * @param <int> graphtype
+ * @return <long> graph ID */
 long GraphPTGLPrinter::getGraphDatabaseID(string pdbid, string chain, int graphType) const {
     
     long id = -1;
@@ -379,6 +385,11 @@ long GraphPTGLPrinter::getGraphDatabaseID(string pdbid, string chain, int graphT
     return id;
 }
 
+/* Checks whether graphlets ahve already been computed for a given graph.
+ * Returns -1 if no graphlets were computed.
+ * 
+ * @param <unsigned loong int> Graph ID
+ * @return <int>  */
 int GraphPTGLPrinter::databaseContainsGraphletsForGraph(unsigned long int databaseIDofGraph) const {
 
     Database db = Database::getInstance();
@@ -456,6 +467,9 @@ void GraphPTGLPrinter::saveCountsInNovaFormat(std::string graphName, std::vector
     }
 }
 
+/* Delete the graphlet count entry for a given graph
+ * @param <unsigned long int> Graph ID
+ * @return <void> */
 void GraphPTGLPrinter::deleteGraphletCountEntryForGraph(unsigned long int databaseIDofGraph) {
     Database db = Database::getInstance();
     string connection_string = db.get_connect_string();
@@ -477,6 +491,8 @@ void GraphPTGLPrinter::deleteGraphletCountEntryForGraph(unsigned long int databa
         cerr << apptag << "SQL trouble when checking for graphlet entry for graph in DB: '" << e.what() << "'." << endl;
     }
 }
+
+/* test connection to database */
 int GraphPTGLPrinter::testDatabasePGXX() {
 
     if( ! silent) {

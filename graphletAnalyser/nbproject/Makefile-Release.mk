@@ -21,7 +21,7 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-Linux-x86
+CND_PLATFORM=GNU-Linux
 CND_DLIB_EXT=so
 CND_CONF=Release
 CND_DISTDIR=dist
@@ -56,6 +56,21 @@ TESTFILES= \
 	${TESTDIR}/TestFiles/f1 \
 	${TESTDIR}/TestFiles/f4 \
 	${TESTDIR}/TestFiles/f5
+
+# Test Object Files
+TESTOBJECTFILES= \
+	${TESTDIR}/tests/newtestclass.o \
+	${TESTDIR}/tests/newtestclass1.o \
+	${TESTDIR}/tests/newtestclass2.o \
+	${TESTDIR}/tests/newtestclass3.o \
+	${TESTDIR}/tests/newtestclass4.o \
+	${TESTDIR}/tests/newtestclass5.o \
+	${TESTDIR}/tests/newtestrunner.o \
+	${TESTDIR}/tests/newtestrunner1.o \
+	${TESTDIR}/tests/newtestrunner2.o \
+	${TESTDIR}/tests/newtestrunner3.o \
+	${TESTDIR}/tests/newtestrunner4.o \
+	${TESTDIR}/tests/newtestrunner5.o
 
 # C Compiler Flags
 CFLAGS=
@@ -130,7 +145,9 @@ ${OBJECTDIR}/main.o: main.cpp
 .build-subprojects:
 
 # Build Test Targets
-.build-tests-conf: .build-conf ${TESTFILES}
+.build-tests-conf: .build-tests-subprojects .build-conf ${TESTFILES}
+.build-tests-subprojects:
+
 ${TESTDIR}/TestFiles/f3: ${TESTDIR}/tests/newtestclass2.o ${TESTDIR}/tests/newtestrunner2.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc}   -o ${TESTDIR}/TestFiles/f3 $^ ${LDLIBSOPTIONS} `cppunit-config --libs`   

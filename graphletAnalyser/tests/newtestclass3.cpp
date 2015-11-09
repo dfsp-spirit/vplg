@@ -17,10 +17,10 @@ newtestclass3::~newtestclass3() {
 }
 
 void newtestclass3::setUp() {
-    test_string_float = "[1.,2.33,3.1049]";
+    test_string_float = "[1.0,2.33,3.1049]";
     test_string_int = "[1,2,3]";
     test_string_vec_int = "[[1,2,3],[],[1,2,3]]";
-    test_string_vec_float = "[[],[1.,2.33,3.1049],[1.,2.33,3.1049]]";
+    test_string_vec_float = "[[],[1.0,2.33,3.1049],[1.0,2.33,3.1049]]";
     test_string_info = "\"Graphname\" : \"myGraph\", \"Number of vertices\" : 42, \"Number of edges\" : 84,  \"Absolute Counts\" : {\"2-graphlets\" : [1], \"3-graphlets\" : [1,2], \"4-graphlets\" : [1,2,3], \"5-graphlets\" : [1,2,3,4]}, \"Normalized Counts\" :  {\"2-graphlets\" : [0.1], \"3-graphlets\" : [0.1,0.2],\"4-graphlets\" : [0.1,0.2,0.3], \"5-graphlets\" : null}}";
             
     

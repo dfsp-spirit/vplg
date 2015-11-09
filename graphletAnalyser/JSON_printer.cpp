@@ -24,6 +24,9 @@ std::string JSON_printer::print_float_vector(std::vector<float> vec) {
         //remove zeros from the end
         str_number = std::to_string(vec[i]);
         str_number.erase ( str_number.find_last_not_of('0') + 1, std::string::npos );
+        if (str_number.back() == '.') {
+            str_number = str_number + "0";
+        }
  
         
         out_string = out_string + str_number;
@@ -102,7 +105,10 @@ std::string JSON_printer::print_vectors_with_info(std::string graph_name, int nu
     std::vector<float> four_graphletsNORM = rel_counts[2];
     std::vector<float> five_graphletsNORM = rel_counts[3];
     
-    std::string out_str = "{ \"Graphname\" : " + graph_name + ", \"Number of vertices\" : " +  std::to_string(num_nodes) + ", ";
+    std::string quot_marks = "\"";
+    
+    
+    std::string out_str = "{ \"Graphname\" : " + quot_marks + graph_name + quot_marks + ", \"Number of vertices\" : " +  std::to_string(num_nodes) + ", ";
     out_str = out_str + "\"Number of edges\" : " + std::to_string(num_edges) + ", ";
     std::string abs_str = "\"Absolute Counts\" : { ";
     std::string norm_str = "\"Normalized Counts\" : { ";

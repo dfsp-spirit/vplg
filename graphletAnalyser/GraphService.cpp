@@ -350,6 +350,9 @@ std::unordered_map<std::string, std::vector<int>> GraphService::get_labeled_abs_
 }
 
 
+//TODO: Fully implement get_labeled_norm_counts
+
+/* Should return the labeled normalized counts. Is not yet fully implemented */
 std::unordered_map<std::string, std::vector<float>> GraphService::get_labeled_norm_counts(std::string id, std::vector<std::string> patterns) {
     std::unordered_map<std::string,std::vector<float>> map = std::unordered_map<std::string, std::vector<float>>();
     

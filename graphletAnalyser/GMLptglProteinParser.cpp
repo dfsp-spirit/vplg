@@ -296,6 +296,7 @@ string GMLptglProteinParser::parse_value_string(const string& line) {
 	return label;
 }
 
+/* Returns the graph */
 Graph GMLptglProteinParser::getGraph() {
     return graph;
 }
