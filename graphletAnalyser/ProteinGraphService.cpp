@@ -14,9 +14,9 @@ ProteinGraphService::ProteinGraphService(const Graph& graph) {
     sse_graphlets_tri = std::vector<std::string>();
     
     sse_graphlets_2p.push_back("HH");
-    sse_graphlets_2p.push_back("HE");
     sse_graphlets_2p.push_back("HL");
     sse_graphlets_2p.push_back("EE");
+    sse_graphlets_2p.push_back("HE");
     sse_graphlets_2p.push_back("EL");
     sse_graphlets_2p.push_back("LL");
     

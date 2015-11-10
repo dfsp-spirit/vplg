@@ -258,6 +258,34 @@ void newtestclass::test_get_norm_counts() {
     CPPUNIT_ASSERT(service2.get_norm_counts() == test_count_vector_float);
 }
 
+void newtestclass::test_reverse_string() {
+    CPPUNIT_ASSERT(service1.reverse_string(test_string) == test_rev_set);
+}
+
+void newtestclass::test_compute_CAT() {
+    
+    CPPUNIT_ASSERT(service1.compute_CAT(test_string) == test_CAT_set);
+}
+
+void newtestclass::test_get_2_patterns() {
+    test_2p_vec = std::vector<std::string>();
+    test_2p_vec.push_back("AA");
+    test_2p_vec.push_back("AB");
+    test_2p_vec.push_back("AC");
+    test_2p_vec.push_back("BB");
+    test_2p_vec.push_back("BC");
+    test_2p_vec.push_back("CC");
+    
+    std::vector<std::string> t_vec = service1.get_length_2_patterns(test_string);
+    
+    
+    
+    
+    
+    CPPUNIT_ASSERT(t_vec == test_2p_vec);
+    
+}
+
 void newtestclass::test_get_labeled_abs_counts() {
     CPPUNIT_ASSERT(true);
 }

@@ -26,7 +26,7 @@ GMLptglProteinParser::GMLptglProteinParser() {
  * Constructor for the Parser, creates graph Objects from GML files in the
  * format of the ptgl
  * @param string gmlFile -- a GML file in the ptgl format */
-GMLptglProteinParser::GMLptglProteinParser(const string& gmlFile) {
+GMLptglProteinParser::GMLptglProteinParser(const string& gmlFile, const std::string vertex_type_field) {
     bool print = verbose;
     
     string name = gmlFile;        
@@ -136,9 +136,9 @@ GMLptglProteinParser::GMLptglProteinParser(const string& gmlFile) {
                         if (key == "id") {
                             vi.id = atoi(value.c_str());
                         }
-			else if (key == "sse_type") {
-                            vi.properties["sse_type"] = parse_value_string(line);
-                            vi.label = vi.properties["sse_type"];
+			else if (key == vertex_type_field) {
+                            vi.properties[vertex_type_field] = parse_value_string(line);
+                            vi.label = vi.properties[vertex_type_field];
                         }
                         else if (key == "label") {
                             vi.properties["label"] = parse_value_string(line);

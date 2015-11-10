@@ -110,8 +110,10 @@ void fill_settings_default() {
 	options["output_counts_nova"] = "yes";
 	options["output_counts_database"] = "no";
         options["graph_vertex_type_field"] = "sse_type";
+        options["graph_vertex_type_alphabet"] = "HEL";
         options["output_counts_JSON"] = "yes";
         options["output_labeled_counts_JSON"] = "yes";
+        
 }
 
 /*********************************************************
@@ -332,7 +334,6 @@ int main(int argc, char** argv) {
     
     
     //TODO:
-    //Add JSON as output format
     //
     //modify get_norm_counts in way that enables them to be returned in a readable and
     //understandable way
@@ -354,8 +355,17 @@ int main(int argc, char** argv) {
             continue;
         }
         
+        
+        //choose label to look for from cfg file or default settings
+        std::string vertex_label = options["graph_vertex_type_field"];
+        
+        
+        // TODO: finish computation of length 3 labels
+        // TODO: enable fetching of alphabet from cfg file
+        // TODO: change main to reflect above changes
+        
         // construct protein graph by parsing gml file
-        GMLptglProteinParser Parser(files[i]);
+        GMLptglProteinParser Parser(files[i], vertex_label);
         Graph graph;
         graph = Parser.getGraph();
         ProteinGraphService service;
@@ -449,7 +459,21 @@ int main(int argc, char** argv) {
         
         if (withLabeled) {
             
-            norm_labeled_counts = service.get_norm_ptgl_counts_1dim();
+            //when the sse_type is used as a label, use the hardcoded label vectors
+            //from ProteinGraphService
+            if (vertex_label.compare("sse_type") == 0) {
+                norm_labeled_counts = service.get_norm_ptgl_counts_1dim();
+            }
+            else {
+                // if the sse type is not used as a label...
+                
+                // get the alphabet from the config file
+                std::string sigma = options["graph_vertex_type_alphabet"];
+                
+                
+                
+                
+            }
         }
 	     
         if( ! silent) {

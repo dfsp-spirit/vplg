@@ -30,6 +30,9 @@ class newtestclass : public CPPUNIT_NS::TestFixture {
     CPPUNIT_TEST(test_get_labeled_norm_counts);
     CPPUNIT_TEST(test_get_graphlet_identifier);
     CPPUNIT_TEST(test_get_patterns);
+    CPPUNIT_TEST(test_compute_CAT);
+    CPPUNIT_TEST(test_reverse_string);
+    CPPUNIT_TEST(test_get_2_patterns);
     
     CPPUNIT_TEST_SUITE_END();
 
@@ -55,6 +58,10 @@ private:
     std::vector<std::vector<int>> test_adj_all_vector;
     std::vector<std::vector<int>> test_count_vector_int;
     std::vector<std::vector<float>> test_count_vector_float;
+    std::string test_string = "ABC";
+    std::set<std::string> test_rev_set = {"ABC", "CBA"};
+    std::set<std::string> test_CAT_set = {"ABC", "BCA", "CAB"};
+    std::vector<std::string> test_2p_vec;
 
     void test_get_label();
     void test_getPropertyValue();
@@ -72,6 +79,9 @@ private:
     void test_get_labeled_norm_counts();
     void test_get_graphlet_identifier();
     void test_get_patterns();
+    void test_compute_CAT();
+    void test_reverse_string();
+    void test_get_2_patterns();
 };
 
 #endif	/* NEWTESTCLASS_H */

@@ -28,7 +28,7 @@ class GMLptglProteinParser {
         
         //constructors
         GMLptglProteinParser();
-        GMLptglProteinParser(const std::string&);
+        GMLptglProteinParser(const std::string&, const std::string);
         
         Graph getGraph();
         

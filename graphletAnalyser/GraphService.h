@@ -96,6 +96,10 @@ public:
     std::unordered_map<std::string, std::vector<float>> get_labeled_norm_counts(std::string id, std::vector<std::string> patterns);
     std::string get_graphlet_identifier();
     std::vector<std::string> get_patterns();
+    std::set<std::string> compute_CAT(std::string word);
+    std::set<std::string> reverse_string(std::string word);
+    std::vector<std::string> get_length_2_patterns(std::string sig);
+    std::vector<std::vector<std::string>> get_length_3_patterns(std::string sig);
     GraphService & operator=(const GraphService & serv);
 };
 

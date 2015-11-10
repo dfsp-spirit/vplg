@@ -386,3 +386,74 @@ GraphService & GraphService::operator =(const GraphService & serv) {
     graphlet_patterns = std::vector<std::string>();
     return *this;
 }
+
+/* Finds all cyclic permutations for a given word */
+std::set<std::string> GraphService::compute_CAT(std::string word) {
+    
+    std::set<std::string> words = std::set<std::string>();
+    std::string word2 = word + word;
+    std::string cat_word = "";
+    
+    for (int i = 0; i < word.size(); i++) {
+        cat_word = word2.substr (i, word.size());
+                
+        words.insert(cat_word);
+    }
+    
+    return words;
+}
+
+std::set<std::string> GraphService::reverse_string(std::string word) {
+    
+    std::set<std::string> words = std::set<std::string>();
+    words.insert(word);
+    std::string word2 = "";
+    
+   
+    
+    for (auto i = word.rbegin(); i != word.rend(); ++i) {
+        word2 = word2 + *i;
+    }
+    words.insert(word2);
+    return words;
+    
+}
+
+/* returns all possible patterns of length 2 for a given string, which
+ * represents an alphabet
+ * @param std::string sig - the alphabet
+ * @return std::vector<std::string> all pairs from the alphabet */
+std::vector<std::string> GraphService::get_length_2_patterns(std::string sig) {
+    std::vector<std::string> out_vec = std::vector<std::string>();
+    for (int i = 0; i < sig.size(); i++) {
+        std::string pat_2 = sig.substr(i,1);
+        std::string pat_21 = pat_2 + pat_2;
+        out_vec.push_back(pat_21);
+        for (int k = i + 1; k < sig.size(); k++) {
+            std::string pat_22 = pat_2 + sig.substr(k,1);
+            out_vec.push_back(pat_22);
+        }
+        
+        
+    }
+    
+    return out_vec;
+}
+
+/* returns all possible patterns of length 3 (for triangle and 3-path) for 
+ * a given string - analog to get_length_2_patterns */
+std::vector<std::vector<std::string>> GraphService::get_length_3_patterns(std::string sig) {
+    std::vector<std::string> vec_3p = std::vector<std::string>(); // for 3-path
+    std::vector<std::string> vec_tri = std::vector<std::string>(); // for triangle pattern
+    
+    for (int i = 0; i<sig.size(); i++) {
+        std::string prefix = sig.substr(i,1);
+        
+        
+        
+        
+        
+    }
+    
+    
+}
