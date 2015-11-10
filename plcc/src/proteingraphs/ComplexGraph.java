@@ -181,7 +181,9 @@ public class ComplexGraph extends UAdjListGraph {
                 Logger.getLogger(ComplexGraph.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        System.out.println("    SSE Contacts written to DB: " + countInsert + " inserted, " + countFail + " skipped (contact involved coils).");
+        if(! Settings.getBoolean("plcc_B_silent")) {
+            System.out.println("    SSE Contacts written to DB: " + countInsert + " inserted, " + countFail + " skipped (contact involved coils).");
+        }
     }
 
     /**
@@ -534,7 +536,7 @@ public class ComplexGraph extends UAdjListGraph {
             }
             iChainID = -1;
             String edgesString = cg.proteinNodeMap.toString();
-            System.out.println("DrawChainLevelCG: edgesString is '" + edgesString + "'.");
+            //System.out.println("DrawChainLevelCG: edgesString is '" + edgesString + "'.");
             
             
 

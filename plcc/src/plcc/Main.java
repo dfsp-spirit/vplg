@@ -2006,6 +2006,7 @@ public class Main {
             }
         }
         if(! silent) {
+            System.out.println("(Was all the output too much clutter? Try the '--silent' command line option.)");
             System.out.println("All done, exiting.");
         }
         System.exit(0);
@@ -2914,7 +2915,9 @@ public class Main {
                 //tmpMacroMol.put("pdb_ec_number", pmi.getECNumber());
                 try {
                     DBManager.writeMacromoleculeToDB(pdbid, mol.get("pdb_mol_id"), mol.get("pdb_mol_name"), mol.get("pdb_ec_number"), mol.get("pdb_org_sci"), mol.get("pdb_org_common"), mol.get("pdb_all_chains"));
-                    System.out.println("  Macromolecule '" + mol.get("pdb_mol_name") + "' with PDB MOL_ID '" + mol.get("pdb_mol_id") + "' written to database. Consists of chains '" + mol.get("pdb_all_chains") + "'.");
+                    if( ! silent) {
+                        System.out.println("  Macromolecule '" + mol.get("pdb_mol_name") + "' with PDB MOL_ID '" + mol.get("pdb_mol_id") + "' written to database. Consists of chains '" + mol.get("pdb_all_chains") + "'.");
+                    }
                 } catch(Exception e) {
                     DP.getInstance().e("Main", "Failed to write macromolecule to database: '" + e.getMessage() + "'.");
                 }
