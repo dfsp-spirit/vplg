@@ -1170,7 +1170,7 @@ public class Main {
                     if(! silent) {
                         System.out.println("Computing pairwise graphlet similarities for all complex graphs in the database. This will take a lot of time and memory for large databases...");
                     }
-                    Long[] res = DBManager.computeGraphletSimilarityScoresForPGsWholeDatabaseAndStoreBest(ProtGraph.GRAPHTYPE_ALBE, Settings.getInteger("plcc_I_compute_all_graphlet_similarities_num_to_save_in_db"));
+                    Long[] res = DBManager.computeGraphletSimilarityScoresForCGsWholeDatabaseAndStoreBest(Settings.getInteger("plcc_I_compute_all_graphlet_similarities_num_to_save_in_db"));
                     // numChainsFound, numGraphletsFound, numScoresComputed, numScoresSaved
                     if(! silent) {
                         System.out.println("  Done. Found " + res[0] + " CGs and " + res[1] + " graphlet counts for them in the DB. Computed " + res[2] + " similarity scores and saved " + res[3] + " of them to the DB.");
@@ -1185,10 +1185,10 @@ public class Main {
                     if(! silent) {
                         System.out.println("Computing pairwise graphlet similarities for all amino acid graphs in the database. This will take a lot of time and memory for large databases...");
                     }
-                    Long[] res = DBManager.computeGraphletSimilarityScoresForPGsWholeDatabaseAndStoreBest(ProtGraph.GRAPHTYPE_ALBE, Settings.getInteger("plcc_I_compute_all_graphlet_similarities_num_to_save_in_db"));
+                    Long[] res = DBManager.computeGraphletSimilarityScoresForAAGsWholeDatabaseAndStoreBest(Settings.getInteger("plcc_I_compute_all_graphlet_similarities_num_to_save_in_db"));
                     // numChainsFound, numGraphletsFound, numScoresComputed, numScoresSaved
                     if(! silent) {
-                        System.out.println("  Done. Found " + res[0] + " chains and " + res[1] + " graphlet counts for them in the DB. Computed " + res[2] + " similarity scores and saved " + res[3] + " of them to the DB.");
+                        System.out.println("  Done. Found " + res[0] + " AAGs and " + res[1] + " graphlet counts for them in the DB. Computed " + res[2] + " similarity scores and saved " + res[3] + " of them to the DB.");
                     }
                     if( ! DBManager.getAutoCommit()) {
                         DBManager.commit();

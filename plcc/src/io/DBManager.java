@@ -612,6 +612,122 @@ public class DBManager {
         return new Long[]{ numPDBsFound, numGraphletsFound, numScoresComputed, numScoresSaved };
     }
     
+    
+    /**
+     * Computes the pairwise graphlet similarity scores between all amino acid graphs in the DB. Note that graphlet counts for all the graphs have already to exist in the database (written there by GraphletAnalyzer)!
+     * Also note that this function is gonna take a lot of time AND use a lot of memory if you have a large DB.
+     * 
+     * @param numberOfTopScoresToSavePerPair all pairwise scores are computes, but you may want to keep only the 10 most similar scores. That is what this is for. If you set it to null, all scores will be kept, which may leave you with a vast database filled with mainly useless stuff.
+     * @return a long array of size 3: first position holds the number of chains found in the DB, second holds number of graphlet counts found in DB for these chains, third holds number of computed scores (or PG pairs), fourth holds the number of scores stored in the database
+     */
+    public static Long[] computeGraphletSimilarityScoresForAAGsWholeDatabaseAndStoreBest(Integer numberOfTopScoresToSavePerPair) {
+                
+        
+        Long numScoresComputed = 0L;
+        Long numScoresSaved = 0L;
+        List<String> allPDBs = DBManager.getAllPDBIDsInTheDB(); // more than 100k chains with full PDB in database
+        
+        Long numPDBsFound = ((Integer)allPDBs.size()).longValue();
+        Long numGraphletsFound = 0L;
+        
+        Double[] src_graphlets, cmp_graphlets;
+        
+        String src_pdb_id, cmp_pdb_id;
+        Double[] src_scores;
+        for(int i = 0; i < allPDBs.size(); i++) {
+            src_pdb_id = allPDBs.get(i);
+            src_scores = new Double[allPDBs.size()];
+            src_graphlets = null;
+            
+            
+            // some status output never hurts
+            if(i % 5 == 0) {
+                System.out.println("  At PDB #" + i + " of " + allPDBs.size() + " amino acid graphs (PDB files).");
+            }
+            
+            
+            try {
+                src_graphlets = DBManager.getNormalizedAminoacidgraphGraphletCounts(src_pdb_id);            
+            }
+            catch(SQLException e) {
+                DP.getInstance().e("DBManager", "Could not get src_graphlets for amino acid graph with PDB ID " + src_pdb_id + ": '" + e.getMessage() + "', skipping.");
+                continue;
+            }
+            
+            if(src_graphlets == null) { 
+                continue;
+            }
+            else {
+                numGraphletsFound++;
+            }
+            
+            
+            for(int j = 0; j < allPDBs.size(); j++) {
+                cmp_pdb_id = allPDBs.get(j);
+                cmp_graphlets = null;
+                
+                if(i == j) {
+                    continue;
+                }
+                
+              
+                
+                try {
+                    cmp_graphlets = DBManager.getNormalizedAminoacidgraphGraphletCounts(cmp_pdb_id);
+                }
+                catch(SQLException e) {
+                    DP.getInstance().e("DBManager", "Could not get cmp_graphlets for amino acid graph " + cmp_pdb_id + " : '" + e.getMessage() + "', skipping.");                    
+                }
+                
+                if(cmp_graphlets == null) {  
+                    src_scores[j] = null; 
+                }
+                else {        
+                    numGraphletsFound++;
+                    src_scores[j] = SimilarityByGraphlets.getRelativeGraphletFrequencyDistanceNormalized(src_graphlets, cmp_graphlets);
+                    numScoresComputed++;
+                }
+            }
+            
+            // Now we have a long list of score for src_pdb_id and src_chain_name. Sort it and write best to the database.
+            String[] allPDBIDs = new String[allPDBs.size()];
+            for(int k = 0; k < allPDBs.size(); k++) {
+                allPDBIDs[k] = allPDBs.get(k);
+            }
+            
+            Double scoreTooLarge = 1000.0;
+            PlccUtilities.replaceNullValuesInArrayWith(src_scores, scoreTooLarge);
+            PlccUtilities.multiQuickSortTS(src_scores, allPDBIDs);
+            
+            if(numberOfTopScoresToSavePerPair == null) {
+                numberOfTopScoresToSavePerPair = allPDBIDs.length;
+            }
+            
+            if(numberOfTopScoresToSavePerPair > allPDBIDs.length) {
+                numberOfTopScoresToSavePerPair = allPDBIDs.length;
+            }
+            
+            System.out.println("Similarity of all amino acid graphs to " + src_pdb_id + ":");
+            for(int k = 0; k < numberOfTopScoresToSavePerPair; k++) {
+                if(src_scores[k] != null) {
+                    if(src_scores[k] < scoreTooLarge) {
+                        System.out.println("  #" + k + ": " + allPDBIDs[k] + " with score " + src_scores[k] + ".");
+                        try {
+                            DBManager.writeAAGGraphletSimilarityScoreToDB(src_pdb_id, allPDBIDs[k], src_scores[k]);
+                        } catch (SQLException e) {
+                            System.err.println("Could not write amino acid graph graphlet similarity score to DB: '" + e.getMessage() + "'.");
+                        }
+                        numScoresSaved++;
+                    }
+                }
+            }
+            
+        }
+        
+        return new Long[]{ numPDBsFound, numGraphletsFound, numScoresComputed, numScoresSaved };
+    }
+    
+    
     /**
      * Checks whether a DB connection exists. Tries to establish it if not.
      * @return: Whether a DB connection could be established in the end.
@@ -8485,6 +8601,54 @@ connection.close();
     
     
     
+    
+    /**
+     * Deletes all graphlet similarity entries for a amino acid graph pair from the plcc database tables.
+     * @param source_aagraph_id the source graph id
+     * @param target_aagraph_id the target graph id
+     * @return The number of affected records (0 if the PDB ID was not in the database).
+     */
+    public static Integer deleteGraphletSimilaritiesFromDBForAminoacidGraphs(Long source_aagraph_id, Long target_aagraph_id) {
+
+        PreparedStatement statement = null;        
+        ResultSetMetaData md;
+        int count = 0;        
+        ResultSet rs = null;
+        
+        
+        String query = "DELETE FROM " + tbl_graphletsimilarity_aa + " gs WHERE ( gs.aagraphletsimilarity_sourcegraph = ? AND gs.aagraphletsimilarity_targetgraph = ? );";
+        
+        
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, source_aagraph_id);
+            statement.setLong(2, target_aagraph_id);
+              
+            
+            count = statement.executeUpdate();
+            //dbc.commit();
+            
+            //md = rs.getMetaData();
+            //count = md.getColumnCount();
+            
+            
+        } catch (SQLException e) {
+            DP.getInstance().e("DBManager", "deleteGraphletSimilaritiesFromDBForAminoacidGraphs: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                //dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "deleteGraphletSimilaritiesFromDBForAminoacidGraphs: Could not close statement and reset autocommit."); }
+        }
+        
+
+        return (count);
+    }
+    
     /**
      * Deletes all graphlet similarity entries for a source protein graph from the plcc database tables. Note that this function does NOT delete the entries where this graph is the target graph.
      * @param source_graph_id the source graph id
@@ -10720,14 +10884,14 @@ connection.close();
      * @throws SQLException if something went wrong
      */
     public static Boolean writePGGraphletSimilarityScoreToDB(String src_pdb_id, String src_chain_name, String tgt_pdb_id, String tgt_chain_name, String graph_type, Double score) throws SQLException {
-        Long src_graph_id = DBManager.getDBProteinGraphID(src_pdb_id, src_chain_name, graph_type);
-        Long tgt_graph_id = DBManager.getDBProteinGraphID(tgt_pdb_id, tgt_chain_name, graph_type);
+        Long src_proteingraph_id = DBManager.getDBProteinGraphID(src_pdb_id, src_chain_name, graph_type);
+        Long tgt_proteingraph_id = DBManager.getDBProteinGraphID(tgt_pdb_id, tgt_chain_name, graph_type);
         
-        if(src_graph_id < 0 || tgt_graph_id < 0) {
+        if(src_proteingraph_id < 0 || tgt_proteingraph_id < 0) {
             return false;
         }
         
-        return DBManager.writePGGraphletSimilarityScoreToDB(src_graph_id, tgt_graph_id, score);
+        return DBManager.writePGGraphletSimilarityScoreToDB(src_proteingraph_id, tgt_proteingraph_id, score);
     }
     
     /**
@@ -10739,14 +10903,33 @@ connection.close();
      * @throws SQLException if something went wrong
      */
     public static Boolean writeCGGraphletSimilarityScoreToDB(String src_pdb_id, String tgt_pdb_id, Double score) throws SQLException {
-        Long src_graph_id = DBManager.getDBComplexgraphID(src_pdb_id);
-        Long tgt_graph_id = DBManager.getDBComplexgraphID(tgt_pdb_id);
+        Long src_complexgraph_id = DBManager.getDBComplexgraphID(src_pdb_id);
+        Long tgt_complexgraph_id = DBManager.getDBComplexgraphID(tgt_pdb_id);
         
-        if(src_graph_id < 0 || tgt_graph_id < 0) {
+        if(src_complexgraph_id < 0 || tgt_complexgraph_id < 0) {
             return false;
         }
         
-        return DBManager.writeCGGraphletSimilarityScoreToDB(src_graph_id, tgt_graph_id, score);
+        return DBManager.writeCGGraphletSimilarityScoreToDB(src_complexgraph_id, tgt_complexgraph_id, score);
+    }
+    
+    /**
+     * Writes the graphlet similarity score to the DB for the given amino acid graph pair
+     * @param src_pdb_id the source graph PDB ID
+     * @param tgt_pdb_id the target graph PDB ID
+     * @param score the similarity score
+     * @return whether it worked out
+     * @throws SQLException if something went wrong
+     */
+    public static Boolean writeAAGGraphletSimilarityScoreToDB(String src_pdb_id, String tgt_pdb_id, Double score) throws SQLException {
+        Long src_aagraph_id = DBManager.getDBAminoacidgraphID(src_pdb_id);
+        Long tgt_aagraph_id = DBManager.getDBAminoacidgraphID(tgt_pdb_id);
+        
+        if(src_aagraph_id < 0 || tgt_aagraph_id < 0) {
+            return false;
+        }
+        
+        return DBManager.writeAAGGraphletSimilarityScoreToDB(src_aagraph_id, tgt_aagraph_id, score);
     }
     
     /**
@@ -10805,6 +10988,65 @@ connection.close();
                 
         return(result);
     }
+    
+    
+    /**
+     * Writes information on a graphlet similarity between two amino acid graphs to the DB.
+     * @param source_aminoacidgraph_id the first amino acid graph db id
+     * @param target_aminoacidgraph_id the second amino acid graph db id
+     * @param score the similarity score
+     * @return whether it worked out
+     * @throws java.sql.SQLException if something goes wrong with the DB
+     */
+    public static Boolean writeAAGGraphletSimilarityScoreToDB(Long source_aminoacidgraph_id, Long target_aminoacidgraph_id, Double score) throws SQLException {
+
+        
+
+        if (source_aminoacidgraph_id < 0 || target_aminoacidgraph_id < 0) {            
+            return (false);
+        }
+        
+        if(DBManager.graphletSimilarityScoreExistsInDBForAminoacidGraphs(source_aminoacidgraph_id, target_aminoacidgraph_id)) {
+            deleteGraphletSimilaritiesFromDBForAminoacidGraphs(source_aminoacidgraph_id, target_aminoacidgraph_id);
+        }
+
+        Boolean result = false;
+        PreparedStatement statement = null;
+
+        String query = "INSERT INTO " + tbl_graphletsimilarity_aa + " (aagraphletsimilarity_sourcegraph, aagraphletsimilarity_targetgraph, score) VALUES (?, ?, ?);";
+
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, source_aminoacidgraph_id);
+            statement.setLong(2, target_aminoacidgraph_id);
+            statement.setDouble(3, score);
+                                
+            statement.executeUpdate();
+            //dbc.commit();
+            result = true;
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: writeAAGGraphletSimilarityScoreToDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: writeAAGGraphletSimilarityScoreToDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: writeAAGGraphletSimilarityScoreToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+            result = false;
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            //dbc.setAutoCommit(true);
+        }
+                
+        return(result);
+    }
+    
     
     /**
      * Writes information on a graphlet similarity between two complex graphs to the DB.
@@ -12285,6 +12527,76 @@ connection.close();
     
     
     
+    /**
+     * Determines whether a graphlet similarity score entry exists in the DB for the given pair of amino acid graphs.
+     * @param source_aagraph_id the source graph id
+     * @param target_aagraph_id the target graph id
+     * @return true if it exists, false otherwise
+     */
+    public static synchronized Boolean graphletSimilarityScoreExistsInDBForAminoacidGraphs(Long source_aagraph_id, Long target_aagraph_id) {
+        
+        if(source_aagraph_id < 0 || target_aagraph_id < 0) {
+            return false;
+        }        
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT aagraphletsimilarity_id FROM " + tbl_graphletsimilarity_aa + " WHERE ( aagraphletsimilarity_sourcegraph = ? AND aagraphletsimilarity_targetgraph = ? );";
+
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, source_aagraph_id);
+            statement.setLong(2, target_aagraph_id);
+                                
+            rs = statement.executeQuery();
+            //dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "graphletSimilarityScoreExistsInDBForAminoacidGraphs:'" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                //dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "graphletSimilarityScoreExistsInDBForAminoacidGraphs: Could not close statement and reset autocommit."); }
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        if(tableData.size() >= 1) {            
+            return(true);     
+        }
+        else {
+            return(false);
+        }        
+    }
     
     
     /**
@@ -12871,16 +13183,16 @@ connection.close();
         Long graphid = DBManager.getDBComplexgraphID(pdb_id);
         
         if(graphid <= 0) {
-            DP.getInstance().e("DBManager", "getNormalizedGraphletCounts(): Could not find complex graph with pdb_id '" + pdb_id + "' in DB.");
+            DP.getInstance().e("DBManager", "getNormalizedComplexgraphGraphletCounts(): Could not find complex graph with pdb_id '" + pdb_id + "' in DB.");
             return null;
         }
 
-        String query = "SELECT graphlet_counts[0], graphlet_counts[1], graphlet_counts[2], graphlet_counts[3], graphlet_counts[4],"
-                + " graphlet_counts[5], graphlet_counts[6], graphlet_counts[7], graphlet_counts[8], graphlet_counts[9],"
-                + " graphlet_counts[10], graphlet_counts[11], graphlet_counts[12], graphlet_counts[13], graphlet_counts[14],"
-                + " graphlet_counts[15], graphlet_counts[16], graphlet_counts[17], graphlet_counts[18], graphlet_counts[19],"
-                + " graphlet_counts[20], graphlet_counts[21], graphlet_counts[22], graphlet_counts[23], graphlet_counts[24],"
-                + " graphlet_counts[25], graphlet_counts[26], graphlet_counts[27], graphlet_counts[28], graphlet_counts[29]"
+        String query = "SELECT complex_graphlet_counts[0], complex_graphlet_counts[1], complex_graphlet_counts[2], complex_graphlet_counts[3], complex_graphlet_counts[4],"
+                + " complex_graphlet_counts[5], complex_graphlet_counts[6], complex_graphlet_counts[7], complex_graphlet_counts[8], complex_graphlet_counts[9],"
+                + " complex_graphlet_counts[10], complex_graphlet_counts[11], complex_graphlet_counts[12], complex_graphlet_counts[13], complex_graphlet_counts[14],"
+                + " complex_graphlet_counts[15], complex_graphlet_counts[16], complex_graphlet_counts[17], complex_graphlet_counts[18], complex_graphlet_counts[19],"
+                + " complex_graphlet_counts[20], complex_graphlet_counts[21], complex_graphlet_counts[22], complex_graphlet_counts[23], complex_graphlet_counts[24],"
+                + " complex_graphlet_counts[25], complex_graphlet_counts[26], complex_graphlet_counts[27], complex_graphlet_counts[28], complex_graphlet_counts[29]"
                 + " FROM " + tbl_graphletcount_complex + " WHERE (complexgraph_id = ?);";
 
         try {
@@ -12944,6 +13256,112 @@ connection.close();
             }
             else {
                 DP.getInstance().e("DBManager", "getNormalizedComplexgraphGraphletCounts: No entry for graphlets of complex graph of PDB ID '" + pdb_id + "'.");
+                return(null);
+            }
+        }
+        else {
+            return(null);
+        }        
+    }
+    
+    
+    /**
+     * Retrieves the graphlet counts for the requested amino acid graph from the database. The graph is identified by its PDB ID.
+     * @param pdb_id the requested pdb ID, e.g. "1a0s"
+     * @return a Double array of the graphlet counts
+     * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
+     */
+    public static Double[] getNormalizedAminoacidgraphGraphletCounts(String pdb_id) throws SQLException {
+        
+        int numReqGraphletTypes = 30;
+        
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<Double>> tableData = new ArrayList<ArrayList<Double>>();
+        ArrayList<Double> rowData = null;
+        int count;
+        
+
+        
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        Long graphid = DBManager.getDBComplexgraphID(pdb_id);
+        
+        if(graphid <= 0) {
+            DP.getInstance().e("DBManager", "getNormalizedAminoacidgraphGraphletCounts(): Could not find complex graph with pdb_id '" + pdb_id + "' in DB.");
+            return null;
+        }
+
+        String query = "SELECT aa_graphlet_counts[0], aa_graphlet_counts[1], aa_graphlet_counts[2], aa_graphlet_counts[3], aa_graphlet_counts[4],"
+                + " aa_graphlet_counts[5], aa_graphlet_counts[6], aa_graphlet_counts[7], aa_graphlet_counts[8], aa_graphlet_counts[9],"
+                + " aa_graphlet_counts[10], aa_graphlet_counts[11], aa_graphlet_counts[12], aa_graphlet_counts[13], aa_graphlet_counts[14],"
+                + " aa_graphlet_counts[15], aa_graphlet_counts[16], aa_graphlet_counts[17], aa_graphlet_counts[18], aa_graphlet_counts[19],"
+                + " aa_graphlet_counts[20], aa_graphlet_counts[21], aa_graphlet_counts[22], aa_graphlet_counts[23], aa_graphlet_counts[24],"
+                + " aa_graphlet_counts[25], aa_graphlet_counts[26], aa_graphlet_counts[27], aa_graphlet_counts[28], aa_graphlet_counts[29]"
+                + " FROM " + tbl_graphletcount_aa + " WHERE (aagraph_id = ?);";
+
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, graphid);
+                                
+            rs = statement.executeQuery();
+            //dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<Double>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getDouble(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "getNormalizedAminoacidgraphGraphletCounts: Retrieval of graphlets failed: '" + e.getMessage() + "'.");
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            //dbc.setAutoCommit(true);
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        ArrayList<Double> rowGraphlets;
+        Double[] result = new Double[numReqGraphletTypes];        
+        if(tableData.size() >= 1) {
+            rowGraphlets = tableData.get(0);
+            if(rowGraphlets.size() > 0) {
+                if(rowGraphlets.size() == numReqGraphletTypes) {
+                    NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
+                    for(int i = 0; i < rowGraphlets.size(); i++) {
+                        try {
+                            // old, without locale: result[i] = Double.valueOf(rowGraphlets.get(i));
+                            result[i] = rowGraphlets.get(i);
+                        } catch(NumberFormatException ce) {
+                            DP.getInstance().e("DBManager", "getNormalizedAminoacidgraphGraphletCounts: Cast error. Could not cast entry for graphlets of amino acid graph of PDB ID '" + pdb_id + "' to Double.");
+                            return null;
+                        } 
+                    }
+                    return(result);
+                } else {
+                    DP.getInstance().e("DBManager", "getNormalizedAminoacidgraphGraphletCounts: Entry for graphlets of amino acid graph of PDB ID '" + pdb_id + "' has wrong size (found " + rowGraphlets.size() + ", expected " + numReqGraphletTypes + ").");
+                    return(null);
+                }                                
+            }
+            else {
+                DP.getInstance().e("DBManager", "getNormalizedAminoacidgraphGraphletCounts: No entry for graphlets of amino acid graph of PDB ID '" + pdb_id + "'.");
                 return(null);
             }
         }
