@@ -419,7 +419,28 @@ public class Main {
                     if(s.equals("--compute-whole-db-graphlet-similarities")) {
                         useFileFromCommandline = false;
                         Settings.set("plcc_B_useDB", "true");
-                        Settings.set("plcc_B_compute_all_graphlet_similarities", "true");                        
+                        Settings.set("plcc_B_compute_graphlet_similarities", "true");
+                        Settings.set("plcc_B_compute_graphlet_similarities_pg", "true");
+                        Settings.set("plcc_B_compute_graphlet_similarities_cg", "true");
+                        Settings.set("plcc_B_compute_graphlet_similarities_aag", "true");
+                    }
+                    if(s.equals("--compute-whole-db-graphlet-similarities-pg")) {
+                        useFileFromCommandline = false;
+                        Settings.set("plcc_B_useDB", "true");
+                        Settings.set("plcc_B_compute_graphlet_similarities", "true");
+                        Settings.set("plcc_B_compute_graphlet_similarities_pg", "true");
+                    }
+                    if(s.equals("--compute-whole-db-graphlet-similarities-cg")) {
+                        useFileFromCommandline = false;
+                        Settings.set("plcc_B_useDB", "true");
+                        Settings.set("plcc_B_compute_graphlet_similarities", "true");
+                        Settings.set("plcc_B_compute_graphlet_similarities_cg", "true");                        
+                    }
+                    if(s.equals("--compute-whole-db-graphlet-similarities-aag")) {
+                        useFileFromCommandline = false;
+                        Settings.set("plcc_B_useDB", "true");
+                        Settings.set("plcc_B_compute_graphlet_similarities", "true");
+                        Settings.set("plcc_B_compute_graphlet_similarities_aag", "true");;                        
                     }
                     
                     if(s.equals("--compute-graph-metrics")) {
@@ -1122,26 +1143,64 @@ public class Main {
             
         }
         
-        if(Settings.getBoolean("plcc_B_compute_all_graphlet_similarities")) {
-            
+        if(Settings.getBoolean("plcc_B_compute_graphlet_similarities")) {
+                        
             if(! silent) {
-                System.out.println("Computing pairwise graphlet similarities for all graphs in the database. This will take a lot of time and memory for large databases...");
+                System.out.println("Computing pairwise graphlet similarities.");
             }
             
             if(DBManager.initUsingDefaults()) {
-                Long[] res = DBManager.computeGraphletSimilarityScoresForWholeDatabaseAndStoreBest(ProtGraph.GRAPHTYPE_ALBE, Settings.getInteger("plcc_I_compute_all_graphlet_similarities_num_to_save_in_db"));
-                // numChainsFound, numGraphletsFound, numScoresComputed, numScoresSaved
-                if(! silent) {
-                    System.out.println("Done. Found " + res[0] + " chains and " + res[1] + " graphlet counts for them in the DB. Computed " + res[2] + " similarity scores and saved " + res[3] + " of them to the DB.");
+                // protein graphs
+                if(Settings.getBoolean("plcc_B_compute_graphlet_similarities_pg")) {
+                    if(! silent) {
+                        System.out.println("Computing pairwise graphlet similarities for all protein graphs in the database. This will take a lot of time and memory for large databases...");
+                    }
+                    Long[] res = DBManager.computeGraphletSimilarityScoresForPGsWholeDatabaseAndStoreBest(ProtGraph.GRAPHTYPE_ALBE, Settings.getInteger("plcc_I_compute_all_graphlet_similarities_num_to_save_in_db"));
+                    // numChainsFound, numGraphletsFound, numScoresComputed, numScoresSaved
+                    if(! silent) {
+                        System.out.println("  Done. Found " + res[0] + " PGs (used ALBE graph type) and " + res[1] + " graphlet counts for them in the DB. Computed " + res[2] + " similarity scores and saved " + res[3] + " of them to the DB.");
+                    }
+                    if( ! DBManager.getAutoCommit()) {
+                        DBManager.commit();
+                    }
                 }
-                if( ! DBManager.getAutoCommit()) {
-                    DBManager.commit();
+                
+                // complex graphs
+                if(Settings.getBoolean("plcc_B_compute_graphlet_similarities_cg")) {
+                    if(! silent) {
+                        System.out.println("Computing pairwise graphlet similarities for all complex graphs in the database. This will take a lot of time and memory for large databases...");
+                    }
+                    Long[] res = DBManager.computeGraphletSimilarityScoresForPGsWholeDatabaseAndStoreBest(ProtGraph.GRAPHTYPE_ALBE, Settings.getInteger("plcc_I_compute_all_graphlet_similarities_num_to_save_in_db"));
+                    // numChainsFound, numGraphletsFound, numScoresComputed, numScoresSaved
+                    if(! silent) {
+                        System.out.println("  Done. Found " + res[0] + " CGs and " + res[1] + " graphlet counts for them in the DB. Computed " + res[2] + " similarity scores and saved " + res[3] + " of them to the DB.");
+                    }
+                    if( ! DBManager.getAutoCommit()) {
+                        DBManager.commit();
+                    }
                 }
+                
+                // amino acid graphs
+                if(Settings.getBoolean("plcc_B_compute_graphlet_similarities_aag")) {
+                    if(! silent) {
+                        System.out.println("Computing pairwise graphlet similarities for all amino acid graphs in the database. This will take a lot of time and memory for large databases...");
+                    }
+                    Long[] res = DBManager.computeGraphletSimilarityScoresForPGsWholeDatabaseAndStoreBest(ProtGraph.GRAPHTYPE_ALBE, Settings.getInteger("plcc_I_compute_all_graphlet_similarities_num_to_save_in_db"));
+                    // numChainsFound, numGraphletsFound, numScoresComputed, numScoresSaved
+                    if(! silent) {
+                        System.out.println("  Done. Found " + res[0] + " chains and " + res[1] + " graphlet counts for them in the DB. Computed " + res[2] + " similarity scores and saved " + res[3] + " of them to the DB.");
+                    }
+                    if( ! DBManager.getAutoCommit()) {
+                        DBManager.commit();
+                    }
+                }
+                
                 System.exit(0);
             } else {
                 System.err.println("ERROR: Could not connect to DB, exiting.");
                 System.exit(1);
-            }   
+            }
+            
             
         }
         
