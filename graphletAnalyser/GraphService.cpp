@@ -441,19 +441,74 @@ std::vector<std::string> GraphService::get_length_2_patterns(std::string sig) {
 }
 
 /* returns all possible patterns of length 3 (for triangle and 3-path) for 
- * a given string - analog to get_length_2_patterns */
+ * a given string - analog to get_length_2_patterns
+ * cyclic permutations are ignored for the triangle vector
+ * reversed words are ignored for the 3-path-vector */
 std::vector<std::vector<std::string>> GraphService::get_length_3_patterns(std::string sig) {
     std::vector<std::string> vec_3p = std::vector<std::string>(); // for 3-path
     std::vector<std::string> vec_tri = std::vector<std::string>(); // for triangle pattern
+    std::vector<std::vector<std::string>> vec = std::vector<std::vector<std::string>>();
+    
     
     for (int i = 0; i<sig.size(); i++) {
         std::string prefix = sig.substr(i,1);
+        std::string all_same = prefix + prefix + prefix;
+        vec_3p.push_back(all_same); // add word where all letters are the same
+        vec_tri.push_back(all_same);
         
-        
+        for (int k = i + 1; k <sig.size(); k++) {
+            
+            
+            //create words of length 3 with 2 different letters
+            std::string l2_prefix = prefix + sig.substr(k,1);
+            std::string two_same = sig.substr(k,1) + sig.substr(k,1);
+            
+            std::string word_w2 = l2_prefix + prefix;
+            std::string word_w2_3p = prefix + l2_prefix;
+            std::string word_w2_tri = prefix + two_same;
+            std::string word_w2_sec_mid = sig.substr(k,1) + l2_prefix;
+            
+            //words which are reversed are ignored because reasons
+            
+            vec_3p.push_back(word_w2);
+            vec_3p.push_back(word_w2_3p);
+            vec_3p.push_back(word_w2_tri); // add word with 2 different letters
+            vec_3p.push_back(word_w2_sec_mid);
+            
+            vec_tri.push_back(word_w2);    // word_w2_3p is not added for triangle
+            vec_tri.push_back(word_w2_tri);// pattern, because it is
+                                           // a cyclic permutation of word_w2
+            
+            
+            
+            for (int m = k+1; m < sig.size(); m++) {
+                
+                // create words of length 3 where all 3 letters are different
+                std::string word_w3 = l2_prefix + sig.substr(m,1);
+                std::string word_w3CAT = sig.substr(m,1) + l2_prefix;
+                std::string word_w3_CAT2 = sig.substr(k,1) + sig.substr(m,1) + sig.substr(i,1);
+                
+                
+                // insert words into vectors where necessary
+                vec_3p.push_back(word_w3);
+                vec_3p.push_back(word_w3CAT);
+                vec_3p.push_back(word_w3_CAT2);
+                
+                vec_tri.push_back(word_w3);
+                
+                
+                
+            }
+            
+        }
         
         
         
     }
     
+    vec.push_back(vec_3p);
+    vec.push_back(vec_tri);
+            
+    return vec;
     
 }

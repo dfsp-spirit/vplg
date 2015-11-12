@@ -20,33 +20,53 @@ ProteinGraphService::ProteinGraphService(const Graph& graph) {
     sse_graphlets_2p.push_back("EL");
     sse_graphlets_2p.push_back("LL");
     
+                                       // the numbers below show the index 
+                                       // in the triangle path vector
     sse_graphlets_3p.push_back("HHH"); //0
-    sse_graphlets_3p.push_back("HHE"); //1
-    sse_graphlets_3p.push_back("HHL"); //2
-    sse_graphlets_3p.push_back("HEH"); 
-    sse_graphlets_3p.push_back("HLH");
-    sse_graphlets_3p.push_back("EEE"); //5
-    sse_graphlets_3p.push_back("EEH"); //6
-    sse_graphlets_3p.push_back("EEL"); //7
-    sse_graphlets_3p.push_back("EHE"); 
-    sse_graphlets_3p.push_back("ELE");
+    
+    sse_graphlets_3p.push_back("HEH"); //1
+    sse_graphlets_3p.push_back("HHE"); 
+    sse_graphlets_3p.push_back("HEE"); //2
     sse_graphlets_3p.push_back("EHE");
-    sse_graphlets_3p.push_back("LLL"); //11
-    sse_graphlets_3p.push_back("LLH"); //12
-    sse_graphlets_3p.push_back("LLE"); //13
+    
+    sse_graphlets_3p.push_back("HEL"); //3
+    sse_graphlets_3p.push_back("LHE");
+    sse_graphlets_3p.push_back("ELH");
+    
+    
+    sse_graphlets_3p.push_back("HLH"); //4
+    sse_graphlets_3p.push_back("HHL"); 
+    sse_graphlets_3p.push_back("HLL"); //5
     sse_graphlets_3p.push_back("LHL"); 
+    
+    
+    
+    sse_graphlets_3p.push_back("EEE"); //6
+    
+    sse_graphlets_3p.push_back("ELE"); //7
+    sse_graphlets_3p.push_back("EEL");
+    sse_graphlets_3p.push_back("ELL"); //8
     sse_graphlets_3p.push_back("LEL");
+
+    
+    
+    sse_graphlets_3p.push_back("LLL"); //9
+
+
+    // 19 graphlets for the 3-path pattern in total    
+    
+    
     
     sse_graphlets_tri.push_back(sse_graphlets_3p[0]);
     sse_graphlets_tri.push_back(sse_graphlets_3p[1]);
-    sse_graphlets_tri.push_back(sse_graphlets_3p[2]);
+    sse_graphlets_tri.push_back(sse_graphlets_3p[3]);
     sse_graphlets_tri.push_back(sse_graphlets_3p[5]);
-    sse_graphlets_tri.push_back(sse_graphlets_3p[6]);
-    sse_graphlets_tri.push_back(sse_graphlets_3p[7]);
-    sse_graphlets_tri.push_back(sse_graphlets_3p[11]);
+    sse_graphlets_tri.push_back(sse_graphlets_3p[8]);
+    sse_graphlets_tri.push_back(sse_graphlets_3p[10]);
     sse_graphlets_tri.push_back(sse_graphlets_3p[12]);
     sse_graphlets_tri.push_back(sse_graphlets_3p[13]);
-    
+    sse_graphlets_tri.push_back(sse_graphlets_3p[15]);
+    sse_graphlets_tri.push_back(sse_graphlets_3p[17]);
     
     
     
@@ -55,9 +75,9 @@ ProteinGraphService::ProteinGraphService(const Graph& graph) {
     
     /* NOTE:
      * length of labeled 2 path vector:    6
-     * length of labeled 3 path vector:   16
-     * length of labeled triangle vector:  9
-     * combined length:                   31 */
+     * length of labeled 3 path vector:   19
+     * length of labeled triangle vector: 10
+     * combined length:                   35 */
     
     
 }
