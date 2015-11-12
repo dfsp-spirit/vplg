@@ -13065,7 +13065,7 @@ connection.close();
      */
     public static Double[] getNormalizedProteinGraphGraphletCounts(String pdb_id, String chain_name, String graph_type) throws SQLException {
         
-        int numReqGraphletTypes = 30;
+        int numReqGraphletTypes = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_num_graphlets_to_consider");
         
         Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
         
@@ -13090,14 +13090,14 @@ connection.close();
             DP.getInstance().e("DBManager", "getNormalizedGraphletCounts(): Could not find " + graph_type + " protein graph with pdb_id '" + pdb_id + "' and chain_name '" + chain_name + "' in DB.");
             return null;
         }
+        
+        List<String> variableParts = new ArrayList<>();
+        for(int i = 0; i < numReqGraphletTypes; i++) {
+            variableParts.add("" + i);
+        }
+        String constructedQueryPart = DBManager.constructRepetetiveQueryPart("graphlet_counts[", "]", variableParts, ", ");
 
-        String query = "SELECT graphlet_counts[0], graphlet_counts[1], graphlet_counts[2], graphlet_counts[3], graphlet_counts[4],"
-                + " graphlet_counts[5], graphlet_counts[6], graphlet_counts[7], graphlet_counts[8], graphlet_counts[9],"
-                + " graphlet_counts[10], graphlet_counts[11], graphlet_counts[12], graphlet_counts[13], graphlet_counts[14],"
-                + " graphlet_counts[15], graphlet_counts[16], graphlet_counts[17], graphlet_counts[18], graphlet_counts[19],"
-                + " graphlet_counts[20], graphlet_counts[21], graphlet_counts[22], graphlet_counts[23], graphlet_counts[24],"
-                + " graphlet_counts[25], graphlet_counts[26], graphlet_counts[27], graphlet_counts[28], graphlet_counts[29]"
-                + " FROM " + tbl_graphletcount + " WHERE (graph_id = ?);";
+        String query = "SELECT " + constructedQueryPart + " FROM " + tbl_graphletcount + " WHERE (graph_id = ?);";
 
         try {
             //dbc.setAutoCommit(false);
@@ -13177,7 +13177,7 @@ connection.close();
      */
     public static Double[] getNormalizedComplexgraphGraphletCounts(String pdb_id) throws SQLException {
         
-        int numReqGraphletTypes = 30;
+        int numReqGraphletTypes = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_num_graphlets_to_consider");
         
         
         ResultSetMetaData md;
@@ -13197,13 +13197,13 @@ connection.close();
             return null;
         }
 
-        String query = "SELECT complex_graphlet_counts[0], complex_graphlet_counts[1], complex_graphlet_counts[2], complex_graphlet_counts[3], complex_graphlet_counts[4],"
-                + " complex_graphlet_counts[5], complex_graphlet_counts[6], complex_graphlet_counts[7], complex_graphlet_counts[8], complex_graphlet_counts[9],"
-                + " complex_graphlet_counts[10], complex_graphlet_counts[11], complex_graphlet_counts[12], complex_graphlet_counts[13], complex_graphlet_counts[14],"
-                + " complex_graphlet_counts[15], complex_graphlet_counts[16], complex_graphlet_counts[17], complex_graphlet_counts[18], complex_graphlet_counts[19],"
-                + " complex_graphlet_counts[20], complex_graphlet_counts[21], complex_graphlet_counts[22], complex_graphlet_counts[23], complex_graphlet_counts[24],"
-                + " complex_graphlet_counts[25], complex_graphlet_counts[26], complex_graphlet_counts[27], complex_graphlet_counts[28], complex_graphlet_counts[29]"
-                + " FROM " + tbl_graphletcount_complex + " WHERE (complexgraph_id = ?);";
+        List<String> variableParts = new ArrayList<>();
+        for(int i = 0; i < numReqGraphletTypes; i++) {
+            variableParts.add("" + i);
+        }
+        String constructedQueryPart = DBManager.constructRepetetiveQueryPart("complex_graphlet_counts[", "]", variableParts, ", ");
+        
+        String query = "SELECT " + constructedQueryPart + " FROM " + tbl_graphletcount_complex + " WHERE (complexgraph_id = ?);";
 
         try {
             //dbc.setAutoCommit(false);
@@ -13274,6 +13274,29 @@ connection.close();
         }        
     }
     
+    /**
+     * Creates a string from a list of strings, adding the prefix before each entry and the suffix after each entry. The separator string is added inbetween the parts.
+     * @param prefix the prefix, added before each part
+     * @param suffix the suffix, added after each part
+     * @param variableParts the list of variable parts
+     * @param separator the separator, added after each part with the exception of the last one
+     * @return the string constructed as described above
+     */
+    public static String constructRepetetiveQueryPart(String prefix, String suffix, List<String> variableParts, String separator) {
+        StringBuilder res = new StringBuilder();
+        
+        for(int i = 0; i < variableParts.size(); i++) {
+            res.append(prefix);
+            res.append(variableParts.get(i));
+            res.append(suffix);
+            
+            if(i < (variableParts.size() - 1) ) {
+                res.append(separator);
+            }
+        }
+        return res.toString();
+    }
+    
     
     /**
      * Retrieves the graphlet counts for the requested amino acid graph from the database. The graph is identified by its PDB ID.
@@ -13283,7 +13306,7 @@ connection.close();
      */
     public static Double[] getNormalizedAminoacidgraphGraphletCounts(String pdb_id) throws SQLException {
         
-        int numReqGraphletTypes = 30;
+        int numReqGraphletTypes = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_num_graphlets_to_consider");
         
         
         ResultSetMetaData md;
@@ -13303,13 +13326,13 @@ connection.close();
             return null;
         }
 
-        String query = "SELECT aa_graphlet_counts[0], aa_graphlet_counts[1], aa_graphlet_counts[2], aa_graphlet_counts[3], aa_graphlet_counts[4],"
-                + " aa_graphlet_counts[5], aa_graphlet_counts[6], aa_graphlet_counts[7], aa_graphlet_counts[8], aa_graphlet_counts[9],"
-                + " aa_graphlet_counts[10], aa_graphlet_counts[11], aa_graphlet_counts[12], aa_graphlet_counts[13], aa_graphlet_counts[14],"
-                + " aa_graphlet_counts[15], aa_graphlet_counts[16], aa_graphlet_counts[17], aa_graphlet_counts[18], aa_graphlet_counts[19],"
-                + " aa_graphlet_counts[20], aa_graphlet_counts[21], aa_graphlet_counts[22], aa_graphlet_counts[23], aa_graphlet_counts[24],"
-                + " aa_graphlet_counts[25], aa_graphlet_counts[26], aa_graphlet_counts[27], aa_graphlet_counts[28], aa_graphlet_counts[29]"
-                + " FROM " + tbl_graphletcount_aa + " WHERE (aagraph_id = ?);";
+        List<String> variableParts = new ArrayList<>();
+        for(int i = 0; i < numReqGraphletTypes; i++) {
+            variableParts.add("" + i);
+        }
+        String constructedQueryPart = DBManager.constructRepetetiveQueryPart("aa_graphlet_counts[", "]", variableParts, ", ");
+        
+        String query = "SELECT " + constructedQueryPart + " FROM " + tbl_graphletcount_aa + " WHERE (aagraph_id = ?);";
 
         try {
             //dbc.setAutoCommit(false);

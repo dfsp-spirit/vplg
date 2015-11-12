@@ -381,6 +381,7 @@ public class Settings {
         defSet("plcc_B_compute_graphlet_similarities_cg", "false", "Whether to compute graphlet similarities for complex graphs. Only used if plcc_B_compute_graphlet_similarities is true.");
         defSet("plcc_B_compute_graphlet_similarities_aag", "false", "Whether to compute graphlet similarities for amino acid graphs. Only used if plcc_B_compute_graphlet_similarities is true.");
         defSet("plcc_I_compute_all_graphlet_similarities_num_to_save_in_db", "25", "The number of the most similar protein chain to store in the database after graphlet similarity computation. Set to n to store the n most similar for each chain.");
+        defSet("plcc_I_compute_all_graphlet_similarities_num_graphlets_to_consider", "30", "The number of graphlets from the database entry to consider when computing the similarity score. If the graphlet array in the DB field is longer than the value given here, the rest will be ignored.");
         defSet("plcc_S_search_similar_PDBID", "8icd", "Used only when plcc_B_search_similar is true. The protein PDB ID to use as a pattern during the similarity search.");
         defSet("plcc_S_search_similar_chainID", "A", "Used only when plcc_B_search_similar is true. The protein chain ID to use as a pattern during the similarity search.");
         defSet("plcc_S_search_similar_graphtype", "albelig", "Used only when plcc_B_search_similar is true. The graph type to use as a pattern during the similarity search.");
