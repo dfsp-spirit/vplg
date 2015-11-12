@@ -384,7 +384,7 @@ public class DBManager {
             
             // some status output never hurts
             if(i % 5 == 0) {
-                System.out.println("  At chain #" + i + " of " + allChains.size() + ".");
+                System.out.println("  At PG (chain) #" + i + " of " + allChains.size() + ".");
             }
             
             if(fakeIt) {
@@ -477,20 +477,23 @@ public class DBManager {
                 numberOfTopScoresToSavePerPair = allPDBChains.length;
             }
             
-            System.out.println("Similarity of all DB chains to " + src_pdb_id + " chain " + src_chain_name + ":");
+            System.out.println("    Similarity of at most " + numberOfTopScoresToSavePerPair + " DB chains to " + src_pdb_id + " chain " + src_chain_name + ":");
+            int numScoresSavedForCurrent = 0;
             for(int k = 0; k < numberOfTopScoresToSavePerPair; k++) {
                 if(src_scores[k] != null) {
                     if(src_scores[k] < scoreTooLarge) {
-                        System.out.println("  #" + k + ": " + allPDBChains[k] + " with score " + src_scores[k] + ".");
+                        System.out.println("     #" + k + ": " + allPDBChains[k] + " with score " + src_scores[k] + ".");
                         try {
                             DBManager.writePGGraphletSimilarityScoreToDB(src_pdb_id, src_chain_name, allPDBChains[k].substring(0, 4), allPDBChains[k].substring(4), graphType, src_scores[k]);
                         } catch (SQLException e) {
-                            System.err.println("Could not write graphlet similarity score to DB: '" + e.getMessage() + "'.");
+                            System.err.println("Could not write graphlet similarity score to DB for PGs: '" + e.getMessage() + "'.");
                         }
                         numScoresSaved++;
+                        numScoresSavedForCurrent++;
                     }
                 }
             }
+            System.out.println("    A total of " + numScoresSavedForCurrent + " pairwise scores were saved for this PG.");
             
         }
         
@@ -527,7 +530,7 @@ public class DBManager {
             
             // some status output never hurts
             if(i % 5 == 0) {
-                System.out.println("  At PDB #" + i + " of " + allPDBs.size() + " complex graphs (PDB files).");
+                System.out.println("  At CG (PDB file) #" + i + " of " + allPDBs.size() + " complex graphs (PDB files).");
             }
             
             
@@ -592,20 +595,23 @@ public class DBManager {
                 numberOfTopScoresToSavePerPair = allPDBIDs.length;
             }
             
-            System.out.println("Similarity of all complex graphs to " + src_pdb_id + ":");
+            System.out.println("    Similarity of at most " + numberOfTopScoresToSavePerPair + " complex graphs to " + src_pdb_id + ":");
+            int numScoresSavedForCurrent = 0;
             for(int k = 0; k < numberOfTopScoresToSavePerPair; k++) {
                 if(src_scores[k] != null) {
                     if(src_scores[k] < scoreTooLarge) {
-                        System.out.println("  #" + k + ": " + allPDBIDs[k] + " with score " + src_scores[k] + ".");
+                        System.out.println("     #" + k + ": " + allPDBIDs[k] + " with score " + src_scores[k] + ".");
                         try {
                             DBManager.writeCGGraphletSimilarityScoreToDB(src_pdb_id, allPDBIDs[k], src_scores[k]);
                         } catch (SQLException e) {
                             System.err.println("Could not write complex graph graphlet similarity score to DB: '" + e.getMessage() + "'.");
                         }
                         numScoresSaved++;
+                        numScoresSavedForCurrent++;
                     }
                 }
             }
+            System.out.println("    A total of " + numScoresSavedForCurrent + " pairwise scores were saved for this CG.");
             
         }
         
@@ -642,7 +648,7 @@ public class DBManager {
             
             // some status output never hurts
             if(i % 5 == 0) {
-                System.out.println("  At PDB #" + i + " of " + allPDBs.size() + " amino acid graphs (PDB files).");
+                System.out.println("  At AAG (PDB file) #" + i + " of " + allPDBs.size() + " amino acid graphs (PDB files).");
             }
             
             
@@ -707,20 +713,24 @@ public class DBManager {
                 numberOfTopScoresToSavePerPair = allPDBIDs.length;
             }
             
-            System.out.println("Similarity of all amino acid graphs to " + src_pdb_id + ":");
+            System.out.println("    Similarity of all amino acid graphs to " + src_pdb_id + ":");
+            int numScoresSavedForCurrent = 0;
             for(int k = 0; k < numberOfTopScoresToSavePerPair; k++) {
                 if(src_scores[k] != null) {
                     if(src_scores[k] < scoreTooLarge) {
-                        System.out.println("  #" + k + ": " + allPDBIDs[k] + " with score " + src_scores[k] + ".");
+                        System.out.println("     #" + k + ": " + allPDBIDs[k] + " with score " + src_scores[k] + ".");
                         try {
                             DBManager.writeAAGGraphletSimilarityScoreToDB(src_pdb_id, allPDBIDs[k], src_scores[k]);
                         } catch (SQLException e) {
                             System.err.println("Could not write amino acid graph graphlet similarity score to DB: '" + e.getMessage() + "'.");
                         }
                         numScoresSaved++;
+                        numScoresSavedForCurrent++;
                     }
                 }
             }
+            System.out.println("    A total of " + numScoresSavedForCurrent + " pairwise scores were saved for this CG.");
+            
             
         }
         
