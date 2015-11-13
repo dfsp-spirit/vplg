@@ -1,0 +1,13 @@
+The representatives file was downloaded from the PDB website. You can use the REST API to get the file (also in a normal web browser). See
+
+   http://www.rcsb.org/pdb/software/rest.do
+   
+for info on the PDB REST API.
+
+I used all representativechains from the 40% sequence clustering, which (at the time of writing this, NOV 2015) can be obtained from:
+
+  http://www.rcsb.org/pdb/rest/representatives?cluster=40
+  
+
+  
+--TS
