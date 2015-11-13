@@ -1160,6 +1160,9 @@ public class Main {
                     if(! silent) {
                         System.out.println(" PG graphlet similarity done. Found " + res[0] + " PGs (used ALBE graph type) and " + res[1] + " graphlet counts for them in the DB. Computed " + res[2] + " similarity scores and saved " + res[3] + " of them to the DB.");
                     }
+                    if(res[0] > 0 && res[1] == 0) {
+                        System.err.println(" WARNING: Found protein graphs but no graphlet counts for them in the database. (Did you run GraphletAnalyzer on the GML files to compute and save graphlet counts to the database?)");
+                    }
                     if( ! DBManager.getAutoCommit()) {
                         DBManager.commit();
                     }
@@ -1175,6 +1178,9 @@ public class Main {
                     if(! silent) {
                         System.out.println(" CG graphlet similarity done. Found " + res[0] + " CGs and " + res[1] + " graphlet counts for them in the DB. Computed " + res[2] + " similarity scores and saved " + res[3] + " of them to the DB.");
                     }
+                    if(res[0] > 0 && res[1] == 0) {
+                        System.err.println(" WARNING: Found complex graphs but no graphlet counts for them in the database. (Did you run GraphletAnalyzer on the GML files to compute and save graphlet counts to the database?)");
+                    }
                     if( ! DBManager.getAutoCommit()) {
                         DBManager.commit();
                     }
@@ -1189,6 +1195,9 @@ public class Main {
                     // numChainsFound, numGraphletsFound, numScoresComputed, numScoresSaved
                     if(! silent) {
                         System.out.println(" AAG graphlet similarity done. Found " + res[0] + " AAGs and " + res[1] + " graphlet counts for them in the DB. Computed " + res[2] + " similarity scores and saved " + res[3] + " of them to the DB.");
+                    }
+                    if(res[0] > 0 && res[1] == 0) {
+                        System.err.println(" WARNING: Found amino acid graphs but no graphlet counts for them in the database. (Did you run GraphletAnalyzer on the GML files to compute and save graphlet counts to the database?)");
                     }
                     if( ! DBManager.getAutoCommit()) {
                         DBManager.commit();
