@@ -174,7 +174,7 @@ string GraphPTGLPrinter::printGraphString(const Graph& g) const {
  * @param <vector<vector<float>> normalized graphlet counts
  * @param <vector<vector<float>> normalized ptgl counts
  */
-int GraphPTGLPrinter::saveCountsToDatabasePGXX(int graphtype_int, std::vector<std::string> ids, std::vector<std::vector<float>> norm_counts, std::vector<float> lab_counts) {
+int GraphPTGLPrinter::savePGCountsToDatabasePGXX(int graphtype_int, std::vector<std::string> ids, std::vector<std::vector<float>> norm_counts, std::vector<float> lab_counts) {
     
     Database db = Database::getInstance();
     string connection_string = db.get_connect_string();
@@ -221,7 +221,7 @@ int GraphPTGLPrinter::saveCountsToDatabasePGXX(int graphtype_int, std::vector<st
     }
     
     try {				                                
-        long dbpk = getGraphDatabaseID(pdbid, chain, graphtype);
+        long dbpk = getPGGraphDatabaseID(pdbid, chain, graphtype);
 
         connection C(connection_string);
         //cout << "      Connected to database '" << C.dbname() << "'.\n";
@@ -246,7 +246,7 @@ int GraphPTGLPrinter::saveCountsToDatabasePGXX(int graphtype_int, std::vector<st
                 cout << apptag << "      Found graph in database, ID is " << dbpk << ".\n";  
             }
             
-            int numGraphletCountsAlreadyInDatabase = databaseContainsGraphletsForGraph(dbpk);
+            int numGraphletCountsAlreadyInDatabase = databaseContainsGraphletsForPGGraph(dbpk);
             if(numGraphletCountsAlreadyInDatabase == 0) {
                 if( ! silent) {
                     cout << apptag << "      Database does not contain graphlet count entries for this graph, ok.\n";
@@ -351,7 +351,7 @@ int GraphPTGLPrinter::saveCountsToDatabasePGXX(int graphtype_int, std::vector<st
  * @param <string> Chain
  * @param <int> graphtype
  * @return <long> graph ID */
-long GraphPTGLPrinter::getGraphDatabaseID(string pdbid, string chain, int graphType) const {
+long GraphPTGLPrinter::getPGGraphDatabaseID(string pdbid, string chain, int graphType) const {
     
     long id = -1;
     
@@ -390,7 +390,7 @@ long GraphPTGLPrinter::getGraphDatabaseID(string pdbid, string chain, int graphT
  * 
  * @param <unsigned loong int> Graph ID
  * @return <int>  */
-int GraphPTGLPrinter::databaseContainsGraphletsForGraph(unsigned long int databaseIDofGraph) const {
+int GraphPTGLPrinter::databaseContainsGraphletsForPGGraph(unsigned long int databaseIDofGraph) const {
 
     Database db = Database::getInstance();
     string connection_string = db.get_connect_string();
@@ -525,5 +525,220 @@ int GraphPTGLPrinter::testDatabasePGXX() {
     } catch (const std::exception &e) {
         cerr << apptag << "SQL trouble when testing DB: '" << e.what() << "'." << endl;
         return 1;
+    }
+}
+
+int GraphPTGLPrinter::saveAACountsToDatabasePGXX(std::string pdb_id, std::string label, std::vector<std::vector<float>> norm_counts, std::vector<float> lab_counts) {
+    
+    Database db = Database::getInstance();
+    string connection_string = db.get_connect_string();
+ 
+    
+    
+    std::vector<float> graphlet3CountsNormalized = norm_counts[1];
+    std::vector<float> graphlet4CountsNormalized = norm_counts[2];
+    std::vector<float> graphlet5CountsNormalized = norm_counts[3];
+    
+    //TODO: implement function get--counts in graphservice
+    //      so that the labeled counts can be written into the database
+    
+    std::vector<float> cl = lab_counts;
+
+    
+    if( ! silent) {
+        cout << apptag <<  "    Saving graphlets for graphtype " << graphtypestr << " (gt code=" << graphtype << ") of pdbid " << pdbid << " chain " << chain << " to PostgreSQL database.\n";
+    }
+    
+    // TODO: remove this
+    long unsigned int numGraphletsTypesCounted;
+    if(label.compare("") != 0) {
+        numGraphletsTypesCounted = graphlet3CountsNormalized.size() + graphlet4CountsNormalized.size() + graphlet5CountsNormalized.size() + cl.size();
+        if( ! silent) {
+            cout << apptag << "    Saving " << graphlet3CountsNormalized.size() << " different 3-graphlets, " << graphlet4CountsNormalized.size() << " different 4-graphlets, " << graphlet5CountsNormalized.size() << " different 5-graphlets and " << cl.size() << " different labeled graphlets (" << numGraphletsTypesCounted << " total).\n";           
+        }
+    }
+    else {
+        numGraphletsTypesCounted = graphlet3CountsNormalized.size() + graphlet4CountsNormalized.size() + graphlet5CountsNormalized.size();
+        if( ! silent) {
+            cout << apptag << "    Saving " << graphlet3CountsNormalized.size() << " different 3-graphlets, " << graphlet4CountsNormalized.size() << " different 4-graphlets and " << graphlet5CountsNormalized.size() << " different 5-graphlets (" << numGraphletsTypesCounted << " total).\n";   
+        }
+    }
+    
+    try {				                                
+        long dbpk = getPGGraphDatabaseID(pdbid, chain, graphtype);
+
+        connection C(connection_string);
+        //cout << "      Connected to database '" << C.dbname() << "'.\n";
+        work W(C);
+
+        // The relevant table in the database is called 'plcc_graphlets'. It get created by the PLCC application using the following line of code:
+        //   doInsertQuery("CREATE TABLE plcc_graphlets (graphlet_id serial primary key, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graphlet_counts int[55] not null);");
+        // referenced tables:
+        //   doInsertQuery("CREATE TABLE plcc_graph (graph_id serial primary key, chain_id int not null references plcc_chain ON DELETE CASCADE, graph_type int not null references plcc_graphtypes, graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_image_png text, graph_image_svg text, graph_image_pdf text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
+        //   doInsertQuery("CREATE TABLE plcc_graphtypes (graphtype_id int not null primary key,  graphtype_text text not null);");
+        //   doInsertQuery("CREATE TABLE plcc_chain (chain_id serial primary key, chain_name varchar(2) not null, mol_name varchar(200) not null, organism_scientific varchar(200) not null, organism_common varchar(200) not null, pdb_id varchar(4) not null references plcc_protein ON DELETE CASCADE, chain_isinnonredundantset smallint DEFAULT 1);");
+        //   doInsertQuery("CREATE TABLE plcc_protein (pdb_id varchar(4) primary key, header varchar(200) not null, title varchar(400) not null, experiment varchar(200) not null, keywords varchar(400) not null, resolution real not null);");
+
+
+        // Let's insert the graphlet counts into the DB.
+        if(dbpk <= 0) {
+            cerr << apptag << "ERROR: ID of graph not found in the database, cannot assign graphlets to it. Skipping.\n";
+            return 1;
+        }
+        else {
+            if( ! silent) {
+                cout << apptag << "      Found graph in database, ID is " << dbpk << ".\n";  
+            }
+            
+            int numGraphletCountsAlreadyInDatabase = databaseContainsGraphletsForPGGraph(dbpk);
+            if(numGraphletCountsAlreadyInDatabase == 0) {
+                if( ! silent) {
+                    cout << apptag << "      Database does not contain graphlet count entries for this graph, ok.\n";
+                }
+            }
+            else {
+                if( ! silent) {
+                    cout << apptag << "      Database already contains graphlet count entry for this graph, trying to delete old entry.\n";
+                }
+                deleteGraphletCountEntryForGraph(dbpk);
+            }
+            
+            stringstream ssdbpk;
+            ssdbpk << dbpk;
+            string dbpkStr = ssdbpk.str();
+            
+            // collect and insert graphlets
+            // DB table: doInsertQuery("CREATE TABLE " + tbl_graphletcount + " (graphlet_id serial primary key, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graphlet_counts int[55] not null);");
+             string strVal;
+            
+            std::vector<float> allGraphletcounts;
+
+            allGraphletcounts.reserve(graphlet3CountsNormalized.size() + graphlet4CountsNormalized.size() + graphlet5CountsNormalized.size() + cl.size());
+            allGraphletcounts.insert(allGraphletcounts.end(), graphlet3CountsNormalized.begin(), graphlet3CountsNormalized.end());
+            allGraphletcounts.insert(allGraphletcounts.end(), graphlet4CountsNormalized.begin(), graphlet4CountsNormalized.end());
+            allGraphletcounts.insert(allGraphletcounts.end(), graphlet5CountsNormalized.begin(), graphlet5CountsNormalized.end());
+            allGraphletcounts.insert(allGraphletcounts.end(), cl.begin(), cl.end());
+
+            
+            // check stuff
+            int numExpected = 67;
+            if(cl.empty()) {
+                numExpected = 67 - 38;
+            }
+            
+            
+            if(allGraphletcounts.size() != numExpected) {
+                cerr << apptag << "ERROR: Expected counts for " << numExpected << " different graphlets, but found " << allGraphletcounts.size() << ". Cannot write graphlet counts to database.\n";
+                return 1;
+            }
+            
+            float val;
+            string query = "INSERT INTO plcc_aa_graphlets (aagraph_id, aa_graphlet_counts) VALUES (" + W.esc(dbpkStr) + ", '{";
+            for (int i = 0; i < allGraphletcounts.size(); i++) {
+                std::stringstream ssVal;
+                val = allGraphletcounts[i];
+                if(val < 0.0f || val > 1.0f) {
+                    cout << apptag << "WARNING: Graphlet count for graphlet #" << i << " is '" << val << "', but should be normalized between 0.0 and 1.0.\n";
+                }
+                ssVal << std::fixed << std::setprecision(4) << val;
+                strVal = ssVal.str();
+                //cout << "      Adding value '" << strVal << "'.\n";
+                query += W.esc(strVal);
+                if(i < allGraphletcounts.size() - 1) {
+                    query += ", ";
+                }
+            }
+            
+            
+//            // fill the remaining fields if there is no data on labeled graphlets
+//            if( ! withLabeled) {
+//                float valueForMissing = -1.0f;
+//                cout << apptag << "WARNING: Writing graphlets to database but missing data on labeled graphlets, setting count " << valueForMissing << " for them.\n";
+//                int numMissingValues = (55  - allGraphletcounts.size());                
+//                for (int i = 0; i < numMissingValues; i++) {
+//                    std::stringstream ssVal;
+//                    ssVal << std::fixed << std::setprecision(4) << valueForMissing;
+//                    strVal = ssVal.str();
+//                    query += W.esc(strVal);
+//                    if(i < numMissingValues - 1) {
+//                        query += ", ";
+//                    }
+//                }                
+//            }
+            
+            
+            query += "}');";
+            //cout << "      SQL query is '" << query << "'.\n";
+            pqxx::result res = W.exec(query);
+            int numInserted = res.affected_rows();
+            if(numInserted == 1) {
+                if( ! silent) {
+                    cout << apptag << "      Inserted " << numInserted << " graphlet count row.\n";
+                }
+            }
+            else {
+                cerr << apptag << "ERROR: Inserted " << numInserted << " graphlet count rows.\n";
+            }
+            W.commit();
+            return 0;
+        }
+
+    } catch (const std::exception &e) {
+        cerr << apptag << "SQL trouble when trying to save graphlets to DB: '" << e.what() << "'." << endl;
+        return 1;
+    }
+}
+
+long GraphPTGLPrinter::getAAGraphDatabaseID(string pdbid) const {
+    
+    long id = -1;
+    
+    
+    try {
+        connection C("dbname=vplg user=vplg host=localhost port=5432 connect_timeout=10 password=vplg");
+        //cout << "      Connected to database '" << C.dbname() << "'.\n";
+        work W(C);
+        result R = W.exec("SELECT g.aagraph_id FROM plcc_aa_graph g INNER JOIN plcc_protein p ON  p.pdb_id = g.pdb_id WHERE (p.pdb_id = '" + W.esc(pdbid) + "');");
+
+        //cout << "      Found " << R.size() << " graphs of type " << graphType << " for PDB " << pdbid << " chain " << chain << "." << endl;
+
+        if(R.size() == 1) {
+                result::const_iterator r = R.begin();
+                id = atol(r[0].c_str());	// cast string to long and return
+                return id;
+        }
+
+        //for (result::const_iterator r = R.begin(); r != R.end(); ++r) {
+        //	cout << r[0].c_str() << endl;
+        //}
+
+    } catch (const std::exception &e) {
+        cerr << apptag << "ERROR: SQL trouble when trying to retrieve graph PK from DB: '" << e.what() << "'." << endl;
+        return -1;
+    }
+    
+    return id;
+}
+
+int GraphPTGLPrinter::databaseContainsGraphletsForAAGraph(unsigned long int databaseIDofGraph) const {
+
+    Database db = Database::getInstance();
+    string connection_string = db.get_connect_string();
+    
+    stringstream ssdbpk;
+    ssdbpk << databaseIDofGraph;
+    string dbpkStr = ssdbpk.str();
+
+    try {
+        connection C(connection_string);
+        work W(C);
+        result R = W.exec("SELECT g.aa_graphlet_id FROM plcc_aa_graphlets g WHERE g.aagraph_id = " + W.esc(dbpkStr) + ";");
+
+        int count = R.size();
+        return count;		
+        
+    } catch (const std::exception &e) {
+        cerr << apptag << "SQL trouble when checking for graphlet entry for graph in DB: '" << e.what() << "'." << endl;
+        return -1;
     }
 }

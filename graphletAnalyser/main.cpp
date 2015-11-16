@@ -499,7 +499,7 @@ int main(int argc, char** argv) {
             int graphtype_int = service.getGraphTypeInt(graphtype);
             
             
-            int db_res = printer.saveCountsToDatabasePGXX(graphtype_int, id_vec, norm_counts, norm_labeled_counts);
+            int db_res = printer.savePGCountsToDatabasePGXX(graphtype_int, id_vec, norm_counts, norm_labeled_counts);
         }
 
         if(options["output_counts_matlab"] == "yes") {
