@@ -98,7 +98,7 @@ const std::string greeting_message_long =
 
 const std::string greeting_message =
         "[GA] === graphletAnalyser -- compute graphlet counts in networks ===\n"
-        "[GA] === (c) MolBI group, 2014-2015.            ===\n"
+        "[GA] ===                  (c) MolBI group, 2014-2015.            ===\n"
         "[GA] === written by Tatiana Bakirova, Ben Haladik and Tim Schaefer ===\n";
 
 
@@ -119,7 +119,10 @@ const std::string usage_message = "\n"
         " --inputFilesAsList    : Treat the input file as a list of files to handle, one file per line. Default: off.\n"
         " --printGraphletDetails: Print details on certain graphlets to stdout. Default: off.\n"
         " --useDatabase         : Write graphlet counts to a PostgreSQL database (set DB credentials in config file 'graphletanalyser.cfg'). Default: off.\n"
-        " --skipLabeledGraphlets: Do not compute the counts of labeled graphlets. Default: off.\n";
+        " --skipLabeledGraphlets: Do not compute the counts of labeled graphlets. Default: off.\n"
+        " --aa_graph            : Compute graphlets for an amino acid graph and use the corresponding tables.\n"
+        " --sse_graph            : Compute graphlets for a ptgl graph and use the corresponding tables.\n"
+        " --complex_graph            : Compute graphlets for a ptgl complexgraph and use the corresponding tables.\n";
 				       
 
 #endif	/* GLOBAL_H */

@@ -29,6 +29,9 @@ int inputFilesAsList = 0;
 int useDatabase = 0;
 int saveGraphletDetails = 0;
 int skipLabeledGraphlets = 0;
+int aa_graph = 0;
+int sse_graph = 0;
+int complex_graph = 0;
 string input_path = "./";
 string input_files_list = "";
 string output_path = "./";
@@ -196,9 +199,13 @@ int main(int argc, char** argv) {
             {"verbose",          no_argument, &verbose,          1},
             {"brief",            no_argument, &verbose,          0},
             {"inputFilesAsList", no_argument, &inputFilesAsList, 1},
-			{"useDatabase",      no_argument, &useDatabase,      1},
+	    {"useDatabase",      no_argument, &useDatabase,      1},
             {"printGraphletDetails",      no_argument, &saveGraphletDetails,      1},
             {"skipLabeledGraphlets",      no_argument, &skipLabeledGraphlets,      1},
+            {"aa_graph",         no_argument, &aa_graph,         1},
+            {"complex_graph",    no_argument, &complex_graph,    1},
+            {"sse_graph",        no_argument, &sse_graph,        1},
+            
          
             /* These options don't set a flag 
              * and will be distinguished by their indices. */
@@ -356,6 +363,25 @@ int main(int argc, char** argv) {
         }
         
         
+        // set graph type according to command line arguments
+        if (sse_graph) {
+            options["graph_vertex_type_field"] = "sse_type";
+            options["graph_vertex_type_alphabet"] = "HEL";
+            options["graphtype"] = "sse_graph";
+                    
+        } else if (aa_graph) {
+            options["graph_vertex_type_field"] = "chem_prop3";
+            options["graph_vertex_type_alphabet"] = "hpa?";
+            options["graphtype"] = "aa_graph";
+        } else if (complex_graph) {
+            options["graph_vertex_type_field"] = "sse_type";
+            options["graph_vertex_type_alphabet"] = "HEL";
+            options["graphtype"] = "complex_graph";
+        }
+        
+        
+        
+        
         //choose label to look for from cfg file or default settings
         std::string vertex_label = options["graph_vertex_type_field"];
         
@@ -491,6 +517,9 @@ int main(int argc, char** argv) {
         if(options["output_counts_database"] == "yes") {
             
             if(options["graphtype"] == "sse_graph") {
+                
+                std::cout << apptag << "Computing graphlets for sse graph" << std::endl;
+                
                 std::vector<std::string> id_vec = std::vector<std::string>();
                 id_vec.push_back(service.getPdbid());
                 id_vec.push_back(service.getChainID());
@@ -503,6 +532,9 @@ int main(int argc, char** argv) {
                 int db_res = printer.savePGCountsToDatabasePGXX(graphtype_int, id_vec, norm_counts, norm_labeled_counts);
             }
             else if(options["graphtype"] == "aa_graph") {
+                
+                std::cout << apptag << "Computing graphlets for AA graph" << std::endl;
+                
                 std::string pdb_id = service.getPdbid();
                 std::string label = "";
                 if (withLabeled) {
@@ -513,6 +545,9 @@ int main(int argc, char** argv) {
                 
             }
             else if(options["graphtype"] == "complex_graph") {
+                
+                std::cout << apptag << "Computing graphlets for complexgraph" << std::endl;
+                
                 std::string pdb_id = service.getPdbid();
                 std::string label = "";
                 
