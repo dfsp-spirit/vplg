@@ -528,7 +528,7 @@ int GraphPTGLPrinter::testDatabasePGXX() {
     }
 }
 
-int GraphPTGLPrinter::saveAACountsToDatabasePGXX(std::string pdb_id, std::string label, std::vector<std::vector<float>> norm_counts, std::vector<float> lab_counts) {
+int GraphPTGLPrinter::saveAACountsToDatabasePGXX(std::string pdbid, std::string label, std::vector<std::vector<float>> norm_counts, std::vector<float> lab_counts) {
     
     Database db = Database::getInstance();
     string connection_string = db.get_connect_string();
@@ -546,7 +546,7 @@ int GraphPTGLPrinter::saveAACountsToDatabasePGXX(std::string pdb_id, std::string
 
     
     if( ! silent) {
-        cout << apptag <<  "    Saving graphlets for graphtype " << graphtypestr << " (gt code=" << graphtype << ") of pdbid " << pdbid << " chain " << chain << " to PostgreSQL database.\n";
+        cout << apptag <<  "    Saving graphlets of pdbid " << pdbid << " to PostgreSQL database.\n";
     }
     
     // TODO: remove this
@@ -565,7 +565,7 @@ int GraphPTGLPrinter::saveAACountsToDatabasePGXX(std::string pdb_id, std::string
     }
     
     try {				                                
-        long dbpk = getPGGraphDatabaseID(pdbid, chain, graphtype);
+        long dbpk = getAAGraphDatabaseID(pdbid);
 
         connection C(connection_string);
         //cout << "      Connected to database '" << C.dbname() << "'.\n";
@@ -698,7 +698,7 @@ long GraphPTGLPrinter::getAAGraphDatabaseID(string pdbid) const {
         connection C("dbname=vplg user=vplg host=localhost port=5432 connect_timeout=10 password=vplg");
         //cout << "      Connected to database '" << C.dbname() << "'.\n";
         work W(C);
-        result R = W.exec("SELECT g.aagraph_id FROM plcc_aa_graph g INNER JOIN plcc_protein p ON  p.pdb_id = g.pdb_id WHERE (p.pdb_id = '" + W.esc(pdbid) + "');");
+        result R = W.exec("SELECT g.aagraph_id FROM plcc_aagraph g INNER JOIN plcc_protein p ON  p.pdb_id = g.pdb_id WHERE (p.pdb_id = '" + W.esc(pdbid) + "');");
 
         //cout << "      Found " << R.size() << " graphs of type " << graphType << " for PDB " << pdbid << " chain " << chain << "." << endl;
 
@@ -716,6 +716,8 @@ long GraphPTGLPrinter::getAAGraphDatabaseID(string pdbid) const {
         cerr << apptag << "ERROR: SQL trouble when trying to retrieve graph PK from DB: '" << e.what() << "'." << endl;
         return -1;
     }
+    
+    std::cout << pdbid << std::endl << id << std::endl;
     
     return id;
 }

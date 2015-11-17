@@ -470,7 +470,7 @@ int main(int argc, char** argv) {
                 // get the alphabet from the config file
                 std::string sigma = options["graph_vertex_type_alphabet"];
                 
-                
+                // TODO: add computation of words for labeled graphlets
                 
                 
             }
@@ -490,7 +490,8 @@ int main(int argc, char** argv) {
 
         if(options["output_counts_database"] == "yes") {
             
-            std::vector<std::string> id_vec = std::vector<std::string>();
+            if(options["graph_vertex_type_field"] == "sse_type") {
+                std::vector<std::string> id_vec = std::vector<std::string>();
             id_vec.push_back(service.getPdbid());
             id_vec.push_back(service.getChainID());
             id_vec.push_back(service.get_label());
@@ -500,6 +501,18 @@ int main(int argc, char** argv) {
             
             
             int db_res = printer.savePGCountsToDatabasePGXX(graphtype_int, id_vec, norm_counts, norm_labeled_counts);
+            }
+            else if(options["graph_vertex_type_field"] == "chem_prop3") {
+                std::string pdb_id = service.getPdbid();
+                std::string label = "";
+                if (withLabeled) {
+                    label = "chem_prop3";
+                }
+                
+                int db_res = printer.saveAACountsToDatabasePGXX(pdb_id,label,norm_counts,norm_labeled_counts);
+                
+            }
+            
         }
 
         if(options["output_counts_matlab"] == "yes") {
