@@ -29,12 +29,17 @@ class GraphPTGLPrinter : public GraphPrinter {
         std::string printGraphTypeString() const;
         int savePGCountsToDatabasePGXX(int,std::vector<std::string>,std::vector<std::vector<float>>, std::vector<float>);
         int saveAACountsToDatabasePGXX(std::string,std::string,std::vector<std::vector<float>>,std::vector<float>);
+        int saveCGCountsToDatabasePGXX(std::string,std::string,std::vector<std::vector<float>>,std::vector<float>);
         long getPGGraphDatabaseID(std::string, std::string, int) const;
         long getAAGraphDatabaseID(std::string) const;
+        long getCGGraphDatabaseID(std::string) const;
         int databaseContainsGraphletsForPGGraph(unsigned long int) const;
         int databaseContainsGraphletsForAAGraph(unsigned long int) const;
+        int databaseContainsGraphletsForCGGraph(unsigned long int) const;
         void saveCountsInNovaFormat(std::string,std::vector<std::vector<float>>,std::vector<float>) const;
-        void deleteGraphletCountEntryForGraph(unsigned long int);
+        void deletePGGraphletCountEntryForGraph(unsigned long int);
+        void deleteAAGraphletCountEntryForGraph(unsigned long int);
+        void deleteCGGraphletCountEntryForGraph(unsigned long int);
         int testDatabasePGXX();
 };
 
