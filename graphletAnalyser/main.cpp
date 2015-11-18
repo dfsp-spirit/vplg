@@ -1,7 +1,7 @@
 /* 
  * File:   main.cpp
  * Author: tatiana
- *
+ * Edits:  ben
  * Created on April 18, 2013, 10:42 AM
  * Modified by Tim from July 2014
  * Modified by Ben from May 2015

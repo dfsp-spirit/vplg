@@ -267,7 +267,7 @@ void newtestclass::test_compute_CAT() {
     CPPUNIT_ASSERT(service1.compute_CAT(test_string) == test_CAT_set);
 }
 
-void newtestclass::test_get_2_patterns() {
+void newtestclass::test_get_length_2_patterns() {
     test_2p_vec = std::vector<std::string>();
     test_2p_vec.push_back("AA");
     test_2p_vec.push_back("AB");
@@ -283,6 +283,76 @@ void newtestclass::test_get_2_patterns() {
     
     
     CPPUNIT_ASSERT(t_vec == test_2p_vec);
+    
+}
+
+void newtestclass::test_get_length_3_patterns() {
+    
+    std::vector<std::vector<std::string>> testing_vec = std::vector<std::vector<std::string>>();
+    
+    std::vector<std::string> testing_vec_tri = std::vector<std::string>();
+    std::vector<std::string> testing_vec_3p = std::vector<std::string>();
+    
+    testing_vec_tri.push_back("AAA");
+    testing_vec_3p.push_back("AAA");
+    
+    testing_vec_3p.push_back("ABA");
+    testing_vec_3p.push_back("AAB");
+    testing_vec_3p.push_back("ABB");
+    testing_vec_3p.push_back("BAB");
+    
+    testing_vec_tri.push_back("ABA");
+    testing_vec_tri.push_back("ABB");
+    
+    
+    testing_vec_3p.push_back("ABC");
+    testing_vec_3p.push_back("CAB");
+    testing_vec_3p.push_back("BCA");
+    
+    testing_vec_tri.push_back("ABC");
+    testing_vec_tri.push_back("CBA");
+    
+    
+    
+    testing_vec_3p.push_back("ACA");
+    testing_vec_3p.push_back("AAC");
+    testing_vec_3p.push_back("ACC");
+    testing_vec_3p.push_back("CAC");
+    
+    testing_vec_tri.push_back("ACA");
+    testing_vec_tri.push_back("ACC");
+    
+    
+    
+    
+    testing_vec_3p.push_back("BBB");
+    testing_vec_tri.push_back("BBB");
+    
+    testing_vec_3p.push_back("BCB");
+    testing_vec_3p.push_back("BBC");
+    testing_vec_3p.push_back("BCC");
+    testing_vec_3p.push_back("CBC");
+    
+    testing_vec_tri.push_back("BCB");
+    testing_vec_tri.push_back("BCC");
+    
+    
+    
+    
+    
+    
+    testing_vec_3p.push_back("CCC");
+    testing_vec_tri.push_back("CCC");
+    
+    
+    
+    testing_vec.push_back(testing_vec_3p);
+    testing_vec.push_back(testing_vec_tri);        
+    
+    std::vector<std::vector<std::string>> tested_vec = service1.get_length_3_patterns(test_string);
+    
+    CPPUNIT_ASSERT(tested_vec == testing_vec);
+    
     
 }
 

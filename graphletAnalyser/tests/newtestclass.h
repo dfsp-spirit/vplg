@@ -32,7 +32,8 @@ class newtestclass : public CPPUNIT_NS::TestFixture {
     CPPUNIT_TEST(test_get_patterns);
     CPPUNIT_TEST(test_compute_CAT);
     CPPUNIT_TEST(test_reverse_string);
-    CPPUNIT_TEST(test_get_2_patterns);
+    CPPUNIT_TEST(test_get_length_2_patterns);
+    CPPUNIT_TEST(test_get_length_3_patterns);
     
     CPPUNIT_TEST_SUITE_END();
 
@@ -62,6 +63,7 @@ private:
     std::set<std::string> test_rev_set = {"ABC", "CBA"};
     std::set<std::string> test_CAT_set = {"ABC", "BCA", "CAB"};
     std::vector<std::string> test_2p_vec;
+    std::vector<std::vector<std::string>> test_3p_vec;
 
     void test_get_label();
     void test_getPropertyValue();
@@ -81,7 +83,8 @@ private:
     void test_get_patterns();
     void test_compute_CAT();
     void test_reverse_string();
-    void test_get_2_patterns();
+    void test_get_length_2_patterns();
+    void test_get_length_3_patterns();
 };
 
 #endif	/* NEWTESTCLASS_H */

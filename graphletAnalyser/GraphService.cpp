@@ -466,14 +466,14 @@ std::vector<std::vector<std::string>> GraphService::get_length_3_patterns(std::s
             std::string word_w2 = l2_prefix + prefix;
             std::string word_w2_3p = prefix + l2_prefix;
             std::string word_w2_tri = prefix + two_same;
-            std::string word_w2_sec_mid = sig.substr(k,1) + l2_prefix;
+            std::string word_w2_fst_mid = sig.substr(k,1) + l2_prefix;
             
             //words which are reversed are ignored because reasons
             
             vec_3p.push_back(word_w2);
             vec_3p.push_back(word_w2_3p);
             vec_3p.push_back(word_w2_tri); // add word with 2 different letters
-            vec_3p.push_back(word_w2_sec_mid);
+            vec_3p.push_back(word_w2_fst_mid);
             
             vec_tri.push_back(word_w2);    // word_w2_3p is not added for triangle
             vec_tri.push_back(word_w2_tri);// pattern, because it is
@@ -489,11 +489,14 @@ std::vector<std::vector<std::string>> GraphService::get_length_3_patterns(std::s
                 std::string word_w3_CAT2 = sig.substr(k,1) + sig.substr(m,1) + sig.substr(i,1);
                 
                 
+                
                 // insert words into vectors where necessary
                 vec_3p.push_back(word_w3);
                 vec_3p.push_back(word_w3CAT);
                 vec_3p.push_back(word_w3_CAT2);
                 
+                vec_tri.push_back(word_w3);
+                std::reverse(word_w3.begin(),word_w3.end());
                 vec_tri.push_back(word_w3);
                 
                 
