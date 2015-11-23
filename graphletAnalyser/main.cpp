@@ -446,31 +446,60 @@ int main(int argc, char** argv) {
             withLabeled = false;
         }
         
+        // setting up vectors for storing data
         
-        
-        
-        std::vector<std::string> evec1 = std::vector<std::string>();
-        std::vector<std::vector<std::string>> evec = std::vector<std::vector<std::string>>();
-        
-        
-        std::vector<int> counts2 = gc.count_connected_2_graphlets("", evec1);
-        std::vector<int> counts3 = gc.count_connected_3_graphlets("",evec);
-        std::vector<int> counts4 = gc.count_connected_4_graphlets("",evec);
-        std::vector<int> counts5 = gc.count_connected_5_graphlets();
-        
+        std::vector<float> norm_labeled_counts = std::vector<float>();
+        vector<vector<float>> norm_counts = vector<vector<float>>();
         std::vector<std::vector<int>> abs_counts = std::vector<std::vector<int>>();
+        
+        std::vector<int> counts2;
+        std::vector<int> counts3;
+        std::vector<int> counts4;
+        std::vector<int> counts5;
+        
+        
+        if (!withLabeled) {
+            
+            std::vector<std::string> evec1 = std::vector<std::string>();
+            std::vector<std::vector<std::string>> evec = std::vector<std::vector<std::string>>();
+        
+        
+            counts2 = gc.count_connected_2_graphlets("", evec1);
+            counts3 = gc.count_connected_3_graphlets("",evec);
+            counts4 = gc.count_connected_4_graphlets("",evec);
+            counts5 = gc.count_connected_5_graphlets();
+
+        
+
+            
+        } else {
+            
+           
+                
+                std::string alphabet = options["graph_vertex_type_alphabet"];
+                std::vector<std::string> lab2vec = service.get_length_2_patterns(alphabet);
+                std::vector<std::vector<std::string>> lab3vec = service.get_length_3_patterns(alphabet);
+                std::vector<std::vector<std::string>> evec = std::vector<std::vector<std::string>>();
+                
+                counts2 = gc.count_connected_2_graphlets(vertex_label, lab2vec);
+                counts3 = gc.count_connected_3_graphlets(vertex_label,lab3vec);
+                counts4 = gc.count_connected_4_graphlets("",evec);
+                counts5 = gc.count_connected_5_graphlets();
+                
+                norm_labeled_counts = gc.get_normalized_labeled_counts();
+                
+
+            
+            
+        }
+        
         
         abs_counts.push_back(counts2);
         abs_counts.push_back(counts3);
         abs_counts.push_back(counts4);
         abs_counts.push_back(counts5);
         
-        
         int total = gc.get_total_counts();
-        
-        
-        vector<vector<float>> norm_counts = vector<vector<float>>();
-        
         std::vector<float> ncounts2 = gc.normalize_counts(counts2,total);
         std::vector<float> ncounts3 = gc.normalize_counts(counts3,total);
         std::vector<float> ncounts4 = gc.normalize_counts(counts4,total);
@@ -481,26 +510,7 @@ int main(int argc, char** argv) {
         norm_counts.push_back(ncounts4);
         norm_counts.push_back(ncounts5);
         
-        std::vector<float> norm_labeled_counts = std::vector<float>();
-        
-        if (withLabeled) {
-            
-            //when the sse_type is used as a label, use the hardcoded label vectors
-            //from ProteinGraphService
-            if (vertex_label.compare("sse_type") == 0) {
-                norm_labeled_counts = service.get_norm_ptgl_counts_1dim();
-            }
-            else {
-                // if the sse type is not used as a label...
-                
-                // get the alphabet from the config file
-                std::string sigma = options["graph_vertex_type_alphabet"];
-                
-                // TODO: add computation of words for labeled graphlets
-                
-                
-            }
-        }
+
 	     
         if( ! silent) {
             cout << apptag << "  Saving results.\n";

@@ -277,9 +277,10 @@ int GraphPTGLPrinter::savePGCountsToDatabasePGXX(int graphtype_int, std::vector<
 
             
             // check stuff
-            int numExpected = 67;
+            
+            int numExpected = 64;
             if(cl.empty()) {
-                numExpected = 67 - 38;
+                numExpected = 64 - 38;
             }
             
             
@@ -621,6 +622,7 @@ int GraphPTGLPrinter::saveAACountsToDatabasePGXX(std::string pdbid, std::string 
 
             
             // check stuff
+            /*
             int numExpected = 67;
             if(cl.empty()) {
                 numExpected = 67 - 38;
@@ -632,6 +634,7 @@ int GraphPTGLPrinter::saveAACountsToDatabasePGXX(std::string pdbid, std::string 
                 return 1;
             }
             
+             */
             float val;
             string query = "INSERT INTO plcc_aa_graphlets (aagraph_id, aa_graphlet_counts) VALUES (" + W.esc(dbpkStr) + ", '{";
             for (int i = 0; i < allGraphletcounts.size(); i++) {
@@ -925,9 +928,10 @@ int GraphPTGLPrinter::saveCGCountsToDatabasePGXX(std::string pdbid, std::string 
 
             
             // check stuff
-            int numExpected = 67;
+            
+            int numExpected = 64;
             if(cl.empty()) {
-                numExpected = 67 - 38;
+                numExpected = 64 - 38;
             }
             
             
@@ -935,6 +939,7 @@ int GraphPTGLPrinter::saveCGCountsToDatabasePGXX(std::string pdbid, std::string 
                 cerr << apptag << "ERROR: Expected counts for " << numExpected << " different graphlets, but found " << allGraphletcounts.size() << ". Cannot write graphlet counts to database.\n";
                 return 1;
             }
+            
             
             float val;
             string query = "INSERT INTO plcc_complex_graphlets (complexgraph_id, complex_graphlet_counts) VALUES (" + W.esc(dbpkStr) + ", '{";

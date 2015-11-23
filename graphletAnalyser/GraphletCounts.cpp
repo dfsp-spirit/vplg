@@ -1459,3 +1459,28 @@ int GraphletCounts::get_total_counts() {
     int counts = num2 + num3 + num4 + num5;
     return counts;
 }
+
+std::vector<float> GraphletCounts::get_normalized_labeled_counts() {
+    
+    float total = float (get_total_counts());
+    std::vector<float> out_vec = std::vector<float>();
+    float val;
+    
+    for (int i = 0; i < labeled_2_countsABS.size(); i++) {
+        val = (float (labeled_2_countsABS[i]))/total;
+        out_vec.push_back(val);
+    }
+    
+    for (int i = 0; i < labeled_3_countsABS[0].size(); i++) {
+        int ival = labeled_3_countsABS[0][i];
+        val = (float (ival))/total;
+        out_vec.push_back(val);
+    }
+    for (int i = 0; i < labeled_3_countsABS[1].size(); i++) {
+        int ival = labeled_3_countsABS[1][i];
+        val = (float (ival))/total;
+        out_vec.push_back(val);
+    }
+    
+    return out_vec;
+}

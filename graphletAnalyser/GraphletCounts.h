@@ -96,6 +96,7 @@ public:
     std::vector<std::vector<float>> get_normalized_counts();
     std::vector<int> get_labeled_abs_counts();
     std::vector<float> normalize_counts(std::vector<int>,float);
+    std::vector<float> get_normalized_labeled_counts();
     Graph get_graph() const;
     
     
