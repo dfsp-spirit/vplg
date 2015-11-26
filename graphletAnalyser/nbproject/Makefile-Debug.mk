@@ -43,6 +43,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/GraphletCounts.o \
 	${OBJECTDIR}/JSON_printer.o \
 	${OBJECTDIR}/ProteinGraphService.o \
+	${OBJECTDIR}/Scoring.o \
 	${OBJECTDIR}/main.o
 
 # Test Directory
@@ -55,7 +56,8 @@ TESTFILES= \
 	${TESTDIR}/TestFiles/f6 \
 	${TESTDIR}/TestFiles/f1 \
 	${TESTDIR}/TestFiles/f4 \
-	${TESTDIR}/TestFiles/f5
+	${TESTDIR}/TestFiles/f5 \
+	${TESTDIR}/TestFiles/f7
 
 # Test Object Files
 TESTOBJECTFILES= \
@@ -65,12 +67,14 @@ TESTOBJECTFILES= \
 	${TESTDIR}/tests/newtestclass3.o \
 	${TESTDIR}/tests/newtestclass4.o \
 	${TESTDIR}/tests/newtestclass5.o \
+	${TESTDIR}/tests/newtestclass6.o \
 	${TESTDIR}/tests/newtestrunner.o \
 	${TESTDIR}/tests/newtestrunner1.o \
 	${TESTDIR}/tests/newtestrunner2.o \
 	${TESTDIR}/tests/newtestrunner3.o \
 	${TESTDIR}/tests/newtestrunner4.o \
-	${TESTDIR}/tests/newtestrunner5.o
+	${TESTDIR}/tests/newtestrunner5.o \
+	${TESTDIR}/tests/newtestrunner6.o
 
 # C Compiler Flags
 CFLAGS=
@@ -136,6 +140,11 @@ ${OBJECTDIR}/ProteinGraphService.o: ProteinGraphService.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ProteinGraphService.o ProteinGraphService.cpp
 
+${OBJECTDIR}/Scoring.o: Scoring.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Scoring.o Scoring.cpp
+
 ${OBJECTDIR}/main.o: main.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
@@ -171,6 +180,10 @@ ${TESTDIR}/TestFiles/f4: ${TESTDIR}/tests/newtestclass3.o ${TESTDIR}/tests/newte
 ${TESTDIR}/TestFiles/f5: ${TESTDIR}/tests/newtestclass4.o ${TESTDIR}/tests/newtestrunner4.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc}   -o ${TESTDIR}/TestFiles/f5 $^ ${LDLIBSOPTIONS} -L/usr/lib64 -lboost_graph -lboost_regex -lpq -lpqxx `cppunit-config --libs`   
+
+${TESTDIR}/TestFiles/f7: ${TESTDIR}/tests/newtestclass6.o ${TESTDIR}/tests/newtestrunner6.o ${OBJECTFILES:%.o=%_nomain.o}
+	${MKDIR} -p ${TESTDIR}/TestFiles
+	${LINK.cc}   -o ${TESTDIR}/TestFiles/f7 $^ ${LDLIBSOPTIONS} -L/usr/lib64 -lboost_graph -lboost_regex -lpq -lpqxx `cppunit-config --libs`   
 
 
 ${TESTDIR}/tests/newtestclass2.o: tests/newtestclass2.cpp 
@@ -243,6 +256,18 @@ ${TESTDIR}/tests/newtestrunner4.o: tests/newtestrunner4.cpp
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
 	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner4.o tests/newtestrunner4.cpp
+
+
+${TESTDIR}/tests/newtestclass6.o: tests/newtestclass6.cpp 
+	${MKDIR} -p ${TESTDIR}/tests
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestclass6.o tests/newtestclass6.cpp
+
+
+${TESTDIR}/tests/newtestrunner6.o: tests/newtestrunner6.cpp 
+	${MKDIR} -p ${TESTDIR}/tests
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner6.o tests/newtestrunner6.cpp
 
 
 ${OBJECTDIR}/Database_nomain.o: ${OBJECTDIR}/Database.o Database.cpp 
@@ -349,6 +374,19 @@ ${OBJECTDIR}/ProteinGraphService_nomain.o: ${OBJECTDIR}/ProteinGraphService.o Pr
 	    ${CP} ${OBJECTDIR}/ProteinGraphService.o ${OBJECTDIR}/ProteinGraphService_nomain.o;\
 	fi
 
+${OBJECTDIR}/Scoring_nomain.o: ${OBJECTDIR}/Scoring.o Scoring.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/Scoring.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Scoring_nomain.o Scoring.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/Scoring.o ${OBJECTDIR}/Scoring_nomain.o;\
+	fi
+
 ${OBJECTDIR}/main_nomain.o: ${OBJECTDIR}/main.o main.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	@NMOUTPUT=`${NM} ${OBJECTDIR}/main.o`; \
@@ -372,6 +410,7 @@ ${OBJECTDIR}/main_nomain.o: ${OBJECTDIR}/main.o main.cpp
 	    ${TESTDIR}/TestFiles/f1 || true; \
 	    ${TESTDIR}/TestFiles/f4 || true; \
 	    ${TESTDIR}/TestFiles/f5 || true; \
+	    ${TESTDIR}/TestFiles/f7 || true; \
 	else  \
 	    ./${TEST} || true; \
 	fi
