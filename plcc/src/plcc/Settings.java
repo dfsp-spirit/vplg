@@ -216,6 +216,8 @@ public class Settings {
         defSet("plcc_B_set_pdb_representative_chains_remove_old_labels", "true", "Whether the old labels should be removed from all chains before the new ones are applied. Removed means all chains are considered NOT part of the representative set.");        
         defSet("plcc_S_representative_chains_xml_file", "representatives.xml", "The path to the XML file containing the representative PDB chains from the PDB. You can get the file from the RCSB PDB REST web service.");
         defSet("plcc_B_writeComplexContactCSV", "false", "Whether to write a CSV file containing all contacts used for co,plex graph computation.");
+        defSet("plcc_B_write_chains_file", "false", "Whether to write a chains file containing all chain names of the currently handled PDB file. Can be used by GraphletAnalyzer later to construct graph file names for all chains.");
+        
 
         
         defSet("plcc_B_split_dsspfile_warning", "true", "Whether to show a warning about splitting the DSSP file when multiple models are detected in a PDB file.");

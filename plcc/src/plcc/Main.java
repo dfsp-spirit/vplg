@@ -394,10 +394,28 @@ public class Main {
                         Settings.set("plcc_B_no_warn", "true");
                     }
                     
-                    if(s.equals("--cluster")) {
+                    if(s.equals("--cluster")) {                        
                         Settings.set("plcc_B_clustermode", "true");
+                        Settings.set("plcc_B_silent", "true");
+                        Settings.set("plcc_B_write_chains_file", "true");
+                        Settings.set("plcc_B_compute_motifs", "true");
+                        Settings.set("plcc_B_complex_graphs", "true");
+                        Settings.set("plcc_B_separate_contacts_by_chain", "false");
+                        Settings.set("plcc_B_folding_graphs", "true");
+                        Settings.set("plcc_B_draw_folding_graphs", "true");
+                        Settings.set("plcc_B_output_images_dir_tree", "true");
+                        Settings.set("plcc_B_output_textfiles_dir_tree", "true");
+                        Settings.set("plcc_B_useDB", "true");
+                        Settings.set("plcc_B_folding_graphs", "true");
+                        Settings.set("plcc_B_AAgraph_allchainscombined", "true");
+                        Settings.set("plcc_B_AAgraph_perchain", "true");
+                        Settings.set("plcc_B_no_warn", "true");
                     }
                     
+                    if(s.equals("--write-chains-file")) {
+                        Settings.set("plcc_B_write_chains_file", "true");
+                    }                                                
+                            
                     if(s.equals("-Z") || s.equals("--silent")) {
                         Settings.set("plcc_B_silent", "true");
                     }
@@ -1055,6 +1073,12 @@ public class Main {
             }
         }
 
+        if(Settings.getBoolean("plcc_B_clustermode")) {
+            if(! silent) {
+                System.out.println("Cluster mode active.");
+            }
+        }
+        
         // This check is rather useless and it will break PDB files that were split into multiple files (one for each
         //  model) and renames, e.g. "2kos_1.pdb" for model 1 of protein 2kos. It is therefore disabaled atm.
         if(pdbid.length() != 4) {
@@ -1753,11 +1777,11 @@ public class Main {
             }
         }
         
-        if(Settings.getBoolean("plcc_B_clustermode")) {
-            // write the chains file if it has not yet been written
+        if(Settings.getBoolean("plcc_B_write_chains_file")) {
+            // write the chains file if it has not yet been written. Used in cluster mode for the GraphletAnlayzer software to know the names of all graphs of all chains.
             if( ! Settings.getBoolean("plcc_B_ptgl_text_output")) {
                 if(! silent) {
-                    System.out.println("Writing chain file due to cluster mode setting...");
+                    System.out.println("Writing chain file...");
                 }
                 writeChains(chainsFile, pdbid, chains);
             }
@@ -5210,6 +5234,7 @@ public class Main {
         System.out.println("-o | --outputdir <dir>     : write output files to directory <dir> (instead of '.', the current directory)");
         System.out.println("-O | --outputformats <list>: write only graph output formats in <list>, where g=GML, t=TGF, d=DOT language, e=Kavosh edge list, p=PLCC, j=json. Specify 'x' for none.");
         System.out.println("-p | --pdbfile <pdbfile>   : use input PDB file <pdbfile> (instead of assuming '<pdbid>.pdb')");
+        System.out.println("-P | --write-chains-file   : write an info file containing all chain names of the handled PDB file (for other software to know output file names)");
         System.out.println("     --gz-pdbfile <f>      : use gzipped input PDB file <f>.");
         System.out.println("-q | --fg-notations <list> : draw only the folding graph notations in <list>, e.g. 'kars' = KEY, ADJ, RED and SEQ.");
         System.out.println("-r | --recreate-tables     : drop and recreate DB statistics tables, then exit (see -u)*");
@@ -5228,9 +5253,10 @@ public class Main {
         System.out.println("-z | --ramaplot            : draw a ramachandran plot of each chain to the file '<pdbid>_<chain>_plot.svg'");        
         System.out.println("-Z | --silent              : silent mode. do not write output to STDOUT.");        
         System.out.println("   --compute-graph-metrics : compute graph metrics like cluster coefficient for PGs. Slower!");
+        System.out.println("   --cluster               : Set all options for cluster mode. Equals '-f -u -k -s -G -i -Z -P'.");
         System.out.println("");
         System.out.println("The following options only make sense for database maintenance:");
-        System.out.println("--set-pdb-representative-chains <file> <k> : Set non-redundant chain status for all chains in DB from XML file <file>. <k> determines what to do with existing flags, valid options are 'keep' or 'remove'.");
+        System.out.println("--set-pdb-representative-chains <file> <k> : Set non-redundant chain status for all chains in DB from XML file <file>. <k> determines what to do with existing flags, valid options are 'keep' or 'remove'. Get the file from PDB REST API.");
         System.out.println("");
         System.out.println("EXAMPLES: java -jar plcc.jar 8icd");
         System.out.println("          java -jar plcc.jar 8icd -D 2 -d /tmp/dssp/8icd.dssp -p /tmp/pdb/8icd.pdb");
