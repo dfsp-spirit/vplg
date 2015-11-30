@@ -1876,7 +1876,13 @@ public class Main {
 
                     if(Settings.getBoolean("plcc_B_useDB")) {
                         try {
-                            DBManager.writeAminoAcidGraphToDB(pdbid, AAGraph.CHAINID_ALL_CHAINS, aag.toGraphModellingLanguageFormat());
+                            if(Settings.getBoolean("plcc_B_write_graphstrings_to_database_aag")) {
+                                DBManager.writeAminoAcidGraphToDB(pdbid, AAGraph.CHAINID_ALL_CHAINS, aag.toGraphModellingLanguageFormat());
+                            }
+                            else {
+                                DBManager.writeAminoAcidGraphToDB(pdbid, AAGraph.CHAINID_ALL_CHAINS, null);
+                            }
+                            
                             if(! silent) {
                                 System.out.println("Wrote all chains AA graph of " + pdbid + " to DB.");
                             }
@@ -1934,7 +1940,13 @@ public class Main {
                         
                         if(Settings.getBoolean("plcc_B_useDB")) {
                             try {
-                                DBManager.writeAminoAcidGraphToDB(pdbid, c.getPdbChainID(), aag.toGraphModellingLanguageFormat());
+                                if(Settings.getBoolean("plcc_B_write_graphstrings_to_database_aag")) {
+                                    DBManager.writeAminoAcidGraphToDB(pdbid, c.getPdbChainID(), aag.toGraphModellingLanguageFormat());
+                                }
+                                else {
+                                    DBManager.writeAminoAcidGraphToDB(pdbid, c.getPdbChainID(), null);
+                                }
+                                
                                 if(! silent) {
                                     System.out.println("Wrote chain '" + c.getPdbChainID() + "' AA graph of " + pdbid + " to DB.");
                                 }
@@ -2803,7 +2815,13 @@ public class Main {
                                         
                     
                     try { 
-                        Boolean res = DBManager.writeProteinGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), pg.toGraphModellingLanguageFormat(), pg.toVPLGGraphFormat(), pg.toKavoshFormat(), pg.toDOTLanguageFormat(), pg.toJSONFormat(), pg.toXMLFormat(), pg.getSSEStringSequential(), pg.containsBetaBarrel()); 
+                        Boolean res;
+                        if(Settings.getBoolean("plcc_B_write_graphstrings_to_database_pg")) {
+                            res = DBManager.writeProteinGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), null, null, null, null, null, null, pg.getSSEStringSequential(), pg.containsBetaBarrel()); 
+                        }
+                        else {
+                            res = DBManager.writeProteinGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), pg.toGraphModellingLanguageFormat(), pg.toVPLGGraphFormat(), pg.toKavoshFormat(), pg.toDOTLanguageFormat(), pg.toJSONFormat(), pg.toXMLFormat(), pg.getSSEStringSequential(), pg.containsBetaBarrel()); 
+                        }
                         
                         if((! silent) && res) {
                             System.out.println("      Inserted '" + gt + "' graph of PDB ID '" + pdbid + "' chain '" + chain + "' into DB.");
@@ -3155,7 +3173,13 @@ public class Main {
                 else {
                                 
                     try { 
-                        fgDbId = DBManager.writeFoldingGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), fg_number, FoldingGraph.getFoldNameOfFoldNumber(fg_number), fg.getMinimalVertexIndexInParentGraph(), fg.toGraphModellingLanguageFormat(), fg.toVPLGGraphFormat(), fg.toKavoshFormat(), fg.toDOTLanguageFormat(), fg.toJSONFormat(), fg.toXMLFormat(), fg.getSSEStringSequential(), fg.containsBetaBarrel()); 
+                        if(Settings.getBoolean("plcc_B_write_graphstrings_to_database_fg")) {
+                            fgDbId = DBManager.writeFoldingGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), fg_number, FoldingGraph.getFoldNameOfFoldNumber(fg_number), fg.getMinimalVertexIndexInParentGraph(), fg.toGraphModellingLanguageFormat(), fg.toVPLGGraphFormat(), fg.toKavoshFormat(), fg.toDOTLanguageFormat(), fg.toJSONFormat(), fg.toXMLFormat(), fg.getSSEStringSequential(), fg.containsBetaBarrel()); 
+                        }
+                        else {
+                            fgDbId = DBManager.writeFoldingGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), fg_number, FoldingGraph.getFoldNameOfFoldNumber(fg_number), fg.getMinimalVertexIndexInParentGraph(), null, null, null, null, null, null, fg.getSSEStringSequential(), fg.containsBetaBarrel()); 
+                        }
+                        
                         if(! silent) {
                             System.out.println("        Inserted '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB.");
                         }
@@ -7196,11 +7220,16 @@ public class Main {
             //System.out.println("dbImagePathChainCG = '" + dbImagePathChainCG + "'");
             //dbImagePath += DrawTools.getFileExtensionForImageFormat(format);
             try {
+                if(Settings.getBoolean("plcc_B_write_graphstrings_to_database_cg")) {
+                    DBManager.writeComplexGraphToDB(pdbid, cg.toGraphModellingLanguageFormat(), null, cg.toXMLFormat(), null, cg.toKavoshFormat(), null, dbImagePathCG + ".svg", dbImagePathChainCG + ".svg", dbImagePathCG + ".png", dbImagePathChainCG + ".png", dbImagePathCG + ".pdf", dbImagePathChainCG + ".pdf");
+                } else {
+                    DBManager.writeComplexGraphToDB(pdbid, null, null, null, null, null, null, dbImagePathCG + ".svg", dbImagePathChainCG + ".svg", dbImagePathCG + ".png", dbImagePathChainCG + ".png", dbImagePathCG + ".pdf", dbImagePathChainCG + ".pdf");
+                }
                 
-                DBManager.writeComplexGraphToDB(pdbid, cg.toGraphModellingLanguageFormat(), null, cg.toXMLFormat(), null, cg.toKavoshFormat(), null, dbImagePathCG + ".svg", dbImagePathChainCG + ".svg", dbImagePathCG + ".png", dbImagePathChainCG + ".png", dbImagePathCG + ".pdf", dbImagePathChainCG + ".pdf");
                 if(! silent) {
                     System.out.println("Wrote complex graph of " + pdbid + " to DB.");
                 }
+                
             } catch(SQLException e) {
                 DP.getInstance().w("Main", "Could not write complex graph to DB: '" + e.getMessage() + "'.");
             }

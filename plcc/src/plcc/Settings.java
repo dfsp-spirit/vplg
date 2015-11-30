@@ -355,6 +355,10 @@ public class Settings {
         defSet("plcc_S_db_password", "", "DB password (empty if local is TRUST for this user)");
         defSet("plcc_S_graph_image_base_path", "/srv/www/htdocs/vplgweb/data/", "The graph image base path for the database. The relative path to the path given here is used to locate the graph image on disk.");
         defSet("plcc_B_db_use_batch_inserts", "false", "Whether inserts into the database should use batch mode instead of many single queries whenever possible. Only implemented for a few queries for which it may make sense.");
+        defSet("plcc_B_write_graphstrings_to_database_pg", "false", "Whether to write the protein graph strings to the database in the different formats like XML, GML, TGF, etc. They are currently written to disk only by default, and NULL values are inserted into the DB, because we do not use the DB fields for anything atm.");
+        defSet("plcc_B_write_graphstrings_to_database_fg", "false", "Whether to write the folding graph strings to the database in the different formats like XML, GML, TGF, etc. They are currently written to disk only by default, and NULL values are inserted into the DB, because we do not use the DB fields for anything atm.");
+        defSet("plcc_B_write_graphstrings_to_database_cg", "false", "Whether to write the complex graph strings to the database in the different formats like XML, GML, TGF, etc. They are currently written to disk only by default, and NULL values are inserted into the DB, because we do not use the DB fields for anything atm.");
+        defSet("plcc_B_write_graphstrings_to_database_aag", "false", "Whether to write the amino acid graph strings to the database in the different formats like XML, GML, TGF, etc. They are currently written to disk only by default, and NULL values are inserted into the DB, because we do not use the DB fields for anything atm.");
         
         
         // short report stuff
