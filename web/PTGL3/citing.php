@@ -74,6 +74,30 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
 	<!-- BiBTex Entry Tim -->
 
+	<p>
+	The most recent and recommended citation of the PTGL is:<br>
+	<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;Schäfer T, Scheck A, Bruneß D, May P, Koch I (2015). <i>The new protein topology graph library web server.</i> Bioinformatics. (<a href="http://bioinformatics.oxfordjournals.org/content/early/2015/10/27/bioinformatics.btv574" target="_blank">btv574 at oxfordjournals.org</a>).
+	<br>
+	<br>
+		
+	You can find the BibTex entry for this publication here:
+	</p>
+	
+  <div id="bibtex">
+  @article{schafer2015new,<br>
+  title={The new protein topology graph library web server},<br>
+  author={Sch{\"a}fer, Tim and Scheck, Andreas and Brune{\ss}, Daniel and May, Patrick and Koch, Ina},<br>
+  journal={Bioinformatics},<br>
+  pages={btv574},<br>
+  year={2015},<br>
+  publisher={Oxford Univ Press}<br>
+}<br>
+  </div>
+  <br>
+  
+  <p>BibTex entries for older publications:</p>
+	
   <div id="bibtex">
 	@InProceedings{schfer_et_al:OASIcs:2012:3722,<br>
 	author =    {Tim Sch{\"a}fer and Patrick May and Ina Koch},<br>

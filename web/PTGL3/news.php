@@ -44,18 +44,28 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
 	<div id="PageIntro">
 		<div class="container" id="pageintro">
+		<br/>
 		<h2> PTGL news</h2>
 		<br>
 		
-		Here we list important information on updates, planned maintenance, and more.
+		<p>Here we list important information on PTGL updates, planned maintenance times, and more.</p>
 		<br /><br/>
-
-		<ul id="news">
-		<li><b>NOV 30, 2015: Major update scheduled<b> We are currently running an update to the latest PDB version on our cluster. The update will be rolled out to the PTGL server in December. This update will add support for complex graphs and ligand-centered graphs.</li>
-		<li><b>OCT 27, 2015: New PTGL paper published<b> We have published a paper on the new PTGL in Oxford Bioinformatics. Read it <a href="http://bioinformatics.oxfordjournals.org/content/early/2015/10/27/bioinformatics.btv574" target="_blank">at oxfordjournals.org</a>.</li>
-		<li><b>JUN 06, 2015: The PTGL is on Twitter<b> The PTGL now has a twitter account, and you can stay up-to-date by following <a href="https://twitter.com/vplg_project" target="_blank">@vplg_project</a>.</li>
 		
-		</ul>
+		<h4>NOV 30, 2015: Major update scheduled</h4>
+		<p>We are currently running an update to the latest PDB version on our cluster. The update will be rolled out to the PTGL server in December. This update will add support for complex graphs and ligand-centered graphs.</p>
+		<br /><br/>
+		
+		
+		<h4>OCT 27, 2015: New PTGL paper published</h4>
+		<p>We have published a paper on the new PTGL in Oxford Bioinformatics. Read it <a href="http://bioinformatics.oxfordjournals.org/content/early/2015/10/27/bioinformatics.btv574" target="_blank">at oxfordjournals.org</a>.</p>
+		<br /><br/>
+		
+		
+		<h4>JUN 06, 2015: The PTGL is on Twitter</h4>
+		<p>The PTGL now has a twitter account, and you can stay up-to-date by following <a href="https://twitter.com/vplg_project" target="_blank">@vplg_project</a>.</p>
+		<br /><br/>
+		
+
 
 </div><!-- end container and contentText -->
 </div><!-- end wrapper -->
