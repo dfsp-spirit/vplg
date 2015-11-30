@@ -237,7 +237,7 @@ public class Settings {
         defSet("plcc_B_ramachandran_plot", "false", "Whether a Ramachandran plot is drawn to a file for each chain (slower).");
         defSet("plcc_B_strict_ptgl_behaviour", "true", "Whether plcc should try to strictly mimick the PTGL, including questionable stuff.");
         defSet("plcc_B_key_use_alternate_arcs", "true", "Whether to use alternative crossover arcs in KEY notation. The alternative arcs cut through other SSEs, the default ones use a vertical central line and shift the center to avoid this.");
-        defSet("plcc_B_print_notations_on_fg_images", "true", "Whether to add the notation string to the FG images.");
+        defSet("plcc_B_print_notations_on_fg_images", "false", "Whether to add the notation string to the FG images.");
         
         defSet("plcc_B_output_images_dir_tree", "false", "Whether to write output images to a PDB-style sub directory structure under the output directory instead of writing them in their directly. This is useful if you want to process the whole PDB because most filesystems will get into trouble with tens of thousands of files in a single directory. The directory structure will be chosen from the meta data, i.e., PDB ID, chain, graph type, etc.");
         defSet("plcc_B_output_textfiles_dir_tree", "false", "Whether to write output graph text files to a PDB-style sub directory structure under the output directory instead of writing them in their directly. This is useful if you want to process the whole PDB because most filesystems will get into trouble with tens of thousands of files in a single directory. The directory structure will be chosen from the meta data, i.e., PDB ID, chain, graph type, etc.");

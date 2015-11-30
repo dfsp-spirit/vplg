@@ -165,7 +165,7 @@ public class ProteinGraphDrawer {
         Font fontBold = pl.getStandardFontBold();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();
-        String proteinHeader = "The ADJ " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
+        String proteinHeader = "ADJ " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + "";
         String notation = "ADJ notation: '" + pnfr.adjNotation + "'";
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
@@ -607,7 +607,7 @@ public class ProteinGraphDrawer {
         Font font = pl.getStandardFont();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();
-        String proteinHeader = "The KEY " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
+        String proteinHeader = "KEY " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + "";
         String notation = "KEY notation: '" + pnfr.keyNotation + "'";
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
@@ -957,7 +957,7 @@ public class ProteinGraphDrawer {
         Font fontBold = pl.getStandardFontBold();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();
-        String proteinHeader = "The RED " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
+        String proteinHeader = "RED " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + "";
         String notation = "RED notation: '" + pnfr.redNotation + "'";
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
@@ -1159,7 +1159,7 @@ public class ProteinGraphDrawer {
         Font fontBold = pl.getStandardFontBold();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();
-        String proteinHeader = "The DEF " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
+        String proteinHeader = "DEF " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + "";
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
         String sseNumberFoldingGraph;
@@ -1512,7 +1512,7 @@ public class ProteinGraphDrawer {
         Font font = pl.getStandardFont();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();        
-        String proteinHeader = "The " + pg.getGraphType() + " protein graph of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + " [V=" + pg.numVertices() + ", E=" + pg.numSSEContacts() + "].";
+        String proteinHeader = "" + pg.getGraphType() + " protein graph of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + "";
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
         String sseNumberGraph;
@@ -1877,7 +1877,7 @@ public class ProteinGraphDrawer {
         Font font = pl.getStandardFont();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();
-        String proteinHeader = "The " + graphType + " protein graph of PDB entry " +pdbid + ", chain " + chainid + " [V=" + pg.getDrawableVertices().size() + ", E=" + pg.getDrawableEdges().size() + "].";
+        String proteinHeader = "" + graphType + " protein graph of PDB entry " +pdbid + ", chain " + chainid + "";
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
         String sseNumberGraph;
@@ -2385,7 +2385,7 @@ public class ProteinGraphDrawer {
         Font fontBold = pl.getStandardFontBold();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();
-        String proteinHeader = "The SEQ " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
+        String proteinHeader = "SEQ " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + "";
         String notation = "SEQ notation: '" + pnfr.seqNotation + "'";
         Integer stringHeight = fontMetrics.getAscent();
         String sseNumberSeq;
@@ -2666,7 +2666,7 @@ public class ProteinGraphDrawer {
         Font fontBold = pl.getStandardFontBold();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();
-        String proteinHeader = "The KEY " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + " [V=" + fg.numVertices() + ", E=" + fg.numSSEContacts() + "].";
+        String proteinHeader = "KEY " + pg.getGraphType() + " folding graph " + fg.getFoldingGraphFoldName() + " (# " + fg.getFoldingGraphNumber() + ") of PDB entry " + pg.getPdbid() + ", chain " + pg.getChainid() + "";
         String notation = "KEY notation: '" + pnfr.keyNotation + "'";
         if (debug) {
             DP.getInstance().d("Notation from PNFR: " + notation);
