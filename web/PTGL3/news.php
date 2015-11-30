@@ -61,8 +61,19 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<br /><br/>
 		
 		
+		<h4>JUL 29, 2015: VPLG code moved to GitHub, project page stays at SourceForge</h4>
+		<p>The code of VPLG, the command line application which computes all the data in the PTGL database, has been <a href="https://github.com/dfsp-spirit/vplg" target="_blank">moved to GitHub</a>. The <a href="https://sourceforge.net/projects/vplg/" target="_blank">project page and the VPLG releases</a> will stay at SourceForge though, so this only affects developers and people interested in the source code.</p>
+		<br /><br/>
+		
+		
+		
 		<h4>JUN 06, 2015: The PTGL is on Twitter</h4>
 		<p>The PTGL now has a twitter account, and you can stay up-to-date by following <a href="https://twitter.com/vplg_project" target="_blank">@vplg_project</a>.</p>
+		<br /><br/>
+		
+		
+		<h4>JUN 06, 2015: Server updated to latest PDB release</h4>
+		<p>The PTGL has been updated to PDB data from May 2015, and is now online again. Enjoy.</p>
 		<br /><br/>
 		
 
