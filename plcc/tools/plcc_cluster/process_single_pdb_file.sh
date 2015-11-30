@@ -2,7 +2,9 @@
 ## process_single_pdb_file.sh -- processes a single PDB file. This is used by the MPI version of the update scripts.
 ##                               You can also use it on its own, of course.
 ##
-## Written by ts_2011
+## Written by ts, 2011
+## Updated by ts, 2014
+## Updated by ts, 11-2015
 
 APPTAG="[PROC_1PDB]"
 CFG_FILE="settings_statistics.cfg"
@@ -22,7 +24,7 @@ ERROR_LOG_GET_PDB_FILE="/dev/stderr"		# may be reset below once PDB ID is known
 ERROR_LOG_CREATE_DSSP_FILE="/dev/stderr"	# may be reset below once PDB ID is known
 SILENT="YES"
 
-## IMPORTANT: set this to "YES" if plcc is run with '-k' / '--output-subdir-tree'
+## IMPORTANT: set this to "YES" if plcc is run with '-k' / '--output-subdir-tree' (i.e., if file '7tim_whatever.gml' is in subdir 'ti/7tim/')
 PLCC_RUNS_IN_SUBDIR_TREE_MODE="YES"
 
 ################################################## functions ##################################################
@@ -380,28 +382,63 @@ if [ -r $FLN ]; then
                 fi
 		CHAINS_FILE="${PLCC_OUTPUT_DIR}/${PDBID}.chains"
 		if [ ! -f "$CHAINS_FILE" ]; then
-		       echo "$APPTAG ##### ERROR: No chains file found at '$CHAINS_FILE', is '--cluster' set as PLCC command line option?"
+		       echo "$APPTAG ##### ERROR: No chains file found at '$CHAINS_FILE', is '--cluster' or '--write-chains-file' set as PLCC command line option?"
 	        else
 			for CHAIN in $(cat ${CHAINS_FILE});
 			do
-			        if [ "$PLCC_RUNS_IN_SUBDIR_TREE_MODE" = "YES" ]; then
-			            ## extract the subdir from the pdbid (it is defined by the 2nd and 3rd letter of the id, e.g., for the pdbid '3kmf', it is 'km')
-                                    MID2PDBCHARS=${PDBID:1:2}
-			            ALBE_GML_GRAPHFILE="${PLCC_OUTPUT_DIR}/${MID2PDBCHARS}/${PDBID}/${CHAIN}/${PDBID}_${CHAIN}_albe_PG.gml"
-			        else
-			            ALBE_GML_GRAPHFILE="${PLCC_OUTPUT_DIR}/${PDBID}_${CHAIN}_albe_PG.gml"
-			        fi
+			        ## extract the subdir from the pdbid (it is defined by the 2nd and 3rd letter of the id, e.g., for the pdbid '3kmf', it is 'km')
+			        MID2PDBCHARS=${PDBID:1:2}
+			        
+			        # run GA for the protein graph
+			        if [ "$RUN_GRAPHLETANALYSER_ON_PG" = "YES" ]; then
+				    if [ "$PLCC_RUNS_IN_SUBDIR_TREE_MODE" = "YES" ]; then										
+					ALBE_GML_PG_GRAPHFILE="${PLCC_OUTPUT_DIR}/${MID2PDBCHARS}/${PDBID}/${CHAIN}/${PDBID}_${CHAIN}_albe_PG.gml"
+				    else
+					ALBE_GML_PG_GRAPHFILE="${PLCC_OUTPUT_DIR}/${PDBID}_${CHAIN}_albe_PG.gml"
+				    fi
 
-				if [ -f "$ALBE_GML_GRAPHFILE" ]; then
-					./graphletanalyser --silent --useDatabase $ALBE_GML_GRAPHFILE
-				else
-					echo "$APPTAG ##### ERROR:The albe GML graph file was not found at '$ALBE_GML_GRAPHFILE', cannot run graphletanalyser on it."
+				    if [ -f "$ALBE_GML_PG_GRAPHFILE" ]; then
+					    ./graphletanalyser --silent --useDatabase --sse_graph $ALBE_GML_PG_GRAPHFILE
+				    else
+					    echo "$APPTAG ##### ERROR:The albe GML PG graph file was not found at '$ALBE_GML_PG_GRAPHFILE', cannot run graphletanalyser on it."
+				    fi
 				fi
+								
 			done
 
 			if [ "$DELETE_CLUSTER_CHAINS_FILE" = "YES" ]; then
 				rm "$CHAINS_FILE"
 			fi
+		fi
+		
+		# run GA for the complex graph -- there is only one (not one for each chain), so no need for chains file
+		if [ "$RUN_GRAPHLETANALYSER_ON_CG" = "YES" ]; then
+		    if [ "$PLCC_RUNS_IN_SUBDIR_TREE_MODE" = "YES" ]; then										
+			ALBELIG_GML_CG_GRAPHFILE="${PLCC_OUTPUT_DIR}/${MID2PDBCHARS}/${PDBID}/ALL/${PDBID}_complex_sses_albelig_CG.gml"
+		    else
+			ALBELIG_GML_CG_GRAPHFILE="${PLCC_OUTPUT_DIR}/${PDBID}_complex_sses_albelig_CG.gml"
+		    fi
+
+		    if [ -f "$ALBELIG_GML_CG_GRAPHFILE" ]; then
+			    ./graphletanalyser --silent --useDatabase --complex_graph $ALBELIG_GML_CG_GRAPHFILE
+		    else
+			    echo "$APPTAG ##### ERROR:The albelig GML CG graph file was not found at '$ALBELIG_GML_CG_GRAPHFILE', cannot run graphletanalyser on it."
+		    fi
+		fi
+		
+		# run GA for the amino acid graph -- there is only one (not one for each chain), so no need for chains file
+		if [ "$RUN_GRAPHLETANALYSER_ON_AAG" = "YES" ]; then
+		    if [ "$PLCC_RUNS_IN_SUBDIR_TREE_MODE" = "YES" ]; then										
+			GML_AAG_GRAPHFILE="${PLCC_OUTPUT_DIR}/${MID2PDBCHARS}/${PDBID}/ALL/${PDBID}_aagraph.gml"
+		    else
+			GML_AAG_GRAPHFILE="${PLCC_OUTPUT_DIR}/${PDBID}_aagraph.gml"
+		    fi
+
+		    if [ -f "$GML_AAG_GRAPHFILE" ]; then
+			    ./graphletanalyser --silent --useDatabase --aa_graph $GML_AAG_GRAPHFILE
+		    else
+			    echo "$APPTAG ##### ERROR:The GML AAG graph file was not found at '$GML_AAG_GRAPHFILE', cannot run graphletanalyser on it."
+		    fi
 		fi
 	    fi
 
