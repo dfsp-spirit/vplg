@@ -2817,10 +2817,10 @@ public class Main {
                     try { 
                         Boolean res;
                         if(Settings.getBoolean("plcc_B_write_graphstrings_to_database_pg")) {
-                            res = DBManager.writeProteinGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), null, null, null, null, null, null, pg.getSSEStringSequential(), pg.containsBetaBarrel()); 
+                            res = DBManager.writeProteinGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), pg.toGraphModellingLanguageFormat(), pg.toVPLGGraphFormat(), pg.toKavoshFormat(), pg.toDOTLanguageFormat(), pg.toJSONFormat(), pg.toXMLFormat(), pg.getSSEStringSequential(), pg.containsBetaBarrel());
                         }
-                        else {
-                            res = DBManager.writeProteinGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), pg.toGraphModellingLanguageFormat(), pg.toVPLGGraphFormat(), pg.toKavoshFormat(), pg.toDOTLanguageFormat(), pg.toJSONFormat(), pg.toXMLFormat(), pg.getSSEStringSequential(), pg.containsBetaBarrel()); 
+                        else {                            
+                            res = DBManager.writeProteinGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), null, null, null, null, null, null, pg.getSSEStringSequential(), pg.containsBetaBarrel()); 
                         }
                         
                         if((! silent) && res) {
