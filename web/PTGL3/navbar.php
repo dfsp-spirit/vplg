@@ -72,6 +72,9 @@
 						<a href="#"  class="navbarFont dropdown-toggle" data-toggle="dropdown"> Meta <strong class="caret"></strong></a>
 						<ul class="dropdown-menu">
 						
+						        <li>
+								<a href="news.php"><span class="fa fa-info"></span> News</a>
+							</li>
 							<li>
 								<a href="about.php"><span class="fa fa-info"></span> About</a>
 							</li>

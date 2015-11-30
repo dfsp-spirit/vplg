@@ -132,7 +132,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 	<div id="PageIntro">
 		<div class="container" id="pageintro">
 		<strong>Authors</strong><br>
-		The VPLG software, PTGL API and the database were written and designed by Tim Schäfer. The web frontend was written by Daniel Bruneß, Andreas Scheck and Tim Schäfer.
+		The VPLG software, PTGL API and the database schema were written/designed by Tim Schäfer. The web frontend was written by Daniel Bruneß, Andreas Scheck and Tim Schäfer. Markus Kessler worked on the complex graph code. Tatiana Bakirova, Ben Haladik and Tim Schäfer worked on graphlet code.
 		
 		<br><br>
 		<strong>Acknowledgement</strong><br>
