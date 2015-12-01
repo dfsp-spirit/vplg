@@ -589,7 +589,7 @@ int main(int argc, char** argv) {
                 int db_res = printer.saveAACountsToDatabasePGXX(pdb_id,label,norm_counts,norm_labeled_counts);
                 
             }
-            else if(options["graphtype"] == "complex_graph") {
+            else if(options["graphtype"] == "complex_graph" || options["graphtype"] == "complex_albe" || options["graphtype"] == "complex_albelig") {
                 
                 std::cout << apptag << "Computing graphlets for complex graph from file '" << files[i] << "'." << std::endl;
                 
