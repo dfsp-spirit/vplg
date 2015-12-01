@@ -563,7 +563,7 @@ int main(int argc, char** argv) {
             
             if(options["graphtype"] == "sse_graph") {
                 
-                std::cout << apptag << "Computing graphlets for sse graph from file '" << files[i] << "'." << std::endl;
+                std::cout << apptag << "Computing graphlets for " << service.getPdbid() << " sse graph of chain " << service.getChainID() << " from file '" << files[i] << "'." << std::endl;
                 
                 std::vector<std::string> id_vec = std::vector<std::string>();
                 id_vec.push_back(service.getPdbid());
@@ -578,7 +578,7 @@ int main(int argc, char** argv) {
             }
             else if(options["graphtype"] == "aa_graph") {
                 
-                std::cout << apptag << "Computing graphlets for AA graph from file '" << files[i] << "'." << std::endl;
+                std::cout << apptag << "Computing graphlets for " << service.getPdbid() << " AA graph from file '" << files[i] << "'." << std::endl;
                 
                 std::string pdb_id = service.getPdbid();
                 std::string label = "";
@@ -591,7 +591,7 @@ int main(int argc, char** argv) {
             }
             else if(options["graphtype"] == "complex_graph" || options["graphtype"] == "complex_albe" || options["graphtype"] == "complex_albelig") {
                 
-                std::cout << apptag << "Computing graphlets for complex graph from file '" << files[i] << "'." << std::endl;
+                std::cout << apptag << "Computing graphlets for " << service.getPdbid() << " complex graph from file '" << files[i] << "'." << std::endl;
                 
                 std::string pdb_id = service.getPdbid();
                 std::string label = "";
