@@ -360,8 +360,12 @@ long GraphPTGLPrinter::getPGGraphDatabaseID(string pdbid, string chain, int grap
     ssgt << graphType;
     string graphTypeStr = ssgt.str();
     
+    Database db = Database::getInstance();
+    string connection_string = db.get_connect_string();
+    
     try {
-        connection C("dbname=vplg user=vplg host=localhost port=5432 connect_timeout=10 password=vplg");
+        //connection C("dbname=vplg user=vplg host=localhost port=5432 connect_timeout=10 password=vplg");
+        connection C(connection_string);
         //cout << "      Connected to database '" << C.dbname() << "'.\n";
         work W(C);
         result R = W.exec("SELECT g.graph_id FROM plcc_graph g INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON  p.pdb_id = c.pdb_id WHERE (c.chain_name = '" + W.esc(chain) + "' AND g.graph_type = " + W.esc(graphTypeStr) + " AND p.pdb_id = '" + W.esc(pdbid) + "');");
@@ -379,7 +383,7 @@ long GraphPTGLPrinter::getPGGraphDatabaseID(string pdbid, string chain, int grap
         //}
 
     } catch (const std::exception &e) {
-        cerr << apptag << "ERROR: SQL trouble when trying to retrieve graph PK from DB: '" << e.what() << "'." << endl;
+        cerr << apptag << "ERROR: SQL trouble when trying to retrieve protein graph PK from DB: '" << e.what() << "'." << endl;
         return -1;
     }
     
@@ -695,10 +699,12 @@ int GraphPTGLPrinter::saveAACountsToDatabasePGXX(std::string pdbid, std::string 
 long GraphPTGLPrinter::getAAGraphDatabaseID(string pdbid) const {
     
     long id = -1;
-    
+    Database db = Database::getInstance();
+    string connection_string = db.get_connect_string();
     
     try {
-        connection C("dbname=vplg user=vplg host=localhost port=5432 connect_timeout=10 password=vplg");
+        //connection C("dbname=vplg user=vplg host=localhost port=5432 connect_timeout=10 password=vplg");
+        connection C(connection_string);
         //cout << "      Connected to database '" << C.dbname() << "'.\n";
         work W(C);
         result R = W.exec("SELECT g.aagraph_id FROM plcc_aagraph g INNER JOIN plcc_protein p ON  p.pdb_id = g.pdb_id WHERE (p.pdb_id = '" + W.esc(pdbid) + "');");
@@ -716,7 +722,7 @@ long GraphPTGLPrinter::getAAGraphDatabaseID(string pdbid) const {
         //}
 
     } catch (const std::exception &e) {
-        cerr << apptag << "ERROR: SQL trouble when trying to retrieve graph PK from DB: '" << e.what() << "'." << endl;
+        cerr << apptag << "ERROR: SQL trouble when trying to retrieve amino acid graph PK from DB: '" << e.what() << "'." << endl;
         return -1;
     }
     
@@ -806,11 +812,13 @@ void GraphPTGLPrinter::deleteCGGraphletCountEntryForGraph(unsigned long int data
 long GraphPTGLPrinter::getCGGraphDatabaseID(string pdbid) const {
     
     long id = -1;
-    
+    Database db = Database::getInstance();
+    string connection_string = db.get_connect_string();
     
     
     try {
-        connection C("dbname=vplg user=vplg host=localhost port=5432 connect_timeout=10 password=vplg");
+        //connection C("dbname=vplg user=vplg host=localhost port=5432 connect_timeout=10 password=vplg");
+        connection C(connection_string);
         //cout << "      Connected to database '" << C.dbname() << "'.\n";
         work W(C);
         result R = W.exec("SELECT g.complexgraph_id FROM plcc_complexgraph g INNER JOIN plcc_protein p ON  p.pdb_id = g.pdb_id WHERE (p.pdb_id = '" + W.esc(pdbid) + "');");
@@ -828,7 +836,7 @@ long GraphPTGLPrinter::getCGGraphDatabaseID(string pdbid) const {
         //}
 
     } catch (const std::exception &e) {
-        cerr << apptag << "ERROR: SQL trouble when trying to retrieve graph PK from DB: '" << e.what() << "'." << endl;
+        cerr << apptag << "ERROR: SQL trouble when trying to retrieve complex graph PK from DB: '" << e.what() << "'." << endl;
         return -1;
     }
     
