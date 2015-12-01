@@ -310,7 +310,7 @@ int main(int argc, char** argv) {
                     files.push_back(line);
                     if (input_path != "") {
                         files.back().insert(0, input_path);
-                    } else {
+                    } else if (files.back().at(0) != '/') {
                         files.back().insert(0, "./");
                     }
                 }
