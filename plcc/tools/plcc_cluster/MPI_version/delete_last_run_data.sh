@@ -8,6 +8,7 @@ CONFIRMED="NO"
 ## settings
 EMPTY_THE_DATABASE="YES"
 STOP_OPENPBS_JOBS="YES"
+DELETE_DATA_ON_DISK="YES"
 
 ## end of settings, dont mess with stuff below
 
@@ -26,21 +27,30 @@ if [ $2 = "empty_db" ]; then
 fi
 
 ## stop all currently running OpenPBS jobs for my user
-if [ "$EMPTY_THE_DATABASE" = "YES" ]; then
-	echo "Stopping all your running OpenPBS jobs..."
+if [ "$STOP_OPENPBS_JOBS" = "YES" ]; then
+	echo "$APPTAG Stopping all your running OpenPBS jobs..."
 	for JOBID in $(qstat | grep '^[0-9]' | awk -F . '{print $1}' | tr "\n" " "); do qdel $JOBID; done
 else
-	echo "NOT stopping OpenPBS jobs of user (as configured in script settings)."
+	echo "$APPTAG NOT stopping OpenPBS jobs of user (as configured in script settings)."
 fi
 
 
 if [ "$EMPTY_THE_DATABASE" = "YES" ]; then
-	echo "Emptying the database..."
+	echo "$APPTAG Emptying the database..."
 	cd ../plcc_run/ && java -jar plcc.jar NONE -r
 else
-	echo "NOT emptying the database (as configured in script settings)."
+	echo "$APPTAG NOT emptying the database (as configured in script settings)."
 fi
 
 
+if [ "$DELETE_DATA_ON_DISK" = "YES" ]; then
+	echo "$APPTAG Deleting updata data (graph file etc) on disk..."
+	cd ../plcc_run/ && java -jar plcc.jar NONE -r
+else
+	echo "$APPTAG NOT deleting data on disk (as configured in script settings)."
+fi
+
+echo "$APPTAG All done, exiting."
+exit 0
 
 ## 
