@@ -9,8 +9,12 @@ CONFIRMED="NO"
 EMPTY_THE_DATABASE="YES"
 STOP_OPENPBS_JOBS="YES"
 DELETE_DATA_ON_DISK="YES"
+PLCC_RUN_DIR="./plcc_run"
+DATA_DIR_TO_DELETE="/shares/modshare/vplg_all_nodes_output"
 
 ## end of settings, dont mess with stuff below
+
+CWD=`pwd`
 
 if [ $1 = "confirm" ]; then
 	CONFIRMED="YES"
@@ -37,7 +41,8 @@ fi
 
 if [ "$EMPTY_THE_DATABASE" = "YES" ]; then
 	echo "$APPTAG Emptying the database..."
-	cd ../plcc_run/ && java -jar plcc.jar NONE -r
+	cd $PLCC_RUN_DIR && java -jar plcc.jar NONE -r
+	cd $CWD
 else
 	echo "$APPTAG NOT emptying the database (as configured in script settings)."
 fi
@@ -45,7 +50,7 @@ fi
 
 if [ "$DELETE_DATA_ON_DISK" = "YES" ]; then
 	echo "$APPTAG Deleting updata data (graph file etc) on disk..."
-	cd ../plcc_run/ && java -jar plcc.jar NONE -r
+	rm -rf $DATA_DIR_TO_DELETE && mkdir -p $DATA_DIR_TO_DELETE && chmod ugo+rwx $DATA_DIR_TO_DELETE
 else
 	echo "$APPTAG NOT deleting data on disk (as configured in script settings)."
 fi

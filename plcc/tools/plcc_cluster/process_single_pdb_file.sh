@@ -195,7 +195,8 @@ TIME_START=$(date)
 if [ -z "$1" ]; then
     echo "$APPTAG ##### ERROR: Usage: $0 <PDB_FILE>"
     echo "$APPTAG ##### ERROR: Usage: $0 <PDB_FILE>" >>$ERROR_LOG
-    echo "The PDB file should be the path to the gzipped file that was retrieved via rsync from the PDB server. See config for file extension settings. (This script calls scripts to unzip it and create the DSSP file.)"
+    echo "$APPTAG The PDB file should be the path to the gzipped file that was retrieved via rsync from the PDB server. See config for file extension settings. (This script calls scripts to unzip it and create the DSSP file.)"
+    echo "$APPTAG At the MolBI cluster, an example input path would be '/shares/databases/PDB/data/structures/divided/pdb/ti/pdb7tim.ent.gz'." 
     exit 1
 fi
 
