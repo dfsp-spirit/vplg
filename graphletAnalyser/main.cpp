@@ -309,8 +309,19 @@ int main(int argc, char** argv) {
                     if ((line == "") || (isspace(line.c_str()[0]))) continue;
                     files.push_back(line);
                     if (input_path != "") {
-                        files.back().insert(0, input_path);
-                    } else if (files.back().at(0) != '/') {
+                        
+                        if (input_path.substr(0,3).compare(".//") == 0) {
+                            
+                            input_path = input_path.substr(2, input_path.size());
+                            
+                            files.back().insert(0, input_path);
+                            
+                        } else {
+                            files.back().insert(0, input_path);    
+                        }
+                        
+                        
+                    } else {
                         files.back().insert(0, "./");
                     }
                 }
@@ -328,7 +339,15 @@ int main(int argc, char** argv) {
                 if(verbose) { cout << argv[optind] << " "; }
                 files.push_back(argv[optind]);
                 if (input_path != "") {
-                    files.back().insert(0, input_path);
+                    if (input_path.substr(0,3).compare(".//") == 0) {
+                        
+                            input_path = input_path.substr(2, input_path.size());
+                        
+                            files.back().insert(0, input_path);
+                            
+                        } else {
+                            files.back().insert(0, input_path);    
+                        }
                 } else {
                     files.back().insert(0, "./");
                 }
@@ -347,7 +366,23 @@ int main(int argc, char** argv) {
     
     /*----------------------------------------------------
      *           process the input files
-     *---------------------------------------------------*/    
+     *---------------------------------------------------*/ 
+    
+    std::vector<std::string> files2 = std::vector<std::string>();
+    
+    for (int i = 0; i < files.size(); i++) {
+        
+        if (files[i].substr(0,3).compare(".//") == 0) {
+            
+            files2.push_back(files[i].substr(2,files[i].size()));
+        } else {
+            files2.push_back(files[i]);
+        }
+        
+    }
+    
+    files = files2;
+    
     if( ! silent) {
         cout << apptag << "Handling all " << files.size() << " input files.\n";
     }
