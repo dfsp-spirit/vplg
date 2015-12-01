@@ -106,7 +106,7 @@ GraphletCounts::GraphletCounts(const Graph& graph) {
         else if(graphType == "beta") {
             graphtype = 2;
         }
-        else if(graphType == "albe") {
+        else if(graphType == "albe"  || graphType == "complex_albe") {
             graphtype = 3;
         }
         else if(graphType == "alphalig") {
@@ -115,7 +115,7 @@ GraphletCounts::GraphletCounts(const Graph& graph) {
         else if(graphType == "betalig") {
             graphtype = 5;
         }
-        else if(graphType == "albelig") {
+        else if(graphType == "albelig"  || graphType == "complex_albelig") {
             graphtype = 6;
         }
         else if(graphType == "aa_graph") {
@@ -1377,7 +1377,7 @@ GraphletCounts & GraphletCounts::operator=(const GraphletCounts & counter) {
         else if(graphType == "beta") {
             graphtype = 2;
         }
-        else if(graphType == "albe") {
+        else if(graphType == "albe"  || graphType == "complex_albe") {
             graphtype = 3;
         }
         else if(graphType == "alphalig") {
@@ -1386,7 +1386,7 @@ GraphletCounts & GraphletCounts::operator=(const GraphletCounts & counter) {
         else if(graphType == "betalig") {
             graphtype = 5;
         }
-        else if(graphType == "albelig") {
+        else if(graphType == "albelig"  || graphType == "complex_albelig") {
             graphtype = 6;
         }
         else if(graphType == "aa_graph") {
