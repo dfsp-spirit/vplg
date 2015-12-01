@@ -563,7 +563,7 @@ int main(int argc, char** argv) {
             
             if(options["graphtype"] == "sse_graph") {
                 
-                std::cout << apptag << "Computing graphlets for sse graph" << std::endl;
+                std::cout << apptag << "Computing graphlets for sse graph from file '" << files[i] << "'." << std::endl;
                 
                 std::vector<std::string> id_vec = std::vector<std::string>();
                 id_vec.push_back(service.getPdbid());
@@ -578,7 +578,7 @@ int main(int argc, char** argv) {
             }
             else if(options["graphtype"] == "aa_graph") {
                 
-                std::cout << apptag << "Computing graphlets for AA graph" << std::endl;
+                std::cout << apptag << "Computing graphlets for AA graph from file '" << files[i] << "'." << std::endl;
                 
                 std::string pdb_id = service.getPdbid();
                 std::string label = "";
@@ -591,12 +591,15 @@ int main(int argc, char** argv) {
             }
             else if(options["graphtype"] == "complex_graph") {
                 
-                std::cout << apptag << "Computing graphlets for complexgraph" << std::endl;
+                std::cout << apptag << "Computing graphlets for complex graph from file '" << files[i] << "'." << std::endl;
                 
                 std::string pdb_id = service.getPdbid();
                 std::string label = "";
                 
                 int db_res = printer.saveCGCountsToDatabasePGXX(pdb_id,label,norm_counts,norm_labeled_counts);
+            }
+            else {
+                std:cerr << apptag << "Cannot save graphlet counts to DB for file '" << files[i] << "', graph type unknown." << std::endl;
             }
             
         }

@@ -122,7 +122,7 @@ GraphletCounts::GraphletCounts(const Graph& graph) {
             graphtype = 7;
         }
         else {
-        cerr << "WARNING: Invalid graph type string, cannot translate it to graph type int code in GraphletCounts.\n";
+        cerr << "WARNING: Invalid graph type string '" << graphType << "', cannot translate it to graph type int code in GraphletCounts.\n";
         graphtype = -1;
         }
         
