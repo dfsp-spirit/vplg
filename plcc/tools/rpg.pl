@@ -115,7 +115,8 @@ sub get_footer_string {
 	if($format == "gml") {
 	    $footer .= "]\n";
 	}
-	else if ($format == "plcc") {
+	elsif ($format == "plcc") {
+	    $footer .= "";
 	}
 	else {
 	  die("get_footer_string: invalid output format\n");
@@ -154,7 +155,7 @@ sub get_vertex_sting {
         $vertex = "    sse_type \"$sse_type\"\n";
 		$vertex = "  ]\n";
     }	
-	else if ($format == "plcc") {
+	elsif ($format == "plcc") {
 	    $vertex .= "| $pdbid | $chain | $graphtype | $sse_id | $sse_seq_num | $sse_type | $dssp_start | $dssp_end | $pdb_start | $pdb_end | $sequence\n";
 	} 
 	else {
@@ -179,8 +180,8 @@ sub get_edge_string {
         $edge .= "    spatial \"$spatial\"\n";
 	    $edge .= "  ]\n";  
 	}
-	else if($format == "plcc") {
-	    $edge .= "= $sse1 = $contact_type = $sse2\n";
+	elsif($format == "plcc") {
+	    $edge .= "= $source = $spatial = $target\n";
 	}
 	else {
 	    die("get_edge_string: invalid output format\n");
@@ -213,7 +214,7 @@ sub get_header_string {
 		$header .= "  is_AA_graph 0\n";
 		$header .= "  is_all_chains_graph 0\n";	
 	}
-	else if ($format == "plcc") {
+	elsif ($format == "plcc") {
 	    $header .= "> format_version > 2\n";
         $header .= "> pdbid > $pdbid\n";
         $header .= "> chainid > $chain\n";
