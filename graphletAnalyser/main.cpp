@@ -25,6 +25,7 @@ using namespace boost;
  *---------------------------------------------------*/
 int verbose = 0;
 int silent = 0;
+int timerun = 0;
 int inputFilesAsList = 0;
 int useDatabase = 0;
 int saveGraphletDetails = 0;
@@ -196,6 +197,7 @@ int main(int argc, char** argv) {
         static struct option long_options[] = {
             /* These options set a flag. */
             {"silent",          no_argument, &silent,          1},
+            {"timerun",          no_argument, &timerun,          1},
             {"verbose",          no_argument, &verbose,          1},
             {"brief",            no_argument, &verbose,          0},
             {"inputFilesAsList", no_argument, &inputFilesAsList, 1},
@@ -271,7 +273,7 @@ int main(int argc, char** argv) {
         cout << startOutput;
     }
     
-    if(! silent) {
+    if((! silent) || timerun) {
         std::cout << apptag << "  Starting at time " << currentDateTime() << std::endl;
     }
     
@@ -637,8 +639,8 @@ int main(int argc, char** argv) {
         cout << setw(43) << "  finished processing  " << setw(25) << " \n";
     }
     
-    if( ! silent) {
-        cout << apptag << "Done with all " << files.size() << " input files, exiting.\n";
+    if((! silent) || timerun) {
+        cout << apptag << "Done with all " << files.size() << " input files at " << currentDateTime() << ", exiting.\n";
     }
     return 0;
 }

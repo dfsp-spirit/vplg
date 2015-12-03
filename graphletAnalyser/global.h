@@ -63,6 +63,7 @@
  */
 extern int silent;
 extern int verbose;
+extern int timerun;
 extern int saveGraphletDetails;
 extern int withLabeledGraphlets;
 extern std::string input_path;
@@ -116,6 +117,7 @@ const std::string usage_message = "\n"
         " -l, --logs-path <p>   : Sets path to the log files directory. Default: the current directory.\n"
         " --brief               : Generates only one run log. Default: off.\n"
         " --verbose             : Generates logs also for gml file parsing and graphlet counting. Default: off.\n"
+        " --timerun             : Show system time at start and end of execution, even with silent. Default: off.\n"
         " --inputFilesAsList    : Treat the input file as a list of files to handle, one file per line. Default: off.\n"
         " --printGraphletDetails: Print details on certain graphlets to stdout. Default: off.\n"
         " --useDatabase         : Write graphlet counts to a PostgreSQL database (set DB credentials in config file 'graphletanalyser.cfg'). Default: off.\n"
