@@ -65,7 +65,7 @@ function report_and_exit()
     TIME_END=$(date)
 
     #echo "$APPTAG Done, handled $NUM_HANDLED of the $NUM_FILES files ($NUM_SUCCESS ok, $NUM_TOTAL_FAIL failed)."
-    echo "$APPTAG Done, handled $NUM_HANDLED of the $NUM_FILES files ($NUM_SUCCESS ok, $NUM_TOTAL_FAIL failed)." >>$DBINSERT_LOG
+    echo "$APPTAG Done, handled $NUM_HANDLED of the $NUM_FILES files ($NUM_SUCCESS ok, $NUM_TOTAL_FAIL failed, $NUM_NOT_UPDATED existed in DB and not updated)." >>$DBINSERT_LOG
     
     #echo "$APPTAG Started at '$TIME_START', finished at '$TIME_END'."
     echo "$APPTAG Started at '$TIME_START', finished at '$TIME_END'." >>$DBINSERT_LOG    
@@ -261,6 +261,7 @@ NUM_TOTAL_FAIL=0
 NUM_PDB_FAIL=0
 NUM_DSSP_FAIL=0
 NUM_PLCC_FAIL=0
+NUM_NOT_UPDATED=0
 
 ## Remember that this is a list of file names like this: '/srv/www/PDB/data/structures/divided/pdb/ic/pdb8icd.ent.gz'. So we need to extract the
 ##  PDB ID from that name, then run the insert scripts for that PDB ID.
@@ -282,6 +283,17 @@ if [ -r $FLN ]; then
 	
 	if [ "$SILENT" = "NO" ]; then
 	  echo "$APPTAG $PDBID Changed directory to '`pwd`'."
+	fi
+	
+	## check whether the PDB file is already in the database -- (only if this matters)
+	if [ "$UPDATE_EXISTING_PDB_FILES" = "NO" ]; then
+	    PLCC_CHECK_COMMAND="./plcc $PDBID --check-whether-in-db"
+	    $($PLCC_CHECK_COMMAND)
+	    if [ $? -eq 0 ]; then
+	      # the protein was found in the database, but we should NOT update it. So exit.
+	      let NUM_NOT_UPDATED++
+	      report_and_exit 0
+	    fi
 	fi
 	
 	## Get the PDB file
