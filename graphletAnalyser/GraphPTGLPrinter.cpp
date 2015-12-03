@@ -294,6 +294,14 @@ int GraphPTGLPrinter::savePGCountsToDatabasePGXX(int graphtype_int, std::vector<
             for (int i = 0; i < allGraphletcounts.size(); i++) {
                 std::stringstream ssVal;
                 val = allGraphletcounts[i];
+                
+                // check for NaN values (resulting from division by zero during normalization, when the total number of graphlets found is 0)
+                if(val != val) {    // proper way to check for NaN in C++ it seems
+                    // no values will be added, resulting in an empty array {}
+                    //continue; 
+                    break;      // if one value is NaN, all others also are NaN anyway, so break instead of continue.
+                }
+                
                 if(val < 0.0f || val > 1.0f) {
                     cout << apptag << "WARNING: Graphlet count for graphlet #" << i << " is '" << val << "', but should be normalized between 0.0 and 1.0.\n";
                 }
@@ -644,6 +652,14 @@ int GraphPTGLPrinter::saveAACountsToDatabasePGXX(std::string pdbid, std::string 
             for (int i = 0; i < allGraphletcounts.size(); i++) {
                 std::stringstream ssVal;
                 val = allGraphletcounts[i];
+                
+                // check for NaN values (resulting from division by zero during normalization, when the total number of graphlets found is 0)
+                if(val != val) {    // proper way to check for NaN in C++ it seems
+                    // no values will be added, resulting in an empty array {}
+                    //continue; 
+                    break;      // if one value is NaN, all others also are NaN anyway, so break instead of continue.
+                }
+                
                 if(val < 0.0f || val > 1.0f) {
                     cout << apptag << "WARNING: Graphlet count for graphlet #" << i << " is '" << val << "', but should be normalized between 0.0 and 1.0.\n";
                 }
@@ -954,11 +970,21 @@ int GraphPTGLPrinter::saveCGCountsToDatabasePGXX(std::string pdbid, std::string 
             for (int i = 0; i < allGraphletcounts.size(); i++) {
                 std::stringstream ssVal;
                 val = allGraphletcounts[i];
+                
+                // check for NaN values (resulting from division by zero during normalization, when the total number of graphlets found is 0)
+                if(val != val) {    // proper way to check for NaN in C++ it seems
+                    // no values will be added, resulting in an empty array {}
+                    //continue; 
+                    break;      // if one value is NaN, all others also are NaN anyway, so break instead of continue.
+                }
+                
                 if(val < 0.0f || val > 1.0f) {
                     cout << apptag << "WARNING: Graphlet count for graphlet #" << i << " is '" << val << "', but should be normalized between 0.0 and 1.0.\n";
                 }
                 ssVal << std::fixed << std::setprecision(4) << val;
                 strVal = ssVal.str();
+                
+                
                 //cout << "      Adding value '" << strVal << "'.\n";
                 query += W.esc(strVal);
                 if(i < allGraphletcounts.size() - 1) {

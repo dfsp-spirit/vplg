@@ -263,7 +263,9 @@ std::vector<float> GraphletCounts::normalize_counts(std::vector<int> absCounts, 
     
     // calculate the normalization for the given unlabeled vector
     std::vector<float> normalizedCounts = std::vector<float>();
-    if (max == 0.0) {std::cerr << "WARNING: division by zero!!";}
+    if (max == 0.0) {
+        std::cerr << apptag << "WARNING: Division by zero while normalizing graphlet counts (no graphlets found at all). Setting NAN value.\n";
+    }
     
     for (int i = 0; i<absCounts.size(); i++) {
         
