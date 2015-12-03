@@ -372,6 +372,7 @@ int main(int argc, char** argv) {
     
     std::vector<std::string> files2 = std::vector<std::string>();
     
+    // fix for absolute paths
     for (int i = 0; i < files.size(); i++) {
         
         if (files[i].substr(0,3).compare(".//") == 0) {
@@ -381,17 +382,18 @@ int main(int argc, char** argv) {
             files2.push_back(files[i]);
         }
         
-    }
-    
+    }    
     files = files2;
+    
+    
     
     if( ! silent) {
         cout << apptag << "Handling all " << files.size() << " input files.\n";
     }
     for (int i = 0; i < files.size(); i++) {
 
-        if( ! silent) {
-            cout << apptag << "  Starting to process file #" << (i + 1) << " of " << files.size() << ": '" << files[i] << "'.\n";
+        if((! silent) || timerun) {
+            cout << apptag << "  Starting to process file #" << (i + 1) << " of " << files.size() << " at " << currentDateTime() << ": '" << files[i] << "'.\n";
         }
         
         if(filesize(files[i].c_str()) <= 0) {
@@ -629,8 +631,8 @@ int main(int argc, char** argv) {
             
         }
 
-        if( ! silent) {
-            cout << apptag << "  Done with file #" << (i + 1) << " of " << files.size() << ": '" << files[i] << "'.\n";
+        if(( ! silent) || timerun) {
+            cout << apptag << "  Done with file #" << (i + 1) << " of " << files.size() << " at " << currentDateTime() << ": '" << files[i] << "' (|V|=" << n << ", |E|=" << m << ").\n";
         }
     }
     
