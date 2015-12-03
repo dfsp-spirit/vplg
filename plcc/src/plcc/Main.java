@@ -570,6 +570,30 @@ public class Main {
                         }
                     }
                     
+                    if(s.equals("--check-whether-in-db")) {                        
+                        if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"), Settings.getBoolean("plcc_B_db_use_autocommit"))) {
+                            Boolean found;
+                            try {                                    
+                                found = DBManager.proteinExistsInDB(pdbid);
+                                if(found) {
+                                    System.out.println("Protein '" + pdbid + "' found in database (exiting with return code 0).");
+                                    System.exit(0);
+                                }
+                                else {
+                                    System.out.println("Protein '" + pdbid + "' NOT found in database (exiting with return code 1).");
+                                    System.exit(1);
+                                }
+                            } catch(Exception e) {
+                                System.err.println("ERROR: Checking for protein failed: '" + e.getMessage() + "' (exiting with return code 2)");
+                                System.exit(2);
+                            }
+                        }
+                        else {
+                            System.err.println("ERROR: Could not check whether protein exists in database, connection failed (exiting with return code 2).");
+                            System.exit(2);
+                        }
+                    }
+                    
                     
                     if(s.equals("-j") || s.equals("--ddb")) {
                         if(args.length <= i+4 ) {
@@ -5277,6 +5301,7 @@ public class Main {
         System.out.println("-z | --ramaplot            : draw a ramachandran plot of each chain to the file '<pdbid>_<chain>_plot.svg'");        
         System.out.println("-Z | --silent              : silent mode. do not write output to STDOUT.");        
         System.out.println("   --compute-graph-metrics : compute graph metrics like cluster coefficient for PGs. Slower!");
+        System.out.println("   --check-whether-in-db   : check whether the PDB file exists in the database and exit. Returns 0 if it does, 1 if not, value >1 on error.");
         System.out.println("   --cluster               : Set all options for cluster mode. Equals '-f -u -k -s -G -i -Z -P'.");
         System.out.println("");
         System.out.println("The following options only make sense for database maintenance:");
