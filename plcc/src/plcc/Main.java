@@ -576,11 +576,15 @@ public class Main {
                             try {                                    
                                 found = DBManager.proteinExistsInDB(pdbid);
                                 if(found) {
-                                    System.out.println("Protein '" + pdbid + "' found in database (exiting with return code 0).");
+                                    if( ! Settings.getBoolean("plcc_B_silent")) {
+                                        System.out.println("Protein '" + pdbid + "' found in database (exiting with return code 0).");
+                                    }
                                     System.exit(0);
                                 }
                                 else {
-                                    System.out.println("Protein '" + pdbid + "' NOT found in database (exiting with return code 1).");
+                                    if( ! Settings.getBoolean("plcc_B_silent")) {
+                                        System.out.println("Protein '" + pdbid + "' NOT found in database (exiting with return code 1).");
+                                    }
                                     System.exit(1);
                                 }
                             } catch(Exception e) {
