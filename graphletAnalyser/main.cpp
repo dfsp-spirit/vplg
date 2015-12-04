@@ -396,6 +396,8 @@ int main(int argc, char** argv) {
             cout << apptag << "  Starting to process file #" << (i + 1) << " of " << files.size() << " at " << currentDateTime() << ": '" << files[i] << "'.\n";
         }
         
+        time_t start_file_time = time(NULL);
+        
         if(filesize(files[i].c_str()) <= 0) {
             cerr << apptag << "    Skipping empty input file '" << files[i] << "', invalid GML file.\n";
             continue;
@@ -630,9 +632,13 @@ int main(int argc, char** argv) {
             printer.save_labeled_counts_as_json(graph[graph_bundle].label, n, m, map);
             
         }
-
+        
+        time_t end_file_time = time(NULL);
+        double runtime_seconds = difftime(end_file_time, start_file_time);
+        
+        
         if(( ! silent) || timerun) {
-            cout << apptag << "  Done with file #" << (i + 1) << " of " << files.size() << " at " << currentDateTime() << ": '" << files[i] << "' (|V|=" << n << ", |E|=" << m << ").\n";
+            cout << apptag << "  Done with file #" << (i + 1) << " of " << files.size() << " at " << currentDateTime() << ": '" << files[i] << "' (|V|=" << n << ", |E|=" << m << "). Took " << runtime_seconds << " secs.\n";
         }
     }
     
