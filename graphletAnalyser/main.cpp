@@ -370,6 +370,8 @@ int main(int argc, char** argv) {
      *           process the input files
      *---------------------------------------------------*/ 
     
+    //look for malformed paths
+    
     std::vector<std::string> files2 = std::vector<std::string>();
     
     // fix for absolute paths
@@ -619,7 +621,7 @@ int main(int argc, char** argv) {
         }
         
         if (options["output_counts_JSON"] == "yes") {
-            printer.save_counts_as_json(graph[graph_bundle].label, n, m, abs_counts, norm_counts);
+            printer.save_counts_as_json(graph[graph_bundle].properties["pdb_id"] + "_counts", n, m, abs_counts, norm_counts);
         }
         
         if (options["output_labeled_counts_JSON"] == "yes") {
