@@ -1418,6 +1418,9 @@ public class DBManager {
             doInsertQuery("CREATE INDEX plcc_idx_chaintomacromol_chainid ON " + tbl_nm_chaintomacromolecule + " (chaintomacromol_chainid);");
             doInsertQuery("CREATE INDEX plcc_idx_chaintomacromol_macromolid ON " + tbl_nm_chaintomacromolecule + " (chaintomacromol_macromolid);");
             
+            doInsertQuery("CREATE INDEX plcc_idx_aagraph_pdbid ON " + tbl_aagraph + " (pdb_id);");
+            doInsertQuery("CREATE INDEX plcc_idx_complexgraph_pdbid ON " + tbl_complexgraph + " (pdb_id);");
+            
                     
 
             // indices on PKs get created automatically
