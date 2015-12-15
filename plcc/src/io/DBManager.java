@@ -13059,16 +13059,18 @@ connection.close();
     
     /**
      * Retrieves the graphlet counts for the requested protein graph from the database. The graph is identified by the
-     * unique triplet (pdbid, chain_name, graph_type).
+     * unique triplet (pdbid, chain_name, graph_type). Note that this function uses the setting for which graphlets to consider, and that it will ONLY returns the configured graphlet range!
      * @param pdb_id the requested pdb ID, e.g. "1a0s"
      * @param chain_name the requested pdb ID, e.g. "A"
      * @param graph_type the requested graph type, e.g. "albe"
-     * @return a Double array of the graphlet counts
+     * @return a Double array of the graphlet counts, which is only the array slice configured in settings from the whole array in the database
      * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
      */
     public static Double[] getNormalizedProteinGraphGraphletCounts(String pdb_id, String chain_name, String graph_type) throws SQLException {
-        
-        int numReqGraphletTypes = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_num_graphlets_to_consider");
+                
+        int graphletStartIndex = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_start_graphlet_index");
+        int graphletEndIndex = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_end_graphlet_index");
+        int numToConsider = (graphletEndIndex - graphletStartIndex) + 1;
         
         Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
         
@@ -13095,7 +13097,7 @@ connection.close();
         }
         
         List<String> variableParts = new ArrayList<>();
-        for(int i = 0; i < numReqGraphletTypes; i++) {
+        for(int i = graphletStartIndex; i <= graphletEndIndex; i++) {
             variableParts.add("" + i);
         }
         String constructedQueryPart = DBManager.constructRepetetiveQueryPart("graphlet_counts[", "]", variableParts, ", ");
@@ -13140,11 +13142,11 @@ connection.close();
         
         // OK, check size of results table and return 1st field of 1st column
         ArrayList<Double> rowGraphlets;
-        Double[] result = new Double[numReqGraphletTypes];        
+        Double[] result = new Double[numToConsider];        
         if(tableData.size() >= 1) {
             rowGraphlets = tableData.get(0);
             if(rowGraphlets.size() > 0) {
-                if(rowGraphlets.size() == numReqGraphletTypes) {
+                if(rowGraphlets.size() == numToConsider) {
                     NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
                     for(int i = 0; i < rowGraphlets.size(); i++) {
                         try {
@@ -13157,7 +13159,7 @@ connection.close();
                     }
                     return(result);
                 } else {
-                    DP.getInstance().e("DBManager", "getNormalizedGraphletCounts: Entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "' has wrong size (found " + rowGraphlets.size() + ", expected " + numReqGraphletTypes + ").");
+                    DP.getInstance().e("DBManager", "getNormalizedGraphletCounts: Entry for graphlets of graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "' has wrong size (found " + rowGraphlets.size() + ", expected " + numToConsider + ").");
                     return(null);
                 }                                
             }
@@ -13173,15 +13175,16 @@ connection.close();
     
     
     /**
-     * Retrieves the graphlet counts for the requested complex graph from the database. The graph is identified by its PDB ID.
+     * Retrieves the graphlet counts for the requested complex graph from the database. The graph is identified by its PDB ID. Note that this function uses the setting for which graphlets to consider, and that it will ONLY returns the configured graphlet range!
      * @param pdb_id the requested pdb ID, e.g. "1a0s"
-     * @return a Double array of the graphlet counts
+     * @return a Double array of the graphlet counts, which is only the array slice configured in settings from the whole array in the database
      * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
      */
     public static Double[] getNormalizedComplexgraphGraphletCounts(String pdb_id) throws SQLException {
-        
-        int numReqGraphletTypes = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_num_graphlets_to_consider");
-        
+                
+        int graphletStartIndex = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_start_graphlet_index");
+        int graphletEndIndex = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_end_graphlet_index");
+        int numToConsider = (graphletEndIndex - graphletStartIndex) + 1;
         
         ResultSetMetaData md;
         ArrayList<String> columnHeaders;
@@ -13201,7 +13204,7 @@ connection.close();
         }
 
         List<String> variableParts = new ArrayList<>();
-        for(int i = 0; i < numReqGraphletTypes; i++) {
+        for(int i = graphletStartIndex; i <= graphletEndIndex; i++) {
             variableParts.add("" + i);
         }
         String constructedQueryPart = DBManager.constructRepetetiveQueryPart("complex_graphlet_counts[", "]", variableParts, ", ");
@@ -13246,11 +13249,11 @@ connection.close();
         
         // OK, check size of results table and return 1st field of 1st column
         ArrayList<Double> rowGraphlets;
-        Double[] result = new Double[numReqGraphletTypes];        
+        Double[] result = new Double[numToConsider];        
         if(tableData.size() >= 1) {
             rowGraphlets = tableData.get(0);
             if(rowGraphlets.size() > 0) {
-                if(rowGraphlets.size() == numReqGraphletTypes) {
+                if(rowGraphlets.size() == numToConsider) {
                     NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
                     for(int i = 0; i < rowGraphlets.size(); i++) {
                         try {
@@ -13263,7 +13266,7 @@ connection.close();
                     }
                     return(result);
                 } else {
-                    DP.getInstance().e("DBManager", "getNormalizedComplexgraphGraphletCounts: Entry for graphlets of complex graph of PDB ID '" + pdb_id + "' has wrong size (found " + rowGraphlets.size() + ", expected " + numReqGraphletTypes + ").");
+                    DP.getInstance().e("DBManager", "getNormalizedComplexgraphGraphletCounts: Entry for graphlets of complex graph of PDB ID '" + pdb_id + "' has wrong size (found " + rowGraphlets.size() + ", expected " + numToConsider + ").");
                     return(null);
                 }                                
             }
@@ -13302,15 +13305,17 @@ connection.close();
     
     
     /**
-     * Retrieves the graphlet counts for the requested amino acid graph from the database. The graph is identified by its PDB ID.
+     * Retrieves the graphlet counts for the requested amino acid graph from the database. The graph is identified by its PDB ID. Note that this function uses the setting for which graphlets to consider, and that it will ONLY returns the configured graphlet range!
      * @param pdb_id the requested pdb ID, e.g. "1a0s"
-     * @return a Double array of the graphlet counts
+     * @return a Double array of the graphlet counts, which is only the array slice configured in settings from the whole array in the database
      * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
      */
     public static Double[] getNormalizedAminoacidgraphGraphletCounts(String pdb_id) throws SQLException {
         
-        int numReqGraphletTypes = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_num_graphlets_to_consider");
         
+        int graphletStartIndex = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_start_graphlet_index");
+        int graphletEndIndex = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_end_graphlet_index");
+        int numToConsider = (graphletEndIndex - graphletStartIndex) + 1;
         
         ResultSetMetaData md;
         ArrayList<String> columnHeaders;
@@ -13330,7 +13335,7 @@ connection.close();
         }
 
         List<String> variableParts = new ArrayList<>();
-        for(int i = 0; i < numReqGraphletTypes; i++) {
+        for(int i = graphletStartIndex; i <= graphletEndIndex; i++) {
             variableParts.add("" + i);
         }
         String constructedQueryPart = DBManager.constructRepetetiveQueryPart("aa_graphlet_counts[", "]", variableParts, ", ");
@@ -13375,11 +13380,11 @@ connection.close();
         
         // OK, check size of results table and return 1st field of 1st column
         ArrayList<Double> rowGraphlets;
-        Double[] result = new Double[numReqGraphletTypes];        
+        Double[] result = new Double[numToConsider];        
         if(tableData.size() >= 1) {
             rowGraphlets = tableData.get(0);
             if(rowGraphlets.size() > 0) {
-                if(rowGraphlets.size() == numReqGraphletTypes) {
+                if(rowGraphlets.size() == numToConsider) {
                     NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
                     for(int i = 0; i < rowGraphlets.size(); i++) {
                         try {
@@ -13392,7 +13397,7 @@ connection.close();
                     }
                     return(result);
                 } else {
-                    DP.getInstance().e("DBManager", "getNormalizedAminoacidgraphGraphletCounts: Entry for graphlets of amino acid graph of PDB ID '" + pdb_id + "' has wrong size (found " + rowGraphlets.size() + ", expected " + numReqGraphletTypes + ").");
+                    DP.getInstance().e("DBManager", "getNormalizedAminoacidgraphGraphletCounts: Entry for graphlets of amino acid graph of PDB ID '" + pdb_id + "' has wrong size (found " + rowGraphlets.size() + ", expected " + numToConsider + ").");
                     return(null);
                 }                                
             }

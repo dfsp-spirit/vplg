@@ -1197,8 +1197,20 @@ public class Main {
         
         if(Settings.getBoolean("plcc_B_compute_graphlet_similarities")) {
                         
+            int graphletStartIndex = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_start_graphlet_index");
+            int graphletEndIndex = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_end_graphlet_index");
+            int numToConsider = (graphletEndIndex - graphletStartIndex) + 1;
+            
+            if(numToConsider < 29) {
+                System.err.println("WARNING: Considering only " + numToConsider + " graphlets. Ignore this warning if this is what you want.");
+                if(numToConsider <= 0) {
+                    System.err.println("ERROR: Configured to consider " + numToConsider + " graphlets in config file. This makes no sense, exiting.");
+                    System.exit(1);
+                }
+            }
+            
             if(! silent) {
-                System.out.println("Computing pairwise graphlet similarities.");
+                System.out.println("Computing pairwise graphlet similarities. Considering " + numToConsider + " graphlets from the array in database (index " + Settings.getInteger("plcc_I_compute_all_graphlet_similarities_start_graphlet_index") + " - " + Settings.getInteger("plcc_I_compute_all_graphlet_similarities_end_graphlet_index") + ").");
             }
             
             if(DBManager.initUsingDefaults()) {

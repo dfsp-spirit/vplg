@@ -112,6 +112,27 @@ public class Settings {
     }
     
     /**
+     * Creates an array of the output image formats for complex graphs which are set in the settings.
+     * @return the output formats, collected from settings like 'plcc_B_img_CG_output_format_PNG'
+     */
+    public static IMAGEFORMAT[] getComplexGraphOutputImageFormats() {
+        ArrayList<IMAGEFORMAT> formats = new ArrayList<IMAGEFORMAT>();
+        
+        if(Settings.getBoolean("plcc_B_img_CG_output_format_PNG")) {
+            formats.add(IMAGEFORMAT.PNG);
+        }
+        if(Settings.getBoolean("plcc_B_img_CG_output_format_PDF")) {
+            formats.add(IMAGEFORMAT.PDF);
+        }
+        // --- ignore SVG because it is always produced ---
+        //if(Settings.getBoolean("plcc_B_img_CG_output_format_SVG")) {
+        //    formats.add(IMAGEFORMAT.SVG);
+        //}
+        
+        return (IMAGEFORMAT[])formats.toArray(new IMAGEFORMAT[formats.size()]);
+    }
+    
+    /**
      * Returns the version string. This is NOT guaranteed to be a number.
      * @return the PLCC version
      */
@@ -198,7 +219,7 @@ public class Settings {
         // The letter at the 6th position of the setting name always indicates the data type (I=Integer, B=Boolean, F=Float, S=String). It is not
         //  used automatically though, it's just a reminder.
 
-        defSet("plcc_B_consider_all_ligands_for_each_chain", "true", "Whether to ignore the assignement of a ligand to a chain in the PDB file, and assign a ligand to each chain it has contacts with.");
+        defSet("plcc_B_consider_all_ligands_for_each_chain", "true", "Whether to ignore the assignement of a ligand to a chain in the PDB file, and assign a ligand to each chain it has contacts with. WARNING: This setting is ignored and off atm.");
         defSet("plcc_B_draw_ligandcomplexgraphs", "true", "Whether to draw ligand-centered complex graphs. This means one graph for each ligans in a PDB file, each showing all SSEs (regardless of chain) the ligand is in contact with. Experimental.");
         // Output and performance
         defSet("plcc_B_separate_contacts_by_chain", "false", "Whether to compute atom contacts separated by chain. Faster but does not detect contacts between different chains and thus cannot be used for complex graph computation.");
@@ -286,11 +307,15 @@ public class Settings {
         
         // new output format settings
         defSet("plcc_B_img_output_format_PNG", "true", "Whether to write protein graph output images in PNG format.");
-        defSet("plcc_B_img_output_format_PDF", "true", "Whether to write protein graph output images in PDF format.");
+        defSet("plcc_B_img_output_format_PDF", "false", "Whether to write protein graph output images in PDF format.");
         defSet("plcc_B_img_output_format_SVG", "true", "Whether to write protein graph output images in SVG format. Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG.");
-        defSet("plcc_B_img_FG_output_format_PNG", "true", "Whether to write protein graph output images in PNG format.");
-        defSet("plcc_B_img_FG_output_format_PDF", "true", "Whether to write protein graph output images in PDF format.");
-        defSet("plcc_B_img_FG_output_format_SVG", "true", "Whether to write protein graph output images in SVG format. Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG.");
+        defSet("plcc_B_img_FG_output_format_PNG", "true", "Whether to write folding graph output images in PNG format.");
+        defSet("plcc_B_img_FG_output_format_PDF", "false", "Whether to write folding graph output images in PDF format.");
+        defSet("plcc_B_img_FG_output_format_SVG", "true", "Whether to write folding graph output images in SVG format. Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG.");
+        defSet("plcc_B_img_CG_output_format_PNG", "true", "Whether to write complex graph output images in PNG format.");
+        defSet("plcc_B_img_CG_output_format_PDF", "false", "Whether to write complex graph output images in PDF format.");
+        defSet("plcc_B_img_CG_output_format_SVG", "true", "Whether to write complex graph output images in SVG format. Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG.");
+        
         
         defSet("plcc_I_img_margin_left", "80", "Size of the left image margin in pixels");
         defSet("plcc_I_img_margin_top", "40", "Size of the top image margin in pixels");
@@ -347,7 +372,7 @@ public class Settings {
         defSet("plcc_B_AAgraph_perchain", "false", "Whether to compute and output amino per-chain acid graphs as well (vertices are AAs, not SSEs).");
 
         // Database stuff
-        defSet("plcc_B_useDB", "false", "Whether to write statistics to the PostgreSQL database");
+        defSet("plcc_B_useDB", "false", "Whether to write any data to the PostgreSQL database");
         defSet("plcc_S_db_name", "vplg", "Database name");
         defSet("plcc_S_db_host", "127.0.0.1", "Hostname or IP of the DB server");
         defSet("plcc_I_db_port", "5432", "DB server port");
@@ -387,7 +412,8 @@ public class Settings {
         defSet("plcc_B_compute_graphlet_similarities_cg", "false", "Whether to compute graphlet similarities for complex graphs. Only used if plcc_B_compute_graphlet_similarities is true.");
         defSet("plcc_B_compute_graphlet_similarities_aag", "false", "Whether to compute graphlet similarities for amino acid graphs. Only used if plcc_B_compute_graphlet_similarities is true.");
         defSet("plcc_I_compute_all_graphlet_similarities_num_to_save_in_db", "25", "The number of the most similar protein chain to store in the database after graphlet similarity computation. Set to n to store the n most similar for each chain.");
-        defSet("plcc_I_compute_all_graphlet_similarities_num_graphlets_to_consider", "30", "The number of graphlets from the database entry to consider when computing the similarity score. If the graphlet array in the DB field is longer than the value given here, the rest will be ignored.");
+        defSet("plcc_I_compute_all_graphlet_similarities_start_graphlet_index", "0", "Determines the graphlets from the array in the DB which are considered for similarity computation. This is the index of the first (start) graphlet used. Do not forget to also set the end index properly. This is inclusive.");
+        defSet("plcc_I_compute_all_graphlet_similarities_end_graphlet_index", "29", "Determines the graphlets from the array in the DB which are considered for similarity computation. This is the index of the last (end) graphlet used. Do not forget to also set the start index properly. This is inclusive.");
         defSet("plcc_S_search_similar_PDBID", "8icd", "Used only when plcc_B_search_similar is true. The protein PDB ID to use as a pattern during the similarity search.");
         defSet("plcc_S_search_similar_chainID", "A", "Used only when plcc_B_search_similar is true. The protein chain ID to use as a pattern during the similarity search.");
         defSet("plcc_S_search_similar_graphtype", "albelig", "Used only when plcc_B_search_similar is true. The graph type to use as a pattern during the similarity search.");
@@ -429,7 +455,7 @@ public class Settings {
         defSet("plcc_I_spatrel_dd_smallest_parallel_def", "7", "Same as above, this is the default for other interactions.");
 
         // graphlets
-        defSet("plcc_I_number_of_graphlets", "30", "The length of the graphlet vector in the database (the PostgreSQL SQL array).");
+        defSet("plcc_I_number_of_graphlets", "30", "The length of the graphlet vector in the database (the PostgreSQL SQL array). This is the number of graphlets used to compute similarity.");
         
 
         return(true);
