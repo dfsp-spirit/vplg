@@ -588,6 +588,22 @@ public class IO {
         return s.toString();
     }
     
+    
+    /**
+     * Prints a map to a string.
+     * @param m the Map
+     * @param keyValueConnectionString the string to use to connect a key with its value (try ':' or '=' if in doubt)
+     * @param pairSeparator the string to print between key-value pairs (try ' ' or ', ' if in doubt)
+     * @return the string
+     */
+    public static String intMapToString(Map<Integer, Integer> m, String keyValueConnectionString, String pairSeparator) {
+        StringBuilder s = new StringBuilder();
+        for(Integer i : m.keySet()) {
+            s.append(i).append(keyValueConnectionString).append(m.get(i)).append(pairSeparator);
+        }
+        return s.toString();
+    }
+    
     /**
      * Debug function to get a string representation of a list, using space as the separator.
      * @param ar the list
@@ -630,12 +646,13 @@ public class IO {
      * @return the string
      */
     public static String intListToString(List<Integer> ar, String start, String end) {
-        String s = start;
+        StringBuilder sb = new StringBuilder();
+        sb.append(start);
         for(Integer i : ar) {
-            s += i + " ";
+            sb.append(i).append(" ");
         }
-        s += end;
-        return s;
+        sb.append(end);
+        return sb.toString();
     }
     
     

@@ -8,7 +8,10 @@
 package algorithms;
 
 import datastructures.SimpleGraphInterface;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Utility class for computing graph metrics.
@@ -66,6 +69,66 @@ public class GraphMetrics {
             }
         }
         return ancc / numVerts.doubleValue();
+    }
+    
+    /**
+     * Computes the degree distribution of g.
+     * @param g the graph
+     * @param includeZeroCounts whether degrees which do not occur in the graph should be listed (with a value of 0) in the returned map
+     * @return a map listing the degree as key, and the number of verts with that degree in g as the value
+     */
+    public static Map<Integer, Integer> degreeDistribution(SimpleGraphInterface g, Boolean includeZeroCounts) {
+        Map<Integer, Integer> dgd = new HashMap<>();
+        
+        if(includeZeroCounts) {
+            for(int i = 0; i < g.getSize(); i++) {
+                dgd.put(i, 0);
+            }
+        }
+        
+        Integer degree, currentCount;
+        for(int i = 0; i < g.getSize(); i++) {
+            degree = g.neighborsOf(i).size();
+            if(dgd.containsKey(degree)) {
+                currentCount = dgd.get(degree);
+                dgd.put(degree, currentCount + 1);
+            }
+            else {
+                dgd.put(degree, 1);
+            }
+        }
+        
+        return dgd;
+    }
+    
+    
+    /**
+     * Sums values in a map in a range of keys. Map has to have both types integer.
+     * @return the sum of the values in the key range
+     */
+    private static Integer sumMapIntIntValuesInRange(Map<Integer, Integer> m, Integer startKeyInclusive, Integer endKeyInclusive) {
+        Integer sum = 0;
+        for(Integer i = startKeyInclusive; i <= endKeyInclusive; i++) {
+            if(m.containsKey(i)) {
+                sum += m.get(i);
+            }
+        }
+        return sum;
+    }
+    
+    /**
+     * Computes the cumulative degree distribution of g.
+     * @param g a graph
+     * @return the cumulative degree distribution. a list that contains at each position n the number of vertices in the graph which have at least degree n.
+     */
+    public static List<Integer> cumulativeDegreeDistribution(SimpleGraphInterface g) {
+        List<Integer> cdd = new ArrayList<>();
+        Map<Integer, Integer> dgd = GraphMetrics.degreeDistribution(g, Boolean.TRUE);
+        
+        for(int i = 0; i < g.getSize(); i++) {
+            cdd.add(GraphMetrics.sumMapIntIntValuesInRange(dgd, i, (g.getSize() -1) ));
+        }
+        return cdd;
     }
     
 }
