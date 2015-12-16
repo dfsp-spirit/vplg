@@ -14,6 +14,7 @@ import java.util.HashMap;
 import graphformats.IGraphMLFormat;
 import io.IO;
 import graphformats.ITrivialGraphFormat;
+import java.util.List;
 
 /**
  * An undirected sparse graph. Uses index based access to vertices and
@@ -23,7 +24,7 @@ import graphformats.ITrivialGraphFormat;
  * 
  * @author ts
  */
-public class SparseGraph<V, E> {
+public class SparseGraph<V, E> implements SimpleGraphInterface {
     
     
     /** Some vertices. Graphs like them. */
@@ -121,6 +122,17 @@ public class SparseGraph<V, E> {
         return this.edges.get(i).contains(j);
     }
     
+    public boolean hasVertexWithIndex(int i) {
+        if(this.getNumVertices() <= 0) {
+            return false;
+        }
+        
+        if(i >= 0 && i < this.getNumVertices()) {
+            return true;
+        }
+        return false;
+    }
+    
     /**
      * Retuns the EdgeInfo for the edge between vertices at indices i and j
      * @param i the vertex i by index
@@ -195,6 +207,14 @@ public class SparseGraph<V, E> {
         return allEdges;
     }
     
+    @Override
+    public List<Integer> neighborsOf(Integer vertIndex) {
+        List<Integer> neighbors = new ArrayList<>();
+        for(int j = 0; j < this.edges.get(vertIndex).size(); j++) {
+            neighbors.add(this.edges.get(vertIndex).get(j));
+         }
+        return neighbors;
+    }
     
     /**
      * Returns the vertex at index idx
@@ -204,6 +224,34 @@ public class SparseGraph<V, E> {
     public V getVertex(int idx) {
         return this.vertices.get(idx);
     }
+
+    @Override
+    public Integer getSize() {
+        return this.getNumVertices();
+    }
+
+    @Override
+    public Boolean containsEdge(Integer i, Integer j) {
+        return this.hasEdge(i, j);
+    }
+
+
+    @Override
+    public Character getVertexLabelChar(Integer i) {
+        if(this.hasVertexWithIndex(i)) {
+            return ' ';
+        }
+        return null;
+    }
+
+    @Override
+    public Character getEdgeLabelChar(Integer i, Integer j) {
+        if(this.hasEdge(i, j)) {
+            return ' ';
+        }
+        return null;
+    }
+
     
     
 }

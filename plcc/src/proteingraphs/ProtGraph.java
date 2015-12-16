@@ -344,7 +344,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
      * Returns the largest connected component of this graph as a folding graph object (or NULL if this graph has no CCs, i.e., it has no vertices).
      * Computes the CCs if they have not been computed yet.
      * 
-     * @return the CC as a FoldingGraph (or NULL if this graph has no vertices)
+     * @return the largest CC as a FoldingGraph (or NULL if this graph has no vertices). If several largest CCs (with identical size) exist, the one closest to the C terminus will be returned.
      */
     public FoldingGraph getLargestConnectedComponent() {
         if(! this.connectedComponentsComputed) {

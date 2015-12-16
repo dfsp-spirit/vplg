@@ -1904,6 +1904,7 @@ public class Main {
                     AAGraph aag = new AAGraph(residues, cInfo);
                     aag.setPdbid(pdbid);
                     aag.setChainid(AAGraph.CHAINID_ALL_CHAINS);
+                    
 
                     String subDirTree = "";
                     if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
@@ -6978,6 +6979,13 @@ public class Main {
         cg.setComplexData(chainEnd, allChains);
         cg.declareComplexGraph(true);
                 
+        // TEST
+        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of CG %%%%%%%%%%%%%%%%%%%%%%%%%");
+        ArrayList<FoldingGraph> conCompsOfCG = cg.getConnectedComponents();
+        FoldingGraph cgSubgraph = cg.getLargestConnectedComponent();
+        System.out.println("Largest CC has size " + cgSubgraph.getSize());
+        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of CG %%%%%%%%%%%%%%%%%%%%%%%%%");
+        
         filePathImg = outputDir;
         filePathGraphs = outputDir;
         filePathHTML = outputDir;
