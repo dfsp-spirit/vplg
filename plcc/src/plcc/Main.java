@@ -1905,6 +1905,15 @@ public class Main {
                     aag.setPdbid(pdbid);
                     aag.setChainid(AAGraph.CHAINID_ALL_CHAINS);
                     
+                    // ###TEST-AAG-METRICS
+                    System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of AAG %%%%%%%%%%%%%%%%%%%%%%%%%");
+                    //ArrayList<FoldingGraph> conCompsOfCG = aag.getConnectedComponents();
+                    //FoldingGraph cgSubgraph = cg.getLargestConnectedComponent();
+                    Map<Integer, Integer> degreeDistrGraph = GraphMetrics.degreeDistribution(aag, false);
+                    //Map<Integer, Integer> degreeDistrLargestCC = GraphMetrics.degreeDistribution(cgSubgraph, false);
+                    System.out.println("AAGraph has size " + aag.getSize());
+                    //System.out.println("Largest CC has size " + cgSubgraph.getSize());
+                    System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of AAG %%%%%%%%%%%%%%%%%%%%%%%%%");
 
                     String subDirTree = "";
                     if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
@@ -6959,7 +6968,7 @@ public class Main {
         
         // This graph is still required because it is used for drawing the VPLG-style picture
         ProtGraph cg = chainCM.toProtGraph();                        
-        cg.declareProteinGraph();        
+        cg.declareProteinGraph();      // this is declared a CG after setting info, see below.  
         
         if( ! silent) {
             System.out.println("    Graph created and declared a CG.");
@@ -6979,10 +6988,12 @@ public class Main {
         cg.setComplexData(chainEnd, allChains);
         cg.declareComplexGraph(true);
                 
-        // TEST
+        // ###TEST-CG-METRICS
         System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of CG %%%%%%%%%%%%%%%%%%%%%%%%%");
         ArrayList<FoldingGraph> conCompsOfCG = cg.getConnectedComponents();
         FoldingGraph cgSubgraph = cg.getLargestConnectedComponent();
+        Map<Integer, Integer> degreeDistrGraph = GraphMetrics.degreeDistribution(cg, false);
+        Map<Integer, Integer> degreeDistrLargestCC = GraphMetrics.degreeDistribution(cgSubgraph, false);
         System.out.println("Largest CC has size " + cgSubgraph.getSize());
         System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of CG %%%%%%%%%%%%%%%%%%%%%%%%%");
         
