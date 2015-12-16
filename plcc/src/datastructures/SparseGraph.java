@@ -28,7 +28,7 @@ public class SparseGraph<V, E> implements SimpleGraphInterface {
     
     
     /** Some vertices. Graphs like them. */
-    protected ArrayList<V> vertices;
+    protected List<V> vertices;
     
     /** The edges, encoded as adjacency lists. */
     protected ArrayList<ArrayList<Integer>> edges;
@@ -42,7 +42,7 @@ public class SparseGraph<V, E> implements SimpleGraphInterface {
      * Constructs a graph from a vertex list. The list may be empty, of course.
      * @param vertList the vertex list
      */
-    public SparseGraph(ArrayList<V> vertList) {
+    public SparseGraph(List<V> vertList) {
         this.vertices = vertList;        
         edges = new ArrayList<ArrayList<Integer>>();
         edgeInfo = new HashMap<String, E>();
