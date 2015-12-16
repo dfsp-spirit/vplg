@@ -15,10 +15,10 @@ GRAPHTYPE="able"
 
 ## gets a list of PDB chains, one per line. Each line contains an entry like '7tim,A,...' for chain A of PDB 7TIM.
 ## we extract the first two fields (PDB ID and chain), separated by ','
-ALL_CHAINS_IN_MANY_LINES=$(awk -F, '{print $1 $2}' $LIST_FILE)
+awk -F, '{print $1 $2}' $LIST_FILE > all_chains_in_many_lines.txt
 
 ## replace the new lines with spaces
-ALL_CHAINS_IN_ONE_LINE=$(tr '\n' ' ' $ALL_CHAINS_IN_MANY_LINES)
+ALL_CHAINS_IN_ONE_LINE=$(tr '\n' ' ' < all_chains_in_many_lines.txt)
 
 for PDBCHAIN in $ALL_CHAINS_IN_ONE_LINE; do
   PDBID=${PDBCHAIN:0:4}        # extract PDB ID (characters 0-3, inclusive)
