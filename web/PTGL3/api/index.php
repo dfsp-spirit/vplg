@@ -311,8 +311,9 @@ $app->get(
 			
 						<a name="example_restclient_code"></a>
 			<section style="padding-bottom: 20px">
-			<h2>Example code to access this API in PHP</h2>
+			<h2>Example code to access this API</h2>
                 <p>
+                    PHP<br/><br/>
                     Here is some simple example code which queries this API from PHP, using <a href="http://curl.haxx.se/" target="_blank">libcurl</a>. The code retrieves the ADJ linear notation string of the albe graph of 7tim chain A. Feel free to use and extend it.
                 </p>              
 
@@ -355,8 +356,10 @@ $app->get(
 <span style="color: #557799">?&gt;</span>
 </pre></td></tr></table></div>
 
+         <br/><br/>         
          <p>
-         We also provide a BASH shell script for Linux that will download the GML files for a list of proteins or chains. The list can be in a CSV file. The script and an example list is available for download here: <a href="./usage_examples/bash_api_example.zip">bash_api_example.zip</a>. The script comes without any warranty. Make sure you understand it and adapt it to your needs before usage.
+         BASH shell<br/><br/>
+         We also provide a BASH shell script for Linux that will download the GML files for a list of proteins or chains. The list can be in a CSV file. The script and an example list is available for download here: <a href="./usage_examples/bash_api_example.zip">bash_api_example.zip</a>. The script comes without any warranty. Make sure you understand it and adapt it to your needs before usage. The script uses wget, awk, tr and other standard unix tools.
          </p>
  
         </section>
