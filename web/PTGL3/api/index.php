@@ -354,6 +354,10 @@ $app->get(
 }
 <span style="color: #557799">?&gt;</span>
 </pre></td></tr></table></div>
+
+         <p>
+         We also provide a BASH shell script for Linux that will download the GML files for a list of proteins or chains. The list can be in a CSV file. The script and an example list is available for download here: <a href="./usage_examples/bash_api_example.zip">bash_api_example.zip</a>. The script comes without any warranty. Make sure you understand it and adapt it to your needs before usage.
+         </p>
  
         </section>
 
