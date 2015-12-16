@@ -1,5 +1,5 @@
 #!/bin/bash
-### Usage example for the PTGL API using bash and wget: get all files from a CSV list ###
+### get_files_from_csv_list_via_PTGL_API.sh -- Usage example for the PTGL API using bash and wget: get all files from a CSV list ###
 ### This script will downnload the GML files of all ALBE protein graphs listed in the second text file 
 ###
 ### Written by Tim Schaefer, http://rcmd.org/ts/
@@ -18,7 +18,7 @@
 ##### settings -- adapt to your needs #####
 LIST_FILE="all_beta.csv"        
 PTGL_API_BASEPATH="http://ptgl.uni-frankfurt.de/api/index.php/"
-GRAPHTYPE="able"
+GRAPHTYPE="albe"
 
 
 ##### end of settings. no need to mess with stuff below this line. #####
@@ -37,7 +37,11 @@ for PDBCHAIN in $ALL_CHAINS_IN_ONE_LINE; do
   API_PATH_GML="${PTGL_API_BASEPATH}/pg/${PDBID}/${CHAIN}/${GRAPHTYPE}/gml"       # construct the API query, adds something like 'pg/7tim/A/albe/gml' to the API base path
   OUTPUT_FILE="${PDBID}_${CHAIN}_${GRAPHTYPE}_PG.gml"
   wget -O $OUTPUT_FILE $API_PATH_GML  
-  echo "Downloaded GML file for PDB $PDBID chain $CHAIN to local file '$OUTPUT_FILE'."
+  if [ $? -ne 0 ]; then
+      echo "Failed to downloaded GML file for PDB $PDBID chain $CHAIN."  
+  elseif
+      echo "Downloaded GML file for PDB $PDBID chain $CHAIN to local file '$OUTPUT_FILE'."
+  fi
 done
 
 echo "All done, exiting."
