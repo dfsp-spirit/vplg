@@ -728,6 +728,8 @@ public class Main {
                                         sb.append(", ");
                                     }
                                 }
+                                sb.append("\n");
+                                sb.append("NOTE: You may want to set representative chains (PRE) now if needed.");
                                 System.out.println(sb.toString());
                             }
                         }
@@ -2739,6 +2741,7 @@ public class Main {
                     }
                 }
                 
+                // ###TEST-PG-METRICS
                 if(Settings.getBoolean("plcc_B_compute_graph_metrics")) {
                     
                     pg.computeConnectedComponents();

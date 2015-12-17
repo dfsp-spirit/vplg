@@ -38,6 +38,17 @@ public class ConnectedComponents {
     }
     
     /**
+     * Determines whether the input graph is connected.
+     * @return whether the input graph is connected, i.e., consists of exactly one connected component
+     */
+    public Boolean inputGraphIsConnected() {
+        if( ! this.alreadyComputed) {
+            this.compute();
+        }
+        return (this.conComps.size() == 1);
+    }
+    
+    /**
      * Returns (and computes if needed) the largest CC.
      * @return the largest CC. If several largest of equal size exist, the last one is returned. Returns null if the graph has no verts (and thus the largest CC has size 0).
      */
@@ -273,5 +284,6 @@ public class ConnectedComponents {
 
             conComps.add(sg);
         }
+        this.alreadyComputed = true;
     }
 }
