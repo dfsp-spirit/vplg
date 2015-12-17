@@ -2471,7 +2471,7 @@ E	3	3	3
      * @param chainEnd a list if SSE indices. Each index of an SSE in the total list is the last SSE of a chain. So chainEnd[2] is the position of the last SSE of the third chain.
      * @param allChains a list of all chains which are included in this CG 
      */
-    public void setComplexData(List<Integer> chainEnd, ArrayList<Chain> allChains){
+    public void setComplexData(List<Integer> chainEnd, List<Chain> allChains){
         this.setAllChains(allChains);
         this.setChainEnds(chainEnd);
     }

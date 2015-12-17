@@ -15,7 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Computes the connected components of a graph given as a SimpleGraphInterface.
+ * Computes the connected components of a graph given as a SimpleGraphInterface. Lazy, only computes stuff when asked for results.
  * @author spirit
  */
 public class ConnectedComponents {
@@ -37,6 +37,33 @@ public class ConnectedComponents {
         return this.conComps;
     }
     
+    /**
+     * Returns (and computes if needed) the largest CC.
+     * @return the largest CC. If several largest of equal size exist, the last one is returned. Returns null if the graph has no verts (and thus the largest CC has size 0).
+     */
+    public SimpleGraphInterface getLargest() {
+        if( ! this.alreadyComputed) {
+            this.compute();
+        }
+        
+        int max = -1;
+        int currentLargestIndex = -1;
+        for(int i = 0; i < conComps.size(); i++) {
+            if(this.conComps.get(i).getSize() >= max) {
+                currentLargestIndex = i;
+            }
+        }
+        
+        if(currentLargestIndex == -1) {
+            return null;
+        }
+        return this.conComps.get(currentLargestIndex);
+    }
+    
+    
+    /**
+     * Runs the actual computation of CC. Called lazily by the other methods if needed.
+     */
     private void compute() {
     // If the list of SSEs is empty, there are no connected components
         if(g.getSize() < 1) {
@@ -107,7 +134,7 @@ public class ConnectedComponents {
         
         
         // we have that vertices marked with their CC, now construct the subgraphs/connected components from them
-        SparseGraph sg;
+        SparseGraph<Integer, String> sg;
         
         
         // Iterate through all connected components (CCs)

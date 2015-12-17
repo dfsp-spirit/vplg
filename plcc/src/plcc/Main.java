@@ -10,6 +10,7 @@
 package plcc;
 
 // imports
+import algorithms.ConnectedComponents;
 import proteingraphs.PTGLNotations;
 import resultcontainers.ProteinResults;
 import resultcontainers.PTGLNotationFoldResult;
@@ -40,6 +41,8 @@ import proteinstructure.Atom;
 import proteinstructure.SSE;
 import algorithms.GraphMetrics;
 import datastructures.AAGraph;
+import datastructures.SimpleGraphInterface;
+import datastructures.SparseGraph;
 import htmlgen.CssGenerator;
 import htmlgen.HtmlGenerator;
 import htmlgen.JmolTools;
@@ -209,7 +212,7 @@ public class Main {
 
         ArrayList<Model> models = new ArrayList<Model>();
         ArrayList<Chain> chains = new ArrayList<Chain>();
-        ArrayList<Residue> residues = new ArrayList<Residue>();
+        List<Residue> residues = new ArrayList<Residue>();
         HashMap<Character, ArrayList<Integer>> sulfurBridges = new HashMap<Character, ArrayList<Integer>>();
         ArrayList<Atom> atoms = new ArrayList<Atom>();
         ArrayList<SSE> dsspSSEs = new ArrayList<SSE>();
@@ -1907,12 +1910,13 @@ public class Main {
                     
                     // ###TEST-AAG-METRICS
                     System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of AAG %%%%%%%%%%%%%%%%%%%%%%%%%");
-                    //ArrayList<FoldingGraph> conCompsOfCG = aag.getConnectedComponents();
-                    //FoldingGraph cgSubgraph = cg.getLargestConnectedComponent();
+                    ConnectedComponents cc = new ConnectedComponents(aag);
+                    List<SimpleGraphInterface> conCompsOfCG = cc.get();
+                    SimpleGraphInterface cgSubgraph = cc.getLargest();
                     Map<Integer, Integer> degreeDistrGraph = GraphMetrics.degreeDistribution(aag, false);
-                    //Map<Integer, Integer> degreeDistrLargestCC = GraphMetrics.degreeDistribution(cgSubgraph, false);
+                    Map<Integer, Integer> degreeDistrLargestCC = GraphMetrics.degreeDistribution(cgSubgraph, false);
                     System.out.println("AAGraph has size " + aag.getSize());
-                    //System.out.println("Largest CC has size " + cgSubgraph.getSize());
+                    System.out.println("Largest CC has size " + cgSubgraph.getSize());
                     System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of AAG %%%%%%%%%%%%%%%%%%%%%%%%%");
 
                     String subDirTree = "";
@@ -2389,7 +2393,7 @@ public class Main {
      * @param pdbid the PDBID of the protein, required to name files properly etc.
      * @param outputDir where to write the output files. the filenames are deduced from graph type and pdbid.
      */
-    public static void calculateSSEGraphsForChains(ArrayList<Chain> allChains, ArrayList<Residue> resList, ArrayList<ResContactInfo> resContacts, String pdbid, String outputDir) {
+    public static void calculateSSEGraphsForChains(List<Chain> allChains, List<Residue> resList, ArrayList<ResContactInfo> resContacts, String pdbid, String outputDir) {
 
         Boolean silent = Settings.getBoolean("plcc_B_silent");
         
@@ -3782,7 +3786,7 @@ public class Main {
      * Writes the a priori frequencies of the amino acids into the contact[][][][] array.
      * @param res the residue list which is used to determine the AA frequencies
      */
-    public static void getAADistribution(ArrayList<Residue> res) {
+    public static void getAADistribution(List<Residue> res) {
 
         Residue r = null;
         Integer rID = -1;
@@ -3801,7 +3805,7 @@ public class Main {
      * @param res A list of Residue objects.
      * @return A list of ResContactInfo objects, each representing a pair of residues that are in contact.
      */
-    public static ArrayList<ResContactInfo> calculateAllContacts(ArrayList<Residue> res) {
+    public static ArrayList<ResContactInfo> calculateAllContacts(List<Residue> res) {
         
         
         Boolean silent = Settings.getBoolean("plcc_B_silent");
@@ -3932,7 +3936,7 @@ public class Main {
      * @param res A list of Residue objects.
      * @return A list of ResContactInfo objects, each representing a pair of residues that are in contact.
      */
-    public static ArrayList<ResContactInfo> calculateAllContactsLimitedByChain(ArrayList<Residue> res, String handledChain) {
+    public static ArrayList<ResContactInfo> calculateAllContactsLimitedByChain(List<Residue> res, String handledChain) {
         
         Boolean silent = Settings.getBoolean("plcc_B_silent");
                 
@@ -4754,7 +4758,7 @@ public class Main {
      * @param res a residue list
      * @return the radius of the largest center sphere
      */
-    public static Integer getGlobalMaxCenterSphereRadius(ArrayList<Residue> res) {
+    public static Integer getGlobalMaxCenterSphereRadius(List<Residue> res) {
 
         Residue r = null;
         Integer maxRad, curRad;
@@ -4780,7 +4784,7 @@ public class Main {
      * @param res a list of residues which to consider
      * @return the maximum distance between two consecutive protein residues in the primary sequence
      */
-    public static Integer getGlobalMaxSeqNeighborResDist(ArrayList<Residue> res) {
+    public static Integer getGlobalMaxSeqNeighborResDist(List<Residue> res) {
 
         Residue r, s;
         r = s = null;
@@ -4936,7 +4940,7 @@ public class Main {
      * @param pdbid the PDB ID of the current protein
      * @param ligands a list of residues which are expected to be ligands
      */
-    public static void writeLigands(String ligFile, String pdbid, ArrayList<Residue> ligands) {
+    public static void writeLigands(String ligFile, String pdbid, List<Residue> ligands) {
 
         FileWriter ligFW = null;
         PrintWriter ligFH = null;
@@ -5121,7 +5125,7 @@ public class Main {
      * @return true if it worked out. Note though that this is considered critical.
      * 
      */
-    public static Boolean writeOrderedDsspLigFile(String dsspFile, String dsspLigFile, ArrayList<Residue> res) {
+    public static Boolean writeOrderedDsspLigFile(String dsspFile, String dsspLigFile, List<Residue> res) {
 
         File dFile = new File(dsspFile);
         File dligFile = new File(dsspLigFile);
@@ -6268,7 +6272,7 @@ public class Main {
      * @param outputDir where to write the output files. the filenames are deduced from graph type and pdbid.
      * @param graphType the graph type, one of the constants like SSEGraph.GRAPHTYPE_ALBE 
      */
-    public static void calculateComplexGraph(ArrayList<Chain> allChains, ArrayList<Residue> resList, ArrayList<ResContactInfo> resContacts, String pdbid, String outputDir, String graphType) {
+    public static void calculateComplexGraph(List<Chain> allChains, List<Residue> resList, List<ResContactInfo> resContacts, String pdbid, String outputDir, String graphType) {
 
         
         Boolean silent = Settings.getBoolean("plcc_B_silent");

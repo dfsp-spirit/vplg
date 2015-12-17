@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import proteinstructure.AminoAcid;
 import graphformats.IGraphModellingLanguageFormat;
+import java.util.List;
 import proteingraphs.ResContactInfo;
 import proteinstructure.Residue;
 
@@ -44,7 +45,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
     /** Advanced Constructor, constructs the edges automatically from ResContactInfo list
      * @param vertices the vertex list to use
      * @param contacts the contacts, which are used to create the edges of the graph */
-    public AAGraph(ArrayList<Residue> vertices, ArrayList<ResContactInfo> contacts) {
+    public AAGraph(List<Residue> vertices, ArrayList<ResContactInfo> contacts) {
         super(vertices);
         for(int i = 0; i < contacts.size(); i++) {
             this.addEdgeFromRCI(contacts.get(i));
