@@ -62,6 +62,7 @@ public class DBManager {
     static String tbl_graphletcount_aa = "plcc_aa_graphlets";    
     static String tbl_motif = "plcc_motif";
     static String tbl_motiftype = "plcc_motiftype";
+    static String tbl_representative_chains = "plcc_representative_chains";
     static String tbl_ligand = "plcc_ligand";
     static String tbl_nm_ligandtochain = "plcc_nm_ligandtochain";
     static String tbl_nm_ssetoproteingraph = "plcc_nm_ssetoproteingraph";
@@ -169,28 +170,52 @@ public class DBManager {
      * @return an array of numbers, each position logs a count. 0 = number of chains in input list. 1 = number of chains updated in DB.
      * @throws SQLException if DB stuff goes wrong
      */
-    public static Integer[] markAllRepresentativeChainsFromList(List<String[]> pdbChains) throws SQLException {
+    public static Integer[] markAllRepresentativeExistingChainsInChainsTableFromList(List<String[]> pdbChains) throws SQLException {
         Integer numUpdatedInDB = 0;
         
         String pdb_id, chain;
         for(String[] pdbChain : pdbChains) {
             pdb_id = pdbChain[0];
             chain = pdbChain[1];
-            numUpdatedInDB += DBManager.markChainRepresentative(pdb_id, chain, true);
+            numUpdatedInDB += DBManager.markChainRepresentativeInChainsTable(pdb_id, chain, true);
         }
         
         return new Integer[] { pdbChains.size(), numUpdatedInDB };
     }
     
+    /**
+     * This function lists a chain in the representative chains table for all chains in the given list.
+     * @param pdbChains a list of PDB chains, each String array in the list has length 2 and looks like ["7tim", "A"].
+     * @return an array of numbers, each position logs a count. 0 = number of chains in input list. 1 = number of chains updated in DB.
+     * @throws SQLException if DB stuff goes wrong
+     */
+    public static Integer[] markAllRepresentativeExistingChainsInInfoTableFromList(List<String[]> pdbChains) throws SQLException {
+        Integer numUpdatedInDB = 0;
+        Integer numAlreadyThere = 0;
+        
+        String pdb_id, chain;
+        for(String[] pdbChain : pdbChains) {
+            pdb_id = pdbChain[0];
+            chain = pdbChain[1];
+            if(DBManager.proteinChainExistsInRepresentativeChainsInfoTable(pdb_id, chain)) {
+                numAlreadyThere++;
+                continue;
+            }
+            numUpdatedInDB += DBManager.markChainRepresentativeInInfoTable(pdb_id, chain);
+        }
+        
+        return new Integer[] { pdbChains.size(), numUpdatedInDB, numAlreadyThere };
+    }
+    
     
     /**
-     * Marks all chains which are currently in the DB as NOT part of the representative 40 set. This
+     * Marks all chains which are currently in the DB as NOT part of the representative 40 set in the chains table. This
      * function can be called before labeling those in a list of representative, to ensure that an
      * already existing labeling is removed before applying the new one.
      * @return the number of updated rows in the DB
      * @throws SQLException if DB stuff goes wrong
      */
-    public static Integer markAllChainsAsNonRepresentative() throws SQLException {
+    public static Integer markAllChainsAsNonRepresentativeInChainsTable() throws SQLException {
         
         String query = "UPDATE " + tbl_chain + " SET chain_isinnonredundantset = 0;";        
         
@@ -202,13 +227,48 @@ public class DBManager {
                                 
             numRowsAffected = statement.executeUpdate();
         } catch (SQLException e ) {
-            System.err.println("ERROR: SQL: markAllChainsAsNonRepresentative: '" + e.getMessage() + "'.");
+            System.err.println("ERROR: SQL: markAllChainsAsNonRepresentativeInChainsTable: '" + e.getMessage() + "'.");
             if (dbc != null) {
                 try {
-                    System.err.print("ERROR: SQL: markAllChainsAsNonRepresentative: Transaction is being rolled back.");
+                    System.err.print("ERROR: SQL: markAllChainsAsNonRepresentativeInChainsTable: Transaction is being rolled back.");
                     dbc.rollback();
                 } catch(SQLException excep) {
-                    System.err.println("ERROR: SQL: markAllChainsAsNonRepresentative: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                    System.err.println("ERROR: SQL: markAllChainsAsNonRepresentativeInChainsTable: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+        } 
+       
+        return numRowsAffected;
+    }
+    
+    /**
+     * Marks all chains which are currently in the DB as NOT part of the representative 40 set in the info table, i.e, drops all rows from that table. 
+     * @return the number of updated rows in the DB
+     * @throws SQLException if DB stuff goes wrong
+     */
+    public static Integer markAllChainsAsNonRepresentativeInInfoTable() throws SQLException {
+        
+        String query = "DELETE FROM " + tbl_representative_chains + ";";        
+        
+        Integer numRowsAffected = 0;
+        PreparedStatement statement = null;
+        
+        try {
+            statement = dbc.prepareStatement(query);
+                                
+            numRowsAffected = statement.executeUpdate();
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: markAllChainsAsNonRepresentativeInListTable: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: markAllChainsAsNonRepresentativeInListTable: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: markAllChainsAsNonRepresentativeInListTable: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
                 }
             }
         } finally {
@@ -229,7 +289,7 @@ public class DBManager {
      * @return the number of updated rows in the DB
      * @throws SQLException if DB stuff goes wrong
      */
-    public static Integer markChainRepresentative(String pdb_id, String chain, boolean targetValue) throws SQLException {
+    public static Integer markChainRepresentativeInChainsTable(String pdb_id, String chain, boolean targetValue) throws SQLException {
         
         String query = "UPDATE " + tbl_chain + " SET chain_isinnonredundantset = ? WHERE pdb_id = ? AND chain_name = ?;";        
         
@@ -245,13 +305,55 @@ public class DBManager {
                                 
             numRowsAffected = statement.executeUpdate();
         } catch (SQLException e ) {
-            System.err.println("ERROR: SQL: markChainRepresentative: '" + e.getMessage() + "'.");
+            System.err.println("ERROR: SQL: markChainRepresentativeInChainsTable: '" + e.getMessage() + "'.");
             if (dbc != null) {
                 try {
-                    System.err.print("ERROR: SQL: markChainRepresentative: Transaction is being rolled back.");
+                    System.err.print("ERROR: SQL: markChainRepresentativeInChainsTable: Transaction is being rolled back.");
                     dbc.rollback();
                 } catch(SQLException excep) {
-                    System.err.println("ERROR: SQL: markChainRepresentative: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                    System.err.println("ERROR: SQL: markChainRepresentativeInChainsTable: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+        } 
+       
+        return numRowsAffected;
+    }
+    
+    
+    /**
+     * Adds a chain to the representative chains info table.
+     * @param pdb_id the PDB ICH
+     * @param chain the chain name
+     * @return number of affected rows
+     * @throws SQLException if stuff went wrong
+     */ 
+    public static Integer markChainRepresentativeInInfoTable(String pdb_id, String chain) throws SQLException {
+        
+                
+        String query = "INSERT INTO " + tbl_representative_chains + " (pdb_id, chain_name) values (?, ?);";        
+        
+        Integer numRowsAffected = 0;
+        PreparedStatement statement = null;
+        
+        try {
+            statement = dbc.prepareStatement(query);
+            
+            statement.setString(1, pdb_id);
+            statement.setString(2, chain);
+                                
+            numRowsAffected = statement.executeUpdate();
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: markChainRepresentativeInInfoTable: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: markChainRepresentativeInInfoTable: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: markChainRepresentativeInInfoTable: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
                 }
             }
         } finally {
@@ -1040,7 +1142,9 @@ public class DBManager {
             doDeleteQuery("DROP TABLE " + tbl_graphletsimilarity_aa + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_ligandcenteredgraph + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_nm_lcg_to_chain + " CASCADE;");
-            doDeleteQuery("DROP TABLE " + tbl_nm_chaintomacromolecule + " CASCADE;");            
+            doDeleteQuery("DROP TABLE " + tbl_nm_chaintomacromolecule + " CASCADE;");  
+            doDeleteQuery("DROP TABLE " + tbl_representative_chains + ";");  
+
             
             
             //doDeleteQuery("DROP TABLE " + tbl_fglinnot_alpha + " CASCADE;");
@@ -1111,6 +1215,7 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_aagraph + " (aagraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, chain_description text, aagraph_string_gml text);");
             doInsertQuery("CREATE TABLE " + tbl_motiftype + " (motiftype_id serial primary key, motiftype_name varchar(40));");
             doInsertQuery("CREATE TABLE " + tbl_motif + " (motif_id serial primary key, motiftype_id int not null references " + tbl_motiftype + " ON DELETE CASCADE, motif_name varchar(40), motif_abbreviation varchar(9));");
+            doInsertQuery("CREATE TABLE " + tbl_representative_chains + " (pdb_id varchar(4) not null, chain_name varchar(1) not null, PRIMARY KEY(pdb_id, chain_name));");
                         
             
             /**
@@ -1249,6 +1354,8 @@ public class DBManager {
             doInsertQuery("COMMENT ON TABLE " + tbl_ssetypes + " IS 'Stores the names of the SSE types, e.g., 1=helix.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_contacttypes + " IS 'Stores the names of the contact types, e.g., 1=mixed.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_graphtypes + " IS 'Stores the names of the graph types, e.g., 1=alpha.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_representative_chains + " IS 'A text table of the representative PDB chains, to be filled BEFORE inserting proteins in the database. Therefore cannot reference other tables.';");
+            
 
             //doInsertQuery("COMMENT ON TABLE " + tbl_fglinnot_alpha + " IS 'Stores the PTGL linear notation strings ADJ, RED, KEY and SEQ for a single fold of some alpha protein graph. Also stores file system paths to graph images.';");
             //doInsertQuery("COMMENT ON TABLE " + tbl_fglinnot_beta + " IS 'Stores the PTGL linear notation strings ADJ, RED, KEY and SEQ for a single fold of some beta protein graph. Also stores file system paths to graph images.';");
@@ -9051,7 +9158,7 @@ connection.close();
 
     
     /**
-     * Writes an Amino acid graph to the database. Currently only writes few fields, can be extended later.
+     * Writes an Amino acid graph to the database. Currently only writes few fields, can be extended later. WARNING: Make sure to set the chain_description properly.
      * @param pdb_id the PDB ID
      * @param chain_description a chain description. "ALL" for all-chains graph, the chain name otherwise.
      * @param aagraph_string_gml the GML string of the graph
@@ -12141,6 +12248,79 @@ connection.close();
             }
             else {
                 DP.getInstance().w("DB: Protein with PDB ID '" + pdb_id + "' not in DB.");
+                return(false);
+            }
+        }
+        else {
+            return(false);
+        }        
+    }
+    
+    
+    /**
+     * Determines whether a protein chain is listed in the representative chains info table (pre-update).
+     * @param pdb_id the PDB ID of the protein
+     * @param chain the chain name
+     * @return true if the chain is listed, false otherwise
+     */
+    public static synchronized Boolean proteinChainExistsInRepresentativeChainsInfoTable(String pdb_id, String chain) {
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT pdb_id FROM " + tbl_representative_chains + " WHERE (pdb_id = ? AND chain_name = ?);";
+
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setString(1, pdb_id);
+            statement.setString(2, chain);
+                                
+            rs = statement.executeQuery();
+            //dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: proteinChainExistsInRepresentativeChainsInfoTable:'" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                //dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DB: Could not close statement and reset autocommit."); }
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        if(tableData.size() >= 1) {
+            if(tableData.get(0).size() >= 1) {
+                return(true);
+            }
+            else {
                 return(false);
             }
         }

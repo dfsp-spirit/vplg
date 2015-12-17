@@ -233,8 +233,10 @@ public class Settings {
         defSet("plcc_S_debug_compareSSEContactsFile", "geo.dat_ptgl", "The path to the geo.dat file to use for SSE level contact comparison.");                
         defSet("plcc_B_contact_debug_dysfunct", "false", "Atom level contact debugging mode. WARNING: When this is true, plcc will abort after the first few residues and produce wrong overall results!");
         
-        defSet("plcc_B_set_pdb_representative_chains", "false", "Whether this plcc run should assign the representative PDB chains from the XML file in the database and then exit. Requires path to XML file.");
-        defSet("plcc_B_set_pdb_representative_chains_remove_old_labels", "true", "Whether the old labels should be removed from all chains before the new ones are applied. Removed means all chains are considered NOT part of the representative set.");        
+        defSet("plcc_B_set_pdb_representative_chains_post", "false", "Whether this plcc run should assign the representative PDB chains from the XML file in the info table of the database and then exit. Requires path to XML file.");
+        defSet("plcc_B_set_pdb_representative_chains_remove_old_labels_post", "true", "Whether the old labels should be removed from all chains in the chains table before the new ones are applied. Removed means all chains are considered NOT part of the representative set.");        
+        defSet("plcc_B_set_pdb_representative_chains_pre", "false", "Whether this plcc run should assign the representative PDB chains from the XML file in the info table of the database and then exit. Requires path to XML file.");
+        defSet("plcc_B_set_pdb_representative_chains_remove_old_labels_pre", "true", "Whether the old labels should be removed from all chains in the info table before the new ones are applied. Removed means all chains are considered NOT part of the representative set.");        
         defSet("plcc_S_representative_chains_xml_file", "representatives.xml", "The path to the XML file containing the representative PDB chains from the PDB. You can get the file from the RCSB PDB REST web service.");
         defSet("plcc_B_writeComplexContactCSV", "false", "Whether to write a CSV file containing all contacts used for co,plex graph computation.");
         defSet("plcc_B_write_chains_file", "false", "Whether to write a chains file containing all chain names of the currently handled PDB file. Can be used by GraphletAnalyzer later to construct graph file names for all chains.");

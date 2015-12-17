@@ -469,23 +469,47 @@ public class Main {
                     }
                     
                     
-                    if(s.equals("--set-pdb-representative-chains")) {
+                    if(s.equals("--set-pdb-representative-chains-pre")) {
+                        useFileFromCommandline = false;
                         if(args.length <= i+2 ) {
-                            syntaxError("The --set-pdb-representative-chains option requires an XML file to read the data from AND the info whether to remove old labels. For the latter, valid values are 'keep' or 'remove'.");
+                            syntaxError("The --set-pdb-representative-chains-pre option requires an XML file to read the data from AND the info whether to remove old labels. For the latter, valid values are 'keep' or 'remove'.");
                         }
                         else {
                             useFileFromCommandline = false;                                                        
                             Settings.set("plcc_B_useDB", "true");
-                            Settings.set("plcc_B_set_pdb_representative_chains", "true");
+                            Settings.set("plcc_B_set_pdb_representative_chains_pre", "true");
                             Settings.set("plcc_S_representative_chains_xml_file", args[i+1]);
                             if(args[i+2].equals("keep")) {
-                                Settings.set("plcc_B_set_pdb_representative_chains_remove_old_labels", "false");
+                                Settings.set("plcc_B_set_pdb_representative_chains_remove_old_labels_pre", "false");
                             }
                             else if(args[i+2].equals("remove")) {
-                                Settings.set("plcc_B_set_pdb_representative_chains_remove_old_labels", "true");
+                                Settings.set("plcc_B_set_pdb_representative_chains_remove_old_labels_pre", "true");
                             }
                             else {
-                                syntaxError("The --set-pdb-representative-chains option requires an XML file to read the data from AND the info whether to remove old labels. For the latter, valid values are 'keep' or 'remove'.");
+                                syntaxError("The --set-pdb-representative-chains-pre option requires an XML file to read the data from AND the info whether to remove old labels. For the latter, valid values are 'keep' or 'remove'.");
+                            }
+                            
+                        }
+                    }
+                    
+                    if(s.equals("--set-pdb-representative-chains-post")) {
+                        useFileFromCommandline = false;
+                        if(args.length <= i+2 ) {
+                            syntaxError("The --set-pdb-representative-chains-post option requires an XML file to read the data from AND the info whether to remove old labels. For the latter, valid values are 'keep' or 'remove'.");
+                        }
+                        else {
+                            useFileFromCommandline = false;                                                        
+                            Settings.set("plcc_B_useDB", "true");
+                            Settings.set("plcc_B_set_pdb_representative_chains_post", "true");
+                            Settings.set("plcc_S_representative_chains_xml_file", args[i+1]);
+                            if(args[i+2].equals("keep")) {
+                                Settings.set("plcc_B_set_pdb_representative_chains_remove_old_labels_post", "false");
+                            }
+                            else if(args[i+2].equals("remove")) {
+                                Settings.set("plcc_B_set_pdb_representative_chains_remove_old_labels_post", "true");
+                            }
+                            else {
+                                syntaxError("The --set-pdb-representative-chains-post option requires an XML file to read the data from AND the info whether to remove old labels. For the latter, valid values are 'keep' or 'remove'.");
                             }
                             
                         }
@@ -1292,7 +1316,7 @@ public class Main {
         }
         
         // mark the rep chains in the DB, then exit
-        if(Settings.getBoolean("plcc_B_set_pdb_representative_chains")) {
+        if(Settings.getBoolean("plcc_B_set_pdb_representative_chains_pre") || Settings.getBoolean("plcc_B_set_pdb_representative_chains_post")) {
             
             File xmlFile = new File(Settings.get("plcc_S_representative_chains_xml_file"));
             
@@ -1340,45 +1364,97 @@ public class Main {
                 System.exit(1);
             }
             
+            
             // let the DB manager handle the list
             if(DBManager.initUsingDefaults()) {
                 Integer[] res;
                 Integer numOldLabelsRemoved = 0;
                 
-                Integer numChainsInDB = DBManager.countChainsInDB();
                 
-                // remove the old marking if required
-                if(Settings.getBoolean("plcc_B_set_pdb_representative_chains_remove_old_labels")) {
-                    try {
-                        numOldLabelsRemoved = DBManager.markAllChainsAsNonRepresentative();
-                        if( ! DBManager.getAutoCommit()) {
-                            DBManager.commit();
+                // ----- update the existing chains table -----
+                if(Settings.getBoolean("plcc_B_set_pdb_representative_chains_post")) {
+                    System.out.println("This should be run after an update, when the database is full. It marks proteins as part of the non-redundant set in the chain table, and entries in this table only exists AFTER you have added data to the database.");
+                
+                    Integer numChainsInDB = DBManager.countChainsInDB();
+
+                    // remove the old marking if required
+                    if(Settings.getBoolean("plcc_B_set_pdb_representative_chains_remove_old_labels_post")) {
+                        try {
+                            numOldLabelsRemoved = DBManager.markAllChainsAsNonRepresentativeInChainsTable();
+                            if( ! DBManager.getAutoCommit()) {
+                                DBManager.commit();
+                            }
+                            // numChainsInList, numChainsUpdatedInDB
+                            if(! silent) {
+                                System.out.println("  Removed " + numOldLabelsRemoved + " old labels from the " + numChainsInDB + " chains in the DB.");
+                            }
                         }
+                        catch(SQLException e) {
+                            System.err.println("ERROR: Removing old representative labels from chains in DB failed: '" + e.getMessage() + "'.");
+                            System.exit(1);
+                        }
+                    }
+
+
+                    // mark the chains as representative in the chains table (for already existing chains)
+                    try {
+                        res = DBManager.markAllRepresentativeExistingChainsInChainsTableFromList(repChains);
                         // numChainsInList, numChainsUpdatedInDB
                         if(! silent) {
-                            System.out.println("  Removed " + numOldLabelsRemoved + " old labels from the " + numChainsInDB + " chains in the DB.");
+                            System.out.println("Done. Found and updated " + res[1] + " of the " + res[0] + " labels from the XML file in the chains table of the DB. (The DB contains " + numChainsInDB + " chains atm.)");
                         }
                     }
                     catch(SQLException e) {
-                        System.err.println("ERROR: Removing old representative labels in DB failed: '" + e.getMessage() + "'.");
+                        System.err.println("ERROR: Updating representatives in chains table of DB failed: '" + e.getMessage() + "'.");
                         System.exit(1);
                     }
                 }
-                
-                try {
-                    res = DBManager.markAllRepresentativeChainsFromList(repChains);
-                    // numChainsInList, numChainsUpdatedInDB
-                    if(! silent) {
-                        System.out.println("Done. Found and updated " + res[1] + " of the " + res[0] + " labels from the XML file in the DB. (The DB contains " + numChainsInDB + " chains atm.)");
+
+                // ----- update the info table -----
+                if(Settings.getBoolean("plcc_B_set_pdb_representative_chains_pre")) {
+                    System.out.println("This command should be run BEFORE adding data to the database. It is only required if you want PLCC to compute graph statistics for representative chains during the update. You still need to explicitely tell PLCC to do this via command line options.");
+                    
+                    // remove the old marking in list table if required
+                    if(Settings.getBoolean("plcc_B_set_pdb_representative_chains_remove_old_labels_pre")) {
+                        try {
+                            numOldLabelsRemoved = DBManager.markAllChainsAsNonRepresentativeInInfoTable();
+                            if( ! DBManager.getAutoCommit()) {
+                                DBManager.commit();
+                            }
+                            // numChainsInList, numChainsUpdatedInDB
+                            if(! silent) {
+                                System.out.println("  Removed " + numOldLabelsRemoved + " old labels from the info table in the DB.");
+                            }
+                        }
+                        catch(SQLException e) {
+                            System.err.println("ERROR: Removing old representative labels from the info table in DB failed: '" + e.getMessage() + "'.");
+                            System.exit(1);
+                        }
                     }
+                    
+                    
+                    // mark the chains as representative in the chains table (for already existing chains)
+                    try {
+                        res = DBManager.markAllRepresentativeExistingChainsInInfoTableFromList(repChains);
+                        if(! silent) {
+                            System.out.println("Done. Found and updated " + res[1] + " of the " + res[0] + " labels from the XML file in the DB in info table. " + res[2] + " were already in the DB (or duplicated in the XML file).");
+                        }
+                    }
+                    catch(SQLException e) {
+                        System.err.println("ERROR: Updating representatives in list table of DB failed: '" + e.getMessage() + "'.");
+                        System.exit(1);
+                    }
+                   
                 }
-                catch(SQLException e) {
-                    System.err.println("ERROR: Updating representatives in DB failed: '" + e.getMessage() + "'.");
-                    System.exit(1);
-                }
+                
+                
                 if( ! DBManager.getAutoCommit()) {
                     DBManager.commit();
                 }
+                
+                // fill the table of representative chains, only used to compute statistics for these chains WHEN THEY ARE INSERTED LATER
+                
+                
                 System.exit(0);
             } else {
                 System.err.println("ERROR: Could not connect to DB, exiting.");
@@ -1977,7 +2053,7 @@ public class Main {
             }
                         
             
-            if(separateContactsByChain) {
+            if(separateContactsByChain || Settings.getBoolean("plcc_B_AAgraph_perchain")) {
                 String chainID;
                 ArrayList<Chain> theChain;
                 int numChainsHandled = 0;
@@ -2034,8 +2110,9 @@ public class Main {
                         }
                     }
                     
-                    
-                    calculateSSEGraphsForChains(theChain, residues, cInfoThisChain, pdbid, outputDir);
+                    if(separateContactsByChain) {
+                        calculateSSEGraphsForChains(theChain, residues, cInfoThisChain, pdbid, outputDir);
+                    }
                     
                     if(Settings.getBoolean("plcc_B_useDB")) {
                         if( ! DBManager.getAutoCommit()) {
@@ -2046,7 +2123,8 @@ public class Main {
                     numChainsHandled++;
                 }
             }
-            else {  // no chainName separation active
+            
+            if( ! separateContactsByChain){  // no chainName separation active
                 calculateSSEGraphsForChains(handleChains, residues, cInfo, pdbid, outputDir);
                 //calculateComplexGraph(handleChains, residues, cInfo, pdbid, outputDir);
                 if(Settings.getBoolean("plcc_B_useDB")) {
@@ -2055,6 +2133,7 @@ public class Main {
                     }
                 }
             }
+            
             if(! silent) {
                 System.out.println("All " + handleChains.size() + " chains done.");
             }
@@ -5375,7 +5454,8 @@ public class Main {
         System.out.println("   --cluster               : Set all options for cluster mode. Equals '-f -u -k -s -G -i -Z -P'.");
         System.out.println("");
         System.out.println("The following options only make sense for database maintenance:");
-        System.out.println("--set-pdb-representative-chains <file> <k> : Set non-redundant chain status for all chains in DB from XML file <file>. <k> determines what to do with existing flags, valid options are 'keep' or 'remove'. Get the file from PDB REST API.");
+        System.out.println("--set-pdb-representative-chains-pre <file> <k> : Set non-redundant chain status for all chains in DB from XML file <file>. <k> determines what to do with existing flags, valid options are 'keep' or 'remove'. Get the file from PDB REST API. Run this pre-update, BEFORE new data will be added.");
+        System.out.println("--set-pdb-representative-chains-post <file> <k> : Set non-redundant chain status for all chains already existing in the chains table of the DB from XML file <file>. <k> determines what to do with existing flags, valid options are 'keep' or 'remove'. Get the file from PDB REST API. Run this post-update, after new data has been added.");
         System.out.println("");
         System.out.println("EXAMPLES: java -jar plcc.jar 8icd");
         System.out.println("          java -jar plcc.jar 8icd -D 2 -d /tmp/dssp/8icd.dssp -p /tmp/pdb/8icd.pdb");
