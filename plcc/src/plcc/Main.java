@@ -1369,13 +1369,17 @@ public class Main {
             if(DBManager.initUsingDefaults()) {
                 Integer[] res;
                 Integer numOldLabelsRemoved = 0;
-                
+
+                Integer numChainsInDB = DBManager.countChainsInDB();
                 
                 // ----- update the existing chains table -----
                 if(Settings.getBoolean("plcc_B_set_pdb_representative_chains_post")) {
+                    if(numChainsInDB.equals(0)) {
+                        System.err.println("WARNING: No chains in the database. (Did you intend to run the PRE version of this command?)");
+                    }
                     System.out.println("This should be run after an update, when the database is full. It marks proteins as part of the non-redundant set in the chain table, and entries in this table only exists AFTER you have added data to the database.");
                 
-                    Integer numChainsInDB = DBManager.countChainsInDB();
+                    
 
                     // remove the old marking if required
                     if(Settings.getBoolean("plcc_B_set_pdb_representative_chains_remove_old_labels_post")) {
@@ -1412,6 +1416,9 @@ public class Main {
 
                 // ----- update the info table -----
                 if(Settings.getBoolean("plcc_B_set_pdb_representative_chains_pre")) {
+                    if(numChainsInDB > 0) {
+                        System.err.println("WARNING: Database already contains " + numChainsInDB + " chains. (Did you intend to run the POST version of this command?)");
+                    }
                     System.out.println("This command should be run BEFORE adding data to the database. It is only required if you want PLCC to compute graph statistics for representative chains during the update. You still need to explicitely tell PLCC to do this via command line options.");
                     
                     // remove the old marking in list table if required
