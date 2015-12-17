@@ -1909,15 +1909,17 @@ public class Main {
                     aag.setChainid(AAGraph.CHAINID_ALL_CHAINS);
                     
                     // ###TEST-AAG-METRICS
-                    System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of AAG %%%%%%%%%%%%%%%%%%%%%%%%%");
-                    ConnectedComponents cc = new ConnectedComponents(aag);
-                    List<SimpleGraphInterface> conCompsOfCG = cc.get();
-                    SimpleGraphInterface cgSubgraph = cc.getLargest();
-                    Map<Integer, Integer> degreeDistrGraph = GraphMetrics.degreeDistribution(aag, false);
-                    Map<Integer, Integer> degreeDistrLargestCC = GraphMetrics.degreeDistribution(cgSubgraph, false);
-                    System.out.println("AAGraph has size " + aag.getSize());
-                    System.out.println("Largest CC has size " + cgSubgraph.getSize());
-                    System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of AAG %%%%%%%%%%%%%%%%%%%%%%%%%");
+                    if(Settings.getBoolean("plcc_B_compute_graph_metrics")) {
+                        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of AAG %%%%%%%%%%%%%%%%%%%%%%%%%");
+                        ConnectedComponents cc = new ConnectedComponents(aag);
+                        List<SimpleGraphInterface> conCompsOfCG = cc.get();
+                        SimpleGraphInterface cgSubgraph = cc.getLargest();
+                        Map<Integer, Integer> degreeDistrGraph = GraphMetrics.degreeDistribution(aag, false);
+                        Map<Integer, Integer> degreeDistrLargestCC = GraphMetrics.degreeDistribution(cgSubgraph, false);
+                        System.out.println("AAGraph has size " + aag.getSize());
+                        System.out.println("Largest CC has size " + cgSubgraph.getSize());
+                        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of AAG %%%%%%%%%%%%%%%%%%%%%%%%%");
+                    }
 
                     String subDirTree = "";
                     if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
@@ -2700,7 +2702,7 @@ public class Main {
                     Integer minDegreeLargestCC = Collections.min(degreeDistrLargestCC.keySet());
                     List<Integer> cumulDegreeDistrLargestCC = GraphMetrics.cumulativeDegreeDistribution(fg);
                     
-                    
+                    System.out.println("########## PG graph metrics ##########");
                     System.out.println("      Stats for the " + gt + " graph of " + pdbid + " chain " + chain + ":");                    
                     if(pcc) { System.out.println("       PG is not connected, also printing data for its largest connected component (FG)."); }
                     
@@ -6992,14 +6994,16 @@ public class Main {
         cg.setComplexData(chainEnd, allChains);
         cg.declareComplexGraph(true);
                 
-        // ###TEST-CG-METRICS
-        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of CG %%%%%%%%%%%%%%%%%%%%%%%%%");
-        ArrayList<FoldingGraph> conCompsOfCG = cg.getConnectedComponents();
-        FoldingGraph cgSubgraph = cg.getLargestConnectedComponent();
-        Map<Integer, Integer> degreeDistrGraph = GraphMetrics.degreeDistribution(cg, false);
-        Map<Integer, Integer> degreeDistrLargestCC = GraphMetrics.degreeDistribution(cgSubgraph, false);
-        System.out.println("Largest CC has size " + cgSubgraph.getSize());
-        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of CG %%%%%%%%%%%%%%%%%%%%%%%%%");
+        if(Settings.getBoolean("plcc_B_compute_graph_metrics")) {
+            // ###TEST-CG-METRICS
+            System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of CG %%%%%%%%%%%%%%%%%%%%%%%%%");
+            ArrayList<FoldingGraph> conCompsOfCG = cg.getConnectedComponents();
+            FoldingGraph cgSubgraph = cg.getLargestConnectedComponent();
+            Map<Integer, Integer> degreeDistrGraph = GraphMetrics.degreeDistribution(cg, false);
+            Map<Integer, Integer> degreeDistrLargestCC = GraphMetrics.degreeDistribution(cgSubgraph, false);
+            System.out.println("Largest CC has size " + cgSubgraph.getSize());
+            System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of CG %%%%%%%%%%%%%%%%%%%%%%%%%");
+        }
         
         filePathImg = outputDir;
         filePathGraphs = outputDir;
