@@ -1,7 +1,9 @@
-/**
- * Computes the graph distances of a graph given as a SimpleGraphInterface. Lazy, only computes stuff when asked for results.
- * Currently uses Dijkstra's algo.
- * @author spirit
+/*
+ * This file is part of the Visualization of Protein Ligand Graphs (VPLG) software package.
+ *
+ * Copyright Tim Schäfer 2015. VPLG is free software, see the LICENSE and README files for details.
+ *
+ * @author Tim Schäfer
  */
 package algorithms;
 
@@ -13,7 +15,8 @@ import proteingraphs.ProtGraph;
 import proteingraphs.ProtGraphs;
 
 /**
- *
+ * Computes the graph distances of a graph given as a SimpleGraphInterface. Lazy, only computes stuff when asked for results.
+ * Uses the Floyd–Warshall algorithm.
  * @author ts
  */
 public class GraphDistances {
