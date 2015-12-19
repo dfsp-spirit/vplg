@@ -24,11 +24,20 @@ public class GraphDistances {
     protected SimpleGraphInterface g;
     protected boolean alreadyComputed;
     protected Integer[ ][ ] distMatrix;           // distances of the vertices within this graph
-    public Boolean setInfinityDistancesToMinusOne = true;
+    private Boolean setInfinityDistancesToMinusOne = false;
     
     public GraphDistances(SimpleGraphInterface g) {
         this.g = g;
         this.alreadyComputed = false;
+    }
+    
+    
+    /**
+     * Sets the value returned in the matrix for vertex pairs which are not reachable from each other.
+     * @param yesOrNo if TRUE, the distances will be set to -1. If FALSE, they will be set to (or rather left at) Integer.MAX_VALUE. Setting this to true is slower, as all V*V values have to be changed.
+     */
+    public void setInfinityDistancesToMinusOne(Boolean yesOrNo) {
+        this.setInfinityDistancesToMinusOne = yesOrNo;
     }
     
     private void compute() {
@@ -37,7 +46,7 @@ public class GraphDistances {
     }
     
     /**
-     * Computes and returns the distance matrix. The matrix lists Integer.MAX_VALUE for vertex pairs which are not reachable from each other.
+     * Computes and returns the distance matrix. The matrix lists Integer.MAX_VALUE for vertex pairs which are not reachable from each other. If you want the distances to be set to -1 instead, use the setInfinityDistancesToMinusOne function.
      * @return the distance matrix
      */
     public Integer[][] getDistMatrix() {
@@ -118,7 +127,7 @@ public class GraphDistances {
         Boolean ok = true;
         
         GraphDistances gd = new GraphDistances(pg);
-        gd.setInfinityDistancesToMinusOne = true;
+        gd.setInfinityDistancesToMinusOne(true);
         Integer[][] distsFloydWarshall = gd.getDistMatrix();
         System.out.println("Floyd Warshall done.");
                 
