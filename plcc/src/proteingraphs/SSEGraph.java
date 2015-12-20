@@ -2191,8 +2191,8 @@ E	3	3	3
     }
     
     /**
-     * The eccentricity e(v) of a vertex v is the greatest geodesic distance between v and any other vertex.
-     * @param v
+     * The eccentricity e(v) of a vertex v is the greatest distance between v and any other vertex.
+     * @param v the vertex, by index
      * @return the eccentricity
      */
     public Integer getEccentricityOfVertex(int v) {

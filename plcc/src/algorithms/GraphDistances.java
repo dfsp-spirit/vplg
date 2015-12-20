@@ -11,6 +11,7 @@ import datastructures.SimpleGraphInterface;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import proteingraphs.ProtGraph;
 import proteingraphs.ProtGraphs;
 
@@ -25,10 +26,13 @@ public class GraphDistances {
     protected boolean alreadyComputed;
     protected Integer[ ][ ] distMatrix;           // distances of the vertices within this graph
     private Boolean setInfinityDistancesToMinusOne = false;
+    private static Integer DISTANCE_INFINITY = Integer.MAX_VALUE;
+    private Boolean graphIsConnected;
     
     public GraphDistances(SimpleGraphInterface g) {
         this.g = g;
         this.alreadyComputed = false;
+        this.graphIsConnected = null;
     }
     
     
@@ -38,6 +42,12 @@ public class GraphDistances {
      */
     public void setInfinityDistancesToMinusOne(Boolean yesOrNo) {
         this.setInfinityDistancesToMinusOne = yesOrNo;
+        if(yesOrNo == true) {
+            GraphDistances.DISTANCE_INFINITY = -1;
+        }
+        else {
+            GraphDistances.DISTANCE_INFINITY = Integer.MAX_VALUE;
+        }
     }
     
     private void compute() {
@@ -106,14 +116,134 @@ public class GraphDistances {
             
             for(int i = 0; i < g.getSize(); i++) {
                 for(int j = 0; j < g.getSize(); j++) {
-                    if(distMatrix[i][j] == Integer.MAX_VALUE) {
+                    if(Objects.equals(distMatrix[i][j], Integer.MAX_VALUE)) {
                         distMatrix[i][j] = -1;
-                    }
+                    } 
                 }
             }
             
         }
 
+    }
+    
+    private void determineWhetherGraphIsConnected() {
+        if( ! this.alreadyComputed) {
+            this.compute();
+        }
+        
+        if(this.graphIsConnected != null) {
+            return;
+        }
+        
+        Boolean result = true;  //assume it is connected
+        
+        outerLoop:
+        for(int i = 0; i < g.getSize(); i++) {
+            for(int j = 0; j < g.getSize(); j++) {
+                if(Objects.equals(distMatrix[i][j], GraphDistances.DISTANCE_INFINITY)) {
+                    result = false;     // it is not connected if distance betweem any pair of vertices is infinite
+                    break outerLoop;
+                } 
+            }
+        }
+        
+        this.graphIsConnected = result;
+    }
+    
+    
+    /**
+     * The eccentricity e(v) of a vertex v is the greatest distance between v and any other vertex. If the graph is not connected, it is null for every vertex.
+     * @param v the vertex, by index
+     * @return the eccentricity or null if not defined
+     */
+    public Integer getEccentricityOfVertex(int v) {
+        
+        if( ! this.alreadyComputed) {
+            this.compute();
+        }
+        
+        if(g.getSize() == 0) {
+            return null;
+        }
+        
+        this.determineWhetherGraphIsConnected();
+        if(this.graphIsConnected) {
+                
+            Integer e = 0;
+            for(int i = 0; i < g.getSize(); i++) {
+                if(i == v) {
+                    continue;
+                }
+                if(distMatrix[i][v] > e) {
+                    e = distMatrix[i][v];
+                }
+            }
+            
+            if(e.equals(0)) {
+                return null;
+            }
+            return e;
+            
+        }
+        else {
+            return null;
+        }
+    }
+    
+    /**
+     * The radius r of a graph is the minimum eccentricity of any vertex.
+     * @return the graph radius or null if this graph is not connected or empty
+     */
+    public Integer getGraphRadius() {
+        if(g.getSize() == 0) {
+            return null;
+        }
+        
+        this.determineWhetherGraphIsConnected();
+        
+        if(this.graphIsConnected) {
+            Integer minEcc = Integer.MAX_VALUE;
+            for(int i = 0; i < g.getSize(); i++) {
+                Integer e = this.getEccentricityOfVertex(i);
+                if(e != null) {
+                    if(e < minEcc) {
+                        minEcc = e;
+                    }
+                }
+            }
+            return minEcc;
+        }
+        else {
+            return null;
+        }
+    }
+    
+    /**
+     * The diameter d of a graph is the maximum eccentricity of any vertex.
+     * @return the graph diameter or null if this graph is not connected or empty
+     */
+    public Integer getGraphDiameter() {
+        if(g.getSize() == 0) {
+            return null;
+        }
+        
+        this.determineWhetherGraphIsConnected();
+        
+        if(this.graphIsConnected) {
+            Integer maxEcc = 0;
+            for(int i = 0; i < g.getSize(); i++) {
+                Integer e = this.getEccentricityOfVertex(i);
+                if(e != null) {
+                    if(e > maxEcc) {
+                        maxEcc = e;
+                    }
+                }
+            }
+            return maxEcc;
+        }
+        else {
+            return null;
+        }
     }
     
     /**
@@ -148,7 +278,7 @@ public class GraphDistances {
         
         for(int i = 0; i < distsDijkstra.length; i++) {
             for(int j = 0; j < distsDijkstra.length; j++) {
-                if(distsDijkstra[i][j] != distsFloydWarshall[i][j]) {
+                if(!Objects.equals(distsDijkstra[i][j], distsFloydWarshall[i][j])) {
                     ok = false;
                     System.err.println("ERROR: algos do not agree on distance of " + i + " and " + j + ": " + distsDijkstra[i][j] + " / " + distsFloydWarshall[i][j] + ".");
                 }
