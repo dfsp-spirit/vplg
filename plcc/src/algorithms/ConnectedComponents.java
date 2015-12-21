@@ -30,6 +30,11 @@ public class ConnectedComponents {
         alreadyComputed = false;
     }
     
+    
+    /**
+     * Returns a list of connected components.
+     * @return a list of connected components.
+     */
     public List<SimpleGraphInterface> get() {
         if( ! this.alreadyComputed) {
             this.compute();

@@ -40,6 +40,7 @@ import proteinstructure.AminoAcid;
 import proteinstructure.Atom;
 import proteinstructure.SSE;
 import algorithms.GraphMetrics;
+import algorithms.GraphProperties;
 import datastructures.AAGraph;
 import datastructures.SimpleGraphInterface;
 import datastructures.SparseGraph;
@@ -2747,8 +2748,12 @@ public class Main {
                     pg.computeConnectedComponents();
                     FoldingGraph fg = pg.getLargestConnectedComponent();
                     
+                    GraphProperties gpGraph = new GraphProperties(pg);
+                    GraphProperties gpSubgraph = new GraphProperties(fg);
+                    
                     // ----- number of vertices -----
                     Integer numVertsPG = pg.getSize();
+                    Integer numVertsPG2 = gpSubgraph.getNumVertices();
                     Integer numVertsLargestCC = fg.getSize();
                     
                     // we do not print largest connected component data if it is equal to whole graph data anyway

@@ -1209,7 +1209,7 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_ssecontact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null references " + tbl_contacttypes + " ON DELETE CASCADE, check (sse1 < sse2));");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact_complexgraph + " (ssecontact_complexgraph_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, complex_contact_count int not null, complex_contact_type int not null references " + tbl_complexcontacttypes + " ON DELETE CASCADE check (sse1 < sse2));");            
             doInsertQuery("CREATE TABLE " + tbl_complex_contact_stats + " (complex_contact_id serial primary key, chain1 int not null references " + tbl_chain + " ON DELETE CASCADE, chain2 int not null references " + tbl_chain + " ON DELETE CASCADE, contact_num_HH int not null, contact_num_HS int not null, contact_num_HL int not null, contact_num_SS int not null, contact_num_SL int not null, contact_num_LL int not null, contact_num_DS int not null);");
-            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_json text, graph_string_xml text, graph_image_png text, graph_image_svg text, graph_image_pdf text, filepath_graphfile_gml text, filepath_graphfile_kavosh text, filepath_graphfile_plcc text, filepath_graphfile_dotlanguage text, filepath_graphfile_json text, filepath_graphfile_xml text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
+            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_json text, graph_string_xml text, graph_image_png text, graph_image_svg text, graph_image_pdf text, filepath_graphfile_gml text, filepath_graphfile_kavosh text, filepath_graphfile_plcc text, filepath_graphfile_dotlanguage text, filepath_graphfile_json text, filepath_graphfile_xml text, sse_string text, graph_containsbetabarrel int DEFAULT 0, stat_num_verts int, stat_num_edges int, stat_min_degree int, stat_max_degree int, );");
             doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, fg_number int not null, fold_name varchar(2) not null, first_vertex_position_in_parent int not null, graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_json text, graph_string_xml text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_complexgraph + " (complexgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, ssegraph_string_gml text, chaingraph_string_gml text, ssegraph_string_xml text, chaingraph_string_xml text, ssegraph_string_kavosh text, chaingraph_string_kavosh text, filepath_ssegraph_image_svg text, filepath_chaingraph_image_svg text, filepath_ssegraph_image_png text, filepath_chaingraph_image_png text, filepath_ssegraph_image_pdf text, filepath_chaingraph_image_pdf text);");
             doInsertQuery("CREATE TABLE " + tbl_aagraph + " (aagraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, chain_description text, aagraph_string_gml text);");
@@ -1558,6 +1558,7 @@ public class DBManager {
             doInsertQuery("INSERT INTO " + tbl_motiftype + " (motiftype_id, motiftype_name) VALUES (2, 'beta');");
             doInsertQuery("INSERT INTO " + tbl_motiftype + " (motiftype_id, motiftype_name) VALUES (3, 'alpha/beta');");
             doInsertQuery("INSERT INTO " + tbl_motiftype + " (motiftype_id, motiftype_name) VALUES (4, 'alpha+beta');");
+            doInsertQuery("INSERT INTO " + tbl_motiftype + " (motiftype_id, motiftype_name) VALUES (5, 'ligand');");
             
             // alpha motifs
             doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name, motif_abbreviation) VALUES (1, 1, 'Four Helix Bundle', '" + Motifs.MOTIF__FOUR_HELIX_BUNDLE + "');");
@@ -1573,6 +1574,9 @@ public class DBManager {
             doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name, motif_abbreviation) VALUES (9, 3, 'Rossman Fold', 'rossman');");
             doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name, motif_abbreviation) VALUES (10, 3, 'TIM Barrel', 'tim');");
             doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name, motif_abbreviation) VALUES (11, 4, 'Ferredoxin Fold', 'ferre');");
+            // ligand motifs
+            doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name, motif_abbreviation) VALUES (12, 5, 'Ligand bound to helix', 'lighelix');");
+            doInsertQuery("INSERT INTO " + tbl_motif + " (motif_id, motiftype_id, motif_name, motif_abbreviation) VALUES (13, 5, 'Ligand bound to strand', 'ligstrand');");
             
 
             if( ! DBManager.getAutoCommit()) {
@@ -8258,7 +8262,7 @@ connection.close();
     
     
     /**
-     * Checks whether the chain contains a ferredoxin fold motifThese checks consider the different linear notations of several graph types.
+     * Checks whether the chain contains a ferredoxin fold motif. These checks consider the different linear notations of several graph types.
      * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
      * @param chain_db_id
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
@@ -8335,6 +8339,161 @@ connection.close();
         return(false);                
     }
     
+    /**
+     * Checks whether the chain contains a ligand bound to helix motif. These checks consider the different linear notations of several graph types.
+     * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
+     * @param chain_db_id
+     * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
+     */
+    public static Boolean chainContainsMotif_LigandHelix(Long chain_db_id) {
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+                
+        PreparedStatement statement = null;
+        ResultSet rs = null;             
+        
+        StringBuilder querySB = new StringBuilder();
+                
+        // find chains
+        querySB.append("SELECT p.pdb_id, c.chain_name ");
+	querySB.append("FROM plcc_fglinnot ln ");
+	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
+	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
+	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
+        querySB.append("WHERE ( c.chain_id = ? AND ((ln.ptgl_linnot_adj LIKE '%h,_ll%') OR ( ln.ptgl_linnot_adj LIKE '%h,__ll%' ) OR ( ln.ptgl_linnot_adj LIKE '%ll,__h%' ) OR ( ln.ptgl_linnot_adj LIKE '%ll,___h%' ) ) ) ");
+        querySB.append("GROUP BY p.pdb_id, c.chain_name, ln.firstvertexpos_adj ");
+        
+        
+        String query = querySB.toString();
+        
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, chain_db_id);
+                                
+            rs = statement.executeQuery();
+            //dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "chainContainsMotif_LigandHelix: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                //dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_LigandHelix: Could not close statement and reset autocommit."); }
+        }
+        
+        // OK, check size of results table
+        if(tableData.size() >= 1) {
+            return true;
+        }
+        
+        return(false);                
+    }
+    
+    /**
+     * Checks whether the chain contains a ligand bound to strand fold motif. These checks consider the different linear notations of several graph types.
+     * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
+     * @param chain_db_id
+     * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
+     */
+    public static Boolean chainContainsMotif_LigandStrand(Long chain_db_id) {
+        
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+                
+        PreparedStatement statement = null;
+        ResultSet rs = null;             
+        
+        StringBuilder querySB = new StringBuilder();
+                
+        // find chains
+        querySB.append("SELECT p.pdb_id, c.chain_name ");
+	querySB.append("FROM plcc_fglinnot ln ");
+	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
+	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
+	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
+	querySB.append("WHERE ( c.chain_id = ? AND ((ln.ptgl_linnot_adj LIKE '%e,_ll%') OR ( ln.ptgl_linnot_adj LIKE '%e,__ll%' ) OR ( ln.ptgl_linnot_adj LIKE '%ll,__e%' ) OR ( ln.ptgl_linnot_adj LIKE '%ll,___e%' ) ) ) ");
+        querySB.append("GROUP BY p.pdb_id, c.chain_name, ln.firstvertexpos_adj ");
+        
+        
+        String query = querySB.toString();
+        
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, chain_db_id);
+                                
+            rs = statement.executeQuery();
+            //dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "chainContainsMotif_LigandStrand: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                //dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_LigandStrand: Could not close statement and reset autocommit."); }
+        }
+        
+        // OK, check size of results table
+        if(tableData.size() >= 1) {
+            return true;
+        }
+        
+        return(false);                
+    }
     
     /**
      * Returns all protein graph database IDs for the given PDB ID and chain.

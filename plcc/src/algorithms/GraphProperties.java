@@ -96,4 +96,29 @@ public class GraphProperties {
         return gd.getGraphDiameter();
     }
     
+    
+    /**
+     * Checks whether the graph is connected, i.e., every vertex is reachable from every other vertex
+     * @return whether the graph is connected
+     */
+    public Boolean getGraphIsConnected() {
+        return cc.inputGraphIsConnected();
+    }
+    
+    /**
+     * Returns a list of connected components.
+     * @return a list of connected components.
+     */
+    public List<SimpleGraphInterface> getConnectedComponents() {
+        return cc.get();
+    }
+    
+    /**
+     * Returns (and computes if needed) the largest CC.
+     * @return the largest CC. If several largest of equal size exist, the last one is returned. Returns null if the graph has no verts (and thus the largest CC has size 0).
+     */
+    public SimpleGraphInterface getLargestConnectedComponent() {
+        return cc.getLargest();
+    }
+    
 }

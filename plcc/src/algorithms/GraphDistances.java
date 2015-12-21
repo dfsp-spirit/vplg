@@ -247,6 +247,31 @@ public class GraphDistances {
     }
     
     /**
+     * Computes the average shortest path distance within the graph.
+     * @return the average shortest path distance, or null if the graph is not connected
+     */
+    public Double getAverageShortestPathDistance() {
+        
+        this.determineWhetherGraphIsConnected();
+        if(this.graphIsConnected) {
+            
+            
+            Double d = .0d;
+            Integer numDist = 0;
+            for(int i = 0; i < g.getSize(); i++) {
+                for(int j = i+1; j < g.getSize(); j++) {
+                    d += distMatrix[i][j];
+                    numDist++;
+                }                
+            }
+            return d / numDist.doubleValue();
+        }
+        else {
+            return null;
+        }
+    }
+    
+    /**
      * Test function only
      * @param args ignored
      */
