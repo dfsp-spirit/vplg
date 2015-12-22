@@ -1994,7 +1994,8 @@ public class Main {
                     aag.setPdbid(pdbid);
                     aag.setChainid(AAGraph.CHAINID_ALL_CHAINS);
                     
-                    // ###TEST-AAG-METRICS
+                    // ###TEST-AAG-METRICS --- now computed and written to DB below
+                    /*
                     if(Settings.getBoolean("plcc_B_compute_graph_metrics")) {
                         System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of AAG %%%%%%%%%%%%%%%%%%%%%%%%%");
                         ConnectedComponents cc = new ConnectedComponents(aag);
@@ -2006,6 +2007,7 @@ public class Main {
                         System.out.println("Largest CC has size " + cgSubgraph.getSize());
                         System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of AAG %%%%%%%%%%%%%%%%%%%%%%%%%");
                     }
+                    */
 
                     String subDirTree = "";
                     if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
@@ -2047,17 +2049,17 @@ public class Main {
                             try {
                                 Long graph_db_id = DBManager.getDBAminoacidgraphID(pdbid);
                                 if(graph_db_id > 0L) {
-                                    //System.out.println("Found graph " + pdbid + " " + chain + " " + gt + " with ID " + graph_db_id + ".");
+                                    //System.out.println("Found aa graph " + pdbid + ".");
                                     // write graph properties
                                     DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.FALSE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50));
                                     // write properties of largest CC of graph
                                     DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.TRUE, sgp.getNumVertices(), sgp.getNumEdges(), sgp.getMinDegree(), sgp.getMaxDegree(), sgp.getConnectedComponents().size(), sgp.getGraphDiameter(), sgp.getGraphRadius(), sgp.getAverageClusterCoefficient(), sgp.getAverageShortestPathLength(), sgp.getDegreeDistributionUpTo(50));
                                 }
                                 else {
-                                    DP.getInstance().e("Main", "Could not write graph properties to DB, graph not found in database.");
+                                    DP.getInstance().e("Main", "Could not write aa graph properties to DB, graph not found in database.");
                                 }
                             } catch(SQLException e) {
-                                DP.getInstance().e("SQL error while trying to store graph stats: '" + e.getMessage()+ "'.");
+                                DP.getInstance().e("SQL error while trying to store aa graph stats: '" + e.getMessage()+ "'.");
                             }
                         }
 
@@ -7150,7 +7152,8 @@ public class Main {
         cg.addMetadata(md);
         cg.setComplexData(chainEnd, allChains);
         cg.declareComplexGraph(true);
-                
+            
+        /*
         if(Settings.getBoolean("plcc_B_compute_graph_metrics")) {
             // ###TEST-CG-METRICS
             System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of CG %%%%%%%%%%%%%%%%%%%%%%%%%");
@@ -7159,8 +7162,8 @@ public class Main {
             Map<Integer, Integer> degreeDistrGraph = GraphMetrics.degreeDistribution(cg, false);
             Map<Integer, Integer> degreeDistrLargestCC = GraphMetrics.degreeDistribution(cgSubgraph, false);
             System.out.println("Largest CC has size " + cgSubgraph.getSize());
-            System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of CG %%%%%%%%%%%%%%%%%%%%%%%%%");
         }
+                */
         
         filePathImg = outputDir;
         filePathGraphs = outputDir;
@@ -7318,6 +7321,87 @@ public class Main {
             }
         } 
         
+        // database
+        if(Settings.getBoolean("plcc_B_useDB")) {
+            String dbImagePathCG = fileNameSSELevelWithoutExtension;
+            String dbImagePathChainCG = fileNameChainLevelWithoutExtension;
+            if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
+                dbImagePathCG = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, "ALL") + fs + fileNameSSELevelWithoutExtension;
+                dbImagePathChainCG = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, "ALL") + fs + fileNameChainLevelWithoutExtension;
+            }
+            //System.out.println("dbImagePathCG = '" + dbImagePathCG + "'");
+            //System.out.println("dbImagePathChainCG = '" + dbImagePathChainCG + "'");
+            //dbImagePath += DrawTools.getFileExtensionForImageFormat(format);
+            try {
+                if(Settings.getBoolean("plcc_B_write_graphstrings_to_database_cg")) {
+                    DBManager.writeComplexGraphToDB(pdbid, cg.toGraphModellingLanguageFormat(), null, cg.toXMLFormat(), null, cg.toKavoshFormat(), null, dbImagePathCG + ".svg", dbImagePathChainCG + ".svg", dbImagePathCG + ".png", dbImagePathChainCG + ".png", dbImagePathCG + ".pdf", dbImagePathChainCG + ".pdf");
+                } else {
+                    DBManager.writeComplexGraphToDB(pdbid, null, null, null, null, null, null, dbImagePathCG + ".svg", dbImagePathChainCG + ".svg", dbImagePathCG + ".png", dbImagePathChainCG + ".png", dbImagePathCG + ".pdf", dbImagePathChainCG + ".pdf");
+                }
+                
+                if(! silent) {
+                    System.out.println("Wrote complex graph of " + pdbid + " to DB.");
+                }
+                
+            } catch(SQLException e) {
+                DP.getInstance().w("Main", "Could not write complex graph to DB: '" + e.getMessage() + "'.");
+            }
+        } 
+        
+        if(Settings.getBoolean("plcc_B_compute_graph_metrics") && graphType.equals(SSEGraph.GRAPHTYPE_ALBELIG)) {
+            GraphProperties gp = new GraphProperties(cg);
+            GraphProperties sgp = new GraphProperties(gp.getLargestConnectedComponent());
+            
+            // DEBUG ---------------
+            /*
+            System.out.println("??????????????????????????????");
+            System.out.println("CG size " + cg.getSize());
+            SimpleGraphInterface testCG = (SimpleGraphInterface)cg;
+            System.out.println("CG as SGI size:" + testCG.getSize());
+            
+            List<FoldingGraph> lt = cg.getConnectedComponents();
+            System.out.print("FGs:");
+            for(FoldingGraph t : lt) {
+                System.out.print(t.getSize() + " ");
+            }
+            System.out.println("");
+                    */
+            
+            
+            SimpleGraphInterface test = gp.getLargestConnectedComponent();
+            System.out.println("largest CC size:" + test.getSize());
+            List<SimpleGraphInterface> tests = gp.getConnectedComponents();
+            System.out.print("All " + tests.size() + " CC sizes:");
+            for(SimpleGraphInterface t : tests) {
+                System.out.print(t.getSize() + " ");
+            }
+            System.out.println("");
+            // DEBUG ----------------
+            
+            if(Settings.getBoolean("plcc_B_useDB")) {
+
+                if( ! DBManager.getAutoCommit()) {
+                    DBManager.commit();
+                }
+
+                try {
+                    Long graph_db_id = DBManager.getDBComplexgraphID(pdbid);
+                    if(graph_db_id > 0L) {
+                        //System.out.println("Found complex graph " + pdbid + " with ID " + graph_db_id + ".");
+                        // write graph properties
+                        DBManager.writeComplexgraphStatsToDB(graph_db_id, Boolean.FALSE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50));
+                        // write properties of largest CC of graph
+                        DBManager.writeComplexgraphStatsToDB(graph_db_id, Boolean.TRUE, sgp.getNumVertices(), sgp.getNumEdges(), sgp.getMinDegree(), sgp.getMaxDegree(), sgp.getConnectedComponents().size(), sgp.getGraphDiameter(), sgp.getGraphRadius(), sgp.getAverageClusterCoefficient(), sgp.getAverageShortestPathLength(), sgp.getDegreeDistributionUpTo(50));
+                    }
+                    else {
+                        DP.getInstance().e("Main", "Could not write complex graph properties to DB, graph not found in database.");
+                    }
+                } catch(SQLException e) {
+                    DP.getInstance().e("SQL error while trying to store complex graph stats: '" + e.getMessage()+ "'.");
+                }
+            }
+        }
+        
         if(Settings.getBoolean("plcc_B_draw_graphs") && Settings.getBoolean("plcc_B_draw_ligandcomplexgraphs") && graphType.equals(SSEGraph.GRAPHTYPE_ALBELIG)) {
             if(! silent) {
                 System.out.println("    Drawing ligand-centered complex graphs...");
@@ -7463,40 +7547,13 @@ public class Main {
                     }
                 } 
             }
-        }
-            
+        }            
         else {
             if(! silent) {
                 System.out.println("    Not drawing ligand-centered complex graphs (" + graphType + ").");
             }
         }
-        
-        // database
-        if(Settings.getBoolean("plcc_B_useDB")) {
-            String dbImagePathCG = fileNameSSELevelWithoutExtension;
-            String dbImagePathChainCG = fileNameChainLevelWithoutExtension;
-            if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
-                dbImagePathCG = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, "ALL") + fs + fileNameSSELevelWithoutExtension;
-                dbImagePathChainCG = IO.getRelativeOutputPathtoBaseOutputDir(pdbid, "ALL") + fs + fileNameChainLevelWithoutExtension;
-            }
-            //System.out.println("dbImagePathCG = '" + dbImagePathCG + "'");
-            //System.out.println("dbImagePathChainCG = '" + dbImagePathChainCG + "'");
-            //dbImagePath += DrawTools.getFileExtensionForImageFormat(format);
-            try {
-                if(Settings.getBoolean("plcc_B_write_graphstrings_to_database_cg")) {
-                    DBManager.writeComplexGraphToDB(pdbid, cg.toGraphModellingLanguageFormat(), null, cg.toXMLFormat(), null, cg.toKavoshFormat(), null, dbImagePathCG + ".svg", dbImagePathChainCG + ".svg", dbImagePathCG + ".png", dbImagePathChainCG + ".png", dbImagePathCG + ".pdf", dbImagePathChainCG + ".pdf");
-                } else {
-                    DBManager.writeComplexGraphToDB(pdbid, null, null, null, null, null, null, dbImagePathCG + ".svg", dbImagePathChainCG + ".svg", dbImagePathCG + ".png", dbImagePathChainCG + ".png", dbImagePathCG + ".pdf", dbImagePathChainCG + ".pdf");
-                }
                 
-                if(! silent) {
-                    System.out.println("Wrote complex graph of " + pdbid + " to DB.");
-                }
-                
-            } catch(SQLException e) {
-                DP.getInstance().w("Main", "Could not write complex graph to DB: '" + e.getMessage() + "'.");
-            }
-        } 
         
         if(! silent) {
             System.out.println("Complex graph computation done.");

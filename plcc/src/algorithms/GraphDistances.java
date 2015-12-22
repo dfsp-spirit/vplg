@@ -211,6 +211,9 @@ public class GraphDistances {
                     }
                 }
             }
+            if(minEcc == Integer.MAX_VALUE) {
+                minEcc = null;
+            }
             return minEcc;
         }
         else {

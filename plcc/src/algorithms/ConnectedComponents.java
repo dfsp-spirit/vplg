@@ -64,14 +64,20 @@ public class ConnectedComponents {
         
         int max = -1;
         int currentLargestIndex = -1;
+        int curSize;
         for(int i = 0; i < conComps.size(); i++) {
-            if(this.conComps.get(i).getSize() >= max) {
+            curSize = this.conComps.get(i).getSize();
+            if(curSize >= max) {
                 currentLargestIndex = i;
+                max = curSize;
             }
         }
         
         if(currentLargestIndex == -1) {
             return null;
+        }
+        for(int i = 0; i < conComps.size(); i++) {
+            System.out.print(" " + conComps.get(i).getSize());
         }
         return this.conComps.get(currentLargestIndex);
     }
