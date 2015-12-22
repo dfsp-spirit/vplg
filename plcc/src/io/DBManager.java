@@ -72,6 +72,7 @@ public class DBManager {
     static String tbl_nm_ssetofoldinggraph = "plcc_nm_ssetofoldinggraph";
     static String tbl_nm_chaintomotif = "plcc_nm_chaintomotif";
     static String tbl_aagraph = "plcc_aagraph";
+    static String tbl_aatypeinteractions = "plcc_aatypeinteractions";
     
     /** Name of the table which stores info on SSE types, e.g., alpha-helix, beta-strand and ligand. */
     static String tbl_ssetypes = "plcc_ssetypes";
@@ -1154,6 +1155,7 @@ public class DBManager {
             doDeleteQuery("DROP TABLE " + tbl_stats_proteingraph + ";");
             doDeleteQuery("DROP TABLE " + tbl_stats_complexgraph + ";");
             doDeleteQuery("DROP TABLE " + tbl_stats_aagraph + ";");
+            doDeleteQuery("DROP TABLE " + tbl_aatypeinteractions + ";");
             
             
             
@@ -1276,6 +1278,10 @@ public class DBManager {
             
             doInsertQuery("CREATE TABLE " + tbl_ligandcenteredgraph + " (ligandcenteredgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, lig_sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, filepath_lcg_svg text, filepath_lcg_png text, filepath_lcg_pdf text);");
             doInsertQuery("CREATE TABLE " + tbl_nm_lcg_to_chain + " (lcg2c_id serial primary key, lcg2c_ligandcenteredgraph_id int not null references " + tbl_ligandcenteredgraph + " ON DELETE CASCADE, lcg2c_chain_id int not null references " + tbl_chain + " ON DELETE CASCADE);");
+            
+            doInsertQuery("CREATE TABLE " + tbl_aatypeinteractions + " (aatypeinteractions_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, ala int, arg int, asn int, asp int, cys int, glu int, gln int, gly int, his int, ile int, leu int, lys int, met int, phe int, pro int, ser int, thr int, trp int, tyr int, val int);");
+            
+            
 
             // set constraints
             doInsertQuery("ALTER TABLE " + tbl_ligandcenteredgraph + " ADD CONSTRAINT constr_ligcg_uniq UNIQUE (lig_sse_id);");
@@ -1556,6 +1562,7 @@ public class DBManager {
             doInsertQuery("CREATE INDEX plcc_idx_pgstats_graphid ON " + tbl_stats_proteingraph + " (pg_id);");
             doInsertQuery("CREATE INDEX plcc_idx_cgstats_graphid ON " + tbl_stats_complexgraph + " (cg_id);");
             doInsertQuery("CREATE INDEX plcc_idx_aagstats_graphid ON " + tbl_stats_aagraph + " (aag_id);");
+            doInsertQuery("CREATE INDEX plcc_idx_aatypeinteractions_pdbid ON " + tbl_aatypeinteractions + " (pdb_id);");
             
                     
 
@@ -9342,6 +9349,57 @@ connection.close();
         }
         return(result);
     }
+    
+    
+    /**
+     * Writes the amino acid type interaction counts to the database for a protein.
+     * @param pdb_id the PDB ID of the protein
+     * @param counts the AA interaction counts for each type of AA. There are a total of 20 types. Meaning, with how many other AAs (of arbitrary type) did ala, arg, asn, ... interact in this protein. The order of AAs is: ala, arg, asn, asp, cys, glu, gln, gly, his, ile, leu, lys, met, phe, pro, ser, thr, trp, tyr, val.
+     * @return true if it workd, false on wrong input. also check exceptions.
+     * @throws SQLException if SQL stuff went wrong
+     */
+    public static Boolean writeAATypeInteractionCountsToDB(String pdb_id, int[] counts) throws SQLException {
+                       
+        PreparedStatement statement = null;
+        Boolean result;
+        String query = "INSERT INTO " + tbl_aatypeinteractions + " (pdb_id, ala, arg, asn, asp, cys, glu, gln, gly, his, ile, leu, lys, met, phe, pro, ser, thr, trp, tyr, val) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+
+        if(counts.length != 20) {
+            System.err.println("ERROR: writeAATypeInteractionCountsToDB: Expected exactly 20 counts, received " + counts.length + ", ignoring.");
+            return false;
+        }
+        
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setString(1, pdb_id);
+            for(int i = 0; i < counts.length; i++) {
+                statement.setInt((i+2), counts[i]);
+            }                                            
+            statement.executeUpdate();
+            //dbc.commit();
+            result = true;
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: writeAATypeInteractionCountsToDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: writeAATypeInteractionCountsToDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: writeAATypeInteractionCountsToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+            result = false;
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            //dbc.setAutoCommit(true);
+        }
+        return(result);
+    }
+    
     
 
     

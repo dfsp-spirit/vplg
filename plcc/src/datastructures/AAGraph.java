@@ -74,7 +74,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
      * This means that you can get the count for "ALA" by: count_ala = counts[name3ToID("ALA")];.
      * Because the internal IDs start with 1, the 0 field is not required for the AA types. It contains the total number of valid AAs.
      */
-    public int[] getAATypeCounts() {
+    public int[] getAATypeCountsIncludingSum() {
         int[] counts = new int[21];
         Arrays.fill(counts, 0);
         
@@ -90,12 +90,26 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         return counts;
     }
     
+    
+    /**
+     * Returns residue counts for each AA type.
+     * @return residue counts for each AA type. Length is 20, AA order is that of AminoAcid.name3 list.
+     */
+    public int[] getAATypeCountsNoSum() {
+        int[] countsSum = this.getAATypeCountsIncludingSum();
+        int[] counts = new int[20];
+        for(int i = 1; i < countsSum.length; i++) {
+            counts[i-1] = countsSum[i];
+        }
+        return counts;
+    }
+    
     /**
      * Computes a matrix of the number of interactions for each AA type, e.g., how many interactions exist for this
      * protein between AAs of the types ARG and LYS, ARG and ARG, ... This returns a 21*21 matrix, ignore the 0 lines (matrix[0][whatever] and matrix[whatever][0]). The reason for this to start at 1
      * is that it uses the internal PTGL AA type identifier (which starts at 1 for historical/compatibility reasons).
      
-     * @param computeCountsForAllAminoAcidTypes if this parameter is set to true, then the counts for all AA types are also computed. They
+     * @param computeCountsForAllAminoAcidTypes if this parameter is set to true, then the counts for all AA types are also computed. THESE ARE NOT CONTACT COUNTS! They are AA counts, i.e., how many times does valine occur in the protein! They
      * are written to the 0 fields of the first matrix dimension (matrix[0][AAtypeID]). The field matrix[0][0] contains the total number of valid (natural) amino acids in the residue list.
      * If this parameter is false, the count computation is skipped and all these fields contain zeros.
      * 
@@ -137,7 +151,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         }
         
         if(computeCountsForAllAminoAcidTypes) {
-            int[] counts = getAATypeCounts();
+            int[] counts = getAATypeCountsIncludingSum();
             matrix[0][0] = counts[0];   // total number of AAs
             
             for(int i = 1; i < counts.length; i++) {
@@ -147,6 +161,20 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         }
         
         return matrix;
+    }
+    
+    
+    /**
+     * Computes the sum of contacts in the AAG for each amino acid type. E.g., how many contacts does val, ala, etc... have with AAs of any type. 
+     * @return an array with the counts for each aa type. The order in the array is the internal PTGL AA type identifier. The PTGL AA type identifier starts at 1 instead of 0, so this is shifted by 1.
+     */
+    public int[] getTotalContactCountByAAType() {
+        int[][] iim = this.getAminoAcidTypeInteractionMatrix(true);
+        int[] countsByType = new int[20];
+        for(int i = 0; i < countsByType.length; i++) {
+            countsByType[i] = iim[i+1][0];
+        }
+        return countsByType;
     }
     
     

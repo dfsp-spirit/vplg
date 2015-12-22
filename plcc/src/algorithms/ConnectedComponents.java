@@ -75,10 +75,7 @@ public class ConnectedComponents {
         
         if(currentLargestIndex == -1) {
             return null;
-        }
-        for(int i = 0; i < conComps.size(); i++) {
-            System.out.print(" " + conComps.get(i).getSize());
-        }
+        }        
         return this.conComps.get(currentLargestIndex);
     }
     

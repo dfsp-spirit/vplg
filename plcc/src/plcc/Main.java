@@ -42,6 +42,7 @@ import proteinstructure.SSE;
 import algorithms.GraphMetrics;
 import algorithms.GraphProperties;
 import datastructures.AAGraph;
+import datastructures.AAInteractionNetwork;
 import datastructures.SimpleGraphInterface;
 import datastructures.SparseGraph;
 import htmlgen.CssGenerator;
@@ -2086,7 +2087,49 @@ public class Main {
                     else {
                         System.err.println("ERROR: Could not write AA type contact stats matrix for all chains to file '" + aaMatrixFile + "'.");
                     }
+                    
+                    //List<String> aaNames = new ArrayList<>();
+                    //aaNames.addAll(Arrays.asList(AminoAcid.names3));
+                    //AAInteractionNetwork aai = new AAInteractionNetwork(aaNames, aag.getAminoAcidTypeInteractionMatrix(false));
+                    if(Settings.getBoolean("plcc_B_useDB")) {
 
+                        if( ! DBManager.getAutoCommit()) {
+                            DBManager.commit();
+                        }
+                        
+                        if(Settings.getBoolean("plcc_B_useDB")) {
+                            
+                            int[] contactCountsByAATypeAbsolute = aag.getTotalContactCountByAAType();
+                            int[] aacounts = aag.getAATypeCountsNoSum();
+                            if(contactCountsByAATypeAbsolute.length != 20 || aacounts.length != 20) {
+                                DP.getInstance().e("Main", "Wrong lenghts of amino acid stats arrays detected (" + contactCountsByAATypeAbsolute.length + "/" +  aacounts.length + "). This is a bug.");
+                            }
+                            
+                            double[] contactCountsByAATypeNormalized = new double[20];
+                            int sumContactCounts = 0;
+                            for(int i = 0; i < contactCountsByAATypeAbsolute.length; i++) {
+                                sumContactCounts += contactCountsByAATypeAbsolute[i];
+                            }
+                            
+                            int sumAACounts = 0;    // the total number of AA residues
+                            for(int i = 0; i < aacounts.length; i++) {
+                                sumAACounts += aacounts[i];
+                            }
+                            
+                            
+                            for(int i = 0; i < contactCountsByAATypeNormalized.length; i++) {
+                                contactCountsByAATypeNormalized[i] = contactCountsByAATypeAbsolute[i] / aacounts[i];
+                            }
+                            
+                            try {
+                                DBManager.writeAATypeInteractionCountsToDB(pdbid, contactCountsByAATypeAbsolute);
+                            } catch(SQLException e) {
+                                DP.getInstance().e("Main", "Could not write AA type interaction counts to database, skipping: '" + e.getMessage() + "'.");
+                            }
+
+                        }
+                    }
+                                       
 
                 }
 
@@ -4129,11 +4172,13 @@ public class Main {
         Integer numResPairsSkippedWrongChain = 0;
         
         Boolean includeLigandsFromOtherChains = Settings.getBoolean("plcc_B_consider_all_ligands_for_each_chain");
+        /*
         if(includeLigandsFromOtherChains) {
             if(!silent) {
                 DP.getInstance().i("Main", "calculateAllContactsLimitedByChain: Also considering valid 3D ligand contacts from ligands associated to other chains in PDB file.");
             }
         }
+        */
         
         int numLigandsFromOtherChainsKept = 0;
         
@@ -7365,7 +7410,7 @@ public class Main {
                 System.out.print(t.getSize() + " ");
             }
             System.out.println("");
-                    */
+                  
             
             
             SimpleGraphInterface test = gp.getLargestConnectedComponent();
@@ -7377,6 +7422,7 @@ public class Main {
             }
             System.out.println("");
             // DEBUG ----------------
+              */
             
             if(Settings.getBoolean("plcc_B_useDB")) {
 
