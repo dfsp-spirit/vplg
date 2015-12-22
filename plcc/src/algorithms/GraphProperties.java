@@ -47,8 +47,16 @@ public class GraphProperties {
         return e/2;
     }
     
-    public Double getAverageNetworkClusterCoefficient() {
+    public Double getAverageClusterCoefficient() {
         return GraphMetrics.averageNetworkClusterCoefficient(graph);
+    }
+    
+    public Integer[] getDegreeDistributionUpTo(int m) {
+        return GraphMetrics.getDegreeDistributionUpTo(graph, m);
+    }
+    
+    public Double getAverageShortestPathLength() {
+        return gd.getAverageShortestPathLength();
     }
     
     public Map<Integer, Integer> getDegreeDistribution(Boolean includeZeros) {

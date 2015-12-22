@@ -9,6 +9,7 @@ package algorithms;
 
 import datastructures.SimpleGraphInterface;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +70,25 @@ public class GraphMetrics {
             }
         }
         return ancc / numVerts.doubleValue();
+    }
+    
+    
+    /**
+     * Gives degree distribution as array, from degree 0 to (maxDegreeExclusive - 1).
+     * @param maxDegreeExclusive max degree, exclusive. If you put 50, you will get degree distribution from 0 to 49.
+     * @return the dgd
+     */
+    public static Integer[] getDegreeDistributionUpTo(SimpleGraphInterface g, int maxDegreeExclusive) {
+        Integer[] dgd = new Integer[maxDegreeExclusive];
+        Arrays.fill(dgd, 0);
+        
+        int degree;
+        for(int i = 0; i < g.getSize(); i++) {
+            degree = g.neighborsOf(i).size();
+            dgd[degree] = dgd[degree] + 1;
+        }
+        
+        return dgd;
     }
     
     /**

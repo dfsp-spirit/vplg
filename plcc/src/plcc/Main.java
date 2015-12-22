@@ -2742,100 +2742,7 @@ public class Main {
                     }
                 }
                 
-                // ###TEST-PG-METRICS
-                if(Settings.getBoolean("plcc_B_compute_graph_metrics")) {
-                    
-                    pg.computeConnectedComponents();
-                    FoldingGraph fg = pg.getLargestConnectedComponent();
-                    
-                    GraphProperties gpGraph = new GraphProperties(pg);
-                    GraphProperties gpSubgraph = new GraphProperties(fg);
-                    
-                    // ----- number of vertices -----
-                    Integer numVertsPG = pg.getSize();
-                    Integer numVertsPG2 = gpSubgraph.getNumVertices();
-                    Integer numVertsLargestCC = fg.getSize();
-                    
-                    // we do not print largest connected component data if it is equal to whole graph data anyway
-                    Boolean pcc = true;
-                    if(numVertsPG.equals(numVertsLargestCC)) {
-                        pcc = false;
-                    }
-                    
-                    // ----- edge count -----
-                    Integer numEdgesGraph = pg.getEdgeList().size();
-                    Integer numEdgesLargestCC = fg.getEdgeList().size();
-                    
-                    // ----- average network cluster coefficient -----
-                    Double anccGraph = GraphMetrics.averageNetworkClusterCoefficient(pg);
-                    Double anccLargestCC = GraphMetrics.averageNetworkClusterCoefficient(fg);
-                    
-                    Integer numCCGraph = pg.getConnectedComponents().size();
-                    Integer numCCLargestCC = 1;
-                    
-                    // ----- average shortest path length -----
-                    Double asplGraph = pg.getAverageShortestPathDistance();
-                    Double asplLargestCC = fg.getAverageShortestPathDistance();
-                    
-                    // ----- diameter -----
-                    Integer diamGraph = pg.getGraphDiameter();
-                    Integer diamLargestCC = fg.getGraphDiameter();
-                    
-                    // ----- radius -----
-                    Integer radiusGraph = pg.getGraphRadius();
-                    Integer radiusLargestCC = fg.getGraphRadius();
-                    
-                    // ----- degree dist -----
-                    Map<Integer, Integer> degreeDistrGraph = GraphMetrics.degreeDistribution(pg, false);
-                    Integer maxDegreeGraph = Collections.max(degreeDistrGraph.keySet());
-                    Integer minDegreeGraph = Collections.min(degreeDistrGraph.keySet());
-                    List<Integer> cumulDegreeDistrGraph = GraphMetrics.cumulativeDegreeDistribution(pg);
-                    
-                    Map<Integer, Integer> degreeDistrLargestCC = GraphMetrics.degreeDistribution(fg, false);
-                    Integer maxDegreeLargestCC = Collections.max(degreeDistrLargestCC.keySet());
-                    Integer minDegreeLargestCC = Collections.min(degreeDistrLargestCC.keySet());
-                    List<Integer> cumulDegreeDistrLargestCC = GraphMetrics.cumulativeDegreeDistribution(fg);
-                    
-                    System.out.println("########## PG graph metrics ##########");
-                    System.out.println("      Stats for the " + gt + " graph of " + pdbid + " chain " + chain + ":");                    
-                    if(pcc) { System.out.println("       PG is not connected, also printing data for its largest connected component (FG)."); }
-                    
-                    System.out.println("       *number of connected components PG = " + numCCGraph + "");
-                    if(pcc) { System.out.println("       *number of connected components FG = " + numCCLargestCC + ""); }
-                    
-                    System.out.println("       *number of vertices PG = " + numVertsPG + "");
-                    if(pcc) { System.out.println("       *number of vertices FG = " + numVertsLargestCC + ""); }
-                    
-                    System.out.println("       *number of edges PG = " + numEdgesGraph + "");
-                    if(pcc) { System.out.println("       *number of edges FG = " + numEdgesLargestCC + ""); }
-                    
-                    System.out.println("       *diameter of PG = " + diamGraph + "");
-                    if(pcc) { System.out.println("       *diameter of FG = " + diamLargestCC + ""); }
-                    
-                    System.out.println("       *radius of PG = " + radiusGraph + "");
-                    if(pcc) { System.out.println("       *radius of FG = " + radiusLargestCC + ""); }
-                    
-                    System.out.format("       *average network cluster coefficient PG = %.4f\n", anccGraph);
-                    if(pcc) { System.out.format("       *average network cluster coefficient FG = %.4f\n", anccLargestCC); }
-                    
-                    System.out.format("       *average shortest path length of PG = %.4f\n", asplGraph);
-                    if(pcc) { System.out.format("       *average shortest path length of FG = %.4f\n", asplLargestCC); }
-                    
-                    System.out.format("       *max degree of PG = %d\n", maxDegreeGraph);
-                    if(pcc) { System.out.format("       *max degree of FG = %d\n", maxDegreeLargestCC); }
-                    
-                    System.out.format("       *min degree of PG = %d\n", minDegreeGraph);
-                    if(pcc) { System.out.format("       *min degree of FG = %d\n", minDegreeLargestCC); }
-                    
-                    System.out.println("       *degree dist of PG = " + IO.intMapToString(degreeDistrGraph, ":", " "));
-                    if(pcc) { System.out.println("       *degree dist of FG = " + IO.intMapToString(degreeDistrLargestCC, ":", " ")); }
-                    
-                    System.out.println("       *cumulative degree dist of PG = " + IO.intListToString(cumulDegreeDistrGraph));
-                    if(pcc) { System.out.println("       *cumulative degree dist of FG = " + IO.intListToString(cumulDegreeDistrLargestCC)); }
-                    
-                    
                 
-                }
 
                 // draw the protein graph image
 
@@ -3141,6 +3048,117 @@ public class Main {
                     }
                 }
 
+                // ###TEST-PG-METRICS
+                if(Settings.getBoolean("plcc_B_compute_graph_metrics")) {
+                    
+                    pg.computeConnectedComponents();
+                    FoldingGraph fg = pg.getLargestConnectedComponent();
+                    
+                    GraphProperties gp = new GraphProperties(pg);
+                    GraphProperties gpSubgraph = new GraphProperties(fg);
+                    
+                    
+                    
+                    // ----- number of vertices -----
+                    Integer numVertsPG = pg.getSize();
+                    Integer numVertsPG2 = gpSubgraph.getNumVertices();
+                    Integer numVertsLargestCC = fg.getSize();
+                    
+                    // we do not print largest connected component data if it is equal to whole graph data anyway
+                    Boolean pcc = true;
+                    if(numVertsPG.equals(numVertsLargestCC)) {
+                        pcc = false;
+                    }
+                    
+                    // ----- edge count -----
+                    Integer numEdgesGraph = pg.getEdgeList().size();
+                    Integer numEdgesLargestCC = fg.getEdgeList().size();
+                    
+                    // ----- average network cluster coefficient -----
+                    Double anccGraph = GraphMetrics.averageNetworkClusterCoefficient(pg);
+                    Double anccLargestCC = GraphMetrics.averageNetworkClusterCoefficient(fg);
+                    
+                    Integer numCCGraph = pg.getConnectedComponents().size();
+                    Integer numCCLargestCC = 1;
+                    
+                    // ----- average shortest path length -----
+                    Double asplGraph = pg.getAverageShortestPathDistance();
+                    Double asplLargestCC = fg.getAverageShortestPathDistance();
+                    
+                    // ----- diameter -----
+                    Integer diamGraph = pg.getGraphDiameter();
+                    Integer diamLargestCC = fg.getGraphDiameter();
+                    
+                    // ----- radius -----
+                    Integer radiusGraph = pg.getGraphRadius();
+                    Integer radiusLargestCC = fg.getGraphRadius();
+                    
+                    // ----- degree dist -----
+                    Map<Integer, Integer> degreeDistrGraph = GraphMetrics.degreeDistribution(pg, false);
+                    Integer maxDegreeGraph = Collections.max(degreeDistrGraph.keySet());
+                    Integer minDegreeGraph = Collections.min(degreeDistrGraph.keySet());
+                    List<Integer> cumulDegreeDistrGraph = GraphMetrics.cumulativeDegreeDistribution(pg);
+                    
+                    Map<Integer, Integer> degreeDistrLargestCC = GraphMetrics.degreeDistribution(fg, false);
+                    Integer maxDegreeLargestCC = Collections.max(degreeDistrLargestCC.keySet());
+                    Integer minDegreeLargestCC = Collections.min(degreeDistrLargestCC.keySet());
+                    List<Integer> cumulDegreeDistrLargestCC = GraphMetrics.cumulativeDegreeDistribution(fg);
+                    
+                    System.out.println("########## PG graph metrics ##########");
+                    System.out.println("      Stats for the " + gt + " graph of " + pdbid + " chain " + chain + ":");                    
+                    if(pcc) { System.out.println("       PG is not connected, also printing data for its largest connected component (FG)."); }
+                    
+                    System.out.println("       *number of connected components PG = " + numCCGraph + "," + gp.getConnectedComponents().size());
+                    if(pcc) { System.out.println("       *number of connected components FG = " + numCCLargestCC + ""); }
+                    
+                    System.out.println("       *number of vertices PG = " + numVertsPG + "," + gp.getNumVertices());
+                    if(pcc) { System.out.println("       *number of vertices FG = " + numVertsLargestCC + ""); }
+                    
+                    System.out.println("       *number of edges PG = " + numEdgesGraph + "," + gp.getNumEdges());
+                    if(pcc) { System.out.println("       *number of edges FG = " + numEdgesLargestCC + ""); }
+                    
+                    System.out.println("       *diameter of PG = " + diamGraph + "," + gp.getGraphDiameter());
+                    if(pcc) { System.out.println("       *diameter of FG = " + diamLargestCC + ""); }
+                    
+                    System.out.println("       *radius of PG = " + radiusGraph + "," + gp.getGraphRadius());
+                    if(pcc) { System.out.println("       *radius of FG = " + radiusLargestCC + ""); }
+                    
+                    System.out.format("       *average network cluster coefficient PG = %.4f\n", anccGraph);
+                    System.out.println(gp.getAverageClusterCoefficient());
+                    if(pcc) { System.out.format("       *average network cluster coefficient FG = %.4f\n", anccLargestCC); }
+                    
+                    System.out.format("       *average shortest path length of PG = %.4f\n", asplGraph);
+                    System.out.println(gp.getAverageShortestPathLength());
+                    if(pcc) { System.out.format("       *average shortest path length of FG = %.4f\n", asplLargestCC); }
+                    
+                    System.out.format("       *max degree of PG = %d\n", maxDegreeGraph);
+                    System.out.println(gp.getMaxDegree());
+                    if(pcc) { System.out.format("       *max degree of FG = %d\n", maxDegreeLargestCC); }
+                    
+                    System.out.format("       *min degree of PG = %d\n", minDegreeGraph);
+                    System.out.println(gp.getMinDegree());
+                    if(pcc) { System.out.format("       *min degree of FG = %d\n", minDegreeLargestCC); }
+                    
+                    System.out.println("       *degree dist of PG = " + IO.intMapToString(degreeDistrGraph, ":", " "));
+                    if(pcc) { System.out.println("       *degree dist of FG = " + IO.intMapToString(degreeDistrLargestCC, ":", " ")); }
+                    System.out.println(IO.integerArrayToString(gp.getDegreeDistributionUpTo(50)));
+                    
+                    System.out.println("       *cumulative degree dist of PG = " + IO.intListToString(cumulDegreeDistrGraph));
+                    if(pcc) { System.out.println("       *cumulative degree dist of FG = " + IO.intListToString(cumulDegreeDistrLargestCC)); }
+                    
+                    if(Settings.getBoolean("plcc_B_useDB")) {
+                        try {
+                            Long graph_db_id = DBManager.getDBProteinGraphID(pdbid, chain, gt);
+                            System.out.println("Graph DB ID is " + graph_db_id + ".");
+                            DBManager.writeProteingraphStatsToDB(graph_db_id, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50));
+                        } catch(SQLException e) {
+                            DP.getInstance().e("SQL error while trying to store graph stats: '" + e.getMessage()+ "'.");
+                        }
+                    }
+                
+                }
+                
+                
                 /* ----------------------------------------------- Folding graphs ---------------------------------------------- */
 
                 if(Settings.getBoolean("plcc_B_folding_graphs")) {

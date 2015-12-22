@@ -250,7 +250,7 @@ public class GraphDistances {
      * Computes the average shortest path distance within the graph.
      * @return the average shortest path distance, or null if the graph is not connected
      */
-    public Double getAverageShortestPathDistance() {
+    public Double getAverageShortestPathLength() {
         
         this.determineWhetherGraphIsConnected();
         if(this.graphIsConnected) {

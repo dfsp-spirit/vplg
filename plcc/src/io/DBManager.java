@@ -57,6 +57,9 @@ public class DBManager {
     static String tbl_proteingraph = "plcc_graph";
     static String tbl_foldinggraph = "plcc_foldinggraph";
     static String tbl_complexgraph = "plcc_complexgraph";
+    static String tbl_stats_proteingraph = "plcc_stats_proteingraph";
+    static String tbl_stats_complexgraph = "plcc_stats_complexgraph";
+    static String tbl_stats_aagraph = "plcc_stats_aagraph";
     static String tbl_graphletcount = "plcc_graphlets";
     static String tbl_graphletcount_complex = "plcc_complex_graphlets";    
     static String tbl_graphletcount_aa = "plcc_aa_graphlets";    
@@ -131,6 +134,10 @@ public class DBManager {
     static String view_secondat = "plcc_view_secondat";
     static String view_graphlets = "plcc_view_graphlets";
     static String view_graphletsimilarity = "plcc_view_graphletsimilarity";
+    static String view_pgstats = "plcc_view_pgstats";
+    static String view_cgstats = "plcc_view_cgstats";
+    static String view_aagstats = "plcc_view_aagstats";
+    
 
     /**
      * Sets the database address and the credentials to access the DB, then connects by calling the connect() function.
@@ -1144,7 +1151,10 @@ public class DBManager {
             doDeleteQuery("DROP TABLE " + tbl_nm_lcg_to_chain + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_nm_chaintomacromolecule + " CASCADE;");  
             doDeleteQuery("DROP TABLE " + tbl_representative_chains + ";");  
-
+            doDeleteQuery("DROP TABLE " + tbl_stats_proteingraph + ";");
+            doDeleteQuery("DROP TABLE " + tbl_stats_complexgraph + ";");
+            doDeleteQuery("DROP TABLE " + tbl_stats_aagraph + ";");
+            
             
             
             //doDeleteQuery("DROP TABLE " + tbl_fglinnot_alpha + " CASCADE;");
@@ -1209,13 +1219,17 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_ssecontact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null references " + tbl_contacttypes + " ON DELETE CASCADE, check (sse1 < sse2));");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact_complexgraph + " (ssecontact_complexgraph_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, complex_contact_count int not null, complex_contact_type int not null references " + tbl_complexcontacttypes + " ON DELETE CASCADE check (sse1 < sse2));");            
             doInsertQuery("CREATE TABLE " + tbl_complex_contact_stats + " (complex_contact_id serial primary key, chain1 int not null references " + tbl_chain + " ON DELETE CASCADE, chain2 int not null references " + tbl_chain + " ON DELETE CASCADE, contact_num_HH int not null, contact_num_HS int not null, contact_num_HL int not null, contact_num_SS int not null, contact_num_SL int not null, contact_num_LL int not null, contact_num_DS int not null);");
-            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_json text, graph_string_xml text, graph_image_png text, graph_image_svg text, graph_image_pdf text, filepath_graphfile_gml text, filepath_graphfile_kavosh text, filepath_graphfile_plcc text, filepath_graphfile_dotlanguage text, filepath_graphfile_json text, filepath_graphfile_xml text, sse_string text, graph_containsbetabarrel int DEFAULT 0, stat_num_verts int, stat_num_edges int, stat_min_degree int, stat_max_degree int, );");
+            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_json text, graph_string_xml text, graph_image_png text, graph_image_svg text, graph_image_pdf text, filepath_graphfile_gml text, filepath_graphfile_kavosh text, filepath_graphfile_plcc text, filepath_graphfile_dotlanguage text, filepath_graphfile_json text, filepath_graphfile_xml text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, fg_number int not null, fold_name varchar(2) not null, first_vertex_position_in_parent int not null, graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_json text, graph_string_xml text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_complexgraph + " (complexgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, ssegraph_string_gml text, chaingraph_string_gml text, ssegraph_string_xml text, chaingraph_string_xml text, ssegraph_string_kavosh text, chaingraph_string_kavosh text, filepath_ssegraph_image_svg text, filepath_chaingraph_image_svg text, filepath_ssegraph_image_png text, filepath_chaingraph_image_png text, filepath_ssegraph_image_pdf text, filepath_chaingraph_image_pdf text);");
             doInsertQuery("CREATE TABLE " + tbl_aagraph + " (aagraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, chain_description text, aagraph_string_gml text);");
             doInsertQuery("CREATE TABLE " + tbl_motiftype + " (motiftype_id serial primary key, motiftype_name varchar(40));");
             doInsertQuery("CREATE TABLE " + tbl_motif + " (motif_id serial primary key, motiftype_id int not null references " + tbl_motiftype + " ON DELETE CASCADE, motif_name varchar(40), motif_abbreviation varchar(9));");
             doInsertQuery("CREATE TABLE " + tbl_representative_chains + " (pdb_id varchar(4) not null, chain_name varchar(1) not null, PRIMARY KEY(pdb_id, chain_name));");
+            
+            doInsertQuery("CREATE TABLE " + tbl_stats_proteingraph + " (statspg_id serial primary key, pg_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, num_verts int, num_edges int, min_degree int, max_degree int, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50]);");
+            doInsertQuery("CREATE TABLE " + tbl_stats_complexgraph + " (statscg_id serial primary key, cg_id int not null references " + tbl_complexgraph + " ON DELETE CASCADE, num_verts int, num_edges int, min_degree int, max_degree int, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50]);");
+            doInsertQuery("CREATE TABLE " + tbl_stats_aagraph + " (statsaag_id serial primary key, aag_id int not null references " + tbl_aagraph + " ON DELETE CASCADE, num_verts int, num_edges int, min_degree int, max_degree int, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50]);");
                         
             
             /**
@@ -1239,9 +1253,9 @@ public class DBManager {
              *       – 2 entries: all labelings of the graphlet g1 with one vertex, or simply the vertices with the label “H” and the vertices with the label “E” added to get the distribution vertex labels.
              *
              */
-            doInsertQuery("CREATE TABLE " + tbl_graphletcount + " (graphlet_id serial primary key, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graphlet_counts decimal[55] not null);");
+            doInsertQuery("CREATE TABLE " + tbl_graphletcount + " (graphlet_id serial primary key, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graphlet_counts decimal[70] not null);");
             doInsertQuery("CREATE TABLE " + tbl_graphletcount_complex + " (complex_graphlet_id serial primary key, complexgraph_id int not null references " + tbl_complexgraph + " ON DELETE CASCADE, complex_graphlet_counts decimal[55] not null);");
-            doInsertQuery("CREATE TABLE " + tbl_graphletcount_aa + " (aa_graphlet_id serial primary key, aagraph_id int not null references " + tbl_aagraph + " ON DELETE CASCADE, aa_graphlet_counts decimal[55] not null);");
+            doInsertQuery("CREATE TABLE " + tbl_graphletcount_aa + " (aa_graphlet_id serial primary key, aagraph_id int not null references " + tbl_aagraph + " ON DELETE CASCADE, aa_graphlet_counts decimal[70] not null);");
             doInsertQuery("CREATE TABLE " + tbl_nm_ssetoproteingraph + " (ssetoproteingraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, position_in_graph int not null);");
             doInsertQuery("CREATE TABLE " + tbl_nm_ssetofoldinggraph + " (ssetofoldinggraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, position_in_graph int not null);");
             doInsertQuery("CREATE TABLE " + tbl_nm_chaintomotif + " (chaintomotif_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, motif_id int not null references " + tbl_motif + " ON DELETE CASCADE);");
@@ -1281,7 +1295,9 @@ public class DBManager {
             doInsertQuery("ALTER TABLE " + tbl_graphletsimilarity + " ADD CONSTRAINT constr_graphletsimilarity_uniq UNIQUE (graphletsimilarity_sourcegraph, graphletsimilarity_targetgraph);");
             doInsertQuery("ALTER TABLE " + tbl_graphletsimilarity_complex + " ADD CONSTRAINT constr_complexgraphletsimilarity_uniq UNIQUE (complexgraphletsimilarity_sourcegraph, complexgraphletsimilarity_targetgraph);");
             doInsertQuery("ALTER TABLE " + tbl_graphletsimilarity_aa + " ADD CONSTRAINT constr_aagraphletsimilarity_uniq UNIQUE (aagraphletsimilarity_sourcegraph, aagraphletsimilarity_targetgraph);");
-            
+            doInsertQuery("ALTER TABLE " + tbl_stats_proteingraph + " ADD CONSTRAINT constr_pgstats_uniq UNIQUE (pg_id);");
+            doInsertQuery("ALTER TABLE " + tbl_stats_complexgraph + " ADD CONSTRAINT constr_cgstats_uniq UNIQUE (cg_id);");
+            doInsertQuery("ALTER TABLE " + tbl_stats_aagraph + " ADD CONSTRAINT constr_aagstats_uniq UNIQUE (aag_id);");
             //doInsertQuery("ALTER TABLE " + tbl_fglinnot_alpha + " ADD CONSTRAINT constr_fglinnotalpha_uniq UNIQUE (linnot_foldinggraph_id);");
             //doInsertQuery("ALTER TABLE " + tbl_fglinnot_beta + " ADD CONSTRAINT constr_fglinnotbeta_uniq UNIQUE (linnot_foldinggraph_id);");
             //doInsertQuery("ALTER TABLE " + tbl_fglinnot_albe + " ADD CONSTRAINT constr_fglinnotalbe_uniq UNIQUE (linnot_foldinggraph_id);");
@@ -1310,6 +1326,8 @@ public class DBManager {
             doInsertQuery("CREATE VIEW " + view_secondat + " AS SELECT s.sse_id, p.pdb_id, c.chain_name, s.position_in_chain, s.dssp_start, s.dssp_end, sset.ssetype_text, sd.alpha_fg_number, sd.alpha_fg_foldname, sd.alpha_fg_position, sd.beta_fg_number, sd.beta_fg_foldname, sd.beta_fg_position, sd.albe_fg_number, sd.albe_fg_foldname, sd.albe_fg_position, sd.alphalig_fg_number, sd.alphalig_fg_foldname, sd.alphalig_fg_position, sd.betalig_fg_number, sd.betalig_fg_foldname, sd.betalig_fg_position, sd.albelig_fg_number, sd.albelig_fg_foldname, sd.albelig_fg_position FROM " + tbl_sse + " s INNER JOIN " + tbl_chain + " c ON s.chain_id = c.chain_id INNER JOIN " + tbl_protein + " p ON c.pdb_id = p.pdb_id INNER JOIN " + tbl_ssetypes + " sset ON s.sse_type = sset.ssetype_id INNER JOIN " + tbl_secondat + " sd ON s.sse_id = sd.sse_id;");
             doInsertQuery("CREATE VIEW " + view_graphlets + " AS SELECT p.pdb_id, c.chain_name, gt.graphtype_text, gc.graphlet_counts FROM " + tbl_graphletcount + " gc INNER JOIN " + tbl_proteingraph + " g ON gc.graph_id = g.graph_id INNER JOIN " + tbl_chain + " c ON g.chain_id = c.chain_id INNER JOIN " + tbl_protein + " p ON c.pdb_id = p.pdb_id INNER JOIN " + tbl_graphtypes + " gt ON  g.graph_type = gt.graphtype_id;");
             doInsertQuery("CREATE VIEW " + view_chainmotifs + " AS SELECT p.pdb_id, c.chain_name, m.motif_name, mt.motiftype_name FROM " + tbl_nm_chaintomotif + " c2m INNER JOIN " + tbl_motif + " m ON c2m.motif_id = m.motif_id INNER JOIN " + tbl_chain + " c ON c2m.chain_id = c.chain_id INNER JOIN " + tbl_protein + " p ON c.pdb_id = p.pdb_id INNER JOIN plcc_motiftype mt ON m.motiftype_id = mt.motiftype_id;");
+            
+            doInsertQuery("CREATE VIEW " + view_pgstats + " AS SELECT p.pdb_id, c.chain_name, gt.graphtype_text, stats.diameter, stats.radius FROM " + tbl_stats_proteingraph + " stats INNER JOIN " + tbl_proteingraph + " g ON stats.pg_id = g.graph_id INNER JOIN " + tbl_chain + " c ON g.chain_id = c.chain_id INNER JOIN " + tbl_protein + " p ON c.pdb_id = p.pdb_id INNER JOIN " + tbl_graphtypes + " gt ON  g.graph_type = gt.graphtype_id;");
             
             // add comments on views
             doInsertQuery("COMMENT ON VIEW " + view_ssecontacts + " IS 'Easy overview of SSE contacts.';");
@@ -1366,6 +1384,9 @@ public class DBManager {
             doInsertQuery("COMMENT ON TABLE " + tbl_fglinnot + " IS 'Stores the PTGL linear notation strings ADJ, RED, KEY and SEQ for a single fold (all graph types). Also stores file system paths to graph images.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_secondat + " IS 'Stores the position of a certain SSE in the folding graphs. For each graph type, the FG number (and name) in which the SSE occurs and its position in that fg are given. This table is ugly and does not follow good DB design rules, it is required for historical reasons though.';");
             doInsertQuery("COMMENT ON TABLE " + tbl_nm_chaintomacromolecule + " IS 'Defines which PDB chains belong together, i.e., to a single macromolecule.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_stats_proteingraph + " IS 'Stores graph properties like min degree, diameter, etc for a protein graph.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_stats_proteingraph + " IS 'Stores graph properties like min degree, diameter, etc for a complex graph.';");
+            doInsertQuery("COMMENT ON TABLE " + tbl_stats_proteingraph + " IS 'Stores graph properties like min degree, diameter, etc for an amino acid graph.';");
             
             
             // add comments for specific fields
@@ -1527,6 +1548,9 @@ public class DBManager {
             
             doInsertQuery("CREATE INDEX plcc_idx_aagraph_pdbid ON " + tbl_aagraph + " (pdb_id);");
             doInsertQuery("CREATE INDEX plcc_idx_complexgraph_pdbid ON " + tbl_complexgraph + " (pdb_id);");
+            doInsertQuery("CREATE INDEX plcc_idx_pgstats_graphid ON " + tbl_stats_proteingraph + " (pg_id);");
+            doInsertQuery("CREATE INDEX plcc_idx_cgstats_graphid ON " + tbl_stats_complexgraph + " (cg_id);");
+            doInsertQuery("CREATE INDEX plcc_idx_aagstats_graphid ON " + tbl_stats_aagraph + " (aag_id);");
             
                     
 
@@ -10750,12 +10774,31 @@ connection.close();
     }
     */
     
+    
     /**
      * Formats the array for SQL insert into an array field.
-     * @param arr the input array
+     * @param arr the input array, int
      * @return the SQL String for the array, e.g., "'{0.81, 0.45}'".
      */
-    public static String getSQLArrayString(Double[] arr) {
+    public static String getSQLIntArrayString(Integer[] arr) {
+        StringBuilder pgArrayString = new StringBuilder();
+        pgArrayString.append("'{");
+        for(int i = 0; i < arr.length; i++) {
+            pgArrayString.append(arr[i]);            
+            if(i < arr.length - 1) {
+                pgArrayString.append(", ");
+            }
+        }
+        pgArrayString.append("}'");
+        return pgArrayString.toString();
+    }
+    
+    /**
+     * Formats the array for SQL insert into an array field.
+     * @param arr the input array, double
+     * @return the SQL String for the array, e.g., "'{0.81, 0.45}'".
+     */
+    public static String getSQLDoubleArrayString(Double[] arr) {
         StringBuilder pgArrayString = new StringBuilder();
         String valStr;
         pgArrayString.append("'{");
@@ -10769,6 +10812,76 @@ connection.close();
         pgArrayString.append("}'");
         return pgArrayString.toString();
     }
+    
+    
+    /**
+     * Writes statistics and properties of a protein graph to the database
+     * @param graph_db_id the internal database ID of the graph
+     * @param num_verts
+     * @param num_edges
+     * @param min_degree
+     * @param max_degree
+     * @param num_connected_components
+     * @param diameter
+     * @param radius
+     * @param avg_cluster_coeff
+     * @param avg_shortest_path_length
+     * @param degreedist
+     * @return
+     * @throws SQLException 
+     */
+    public static Boolean writeProteingraphStatsToDB(Long graph_db_id, int num_verts, int num_edges, int min_degree, int max_degree, int num_connected_components, int diameter, int radius, double avg_cluster_coeff, double avg_shortest_path_length, Integer[] degreedist) throws SQLException {
+        if (graph_db_id < 0) {
+            System.err.println("ERROR: writeProteingraphStatsToDB: Invalid graph database id (<0), not writing stats.");
+            return (false);
+        }
+        
+        PreparedStatement statement = null;
+        Boolean result = false;
+        String query = "INSERT INTO " + tbl_stats_proteingraph + " (pg_id, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+
+        try {
+            //dbc.setAutoCommit(false);
+            Array sqlArray = dbc.createArrayOf("INT", degreedist);
+            
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, graph_db_id);
+            statement.setInt(2, num_verts);
+            statement.setInt(3, num_edges);
+            statement.setInt(4, min_degree);
+            statement.setInt(5, max_degree);
+            statement.setInt(6, num_connected_components);
+            statement.setInt(7, diameter);
+            statement.setInt(8, radius);
+            statement.setDouble(9, avg_cluster_coeff);
+            statement.setDouble(10, avg_shortest_path_length);
+            statement.setArray(11, sqlArray);
+                                
+            statement.executeUpdate();
+            //dbc.commit();
+            result = true;
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: writeProteingraphStatsToDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: writeProteingraphStatsToDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: writeProteingraphStatsToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+            result = false;
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            //dbc.setAutoCommit(true);
+        }
+                
+        return(result);
+    }
+    
     
     /**
      * Writes information on the normalized graphlet counts for a protein graph to the database. Used by graphlet computation
@@ -10803,7 +10916,7 @@ connection.close();
         StringBuilder querySB = new StringBuilder();
         querySB.append("INSERT INTO ").append(tbl_graphletcount).append(" (graph_id, graphlet_counts) VALUES ( ");
         
-        String pgArray = DBManager.getSQLArrayString(graphlet_counts);
+        String pgArray = DBManager.getSQLDoubleArrayString(graphlet_counts);
         
         querySB.append(graph_db_id);
         querySB.append(", ");
