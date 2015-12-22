@@ -2122,9 +2122,15 @@ public class Main {
                             }
                             
                             try {
-                                DBManager.writeAATypeInteractionCountsToDB(pdbid, contactCountsByAATypeAbsolute);
+                                DBManager.writeAbsoluteAATypeInteractionCountsToDB(pdbid, contactCountsByAATypeAbsolute);
                             } catch(SQLException e) {
-                                DP.getInstance().e("Main", "Could not write AA type interaction counts to database, skipping: '" + e.getMessage() + "'.");
+                                DP.getInstance().e("Main", "Could not write absolute AA type interaction counts to database, skipping: '" + e.getMessage() + "'.");
+                            }
+                            
+                            try {
+                                DBManager.writeNormalizedAATypeInteractionCountsToDB(pdbid, contactCountsByAATypeNormalized);
+                            } catch(SQLException e) {
+                                DP.getInstance().e("Main", "Could not write normalized AA type interaction counts to database, skipping: '" + e.getMessage() + "'.");
                             }
 
                         }
