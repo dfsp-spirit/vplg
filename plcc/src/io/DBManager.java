@@ -1227,9 +1227,9 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_motif + " (motif_id serial primary key, motiftype_id int not null references " + tbl_motiftype + " ON DELETE CASCADE, motif_name varchar(40), motif_abbreviation varchar(9));");
             doInsertQuery("CREATE TABLE " + tbl_representative_chains + " (pdb_id varchar(4) not null, chain_name varchar(1) not null, PRIMARY KEY(pdb_id, chain_name));");
             
-            doInsertQuery("CREATE TABLE " + tbl_stats_proteingraph + " (statspg_id serial primary key, pg_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, num_verts int, num_edges int, min_degree int, max_degree int, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50]);");
-            doInsertQuery("CREATE TABLE " + tbl_stats_complexgraph + " (statscg_id serial primary key, cg_id int not null references " + tbl_complexgraph + " ON DELETE CASCADE, num_verts int, num_edges int, min_degree int, max_degree int, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50]);");
-            doInsertQuery("CREATE TABLE " + tbl_stats_aagraph + " (statsaag_id serial primary key, aag_id int not null references " + tbl_aagraph + " ON DELETE CASCADE, num_verts int, num_edges int, min_degree int, max_degree int, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50]);");
+            doInsertQuery("CREATE TABLE " + tbl_stats_proteingraph + " (statspg_id serial primary key, pg_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, is_for_cc int NOT NULL, num_verts int, num_edges int, min_degree int, max_degree int, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50]);");
+            doInsertQuery("CREATE TABLE " + tbl_stats_complexgraph + " (statscg_id serial primary key, cg_id int not null references " + tbl_complexgraph + " ON DELETE CASCADE, is_for_cc int NOT NULL, num_verts int, num_edges int, min_degree int, max_degree int, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50]);");
+            doInsertQuery("CREATE TABLE " + tbl_stats_aagraph + " (statsaag_id serial primary key, aag_id int not null references " + tbl_aagraph + " ON DELETE CASCADE, is_for_cc int NOT NULL, num_verts int, num_edges int, min_degree int, max_degree int, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50]);");
                         
             
             /**
@@ -1295,9 +1295,9 @@ public class DBManager {
             doInsertQuery("ALTER TABLE " + tbl_graphletsimilarity + " ADD CONSTRAINT constr_graphletsimilarity_uniq UNIQUE (graphletsimilarity_sourcegraph, graphletsimilarity_targetgraph);");
             doInsertQuery("ALTER TABLE " + tbl_graphletsimilarity_complex + " ADD CONSTRAINT constr_complexgraphletsimilarity_uniq UNIQUE (complexgraphletsimilarity_sourcegraph, complexgraphletsimilarity_targetgraph);");
             doInsertQuery("ALTER TABLE " + tbl_graphletsimilarity_aa + " ADD CONSTRAINT constr_aagraphletsimilarity_uniq UNIQUE (aagraphletsimilarity_sourcegraph, aagraphletsimilarity_targetgraph);");
-            doInsertQuery("ALTER TABLE " + tbl_stats_proteingraph + " ADD CONSTRAINT constr_pgstats_uniq UNIQUE (pg_id);");
-            doInsertQuery("ALTER TABLE " + tbl_stats_complexgraph + " ADD CONSTRAINT constr_cgstats_uniq UNIQUE (cg_id);");
-            doInsertQuery("ALTER TABLE " + tbl_stats_aagraph + " ADD CONSTRAINT constr_aagstats_uniq UNIQUE (aag_id);");
+            doInsertQuery("ALTER TABLE " + tbl_stats_proteingraph + " ADD CONSTRAINT constr_pgstats_uniq UNIQUE (pg_id, is_for_cc);");
+            doInsertQuery("ALTER TABLE " + tbl_stats_complexgraph + " ADD CONSTRAINT constr_cgstats_uniq UNIQUE (cg_id, is_for_cc);");
+            doInsertQuery("ALTER TABLE " + tbl_stats_aagraph + " ADD CONSTRAINT constr_aagstats_uniq UNIQUE (aag_id, is_for_cc);");
             //doInsertQuery("ALTER TABLE " + tbl_fglinnot_alpha + " ADD CONSTRAINT constr_fglinnotalpha_uniq UNIQUE (linnot_foldinggraph_id);");
             //doInsertQuery("ALTER TABLE " + tbl_fglinnot_beta + " ADD CONSTRAINT constr_fglinnotbeta_uniq UNIQUE (linnot_foldinggraph_id);");
             //doInsertQuery("ALTER TABLE " + tbl_fglinnot_albe + " ADD CONSTRAINT constr_fglinnotalbe_uniq UNIQUE (linnot_foldinggraph_id);");
@@ -10817,6 +10817,7 @@ connection.close();
     /**
      * Writes statistics and properties of a protein graph to the database
      * @param graph_db_id the internal database ID of the graph
+     * @param isForLargestConnectedComponent
      * @param num_verts
      * @param num_edges
      * @param min_degree
@@ -10830,7 +10831,7 @@ connection.close();
      * @return
      * @throws SQLException 
      */
-    public static Boolean writeProteingraphStatsToDB(Long graph_db_id, Integer num_verts, Integer num_edges, Integer min_degree, Integer max_degree, Integer num_connected_components, Integer diameter, Integer radius, Double avg_cluster_coeff, Double avg_shortest_path_length, Integer[] degreedist) throws SQLException {
+    public static Boolean writeProteingraphStatsToDB(Long graph_db_id, Boolean isForLargestConnectedComponent, Integer num_verts, Integer num_edges, Integer min_degree, Integer max_degree, Integer num_connected_components, Integer diameter, Integer radius, Double avg_cluster_coeff, Double avg_shortest_path_length, Integer[] degreedist) throws SQLException {
         if (graph_db_id < 0) {
             System.err.println("ERROR: writeProteingraphStatsToDB: Invalid graph database id (<0), not writing stats.");
             return (false);
@@ -10838,8 +10839,9 @@ connection.close();
         
         PreparedStatement statement = null;
         Boolean result = false;
-        String query = "INSERT INTO " + tbl_stats_proteingraph + " (pg_id, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-
+        String query = "INSERT INTO " + tbl_stats_proteingraph + " (pg_id, is_for_cc, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        int is_for_cc = (isForLargestConnectedComponent ? 1 : 0);
+        
         try {
             //dbc.setAutoCommit(false);
             Array sqlArray = dbc.createArrayOf("int", degreedist);
@@ -10847,16 +10849,17 @@ connection.close();
             statement = dbc.prepareStatement(query);
 
             statement.setLong(1, graph_db_id);
-            statement.setInt(2, num_verts);
-            statement.setInt(3, num_edges);
-            statement.setInt(4, min_degree);
-            statement.setInt(5, max_degree);
-            statement.setInt(6, num_connected_components);
-            if(diameter == null) {statement.setNull(7, java.sql.Types.INTEGER); } else { statement.setInt(7, diameter); }
-            if(radius == null) { statement.setNull(8, java.sql.Types.INTEGER); } else { statement.setInt(8, radius); }
-            if(avg_cluster_coeff == null) { statement.setNull(9, java.sql.Types.DOUBLE); } else { statement.setDouble(9, avg_cluster_coeff); }
-            if(avg_shortest_path_length == null) { statement.setNull(10, java.sql.Types.DOUBLE); } else { statement.setDouble(10, avg_shortest_path_length); }
-            statement.setArray(11, sqlArray);
+            statement.setInt(2, is_for_cc);
+            statement.setInt(3, num_verts);
+            statement.setInt(4, num_edges);
+            statement.setInt(5, min_degree);
+            statement.setInt(6, max_degree);
+            statement.setInt(7, num_connected_components);
+            if(diameter == null) {statement.setNull(8, java.sql.Types.INTEGER); } else { statement.setInt(8, diameter); }
+            if(radius == null) { statement.setNull(9, java.sql.Types.INTEGER); } else { statement.setInt(9, radius); }
+            if(avg_cluster_coeff == null) { statement.setNull(10, java.sql.Types.DOUBLE); } else { statement.setDouble(10, avg_cluster_coeff); }
+            if(avg_shortest_path_length == null) { statement.setNull(11, java.sql.Types.DOUBLE); } else { statement.setDouble(11, avg_shortest_path_length); }
+            statement.setArray(12, sqlArray);
                                 
             statement.executeUpdate();
             //dbc.commit();
