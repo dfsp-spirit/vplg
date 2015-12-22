@@ -2097,7 +2097,7 @@ public class Main {
                             DBManager.commit();
                         }
                         
-                        if(Settings.getBoolean("plcc_B_useDB")) {
+                        if(Settings.getBoolean("plcc_B_compute_graph_metrics")) {
                             
                             int[] contactCountsByAATypeAbsolute = aag.getTotalContactCountByAAType();
                             int[] aacounts = aag.getAATypeCountsNoSum();
@@ -2109,17 +2109,7 @@ public class Main {
                             int sumContactCounts = 0;
                             for(int i = 0; i < contactCountsByAATypeAbsolute.length; i++) {
                                 sumContactCounts += contactCountsByAATypeAbsolute[i];
-                            }
-                            
-                            int sumAACounts = 0;    // the total number of AA residues
-                            for(int i = 0; i < aacounts.length; i++) {
-                                sumAACounts += aacounts[i];
-                            }
-                            
-                            
-                            for(int i = 0; i < contactCountsByAATypeNormalized.length; i++) {
-                                contactCountsByAATypeNormalized[i] = contactCountsByAATypeAbsolute[i] / aacounts[i];
-                            }
+                            }                                                        
                             
                             try {
                                 DBManager.writeAbsoluteAATypeInteractionCountsToDB(pdbid, contactCountsByAATypeAbsolute);
@@ -2127,11 +2117,28 @@ public class Main {
                                 DP.getInstance().e("Main", "Could not write absolute AA type interaction counts to database, skipping: '" + e.getMessage() + "'.");
                             }
                             
-                            try {
-                                DBManager.writeNormalizedAATypeInteractionCountsToDB(pdbid, contactCountsByAATypeNormalized);
-                            } catch(SQLException e) {
-                                DP.getInstance().e("Main", "Could not write normalized AA type interaction counts to database, skipping: '" + e.getMessage() + "'.");
+                            int sumAACounts = 0;    // the total number of AA residues
+                            Boolean containsZeroCounts = false;
+                            for(int i = 0; i < aacounts.length; i++) {
+                                if(aacounts[i] == 0) {
+                                    containsZeroCounts = true;
+                                }
+                                sumAACounts += aacounts[i];
                             }
+                            
+                            if( ! containsZeroCounts) { // avoid division by zero
+                                for(int i = 0; i < contactCountsByAATypeNormalized.length; i++) {
+                                    contactCountsByAATypeNormalized[i] = contactCountsByAATypeAbsolute[i] / aacounts[i];
+                                }
+                                
+                                try {
+                                    DBManager.writeNormalizedAATypeInteractionCountsToDB(pdbid, contactCountsByAATypeNormalized);
+                                } catch(SQLException e) {
+                                    DP.getInstance().e("Main", "Could not write normalized AA type interaction counts to database, skipping: '" + e.getMessage() + "'.");
+                                }
+                            }
+                            
+                            
 
                         }
                     }
