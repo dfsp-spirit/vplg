@@ -10830,7 +10830,7 @@ connection.close();
      * @return
      * @throws SQLException 
      */
-    public static Boolean writeProteingraphStatsToDB(Long graph_db_id, int num_verts, int num_edges, int min_degree, int max_degree, int num_connected_components, int diameter, int radius, double avg_cluster_coeff, double avg_shortest_path_length, Integer[] degreedist) throws SQLException {
+    public static Boolean writeProteingraphStatsToDB(Long graph_db_id, Integer num_verts, Integer num_edges, Integer min_degree, Integer max_degree, Integer num_connected_components, Integer diameter, Integer radius, Double avg_cluster_coeff, Double avg_shortest_path_length, Integer[] degreedist) throws SQLException {
         if (graph_db_id < 0) {
             System.err.println("ERROR: writeProteingraphStatsToDB: Invalid graph database id (<0), not writing stats.");
             return (false);
@@ -10842,7 +10842,7 @@ connection.close();
 
         try {
             //dbc.setAutoCommit(false);
-            Array sqlArray = dbc.createArrayOf("INT", degreedist);
+            Array sqlArray = dbc.createArrayOf("int", degreedist);
             
             statement = dbc.prepareStatement(query);
 
@@ -10852,10 +10852,10 @@ connection.close();
             statement.setInt(4, min_degree);
             statement.setInt(5, max_degree);
             statement.setInt(6, num_connected_components);
-            statement.setInt(7, diameter);
-            statement.setInt(8, radius);
-            statement.setDouble(9, avg_cluster_coeff);
-            statement.setDouble(10, avg_shortest_path_length);
+            if(diameter == null) {statement.setNull(7, java.sql.Types.INTEGER); } else { statement.setInt(7, diameter); }
+            if(radius == null) { statement.setNull(8, java.sql.Types.INTEGER); } else { statement.setInt(8, radius); }
+            if(avg_cluster_coeff == null) { statement.setNull(9, java.sql.Types.DOUBLE); } else { statement.setDouble(9, avg_cluster_coeff); }
+            if(avg_shortest_path_length == null) { statement.setNull(10, java.sql.Types.DOUBLE); } else { statement.setDouble(10, avg_shortest_path_length); }
             statement.setArray(11, sqlArray);
                                 
             statement.executeUpdate();

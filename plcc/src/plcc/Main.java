@@ -3147,10 +3147,23 @@ public class Main {
                     if(pcc) { System.out.println("       *cumulative degree dist of FG = " + IO.intListToString(cumulDegreeDistrLargestCC)); }
                     
                     if(Settings.getBoolean("plcc_B_useDB")) {
+                        
+                        if( ! DBManager.getAutoCommit()) {
+                            DBManager.commit();
+                        }
+                        
                         try {
                             Long graph_db_id = DBManager.getDBProteinGraphID(pdbid, chain, gt);
-                            System.out.println("Graph DB ID is " + graph_db_id + ".");
-                            DBManager.writeProteingraphStatsToDB(graph_db_id, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50));
+                            if(graph_db_id > 0L) {
+                                System.out.println("Found graph " + pdbid + " " + chain + " " + gt + " with ID " + graph_db_id + ".");
+                                Integer num_verts = gp.getNumVertices();
+                                Integer num_edges = gp.getNumEdges();
+                                //int min_degree, int max_degree, int num_connected_components, int diameter, int radius, double avg_cluster_coeff, double avg_shortest_path_length, Integer[] degreedist
+                                DBManager.writeProteingraphStatsToDB(graph_db_id, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50));
+                            }
+                            else {
+                                DP.getInstance().e("Main", "Could not write graph properties to DB, graph not found in database.");
+                            }
                         } catch(SQLException e) {
                             DP.getInstance().e("SQL error while trying to store graph stats: '" + e.getMessage()+ "'.");
                         }
