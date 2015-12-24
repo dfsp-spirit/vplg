@@ -158,6 +158,14 @@ public class Main {
     public static Integer chainComplexGraphContactThreshold = 1; // set to 1 to act like deactivated..
 
 
+    public static void checkArgsUsage(String[] args, Boolean[] argsUsed) {
+        for(int i = 0; i < argsUsed.length; i++) {
+            Boolean b = argsUsed[i];
+            if( ! b) {
+                System.err.println("WARNING: Command line argument #" + i +": '" + args[i] + "' not recognized or used.");
+            }
+        }
+    }
 
     /**
      * @param args the command line arguments
@@ -260,13 +268,19 @@ public class Main {
         // ****************************************************    parse args    **********************************************************
         if(args.length > 0) {
 
+            Boolean[] argsUsed = new Boolean[args.length];
+            Arrays.fill(argsUsed, Boolean.FALSE);
+            
             if(args[0].equals("-h") || args[0].equals("--help")) {
                 usage();
+                argsUsed[0] = true;
+                checkArgsUsage(args, argsUsed);
                 System.exit(0);
             }
 
             // get pdbid from first arg
             pdbid = args[0];
+            argsUsed[0] = true;
             
             if(! pdbid.equals("NONE")) {
                 DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -292,6 +306,8 @@ public class Main {
 
                     if(s.equals("-h") || s.equals("--help")) {
                         usage();
+                        argsUsed[i] = true;
+                        checkArgsUsage(args, argsUsed);
                         System.exit(0);
                     }
 
@@ -301,6 +317,8 @@ public class Main {
                         }
                         else {
                             dsspFile = args[i+1];
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
                         }
                     }
                     
@@ -317,6 +335,8 @@ public class Main {
                             }
                             Settings.set("plcc_B_skip_too_large", "true");
                             Settings.set("plcc_I_skip_num_atoms_threshold", args[i+1]);
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
                         }
                     }
                     
@@ -343,6 +363,8 @@ public class Main {
                                 //System.err.println("ERROR: The message was '" + e.getMessage() + "'.");                                
                                 System.exit(1);
                             }
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
                         }
                     }
                     
@@ -368,6 +390,8 @@ public class Main {
                                 //System.err.println("ERROR: The message was '" + e.getMessage() + "'.");
                                 System.exit(1);
                             }
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
                         }
                     }
 
@@ -375,6 +399,7 @@ public class Main {
                     if(s.equals("--report-db-proteins")) {
                         useFileFromCommandline = false;
                         Settings.set("plcc_B_report_db_proteins", "true");
+                        argsUsed[i] = true;
                     }
                     
                     if(s.equals("-p") || s.equals("--pdbfile")) {
@@ -384,6 +409,8 @@ public class Main {
                         else {
                             pdbFile = args[i+1];
                         }
+                        argsUsed[i] = true;
+                        argsUsed[i+1] = true;
                     }
                     
                     
@@ -392,11 +419,14 @@ public class Main {
                         // The config file has already been created before parsing the command line if it did not exist, so we just do nothing here.
                         // We intentionally keep this option so we do not need to run other commands to get a config.
                         System.out.println("Tried to create PLCC config file at '" + Settings.getDefaultConfigFilePath() + "' (see above). Exiting.");
+                        argsUsed[i] = true;
+                        checkArgsUsage(args, argsUsed);
                         System.exit(0);
                     }
                     
                     if(s.equals("-N") || s.equals("--no-warn")) {
                         Settings.set("plcc_B_no_warn", "true");
+                        argsUsed[i] = true;
                     }
                     
                     if(s.equals("--cluster")) {                        
@@ -415,28 +445,36 @@ public class Main {
                         Settings.set("plcc_B_AAgraph_allchainscombined", "true");
                         Settings.set("plcc_B_AAgraph_perchain", "true");
                         Settings.set("plcc_B_no_warn", "true");
+                        argsUsed[i] = true;
                     }
                     
                     if(s.equals("--write-chains-file")) {
                         Settings.set("plcc_B_write_chains_file", "true");
+                        argsUsed[i] = true;
                     }                                                
                             
                     if(s.equals("-Z") || s.equals("--silent")) {
                         Settings.set("plcc_B_silent", "true");
+                        argsUsed[i] = true;
                     }
                     
                     if(s.equals("--motifs")) {
                         Settings.set("plcc_B_compute_motifs", "true");
+                        argsUsed[i] = true;
                     }
                     if(s.equals("--no-motifs")) {
                         Settings.set("plcc_B_compute_motifs", "false");
+                        argsUsed[i] = true;
                     }
                     
                     if(s.equals("--db-batch")) {
                         Settings.set("plcc_B_db_use_batch_inserts", "true");
+                        argsUsed[i] = true;
                     }
                     if(s.equals("--no-db-batch")) {
                         Settings.set("plcc_B_db_use_batch_inserts", "false");
+                        argsUsed[i] = true;
+                        argsUsed[i] = true;
                     }
                     
                     if(s.equals("--compute-whole-db-graphlet-similarities")) {
@@ -446,28 +484,33 @@ public class Main {
                         Settings.set("plcc_B_compute_graphlet_similarities_pg", "true");
                         Settings.set("plcc_B_compute_graphlet_similarities_cg", "true");
                         Settings.set("plcc_B_compute_graphlet_similarities_aag", "true");
+                        argsUsed[i] = true;
                     }
                     if(s.equals("--compute-whole-db-graphlet-similarities-pg")) {
                         useFileFromCommandline = false;
                         Settings.set("plcc_B_useDB", "true");
                         Settings.set("plcc_B_compute_graphlet_similarities", "true");
                         Settings.set("plcc_B_compute_graphlet_similarities_pg", "true");
+                        argsUsed[i] = true;
                     }
                     if(s.equals("--compute-whole-db-graphlet-similarities-cg")) {
                         useFileFromCommandline = false;
                         Settings.set("plcc_B_useDB", "true");
                         Settings.set("plcc_B_compute_graphlet_similarities", "true");
-                        Settings.set("plcc_B_compute_graphlet_similarities_cg", "true");                        
+                        Settings.set("plcc_B_compute_graphlet_similarities_cg", "true"); 
+                        argsUsed[i] = true;
                     }
                     if(s.equals("--compute-whole-db-graphlet-similarities-aag")) {
                         useFileFromCommandline = false;
                         Settings.set("plcc_B_useDB", "true");
                         Settings.set("plcc_B_compute_graphlet_similarities", "true");
-                        Settings.set("plcc_B_compute_graphlet_similarities_aag", "true");;                        
+                        Settings.set("plcc_B_compute_graphlet_similarities_aag", "true");
+                        argsUsed[i] = true;
                     }
                     
                     if(s.equals("--compute-graph-metrics")) {
                         Settings.set("plcc_B_compute_graph_metrics", "true");
+                        argsUsed[i] = true;
                     }
                     
                     
@@ -490,7 +533,9 @@ public class Main {
                             else {
                                 syntaxError("The --set-pdb-representative-chains-pre option requires an XML file to read the data from AND the info whether to remove old labels. For the latter, valid values are 'keep' or 'remove'.");
                             }
-                            
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
+                            argsUsed[i+2] = true;
                         }
                     }
                     
@@ -513,7 +558,9 @@ public class Main {
                             else {
                                 syntaxError("The --set-pdb-representative-chains-post option requires an XML file to read the data from AND the info whether to remove old labels. For the latter, valid values are 'keep' or 'remove'.");
                             }
-                            
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
+                            argsUsed[i+2] = true;
                         }
                     }
                     
@@ -539,6 +586,9 @@ public class Main {
                                 Settings.set("plcc_I_lig_min_atoms", min.toString());
                                 Settings.set("plcc_I_lig_max_atoms", max.toString());
                             }
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
+                            argsUsed[i+2] = true;
                         }
                     }
                     
@@ -550,6 +600,8 @@ public class Main {
                         }
                         else {
                             Settings.set("plcc_S_search_similar_method", args[i+1]);
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;                            
                         }
                     }
                     
@@ -567,6 +619,10 @@ public class Main {
                             Settings.set("plcc_B_search_similar_chainID", args[i+2]);
                             Settings.set("plcc_S_search_similar_graphtype", args[i+3]);                            
                         }
+                        argsUsed[i] = true;
+                        argsUsed[i+1] = true;
+                        argsUsed[i+2] = true;
+                        argsUsed[i+3] = true;
                     }
                     
                                                                                
@@ -595,11 +651,15 @@ public class Main {
                             else {
                                 System.out.println("Protein was not in the database, " + numRows + " rows affected. Exiting.");
                             }
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
+                            checkArgsUsage(args, argsUsed);
                             System.exit(0);
                         }
                     }
                     
-                    if(s.equals("--check-whether-in-db")) {                        
+                    if(s.equals("--check-whether-in-db")) {
+                        argsUsed[i] = true;                        
                         if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"), Settings.getBoolean("plcc_B_db_use_autocommit"))) {
                             Boolean found;
                             try {                                    
@@ -608,21 +668,25 @@ public class Main {
                                     if( ! Settings.getBoolean("plcc_B_silent")) {
                                         System.out.println("Protein '" + pdbid + "' found in database (exiting with return code 0).");
                                     }
+                                    checkArgsUsage(args, argsUsed);
                                     System.exit(0);
                                 }
                                 else {
                                     if( ! Settings.getBoolean("plcc_B_silent")) {
                                         System.out.println("Protein '" + pdbid + "' NOT found in database (exiting with return code 1).");
                                     }
+                                    checkArgsUsage(args, argsUsed);
                                     System.exit(1);
                                 }
                             } catch(Exception e) {
                                 System.err.println("ERROR: Checking for protein failed: '" + e.getMessage() + "' (exiting with return code 2)");
+                                checkArgsUsage(args, argsUsed);
                                 System.exit(2);
                             }
                         }
                         else {
                             System.err.println("ERROR: Could not check whether protein exists in database, connection failed (exiting with return code 2).");
+                            checkArgsUsage(args, argsUsed);
                             System.exit(2);
                         }
                     }
@@ -639,14 +703,21 @@ public class Main {
                             String a_gt = args[i+3];
                             String a_outFile = args[i+4];
                                                         
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
+                            argsUsed[i+2] = true;
+                            argsUsed[i+3] = true;
+                            argsUsed[i+4] = true;
                             System.out.println("Retrieving " + a_gt + " graph of PDB entry " + a_pdbid + ", chain " + a_chain + " from database.");
                             
                             if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"), Settings.getBoolean("plcc_B_db_use_autocommit"))) {
                                 drawPlccGraphFromDB(a_pdbid, a_chain, a_gt, a_outFile + Settings.get("plcc_S_img_output_fileext"), false);
                                 System.out.println("Handled " + a_gt + " graph of PDB entry " + a_pdbid + ", chain " + a_chain + ", exiting.");
+                                checkArgsUsage(args, argsUsed);
                                 System.exit(0);
                             }
                             else {
+                                checkArgsUsage(args, argsUsed);
                                 System.exit(1);
                             }                                                                                    
                         }
@@ -660,6 +731,8 @@ public class Main {
                         else {
                             compareResContacts = true;
                             compareResContactsFile = args[i+1];
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
                         }
                     }
                     
@@ -670,26 +743,32 @@ public class Main {
                         else {
                             Settings.set("plcc_B_debug_compareSSEContacts", "true");
                             Settings.set("plcc_S_debug_compareSSEContactsFile", args[i+1]);
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
                         }
                     }                                        
                     
                     
                     if(s.equals("-y") || s.equals("--write-geodat")) {
                         Settings.set("plcc_B_ptgl_geodat_output", "true");
+                        argsUsed[i] = true;
                     }
                     
                     if(s.equals("-E") || s.equals("--separate-contacts")) {
                         Settings.set("plcc_B_separate_contacts_by_chain", "true");
+                        argsUsed[i] = true;
                     }
                     
                     if(s.equals("-G") || s.equals("--complex-graphs")) {
                         Settings.set("plcc_B_complex_graphs", "true");
                         Settings.set("plcc_B_separate_contacts_by_chain", "false");
+                        argsUsed[i] = true;
                     }
                     
                     
                     if(s.equals("-z") || s.equals("--ramaplot")) {
                         Settings.set("plcc_B_ramachandran_plot", "true");
+                        argsUsed[i] = true;
                     }
                     
 
@@ -700,6 +779,8 @@ public class Main {
                         else {
                             outputDir = args[i+1];
                             Settings.set("plcc_S_output_dir", outputDir);
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
                         }
                     }
 
@@ -740,61 +821,75 @@ public class Main {
                         }
                         // exit
                         System.out.println("Done recreating DB tables, exiting.");
+                        argsUsed[i] = true;
+                        Main.checkArgsUsage(args, argsUsed);
                         Main.doExit(0);
                     }
                     
                     if(s.equals("-s") || s.equals("--draw-linnots")) {
                         Settings.set("plcc_B_folding_graphs", "true");
                         Settings.set("plcc_B_draw_folding_graphs", "true");
+                        argsUsed[i] = true;
                     }
 
                     if(s.equals("-a") || s.equals("--include-coils")) {
                         Settings.set("plcc_B_include_coils", "true");
+                        argsUsed[i] = true;
                     }
                     
                     if(s.equals("-B") || s.equals("--force-backbone")) {
                         Settings.set("plcc_B_forceBackboneContacts", "true");
+                        argsUsed[i] = true;
                     }
                    
 
                     if(s.equals("-w") || s.equals("--dont-write-images")) {
                         Settings.set("plcc_B_draw_graphs", "false");
+                        argsUsed[i] = true;
                     }
 
                     if(s.equals("-c") || s.equals("--dont-calc-graphs")) {
                         Settings.set("plcc_B_calc_draw_graphs", "false");
+                        argsUsed[i] = true;
                     }
                     
                     if(s.equals("--no-ptgl")) {
                         Settings.set("plcc_B_strict_ptgl_behaviour", "false");
+                        argsUsed[i] = true;
                     }
                     
 
                     if(s.equals("-u") || s.equals("--use-database")) {
                         Settings.set("plcc_B_useDB", "true");
+                        argsUsed[i] = true;
                     }
                     
                     if(s.equals("-f") || s.equals("--folding-graphs")) {
                         Settings.set("plcc_B_folding_graphs", "true");
+                        argsUsed[i] = true;
                     }
                     
                     if(s.equals("-k") || s.equals("--img-dir-tree")) {
                         Settings.set("plcc_B_output_images_dir_tree", "true");
+                        argsUsed[i] = true;
                     }
                     
                     if(s.equals("-K") || s.equals("--graph-dir-tree")) {
                         Settings.set("plcc_B_output_textfiles_dir_tree", "true");
+                        argsUsed[i] = true;
                     }
                     
                     if(s.equals("--output-subdir-tree")) {
                         Settings.set("plcc_B_output_images_dir_tree", "true");
                         Settings.set("plcc_B_output_textfiles_dir_tree", "true");
+                        argsUsed[i] = true;
                     }
                     
                     if(s.equals("-W") || s.equals("--output-www")) {
                         Settings.set("plcc_B_output_images_dir_tree", "true");
                         Settings.set("plcc_B_output_textfiles_dir_tree", "true");
                         Settings.set("plcc_B_output_textfiles_dir_tree_html", "true");
+                        argsUsed[i] = true;
                     }
                     
                     if(s.equals("-H") || s.equals("--output-www-with-core")) {
@@ -802,6 +897,7 @@ public class Main {
                         Settings.set("plcc_B_output_textfiles_dir_tree", "true");
                         Settings.set("plcc_B_output_textfiles_dir_tree_html", "true");
                         Settings.set("plcc_B_output_textfiles_dir_tree_core_html", "true");
+                        argsUsed[i] = true;
                     }
                     
                     
@@ -813,6 +909,8 @@ public class Main {
                         else {
                             String format = args[i+1].toUpperCase();
                             
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
                             
                             if((format.equals("PNG"))) {
                                 Settings.set("plcc_S_img_output_format", "PNG");
@@ -828,6 +926,7 @@ public class Main {
                             }
                             else {
                                 System.err.println("ERROR: Requested image output format '" + format + "' invalid. Use 'PNG' or 'SVG' for bitmap or vector output.");
+                                checkArgsUsage(args, argsUsed);
                                 syntaxError();
                             }                            
                         }
@@ -836,12 +935,14 @@ public class Main {
                     
                     if(s.equals("--contact-level-debugging")) {                                                                        
                         Settings.set("plcc_B_contact_debug_dysfunct", "true");
+                        argsUsed[i] = true;
                     }
                     
                     
 
                     if(s.equals("-n") || s.equals("--textfiles")) {
                         Settings.set("plcc_B_ptgl_text_output", "true");
+                        argsUsed[i] = true;
                     }
                     
                     if(s.equals("-q") || s.equals("--fg-notations")) {
@@ -849,6 +950,8 @@ public class Main {
                             syntaxError();
                         }
                         else {
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
                             // We want to calculate folding graphs!
                             Settings.set("plcc_B_folding_graphs", "true");
                             
@@ -888,6 +991,8 @@ public class Main {
                             syntaxError();
                         }
                         else {
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
                             // We want to calculate SSE graphs!
                             Settings.set("plcc_B_calc_draw_graphs", "true");
                             
@@ -931,7 +1036,8 @@ public class Main {
                             syntaxError();
                         }
                         else {
-                            
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
                             // If the user specifies the graph output formats manually, all those
                             // which are NOT listed default to 'off':                                                        
                             Settings.set("plcc_B_output_GML", "false");
@@ -993,6 +1099,8 @@ public class Main {
                         }
                         else {
                             Settings.set("plcc_I_debug_level", args[i+1]);
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
                         }
                     }
                     
@@ -1002,7 +1110,9 @@ public class Main {
                         }
                         else {
                             Settings.set("plcc_B_force_chain", "true");
-                            Settings.set("plcc_S_forced_chain_id", args[i+1]);                            
+                            Settings.set("plcc_S_forced_chain_id", args[i+1]);    
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
                         }
                     }
                     
@@ -1014,11 +1124,14 @@ public class Main {
                             syntaxError();
                         }
                         else {
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
                             Settings.set("plcc_B_graphimg_header", "false");
                             System.out.println("Drawing custom graph in TGF format from file '" + args[i+1] + "'.");
                             IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
                             drawTGFGraph(args[i+1], args[i+1], formats, new HashMap<Integer, String>());
                             System.out.println("Done drawing TGF graph, exiting.");
+                            checkArgsUsage(args, argsUsed);
                             System.exit(1);
                         }
                     }
@@ -1028,6 +1141,8 @@ public class Main {
                             syntaxError();
                         }
                         else {
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
                             Settings.set("plcc_B_graphimg_header", "false");
                             DP.getInstance().i("Drawing custom graph in GML format from file '" + args[i+1] + "'.");
                             IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
@@ -1046,6 +1161,7 @@ public class Main {
                             
                             // read vertex mappings from file if a file has been specified
                             if(args.length > i+2) {
+                                argsUsed[i+2] = true;
                                 DP.getInstance().i("Parsing vertex mappings file...");
                                 try {
                                     vertexMappings = IO.parseMappingsFile(args[i+2]);
@@ -1057,6 +1173,7 @@ public class Main {
                             }                            
                             
                             if(args.length > i+3) {
+                                argsUsed[i+3] = true;
                                 outFilePathNoExt = args[i+3];
                                 DP.getInstance().i("Using custom image output base file path '" + outFilePathNoExt + "'.");
                             }
@@ -1067,7 +1184,7 @@ public class Main {
                             
                             ProteinGraphDrawer.drawDrawableGraph(outFilePathNoExt, formats, g, vertexMappings);
                             DP.getInstance().i("Done drawing GML graph to base file '" + outFilePathNoExt + "', exiting.");
-                            
+                            checkArgsUsage(args, argsUsed);
                             System.exit(0);
                         }
                     }
@@ -1077,10 +1194,13 @@ public class Main {
                             syntaxError();
                         }
                         else {
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
                             System.out.println("Drawing protein graph in plcc format from file '" + args[i+1] + "'.");
                             drawPlccGraphFromFile(args[i+1], args[i+1] + Settings.get("plcc_S_img_output_fileext"), false);
                             System.out.println("Handled plcc graph file '" + args[i+1] + "', exiting.");
-                            System.exit(1);
+                            checkArgsUsage(args, argsUsed);
+                            System.exit(0);
                         }
                     }
                     
@@ -1089,28 +1209,35 @@ public class Main {
                             syntaxError();
                         }
                         else {
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
                             Settings.set("plcc_B_folding_graphs", "true");
                             Settings.set("plcc_B_draw_graphs", "true");                            
                             System.out.println("Drawing protein graph and folding graphs in plcc format from file '" + args[i+1] + "'.");
                             drawPlccGraphFromFile(args[i+1], args[i+1] + Settings.get("plcc_S_img_output_fileext"), true);
                             System.out.println("Handled plcc graph file '" + args[i+1] + " and folding graphs', exiting.");
-                            System.exit(1);
+                            checkArgsUsage(args, argsUsed);
+                            System.exit(0);
                         }
                     }
                     
                     if(s.equals("-i") || s.equals("--aa-graphs")) {
                         Settings.set("plcc_B_AAgraph_allchainscombined", "true");
                         Settings.set("plcc_B_AAgraph_perchain", "true");
+                        argsUsed[i] = true;
                     }
+                    
+                    
 
 
                 } //end for loop
+                checkArgsUsage(args, argsUsed); // warn if there were extra command line args we do not know
             }
 
             
         } else {
             usage_short();      // the first argument (pdbid) is required!
-            System.exit(0);
+            System.exit(1);
         }
         
         
