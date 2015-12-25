@@ -83,6 +83,7 @@ import org.xml.sax.SAXException;
 import graphdrawing.DrawTools.IMAGEFORMAT;
 import graphdrawing.DrawableGraph;
 import graphdrawing.IDrawableGraph;
+import graphdrawing.SimpleGraphDrawer;
 import parsers.GMLGraphParser;
 import parsers.IGraphParser;
 import similarity.CompareOneToDB;
@@ -2203,7 +2204,14 @@ public class Main {
                     else {
                         System.err.println("ERROR: Could not write AAGraph for all chains to file '" + aagFile + "'.");
                     }
-
+                    
+                    if(Settings.getBoolean("plcc_B_draw_aag")) {
+                        Map<Integer, Color> cmap = new HashMap<>();
+                        String aagDrawFileNoExt = outputDir + fs + subDirTree + pdbid + "_aagraph_vis";
+                        //System.out.println("Drawing aag to base file '" + aagDrawFileNoExt + "'.");
+                        SimpleGraphDrawer.drawSimpleGraph(aagDrawFileNoExt, Settings.getAminoAcidGraphOutputImageFormats(), aag, cmap);                        
+                    }
+                    
                     // write the AA contact statistics matrix (by AA type, not single AA)
                     String aaMatrixFile = outputDir + fs + subDirTree + pdbid + "_aatypematrix.gml";
                     if(writeStringToFile(aaMatrixFile, aag.getAminoAcidTypeInteractionMatrixGML())) {

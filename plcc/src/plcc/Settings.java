@@ -91,6 +91,24 @@ public class Settings {
     }
     
     /**
+     * Creates an array of the output image formats for aa graphs which are set in the settings.
+     * @return the output formats, collected from settings like 'plcc_B_img_output_format_PNG'
+     */
+    public static IMAGEFORMAT[] getAminoAcidGraphOutputImageFormats() {
+        ArrayList<IMAGEFORMAT> formats = new ArrayList<IMAGEFORMAT>();
+        
+        if(Settings.getBoolean("plcc_B_img_output_format_PNG")) {
+            formats.add(IMAGEFORMAT.PNG);
+        }
+        if(Settings.getBoolean("plcc_B_img_output_format_PDF")) {
+            formats.add(IMAGEFORMAT.PDF);
+        }
+       
+        
+        return (IMAGEFORMAT[])formats.toArray(new IMAGEFORMAT[formats.size()]);
+    }
+    
+    /**
      * Creates an array of the output image formats for folding graphs which are set in the settings.
      * @return the output formats, collected from settings like 'plcc_B_img_output_format_PNG'
      */
@@ -349,6 +367,7 @@ public class Settings {
         defSet("plcc_B_calc_draw_graphs", "true", "Whether the SSE graphs are calculated.");
         defSet("plcc_B_draw_graphs", "true", "Whether the SSE graphs are drawn and written to image files.");
         defSet("plcc_B_draw_folding_graphs", "false", "Whether the folding graphs are drawn and written to image files.");
+        defSet("plcc_B_draw_aag", "false", "Whether to draw amino acid graphs to image files, uses grid visualization.");        
         defSet("plcc_B_graphtype_albe", "true", "Determines whether alpha-beta graphs are drawn");
         defSet("plcc_B_graphtype_albelig", "true", "Determines whether alpha-beta graphs with ligands are drawn");
         defSet("plcc_B_graphtype_alpha", "true", "Determines whether alpha graphs are drawn");
