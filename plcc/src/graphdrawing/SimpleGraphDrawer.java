@@ -27,6 +27,7 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import plcc.Settings;
 import tools.DP;
+import tools.MathTools;
 
 /**
  * A drawing class which draws a simple graph. Vertices are arranged on an x,y grid, and edges are drawn between them as straight lines.
@@ -61,7 +62,10 @@ public class SimpleGraphDrawer {
     
     private static Integer[] vertGridPosition(int i) {
         Integer x = i % VERTS_PER_LINE;
-        Integer y = Math.floorDiv(i, VERTS_PER_LINE);
+        //Integer iC = i;
+        //Double divRes = (iC.doubleValue()) / VERTS_PER_LINE.doubleValue();
+        //Integer y = ((Double)Math.floor(divRes)).intValue();
+        Integer y = MathTools.floorDiv(i, VERTS_PER_LINE);
         //System.out.println("gridPos of vert "+ i + ": " + x + " " + y + "(vpl=" + VERTS_PER_LINE+")");
         return new Integer[]{x, y};
     }
