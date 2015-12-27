@@ -352,7 +352,7 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
         }
         
         Integer maxSize = 0;
-        Integer indexOfLargestCC = -1;
+        Integer indexOfLargestCC = 0;
         
         FoldingGraph fg;
         for(Integer i = 0;  i < this.connectedComponents.size(); i++) {

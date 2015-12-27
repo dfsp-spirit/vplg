@@ -11,6 +11,8 @@ import datastructures.SimpleGraphInterface;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import tools.DP;
 
 /**
  * Computes various graph properties for a graph and stores the results. This is kind of a result container and a facade, which calls all the other graph algorithms in the background. This class is lazy.
@@ -30,13 +32,15 @@ public class GraphProperties {
     
     public GraphProperties(final SimpleGraphInterface g) {
         this.graph = g;
+        if(g == null) { DP.getInstance().e("GraphProperties", "Constructor: Graph is null."); }
         this.cc = new ConnectedComponents(g);
         this.gd = new GraphDistances(g);
         this.degreeDist = null;
     }
     
     public Integer getNumVertices() {
-        return graph.getSize();
+        if(this.graph == null) { DP.getInstance().e("GraphProperties", "getNumVertices: Graph is null. Returning 0 as size."); return 0; }
+        return this.graph.getSize();
     }
     
     public Integer getNumEdges() {
@@ -68,11 +72,13 @@ public class GraphProperties {
     
     /**
      * Determines the maximum degree of the graph
-     * @return the maximum degree of the graph
+     * @return the maximum degree of the graph.
      */
     public Integer getMaxDegree() {
         Map<Integer, Integer> dgd = this.getDegreeDistribution(false);
-        return Collections.max(dgd.keySet());
+        Set<Integer> degrees = dgd.keySet();
+        if(degrees.isEmpty()) { return 0; }
+        return Collections.max(degrees);
     }
     
     /**
@@ -81,7 +87,9 @@ public class GraphProperties {
      */
     public Integer getMinDegree() {
         Map<Integer, Integer> dgd = this.getDegreeDistribution(false);
-        return Collections.min(dgd.keySet());
+        Set<Integer> degrees = dgd.keySet();
+        if(degrees.isEmpty()) { return 0; }
+        return Collections.min(degrees);
     }
     
     public List<Integer> getCumulativeDegreeDistribution() {

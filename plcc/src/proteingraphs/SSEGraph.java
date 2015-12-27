@@ -187,6 +187,7 @@ public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements I
         super();
         this.sseList = sses;        
         this.size = sseList.size();
+        if(this.size == 0) { DP.getInstance().w("SSEGraph", "Trying to create graph from empty vertex list."); }
         this.matrix = new Integer[size][size];
         this.distMatrix = new Integer[size][size];      // distances in graph
         this.isProteinGraph = true;
