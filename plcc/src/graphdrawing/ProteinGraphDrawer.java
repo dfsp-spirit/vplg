@@ -46,6 +46,7 @@ import proteingraphs.ProtGraph;
 import proteingraphs.SSEGraph;
 import plcc.Settings;
 import proteingraphs.SpatRel;
+import proteinstructure.AminoAcid;
 import proteinstructure.Chain;
 import tools.DP;
 import tools.PlccUtilities;
@@ -1847,6 +1848,50 @@ public class ProteinGraphDrawer {
         Rectangle2D roi = new Rectangle2D.Double(0, 0, pl.getPageWidth(), pl.getPageHeight());
         DrawResult drawRes = new DrawResult(ig2, roi);
         return drawRes;
+    }
+    
+    /**
+     * Assigns a color to a chemical property of an AA, useful for drawing residue representations, e.g., in amino acif graphs or matrices.
+     * @param chemProp3 the chem prop 3 string, use constants like AminoAcid.CHEMPROP3_AA_STRING_HYDROPHOBIC
+     * @return a color, or null if the supplied chemProp3 string is not assigned to any color
+     */
+    public static Color getChemProp3Color(String chemProp3) {
+        Color c = null;
+        if(chemProp3.equals(AminoAcid.CHEMPROP3_AA_STRING_HYDROPHOBIC)) {
+            c = Color.BLACK;
+        }
+        if(chemProp3.equals(AminoAcid.CHEMPROP3_AA_STRING_POLAR_CHARGED)) {
+            c = Color.RED;
+        }
+        if(chemProp3.equals(AminoAcid.CHEMPROP3_AA_STRING_POLAR_UNCHARGED)) {
+            c = Color.BLUE;
+        }
+        return c;
+    }
+    
+    /**
+     * Assigns a color to a chemical property of an AA, useful for drawing residue representations, e.g., in amino acid graphs or matrices.
+     * @param chemProp5 the chem prop 5 string, use constants like AminoAcid.CHEMPROP5_*
+     * @return a color, or null if the supplied chemProp5 string is not assigned to any color
+     */
+    public static Color getChemProp5Color(String chemProp5) {
+        Color c = null;
+        if(chemProp5.equals(AminoAcid.CHEMPROP5_AA_STRING_HYDROPHOBIC)) {
+            c = Color.BLACK;
+        }
+        if(chemProp5.equals(AminoAcid.CHEMPROP5_AA_STRING_NEGATIVE_CHARGE)) {
+            c = Color.ORANGE;
+        }
+        if(chemProp5.equals(AminoAcid.CHEMPROP5_AA_STRING_POLAR)) {
+            c = Color.BLUE;
+        }
+        if(chemProp5.equals(AminoAcid.CHEMPROP5_AA_STRING_POSITIVE_CHARGE)) {
+            c = Color.MAGENTA;
+        }
+        if(chemProp5.equals(AminoAcid.CHEMPROP5_AA_STRING_SMALL_APOLAR)) {
+            c = Color.GRAY;
+        }
+        return c;
     }
     
     

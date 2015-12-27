@@ -367,7 +367,7 @@ public class Settings {
         defSet("plcc_B_calc_draw_graphs", "true", "Whether the SSE graphs are calculated.");
         defSet("plcc_B_draw_graphs", "true", "Whether the SSE graphs are drawn and written to image files.");
         defSet("plcc_B_draw_folding_graphs", "false", "Whether the folding graphs are drawn and written to image files.");
-        defSet("plcc_B_draw_aag", "false", "Whether to draw amino acid graphs to image files, uses grid visualization.");        
+        defSet("plcc_B_draw_aag", "true", "Whether to draw amino acid graphs to image files, uses grid visualization.");        
         defSet("plcc_B_graphtype_albe", "true", "Determines whether alpha-beta graphs are drawn");
         defSet("plcc_B_graphtype_albelig", "true", "Determines whether alpha-beta graphs with ligands are drawn");
         defSet("plcc_B_graphtype_alpha", "true", "Determines whether alpha graphs are drawn");

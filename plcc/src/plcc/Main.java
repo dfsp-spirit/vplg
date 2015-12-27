@@ -2207,9 +2207,40 @@ public class Main {
                     
                     if(Settings.getBoolean("plcc_B_draw_aag")) {
                         Map<Integer, Color> cmap = new HashMap<>();
+                        // fill color map
+                        Color c;
+                        Boolean use3Colors = false;
+                        for(int i = 0; i < aag.getNumVertices(); i++) {
+                            Residue r = aag.getVertex(i);
+                            if(r != null) {
+                                if(use3Colors) {
+                                    c = ProteinGraphDrawer.getChemProp3Color(r.getChemicalProperty3OneLetterString());
+                                } else {
+                                    c = ProteinGraphDrawer.getChemProp5Color(r.getChemicalProperty5OneLetterString());
+                                }
+                                if(c != null) {
+                                    cmap.put(i, c);
+                                }
+                            }
+                        }
+                        
+                        // fill label map with 1 letter AA code
+                        Map<Integer, String> lmap = new HashMap<>();
+                        String l;
+                        for(int i = 0; i < aag.getNumVertices(); i++) {
+                            Residue r = aag.getVertex(i);
+                            if(r != null) {
+                                l = r.getAAName1();
+                                if(l != null) {
+                                    lmap.put(i, l);
+                                }
+                            }
+                        }
+                        
+                                                
                         String aagDrawFileNoExt = outputDir + fs + subDirTree + pdbid + "_aagraph_vis";
                         //System.out.println("Drawing aag to base file '" + aagDrawFileNoExt + "'.");
-                        SimpleGraphDrawer.drawSimpleGraph(aagDrawFileNoExt, Settings.getAminoAcidGraphOutputImageFormats(), aag, cmap);                        
+                        SimpleGraphDrawer.drawSimpleGraph(aagDrawFileNoExt, Settings.getAminoAcidGraphOutputImageFormats(), aag, cmap, lmap);                        
                     }
                     
                     // write the AA contact statistics matrix (by AA type, not single AA)

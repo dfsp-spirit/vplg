@@ -55,6 +55,10 @@ public class SimpleGraphDrawer {
         return(new Font(Settings.get("plcc_S_img_default_font"), Font.PLAIN, Settings.getInteger("plcc_I_img_default_font_size")));
     }
     
+    public static Font getSmallFont() {
+        return(new Font(Settings.get("plcc_S_img_default_font"), Font.PLAIN, 6));
+    }
+    
     private static Integer[] vertGridPosition(int i) {
         Integer x = i % VERTS_PER_LINE;
         Integer y = Math.floorDiv(i, VERTS_PER_LINE);
@@ -74,11 +78,11 @@ public class SimpleGraphDrawer {
      * @param pg the graph to draw
      * @return a map of formats to the corresponding output files written to disk
      */
-    public static HashMap<DrawTools.IMAGEFORMAT, String> drawSimpleGraph(String baseFilePathNoExt, DrawTools.IMAGEFORMAT[] formats, SimpleGraphInterface pg, Map<Integer, Color> vertexColors) {
+    public static HashMap<DrawTools.IMAGEFORMAT, String> drawSimpleGraph(String baseFilePathNoExt, DrawTools.IMAGEFORMAT[] formats, SimpleGraphInterface pg, Map<Integer, Color> vertexColors, Map<Integer, String> vertexLabels) {
         
         
         
-        DrawResult drawRes = SimpleGraphDrawer.drawSimpleGraphG2D(pg, vertexColors);
+        DrawResult drawRes = SimpleGraphDrawer.drawSimpleGraphG2D(pg, vertexColors, vertexLabels);
         String svgFilePath = baseFilePathNoExt + ".svg";
         HashMap<DrawTools.IMAGEFORMAT, String> resultFilesByFormat = new HashMap<DrawTools.IMAGEFORMAT, String>();
         try {
@@ -99,10 +103,31 @@ public class SimpleGraphDrawer {
         return resultFilesByFormat;
     }
     
-    private static DrawResult drawSimpleGraphG2D(SimpleGraphInterface pg, Map<Integer, Color> vertexColors) {
+    private static Integer[] getRGBforEdgeColor(Color vertexColor1, Color vertexColor2) {
+        Color cres = vertexColor1;  // could do something more sophisitcated here one day...
+        Integer[] rgb = new Integer[]{ cres.getRed(), cres.getGreen(), cres.getBlue() };
+        return rgb;
+    }
+    
+    /**
+     * Returns the vertex color from the map, or a default color if no color for the given vertex is specified in the map
+     * @param cmap color map, mapping vertex indices to colors
+     * @param index the index of the vertex in question
+     * @return a color, from the map if possible, default otherwise
+     */
+    private static Color getVertexColorFromMap(Map<Integer, Color> cmap, Integer index) {
+        Color c = Color.BLACK;
+        if(cmap.containsKey(index)) {
+            c = cmap.get(index);
+        }
+        return c;
+    }
+    
+    private static DrawResult drawSimpleGraphG2D(SimpleGraphInterface pg, Map<Integer, Color> vertexColors, Map<Integer, String> vertexLabels) {
        
         Integer maxPixY = pixelPosOfGridPosition(vertGridPosition(pg.getSize()-1))[1];
-        if(maxPixY > HEIGHT) {
+        int spacerForLabel = 25;
+        if(maxPixY + spacerForLabel > HEIGHT) {
             HEIGHT = maxPixY + BORDER;
         }
         
@@ -115,7 +140,7 @@ public class SimpleGraphDrawer {
         ig2.setPaint(Color.WHITE);
         ig2.fillRect(0, 0, WIDTH, HEIGHT);
         ig2.setPaint(Color.BLACK);
-        Font font = getStandardFont();
+        Font font = getSmallFont();
         ig2.setFont(font);
         FontMetrics fontMetrics = ig2.getFontMetrics();        
         Integer stringHeight = fontMetrics.getAscent();   
@@ -124,7 +149,7 @@ public class SimpleGraphDrawer {
         Line2D line;
         ig2.setStroke(new BasicStroke(2));     
         
-        Color C_VERTEX = Color.RED;
+        Color C_VERTEX = Color.BLACK;
         Color C_EDGE = new Color(128, 128, 128, 128);
         
         Integer x = VERT_START_X;
@@ -133,11 +158,14 @@ public class SimpleGraphDrawer {
         GraphProperties gp = new GraphProperties(pg);
         Integer maxDegree = gp.getMaxDegree();
       
-        for (Integer i = 0; i < pg.getSize(); i++) {            
-            ig2.setColor(vertexColors.get(i));
+        Color c; String l;
+        for (Integer i = 0; i < pg.getSize(); i++) {
+            ig2.setColor(getVertexColorFromMap(vertexColors, i));
             Integer[] pixPos = pixelPosOfGridPosition(vertGridPosition(i));
             shape = new Rectangle(pixPos[0] - VERT_HALF_WIDTH_HEIGHT, pixPos[1] - VERT_HALF_WIDTH_HEIGHT, VERT_WIDTH_HEIGHT, VERT_WIDTH_HEIGHT);
+            l = vertexLabels.get(i);
             ig2.draw(shape);
+            if(l != null) { ig2.setColor(Color.BLACK); ig2.drawString(l, pixPos[0], pixPos[1] + 10); }            
         }
         
         Integer diff, degree1, degree2;
@@ -150,9 +178,10 @@ public class SimpleGraphDrawer {
                     if(diff > SETTING_MIN_SEQ_DIST_TO_DRAW && (degree1 >= SETTING_MIN_DEGREE_TO_DRAW || degree2 >= SETTING_MIN_DEGREE_TO_DRAW)) {
                         Integer largerDegree = (degree1 > degree2 ? degree1 : degree2);
                         Double degreeP = largerDegree.doubleValue()/ maxDegree.doubleValue();
-                        Integer transp = ((Double)Math.floor((degreeP / maxDegree) * 200)).intValue();
+                        Integer transp = ((Double)Math.floor((degreeP / maxDegree) * 100)).intValue();
                         //ig2.setPaint(C_EDGE);
-                        ig2.setPaint(new Color(128 , 128, 128, 55+transp));
+                        Integer[] rgb = getRGBforEdgeColor(getVertexColorFromMap(vertexColors, i), getVertexColorFromMap(vertexColors, j));
+                        ig2.setPaint(new Color(rgb[0] ,rgb[1], rgb[2], (255-(155+transp))));
                         ig2.setStroke(new BasicStroke(1));
                         Integer[] pixPosStart = pixelPosOfGridPosition(vertGridPosition(i));
                         Integer[] pixPosEnd = pixelPosOfGridPosition(vertGridPosition(j));
