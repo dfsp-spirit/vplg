@@ -939,6 +939,11 @@ public class Main {
                         argsUsed[i] = true;
                     }
                     
+                    if(s.equals("--draw-aag")) {                                                                        
+                        Settings.set("plcc_B_draw_aag", "true");
+                        argsUsed[i] = true;
+                    }
+                    
                     
 
                     if(s.equals("-n") || s.equals("--textfiles")) {
@@ -5754,6 +5759,7 @@ public class Main {
         System.out.println("-Z | --silent              : silent mode. do not write output to STDOUT.");        
         System.out.println("   --compute-graph-metrics : compute graph metrics like cluster coefficient for PGs. Slower!");
         System.out.println("   --check-whether-in-db   : check whether the PDB file exists in the database and exit. Returns 0 if it does, 1 if not, value >1 on error.");
+        System.out.println("   --draw-aag              : visualize amino acid graphs, debug option mostly.");
         System.out.println("   --cluster               : Set all options for cluster mode. Equals '-f -u -k -s -G -i -Z -P'.");
         System.out.println("");
         System.out.println("The following options only make sense for database maintenance:");
