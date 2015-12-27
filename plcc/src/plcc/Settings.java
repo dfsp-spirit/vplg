@@ -92,15 +92,15 @@ public class Settings {
     
     /**
      * Creates an array of the output image formats for aa graphs which are set in the settings.
-     * @return the output formats, collected from settings like 'plcc_B_img_output_format_PNG'
+     * @return the output formats, collected from settings like 'plcc_B_img_AAG_output_format_PNG'
      */
     public static IMAGEFORMAT[] getAminoAcidGraphOutputImageFormats() {
         ArrayList<IMAGEFORMAT> formats = new ArrayList<IMAGEFORMAT>();
         
-        if(Settings.getBoolean("plcc_B_img_output_format_PNG")) {
+        if(Settings.getBoolean("plcc_B_img_AAG_output_format_PNG")) {
             formats.add(IMAGEFORMAT.PNG);
         }
-        if(Settings.getBoolean("plcc_B_img_output_format_PDF")) {
+        if(Settings.getBoolean("plcc_B_img_AAG_output_format_PDF")) {
             formats.add(IMAGEFORMAT.PDF);
         }
        
@@ -110,7 +110,7 @@ public class Settings {
     
     /**
      * Creates an array of the output image formats for folding graphs which are set in the settings.
-     * @return the output formats, collected from settings like 'plcc_B_img_output_format_PNG'
+     * @return the output formats, collected from settings like 'plcc_B_img_FG_output_format_PNG'
      */
     public static IMAGEFORMAT[] getFoldingGraphOutputImageFormats() {
         ArrayList<IMAGEFORMAT> formats = new ArrayList<IMAGEFORMAT>();
@@ -321,20 +321,23 @@ public class Settings {
         defSet("plcc_B_warn_cfg_fallback_to_default", "false", "Whether to print warnings when a setting is not defined in the config file and internal defaults are used.");
         defSet("plcc_S_temp_dir", ".", "The directory where temporary files can be created. You need write access to it, of course.");
         
-        defSet("plcc_S_img_output_format", "PNG", "image output format (valid options: 'PNG', 'JPG')");
-        defSet("plcc_S_img_output_fileext", ".png", "file extension of output images (should fit plcc_S_img_output_format more or less, e.g. '.png', '.jpg')");
+        defSet("plcc_S_img_output_format", "PNG", "Not used for graph images anymore. image output format (valid options: 'PNG', 'JPG')");
+        defSet("plcc_S_img_output_fileext", ".png", "Not used for graph images anymore, applies to Ramaplot etc only. file extension of output images (should fit plcc_S_img_output_format more or less, e.g. '.png', '.jpg')");
         defSet("plcc_B_skip_empty_chains", "true", "whether to completely skip chains which do not contain any DSSP SSEs (i.e., contain only ligands).");                
         
         // new output format settings
         defSet("plcc_B_img_output_format_PNG", "true", "Whether to write protein graph output images in PNG format.");
         defSet("plcc_B_img_output_format_PDF", "false", "Whether to write protein graph output images in PDF format.");
-        defSet("plcc_B_img_output_format_SVG", "true", "Whether to write protein graph output images in SVG format. Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG.");
+        defSet("plcc_B_img_output_format_SVG", "true", "Whether to write protein graph output images in SVG format. Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG.");        
         defSet("plcc_B_img_FG_output_format_PNG", "true", "Whether to write folding graph output images in PNG format.");
         defSet("plcc_B_img_FG_output_format_PDF", "false", "Whether to write folding graph output images in PDF format.");
         defSet("plcc_B_img_FG_output_format_SVG", "true", "Whether to write folding graph output images in SVG format. Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG.");
         defSet("plcc_B_img_CG_output_format_PNG", "true", "Whether to write complex graph output images in PNG format.");
         defSet("plcc_B_img_CG_output_format_PDF", "false", "Whether to write complex graph output images in PDF format.");
         defSet("plcc_B_img_CG_output_format_SVG", "true", "Whether to write complex graph output images in SVG format. Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG.");
+        defSet("plcc_B_img_AAG_output_format_PNG", "false", "Whether to write amino acid graph output images in PNG format.");
+        defSet("plcc_B_img_AAG_output_format_PDF", "false", "Whether to write amino acid graph output images in PDF format.");
+        defSet("plcc_B_img_AAG_output_format_SVG", "true", "Whether to write complex graph output images in SVG format. Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG.");
         
         
         defSet("plcc_I_img_margin_left", "80", "Size of the left image margin in pixels");

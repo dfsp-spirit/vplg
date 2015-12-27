@@ -82,7 +82,7 @@ public class SimpleGraphDrawer {
      * @param pg the graph to draw
      * @return a map of formats to the corresponding output files written to disk
      */
-    public static HashMap<DrawTools.IMAGEFORMAT, String> drawSimpleGraph(String baseFilePathNoExt, DrawTools.IMAGEFORMAT[] formats, SimpleGraphInterface pg, Map<Integer, Color> vertexColors, Map<Integer, String> vertexLabels) {
+    public static HashMap<DrawTools.IMAGEFORMAT, String> drawSimpleGraphGrid(String baseFilePathNoExt, DrawTools.IMAGEFORMAT[] formats, SimpleGraphInterface pg, Map<Integer, Color> vertexColors, Map<Integer, String> vertexLabels) {
         
         
         

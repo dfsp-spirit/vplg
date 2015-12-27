@@ -2245,7 +2245,7 @@ public class Main {
                                                 
                         String aagDrawFileNoExt = outputDir + fs + subDirTree + pdbid + "_aagraph_vis";
                         //System.out.println("Drawing aag to base file '" + aagDrawFileNoExt + "'.");
-                        SimpleGraphDrawer.drawSimpleGraph(aagDrawFileNoExt, Settings.getAminoAcidGraphOutputImageFormats(), aag, cmap, lmap);                        
+                        SimpleGraphDrawer.drawSimpleGraphGrid(aagDrawFileNoExt, Settings.getAminoAcidGraphOutputImageFormats(), aag, cmap, lmap);                        
                     }
                     
                     // write the AA contact statistics matrix (by AA type, not single AA)
@@ -5759,7 +5759,7 @@ public class Main {
         System.out.println("-Z | --silent              : silent mode. do not write output to STDOUT.");        
         System.out.println("   --compute-graph-metrics : compute graph metrics like cluster coefficient for PGs. Slower!");
         System.out.println("   --check-whether-in-db   : check whether the PDB file exists in the database and exit. Returns 0 if it does, 1 if not, value >1 on error.");
-        System.out.println("   --draw-aag              : visualize amino acid graphs, debug option mostly.");
+        System.out.println("   --draw-aag              : visualize amino acid graphs, test only");
         System.out.println("   --cluster               : Set all options for cluster mode. Equals '-f -u -k -s -G -i -Z -P'.");
         System.out.println("");
         System.out.println("The following options only make sense for database maintenance:");
@@ -5775,14 +5775,14 @@ public class Main {
         System.out.println("");
         System.out.println("REQUIRED INPUT FILES: This program requires the PDB file and the DSSP file of a protein.");
         System.out.println("                      This does not apply to options that don't use it (marked with * above), of course.");
-        System.out.println("                      A PDBID still has to be given as first argument, it will be ignored though (use 'none').");
+        System.out.println("                      A PDBID still has to be given as first argument, it will be ignored though (use 'NONE').");
         System.out.println("");
         System.out.println("NOTES: ");
         System.out.println("       -The DSSP program assumes that the input PDB file only has a single model.");
         System.out.println("        You have to split PDB files with multiple models up BEFORE running DSSP (use the 'splitpdb' tool).");
         System.out.println("        If you don't do this, the broken DSSP file will get this program into trouble.");
         System.out.println("       -See the config file '" + Settings.getConfigFile() + "' in your userhome to set advanced options.");
-        System.out.println("       -If all the parameters above scare you try 'java -jar plcc.jar <PDBID>' for a start.");
+        System.out.println("       -Try 'java -jar plcc.jar <PDBID>' for a start.");
     }
 
     /**
