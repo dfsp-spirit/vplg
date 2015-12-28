@@ -139,13 +139,18 @@ public class GraphMetrics {
     /**
      * Computes the cumulative degree distribution of g.
      * @param g a graph
+     * @param upToDegree the max degree to include. If set to null, (g.getSize() -1) will be used.  You could also specify the max degree of the graph.
      * @return the cumulative degree distribution. a list that contains at each position n the number of vertices in the graph which have at least degree n.
      */
-    public static List<Integer> cumulativeDegreeDistribution(SimpleGraphInterface g) {
+    public static List<Integer> cumulativeDegreeDistributionUpTo(SimpleGraphInterface g, Integer upToDegree) {
         List<Integer> cdd = new ArrayList<>();
         Map<Integer, Integer> dgd = GraphMetrics.degreeDistribution(g, Boolean.TRUE);
         
-        for(int i = 0; i < g.getSize(); i++) {
+        if(upToDegree == null) {
+            upToDegree = (g.getSize() -1);
+        }
+        
+        for(int i = 0; i < upToDegree; i++) {
             cdd.add(GraphMetrics.sumMapIntIntValuesInRange(dgd, i, (g.getSize() -1) ));
         }
         return cdd;

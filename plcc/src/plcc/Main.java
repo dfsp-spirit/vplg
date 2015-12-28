@@ -2185,9 +2185,9 @@ public class Main {
                                 if(graph_db_id > 0L) {
                                     //System.out.println("Found aa graph " + pdbid + ".");
                                     // write graph properties
-                                    DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.FALSE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity());
+                                    DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.FALSE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity(), gp.getCumulativeDegreeDistributionUpToAsArray(50));
                                     // write properties of largest CC of graph
-                                    DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.TRUE, sgp.getNumVertices(), sgp.getNumEdges(), sgp.getMinDegree(), sgp.getMaxDegree(), sgp.getConnectedComponents().size(), sgp.getGraphDiameter(), sgp.getGraphRadius(), sgp.getAverageClusterCoefficient(), sgp.getAverageShortestPathLength(), sgp.getDegreeDistributionUpTo(50), sgp.getAverageDegree(), sgp.getDensity());
+                                    DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.TRUE, sgp.getNumVertices(), sgp.getNumEdges(), sgp.getMinDegree(), sgp.getMaxDegree(), sgp.getConnectedComponents().size(), sgp.getGraphDiameter(), sgp.getGraphRadius(), sgp.getAverageClusterCoefficient(), sgp.getAverageShortestPathLength(), sgp.getDegreeDistributionUpTo(50), sgp.getAverageDegree(), sgp.getDensity(), sgp.getCumulativeDegreeDistributionUpToAsArray(50));
                                 }
                                 else {
                                     DP.getInstance().e("Main", "Could not write aa graph properties to DB, graph not found in database.");
@@ -3329,9 +3329,9 @@ public class Main {
                                 if(graph_db_id > 0L) {
                                     //System.out.println("Found graph " + pdbid + " " + chain + " " + gt + " with ID " + graph_db_id + ".");
                                     // write graph properties
-                                    DBManager.writeProteingraphStatsToDB(graph_db_id, Boolean.FALSE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity());
+                                    DBManager.writeProteingraphStatsToDB(graph_db_id, Boolean.FALSE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity(), gp.getCumulativeDegreeDistributionUpToAsArray(50));
                                     // write properties of largest CC of graph
-                                    DBManager.writeProteingraphStatsToDB(graph_db_id, Boolean.TRUE, sgp.getNumVertices(), sgp.getNumEdges(), sgp.getMinDegree(), sgp.getMaxDegree(), sgp.getConnectedComponents().size(), sgp.getGraphDiameter(), sgp.getGraphRadius(), sgp.getAverageClusterCoefficient(), sgp.getAverageShortestPathLength(), sgp.getDegreeDistributionUpTo(50), sgp.getAverageDegree(), sgp.getDensity());
+                                    DBManager.writeProteingraphStatsToDB(graph_db_id, Boolean.TRUE, sgp.getNumVertices(), sgp.getNumEdges(), sgp.getMinDegree(), sgp.getMaxDegree(), sgp.getConnectedComponents().size(), sgp.getGraphDiameter(), sgp.getGraphRadius(), sgp.getAverageClusterCoefficient(), sgp.getAverageShortestPathLength(), sgp.getDegreeDistributionUpTo(50), sgp.getAverageDegree(), sgp.getDensity(), sgp.getCumulativeDegreeDistributionUpToAsArray(50));
                                 }
                                 else {
                                     DP.getInstance().e("Main", "Could not write graph properties to DB, graph not found in database.");
@@ -7534,9 +7534,9 @@ public class Main {
                     if(graph_db_id > 0L) {
                         //System.out.println("Found complex graph " + pdbid + " with ID " + graph_db_id + ".");
                         // write graph properties
-                        DBManager.writeComplexgraphStatsToDB(graph_db_id, Boolean.FALSE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity());
+                        DBManager.writeComplexgraphStatsToDB(graph_db_id, Boolean.FALSE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity(), gp.getCumulativeDegreeDistributionUpToAsArray(50));
                         // write properties of largest CC of graph
-                        DBManager.writeComplexgraphStatsToDB(graph_db_id, Boolean.TRUE, sgp.getNumVertices(), sgp.getNumEdges(), sgp.getMinDegree(), sgp.getMaxDegree(), sgp.getConnectedComponents().size(), sgp.getGraphDiameter(), sgp.getGraphRadius(), sgp.getAverageClusterCoefficient(), sgp.getAverageShortestPathLength(), sgp.getDegreeDistributionUpTo(50), sgp.getAverageDegree(), sgp.getDensity());
+                        DBManager.writeComplexgraphStatsToDB(graph_db_id, Boolean.TRUE, sgp.getNumVertices(), sgp.getNumEdges(), sgp.getMinDegree(), sgp.getMaxDegree(), sgp.getConnectedComponents().size(), sgp.getGraphDiameter(), sgp.getGraphRadius(), sgp.getAverageClusterCoefficient(), sgp.getAverageShortestPathLength(), sgp.getDegreeDistributionUpTo(50), sgp.getAverageDegree(), sgp.getDensity(), sgp.getCumulativeDegreeDistributionUpToAsArray(50));
                     }
                     else {
                         DP.getInstance().e("Main", "Could not write complex graph properties to DB, graph not found in database.");

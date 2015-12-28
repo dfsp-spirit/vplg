@@ -116,8 +116,32 @@ public class GraphProperties {
         return Collections.min(degrees);
     }
     
+    /**
+     * Computes the cumulative degree distribution of the graph.
+     * @return the cumulative degree distribution. a list that contains at each position n the number of vertices in the graph which have at least degree n.
+     */
     public List<Integer> getCumulativeDegreeDistribution() {
-        return GraphMetrics.cumulativeDegreeDistribution(graph);
+        return GraphMetrics.cumulativeDegreeDistributionUpTo(graph, null);
+    }
+    
+    /**
+     * Computes the cumulative degree distribution of g.
+     * @param upToDegree the max degree to include. If set to null, (g.getSize() -1) will be used. You could also specify the max degree of the graph.
+     * @return the cumulative degree distribution. a list that contains at each position n the number of vertices in the graph which have at least degree n.
+     */
+    public List<Integer> getCumulativeDegreeDistributionUpTo(Integer upToDegree) {
+        return GraphMetrics.cumulativeDegreeDistributionUpTo(graph, upToDegree);
+    }
+    
+    /**
+     * Computes the cumulative degree distribution of g. Uses the getCumulativeDegreeDistributionUpTo function internally, only difference is return type array instead of list.
+     * @param upToDegree the max degree to include. If set to null, (g.getSize() -1) will be used. You could also specify the max degree of the graph.
+     * @return the cumulative degree distribution. a list that contains at each position n the number of vertices in the graph which have at least degree n.
+     */
+    public Integer[] getCumulativeDegreeDistributionUpToAsArray(Integer upToDegree) {
+        List<Integer> l = GraphMetrics.cumulativeDegreeDistributionUpTo(graph, upToDegree);
+        Integer[] arr = l.toArray(new Integer[l.size()]);
+        return arr;
     }
     
     /**
