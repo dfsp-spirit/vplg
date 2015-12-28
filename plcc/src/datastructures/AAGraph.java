@@ -284,7 +284,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
                 }
             }
             else {
-                System.err.println("WARNING: Could not add edge from ResContactInfo, vertices not found in graph.");
+                System.err.println("WARNING: Could not add edge from ResContactInfo, vertices " + resA.getFancyName() + " and/or " + resB.getFancyName() + " not found in graph (this is OK for non-standard residue types and ligands).");
                 return false;
             }
         }

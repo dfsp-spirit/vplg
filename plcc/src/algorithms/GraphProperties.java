@@ -51,6 +51,30 @@ public class GraphProperties {
         return e/2;
     }
     
+    /**
+     * Returns the average vertex degree of g.
+     * @return the average vertex degree, i.e., 2*|E| / |V|.
+     */
+    public Double getAverageDegree() {
+        if(getNumVertices() == null) { return null; }
+        if(getNumVertices() == 0) { return 0D; }
+        Double E = getNumEdges().doubleValue();
+        Double V = getNumVertices().doubleValue();
+        return (Double)((2 * E) / V);
+    }
+    
+    /**
+     * The graph density measures how many edges are in set E compared to the maximum possible number of edges between vertices in set V.
+     * @return the graph density, i.e.,  2 * |E| / (|V| * (|V| − 1))
+     */
+    public Double getDensity() {
+        if(getNumVertices() == null) { return null; }
+        if(getNumVertices() == 0) { return 0D; }
+        Double E = getNumEdges().doubleValue();
+        Double V = getNumVertices().doubleValue();
+        return (Double)((2 * E) / (V * (V-1)) );
+    }
+    
     public Double getAverageClusterCoefficient() {
         return GraphMetrics.averageNetworkClusterCoefficient(graph);
     }

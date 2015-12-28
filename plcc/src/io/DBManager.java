@@ -1231,9 +1231,9 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_motif + " (motif_id serial primary key, motiftype_id int not null references " + tbl_motiftype + " ON DELETE CASCADE, motif_name varchar(40), motif_abbreviation varchar(9));");
             doInsertQuery("CREATE TABLE " + tbl_representative_chains + " (pdb_id varchar(4) not null, chain_name varchar(1) not null, PRIMARY KEY(pdb_id, chain_name));");
             
-            doInsertQuery("CREATE TABLE " + tbl_stats_proteingraph + " (statspg_id serial primary key, pg_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, is_for_cc int NOT NULL, num_verts int, num_edges int, min_degree int, max_degree int, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50]);");
-            doInsertQuery("CREATE TABLE " + tbl_stats_complexgraph + " (statscg_id serial primary key, cg_id int not null references " + tbl_complexgraph + " ON DELETE CASCADE, is_for_cc int NOT NULL, num_verts int, num_edges int, min_degree int, max_degree int, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50]);");
-            doInsertQuery("CREATE TABLE " + tbl_stats_aagraph + " (statsaag_id serial primary key, aag_id int not null references " + tbl_aagraph + " ON DELETE CASCADE, is_for_cc int NOT NULL, num_verts int, num_edges int, min_degree int, max_degree int, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50]);");
+            doInsertQuery("CREATE TABLE " + tbl_stats_proteingraph + " (statspg_id serial primary key, pg_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, is_for_cc int NOT NULL, num_verts int, num_edges int, min_degree int, max_degree int, density double precision, avg_degree double precision, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50]);");
+            doInsertQuery("CREATE TABLE " + tbl_stats_complexgraph + " (statscg_id serial primary key, cg_id int not null references " + tbl_complexgraph + " ON DELETE CASCADE, is_for_cc int NOT NULL, num_verts int, num_edges int, min_degree int, max_degree int, density double precision, avg_degree double precision, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50]);");
+            doInsertQuery("CREATE TABLE " + tbl_stats_aagraph + " (statsaag_id serial primary key, aag_id int not null references " + tbl_aagraph + " ON DELETE CASCADE, is_for_cc int NOT NULL, num_verts int, num_edges int, min_degree int, max_degree int, density double precision, avg_degree double precision, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50]);");
                         
             
             /**
@@ -1336,9 +1336,9 @@ public class DBManager {
             doInsertQuery("CREATE VIEW " + view_graphlets + " AS SELECT p.pdb_id, c.chain_name, gt.graphtype_text, gc.graphlet_counts FROM " + tbl_graphletcount + " gc INNER JOIN " + tbl_proteingraph + " g ON gc.graph_id = g.graph_id INNER JOIN " + tbl_chain + " c ON g.chain_id = c.chain_id INNER JOIN " + tbl_protein + " p ON c.pdb_id = p.pdb_id INNER JOIN " + tbl_graphtypes + " gt ON  g.graph_type = gt.graphtype_id;");
             doInsertQuery("CREATE VIEW " + view_chainmotifs + " AS SELECT p.pdb_id, c.chain_name, m.motif_name, mt.motiftype_name FROM " + tbl_nm_chaintomotif + " c2m INNER JOIN " + tbl_motif + " m ON c2m.motif_id = m.motif_id INNER JOIN " + tbl_chain + " c ON c2m.chain_id = c.chain_id INNER JOIN " + tbl_protein + " p ON c.pdb_id = p.pdb_id INNER JOIN plcc_motiftype mt ON m.motiftype_id = mt.motiftype_id;");
             
-            doInsertQuery("CREATE VIEW " + view_pgstats + " AS SELECT p.pdb_id, c.chain_name, gt.graphtype_text, stats.is_for_cc as is_for_cc, stats.num_verts, stats.num_edges, stats.min_degree, stats.max_degree, stats.diameter, stats.radius, stats.num_connected_components, stats.avg_cluster_coeff, stats.avg_shortest_path_length, stats.degreedist FROM " + tbl_stats_proteingraph + " stats INNER JOIN " + tbl_proteingraph + " g ON stats.pg_id = g.graph_id INNER JOIN " + tbl_chain + " c ON g.chain_id = c.chain_id INNER JOIN " + tbl_protein + " p ON c.pdb_id = p.pdb_id INNER JOIN " + tbl_graphtypes + " gt ON  g.graph_type = gt.graphtype_id;");
-            doInsertQuery("CREATE VIEW " + view_cgstats + " AS SELECT cg.pdb_id, stats.is_for_cc as is_for_cc, stats.num_verts, stats.num_edges, stats.min_degree, stats.max_degree, stats.diameter, stats.radius, stats.num_connected_components, stats.avg_cluster_coeff, stats.avg_shortest_path_length, stats.degreedist FROM " + tbl_stats_complexgraph + " stats INNER JOIN " + tbl_complexgraph + " cg ON stats.cg_id = cg.complexgraph_id;");
-            doInsertQuery("CREATE VIEW " + view_aagstats + " AS SELECT aag.pdb_id, aag.chain_description, stats.is_for_cc as is_for_cc, stats.num_verts, stats.num_edges, stats.min_degree, stats.max_degree, stats.diameter, stats.radius, stats.num_connected_components, stats.avg_cluster_coeff, stats.avg_shortest_path_length, stats.degreedist FROM " + tbl_stats_aagraph + " stats INNER JOIN " + tbl_aagraph + " aag ON stats.aag_id = aag.aagraph_id;");            
+            doInsertQuery("CREATE VIEW " + view_pgstats + " AS SELECT p.pdb_id, c.chain_name, gt.graphtype_text, stats.is_for_cc as is_for_cc, stats.num_verts, stats.num_edges, stats.min_degree, stats.max_degree, stats.avg_degree, stats.density, stats.diameter, stats.radius, stats.num_connected_components, stats.avg_cluster_coeff, stats.avg_shortest_path_length, stats.degreedist FROM " + tbl_stats_proteingraph + " stats INNER JOIN " + tbl_proteingraph + " g ON stats.pg_id = g.graph_id INNER JOIN " + tbl_chain + " c ON g.chain_id = c.chain_id INNER JOIN " + tbl_protein + " p ON c.pdb_id = p.pdb_id INNER JOIN " + tbl_graphtypes + " gt ON  g.graph_type = gt.graphtype_id;");
+            doInsertQuery("CREATE VIEW " + view_cgstats + " AS SELECT cg.pdb_id, stats.is_for_cc as is_for_cc, stats.num_verts, stats.num_edges, stats.min_degree, stats.max_degree, stats.avg_degree, stats.density, stats.diameter, stats.radius, stats.num_connected_components, stats.avg_cluster_coeff, stats.avg_shortest_path_length, stats.degreedist FROM " + tbl_stats_complexgraph + " stats INNER JOIN " + tbl_complexgraph + " cg ON stats.cg_id = cg.complexgraph_id;");
+            doInsertQuery("CREATE VIEW " + view_aagstats + " AS SELECT aag.pdb_id, aag.chain_description, stats.is_for_cc as is_for_cc, stats.num_verts, stats.num_edges, stats.min_degree, stats.max_degree, stats.avg_degree, stats.density, stats.diameter, stats.radius, stats.num_connected_components, stats.avg_cluster_coeff, stats.avg_shortest_path_length, stats.degreedist FROM " + tbl_stats_aagraph + " stats INNER JOIN " + tbl_aagraph + " aag ON stats.aag_id = aag.aagraph_id;");            
             
             // add comments on views
             doInsertQuery("COMMENT ON VIEW " + view_ssecontacts + " IS 'Easy overview of SSE contacts.';");
@@ -10947,7 +10947,7 @@ connection.close();
      * @return false if it failed, true otherwise. but see exceptions as well.
      * @throws SQLException if stuff went wrong
      */
-    public static Boolean writeProteingraphStatsToDB(Long graph_db_id, Boolean isForLargestConnectedComponent, Integer num_verts, Integer num_edges, Integer min_degree, Integer max_degree, Integer num_connected_components, Integer diameter, Integer radius, Double avg_cluster_coeff, Double avg_shortest_path_length, Integer[] degreedist) throws SQLException {
+    public static Boolean writeProteingraphStatsToDB(Long graph_db_id, Boolean isForLargestConnectedComponent, Integer num_verts, Integer num_edges, Integer min_degree, Integer max_degree, Integer num_connected_components, Integer diameter, Integer radius, Double avg_cluster_coeff, Double avg_shortest_path_length, Integer[] degreedist, Double avg_degree, Double density) throws SQLException {
         if (graph_db_id < 0) {
             System.err.println("ERROR: writeProteingraphStatsToDB: Invalid graph database id (<0), not writing stats.");
             return (false);
@@ -10955,7 +10955,7 @@ connection.close();
         
         PreparedStatement statement = null;
         Boolean result = false;
-        String query = "INSERT INTO " + tbl_stats_proteingraph + " (pg_id, is_for_cc, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO " + tbl_stats_proteingraph + " (pg_id, is_for_cc, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist, avg_degree, density) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         int is_for_cc = (isForLargestConnectedComponent ? 1 : 0);
         
         try {
@@ -10976,6 +10976,8 @@ connection.close();
             if(avg_cluster_coeff == null) { statement.setNull(10, java.sql.Types.DOUBLE); } else { statement.setDouble(10, avg_cluster_coeff); }
             if(avg_shortest_path_length == null) { statement.setNull(11, java.sql.Types.DOUBLE); } else { statement.setDouble(11, avg_shortest_path_length); }
             statement.setArray(12, sqlArray);
+            if(avg_degree == null) { statement.setNull(13, java.sql.Types.DOUBLE); } else { statement.setDouble(13, avg_degree); }
+            if(density == null) { statement.setNull(14, java.sql.Types.DOUBLE); } else { statement.setDouble(14, density); }
                                 
             statement.executeUpdate();
             //dbc.commit();
@@ -11018,7 +11020,7 @@ connection.close();
      * @return false if it failed, true otherwise. but see exceptions as well.
      * @throws SQLException if stuff went wrong
      */
-    public static Boolean writeComplexgraphStatsToDB(Long graph_db_id, Boolean isForLargestConnectedComponent, Integer num_verts, Integer num_edges, Integer min_degree, Integer max_degree, Integer num_connected_components, Integer diameter, Integer radius, Double avg_cluster_coeff, Double avg_shortest_path_length, Integer[] degreedist) throws SQLException {
+    public static Boolean writeComplexgraphStatsToDB(Long graph_db_id, Boolean isForLargestConnectedComponent, Integer num_verts, Integer num_edges, Integer min_degree, Integer max_degree, Integer num_connected_components, Integer diameter, Integer radius, Double avg_cluster_coeff, Double avg_shortest_path_length, Integer[] degreedist, Double avg_degree, Double density) throws SQLException {
         if (graph_db_id < 0) {
             System.err.println("ERROR: writeComplexgraphStatsToDB: Invalid graph database id (<0), not writing stats.");
             return (false);
@@ -11026,7 +11028,7 @@ connection.close();
         
         PreparedStatement statement = null;
         Boolean result = false;
-        String query = "INSERT INTO " + tbl_stats_complexgraph + " (cg_id, is_for_cc, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO " + tbl_stats_complexgraph + " (cg_id, is_for_cc, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist, avg_degree, density) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?);";
         int is_for_cc = (isForLargestConnectedComponent ? 1 : 0);
         
         try {
@@ -11047,6 +11049,8 @@ connection.close();
             if(avg_cluster_coeff == null) { statement.setNull(10, java.sql.Types.DOUBLE); } else { statement.setDouble(10, avg_cluster_coeff); }
             if(avg_shortest_path_length == null) { statement.setNull(11, java.sql.Types.DOUBLE); } else { statement.setDouble(11, avg_shortest_path_length); }
             statement.setArray(12, sqlArray);
+            if(avg_degree == null) { statement.setNull(13, java.sql.Types.DOUBLE); } else { statement.setDouble(13, avg_degree); }
+            if(density == null) { statement.setNull(14, java.sql.Types.DOUBLE); } else { statement.setDouble(14, density); }
                                 
             statement.executeUpdate();
             //dbc.commit();
@@ -11089,7 +11093,7 @@ connection.close();
      * @return false if it failed, true otherwise. but see exceptions as well.
      * @throws SQLException if stuff went wrong
      */
-    public static Boolean writeAminoacidgraphStatsToDB(Long graph_db_id, Boolean isForLargestConnectedComponent, Integer num_verts, Integer num_edges, Integer min_degree, Integer max_degree, Integer num_connected_components, Integer diameter, Integer radius, Double avg_cluster_coeff, Double avg_shortest_path_length, Integer[] degreedist) throws SQLException {
+    public static Boolean writeAminoacidgraphStatsToDB(Long graph_db_id, Boolean isForLargestConnectedComponent, Integer num_verts, Integer num_edges, Integer min_degree, Integer max_degree, Integer num_connected_components, Integer diameter, Integer radius, Double avg_cluster_coeff, Double avg_shortest_path_length, Integer[] degreedist, Double avg_degree, Double density) throws SQLException {
         if (graph_db_id < 0) {
             System.err.println("ERROR: writeAminoacidgraphStatsToDB: Invalid graph database id (<0), not writing stats.");
             return (false);
@@ -11097,7 +11101,7 @@ connection.close();
         
         PreparedStatement statement = null;
         Boolean result = false;
-        String query = "INSERT INTO " + tbl_stats_aagraph + " (aag_id, is_for_cc, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO " + tbl_stats_aagraph + " (aag_id, is_for_cc, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist, avg_degree, density) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?);";
         int is_for_cc = (isForLargestConnectedComponent ? 1 : 0);
         
         try {
@@ -11116,8 +11120,10 @@ connection.close();
             if(diameter == null) {statement.setNull(8, java.sql.Types.INTEGER); } else { statement.setInt(8, diameter); }
             if(radius == null) { statement.setNull(9, java.sql.Types.INTEGER); } else { statement.setInt(9, radius); }
             if(avg_cluster_coeff == null) { statement.setNull(10, java.sql.Types.DOUBLE); } else { statement.setDouble(10, avg_cluster_coeff); }
-            if(avg_shortest_path_length == null) { statement.setNull(11, java.sql.Types.DOUBLE); } else { statement.setDouble(11, avg_shortest_path_length); }
+            if(avg_shortest_path_length == null) { statement.setNull(11, java.sql.Types.DOUBLE); } else { statement.setDouble(11, avg_shortest_path_length); }            
             statement.setArray(12, sqlArray);
+            if(avg_degree == null) { statement.setNull(13, java.sql.Types.DOUBLE); } else { statement.setDouble(13, avg_degree); }
+            if(density == null) { statement.setNull(14, java.sql.Types.DOUBLE); } else { statement.setDouble(14, density); }
                                 
             statement.executeUpdate();
             //dbc.commit();
