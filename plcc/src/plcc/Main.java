@@ -224,6 +224,7 @@ public class Main {
         ArrayList<Model> models = new ArrayList<Model>();
         ArrayList<Chain> chains = new ArrayList<Chain>();
         List<Residue> residues = new ArrayList<Residue>();
+        List<Residue> residuesWithoutLigands = new ArrayList<Residue>();
         HashMap<Character, ArrayList<Integer>> sulfurBridges = new HashMap<Character, ArrayList<Integer>>();
         ArrayList<Atom> atoms = new ArrayList<Atom>();
         ArrayList<SSE> dsspSSEs = new ArrayList<SSE>();
@@ -2123,10 +2124,31 @@ public class Main {
                     //    if(r.isOtherRes()) {System.out.println("##########OTHER! type="+ r.getType() ); }
                     //    else { System.out.println("###########SSE: " + r.getNonEmptySSEString() + " type=" + r.getType()); }
                     //}
-
-                    AAGraph aag = new AAGraph(residues, cInfo);
+                    residuesWithoutLigands = new ArrayList<>();
+                    AAGraph aag;
+                    
+                    Boolean skipLigandsForAAGraphs = Boolean.TRUE;
+                    if(skipLigandsForAAGraphs) {
+                        for(Residue r : residues) {
+                            if(r.isAA()) { residuesWithoutLigands.add(r); }
+                        }
+                        aag = new AAGraph(residuesWithoutLigands, cInfo);
+                    }
+                    else {
+                        aag = new AAGraph(residues, cInfo);
+                    }
                     aag.setPdbid(pdbid);
                     aag.setChainid(AAGraph.CHAINID_ALL_CHAINS);
+                    
+                    //DEBUG
+                    /*
+                    int reportMinDegree = 15;
+                    for(int i = 0; i < aag.getNumVertices(); i++) {
+                        if(aag.getVertexDegree(i) >= reportMinDegree) {
+                            DP.getInstance().i("Main", "Reporting AAG vertex with high degree " + aag.getVertexDegree(i) + ": " + aag.getVertex(i).getFancyName());
+                        }
+                    }
+                    */
                     
                     // ###TEST-AAG-METRICS --- now computed and written to DB below
                     /*
