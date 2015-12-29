@@ -67,7 +67,7 @@ public class SparseGraph<V, E> implements SimpleGraphInterface {
     
     /**
      * Returns the edge name string for the edge info HashMap. Used internally only.
-     * @param i the vertex i by index
+     * @param i the vertex neighbourIndex by index
      * @param j the vertex j by index
      * @return the edge name
      */
@@ -77,8 +77,8 @@ public class SparseGraph<V, E> implements SimpleGraphInterface {
     
     
     /**
-     * Adds an edge between the vertices at indices i and j.
-     * @param i the vertex i by index
+     * Adds an edge between the vertices at indices neighbourIndex and j.
+     * @param i the vertex neighbourIndex by index
      * @param j the vertex j by index 
      * @param e the edge info
      */ 
@@ -111,12 +111,83 @@ public class SparseGraph<V, E> implements SimpleGraphInterface {
         return idx;
     }
     
+    public void addVertex(V v) {
+        this.vertices.add(v);
+        this.edges.add(new ArrayList<Integer>());
+    }
+    
+    public Boolean deleteVertex(int idx) {
+        
+        if( ! this.hasVertexWithIndex(idx)) {
+            return false;
+        }
+        
+        // delete edges first
+        int numNeighbors = this.neighborsOf(idx).size();
+        for(int i = (numNeighbors - 1); i >= 0; i--) {
+            deleteEdge(idx, i);            
+        }
+        
+        // ... now the vert
+        this.vertices.remove(idx);
+        
+        // now remove the adjacency list of the vertex
+        this.edges.remove(idx);
+        
+        // now fix all edges (and the edgeInfo objects) which point to wrong (changed) vertex indices. These are the edges which involve at least one vertex with index >= the deleted one.
+        for(int i = 0; i < this.edges.size(); i++) {
+            List<Integer> adjList = this.edges.get(i);
+            for(int j = 0; j < adjList.size(); j++) {
+               int neighborIndex = adjList.get(j);
+               
+               
+               if(neighborIndex >= idx) {
+                   // fix the edge
+                   adjList.set(j, (neighborIndex - 1));
+                   
+                   // fix the edge info
+                    E e = this.getEdgeInfo(i, neighborIndex);
+                    this.deleteEdgeInfo(i, neighborIndex);
+                    this.setEdgeInfo(i, neighborIndex-1, e);
+               }                              
+            }
+        }
+        
+        return true;
+    }
     
     /**
-     * Checks whether an edge exists between the vertices at index i and j.
-     * @param i the vertex i by index
+     * Deletes an edge by index, also taking care of the edge info.
+     * @param i first index
+     * @param j 2nd index
+     * @return true if the edge existed and was removed, false otherwise
+     */
+    public Boolean deleteEdge(int i, int j) {
+        if( ! this.hasEdge(i, j)) {
+            return false;
+        }
+        
+        if(this.edges.get(i).contains(j)) {
+            //System.out.println("deleteEdge("+i+","+j+"): edge list for "+i+": " + IO.intListToString(this.edges.get(i)));
+            int idxj = this.edges.get(i).indexOf(j);
+            Integer removedObject = this.edges.get(i).remove(idxj);            
+        }
+        
+        if(this.edges.get(j).contains(i)) {
+            //System.out.println("deleteEdge("+i+","+j+"): edge list for "+j+": " + IO.intListToString(this.edges.get(j)));
+            int idxi = this.edges.get(j).indexOf(i);
+            Integer removedObject = this.edges.get(j).remove(idxi);
+        }
+        
+        deleteEdgeInfo(i, j);
+        return true;
+    }
+    
+    /**
+     * Checks whether an edge exists between the vertices at index neighbourIndex and j.
+     * @param i the vertex neighbourIndex by index
      * @param j the vertex j by index
-     * @return true if i and j are adjacent, false otherwise
+     * @return true if neighbourIndex and j are adjacent, false otherwise
      */ 
     public boolean hasEdge(int i, int j) {
         return this.edges.get(i).contains(j);
@@ -134,19 +205,23 @@ public class SparseGraph<V, E> implements SimpleGraphInterface {
     }
     
     /**
-     * Retuns the EdgeInfo for the edge between vertices at indices i and j
-     * @param i the vertex i by index
+     * Returns the EdgeInfo for the edge between vertices at indices neighbourIndex and j
+     * @param i the vertex neighbourIndex by index
      * @param j the vertex j by index
-     * @return the EdgeInfo for the edge between vertices at indices i and j
+     * @return the EdgeInfo for the edge between vertices at indices neighbourIndex and j
      */
     public E getEdgeInfo(int i, int j) {
         return this.edgeInfo.get(this.getEdgeName(i, j));
     }
     
+    private void deleteEdgeInfo(int i, int j) {
+        this.edgeInfo.remove(this.getEdgeName(i, j));
+    }
+    
     
     /**
-     * Sets the EdgeInfo for the edge between vertices at indices i and j. Note that the edge has to exist already.
-     * @param i the vertex i by index
+     * Sets the EdgeInfo for the edge between vertices at indices neighbourIndex and j. Note that the edge has to exist already.
+     * @param i the vertex neighbourIndex by index
      * @param j the vertex j by index
      * @param e the EdgeInfo
      * @return true if such and edge exists and the data was set, false otherwise
@@ -182,9 +257,9 @@ public class SparseGraph<V, E> implements SimpleGraphInterface {
     
     
     /**
-     * Returns the degree of vertex at index i.
+     * Returns the degree of vertex at index neighbourIndex.
      * @param vIndex the vertex index
-     * @return the vertex degree, i.e., the number of vertices adjacent to i
+     * @return the vertex degree, neighbourIndex.adjList., the number of vertices adjacent to neighbourIndex
      */
     public int getVertexDegree(int vIndex) {
         return this.edges.get(vIndex).size();
@@ -193,7 +268,7 @@ public class SparseGraph<V, E> implements SimpleGraphInterface {
     
     /**
      * Returns a list of edges in this graph. Each integer array (of length 2) in the returned list holds
-     * the indices of a pair of adjacent vertices.
+     * the indices of a pair of adjacent vertices. (Do not try to modify the list to modify the edges of the graph, it is a copy.)
      * @return a list of vertex pairs given by their indices which are neighbors
      */
     public ArrayList<Integer[]> getEdgeListIndex() {
@@ -252,6 +327,44 @@ public class SparseGraph<V, E> implements SimpleGraphInterface {
         return null;
     }
 
-    
+    public static void main(String[] args) {
+        SparseGraph<String, String> g = new SparseGraph<>();
+        SimpleGraphDrawer gd;
+        g.addVertex("0");
+        g.addVertex("1");
+        g.addVertex("2");
+        g.addVertex("3");
+        
+        gd = new SimpleGraphDrawer(g);
+        System.out.println("Graph 1:\n" + gd.getGraphConsoleDrawing());
+        
+        g.addEdge(0, 1, "a");
+        g.addEdge(1, 2, "b");
+        g.addEdge(2, 3, "c");
+        g.addEdge(3, 0, "d");
+        
+        gd = new SimpleGraphDrawer(g);
+        System.out.println("Graph 2:\n" + gd.getGraphConsoleDrawing());
+        
+        g.addEdge(1, 3, "e");
+        
+        gd = new SimpleGraphDrawer(g);
+        System.out.println("Graph 3:\n" + gd.getGraphConsoleDrawing());
+        
+        g.deleteVertex(2);
+        
+        gd = new SimpleGraphDrawer(g);
+        System.out.println("Graph 4:\n" + gd.getGraphConsoleDrawing());
+        
+        g.deleteEdge(0, 2);
+        
+        gd = new SimpleGraphDrawer(g);
+        System.out.println("Graph 5:\n" + gd.getGraphConsoleDrawing());
+        
+        g.deleteVertex(1);
+        
+        gd = new SimpleGraphDrawer(g);
+        System.out.println("Graph 6:\n" + gd.getGraphConsoleDrawing());
+    }
     
 }
