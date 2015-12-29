@@ -79,6 +79,10 @@ public class GraphProperties {
         return GraphMetrics.averageNetworkClusterCoefficient(graph);
     }
     
+    public Double getMaximumNetworkClusterCoefficient() {
+        return GraphMetrics.maximumNetworkClusterCoefficient(graph);
+    }
+    
     public Integer[] getDegreeDistributionUpTo(int m) {
         return GraphMetrics.getDegreeDistributionUpTo(graph, m);
     }

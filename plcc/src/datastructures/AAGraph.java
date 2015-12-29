@@ -14,6 +14,7 @@ import graphformats.IGraphModellingLanguageFormat;
 import java.util.List;
 import proteingraphs.ResContactInfo;
 import proteinstructure.Residue;
+import tools.DP;
 
 /**
  * An undirected, adjacency list based amino acid graph. Suitable for large, sparse graphs. 
@@ -284,7 +285,26 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
                 }
             }
             else {
-                System.err.println("WARNING: Could not add edge from ResContactInfo, vertices " + resA.getFancyName() + " and/or " + resB.getFancyName() + " not found in graph (this is OK for non-standard residue types and ligands).");
+                Boolean notFoundIsorAreLigands = Boolean.FALSE;
+                StringBuilder sb = new StringBuilder();
+                sb.append("addEdgeFromRCI: Could not add edge from ResContactInfo between vertices " + resA.getFancyName() + " and " + resB.getFancyName() + ".");
+                if(indexResA < 0 && indexResB < 0) {
+                    sb.append(" BOTH residues not found.\n");
+                    if( (! resA.isAA()) && (! resB.isAA())) { notFoundIsorAreLigands = Boolean.TRUE; }
+                }
+                else {
+                    if(indexResA < 0) {
+                        sb.append(" FIRST residue not found.\n");
+                        if( ! resA.isAA() ) { notFoundIsorAreLigands = Boolean.TRUE; }
+                    }
+                    else {  // indexResA < 0
+                        sb.append(" SECOND residue not found.\n");
+                        if( ! resB.isAA() ) { notFoundIsorAreLigands = Boolean.TRUE; }
+                    }
+                }
+                if( ! notFoundIsorAreLigands) { // only warn for non-ligand residues which were not found.
+                    DP.getInstance().w("AAGraph", sb.toString());
+                }                
                 return false;
             }
         }

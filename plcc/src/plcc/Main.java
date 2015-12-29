@@ -2208,6 +2208,7 @@ public class Main {
                                     //System.out.println("Found aa graph " + pdbid + ".");
                                     // write graph properties
                                     DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.FALSE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity(), gp.getCumulativeDegreeDistributionUpToAsArray(50));
+                                    //System.out.println("max CC is: " + gp.getMaximumNetworkClusterCoefficient());
                                     // write properties of largest CC of graph
                                     DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.TRUE, sgp.getNumVertices(), sgp.getNumEdges(), sgp.getMinDegree(), sgp.getMaxDegree(), sgp.getConnectedComponents().size(), sgp.getGraphDiameter(), sgp.getGraphRadius(), sgp.getAverageClusterCoefficient(), sgp.getAverageShortestPathLength(), sgp.getDegreeDistributionUpTo(50), sgp.getAverageDegree(), sgp.getDensity(), sgp.getCumulativeDegreeDistributionUpToAsArray(50));
                                 }

@@ -72,6 +72,28 @@ public class GraphMetrics {
         return ancc / numVerts.doubleValue();
     }
     
+    /**
+     * Computes the average network cluster coefficient of g, i.e., the average of all local cluster coefficients of the vertices.
+     * @param g a graph
+     * @return the average network cluster coefficient of g. Note that this is NOT the same as the global CC. Also note that null is returned if the graph is empty.
+     */
+    public static Double maximumNetworkClusterCoefficient(SimpleGraphInterface g) {
+        if(g.getSize() == 0) {
+            return null;
+        }
+        
+        Double max_cc = .0d;
+        for(int i = 0; i < g.getSize(); i++) {
+            Double lcc = GraphMetrics.localClusteringCoefficientUndirected(g, i);
+            if(lcc != null) {
+                if(lcc >= max_cc) {
+                    max_cc = lcc;
+                }
+            }
+        }
+        return max_cc;
+    }
+    
     
     /**
      * Gives degree distribution as array, from degree 0 to (maxDegreeExclusive - 1).
