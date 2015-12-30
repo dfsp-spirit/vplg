@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
@@ -316,11 +317,11 @@ public class IO {
     
     
     /**
-     * Debug function to get a string representation of a HashMap.
-     * @param map the HashMap
+     * Debug function to get a string representation of a Map.
+     * @param map theMap
      * @return the string
      */
-    public static String hashMapToString(HashMap<Integer, Integer> map) {
+    public static String mapIntegerToString(Map<Integer, Integer> map) {
         StringBuilder sb = new StringBuilder();
         for(Entry e : map.entrySet()) {
             sb.append(e.getKey()).append("=>").append(e.getValue()).append(" ");
@@ -329,11 +330,11 @@ public class IO {
     }
     
     /**
-     * Debug function to get a string representation of a HashSet.
-     * @param set the HashSet
+     * Debug function to get a string representation of a Set.
+     * @param set the Set
      * @return the string
      */
-    public static String hashSetToString(HashSet<Integer> set) {
+    public static String setIntegerToString(Set<Integer> set) {
         StringBuilder sb = new StringBuilder();
         for(Integer i : set) {
             sb.append(i).append(" ");

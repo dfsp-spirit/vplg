@@ -334,7 +334,7 @@ public class PTGLNotations {
                 }
                 
                 if(verbose) {
-                    System.out.println("  pos: " + IO.hashMapToString(pos));
+                    System.out.println("  pos: " + IO.mapIntegerToString(pos));
                 }
                 
                 //#########################################################################
@@ -404,7 +404,7 @@ public class PTGLNotations {
                     
                     if(adjverbose) {
                         System.out.println("    Fold#" + foldNum + "  ===== At iteration #" + numIterations + ", adjcur=" + adjcur + ". adjvisited.size()=" + adjvisited.size() + ", ccVerts.size()=" + ccVerts.size() + ", finished=" + fin + ". =====");
-                        System.out.println("    adjvisited (" + adjvisited.size() + " of " + ccVerts.size() + "): " + IO.hashSetToString(adjvisited));                        
+                        System.out.println("    adjvisited (" + adjvisited.size() + " of " + ccVerts.size() + "): " + IO.setIntegerToString(adjvisited));                        
                     }                    
                     numIterations++;
                     
@@ -823,7 +823,7 @@ public class PTGLNotations {
                     if(keyverbose) {
                         System.out.println("    KEY starts. keyorder=" + IO.intListToString(keyorder) + ".");
                         System.out.println("      keypos=" + IO.intListToString(keypos) + ".");
-                        System.out.println("      tvertex=" + IO.hashMapToString(tvertex) + ".");
+                        System.out.println("      tvertex=" + IO.mapIntegerToString(tvertex) + ".");
                     }
                     
                     if(isMultiSSETypeGraph) {

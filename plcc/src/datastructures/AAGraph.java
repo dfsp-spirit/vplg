@@ -12,6 +12,7 @@ import java.util.Arrays;
 import proteinstructure.AminoAcid;
 import graphformats.IGraphModellingLanguageFormat;
 import java.util.List;
+import java.util.Set;
 import proteingraphs.ResContactInfo;
 import proteinstructure.Residue;
 import tools.DP;
@@ -321,6 +322,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
      *  See http://www.fim.uni-passau.de/fileadmin/files/lehrstuhl/brandenburg/projekte/gml/gml-technical-report.pdf for the publication 
      * and http://en.wikipedia.org/wiki/Graph_Modelling_Language for a brief description.
      * 
+     * @return the GML string
      */
     @Override
     public String toGraphModellingLanguageFormat() {
@@ -427,5 +429,13 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
 
     public final void setChainid(String chainid) {
         this.chainid = chainid;
+    }
+    
+    public List<Residue> getResiduesFromSetByIndex(Set<Integer> vertIndices) {
+        List<Residue> l = new ArrayList<>();
+        for(int index : vertIndices) {
+            l.add(this.vertices.get(index));
+        }
+        return l;
     }
 }

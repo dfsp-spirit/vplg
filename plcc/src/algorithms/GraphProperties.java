@@ -166,6 +166,24 @@ public class GraphProperties {
     
     
     /**
+     * Determines the set of all vertices which have maximum eccentricity (at least 2).
+     * @return the set of all vertices which have maximum eccentricity
+     */
+    public Set<Integer> determineMaxEccVertexSet(){
+        return gd.determineMaxEccVertexSet();
+    }
+    
+    /**
+     * Determines the set of all vertices which have at least the given eccentricity.
+     * @param minEcc the eccentricity
+     * @return the set of all vertices which have at least the given eccentricity
+     */
+    public Set<Integer> determineVertexSetWithEccAtLeast(int minEcc) {
+        return gd.determineVertexSetWithEccAtLeast(minEcc);
+    }
+    
+    
+    /**
      * Checks whether the graph is connected, i.e., every vertex is reachable from every other vertex
      * @return whether the graph is connected
      */

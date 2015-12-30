@@ -2140,30 +2140,7 @@ public class Main {
                     aag.setPdbid(pdbid);
                     aag.setChainid(AAGraph.CHAINID_ALL_CHAINS);
                     
-                    //DEBUG
-                    /*
-                    int reportMinDegree = 15;
-                    for(int i = 0; i < aag.getNumVertices(); i++) {
-                        if(aag.getVertexDegree(i) >= reportMinDegree) {
-                            DP.getInstance().i("Main", "Reporting AAG vertex with high degree " + aag.getVertexDegree(i) + ": " + aag.getVertex(i).getFancyName());
-                        }
-                    }
-                    */
                     
-                    // ###TEST-AAG-METRICS --- now computed and written to DB below
-                    /*
-                    if(Settings.getBoolean("plcc_B_compute_graph_metrics")) {
-                        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of AAG %%%%%%%%%%%%%%%%%%%%%%%%%");
-                        ConnectedComponents cc = new ConnectedComponents(aag);
-                        List<SimpleGraphInterface> conCompsOfCG = cc.get();
-                        SimpleGraphInterface cgSubgraph = cc.getLargest();
-                        Map<Integer, Integer> degreeDistrGraph = GraphMetrics.degreeDistribution(aag, false);
-                        Map<Integer, Integer> degreeDistrLargestCC = GraphMetrics.degreeDistribution(cgSubgraph, false);
-                        System.out.println("AAGraph has size " + aag.getSize());
-                        System.out.println("Largest CC has size " + cgSubgraph.getSize());
-                        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%% Computing CCs of AAG %%%%%%%%%%%%%%%%%%%%%%%%%");
-                    }
-                    */
 
                     String subDirTree = "";
                     if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
@@ -2208,6 +2185,13 @@ public class Main {
                                     //System.out.println("Found aa graph " + pdbid + ".");
                                     // write graph properties
                                     DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.FALSE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity(), gp.getCumulativeDegreeDistributionUpToAsArray(50));
+                                    
+                                    // determine and print max ecc vertex set, for thesis only
+                                    //Set<Integer> s = gp.determineMaxEccVertexSet(); System.out.println("Max ECC vertices: " + IO.setIntegerToString(s) + ".");
+                                    //  Set<Integer> s = gp.determineVertexSetWithEccAtLeast(12);
+                                    //List<Residue> l = aag.getResiduesFromSetByIndex(s);
+                                    //System.out.println("Pymol select script for " + l.size() + " residues: '" + Main.getPymolSelectionScriptForResidues(l) + "'.");
+                                    
                                     //System.out.println("max CC is: " + gp.getMaximumNetworkClusterCoefficient());
                                     // write properties of largest CC of graph
                                     DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.TRUE, sgp.getNumVertices(), sgp.getNumEdges(), sgp.getMinDegree(), sgp.getMaxDegree(), sgp.getConnectedComponents().size(), sgp.getGraphDiameter(), sgp.getGraphRadius(), sgp.getAverageClusterCoefficient(), sgp.getAverageShortestPathLength(), sgp.getDegreeDistributionUpTo(50), sgp.getAverageDegree(), sgp.getDensity(), sgp.getCumulativeDegreeDistributionUpToAsArray(50));
@@ -5805,6 +5789,36 @@ public class Main {
 
         script = scriptProt + "\n" + scriptLig;
         return(script);
+    }
+    
+    /**
+     * Generates a script for the PyMol protein visualization software that selects all ligands and the residues they are in contact with
+     * according to the residue contact calculations of this program.
+     * @param protRes the protein residues
+     * @return the script as a single string. note that the string may consist of multiple lines.
+     */
+    public static String getPymolSelectionScriptForResidues(List<Residue> protRes) {
+
+
+        StringBuilder scriptProt = new StringBuilder();
+
+        
+        // Handle protein residues
+        if(protRes.isEmpty()) {
+            scriptProt.append("select none");
+        } else {
+
+            scriptProt.append("select prot_res, resi ");
+            for(Integer j = 0; j < protRes.size(); j++) {
+                scriptProt.append(protRes.get(j).getPdbResNum());
+
+                if(j < (protRes.size() - 1)) {
+                    scriptProt.append("+");
+                }
+            }
+        }       
+
+        return(scriptProt.toString());
     }
 
 

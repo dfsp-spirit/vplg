@@ -8,10 +8,13 @@
 package algorithms;
 
 import datastructures.SimpleGraphInterface;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import proteingraphs.ProtGraph;
 import proteingraphs.ProtGraphs;
 
@@ -27,12 +30,13 @@ public class GraphDistances {
     protected Integer[ ][ ] distMatrix;           // distances of the vertices within this graph
     private Boolean setInfinityDistancesToMinusOne = false;
     private static Integer DISTANCE_INFINITY = Integer.MAX_VALUE;
+    protected Set<Integer> verticesOfMaxEccentricity;
     private Boolean graphIsConnected;
     
     public GraphDistances(SimpleGraphInterface g) {
         this.g = g;
         this.alreadyComputed = false;
-        this.graphIsConnected = null;
+        this.graphIsConnected = null;        
     }
     
     
@@ -150,9 +154,51 @@ public class GraphDistances {
         this.graphIsConnected = result;
     }
     
+    /**
+     * Determines the set of all vertices which have maximum eccentricity.
+     * @return the set of all vertices which have maximum eccentricity
+     */
+    public Set<Integer> determineMaxEccVertexSet() {
+        if(this.verticesOfMaxEccentricity == null) {
+            this.verticesOfMaxEccentricity = new HashSet<>();
+            Integer maxEcc = this.getGraphDiameter();
+            Integer ecc;
+            
+            for(int i = 0; i < g.getSize(); i++) {
+                ecc = getEccentricityOfVertex(i);
+                if(ecc != null) {
+                    if(ecc.equals(maxEcc)) {
+                        this.verticesOfMaxEccentricity.add(i);
+                    }
+                }
+            }
+        }                
+        return this.verticesOfMaxEccentricity;
+    }
     
     /**
-     * The eccentricity e(v) of a vertex v is the greatest distance between v and any other vertex. If the graph is not connected, it is null for every vertex.
+     * Determines the set of all vertices which have at least the given eccentricity.
+     * @param minEcc the eccentricity
+     * @return the set of all vertices which have at least the given eccentricity
+     */
+    public Set<Integer> determineVertexSetWithEccAtLeast(int minEcc) {
+        Set<Integer> v = new HashSet<>();
+        Integer ecc;
+
+        for(int i = 0; i < g.getSize(); i++) {
+            ecc = getEccentricityOfVertex(i);
+            if(ecc != null) {
+                if(ecc >= minEcc) {
+                    v.add(i);
+                }
+            }
+        }
+
+        return v;
+    }
+    
+    /**
+     * The eccentricity ecc(v) of a vertex v is the greatest distance between v and any other vertex. If the graph is not connected, it is null for every vertex.
      * @param v the vertex, by index
      * @return the eccentricity or null if not defined
      */
@@ -169,20 +215,20 @@ public class GraphDistances {
         this.determineWhetherGraphIsConnected();
         if(this.graphIsConnected) {
                 
-            Integer e = 0;
+            Integer ecc = 0;
             for(int i = 0; i < g.getSize(); i++) {
                 if(i == v) {
                     continue;
                 }
-                if(distMatrix[i][v] > e) {
-                    e = distMatrix[i][v];
+                if(distMatrix[i][v] > ecc) {
+                    ecc = distMatrix[i][v];
                 }
             }
             
-            if(e.equals(0)) {
+            if(ecc.equals(0)) {
                 return null;
-            }
-            return e;
+            }                        
+            return ecc;
             
         }
         else {
