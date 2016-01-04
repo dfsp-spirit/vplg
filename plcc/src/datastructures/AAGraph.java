@@ -128,7 +128,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
             Arrays.fill(matrix[i], 0);
         }
         
-        ArrayList<Integer[]> allEdges = this.getEdgeListIndex();
+        List<Integer[]> allEdges = this.getEdgeListIndex();
         int numIgnored = 0;
         for(Integer[] edge : allEdges) {
             Integer resAPtglAAtype = this.vertices.get(edge[0]).getInternalAAID();
@@ -229,7 +229,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         
         // print the edges with labels -- an edge label is the number of contacts between AAs of the given types
         Integer src, tgt, numContacts;
-        ArrayList<Integer[]> allEdges = this.getEdgeListIndex();
+        List<Integer[]> allEdges = this.getEdgeListIndex();
         for(Integer i = 1; i < matrix.length; i++) {
             for(Integer j = 1; j < matrix[0].length; j++) {
                 src = i;
@@ -375,7 +375,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         
         // print all edges
         Integer src, tgt;
-        ArrayList<Integer[]> allEdges = this.getEdgeListIndex();
+        List<Integer[]> allEdges = this.getEdgeListIndex();
         for(Integer[] edge : allEdges) {
             src = edge[0];
             tgt = edge[1];

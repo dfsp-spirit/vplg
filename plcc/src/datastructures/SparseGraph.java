@@ -282,7 +282,7 @@ public class SparseGraph<V, E> implements SimpleGraphInterface, IMutableGraph<V>
      * the indices of a pair of adjacent vertices. (Do not try to modify the list to modify the edges of the graph, it is a copy.)
      * @return a list of vertex pairs given by their indices which are neighbors
      */
-    public ArrayList<Integer[]> getEdgeListIndex() {
+    public List<Integer[]> getEdgeListIndex() {
         ArrayList<Integer[]> allEdges = new ArrayList<Integer[]>();
         for(int i = 0; i < this.edges.size(); i++) {
             for(int j = 0; j < this.edges.get(i).size(); j++) {
