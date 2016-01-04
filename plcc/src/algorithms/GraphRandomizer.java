@@ -55,10 +55,16 @@ public class GraphRandomizer {
             int edgeTo = GraphRandomizer.getRandomVertex(g);
             if(rnd.nextBoolean()) {
                 // keep start vertex identical
+                while(g.containsEdge(e[0], edgeTo)) {   // ensure we really need a new edge, the one we intend to create may already exist
+                    edgeTo = GraphRandomizer.getRandomVertex(g);
+                }
                 g.addEdge(e[0], edgeTo, null);
             }
             else {
                 // keep target vertex identical
+                while(g.containsEdge(edgeTo, e[0])) {   // ensure we really need a new edge, the one we intend to create may already exist
+                    edgeTo = GraphRandomizer.getRandomVertex(g);
+                }
                 g.addEdge(edgeTo, e[0], null);
             }
         }
