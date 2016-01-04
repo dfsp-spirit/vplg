@@ -207,4 +207,25 @@ public class GraphProperties {
         return cc.getLargest();
     }
     
+    
+    /**
+     * Creates an overview string with the most important props, testing only function.
+     * @return an overview string with the most important props of g
+     */
+    public String getOverviewPropsString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("numVerts: ").append(this.getNumVertices()).append("\n");
+        sb.append("numEdges: ").append(this.getNumEdges()).append("\n");
+        sb.append("diameter: ").append(this.getGraphDiameter()).append("\n");
+        sb.append("radius: ").append(this.getGraphRadius()).append("\n");
+        sb.append("aSPL: ").append(this.getAverageShortestPathLength()).append("\n");
+        sb.append("ClC: ").append(this.getAverageClusterCoefficient()).append("\n");
+        sb.append("avgDegree: ").append(this.getAverageDegree()).append("\n");
+        sb.append("maxDegree: ").append(this.getMaxDegree()).append("\n");
+        sb.append("minDegree: ").append(this.getMinDegree()).append("\n");
+        sb.append("density: ").append(this.getDensity()).append("\n");
+        sb.append("numCC: ").append(this.getConnectedComponents().size()).append("\n");                                
+        return sb.toString();
+    }
+    
 }

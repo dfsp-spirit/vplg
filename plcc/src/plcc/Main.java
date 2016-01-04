@@ -41,6 +41,7 @@ import proteinstructure.Atom;
 import proteinstructure.SSE;
 import algorithms.GraphMetrics;
 import algorithms.GraphProperties;
+import algorithms.GraphRandomizer;
 import datastructures.AAGraph;
 import datastructures.AAInteractionNetwork;
 import datastructures.SimpleGraphInterface;
@@ -2169,7 +2170,8 @@ public class Main {
                     } 
 
                     
-                    if(Settings.getBoolean("plcc_B_compute_graph_metrics")) {                                            
+                    if(Settings.getBoolean("plcc_B_compute_graph_metrics")) {    
+                        aag.selfCheck();
                         GraphProperties gp = new GraphProperties(aag);
                         GraphProperties sgp = new GraphProperties(gp.getLargestConnectedComponent());
 
@@ -2185,6 +2187,13 @@ public class Main {
                                     //System.out.println("Found aa graph " + pdbid + ".");
                                     // write graph properties
                                     DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.FALSE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity(), gp.getCumulativeDegreeDistributionUpToAsArray(50));
+                                    
+                                    System.out.println("###TEST-GP-BEFORE: " + gp.getOverviewPropsString() + "###");
+                                    aag.selfCheck();
+                                    GraphRandomizer gr = new GraphRandomizer(aag, 1.0);
+                                    GraphProperties gp_rand = new GraphProperties(aag); // now changed
+                                    System.out.println("###TEST-GP-AFTER: " + gp_rand.getOverviewPropsString() + "###");
+                                    aag.selfCheck();
                                     
                                     // determine and print max ecc vertex set, for thesis only
                                     //Set<Integer> s = gp.determineMaxEccVertexSet(); System.out.println("Max ECC vertices: " + IO.setIntegerToString(s) + ".");

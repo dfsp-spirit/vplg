@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Randomizes (rewires) the edges of the given graph with the given probability.
+ * Randomizes (rewires) the edges of the given graph with the given probability. Changes the input graph!
  * @author spirit
  */
 public class GraphRandomizer {
@@ -31,6 +31,9 @@ public class GraphRandomizer {
      */
     public GraphRandomizer(SparseGraph g, Double edgeRewireProb) {
         Double draw;
+        
+        int vertsBefore = g.getNumVertices();
+        int edgesBefore = g.getNumEdges();
 
         List<Integer[]> allEdges = g.getEdgeListIndex();
         List<Integer[]> edgesToChange = new ArrayList<>();
@@ -45,7 +48,7 @@ public class GraphRandomizer {
         }
         
         // change edges
-        System.out.println("Changing " + edgesToChange.size() + " edges in graph.");
+        //System.out.println("Changing " + edgesToChange.size() + " edges in graph.");
         Integer[] e;
         for(int i = 0; i < edgesToChange.size(); i++) {
             e = edgesToChange.get(i);
@@ -60,8 +63,8 @@ public class GraphRandomizer {
                 while(g.containsEdge(e[0], edgeTo)) {   // ensure we really need a new edge, the one we intend to create may already exist
                     edgeTo = GraphRandomizer.getRandomVertex(g);
                 }
-                g.addEdge(e[0], edgeTo, null);
-                System.out.println("Removed (" + e[0] + "," + e[1] + "), added (" + e[0] +"," + edgeTo + ").");
+                g.addEdge(e[0], edgeTo, null);  // Do we have to ensure that we do not add back the same edge that we just deleted? Or is it fine this way? I dont know, watts&Strogatz paper does not explain it.
+                //System.out.println("Removed (" + e[0] + "," + e[1] + "), added (" + e[0] +"," + edgeTo + ").");
             }
             else {
                 // keep target vertex identical
@@ -69,10 +72,20 @@ public class GraphRandomizer {
                     edgeTo = GraphRandomizer.getRandomVertex(g);
                 }
                 g.addEdge(edgeTo, e[1], null);
-                System.out.println("Removed (" + e[0] + "," + e[1] + "), added (" + edgeTo +"," + e[1] + ").");
+                //System.out.println("Removed (" + e[0] + "," + e[1] + "), added (" + edgeTo +"," + e[1] + ").");
             }
         }
         
+        int vertsAfter = g.getNumVertices();
+        int edgesAfter = g.getNumEdges();
+        
+        if(vertsAfter != vertsBefore) {
+            System.err.println("ERROR: GraphRandomizer: Vertex count before and after rewiring does not match: " + vertsBefore + " changed to " + vertsAfter + ".");
+        }
+        
+        if(edgesAfter != edgesBefore) {
+            System.err.println("ERROR: GraphRandomizer: Edge count before and after rewiring does not match: " + edgesBefore + " changed to " + edgesAfter + ".");
+        }
         
         
         

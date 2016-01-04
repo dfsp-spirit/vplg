@@ -15,6 +15,7 @@ import graphformats.IGraphMLFormat;
 import io.IO;
 import graphformats.ITrivialGraphFormat;
 import java.util.List;
+import tools.DP;
 
 /**
  * An undirected sparse graph. Uses index based access to vertices and
@@ -278,16 +279,40 @@ public class SparseGraph<V, E> implements SimpleGraphInterface, IMutableGraph<V>
     
     
     /**
+     * Determines whether a list contains an array.
+     * @param l a list
+     * @param a an array
+     * @return whether l contains a, compared using <code>Arrays.equals</code>.
+     */
+    private static Boolean listContainsArray(List<Integer[]> l, Integer[] a) {
+        Boolean c = false;
+        for(Integer[] r : l) {
+            if(Arrays.equals(r, a)) {
+                c = true;
+                break;
+            }
+        }
+        return c;
+    }
+    /**
      * Returns a list of edges in this graph. Each integer array (of length 2) in the returned list holds
-     * the indices of a pair of adjacent vertices. (Do not try to modify the list to modify the edges of the graph, it is a copy.)
+     * the indices of a pair of adjacent vertices. (Do not try to modify the list to modify the edges of the graph, it is a copy.) It does return an edge (i, j) only ONCE, not both as (i, j) and (j, i).
      * @return a list of vertex pairs given by their indices which are neighbors
      */
     public List<Integer[]> getEdgeListIndex() {
-        ArrayList<Integer[]> allEdges = new ArrayList<Integer[]>();
+        List<Integer[]> allEdges = new ArrayList<>();
+        Integer[] e, eReversed;
         for(int i = 0; i < this.edges.size(); i++) {
             for(int j = 0; j < this.edges.get(i).size(); j++) {
                int neighborOfI = this.edges.get(i).get(j);
-               allEdges.add(new Integer[]{i, neighborOfI});
+               e = new Integer[]{i, neighborOfI};
+               eReversed = new Integer[]{neighborOfI, i};
+               if( ! SparseGraph.listContainsArray(allEdges, e)) {
+                    if( ! SparseGraph.listContainsArray(allEdges, eReversed)) {
+                        allEdges.add(e);                    
+                    }
+               }
+               
             }
         }
         return allEdges;
@@ -299,7 +324,55 @@ public class SparseGraph<V, E> implements SimpleGraphInterface, IMutableGraph<V>
         for(int j = 0; j < this.edges.get(vertIndex).size(); j++) {
             neighbors.add(this.edges.get(vertIndex).get(j));
          }
+        if(neighbors.contains(vertIndex)) {
+            DP.getInstance().w("SparseGraph", "neighborsOf: neighbor list of vertex at index " + vertIndex + " contains the vertex itself.");
+        }
         return neighbors;
+    }
+    
+    /**
+     * Performs edge self test
+     * @return false if stuff went wrong
+     */
+    private Boolean selfCheckEdges() {
+        Boolean allOK = true;
+        for(int i = 0; i < this.getSize(); i++) {
+            List<Integer> neighbors = this.neighborsOf(i);
+            if(neighbors.contains(i)) {
+                System.err.println("ERROR: SparseGraph: selfCheckEdges: NeighborList of vertex at index " + i + " contains vertex itself.");
+                allOK = false;
+            }
+        }
+        
+        int numE = 0;
+        for(int i = 0; i < this.getNumVertices(); i++) {
+            for(int j = i+1; j < this.getNumVertices(); j++) {
+                if(this.containsEdge(i, j)) {
+                    numE++;
+                }
+            }            
+        }
+        
+        if(this.getEdgeListIndex().size() != numE) {
+            System.err.println("ERROR: SparseGraph: selfCheckEdges: Edgelist size mismatch by different determination methods. numE=" + numE + ", getEdgeListIndex().size()=" + getEdgeListIndex().size() + ".");
+            allOK = false;
+        }
+        return allOK;
+    }
+    
+    /**
+     * Runs a self-check, prints errors to STDERR if stuff seems fishy.
+     */
+    public void selfCheck() {
+        Boolean allOK = true;
+        if( ! selfCheckEdges()) { allOK = false; }
+        
+        if(allOK) {
+            System.out.println("SparseGraph: Selfcheck OK.");
+        }
+        else {
+            System.err.println("SparseGraph: Selfcheck FAILED.");
+        }
     }
     
     /**
