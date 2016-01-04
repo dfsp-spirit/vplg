@@ -14,6 +14,7 @@ import datastructures.SparseGraph;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import tools.DP;
 
 /**
  * Randomizes (rewires) the edges of the given graph with the given probability. Changes the input graph!
@@ -36,6 +37,12 @@ public class GraphRandomizer {
         int edgesBefore = g.getNumEdges();
 
         List<Integer[]> allEdges = g.getEdgeListIndex();
+        
+        if(edgesBefore != allEdges.size()) {
+            System.err.println("ERROR: GraphRandomizer: Given graph reports different number of edges using different methods (g.getNumEdges="+edgesBefore+", g.getEdgeListIndex().size()=" + allEdges.size() + ". Forcing self-check on graph.");
+            g.selfCheck();
+        }
+        
         List<Integer[]> edgesToChange = new ArrayList<>();
         
         // determine which edges to change
@@ -48,19 +55,21 @@ public class GraphRandomizer {
         }
         
         // change edges
-        //System.out.println("Changing " + edgesToChange.size() + " edges in graph.");
+        System.out.println("Changing " + edgesToChange.size() + " edges in graph.");
         Integer[] e;
         for(int i = 0; i < edgesToChange.size(); i++) {
             e = edgesToChange.get(i);
             
             // delete old edge
-            g.deleteEdge(e[0], e[1]);
+            if(! g.deleteEdge(e[0], e[1])) {
+                DP.getInstance().w("Graphrandomizer", "Could not delete edge (" + e[0] + "," + e[1] + ").");
+            }
             
             // now add a new edge for it
-            int edgeTo = GraphRandomizer.getRandomVertex(g);
+            Integer edgeTo = GraphRandomizer.getRandomVertex(g);
             if(rnd.nextBoolean()) {
                 // keep start vertex identical
-                while(g.containsEdge(e[0], edgeTo)) {   // ensure we really need a new edge, the one we intend to create may already exist
+                while(g.containsEdge(e[0], edgeTo) || e[0].equals(edgeTo)) {   // ensure we really create a new edge, the one we intend to create may already exist (and ensure we do NOT add a self-edge)
                     edgeTo = GraphRandomizer.getRandomVertex(g);
                 }
                 g.addEdge(e[0], edgeTo, null);  // Do we have to ensure that we do not add back the same edge that we just deleted? Or is it fine this way? I dont know, watts&Strogatz paper does not explain it.
@@ -68,7 +77,7 @@ public class GraphRandomizer {
             }
             else {
                 // keep target vertex identical
-                while(g.containsEdge(edgeTo, e[1])) {   // ensure we really need a new edge, the one we intend to create may already exist
+                while(g.containsEdge(edgeTo, e[1]) || e[1].equals(edgeTo)) {   // ensure we really create a new edge, the one we intend to create may already exist (and ensure we do NOT add a self-edge)
                     edgeTo = GraphRandomizer.getRandomVertex(g);
                 }
                 g.addEdge(edgeTo, e[1], null);

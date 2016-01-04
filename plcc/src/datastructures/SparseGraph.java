@@ -86,13 +86,24 @@ public class SparseGraph<V, E> implements SimpleGraphInterface, IMutableGraph<V>
      * @param e the edge info
      */ 
     public void addEdge(int i, int j, E e) {
+        if(i == j) {
+            DP.getInstance().w("SparseGraph", "addEdge: Edge " + i + "," + j + " is invalid self-edge, ignoring request to add it.");
+            return;
+        }
         if(! this.edges.get(i).contains(j)) {
           this.edges.get(i).add(j);
           this.setEdgeInfo(i, j, e);
         }
+        else {
+            DP.getInstance().w("SparseGraph", "addEdge: Edge " + i + "," + j + " already in list of " + i + ".");
+        }
+        
         if(! this.edges.get(j).contains(i)) {
           this.edges.get(j).add(i);
           this.setEdgeInfo(j, i, e);
+        }
+        else {
+            DP.getInstance().w("SparseGraph", "addEdge: Edge " + i + "," + j + " already in list of " + j + ".");
         }
     }
     
@@ -264,7 +275,7 @@ public class SparseGraph<V, E> implements SimpleGraphInterface, IMutableGraph<V>
         for(int i = 0; i < this.edges.size(); i++) {
             numTotal += this.edges.get(i).size();
         }
-        return numTotal;    
+        return numTotal / 2;    
     }
     
     
@@ -357,6 +368,12 @@ public class SparseGraph<V, E> implements SimpleGraphInterface, IMutableGraph<V>
             System.err.println("ERROR: SparseGraph: selfCheckEdges: Edgelist size mismatch by different determination methods. numE=" + numE + ", getEdgeListIndex().size()=" + getEdgeListIndex().size() + ".");
             allOK = false;
         }
+        
+        if(this.getNumEdges() != numE) {
+            System.err.println("ERROR: SparseGraph: selfCheckEdges: Edgelist size mismatch by different determination methods. numE=" + numE + ", getNumEdges()=" + this.getNumEdges() + ".");
+            allOK = false;
+        }
+            
         return allOK;
     }
     
