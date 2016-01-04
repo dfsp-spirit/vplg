@@ -55,7 +55,7 @@ public class GraphRandomizer {
         }
         
         // change edges
-        System.out.println("Changing " + edgesToChange.size() + " edges in graph.");
+        //System.out.println("Changing " + edgesToChange.size() + " of the " + allEdges.size() + " edges in graph.");
         Integer[] e;
         for(int i = 0; i < edgesToChange.size(); i++) {
             e = edgesToChange.get(i);

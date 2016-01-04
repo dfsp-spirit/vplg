@@ -385,7 +385,7 @@ public class SparseGraph<V, E> implements SimpleGraphInterface, IMutableGraph<V>
         if( ! selfCheckEdges()) { allOK = false; }
         
         if(allOK) {
-            System.out.println("SparseGraph: Selfcheck OK.");
+            //System.out.println("SparseGraph: Selfcheck OK.");
         }
         else {
             System.err.println("SparseGraph: Selfcheck FAILED.");

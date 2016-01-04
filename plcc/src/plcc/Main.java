@@ -2188,11 +2188,12 @@ public class Main {
                                     // write graph properties
                                     DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.FALSE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity(), gp.getCumulativeDegreeDistributionUpToAsArray(50));
                                     
-                                    System.out.println("###TEST-GP-BEFORE: " + gp.getOverviewPropsString() + "###");
+                                    System.out.println("###TEST-GP-BEFORE: \n" + gp.getOverviewPropsString(true) + "###");
                                     aag.selfCheck();
-                                    GraphRandomizer gr = new GraphRandomizer(aag, 1.0);
+                                    Double edgeRewireProbability = 0.1d;
+                                    GraphRandomizer gr = new GraphRandomizer(aag, edgeRewireProbability);
                                     GraphProperties gp_rand = new GraphProperties(aag); // now changed
-                                    System.out.println("###TEST-GP-AFTER: " + gp_rand.getOverviewPropsString() + "###");
+                                    System.out.println("###TEST-GP-AFTER-RANDOMIZATION with p="+edgeRewireProbability+": \n" + gp_rand.getOverviewPropsString(false) + "###");
                                     aag.selfCheck();
                                     
                                     // determine and print max ecc vertex set, for thesis only
