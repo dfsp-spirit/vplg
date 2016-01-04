@@ -8,6 +8,7 @@
 package algorithms;
 
 import datastructures.IMutableGraph;
+import datastructures.SimpleGraphDrawer;
 import datastructures.SimpleGraphInterface;
 import datastructures.SparseGraph;
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ public class GraphRandomizer {
         }
         
         // change edges
+        System.out.println("Changing " + edgesToChange.size() + " edges in graph.");
         Integer[] e;
         for(int i = 0; i < edgesToChange.size(); i++) {
             e = edgesToChange.get(i);
@@ -59,13 +61,15 @@ public class GraphRandomizer {
                     edgeTo = GraphRandomizer.getRandomVertex(g);
                 }
                 g.addEdge(e[0], edgeTo, null);
+                System.out.println("Removed (" + e[0] + "," + e[1] + "), added (" + e[0] +"," + edgeTo + ").");
             }
             else {
                 // keep target vertex identical
-                while(g.containsEdge(edgeTo, e[0])) {   // ensure we really need a new edge, the one we intend to create may already exist
+                while(g.containsEdge(edgeTo, e[1])) {   // ensure we really need a new edge, the one we intend to create may already exist
                     edgeTo = GraphRandomizer.getRandomVertex(g);
                 }
-                g.addEdge(edgeTo, e[0], null);
+                g.addEdge(edgeTo, e[1], null);
+                System.out.println("Removed (" + e[0] + "," + e[1] + "), added (" + edgeTo +"," + e[1] + ").");
             }
         }
         
@@ -80,7 +84,7 @@ public class GraphRandomizer {
      * @return a vertex, by index
      */
     private static int getRandomVertex(SparseGraph g) {
-        return GraphRandomizer.getRandomIntBtween(0, g.getNumVertices());
+        return GraphRandomizer.getRandomIntBetweenInclusive(0, (g.getNumVertices() - 1));
     }
   
     
@@ -93,9 +97,36 @@ public class GraphRandomizer {
     * @param max Maximum value.  Must be greater than min.
     * @return Integer between min and max, inclusive.
     */
-    public static int getRandomIntBtween(int min, int max) {
+    public static int getRandomIntBetweenInclusive(int min, int max) {
         int randomNum = rnd.nextInt((max - min) + 1) + min;
         return randomNum;
+    }
+    
+    
+    /**
+     * Testing main
+     * @param args ignored
+     */
+    public static void main(String[] args) {            
+        SparseGraph<String, String> g = new SparseGraph<>();
+        SimpleGraphDrawer gd;
+        g.addVertex("0");
+        g.addVertex("1");
+        g.addVertex("2");
+        g.addVertex("3");
+                
+        g.addEdge(0, 1, "a");
+        g.addEdge(1, 2, "b");
+        g.addEdge(2, 3, "c");
+        g.addEdge(3, 0, "d");
+        
+        gd = new SimpleGraphDrawer(g);
+        System.out.println("Graph 1:\n" + gd.getGraphConsoleDrawing());
+        
+        GraphRandomizer gr = new GraphRandomizer(g, 0.5);
+        
+        gd = new SimpleGraphDrawer(g);
+        System.out.println("Graph 2:\n" + gd.getGraphConsoleDrawing());
     }
     
 }
