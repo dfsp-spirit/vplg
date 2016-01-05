@@ -11,8 +11,11 @@ import datastructures.SimpleGraphInterface;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import tools.DP;
 
 /**
  * Utility class for computing graph metrics.
@@ -83,8 +86,9 @@ public class GraphMetrics {
         }
         
         Double max_cc = .0d;
+        Double lcc;
         for(int i = 0; i < g.getSize(); i++) {
-            Double lcc = GraphMetrics.localClusteringCoefficientUndirected(g, i);
+            lcc = GraphMetrics.localClusteringCoefficientUndirected(g, i);
             if(lcc != null) {
                 if(lcc >= max_cc) {
                     max_cc = lcc;
@@ -94,6 +98,61 @@ public class GraphMetrics {
         return max_cc;
     }
     
+
+   /**
+     * Determines the set of all vertices which have at least the given clustering coefficient.
+     * @param g the graph
+     * @param minClC the minimum clustering coefficient allowed for vertices to be included
+     * @return the set of all vertices which have at least the given clustering coefficient in g, by index. (Vertices with undefined CC are never included in the set.)
+     */
+    public static Set<Integer> determineVertexSetWithClCAtLeast(SimpleGraphInterface g, Double minClC) {
+        Set<Integer> v = new HashSet<>();
+        if(minClC < 0.0 || minClC > 1.0) {
+            DP.getInstance().w("GraphMetrics", "determineVertexSetWithClCAtLeast: requested ClC minimum value '" + minClC + "' makes no sense, must be in range 0 - 1 (returning empty set.)");
+            return v;
+        }
+        
+        Double lcc;
+        for(int i = 0; i < g.getSize(); i++) {
+            lcc = GraphMetrics.localClusteringCoefficientUndirected(g, i);
+            if(lcc != null) {
+                if(lcc >= minClC) {
+                    v.add(i);
+                }
+            }
+        }
+        
+        return v;
+        
+    }
+    
+    
+    /**
+     * Determines the set of all vertices which have at most the given clustering coefficient.
+     * @param g the graph
+     * @param maxClC the maximum clustering coefficient allowed for vertices to be included
+     * @return the set of all vertices which have at most the given clustering coefficient in g, by index. (Vertices with undefined CC are never included in the set.)
+     */
+    public static Set<Integer> determineVertexSetWithClCAtMost(SimpleGraphInterface g, Double maxClC) {
+        Set<Integer> v = new HashSet<>();
+        if(maxClC < 0.0 || maxClC > 1.0) {
+            DP.getInstance().w("GraphMetrics", "determineVertexSetWithClCAtLeast: requested ClC maximum value '" + maxClC + "' makes no sense, must be in range 0 - 1 (returning empty set.)");
+            return v;
+        }
+        
+        Double lcc;
+        for(int i = 0; i < g.getSize(); i++) {
+            lcc = GraphMetrics.localClusteringCoefficientUndirected(g, i);
+            if(lcc != null) {
+                if(lcc <= maxClC) {
+                    v.add(i);
+                }
+            }
+        }
+        
+        return v;
+        
+    }
     
     /**
      * Gives degree distribution as array, from degree 0 to (maxDegreeExclusive - 1).

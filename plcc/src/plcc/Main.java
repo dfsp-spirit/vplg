@@ -2188,19 +2188,27 @@ public class Main {
                                     // write graph properties
                                     DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.FALSE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity(), gp.getCumulativeDegreeDistributionUpToAsArray(50));
                                     
-                                    System.out.println("###TEST-GP-BEFORE: \n" + gp.getOverviewPropsString(true) + "###");
-                                    aag.selfCheck();
-                                    Double edgeRewireProbability = 0.1d;
-                                    GraphRandomizer gr = new GraphRandomizer(aag, edgeRewireProbability);
-                                    GraphProperties gp_rand = new GraphProperties(aag); // now changed
-                                    System.out.println("###TEST-GP-AFTER-RANDOMIZATION with p="+edgeRewireProbability+": \n" + gp_rand.getOverviewPropsString(false) + "###");
-                                    aag.selfCheck();
+                                    Boolean rewireGraphsToCompareWithRandom = false;
+                                    if(rewireGraphsToCompareWithRandom) {   // this was only needed for graph analyses carried out for the Ph.D. thesis of TS, ignore
+                                        System.out.println("###TEST-AAG-GP-BEFORE-REWIRING: \n" + gp.getOverviewPropsString(true) + "###");
+                                        aag.selfCheck();
+                                        Double edgeRewireProbability = 0.1d;
+                                        GraphRandomizer gr = new GraphRandomizer(aag, edgeRewireProbability);
+                                        GraphProperties gp_rand = new GraphProperties(aag); // now changed
+                                        System.out.println("###TEST-AAG-GP-AFTER-RANDOMIZATION with p="+edgeRewireProbability+": \n" + gp_rand.getOverviewPropsString(false) + "###");
+                                        aag.selfCheck();
+                                    }
                                     
-                                    // determine and print max ecc vertex set, for thesis only
-                                    //Set<Integer> s = gp.determineMaxEccVertexSet(); System.out.println("Max ECC vertices: " + IO.setIntegerToString(s) + ".");
-                                    //  Set<Integer> s = gp.determineVertexSetWithEccAtLeast(12);
-                                    //List<Residue> l = aag.getResiduesFromSetByIndex(s);
-                                    //System.out.println("Pymol select script for " + l.size() + " residues: '" + Main.getPymolSelectionScriptForResidues(l) + "'.");
+                                    Boolean selectResiduesWithPropertiesForVisualization = false;
+                                    if(selectResiduesWithPropertiesForVisualization) { //determine and print max ecc vertex set, for Ph.D. thesis only (output can be used to mark the residues in PyMol)
+                                        
+                                        //Set<Integer> s = gp.determineMaxEccVertexSet(); System.out.println("Max ECC vertices: " + IO.setIntegerToString(s) + ".");
+                                        //Set<Integer> s = gp.determineVertexSetWithEccAtLeast(12);
+                                        //Set<Integer> s = gp.determineVertexSetWithClCAtLeast(0.8);
+                                        Set<Integer> s = gp.determineVertexSetWithClCAtMost(0.25);
+                                        List<Residue> l = aag.getResiduesFromSetByIndex(s);
+                                        System.out.println("Pymol select script for " + l.size() + " of the " + aag.getSize() + " residues: '" + Main.getPymolSelectionScriptForResidues(l) + "'.");
+                                    }
                                     
                                     //System.out.println("max CC is: " + gp.getMaximumNetworkClusterCoefficient());
                                     // write properties of largest CC of graph

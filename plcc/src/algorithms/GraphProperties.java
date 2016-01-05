@@ -173,6 +173,7 @@ public class GraphProperties {
         return gd.determineMaxEccVertexSet();
     }
     
+    
     /**
      * Determines the set of all vertices which have at least the given eccentricity.
      * @param minEcc the eccentricity
@@ -180,6 +181,24 @@ public class GraphProperties {
      */
     public Set<Integer> determineVertexSetWithEccAtLeast(int minEcc) {
         return gd.determineVertexSetWithEccAtLeast(minEcc);
+    }
+    
+    /**
+     * Determines the set of all vertices which have at least the given clustering coefficient.
+     * @param minClC the minimum clustering coefficient
+     * @return the set of all vertices which have at least the given clustering coefficient. (Vertices with undefined CC are never included in the set.)
+     */
+    public Set<Integer> determineVertexSetWithClCAtLeast(Double minClC) {        
+        return GraphMetrics.determineVertexSetWithClCAtLeast(graph, minClC);
+    }
+    
+    /**
+     * Determines the set of all vertices which have at most the given clustering coefficient.
+     * @param maxClC the maximum clustering coefficient allowed for vertices to be included
+     * @return the set of all vertices which have at most the given clustering coefficient in g, by index. (Vertices with undefined CC are never included in the set.)
+     */
+    public Set<Integer> determineVertexSetWithClCAtMost(Double maxClC) {        
+        return GraphMetrics.determineVertexSetWithClCAtMost(graph, maxClC);
     }
     
     
