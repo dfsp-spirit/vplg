@@ -2192,7 +2192,7 @@ public class Main {
                                     if(rewireGraphsToCompareWithRandom) {   // this was only needed for graph analyses carried out for the Ph.D. thesis of TS, ignore
                                         System.out.println("###TEST-AAG-GP-BEFORE-REWIRING: \n" + gp.getOverviewPropsString(true) + "###");
                                         aag.selfCheck();
-                                        Double edgeRewireProbability = 0.1d;
+                                        Double edgeRewireProbability = 1.0d;
                                         GraphRandomizer gr = new GraphRandomizer(aag, edgeRewireProbability);
                                         GraphProperties gp_rand = new GraphProperties(aag); // now changed
                                         System.out.println("###TEST-AAG-GP-AFTER-RANDOMIZATION with p="+edgeRewireProbability+": \n" + gp_rand.getOverviewPropsString(false) + "###");

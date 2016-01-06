@@ -64,6 +64,17 @@ public class GraphProperties {
     }
     
     /**
+     * Computes the average (mean) network clustering coefficient of g, i.e., the average of all normalized local clustering coefficients of the vertices.
+     * The local clustering coefficient definition used here is an alternative
+     * to the definition of Watts/Strogatz which returns valid values even for vertices with less than 2 neighbors: in that case, the edge density of the graph is returned.
+     * The resulting value is normalized by the edge density of the whole graph. The mean over all normalized values is then computed by this function.
+     * @return the normalized average network cluster coefficient of g, a value between greater 0 (and potentially greater than 1.0). If the value is greater 1.0, the graph tends to cluster. Returns null if g is empty.
+     */
+    public Double getAverageNormalizedNetworkClusterCoefficient() {
+        return GraphMetrics.averageNormalizedNetworkClusterCoefficient(graph);
+    }
+    
+    /**
      * The graph density measures how many edges are in set E compared to the maximum possible number of edges between vertices in set V.
      * @return the graph density, i.e.,  2 * |E| / (|V| * (|V| − 1))
      */
@@ -239,6 +250,7 @@ public class GraphProperties {
         sb.append(addLabel? "radius: " : "").append(this.getGraphRadius()).append("\n");
         sb.append(addLabel? "aSPL: " : "").append(this.getAverageShortestPathLength()).append("\n");
         sb.append(addLabel? "ClC: " : "").append(this.getAverageClusterCoefficient()).append("\n");
+        sb.append(addLabel? "naClC: " : "").append(this.getAverageNormalizedNetworkClusterCoefficient()).append("\n");        
         sb.append(addLabel? "avgDegree: " : "").append(this.getAverageDegree()).append("\n");
         sb.append(addLabel? "maxDegree: " : "").append(this.getMaxDegree()).append("\n");
         sb.append(addLabel? "minDegree: " : "").append(this.getMinDegree()).append("\n");

@@ -52,11 +52,55 @@ public class GraphMetrics {
         return lcc;
     }
     
+    /**
+     * Computes the local cluster coefficient of vertex at index v in the graph g. This is an alternative
+     * to the definition of Watts/Strogatz which returns valid values even for vertices with less than 2 neighbors: in that case, the edge density of the graph is returned. This is used for the normalized ClC.
+     * @param g the graph
+     * @param v the vertex index
+     * @return the local CC of the vertex according to Watts/Strogatz if v has at least 2 neighbors; the edge density of the graph if it does not.
+     */
+    private static Double localClusteringCoefficientUndirectedNotNull(SimpleGraphInterface g, Integer v) {
+        List<Integer> neighbors = g.neighborsOf(v);                
+        Integer numNeighbors = neighbors.size();
+        
+        if(numNeighbors < 2) {
+            GraphMetrics.getDensity(g);
+        }
+        
+        Integer maxPossibleEdges = (numNeighbors * (numNeighbors - 1)) / 2;       // division by 2 is due to undirectedness of graph
+        Integer numEdgesBetweenNeighbors = 0;
+        for(int i = 0; i < numNeighbors; i++) {
+            for(int j = i+1; j < numNeighbors; j++) {
+                if(g.containsEdge(neighbors.get(i), neighbors.get(j))) {
+                    numEdgesBetweenNeighbors++;
+                }
+            }
+        }
+        Double lcc = numEdgesBetweenNeighbors.doubleValue() / maxPossibleEdges.doubleValue();
+        return lcc;
+    }
     
     /**
-     * Computes the average network cluster coefficient of g, i.e., the average of all local cluster coefficients of the vertices.
+     * Computes the normalized local cluster coefficient of vertex at index v in the graph g. The local clustering coefficient definition used here is an alternative
+     * to the definition of Watts/Strogatz which returns valid values even for vertices with less than 2 neighbors: in that case, the edge density of the graph is returned.
+     * The resulting value is normalized by the edge density of the whole graph.
+     * @param g the graph
+     * @param v the vertex index
+     * @return the local CC of the vertex (see above), normalized by the edge density of the whole graph
+     */
+    public static Double normalizedLocalClusteringCoefficient(SimpleGraphInterface g, Integer v) {
+        Double lCl = GraphMetrics.localClusteringCoefficientUndirectedNotNull(g, v);
+        Double norm = lCl / GraphMetrics.getDensity(g);
+        return norm;
+    }
+    
+    
+    
+    
+    /**
+     * Computes the average (mean) network clustering coefficient of g, i.e., the average of all local cluster coefficients of the vertices. Uses clustering coefficient definition of Watts/Strogatz, i.e., undefined for vertices with degree less than 2. Such vertices are IGNORED when computing the mean (and the result is divided by the number of CONSIDERED vertices).
      * @param g a graph
-     * @return the average network cluster coefficient of g. Note that this is NOT the same as the global CC. Also note that null is returned if the graph is empty.
+     * @return the average network cluster coefficient of g, a value between 0 and 1. Note that this is NOT the same as the global CC. Also note that null is returned if the graph is empty.
      */
     public static Double averageNetworkClusterCoefficient(SimpleGraphInterface g) {
         if(g.getSize() == 0) {
@@ -76,7 +120,61 @@ public class GraphMetrics {
     }
     
     /**
-     * Computes the average network cluster coefficient of g, i.e., the average of all local cluster coefficients of the vertices.
+     * Computes the average (mean) network clustering coefficient of g, i.e., the average of all normalized local clustering coefficients of the vertices.
+     * The local clustering coefficient definition used here is an alternative
+     * to the definition of Watts/Strogatz which returns valid values even for vertices with less than 2 neighbors: in that case, the edge density of the graph is returned.
+     * The resulting value is normalized by the edge density of the whole graph. The mean over all normalized values is then computed by this function.
+     * @param g a graph
+     * @return the normalized average network cluster coefficient of g, a value between greater 0 (and potentially greater than 1.0). If the value is greater 1.0, the graph tends to cluster. Returns null if g is empty.
+     */
+    public static Double averageNormalizedNetworkClusterCoefficient(SimpleGraphInterface g) {
+        if(g.getSize() == 0) {
+            return null;
+        }
+        
+        Double ancc = .0d;
+        Integer numVerts = 0;
+        for(int i = 0; i < g.getSize(); i++) {
+            Double lcc = GraphMetrics.normalizedLocalClusteringCoefficient(g, i);
+            if(lcc != null) {
+                ancc += lcc;
+                numVerts++;
+                //System.out.println("lcc for v " + i + " of " + g.getSize() + " is " + lcc + ", sum is " + ancc + " so far.");                
+            }
+        }
+        //System.out.println("Sum computed, " + numVerts + " of " + g.getSize() + " returned valid values.");
+        return ancc / numVerts.doubleValue();
+    }
+    
+    /**
+     * The graph density measures how many edges are in set E compared to the maximum possible number of edges between vertices in set V.
+     * @param g the graph
+     * @return the graph density, i.e.,  2 * |E| / (|V| * (|V| − 1))
+     */
+    private static Double getDensity(SimpleGraphInterface g) {
+        if(g.getSize()== null) { return null; }
+        if(g.getSize() == 0) { return 0D; }
+        Double E = GraphMetrics.getNumEdges(g).doubleValue();
+        Double V = g.getSize().doubleValue();
+        return (Double)((2 * E) / (V * (V-1)) );
+    }
+    
+    
+    /**
+     * Determines the number of edges in g. An edge (i, j) in the undirected graph is only counted once (not both as (i, j) and (j, i)).
+     * @param g the graph
+     * @return the number of edges in g
+     */
+    private static Integer getNumEdges(SimpleGraphInterface g) {
+        Integer ne = 0;
+        for(int i = 0; i < g.getSize(); i++) {
+            ne += g.neighborsOf(i).size();
+        }
+        return ne / 2;
+    }
+    
+    /**
+     * Computes the average network cluster coefficient of g, i.e., the average of all local cluster coefficients of the vertices. Uses Watts/Strogatz definition of ClC.
      * @param g a graph
      * @return the average network cluster coefficient of g. Note that this is NOT the same as the global CC. Also note that null is returned if the graph is empty.
      */
