@@ -2128,7 +2128,7 @@ public class Main {
                     residuesWithoutLigands = new ArrayList<>();
                     AAGraph aag;
                     
-                    Boolean skipLigandsForAAGraphs = Boolean.TRUE;
+                    Boolean skipLigandsForAAGraphs = ( ! Settings.getBoolean("plcc_B_aminoacidgraphs_include_ligands"));
                     if(skipLigandsForAAGraphs) {
                         for(Residue r : residues) {
                             if(r.isAA()) { residuesWithoutLigands.add(r); }
@@ -2171,7 +2171,7 @@ public class Main {
 
                     
                     if(Settings.getBoolean("plcc_B_compute_graph_metrics")) {    
-                        aag.selfCheck();
+                        //aag.selfCheck();
                         GraphProperties gp = new GraphProperties(aag);
                         GraphProperties sgp = new GraphProperties(gp.getLargestConnectedComponent());
 
