@@ -21,7 +21,7 @@ public class TextTools {
      */
     public static void main(String[] args) {
         
-        String s, n; Integer sum;
+        String s, n; Integer sum;       // some degree distributions. the lists were copied from the database; the code in this class formats them for plotting with Latex PGF plots package.
         //s = "0,1,8,53,115,173,203,203,196,154,104,69,43,17,8,2,0";
         //s = "0,0,18,51,101,202,327,397,520,512,391,296,163,68,20,4,0,0,0,2,4,4,0";
         
@@ -34,7 +34,12 @@ public class TextTools {
         //s = "574,574,574,571,570,557,521,456,401,298,183,96,42,11,4,2,0"; sum = 574;   // cumul, 3KMF without ligands
         //s = "1331,1331,1330,1322,1270,1156,979,776,570,378,233,136,68,27,10,2,0"; sum = 1331;   // cumul 1hzh without ligands
         
-        s = "3070,3070,3070,3052,2997,2887,2691,2361,1955,1426,896,510,229,87,23,2,0"; sum = 3070;   // cumul 4a97 without ligands
+        
+        //s = "3070,3070,3070,3052,2997,2887,2691,2361,1955,1426,896,510,229,87,23,2,0"; sum = 3070;   // cumul 4a97 without ligands
+        //s = "416,326,252,187,131,91,54,26,6,4,3,1,1,0"; sum = 416;   // cumul 8ICD, only long range contacts (seqdist >= 10 residues). this disconnects the graph into 91 connected components, this is for the whole disconnected graph.
+        
+        
+        s = "416,416,414,400,342,282,222,154,114,35,11,1,1,0"; sum = 416; // cumul 8ICD, only SHORT range contacts (seqdist <= 10 residues). this disconnects the graph into 2 connected components, this is for the whole disconnected graph.
         
         
         n = generateNormalizedString(s, sum);

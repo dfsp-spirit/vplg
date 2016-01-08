@@ -2099,6 +2099,11 @@ public class Main {
 
         // ********************************************** SSE stuff and graph computation ******************************************//
 
+        // sanity check for settings
+        if(Settings.getInteger("plcc_I_aag_min_residue_seq_distance_for_contact") > 0 && Settings.getInteger("plcc_I_aag_max_residue_seq_distance_for_contact") > 0) {
+            DP.getInstance().w("Main", "Settings 'plcc_I_aag_min_residue_seq_distance_for_contact' and 'plcc_I_aag_max_residue_seq_distance_for_contact' should NOT be used together: inter-chain contacts cannot pass both checks. Set one of them to 0 to disable it.");
+        }
+        
         if(Settings.getBoolean("plcc_B_calc_draw_graphs")) {
             if(! silent) {
                 System.out.println("  Calculating SSE graphs.");

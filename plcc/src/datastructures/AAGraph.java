@@ -13,6 +13,7 @@ import proteinstructure.AminoAcid;
 import graphformats.IGraphModellingLanguageFormat;
 import java.util.List;
 import java.util.Set;
+import plcc.Settings;
 import proteingraphs.ResContactInfo;
 import proteinstructure.Residue;
 import tools.DP;
@@ -44,13 +45,84 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         this.chainid = "";
     }
     
+    /**
+     * Checks whether a residue contact satisifies the minimal sequential residue distance rule.
+     * @param minSeqDist the minimal allowed seq dist
+     * @param c the contact
+     * @return whether the contact satisfies the minimal sequential residue distance rule
+     */
+    private Boolean checkMinSeqDistance(Integer minSeqDist, ResContactInfo c) {
+        if(minSeqDist <= 0) {
+             return true;
+        } else {
+            Residue resA = c.getResA();
+            Residue resB = c.getResB();
+            if( ! resA.getChainID().equals(resB.getChainID())) {
+                //different chains, add contact
+                return true;
+            }
+            else {
+                // same chain, gotta check residue distance
+                int seqDist = Math.abs(resA.getPdbResNum() - resB.getPdbResNum());
+                if(seqDist < minSeqDist) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
+        }
+    }
+    
+    /**
+     * Checks whether a residue contact satisifies the maximal sequential residue distance rule.
+     * @param maxSeqDist the max allowed seq dist
+     * @param c the contact
+     * @return whether the contact satisfies the maximal sequential residue distance rule
+     */
+    private Boolean checkMaxSeqDistance(Integer maxSeqDist, ResContactInfo c) {
+        if(maxSeqDist <= 0) {
+             return true;
+        } else {
+            Residue resA = c.getResA();
+            Residue resB = c.getResB();
+            if( ! resA.getChainID().equals(resB.getChainID())) {
+                //different chains, do NOT add contact
+                return false;
+            }
+            else {
+                // same chain, gotta check residue distance
+                int seqDist = Math.abs(resA.getPdbResNum() - resB.getPdbResNum());
+                if(seqDist > maxSeqDist) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
+        }
+    }
+    
+    private Boolean contactSatisfiesRules(ResContactInfo c) {
+        Integer minSeqDist = Settings.getInteger("plcc_I_aag_min_residue_seq_distance_for_contact");
+        Integer maxSeqDist = Settings.getInteger("plcc_I_aag_max_residue_seq_distance_for_contact");
+        Boolean minSeqDistanceCheckPassed = checkMinSeqDistance(minSeqDist, c);
+        Boolean maxSeqDistanceCheckPassed = checkMaxSeqDistance(maxSeqDist, c);
+        
+        Boolean allChecksPassed = minSeqDistanceCheckPassed && maxSeqDistanceCheckPassed;
+        
+        return allChecksPassed;
+    }
+    
     /** Advanced Constructor, constructs the edges automatically from ResContactInfo list
      * @param vertices the vertex list to use
      * @param contacts the contacts, which are used to create the edges of the graph */
     public AAGraph(List<Residue> vertices, ArrayList<ResContactInfo> contacts) {
         super(vertices);
         for(int i = 0; i < contacts.size(); i++) {
-            this.addEdgeFromRCI(contacts.get(i));
+            if(contactSatisfiesRules(contacts.get(i))) {
+                this.addEdgeFromRCI(contacts.get(i));
+            }
         }
         this.pdbid = "";
         this.chainid = "";

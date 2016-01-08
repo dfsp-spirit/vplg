@@ -339,6 +339,9 @@ public class Settings {
         defSet("plcc_B_img_AAG_output_format_PDF", "false", "Whether to write amino acid graph output images in PDF format.");
         defSet("plcc_B_img_AAG_output_format_SVG", "true", "Whether to write complex graph output images in SVG format. Note that this setting currently has no effect, SVG is always generated. The other formats get converted from the SVG.");
         
+        defSet("plcc_I_aag_min_residue_seq_distance_for_contact", "0", "If set to a value greater than zero, only contacts from residues more than or exactly this value apart in the sequence can for a contact. Can be used to force network of long-range contacts, ignoring backbone connections. Contacts between residues from different chains always are accepted. This will split the graph into many connected components.");
+        defSet("plcc_I_aag_max_residue_seq_distance_for_contact", "0", "If set to a value greater than zero, only contacts from residues less than or exactly this value apart in the sequence can for a contact. Can be used to force network of short-range contacts, ignoring long-range connections. Also ignores all contacts to residues from other chains.");
+        
         
         defSet("plcc_I_img_margin_left", "80", "Size of the left image margin in pixels");
         defSet("plcc_I_img_margin_top", "40", "Size of the top image margin in pixels");
