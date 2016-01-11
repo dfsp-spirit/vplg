@@ -10,6 +10,7 @@
 package alltests;
 
 
+import datastructures.SparseGraph;
 import graphdrawing.IDrawableGraph;
 import org.junit.Assert;
 import junit.framework.TestCase;
@@ -76,6 +77,13 @@ public class TestGMLGraphParser extends TestCase {
         System.out.println("Received graph with " + g.getDrawableVertices().size() + " vertices and " + g.getDrawableEdges().size() + " edges.");
         assertEquals(3, g.getDrawableEdges().size());
         assertEquals(3, g.getDrawableVertices().size());
+    }
+    
+    @org.junit.Test public void testSparseGraph() {                     
+        SparseGraph<String, String> g = p.getSparseGraph();
+        System.out.println("Received graph with " + g.getNumVertices() + " vertices and " + g.getNumEdges() + " edges.");
+        assertEquals(3, g.getNumEdges());
+        assertEquals(3, g.getNumVertices());
     }
     
     

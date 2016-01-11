@@ -68,7 +68,7 @@ public class SPGFGraphParser extends GraphParser implements IGraphParser, IDrawa
                 
                 edgeInfos = new ArrayList<>();
                 for(String ei : edgesPart.split(",")) {
-                    this.outEdges.add(new ParsedEdgeInfo(Integer.valueOf(ei.charAt(0)+""), Integer.valueOf(ei.charAt(2)+""), ei.charAt(1)+""));
+                    this.addOutEdge(new ParsedEdgeInfo(Integer.valueOf(ei.charAt(0)+""), Integer.valueOf(ei.charAt(2)+""), ei.charAt(1)+""));
                 }
                 
                 //System.out.println("Found " + this.outVerts.size() + " verts, " + this.outEdges.size() + " edges.");

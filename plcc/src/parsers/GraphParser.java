@@ -7,6 +7,7 @@
  */
 package parsers;
 
+import datastructures.SparseGraph;
 import graphdrawing.DrawableGraph;
 import graphdrawing.IDrawableEdge;
 import graphdrawing.IDrawableGraph;
@@ -36,6 +37,42 @@ public abstract class GraphParser implements IGraphParser, IDrawableGraphProvide
     }
     
     /**
+     * Checks whether a parse edge info with same start and target vertices (including switched version) exists in the list.
+     * @param list
+     * @param e
+     * @return 
+     */
+    private static Boolean listContainsEdgeInfo(List<ParsedEdgeInfo> list, ParsedEdgeInfo e) {
+        Integer s, t;
+        Integer e_s = e.getStartVertexID();
+        Integer e_t = e.getEndVertexID();
+        for(ParsedEdgeInfo efl : list) {
+            s = efl.getStartVertexID();
+            t = efl.getEndVertexID();
+            if(s.equals(e_s) && t.equals(e_t) ) {
+                return true;
+            }
+            if(s.equals(e_t) && t.equals(e_s) ) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Wrapper, prevents adding of edges which are already in the list.
+     * @param e the edge
+     * @return true if it was NOT in the list and was added, false if it was in the list and ignored
+     */
+    protected Boolean addOutEdge(ParsedEdgeInfo e) {
+        if(GraphParser.listContainsEdgeInfo(outEdges, e)) {
+            return false;
+        }
+        outEdges.add(e);
+        return true;
+    }
+    
+    /**
      * Sub classes should implement this and call it at the end of their constructor.
      * It must parse the input string and fill the lists of parsed vertices and edges from it. Be sure to set this.parsed = true at the end of the method.
      */
@@ -52,6 +89,31 @@ public abstract class GraphParser implements IGraphParser, IDrawableGraphProvide
     @Override
     public IDrawableGraph getDrawableGraph() {
         IDrawableGraph g = new DrawableGraph(this.getDrawableVertices(), this.getDrawableEdges(), this.gInfo.getMap());
+        return g;
+    }
+    
+    /**
+     * Constructs a sparse graph from the parsed data.
+     * @return  a sparse graph. uses the strings from the 'label' field of parsed vertices and edges (or the vertex/edge index if the label is null).
+     */
+    public SparseGraph<String, String> getSparseGraph() {
+        
+        SparseGraph<String, String> g = new SparseGraph<>();
+        
+        String vLabel, eLabel;
+        for(int i = 0; i < this.getVertices().size(); i++) {
+            ParsedVertexInfo v = this.getVertices().get(i);
+            vLabel = v.getVertexProperty("label");
+            if(vLabel == null) { vLabel = "" + i; }
+            g.addVertex(vLabel);
+        }
+        
+        for(int i = 0; i < this.getEdges().size(); i++) {
+            ParsedEdgeInfo e = this.getEdges().get(i);
+            eLabel = e.getEdgeProperty("label");            
+            if(eLabel == null) { eLabel = "" + i; }
+            g.addEdge(e.getStartVertexID(), e.getEndVertexID(), eLabel);
+        }
         return g;
     }
 
@@ -79,6 +141,12 @@ public abstract class GraphParser implements IGraphParser, IDrawableGraphProvide
     @Override
     public ParsedGraphInfo getGraphInfo() {
         return this.gInfo;
+    }
+    
+    
+    
+    public static void main(String[] args) {
+        
     }
 
 

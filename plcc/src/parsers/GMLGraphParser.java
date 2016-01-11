@@ -8,6 +8,7 @@
 package parsers;
 
 
+import datastructures.SparseGraph;
 import graphdrawing.DrawableGraph;
 import graphdrawing.DrawableVertex;
 import graphdrawing.IDrawableEdge;
@@ -80,7 +81,7 @@ public class GMLGraphParser extends GraphParser implements IGraphParser, IDrawab
             String lstrip = line.trim();
             if(lstrip.equals("]")) {
                 if(inGraph) { inGraph = false; }
-                if(inEdge) { inEdge = false; if(e.verify()) { this.outEdges.add(e); } else { System.err.println("ERROR: incomplete e"); } }
+                if(inEdge) { inEdge = false; if(e.verify()) { this.addOutEdge(e); } else { System.err.println("ERROR: incomplete e"); } }
                 if(inVertex) { inVertex = false; if(v.verify()) { this.outVerts.add(v); } else { System.err.println("ERROR: incomplete v"); } }
                 if(! hitGraphStart) { System.err.println("ERROR: unmatched ] found in line " + i + "."); }
                 continue;
