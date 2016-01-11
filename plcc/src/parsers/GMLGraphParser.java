@@ -15,6 +15,8 @@ import graphdrawing.IDrawableEdge;
 import graphdrawing.IDrawableGraph;
 import graphdrawing.IDrawableGraphProvider;
 import graphdrawing.IDrawableVertex;
+import io.FileParser;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -124,6 +126,27 @@ public class GMLGraphParser extends GraphParser implements IGraphParser, IDrawab
             }
         }      
         this.parsed = true;
+    }
+    
+    
+    /**
+     * Testing main only
+     * @param args ignored
+     */
+    public static void main(String[] args) {
+        String fileName = "ic/8icd/ALL/8icd_aagraph.gml";
+        System.out.println("Trying to parse GML file '" + fileName + "'...");
+        String gml = "";
+        try {
+            gml = FileParser.slurpFileToString(fileName);
+        } catch(IOException e) {
+            System.err.println("Noooooo: '" + e.getMessage() + "'.");
+            System.exit(1);
+        }
+        
+        GMLGraphParser gp = new GMLGraphParser(gml);
+        SparseGraph<String, String> g = gp.getSparseGraph();
+        System.out.println("Graph constructed, |V|=" + g.getNumVertices() +", |E|=" + g.getNumEdges() + ".");
     }
     
     

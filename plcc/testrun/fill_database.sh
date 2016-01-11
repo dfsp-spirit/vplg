@@ -9,9 +9,10 @@
 RUN_GRAPHLETANALYSER="NO"
 
 
-PLCC_OPTIONS="-f -u -k -s --complex-graphs --aa-graphs"
+#PLCC_OPTIONS="-f -u -k -s --complex-graphs --aa-graphs"
+PLCC_OPTIONS="--cluster  --compute-graph-metrics --silent"
 PLCC_RUNS_IN_SUBDIR_TREE_MODE="YES"
-## IMPORTANT: set this to "YES" if plcc is run with '-k' / '--output-subdir-tree'
+## IMPORTANT: set this to "YES" if plcc is run with '-k' / '--output-subdir-tree' or other options which include it (e.g., --cluster)
 
 DELETE_CLUSTER_CHAINS_FILE="YES"
 SILENT="YES"
