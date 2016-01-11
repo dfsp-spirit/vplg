@@ -264,7 +264,9 @@ public class GraphMetrics {
         int degree;
         for(int i = 0; i < g.getSize(); i++) {
             degree = g.neighborsOf(i).size();
-            dgd[degree] = dgd[degree] + 1;
+            if(degree < (maxDegreeExclusive)) {
+                dgd[degree] = dgd[degree] + 1;
+            }
         }
         
         return dgd;
