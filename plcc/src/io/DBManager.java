@@ -1257,9 +1257,9 @@ public class DBManager {
              *       – 2 entries: all labelings of the graphlet g1 with one vertex, or simply the vertices with the label “H” and the vertices with the label “E” added to get the distribution vertex labels.
              *
              */
-            doInsertQuery("CREATE TABLE " + tbl_graphletcount + " (graphlet_id serial primary key, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graphlet_counts decimal[70] not null);");
-            doInsertQuery("CREATE TABLE " + tbl_graphletcount_complex + " (complex_graphlet_id serial primary key, complexgraph_id int not null references " + tbl_complexgraph + " ON DELETE CASCADE, complex_graphlet_counts decimal[55] not null);");
-            doInsertQuery("CREATE TABLE " + tbl_graphletcount_aa + " (aa_graphlet_id serial primary key, aagraph_id int not null references " + tbl_aagraph + " ON DELETE CASCADE, aa_graphlet_counts decimal[70] not null);");
+            doInsertQuery("CREATE TABLE " + tbl_graphletcount + " (graphlet_id serial primary key, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graphlet_counts decimal[58] not null);");
+            doInsertQuery("CREATE TABLE " + tbl_graphletcount_complex + " (complex_graphlet_id serial primary key, complexgraph_id int not null references " + tbl_complexgraph + " ON DELETE CASCADE, complex_graphlet_counts decimal[58] not null);");
+            doInsertQuery("CREATE TABLE " + tbl_graphletcount_aa + " (aa_graphlet_id serial primary key, aagraph_id int not null references " + tbl_aagraph + " ON DELETE CASCADE, aa_graphlet_counts decimal[93] not null);");
             doInsertQuery("CREATE TABLE " + tbl_nm_ssetoproteingraph + " (ssetoproteingraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, position_in_graph int not null);");
             doInsertQuery("CREATE TABLE " + tbl_nm_ssetofoldinggraph + " (ssetofoldinggraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, position_in_graph int not null);");
             doInsertQuery("CREATE TABLE " + tbl_nm_chaintomotif + " (chaintomotif_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, motif_id int not null references " + tbl_motif + " ON DELETE CASCADE);");

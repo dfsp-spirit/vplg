@@ -6,7 +6,9 @@
 
 ## settings ###
 
-RUN_GRAPHLETANALYSER="NO"
+RUN_GRAPHLETANALYSER="YES"
+RUN_GRAPHLETANALYSER_ALSO_FOR_COMPLEXGRAPHS="YES"
+RUN_GRAPHLETANALYSER_ALSO_FOR_AMINOACIDGRAPHS="YES"
 
 
 #PLCC_OPTIONS="-f -u -k -s --complex-graphs --aa-graphs"
@@ -63,21 +65,27 @@ do
 	fi
 	
 	if [ "$RUN_GRAPHLETANALYSER" = "YES" ]; then
+	
 	        if [ "$SILENT" = "NO" ]; then
                   echo "$APPTAG Running Graphletanalyser to compute graphlets for all chains of the PDB file."
                 fi
+                
+                ## extract the subdir from the pdbid (it is defined by the 2nd and 3rd letter of the id, e.g., for the pdbid '3kmf', it is 'km')
+                MID2PDBCHARS=${PDBID:1:2}
+                
 		CHAINS_FILE="${PLCC_OUTPUT_DIR}/${PDBID}.chains"
+		
 		if [ ! -f "$CHAINS_FILE" ]; then
 		       echo "$APPTAG ##### ERROR: No chains file found at '$CHAINS_FILE', is '--cluster' set as PLCC command line option?"
 	        else
 	                if [ "$SILENT" = "NO" ]; then
 	                  echo "$APPTAG Chains file found at '$CHAINS_FILE'."
 	                fi
+	                
+	                ## run GA for the protein graphs of all chains
 			for CHAIN in $(cat ${CHAINS_FILE});
 			do
-			        if [ "$PLCC_RUNS_IN_SUBDIR_TREE_MODE" = "YES" ]; then
-			            ## extract the subdir from the pdbid (it is defined by the 2nd and 3rd letter of the id, e.g., for the pdbid '3kmf', it is 'km')
-                                    MID2PDBCHARS=${PDBID:1:2}
+			        if [ "$PLCC_RUNS_IN_SUBDIR_TREE_MODE" = "YES" ]; then			            
 			            ALBE_GML_GRAPHFILE="${PLCC_OUTPUT_DIR}/${MID2PDBCHARS}/${PDBID}/${CHAIN}/${PDBID}_${CHAIN}_albe_PG.gml"
 			        else
 			            ALBE_GML_GRAPHFILE="${PLCC_OUTPUT_DIR}/${PDBID}_${CHAIN}_albe_PG.gml"
@@ -85,14 +93,53 @@ do
 
 				if [ -f "$ALBE_GML_GRAPHFILE" ]; then
 				        if [ "$SILENT" = "NO" ]; then
-				          echo "$APPTAG Running Graphletanalyser on file '$ALBE_GML_GRAPHFILE' for albe graph of $PDBID chain '$CHAIN'."
+				          echo "$APPTAG Running Graphletanalyser on file '$ALBE_GML_GRAPHFILE' for albe protein graph of $PDBID chain '$CHAIN'."
 				        fi
-					./graphletanalyser --silent --useDatabase $ALBE_GML_GRAPHFILE
+					./graphletanalyser --silent --useDatabase --sse_graph $ALBE_GML_GRAPHFILE
 				else
-					echo "$APPTAG ##### ERROR:The albe GML graph file was not found at '$ALBE_GML_GRAPHFILE', cannot run graphletanalyser on it."
+					echo "$APPTAG ##### ERROR: The albe GML protein graph file was not found at '$ALBE_GML_GRAPHFILE', cannot run graphletanalyser on it."
 				fi
 			done
 
+			## now also compute the graphlet counts for CGs
+			if [ "$RUN_GRAPHLETANALYSER_ALSO_FOR_COMPLEXGRAPHS" = "YES" ]; then
+			    if [ "$PLCC_RUNS_IN_SUBDIR_TREE_MODE" = "YES" ]; then
+				ALBELIG_GML_COMPLEXGRAPHFILE="${PLCC_OUTPUT_DIR}/${MID2PDBCHARS}/${PDBID}/ALL/${PDBID}_complex_sses_albelig_CG.gml"
+			    else
+				ALBELIG_GML_COMPLEXGRAPHFILE="${PLCC_OUTPUT_DIR}/${PDBID}_aagraph.gml"
+			    fi
+			
+			    if [ -f "$ALBELIG_GML_COMPLEXGRAPHFILE" ]; then
+				    if [ "$SILENT" = "NO" ]; then
+				      echo "$APPTAG Running Graphletanalyser on file '$ALBELIG_GML_COMPLEXGRAPHFILE' for albelig complex graph of PDB $PDBID."
+				    fi
+				    ./graphletanalyser --silent --useDatabase --complex_graph $ALBELIG_GML_COMPLEXGRAPHFILE
+			    else
+				    echo "$APPTAG ##### ERROR: The albelig GML complex graph file was not found at '$ALBELIG_GML_COMPLEXGRAPHFILE', cannot run graphletanalyser on it."
+			    fi
+			fi
+			
+			## now also compute the graphlet counts for AAGs
+			if [ "$RUN_GRAPHLETANALYSER_ALSO_FOR_AMINOACIDGRAPHS" = "YES" ]; then
+			    if [ "$PLCC_RUNS_IN_SUBDIR_TREE_MODE" = "YES" ]; then
+				ALBE_GML_AMINOACIDGRAPHFILE="${PLCC_OUTPUT_DIR}/${MID2PDBCHARS}/${PDBID}/ALL/${PDBID}_aagraph.gml"
+			    else
+				ALBE_GML_AMINOACIDGRAPHFILE="${PLCC_OUTPUT_DIR}/${PDBID}_aagraph.gml"
+			    fi
+			
+			    if [ -f "$ALBE_GML_AMINOACIDGRAPHFILE" ]; then
+				    if [ "$SILENT" = "NO" ]; then
+				      echo "$APPTAG Running Graphletanalyser on file '$ALBE_GML_AMINOACIDGRAPHFILE' for albe amino acid graph of PDB $PDBID."
+				    fi
+				    ./graphletanalyser --silent --useDatabase --aa_graph $ALBE_GML_AMINOACIDGRAPHFILE
+			    else
+				    echo "$APPTAG ##### ERROR: The albe GML amino acid graph file was not found at '$ALBE_GML_AMINOACIDGRAPHFILE', cannot run graphletanalyser on it."
+			    fi
+			fi
+		      
+			
+
+			## delete chains file
 			if [ "$DELETE_CLUSTER_CHAINS_FILE" = "YES" ]; then
 				rm "$CHAINS_FILE"
 			fi
