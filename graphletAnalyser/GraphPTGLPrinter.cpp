@@ -238,7 +238,7 @@ int GraphPTGLPrinter::savePGCountsToDatabasePGXX(int graphtype_int, std::vector<
 
         // Let's insert the graphlet counts into the DB.
         if(dbpk <= 0) {
-            cerr << apptag << "ERROR: ID of graph not found in the database, cannot assign graphlets to it. Skipping.\n";
+            cerr << apptag << "ERROR: ID of protein graph not found in the database, cannot assign graphlets to it. Skipping.\n";
             return 1;
         }
         else {
@@ -349,7 +349,7 @@ int GraphPTGLPrinter::savePGCountsToDatabasePGXX(int graphtype_int, std::vector<
         }
 
     } catch (const std::exception &e) {
-        cerr << apptag << "SQL trouble when trying to save graphlets to DB: '" << e.what() << "'." << endl;
+        cerr << apptag << "SQL trouble when trying to save graphlets for protein graph to DB: '" << e.what() << "'." << endl;
         return 1;
     }
 }
@@ -421,7 +421,7 @@ int GraphPTGLPrinter::databaseContainsGraphletsForPGGraph(unsigned long int data
         return count;		
         
     } catch (const std::exception &e) {
-        cerr << apptag << "SQL trouble when checking for graphlet entry for graph in DB: '" << e.what() << "'." << endl;
+        cerr << apptag << "SQL trouble when checking for graphlet entry for protein graph in DB: '" << e.what() << "'." << endl;
         return -1;
     }
 }
@@ -501,7 +501,7 @@ void GraphPTGLPrinter::deletePGGraphletCountEntryForGraph(unsigned long int data
         }
         W.commit();                        
     } catch (const std::exception &e) {
-        cerr << apptag << "SQL trouble when checking for graphlet entry for graph in DB: '" << e.what() << "'." << endl;
+        cerr << apptag << "SQL trouble when checking for graphlet entry for protein graph in DB: '" << e.what() << "'." << endl;
     }
 }
 
@@ -595,23 +595,23 @@ int GraphPTGLPrinter::saveAACountsToDatabasePGXX(std::string pdbid, std::string 
 
         // Let's insert the graphlet counts into the DB.
         if(dbpk <= 0) {
-            cerr << apptag << "ERROR: ID of graph not found in the database, cannot assign graphlets to it. Skipping.\n";
+            cerr << apptag << "ERROR: ID of amino acid graph for " << pdbid << " not found in the database, cannot assign graphlets to it. Skipping.\n";
             return 1;
         }
         else {
             if( ! silent) {
-                cout << apptag << "      Found graph in database, ID is " << dbpk << ".\n";  
+                cout << apptag << "      Found amino acid graph in database, ID is " << dbpk << ".\n";  
             }
             
             int numGraphletCountsAlreadyInDatabase = databaseContainsGraphletsForAAGraph(dbpk);
             if(numGraphletCountsAlreadyInDatabase == 0) {
                 if( ! silent) {
-                    cout << apptag << "      Database does not contain graphlet count entries for this graph, ok.\n";
+                    cout << apptag << "      Database does not contain graphlet count entries for this amino acid graph, ok.\n";
                 }
             }
             else {
                 if( ! silent) {
-                    cout << apptag << "      Database already contains graphlet count entry for this graph, trying to delete old entry.\n";
+                    cout << apptag << "      Database already contains graphlet count entry for this amino acid graph, trying to delete old entry.\n";
                 }
                 deleteAAGraphletCountEntryForGraph(dbpk);
             }
@@ -707,7 +707,7 @@ int GraphPTGLPrinter::saveAACountsToDatabasePGXX(std::string pdbid, std::string 
         }
 
     } catch (const std::exception &e) {
-        cerr << apptag << "SQL trouble when trying to save graphlets to DB: '" << e.what() << "'." << endl;
+        cerr << apptag << "SQL trouble when trying to save graphlets for amino acid graph to DB: '" << e.what() << "'." << endl;
         return 1;
     }
 }
@@ -877,7 +877,7 @@ int GraphPTGLPrinter::saveCGCountsToDatabasePGXX(std::string pdbid, std::string 
 
     
     if( ! silent) {
-        cout << apptag <<  "    Saving graphlets of pdbid " << pdbid << " to PostgreSQL database.\n";
+        cout << apptag <<  "    Saving graphlets of pdbid " << pdbid << " complex graph to PostgreSQL database.\n";
     }
     
     // TODO: remove this
@@ -913,23 +913,23 @@ int GraphPTGLPrinter::saveCGCountsToDatabasePGXX(std::string pdbid, std::string 
 
         // Let's insert the graphlet counts into the DB.
         if(dbpk <= 0) {
-            cerr << apptag << "ERROR: ID of graph not found in the database, cannot assign graphlets to it. Skipping.\n";
+            cerr << apptag << "ERROR: ID of complex graph for " << pdbid << " not found in the database, cannot assign graphlets to it. Skipping.\n";
             return 1;
         }
         else {
             if( ! silent) {
-                cout << apptag << "      Found graph in database, ID is " << dbpk << ".\n";  
+                cout << apptag << "      Found complex graph in database, ID is " << dbpk << ".\n";  
             }
             
             int numGraphletCountsAlreadyInDatabase = databaseContainsGraphletsForCGGraph(dbpk);
             if(numGraphletCountsAlreadyInDatabase == 0) {
                 if( ! silent) {
-                    cout << apptag << "      Database does not contain graphlet count entries for this graph, ok.\n";
+                    cout << apptag << "      Database does not contain graphlet count entries for this complex graph, ok.\n";
                 }
             }
             else {
                 if( ! silent) {
-                    cout << apptag << "      Database already contains graphlet count entry for this graph, trying to delete old entry.\n";
+                    cout << apptag << "      Database already contains graphlet count entry for this complex graph, trying to delete old entry.\n";
                 }
                 deleteCGGraphletCountEntryForGraph(dbpk);
             }
@@ -1027,7 +1027,7 @@ int GraphPTGLPrinter::saveCGCountsToDatabasePGXX(std::string pdbid, std::string 
         }
 
     } catch (const std::exception &e) {
-        cerr << apptag << "SQL trouble when trying to save graphlets to DB: '" << e.what() << "'." << endl;
+        cerr << apptag << "SQL trouble when trying to save graphlets for complex graph to DB: '" << e.what() << "'." << endl;
         return 1;
     }
 }
