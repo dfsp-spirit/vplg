@@ -545,6 +545,7 @@ int GraphPTGLPrinter::saveAACountsToDatabasePGXX(std::string pdbid, std::string 
     
     Database db = Database::getInstance();
     string connection_string = db.get_connect_string();
+    std::string chain_description = "ALL";
  
     
     
@@ -559,7 +560,7 @@ int GraphPTGLPrinter::saveAACountsToDatabasePGXX(std::string pdbid, std::string 
 
     
     if( ! silent) {
-        cout << apptag <<  "    Saving graphlets of pdbid " << pdbid << " to PostgreSQL database.\n";
+        cout << apptag <<  "    Saving graphlets of amino acid graph for pdbid " << pdbid << " to PostgreSQL database.\n";
     }
     
     // TODO: remove this
@@ -578,7 +579,7 @@ int GraphPTGLPrinter::saveAACountsToDatabasePGXX(std::string pdbid, std::string 
     }
     
     try {				                                
-        long dbpk = getAAGraphDatabaseID(pdbid);
+        long dbpk = getAAGraphDatabaseID(pdbid, chain_description);
 
         connection C(connection_string);
         //cout << "      Connected to database '" << C.dbname() << "'.\n";
@@ -595,7 +596,7 @@ int GraphPTGLPrinter::saveAACountsToDatabasePGXX(std::string pdbid, std::string 
 
         // Let's insert the graphlet counts into the DB.
         if(dbpk <= 0) {
-            cerr << apptag << "ERROR: ID of amino acid graph for " << pdbid << " not found in the database, cannot assign graphlets to it. Skipping.\n";
+            cerr << apptag << "ERROR: ID of amino acid graph for " << pdbid << " chain description " << chain_description << " not found in the database, cannot assign graphlets to it. Skipping.\n";
             return 1;
         }
         else {
@@ -712,7 +713,7 @@ int GraphPTGLPrinter::saveAACountsToDatabasePGXX(std::string pdbid, std::string 
     }
 }
 
-long GraphPTGLPrinter::getAAGraphDatabaseID(string pdbid) const {
+long GraphPTGLPrinter::getAAGraphDatabaseID(string pdbid, string chain_description) const {
     
     long id = -1;
     Database db = Database::getInstance();
@@ -723,7 +724,7 @@ long GraphPTGLPrinter::getAAGraphDatabaseID(string pdbid) const {
         connection C(connection_string);
         //cout << "      Connected to database '" << C.dbname() << "'.\n";
         work W(C);
-        result R = W.exec("SELECT g.aagraph_id FROM plcc_aagraph g INNER JOIN plcc_protein p ON  p.pdb_id = g.pdb_id WHERE (p.pdb_id = '" + W.esc(pdbid) + "');");
+        result R = W.exec("SELECT g.aagraph_id FROM plcc_aagraph g WHERE (g.pdb_id = '" + W.esc(pdbid) + "' AND g.chain_description = '" + W.esc(chain_description) + "');");
 
         //cout << "      Found " << R.size() << " graphs of type " << graphType << " for PDB " << pdbid << " chain " << chain << "." << endl;
 

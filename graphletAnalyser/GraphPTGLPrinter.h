@@ -31,7 +31,7 @@ class GraphPTGLPrinter : public GraphPrinter {
         int saveAACountsToDatabasePGXX(std::string,std::string,std::vector<std::vector<float>>,std::vector<float>);
         int saveCGCountsToDatabasePGXX(std::string,std::string,std::vector<std::vector<float>>,std::vector<float>);
         long getPGGraphDatabaseID(std::string, std::string, int) const;
-        long getAAGraphDatabaseID(std::string) const;
+        long getAAGraphDatabaseID(std::string, std::string) const;
         long getCGGraphDatabaseID(std::string) const;
         int databaseContainsGraphletsForPGGraph(unsigned long int) const;
         int databaseContainsGraphletsForAAGraph(unsigned long int) const;
