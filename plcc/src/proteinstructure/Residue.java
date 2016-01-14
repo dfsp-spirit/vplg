@@ -382,7 +382,8 @@ public class Residue implements java.io.Serializable {
 
 
     /**
-     * Returns the radius of the collision sphere of this residue.
+     * Returns the radius of the collision sphere of this residue. This radius doe NOT yet include the outer hull, it is the distance from the center atom to the (non-H) atom farthest away from it.
+     * @return the radius, in 1/10th Angstroem (so 20 means 2.0 A).
      */
     public Integer getCenterSphereRadius() {
 
@@ -409,7 +410,7 @@ public class Residue implements java.io.Serializable {
 
 
     /**
-     * Determines the center atom of this residue.
+     * Determines the center atom of this residue, and also sets the center sphere radius for the residue.
      * @return the center atom
      */
     public Atom getCenterAtom() {

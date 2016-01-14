@@ -61,7 +61,7 @@ do
 	if [ ! -r $DSSPFILE ]; then
 	   echo "$filename" >> $NODSSP_LIST
 	else
-	    ./plcc $filename $PLCC_OPTIONS	    
+	    java -Xmx4096M -jar plcc.jar $filename $PLCC_OPTIONS	    
 	fi
 	
 	if [ "$RUN_GRAPHLETANALYSER" = "YES" ]; then

@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import proteinstructure.AminoAcid;
 import graphformats.IGraphModellingLanguageFormat;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import plcc.Settings;
 import proteingraphs.ResContactInfo;
@@ -101,6 +103,58 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
                 }
             }
         }
+    }
+    
+    /**
+     * Returns the maximal degree for any residue of a specific type, for all 20 different residue types (amino acids).
+     * @return a map of 1 letter amino acid names to their respective max degree in this graph. Only contains entries for the 20 natural AAs, not for stuff like ligands or other special residues.
+     */
+    public Map<String, Integer> getMaxDegreeByAminoacidType() {
+        Map<String, Integer> maxDegs = new HashMap<>();                
+        for(int i = 0; i < 20; i++) {
+            maxDegs.put(AminoAcid.names1[i], 0);
+        }
+        
+        Residue r; String name1; Integer deg;
+        for(int i = 0; i < this.getNumVertices(); i++) {
+            r = this.getVertex(i);
+            if(r.isAA()) {
+                name1 = r.getAAName1();
+                deg = this.neighborsOf(i).size();
+                if(maxDegs.containsKey(name1)) {
+                    if(maxDegs.get(name1) < deg) {
+                        maxDegs.put(name1, deg);
+                    }
+                }
+            }
+        }
+        return maxDegs;
+    }
+    
+    /**
+     * Returns the maximal center sphere radius (which is the Ferret diameter of the residue, NOT including the outer 2A collision hull added to it (on each side)) for any residue of a specific type, for all 20 different residue types (amino acids). Note that the diameter for residues of a specific type may vary based on the residue conformation. Note that it includes 2A around each atom, and is given in 1/10 A.
+     * @return a map of 1 letter amino acid names to their max ferret diameter in this graph. Only contains entries for the 20 natural AAs, not for stuff like ligands or other special residues. NOTE that the values are given in 1/10th Angstroem (so 50 means 5 Angstroem).
+     */
+    public Map<String, Integer> getMaxFerretDiameterByAminoacidType() {
+        Map<String, Integer> maxDiameters = new HashMap<>();                
+        for(int i = 0; i < 20; i++) {
+            maxDiameters.put(AminoAcid.names1[i], 0);
+        }
+        
+        Residue r; String name1; Integer diam;
+        for(int i = 0; i < this.getNumVertices(); i++) {
+            r = this.getVertex(i);
+            if(r.isAA()) {
+                name1 = r.getAAName1();
+                diam = r.getCenterSphereRadius() * 2;
+                if(maxDiameters.containsKey(name1)) {
+                    if(maxDiameters.get(name1) < diam) {
+                        maxDiameters.put(name1, diam);
+                    }
+                }
+            }
+        }
+        return maxDiameters;
     }
     
     private Boolean contactSatisfiesRules(ResContactInfo c) {

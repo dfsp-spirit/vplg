@@ -253,7 +253,7 @@ public class GraphMetrics {
     }
     
     /**
-     * Gives degree distribution as array, from degree 0 to (maxDegreeExclusive - 1).
+     * Gives degree distribution as array, from degree 0 to (maxDegreeExclusive - 1). These are maxDegreeExclusive values.
      * @param maxDegreeExclusive max degree, exclusive. If you put 50, you will get degree distribution from 0 to 49.
      * @return the dgd
      */

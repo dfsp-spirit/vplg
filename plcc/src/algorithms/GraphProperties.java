@@ -9,6 +9,7 @@ package algorithms;
 
 import datastructures.SimpleGraphInterface;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -212,6 +213,20 @@ public class GraphProperties {
         return GraphMetrics.determineVertexSetWithClCAtMost(graph, maxClC);
     }
     
+    /**
+     * Determines the set of all vertices which have at least the given degree.
+     * @param deg the min degree allowed for vertices to be included
+     * @return the set of all vertices which have least the given degree in g, by index.
+     */
+    public Set<Integer> determineVertexSetWithDegreeAtLeast(Integer deg) {        
+        Set<Integer> verts = new HashSet<>();
+        for(int i = 0; i < graph.getSize(); i++) {
+            if(graph.neighborsOf(i).size() >= deg) {
+                verts.add(i);
+            }
+        }
+        return verts;
+    }
     
     /**
      * Checks whether the graph is connected, i.e., every vertex is reachable from every other vertex

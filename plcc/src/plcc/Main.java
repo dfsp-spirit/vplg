@@ -1253,10 +1253,11 @@ public class Main {
         Boolean silent = false;
         if(Settings.getBoolean("plcc_B_silent")) {
             if(Settings.getBoolean("plcc_B_print_silent_notice")) {
+                String startTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
                 if(Settings.getBoolean("plcc_B_no_warn")) {
-                    System.out.println("[PLCC]  Silent mode and no-warn active, only errors will be printed from now on. Bye.");
+                    System.out.println("[PLCC] [" + pdbid + "] [" + startTime + "] Silent mode and no-warn active, only errors will be printed from now on. Bye.");
                 } else {
-                    System.out.println("[PLCC] Silent mode active, only errors and warnings will be printed from now on. Bye.");
+                    System.out.println("[PLCC] [" + pdbid + "] [" + startTime + "]  Silent mode active, only errors and warnings will be printed from now on. Bye.");
                 }
             }
             silent = true;
@@ -2210,9 +2211,43 @@ public class Main {
                                         //Set<Integer> s = gp.determineMaxEccVertexSet(); System.out.println("Max ECC vertices: " + IO.setIntegerToString(s) + ".");
                                         //Set<Integer> s = gp.determineVertexSetWithEccAtLeast(12);
                                         //Set<Integer> s = gp.determineVertexSetWithClCAtLeast(0.8);
-                                        Set<Integer> s = gp.determineVertexSetWithClCAtMost(0.25);
+                                        //Set<Integer> s = gp.determineVertexSetWithClCAtMost(0.25);
+                                        Set<Integer> s = gp.determineVertexSetWithDegreeAtLeast(16);
+                                        
                                         List<Residue> l = aag.getResiduesFromSetByIndex(s);
                                         System.out.println("Pymol select script for " + l.size() + " of the " + aag.getSize() + " residues: '" + Main.getPymolSelectionScriptForResidues(l) + "'.");
+                                    }
+                                    
+                                    
+                                    Boolean showResProps = true;
+                                    if(showResProps) {
+                                        Map<String, Integer> maxDegrees = aag.getMaxDegreeByAminoacidType();
+                                        Map<String, Integer> maxDiams = aag.getMaxFerretDiameterByAminoacidType();
+
+                                        List<String> sortedKeys = new ArrayList<>(maxDegrees.keySet());
+                                        Collections.sort(sortedKeys);
+                                        StringBuilder sb = new StringBuilder();
+                                        sb.append("Residue types: \n");
+                                        for(String key : sortedKeys) {
+                                            sb.append(key + "\t");
+                                        }
+                                        sb.append("\n");
+                                        sb.append("Atom count by residue type: \n");
+                                        for(String key : sortedKeys) {
+                                            sb.append(AminoAcid.atomCountOfName1(key) + "\t");
+                                        }
+                                        sb.append("\n");
+                                        sb.append("maxDegree by residue type: \n");
+                                        for(String key : sortedKeys) {
+                                            sb.append(maxDegrees.get(key) + "\t");
+                                        }
+                                        sb.append("\n");
+                                        sb.append("maxDiam by residue type: \n");
+                                        for(String key : sortedKeys) {
+                                            sb.append(maxDiams.get(key) + "\t");
+                                        }
+                                        sb.append("\n");
+                                        System.out.println(sb.toString());
                                     }
                                     
                                     //System.out.println("max CC is: " + gp.getMaximumNetworkClusterCoefficient());

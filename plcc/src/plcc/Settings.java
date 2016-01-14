@@ -245,7 +245,7 @@ public class Settings {
         defSet("plcc_B_no_parse_warn", "true", "Whether to suppress all warnings related to parsing of atoms from and other data from the PDB and DSSP input files.");
         defSet("plcc_B_no_not_impl_warn", "true", "Whether to suppress all warnings related to not implemented function.");
         defSet("plcc_B_silent", "false", "Whether to suppress all output. Cluster mode, not recommended for normal usage.");
-        defSet("plcc_B_print_silent_notice", "false", "Whether to print a single line informing the user that silent mode is set in silent mode.");
+        defSet("plcc_B_print_silent_notice", "true", "Whether to print a single line informing the user that silent mode is set in silent mode (includes PDB ID of current file).");
         defSet("plcc_I_debug_level", "0", "Debug level. Higher value means more output.");
         defSet("plcc_B_debug_compareSSEContacts", "false", "Whether to compare the computed SSE level contacts to those in the geom_neo output file that is supplied.");
         defSet("plcc_S_debug_compareSSEContactsFile", "geo.dat_ptgl", "The path to the geo.dat file to use for SSE level contact comparison.");                

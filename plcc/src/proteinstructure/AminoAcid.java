@@ -184,6 +184,16 @@ public class AminoAcid {
         
         
     }
+    
+    /**
+     * Returns the number of (non-H) atoms that the AA with the given name1 has.
+     * @param n the name1
+     * @return the number of atoms or -1 if an invalid ID was given
+     */
+    public static Integer atomCountOfName1(String n) {
+        Integer id = AminoAcid.name1ToID(n);
+        return AminoAcid.atomCountOfID(id);
+    }
 
 
     /**
