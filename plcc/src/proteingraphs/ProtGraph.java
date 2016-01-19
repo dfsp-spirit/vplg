@@ -12,6 +12,7 @@ package proteingraphs;
 
 //import com.google.gson.Gson;
 
+import datastructures.SparseGraph;
 import proteinstructure.SSE;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -520,6 +521,35 @@ public class ProtGraph extends SSEGraph implements java.io.Serializable  {
         System.out.println("Graph format perl:\n" + pf);
         
        
+    }
+    
+    /**
+     * Constructs a SparseGraph from the data in this graph.
+     * @return the SparseGraph
+     */
+    @Override
+    public SparseGraph<String, String> toSparseGraph() {
+        SparseGraph<String, String> g = new SparseGraph<>();
+        
+        // add verts
+        for(int i = 0; i < this.sseList.size(); i++) {
+            g.addVertex(this.getFGNotationOfVertex(i));
+        }
+        
+        // add edges
+        Integer[] e;
+        for(int i = 0; i < this.getEdgeList().size(); i++) {
+            e = this.getEdgeList().get(i);
+            g.addEdge(e[0], e[1], SpatRel.getString(this.matrix[e[0]][e[1]]));
+        }
+        
+        if(this.sseList.size() != g.getNumVertices()) {
+            DP.getInstance().e("FoldingGraph", "toSparseGraph: vertex counts of graphs do not match.");
+        }
+        if(this.getEdgeList().size() != g.getNumEdges()) {
+            DP.getInstance().e("FoldingGraph", "toSparseGraph: edge counts of graphs do not match.");
+        }
+        return g;        
     }
     
     

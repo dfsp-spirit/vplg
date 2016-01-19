@@ -1190,8 +1190,22 @@ public class Main {
                             IDrawableGraph g = p.getDrawableGraph();
                             DP.getInstance().i("Received graph with " + g.getDrawableVertices().size() + " vertices and " + g.getDrawableEdges().size() + " edges.");
                             
-                            ProteinGraphDrawer.drawDrawableGraph(outFilePathNoExt, formats, g, vertexMappings);
-                            DP.getInstance().i("Done drawing GML graph to base file '" + outFilePathNoExt + "', exiting.");
+                            
+                            Boolean testSparseGraphProps = true;
+                            Boolean skipDrawing = true;
+                            if(testSparseGraphProps) {
+                                System.out.println("Constructing sparse graph...");
+                                SparseGraph<String, String> sg = g.toSparseGraph();
+                                System.out.println("Computing sparse graph properties...");
+                                GraphProperties gp = new GraphProperties(sg);
+                                System.out.println(gp.getOverviewPropsString(true));
+                            }
+                                                        
+                            
+                            if( ! skipDrawing) {
+                                ProteinGraphDrawer.drawDrawableGraph(outFilePathNoExt, formats, g, vertexMappings);
+                                DP.getInstance().i("Done drawing GML graph to base file '" + outFilePathNoExt + "', exiting.");
+                            }
                             checkArgsUsage(args, argsUsed);
                             System.exit(0);
                         }
