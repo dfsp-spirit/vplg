@@ -430,7 +430,9 @@ public class ComplexGraph extends UAdjListGraph {
                     ig2.setFont(labelfont);
                     ig2.setPaint(Color.BLACK);
                     Integer cInteractions = cg.numChainInteractions[i][j];
-                    ig2.drawString(cInteractions.toString(), labelPosX, labelPosY + (stringHeight / 4));
+                    if(cInteractions != null) {
+                        ig2.drawString(cInteractions.toString(), labelPosX, labelPosY + (stringHeight / 4));
+                    }
 
                 }
             }
