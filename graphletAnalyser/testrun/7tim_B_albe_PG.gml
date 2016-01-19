@@ -4,7 +4,7 @@ graph [
   comment "title=STRUCTURE OF THE TRIOSEPHOSPHATE ISOMERASE-PHOSPHOGLYCOLOHYDROXAMATE COMPLEX: AN ANALOGUE OF THEINTERMEDIATE ON THE REACTION PATHWAY|keywords=INTRAMOLECULAR OXIDOREDUCTASE|pdbid=7tim|experiment=X-RAY DIFFRACTION|pdb_mol_name=TRIOSEPHOSPHATE ISOMERASE|chainid=B|graphtype=albe|resolution=1.9|date=23-APR-91|pdb_org_sci=SACCHAROMYCES CEREVISIAE|graphclass=protein graph|header=INTRAMOLECULAR OXIDOREDUCTASE|pdb_org_common=BAKER'S YEAST|"
   directed 0
   isplanar 0
-  creator "PLCC version 0.86"
+  creator "PLCC version 0.98"
   pdb_id "7tim"
   chain_id "B"
   graph_type "albe"
@@ -25,6 +25,7 @@ graph [
     pdb_residues_full "B-5- ,B-6- ,B-7- ,B-8- ,B-9- ,B-10- "
     aa_sequence "FFVGGN"
     sse_type "E"
+    fg_notation_label "e"
   ]
   node [
     id 1
@@ -38,6 +39,7 @@ graph [
     pdb_residues_full "B-17- ,B-18- ,B-19- ,B-20- ,B-21- ,B-22- ,B-23- ,B-24- ,B-25- ,B-26- ,B-27- ,B-28- ,B-29- "
     aa_sequence "KQSIKEIVERLNT"
     sse_type "H"
+    fg_notation_label "h"
   ]
   node [
     id 2
@@ -51,6 +53,7 @@ graph [
     pdb_residues_full "B-36- ,B-37- ,B-38- ,B-39- ,B-40- ,B-41- "
     aa_sequence "VEVVIC"
     sse_type "E"
+    fg_notation_label "e"
   ]
   node [
     id 3
@@ -64,6 +67,7 @@ graph [
     pdb_residues_full "B-44- ,B-45- ,B-46- ,B-47- ,B-48- ,B-49- ,B-50- ,B-51- ,B-52- ,B-53- "
     aa_sequence "ATYLDYSVSL"
     sse_type "H"
+    fg_notation_label "h"
   ]
   node [
     id 4
@@ -77,6 +81,7 @@ graph [
     pdb_residues_full "B-59- ,B-60- ,B-61- ,B-62- ,B-63- "
     aa_sequence "VTVGA"
     sse_type "E"
+    fg_notation_label "e"
   ]
   node [
     id 5
@@ -90,6 +95,7 @@ graph [
     pdb_residues_full "B-80- ,B-81- ,B-82- ,B-83- ,B-84- ,B-85- "
     aa_sequence "VDQIKD"
     sse_type "H"
+    fg_notation_label "h"
   ]
   node [
     id 6
@@ -103,6 +109,7 @@ graph [
     pdb_residues_full "B-90- ,B-91- ,B-92- ,B-93- "
     aa_sequence "WVIL"
     sse_type "E"
+    fg_notation_label "e"
   ]
   node [
     id 7
@@ -116,6 +123,7 @@ graph [
     pdb_residues_full "B-96- ,B-97- ,B-98- ,B-99- ,B-100- "
     aa_sequence "SERRS"
     sse_type "H"
+    fg_notation_label "h"
   ]
   node [
     id 8
@@ -129,6 +137,7 @@ graph [
     pdb_residues_full "B-106- ,B-107- ,B-108- ,B-109- ,B-110- ,B-111- ,B-112- ,B-113- ,B-114- ,B-115- ,B-116- ,B-117- ,B-118- "
     aa_sequence "DKFIADKTKFALG"
     sse_type "H"
+    fg_notation_label "h"
   ]
   node [
     id 9
@@ -142,6 +151,7 @@ graph [
     pdb_residues_full "B-122- ,B-123- ,B-124- ,B-125- ,B-126- ,B-127- "
     aa_sequence "GVILCI"
     sse_type "E"
+    fg_notation_label "e"
   ]
   node [
     id 10
@@ -155,6 +165,7 @@ graph [
     pdb_residues_full "B-131- ,B-132- ,B-133- ,B-134- ,B-135- "
     aa_sequence "LEEKK"
     sse_type "H"
+    fg_notation_label "h"
   ]
   node [
     id 11
@@ -168,6 +179,7 @@ graph [
     pdb_residues_full "B-139- ,B-140- ,B-141- ,B-142- ,B-143- ,B-144- ,B-145- ,B-146- ,B-147- ,B-148- ,B-149- ,B-150- ,B-151- ,B-152- ,B-153- "
     aa_sequence "TLDVVERQLNAVLEE"
     sse_type "H"
+    fg_notation_label "h"
   ]
   node [
     id 12
@@ -181,6 +193,7 @@ graph [
     pdb_residues_full "B-160- ,B-161- ,B-162- ,B-163- ,B-164- "
     aa_sequence "VVVAY"
     sse_type "E"
+    fg_notation_label "e"
   ]
   node [
     id 13
@@ -194,6 +207,7 @@ graph [
     pdb_residues_full "B-167- ,B-168- ,B-169- "
     aa_sequence "VWA"
     sse_type "H"
+    fg_notation_label "h"
   ]
   node [
     id 14
@@ -207,6 +221,7 @@ graph [
     pdb_residues_full "B-178- ,B-179- ,B-180- ,B-181- ,B-182- ,B-183- ,B-184- ,B-185- ,B-186- ,B-187- ,B-188- ,B-189- ,B-190- ,B-191- ,B-192- ,B-193- ,B-194- ,B-195- ,B-196- ,B-197- ,B-198- ,B-199- ,B-200- ,B-201- ,B-202- ,B-203- "
     aa_sequence "PEDAQDIHASIRKFLASKLGDKAASE"
     sse_type "H"
+    fg_notation_label "h"
   ]
   node [
     id 15
@@ -220,6 +235,7 @@ graph [
     pdb_residues_full "B-206- ,B-207- ,B-208- ,B-209- "
     aa_sequence "ILYG"
     sse_type "E"
+    fg_notation_label "e"
   ]
   node [
     id 16
@@ -233,6 +249,7 @@ graph [
     pdb_residues_full "B-217- ,B-218- ,B-219- ,B-220- "
     aa_sequence "AVTF"
     sse_type "H"
+    fg_notation_label "h"
   ]
   node [
     id 17
@@ -246,6 +263,7 @@ graph [
     pdb_residues_full "B-228- ,B-229- ,B-230- ,B-231- "
     aa_sequence "GFLV"
     sse_type "E"
+    fg_notation_label "e"
   ]
   node [
     id 18
@@ -259,6 +277,7 @@ graph [
     pdb_residues_full "B-233- ,B-234- ,B-235- ,B-236- "
     aa_sequence "GASL"
     sse_type "H"
+    fg_notation_label "h"
   ]
   node [
     id 19
@@ -272,6 +291,7 @@ graph [
     pdb_residues_full "B-239- ,B-240- ,B-241- ,B-242- ,B-243- ,B-244- "
     aa_sequence "EFVDII"
     sse_type "H"
+    fg_notation_label "h"
   ]
   edge [
     source 0

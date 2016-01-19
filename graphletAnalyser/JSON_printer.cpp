@@ -167,9 +167,9 @@ std::string JSON_printer::print_vectors_with_info(std::string graph_name, int nu
 std::string JSON_printer::print_labeled_counts(std::string graph_name, int num_nodes, int num_edges, std::unordered_map<std::string, std::vector<int>> map) {
     
     
-    std::string out_str = "{ \"Graphname\" : " + graph_name + ", \"Number of vertices\" : " +  std::to_string(num_nodes) + ", ";
+    std::string out_str = "{ \"Graphname\" : \"" + graph_name + "\", \"Number of vertices\" : " +  std::to_string(num_nodes) + ", ";
     out_str = out_str + "\"Number of edges\" : " + std::to_string(num_edges) + ", ";
-    out_str += "\"Labeled Counts \" : { ";
+    out_str += "\"Labeled Counts\" : { ";
     
     
     
@@ -181,8 +181,8 @@ std::string JSON_printer::print_labeled_counts(std::string graph_name, int num_n
         out_str += ", ";
                 
     }
-    out_str.erase(out_str.size() - 3, 2);
-    out_str += "}}";
+    out_str.erase(out_str.size() - 3, 3);
+    out_str += "]}}";
     
     
     return out_str;

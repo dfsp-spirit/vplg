@@ -246,14 +246,14 @@ void newtestclass::test_get_norm_counts() {
     
     std::vector<std::vector<float>> vec = service2.get_norm_counts();
     
-    for (int i = 0; i< vec.size(); i ++) {
-        
-        std::vector<float> vvec = vec[i];
-        for (int k = 0; k < vvec.size(); k++) {
-            std::cout << " " << vvec[k];
-        }
-        
-    }
+   // for (int i = 0; i< vec.size(); i ++) {
+   //     
+   //     std::vector<float> vvec = vec[i];
+   //     for (int k = 0; k < vvec.size(); k++) {
+   //         std::cout << " " << vvec[k];
+   //     }
+   //     
+   // }
     
     CPPUNIT_ASSERT(service2.get_norm_counts() == test_count_vector_float);
 }

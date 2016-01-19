@@ -21,8 +21,8 @@ void newtestclass3::setUp() {
     test_string_int = "[1,2,3]";
     test_string_vec_int = "[[1,2,3],[],[1,2,3]]";
     test_string_vec_float = "[[],[1.0,2.33,3.1049],[1.0,2.33,3.1049]]";
-    test_string_info = "\"Graphname\" : \"myGraph\", \"Number of vertices\" : 42, \"Number of edges\" : 84,  \"Absolute Counts\" : {\"2-graphlets\" : [1], \"3-graphlets\" : [1,2], \"4-graphlets\" : [1,2,3], \"5-graphlets\" : [1,2,3,4]}, \"Normalized Counts\" :  {\"2-graphlets\" : [0.1], \"3-graphlets\" : [0.1,0.2],\"4-graphlets\" : [0.1,0.2,0.3], \"5-graphlets\" : null}}";
-            
+    test_string_info = "{ \"Graphname\" : \"myGraph\", \"Number of vertices\" : 42, \"Number of edges\" : 84, \"Absolute Counts\" : { \"2-graphlets\" : [1], \"3-graphlets\" : [1,2], \"4-graphlets\" : [1,2,3], \"5-graphlets\" : [1,2,3,4]}, \"Normalized Counts\" : { \"2-graphlets\" : [0.1], \"3-graphlets\" : [0.1,0.2], \"4-graphlets\" : [0.1,0.2,0.3], \"5-graphlets\" : []}}";
+    test_string_lab = "{ \"Graphname\" : \"myGraph\", \"Number of vertices\" : 1, \"Number of edges\" : 1, \"Labeled Counts\" : { \"ABC\" : [1]}}";        
     
     test_vector_float = std::vector<float>();
     test_vector_float.push_back(1);
@@ -111,6 +111,22 @@ void newtestclass3::test_print_vectors_with_info() {
     
     std::string tst = printer.print_vectors_with_info("myGraph",42,84,v_vec_f,v_vec_i);
     
-    CPPUNIT_ASSERT(test_string_info.compare(tst));
+    //std::cout << tst << std::endl << test_string_info << std::endl;
+    
+    
+    CPPUNIT_ASSERT(test_string_info.compare(tst) == 0);
+    
+}
+
+void newtestclass3::test_print_labeled_counts() {
+    std::unordered_map<std::string, std::vector<int>> testmap = std::unordered_map<std::string, std::vector<int>>();
+    std::vector<int> test_vec = std::vector<int>();
+    test_vec.push_back(1);
+    testmap["ABC"] = test_vec;
+    std::string test = printer.print_labeled_counts("myGraph", 1, 1, testmap);
+    
+    //std::cout << std::endl << test << std::endl << test_string_lab << std::endl;
+    
+    CPPUNIT_ASSERT(test.compare(test_string_lab) == 0);
     
 }

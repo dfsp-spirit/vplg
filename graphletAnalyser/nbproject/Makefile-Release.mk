@@ -56,8 +56,7 @@ TESTFILES= \
 	${TESTDIR}/TestFiles/f6 \
 	${TESTDIR}/TestFiles/f1 \
 	${TESTDIR}/TestFiles/f4 \
-	${TESTDIR}/TestFiles/f5 \
-	${TESTDIR}/TestFiles/f7
+	${TESTDIR}/TestFiles/f5
 
 # Test Object Files
 TESTOBJECTFILES= \
@@ -67,14 +66,12 @@ TESTOBJECTFILES= \
 	${TESTDIR}/tests/newtestclass3.o \
 	${TESTDIR}/tests/newtestclass4.o \
 	${TESTDIR}/tests/newtestclass5.o \
-	${TESTDIR}/tests/newtestclass6.o \
 	${TESTDIR}/tests/newtestrunner.o \
 	${TESTDIR}/tests/newtestrunner1.o \
 	${TESTDIR}/tests/newtestrunner2.o \
 	${TESTDIR}/tests/newtestrunner3.o \
 	${TESTDIR}/tests/newtestrunner4.o \
-	${TESTDIR}/tests/newtestrunner5.o \
-	${TESTDIR}/tests/newtestrunner6.o
+	${TESTDIR}/tests/newtestrunner5.o
 
 # C Compiler Flags
 CFLAGS=
@@ -181,10 +178,6 @@ ${TESTDIR}/TestFiles/f5: ${TESTDIR}/tests/newtestclass4.o ${TESTDIR}/tests/newte
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc}   -o ${TESTDIR}/TestFiles/f5 $^ ${LDLIBSOPTIONS} `cppunit-config --libs`   
 
-${TESTDIR}/TestFiles/f7: ${TESTDIR}/tests/newtestclass6.o ${TESTDIR}/tests/newtestrunner6.o ${OBJECTFILES:%.o=%_nomain.o}
-	${MKDIR} -p ${TESTDIR}/TestFiles
-	${LINK.cc}   -o ${TESTDIR}/TestFiles/f7 $^ ${LDLIBSOPTIONS} `cppunit-config --libs`   
-
 
 ${TESTDIR}/tests/newtestclass2.o: tests/newtestclass2.cpp 
 	${MKDIR} -p ${TESTDIR}/tests
@@ -256,18 +249,6 @@ ${TESTDIR}/tests/newtestrunner4.o: tests/newtestrunner4.cpp
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -Werror `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner4.o tests/newtestrunner4.cpp
-
-
-${TESTDIR}/tests/newtestclass6.o: tests/newtestclass6.cpp 
-	${MKDIR} -p ${TESTDIR}/tests
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -Werror `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestclass6.o tests/newtestclass6.cpp
-
-
-${TESTDIR}/tests/newtestrunner6.o: tests/newtestrunner6.cpp 
-	${MKDIR} -p ${TESTDIR}/tests
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -Werror `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner6.o tests/newtestrunner6.cpp
 
 
 ${OBJECTDIR}/Database_nomain.o: ${OBJECTDIR}/Database.o Database.cpp 
@@ -410,7 +391,6 @@ ${OBJECTDIR}/main_nomain.o: ${OBJECTDIR}/main.o main.cpp
 	    ${TESTDIR}/TestFiles/f1 || true; \
 	    ${TESTDIR}/TestFiles/f4 || true; \
 	    ${TESTDIR}/TestFiles/f5 || true; \
-	    ${TESTDIR}/TestFiles/f7 || true; \
 	else  \
 	    ./${TEST} || true; \
 	fi

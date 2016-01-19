@@ -19,6 +19,7 @@ class newtestclass3 : public CPPUNIT_NS::TestFixture {
     CPPUNIT_TEST(test_print_int_vec_vector);
     CPPUNIT_TEST(test_print_float_vec_vector);
     CPPUNIT_TEST(test_print_vectors_with_info);
+    CPPUNIT_TEST(test_print_labeled_counts);
 
     CPPUNIT_TEST_SUITE_END();
 
@@ -27,7 +28,7 @@ public:
     virtual ~newtestclass3();
     void setUp();
     void tearDown();
-    std::string test_string_float, test_string_int, test_string_vec_float, test_string_vec_int, test_string_info;
+    std::string test_string_float, test_string_int, test_string_vec_float, test_string_vec_int, test_string_info, test_string_lab;
     std::vector<float> test_vector_float;
     std::vector<int> test_vector_int;
     std::vector<std::vector<float>> test_vec_vector_float;
@@ -41,6 +42,7 @@ private:
     void test_print_int_vec_vector();
     void test_print_float_vec_vector();
     void test_print_vectors_with_info();
+    void test_print_labeled_counts();
 };
 
 #endif	/* NEWTESTCLASS3_H */
