@@ -85,6 +85,7 @@ import graphdrawing.DrawTools.IMAGEFORMAT;
 import graphdrawing.DrawableGraph;
 import graphdrawing.IDrawableGraph;
 import graphdrawing.SimpleGraphDrawer;
+import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import parsers.GMLGraphParser;
 import parsers.IGraphParser;
 import similarity.CompareOneToDB;
@@ -2237,6 +2238,8 @@ public class Main {
                                     if(showResProps) {
                                         Map<String, Integer> maxDegrees = aag.getMaxDegreeByAminoacidType();
                                         Map<String, Integer> maxDiams = aag.getMaxFerretDiameterByAminoacidType();
+                                        Map<String, Double> avgDiams = aag.getAverageFerretDiameterByAminoacidType();
+                                        Map<String, Double> avgDegrees = aag.getAverageDegreeByAminoacidType();
 
                                         List<String> sortedKeys = new ArrayList<>(maxDegrees.keySet());
                                         Collections.sort(sortedKeys);
@@ -2247,8 +2250,12 @@ public class Main {
                                         }
                                         sb.append("\n");
                                         sb.append("Atom count by residue type: \n");
+                                        Integer[] numAtoms = new Integer[20];
+                                        int tmp = 0;
                                         for(String key : sortedKeys) {
                                             sb.append(AminoAcid.atomCountOfName1(key) + "\t");
+                                            numAtoms[tmp] = AminoAcid.atomCountOfName1(key);
+                                            tmp++;
                                         }
                                         sb.append("\n");
                                         sb.append("maxDegree by residue type: \n");
@@ -2262,6 +2269,29 @@ public class Main {
                                         }
                                         sb.append("\n");
                                         System.out.println(sb.toString());
+                                        PearsonsCorrelation pc = new PearsonsCorrelation();
+                                        
+                                        double[] maxDiamsAr = IO.integerArrayToDoubleArray(IO.mapStringIntegerToArraySortedByMapKeys(maxDiams));
+                                        double[] numAtomsAr = IO.integerArrayToDoubleArray(numAtoms);
+                                        double[] maxDegreesAr = IO.integerArrayToDoubleArray(IO.mapStringIntegerToArraySortedByMapKeys(maxDegrees));
+                                        double[] avgDiamsAr = IO.mapStringDoubleToArraySortedByMapKeys(avgDiams);
+                                        double[] avgDegreesAr = IO.mapStringDoubleToArraySortedByMapKeys(avgDegrees);
+                                        
+                                        Double corrMaxDiam2NumAtoms = pc.correlation(maxDiamsAr, numAtomsAr);
+                                        Double corrMaxDiam2Degrees = pc.correlation(maxDiamsAr, maxDegreesAr);
+                                        Double corrAvgDiam2NumAtoms = pc.correlation(avgDiamsAr, numAtomsAr);
+                                        Double corrAvgDiam2MaxDegrees = pc.correlation(avgDiamsAr, maxDegreesAr);
+                                        Double corrAvgDiam2AvgDegrees = pc.correlation(avgDiamsAr, avgDegreesAr);
+                                        Double corrNumAtoms2MaxDegrees = pc.correlation(numAtomsAr, maxDegreesAr);
+                                        Double corrNumAtoms2AvgDegrees = pc.correlation(numAtomsAr, avgDegreesAr);
+                                        
+                                        System.out.println("Pearson correlation, MaxDiameter to NumAtoms: " + corrMaxDiam2NumAtoms);
+                                        System.out.println("Pearson correlation, MaxDiameter to MaxDegrees: " + corrMaxDiam2Degrees);
+                                        System.out.println("Pearson correlation, AvgDiameter to NumAtoms: " + corrAvgDiam2NumAtoms);
+                                        System.out.println("Pearson correlation, AvgDiameter to MaxDegrees: " + corrAvgDiam2MaxDegrees);
+                                        System.out.println("Pearson correlation, AvgDiameter to AvgDegrees: " + corrAvgDiam2AvgDegrees);
+                                        System.out.println("Pearson correlation, NumAtoms to MaxDegrees: " + corrNumAtoms2MaxDegrees);
+                                        System.out.println("Pearson correlation, NumAtoms to AvgDegrees: " + corrNumAtoms2AvgDegrees);
                                     }
                                     
                                     //System.out.println("max CC is: " + gp.getMaximumNetworkClusterCoefficient());

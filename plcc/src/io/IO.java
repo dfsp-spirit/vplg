@@ -17,6 +17,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -49,6 +50,42 @@ import tools.DP;
  */
 public class IO {
    
+    public static Integer[] mapStringIntegerToArraySortedByMapKeys(Map<String, Integer> maxDiams) {
+        List<String> sortedKeys = new ArrayList<>(maxDiams.keySet());
+        Collections.sort(sortedKeys);
+        
+        Integer[] res = new Integer[maxDiams.keySet().size()];
+        
+        int i = 0;
+        for(String key : sortedKeys) {
+            res[i] = maxDiams.get(key);
+            i++;
+        }
+        return res;
+    }
+    
+    public static double[] mapStringDoubleToArraySortedByMapKeys(Map<String, Double> maxDiams) {
+        List<String> sortedKeys = new ArrayList<>(maxDiams.keySet());
+        Collections.sort(sortedKeys);
+        
+        double[] res = new double[maxDiams.keySet().size()];
+        
+        int i = 0;
+        for(String key : sortedKeys) {
+            res[i] = maxDiams.get(key);
+            i++;
+        }
+        return res;
+    }
+    
+    public static double[] integerArrayToDoubleArray(Integer[] in) {
+        double[] out = new double[in.length];
+        for(int i = 0; i < in.length; i++) {
+            out[i] = in[i].doubleValue();
+        }
+        return out;
+    } 
+    
     /**
      * Transforms a path into a web server path. Currently, this replaces the Windows file separator '\' with the unix/web file separator '/' in the input string and returns the result as a new string.
      * Note that the original string is NOT altered.

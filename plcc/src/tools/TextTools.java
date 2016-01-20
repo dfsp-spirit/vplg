@@ -25,10 +25,15 @@ public class TextTools {
         //s = "0,1,8,53,115,173,203,203,196,154,104,69,43,17,8,2,0";
         //s = "0,0,18,51,101,202,327,397,520,512,391,296,163,68,20,4,0,0,0,2,4,4,0";
         
-        //s = "0,0,0,6,22,28,52,49,52,73,58,37,22,8,6,2,0,1,0"; sum = TextTools.getSum(s); // 8icd degree distribution
-        //s = "0,0,3,1,13,34,61,58,92,107,89,53,46,13,2,2,0,0,0,0,0,1,0,1,0,2,0"; sum = TextTools.getSum(s); // 3kmf degree distribution
-        //s = "0,1,8,53,115,173,203,203,196,154,104,69,43,17,8,2,0"; sum = TextTools.getSum(s); // 1hzh degree distribution
-        s = "0,0,18,51,101,202,327,397,520,512,391,296,163,68,20,4,0,0,0,2,4,4,0"; sum = TextTools.getSum(s); // 4a97 degree distribution
+        //s = "0,0,0,6,22,28,52,49,52,73,58,37,22,8,6,2,0,1,0"; sum = TextTools.getSum(s); // 8icd degree distribution, with ligands
+        //s = "0,0,3,1,13,34,61,58,92,107,89,53,46,13,2,2,0,0,0,0,0,1,0,1,0,2,0"; sum = TextTools.getSum(s); // 3kmf degree distribution, with ligands
+        //s = "0,1,8,53,115,173,203,203,196,154,104,69,43,17,8,2,0"; sum = TextTools.getSum(s); // 1hzh degree distribution, with ligands
+        //s = "0,0,18,51,101,202,327,397,520,512,391,296,163,68,20,4,0,0,0,2,4,4,0"; sum = TextTools.getSum(s); // 4a97 degree distribution, with ligands
+        
+        s = "0,0,0,6,22,27,52,50,54,70,59,37,21,8,6,2,0"; sum = TextTools.getSum(s); // 8icd degree distribution, without ligands
+        //s = "0,0,3,1,13,36,65,55,103,115,87,54,31,7,2,2,0"; sum = TextTools.getSum(s); // 3kmf degree distribution, without ligands
+        //s = "0,1,8,52,114,177,203,206,192,145,97,68,41,17,8,2,0"; sum = TextTools.getSum(s); // 1hzh degree distribution, without ligands
+        //s= "0,0,18,55,110,196,330,406,529,530,386,281,142,64,21,2,0"; sum = TextTools.getSum(s); // 4a97 degree distribution, without ligands
         
         //s = "416,416,416,416,410,388,360,308,259,207,134,76,39,17,9,3,1,1,0"; sum = TextTools.leftMostIntegerOf(s);   // cumul, 8ICD including ligands (not that the sum is the left-most value for cumulative distributions)
         //s = "578,578,578,575,574,561,527,466,408,316,209,120,67,21,8,6,4,4,4,4,4,4,3,3,2,2,0"; sum = 578;    // cumul, 3KMF including ligands

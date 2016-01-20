@@ -157,6 +157,71 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         return maxDiameters;
     }
     
+    
+    /**
+     * Returns the average degree for any residue of a specific type, for all 20 different residue types (amino acids). 
+     * @return a map of 1 letter amino acid names to their average degree in this graph. Only contains entries for the 20 natural AAs, not for stuff like ligands or other special residues. 
+     */
+    public Map<String, Double> getAverageDegreeByAminoacidType() {
+        Map<String, Integer> degreeSum = new HashMap<>();
+        Map<String, Integer> numValues = new HashMap<>();
+        Map<String, Double> avg = new HashMap<>();
+        for(int i = 0; i < 20; i++) {
+            degreeSum.put(AminoAcid.names1[i], 0);
+            numValues.put(AminoAcid.names1[i], 0);
+        }
+        
+        Residue r; String name1; Integer degree;
+        for(int i = 0; i < this.getNumVertices(); i++) {
+            r = this.getVertex(i);
+            if(r.isAA()) {
+                name1 = r.getAAName1();
+                degree = this.neighborsOf(i).size();
+                if(degreeSum.containsKey(name1)) {
+                    degreeSum.put(name1, (degreeSum.get(name1) + degree));
+                    numValues.put(name1, (numValues.get(name1) + 1));
+                }
+            }
+        }
+        
+        for(String key : degreeSum.keySet()) {
+            avg.put(key, degreeSum.get(key).doubleValue() / numValues.get(key).doubleValue());
+        }
+        return avg;
+    }
+    
+    
+    /**
+     * Returns the average center sphere radius (which is the Ferret diameter of the residue, NOT including the outer 2A collision hull added to it (on each side)) for any residue of a specific type, for all 20 different residue types (amino acids). Note that the diameter for residues of a specific type may vary based on the residue conformation. Note that it includes 2A around each atom, and is given in 1/10 A.
+     * @return a map of 1 letter amino acid names to their average ferret diameter in this graph. Only contains entries for the 20 natural AAs, not for stuff like ligands or other special residues. NOTE that the values are given in 1/10th Angstroem (so 50 means 5 Angstroem).
+     */
+    public Map<String, Double> getAverageFerretDiameterByAminoacidType() {
+        Map<String, Integer> diameterSum = new HashMap<>();
+        Map<String, Integer> numValues = new HashMap<>();
+        Map<String, Double> avg = new HashMap<>();
+        for(int i = 0; i < 20; i++) {
+            diameterSum.put(AminoAcid.names1[i], 0);
+            numValues.put(AminoAcid.names1[i], 0);
+        }
+        
+        Residue r; String name1; Integer diam;
+        for(int i = 0; i < this.getNumVertices(); i++) {
+            r = this.getVertex(i);
+            if(r.isAA()) {
+                name1 = r.getAAName1();
+                diam = r.getCenterSphereRadius() * 2;
+                if(diameterSum.containsKey(name1)) {
+                    diameterSum.put(name1, (diameterSum.get(name1) + diam));
+                    numValues.put(name1, (numValues.get(name1) + 1));
+                }
+            }
+        }
+        for(String key : diameterSum.keySet()) {
+            avg.put(key, diameterSum.get(key).doubleValue() / numValues.get(key).doubleValue());
+        }
+        return avg;
+    }
+    
     private Boolean contactSatisfiesRules(ResContactInfo c) {
         Integer minSeqDist = Settings.getInteger("plcc_I_aag_min_residue_seq_distance_for_contact");
         Integer maxSeqDist = Settings.getInteger("plcc_I_aag_max_residue_seq_distance_for_contact");
