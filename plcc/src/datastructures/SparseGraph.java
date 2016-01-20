@@ -90,6 +90,12 @@ public class SparseGraph<V, E> implements SimpleGraphInterface, IMutableGraph<V>
             DP.getInstance().w("SparseGraph", "addEdge: Edge " + i + "," + j + " is invalid self-edge, ignoring request to add it.");
             return;
         }
+        
+        if(i < 0 || j < 0 || i >= this.getSize() || j >= this.getSize()) {
+            DP.getInstance().w("SparseGraph", "addEdge: Edge " + i + "," + j + " is invalid, this graph only has " + this.getSize() + " vertices. Skipping.");
+            return;
+        }
+        
         if(! this.edges.get(i).contains(j)) {
           this.edges.get(i).add(j);
           this.setEdgeInfo(i, j, e);
