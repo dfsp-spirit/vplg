@@ -96,6 +96,8 @@ public class SparseGraph<V, E> implements SimpleGraphInterface, IMutableGraph<V>
             return;
         }
         
+        //DP.getInstance().d("SparseGraph", "Adding edge from " + i + " to " + j + ".");
+        
         if(! this.edges.get(i).contains(j)) {
           this.edges.get(i).add(j);
           this.setEdgeInfo(i, j, e);

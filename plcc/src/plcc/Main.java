@@ -1145,7 +1145,7 @@ public class Main {
                         }
                     }
                     
-                    if(s.equals("--draw-gml-graph")) {
+                    if(s.equals("--draw-gml-graph") || s.equals("--props-gml-graph")) {
                         if(args.length <= i+1 ) {
                             syntaxError();
                         }
@@ -1194,18 +1194,33 @@ public class Main {
                             
                             Boolean testSparseGraphProps = true;
                             Boolean skipDrawing = true;
+                            
+                            if(s.equals("--draw-gml-graph")){
+                                testSparseGraphProps = false;
+                                skipDrawing = false;
+                            }
+                            else {
+                                testSparseGraphProps = true;
+                                skipDrawing = true;
+                            }
+                            
                             if(testSparseGraphProps) {
-                                System.out.println("Constructing sparse graph...");
+                                DP.getInstance().i("Main", "Constructing sparse graph...");
                                 SparseGraph<String, String> sg = g.toSparseGraph();
-                                System.out.println("Computing sparse graph properties...");
+                                DP.getInstance().i("Main", "Computing sparse graph properties for SG with " + sg.getNumVertices() +" verts and " + sg.getNumEdges() + " edges ...");
                                 GraphProperties gp = new GraphProperties(sg);
+                                //DP.getInstance().i("Main", "Props for SG constructed.");
                                 System.out.println(gp.getOverviewPropsString(true));
+                                //DP.getInstance().i("Main", "Props for SG computed and printed.");
                             }
                                                         
                             
                             if( ! skipDrawing) {
                                 ProteinGraphDrawer.drawDrawableGraph(outFilePathNoExt, formats, g, vertexMappings);
-                                DP.getInstance().i("Done drawing GML graph to base file '" + outFilePathNoExt + "', exiting.");
+                                DP.getInstance().i("Main", "Done drawing GML graph to base file '" + outFilePathNoExt + "', exiting.");
+                            }
+                            else {
+                                DP.getInstance().i("Main", "Skipped drawing of the GML graph as requested.");
                             }
                             checkArgsUsage(args, argsUsed);
                             System.exit(0);

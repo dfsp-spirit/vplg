@@ -15,6 +15,19 @@ import java.util.Set;
  * @author spirit
  */
 public interface IDrawableEdge {
+    
+    /**
+     * Returns the spatial relation string
+     * @return the spatial relation string of the edge
+     */
     public String getSpatRel();
+    
+    /**
+     * Returns the vertex indices of the edge
+     * @return a list of length 2, containing the vertices (by index) that this edge is incident on
+     */
     public List<Integer> getVertPairIndicesNtoC();
+    
+    @Override
+    public String toString();
 }

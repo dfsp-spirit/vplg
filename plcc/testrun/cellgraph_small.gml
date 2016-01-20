@@ -413,26 +413,26 @@ graph [
     y_coord 13108
   ]
 edge [
-    source 1896
-    target 6289
+    source 21
+    target 18
     label "685.8950357015277"
     distance 685.8950357015277
   ]
   edge [
-    source 1896
-    target 9249
+    source 3
+    target 33
     label "674.6732542497887"
     distance 674.6732542497887
   ]
   edge [
-    source 1896
-    target 6288
+    source 9
+    target 11
     label "229.93042425916585"
     distance 229.93042425916585
   ]
   edge [
-    source 1896
-    target 9250
+    source 17
+    target 48
     label "656.196616876375"
     distance 656.196616876375
   ]

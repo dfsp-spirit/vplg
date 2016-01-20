@@ -275,7 +275,7 @@ public class ConnectedComponents {
             // Now add the contacts/edges between the vertices by iterating through the contact matrix of this graph and
             //  translating the indices to the new graph.
             for(Integer k = 0; k < g.getSize(); k++) {
-                for(Integer l = 0; l < g.getSize(); l++) {
+                for(Integer l = k+1; l < g.getSize(); l++) {
                     
                     // If there is such a contact in this graph..
                     if(g.containsEdge(k, l)) {

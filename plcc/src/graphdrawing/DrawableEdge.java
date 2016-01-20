@@ -10,6 +10,7 @@ package graphdrawing;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import tools.DP;
 
 /**
  *
@@ -23,6 +24,9 @@ public class DrawableEdge implements IDrawableEdge {
     public DrawableEdge(String spatRel, List<Integer> vertPairIndicesNtoC) {
         this.spatRel = spatRel;
         this.vertPairIndicesNtoC = vertPairIndicesNtoC;
+        if(this.vertPairIndicesNtoC.size() != 2) {
+            DP.getInstance().w("DrawableEdge", "Length of vert pair indices N to C has invalid length " + this.vertPairIndicesNtoC.size() + ", should be 2.");
+        }
     }
     
     @Override

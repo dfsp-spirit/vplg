@@ -112,8 +112,10 @@ public class DrawableGraph implements IDrawableGraph {
         IDrawableEdge e;
         for(int i = 0; i < this.drawableEdges.size(); i++) {
             e = this.drawableEdges.get(i);
+            //DP.getInstance().d("DrawableGraph", "Adding edge "+ e.toString() + " from " + e.getVertPairIndicesNtoC().get(0) + " to " + e.getVertPairIndicesNtoC().get(1) + ".");
             g.addEdge(e.getVertPairIndicesNtoC().get(0), e.getVertPairIndicesNtoC().get(1), e.getSpatRel());
         }
+        //DP.getInstance().d("DrawableGraph", "Done adding all " + this.drawableEdges.size() + " edges.");
         
         if(this.drawableVertices.size() != g.getNumVertices()) {
             DP.getInstance().e("DrawableGraph", "toSparseGraph: vertex counts of graphs do not match (" + this.drawableVertices.size() + " vs " + g.getNumVertices() + ").");

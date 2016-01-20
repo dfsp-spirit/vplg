@@ -258,19 +258,26 @@ public class GraphProperties {
      * @return an overview string with the most important props of g
      */
     public String getOverviewPropsString(Boolean addLabel) {
+        //DP.getInstance().e("GraphProperties", "Starting computation of graph props....");
         StringBuilder sb = new StringBuilder();
         sb.append(addLabel? "numVerts: " : "").append(this.getNumVertices()).append("\n");
         sb.append(addLabel? "numEdges: " : "").append(this.getNumEdges()).append("\n");
+        //DP.getInstance().e("GraphProperties", "Computation of graph props: getnumEdges() done.");
         sb.append(addLabel? "diameter: " : "").append(this.getGraphDiameter()).append("\n");
         sb.append(addLabel? "radius: " : "").append(this.getGraphRadius()).append("\n");
         sb.append(addLabel? "aSPL: " : "").append(this.getAverageShortestPathLength()).append("\n");
         sb.append(addLabel? "ClC: " : "").append(this.getAverageClusterCoefficient()).append("\n");
+        //DP.getInstance().e("GraphProperties", "Computation of graph props: getAverageClusterCoefficient() done.");
         sb.append(addLabel? "naClC: " : "").append(this.getAverageNormalizedNetworkClusterCoefficient()).append("\n");        
         sb.append(addLabel? "avgDegree: " : "").append(this.getAverageDegree()).append("\n");
         sb.append(addLabel? "maxDegree: " : "").append(this.getMaxDegree()).append("\n");
         sb.append(addLabel? "minDegree: " : "").append(this.getMinDegree()).append("\n");
+        //DP.getInstance().e("GraphProperties", "Computation of graph props: getMinDegree() done.");
         sb.append(addLabel? "density: " : "").append(this.getDensity()).append("\n");
+        //DP.getInstance().e("GraphProperties", "Computation of graph props: getDensity() done.");
         sb.append(addLabel? "numCC: " : "").append(this.getConnectedComponents().size()).append("\n");                                
+        //DP.getInstance().e("GraphProperties", "Computation of graph props: getConnectedComponents() done.");
+        //DP.getInstance().e("GraphProperties", "Done with computation of graph props, info string constructed.");
         return sb.toString();
     }
     
