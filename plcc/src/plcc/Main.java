@@ -1192,19 +1192,20 @@ public class Main {
                             DP.getInstance().i("Received graph with " + g.getDrawableVertices().size() + " vertices and " + g.getDrawableEdges().size() + " edges.");
                             
                             
-                            Boolean testSparseGraphProps = true;
+                            Boolean computeSparseGraphProps = true;
+                            Boolean alsoComputePropsForLargestCC = true;    // will only be done if the graph consists of more than 1 CC
                             Boolean skipDrawing = true;
                             
                             if(s.equals("--draw-gml-graph")){
-                                testSparseGraphProps = false;
+                                computeSparseGraphProps = false;
                                 skipDrawing = false;
                             }
                             else {
-                                testSparseGraphProps = true;
+                                computeSparseGraphProps = true;
                                 skipDrawing = true;
                             }
                             
-                            if(testSparseGraphProps) {
+                            if(computeSparseGraphProps) {
                                 DP.getInstance().i("Main", "Constructing sparse graph...");
                                 SparseGraph<String, String> sg = g.toSparseGraph();
                                 DP.getInstance().i("Main", "Computing sparse graph properties for SG with " + sg.getNumVertices() +" verts and " + sg.getNumEdges() + " edges ...");
@@ -1212,16 +1213,21 @@ public class Main {
                                 //DP.getInstance().i("Main", "Props for SG constructed.");
                                 System.out.println(gp.getOverviewPropsString(true));
                                 //DP.getInstance().i("Main", "Props for SG computed and printed.");
+                                if(alsoComputePropsForLargestCC) {
+                                    if( ! gp.getGraphIsConnected()) {                                        
+                                        SimpleGraphInterface lcc = gp.getLargestConnectedComponent();
+                                        DP.getInstance().i("Main", "Graph is not connected. Also computing sparse graph properties for its largest CC with " + lcc.getSize() +" verts ...");
+                                        GraphProperties lccp = new GraphProperties(lcc);
+                                        System.out.println(lccp.getOverviewPropsString(true));
+                                    }
+                                }
                             }
                                                         
                             
                             if( ! skipDrawing) {
                                 ProteinGraphDrawer.drawDrawableGraph(outFilePathNoExt, formats, g, vertexMappings);
                                 DP.getInstance().i("Main", "Done drawing GML graph to base file '" + outFilePathNoExt + "', exiting.");
-                            }
-                            else {
-                                DP.getInstance().i("Main", "Skipped drawing of the GML graph as requested.");
-                            }
+                            }                            
                             checkArgsUsage(args, argsUsed);
                             System.exit(0);
                         }
@@ -5785,6 +5791,7 @@ public class Main {
         System.out.println("-S | --sim-measure <m>     : use similarity measure <m>. Valid settings include 'string_sse', 'graph_set' and 'graph_compat'.");
         System.out.println("-t | --draw-tgf-graph <f>  : read graph in TGF format from file <f> and draw it to <f>.png, then exit (pdbid will be ignored)*");
         System.out.println("     --draw-gml-graph <f>  : read graph in GML format from file <f> and draw it to <f>.png, then exit (pdbid will be ignored)*");
+        System.out.println("     --props-gml-graph <f> : read graph in GML format from file <f> and compute graph properties, then exit (pdbid will be ignored)*");
         System.out.println("-u | --use-database        : write SSE contact data to database [requires DB credentials in cfg file]");                       
         System.out.println("-v | --del-db-protein <p>  : delete the protein chain with PDBID <p> from the database [requires DB credentials in cfg file]");
         System.out.println("-w | --dont-write-images   : do not draw the SSE graphs and write them to image files [DEBUG]");                             
