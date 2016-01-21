@@ -21,8 +21,8 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-Linux
-CND_DLIB_EXT=so
+CND_PLATFORM=Cygwin_4.x-Windows
+CND_DLIB_EXT=dll
 CND_CONF=Release
 CND_DISTDIR=dist
 CND_BUILDDIR=build
@@ -59,23 +59,6 @@ TESTFILES= \
 	${TESTDIR}/TestFiles/f5 \
 	${TESTDIR}/TestFiles/f7
 
-# Test Object Files
-TESTOBJECTFILES= \
-	${TESTDIR}/tests/newtestclass.o \
-	${TESTDIR}/tests/newtestclass1.o \
-	${TESTDIR}/tests/newtestclass2.o \
-	${TESTDIR}/tests/newtestclass3.o \
-	${TESTDIR}/tests/newtestclass4.o \
-	${TESTDIR}/tests/newtestclass5.o \
-	${TESTDIR}/tests/newtestclass6.o \
-	${TESTDIR}/tests/newtestrunner.o \
-	${TESTDIR}/tests/newtestrunner1.o \
-	${TESTDIR}/tests/newtestrunner2.o \
-	${TESTDIR}/tests/newtestrunner3.o \
-	${TESTDIR}/tests/newtestrunner4.o \
-	${TESTDIR}/tests/newtestrunner5.o \
-	${TESTDIR}/tests/newtestrunner6.o
-
 # C Compiler Flags
 CFLAGS=
 
@@ -94,9 +77,9 @@ LDLIBSOPTIONS=-lboost_graph -lboost_regex
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
-	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/graphletanalyser
+	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/graphletanalyser.exe
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/graphletanalyser: ${OBJECTFILES}
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/graphletanalyser.exe: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/graphletanalyser ${OBJECTFILES} ${LDLIBSOPTIONS}
 
@@ -154,9 +137,7 @@ ${OBJECTDIR}/main.o: main.cpp
 .build-subprojects:
 
 # Build Test Targets
-.build-tests-conf: .build-tests-subprojects .build-conf ${TESTFILES}
-.build-tests-subprojects:
-
+.build-tests-conf: .build-conf ${TESTFILES}
 ${TESTDIR}/TestFiles/f3: ${TESTDIR}/tests/newtestclass2.o ${TESTDIR}/tests/newtestrunner2.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc}   -o ${TESTDIR}/TestFiles/f3 $^ ${LDLIBSOPTIONS} `cppunit-config --libs`   
@@ -418,7 +399,7 @@ ${OBJECTDIR}/main_nomain.o: ${OBJECTDIR}/main.o main.cpp
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
-	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/graphletanalyser
+	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/graphletanalyser.exe
 
 # Subprojects
 .clean-subprojects:

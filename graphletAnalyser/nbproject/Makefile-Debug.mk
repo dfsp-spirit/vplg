@@ -21,8 +21,8 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-Linux
-CND_DLIB_EXT=so
+CND_PLATFORM=Cygwin_4.x-Windows
+CND_DLIB_EXT=dll
 CND_CONF=Debug
 CND_DISTDIR=dist
 CND_BUILDDIR=build
@@ -59,23 +59,6 @@ TESTFILES= \
 	${TESTDIR}/TestFiles/f5 \
 	${TESTDIR}/TestFiles/f7
 
-# Test Object Files
-TESTOBJECTFILES= \
-	${TESTDIR}/tests/newtestclass.o \
-	${TESTDIR}/tests/newtestclass1.o \
-	${TESTDIR}/tests/newtestclass2.o \
-	${TESTDIR}/tests/newtestclass3.o \
-	${TESTDIR}/tests/newtestclass4.o \
-	${TESTDIR}/tests/newtestclass5.o \
-	${TESTDIR}/tests/newtestclass6.o \
-	${TESTDIR}/tests/newtestrunner.o \
-	${TESTDIR}/tests/newtestrunner1.o \
-	${TESTDIR}/tests/newtestrunner2.o \
-	${TESTDIR}/tests/newtestrunner3.o \
-	${TESTDIR}/tests/newtestrunner4.o \
-	${TESTDIR}/tests/newtestrunner5.o \
-	${TESTDIR}/tests/newtestrunner6.o
-
 # C Compiler Flags
 CFLAGS=
 
@@ -94,69 +77,67 @@ LDLIBSOPTIONS=-L/usr/lib64 -lboost_regex -lboost_graph -lpqxx -lpq
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
-	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/graphletanalyser
+	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/graphletanalyser.exe
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/graphletanalyser: ${OBJECTFILES}
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/graphletanalyser.exe: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/graphletanalyser ${OBJECTFILES} ${LDLIBSOPTIONS}
 
 ${OBJECTDIR}/Database.o: Database.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Database.o Database.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Database.o Database.cpp
 
 ${OBJECTDIR}/GMLptglProteinParser.o: GMLptglProteinParser.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GMLptglProteinParser.o GMLptglProteinParser.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GMLptglProteinParser.o GMLptglProteinParser.cpp
 
 ${OBJECTDIR}/GraphPTGLPrinter.o: GraphPTGLPrinter.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GraphPTGLPrinter.o GraphPTGLPrinter.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GraphPTGLPrinter.o GraphPTGLPrinter.cpp
 
 ${OBJECTDIR}/GraphPrinter.o: GraphPrinter.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GraphPrinter.o GraphPrinter.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GraphPrinter.o GraphPrinter.cpp
 
 ${OBJECTDIR}/GraphService.o: GraphService.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GraphService.o GraphService.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GraphService.o GraphService.cpp
 
 ${OBJECTDIR}/GraphletCounts.o: GraphletCounts.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GraphletCounts.o GraphletCounts.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GraphletCounts.o GraphletCounts.cpp
 
 ${OBJECTDIR}/JSON_printer.o: JSON_printer.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/JSON_printer.o JSON_printer.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/JSON_printer.o JSON_printer.cpp
 
 ${OBJECTDIR}/ProteinGraphService.o: ProteinGraphService.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ProteinGraphService.o ProteinGraphService.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ProteinGraphService.o ProteinGraphService.cpp
 
 ${OBJECTDIR}/Scoring.o: Scoring.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Scoring.o Scoring.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Scoring.o Scoring.cpp
 
 ${OBJECTDIR}/main.o: main.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
 
 # Subprojects
 .build-subprojects:
 
 # Build Test Targets
-.build-tests-conf: .build-tests-subprojects .build-conf ${TESTFILES}
-.build-tests-subprojects:
-
+.build-tests-conf: .build-conf ${TESTFILES}
 ${TESTDIR}/TestFiles/f3: ${TESTDIR}/tests/newtestclass2.o ${TESTDIR}/tests/newtestrunner2.o ${OBJECTFILES:%.o=%_nomain.o}
 	${MKDIR} -p ${TESTDIR}/TestFiles
 	${LINK.cc}   -o ${TESTDIR}/TestFiles/f3 $^ ${LDLIBSOPTIONS} -L/usr/lib64 -lboost_graph -lboost_regex -lpq -lpqxx `cppunit-config --libs`   
@@ -189,85 +170,85 @@ ${TESTDIR}/TestFiles/f7: ${TESTDIR}/tests/newtestclass6.o ${TESTDIR}/tests/newte
 ${TESTDIR}/tests/newtestclass2.o: tests/newtestclass2.cpp 
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestclass2.o tests/newtestclass2.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestclass2.o tests/newtestclass2.cpp
 
 
 ${TESTDIR}/tests/newtestrunner2.o: tests/newtestrunner2.cpp 
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner2.o tests/newtestrunner2.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner2.o tests/newtestrunner2.cpp
 
 
 ${TESTDIR}/tests/newtestclass1.o: tests/newtestclass1.cpp 
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestclass1.o tests/newtestclass1.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestclass1.o tests/newtestclass1.cpp
 
 
 ${TESTDIR}/tests/newtestrunner1.o: tests/newtestrunner1.cpp 
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner1.o tests/newtestrunner1.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner1.o tests/newtestrunner1.cpp
 
 
 ${TESTDIR}/tests/newtestclass5.o: tests/newtestclass5.cpp 
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestclass5.o tests/newtestclass5.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestclass5.o tests/newtestclass5.cpp
 
 
 ${TESTDIR}/tests/newtestrunner5.o: tests/newtestrunner5.cpp 
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner5.o tests/newtestrunner5.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner5.o tests/newtestrunner5.cpp
 
 
 ${TESTDIR}/tests/newtestclass.o: tests/newtestclass.cpp 
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestclass.o tests/newtestclass.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestclass.o tests/newtestclass.cpp
 
 
 ${TESTDIR}/tests/newtestrunner.o: tests/newtestrunner.cpp 
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner.o tests/newtestrunner.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner.o tests/newtestrunner.cpp
 
 
 ${TESTDIR}/tests/newtestclass3.o: tests/newtestclass3.cpp 
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestclass3.o tests/newtestclass3.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestclass3.o tests/newtestclass3.cpp
 
 
 ${TESTDIR}/tests/newtestrunner3.o: tests/newtestrunner3.cpp 
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner3.o tests/newtestrunner3.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner3.o tests/newtestrunner3.cpp
 
 
 ${TESTDIR}/tests/newtestclass4.o: tests/newtestclass4.cpp 
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestclass4.o tests/newtestclass4.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestclass4.o tests/newtestclass4.cpp
 
 
 ${TESTDIR}/tests/newtestrunner4.o: tests/newtestrunner4.cpp 
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner4.o tests/newtestrunner4.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner4.o tests/newtestrunner4.cpp
 
 
 ${TESTDIR}/tests/newtestclass6.o: tests/newtestclass6.cpp 
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestclass6.o tests/newtestclass6.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestclass6.o tests/newtestclass6.cpp
 
 
 ${TESTDIR}/tests/newtestrunner6.o: tests/newtestrunner6.cpp 
 	${MKDIR} -p ${TESTDIR}/tests
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner6.o tests/newtestrunner6.cpp
+	$(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -std=gnu++11 `cppunit-config --cflags` -MMD -MP -MF "$@.d" -o ${TESTDIR}/tests/newtestrunner6.o tests/newtestrunner6.cpp
 
 
 ${OBJECTDIR}/Database_nomain.o: ${OBJECTDIR}/Database.o Database.cpp 
@@ -278,7 +259,7 @@ ${OBJECTDIR}/Database_nomain.o: ${OBJECTDIR}/Database.o Database.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Database_nomain.o Database.cpp;\
+	    $(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Database_nomain.o Database.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/Database.o ${OBJECTDIR}/Database_nomain.o;\
 	fi
@@ -291,7 +272,7 @@ ${OBJECTDIR}/GMLptglProteinParser_nomain.o: ${OBJECTDIR}/GMLptglProteinParser.o 
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GMLptglProteinParser_nomain.o GMLptglProteinParser.cpp;\
+	    $(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GMLptglProteinParser_nomain.o GMLptglProteinParser.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/GMLptglProteinParser.o ${OBJECTDIR}/GMLptglProteinParser_nomain.o;\
 	fi
@@ -304,7 +285,7 @@ ${OBJECTDIR}/GraphPTGLPrinter_nomain.o: ${OBJECTDIR}/GraphPTGLPrinter.o GraphPTG
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GraphPTGLPrinter_nomain.o GraphPTGLPrinter.cpp;\
+	    $(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GraphPTGLPrinter_nomain.o GraphPTGLPrinter.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/GraphPTGLPrinter.o ${OBJECTDIR}/GraphPTGLPrinter_nomain.o;\
 	fi
@@ -317,7 +298,7 @@ ${OBJECTDIR}/GraphPrinter_nomain.o: ${OBJECTDIR}/GraphPrinter.o GraphPrinter.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GraphPrinter_nomain.o GraphPrinter.cpp;\
+	    $(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GraphPrinter_nomain.o GraphPrinter.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/GraphPrinter.o ${OBJECTDIR}/GraphPrinter_nomain.o;\
 	fi
@@ -330,7 +311,7 @@ ${OBJECTDIR}/GraphService_nomain.o: ${OBJECTDIR}/GraphService.o GraphService.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GraphService_nomain.o GraphService.cpp;\
+	    $(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GraphService_nomain.o GraphService.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/GraphService.o ${OBJECTDIR}/GraphService_nomain.o;\
 	fi
@@ -343,7 +324,7 @@ ${OBJECTDIR}/GraphletCounts_nomain.o: ${OBJECTDIR}/GraphletCounts.o GraphletCoun
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GraphletCounts_nomain.o GraphletCounts.cpp;\
+	    $(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GraphletCounts_nomain.o GraphletCounts.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/GraphletCounts.o ${OBJECTDIR}/GraphletCounts_nomain.o;\
 	fi
@@ -356,7 +337,7 @@ ${OBJECTDIR}/JSON_printer_nomain.o: ${OBJECTDIR}/JSON_printer.o JSON_printer.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/JSON_printer_nomain.o JSON_printer.cpp;\
+	    $(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/JSON_printer_nomain.o JSON_printer.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/JSON_printer.o ${OBJECTDIR}/JSON_printer_nomain.o;\
 	fi
@@ -369,7 +350,7 @@ ${OBJECTDIR}/ProteinGraphService_nomain.o: ${OBJECTDIR}/ProteinGraphService.o Pr
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ProteinGraphService_nomain.o ProteinGraphService.cpp;\
+	    $(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ProteinGraphService_nomain.o ProteinGraphService.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/ProteinGraphService.o ${OBJECTDIR}/ProteinGraphService_nomain.o;\
 	fi
@@ -382,7 +363,7 @@ ${OBJECTDIR}/Scoring_nomain.o: ${OBJECTDIR}/Scoring.o Scoring.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Scoring_nomain.o Scoring.cpp;\
+	    $(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Scoring_nomain.o Scoring.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/Scoring.o ${OBJECTDIR}/Scoring_nomain.o;\
 	fi
@@ -395,7 +376,7 @@ ${OBJECTDIR}/main_nomain.o: ${OBJECTDIR}/main.o main.cpp
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main_nomain.o main.cpp;\
+	    $(COMPILE.cc) -g -Inbproject -I/usr/include -include Graph.h -include GraphService.h -std=c++11 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main_nomain.o main.cpp;\
 	else  \
 	    ${CP} ${OBJECTDIR}/main.o ${OBJECTDIR}/main_nomain.o;\
 	fi
@@ -418,7 +399,7 @@ ${OBJECTDIR}/main_nomain.o: ${OBJECTDIR}/main.o main.cpp
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
-	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/graphletanalyser
+	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/graphletanalyser.exe
 
 # Subprojects
 .clean-subprojects:
