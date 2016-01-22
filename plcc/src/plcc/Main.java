@@ -1153,7 +1153,23 @@ public class Main {
                             argsUsed[i] = true;
                             argsUsed[i+1] = true;
                             Settings.set("plcc_B_graphimg_header", "false");
-                            DP.getInstance().i("Drawing custom graph in GML format from file '" + args[i+1] + "'.");
+                            
+                            Boolean computeSparseGraphProps = true;
+                            Boolean alsoComputePropsForLargestCC = true;    // will only be done if the graph consists of more than 1 CC
+                            Boolean skipDrawing = true;
+                            
+                            if(s.equals("--draw-gml-graph")){
+                                DP.getInstance().i("Drawing custom graph in GML format from file '" + args[i+1] + "'.");
+                                computeSparseGraphProps = false;
+                                skipDrawing = false;
+                            }
+                            else {
+                                DP.getInstance().i("Computing custom graph properties for graph in GML format from file '" + args[i+1] + "'.");
+                                computeSparseGraphProps = true;
+                                skipDrawing = true;
+                            }
+                            
+                            
                             IMAGEFORMAT[] formats = new IMAGEFORMAT[]{ DrawTools.IMAGEFORMAT.PNG };
                             String gml = null;
                             
@@ -1192,18 +1208,7 @@ public class Main {
                             DP.getInstance().i("Received graph with " + g.getDrawableVertices().size() + " vertices and " + g.getDrawableEdges().size() + " edges.");
                             
                             
-                            Boolean computeSparseGraphProps = true;
-                            Boolean alsoComputePropsForLargestCC = true;    // will only be done if the graph consists of more than 1 CC
-                            Boolean skipDrawing = true;
                             
-                            if(s.equals("--draw-gml-graph")){
-                                computeSparseGraphProps = false;
-                                skipDrawing = false;
-                            }
-                            else {
-                                computeSparseGraphProps = true;
-                                skipDrawing = true;
-                            }
                             
                             if(computeSparseGraphProps) {
                                 DP.getInstance().i("Main", "Constructing sparse graph...");
