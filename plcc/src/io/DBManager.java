@@ -1312,7 +1312,6 @@ public class DBManager {
             doInsertQuery("ALTER TABLE " + tbl_stats_proteingraph + " ADD CONSTRAINT constr_pgstats_uniq UNIQUE (pg_id, is_for_cc);");
             doInsertQuery("ALTER TABLE " + tbl_stats_complexgraph + " ADD CONSTRAINT constr_cgstats_uniq UNIQUE (cg_id, is_for_cc);");
             doInsertQuery("ALTER TABLE " + tbl_stats_aagraph + " ADD CONSTRAINT constr_aagstats_uniq UNIQUE (aag_id, is_for_cc);");
-            doInsertQuery("ALTER TABLE " + tbl_stats_customgraph + " ADD CONSTRAINT constr_customstats_uniq UNIQUE (unique_name);");
             doInsertQuery("ALTER TABLE " + tbl_stats_customgraph + " ADD CONSTRAINT constr_customstats_uniq_cc UNIQUE (unique_name, is_for_cc);");
             //doInsertQuery("ALTER TABLE " + tbl_fglinnot_alpha + " ADD CONSTRAINT constr_fglinnotalpha_uniq UNIQUE (linnot_foldinggraph_id);");
             //doInsertQuery("ALTER TABLE " + tbl_fglinnot_beta + " ADD CONSTRAINT constr_fglinnotbeta_uniq UNIQUE (linnot_foldinggraph_id);");
@@ -1457,6 +1456,7 @@ public class DBManager {
             doInsertQuery("COMMENT ON COLUMN " + tbl_stats_complexgraph + ".is_for_cc IS 'If set to 0, these properties are for the graph itself. If set to 1, they are for its largest connected component. Used because some graph properties are not defined for unconnected graphs.';");
             doInsertQuery("COMMENT ON COLUMN " + tbl_stats_aagraph + ".is_for_cc IS 'If set to 0, these properties are for the graph itself. If set to 1, they are for its largest connected component. Used because some graph properties are not defined for unconnected graphs.';");
             doInsertQuery("COMMENT ON COLUMN " + tbl_stats_customgraph + ".is_for_cc IS 'If set to 0, these properties are for the graph itself. If set to 1, they are for its largest connected component. Used because some graph properties are not defined for unconnected graphs.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_stats_customgraph + ".unique_name IS 'This is unique for a graph and its CC only. So it can exist at most twice: once for the graph, and once for its largest CC. See the is_for_cc field of this table.';");
             
             
             // add indices
@@ -11221,7 +11221,7 @@ connection.close();
             if(avg_degree == null) { statement.setNull(14, java.sql.Types.DOUBLE); } else { statement.setDouble(14, avg_degree); }
             if(density == null) { statement.setNull(15, java.sql.Types.DOUBLE); } else { statement.setDouble(15, density); }
             statement.setArray(16, sqlArrayCumulDegreedist);
-            statement.setLong(17, runtime_secs);
+            if(runtime_secs == null) { statement.setNull(17, java.sql.Types.DOUBLE); } else { statement.setDouble(17, runtime_secs); }
                                 
             statement.executeUpdate();
             //dbc.commit();

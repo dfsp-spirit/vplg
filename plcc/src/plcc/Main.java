@@ -2310,7 +2310,8 @@ public class Main {
                     if(Settings.getBoolean("plcc_B_compute_graph_metrics")) {    
                         //aag.selfCheck();
                         GraphProperties gp = new GraphProperties(aag);
-                        GraphProperties sgp = new GraphProperties(gp.getLargestConnectedComponent());
+                        SparseGraph lcc = (SparseGraph)gp.getLargestConnectedComponent();
+                        GraphProperties lccgp = new GraphProperties(lcc);
 
                         if(Settings.getBoolean("plcc_B_useDB")) {
 
@@ -2326,15 +2327,26 @@ public class Main {
                                     Long runtime_secs = null;
                                     DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.FALSE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity(), gp.getCumulativeDegreeDistributionUpToAsArray(50), runtime_secs);
                                     
-                                    Boolean rewireGraphsToCompareWithRandom = false;
-                                    if(rewireGraphsToCompareWithRandom) {   // this was only needed for graph analyses carried out for the Ph.D. thesis of TS, ignore
+                                    Boolean rewireGraphsToCompareWithRandom = true;
+                                    Boolean writeRandomGraphPropsToDatabase = true;
+                                    Double edgeRewireProbability = 1.0d;
+                                    String rand_graph_name = pdbid + "_AA_random";  // same for graph and lcc
+                                    
+                                    if(rewireGraphsToCompareWithRandom) {   // this was only needed for graph analyses carried out for the Ph.D. thesis of TS, ignore                                        
                                         System.out.println("###TEST-AAG-GP-BEFORE-REWIRING: \n" + gp.getOverviewPropsString(true) + "###");
                                         aag.selfCheck();
-                                        Double edgeRewireProbability = 1.0d;
+                                        
                                         GraphRandomizer gr = new GraphRandomizer(aag, edgeRewireProbability);
                                         GraphProperties gp_rand = new GraphProperties(aag); // now changed
                                         System.out.println("###TEST-AAG-GP-AFTER-RANDOMIZATION with p="+edgeRewireProbability+": \n" + gp_rand.getOverviewPropsString(false) + "###");
                                         aag.selfCheck();
+                                        
+                                        
+                                        
+                                        if(writeRandomGraphPropsToDatabase) {                                            
+                                            String rand_graph_description = "full graph";
+                                            DBManager.writeCustomgraphStatsToDB(rand_graph_name, rand_graph_description, Boolean.FALSE, gp_rand.getNumVertices(), gp_rand.getNumEdges(), gp_rand.getMinDegree(), gp_rand.getMaxDegree(), gp_rand.getConnectedComponents().size(), gp.getGraphDiameter(), gp_rand.getGraphRadius(), gp_rand.getAverageClusterCoefficient(), gp_rand.getAverageShortestPathLength(), gp_rand.getDegreeDistributionUpTo(50), gp_rand.getAverageDegree(), gp_rand.getDensity(), gp_rand.getCumulativeDegreeDistributionUpToAsArray(50), runtime_secs);                                            
+                                        }
                                     }
                                     
                                     Boolean selectResiduesWithPropertiesForVisualization = false;
@@ -2351,7 +2363,7 @@ public class Main {
                                     }
                                     
                                     
-                                    Boolean showResProps = true;
+                                    Boolean showResProps = false;
                                     if(showResProps) {
                                         Map<String, Integer> maxDegrees = aag.getMaxDegreeByAminoacidType();
                                         Map<String, Integer> maxDiams = aag.getMaxFerretDiameterByAminoacidType();
@@ -2414,7 +2426,16 @@ public class Main {
                                     //System.out.println("max CC is: " + gp.getMaximumNetworkClusterCoefficient());
                                     // write properties of largest CC of graph
                                     runtime_secs = null;
-                                    DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.TRUE, sgp.getNumVertices(), sgp.getNumEdges(), sgp.getMinDegree(), sgp.getMaxDegree(), sgp.getConnectedComponents().size(), sgp.getGraphDiameter(), sgp.getGraphRadius(), sgp.getAverageClusterCoefficient(), sgp.getAverageShortestPathLength(), sgp.getDegreeDistributionUpTo(50), sgp.getAverageDegree(), sgp.getDensity(), sgp.getCumulativeDegreeDistributionUpToAsArray(50), runtime_secs);
+                                    DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.TRUE, lccgp.getNumVertices(), lccgp.getNumEdges(), lccgp.getMinDegree(), lccgp.getMaxDegree(), lccgp.getConnectedComponents().size(), lccgp.getGraphDiameter(), lccgp.getGraphRadius(), lccgp.getAverageClusterCoefficient(), lccgp.getAverageShortestPathLength(), lccgp.getDegreeDistributionUpTo(50), lccgp.getAverageDegree(), lccgp.getDensity(), lccgp.getCumulativeDegreeDistributionUpToAsArray(50), runtime_secs);
+                                    
+                                    if(rewireGraphsToCompareWithRandom) {
+                                        GraphRandomizer gr_lcc = new GraphRandomizer(lcc, edgeRewireProbability);
+                                        GraphProperties gp_lcc_rand = new GraphProperties(lcc); // now changed
+                                        if(writeRandomGraphPropsToDatabase) {
+                                            String rand_graph_description = "largest CC";
+                                            DBManager.writeCustomgraphStatsToDB(rand_graph_name, rand_graph_description, Boolean.TRUE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity(), gp.getCumulativeDegreeDistributionUpToAsArray(50), runtime_secs);                                            
+                                        }
+                                    }
                                 }
                                 else {
                                     DP.getInstance().e("Main", "Could not write aa graph properties to DB, graph not found in database.");
