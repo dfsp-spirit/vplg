@@ -10990,7 +10990,7 @@ connection.close();
             if(avg_degree == null) { statement.setNull(13, java.sql.Types.DOUBLE); } else { statement.setDouble(13, avg_degree); }
             if(density == null) { statement.setNull(14, java.sql.Types.DOUBLE); } else { statement.setDouble(14, density); }
             statement.setArray(15, sqlArrayCumulDegreedist);
-            statement.setLong(16, runtime_secs);
+            if(runtime_secs == null) { statement.setNull(16, java.sql.Types.DOUBLE); } else { statement.setDouble(16, runtime_secs); }
                                 
             statement.executeUpdate();            
             //dbc.commit();
@@ -11066,7 +11066,7 @@ connection.close();
             if(avg_degree == null) { statement.setNull(13, java.sql.Types.DOUBLE); } else { statement.setDouble(13, avg_degree); }
             if(density == null) { statement.setNull(14, java.sql.Types.DOUBLE); } else { statement.setDouble(14, density); }
             statement.setArray(15, sqlArrayCumulDegreedist);
-            statement.setLong(16, runtime_secs);
+            if(runtime_secs == null) { statement.setNull(16, java.sql.Types.DOUBLE); } else { statement.setDouble(16, runtime_secs); }
                                 
             statement.executeUpdate();
             //dbc.commit();
@@ -11142,7 +11142,7 @@ connection.close();
             if(avg_degree == null) { statement.setNull(13, java.sql.Types.DOUBLE); } else { statement.setDouble(13, avg_degree); }
             if(density == null) { statement.setNull(14, java.sql.Types.DOUBLE); } else { statement.setDouble(14, density); }
             statement.setArray(15, sqlArrayCumulDegreedist);
-            statement.setLong(16, runtime_secs);
+            if(runtime_secs == null) { statement.setNull(16, java.sql.Types.DOUBLE); } else { statement.setDouble(16, runtime_secs); }
                                 
             statement.executeUpdate();
             //dbc.commit();
