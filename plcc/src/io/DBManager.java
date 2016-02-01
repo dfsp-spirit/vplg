@@ -60,6 +60,7 @@ public class DBManager {
     static String tbl_stats_proteingraph = "plcc_stats_proteingraph";
     static String tbl_stats_complexgraph = "plcc_stats_complexgraph";
     static String tbl_stats_aagraph = "plcc_stats_aagraph";
+    static String tbl_stats_customgraph = "plcc_stats_customgraph";
     static String tbl_graphletcount = "plcc_graphlets";
     static String tbl_graphletcount_complex = "plcc_complex_graphlets";    
     static String tbl_graphletcount_aa = "plcc_aa_graphlets";    
@@ -139,6 +140,8 @@ public class DBManager {
     static String view_pgstats = "plcc_view_pgstats";
     static String view_cgstats = "plcc_view_cgstats";
     static String view_aagstats = "plcc_view_aagstats";
+    static String view_customstats = "plcc_view_customstats";
+
     
 
     /**
@@ -1153,9 +1156,10 @@ public class DBManager {
             doDeleteQuery("DROP TABLE " + tbl_nm_lcg_to_chain + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_nm_chaintomacromolecule + " CASCADE;");  
             doDeleteQuery("DROP TABLE " + tbl_representative_chains + ";");  
-            doDeleteQuery("DROP TABLE " + tbl_stats_proteingraph + ";");
-            doDeleteQuery("DROP TABLE " + tbl_stats_complexgraph + ";");
-            doDeleteQuery("DROP TABLE " + tbl_stats_aagraph + ";");
+            doDeleteQuery("DROP TABLE " + tbl_stats_proteingraph + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_stats_complexgraph + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_stats_aagraph + " CASCADE;");
+            doDeleteQuery("DROP TABLE " + tbl_stats_customgraph + " CASCADE;");
             doDeleteQuery("DROP TABLE " + tbl_aatypeinteractions_absolute + ";");
             doDeleteQuery("DROP TABLE " + tbl_aatypeinteractions_normalized + ";");
             
@@ -1231,9 +1235,10 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_motif + " (motif_id serial primary key, motiftype_id int not null references " + tbl_motiftype + " ON DELETE CASCADE, motif_name varchar(40), motif_abbreviation varchar(9));");
             doInsertQuery("CREATE TABLE " + tbl_representative_chains + " (pdb_id varchar(4) not null, chain_name varchar(1) not null, PRIMARY KEY(pdb_id, chain_name));");
             
-            doInsertQuery("CREATE TABLE " + tbl_stats_proteingraph + " (statspg_id serial primary key, pg_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, is_for_cc int NOT NULL, num_verts int, num_edges int, min_degree int, max_degree int, density double precision, avg_degree double precision, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50], cumul_degreedist decimal[50]);");
-            doInsertQuery("CREATE TABLE " + tbl_stats_complexgraph + " (statscg_id serial primary key, cg_id int not null references " + tbl_complexgraph + " ON DELETE CASCADE, is_for_cc int NOT NULL, num_verts int, num_edges int, min_degree int, max_degree int, density double precision, avg_degree double precision, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50], cumul_degreedist decimal[50]);");
-            doInsertQuery("CREATE TABLE " + tbl_stats_aagraph + " (statsaag_id serial primary key, aag_id int not null references " + tbl_aagraph + " ON DELETE CASCADE, is_for_cc int NOT NULL, num_verts int, num_edges int, min_degree int, max_degree int, density double precision, avg_degree double precision, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50], cumul_degreedist decimal[50]);");
+            doInsertQuery("CREATE TABLE " + tbl_stats_proteingraph + " (statspg_id serial primary key, pg_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, is_for_cc int NOT NULL, num_verts int, num_edges int, min_degree int, max_degree int, density double precision, avg_degree double precision, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50], cumul_degreedist decimal[50], runtime_secs int);");
+            doInsertQuery("CREATE TABLE " + tbl_stats_complexgraph + " (statscg_id serial primary key, cg_id int not null references " + tbl_complexgraph + " ON DELETE CASCADE, is_for_cc int NOT NULL, num_verts int, num_edges int, min_degree int, max_degree int, density double precision, avg_degree double precision, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50], cumul_degreedist decimal[50], runtime_secs int);");
+            doInsertQuery("CREATE TABLE " + tbl_stats_aagraph + " (statsaag_id serial primary key, aag_id int not null references " + tbl_aagraph + " ON DELETE CASCADE, is_for_cc int NOT NULL, num_verts int, num_edges int, min_degree int, max_degree int, density double precision, avg_degree double precision, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50], cumul_degreedist decimal[50], runtime_secs int);");
+            doInsertQuery("CREATE TABLE " + tbl_stats_customgraph + " (statscustom_id serial primary key, unique_name text not null, description text, is_for_cc int NOT NULL, num_verts int, num_edges int, min_degree int, max_degree int, density double precision, avg_degree double precision, avg_cluster_coeff double precision, num_connected_components int, avg_shortest_path_length double precision, diameter int, radius int, degreedist decimal[50], cumul_degreedist decimal[50], runtime_secs int);");
                         
             
             /**
@@ -1257,9 +1262,9 @@ public class DBManager {
              *       – 2 entries: all labelings of the graphlet g1 with one vertex, or simply the vertices with the label “H” and the vertices with the label “E” added to get the distribution vertex labels.
              *
              */
-            doInsertQuery("CREATE TABLE " + tbl_graphletcount + " (graphlet_id serial primary key, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, graphlet_counts decimal[58] not null);");
-            doInsertQuery("CREATE TABLE " + tbl_graphletcount_complex + " (complex_graphlet_id serial primary key, complexgraph_id int not null references " + tbl_complexgraph + " ON DELETE CASCADE, complex_graphlet_counts decimal[58] not null);");
-            doInsertQuery("CREATE TABLE " + tbl_graphletcount_aa + " (aa_graphlet_id serial primary key, aagraph_id int not null references " + tbl_aagraph + " ON DELETE CASCADE, aa_graphlet_counts decimal[93] not null);");
+            doInsertQuery("CREATE TABLE " + tbl_graphletcount + " (graphlet_id serial primary key, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, runtime_secs int, graphlet_counts decimal[58] not null);");
+            doInsertQuery("CREATE TABLE " + tbl_graphletcount_complex + " (complex_graphlet_id serial primary key, complexgraph_id int not null references " + tbl_complexgraph + " ON DELETE CASCADE, runtime_secs int, complex_graphlet_counts decimal[58] not null);");
+            doInsertQuery("CREATE TABLE " + tbl_graphletcount_aa + " (aa_graphlet_id serial primary key, aagraph_id int not null references " + tbl_aagraph + " ON DELETE CASCADE, runtime_secs int, aa_graphlet_counts decimal[93] not null);");
             doInsertQuery("CREATE TABLE " + tbl_nm_ssetoproteingraph + " (ssetoproteingraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, position_in_graph int not null);");
             doInsertQuery("CREATE TABLE " + tbl_nm_ssetofoldinggraph + " (ssetofoldinggraph_id serial primary key, sse_id int not null references " + tbl_sse + " ON DELETE CASCADE, foldinggraph_id int not null references " + tbl_foldinggraph + " ON DELETE CASCADE, position_in_graph int not null);");
             doInsertQuery("CREATE TABLE " + tbl_nm_chaintomotif + " (chaintomotif_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, motif_id int not null references " + tbl_motif + " ON DELETE CASCADE);");
@@ -1307,6 +1312,8 @@ public class DBManager {
             doInsertQuery("ALTER TABLE " + tbl_stats_proteingraph + " ADD CONSTRAINT constr_pgstats_uniq UNIQUE (pg_id, is_for_cc);");
             doInsertQuery("ALTER TABLE " + tbl_stats_complexgraph + " ADD CONSTRAINT constr_cgstats_uniq UNIQUE (cg_id, is_for_cc);");
             doInsertQuery("ALTER TABLE " + tbl_stats_aagraph + " ADD CONSTRAINT constr_aagstats_uniq UNIQUE (aag_id, is_for_cc);");
+            doInsertQuery("ALTER TABLE " + tbl_stats_customgraph + " ADD CONSTRAINT constr_customstats_uniq UNIQUE (unique_name);");
+            doInsertQuery("ALTER TABLE " + tbl_stats_customgraph + " ADD CONSTRAINT constr_customstats_uniq_cc UNIQUE (unique_name, is_for_cc);");
             //doInsertQuery("ALTER TABLE " + tbl_fglinnot_alpha + " ADD CONSTRAINT constr_fglinnotalpha_uniq UNIQUE (linnot_foldinggraph_id);");
             //doInsertQuery("ALTER TABLE " + tbl_fglinnot_beta + " ADD CONSTRAINT constr_fglinnotbeta_uniq UNIQUE (linnot_foldinggraph_id);");
             //doInsertQuery("ALTER TABLE " + tbl_fglinnot_albe + " ADD CONSTRAINT constr_fglinnotalbe_uniq UNIQUE (linnot_foldinggraph_id);");
@@ -1339,6 +1346,7 @@ public class DBManager {
             doInsertQuery("CREATE VIEW " + view_pgstats + " AS SELECT p.pdb_id, c.chain_name, gt.graphtype_text, stats.is_for_cc as is_for_cc, stats.num_verts, stats.num_edges, stats.min_degree, stats.max_degree, stats.avg_degree, stats.density, stats.diameter, stats.radius, stats.num_connected_components, stats.avg_cluster_coeff, stats.avg_shortest_path_length, stats.degreedist, stats.cumul_degreedist FROM " + tbl_stats_proteingraph + " stats INNER JOIN " + tbl_proteingraph + " g ON stats.pg_id = g.graph_id INNER JOIN " + tbl_chain + " c ON g.chain_id = c.chain_id INNER JOIN " + tbl_protein + " p ON c.pdb_id = p.pdb_id INNER JOIN " + tbl_graphtypes + " gt ON  g.graph_type = gt.graphtype_id;");
             doInsertQuery("CREATE VIEW " + view_cgstats + " AS SELECT cg.pdb_id, stats.is_for_cc as is_for_cc, stats.num_verts, stats.num_edges, stats.min_degree, stats.max_degree, stats.avg_degree, stats.density, stats.diameter, stats.radius, stats.num_connected_components, stats.avg_cluster_coeff, stats.avg_shortest_path_length, stats.degreedist, stats.cumul_degreedist FROM " + tbl_stats_complexgraph + " stats INNER JOIN " + tbl_complexgraph + " cg ON stats.cg_id = cg.complexgraph_id;");
             doInsertQuery("CREATE VIEW " + view_aagstats + " AS SELECT aag.pdb_id, aag.chain_description, stats.is_for_cc as is_for_cc, stats.num_verts, stats.num_edges, stats.min_degree, stats.max_degree, stats.avg_degree, stats.density, stats.diameter, stats.radius, stats.num_connected_components, stats.avg_cluster_coeff, stats.avg_shortest_path_length, stats.degreedist, stats.cumul_degreedist FROM " + tbl_stats_aagraph + " stats INNER JOIN " + tbl_aagraph + " aag ON stats.aag_id = aag.aagraph_id;");            
+            doInsertQuery("CREATE VIEW " + view_customstats + " AS SELECT stats.unique_name, stats.description, stats.is_for_cc as is_for_cc, stats.num_verts, stats.num_edges, stats.min_degree, stats.max_degree, stats.avg_degree, stats.density, stats.diameter, stats.radius, stats.num_connected_components, stats.avg_cluster_coeff, stats.avg_shortest_path_length, stats.degreedist, stats.cumul_degreedist FROM " + tbl_stats_customgraph + " stats;");            
             
             // add comments on views
             doInsertQuery("COMMENT ON VIEW " + view_ssecontacts + " IS 'Easy overview of SSE contacts.';");
@@ -1448,6 +1456,7 @@ public class DBManager {
             doInsertQuery("COMMENT ON COLUMN " + tbl_stats_proteingraph + ".is_for_cc IS 'If set to 0, these properties are for the graph itself. If set to 1, they are for its largest connected component. Used because some graph properties are not defined for unconnected graphs.';");
             doInsertQuery("COMMENT ON COLUMN " + tbl_stats_complexgraph + ".is_for_cc IS 'If set to 0, these properties are for the graph itself. If set to 1, they are for its largest connected component. Used because some graph properties are not defined for unconnected graphs.';");
             doInsertQuery("COMMENT ON COLUMN " + tbl_stats_aagraph + ".is_for_cc IS 'If set to 0, these properties are for the graph itself. If set to 1, they are for its largest connected component. Used because some graph properties are not defined for unconnected graphs.';");
+            doInsertQuery("COMMENT ON COLUMN " + tbl_stats_customgraph + ".is_for_cc IS 'If set to 0, these properties are for the graph itself. If set to 1, they are for its largest connected component. Used because some graph properties are not defined for unconnected graphs.';");
             
             
             // add indices
@@ -1565,6 +1574,7 @@ public class DBManager {
             doInsertQuery("CREATE INDEX plcc_idx_pgstats_graphid ON " + tbl_stats_proteingraph + " (pg_id);");
             doInsertQuery("CREATE INDEX plcc_idx_cgstats_graphid ON " + tbl_stats_complexgraph + " (cg_id);");
             doInsertQuery("CREATE INDEX plcc_idx_aagstats_graphid ON " + tbl_stats_aagraph + " (aag_id);");
+            doInsertQuery("CREATE INDEX plcc_idx_customstats_graphname ON " + tbl_stats_customgraph + " (unique_name);");
             doInsertQuery("CREATE INDEX plcc_idx_aatypeinteractions_pdbid ON " + tbl_aatypeinteractions_absolute + " (pdb_id);");
             doInsertQuery("CREATE INDEX plcc_idx_aatypeinteractionsnorm_pdbid ON " + tbl_aatypeinteractions_normalized + " (pdb_id);");
             
@@ -10947,7 +10957,7 @@ connection.close();
      * @return false if it failed, true otherwise. but see exceptions as well.
      * @throws SQLException if stuff went wrong
      */
-    public static Boolean writeProteingraphStatsToDB(Long graph_db_id, Boolean isForLargestConnectedComponent, Integer num_verts, Integer num_edges, Integer min_degree, Integer max_degree, Integer num_connected_components, Integer diameter, Integer radius, Double avg_cluster_coeff, Double avg_shortest_path_length, Integer[] degreedist, Double avg_degree, Double density, Integer[] cumul_degreedist) throws SQLException {
+    public static Boolean writeProteingraphStatsToDB(Long graph_db_id, Boolean isForLargestConnectedComponent, Integer num_verts, Integer num_edges, Integer min_degree, Integer max_degree, Integer num_connected_components, Integer diameter, Integer radius, Double avg_cluster_coeff, Double avg_shortest_path_length, Integer[] degreedist, Double avg_degree, Double density, Integer[] cumul_degreedist, Long runtime_secs) throws SQLException {
         if (graph_db_id < 0) {
             System.err.println("ERROR: writeProteingraphStatsToDB: Invalid graph database id (<0), not writing stats.");
             return (false);
@@ -10955,7 +10965,7 @@ connection.close();
         
         PreparedStatement statement = null;
         Boolean result = false;
-        String query = "INSERT INTO " + tbl_stats_proteingraph + " (pg_id, is_for_cc, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist, avg_degree, density, cumul_degreedist) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO " + tbl_stats_proteingraph + " (pg_id, is_for_cc, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist, avg_degree, density, cumul_degreedist, runtime_secs) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         int is_for_cc = (isForLargestConnectedComponent ? 1 : 0);
         
         try {
@@ -10980,8 +10990,9 @@ connection.close();
             if(avg_degree == null) { statement.setNull(13, java.sql.Types.DOUBLE); } else { statement.setDouble(13, avg_degree); }
             if(density == null) { statement.setNull(14, java.sql.Types.DOUBLE); } else { statement.setDouble(14, density); }
             statement.setArray(15, sqlArrayCumulDegreedist);
+            statement.setLong(16, runtime_secs);
                                 
-            statement.executeUpdate();
+            statement.executeUpdate();            
             //dbc.commit();
             result = true;
         } catch (SQLException e ) {
@@ -11022,7 +11033,7 @@ connection.close();
      * @return false if it failed, true otherwise. but see exceptions as well.
      * @throws SQLException if stuff went wrong
      */
-    public static Boolean writeComplexgraphStatsToDB(Long graph_db_id, Boolean isForLargestConnectedComponent, Integer num_verts, Integer num_edges, Integer min_degree, Integer max_degree, Integer num_connected_components, Integer diameter, Integer radius, Double avg_cluster_coeff, Double avg_shortest_path_length, Integer[] degreedist, Double avg_degree, Double density, Integer[] cumul_degreedist) throws SQLException {
+    public static Boolean writeComplexgraphStatsToDB(Long graph_db_id, Boolean isForLargestConnectedComponent, Integer num_verts, Integer num_edges, Integer min_degree, Integer max_degree, Integer num_connected_components, Integer diameter, Integer radius, Double avg_cluster_coeff, Double avg_shortest_path_length, Integer[] degreedist, Double avg_degree, Double density, Integer[] cumul_degreedist, Long runtime_secs) throws SQLException {
         if (graph_db_id < 0) {
             System.err.println("ERROR: writeComplexgraphStatsToDB: Invalid graph database id (<0), not writing stats.");
             return (false);
@@ -11030,7 +11041,7 @@ connection.close();
         
         PreparedStatement statement = null;
         Boolean result = false;
-        String query = "INSERT INTO " + tbl_stats_complexgraph + " (cg_id, is_for_cc, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist, avg_degree, density, cumul_degreedist) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?);";
+        String query = "INSERT INTO " + tbl_stats_complexgraph + " (cg_id, is_for_cc, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist, avg_degree, density, cumul_degreedist, runtime_secs) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?);";
         int is_for_cc = (isForLargestConnectedComponent ? 1 : 0);
         
         try {
@@ -11055,6 +11066,7 @@ connection.close();
             if(avg_degree == null) { statement.setNull(13, java.sql.Types.DOUBLE); } else { statement.setDouble(13, avg_degree); }
             if(density == null) { statement.setNull(14, java.sql.Types.DOUBLE); } else { statement.setDouble(14, density); }
             statement.setArray(15, sqlArrayCumulDegreedist);
+            statement.setLong(16, runtime_secs);
                                 
             statement.executeUpdate();
             //dbc.commit();
@@ -11097,7 +11109,7 @@ connection.close();
      * @return false if it failed, true otherwise. but see exceptions as well.
      * @throws SQLException if stuff went wrong
      */
-    public static Boolean writeAminoacidgraphStatsToDB(Long graph_db_id, Boolean isForLargestConnectedComponent, Integer num_verts, Integer num_edges, Integer min_degree, Integer max_degree, Integer num_connected_components, Integer diameter, Integer radius, Double avg_cluster_coeff, Double avg_shortest_path_length, Integer[] degreedist, Double avg_degree, Double density, Integer[] cumul_degreedist) throws SQLException {
+    public static Boolean writeAminoacidgraphStatsToDB(Long graph_db_id, Boolean isForLargestConnectedComponent, Integer num_verts, Integer num_edges, Integer min_degree, Integer max_degree, Integer num_connected_components, Integer diameter, Integer radius, Double avg_cluster_coeff, Double avg_shortest_path_length, Integer[] degreedist, Double avg_degree, Double density, Integer[] cumul_degreedist, Long runtime_secs) throws SQLException {
         if (graph_db_id < 0) {
             System.err.println("ERROR: writeAminoacidgraphStatsToDB: Invalid graph database id (<0), not writing stats.");
             return (false);
@@ -11105,7 +11117,7 @@ connection.close();
         
         PreparedStatement statement = null;
         Boolean result = false;
-        String query = "INSERT INTO " + tbl_stats_aagraph + " (aag_id, is_for_cc, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist, avg_degree, density, cumul_degreedist) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?);";
+        String query = "INSERT INTO " + tbl_stats_aagraph + " (aag_id, is_for_cc, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist, avg_degree, density, cumul_degreedist, runtime_secs) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?);";
         int is_for_cc = (isForLargestConnectedComponent ? 1 : 0);
         
         try {
@@ -11130,6 +11142,7 @@ connection.close();
             if(avg_degree == null) { statement.setNull(13, java.sql.Types.DOUBLE); } else { statement.setDouble(13, avg_degree); }
             if(density == null) { statement.setNull(14, java.sql.Types.DOUBLE); } else { statement.setDouble(14, density); }
             statement.setArray(15, sqlArrayCumulDegreedist);
+            statement.setLong(16, runtime_secs);
                                 
             statement.executeUpdate();
             //dbc.commit();
@@ -11142,6 +11155,85 @@ connection.close();
                     dbc.rollback();
                 } catch(SQLException excep) {
                     System.err.println("ERROR: SQL: writeAminoacidgraphStatsToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+            result = false;
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            //dbc.setAutoCommit(true);
+        }
+                
+        return(result);
+    }
+    
+    
+        /**
+     * Writes statistics and properties of a custom graph to the db. A custom graph can be any graph, e.g., a cell graph parsed from a GML file. It could also be a random graph computed for an AAG.
+     * @param unique_name a unique name for the graph
+     * @param description optional description, can be null
+     * @param isForLargestConnectedComponent whether its for the largest CC of the graph or the graph itself
+     * @param num_verts num verts
+     * @param num_edges num edges
+     * @param min_degree min degree
+     * @param max_degree max deg
+     * @param num_connected_components num CCs
+     * @param diameter diam
+     * @param radius radius
+     * @param avg_cluster_coeff avg clustercoeff
+     * @param avg_shortest_path_length avg spl
+     * @param degreedist dgd
+     * @return false if it failed, true otherwise. but see exceptions as well.
+     * @throws SQLException if stuff went wrong
+     */
+    public static Boolean writeCustomgraphStatsToDB(String unique_name, String description, Boolean isForLargestConnectedComponent, Integer num_verts, Integer num_edges, Integer min_degree, Integer max_degree, Integer num_connected_components, Integer diameter, Integer radius, Double avg_cluster_coeff, Double avg_shortest_path_length, Integer[] degreedist, Double avg_degree, Double density, Integer[] cumul_degreedist, Long runtime_secs) throws SQLException {
+        if (unique_name == null) {
+            System.err.println("ERROR: writeCustomgraphStatsToDB: Unique graph name must not be null, not writing stats.");
+            return (false);
+        }
+        
+        PreparedStatement statement = null;
+        Boolean result = false;
+        String query = "INSERT INTO " + tbl_stats_customgraph + " (unique_name, description, is_for_cc, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist, avg_degree, density, cumul_degreedist, runtime_secs) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?, ?);";
+        int is_for_cc = (isForLargestConnectedComponent ? 1 : 0);
+        
+        try {
+            //dbc.setAutoCommit(false);
+            Array sqlArrayDegreedist = dbc.createArrayOf("int", degreedist);
+            Array sqlArrayCumulDegreedist = dbc.createArrayOf("int", cumul_degreedist);
+            
+            statement = dbc.prepareStatement(query);
+
+            statement.setString(1, unique_name);
+            statement.setString(2, description);
+            statement.setInt(3, is_for_cc);
+            statement.setInt(4, num_verts);
+            statement.setInt(5, num_edges);
+            statement.setInt(6, min_degree);
+            statement.setInt(7, max_degree);
+            statement.setInt(8, num_connected_components);
+            if(diameter == null) {statement.setNull(9, java.sql.Types.INTEGER); } else { statement.setInt(9, diameter); }
+            if(radius == null) { statement.setNull(10, java.sql.Types.INTEGER); } else { statement.setInt(10, radius); }
+            if(avg_cluster_coeff == null) { statement.setNull(11, java.sql.Types.DOUBLE); } else { statement.setDouble(11, avg_cluster_coeff); }
+            if(avg_shortest_path_length == null) { statement.setNull(12, java.sql.Types.DOUBLE); } else { statement.setDouble(12, avg_shortest_path_length); } 
+            statement.setArray(13, sqlArrayDegreedist);
+            if(avg_degree == null) { statement.setNull(14, java.sql.Types.DOUBLE); } else { statement.setDouble(14, avg_degree); }
+            if(density == null) { statement.setNull(15, java.sql.Types.DOUBLE); } else { statement.setDouble(15, density); }
+            statement.setArray(16, sqlArrayCumulDegreedist);
+            statement.setLong(17, runtime_secs);
+                                
+            statement.executeUpdate();
+            //dbc.commit();
+            result = true;
+        } catch (SQLException e ) {
+            System.err.println("ERROR: SQL: writeCustomgraphStatsToDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    System.err.print("ERROR: SQL: writeCustomgraphStatsToDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    System.err.println("ERROR: SQL: writeCustomgraphStatsToDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
                 }
             }
             result = false;

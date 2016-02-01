@@ -85,6 +85,7 @@ import graphdrawing.DrawTools.IMAGEFORMAT;
 import graphdrawing.DrawableGraph;
 import graphdrawing.IDrawableGraph;
 import graphdrawing.SimpleGraphDrawer;
+import java.util.concurrent.TimeUnit;
 import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import parsers.GMLGraphParser;
 import parsers.IGraphParser;
@@ -1211,19 +1212,108 @@ public class Main {
                             
                             
                             if(computeSparseGraphProps) {
+                                Date propsComputationStartTime, propsComputationEndTime; long timeDiff;
+                                String unique_name;
+                                String description = null;
+                                Boolean isForLargestConnectedComponent = false;
+                                Integer num_verts;
+                                Integer num_edges;
+                                Integer min_degree;
+                                Integer max_degree;
+                                Integer num_connected_components;
+                                Integer diameter;
+                                Integer radius;
+                                Double avg_cluster_coeff;
+                                Double avg_shortest_path_length;
+                                Integer[] degreedist;
+                                Double avg_degree;
+                                Double density;
+                                Integer[] cumul_degreedist;
+                                Long runtime_secs;
+                                
+                                propsComputationStartTime = new Date();
                                 DP.getInstance().i("Main", "Constructing sparse graph...");
                                 SparseGraph<String, String> sg = g.toSparseGraph();
                                 DP.getInstance().i("Main", "Computing sparse graph properties for SG with " + sg.getNumVertices() +" verts and " + sg.getNumEdges() + " edges ...");
                                 GraphProperties gp = new GraphProperties(sg);
                                 //DP.getInstance().i("Main", "Props for SG constructed.");
-                                System.out.println(gp.getOverviewPropsString(true));
-                                //DP.getInstance().i("Main", "Props for SG computed and printed.");
+                                Boolean alsoPrintGraphProps = false;
+                                if(alsoPrintGraphProps) {
+                                    System.out.println(gp.getOverviewPropsString(true));
+                                    //DP.getInstance().i("Main", "Props for SG computed and printed.");                                                                    
+                                }
+                                
+                                unique_name = "g" + System.currentTimeMillis(); // has to be kept for the CC as well
+                                
+                                num_verts = gp.getNumVertices();
+                                num_edges = gp.getNumEdges();
+                                min_degree = gp.getMinDegree();
+                                max_degree = gp.getMaxDegree();
+                                num_connected_components = gp.getConnectedComponents().size();
+                                diameter = gp.getGraphDiameter();
+                                radius = gp.getGraphRadius();
+                                avg_cluster_coeff = gp.getAverageClusterCoefficient();
+                                avg_shortest_path_length = gp.getAverageShortestPathLength();
+                                degreedist = gp.getDegreeDistributionUpTo(50);
+                                avg_degree = gp.getAverageDegree();
+                                density = gp.getDensity();
+                                cumul_degreedist = gp.getCumulativeDegreeDistributionUpToAsArray(50);
+
+                                
+                                propsComputationEndTime = new Date();
+                                timeDiff = propsComputationEndTime.getTime() - propsComputationStartTime.getTime();//as given
+                                runtime_secs = TimeUnit.MILLISECONDS.toSeconds(timeDiff);
+                                System.out.println("Computed graph properties for custom graph with " + gp.getNumVertices() + " verts and " + gp.getNumEdges() + " edges in " + runtime_secs + " seconds.");
+                                
+
+                                if(Settings.getBoolean("plcc_B_useDB")) {
+                                    try {
+                                        DBManager.writeCustomgraphStatsToDB(unique_name, description, isForLargestConnectedComponent, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist, avg_degree, density, cumul_degreedist, runtime_secs);                                        
+                                    }catch(SQLException e) {
+                                        DP.getInstance().e("Main", "Could not write custom graph stats to db: '" + e.getMessage() + "'.");
+                                    }
+                                }
+                                
                                 if(alsoComputePropsForLargestCC) {
                                     if( ! gp.getGraphIsConnected()) {                                        
+                                        propsComputationStartTime = new Date();
                                         SimpleGraphInterface lcc = gp.getLargestConnectedComponent();
                                         DP.getInstance().i("Main", "Graph is not connected. Also computing sparse graph properties for its largest CC with " + lcc.getSize() +" verts ...");
+                                        
                                         GraphProperties lccp = new GraphProperties(lcc);
-                                        System.out.println(lccp.getOverviewPropsString(true));
+                                        
+                                        isForLargestConnectedComponent = true;
+                                        num_verts = lccp.getNumVertices();
+                                        num_edges = lccp.getNumEdges();
+                                        min_degree = lccp.getMinDegree();
+                                        max_degree = lccp.getMaxDegree();
+                                        num_connected_components = lccp.getConnectedComponents().size();
+                                        diameter = lccp.getGraphDiameter();
+                                        radius = lccp.getGraphRadius();
+                                        avg_cluster_coeff = lccp.getAverageClusterCoefficient();
+                                        avg_shortest_path_length = lccp.getAverageShortestPathLength();
+                                        degreedist = lccp.getDegreeDistributionUpTo(50);
+                                        avg_degree = lccp.getAverageDegree();
+                                        density = lccp.getDensity();
+                                        cumul_degreedist = lccp.getCumulativeDegreeDistributionUpToAsArray(50);
+                                        
+                                        propsComputationEndTime = new Date();
+                                        timeDiff = propsComputationEndTime.getTime() - propsComputationStartTime.getTime();//as given
+                                        runtime_secs = TimeUnit.MILLISECONDS.toSeconds(timeDiff);
+                                        System.out.println("Computed graph properties for largest CC of custom graph with " + lccp.getNumVertices() + " verts and " + lccp.getNumEdges() + " edges in " + runtime_secs + " seconds.");
+                                        
+                                        if(alsoPrintGraphProps) {
+                                            System.out.println(lccp.getOverviewPropsString(true));
+                                        }
+                                        
+                                        //TODO: write props to DB here if requested
+                                        if(Settings.getBoolean("plcc_B_useDB")) {
+                                            try {
+                                                DBManager.writeCustomgraphStatsToDB(unique_name, description, isForLargestConnectedComponent, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist, avg_degree, density, cumul_degreedist, runtime_secs);
+                                            }catch(SQLException e) {
+                                                DP.getInstance().e("Main", "Could not write custom graph stats for largest CC to db: '" + e.getMessage() + "'.");
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -2233,7 +2323,8 @@ public class Main {
                                 if(graph_db_id > 0L) {
                                     //System.out.println("Found aa graph " + pdbid + ".");
                                     // write graph properties
-                                    DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.FALSE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity(), gp.getCumulativeDegreeDistributionUpToAsArray(50));
+                                    Long runtime_secs = null;
+                                    DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.FALSE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity(), gp.getCumulativeDegreeDistributionUpToAsArray(50), runtime_secs);
                                     
                                     Boolean rewireGraphsToCompareWithRandom = false;
                                     if(rewireGraphsToCompareWithRandom) {   // this was only needed for graph analyses carried out for the Ph.D. thesis of TS, ignore
@@ -2322,7 +2413,8 @@ public class Main {
                                     
                                     //System.out.println("max CC is: " + gp.getMaximumNetworkClusterCoefficient());
                                     // write properties of largest CC of graph
-                                    DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.TRUE, sgp.getNumVertices(), sgp.getNumEdges(), sgp.getMinDegree(), sgp.getMaxDegree(), sgp.getConnectedComponents().size(), sgp.getGraphDiameter(), sgp.getGraphRadius(), sgp.getAverageClusterCoefficient(), sgp.getAverageShortestPathLength(), sgp.getDegreeDistributionUpTo(50), sgp.getAverageDegree(), sgp.getDensity(), sgp.getCumulativeDegreeDistributionUpToAsArray(50));
+                                    runtime_secs = null;
+                                    DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.TRUE, sgp.getNumVertices(), sgp.getNumEdges(), sgp.getMinDegree(), sgp.getMaxDegree(), sgp.getConnectedComponents().size(), sgp.getGraphDiameter(), sgp.getGraphRadius(), sgp.getAverageClusterCoefficient(), sgp.getAverageShortestPathLength(), sgp.getDegreeDistributionUpTo(50), sgp.getAverageDegree(), sgp.getDensity(), sgp.getCumulativeDegreeDistributionUpToAsArray(50), runtime_secs);
                                 }
                                 else {
                                     DP.getInstance().e("Main", "Could not write aa graph properties to DB, graph not found in database.");
@@ -3464,9 +3556,10 @@ public class Main {
                                 if(graph_db_id > 0L) {
                                     //System.out.println("Found graph " + pdbid + " " + chain + " " + gt + " with ID " + graph_db_id + ".");
                                     // write graph properties
-                                    DBManager.writeProteingraphStatsToDB(graph_db_id, Boolean.FALSE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity(), gp.getCumulativeDegreeDistributionUpToAsArray(50));
+                                    Long runtime_secs = null;
+                                    DBManager.writeProteingraphStatsToDB(graph_db_id, Boolean.FALSE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity(), gp.getCumulativeDegreeDistributionUpToAsArray(50), runtime_secs);
                                     // write properties of largest CC of graph
-                                    DBManager.writeProteingraphStatsToDB(graph_db_id, Boolean.TRUE, sgp.getNumVertices(), sgp.getNumEdges(), sgp.getMinDegree(), sgp.getMaxDegree(), sgp.getConnectedComponents().size(), sgp.getGraphDiameter(), sgp.getGraphRadius(), sgp.getAverageClusterCoefficient(), sgp.getAverageShortestPathLength(), sgp.getDegreeDistributionUpTo(50), sgp.getAverageDegree(), sgp.getDensity(), sgp.getCumulativeDegreeDistributionUpToAsArray(50));
+                                    DBManager.writeProteingraphStatsToDB(graph_db_id, Boolean.TRUE, sgp.getNumVertices(), sgp.getNumEdges(), sgp.getMinDegree(), sgp.getMaxDegree(), sgp.getConnectedComponents().size(), sgp.getGraphDiameter(), sgp.getGraphRadius(), sgp.getAverageClusterCoefficient(), sgp.getAverageShortestPathLength(), sgp.getDegreeDistributionUpTo(50), sgp.getAverageDegree(), sgp.getDensity(), sgp.getCumulativeDegreeDistributionUpToAsArray(50), runtime_secs);
                                 }
                                 else {
                                     DP.getInstance().e("Main", "Could not write graph properties to DB, graph not found in database.");
@@ -7700,9 +7793,10 @@ public class Main {
                     if(graph_db_id > 0L) {
                         //System.out.println("Found complex graph " + pdbid + " with ID " + graph_db_id + ".");
                         // write graph properties
-                        DBManager.writeComplexgraphStatsToDB(graph_db_id, Boolean.FALSE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity(), gp.getCumulativeDegreeDistributionUpToAsArray(50));
+                        Long runtime_secs = null;
+                        DBManager.writeComplexgraphStatsToDB(graph_db_id, Boolean.FALSE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity(), gp.getCumulativeDegreeDistributionUpToAsArray(50), runtime_secs);
                         // write properties of largest CC of graph
-                        DBManager.writeComplexgraphStatsToDB(graph_db_id, Boolean.TRUE, sgp.getNumVertices(), sgp.getNumEdges(), sgp.getMinDegree(), sgp.getMaxDegree(), sgp.getConnectedComponents().size(), sgp.getGraphDiameter(), sgp.getGraphRadius(), sgp.getAverageClusterCoefficient(), sgp.getAverageShortestPathLength(), sgp.getDegreeDistributionUpTo(50), sgp.getAverageDegree(), sgp.getDensity(), sgp.getCumulativeDegreeDistributionUpToAsArray(50));
+                        DBManager.writeComplexgraphStatsToDB(graph_db_id, Boolean.TRUE, sgp.getNumVertices(), sgp.getNumEdges(), sgp.getMinDegree(), sgp.getMaxDegree(), sgp.getConnectedComponents().size(), sgp.getGraphDiameter(), sgp.getGraphRadius(), sgp.getAverageClusterCoefficient(), sgp.getAverageShortestPathLength(), sgp.getDegreeDistributionUpTo(50), sgp.getAverageDegree(), sgp.getDensity(), sgp.getCumulativeDegreeDistributionUpToAsArray(50), runtime_secs);
                     }
                     else {
                         DP.getInstance().e("Main", "Could not write complex graph properties to DB, graph not found in database.");
