@@ -14,6 +14,7 @@
 #include "ProteinGraphService.h"
 #include "GMLptglProteinParser.h"
 #include "GraphPTGLPrinter.h"
+#include <time.h>
 
 
 using namespace std;
@@ -411,11 +412,13 @@ int main(int argc, char** argv) {
             options["graph_vertex_type_field"] = "sse_type";
             options["graph_vertex_type_alphabet"] = "HEL";
             options["graphtype"] = "sse_graph";
+            
                     
         } else if (aa_graph) {
             options["graph_vertex_type_field"] = "chem_prop3";
             options["graph_vertex_type_alphabet"] = "hpa?";
             options["graphtype"] = "aa_graph";
+            
         } else if (complex_graph) {
             options["graph_vertex_type_field"] = "sse_type";
             options["graph_vertex_type_alphabet"] = "HEL";
@@ -501,6 +504,16 @@ int main(int argc, char** argv) {
         std::vector<int> counts5;
         
         
+        // set up variables for measuring time
+        time_t timer;
+        time_t other_timer;
+        
+        
+        timer = time(NULL);
+        
+        int seconds;
+        
+        
         if (!withLabeled) {
             
             std::vector<std::string> evec1 = std::vector<std::string>();
@@ -535,6 +548,11 @@ int main(int argc, char** argv) {
             
             
         }
+        
+        other_timer = time(NULL);
+        
+        seconds = difftime(other_timer, timer);
+        
         
         
         abs_counts.push_back(counts2);
@@ -582,7 +600,7 @@ int main(int argc, char** argv) {
                 int graphtype_int = service.getGraphTypeInt(graphtype);
             
             
-                int db_res = printer.savePGCountsToDatabasePGXX(graphtype_int, id_vec, norm_counts, norm_labeled_counts);
+                int db_res = printer.savePGCountsToDatabasePGXX(graphtype_int, id_vec, norm_counts, norm_labeled_counts, seconds);
             }
             else if(options["graphtype"] == "aa_graph") {
                 
@@ -594,7 +612,7 @@ int main(int argc, char** argv) {
                     label = "chem_prop3";
                 }
                 
-                int db_res = printer.saveAACountsToDatabasePGXX(pdb_id,label,norm_counts,norm_labeled_counts);
+                int db_res = printer.saveAACountsToDatabasePGXX(pdb_id,label,norm_counts,norm_labeled_counts, seconds);
                 
             }
             else if(options["graphtype"] == "complex_graph" || options["graphtype"] == "complex_albe" || options["graphtype"] == "complex_albelig") {
@@ -604,7 +622,7 @@ int main(int argc, char** argv) {
                 std::string pdb_id = service.getPdbid();
                 std::string label = "";
                 
-                int db_res = printer.saveCGCountsToDatabasePGXX(pdb_id,label,norm_counts,norm_labeled_counts);
+                int db_res = printer.saveCGCountsToDatabasePGXX(pdb_id,label,norm_counts,norm_labeled_counts,seconds);
             }
             else {
                 std:cerr << apptag << "Cannot save graphlet counts to DB for file '" << files[i] << "', graph type unknown." << std::endl;

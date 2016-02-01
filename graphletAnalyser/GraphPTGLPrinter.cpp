@@ -174,7 +174,7 @@ string GraphPTGLPrinter::printGraphString(const Graph& g) const {
  * @param <vector<vector<float>> normalized graphlet counts
  * @param <vector<vector<float>> normalized ptgl counts
  */
-int GraphPTGLPrinter::savePGCountsToDatabasePGXX(int graphtype_int, std::vector<std::string> ids, std::vector<std::vector<float>> norm_counts, std::vector<float> lab_counts) {
+int GraphPTGLPrinter::savePGCountsToDatabasePGXX(int graphtype_int, std::vector<std::string> ids, std::vector<std::vector<float>> norm_counts, std::vector<float> lab_counts, int time) {
     
     Database db = Database::getInstance();
     string connection_string = db.get_connect_string();
@@ -290,7 +290,7 @@ int GraphPTGLPrinter::savePGCountsToDatabasePGXX(int graphtype_int, std::vector<
             }
             
             float val;
-            string query = "INSERT INTO plcc_graphlets (graph_id, graphlet_counts) VALUES (" + W.esc(dbpkStr) + ", '{";
+            string query = "INSERT INTO plcc_graphlets (graph_id, runtime_secs, graphlet_counts) VALUES (" + W.esc(dbpkStr) + ", " + std::to_string(time) + ", '{";
             for (int i = 0; i < allGraphletcounts.size(); i++) {
                 std::stringstream ssVal;
                 val = allGraphletcounts[i];
@@ -541,7 +541,7 @@ int GraphPTGLPrinter::testDatabasePGXX() {
     }
 }
 
-int GraphPTGLPrinter::saveAACountsToDatabasePGXX(std::string pdbid, std::string label, std::vector<std::vector<float>> norm_counts, std::vector<float> lab_counts) {
+int GraphPTGLPrinter::saveAACountsToDatabasePGXX(std::string pdbid, std::string label, std::vector<std::vector<float>> norm_counts, std::vector<float> lab_counts, int time) {
     
     Database db = Database::getInstance();
     string connection_string = db.get_connect_string();
@@ -649,7 +649,7 @@ int GraphPTGLPrinter::saveAACountsToDatabasePGXX(std::string pdbid, std::string 
             
              */
             float val;
-            string query = "INSERT INTO plcc_aa_graphlets (aagraph_id, aa_graphlet_counts) VALUES (" + W.esc(dbpkStr) + ", '{";
+            string query = "INSERT INTO plcc_aa_graphlets (aagraph_id, runtime_secs, aa_graphlet_counts, ) VALUES (" + W.esc(dbpkStr) + ", " + std::to_string(time) + ", '{";
             for (int i = 0; i < allGraphletcounts.size(); i++) {
                 std::stringstream ssVal;
                 val = allGraphletcounts[i];
@@ -860,7 +860,7 @@ long GraphPTGLPrinter::getCGGraphDatabaseID(string pdbid) const {
     return id;
 }
 
-int GraphPTGLPrinter::saveCGCountsToDatabasePGXX(std::string pdbid, std::string label, std::vector<std::vector<float>> norm_counts, std::vector<float> lab_counts) {
+int GraphPTGLPrinter::saveCGCountsToDatabasePGXX(std::string pdbid, std::string label, std::vector<std::vector<float>> norm_counts, std::vector<float> lab_counts, int time) {
     
     Database db = Database::getInstance();
     string connection_string = db.get_connect_string();
@@ -967,7 +967,7 @@ int GraphPTGLPrinter::saveCGCountsToDatabasePGXX(std::string pdbid, std::string 
             
             
             float val;
-            string query = "INSERT INTO plcc_complex_graphlets (complexgraph_id, complex_graphlet_counts) VALUES (" + W.esc(dbpkStr) + ", '{";
+            string query = "INSERT INTO plcc_complex_graphlets (complexgraph_id, runtime_secs, complex_graphlet_counts) VALUES (" + W.esc(dbpkStr) + ", " + std::to_string(time) + ", '{";
             for (int i = 0; i < allGraphletcounts.size(); i++) {
                 std::stringstream ssVal;
                 val = allGraphletcounts[i];

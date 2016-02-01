@@ -27,9 +27,9 @@ class GraphPTGLPrinter : public GraphPrinter {
         std::string printGraphString(const Graph& g) const;
         std::string printChainID() const;
         std::string printGraphTypeString() const;
-        int savePGCountsToDatabasePGXX(int,std::vector<std::string>,std::vector<std::vector<float>>, std::vector<float>);
-        int saveAACountsToDatabasePGXX(std::string,std::string,std::vector<std::vector<float>>,std::vector<float>);
-        int saveCGCountsToDatabasePGXX(std::string,std::string,std::vector<std::vector<float>>,std::vector<float>);
+        int savePGCountsToDatabasePGXX(int,std::vector<std::string>,std::vector<std::vector<float>>, std::vector<float>,int);
+        int saveAACountsToDatabasePGXX(std::string,std::string,std::vector<std::vector<float>>,std::vector<float>,int);
+        int saveCGCountsToDatabasePGXX(std::string,std::string,std::vector<std::vector<float>>,std::vector<float>,int);
         long getPGGraphDatabaseID(std::string, std::string, int) const;
         long getAAGraphDatabaseID(std::string, std::string) const;
         long getCGGraphDatabaseID(std::string) const;
