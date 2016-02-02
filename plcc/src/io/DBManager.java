@@ -1218,7 +1218,7 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_contacttypes + " (contacttype_id int not null primary key,  contacttype_text text not null);");
             doInsertQuery("CREATE TABLE " + tbl_complexcontacttypes + " (complexcontacttype_id int not null primary key,  complexcontacttype_text text not null);");
             doInsertQuery("CREATE TABLE " + tbl_graphtypes + " (graphtype_id int not null primary key,  graphtype_text text not null);");            
-            doInsertQuery("CREATE TABLE " + tbl_protein + " (pdb_id varchar(4) primary key, header text not null, title text not null, experiment text not null, keywords text not null, resolution real not null, runtime_secs int);");
+            doInsertQuery("CREATE TABLE " + tbl_protein + " (pdb_id varchar(4) primary key, header text not null, title text not null, experiment text not null, keywords text not null, resolution real not null, runtime_secs int, num_residues int);");
             doInsertQuery("CREATE TABLE " + tbl_macromolecule + " (macromolecule_id serial primary key,  pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, mol_id_pdb text not null, mol_name text not null, mol_ec_number text, mol_organism_scientific text, mol_organism_common text, mol_chains text);");
             doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(2) not null, mol_id_pdb text not null, mol_name text not null, organism_scientific text not null, organism_common text not null, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, chain_isinnonredundantset smallint DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence text not null, sse_type int not null references " + tbl_ssetypes + " ON DELETE CASCADE, lig_name varchar(5), position_in_chain int);");
@@ -8667,7 +8667,7 @@ connection.close();
      * @return true if the protein was written to the DB, false otherwise
      * @throws SQLException if the DB could not be reset or closed properly
      */
-    public static Boolean writeProteinToDB(String pdb_id, String title, String header, String keywords, String experiment, Double resolution) throws SQLException {
+    public static Boolean writeProteinToDB(String pdb_id, String title, String header, String keywords, String experiment, Double resolution, Integer numResidues) throws SQLException {
         
         if(proteinExistsInDB(pdb_id)) {
             try {
@@ -8681,7 +8681,7 @@ connection.close();
 
         PreparedStatement statement = null;
 
-        String query = "INSERT INTO " + tbl_protein + " (pdb_id, title, header, keywords, experiment, resolution) VALUES (?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO " + tbl_protein + " (pdb_id, title, header, keywords, experiment, resolution, num_residues) VALUES (?, ?, ?, ?, ?, ?, ?);";
 
         try {
             ////dbc.setAutoCommit(false);
@@ -8693,6 +8693,7 @@ connection.close();
             statement.setString(4, keywords);
             statement.setString(5, experiment);
             statement.setDouble(6, resolution);
+            statement.setInt(7, numResidues);
                                 
             statement.executeUpdate();
             ////dbc.commit();

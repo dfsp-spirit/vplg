@@ -38,9 +38,9 @@ public abstract class GraphParser implements IGraphParser, IDrawableGraphProvide
     
     /**
      * Checks whether a parse edge info with same start and target vertices (including switched version) exists in the list.
-     * @param list
-     * @param e
-     * @return 
+     * @param list list of edge infos
+     * @param e the edge we are looking for
+     * @return true or false, guess what it means
      */
     private static Boolean listContainsEdgeInfo(List<ParsedEdgeInfo> list, ParsedEdgeInfo e) {
         Integer s, t;

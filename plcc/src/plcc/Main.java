@@ -1564,7 +1564,9 @@ public class Main {
                     if(! silent) {
                         System.out.println("*Computing pairwise graphlet similarities for all amino acid graphs in the database. This will take a lot of time and memory for large databases...");
                     }
-                    Long[] res = DBManager.computeGraphletSimilarityScoresForAAGsWholeDatabaseAndStoreBest(Settings.getInteger("plcc_I_compute_all_graphlet_similarities_num_to_save_in_db"));
+                    Integer numToSave = Settings.getInteger("plcc_I_compute_all_graphlet_similarities_num_to_save_in_db");
+                    if(numToSave < 0) { numToSave = null; }
+                    Long[] res = DBManager.computeGraphletSimilarityScoresForAAGsWholeDatabaseAndStoreBest(numToSave);
                     // numChainsFound, numGraphletsFound, numScoresComputed, numScoresSaved
                     if(! silent) {
                         System.out.println(" AAG graphlet similarity done. Found " + res[0] + " AAGs and " + res[1] + " graphlet counts for them in the DB. Computed " + res[2] + " similarity scores and saved " + res[3] + " of them to the DB.");
@@ -2248,7 +2250,7 @@ public class Main {
             }
             
             if(Settings.getBoolean("plcc_B_useDB")) {
-                writeProteinDataToDatabase(pdbid);
+                writeProteinDataToDatabase(pdbid, residues.size());
                 if( ! DBManager.getAutoCommit()) {
                     DBManager.commit();
                 }
@@ -2990,17 +2992,17 @@ public class Main {
      * Writes data on the current protein to the database and deletes any old data in there which has the same PDB identifier.
      * @param pdbid the PDB ID to use
      */
-    public static void writeProteinDataToDatabase(String pdbid) {
+    public static void writeProteinDataToDatabase(String pdbid, int numResidues) {
         
         Boolean silent = Settings.getBoolean("plcc_B_silent");
         
         HashMap<String, String> md = FileParser.getPDBMetaData();
-        Double res = -1.0;
+        Double resolution = -1.0;
         try {
-            res = Double.valueOf(md.get("resolution"));
+            resolution = Double.valueOf(md.get("resolution"));
         } catch (Exception e) {
-            res = -1.0;
-            DP.getInstance().w("Could not determine resolution of PDB file for protein '" + pdbid + "', assuming NMR with resolution '" + res + "'.");
+            resolution = -1.0;
+            DP.getInstance().w("Could not determine resolution of PDB file for protein '" + pdbid + "', assuming NMR with resolution '" + resolution + "'.");
             
         }
                 
@@ -3015,7 +3017,7 @@ public class Main {
             }
                         
             try {
-                DBManager.writeProteinToDB(pdbid, md.get("title"), md.get("header"), md.get("keywords"), md.get("experiment"), res);
+                DBManager.writeProteinToDB(pdbid, md.get("title"), md.get("header"), md.get("keywords"), md.get("experiment"), resolution, numResidues);
                 if(! silent) {
                     System.out.println("  Info on protein '" + pdbid + "' written to DB.");
                 }

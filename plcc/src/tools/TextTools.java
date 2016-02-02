@@ -99,7 +99,7 @@ public class TextTools {
     /**
      * Handles the numbers as a histogram and computes the mean
      * @param s
-     * @return 
+     * @return the mean
      */
     public static Double getMeanOfIntegerHistogram(String s) {
         Integer sum = 0;
