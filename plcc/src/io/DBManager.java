@@ -1218,7 +1218,7 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_contacttypes + " (contacttype_id int not null primary key,  contacttype_text text not null);");
             doInsertQuery("CREATE TABLE " + tbl_complexcontacttypes + " (complexcontacttype_id int not null primary key,  complexcontacttype_text text not null);");
             doInsertQuery("CREATE TABLE " + tbl_graphtypes + " (graphtype_id int not null primary key,  graphtype_text text not null);");            
-            doInsertQuery("CREATE TABLE " + tbl_protein + " (pdb_id varchar(4) primary key, header text not null, title text not null, experiment text not null, keywords text not null, resolution real not null, int runtime_secs);");
+            doInsertQuery("CREATE TABLE " + tbl_protein + " (pdb_id varchar(4) primary key, header text not null, title text not null, experiment text not null, keywords text not null, resolution real not null, runtime_secs int);");
             doInsertQuery("CREATE TABLE " + tbl_macromolecule + " (macromolecule_id serial primary key,  pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, mol_id_pdb text not null, mol_name text not null, mol_ec_number text, mol_organism_scientific text, mol_organism_common text, mol_chains text);");
             doInsertQuery("CREATE TABLE " + tbl_chain + " (chain_id serial primary key, chain_name varchar(2) not null, mol_id_pdb text not null, mol_name text not null, organism_scientific text not null, organism_common text not null, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, chain_isinnonredundantset smallint DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_sse + " (sse_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, dssp_start int not null, dssp_end int not null, pdb_start varchar(20) not null, pdb_end varchar(20) not null, sequence text not null, sse_type int not null references " + tbl_ssetypes + " ON DELETE CASCADE, lig_name varchar(5), position_in_chain int);");
@@ -10156,6 +10156,49 @@ connection.close();
     }
     
     
+    /**
+     * Sets the total runtime it took to run PLCC for a PDB file in the database. The protein entry has to exist in the database already.
+     * 
+     * @param pdbid the PDB ID
+     * @param runtime_secs the runtime in seconds
+     * @return the number of affected rows
+     */
+    public static Integer updateProteinTotalRuntimeInDB(String pdbid, Long runtime_secs) throws SQLException {
+        
+        PreparedStatement statement = null;
+        String query = "UPDATE " + tbl_protein + " SET runtime_secs = ? WHERE pdb_id = ?;";
+        Integer numRowsAffected = 0;
+        
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            
+            statement.setDouble(1, runtime_secs);
+            statement.setString(2, pdbid);
+                                
+            numRowsAffected = statement.executeUpdate();
+            //dbc.commit();
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "updateProteinTotalRuntimeInDB: '" + e.getMessage() + "'.");
+            if (dbc != null) {
+                try {
+                    DP.getInstance().e("DBManager", "updateProteinTotalRuntimeInDB: Transaction is being rolled back.");
+                    dbc.rollback();
+                } catch(SQLException excep) {
+                    DP.getInstance().e("DBManager", "updateProteinTotalRuntimeInDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                }
+            }
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+            //dbc.setAutoCommit(true);
+        } 
+       
+        return numRowsAffected;
+        
+    }
     
     /**
      * Sets the image path for a specific protein graph representation in the database. The graph has to exist in the database already.
@@ -10189,13 +10232,13 @@ connection.close();
             numRowsAffected = statement.executeUpdate();
             //dbc.commit();
         } catch (SQLException e ) {
-            System.err.println("ERROR: SQL: updateProteinGraphImagePathInDB: '" + e.getMessage() + "'.");
+            DP.getInstance().e("DBManager", "updateProteinGraphImagePathInDB: '" + e.getMessage() + "'.");
             if (dbc != null) {
                 try {
-                    System.err.print("ERROR: SQL: updateProteinGraphImagePathInDB: Transaction is being rolled back.");
+                    DP.getInstance().e("DBManager", "updateProteinGraphImagePathInDB: Transaction is being rolled back.");
                     dbc.rollback();
                 } catch(SQLException excep) {
-                    System.err.println("ERROR: SQL: updateProteinGraphImagePathInDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                    DP.getInstance().e("DBManager", "updateProteinGraphImagePathInDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
                 }
             }
         } finally {

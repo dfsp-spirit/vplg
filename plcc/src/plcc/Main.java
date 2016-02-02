@@ -2760,12 +2760,7 @@ public class Main {
 
         // ****************************************************    all done    ********************************************************** //
         
-        if(Settings.getBoolean("plcc_B_useDB")) {
-            if( ! DBManager.getAutoCommit()) {
-                DBManager.commit();            
-            }
-            DBManager.closeConnection();
-        }
+        
         
         
         if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
@@ -2786,6 +2781,21 @@ public class Main {
         long timeDiffTotal = totalComputationEndTime.getTime() - computationStartTime.getTime();//as given
         long runtimeTotal_secs = TimeUnit.MILLISECONDS.toSeconds(timeDiffTotal);
         int[] compTimes = splitDurationToComponentTimes(runtimeTotal_secs);
+        
+        if(Settings.getBoolean("plcc_B_useDB")) {
+            try {
+                DBManager.updateProteinTotalRuntimeInDB(pdbid, runtimeTotal_secs);
+            }catch(SQLException e) {
+                DP.getInstance().w("Main", "Could not set runtime for PDB file '" + pdbid + "' in database.");
+            }
+        }
+        
+        if(Settings.getBoolean("plcc_B_useDB")) {
+            if( ! DBManager.getAutoCommit()) {
+                DBManager.commit();            
+            }
+            DBManager.closeConnection();
+        }
         
         if(! silent) {
             System.out.println("(Too much clutter? Try the '--silent' command line option.)");
