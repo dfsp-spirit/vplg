@@ -177,6 +177,7 @@ public class Main {
      */
     public static void main(String[] args) {
                 
+        Date computationStartTime = new Date();
         StringBuilder outputToBePrintedUnlessSilent = new StringBuilder();
         
         outputToBePrintedUnlessSilent.append("[======================== plcc -- Protein-Ligand Contact Calculation ========================]\n");
@@ -2780,14 +2781,37 @@ public class Main {
                 System.out.print(numDel + " ok.\n");
             }
         }
+        
+        Date totalComputationEndTime = new Date();
+        long timeDiffTotal = totalComputationEndTime.getTime() - computationStartTime.getTime();//as given
+        long runtimeTotal_secs = TimeUnit.MILLISECONDS.toSeconds(timeDiffTotal);
+        int[] compTimes = splitDurationToComponentTimes(runtimeTotal_secs);
+        
         if(! silent) {
-            System.out.println("(Was all the output too much clutter? Try the '--silent' command line option.)");
-            System.out.println("All done, exiting.");
+            System.out.println("(Too much clutter? Try the '--silent' command line option.)");
+            System.out.println("All done, exiting. Total runtime was " + runtimeTotal_secs + " seconds ("+compTimes[0]+":" + String.format("%02d:%02d", compTimes[1], compTimes[2])+" hms).");
         }
         System.exit(0);
 
     }
 
+    
+    /**
+     * Takes a duration given in seconds, and gives it in the hours + minutes + seconds format.
+     * @param secsIn the duration in number of seconds
+     * @return the duration as hours+mins+secs, in an int array (in the order just given)
+     */
+    public static int[] splitDurationToComponentTimes(long secsIn) {
+        long longVal = secsIn;
+        int hours = (int) longVal / 3600;
+        int remainder = (int) longVal - hours * 3600;
+        int mins = remainder / 60;
+        remainder = remainder - mins * 60;
+        int secs = remainder;
+
+        int[] ints = {hours , mins , secs};
+        return ints;
+    }
 
     /**
      * Draws the image of a graph from the file 'tpgFile' (which is expected to contain a graph in the Trivial Graph Format) and writes it to the PNG file img.
