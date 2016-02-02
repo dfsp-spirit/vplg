@@ -476,6 +476,9 @@ public class DBManager {
             DP.getInstance().w("DBManager", "computeGraphletSimilarityScoresForWholeDatabaseAndStoreBest(): Graphlets for your chose graph type '" + graphType + "' may not be in the database. By default, we compute \"albe\" graphlets only.");
         }
         
+        String graphletSimMethod = Settings.get("plcc_S_search_similar_graphlet_scoretype");
+        
+        
         Long numScoresComputed = 0L;
         Long numScoresSaved = 0L;
         ArrayList<ArrayList<String>> allChains = DBManager.getAllPDBIDsandChains(); // these are more than 200,000 chains if the while PDB is in the database
@@ -567,7 +570,16 @@ public class DBManager {
                 }
                 else {        
                     numGraphletsFound++;
-                    src_scores[j] = SimilarityByGraphlets.getRelativeGraphletFrequencyDistanceNormalized(src_graphlets, cmp_graphlets);
+                    if(graphletSimMethod.equals(SimilarityByGraphlets.GRAPHLET_SIM_METHOD_RGF)) {
+                        src_scores[j] = SimilarityByGraphlets.getRelativeGraphletFrequencyDistanceNormalized(src_graphlets, cmp_graphlets);
+                    }
+                    else if(graphletSimMethod.equals(SimilarityByGraphlets.GRAPHLET_SIM_METHOD_CUSTOM)) {
+                        src_scores[j] = SimilarityByGraphlets.getRelativeGraphletFrequencyDistanceNormalized(src_graphlets, cmp_graphlets);
+                    }
+                    else {
+                        DP.getInstance().c("DBManager", "Invalid graphlet similarity method set, aborting.");
+                    }
+                    
                     numScoresComputed++;
                 }
             }
@@ -624,7 +636,7 @@ public class DBManager {
      */
     public static Long[] computeGraphletSimilarityScoresForCGsWholeDatabaseAndStoreBest(Integer numberOfTopScoresToSavePerPair) {
                 
-        
+        String graphletSimMethod = Settings.get("plcc_S_search_similar_graphlet_scoretype");
         Long numScoresComputed = 0L;
         Long numScoresSaved = 0L;
         List<String> allPDBs = DBManager.getAllPDBIDsInTheDB(); // more than 100k chains with full PDB in database
@@ -686,7 +698,15 @@ public class DBManager {
                 }
                 else {        
                     numGraphletsFound++;
-                    src_scores[j] = SimilarityByGraphlets.getRelativeGraphletFrequencyDistanceNormalized(src_graphlets, cmp_graphlets);
+                    if(graphletSimMethod.equals(SimilarityByGraphlets.GRAPHLET_SIM_METHOD_RGF)) {
+                        src_scores[j] = SimilarityByGraphlets.getRelativeGraphletFrequencyDistanceNormalized(src_graphlets, cmp_graphlets);
+                    }
+                    else if(graphletSimMethod.equals(SimilarityByGraphlets.GRAPHLET_SIM_METHOD_CUSTOM)) {
+                        src_scores[j] = SimilarityByGraphlets.getRelativeGraphletFrequencyDistanceNormalized(src_graphlets, cmp_graphlets);
+                    }
+                    else {
+                        DP.getInstance().c("DBManager", "Invalid graphlet similarity method set, aborting.");
+                    }
                     numScoresComputed++;
                 }
             }
@@ -749,7 +769,7 @@ public class DBManager {
         
         Long numPDBsFound = ((Integer)allPDBs.size()).longValue();
         Long numGraphletsFound = 0L;
-        
+        String graphletSimMethod = Settings.get("plcc_S_search_similar_graphlet_scoretype");
         Double[] src_graphlets, cmp_graphlets;
         
         String src_pdb_id, cmp_pdb_id;
@@ -804,7 +824,15 @@ public class DBManager {
                 }
                 else {        
                     numGraphletsFound++;
-                    src_scores[j] = SimilarityByGraphlets.getRelativeGraphletFrequencyDistanceNormalized(src_graphlets, cmp_graphlets);
+                    if(graphletSimMethod.equals(SimilarityByGraphlets.GRAPHLET_SIM_METHOD_RGF)) {
+                        src_scores[j] = SimilarityByGraphlets.getRelativeGraphletFrequencyDistanceNormalized(src_graphlets, cmp_graphlets);
+                    }
+                    else if(graphletSimMethod.equals(SimilarityByGraphlets.GRAPHLET_SIM_METHOD_CUSTOM)) {
+                        src_scores[j] = SimilarityByGraphlets.getRelativeGraphletFrequencyDistanceNormalized(src_graphlets, cmp_graphlets);
+                    }
+                    else {
+                        DP.getInstance().c("DBManager", "Invalid graphlet similarity method set, aborting.");
+                    }
                     numScoresComputed++;
                 }
             }
