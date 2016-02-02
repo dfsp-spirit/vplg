@@ -541,6 +541,7 @@ int GraphPTGLPrinter::testDatabasePGXX() {
     }
 }
 
+
 int GraphPTGLPrinter::saveAACountsToDatabasePGXX(std::string pdbid, std::string label, std::vector<std::vector<float>> norm_counts, std::vector<float> lab_counts, int time) {
     
     Database db = Database::getInstance();
@@ -649,7 +650,7 @@ int GraphPTGLPrinter::saveAACountsToDatabasePGXX(std::string pdbid, std::string 
             
              */
             float val;
-            string query = "INSERT INTO plcc_aa_graphlets (aagraph_id, runtime_secs, aa_graphlet_counts, ) VALUES (" + W.esc(dbpkStr) + ", " + std::to_string(time) + ", '{";
+            string query = "INSERT INTO plcc_aa_graphlets (aagraph_id, runtime_secs, aa_graphlet_counts) VALUES (" + W.esc(dbpkStr) + ", " + std::to_string(time) + ", '{";
             for (int i = 0; i < allGraphletcounts.size(); i++) {
                 std::stringstream ssVal;
                 val = allGraphletcounts[i];
