@@ -1270,6 +1270,7 @@ public class Main {
 
                                 if(Settings.getBoolean("plcc_B_useDB")) {
                                     try {
+                                        DBManager.deleteCustomGraphStatsFromDBByUniqueName(unique_name);
                                         DBManager.writeCustomgraphStatsToDB(unique_name, description, isForLargestConnectedComponent, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist, avg_degree, density, cumul_degreedist, runtime_secs);                                        
                                     }catch(SQLException e) {
                                         DP.getInstance().e("Main", "Could not write custom graph stats to db: '" + e.getMessage() + "'.");
@@ -1309,9 +1310,9 @@ public class Main {
                                             System.out.println(GraphProperties.getOverviewPropsString(true, gpr_lcc));
                                         }
                                         
-                                        //TODO: write props to DB here if requested
                                         if(Settings.getBoolean("plcc_B_useDB")) {
                                             try {
+                                                DBManager.deleteCustomGraphStatsFromDBByUniqueName(unique_name);
                                                 DBManager.writeCustomgraphStatsToDB(unique_name, description, isForLargestConnectedComponent, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist, avg_degree, density, cumul_degreedist, runtime_secs);
                                             }catch(SQLException e) {
                                                 DP.getInstance().e("Main", "Could not write custom graph stats for largest CC to db: '" + e.getMessage() + "'.");
@@ -2350,6 +2351,7 @@ public class Main {
                                         
                                         if(writeRandomGraphPropsToDatabase) {                                            
                                             String rand_graph_description = "full graph";
+                                            DBManager.deleteCustomGraphStatsFromDBByUniqueName(rand_graph_name);
                                             DBManager.writeCustomgraphStatsToDB(rand_graph_name, rand_graph_description, Boolean.FALSE, gp_rand.getNumVertices(), gp_rand.getNumEdges(), gp_rand.getMinDegree(), gp_rand.getMaxDegree(), gp_rand.getConnectedComponents().size(), gp.getGraphDiameter(), gp_rand.getGraphRadius(), gp_rand.getAverageClusterCoefficient(), gp_rand.getAverageShortestPathLength(), gp_rand.getDegreeDistributionUpTo(50), gp_rand.getAverageDegree(), gp_rand.getDensity(), gp_rand.getCumulativeDegreeDistributionUpToAsArray(50), runtime_secs);                                            
                                         }
                                     }
@@ -2438,6 +2440,7 @@ public class Main {
                                         GraphProperties gp_lcc_rand = new GraphProperties(lcc); // now changed
                                         if(writeRandomGraphPropsToDatabase) {
                                             String rand_graph_description = "largest CC";
+                                            DBManager.deleteCustomGraphStatsFromDBByUniqueName(rand_graph_name);
                                             DBManager.writeCustomgraphStatsToDB(rand_graph_name, rand_graph_description, Boolean.TRUE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity(), gp.getCumulativeDegreeDistributionUpToAsArray(50), runtime_secs);                                            
                                         }
                                     }

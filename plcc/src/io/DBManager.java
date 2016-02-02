@@ -8834,6 +8834,45 @@ connection.close();
     }
     
     /**
+     * Deletes stats for a custom graph from the database.
+     * @param unique_name the unique name identifying the graph (and its largest CC).
+     * @return The number of affected records (0 if none with that name was in the database).
+     */
+    public static Integer deleteCustomGraphStatsFromDBByUniqueName(String unique_name) {
+
+        PreparedStatement statement = null;        
+        ResultSetMetaData md;
+        int count = 0;               
+        
+        String query = "DELETE FROM " + tbl_stats_customgraph + " WHERE unique_name = ?;";
+        
+        
+        try {
+            ////dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+            statement.setString(1, unique_name);                          
+            count = statement.executeUpdate();
+            ////dbc.commit();
+            
+            //md = rs.getMetaData();
+            //count = md.getColumnCount();            
+            
+        } catch (SQLException e) {
+            DP.getInstance().e("DBManager","deleteCustomGraphFromDB: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                ////dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager","deleteCustomGraphFromDB: Could not close statement and reset autocommit."); }
+        }
+        
+
+        return (count);
+    }
+    
+    /**
      * Deletes all graphlet similarity entries for a protein graph pair from the plcc database tables.
      * @param source_proteingraph_id the source graph id
      * @param target_proteingraph_id the target graph id
