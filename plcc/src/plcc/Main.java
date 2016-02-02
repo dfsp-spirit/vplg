@@ -40,6 +40,7 @@ import proteinstructure.AminoAcid;
 import proteinstructure.Atom;
 import proteinstructure.SSE;
 import algorithms.GraphMetrics;
+import algorithms.GraphPropResults;
 import algorithms.GraphProperties;
 import algorithms.GraphRandomizer;
 import datastructures.AAGraph;
@@ -1239,7 +1240,8 @@ public class Main {
                                 //DP.getInstance().i("Main", "Props for SG constructed.");
                                 Boolean alsoPrintGraphProps = false;
                                 if(alsoPrintGraphProps) {
-                                    System.out.println(gp.getOverviewPropsString(true));
+                                    GraphPropResults gpr = gp.getGraphPropResults();
+                                    System.out.println(GraphProperties.getOverviewPropsString(true, gpr));
                                     //DP.getInstance().i("Main", "Props for SG computed and printed.");                                                                    
                                 }
                                 
@@ -1303,7 +1305,8 @@ public class Main {
                                         System.out.println("Computed graph properties for largest CC of custom graph with " + lccp.getNumVertices() + " verts and " + lccp.getNumEdges() + " edges in " + runtime_secs + " seconds.");
                                         
                                         if(alsoPrintGraphProps) {
-                                            System.out.println(lccp.getOverviewPropsString(true));
+                                            GraphPropResults gpr_lcc = lccp.getGraphPropResults();
+                                            System.out.println(GraphProperties.getOverviewPropsString(true, gpr_lcc));
                                         }
                                         
                                         //TODO: write props to DB here if requested
@@ -2333,12 +2336,14 @@ public class Main {
                                     String rand_graph_name = pdbid + "_AA_random";  // same for graph and lcc
                                     
                                     if(rewireGraphsToCompareWithRandom) {   // this was only needed for graph analyses carried out for the Ph.D. thesis of TS, ignore                                        
-                                        System.out.println("###TEST-AAG-GP-BEFORE-REWIRING: \n" + gp.getOverviewPropsString(true) + "###");
+                                        GraphPropResults gpr = gp.getGraphPropResults();
+                                        System.out.println("###TEST-AAG-GP-BEFORE-REWIRING: \n" + GraphProperties.getOverviewPropsString(true, gpr) + "###");
                                         aag.selfCheck();
                                         
                                         GraphRandomizer gr = new GraphRandomizer(aag, edgeRewireProbability);
                                         GraphProperties gp_rand = new GraphProperties(aag); // now changed
-                                        System.out.println("###TEST-AAG-GP-AFTER-RANDOMIZATION with p="+edgeRewireProbability+": \n" + gp_rand.getOverviewPropsString(false) + "###");
+                                        GraphPropResults gpr_rand = gp_rand.getGraphPropResults();
+                                        System.out.println("###TEST-AAG-GP-AFTER-RANDOMIZATION with p="+edgeRewireProbability+": \n" + GraphProperties.getOverviewPropsString(false, gpr_rand) + "###");
                                         aag.selfCheck();
                                         
                                         

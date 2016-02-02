@@ -255,30 +255,49 @@ public class GraphProperties {
     
     /**
      * Creates an overview string with the most important props, testing only function.
+     * @param addLabel whether to label what the values mean in front of them
+     * @param gpr the results to use
      * @return an overview string with the most important props of g
      */
-    public String getOverviewPropsString(Boolean addLabel) {
+    public static String getOverviewPropsString(Boolean addLabel, GraphPropResults gpr) {
         //DP.getInstance().e("GraphProperties", "Starting computation of graph props....");
         StringBuilder sb = new StringBuilder();
-        sb.append(addLabel? "numVerts: " : "").append(this.getNumVertices()).append("\n");
-        sb.append(addLabel? "numEdges: " : "").append(this.getNumEdges()).append("\n");
-        //DP.getInstance().e("GraphProperties", "Computation of graph props: getnumEdges() done.");
-        sb.append(addLabel? "diameter: " : "").append(this.getGraphDiameter()).append("\n");
-        sb.append(addLabel? "radius: " : "").append(this.getGraphRadius()).append("\n");
-        sb.append(addLabel? "aSPL: " : "").append(this.getAverageShortestPathLength()).append("\n");
-        sb.append(addLabel? "ClC: " : "").append(this.getAverageClusterCoefficient()).append("\n");
-        //DP.getInstance().e("GraphProperties", "Computation of graph props: getAverageClusterCoefficient() done.");
-        sb.append(addLabel? "naClC: " : "").append(this.getAverageNormalizedNetworkClusterCoefficient()).append("\n");        
-        sb.append(addLabel? "avgDegree: " : "").append(this.getAverageDegree()).append("\n");
-        sb.append(addLabel? "maxDegree: " : "").append(this.getMaxDegree()).append("\n");
-        sb.append(addLabel? "minDegree: " : "").append(this.getMinDegree()).append("\n");
-        //DP.getInstance().e("GraphProperties", "Computation of graph props: getMinDegree() done.");
-        sb.append(addLabel? "density: " : "").append(this.getDensity()).append("\n");
-        //DP.getInstance().e("GraphProperties", "Computation of graph props: getDensity() done.");
-        sb.append(addLabel? "numCC: " : "").append(this.getConnectedComponents().size()).append("\n");                                
-        //DP.getInstance().e("GraphProperties", "Computation of graph props: getConnectedComponents() done.");
-        //DP.getInstance().e("GraphProperties", "Done with computation of graph props, info string constructed.");
+        sb.append(addLabel? "numVerts: " : "").append(gpr.numVertices).append("\n");
+        sb.append(addLabel? "numEdges: " : "").append(gpr.numEdges).append("\n");
+        sb.append(addLabel? "diameter: " : "").append(gpr.graphDiameter).append("\n");
+        sb.append(addLabel? "radius: " : "").append(gpr.graphRadius).append("\n");
+        sb.append(addLabel? "aSPL: " : "").append(gpr.averageShortestPathLength).append("\n");
+        sb.append(addLabel? "ClC: " : "").append(gpr.averageClusterCoefficient).append("\n");
+        sb.append(addLabel? "naClC: " : "").append(gpr.averageNormalizedNetworkClusterCoefficient).append("\n");        
+        sb.append(addLabel? "avgDegree: " : "").append(gpr.averageDegree).append("\n");
+        sb.append(addLabel? "maxDegree: " : "").append(gpr.maxDegree).append("\n");
+        sb.append(addLabel? "minDegree: " : "").append(gpr.minDegree).append("\n");
+        sb.append(addLabel? "density: " : "").append(gpr.density).append("\n");
+        sb.append(addLabel? "numCC: " : "").append(gpr.numConnectedComponents).append("\n");                                
         return sb.toString();
+    }
+    
+    /**
+     * Performs all computations NOW, and returns the result. 
+     * @return a simple container which holds all result values, but NOT the connected components or other references to the graph (or subgraphs)
+     */
+    public GraphPropResults getGraphPropResults() {
+        GraphPropResults gpr = new GraphPropResults();
+
+        gpr.numVertices = (this.getNumVertices());
+        gpr.numEdges = (this.getNumEdges());
+        gpr.graphDiameter = (this.getGraphDiameter());
+        gpr.graphRadius = (this.getGraphRadius());
+        gpr.averageShortestPathLength = (this.getAverageShortestPathLength());
+        gpr.averageClusterCoefficient = (this.getAverageClusterCoefficient());
+        gpr.averageNormalizedNetworkClusterCoefficient = (this.getAverageNormalizedNetworkClusterCoefficient());
+        gpr.averageDegree = (this.getAverageDegree());
+        gpr.maxDegree = (this.getMaxDegree());
+        gpr.minDegree = (this.getMinDegree());
+        gpr.density = (this.getDensity());
+        gpr.numConnectedComponents = (this.getConnectedComponents().size());
+
+        return gpr;
     }
     
 }
