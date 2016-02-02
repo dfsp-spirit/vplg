@@ -92,6 +92,7 @@ import parsers.GMLGraphParser;
 import parsers.IGraphParser;
 import similarity.CompareOneToDB;
 import similarity.Similarity;
+import similarity.SimilarityByGraphlets;
 import tools.DP;
 import tools.PlccUtilities;
 import tools.XMLContentHandlerPDBRepresentatives;
@@ -316,6 +317,30 @@ public class Main {
                         argsUsed[i] = true;
                         checkArgsUsage(args, argsUsed);
                         System.exit(0);
+                    }
+                    
+                    
+                    if(s.equals("--graphlet-sim-method")) {
+                        if(args.length <= i+1 ) {
+                            syntaxError();
+                        }
+                        else {
+                            String gm;
+                            gm = args[i+1];
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
+                            
+                            if(gm.equals(SimilarityByGraphlets.GRAPHLET_SIM_METHOD_RGF)) {
+                                Settings.set("plcc_S_search_similar_graphlet_scoretype", SimilarityByGraphlets.GRAPHLET_SIM_METHOD_RGF);
+                            }
+                            else if(gm.equals(SimilarityByGraphlets.GRAPHLET_SIM_METHOD_CUSTOM)) {
+                                Settings.set("plcc_S_search_similar_graphlet_scoretype", SimilarityByGraphlets.GRAPHLET_SIM_METHOD_CUSTOM);
+                            }
+                            else {
+                                System.err.println("ERROR: Invalid graphlet similarity method given. Use 'rgf' or 'cus'.");
+                                syntaxError();
+                            }                                
+                        }
                     }
 
                     if(s.equals("-d") || s.equals("--dsspfile")) {

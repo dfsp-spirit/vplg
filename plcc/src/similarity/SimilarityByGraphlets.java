@@ -18,6 +18,9 @@ import tools.DP;
  */
 public class SimilarityByGraphlets {
     
+    public static final String GRAPHLET_SIM_METHOD_RGF = "rgf";
+    public static final String GRAPHLET_SIM_METHOD_CUSTOM = "cus";
+    
     public enum GraphletDeterminationMethod { DATABASE, FILE, FAKE_FOR_DEBUG }
     
     
