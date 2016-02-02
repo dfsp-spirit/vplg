@@ -574,7 +574,8 @@ public class DBManager {
                         src_scores[j] = SimilarityByGraphlets.getRelativeGraphletFrequencyDistanceNormalized(src_graphlets, cmp_graphlets);
                     }
                     else if(graphletSimMethod.equals(SimilarityByGraphlets.GRAPHLET_SIM_METHOD_CUSTOM)) {
-                        src_scores[j] = SimilarityByGraphlets.getRelativeGraphletFrequencyDistanceNormalized(src_graphlets, cmp_graphlets);
+                        // compute tanimoto coefficient for default precision value of 0.8
+                        src_scores[j] = SimilarityByGraphlets.getTanimotoCoefficient(src_graphlets, cmp_graphlets, 0.8);
                     }
                     else {
                         DP.getInstance().c("DBManager", "Invalid graphlet similarity method set, aborting.");
@@ -702,7 +703,7 @@ public class DBManager {
                         src_scores[j] = SimilarityByGraphlets.getRelativeGraphletFrequencyDistanceNormalized(src_graphlets, cmp_graphlets);
                     }
                     else if(graphletSimMethod.equals(SimilarityByGraphlets.GRAPHLET_SIM_METHOD_CUSTOM)) {
-                        src_scores[j] = SimilarityByGraphlets.getRelativeGraphletFrequencyDistanceNormalized(src_graphlets, cmp_graphlets);
+                        src_scores[j] = SimilarityByGraphlets.getTanimotoCoefficient(src_graphlets, cmp_graphlets, 0.8);
                     }
                     else {
                         DP.getInstance().c("DBManager", "Invalid graphlet similarity method set, aborting.");
@@ -828,7 +829,7 @@ public class DBManager {
                         src_scores[j] = SimilarityByGraphlets.getRelativeGraphletFrequencyDistanceNormalized(src_graphlets, cmp_graphlets);
                     }
                     else if(graphletSimMethod.equals(SimilarityByGraphlets.GRAPHLET_SIM_METHOD_CUSTOM)) {
-                        src_scores[j] = SimilarityByGraphlets.getRelativeGraphletFrequencyDistanceNormalized(src_graphlets, cmp_graphlets);
+                        src_scores[j] = SimilarityByGraphlets.getTanimotoCoefficient(src_graphlets, cmp_graphlets, 0.8);
                     }
                     else {
                         DP.getInstance().c("DBManager", "Invalid graphlet similarity method set, aborting.");

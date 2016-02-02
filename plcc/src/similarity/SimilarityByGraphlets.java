@@ -79,8 +79,11 @@ public class SimilarityByGraphlets {
         
         double scoreA, scoreB;
         for(int i = 0; i < graphletCountsA.length; i++) {
-            scoreA = -Math.log(graphletCountsA[i] / totalInA);
-            scoreB = -Math.log(graphletCountsB[i] / totalInB);
+            
+            
+                scoreA = -Math.log(graphletCountsA[i] / totalInA);
+                scoreB = -Math.log(graphletCountsB[i] / totalInB);
+            
             if(Double.isInfinite(scoreA) || Double.isInfinite(scoreB)) {
                 //System.out.println("Skipping graphlet #" + i + ", lead to infinite score.");
                 continue;                
@@ -90,6 +93,69 @@ public class SimilarityByGraphlets {
         }
         
         return res;
+    }
+    
+    /**
+     * Implements the computation of the Tanimoto Coeffcient in a slightly modified version.
+     * It is used as a similarity measure for two vectors. Those contain relative graphlet
+     * frequencies in this case. The modification allows for a precision to be added.
+     * 
+     * Precision values can be between 1 and 0. The precision value refers to
+     * the percentage of identity for which two values are treated as equal.
+     * 
+     * @param graphletCountsA contains relative graphlet counts for a network a
+     * @param graphletCountsB contains relative graphlet counts for a network b
+     * @param precision set precision. if 1 is entered only equal numbers contribute to a positive score. precision of 0.7 means numbers can differ by this factor and still contribute to a positive score
+     *                  CAUTION: only use values between 0 and 1!
+     * @return the tanimoto coeffcient for the two vectors
+     */
+    public static double getTanimotoCoefficient(Double[] graphletCountsA, Double[] graphletCountsB, double precision) {
+        
+        double cof = 0.0;
+        
+        double num = 0.0;
+        double prec = precision;
+        
+        
+        if (precision > 1.0 || precision < 0) {
+            
+            System.out.println("WARNING: Found precision greater than 1 or smaller than 0. Switching to 1 ");
+            prec = 1.0;
+        }
+        
+        for (int i = 0; i < graphletCountsA.length; i++) {
+            
+            if (graphletCountsA[i] >= (graphletCountsB[i]*prec) && graphletCountsB[i] >= (graphletCountsA[i]*prec)) {
+                num += 1.0;
+            }
+            
+        }
+        
+        double denom = graphletCountsA.length + graphletCountsB.length - num;
+        
+        cof = ((double)num)/((double)denom);
+        
+        return cof;
+    }
+    
+    /**
+     * Implements computation of the Tanimoto Coefficient. It is used as a similariy 
+     * measure for two vectors, which contain relative graphlet frequencies for a
+     * network in this case.
+     * Overloads getTanimotoCoefficient(Double[],Double[],double)
+     * 
+     * 
+     * @param graphletCountsA relative graphlet frequencies for network a 
+     * @param graphletCountsB relative graphlet frequencies for network b
+     * @return 
+     */
+    public static double getTanimotoCoefficient(Double[] graphletCountsA, Double[] graphletCountsB) {
+        
+        double prec = 1.0;
+        
+        
+        double ret_val = getTanimotoCoefficient(graphletCountsA, graphletCountsB, prec);
+        return ret_val;
     }
     
     
