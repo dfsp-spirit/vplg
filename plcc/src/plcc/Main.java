@@ -2339,14 +2339,14 @@ public class Main {
                                     
                                     if(rewireGraphsToCompareWithRandom) {   // this was only needed for graph analyses carried out for the Ph.D. thesis of TS, ignore                                        
                                         GraphPropResults gpr = gp.getGraphPropResults();
-                                        System.out.println("###TEST-AAG-GP-BEFORE-REWIRING: \n" + GraphProperties.getOverviewPropsString(true, gpr) + "###");
-                                        aag.selfCheck();
+                                        //System.out.println("###TEST-AAG-GP-BEFORE-REWIRING: \n" + GraphProperties.getOverviewPropsString(true, gpr) + "###");
+                                        //aag.selfCheck();
                                         
                                         GraphRandomizer gr = new GraphRandomizer(aag, edgeRewireProbability);
                                         GraphProperties gp_rand = new GraphProperties(aag); // now changed
                                         GraphPropResults gpr_rand = gp_rand.getGraphPropResults();
-                                        System.out.println("###TEST-AAG-GP-AFTER-RANDOMIZATION with p="+edgeRewireProbability+": \n" + GraphProperties.getOverviewPropsString(false, gpr_rand) + "###");
-                                        aag.selfCheck();
+                                        //System.out.println("###TEST-AAG-GP-AFTER-RANDOMIZATION with p="+edgeRewireProbability+": \n" + GraphProperties.getOverviewPropsString(false, gpr_rand) + "###");
+                                        //aag.selfCheck();
                                         
                                         
                                         
