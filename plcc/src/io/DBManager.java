@@ -8864,7 +8864,7 @@ connection.close();
     }
     
     /**
-     * Deletes stats for a custom graph from the database.
+     * Deletes stats for a custom graph (and its largest CC, if in there) from the database.
      * @param unique_name the unique name identifying the graph (and its largest CC).
      * @return The number of affected records (0 if none with that name was in the database).
      */
@@ -8888,14 +8888,57 @@ connection.close();
             //count = md.getColumnCount();            
             
         } catch (SQLException e) {
-            DP.getInstance().e("DBManager","deleteCustomGraphFromDB: '" + e.getMessage() + "'.");
+            DP.getInstance().e("DBManager","deleteCustomGraphStatsFromDBByUniqueName: '" + e.getMessage() + "'.");
         } finally {
             try {
                 if (statement != null) {
                     statement.close();
                 }
                 ////dbc.setAutoCommit(true);
-            } catch(SQLException e) { DP.getInstance().w("DBManager","deleteCustomGraphFromDB: Could not close statement and reset autocommit."); }
+            } catch(SQLException e) { DP.getInstance().w("DBManager","deleteCustomGraphStatsFromDBByUniqueName: Could not close statement and reset autocommit."); }
+        }
+        
+
+        return (count);
+    }
+    
+    
+    /**
+     * Deletes stats for a custom graph or its largest CC from the database. Which one is deleted depends on second parameter.
+     * @param unique_name the unique name identifying the graph (and its largest CC).
+     * @param deleteLargestCC if true, the data for the largest CC will be deleted. if false, the data for the full graph will be deleted.
+     * @return The number of affected records (0 if none with that name was in the database).
+     */
+    public static Integer deleteCustomGraphStatsFromDBByUniqueNameAndGraphOrCC(String unique_name, Boolean deleteLargestCC) {
+
+        PreparedStatement statement = null;        
+        ResultSetMetaData md;
+        int count = 0;               
+        int is_for_cc = (deleteLargestCC ? 1 : 0);
+        
+        String query = "DELETE FROM " + tbl_stats_customgraph + " WHERE unique_name = ? and is_for_cc = ?;";
+        
+        
+        try {
+            ////dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+            statement.setString(1, unique_name);                          
+            statement.setInt(2, is_for_cc);                          
+            count = statement.executeUpdate();
+            ////dbc.commit();
+            
+            //md = rs.getMetaData();
+            //count = md.getColumnCount();            
+            
+        } catch (SQLException e) {
+            DP.getInstance().e("DBManager","deleteCustomGraphStatsFromDBByUniqueNameAndGraphOrCC: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                ////dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager","deleteCustomGraphStatsFromDBByUniqueNameAndGraphOrCC: Could not close statement and reset autocommit."); }
         }
         
 

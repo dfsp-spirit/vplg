@@ -1264,27 +1264,27 @@ public class Main {
                                 DP.getInstance().i("Main", "Computing sparse graph properties for SG with " + sg.getNumVertices() +" verts and " + sg.getNumEdges() + " edges ...");
                                 GraphProperties gp = new GraphProperties(sg);
                                 //DP.getInstance().i("Main", "Props for SG constructed.");
+                                GraphPropResults gpr = gp.getGraphPropResults();
                                 Boolean alsoPrintGraphProps = false;
-                                if(alsoPrintGraphProps) {
-                                    GraphPropResults gpr = gp.getGraphPropResults();
+                                if(alsoPrintGraphProps) {                                    
                                     System.out.println(GraphProperties.getOverviewPropsString(true, gpr));
                                     //DP.getInstance().i("Main", "Props for SG computed and printed.");                                                                    
                                 }
                                 
                                 unique_name = "g" + System.currentTimeMillis(); // has to be kept for the CC as well
                                 
-                                num_verts = gp.getNumVertices();
-                                num_edges = gp.getNumEdges();
-                                min_degree = gp.getMinDegree();
-                                max_degree = gp.getMaxDegree();
-                                num_connected_components = gp.getConnectedComponents().size();
-                                diameter = gp.getGraphDiameter();
-                                radius = gp.getGraphRadius();
-                                avg_cluster_coeff = gp.getAverageClusterCoefficient();
-                                avg_shortest_path_length = gp.getAverageShortestPathLength();
+                                num_verts = gpr.numVertices;
+                                num_edges = gpr.numEdges;
+                                min_degree = gpr.maxDegree;
+                                max_degree = gpr.minDegree;
+                                num_connected_components = gpr.numConnectedComponents;
+                                diameter = gpr.graphDiameter;
+                                radius = gpr.graphRadius;
+                                avg_cluster_coeff = gpr.averageClusterCoefficient;
+                                avg_shortest_path_length = gpr.averageShortestPathLength;
                                 degreedist = gp.getDegreeDistributionUpTo(50);
-                                avg_degree = gp.getAverageDegree();
-                                density = gp.getDensity();
+                                avg_degree = gpr.averageDegree;
+                                density = gpr.density;
                                 cumul_degreedist = gp.getCumulativeDegreeDistributionUpToAsArray(50);
 
                                 
@@ -1339,7 +1339,6 @@ public class Main {
                                         
                                         if(Settings.getBoolean("plcc_B_useDB")) {
                                             try {
-                                                DBManager.deleteCustomGraphStatsFromDBByUniqueName(unique_name);
                                                 DBManager.writeCustomgraphStatsToDB(unique_name, description, isForLargestConnectedComponent, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist, avg_degree, density, cumul_degreedist, runtime_secs);
                                             }catch(SQLException e) {
                                                 DP.getInstance().e("Main", "Could not write custom graph stats for largest CC to db: '" + e.getMessage() + "'.");
@@ -2344,7 +2343,8 @@ public class Main {
                         //aag.selfCheck();
                         GraphProperties gp = new GraphProperties(aag);
                         SparseGraph lcc = (SparseGraph)gp.getLargestConnectedComponent();
-                        GraphProperties lccgp = new GraphProperties(lcc);
+                        GraphProperties gp_lcc = new GraphProperties(lcc);
+                        Date propsComputationEndTime; Date propsComputationStartTime; Long timeDiff; Long runtime_secs;
 
                         if(Settings.getBoolean("plcc_B_useDB")) {
 
@@ -2357,31 +2357,38 @@ public class Main {
                                 if(graph_db_id > 0L) {
                                     //System.out.println("Found aa graph " + pdbid + ".");
                                     // write graph properties
-                                    Long runtime_secs = null;
-                                    DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.FALSE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity(), gp.getCumulativeDegreeDistributionUpToAsArray(50), runtime_secs);
+                                    propsComputationStartTime = new Date();                                    
+                                    GraphPropResults gpr = gp.getGraphPropResults();                                    
+                                    propsComputationEndTime = new Date();
+                                    timeDiff = propsComputationEndTime.getTime() - propsComputationStartTime.getTime();//as given
+                                    runtime_secs = TimeUnit.MILLISECONDS.toSeconds(timeDiff);                                    
+                                    DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.FALSE, gpr.numVertices, gpr.numEdges, gpr.minDegree, gpr.maxDegree, gpr.numConnectedComponents, gpr.graphDiameter, gpr.graphRadius, gpr.averageClusterCoefficient, gpr.averageShortestPathLength, gp.getDegreeDistributionUpTo(50), gpr.averageDegree, gpr.density, gp.getCumulativeDegreeDistributionUpToAsArray(50), runtime_secs);
                                     
                                     Boolean rewireGraphsToCompareWithRandom = true;
                                     Boolean writeRandomGraphPropsToDatabase = true;
                                     Double edgeRewireProbability = 1.0d;
                                     String rand_graph_name = pdbid + "_AA_random";  // same for graph and lcc
                                     
-                                    if(rewireGraphsToCompareWithRandom) {   // this was only needed for graph analyses carried out for the Ph.D. thesis of TS, ignore                                        
-                                        GraphPropResults gpr = gp.getGraphPropResults();
+                                    if(rewireGraphsToCompareWithRandom) {   // this was only needed for graph analyses carried out for the Ph.D. thesis of TS, ignore                                                                                
                                         //System.out.println("###TEST-AAG-GP-BEFORE-REWIRING: \n" + GraphProperties.getOverviewPropsString(true, gpr) + "###");
                                         //aag.selfCheck();
                                         
                                         GraphRandomizer gr = new GraphRandomizer(aag, edgeRewireProbability);
                                         GraphProperties gp_rand = new GraphProperties(aag); // now changed
+                                        propsComputationStartTime = new Date();
                                         GraphPropResults gpr_rand = gp_rand.getGraphPropResults();
+                                        propsComputationEndTime = new Date();
+                                        timeDiff = propsComputationEndTime.getTime() - propsComputationStartTime.getTime();//as given
+                                        runtime_secs = TimeUnit.MILLISECONDS.toSeconds(timeDiff);
                                         //System.out.println("###TEST-AAG-GP-AFTER-RANDOMIZATION with p="+edgeRewireProbability+": \n" + GraphProperties.getOverviewPropsString(false, gpr_rand) + "###");
                                         //aag.selfCheck();
                                         
                                         
                                         
                                         if(writeRandomGraphPropsToDatabase) {                                            
-                                            String rand_graph_description = "full graph";
+                                            String rand_graph_description = "full random graph";
                                             DBManager.deleteCustomGraphStatsFromDBByUniqueName(rand_graph_name);
-                                            DBManager.writeCustomgraphStatsToDB(rand_graph_name, rand_graph_description, Boolean.FALSE, gp_rand.getNumVertices(), gp_rand.getNumEdges(), gp_rand.getMinDegree(), gp_rand.getMaxDegree(), gp_rand.getConnectedComponents().size(), gp.getGraphDiameter(), gp_rand.getGraphRadius(), gp_rand.getAverageClusterCoefficient(), gp_rand.getAverageShortestPathLength(), gp_rand.getDegreeDistributionUpTo(50), gp_rand.getAverageDegree(), gp_rand.getDensity(), gp_rand.getCumulativeDegreeDistributionUpToAsArray(50), runtime_secs);                                            
+                                            DBManager.writeCustomgraphStatsToDB(rand_graph_name, rand_graph_description, Boolean.FALSE, gpr_rand.numVertices, gpr_rand.numEdges, gpr_rand.minDegree, gpr_rand.maxDegree, gpr_rand.numConnectedComponents, gpr_rand.graphDiameter, gpr_rand.graphRadius, gpr_rand.averageClusterCoefficient, gpr_rand.averageShortestPathLength, gp_rand.getDegreeDistributionUpTo(50), gpr_rand.averageDegree, gpr_rand.density, gp_rand.getCumulativeDegreeDistributionUpToAsArray(50), runtime_secs);                                            
                                         }
                                     }
                                     
@@ -2459,18 +2466,30 @@ public class Main {
                                         System.out.println("Pearson correlation, NumAtoms to AvgDegrees: " + corrNumAtoms2AvgDegrees);
                                     }
                                     
-                                    //System.out.println("max CC is: " + gp.getMaximumNetworkClusterCoefficient());
-                                    // write properties of largest CC of graph
-                                    runtime_secs = null;
-                                    DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.TRUE, lccgp.getNumVertices(), lccgp.getNumEdges(), lccgp.getMinDegree(), lccgp.getMaxDegree(), lccgp.getConnectedComponents().size(), lccgp.getGraphDiameter(), lccgp.getGraphRadius(), lccgp.getAverageClusterCoefficient(), lccgp.getAverageShortestPathLength(), lccgp.getDegreeDistributionUpTo(50), lccgp.getAverageDegree(), lccgp.getDensity(), lccgp.getCumulativeDegreeDistributionUpToAsArray(50), runtime_secs);
-                                    
-                                    if(rewireGraphsToCompareWithRandom) {
-                                        GraphRandomizer gr_lcc = new GraphRandomizer(lcc, edgeRewireProbability);
-                                        GraphProperties gp_lcc_rand = new GraphProperties(lcc); // now changed
-                                        if(writeRandomGraphPropsToDatabase) {
-                                            String rand_graph_description = "largest CC";
-                                            DBManager.deleteCustomGraphStatsFromDBByUniqueName(rand_graph_name);
-                                            DBManager.writeCustomgraphStatsToDB(rand_graph_name, rand_graph_description, Boolean.TRUE, gp.getNumVertices(), gp.getNumEdges(), gp.getMinDegree(), gp.getMaxDegree(), gp.getConnectedComponents().size(), gp.getGraphDiameter(), gp.getGraphRadius(), gp.getAverageClusterCoefficient(), gp.getAverageShortestPathLength(), gp.getDegreeDistributionUpTo(50), gp.getAverageDegree(), gp.getDensity(), gp.getCumulativeDegreeDistributionUpToAsArray(50), runtime_secs);                                            
+                                    // write properties of largest CC of graph, if the graph consists of more than one CC
+                                    if(gpr.numConnectedComponents > 1) {
+                                        propsComputationStartTime = new Date();                                    
+                                        GraphPropResults gpr_lcc = gp_lcc.getGraphPropResults();                                    
+                                        propsComputationEndTime = new Date();
+                                        timeDiff = propsComputationEndTime.getTime() - propsComputationStartTime.getTime();//as given
+                                        runtime_secs = TimeUnit.MILLISECONDS.toSeconds(timeDiff);                                    
+
+                                        DBManager.writeAminoacidgraphStatsToDB(graph_db_id, Boolean.TRUE, gpr_lcc.numVertices, gpr_lcc.numEdges, gpr_lcc.minDegree, gpr_lcc.maxDegree, gpr_lcc.numConnectedComponents, gpr_lcc.graphDiameter, gpr_lcc.graphRadius, gpr_lcc.averageClusterCoefficient, gpr_lcc.averageShortestPathLength, gp_lcc.getDegreeDistributionUpTo(50), gpr_lcc.averageDegree, gpr_lcc.density, gp_lcc.getCumulativeDegreeDistributionUpToAsArray(50), runtime_secs);
+
+                                        if(rewireGraphsToCompareWithRandom) {
+                                            // write properties of random equiv of largest CC of graph
+                                            GraphRandomizer gr_lcc = new GraphRandomizer(lcc, edgeRewireProbability);
+                                            GraphProperties gp_lcc_rand = new GraphProperties(lcc);
+                                            propsComputationStartTime = new Date();
+                                            GraphPropResults gpr_lcc_rand = gp_lcc_rand.getGraphPropResults();
+                                            propsComputationEndTime = new Date();
+                                            timeDiff = propsComputationEndTime.getTime() - propsComputationStartTime.getTime();//as given
+                                            runtime_secs = TimeUnit.MILLISECONDS.toSeconds(timeDiff);                                    
+                                            if(writeRandomGraphPropsToDatabase) {
+                                                String rand_graph_description = "largest CC random";
+                                                //DBManager.deleteCustomGraphStatsFromDBByUniqueName(rand_graph_name);
+                                                DBManager.writeCustomgraphStatsToDB(rand_graph_name, rand_graph_description, Boolean.TRUE, gpr_lcc_rand.numVertices, gpr_lcc_rand.numEdges, gpr_lcc_rand.minDegree, gpr_lcc_rand.maxDegree, gpr_lcc_rand.numConnectedComponents, gpr_lcc_rand.graphDiameter, gpr_lcc_rand.graphRadius, gpr_lcc_rand.averageClusterCoefficient, gpr_lcc_rand.averageShortestPathLength, gp_lcc_rand.getDegreeDistributionUpTo(50), gpr_lcc_rand.averageDegree, gpr_lcc_rand.density, gp_lcc_rand.getCumulativeDegreeDistributionUpToAsArray(50), runtime_secs);                                            
+                                            }
                                         }
                                     }
                                 }
