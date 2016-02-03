@@ -795,7 +795,11 @@ public class DBManager {
                 continue;
             }
             
-            if(src_graphlets == null) { 
+            if(src_graphlets == null) {
+                
+                
+                System.out.println("Did not find graphlets for PDB-ID " + src_pdb_id);
+                
                 continue;
             }
             else {
@@ -14301,10 +14305,10 @@ connection.close();
         
         PreparedStatement statement = null;
         ResultSet rs = null;
-        Long graphid = DBManager.getDBComplexgraphID(pdb_id);
+        Long graphid = DBManager.getDBAminoacidgraphID(pdb_id);
         
         if(graphid <= 0) {
-            DP.getInstance().e("DBManager", "getNormalizedAminoacidgraphGraphletCounts(): Could not find complex graph with pdb_id '" + pdb_id + "' in DB.");
+            DP.getInstance().e("DBManager", "getNormalizedAminoacidgraphGraphletCounts(): Could not find amino acid graph with pdb_id '" + pdb_id + "' in DB.");
             return null;
         }
 
@@ -14381,6 +14385,7 @@ connection.close();
             }
         }
         else {
+            System.out.println("Size of tabledata is 1 or smaller!!!!!");
             return(null);
         }        
     }
