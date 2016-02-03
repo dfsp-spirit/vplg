@@ -1259,7 +1259,7 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_json text, graph_string_xml text, graph_image_png text, graph_image_svg text, graph_image_pdf text, filepath_graphfile_gml text, filepath_graphfile_kavosh text, filepath_graphfile_plcc text, filepath_graphfile_dotlanguage text, filepath_graphfile_json text, filepath_graphfile_xml text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, fg_number int not null, fold_name varchar(2) not null, first_vertex_position_in_parent int not null, graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_json text, graph_string_xml text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_complexgraph + " (complexgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, ssegraph_string_gml text, chaingraph_string_gml text, ssegraph_string_xml text, chaingraph_string_xml text, ssegraph_string_kavosh text, chaingraph_string_kavosh text, filepath_ssegraph_image_svg text, filepath_chaingraph_image_svg text, filepath_ssegraph_image_png text, filepath_chaingraph_image_png text, filepath_ssegraph_image_pdf text, filepath_chaingraph_image_pdf text);");
-            doInsertQuery("CREATE TABLE " + tbl_aagraph + " (aagraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, chain_description text, aagraph_string_gml text);");
+            doInsertQuery("CREATE TABLE " + tbl_aagraph + " (aagraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, chain_description text, aagraph_string_gml text, num_vertices int, num_edges int);");
             doInsertQuery("CREATE TABLE " + tbl_motiftype + " (motiftype_id serial primary key, motiftype_name varchar(40));");
             doInsertQuery("CREATE TABLE " + tbl_motif + " (motif_id serial primary key, motiftype_id int not null references " + tbl_motiftype + " ON DELETE CASCADE, motif_name varchar(40), motif_abbreviation varchar(9));");
             doInsertQuery("CREATE TABLE " + tbl_representative_chains + " (pdb_id varchar(4) not null, chain_name varchar(1) not null, PRIMARY KEY(pdb_id, chain_name));");
@@ -9543,11 +9543,11 @@ connection.close();
      * @return ignore
      * @throws SQLException if DB stuff went wrong
      */
-    public static Boolean writeAminoAcidGraphToDB(String pdb_id, String chain_description, String aagraph_string_gml) throws SQLException {
+    public static Boolean writeAminoAcidGraphToDB(String pdb_id, String chain_description, String aagraph_string_gml, Integer num_vertices, Integer num_edges) throws SQLException {
                        
         PreparedStatement statement = null;
         Boolean result;
-        String query = "INSERT INTO " + tbl_aagraph + " (pdb_id, chain_description, aagraph_string_gml) VALUES (?, ?, ?);";
+        String query = "INSERT INTO " + tbl_aagraph + " (pdb_id, chain_description, aagraph_string_gml, num_vertices, num_edges) VALUES (?, ?, ?, ?, ?);";
 
         
         try {
@@ -9557,6 +9557,8 @@ connection.close();
             statement.setString(1, pdb_id);
             statement.setString(2, chain_description);
             statement.setString(3, aagraph_string_gml);
+            statement.setInt(4, num_vertices);
+            statement.setInt(5, num_edges);
                                 
             statement.executeUpdate();
             //dbc.commit();

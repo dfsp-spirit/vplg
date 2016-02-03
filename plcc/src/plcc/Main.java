@@ -2324,10 +2324,10 @@ public class Main {
                     if(Settings.getBoolean("plcc_B_useDB")) {
                         try {
                             if(Settings.getBoolean("plcc_B_write_graphstrings_to_database_aag")) {
-                                DBManager.writeAminoAcidGraphToDB(pdbid, AAGraph.CHAINID_ALL_CHAINS, aag.toGraphModellingLanguageFormat());
+                                DBManager.writeAminoAcidGraphToDB(pdbid, AAGraph.CHAINID_ALL_CHAINS, aag.toGraphModellingLanguageFormat(), aag.getNumVertices(), aag.getNumEdges());
                             }
                             else {
-                                DBManager.writeAminoAcidGraphToDB(pdbid, AAGraph.CHAINID_ALL_CHAINS, null);
+                                DBManager.writeAminoAcidGraphToDB(pdbid, AAGraph.CHAINID_ALL_CHAINS, null, aag.getNumVertices(), aag.getNumEdges());
                             }
                             
                             if(! silent) {
@@ -2625,10 +2625,10 @@ public class Main {
                         if(Settings.getBoolean("plcc_B_useDB")) {
                             try {
                                 if(Settings.getBoolean("plcc_B_write_graphstrings_to_database_aag")) {
-                                    DBManager.writeAminoAcidGraphToDB(pdbid, c.getPdbChainID(), aag.toGraphModellingLanguageFormat());
+                                    DBManager.writeAminoAcidGraphToDB(pdbid, c.getPdbChainID(), aag.toGraphModellingLanguageFormat(), aag.getNumVertices(), aag.getNumEdges());
                                 }
                                 else {
-                                    DBManager.writeAminoAcidGraphToDB(pdbid, c.getPdbChainID(), null);
+                                    DBManager.writeAminoAcidGraphToDB(pdbid, c.getPdbChainID(), null, aag.getNumVertices(), aag.getNumEdges());
                                 }
                                 
                                 if(! silent) {
@@ -2827,6 +2827,11 @@ public class Main {
         if(! silent) {
             System.out.println("(Too much clutter? Try the '--silent' command line option.)");
             System.out.println("All done, exiting. Total runtime was " + runtimeTotal_secs + " seconds ("+compTimes[0]+":" + String.format("%02d:%02d", compTimes[1], compTimes[2])+" hms).");
+        } else {
+            if(Settings.getBoolean("plcc_B_print_silent_notice")) {
+                String endTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
+                System.out.println("[PLCC] [" + pdbid + "] [" + endTime + "] " + "All done (silently), exiting. Total runtime was " + runtimeTotal_secs + " seconds ("+compTimes[0]+":" + String.format("%02d:%02d", compTimes[1], compTimes[2])+" hms).");
+            }
         }
         System.exit(0);
 
