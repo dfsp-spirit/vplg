@@ -1297,7 +1297,8 @@ public class Main {
                                 if(Settings.getBoolean("plcc_B_useDB")) {
                                     try {
                                         DBManager.deleteCustomGraphStatsFromDBByUniqueName(unique_name);
-                                        DBManager.writeCustomgraphStatsToDB(unique_name, description, isForLargestConnectedComponent, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist, avg_degree, density, cumul_degreedist, runtime_secs);                                        
+                                        DBManager.writeCustomgraphStatsToDB(unique_name, description, isForLargestConnectedComponent, num_verts, num_edges, min_degree, max_degree, num_connected_components, diameter, radius, avg_cluster_coeff, avg_shortest_path_length, degreedist, avg_degree, density, cumul_degreedist, runtime_secs);
+                                        System.out.println("Graph properties for custom graph written to database, graph has been assigned unique name '" + unique_name + "' in db.");
                                     }catch(SQLException e) {
                                         DP.getInstance().e("Main", "Could not write custom graph stats to db: '" + e.getMessage() + "'.");
                                     }
@@ -1418,7 +1419,7 @@ public class Main {
                 if(Settings.getBoolean("plcc_B_no_warn")) {
                     System.out.println("[PLCC] [" + pdbid + "] [" + startTime + "] Silent mode and no-warn active, only errors and a final completion notice will be printed from now on. Bye.");
                 } else {
-                    System.out.println("[PLCC] [" + pdbid + "] [" + startTime + "]  Silent mode active, only errors, warnings and a final completion notice will be printed from now on. Bye.");
+                    System.out.println("[PLCC] [" + pdbid + "] [" + startTime + "] Silent mode active, only errors, warnings and a final completion notice will be printed from now on. Bye.");
                 }
             }
             silent = true;
