@@ -1416,9 +1416,9 @@ public class Main {
             if(Settings.getBoolean("plcc_B_print_silent_notice")) {
                 String startTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
                 if(Settings.getBoolean("plcc_B_no_warn")) {
-                    System.out.println("[PLCC] [" + pdbid + "] [" + startTime + "] Silent mode and no-warn active, only errors will be printed from now on. Bye.");
+                    System.out.println("[PLCC] [" + pdbid + "] [" + startTime + "] Silent mode and no-warn active, only errors and a final completion notice will be printed from now on. Bye.");
                 } else {
-                    System.out.println("[PLCC] [" + pdbid + "] [" + startTime + "]  Silent mode active, only errors and warnings will be printed from now on. Bye.");
+                    System.out.println("[PLCC] [" + pdbid + "] [" + startTime + "]  Silent mode active, only errors, warnings and a final completion notice will be printed from now on. Bye.");
                 }
             }
             silent = true;
