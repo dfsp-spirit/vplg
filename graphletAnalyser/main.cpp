@@ -416,7 +416,7 @@ int main(int argc, char** argv) {
                     
         } else if (aa_graph) {
             options["graph_vertex_type_field"] = "chem_prop3";
-            options["graph_vertex_type_alphabet"] = "hpa?";
+            options["graph_vertex_type_alphabet"] = "hpc?";
             options["graphtype"] = "aa_graph";
             
         } else if (complex_graph) {
@@ -432,9 +432,8 @@ int main(int argc, char** argv) {
         std::string vertex_label = options["graph_vertex_type_field"];
         
         
-        // TODO: finish computation of length 3 labels
-        // TODO: enable fetching of alphabet from cfg file
-        // TODO: change main to reflect above changes
+       
+        
         
         // construct protein graph by parsing gml file
         GMLptglProteinParser Parser(files[i], vertex_label);
@@ -508,7 +507,7 @@ int main(int argc, char** argv) {
         time_t timer;
         time_t other_timer;
         
-        
+        // get current time
         timer = time(NULL);
         
         int seconds;
@@ -549,8 +548,13 @@ int main(int argc, char** argv) {
             
         }
         
+        
+        
+        // get current time
         other_timer = time(NULL);
         
+        
+        //measure computation time
         seconds = difftime(other_timer, timer);
         
         
