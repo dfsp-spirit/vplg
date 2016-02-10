@@ -434,6 +434,17 @@ public class Main {
                         argsUsed[i] = true;
                     }
                     
+                    if(s.equals("--alt-aa-contacts")) {
+                        useFileFromCommandline = true;
+                        Settings.set("plcc_B_alternate_aminoacid_contact_model", "true");
+                        //adjust other settings here
+                        Settings.set("plcc_B_AAgraph_allchainscombined", "true");
+                        Settings.set("plcc_B_aminoacidgraphs_include_ligands", "true");
+                        Settings.set("plcc_B_calc_draw_graphs", "false");
+                        Settings.set("plcc_B_complex_graphs", "false");                        
+                        argsUsed[i] = true;
+                    }
+                    
                     if(s.equals("-p") || s.equals("--pdbfile")) {
                         if(args.length <= i+1 ) {
                             syntaxError();
@@ -2051,7 +2062,12 @@ public class Main {
             cInfoThisChain = new ArrayList<ResContactInfo>();   // will be computed separately for each chainName later
             cInfo = null;                                       // will not be used in this case (separateContactsByChain=on)
         } else {        
-            cInfo = calculateAllContacts(residues);
+            if(Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model")) {
+                cInfo = calculateAllContactsAlternativeModel(residues);
+            }
+            else {
+                cInfo = calculateAllContacts(residues);
+            }
             if(! silent) {
                 System.out.println("Received data on " + cInfo.size() + " residue contacts that have been confirmed on atom level.");
             }
@@ -2309,6 +2325,8 @@ public class Main {
                     }
                     aag.setPdbid(pdbid);
                     aag.setChainid(AAGraph.CHAINID_ALL_CHAINS);
+                    //String gml = aag.toGraphModellingLanguageFormat();
+                    //IO.stringToTextFile("graph.gml", gml);
                     
                     
 
@@ -4444,6 +4462,11 @@ public class Main {
         }
     }
 
+    
+    public static ArrayList<ResContactInfo> calculateAllContactsAlternativeModel(List<Residue> res) {
+        throw new java.lang.UnsupportedOperationException("Not implemented yet!");
+    }
+    
     /**
      * Calculates all contacts between the residues in res.
      * @param res A list of Residue objects.

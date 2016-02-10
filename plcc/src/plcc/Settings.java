@@ -460,7 +460,8 @@ public class Settings {
         defSet("plcc_B_forceBackboneContacts", "false", "Whether all amino acids of a protein graph should be connected sequentially, from N to C terminus, with contacts of type backbone.");
         defSet("plcc_B_skip_too_large", "false", "Whether to abort if the protein has more than 'plcc_I_skip_num_atoms_threshold' atoms.");
         defSet("plcc_I_skip_num_atoms_threshold", "80000", "The maximal number of atoms per PDB file if 'plcc_B_skip_too_large' is true. In that case, PLCC will abort for PDB files with more atoms (for cluster mode).");
-        
+        defSet("plcc_B_alternate_aminoacid_contact_model", "false", "Use alternate residue contact model by Andreas. Skips all computations except AA graphs. EXP.");
+                
         // SSE definitions
         defSet("plcc_I_min_SSE_length", "3", "the minimal length in AAs a non-ligand SSE must have to be considered (PTGL-style filtering of very short SSEs)");
         defSet("plcc_B_merge_helices", "true", "whether to merge different helix types if they are adjacent in the primary structure");
