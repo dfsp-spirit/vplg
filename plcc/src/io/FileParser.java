@@ -1315,14 +1315,14 @@ public class FileParser {
     private static void createAllResiduesFromDsspData() {
 
         String dLine;
-        Integer dLineNum, dsspResNum, pdbResNum, resIndex;
+        Integer dLineNum, dsspResNum, pdbResNum, resIndex, acc;
         dLineNum = dsspResNum = pdbResNum = 0;
         String dsspChainID, resName1Letter, sseString, iCode;
         dsspChainID = resName1Letter = iCode = "";
         sseString = "UNDEF";
         Character lastChar = null;
         Float phi = 0.0f;
-        Float psi = 0.0f;
+        Float psi = 0.0f;        
 
         s_residues = new ArrayList<Residue>();
         s_sulfurBridges = new HashMap<Character, ArrayList<Integer>>();
@@ -1351,8 +1351,9 @@ public class FileParser {
                     // 14+15 are ignored: blank
                     sseString = dLine.substring(16, 17);
                     // lots of stuff is ignored here
-                    phi = Float.valueOf(dLine.substring(103, 108).trim());
-                    psi = Float.valueOf(dLine.substring(109, 114).trim());
+                    phi = Float.valueOf(dLine.substring(103, 108).trim());  // phi backbone angle
+                    psi = Float.valueOf(dLine.substring(109, 114).trim());  // psi backbone angle
+                    acc = Integer.valueOf(dLine.substring(35, 38).trim());  // solvent accessible surface
                     // rest is ignored: not needed
                 } catch(Exception e) {
                     System.err.println("ERROR: Parsing of DSSP line " + dLineNum + " failed: '" + e.getMessage() + "'. DSSP file looks broken.");
@@ -1373,6 +1374,7 @@ public class FileParser {
                 r.setType(Residue.RESIDUE_TYPE_AA);                   // DSSP files only contain protein residues, ligands are ignored
                 r.setPhi(phi);
                 r.setPsi(psi);
+                r.setAcc(acc);
 
                 // Cysteins which form a sulfur bridge are arbitrary lowercase letters in dssp. A residue
                 // with name 'a' means it is a cysteine, but it has forms a sulfur bridge with a second residue in the file that is
@@ -1788,7 +1790,7 @@ public class FileParser {
         }
         else {
             System.err.println("ERROR: FileParser.getDsspLines(): Request for data before initData() was called.");
-            System.exit(-1);
+            System.exit(1);
             return(null);
         }
     }
@@ -1826,7 +1828,7 @@ public class FileParser {
                     } catch (Exception e) {
                         System.err.println("ERROR: Parsing of DSSP line " + dLineNum + " failed. DSSP file broken.");
                         e.printStackTrace();
-                        System.exit(-1);
+                        System.exit(1);
                     }
                 }
             }

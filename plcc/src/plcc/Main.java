@@ -440,8 +440,8 @@ public class Main {
                         //adjust other settings here
                         Settings.set("plcc_B_AAgraph_allchainscombined", "true");
                         Settings.set("plcc_B_aminoacidgraphs_include_ligands", "true");
-                        Settings.set("plcc_B_calc_draw_graphs", "false");
-                        Settings.set("plcc_B_complex_graphs", "false");                        
+                        Settings.set("plcc_B_quit_after_aag", "true");
+                        outputToBePrintedUnlessSilent.append("  Using alternate residue contact model. Only computing PPI interface graphs.\n");
                         argsUsed[i] = true;
                     }
                     
@@ -1403,6 +1403,18 @@ public class Main {
                     
                     if(s.equals("-i") || s.equals("--aa-graphs")) {
                         Settings.set("plcc_B_AAgraph_allchainscombined", "true");
+                        Settings.set("plcc_B_AAgraph_perchain", "true");
+                        argsUsed[i] = true;
+                    }
+                    
+                    if(s.equals("--aa-graphs-pdb")) {
+                        Settings.set("plcc_B_AAgraph_allchainscombined", "true");
+                        Settings.set("plcc_B_AAgraph_perchain", "false");
+                        argsUsed[i] = true;
+                    }
+                    
+                    if(s.equals("--aa-graphs-chain")) {
+                        Settings.set("plcc_B_AAgraph_allchainscombined", "false");
                         Settings.set("plcc_B_AAgraph_perchain", "true");
                         argsUsed[i] = true;
                     }
@@ -2700,6 +2712,11 @@ public class Main {
                         }
                     }
                     
+                    if(Settings.getBoolean("plcc_B_quit_after_aag")) {
+                        System.out.println("Quitting after AAG computation as requested by settings.");
+                        Main.doExit(0);
+                    }
+                    
                     if(separateContactsByChain) {
                         calculateSSEGraphsForChains(theChain, residues, cInfoThisChain, pdbid, outputDir);
                     }
@@ -2712,6 +2729,11 @@ public class Main {
                     
                     numChainsHandled++;
                 }
+            }
+            
+            if(Settings.getBoolean("plcc_B_quit_after_aag")) {
+                System.out.println("Quitting after AAG computation as requested by settings.");
+                Main.doExit(0);
             }
             
             if( ! separateContactsByChain){  // no chainName separation active                
@@ -4462,9 +4484,14 @@ public class Main {
         }
     }
 
-    
+    /**
+     * Computes residue contacts following the definition by Andreas for interfaces between chains of multi-chain proteins.
+     * @param res a list of residues
+     * @return A list of ResContactInfo objects, each representing a pair of residues that are in contact.
+     */
     public static ArrayList<ResContactInfo> calculateAllContactsAlternativeModel(List<Residue> res) {
-        throw new java.lang.UnsupportedOperationException("Not implemented yet!");
+        //throw new java.lang.UnsupportedOperationException("Not implemented yet!");
+        return calculateAllContacts(res);
     }
     
     /**
@@ -6007,7 +6034,9 @@ public class Main {
         System.out.println("-h | --help                : show this help message and exit");
         System.out.println("-H | --output-www-with-core: add HTML navigation files and core files to the subdir tree (implies -k, -W). ");
         //System.out.println("-i | --ignoreligands       : ignore ligand contacts in geom_neo format output files [DEBUG]");
-        System.out.println("-i | --aa-graphs           : compute and output amino acid-based graphs as well. In these graphs, each vertes is an amino acid instead of a SSE.");        
+        System.out.println("-i | --aa-graphs           : compute and output amino acid-based graphs as well. In these graphs, each vertes is an amino acid instead of a SSE. Computes per-chain and per-PDB file AAGs.");        
+        System.out.println("     --aa-graphs-pdb       : computes amino acid graphs (see above), but only the graphs for the whole PDB file (all chains combined into one graph).");        
+        System.out.println("     --aa-graphs-chain     : computes amino acid graphs (see above), but only the graphs which model a single chain each (n graphs for a PDB file with n chains).");                
         System.out.println("-j | --ddb <p> <c> <gt> <f>: get the graph type <gt> of chain <c> of pdbid <p> from the DB and draw it to file <f> (omit the file extension)*");        
         System.out.println("-k | --output-subdir-tree  : write all output files to a PDB-style sudbir tree of the output dir (e.g., <OUTDIR>/ic/8icd/<outfile>). ");                
         System.out.println("-l | --draw-plcc-graph <f> : read graph in plcc format from file <f> and draw it to <f>.png, then exit (<pdbid> will be ignored)*");                

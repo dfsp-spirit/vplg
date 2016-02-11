@@ -42,8 +42,9 @@ public class Residue implements java.io.Serializable {
     private String modelID = null;
     private String iCode = null;                            // PDB insertion code
     
-    private Float phi = null;
-    private Float psi = null;
+    private Float phi = null;       // phi backbone angle
+    private Float psi = null;       // psi backbone angle
+    private Integer acc = null;     // solvent accessible surface, from DSSP file
 
     // see http://www.wwpdb.org/documentation/format32/sect4.html for the format of the heterogen section of PDB files
     private String ligName = null;                          // HETNAM record of PDB file (name of this hetero group)
@@ -703,8 +704,21 @@ public class Residue implements java.io.Serializable {
     public String getUniqueString() { return("(" + chainID + "-" + pdbResNum + "-" + iCode + ")"); }
     public Float getPhi() { if(this.isAA()) { return(phi); } else { return(0.0f); } }
     public Float getPsi() { if(this.isAA()) { return(psi); } else { return(0.0f); } }
+    public Integer getAcc() { if(this.isAA()) { return(acc); } else { return(0); } }
     public String getResName3() { return resName3;}
 
+    
+    /**
+     * Determines whether this residue lies at the protein surface.
+     * @return whether this residue lies at the protein surface.
+     */
+    public Boolean isSurfaceResidue() {
+        if(this.acc == null) {
+            return true;    // if we do not have SAS data, assume yes
+        }
+        return(this.acc >= 15);
+    }
+    
     public String getLigName() {
         if(this.isLigand()) {
             return(this.ligName);
@@ -757,6 +771,7 @@ public class Residue implements java.io.Serializable {
     public void setLigSynonyms(String s) { ligSynonyms = s; }
     public void setPhi(Float f) { phi = f; }
     public void setPsi(Float f) { psi = f; }
+    public void setAcc(Integer f) { acc = f; }
     
     
     /**
