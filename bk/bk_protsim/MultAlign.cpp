@@ -43,20 +43,34 @@ c_clique MultAlign::combine(c_clique& complex, s_clique_p& simple, const Product
     return result;
 }
 
+/*
+ * Compute the multiple alignment from the given graph vectors.
+ * The results will be saved in text files in the directory saved in the class
+ */
 void MultAlign::run() { 
-    for(s_clique_p& clique : BK_Output::get_result_all(*alignments[1])) {            //for each simple clique in the 0-1 alignment
-        c_clique complex = c_clique();                                        //create new complex clique list in results
-        for(VertexDescriptor_p& p_vertex : clique) {                                                          //for each p_vertex in the simple clique
-            complex.push_back(c_edge());                                        //create new list (complex edge)
+    /* works as an initilizer for the intersect function.
+     * each clique in the 0-1 alignment is transfered into a temporary complex clique. 
+     * The cc is then expanded by the recursive intersect function.
+     */
+    for(s_clique_p& clique : BK_Output::get_result_all(*alignments[1])) {     //for each simple clique in the 0-1 alignment
+        c_clique complex = c_clique();                                        //create new complex clique
+        for(VertexDescriptor_p& p_vertex : clique) {                          //for each p_vertex in the simple clique
+            complex.push_back(c_edge());                                      //create new list (complex edge)
             complex.back().push_back(products[1]->getProductGraph()[p_vertex].edgeFst);          //add the g1 edge as the first element  
             complex.back().push_back(products[1]->getProductGraph()[p_vertex].edgeSec);          //add the g2 edge as the second element 
-        }
-        intersect(complex, 2);
+        }//end turn the simple clique into a complex one
+        intersect(complex, 2); //call intersect to add the remaining layers to the cc
     }
 }
 
-void MultAlign::intersect(c_clique complex, int i){
-    if (i<this->I) {
+/*
+ * Function to expand a complex clique. Each recursion layer intersects the cc with all sc of the remaining graphs.
+ * Once the cc is complete, it is passed to the output manager to be saved in a file.
+ * Maximum recursion depth is the number of the graphs in the multiple alignment.
+ * takes a complex clique and an int counter of the number of already included graphs
+ */
+void MultAlign::intersect(c_clique& complex, int i){
+    if (i<this->I) { //clique complete?
         for(s_clique_p& clique : BK_Output::get_result_all(*alignments[i])) {
             c_clique new_complex = this->combine(complex, clique, *products[i]);
             if( ! new_complex.empty()) {
@@ -69,6 +83,9 @@ void MultAlign::intersect(c_clique complex, int i){
     }  
 }
 
+/*
+ * return the total number of complex cliques
+ */
 unsigned long MultAlign::num_cliques(){
     return this->count;
 }

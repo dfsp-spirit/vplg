@@ -34,7 +34,7 @@ public:
 private:
     std::list<std::list<EdgeDescriptor>> combine(std::list<std::list<EdgeDescriptor>>&, std::list<VertexDescriptor_p>&, const ProductGraph&);
     bool edgecomp (const Graph* a, const Graph* b) {return boost::num_edges(*a) < boost::num_edges(*b);}
-    void intersect(std::list<std::list<EdgeDescriptor>>, int);
+    void intersect(std::list<std::list<EdgeDescriptor>>&, int);
     
     
     const std::vector<Graph*> graphs;

@@ -6,9 +6,13 @@
 
 #include <sstream>
 #include <list>
-
-
 #include "Mult_Output.h"
+
+typedef std::list<EdgeDescriptor> c_edge;
+
+typedef std::list<c_edge> c_clique;
+typedef std::list<VertexDescriptor_p> s_clique_p;
+typedef std::list<VertexDescriptor> s_clique;
 
 Mult_Output::Mult_Output() : DIR(""){
     streams = std::vector<std::ofstream*>(0);
@@ -41,7 +45,7 @@ Mult_Output::~Mult_Output() {
 /*
  * Manages the output operations
  */
-void Mult_Output::out(const std::list<std::list<EdgeDescriptor>>& complex, const std::vector<Graph*>& graphs){
+void Mult_Output::out(c_clique& complex, const std::vector<Graph*>& graphs){
     short num = complex.size()-1;
     while (this->streams.size() < num){          //if necessary, expand the vectors to include new the appropriate files
         streams.push_back(new std::ofstream());
@@ -51,7 +55,7 @@ void Mult_Output::out(const std::list<std::list<EdgeDescriptor>>& complex, const
         streams.back()->close();
         streams.back()->open(ss.str(), std::ofstream::app);
     }//end expand vectors
-    for (const std::list<EdgeDescriptor>& ce : complex){
+    for (const c_edge& ce : complex){
         int pos = 0;
         for (auto i = ce.begin(); i != ce.end(); ++i, ++pos) {                                           //for each simple edge
                     *streams[num] << (*graphs[pos])[boost::source(*i,(*graphs[pos]))].id+1 <<"-"<< (*graphs[pos])[boost::target(*i,(*graphs[pos]))].id+1 << ";";   
@@ -60,6 +64,13 @@ void Mult_Output::out(const std::list<std::list<EdgeDescriptor>>& complex, const
     }
     *streams[num] << std::endl;
     streams[num]->flush(); 
+    
+    //
+    /*for(int pos = 0; !complex.empty(); ++pos){
+        for(c_edge& ce : complex) {
+            *streams[num] << (*graphs[pos])[boost::source(ce.front(),(*graphs[pos]))].id+1 <<"-"<< (*graphs[pos])[boost::target(ce.front(),(*graphs[pos]))].id+1 << ";";
+        }
+    }*/
 }
 
 

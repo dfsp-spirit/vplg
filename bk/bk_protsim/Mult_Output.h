@@ -19,12 +19,12 @@ public:
     Mult_Output(std::string);
     ~Mult_Output();
     
-    void out(const std::list<std::list<EdgeDescriptor>>&, const std::vector<Graph*>&);
+    void out(std::list<std::list<EdgeDescriptor>>&, const std::vector<Graph*>&);
     std::vector<unsigned int> distribution();
 
     
     
-private:
+private: 
     std::string DIR;
     std::vector<std::ofstream*> streams;
     std::vector<unsigned int> counts;
