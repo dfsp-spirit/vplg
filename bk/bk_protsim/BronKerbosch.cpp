@@ -18,6 +18,7 @@
 
 
 #include "BronKerbosch.h"
+#include <iostream>
 
 
 
@@ -50,7 +51,7 @@ BronKerbosch::~BronKerbosch() {
  * running it will lead to wrong results and in the worst case segfaults!!
  * The graph will only ever be read and never written to.
  */
-void BronKerbosch::run() {
+void BronKerbosch::run_c() {
     /* 
      * this function works as an initializer for the recursive findCliques function.
      * It will start the findClique function n times for n vertices in the graph.
@@ -86,7 +87,7 @@ void BronKerbosch::run() {
                 insert_vertex(a,D);
             } //end else v and a z-connected
         }//end for all neighbours of v
-        findCliques(C, P, D, S); 
+        findCliques_c(C, P, D, S); 
         remove_set(S);
         remove_set(D);
         remove_set(P);
@@ -101,6 +102,32 @@ void BronKerbosch::run() {
     delete[] this->vertex_array; this->vertex_array = nullptr;
     delete[] this->set_array;      this->set_array = nullptr;
 }// end run()
+
+/*
+ * runs a modified Bron-Kerbosch algorithm on a boost::adjacency_list type graph
+ * The used algorithm uses an unspecified Pivot element.
+ * To access the result it is advised use the static BK_Output class functions.
+ * If the graph g is modified by any other sources (invalidating the VertexDescriptors), while this function is 
+ * running it will lead to wrong results and in the worst case segfaults!!
+ * The graph will only ever be read and never written to.
+ */
+void BronKerbosch::run() {
+    this-> vertex_array = new object[MAX_VERTICES]();
+    this-> set_array = new object[MAX_SETS]();
+    int C = new_set();
+    int P = new_set();
+    int S = new_set();
+    
+    VertexIterator_p vi, ve;
+    for (boost::tie(vi,ve) = boost::vertices(this->g); vi != ve; ++vi) { //iterate over all vertices in g
+        insert_vertex(boost::vertex(*vi, this->g),P);
+    }
+    
+    findCliques(C,P,S);
+    remove_set(S);
+    remove_set(P);
+    remove_set(C);
+}// end run_c()
 
 /*
  * Returns a const reference to the graph on which the Bron-Kerbosch algorithm was used on. 
@@ -118,12 +145,12 @@ std::list<std::list<VertexDescriptor_p>>  BronKerbosch::get_result_list() const{
     }
 
 /*
- * Private function to do the actual work.
+ * Private function to do the actual work of the connected variant.
  * It is initialized by the run function, giving it a single vertex in the set C.
  * The function will then recursively find all Cliques containing this vertex.
  * All found cliques are added to the private member field result.
  */
-void BronKerbosch::findCliques(int C, int P, int D, int S) {
+void BronKerbosch::findCliques_c(int C, int P, int D, int S) {
     if (!set_array[P].next_vertex && !set_array[S].next_vertex) {
         this->result.push_front(output_clique(C));//add the found clique to the result list
 
@@ -178,7 +205,7 @@ void BronKerbosch::findCliques(int C, int P, int D, int S) {
                         } //end if else n  in D
                     }//end if else n in P
                 }// end for neigbours of ui
-                findCliques(C, P2, D2, S2);
+                findCliques_c(C, P2, D2, S2);
                 remove_set(S2);
                 remove_set(D2);
                 remove_set(P2);
@@ -191,6 +218,58 @@ void BronKerbosch::findCliques(int C, int P, int D, int S) {
         remove_set(S1);
         remove_set(P1);
     }//end if P and S not empty
+}// end findCliques()
+
+/*
+ * Private function to do the actual work.
+ * It is initialized by the run_c function, giving it a single vertex in the set C.
+ * The function will then recursively find all Cliques containing this vertex.
+ * All found cliques are added to the private member field result.
+ */
+void BronKerbosch::findCliques(int C, int P, int S) {
+    if (!set_array[P].next_vertex && !set_array[S].next_vertex) {
+        this->result.push_front(output_clique(C));//add the found clique to the result list
+
+    } else {
+        int P1 = new_set(); copy_set(P,P1);
+        int S1 = new_set(); copy_set(S,S1);
+        //chose a pivot element. Will choose the pivot from P, if possible, else from S.
+        //no heuristic used, it is simply the first vertex in the set
+        VertexDescriptor_p piv;
+        object* op=set_array[P].next_vertex;
+        if( op ) piv=op->vertex; 
+        
+        
+        //start of main algorithm
+        //iterates over all vertices connected to every vertex in C by a z-edge
+        while (op) {
+            VertexDescriptor_p ui = op->vertex;
+            if( ! boost::edge(piv,ui,this->g).second) {
+                insert_vertex(ui, C);
+                int P2 = new_set();
+                int S2 = new_set();
+                AdjacencyIterator_p ai, ae;
+                for (boost::tie(ai,ae)=boost::adjacent_vertices(ui, this->g); ai!=ae;++ai) { //iterate over all neighbours of ui
+                    VertexDescriptor_p n = boost::vertex(*ai, this->g);
+                    if (is_vertex_in_set(n,P1)) { //if n is in P
+                        insert_vertex(n, P2);
+                    }
+                    else if (is_vertex_in_set(n,S1)) { //if n is in S
+                        insert_vertex(n, S2);
+                    } 
+                }
+                findCliques(C,P2,S2);
+                remove_set(S2);
+                remove_set(P2);
+                remove_vertex(ui,C);
+                remove_vertex(ui,P1);
+                insert_vertex(ui,S1);
+            }
+            op = op->next_vertex;
+        }//end for vertices in P
+        remove_set(S1);
+        remove_set(P1);
+    }//end if P and S not empty        
 }// end findCliques()
 
 /*

@@ -51,6 +51,7 @@ public:
     ~BronKerbosch();
     
     void  run();
+    void  run_c();
     std::list<std::list<VertexDescriptor_p>>  get_result_list() const;
     const Graph_p& get_Product_Graph() const;
     void set_result(std::list<std::list<VertexDescriptor_p>> value);  //only for test purposes , should be removed before final distribution
@@ -67,12 +68,13 @@ private:
    
     //stores the results 
     std::list<std::list<VertexDescriptor_p>> result;
-    
+      
     //convertes the results from the internal format into a std container
     std::list<VertexDescriptor_p> output_clique(int s);
     
     //main function for calculation
-    void findCliques(int C, int P, int D, int S);
+    void findCliques(int C, int P, int S);
+    void findCliques_c(int C, int P, int D, int S);
     bool zPath(VertexDescriptor_p v, VertexDescriptor_p w, int s);
     bool zCon(VertexDescriptor_p v, VertexDescriptor_p w);
     

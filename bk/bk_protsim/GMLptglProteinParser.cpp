@@ -38,8 +38,8 @@ string input_path = "./";
 string input_files_list = "";
 string output_path = "";
 string logs_path = "";
-//string apptag = "[BK] ";
-//std::map<std::string, std::string> options;
+string apptag = "[BK] ";
+std::map<std::string, std::string> options;
 
 /*
  * Default constructor */
@@ -126,23 +126,20 @@ GMLptglProteinParser::GMLptglProteinParser(const string& gmlFile) {
                 //	cout << "key='" << key << "', value ='" << value << "'.\n";
                 switch (part) {
                     case PART_GRAPH:						// --------------- graph props --------------
-                        if (key == "label") {
-                            graph[graph_bundle].properties["label"] = parse_value_string(line);                            
+                        if(key == "id") {
+                            graph[graph_bundle].id = atoi(value.c_str());
+                        }
+                        else if(key == "directed") {
+                            graph[graph_bundle].directed = atoi(value.c_str());
+                        }
+                        else if (key == "label") {
+                            graph[graph_bundle].label = parse_value_string(line); 
                             if (print) {
                                 logFile << "  Graph property label " << graph[graph_bundle].label << " was added." << endl;
-                            }                         
+                            }     
                         }
-                        else if(key == "pdb_id") {
-                            graph[graph_bundle].properties["pdb_id"] = parse_value_string(line);
-                        }
-                        else if(key == "chain_id") {
-                            graph[graph_bundle].properties["chain_id"] = parse_value_string(line);
-                        }
-                        else if(key == "graph_type") {
-                            graph[graph_bundle].properties["graph_type"] = parse_value_string(line);
-                        }
-                        else if(key == "is_protein_graph") {
-                            graph[graph_bundle].properties["is_protein_graph"] = atoi(value.c_str());
+                        else if(key == "comment") {
+                            graph[graph_bundle].comment = parse_value_string(line);
                         }
                         else {
                             if(isElementClosingLine(line)) {    
@@ -152,6 +149,8 @@ GMLptglProteinParser::GMLptglProteinParser(const string& gmlFile) {
                                 if(print) {
                                     cout << "Closing graph in line #" << lineNum << ".\n";
                                 }
+                            } else {
+                                graph[graph_bundle].properties[key] = parse_value_string(line);
                             }
                         }
                         break;
@@ -160,36 +159,14 @@ GMLptglProteinParser::GMLptglProteinParser(const string& gmlFile) {
                         if (key == "id") {
                             vi.id = atoi(value.c_str());
                         }
-                        else if (key == "sse_type") {
-                            vi.properties["sse_type"] = parse_value_string(line);
-                            vi.label = vi.properties["sse_type"];
-                        }
                         else if (key == "label") {
-                            vi.properties["label"] = parse_value_string(line);
+                            vi.label = parse_value_string(line);
                         }
-			else if (key == "num_in_chain") {
-                            vi.properties["num_in_chain"] = atoi(value.c_str());
+                        else if (key == "sse_type") {
+                            vi.label = parse_value_string(line);
                         }
-			else if (key == "num_residues") {
-                            vi.properties["num_residues"] = atoi(value.c_str());
-                        }
-			else if (key == "dssp_res_start") {
-                            vi.properties["dssp_res_start"] = atoi(value.c_str());
-                        }
-			else if (key == "dssp_res_end") {
-                            vi.properties["dssp_res_end"] = atoi(value.c_str());
-                        }
-                        else if (key == "pdb_res_start") {
-                            vi.properties["pdb_res_start"] = parse_value_string(line);
-                        }
-			else if (key == "pdb_res_end") {
-                            vi.properties["pdb_res_end"] = parse_value_string(line);
-                        }
-			else if (key == "pdb_residues_full") {
-                            vi.properties["pdb_residues_full"] = parse_value_string(line);
-                        }
-			else if (key == "aa_sequence") {
-                            vi.properties["aa_sequence"] = parse_value_string(line);
+                        else if (key == "comment") {
+                            vi.comment = parse_value_string(line);
                         }
                         else {                            
                             if(isElementClosingLine(line)) {
@@ -212,6 +189,8 @@ GMLptglProteinParser::GMLptglProteinParser(const string& gmlFile) {
                                         cout << apptag << "Closing graph in line #" << lineNum << ".\n";
                                     }
                                 }                                
+                            } else {
+                                vi.properties[key] = parse_value_string(line);
                             }
                         }
 						
@@ -221,13 +200,14 @@ GMLptglProteinParser::GMLptglProteinParser(const string& gmlFile) {
                         if (key == "source") {
                             ei.source = atoi(value.c_str());
                         }
-			else if (key == "label") {
-                        }						
 			else if (key == "target") {
                             ei.target = atoi(value.c_str());
-                        } 
-			else if (key == "spatial") {
-                            ei.properties["spatial"] = parse_value_string(line);
+                        }
+			else if (key == "label") {
+                            ei.label = parse_value_string(line);
+                        }
+                        else if (key == "comment") {
+                            ei.comment = parse_value_string(line);
                         }
                         else {                            
                             if(isElementClosingLine(line)) {
@@ -237,7 +217,7 @@ GMLptglProteinParser::GMLptglProteinParser(const string& gmlFile) {
                                     u = vertex(ei.target, graph);
                                     add_edge(v, u, ei, graph);
                                     if (print) { 
-                                        logFile << "  " << ei.properties["spatial"] << " edge (" << ei.source << ", " << ei.target << ") was added" << endl;
+                                        logFile << "  " << ei.label << " edge (" << ei.source << ", " << ei.target << ") was added" << endl;
                                     }
                                     if(print) {
                                         cout << apptag << "Closing edge (" << ei.source << ", " << ei.target << ") in line #" << lineNum << ".\n";
@@ -252,6 +232,8 @@ GMLptglProteinParser::GMLptglProteinParser(const string& gmlFile) {
                                         cout << apptag << "Closing graph in line #" << lineNum << ".\n";
                                     }
                                 }                                
+                            } else {
+                                ei.properties[key] = parse_value_string(line);
                             }
                         }
                         

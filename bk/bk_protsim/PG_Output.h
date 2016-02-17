@@ -27,18 +27,20 @@
  */
 class PG_Output {
 public:
-    static std::list<unsigned long> get_common_first(const ProductGraph& pg, std::list<unsigned long> clique);
-    static std::list<unsigned long> get_common_second(const ProductGraph& pg, std::list<unsigned long> clique);
+    static std::list<VertexDescriptor_p> get_common_first(const ProductGraph& pg, std::list<VertexDescriptor_p> clique);
+    static std::list<VertexDescriptor_p> get_common_second(const ProductGraph& pg, std::list<VertexDescriptor_p> clique);
     
-    static std::list<int> get_vertex_ids_first(const ProductGraph& pg, std::list<unsigned long> clique);
-    static std::list<int> get_vertex_ids_second(const ProductGraph& pg, std::list<unsigned long> clique);
+    static std::list<int> get_vertex_ids_first(const ProductGraph& pg, std::list<VertexDescriptor_p> clique);
+    static std::list<int> get_vertex_ids_second(const ProductGraph& pg, std::list<VertexDescriptor_p> clique);
     
-    static std::string get_JSON_vertex_ids_first(const ProductGraph& pg, std::list<unsigned long> clique);
-    static std::string get_JSON_vertex_ids_second(const ProductGraph& pg, std::list<unsigned long> clique);
+    static std::string get_JSON_vertex_ids_first(const ProductGraph& pg, std::list<VertexDescriptor_p> clique);
+    static std::string get_JSON_vertex_ids_second(const ProductGraph& pg, std::list<VertexDescriptor_p> clique);
     static std::string int_list_to_JSON(std::list<int> clique);
     static std::string int_list_to_plcc_vertex_mapping_string(std::list<int> clique, std::string prefix);
+    static std::list<std::list<VertexDescriptor_p>> filter_iso(const ProductGraph& pg, std::list<std::list<VertexDescriptor_p>> cliques);
 private:
-    
+    static bool comp(const std::pair<std::list<VertexDescriptor>,std::list<VertexDescriptor>> a, const std::pair<std::list<VertexDescriptor>,std::list<VertexDescriptor>> b);
+  
 };
 
 #endif	/* PG_OUTPUT_H */

@@ -20,6 +20,8 @@
 #include "common.h"
 #include <tuple>
 #include <forward_list>
+#include <iostream>
+#include <string>
 
 /*
  * default constructor. Assigns 0-Values.
@@ -105,10 +107,12 @@ void ProductGraph::run() {
     prodGraph[boost::graph_bundle].id = 0;
     prodGraph[boost::graph_bundle].directed = 0; //i hope 0 is undirected
     //save the id of the original graphs as the label of the product graph
-    prodGraph[boost::graph_bundle].label = std::to_string(fstGraph[boost::graph_bundle].id)  + "$" +
-                                                                               std::to_string(secGraph[boost::graph_bundle].id) ;
-    prodGraph[boost::graph_bundle].comment = "Compatibility graph of "+ std::to_string(fstGraph[boost::graph_bundle].id)  + " and " +
-                                                                               std::to_string(secGraph[boost::graph_bundle].id);
+    std::stringstream ss;
+    ss << fstGraph[boost::graph_bundle].id << "$" << secGraph[boost::graph_bundle].id;
+    prodGraph[boost::graph_bundle].label = ss.str();
+    ss.clear(); ss.str(std::string());
+    ss << "Compatibility graph of " << fstGraph[boost::graph_bundle].id << " and " << secGraph[boost::graph_bundle].id;
+    prodGraph[boost::graph_bundle].comment = ss.str();
     //copy the values from the list to the graph
     VertexIterator_p vi, viEnd;
     boost::tie(vi, viEnd) = boost::vertices(prodGraph);

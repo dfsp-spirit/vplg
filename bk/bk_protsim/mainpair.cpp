@@ -16,6 +16,7 @@
  * Created on June 16, 2015, 2:56 PM
  */
 
+
 #include <iostream>
 #include <fstream>
 #include "GMLptglProteinParser.h"
@@ -131,7 +132,7 @@ std::map<std::string, std::string> options;
 /*
  * 
  */
-int main(int argc, char** argv) {
+int main2(int argc, char** argv) {
        
     //std::string apptag = "[BK] ";
     std::string startOutput = "";
@@ -340,7 +341,7 @@ int main(int argc, char** argv) {
     pg.run();
     //find cliques in the product graph
     BronKerbosch bk(pg.getProductGraph());
-    bk.run();
+    bk.run_c();
 
     //parse output parameter, get list of found cliques
     std::list<std::list<unsigned long>> result_list;
