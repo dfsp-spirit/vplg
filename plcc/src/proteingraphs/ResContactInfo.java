@@ -40,7 +40,13 @@ public class ResContactInfo {
     public static final Integer CL = 9;         //  9 = # of sidechain-ligand contacts      (protein - ligand only)
     public static final Integer LC = 10;        // 10 = # of ligand-sidechain contacts      (protein - ligand only)
     public static final Integer LL = 11;        // 11 = # of ligand-ligand contacts         (ligand - ligand only)
-    public static final Integer DISULFIDE = 12;        // 12 = # of disulfide bridges 
+    public static final Integer DISULFIDE = 12;        // 12 = # of disulfide bridges
+    public static final Integer IHB = 13;       // 13 = # of interchain H-bridge contacts 1, N=>O
+    public static final Integer IBH = 14;       // 14 = # of interchain H-bridge contacts, O=>N
+    public static final Integer IVDW = 15;      // 15 = # of interchain van der Waals interactions
+    public static final Integer ISS = 16;       // 16 = # of interchain disulfide bridges
+    public static final Integer IPI = 17;       // 17 = # of interchain pi-effects
+    public static final Integer ISB = 18;       // 18 = # of interchain salt bridges
     
     
     // The different values in 'XY' vs 'YX' are only produced by the the sequential order of the
