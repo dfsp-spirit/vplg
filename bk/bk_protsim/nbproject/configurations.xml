@@ -8,6 +8,8 @@
       <itemPath>BronKerbosch.h</itemPath>
       <itemPath>GMLptglProteinParser.h</itemPath>
       <itemPath>Graph.h</itemPath>
+      <itemPath>MultAlign.h</itemPath>
+      <itemPath>Mult_Output.h</itemPath>
       <itemPath>PG_Output.h</itemPath>
       <itemPath>ProductGraph.h</itemPath>
       <itemPath>common.h</itemPath>
@@ -22,9 +24,12 @@
       <itemPath>BK_Output.cpp</itemPath>
       <itemPath>BronKerbosch.cpp</itemPath>
       <itemPath>GMLptglProteinParser.cpp</itemPath>
+      <itemPath>MultAlign.cpp</itemPath>
+      <itemPath>Mult_Output.cpp</itemPath>
       <itemPath>PG_Output.cpp</itemPath>
       <itemPath>ProductGraph.cpp</itemPath>
-      <itemPath>main.cpp</itemPath>
+      <itemPath>mainmult.cpp</itemPath>
+      <itemPath>mainpair.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -98,6 +103,14 @@
       </item>
       <item path="Graph.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="MultAlign.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="MultAlign.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Mult_Output.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Mult_Output.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="PG_Output.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="PG_Output.h" ex="false" tool="3" flavor2="0">
@@ -164,7 +177,7 @@
           </linkerLibItems>
         </linkerTool>
       </folder>
-      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      <item path="mainmult.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="tests/Test_BK_Output.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -225,6 +238,14 @@
       </item>
       <item path="Graph.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="MultAlign.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="MultAlign.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="Mult_Output.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="Mult_Output.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="PG_Output.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="PG_Output.h" ex="false" tool="3" flavor2="0">
@@ -291,7 +312,9 @@
           </linkerLibItems>
         </linkerTool>
       </folder>
-      <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      <item path="mainmult.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="mainpair.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="tests/Test_BK_Output.cpp" ex="false" tool="1" flavor2="0">
       </item>

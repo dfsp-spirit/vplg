@@ -38,9 +38,12 @@ OBJECTFILES= \
 	${OBJECTDIR}/BK_Output.o \
 	${OBJECTDIR}/BronKerbosch.o \
 	${OBJECTDIR}/GMLptglProteinParser.o \
+	${OBJECTDIR}/MultAlign.o \
+	${OBJECTDIR}/Mult_Output.o \
 	${OBJECTDIR}/PG_Output.o \
 	${OBJECTDIR}/ProductGraph.o \
-	${OBJECTDIR}/main.o
+	${OBJECTDIR}/mainmult.o \
+	${OBJECTDIR}/mainpair.o
 
 # Test Directory
 TESTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}/tests
@@ -91,6 +94,16 @@ ${OBJECTDIR}/GMLptglProteinParser.o: GMLptglProteinParser.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/GMLptglProteinParser.o GMLptglProteinParser.cpp
 
+${OBJECTDIR}/MultAlign.o: MultAlign.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/MultAlign.o MultAlign.cpp
+
+${OBJECTDIR}/Mult_Output.o: Mult_Output.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Mult_Output.o Mult_Output.cpp
+
 ${OBJECTDIR}/PG_Output.o: PG_Output.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
@@ -101,10 +114,15 @@ ${OBJECTDIR}/ProductGraph.o: ProductGraph.cpp
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ProductGraph.o ProductGraph.cpp
 
-${OBJECTDIR}/main.o: main.cpp 
+${OBJECTDIR}/mainmult.o: mainmult.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/mainmult.o mainmult.cpp
+
+${OBJECTDIR}/mainpair.o: mainpair.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/mainpair.o mainpair.cpp
 
 # Subprojects
 .build-subprojects:
@@ -215,6 +233,32 @@ ${OBJECTDIR}/GMLptglProteinParser_nomain.o: ${OBJECTDIR}/GMLptglProteinParser.o 
 	    ${CP} ${OBJECTDIR}/GMLptglProteinParser.o ${OBJECTDIR}/GMLptglProteinParser_nomain.o;\
 	fi
 
+${OBJECTDIR}/MultAlign_nomain.o: ${OBJECTDIR}/MultAlign.o MultAlign.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/MultAlign.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O2 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/MultAlign_nomain.o MultAlign.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/MultAlign.o ${OBJECTDIR}/MultAlign_nomain.o;\
+	fi
+
+${OBJECTDIR}/Mult_Output_nomain.o: ${OBJECTDIR}/Mult_Output.o Mult_Output.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/Mult_Output.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O2 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/Mult_Output_nomain.o Mult_Output.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/Mult_Output.o ${OBJECTDIR}/Mult_Output_nomain.o;\
+	fi
+
 ${OBJECTDIR}/PG_Output_nomain.o: ${OBJECTDIR}/PG_Output.o PG_Output.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	@NMOUTPUT=`${NM} ${OBJECTDIR}/PG_Output.o`; \
@@ -241,17 +285,30 @@ ${OBJECTDIR}/ProductGraph_nomain.o: ${OBJECTDIR}/ProductGraph.o ProductGraph.cpp
 	    ${CP} ${OBJECTDIR}/ProductGraph.o ${OBJECTDIR}/ProductGraph_nomain.o;\
 	fi
 
-${OBJECTDIR}/main_nomain.o: ${OBJECTDIR}/main.o main.cpp 
+${OBJECTDIR}/mainmult_nomain.o: ${OBJECTDIR}/mainmult.o mainmult.cpp 
 	${MKDIR} -p ${OBJECTDIR}
-	@NMOUTPUT=`${NM} ${OBJECTDIR}/main.o`; \
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/mainmult.o`; \
 	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
 	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
 	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
 	then  \
 	    ${RM} "$@.d";\
-	    $(COMPILE.cc) -O2 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main_nomain.o main.cpp;\
+	    $(COMPILE.cc) -O2 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/mainmult_nomain.o mainmult.cpp;\
 	else  \
-	    ${CP} ${OBJECTDIR}/main.o ${OBJECTDIR}/main_nomain.o;\
+	    ${CP} ${OBJECTDIR}/mainmult.o ${OBJECTDIR}/mainmult_nomain.o;\
+	fi
+
+${OBJECTDIR}/mainpair_nomain.o: ${OBJECTDIR}/mainpair.o mainpair.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	@NMOUTPUT=`${NM} ${OBJECTDIR}/mainpair.o`; \
+	if (echo "$$NMOUTPUT" | ${GREP} '|main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T main$$') || \
+	   (echo "$$NMOUTPUT" | ${GREP} 'T _main$$'); \
+	then  \
+	    ${RM} "$@.d";\
+	    $(COMPILE.cc) -O2 -Dmain=__nomain -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/mainpair_nomain.o mainpair.cpp;\
+	else  \
+	    ${CP} ${OBJECTDIR}/mainpair.o ${OBJECTDIR}/mainpair_nomain.o;\
 	fi
 
 # Run Test Targets
