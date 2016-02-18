@@ -214,7 +214,13 @@ public class ResContactInfo {
     public Integer getNumContactsLC() { return(numPairContacts[LC]); }
     public Integer getNumContactsLL() { return(numPairContacts[LL]); }
     public Integer getNumContactsDisulfide() { return(numPairContacts[DISULFIDE]); }
-
+    public Integer getNumContactsIHB() {return(numPairContacts[IHB]); }
+    public Integer getNumContactsIBH() {return(numPairContacts[IBH]); }
+    public Integer getNumContactsIVDW() {return(numPairContacts[IVDW]); }
+    public Integer getNumContactsISS() {return(numPairContacts[ISS]); }
+    public Integer getNumContactsIPI() {return(numPairContacts[IPI]); }
+    public Integer getNumContactsISB() {return(numPairContacts[ISB]); }
+    
     // DEBUG only
     public Residue getResA() { return(resA); }
     public Residue getResB() { return(resB); }
