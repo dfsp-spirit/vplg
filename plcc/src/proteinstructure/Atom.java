@@ -10,6 +10,7 @@ package proteinstructure;
 
 // imports
 
+import java.util.HashMap;
 import proteingraphs.Position3D;
 import plcc.Settings;
 
@@ -188,6 +189,149 @@ public class Atom implements java.io.Serializable {
         return("[Atom] #" + this.pdbAtomNumber + " NAME=" + this.name + " CS=" + this.chemSym + " Type=" + this.type + " Chain=" + this.chainID + " ResDssp=" + this.getResidue().getDsspResNum() + " ResPDB=" + this.getResidue().getUniquePDBName() + " Coords=" + getCoordString() + " AltLoc='" + this.altLoc + "'.");
     }
 
+
+    /**
+     * Checks whether a vdW contact exists to another atom (vdW radii overlap).
+     * In contrast to atomContactTo() this method considers different vdW radii
+     * for different atoms. This method is used for the calculation of the
+     * alternative contact model.
+     * @param a is the atom to which a contact is checked.
+     * @return True if contact exists, otherwise False.
+     */
+    public Boolean vdwAtomContactTo (Atom a) {
+        HashMap<String, Double> vdwRadii = new HashMap<>();
+        vdwRadii.put("H", 12.0);
+        vdwRadii.put("He", 14.0);
+        vdwRadii.put("Li", 18.1);
+        vdwRadii.put("Be", 19.8);
+        vdwRadii.put("B", 19.1);
+        vdwRadii.put("C", 17.0);
+        vdwRadii.put("N", 15.5);
+        vdwRadii.put("O", 15.2);
+        vdwRadii.put("F", 14.7);
+        vdwRadii.put("Ne", 15.4);
+        vdwRadii.put("Na", 22.7);
+        vdwRadii.put("Mg", 17.3);
+        vdwRadii.put("Al", 22.5);
+        vdwRadii.put("Si", 22.2);
+        vdwRadii.put("P", 18.0);
+        vdwRadii.put("S", 18.0);
+        vdwRadii.put("Cl", 17.5);
+        vdwRadii.put("Ar", 17.6);
+        vdwRadii.put("K", 27.5);
+        vdwRadii.put("Ca", 26.2);
+        vdwRadii.put("Sc", 25.8);
+        vdwRadii.put("Ti", 24.6);
+        vdwRadii.put("V", 24.2);
+        vdwRadii.put("Cr", 24.5);
+        vdwRadii.put("Mn", 24.5);
+        vdwRadii.put("Fe", 24.4);
+        vdwRadii.put("Co", 24.0);
+        vdwRadii.put("Ni", 16.3);
+        vdwRadii.put("Cu", 14.0);
+        vdwRadii.put("Zn", 13.9);
+        vdwRadii.put("Ga", 18.7);
+        vdwRadii.put("Ge", 22.9);
+        vdwRadii.put("As", 18.5);
+        vdwRadii.put("Se", 19.0);
+        vdwRadii.put("Br", 18.3);
+        vdwRadii.put("Kr", 20.2);
+        vdwRadii.put("Rb", 32.1);
+        vdwRadii.put("Sr", 28.4);
+        vdwRadii.put("Y", 27.5);
+        vdwRadii.put("Zr", 25.2);
+        vdwRadii.put("Nb", 25.6);
+        vdwRadii.put("Mo", 24.5);
+        vdwRadii.put("Tc", 24.4);
+        vdwRadii.put("Ru", 24.6);
+        vdwRadii.put("Rh", 24.4);
+        vdwRadii.put("Pd", 16.3);
+        vdwRadii.put("Ag", 17.2);
+        vdwRadii.put("Cd", 16.2);
+        vdwRadii.put("In", 19.3);
+        vdwRadii.put("Sn", 21.7);
+        vdwRadii.put("Sb", 22.0);
+        vdwRadii.put("Te", 20.0);
+        vdwRadii.put("I", 19.8);
+        vdwRadii.put("Xe", 21.6);
+        vdwRadii.put("Cs", 34.8);
+        vdwRadii.put("Ba", 30.3);
+        vdwRadii.put("La", 29.8);
+        vdwRadii.put("Ce", 28.8);
+        vdwRadii.put("Pr", 29.2);
+        vdwRadii.put("Nd", 29.5);
+        vdwRadii.put("Sm", 29.0);
+        vdwRadii.put("Eu", 28.7);
+        vdwRadii.put("Gd", 28.3);
+        vdwRadii.put("Tb", 27.9);
+        vdwRadii.put("Dy", 28.7);
+        vdwRadii.put("Ho", 28.1);
+        vdwRadii.put("Er", 28.3);
+        vdwRadii.put("Tm", 27.9);
+        vdwRadii.put("Yb", 28.0);
+        vdwRadii.put("Lu", 27.4);
+        vdwRadii.put("Hf", 26.3);
+        vdwRadii.put("Ta", 25.3);
+        vdwRadii.put("W", 25.7);
+        vdwRadii.put("Re", 24.9);
+        vdwRadii.put("Os", 24.8);
+        vdwRadii.put("Ir", 24.1);
+        vdwRadii.put("Pt", 17.2);
+        vdwRadii.put("Au", 16.6);
+        vdwRadii.put("Hg", 17.0);
+        vdwRadii.put("Tl", 19.6);
+        vdwRadii.put("Pb", 20.2);
+        vdwRadii.put("Bi", 23.0);
+        vdwRadii.put("Ac", 28.0);
+        vdwRadii.put("Th", 29.3);
+        vdwRadii.put("Pa", 28.8);
+        vdwRadii.put("U", 18.6);
+        vdwRadii.put("Np", 28.2);
+        vdwRadii.put("Pu", 28.1);
+        vdwRadii.put("Am", 28.3);
+        vdwRadii.put("Cm", 30.5);
+        vdwRadii.put("Bk", 34.0);
+        vdwRadii.put("Cf", 30.5);
+        vdwRadii.put("Es", 27.0);
+        
+        
+        Double atomRadiusThis;
+        Double atomRadiusOther;
+        
+        Double radLig = Settings.getInteger("plcc_I_lig_atom_radius").doubleValue();
+
+        if(this.isLigandAtom()) {
+            atomRadiusThis = radLig;
+        }
+        else {
+            atomRadiusThis = vdwRadii.get(this.chemSym.replaceAll("\\s+","")); //replaceAll is needed to delete whitespace in front of the chemSym; otherwise you cannot look it up in the hashmap
+        }
+        
+        if(a.isLigandAtom()) {
+            atomRadiusOther = radLig;
+        }
+        else {
+            atomRadiusOther = vdwRadii.get(a.chemSym.replaceAll("\\s+",""));
+        }
+
+
+        Double dist = this.distToAtom(a).doubleValue();
+        Double maxDist = atomRadiusThis + atomRadiusOther;
+
+        //TODO: - check whether dist is <0? Why has it been removed in atomContactTo()?
+        if( dist < maxDist) {
+            // Contact!
+            //System.out.println("        ++++ CONTACT between atoms " + this.pdbAtomNumber + " and " + a.getPdbAtomNum() + " in dist " + dist + " (maxDist is " + maxDist + ").");
+            return(true);
+        }
+        else {
+            // No contact
+            //System.out.println("        ---- No contact between atoms " + this.pdbAtomNumber + " and " + a.getPdbAtomNum() + " in dist " + dist + " (maxDist is " + maxDist + ").");
+            return(false);
+        }
+    }
+    
+    
     /**
      * Compares two Atoms via their PDB atom number.
      * @param other the other atom
