@@ -23,6 +23,7 @@ import tools.DP;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.io.*;
+import java.util.List;
 import java.util.Scanner;
 import resultcontainers.ProteinResults;
 import plcc.Settings;
@@ -295,7 +296,20 @@ public class FileParser {
         return s_sulfurBridges;
     }
 
-
+    
+    public static ArrayList<ArrayList<Integer>> getInterchainSulfurBridges(List<Residue> res) {
+        ArrayList<ArrayList<Integer>> interchainSulfurBridges = new ArrayList<ArrayList<Integer>>();
+        HashMap<Character, ArrayList<Integer>> sulfurBridges = FileParser.getSulfurBridges();
+        
+        for(ArrayList<Integer> value : sulfurBridges.values()) {
+            if(!res.get(value.get(0)).getChainID().equals(res.get(value.get(1)).getChainID())) {
+                interchainSulfurBridges.add(value);
+            }
+        }
+        return(interchainSulfurBridges);
+    }
+    
+    
     /**
      * Parses all data, goes through all the lines and calls the appropriate function to handle each line.
      * @return ignore
