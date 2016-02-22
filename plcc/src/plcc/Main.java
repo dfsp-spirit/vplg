@@ -4490,9 +4490,55 @@ public class Main {
      * @return A list of ResContactInfo objects, each representing a pair of residues that are in contact.
      */
     public static ArrayList<ResContactInfo> calculateAllContactsAlternativeModel(List<Residue> res) {
-        //throw new java.lang.UnsupportedOperationException("Not implemented yet!");
-        return calculateAllContacts(res);
+
+        System.out.println("\n *** Calculation of interchain contacts. Still WIP! ***");
+        
+        Residue a, b;
+        Integer rs = res.size();
+        
+        Integer numResContactsChecked, numResContactsPossible, numResContactsImpossible;
+        numResContactsChecked = numResContactsPossible = numResContactsImpossible = 0;
+
+        ResContactInfo rci;
+        ArrayList<ResContactInfo> contactInfo = new ArrayList<ResContactInfo>();
+        
+
+        for(Integer i = 0; i < rs; i++) {
+            a = res.get(i);
+
+            for(Integer j = i + 1; j < rs; j++) {
+                b = res.get(j);
+                numResContactsChecked++;
+
+                
+                // We only need to check on atom level if the center spheres overlap
+                //if(a.contactPossibleWithResidue(b)) {                                        
+                if(a.interchainContactPossibleWithResidue(b)) {                                        
+                    numResContactsPossible++;
+
+                    rci = calculateAtomContactsBetweenResiduesAlternativeModel(a, b);
+                                      
+                    if( rci != null) {
+                        // There were atoms contacts!
+                        contactInfo.add(rci);
+                    }
+                }
+                else {
+                    numResContactsImpossible++;
+                    //System.out.println("    DSSP res# " + a.getDsspResNum() + "/" + b.getDsspResNum() + ": No atom contact possible, skipping atom level checks.");
+                }
+            }
+        }
+
+        if(! FileParser.silent) {
+            System.out.println("  Checked " + numResContactsChecked + " contacts for " + rs + " residues: " + numResContactsPossible + " possible, " + contactInfo.size() + " found, " + numResContactsImpossible + " impossible (collison spheres check).");
+        }
+        
+            
+        //System.out.println(getPymolSelectionScript(contactInfo));
+        return(contactInfo);
     }
+    
     
     /**
      * Calculates all contacts between the residues in res.
@@ -4584,7 +4630,7 @@ public class Main {
                 else {
                     numResContactsImpossible++;
                     //System.out.println("    DSSP res# " + a.getDsspResNum() + "/" + b.getDsspResNum() + ": No atom contact possible, skipping atom level checks.");
-
+                       
                     // Further speedup: If the distance of a residue to another Residue is very large we
                     //  may be able to skip some of the next residues (I. Koch):
                     //  If the distance between them is
@@ -5120,6 +5166,364 @@ public class Main {
         return(result);         // This is null if no contact was detected
         
     }
+ 
+    
+    /**
+     * Alternative model to calculate the atom contacts between residue 'a' and 'b'.
+     * This alternative model is used to calculate interchain contacts between
+     * atoms that are used to detect protein-protein interactions.
+     * @param a one of the residues of the residue pair
+     * @param b one of the residues of the residue pair
+     * @return A ResContactInfo object with information on the atom contacts between 'a' and 'b'.
+     */
+    public static ResContactInfo calculateAtomContactsBetweenResiduesAlternativeModel(Residue a, Residue b) {
+
+        ArrayList<Atom> atoms_a = a.getAtoms();
+        ArrayList<Atom> atoms_b = b.getAtoms();
+
+        Atom x, y;
+        Integer dist = null;
+        Integer CAdist = a.resCenterDistTo(b);
+        ResContactInfo result = null;
+
+
+        Integer[] numPairContacts = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES + 7]; // +7 because of added experimental contact types for alternative model
+        // The positions in the numPairContacts array hold the number of contacts of each type for a pair of residues:
+        // Some cheap vars to make things easier to understand (a replacement for #define):
+        /*
+        Integer TT = 0;         //  0 = total number of contacts            (all residue type combinations)
+        Integer BB = 1;         //  1 = # of backbone-backbone contacts     (protein - protein only)
+        Integer CB = 2;         //  2 = # of sidechain-backbone contacts    (protein - protein only)
+        Integer BC = 3;         //  3 = # of backbone-sidechain contacts    (protein - protein only)
+        Integer CC = 4;         //  4 = # of sidechain-sidechain contacts   (protein - protein only)
+        Integer HB = 5;         //  5 = # of H-bridge contacts 1, N=>0      (protein - protein only)
+        Integer BH = 6;         //  6 = # of H-bridge contacts 2, 0=>N      (protein - protein only)
+        Integer BL = 7;         //  7 = # of backbone-ligand contacts       (protein - ligand only)
+        Integer LB = 8;         //  8 = # of ligand-backbone contacts       (protein - ligand only)
+        Integer CL = 9;         //  9 = # of sidechain-ligand contacts      (protein - ligand only)
+        Integer LC = 10;        // 10 = # of ligand-sidechain contacts      (protein - ligand only)
+        Integer LL = 11;        // 11 = # of ligand-ligand contacts         (ligand - ligand only)
+        Integer DISULFIDE = 12  // 12 = # of disulfide bridges
+        ---------------- alternative model contact types ----------------------
+        Integer IHB = 13        // 13 = # of interchain H-bridge contacts 1, N=>O
+        Integer IBH = 14        // 14 = # of interchain H-bridge contacts 2, O=>N
+        Integer IVDW = 15       // 15 = # of interchain van der Waals interactions
+        Integer ISS = 16        // 16 = # of interchain disulfide bridges
+        Integer IPI = 17        // 17 = # of interchain pi-effects
+        Integer ISB = 18        // 18 = # of interchain salt bridges
+        */
+
+
+        Integer numTotalLigContactsPair = 0;
+
+
+
+        Integer[] minContactDistances = new Integer[numPairContacts.length];
+        // Holds the minimal distances of contacts of the appropriate type (see numPairContacts, index 0 is unused)
+
+        Integer[] contactAtomNumInResidueA = new Integer[numPairContacts.length];
+        // Holds the number Atom x has in its residue a for the contact with minimal distance of that type.
+        // See minContactDistances and numPairContacts; index 0 is unused; index 5 + 6 are also unused (atom is obvious + always the same)
+
+        Integer[] contactAtomNumInResidueB = new Integer[numPairContacts.length];
+        // Holds the number Atom y has in its residue b for the contact with minimal distance of that type.
+        // See minContactDistances and numPairContacts; index 0 is unused; index 5 + 6 are also unused (atom is obvious + always the same)
+        
+
+        for(Integer k = 0; k < numPairContacts.length; k++) {      // init all arrays
+            numPairContacts[k] = 0;
+            minContactDistances[k] = -1;    // We are looking for the smallest distance >= 0 in this function so do NOT set '0' as the initial value or everything will get fucked up!
+            contactAtomNumInResidueA[k] = -1;   // We HAVE to assign '-1', NOT any other value here! See comments below for details.
+            contactAtomNumInResidueB[k] = -1;   // We HAVE to assign '-1', NOT any other value here! See comments below for details.
+            // The initial value of '-1' is required for the atom index arrays because our index
+            // starts at '0', but geom_neo treads a '0' in a line of <pdbid>.geo as 'no contact' because
+            // it starts its index at '1'.
+            // This problem is solved by the functions in ResContactInfo: they return (our_index + 1). This
+            // means that:
+            //   1) If no contact was detected, our_index is -1 and they return 0, which means 'no contact' to geom_neo.
+            //   2) If a contact was detected, our_index is converted to the geom_neo index. :)
+        }
+
+        // We assume that the first 5 atoms (index 0..4) in a residue that is an AA are backbone atoms,
+        //  while all other (6..END) are assumed to be side chainName atoms.
+        //  The backbone atoms should have atom names ' N  ', ' CA ', ' C  ' and ' O  ' but we don't check
+        //  this atm because geom_neo doesn't do that and we want to stay compatible.
+        //  Of course, all of this only makes sense for resides that are AAs, not for ligands. We care for that.
+        Integer numOfLastBackboneAtomInResidue = 4;
+        Integer atomIndexOfBackboneN = 0;       // backbone nitrogen atom index
+        Integer atomIndexOfBackboneO = 3;       // backbone oxygen atom index
+
+        Integer aIntID = a.getInternalAAID();     // Internal AA ID (ALA=1, ARG=2, ...)
+        Integer bIntID = b.getInternalAAID();
+        Integer statAtomIDi, statAtomIDj;
+
+        
+        
+        // Add contact type interchain disulfide bridge.
+        // Interchain disulfide bridges are parsed from the the DSSP file itself earlier.
+        // This adds the detected disulfide bridge contacts to the statistics.
+        HashMap<Character, ArrayList<Integer>> interchainSB = FileParser.getInterchainSulfurBridges();
+        
+        // Check for the current residue pair if there is a sulfur bridge between them.
+        // If that's the case, then add this contact to the statistics.
+        for(ArrayList<Integer> valuePair : interchainSB.values()) {
+                if((a.getDsspResNum() == valuePair.get(0) && b.getDsspResNum() == valuePair.get(1)) || (a.getDsspResNum() == valuePair.get(1) && b.getDsspResNum() == valuePair.get(0))) {
+                    numPairContacts[ResContactInfo.TT]++;   // update total number of contacts for this residue pair
+                    numPairContacts[ResContactInfo.ISS]++;   // update disulfide bridge number of contacts for this residue pair
+                }
+        }
+        
+
+        // Iterate through all atoms of the two residues and check contacts for all pairs
+        outerloop:
+        for(Integer i = 0; i < atoms_a.size(); i++) {
+            
+            
+            if(i >= MAX_ATOMS_PER_AA && a.isAA()) {
+                DP.getInstance().w("calculateAtomContactsBetweenResidues(): The AA residue " + a.getUniquePDBName() + " of type " + a.getName3() + " has more atoms than allowed, skipping atom #" + i + ".");
+                break;
+            }
+            
+            x = atoms_a.get(i);
+
+            innerloop:
+            for(Integer j = 0; j < atoms_b.size(); j++) {
+                                
+                if(j >= MAX_ATOMS_PER_AA && b.isAA()) {
+                    DP.getInstance().w("calculateAtomContactsBetweenResidues(): The AA residue " + b.getUniquePDBName() + " of type " + b.getName3() + " has more atoms than allowed, skipping atom #" + j + ".");
+                    //continue;
+                    break outerloop;
+                }
+                
+                y = atoms_b.get(j);
+                                
+
+                // Check whether a contact exist. If so, classify it. Note that the code of geom_neo works based on the
+                //  position of an atom in the atom list of its residue (e.g., it assumes that the 2nd atom of an AA is
+                //  the C alpha atom. While this seems to hold for many PDB files it will produce wrong results if atoms
+                //  are missing from the PDB file or other weird stuff is going on in there.
+
+                //System.out.println("      Checking atom pair " + x.getChemSym() + " and " + y.getChemSym() + " with residue index " + i + " and " + j + " of residues " + a.getFancyName() + " and " + b.getFancyName() + ".");
+                //System.out.println("        " + x);
+                //System.out.println("        " + y);
+
+                dist = x.distToAtom(y);
+                
+                
+                //TODO: - implement the new different contact types (IHB, IBH, IPI, ISB)
+                if(x.vdwAtomContactTo(y)) {             // If a contact is detected, Atom.vdwAtomContactTo() returns true
+
+                    // The van der Waals radii spheres overlap, contact found.
+                    numPairContacts[ResContactInfo.TT]++;   // update total number of contacts for this residue pair
+                    
+                    // DEBUG
+                    //System.out.println("DEBUG: Atom contact in distance " + dist + " between atom " + x + " and " + y + ".");
+
+
+                    // Update contact statistics.
+                    statAtomIDi = i + 1;    // The field '0' is used for all contacts and we need to follow geom_neo conventions so we start the index at 1 instead of 0.
+                    statAtomIDj = j + 1;
+                    if(x.isLigandAtom()) { statAtomIDi = 1; }       // Different ligands can have different numbers of atoms and separating them just makes no sense. We assign all contacts to the first atom.
+                    if(y.isLigandAtom()) { statAtomIDj = 1; }
+                    
+                    try {
+
+                        contact[0][0][0][0]++;                 // update global total number of contacts
+                        contact[aIntID][bIntID][0][0]++;       // contacts AA type a <-> AA type b
+                        contact[bIntID][aIntID][0][0]++;       // contacts AA type b <-> AA type a
+
+
+                        //System.out.println("DEBUG: a=" + aIntID + ",b=" + bIntID + ",i=" + statAtomIDi + ",j=" + statAtomIDj + ". Residues=" + a.getFancyName() + "," + b.getFancyName() + ".");
+                        contact[aIntID][bIntID][statAtomIDi][statAtomIDj]++;       // contacts of atoms of AAs
+                        contact[bIntID][aIntID][statAtomIDj][statAtomIDi]++;
+
+                        contact[aIntID][bIntID][statAtomIDi][0]++;                 // total number of contacts for atom x of this AA
+                        contact[bIntID][aIntID][0][statAtomIDi]++;
+
+                        contact[aIntID][bIntID][statAtomIDj][0]++;                 // total number of contacts for atom x of this AA
+                        contact[bIntID][aIntID][0][statAtomIDj]++;
+                    } catch(java.lang.ArrayIndexOutOfBoundsException e) {
+                        //DP.getInstance().w("calculateAtomContactsBetweenResidues():Contact statistics array out of bounds. Residues with excessive number of atoms detected: " + e.getMessage() + ".");
+                        DP.getInstance().w("calculateAtomContactsBetweenResidues(): Atom count for residues too high (" + e.getMessage() + "), ignoring contacts for these atoms (aIntID=" + aIntID + ", bIntID=" + bIntID + ", statAtomIDi=" + statAtomIDi + ", statAtomIDj=" + statAtomIDj + ").");
+                        continue;
+                    }
+                    
+                    // Determine the contact type.                    
+                    if(x.isProteinAtom() && y.isProteinAtom()) {
+                        // *************************** protein - protein contact *************************
+
+
+                        // Check the exact contact type
+                        if(i <= numOfLastBackboneAtomInResidue && j <= numOfLastBackboneAtomInResidue) {
+                            // to be precise, this is a backbone - backbone contact
+                            numPairContacts[ResContactInfo.BB]++;
+
+                            // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
+                            if((minContactDistances[ResContactInfo.BB] < 0) || dist < minContactDistances[ResContactInfo.BB]) {
+                                minContactDistances[ResContactInfo.BB] = dist;
+                                contactAtomNumInResidueA[ResContactInfo.BB] = i;
+                                contactAtomNumInResidueB[ResContactInfo.BB] = j;
+                            }
+
+                        }
+                        else if(i > numOfLastBackboneAtomInResidue && j <= numOfLastBackboneAtomInResidue) {
+                            // to be precise, this is a chainName - backbone contact
+                            numPairContacts[ResContactInfo.CB]++;
+
+                            // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
+                            if((minContactDistances[ResContactInfo.CB] < 0) || dist < minContactDistances[ResContactInfo.CB]) {
+                                minContactDistances[ResContactInfo.CB] = dist;
+                                contactAtomNumInResidueA[ResContactInfo.CB] = i;
+                                contactAtomNumInResidueB[ResContactInfo.CB] = j;
+                            }
+
+                        }
+                        else if(i <= numOfLastBackboneAtomInResidue && j > numOfLastBackboneAtomInResidue) {
+                            // to be precise, this is a backbone - chainName contact
+                            numPairContacts[ResContactInfo.BC]++;
+
+                            // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
+                            if((minContactDistances[ResContactInfo.BC] < 0) || dist < minContactDistances[ResContactInfo.BC]) {
+                                minContactDistances[ResContactInfo.BC] = dist;
+                                contactAtomNumInResidueA[ResContactInfo.BC] = i;
+                                contactAtomNumInResidueB[ResContactInfo.BC] = j;
+                            }
+                        }
+                        else if(i > numOfLastBackboneAtomInResidue && j > numOfLastBackboneAtomInResidue) {
+                            // to be precise, this is a chainName - chainName contact
+                            numPairContacts[ResContactInfo.CC]++;          // 'C' instead of 'S' for side chainName pays off
+
+                            // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
+                            if((minContactDistances[ResContactInfo.CC] < 0) || dist < minContactDistances[ResContactInfo.CC]) {
+                                minContactDistances[ResContactInfo.CC] = dist;
+                                contactAtomNumInResidueA[ResContactInfo.CC] = i;
+                                contactAtomNumInResidueB[ResContactInfo.CC] = j;
+                            }
+                        }
+                        else {
+                            System.err.println("ERROR: Congrats, you found a bug in the atom contact type determination code (res " + a.getPdbResNum() + " atom " + i + " / res " + b.getPdbResNum() + " atom " + j + ").");
+                            System.err.println("ERROR: Atom types are: i (PDB atom #" + x.getPdbAtomNum() + ") => " + x.getAtomType() + ", j (PDB atom #" + y.getPdbAtomNum() + ") => " + y.getAtomType() + ".");
+                            Main.doExit(1);
+                        }
+                        
+                        //TODO: - add new H-bridge calculation to be more precise and include H-bridges with/between sidechains
+                        // Check for H bridges separately
+                        if(i.equals(atomIndexOfBackboneN) && j.equals(atomIndexOfBackboneO)) {
+                            // H bridge from backbone atom 'N' of residue a to backbone atom 'O' of residue b.
+                            numPairContacts[ResContactInfo.HB]++;
+                            // There can only be one of these so if we found it, simply update the distance.
+                            minContactDistances[ResContactInfo.HB] = dist;
+                        }
+
+                        if(i.equals(atomIndexOfBackboneO) && j.equals(atomIndexOfBackboneN)) {
+                            // H bridge from backbone atom 'O' of residue a to backbone atom 'N' of residue b.
+                            numPairContacts[ResContactInfo.BH]++;
+                            // There can only be one of these so if we found it, simply update the distance.
+                            minContactDistances[ResContactInfo.BH] = dist;
+                        }
+                    }
+                    
+                    else if(x.isProteinAtom() && y.isLigandAtom()) {
+                        // *************************** protein - ligand contact *************************
+                        numTotalLigContactsPair++;
+
+                        // Check the exact contact type
+                        if(i <= numOfLastBackboneAtomInResidue) {
+                            // to be precise, this is a backbone - ligand contact
+                            numPairContacts[ResContactInfo.BL]++;
+
+                            // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
+                            if((minContactDistances[ResContactInfo.BL] < 0) || dist < minContactDistances[ResContactInfo.BL]) {
+                                minContactDistances[ResContactInfo.BL] = dist;
+                                contactAtomNumInResidueA[ResContactInfo.BL] = i;
+                                contactAtomNumInResidueB[ResContactInfo.BL] = j;
+                            }
+
+                        }
+                        else {
+                            // to be precise, this is a side chainName - ligand contact
+                            numPairContacts[ResContactInfo.CL]++;
+
+                            // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
+                            if((minContactDistances[ResContactInfo.CL] < 0) || dist < minContactDistances[ResContactInfo.CL]) {
+                                minContactDistances[ResContactInfo.CL] = dist;
+                                contactAtomNumInResidueA[ResContactInfo.CL] = i;
+                                contactAtomNumInResidueB[ResContactInfo.CL] = j;
+                            }
+                        }
+
+                    }
+                    else if(x.isLigandAtom() && y.isProteinAtom()) {
+                        // *************************** ligand - protein contact *************************
+                        numTotalLigContactsPair++;
+
+                        // Check the exact contact type
+                        if(j <= numOfLastBackboneAtomInResidue) {
+                            // to be precise, this is a ligand - backbone contact
+                            numPairContacts[ResContactInfo.LB]++;
+
+                            // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
+                            if((minContactDistances[ResContactInfo.LB] < 0) || dist < minContactDistances[ResContactInfo.LB]) {
+                                minContactDistances[ResContactInfo.LB] = dist;
+                                contactAtomNumInResidueA[ResContactInfo.LB] = i;
+                                contactAtomNumInResidueB[ResContactInfo.LB] = j;
+                            }
+
+                        }
+                        else {
+                            // to be precise, this is a ligand - side chainName contact
+                            numPairContacts[ResContactInfo.LC]++;
+
+                            // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
+                            if((minContactDistances[ResContactInfo.LC] < 0) || dist < minContactDistances[ResContactInfo.LC]) {
+                                minContactDistances[ResContactInfo.LC] = dist;
+                                contactAtomNumInResidueA[ResContactInfo.LC] = i;
+                                contactAtomNumInResidueB[ResContactInfo.LC] = j;
+                            }
+                        }
+                            
+                    }
+                    else if(x.isLigandAtom() && y.isLigandAtom()) {
+                        // *************************** ligand - ligand contact *************************
+                        numTotalLigContactsPair++;
+
+                        // no choices here, ligands have no sub type
+                        numPairContacts[ResContactInfo.LL]++;
+                        
+                        // update data if this is the first contact of this type or if it is better (smaller distance) than the old contact
+                        if((minContactDistances[ResContactInfo.LL] < 0) || dist < minContactDistances[ResContactInfo.LL]) {
+                            minContactDistances[ResContactInfo.LL] = dist;
+                            contactAtomNumInResidueA[ResContactInfo.LL] = i;
+                            contactAtomNumInResidueB[ResContactInfo.LL] = j;
+                        }
+                        
+
+                    }
+                    else {
+                        // *************************** unknown contact, wtf? *************************
+                        // This branch should never be hit because atoms of type OTHER are ignored while creating the list of Atom objects
+                        System.out.println("WARNING: One of the atoms " + x.getPdbAtomNum() + " and " + y.getPdbAtomNum() + " is of type UNKNOWN. Bug?");
+                    }                                                            
+                }                
+                else {
+                    // No atom contact for these 2 atoms, but there could be contacts between others
+                }
+            }
+        }
+
+
+        
+        // Iteration through all atoms of the two residues is done
+        if(numPairContacts[ResContactInfo.TT] > 0) {
+            result = new ResContactInfo(numPairContacts, minContactDistances, contactAtomNumInResidueA, contactAtomNumInResidueB, a, b, CAdist, numTotalLigContactsPair);
+        }
+        else {
+            result = null;
+        }
+        return(result);         // This is null if no contact was detected
+        
+       
+     }
 
 
     /**
@@ -6112,12 +6516,12 @@ public class Main {
 
         ResContactInfo c = null;
         // Select all residues of the protein that have ligand contacts
-
+        
         for (Integer i = 0; i < contacts.size(); i++) {
             c = contacts.get(i);
             if(c.getNumLigContactsTotal() > 0) {
                 // This is a ligand contact, add the residues to one of the lists depending on their type (ligand or protein residue)
-
+                
                 // Handle resA
                 if(c.getResA().isAA()) {
                     if( ! protRes.contains(c.getResA())) {
