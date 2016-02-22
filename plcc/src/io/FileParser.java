@@ -65,7 +65,12 @@ public class FileParser {
     // id (an arbitrary character, starting with 'a' for the first bridge usually). The list in the value part contains
     // the DSSP residue IDs of all residues which are part of the bridge (and thus should have length 2).
     static HashMap<Character, ArrayList<Integer>> s_sulfurBridges;
-
+    
+    // The list of interchain sulfur bridges from the DSSP file. The list structure is the same as for s_sulfurBridges.
+    static HashMap<Character, ArrayList<Integer>> s_interchainSulfurBridges;
+    // This list is needed to track if sulfur bridges span between to independent chains.
+    static HashMap<Character, String> s_interchainSulfurBridgesChainID;
+    
     static Boolean dataInitDone = false;
 
     static Integer curLineNumPDB = null;
@@ -296,17 +301,8 @@ public class FileParser {
         return s_sulfurBridges;
     }
 
-    
-    public static ArrayList<ArrayList<Integer>> getInterchainSulfurBridges(List<Residue> res) {
-        ArrayList<ArrayList<Integer>> interchainSulfurBridges = new ArrayList<ArrayList<Integer>>();
-        HashMap<Character, ArrayList<Integer>> sulfurBridges = FileParser.getSulfurBridges();
-        
-        for(ArrayList<Integer> value : sulfurBridges.values()) {
-            if(!res.get(value.get(0)).getChainID().equals(res.get(value.get(1)).getChainID())) {
-                interchainSulfurBridges.add(value);
-            }
-        }
-        return(interchainSulfurBridges);
+    public static HashMap<Character, ArrayList<Integer>> getInterchainSulfurBridges() {
+        return s_interchainSulfurBridges;
     }
     
     
@@ -1340,6 +1336,8 @@ public class FileParser {
 
         s_residues = new ArrayList<Residue>();
         s_sulfurBridges = new HashMap<Character, ArrayList<Integer>>();
+        s_interchainSulfurBridges = new HashMap<Character, ArrayList<Integer>>();
+        s_interchainSulfurBridgesChainID = new  HashMap<Character, String>();
         Residue r;
 
         for(Integer i = dsspDataStartLine - 1; i < dsspLines.size(); i++) {
@@ -1402,11 +1400,28 @@ public class FileParser {
                         if(s_sulfurBridges.containsKey(c)) {
                             // the sulfur bridge partner is already in there
                             (s_sulfurBridges.get(c)).add(dsspResNum);
+                            
+                            // Check whether its a interhcain sulfur bridge (different chain IDs)
+                            if(! s_interchainSulfurBridgesChainID.get(c).equals(dsspChainID)) {
+                                ArrayList<Integer> tmpInterchain = new ArrayList<Integer>();
+                                
+                                // Get the dsspResNum from the first residue of this interchain sulfur bridge
+                                tmpInterchain.add(s_sulfurBridges.get(c).get(0));
+                                // Also add the dsspResNum of the current (second) residue.
+                                tmpInterchain.add(dsspResNum);
+                                s_interchainSulfurBridges.put(c, tmpInterchain);
+                            }
+                            
+                            
                         } else {
                             // this is the first residue of the sulfur bridge pair
                             ArrayList<Integer> tmp = new ArrayList<Integer>();
                             tmp.add(dsspResNum);
                             s_sulfurBridges.put(c, tmp);
+                            
+                            // If its the first residue of the sulfur bridge save the chain this residue belongs to.
+                            // This will be used to check if the second residue is on the same change or not.
+                            s_interchainSulfurBridgesChainID.put(c, dsspChainID);
                         }
                     }
                 } catch (Exception e) {
