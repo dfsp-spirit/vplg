@@ -41,10 +41,11 @@ public:
     void saveInSimpleFormat(Graph& g); // save the edges of the graph to a file
     void saveABSGraphletCountsSummary(std::string graphName, std::vector<std::vector<int>> abs_counts, std::vector<float> labeled_counts);
     void saveNormalizedGraphletCountsSummary(std::string graphName, std::vector<std::vector<float>> norm_counts, std::vector<float> labeled_counts);
+    void save_norm_counts_csv(std::string pdb, std::vector<std::vector<float>> norm_counts, std::vector<float> lab_counts);
     void save_normalized_counts_as_matlab_variable(std::vector<std::vector<float>>,std::vector<float>);
     void save_absolute_counts_as_matlab_variable(std::vector<std::vector<int>>,std::vector<int>);
     void save_counts_in_nova_format(std::string,std::vector<std::vector<int>>);
-    void save_abs_counts_as_matlab_variable();
+    void save_abs_counts_as_matlab_variable();    
     void save_norm_counts_as_matlab_variable();
     void save_counts_as_json(std::string graphname, int num_vertices, int num_edges,std::vector<std::vector<int>> abs_counts, std::vector<std::vector<float>> rel_counts);
     void save_labeled_counts_as_json(std::string graphname, int num_vertices, int num_edges, std::unordered_map<std::string, std::vector<int>> map);

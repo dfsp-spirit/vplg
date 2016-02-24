@@ -312,6 +312,84 @@ void GraphPrinter::saveNormalizedGraphletCountsSummary(std::string graphName, st
 }
 
 /**
+ Save norm counts as csv file
+ 
+ */
+void GraphPrinter::save_norm_counts_csv(std::string pdb, std::vector<std::vector<float>> norm_counts, std::vector<float> lab_counts) {
+    
+    std::ofstream summaryFile;
+    const std::string summaryFileName = output_path + "counts.csv";
+    
+
+    
+
+    summaryFile.open(summaryFileName.c_str(), std::ios_base::app);
+    if (!summaryFile.is_open()) {
+        std::cout << apptag << "ERROR: could not open summary file at '" << summaryFileName << "'.\n";
+    }  else {
+        
+        
+        // read file to see if header is already written
+        std::string line;
+        while ( getline (summaryFileName, line) ) {
+            
+           
+            if (!(line.compare(0,3,"PDB") == 0)) {
+                
+                for (int i = 1; i < norm_counts[1].size(); i++) {
+                    
+                }
+                
+                for (int i = 1; i < norm_counts[2].size(); i++) {
+                    
+                }
+                
+                for (int i = 1; i < norm_counts[3].size(); i++) {
+                    
+                }
+                
+                for (int i = 1; i < lab_counts.size(); i++) {
+                    
+                }
+                
+                break;
+                
+            } else {
+                break;
+            }
+            
+        }
+        
+        
+        summaryFile << pdb << ",";
+        
+
+
+        summaryFile << std::setw(6) << "[g3] " << std::setiosflags(std::ios::fixed) << std::setprecision(4) << norm_counts[1][0];
+        for (int i = 1; i < norm_counts[1].size(); i++) summaryFile << ", " << std::setiosflags(std::ios::fixed) << std::setprecision(4) << norm_counts[1][i];
+        
+        summaryFile << std::setw(6) << "[g4] " << std::setiosflags(std::ios::fixed) << std::setprecision(4) << norm_counts[2][0];
+        for (int i = 1; i < norm_counts[2].size(); i++) summaryFile << ", " << std::setiosflags(std::ios::fixed) << std::setprecision(4) << norm_counts[2][i];
+        
+        summaryFile << std::setw(6) << "[g5] " << std::setiosflags(std::ios::fixed) << std::setprecision(4) << norm_counts[3][0];
+        for (int i = 1; i < norm_counts[3].size(); i++) summaryFile << ", " << std::setiosflags(std::ios::fixed) << std::setprecision(4) << norm_counts[3][i];
+        
+        if (!lab_counts.empty()) {
+            summaryFile << std::setw(10) << " [labeled] " << std::setiosflags(std::ios::fixed) << std::setprecision(4) << lab_counts[0];
+            for (int i = 1; i < labeled_counts.size(); i++) summaryFile << ", " << std::setiosflags(std::ios::fixed) << std::setprecision(4) << lab_counts[i];
+        }
+
+        summaryFile << "\n";
+        summaryFile.close();
+        
+        if( ! silent) {
+            std::cout << apptag << "    The summary over all computed counts is in \"" << summaryFileName << "\".\n";
+        }
+    }
+    
+}
+
+/**
  * Saves the normalized graphlet counts in MATLAB format to the MATLAB output file. If the file does already exist,
  * the data for this graph gets appended to it. Ignores 2-graphlets.
  * @param <vector<vector<float>>> unlabeled counts
