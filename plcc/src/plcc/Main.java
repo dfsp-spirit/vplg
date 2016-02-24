@@ -4517,7 +4517,7 @@ public class Main {
                     numResContactsPossible++;
 
                     rci = calculateAtomContactsBetweenResiduesAlternativeModel(a, b);
-                                      
+                    
                     if( rci != null) {
                         // There were atoms contacts!
                         contactInfo.add(rci);
@@ -4535,7 +4535,7 @@ public class Main {
         }
         
             
-        //System.out.println(getPymolSelectionScript(contactInfo));
+        //System.out.println(getPymolSelectionScriptPPI(contactInfo));
         return(contactInfo);
     }
     
@@ -5351,6 +5351,12 @@ public class Main {
                     // Determine the contact type.                    
                     if(x.isProteinAtom() && y.isProteinAtom()) {
                         // *************************** protein - protein contact *************************
+                        numPairContacts[ResContactInfo.IVDW]++;
+                        if(minContactDistances[ResContactInfo.IVDW] < 0 || dist < minContactDistances[ResContactInfo.IVDW]) {
+                            minContactDistances[ResContactInfo.IVDW] = dist;
+                            contactAtomNumInResidueA[ResContactInfo.IVDW] = i;
+                            contactAtomNumInResidueB[ResContactInfo.IVDW] = j;
+                        }
 
 
                         // Check the exact contact type
@@ -6729,6 +6735,200 @@ public class Main {
         return(scriptLig);
     }
 
+    
+    public static String getPymolSelectionScriptPPI (ArrayList<ResContactInfo> contacts) {
+        ArrayList<Residue> protRes = new ArrayList<Residue>();  // all residues of interchain protein contacts
+        ArrayList<Residue> ligRes = new ArrayList<Residue>();   // all residues of ligand contacts
+        ArrayList<Residue> ivdwRes = new ArrayList<Residue>();  // all residues of interchain van der Waals contacts
+        ArrayList<Residue> issRes = new ArrayList<Residue>();   // all residues of interchain sulfur bridge contacts
+        
+        String script = "";
+        String scriptProt = "";
+        String scriptLig = "";
+        String scriptIvdw = "";
+        String scriptIss = "";
+        
+        ArrayList<ArrayList<Integer>> bondsIvdw = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<Integer>> bondsIss = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<String>> bondsChainIvdw = new ArrayList<ArrayList<String>>();
+        ArrayList<ArrayList<String>> bondsChainIss = new ArrayList<ArrayList<String>>();
+        ArrayList<ArrayList<Integer>> bondsIvdwAtoms = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<Integer>> bondsIssAtoms = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<String>> bondsAtomNamesIvdw = new ArrayList<ArrayList<String>>();
+        
+        
+        ResContactInfo c = null;
+        // Select all residues of the protein that have ligand contacts
+        
+        for (Integer i = 0; i < contacts.size(); i++) {
+            c = contacts.get(i);
+            
+            if(c.getNumLigContactsTotal() > 0) {
+                // This is a ligand contact, add the residues to one of the lists depending on their type (ligand or protein residue)
+                
+                // Handle resA
+                if(c.getResA().isAA()) {
+                    if( ! protRes.contains(c.getResA())) {
+                        protRes.add(c.getResA());
+                    }
+                }
+                if(c.getResA().isLigand()) {
+                    if( ! ligRes.contains(c.getResA())) {
+                        ligRes.add(c.getResA());
+                    }
+                }
+
+                // Handle resB
+                if(c.getResB().isAA()) {
+                    if( ! protRes.contains(c.getResB())) {
+                        protRes.add(c.getResB());
+                    }
+                }
+                if(c.getResB().isLigand()) {
+                    if( ! ligRes.contains(c.getResB())) {
+                        ligRes.add(c.getResB());
+                    }
+                }
+
+            }
+            
+            // Select all residues of the protein that are protein-protein contacts
+            if((c.getNumContactsBB() > 0) || (c.getNumContactsBC() > 0) || (c.getNumContactsCB() > 0)|| (c.getNumContactsCC() > 0)) {
+                if(! protRes.contains(c.getResA())) {
+                    protRes.add(c.getResA());
+                }
+                if(! protRes.contains(c.getResB())) {
+                    protRes.add(c.getResB());
+                }
+            }
+            
+            // Select all residues of the protein that have interchain vdW contacts
+            if(c.getNumContactsIVDW() > 0) {
+                if(! protRes.contains(c.getResA())) {
+                    protRes.add(c.getResA());
+                }
+                if(! protRes.contains(c.getResB())) {
+                    protRes.add(c.getResB());
+                }
+                if(! ivdwRes.contains(c.getResA())) {
+                    ivdwRes.add(c.getResA());
+                }
+                if(! ivdwRes.contains(c.getResB())) {
+                    ivdwRes.add(c.getResB());
+                }
+                
+                ArrayList<Integer> tmp = new ArrayList<Integer>();
+                tmp.add(c.getPdbResNumResA());
+                tmp.add(c.getPdbResNumResB());
+                bondsIvdw.add(tmp);
+                
+                ArrayList<String> chains = new ArrayList<String>();
+                chains.add(c.getResA().getChainID());
+                chains.add(c.getResB().getChainID());
+                bondsChainIvdw.add(chains);
+                
+                ArrayList<Integer> atoms = new ArrayList<Integer>();
+                atoms.add(c.getIVDWContactAtomNumA());
+                atoms.add(c.getIVDWContactAtomNumB());
+                bondsIvdwAtoms.add(atoms);
+                
+                ArrayList<String> atomNames = new ArrayList<String>();
+                atomNames.add(c.getResA().getAtoms().get(c.getIVDWContactAtomNumA()).getAtomName());
+                atomNames.add(c.getResB().getAtoms().get(c.getIVDWContactAtomNumB()).getAtomName());
+                bondsAtomNamesIvdw.add(atomNames);
+                
+            }
+            
+            // Select all residues of the protein that have interchain sulfur contacts
+            if(c.getNumContactsISS() > 0) {
+                if(! protRes.contains(c.getResA())) {
+                    protRes.add(c.getResA());
+                }
+                if(! protRes.contains(c.getResB())) {
+                    protRes.add(c.getResB());
+                }
+                if(! issRes.contains(c.getResA())) {
+                    issRes.add(c.getResA());
+                }
+                if(! issRes.contains(c.getResB())) {
+                    issRes.add(c.getResB());
+                }
+                
+                ArrayList<Integer> tmp = new ArrayList<Integer>();
+                tmp.add(c.getPdbResNumResA());
+                tmp.add(c.getPdbResNumResB());
+                bondsIss.add(tmp);
+                
+                ArrayList<String> chains = new ArrayList<String>();
+                chains.add(c.getResA().getChainID());
+                chains.add(c.getResB().getChainID());
+                bondsChainIss.add(chains);
+            }
+        }
+
+        // Now create the scripts...
+
+        // Handle protein residues
+        if(protRes.isEmpty()) {
+            scriptProt = "select none";
+        } else {
+
+            scriptProt = "select protein_contact_res, ";
+            for(Integer j = 0; j < protRes.size(); j++) {
+                scriptProt += "chain " + protRes.get(j).getChainID() + " and resi " + protRes.get(j).getPdbResNum();
+
+                if(j < (protRes.size() - 1)) {
+                    scriptProt += " + ";
+                }
+            }
+        }
+
+        // Handle ligands
+        if(ligRes.isEmpty()) {
+            scriptLig = "select none";
+        } else {
+
+            scriptLig = "";
+            for(Integer k = 0; k < ligRes.size(); k++) {
+
+                scriptLig += "select lig_" + ligRes.get(k).getName3().trim() + ", resi " + ligRes.get(k).getPdbResNum() + "\n";
+
+            }
+        }
+
+        if(ivdwRes.isEmpty()) {
+            scriptIvdw = "select none";
+        } else {
+            scriptIvdw = "select ivdw_contact_res, ";
+            for(Integer i = 0; i < ivdwRes.size(); i++) {
+                scriptIvdw += "chain " + ivdwRes.get(i).getChainID() + " and resi " + ivdwRes.get(i).getPdbResNum();
+                
+                if(i < (ivdwRes.size() - 1)) {
+                    scriptIvdw += " + ";
+                }
+            }
+        }
+        
+        if(issRes.isEmpty()) {
+            scriptIss = "select none";
+        } else {
+            scriptIss = "select iss_contact_res, ";
+            
+            for(Integer x = 0; x < issRes.size(); x++) {
+                scriptIss += "chain " + issRes.get(x).getChainID() + " and resi " + issRes.get(x).getPdbResNum();
+                
+                if(x < (issRes.size()) - 1) {
+                    scriptIss += " + ";
+                }
+            }
+        }
+        
+        
+        System.out.println("Pymol selection scripts: protein, ligand, ivdw, iss\n");
+        script = scriptProt + "\n" + scriptLig + "\n" + scriptIvdw + "\n" + scriptIss + "\n" + bondsIvdw.toString() + "\n" + bondsChainIvdw.toString() + "\n" + bondsAtomNamesIvdw.toString() + "\n" + bondsIss.toString() + "\n" + bondsChainIss.toString();
+        return(script);
+    }
+    
     
     /**
      * Creates all SSEs according to DSSP definition from a list of residues. The list is expected to be ordered like in the DSSP file. (Note that residues which are no alpha helix or beta strand are not assigned to any SSE default. You can change this in the settings by settings, see the 'plcc_B_include_coils' option.)
