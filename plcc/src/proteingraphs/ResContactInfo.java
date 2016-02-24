@@ -198,6 +198,10 @@ public class ResContactInfo {
     public Integer getLLContactDist() { return(minContactDistances[LL]); }
     public Integer getLLContactAtomNumA() { return(contactAtomIndexInResidueA[LL] + 1); }
     public Integer getLLContactAtomNumB() { return(contactAtomIndexInResidueB[LL] + 1); }
+    
+    public Integer getIVDWContactDist() { return(minContactDistances[IVDW]); }
+    public Integer getIVDWContactAtomNumA() { return(contactAtomIndexInResidueA[IVDW]); }
+    public Integer getIVDWContactAtomNumB() { return(contactAtomIndexInResidueB[IVDW]); }
 
     // the getters for statistics follow
     public Integer getNumContactsTotal() { return(numPairContacts[TT]); }
