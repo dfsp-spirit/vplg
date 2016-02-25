@@ -318,46 +318,67 @@ void GraphPrinter::saveNormalizedGraphletCountsSummary(std::string graphName, st
 void GraphPrinter::save_norm_counts_csv(std::string pdb, std::vector<std::vector<float>> norm_counts, std::vector<float> lab_counts) {
     
     std::ofstream summaryFile;
+    std::ifstream summaryFileIn;
     const std::string summaryFileName = output_path + "counts.csv";
     
 
     
 
-    summaryFile.open(summaryFileName.c_str(), std::ios_base::app);
-    if (!summaryFile.is_open()) {
+    
+    summaryFileIn.open(summaryFileName.c_str(), std::ios_base::app);
+    if (!summaryFileIn.is_open()) {
         std::cout << apptag << "ERROR: could not open summary file at '" << summaryFileName << "'.\n";
     }  else {
         
-        
+        std::string header;
         // read file to see if header is already written
         std::string line;
-        while ( getline (summaryFileName, line) ) {
+        std::stringstream stream;
+        
+        /*
+        while ( std::getline(summaryFileIn, line) ) {
             
            
             if (!(line.compare(0,3,"PDB") == 0)) {
                 
-                for (int i = 1; i < norm_counts[1].size(); i++) {
+                stream << "PDB";
+                
+                for (int i = 0; i < norm_counts[1].size(); i++) {
                     
+                    stream << ", [g3]" << i+1;
                 }
                 
-                for (int i = 1; i < norm_counts[2].size(); i++) {
-                    
+                for (int i = 0; i < norm_counts[2].size(); i++) {
+                    stream << ", [g4]" << i+1;
                 }
                 
-                for (int i = 1; i < norm_counts[3].size(); i++) {
-                    
+                for (int i = 0; i < norm_counts[3].size(); i++) {
+                    stream << ", [g5]" << i+1;
                 }
                 
-                for (int i = 1; i < lab_counts.size(); i++) {
-                    
+                for (int i = 0; i < lab_counts.size(); i++) {
+                    stream << ", [lab]" << i+1;
                 }
+                
+                header = stream.str();
+                summaryFileIn.close();
+                
+                
+                
+                summaryFile.open(summaryFileName.c_str(), std::ios_base::app);
+                summaryFile << header;
                 
                 break;
                 
             } else {
+                summaryFileIn.close();
                 break;
             }
             
+        }*/
+        
+        if (!summaryFile.is_open()) {
+            summaryFile.open(summaryFileName.c_str(), std::ios_base::app);
         }
         
         
@@ -365,18 +386,14 @@ void GraphPrinter::save_norm_counts_csv(std::string pdb, std::vector<std::vector
         
 
 
-        summaryFile << std::setw(6) << "[g3] " << std::setiosflags(std::ios::fixed) << std::setprecision(4) << norm_counts[1][0];
-        for (int i = 1; i < norm_counts[1].size(); i++) summaryFile << ", " << std::setiosflags(std::ios::fixed) << std::setprecision(4) << norm_counts[1][i];
+        for (int i = 0; i < norm_counts[1].size(); i++) summaryFile << ", " << std::setiosflags(std::ios::fixed) << std::setprecision(4) << norm_counts[1][i];
         
-        summaryFile << std::setw(6) << "[g4] " << std::setiosflags(std::ios::fixed) << std::setprecision(4) << norm_counts[2][0];
-        for (int i = 1; i < norm_counts[2].size(); i++) summaryFile << ", " << std::setiosflags(std::ios::fixed) << std::setprecision(4) << norm_counts[2][i];
+        for (int i = 0; i < norm_counts[2].size(); i++) summaryFile << ", " << std::setiosflags(std::ios::fixed) << std::setprecision(4) << norm_counts[2][i];
         
-        summaryFile << std::setw(6) << "[g5] " << std::setiosflags(std::ios::fixed) << std::setprecision(4) << norm_counts[3][0];
-        for (int i = 1; i < norm_counts[3].size(); i++) summaryFile << ", " << std::setiosflags(std::ios::fixed) << std::setprecision(4) << norm_counts[3][i];
+        for (int i = 0; i < norm_counts[3].size(); i++) summaryFile << ", " << std::setiosflags(std::ios::fixed) << std::setprecision(4) << norm_counts[3][i];
         
         if (!lab_counts.empty()) {
-            summaryFile << std::setw(10) << " [labeled] " << std::setiosflags(std::ios::fixed) << std::setprecision(4) << lab_counts[0];
-            for (int i = 1; i < labeled_counts.size(); i++) summaryFile << ", " << std::setiosflags(std::ios::fixed) << std::setprecision(4) << lab_counts[i];
+            for (int i = 1; i < lab_counts.size(); i++) summaryFile << ", " << std::setiosflags(std::ios::fixed) << std::setprecision(4) << lab_counts[i];
         }
 
         summaryFile << "\n";

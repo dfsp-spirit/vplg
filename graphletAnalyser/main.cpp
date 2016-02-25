@@ -118,6 +118,7 @@ void fill_settings_default() {
         options["graph_vertex_type_alphabet"] = "HEL";
         options["output_counts_JSON"] = "yes";
         options["output_labeled_counts_JSON"] = "yes";
+        options["output_csv"] = "yes";
         
 }
 
@@ -644,6 +645,10 @@ int main(int argc, char** argv) {
         
         if (options["output_counts_JSON"] == "yes") {
             printer.save_counts_as_json(graph[graph_bundle].properties["pdb_id"] + "_counts", n, m, abs_counts, norm_counts);
+        }
+        
+        if (options["output_csv"] == "yes") {
+            printer.save_norm_counts_csv(graph[graph_bundle].properties["pdb_id"], norm_counts, norm_labeled_counts);
         }
         
         if (options["output_labeled_counts_JSON"] == "yes") {
