@@ -4535,7 +4535,12 @@ public class Main {
         }
         
             
-        //System.out.println(getPymolSelectionScriptPPI(contactInfo));
+        if(getPymolSelectionScriptPPI(contactInfo)) {
+            System.out.println("[PYMOL] Python script successfully written.");
+        }
+        else {
+            System.out.println("[PYMOL] Error: Python script could not be written.");
+        }
         return(contactInfo);
     }
     
@@ -6735,8 +6740,12 @@ public class Main {
         return(scriptLig);
     }
 
-    
-    public static String getPymolSelectionScriptPPI (ArrayList<ResContactInfo> contacts) {
+    /**
+     * Creates a Python script for PyMol to visualize bonds calculated with the alternative contact model.
+     * @param contacts the contacts to consider for this script.
+     * @return true if python file could be written, otherwise false.
+     */
+    public static Boolean getPymolSelectionScriptPPI (ArrayList<ResContactInfo> contacts) {
         ArrayList<Residue> protRes = new ArrayList<Residue>();  // all residues of interchain protein contacts
         ArrayList<Residue> ligRes = new ArrayList<Residue>();   // all residues of ligand contacts
         ArrayList<Residue> ivdwRes = new ArrayList<Residue>();  // all residues of interchain van der Waals contacts
@@ -6756,6 +6765,7 @@ public class Main {
         ArrayList<ArrayList<Integer>> bondsIssAtoms = new ArrayList<ArrayList<Integer>>();
         ArrayList<ArrayList<String>> bondsAtomNamesIvdw = new ArrayList<ArrayList<String>>();
         
+        Boolean fileWriteSuccess = false;
         
         ResContactInfo c = null;
         // Select all residues of the protein that have ligand contacts
@@ -6923,10 +6933,109 @@ public class Main {
             }
         }
         
+        // Create python file that can be executed from pymol
+        StringBuilder sb = new StringBuilder();
+        String lineSep = System.lineSeparator();
+        String blankLine = lineSep + lineSep;
         
-        System.out.println("Pymol selection scripts: protein, ligand, ivdw, iss\n");
-        script = scriptProt + "\n" + scriptLig + "\n" + scriptIvdw + "\n" + scriptIss + "\n" + bondsIvdw.toString() + "\n" + bondsChainIvdw.toString() + "\n" + bondsAtomNamesIvdw.toString() + "\n" + bondsIss.toString() + "\n" + bondsChainIss.toString();
-        return(script);
+        sb.append("#!/usr/bin/env python");
+        sb.append(blankLine);
+        
+        sb.append("# This file is part of the Visualization of Protein Ligand Graphs (VPLG) software package.");
+        sb.append(lineSep);
+        sb.append("# *");
+        sb.append(lineSep);
+        sb.append("# * Copyright Tim Schaefer 2012. VPLG is free software, see the LICENSE and README files for details");
+        sb.append(lineSep);
+        sb.append("# * author Andreas Scheck");
+        sb.append(lineSep);
+        sb.append("# *");
+        sb.append(blankLine);
+        sb.append("\"\"\"");
+        sb.append(lineSep);
+        sb.append("    This is a small script for visualizing different types of chemical bonds, calculated with the VPLG software, in PyMol.");
+        sb.append(lineSep);
+        sb.append("    Fetch the protein you want to inspect in PyMol and then run this python script, created for that specific protein,");
+        sb.append(lineSep);
+        sb.append("    within PyMol (File -> Run... -> /path/to/this/file).");
+        sb.append(lineSep);
+        sb.append("\"\"\"");
+        sb.append(blankLine);
+        
+        sb.append("import pymol");
+        sb.append(blankLine);
+        sb.append("select_ligands = \'" + scriptLig + "\'");
+        sb.append(blankLine);
+        sb.append("select_prot = \'" + scriptProt + "\'");
+        sb.append(blankLine);
+        sb.append("select_ivdw = \'" + scriptIvdw + "\'");
+        sb.append(blankLine);
+        sb.append("select_iss = \'" + scriptIss + "\'");
+        sb.append(blankLine);
+        sb.append("bonds_ivdw = " + bondsIvdw.toString());
+        sb.append(blankLine);
+        
+        sb.append("bonds_chain_ivdw = [");
+        for(ArrayList<String> valuePair : bondsChainIvdw) {
+                sb.append("[\'" + valuePair.get(0) + "\',\'" + valuePair.get(1) + "\'],");
+        }
+        sb.append("]");
+        sb.append(blankLine);
+        
+        sb.append("bonds_iss = " + bondsIss.toString());
+        sb.append(blankLine);
+        
+        sb.append("bonds_chain_iss = [");
+        for(ArrayList<String> valuePair : bondsChainIss) {
+            sb.append("[\'" + valuePair.get(0) + "\',\'" + valuePair.get(1) + "\'],");
+        }
+        sb.append("]");
+        sb.append(blankLine);
+        
+        sb.append("bonds_atom_names_ivdw = [");
+        for(ArrayList<String> valuePair : bondsAtomNamesIvdw) {
+            sb.append("[\'" + valuePair.get(0) + "\',\'" + valuePair.get(1) + "\'],");
+        }
+        sb.append("]");
+        sb.append(blankLine);
+        
+        sb.append("pymol.cmd.do(\'{}\'.format(select_ivdw))");
+        sb.append(blankLine);
+        sb.append("pymol.cmd.do(\'{}\'.format(select_iss))");
+        sb.append(blankLine);
+        
+        sb.append("for x, y in enumerate(bonds_ivdw):");
+        sb.append(lineSep);
+        sb.append("    pymol.cmd.distance(\'ivdw_distance\', \'chain {} and resi {} and name {}\'.format(bonds_chain_ivdw[x][0], y[0], bonds_atom_names_ivdw[x][0]), 'chain {} and resi {} and name {}'.format(bonds_chain_ivdw[x][1], y[1], bonds_atom_names_ivdw[x][1]))");
+        sb.append(lineSep);
+        sb.append("    pymol.cmd.color(\'red\', \'ivdw_distance\')");
+        sb.append(lineSep);
+        sb.append("pymol.cmd.do(\'set dash_width, 7\')");
+        sb.append(lineSep);
+        sb.append("pymol.cmd.do(\'set dash_length, 0.5\')");
+        sb.append(lineSep);
+        sb.append("pymol.cmd.do(\'set dash_gap, 0.2\')");
+        sb.append(lineSep);
+        sb.append("pymol.cmd.do(\'set label_distance_digits, 2\')");
+        sb.append(blankLine);
+        
+        File pythonScript = new File("./visualize_bonds_pymol.py");
+        try {
+            FileWriter fw = new FileWriter(pythonScript.getAbsoluteFile());
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.append(sb);
+            bw.close();
+            fileWriteSuccess = true;
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+
+        System.out.println("[PYMOL] Writing python script to visualize bonds within PyMol.");
+        
+        //System.out.println("Pymol selection scripts: protein, ligand, ivdw, iss\n");
+        //script = scriptProt + "\n" + scriptLig + "\n" + scriptIvdw + "\n" + scriptIss + "\n" + bondsIvdw.toString() + "\n" + bondsChainIvdw.toString() + "\n" + bondsAtomNamesIvdw.toString() + "\n" + bondsIss.toString() + "\n" + bondsChainIss.toString();
+        return(fileWriteSuccess);
     }
     
     
