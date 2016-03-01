@@ -330,6 +330,36 @@ public class Atom implements java.io.Serializable {
             return(false);
         }
     }
+
+    
+    /**
+     * Checks whether the angle between acceptor-donor and acceptor-acceptor antecedent
+     * in a possible hydrogen bond is satisfied.
+     * This is the case when the angle is greater than 90 degrees.
+     * For more information see: doi:10.1006/jmbi.1994.1334
+     * @param a is the acceptor atom.
+     * @param aa is the acceptor antecedent atom.
+     * @return True if the angle is greater than 90 degrees, otherwise False.
+     */
+    public Boolean hbondAtomAngleBetween(Atom a, Atom aa) {
+    
+        Integer d1x = this.getCoordX() - a.getCoordX();
+        Integer d1y = this.getCoordY() - a.getCoordY();
+        Integer d1z = this.getCoordZ() - a.getCoordZ();
+
+        Integer d2x = aa.getCoordX() - a.getCoordX();
+        Integer d2y = aa.getCoordY() - a.getCoordY();
+        Integer d2z = aa.getCoordZ() - a.getCoordZ();
+
+        Double angle = 0.0;
+        angle = Math.acos((d1x * d2x + d1y * d2y + d1z * d2z) / (Math.sqrt(Math.pow(d1x,2) + Math.pow(d1y, 2) + Math.pow(d1z, 2)) * Math.sqrt(Math.pow(d2x, 2) + Math.pow(d2y, 2) + Math.pow(d2z, 2)))) * (180/Math.PI);
+        
+        if (angle > 90) {
+            return(true);
+        }
+
+        return(false);
+    }
     
     
     /**
