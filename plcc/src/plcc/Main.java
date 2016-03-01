@@ -5190,8 +5190,15 @@ public class Main {
         Integer dist = null;
         Integer CAdist = a.resCenterDistTo(b);
         ResContactInfo result = null;
+        HashMap<Character, Character> remoteness = new HashMap<Character, Character>();
+        remoteness.put('B', 'A');
+        remoteness.put('G', 'B');
+        remoteness.put('D', 'G');
+        remoteness.put('E', 'D');
+        remoteness.put('Z', 'E');
+        remoteness.put('H', 'Z');
 
-
+        
         Integer[] numPairContacts = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES + 7]; // +7 because of added experimental contact types for alternative model
         // The positions in the numPairContacts array hold the number of contacts of each type for a pair of residues:
         // Some cheap vars to make things easier to understand (a replacement for #define):
@@ -5257,6 +5264,8 @@ public class Main {
         Integer numOfLastBackboneAtomInResidue = 4;
         Integer atomIndexOfBackboneN = 0;       // backbone nitrogen atom index
         Integer atomIndexOfBackboneO = 3;       // backbone oxygen atom index
+        Integer atomIndexOfBackboneC = 2;       // backbone carbon atom index
+        Integer atomIndexOfBackboneCa = 1;    // backbone C-alpha atom index
 
         Integer aIntID = a.getInternalAAID();     // Internal AA ID (ALA=1, ARG=2, ...)
         Integer bIntID = b.getInternalAAID();
@@ -5302,7 +5311,7 @@ public class Main {
                 
                 y = atoms_b.get(j);
                                 
-
+                
                 // Check whether a contact exist. If so, classify it. Note that the code of geom_neo works based on the
                 //  position of an atom in the atom list of its residue (e.g., it assumes that the 2nd atom of an AA is
                 //  the C alpha atom. While this seems to hold for many PDB files it will produce wrong results if atoms
@@ -5316,6 +5325,167 @@ public class Main {
                 
                 
                 //TODO: - implement the new different contact types (IHB, IBH, IPI, ISB)
+                
+                // H-bonds
+                if(dist < 39){
+                    // Backbone - Backbone H-bonds
+                    // NH -> 0
+                    if(i.equals(atomIndexOfBackboneN) && j.equals(atomIndexOfBackboneO)) {
+                        if(x.hbondAtomAngleBetween(y, atoms_b.get(atomIndexOfBackboneC))) {
+                            System.out.println("New: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                        }
+                    }
+                    if(i.equals(atomIndexOfBackboneO) && j.equals(atomIndexOfBackboneN)) {
+                        if(y.hbondAtomAngleBetween(x, atoms_a.get(atomIndexOfBackboneC))) {
+                            System.out.println("New: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                        }
+                    }
+                    
+                    // Backbone - Sidechain H-bonds
+                    // O -> NH
+                    if(i.equals(atomIndexOfBackboneO) && ((j > numOfLastBackboneAtomInResidue) && y.getChemSym().equals(" N"))) {
+                        if(y.hbondAtomAngleBetween(x, atoms_a.get(atomIndexOfBackboneC))) {
+                            System.out.println("New BS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                        }
+                    }
+                    if(((i > numOfLastBackboneAtomInResidue) && x.getChemSym().equals(" N")) && j.equals(atomIndexOfBackboneO)) {
+                        if(x.hbondAtomAngleBetween(y, atoms_b.get(atomIndexOfBackboneC))) {
+                            System.out.println("New SB ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                        }
+                    }
+                    
+                    // O -> OH
+                    if(i.equals(atomIndexOfBackboneO) && ((j > numOfLastBackboneAtomInResidue) && y.getChemSym().equals(" O"))) {
+                        // Check if the amino acid is Serine, Threonine, or Tyrosine, as only those have hydroxy groups in their side chain.
+                        // All other amino acids only have oxygen in the side chain as part of carbonyl groups.
+                        if(b.getResName3().equals("SER") || b.getResName3().equals("THR") || b.getResName3().equals("TYR")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(atomIndexOfBackboneC))) {
+                                System.out.println("New BS OOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                    }
+                    if(((i > numOfLastBackboneAtomInResidue) && x.getChemSym().equals(" O")) && j.equals(atomIndexOfBackboneO)) {
+                        // Check if the amino acid is serine, threonine or tyrosine, as only those have hydroxy groups in their side chain.
+                        // All other amino acids only have oxygen in the side chain as part of carbonyl groups.
+                        if(a.getResName3().equals("SER") || a.getResName3().equals("THR") || a.getResName3().equals("TYR")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(atomIndexOfBackboneC))) {
+                                System.out.println("New SB ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }   
+                    }
+                    
+                    // NH -> O
+                    if(i.equals(atomIndexOfBackboneN) && ((j > numOfLastBackboneAtomInResidue) && y.getChemSym().equals(" O"))) {
+                        // Check if amino acid is Asparagine, Glutamine, Glutamic Acid, or Aspartic Acid, as only those have carbonyl groups in their side chain.
+                        if(b.getResName3().equals("ASP")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(5))) {
+                                System.out.println("New BS NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(b.getResName3().equals("GLU")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
+                                System.out.println("New BS NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(b.getResName3().equals("ASN")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(5))) {
+                                System.out.println("New BS NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(b.getResName3().equals("GLN")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
+                                System.out.println("New BS NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                    }
+                    if(((i > numOfLastBackboneAtomInResidue) && x.getChemSym().equals(" O")) && j.equals(atomIndexOfBackboneN)) {
+                        // Check if amino acid is Asparagine, Glutamine, Glutamic Acid, or Aspartic Acid, as only those have carbonyl groups in their side chain.
+                        if(a.getResName3().equals("ASP")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(5))) {
+                                System.out.println("New SB NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(a.getResName3().equals("GLU")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
+                                System.out.println("New SB NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(a.getResName3().equals("ASN")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(5))) {
+                                System.out.println("New SB NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(a.getResName3().equals("GLN")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
+                                System.out.println("New SB NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                    }
+                    
+                    // NH -> OH
+                    if(i.equals(atomIndexOfBackboneN) && ((j > numOfLastBackboneAtomInResidue) && y.getChemSym().equals(" O"))) {
+                        // Check if amino acid is Serine, Threonine, or Tyrosine, as only those have hydroxy groups in their side chain.
+                        
+                        // NH as donor
+                        if(b.getResName3().equals("SER")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(numOfLastBackboneAtomInResidue))) {
+                                System.out.println("New BS NHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(b.getResName3().equals("THR")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(numOfLastBackboneAtomInResidue))) {
+                                System.out.println("New BS NHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(b.getResName3().equals("TYR")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(10))) {
+                                System.out.println("New BS NHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        
+                        // NH as acceptor
+                        if((b.getResName3().equals("SER") || b.getResName3().equals("THR") || b.getResName3().equals("TYR")) && y.hbondAtomAngleBetween(x, atoms_a.get(atomIndexOfBackboneCa))) {
+                                System.out.println("New BS NHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                        }
+                    }
+                    if(((i > numOfLastBackboneAtomInResidue) && x.getChemSym().equals(" O")) && j.equals(atomIndexOfBackboneN)) {
+                        // Check if amino acid is Serine, Threonine, or Tyrosine, as only those have hydroxy groups in their side chain.
+                        
+                        // NH as donor
+                        if(a.getResName3().equals("SER")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(numOfLastBackboneAtomInResidue))) {
+                                System.out.println("New SB NHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(a.getResName3().equals("THR")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(numOfLastBackboneAtomInResidue))) {
+                                System.out.println("New SB NHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(a.getResName3().equals("TYR")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(10))) {
+                                System.out.println("New SB NHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        
+                        // NH as acceptor
+                        if((a.getResName3().equals("SER") || a.getResName3().equals("THR") || a.getResName3().equals("TYR")) && x.hbondAtomAngleBetween(y, atoms_b.get(atomIndexOfBackboneCa))) {
+                                System.out.println("New SB NHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                        }
+                        
+                    }
+                    
+                            
+                    
+                    
+                }
+                    
+                    
+                    
+                    
+                
+                
+                
                 if(x.vdwAtomContactTo(y)) {             // If a contact is detected, Atom.vdwAtomContactTo() returns true
 
                     // The van der Waals radii spheres overlap, contact found.
