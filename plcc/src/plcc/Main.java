@@ -5190,14 +5190,12 @@ public class Main {
         Integer dist = null;
         Integer CAdist = a.resCenterDistTo(b);
         ResContactInfo result = null;
-        HashMap<Character, Character> remoteness = new HashMap<Character, Character>();
-        remoteness.put('B', 'A');
-        remoteness.put('G', 'B');
-        remoteness.put('D', 'G');
-        remoteness.put('E', 'D');
-        remoteness.put('Z', 'E');
-        remoteness.put('H', 'Z');
-
+        ArrayList<String> sidechainOAAs = new ArrayList<String>();
+        sidechainOAAs.add("ASP");
+        sidechainOAAs.add("GLU");
+        sidechainOAAs.add("ASN");
+        sidechainOAAs.add("GLN");
+        
         
         Integer[] numPairContacts = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES + 7]; // +7 because of added experimental contact types for alternative model
         // The positions in the numPairContacts array hold the number of contacts of each type for a pair of residues:
@@ -5332,12 +5330,22 @@ public class Main {
                     // NH -> 0
                     if(i.equals(atomIndexOfBackboneN) && j.equals(atomIndexOfBackboneO)) {
                         if(x.hbondAtomAngleBetween(y, atoms_b.get(atomIndexOfBackboneC))) {
-                            System.out.println("New: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New BB NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
                         }
                     }
                     if(i.equals(atomIndexOfBackboneO) && j.equals(atomIndexOfBackboneN)) {
                         if(y.hbondAtomAngleBetween(x, atoms_a.get(atomIndexOfBackboneC))) {
-                            System.out.println("New: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New BB NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                        }
+                    }
+                    
+                    // NH -> NH
+                    if(i.equals(atomIndexOfBackboneN) && j.equals(atomIndexOfBackboneN)) {
+                        if(x.hbondAtomAngleBetween(y, atoms_b.get(atomIndexOfBackboneCa))) {
+                            System.out.println("New BB NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                        }
+                        if(y.hbondAtomAngleBetween(x, atoms_a.get(atomIndexOfBackboneCa))) {
+                            System.out.println("New BB NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
                         }
                     }
                     
@@ -5377,6 +5385,7 @@ public class Main {
                     // NH -> O
                     if(i.equals(atomIndexOfBackboneN) && ((j > numOfLastBackboneAtomInResidue) && y.getChemSym().equals(" O"))) {
                         // Check if amino acid is Asparagine, Glutamine, Glutamic Acid, or Aspartic Acid, as only those have carbonyl groups in their side chain.
+                        try {
                         if(b.getResName3().equals("ASP")) {
                             if(x.hbondAtomAngleBetween(y, atoms_b.get(5))) {
                                 System.out.println("New BS NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
@@ -5397,9 +5406,14 @@ public class Main {
                                 System.out.println("New BS NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
                             }
                         }
+                        }
+                        catch(java.lang.ArrayIndexOutOfBoundsException e){
+                            System.out.println("NH -> O backbone-sidechain failed. Possibly because of missing atoms of the sidechain in the pdb file.");
+                        }
                     }
                     if(((i > numOfLastBackboneAtomInResidue) && x.getChemSym().equals(" O")) && j.equals(atomIndexOfBackboneN)) {
                         // Check if amino acid is Asparagine, Glutamine, Glutamic Acid, or Aspartic Acid, as only those have carbonyl groups in their side chain.
+                        try {
                         if(a.getResName3().equals("ASP")) {
                             if(y.hbondAtomAngleBetween(x, atoms_a.get(5))) {
                                 System.out.println("New SB NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
@@ -5420,6 +5434,10 @@ public class Main {
                                 System.out.println("New SB NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
                             }
                         }
+                        }
+                        catch(java.lang.ArrayIndexOutOfBoundsException e){
+                            System.out.println("NH -> O sidechain-backbone failed. Possibly because of missing atoms of the sidechain in the pdb file.");
+                        }
                     }
                     
                     // NH -> OH
@@ -5427,6 +5445,7 @@ public class Main {
                         // Check if amino acid is Serine, Threonine, or Tyrosine, as only those have hydroxy groups in their side chain.
                         
                         // NH as donor
+                        try {
                         if(b.getResName3().equals("SER")) {
                             if(x.hbondAtomAngleBetween(y, atoms_b.get(numOfLastBackboneAtomInResidue))) {
                                 System.out.println("New BS NHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
@@ -5447,11 +5466,17 @@ public class Main {
                         if((b.getResName3().equals("SER") || b.getResName3().equals("THR") || b.getResName3().equals("TYR")) && y.hbondAtomAngleBetween(x, atoms_a.get(atomIndexOfBackboneCa))) {
                                 System.out.println("New BS NHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
                         }
+                        }
+                        catch(java.lang.ArrayIndexOutOfBoundsException e){
+                            System.out.println("NH -> OH backbone-sidechain failed. Possibly because of missing atoms of the sidechain in the pdb file.");
+                        }
                     }
+                    
                     if(((i > numOfLastBackboneAtomInResidue) && x.getChemSym().equals(" O")) && j.equals(atomIndexOfBackboneN)) {
                         // Check if amino acid is Serine, Threonine, or Tyrosine, as only those have hydroxy groups in their side chain.
                         
                         // NH as donor
+                        try {
                         if(a.getResName3().equals("SER")) {
                             if(y.hbondAtomAngleBetween(x, atoms_a.get(numOfLastBackboneAtomInResidue))) {
                                 System.out.println("New SB NHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
@@ -5474,8 +5499,275 @@ public class Main {
                         }
                         
                     }
+                        catch(java.lang.ArrayIndexOutOfBoundsException e){
+                            System.out.println("NH -> OH sidechain-backbone failed. Possibly because of missing atoms of the sidechain in the pdb file.");
+                        }
+                    }
                     
+                    // NH -> NH
+                    if(i.equals(atomIndexOfBackboneN) && ((j > numOfLastBackboneAtomInResidue) && y.getChemSym().equals(" N"))) {
+                        // Check if amino acid is Arginine, Histidine, Lysine, Asparagine, Glutamine, or Tryptophan, as only those have amine groups in their side chain.
+                        
+                        // Backbone NH as donor
+                        try {
+                        if(b.getResName3().equals("ARG")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(8))) {
+                                System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                            else if(x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
+                                System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(b.getResName3().equals("HIS")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(5))) {
+                                System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                            else if(x.hbondAtomAngleBetween(y, atoms_b.get(8))) {
+                                System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(b.getResName3().equals("LYS")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(7))) {
+                                System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(b.getResName3().equals("ASN")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(5))) {
+                                System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(b.getResName3().equals("GLN")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
+                                System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(b.getResName3().equals("TRP")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
+                                System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                            else if(x.hbondAtomAngleBetween(y, atoms_b.get(9))) {
+                                System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        }
+                        catch(java.lang.ArrayIndexOutOfBoundsException e){
+                            System.out.println("NH -> O backbone-sidechain failed. Possibly because of missing atoms of the sidechain in the pdb file.");
+                        }
+                        
+                        // Backbone NH as acceptor
+                        if((b.getResName3().equals("ARG") || b.getResName3().equals("HIS") || b.getResName3().equals("LYS") || b.getResName3().equals("ASN") || b.getResName3().equals("GLN") || b.getResName3().equals("TRP") && y.hbondAtomAngleBetween(x, atoms_a.get(atomIndexOfBackboneCa)))) {
+                                System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                        }
+                    }
+                    
+                    if(((i > numOfLastBackboneAtomInResidue) && x.getChemSym().equals(" N")) && j.equals(atomIndexOfBackboneN)) {
+                        // Check if amino acid is Arginine, Histidine, Lysine, Asparagine, Glutamine, or Tryptophan, as only those have amine groups in their side chain.
+                        
+                        // Backbone NH as donor
+                        try {
+                        if(a.getResName3().equals("ARG")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(8))) {
+                                System.out.println("New SB NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                            else if(y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
+                                System.out.println("New SB NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(a.getResName3().equals("HIS")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(5))) {
+                                System.out.println("New SB NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                            else if(y.hbondAtomAngleBetween(x, atoms_a.get(8))) {
+                                System.out.println("New SB NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(a.getResName3().equals("LYS")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(7))) {
+                                System.out.println("New SB NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(a.getResName3().equals("ASN")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(5))) {
+                                System.out.println("New SB NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(a.getResName3().equals("GLN")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
+                                System.out.println("New SB NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(a.getResName3().equals("TRP")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
+                                System.out.println("New SB NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                            else if(y.hbondAtomAngleBetween(x, atoms_a.get(9))) {
+                                System.out.println("New SB NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        }
+                        catch(java.lang.ArrayIndexOutOfBoundsException e){
+                            System.out.println("NH -> O backbone-sidechain failed. Possibly because of missing atoms of the sidechain in the pdb file.");
+                        }
+                        
+                        // Backbone NH as acceptor
+                        if((a.getResName3().equals("ARG") || a.getResName3().equals("HIS") || a.getResName3().equals("LYS") || a.getResName3().equals("ASN") || a.getResName3().equals("GLN") || a.getResName3().equals("TRP") && x.hbondAtomAngleBetween(y, atoms_b.get(atomIndexOfBackboneCa)))) {
+                                System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                        }
+                    }
+                    
+                    // Sidechain-Sidechain H-bond
+                    
+                    // O -> NH
+                    if(((i > numOfLastBackboneAtomInResidue) && x.getChemSym().equals(" O")) 
+                        && ((j > numOfLastBackboneAtomInResidue) && y.getChemSym().equals(" N"))) {
+                        
+                        for(String sidechainOAA : sidechainOAAs) {
+                        try {
+                        
+                        if(a.getResName3().equals(sidechainOAA) && b.getResName3().equals("ARG")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(8))) {
+                                System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                            else if(x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
+                                System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(a.getResName3().equals(sidechainOAA) && b.getResName3().equals("HIS")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(5))) {
+                                System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                            else if(x.hbondAtomAngleBetween(y, atoms_b.get(8))) {
+                                System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(a.getResName3().equals(sidechainOAA) && b.getResName3().equals("LYS")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(7))) {
+                                System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(a.getResName3().equals(sidechainOAA) && b.getResName3().equals("ASN")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(5))) {
+                                System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(a.getResName3().equals(sidechainOAA) && b.getResName3().equals("GLN")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
+                                System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(a.getResName3().equals(sidechainOAA) && b.getResName3().equals("TRP")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
+                                System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                            else if(x.hbondAtomAngleBetween(y, atoms_b.get(9))) {
+                                System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        }
+                        catch(java.lang.IndexOutOfBoundsException e) {
+                            System.out.println("O -> NH sidechain-sidechain failed. Possibly because of missing atoms of the sidechain in the pdb file.");
+                        }
+                        }
+                    }
+                    
+                    if(((i > numOfLastBackboneAtomInResidue) && x.getChemSym().equals(" N")) 
+                        && ((j > numOfLastBackboneAtomInResidue) && y.getChemSym().equals(" O"))) {
+                        
+                        for(String sidechainOAA : sidechainOAAs) {
+                        try {
+                        
+                        if(b.getResName3().equals(sidechainOAA) && a.getResName3().equals("ARG")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(8))) {
+                                System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                            else if(y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
+                                System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(b.getResName3().equals(sidechainOAA) && a.getResName3().equals("HIS")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(5))) {
+                                System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                            else if(y.hbondAtomAngleBetween(x, atoms_a.get(8))) {
+                                System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(b.getResName3().equals(sidechainOAA) && a.getResName3().equals("LYS")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(7))) {
+                                System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(b.getResName3().equals(sidechainOAA) && a.getResName3().equals("ASN")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(5))) {
+                                System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(b.getResName3().equals(sidechainOAA) && a.getResName3().equals("GLN")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
+                                System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(b.getResName3().equals(sidechainOAA) && a.getResName3().equals("TRP")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
+                                System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                            else if(y.hbondAtomAngleBetween(x, atoms_a.get(9))) {
+                                System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        }
+                        catch(java.lang.IndexOutOfBoundsException e) {
+                            System.out.println("O -> NH sidechain-sidechain failed. Possibly because of missing atoms of the sidechain in the pdb file.");
+                        }
+                        }
+                    }
                             
+                    // O -> OH
+                    if(((i > numOfLastBackboneAtomInResidue) && x.getChemSym().equals(" O")) 
+                        && ((j > numOfLastBackboneAtomInResidue) && y.getChemSym().equals(" O"))) {
+                        for(String sidechainOAA : sidechainOAAs) {
+                        try {
+                            
+                        if(a.getResName3().equals(sidechainOAA) && b.getResName3().equals("SER")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(numOfLastBackboneAtomInResidue))) {
+                                System.out.println("New SS OOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(a.getResName3().equals(sidechainOAA) && b.getResName3().equals("THR")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(numOfLastBackboneAtomInResidue))) {
+                                System.out.println("New SS OOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(a.getResName3().equals(sidechainOAA) && b.getResName3().equals("TYR")) {
+                            if(x.hbondAtomAngleBetween(y, atoms_b.get(10))) {
+                                System.out.println("New SS OOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        
+                        if(b.getResName3().equals(sidechainOAA) && a.getResName3().equals("SER")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(numOfLastBackboneAtomInResidue))) {
+                                System.out.println("New SS OOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(b.getResName3().equals(sidechainOAA) && a.getResName3().equals("THR")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(numOfLastBackboneAtomInResidue))) {
+                                System.out.println("New SS OOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            }
+                        }
+                        else if(b.getResName3().equals(sidechainOAA) && a.getResName3().equals("TYR")) {
+                            if(y.hbondAtomAngleBetween(x, atoms_a.get(10))) {
+                                System.out.println("New SS OOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            } 
+                        }
+                        }
+                        catch(java.lang.IndexOutOfBoundsException e) {
+                            System.out.println("O -> OH sidechain-sidechain failed. Possibly because of missing atoms of the sidechain in the pdb file.");
+                        }
+                        }
+                    }
+                    
+                    
+                    
                     
                     
                 }
