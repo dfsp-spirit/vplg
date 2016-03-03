@@ -41,13 +41,31 @@ public class ResContactInfo {
     public static final Integer LC = 10;        // 10 = # of ligand-sidechain contacts      (protein - ligand only)
     public static final Integer LL = 11;        // 11 = # of ligand-ligand contacts         (ligand - ligand only)
     public static final Integer DISULFIDE = 12;        // 12 = # of disulfide bridges
-    public static final Integer IHB = 13;       // 13 = # of interchain H-bridge contacts 1, N=>O
-    public static final Integer IBH = 14;       // 14 = # of interchain H-bridge contacts, O=>N
+    public static final Integer BBNO = 13;       // 13 = # of interchain H-bridge contacts 1, N=>O
+    public static final Integer BBON = 14;       // 14 = # of interchain H-bridge contacts, O=>N
     public static final Integer IVDW = 15;      // 15 = # of interchain van der Waals interactions
     public static final Integer ISS = 16;       // 16 = # of interchain disulfide bridges
     public static final Integer IPI = 17;       // 17 = # of interchain pi-effects
     public static final Integer ISB = 18;       // 18 = # of interchain salt bridges
-    
+    public static final Integer BBNN = 19;
+    public static final Integer BCOOH = 20;
+    public static final Integer CBOHO = 21;
+    public static final Integer BCON = 22;
+    public static final Integer CBNO = 23;
+    public static final Integer BCNN = 24;
+    public static final Integer CBNN = 25;
+    public static final Integer BCNO = 26;
+    public static final Integer CBON = 27;
+    public static final Integer BCNOH = 28;
+    public static final Integer CBOHN = 29;
+    public static final Integer CCON = 30;
+    public static final Integer CCNO = 31;
+    public static final Integer CCOOH = 32;
+    public static final Integer CCOHO = 33;
+    public static final Integer CCOHOH = 34;
+    public static final Integer CCNN = 35;
+    public static final Integer CCOHN = 36;
+    public static final Integer CCNOH = 37;
     
     // The different values in 'XY' vs 'YX' are only produced by the the sequential order of the
     //  residues (e.g., the ligand came fist: this was treated as an 'LB' contact, otherwise it
@@ -202,8 +220,16 @@ public class ResContactInfo {
     public Integer getIVDWContactDist() { return(minContactDistances[IVDW]); }
     public Integer getIVDWContactAtomNumA() { return(contactAtomIndexInResidueA[IVDW]); }
     public Integer getIVDWContactAtomNumB() { return(contactAtomIndexInResidueB[IVDW]); }
-
-    // the getters for statistics follow
+    
+    public Integer getBBONContactDist() { return(minContactDistances[BBON]); }
+    public Integer getBBONContactAtomNumA() { return(contactAtomIndexInResidueA[BBON]); }
+    public Integer getBBONContactAtomNumB() { return(contactAtomIndexInResidueB[BBON]); }
+    
+    public Integer getCCONContactDist() { return(minContactDistances[CCON]); }
+    public Integer getCCONContactAtomNumA() { return(contactAtomIndexInResidueA[CCON]); }
+    public Integer getCCONContactAtomNumB() { return(contactAtomIndexInResidueB[CCON]); }
+    
+// the getters for statistics follow
     public Integer getNumContactsTotal() { return(numPairContacts[TT]); }
     public Integer getNumLigContactsTotal() { return(numTotalLigContactsPair); }
     public Integer getNumContactsBB() { return(numPairContacts[BB]); }
@@ -218,12 +244,13 @@ public class ResContactInfo {
     public Integer getNumContactsLC() { return(numPairContacts[LC]); }
     public Integer getNumContactsLL() { return(numPairContacts[LL]); }
     public Integer getNumContactsDisulfide() { return(numPairContacts[DISULFIDE]); }
-    public Integer getNumContactsIHB() {return(numPairContacts[IHB]); }
-    public Integer getNumContactsIBH() {return(numPairContacts[IBH]); }
-    public Integer getNumContactsIVDW() {return(numPairContacts[IVDW]); }
-    public Integer getNumContactsISS() {return(numPairContacts[ISS]); }
-    public Integer getNumContactsIPI() {return(numPairContacts[IPI]); }
-    public Integer getNumContactsISB() {return(numPairContacts[ISB]); }
+    public Integer getNumContactsBBON() { return(numPairContacts[BBON]); }
+    public Integer getNumContactsIBH() { return(numPairContacts[BBNO]); }
+    public Integer getNumContactsIVDW() { return(numPairContacts[IVDW]); }
+    public Integer getNumContactsISS() { return(numPairContacts[ISS]); }
+    public Integer getNumContactsIPI() { return(numPairContacts[IPI]); }
+    public Integer getNumContactsISB() { return(numPairContacts[ISB]); }
+    public Integer getNumContactsCCON() { return(numPairContacts[CCON]); }
     
     // DEBUG only
     public Residue getResA() { return(resA); }
