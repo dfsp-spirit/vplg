@@ -5366,7 +5366,7 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.BBBH] = i;
                                 contactAtomNumInResidueB[ResContactInfo.BBBH] = j;
                             }
-                            System.out.println("New BB NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New BB ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
                         }
                     }
                     
@@ -8133,26 +8133,54 @@ public class Main {
         ArrayList<Residue> ligRes = new ArrayList<Residue>();   // all residues of ligand contacts
         ArrayList<Residue> ivdwRes = new ArrayList<Residue>();  // all residues of interchain van der Waals contacts
         ArrayList<Residue> issRes = new ArrayList<Residue>();   // all residues of interchain sulfur bridge contacts
+        ArrayList<Residue> bbRes = new ArrayList<Residue>();    // all residues of interchain backbone-backbone h-bridge contacts
+        ArrayList<Residue> bcRes = new ArrayList<Residue>();    // all residues of interchain backbone-sidechain h-bridge contacts
+        ArrayList<Residue> cbRes = new ArrayList<Residue>();      // all residues of interchain sidechain-backbone h-bridge contacts
+        ArrayList<Residue> ccRes = new ArrayList<Residue>();    // all residues of interchain sidechain-sidechain h-bridge contacts
         
         String script = "";
         String scriptProt = "";
         String scriptLig = "";
         String scriptIvdw = "";
         String scriptIss = "";
+        String scriptBB = "";
+        String scriptBC = "";
+        String scriptCB = "";
+        String scriptCC = "";
         
         ArrayList<ArrayList<Integer>> bondsIvdw = new ArrayList<ArrayList<Integer>>();
-        ArrayList<ArrayList<Integer>> bondsIss = new ArrayList<ArrayList<Integer>>();
         ArrayList<ArrayList<String>> bondsChainIvdw = new ArrayList<ArrayList<String>>();
-        ArrayList<ArrayList<String>> bondsChainIss = new ArrayList<ArrayList<String>>();
         ArrayList<ArrayList<Integer>> bondsIvdwAtoms = new ArrayList<ArrayList<Integer>>();
-        ArrayList<ArrayList<Integer>> bondsIssAtoms = new ArrayList<ArrayList<Integer>>();
         ArrayList<ArrayList<String>> bondsAtomNamesIvdw = new ArrayList<ArrayList<String>>();
+        
+        ArrayList<ArrayList<Integer>> bondsIss = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<String>> bondsChainIss = new ArrayList<ArrayList<String>>();
+        ArrayList<ArrayList<Integer>> bondsIssAtoms = new ArrayList<ArrayList<Integer>>();
+        
+        ArrayList<ArrayList<Integer>> bondsBB = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<String>> bondsChainBB = new ArrayList<ArrayList<String>>();
+        ArrayList<ArrayList<Integer>> bondsBBAtoms = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<String>> bondsAtomNamesBB = new ArrayList<ArrayList<String>>();
+        
+        ArrayList<ArrayList<Integer>> bondsBC = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<String>> bondsChainBC = new ArrayList<ArrayList<String>>();
+        ArrayList<ArrayList<Integer>> bondsBCAtoms = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<String>> bondsAtomNamesBC = new ArrayList<ArrayList<String>>();
+        
+        ArrayList<ArrayList<Integer>> bondsCB = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<String>> bondsChainCB = new ArrayList<ArrayList<String>>();
+        ArrayList<ArrayList<Integer>> bondsCBAtoms = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<String>> bondsAtomNamesCB = new ArrayList<ArrayList<String>>();
+        
+        ArrayList<ArrayList<Integer>> bondsCC = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<String>> bondsChainCC = new ArrayList<ArrayList<String>>();
+        ArrayList<ArrayList<Integer>> bondsCCAtoms = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<String>> bondsAtomNamesCC = new ArrayList<ArrayList<String>>();
         
         Boolean fileWriteSuccess = false;
         
         ResContactInfo c = null;
         // Select all residues of the protein that have ligand contacts
-        
         for (Integer i = 0; i < contacts.size(); i++) {
             c = contacts.get(i);
             
@@ -8232,6 +8260,210 @@ public class Main {
                 
             }
             
+            // Select all residues of the protein that have interchain backbone-backbone h-bridge contacts
+            if(c.getNumContactsBBHB()> 0 || c.getNumContactsBBBH() > 0) {
+                if(! protRes.contains(c.getResA())) {
+                    protRes.add(c.getResA());
+                }
+                if(! protRes.contains(c.getResB())) {
+                    protRes.add(c.getResB());
+                }
+                if(! bbRes.contains(c.getResA())) {
+                    bbRes.add(c.getResA());
+                }
+                if(! bbRes.contains(c.getResB())) {
+                    bbRes.add(c.getResB());
+                }
+                
+                ArrayList<Integer> tmp = new ArrayList<Integer>();
+                tmp.add(c.getPdbResNumResA());
+                tmp.add(c.getPdbResNumResB());
+                bondsBB.add(tmp);
+                
+                ArrayList<String> chains = new ArrayList<String>();
+                chains.add(c.getResA().getChainID());
+                chains.add(c.getResB().getChainID());
+                bondsChainBB.add(chains);
+                
+                if(c.getNumContactsBBHB() > 0) {
+                    ArrayList<Integer> atoms = new ArrayList<Integer>();
+                    atoms.add(c.getBBHBContactAtomNumA());
+                    atoms.add(c.getBBHBContactAtomNumB());
+                    bondsBBAtoms.add(atoms);
+                
+                ArrayList<String> atomNames = new ArrayList<String>();
+                atomNames.add(c.getResA().getAtoms().get(c.getBBHBContactAtomNumA()).getAtomName());
+                atomNames.add(c.getResB().getAtoms().get(c.getBBHBContactAtomNumB()).getAtomName());
+                bondsAtomNamesBB.add(atomNames);
+                }
+                
+                if(c.getNumContactsBBBH() > 0) {
+                    ArrayList<Integer> atoms = new ArrayList<Integer>();
+                    atoms.add(c.getBBBHContactAtomNumA());
+                    atoms.add(c.getBBBHContactAtomNumB());
+                    bondsBBAtoms.add(atoms);
+                
+                ArrayList<String> atomNames = new ArrayList<String>();
+                atomNames.add(c.getResA().getAtoms().get(c.getBBBHContactAtomNumA()).getAtomName());
+                atomNames.add(c.getResB().getAtoms().get(c.getBBBHContactAtomNumB()).getAtomName());
+                bondsAtomNamesBB.add(atomNames);
+                }
+                
+            }
+            
+            // Select all residues of the protein that have interchain backbone-sidechain h-bridge contacts
+            if(c.getNumContactsBCHB()> 0 || c.getNumContactsBCBH() > 0) {
+                if(! protRes.contains(c.getResA())) {
+                    protRes.add(c.getResA());
+                }
+                if(! protRes.contains(c.getResB())) {
+                    protRes.add(c.getResB());
+                }
+                if(! bcRes.contains(c.getResA())) {
+                    bcRes.add(c.getResA());
+                }
+                if(! bcRes.contains(c.getResB())) {
+                    bcRes.add(c.getResB());
+                }
+                
+                ArrayList<Integer> tmp = new ArrayList<Integer>();
+                tmp.add(c.getPdbResNumResA());
+                tmp.add(c.getPdbResNumResB());
+                bondsBC.add(tmp);
+                
+                ArrayList<String> chains = new ArrayList<String>();
+                chains.add(c.getResA().getChainID());
+                chains.add(c.getResB().getChainID());
+                bondsChainBC.add(chains);
+                
+                if(c.getNumContactsBCHB() > 0) {
+                    ArrayList<Integer> atoms = new ArrayList<Integer>();
+                    atoms.add(c.getBCHBContactAtomNumA());
+                    atoms.add(c.getBCHBContactAtomNumB());
+                    bondsBCAtoms.add(atoms);
+                
+                ArrayList<String> atomNames = new ArrayList<String>();
+                atomNames.add(c.getResA().getAtoms().get(c.getBCHBContactAtomNumA()).getAtomName());
+                atomNames.add(c.getResB().getAtoms().get(c.getBCHBContactAtomNumB()).getAtomName());
+                bondsAtomNamesBC.add(atomNames);
+                }
+                
+                if(c.getNumContactsBCBH() > 0) {
+                    ArrayList<Integer> atoms = new ArrayList<Integer>();
+                    atoms.add(c.getBCBHContactAtomNumA());
+                    atoms.add(c.getBCBHContactAtomNumB());
+                    bondsBCAtoms.add(atoms);
+                
+                ArrayList<String> atomNames = new ArrayList<String>();
+                atomNames.add(c.getResA().getAtoms().get(c.getBCBHContactAtomNumA()).getAtomName());
+                atomNames.add(c.getResB().getAtoms().get(c.getBCBHContactAtomNumB()).getAtomName());
+                bondsAtomNamesBC.add(atomNames);
+                }
+                
+            }
+            
+            // Select all residues of the protein that have interchain sidechain-backbone h-bridge contacts
+            if(c.getNumContactsCBHB()> 0 || c.getNumContactsCBBH() > 0) {
+                if(! protRes.contains(c.getResA())) {
+                    protRes.add(c.getResA());
+                }
+                if(! protRes.contains(c.getResB())) {
+                    protRes.add(c.getResB());
+                }
+                if(! cbRes.contains(c.getResA())) {
+                    cbRes.add(c.getResA());
+                }
+                if(! cbRes.contains(c.getResB())) {
+                    cbRes.add(c.getResB());
+                }
+                
+                ArrayList<Integer> tmp = new ArrayList<Integer>();
+                tmp.add(c.getPdbResNumResA());
+                tmp.add(c.getPdbResNumResB());
+                bondsCB.add(tmp);
+                
+                ArrayList<String> chains = new ArrayList<String>();
+                chains.add(c.getResA().getChainID());
+                chains.add(c.getResB().getChainID());
+                bondsChainCB.add(chains);
+                
+                if(c.getNumContactsCBHB() > 0) {
+                    ArrayList<Integer> atoms = new ArrayList<Integer>();
+                    atoms.add(c.getCBHBContactAtomNumA());
+                    atoms.add(c.getCBHBContactAtomNumB());
+                    bondsCBAtoms.add(atoms);
+                
+                ArrayList<String> atomNames = new ArrayList<String>();
+                atomNames.add(c.getResA().getAtoms().get(c.getCBHBContactAtomNumA()).getAtomName());
+                atomNames.add(c.getResB().getAtoms().get(c.getCBHBContactAtomNumB()).getAtomName());
+                bondsAtomNamesCB.add(atomNames);
+                }
+                
+                if(c.getNumContactsCBBH() > 0) {
+                    ArrayList<Integer> atoms = new ArrayList<Integer>();
+                    atoms.add(c.getCBBHContactAtomNumA());
+                    atoms.add(c.getCBBHContactAtomNumB());
+                    bondsCBAtoms.add(atoms);
+                
+                ArrayList<String> atomNames = new ArrayList<String>();
+                atomNames.add(c.getResA().getAtoms().get(c.getCBBHContactAtomNumA()).getAtomName());
+                atomNames.add(c.getResB().getAtoms().get(c.getCBBHContactAtomNumB()).getAtomName());
+                bondsAtomNamesCB.add(atomNames);
+                }
+                
+            }
+            
+            // Select all residues of the protein that have interchain sidechain-sidechain h-bridge contacts
+            if(c.getNumContactsCCHB()> 0 || c.getNumContactsCCBH() > 0) {
+                if(! protRes.contains(c.getResA())) {
+                    protRes.add(c.getResA());
+                }
+                if(! protRes.contains(c.getResB())) {
+                    protRes.add(c.getResB());
+                }
+                if(! ccRes.contains(c.getResA())) {
+                    ccRes.add(c.getResA());
+                }
+                if(! ccRes.contains(c.getResB())) {
+                    ccRes.add(c.getResB());
+                }
+                
+                ArrayList<Integer> tmp = new ArrayList<Integer>();
+                tmp.add(c.getPdbResNumResA());
+                tmp.add(c.getPdbResNumResB());
+                bondsCC.add(tmp);
+                
+                ArrayList<String> chains = new ArrayList<String>();
+                chains.add(c.getResA().getChainID());
+                chains.add(c.getResB().getChainID());
+                bondsChainCC.add(chains);
+                
+                if(c.getNumContactsCCHB() > 0) {
+                    ArrayList<Integer> atoms = new ArrayList<Integer>();
+                    atoms.add(c.getCCHBContactAtomNumA());
+                    atoms.add(c.getCCHBContactAtomNumB());
+                    bondsCCAtoms.add(atoms);
+                
+                ArrayList<String> atomNames = new ArrayList<String>();
+                atomNames.add(c.getResA().getAtoms().get(c.getCCHBContactAtomNumA()).getAtomName());
+                atomNames.add(c.getResB().getAtoms().get(c.getCCHBContactAtomNumB()).getAtomName());
+                bondsAtomNamesCC.add(atomNames);
+                }
+                
+                if(c.getNumContactsCCBH() > 0) {
+                    ArrayList<Integer> atoms = new ArrayList<Integer>();
+                    atoms.add(c.getCCBHContactAtomNumA());
+                    atoms.add(c.getCCBHContactAtomNumB());
+                    bondsCCAtoms.add(atoms);
+                
+                ArrayList<String> atomNames = new ArrayList<String>();
+                atomNames.add(c.getResA().getAtoms().get(c.getCCBHContactAtomNumA()).getAtomName());
+                atomNames.add(c.getResB().getAtoms().get(c.getCCBHContactAtomNumB()).getAtomName());
+                bondsAtomNamesCC.add(atomNames);
+                }
+                
+            }
+            
             // Select all residues of the protein that have interchain sulfur contacts
             if(c.getNumContactsISS() > 0) {
                 if(! protRes.contains(c.getResA())) {
@@ -8302,6 +8534,58 @@ public class Main {
             }
         }
         
+        if(bbRes.isEmpty()) {
+            scriptBB = "select none";
+        } else {
+            scriptBB = "select bb_h_bridge_contact_res, ";
+            for(Integer i = 0; i < bbRes.size(); i++) {
+                scriptBB += "chain " + bbRes.get(i).getChainID() + " and resi " + bbRes.get(i).getPdbResNum();
+                
+                if(i < (bbRes.size() - 1)) {
+                    scriptBB += " + ";
+                }
+            }
+        }
+        
+        if(bcRes.isEmpty()) {
+            scriptBC = "select none";
+        } else {
+            scriptBC = "select bc_h_bridge_contact_res, ";
+            for(Integer i = 0; i < bcRes.size(); i++) {
+                scriptBC += "chain " + bcRes.get(i).getChainID() + " and resi " + bcRes.get(i).getPdbResNum();
+                
+                if(i < (bcRes.size() - 1)) {
+                    scriptBC += " + ";
+                }
+            }
+        }
+        
+        if(cbRes.isEmpty()) {
+            scriptCB = "select none";
+        } else {
+            scriptCB = "select cb_h_bridge_contact_res, ";
+            for(Integer i = 0; i < cbRes.size(); i++) {
+                scriptCB += "chain " + cbRes.get(i).getChainID() + " and resi " + cbRes.get(i).getPdbResNum();
+                
+                if(i < (cbRes.size() - 1)) {
+                    scriptCB += " + ";
+                }
+            }
+        }
+        
+        if(ccRes.isEmpty()) {
+            scriptCC = "select none";
+        } else {
+            scriptCC = "select cc_h_bridge_contact_res, ";
+            for(Integer i = 0; i < ccRes.size(); i++) {
+                scriptCC += "chain " + ccRes.get(i).getChainID() + " and resi " + ccRes.get(i).getPdbResNum();
+                
+                if(i < (ccRes.size() - 1)) {
+                    scriptCC += " + ";
+                }
+            }
+        }
+        
         if(issRes.isEmpty()) {
             scriptIss = "select none";
         } else {
@@ -8353,13 +8637,57 @@ public class Main {
         sb.append(blankLine);
         sb.append("select_ivdw = \'" + scriptIvdw + "\'");
         sb.append(blankLine);
+        sb.append("select_bb_h_bridge = \'" + scriptBB + "\'");
+        sb.append(blankLine);
+        sb.append("select_bc_h_bridge = \'" + scriptBC + "\'");
+        sb.append(blankLine);
+        sb.append("select_cb_h_bridge = \'" + scriptCB + "\'");
+        sb.append(blankLine);
+        sb.append("select_cc_h_bridge = \'" + scriptCC + "\'");
+        sb.append(blankLine);
         sb.append("select_iss = \'" + scriptIss + "\'");
         sb.append(blankLine);
         sb.append("bonds_ivdw = " + bondsIvdw.toString());
         sb.append(blankLine);
+        sb.append("bonds_bb = " + bondsBB.toString());
+        sb.append(blankLine);
+        sb.append("bonds_bc = " + bondsBC.toString());
+        sb.append(blankLine);
+        sb.append("bonds_cb = " + bondsCB.toString());
+        sb.append(blankLine);
+        sb.append("bonds_cc = " + bondsCC.toString());
+        sb.append(blankLine);
         
         sb.append("bonds_chain_ivdw = [");
         for(ArrayList<String> valuePair : bondsChainIvdw) {
+                sb.append("[\'" + valuePair.get(0) + "\',\'" + valuePair.get(1) + "\'],");
+        }
+        sb.append("]");
+        sb.append(blankLine);
+        
+        sb.append("bonds_chain_bb = [");
+        for(ArrayList<String> valuePair : bondsChainBB) {
+                sb.append("[\'" + valuePair.get(0) + "\',\'" + valuePair.get(1) + "\'],");
+        }
+        sb.append("]");
+        sb.append(blankLine);
+        
+        sb.append("bonds_chain_bc = [");
+        for(ArrayList<String> valuePair : bondsChainBC) {
+                sb.append("[\'" + valuePair.get(0) + "\',\'" + valuePair.get(1) + "\'],");
+        }
+        sb.append("]");
+        sb.append(blankLine);
+        
+        sb.append("bonds_chain_cb = [");
+        for(ArrayList<String> valuePair : bondsChainCB) {
+                sb.append("[\'" + valuePair.get(0) + "\',\'" + valuePair.get(1) + "\'],");
+        }
+        sb.append("]");
+        sb.append(blankLine);
+        
+        sb.append("bonds_chain_cc = [");
+        for(ArrayList<String> valuePair : bondsChainCC) {
                 sb.append("[\'" + valuePair.get(0) + "\',\'" + valuePair.get(1) + "\'],");
         }
         sb.append("]");
@@ -8382,9 +8710,45 @@ public class Main {
         sb.append("]");
         sb.append(blankLine);
         
+        sb.append("bonds_atom_names_bb = [");
+        for(ArrayList<String> valuePair : bondsAtomNamesBB) {
+            sb.append("[\'" + valuePair.get(0) + "\',\'" + valuePair.get(1) + "\'],");
+        }
+        sb.append("]");
+        sb.append(blankLine);
+        
+        sb.append("bonds_atom_names_bc = [");
+        for(ArrayList<String> valuePair : bondsAtomNamesBC) {
+            sb.append("[\'" + valuePair.get(0) + "\',\'" + valuePair.get(1) + "\'],");
+        }
+        sb.append("]");
+        sb.append(blankLine);
+        
+        sb.append("bonds_atom_names_cb = [");
+        for(ArrayList<String> valuePair : bondsAtomNamesCB) {
+            sb.append("[\'" + valuePair.get(0) + "\',\'" + valuePair.get(1) + "\'],");
+        }
+        sb.append("]");
+        sb.append(blankLine);
+        
+        sb.append("bonds_atom_names_cc = [");
+        for(ArrayList<String> valuePair : bondsAtomNamesCC) {
+            sb.append("[\'" + valuePair.get(0) + "\',\'" + valuePair.get(1) + "\'],");
+        }
+        sb.append("]");
+        sb.append(blankLine);
+        
         sb.append("pymol.cmd.do(\'{}\'.format(select_ivdw))");
         sb.append(blankLine);
         sb.append("pymol.cmd.do(\'{}\'.format(select_iss))");
+        sb.append(blankLine);
+        sb.append("pymol.cmd.do(\'{}\'.format(select_bb_h_bridge))");
+        sb.append(blankLine);
+        sb.append("pymol.cmd.do(\'{}\'.format(select_bc_h_bridge))");
+        sb.append(blankLine);
+        sb.append("pymol.cmd.do(\'{}\'.format(select_cb_h_bridge))");
+        sb.append(blankLine);
+        sb.append("pymol.cmd.do(\'{}\'.format(select_cc_h_bridge))");
         sb.append(blankLine);
         
         sb.append("for x, y in enumerate(bonds_ivdw):");
@@ -8392,6 +8756,66 @@ public class Main {
         sb.append("    pymol.cmd.distance(\'ivdw_distance\', \'chain {} and resi {} and name {}\'.format(bonds_chain_ivdw[x][0], y[0], bonds_atom_names_ivdw[x][0]), 'chain {} and resi {} and name {}'.format(bonds_chain_ivdw[x][1], y[1], bonds_atom_names_ivdw[x][1]))");
         sb.append(lineSep);
         sb.append("    pymol.cmd.color(\'red\', \'ivdw_distance\')");
+        sb.append(lineSep);
+        sb.append("pymol.cmd.do(\'set dash_width, 7\')");
+        sb.append(lineSep);
+        sb.append("pymol.cmd.do(\'set dash_length, 0.5\')");
+        sb.append(lineSep);
+        sb.append("pymol.cmd.do(\'set dash_gap, 0.2\')");
+        sb.append(lineSep);
+        sb.append("pymol.cmd.do(\'set label_distance_digits, 2\')");
+        sb.append(blankLine);
+        
+        sb.append("for x, y in enumerate(bonds_bb):");
+        sb.append(lineSep);
+        sb.append("    pymol.cmd.distance(\'bb_distance\', \'chain {} and resi {} and name {}\'.format(bonds_chain_bb[x][0], y[0], bonds_atom_names_bb[x][0]), 'chain {} and resi {} and name {}'.format(bonds_chain_bb[x][1], y[1], bonds_atom_names_bb[x][1]))");
+        sb.append(lineSep);
+        sb.append("    pymol.cmd.color(\'blue\', \'bb_distance\')");
+        sb.append(lineSep);
+        sb.append("pymol.cmd.do(\'set dash_width, 7\')");
+        sb.append(lineSep);
+        sb.append("pymol.cmd.do(\'set dash_length, 0.5\')");
+        sb.append(lineSep);
+        sb.append("pymol.cmd.do(\'set dash_gap, 0.2\')");
+        sb.append(lineSep);
+        sb.append("pymol.cmd.do(\'set label_distance_digits, 2\')");
+        sb.append(blankLine);
+        
+        sb.append("for x, y in enumerate(bonds_bc):");
+        sb.append(lineSep);
+        sb.append("    pymol.cmd.distance(\'bc_distance\', \'chain {} and resi {} and name {}\'.format(bonds_chain_bc[x][0], y[0], bonds_atom_names_bc[x][0]), 'chain {} and resi {} and name {}'.format(bonds_chain_bc[x][1], y[1], bonds_atom_names_bc[x][1]))");
+        sb.append(lineSep);
+        sb.append("    pymol.cmd.color(\'magenta\', \'bc_distance\')");
+        sb.append(lineSep);
+        sb.append("pymol.cmd.do(\'set dash_width, 7\')");
+        sb.append(lineSep);
+        sb.append("pymol.cmd.do(\'set dash_length, 0.5\')");
+        sb.append(lineSep);
+        sb.append("pymol.cmd.do(\'set dash_gap, 0.2\')");
+        sb.append(lineSep);
+        sb.append("pymol.cmd.do(\'set label_distance_digits, 2\')");
+        sb.append(blankLine);
+        
+        sb.append("for x, y in enumerate(bonds_cb):");
+        sb.append(lineSep);
+        sb.append("    pymol.cmd.distance(\'cb_distance\', \'chain {} and resi {} and name {}\'.format(bonds_chain_cb[x][0], y[0], bonds_atom_names_cb[x][0]), 'chain {} and resi {} and name {}'.format(bonds_chain_cb[x][1], y[1], bonds_atom_names_cb[x][1]))");
+        sb.append(lineSep);
+        sb.append("    pymol.cmd.color(\'violet\', \'cb_distance\')");
+        sb.append(lineSep);
+        sb.append("pymol.cmd.do(\'set dash_width, 7\')");
+        sb.append(lineSep);
+        sb.append("pymol.cmd.do(\'set dash_length, 0.5\')");
+        sb.append(lineSep);
+        sb.append("pymol.cmd.do(\'set dash_gap, 0.2\')");
+        sb.append(lineSep);
+        sb.append("pymol.cmd.do(\'set label_distance_digits, 2\')");
+        sb.append(blankLine);
+        
+        sb.append("for x, y in enumerate(bonds_cc):");
+        sb.append(lineSep);
+        sb.append("    pymol.cmd.distance(\'cc_distance\', \'chain {} and resi {} and name {}\'.format(bonds_chain_cc[x][0], y[0], bonds_atom_names_cc[x][0]), 'chain {} and resi {} and name {}'.format(bonds_chain_cc[x][1], y[1], bonds_atom_names_cc[x][1]))");
+        sb.append(lineSep);
+        sb.append("    pymol.cmd.color(\'cyan\', \'cc_distance\')");
         sb.append(lineSep);
         sb.append("pymol.cmd.do(\'set dash_width, 7\')");
         sb.append(lineSep);
