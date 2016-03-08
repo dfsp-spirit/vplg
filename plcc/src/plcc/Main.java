@@ -2082,6 +2082,13 @@ public class Main {
         } else {        
             if(Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model")) {
                 cInfo = calculateAllContactsAlternativeModel(residues);
+                
+                if(getPymolSelectionScriptPPI(cInfo, pdbid)) {
+                    System.out.println("[PYMOL] Python script successfully written.");
+                }
+                else {
+                    System.out.println("[PYMOL] Error: Python script could not be written.");
+                }
             }
             else {
                 cInfo = calculateAllContacts(residues);
@@ -4541,12 +4548,7 @@ public class Main {
         }
         
             
-        if(getPymolSelectionScriptPPI(contactInfo)) {
-            System.out.println("[PYMOL] Python script successfully written.");
-        }
-        else {
-            System.out.println("[PYMOL] Error: Python script could not be written.");
-        }
+        
         return(contactInfo);
     }
     
@@ -8128,7 +8130,7 @@ public class Main {
      * @param contacts the contacts to consider for this script.
      * @return true if python file could be written, otherwise false.
      */
-    public static Boolean getPymolSelectionScriptPPI (ArrayList<ResContactInfo> contacts) {
+    public static Boolean getPymolSelectionScriptPPI (ArrayList<ResContactInfo> contacts, String pdbid) {
         ArrayList<Residue> protRes = new ArrayList<Residue>();  // all residues of interchain protein contacts
         ArrayList<Residue> ligRes = new ArrayList<Residue>();   // all residues of ligand contacts
         ArrayList<Residue> ivdwRes = new ArrayList<Residue>();  // all residues of interchain van der Waals contacts
@@ -8826,7 +8828,7 @@ public class Main {
         sb.append("pymol.cmd.do(\'set label_distance_digits, 2\')");
         sb.append(blankLine);
         
-        File pythonScript = new File("./visualize_bonds_pymol.py");
+        File pythonScript = new File("./" + pdbid + "_visualize_bonds_pymol.py");
         try {
             FileWriter fw = new FileWriter(pythonScript.getAbsoluteFile());
             BufferedWriter bw = new BufferedWriter(fw);
