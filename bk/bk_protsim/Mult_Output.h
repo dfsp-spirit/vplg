@@ -12,7 +12,12 @@
 #include <fstream>
 #include "Graph.h"
 
-
+/*
+ * Class to handle the results of the Mult_align class.
+ * All clique passed to an instance of this class will be written to files in the specified directory.
+ * For each clique size a new file will be added to allow for easier comparison.
+ * Additionally the number of cliques of each size is counted and can be accessed at any time.
+ */
 class Mult_Output {
 public:
     Mult_Output();
@@ -21,10 +26,12 @@ public:
     
     void out(std::list<std::list<EdgeDescriptor>>&, const std::vector<Graph*>&);
     std::vector<unsigned int> distribution();
-
+    
+    void filter_iso();
     
     
 private: 
+    int filter_copy(std::string&, std::string&);
     std::string DIR;
     std::vector<std::ofstream*> streams;
     std::vector<unsigned int> counts;
