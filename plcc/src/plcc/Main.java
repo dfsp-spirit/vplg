@@ -2082,13 +2082,6 @@ public class Main {
         } else {        
             if(Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model")) {
                 cInfo = calculateAllContactsAlternativeModel(residues);
-                
-                if(getPymolSelectionScriptPPI(cInfo, pdbid)) {
-                    System.out.println("[PYMOL] Python script successfully written.");
-                }
-                else {
-                    System.out.println("[PYMOL] Error: Python script could not be written.");
-                }
             }
             else {
                 cInfo = calculateAllContacts(residues);
@@ -2556,6 +2549,36 @@ public class Main {
                     else {
                         System.err.println("ERROR: Could not write AAGraph for all chains to file '" + aagFile + "'.");
                     }
+                    
+                    if(Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model")) {
+                        
+                        // Writes and saves a python script that can be used to visualize bonds with PyMol
+                        if(getPymolSelectionScriptPPI(cInfo, pdbid)) {
+                            System.out.println("[PYMOL] Python script successfully written.");
+                        }
+                        else {
+                            System.out.println("[PYMOL] Error: Python script could not be written.");
+                        }
+                        
+                        // write the simple AA graph to disc
+                        String simpleAagFile = pdbid + "_aagraph_simple.fanmod";
+                        if(writeStringToFile(simpleAagFile, aag.toFanMod().get(0))) {
+                            if(! silent) {
+                                System.out.println("  Simple AAGraph for all chains written to file '" + simpleAagFile + "'.");
+                            }
+                        } else {
+                            System.err.println("ERROR: Could not write simple AAGraph for all chains to file '" + simpleAagFile + "'.");
+                        }
+                        // Write corresponding index file to disc
+                        String simpleAagIndexFile = pdbid + "_aagraph_simple.id";
+                        if(writeStringToFile(simpleAagIndexFile, aag.toFanMod().get(1))) {
+                            if(! silent) {
+                                System.out.println("  Simple AAGraph index for all chains written to file '" + simpleAagIndexFile + "'.");
+                            }
+                        } else {
+                            System.err.println("ERROR: Could not write simple AAGraph index for all chains to file '" + simpleAagIndexFile + "'.");
+                        }
+                            }
                     
                     if(Settings.getBoolean("plcc_B_draw_aag")) {
                         Map<Integer, Color> cmap = new HashMap<>();
