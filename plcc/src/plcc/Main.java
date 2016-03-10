@@ -5479,7 +5479,7 @@ public class Main {
                                 System.out.println("New BS NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
                         }
                         }
-                        catch(java.lang.ArrayIndexOutOfBoundsException e){
+                        catch(java.lang.IndexOutOfBoundsException e){
                             System.out.println("NH -> O backbone-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                     }
@@ -5529,7 +5529,7 @@ public class Main {
                             System.out.println("New SB NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
                         }
                         }
-                        catch(java.lang.ArrayIndexOutOfBoundsException e){
+                        catch(java.lang.IndexOutOfBoundsException e){
                             System.out.println("NH -> O sidechain-backbone calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                     }
@@ -5583,7 +5583,7 @@ public class Main {
                                 System.out.println("New BS NHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
                         }
                         }
-                        catch(java.lang.ArrayIndexOutOfBoundsException e){
+                        catch(java.lang.IndexOutOfBoundsException e){
                             System.out.println("NH -> OH backbone-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                     }
@@ -5637,7 +5637,7 @@ public class Main {
                         }
                         
                     }
-                        catch(java.lang.ArrayIndexOutOfBoundsException e){
+                        catch(java.lang.IndexOutOfBoundsException e){
                             System.out.println("NH -> OH sidechain-backbone calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                     }
@@ -5750,7 +5750,7 @@ public class Main {
                                 System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
                         }
                         }
-                        catch(java.lang.ArrayIndexOutOfBoundsException e){
+                        catch(java.lang.IndexOutOfBoundsException e){
                             System.out.println("NH -> NH backbone-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                     }
@@ -5862,7 +5862,7 @@ public class Main {
                                 System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
                         }
                         }
-                        catch(java.lang.ArrayIndexOutOfBoundsException e){
+                        catch(java.lang.IndexOutOfBoundsException e){
                             System.out.println("NH -> NH sidechain-backbone calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                     }
