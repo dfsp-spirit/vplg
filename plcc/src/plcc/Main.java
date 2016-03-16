@@ -8538,10 +8538,13 @@ public class Main {
             scriptLig = "select none";
         } else {
 
-            scriptLig = "";
+            scriptLig = "select lig_contact_res, ";
             for(Integer k = 0; k < ligRes.size(); k++) {
-
-                scriptLig += "select lig_" + ligRes.get(k).getName3().trim() + ", resi " + ligRes.get(k).getPdbResNum() + "\n";
+                scriptLig += "chain " + ligRes.get(k).getChainID() + " and resi " + ligRes.get(k).getPdbResNum();
+                
+                if(k < (ligRes.size() - 1)) {
+                    scriptLig += " + ";
+                }
 
             }
         }
@@ -8774,6 +8777,8 @@ public class Main {
         sb.append("pymol.cmd.do(\'{}\'.format(select_cb_h_bridge))");
         sb.append(blankLine);
         sb.append("pymol.cmd.do(\'{}\'.format(select_cc_h_bridge))");
+        sb.append(blankLine);
+        sb.append("pymol.cmd.do(\'{}\'.format(select_ligands))");
         sb.append(blankLine);
         
         sb.append("for x, y in enumerate(bonds_ivdw):");
