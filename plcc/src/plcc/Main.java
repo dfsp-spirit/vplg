@@ -2082,13 +2082,6 @@ public class Main {
         } else {        
             if(Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model")) {
                 cInfo = calculateAllContactsAlternativeModel(residues);
-                
-                if(getPymolSelectionScriptPPI(cInfo, pdbid)) {
-                    System.out.println("[PYMOL] Python script successfully written.");
-                }
-                else {
-                    System.out.println("[PYMOL] Error: Python script could not be written.");
-                }
             }
             else {
                 cInfo = calculateAllContacts(residues);
@@ -2556,6 +2549,36 @@ public class Main {
                     else {
                         System.err.println("ERROR: Could not write AAGraph for all chains to file '" + aagFile + "'.");
                     }
+                    
+                    if(Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model")) {
+                        
+                        // Writes and saves a python script that can be used to visualize bonds with PyMol
+                        if(getPymolSelectionScriptPPI(cInfo, pdbid)) {
+                            System.out.println("[PYMOL] Python script successfully written.");
+                        }
+                        else {
+                            System.out.println("[PYMOL] Error: Python script could not be written.");
+                        }
+                        
+                        // write the simple AA graph to disc
+                        String simpleAagFile = pdbid + "_aagraph_simple.fanmod";
+                        if(writeStringToFile(simpleAagFile, aag.toFanMod().get(0))) {
+                            if(! silent) {
+                                System.out.println("  Simple AAGraph for all chains written to file '" + simpleAagFile + "'.");
+                            }
+                        } else {
+                            System.err.println("ERROR: Could not write simple AAGraph for all chains to file '" + simpleAagFile + "'.");
+                        }
+                        // Write corresponding index file to disc
+                        String simpleAagIndexFile = pdbid + "_aagraph_simple.id";
+                        if(writeStringToFile(simpleAagIndexFile, aag.toFanMod().get(1))) {
+                            if(! silent) {
+                                System.out.println("  Simple AAGraph index for all chains written to file '" + simpleAagIndexFile + "'.");
+                            }
+                        } else {
+                            System.err.println("ERROR: Could not write simple AAGraph index for all chains to file '" + simpleAagIndexFile + "'.");
+                        }
+                            }
                     
                     if(Settings.getBoolean("plcc_B_draw_aag")) {
                         Map<Integer, Color> cmap = new HashMap<>();
@@ -5479,7 +5502,7 @@ public class Main {
                                 System.out.println("New BS NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
                         }
                         }
-                        catch(java.lang.ArrayIndexOutOfBoundsException e){
+                        catch(java.lang.IndexOutOfBoundsException e){
                             System.out.println("NH -> O backbone-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                     }
@@ -5529,7 +5552,7 @@ public class Main {
                             System.out.println("New SB NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
                         }
                         }
-                        catch(java.lang.ArrayIndexOutOfBoundsException e){
+                        catch(java.lang.IndexOutOfBoundsException e){
                             System.out.println("NH -> O sidechain-backbone calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                     }
@@ -5583,7 +5606,7 @@ public class Main {
                                 System.out.println("New BS NHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
                         }
                         }
-                        catch(java.lang.ArrayIndexOutOfBoundsException e){
+                        catch(java.lang.IndexOutOfBoundsException e){
                             System.out.println("NH -> OH backbone-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                     }
@@ -5637,7 +5660,7 @@ public class Main {
                         }
                         
                     }
-                        catch(java.lang.ArrayIndexOutOfBoundsException e){
+                        catch(java.lang.IndexOutOfBoundsException e){
                             System.out.println("NH -> OH sidechain-backbone calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                     }
@@ -5750,7 +5773,7 @@ public class Main {
                                 System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
                         }
                         }
-                        catch(java.lang.ArrayIndexOutOfBoundsException e){
+                        catch(java.lang.IndexOutOfBoundsException e){
                             System.out.println("NH -> NH backbone-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                     }
@@ -5862,7 +5885,7 @@ public class Main {
                                 System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
                         }
                         }
-                        catch(java.lang.ArrayIndexOutOfBoundsException e){
+                        catch(java.lang.IndexOutOfBoundsException e){
                             System.out.println("NH -> NH sidechain-backbone calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                     }
@@ -8515,10 +8538,13 @@ public class Main {
             scriptLig = "select none";
         } else {
 
-            scriptLig = "";
+            scriptLig = "select lig_contact_res, ";
             for(Integer k = 0; k < ligRes.size(); k++) {
-
-                scriptLig += "select lig_" + ligRes.get(k).getName3().trim() + ", resi " + ligRes.get(k).getPdbResNum() + "\n";
+                scriptLig += "chain " + ligRes.get(k).getChainID() + " and resi " + ligRes.get(k).getPdbResNum();
+                
+                if(k < (ligRes.size() - 1)) {
+                    scriptLig += " + ";
+                }
 
             }
         }
@@ -8751,6 +8777,8 @@ public class Main {
         sb.append("pymol.cmd.do(\'{}\'.format(select_cb_h_bridge))");
         sb.append(blankLine);
         sb.append("pymol.cmd.do(\'{}\'.format(select_cc_h_bridge))");
+        sb.append(blankLine);
+        sb.append("pymol.cmd.do(\'{}\'.format(select_ligands))");
         sb.append(blankLine);
         
         sb.append("for x, y in enumerate(bonds_ivdw):");

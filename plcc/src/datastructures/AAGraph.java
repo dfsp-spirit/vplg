@@ -12,9 +12,11 @@ import java.util.Arrays;
 import proteinstructure.AminoAcid;
 import graphformats.IGraphModellingLanguageFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import plcc.Settings;
 import proteingraphs.ResContactInfo;
 import proteinstructure.Residue;
@@ -584,6 +586,80 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         
         return(gmlf.toString());
     }
+    
+    /**
+     * Creates a simple text represenation of the graph used by the FANMOD software and also maps the indices from the standard AAGraph to this simple representation.
+     * The standard AAGraph format does not suit the required input format for the FANMOD software. (See: http://theinf1.informatik.uni-jena.de/~wernicke/motifs/fanmod-manual.pdf
+     * for more details)
+     * This will also return a string that maps the index a vertex has in the standard AAGraph format to the index the vertex now has in the simple representation.
+     * @return two strings, one representing the graph to be used by the FANMOD software and the other mapping the vertices index from the standard AAGraph to this simple representation.
+     */
+    public ArrayList<String> toFanMod() {
+        StringBuilder sbAag = new StringBuilder();
+        StringBuilder sbIdx = new StringBuilder();
+        Residue residue;
+        HashMap<Integer, Integer> indexTable = new HashMap<Integer, Integer>();
+        
+        // Header for index file
+        sbIdx.append("# SimpleGraphID, AAGraphID, PDBResNum, PDBResName");
+        sbIdx.append(System.lineSeparator());
+        
+        
+        List<Integer[]> allEdges = this.getEdgeListIndex();
+        
+        // Create a list that contains all the vertices that contribute to edges
+        ArrayList<Integer> allVerticesFromEdges = new ArrayList<Integer>();
+        for(Integer[] edge : allEdges) {
+            allVerticesFromEdges.add(edge[0]);
+            allVerticesFromEdges.add(edge[1]);
+        }
+        
+        // Get rid of redundant entries from the allVerticesFromEdges list (make a set out of it) and then sort and convert it to a new list.
+        // This is done because the FANMOD software wants a graph whose vertices are labelled as consecutive integers with the lowest integer
+        // being zero.
+        HashSet<Integer> tmpHashSet = new HashSet<Integer>(allVerticesFromEdges);   // gets rid off non-redundant entries
+        TreeSet<Integer> tmpTreeSet = new TreeSet<Integer>(tmpHashSet);             // sorts the set
+        ArrayList<Integer> sortedList = new ArrayList<Integer>(tmpTreeSet);         // converts the sorted, non-redundant set back to an ArrayList
+        
+        // Save the vertex ID from the AAGraph and corresponding vertex ID from the simple AAGraph in the HashMap.
+        // Also build a string that contains those IDs, the PDBResNum and the PDBResName to be able to identify the
+        // vertices from the simple AAGraph. This string will be saved in the *_aag_simple.id file
+        for(int i = 0; i < sortedList.size(); i++) {
+            indexTable.put(sortedList.get(i), i);
+            
+            residue = this.vertices.get(sortedList.get(i));
+            
+            sbIdx.append(i);
+            sbIdx.append(",");
+            sbIdx.append(sortedList.get(i));
+            sbIdx.append(",");
+            sbIdx.append(residue.getPdbResNum());
+            sbIdx.append(",");
+            sbIdx.append(residue.getResName3());
+            sbIdx.append(System.lineSeparator());
+        }
+       
+        // Build string for the *_aag_simple.fanmod file.
+        Integer src, tgt;
+        for(Integer[] edge : allEdges) {
+            src = edge[0];
+            tgt = edge[1];
+            
+            sbAag.append(indexTable.get(src));
+            sbAag.append(" ");
+            sbAag.append(indexTable.get(tgt));
+            sbAag.append(System.lineSeparator());
+        }
+        
+        
+        ArrayList<String> output = new ArrayList<String>();
+        output.add(sbAag.toString());
+        output.add(sbIdx.toString());
+        
+        return(output);
+    }
+    
+    
     
     
     /**
