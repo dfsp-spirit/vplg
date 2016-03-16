@@ -49,7 +49,7 @@ int main (int argc, char** argv) {
         } //end for all input files  
         std::sort(graphs.begin(), graphs.end(),edgecomp);
         for (auto p : graphs) {
-            if (p) { std::cout << (*p)[boost::graph_bundle].properties["pdb_id"] << (*p)[boost::graph_bundle].properties["chain_id"] << std::endl;}}
+            if (p) { std::cout << (*p)[boost::graph_bundle].properties["pdb_id"] << (*p)[boost::graph_bundle].properties["chain_id"] << "\n";}}
         std::cout << std::endl;
 
 
@@ -60,9 +60,9 @@ int main (int argc, char** argv) {
             ProductGraph* p = new ProductGraph(*graphs[0],*graphs[i]);
             products[i] = p;
             p->run();
-            std::cout <<"PG "<< i << " with " << boost::num_edges(p->getProductGraph()) << " edges and "<< boost::num_vertices(p->getProductGraph())  <<  " vertices." << std::endl;
+            std::cout <<"PG "<< i << " with " << boost::num_edges(p->getProductGraph()) << " edges and "<< boost::num_vertices(p->getProductGraph())  <<  " vertices.\n";
         } //end for all graphs
-        std::cout << "Prod Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        std::cout << "Prod Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms\n";
         std::cout << std::endl;
 
 
@@ -74,23 +74,31 @@ int main (int argc, char** argv) {
             alignments[i] = bk;
             bk->run_c();
             bk->set_result(PG_Output::filter_iso(*products[i],bk->get_result_list()));
-            std::cout << "Alignment"  << i << " has " << BK_Output::get_result_all(*bk).size() <<" cliques." << std::endl;
+            std::cout << "Alignment "  << i << " has " << BK_Output::get_result_all(*bk).size() <<" cliques.\n";
         } //end for all product graphs
-        std::cout << "Bron Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
+        std::cout << "Bron Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms\n";
         std::cout << std::endl;
 
         
         
         //compute multiple alignment
         start = std::clock();
-        MultAlign multi(graphs, products, alignments, argc-1, "output.txt");
+        MultAlign multi(graphs, products, alignments, argc-1, "Output");
         multi.run();
-        std::cout << "Mult Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms" << std::endl;
-        std::cout << multi.num_cliques();
+        std::cout << "Number before filter " << multi.num_cliques() << "\n";
+        std::cout << "Mult Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms\n";
+        std::cout << std::endl;
+        
+        //filter duplicates
+        start = std::clock();
+        multi.filter();
+        std::cout << "Number after filter " << multi.num_cliques() << "\n";
+        std::cout << "Filter Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms\n";
+        std::cout << std::endl;
     
     
     } //end try
-    catch(const std::exception& e){
+    catch(const std::exception& e){ //general exception catch and output
         std::cout << e.what();
         exit(1);
     } //end catch

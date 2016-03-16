@@ -18,8 +18,7 @@ typedef std::list<VertexDescriptor> s_clique;
 MultAlign::MultAlign() : graphs(), products(), alignments(), I(0) {count = 0;}
 
 MultAlign::MultAlign(const std::vector<Graph*> g, const std::vector<ProductGraph*> p, const std::vector<BronKerbosch*> a, int i, std::string out) 
-                    : graphs(g), products(p), alignments(a), I(i){
-    oManager = Mult_Output(out);
+                    : graphs(g), products(p), alignments(a), I(i), oManager(Mult_Output(out)){
     count = 0;
 } 
 
@@ -61,6 +60,10 @@ void MultAlign::run() {
         }//end turn the simple clique into a complex one
         intersect(complex, 2); //call intersect to add the remaining layers to the cc
     }
+}
+
+void MultAlign::filter() {
+    this->oManager.filter_iso();
 }
 
 /*
