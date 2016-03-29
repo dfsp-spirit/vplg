@@ -451,9 +451,7 @@ public class Main {
                         argsUsed[i] = true;
                     }
                     
-                    if(Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model")) {
-                        
-                    }
+                    
                     
                     if(s.equals("-p") || s.equals("--pdbfile")) {
                         if(args.length <= i+1 ) {
