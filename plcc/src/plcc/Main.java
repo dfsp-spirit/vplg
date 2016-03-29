@@ -451,6 +451,10 @@ public class Main {
                         argsUsed[i] = true;
                     }
                     
+                    if(Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model")) {
+                        
+                    }
+                    
                     if(s.equals("-p") || s.equals("--pdbfile")) {
                         if(args.length <= i+1 ) {
                             syntaxError();
@@ -5204,6 +5208,12 @@ public class Main {
     }
  
     
+    public static List<Integer> calculatePiEffects(Residue a, Residue b) {
+        throw new java.lang.UnsupportedOperationException("Not implemented yet");
+        //List<Atom> resAAtoms = a.getAtoms();
+        
+    }
+    
     /**
      * Alternative model to calculate the atom contacts between residue 'a' and 'b'.
      * This alternative model is used to calculate interchain contacts between
@@ -5238,6 +5248,8 @@ public class Main {
         sidechainNHAAs.add("GLN");
         sidechainNHAAs.add("TRP");
         
+        Main.calculatePiEffects(a, b);
+        // TODO: save results to RCI
         
         Integer[] numPairContacts = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL];
         // The positions in the numPairContacts array hold the number of contacts of each type for a pair of residues:
