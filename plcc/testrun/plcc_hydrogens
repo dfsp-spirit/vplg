@@ -1,0 +1,42 @@
+#!/bin/bash
+
+## check for java in PATH
+which java > /dev/null
+if [ $? -ne 0 ]; then
+    echo "ERROR: Could not find 'java' executable in PATH. Is the JRE installed?"
+    exit 1
+fi
+
+## k, run. some settings first
+APPTAG="[PH]"
+PDBID=$1
+PDBFILE="${PDBID}.pdb"
+PDBFILE_STRIPPED_HYD="${PDBID}_stripped_hyd.pdb"
+#PDBFILE_ADDED_HYD="${PDBID}_added_hyd.pdb"
+PDBFILE_ADDED_HYD="${PDBFILE}"
+REDUCE_PROGRAM="./reduce"
+
+if [ -z "$1" ]; then
+  echo "$APPTAG Usage: $0 <plcc options>."
+  echo "$APPTAG The first argument should be the basename of a PDB file contained in this directory."
+  exit 1
+fi
+
+if [ ! -f "$PDBFILE" ]; then
+  echo "$APPTAG ERROR: PDB file '$PDBFILE' expected but not found, exiting."
+  exit 1
+fi
+
+## strip hydrogens
+echo "$APPTAG Stripping hydrogens from PDB file '$PDBFILE' with reduce... (will save output at '$PDBFILE_STRIPPED_HYD')."
+$($REDUCE_PROGRAM -Trim -Quiet $PDBFILE > $PDBFILE_STRIPPED_HYD)
+
+## add them back
+echo "$APPTAG Adding hydrogens to PDB file '$PDBFILE_STRIPPED_HYD' with reduce... (will save output at '$PDBFILE_ADDED_HYD')"
+$($REDUCE_PROGRAM -FLIP -Quiet $PDBFILE_STRIPPED_HYD > $PDBFILE_ADDED_HYD)
+
+echo "$APPTAG New PDB file with added hydrogens written to '$PDBFILE_ADDED_HYD'. Running plcc."
+## done, run plcc
+
+java -jar plcc.jar $@
+
