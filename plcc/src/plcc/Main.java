@@ -5208,8 +5208,14 @@ public class Main {
  
     
     public static List<Integer> calculatePiEffects(Residue a, Residue b) {
-        throw new java.lang.UnsupportedOperationException("Not implemented yet");
+        if(Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce")) {
+            System.out.println("calculatePiEffects: Residue " + a.getFancyName() + " has " + a.getHydrogenAtoms().size() + " H atoms.");
+        }
+        
+        //throw new java.lang.UnsupportedOperationException("Not implemented yet");
         //List<Atom> resAAtoms = a.getAtoms();
+        List<Integer> ret = new ArrayList();
+        return ret;
         
     }
     

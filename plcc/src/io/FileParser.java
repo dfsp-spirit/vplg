@@ -687,11 +687,14 @@ public class FileParser {
             DP.getInstance().w("Residue with PDB # " + resNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue.");
             return(false);
         } else {            
-            tmpRes.addAtom(a);
-            if( ! (Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
+            
+            if(Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {
                 tmpRes.addHydrogenAtom(a);
             }
-            s_atoms.add(a);
+            else {
+                tmpRes.addAtom(a);
+                s_atoms.add(a);
+            }
         }                
 
         return(true);
