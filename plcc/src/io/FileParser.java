@@ -87,6 +87,24 @@ public class FileParser {
     static Integer[] resIndexPDB = null;        // for a DSSP res number, holds the index of that residue in s_residues
     static Integer[] resIndexDSSP = null;       // for a PDB res number, holds the index of that residue in s_residues
 
+    
+    /**
+     * Parses the contents of a line from the given startIndex to the end of the line.
+     * @param startIndexInclusive the start index, inclusive
+     * @param line the whole line as a string
+     * @return the contents of the line from start index to end -- may be empty. if the line is too short, the string is also empty (even if it is shorter than start index).
+     */
+    public static String getLineContentsToEndFrom(int startIndexInclusive, String line) {
+        if(line == null) {
+            return "";
+        }
+        int length = line.length();
+        if(length <= startIndexInclusive) {
+            return "";
+        }
+        String substr = line.substring(startIndexInclusive, length);
+        return substr;
+    }
 
     /**
      * @param df Path to a DSSP file. Does NOT test whether it exist, do that earlier.
@@ -767,11 +785,24 @@ public class FileParser {
         String iCode = " ";
 
         try {
-            cTerminusResNumPDB = Integer.valueOf((curLinePDB.substring(22, 26)).trim());
-            cID = curLinePDB.substring(21, 22);
-            iCode = curLinePDB.substring(26, 27);
+            
+            // Ugly hack for the non-standard PDB files produced by the 'reduce' hydrogen program follows.
+            // Reduce rewrites the PDB file and does NOT fill the empty lines with spaces, so we need to cope with shorter line lengths here.
+            if(curLinePDB.length() < 27) {
+                cID = curLinePDB.substring(21, 22);
+                cTerminusResNumPDB = Integer.valueOf((FileParser.getLineContentsToEndFrom(22, curLinePDB).trim()));                                        
+                iCode = ""; // icode parsing is not supported with reduce-made PDB files, I'm not sure what they do with it and how we should discriminate it from the last digit of the residue number
+                DP.getInstance().w("Main", " Non-standard PDB 'TER' line of length " + curLinePDB.length() + " encountered. Parsing of iCode not supported for these lines. Assuming terminating residue number '" + cTerminusResNumPDB + "' and empty iCode for chain '" + cID + "'.");
+            }
+            else {
+                // this is the method for standard PDB files
+                cTerminusResNumPDB = Integer.valueOf((curLinePDB.substring(22, 26)).trim());
+                cID = curLinePDB.substring(21, 22);                        
+                iCode = curLinePDB.substring(26, 27);
+            }
+            
         } catch (Exception e) {
-            System.err.println("WARNING: Hit TER line at PDB line number " + curLineNumPDB + " but parsing the line failed, ignoring.");
+            System.err.println("WARNING: Hit TER line at PDB line number " + curLineNumPDB + " but parsing the line failed: '" + e.getMessage() + "', ignoring.");
             //e.printStackTrace();
             //System.exit(1);
         }
@@ -1657,10 +1688,23 @@ public class FileParser {
                     hetID = line.substring(12, 15);                         // Can't trim this as spaces are important!
                     continuation = (line.substring(16, 18)).trim();
                     asterisk = (line.substring(18, 19)).trim();
-                    formula = (line.substring(19, 71)).trim();
+                    
+                    // Ugly hack for the non-standard PDB files produced by the 'reduce' hydrogen program follows.
+                    // Reduce rewrites the PDB file and does NOT fill the empty lines with spaces, so we need to cope with shorter line lengths here.
+                    if(line.length() < 71) {
+                        formula = FileParser.getLineContentsToEndFrom(19, line);
+                    }
+                    else {
+                        // this is the method for standard PDB files
+                        formula = (line.substring(19, 71)).trim();
+                    }
                 } catch(NumberFormatException e) {
                     System.err.println("ERROR: Parsing FORMUL line at PDB line number " + i + " failed.");
                     //e.printStackTrace();
+                    continue;
+                }
+                catch(StringIndexOutOfBoundsException s) {
+                    System.err.println("ERROR: Parsing FORMUL line at PDB line number " + i + " failed.");
                     continue;
                 }
 
@@ -1695,7 +1739,15 @@ public class FileParser {
                 try {
                     continuation = (line.substring(8, 10)).trim();
                     hetID = line.substring(11, 14);                         // Can't trim this as spaces are important!
-                    name = (line.substring(15, 71)).trim();
+                    
+                    // Ugly hack for the non-standard PDB files produced by the 'reduce' hydrogen program follows.
+                    // Reduce rewrites the PDB file and does NOT fill the empty lines with spaces, so we need to cope with shorter line lengths here.
+                    if(line.length() < 71) {
+                        name = FileParser.getLineContentsToEndFrom(15, line);
+                    }
+                    else {
+                        name = (line.substring(15, 71)).trim();
+                    }
                 } catch(Exception e) {
                     System.err.println("ERROR: Parsing HETNAM line at PDB line number " + i + " failed.");
                     //e.printStackTrace();
