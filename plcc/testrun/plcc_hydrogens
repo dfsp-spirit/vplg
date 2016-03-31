@@ -33,7 +33,7 @@ $($REDUCE_PROGRAM -Trim -Quiet $PDBFILE > $PDBFILE_STRIPPED_HYD)
 
 ## add them back
 echo "$APPTAG Adding hydrogens to PDB file '$PDBFILE_STRIPPED_HYD' with reduce... (will save output at '$PDBFILE_ADDED_HYD')"
-$($REDUCE_PROGRAM -FLIP -Quiet $PDBFILE_STRIPPED_HYD > $PDBFILE_ADDED_HYD)
+$($REDUCE_PROGRAM -build -Quiet $PDBFILE_STRIPPED_HYD > $PDBFILE_ADDED_HYD)
 
 echo "$APPTAG New PDB file with added hydrogens written to '$PDBFILE_ADDED_HYD'. Running plcc."
 ## done, run plcc
