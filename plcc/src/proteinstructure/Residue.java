@@ -13,6 +13,7 @@ import proteinstructure.SSE;
 import tools.DP;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 import plcc.Main;
 import plcc.Settings;
@@ -34,7 +35,8 @@ public class Residue implements java.io.Serializable {
     private String resName3 = null;                          // 3 letter name
     private String AAName1 = null;                          // 1 letter name, AAs only
     private Integer type = null;                            // residue type: 0=AA, 1=Ligand, 2=Other
-    private ArrayList<Atom> atoms = null;                         // a list of all Atoms of the Residue
+    private ArrayList<Atom> atoms = null;                         // a list of all (non-H) Atoms of the Residue
+    private ArrayList<Atom> hydrogenatoms = null;                         // a list of all hydrogen Atoms of the Residue
     private Integer pdbResNum = null;                       // pdb residue number
     private Integer dsspResNum = null;                      // guess what
     private Chain chain = null;                             // the Chain this Residue belongs to
@@ -102,7 +104,7 @@ public class Residue implements java.io.Serializable {
     }
     
     // constructor
-    public Residue() { atoms = new ArrayList<Atom>(); }
+    public Residue() { atoms = new ArrayList<Atom>(); hydrogenatoms = new ArrayList<Atom>(); }
 
     /**
      * Constructs a new residue with PDB residue number 'prn' and DSSP residue number 'drn'.
@@ -111,6 +113,7 @@ public class Residue implements java.io.Serializable {
      */
     public Residue(Integer residueNumberPDB, Integer residueNumberDSSP) {
         atoms = new ArrayList<Atom>();
+        hydrogenatoms = new ArrayList<Atom>();
         pdbResNum = residueNumberPDB;
         dsspResNum = residueNumberDSSP;
     }
@@ -678,10 +681,16 @@ public class Residue implements java.io.Serializable {
     public String getChainID() { return(chainID); }
     
     /**
-     * Returns the list of atoms of this residue.
+     * Returns the list of (non-H) atoms of this residue.
      * @return the atom list
      */
     public ArrayList<Atom> getAtoms() { return(atoms); }
+    
+    /**
+     * Returns the list of hydrogen atoms of this residue. Only available with special command line options and PDB files!
+     * @return the hydrogen atom list
+     */
+    public List<Atom> getHydrogenAtoms() { return hydrogenatoms; }
     
     /**
      * Returns the atom count of this Residue.
@@ -790,6 +799,7 @@ public class Residue implements java.io.Serializable {
 
     // setters
     public void addAtom(Atom a) { atoms.add(a); }
+    public void addHydrogenAtom(Atom a) { hydrogenatoms.add(a); }
     public void setResName3(String s) { resName3 = s; }
     public void setAAName1(String s) { AAName1 = s; }
     public void setType(Integer i) { type = i; }

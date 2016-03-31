@@ -583,6 +583,12 @@ public class FileParser {
             // 66 - 72 are ignored: blanks
             // 72 - 75 are ignored: segment identifier
             chemSym = curLinePDB.substring(76, 78);
+            
+            
+            //if(chemSym.trim().equals("H")) {
+            //    System.out.println("Found hydrogen line '" + curLinePDB + "'.");
+            //}
+            
             // 78 - 79 are ignored: atom charge
         } catch(Exception e) {
             System.err.println("ERROR: Hit ATOM/HETATM line at PDB line number " + curLineNumPDB + " but parsing the line failed (length " + curLinePDB.length() + "): '" + e.getMessage() + "'.");
