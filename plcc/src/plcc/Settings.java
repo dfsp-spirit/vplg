@@ -318,6 +318,8 @@ public class Settings {
         defSet("plcc_B_Jmol_graph_vis_commands", "true", "whether to compute and print Jmol commands to visualize the protein graphs in 3D.");
         defSet("plcc_B_Jmol_graph_vis_resblue_commands", "true", "whether to compute and print Jmol commands to color the residues of the protein graphs blue in 3D.");
         
+        defSet("plcc_B_handle_hydrogen_atoms_from_reduce", "false", "whether to parse hydrogen atoms added to PDB files by the external Reduce software. internal experimental option, not officially supported.");
+        
         defSet("plcc_B_warn_cfg_fallback_to_default", "false", "Whether to print warnings when a setting is not defined in the config file and internal defaults are used.");
         defSet("plcc_S_temp_dir", ".", "The directory where temporary files can be created. You need write access to it, of course.");
         

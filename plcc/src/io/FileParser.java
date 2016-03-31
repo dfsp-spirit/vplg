@@ -617,7 +617,12 @@ public class FileParser {
 
             if(isIgnoredAtom(chemSym)) {
                 //a.setAtomtype(3);
-                return(false);
+                
+                if( ! (Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
+                    return(false);
+                }
+                
+                
             }
 
             // the N terminus is in an ATOM line, never in a HETATM line
@@ -631,7 +636,12 @@ public class FileParser {
 
             // only ATOMs, not HETATMs, have a DSSP entry
             //a.setDsspResNum(getDsspResNumForPdbResNum(resNumPDB));
-            a.setDsspResNum(getDsspResNumForPdbFields(resNumPDB, chainID, iCode));
+            if((Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
+                a.setDsspResNum(null);
+            }
+            else {
+                a.setDsspResNum(getDsspResNumForPdbFields(resNumPDB, chainID, iCode));
+            }
         }
         else {          // HETATM
 
@@ -678,6 +688,9 @@ public class FileParser {
             return(false);
         } else {            
             tmpRes.addAtom(a);
+            if( ! (Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
+                tmpRes.addHydrogenAtom(a);
+            }
             s_atoms.add(a);
         }                
 

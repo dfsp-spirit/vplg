@@ -443,6 +443,7 @@ public class Main {
                     if(s.equals("--alt-aa-contacts")) {
                         useFileFromCommandline = true;
                         Settings.set("plcc_B_alternate_aminoacid_contact_model", "true");
+                        Settings.set("plcc_B_handle_hydrogen_atoms_from_reduce", "true");
                         //adjust other settings here
                         Settings.set("plcc_B_AAgraph_allchainscombined", "true");
                         Settings.set("plcc_B_aminoacidgraphs_include_ligands", "true");

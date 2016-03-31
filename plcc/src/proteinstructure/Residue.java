@@ -345,7 +345,9 @@ public class Residue implements java.io.Serializable {
         int numAtomsWithChosenAltLoc = this.getNumAtomsWithAltLoc(chosenAltLoc);
         
         if((numAtomsWithChosenAltLoc < 1 || numAtomsWithChosenAltLoc > Main.MAX_ATOMS_PER_AA) && this.isAA()) {
-            DP.getInstance().w("Chosen altLoc '" + chosenAltLoc + "' leads to " + numAtomsWithChosenAltLoc + " atoms for AA residue " + this.getFancyName() + ".");
+            if( ! Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce")) {
+                DP.getInstance().w("Chosen altLoc '" + chosenAltLoc + "' leads to " + numAtomsWithChosenAltLoc + " atoms for AA residue " + this.getFancyName() + ".");
+            }
         }
         
         
