@@ -1,4 +1,14 @@
 #!/bin/bash
+## This script runs the 'reduce' program to (strip and re-) add hydrogens to a PDB file, then it runs plcc on the file with the command line options passed to this script.
+## Written by TS, APR 2016
+## Usage: ./plcc_hydrogens <plcc_options>
+##        The first arg should be a PDB identifier (e.g., '8icd' if you have the files '8icd.pdb' and '8icd.dssp' in this directory.)
+## Example call: ./plcc_hydrogens 8icd --alt-aa-contacts --silent
+## NOTES: - Calling this script will CHANGE the PDB file! It is still save to run it multiple times, since the added hydrogens will be stripped and re-added only, not added again.
+##        - The 'reduce' program is part of the kinemage software package, see http://kinemage.biochem.duke.edu/software/reduce.php
+##          See also Word, et al.(1999) "Asparagine and glutamine: using hydrogen atom contacts in the choice of sidechain amide orientation" J. Mol. Biol. 285, 1735-1747
+
+
 
 ## check for java in PATH
 which java > /dev/null
@@ -12,14 +22,20 @@ APPTAG="[PH]"
 PDBID=$1
 PDBFILE="${PDBID}.pdb"
 PDBFILE_STRIPPED_HYD="${PDBID}_stripped_hyd.pdb"
+PDBFILE_BACKUP="${PDBID}.pdb.orig"
 #PDBFILE_ADDED_HYD="${PDBID}_added_hyd.pdb"
 PDBFILE_ADDED_HYD="${PDBFILE}"
 REDUCE_PROGRAM="./reduce"
 
 if [ -z "$1" ]; then
   echo "$APPTAG Usage: $0 <plcc options>."
-  echo "$APPTAG The first argument should be the basename of a PDB file contained in this directory."
+  echo "$APPTAG The first argument should be the basename of a PDB file contained in this directory (e.g., '8icd' if you have the files '8icd.pdb' and '8icd.dssp' in this directory)."
+  echo "$APPTAG Note that you must also provide the '--alt-aa-contacts' option for this script to make any sense."
   exit 1
+fi
+
+if [ -z "$2" ]; then
+  echo "$APPTAG WARNING: Note that you must provide the '--alt-aa-contacts' option for this script to make any sense (otherwise the added hydrogens will just be ignored by plcc)."
 fi
 
 if [ ! -f "$PDBFILE" ]; then
@@ -27,13 +43,16 @@ if [ ! -f "$PDBFILE" ]; then
   exit 1
 fi
 
+## backup PDB file
+cp "$PDBFILE" "$PDBFILE_BACKUP" 2>&1 /dev/null
+
 ## strip hydrogens
 echo "$APPTAG Stripping hydrogens from PDB file '$PDBFILE' with reduce... (will save output at '$PDBFILE_STRIPPED_HYD')."
 $($REDUCE_PROGRAM -Trim -Quiet $PDBFILE > $PDBFILE_STRIPPED_HYD)
 
 ## add them back
 echo "$APPTAG Adding hydrogens to PDB file '$PDBFILE_STRIPPED_HYD' with reduce... (will save output at '$PDBFILE_ADDED_HYD')"
-$($REDUCE_PROGRAM -build -Quiet $PDBFILE_STRIPPED_HYD > $PDBFILE_ADDED_HYD)
+$($REDUCE_PROGRAM -build -DB reduce_wwPDB_het_dict.txt -Quiet $PDBFILE_STRIPPED_HYD > $PDBFILE_ADDED_HYD)
 
 echo "$APPTAG New PDB file with added hydrogens written to '$PDBFILE_ADDED_HYD'. Running plcc."
 ## done, run plcc
