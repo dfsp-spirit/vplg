@@ -139,7 +139,7 @@ public class Main {
      * The number of different contacts types according to the alternative contact model which are stored for a pair of residues.
      * See calculateAtomContactsBetweenResiduesAlternativeModel() and the ResContactInfo class for details and usage.
      */
-    public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL = 25;
+    public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL = 27;
 
     /**
      * The contacts of a chainName. The 4 fields are: AA 1 index, AA 2 index, atom index in AA 1, atom index in chainName 2.
@@ -4544,6 +4544,9 @@ public class Main {
 
         for(Integer i = 0; i < rs; i++) {
             a = res.get(i);
+            
+            //DEBUG
+            //System.out.println("calculatePiEffects: Residue " + a.getFancyName() + " has " + a.getHydrogenAtoms().size() + " H atoms.");
 
             for(Integer j = i + 1; j < rs; j++) {
                 b = res.get(j);
@@ -5252,8 +5255,21 @@ public class Main {
         sidechainNHAAs.add("ASN");
         sidechainNHAAs.add("GLN");
         sidechainNHAAs.add("TRP");
+        ArrayList<String> sidechainPiRings = new ArrayList<String>();
+        sidechainPiRings.add("TRP");
+        sidechainPiRings.add("TYR");
+        sidechainPiRings.add("PHE");
         
-        Main.calculatePiEffects(a, b);
+        ArrayList<Atom> ring = new ArrayList<Atom>();
+        double[] ringMidKoord = new double[3];
+        double[] spanningVectorA = new double[3];
+        double[] spanningVectorB = new double[3]; 
+        double[] normal = new double[3];
+        double[] XMidpointVector = new double[3];
+        double[] parameter = new double[4];
+
+        
+        //Main.calculatePiEffects(a, b);
         // TODO: save results to RCI
         
         Integer[] numPairContacts = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL];
@@ -5282,7 +5298,7 @@ public class Main {
         Integer ISB = 18        // 18 = # of interchain salt bridges
         */
 
-
+        
         Integer numTotalLigContactsPair = 0;
 
 
@@ -6944,6 +6960,123 @@ public class Main {
                 else {
                     // No atom contact for these 2 atoms, but there could be contacts between others
                 }
+                
+
+                //non-canonical interactions
+                
+                //NHPI
+                
+                /*
+                
+                System.out.println(x.getAtomName());
+                
+                
+                if(b.getName3() == "TYR") {
+                    System.out.println(y.getAtomName() + " Koord: " + y.getCoordX());
+                }
+                */
+                
+                // checks for j == 0 as the calculation for N-H...Pi needs to be done only once for the N
+                if(sidechainPiRings.contains(b.getName3()) && (i.equals(atomIndexOfBackboneN)) && j == 0) {
+                    if (b.getName3() == "TYR") {
+                       
+                       //resetting the variables
+                       ring.clear();
+                       Arrays.fill(ringMidKoord, 0);
+                       Arrays.fill(spanningVectorA, 0);
+                       Arrays.fill(spanningVectorB, 0);
+                       Arrays.fill(normal, 0);
+                       Arrays.fill(XMidpointVector, 0);
+                       Arrays.fill(parameter, 0);
+
+                       
+                       if (atoms_b.size() == 12) {
+                           
+                        for (Integer k = 5; k < 12; k++) {
+                            ring.add(atoms_b.get(k));
+                        }
+                        
+                       } else {
+                           System.out.println("TYR does not have 12 Atoms. Broken?");
+                       }
+                       
+                       //calculate mid-point of ring
+                       ringMidKoord[0] = 0.0;
+                       ringMidKoord[1] = 0.0;
+                       ringMidKoord[2] = 0.0;
+                       
+                       for (Atom k : ring) {
+                          ringMidKoord[0] += k.getCoordX();
+                          ringMidKoord[1] += k.getCoordY();
+                          ringMidKoord[2] += k.getCoordZ();
+                       }
+                       
+                       ringMidKoord[0] = ringMidKoord[0] / ring.size();
+                       ringMidKoord[1] = ringMidKoord[1] / ring.size();
+                       ringMidKoord[2] = ringMidKoord[2] / ring.size();
+                       
+                       //TODO check distances (H positions required)
+                       
+                       
+                       //DEBUG
+                       //System.out.printf("\nTYR MIDPOINT " + ringMidKoord[0] + "/" + ringMidKoord[1] + "/" + ringMidKoord[2] + "\n");
+                       
+                       //calculate normal vector
+
+                       spanningVectorA[0] = ring.get(1).getCoordX() - ring.get(0).getCoordX();
+                       spanningVectorA[1] = ring.get(1).getCoordY() - ring.get(0).getCoordY();
+                       spanningVectorA[2] = ring.get(1).getCoordZ() - ring.get(0).getCoordZ();
+                       
+                       spanningVectorB[0] = ring.get(3).getCoordX() - ring.get(0).getCoordX();
+                       spanningVectorB[1] = ring.get(3).getCoordY() - ring.get(0).getCoordY();
+                       spanningVectorB[2] = ring.get(3).getCoordZ() - ring.get(0).getCoordZ();
+                   
+                       normal[0] = (spanningVectorA[1] * spanningVectorB[2]) - (spanningVectorA[2] * spanningVectorB[1]);
+                       normal[1] = (spanningVectorA[2] * spanningVectorB[0]) - (spanningVectorA[0] * spanningVectorB[2]);
+                       normal[2] = (spanningVectorA[0] * spanningVectorB[1]) - (spanningVectorA[1] * spanningVectorB[0]);
+                       
+                       
+                       //calculate vector from N to ring mid-point
+                       XMidpointVector[0] = ringMidKoord[0] - x.getCoordX();
+                       XMidpointVector[1] = ringMidKoord[1] - x.getCoordY();
+                       XMidpointVector[2] = ringMidKoord[2] - x.getCoordZ();
+                                              
+                       //calculate N-midpoint-normal angle
+                       //needs to be checked if calculated rightly. Values for tim7 bewtween 0 and 3
+                       parameter[3] = normal[0] * XMidpointVector[0] + normal[1] * XMidpointVector[1] + normal[2] * XMidpointVector[2];
+                       parameter[3] = parameter[3] / (Math.sqrt(Math.pow(normal[0], 2) + Math.pow(normal[1], 2) + Math.pow(normal[2], 2)) * 
+                               Math.sqrt(Math.pow(XMidpointVector[0], 2) + Math.pow(XMidpointVector[1], 2) + Math.pow(XMidpointVector[2], 2)));
+                       parameter[3] = Math.acos(parameter[3]);
+                      
+                       
+                       //DEBUG
+                       /*
+                       System.out.print("\n");
+                       System.out.printf("TYR MIDPOINT " + ringMidKoord[0] + "/" + ringMidKoord[1] + "/" + ringMidKoord[2]);
+                       System.out.print("\n");
+                       System.out.printf("spanningVectorA " + spanningVectorA[0] + "/" + spanningVectorA[1] + "/" + spanningVectorA[2]);
+                       System.out.print("\n");
+                       System.out.printf("spanningVectorB " + spanningVectorB[0] + "/" + spanningVectorB[1] + "/" + spanningVectorB[2]);
+                       System.out.print("\n");
+                       System.out.printf("normal" + normal[0] + "/" + normal[1] + "/" + normal[2]);
+                       System.out.print("\n");
+                       System.out.printf("XMidpointVector" + XMidpointVector[0] + "/" + XMidpointVector[1] + "/" + XMidpointVector[2]);
+                       System.out.print("\n");
+                       System.out.printf("parameter 3: " + parameter[3]);
+                       */
+                       
+                    } else if ("TRP".equals(b.getName3())) {
+                        
+                    } else if ("PHE".equals(b.getName3())) {
+                        
+                    }
+    
+                }
+                
+                //PINH
+                
+                
+                
             }
         }
 
