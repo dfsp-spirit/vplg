@@ -44,7 +44,7 @@ if [ ! -f "$PDBFILE" ]; then
 fi
 
 ## backup PDB file
-cp "$PDBFILE" "$PDBFILE_BACKUP" 2>&1 /dev/null
+cp "$PDBFILE" "$PDBFILE_BACKUP"
 
 ## strip hydrogens
 echo "$APPTAG Stripping hydrogens from PDB file '$PDBFILE' with reduce... (will save output at '$PDBFILE_STRIPPED_HYD')."

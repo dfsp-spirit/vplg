@@ -285,8 +285,11 @@ public class Main {
             Boolean[] argsUsed = new Boolean[args.length];
             Arrays.fill(argsUsed, Boolean.FALSE);
             
-            if(args[0].equals("-h") || args[0].equals("--help")) {
+            if(args[0].equals("-h") || args[0].equals("--help") || args[0].equals("--helpdev")) {
                 usage();
+                if(args[0].equals("--helpdev")) {
+                    usagedev();
+                }
                 argsUsed[0] = true;
                 checkArgsUsage(args, argsUsed);
                 System.exit(0);
@@ -7988,6 +7991,15 @@ public class Main {
         System.out.println("DETAILED HELP: java -jar plcc.jar --help");
     }
     
+    
+    /**
+     * Prints detailed development usage info to STDOUT. The options printed here are internal experimental options, for development only.     
+     */
+    public static void usagedev() {
+        System.out.println("DEV OPTIONS:");
+        System.out.println("     Unsupported development-only options follow. For internal usage only.");
+        System.out.println("       --alt-aa-contacts          : use alternate AA contact model by AS. Exits after AAGs.");
+    }
     
     /**
      * Prints detailed usage info to STDOUT.
