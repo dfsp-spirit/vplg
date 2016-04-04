@@ -5263,8 +5263,10 @@ public class Main {
         sidechainPiRings.add("TYR");
         sidechainPiRings.add("PHE");
         
-        ArrayList<Atom> ring = new ArrayList<Atom>();
-        double[] ringMidKoord = new double[3];
+        ArrayList<Atom> six_ring = new ArrayList<Atom>();
+        ArrayList<Atom> five_ring = new ArrayList<Atom>(); //in case of TRP
+        double[] sixRingMidKoord = new double[3];
+        double[] fiveRingMidKoord = new double[3];
         double[] spanningVectorA = new double[3];
         double[] spanningVectorB = new double[3]; 
         double[] normal = new double[3];
@@ -6973,57 +6975,97 @@ public class Main {
         }
         
         //non-canonical interactions
-        Atom bb_n = a.getAtoms().get(0);
                 
         //NHPI
+        
+        Atom bb_n = a.getAtoms().get(0);
 
         if(sidechainPiRings.contains(b.getName3())) {
+            
+            //resetting the variables
+            six_ring.clear();
+            Arrays.fill(sixRingMidKoord, 0);
+            Arrays.fill(spanningVectorA, 0);
+            Arrays.fill(spanningVectorB, 0);
+            Arrays.fill(normal, 0);
+            Arrays.fill(XMidpointVector, 0);
+            Arrays.fill(parameter, 0);
+            
+            /*
+            //DEBUG
             if ("TYR".equals(b.getName3())) {
-
-               //resetting the variables
-
-               ring.clear();
-               Arrays.fill(ringMidKoord, 0);
-               Arrays.fill(spanningVectorA, 0);
-               Arrays.fill(spanningVectorB, 0);
-               Arrays.fill(normal, 0);
-               Arrays.fill(XMidpointVector, 0);
-               Arrays.fill(parameter, 0);
-
-
-               //System.out.println("TEST " + a.getAtoms().get(1).getAtomName());
-
-               //write ring atoms from atoms_b into ring and check vor right quantity
-               if (atoms_b.size() == 12) {
-
-                for (Integer k = 5; k < 12; k++) {
-                    ring.add(atoms_b.get(k));
+                System.out.println("TYR");
+                
+                
+            
+            } else if ("PHE".equals(b.getName3())) {
+                        System.out.println("PHE");
+                        } else if ("TRP".equals(b.getName3())) {
+                            System.out.println("TRP");
+                        }
+            */
+            
+            //write ring atoms from atoms_b into ring ArrayList of Atom
+            if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
+          
+                for (Integer k = 5; k < 11; k++) {
+                    six_ring.add(atoms_b.get(k));
                 }
 
-               } else {
-                   System.out.println("TYR does not have 12 Atoms. Broken?");
+            } else if ("TRP".equals(b.getName3())) {
+                
+                for (Integer k = 5; k < 10; k++) {
+                    
+                    five_ring.add(atoms_b.get(k)); 
+                    
+                }
+                
+                // calculate mid-point of five-ring
+                for (Atom k : five_ring) {
+                    
+                    fiveRingMidKoord[0] += k.getCoordX();
+                    fiveRingMidKoord[1] += k.getCoordY();
+                    fiveRingMidKoord[2] += k.getCoordZ();
+                }
+
+                fiveRingMidKoord[0] = fiveRingMidKoord[0] / fiveRingMidKoord.length;
+                fiveRingMidKoord[1] = fiveRingMidKoord[1] / fiveRingMidKoord.length;
+                fiveRingMidKoord[2] = fiveRingMidKoord[2] / fiveRingMidKoord.length;
+               
+                
+                six_ring.add(atoms_b.get(7)); //CD2
+                for (Integer k = 9; k < 14; k++) {
+                    six_ring.add(atoms_b.get(k));
+                }
+                
+                /*
+                //DEBUG
+                for (Atom k : five_ring) {
+                    System.out.println(k.getAtomName());
+                }
+                */
+            }
+                
+               //calculate mid-point of six-ring
+               sixRingMidKoord[0] = 0.0; //can be deleted?
+               sixRingMidKoord[1] = 0.0;
+               sixRingMidKoord[2] = 0.0;
+
+               for (Atom k : six_ring) {
+                  sixRingMidKoord[0] += k.getCoordX();
+                  sixRingMidKoord[1] += k.getCoordY();
+                  sixRingMidKoord[2] += k.getCoordZ();
                }
 
-               //calculate mid-point of ring
-               ringMidKoord[0] = 0.0;
-               ringMidKoord[1] = 0.0;
-               ringMidKoord[2] = 0.0;
-
-               for (Atom k : ring) {
-                  ringMidKoord[0] += k.getCoordX();
-                  ringMidKoord[1] += k.getCoordY();
-                  ringMidKoord[2] += k.getCoordZ();
-               }
-
-               ringMidKoord[0] = ringMidKoord[0] / ring.size();
-               ringMidKoord[1] = ringMidKoord[1] / ring.size();
-               ringMidKoord[2] = ringMidKoord[2] / ring.size();
+               sixRingMidKoord[0] = sixRingMidKoord[0] / six_ring.size();
+               sixRingMidKoord[1] = sixRingMidKoord[1] / six_ring.size();
+               sixRingMidKoord[2] = sixRingMidKoord[2] / six_ring.size();
                
                //calculate parameter 1: N-midpoint distance
                //needs to be checked for right calculation (did not match criteria for any residue pair in 7tim
-               parameter[0] = Math.sqrt(Math.pow(bb_n.getCoordX() - ringMidKoord[0], 2) + 
-                       Math.pow(bb_n.getCoordY() - ringMidKoord[1], 2) + 
-                       Math.pow(bb_n.getCoordZ() - ringMidKoord[2], 2));
+               parameter[0] = Math.sqrt(Math.pow(bb_n.getCoordX() - sixRingMidKoord[0], 2) + 
+                       Math.pow(bb_n.getCoordY() - sixRingMidKoord[1], 2) + 
+                       Math.pow(bb_n.getCoordZ() - sixRingMidKoord[2], 2));
 
                //TODO calculate Parameter 2, 3
 
@@ -7032,22 +7074,22 @@ public class Main {
                //System.out.printf("\nTYR MIDPOINT " + ringMidKoord[0] + "/" + ringMidKoord[1] + "/" + ringMidKoord[2] + "\n");
 
                //calculate normal vector
-               spanningVectorA[0] = ring.get(1).getCoordX() - ring.get(0).getCoordX();
-               spanningVectorA[1] = ring.get(1).getCoordY() - ring.get(0).getCoordY();
-               spanningVectorA[2] = ring.get(1).getCoordZ() - ring.get(0).getCoordZ();
+               spanningVectorA[0] = six_ring.get(1).getCoordX() - six_ring.get(0).getCoordX();
+               spanningVectorA[1] = six_ring.get(1).getCoordY() - six_ring.get(0).getCoordY();
+               spanningVectorA[2] = six_ring.get(1).getCoordZ() - six_ring.get(0).getCoordZ();
 
-               spanningVectorB[0] = ring.get(3).getCoordX() - ring.get(0).getCoordX();
-               spanningVectorB[1] = ring.get(3).getCoordY() - ring.get(0).getCoordY();
-               spanningVectorB[2] = ring.get(3).getCoordZ() - ring.get(0).getCoordZ();
+               spanningVectorB[0] = six_ring.get(3).getCoordX() - six_ring.get(0).getCoordX();
+               spanningVectorB[1] = six_ring.get(3).getCoordY() - six_ring.get(0).getCoordY();
+               spanningVectorB[2] = six_ring.get(3).getCoordZ() - six_ring.get(0).getCoordZ();
 
                normal[0] = (spanningVectorA[1] * spanningVectorB[2]) - (spanningVectorA[2] * spanningVectorB[1]);
                normal[1] = (spanningVectorA[2] * spanningVectorB[0]) - (spanningVectorA[0] * spanningVectorB[2]);
                normal[2] = (spanningVectorA[0] * spanningVectorB[1]) - (spanningVectorA[1] * spanningVectorB[0]);
 
                //calculate vector from N to ring mid-point
-               XMidpointVector[0] = ringMidKoord[0] - bb_n.getCoordX();
-               XMidpointVector[1] = ringMidKoord[1] - bb_n.getCoordY();
-               XMidpointVector[2] = ringMidKoord[2] - bb_n.getCoordZ();
+               XMidpointVector[0] = sixRingMidKoord[0] - bb_n.getCoordX();
+               XMidpointVector[1] = sixRingMidKoord[1] - bb_n.getCoordY();
+               XMidpointVector[2] = sixRingMidKoord[2] - bb_n.getCoordZ();
 
                //calculate parameter 4: N-midpoint-normal angle
                parameter[3] = normal[0] * XMidpointVector[0] + normal[1] * XMidpointVector[1] + normal[2] * XMidpointVector[2];
@@ -7078,11 +7120,7 @@ public class Main {
                System.out.printf("parameter 1: " + parameter[0] + " parameter 4: " + parameter[3]);
 
 
-            } else if ("TRP".equals(b.getName3())) {
-
-            } else if ("PHE".equals(b.getName3())) {
-
-            }
+            
 
         }
 
