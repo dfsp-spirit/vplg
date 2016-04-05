@@ -53,6 +53,20 @@ public class ResContactInfo {
     public static final Integer CBBH = 22;      // 22 = # of interchain H-bridge contacts, sidechain-backbone, acceptor-donor
     public static final Integer CCHB = 23;      // 23 = # of interchain H-bridge contacts, sidechain-sidechain, donor-acceptor
     public static final Integer CCBH = 24;      // 24 = # of interchain H-bridge contacts, sidechain-sidechain, acceptor-donor
+    public static final Integer NHPI = 25;      // 25 = # of interchain N-H...Pi contacts, backbone-sidechain, donor-acceptor (non-canonical interaction)
+    public static final Integer PINH = 26;      // 26 = # of interchain N-H...Pi contacts, sidechain-backbone, acceptor-donor (non-canonical interaction)
+    public static final Integer CAHPI = 27;     // 27 = # of interchain CA-H...Pi contacts, backbone-sidechain, donor-acceptor (non-canonical interaction)
+    public static final Integer PICAH = 28;     // 28 = # of interchain CA-H...Pi contacts, sidechain-backbone, acceptor-donor (non-canonical interaction) 
+    public static final Integer CNHPI = 29;     // 29 = # of interchain N-H...Pi contacts, sidechain-sidechain, donor-acceptor (non-canonical interaction)
+    public static final Integer PICNH = 30;     // 30 = # of interchain N-H...Pi contacts, sidechain-sidechain, acceptor-donor (non-canonical interaction)
+    public static final Integer SHPI = 31;      // 31 = # of interchain S-H...Pi contacts, sidechain-sidechain, donor-acceptor (non-canonical interaction)
+    public static final Integer PISH = 32;      // 32 = # of interchain S-H...Pi contacts, sidechain-sidechain, acceptor-donor (non-canonical interaction)
+    public static final Integer XOHPI = 33;     // 33 = # of interchain X-O-H...Pi contacts witch X = Ser || Thr || Tyr, sidechain-sidechain, donor-accepor (non-canonical interaction
+    public static final Integer PIXOH = 34;     // 34 = # of interchain X-O-H...Pi contacts witch X = Ser || Thr || Tyr, sidechain-sidechain, acceptor-donor(non-canonical interaction
+    public static final Integer PROCDHPI = 35;  // 35 = # of interchain Pro-CD-H...Pi contacts, sidechain-sidechain, donor-acceptor (non-canonical)
+    public static final Integer PIPROCDH = 36;  // 36 = # of interchain Pro-CD-H...Pi contacts, sidechain-sidechain, acceptor-donor (non-canonical)
+    
+    
     
     // The different values in 'XY' vs 'YX' are only produced by the the sequential order of the
     //  residues (e.g., the ligand came fist: this was treated as an 'LB' contact, otherwise it
@@ -239,6 +253,14 @@ public class ResContactInfo {
     public Integer getCCBHContactDist() { return(minContactDistances[CCBH]); }
     public Integer getCCBHContactAtomNumA() { return(contactAtomIndexInResidueA[CCBH]); }
     public Integer getCCBHContactAtomNumB() { return(contactAtomIndexInResidueB[CCBH]); }
+    
+    public Integer getNHPIContactDist() { return(minContactDistances[NHPI]); }
+    public Integer getNHPIContactAtomNumA() { return(contactAtomIndexInResidueA[NHPI]); }
+    public Integer getNHPIContactAtomNumB() { return(contactAtomIndexInResidueB[NHPI]); }
+    
+    public Integer getPINHContactDist() { return(minContactDistances[PINH]); }
+    public Integer getPINHContactAtomNumA() { return(contactAtomIndexInResidueA[PINH]); }
+    public Integer getPINHContactAtomNumB() { return(contactAtomIndexInResidueB[PINH]); }
     
    
     

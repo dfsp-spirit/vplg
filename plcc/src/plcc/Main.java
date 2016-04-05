@@ -139,7 +139,7 @@ public class Main {
      * The number of different contacts types according to the alternative contact model which are stored for a pair of residues.
      * See calculateAtomContactsBetweenResiduesAlternativeModel() and the ResContactInfo class for details and usage.
      */
-    public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL = 27;
+    public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL = 36;
 
     /**
      * The contacts of a chainName. The 4 fields are: AA 1 index, AA 2 index, atom index in AA 1, atom index in chainName 2.
@@ -7134,7 +7134,10 @@ public class Main {
             //DEBUG
             //System.out.print("\n");
             //System.out.printf("parameter 1: " + parameter[0] + " parameter 2: "+ parameter[1] + " parameter 3: "+ parameter[2]+ " parameter 4: " + parameter[3]);
-
+            
+            if (parameter[0] <= 4.3 && parameter[1] <= 3.5 && parameter[2] >= 120 && parameter[3] <= 30) {
+                System.out.println("PI EFFECT between " + a.getName3() + " and " + b.getName3());
+            }
 
             
 
