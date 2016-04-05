@@ -5268,7 +5268,9 @@ public class Main {
         double[] sixRingMidKoord = new double[3];
         double[] fiveRingMidKoord = new double[3];
         double[] spanningVectorA = new double[3];
-        double[] spanningVectorB = new double[3]; 
+        double[] spanningVectorB = new double[3];
+        double[] HXVector = new double[3];
+        double[] HMidpointVector = new double[3];
         double[] normal = new double[3];
         double[] XMidpointVector = new double[3];
         double[] parameter = new double[4];
@@ -6978,32 +6980,29 @@ public class Main {
                 
         //NHPI
         
-        Atom bb_n = a.getAtoms().get(0);
+        Atom bb_N = a.getAtoms().get(0);
+        Atom bb_H = a.getHydrogenAtoms().get(0);
 
         if(sidechainPiRings.contains(b.getName3())) {
+            
+            //DEBUG
+            /*
+            System.out.println(a.getName3());
+            for (Atom k : a.getHydrogenAtoms()) {
+                System.out.println(k.getAtomName());
+            }
+            */
             
             //resetting the variables
             six_ring.clear();
             Arrays.fill(sixRingMidKoord, 0);
             Arrays.fill(spanningVectorA, 0);
             Arrays.fill(spanningVectorB, 0);
+            Arrays.fill(HXVector, 0);
+            Arrays.fill(XMidpointVector, 0);
             Arrays.fill(normal, 0);
             Arrays.fill(XMidpointVector, 0);
             Arrays.fill(parameter, 0);
-            
-            /*
-            //DEBUG
-            if ("TYR".equals(b.getName3())) {
-                System.out.println("TYR");
-                
-                
-            
-            } else if ("PHE".equals(b.getName3())) {
-                        System.out.println("PHE");
-                        } else if ("TRP".equals(b.getName3())) {
-                            System.out.println("TRP");
-                        }
-            */
             
             //write ring atoms from atoms_b into ring ArrayList of Atom
             if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
@@ -7046,78 +7045,95 @@ public class Main {
                 */
             }
                 
-               //calculate mid-point of six-ring
-               sixRingMidKoord[0] = 0.0; //can be deleted?
-               sixRingMidKoord[1] = 0.0;
-               sixRingMidKoord[2] = 0.0;
+            //calculate mid-point of six-ring
+            for (Atom k : six_ring) {
+               sixRingMidKoord[0] += k.getCoordX();
+               sixRingMidKoord[1] += k.getCoordY();
+               sixRingMidKoord[2] += k.getCoordZ();
+            }
 
-               for (Atom k : six_ring) {
-                  sixRingMidKoord[0] += k.getCoordX();
-                  sixRingMidKoord[1] += k.getCoordY();
-                  sixRingMidKoord[2] += k.getCoordZ();
-               }
+            sixRingMidKoord[0] = sixRingMidKoord[0] / six_ring.size();
+            sixRingMidKoord[1] = sixRingMidKoord[1] / six_ring.size();
+            sixRingMidKoord[2] = sixRingMidKoord[2] / six_ring.size();
 
-               sixRingMidKoord[0] = sixRingMidKoord[0] / six_ring.size();
-               sixRingMidKoord[1] = sixRingMidKoord[1] / six_ring.size();
-               sixRingMidKoord[2] = sixRingMidKoord[2] / six_ring.size();
-               
-               //calculate parameter 1: N-midpoint distance
-               //needs to be checked for right calculation (did not match criteria for any residue pair in 7tim
-               parameter[0] = Math.sqrt(Math.pow(bb_n.getCoordX() - sixRingMidKoord[0], 2) + 
-                       Math.pow(bb_n.getCoordY() - sixRingMidKoord[1], 2) + 
-                       Math.pow(bb_n.getCoordZ() - sixRingMidKoord[2], 2));
+            //calculate parameter 1: N-midpoint distance
+            //needs to be checked for right calculation (did not match criteria for any residue pair in 7tim)
+            parameter[0] = Math.sqrt(Math.pow(bb_N.getCoordX() - sixRingMidKoord[0], 2) + 
+                   Math.pow(bb_N.getCoordY() - sixRingMidKoord[1], 2) + 
+                   Math.pow(bb_N.getCoordZ() - sixRingMidKoord[2], 2));
 
-               //TODO calculate Parameter 2, 3
+            //calculate parameter 2: H-midpoint distance
+            //needs to be checked for right calculation (did not match criteria for any residue pair in 7tim)
+            parameter[1] = Math.sqrt(Math.pow(bb_H.getCoordX() - sixRingMidKoord[0], 2) + 
+                   Math.pow(bb_H.getCoordY() - sixRingMidKoord[1], 2) + 
+                   Math.pow(bb_H.getCoordZ() - sixRingMidKoord[2], 2));
+            
+            //calculate parameter 3: N-H-midpoint angle
+            HXVector[0] = bb_N.getCoordX() - bb_H.getCoordX();
+            HXVector[1] = bb_N.getCoordY() - bb_H.getCoordY();
+            HXVector[2] = bb_N.getCoordZ() - bb_H.getCoordZ();
+            
+            HMidpointVector[0] = sixRingMidKoord[0] - bb_H.getCoordX();
+            HMidpointVector[1] = sixRingMidKoord[1] - bb_H.getCoordY();
+            HMidpointVector[2] = sixRingMidKoord[2] - bb_H.getCoordZ();
+            
+            parameter[2] = HXVector[0] * HMidpointVector[0] + HXVector[1] * HMidpointVector[1] + HXVector[2] * HMidpointVector[2];
+            parameter[2] = parameter[2] / (Math.sqrt(Math.pow(HXVector[0], 2) + Math.pow(HXVector[1], 2) + 
+                    Math.pow(HXVector[2], 2)) * Math.sqrt(Math.pow(HMidpointVector[0], 2) + Math.pow(HMidpointVector[1], 2) + 
+                            Math.pow(HMidpointVector[2], 2)));
+            parameter[2] = Math.acos(parameter[2]);
+            
+            //converte to degree
+            parameter[2] = (360 / (2 * Math.PI)) * parameter[2];
+
+            //DEBUG
+            //System.out.printf("\nTYR MIDPOINT " + ringMidKoord[0] + "/" + ringMidKoord[1] + "/" + ringMidKoord[2] + "\n");
+
+            //calculate normal vector
+            spanningVectorA[0] = six_ring.get(1).getCoordX() - six_ring.get(0).getCoordX();
+            spanningVectorA[1] = six_ring.get(1).getCoordY() - six_ring.get(0).getCoordY();
+            spanningVectorA[2] = six_ring.get(1).getCoordZ() - six_ring.get(0).getCoordZ();
+
+            spanningVectorB[0] = six_ring.get(3).getCoordX() - six_ring.get(0).getCoordX();
+            spanningVectorB[1] = six_ring.get(3).getCoordY() - six_ring.get(0).getCoordY();
+            spanningVectorB[2] = six_ring.get(3).getCoordZ() - six_ring.get(0).getCoordZ();
+
+            normal[0] = (spanningVectorA[1] * spanningVectorB[2]) - (spanningVectorA[2] * spanningVectorB[1]);
+            normal[1] = (spanningVectorA[2] * spanningVectorB[0]) - (spanningVectorA[0] * spanningVectorB[2]);
+            normal[2] = (spanningVectorA[0] * spanningVectorB[1]) - (spanningVectorA[1] * spanningVectorB[0]);
+
+            //calculate vector from N to ring mid-point
+            XMidpointVector[0] = sixRingMidKoord[0] - bb_N.getCoordX();
+            XMidpointVector[1] = sixRingMidKoord[1] - bb_N.getCoordY();
+            XMidpointVector[2] = sixRingMidKoord[2] - bb_N.getCoordZ();
+
+            //calculate parameter 4: N-midpoint-normal angle
+            parameter[3] = normal[0] * XMidpointVector[0] + normal[1] * XMidpointVector[1] + normal[2] * XMidpointVector[2];
+            parameter[3] = parameter[3] / (Math.sqrt(Math.pow(normal[0], 2) + Math.pow(normal[1], 2) + Math.pow(normal[2], 2)) * 
+                    Math.sqrt(Math.pow(XMidpointVector[0], 2) + Math.pow(XMidpointVector[1], 2) + Math.pow(XMidpointVector[2], 2)));
+            parameter[3] = Math.acos(parameter[3]);
+
+            //converte to degree
+            parameter[3] = (360 / (2 * Math.PI)) * parameter[3];
 
 
-               //DEBUG
-               //System.out.printf("\nTYR MIDPOINT " + ringMidKoord[0] + "/" + ringMidKoord[1] + "/" + ringMidKoord[2] + "\n");
+            //DEBUG
+            /*
+            System.out.print("\n");
+            System.out.printf("TYR MIDPOINT " + ringMidKoord[0] + "/" + ringMidKoord[1] + "/" + ringMidKoord[2]);
+            System.out.print("\n");
+            System.out.printf("spanningVectorA " + spanningVectorA[0] + "/" + spanningVectorA[1] + "/" + spanningVectorA[2]);
+            System.out.print("\n");
+            System.out.printf("spanningVectorB " + spanningVectorB[0] + "/" + spanningVectorB[1] + "/" + spanningVectorB[2]);
+            System.out.print("\n");
+            System.out.printf("normal" + normal[0] + "/" + normal[1] + "/" + normal[2]);
+            System.out.print("\n");
+            System.out.printf("XMidpointVector" + XMidpointVector[0] + "/" + XMidpointVector[1] + "/" + XMidpointVector[2]);
+            */
 
-               //calculate normal vector
-               spanningVectorA[0] = six_ring.get(1).getCoordX() - six_ring.get(0).getCoordX();
-               spanningVectorA[1] = six_ring.get(1).getCoordY() - six_ring.get(0).getCoordY();
-               spanningVectorA[2] = six_ring.get(1).getCoordZ() - six_ring.get(0).getCoordZ();
-
-               spanningVectorB[0] = six_ring.get(3).getCoordX() - six_ring.get(0).getCoordX();
-               spanningVectorB[1] = six_ring.get(3).getCoordY() - six_ring.get(0).getCoordY();
-               spanningVectorB[2] = six_ring.get(3).getCoordZ() - six_ring.get(0).getCoordZ();
-
-               normal[0] = (spanningVectorA[1] * spanningVectorB[2]) - (spanningVectorA[2] * spanningVectorB[1]);
-               normal[1] = (spanningVectorA[2] * spanningVectorB[0]) - (spanningVectorA[0] * spanningVectorB[2]);
-               normal[2] = (spanningVectorA[0] * spanningVectorB[1]) - (spanningVectorA[1] * spanningVectorB[0]);
-
-               //calculate vector from N to ring mid-point
-               XMidpointVector[0] = sixRingMidKoord[0] - bb_n.getCoordX();
-               XMidpointVector[1] = sixRingMidKoord[1] - bb_n.getCoordY();
-               XMidpointVector[2] = sixRingMidKoord[2] - bb_n.getCoordZ();
-
-               //calculate parameter 4: N-midpoint-normal angle
-               parameter[3] = normal[0] * XMidpointVector[0] + normal[1] * XMidpointVector[1] + normal[2] * XMidpointVector[2];
-               parameter[3] = parameter[3] / (Math.sqrt(Math.pow(normal[0], 2) + Math.pow(normal[1], 2) + Math.pow(normal[2], 2)) * 
-                       Math.sqrt(Math.pow(XMidpointVector[0], 2) + Math.pow(XMidpointVector[1], 2) + Math.pow(XMidpointVector[2], 2)));
-               parameter[3] = Math.acos(parameter[3]);
-
-               //converte to degree
-               parameter[3] = (360 / (2 * Math.PI)) * parameter[3];
-
-
-               //DEBUG
-               /*
-               System.out.print("\n");
-               System.out.printf("TYR MIDPOINT " + ringMidKoord[0] + "/" + ringMidKoord[1] + "/" + ringMidKoord[2]);
-               System.out.print("\n");
-               System.out.printf("spanningVectorA " + spanningVectorA[0] + "/" + spanningVectorA[1] + "/" + spanningVectorA[2]);
-               System.out.print("\n");
-               System.out.printf("spanningVectorB " + spanningVectorB[0] + "/" + spanningVectorB[1] + "/" + spanningVectorB[2]);
-               System.out.print("\n");
-               System.out.printf("normal" + normal[0] + "/" + normal[1] + "/" + normal[2]);
-               System.out.print("\n");
-               System.out.printf("XMidpointVector" + XMidpointVector[0] + "/" + XMidpointVector[1] + "/" + XMidpointVector[2]);
-               */
-               
-               //DEBUG
-               //System.out.print("\n");
-               //System.out.printf("parameter 1: " + parameter[0] + " parameter 4: " + parameter[3]);
+            //DEBUG
+            //System.out.print("\n");
+            //System.out.printf("parameter 1: " + parameter[0] + " parameter 2: "+ parameter[1] + " parameter 3: "+ parameter[2]+ " parameter 4: " + parameter[3]);
 
 
             
