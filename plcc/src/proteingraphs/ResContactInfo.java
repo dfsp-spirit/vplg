@@ -255,15 +255,52 @@ public class ResContactInfo {
     public Integer getCCBHContactAtomNumB() { return(contactAtomIndexInResidueB[CCBH]); }
     
     public Integer getNHPIContactDist() { return(minContactDistances[NHPI]); }
-    public Integer getNHPIContactAtomNumA() { return(contactAtomIndexInResidueA[NHPI]); }
-    public Integer getNHPIContactAtomNumB() { return(contactAtomIndexInResidueB[NHPI]); }
+    public Integer getNHPIContactAtomNumA() { return(contactAtomIndexInResidueA[NHPI] + 1); }
+    public Integer getNHPIContactAtomNumB() { return(contactAtomIndexInResidueB[NHPI] + 1); }
     
     public Integer getPINHContactDist() { return(minContactDistances[PINH]); }
-    public Integer getPINHContactAtomNumA() { return(contactAtomIndexInResidueA[PINH]); }
-    public Integer getPINHContactAtomNumB() { return(contactAtomIndexInResidueB[PINH]); }
+    public Integer getPINHContactAtomNumA() { return(contactAtomIndexInResidueA[PINH] + 1); }
+    public Integer getPINHContactAtomNumB() { return(contactAtomIndexInResidueB[PINH] + 1); }
     
-   
+    public Integer getCAHPIContactDist() { return(minContactDistances[CAHPI]); }
+    public Integer getCAHPIContactAtomNumA() { return(contactAtomIndexInResidueA[CAHPI] + 1); }
+    public Integer getCAHPIContactAtomNumB() { return(contactAtomIndexInResidueB[CAHPI] + 1); }
     
+    public Integer getPICAHContactDist() { return(minContactDistances[PICAH]); }
+    public Integer getPICAHContactAtomNumA() { return(contactAtomIndexInResidueA[PICAH] + 1); }
+    public Integer getPICAHContactAtomNumB() { return(contactAtomIndexInResidueB[PICAH] + 1); }
+    
+    public Integer getCNHPIContactDist() { return(minContactDistances[CNHPI]); }
+    public Integer getCNHPIContactAtomNumA() { return(contactAtomIndexInResidueA[CNHPI] + 1); }
+    public Integer getCNHPIContactAtomNumB() { return(contactAtomIndexInResidueB[CNHPI] + 1); }
+    
+    public Integer getPICNHContactDist() { return(minContactDistances[PICNH]); }
+    public Integer getPICNHContactAtomNumA() { return(contactAtomIndexInResidueA[PICNH] + 1); }
+    public Integer getPICNHContactAtomNumB() { return(contactAtomIndexInResidueB[PICNH] + 1); }
+    
+    public Integer getSHPIContactDist() { return(minContactDistances[SHPI]); }
+    public Integer getSHPIContactAtomNumA() { return(contactAtomIndexInResidueA[SHPI] + 1); }
+    public Integer getSHPIContactAtomNumB() { return(contactAtomIndexInResidueB[SHPI] + 1); }
+    
+    public Integer getPISHContactDist() { return(minContactDistances[PISH]); }
+    public Integer getPISHContactAtomNumA() { return(contactAtomIndexInResidueA[PISH] + 1); }
+    public Integer getPISHContactAtomNumB() { return(contactAtomIndexInResidueB[PISH] + 1); }
+    
+    public Integer getXOHPIContactDist() { return(minContactDistances[XOHPI]); }
+    public Integer getXOHPIContactAtomNumA() { return(contactAtomIndexInResidueA[XOHPI] + 1); }
+    public Integer getXOHPIContactAtomNumB() { return(contactAtomIndexInResidueB[XOHPI] + 1); }
+    
+    public Integer getPIXOHContactDist() { return(minContactDistances[PIXOH]); }
+    public Integer getPIXOHContactAtomNumA() { return(contactAtomIndexInResidueA[PIXOH] + 1); }
+    public Integer getPIXOHContactAtomNumB() { return(contactAtomIndexInResidueB[PIXOH] + 1); }
+    
+    public Integer getPROCDHPIContactDist() { return(minContactDistances[PROCDHPI]); }
+    public Integer getPROCDHPIContactAtomNumA() { return(contactAtomIndexInResidueA[PROCDHPI] + 1); }
+    public Integer getPROCDHPIContactAtomNumB() { return(contactAtomIndexInResidueB[PROCDHPI] + 1); }
+    
+    public Integer getPIPROCDHContactDist() { return(minContactDistances[PIPROCDH]); }
+    public Integer getPIPROCDHContactAtomNumA() { return(contactAtomIndexInResidueA[PIPROCDH] + 1); }
+    public Integer getPIPROCDHContactAtomNumB() { return(contactAtomIndexInResidueB[PIPROCDH] + 1); }    
     
 // the getters for statistics follow
     public Integer getNumContactsTotal() { return(numPairContacts[TT]); }
@@ -292,6 +329,20 @@ public class ResContactInfo {
     public Integer getNumContactsCBBH() { return(numPairContacts[CBBH]); }
     public Integer getNumContactsCCHB() { return(numPairContacts[CCHB]); }
     public Integer getNumContactsCCBH() { return(numPairContacts[CCBH]); }
+    
+    public Integer getNumContactsNHPI() { return(numPairContacts[NHPI]); }
+    public Integer getNumContactsPINH() { return(numPairContacts[PINH]); }
+    public Integer getNumContactsCAHPI() { return(numPairContacts[CAHPI]); }
+    public Integer getNumContactsPICAH() { return(numPairContacts[PICAH]); }
+    public Integer getNumContactsCNHPI() { return(numPairContacts[CNHPI]); }
+    public Integer getNumContactsPICNH() { return(numPairContacts[PICNH]); }
+    public Integer getNumContactsSHPI() { return(numPairContacts[SHPI]); }
+    public Integer getNumContactsPISH() { return(numPairContacts[PISH]); }
+    public Integer getNumContactsXOHPI() { return(numPairContacts[XOHPI]); }
+    public Integer getNumContactsPIXOH() { return(numPairContacts[PIXOH]); }
+    public Integer getNumContactsPROCDHPI() { return(numPairContacts[PROCDHPI]); }
+    public Integer getNumContactsPIPROCDH() { return(numPairContacts[PIPROCDH]); }
+    
     
     // DEBUG only
     public Residue getResA() { return(resA); }
