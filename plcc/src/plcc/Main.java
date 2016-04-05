@@ -7136,9 +7136,57 @@ public class Main {
             //System.out.printf("parameter 1: " + parameter[0] + " parameter 2: "+ parameter[1] + " parameter 3: "+ parameter[2]+ " parameter 4: " + parameter[3]);
             
             if (parameter[0] <= 4.3 && parameter[1] <= 3.5 && parameter[2] >= 120 && parameter[3] <= 30) {
-                System.out.println("PI EFFECT between " + a.getName3() + " and " + b.getName3());
+                System.out.println("PI EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
             }
+            
+            //calculation for five-membered ring in TRP
+            //can be modulized
+            if ("TRP".equals(b.getName3())) {
+                parameter[0] = Math.sqrt(Math.pow(bb_N.getCoordX() - fiveRingMidKoord[0], 2) + 
+                   Math.pow(bb_N.getCoordY() - fiveRingMidKoord[1], 2) + 
+                   Math.pow(bb_N.getCoordZ() - fiveRingMidKoord[2], 2));
+                
+                parameter[1] = Math.sqrt(Math.pow(bb_H.getCoordX() - fiveRingMidKoord[0], 2) + 
+                   Math.pow(bb_H.getCoordY() - fiveRingMidKoord[1], 2) + 
+                   Math.pow(bb_H.getCoordZ() - fiveRingMidKoord[2], 2));
+                
+                HMidpointVector[0] = fiveRingMidKoord[0] - bb_H.getCoordX();
+                HMidpointVector[1] = fiveRingMidKoord[1] - bb_H.getCoordY();
+                HMidpointVector[2] = fiveRingMidKoord[2] - bb_H.getCoordZ();
 
+                parameter[2] = HXVector[0] * HMidpointVector[0] + HXVector[1] * HMidpointVector[1] + HXVector[2] * HMidpointVector[2];
+                parameter[2] = parameter[2] / (Math.sqrt(Math.pow(HXVector[0], 2) + Math.pow(HXVector[1], 2) + 
+                        Math.pow(HXVector[2], 2)) * Math.sqrt(Math.pow(HMidpointVector[0], 2) + Math.pow(HMidpointVector[1], 2) + 
+                                Math.pow(HMidpointVector[2], 2)));
+                parameter[2] = Math.acos(parameter[2]);
+
+                //converte to degree
+                parameter[2] = (360 / (2 * Math.PI)) * parameter[2];
+                
+                spanningVectorA[0] = five_ring.get(1).getCoordX() - five_ring.get(0).getCoordX();
+                spanningVectorA[1] = five_ring.get(1).getCoordY() - five_ring.get(0).getCoordY();
+                spanningVectorA[2] = five_ring.get(1).getCoordZ() - five_ring.get(0).getCoordZ();
+
+                spanningVectorB[0] = five_ring.get(3).getCoordX() - five_ring.get(0).getCoordX();
+                spanningVectorB[1] = five_ring.get(3).getCoordY() - five_ring.get(0).getCoordY();
+                spanningVectorB[2] = five_ring.get(3).getCoordZ() - five_ring.get(0).getCoordZ();
+
+                normal[0] = (spanningVectorA[1] * spanningVectorB[2]) - (spanningVectorA[2] * spanningVectorB[1]);
+                normal[1] = (spanningVectorA[2] * spanningVectorB[0]) - (spanningVectorA[0] * spanningVectorB[2]);
+                normal[2] = (spanningVectorA[0] * spanningVectorB[1]) - (spanningVectorA[1] * spanningVectorB[0]);
+                
+                parameter[3] = normal[0] * XMidpointVector[0] + normal[1] * XMidpointVector[1] + normal[2] * XMidpointVector[2];
+                parameter[3] = parameter[3] / (Math.sqrt(Math.pow(normal[0], 2) + Math.pow(normal[1], 2) + Math.pow(normal[2], 2)) * 
+                        Math.sqrt(Math.pow(XMidpointVector[0], 2) + Math.pow(XMidpointVector[1], 2) + Math.pow(XMidpointVector[2], 2)));
+                parameter[3] = Math.acos(parameter[3]);
+
+                //converte to degree
+                parameter[3] = (360 / (2 * Math.PI)) * parameter[3];
+                
+                if (parameter[0] <= 4.3 && parameter[1] <= 3.5 && parameter[2] >= 120 && parameter[3] <= 30) {
+                    System.out.println("PI EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                }
+            }
             
 
         }
