@@ -7115,9 +7115,9 @@ public class Main {
                System.out.printf("XMidpointVector" + XMidpointVector[0] + "/" + XMidpointVector[1] + "/" + XMidpointVector[2]);
                */
                
-               
-               System.out.print("\n");
-               System.out.printf("parameter 1: " + parameter[0] + " parameter 4: " + parameter[3]);
+               //DEBUG
+               //System.out.print("\n");
+               //System.out.printf("parameter 1: " + parameter[0] + " parameter 4: " + parameter[3]);
 
 
             
