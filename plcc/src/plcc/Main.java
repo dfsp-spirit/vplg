@@ -5225,6 +5225,23 @@ public class Main {
         
     }
     
+    public static double[] calculateMidpointOfAtoms(ArrayList<Atom> atoms) {
+        double[] ret = new double[3];
+        Arrays.fill(ret, 0.0);
+        
+        for (Atom k : atoms) {
+            ret[0] += k.getCoordX();
+            ret[1] += k.getCoordY();
+            ret[2] += k.getCoordZ();
+        }
+        
+        ret[0] = ret[0] / atoms.size();
+        ret[1] = ret[1] / atoms.size();
+        ret[2] = ret[2] / atoms.size();
+        
+        return ret;
+    }
+    
     /**
      * Alternative model to calculate the atom contacts between residue 'a' and 'b'.
      * This alternative model is used to calculate interchain contacts between
@@ -7020,17 +7037,7 @@ public class Main {
                 }
                 
                 // calculate mid-point of five-ring
-                for (Atom k : five_ring) {
-                    
-                    fiveRingMidKoord[0] += k.getCoordX();
-                    fiveRingMidKoord[1] += k.getCoordY();
-                    fiveRingMidKoord[2] += k.getCoordZ();
-                }
-
-                fiveRingMidKoord[0] = fiveRingMidKoord[0] / fiveRingMidKoord.length;
-                fiveRingMidKoord[1] = fiveRingMidKoord[1] / fiveRingMidKoord.length;
-                fiveRingMidKoord[2] = fiveRingMidKoord[2] / fiveRingMidKoord.length;
-               
+                fiveRingMidKoord = calculateMidpointOfAtoms(five_ring);
                 
                 six_ring.add(atoms_b.get(7)); //CD2
                 for (Integer k = 9; k < 14; k++) {
@@ -7046,16 +7053,8 @@ public class Main {
             }
                 
             //calculate mid-point of six-ring
-            for (Atom k : six_ring) {
-               sixRingMidKoord[0] += k.getCoordX();
-               sixRingMidKoord[1] += k.getCoordY();
-               sixRingMidKoord[2] += k.getCoordZ();
-            }
-
-            sixRingMidKoord[0] = sixRingMidKoord[0] / six_ring.size();
-            sixRingMidKoord[1] = sixRingMidKoord[1] / six_ring.size();
-            sixRingMidKoord[2] = sixRingMidKoord[2] / six_ring.size();
-
+            sixRingMidKoord = calculateMidpointOfAtoms(six_ring);
+            
             //calculate parameter 1: N-midpoint distance
             //needs to be checked for right calculation (did not match criteria for any residue pair in 7tim)
             parameter[0] = Math.sqrt(Math.pow(bb_N.getCoordX() - sixRingMidKoord[0], 2) + 
