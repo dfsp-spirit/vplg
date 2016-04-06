@@ -5242,6 +5242,38 @@ public class Main {
         return ret;
     }
     
+    public static double calculateDistanceAtomToPoint(Atom atom, double[] point) {
+        double ret = 0.0;
+        ret = Math.sqrt(Math.pow(atom.getCoordX() - point[0], 2) + 
+                Math.pow(atom.getCoordY() - point[1], 2) + 
+                Math.pow(atom.getCoordZ() - point[2], 2));
+        return ret;
+    }
+    
+    public static double converteRadianToDegree(double rad) {
+        double deg;
+        deg = (360 / (2 * Math.PI)) * rad;
+        return deg;
+    }
+    
+    public static double[] calculateNormalOfPlane(double[] spanningVectorA, double[] spanningVectorB) {
+        double[] normal = new double[3];
+        normal[0] = (spanningVectorA[1] * spanningVectorB[2]) - (spanningVectorA[2] * spanningVectorB[1]);
+        normal[1] = (spanningVectorA[2] * spanningVectorB[0]) - (spanningVectorA[0] * spanningVectorB[2]);
+        normal[2] = (spanningVectorA[0] * spanningVectorB[1]) - (spanningVectorA[1] * spanningVectorB[0]);
+        return normal;
+    }
+    
+    public static double calculateAngleBetw3DVecs(double[] vectorA, double[] vectorB) {
+        double angle;
+        angle = vectorA[0] * vectorB[0] + vectorA[1] * vectorB[1] + vectorA[2] * vectorB[2];
+        angle = angle / (Math.sqrt(Math.pow(vectorA[0], 2) + Math.pow(vectorA[1], 2) + 
+                    Math.pow(vectorA[2], 2)) * Math.sqrt(Math.pow(vectorB[0], 2) + Math.pow(vectorB[1], 2) + 
+                            Math.pow(vectorB[2], 2)));
+        angle = Math.acos(angle);
+        return angle;
+    }
+    
     /**
      * Alternative model to calculate the atom contacts between residue 'a' and 'b'.
      * This alternative model is used to calculate interchain contacts between
@@ -6996,22 +7028,13 @@ public class Main {
         //non-canonical interactions
                 
         //NHPI
-        
-        Atom bb_N = a.getAtoms().get(0);
-        Atom bb_H = a.getHydrogenAtoms().get(0);
-
         if(sidechainPiRings.contains(b.getName3())) {
-            
-            //DEBUG
-            /*
-            System.out.println(a.getName3());
-            for (Atom k : a.getHydrogenAtoms()) {
-                System.out.println(k.getAtomName());
-            }
-            */
+            Atom bb_N = a.getAtoms().get(0);
+            Atom bb_H = a.getHydrogenAtoms().get(0);
             
             //resetting the variables
             six_ring.clear();
+            five_ring.clear();
             Arrays.fill(sixRingMidKoord, 0);
             Arrays.fill(spanningVectorA, 0);
             Arrays.fill(spanningVectorB, 0);
@@ -7022,34 +7045,28 @@ public class Main {
             Arrays.fill(parameter, 0);
             
             //write ring atoms from atoms_b into ring ArrayList of Atom
+            //
             if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
           
-                for (Integer k = 5; k < 11; k++) {
+                for (Integer k = 4; k < 11; k++) {
                     six_ring.add(atoms_b.get(k));
                 }
 
             } else if ("TRP".equals(b.getName3())) {
                 
+                //five_ring includes CG, CD1, NE1, CE2, CD2
                 for (Integer k = 5; k < 10; k++) {
-                    
-                    five_ring.add(atoms_b.get(k)); 
-                    
+                    five_ring.add(atoms_b.get(k));      
                 }
                 
                 // calculate mid-point of five-ring
                 fiveRingMidKoord = calculateMidpointOfAtoms(five_ring);
                 
+                //six_ring includes DC2, CE2, CE3, CZ2, CZ3, CH2
                 six_ring.add(atoms_b.get(7)); //CD2
                 for (Integer k = 9; k < 14; k++) {
                     six_ring.add(atoms_b.get(k));
                 }
-                
-                /*
-                //DEBUG
-                for (Atom k : five_ring) {
-                    System.out.println(k.getAtomName());
-                }
-                */
             }
                 
             //calculate mid-point of six-ring
@@ -7057,15 +7074,11 @@ public class Main {
             
             //calculate parameter 1: N-midpoint distance
             //needs to be checked for right calculation (did not match criteria for any residue pair in 7tim)
-            parameter[0] = Math.sqrt(Math.pow(bb_N.getCoordX() - sixRingMidKoord[0], 2) + 
-                   Math.pow(bb_N.getCoordY() - sixRingMidKoord[1], 2) + 
-                   Math.pow(bb_N.getCoordZ() - sixRingMidKoord[2], 2));
+            parameter[0] = calculateDistanceAtomToPoint(bb_N, sixRingMidKoord);
 
             //calculate parameter 2: H-midpoint distance
             //needs to be checked for right calculation (did not match criteria for any residue pair in 7tim)
-            parameter[1] = Math.sqrt(Math.pow(bb_H.getCoordX() - sixRingMidKoord[0], 2) + 
-                   Math.pow(bb_H.getCoordY() - sixRingMidKoord[1], 2) + 
-                   Math.pow(bb_H.getCoordZ() - sixRingMidKoord[2], 2));
+            parameter[1] = calculateDistanceAtomToPoint(bb_H, sixRingMidKoord);
             
             //calculate parameter 3: N-H-midpoint angle
             HXVector[0] = bb_N.getCoordX() - bb_H.getCoordX();
@@ -7076,14 +7089,10 @@ public class Main {
             HMidpointVector[1] = sixRingMidKoord[1] - bb_H.getCoordY();
             HMidpointVector[2] = sixRingMidKoord[2] - bb_H.getCoordZ();
             
-            parameter[2] = HXVector[0] * HMidpointVector[0] + HXVector[1] * HMidpointVector[1] + HXVector[2] * HMidpointVector[2];
-            parameter[2] = parameter[2] / (Math.sqrt(Math.pow(HXVector[0], 2) + Math.pow(HXVector[1], 2) + 
-                    Math.pow(HXVector[2], 2)) * Math.sqrt(Math.pow(HMidpointVector[0], 2) + Math.pow(HMidpointVector[1], 2) + 
-                            Math.pow(HMidpointVector[2], 2)));
-            parameter[2] = Math.acos(parameter[2]);
+            parameter[2] = calculateAngleBetw3DVecs(HXVector, HMidpointVector);
             
             //converte to degree
-            parameter[2] = (360 / (2 * Math.PI)) * parameter[2];
+            parameter[2] = converteRadianToDegree(parameter[2]);
 
             //DEBUG
             //System.out.printf("\nTYR MIDPOINT " + ringMidKoord[0] + "/" + ringMidKoord[1] + "/" + ringMidKoord[2] + "\n");
@@ -7093,13 +7102,11 @@ public class Main {
             spanningVectorA[1] = six_ring.get(1).getCoordY() - six_ring.get(0).getCoordY();
             spanningVectorA[2] = six_ring.get(1).getCoordZ() - six_ring.get(0).getCoordZ();
 
-            spanningVectorB[0] = six_ring.get(3).getCoordX() - six_ring.get(0).getCoordX();
-            spanningVectorB[1] = six_ring.get(3).getCoordY() - six_ring.get(0).getCoordY();
-            spanningVectorB[2] = six_ring.get(3).getCoordZ() - six_ring.get(0).getCoordZ();
-
-            normal[0] = (spanningVectorA[1] * spanningVectorB[2]) - (spanningVectorA[2] * spanningVectorB[1]);
-            normal[1] = (spanningVectorA[2] * spanningVectorB[0]) - (spanningVectorA[0] * spanningVectorB[2]);
-            normal[2] = (spanningVectorA[0] * spanningVectorB[1]) - (spanningVectorA[1] * spanningVectorB[0]);
+            spanningVectorB[0] = six_ring.get(2).getCoordX() - six_ring.get(0).getCoordX();
+            spanningVectorB[1] = six_ring.get(2).getCoordY() - six_ring.get(0).getCoordY();
+            spanningVectorB[2] = six_ring.get(2).getCoordZ() - six_ring.get(0).getCoordZ();
+            
+            normal = calculateNormalOfPlane(spanningVectorA, spanningVectorB);
 
             //calculate vector from N to ring mid-point
             XMidpointVector[0] = sixRingMidKoord[0] - bb_N.getCoordX();
@@ -7107,13 +7114,10 @@ public class Main {
             XMidpointVector[2] = sixRingMidKoord[2] - bb_N.getCoordZ();
 
             //calculate parameter 4: N-midpoint-normal angle
-            parameter[3] = normal[0] * XMidpointVector[0] + normal[1] * XMidpointVector[1] + normal[2] * XMidpointVector[2];
-            parameter[3] = parameter[3] / (Math.sqrt(Math.pow(normal[0], 2) + Math.pow(normal[1], 2) + Math.pow(normal[2], 2)) * 
-                    Math.sqrt(Math.pow(XMidpointVector[0], 2) + Math.pow(XMidpointVector[1], 2) + Math.pow(XMidpointVector[2], 2)));
-            parameter[3] = Math.acos(parameter[3]);
+            parameter[3] = calculateAngleBetw3DVecs(HMidpointVector, normal);
 
             //converte to degree
-            parameter[3] = (360 / (2 * Math.PI)) * parameter[3];
+            parameter[3] = converteRadianToDegree(parameter[3]);
 
 
             //DEBUG
@@ -7132,66 +7136,206 @@ public class Main {
 
             //DEBUG
             //System.out.print("\n");
-            //System.out.printf("parameter 1: " + parameter[0] + " parameter 2: "+ parameter[1] + " parameter 3: "+ parameter[2]+ " parameter 4: " + parameter[3]);
+            System.out.printf("6Ring: parameter 1: " + parameter[0] + " parameter 2: "+ parameter[1] + " parameter 3: "+ parameter[2]+ " parameter 4: " + parameter[3]);
             
             if (parameter[0] <= 4.3 && parameter[1] <= 3.5 && parameter[2] >= 120 && parameter[3] <= 30) {
-                System.out.println("PI EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                System.out.println("NHPI EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
             }
             
             //calculation for five-membered ring in TRP
             //can be modulized
             if ("TRP".equals(b.getName3())) {
-                parameter[0] = Math.sqrt(Math.pow(bb_N.getCoordX() - fiveRingMidKoord[0], 2) + 
-                   Math.pow(bb_N.getCoordY() - fiveRingMidKoord[1], 2) + 
-                   Math.pow(bb_N.getCoordZ() - fiveRingMidKoord[2], 2));
+                parameter[0] = calculateDistanceAtomToPoint(bb_N, fiveRingMidKoord);
                 
-                parameter[1] = Math.sqrt(Math.pow(bb_H.getCoordX() - fiveRingMidKoord[0], 2) + 
-                   Math.pow(bb_H.getCoordY() - fiveRingMidKoord[1], 2) + 
-                   Math.pow(bb_H.getCoordZ() - fiveRingMidKoord[2], 2));
+                parameter[1] = calculateDistanceAtomToPoint(bb_H, fiveRingMidKoord);
                 
                 HMidpointVector[0] = fiveRingMidKoord[0] - bb_H.getCoordX();
                 HMidpointVector[1] = fiveRingMidKoord[1] - bb_H.getCoordY();
                 HMidpointVector[2] = fiveRingMidKoord[2] - bb_H.getCoordZ();
 
-                parameter[2] = HXVector[0] * HMidpointVector[0] + HXVector[1] * HMidpointVector[1] + HXVector[2] * HMidpointVector[2];
-                parameter[2] = parameter[2] / (Math.sqrt(Math.pow(HXVector[0], 2) + Math.pow(HXVector[1], 2) + 
-                        Math.pow(HXVector[2], 2)) * Math.sqrt(Math.pow(HMidpointVector[0], 2) + Math.pow(HMidpointVector[1], 2) + 
-                                Math.pow(HMidpointVector[2], 2)));
-                parameter[2] = Math.acos(parameter[2]);
+                parameter[2] = calculateAngleBetw3DVecs(HXVector, HMidpointVector); 
 
                 //converte to degree
-                parameter[2] = (360 / (2 * Math.PI)) * parameter[2];
+                parameter[2] = converteRadianToDegree(parameter[2]);
                 
                 spanningVectorA[0] = five_ring.get(1).getCoordX() - five_ring.get(0).getCoordX();
                 spanningVectorA[1] = five_ring.get(1).getCoordY() - five_ring.get(0).getCoordY();
                 spanningVectorA[2] = five_ring.get(1).getCoordZ() - five_ring.get(0).getCoordZ();
 
-                spanningVectorB[0] = five_ring.get(3).getCoordX() - five_ring.get(0).getCoordX();
-                spanningVectorB[1] = five_ring.get(3).getCoordY() - five_ring.get(0).getCoordY();
-                spanningVectorB[2] = five_ring.get(3).getCoordZ() - five_ring.get(0).getCoordZ();
+                spanningVectorB[0] = five_ring.get(2).getCoordX() - five_ring.get(0).getCoordX();
+                spanningVectorB[1] = five_ring.get(2).getCoordY() - five_ring.get(0).getCoordY();
+                spanningVectorB[2] = five_ring.get(2).getCoordZ() - five_ring.get(0).getCoordZ();
 
-                normal[0] = (spanningVectorA[1] * spanningVectorB[2]) - (spanningVectorA[2] * spanningVectorB[1]);
-                normal[1] = (spanningVectorA[2] * spanningVectorB[0]) - (spanningVectorA[0] * spanningVectorB[2]);
-                normal[2] = (spanningVectorA[0] * spanningVectorB[1]) - (spanningVectorA[1] * spanningVectorB[0]);
+                normal = calculateNormalOfPlane(spanningVectorA, spanningVectorB);
                 
-                parameter[3] = normal[0] * XMidpointVector[0] + normal[1] * XMidpointVector[1] + normal[2] * XMidpointVector[2];
-                parameter[3] = parameter[3] / (Math.sqrt(Math.pow(normal[0], 2) + Math.pow(normal[1], 2) + Math.pow(normal[2], 2)) * 
-                        Math.sqrt(Math.pow(XMidpointVector[0], 2) + Math.pow(XMidpointVector[1], 2) + Math.pow(XMidpointVector[2], 2)));
-                parameter[3] = Math.acos(parameter[3]);
+                parameter[3] = calculateAngleBetw3DVecs(normal, XMidpointVector);
 
                 //converte to degree
-                parameter[3] = (360 / (2 * Math.PI)) * parameter[3];
+                parameter[3] = converteRadianToDegree(parameter[3]);
+                
+                //DEBUG
+                System.out.printf("5Ring: parameter 1: " + parameter[0] + " parameter 2: "+ parameter[1] + " parameter 3: "+ parameter[2]+ " parameter 4: " + parameter[3]);
                 
                 if (parameter[0] <= 4.3 && parameter[1] <= 3.5 && parameter[2] >= 120 && parameter[3] <= 30) {
-                    System.out.println("PI EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                    System.out.println("NHPI EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
                 }
             }
-            
-
         }
 
         //PINH
+        Atom bb_N = b.getAtoms().get(0);
+        Atom bb_H = b.getHydrogenAtoms().get(0);
 
+        if(sidechainPiRings.contains(a.getName3())) {
+ 
+            //resetting the variables
+            six_ring.clear();
+            five_ring.clear();
+            Arrays.fill(sixRingMidKoord, 0);
+            Arrays.fill(spanningVectorA, 0);
+            Arrays.fill(spanningVectorB, 0);
+            Arrays.fill(HXVector, 0);
+            Arrays.fill(XMidpointVector, 0);
+            Arrays.fill(normal, 0);
+            Arrays.fill(XMidpointVector, 0);
+            Arrays.fill(parameter, 0);
+            
+            //write ring atoms from atoms_a into ring ArrayList of Atom
+            if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
+          
+                for (Integer k = 4; k < 11; k++) {
+                    six_ring.add(atoms_a.get(k));
+                }
+
+            } else if ("TRP".equals(a.getName3())) {
+                
+                //five_ring includes CG, CD1, NE1, CE2, CD2
+                for (Integer k = 5; k < 10; k++) {
+                    five_ring.add(atoms_a.get(k));      
+                }
+                
+                // calculate mid-point of five-ring
+                fiveRingMidKoord = calculateMidpointOfAtoms(five_ring);
+                
+                //six_ring includes DC2, CE2, CE3, CZ2, CZ3, CH2
+                six_ring.add(atoms_a.get(7)); //CD2
+                for (Integer k = 9; k < 14; k++) {
+                    six_ring.add(atoms_a.get(k));
+                }
+            }
+                
+            //calculate mid-point of six-ring
+            sixRingMidKoord = calculateMidpointOfAtoms(six_ring);
+            
+            //calculate parameter 1: N-midpoint distance
+            //needs to be checked for right calculation (did not match criteria for any residue pair in 7tim)
+            parameter[0] = calculateDistanceAtomToPoint(bb_N, sixRingMidKoord);
+
+            //calculate parameter 2: H-midpoint distance
+            //needs to be checked for right calculation (did not match criteria for any residue pair in 7tim)
+            parameter[1] = calculateDistanceAtomToPoint(bb_H, sixRingMidKoord);
+            
+            //calculate parameter 3: N-H-midpoint angle
+            HXVector[0] = bb_N.getCoordX() - bb_H.getCoordX();
+            HXVector[1] = bb_N.getCoordY() - bb_H.getCoordY();
+            HXVector[2] = bb_N.getCoordZ() - bb_H.getCoordZ();
+            
+            HMidpointVector[0] = sixRingMidKoord[0] - bb_H.getCoordX();
+            HMidpointVector[1] = sixRingMidKoord[1] - bb_H.getCoordY();
+            HMidpointVector[2] = sixRingMidKoord[2] - bb_H.getCoordZ();
+            
+            parameter[2] = calculateAngleBetw3DVecs(HXVector, HMidpointVector);
+            
+            //converte to degree
+            parameter[2] = converteRadianToDegree(parameter[2]);
+
+            //DEBUG
+            //System.out.printf("\nTYR MIDPOINT " + ringMidKoord[0] + "/" + ringMidKoord[1] + "/" + ringMidKoord[2] + "\n");
+
+            //calculate normal vector
+            spanningVectorA[0] = six_ring.get(1).getCoordX() - six_ring.get(0).getCoordX();
+            spanningVectorA[1] = six_ring.get(1).getCoordY() - six_ring.get(0).getCoordY();
+            spanningVectorA[2] = six_ring.get(1).getCoordZ() - six_ring.get(0).getCoordZ();
+
+            spanningVectorB[0] = six_ring.get(2).getCoordX() - six_ring.get(0).getCoordX();
+            spanningVectorB[1] = six_ring.get(2).getCoordY() - six_ring.get(0).getCoordY();
+            spanningVectorB[2] = six_ring.get(2).getCoordZ() - six_ring.get(0).getCoordZ();
+            
+            normal = calculateNormalOfPlane(spanningVectorA, spanningVectorB);
+
+            //calculate vector from N to ring mid-point
+            XMidpointVector[0] = sixRingMidKoord[0] - bb_N.getCoordX();
+            XMidpointVector[1] = sixRingMidKoord[1] - bb_N.getCoordY();
+            XMidpointVector[2] = sixRingMidKoord[2] - bb_N.getCoordZ();
+
+            //calculate parameter 4: N-midpoint-normal angle
+            parameter[3] = calculateAngleBetw3DVecs(HMidpointVector, normal);
+
+            //converte to degree
+            parameter[3] = converteRadianToDegree(parameter[3]);
+
+
+            //DEBUG
+            /*
+            System.out.print("\n");
+            System.out.printf("TYR MIDPOINT " + ringMidKoord[0] + "/" + ringMidKoord[1] + "/" + ringMidKoord[2]);
+            System.out.print("\n");
+            System.out.printf("spanningVectorA " + spanningVectorA[0] + "/" + spanningVectorA[1] + "/" + spanningVectorA[2]);
+            System.out.print("\n");
+            System.out.printf("spanningVectorB " + spanningVectorB[0] + "/" + spanningVectorB[1] + "/" + spanningVectorB[2]);
+            System.out.print("\n");
+            System.out.printf("normal" + normal[0] + "/" + normal[1] + "/" + normal[2]);
+            System.out.print("\n");
+            System.out.printf("XMidpointVector" + XMidpointVector[0] + "/" + XMidpointVector[1] + "/" + XMidpointVector[2]);
+            */
+
+            //DEBUG
+            //System.out.print("\n");
+            System.out.printf("!6Ring: parameter 1: " + parameter[0] + " parameter 2: "+ parameter[1] + " parameter 3: "+ parameter[2]+ " parameter 4: " + parameter[3]);
+            
+            if (parameter[0] <= 4.3 && parameter[1] <= 3.5 && parameter[2] >= 120 && parameter[3] <= 30) {
+                System.out.println("PINH EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+            }
+            
+            //calculation for five-membered ring in TRP
+            //can be modulized
+            if ("TRP".equals(a.getName3())) {
+                parameter[0] = calculateDistanceAtomToPoint(bb_N, fiveRingMidKoord);
+                
+                parameter[1] = calculateDistanceAtomToPoint(bb_H, fiveRingMidKoord);
+                
+                HMidpointVector[0] = fiveRingMidKoord[0] - bb_H.getCoordX();
+                HMidpointVector[1] = fiveRingMidKoord[1] - bb_H.getCoordY();
+                HMidpointVector[2] = fiveRingMidKoord[2] - bb_H.getCoordZ();
+
+                parameter[2] = calculateAngleBetw3DVecs(HXVector, HMidpointVector); 
+
+                //converte to degree
+                parameter[2] = converteRadianToDegree(parameter[2]);
+                
+                spanningVectorA[0] = five_ring.get(1).getCoordX() - five_ring.get(0).getCoordX();
+                spanningVectorA[1] = five_ring.get(1).getCoordY() - five_ring.get(0).getCoordY();
+                spanningVectorA[2] = five_ring.get(1).getCoordZ() - five_ring.get(0).getCoordZ();
+
+                spanningVectorB[0] = five_ring.get(2).getCoordX() - five_ring.get(0).getCoordX();
+                spanningVectorB[1] = five_ring.get(2).getCoordY() - five_ring.get(0).getCoordY();
+                spanningVectorB[2] = five_ring.get(2).getCoordZ() - five_ring.get(0).getCoordZ();
+
+                normal = calculateNormalOfPlane(spanningVectorA, spanningVectorB);
+                
+                parameter[3] = calculateAngleBetw3DVecs(normal, XMidpointVector);
+
+                //converte to degree
+                parameter[3] = converteRadianToDegree(parameter[3]);
+                
+                //DEBUG
+                System.out.printf("5Ring: parameter 1: " + parameter[0] + " parameter 2: "+ parameter[1] + " parameter 3: "+ parameter[2]+ " parameter 4: " + parameter[3]);
+                
+                if (parameter[0] <= 4.3 && parameter[1] <= 3.5 && parameter[2] >= 120 && parameter[3] <= 30) {
+                    System.out.println("PINH EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                }
+            }
+        }
 
         
         // Iteration through all atoms of the two residues is done
