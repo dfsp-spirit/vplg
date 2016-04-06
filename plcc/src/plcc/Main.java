@@ -2915,7 +2915,7 @@ public class Main {
             try {
                 DBManager.updateProteinTotalRuntimeInDB(pdbid, runtimeTotal_secs);
             }catch(SQLException e) {
-                DP.getInstance().w("Main", "Could not set runtime for PDB file '" + pdbid + "' in database.");
+                DP.getInstance().w("Main", "Could not set total runtime for PDB file '" + pdbid + "' in database.");
             }
         }
         

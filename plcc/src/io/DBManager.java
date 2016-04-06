@@ -8697,6 +8697,7 @@ connection.close();
      * @param keywords the PDB keywords field
      * @param experiment the PDB experiment field
      * @param resolution the resolution of the structure, from the PDB headers
+     * @param numResidues the number of AA residues in the PDB file
      * @return true if the protein was written to the DB, false otherwise
      * @throws SQLException if the DB could not be reset or closed properly
      */

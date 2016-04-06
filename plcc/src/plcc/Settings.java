@@ -259,6 +259,8 @@ public class Settings {
         defSet("plcc_B_writeComplexContactCSV", "false", "Whether to write a CSV file containing all contacts used for co,plex graph computation.");
         defSet("plcc_B_write_chains_file", "false", "Whether to write a chains file containing all chain names of the currently handled PDB file. Can be used by GraphletAnalyzer later to construct graph file names for all chains.");
         defSet("plcc_B_aminoacidgraphs_include_ligands", "false", "Whether amino acid graphs should include ligands.");
+        
+        defSet("plcc_B_special_linnot_rules_for_bifurcated_adj_and_red", "true", "Whether special rules should be used for computing the ADJ and RED notations of FGs. These special rules were not used in the latest PTGL version by PM, but it seems in older versions.");
 
         
         defSet("plcc_B_split_dsspfile_warning", "true", "Whether to show a warning about splitting the DSSP file when multiple models are detected in a PDB file.");
