@@ -302,7 +302,16 @@ public class ResContactInfo {
     
     public Integer getPIPROCDHContactDist() { return(minContactDistances[PIPROCDH]); }
     public Integer getPIPROCDHContactAtomNumA() { return(contactAtomIndexInResidueA[PIPROCDH] + 1); }
-    public Integer getPIPROCDHContactAtomNumB() { return(contactAtomIndexInResidueB[PIPROCDH] + 1); }    
+    public Integer getPIPROCDHContactAtomNumB() { return(contactAtomIndexInResidueB[PIPROCDH] + 1); }   
+    
+    public Integer getCAHCOContactDist() { return(minContactDistances[CAHCO]); }
+    public Integer getCAHCOContactAtomNumA() { return(contactAtomIndexInResidueA[CAHCO] + 1); }
+    public Integer getCAHCOContactAtomNumB() { return(contactAtomIndexInResidueB[CAHCO] + 1); }
+    
+    public Integer getCOCAHContactDist() { return(minContactDistances[COCAH]); }
+    public Integer getCOCAHContactAtomNumA() { return(contactAtomIndexInResidueA[COCAH] + 1); }
+    public Integer getCOCAHContactAtomNumB() { return(contactAtomIndexInResidueB[COCAH] + 1); }
+    
     
 // the getters for statistics follow
     public Integer getNumContactsTotal() { return(numPairContacts[TT]); }
@@ -331,7 +340,6 @@ public class ResContactInfo {
     public Integer getNumContactsCBBH() { return(numPairContacts[CBBH]); }
     public Integer getNumContactsCCHB() { return(numPairContacts[CCHB]); }
     public Integer getNumContactsCCBH() { return(numPairContacts[CCBH]); }
-    
     public Integer getNumContactsNHPI() { return(numPairContacts[NHPI]); }
     public Integer getNumContactsPINH() { return(numPairContacts[PINH]); }
     public Integer getNumContactsCAHPI() { return(numPairContacts[CAHPI]); }
@@ -344,6 +352,8 @@ public class ResContactInfo {
     public Integer getNumContactsPIXOH() { return(numPairContacts[PIXOH]); }
     public Integer getNumContactsPROCDHPI() { return(numPairContacts[PROCDHPI]); }
     public Integer getNumContactsPIPROCDH() { return(numPairContacts[PIPROCDH]); }
+    public Integer getNumContactsCACOH() { return(numPairContacts[CAHCO]); }
+    public Integer getNumContactsCOCAH() { return(numPairContacts[COCAH]); }
     
     
     // DEBUG only
