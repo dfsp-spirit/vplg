@@ -65,6 +65,8 @@ public class ResContactInfo {
     public static final Integer PIXOH = 34;     // 34 = # of interchain X-O-H...Pi contacts witch X = Ser || Thr || Tyr, sidechain-sidechain, acceptor-donor(non-canonical interaction
     public static final Integer PROCDHPI = 35;  // 35 = # of interchain Pro-CD-H...Pi contacts, sidechain-sidechain, donor-acceptor (non-canonical)
     public static final Integer PIPROCDH = 36;  // 36 = # of interchain Pro-CD-H...Pi contacts, sidechain-sidechain, acceptor-donor (non-canonical)
+    public static final Integer CAHCO = 37;     // 37 = # of interchain CA-H...O=C contacts, mainchain-sidechain, donor-acceptor (non-canonical)
+    public static final Integer COCAH = 38;     // 38 = # of interchain CA-H...O=C contacts, mainchain-sidechain, acceptor-donor (non-canonical)
     
     
     
