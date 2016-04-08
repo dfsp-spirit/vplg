@@ -810,6 +810,12 @@ public class Main {
                         argsUsed[i] = true;
                     }
                     
+                    if(s.equals("--force")) {
+                        Settings.set("plcc_F_abort_if_pdb_resolution_worse_than", "-1.0");
+                        Settings.set("plcc_I_abort_if_num_residues_below", "-1");
+                        argsUsed[i] = true;
+                    }
+                    
                     if(s.equals("-E") || s.equals("--separate-contacts")) {
                         Settings.set("plcc_B_separate_contacts_by_chain", "true");
                         argsUsed[i] = true;
@@ -1955,6 +1961,30 @@ public class Main {
                 }
                 System.exit(0);
             }
+        }
+        
+        // check whether we need to abort processing because of bad resolution or too few residues
+        Float badResolution = Settings.getFloat("plcc_F_abort_if_pdb_resolution_worse_than");
+        if(badResolution >= 0.0) {
+            HashMap<String, String> md = FileParser.getPDBMetaData();
+            Double resolution = -1.0;
+            try {
+                resolution = Double.valueOf(md.get("resolution"));
+            } catch (Exception e) {
+                resolution = -1.0;
+                DP.getInstance().w("Could not determine resolution of PDB file for protein '" + pdbid + "', assuming NMR with resolution '" + resolution + "'.");            
+            }
+            
+            if(resolution > badResolution) {
+                DP.getInstance().e("Main", "Aborting further processing of PDB '" + pdbid + "': resolution '" + resolution + "' too bad, must be at '" + badResolution + "' or better. (Set 'plcc_F_abort_if_pdb_resolution_worse_than' to a negative float value in the config file to prevent this behaviour or use --force.) Exiting now.");
+                System.exit(0);
+            }
+        }
+        
+        Integer minNumberOfResidues = Settings.getInteger("plcc_I_abort_if_num_residues_below");
+        if(residues.size() < minNumberOfResidues) {
+            DP.getInstance().e("Main", "Aborting further processing of PDB '" + pdbid + "': residue count '" + residues.size() + "' too low, must be at least '" + minNumberOfResidues + "'. (Set 'plcc_I_abort_if_num_residues_below' to a negative int value in the config file to prevent this behaviour or use --force.) Exiting now.");
+            System.exit(0);
         }
         
         
@@ -8424,6 +8454,7 @@ public class Main {
         System.out.println("   --compute-graph-metrics : compute graph metrics like cluster coefficient for PGs. Slower!");
         System.out.println("   --check-whether-in-db   : check whether the PDB file exists in the database and exit. Returns 0 if it does, 1 if not, value >1 on error.");
         System.out.println("   --draw-aag              : visualize amino acid graphs, test only");
+        System.out.println("   --force                 : process a PDB file even if the resolution is too bad or the number of residues is too low according to settings.");
         System.out.println("   --cluster               : Set all options for cluster mode. Equals '-f -u -k -s -G -i -Z -P'.");
         System.out.println("");
         System.out.println("The following options only make sense for database maintenance:");
