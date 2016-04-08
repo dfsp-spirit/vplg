@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graph label="PLCC graph" 
+    xmlns="http://www.cs.rpi.edu/XGMML"  
+    directed="0">  
+    <att name="graphClass" type="string" value="proteingraph"/>
+    <att name="pdbid" type="string" value="2a4c"/>
+    <att name="chain" type="string" value="A"/>
+    <att name="graphType" type="string" value="albelig"/>
+    <node label="e0" id="e0">
+        <att name="sseType" type="string" value="strand"/>
+    </node>
+    <node label="h1" id="h1">
+        <att name="sseType" type="string" value="helix"/>
+    </node>
+    <node label="e2" id="e2">
+        <att name="sseType" type="string" value="strand"/>
+    </node>
+    <node label="e3" id="e3">
+        <att name="sseType" type="string" value="strand"/>
+    </node>
+    <node label="e4" id="e4">
+        <att name="sseType" type="string" value="strand"/>
+    </node>
+    <node label="e5" id="e5">
+        <att name="sseType" type="string" value="strand"/>
+    </node>
+    <node label="e6" id="e6">
+        <att name="sseType" type="string" value="strand"/>
+    </node>
+    <node label="e7" id="e7">
+        <att name="sseType" type="string" value="strand"/>
+    </node>
+    <edge source="e0" target="e7" label="(e0-p-e7)">
+        <att name="edgeType" type="string" value="p"/>
+    </edge>
+    <edge source="e0" target="h1" label="(e0-m-h1)">
+        <att name="edgeType" type="string" value="m"/>
+    </edge>
+    <edge source="e0" target="e2" label="(e0-a-e2)">
+        <att name="edgeType" type="string" value="a"/>
+    </edge>
+    <edge source="e2" target="e5" label="(e2-a-e5)">
+        <att name="edgeType" type="string" value="a"/>
+    </edge>
+    <edge source="e3" target="e6" label="(e3-a-e6)">
+        <att name="edgeType" type="string" value="a"/>
+    </edge>
+    <edge source="e4" target="e5" label="(e4-a-e5)">
+        <att name="edgeType" type="string" value="a"/>
+    </edge>
+    <edge source="e6" target="e7" label="(e6-a-e7)">
+        <att name="edgeType" type="string" value="a"/>
+    </edge>
+</graph>

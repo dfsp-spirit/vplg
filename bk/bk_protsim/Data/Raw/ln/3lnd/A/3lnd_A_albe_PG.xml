@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graph label="PLCC graph" 
+    xmlns="http://www.cs.rpi.edu/XGMML"  
+    directed="0">  
+    <att name="graphClass" type="string" value="proteingraph"/>
+    <att name="pdbid" type="string" value="3lnd"/>
+    <att name="chain" type="string" value="A"/>
+    <att name="graphType" type="string" value="albe"/>
+    <node label="e0" id="e0">
+        <att name="sseType" type="string" value="strand"/>
+    </node>
+    <node label="e1" id="e1">
+        <att name="sseType" type="string" value="strand"/>
+    </node>
+    <node label="e2" id="e2">
+        <att name="sseType" type="string" value="strand"/>
+    </node>
+    <node label="e3" id="e3">
+        <att name="sseType" type="string" value="strand"/>
+    </node>
+    <node label="h4" id="h4">
+        <att name="sseType" type="string" value="helix"/>
+    </node>
+    <node label="e5" id="e5">
+        <att name="sseType" type="string" value="strand"/>
+    </node>
+    <node label="e6" id="e6">
+        <att name="sseType" type="string" value="strand"/>
+    </node>
+    <node label="e7" id="e7">
+        <att name="sseType" type="string" value="strand"/>
+    </node>
+    <node label="e8" id="e8">
+        <att name="sseType" type="string" value="strand"/>
+    </node>
+    <node label="e9" id="e9">
+        <att name="sseType" type="string" value="strand"/>
+    </node>
+    <node label="h10" id="h10">
+        <att name="sseType" type="string" value="helix"/>
+    </node>
+    <node label="e11" id="e11">
+        <att name="sseType" type="string" value="strand"/>
+    </node>
+    <node label="e12" id="e12">
+        <att name="sseType" type="string" value="strand"/>
+    </node>
+    <node label="e13" id="e13">
+        <att name="sseType" type="string" value="strand"/>
+    </node>
+    <node label="h14" id="h14">
+        <att name="sseType" type="string" value="helix"/>
+    </node>
+    <node label="e15" id="e15">
+        <att name="sseType" type="string" value="strand"/>
+    </node>
+    <edge source="e0" target="e6" label="(e0-p-e6)">
+        <att name="edgeType" type="string" value="p"/>
+    </edge>
+    <edge source="e0" target="e1" label="(e0-a-e1)">
+        <att name="edgeType" type="string" value="a"/>
+    </edge>
+    <edge source="e1" target="e3" label="(e1-a-e3)">
+        <att name="edgeType" type="string" value="a"/>
+    </edge>
+    <edge source="e2" target="e3" label="(e2-a-e3)">
+        <att name="edgeType" type="string" value="a"/>
+    </edge>
+    <edge source="e5" target="e6" label="(e5-p-e6)">
+        <att name="edgeType" type="string" value="p"/>
+    </edge>
+    <edge source="e7" target="e8" label="(e7-a-e8)">
+        <att name="edgeType" type="string" value="a"/>
+    </edge>
+    <edge source="e7" target="e15" label="(e7-p-e15)">
+        <att name="edgeType" type="string" value="p"/>
+    </edge>
+    <edge source="e8" target="e12" label="(e8-a-e12)">
+        <att name="edgeType" type="string" value="a"/>
+    </edge>
+    <edge source="e9" target="e11" label="(e9-a-e11)">
+        <att name="edgeType" type="string" value="a"/>
+    </edge>
+    <edge source="e9" target="e13" label="(e9-a-e13)">
+        <att name="edgeType" type="string" value="a"/>
+    </edge>
+    <edge source="h10" target="e11" label="(h10-m-e11)">
+        <att name="edgeType" type="string" value="m"/>
+    </edge>
+    <edge source="e11" target="e12" label="(e11-a-e12)">
+        <att name="edgeType" type="string" value="a"/>
+    </edge>
+    <edge source="e13" target="e15" label="(e13-a-e15)">
+        <att name="edgeType" type="string" value="a"/>
+    </edge>
+</graph>

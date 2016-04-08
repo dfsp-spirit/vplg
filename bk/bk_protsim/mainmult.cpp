@@ -21,7 +21,7 @@
 // should be <
 
 bool edgecomp (const Graph* a, const Graph* b) {
-    return boost::num_edges(*a) > boost::num_edges(*b);
+    return boost::num_edges(*a) < boost::num_edges(*b);
 }
 
 int main (int argc, char** argv) {
@@ -83,7 +83,7 @@ int main (int argc, char** argv) {
         
         //compute multiple alignment
         start = std::clock();
-        MultAlign multi(graphs, products, alignments, argc-1, "Output");
+        MultAlign multi(graphs, products, alignments, argc-1,0, "Output");
         multi.run();
         std::cout << "Number before filter " << multi.num_cliques() << "\n";
         std::cout << "Mult Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms\n";
@@ -95,6 +95,10 @@ int main (int argc, char** argv) {
         std::cout << "Number after filter " << multi.num_cliques() << "\n";
         std::cout << "Filter Time: " << (std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << " ms\n";
         std::cout << std::endl;
+        
+        for (auto d : multi.distribution()) {
+            std::cout << d << "\n";
+        }
     
     
     } //end try

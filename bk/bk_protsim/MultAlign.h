@@ -26,10 +26,11 @@
 class MultAlign {
 public:
     MultAlign();
-    MultAlign(const std::vector<Graph*>, const std::vector<ProductGraph*>, const std::vector<BronKerbosch*>, int, std::string);
+    MultAlign(const std::vector<Graph*>, const std::vector<ProductGraph*>, const std::vector<BronKerbosch*>, int, int, std::string);
     ~MultAlign();
     
     unsigned long num_cliques();
+    std::vector<unsigned int> distribution();
     void run();
     void filter();
 private:
@@ -44,6 +45,7 @@ private:
     
     Mult_Output oManager;
     const int I;
+    const int CUTOFF;
     unsigned long count;
 };
 

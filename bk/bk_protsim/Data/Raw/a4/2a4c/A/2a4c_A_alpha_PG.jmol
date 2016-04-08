@@ -1,0 +1,1 @@
+load =2A4C; hide waters;draw h0 color [255 0 0] diameter 5.0 circle {36.6 2.3 -8.9}; delete water; cartoon only; display :A; color cartoon translucent orange; 

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graph label="PLCC graph" 
+    xmlns="http://www.cs.rpi.edu/XGMML"  
+    directed="0">  
+    <att name="graphClass" type="string" value="proteingraph"/>
+    <att name="pdbid" type="string" value="3k5s"/>
+    <att name="chain" type="string" value="B"/>
+    <att name="graphType" type="string" value="alphalig"/>
+    <node label="l0" id="l0">
+        <att name="sseType" type="string" value="ligand"/>
+    </node>
+    <node label="l1" id="l1">
+        <att name="sseType" type="string" value="ligand"/>
+    </node>
+    <node label="l2" id="l2">
+        <att name="sseType" type="string" value="ligand"/>
+    </node>
+    <edge source="l1" target="l2" label="(l1-j-l2)">
+        <att name="edgeType" type="string" value="j"/>
+    </edge>
+</graph>

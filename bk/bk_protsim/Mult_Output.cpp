@@ -31,8 +31,6 @@ Mult_Output::Mult_Output(std::string directory) : DIR(directory){
         ss << this->DIR << "/" << i+1 << ".txt";
         streams[i] = new std::ofstream();
         streams[i]->open(ss.str(), std::ofstream::trunc);
-        streams[i]->close();
-        streams[i]->open(ss.str(), std::ofstream::app);
         ss.clear();
         ss.str("");
         counts[i] = 0;
@@ -51,11 +49,7 @@ Mult_Output::~Mult_Output() {
  * Manages the output operations
  */
 void Mult_Output::out(c_clique& complex, const std::vector<Graph*>& graphs){
-    //short num = complex.size()-1;
-    short num = 0;
-    std::cout << "compex size " << complex.size() << std::endl;
-    std::cout << "num " << num << std::endl;
-    std::cout << "file " << num+1 << std::endl;
+    unsigned short num = complex.size()-1;
    
     //expand the vectors if no file for the needed length exists yet
     while (this->streams.size() <= num){  
@@ -64,34 +58,35 @@ void Mult_Output::out(c_clique& complex, const std::vector<Graph*>& graphs){
         std::stringstream ss;
         ss << this->DIR << "/" << num+1 << ".txt";
         streams.back()->open(ss.str(), std::ofstream::trunc);
-        streams.back()->close();
-        streams.back()->open(ss.str(), std::ofstream::app);
     }//end expand vectors
-    
+      
     //new output, one line = one graph, listing all vertices of that graph in the complex clique, in ascending order
     int pos = 0;
     *streams[num] << "{\n";
     std::stringstream ss;
     while (!complex.front().empty()) { //iterate over each layer of the complex clique
         *streams[num] << "\t\"graph "<< (*graphs[pos])[boost::graph_bundle].properties["pdb_id"] <<"\" : [";
-        std::set<VertexDescriptor> s;
-        for (c_edge& ce : complex) { //iterator over the complex edges of the complex clique
-            s.insert((*graphs[pos])[boost::source(ce.front(),(*graphs[pos]))].id);
-            s.insert((*graphs[pos])[boost::target(ce.front(),(*graphs[pos]))].id);
+        std::set<EdgeDescriptor> s;
+        for(c_edge& ce : complex){
+            s.insert(ce.front());
             ce.pop_front();
         }
+        
+        
         auto e = --s.end();
-        for (auto i = s.begin(); i != e; ++i) {
-            *streams[num] << *i << ",";
-            ss << *i;
+        auto iter = s.begin();
+        for (auto iter = s.begin(); iter != e; ++iter) {
+            *streams[num] << "(" << (*graphs[pos])[boost::source(*iter,(*graphs[pos]))].id +1;
+            *streams[num] << "," << (*graphs[pos])[boost::target(*iter,(*graphs[pos]))].id +1<< "),";
         }
-        *streams[num] << *e << "],\n";
-        ss << *e;
+        *streams[num] << "(" << (*graphs[pos])[boost::source(*e,(*graphs[pos]))].id+1;
+        *streams[num] << "," << (*graphs[pos])[boost::target(*e,(*graphs[pos]))].id+1 << ")],\n"; //for the last element dont include the "," but end the collection
+        ss << *iter;
         pos += 1;
     }
     *streams[num] << "\t\"iden\" : \"" << ss.rdbuf() << "\"\n";
     *streams[num] << "}\n\n";
-    counts[num] += 1;
+    counts[num] += 1; 
 }
 
 /*
@@ -99,8 +94,9 @@ void Mult_Output::out(c_clique& complex, const std::vector<Graph*>& graphs){
  * Should be called after all results have been passed to the out funktion.
  * This will require additional disk space as each file will be temporarilly duplicated.
  */
-void Mult_Output::filter_iso() {
+int Mult_Output::filter_iso() {
     std::stringstream ss;
+    int total = 0; 
     for (int i = 0; i < streams.size(); ++i) {
         streams[i]->close(); 
         ss << this->DIR << "/" << i+1 << ".txt";
@@ -109,12 +105,14 @@ void Mult_Output::filter_iso() {
         std::string newF = ss.str();
         
         counts[i] = filter_copy(oldF, newF);
+        total += counts[i];
         std::remove(oldF.c_str());
         std::rename(newF.c_str(), oldF.c_str());
         streams[i]->open(oldF, std::ofstream::app);
         ss.clear();
         ss.str("");
     }
+    return total;
 }
 
 /*

@@ -27,7 +27,7 @@ public:
     void out(std::list<std::list<EdgeDescriptor>>&, const std::vector<Graph*>&);
     std::vector<unsigned int> distribution();
     
-    void filter_iso();
+    int filter_iso();
     
     
 private: 

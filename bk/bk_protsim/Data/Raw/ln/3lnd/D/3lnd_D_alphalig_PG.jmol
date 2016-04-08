@@ -1,0 +1,1 @@
+load =3LND; hide waters;draw l1jl2 color [255 9 255] {-12.0 45.1 4.1} {-15.3 43.5 3.3}; draw l0 color [255 9 255] diameter 5.0 circle {-10.9 51.7 3.5}; draw l1 color [255 9 255] diameter 5.0 circle {-12.0 45.1 4.1}; draw l2 color [255 9 255] diameter 5.0 circle {-15.3 43.5 3.3}; delete water; cartoon only; display :D; color cartoon translucent orange; 

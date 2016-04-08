@@ -1,0 +1,1 @@
+{"pdbid":"3k6d","chain":"A","graphType":"albelig","graphClass":"proteingraph","vertices":["e0","e1","e2"],"edges":{"e0":["e2"],"e1":["e2"],"e2":["e0","e1"]},"edgeLabels":{"e1-e2":"a","e0-e2":"a"}}

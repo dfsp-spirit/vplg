@@ -1,0 +1,38 @@
+#!/bin/bash
+
+#while read p; do
+
+#curl --get -o /home/ben/fatcat_data/$p.gml ptgl.uni-frankfurt.de/api/index.php/pg/$p/A/albe/gml
+
+#done <$1
+
+#for f in $1/*.gml
+#do
+#    curl --get -o /home/ben/fatcat_data/$p.gml ptgl.uni-frankfurt.de/api/index.php/pg/$p/A/albe/gml
+    
+#    /home/ben/develop/vplg/trunk/graphletAnalyser/testrun/graphletanalyser /home/ben/bin/$f --sse_graph
+    
+#    echo "Processing $f file"
+#done
+
+while read p; do
+
+echo "Starting to process $p"
+
+#cd /home/julian/develop/vplg-github-git/plcc/testrun/
+
+#curl --get -o /home/julian/develop/vplg-github-git/plcc/testrun/$p.pdb http://files.rcsb.org/view/$p.pdb
+
+#curl --get -o /home/julian/develop/vplg-github-git/plcc/testrun/$p.dssp ftp://ftp.cmbi.ru.nl/pub/molbio/data/dssp/$p.dssp
+
+
+
+#cp /home/ben/fatcat_sim_pdb/$p.pdb /home/ben/develop/vplg/trunk/plcc/testrun
+#cp /home/ben/fatcat_sim_dssp/$P.dssp /home/ben/develop/vplg/trunk/plcc/testrun
+
+
+
+java -jar plcc.jar $p -f -k -s
+
+
+done <$1

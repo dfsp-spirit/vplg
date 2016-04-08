@@ -12,13 +12,12 @@ typedef std::list<EdgeDescriptor> c_edge;
 
 typedef std::list<c_edge> c_clique;
 typedef std::list<VertexDescriptor_p> s_clique_p;
-typedef std::list<VertexDescriptor> s_clique;
 
 
-MultAlign::MultAlign() : graphs(), products(), alignments(), I(0) {count = 0;}
+MultAlign::MultAlign() : graphs(), products(), alignments(), I(0),CUTOFF(0) {count = 0;}
 
-MultAlign::MultAlign(const std::vector<Graph*> g, const std::vector<ProductGraph*> p, const std::vector<BronKerbosch*> a, int i, std::string out) 
-                    : graphs(g), products(p), alignments(a), I(i), oManager(Mult_Output(out)){
+MultAlign::MultAlign(const std::vector<Graph*> g, const std::vector<ProductGraph*> p, const std::vector<BronKerbosch*> a, int i, int cutoff, std::string out) 
+                    : graphs(g), products(p), alignments(a), I(i),CUTOFF(cutoff), oManager(Mult_Output(out)){
     count = 0;
 } 
 
@@ -31,13 +30,11 @@ MultAlign::~MultAlign() {}
 c_clique MultAlign::combine(c_clique& complex, s_clique_p& simple, const ProductGraph& pg){
     c_clique result;                                  //new complex clique
     for(c_edge& c_e : complex) {                               //for each complex edge
-        result.push_back(c_edge());
-        for(VertexDescriptor_p p_v : simple){                                     //for each pvertex
+        for(VertexDescriptor_p& p_v : simple){                                     //for each pvertex
             if (c_e.front() == pg.getProductGraph()[p_v].edgeFst){               //if the pvertex matches the complex edge
-                result.back() = c_e;                                        //copy complex edge to result list
+                result.push_back(c_e);                                        //copy complex edge to result list
                 result.back().push_back( pg.getProductGraph()[p_v].edgeSec); }    //insert into the complex edge 
-    }
-        if (result.back().empty()) { result.pop_back(); }
+        }
     }
     return result;
 }
@@ -47,7 +44,7 @@ c_clique MultAlign::combine(c_clique& complex, s_clique_p& simple, const Product
  * The results will be saved in text files in the directory saved in the class
  */
 void MultAlign::run() { 
-    /* works as an initilizer for the intersect function.
+    /* works as an initializer for the intersect function.
      * each clique in the 0-1 alignment is transfered into a temporary complex clique. 
      * The cc is then expanded by the recursive intersect function.
      */
@@ -63,7 +60,7 @@ void MultAlign::run() {
 }
 
 void MultAlign::filter() {
-    this->oManager.filter_iso();
+    this->count = this->oManager.filter_iso();
 }
 
 /*
@@ -76,9 +73,9 @@ void MultAlign::intersect(c_clique& complex, int i){
     if (i<this->I) { //clique complete?
         for(s_clique_p& clique : BK_Output::get_result_all(*alignments[i])) {
             c_clique new_complex = this->combine(complex, clique, *products[i]);
-            if( ! new_complex.empty()) {
+            if(new_complex.size() > this->CUTOFF) {
                 intersect(new_complex, i+1);
-            } 
+            }
         } 
     } else {
         this->oManager.out(complex, this->graphs);
@@ -91,5 +88,9 @@ void MultAlign::intersect(c_clique& complex, int i){
  */
 unsigned long MultAlign::num_cliques(){
     return this->count;
+}
+
+std::vector<unsigned int> MultAlign::distribution() {
+    return this->oManager.distribution();
 }
 

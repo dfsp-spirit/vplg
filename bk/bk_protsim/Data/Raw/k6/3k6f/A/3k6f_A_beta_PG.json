@@ -1,0 +1,1 @@
+{"pdbid":"3k6f","chain":"A","graphType":"beta","graphClass":"proteingraph","vertices":["e0","e1","e2","e3","e4","e5","e6"],"edges":{"e5":["e6","e2"],"e6":["e5","e0"],"e0":["e6","e1"],"e1":["e0","e4"],"e2":["e5","e3"],"e3":["e2","e4"],"e4":["e1","e3"]},"edgeLabels":{"e0-e6":"p","e1-e4":"a","e2-e5":"a","e5-e6":"a","e2-e3":"a","e3-e4":"a","e0-e1":"a"}}

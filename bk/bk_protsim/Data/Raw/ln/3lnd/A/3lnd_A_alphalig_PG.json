@@ -1,0 +1,1 @@
+{"pdbid":"3lnd","chain":"A","graphType":"alphalig","graphClass":"proteingraph","vertices":["h0","h1","h2","l3","l4","l5"],"edges":{"l3":[],"h0":["l4","l5"],"l4":["h0","l5"],"h1":[],"l5":["h0","l4"],"h2":[]},"edgeLabels":{"l4-l5":"j","h0-l4":"j","h0-l5":"j"}}

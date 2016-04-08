@@ -1,0 +1,5 @@
+# line format is '<notation_type>:<start_vertex_index_in_parent_protein_graph>:<number_of_sses_in_connected_component>:<notation_string>'
+ADJ:7:10:{e,3ae,6jl,-8ze,7pe,-8pe,7ae,-3ae,1ae,1ae,-4ae,5ze,1ae}
+RED:1:10:{e,3ae,6jl,-8ze,7pe,-8pe,7ae,-3ae,1ae,1ae,-4ae,5ze,1ae}
+KEY:-1:-1:null
+SEQ:7:10:{e,1e,1e,1e,1e,1e,1e,1e,1e,1l}

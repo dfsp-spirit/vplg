@@ -1,0 +1,1 @@
+load =1ZVN; hide waters;draw h0 color [255 0 0] diameter 5.0 circle {45.8 24.2 48.6}; delete water; cartoon only; display :A; color cartoon translucent orange; 
