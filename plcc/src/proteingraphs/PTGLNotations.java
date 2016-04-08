@@ -104,11 +104,11 @@ public class PTGLNotations {
         if(! this.resultsComputed) {
             
             if(Settings.getBoolean("plcc_B_special_linnot_rules_for_bifurcated_adj_and_red")) {
-                System.out.println("Using special rules for bifurcated ADJ and RED linear notation strings.");
+                //System.out.println("Using special rules for bifurcated ADJ and RED linear notation strings.");
                 this.computeLinearNotationsExtraRulesForBifurcated();
             }
             else {
-                System.out.println("Using standard rules for bifurcated ADJ and RED linear notation strings.");
+                //System.out.println("Using standard rules for bifurcated ADJ and RED linear notation strings.");
                 this.computeLinearNotations();
             }
             

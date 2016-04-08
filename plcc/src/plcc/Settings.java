@@ -261,7 +261,9 @@ public class Settings {
         defSet("plcc_B_aminoacidgraphs_include_ligands", "false", "Whether amino acid graphs should include ligands.");
         
         defSet("plcc_B_special_linnot_rules_for_bifurcated_adj_and_red", "true", "Whether special rules should be used for computing the ADJ and RED notations of FGs. These special rules were not used in the latest PTGL version by PM, but it seems in older versions.");
-
+        
+        defSet("plcc_F_abort_if_pdb_resolution_worse_than", "10.0", "abort all processing for PDB files with bad resolution. The value defines what is bad resolution, in Angstroem. Resolution must be given as a float, e.g., '10.0'. If set to 20.0, the program will terminate and NOT further process a PDB file which is detected to have a resolution of more than 20 A. The resolution is read from the PDB file. Set to a negative value like -1.0 to disable this, and thus parse all PDB files, no matter the resolution.");
+        defSet("plcc_I_abort_if_num_residues_below", "30", "abort all processing for PDB files with too few residues. The value defines what is too few. If set to 30, the program will terminate and NOT further process a PDB file which is detected to have less than 30 residues. Set to a negative value like -1 to disable this, and thus parse all PDB files, no matter the residue count.");
         
         defSet("plcc_B_split_dsspfile_warning", "true", "Whether to show a warning about splitting the DSSP file when multiple models are detected in a PDB file.");
         defSet("plcc_B_clustermode", "false", "Whether to write extra output files used only in cluster mode, like GML albe graph file list.");
