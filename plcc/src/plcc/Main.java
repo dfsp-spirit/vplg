@@ -140,7 +140,7 @@ public class Main {
      * The number of different contacts types according to the alternative contact model which are stored for a pair of residues.
      * See calculateAtomContactsBetweenResiduesAlternativeModel() and the ResContactInfo class for details and usage.
      */
-    public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL = 36;
+    public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL = 38;
 
     /**
      * The contacts of a chainName. The 4 fields are: AA 1 index, AA 2 index, atom index in AA 1, atom index in chainName 2.
@@ -5215,7 +5215,10 @@ public class Main {
  
     
     public static boolean checkForPiEffect(Atom x, Atom h, ArrayList<Atom> acceptor) {
+        //avoid some errors
         boolean ret = false;
+        
+        //check if acceptor is not empty
         
         //decide what Pi effect is possible
         
@@ -6980,9 +6983,132 @@ public class Main {
         }
         
         //non-canonical interactions
+        
+        
+        //new implementation (needs validation)
+        /*
+        //residue b includes aromatic ring
+        //TODO or includes C=O
+        if (sidechainPiRings.contains(b.getName3())) {
+            //get atoms of six-ring (and five-ring in case of Trp)
+            six_ring.clear();
+            five_ring.clear();
+            if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
+                if (atoms_b.size() >= 10) {
+                    for (Integer k = 4; k < 11; k++) {
+                        six_ring.add(atoms_b.get(k));
+                    }
+                }
+                else {
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough atoms.");
+                }
+
+            } else if ("TRP".equals(b.getName3())) {
                 
+                //five_ring includes CG, CD1, NE1, CE2, CD2
+                if (atoms_b.size() >= 9) {
+                    for (Integer k = 5; k < 10; k++) {
+                        five_ring.add(atoms_b.get(k));      
+                    }
+                }
+                
+                // calculate mid-point of five-ring
+                fiveRingMidKoord = PiEffectCalculations.calculateMidpointOfAtoms(five_ring);
+                
+                //six_ring includes DC2, CE2, CE3, CZ2, CZ3, CH2
+                if (atoms_b.size() >= 13) {
+                    six_ring.add(atoms_b.get(7)); //CD2
+                    for (Integer k = 9; k < 14; k++) {
+                        six_ring.add(atoms_b.get(k));
+                    }
+                } else {
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough atoms.");
+                }
+            }
+            
+            //NHPI
+            if (atoms_a.size() > 0 && a.getHydrogenAtoms().size() > 0) {
+                if (checkForPiEffect(atoms_a.get(0), a.getHydrogenAtoms().get(0), six_ring)) {
+                    //TODO count up and check for minDis
+                }
+                
+                if ("TRP".equals(b.getName3())) {
+                    if (checkForPiEffect(a.getAtoms().get(0), a.getHydrogenAtoms().get(0), five_ring)) {
+                    //TODO count up and check for minDis
+                    }
+                
+                }
+            }
+            else {
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains no atoms or/and no hydrogens."
+                        + " Continue search in in next residues.");
+            }
+        }
+        
+        //residue a includes aromatic ring
+        //TODO or includes C=O
+        if (sidechainPiRings.contains(a.getName3())) {
+            six_ring.clear();
+            five_ring.clear();
+            if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
+                if (atoms_a.size() >= 10) {
+                    for (Integer k = 4; k < 11; k++) {
+                        six_ring.add(atoms_a.get(k));
+                    }
+                }
+                else {
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms.");
+                }
+
+            } else if ("TRP".equals(a.getName3())) {
+                
+                //five_ring includes CG, CD1, NE1, CE2, CD2
+                if (atoms_a.size() > 9) {
+                    for (Integer k = 5; k < 10; k++) {
+                        five_ring.add(atoms_a.get(k));      
+                    }
+                }
+                
+                // calculate mid-point of five-ring
+                fiveRingMidKoord = PiEffectCalculations.calculateMidpointOfAtoms(five_ring);
+                
+                //six_ring includes DC2, CE2, CE3, CZ2, CZ3, CH2
+                if (atoms_a.size() >= 13) { 
+                    six_ring.add(atoms_a.get(7)); //CD2
+                    for (Integer k = 9; k < 14; k++) {
+                        six_ring.add(atoms_a.get(k));
+                    }
+                }
+                else {
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms.");
+                }
+            }
+            
+            //PINH
+            if (atoms_b.size() > 0 && b.getHydrogenAtoms().size() > 0) {
+                if (checkForPiEffect(b.getAtoms().get(0), b.getHydrogenAtoms().get(0), six_ring)) {
+                    //TODO count up and check for minDis
+                }
+                
+                if ("TRP".equals(b.getName3())) {
+                    if (checkForPiEffect(a.getAtoms().get(0), a.getHydrogenAtoms().get(0), five_ring)) {
+                        //TODO count up and check for minDis
+                    }
+                }
+            }
+            else {
+                DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains no atoms or/and no hydrogens."
+                        + " Continue search in in next residues.");
+            }  
+        }
+        */
+        
+          
+        //old imlpementation (do not remove yet!)
+        
         //NHPI
         if(sidechainPiRings.contains(b.getName3())) {
+            
             Atom bb_N = a.getAtoms().get(0);
             
             if(a.getHydrogenAtoms().isEmpty()) {
@@ -7097,9 +7223,16 @@ public class Main {
             //System.out.print("\n");
             //System.out.printf("6Ring: parameter 1: " + parameter[0] + " parameter 2: "+ parameter[1] + " parameter 3: "+ parameter[2]+ " parameter 4: " + parameter[3]);
             
+            //TEST
+            if ((parameter[0] / 10) <= 4.3 && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120) {
+                System.out.println("NHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+            }
+            
+            /*
             if ((parameter[0] / 10) <= 4.3 && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120 && parameter[3] <= 30) {
                 System.out.println("NHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
             }
+            */
             
             //calculation for five-membered ring in TRP
             //can be modulized
@@ -7135,9 +7268,16 @@ public class Main {
                 //DEBUG
                 //System.out.printf("5Ring: parameter 1: " + parameter[0] + " parameter 2: "+ parameter[1] + " parameter 3: "+ parameter[2]+ " parameter 4: " + parameter[3]);
                 
+                //TEST
+                if ((parameter[0] / 10) <= 4.3 && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120) {
+                    System.out.println("NHPI EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                }
+                
+                /*
                 if ((parameter[0] / 10) <= 4.3 && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120 && parameter[3] <= 30) {
                     System.out.println("NHPI EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
                 }
+                */
             }
         }
 
@@ -7252,9 +7392,16 @@ public class Main {
             //System.out.print("\n");
             //System.out.printf("!6Ring: parameter 1: " + parameter[0] + " parameter 2: "+ parameter[1] + " parameter 3: "+ parameter[2]+ " parameter 4: " + parameter[3]);
             
+            //TEST
+            if ((parameter[0] <= 4.3 / 10) && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120) {
+                System.out.println("PINH EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+            }
+            
+            /*
             if ((parameter[0] <= 4.3 / 10) && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120 && parameter[3] <= 30) {
                 System.out.println("PINH EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
             }
+            */
             
             //calculation for five-membered ring in TRP
             //can be modulized
@@ -7290,11 +7437,19 @@ public class Main {
                 //DEBUG
                 //System.out.printf("5Ring: parameter 1: " + parameter[0] + " parameter 2: "+ parameter[1] + " parameter 3: "+ parameter[2]+ " parameter 4: " + parameter[3]);
                 
+                //TEST
+                if ((parameter[0] / 10) <= 4.3 && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120) {
+                    //DEBUG
+                    System.out.println("PINH EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                    
+                }
+                /*
                 if ((parameter[0] / 10) <= 4.3 && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120 && parameter[3] <= 30) {
                     //DEBUG
                     System.out.println("PINH EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
                     
                 }
+                */
             }
         }
          
