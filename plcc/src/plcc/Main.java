@@ -5243,23 +5243,97 @@ public class Main {
         
     }
  
-    
-    public static boolean checkForPiEffect(Atom x, Atom h, ArrayList<Atom> acceptor) {
-        //avoid some errors
-        boolean ret = false;
+    /**
+     * Checks if a pi effect between the given X-H and aromatic ring occurs.
+     * @param x Atom which is has a H.
+     * @param h Atom which is bound to X.
+     * @param acceptor ArrayList of Atom containing the atoms of the aromatic ring. Must be at least a five-ring.
+     * @param type optional boolean. If true then X=N gets treated as sidechain N of Arg/Lys and X=C gets treated as Pro-CD.
+     * @return boolean whether pi effect occurs. Returns false, too, if less than 4 atoms in acceptor
+     */
+    public static boolean checkForPiEffect(Atom x, Atom h, ArrayList<Atom> acceptor, boolean... type) {
+        double[] ringMidKoord = new double[3];
+        double[] spanningVectorA = new double[3];
+        double[] spanningVectorB = new double[3];
+        double[] HXVector = new double[3];
+        double[] HMidpointVector = new double[3];
+        double[] normal = new double[3];
+        double[] XMidpointVector = new double[3];
+        double[] parameter = new double[4];
         
-        //check if acceptor is not empty
-        
-        //decide what Pi effect is possible
-        
-        //check if Pi effect occurs
-        
-        return ret;
-        
+        if (acceptor.size() > 5) {
+            //calculate mid-point of ring
+            ringMidKoord = PiEffectCalculations.calculateMidpointOfAtoms(acceptor);
+            
+            //calculate parameter 1: X-midpoint distance
+            parameter[0] = PiEffectCalculations.calculateDistanceAtomToPoint(x, ringMidKoord);
+
+            //calculate parameter 2: H-midpoint distance
+            parameter[1] = PiEffectCalculations.calculateDistanceAtomToPoint(h, ringMidKoord);
+            
+            //calculate parameter 3: N-H-midpoint angle
+            HXVector[0] = x.getCoordX() - h.getCoordX();
+            HXVector[1] = x.getCoordY() - h.getCoordY();
+            HXVector[2] = x.getCoordZ() - h.getCoordZ();
+            
+            HMidpointVector[0] = ringMidKoord[0] - h.getCoordX();
+            HMidpointVector[1] = ringMidKoord[1] - h.getCoordY();
+            HMidpointVector[2] = ringMidKoord[2] - h.getCoordZ();
+            
+            parameter[2] = PiEffectCalculations.calculateAngleBetw3DVecs(HXVector, HMidpointVector);
+            
+            //converte to degree
+            parameter[2] = PiEffectCalculations.converteRadianToDegree(parameter[2]);
+
+            //calculate normal vector
+            spanningVectorA[0] = acceptor.get(1).getCoordX() - acceptor.get(0).getCoordX();
+            spanningVectorA[1] = acceptor.get(1).getCoordY() - acceptor.get(0).getCoordY();
+            spanningVectorA[2] = acceptor.get(1).getCoordZ() - acceptor.get(0).getCoordZ();
+
+            spanningVectorB[0] = acceptor.get(2).getCoordX() - acceptor.get(0).getCoordX();
+            spanningVectorB[1] = acceptor.get(2).getCoordY() - acceptor.get(0).getCoordY();
+            spanningVectorB[2] = acceptor.get(2).getCoordZ() - acceptor.get(0).getCoordZ();
+            
+            normal = PiEffectCalculations.calculateNormalOfPlane(spanningVectorA, spanningVectorB);
+            
+            //check if normal vector points to X-H group. Flip if not.
+            //May be replaced with better calculation of normal vector
+            //normal = PiEffectCalculations.checkDirectionNormal(normal, ringMidKoord, h);
+
+            //calculate vector from N to ring mid-point
+            XMidpointVector[0] = ringMidKoord[0] - x.getCoordX();
+            XMidpointVector[1] = ringMidKoord[1] - x.getCoordY();
+            XMidpointVector[2] = ringMidKoord[2] - x.getCoordZ();
+
+            //calculate parameter 4: N-midpoint-normal angle
+            parameter[3] = PiEffectCalculations.calculateAngleBetw3DVecs(HMidpointVector, normal);
+
+            //converte to degree
+            parameter[3] = PiEffectCalculations.converteRadianToDegree(parameter[3]);
+           
+            //determine if pi effect occurs
+            //choose threshold by given X (altered if type=true, see javadocs for more information)
+            if ("N".equals(x.getAtomShortName())) {
+                if (type.length > 0) {
+                    if (type[0]) { // Arg/Lys sidechain N-H...Pi
+                        if ((parameter[0] / 10) <= 4.0 && (parameter[1] / 10) <= 3.8 && parameter[2] >= 10 && parameter[3] <= 30) {
+                            return true;
+                        }
+                    } else { // backbone N-H...Pi
+                        if ((parameter[0] / 10) <= 4.3 && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120 && parameter[3] <= 30) {
+                            return true;
+                        }
+                    } 
+                } else { // backbone N-H...Pi
+                    if ((parameter[0] / 10) <= 4.3 && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120 && parameter[3] <= 30) {
+                        return true;
+                    }
+                }
+            }
+        }
+        // not at least 5 atoms in acceptor. Warning has been printed previously.
+        return false;  
     }
-    
-    
-    
     
     /**
      * Alternative model to calculate the atom contacts between residue 'a' and 'b'.
@@ -5310,10 +5384,6 @@ public class Main {
         double[] normal = new double[3];
         double[] XMidpointVector = new double[3];
         double[] parameter = new double[4];
-
-        
-        //Main.calculatePiEffects(a, b);
-        // TODO: save results to RCI
         
         Integer[] numPairContacts = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL];
         // The positions in the numPairContacts array hold the number of contacts of each type for a pair of residues:
@@ -7016,10 +7086,10 @@ public class Main {
         
         
         //new implementation (needs validation)
-        /*
-        //residue b includes aromatic ring
+        
+        //residue b includes aromatic ring (acceptor) and res a is donor
         //TODO or includes C=O
-        if (sidechainPiRings.contains(b.getName3())) {
+        if (sidechainPiRings.contains(b.getName3())) {           
             //get atoms of six-ring (and five-ring in case of Trp)
             six_ring.clear();
             five_ring.clear();
@@ -7059,12 +7129,18 @@ public class Main {
             //NHPI
             if (atoms_a.size() > 0 && a.getHydrogenAtoms().size() > 0) {
                 if (checkForPiEffect(atoms_a.get(0), a.getHydrogenAtoms().get(0), six_ring)) {
-                    //TODO count up and check for minDis
+                    System.out.println("NHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                    numPairContacts[ResContactInfo.TT]++;
+                    numPairContacts[ResContactInfo.NHPI]++;
+                    //TODO check for minDis and contactAtomIndexInResidue
                 }
                 
                 if ("TRP".equals(b.getName3())) {
                     if (checkForPiEffect(a.getAtoms().get(0), a.getHydrogenAtoms().get(0), five_ring)) {
-                    //TODO count up and check for minDis
+                        System.out.println("NHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                        numPairContacts[ResContactInfo.TT]++;
+                        numPairContacts[ResContactInfo.NHPI]++;
+                        //TODO check for minDis and contactAtomIndexInResidue
                     }
                 
                 }
@@ -7073,15 +7149,45 @@ public class Main {
                     DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains no atoms or/and no hydrogens."
                         + " Continue search in in next residues.");
             }
+            
+            //CNHPI
+            if ("LYS".equals(a.getName3())) {
+                if (atoms_a.size() >= 9 && a.getHydrogenAtoms().size() > 0) {
+                    for (Atom hz : a.getHydrogenAtoms()) {
+                        if (hz.getAtomName().contains("HZ")) {
+                            if (checkForPiEffect(atoms_a.get(8), hz, six_ring, true)) {
+                                System.out.println("CNHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                                numPairContacts[ResContactInfo.TT]++;
+                                numPairContacts[ResContactInfo.CNHPI]++;
+                                //TODO check for minDis and contactAtomIndexInResidue
+                            }
+                            
+                            if ("TRP".equals(b.getName3())) {
+                                if (checkForPiEffect(atoms_a.get(8), hz, five_ring, true)) {
+                                    System.out.println("CNHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                                    numPairContacts[ResContactInfo.TT]++;
+                                    numPairContacts[ResContactInfo.NHPI]++;
+                                    //TODO check for minDis and contactAtomIndexInResidue
+                                }
+                }
+                        }
+                    }
+                }
+                else {
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains no atoms or/and no hydrogens."
+                        + " Continue search in in next residues.");
+                }
+            }
+            
         }
         
-        //residue a includes aromatic ring
+        //residue a includes aromatic ring and res b is donor
         //TODO or includes C=O
         if (sidechainPiRings.contains(a.getName3())) {
             six_ring.clear();
             five_ring.clear();
             if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
-                if (atoms_a.size() >= 10) {
+                if (atoms_a.size() >= 11) {
                     for (Integer k = 4; k < 11; k++) {
                         six_ring.add(atoms_a.get(k));
                     }
@@ -7117,25 +7223,62 @@ public class Main {
             //PINH
             if (atoms_b.size() > 0 && b.getHydrogenAtoms().size() > 0) {
                 if (checkForPiEffect(b.getAtoms().get(0), b.getHydrogenAtoms().get(0), six_ring)) {
-                    //TODO count up and check for minDis
+                    System.out.println("PINH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                    numPairContacts[ResContactInfo.TT]++;
+                    numPairContacts[ResContactInfo.PINH]++;
+                    //TODO check for minDis contactAtomIndexInResidue
                 }
                 
                 if ("TRP".equals(b.getName3())) {
                     if (checkForPiEffect(a.getAtoms().get(0), a.getHydrogenAtoms().get(0), five_ring)) {
-                        //TODO count up and check for minDis
+                        System.out.println("PINH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                        numPairContacts[ResContactInfo.TT]++;
+                        numPairContacts[ResContactInfo.PINH]++;
+                        //TODO check for minDis contactAtomIndexInResidue
                     }
                 }
             }
             else {
                 DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains no atoms or/and no hydrogens."
                         + " Continue search in in next residues.");
-            }  
+            }
+            
+            //PICNH
+            if ("LYS".equals(b.getName3())) {
+                if (atoms_b.size() >= 9 && b.getHydrogenAtoms().size() > 0) {
+                   for (Atom hz : b.getHydrogenAtoms()) {
+                       if (hz.getAtomName().contains("HZ")) {
+                            if (checkForPiEffect(atoms_b.get(8), hz, six_ring, true)) {
+                                System.out.println("CNHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                                numPairContacts[ResContactInfo.TT]++;
+                                numPairContacts[ResContactInfo.PICNH]++;
+                                //TODO check for minDis and contactAtomIndexInResidue
+                            }
+
+                            if ("TRP".equals(a.getName3())) {
+                                if (checkForPiEffect(atoms_b.get(8), hz, five_ring, true)) {
+                                    System.out.println("CNHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                                    numPairContacts[ResContactInfo.TT]++;
+                                    numPairContacts[ResContactInfo.PICNH]++;
+                                    //TODO check for minDis and contactAtomIndexInResidue
+                                }
+                            }
+                        }        
+                   }
+                }
+                else {
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains no atoms or/and no hydrogens."
+                            + " Continue search in in next residues.");
+                }
+            }
         }
-        */
+        
+        
+        
         
           
         //old imlpementation (do not remove yet!)
-        
+        /*
         //NHPI
         if(sidechainPiRings.contains(b.getName3())) {
             
@@ -7227,6 +7370,10 @@ public class Main {
             XMidpointVector[0] = sixRingMidKoord[0] - bb_N.getCoordX();
             XMidpointVector[1] = sixRingMidKoord[1] - bb_N.getCoordY();
             XMidpointVector[2] = sixRingMidKoord[2] - bb_N.getCoordZ();
+            
+            //check if normal vector points to X-H group. Flip if not.
+            //May be replaced with better calculation of normal vector
+            normal = PiEffectCalculations.checkDirectionNormal(normal, sixRingMidKoord, bb_H);
 
             //calculate parameter 4: N-midpoint-normal angle
             parameter[3] = PiEffectCalculations.calculateAngleBetw3DVecs(HMidpointVector, normal);
@@ -7234,35 +7381,22 @@ public class Main {
             //converte to degree
             parameter[3] = PiEffectCalculations.converteRadianToDegree(parameter[3]);
 
-
-            //DEBUG
-            /*
-            System.out.print("\n");
-            System.out.printf("TYR MIDPOINT " + ringMidKoord[0] + "/" + ringMidKoord[1] + "/" + ringMidKoord[2]);
-            System.out.print("\n");
-            System.out.printf("spanningVectorA " + spanningVectorA[0] + "/" + spanningVectorA[1] + "/" + spanningVectorA[2]);
-            System.out.print("\n");
-            System.out.printf("spanningVectorB " + spanningVectorB[0] + "/" + spanningVectorB[1] + "/" + spanningVectorB[2]);
-            System.out.print("\n");
-            System.out.printf("normal" + normal[0] + "/" + normal[1] + "/" + normal[2]);
-            System.out.print("\n");
-            System.out.printf("XMidpointVector" + XMidpointVector[0] + "/" + XMidpointVector[1] + "/" + XMidpointVector[2]);
-            */
-
             //DEBUG
             //System.out.print("\n");
             //System.out.printf("6Ring: parameter 1: " + parameter[0] + " parameter 2: "+ parameter[1] + " parameter 3: "+ parameter[2]+ " parameter 4: " + parameter[3]);
             
             //TEST
-            if ((parameter[0] / 10) <= 4.3 && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120) {
-                System.out.println("NHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
-            }
             
-            /*
+            //if ((parameter[0] / 10) <= 4.3 && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120) {
+            //    System.out.println("NHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+            //}
+            
+            
+            
             if ((parameter[0] / 10) <= 4.3 && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120 && parameter[3] <= 30) {
                 System.out.println("NHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
             }
-            */
+            
             
             //calculation for five-membered ring in TRP
             //can be modulized
@@ -7290,6 +7424,10 @@ public class Main {
 
                 normal = PiEffectCalculations.calculateNormalOfPlane(spanningVectorA, spanningVectorB);
                 
+                //check if normal vector points to X-H group. Flip if not.
+                //May be replaced with better calculation of normal vector
+                normal = PiEffectCalculations.checkDirectionNormal(normal, sixRingMidKoord, bb_H);
+                
                 parameter[3] = PiEffectCalculations.calculateAngleBetw3DVecs(normal, XMidpointVector);
 
                 //converte to degree
@@ -7299,15 +7437,14 @@ public class Main {
                 //System.out.printf("5Ring: parameter 1: " + parameter[0] + " parameter 2: "+ parameter[1] + " parameter 3: "+ parameter[2]+ " parameter 4: " + parameter[3]);
                 
                 //TEST
-                if ((parameter[0] / 10) <= 4.3 && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120) {
-                    System.out.println("NHPI EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
-                }
+                //if ((parameter[0] / 10) <= 4.3 && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120) {
+                //    System.out.println("NHPI EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                //} 
                 
-                /*
                 if ((parameter[0] / 10) <= 4.3 && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120 && parameter[3] <= 30) {
                     System.out.println("NHPI EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
                 }
-                */
+                
             }
         }
 
@@ -7391,6 +7528,10 @@ public class Main {
             spanningVectorB[2] = six_ring.get(2).getCoordZ() - six_ring.get(0).getCoordZ();
             
             normal = PiEffectCalculations.calculateNormalOfPlane(spanningVectorA, spanningVectorB);
+            
+            //check if normal vector points to X-H group. Flip if not.
+            //May be replaced with better calculation of normal vector
+            normal = PiEffectCalculations.checkDirectionNormal(normal, sixRingMidKoord, bb_H);
 
             //calculate vector from N to ring mid-point
             XMidpointVector[0] = sixRingMidKoord[0] - bb_N.getCoordX();
@@ -7403,35 +7544,19 @@ public class Main {
             //converte to degree
             parameter[3] = PiEffectCalculations.converteRadianToDegree(parameter[3]);
 
-
-            //DEBUG
-            /*
-            System.out.print("\n");
-            System.out.printf("TYR MIDPOINT " + ringMidKoord[0] + "/" + ringMidKoord[1] + "/" + ringMidKoord[2]);
-            System.out.print("\n");
-            System.out.printf("spanningVectorA " + spanningVectorA[0] + "/" + spanningVectorA[1] + "/" + spanningVectorA[2]);
-            System.out.print("\n");
-            System.out.printf("spanningVectorB " + spanningVectorB[0] + "/" + spanningVectorB[1] + "/" + spanningVectorB[2]);
-            System.out.print("\n");
-            System.out.printf("normal" + normal[0] + "/" + normal[1] + "/" + normal[2]);
-            System.out.print("\n");
-            System.out.printf("XMidpointVector" + XMidpointVector[0] + "/" + XMidpointVector[1] + "/" + XMidpointVector[2]);
-            */
-
             //DEBUG
             //System.out.print("\n");
             //System.out.printf("!6Ring: parameter 1: " + parameter[0] + " parameter 2: "+ parameter[1] + " parameter 3: "+ parameter[2]+ " parameter 4: " + parameter[3]);
             
             //TEST
-            if ((parameter[0] <= 4.3 / 10) && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120) {
-                System.out.println("PINH EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
-            }
+            //if ((parameter[0] <= 4.3 / 10) && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120) {
+            //    System.out.println("PINH EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+            //}
             
-            /*
             if ((parameter[0] <= 4.3 / 10) && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120 && parameter[3] <= 30) {
                 System.out.println("PINH EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
             }
-            */
+            
             
             //calculation for five-membered ring in TRP
             //can be modulized
@@ -7459,6 +7584,10 @@ public class Main {
 
                 normal = PiEffectCalculations.calculateNormalOfPlane(spanningVectorA, spanningVectorB);
                 
+                //check if normal vector points to X-H group. Flip if not.
+                //May be replaced with better calculation of normal vector
+                normal = PiEffectCalculations.checkDirectionNormal(normal, sixRingMidKoord, bb_H);
+                
                 parameter[3] = PiEffectCalculations.calculateAngleBetw3DVecs(normal, XMidpointVector);
 
                 //converte to degree
@@ -7468,20 +7597,21 @@ public class Main {
                 //System.out.printf("5Ring: parameter 1: " + parameter[0] + " parameter 2: "+ parameter[1] + " parameter 3: "+ parameter[2]+ " parameter 4: " + parameter[3]);
                 
                 //TEST
-                if ((parameter[0] / 10) <= 4.3 && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120) {
+                //if ((parameter[0] / 10) <= 4.3 && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120) {
                     //DEBUG
-                    System.out.println("PINH EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
-                    
-                }
-                /*
+                //    System.out.println("PINH EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                //    
+                //}
+                
                 if ((parameter[0] / 10) <= 4.3 && (parameter[1] / 10) <= 3.5 && parameter[2] >= 120 && parameter[3] <= 30) {
                     //DEBUG
                     System.out.println("PINH EFFECT between " +a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
                     
                 }
-                */
+                
             }
         }
+        */
          
         
         // Iteration through all atoms of the two residues is done

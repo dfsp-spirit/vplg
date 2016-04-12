@@ -101,7 +101,7 @@ public class PiEffectCalculations {
     }
 
     /**
-     * Convertes a angle in radian to degree
+     * Converts a angle in radian to degree
      * @param rad double angle in radian
      * @return double angle in degree
      */
@@ -112,6 +112,44 @@ public class PiEffectCalculations {
         double deg;
         deg = (360 / (2 * Math.PI)) * rad;
         return deg;
+    }
+    
+    /**
+     * Checks if the normal vector needs to be flipped
+     * @param normal double array of length 3 containing the coordinates of the normal
+     * @param ringMidKoord double array of length 3 containing the coordinates of the midpoint of the ring
+     * @param h Atom Hydrogen bound to X in calculation of pi effects (used for distance calculation)
+     * @return the normal pointing towards H as double array of length 3
+     */
+    public static double[] checkDirectionNormal(double[] normal, double[] ringMidKoord, Atom h) {
+        //test: increase the length of the normal vector
+        normal[0] *= 10;
+        normal[1] *= 10;
+        normal[2] *= 10;
+        
+        double[] normalEndpoint =  new double[3];
+        normalEndpoint[0] = ringMidKoord[0] + normal[0];
+        normalEndpoint[1] = ringMidKoord[1] + normal[1];
+        normalEndpoint[2] = ringMidKoord[2] + normal[2];
+
+        double[] flippedNormalEndpoint = new double[3];
+        flippedNormalEndpoint[0] = ringMidKoord[0] - normal[0];
+        flippedNormalEndpoint[1] = ringMidKoord[1] - normal[1];
+        flippedNormalEndpoint[2] = ringMidKoord[2] - normal[2];
+
+        if (Math.sqrt(Math.pow(normalEndpoint[0] - h.getCoordX(), 2) + Math.pow(normalEndpoint[1] - h.getCoordY(), 2) + Math.pow(normalEndpoint[2] - h.getCoordZ() , 2)) > Math.sqrt(Math.pow(flippedNormalEndpoint[0] - h.getCoordX(), 2) + Math.pow(flippedNormalEndpoint[1] - h.getCoordY(), 2) + Math.pow(flippedNormalEndpoint[2] - h.getCoordZ(), 2))) {
+            normal[0] *= -1;
+            normal[1] *= -1;
+            normal[2] *= -1;
+            
+            //DEBUG needs to be removed
+            //System.out.println("FLIPPED NORMAL VECTOR (debug only)");
+        } else {
+            //DEBUG
+            //System.out.println("NO NEED TO FLIP NORMAL");
+        }
+        
+        return normal;
     }
     
 }
