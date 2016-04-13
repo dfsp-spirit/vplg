@@ -115,7 +115,7 @@ public class PiEffectCalculations {
     }
     
     /**
-     * Checks if the normal vector needs to be flipped
+     * Checks if the normal vector needs to be flipped (MAY  BE REMOVED)
      * @param normal double array of length 3 containing the coordinates of the normal
      * @param ringMidKoord double array of length 3 containing the coordinates of the midpoint of the ring
      * @param h Atom Hydrogen bound to X in calculation of pi effects (used for distance calculation)
@@ -150,6 +150,26 @@ public class PiEffectCalculations {
         }
         
         return normal;
+    }
+    
+    /**
+     * Gives the Atom number to a the name of an Arg H
+     * @param h Atom hydrogen
+     * @return int
+     */
+    public static int giveAtomNumOfNBondToArgH(Atom h) {
+        if (h.getAtomName().contains("HE")) {
+            return 7;
+        }
+        else if (h.getAtomName().contains("HH1")) {
+            return 9;
+        }
+        else if (h.getAtomName().contains("HH2")) {
+            return 10;
+        }
+        DP.getInstance().e("PiEffectCalculations", "Hydrogen of Arginin had an uncommon name. Not expected to happen. Please check your PDB file "
+                + "or report back to the code authors. Program may crash.");
+        return -1;
     }
     
 }
