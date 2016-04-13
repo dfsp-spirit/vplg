@@ -7103,10 +7103,7 @@ public class Main {
             }
         }
         
-        //non-canonical interactions
-        
-        
-        //new implementation (needs validation)
+        //non-canonical interactions (new implementation)
         
         int piDist;
         
@@ -7127,7 +7124,7 @@ public class Main {
                 }
 
             } else if ("TRP".equals(b.getName3())) {
-                
+                           
                 //five_ring includes CG, CD1, NE1, CE2, CD2
                 if (atoms_b.size() >= 9) {
                     for (Integer k = 5; k < 10; k++) {
@@ -7158,6 +7155,13 @@ public class Main {
                     numPairContacts[ResContactInfo.NHPI]++;
                     if (minContactDistances[ResContactInfo.NHPI] == 0 || piDist > minContactDistances[ResContactInfo.NHPI]) {
                         minContactDistances[ResContactInfo.NHPI] = piDist;
+                        contactAtomNumInResidueA[ResContactInfo.NHPI] = 0; //backbone N
+                        if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
+                            contactAtomNumInResidueB[ResContactInfo.NHPI] = 5; //CG of six_ring
+                        }
+                        else {
+                            contactAtomNumInResidueB[ResContactInfo.NHPI] = 7; //CD2 of six_ring
+                        }
                     }
                     //TODO check contactAtomIndexInResidue
                 }
@@ -7169,6 +7173,13 @@ public class Main {
                     numPairContacts[ResContactInfo.NHPI]++;
                     if (minContactDistances[ResContactInfo.NHPI] == 0 || piDist > minContactDistances[ResContactInfo.NHPI]) {
                         minContactDistances[ResContactInfo.NHPI] = piDist;
+                        contactAtomNumInResidueA[ResContactInfo.NHPI] = 0; //backbone N
+                        if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
+                            contactAtomNumInResidueB[ResContactInfo.NHPI] = 5; //CG of six_ring
+                        }
+                        else {
+                            contactAtomNumInResidueB[ResContactInfo.NHPI] = 7; //CD2 of six_ring
+                        }
                     }
                     //TODO check for minDis and contactAtomIndexInResidue
                 }
@@ -7181,6 +7192,8 @@ public class Main {
                         numPairContacts[ResContactInfo.NHPI]++;
                         if (minContactDistances[ResContactInfo.NHPI] == 0 || piDist > minContactDistances[ResContactInfo.NHPI]) {
                             minContactDistances[ResContactInfo.NHPI] = piDist;
+                            contactAtomNumInResidueA[ResContactInfo.NHPI] = 0; //backbone N
+                            contactAtomNumInResidueB[ResContactInfo.NHPI] = 5; //CG of five_ring
                         }
                         //TODO check for minDis and contactAtomIndexInResidue
                     }
@@ -7192,6 +7205,8 @@ public class Main {
                         numPairContacts[ResContactInfo.NHPI]++;
                         if (minContactDistances[ResContactInfo.NHPI] == 0 || piDist > minContactDistances[ResContactInfo.NHPI]) {
                             minContactDistances[ResContactInfo.NHPI] = piDist;
+                            contactAtomNumInResidueA[ResContactInfo.NHPI] = 0; //backbone N
+                            contactAtomNumInResidueB[ResContactInfo.NHPI] = 5; //CG of five_ring
                         }
                         //TODO check for minDis and contactAtomIndexInResidue
                     }
@@ -7215,8 +7230,14 @@ public class Main {
                                 numPairContacts[ResContactInfo.CNHPI]++;
                                 if (minContactDistances[ResContactInfo.CNHPI] == 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                     minContactDistances[ResContactInfo.CNHPI] = piDist;
-                                }
-                                //TODO check for minDis and contactAtomIndexInResidue
+                                    contactAtomNumInResidueA[ResContactInfo.CNHPI] = 8; //sidechain N
+                                    if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
+                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 5; //CG of six_ring
+                                    }
+                                    else {
+                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 7; //CD2 of six_ring
+                                    }
+                                }                             
                             }
                             
                             piDist = (int)calculateDistancePiEffect(atoms_a.get(8), hz, six_ring, true, true);
@@ -7226,8 +7247,14 @@ public class Main {
                                 numPairContacts[ResContactInfo.CNHPI]++;
                                 if (minContactDistances[ResContactInfo.CNHPI] == 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                     minContactDistances[ResContactInfo.CNHPI] = piDist;
+                                    contactAtomNumInResidueA[ResContactInfo.CNHPI] = 8; //sidechain N
+                                    if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
+                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 5; //CG of six_ring
+                                    }
+                                    else {
+                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 7; //CD2 of six_ring
+                                    }
                                 }
-                                //TODO check for minDis and contactAtomIndexInResidue
                             }
                             
                             if ("TRP".equals(b.getName3())) {
@@ -7238,8 +7265,9 @@ public class Main {
                                     numPairContacts[ResContactInfo.CNHPI]++;
                                     if (minContactDistances[ResContactInfo.CNHPI] == 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                         minContactDistances[ResContactInfo.CNHPI] = piDist;
+                                        contactAtomNumInResidueA[ResContactInfo.CNHPI] = 8; //sidechain N
+                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 5; //CG of five_ring
                                     }
-                                    //TODO check for minDis and contactAtomIndexInResidue
                                 }
                                 
                                 piDist = (int)calculateDistancePiEffect(atoms_a.get(8), hz, five_ring, true, true);
@@ -7249,8 +7277,9 @@ public class Main {
                                     numPairContacts[ResContactInfo.CNHPI]++;
                                     if (minContactDistances[ResContactInfo.CNHPI] == 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                         minContactDistances[ResContactInfo.CNHPI] = piDist;
+                                        contactAtomNumInResidueA[ResContactInfo.CNHPI] = 8; //sidechain N
+                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 5; //CG of five_ring
                                     }
-                                    //TODO check for minDis and contactAtomIndexInResidue
                                 }
                 }
                         }
@@ -7269,15 +7298,7 @@ public class Main {
                     for (Atom argH : a.getHydrogenAtoms()) {
                         //check if H is bond to a sidechain N
                         if (argH.getAtomName().contains("HE") || argH.getAtomName().contains("HH")) {
-                            if (argH.getAtomName().contains("HE")) {
-                                argN = atoms_a.get(7);
-                            }
-                            else if (argH.getAtomName().contains("HH1")) {
-                                argN = atoms_a.get(9);
-                            }
-                            else {
-                                argN = atoms_a.get(10);
-                            }
+                            argN = atoms_a.get(PiEffectCalculations.giveAtomNumOfNBondToArgH(argH));
                             
                             piDist = (int)calculateDistancePiEffect(argN, argH, six_ring, true);
                             if (piDist > 0) {
@@ -7286,8 +7307,15 @@ public class Main {
                                 numPairContacts[ResContactInfo.CNHPI]++;
                                 if (minContactDistances[ResContactInfo.CNHPI] == 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                     minContactDistances[ResContactInfo.CNHPI] = piDist;
+                                    contactAtomNumInResidueA[ResContactInfo.CNHPI] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
+                                    if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
+                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 5; //CG of six_ring
+                                    }
+                                    else {
+                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 7; //CD2 of six_ring
+                                    }
                                 }
-                                //TODO check for minDis and contactAtomIndexInResidue
+                                
                             }
                             
                             piDist = (int)calculateDistancePiEffect(argN, argH, six_ring, true, true);
@@ -7297,6 +7325,13 @@ public class Main {
                                 numPairContacts[ResContactInfo.CNHPI]++;
                                 if (minContactDistances[ResContactInfo.CNHPI] == 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                     minContactDistances[ResContactInfo.CNHPI] = piDist;
+                                    contactAtomNumInResidueA[ResContactInfo.CNHPI] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
+                                    if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
+                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 5; //CG of six_ring
+                                    }
+                                    else {
+                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 7; //CD2 of six_ring
+                                    }
                                 }
                                 //TODO check for minDis and contactAtomIndexInResidue
                             }
@@ -7309,8 +7344,9 @@ public class Main {
                                     numPairContacts[ResContactInfo.CNHPI]++;
                                     if (minContactDistances[ResContactInfo.CNHPI] == 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                         minContactDistances[ResContactInfo.CNHPI] = piDist;
+                                        contactAtomNumInResidueA[ResContactInfo.CNHPI] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
+                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 5; //CG of five_ring
                                     }
-                                    //TODO check for minDis and contactAtomIndexInResidue
                                 }
                                 
                                 piDist = (int)calculateDistancePiEffect(argN, argH, five_ring, true, true);
@@ -7320,8 +7356,9 @@ public class Main {
                                     numPairContacts[ResContactInfo.CNHPI]++;
                                     if (minContactDistances[ResContactInfo.CNHPI] == 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                         minContactDistances[ResContactInfo.CNHPI] = piDist;
+                                        contactAtomNumInResidueA[ResContactInfo.CNHPI] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
+                                        contactAtomNumInResidueB[ResContactInfo.CNHPI] = 5; //CG of five_ring
                                     }
-                                    //TODO check for minDis and contactAtomIndexInResidue
                                 }
                             }
                         }
@@ -7382,8 +7419,14 @@ public class Main {
                     numPairContacts[ResContactInfo.PINH]++;
                     if (minContactDistances[ResContactInfo.PINH] == 0 || piDist > minContactDistances[ResContactInfo.PINH]) {
                         minContactDistances[ResContactInfo.PINH] = piDist;
+                        contactAtomNumInResidueB[ResContactInfo.PINH] = 0; //backbone N
+                        if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
+                            contactAtomNumInResidueA[ResContactInfo.PINH] = 5; //CG of six_ring
+                        }
+                        else {
+                            contactAtomNumInResidueA[ResContactInfo.PINH] = 7; //CD2 of six_ring
+                        }
                     }
-                    //TODO check for minDis contactAtomIndexInResidue
                 }
                 
                 piDist = (int)calculateDistancePiEffect(b.getAtoms().get(0), b.getHydrogenAtoms().get(0), six_ring, false, true);
@@ -7393,8 +7436,14 @@ public class Main {
                     numPairContacts[ResContactInfo.PINH]++;
                     if (minContactDistances[ResContactInfo.PINH] == 0 || piDist > minContactDistances[ResContactInfo.PINH]) {
                         minContactDistances[ResContactInfo.PINH] = piDist;
+                        contactAtomNumInResidueB[ResContactInfo.PINH] = 0; //backbone N
+                        if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
+                            contactAtomNumInResidueA[ResContactInfo.PINH] = 5; //CG of six_ring
+                        }
+                        else {
+                            contactAtomNumInResidueA[ResContactInfo.PINH] = 7; //CD2 of six_ring
+                        }
                     }
-                    //TODO check for minDis contactAtomIndexInResidue
                 }
                 
                 if ("TRP".equals(b.getName3())) {
@@ -7405,8 +7454,9 @@ public class Main {
                         numPairContacts[ResContactInfo.PINH]++;
                         if (minContactDistances[ResContactInfo.PINH] == 0 || piDist > minContactDistances[ResContactInfo.PINH]) {
                             minContactDistances[ResContactInfo.PINH] = piDist;
+                            contactAtomNumInResidueB[ResContactInfo.PINH] = 0; //backbone N
+                            contactAtomNumInResidueA[ResContactInfo.PINH] = 5; //CG of five_ring
                         }
-                        //TODO check for minDis contactAtomIndexInResidue
                     }
                     
                     piDist = (int)calculateDistancePiEffect(a.getAtoms().get(0), a.getHydrogenAtoms().get(0), five_ring, false, true);
@@ -7416,8 +7466,9 @@ public class Main {
                         numPairContacts[ResContactInfo.PINH]++;
                         if (minContactDistances[ResContactInfo.PINH] == 0 || piDist > minContactDistances[ResContactInfo.PINH]) {
                             minContactDistances[ResContactInfo.PINH] = piDist;
+                            contactAtomNumInResidueB[ResContactInfo.PINH] = 0; //backbone N
+                            contactAtomNumInResidueA[ResContactInfo.PINH] = 5; //CG of five_ring
                         }
-                        //TODO check for minDis contactAtomIndexInResidue
                     }
                 }
             }
@@ -7438,8 +7489,14 @@ public class Main {
                                 numPairContacts[ResContactInfo.PICNH]++;
                                 if (minContactDistances[ResContactInfo.PICNH] == 0 || piDist > minContactDistances[ResContactInfo.PICNH]) {
                                     minContactDistances[ResContactInfo.PICNH] = piDist;
+                                    contactAtomNumInResidueB[ResContactInfo.PICNH] = 8; //sidechain N
+                                    if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
+                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 5; //CG of six_ring
+                                    }
+                                    else {
+                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 7; //CD2 of six_ring
+                                    }
                                 }
-                                //TODO check for minDis and contactAtomIndexInResidue
                             }
                             
                             piDist = (int)calculateDistancePiEffect(atoms_b.get(8), hz, six_ring, true, true);
@@ -7449,8 +7506,14 @@ public class Main {
                                 numPairContacts[ResContactInfo.PICNH]++;
                                 if (minContactDistances[ResContactInfo.PICNH] == 0 || piDist > minContactDistances[ResContactInfo.PICNH]) {
                                     minContactDistances[ResContactInfo.PICNH] = piDist;
+                                    contactAtomNumInResidueB[ResContactInfo.PICNH] = 8; //sidechain N
+                                    if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
+                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 5; //CG of six_ring
+                                    }
+                                    else {
+                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 7; //CD2 of six_ring
+                                    }
                                 }
-                                //TODO check for minDis and contactAtomIndexInResidue
                             }
 
                             if ("TRP".equals(a.getName3())) {
@@ -7461,8 +7524,9 @@ public class Main {
                                     numPairContacts[ResContactInfo.PICNH]++;
                                     if (minContactDistances[ResContactInfo.PICNH] == 0 || piDist > minContactDistances[ResContactInfo.PICNH]) {
                                         minContactDistances[ResContactInfo.PICNH] = piDist;
+                                        contactAtomNumInResidueB[ResContactInfo.PICNH] = 8; //sidechain N
+                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 5; //CG of five_ring
                                     }
-                                    //TODO check for minDis and contactAtomIndexInResidue
                                 }
                                 
                                 piDist = (int)calculateDistancePiEffect(atoms_b.get(8), hz, five_ring, true, true);
@@ -7472,8 +7536,9 @@ public class Main {
                                     numPairContacts[ResContactInfo.PICNH]++;
                                     if (minContactDistances[ResContactInfo.PICNH] == 0 || piDist > minContactDistances[ResContactInfo.PICNH]) {
                                         minContactDistances[ResContactInfo.PICNH] = piDist;
+                                        contactAtomNumInResidueB[ResContactInfo.PICNH] = 8; //sidechain N
+                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 5; //CG of five_ring
                                     }
-                                    //TODO check for minDis and contactAtomIndexInResidue
                                 }
                             }
                         }        
@@ -7510,6 +7575,13 @@ public class Main {
                                 numPairContacts[ResContactInfo.PICNH]++;
                                 if (minContactDistances[ResContactInfo.PICNH] == 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                     minContactDistances[ResContactInfo.PICNH] = piDist;
+                                    contactAtomNumInResidueB[ResContactInfo.PICNH] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
+                                    if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
+                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 5; //CG of six_ring
+                                    }
+                                    else {
+                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 7; //CD2 of six_ring
+                                    }
                                 }
                                 //TODO check for minDis and contactAtomIndexInResidue
                             }
@@ -7521,8 +7593,14 @@ public class Main {
                                 numPairContacts[ResContactInfo.PICNH]++;
                                 if (minContactDistances[ResContactInfo.PICNH] == 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                     minContactDistances[ResContactInfo.PICNH] = piDist;
+                                    contactAtomNumInResidueB[ResContactInfo.PICNH] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
+                                    if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
+                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 5; //CG of six_ring
+                                    }
+                                    else {
+                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 7; //CD2 of six_ring
+                                    }
                                 }
-                                //TODO check for minDis and contactAtomIndexInResidue
                             }
 
                             if ("TRP".equals(b.getName3())) {
@@ -7533,8 +7611,9 @@ public class Main {
                                     numPairContacts[ResContactInfo.PICNH]++;
                                     if (minContactDistances[ResContactInfo.PICNH] == 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                         minContactDistances[ResContactInfo.PICNH] = piDist;
+                                        contactAtomNumInResidueB[ResContactInfo.PICNH] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
+                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 5; //CG of five_ring
                                     }
-                                    //TODO check for minDis and contactAtomIndexInResidue
                                 }
 
                                 piDist = (int)calculateDistancePiEffect(argN, argH, five_ring, true, true);
@@ -7544,8 +7623,9 @@ public class Main {
                                     numPairContacts[ResContactInfo.PICNH]++;
                                     if (minContactDistances[ResContactInfo.PICNH] == 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                         minContactDistances[ResContactInfo.PICNH] = piDist;
+                                        contactAtomNumInResidueB[ResContactInfo.PICNH] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
+                                        contactAtomNumInResidueA[ResContactInfo.PICNH] = 5; //CG of five_ring
                                     }
-                                    //TODO check for minDis and contactAtomIndexInResidue
                                 }
                             }
                         }
