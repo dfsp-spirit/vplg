@@ -7111,6 +7111,12 @@ public class Main {
         
         //non-canonical interactions (new implementation)
         
+        if (a.getName3().equals("LEU")) {
+            for (Atom k : a.getHydrogenAtoms()) {
+                System.out.println(k.getAtomShortName());
+            }
+        }
+        
         int piDist;
         
         //residue b includes aromatic ring (acceptor) and res a is donor
@@ -7372,77 +7378,99 @@ public class Main {
                         + " Continue search in in next residues.");
                 }
             }
-            /*
-            //CAHPI
-            for (Atom k : a.getHydrogenAtoms()) {
-                System.out.println(k.getAtomName());
-            }
-            for (Atom k : atoms_a) {
-                System.out.println(k.getAtomName());
-            }
             
+            //CAHPI            
             if (atoms_a.size() > 2 && a.getHydrogenAtoms().size() > 2) {
-                if (atoms_a.get(1).getAtomName().contains("CA") && a.getHydrogenAtoms().get(1).getAtomName().contains("HA")) {
-                    
-                    
-                    //TOWORKON
-                    piDist = (int)(calculateDistancePiEffect(atoms_a.get(1), a.getHydrogenAtoms().get(1), six_ring) / 10);
+                if ((atoms_a.get(1).getAtomShortName().contains("CA") && a.getHydrogenAtoms().get(1).getAtomShortName().equals("HA")) || //Pro contains no H -> HA has index 0
+                        ("PRO".equals(a.getName3()) && atoms_a.get(1).getAtomName().equals("CA") 
+                        && a.getHydrogenAtoms().get(0).getAtomShortName().equals("HA")) ) {                  
+                    if ("PRO".equals(a.getName3())) {
+                        piDist = (int)(calculateDistancePiEffect(atoms_a.get(1), a.getHydrogenAtoms().get(0), six_ring) / 10);
+                    }
+                    else {
+                        piDist = (int)(calculateDistancePiEffect(atoms_a.get(1), a.getHydrogenAtoms().get(1), six_ring) / 10);
+                    }
                     if ( piDist > 0) {
-                        System.out.println("NHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                        System.out.println("CAHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
                         numPairContacts[ResContactInfo.TT]++;
-                        numPairContacts[ResContactInfo.NHPI]++;
-                        if (minContactDistances[ResContactInfo.NHPI] == 0 || piDist > minContactDistances[ResContactInfo.NHPI]) {
-                            minContactDistances[ResContactInfo.NHPI] = piDist;
-                            contactAtomNumInResidueA[ResContactInfo.NHPI] = 0; //backbone N
+                        numPairContacts[ResContactInfo.CAHPI]++;
+                        if (minContactDistances[ResContactInfo.CAHPI] == 0 || piDist > minContactDistances[ResContactInfo.CAHPI]) {
+                            minContactDistances[ResContactInfo.CAHPI] = piDist;
+                            contactAtomNumInResidueA[ResContactInfo.CAHPI] = 1; //CA
                             if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
-                                contactAtomNumInResidueB[ResContactInfo.NHPI] = 5; //CG of six_ring
+                                contactAtomNumInResidueB[ResContactInfo.CAHPI] = 5; //CG of six_ring
                             }
                             else {
-                                contactAtomNumInResidueB[ResContactInfo.NHPI] = 7; //CD2 of six_ring
+                                contactAtomNumInResidueB[ResContactInfo.CAHPI] = 7; //CD2 of six_ring
                             }
                         }
                     }
-
-                    piDist = (int)(calculateDistancePiEffect(atoms_a.get(0), a.getHydrogenAtoms().get(0), six_ring, false, true) / 10);
-                    if (piDist > 0) {
-                        System.out.println("NHPI EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                    
+                    if ("PRO".equals(a.getName3())) {
+                        piDist = (int)(calculateDistancePiEffect(atoms_a.get(1), a.getHydrogenAtoms().get(0), six_ring, false, true) / 10);
+                    }
+                    else {
+                        piDist = (int)(calculateDistancePiEffect(atoms_a.get(1), a.getHydrogenAtoms().get(1), six_ring, false, true) / 10);
+                    }
+                    
+                    if ( piDist > 0) {
+                        System.out.println("CAHPI EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
                         numPairContacts[ResContactInfo.TT]++;
-                        numPairContacts[ResContactInfo.NHPI]++;
-                        if (minContactDistances[ResContactInfo.NHPI] == 0 || piDist > minContactDistances[ResContactInfo.NHPI]) {
-                            minContactDistances[ResContactInfo.NHPI] = piDist;
-                            contactAtomNumInResidueA[ResContactInfo.NHPI] = 0; //backbone N
+                        numPairContacts[ResContactInfo.CAHPI]++;
+                        if (minContactDistances[ResContactInfo.CAHPI] == 0 || piDist > minContactDistances[ResContactInfo.CAHPI]) {
+                            minContactDistances[ResContactInfo.CAHPI] = piDist;
+                            contactAtomNumInResidueA[ResContactInfo.CAHPI] = 1; //CA
                             if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
-                                contactAtomNumInResidueB[ResContactInfo.NHPI] = 5; //CG of six_ring
+                                contactAtomNumInResidueB[ResContactInfo.CAHPI] = 5; //CG of six_ring
                             }
                             else {
-                                contactAtomNumInResidueB[ResContactInfo.NHPI] = 7; //CD2 of six_ring
+                                contactAtomNumInResidueB[ResContactInfo.CAHPI] = 7; //CD2 of six_ring
                             }
                         }
-                        //TODO check for minDis and contactAtomIndexInResidue
                     }
 
                     if ("TRP".equals(b.getName3())) {
-                        piDist = (int)(calculateDistancePiEffect(a.getAtoms().get(0), a.getHydrogenAtoms().get(0), five_ring) / 10);
-                        if (piDist > 0) {
-                            System.out.println("NHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                        if ("PRO".equals(a.getName3())) {
+                            piDist = (int)(calculateDistancePiEffect(atoms_a.get(1), a.getHydrogenAtoms().get(0), five_ring) / 10);
+                        }
+                        else {
+                            piDist = (int)(calculateDistancePiEffect(atoms_a.get(1), a.getHydrogenAtoms().get(1), five_ring) / 10);
+                        }
+                        if ( piDist > 0) {
+                            System.out.println("CAHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
                             numPairContacts[ResContactInfo.TT]++;
-                            numPairContacts[ResContactInfo.NHPI]++;
-                            if (minContactDistances[ResContactInfo.NHPI] == 0 || piDist > minContactDistances[ResContactInfo.NHPI]) {
-                                minContactDistances[ResContactInfo.NHPI] = piDist;
-                                contactAtomNumInResidueA[ResContactInfo.NHPI] = 0; //backbone N
-                                contactAtomNumInResidueB[ResContactInfo.NHPI] = 5; //CG of five_ring
+                            numPairContacts[ResContactInfo.CAHPI]++;
+                            if (minContactDistances[ResContactInfo.CAHPI] == 0 || piDist > minContactDistances[ResContactInfo.CAHPI]) {
+                                minContactDistances[ResContactInfo.CAHPI] = piDist;
+                                contactAtomNumInResidueA[ResContactInfo.CAHPI] = 1; //CA
+                                if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
+                                    contactAtomNumInResidueB[ResContactInfo.CAHPI] = 5; //CG of six_ring
+                                }
+                                else {
+                                    contactAtomNumInResidueB[ResContactInfo.CAHPI] = 7; //CD2 of six_ring
+                                }
                             }
                         }
 
-                        piDist = (int)(calculateDistancePiEffect(a.getAtoms().get(0), a.getHydrogenAtoms().get(0), five_ring, false, true) / 10);
-                        if (piDist > 0) {
-                            System.out.println("NHPI EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                        if ("PRO".equals(a.getName3())) {
+                            piDist = (int)(calculateDistancePiEffect(atoms_a.get(1), a.getHydrogenAtoms().get(0), five_ring, false, true) / 10);
+                        }
+                        else {
+                            piDist = (int)(calculateDistancePiEffect(atoms_a.get(1), a.getHydrogenAtoms().get(1), five_ring, false, true) / 10);
+                        }
+                        if ( piDist > 0) {
+                            System.out.println("CAHPI EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
                             numPairContacts[ResContactInfo.TT]++;
-                            numPairContacts[ResContactInfo.NHPI]++;
-                            if (minContactDistances[ResContactInfo.NHPI] == 0 || piDist > minContactDistances[ResContactInfo.NHPI]) {
-                                minContactDistances[ResContactInfo.NHPI] = piDist;
-                                contactAtomNumInResidueA[ResContactInfo.NHPI] = 0; //backbone N
-                                contactAtomNumInResidueB[ResContactInfo.NHPI] = 5; //CG of five_ring
+                            numPairContacts[ResContactInfo.CAHPI]++;
+                            if (minContactDistances[ResContactInfo.CAHPI] == 0 || piDist > minContactDistances[ResContactInfo.CAHPI]) {
+                                minContactDistances[ResContactInfo.CAHPI] = piDist;
+                                contactAtomNumInResidueA[ResContactInfo.CAHPI] = 1; //CA
+                                if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {
+                                    contactAtomNumInResidueB[ResContactInfo.CAHPI] = 5; //CG of six_ring
+                                }
+                                else {
+                                    contactAtomNumInResidueB[ResContactInfo.CAHPI] = 7; //CD2 of six_ring
+                                }
                             }
                         }
 
@@ -7457,7 +7485,7 @@ public class Main {
                     DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains no atoms or/and no hydrogens."
                         + " Continue search in next residues.");
             }
-        */    
+          
         }
         
         
@@ -7726,6 +7754,113 @@ public class Main {
                     DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains no atoms or/and no hydrogens."
                         + " Continue search in in next residues.");
                 }  
+            }
+            
+            //PICAH            
+            if (atoms_b.size() > 2 && b.getHydrogenAtoms().size() > 2) {
+                if ((atoms_b.get(1).getAtomShortName().equals("CA") && a.getHydrogenAtoms().get(1).getAtomShortName().equals("HA")) || //Pro contains no H -> HA has index 0
+                        ("PRO".equals(b.getName3()) && atoms_b.get(1).getAtomShortName().equals("CA") 
+                        && b.getHydrogenAtoms().get(0).getAtomShortName().equals("HA")) ) {                  
+                    if ("PRO".equals(a.getName3())) {
+                        piDist = (int)(calculateDistancePiEffect(atoms_b.get(1), b.getHydrogenAtoms().get(0), six_ring) / 10);
+                    }
+                    else {
+                        piDist = (int)(calculateDistancePiEffect(atoms_b.get(1), b.getHydrogenAtoms().get(1), six_ring) / 10);
+                    }
+                    if ( piDist > 0) {
+                        System.out.println("PICAH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                        numPairContacts[ResContactInfo.TT]++;
+                        numPairContacts[ResContactInfo.PICAH]++;
+                        if (minContactDistances[ResContactInfo.PICAH] == 0 || piDist > minContactDistances[ResContactInfo.PICAH]) {
+                            minContactDistances[ResContactInfo.PICAH] = piDist;
+                            contactAtomNumInResidueA[ResContactInfo.PICAH] = 1; //CA
+                            if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
+                                contactAtomNumInResidueB[ResContactInfo.PICAH] = 5; //CG of six_ring
+                            }
+                            else {
+                                contactAtomNumInResidueB[ResContactInfo.PICAH] = 7; //CD2 of six_ring
+                            }
+                        }
+                    }
+                    
+                    if ("PRO".equals(b.getName3())) {
+                        piDist = (int)(calculateDistancePiEffect(atoms_b.get(1), b.getHydrogenAtoms().get(0), six_ring, false, true) / 10);
+                    }
+                    else {
+                        piDist = (int)(calculateDistancePiEffect(atoms_b.get(1), b.getHydrogenAtoms().get(1), six_ring, false, true) / 10);
+                    }
+                    
+                    if ( piDist > 0) {
+                        System.out.println("PICAH EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                        numPairContacts[ResContactInfo.TT]++;
+                        numPairContacts[ResContactInfo.PICAH]++;
+                        if (minContactDistances[ResContactInfo.PICAH] == 0 || piDist > minContactDistances[ResContactInfo.CAHPI]) {
+                            minContactDistances[ResContactInfo.PICAH] = piDist;
+                            contactAtomNumInResidueA[ResContactInfo.PICAH] = 1; //CA
+                            if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
+                                contactAtomNumInResidueB[ResContactInfo.PICAH] = 5; //CG of six_ring
+                            }
+                            else {
+                                contactAtomNumInResidueB[ResContactInfo.PICAH] = 7; //CD2 of six_ring
+                            }
+                        }
+                    }
+
+                    if ("TRP".equals(a.getName3())) {
+                        if ("PRO".equals(b.getName3())) {
+                            piDist = (int)(calculateDistancePiEffect(atoms_b.get(1), b.getHydrogenAtoms().get(0), five_ring) / 10);
+                        }
+                        else {
+                            piDist = (int)(calculateDistancePiEffect(atoms_b.get(1), b.getHydrogenAtoms().get(1), five_ring) / 10);
+                        }
+                        if ( piDist > 0) {
+                            System.out.println("PICAH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                            numPairContacts[ResContactInfo.TT]++;
+                            numPairContacts[ResContactInfo.PICAH]++;
+                            if (minContactDistances[ResContactInfo.PICAH] == 0 || piDist > minContactDistances[ResContactInfo.PICAH]) {
+                                minContactDistances[ResContactInfo.PICAH] = piDist;
+                                contactAtomNumInResidueA[ResContactInfo.PICAH] = 1; //CA
+                                if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
+                                    contactAtomNumInResidueB[ResContactInfo.PICAH] = 5; //CG of six_ring
+                                }
+                                else {
+                                    contactAtomNumInResidueB[ResContactInfo.PICAH] = 7; //CD2 of six_ring
+                                }
+                            }
+                        }
+
+                        if ("PRO".equals(b.getName3())) {
+                            piDist = (int)(calculateDistancePiEffect(atoms_b.get(1), b.getHydrogenAtoms().get(0), five_ring, false, true) / 10);
+                        }
+                        else {
+                            piDist = (int)(calculateDistancePiEffect(atoms_b.get(1), b.getHydrogenAtoms().get(1), five_ring, false, true) / 10);
+                        }
+                        if ( piDist > 0) {
+                            System.out.println("PICAH EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                            numPairContacts[ResContactInfo.TT]++;
+                            numPairContacts[ResContactInfo.PICAH]++;
+                            if (minContactDistances[ResContactInfo.PICAH] == 0 || piDist > minContactDistances[ResContactInfo.PICAH]) {
+                                minContactDistances[ResContactInfo.PICAH] = piDist;
+                                contactAtomNumInResidueA[ResContactInfo.CAHPI] = 1; //CA
+                                if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
+                                    contactAtomNumInResidueB[ResContactInfo.PICAH] = 5; //CG of six_ring
+                                }
+                                else {
+                                    contactAtomNumInResidueB[ResContactInfo.PICAH] = 7; //CD2 of six_ring
+                                }
+                            }
+                        }
+
+                    }
+                }
+                else {
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains no CA and/or HA at expected position."
+                            + " Continue search in next residues.");
+                }
+            }
+            else {
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains no atoms or/and no hydrogens."
+                        + " Continue search in next residues.");
             }
         } 
         
