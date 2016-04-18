@@ -140,7 +140,7 @@ public class Main {
      * The number of different contacts types according to the alternative contact model which are stored for a pair of residues.
      * See calculateAtomContactsBetweenResiduesAlternativeModel() and the ResContactInfo class for details and usage.
      */
-    public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL = 38;
+    public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL = 39;
 
     /**
      * The contacts of a chainName. The 4 fields are: AA 1 index, AA 2 index, atom index in AA 1, atom index in chainName 2.
@@ -5358,8 +5358,58 @@ public class Main {
                 }
             }
         }
-        // not at least 5 atoms in acceptor. Warning has been printed previously.
+        // No pi effect occurs or not at least 5 atoms in acceptor (Warning has been printed previously).
         return -1;  
+    }
+    
+    public static double calculateDistancePiEffect(Atom ca, Atom h, Atom c, Atom o) {
+        double[] parameter = new double[4];
+        double[] hCAVector = new double[3];
+        double[] hOVector = new double[3];
+        double[] oHVector = new double[3];
+        double[] oCVector = new double[3];
+        
+        //parameter 1
+        parameter[0] = ca.distToAtom(o);
+        
+        //parameter 2
+        parameter[1] = h.distToAtom(o);
+        
+        //parameter 3
+        hCAVector[0] = ca.getCoordX() - h.getCoordX();
+        hCAVector[1] = ca.getCoordY() - h.getCoordY();
+        hCAVector[2] = ca.getCoordZ() - h.getCoordZ();
+        
+        hOVector[0] = o.getCoordX() - h.getCoordX();
+        hOVector[1] = o.getCoordY() - h.getCoordY();
+        hOVector[2] = o.getCoordZ() - h.getCoordZ();
+        
+        parameter[2] = PiEffectCalculations.calculateAngleBetw3DVecs(hCAVector, hOVector);
+        
+        //converte to degree
+        parameter[2] = PiEffectCalculations.converteRadianToDegree(parameter[2]);
+        
+        //parameter 4
+        oHVector[0] = h.getCoordX() - o.getCoordX();
+        oHVector[1] = h.getCoordY() - o.getCoordY();
+        oHVector[2] = h.getCoordZ() - o.getCoordZ();
+        
+        oCVector[0] = c.getCoordX() - o.getCoordX();
+        oCVector[1] = c.getCoordY() - o.getCoordY();
+        oCVector[2] = c.getCoordZ() - o.getCoordZ();
+        
+        parameter[3] = PiEffectCalculations.calculateAngleBetw3DVecs(oHVector, oCVector);
+        
+        //converte to degree
+        parameter[3] = PiEffectCalculations.converteRadianToDegree(parameter[3]);
+        
+        //determine if pi effect occurs
+        if ((parameter[0] / 10) <= 3.8 && (parameter[1] / 10) <= 3.3 && parameter[2] >= 120 && parameter[3] >= 90) {
+            return parameter[0];
+        }
+        
+        //No pi effect occurs.
+        return -1;
     }
     
     /**
@@ -5399,6 +5449,13 @@ public class Main {
         sidechainPiRings.add("TRP");
         sidechainPiRings.add("TYR");
         sidechainPiRings.add("PHE");
+        ArrayList<String> sidechainCarbonyls = new ArrayList<String>();
+        sidechainCarbonyls.add("GLN");
+        sidechainCarbonyls.add("ASN");
+        sidechainCarbonyls.add("GLU");
+        sidechainCarbonyls.add("ASP");
+
+
         
         ArrayList<Atom> six_ring = new ArrayList<Atom>();
         ArrayList<Atom> five_ring = new ArrayList<Atom>(); //in case of TRP
@@ -7114,7 +7171,6 @@ public class Main {
         int piDist;
         
         //residue b includes aromatic ring (acceptor) and res a is donor
-        //TODO or includes C=O
         if (sidechainPiRings.contains(b.getName3())) {           
             //get atoms of six-ring (and five-ring in case of Trp)
             six_ring.clear();
@@ -7658,9 +7714,111 @@ public class Main {
             }
         }
         
+        //C=O in residue b acts as acceptor
+        //CAHCO
+        if (sidechainCarbonyls.contains(b.getName3())) {
+            //check for a valid res b
+            if ( (("GLU".equals(b.getName3()) || "GLN".equals(b.getName3())) && atoms_b.size() >= 8) ||
+                    (("ASP".equals(b.getName3()) || "ASN".equals(b.getName3())) && atoms_b.size() >= 7) ) {
+                if ( ("GLU".equals(b.getName3()) || "GLN".equals(b.getName3()) && atoms_b.get(6).getAtomShortName().equals("CD") && 
+                        atoms_b.get(7).getAtomShortName().equals("OE1")) ||
+                       (("ASP".equals(b.getName3()) || "ASN".equals(b.getName3())) && atoms_b.get(5).getAtomShortName().equals("CG") &&
+                        atoms_b.get(6).getAtomShortName().equals("OD1")) ) {  
+            
+                    if ((atoms_a.size() >= 2 && a.getHydrogenAtoms().size() >= 2) || ("PRO".equals(a.getName3()) && atoms_a.size() >= 2 && a.getHydrogenAtoms().size() >= 1)) {
+                        if ((atoms_a.get(1).getAtomShortName().contains("CA") && a.getHydrogenAtoms().get(1).getAtomShortName().equals("HA")) || //Pro contains no H -> HA has index 0
+                                ("PRO".equals(a.getName3()) && atoms_a.get(1).getAtomShortName().equals("CA") 
+                                && a.getHydrogenAtoms().get(0).getAtomShortName().equals("HA")) || //Gly contains two HA
+                                "GLY".equals(a.getName3()) && a.getHydrogenAtoms().get(1).getAtomName().contains("HA") && 
+                                a.getHydrogenAtoms().get(2).getAtomName().contains("HA")) {                  
+                            if ("PRO".equals(a.getName3())) {
+                                if ("GLU".equals(b.getName3()) || "GLN".equals(b.getName3())) {
+                                    piDist = (int)(calculateDistancePiEffect(atoms_a.get(1), a.getHydrogenAtoms().get(0), atoms_b.get(6), atoms_b.get(7)) / 10);
+                                }
+                                else {
+                                    piDist = (int)(calculateDistancePiEffect(atoms_a.get(1), a.getHydrogenAtoms().get(0), atoms_b.get(5), atoms_b.get(6)) / 10);
+                                }
+                            }
+                            else {
+                                if ("GLU".equals(b.getName3()) || "GLN".equals(b.getName3())) {
+                                    piDist = (int)(calculateDistancePiEffect(atoms_a.get(1), a.getHydrogenAtoms().get(1), atoms_b.get(6), atoms_b.get(7)) / 10);
+                                }
+                                else {
+                                    piDist = (int)(calculateDistancePiEffect(atoms_a.get(1), a.getHydrogenAtoms().get(1), atoms_b.get(5), atoms_b.get(6)) / 10);
+                                }
+                            }
+                            if (piDist > 0) {
+                                System.out.println("CAHCO EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
+                                numPairContacts[ResContactInfo.TT]++;
+                                numPairContacts[ResContactInfo.CAHCO]++;
+                                if (minContactDistances[ResContactInfo.CAHCO] == 0 || piDist > minContactDistances[ResContactInfo.CAHCO]) {
+                                    minContactDistances[ResContactInfo.CAHCO] = piDist;
+                                    contactAtomNumInResidueA[ResContactInfo.CAHCO] = 1; //CA
+                                    if ("GLU".equals(b.getName3()) || "GLN".equals(b.getName3())) {
+                                        contactAtomNumInResidueB[ResContactInfo.CAHCO] = 7; //OE1
+                                    }
+                                    else {
+                                        contactAtomNumInResidueB[ResContactInfo.CAHCO] = 6; //OD1
+                                    }
+                                }
+                            }
+                            
+                            //same procedure for second HA of Gly
+                            if ("GLY".equals(a.getName3())) {
+                                if ("GLU".equals(b.getName3()) || "GLN".equals(b.getName3())) {
+                                    piDist = (int)(calculateDistancePiEffect(atoms_a.get(1), a.getHydrogenAtoms().get(2), atoms_b.get(6), atoms_b.get(7)) / 10);
+                                }
+                                else {
+                                    piDist = (int)(calculateDistancePiEffect(atoms_a.get(1), a.getHydrogenAtoms().get(2), atoms_b.get(5), atoms_b.get(6)) / 10);
+                                }
+                                if ( piDist > 0) {
+                                    System.out.println("CAHCO EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
+                                    numPairContacts[ResContactInfo.TT]++;
+                                    numPairContacts[ResContactInfo.CAHCO]++;
+                                    if (minContactDistances[ResContactInfo.CAHCO] == 0 || piDist > minContactDistances[ResContactInfo.CAHCO]) {
+                                        minContactDistances[ResContactInfo.CAHCO] = piDist;
+                                        contactAtomNumInResidueA[ResContactInfo.CAHCO] = 1; //CA
+                                        if ("GLU".equals(b.getName3()) || "GLN".equals(b.getName3())) {
+                                            contactAtomNumInResidueB[ResContactInfo.CAHCO] = 7; //OE1
+                                        }
+                                        else {
+                                            contactAtomNumInResidueB[ResContactInfo.CAHCO] = 6; //OD1
+                                        }
+                                    }
+                                }
+                                
+                            }
+                        }
+                        else {
+                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains no CA and/or HA at expected position."
+                                    + " Continue search in next residues.");
+                        }
+                    }
+                    else {
+                        if ((! (atoms_a.size() > 2)) || "PHE".equals(a.getName3()) && !(atoms_a.size() > 2)) {
+                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms (no CA)."
+                                + " Continue search in next residues.");
+                        }
+                        else {
+                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough hydrogen (no HA)."
+                                + " Continue search in next residues.");
+                        }
+                    }
+            
+                }
+                else {
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not the expected atom names for C=O."
+                        + " Continue seach in next residues.");
+                }
+            }
+            else {
+                DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough atoms (no C=O)."
+                    + " Continue search in next residues.");
+            }
+        }
+        
         
         //residue a includes aromatic ring and res b is donor
-        //TODO or includes C=O
         if (sidechainPiRings.contains(a.getName3())) {
             six_ring.clear();
             five_ring.clear();
@@ -8211,7 +8369,110 @@ public class Main {
                     }
                 }
             }
-        } 
+        }
+        
+        //C=O in residue a acts as acceptor
+        //COCAH
+        if (sidechainCarbonyls.contains(a.getName3())) {
+            //check for a valid res a
+            if ( (("GLU".equals(a.getName3()) || "GLN".equals(a.getName3())) && atoms_a.size() >= 8) ||
+                    (("ASP".equals(a.getName3()) || "ASN".equals(a.getName3())) && atoms_a.size() >= 7) ) {
+                if ( ("GLU".equals(a.getName3()) || "GLN".equals(a.getName3()) && atoms_a.get(6).getAtomShortName().equals("CD") && 
+                        atoms_a.get(7).getAtomShortName().equals("OE1")) ||
+                       (("ASP".equals(a.getName3()) || "ASN".equals(a.getName3())) && atoms_a.get(5).getAtomShortName().equals("CG") &&
+                        atoms_a.get(6).getAtomShortName().equals("OD1")) ) {  
+            
+                    if ((atoms_b.size() >= 2 && b.getHydrogenAtoms().size() >= 2) || ("PRO".equals(b.getName3()) && atoms_b.size() >= 2 && b.getHydrogenAtoms().size() >= 1)) {
+                        if ((atoms_b.get(1).getAtomShortName().contains("CA") && b.getHydrogenAtoms().get(1).getAtomShortName().equals("HA")) || //Pro contains no H -> HA has index 0
+                                ("PRO".equals(b.getName3()) && atoms_b.get(1).getAtomShortName().equals("CA") 
+                                && b.getHydrogenAtoms().get(0).getAtomShortName().equals("HA")) || //Gly contains two HA
+                                "GLY".equals(b.getName3()) && b.getHydrogenAtoms().get(1).getAtomName().contains("HA") && 
+                                b.getHydrogenAtoms().get(2).getAtomName().contains("HA")) {                  
+                            if ("PRO".equals(b.getName3())) {
+                                if ("GLU".equals(a.getName3()) || "GLN".equals(a.getName3())) {
+                                    piDist = (int)(calculateDistancePiEffect(atoms_b.get(1), b.getHydrogenAtoms().get(0), atoms_a.get(6), atoms_a.get(7)) / 10);
+                                }
+                                else {
+                                    piDist = (int)(calculateDistancePiEffect(atoms_b.get(1), b.getHydrogenAtoms().get(0), atoms_a.get(5), atoms_a.get(6)) / 10);
+                                }
+                            }
+                            else {
+                                if ("GLU".equals(a.getName3()) || "GLN".equals(a.getName3())) {
+                                    piDist = (int)(calculateDistancePiEffect(atoms_b.get(1), b.getHydrogenAtoms().get(1), atoms_a.get(6), atoms_a.get(7)) / 10);
+                                }
+                                else {
+                                    piDist = (int)(calculateDistancePiEffect(atoms_b.get(1), b.getHydrogenAtoms().get(1), atoms_a.get(5), atoms_a.get(6)) / 10);
+                                }
+                            }
+                            if (piDist > 0) {
+                                System.out.println("COCAH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
+                                numPairContacts[ResContactInfo.TT]++;
+                                numPairContacts[ResContactInfo.COCAH]++;
+                                if (minContactDistances[ResContactInfo.COCAH] == 0 || piDist > minContactDistances[ResContactInfo.COCAH]) {
+                                    minContactDistances[ResContactInfo.COCAH] = piDist;
+                                    contactAtomNumInResidueA[ResContactInfo.COCAH] = 1; //CA
+                                    if ("GLU".equals(a.getName3()) || "GLN".equals(a.getName3())) {
+                                        contactAtomNumInResidueB[ResContactInfo.COCAH] = 7; //OE1
+                                    }
+                                    else {
+                                        contactAtomNumInResidueB[ResContactInfo.COCAH] = 6; //OD1
+                                    }
+                                }
+                            }
+                            
+                            //same procedure for second HA of Gly
+                            if ("GLY".equals(b.getName3())) {
+                                if ("GLU".equals(a.getName3()) || "GLN".equals(a.getName3())) {
+                                    piDist = (int)(calculateDistancePiEffect(atoms_b.get(1), b.getHydrogenAtoms().get(2), atoms_a.get(6), atoms_a.get(7)) / 10);
+                                }
+                                else {
+                                    piDist = (int)(calculateDistancePiEffect(atoms_b.get(1), b.getHydrogenAtoms().get(2), atoms_a.get(5), atoms_a.get(6)) / 10);
+                                }
+                                if ( piDist > 0) {
+                                    System.out.println("COCAH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
+                                    numPairContacts[ResContactInfo.TT]++;
+                                    numPairContacts[ResContactInfo.COCAH]++;
+                                    if (minContactDistances[ResContactInfo.COCAH] == 0 || piDist > minContactDistances[ResContactInfo.COCAH]) {
+                                        minContactDistances[ResContactInfo.COCAH] = piDist;
+                                        contactAtomNumInResidueA[ResContactInfo.COCAH] = 1; //CA
+                                        if ("GLU".equals(a.getName3()) || "GLN".equals(a.getName3())) {
+                                            contactAtomNumInResidueB[ResContactInfo.COCAH] = 7; //OE1
+                                        }
+                                        else {
+                                            contactAtomNumInResidueB[ResContactInfo.COCAH] = 6; //OD1
+                                        }
+                                    }
+                                }
+                                
+                            }
+                        }
+                        else {
+                            DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains no CA and/or HA at expected position."
+                                    + " Continue search in next residues.");
+                        }
+                    }
+                    else {
+                        if ((! (atoms_b.size() > 2)) || "PHE".equals(b.getName3()) && !(atoms_b.size() > 2)) {
+                            DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough atoms (no CA)."
+                                + " Continue search in next residues.");
+                        }
+                        else {
+                            DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough hydrogen (no HA)."
+                                + " Continue search in next residues.");
+                        }
+                    }
+            
+                }
+                else {
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not the expected atom names for C=O."
+                        + " Continue seach in next residues.");
+                }
+            }
+            else {
+                DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms (no C=O)."
+                    + " Continue search in next residues.");
+            }
+        }
         
         // Iteration through all atoms of the two residues is done
         if(numPairContacts[ResContactInfo.TT] > 0) {
