@@ -5362,6 +5362,14 @@ public class Main {
         return -1;  
     }
     
+    /**
+     * Checks if a pi effect occurs for the specific group of CA-H...O=C effects (overloaded method).
+     * @param ca Atom backbone C alpha
+     * @param h Atom Hydrogen bound to ca
+     * @param c Atom C of another residue
+     * @param o Atom oxygen with double bond to c
+     * @return double distance as 10th of Angstrom from CA to O (=> parameter 1). Returns -1 if no Pi effect occurs
+     */
     public static double calculateDistancePiEffect(Atom ca, Atom h, Atom c, Atom o) {
         double[] parameter = new double[4];
         double[] hCAVector = new double[3];
