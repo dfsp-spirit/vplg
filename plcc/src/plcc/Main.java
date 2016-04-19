@@ -5355,7 +5355,14 @@ public class Main {
             
             //S-H...Pi
             if ("SG".equals(x.getAtomShortName())) {
-               if ((parameter[0] / 10) <= 4.0 && parameter[3] <= 30) {
+                if ((parameter[0] / 10) <= 4.0 && parameter[3] <= 30) {
+                    return parameter[0];
+                } 
+            }
+            
+            //O-H...Pi
+            if (x.getAtomShortName().contains("OG") || "OH".equals(x.getAtomShortName())) {
+                if ((parameter[0] / 10) <= 3.8 && parameter[3] <= 30) {
                     return parameter[0];
                 } 
             }
