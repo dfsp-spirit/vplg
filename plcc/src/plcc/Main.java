@@ -8044,7 +8044,7 @@ public class Main {
                     }
                 }
                 else {
-                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms.");
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms (six ring).");
                 }
 
             } else if ("TRP".equals(a.getName3())) {
@@ -8055,6 +8055,9 @@ public class Main {
                         five_ring.add(atoms_a.get(k));      
                     }
                 }
+                else {
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms (five ring).");
+                }
                 
                 //six_ring includes DC2, CE2, CE3, CZ2, CZ3, CH2
                 if (atoms_a.size() >= 13) { 
@@ -8064,7 +8067,7 @@ public class Main {
                     }
                 }
                 else {
-                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms.");
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms (six ring).");
                 }
             }
             
