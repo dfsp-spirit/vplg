@@ -444,6 +444,13 @@ public class Main {
                         argsUsed[i] = true;
                     }
                     
+                    
+                    if(s.equals("--convert-models-to-chains")) {
+                       Settings.set("plcc_B_convert_models_to_chains", "true");                        
+                        argsUsed[i] = true;
+                    }
+                    
+                    
                     if(s.equals("--alt-aa-contacts")) {
                         useFileFromCommandline = true;
                         Settings.set("plcc_B_alternate_aminoacid_contact_model", "true");
@@ -1853,6 +1860,19 @@ public class Main {
             System.err.println("ERROR: pdbfile '" + pdbFile + "' not found. Exiting.");
             System.exit(1);
         }
+        
+        // convert pdf file with multiple models to pdb file with multiple chains only
+        // the models will be converted to separated chains
+        if(Settings.getBoolean("plcc_B_convert_models_to_chains")) {
+                Boolean status = FileParser.convertPdbModelsToChains(pdbFile);
+                if(status) {
+                    System.out.println("  New converted PDB file " + pdbFile + "C has been saved.");
+                    System.exit(0);
+                }
+                else {
+                    System.exit(1);
+                }
+       }
 
         // dssp file
         input_file = new File(dsspFile);

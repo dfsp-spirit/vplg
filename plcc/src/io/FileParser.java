@@ -23,8 +23,10 @@ import tools.DP;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.io.*;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.TreeMap;
 import resultcontainers.ProteinResults;
 import plcc.Settings;
 
@@ -2089,6 +2091,161 @@ public class FileParser {
 
         return(res);
     }
+    
+    /**
+     * Parses a PDB file with multiple MODELS, converts those models to separate chains, and saves the result in a new PDB file.
+     * If only none or only one model was found, the method stops because there is nothing to convert.
+     * @param pdbFile
+     * @return true if converting was successful, false otherwise.
+     */
+    public static Boolean convertPdbModelsToChains(String pdbFile) {
+        // Read the PDB file
+        ArrayList<String> file = slurpFile(pdbFile);
+        
+        Integer pLineNum = 0;
+        String mID = "";
+        // Contains the all the models as <k,v> = <line number were models starts, model ID>
+        TreeMap<Integer, String> models = new TreeMap<Integer, String>();
+        String pLine = "";
+        
+        // Iterate through the PDB file and look at each line
+        for(Integer i = 0; i < file.size(); i++) {
+            pLineNum = i + 1;
+            pLine = file.get(i);
+            
+            if(pLine.startsWith("MODEL ")) {
+                // If the line is marked as MODEL, try to get the model ID
+                try {
+                    mID = (pLine.substring(10, 16)).trim();
+                } catch(Exception e) {
+                    System.err.println("ERROR: Hit MODEL line at PDB line number " + pLineNum + " but parsing the line failed.");
+                    e.printStackTrace();
+                    System.exit(-1);
+                }
+
+                // Model found
+                if(!models.containsValue(mID)) {
+                    System.out.println("    PDB: New PDB Model (model ID '" + mID + "') starts at PDB line " + pLineNum + ".");
+                    models.put(pLineNum, mID);
+                }
+                else {
+                    System.err.println("ERROR: Found models with the same ID.");
+                    System.exit(-1);
+                }
+            }
+        }
+        
+        // Only if there is more than two models we will have to convert something, otherwise stop here
+        if(models.size() < 2) {
+            System.out.println(models.size());
+            System.out.println("No different models/only one model found. Nothing to convert here.");
+            return false;
+        }
+        
+        // Initate a sting builder that will store the output string that will result in the new PDB file
+        StringBuilder sb = new StringBuilder();
+        String lineSep = System.lineSeparator();
+        
+        // Parse the header of the file until the first MODEL is reached
+        for(Integer i = 0; i < file.size(); i++) {
+            pLineNum = i + 1;
+            pLine = file.get(i);
+            
+            if(pLine.startsWith("MODEL ")) {
+                break;
+            }
+            else {
+                sb.append(pLine);
+                sb.append(lineSep);
+            }
+        }
+        
+        
+        // Alphabet that makes up all possible chain IDs
+        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String newChainID = null;
+        Integer atomID = 0;
+        Integer residueID = 0;
+
+        // Go through all the found models by starting at the line the models begin
+        for(Integer lineNum : models.keySet()) {
+            String chainID = "-1";
+            
+            // Get the first new chain ID from the alphabet that can be used to rename chains
+            newChainID = alphabet.substring(0, 1);
+            alphabet = alphabet.replace(newChainID, "");
+            
+            while(!file.get(lineNum).startsWith("ENDMDL")) {
+                
+                // Go through the model until its end is reached and extract the chain ID from each entry
+                String newLine = file.get(lineNum);
+                chainID = newLine.substring(21,22);
+                
+                // Get the IDs from the current line which will be the old IDs that get overwritten
+                Integer oldAtomID = Integer.parseInt(newLine.substring(6, 11).trim());
+                Integer oldresidueID = Integer.parseInt(newLine.substring(22, 26).trim());
+                // Now add the highest IDs from the previous model to the current IDs to get the new IDs
+                // If we are still processing the first model, zero will be added, so nothing changes
+                Integer newAtomID = oldAtomID + atomID;
+                Integer newResidueID = oldresidueID + residueID;
+                
+                
+                lineNum++;
+                
+                // Now look at the next line to see what chain ID this line has
+                String nextLine = file.get(lineNum);
+                String nextChainID = nextLine.substring(21, 22);
+               
+                // If both chain IDs are different and we have not reached the end of the model yet, 
+                // get a new chain ID and replace the old chain ID with this new one
+                if(!chainID.equals(nextChainID) && !nextLine.startsWith("ENDMDL")) {
+                    newChainID = alphabet.substring(0, 1);
+                    // Delete the character from the alphabet as we have used it now
+                    alphabet = alphabet.replace(newChainID, "");
+                    
+                    newLine = new StringBuilder(newLine).replace(21, 22, newChainID).toString();
+                    // Add the new IDs
+                    newLine = new StringBuilder(newLine).replace(6, 11, newAtomID.toString()).toString();
+                    newLine = new StringBuilder(newLine).replace(22, 26, newResidueID.toString()).toString();
+                    sb.append(newLine);
+                    sb.append(lineSep);
+                }
+                else {
+                    // If the next line is the same as the one before, we do not have to assing a new chain ID
+                    // but we still have to rename the old chain ID with the currently used new chain ID
+                    newLine = new StringBuilder(newLine).replace(21, 22, newChainID).toString();
+                    // Add the new IDs
+                    newLine = new StringBuilder(newLine).replace(6, 11, newAtomID.toString()).toString();
+                    newLine = new StringBuilder(newLine).replace(22, 26, newResidueID.toString()).toString();
+                    sb.append(newLine);
+                    sb.append(lineSep);
+                    
+                }
+            }
+            // Get the last IDs before a new model is reached and the IDs would therefore start all over again
+            // We will use those last/highest IDs to add them to the IDs from the next model; in this way the
+            // IDs will be consecutive
+            atomID = Integer.parseInt(file.get(lineNum - 1).substring(6, 11).trim());
+            residueID = Integer.parseInt(file.get(lineNum - 1).substring(22, 26).trim());
+        }
+
+        
+        // Save the converted PDB file
+        File convertedPdbFile = new File("./" + pdbFile + "C");
+        try {
+            FileWriter fw = new FileWriter(convertedPdbFile.getAbsoluteFile());
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.append(sb);
+            bw.close();
+        } catch (IOException ex) {
+        }
+        //System.out.println(sb.toString());
+        //System.out.println(chains.toString());
+        //System.out.println(models.toString());
+        return true;
+    }
+    
+    
     
     
     /**

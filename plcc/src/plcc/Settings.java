@@ -436,6 +436,7 @@ public class Settings {
         defSet("plcc_S_forced_chain_id", "A", "The forced chain ID, only used when plcc_B_force_chain is true");
         defSet("plcc_I_lig_min_atoms", "1", "The minimum number of atoms a ligand has to consist of to count as an SSE.");
         defSet("plcc_I_lig_max_atoms", "-1", "The maximum number of atoms a ligand has to consist of to count as an SSE. Set to <0 for unlimited.");
+        defSet("plcc_B_convert_models_to_chains", "false", "Wether the PDB file should be checked to have multiple models and if so to convert those models to chains");
 
         
         // similarity stuff
