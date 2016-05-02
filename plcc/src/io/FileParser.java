@@ -2107,7 +2107,7 @@ public class FileParser {
         // Contains the all the models as <k,v> = <line number were models starts, model ID>
         TreeMap<Integer, String> models = new TreeMap<Integer, String>();
         String pLine = "";
-        
+      
         // Iterate through the PDB file and look at each line
         for(Integer i = 0; i < file.size(); i++) {
             pLineNum = i + 1;
@@ -2160,12 +2160,14 @@ public class FileParser {
             }
         }
         
-        
+             
         // Alphabet that makes up all possible chain IDs
         String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         String newChainID = null;
         Integer atomID = 0;
         Integer residueID = 0;
+        Integer newAtomID = null;
+        Integer terCount = 0;
 
         // Go through all the found models by starting at the line the models begin
         for(Integer lineNum : models.keySet()) {
@@ -2177,6 +2179,11 @@ public class FileParser {
             
             while(!file.get(lineNum).startsWith("ENDMDL")) {
                 
+                // Count all the TER records in the file. This is later used to write the MASTER record
+                if(file.get(lineNum).startsWith("TER")) {
+                    terCount++;
+                }
+                
                 // Go through the model until its end is reached and extract the chain ID from each entry
                 String newLine = file.get(lineNum);
                 chainID = newLine.substring(21,22);
@@ -2186,8 +2193,14 @@ public class FileParser {
                 Integer oldresidueID = Integer.parseInt(newLine.substring(22, 26).trim());
                 // Now add the highest IDs from the previous model to the current IDs to get the new IDs
                 // If we are still processing the first model, zero will be added, so nothing changes
-                Integer newAtomID = oldAtomID + atomID;
+                newAtomID = oldAtomID + atomID;
                 Integer newResidueID = oldresidueID + residueID;
+                
+                // Creates a string of spaces. To keep the PDB file format intact it is necessary to add the correct amount of spaces
+                // in front of the later inserted string. To do this, we take the maximum length the entry may have (5 for atom IDs, 4 for residue IDs)
+                // and substract the length of the the new ID. With this we know how much spaces need to be added as prefix.
+                String spacesAtomID = new String(new char[5 - newAtomID.toString().length()]).replace("\0", " ");
+                String spacesResidueID = new String(new char[4 - newResidueID.toString().length()]).replace("\0", " ");
                 
                 
                 lineNum++;
@@ -2205,8 +2218,8 @@ public class FileParser {
                     
                     newLine = new StringBuilder(newLine).replace(21, 22, newChainID).toString();
                     // Add the new IDs
-                    newLine = new StringBuilder(newLine).replace(6, 11, newAtomID.toString()).toString();
-                    newLine = new StringBuilder(newLine).replace(22, 26, newResidueID.toString()).toString();
+                    newLine = new StringBuilder(newLine).replace(6, 11, spacesAtomID + newAtomID.toString()).toString();
+                    newLine = new StringBuilder(newLine).replace(22, 26, spacesResidueID + newResidueID.toString()).toString();
                     sb.append(newLine);
                     sb.append(lineSep);
                 }
@@ -2215,8 +2228,8 @@ public class FileParser {
                     // but we still have to rename the old chain ID with the currently used new chain ID
                     newLine = new StringBuilder(newLine).replace(21, 22, newChainID).toString();
                     // Add the new IDs
-                    newLine = new StringBuilder(newLine).replace(6, 11, newAtomID.toString()).toString();
-                    newLine = new StringBuilder(newLine).replace(22, 26, newResidueID.toString()).toString();
+                    newLine = new StringBuilder(newLine).replace(6, 11, spacesAtomID + newAtomID.toString()).toString();
+                    newLine = new StringBuilder(newLine).replace(22, 26, spacesResidueID + newResidueID.toString()).toString();
                     sb.append(newLine);
                     sb.append(lineSep);
                     
@@ -2228,7 +2241,27 @@ public class FileParser {
             atomID = Integer.parseInt(file.get(lineNum - 1).substring(6, 11).trim());
             residueID = Integer.parseInt(file.get(lineNum - 1).substring(22, 26).trim());
         }
-
+        
+        // Get the missing spaces for the MASTER record entries
+        Integer masterNumAtm = newAtomID - terCount;
+        String spacesMasterNumAtm = new String(new char[5 - masterNumAtm.toString().length()]).replace("\0", " ");
+        String spacesMasterNumTer = new String(new char[5 - terCount.toString().length()]).replace("\0", " ");
+        
+        // Find the MASTER record and keep all its entries except the number of ATOM/HETATM records and the number of TER records.
+        // Those two entries are updated with the new correct numbers of the converted file. Since all the other numbers to not get
+        // changed during the converting, they are not touched.
+        for(Integer x = file.size() - 1; x > 0; x--) {
+            if(file.get(x).startsWith("MASTER ")) {
+                String newMaster = file.get(x);
+                newMaster = new StringBuilder(newMaster).replace(50, 55, spacesMasterNumAtm + masterNumAtm.toString()).toString();
+                newMaster = new StringBuilder(newMaster).replace(55, 60, spacesMasterNumTer + terCount.toString()).toString();
+                sb.append(newMaster);
+                sb.append(lineSep);
+            }
+        }
+        
+        sb.append("END                                                                             ");
+        sb.append(lineSep);
         
         // Save the converted PDB file
         File convertedPdbFile = new File("./" + pdbFile + "C");
