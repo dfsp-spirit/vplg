@@ -22,6 +22,7 @@ Authors
 --------
 The initial version, including the graphlet couting algorithm and GML parser, was written by Tatiana Bakirova. 
 Tim Schaefer added config file support, database support and many other options later.
+Ben Haladik reworked many parts for his Bachelor's thesis in 2016.
 
 This program is maintained by Tim Schäfer. See http://www.bioinformatik.uni-frankfurt.de/ or http://rcmd.org/ts/ for contact info.
 
@@ -85,6 +86,10 @@ First: these instructions are for Linux and I cannot help with Windows. (I guess
    
        zypper in cppunit libcppunit-devel
 
+  Example #2, for Ubuntu 14.04 LTS:
+
+       apt-get install build-essential libboost1.55 libboost-graph1.55.0 libboost-graph-dev libboost-regex-dev libpqxx-4.0 libpqgxx-dev libpq5 libpq-dev
+
 2) Build project (compile + link a graphletAnalyser binary from the source):
    You can do this from within NetBeans (a NetBeans project file is included) or from the command line. In NetBeans, open the project, right-click it and choose 'Clean and build'. Make sure 
    to install the C++ plugin for NetBeans though, otherwise you will not be able to open the project (the source directory will not even be recognized as a project).
@@ -125,4 +130,5 @@ Versions of this README file
 ------------------------------
 DEC 2013: Initial version by Tatiana Bakirova.
 JUL 2014: Updated for new version and database support by Tim Schäfer. Also added some explanations and details. Added info on configuration options and usage. Added license.
+MAY 2016: Update README, by TS.
 
