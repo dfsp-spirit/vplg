@@ -71,7 +71,9 @@ do
                 fi
                 
                 ## extract the subdir from the pdbid (it is defined by the 2nd and 3rd letter of the id, e.g., for the pdbid '3kmf', it is 'km')
-                MID2PDBCHARS=${PDBID:1:2}
+		#echo "ID=$PDBID"
+                #MID2PDBCHARS=${PDBID:1:2}
+		MID2PDBCHARS=$(echo $PDBID | cut -c 2-3)
                 
 		CHAINS_FILE="${PLCC_OUTPUT_DIR}/${PDBID}.chains"
 		
