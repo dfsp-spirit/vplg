@@ -41,7 +41,7 @@ fi
 	done
 
 	echo "$APPTAG Submitted all protein graph computation jobs."
-fi
+#fi
 
 
 echo "$APPTAG Submitted all jobs. Exiting."
