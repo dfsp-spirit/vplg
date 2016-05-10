@@ -16,7 +16,7 @@ PLCC_OPTIONS="--cluster  --compute-graph-metrics --silent"
 PLCC_RUNS_IN_SUBDIR_TREE_MODE="YES"
 ## IMPORTANT: set this to "YES" if plcc is run with '-k' / '--output-subdir-tree' or other options which include it (e.g., --cluster)
 
-DELETE_CLUSTER_CHAINS_FILE="YES"
+DELETE_CLUSTER_CHAINS_FILE="NO"
 SILENT="YES"
 
 ### end of settings ###
