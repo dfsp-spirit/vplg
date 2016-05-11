@@ -2087,18 +2087,17 @@ public class FileParser {
             DP.getInstance().w("Could not parse resolution from 'REMARK 2 RESOLUTION' record, assuming 'NOT APPLICABLE'.");
             res = -1.0;
         }
-
-
         return(res);
     }
     
     /**
      * Parses a PDB file with multiple MODELS, converts those models to separate chains, and saves the result in a new PDB file.
      * If only none or only one model was found, the method stops because there is nothing to convert.
-     * @param pdbFile
+     * @param pdbFile the input file
+     * @param outFile the output path for the new file
      * @return true if converting was successful, false otherwise.
      */
-    public static Boolean convertPdbModelsToChains(String pdbFile) {
+    public static Boolean convertPdbModelsToChains(String pdbFile, String outFile) {
         // Read the PDB file
         ArrayList<String> file = slurpFile(pdbFile);
         
@@ -2120,7 +2119,7 @@ public class FileParser {
                 } catch(Exception e) {
                     System.err.println("ERROR: Hit MODEL line at PDB line number " + pLineNum + " but parsing the line failed.");
                     e.printStackTrace();
-                    System.exit(-1);
+                    System.exit(1);
                 }
 
                 // Model found
@@ -2130,14 +2129,14 @@ public class FileParser {
                 }
                 else {
                     System.err.println("ERROR: Found models with the same ID.");
-                    System.exit(-1);
+                    System.exit(1);
                 }
             }
         }
         
         // Only if there is more than two models we will have to convert something, otherwise stop here
         if(models.size() < 2) {
-            System.out.println(models.size());
+            //System.out.println(models.size());
             System.out.println("No different models/only one model found. Nothing to convert here.");
             return false;
         }
@@ -2264,13 +2263,14 @@ public class FileParser {
         sb.append(lineSep);
         
         // Save the converted PDB file
-        File convertedPdbFile = new File("./" + pdbFile + "C");
+        File convertedPdbFile = new File(outFile);
         try {
             FileWriter fw = new FileWriter(convertedPdbFile.getAbsoluteFile());
             BufferedWriter bw = new BufferedWriter(fw);
             bw.append(sb);
             bw.close();
         } catch (IOException ex) {
+            DP.getInstance().e("FileParser", "Could not write converted PDB file '" + outFile + "': '" + ex.getMessage() + "'.");
         }
         //System.out.println(sb.toString());
         //System.out.println(chains.toString());

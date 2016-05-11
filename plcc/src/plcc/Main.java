@@ -258,6 +258,8 @@ public class Main {
         String modelsFile = "";
         String sseMappingsFile = "";
         String resMapFile = "";
+        String convertModelsToChainsInputFile = "";
+        String convertModelsToChainsOutputFile = "";
         
         Boolean compareResContacts = false;
         String compareResContactsFile = "";
@@ -445,9 +447,22 @@ public class Main {
                     }
                     
                     
+                                        
                     if(s.equals("--convert-models-to-chains")) {
-                       Settings.set("plcc_B_convert_models_to_chains", "true");                        
-                        argsUsed[i] = true;
+                        convertModelsToChainsInputFile = null;
+                        convertModelsToChainsOutputFile = null;
+                        if(args.length <= i+2 ) {
+                            syntaxError();
+                        }
+                        else {
+                            useFileFromCommandline = false;
+                            Settings.set("plcc_B_convert_models_to_chains", "true");                        
+                            argsUsed[i] = true;
+                            convertModelsToChainsInputFile = args[i+1];
+                            argsUsed[i+1] = true;
+                            convertModelsToChainsOutputFile = args[i+2];
+                            argsUsed[i+2] = true;
+                        }
                     }
                     
                     
@@ -1845,9 +1860,24 @@ public class Main {
             } else {
                 System.err.println("ERROR: Could not connect to DB, exiting.");
                 System.exit(1);
-            }   
-            
+            }               
         }
+        
+        // convert pdf file with multiple models to pdb file with multiple chains only
+        // the models will be converted to separated chains
+        if(Settings.getBoolean("plcc_B_convert_models_to_chains")) {
+                
+                System.out.println("  Converting models of input PDB file '" + convertModelsToChainsInputFile + "' to chains and storing new PDB file at '" + convertModelsToChainsOutputFile + "'...");
+                Boolean status = FileParser.convertPdbModelsToChains(convertModelsToChainsInputFile, convertModelsToChainsOutputFile);
+                if(status) {
+                    System.out.println("  Conversion done. The resulting new PDB file is at '" + convertModelsToChainsOutputFile + "'. Note that only structural data (atom positions) have been converted, HEADER information has not been adapted.");
+                    System.exit(0);
+                }
+                else {
+                    DP.getInstance().w("Main", "Conversion of PDB file '" + convertModelsToChainsInputFile + "' failed or nothing to convert.");
+                    System.exit(1);
+                }
+       }
                 
 
         File input_file;
@@ -1860,19 +1890,7 @@ public class Main {
             System.err.println("ERROR: pdbfile '" + pdbFile + "' not found. Exiting.");
             System.exit(1);
         }
-        
-        // convert pdf file with multiple models to pdb file with multiple chains only
-        // the models will be converted to separated chains
-        if(Settings.getBoolean("plcc_B_convert_models_to_chains")) {
-                Boolean status = FileParser.convertPdbModelsToChains(pdbFile);
-                if(status) {
-                    System.out.println("  New converted PDB file " + pdbFile + "C has been saved.");
-                    System.exit(0);
-                }
-                else {
-                    System.exit(1);
-                }
-       }
+                
 
         // dssp file
         input_file = new File(dsspFile);
@@ -9892,6 +9910,10 @@ public class Main {
         System.out.println("--set-pdb-representative-chains-pre <file> <k> : Set non-redundant chain status for all chains in DB from XML file <file>. <k> determines what to do with existing flags, valid options are 'keep' or 'remove'. Get the file from PDB REST API. Run this pre-update, BEFORE new data will be added.");
         System.out.println("--set-pdb-representative-chains-post <file> <k> : Set non-redundant chain status for all chains already existing in the chains table of the DB from XML file <file>. <k> determines what to do with existing flags, valid options are 'keep' or 'remove'. Get the file from PDB REST API. Run this post-update, after new data has been added.");
         System.out.println("");
+        System.out.println("The following options are tools integrated into this software:");
+        System.out.println("--convert-models-to-chains <infile> <outfile>: Rewrite the input PDB file, transforming models into chains. Useful when treating PDB files which contain biological assemblies and you want all parts of a protein complex at once, e.g., to analyze the interactions between the chains.");
+        System.out.println("");
+        
         System.out.println("EXAMPLES: java -jar plcc.jar 8icd");
         System.out.println("          java -jar plcc.jar 8icd -D 2 -d /tmp/dssp/8icd.dssp -p /tmp/pdb/8icd.pdb");
         System.out.println("          java -jar plcc.jar 8icd -o /tmp");

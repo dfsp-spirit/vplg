@@ -147,7 +147,7 @@ public class SimilarityByGraphlets {
      * 
      * @param graphletCountsA relative graphlet frequencies for network a 
      * @param graphletCountsB relative graphlet frequencies for network b
-     * @return 
+     * @return the Tanimoto coefficient
      */
     public static double getTanimotoCoefficient(Double[] graphletCountsA, Double[] graphletCountsB) {
         
