@@ -2997,11 +2997,11 @@ public class Main {
         
         if(! silent) {
             System.out.println("(Too much clutter? Try the '--silent' command line option.)");
-            System.out.println("All done, exiting. Total runtime was " + runtimeTotal_secs + " seconds ("+compTimes[0]+":" + String.format("%02d:%02d", compTimes[1], compTimes[2])+" hms).");
+            System.out.println("All done, exiting. Total runtime was " + runtimeTotal_secs + " seconds ("+compTimes[0]+":" + String.format("%02d:%02d", compTimes[1], compTimes[2])+" hms) for " + residues.size() + " residues.");
         } else {
             if(Settings.getBoolean("plcc_B_print_silent_notice")) {
                 String endTime = new SimpleDateFormat("HH:mm:ss").format(new Date());
-                System.out.println("[PLCC] [" + pdbid + "] [" + endTime + "] " + "All done (silently), exiting. Total runtime was " + runtimeTotal_secs + " seconds ("+compTimes[0]+":" + String.format("%02d:%02d", compTimes[1], compTimes[2])+" hms).");
+                System.out.println("[PLCC] [" + pdbid + "] [" + endTime + "] " + "All done silently, exiting. Total runtime was " + runtimeTotal_secs + " seconds ("+compTimes[0]+":" + String.format("%02d:%02d", compTimes[1], compTimes[2])+" hms). "+residues.size()+ "residues.");
             }
         }
         System.exit(0);
