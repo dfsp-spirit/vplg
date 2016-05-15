@@ -100,6 +100,22 @@
 							</li>
 						</ul><!-- end dropdown menu -->
 					</li><!-- end dropdown -->
+					
+					<?php if($DEBUG) { ?>
+					<li class="dropdown">
+						<!-- <strong>caret</strong> creates the little triangle/arrow -->
+						<a href="#"  class="navbarFont dropdown-toggle" data-toggle="dropdown"> Dev <strong class="caret"></strong></a>
+						<ul class="dropdown-menu">
+							<li>
+								<a href="graphlets_pg.php"><i class="fa fa-briefcase"></i> Graphlets PG</a>
+							</li>
+							<li>
+								<a href="bkweb.php"><i class="fa fa-briefcase"></i> BK web (Visor)</a>
+							</li>
+						</ul><!-- end dropdown menu -->
+					</li><!-- end dropdown -->
+					<?php } ?>
+					
 				</ul><!-- end nav navbar-nav -->								
 			</div><!-- end nav-collapse -->
 
