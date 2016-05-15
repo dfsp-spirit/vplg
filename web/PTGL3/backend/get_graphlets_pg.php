@@ -119,7 +119,7 @@ if($valid_values){
     <th>PDB</th>
     <th>Chain</th>
     <th>GT</th>
-	<th>Graphlets</th>
+	<th>Relative graphlet frequency</th>
       </tr>\n";
 		
 	$num_found = 0;
@@ -129,13 +129,13 @@ if($valid_values){
 	    $res_pdb_id = $arr['pdb_id'];
 	    $res_chain_name = $arr['chain_name'];
 	    $res_graph_type = $graphtype_str;
-	    $res_graphlets_array = json_decode($arr['graphlets']);
-	    //$res_graphlets = implode("," $res_graphlets_array);  // format array for output
-	    $res_graphlets = $res_graphlets_array;
+	    $res_graphlets_array = (array) json_decode($arr['graphlets'], true);
+	    $res_graphlets = implode(", ", $res_graphlets_array);  // format array for output
+	    //$res_graphlets = $res_graphlets_array;
 
 		
 		$tableString .= "<tr>\n";
-		$tableString .= "<td>$res_pd_id</td><td>$res_chain_name</td><td>$res_graph_type</td><td>$res_graphlets</td>\n";
+		$tableString .= "<td>$res_pdb_id</td><td>$res_chain_name</td><td>$res_graph_type</td><td>$res_graphlets</td>\n";
 		$tableString .= "</tr>\n";
 				
 		
