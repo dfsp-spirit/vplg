@@ -69,7 +69,7 @@ function get_total_graphlet_pg_count($db) {
 		</div><!-- end container-->
 		</div><!-- end Home -->
 		
-		<form class="form-inline" action="foldinggraphs.php" method="get">
+		<form class="form-inline" action="graphlets_pg.php" method="get">
 			
 		<label>Enter PDB identifier and chain, e.g., '7timA':
 		<?php
@@ -124,7 +124,7 @@ function get_total_graphlet_pg_count($db) {
 			          if($valid_values) {
 				      echo "<h3> Search Results </h3>\n";
 				  
-				      echo $tableString; /* The table string is constructed in /backend/get_foldinggraphs.php, which is included by this file. */  
+				      echo $tableString; /* The table string is constructed in /backend/get_graphlets_pg.php, which is included by this file. */  
 				
 				      if($num_found > 0) {
 					echo "<br><h3> Folding graph images </h3><br><p>The images below show the folding graphs (connected components) of the protein graph. The folding graphs and their linear notations are used to power the motif search and other features of this database server. Note that folding graphs of size 1 (isolated vertices in the graph) are not listed here -- they would not be of any use. In the images, the following abbreviations are used: PG = protein graph, FG = folding graph, SQ = sequential in chain.</p>\n";

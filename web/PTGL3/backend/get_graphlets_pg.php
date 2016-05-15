@@ -130,7 +130,8 @@ if($valid_values){
 	    $res_chain_name = $arr['chain_name'];
 	    $res_graph_type = $graphtype_str;
 	    $res_graphlets_array = json_decode($arr['graphlets']);
-	    $res_graphlets = implode("," $res_graphlets_array);  // format array for output
+	    //$res_graphlets = implode("," $res_graphlets_array);  // format array for output
+	    $res_graphlets = $res_graphlets_array;
 
 		
 		$tableString .= "<tr>\n";
