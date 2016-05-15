@@ -26,6 +26,14 @@ function get_pg_graphlets_query_string($pdb_id, $chain_name, $graphtype_int) {
   return $query;
 }
 
+function visualize_share($v) {
+  $res = "";
+  if($v <= 0.0) { return ""; }
+  if($v >= 1.0) { return str_repeat(".",100); }
+  $times = floor($v * 100);
+  return str_repeat(".", $times);
+}
+
 
 function get_graphtype_string($graphtype_int){
 	switch ($graphtype_int){
@@ -113,7 +121,7 @@ if($valid_values){
     //if(! $result) { echo "NO_RESULT: " .  pg_last_error($db) . "."; }
 	if(! $result) { array_push($SHOW_ERROR_LIST, "Database query failed: '" . pg_last_error($db) . "'"); }
 	$tableString = "";
-	$tableString .= "<div><table id='tblfgresults'>\n";
+	$tableString .= "<div><table id='tblgraphletresults'>\n";
 	$tableString .= "<caption> The graphlets of the PG of PDB $pdb_id chain $chain_name graph type $graphtype_str</caption>\n";
 	$tableString .= "<tr>
     <th>PDB</th>
@@ -145,6 +153,19 @@ if($valid_values){
 	}		
 	
 	$tableString .= "</table></div>\n";
+	
+	$tableString .= "<br/><br />\n";
+	
+	if($num_found == 1 && count($res_graphlets) > 0) {
+	    $tableString .= "<div><table id='tblgraphletresultsdetails'>\n";
+	  $tableString .= "<caption> Graphlets details of the PG of PDB $pdb_id chain $chain_name graph type $graphtype_str</caption>\n";
+	  $tableString .= "<tr><th>Graphlet</th><th>Relative Count</th><th>Vis</th>\n";
+	  foreach ($res_graphlets_array as $k=>$v){
+		$tableString .= "<tr><td>$k</td><td>$v</td><td>" . visualize_share($v) . "</td></tr>\n";
+	  }
+	  $tableString .= "</table></div>\n";
+	
+	}
 	
 	if($num_found >= 1) {
 	    $tableString .= "<br><br><a href='results.php?q=$pdbchain'>Go to protein graph</a><br><br>";	  	           		 		 

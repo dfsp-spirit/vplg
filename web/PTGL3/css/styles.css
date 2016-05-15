@@ -1073,6 +1073,37 @@ table#tblfgresults th {
     background-color: black;
 }
 
+	table#tblgraphletresults {
+    width: 100%;
+    background-color: #f1f1c1;
+	} 
+	 table#tblgraphletresults tr:nth-child(even) {
+    background-color: #eee;
+}
+table#tblgraphletresults tr:nth-child(odd) {
+    background-color: #fff;
+}
+table#tblgraphletresults th {
+    color: white;
+    background-color: black;
+}
+
+	table#tblgraphletresultsdetails {
+    width: 100%;
+    background-color: #f1f1c1;
+	} 
+	 table#tblgraphletresultsdetails tr:nth-child(even) {
+    background-color: #eee;
+}
+table#tblgraphletresultsdetails tr:nth-child(odd) {
+    background-color: #fff;
+}
+table#tblgraphletresultsdetails th {
+    color: white;
+    background-color: black;
+}
+
+
 	.results table {
     width: 100%;
     background-color: #f1f1c1;
