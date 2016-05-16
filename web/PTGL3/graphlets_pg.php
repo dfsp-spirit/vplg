@@ -64,7 +64,7 @@ function get_total_graphlet_pg_count($db) {
 		
 		<div id="PageIntro">
 		<div class="container" id="pageintro">		
-		Select the chain and graph type you are interested in below. You will then be able to see the graphlet distribution.
+		Select the chain and graph type you are interested in below. You will then be able to see the graphlet distribution. Note that by default, graphlets are only computed for  albe graphs.
 		
 		</div><!-- end container-->
 		</div><!-- end Home -->
@@ -89,7 +89,7 @@ function get_total_graphlet_pg_count($db) {
 		     $values = array(1, 2, 3, 4, 5, 6);
 		     $labels = array("Alpha", "Beta", "Alpha-Beta", "Alpha-Ligand", "Beta-Ligand", "Alpha-Beta-Ligand");
 		     
-		     $pre_sel = 1;
+		     $pre_sel = 3;
 		     if(isset($_GET['graphtype_int'])) {
 		       $tmp = intval($_GET['graphtype_int']);
 		       if($tmp >= 1 && $tmp <= 6) {
