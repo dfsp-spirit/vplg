@@ -110,6 +110,12 @@
 								<a href="graphlets_pg.php"><i class="fa fa-briefcase"></i> Graphlets PG</a>
 							</li>
 							<li>
+								<a href="graphlets_cg.php"><i class="fa fa-briefcase"></i> Graphlets CG</a>
+							</li>
+							<li>
+								<a href="graphlets_aag.php"><i class="fa fa-briefcase"></i> Graphlets AAG</a>
+							</li>
+							<li>
 								<a href="bkweb.php"><i class="fa fa-briefcase"></i> BK web (Visor)</a>
 							</li>
 						</ul><!-- end dropdown menu -->
