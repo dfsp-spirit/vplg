@@ -57,7 +57,7 @@ $valid_values = FALSE;
 if(isset($_GET['pdb_id'])){
         $pageload_was_search = TRUE;
 	$valid_values = FALSE;
-			
+	$pdb_id = $_GET['pdb_id'];		
 				if(check_valid_pdbid($pdb_id)) {
 					$valid_values = TRUE;				  
 				}
