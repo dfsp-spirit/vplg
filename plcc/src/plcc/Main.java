@@ -9572,13 +9572,13 @@ public class Main {
                 bondsChainIvdw.add(chains);
                 
                 ArrayList<Integer> atoms = new ArrayList<Integer>();
-                atoms.add(c.getIVDWContactAtomNumA());
-                atoms.add(c.getIVDWContactAtomNumB());
+                atoms.add(c.getIVDWContactAtomNumA() - 1);
+                atoms.add(c.getIVDWContactAtomNumB() - 1);
                 bondsIvdwAtoms.add(atoms);
                 
                 ArrayList<String> atomNames = new ArrayList<String>();
-                atomNames.add(c.getResA().getAtoms().get(c.getIVDWContactAtomNumA()).getAtomName());
-                atomNames.add(c.getResB().getAtoms().get(c.getIVDWContactAtomNumB()).getAtomName());
+                atomNames.add(c.getResA().getAtoms().get(c.getIVDWContactAtomNumA() - 1).getAtomName());
+                atomNames.add(c.getResB().getAtoms().get(c.getIVDWContactAtomNumB() - 1).getAtomName());
                 bondsAtomNamesIvdw.add(atomNames);
                 
             }
@@ -9610,25 +9610,25 @@ public class Main {
                 
                 if(c.getNumContactsBBHB() > 0) {
                     ArrayList<Integer> atoms = new ArrayList<Integer>();
-                    atoms.add(c.getBBHBContactAtomNumA());
-                    atoms.add(c.getBBHBContactAtomNumB());
+                    atoms.add(c.getBBHBContactAtomNumA() - 1);
+                    atoms.add(c.getBBHBContactAtomNumB() - 1);
                     bondsBBAtoms.add(atoms);
                 
                 ArrayList<String> atomNames = new ArrayList<String>();
-                atomNames.add(c.getResA().getAtoms().get(c.getBBHBContactAtomNumA()).getAtomName());
-                atomNames.add(c.getResB().getAtoms().get(c.getBBHBContactAtomNumB()).getAtomName());
+                atomNames.add(c.getResA().getAtoms().get(c.getBBHBContactAtomNumA() - 1).getAtomName());
+                atomNames.add(c.getResB().getAtoms().get(c.getBBHBContactAtomNumB() - 1).getAtomName());
                 bondsAtomNamesBB.add(atomNames);
                 }
                 
                 if(c.getNumContactsBBBH() > 0) {
                     ArrayList<Integer> atoms = new ArrayList<Integer>();
-                    atoms.add(c.getBBBHContactAtomNumA());
-                    atoms.add(c.getBBBHContactAtomNumB());
+                    atoms.add(c.getBBBHContactAtomNumA() - 1);
+                    atoms.add(c.getBBBHContactAtomNumB() - 1);
                     bondsBBAtoms.add(atoms);
                 
                 ArrayList<String> atomNames = new ArrayList<String>();
-                atomNames.add(c.getResA().getAtoms().get(c.getBBBHContactAtomNumA()).getAtomName());
-                atomNames.add(c.getResB().getAtoms().get(c.getBBBHContactAtomNumB()).getAtomName());
+                atomNames.add(c.getResA().getAtoms().get(c.getBBBHContactAtomNumA() - 1).getAtomName());
+                atomNames.add(c.getResB().getAtoms().get(c.getBBBHContactAtomNumB() - 1).getAtomName());
                 bondsAtomNamesBB.add(atomNames);
                 }
                 
@@ -9661,25 +9661,25 @@ public class Main {
                 
                 if(c.getNumContactsBCHB() > 0) {
                     ArrayList<Integer> atoms = new ArrayList<Integer>();
-                    atoms.add(c.getBCHBContactAtomNumA());
-                    atoms.add(c.getBCHBContactAtomNumB());
+                    atoms.add(c.getBCHBContactAtomNumA() - 1);
+                    atoms.add(c.getBCHBContactAtomNumB() - 1);
                     bondsBCAtoms.add(atoms);
                 
                 ArrayList<String> atomNames = new ArrayList<String>();
-                atomNames.add(c.getResA().getAtoms().get(c.getBCHBContactAtomNumA()).getAtomName());
-                atomNames.add(c.getResB().getAtoms().get(c.getBCHBContactAtomNumB()).getAtomName());
+                atomNames.add(c.getResA().getAtoms().get(c.getBCHBContactAtomNumA() - 1).getAtomName());
+                atomNames.add(c.getResB().getAtoms().get(c.getBCHBContactAtomNumB() - 1).getAtomName());
                 bondsAtomNamesBC.add(atomNames);
                 }
                 
                 if(c.getNumContactsBCBH() > 0) {
                     ArrayList<Integer> atoms = new ArrayList<Integer>();
-                    atoms.add(c.getBCBHContactAtomNumA());
-                    atoms.add(c.getBCBHContactAtomNumB());
+                    atoms.add(c.getBCBHContactAtomNumA() - 1);
+                    atoms.add(c.getBCBHContactAtomNumB() - 1);
                     bondsBCAtoms.add(atoms);
                 
                 ArrayList<String> atomNames = new ArrayList<String>();
-                atomNames.add(c.getResA().getAtoms().get(c.getBCBHContactAtomNumA()).getAtomName());
-                atomNames.add(c.getResB().getAtoms().get(c.getBCBHContactAtomNumB()).getAtomName());
+                atomNames.add(c.getResA().getAtoms().get(c.getBCBHContactAtomNumA() - 1).getAtomName());
+                atomNames.add(c.getResB().getAtoms().get(c.getBCBHContactAtomNumB() - 1).getAtomName());
                 bondsAtomNamesBC.add(atomNames);
                 }
                 
@@ -9712,25 +9712,25 @@ public class Main {
                 
                 if(c.getNumContactsCBHB() > 0) {
                     ArrayList<Integer> atoms = new ArrayList<Integer>();
-                    atoms.add(c.getCBHBContactAtomNumA());
-                    atoms.add(c.getCBHBContactAtomNumB());
+                    atoms.add(c.getCBHBContactAtomNumA() - 1);
+                    atoms.add(c.getCBHBContactAtomNumB() - 1);
                     bondsCBAtoms.add(atoms);
                 
                 ArrayList<String> atomNames = new ArrayList<String>();
-                atomNames.add(c.getResA().getAtoms().get(c.getCBHBContactAtomNumA()).getAtomName());
-                atomNames.add(c.getResB().getAtoms().get(c.getCBHBContactAtomNumB()).getAtomName());
+                atomNames.add(c.getResA().getAtoms().get(c.getCBHBContactAtomNumA() - 1).getAtomName());
+                atomNames.add(c.getResB().getAtoms().get(c.getCBHBContactAtomNumB() - 1).getAtomName());
                 bondsAtomNamesCB.add(atomNames);
                 }
                 
                 if(c.getNumContactsCBBH() > 0) {
                     ArrayList<Integer> atoms = new ArrayList<Integer>();
-                    atoms.add(c.getCBBHContactAtomNumA());
-                    atoms.add(c.getCBBHContactAtomNumB());
+                    atoms.add(c.getCBBHContactAtomNumA() - 1);
+                    atoms.add(c.getCBBHContactAtomNumB() - 1);
                     bondsCBAtoms.add(atoms);
                 
                 ArrayList<String> atomNames = new ArrayList<String>();
-                atomNames.add(c.getResA().getAtoms().get(c.getCBBHContactAtomNumA()).getAtomName());
-                atomNames.add(c.getResB().getAtoms().get(c.getCBBHContactAtomNumB()).getAtomName());
+                atomNames.add(c.getResA().getAtoms().get(c.getCBBHContactAtomNumA() - 1).getAtomName());
+                atomNames.add(c.getResB().getAtoms().get(c.getCBBHContactAtomNumB() - 1).getAtomName());
                 bondsAtomNamesCB.add(atomNames);
                 }
                 
@@ -9763,25 +9763,25 @@ public class Main {
                 
                 if(c.getNumContactsCCHB() > 0) {
                     ArrayList<Integer> atoms = new ArrayList<Integer>();
-                    atoms.add(c.getCCHBContactAtomNumA());
-                    atoms.add(c.getCCHBContactAtomNumB());
+                    atoms.add(c.getCCHBContactAtomNumA() - 1);
+                    atoms.add(c.getCCHBContactAtomNumB() - 1);
                     bondsCCAtoms.add(atoms);
                 
                 ArrayList<String> atomNames = new ArrayList<String>();
-                atomNames.add(c.getResA().getAtoms().get(c.getCCHBContactAtomNumA()).getAtomName());
-                atomNames.add(c.getResB().getAtoms().get(c.getCCHBContactAtomNumB()).getAtomName());
+                atomNames.add(c.getResA().getAtoms().get(c.getCCHBContactAtomNumA() - 1).getAtomName());
+                atomNames.add(c.getResB().getAtoms().get(c.getCCHBContactAtomNumB() - 1).getAtomName());
                 bondsAtomNamesCC.add(atomNames);
                 }
                 
                 if(c.getNumContactsCCBH() > 0) {
                     ArrayList<Integer> atoms = new ArrayList<Integer>();
-                    atoms.add(c.getCCBHContactAtomNumA());
-                    atoms.add(c.getCCBHContactAtomNumB());
+                    atoms.add(c.getCCBHContactAtomNumA() - 1);
+                    atoms.add(c.getCCBHContactAtomNumB() - 1);
                     bondsCCAtoms.add(atoms);
                 
                 ArrayList<String> atomNames = new ArrayList<String>();
-                atomNames.add(c.getResA().getAtoms().get(c.getCCBHContactAtomNumA()).getAtomName());
-                atomNames.add(c.getResB().getAtoms().get(c.getCCBHContactAtomNumB()).getAtomName());
+                atomNames.add(c.getResA().getAtoms().get(c.getCCBHContactAtomNumA() - 1).getAtomName());
+                atomNames.add(c.getResB().getAtoms().get(c.getCCBHContactAtomNumB() - 1).getAtomName());
                 bondsAtomNamesCC.add(atomNames);
                 }
                 
@@ -10166,7 +10166,7 @@ public class Main {
         }
         
 
-        System.out.println("[PYMOL] Writing python script to visualize bonds within PyMol.");
+        DP.getInstance().i("main", "Writing python script to visualize bonds within PyMol.");
         
         //System.out.println("Pymol selection scripts: protein, ligand, ivdw, iss\n");
         //script = scriptProt + "\n" + scriptLig + "\n" + scriptIvdw + "\n" + scriptIss + "\n" + bondsIvdw.toString() + "\n" + bondsChainIvdw.toString() + "\n" + bondsAtomNamesIvdw.toString() + "\n" + bondsIss.toString() + "\n" + bondsChainIss.toString();

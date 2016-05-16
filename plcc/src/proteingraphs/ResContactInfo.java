@@ -221,40 +221,40 @@ public class ResContactInfo {
     public Integer getLLContactAtomNumB() { return(contactAtomIndexInResidueB[LL] + 1); }
     
     public Integer getIVDWContactDist() { return(minContactDistances[IVDW]); }
-    public Integer getIVDWContactAtomNumA() { return(contactAtomIndexInResidueA[IVDW]); }
-    public Integer getIVDWContactAtomNumB() { return(contactAtomIndexInResidueB[IVDW]); }
+    public Integer getIVDWContactAtomNumA() { return(contactAtomIndexInResidueA[IVDW] + 1); }
+    public Integer getIVDWContactAtomNumB() { return(contactAtomIndexInResidueB[IVDW] + 1); }
     
     public Integer getBBHBContactDist() { return(minContactDistances[BBHB]); }
-    public Integer getBBHBContactAtomNumA() { return(contactAtomIndexInResidueA[BBHB]); }
-    public Integer getBBHBContactAtomNumB() { return(contactAtomIndexInResidueB[BBHB]); }
+    public Integer getBBHBContactAtomNumA() { return(contactAtomIndexInResidueA[BBHB] + 1); }
+    public Integer getBBHBContactAtomNumB() { return(contactAtomIndexInResidueB[BBHB] + 1); }
     
     public Integer getBBBHContactDist() { return(minContactDistances[BBBH]); }
-    public Integer getBBBHContactAtomNumA() { return(contactAtomIndexInResidueA[BBBH]); }
-    public Integer getBBBHContactAtomNumB() { return(contactAtomIndexInResidueB[BBBH]); }
+    public Integer getBBBHContactAtomNumA() { return(contactAtomIndexInResidueA[BBBH] + 1); }
+    public Integer getBBBHContactAtomNumB() { return(contactAtomIndexInResidueB[BBBH] + 1); }
     
     public Integer getBCHBContactDist() { return(minContactDistances[BCHB]); }
-    public Integer getBCHBContactAtomNumA() { return(contactAtomIndexInResidueA[BCHB]); }
-    public Integer getBCHBContactAtomNumB() { return(contactAtomIndexInResidueB[BCHB]); }
+    public Integer getBCHBContactAtomNumA() { return(contactAtomIndexInResidueA[BCHB] + 1); }
+    public Integer getBCHBContactAtomNumB() { return(contactAtomIndexInResidueB[BCHB] + 1); }
     
     public Integer getBCBHContactDist() { return(minContactDistances[BCBH]); }
-    public Integer getBCBHContactAtomNumA() { return(contactAtomIndexInResidueA[BCBH]); }
-    public Integer getBCBHContactAtomNumB() { return(contactAtomIndexInResidueB[BCBH]); }
+    public Integer getBCBHContactAtomNumA() { return(contactAtomIndexInResidueA[BCBH] + 1); }
+    public Integer getBCBHContactAtomNumB() { return(contactAtomIndexInResidueB[BCBH] + 1); }
     
     public Integer getCBHBContactDist() { return(minContactDistances[CBHB]); }
-    public Integer getCBHBContactAtomNumA() { return(contactAtomIndexInResidueA[CBHB]); }
-    public Integer getCBHBContactAtomNumB() { return(contactAtomIndexInResidueB[CBHB]); }
+    public Integer getCBHBContactAtomNumA() { return(contactAtomIndexInResidueA[CBHB] + 1); }
+    public Integer getCBHBContactAtomNumB() { return(contactAtomIndexInResidueB[CBHB] + 1); }
     
     public Integer getCBBHContactDist() { return(minContactDistances[CBBH]); }
-    public Integer getCBBHContactAtomNumA() { return(contactAtomIndexInResidueA[CBBH]); }
-    public Integer getCBBHContactAtomNumB() { return(contactAtomIndexInResidueB[CBBH]); }
+    public Integer getCBBHContactAtomNumA() { return(contactAtomIndexInResidueA[CBBH] + 1); }
+    public Integer getCBBHContactAtomNumB() { return(contactAtomIndexInResidueB[CBBH] + 1); }
     
     public Integer getCCHBContactDist() { return(minContactDistances[CCHB]); }
-    public Integer getCCHBContactAtomNumA() { return(contactAtomIndexInResidueA[CCHB]); }
-    public Integer getCCHBContactAtomNumB() { return(contactAtomIndexInResidueB[CCHB]); }
+    public Integer getCCHBContactAtomNumA() { return(contactAtomIndexInResidueA[CCHB] + 1); }
+    public Integer getCCHBContactAtomNumB() { return(contactAtomIndexInResidueB[CCHB] + 1); }
     
     public Integer getCCBHContactDist() { return(minContactDistances[CCBH]); }
-    public Integer getCCBHContactAtomNumA() { return(contactAtomIndexInResidueA[CCBH]); }
-    public Integer getCCBHContactAtomNumB() { return(contactAtomIndexInResidueB[CCBH]); }
+    public Integer getCCBHContactAtomNumA() { return(contactAtomIndexInResidueA[CCBH] + 1); }
+    public Integer getCCBHContactAtomNumB() { return(contactAtomIndexInResidueB[CCBH] + 1); }
     
     public Integer getNHPIContactDist() { return(minContactDistances[NHPI]); }
     public Integer getNHPIContactAtomNumA() { return(contactAtomIndexInResidueA[NHPI] + 1); }
