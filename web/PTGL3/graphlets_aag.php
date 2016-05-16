@@ -3,16 +3,16 @@
 <?php 
 include('./backend/config.php');
 $SHOW_ERROR_LIST = array();
-include('./backend/get_graphlets_pg.php');
+include('./backend/get_graphlets_aag.php');
 include('./common.php');
 $DO_SHOW_ERROR_LIST = $DEBUG_MODE;
 
 
-$title = "Graphlets for Protein graphs";
+$title = "Graphlets for Amino acid graphs";
 $title = $SITE_TITLE.$TITLE_SPACER.$title;
 
-function get_total_graphlet_pg_count($db) {
-  $query = "SELECT count(pgg.graphlet_id) as count FROM plcc_graphlets pgg";
+function get_total_graphlet_aag_count($db) {
+  $query = "SELECT count(ag.aa_graphlet_id) as count FROM plcc_aa_graphlets ag";
   $result = pg_query($db, $query);  
   $arr = pg_fetch_array($result, NULL, PGSQL_ASSOC);
   return $arr['count'];
@@ -59,57 +59,33 @@ function get_total_graphlet_pg_count($db) {
 	<?php include('navbar.php'); ?>
 
 	<div class="container" id="publications">
-		<h2>Graphlets for a protein graph</h2>
+		<h2>Graphlets for an amino acid graph</h2>
 		<br>
 		
 		<div id="PageIntro">
 		<div class="container" id="pageintro">		
-		Select the chain and graph type you are interested in below. You will then be able to see the graphlet distribution for the PG. Note that by default, graphlets are only computed for albe graphs.
+		Select the PDB ID you are interested in below. You will then be able to see the graphlet distribution for the AAG.
 		
 		</div><!-- end container-->
 		</div><!-- end Home -->
 		
-		<form class="form-inline" action="graphlets_pg.php" method="get">
+		<form class="form-inline" action="graphlets_aag.php" method="get">
 			
-		<label>Enter PDB identifier and chain, e.g., '7timA':
+		<label>Enter PDB identifier, e.g., '7tim':
 		<?php
-		if(isset($_GET['pdbchain']) && $_GET['pdbchain'] != "") {
-		  echo '<input type="text" class="form-control" name="pdbchain" maxlength="5" id="search_fgs_of_pg_pdbchain" placeholder="Enter PDB ID and chain" value="' . $_GET['pdbchain'] . '">';
+		if(isset($_GET['pdb_id']) && $_GET['pdb_id'] != "") {
+		  echo '<input type="text" class="form-control" name="pdb_id" maxlength="4" id="search_graphlets_of_aag_pdb_id" placeholder="Enter PDB ID" value="' . $_GET['pdb_id'] . '">';
 		}
 		else {
-		  echo '<input type="text" class="form-control" name="pdbchain" maxlength="5" id="search_fgs_of_pg_pdbchain" placeholder="Enter PDB ID and chain">';
+		  echo '<input type="text" class="form-control" name="pdb_id" maxlength="4" id="search_graphlets_of_aag_pdb_id" placeholder="Enter PDB ID">';
 		}
 		?>
 		</label>
 			
-		
-		<label>Select graph-type: 
-		  <select id="multidown" name="graphtype_int">
-		  <?php
-		     $values = array(1, 2, 3, 4, 5, 6);
-		     $labels = array("Alpha", "Beta", "Alpha-Beta", "Alpha-Ligand", "Beta-Ligand", "Alpha-Beta-Ligand");
-		     
-		     $pre_sel = 3;
-		     if(isset($_GET['graphtype_int'])) {
-		       $tmp = intval($_GET['graphtype_int']);
-		       if($tmp >= 1 && $tmp <= 6) {
-		         $pre_sel = $tmp;
-		       }
-		     }
-		     
-		     for($i = 0; $i < count($values); $i++) {
-		       $sel = "";
-		       if($pre_sel === $values[$i]) {
-		         $sel = " selected='selected' ";
-		       }
-		       echo "<option class='downloadOption' $sel value='" . $values[$i] . "'>"  . $labels[$i] . "</option>";
-		     }
-		  ?>			
-		  </select>
-		</label>
+				
 		
 		
-		<button type="submit" id="sendit_all_graphlets_of_pg" "class="btn btn-default">Search <span class="glyphicon glyphicon-search"></span></button><br>
+		<button type="submit" id="sendit_all_graphlets_of_aag" "class="btn btn-default">Search <span class="glyphicon glyphicon-search"></span></button><br>
 
 		</form>	
 		
@@ -124,22 +100,22 @@ function get_total_graphlet_pg_count($db) {
 			          if($valid_values) {
 				      echo "<h3> Search Results </h3>\n";
 				  
-				      echo $tableString; /* The table string is constructed in /backend/get_graphlets_pg.php, which is included by this file. */  
+				      echo $tableString; /* The table string is constructed in /backend/get_graphlets_aag.php, which is included by this file. */  
 				
 				      if($num_found > 0) {
 				      }
 				      else {	
 				        $conn_string = "host=" . $DB_HOST . " port=" . $DB_PORT . " dbname=" . $DB_NAME . " user=" . $DB_USER ." password=" . $DB_PASSWORD;
                                         $db = pg_connect($conn_string);
-                                        $num_pg_graphlets = 0;
+                                        $num_aag_graphlets = 0;
                                         if($db) {
-                                          $num_pg_graphlets = get_total_graphlet_pg_count($db);
+                                          $num_aag_graphlets = get_total_graphlet_aag_count($db);
                                         }
-					echo "<br><h3> No graphlets found for your query</h3><br><p>Sorry, your query returned no results. (There are $num_pg_graphlets PG graphlet counts in the database.)</p>\n";
+					echo "<br><h3> No graphlets found for your query</h3><br><p>Sorry, your query returned no results. (There are $num_aag_graphlets AAG graphlet counts in the database.)</p>\n";
 				      }
 				  }
 				  else {
-				       echo "<br><h3> Invalid query</h3><br><p>Sorry, please use another search. (Did you fill out the PDB ID and chain field properly?)</p>\n";
+				       echo "<br><h3> Invalid query</h3><br><p>Sorry, please use another search. (Did you fill out the PDB ID field properly?)</p>\n";
 				  }
 			      }
 			
