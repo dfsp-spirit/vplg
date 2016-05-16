@@ -64,6 +64,20 @@ BibTeX - Entry:
     }
 
     
+Alternatively, cite the new PTGL paper published in Bioinformatics:
+
+
+@article{ptgl2016,
+	title={{The new Protein Topology Graph Library web server}},
+  author={Tim Sch\"{a}fer and Daniel Brune{\ss} and Andreas Scheck and Ina Koch},
+	year = 2016,
+	journal={Bioinformatics},
+	volume={32},
+	number={3},
+	pages={474--476},
+	publisher = {Oxford University Press}
+}
+
     
     
 
