@@ -2092,7 +2092,7 @@ public class FileParser {
     
     /**
      * Parses a PDB file with multiple MODELS, converts those models to separate chains, and saves the result in a new PDB file.
-     * If only none or only one model was found, the method stops because there is nothing to convert.
+     * If no or only one model was found, the method stops because there is nothing to convert.
      * @param pdbFile the input file
      * @param outFile the output path for the new file
      * @return true if converting was successful, false otherwise.
@@ -2141,7 +2141,7 @@ public class FileParser {
             return false;
         }
         
-        // Initate a sting builder that will store the output string that will result in the new PDB file
+        // Initate a string builder that will store the output string to write the new PDB file
         StringBuilder sb = new StringBuilder();
         String lineSep = System.lineSeparator();
         
@@ -2161,20 +2161,31 @@ public class FileParser {
         
              
         // Alphabet that makes up all possible chain IDs
-        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         String newChainID = null;
         Integer atomID = 0;
         Integer residueID = 0;
         Integer newAtomID = null;
         Integer terCount = 0;
+        
+        if(models.size() > alphabet.length()) {
+            DP.getInstance().w("FileParser", "There are more models than possible chain IDs (" + alphabet.length() + "). Aborting the conversion now.");
+            System.exit(1);
+        }
 
         // Go through all the found models by starting at the line the models begin
         for(Integer lineNum : models.keySet()) {
             String chainID = "-1";
             
             // Get the first new chain ID from the alphabet that can be used to rename chains
-            newChainID = alphabet.substring(0, 1);
-            alphabet = alphabet.replace(newChainID, "");
+            if(alphabet.length() > 0) {
+                newChainID = alphabet.substring(0, 1);
+                alphabet = alphabet.replace(newChainID, "");
+            }
+            else {
+                DP.getInstance().w("FileParser", "Not enough letters to set unique chain IDs. Aborting.");
+                System.exit(1);
+            }
             
             while(!file.get(lineNum).startsWith("ENDMDL")) {
                 
@@ -2194,6 +2205,12 @@ public class FileParser {
                 // If we are still processing the first model, zero will be added, so nothing changes
                 newAtomID = oldAtomID + atomID;
                 Integer newResidueID = oldresidueID + residueID;
+                
+                if(newAtomID > 99999) {
+                    DP.getInstance().w("FileParser", "Trying to assign a new atom ID greater than 99999. The PDB file format does not support this.\n"
+                            + "Aborting the conversion now.");
+                    System.exit(1);
+                }
                 
                 // Creates a string of spaces. To keep the PDB file format intact it is necessary to add the correct amount of spaces
                 // in front of the later inserted string. To do this, we take the maximum length the entry may have (5 for atom IDs, 4 for residue IDs)
