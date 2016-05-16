@@ -5489,7 +5489,7 @@ public class Main {
 
         ArrayList<Atom> atoms_a = a.getAtoms();
         ArrayList<Atom> atoms_b = b.getAtoms();
-
+        
         Atom x, y;
         Integer dist = null;
         Integer CAdist = a.resCenterDistTo(b);
@@ -5661,7 +5661,7 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.BBHB] = i;
                                 contactAtomNumInResidueB[ResContactInfo.BBHB] = j;
                             }
-                            System.out.println("New BB NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New BB NHO: " + x.toString() + "/" + y.toString());
                         }
                     }
                     if(i.equals(atomIndexOfBackboneO) && j.equals(atomIndexOfBackboneN)) {
@@ -5673,7 +5673,7 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.BBBH] = i;
                                 contactAtomNumInResidueB[ResContactInfo.BBBH] = j;
                             }
-                            System.out.println("New BB ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New BB ONH: " + x.toString() + "/" + y.toString());
                         }
                     }
                     
@@ -5689,7 +5689,7 @@ public class Main {
                             contactAtomNumInResidueA[ResContactInfo.BCBH] = i;
                             contactAtomNumInResidueB[ResContactInfo.BCBH] = j;
                         }
-                            System.out.println("New BS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New BS ONH: " + x.toString() + "/" + y.toString());
                         }
                     }
                     if(((i > numOfLastBackboneAtomInResidue) && x.getChemSym().equals(" N")) && j.equals(atomIndexOfBackboneO)) {
@@ -5701,7 +5701,7 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.CBHB] = i;
                                 contactAtomNumInResidueB[ResContactInfo.CBHB] = j;
                             }
-                            System.out.println("New SB ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New SB ONH: " + x.toString() + "/" + y.toString());
                         }
                     }
                     
@@ -5718,7 +5718,7 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.BCBH] = i;
                                 contactAtomNumInResidueB[ResContactInfo.BCBH] = j;
                             }
-                                System.out.println("New BS OOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                                System.out.println("New BS OOH: " + x.toString() + "/" + y.toString());
                             }
                         }
                     }
@@ -5734,7 +5734,7 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.CBHB] = i;
                                 contactAtomNumInResidueB[ResContactInfo.CBHB] = j;
                             }
-                                System.out.println("New SB ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                                System.out.println("New SB ONH: " + x.toString() + "/" + y.toString());
                             }
                         }   
                     }
@@ -5743,7 +5743,10 @@ public class Main {
                     if(i.equals(atomIndexOfBackboneN) && ((j > numOfLastBackboneAtomInResidue) && y.getChemSym().equals(" O"))) {
                         // Check if amino acid is Asparagine, Glutamine, Glutamic Acid, or Aspartic Acid, as only those have carbonyl groups in their side chain.
                         try {
-                        if(b.getResName3().equals("ASP") && x.hbondAtomAngleBetween(y, atoms_b.get(5))) {
+                        if((b.getResName3().equals("ASP") && x.hbondAtomAngleBetween(y, atoms_b.get(5))) ||
+                           (b.getResName3().equals("GLU") && x.hbondAtomAngleBetween(y, atoms_b.get(6))) ||
+                           (b.getResName3().equals("ASN") && x.hbondAtomAngleBetween(y, atoms_b.get(5))) ||
+                           (b.getResName3().equals("GLN") && x.hbondAtomAngleBetween(y, atoms_b.get(6)))   ) {
                             numPairContacts[ResContactInfo.TT]++; 
                             numPairContacts[ResContactInfo.BCHB]++;
                             if((minContactDistances[ResContactInfo.BCHB] < 0) || dist < minContactDistances[ResContactInfo.BCHB]) {
@@ -5751,41 +5754,11 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.BCHB] = i;
                                 contactAtomNumInResidueB[ResContactInfo.BCHB] = j;
                             }
-                            System.out.println("New BS NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(b.getResName3().equals("GLU") && x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.BCHB]++;
-                            if((minContactDistances[ResContactInfo.BCHB] < 0) || dist < minContactDistances[ResContactInfo.BCHB]) {
-                                minContactDistances[ResContactInfo.BCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.BCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.BCHB] = j;
-                            }
-                            System.out.println("New BS NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(b.getResName3().equals("ASN") && x.hbondAtomAngleBetween(y, atoms_b.get(5))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.BCHB]++;
-                            if((minContactDistances[ResContactInfo.BCHB] < 0) || dist < minContactDistances[ResContactInfo.BCHB]) {
-                                minContactDistances[ResContactInfo.BCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.BCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.BCHB] = j;
-                            }
-                            System.out.println("New BS NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(b.getResName3().equals("GLN") && x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.BCHB]++;
-                            if((minContactDistances[ResContactInfo.BCHB] < 0) || dist < minContactDistances[ResContactInfo.BCHB]) {
-                                minContactDistances[ResContactInfo.BCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.BCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.BCHB] = j;
-                            }
-                                System.out.println("New BS NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New BS NHO: " + x.toString() + "/" + y.toString());
                         }
                         }
                         catch(java.lang.IndexOutOfBoundsException e){
-                            System.out.println("NH -> O backbone-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
+                            DP.getInstance().w("main", "NH -> O backbone-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                     }
                     
@@ -5793,7 +5766,10 @@ public class Main {
                     if(((i > numOfLastBackboneAtomInResidue) && x.getChemSym().equals(" O")) && j.equals(atomIndexOfBackboneN)) {
                         // Check if amino acid is Asparagine, Glutamine, Glutamic Acid, or Aspartic Acid, as only those have carbonyl groups in their side chain.
                         try {
-                        if(a.getResName3().equals("ASP") && y.hbondAtomAngleBetween(x, atoms_a.get(5))) {
+                        if((a.getResName3().equals("ASP") && y.hbondAtomAngleBetween(x, atoms_a.get(5))) ||
+                           (a.getResName3().equals("GLU") && y.hbondAtomAngleBetween(x, atoms_a.get(6))) ||
+                           (a.getResName3().equals("ASN") && y.hbondAtomAngleBetween(x, atoms_a.get(5))) ||
+                           (a.getResName3().equals("GLN") && y.hbondAtomAngleBetween(x, atoms_a.get(6)))    ) {
                             numPairContacts[ResContactInfo.TT]++; 
                             numPairContacts[ResContactInfo.CBBH]++;
                             if((minContactDistances[ResContactInfo.CBBH] < 0) || dist < minContactDistances[ResContactInfo.CBBH]) {
@@ -5801,41 +5777,11 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.CBBH] = i;
                                 contactAtomNumInResidueB[ResContactInfo.CBBH] = j;
                             }
-                            System.out.println("New SB NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("GLU") && y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CBBH]++;
-                            if((minContactDistances[ResContactInfo.CBBH] < 0) || dist < minContactDistances[ResContactInfo.CBBH]) {
-                                minContactDistances[ResContactInfo.CBBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CBBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CBBH] = j;
-                            }
-                            System.out.println("New SB NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("ASN") && y.hbondAtomAngleBetween(x, atoms_a.get(5))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CBBH]++;
-                            if((minContactDistances[ResContactInfo.CBBH] < 0) || dist < minContactDistances[ResContactInfo.CBBH]) {
-                                minContactDistances[ResContactInfo.CBBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CBBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CBBH] = j;
-                            }
-                            System.out.println("New SB NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("GLN") && y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CBBH]++;
-                            if((minContactDistances[ResContactInfo.CBBH] < 0) || dist < minContactDistances[ResContactInfo.CBBH]) {
-                                minContactDistances[ResContactInfo.CBBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CBBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CBBH] = j;
-                            }
-                            System.out.println("New SB NHO: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New SB NHO: " + x.toString() + "/" + y.toString());
                         }
                         }
                         catch(java.lang.IndexOutOfBoundsException e){
-                            System.out.println("NH -> O sidechain-backbone calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
+                            DP.getInstance().w("main", "NH -> O sidechain-backbone calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                     }
                     
@@ -5845,7 +5791,9 @@ public class Main {
                         
                         // NH as donor
                         try {
-                        if(b.getResName3().equals("SER") && x.hbondAtomAngleBetween(y, atoms_b.get(numOfLastBackboneAtomInResidue))) {
+                        if((b.getResName3().equals("SER") && x.hbondAtomAngleBetween(y, atoms_b.get(numOfLastBackboneAtomInResidue))) ||
+                           (b.getResName3().equals("THR") && x.hbondAtomAngleBetween(y, atoms_b.get(numOfLastBackboneAtomInResidue))) ||
+                           (b.getResName3().equals("TYR") && x.hbondAtomAngleBetween(y, atoms_b.get(10))) ) {
                             numPairContacts[ResContactInfo.TT]++; 
                             numPairContacts[ResContactInfo.BCHB]++;
                             if((minContactDistances[ResContactInfo.BCHB] < 0) || dist < minContactDistances[ResContactInfo.BCHB]) {
@@ -5853,29 +5801,8 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.BCHB] = i;
                                 contactAtomNumInResidueB[ResContactInfo.BCHB] = j;
                             }
-                            System.out.println("New BS NHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(b.getResName3().equals("THR") && x.hbondAtomAngleBetween(y, atoms_b.get(numOfLastBackboneAtomInResidue))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.BCHB]++;
-                            if((minContactDistances[ResContactInfo.BCHB] < 0) || dist < minContactDistances[ResContactInfo.BCHB]) {
-                                minContactDistances[ResContactInfo.BCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.BCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.BCHB] = j;
-                            }
-                            System.out.println("New BS NHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(b.getResName3().equals("TYR") && x.hbondAtomAngleBetween(y, atoms_b.get(10))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.BCHB]++;
-                            if((minContactDistances[ResContactInfo.BCHB] < 0) || dist < minContactDistances[ResContactInfo.BCHB]) {
-                                minContactDistances[ResContactInfo.BCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.BCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.BCHB] = j;
-                            }
-                            System.out.println("New BS NHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        
+                            System.out.println("New BS NHOH: " + x.toString() + "/" + y.toString());
+                        }                        
                         // NH as acceptor
                         else if((b.getResName3().equals("SER") || b.getResName3().equals("THR") || b.getResName3().equals("TYR")) && y.hbondAtomAngleBetween(x, atoms_a.get(atomIndexOfBackboneCa))) {
                             numPairContacts[ResContactInfo.TT]++; 
@@ -5885,11 +5812,11 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.BCBH] = i;
                                 contactAtomNumInResidueB[ResContactInfo.BCBH] = j;
                             }
-                                System.out.println("New BS NHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                                System.out.println("New BS NHOH: " + x.toString() + "/" + y.toString());
                         }
                         }
                         catch(java.lang.IndexOutOfBoundsException e){
-                            System.out.println("NH -> OH backbone-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
+                            DP.getInstance().w("main", "NH -> OH backbone-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                     }
                     
@@ -5898,7 +5825,9 @@ public class Main {
                         
                         // NH as donor
                         try {
-                        if(a.getResName3().equals("SER") && y.hbondAtomAngleBetween(x, atoms_a.get(numOfLastBackboneAtomInResidue))) {
+                        if((a.getResName3().equals("SER") && y.hbondAtomAngleBetween(x, atoms_a.get(numOfLastBackboneAtomInResidue))) ||
+                           (a.getResName3().equals("THR") && y.hbondAtomAngleBetween(x, atoms_a.get(numOfLastBackboneAtomInResidue))) ||
+                           (a.getResName3().equals("TYR") && y.hbondAtomAngleBetween(x, atoms_a.get(10)))    ) {
                             numPairContacts[ResContactInfo.TT]++; 
                             numPairContacts[ResContactInfo.CBBH]++;
                             if((minContactDistances[ResContactInfo.CBBH] < 0) || dist < minContactDistances[ResContactInfo.CBBH]) {
@@ -5906,27 +5835,7 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.CBBH] = i;
                                 contactAtomNumInResidueB[ResContactInfo.CBBH] = j;
                             }
-                            System.out.println("New SB NHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("THR") && y.hbondAtomAngleBetween(x, atoms_a.get(numOfLastBackboneAtomInResidue))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CBBH]++;
-                            if((minContactDistances[ResContactInfo.CBBH] < 0) || dist < minContactDistances[ResContactInfo.CBBH]) {
-                                minContactDistances[ResContactInfo.CBBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CBBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CBBH] = j;
-                            }
-                            System.out.println("New SB NHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("TYR") && y.hbondAtomAngleBetween(x, atoms_a.get(10))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CBBH]++;
-                            if((minContactDistances[ResContactInfo.CBBH] < 0) || dist < minContactDistances[ResContactInfo.CBBH]) {
-                                minContactDistances[ResContactInfo.CBBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CBBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CBBH] = j;
-                            }
-                            System.out.println("New SB NHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New SB NHOH: " + x.toString() + "/" + y.toString());
                         }
                         
                         // NH as acceptor
@@ -5938,12 +5847,12 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.CBHB] = i;
                                 contactAtomNumInResidueB[ResContactInfo.CBHB] = j;
                             }
-                                System.out.println("New SB NHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                                System.out.println("New SB NHOH: " + x.toString() + "/" + y.toString());
                         }
                         
                     }
                         catch(java.lang.IndexOutOfBoundsException e){
-                            System.out.println("NH -> OH sidechain-backbone calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
+                            DP.getInstance().w("main", "NH -> OH sidechain-backbone calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                     }
                     
@@ -5953,7 +5862,15 @@ public class Main {
                         
                         // Backbone NH as donor
                         try {
-                        if(b.getResName3().equals("ARG") && x.hbondAtomAngleBetween(y, atoms_b.get(8))) {
+                        if((b.getResName3().equals("ARG") && x.hbondAtomAngleBetween(y, atoms_b.get(8))) ||
+                           (b.getResName3().equals("ARG") && x.hbondAtomAngleBetween(y, atoms_b.get(6))) ||
+                           (b.getResName3().equals("HIS") && x.hbondAtomAngleBetween(y, atoms_b.get(5))) ||
+                           (b.getResName3().equals("HIS") && x.hbondAtomAngleBetween(y, atoms_b.get(8))) ||
+                           (b.getResName3().equals("LYS") && x.hbondAtomAngleBetween(y, atoms_b.get(7))) ||
+                           (b.getResName3().equals("ASN") && x.hbondAtomAngleBetween(y, atoms_b.get(5))) ||
+                           (b.getResName3().equals("GLN") && x.hbondAtomAngleBetween(y, atoms_b.get(6))) ||
+                           (b.getResName3().equals("TRP") && x.hbondAtomAngleBetween(y, atoms_b.get(6))) ||
+                           (b.getResName3().equals("TRP") && x.hbondAtomAngleBetween(y, atoms_b.get(9)))  ) {
                             numPairContacts[ResContactInfo.TT]++; 
                             numPairContacts[ResContactInfo.BCHB]++;
                             if((minContactDistances[ResContactInfo.BCHB] < 0) || dist < minContactDistances[ResContactInfo.BCHB]) {
@@ -5961,87 +5878,7 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.BCHB] = i;
                                 contactAtomNumInResidueB[ResContactInfo.BCHB] = j;
                             }
-                            System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(b.getResName3().equals("ARG") && x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.BCHB]++;
-                            if((minContactDistances[ResContactInfo.BCHB] < 0) || dist < minContactDistances[ResContactInfo.BCHB]) {
-                                minContactDistances[ResContactInfo.BCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.BCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.BCHB] = j;
-                            }
-                            System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(b.getResName3().equals("HIS") && x.hbondAtomAngleBetween(y, atoms_b.get(5))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.BCHB]++;
-                            if((minContactDistances[ResContactInfo.BCHB] < 0) || dist < minContactDistances[ResContactInfo.BCHB]) {
-                                minContactDistances[ResContactInfo.BCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.BCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.BCHB] = j;
-                            }
-                            System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(b.getResName3().equals("HIS") && x.hbondAtomAngleBetween(y, atoms_b.get(8))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.BCHB]++;
-                            if((minContactDistances[ResContactInfo.BCHB] < 0) || dist < minContactDistances[ResContactInfo.BCHB]) {
-                                minContactDistances[ResContactInfo.BCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.BCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.BCHB] = j;
-                            }
-                            System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(b.getResName3().equals("LYS") && x.hbondAtomAngleBetween(y, atoms_b.get(7))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.BCHB]++;
-                            if((minContactDistances[ResContactInfo.BCHB] < 0) || dist < minContactDistances[ResContactInfo.BCHB]) {
-                                minContactDistances[ResContactInfo.BCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.BCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.BCHB] = j;
-                            }
-                            System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(b.getResName3().equals("ASN") && x.hbondAtomAngleBetween(y, atoms_b.get(5))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.BCHB]++;
-                            if((minContactDistances[ResContactInfo.BCHB] < 0) || dist < minContactDistances[ResContactInfo.BCHB]) {
-                                minContactDistances[ResContactInfo.BCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.BCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.BCHB] = j;
-                            }
-                            System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(b.getResName3().equals("GLN") && x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.BCHB]++;
-                            if((minContactDistances[ResContactInfo.BCHB] < 0) || dist < minContactDistances[ResContactInfo.BCHB]) {
-                                minContactDistances[ResContactInfo.BCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.BCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.BCHB] = j;
-                            }
-                            System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(b.getResName3().equals("TRP") && x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.BCHB]++;
-                            if((minContactDistances[ResContactInfo.BCHB] < 0) || dist < minContactDistances[ResContactInfo.BCHB]) {
-                                minContactDistances[ResContactInfo.BCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.BCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.BCHB] = j;
-                            }
-                            System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(b.getResName3().equals("TRP") && x.hbondAtomAngleBetween(y, atoms_b.get(9))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.BCHB]++;
-                            if((minContactDistances[ResContactInfo.BCHB] < 0) || dist < minContactDistances[ResContactInfo.BCHB]) {
-                                minContactDistances[ResContactInfo.BCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.BCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.BCHB] = j;
-                            }
-                            System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New BS NHNH: " + x.toString() + "/" + y.toString());
                         }
                         // Backbone NH as acceptor
                         else if((b.getResName3().equals("ARG") || b.getResName3().equals("HIS") || b.getResName3().equals("LYS") || b.getResName3().equals("ASN") || b.getResName3().equals("GLN") || b.getResName3().equals("TRP") && y.hbondAtomAngleBetween(x, atoms_a.get(atomIndexOfBackboneCa)))) {
@@ -6052,11 +5889,11 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.BCBH] = i;
                                 contactAtomNumInResidueB[ResContactInfo.BCBH] = j;
                             }
-                                System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                                System.out.println("New BS NHNH: " + x.toString() + "/" + y.toString());
                         }
                         }
                         catch(java.lang.IndexOutOfBoundsException e){
-                            System.out.println("NH -> NH backbone-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
+                            DP.getInstance().w("main", "NH -> NH backbone-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                     }
                     
@@ -6065,7 +5902,15 @@ public class Main {
                         
                         // Backbone NH as donor
                         try {
-                        if(a.getResName3().equals("ARG") && y.hbondAtomAngleBetween(x, atoms_a.get(8))) {
+                        if((a.getResName3().equals("ARG") && y.hbondAtomAngleBetween(x, atoms_a.get(8))) ||
+                           (a.getResName3().equals("ARG") && y.hbondAtomAngleBetween(x, atoms_a.get(6))) ||
+                           (a.getResName3().equals("HIS") && y.hbondAtomAngleBetween(x, atoms_a.get(5))) ||
+                           (a.getResName3().equals("HIS") && y.hbondAtomAngleBetween(x, atoms_a.get(8))) ||
+                           (a.getResName3().equals("LYS") && y.hbondAtomAngleBetween(x, atoms_a.get(7))) ||
+                           (a.getResName3().equals("ASN") && y.hbondAtomAngleBetween(x, atoms_a.get(5))) ||
+                           (a.getResName3().equals("GLN") && y.hbondAtomAngleBetween(x, atoms_a.get(6))) ||
+                           (a.getResName3().equals("TRP") && y.hbondAtomAngleBetween(x, atoms_a.get(6))) ||
+                           (a.getResName3().equals("TRP") && y.hbondAtomAngleBetween(x, atoms_a.get(9)))    ) {
                             numPairContacts[ResContactInfo.TT]++; 
                             numPairContacts[ResContactInfo.CBBH]++;
                             if((minContactDistances[ResContactInfo.CBBH] < 0) || dist < minContactDistances[ResContactInfo.CBBH]) {
@@ -6073,88 +5918,8 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.CBBH] = i;
                                 contactAtomNumInResidueB[ResContactInfo.CBBH] = j;
                             }
-                            System.out.println("New SB NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New SB NHNH: " + x.toString() + "/" + y.toString());
                             }
-                        else if(a.getResName3().equals("ARG") && y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CBBH]++;
-                            if((minContactDistances[ResContactInfo.CBBH] < 0) || dist < minContactDistances[ResContactInfo.CBBH]) {
-                                minContactDistances[ResContactInfo.CBBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CBBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CBBH] = j;
-                            }
-                            System.out.println("New SB NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("HIS") && y.hbondAtomAngleBetween(x, atoms_a.get(5))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CBBH]++;
-                            if((minContactDistances[ResContactInfo.CBBH] < 0) || dist < minContactDistances[ResContactInfo.CBBH]) {
-                                minContactDistances[ResContactInfo.CBBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CBBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CBBH] = j;
-                            }
-                            System.out.println("New SB NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("HIS") && y.hbondAtomAngleBetween(x, atoms_a.get(8))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CBBH]++;
-                            if((minContactDistances[ResContactInfo.CBBH] < 0) || dist < minContactDistances[ResContactInfo.CBBH]) {
-                                minContactDistances[ResContactInfo.CBBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CBBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CBBH] = j;
-                            }
-                            System.out.println("New SB NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("LYS") && y.hbondAtomAngleBetween(x, atoms_a.get(7))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CBBH]++;
-                            if((minContactDistances[ResContactInfo.CBBH] < 0) || dist < minContactDistances[ResContactInfo.CBBH]) {
-                                minContactDistances[ResContactInfo.CBBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CBBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CBBH] = j;
-                            }
-                            System.out.println("New SB NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("ASN") && y.hbondAtomAngleBetween(x, atoms_a.get(5))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CBBH]++;
-                            if((minContactDistances[ResContactInfo.CBBH] < 0) || dist < minContactDistances[ResContactInfo.CBBH]) {
-                                minContactDistances[ResContactInfo.CBBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CBBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CBBH] = j;
-                            }
-                            System.out.println("New SB NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("GLN") && y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CBBH]++;
-                            if((minContactDistances[ResContactInfo.CBBH] < 0) || dist < minContactDistances[ResContactInfo.CBBH]) {
-                                minContactDistances[ResContactInfo.CBBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CBBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CBBH] = j;
-                            }
-                            System.out.println("New SB NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("TRP") && y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CBBH]++;
-                            if((minContactDistances[ResContactInfo.CBBH] < 0) || dist < minContactDistances[ResContactInfo.CBBH]) {
-                                minContactDistances[ResContactInfo.CBBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CBBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CBBH] = j;
-                            }
-                            System.out.println("New SB NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("TRP") && y.hbondAtomAngleBetween(x, atoms_a.get(9))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CBBH]++;
-                            if((minContactDistances[ResContactInfo.CBBH] < 0) || dist < minContactDistances[ResContactInfo.CBBH]) {
-                                minContactDistances[ResContactInfo.CBBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CBBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CBBH] = j;
-                            }
-                            System.out.println("New SB NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
                         // Backbone NH as acceptor
                         else if((a.getResName3().equals("ARG") || a.getResName3().equals("HIS") || a.getResName3().equals("LYS") || a.getResName3().equals("ASN") || a.getResName3().equals("GLN") || a.getResName3().equals("TRP") && x.hbondAtomAngleBetween(y, atoms_b.get(atomIndexOfBackboneCa)))) {
                             numPairContacts[ResContactInfo.TT]++; 
@@ -6164,11 +5929,11 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.CBHB] = i;
                                 contactAtomNumInResidueB[ResContactInfo.CBHB] = j;
                             }
-                                System.out.println("New BS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                                System.out.println("New BS NHNH: " + x.toString() + "/" + y.toString());
                         }
                         }
                         catch(java.lang.IndexOutOfBoundsException e){
-                            System.out.println("NH -> NH sidechain-backbone calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
+                            DP.getInstance().w("main", "NH -> NH sidechain-backbone calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                     }
                     
@@ -6182,7 +5947,10 @@ public class Main {
                         for(String sidechainNHAA : sidechainNHAAs) {
                         try {
                             
-                        if(a.getResName3().equals("ASP") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(5))) {
+                        if((a.getResName3().equals("ASP") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(5))) ||
+                           (a.getResName3().equals("GLU") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(6))) ||
+                           (a.getResName3().equals("ASN") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(5))) ||
+                           (a.getResName3().equals("GLN") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(6)))    ) {
                             numPairContacts[ResContactInfo.TT]++; 
                             numPairContacts[ResContactInfo.CCBH]++;
                             if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
@@ -6190,41 +5958,11 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
                                 contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
                             }
-                            System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("GLU") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("ASN") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(5))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("GLN") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New SS ONH: " + x.toString() + "/" + y.toString());
                         }
                         }
                         catch(java.lang.IndexOutOfBoundsException e) {
-                            System.out.println("O -> NH sidechain-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
+                            DP.getInstance().w("main", "O -> NH sidechain-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                         }
                     }
@@ -6236,7 +5974,10 @@ public class Main {
                         for(String sidechainNHAA : sidechainNHAAs) {
                         try {
                             
-                        if(b.getResName3().equals("ASP") && a.getResName3().equals(sidechainNHAA) && x.hbondAtomAngleBetween(y, atoms_b.get(5))) {
+                        if((b.getResName3().equals("ASP") && a.getResName3().equals(sidechainNHAA) && x.hbondAtomAngleBetween(y, atoms_b.get(5))) ||
+                           (b.getResName3().equals("GLU") && a.getResName3().equals(sidechainNHAA) && x.hbondAtomAngleBetween(y, atoms_b.get(6))) ||
+                           (b.getResName3().equals("ASN") && a.getResName3().equals(sidechainNHAA) && x.hbondAtomAngleBetween(y, atoms_b.get(5))) ||
+                           (b.getResName3().equals("GLN") && a.getResName3().equals(sidechainNHAA) && x.hbondAtomAngleBetween(y, atoms_b.get(6)))    ) {
                             numPairContacts[ResContactInfo.TT]++; 
                             numPairContacts[ResContactInfo.CCHB]++;
                             if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
@@ -6244,41 +5985,11 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
                                 contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
                             }
-                            System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(b.getResName3().equals("GLU") && a.getResName3().equals(sidechainNHAA) && x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(b.getResName3().equals("ASN") && a.getResName3().equals(sidechainNHAA) && x.hbondAtomAngleBetween(y, atoms_b.get(5))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(b.getResName3().equals("GLN") && a.getResName3().equals(sidechainNHAA) && x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS ONH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New SS ONH: " + x.toString() + "/" + y.toString());
                         }
                         }
                         catch(java.lang.IndexOutOfBoundsException e) {
-                            System.out.println("O -> NH sidechain-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
+                            DP.getInstance().w("main", "O -> NH sidechain-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                         }
                     }
@@ -6293,7 +6004,10 @@ public class Main {
                         for(String sidechainOHAA : sidechainOHAAs) {
                         try {
                             
-                        if(a.getResName3().equals("ASP") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(5))) {
+                        if((a.getResName3().equals("ASP") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(5))) ||
+                           (a.getResName3().equals("GLU") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(6))) ||
+                           (a.getResName3().equals("ASN") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(5))) ||
+                           (a.getResName3().equals("GLN") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(6)))    ) {
                             numPairContacts[ResContactInfo.TT]++; 
                             numPairContacts[ResContactInfo.CCBH]++;
                             if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
@@ -6301,41 +6015,11 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
                                 contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
                             }
-                            System.out.println("New SS OOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("GLU") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS OOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("ASN") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(5))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS OOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("GLN") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS OOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New SS OOH: " + x.toString() + "/" + y.toString());
                         }
                         }
                         catch(java.lang.IndexOutOfBoundsException e) {
-                            System.out.println("O -> OH sidechain-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
+                            DP.getInstance().w("main", "O -> OH sidechain-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                         }
                         
@@ -6343,7 +6027,10 @@ public class Main {
                         for(String sidechainOHAA : sidechainOHAAs) {
                         try {
                             
-                        if(b.getResName3().equals("ASP") && a.getResName3().equals(sidechainOHAA) && x.hbondAtomAngleBetween(y, atoms_b.get(5))) {
+                        if((b.getResName3().equals("ASP") && a.getResName3().equals(sidechainOHAA) && x.hbondAtomAngleBetween(y, atoms_b.get(5))) ||
+                           (b.getResName3().equals("GLU") && a.getResName3().equals(sidechainOHAA) && x.hbondAtomAngleBetween(y, atoms_b.get(6))) ||
+                           (b.getResName3().equals("ASN") && a.getResName3().equals(sidechainOHAA) && x.hbondAtomAngleBetween(y, atoms_b.get(5))) ||
+                           (b.getResName3().equals("GLN") && a.getResName3().equals(sidechainOHAA) && x.hbondAtomAngleBetween(y, atoms_b.get(6)))    ) {
                             numPairContacts[ResContactInfo.TT]++; 
                             numPairContacts[ResContactInfo.CCHB]++;
                             if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
@@ -6351,41 +6038,11 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
                                 contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
                             }
-                            System.out.println("New SS OOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(b.getResName3().equals("GLU") && a.getResName3().equals(sidechainOHAA) && x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS OOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(b.getResName3().equals("ASN") && a.getResName3().equals(sidechainOHAA) && x.hbondAtomAngleBetween(y, atoms_b.get(5))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS OOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(b.getResName3().equals("GLN") && a.getResName3().equals(sidechainOHAA) && x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS OOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New SS OOH: " + x.toString() + "/" + y.toString());
                         }
                         }
                         catch(java.lang.IndexOutOfBoundsException e) {
-                            System.out.println("O -> OH sidechain-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
+                            DP.getInstance().w("main", "O -> OH sidechain-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                         }
                     }
@@ -6401,7 +6058,15 @@ public class Main {
                         for(String sidechainOHAA : sidechainOHAAs) {
                         try {
                             
-                        if(a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("ARG") && x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
+                        if((a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("ARG") && x.hbondAtomAngleBetween(y, atoms_b.get(6))) ||
+                           (a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("ARG") && x.hbondAtomAngleBetween(y, atoms_b.get(8))) ||
+                           (a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("HIS") && x.hbondAtomAngleBetween(y, atoms_b.get(5))) ||
+                           (a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("HIS") && x.hbondAtomAngleBetween(y, atoms_b.get(8))) ||
+                           (a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("LYS") && x.hbondAtomAngleBetween(y, atoms_b.get(7))) ||
+                           (a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("ASN") && x.hbondAtomAngleBetween(y, atoms_b.get(5))) ||
+                           (a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("GLN") && x.hbondAtomAngleBetween(y, atoms_b.get(6))) ||
+                           (a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("TRP") && x.hbondAtomAngleBetween(y, atoms_b.get(6))) ||
+                           (a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("TRP") && x.hbondAtomAngleBetween(y, atoms_b.get(9)))    ) {
                             numPairContacts[ResContactInfo.TT]++; 
                             numPairContacts[ResContactInfo.CCHB]++;
                             if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
@@ -6409,100 +6074,12 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
                                 contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
                             }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                            contactFound = true;
-                        }
-                        else if(a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("ARG") && x.hbondAtomAngleBetween(y, atoms_b.get(8))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                            contactFound = true;
-                        }
-                        else if(a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("HIS") && x.hbondAtomAngleBetween(y, atoms_b.get(5))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                            contactFound = true;
-                        }
-                        else if(a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("HIS") && x.hbondAtomAngleBetween(y, atoms_b.get(8))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                            contactFound = true;
-                        }
-                        else if(a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("LYS") && x.hbondAtomAngleBetween(y, atoms_b.get(7))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                            contactFound = true;
-                        }
-                        else if(a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("ASN") && x.hbondAtomAngleBetween(y, atoms_b.get(5))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                            contactFound = true;
-                        }
-                        else if(a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("GLN") && x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                            contactFound = true;
-                        }
-                        else if(a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("TRP") && x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                            contactFound = true;
-                        }
-                        else if(a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("TRP") && x.hbondAtomAngleBetween(y, atoms_b.get(9))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New SS OHNH: " + x.toString() + "/" + y.toString());
                             contactFound = true;
                         }
                         }
                         catch(java.lang.IndexOutOfBoundsException e) {
-                            System.out.println("OH -> NH sidechain-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
+                            DP.getInstance().w("main", "OH -> NH sidechain-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                         }
                         
@@ -6510,7 +6087,9 @@ public class Main {
                         // OH as acceptor
                         for(String sidechainNHAA : sidechainNHAAs) {
                         try {  
-                        if(a.getResName3().equals("SER") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(numOfLastBackboneAtomInResidue))) {
+                        if((a.getResName3().equals("SER") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(numOfLastBackboneAtomInResidue))) ||
+                           (a.getResName3().equals("THR") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(numOfLastBackboneAtomInResidue))) ||
+                           (a.getResName3().equals("TYR") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(10))) ) {
                             numPairContacts[ResContactInfo.TT]++; 
                             numPairContacts[ResContactInfo.CCBH]++;
                             if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
@@ -6518,31 +6097,11 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
                                 contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
                             }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("THR") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(numOfLastBackboneAtomInResidue))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("TYR") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(10))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New SS OHNH: " + x.toString() + "/" + y.toString());
                         }
                         }
                         catch(java.lang.IndexOutOfBoundsException e) {
-                            System.out.println("OH -> NH sidechain-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
+                            DP.getInstance().w("main", "OH -> NH sidechain-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                         }
                         }
@@ -6559,7 +6118,9 @@ public class Main {
                         for(String sidechainNHAA : sidechainNHAAs) {
                         try {
                             
-                        if(a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("SER") && x.hbondAtomAngleBetween(y, atoms_b.get(numOfLastBackboneAtomInResidue))) {
+                        if((a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("SER") && x.hbondAtomAngleBetween(y, atoms_b.get(numOfLastBackboneAtomInResidue))) ||
+                           (a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("THR") && x.hbondAtomAngleBetween(y, atoms_b.get(numOfLastBackboneAtomInResidue))) ||
+                           (a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("TYR") && x.hbondAtomAngleBetween(y, atoms_b.get(10)))    ) {
                             numPairContacts[ResContactInfo.TT]++; 
                             numPairContacts[ResContactInfo.CCHB]++;
                             if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
@@ -6567,34 +6128,12 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
                                 contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
                             }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                            contactFound = true;
-                        }
-                        else if(a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("THR") && x.hbondAtomAngleBetween(y, atoms_b.get(numOfLastBackboneAtomInResidue))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                            contactFound = true;
-                        }
-                        else if(a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("TYR") && x.hbondAtomAngleBetween(y, atoms_b.get(10))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New SS OHNH: " + x.toString() + "/" + y.toString());
                             contactFound = true;
                         }
                         }
                         catch(java.lang.IndexOutOfBoundsException e) {
-                            System.out.println("NH -> OH sidechain-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
+                            DP.getInstance().w("main", "NH -> OH sidechain-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                         }
                         
@@ -6603,7 +6142,15 @@ public class Main {
                         for(String sidechainOHAA : sidechainOHAAs) {
                         try {
                             
-                        if(a.getResName3().equals("ARG") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
+                        if((a.getResName3().equals("ARG") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(6))) ||
+                           (a.getResName3().equals("ARG") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(8))) ||
+                           (a.getResName3().equals("HIS") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(5))) ||
+                           (a.getResName3().equals("HIS") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(8))) ||
+                           (a.getResName3().equals("LYS") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(7))) ||
+                           (a.getResName3().equals("ASN") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(5))) ||
+                           (a.getResName3().equals("GLN") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(6))) ||
+                           (a.getResName3().equals("TRP") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(6))) ||
+                           (a.getResName3().equals("TRP") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(9)))    ) {
                             numPairContacts[ResContactInfo.TT]++; 
                             numPairContacts[ResContactInfo.CCBH]++;
                             if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
@@ -6611,91 +6158,11 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
                                 contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
                             }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("ARG") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(8))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("HIS") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(5))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("HIS") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(8))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("LYS") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(7))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("ASN") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(5))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("GLN") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("TRP") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("TRP") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(9))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS OHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New SS OHNH: " + x.toString() + "/" + y.toString());
                         }
                         }
                         catch(java.lang.IndexOutOfBoundsException e) {
-                            System.out.println("NH -> OH sidechain-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
+                            DP.getInstance().w("main", "NH -> OH sidechain-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                         }
                         }
@@ -6712,7 +6179,9 @@ public class Main {
                         for(String sidechainOHAA : sidechainOHAAs) {
                         try {
                             
-                        if(a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("SER") && x.hbondAtomAngleBetween(y, atoms_b.get(numOfLastBackboneAtomInResidue))) {
+                        if((a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("SER") && x.hbondAtomAngleBetween(y, atoms_b.get(numOfLastBackboneAtomInResidue))) ||
+                           (a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("THR") && x.hbondAtomAngleBetween(y, atoms_b.get(numOfLastBackboneAtomInResidue))) ||
+                           (a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("TYR") && x.hbondAtomAngleBetween(y, atoms_b.get(10)))    ) {
                             numPairContacts[ResContactInfo.TT]++; 
                             numPairContacts[ResContactInfo.CCHB]++;
                             if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
@@ -6720,35 +6189,15 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
                                 contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
                             }
-                            System.out.println("New SS OHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                            contactFound = true;
-                        }
-                        else if(a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("THR") && x.hbondAtomAngleBetween(y, atoms_b.get(numOfLastBackboneAtomInResidue))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS OHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                            contactFound = true;
-                        }
-                        else if(a.getResName3().equals(sidechainOHAA) && b.getResName3().equals("TYR") && x.hbondAtomAngleBetween(y, atoms_b.get(10))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS OHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New SS OHOH: " + x.toString() + "/" + y.toString());
                             contactFound = true;
                         }
                         
                         if(! contactFound) {
                         // first OH as acceptor
-                        if(a.getResName3().equals("SER") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(numOfLastBackboneAtomInResidue))) {
+                        if((a.getResName3().equals("SER") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(numOfLastBackboneAtomInResidue))) ||
+                           (a.getResName3().equals("THR") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(numOfLastBackboneAtomInResidue))) ||
+                           (a.getResName3().equals("TYR") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(10)))    ) {
                             numPairContacts[ResContactInfo.TT]++; 
                             numPairContacts[ResContactInfo.CCBH]++;
                             if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
@@ -6756,32 +6205,12 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
                                 contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
                             }
-                            System.out.println("New SS OHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("THR") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(numOfLastBackboneAtomInResidue))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS OHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("TYR") && b.getResName3().equals(sidechainOHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(10))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS OHOH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New SS OHOH: " + x.toString() + "/" + y.toString());
                         }
                         }
                         }
                         catch(java.lang.IndexOutOfBoundsException e) {
-                            System.out.println("OH -> OH sidechain-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
+                            DP.getInstance().w("main", "OH -> OH sidechain-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                         }
                     }
@@ -6797,7 +6226,15 @@ public class Main {
                         for(String sidechainNHAA : sidechainNHAAs) {
                         try {
                             
-                        if(a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("ARG") && x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
+                        if((a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("ARG") && x.hbondAtomAngleBetween(y, atoms_b.get(6))) ||
+                           (a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("ARG") && x.hbondAtomAngleBetween(y, atoms_b.get(8))) ||
+                           (a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("HIS") && x.hbondAtomAngleBetween(y, atoms_b.get(5))) ||
+                           (a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("HIS") && x.hbondAtomAngleBetween(y, atoms_b.get(8))) ||
+                           (a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("LYS") && x.hbondAtomAngleBetween(y, atoms_b.get(7))) ||
+                           (a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("ASN") && x.hbondAtomAngleBetween(y, atoms_b.get(5))) ||
+                           (a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("GLN") && x.hbondAtomAngleBetween(y, atoms_b.get(6))) ||
+                           (a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("TRP") && x.hbondAtomAngleBetween(y, atoms_b.get(6))) ||
+                           (a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("TRP") && x.hbondAtomAngleBetween(y, atoms_b.get(9)))    ) {
                             numPairContacts[ResContactInfo.TT]++; 
                             numPairContacts[ResContactInfo.CCHB]++;
                             if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
@@ -6805,101 +6242,21 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
                                 contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
                             }
-                            System.out.println("New SS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                            contactFound = true;
-                        }
-                        else if(a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("ARG") && x.hbondAtomAngleBetween(y, atoms_b.get(8))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                            contactFound = true;
-                        }
-                        else if(a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("HIS") && x.hbondAtomAngleBetween(y, atoms_b.get(5))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                            contactFound = true;
-                        }
-                        else if(a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("HIS") && x.hbondAtomAngleBetween(y, atoms_b.get(8))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                            contactFound = true;
-                        }
-                        else if(a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("LYS") && x.hbondAtomAngleBetween(y, atoms_b.get(7))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                            contactFound = true;
-                        }
-                        else if(a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("ASN") && x.hbondAtomAngleBetween(y, atoms_b.get(5))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                            contactFound = true;
-                        }
-                        else if(a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("GLN") && x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                            contactFound = true;
-                        }
-                        else if(a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("TRP") && x.hbondAtomAngleBetween(y, atoms_b.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                            contactFound = true;
-                        }
-                        else if(a.getResName3().equals(sidechainNHAA) && b.getResName3().equals("TRP") && x.hbondAtomAngleBetween(y, atoms_b.get(9))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCHB]++;
-                            if((minContactDistances[ResContactInfo.CCHB] < 0) || dist < minContactDistances[ResContactInfo.CCHB]) {
-                                minContactDistances[ResContactInfo.CCHB] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCHB] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
-                            }
-                            System.out.println("New SS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New SS NHNH: " + x.toString() + "/" + y.toString());
                             contactFound = true;
                         }
                          
                         if(! contactFound) {
                         // first NH as acceptor
-                        if(a.getResName3().equals("ARG") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
+                        if((a.getResName3().equals("ARG") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(6))) ||
+                           (a.getResName3().equals("ARG") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(8))) ||
+                           (a.getResName3().equals("HIS") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(5))) ||
+                           (a.getResName3().equals("HIS") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(8))) ||
+                           (a.getResName3().equals("LYS") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(7))) ||
+                           (a.getResName3().equals("ASN") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(5))) ||
+                           (a.getResName3().equals("GLN") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(6))) ||
+                           (a.getResName3().equals("TRP") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(6))) ||
+                           (a.getResName3().equals("TRP") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(9)))    ) {
                             numPairContacts[ResContactInfo.TT]++; 
                             numPairContacts[ResContactInfo.CCBH]++;
                             if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
@@ -6907,92 +6264,12 @@ public class Main {
                                 contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
                                 contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
                             }
-                            System.out.println("New SS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("ARG") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(8))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("HIS") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(5))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("HIS") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(8))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("LYS") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(7))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("ASN") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(5))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("GLN") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("TRP") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(6))) {
-                            numPairContacts[ResContactInfo.TT]++; 
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
-                        }
-                        else if(a.getResName3().equals("TRP") && b.getResName3().equals(sidechainNHAA) && y.hbondAtomAngleBetween(x, atoms_a.get(9))) {
-                            numPairContacts[ResContactInfo.TT]++;
-                            numPairContacts[ResContactInfo.CCBH]++;
-                            if((minContactDistances[ResContactInfo.CCBH] < 0) || dist < minContactDistances[ResContactInfo.CCBH]) {
-                                minContactDistances[ResContactInfo.CCBH] = dist;
-                                contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
-                                contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
-                            }
-                            System.out.println("New SS NHNH: " + x.getPdbAtomNum() + "/" + y.getPdbAtomNum());
+                            System.out.println("New SS NHNH: " + x.toString() + "/" + y.toString());
                         }
                         }
                         }
                         catch(java.lang.IndexOutOfBoundsException e) {
-                            System.out.println("NH -> NH sidechain-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
+                            DP.getInstance().w("main", "NH -> NH sidechain-sidechain calculation failed for residues " + x.getPdbResNum() + " and " + y.getPdbResNum() + ". Possibly because of missing atoms of the sidechain in the pdb file.");
                         }
                         
                         }
@@ -7051,6 +6328,7 @@ public class Main {
                             contactAtomNumInResidueA[ResContactInfo.IVDW] = i;
                             contactAtomNumInResidueB[ResContactInfo.IVDW] = j;
                         }
+                        System.out.println("New IVDW: " + x.toString() + "/" + y.toString());
 
 
                         // Check the exact contact type
@@ -7127,6 +6405,7 @@ public class Main {
                     else if(x.isProteinAtom() && y.isLigandAtom()) {
                         // *************************** protein - ligand contact *************************
                         numTotalLigContactsPair++;
+                        System.out.println("New Lig: " + x.toString() + "/" + y.toString());
 
                         // Check the exact contact type
                         if(i <= numOfLastBackboneAtomInResidue) {
@@ -7157,7 +6436,8 @@ public class Main {
                     else if(x.isLigandAtom() && y.isProteinAtom()) {
                         // *************************** ligand - protein contact *************************
                         numTotalLigContactsPair++;
-
+                        System.out.println("New Lig: " + x.toString() + "/" + y.toString());
+                        
                         // Check the exact contact type
                         if(j <= numOfLastBackboneAtomInResidue) {
                             // to be precise, this is a ligand - backbone contact
@@ -7187,6 +6467,7 @@ public class Main {
                     else if(x.isLigandAtom() && y.isLigandAtom()) {
                         // *************************** ligand - ligand contact *************************
                         numTotalLigContactsPair++;
+                        System.out.println("New LigLig: " + x.toString() + "/" + y.toString());
 
                         // no choices here, ligands have no sub type
                         numPairContacts[ResContactInfo.LL]++;
@@ -7221,7 +6502,7 @@ public class Main {
         //non-canonical interactions (new implementation)
         
         int piDist;
-        
+
         //residue b includes aromatic ring (acceptor) and res a is donor
         if (sidechainPiRings.contains(b.getName3())) {           
             //get atoms of six-ring (and five-ring in case of Trp)
@@ -7244,16 +6525,18 @@ public class Main {
                     for (Integer k = 5; k < 10; k++) {
                         five_ring.add(atoms_b.get(k));      
                     }
+                } else {
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough atoms for 5-ring.");
                 }
                 
-                //six_ring includes DC2, CE2, CE3, CZ2, CZ3, CH2
+                //six_ring includes CD2, CE2, CE3, CZ2, CZ3, CH2
                 if (atoms_b.size() >= 13) {
                     six_ring.add(atoms_b.get(7)); //CD2
                     for (Integer k = 9; k < 14; k++) {
                         six_ring.add(atoms_b.get(k));
                     }
                 } else {
-                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough atoms.");
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough atoms for 6-ring.");
                 }
             }
             
@@ -8097,7 +7380,7 @@ public class Main {
                     DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms (five ring).");
                 }
                 
-                //six_ring includes DC2, CE2, CE3, CZ2, CZ3, CH2
+                //six_ring includes CD2, CE2, CE3, CZ2, CZ3, CH2
                 if (atoms_a.size() >= 13) { 
                     six_ring.add(atoms_a.get(7)); //CD2
                     for (Integer k = 9; k < 14; k++) {
