@@ -6510,7 +6510,7 @@ public class Main {
             five_ring.clear();
             if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {                
                 if (atoms_b.size() >= 11) {
-                    for (Integer k = 4; k < 11; k++) {
+                    for (Integer k = 5; k < 11; k++) {
                         six_ring.add(atoms_b.get(k));
                     }
                 }
@@ -7360,7 +7360,8 @@ public class Main {
             five_ring.clear();
             if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {
                 if (atoms_a.size() >= 11) {
-                    for (Integer k = 4; k < 10; k++) {
+                    //CG, CD1, CD2, CE1, CE2, CZ
+                    for (Integer k = 5; k < 11; k++) {
                         six_ring.add(atoms_a.get(k));
                     }
                 }
