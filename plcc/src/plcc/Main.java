@@ -4635,6 +4635,27 @@ public class Main {
                     if( rci != null) {
                         // There were atoms contacts!
                         contactInfo.add(rci);
+                       /* System.out.println("#!# BBHB " + rci.getNumContactsBBHB());
+                        System.out.println("#!# BBBH " + rci.getNumContactsBBBH());
+                        System.out.println("#!# IVDW " + rci.getNumContactsIVDW());
+                        System.out.println("#!# ISS " + rci.getNumContactsISS());
+                        System.out.println("#!# BCHB " + rci.getNumContactsBCHB());
+                        System.out.println("#!# BCBH " + rci.getNumContactsBCBH());
+                        System.out.println("#!# CBHB " + rci.getNumContactsCBHB());
+                        System.out.println("#!# CBBH " + rci.getNumContactsCBBH());
+                        System.out.println("#!# CCHB " + rci.getNumContactsCCHB());
+                        System.out.println("#!# CCBH " + rci.getNumContactsCCBH());
+                        
+                        System.out.println("#!# BB " + rci.getNumContactsBB());
+                        System.out.println("#!# CB " + rci.getNumContactsCB());
+                        System.out.println("#!# BC " + rci.getNumContactsBC());
+                        System.out.println("#!# CC " + rci.getNumContactsCC());
+                        System.out.println("#!# BL " + rci.getNumContactsBL());
+                        System.out.println("#!# LB " + rci.getNumContactsLB());
+                        System.out.println("#!# CL " + rci.getNumContactsCL());
+                        System.out.println("#!# LC " + rci.getNumContactsLC());
+                        System.out.println("#!# LL " + rci.getNumContactsLL());
+                        */
                     }
                 }
                 else {
@@ -5359,7 +5380,7 @@ public class Main {
             XMidpointVector[2] = ringMidKoord[2] - x.getCoordZ();
 
             //calculate parameter 4: N-midpoint-normal angle
-            parameter[3] = PiEffectCalculations.calculateAngleBetw3DVecs(HMidpointVector, normal);
+            parameter[3] = PiEffectCalculations.calculateAngleBetw3DVecs(XMidpointVector, normal);
 
             //converte to degree
             parameter[3] = PiEffectCalculations.converteRadianToDegree(parameter[3]);
@@ -7431,7 +7452,7 @@ public class Main {
                     }
 
                     if ("TRP".equals(b.getName3())) {
-                        piDist = (int)(calculateDistancePiEffect(a.getAtoms().get(0), a.getHydrogenAtoms().get(0), five_ring) / 10);
+                        piDist = (int)(calculateDistancePiEffect(b.getAtoms().get(0), b.getHydrogenAtoms().get(0), five_ring) / 10);
                         if (piDist > 0) {
                             System.out.println("PINH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
                             numPairContacts[ResContactInfo.TT]++;
@@ -7443,7 +7464,7 @@ public class Main {
                             }
                         }
 
-                        piDist = (int)(calculateDistancePiEffect(a.getAtoms().get(0), a.getHydrogenAtoms().get(0), five_ring, false, true) / 10);
+                        piDist = (int)(calculateDistancePiEffect(b.getAtoms().get(0), b.getHydrogenAtoms().get(0), five_ring, false, true) / 10);
                         if (piDist > 0) {
                             System.out.println("PINH EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
                             numPairContacts[ResContactInfo.TT]++;
