@@ -140,7 +140,7 @@ public class Main {
      * The number of different contacts types according to the alternative contact model which are stored for a pair of residues.
      * See calculateAtomContactsBetweenResiduesAlternativeModel() and the ResContactInfo class for details and usage.
      */
-    public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL = 39;
+    public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL = 40;
 
     /**
      * The contacts of a chainName. The 4 fields are: AA 1 index, AA 2 index, atom index in AA 1, atom index in chainName 2.
@@ -7307,15 +7307,15 @@ public class Main {
                             if (piDist > 0) {
                                 System.out.println("CAHCO EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
                                 numPairContacts[ResContactInfo.TT]++;
-                                numPairContacts[ResContactInfo.CAHCO]++;
-                                if (minContactDistances[ResContactInfo.CAHCO] == 0 || piDist > minContactDistances[ResContactInfo.CAHCO]) {
-                                    minContactDistances[ResContactInfo.CAHCO] = piDist;
-                                    contactAtomNumInResidueA[ResContactInfo.CAHCO] = 1; //CA
+                                numPairContacts[ResContactInfo.CCAHCO]++;
+                                if (minContactDistances[ResContactInfo.CCAHCO] == 0 || piDist > minContactDistances[ResContactInfo.CCAHCO]) {
+                                    minContactDistances[ResContactInfo.CCAHCO] = piDist;
+                                    contactAtomNumInResidueA[ResContactInfo.CCAHCO] = 1; //CA
                                     if ("GLU".equals(b.getName3()) || "GLN".equals(b.getName3())) {
-                                        contactAtomNumInResidueB[ResContactInfo.CAHCO] = 7; //OE1
+                                        contactAtomNumInResidueB[ResContactInfo.CCAHCO] = 7; //OE1
                                     }
                                     else {
-                                        contactAtomNumInResidueB[ResContactInfo.CAHCO] = 6; //OD1
+                                        contactAtomNumInResidueB[ResContactInfo.CCAHCO] = 6; //OD1
                                     }
                                 }
                             }
@@ -7331,15 +7331,15 @@ public class Main {
                                 if ( piDist > 0) {
                                     System.out.println("CAHCO EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
                                     numPairContacts[ResContactInfo.TT]++;
-                                    numPairContacts[ResContactInfo.CAHCO]++;
-                                    if (minContactDistances[ResContactInfo.CAHCO] == 0 || piDist > minContactDistances[ResContactInfo.CAHCO]) {
-                                        minContactDistances[ResContactInfo.CAHCO] = piDist;
-                                        contactAtomNumInResidueA[ResContactInfo.CAHCO] = 1; //CA
+                                    numPairContacts[ResContactInfo.CCAHCO]++;
+                                    if (minContactDistances[ResContactInfo.CCAHCO] == 0 || piDist > minContactDistances[ResContactInfo.CCAHCO]) {
+                                        minContactDistances[ResContactInfo.CCAHCO] = piDist;
+                                        contactAtomNumInResidueA[ResContactInfo.CCAHCO] = 1; //CA
                                         if ("GLU".equals(b.getName3()) || "GLN".equals(b.getName3())) {
-                                            contactAtomNumInResidueB[ResContactInfo.CAHCO] = 7; //OE1
+                                            contactAtomNumInResidueB[ResContactInfo.CCAHCO] = 7; //OE1
                                         }
                                         else {
-                                            contactAtomNumInResidueB[ResContactInfo.CAHCO] = 6; //OD1
+                                            contactAtomNumInResidueB[ResContactInfo.CCAHCO] = 6; //OD1
                                         }
                                     }
                                 }
@@ -8171,15 +8171,15 @@ public class Main {
                             if (piDist > 0) {
                                 System.out.println("COCAH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
                                 numPairContacts[ResContactInfo.TT]++;
-                                numPairContacts[ResContactInfo.COCAH]++;
-                                if (minContactDistances[ResContactInfo.COCAH] == 0 || piDist > minContactDistances[ResContactInfo.COCAH]) {
-                                    minContactDistances[ResContactInfo.COCAH] = piDist;
-                                    contactAtomNumInResidueA[ResContactInfo.COCAH] = 1; //CA
+                                numPairContacts[ResContactInfo.CCOCAH]++;
+                                if (minContactDistances[ResContactInfo.CCOCAH] == 0 || piDist > minContactDistances[ResContactInfo.CCOCAH]) {
+                                    minContactDistances[ResContactInfo.CCOCAH] = piDist;
+                                    contactAtomNumInResidueA[ResContactInfo.CCOCAH] = 1; //CA
                                     if ("GLU".equals(a.getName3()) || "GLN".equals(a.getName3())) {
-                                        contactAtomNumInResidueB[ResContactInfo.COCAH] = 7; //OE1
+                                        contactAtomNumInResidueB[ResContactInfo.CCOCAH] = 7; //OE1
                                     }
                                     else {
-                                        contactAtomNumInResidueB[ResContactInfo.COCAH] = 6; //OD1
+                                        contactAtomNumInResidueB[ResContactInfo.CCOCAH] = 6; //OD1
                                     }
                                 }
                             }
@@ -8195,15 +8195,15 @@ public class Main {
                                 if ( piDist > 0) {
                                     System.out.println("COCAH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
                                     numPairContacts[ResContactInfo.TT]++;
-                                    numPairContacts[ResContactInfo.COCAH]++;
-                                    if (minContactDistances[ResContactInfo.COCAH] == 0 || piDist > minContactDistances[ResContactInfo.COCAH]) {
-                                        minContactDistances[ResContactInfo.COCAH] = piDist;
-                                        contactAtomNumInResidueA[ResContactInfo.COCAH] = 1; //CA
+                                    numPairContacts[ResContactInfo.CCOCAH]++;
+                                    if (minContactDistances[ResContactInfo.CCOCAH] == 0 || piDist > minContactDistances[ResContactInfo.CCOCAH]) {
+                                        minContactDistances[ResContactInfo.CCOCAH] = piDist;
+                                        contactAtomNumInResidueA[ResContactInfo.CCOCAH] = 1; //CA
                                         if ("GLU".equals(a.getName3()) || "GLN".equals(a.getName3())) {
-                                            contactAtomNumInResidueB[ResContactInfo.COCAH] = 7; //OE1
+                                            contactAtomNumInResidueB[ResContactInfo.CCOCAH] = 7; //OE1
                                         }
                                         else {
-                                            contactAtomNumInResidueB[ResContactInfo.COCAH] = 6; //OD1
+                                            contactAtomNumInResidueB[ResContactInfo.CCOCAH] = 6; //OD1
                                         }
                                     }
                                 }

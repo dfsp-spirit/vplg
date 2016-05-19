@@ -65,8 +65,10 @@ public class ResContactInfo {
     public static final Integer PIXOH = 34;     // 34 = # of interchain X-O-H...Pi contacts witch X = Ser || Thr || Tyr, sidechain-sidechain, acceptor-donor(non-canonical interaction
     public static final Integer PROCDHPI = 35;  // 35 = # of interchain Pro-CD-H...Pi contacts, sidechain-sidechain, donor-acceptor (non-canonical)
     public static final Integer PIPROCDH = 36;  // 36 = # of interchain Pro-CD-H...Pi contacts, sidechain-sidechain, acceptor-donor (non-canonical)
-    public static final Integer CAHCO = 37;     // 37 = # of interchain CA-H...O=C contacts, mainchain-sidechain, donor-acceptor (non-canonical)
-    public static final Integer COCAH = 38;     // 38 = # of interchain CA-H...O=C contacts, mainchain-sidechain, acceptor-donor (non-canonical)
+    public static final Integer CCAHCO = 37;    // 37 = # of interchain CA-H...O=C contacts, mainchain-sidechain, donor-acceptor (non-canonical)
+    public static final Integer CCOCAH = 38;    // 38 = # of interchain CA-H...O=C contacts, mainchain-sidechain, acceptor-donor (non-canonical)
+    public static final Integer BCAHCO = 39;    // 39 = # of interchain CA-H...O=C contacts, mainchain-mainchain, donor-acceptor (non-canonical)
+    public static final Integer BCOCAH = 40;    // 40 = # of interchain CA-H...O=C contacts, mainchain-mainchain, acceptor-donor (non-canonical)
     
     
     
@@ -304,13 +306,21 @@ public class ResContactInfo {
     public Integer getPIPROCDHContactAtomNumA() { return(contactAtomIndexInResidueA[PIPROCDH] + 1); }
     public Integer getPIPROCDHContactAtomNumB() { return(contactAtomIndexInResidueB[PIPROCDH] + 1); }   
     
-    public Integer getCAHCOContactDist() { return(minContactDistances[CAHCO]); }
-    public Integer getCAHCOContactAtomNumA() { return(contactAtomIndexInResidueA[CAHCO] + 1); }
-    public Integer getCAHCOContactAtomNumB() { return(contactAtomIndexInResidueB[CAHCO] + 1); }
+    public Integer getCCAHCOContactDist() { return(minContactDistances[CCAHCO]); }
+    public Integer getCCAHCOContactAtomNumA() { return(contactAtomIndexInResidueA[CCAHCO] + 1); }
+    public Integer getCCAHCOContactAtomNumB() { return(contactAtomIndexInResidueB[CCAHCO] + 1); }
     
-    public Integer getCOCAHContactDist() { return(minContactDistances[COCAH]); }
-    public Integer getCOCAHContactAtomNumA() { return(contactAtomIndexInResidueA[COCAH] + 1); }
-    public Integer getCOCAHContactAtomNumB() { return(contactAtomIndexInResidueB[COCAH] + 1); }
+    public Integer getCCOCAHContactDist() { return(minContactDistances[CCOCAH]); }
+    public Integer getCCOCAHContactAtomNumA() { return(contactAtomIndexInResidueA[CCOCAH] + 1); }
+    public Integer getCCOCAHContactAtomNumB() { return(contactAtomIndexInResidueB[CCOCAH] + 1); }
+    
+    public Integer getBCAHCOContactDist() { return(minContactDistances[BCAHCO]); }
+    public Integer getBCAHCOContactAtomNumA() { return(contactAtomIndexInResidueA[BCAHCO] + 1); }
+    public Integer getBCAHCOContactAtomNumB() { return(contactAtomIndexInResidueB[BCAHCO] + 1); }
+    
+    public Integer getBCOCAHContactDist() { return(minContactDistances[BCOCAH]); }
+    public Integer getBCOCAHContactAtomNumA() { return(contactAtomIndexInResidueA[BCOCAH] + 1); }
+    public Integer getBCOCAHContactAtomNumB() { return(contactAtomIndexInResidueB[BCOCAH] + 1); }
     
     
 // the getters for statistics follow
@@ -352,8 +362,10 @@ public class ResContactInfo {
     public Integer getNumContactsPIXOH() { return(numPairContacts[PIXOH]); }
     public Integer getNumContactsPROCDHPI() { return(numPairContacts[PROCDHPI]); }
     public Integer getNumContactsPIPROCDH() { return(numPairContacts[PIPROCDH]); }
-    public Integer getNumContactsCACOH() { return(numPairContacts[CAHCO]); }
-    public Integer getNumContactsCOCAH() { return(numPairContacts[COCAH]); }
+    public Integer getNumContactsCCACOH() { return(numPairContacts[CCAHCO]); }
+    public Integer getNumContactsCCOCAH() { return(numPairContacts[CCOCAH]); }
+    public Integer getNumContactsBCACOH() { return(numPairContacts[BCAHCO]); }
+    public Integer getNumContactsBCOCAH() { return(numPairContacts[BCOCAH]); }
     
     
     // DEBUG only
