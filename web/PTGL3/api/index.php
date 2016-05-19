@@ -404,7 +404,8 @@ EOT;
     'graphformat_json' => 'json',
     'textformat_plain' => 'plain',
     'textformat_json' => 'json',
-    'imageformat' => 'png|svg'
+    'imageformat' => 'png|svg',
+    'motifname' => '4helix|globin|barrel|immuno|propeller|jelly|ubi|plait|rossman|tim'
 ));
 
 /**
@@ -445,6 +446,46 @@ if(!$db) {
 //else {
 //  echo "Connected to database $DB_NAME at host $DB_HOST.\n";
 //}
+
+
+function get_motif_id($motif_abbreviation) {
+	$motif_id = -1;
+	if($motif_abbreviation === "4helix") {
+		$motif_id = 1;
+	}
+	else if($motif_abbreviation === "globin") {
+		$motif_id = 2;
+	}
+	else if($motif_abbreviation === "barrel") {
+		$motif_id = 3;
+	}
+	else if($motif_abbreviation === "immuno") {
+		$motif_id = 4;
+	}
+	else if($motif_abbreviation === "propeller") {
+		$motif_id = 5;
+	}
+	else if($motif_abbreviation === "jelly") {
+		$motif_id = 6;
+	}
+	else if($motif_abbreviation === "ubi") {
+		$motif_id = 7;
+	}
+	else if($motif_abbreviation === "plait") {
+		$motif_id = 8;
+	}
+	else if($motif_abbreviation === "rossman") {
+		$motif_id = 9;
+	}
+	else if($motif_abbreviation === "tim") {
+		$motif_id = 10;
+	}
+	else {
+		$motif_id = -1;
+	}
+	return $motif_id;
+}
+
 
 // ----------------- define the GET routes we need ---------------------
 
@@ -694,6 +735,7 @@ $app->get('/chains/:pdbid', function ($pdbid) use($db) {
 	$array = pg_fetch_all($result);
     for($i = 0; $i < count($array); $i++){
         $row = $array[$i];
+        $num_res++;
 		$json .= '"' . $row['chain_name'] . '"';
 		if($i < count($array) - 1) {
 		    $json .= ", ";
@@ -702,6 +744,35 @@ $app->get('/chains/:pdbid', function ($pdbid) use($db) {
 	$json .= "]";
 	echo $json;
     //echo "You requested all chain names of PDB $pdbid.\n";
+});
+
+
+// get all chains with a certain motif
+$app->get('/pdbchains_containing_motif/:motifname', function ($motifname) use($db) {
+    $motifid = get_motif_id($motifname);
+    $query = "SELECT c.chain_name, p.pdb_id
+                            FROM plcc_nm_chaintomotif c2m
+                            INNER JOIN plcc_chain c
+                            ON c2m.chain_id = c.chain_id				   
+                            INNER JOIN plcc_protein p
+                            ON p.pdb_id = c.pdb_id 
+                            WHERE c2m.motif_id = '" . $motifid ."'";
+    $result = pg_query($db, $query);
+    
+    $num_res = 0;
+	//["somestring1", "somestring2"]
+	$json = "[";
+	$array = pg_fetch_all($result);
+    for($i = 0; $i < count($array); $i++){
+        $row = $array[$i];
+        $num_res++;
+		$json .= '"' . $row['pdb_id'] . $row['chain_name'] . '"';
+		if($i < count($array) - 1) {
+		    $json .= ", ";
+		}
+	}
+	$json .= "]";
+	echo $json;
 });
 
 
