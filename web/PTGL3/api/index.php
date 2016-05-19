@@ -319,18 +319,18 @@ $app->get(
 				</ul>
 				Note that this returns a very long list for some motifs.
 				
-				The following names are available:
+				The following names (in bold) are available:
 				<ul>
-				    <li>4helix: 4 helix bundle</li>
-				    <li>globin: globin fold</li>
-				    <li>barrel: beta barrel</li>
-				    <li>immuno: immunoglobin fold</li>
-				    <li>propeller: beta propeller</li>
-				    <li>jelly: jelly roll</li>
-				    <li>ubi: ubiquitin fold</li>
-				    <li>plait: beta plait</li>
-				    <li>rossman: rossman fold</li>
-				    <li>tim: TIM barrel</li>
+				    <li><b>4helix</b> : 4 helix bundle</li>
+				    <li><b>globin</b> : globin fold</li>
+				    <li><b>barrel</b> : beta barrel</li>
+				    <li><b>immuno</b> : immunoglobin fold</li>
+				    <li><b>propeller</b> : beta propeller</li>
+				    <li><b>jelly</b> : jelly roll</li>
+				    <li><b>ubi</b> : ubiquitin fold</li>
+				    <li><b>plait</b> : beta plait</li>
+				    <li><b>rossman</b> : rossman fold</li>
+				    <li><b>tim</b> : TIM barrel</li>
 				    
 				</ul>
 				
