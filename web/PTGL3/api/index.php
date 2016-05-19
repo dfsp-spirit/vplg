@@ -317,6 +317,7 @@ $app->get(
 				<ul>
 				<li>&lt;motifname&gt; the name of the motif.</li>
 				</ul>
+				Note that this returns a very long list for some motifs.
 				
 				The following names are available:
 				<ul>
