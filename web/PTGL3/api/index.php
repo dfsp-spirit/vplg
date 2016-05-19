@@ -139,7 +139,7 @@ $app->get(
                 <p>
 				All data must be retrieved via GET. Atm, no authentication is required to access the API.
 				<br><br>
-				Learn howto address: <a href=#address_pg">Protein graphs</a> |  <a href="#address_fg">Folding graphs</a> | <a href="#address_linnot">Linear notations</a>
+				Learn howto address: <a href=#address_pg">Protein graphs</a> |  <a href="#address_fg">Folding graphs</a> | <a href="#address_linnot">Linear notations</a> | <a href="#motif">Motifs</a>
 				<br>
 				
 				<a name="address_pg"></a>
@@ -307,6 +307,50 @@ $app->get(
 
                 </p>                
             </section>
+            
+            
+            			<a name="motif"></a>
+            <section style="padding-bottom: 20px">
+                <h2>Motif queries</h2>
+                <p>
+                <br> To query for PDB chains containing a motif, you need the following information:
+				<ul>
+				<li>&lt;motifname&gt; the name of the motif.</li>
+				</ul>
+				
+				The following names are available:
+				<ul>
+				    <li>4helix: 4 helix bundle</li>
+				    <li>globin: globin fold</li>
+				    <li>barrel: beta barrel</li>
+				    <li>immuno: immunoglobin fold</li>
+				    <li>propeller: beta propeller</li>
+				    <li>jelly: jelly roll</li>
+				    <li>ubi: ubiquitin fold</li>
+				    <li>plait: beta plait</li>
+				    <li>rossman: rossman fold</li>
+				    <li>tim: TIM barrel</li>
+				    
+				</ul>
+				
+                
+                                    
+				    All of these return data in JSON format only:
+						<br><br>
+						
+			            A JSON list of all protein chains (e.g., '7timA') that contain a certain motif:
+						
+					    <ul>
+						<li>format: <i>/<b>pdbchains_containing_motif</b>/&lt;motifname&gt;/json</i> </li>
+			            <li>example: <i><a href="$ptgl_api_url/pdbchains_containing_motif/4helix/json" target="_blank">/api/index.php/pdbchains_containing_motif/4helix/json</a></i> retrieves a list of protein chains that contain the 4helix motif in JSON format.</li>
+						</ul>
+						<br>
+						
+
+                </p>                
+            </section>
+
+            
 			
 			
 						<a name="example_restclient_code"></a>
@@ -748,7 +792,7 @@ $app->get('/chains/:pdbid', function ($pdbid) use($db) {
 
 
 // get all chains with a certain motif
-$app->get('/pdbchains_containing_motif/:motifname', function ($motifname) use($db) {
+$app->get('/pdbchains_containing_motif/:motifname/:textformat_json', function ($motifname) use($db) {
     $motifid = get_motif_id($motifname);
     $query = "SELECT c.chain_name, p.pdb_id
                             FROM plcc_nm_chaintomotif c2m
