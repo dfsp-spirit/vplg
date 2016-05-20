@@ -140,7 +140,7 @@ public class Main {
      * The number of different contacts types according to the alternative contact model which are stored for a pair of residues.
      * See calculateAtomContactsBetweenResiduesAlternativeModel() and the ResContactInfo class for details and usage.
      */
-    public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL = 40;
+    public static final Integer NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL = 41;
 
     /**
      * The contacts of a chainName. The 4 fields are: AA 1 index, AA 2 index, atom index in AA 1, atom index in chainName 2.
@@ -6536,7 +6536,7 @@ public class Main {
                     }
                 }
                 else {
-                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough atoms.");
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() + ") contains not enough atoms.");
                 }
 
             } else if ("TRP".equals(b.getName3())) {
@@ -6547,7 +6547,7 @@ public class Main {
                         five_ring.add(atoms_b.get(k));      
                     }
                 } else {
-                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough atoms for 5-ring.");
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough atoms for 5-ring.");
                 }
                 
                 //six_ring includes CD2, CE2, CE3, CZ2, CZ3, CH2
@@ -6557,7 +6557,7 @@ public class Main {
                         six_ring.add(atoms_b.get(k));
                     }
                 } else {
-                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough atoms for 6-ring.");
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough atoms for 6-ring.");
                 }
             }
             
@@ -6628,11 +6628,11 @@ public class Main {
             }
             else {
                 if (! (atoms_a.size() > 0)) {
-                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains no atoms."
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains no atoms."
                         + " Continue search in next residues.");
                 }
                 else {
-                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains no hydrogen."
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains no hydrogen."
                         + " Continue search in next residues.");
                 }
             }
@@ -6706,11 +6706,11 @@ public class Main {
                 }
                 else {
                     if (! (atoms_a.size() >= 9)) {
-                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms."
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms."
                         + " Continue search in next residues.");
                     }
                     else {
-                        DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains no hydrogen."
+                        DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains no hydrogen."
                             + " Continue search in next residues.");
                     }
                 }
@@ -6790,11 +6790,11 @@ public class Main {
                 }
                 else {
                     if (! (atoms_a.size() >= 10)) {
-                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms."
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms."
                         + " Continue search in next residues.");
                     }
                     else {
-                        DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains no hydrogen."
+                        DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains no hydrogen."
                             + " Continue search in next residues.");
                     }
                 }
@@ -6973,17 +6973,17 @@ public class Main {
                     }
                 }
                 else {
-                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains no CA and/or HA at expected position."
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains no CA and/or HA at expected position."
                             + " Continue search in next residues.");
                 }
             }
             else {
                 if ((! (atoms_a.size() > 2)) || "PHE".equals(a.getName3()) && !(atoms_a.size() > 2)) {
-                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms (no CA)."
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms (no CA)."
                         + " Continue search in next residues.");
                 }
                 else {
-                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough hydrogen (no HA)."
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough hydrogen (no HA)."
                         + " Continue search in next residues.");
                 }
             }
@@ -7056,11 +7056,11 @@ public class Main {
                 }
                 else {
                     if (! (atoms_a.size() >= 7)) {
-                        DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms."
+                        DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms."
                             + " Continue search in next residues.");
                     }
                     else {
-                        DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough hydrogens."
+                        DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough hydrogens."
                             + " Continue search in next residues.");
                     }
                 }
@@ -7131,11 +7131,11 @@ public class Main {
                 }
                 else {
                     if (! (atoms_a.size() >= 5)) {
-                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms (no SG)."
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms (no SG)."
                         + " Continue search in next residues.");
                     }
                     else {
-                        DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough hydrogen (no HG)."
+                        DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough hydrogen (no HG)."
                             + " Continue search in next residues.");
                     }
                 }         
@@ -7153,10 +7153,10 @@ public class Main {
                     }
                     else {
                         if (! (atoms_a.size() >= 6)) {
-                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms (no OG).");
+                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms (no OG).");
                         }
                         else {
-                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough hydrogens (no HG).");
+                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough hydrogens (no HG).");
                         }
                     }
                 }
@@ -7167,10 +7167,10 @@ public class Main {
                     }
                     else {
                         if (! (atoms_a.size() >= 6)) {
-                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms (no OG1).");
+                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms (no OG1).");
                         }
                         else {
-                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough hydrogens (no HG1).");
+                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough hydrogens (no HG1).");
                         }
                     }
                 }
@@ -7181,10 +7181,10 @@ public class Main {
                     }
                     else {
                         if (! (atoms_a.size() >= 12)) {
-                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms (no OH).");
+                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms (no OH).");
                         }
                         else {
-                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough hydrogens (no HH).");
+                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough hydrogens (no HH).");
                         }
                     }
                 }
@@ -7271,8 +7271,8 @@ public class Main {
             }
         }
         
-        //C=O in residue b acts as acceptor
-        //CAHCO
+        //C=O in sidechain of aminoacid b acts as acceptor
+        //CCAHCO
         if (sidechainOAAs.contains(b.getName3())) {
             //check for a valid res b
             if ( (("GLU".equals(b.getName3()) || "GLN".equals(b.getName3())) && atoms_b.size() >= 8) ||
@@ -7305,7 +7305,7 @@ public class Main {
                                 }
                             }
                             if (piDist > 0) {
-                                System.out.println("CAHCO EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
+                                System.out.println("CCAHCO EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.CCAHCO]++;
                                 if (minContactDistances[ResContactInfo.CCAHCO] == 0 || piDist > minContactDistances[ResContactInfo.CCAHCO]) {
@@ -7329,7 +7329,7 @@ public class Main {
                                     piDist = (int)(calculateDistancePiEffect(atoms_a.get(1), a.getHydrogenAtoms().get(2), atoms_b.get(5), atoms_b.get(6)) / 10);
                                 }
                                 if ( piDist > 0) {
-                                    System.out.println("CAHCO EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
+                                    System.out.println("CCAHCO EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.CCAHCO]++;
                                     if (minContactDistances[ResContactInfo.CCAHCO] == 0 || piDist > minContactDistances[ResContactInfo.CCAHCO]) {
@@ -7347,33 +7347,125 @@ public class Main {
                             }
                         }
                         else {
-                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains no CA and/or HA at expected position."
+                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains no CA and/or HA at expected position."
                                     + " Continue search in next residues.");
                         }
                     }
                     else {
                         if ((! (atoms_a.size() > 2)) || "PHE".equals(a.getName3()) && !(atoms_a.size() > 2)) {
-                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms (no CA)."
+                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms (no CA)."
                                 + " Continue search in next residues.");
                         }
                         else {
-                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough hydrogen (no HA)."
+                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough hydrogen (no HA)."
                                 + " Continue search in next residues.");
                         }
                     }
             
                 }
                 else {
-                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not the expected atom names for C=O."
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not the expected atom names for C=O."
                         + " Continue seach in next residues.");
                 }
             }
             else {
-                DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough atoms (no C=O)."
+                DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough atoms (no C=O)."
                     + " Continue search in next residues.");
             }
         }
         
+        //BCAHCO
+        if (atoms_a.size() >= 2 && (a.getHydrogenAtoms().size() >= 2 || a.getName3().equals("PRO") && 
+                a.getHydrogenAtoms().size() >= 1) && atoms_b.size() >= 4) {
+            
+            if (atoms_a.get(1).getAtomShortName().equals("CA") && ( ((! a.getName3().equals("PRO")) &&
+                    ( a.getHydrogenAtoms().get(1).getAtomShortName().equals("HA")) || a.getName3().equals("GLY") && 
+                    a.getHydrogenAtoms().get(1).getAtomShortName().equals("HA2")) || 
+                    a.getName3().equals("PRO") && a.getHydrogenAtoms().get(0).getAtomShortName().equals("HA") ) &&
+                    atoms_b.get(2).getAtomShortName().equals("C") && atoms_b.get(3).getAtomShortName().equals("O")) {
+                
+                if (a.getName3().equals("PRO")) {
+                    piDist = (int)(calculateDistancePiEffect(atoms_a.get(1), a.getHydrogenAtoms().get(0), atoms_b.get(2), atoms_b.get(3)) / 10);
+                }
+                else {
+                    piDist = (int)(calculateDistancePiEffect(atoms_a.get(1), a.getHydrogenAtoms().get(1), atoms_b.get(2), atoms_b.get(3)) / 10);
+                }
+                if (piDist > 0) {
+                    System.out.println("BCAHCO EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
+                    numPairContacts[ResContactInfo.TT]++;
+                    numPairContacts[ResContactInfo.BCAHCO]++;
+                    if (minContactDistances[ResContactInfo.BCAHCO] == 0 || piDist > minContactDistances[ResContactInfo.BCAHCO]) {
+                        minContactDistances[ResContactInfo.BCAHCO] = piDist;
+                        contactAtomNumInResidueA[ResContactInfo.BCAHCO] = 1; //CA
+                        contactAtomNumInResidueB[ResContactInfo.BCAHCO] = 3; //O         
+                    }
+                }
+                
+                //GLY contains two HA: same procedure again
+                if (a.getName3().equals("GLY") && a.getHydrogenAtoms().size() >= 3) {
+                    if (a.getHydrogenAtoms().get(2).getAtomShortName().equals("HA3")) {
+                        
+                        piDist = (int)(calculateDistancePiEffect(atoms_a.get(1), a.getHydrogenAtoms().get(2), atoms_b.get(2), atoms_b.get(3)) / 10);
+                        if (piDist > 0) {
+                            System.out.println("BCAHCO EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
+                            numPairContacts[ResContactInfo.TT]++;
+                            numPairContacts[ResContactInfo.BCAHCO]++;
+                            if (minContactDistances[ResContactInfo.BCAHCO] == 0 || piDist > minContactDistances[ResContactInfo.BCAHCO]) {
+                                minContactDistances[ResContactInfo.BCAHCO] = piDist;
+                                contactAtomNumInResidueA[ResContactInfo.BCAHCO] = 1; //CA
+                                contactAtomNumInResidueB[ResContactInfo.BCAHCO] = 3; //O         
+                            }
+                        }
+                        
+                    }
+                    else {
+                        DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not the expected atom name (HA3)"
+                            + " for calculation of BCAHCO. Continue search in next residue.");
+                    }
+                }
+                else {
+                    if (a.getName3().equals("GLY") && ! (a.getHydrogenAtoms().size() >= 3)) {
+                        DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains no (second) HA"
+                            + " in calculation of BCAHCO. Continue search in next residue.");
+                    }
+                }
+                //Gly Abfragen
+            }
+            else {
+                if (! (atoms_a.get(1).getAtomShortName().equals("CA"))) {
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") "
+                            + "contains not the expected atom name (CA)"
+                            + " for calculation of BCAHCO. Continue search in next residue.");
+                }
+                else if (! (atoms_b.get(2).getAtomShortName().equals("C") && atoms_b.get(3).getAtomShortName().equals("O"))) {
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") "
+                            + "contains not the expected atom name (C or O)"
+                            + " for calculation of BCAHCO. Continue search in next residue.");
+                }
+                else { // no HA at expected position
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") "
+                            + "contains not the expected atom name (HA or HA2 in case of GLY)"
+                            + " for calculation of BCAHCO. Continue search in next residue.");
+                }
+            }
+        }
+        else {
+            if (! (atoms_a.size() >= 2)) {
+                DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") "
+                        + "contains not enough atoms (no CA for BCAHCO)."
+                        + " Continue search in next residue.");
+            }
+            else if (! (a.getHydrogenAtoms().size() >= 2)) {
+                DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") "
+                        + "contains not enough hydrogens (no HA for BCAHCO)."
+                        + " Continue search in next residue.");
+            }
+            else { // ! atoms_b.size() >= 4
+                DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") "
+                        + "ontains not enough atoms (no C=O for BCAHCO)."
+                        + " Continue search in next residue.");
+            }
+        }    
         
         //residue a includes aromatic ring and res b is donor
         if (sidechainPiRings.contains(a.getName3())) {
@@ -7387,7 +7479,7 @@ public class Main {
                     }
                 }
                 else {
-                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms (six ring).");
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms (six ring).");
                 }
 
             } else if ("TRP".equals(a.getName3())) {
@@ -7399,7 +7491,7 @@ public class Main {
                     }
                 }
                 else {
-                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms (five ring).");
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms (five ring).");
                 }
                 
                 //six_ring includes CD2, CE2, CE3, CZ2, CZ3, CH2
@@ -7410,7 +7502,7 @@ public class Main {
                     }
                 }
                 else {
-                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms (six ring).");
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms (six ring).");
                 }
             }
             
@@ -7480,11 +7572,11 @@ public class Main {
             }
             else {
                 if (! (atoms_b.size() > 0)) {
-                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains no atoms."
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains no atoms."
                         + " Continue search in next residues.");
                     }
                 else {
-                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains no hydrogens."
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains no hydrogens."
                         + " Continue search in next residues.");
                 }
             }
@@ -7558,11 +7650,11 @@ public class Main {
                 }
                 else {
                     if (! (atoms_b.size() >= 9)) {
-                        DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough atoms (no NZ)."
+                        DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough atoms (no NZ)."
                             + " Continue search in next residues.");
                         }
                     else {
-                        DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains no hydrogens."
+                        DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains no hydrogens."
                             + " Continue search in next residues.");
                     }
                 }
@@ -7650,11 +7742,11 @@ public class Main {
                 }
                 else {
                     if (! (atoms_b.size() >= 10)) {
-                        DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough atoms."
+                        DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough atoms."
                             + " Continue search in next residues.");
                         }
                     else {
-                        DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains no hydrogens."
+                        DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains no hydrogens."
                             + " Continue search in next residues.");
                     }
                 }  
@@ -7835,17 +7927,17 @@ public class Main {
                     }
                 }
                 else {
-                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains no CA and/or HA at expected position."
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains no CA and/or HA at expected position."
                             + " Continue search in next residues.");
                 }
             }
             else {
                 if ((! (atoms_b.size() > 2)) || "PHE".equals(b.getName3()) && !(atoms_b.size() > 2)) {
-                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough atoms (no CA)."
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough atoms (no CA)."
                         + " Continue search in next residues.");
                 }
                 else {
-                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough hydrogen (no HA)."
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough hydrogen (no HA)."
                         + " Continue search in next residues.");
                 }
             }
@@ -7918,11 +8010,11 @@ public class Main {
                 }
                 else {
                     if (! (atoms_a.size() >= 7)) {
-                        DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough atoms."
+                        DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough atoms."
                             + " Continue search in next residues.");
                     }
                     else {
-                        DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough hydrogens."
+                        DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough hydrogens."
                             + " Continue search in next residues.");
                     }
                 }
@@ -7995,11 +8087,11 @@ public class Main {
                 }
                 else {
                     if (! (atoms_a.size() >= 5)) {
-                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough atoms (no SG)."
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough atoms (no SG)."
                         + " Continue search in next residues.");
                     }
                     else {
-                        DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough hydrogen (no HG)."
+                        DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough hydrogen (no HG)."
                             + " Continue search in next residues.");
                     }
                 }
@@ -8017,10 +8109,10 @@ public class Main {
                     }
                     else {
                         if (! (atoms_b.size() >= 6)) {
-                            DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough atoms (no OG).");
+                            DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough atoms (no OG).");
                         }
                         else {
-                            DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough hydrogens (no HG).");
+                            DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough hydrogens (no HG).");
                         }
                     }
                 }
@@ -8031,10 +8123,10 @@ public class Main {
                     }
                     else {
                         if (! (atoms_b.size() >= 6)) {
-                            DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough atoms (no OG1).");
+                            DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough atoms (no OG1).");
                         }
                         else {
-                            DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough hydrogens (no HG1).");
+                            DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough hydrogens (no HG1).");
                         }
                     }
                 }
@@ -8045,10 +8137,10 @@ public class Main {
                     }
                     else {
                         if (! (atoms_b.size() >= 12)) {
-                            DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough atoms (no OH).");
+                            DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough atoms (no OH).");
                         }
                         else {
-                            DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough hydrogens (no HH).");
+                            DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough hydrogens (no HH).");
                         }
                     }
                 }
@@ -8135,8 +8227,8 @@ public class Main {
             }
         }
         
-        //C=O in residue a acts as acceptor
-        //COCAH
+        //C=O in sidechain of aminoacid a acts as acceptor
+        //CCOCAH
         if (sidechainOAAs.contains(a.getName3())) {
             //check for a valid res a
             if ( (("GLU".equals(a.getName3()) || "GLN".equals(a.getName3())) && atoms_a.size() >= 8) ||
@@ -8169,7 +8261,7 @@ public class Main {
                                 }
                             }
                             if (piDist > 0) {
-                                System.out.println("COCAH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
+                                System.out.println("CCOCAH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.CCOCAH]++;
                                 if (minContactDistances[ResContactInfo.CCOCAH] == 0 || piDist > minContactDistances[ResContactInfo.CCOCAH]) {
@@ -8193,7 +8285,7 @@ public class Main {
                                     piDist = (int)(calculateDistancePiEffect(atoms_b.get(1), b.getHydrogenAtoms().get(2), atoms_a.get(5), atoms_a.get(6)) / 10);
                                 }
                                 if ( piDist > 0) {
-                                    System.out.println("COCAH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
+                                    System.out.println("CCOCAH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.CCOCAH]++;
                                     if (minContactDistances[ResContactInfo.CCOCAH] == 0 || piDist > minContactDistances[ResContactInfo.CCOCAH]) {
@@ -8211,30 +8303,124 @@ public class Main {
                             }
                         }
                         else {
-                            DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains no CA and/or HA at expected position."
+                            DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains no CA and/or HA at expected position."
                                     + " Continue search in next residues.");
                         }
                     }
                     else {
                         if ((! (atoms_b.size() > 2)) || "PHE".equals(b.getName3()) && !(atoms_b.size() > 2)) {
-                            DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough atoms (no CA)."
+                            DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough atoms (no CA)."
                                 + " Continue search in next residues.");
                         }
                         else {
-                            DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + ") contains not enough hydrogen (no HA)."
+                            DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough hydrogen (no HA)."
                                 + " Continue search in next residues.");
                         }
                     }
             
                 }
                 else {
-                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not the expected atom names for C=O."
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not the expected atom names for C=O."
                         + " Continue seach in next residues.");
                 }
             }
             else {
-                DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + ") contains not enough atoms (no C=O)."
+                DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms (no C=O)."
                     + " Continue search in next residues.");
+            }
+        }
+        
+        //BCOCAH
+        if (atoms_b.size() >= 2 && (b.getHydrogenAtoms().size() >= 2 || b.getName3().equals("PRO") && 
+                b.getHydrogenAtoms().size() >= 1) && atoms_a.size() >= 4) {
+            
+            if (atoms_b.get(1).getAtomShortName().equals("CA") && ( ((! b.getName3().equals("PRO")) &&
+                    ( b.getHydrogenAtoms().get(1).getAtomShortName().equals("HA")) || b.getName3().equals("GLY") && 
+                    b.getHydrogenAtoms().get(1).getAtomShortName().equals("HA2")) || 
+                    b.getName3().equals("PRO") && b.getHydrogenAtoms().get(0).getAtomShortName().equals("HA") ) &&
+                    atoms_a.get(2).getAtomShortName().equals("C") && atoms_a.get(3).getAtomShortName().equals("O")) {
+                
+                if (b.getName3().equals("PRO")) {
+                    piDist = (int)(calculateDistancePiEffect(atoms_b.get(1), b.getHydrogenAtoms().get(0), atoms_a.get(2), atoms_a.get(3)) / 10);
+                }
+                else {
+                    piDist = (int)(calculateDistancePiEffect(atoms_b.get(1), b.getHydrogenAtoms().get(1), atoms_a.get(2), atoms_a.get(3)) / 10);
+                }
+                if (piDist > 0) {
+                    System.out.println("BCOCAH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
+                    numPairContacts[ResContactInfo.TT]++;
+                    numPairContacts[ResContactInfo.BCOCAH]++;
+                    if (minContactDistances[ResContactInfo.BCOCAH] == 0 || piDist > minContactDistances[ResContactInfo.BCOCAH]) {
+                        minContactDistances[ResContactInfo.BCOCAH] = piDist;
+                        contactAtomNumInResidueA[ResContactInfo.BCOCAH] = 1; //CA
+                        contactAtomNumInResidueB[ResContactInfo.BCOCAH] = 3; //O         
+                    }
+                }
+                
+                //GLY contains two HA: same procedure again
+                if (b.getName3().equals("GLY") && b.getHydrogenAtoms().size() >= 3) {
+                    if (b.getHydrogenAtoms().get(2).getAtomShortName().equals("HA3")) {
+                        
+                        piDist = (int)(calculateDistancePiEffect(atoms_b.get(1), b.getHydrogenAtoms().get(2), atoms_a.get(2), atoms_a.get(3)) / 10);
+                        if (piDist > 0) {
+                            System.out.println("BCOCAH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
+                            numPairContacts[ResContactInfo.TT]++;
+                            numPairContacts[ResContactInfo.BCOCAH]++;
+                            if (minContactDistances[ResContactInfo.BCOCAH] == 0 || piDist > minContactDistances[ResContactInfo.BCOCAH]) {
+                                minContactDistances[ResContactInfo.BCOCAH] = piDist;
+                                contactAtomNumInResidueA[ResContactInfo.BCOCAH] = 1; //CA
+                                contactAtomNumInResidueB[ResContactInfo.BCOCAH] = 3; //O         
+                            }
+                        }
+                        
+                    }
+                    else {
+                        DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") "
+                                + "contains not the expected atom name (HA3)"
+                            + " for calculation of BCOCAH. Continue search in next residue.");
+                    }
+                }
+                else {
+                    if (b.getName3().equals("GLY") && ! (b.getHydrogenAtoms().size() >= 3)) {
+                        DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") "
+                                + "contains no (second) HA"
+                            + " in calculation of BCOCAH. Continue search in next residue.");
+                    }
+                }
+            }
+            else {
+                if (! (atoms_a.get(1).getAtomShortName().equals("CA"))) {
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") "
+                            + "contains not the expected atom name (CA)"
+                            + " for calculation of BCOCAH. Continue search in next residue.");
+                }
+                else if (! (atoms_a.get(2).getAtomShortName().equals("C") && atoms_a.get(3).getAtomShortName().equals("O"))) {
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") "
+                            + "contains not the expected atom name (C or O)"
+                            + " for calculation of BCOCAH. Continue search in next residue.");
+                }
+                else { // no HA at expected position
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") "
+                            + "contains not the expected atom name (HA or HA2 in case of GLY)"
+                            + " for calculation of BCOCAH. Continue search in next residue.");
+                }
+            }
+        }
+        else {
+            if (! (atoms_a.size() >= 2)) {
+                DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") "
+                        + "contains not enough atoms (no CA for BCAHCO)."
+                        + " Continue search in next residue.");
+            }
+            else if (! (a.getHydrogenAtoms().size() >= 2)) {
+                DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") "
+                        + "contains not enough hydrogens (no HA for BCAHCO)."
+                        + " Continue search in next residue.");
+            }
+            else { // ! atoms_b.size() >= 4
+                DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") "
+                        + "contains not enough atoms (no C=O for BCAHCO)."
+                        + " Continue search in next residue.");
             }
         }
         
