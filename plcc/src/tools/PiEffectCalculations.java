@@ -32,6 +32,53 @@ public class PiEffectCalculations {
             ret[0] = ret[0] / atoms.size();
             ret[1] = ret[1] / atoms.size();
             ret[2] = ret[2] / atoms.size();
+            
+            /*
+            Alternative midpoint calculation. Calculate the centroid of the polygon.
+            In this case the polygon (aromatic ring) is considered planar. With this it is
+            easy to calculate the centroid. The z-coordinate for the centroid is calculated
+            as the average of all z-coordinates from the atoms that are part of the ring.
+            For testing purposes only right now.
+            */
+            double area = 0;
+            double xs = 0;
+            double ys = 0;
+            double zs = 0;
+            
+            ArrayList<Atom> modifiedAtomList = atoms;
+            modifiedAtomList.add(atoms.get(0));
+            
+            
+            // area of the polygon calculated with the Shoelace formula
+            for (int x = 0; x < modifiedAtomList.size() - 1; x++) {
+                area += (modifiedAtomList.get(x).getCoordX() * modifiedAtomList.get(x + 1).getCoordY() - modifiedAtomList.get(x + 1).getCoordX() * modifiedAtomList.get(x).getCoordY());
+            }
+            area = 0.5 * area;
+            
+            // x coordinate of the centroid 
+            for (int x = 0; x < modifiedAtomList.size() - 1; x++) {
+                xs += (modifiedAtomList.get(x).getCoordX() + modifiedAtomList.get(x + 1).getCoordX()) * 
+                        (modifiedAtomList.get(x).getCoordX() * modifiedAtomList.get(x + 1).getCoordY() - modifiedAtomList.get(x + 1).getCoordX() * modifiedAtomList.get(x).getCoordY());
+            }
+            xs = (1/(6 * area)) * xs;
+            
+            
+            // y coordinate of the centroid
+            for (int x = 0; x < modifiedAtomList.size() - 1; x++) {
+                ys += (modifiedAtomList.get(x).getCoordY() + modifiedAtomList.get(x + 1).getCoordY()) * 
+                        (modifiedAtomList.get(x).getCoordX() * modifiedAtomList.get(x + 1).getCoordY() - modifiedAtomList.get(x + 1).getCoordX() * modifiedAtomList.get(x).getCoordY());
+            }
+            ys = (1/(6 * area)) * ys;
+            
+            for (Atom a : atoms) {
+                zs += a.getCoordZ();
+            }
+            zs = zs / atoms.size();
+            
+            
+            System.out.println("!!! MP: " + String.valueOf(ret[0]) + "," + String.valueOf(ret[1]) + "," + String.valueOf(ret[2]) + "\n");
+            System.out.println("!!! CT: " + String.valueOf(xs) + "," + String.valueOf(ys) + "," + String.valueOf(zs) + "\n");
+            
             return ret;
         }
         else {
