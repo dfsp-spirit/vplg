@@ -29,6 +29,7 @@ import java.util.Scanner;
 import java.util.TreeMap;
 import resultcontainers.ProteinResults;
 import plcc.Settings;
+import proteinstructure.BindingSite;
 
 
 /**
@@ -62,6 +63,7 @@ public class FileParser {
     static ArrayList<SSE> s_dsspSSEs = null;             // all SSEs according to DSSP definition
     static ArrayList<SSE> s_ptglSSEs = null;                // the modified SSE list the PTGL uses
     static HashMap<String, ArrayList<String>> homologuesMap = null;
+    static List<BindingSite> s_sites;
     
     // The list of sulfur bridges (aka disulfide bridges) from the DSSP file. The key is the DSSP sulfur bridge
     // id (an arbitrary character, starting with 'a' for the first bridge usually). The list in the value part contains
@@ -141,6 +143,7 @@ public class FileParser {
         s_atoms = new ArrayList<Atom>();
         s_dsspSSEs = new ArrayList<SSE>();
         s_ptglSSEs = new ArrayList<SSE>();
+        s_sites = new ArrayList<>();
         
         homologuesMap = new HashMap<>();
 
@@ -1294,6 +1297,62 @@ public class FileParser {
                 }
             }             
         }
+    }
+    
+    private static void createAllBindingSitesFromPdbData() {
+        Integer pLineNum = 0;
+        String pLine = "";
+        Boolean inSite = Boolean.FALSE;
+     
+        for(Integer i = 0; i < pdbLines.size(); i++) {
+
+            pLineNum = i + 1;
+            pLine = pdbLines.get(i);
+            String modelID;
+            String siteName;
+            String siteLineNumString;
+            Integer siteLineNum;
+            BindingSite curSite = null;
+            String siteNumResDeclaredString;
+            Integer siteNumResDeclared;
+            
+            // keep track of current model
+            if(pLine.startsWith("MODEL  ")) {
+                try {
+                    modelID = (pLine.substring(10, 16)).trim();
+                } catch(Exception e) {
+                    System.err.println("ERROR: Hit broken MODEL line at PDB line number " + pLineNum + " while looking for Chains.");
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+            }
+            
+            if(pLine.startsWith("SITE  ")) {
+                inSite = true;
+                siteLineNumString = pLine.substring(4, 10).trim();
+                siteLineNum = Integer.parseInt(siteLineNumString);
+                siteNumResDeclaredString = pLine.substring(14, 17).trim();
+                siteNumResDeclared = Integer.parseInt(siteLineNumString);
+                if(siteLineNum.equals(1)) {
+                    // new site detected -- and we way need to save old one.
+                    if(curSite != null) {
+                        s_sites.add(curSite);
+                        if(curSite.getSiteResidues().size() != curSite.getNumResiduesDeclared()) {
+                            DP.getInstance().w("FileParser", "Binding site residue count differs from value declared in PDB file.");
+                        }
+                    }
+                    // now start the new site
+                    siteName = pLine.substring(11, 14).trim();
+                    curSite = new BindingSite(siteName);
+                    curSite.setNumResDeclared(siteNumResDeclared);
+                }
+            }
+        }
+        
+    }
+    
+    private List<String[]> parseResidueInfos(String line) {
+        List<String[]> residueInfos = new ArrayList<>();
     }
 
     private static void createAllChainsFromPdbData() {
