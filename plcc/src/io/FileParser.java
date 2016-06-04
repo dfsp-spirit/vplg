@@ -1353,6 +1353,8 @@ public class FileParser {
     
     private List<String[]> parseResidueInfos(String line) {
         List<String[]> residueInfos = new ArrayList<>();
+        System.err.println(" parseResidueInfos: not implemented yet, returning empty list");
+        return residueInfos;
     }
 
     private static void createAllChainsFromPdbData() {
