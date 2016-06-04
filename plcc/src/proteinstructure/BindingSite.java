@@ -24,6 +24,7 @@ public class BindingSite {
         this.siteName = "";
         this.modelID = null;
         this.numResDeclared = null;
+        this.residueInfos = new ArrayList<>();
     }
     
     public BindingSite(String siteName) {
@@ -32,6 +33,7 @@ public class BindingSite {
         this.siteName = siteName;
         this.modelID = null;
         this.numResDeclared = null;
+        this.residueInfos = new ArrayList<>();
     }
     
     protected List<Residue> siteResidues;
@@ -40,11 +42,51 @@ public class BindingSite {
     /** The number of residues declared in the PDB SITE line for this site. */
     protected Integer numResDeclared;
     
+    /** Site description from REMARK 800 line of PDB file */
+    protected String description;
+    /** Site evidence code from REMARK 800 line of PDB file */
+    protected String evidenceCode;
+    protected List<String[]> residueInfos;
+
+    public List<String[]> getResidueInfos() {
+        return residueInfos;
+    }
+
+    public void setResidueInfos(List<String[]> residueInfos) {
+        this.residueInfos = residueInfos;
+    }
+    
+    public void addResidueInfos(List<String[]> residueInfos) {
+        for(String[] r : residueInfos) {
+            this.residueInfos.add(r);
+        }
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getEvidenceCode() {
+        return evidenceCode;
+    }
+
+    public void setEvidenceCode(String evidenceCode) {
+        this.evidenceCode = evidenceCode;
+    }
+    
     /** The name assigned in the SITE line of the PDB file. */
     protected String siteName;
 
     public List<Residue> getSiteResidues() {
         return siteResidues;
+    }
+    
+    public String getSiteName() {
+        return this.siteName;
     }
     
     public void addSiteResidue(Residue r) {
@@ -77,5 +119,10 @@ public class BindingSite {
     
     public Integer getNumResiduesDeclared() {
         return this.numResDeclared;
+    }
+    
+    @Override
+    public String toString() {
+        return this.siteName + " (" + this.getDescription() + "), size " + this.getResidueInfos().size() + "";
     }
 }

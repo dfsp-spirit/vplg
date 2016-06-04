@@ -25,7 +25,9 @@ import java.util.HashMap;
 import java.io.*;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.StringTokenizer;
 import java.util.TreeMap;
 import resultcontainers.ProteinResults;
 import plcc.Settings;
@@ -374,6 +376,16 @@ public class FileParser {
             System.out.println("  Creating all Chains...");
         }
         createAllChainsFromPdbData();   // fills s_chains
+        
+        createAllBindingSitesFromPdbData(); // fills s_bindingsites
+        if(! FileParser.silent) {
+            System.out.println("  Creating binding sites...");
+            for(BindingSite s : s_sites) {
+                System.out.println(s.toString());
+            }
+            System.out.println("    Found " + s_sites.size() + " binding sites.");
+        }
+        
 
         if(! FileParser.silent) {
             System.out.println("  Creating all Residues...");
@@ -1299,16 +1311,19 @@ public class FileParser {
         }
     }
     
+    /**
+     * Parses binding site data from the PDB data.
+     */
     private static void createAllBindingSitesFromPdbData() {
         Integer pLineNum = 0;
         String pLine = "";
-        Boolean inSite = Boolean.FALSE;
+        Boolean haveBeenInSiteSectionAlready = Boolean.FALSE;
      
         for(Integer i = 0; i < pdbLines.size(); i++) {
 
             pLineNum = i + 1;
             pLine = pdbLines.get(i);
-            String modelID;
+            String modelID = null;
             String siteName;
             String siteLineNumString;
             Integer siteLineNum;
@@ -1316,45 +1331,175 @@ public class FileParser {
             String siteNumResDeclaredString;
             Integer siteNumResDeclared;
             
+            // parse the REMARK lines
+            String siteIdentifier = null;
+            String siteEvidenceCode;
+            String siteDescription;            
+            Map<String, String> siteEvidenceCodes = new HashMap<>();
+            Map<String, String> siteDescriptions = new HashMap<>();
+            if(pLine.startsWith("REMARK 800")) {
+                int lineLength = pLine.length();
+                if(pLine.startsWith("REMARK 800 SITE_IDENTIFIER:")) {
+                    siteIdentifier = pLine.substring(27, (lineLength - 1)).trim();
+                }
+                
+                if(pLine.startsWith("REMARK 800 EVIDENCE_CODE:")) {
+                    siteEvidenceCode = pLine.substring(25, (lineLength - 1)).trim();
+                    if(siteIdentifier != null) {
+                        siteEvidenceCodes.put(siteIdentifier, siteEvidenceCode);
+                    }
+                }
+                
+                if(pLine.startsWith("REMARK 800 SITE_DESCRIPTION:")) {
+                    siteDescription = pLine.substring(28, (lineLength - 1)).trim();
+                    if(siteIdentifier != null) {
+                        siteDescriptions.put(siteIdentifier, siteDescription);
+                    }
+                }
+            }
+                        
+            
             // keep track of current model
             if(pLine.startsWith("MODEL  ")) {
                 try {
                     modelID = (pLine.substring(10, 16)).trim();
                 } catch(Exception e) {
-                    System.err.println("ERROR: Hit broken MODEL line at PDB line number " + pLineNum + " while looking for Chains.");
-                    e.printStackTrace();
+                    System.err.println("ERROR: Hit broken MODEL line at PDB line number " + pLineNum + " while looking for SITEs.");
                     System.exit(1);
                 }
             }
             
+            // parse the SITE lines
             if(pLine.startsWith("SITE  ")) {
-                inSite = true;
+                
+                haveBeenInSiteSectionAlready = true;
                 siteLineNumString = pLine.substring(4, 10).trim();
-                siteLineNum = Integer.parseInt(siteLineNumString);
+                
+                if(siteLineNumString.equals("***")) {
+                    DP.getInstance().w("FileParser", " Binding site PDB line is marked with '***', ignoring it. This could be the result of using a non-standard format PDB file, e.g., from the REDUCE software.");
+                    continue;
+                }
+                
+                siteLineNum = 0;
+                try {
+                    siteLineNum = Integer.parseInt(siteLineNumString);
+                } catch(Exception e) {
+                    System.err.println("Parsing line num failed for line '" + pLine + "'.");
+                }
                 siteNumResDeclaredString = pLine.substring(14, 17).trim();
-                siteNumResDeclared = Integer.parseInt(siteLineNumString);
+                siteNumResDeclared = Integer.parseInt(siteNumResDeclaredString);
+                siteName = pLine.substring(11, 14).trim();
                 if(siteLineNum.equals(1)) {
                     // new site detected -- and we way need to save old one.
                     if(curSite != null) {
+                        curSite.setDescription(siteDescriptions.get(curSite.getSiteName()));
+                        curSite.setEvidenceCode(siteEvidenceCodes.get(curSite.getSiteName()));
                         s_sites.add(curSite);
-                        if(curSite.getSiteResidues().size() != curSite.getNumResiduesDeclared()) {
-                            DP.getInstance().w("FileParser", "Binding site residue count differs from value declared in PDB file.");
+                        if(curSite.getResidueInfos().size() != curSite.getNumResiduesDeclared()) {
+                            DP.getInstance().w("FileParser", " Binding site " + curSite.getSiteName() + " residue count " + curSite.getResidueInfos().size() + " differs from value " + curSite.getNumResiduesDeclared() + " declared in PDB file.");
                         }
                     }
-                    // now start the new site
-                    siteName = pLine.substring(11, 14).trim();
+                    // now start the new site                    
                     curSite = new BindingSite(siteName);
+                    System.out.println("    Created new binding site " + siteName + ".");
                     curSite.setNumResDeclared(siteNumResDeclared);
+                    curSite.setModelID(modelID);
+                    List<String[]> residueInfos = FileParser.parseBindingSiteResidueInfos(pLine);
+                    System.out.println("1Added " + residueInfos.size() + " residues to new site " + siteName + " in site line number " +  siteLineNum + "");
+                    curSite.addResidueInfos(residueInfos);
+                }
+                else {
+                    System.out.println("Handling site line " + siteLineNum + ".");
+                    if(curSite != null) {
+                        List<String[]> residueInfos = FileParser.parseBindingSiteResidueInfos(pLine);
+                        curSite.addResidueInfos(residueInfos);
+                        System.out.println("2Added " + residueInfos.size() + " residues to site " + siteName + " in site line number " +  siteLineNum + "");
+                    }
+                    else {
+                        System.err.println("curSite is null in line " + siteLineNum + " of site " + siteName);
+                    }
+                }
+            }
+            else {
+                // make sure to add the last binding site, if any
+                if(haveBeenInSiteSectionAlready) {
+                    if(curSite != null) {
+                        curSite.setDescription(siteDescriptions.get(curSite.getSiteName()));
+                        curSite.setEvidenceCode(siteEvidenceCodes.get(curSite.getSiteName()));
+                        s_sites.add(curSite);
+                        if(curSite.getResidueInfos().size() != curSite.getNumResiduesDeclared()) {
+                            DP.getInstance().w("FileParser", " Binding site " + curSite.getSiteName() + " residue count " + curSite.getResidueInfos().size() + " differs from value " + curSite.getNumResiduesDeclared() + " declared in PDB file.");
+                        }
+                        curSite = null;
+                    }
                 }
             }
         }
         
+        
     }
     
-    private List<String[]> parseResidueInfos(String line) {
+    /**
+     * Parses residue info from a PDB SITE line, which looks like 'SITE     1 AC1 15 ASN A  10  LYS A  12  HIS A  95  GLU A 165                    
+SITE     2 AC1 15 ALA A 169  ILE A 170  GLY A 171  SER A 211                    
+SITE     3 AC1 15 LEU A 230  GLY A 232  GLY A 233  HOH A 620                    
+SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623                               
+'
+     * @param line the input SITE line, like 'SITE     1 AC1 15 ASN A  10  LYS A  12  HIS A  95  GLU A 165'
+     * @return a list of residue infos, consisting of residue name, chain, and PDB residue number (e.g., ["ASN", "A", "170"]).
+     */
+    private static List<String[]> parseBindingSiteResidueInfos(String line) {
         List<String[]> residueInfos = new ArrayList<>();
-        System.err.println(" parseResidueInfos: not implemented yet, returning empty list");
+        
+        // parse first res info
+        try {
+            String[] resInfo = FileParser.parseResInfo(line.substring(18, 28).trim());
+            if(resInfo != null) { residueInfos.add(resInfo); }
+        } catch(Exception e) { DP.getInstance().w("FileParser", "parseBindingSiteResidueInfos: First residue in SITE line not found, but should have at least 1 residue."); }
+        
+        // parse 2nd res info, if available
+        try {
+            String[] resInfo = FileParser.parseResInfo(line.substring(29, 39).trim());
+            if(resInfo != null) { residueInfos.add(resInfo); }
+        } catch(Exception e) { /* It's fine if there is only 1 residue per line */ }
+        
+        // parse 3rd res info, if available
+        try {
+            String[] resInfo = FileParser.parseResInfo(line.substring(40, 50).trim());
+            if(resInfo != null) { residueInfos.add(resInfo); }
+        } catch(Exception e) { /* It's fine if there is only 1 residue per line */ }
+        
+        // parse 4th res info, if available
+        try {
+            String[] resInfo = FileParser.parseResInfo(line.substring(51, 61).trim());
+            if(resInfo != null) { residueInfos.add(resInfo); }
+        } catch(Exception e) { /* It's fine if there is only 1 residue per line */ }
+        
+        
         return residueInfos;
+    }
+    
+    /**
+     * Parses residue info from a SITE line substring
+     * @param s input string like 'ASN A  10'
+     * @return the tokenized info or null if the string did not contain info
+     */
+    private static String[] parseResInfo(String s) {
+        if(s == null) { return null; }
+        if(s.isEmpty()) { return null; }
+        StringTokenizer t = new StringTokenizer(s, " ");
+        String[] data = new String[3];
+        if(t.countTokens() == 3) {
+            for(int i = 0; i < 3; i++) {                
+                data[i] = t.nextToken();
+            }
+            //System.out.println("Found 3 tokens: " + data[0] + "," + data[1] + "," + data[2]);
+            return data;
+        }
+        else {
+            //System.err.println("parseResInfo: Found " + t.countTokens() + " tokens instead of 3.");
+        }
+        return null;
     }
 
     private static void createAllChainsFromPdbData() {
