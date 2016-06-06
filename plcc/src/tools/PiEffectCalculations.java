@@ -16,70 +16,149 @@ import proteinstructure.Atom;
 public class PiEffectCalculations {
 
     /**
-     * Computes Midpoint of given atoms e.g. a aromatic ring
+     * Computes the Midpoint (Centroid) of aromatic 5-/6-rings.
      * @param atoms the list of atoms to consider
      * @return  double array of length 3 describing coords, or null if atom list is empty
      */
     public static double[] calculateMidpointOfAtoms(ArrayList<Atom> atoms) {
         if (! atoms.isEmpty()) {
-            double[] ret = new double[3];
-            Arrays.fill(ret, 0.0);
-            for (Atom k : atoms) {
-                ret[0] += k.getCoordX();
-                ret[1] += k.getCoordY();
-                ret[2] += k.getCoordZ();
+            double[] c = new double[3];
+            
+            if(atoms.get(0).getResidue().getResName3().equals("TRP")) {
+                if (atoms.size() == 5) {
+                    double[] r0 = new double[3];
+                    r0[0] = (atoms.get(1).getCoordX() + atoms.get(2).getCoordX() + atoms.get(4).getCoordX()) / 3;
+                    r0[1] = (atoms.get(1).getCoordY() + atoms.get(2).getCoordY() + atoms.get(4).getCoordY()) / 3;
+                    r0[2] = (atoms.get(1).getCoordZ() + atoms.get(2).getCoordZ() + atoms.get(4).getCoordZ()) / 3;
+
+                    double[] r1 = new double[3];
+                    r1[0] = (atoms.get(0).getCoordX() + atoms.get(2).getCoordX() + atoms.get(1).getCoordX()) / 3;
+                    r1[1] = (atoms.get(0).getCoordY() + atoms.get(2).getCoordY() + atoms.get(1).getCoordY()) / 3;
+                    r1[2] = (atoms.get(0).getCoordZ() + atoms.get(2).getCoordZ() + atoms.get(1).getCoordZ()) / 3;
+
+                    double[] r2 = new double[3];
+                    r2[0] = (atoms.get(1).getCoordX() + atoms.get(4).getCoordX() + atoms.get(3).getCoordX()) / 3;
+                    r2[1] = (atoms.get(1).getCoordY() + atoms.get(4).getCoordY() + atoms.get(3).getCoordY()) / 3;
+                    r2[2] = (atoms.get(1).getCoordZ() + atoms.get(4).getCoordZ() + atoms.get(3).getCoordZ()) / 3;
+
+                    
+                    double a0 = Math.sqrt(Math.pow(((atoms.get(2).getCoordY() - atoms.get(1).getCoordY()) * (atoms.get(4).getCoordZ() - atoms.get(1).getCoordZ()) - (atoms.get(2).getCoordZ() - atoms.get(1).getCoordZ()) * (atoms.get(4).getCoordY() - atoms.get(1).getCoordY())), 2) + 
+                                Math.pow(((atoms.get(2).getCoordZ() - atoms.get(1).getCoordZ()) * (atoms.get(4).getCoordX() - atoms.get(1).getCoordX()) - (atoms.get(2).getCoordX() - atoms.get(1).getCoordX()) * (atoms.get(4).getCoordZ() - atoms.get(1).getCoordZ())), 2) + 
+                                Math.pow(((atoms.get(2).getCoordX() - atoms.get(1).getCoordX()) * (atoms.get(4).getCoordY() - atoms.get(1).getCoordY()) - (atoms.get(2).getCoordY() - atoms.get(1).getCoordY()) * (atoms.get(4).getCoordX() - atoms.get(1).getCoordX())), 2));
+                    
+                    double a1 = Math.sqrt(Math.pow(((atoms.get(2).getCoordY() - atoms.get(0).getCoordY()) * (atoms.get(1).getCoordZ() - atoms.get(0).getCoordZ()) - (atoms.get(2).getCoordZ() - atoms.get(0).getCoordZ()) * (atoms.get(1).getCoordY() - atoms.get(0).getCoordY())), 2) + 
+                                Math.pow(((atoms.get(2).getCoordZ() - atoms.get(0).getCoordZ()) * (atoms.get(1).getCoordX() - atoms.get(0).getCoordX()) - (atoms.get(2).getCoordX() - atoms.get(0).getCoordX()) * (atoms.get(1).getCoordZ() - atoms.get(0).getCoordZ())), 2) + 
+                                Math.pow(((atoms.get(2).getCoordX() - atoms.get(0).getCoordX()) * (atoms.get(1).getCoordY() - atoms.get(0).getCoordY()) - (atoms.get(2).getCoordY() - atoms.get(0).getCoordY()) * (atoms.get(1).getCoordX() - atoms.get(0).getCoordX())), 2));
+                    
+                    double a2 = Math.sqrt(Math.pow(((atoms.get(1).getCoordY() - atoms.get(1).getCoordY()) * (atoms.get(3).getCoordZ() - atoms.get(1).getCoordZ()) - (atoms.get(1).getCoordZ() - atoms.get(1).getCoordZ()) * (atoms.get(3).getCoordY() - atoms.get(1).getCoordY())), 2) + 
+                                Math.pow(((atoms.get(1).getCoordZ() - atoms.get(1).getCoordZ()) * (atoms.get(3).getCoordX() - atoms.get(1).getCoordX()) - (atoms.get(1).getCoordX() - atoms.get(1).getCoordX()) * (atoms.get(3).getCoordZ() - atoms.get(1).getCoordZ())), 2) + 
+                                Math.pow(((atoms.get(1).getCoordX() - atoms.get(1).getCoordX()) * (atoms.get(3).getCoordY() - atoms.get(1).getCoordY()) - (atoms.get(1).getCoordY() - atoms.get(1).getCoordY()) * (atoms.get(3).getCoordX() - atoms.get(1).getCoordX())), 2));
+
+
+                    double a = a0 + a1 + a2;
+
+                    c[0] = (r0[0] * a0 / a) + (r1[0] * a1 / a) + (r2[0] * a2 / a);
+                    c[1] = (r0[1] * a0 / a) + (r1[1] * a1 / a) + (r2[1] * a2 / a);
+                    c[2] = (r0[2] * a0 / a) + (r1[2] * a1 / a) + (r2[2] * a2 / a);
+                    
+                }
+                else if (atoms.size() == 6) {
+                    double[] r0 = new double[3];
+                    r0[0] = (atoms.get(0).getCoordX() + atoms.get(2).getCoordX() + atoms.get(1).getCoordX()) / 3;
+                    r0[1] = (atoms.get(0).getCoordY() + atoms.get(2).getCoordY() + atoms.get(1).getCoordY()) / 3;
+                    r0[2] = (atoms.get(0).getCoordZ() + atoms.get(2).getCoordZ() + atoms.get(1).getCoordZ()) / 3;
+
+                    double[] r1 = new double[3];
+                    r1[0] = (atoms.get(1).getCoordX() + atoms.get(2).getCoordX() + atoms.get(3).getCoordX()) / 3;
+                    r1[1] = (atoms.get(1).getCoordY() + atoms.get(2).getCoordY() + atoms.get(3).getCoordY()) / 3;
+                    r1[2] = (atoms.get(1).getCoordZ() + atoms.get(2).getCoordZ() + atoms.get(3).getCoordZ()) / 3;
+
+                    double[] r2 = new double[3];
+                    r2[0] = (atoms.get(1).getCoordX() + atoms.get(4).getCoordX() + atoms.get(3).getCoordX()) / 3;
+                    r2[1] = (atoms.get(1).getCoordY() + atoms.get(4).getCoordY() + atoms.get(3).getCoordY()) / 3;
+                    r2[2] = (atoms.get(1).getCoordZ() + atoms.get(4).getCoordZ() + atoms.get(3).getCoordZ()) / 3;
+
+                    double[] r3 = new double[3];
+                    r3[0] = (atoms.get(3).getCoordX() + atoms.get(4).getCoordX() + atoms.get(5).getCoordX()) / 3;
+                    r3[1] = (atoms.get(3).getCoordY() + atoms.get(4).getCoordY() + atoms.get(5).getCoordY()) / 3;
+                    r3[2] = (atoms.get(3).getCoordZ() + atoms.get(4).getCoordZ() + atoms.get(5).getCoordZ()) / 3;
+
+                    
+                    double a0 = Math.sqrt(Math.pow(((atoms.get(2).getCoordY() - atoms.get(0).getCoordY()) * (atoms.get(1).getCoordZ() - atoms.get(0).getCoordZ()) - (atoms.get(2).getCoordZ() - atoms.get(0).getCoordZ()) * (atoms.get(1).getCoordY() - atoms.get(0).getCoordY())), 2) + 
+                                Math.pow(((atoms.get(2).getCoordZ() - atoms.get(0).getCoordZ()) * (atoms.get(1).getCoordX() - atoms.get(0).getCoordX()) - (atoms.get(2).getCoordX() - atoms.get(0).getCoordX()) * (atoms.get(1).getCoordZ() - atoms.get(0).getCoordZ())), 2) + 
+                                Math.pow(((atoms.get(2).getCoordX() - atoms.get(0).getCoordX()) * (atoms.get(1).getCoordY() - atoms.get(0).getCoordY()) - (atoms.get(2).getCoordY() - atoms.get(0).getCoordY()) * (atoms.get(1).getCoordX() - atoms.get(0).getCoordX())), 2));
+                    
+                    double a1 = Math.sqrt(Math.pow(((atoms.get(2).getCoordY() - atoms.get(1).getCoordY()) * (atoms.get(3).getCoordZ() - atoms.get(1).getCoordZ()) - (atoms.get(2).getCoordZ() - atoms.get(1).getCoordZ()) * (atoms.get(3).getCoordY() - atoms.get(1).getCoordY())), 2) + 
+                                Math.pow(((atoms.get(2).getCoordZ() - atoms.get(1).getCoordZ()) * (atoms.get(3).getCoordX() - atoms.get(1).getCoordX()) - (atoms.get(2).getCoordX() - atoms.get(1).getCoordX()) * (atoms.get(3).getCoordZ() - atoms.get(1).getCoordZ())), 2) + 
+                                Math.pow(((atoms.get(2).getCoordX() - atoms.get(1).getCoordX()) * (atoms.get(3).getCoordY() - atoms.get(1).getCoordY()) - (atoms.get(2).getCoordY() - atoms.get(1).getCoordY()) * (atoms.get(3).getCoordX() - atoms.get(1).getCoordX())), 2));
+                    
+                    double a2 = Math.sqrt(Math.pow(((atoms.get(4).getCoordY() - atoms.get(1).getCoordY()) * (atoms.get(3).getCoordZ() - atoms.get(1).getCoordZ()) - (atoms.get(4).getCoordZ() - atoms.get(1).getCoordZ()) * (atoms.get(3).getCoordY() - atoms.get(1).getCoordY())), 2) + 
+                                Math.pow(((atoms.get(4).getCoordZ() - atoms.get(1).getCoordZ()) * (atoms.get(3).getCoordX() - atoms.get(1).getCoordX()) - (atoms.get(4).getCoordX() - atoms.get(1).getCoordX()) * (atoms.get(3).getCoordZ() - atoms.get(1).getCoordZ())), 2) + 
+                                Math.pow(((atoms.get(4).getCoordX() - atoms.get(1).getCoordX()) * (atoms.get(3).getCoordY() - atoms.get(1).getCoordY()) - (atoms.get(4).getCoordY() - atoms.get(1).getCoordY()) * (atoms.get(3).getCoordX() - atoms.get(1).getCoordX())), 2));
+                    
+                    double a3 = Math.sqrt(Math.pow(((atoms.get(4).getCoordY() - atoms.get(3).getCoordY()) * (atoms.get(4).getCoordZ() - atoms.get(3).getCoordZ()) - (atoms.get(4).getCoordZ() - atoms.get(3).getCoordZ()) * (atoms.get(4).getCoordY() - atoms.get(3).getCoordY())), 2) + 
+                                Math.pow(((atoms.get(4).getCoordZ() - atoms.get(3).getCoordZ()) * (atoms.get(4).getCoordX() - atoms.get(3).getCoordX()) - (atoms.get(4).getCoordX() - atoms.get(3).getCoordX()) * (atoms.get(4).getCoordZ() - atoms.get(3).getCoordZ())), 2) + 
+                                Math.pow(((atoms.get(4).getCoordX() - atoms.get(3).getCoordX()) * (atoms.get(4).getCoordY() - atoms.get(3).getCoordY()) - (atoms.get(4).getCoordY() - atoms.get(3).getCoordY()) * (atoms.get(4).getCoordX() - atoms.get(3).getCoordX())), 2));
+
+
+                    double a = a0 + a1 + a2 + a3;
+
+                    c[0] = (r0[0] * a0 / a) + (r1[0] * a1 / a) + (r2[0] * a2 / a) + (r3[0] * a3 / a);
+                    c[1] = (r0[1] * a0 / a) + (r1[1] * a1 / a) + (r2[1] * a2 / a) + (r3[1] * a3 / a);
+                    c[2] = (r0[2] * a0 / a) + (r1[2] * a1 / a) + (r2[2] * a2 / a) + (r3[2] * a3 / a);
+                    
+                }
+                
             }
-            ret[0] = ret[0] / atoms.size();
-            ret[1] = ret[1] / atoms.size();
-            ret[2] = ret[2] / atoms.size();
-            
-            /*
-            Alternative midpoint calculation. Calculate the centroid of the polygon.
-            In this case the polygon (aromatic ring) is considered planar. With this it is
-            easy to calculate the centroid. The z-coordinate for the centroid is calculated
-            as the average of all z-coordinates from the atoms that are part of the ring.
-            For testing purposes only right now.
-            */
-            double area = 0;
-            double xs = 0;
-            double ys = 0;
-            double zs = 0;
-            
-            ArrayList<Atom> modifiedAtomList = atoms;
-            modifiedAtomList.add(atoms.get(0));
-            
-            
-            // area of the polygon calculated with the Shoelace formula
-            for (int x = 0; x < modifiedAtomList.size() - 1; x++) {
-                area += (modifiedAtomList.get(x).getCoordX() * modifiedAtomList.get(x + 1).getCoordY() - modifiedAtomList.get(x + 1).getCoordX() * modifiedAtomList.get(x).getCoordY());
+            else {
+                double[] r0 = new double[3];
+                r0[0] = (atoms.get(0).getCoordX() + atoms.get(1).getCoordX() + atoms.get(2).getCoordX()) / 3;
+                r0[1] = (atoms.get(0).getCoordY() + atoms.get(1).getCoordY() + atoms.get(2).getCoordY()) / 3;
+                r0[2] = (atoms.get(0).getCoordZ() + atoms.get(1).getCoordZ() + atoms.get(2).getCoordZ()) / 3;
+                
+                double[] r1 = new double[3];
+                r1[0] = (atoms.get(1).getCoordX() + atoms.get(3).getCoordX() + atoms.get(2).getCoordX()) / 3;
+                r1[1] = (atoms.get(1).getCoordY() + atoms.get(3).getCoordY() + atoms.get(2).getCoordY()) / 3;
+                r1[2] = (atoms.get(1).getCoordZ() + atoms.get(3).getCoordZ() + atoms.get(2).getCoordZ()) / 3;
+                
+                double[] r2 = new double[3];
+                r2[0] = (atoms.get(1).getCoordX() + atoms.get(3).getCoordX() + atoms.get(4).getCoordX()) / 3;
+                r2[1] = (atoms.get(1).getCoordY() + atoms.get(3).getCoordY() + atoms.get(4).getCoordY()) / 3;
+                r2[2] = (atoms.get(1).getCoordZ() + atoms.get(3).getCoordZ() + atoms.get(4).getCoordZ()) / 3;
+                
+                double[] r3 = new double[3];
+                r3[0] = (atoms.get(3).getCoordX() + atoms.get(5).getCoordX() + atoms.get(4).getCoordX()) / 3;
+                r3[1] = (atoms.get(3).getCoordY() + atoms.get(5).getCoordY() + atoms.get(4).getCoordY()) / 3;
+                r3[2] = (atoms.get(3).getCoordZ() + atoms.get(5).getCoordZ() + atoms.get(4).getCoordZ()) / 3;
+                
+                
+                double a0 = Math.sqrt(Math.pow(((atoms.get(1).getCoordY() - atoms.get(0).getCoordY()) * (atoms.get(2).getCoordZ() - atoms.get(0).getCoordZ()) - (atoms.get(1).getCoordZ() - atoms.get(0).getCoordZ()) * (atoms.get(2).getCoordY() - atoms.get(0).getCoordY())), 2) + 
+                            Math.pow(((atoms.get(1).getCoordZ() - atoms.get(0).getCoordZ()) * (atoms.get(2).getCoordX() - atoms.get(0).getCoordX()) - (atoms.get(1).getCoordX() - atoms.get(0).getCoordX()) * (atoms.get(2).getCoordZ() - atoms.get(0).getCoordZ())), 2) + 
+                            Math.pow(((atoms.get(1).getCoordX() - atoms.get(0).getCoordX()) * (atoms.get(2).getCoordY() - atoms.get(0).getCoordY()) - (atoms.get(1).getCoordY() - atoms.get(0).getCoordY()) * (atoms.get(2).getCoordX() - atoms.get(0).getCoordX())), 2));
+                
+                double a1 = Math.sqrt(Math.pow(((atoms.get(3).getCoordY() - atoms.get(1).getCoordY()) * (atoms.get(2).getCoordZ() - atoms.get(1).getCoordZ()) - (atoms.get(3).getCoordZ() - atoms.get(1).getCoordZ()) * (atoms.get(2).getCoordY() - atoms.get(1).getCoordY())), 2) + 
+                            Math.pow(((atoms.get(3).getCoordZ() - atoms.get(1).getCoordZ()) * (atoms.get(2).getCoordX() - atoms.get(1).getCoordX()) - (atoms.get(3).getCoordX() - atoms.get(1).getCoordX()) * (atoms.get(2).getCoordZ() - atoms.get(1).getCoordZ())), 2) + 
+                            Math.pow(((atoms.get(3).getCoordX() - atoms.get(1).getCoordX()) * (atoms.get(2).getCoordY() - atoms.get(1).getCoordY()) - (atoms.get(3).getCoordY() - atoms.get(1).getCoordY()) * (atoms.get(2).getCoordX() - atoms.get(1).getCoordX())), 2));
+                
+                double a2 = Math.sqrt(Math.pow(((atoms.get(3).getCoordY() - atoms.get(1).getCoordY()) * (atoms.get(4).getCoordZ() - atoms.get(1).getCoordZ()) - (atoms.get(3).getCoordZ() - atoms.get(1).getCoordZ()) * (atoms.get(4).getCoordY() - atoms.get(1).getCoordY())), 2) + 
+                            Math.pow(((atoms.get(3).getCoordZ() - atoms.get(1).getCoordZ()) * (atoms.get(4).getCoordX() - atoms.get(1).getCoordX()) - (atoms.get(3).getCoordX() - atoms.get(1).getCoordX()) * (atoms.get(4).getCoordZ() - atoms.get(1).getCoordZ())), 2) + 
+                            Math.pow(((atoms.get(3).getCoordX() - atoms.get(1).getCoordX()) * (atoms.get(4).getCoordY() - atoms.get(1).getCoordY()) - (atoms.get(3).getCoordY() - atoms.get(1).getCoordY()) * (atoms.get(4).getCoordX() - atoms.get(1).getCoordX())), 2));
+                
+                double a3 = Math.sqrt(Math.pow(((atoms.get(5).getCoordY() - atoms.get(3).getCoordY()) * (atoms.get(4).getCoordZ() - atoms.get(3).getCoordZ()) - (atoms.get(5).getCoordZ() - atoms.get(3).getCoordZ()) * (atoms.get(4).getCoordY() - atoms.get(3).getCoordY())), 2) + 
+                            Math.pow(((atoms.get(5).getCoordZ() - atoms.get(3).getCoordZ()) * (atoms.get(4).getCoordX() - atoms.get(3).getCoordX()) - (atoms.get(5).getCoordX() - atoms.get(3).getCoordX()) * (atoms.get(4).getCoordZ() - atoms.get(3).getCoordZ())), 2) + 
+                            Math.pow(((atoms.get(5).getCoordX() - atoms.get(3).getCoordX()) * (atoms.get(4).getCoordY() - atoms.get(3).getCoordY()) - (atoms.get(5).getCoordY() - atoms.get(3).getCoordY()) * (atoms.get(4).getCoordX() - atoms.get(3).getCoordX())), 2));
+                
+                
+                double a = a0 + a1 + a2 + a3;
+
+                c[0] = (r0[0] * a0 / a) + (r1[0] * a1 / a) + (r2[0] * a2 / a) + (r3[0] * a3 / a);
+                c[1] = (r0[1] * a0 / a) + (r1[1] * a1 / a) + (r2[1] * a2 / a) + (r3[1] * a3 / a);
+                c[2] = (r0[2] * a0 / a) + (r1[2] * a1 / a) + (r2[2] * a2 / a) + (r3[2] * a3 / a);
             }
-            area = 0.5 * area;
             
-            // x coordinate of the centroid 
-            for (int x = 0; x < modifiedAtomList.size() - 1; x++) {
-                xs += (modifiedAtomList.get(x).getCoordX() + modifiedAtomList.get(x + 1).getCoordX()) * 
-                        (modifiedAtomList.get(x).getCoordX() * modifiedAtomList.get(x + 1).getCoordY() - modifiedAtomList.get(x + 1).getCoordX() * modifiedAtomList.get(x).getCoordY());
-            }
-            xs = (1/(6 * area)) * xs;
-            
-            
-            // y coordinate of the centroid
-            for (int x = 0; x < modifiedAtomList.size() - 1; x++) {
-                ys += (modifiedAtomList.get(x).getCoordY() + modifiedAtomList.get(x + 1).getCoordY()) * 
-                        (modifiedAtomList.get(x).getCoordX() * modifiedAtomList.get(x + 1).getCoordY() - modifiedAtomList.get(x + 1).getCoordX() * modifiedAtomList.get(x).getCoordY());
-            }
-            ys = (1/(6 * area)) * ys;
-            
-            for (Atom a : atoms) {
-                zs += a.getCoordZ();
-            }
-            zs = zs / atoms.size();
-            
-            
-            System.out.println("!!! MP: " + String.valueOf(ret[0]) + "," + String.valueOf(ret[1]) + "," + String.valueOf(ret[2]) + "\n");
-            System.out.println("!!! CT: " + String.valueOf(xs) + "," + String.valueOf(ys) + "," + String.valueOf(zs) + "\n");
-            
-            return ret;
+            //System.out.println("!!! MP: " + String.valueOf(ret[0]) + "," + String.valueOf(ret[1]) + "," + String.valueOf(ret[2]));
+            //System.out.println("!!! CT: " + String.valueOf(c[0]) + "," + String.valueOf(c[1]) + "," + String.valueOf(c[2]));
+            return c;
         }
         else {
             return null;

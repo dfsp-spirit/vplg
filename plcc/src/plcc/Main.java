@@ -4655,6 +4655,23 @@ public class Main {
                         System.out.println("#!# CL " + rci.getNumContactsCL());
                         System.out.println("#!# LC " + rci.getNumContactsLC());
                         System.out.println("#!# LL " + rci.getNumContactsLL());
+                        
+                        System.out.println("#!# NHPI " + rci.getNumContactsNHPI());
+                        System.out.println("#!# PINH " + rci.getNumContactsPINH());
+                        System.out.println("#!# CAHPI " + rci.getNumContactsCAHPI());
+                        System.out.println("#!# PICAH " + rci.getNumContactsPICAH());
+                        System.out.println("#!# CNHPI " + rci.getNumContactsCNHPI());
+                        System.out.println("#!# PICNH " + rci.getNumContactsPICNH());
+                        System.out.println("#!# SHPI " + rci.getNumContactsSHPI());
+                        System.out.println("#!# PISH " + rci.getNumContactsPISH());
+                        System.out.println("#!# XOHPI " + rci.getNumContactsXOHPI());
+                        System.out.println("#!# PIXOH " + rci.getNumContactsPIXOH());
+                        System.out.println("#!# PROCDHPI " + rci.getNumContactsPROCDHPI());
+                        System.out.println("#!# PIPROCDH " + rci.getNumContactsPIPROCDH());
+                        System.out.println("#!# CCACOH " + rci.getNumContactsCCACOH());
+                        System.out.println("#!# CCOCAH " + rci.getNumContactsCCOCAH());
+                        System.out.println("#!# BCACOH " + rci.getNumContactsBCACOH());
+                        System.out.println("#!# BCOCAH " + rci.getNumContactsBCOCAH());
                         */
                     }
                 }
