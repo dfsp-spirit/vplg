@@ -377,13 +377,17 @@ public class FileParser {
         }
         createAllChainsFromPdbData();   // fills s_chains
         
-        createAllBindingSitesFromPdbData(); // fills s_bindingsites
-        if(! FileParser.silent) {
-            System.out.println("  Creating binding sites...");
-            for(BindingSite s : s_sites) {
-                System.out.println(s.toString());
+        if(Settings.getBoolean("plcc_B_parse_binding_sites")) {
+            if(! FileParser.silent) {
+                System.out.println("  Creating binding sites...");
             }
-            System.out.println("    Found " + s_sites.size() + " binding sites.");
+            createAllBindingSitesFromPdbData(); // fills s_bindingsites
+            if(! FileParser.silent) {
+                for(BindingSite s : s_sites) {
+                    System.out.println("    PDB: " + s.toString());
+                }
+                System.out.println("    Found " + s_sites.size() + " binding sites.");
+            }
         }
         
 
@@ -1318,42 +1322,57 @@ public class FileParser {
         Integer pLineNum = 0;
         String pLine = "";
         Boolean haveBeenInSiteSectionAlready = Boolean.FALSE;
+        String lastSiteInRemark = null;
      
+        
+        String modelID = null;
+        String lastModelID = null;
+        String siteName;
+        String siteLineNumString;
+        Integer siteLineNum;
+        BindingSite curSite = null;
+        String siteNumResDeclaredString;
+        Integer siteNumResDeclared;
+
+        // parse the REMARK lines
+        String siteIdentifier = null;
+        String siteEvidenceCode;
+        String siteDescription;            
+        Map<String, BindingSite> sites = new HashMap<>();
+            
         for(Integer i = 0; i < pdbLines.size(); i++) {
 
             pLineNum = i + 1;
             pLine = pdbLines.get(i);
-            String modelID = null;
-            String siteName;
-            String siteLineNumString;
-            Integer siteLineNum;
-            BindingSite curSite = null;
-            String siteNumResDeclaredString;
-            Integer siteNumResDeclared;
-            
-            // parse the REMARK lines
-            String siteIdentifier = null;
-            String siteEvidenceCode;
-            String siteDescription;            
-            Map<String, String> siteEvidenceCodes = new HashMap<>();
-            Map<String, String> siteDescriptions = new HashMap<>();
-            if(pLine.startsWith("REMARK 800")) {
+                        
+            if(pLine.startsWith("REMARK 800")) {                
                 int lineLength = pLine.length();
                 if(pLine.startsWith("REMARK 800 SITE_IDENTIFIER:")) {
                     siteIdentifier = pLine.substring(27, (lineLength - 1)).trim();
+                    lastSiteInRemark = siteIdentifier;
+                    if(! sites.containsKey(siteIdentifier)) { 
+                        sites.put(siteIdentifier, new BindingSite(siteIdentifier));
+                        //System.out.println("    Adding new binding site '" + siteIdentifier + "' from remark line.");
+                    }
                 }
                 
                 if(pLine.startsWith("REMARK 800 EVIDENCE_CODE:")) {
                     siteEvidenceCode = pLine.substring(25, (lineLength - 1)).trim();
-                    if(siteIdentifier != null) {
-                        siteEvidenceCodes.put(siteIdentifier, siteEvidenceCode);
+                    if(lastSiteInRemark != null) {
+                        sites.get(lastSiteInRemark).setEvidenceCode(siteEvidenceCode);
+                        if(lastSiteInRemark == null) {
+                            DP.getInstance().w("FileParser", "No site encountered before hitting site evidence code line.");
+                        }
                     }
                 }
                 
                 if(pLine.startsWith("REMARK 800 SITE_DESCRIPTION:")) {
                     siteDescription = pLine.substring(28, (lineLength - 1)).trim();
-                    if(siteIdentifier != null) {
-                        siteDescriptions.put(siteIdentifier, siteDescription);
+                    if(lastSiteInRemark != null) {
+                        sites.get(lastSiteInRemark).setDescription(siteDescription);
+                        if(lastSiteInRemark == null) {
+                            DP.getInstance().w("FileParser", "No site encountered before hitting site description line.");
+                        }
                     }
                 }
             }
@@ -1363,8 +1382,9 @@ public class FileParser {
             if(pLine.startsWith("MODEL  ")) {
                 try {
                     modelID = (pLine.substring(10, 16)).trim();
+                    lastModelID = modelID;
                 } catch(Exception e) {
-                    System.err.println("ERROR: Hit broken MODEL line at PDB line number " + pLineNum + " while looking for SITEs.");
+                    DP.getInstance().e("FileParser", " Hit broken MODEL line at PDB line number " + pLineNum + " while looking for SITEs.");
                     System.exit(1);
                 }
             }
@@ -1384,58 +1404,34 @@ public class FileParser {
                 try {
                     siteLineNum = Integer.parseInt(siteLineNumString);
                 } catch(Exception e) {
-                    System.err.println("Parsing line num failed for line '" + pLine + "'.");
+                    DP.getInstance().w("FileParser", "Parsing site internal line num failed for line '" + pLine + "', assuming 0.");
                 }
                 siteNumResDeclaredString = pLine.substring(14, 17).trim();
                 siteNumResDeclared = Integer.parseInt(siteNumResDeclaredString);
                 siteName = pLine.substring(11, 14).trim();
+                curSite = sites.get(siteName);
+                if(curSite == null) {
+                    DP.getInstance().w("FileParser", "Site not found in map of sites when hitting SITE line in PDB file, should have been created from data in REMARK section already. Creating it now.");
+                    sites.put(siteName, new BindingSite(siteName));
+                    curSite = sites.get(siteName);
+                }
+                
+                // set model and number of declared residues on the first line -- we could also do this on any other (or each) line, it would make no difference
                 if(siteLineNum.equals(1)) {
-                    // new site detected -- and we way need to save old one.
-                    if(curSite != null) {
-                        curSite.setDescription(siteDescriptions.get(curSite.getSiteName()));
-                        curSite.setEvidenceCode(siteEvidenceCodes.get(curSite.getSiteName()));
-                        s_sites.add(curSite);
-                        if(curSite.getResidueInfos().size() != curSite.getNumResiduesDeclared()) {
-                            DP.getInstance().w("FileParser", " Binding site " + curSite.getSiteName() + " residue count " + curSite.getResidueInfos().size() + " differs from value " + curSite.getNumResiduesDeclared() + " declared in PDB file.");
-                        }
-                    }
-                    // now start the new site                    
-                    curSite = new BindingSite(siteName);
-                    System.out.println("    Created new binding site " + siteName + ".");
                     curSite.setNumResDeclared(siteNumResDeclared);
-                    curSite.setModelID(modelID);
-                    List<String[]> residueInfos = FileParser.parseBindingSiteResidueInfos(pLine);
-                    System.out.println("1Added " + residueInfos.size() + " residues to new site " + siteName + " in site line number " +  siteLineNum + "");
-                    curSite.addResidueInfos(residueInfos);
+                    curSite.setModelID(lastModelID);
                 }
-                else {
-                    System.out.println("Handling site line " + siteLineNum + ".");
-                    if(curSite != null) {
-                        List<String[]> residueInfos = FileParser.parseBindingSiteResidueInfos(pLine);
-                        curSite.addResidueInfos(residueInfos);
-                        System.out.println("2Added " + residueInfos.size() + " residues to site " + siteName + " in site line number " +  siteLineNum + "");
-                    }
-                    else {
-                        System.err.println("curSite is null in line " + siteLineNum + " of site " + siteName);
-                    }
-                }
-            }
-            else {
-                // make sure to add the last binding site, if any
-                if(haveBeenInSiteSectionAlready) {
-                    if(curSite != null) {
-                        curSite.setDescription(siteDescriptions.get(curSite.getSiteName()));
-                        curSite.setEvidenceCode(siteEvidenceCodes.get(curSite.getSiteName()));
-                        s_sites.add(curSite);
-                        if(curSite.getResidueInfos().size() != curSite.getNumResiduesDeclared()) {
-                            DP.getInstance().w("FileParser", " Binding site " + curSite.getSiteName() + " residue count " + curSite.getResidueInfos().size() + " differs from value " + curSite.getNumResiduesDeclared() + " declared in PDB file.");
-                        }
-                        curSite = null;
-                    }
-                }
+                
+                // parse the residue info from this line and add it
+                List<String[]> residueInfos = FileParser.parseBindingSiteResidueInfos(pLine);
+                //System.out.println("Added " + residueInfos.size() + " residues to new site " + siteName + " in site line number " +  siteLineNum + "");
+                curSite.addResidueInfos(residueInfos);                                        
             }
         }
-        
+
+        for(String key : sites.keySet()) {
+            s_sites.add(sites.get(key));
+        }
         
     }
     

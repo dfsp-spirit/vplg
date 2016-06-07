@@ -19,8 +19,6 @@ import java.util.List;
 public class BindingSite {
     
     public BindingSite() {
-        this.siteResidues = new ArrayList<>();
-        this.ligandResidues = new ArrayList<>();
         this.siteName = "";
         this.modelID = null;
         this.numResDeclared = null;
@@ -28,16 +26,12 @@ public class BindingSite {
     }
     
     public BindingSite(String siteName) {
-        this.siteResidues = new ArrayList<>();
-        this.ligandResidues = new ArrayList<>();
         this.siteName = siteName;
         this.modelID = null;
         this.numResDeclared = null;
         this.residueInfos = new ArrayList<>();
     }
     
-    protected List<Residue> siteResidues;
-    protected List<Residue> ligandResidues;
     protected String modelID;
     /** The number of residues declared in the PDB SITE line for this site. */
     protected Integer numResDeclared;
@@ -80,38 +74,17 @@ public class BindingSite {
     
     /** The name assigned in the SITE line of the PDB file. */
     protected String siteName;
-
-    public List<Residue> getSiteResidues() {
-        return siteResidues;
-    }
+   
     
     public String getSiteName() {
         return this.siteName;
     }
-    
-    public void addSiteResidue(Residue r) {
-        this.siteResidues.add(r);
-    }
+       
     
     public void setNumResDeclared(Integer i) {
         this.numResDeclared = i;
     }
-    
-    public void addLigandResidue(Residue r) {
-        this.ligandResidues.add(r);
-    }
-
-    public void setSiteResidues(List<Residue> siteResidues) {
-        this.siteResidues = siteResidues;
-    }
-
-    public List<Residue> getLigandResidues() {
-        return ligandResidues;
-    }
-
-    public void setLigandResidues(List<Residue> ligandResidues) {
-        this.ligandResidues = ligandResidues;
-    }
+        
     
     public void setModelID(String modelID) {
         this.modelID = modelID;
@@ -123,6 +96,6 @@ public class BindingSite {
     
     @Override
     public String toString() {
-        return this.siteName + " (" + this.getDescription() + "), size " + this.getResidueInfos().size() + "";
+        return this.siteName + " (" + this.getDescription() + "), size " + this.getResidueInfos().size() + " residues.";
     }
 }
