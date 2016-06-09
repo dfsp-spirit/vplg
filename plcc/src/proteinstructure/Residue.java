@@ -42,7 +42,25 @@ public class Residue implements java.io.Serializable {
     private Chain chain = null;                             // the Chain this Residue belongs to
     private String chainID = null;
     private String modelID = null;
-    private String iCode = null;                            // PDB insertion code
+    private String iCode = null;    // PDB insertion code
+    
+    /** The binding sites, if any, that this residue is part of (for protein residues which are part of the pocket, NOT for ligands which dock into a pocket).  */
+    private List<BindingSite> partOfBindingSites;
+
+    public List<BindingSite> getPartOfBindingSites() {
+        return partOfBindingSites;
+    }
+
+    public void setPartOfBindingSites(List<BindingSite> partOfBindingSites) {
+        this.partOfBindingSites = partOfBindingSites;
+    }
+    
+    /** Assigns a new binding site the residue is part of.
+     * @param s the binding site the residue s part of
+     */
+    public void addPartOfBindingSite(BindingSite s) {
+        this.partOfBindingSites.add(s);
+    }
     
     private Float phi = null;       // phi backbone angle
     private Float psi = null;       // psi backbone angle
@@ -104,7 +122,7 @@ public class Residue implements java.io.Serializable {
     }
     
     // constructor
-    public Residue() { atoms = new ArrayList<Atom>(); hydrogenatoms = new ArrayList<Atom>(); }
+    public Residue() { this.atoms = new ArrayList<>(); this.hydrogenatoms = new ArrayList<>(); this.partOfBindingSites = new ArrayList<>(); }
 
     /**
      * Constructs a new residue with PDB residue number 'prn' and DSSP residue number 'drn'.
@@ -112,10 +130,20 @@ public class Residue implements java.io.Serializable {
      * @param residueNumberDSSP the DSSP residue number
      */
     public Residue(Integer residueNumberPDB, Integer residueNumberDSSP) {
-        atoms = new ArrayList<Atom>();
-        hydrogenatoms = new ArrayList<Atom>();
+        atoms = new ArrayList<>();
+        hydrogenatoms = new ArrayList<>();
         pdbResNum = residueNumberPDB;
         dsspResNum = residueNumberDSSP;
+        this.partOfBindingSites = new ArrayList<>();
+    }
+    
+    
+    /**
+     * Determines whether this residue is part of any binding site.
+     * @return whether this residue is part of any binding site
+     */
+    public Boolean isBindingSiteResidue() {
+        return(this.partOfBindingSites.size() > 0);
     }
     
     /**

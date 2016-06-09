@@ -493,6 +493,38 @@ public class FileParser {
                 }
             }
         }
+        
+        // assign residues to binding sites
+        if(Settings.getBoolean("plcc_B_parse_binding_sites")) {
+            Integer siteResPdbResNum; String siteResChainID; String siteResName;
+            int numResAssigned = 0;
+            int numWaterResIgnored = 0;
+            for(BindingSite s : s_sites) {
+                List<String[]> siteResidueInfos = s.getResidueInfos();
+                for(String[] resInfo : siteResidueInfos) {
+                    siteResPdbResNum = Integer.parseInt(resInfo[2]);
+                    siteResChainID = resInfo[1];
+                    siteResName = resInfo[0];
+                    Residue res = FileParser.getResByPdbFields(siteResPdbResNum, siteResChainID, null);
+                    if(res != null) {
+                        res.addPartOfBindingSite(s);
+                        numResAssigned++;
+                    } else {
+                        if(siteResName.toUpperCase().equals("HOH")) {
+                            numWaterResIgnored++;
+                        }
+                        else {
+                            DP.getInstance().w("FileParser", "Could not assign residue " + siteResName + " #" + siteResPdbResNum + " of chain " + siteResChainID + " to binding site, no such residue found in residue list.");
+                        }
+                    }
+                }                
+            }
+            if(! FileParser.silent) {
+                System.out.println("    PDB: Assigned " + numResAssigned + " residues to be part of a binding site (ignored " + numWaterResIgnored + " waters).");
+            }
+        }
+        
+        
         if(! FileParser.silent) {
             System.out.println("    PDB: Deleted " + numAtomsDeletedAltLoc + " duplicate atoms from " + numResiduesAffected + " residues which had several alternative locations.");
 
@@ -936,6 +968,9 @@ public class FileParser {
 
     /**
      * Finds the residue with PDB residue number 'p' of chain 'chID' with iCode 'ic' in the residue list.
+     * @param p pdb residue number
+     * @param chID chain id
+     * @param ic insert code, may be null if you don't care
      * @return The Residue object if found, null otherwise.
      */
     public static Residue getResByPdbFields(Integer p, String chID, String ic) {
@@ -945,7 +980,7 @@ public class FileParser {
                 
                 if((s_residues.get(i).getChainID()).equals(chID)) {
                     
-                    if((s_residues.get(i).getiCode()).equals(ic)) {
+                    if( ic == null || (s_residues.get(i).getiCode()).equals(ic)) {
                         return(s_residues.get(i));
                     }
                         

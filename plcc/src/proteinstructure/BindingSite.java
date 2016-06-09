@@ -16,7 +16,7 @@ import java.util.List;
  * Models a binding site in a certain protein structure. Binding site information is parsed from the SITE entries of a PDB file.
  * @author spirit
  */
-public class BindingSite {
+public class BindingSite implements java.io.Serializable {
     
     public BindingSite() {
         this.siteName = "";
@@ -42,14 +42,26 @@ public class BindingSite {
     protected String evidenceCode;
     protected List<String[]> residueInfos;
 
+    /**
+     * Getter for residue infos. A residue info array consists of residue name, chain, and PDB residue number (e.g., ["ASN", "A", "170"]).
+     * @return the residue infos
+     */
     public List<String[]> getResidueInfos() {
         return residueInfos;
     }
 
+    /**
+     * Set residue infos. A residue info array consists of residue name, chain, and PDB residue number (e.g., ["ASN", "A", "170"]).
+     * @param residueInfos the residue infos 
+     */
     public void setResidueInfos(List<String[]> residueInfos) {
         this.residueInfos = residueInfos;
     }
     
+    /**
+     * Add residue infos. A residue info array consists of residue name, chain, and PDB residue number (e.g., ["ASN", "A", "170"]).
+     * @param residueInfos the residue infos
+     */
     public void addResidueInfos(List<String[]> residueInfos) {
         for(String[] r : residueInfos) {
             this.residueInfos.add(r);

@@ -2510,7 +2510,9 @@ public class Main {
                                         //Set<Integer> s = gp.determineVertexSetWithEccAtLeast(12);
                                         //Set<Integer> s = gp.determineVertexSetWithClCAtLeast(0.8);
                                         //Set<Integer> s = gp.determineVertexSetWithClCAtMost(0.25);
-                                        Set<Integer> s = gp.determineVertexSetWithDegreeAtLeast(16);
+                                        //Set<Integer> s = gp.determineVertexSetWithDegreeAtLeast(14);
+                                        
+                                        Set<Integer> s = aag.findResidues("A", 153, null);
                                         
                                         List<Residue> l = aag.getResiduesFromSetByIndex(s);
                                         System.out.println("Pymol select script for " + l.size() + " of the " + aag.getSize() + " residues: '" + Main.getPymolSelectionScriptForResidues(l) + "'.");
@@ -11712,6 +11714,8 @@ public class Main {
         if(Settings.getBoolean("plcc_B_compute_graph_metrics") && graphType.equals(SSEGraph.GRAPHTYPE_ALBELIG)) {
             GraphProperties gp = new GraphProperties(cg);
             GraphProperties sgp = new GraphProperties(gp.getLargestConnectedComponent());
+            
+            
             
             // DEBUG ---------------
             /*

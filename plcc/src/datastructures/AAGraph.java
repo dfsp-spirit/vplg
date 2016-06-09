@@ -510,6 +510,24 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         super();
     }
     
+    /**
+     * Find residues based on chain, PDB residue number, and icode. You can set these properties to null to have them ignored. Example: If you set chain to "A" and the rest to null, you will get all residues from chain A. If you specify values for all 3 fields, the result set should have size 1.
+     * @param chain the PDB chain name (all are accepted if set to null)
+     * @param pdbresnum the PDB residue number (all are accepted if set to null)
+     * @param icode the PDB iCode field (all are accepted if set to null)
+     * @return a list of residues that match the criteria
+     */
+    public Set<Integer> findResidues(String chain, Integer pdbresnum, String icode){
+        Set<Integer> res = new HashSet<>();
+        int resIndex = 0;
+        for(Residue r : this.vertices) {
+            if((chain == null || r.getChainID().equals(chain)) && (pdbresnum == null || r.getPdbResNum().equals(pdbresnum)) && (icode == null || r.getiCode().equals(icode))) {
+                res.add(resIndex);
+                resIndex++;
+            }
+        }
+        return res;
+    }
    
     /** Returns a Graph Modelling Language format representation of this graph.
      *  See http://www.fim.uni-passau.de/fileadmin/files/lehrstuhl/brandenburg/projekte/gml/gml-technical-report.pdf for the publication 
