@@ -6827,12 +6827,17 @@ public class Main {
             //CAHPI            
             if ((atoms_a.size() > 0 && a.getHydrogenAtoms().size() > 0)) {
                     
-                Atom ca = new Atom();
+                Atom ca = null;
                 for (Atom c : atoms_a) {
                     if (c.getAtomName().contains("CA")) {
                         ca = c;
                     }
                 }
+                if (ca == null) {
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms (no CA)."
+                        + " Continue search in next residues.");
+                }
+                else {
                 
                 for (Atom ha : a.getHydrogenAtoms()) {
                     if (ha.getAtomName().contains("HA")) {
@@ -6910,6 +6915,7 @@ public class Main {
                         }
                     }
                 }
+            }
             }
             else {
                 DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms (No CA)."
@@ -7229,13 +7235,17 @@ public class Main {
             
                     if ((atoms_a.size() >= 2 && a.getHydrogenAtoms().size() > 0) || ("PRO".equals(a.getName3()) && atoms_a.size() >= 2 && a.getHydrogenAtoms().size() > 0)) {
                         
-                        Atom ca = new Atom();
+                        Atom ca = null;
                         for (Atom c : atoms_a) {
                             if (c.getAtomName().contains("CA")) {
                                 ca = c;
                             }
                         }
-
+                        if (ca == null) {
+                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms (no CA)."
+                                + " Continue search in next residues.");
+                        }
+                        else {
                         for (Atom ha : a.getHydrogenAtoms()) {
                             if (ha.getAtomName().contains("HA")) {                  
                             
@@ -7262,6 +7272,7 @@ public class Main {
                             }
                         }
                         }
+                    }
                     }
                     else {
                         if ((! (atoms_a.size() > 2)) || "PHE".equals(a.getName3()) && !(atoms_a.size() > 2)) {
@@ -7303,7 +7314,7 @@ public class Main {
                     DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms (no CA)."
                         + " Continue search in next residues.");
                 }
-
+                else {
                 for (Atom ha : a.getHydrogenAtoms()) {
                     if (ha.getAtomName().contains("HA")) {
                 
@@ -7321,6 +7332,7 @@ public class Main {
                 
                     }
                 }
+            }
             }
             else {
                 if (! (atoms_b.get(2).getAtomShortName().equals("C") && atoms_b.get(3).getAtomShortName().equals("O"))) {
@@ -7646,13 +7658,17 @@ public class Main {
             //PICAH            
             if ((atoms_b.size() > 0) && b.getHydrogenAtoms().size() >  0) {
                 
-                Atom ca = new Atom();
+                Atom ca = null;
                 for (Atom c : atoms_b) {
                     if (c.getAtomName().contains("CA")) {
                         ca = c;
                     }
                 }
-                
+                if (ca == null) {
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms (no CA)."
+                        + " Continue search in next residues.");
+                }
+                else {
                 for (Atom ha : b.getHydrogenAtoms()) {
                     if (ha.getAtomName().contains("HA")) {                 
                     
@@ -7730,6 +7746,7 @@ public class Main {
                     }
                 }
                 }
+            }
             }
             else {
                     DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough atoms (no CA)."
@@ -8051,12 +8068,17 @@ public class Main {
                         atoms_a.get(6).getAtomShortName().equals("OD1")) ) {  
             
                     if ((atoms_b.size() >= 2) && b.getHydrogenAtoms().size() > 0) {
-                        Atom ca = new Atom();
+                        Atom ca = null;
                         for (Atom c : atoms_b) {
                             if (c.getAtomName().contains("CA")) {
                                 ca = c;
                             }
                         }
+                        if (ca == null) {
+                            DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms (no CA)."
+                                + " Continue search in next residues.");
+                        }
+                        else {
 
                         for (Atom ha : b.getHydrogenAtoms()) {
                             if (ha.getAtomName().contains("HA")) {                
@@ -8086,6 +8108,7 @@ public class Main {
                             
                         }
                         }
+                    }
                     }
                     else {
                             DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough atoms (no CA)."
@@ -8120,7 +8143,7 @@ public class Main {
                 DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms (no CA)."
                     + " Continue search in next residues.");
                 }
-
+            else {
             for (Atom ha : b.getHydrogenAtoms()) {
                 if (ha.getAtomName().contains("HA")) {
                 
@@ -8138,6 +8161,7 @@ public class Main {
                 
             }
         }
+            }
         }
         else {
             DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms (no C=O)."
