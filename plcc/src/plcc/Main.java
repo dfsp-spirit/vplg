@@ -6583,7 +6583,7 @@ public class Main {
             if (atoms_a.size() > 0 && a.getHydrogenAtoms().size() > 0) {
                 if (! "PRO".equals(a.getName3())) { //Pro contains no backbone N-H
                     for (Atom h : a.getHydrogenAtoms()) {
-                        if (h.getAtomName().equals("H")) {
+                        if (h.getAtomName().replaceAll("\\s+","").equals("H")) {
                             piDist = (int)(calculateDistancePiEffect(atoms_a.get(0), h, six_ring) / 10);
                       
                             if ( piDist > 0) {
@@ -7408,7 +7408,7 @@ public class Main {
             if (atoms_b.size() > 0 && b.getHydrogenAtoms().size() > 0) {
                 if (! "PRO".equals(b.getName3())) { //Pro contains no backbone N-H
                     for (Atom h : b.getHydrogenAtoms()) {
-                        if (h.getAtomName().equals("H")) {
+                        if (h.getAtomName().replaceAll("\\s+","").equals("H")) {
                         piDist = (int)(calculateDistancePiEffect(b.getAtoms().get(0), h, six_ring) / 10);
                       
                     if (piDist > 0) {
