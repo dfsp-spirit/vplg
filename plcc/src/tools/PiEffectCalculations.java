@@ -6,12 +6,15 @@
 package tools;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import org.apache.commons.math3.linear.EigenDecomposition;
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.RealVector;
+import org.apache.commons.math3.stat.correlation.Covariance;
 import proteinstructure.Atom;
 
 /**
  *
- * @author niclas
+ * @author niclas, andreas
  */
 public class PiEffectCalculations {
 
@@ -297,5 +300,63 @@ public class PiEffectCalculations {
                 + "or report back to the code authors. Program may crash.");
         return -1;
     }
-    
+   
+    /**
+     * Estimates the planarity of an aromatic ring by calculating the RMSD of all
+     * atoms to a least squares plane fitted to the atoms.
+     * A least squares plane will be fitted to the supplied atoms and the RMSD
+     * from all atoms to this plane will be calculated. The RMSD value serves as
+     * an estimater for planarity, where perfect planarity would correspond to
+     * a RMSD value of zero.
+     * The least squares plane calculation is based on:
+     * - D. M. Blow (1960). "To Fit a Plane to a Set of Points by Least Squares." Acta Cryst., 13, 168.
+     * - V. Schomaker et al. (1959). "To Fit a Plane or a Line to a Set of Points by Least Squares." Acta Cryst., 12, 600-604.
+     * @param atoms List of atoms forming the aromatic ring to be checked for planarity.
+     * @return 
+     */
+    public static double calculateAromaticRingPlanarity(ArrayList<Atom> atoms) {
+        
+        // we need a point to lie in the plane; this should probably be replaced
+        // by the calculation of the geometric average of the atoms
+        double[] centroid = calculateMidpointOfAtoms(atoms);
+        
+        // get all x,y,z coordinates from the atoms
+        double[][] atomCoords = new double[atoms.size()][3];
+        for(int i = 0; i < atoms.size(); i++) {
+            atomCoords[i][0] = atoms.get(i).getCoordX();
+            atomCoords[i][1] = atoms.get(i).getCoordY();
+            atomCoords[i][2] = atoms.get(i).getCoordZ();
+        }
+        
+        RealMatrix covarianceMatrix = new Covariance(atomCoords).getCovarianceMatrix();
+        
+        // perform eigendecomposition of the covariance matrix to get the eigenvalues and eigenvectors
+        EigenDecomposition eigendecomp = new EigenDecomposition(covarianceMatrix);
+        double[] eigenvalues = eigendecomp.getRealEigenvalues();
+        
+        // the smallest eigenvalue corresponds to the best plane
+        double minEigenvalue = eigenvalues[0];
+        RealVector minEigenvector = eigendecomp.getEigenvector(0);
+        
+        for(int x = 1; x < eigenvalues.length; x++) {
+            if(eigenvalues[x] < minEigenvalue) {
+                minEigenvalue = eigenvalues[x];
+                minEigenvector = eigendecomp.getEigenvector(x);
+            }
+        }
+        
+        double originToPlaneDistance = minEigenvector.getEntry(0) * centroid[0] + minEigenvector.getEntry(1) * centroid[1] + minEigenvector.getEntry(2) * centroid[2];
+        
+        /*minEigenvector.setEntry(0, -1 * minEigenvector.getEntry(0));
+        minEigenvector.setEntry(1, -1 * minEigenvector.getEntry(1));
+        minEigenvector.setEntry(2, -1 * minEigenvector.getEntry(2));
+        */
+        double rmsd = 0;
+        for(Atom atom : atoms) {
+            rmsd += Math.pow(minEigenvector.getEntry(0) * atom.getCoordX() + minEigenvector.getEntry(1) * atom.getCoordY() + minEigenvector.getEntry(2) * atom.getCoordZ() - originToPlaneDistance, 2);
+        }
+        rmsd = Math.sqrt(rmsd/atoms.size());
+        System.out.println("[EIGV] " + String.valueOf(minEigenvalue));
+        return rmsd;
+    }
 }

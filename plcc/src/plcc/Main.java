@@ -5561,6 +5561,106 @@ public class Main {
         ArrayList<Atom> six_ring = new ArrayList<Atom>();
         ArrayList<Atom> five_ring = new ArrayList<Atom>(); //in case of TRP
         
+        
+        // only for testing purposes right now
+        // atm this is used to estimate how planar the aromatic rings actually are
+        // (in a mathematical sense) to see if we have to worry about the calculation
+        // of the normal vector for those aromatic rings
+        if (sidechainPiRings.contains(b.getName3())) {           
+            //get atoms of six-ring (and five-ring in case of Trp)
+            six_ring.clear();
+            five_ring.clear();
+            if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {                
+                if (atoms_b.size() >= 11) {
+                    for (Integer k = 5; k < 11; k++) {
+                        six_ring.add(atoms_b.get(k));
+                    }
+                    double rmsd = PiEffectCalculations.calculateAromaticRingPlanarity(six_ring);
+                    System.out.println("[RMSD] " + b.getChainID() + " " + b.getPdbResNum() + " " + b.getName3() + " " + String.valueOf(rmsd));
+                    System.out.println("[RMSD|ATOMS] " + six_ring.toString());
+                }
+                else {
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() + ") contains not enough atoms.");
+                }
+
+            } else if ("TRP".equals(b.getName3())) {
+                           
+                //five_ring includes CG, CD1, NE1, CE2, CD2
+                if (atoms_b.size() >= 9) {
+                    for (Integer k = 5; k < 10; k++) {
+                        five_ring.add(atoms_b.get(k));    
+                    }
+                    double rmsd = PiEffectCalculations.calculateAromaticRingPlanarity(five_ring);
+                    System.out.println("[RMSD] " + b.getChainID() + " " + b.getPdbResNum() + " " + b.getName3() + " " + String.valueOf(rmsd));
+                    System.out.println("[RMSD|ATOMS] " + five_ring.toString());
+                } else {
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough atoms for 5-ring.");
+                }
+                
+                //six_ring includes CD2, CE2, CE3, CZ2, CZ3, CH2
+                if (atoms_b.size() >= 13) {
+                    six_ring.add(atoms_b.get(7)); //CD2
+                    for (Integer k = 9; k < 14; k++) {
+                        six_ring.add(atoms_b.get(k));
+                    }
+                    double rmsd = PiEffectCalculations.calculateAromaticRingPlanarity(six_ring);
+                    System.out.println("[RMSD] " + b.getChainID() + " " + b.getPdbResNum() + " " + b.getName3() + " " + String.valueOf(rmsd));
+                    System.out.println("[RMSD|ATOMS] " + six_ring.toString());
+                } else {
+                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough atoms for 6-ring.");
+                }
+            }
+        }
+        
+        if (sidechainPiRings.contains(a.getName3())) {           
+            //get atoms of six-ring (and five-ring in case of Trp)
+            six_ring.clear();
+            five_ring.clear();
+            if ("TYR".equals(a.getName3()) || "PHE".equals(a.getName3())) {                
+                if (atoms_a.size() >= 11) {
+                    for (Integer k = 5; k < 11; k++) {
+                        six_ring.add(atoms_a.get(k));
+                    }
+                    double rmsd = PiEffectCalculations.calculateAromaticRingPlanarity(six_ring);
+                    System.out.println("[RMSD] " + a.getChainID() + " " + a.getPdbResNum() + " " + a.getName3() + " " + String.valueOf(rmsd));
+                    System.out.println("[RMSD|ATOMS] " + six_ring.toString());
+                }
+                else {
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() + ") contains not enough atoms.");
+                }
+
+            } else if ("TRP".equals(a.getName3())) {
+                           
+                //five_ring includes CG, CD1, NE1, CE2, CD2
+                if (atoms_a.size() >= 9) {
+                    for (Integer k = 5; k < 10; k++) {
+                        five_ring.add(atoms_a.get(k));    
+                    }
+                    double rmsd = PiEffectCalculations.calculateAromaticRingPlanarity(five_ring);
+                    System.out.println("[RMSD] " + a.getChainID() + " " + a.getPdbResNum() + " " + a.getName3() + " " + String.valueOf(rmsd));
+                    System.out.println("[RMSD|ATOMS] " + five_ring.toString());
+                } else {
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms for 5-ring.");
+                }
+                
+                //six_ring includes CD2, CE2, CE3, CZ2, CZ3, CH2
+                if (atoms_a.size() >= 13) {
+                    six_ring.add(atoms_a.get(7)); //CD2
+                    for (Integer k = 9; k < 14; k++) {
+                        six_ring.add(atoms_a.get(k));
+                    }
+                    double rmsd = PiEffectCalculations.calculateAromaticRingPlanarity(six_ring);
+                    System.out.println("[RMSD] " + a.getChainID() + " " + a.getPdbResNum() + " " + a.getName3() + " " + String.valueOf(rmsd));
+                    System.out.println("[RMSD|ATOMS] " + six_ring.toString());
+                } else {
+                    DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms for 6-ring.");
+                }
+            }
+        }
+        
+        
+        
+        
         Integer[] numPairContacts = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL];
         // The positions in the numPairContacts array hold the number of contacts of each type for a pair of residues:
         // Some cheap vars to make things easier to understand (a replacement for #define):
