@@ -81,6 +81,7 @@ import graphdrawing.DrawTools.IMAGEFORMAT;
 import graphdrawing.IComplexGraph;
 import graphdrawing.ProteinGraphColors;
 import graphformats.IGEXFFormat;
+import graphformats.IManualSVGFormat;
 import graphformats.ISimpleProteinGraphFormat;
 import io.IO;
 import plcc.Settings;
@@ -96,7 +97,7 @@ import tools.DP;
  * 
  * @author spirit
  */
-public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements IVPLGGraphFormat, IGraphModellingLanguageFormat, ITrivialGraphFormat, IDOTLanguageFormat, IKavoshFormat, ISimpleProteinGraphFormat, SimpleGraphInterface, IDrawableGraph, IComplexGraph, IGEXFFormat {
+public abstract class SSEGraph extends SimpleAttributedGraphAdapter implements IVPLGGraphFormat, IGraphModellingLanguageFormat, ITrivialGraphFormat, IDOTLanguageFormat, IKavoshFormat, ISimpleProteinGraphFormat, SimpleGraphInterface, IDrawableGraph, IComplexGraph, IGEXFFormat, IManualSVGFormat {
     
     /** the list of all SSEs of this graph */
     protected List<SSE> sseList;
@@ -3193,6 +3194,63 @@ E	3	3	3
         return kf.toString();
     }
     
+    private String getSVGCircleAt(int x, int y) {
+        return "<circle fill=\"red\" stroke-width=\"2\" r=\"10\" cx=\"" + x + "\" cy=\"" + y + "\" stroke=\"none\"/>";
+    }
+    
+    private String getSVGRectAt(int x, int y) {
+        return "<rect x=\"" + x + "\" width=\"20\" stroke-width=\"2\" height=\"20\" y=\"" + y + "\" stroke=\"none\"\n" +
+"      />";
+    }
+    
+    private String getSVGArcFromTo(int x1, int y1, int x2, int y2) {
+        String pathString = "";
+        return "<path fill=\"none\" d=\"" + pathString + "\" stroke=\"red\" stroke-width=\"2\"/>";
+    }
+    
+    @Override
+    public String toManualSVGFormat() {
+        StringBuilder svg = new StringBuilder();
+        
+        int posX = 100; int stepX = 50;
+        String comma;
+        int posY = 50;
+        String sse_type, longSSEClass;
+        for(Integer i = 0; i < this.getSize(); i++) {
+            sse_type = this.getFGNotationOfVertex(i);
+            // the color is defined by the 'longSSEClass', this is done in the CSS of the CytoscapeJS lib by reading the classes
+            longSSEClass = "sse_type_" + sse_type;
+            // { data: { id: '0', name: '1e' }, position: { x: 100, y: 50 }, classes: 'sse strand' },            
+            posX += stepX;
+            if(sse_type.equals("blah")) {
+                svg.append(getSVGCircleAt(posX, posY));
+            } else if(sse_type.equals("blah")) {
+                svg.append(getSVGRectAt(posX, posY));
+            } else {
+                System.out.println("Skipping SSE in SVG");
+            }
+        }
+        
+        svg.append("");
+        
+        int edgeID = 0; int edge_height;
+        String edge_type, long_edge_class;
+        comma = ",";
+        for(Integer i = 0; i < this.getSize(); i++) {
+            for(Integer j = i+1 ; j < this.getSize(); j++) {
+                if(this.containsEdge(i, j) && !Objects.equals(i, j)) {
+                    edge_type = this.getEdgeLabel(i, j);
+                    long_edge_class = "edge_type_" + edge_type;
+                    edge_height = Math.abs(50 * (j - i) / 2);
+                    // { data: { source: '0', target: '1', edgeHeight: '-200px' }, classes: 'pgedge edgeparallel' },
+                    svg.append(getSVGArcFromTo(10, 10, 100, 10));
+                    edgeID++;                    
+                }
+            }
+        }
+        
+        return svg.toString();
+    }
     
     @Override
     public String toGEXFFormat() {

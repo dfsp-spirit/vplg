@@ -3541,6 +3541,7 @@ public class Main {
                 String plccFileNoPath = "";
                 String gexfFileNoPath = "";
                 String cytoscapejsFileNoPath = "";
+                String msvgFileNoPath = "";
                 
                 HashMap<String, String> writtenFormatsDBFilesNoPath = new HashMap<>();
                 
@@ -3607,6 +3608,14 @@ public class Main {
                     if(IO.stringToTextFile(jsonGraphFile, pg.toJSONFormat())) {
                         graphFormatsWritten += "json "; numFormatsWritten++; writtenFormatsDBFilesNoPath.put(GraphFormats.GRAPHFORMAT_JSON, jsonFileNoPath);
                         pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_JSON, new File(jsonGraphFile));
+                    }
+                }
+                if(Settings.getBoolean("plcc_B_output_msvg")) {
+                    String msvgGraphFile = filePathGraphs + fs + fileNameWithoutExtension + ".msvg";
+                    msvgFileNoPath = fileNameWithoutExtension + ".msvg";
+                    if(IO.stringToTextFile(msvgGraphFile, pg.toManualSVGFormat())) {
+                        graphFormatsWritten += "msvg "; numFormatsWritten++; writtenFormatsDBFilesNoPath.put(GraphFormats.GRAPHFORMAT_MANUALSVG, msvgFileNoPath);
+                        pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_MANUALSVG, new File(msvgGraphFile));
                     }
                 }
                 if(Settings.getBoolean("plcc_B_output_gexf")) {
