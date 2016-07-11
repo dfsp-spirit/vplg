@@ -3194,24 +3194,49 @@ E	3	3	3
         return kf.toString();
     }
     
-    private String getSVGCircleAt(int x, int y) {
-        int addx = 10; int addy = 10;
-        return "      <circle fill=\"red\" stroke-width=\"2\" r=\"10\" cx=\"" + (x + addx) + "\" cy=\"" + (y + addy) + "\" stroke=\"none\"/>\n";
+    private String getSVGCircleAt(int x, int y, String id) {
+        int addx = 0; int addy = 10;
+        return "      <circle id=\"" + id + "\" fill=\"red\" stroke-width=\"2\" r=\"10\" cx=\"" + (x + addx) + "\" cy=\"" + (y + addy) + "\" stroke=\"none\"/>\n";
     }
     
-    private String getSVGRectAt(int x, int y) {
-        return "      <rect x=\"" + x + "\" width=\"20\" stroke-width=\"2\" height=\"20\" y=\"" + y + "\" stroke=\"none\"/>\n";
+    private String getSVGCircleLigAt(int x, int y, String id) {
+        int addx = 0; int addy = 10;
+        return "      <circle id=\"" + id + "\" fill=\"magenta\" stroke-width=\"2\" r=\"10\" cx=\"" + (x + addx) + "\" cy=\"" + (y + addy) + "\" stroke=\"none\"/>\n";
     }
     
-    private String getSVGArcFromTo(int x1, int x2, int y1, int y2) {
-        String pathString = "M " + x1 + " " + x2 + " " + "C" + y1 + " " + y2;
-        return "      <path fill=\"none\" d=\"" + pathString + "\" stroke=\"red\" stroke-width=\"2\"/>\n";
+    private String getSVGRectAt(int x, int y, String id) {
+        int addx = -7;
+        int addy = 0;
+        return "      <rect id=\"" + id + "\" x=\"" + (x + addx) + "\" width=\"20\" stroke-width=\"2\" height=\"20\" y=\"" + (y + addy) + "\" stroke=\"none\"/>\n";
+    }
+    
+    private String getSVGArcFromTo(int startX, int startY, int targetX, int targetY, String edge_type, String id) {
+        int distX = targetX - startX;
+        int controlX = startX + (distX / 2);    // between the 2 verts, equal distance to both
+        int controlY = (startY - (distX / 2)); // always negative, so above verts
+        String pathString = "M " + startX + " " + startY + " " + "Q " + controlX + " " + controlY + " " + targetX + " " + targetY + " ";
+        String stroke = "red";
+        if(edge_type.equals("p")) {
+            stroke = "red";
+        }
+        if(edge_type.equals("a")) {
+            stroke = "blue";
+        }
+        if(edge_type.equals("m")) {
+            stroke = "green";
+        }
+        if(edge_type.equals("j")) {
+            stroke = "magenta";
+        }
+        String fill = "none";
+        return "      <path id=\"" + id + "\" fill=\"" + fill + "\" d=\"" + pathString + "\" stroke=\"" + stroke + "\" stroke-width=\"2\"/>\n";
     }
     
     private int[] posOf(int x) {
         int posY = 500;
         int stepX = 50;
-        return new int[]{0 + (x * stepX), posY};
+        int leftMostVertexStartX = 100;
+        return new int[]{leftMostVertexStartX + (x * stepX), posY};
     }
     
     private String printPos(int[] in) {
@@ -3240,26 +3265,32 @@ E	3	3	3
 "        albe protein graph of PDB entry 8icd, chain A\n" +
 "      </text>\n");
 
-        
-        int posX = 100; int stepX = 50;
+        int leftMostVertexStartX = 100;
+        int posX = leftMostVertexStartX; int stepX = 50;
         String comma;
         int posY = 500;
-        String sse_type, longSSEClass;
+        String sse_type, longSSEClass, id;
         for(Integer i = 0; i < this.getSize(); i++) {
             sse_type = this.getFGNotationOfVertex(i);
             // the color is defined by the 'longSSEClass', this is done in the CSS of the CytoscapeJS lib by reading the classes
             longSSEClass = "sse_type_" + sse_type;
             // { data: { id: '0', name: '1e' }, position: { x: 100, y: 50 }, classes: 'sse strand' },            
-            posX += stepX;
+            id = "" + i;
             if(sse_type.equals(SSE.SSE_FGNOTATION_HELIX)) {
-                svg.append(getSVGCircleAt(posX, posY));
+                svg.append(getSVGCircleAt(posX, posY, id));
                 System.out.println("[MSVG] Adding circle for vertex #" + i + " SSE type " + sse_type + " at " + printPos(posX, posY));
-            } else if(sse_type.equals(SSE.SSE_FGNOTATION_STRAND)) {
-                svg.append(getSVGRectAt(posX, posY));
+            }
+            else if(sse_type.equals(SSE.SSE_FGNOTATION_LIGAND)) {
+                svg.append(getSVGCircleLigAt(posX, posY, id));
+                System.out.println("[MSVG] Adding circle for vertex #" + i + " SSE type " + sse_type + " at " + printPos(posX, posY));
+            }
+            else if(sse_type.equals(SSE.SSE_FGNOTATION_STRAND)) {
+                svg.append(getSVGRectAt(posX, posY, id));
                 System.out.println("[MSVG] Adding rect vertex #" + i + " SSE type " + sse_type + " at " + printPos(posX, posY));
             } else {
                 System.out.println("[MSVG] Skipping SSE of type '" + sse_type + "' in SVG output.");
             }
+            posX += stepX;
         }
         
         svg.append("");
@@ -3276,14 +3307,15 @@ E	3	3	3
                     // { data: { source: '0', target: '1', edgeHeight: '-200px' }, classes: 'pgedge edgeparallel' },
                     int[] posStart = posOf(i);
                     int[] posEnd = posOf(j);
-                    System.out.println("[MSVG] Adding edge arc from " + printPos(posStart) + " to " + printPos(posEnd));
-                    svg.append(getSVGArcFromTo(posStart[0], posStart[1], posEnd[0], posEnd[1]));
+                    System.out.println("[MSVG] Adding edge arc of type " + edge_type + " from " + printPos(posStart) + " to " + printPos(posEnd));
+                    svg.append(getSVGArcFromTo(posStart[0], posStart[1], posEnd[0], posEnd[1], edge_type, edgeID + ""));
                     edgeID++;                    
                 }
             }
         }
         
         svg.append("    </g>\n" +
+                "    </g>\n" +
 "  </svg>\n");
         
         return svg.toString();
