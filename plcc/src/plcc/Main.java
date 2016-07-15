@@ -6700,7 +6700,7 @@ public class Main {
                             piDist = (int)(calculateDistancePiEffect(atoms_a.get(0), h, six_ring) / 10);
                       
                             if ( piDist > 0) {
-                                System.out.println("NHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                                System.out.println("New NHPI: " + atoms_a.get(0).toString() + "/" + h.toString());
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.NHPI]++;
                                 if (minContactDistances[ResContactInfo.NHPI] < 0 || piDist > minContactDistances[ResContactInfo.NHPI]) {
@@ -6718,7 +6718,7 @@ public class Main {
 
                             piDist = (int)(calculateDistancePiEffect(atoms_a.get(0), h, six_ring, false, true) / 10);
                             if (piDist > 0) {
-                                System.out.println("NHPI EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                                System.out.println("New NHPI: " + atoms_a.get(0).toString() + "/" + h.toString());
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.NHPI]++;
                                 if (minContactDistances[ResContactInfo.NHPI] < 0 || piDist > minContactDistances[ResContactInfo.NHPI]) {
@@ -6736,7 +6736,7 @@ public class Main {
                             if ("TRP".equals(b.getName3())) {
                                 piDist = (int)(calculateDistancePiEffect(a.getAtoms().get(0), h, five_ring) / 10);
                                 if (piDist > 0) {
-                                    System.out.println("NHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                                    System.out.println("New NHPI: " + atoms_a.get(0).toString() + "/" + h.toString());
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.NHPI]++;
                                     if (minContactDistances[ResContactInfo.NHPI] < 0 || piDist > minContactDistances[ResContactInfo.NHPI]) {
@@ -6748,7 +6748,7 @@ public class Main {
 
                                 piDist = (int)(calculateDistancePiEffect(a.getAtoms().get(0), h, five_ring, false, true) / 10);
                                 if (piDist > 0) {
-                                    System.out.println("NHPI EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                                    System.out.println("New NHPI: " + atoms_a.get(0).toString() + "/" + h.toString());
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.NHPI]++;
                                     if (minContactDistances[ResContactInfo.NHPI] < 0 || piDist > minContactDistances[ResContactInfo.NHPI]) {
@@ -6781,7 +6781,7 @@ public class Main {
                         if (hz.getAtomName().contains("HZ")) {
                             piDist = (int)(calculateDistancePiEffect(atoms_a.get(8), hz, six_ring, true) / 10);
                             if (piDist > 0) {
-                                System.out.println("CNHPI EFFECT (Lys) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                                System.out.println("New CNHPI: " + atoms_a.get(8).toString() + "/" + hz.toString());
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.CNHPI]++;
                                 if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
@@ -6798,7 +6798,7 @@ public class Main {
                             
                             piDist = (int)(calculateDistancePiEffect(atoms_a.get(8), hz, six_ring, true, true) / 10);
                             if (piDist > 0) {
-                                System.out.println("CNHPI EFFECT (Lys) (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                                System.out.println("New CNHPI: " + atoms_a.get(8).toString() + "/" + hz.toString());
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.CNHPI]++;
                                 if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
@@ -6816,7 +6816,7 @@ public class Main {
                             if ("TRP".equals(b.getName3())) {
                                 piDist = (int)(calculateDistancePiEffect(atoms_a.get(8), hz, five_ring, true) / 10);
                                 if (piDist > 0) {
-                                    System.out.println("CNHPI EFFECT (Lys) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                                    System.out.println("New CNHPI: " + atoms_a.get(8).toString() + "/" + hz.toString());
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.CNHPI]++;
                                     if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
@@ -6828,7 +6828,7 @@ public class Main {
                                 
                                 piDist = (int)(calculateDistancePiEffect(atoms_a.get(8), hz, five_ring, true, true) / 10);
                                 if (piDist > 0) {
-                                    System.out.println("CNHPI EFFECT (Lys) (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                                    System.out.println("New CNHPI: " + atoms_a.get(8).toString() + "/" + hz.toString());
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.CNHPI]++;
                                     if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
@@ -6864,7 +6864,7 @@ public class Main {
                             
                             piDist = (int)(calculateDistancePiEffect(argN, argH, six_ring, true) / 10);
                             if (piDist > 0) {
-                                System.out.println("CNHPI (Arg) EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                                System.out.println("New CNHPI: " + argN.toString() + "/" + argH.toString());
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.CNHPI]++;
                                 if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
@@ -6882,7 +6882,7 @@ public class Main {
                             
                             piDist = (int)(calculateDistancePiEffect(argN, argH, six_ring, true, true) / 10);
                             if (piDist > 0) {
-                                System.out.println("CNHPI EFFECT (Arg) (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                                System.out.println("New CNHPI: " + argN.toString() + "/" + argH.toString());
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.CNHPI]++;
                                 if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
@@ -6900,7 +6900,7 @@ public class Main {
                             if ("TRP".equals(b.getName3())) {
                                 piDist = (int)(calculateDistancePiEffect(argN, argH, five_ring, true) / 10);
                                 if (piDist > 0) {
-                                    System.out.println("CNHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                                    System.out.println("New CNHPI: " + argN.toString() + "/" + argH.toString());
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.CNHPI]++;
                                     if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
@@ -6912,7 +6912,7 @@ public class Main {
                                 
                                 piDist = (int)(calculateDistancePiEffect(argN, argH, five_ring, true, true) / 10);
                                 if (piDist > 0) {
-                                    System.out.println("CNHPI EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                                    System.out.println("New CNHPI: " + argN.toString() + "/" + argH.toString());
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.CNHPI]++;
                                     if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
@@ -6958,7 +6958,7 @@ public class Main {
                         piDist = (int)(calculateDistancePiEffect(ca, ha, six_ring) / 10);
 
                         if ( piDist > 0) {
-                            System.out.println("CAHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                            System.out.println("New CAHPI: " + ca.toString() + "/" + ha.toString());
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.CAHPI]++;
                             if (minContactDistances[ResContactInfo.CAHPI] < 0 || piDist > minContactDistances[ResContactInfo.CAHPI]) {
@@ -6976,7 +6976,7 @@ public class Main {
                             piDist = (int)(calculateDistancePiEffect(ca, ha, six_ring, false, true) / 10);
                     
                             if ( piDist > 0) {
-                                System.out.println("CAHPI EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                                System.out.println("New CAHPI: " + ca.toString() + "/" + ha.toString());
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.CAHPI]++;
                                 if (minContactDistances[ResContactInfo.CAHPI] < 0 || piDist > minContactDistances[ResContactInfo.CAHPI]) {
@@ -6994,7 +6994,7 @@ public class Main {
                     if ("TRP".equals(b.getName3())) {
                             piDist = (int)(calculateDistancePiEffect(ca, ha, five_ring) / 10);
                             if ( piDist > 0) {
-                                System.out.println("CAHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                                System.out.println("New CAHPI: " + ca.toString() + "/" + ha.toString());
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.CAHPI]++;
                                 if (minContactDistances[ResContactInfo.CAHPI] < 0 || piDist > minContactDistances[ResContactInfo.CAHPI]) {
@@ -7011,7 +7011,7 @@ public class Main {
 
                             piDist = (int)(calculateDistancePiEffect(ca, ha, five_ring, false, true) / 10);
                             if ( piDist > 0) {
-                                System.out.println("CAHPI EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                                System.out.println("New CAHPI: " + ca.toString() + "/" + ha.toString());
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.CAHPI]++;
                                 if (minContactDistances[ResContactInfo.CAHPI] < 0 || piDist > minContactDistances[ResContactInfo.CAHPI]) {
@@ -7041,7 +7041,7 @@ public class Main {
                         if (hd.getAtomName().contains("HD")) {
                             piDist = (int)(calculateDistancePiEffect(atoms_a.get(6), hd, six_ring) / 10);
                         if ( piDist > 0) {
-                            System.out.println("PROCDHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                            System.out.println("New PROCDHPI: " + atoms_a.get(6).toString() + "/" + hd.toString());
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.PROCDHPI]++;
                             if (minContactDistances[ResContactInfo.PROCDHPI] < 0 || piDist > minContactDistances[ResContactInfo.PROCDHPI]) {
@@ -7058,7 +7058,7 @@ public class Main {
 
                         piDist = (int)(calculateDistancePiEffect(atoms_a.get(6), hd, six_ring, false, true) / 10);
                         if (piDist > 0) {
-                            System.out.println("PROCDHPI EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                            System.out.println("New PROCDHPI: " + atoms_a.get(6).toString() + "/" + hd.toString());
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.PROCDHPI]++;
                             if (minContactDistances[ResContactInfo.PROCDHPI] < 0 || piDist > minContactDistances[ResContactInfo.PROCDHPI]) {
@@ -7076,7 +7076,7 @@ public class Main {
                         if ("TRP".equals(b.getName3())) {
                             piDist = (int)(calculateDistancePiEffect(a.getAtoms().get(6), hd, five_ring) / 10);
                             if (piDist > 0) {
-                                System.out.println("PROCDHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                                System.out.println("New PROCDHPI: " + atoms_a.get(6).toString() + "/" + hd.toString());
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.PROCDHPI]++;
                                 if (minContactDistances[ResContactInfo.PROCDHPI] < 0 || piDist > minContactDistances[ResContactInfo.PROCDHPI]) {
@@ -7088,7 +7088,7 @@ public class Main {
 
                             piDist = (int)(calculateDistancePiEffect(a.getAtoms().get(6), hd, five_ring, false, true) / 10);
                             if (piDist > 0) {
-                                System.out.println("PROCDHPI EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                                System.out.println("New PROCDHPI: " + atoms_a.get(6).toString() + "/" + hd.toString());
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.PROCDHPI]++;
                                 if (minContactDistances[ResContactInfo.PROCDHPI] < 0 || piDist > minContactDistances[ResContactInfo.PROCDHPI]) {
@@ -7121,7 +7121,7 @@ public class Main {
                         if (hg.getAtomName().contains("HG")) {
                     piDist = (int)(calculateDistancePiEffect(atoms_a.get(5), hg, six_ring) / 10);
                     if (piDist > 0) {
-                        System.out.println("SHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                        System.out.println("New SHPI: " + atoms_a.get(5).toString() + "/" + hg.toString());
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.SHPI]++;
                         if (minContactDistances[ResContactInfo.SHPI] < 0 || piDist > minContactDistances[ResContactInfo.SHPI]) {
@@ -7138,7 +7138,7 @@ public class Main {
 
                     piDist = (int)(calculateDistancePiEffect(atoms_a.get(5), hg, six_ring, false, true) / 10);
                     if (piDist > 0) {
-                        System.out.println("SHPI EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                        System.out.println("New SHPI: " + atoms_a.get(5).toString() + "/" + hg.toString());
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.SHPI]++;
                         if (minContactDistances[ResContactInfo.SHPI] < 0 || piDist > minContactDistances[ResContactInfo.SHPI]) {
@@ -7156,7 +7156,7 @@ public class Main {
                     if ("TRP".equals(b.getName3())) {
                         piDist = (int)(calculateDistancePiEffect(atoms_a.get(5), hg, five_ring) / 10);
                         if (piDist > 0) {
-                            System.out.println("SHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                            System.out.println("New SHPI: " + atoms_a.get(5).toString() + "/" + hg.toString());
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.SHPI]++;
                             if (minContactDistances[ResContactInfo.SHPI] < 0 || piDist > minContactDistances[ResContactInfo.SHPI]) {
@@ -7168,7 +7168,7 @@ public class Main {
 
                         piDist = (int)(calculateDistancePiEffect(atoms_a.get(5), hg, five_ring, false, true) / 10);
                         if (piDist > 0) {
-                            System.out.println("SHPI EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                            System.out.println("New SHPI: " + atoms_a.get(5).toString() + "/" + hg.toString());
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.SHPI]++;
                             if (minContactDistances[ResContactInfo.SHPI] < 0 || piDist > minContactDistances[ResContactInfo.SHPI]) {
@@ -7255,7 +7255,7 @@ public class Main {
                 
                 piDist = (int)(calculateDistancePiEffect(OHAA_X, OHAA_H, six_ring) / 10);
                 if (piDist > 0) {
-                    System.out.println("XOHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                    System.out.println("New XOHPI: " + OHAA_X.toString() + "/" + OHAA_H.toString());
                     numPairContacts[ResContactInfo.TT]++;
                     numPairContacts[ResContactInfo.XOHPI]++;
                     if (minContactDistances[ResContactInfo.XOHPI] < 0 || piDist > minContactDistances[ResContactInfo.XOHPI]) {
@@ -7277,7 +7277,7 @@ public class Main {
 
                 piDist = (int)(calculateDistancePiEffect(OHAA_X, OHAA_H, six_ring, false, true) / 10);
                 if (piDist > 0) {
-                    System.out.println("XOHPI EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                    System.out.println("New XOHPI: " + OHAA_X.toString() + "/" + OHAA_H.toString());
                     numPairContacts[ResContactInfo.TT]++;
                     numPairContacts[ResContactInfo.XOHPI]++;
                     if (minContactDistances[ResContactInfo.XOHPI] < 0 || piDist > minContactDistances[ResContactInfo.XOHPI]) {
@@ -7300,7 +7300,7 @@ public class Main {
                 if ("TRP".equals(b.getName3())) {
                     piDist = (int)(calculateDistancePiEffect(OHAA_X, OHAA_H, five_ring) / 10);
                     if (piDist > 0) {
-                        System.out.println("XOHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                        System.out.println("New XOHPI: " + OHAA_X.toString() + "/" + OHAA_H.toString());
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.XOHPI]++;
                         if (minContactDistances[ResContactInfo.XOHPI] < 0 || piDist > minContactDistances[ResContactInfo.XOHPI]) {
@@ -7317,7 +7317,7 @@ public class Main {
 
                     piDist = (int)(calculateDistancePiEffect(OHAA_X, OHAA_H, five_ring, false, true) / 10);
                     if (piDist > 0) {
-                        System.out.println("XOHPI EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                        System.out.println("New XOHPI: " + OHAA_X.toString() + "/" + OHAA_H.toString());
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.XOHPI]++;
                         if (minContactDistances[ResContactInfo.XOHPI] < 0 || piDist > minContactDistances[ResContactInfo.XOHPI]) {
@@ -7369,7 +7369,7 @@ public class Main {
                                     piDist = (int)(calculateDistancePiEffect(ca, ha, atoms_b.get(5), atoms_b.get(6)) / 10);
                                 }
                             if (piDist > 0) {
-                                System.out.println("CCAHCO EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
+                                System.out.println("New CCAHCO: " + ca.toString() + "/" + ha.toString());
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.CCAHCO]++;
                                 if (minContactDistances[ResContactInfo.CCAHCO] < 0 || piDist > minContactDistances[ResContactInfo.CCAHCO]) {
@@ -7433,7 +7433,7 @@ public class Main {
                 
                 piDist = (int)(calculateDistancePiEffect(ca, ha, atoms_b.get(2), atoms_b.get(3)) / 10);
                 if (piDist > 0) {
-                    System.out.println("BCAHCO EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
+                    System.out.println("New BCAHCO: " + ca.toString() + "/" + ha.toString());
                     numPairContacts[ResContactInfo.TT]++;
                     numPairContacts[ResContactInfo.BCAHCO]++;
                     if (minContactDistances[ResContactInfo.BCAHCO] < 0 || piDist > minContactDistances[ResContactInfo.BCAHCO]) {
@@ -7525,7 +7525,7 @@ public class Main {
                         piDist = (int)(calculateDistancePiEffect(b.getAtoms().get(0), h, six_ring) / 10);
                       
                     if (piDist > 0) {
-                        System.out.println("PINH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                        System.out.println("New PINH: " + b.getAtoms().get(0).toString() + "/" + h.toString());
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.PINH]++;
                         if (minContactDistances[ResContactInfo.PINH] < 0 || piDist > minContactDistances[ResContactInfo.PINH]) {
@@ -7542,7 +7542,7 @@ public class Main {
 
                     piDist = (int)(calculateDistancePiEffect(b.getAtoms().get(0), h, six_ring, false, true) / 10);
                     if (piDist > 0) {
-                        System.out.println("PINH EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                        System.out.println("New PINH: " + b.getAtoms().get(0).toString() + "/" + h.toString());
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.PINH]++;
                         if (minContactDistances[ResContactInfo.PINH] < 0 || piDist > minContactDistances[ResContactInfo.PINH]) {
@@ -7560,7 +7560,7 @@ public class Main {
                     if ("TRP".equals(b.getName3())) {
                         piDist = (int)(calculateDistancePiEffect(b.getAtoms().get(0), h, five_ring) / 10);
                         if (piDist > 0) {
-                            System.out.println("PINH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                            System.out.println("New PINH: " + b.getAtoms().get(0).toString() + "/" + h.toString());
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.PINH]++;
                             if (minContactDistances[ResContactInfo.PINH] < 0 || piDist > minContactDistances[ResContactInfo.PINH]) {
@@ -7572,7 +7572,7 @@ public class Main {
 
                         piDist = (int)(calculateDistancePiEffect(b.getAtoms().get(0), h, five_ring, false, true) / 10);
                         if (piDist > 0) {
-                            System.out.println("PINH EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                            System.out.println("New PINH: " + b.getAtoms().get(0).toString() + "/" + h.toString());
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.PINH]++;
                             if (minContactDistances[ResContactInfo.PINH] < 0 || piDist > minContactDistances[ResContactInfo.PINH]) {
@@ -7604,7 +7604,7 @@ public class Main {
                        if (hz.getAtomName().contains("HZ")) {
                            piDist = (int)(calculateDistancePiEffect(atoms_b.get(8), hz, six_ring, true) / 10);
                            if (piDist > 0) {
-                                System.out.println("PICNH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                                System.out.println("New PICNH: " + b.getAtoms().get(8).toString() + "/" + hz.toString());
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.PICNH]++;
                                 if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.PICNH]) {
@@ -7621,7 +7621,7 @@ public class Main {
                             
                             piDist = (int)(calculateDistancePiEffect(atoms_b.get(8), hz, six_ring, true, true) / 10);
                             if (piDist > 0) {
-                                System.out.println("PICNH EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                                System.out.println("New PICNH: " + b.getAtoms().get(8).toString() + "/" + hz.toString());
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.PICNH]++;
                                 if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.PICNH]) {
@@ -7639,7 +7639,7 @@ public class Main {
                             if ("TRP".equals(a.getName3())) {
                                 piDist = (int)(calculateDistancePiEffect(atoms_b.get(8), hz, five_ring, true) / 10);
                                 if (piDist > 0) {
-                                    System.out.println("PICNH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                                    System.out.println("New PICNH: " + b.getAtoms().get(8).toString() + "/" + hz.toString());
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.PICNH]++;
                                     if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.PICNH]) {
@@ -7651,7 +7651,7 @@ public class Main {
                                 
                                 piDist = (int)(calculateDistancePiEffect(atoms_b.get(8), hz, five_ring, true, true) / 10);
                                 if (piDist > 0) {
-                                    System.out.println("PICNH EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                                    System.out.println("New PICNH: " + b.getAtoms().get(8).toString() + "/" + hz.toString());
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.PICNH]++;
                                     if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.PICNH]) {
@@ -7696,7 +7696,7 @@ public class Main {
 
                             piDist = (int)(calculateDistancePiEffect(argN, argH, six_ring, true) / 10);
                             if (piDist > 0) {
-                                System.out.println("PICNH (Arg) EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                                System.out.println("New PICNH: " + argN.toString() + "/" + argH.toString());
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.PICNH]++;
                                 if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
@@ -7713,7 +7713,7 @@ public class Main {
 
                             piDist = (int)(calculateDistancePiEffect(argN, argH, six_ring, true, true) / 10);
                             if (piDist > 0) {
-                                System.out.println("PICNH EFFECT (Arg) (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                                System.out.println("New PICNH: " + argN.toString() + "/" + argH.toString());
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.PICNH]++;
                                 if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
@@ -7731,7 +7731,7 @@ public class Main {
                             if ("TRP".equals(b.getName3())) {
                                 piDist = (int)(calculateDistancePiEffect(argN, argH, five_ring, true) / 10);
                                 if (piDist > 0) {
-                                    System.out.println("PICNH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                                    System.out.println("New PICNH: " + argN.toString() + "/" + argH.toString());
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.PICNH]++;
                                     if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
@@ -7743,7 +7743,7 @@ public class Main {
 
                                 piDist = (int)(calculateDistancePiEffect(argN, argH, five_ring, true, true) / 10);
                                 if (piDist > 0) {
-                                    System.out.println("PICNH EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                                    System.out.println("New PICNH: " + argN.toString() + "/" + argH.toString());
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.PICNH]++;
                                     if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
@@ -7788,7 +7788,7 @@ public class Main {
                     
                     piDist = (int)(calculateDistancePiEffect(ca, ha, six_ring) / 10);
                     if ( piDist > 0) {
-                        System.out.println("PICAH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                        System.out.println("New PICAH: " + ca.toString() + "/" + ha.toString());
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.PICAH]++;
                         if (minContactDistances[ResContactInfo.PICAH] < 0 || piDist > minContactDistances[ResContactInfo.PICAH]) {
@@ -7806,7 +7806,7 @@ public class Main {
                         piDist = (int)(calculateDistancePiEffect(ca, ha, six_ring, false, true) / 10);
                     
                     if ( piDist > 0) {
-                        System.out.println("PICAH EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                        System.out.println("New PICAH: " + ca.toString() + "/" + ha.toString());
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.PICAH]++;
                         if (minContactDistances[ResContactInfo.PICAH] < 0 || piDist > minContactDistances[ResContactInfo.CAHPI]) {
@@ -7824,7 +7824,7 @@ public class Main {
                     if ("TRP".equals(a.getName3())) {
                         piDist = (int)(calculateDistancePiEffect(ca, ha, five_ring) / 10);
                         if ( piDist > 0) {
-                            System.out.println("PICAH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                            System.out.println("New PICAH: " + ca.toString() + "/" + ha.toString());
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.PICAH]++;
                             if (minContactDistances[ResContactInfo.PICAH] < 0 || piDist > minContactDistances[ResContactInfo.PICAH]) {
@@ -7841,7 +7841,7 @@ public class Main {
 
                         piDist = (int)(calculateDistancePiEffect(ca, ha, five_ring, false, true) / 10);
                         if ( piDist > 0) {
-                            System.out.println("PICAH EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                            System.out.println("New PICAH: " + ca.toString() + "/" + ha.toString());
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.PICAH]++;
                             if (minContactDistances[ResContactInfo.PICAH] < 0 || piDist > minContactDistances[ResContactInfo.PICAH]) {
@@ -7873,7 +7873,7 @@ public class Main {
                         if (hd.getAtomName().contains("HD")) {
                         piDist = (int)(calculateDistancePiEffect(atoms_b.get(6), hd, six_ring) / 10);
                         if ( piDist > 0) {
-                            System.out.println("PIPROCDH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                            System.out.println("New PIPROCDH: " + atoms_b.get(6).toString() + "/" + hd.toString());
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.PIPROCDH]++;
                             if (minContactDistances[ResContactInfo.PIPROCDH] < 0 || piDist > minContactDistances[ResContactInfo.PIPROCDH]) {
@@ -7890,7 +7890,7 @@ public class Main {
 
                         piDist = (int)(calculateDistancePiEffect(atoms_b.get(6), hd, six_ring, false, true) / 10);
                         if (piDist > 0) {
-                            System.out.println("PIPROCDH EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                            System.out.println("New PIPROCDH: " + atoms_b.get(6).toString() + "/" + hd.toString());
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.PIPROCDH]++;
                             if (minContactDistances[ResContactInfo.PIPROCDH] < 0 || piDist > minContactDistances[ResContactInfo.PIPROCDH]) {
@@ -7908,7 +7908,7 @@ public class Main {
                         if ("TRP".equals(a.getName3())) {
                             piDist = (int)(calculateDistancePiEffect(b.getAtoms().get(6), hd, five_ring) / 10);
                             if (piDist > 0) {
-                                System.out.println("PIPROCDH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                                System.out.println("New PIPROCDH: " + atoms_b.get(6).toString() + "/" + hd.toString());
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.PIPROCDH]++;
                                 if (minContactDistances[ResContactInfo.PIPROCDH] < 0 || piDist > minContactDistances[ResContactInfo.PIPROCDH]) {
@@ -7920,7 +7920,7 @@ public class Main {
 
                             piDist = (int)(calculateDistancePiEffect(b.getAtoms().get(6), hd, five_ring, false, true) / 10);
                             if (piDist > 0) {
-                                System.out.println("PIPROCDH EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                                System.out.println("New PIPROCDH: " + atoms_b.get(6).toString() + "/" + hd.toString());
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.PIPROCDH]++;
                                 if (minContactDistances[ResContactInfo.PIPROCDH] < 0 || piDist > minContactDistances[ResContactInfo.PIPROCDH]) {
@@ -7954,7 +7954,7 @@ public class Main {
                             piDist = (int)(calculateDistancePiEffect(atoms_b.get(5), hg, six_ring) / 10);
                             
                     if (piDist > 0) {
-                        System.out.println("PISH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                        System.out.println("New PISH: " + atoms_b.get(5).toString() + "/" + hg.toString());
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.PISH]++;
                         if (minContactDistances[ResContactInfo.PISH] < 0 || piDist > minContactDistances[ResContactInfo.PISH]) {
@@ -7971,7 +7971,7 @@ public class Main {
 
                     piDist = (int)(calculateDistancePiEffect(atoms_b.get(5), hg, six_ring, false, true) / 10);
                     if (piDist > 0) {
-                        System.out.println("PISH EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                        System.out.println("New PISH: " + atoms_b.get(5).toString() + "/" + hg.toString());
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.PISH]++;
                         if (minContactDistances[ResContactInfo.PISH] < 0 || piDist > minContactDistances[ResContactInfo.PISH]) {
@@ -7989,7 +7989,7 @@ public class Main {
                     if ("TRP".equals(a.getName3())) {
                         piDist = (int)(calculateDistancePiEffect(atoms_b.get(5), hg, five_ring) / 10);
                         if (piDist > 0) {
-                            System.out.println("SHPI EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                            System.out.println("New PISH: " + atoms_b.get(5).toString() + "/" + hg.toString());
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.PISH]++;
                             if (minContactDistances[ResContactInfo.PISH] < 0 || piDist > minContactDistances[ResContactInfo.PISH]) {
@@ -8001,7 +8001,7 @@ public class Main {
 
                         piDist = (int)(calculateDistancePiEffect(atoms_b.get(5), hg, five_ring, false, true) / 10);
                         if (piDist > 0) {
-                            System.out.println("SHPI EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                            System.out.println("New PISH: " + atoms_b.get(5).toString() + "/" + hg.toString());
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.PISH]++;
                             if (minContactDistances[ResContactInfo.PISH] < 0 || piDist > minContactDistances[ResContactInfo.PISH]) {
@@ -8089,7 +8089,7 @@ public class Main {
                 
                 piDist = (int)(calculateDistancePiEffect(OHAA_X, OHAA_H, six_ring) / 10);
                 if (piDist > 0) {
-                    System.out.println("PIXOH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                    System.out.println("New PIXOH: " + OHAA_X.toString() + "/" + OHAA_H.toString());
                     numPairContacts[ResContactInfo.TT]++;
                     numPairContacts[ResContactInfo.PIXOH]++;
                     if (minContactDistances[ResContactInfo.PIXOH] < 0 || piDist > minContactDistances[ResContactInfo.PIXOH]) {
@@ -8111,7 +8111,7 @@ public class Main {
 
                 piDist = (int)(calculateDistancePiEffect(OHAA_X, OHAA_H, six_ring, false, true) / 10);
                 if (piDist > 0) {
-                    System.out.println("PIXOH EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "six-ring");
+                    System.out.println("New PIXOH: " + OHAA_X.toString() + "/" + OHAA_H.toString());
                     numPairContacts[ResContactInfo.TT]++;
                     numPairContacts[ResContactInfo.PIXOH]++;
                     if (minContactDistances[ResContactInfo.PIXOH] < 0 || piDist > minContactDistances[ResContactInfo.PIXOH]) {
@@ -8134,7 +8134,7 @@ public class Main {
                 if ("TRP".equals(a.getName3())) {
                     piDist = (int)(calculateDistancePiEffect(OHAA_X, OHAA_H, five_ring) / 10);
                     if (piDist > 0) {
-                        System.out.println("PIXOH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                        System.out.println("New PIXOH: " + OHAA_X.toString() + "/" + OHAA_H.toString());
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.PIXOH]++;
                         if (minContactDistances[ResContactInfo.PIXOH] < 0 || piDist > minContactDistances[ResContactInfo.PIXOH]) {
@@ -8151,7 +8151,7 @@ public class Main {
 
                     piDist = (int)(calculateDistancePiEffect(OHAA_X, OHAA_H, five_ring, false, true) / 10);
                     if (piDist > 0) {
-                        System.out.println("PIXOH EFFECT (FLIPPED) between " + a.getUniquePDBName() + " and " + b.getUniquePDBName() + "five-ring");
+                        System.out.println("New PIXOH: " + OHAA_X.toString() + "/" + OHAA_H.toString());
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.PIXOH]++;
                         if (minContactDistances[ResContactInfo.PIXOH] < 0 || piDist > minContactDistances[ResContactInfo.PIXOH]) {
@@ -8204,7 +8204,7 @@ public class Main {
                                     piDist = (int)(calculateDistancePiEffect(ca, ha, atoms_a.get(5), atoms_a.get(6)) / 10);
                                 }
                             if (piDist > 0) {
-                                System.out.println("CCOCAH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
+                                System.out.println("New CCOCAH: " + ca.toString() + "/" + ha.toString());
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.CCOCAH]++;
                                 if (minContactDistances[ResContactInfo.CCOCAH] < 0 || piDist > minContactDistances[ResContactInfo.CCOCAH]) {
@@ -8262,7 +8262,7 @@ public class Main {
                 
                     piDist = (int)(calculateDistancePiEffect(ca, ha, atoms_a.get(2), atoms_a.get(3)) / 10);
                 if (piDist > 0) {
-                    System.out.println("BCOCAH EFFECT between " + a.getUniquePDBName() + " and " + b.getUniquePDBName());
+                    System.out.println("New BCOCAH: " + ca.toString() + "/" + ha.toString());
                     numPairContacts[ResContactInfo.TT]++;
                     numPairContacts[ResContactInfo.BCOCAH]++;
                     if (minContactDistances[ResContactInfo.BCOCAH] < 0 || piDist > minContactDistances[ResContactInfo.BCOCAH]) {
