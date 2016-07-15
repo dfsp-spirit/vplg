@@ -301,6 +301,7 @@ public class Settings {
         defSet("plcc_B_output_json", "true", "Whether to save computed protein graphs to text files in JSON format.");
         defSet("plcc_B_output_xml", "true", "Whether to save computed protein graphs to text files in XML format.");
         defSet("plcc_B_output_gexf", "false", "Whether to save computed protein graphs to text files in GEXF format.");
+        defSet("plcc_B_output_msvg", "true", "Whether to save computed protein graphs to text files in SVG format for interactive mode.");        
         defSet("plcc_S_gexf_format_version", "1.1", "The version of the GEFX file format to use. Supported are '1.1' and '1.2'.");
         defSet("plcc_B_output_cytoscapejs", "false", "Whether to save computed protein graphs to text files in CytoscapeJS format.");
         
