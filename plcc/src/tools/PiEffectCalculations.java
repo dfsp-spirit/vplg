@@ -6,6 +6,7 @@
 package tools;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import org.apache.commons.math3.linear.EigenDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
@@ -316,10 +317,26 @@ public class PiEffectCalculations {
      */
     public static double calculateAromaticRingPlanarity(ArrayList<Atom> atoms) {
         
-        // we need a point to lie in the plane; this should probably be replaced
-        // by the calculation of the geometric average of the atoms
-        double[] centroid = calculateMidpointOfAtoms(atoms);
+        // we need a point to lie in the plane; one point that fullfills this criterion 
+        // is the geometric average of the atoms
         
+        double[] geoAvg = new double[3];
+        if (! atoms.isEmpty()) {
+            Arrays.fill(geoAvg, 0.0);
+            for (Atom k : atoms) {
+                geoAvg[0] += k.getCoordX();
+                geoAvg[1] += k.getCoordY();
+                geoAvg[2] += k.getCoordZ();
+            }
+            geoAvg[0] = geoAvg[0] / atoms.size();
+            geoAvg[1] = geoAvg[1] / atoms.size();
+            geoAvg[2] = geoAvg[2] / atoms.size();
+        }
+        else {
+            DP.getInstance().w("The list of atoms is empty. Nothing to calculate.");
+            return -1;
+        }
+
         // get all x,y,z coordinates from the atoms
         double[][] atomCoords = new double[atoms.size()][3];
         for(int i = 0; i < atoms.size(); i++) {
@@ -345,18 +362,13 @@ public class PiEffectCalculations {
             }
         }
         
-        double originToPlaneDistance = minEigenvector.getEntry(0) * centroid[0] + minEigenvector.getEntry(1) * centroid[1] + minEigenvector.getEntry(2) * centroid[2];
+        double originToPlaneDistance = minEigenvector.getEntry(0) * geoAvg[0] + minEigenvector.getEntry(1) * geoAvg[1] + minEigenvector.getEntry(2) * geoAvg[2];
         
-        /*minEigenvector.setEntry(0, -1 * minEigenvector.getEntry(0));
-        minEigenvector.setEntry(1, -1 * minEigenvector.getEntry(1));
-        minEigenvector.setEntry(2, -1 * minEigenvector.getEntry(2));
-        */
         double rmsd = 0;
         for(Atom atom : atoms) {
             rmsd += Math.pow(minEigenvector.getEntry(0) * atom.getCoordX() + minEigenvector.getEntry(1) * atom.getCoordY() + minEigenvector.getEntry(2) * atom.getCoordZ() - originToPlaneDistance, 2);
         }
         rmsd = Math.sqrt(rmsd/atoms.size());
-        System.out.println("[EIGV] " + String.valueOf(minEigenvalue));
         return rmsd;
     }
 }
