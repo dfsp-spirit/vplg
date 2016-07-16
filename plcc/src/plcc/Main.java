@@ -3611,8 +3611,8 @@ public class Main {
                     }
                 }
                 if(Settings.getBoolean("plcc_B_output_msvg")) {
-                    String msvgGraphFile = filePathGraphs + fs + fileNameWithoutExtension + ".msvg";
-                    msvgFileNoPath = fileNameWithoutExtension + ".msvg";
+                    String msvgGraphFile = filePathGraphs + fs + fileNameWithoutExtension + ".man.svg";
+                    msvgFileNoPath = fileNameWithoutExtension + ".man.svg";
                     if(IO.stringToTextFile(msvgGraphFile, pg.toManualSVGFormat())) {
                         graphFormatsWritten += "msvg "; numFormatsWritten++; writtenFormatsDBFilesNoPath.put(GraphFormats.GRAPHFORMAT_MANUALSVG, msvgFileNoPath);
                         pcr.addProteinGraphOutputFile(gt, GraphFormats.GRAPHFORMAT_MANUALSVG, new File(msvgGraphFile));
