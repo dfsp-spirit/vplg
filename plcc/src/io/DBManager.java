@@ -2228,6 +2228,24 @@ connection.close();
      */
     public static Boolean chainContainsMotif_FourHelixBundle(Long chain_db_id) {
         
+        String[] pdb_chain = DBManager.getPDBIDandChain(chain_db_id);
+        if(pdb_chain.length != 2) {
+            return false;
+        }
+        
+        Integer[] sseCountsOfChain;
+        try {
+            sseCountsOfChain = getSSETypeCountsOfChain(pdb_chain[0], pdb_chain[1]);
+        } catch(SQLException e) {
+            DP.getInstance().e("DBManager", "Could not determine SSE counts for PDB " + pdb_chain[0] + " chain " + pdb_chain[1] + ".");
+            return false;
+        }
+        
+        int numHelices = sseCountsOfChain[1];
+        if(numHelices < 4) {
+            return false;
+        }
+        
         ResultSetMetaData md;
         ArrayList<String> columnHeaders;
         ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
@@ -12262,6 +12280,28 @@ connection.close();
     }
     
     /**
+     * Determines the number of SSEs by type which occur in a chain, based on the sse_string property of the albelig graph in the database.
+     * @param pdb_id the PDB id
+     * @param chain_name the chain name
+     * @return an Integer array of length 4, containing at positions: 0= total SSE count, 1=alpha helix count, 2=beta strand count, 3=ligand count
+     * @throws SQLException if something went wrong with the DB
+     */
+    public static Integer[] getSSETypeCountsOfChain(String pdb_id, String chain_name) throws SQLException {
+        Integer[] counts = new Integer[4];
+        Arrays.fill(counts, 0);
+        String sse_string = getSSEStringOfChain(pdb_id, chain_name);
+        if(sse_string != null) {            
+            for(Character c : sse_string.toCharArray()) {
+                counts[0]++;
+                if(c.equals('H')) { counts[1]++; }
+                else if(c.equals('E')) { counts[2]++; }
+                else if(c.equals('L')) { counts[3]++; }
+            }
+        }
+        return counts;
+    }
+    
+    /**
      * Returns the SSE string of a chain from the database.
      * @param pdb_id the PDB id
      * @param chain_name the chain name
@@ -12797,7 +12837,7 @@ connection.close();
      * @param dbChainID the primary key of the chain in the db (e.g., from the graphs table)
      * @return an array of length 2 that contains the PDB ID at position 0 and the chain name at position 1. If no chain with the requested PK exists, the array has a length != 2.
      */
-    public static String[] getPDBIDandChain(Integer dbChainID) {
+    public static String[] getPDBIDandChain(Long dbChainID) {
         
         ResultSetMetaData md;
         ArrayList<String> columnHeaders;
@@ -12814,7 +12854,7 @@ connection.close();
             //dbc.setAutoCommit(false);
             statement = dbc.prepareStatement(query);
 
-            statement.setInt(1, dbChainID);
+            statement.setLong(1, dbChainID);
                                 
             rs = statement.executeQuery();
             //dbc.commit();
@@ -14588,7 +14628,7 @@ connection.close();
         
         // OK, check size of results table and return 1st field of 1st column
         String graphSSEStringDB, graphTypeDB, pdbidDB, chainNameDB, graphStringDB;
-        Integer chainPK;
+        Long chainPK;
         String[] data;
         
         
@@ -14600,7 +14640,7 @@ connection.close();
                 graphStringDB = tableData.get(i).get(3);
                 
                 try {
-                    chainPK = Integer.valueOf(tableData.get(i).get(1));
+                    chainPK = Long.valueOf(tableData.get(i).get(1));
                 } catch(NumberFormatException e) {
                     DP.getInstance().w("DB: getAllGraphData(): '" + e.getMessage() + "' Ignoring data row.");
                     continue;
