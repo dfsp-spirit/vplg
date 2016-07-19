@@ -351,7 +351,7 @@ public class ProteinGraphDrawer {
         } catch (IOException ex) {
             DP.getInstance().e("Could not write protein graph file : '" + ex.getMessage() + "'.");
         }
-        if (!Settings.getBoolean("plcc_B_silent")) {
+        if (! (Settings.getBoolean("plcc_B_silent") || Settings.getBoolean("plcc_B_only_essential_output"))) {
             StringBuilder sb = new StringBuilder();
             sb.append("      Output protein graph files: ");
             for (DrawTools.IMAGEFORMAT format : resultFilesByFormat.keySet()) {
@@ -411,7 +411,7 @@ public class ProteinGraphDrawer {
         } catch (IOException ex) {
             DP.getInstance().e("Could not write SEQ folding graph file : '" + ex.getMessage() + "'.");
         }
-        if (!Settings.getBoolean("plcc_B_silent")) {
+        if (! (Settings.getBoolean("plcc_B_silent") || Settings.getBoolean("plcc_B_only_essential_output"))) {
             StringBuilder sb = new StringBuilder();
             sb.append("          Output SEQ folding graph files: ");
             for (DrawTools.IMAGEFORMAT format : resultFilesByFormat.keySet()) {
@@ -441,7 +441,7 @@ public class ProteinGraphDrawer {
         } catch (IOException ex) {
             DP.getInstance().e("Could not write RED folding graph file : '" + ex.getMessage() + "'.");
         }
-        if (!Settings.getBoolean("plcc_B_silent")) {
+        if (! (Settings.getBoolean("plcc_B_silent") || Settings.getBoolean("plcc_B_only_essential_output"))) {
             StringBuilder sb = new StringBuilder();
             sb.append("          Output RED folding graph files: ");
             for (DrawTools.IMAGEFORMAT format : resultFilesByFormat.keySet()) {
@@ -2385,7 +2385,7 @@ public class ProteinGraphDrawer {
         } catch (IOException ex) {
             DP.getInstance().e("Could not write ADJ folding graph file : '" + ex.getMessage() + "'.");
         }
-        if (!Settings.getBoolean("plcc_B_silent")) {
+        if (! (Settings.getBoolean("plcc_B_silent") || Settings.getBoolean("plcc_B_only_essential_output"))) {
             StringBuilder sb = new StringBuilder();
             sb.append("          Output ADJ folding graph files: ");
             for (DrawTools.IMAGEFORMAT format : resultFilesByFormat.keySet()) {
@@ -2584,7 +2584,7 @@ public class ProteinGraphDrawer {
             if (pnfr.keyNotation != null || pnfr.keyStartFG >= 0) {
                 DP.getInstance().e("SSEGraph", "drawFoldingGraphKEY: FG reported to NOT support KEY notation, but a KEY notation string is set: '" + pnfr.keyNotation + "', start index is parent is " + pnfr.keyStartFG + ".");
             }
-            if (!Settings.getBoolean("plcc_B_silent")) {
+            if (! (Settings.getBoolean("plcc_B_silent") || Settings.getBoolean("plcc_B_only_essential_output"))) {
                 System.out.println("          Output KEY folding graph files: none, FG does not support KEY notation.");
             }
             return resultFilesByFormat;
@@ -2601,9 +2601,9 @@ public class ProteinGraphDrawer {
         } catch (IOException ex) {
             DP.getInstance().e("Could not write KEY folding graph file : '" + ex.getMessage() + "'.");
         }
-        if (!Settings.getBoolean("plcc_B_silent")) {
+        if (! (Settings.getBoolean("plcc_B_silent") || Settings.getBoolean("plcc_B_only_essential_output"))) {
             StringBuilder sb = new StringBuilder();
-            sb.append("        Output KEY folding graph files: ");
+            sb.append("          Output KEY folding graph files: ");
             for (DrawTools.IMAGEFORMAT format : resultFilesByFormat.keySet()) {
                 sb.append("(").append(format.toString()).append(" => ").append(resultFilesByFormat.get(format)).append(") ");
             }
@@ -3006,7 +3006,7 @@ public class ProteinGraphDrawer {
         } catch (IOException ex) {
             DP.getInstance().e("Could not write DEF folding graph file : '" + ex.getMessage() + "'.");
         }
-        if (!Settings.getBoolean("plcc_B_silent")) {
+        if (! (Settings.getBoolean("plcc_B_silent") || Settings.getBoolean("plcc_B_only_essential_output"))) {
             StringBuilder sb = new StringBuilder();
             sb.append("          Output DEF folding graph files: ");
             for (DrawTools.IMAGEFORMAT format : resultFilesByFormat.keySet()) {

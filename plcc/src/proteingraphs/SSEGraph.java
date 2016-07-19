@@ -3293,17 +3293,17 @@ E	3	3	3
             id = "v" + i;
             if(sse_type.equals(SSE.SSE_FGNOTATION_HELIX)) {
                 svg.append(getSVGCircleAt(posX, posY, id));
-                System.out.println("[MSVG] Adding circle for vertex #" + i + " SSE type " + sse_type + " at " + printPos(posX, posY));
+                //System.out.println("[MSVG] Adding circle for vertex #" + i + " SSE type " + sse_type + " at " + printPos(posX, posY));
             }
             else if(sse_type.equals(SSE.SSE_FGNOTATION_LIGAND)) {
                 svg.append(getSVGCircleLigAt(posX, posY, id));
-                System.out.println("[MSVG] Adding circle for vertex #" + i + " SSE type " + sse_type + " at " + printPos(posX, posY));
+                //System.out.println("[MSVG] Adding circle for vertex #" + i + " SSE type " + sse_type + " at " + printPos(posX, posY));
             }
             else if(sse_type.equals(SSE.SSE_FGNOTATION_STRAND)) {
                 svg.append(getSVGRectAt(posX, posY, id));
-                System.out.println("[MSVG] Adding rect vertex #" + i + " SSE type " + sse_type + " at " + printPos(posX, posY));
+                //System.out.println("[MSVG] Adding rect vertex #" + i + " SSE type " + sse_type + " at " + printPos(posX, posY));
             } else {
-                System.out.println("[MSVG] Skipping SSE of type '" + sse_type + "' in SVG output.");
+                //System.out.println("[MSVG] Skipping SSE of type '" + sse_type + "' in SVG output.");
             }
             posX += stepX;
         }
@@ -3322,7 +3322,7 @@ E	3	3	3
                     // { data: { source: '0', target: '1', edgeHeight: '-200px' }, classes: 'pgedge edgeparallel' },
                     int[] posStart = posOf(i);
                     int[] posEnd = posOf(j);
-                    System.out.println("[MSVG] Adding edge arc of type " + edge_type + " from " + printPos(posStart) + " to " + printPos(posEnd));
+                    //System.out.println("[MSVG] Adding edge arc of type " + edge_type + " from " + printPos(posStart) + " to " + printPos(posEnd));
                     svg.append(getSVGArcFromTo(posStart[0], posStart[1], posEnd[0], posEnd[1], edge_type, "e" + edgeID));
                     edgeID++;                    
                 }

@@ -43,6 +43,7 @@ public class FileParser {
 
     // declare class vars
     public static Boolean silent = false;
+    public static Boolean essentialOutputOnly = false;
     static String fs = System.getProperty("file.separator");
     static Integer maxResidues = 11000;
     static Integer maxUsedDsspResNumInDsspFile = null;
@@ -382,7 +383,7 @@ public class FileParser {
                 System.out.println("  Creating binding sites...");
             }
             createAllBindingSitesFromPdbData(); // fills s_bindingsites
-            if(! FileParser.silent) {
+            if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
                 for(BindingSite s : s_sites) {
                     System.out.println("    PDB: " + s.toString());
                 }
@@ -462,7 +463,7 @@ public class FileParser {
 
         }
 
-        if(! FileParser.silent) {
+        if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
             System.out.println("    PDB: Hit end of PDB file at line " + curLineNumPDB + ".");
 
             // remove duplicate atoms from altLoc here
@@ -519,13 +520,13 @@ public class FileParser {
                     }
                 }                
             }
-            if(! FileParser.silent) {
+            if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
                 System.out.println("    PDB: Assigned " + numResAssigned + " residues to be part of a binding site (ignored " + numWaterResIgnored + " waters).");
             }
         }
         
         
-        if(! FileParser.silent) {
+        if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
             System.out.println("    PDB: Deleted " + numAtomsDeletedAltLoc + " duplicate atoms from " + numResiduesAffected + " residues which had several alternative locations.");
 
             // report statistics
@@ -883,7 +884,7 @@ public class FileParser {
         }
         
 
-        if(! FileParser.silent) {
+        if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
             System.out.println("    PDB: Found C Terminus of chain " + cID + " at PDB line " + curLineNumPDB + ", PDB residue number " + cTerminusResNumPDB + " iCode '" + iCode + "'.");
         }
         //TODO: mark the proper residue as C terminus
@@ -1194,7 +1195,9 @@ public class FileParser {
                 // Model found
                 if( ! modelExistsWithModelID(mID)) {
                     m = new Model(mID);
-                    System.out.println("    PDB: New PDB Model (model ID '" + mID + "') starts at PDB line " + pLineNum + ".");
+                    if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
+                        System.out.println("    PDB: New PDB Model (model ID '" + mID + "') starts at PDB line " + pLineNum + ".");
+                    }
                     s_models.add(m);
                 }
             }
@@ -1203,14 +1206,14 @@ public class FileParser {
 
         // create the default model if this is a non-NMR file (crystal data) that contains no models
         if(s_models.size() < 1) {
-            if(! FileParser.silent) {
+            if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
                 System.out.println("    PDB: No models found in handled PDB lines. This most likely is a crystal data (non-NMR) file. Adding default model '" + defaultModelName + "'.");
             }
             s_models.add(new Model(defaultModelName));
             
         }
 
-        if(! FileParser.silent) {
+        if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
             System.out.println("    PDB: Handled PDB lines contain data from " + s_models.size() + " model(s).");
         }
 
@@ -1596,7 +1599,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
 
                     s_chains.add(c);
 
-                    if(! FileParser.silent) {
+                    if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
                         System.out.println("    PDB: New PDB Chain (chain ID '" + cID + "') starts at PDB line " + pLineNum + ".");
                     }
                 }
@@ -1911,7 +1914,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                         resIndex = s_residues.size() - 1;
                         resIndexDSSP[resNumDSSP] = resIndex;
                         //resIndexPDB[resNumPDB] = resIndex;      // This will crash because some PDB files contain negative residue numbers so fuck it.
-                        if(! FileParser.silent) {
+                        if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
                             System.out.println("    PDB: Added ligand '" +  resNamePDB + "-" + resNumPDB + "', chain " + chainID + " (line " + pLineNum + ", ligand #" + curLigNum + ", DSSP #" + resNumDSSP + ").");
                             System.out.println("    PDB:   => Ligand name = '" + lig.getLigName() + "', formula = '" + lig.getLigFormula() + "', synonyms = '" + lig.getLigSynonyms() + "'.");
                         }

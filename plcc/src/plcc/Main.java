@@ -536,6 +536,16 @@ public class Main {
                         argsUsed[i] = true;
                     }
                     
+                    if(s.equals("--less-output")) {
+                        Settings.set("plcc_B_only_essential_output", "true");
+                        argsUsed[i] = true;
+                    }
+                    
+                    if(s.equals("--verbose")) {
+                        Settings.set("plcc_B_only_essential_output", "false");
+                        argsUsed[i] = true;
+                    }
+                    
                     if(s.equals("--motifs")) {
                         Settings.set("plcc_B_compute_motifs", "true");
                         argsUsed[i] = true;
@@ -1958,9 +1968,17 @@ public class Main {
         // **************************************    here we go: parse files and get data    ******************************************
         if(! silent) {
             System.out.println("Getting data...");
+            FileParser.silent = true;
         } else {
             FileParser.silent = true;
         }
+        if(Settings.getBoolean("plcc_B_only_essential_output")) {
+            FileParser.essentialOutputOnly = true;
+        }
+        else {
+            FileParser.essentialOutputOnly = false;
+        }
+        
         FileParser.initData(pdbFile, dsspFile);
 
         allModelsIDsOfWholePDBFile = FileParser.getAllModelIDsFromWholePdbFile();
@@ -2310,7 +2328,7 @@ public class Main {
 
         }
         else {
-            if(! silent) {
+            if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
                 System.out.println("  Not writing any interim results to text files as requested (geom_neo compatibility mode off).");
             }
         }
@@ -3659,7 +3677,7 @@ public class Main {
                 
                 
                 if(numFormatsWritten > 0) {
-                    if(! silent) {
+                    if(! (Settings.getBoolean("plcc_B_silent") || Settings.getBoolean("plcc_B_only_essential_output"))) {
                         System.out.println("      Exported protein ligand graph in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + new File(filePathGraphs).getAbsolutePath() + fs + "'.");
                     }
                 }
@@ -3718,7 +3736,7 @@ public class Main {
                     // assign SSEs in database
                     try {
                         int numAssigned = DBManager.assignSSEsToProteinGraphInOrder(pg.getVertices(), pdbid, chain, ProtGraphs.getGraphTypeCode(gt));
-                        if(! silent) {
+                        if(! (Settings.getBoolean("plcc_B_silent") || Settings.getBoolean("plcc_B_only_essential_output"))) {
                             System.out.println("      Assigned " + numAssigned + " SSEs to " + gt + " graph of PDB ID '" + pdbid + "' chain '" + chain + "' in the DB.");
                         }
                     } catch(SQLException ex) {
@@ -3856,7 +3874,7 @@ public class Main {
                 if(Settings.getBoolean("plcc_B_folding_graphs")) {
                     //if(gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALPHA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_BETA) || gt.equals(ProtGraphs.GRAPHTYPE_STRING_ALBE)) {
                         
-                        if( ! Settings.getBoolean("plcc_B_silent")) {
+                        if( ! (Settings.getBoolean("plcc_B_silent") || Settings.getBoolean("plcc_B_only_essential_output"))) {
                             System.out.println("      Computing " + gt + " folding graphs.");
                         }
                         
@@ -3872,7 +3890,7 @@ public class Main {
                     //}
                 }
                 else {
-                    if( ! silent) {
+                    if( ! (Settings.getBoolean("plcc_B_silent") || Settings.getBoolean("plcc_B_only_essential_output"))) {
                         System.out.println("      Not handling folding graphs.");
                     }
                 }
@@ -3912,7 +3930,7 @@ public class Main {
         
         DBManager.commit();
         
-        if( ! silent) {
+        if( ! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
             System.out.print("The following macromolecules exist in the PDB file (format: MOL_ID(list of chains) ...):");
             for(String key : macroMoleculesOfPDBfileToChains.keySet()) {
                 System.out.print(" " + key + "(");
@@ -4140,7 +4158,7 @@ public class Main {
                 
                 if(fg.numAlphaBetaVertices() >= Settings.getInteger("plcc_I_min_fgraph_size_draw")) {
                 
-                    if(! silent) {
+                    if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
                         System.out.println("        Drawing all " + notations.size() + " notations of the " + pg.getGraphType() + " FG #" + j + " of size " + fg.getSize() + ".");
                     }
                 
@@ -4231,7 +4249,7 @@ public class Main {
                     
                 } else {
                     // FG too small
-                    if(! silent) {
+                    if(! (silent  || Settings.getBoolean("plcc_B_only_essential_output"))) {
                         System.out.println("        Not drawing any of the " + notations.size() + " notations of the " + pg.getGraphType() + " FG #" + j + " (fg_number=" + fg_number + "): albe size is " + fg.numAlphaBetaVertices() +", min is " + Settings.getInteger("plcc_I_min_fgraph_size_draw") + ".");
                     }
                 }
@@ -4257,7 +4275,7 @@ public class Main {
         
         boolean silent = Settings.getBoolean("plcc_B_silent");
         
-        if(! silent) {
+        if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
             System.out.println("       *Handling " + fg.getGraphType() + " folding Graph #" + fgNumber + " containing " + fg.numVertices() + " vertices and " + fg.numEdges() + " edges (" + fg.numSSEContacts() + " SSE contacts).");
         }
         
@@ -4317,7 +4335,7 @@ public class Main {
 
 
         if(numFormatsWritten > 0) {
-            if(! silent) {
+            if(! (silent  || Settings.getBoolean("plcc_B_only_essential_output"))) {
                 System.out.println("        Exported folding graph #" + fgNumber + " in " + numFormatsWritten + " formats (" + graphFormatsWritten + ") to '" + new File(outputDir).getAbsolutePath() + fs + "'.");
             }
         }
@@ -4352,7 +4370,7 @@ public class Main {
         }
         
         if(numFormatsWritten > 0) {
-            if(! silent) {
+            if(! (silent  || Settings.getBoolean("plcc_B_only_essential_output"))) {
                 System.out.println("        Exported linear notations of " + fg.getGraphType() + " folding graph #" + fgNumber + " in PTGL format to dir '" + new File(outputDir).getAbsolutePath() + fs + "'.");
             }
         }
@@ -9436,7 +9454,8 @@ public class Main {
         //System.out.println("-y | --write-geodat        : write the computed SSE level contacts in geo.dat format to a file (file name: <pdbid>_<chain>.geodat)");        
         System.out.println("-Y | --skip-vast <atoms>   : abort program execution for PDB files with more than <atoms> atoms before contact computation (for cluster mode, try 80000).");        
         System.out.println("-z | --ramaplot            : draw a ramachandran plot of each chain to the file '<pdbid>_<chain>_plot.svg'");        
-        System.out.println("-Z | --silent              : silent mode. do not write output to STDOUT.");        
+        System.out.println("-Z | --silent              : silent mode. do not write output to STDOUT."); 
+        System.out.println("     --verbose             : verbose mode. more detailed output."); 
         System.out.println("   --compute-graph-metrics : compute graph metrics like cluster coefficient for PGs. Slower!");
         System.out.println("   --check-whether-in-db   : check whether the PDB file exists in the database and exit. Returns 0 if it does, 1 if not, value >1 on error.");
         System.out.println("   --draw-aag              : visualize amino acid graphs, test only");
