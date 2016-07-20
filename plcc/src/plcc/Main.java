@@ -478,6 +478,18 @@ public class Main {
                         argsUsed[i] = true;
                     }
                     
+                    if(s.equals("--alt-aa-contacts-ligands")) {
+                        useFileFromCommandline = true;
+                        Settings.set("plcc_B_alternate_aminoacid_contact_model_with_ligands", "true");
+                        Settings.set("plcc_B_handle_hydrogen_atoms_from_reduce", "true");
+                        //adjust other settings here
+                        Settings.set("plcc_B_AAgraph_allchainscombined", "true");
+                        Settings.set("plcc_B_aminoacidgraphs_include_ligands", "true");
+                        Settings.set("plcc_B_quit_after_aag", "true");
+                        outputToBePrintedUnlessSilent.append("  Using alternate residue contact model. Only computing PPI interface graphs.\n");
+                        argsUsed[i] = true;
+                    }
+                    
                     
                     
                     if(s.equals("-p") || s.equals("--pdbfile")) {
@@ -2173,7 +2185,7 @@ public class Main {
             cInfoThisChain = new ArrayList<ResContactInfo>();   // will be computed separately for each chainName later
             cInfo = null;                                       // will not be used in this case (separateContactsByChain=on)
         } else {        
-            if(Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model")) {
+            if(Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model") || Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model_with_ligands")) {
                 cInfo = calculateAllContactsAlternativeModel(residues);
             }
             else {
@@ -2645,7 +2657,7 @@ public class Main {
                         System.err.println("ERROR: Could not write AAGraph for all chains to file '" + aagFile + "'.");
                     }
                     
-                    if(Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model")) {
+                    if(Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model") || Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model_with_ligands")) {
                         
                         // Writes and saves a python script that can be used to visualize bonds with PyMol
                         if(getPymolSelectionScriptPPI(cInfo, pdbid)) {
@@ -4632,7 +4644,7 @@ public class Main {
     public static ArrayList<ResContactInfo> calculateAllContactsAlternativeModel(List<Residue> res) {
 
         System.out.println("\n *** Calculation of interchain contacts. Still WIP! ***");
-        
+        FileParser.silent = false;
         Residue a, b;
         Integer rs = res.size();
         
@@ -4710,7 +4722,7 @@ public class Main {
                 }
             }
         }
-
+        
         if(! FileParser.silent) {
             System.out.println("  Checked " + numResContactsChecked + " contacts for " + rs + " residues: " + numResContactsPossible + " possible, " + contactInfo.size() + " found, " + numResContactsImpossible + " impossible (collison spheres check).");
         }
@@ -8522,7 +8534,7 @@ public class Main {
                             Main.doExit(1);
                         }
                         
-                        /**
+                        /*
                         if(i.equals(atomIndexOfBackboneN) && j.equals(atomIndexOfBackboneO)) {
                             // H bridge from backbone atom 'N' of residue a to backbone atom 'O' of residue b.
                             numPairContacts[ResContactInfo.HB]++;
@@ -8535,10 +8547,12 @@ public class Main {
                             numPairContacts[ResContactInfo.BH]++;
                             // There can only be one of these so if we found it, simply update the distance.
                             minContactDistances[ResContactInfo.BH] = dist;
-                        }**/
+                        }*/
                     }
                     
-                   /* else if(x.isProteinAtom() && y.isLigandAtom()) {
+                    if(Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model_with_ligands")) {
+                    
+                    if(x.isProteinAtom() && y.isLigandAtom()) {
                         // *************************** protein - ligand contact *************************
                         numTotalLigContactsPair++;
                         System.out.println("New Lig: " + x.toString() + "/" + y.toString());
@@ -8616,7 +8630,12 @@ public class Main {
                         }
                         
 
-                    }*/
+                        }
+                    }
+                    else if (x.isLigandAtom() || y.isLigandAtom()) {
+                        // Nothing to do as we computing ligand contacts is disabled by the config.
+                        // We still need to catch ligand molecules here, otherwise "detect" unknown contacts
+                    }
                     else {
                         // *************************** unknown contact, wtf? *************************
                         // This branch should never be hit because atoms of type OTHER are ignored while creating the list of Atom objects
@@ -9609,6 +9628,7 @@ public class Main {
         System.out.println("DEV OPTIONS:");
         System.out.println("     Unsupported development-only options follow. For internal usage only.");
         System.out.println("       --alt-aa-contacts          : use alternate AA contact model by AS. Exits after AAGs.");
+        System.out.println("       --alt-aa-contacts-ligands  : use alternate AA contact model including ligands by AS. Exits after AAGs.");
     }
     
     /**
