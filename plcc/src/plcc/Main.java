@@ -5544,28 +5544,19 @@ public class Main {
         return -1;
     }
     
-    
-    public static void checkAromaticRingPlanarity(Residue a, Residue b) {
+    /**
+     * Calculates the planarity of an aromatic ring.
+     * First a least-squares plane is calculated for the atoms of the aromatic ring
+     * and then the RMSD from all those atoms to this plane is calculated. The lower
+     * the RMSD the more planar the aromatic ring.
+     * @param a residue for whom the aromatic ring planarity will be calculated
+     * @return String containing information about the residue, the RMSD value, and the
+     * atoms forming the aromatic ring.
+     */
+    public static String checkAromaticRingPlanarity(Residue a) {
         
         ArrayList<Atom> atoms_a = a.getAtoms();
-        ArrayList<Atom> atoms_b = b.getAtoms();
         
-        ArrayList<String> sidechainOAAs = new ArrayList<String>();
-        sidechainOAAs.add("ASP");
-        sidechainOAAs.add("GLU");
-        sidechainOAAs.add("ASN");
-        sidechainOAAs.add("GLN");
-        ArrayList<String> sidechainOHAAs = new ArrayList<String>();
-        sidechainOHAAs.add("SER");
-        sidechainOHAAs.add("THR");
-        sidechainOHAAs.add("TYR");
-        ArrayList<String> sidechainNHAAs = new ArrayList<String>();
-        sidechainNHAAs.add("ARG");
-        sidechainNHAAs.add("HIS");
-        sidechainNHAAs.add("LYS");
-        sidechainNHAAs.add("ASN");
-        sidechainNHAAs.add("GLN");
-        sidechainNHAAs.add("TRP");
         ArrayList<String> sidechainPiRings = new ArrayList<String>();
         sidechainPiRings.add("TRP");
         sidechainPiRings.add("TYR");
@@ -5574,56 +5565,12 @@ public class Main {
         ArrayList<Atom> six_ring = new ArrayList<Atom>();
         ArrayList<Atom> five_ring = new ArrayList<Atom>(); //in case of TRP
         
+        StringBuilder sb = new StringBuilder();
+        
         
         // atm this is used to estimate how planar the aromatic rings actually are
         // (in a mathematical sense) to see if we have to worry about the calculation
         // of the normal vector for those aromatic rings
-        if (sidechainPiRings.contains(b.getName3())) {           
-            //get atoms of six-ring (and five-ring in case of Trp)
-            six_ring.clear();
-            five_ring.clear();
-            if ("TYR".equals(b.getName3()) || "PHE".equals(b.getName3())) {                
-                if (atoms_b.size() >= 11) {
-                    for (Integer k = 5; k < 11; k++) {
-                        six_ring.add(atoms_b.get(k));
-                    }
-                    double rmsd = PiEffectCalculations.calculateAromaticRingPlanarity(six_ring);
-                    System.out.println("[RMSD] " + b.getChainID() + " " + b.getPdbResNum() + " " + b.getName3() + " " + String.valueOf(rmsd));
-                    System.out.println("[RMSD|ATOMS] " + six_ring.toString());
-                }
-                else {
-                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() + ") contains not enough atoms.");
-                }
-
-            } else if ("TRP".equals(b.getName3())) {
-                           
-                //five_ring includes CG, CD1, NE1, CE2, CD2
-                if (atoms_b.size() >= 9) {
-                    for (Integer k = 5; k < 10; k++) {
-                        five_ring.add(atoms_b.get(k));    
-                    }
-                    double rmsd = PiEffectCalculations.calculateAromaticRingPlanarity(five_ring);
-                    System.out.println("[RMSD] " + b.getChainID() + " " + b.getPdbResNum() + " " + b.getName3() + " " + String.valueOf(rmsd));
-                    System.out.println("[RMSD|ATOMS] " + five_ring.toString());
-                } else {
-                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough atoms for 5-ring.");
-                }
-                
-                //six_ring includes CD2, CE2, CE3, CZ2, CZ3, CH2
-                if (atoms_b.size() >= 13) {
-                    six_ring.add(atoms_b.get(7)); //CD2
-                    for (Integer k = 9; k < 14; k++) {
-                        six_ring.add(atoms_b.get(k));
-                    }
-                    double rmsd = PiEffectCalculations.calculateAromaticRingPlanarity(six_ring);
-                    System.out.println("[RMSD] " + b.getChainID() + " " + b.getPdbResNum() + " " + b.getName3() + " " + String.valueOf(rmsd));
-                    System.out.println("[RMSD|ATOMS] " + six_ring.toString());
-                } else {
-                    DP.getInstance().w("main", b.getName3() + " (" + b.getFancyName() + " chain: " + b.getChainID() +  ") contains not enough atoms for 6-ring.");
-                }
-            }
-        }
-        
         if (sidechainPiRings.contains(a.getName3())) {           
             //get atoms of six-ring (and five-ring in case of Trp)
             six_ring.clear();
@@ -5634,8 +5581,8 @@ public class Main {
                         six_ring.add(atoms_a.get(k));
                     }
                     double rmsd = PiEffectCalculations.calculateAromaticRingPlanarity(six_ring);
-                    System.out.println("[RMSD] " + a.getChainID() + " " + a.getPdbResNum() + " " + a.getName3() + " " + String.valueOf(rmsd));
-                    System.out.println("[RMSD|ATOMS] " + six_ring.toString());
+                    sb.append("[RMSD] ").append(a.getChainID()).append(" ").append(a.getPdbResNum()).append(" ").append(a.getName3()).append(" ").append(String.valueOf(rmsd));
+                    sb.append("[RMSD|ATOMS] ").append(six_ring.toString());
                 }
                 else {
                     DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() + ") contains not enough atoms.");
@@ -5649,8 +5596,8 @@ public class Main {
                         five_ring.add(atoms_a.get(k));    
                     }
                     double rmsd = PiEffectCalculations.calculateAromaticRingPlanarity(five_ring);
-                    System.out.println("[RMSD] " + a.getChainID() + " " + a.getPdbResNum() + " " + a.getName3() + " " + String.valueOf(rmsd));
-                    System.out.println("[RMSD|ATOMS] " + five_ring.toString());
+                    sb.append("[RMSD] ").append(a.getChainID()).append(" ").append(a.getPdbResNum()).append(" ").append(a.getName3()).append(" ").append(String.valueOf(rmsd));
+                    sb.append("[RMSD|ATOMS] ").append(five_ring.toString());
                 } else {
                     DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms for 5-ring.");
                 }
@@ -5662,15 +5609,24 @@ public class Main {
                         six_ring.add(atoms_a.get(k));
                     }
                     double rmsd = PiEffectCalculations.calculateAromaticRingPlanarity(six_ring);
-                    System.out.println("[RMSD] " + a.getChainID() + " " + a.getPdbResNum() + " " + a.getName3() + " " + String.valueOf(rmsd));
-                    System.out.println("[RMSD|ATOMS] " + six_ring.toString());
+                    sb.append("[RMSD] ").append(a.getChainID()).append(" ").append(a.getPdbResNum()).append(" ").append(a.getName3()).append(" ").append(String.valueOf(rmsd));
+                    sb.append("[RMSD|ATOMS] ").append(six_ring.toString());
                 } else {
                     DP.getInstance().w("main", a.getName3() + " (" + a.getFancyName() + " chain: " + a.getChainID() +  ") contains not enough atoms for 6-ring.");
                 }
             }
         }
+        return sb.toString();
     }
     
+    
+    /** Calculate pi-effects between residue 'a' and 'b'.
+     * Calculates pi-effects occurring between  residues of different chains.
+     * The results can be integrated into the PPI detection.
+     * @param a one of the residues of the residue pair
+     * @param b one of the residues of the residue pair
+     * @return A ResContactInfo object with information on the pi-effects between 'a' and 'b'.
+     */
     public static ResContactInfo calculatePiEffects(Residue a, Residue b) {
         
         ArrayList<Atom> atoms_a = a.getAtoms();
@@ -7430,7 +7386,8 @@ public class Main {
         sidechainPiRings.add("PHE");
         
         // Only used for testing purposes right now.
-        // checkAromaticRingPlanarity(a, b); 
+        // System.out.println(checkAromaticRingPlanarity(a)); 
+        // System.out.println(checkAromaticRingPlanarity(b)); 
        
         Integer[] numPairContacts = new Integer[Main.NUM_RESIDUE_PAIR_CONTACT_TYPES_ALTERNATIVE_MODEL];
         // The positions in the numPairContacts array hold the number of contacts of each type for a pair of residues:
@@ -7555,9 +7512,6 @@ public class Main {
                 //System.out.println("        " + y);
 
                 dist = x.distToAtom(y);
-                
-                
-                //TODO: - implement the new different contact types (IHB, IBH, IPI, ISB)
                 
                 // H-bonds
                 if (dist < 39) {
@@ -8569,8 +8523,6 @@ public class Main {
                         }
                         
                         /**
-                        //TODO: - add new H-bridge calculation to be more precise and include H-bridges with/between sidechains
-                        // Check for H bridges separately
                         if(i.equals(atomIndexOfBackboneN) && j.equals(atomIndexOfBackboneO)) {
                             // H bridge from backbone atom 'N' of residue a to backbone atom 'O' of residue b.
                             numPairContacts[ResContactInfo.HB]++;
