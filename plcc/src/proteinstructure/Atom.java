@@ -301,14 +301,20 @@ public class Atom implements java.io.Serializable {
         Double radLig = Settings.getInteger("plcc_I_lig_atom_radius").doubleValue();
 
         if(this.isLigandAtom()) {
-            atomRadiusThis = radLig;
+            atomRadiusThis = vdwRadii.get(this.chemSym.replaceAll("\\s+",""));
+            if(atomRadiusThis == null) {
+                atomRadiusThis = radLig;
+            }
         }
         else {
             atomRadiusThis = vdwRadii.get(this.chemSym.replaceAll("\\s+","")); //replaceAll is needed to delete whitespace in front of the chemSym; otherwise you cannot look it up in the hashmap
         }
         
         if(a.isLigandAtom()) {
-            atomRadiusOther = radLig;
+            atomRadiusOther = vdwRadii.get(a.chemSym.replaceAll("\\s+",""));
+            if(atomRadiusOther == null) {
+                atomRadiusOther = radLig;
+            }
         }
         else {
             atomRadiusOther = vdwRadii.get(a.chemSym.replaceAll("\\s+",""));
