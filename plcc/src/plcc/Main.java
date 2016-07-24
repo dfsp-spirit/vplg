@@ -1928,7 +1928,7 @@ public class Main {
         }
 
 
-        if(! silent) {
+        if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
             System.out.println("  Checked required files and directories, looks good.");
         }
 
@@ -1972,14 +1972,16 @@ public class Main {
             }
         }
         else {
-            if(! silent) {
+            if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
                 System.out.println("  Not using the database as requested by options.");
             }
         }
 
         // **************************************    here we go: parse files and get data    ******************************************
         if(! silent) {
-            System.out.println("Getting data...");
+            if( ! Settings.getBoolean("plcc_B_only_essential_output")) {
+                System.out.println("Getting data...");
+            }
             FileParser.silent = true;
         } else {
             FileParser.silent = true;
@@ -1995,7 +1997,7 @@ public class Main {
 
         allModelsIDsOfWholePDBFile = FileParser.getAllModelIDsFromWholePdbFile();
 
-        if(! silent) {
+        if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
             // print all model IDs from the PDB file (not just the handled model)
             System.out.println("    PDB: Found the following NMR models in the whole PDB file:");
             System.out.print("    PDB:");
@@ -2059,7 +2061,7 @@ public class Main {
         
         String sBondString;
         if(sulfurBridges.size() > 0) {
-            if(! silent) {
+            if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
                 System.out.print("    DSSP: Protein contains " + sulfurBridges.size() + " disulfide bridges: ");
             
                 for(Character key : sulfurBridges.keySet()) {
@@ -2080,7 +2082,7 @@ public class Main {
                 System.out.print("\n"); 
             }
         } else {
-            if(! silent) {
+            if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
                 System.out.println("    DSSP: Protein contains no disulfide bridges.");
             }
         }
@@ -2112,7 +2114,7 @@ public class Main {
         else {
             // All residues exist, we can now calculate their maximal center sphere radius
             globalMaxCenterSphereRadius = getGlobalMaxCenterSphereRadius(residues);
-            if(! silent) {
+            if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
                 System.out.println("  Maximal center sphere radius for all residues is " + globalMaxCenterSphereRadius + ".");
             }
 
@@ -2120,7 +2122,7 @@ public class Main {
             // Note that this is a lot less useful with ligands enabled since they are always listed at the 
             //  end of the chainName and may be far (in 3D) from their predecessor in the sequence.
             globalMaxSeqNeighborResDist = getGlobalMaxSeqNeighborResDist(residues);     
-            if(! silent) {
+            if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
                 System.out.println("  Maximal distance between residues that are sequence neighbors is " + globalMaxSeqNeighborResDist + ".");
             }
         }
@@ -2155,7 +2157,7 @@ public class Main {
         }
         */
 
-        if(! silent) {
+        if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
             System.out.println("Calculating residue contacts...");
         }
 
@@ -2408,8 +2410,8 @@ public class Main {
         }
         
         if(Settings.getBoolean("plcc_B_calc_draw_graphs")) {
-            if(! silent) {
-                System.out.println("  Calculating SSE graphs.");
+            if(! (silent || Settings.getBoolean("plcc_B_only_essential_output") )) {
+                System.out.println("Calculating SSE graphs.");
                 System.out.println("Calculating SSEs for all chains of protein " + pdbid + "...");
             }
             
@@ -4042,18 +4044,25 @@ public class Main {
 
         
         HashMap<Integer, FoldingGraph> ccsList = new HashMap<Integer, FoldingGraph>();
+        int fgMinSizeDraw = Settings.getInteger("plcc_I_min_fgraph_size_draw");
+        int numFGsWithMinSize = 0;
+        FoldingGraph fg = null;           // A connected component of a protein graph is a folding graph
         for (int i = 0; i < foldingGraphs.size(); i++) {
-            ccsList.put(i, foldingGraphs.get(i));            
+            fg = foldingGraphs.get(i);
+            ccsList.put(i, fg);
+            if(fg.getSize() >= fgMinSizeDraw) {
+                numFGsWithMinSize++;
+            }
         }        
         ProteinFoldingGraphResults fgRes = new ProteinFoldingGraphResults(ccsList);
+        fg = null;
         
-        FoldingGraph fg;           // A connected component of a protein graph is a folding graph
         String fgFile = null;
         String fs = System.getProperty("file.separator");
 
         //System.out.println("Found " + ccs.size() + " connected components in " + graphType + " graph of chainName " + c.getPdbChainID() + ".");
         if(! silent) {
-            System.out.println("      --- Handling all " + foldingGraphs.size() + " " + pg.getGraphType() + " folding graphs of the " + pg.getGraphType() + " protein graph ---");
+            System.out.println("      --- Handling all " + foldingGraphs.size() + " " + pg.getGraphType() + " folding graphs of the " + pg.getGraphType() + " protein graph (" + numFGsWithMinSize + " with >= " + fgMinSizeDraw + " verts) ---");
         }
         for(Integer j = 0; j < foldingGraphs.size(); j++) {            
             fg = foldingGraphs.get(j);
@@ -4468,7 +4477,7 @@ public class Main {
         Boolean silent = Settings.getBoolean("plcc_B_silent");
 
         if(! silent) {
-            System.out.println("    ----- Calculating " + graphType + " graph of chain " + c.getPdbChainID() + ". -----");
+            System.out.println("    ----- Calculating " + graphType + " protein graph of chain " + c.getPdbChainID() + ". -----");
         }
 
         List<String> keepSSEs = new ArrayList<String>();
