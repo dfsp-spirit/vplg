@@ -382,7 +382,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		
 		<div id="PageIntro">
 		<div class="container" id="pageintro">
-		This page gives statistics on the current holdings of this database. The 3D atom data used to compute the protein graphs was retrieved from the RCSB PDB in <?php echo $last_update_month_and_year; ?>.
+		This page gives statistics on the current holdings of this database. The last update was done in <?php echo $last_update_month_and_year; ?>.
 		</div><!-- end container-->
 		</div><!-- end Home -->
 		
