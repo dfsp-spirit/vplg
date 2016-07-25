@@ -155,7 +155,7 @@ public class Settings {
      * @return the PLCC version
      */
     public static String getVersion() {
-        return("0.98.2");
+        return("0.98.3");
     }
 
     /**

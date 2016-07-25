@@ -895,14 +895,19 @@ public class Main {
                     //    System.setProperty("plcc.useLigands", "false");
                     //}
 
-                    if(s.equals("-r") || s.equals("--recreate-tables")) {
-                        System.out.println("Recreating DB tables only (-r)...");
+                    if(s.equals("-r") || s.equals("--recreate-tables") || s.equals("--recreate-tables-empty")) {
+                        Boolean fillTypes = ( ! s.equals("--recreate-tables-empty"));
+                        if(fillTypes) {
+                            System.out.println("Recreating DB tables and adding base type data...");
+                        } else {
+                            System.out.println("Recreating DB tables, not adding any base type data...");
+                        }
                         if(DBManager.init(Settings.get("plcc_S_db_name"), Settings.get("plcc_S_db_host"), Settings.getInteger("plcc_I_db_port"), Settings.get("plcc_S_db_username"), Settings.get("plcc_S_db_password"), true)) {
                             
                             if(DBManager.dropTables()) {
                                 System.out.println("  DB: Tried to drop statistics tables (no error messages => OK).");
                             }
-                            if(DBManager.createTables()) {
+                            if(DBManager.createTables(fillTypes)) {
                                 System.out.println("  DB: Tried to create statistics tables (no error messages => OK).");
                             }
                             
@@ -9680,7 +9685,8 @@ public class Main {
         System.out.println("-P | --write-chains-file   : write an info file containing all chain names of the handled PDB file (for other software to know output file names)");
         System.out.println("     --gz-pdbfile <f>      : use gzipped input PDB file <f>.");
         System.out.println("-q | --fg-notations <list> : draw only the folding graph notations in <list>, e.g. 'kars' = KEY, ADJ, RED and SEQ.");
-        System.out.println("-r | --recreate-tables     : drop and recreate DB statistics tables, then exit (see -u)*");
+        System.out.println("-r | --recreate-tables     : drop and recreate database tables and add base type data, then exit (see -u). Creates a reday-to-use database.*");
+        System.out.println("     --recreate-tables-empty : drop and recreate database tables without adding base type data, then exit (see -u). Creates a completely empty database, suitable for restoring a dump exported from another server.*");        
         System.out.println("-s | --draw-linnots        : not only compute the folding graph linear notations, but draw all 4 of them to image files");
         System.out.println("-S | --sim-measure <m>     : use similarity measure <m>. Valid settings include 'string_sse', 'graph_set' and 'graph_compat'.");
         System.out.println("-t | --draw-tgf-graph <f>  : read graph in TGF format from file <f> and draw it to <f>.png, then exit (pdbid will be ignored)*");

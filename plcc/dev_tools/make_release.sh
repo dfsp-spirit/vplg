@@ -15,9 +15,9 @@ fi
 ## Settings
 RELEASE_DIR="$UHOME/vplg_release"
 TMP_EXPORT_DIR="$UHOME/tmp_svn_export"
-REPO_DIR_PLCC="$UHOME/develop/vplg-full-sf/trunk/plcc"
-REPO_DIR_SPLITPDB="$UHOME/develop/vplg-full-sf/trunk/splitpdb"
-REPO_DIR_VPG="$UHOME/develop/vplg-full-sf/trunk/vpg"
+REPO_DIR_PLCC="$UHOME/develop/vplg/trunk/plcc"
+REPO_DIR_SPLITPDB="$UHOME/develop/vplg/trunk/splitpdb"
+REPO_DIR_VPG="$UHOME/develop/vplg/trunk/vpg"
 
 INCLUDE_VPG="NO"
 
