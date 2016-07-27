@@ -68,7 +68,7 @@ function get_total_complexgraphs_count($db) {
 		It is also of great help when looking at ligands which have contacts with several different chains.
 		<br><br>
 		
-		<div class="boxedred"><p>NOTICE: This feature is still under development. Data is only available for protein 4a97 atm. Data will be available for all proteins after the next PTGL update.</p></div>
+		<!-- <div class="boxedred"><p>NOTICE: This feature is still under development. Data is only available for protein 4a97 atm. Data will be available for all proteins after the next PTGL update.</p></div> -->
 		
 		
 		Enter the PDB identifier you are interested in below to see the respective complex graph.
