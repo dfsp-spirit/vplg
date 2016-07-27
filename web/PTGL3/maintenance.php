@@ -125,14 +125,28 @@ function get_graphtype_abbr($graphtype_int){
 /**
   * Checks the given credentials (both of which are expected to be MD5 encoded).
   */
+/*
 function check_auth($id, $token)  {
-    if(md5($id) === "4d682ec4eed27c53849758bc13b6e179" || md5($id) === "d77d5e503ad1439f585ac494268b351b") {
-        if(md5($token) === "c8bd0177e53c5d2fec5d7e8cba43c505") {
+    if(md5($id) === "md5ofuser1here" || md5($id) === "md5ofuser2here") {
+        if(md5($token) === "md6oftokenhere") {
             return TRUE;
         }
     }
     return FALSE;
 }
+*/
+
+function check_auth_from_list($user, $token, $valid_users, $valid_tokens_md5)  {
+    if(in_array($user, $valid_users)) {
+	$offset = array_search($user, array_keys($valid_users));
+	if(md5($token) === $valid_tokens_md5[$offset]) {
+	    return TRUE;
+	}
+	return FALSE;
+    }
+    return FALSE;
+}
+
 
 
 /**
@@ -330,7 +344,7 @@ function get_linnots_filename($graphtype_int, $notation) {
 		   
 		   // handle tasks
 		   if(isset($_POST['task'])) {
-		       if(check_auth($_POST['admin_id'], $_POST['admin_token'])) {
+		       if(check_auth_from_list($_POST['admin_id'], $_POST['admin_token'], $MAINTENANCE_USERS, $MAINTENANCE_TOKENS_MD5)) {
 		           echo "Task requested: ";
 		           $task = $_POST['task'];
 		           if($task === "linnot_list") {

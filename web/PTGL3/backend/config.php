@@ -52,6 +52,10 @@ $TMP_DATA_DIR		= './temp_data/';
 $TMP_DOWNLOAD_DIR	= './temp_downloads/';
 //---- End of file settings ----//
 
+// Maintenance.php users
+$MAINTENANCE_USERS = array("ts", "nodi");
+$MAINTENANCE_TOKENS_MD5 = array("c8bd0177e53c5d2fec5d7e8cba43c505", "9d07535b8ff70398d39c78c9d19e257e");
+
 
 //---- Debug settings ----//
 $DEBUG_MODE = TRUE;
