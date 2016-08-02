@@ -451,17 +451,16 @@ public class Main {
                     if(s.equals("--convert-models-to-chains")) {
                         convertModelsToChainsInputFile = null;
                         convertModelsToChainsOutputFile = null;
-                        if(args.length <= i+2 ) {
+                        if(args.length <= i+1 ) {
                             syntaxError();
                         }
                         else {
                             useFileFromCommandline = false;
                             Settings.set("plcc_B_convert_models_to_chains", "true");                        
+                            convertModelsToChainsInputFile = pdbFile;
                             argsUsed[i] = true;
-                            convertModelsToChainsInputFile = args[i+1];
+                            convertModelsToChainsOutputFile = args[i+1];
                             argsUsed[i+1] = true;
-                            convertModelsToChainsOutputFile = args[i+2];
-                            argsUsed[i+2] = true;
                         }
                     }
                     
@@ -1890,7 +1889,7 @@ public class Main {
             }               
         }
         
-        // convert pdf file with multiple models to pdb file with multiple chains only
+        // convert pdb file with multiple models to pdb file with multiple chains only
         // the models will be converted to separated chains
         if(Settings.getBoolean("plcc_B_convert_models_to_chains")) {
                 
@@ -1901,7 +1900,7 @@ public class Main {
                     System.exit(0);
                 }
                 else {
-                    DP.getInstance().w("Main", "Conversion of PDB file '" + convertModelsToChainsInputFile + "' failed or nothing to convert.");
+                    DP.getInstance().w("Main", "Conversion of PDB file '" + convertModelsToChainsInputFile + "' failed.");
                     System.exit(1);
                 }
        }

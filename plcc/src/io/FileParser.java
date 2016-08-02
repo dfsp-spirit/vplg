@@ -2335,7 +2335,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
      * If no or only one model was found, the method stops because there is nothing to convert.
      * @param pdbFile the input file
      * @param outFile the output path for the new file
-     * @return true if converting was successful, false otherwise.
+     * @return true if converting was successful or if there was nothing to convert (no or only one model), false otherwise.
      */
     public static Boolean convertPdbModelsToChains(String pdbFile, String outFile) {
         // Read the PDB file
@@ -2359,7 +2359,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                 } catch(Exception e) {
                     System.err.println("ERROR: Hit MODEL line at PDB line number " + pLineNum + " but parsing the line failed.");
                     e.printStackTrace();
-                    System.exit(1);
+                    return false;
                 }
 
                 // Model found
@@ -2369,7 +2369,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                 }
                 else {
                     System.err.println("ERROR: Found models with the same ID.");
-                    System.exit(1);
+                    return false;
                 }
             }
         }
@@ -2378,7 +2378,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         if(models.size() < 2) {
             //System.out.println(models.size());
             System.out.println("No different models/only one model found. Nothing to convert here.");
-            return false;
+            return true;
         }
         
         // Initate a string builder that will store the output string to write the new PDB file
@@ -2410,7 +2410,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         
         if(models.size() > alphabet.length()) {
             DP.getInstance().w("FileParser", "There are more models than possible chain IDs (" + alphabet.length() + "). Aborting the conversion now.");
-            System.exit(1);
+            return false;
         }
 
         // Go through all the found models by starting at the line the models begin
@@ -2424,7 +2424,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
             }
             else {
                 DP.getInstance().w("FileParser", "Not enough letters to set unique chain IDs. Aborting.");
-                System.exit(1);
+                return false;
             }
             
             while(!file.get(lineNum).startsWith("ENDMDL")) {
@@ -2449,7 +2449,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                 if(newAtomID > 99999) {
                     DP.getInstance().w("FileParser", "Trying to assign a new atom ID greater than 99999. The PDB file format does not support this.\n"
                             + "Aborting the conversion now.");
-                    System.exit(1);
+                    return false;
                 }
                 
                 // Creates a string of spaces. To keep the PDB file format intact it is necessary to add the correct amount of spaces
@@ -2528,6 +2528,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
             bw.close();
         } catch (IOException ex) {
             DP.getInstance().e("FileParser", "Could not write converted PDB file '" + outFile + "': '" + ex.getMessage() + "'.");
+            return false;
         }
         //System.out.println(sb.toString());
         //System.out.println(chains.toString());
