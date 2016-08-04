@@ -4741,7 +4741,7 @@ public class Main {
         }
         
             
-        
+
         return(contactInfo);
     }
     
@@ -8563,7 +8563,7 @@ public class Main {
                         }*/
                     }
                     
-                    if(Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model_with_ligands")) {
+                    else if(Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model_with_ligands")) {
                     
                     if(x.isProteinAtom() && y.isLigandAtom()) {
                         // *************************** protein - ligand contact *************************
