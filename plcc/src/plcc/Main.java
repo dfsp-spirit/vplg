@@ -9560,9 +9560,9 @@ public class Main {
         // Write the atom-atom contact information.
         for(int x = 0; x < atomAtomContactTypes.size(); x++) {
             sb.append(atomAtomContactTypes.get(x));
-            sb.append(",");
+            sb.append(";");
             sb.append(atomAtomContacts.get(x)[0]);
-            sb.append(",");
+            sb.append(";");
             sb.append(atomAtomContacts.get(x)[1]);
             sb.append(lineSep);
         }
