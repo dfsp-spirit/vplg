@@ -2377,7 +2377,31 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         // Only if there is more than two models we will have to convert something, otherwise stop here
         if(models.size() < 2) {
             //System.out.println(models.size());
-            System.out.println("No different models/only one model found. Nothing to convert here.");
+            // Initate a string builder that will store the output string to write the new PDB file
+            StringBuilder sb = new StringBuilder();
+            String lineSep = System.lineSeparator();
+            for(Integer i = 0; i < file.size(); i++) {
+                pLine = file.get(i);
+
+                if(!(pLine.startsWith("MODEL ") || pLine.startsWith("ENDMDL"))) {
+                    sb.append(pLine);
+                    sb.append(lineSep);
+                }
+            }
+            
+            // Save the converted PDB file
+            File convertedPdbFile = new File(outFile);
+            try {
+                FileWriter fw = new FileWriter(convertedPdbFile.getAbsoluteFile());
+                BufferedWriter bw = new BufferedWriter(fw);
+                bw.append(sb);
+                bw.close();
+            } catch (IOException ex) {
+                DP.getInstance().e("FileParser", "Could not write converted PDB file '" + outFile + "': '" + ex.getMessage() + "'.");
+                return false;
+            }
+            
+            System.out.println("No different models/only one model found. Nothing to convert here but the MODEL and ENDMDL lines have been removed.");
             return true;
         }
         

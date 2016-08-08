@@ -8383,7 +8383,7 @@ public class Main {
                                                     contactAtomNumInResidueB[ResContactInfo.CCHB] = j;
                                                 }
 //                                                System.out.println("New SS ONH: " + x.toString() + "/" + y.toString());
-                                                atomAtomContactType.add("ssonh");
+                                                atomAtomContactType.add("SSONH");
                                                 donorAcceptor[0] = x;
                                                 donorAcceptor[1] = y;
                                                 atomAtomContacts.add(donorAcceptor);
