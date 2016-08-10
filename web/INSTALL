@@ -47,5 +47,6 @@ Installing the PTGL3 server
   - make sure that the Apache user can read the whole PTGL3 www-dir AND that he can write to PTGL3/temp_downloads/ and PTGL3/temp_data/.
     (Note that something like 'chmod -R go+rx /srv/www/htdocs/PTGL3/' may take hours for so many files, so do it correctly.)
   
+  - to get the PTGL3 API up and running, follow instructions in PTGL3/api/PTGL_API_webserver_config.txt
   
 That's it.
