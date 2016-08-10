@@ -560,11 +560,16 @@ function get_folding_graph_file_name_no_ext($pdbid, $chain, $graphtype_string, $
   return $pdbid . "_" . $chain . "_" . $graphtype_string . "_FG_" . $fg_number;
 }
 
+function get_folding_graph_path_and_file_name_no_ext($pdbid, $chain, $graphtype_string, $fg_number) {
+  $path = get_path_to($pdbid, $chain);
+  $fname = get_folding_graph_file_name_no_ext($pdbid, $chain, $graphtype_string, $fg_number);
+  return $path . $fname;
+}
 
 // ----------------- define the GET routes we need ---------------------
 
 // get a single protein graph
-$app->get('/pg/:pdbid/:chain/:graphtype/:graphformat', function ($pdbid, $chain, $graphtype, $graphformat) use($db, $api_settings:) {    
+$app->get('/pg/:pdbid/:chain/:graphtype/:graphformat', function ($pdbid, $chain, $graphtype, $graphformat) use($db, $api_settings) {    
     //echo "You requested the $graphtype graph of PDB $pdbid chain $chain.\n";
 	$pdbid = strtolower($pdbid);
 	
@@ -662,7 +667,7 @@ $app->get('/fg/:pdbid/:chain/:graphtype/:fold/:graphformat', function ($pdbid, $
     $pdbid = strtolower($pdbid);
     
     if($api_settings['prefer_files_to_db']) {
-        $file_basepath = $api_settings['data_path'] . get_folding_graph_file_name_no_ext($pdbid, $chain, $graphtype, $fold);
+        $file_basepath = $api_settings['data_path'] . get_folding_graph_path_and_file_name_no_ext($pdbid, $chain, $graphtype, $fold);
         $extension = FALSE;
         if($graphformat === "gml") {
 	    $extension = ".gml";
