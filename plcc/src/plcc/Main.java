@@ -4043,6 +4043,7 @@ public class Main {
     public static ProteinFoldingGraphResults calculateFoldingGraphsForSSEGraph(ProtGraph pg, String outputDir) {
         //System.out.println("Searching connected components in " + graphType + " graph of chainName " + c.getPdbChainID() + ".");
         boolean silent = Settings.getBoolean("plcc_B_silent");
+        boolean essentialOutOnly = Settings.getBoolean("plcc_B_only_essential_output");
         //ArrayList<FoldingGraphComputationResult> fgcs = pg.getFoldingGraphComputationResults();
         //ArrayList<FoldingGraph> ccs = pg.getConnectedComponents();
         //ArrayList<FoldingGraph> foldingGraphs = FoldingGraphComputationResult.getFoldingGraphsREDandKEYFromFGCR(fgcs);
@@ -4115,7 +4116,7 @@ public class Main {
             if(Settings.getBoolean("plcc_B_useDB")) { 
                 
                 if(fg.numAlphaBetaVertices() < Settings.getInteger("plcc_I_min_fgraph_size_write_to_db")) {
-                    if(! silent) {
+                    if(! (silent || essentialOutOnly)) {
                         System.out.println("       *Not writing " + gt + " folding graph #" + j + " of size " + fg.numVertices() + " to DB (minimum size is " + Settings.getInteger("plcc_I_min_fgraph_size_write_to_db") + ").");
                     }                   
                 }
@@ -4129,7 +4130,7 @@ public class Main {
                             fgDbId = DBManager.writeFoldingGraphToDB(pdbid, chain, ProtGraphs.getGraphTypeCode(gt), fg_number, FoldingGraph.getFoldNameOfFoldNumber(fg_number), fg.getMinimalVertexIndexInParentGraph(), null, null, null, null, null, null, fg.getSSEStringSequential(), fg.containsBetaBarrel()); 
                         }
                         
-                        if(! silent) {
+                        if(! (silent || essentialOutOnly)) {
                             System.out.println("        Inserted '" + gt + "' folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' into DB.");
                         }
                     }
@@ -4147,7 +4148,7 @@ public class Main {
                     if(fgDbId >= 1) {
                         try {
                             Integer[] numAssigned = DBManager.assignSSEsToFoldingGraphInOrderWithSecondat(fg.getVertices(), fgDbId, gt, fg_number, FoldingGraph.getFoldNameOfFoldNumber(fg_number));
-                            if(! silent) {
+                            if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
                                 if(Objects.equals(numAssigned[0], numAssigned[1])) {
                                     System.out.println("        Assigned " + numAssigned[0] + " SSEs to " + gt + " folding graph # " + fg_number + " of PDB ID '" + pdbid + "' chain '" + chain + "' in the DB.");
                                 } else {
@@ -4177,7 +4178,7 @@ public class Main {
                         DP.getInstance().e("Main", "Could not write " + fg.getGraphType() + " FG # " + fg.getFoldingGraphNumber() + " linear notations to single linnot table in DB, empty insert ID.");                        
                     }
                     else {
-                        if(! silent) {
+                        if(! (silent || essentialOutOnly)) {
                             System.out.println("        Wrote PTGL linear notations for " + fg.getGraphType() + " FG # " + fg.getFoldingGraphNumber() + " to database.");
                         }
                     } 
@@ -4191,7 +4192,7 @@ public class Main {
                 
                 if(fg.numAlphaBetaVertices() >= Settings.getInteger("plcc_I_min_fgraph_size_draw")) {
                 
-                    if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
+                    if(! (silent || essentialOutOnly)) {
                         System.out.println("        Drawing all " + notations.size() + " notations of the " + pg.getGraphType() + " FG #" + j + " of size " + fg.getSize() + ".");
                     }
                 
@@ -4257,7 +4258,7 @@ public class Main {
                                         DP.getInstance().e("Main", "Could not update format " + format + " folding graph image path in database, 0 rows affected.");
                                     }
                                     else {
-                                        if(! silent) {
+                                        if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
                                             System.out.println("          Updated FG " + notation + " notation " + format + " format image path in database.");
                                         }
                                     }
@@ -4282,7 +4283,7 @@ public class Main {
                     
                 } else {
                     // FG too small
-                    if(! (silent  || Settings.getBoolean("plcc_B_only_essential_output"))) {
+                    if(! (silent  || essentialOutOnly)) {
                         System.out.println("        Not drawing any of the " + notations.size() + " notations of the " + pg.getGraphType() + " FG #" + j + " (fg_number=" + fg_number + "): albe size is " + fg.numAlphaBetaVertices() +", min is " + Settings.getInteger("plcc_I_min_fgraph_size_draw") + ".");
                     }
                 }
