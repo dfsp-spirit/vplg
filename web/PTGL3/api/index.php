@@ -38,6 +38,12 @@ include("../backend/config.php");
 $server_name = $SITE_TITLE;
 $ptgl_base_url = $SITE_BASE_URL;
 $ptgl_api_url = rtrim($ptgl_base_url,"/") . "/api/index.php";
+
+
+$api_settings = array();
+$api_settings['prefer_files_to_db'] = TRUE;
+$api_settings['data_path'] = '../data/';
+
  
 // GET route
 $app->get(
@@ -282,6 +288,7 @@ $app->get(
 				    All queries presented so far were entity queries, i.e., they return data on a single object. We also provide some collection queries, which return some handy lists of objects. All of these return data in JSON format only:
 						<br><br>
 						
+						<!--
 			            A JSON list of all protein graph types (alpha, beta, ...) of a protein chain:
 						
 					    <ul>
@@ -289,7 +296,9 @@ $app->get(
 			            <li>example: <i><a href="$ptgl_api_url/pgs/7tim/A/json" target="_blank">/api/index.php/pgs/7tim/A/json</a></i> retrieves a list of protein graphs in JSON format.</li>
 						</ul>
 						<br>
+						-->
 						
+						<!--
 						A JSON list of all folding graphs of a protein graph (the number of FGs depends on the count of connected components of the PG):
 						<br>
 					    <ul>
@@ -297,6 +306,7 @@ $app->get(
 			            <li>example: <i><a href="$ptgl_api_url/fgs/7tim/A/albe/json" target="_blank">/api/index.php/fgs/7tim/A/albe/json</a></i> retrieves a list of folding graphs in JSON format.</li>
 						</ul>
 						<br>
+						-->
 						
 						A JSON list of all linear notation strings of a folding graph:
 						<br>
@@ -531,28 +541,68 @@ function get_motif_id($motif_abbreviation) {
 	return $motif_id;
 }
 
+function get_protein_graph_file_name_no_ext($pdbid, $chain, $graphtype_string) {
+  return $pdbid . "_" . $chain . "_" . $graphtype_string . "_PG";
+}
+
+function get_path_to($pdbid, $chain) {
+  $mid2chars = substr($pdbid, 1, 2);
+  return $mid2chars . "/" . $pdbid . "/". $chain . "/";
+}
+
+function get_protein_graph_path_and_file_name_no_ext($pdbid, $chain, $graphtype_string) {
+  $path = get_path_to($pdbid, $chain);
+  $fname = get_protein_graph_file_name_no_ext($pdbid, $chain, $graphtype_string);
+  return $path . $fname;
+}
+
+function get_folding_graph_file_name_no_ext($pdbid, $chain, $graphtype_string, $fg_number) {
+  return $pdbid . "_" . $chain . "_" . $graphtype_string . "_FG_" . $fg_number;
+}
+
 
 // ----------------- define the GET routes we need ---------------------
 
 // get a single protein graph
-$app->get('/pg/:pdbid/:chain/:graphtype/:graphformat', function ($pdbid, $chain, $graphtype, $graphformat) use($db) {    
+$app->get('/pg/:pdbid/:chain/:graphtype/:graphformat', function ($pdbid, $chain, $graphtype, $graphformat) use($db, $api_settings:) {    
     //echo "You requested the $graphtype graph of PDB $pdbid chain $chain.\n";
 	$pdbid = strtolower($pdbid);
-    $query = "SELECT g.graph_id, g.graph_string_json, g.graph_string_gml, g.graph_string_xml FROM plcc_graph g INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype'";
-    $result = pg_query($db, $query);
-    
-    $num_res = 0;
-    while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
-		$num_res++;
-		if($graphformat === "gml") {
-          echo $arr['graph_string_gml'];
+	
+    if($api_settings['prefer_files_to_db']) {
+        $file_basepath = $api_settings['data_path'] . get_protein_graph_path_and_file_name_no_ext($pdbid, $chain, $graphtype);
+        $extension = FALSE;
+        if($graphformat === "gml") {
+	    $extension = ".gml";
+	  }
+	  if($graphformat === "json") {
+	    $extension = ".json";
+	  }
+		  if($graphformat === "xml") {
+	    $extension = ".xml";
+	  }
+	  
+	  if($extension) {
+	$json_from_file = file_get_contents($file_basepath . $extension);
+        echo $json_from_file;
         }
-        if($graphformat === "json") {
-          echo $arr['graph_string_json'];
-        }
-		if($graphformat === "xml") {
-          echo $arr['graph_string_xml'];
-        }
+    }
+    else {
+      $query = "SELECT g.graph_id, g.graph_string_json, g.graph_string_gml, g.graph_string_xml FROM plcc_graph g INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype'";
+      $result = pg_query($db, $query);
+      
+      $num_res = 0;
+      while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
+		  $num_res++;
+		  if($graphformat === "gml") {
+	    echo $arr['graph_string_gml'];
+	  }
+	  if($graphformat === "json") {
+	    echo $arr['graph_string_json'];
+	  }
+		  if($graphformat === "xml") {
+	    echo $arr['graph_string_xml'];
+	  }
+      }
     }
     //echo "Found $num_res graphs.\n";
 });
@@ -608,23 +658,44 @@ $app->get('/pgvis/:pdbid/:chain/:graphtype/:imageformat', function ($pdbid, $cha
 
 
 // get a specific folding graph
-$app->get('/fg/:pdbid/:chain/:graphtype/:fold/:graphformat', function ($pdbid, $chain, $graphtype, $fold, $graphformat) use($db) {
+$app->get('/fg/:pdbid/:chain/:graphtype/:fold/:graphformat', function ($pdbid, $chain, $graphtype, $fold, $graphformat) use($db, $api_settings) {
     $pdbid = strtolower($pdbid);
-    $query = "SELECT fg.foldinggraph_id, fg.graph_string_json, fg.graph_string_gml, fg.graph_string_xml FROM plcc_foldinggraph fg INNER JOIN plcc_graph g ON fg.parent_graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype' AND fg.fg_number = $fold";
-    $result = pg_query($db, $query);
     
-    $num_res = 0;
-    while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
-	    $num_res++;
-	    if($graphformat === "gml") {
-	        echo $arr['graph_string_gml'];
-	    } 
-        if($graphformat === "json") {
-          echo $arr['graph_string_json'];
+    if($api_settings['prefer_files_to_db']) {
+        $file_basepath = $api_settings['data_path'] . get_folding_graph_file_name_no_ext($pdbid, $chain, $graphtype, $fold);
+        $extension = FALSE;
+        if($graphformat === "gml") {
+	    $extension = ".gml";
+	  }
+	  if($graphformat === "json") {
+	    $extension = ".json";
+	  }
+		  if($graphformat === "xml") {
+	    $extension = ".xml";
+	  }
+	  
+	  if($extension) {
+	$json_from_file = file_get_contents($file_basepath . $extension);
+        echo $json_from_file;
         }
-		if($graphformat === "xml") {
-          echo $arr['graph_string_xml'];
-        }		
+    }
+    else {
+      $query = "SELECT fg.foldinggraph_id, fg.graph_string_json, fg.graph_string_gml, fg.graph_string_xml FROM plcc_foldinggraph fg INNER JOIN plcc_graph g ON fg.parent_graph_id = g.graph_id INNER JOIN plcc_chain c ON g.chain_id = c.chain_id INNER JOIN plcc_protein p ON c.pdb_id = p.pdb_id INNER JOIN plcc_graphtypes gt ON g.graph_type = gt.graphtype_id WHERE p.pdb_id = '$pdbid' AND c.chain_name = '$chain' AND gt.graphtype_text = '$graphtype' AND fg.fg_number = $fold";
+      $result = pg_query($db, $query);
+      
+      $num_res = 0;
+      while ($arr = pg_fetch_array($result, NULL, PGSQL_ASSOC)){
+	      $num_res++;
+	      if($graphformat === "gml") {
+		  echo $arr['graph_string_gml'];
+	      } 
+	  if($graphformat === "json") {
+	    echo $arr['graph_string_json'];
+	  }
+		  if($graphformat === "xml") {
+	    echo $arr['graph_string_xml'];
+	  }		
+      }
     }
     //echo "You requested the folding graph of fold # $fold of the $graphtype protein graph of PDB $pdbid chain $chain. Found $num_res results.\n";
 });
