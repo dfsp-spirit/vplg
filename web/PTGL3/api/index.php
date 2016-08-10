@@ -598,7 +598,7 @@ $app->get('/pgvis/:pdbid/:chain/:graphtype/:imageformat', function ($pdbid, $cha
         }
     }
 	if( ! empty($image_path)) {
-	    $image = file_get_contents(".." . $IMG_ROOT_PATH . $image_path);
+	    $image = file_get_contents("../data/" . $image_path);
 		$finfo = new finfo(FILEINFO_MIME_TYPE);
 		$app->response->header('Content-Type', 'content-type: ' . $finfo->buffer($image));
 		echo $image;
