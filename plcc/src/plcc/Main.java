@@ -3026,6 +3026,12 @@ public class Main {
             }catch(SQLException e) {
                 DP.getInstance().w("Main", "Could not set total runtime for PDB file '" + pdbid + "' in database.");
             }
+            
+            try {
+                DBManager.updateProteinRunCompletedInDB(pdbid, Boolean.TRUE);
+            }catch(SQLException e) {
+                DP.getInstance().w("Main", "Could not set total protein inserted state for PDB file '" + pdbid + "' in database.");
+            }
         }
         
         if(Settings.getBoolean("plcc_B_useDB")) {
