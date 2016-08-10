@@ -41,7 +41,7 @@ $ptgl_api_url = rtrim($ptgl_base_url,"/") . "/api/index.php";
 
 
 $api_settings = array();
-$api_settings['prefer_files_to_db'] = TRUE;
+$api_settings['prefer_files_to_db'] = TRUE;	// if this is set to TRUE, protein graph data in standard graph file formats (GML, XML, JSON) is taken from flat files on disk (the path is constructed). If is is set to FALSE, the string is queried from the database.
 $api_settings['data_path'] = '../data/';
 
  
