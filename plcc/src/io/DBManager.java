@@ -1261,7 +1261,7 @@ public class DBManager {
             doInsertQuery("CREATE TABLE " + tbl_ssecontact + " (contact_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, contact_type int not null references " + tbl_contacttypes + " ON DELETE CASCADE, check (sse1 < sse2));");
             doInsertQuery("CREATE TABLE " + tbl_ssecontact_complexgraph + " (ssecontact_complexgraph_id serial primary key, sse1 int not null references " + tbl_sse + " ON DELETE CASCADE, sse2 int not null references " + tbl_sse + " ON DELETE CASCADE, complex_contact_count int not null, complex_contact_type int not null references " + tbl_complexcontacttypes + " ON DELETE CASCADE check (sse1 < sse2));");            
             doInsertQuery("CREATE TABLE " + tbl_complex_contact_stats + " (complex_contact_id serial primary key, chain1 int not null references " + tbl_chain + " ON DELETE CASCADE, chain2 int not null references " + tbl_chain + " ON DELETE CASCADE, contact_num_HH int not null, contact_num_HS int not null, contact_num_HL int not null, contact_num_SS int not null, contact_num_SL int not null, contact_num_LL int not null, contact_num_DS int not null);");
-            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_json text, graph_string_xml text, graph_image_png text, graph_image_svg text, graph_image_pdf text, filepath_graphfile_gml text, filepath_graphfile_kavosh text, filepath_graphfile_plcc text, filepath_graphfile_dotlanguage text, filepath_graphfile_json text, filepath_graphfile_xml text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
+            doInsertQuery("CREATE TABLE " + tbl_proteingraph + " (graph_id serial primary key, chain_id int not null references " + tbl_chain + " ON DELETE CASCADE, graph_type int not null references " + tbl_graphtypes + ", graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_json text, graph_string_xml text, graph_image_png text, graph_image_svg text, graph_image_pdf text, filepath_graphfile_gml text, filepath_graphfile_kavosh text, filepath_graphfile_plcc text, filepath_graphfile_dotlanguage text, filepath_graphfile_json text, filepath_graphfile_xml text, filepath_graphfile_mansvg text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_foldinggraph + " (foldinggraph_id serial primary key, parent_graph_id int not null references " + tbl_proteingraph + " ON DELETE CASCADE, fg_number int not null, fold_name varchar(2) not null, first_vertex_position_in_parent int not null, graph_string_gml text, graph_string_kavosh text, graph_string_dotlanguage text, graph_string_plcc text, graph_string_json text, graph_string_xml text, sse_string text, graph_containsbetabarrel int DEFAULT 0);");
             doInsertQuery("CREATE TABLE " + tbl_complexgraph + " (complexgraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, ssegraph_string_gml text, chaingraph_string_gml text, ssegraph_string_xml text, chaingraph_string_xml text, ssegraph_string_kavosh text, chaingraph_string_kavosh text, filepath_ssegraph_image_svg text, filepath_chaingraph_image_svg text, filepath_ssegraph_image_png text, filepath_chaingraph_image_png text, filepath_ssegraph_image_pdf text, filepath_chaingraph_image_pdf text);");
             doInsertQuery("CREATE TABLE " + tbl_aagraph + " (aagraph_id serial primary key, pdb_id varchar(4) not null references " + tbl_protein + " ON DELETE CASCADE, chain_description text, aagraph_string_gml text, num_vertices int, num_edges int);");
@@ -10425,9 +10425,11 @@ connection.close();
             dbFieldNameGraphFile = "filepath_graphfile_dotlanguage";
         } else if(format.equals(GraphFormats.GRAPHFORMAT_KAVOSH)) {
             dbFieldNameGraphFile = "filepath_graphfile_kavosh";
+        } else if(format.equals(GraphFormats.GRAPHFORMAT_MANUALSVG)) {
+            dbFieldNameGraphFile = "filepath_graphfile_mansvg";
         } else {
             // TODO: create fields in DB and handle other fields here
-            DP.getInstance().w("updateProteinGraphTextformatPathInDB", "Format '" + format + "' not supported by DB scheme yet, ignoring.");
+            DP.getInstance().w("updateProteinGraphTextformatPathInDB", "Format '" + format + "' not supported by DB schema yet, ignoring.");
             return 0;
         }
         
@@ -10445,13 +10447,13 @@ connection.close();
             numRowsAffected = statement.executeUpdate();
             //dbc.commit();
         } catch (SQLException e ) {
-            System.err.println("ERROR: SQL: updateProteinGraphImagePathInDB: '" + e.getMessage() + "'.");
+            System.err.println("ERROR: SQL: updateProteinGraphTextformatPathInDB: '" + e.getMessage() + "'.");
             if (dbc != null) {
                 try {
-                    System.err.print("ERROR: SQL: updateProteinGraphImagePathInDB: Transaction is being rolled back.");
+                    System.err.print("ERROR: SQL: updateProteinGraphTextformatPathInDB: Transaction is being rolled back.");
                     dbc.rollback();
                 } catch(SQLException excep) {
-                    System.err.println("ERROR: SQL: updateProteinGraphImagePathInDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
+                    System.err.println("ERROR: SQL: updateProteinGraphTextformatPathInDB: Could not roll back transaction: '" + excep.getMessage() + "'.");                    
                 }
             }
         } finally {
