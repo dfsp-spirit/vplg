@@ -6852,9 +6852,8 @@ connection.close();
         
         // ============== plait1.pl ==============
         
-        //?
-        // add chain_db_id to the SQL-statement --> prepared statement needs to be done
-        ArrayList<ArrayList<String>> rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE (ln.ptgl_linnot_red LIKE '%1a,-2p,3a%' or ln.ptgl_linnot_red LIKE '%1a,-2a,3a%' and ln.ptgl_linnot_red NOT LIKE '%-1a,-2_,3a%') GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
+        
+        ArrayList<ArrayList<String>> rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE c.chain_id = " + chain_db_id + " AND (ln.ptgl_linnot_red LIKE '%1a,-2p,3a%' or ln.ptgl_linnot_red LIKE '%1a,-2a,3a%' and ln.ptgl_linnot_red NOT LIKE '%-1a,-2_,3a%') GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
         Integer[] pattern = new Integer[] {1, -2, 3};
         
         List<String> all_pdb_ids = new ArrayList<>();
@@ -7023,7 +7022,7 @@ connection.close();
         
         // ============== plait2.pl ==============
         
-        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE (ln.ptgl_linnot_red LIKE '%-3a,2p,-1a%' or ln.ptgl_linnot_red LIKE '%-3a,2a,-1a%') GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
+        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE c.chain_id = " + chain_db_id + " AND (ln.ptgl_linnot_red LIKE '%-3a,2p,-1a%' or ln.ptgl_linnot_red LIKE '%-3a,2a,-1a%') GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
         pattern = new Integer[] {-3, 2, -1};
         
         all_pdb_ids = new ArrayList<>();
@@ -7188,7 +7187,7 @@ connection.close();
         
         // ============== plait3.pl ==============
         
-        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE (ln.ptgl_linnot_red LIKE '%3a,-2p,1a%' OR ln.ptgl_linnot_red LIKE '%3a,-2a,1a%' AND ln.ptgl_linnot_red NOT LIKE '-3a,-2_,1a%') GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
+        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE c.chain_id = " + chain_db_id + " AND (ln.ptgl_linnot_red LIKE '%3a,-2p,1a%' OR ln.ptgl_linnot_red LIKE '%3a,-2a,1a%' AND ln.ptgl_linnot_red NOT LIKE '-3a,-2_,1a%') GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
         pattern = new Integer[] {3, -2, 1};
         
         all_pdb_ids = new ArrayList<>();
@@ -7352,7 +7351,7 @@ connection.close();
         
          // ============== plait4.pl ==============
         
-        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE (ln.ptgl_linnot_red LIKE '%-1a,2p,-3a%' OR ln.ptgl_linnot_red LIKE '%-1a,2a,-3a%') GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
+        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE c.chain_id = " + chain_db_id + " AND (ln.ptgl_linnot_red LIKE '%-1a,2p,-3a%' OR ln.ptgl_linnot_red LIKE '%-1a,2a,-3a%') GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
         pattern = new Integer[] {-1, 2, -3};
         
         all_pdb_ids = new ArrayList<>();
@@ -7522,15 +7521,8 @@ connection.close();
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
      */
     public static Boolean chainContainsMotif_UbiquitinRoll(Long chain_db_id) {
-        if( ! Settings.getBoolean("plcc_B_no_not_impl_warn")) {
-            DP.getInstance().w("DBManager", "chainContainsMotif_UbiquitinRoll: Not implemented yet, returning false for chain with ID '" + chain_db_id + "'.");
-        }
         
-        // ============== ubi1.pl ==============
-        
-        //?
-        // add chain_db_id to the SQL-statement --> prepared statement needs to be done
-        ArrayList<ArrayList<String>> rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE ln.ptgl_linnot_red LIKE '%-1a,3p,-1a%' GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
+        ArrayList<ArrayList<String>> rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE c.chain_id = " + chain_db_id + " AND ln.ptgl_linnot_red LIKE '%-1a,3p,-1a%' GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
         Integer[] pattern = new Integer[] {-1, 3, -1};
         
         List<String> all_pdb_ids = new ArrayList<>();
@@ -7665,9 +7657,7 @@ connection.close();
         
         // ============== ubi2.pl ==============
         
-        //?
-        // add chain_db_id to the SQL-statement --> prepared statement needs to be done
-        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE ln.ptgl_linnot_red LIKE '%1a,-3p,1a%' and ln.ptgl_linnot_red NOT LIKE '%-1a,-3p,1a%' GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
+        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE c.chain_id = " + chain_db_id + " AND ln.ptgl_linnot_red LIKE '%1a,-3p,1a%' and ln.ptgl_linnot_red NOT LIKE '%-1a,-3p,1a%' GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
         pattern = new Integer[] {1, -3, 1};
         
         all_pdb_ids = new ArrayList<>();
@@ -7799,9 +7789,7 @@ connection.close();
         
         // ============== ubi3.pl ==============
         
-        //?
-        // add chain_db_id to the SQL-statement --> prepared statement needs to be done
-        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE ln.ptgl_linnot_red LIKE '%-1a,4p,-2a,1a%' GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
+        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE c.chain_id = " + chain_db_id + " AND ln.ptgl_linnot_red LIKE '%-1a,4p,-2a,1a%' GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
         pattern = new Integer[] {-1, 4, -2, 1};
         
         all_pdb_ids = new ArrayList<>();
@@ -7934,9 +7922,7 @@ connection.close();
         
         // ============== ubi4.pl ==============
         
-        //?
-        // add chain_db_id to the SQL-statement --> prepared statement needs to be done
-        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE ln.ptgl_linnot_red LIKE '%-1a,2a,-4p,1a%' GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
+        rowsStrandsBeta = DBManager.doSelectQuery("SELECT p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red FROM plcc_fglinnot ln INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id WHERE c.chain_id = " + chain_db_id + " AND ln.ptgl_linnot_red LIKE '%-1a,2a,-4p,1a%' GROUP BY p.pdb_id, c.chain_name, ln.ptgl_linnot_adj, ln.firstvertexpos_adj, ln.ptgl_linnot_red");
         pattern = new Integer[] {-1, 2, -4, 1};
         
         all_pdb_ids = new ArrayList<>();
