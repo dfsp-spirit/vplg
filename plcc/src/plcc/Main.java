@@ -3979,7 +3979,7 @@ public class Main {
                 try {
                     DBManager.writeMacromoleculeToDB(pdbid, mol.get("pdb_mol_id"), mol.get("pdb_mol_name"), mol.get("pdb_ec_number"), mol.get("pdb_org_sci"), mol.get("pdb_org_common"), mol.get("pdb_all_chains"));
                     if( ! silent) {
-                        System.out.println("  Macromolecule '" + mol.get("pdb_mol_name") + "' with PDB MOL_ID '" + mol.get("pdb_mol_id") + "' written to database. Consists of chains '" + mol.get("pdb_all_chains") + "'.");
+                        System.out.println("  Writing macromolecule '" + mol.get("pdb_mol_name") + "' with PDB MOL_ID '" + mol.get("pdb_mol_id") + "' to database. Consists of chains '" + mol.get("pdb_all_chains") + "'.");
                     }
                 } catch(Exception e) {
                     DP.getInstance().e("Main", "Failed to write macromolecule to database: '" + e.getMessage() + "'.");
