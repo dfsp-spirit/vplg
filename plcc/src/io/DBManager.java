@@ -7646,9 +7646,7 @@ connection.close();
                 for (int b = 0; b < all_albeNumberOfHelix.get(i).size(); b++) {
                     if (all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMaxInAlbeGraph.get(i)) {
                         return true;
-                    } else {
-                        return false;
-                    }
+                    } 
                 }
             }
         }
@@ -7778,8 +7776,6 @@ connection.close();
                 for (int b = 0; b < all_albeNumberOfHelix.get(i).size(); b++) {
                     if (all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMaxInAlbeGraph.get(i)) {
                         return true;
-                    } else {
-                        return false;
                     }
                 }
             }
@@ -7910,8 +7906,6 @@ connection.close();
                 for (int b = 0; b < all_albeNumberOfHelix.get(i).size(); b++) {
                     if (all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMaxInAlbeGraph.get(i)) {
                         return true;
-                    } else {
-                        return false;
                     }
                 }
             }
@@ -8043,8 +8037,6 @@ connection.close();
                 for (int b = 0; b < all_albeNumberOfHelix.get(i).size(); b++) {
                     if (all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMaxInAlbeGraph.get(i)) {
                         return true;
-                    } else {
-                        return false;
                     }
                 }
             }
