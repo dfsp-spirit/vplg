@@ -7011,8 +7011,6 @@ connection.close();
                 for (int b = 0; b < all_albeNumberOfHelix.get(i).size(); b++) {
                     if (all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMaxInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) > all_secondHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) < all_secondHelixPositionMaxInAlbeGraph.get(i)) {
                         return true;
-                    } else {
-                        //return false; // Line removed by Tim. Note: If you return false here, you skip the other tests later!
                     }
                 }
             }
@@ -7177,8 +7175,6 @@ connection.close();
                 for (int b = 0; b < all_albeNumberOfHelix.get(i).size(); b++) {
                     if (all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMaxInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) > all_secondHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) < all_secondHelixPositionMaxInAlbeGraph.get(i)) {
                         return true;
-                    } else {
-                        //return false; // Line removed by Tim. Note: If you return false here, you skip the other tests later!
                     }
                 }
             }
@@ -7341,8 +7337,6 @@ connection.close();
                 for (int b = 0; b < all_albeNumberOfHelix.get(i).size(); b++) {
                     if (all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMaxInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) > all_secondHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) < all_secondHelixPositionMaxInAlbeGraph.get(i)) {
                         return true;
-                    } else {
-                        //return false; // Line removed by Tim. Note: If you return false here, you skip the other tests later!
                     }
                 }
             }
@@ -7505,12 +7499,12 @@ connection.close();
                 for (int b = 0; b < all_albeNumberOfHelix.get(i).size(); b++) {
                     if (all_albeNumberOfHelix.get(i).get(a) > all_firstHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(a) < all_firstHelixPositionMaxInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) > all_secondHelixPositionMinInAlbeGraph.get(i) && all_albeNumberOfHelix.get(i).get(b) < all_secondHelixPositionMaxInAlbeGraph.get(i)) {
                         return true;
-                    } else {
-                        //return false; // Line removed by Tim. Note: If you return false here, you skip the other tests later!
                     }
                 }
             }
         }
+        
+        
         return false;
     }
     
