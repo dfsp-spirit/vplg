@@ -2476,19 +2476,25 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                     return false;
                 }
                 
+                if(newResidueID > 9999) {
+                    DP.getInstance().w("FileParser", "Trying to assign a new residue ID greater than 9999. The PDB file format does not support this.\n"
+                                        + "Aborting the conversion now.");
+                    return false;
+                }
+                
                 // Creates a string of spaces. To keep the PDB file format intact it is necessary to add the correct amount of spaces
                 // in front of the later inserted string. To do this, we take the maximum length the entry may have (5 for atom IDs, 4 for residue IDs)
                 // and substract the length of the the new ID. With this we know how much spaces need to be added as prefix.
                 String spacesAtomID = new String(new char[5 - newAtomID.toString().length()]).replace("\0", " ");
                 String spacesResidueID = new String(new char[4 - newResidueID.toString().length()]).replace("\0", " ");
                 
-                
+
                 lineNum++;
                 
                 // Now look at the next line to see what chain ID this line has
                 String nextLine = file.get(lineNum);
                 String nextChainID = nextLine.substring(21, 22);
-               
+                
                 // If both chain IDs are different and we have not reached the end of the model yet, 
                 // get a new chain ID and replace the old chain ID with this new one
                 if(!chainID.equals(nextChainID) && !nextLine.startsWith("ENDMDL")) {
