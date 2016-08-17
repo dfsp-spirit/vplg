@@ -8858,7 +8858,7 @@ public class Main {
                 if(x.vdwAtomContactTo(y)) {             // If a contact is detected, Atom.vdwAtomContactTo() returns true
 
                     // The van der Waals radii spheres overlap, contact found.
-                    numPairContacts[ResContactInfo.TT]++;   // update total number of contacts for this residue pair
+                    // NOT updating total number of contacts for this residue pair at this point, since we need to check later if we want to include ligand contacts
                     
                     // DEBUG
                     //System.out.println("DEBUG: Atom contact in distance " + dist + " between atom " + x + " and " + y + ".");
@@ -8895,6 +8895,7 @@ public class Main {
                     // Determine the contact type.                    
                     if(x.isProteinAtom() && y.isProteinAtom()) {
                         // *************************** protein - protein contact *************************
+                        numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.IVDW]++;
                         if(minContactDistances[ResContactInfo.IVDW] < 0 || dist < minContactDistances[ResContactInfo.IVDW]) {
                             minContactDistances[ResContactInfo.IVDW] = dist;
@@ -8981,6 +8982,7 @@ public class Main {
                     
                     if(x.isProteinAtom() && y.isLigandAtom()) {
                         // *************************** protein - ligand contact *************************
+                        numPairContacts[ResContactInfo.TT]++;
                         numTotalLigContactsPair++;
 //                        System.out.println("New ProtLig: " + x.toString() + "/" + y.toString());
                         atomAtomContactType.add("PROTLIG");
@@ -9016,6 +9018,7 @@ public class Main {
                     }
                     else if(x.isLigandAtom() && y.isProteinAtom()) {
                         // *************************** ligand - protein contact *************************
+                        numPairContacts[ResContactInfo.TT]++;
                         numTotalLigContactsPair++;
 //                        System.out.println("New LigProt: " + x.toString() + "/" + y.toString());
                         atomAtomContactType.add("LIGPROT");
@@ -9051,6 +9054,7 @@ public class Main {
                     }
                     else if(x.isLigandAtom() && y.isLigandAtom()) {
                         // *************************** ligand - ligand contact *************************
+                        numPairContacts[ResContactInfo.TT]++;
                         numTotalLigContactsPair++;
 //                        System.out.println("New LigLig: " + x.toString() + "/" + y.toString());
                         atomAtomContactType.add("LIGLIG");
