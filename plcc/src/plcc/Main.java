@@ -5766,7 +5766,7 @@ public class Main {
             } else if ("TRP".equals(b.getName3())) {
                            
                 //five_ring includes CG, CD1, NE1, CE2, CD2
-                if (atoms_b.size() >= 9) {
+                if (atoms_b.size() >= 10) {
                     for (Integer k = 5; k < 10; k++) {
                         five_ring.add(atoms_b.get(k));    
                     }
@@ -5775,7 +5775,7 @@ public class Main {
                 }
                 
                 //six_ring includes CD2, CE2, CE3, CZ2, CZ3, CH2
-                if (atoms_b.size() >= 13) {
+                if (atoms_b.size() >= 14) {
                     six_ring.add(atoms_b.get(7)); //CD2
                     for (Integer k = 9; k < 14; k++) {
                         six_ring.add(atoms_b.get(k));
@@ -6729,7 +6729,7 @@ public class Main {
             } else if ("TRP".equals(a.getName3())) {
                 
                 //five_ring includes CG, CD1, NE1, CE2, CD2
-                if (atoms_a.size() > 9) {
+                if (atoms_a.size() >= 10) {
                     for (Integer k = 5; k < 10; k++) {
                         five_ring.add(atoms_a.get(k));      
                     }
@@ -6739,7 +6739,7 @@ public class Main {
                 }
                 
                 //six_ring includes CD2, CE2, CE3, CZ2, CZ3, CH2
-                if (atoms_a.size() >= 13) { 
+                if (atoms_a.size() >= 14) { 
                     six_ring.add(atoms_a.get(7)); //CD2
                     for (Integer k = 9; k < 14; k++) {
                         six_ring.add(atoms_a.get(k));
