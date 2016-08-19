@@ -45,6 +45,7 @@ import algorithms.GraphProperties;
 import algorithms.GraphRandomizer;
 import datastructures.AAGraph;
 import datastructures.AAInteractionNetwork;
+import datastructures.PPIGraph;
 import datastructures.SimpleGraphInterface;
 import datastructures.SparseGraph;
 import htmlgen.CssGenerator;
@@ -2433,7 +2434,63 @@ public class Main {
                     if(! silent) {
                         System.out.println("Computing amino acid level contact graph for all chains combined.");
                     }
+                    
+                    
+                    String subDirTree = "";
+                    if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
+                        subDirTree = IO.createSubDirTreeDir(outputDir, pdbid, "ALL");
+                        if(subDirTree == null) { 
+                            DP.getInstance().e("Main", "Could not create subdir tree (outputDir='" + outputDir + "', pdbid='" + pdbid + "'). Missing file system level access rights?"); 
+                            System.exit(1); 
+                        }
+                    }
+                    
+                    if (Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model") || Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model_with_ligands")) {
 
+                        PPIGraph ppig;
+                        ppig = new PPIGraph(residues, cInfo);
+                        ppig.setPdbid(pdbid);
+                        ppig.setChainid(AAGraph.CHAINID_ALL_CHAINS);
+                        // write the PPI graph to disc
+                        String ppigFile = outputDir + fs + subDirTree + pdbid + "_aagraph.gml";
+                        if (writeStringToFile(ppigFile, ppig.toGraphModellingLanguageFormat())) {
+                            if (!silent) {
+                                System.out.println("  PPIGraph for all chains written to file '" + ppigFile + "'.");
+                            }
+                        } else {
+                            System.err.println("ERROR: Could not write PPIGraph for all chains to file '" + ppigFile + "'.");
+                        }
+
+                        // write the simple PPI graph to disc
+                        String simplePpigFile = outputDir + fs + subDirTree + pdbid + "_aagraph_simple.fanmod";
+                        if (writeStringToFile(simplePpigFile, ppig.toFanMod().get(0))) {
+                            if (!silent) {
+                                System.out.println("  Simple PPIGraph for all chains written to file '" + simplePpigFile + "'.");
+                            }
+                        } else {
+                            System.err.println("ERROR: Could not write simple PPIGraph for all chains to file '" + simplePpigFile + "'.");
+                        }
+                        // Write corresponding index file to disc
+                        String simplePpigIndexFile = outputDir + fs + subDirTree + pdbid + "_aagraph_simple.id";
+                        if (writeStringToFile(simplePpigIndexFile, ppig.toFanMod().get(1))) {
+                            if (!silent) {
+                                System.out.println("  Simple PPIGraph index for all chains written to file '" + simplePpigIndexFile + "'.");
+                            }
+                        } else {
+                            System.err.println("ERROR: Could not write simple PPIGraph index for all chains to file '" + simplePpigIndexFile + "'.");
+                        }
+
+                        writePPIstatistics(cInfo, pdbid);
+
+                        // Writes and saves a python script that can be used to visualize bonds with PyMol
+                        if (getPymolSelectionScriptPPI(cInfo, pdbid)) {
+                            System.out.println("[PYMOL] Python script successfully written.");
+                        } else {
+                            System.out.println("[PYMOL] Error: Python script could not be written.");
+                        }
+
+                    } else {
+                    
                     //DEBUG
                     //for(Residue r : residues) {
                     //    if(r.isOtherRes()) {System.out.println("##########OTHER! type="+ r.getType() ); }
@@ -2458,15 +2515,6 @@ public class Main {
                     //IO.stringToTextFile("graph.gml", gml);
                     
                     
-
-                    String subDirTree = "";
-                    if(Settings.getBoolean("plcc_B_output_images_dir_tree") || Settings.getBoolean("plcc_B_output_textfiles_dir_tree")) {
-                        subDirTree = IO.createSubDirTreeDir(outputDir, pdbid, "ALL");
-                        if(subDirTree == null) { 
-                            DP.getInstance().e("Main", "Could not create subdir tree (outputDir='" + outputDir + "', pdbid='" + pdbid + "'). Missing file system level access rights?"); 
-                            System.exit(1); 
-                        }
-                    }
 
                     if(Settings.getBoolean("plcc_B_useDB")) {
                         try {
@@ -2663,37 +2711,7 @@ public class Main {
                         System.err.println("ERROR: Could not write AAGraph for all chains to file '" + aagFile + "'.");
                     }
                     
-                    if(Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model") || Settings.getBoolean("plcc_B_alternate_aminoacid_contact_model_with_ligands")) {
-                        
-                        writePPIstatistics(cInfo, pdbid);
-                        
-                        // Writes and saves a python script that can be used to visualize bonds with PyMol
-                        if(getPymolSelectionScriptPPI(cInfo, pdbid)) {
-                            System.out.println("[PYMOL] Python script successfully written.");
-                        }
-                        else {
-                            System.out.println("[PYMOL] Error: Python script could not be written.");
-                        }
-                        
-                        // write the simple AA graph to disc
-                        String simpleAagFile = pdbid + "_aagraph_simple.fanmod";
-                        if(writeStringToFile(simpleAagFile, aag.toFanMod().get(0))) {
-                            if(! silent) {
-                                System.out.println("  Simple AAGraph for all chains written to file '" + simpleAagFile + "'.");
-                            }
-                        } else {
-                            System.err.println("ERROR: Could not write simple AAGraph for all chains to file '" + simpleAagFile + "'.");
-                        }
-                        // Write corresponding index file to disc
-                        String simpleAagIndexFile = pdbid + "_aagraph_simple.id";
-                        if(writeStringToFile(simpleAagIndexFile, aag.toFanMod().get(1))) {
-                            if(! silent) {
-                                System.out.println("  Simple AAGraph index for all chains written to file '" + simpleAagIndexFile + "'.");
-                            }
-                        } else {
-                            System.err.println("ERROR: Could not write simple AAGraph index for all chains to file '" + simpleAagIndexFile + "'.");
-                        }
-                            }
+                    
                     
                     if(Settings.getBoolean("plcc_B_draw_aag")) {
                         Map<Integer, Color> cmap = new HashMap<>();
@@ -2800,6 +2818,7 @@ public class Main {
                     }
                                        
 
+                }
                 }
 
 

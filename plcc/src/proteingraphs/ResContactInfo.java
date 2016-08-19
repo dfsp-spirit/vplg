@@ -414,6 +414,14 @@ public class ResContactInfo {
         return(this.getNumContactsTotal() > 0 || this.getNumLigContactsTotal() > 0);
     }
 
+    /**
+     * Determines whether the residue pair described by this RCI has enough contacts on atom levels to count as PPI.
+     * For the residue pair to be in contact, at least two contacts of any kind or one disulphide bridge contact must present.
+     * @return true if this RCI contains a PPI contact
+     */
+    public boolean describesPPIContact() {
+         return(this.getNumContactsTotal() > 1 || this.getNumLigContactsTotal() > 1 || this.getNumContactsISS() > 0);
+    }
 
     // no setters needed, this class is only a nice wrapper for the ugly arrays
 
