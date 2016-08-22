@@ -5795,6 +5795,7 @@ public class Main {
                             if ( piDist > 0) {
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.NHPI]++;
+                                donorAcceptor = new Atom[2];
                                 if (minContactDistances[ResContactInfo.NHPI] < 0 || piDist > minContactDistances[ResContactInfo.NHPI]) {
                                     minContactDistances[ResContactInfo.NHPI] = piDist;
                                     contactAtomNumInResidueA[ResContactInfo.NHPI] = 0; //backbone N
@@ -5818,6 +5819,7 @@ public class Main {
                             if (piDist > 0) {
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.NHPI]++;
+                                donorAcceptor = new Atom[2];
                                 if (minContactDistances[ResContactInfo.NHPI] < 0 || piDist > minContactDistances[ResContactInfo.NHPI]) {
                                     minContactDistances[ResContactInfo.NHPI] = piDist;
                                     contactAtomNumInResidueA[ResContactInfo.NHPI] = 0; //backbone N
@@ -5841,6 +5843,7 @@ public class Main {
                                 if (piDist > 0) {
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.NHPI]++;
+                                    donorAcceptor = new Atom[2];
                                     if (minContactDistances[ResContactInfo.NHPI] < 0 || piDist > minContactDistances[ResContactInfo.NHPI]) {
                                         minContactDistances[ResContactInfo.NHPI] = piDist;
                                         contactAtomNumInResidueA[ResContactInfo.NHPI] = 0; //backbone N
@@ -5857,6 +5860,7 @@ public class Main {
                                 if (piDist > 0) {
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.NHPI]++;
+                                    donorAcceptor = new Atom[2];
                                     if (minContactDistances[ResContactInfo.NHPI] < 0 || piDist > minContactDistances[ResContactInfo.NHPI]) {
                                         minContactDistances[ResContactInfo.NHPI] = piDist;
                                         contactAtomNumInResidueA[ResContactInfo.NHPI] = 0; //backbone N
@@ -5894,6 +5898,7 @@ public class Main {
                             if (piDist > 0) {
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.CNHPI]++;
+                                donorAcceptor = new Atom[2];
                                 if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                     minContactDistances[ResContactInfo.CNHPI] = piDist;
                                     contactAtomNumInResidueA[ResContactInfo.CNHPI] = 8; //sidechain N
@@ -5916,6 +5921,7 @@ public class Main {
                             if (piDist > 0) {
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.CNHPI]++;
+                                donorAcceptor = new Atom[2];
                                 if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                     minContactDistances[ResContactInfo.CNHPI] = piDist;
                                     contactAtomNumInResidueA[ResContactInfo.CNHPI] = 8; //sidechain N
@@ -5939,6 +5945,7 @@ public class Main {
                                 if (piDist > 0) {
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.CNHPI]++;
+                                    donorAcceptor = new Atom[2];
                                     if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                         minContactDistances[ResContactInfo.CNHPI] = piDist;
                                         contactAtomNumInResidueA[ResContactInfo.CNHPI] = 8; //sidechain N
@@ -5955,6 +5962,7 @@ public class Main {
                                 if (piDist > 0) {
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.CNHPI]++;
+                                    donorAcceptor = new Atom[2];
                                     if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                         minContactDistances[ResContactInfo.CNHPI] = piDist;
                                         contactAtomNumInResidueA[ResContactInfo.CNHPI] = 8; //sidechain N
@@ -5995,6 +6003,7 @@ public class Main {
                             if (piDist > 0) {
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.CNHPI]++;
+                                donorAcceptor = new Atom[2];
                                 if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                     minContactDistances[ResContactInfo.CNHPI] = piDist;
                                     contactAtomNumInResidueA[ResContactInfo.CNHPI] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
@@ -6017,6 +6026,7 @@ public class Main {
                             if (piDist > 0) {
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.CNHPI]++;
+                                donorAcceptor = new Atom[2];
                                 if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                     minContactDistances[ResContactInfo.CNHPI] = piDist;
                                     contactAtomNumInResidueA[ResContactInfo.CNHPI] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
@@ -6040,6 +6050,7 @@ public class Main {
                                 if (piDist > 0) {
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.CNHPI]++;
+                                    donorAcceptor = new Atom[2];
                                     if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                         minContactDistances[ResContactInfo.CNHPI] = piDist;
                                         contactAtomNumInResidueA[ResContactInfo.CNHPI] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
@@ -6056,6 +6067,7 @@ public class Main {
                                 if (piDist > 0) {
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.CNHPI]++;
+                                    donorAcceptor = new Atom[2];
                                     if (minContactDistances[ResContactInfo.CNHPI] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                         minContactDistances[ResContactInfo.CNHPI] = piDist;
                                         contactAtomNumInResidueA[ResContactInfo.CNHPI] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
@@ -6106,6 +6118,7 @@ public class Main {
                         if ( piDist > 0) {
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.CAHPI]++;
+                            donorAcceptor = new Atom[2];
                             if (minContactDistances[ResContactInfo.CAHPI] < 0 || piDist > minContactDistances[ResContactInfo.CAHPI]) {
                                 minContactDistances[ResContactInfo.CAHPI] = piDist;
                                 contactAtomNumInResidueA[ResContactInfo.CAHPI] = 1; //CA
@@ -6129,6 +6142,7 @@ public class Main {
                             if ( piDist > 0) {
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.CAHPI]++;
+                                donorAcceptor = new Atom[2];
                                 if (minContactDistances[ResContactInfo.CAHPI] < 0 || piDist > minContactDistances[ResContactInfo.CAHPI]) {
                                     minContactDistances[ResContactInfo.CAHPI] = piDist;
                                     contactAtomNumInResidueA[ResContactInfo.CAHPI] = 1; //CA
@@ -6152,6 +6166,7 @@ public class Main {
                             if ( piDist > 0) {
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.CAHPI]++;
+                                donorAcceptor = new Atom[2];
                                 if (minContactDistances[ResContactInfo.CAHPI] < 0 || piDist > minContactDistances[ResContactInfo.CAHPI]) {
                                     minContactDistances[ResContactInfo.CAHPI] = piDist;
                                     contactAtomNumInResidueA[ResContactInfo.CAHPI] = 1; //CA
@@ -6174,6 +6189,7 @@ public class Main {
                             if ( piDist > 0) {
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.CAHPI]++;
+                                donorAcceptor = new Atom[2];
                                 if (minContactDistances[ResContactInfo.CAHPI] < 0 || piDist > minContactDistances[ResContactInfo.CAHPI]) {
                                     minContactDistances[ResContactInfo.CAHPI] = piDist;
                                     contactAtomNumInResidueA[ResContactInfo.CAHPI] = 1; //CA
@@ -6209,6 +6225,7 @@ public class Main {
                         if ( piDist > 0) {
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.PROCDHPI]++;
+                            donorAcceptor = new Atom[2];
                             if (minContactDistances[ResContactInfo.PROCDHPI] < 0 || piDist > minContactDistances[ResContactInfo.PROCDHPI]) {
                                 minContactDistances[ResContactInfo.PROCDHPI] = piDist;
                                 contactAtomNumInResidueA[ResContactInfo.PROCDHPI] = 6; //CD
@@ -6231,6 +6248,7 @@ public class Main {
                         if (piDist > 0) {
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.PROCDHPI]++;
+                            donorAcceptor = new Atom[2];
                             if (minContactDistances[ResContactInfo.PROCDHPI] < 0 || piDist > minContactDistances[ResContactInfo.PROCDHPI]) {
                                 minContactDistances[ResContactInfo.PROCDHPI] = piDist;
                                 contactAtomNumInResidueA[ResContactInfo.PROCDHPI] = 6; //CD
@@ -6254,6 +6272,7 @@ public class Main {
                             if (piDist > 0) {
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.PROCDHPI]++;
+                                donorAcceptor = new Atom[2];
                                 if (minContactDistances[ResContactInfo.PROCDHPI] < 0 || piDist > minContactDistances[ResContactInfo.PROCDHPI]) {
                                     minContactDistances[ResContactInfo.PROCDHPI] = piDist;
                                     contactAtomNumInResidueA[ResContactInfo.PROCDHPI] = 6; //CD
@@ -6270,6 +6289,7 @@ public class Main {
                             if (piDist > 0) {
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.PROCDHPI]++;
+                                donorAcceptor = new Atom[2];
                                 if (minContactDistances[ResContactInfo.PROCDHPI] < 0 || piDist > minContactDistances[ResContactInfo.PROCDHPI]) {
                                     minContactDistances[ResContactInfo.PROCDHPI] = piDist;
                                     contactAtomNumInResidueA[ResContactInfo.PROCDHPI] = 6; //CD
@@ -6307,6 +6327,7 @@ public class Main {
                     if (piDist > 0) {
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.SHPI]++;
+                        donorAcceptor = new Atom[2];
                         if (minContactDistances[ResContactInfo.SHPI] < 0 || piDist > minContactDistances[ResContactInfo.SHPI]) {
                             minContactDistances[ResContactInfo.SHPI] = piDist;
                             contactAtomNumInResidueA[ResContactInfo.SHPI] = 5;
@@ -6329,6 +6350,7 @@ public class Main {
                     if (piDist > 0) {
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.SHPI]++;
+                        donorAcceptor = new Atom[2];
                         if (minContactDistances[ResContactInfo.SHPI] < 0 || piDist > minContactDistances[ResContactInfo.SHPI]) {
                             minContactDistances[ResContactInfo.SHPI] = piDist;
                             contactAtomNumInResidueA[ResContactInfo.SHPI] = 5;
@@ -6352,6 +6374,7 @@ public class Main {
                         if (piDist > 0) {
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.SHPI]++;
+                            donorAcceptor = new Atom[2];
                             if (minContactDistances[ResContactInfo.SHPI] < 0 || piDist > minContactDistances[ResContactInfo.SHPI]) {
                                 minContactDistances[ResContactInfo.SHPI] = piDist;
                                 contactAtomNumInResidueA[ResContactInfo.SHPI] = 5;
@@ -6368,6 +6391,7 @@ public class Main {
                         if (piDist > 0) {
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.SHPI]++;
+                            donorAcceptor = new Atom[2];
                             if (minContactDistances[ResContactInfo.SHPI] < 0 || piDist > minContactDistances[ResContactInfo.SHPI]) {
                                 minContactDistances[ResContactInfo.SHPI] = piDist;
                                 contactAtomNumInResidueA[ResContactInfo.SHPI] = 5;
@@ -6459,6 +6483,7 @@ public class Main {
                 if (piDist > 0) {
                     numPairContacts[ResContactInfo.TT]++;
                     numPairContacts[ResContactInfo.XOHPI]++;
+                    donorAcceptor = new Atom[2];
                     if (minContactDistances[ResContactInfo.XOHPI] < 0 || piDist > minContactDistances[ResContactInfo.XOHPI]) {
                         minContactDistances[ResContactInfo.XOHPI] = piDist;
                         if ("TYR".equals(a.getName3())) {
@@ -6487,6 +6512,7 @@ public class Main {
                 if (piDist > 0) {
                     numPairContacts[ResContactInfo.TT]++;
                     numPairContacts[ResContactInfo.XOHPI]++;
+                    donorAcceptor = new Atom[2];
                     if (minContactDistances[ResContactInfo.XOHPI] < 0 || piDist > minContactDistances[ResContactInfo.XOHPI]) {
                         minContactDistances[ResContactInfo.XOHPI] = piDist;
                         if ("TYR".equals(a.getName3())) {
@@ -6516,6 +6542,7 @@ public class Main {
                     if (piDist > 0) {
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.XOHPI]++;
+                        donorAcceptor = new Atom[2];
                         if (minContactDistances[ResContactInfo.XOHPI] < 0 || piDist > minContactDistances[ResContactInfo.XOHPI]) {
                             minContactDistances[ResContactInfo.XOHPI] = piDist;
                             if ("TYR".equals(a.getName3())) {
@@ -6538,6 +6565,7 @@ public class Main {
                     if (piDist > 0) {
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.XOHPI]++;
+                        donorAcceptor = new Atom[2];
                         if (minContactDistances[ResContactInfo.XOHPI] < 0 || piDist > minContactDistances[ResContactInfo.XOHPI]) {
                             minContactDistances[ResContactInfo.XOHPI] = piDist;
                             if ("TYR".equals(a.getName3())) {
@@ -6595,6 +6623,7 @@ public class Main {
                             if (piDist > 0) {
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.CCAHCO]++;
+                                donorAcceptor = new Atom[2];
                                 if (minContactDistances[ResContactInfo.CCAHCO] < 0 || piDist > minContactDistances[ResContactInfo.CCAHCO]) {
                                     minContactDistances[ResContactInfo.CCAHCO] = piDist;
                                     contactAtomNumInResidueA[ResContactInfo.CCAHCO] = 1; //CA
@@ -6664,6 +6693,7 @@ public class Main {
                 if (piDist > 0) {
                     numPairContacts[ResContactInfo.TT]++;
                     numPairContacts[ResContactInfo.BCAHCO]++;
+                    donorAcceptor = new Atom[2];
                     if (minContactDistances[ResContactInfo.BCAHCO] < 0 || piDist > minContactDistances[ResContactInfo.BCAHCO]) {
                         minContactDistances[ResContactInfo.BCAHCO] = piDist;
                         contactAtomNumInResidueA[ResContactInfo.BCAHCO] = 1; //CA
@@ -6760,6 +6790,7 @@ public class Main {
                     if (piDist > 0) {
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.PINH]++;
+                        donorAcceptor = new Atom[2];
                         if (minContactDistances[ResContactInfo.PINH] < 0 || piDist > minContactDistances[ResContactInfo.PINH]) {
                             minContactDistances[ResContactInfo.PINH] = piDist;
                             contactAtomNumInResidueB[ResContactInfo.PINH] = 0; //backbone N
@@ -6782,6 +6813,7 @@ public class Main {
                     if (piDist > 0) {
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.PINH]++;
+                        donorAcceptor = new Atom[2];
                         if (minContactDistances[ResContactInfo.PINH] < 0 || piDist > minContactDistances[ResContactInfo.PINH]) {
                             minContactDistances[ResContactInfo.PINH] = piDist;
                             contactAtomNumInResidueB[ResContactInfo.PINH] = 0; //backbone N
@@ -6805,6 +6837,7 @@ public class Main {
                         if (piDist > 0) {
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.PINH]++;
+                            donorAcceptor = new Atom[2];
                             if (minContactDistances[ResContactInfo.PINH] < 0 || piDist > minContactDistances[ResContactInfo.PINH]) {
                                 minContactDistances[ResContactInfo.PINH] = piDist;
                                 contactAtomNumInResidueB[ResContactInfo.PINH] = 0; //backbone N
@@ -6821,6 +6854,7 @@ public class Main {
                         if (piDist > 0) {
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.PINH]++;
+                            donorAcceptor = new Atom[2];
                             if (minContactDistances[ResContactInfo.PINH] < 0 || piDist > minContactDistances[ResContactInfo.PINH]) {
                                 minContactDistances[ResContactInfo.PINH] = piDist;
                                 contactAtomNumInResidueB[ResContactInfo.PINH] = 0; //backbone N
@@ -6857,6 +6891,7 @@ public class Main {
                            if (piDist > 0) {
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.PICNH]++;
+                                donorAcceptor = new Atom[2];
                                 if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.PICNH]) {
                                     minContactDistances[ResContactInfo.PICNH] = piDist;
                                     contactAtomNumInResidueB[ResContactInfo.PICNH] = 8; //sidechain N
@@ -6879,6 +6914,7 @@ public class Main {
                             if (piDist > 0) {
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.PICNH]++;
+                                donorAcceptor = new Atom[2];
                                 if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.PICNH]) {
                                     minContactDistances[ResContactInfo.PICNH] = piDist;
                                     contactAtomNumInResidueB[ResContactInfo.PICNH] = 8; //sidechain N
@@ -6902,6 +6938,7 @@ public class Main {
                                 if (piDist > 0) {
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.PICNH]++;
+                                    donorAcceptor = new Atom[2];
                                     if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.PICNH]) {
                                         minContactDistances[ResContactInfo.PICNH] = piDist;
                                         contactAtomNumInResidueB[ResContactInfo.PICNH] = 8; //sidechain N
@@ -6918,6 +6955,7 @@ public class Main {
                                 if (piDist > 0) {
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.PICNH]++;
+                                    donorAcceptor = new Atom[2];
                                     if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.PICNH]) {
                                         minContactDistances[ResContactInfo.PICNH] = piDist;
                                         contactAtomNumInResidueB[ResContactInfo.PICNH] = 8; //sidechain N
@@ -6967,6 +7005,7 @@ public class Main {
                             if (piDist > 0) {
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.PICNH]++;
+                                donorAcceptor = new Atom[2];
                                 if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                     minContactDistances[ResContactInfo.PICNH] = piDist;
                                     contactAtomNumInResidueB[ResContactInfo.PICNH] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
@@ -6989,6 +7028,7 @@ public class Main {
                             if (piDist > 0) {
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.PICNH]++;
+                                donorAcceptor = new Atom[2];
                                 if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                     minContactDistances[ResContactInfo.PICNH] = piDist;
                                     contactAtomNumInResidueB[ResContactInfo.PICNH] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
@@ -7012,6 +7052,7 @@ public class Main {
                                 if (piDist > 0) {
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.PICNH]++;
+                                    donorAcceptor = new Atom[2];
                                     if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                         minContactDistances[ResContactInfo.PICNH] = piDist;
                                         contactAtomNumInResidueB[ResContactInfo.PICNH] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
@@ -7028,6 +7069,7 @@ public class Main {
                                 if (piDist > 0) {
                                     numPairContacts[ResContactInfo.TT]++;
                                     numPairContacts[ResContactInfo.PICNH]++;
+                                    donorAcceptor = new Atom[2];
                                     if (minContactDistances[ResContactInfo.PICNH] < 0 || piDist > minContactDistances[ResContactInfo.CNHPI]) {
                                         minContactDistances[ResContactInfo.PICNH] = piDist;
                                         contactAtomNumInResidueB[ResContactInfo.PICNH] = PiEffectCalculations.giveAtomNumOfNBondToArgH(argH); //sidechain N bond to argH
@@ -7077,6 +7119,7 @@ public class Main {
                     if ( piDist > 0) {
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.PICAH]++;
+                        donorAcceptor = new Atom[2];
                         if (minContactDistances[ResContactInfo.PICAH] < 0 || piDist > minContactDistances[ResContactInfo.PICAH]) {
                             minContactDistances[ResContactInfo.PICAH] = piDist;
                             contactAtomNumInResidueB[ResContactInfo.PICAH] = 1; //CA
@@ -7100,6 +7143,7 @@ public class Main {
                     if ( piDist > 0) {
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.PICAH]++;
+                        donorAcceptor = new Atom[2];
                         if (minContactDistances[ResContactInfo.PICAH] < 0 || piDist > minContactDistances[ResContactInfo.CAHPI]) {
                             minContactDistances[ResContactInfo.PICAH] = piDist;
                             contactAtomNumInResidueB[ResContactInfo.PICAH] = 1; //CA
@@ -7123,6 +7167,7 @@ public class Main {
                         if ( piDist > 0) {
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.PICAH]++;
+                            donorAcceptor = new Atom[2];
                             if (minContactDistances[ResContactInfo.PICAH] < 0 || piDist > minContactDistances[ResContactInfo.PICAH]) {
                                 minContactDistances[ResContactInfo.PICAH] = piDist;
                                 contactAtomNumInResidueB[ResContactInfo.PICAH] = 1; //CA
@@ -7145,6 +7190,7 @@ public class Main {
                         if ( piDist > 0) {
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.PICAH]++;
+                            donorAcceptor = new Atom[2];
                             if (minContactDistances[ResContactInfo.PICAH] < 0 || piDist > minContactDistances[ResContactInfo.PICAH]) {
                                 minContactDistances[ResContactInfo.PICAH] = piDist;
                                 contactAtomNumInResidueB[ResContactInfo.PICAH] = 1; //CA
@@ -7182,6 +7228,7 @@ public class Main {
                         if ( piDist > 0) {
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.PIPROCDH]++;
+                            donorAcceptor = new Atom[2];
                             if (minContactDistances[ResContactInfo.PIPROCDH] < 0 || piDist > minContactDistances[ResContactInfo.PIPROCDH]) {
                                 minContactDistances[ResContactInfo.PIPROCDH] = piDist;
                                 contactAtomNumInResidueB[ResContactInfo.PIPROCDH] = 6; //CD
@@ -7204,6 +7251,7 @@ public class Main {
                         if (piDist > 0) {
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.PIPROCDH]++;
+                            donorAcceptor = new Atom[2];
                             if (minContactDistances[ResContactInfo.PIPROCDH] < 0 || piDist > minContactDistances[ResContactInfo.PIPROCDH]) {
                                 minContactDistances[ResContactInfo.PIPROCDH] = piDist;
                                 contactAtomNumInResidueB[ResContactInfo.PIPROCDH] = 6; //CD
@@ -7227,6 +7275,7 @@ public class Main {
                             if (piDist > 0) {
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.PIPROCDH]++;
+                                donorAcceptor = new Atom[2];
                                 if (minContactDistances[ResContactInfo.PIPROCDH] < 0 || piDist > minContactDistances[ResContactInfo.PIPROCDH]) {
                                     minContactDistances[ResContactInfo.PIPROCDH] = piDist;
                                     contactAtomNumInResidueB[ResContactInfo.PIPROCDH] = 6; //CD
@@ -7243,6 +7292,7 @@ public class Main {
                             if (piDist > 0) {
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.PIPROCDH]++;
+                                donorAcceptor = new Atom[2];
                                 if (minContactDistances[ResContactInfo.PIPROCDH] < 0 || piDist > minContactDistances[ResContactInfo.PIPROCDH]) {
                                     minContactDistances[ResContactInfo.PIPROCDH] = piDist;
                                     contactAtomNumInResidueB[ResContactInfo.PIPROCDH] = 6; //CD
@@ -7281,6 +7331,7 @@ public class Main {
                     if (piDist > 0) {
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.PISH]++;
+                        donorAcceptor = new Atom[2];
                         if (minContactDistances[ResContactInfo.PISH] < 0 || piDist > minContactDistances[ResContactInfo.PISH]) {
                             minContactDistances[ResContactInfo.PISH] = piDist;
                             contactAtomNumInResidueB[ResContactInfo.PISH] = 5;
@@ -7303,6 +7354,7 @@ public class Main {
                     if (piDist > 0) {
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.PISH]++;
+                        donorAcceptor = new Atom[2];
                         if (minContactDistances[ResContactInfo.PISH] < 0 || piDist > minContactDistances[ResContactInfo.PISH]) {
                             minContactDistances[ResContactInfo.PISH] = piDist;
                             contactAtomNumInResidueB[ResContactInfo.PISH] = 5;
@@ -7326,6 +7378,7 @@ public class Main {
                         if (piDist > 0) {
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.PISH]++;
+                            donorAcceptor = new Atom[2];
                             if (minContactDistances[ResContactInfo.PISH] < 0 || piDist > minContactDistances[ResContactInfo.PISH]) {
                                 minContactDistances[ResContactInfo.PISH] = piDist;
                                 contactAtomNumInResidueB[ResContactInfo.PISH] = 5;
@@ -7342,6 +7395,7 @@ public class Main {
                         if (piDist > 0) {
                             numPairContacts[ResContactInfo.TT]++;
                             numPairContacts[ResContactInfo.PISH]++;
+                            donorAcceptor = new Atom[2];
                             if (minContactDistances[ResContactInfo.PISH] < 0 || piDist > minContactDistances[ResContactInfo.PISH]) {
                                 minContactDistances[ResContactInfo.PISH] = piDist;
                                 contactAtomNumInResidueB[ResContactInfo.PISH] = 5;
@@ -7434,6 +7488,7 @@ public class Main {
                 if (piDist > 0) {
                     numPairContacts[ResContactInfo.TT]++;
                     numPairContacts[ResContactInfo.PIXOH]++;
+                    donorAcceptor = new Atom[2];
                     if (minContactDistances[ResContactInfo.PIXOH] < 0 || piDist > minContactDistances[ResContactInfo.PIXOH]) {
                         minContactDistances[ResContactInfo.PIXOH] = piDist;
                         if ("TYR".equals(b.getName3())) {
@@ -7462,6 +7517,7 @@ public class Main {
                 if (piDist > 0) {
                     numPairContacts[ResContactInfo.TT]++;
                     numPairContacts[ResContactInfo.PIXOH]++;
+                    donorAcceptor = new Atom[2];
                     if (minContactDistances[ResContactInfo.PIXOH] < 0 || piDist > minContactDistances[ResContactInfo.PIXOH]) {
                         minContactDistances[ResContactInfo.PIXOH] = piDist;
                         if ("TYR".equals(b.getName3())) {
@@ -7491,6 +7547,7 @@ public class Main {
                     if (piDist > 0) {
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.PIXOH]++;
+                        donorAcceptor = new Atom[2];
                         if (minContactDistances[ResContactInfo.PIXOH] < 0 || piDist > minContactDistances[ResContactInfo.PIXOH]) {
                             minContactDistances[ResContactInfo.PIXOH] = piDist;
                             if ("TYR".equals(b.getName3())) {
@@ -7513,6 +7570,7 @@ public class Main {
                     if (piDist > 0) {
                         numPairContacts[ResContactInfo.TT]++;
                         numPairContacts[ResContactInfo.PIXOH]++;
+                        donorAcceptor = new Atom[2];
                         if (minContactDistances[ResContactInfo.PIXOH] < 0 || piDist > minContactDistances[ResContactInfo.PIXOH]) {
                             minContactDistances[ResContactInfo.PIXOH] = piDist;
                             if ("TYR".equals(b.getName3())) {
@@ -7571,6 +7629,7 @@ public class Main {
                             if (piDist > 0) {
                                 numPairContacts[ResContactInfo.TT]++;
                                 numPairContacts[ResContactInfo.CCOCAH]++;
+                                donorAcceptor = new Atom[2];
                                 if (minContactDistances[ResContactInfo.CCOCAH] < 0 || piDist > minContactDistances[ResContactInfo.CCOCAH]) {
                                     minContactDistances[ResContactInfo.CCOCAH] = piDist;
                                     contactAtomNumInResidueB[ResContactInfo.CCOCAH] = 1; //CA
@@ -7634,6 +7693,7 @@ public class Main {
                 if (piDist > 0) {
                     numPairContacts[ResContactInfo.TT]++;
                     numPairContacts[ResContactInfo.BCOCAH]++;
+                    donorAcceptor = new Atom[2];
                     if (minContactDistances[ResContactInfo.BCOCAH] < 0 || piDist > minContactDistances[ResContactInfo.BCOCAH]) {
                         minContactDistances[ResContactInfo.BCOCAH] = piDist;
                         contactAtomNumInResidueB[ResContactInfo.BCOCAH] = 1; //CA
@@ -7872,6 +7932,7 @@ public class Main {
                                         }
 //                                        System.out.println("New BB NHO: " + x.toString() + "/" + y.toString());
                                         atomAtomContactType.add("BBNHO");
+                                        donorAcceptor = new Atom[2];
                                         donorAcceptor[0] = x;
                                         donorAcceptor[1] = y;
                                         atomAtomContacts.add(donorAcceptor);
@@ -7895,6 +7956,7 @@ public class Main {
                                         }
 //                                        System.out.println("New BB ONH: " + x.toString() + "/" + y.toString());
                                         atomAtomContactType.add("BBONH");
+                                        donorAcceptor = new Atom[2];
                                         donorAcceptor[0] = y;
                                         donorAcceptor[1] = x;
                                         atomAtomContacts.add(donorAcceptor);
@@ -7926,6 +7988,7 @@ public class Main {
                                         }
 //                                        System.out.println("New BS ONH: " + x.toString() + "/" + y.toString());
                                         atomAtomContactType.add("BSONH");
+                                        donorAcceptor = new Atom[2];
                                         donorAcceptor[0] = y;
                                         donorAcceptor[1] = x;
                                         atomAtomContacts.add(donorAcceptor);
@@ -7953,6 +8016,7 @@ public class Main {
                                         }
 //                                        System.out.println("New SB ONH: " + x.toString() + "/" + y.toString());
                                         atomAtomContactType.add("SBONH");
+                                        donorAcceptor = new Atom[2];
                                         donorAcceptor[0] = x;
                                         donorAcceptor[1] = y;
                                         atomAtomContacts.add(donorAcceptor);
@@ -7981,6 +8045,7 @@ public class Main {
                                         }
 //                                        System.out.println("New BS OOH: " + x.toString() + "/" + y.toString());
                                         atomAtomContactType.add("BSOOH");
+                                        donorAcceptor = new Atom[2];
                                         donorAcceptor[0] = y;
                                         donorAcceptor[1] = x;
                                         atomAtomContacts.add(donorAcceptor);
@@ -8007,6 +8072,7 @@ public class Main {
                                         }
 //                                        System.out.println("New SB ONH: " + x.toString() + "/" + y.toString());
                                         atomAtomContactType.add("SBONH");
+                                        donorAcceptor = new Atom[2];
                                         donorAcceptor[0] = x;
                                         donorAcceptor[1] = y;
                                         atomAtomContacts.add(donorAcceptor);
@@ -8038,6 +8104,7 @@ public class Main {
                                             }
 //                                            System.out.println("New BS NHO: " + x.toString() + "/" + y.toString());
                                             atomAtomContactType.add("BSNHO");
+                                            donorAcceptor = new Atom[2];
                                             donorAcceptor[0] = x;
                                             donorAcceptor[1] = y;
                                             atomAtomContacts.add(donorAcceptor);
@@ -8072,6 +8139,7 @@ public class Main {
                                             }
 //                                            System.out.println("New SB NHO: " + x.toString() + "/" + y.toString());
                                             atomAtomContactType.add("SBNHO");
+                                            donorAcceptor = new Atom[2];
                                             donorAcceptor[0] = y;
                                             donorAcceptor[1] = x;
                                             atomAtomContacts.add(donorAcceptor);
@@ -8107,6 +8175,7 @@ public class Main {
                                             }
 //                                            System.out.println("New BS NHOH: " + x.toString() + "/" + y.toString());
                                             atomAtomContactType.add("BSNHOH");
+                                            donorAcceptor = new Atom[2];
                                             donorAcceptor[0] = x;
                                             donorAcceptor[1] = y;
                                             atomAtomContacts.add(donorAcceptor);
@@ -8129,6 +8198,7 @@ public class Main {
                                             }
 //                                            System.out.println("New BS NHOH: " + x.toString() + "/" + y.toString());
                                             atomAtomContactType.add("BSNHOH");
+                                            donorAcceptor = new Atom[2];
                                             donorAcceptor[0] = y;
                                             donorAcceptor[1] = x;
                                             atomAtomContacts.add(donorAcceptor);
@@ -8162,6 +8232,7 @@ public class Main {
                                             }
 //                                            System.out.println("New SB NHOH: " + x.toString() + "/" + y.toString());
                                             atomAtomContactType.add("SBNHOH");
+                                            donorAcceptor = new Atom[2];
                                             donorAcceptor[0] = y;
                                             donorAcceptor[1] = x;
                                             atomAtomContacts.add(donorAcceptor);
@@ -8184,6 +8255,7 @@ public class Main {
                                             }
 //                                            System.out.println("New SB NHOH: " + x.toString() + "/" + y.toString());
                                             atomAtomContactType.add("SBNHOH");
+                                            donorAcceptor = new Atom[2];
                                             donorAcceptor[0] = x;
                                             donorAcceptor[1] = y;
                                             atomAtomContacts.add(donorAcceptor);
@@ -8229,6 +8301,7 @@ public class Main {
                                             }
 //                                            System.out.println("New BS NHNH: " + x.toString() + "/" + y.toString());
                                             atomAtomContactType.add("BSNHNH");
+                                            donorAcceptor = new Atom[2];
                                             donorAcceptor[0] = x;
                                             donorAcceptor[1] = y;
                                             atomAtomContacts.add(donorAcceptor);
@@ -8255,6 +8328,7 @@ public class Main {
                                             }
 //                                            System.out.println("New BS NHNH: " + x.toString() + "/" + y.toString());
                                             atomAtomContactType.add("BSNHNH");
+                                            donorAcceptor = new Atom[2];
                                             donorAcceptor[0] = y;
                                             donorAcceptor[1] = x;
                                             atomAtomContacts.add(donorAcceptor);
@@ -8297,6 +8371,7 @@ public class Main {
                                             }
 //                                            System.out.println("New SB NHNH: " + x.toString() + "/" + y.toString());
                                             atomAtomContactType.add("SBNHNH");
+                                            donorAcceptor = new Atom[2];
                                             donorAcceptor[0] = y;
                                             donorAcceptor[1] = x;
                                             atomAtomContacts.add(donorAcceptor);
@@ -8323,6 +8398,7 @@ public class Main {
                                             }
 //                                            System.out.println("New SB NHNH: " + x.toString() + "/" + y.toString());
                                             atomAtomContactType.add("SBNHNH");
+                                            donorAcceptor = new Atom[2];
                                             donorAcceptor[0] = x;
                                             donorAcceptor[1] = y;
                                             atomAtomContacts.add(donorAcceptor);
@@ -8368,9 +8444,10 @@ public class Main {
                                                 }
 //                                                System.out.println("New SS ONH: " + x.toString() + "/" + y.toString());
                                                 atomAtomContactType.add("SSONH");
-                                            donorAcceptor[0] = y;
-                                            donorAcceptor[1] = x;
-                                            atomAtomContacts.add(donorAcceptor);
+                                                donorAcceptor = new Atom[2];
+                                                donorAcceptor[0] = y;
+                                                donorAcceptor[1] = x;
+                                                atomAtomContacts.add(donorAcceptor);
                                             }
                                         }
                                     }
@@ -8410,6 +8487,7 @@ public class Main {
                                                 }
 //                                                System.out.println("New SS ONH: " + x.toString() + "/" + y.toString());
                                                 atomAtomContactType.add("SSONH");
+                                                donorAcceptor = new Atom[2];
                                                 donorAcceptor[0] = x;
                                                 donorAcceptor[1] = y;
                                                 atomAtomContacts.add(donorAcceptor);
@@ -8452,6 +8530,7 @@ public class Main {
                                                 }
 //                                                System.out.println("New SS OOH: " + x.toString() + "/" + y.toString());
                                                 atomAtomContactType.add("SSOOH");
+                                                donorAcceptor = new Atom[2];
                                                 donorAcceptor[0] = y;
                                                 donorAcceptor[1] = x;
                                                 atomAtomContacts.add(donorAcceptor);
@@ -8487,6 +8566,7 @@ public class Main {
                                                 }
 //                                                System.out.println("New SS OOH: " + x.toString() + "/" + y.toString());
                                                 atomAtomContactType.add("SSOOH");
+                                                donorAcceptor = new Atom[2];
                                                 donorAcceptor[0] = x;
                                                 donorAcceptor[1] = y;
                                                 atomAtomContacts.add(donorAcceptor);
@@ -8537,6 +8617,7 @@ public class Main {
                                                 }
 //                                                System.out.println("New SS OHNH: " + x.toString() + "/" + y.toString());
                                                 atomAtomContactType.add("SSOHNH");
+                                                donorAcceptor = new Atom[2];
                                                 donorAcceptor[0] = x;
                                                 donorAcceptor[1] = y;
                                                 atomAtomContacts.add(donorAcceptor);
@@ -8577,6 +8658,7 @@ public class Main {
                                                     }
 //                                                    System.out.println("New SS OHNH: " + x.toString() + "/" + y.toString());
                                                     atomAtomContactType.add("SSOHNH");
+                                                    donorAcceptor = new Atom[2];
                                                     donorAcceptor[0] = y;
                                                     donorAcceptor[1] = x;
                                                     atomAtomContacts.add(donorAcceptor);
@@ -8622,6 +8704,7 @@ public class Main {
                                                 }
 //                                                System.out.println("New SS OHNH: " + x.toString() + "/" + y.toString());
                                                 atomAtomContactType.add("SSOHNH");
+                                                donorAcceptor = new Atom[2];
                                                 donorAcceptor[0] = x;
                                                 donorAcceptor[1] = y;
                                                 atomAtomContacts.add(donorAcceptor);
@@ -8665,8 +8748,9 @@ public class Main {
                                                         contactAtomNumInResidueA[ResContactInfo.CCBH] = i;
                                                         contactAtomNumInResidueB[ResContactInfo.CCBH] = j;
                                                     }
-                                                    System.out.println("New SS OHNH: " + x.toString() + "/" + y.toString());
+//                                                    System.out.println("New SS OHNH: " + x.toString() + "/" + y.toString());
                                                     atomAtomContactType.add("SSOHNH");
+                                                    donorAcceptor = new Atom[2];
                                                     donorAcceptor[0] = y;
                                                     donorAcceptor[1] = x;
                                                     atomAtomContacts.add(donorAcceptor);
@@ -8711,6 +8795,7 @@ public class Main {
                                                 }
 //                                                System.out.println("New SS OHOH: " + x.toString() + "/" + y.toString());
                                                 atomAtomContactType.add("SSOHOH");
+                                                donorAcceptor = new Atom[2];
                                                 donorAcceptor[0] = x;
                                                 donorAcceptor[1] = y;
                                                 atomAtomContacts.add(donorAcceptor);
@@ -8748,6 +8833,7 @@ public class Main {
                                                     }
 //                                                    System.out.println("New SS OHOH: " + x.toString() + "/" + y.toString());
                                                     atomAtomContactType.add("SSOHOH");
+                                                    donorAcceptor = new Atom[2];
                                                     donorAcceptor[0] = y;
                                                     donorAcceptor[1] = x;
                                                     atomAtomContacts.add(donorAcceptor);
@@ -8804,6 +8890,7 @@ public class Main {
                                                 }
 //                                                System.out.println("New SS NHNH: " + x.toString() + "/" + y.toString());
                                                 atomAtomContactType.add("SSNHNH");
+                                                donorAcceptor = new Atom[2];
                                                 donorAcceptor[0] = x;
                                                 donorAcceptor[1] = y;
                                                 atomAtomContacts.add(donorAcceptor);
@@ -8853,6 +8940,7 @@ public class Main {
                                                     }
 //                                                    System.out.println("New SS NHNH: " + x.toString() + "/" + y.toString());
                                                     atomAtomContactType.add("SSNHNH");
+                                                    donorAcceptor = new Atom[2];
                                                     donorAcceptor[0] = y;
                                                     donorAcceptor[1] = x;
                                                     atomAtomContacts.add(donorAcceptor);
@@ -8923,6 +9011,7 @@ public class Main {
                         }
 //                        System.out.println("New IVDW: " + x.toString() + "/" + y.toString());
                         atomAtomContactType.add("IVDW");
+                        donorAcceptor = new Atom[2];
                         donorAcceptor[0] = x;
                         donorAcceptor[1] = y;
                         atomAtomContacts.add(donorAcceptor);
@@ -9005,6 +9094,7 @@ public class Main {
                         numTotalLigContactsPair++;
 //                        System.out.println("New ProtLig: " + x.toString() + "/" + y.toString());
                         atomAtomContactType.add("PROTLIG");
+                        donorAcceptor = new Atom[2];
                         donorAcceptor[0] = x;
                         donorAcceptor[1] = y;
                         atomAtomContacts.add(donorAcceptor);
@@ -9041,6 +9131,7 @@ public class Main {
                         numTotalLigContactsPair++;
 //                        System.out.println("New LigProt: " + x.toString() + "/" + y.toString());
                         atomAtomContactType.add("LIGPROT");
+                        donorAcceptor = new Atom[2];
                         donorAcceptor[0] = x;
                         donorAcceptor[1] = y;
                         atomAtomContacts.add(donorAcceptor);
@@ -9077,6 +9168,7 @@ public class Main {
                         numTotalLigContactsPair++;
 //                        System.out.println("New LigLig: " + x.toString() + "/" + y.toString());
                         atomAtomContactType.add("LIGLIG");
+                        donorAcceptor = new Atom[2];
                         donorAcceptor[0] = x;
                         donorAcceptor[1] = y;
                         atomAtomContacts.add(donorAcceptor);
