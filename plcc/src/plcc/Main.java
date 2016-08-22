@@ -11761,6 +11761,7 @@ public class Main {
                 else {
                     // There is at least one more SSE.
                     nextSSE = consideredSSEs.get(i + 1);
+                    Boolean currentSSEmergedIntoNext = false;
 
                     
 
@@ -11773,15 +11774,19 @@ public class Main {
                             if(curSSE.getPrimarySeqDistanceInAminoAcidsTo(nextSSE) <= Settings.getInteger("plcc_I_merge_helices_max_dist")) {
                                 // To merge, we add all residues of the next SSE to this one and skip the next one.
                                 // System.out.println("    Merging SSEs #" + i + " of type " + cst +  " and #" + (i + 1) + " of type " + nextSSE.getSseType()  + ".");
-                                curSSE.addResidues(nextSSE.getResidues());
-                                i++;    // ignore the next SSE, we assigned its residues to this one already                                                            
+                                //curSSE.addResidues(nextSSE.getResidues());
+                                nextSSE.addResidues(curSSE.getResidues());
+                                currentSSEmergedIntoNext = true;
+                                //i++;    // ignore the next SSE, we assigned its residues to this one already                                                            
                             }                                                                                    
                         }                        
                     }                    
 
-                    // No matter whether we merged or not, we should add the current SSE.
-                    curSSE.setSseType("H");         // This turns the new SSE (whether merged or a former H/G/I) into a H
-                    outputSSEs.add(curSSE);                                                                            
+                    // Add current SSE only if not merged with next one
+                    if( ! currentSSEmergedIntoNext) {
+                        curSSE.setSseType("H");
+                        outputSSEs.add(curSSE);          
+                    }
                 }
 
 
