@@ -1573,7 +1573,7 @@ public class Main {
                 
                     String patternSSEString = null;
                     try {
-                        patternSSEString = DBManager.getSSEString(Settings.get("plcc_B_search_similar_PDBID"), Settings.get("plcc_B_search_similar_chainID"), Settings.get("plcc_S_search_similar_graphtype"));
+                        patternSSEString = DBManager.getSSEStringOfProteinGraph(Settings.get("plcc_B_search_similar_PDBID"), Settings.get("plcc_B_search_similar_chainID"), Settings.get("plcc_S_search_similar_graphtype"));
                     } catch (Exception e) {
                         System.err.println("ERROR: DB: Could not retrieve SSE string for requested graph from database, exiting.");
                         System.exit(1);

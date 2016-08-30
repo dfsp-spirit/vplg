@@ -12260,17 +12260,9 @@ connection.close();
         return null;
     }
     
-    /**
-     * Determines the number of SSEs by type which occur in a chain, based on the sse_string property of the albelig graph in the database.
-     * @param pdb_id the PDB id
-     * @param chain_name the chain name
-     * @return an Integer array of length 4, containing at positions: 0= total SSE count, 1=alpha helix count, 2=beta strand count, 3=ligand count
-     * @throws SQLException if something went wrong with the DB
-     */
-    public static Integer[] getSSETypeCountsOfChain(String pdb_id, String chain_name) throws SQLException {
+    public static Integer[] countSSETypesInSSEString(String sse_string) {
         Integer[] counts = new Integer[4];
         Arrays.fill(counts, 0);
-        String sse_string = getSSEStringOfChain(pdb_id, chain_name);
         if(sse_string != null) {            
             for(Character c : sse_string.toCharArray()) {
                 counts[0]++;
@@ -12280,6 +12272,29 @@ connection.close();
             }
         }
         return counts;
+    }
+    
+    /**
+     * Determines the number of SSEs by type which occur in a chain, based on the sse_string property of the albelig graph in the database.
+     * @param pdb_id the PDB id
+     * @param chain_name the chain name
+     * @return an Integer array of length 4, containing at positions: 0= total SSE count, 1=alpha helix count, 2=beta strand count, 3=ligand count
+     * @throws SQLException if something went wrong with the DB
+     */
+    public static Integer[] getSSETypeCountsOfChain(String pdb_id, String chain_name) throws SQLException {
+        
+        String sse_string = getSSEStringOfChain(pdb_id, chain_name);
+        return DBManager.countSSETypesInSSEString(sse_string);
+    }
+    
+    public static Integer[] getSSETypeCountsOfProteinGraph(String pdb_id, String chain_name, String graphType) {
+        String sse_string = "";
+        try {
+            sse_string = DBManager.getSSEStringOfProteinGraph(pdb_id, chain_name, graphType);
+        } catch(SQLException e) {
+            DP.getInstance().e("DBManager", "getSSETypeCountsOfProteinGraph: Failed to get SSE string of graph from DB: '" + e.getMessage() + "'. Returning zero counts from empty SSE string.");
+        }
+        return DBManager.countSSETypesInSSEString(sse_string);
     }
     
     /**
@@ -14450,7 +14465,7 @@ connection.close();
      * @return the SSEstring of the graph or null if no such graph exists.
      * @throws SQLException if the database connection could not be closed or reset to auto commit (in the finally block)
      */
-    public static String getSSEString(String pdb_id, String chain_name, String graph_type) throws SQLException {
+    public static String getSSEStringOfProteinGraph(String pdb_id, String chain_name, String graph_type) throws SQLException {
         Integer gtc = ProtGraphs.getGraphTypeCode(graph_type);
         
         Long chain_db_id = getDBChainID(pdb_id, chain_name);
@@ -14523,7 +14538,74 @@ connection.close();
         }        
     }
     
-    
+    public static String getSSEStringOfFoldingGraph(String pdb_id, String chain_name, String graph_type, Integer fg_number) throws SQLException {
+        Long fg_db_id = -1L;
+        fg_db_id = DBManager.getDBFoldingGraphID(pdb_id, chain_name, graph_type, fg_number);
+        if(fg_db_id <= 0) {
+            DP.getInstance().w("DBManager", "getSSEStringOfFoldingGraph: Folding graph not found in database, returning empty SSE string.");
+            return "";
+        }
+        
+        ResultSetMetaData md;
+        List<String> columnHeaders;
+        List<List<String>> tableData = new ArrayList<List<String>>();
+        List<String> rowData = null;
+        int count;      
+
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT sse_string FROM " + tbl_foldinggraph + " WHERE (foldinggraph_id = ?);";
+
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, fg_db_id);
+                                
+            rs = statement.executeQuery();
+            //dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "SQL: getSSEStringOfFoldingGraph: Retrieval of graph string failed: '" + e.getMessage() + "'.");
+        } finally {
+            if (statement != null) {
+                statement.close();
+            }
+        }
+        
+        // OK, check size of results table and return 1st field of 1st column
+        if(tableData.size() >= 1) {
+            if(tableData.get(0).size() >= 1) {
+                return(tableData.get(0).get(0));
+            }
+            else {
+                DP.getInstance().w("DB: getSSEString(): No entry for folding graph '" + graph_type + "' of PDB ID '" + pdb_id + "' chain '" + chain_name + "'.");
+                return("");
+            }
+        }
+        else {
+            return("");
+        }
+    }
     
     /**
      * Retrieves the graph data of all protein graphs from the database.
