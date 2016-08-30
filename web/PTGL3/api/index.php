@@ -22,6 +22,9 @@ require 'Slim/Slim.php';
 $app = new \Slim\Slim();
 $app->setName('ptgl3api');
 
+$response = $app->response();
+$response->header('Access-Control-Allow-Origin', '*');
+
 /**
  * Step 3: Define the Slim application routes
  *
