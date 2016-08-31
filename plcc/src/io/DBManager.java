@@ -12266,9 +12266,9 @@ connection.close();
         if(sse_string != null) {            
             for(Character c : sse_string.toCharArray()) {
                 counts[0]++;
-                if(c.equals('H')) { counts[1]++; }
-                else if(c.equals('E')) { counts[2]++; }
-                else if(c.equals('L')) { counts[3]++; }
+                if(c.equals(SSE.SSECLASS_CHAR_HELIX)) { counts[1]++; }
+                else if(c.equals(SSE.SSECLASS_CHAR_STRAND)) { counts[2]++; }
+                else if(c.equals(SSE.SSECLASS_CHAR_LIGAND)) { counts[3]++; }
             }
         }
         return counts;

@@ -50,6 +50,11 @@ public class SSE extends SSEGraphVertex implements IDrawableVertex, java.io.Seri
     public static final String SSECLASS_STRING_LIGAND = "L";
     public static final String SSECLASS_STRING_OTHER = "O";
     
+    public static final Character SSECLASS_CHAR_HELIX = 'H';
+    public static final Character SSECLASS_CHAR_STRAND = 'E';
+    public static final Character SSECLASS_CHAR_LIGAND = 'L';
+    public static final Character SSECLASS_CHAR_OTHER = 'O';
+    
     public static final String SSE_FGNOTATION_HELIX = "h";
     public static final String SSE_FGNOTATION_STRAND = "e";
     public static final String SSE_FGNOTATION_LIGAND = "l";

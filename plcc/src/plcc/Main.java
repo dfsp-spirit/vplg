@@ -11542,7 +11542,7 @@ public class Main {
 
 
                     // Add the new SSE to the list of SSEs. Ignore ligands though, they are handled later because they are special.
-                    if(! curSSE.getSseType().equals("L")) {
+                    if(! curSSE.getSseType().equals(SSE.SSECLASS_STRING_LIGAND)) {
                         dsspSSElist.add(curSSE);
                         //System.out.println("      Added new SSE of type '" + curSSE.getSseType() + "', " + s_allDsspSSEs.size() + " SSEs found so far.");
                     }
