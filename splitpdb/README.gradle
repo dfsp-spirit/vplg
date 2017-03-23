@@ -1,0 +1,10 @@
+####
+
+To see the build tasks, run:
+    gradle tasks
+
+You can run the application itself, but passing command line args is very ugly. Here is how to pass '-h':
+
+    gradle run -PappArgs="['-h']"
+
+Make sure you have all the ticks and double-quotes! You can add more args to that array, e.g., ... ="['8icd.pdb', '-o', '8icd_split.pdb']"
