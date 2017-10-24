@@ -171,6 +171,7 @@ public class FileParser {
     /**
      * Reads the target text file and returns the data in it.
      * @param file Path to a readable text file. Does NOT test whether it exist, do that earlier.
+     * @param bool_dssp boolean vararg. If given: expects one bool which determines wether file is a dssp file.
      * @return all lines of the file as an ArrayList
      */
     public static ArrayList<String> slurpFile(String file, boolean... bool_dssp) {
