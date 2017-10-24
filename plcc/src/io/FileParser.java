@@ -133,7 +133,7 @@ public class FileParser {
         }
 
         dsspLines = new ArrayList<String>();
-        dsspLines = slurpFile(dsspFile);
+        dsspLines = slurpFile(dsspFile, true);
         if(! FileParser.silent) {
             System.out.println("    Read all " + dsspLines.size() + " lines of file '" + dsspFile + "'.");
         }
@@ -173,7 +173,14 @@ public class FileParser {
      * @param file Path to a readable text file. Does NOT test whether it exist, do that earlier.
      * @return all lines of the file as an ArrayList
      */
-    public static ArrayList<String> slurpFile(String file) {
+    public static ArrayList<String> slurpFile(String file, boolean... bool_dssp) {
+        
+        boolean local_warning = false;
+        boolean local_skip_blanks = false;
+        
+        if (bool_dssp.length > 0) {
+            local_skip_blanks = bool_dssp[0];
+        }
 
         ArrayList<String> lines = new ArrayList<String>();
 
@@ -181,7 +188,23 @@ public class FileParser {
             BufferedReader in = new BufferedReader(new FileReader(file));
             String line = null;
             while ((line = in.readLine()) != null) {
-                lines.add(line);
+                if (! local_skip_blanks) {
+                    lines.add(line);
+                }
+                else {
+                    if (! line.isEmpty()) { // skips empty lines and prints warning
+                        lines.add(line);
+                    }
+                    else {
+                        if (! local_warning) {
+                            System.out.println("[Warning] DSSP File contains empty lines. Parser skips them and tries to go on.");
+                            System.out.println("[Warning] ... You should check if the empty line occurs at the end of the file "
+                                    + "(b/c of your DSSP-database or text editor you pasted to)");
+                            System.out.println("[Warning] ... or if this indicates a severe error. Garbage in -> garbage out.");
+                            local_warning = true;
+                        }
+                    }
+                }
             }
 	} catch (IOException e) {
             System.err.println("ERROR: Could not read text file '" + file + "'.");
@@ -1690,30 +1713,30 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                     char c = (resName1Letter.toCharArray())[0];
                     if( ! Character.isUpperCase(c)) {
                         resName1Letter = "C";   // change residue code cysteine
-                        
+
                         // now go save the sulfur bridge
                         if(s_sulfurBridges.containsKey(c)) {
                             // the sulfur bridge partner is already in there
                             (s_sulfurBridges.get(c)).add(dsspResNum);
-                            
+
                             // Check whether its a interhcain sulfur bridge (different chain IDs)
                             if(! s_interchainSulfurBridgesChainID.get(c).equals(dsspChainID)) {
                                 ArrayList<Integer> tmpInterchain = new ArrayList<Integer>();
-                                
+
                                 // Get the dsspResNum from the first residue of this interchain sulfur bridge
                                 tmpInterchain.add(s_sulfurBridges.get(c).get(0));
                                 // Also add the dsspResNum of the current (second) residue.
                                 tmpInterchain.add(dsspResNum);
                                 s_interchainSulfurBridges.put(c, tmpInterchain);
                             }
-                            
-                            
+
+
                         } else {
                             // this is the first residue of the sulfur bridge pair
                             ArrayList<Integer> tmp = new ArrayList<Integer>();
                             tmp.add(dsspResNum);
                             s_sulfurBridges.put(c, tmp);
-                            
+
                             // If its the first residue of the sulfur bridge save the chain this residue belongs to.
                             // This will be used to check if the second residue is on the same change or not.
                             s_interchainSulfurBridgesChainID.put(c, dsspChainID);
@@ -1722,7 +1745,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                 } catch (Exception e) {
                     DP.getInstance().w("Something is fishy with residue in line " + dLineNum + " of the DSSP file: '" + e.getMessage() + "'. Sulfur bridge trouble?");
                 }
-                
+
 
                 // Fix DSSP file like the one for 2ZW3.pdb which list cysteine residues as 'o' instead of 'c'.
                 if(resName1Letter.equals("O") || resName1Letter.equals("U")) {
@@ -1760,7 +1783,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                 //System.out.println("    DSSP: Added residue PDB # " +  pdbResNum + ", DSSP # " + dsspResNum + " to s_residues at index " + resIndex + ".");
 
                 // Debug tests
-                
+
                 /*
                 Residue tmp = s_residues.get(resIndex);
                 if(dsspResNum != (s_residues.get(resIndex)).getDsspResNum()) {
@@ -1773,7 +1796,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                     System.exit(-1);
                 }
                 */
-                
+
             }
         }
     }
@@ -2165,15 +2188,17 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
             for(Integer i = dsspDataStartLine - 1; i < dsspLines.size(); i++) {
                 dLine = dsspLines.get(i);
                 dLineNum = i + 1;
+                
+                if( (dLine.length() >= 14)) { // Warning has been printed before
+                    if(! dLine.substring(13, 14).equals("!")) {       // if this is NOT a chain brake line
 
-                if(! dLine.substring(13, 14).equals("!")) {       // if this is NOT a chain brake line
-
-                    try {
-                        dsspResNum = Integer.valueOf(dLine.substring(1, 5).trim());
-                    } catch (Exception e) {
-                        System.err.println("ERROR: Parsing of DSSP line " + dLineNum + " failed. DSSP file broken.");
-                        e.printStackTrace();
-                        System.exit(1);
+                        try {
+                            dsspResNum = Integer.valueOf(dLine.substring(1, 5).trim());
+                        } catch (Exception e) {
+                            System.err.println("ERROR: Parsing of DSSP line " + dLineNum + " failed. DSSP file broken.");
+                            e.printStackTrace();
+                            System.exit(1);
+                        }
                     }
                 }
             }
