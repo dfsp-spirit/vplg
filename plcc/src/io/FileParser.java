@@ -133,7 +133,7 @@ public class FileParser {
         }
 
         dsspLines = new ArrayList<String>();
-        dsspLines = slurpFile(dsspFile, true);
+        dsspLines = slurpFile(dsspFile, true); // vararg tells the function that this is a dssp file
         if(! FileParser.silent) {
             System.out.println("    Read all " + dsspLines.size() + " lines of file '" + dsspFile + "'.");
         }
