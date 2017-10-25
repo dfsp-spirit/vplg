@@ -19,6 +19,7 @@ import java.awt.RenderingHints;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -341,7 +342,7 @@ public class ComplexGraph extends UAdjListGraph {
 
                 // determine edge type and the resulting color
                     //edgeType = cg.getContactType(i, j);
-                    ig2.setPaint(Color.RED);
+                    ig2.setPaint(Color.GRAY);
                     if (bw) {
                         ig2.setPaint(Color.LIGHT_GRAY);
                     }      // for non-protein graphs
@@ -497,8 +498,10 @@ public class ComplexGraph extends UAdjListGraph {
         // pick color depending on SSE type
 
             // draw a shape based on SSE type
-            rect = new Rectangle2D.Double(vertStart.x + (i * pl.vertDist), vertStart.y, pl.getVertDiameter(), pl.getVertDiameter());
-            ig2.fill(rect);
+            rect = new Rectangle2D.Double(vertStart.x + (i * pl.vertDist) + pl.getVertDiameter() / 2, vertStart.y - pl.getVertDiameter() / 2, pl.getVertDiameter(), pl.getVertDiameter());
+            AffineTransform rot_45deg = new AffineTransform();
+            rot_45deg.rotate(0.785, vertStart.x + (i * pl.vertDist) + pl.getVertDiameter() / 2, vertStart.y - pl.getVertDiameter() / 2); // rotation around center of vertex
+            ig2.fill(rot_45deg.createTransformedShape(rect));
 
         }
 
