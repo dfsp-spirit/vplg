@@ -406,7 +406,7 @@ public class FileParser {
             if(! FileParser.silent) {
                 System.out.println("  Creating binding sites...");
             }
-            createAllBindingSitesFromPdbData(); // fills s_bindingsites
+                createAllBindingSitesFromPdbData(); // fills s_bindingsites
             if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
                 for(BindingSite s : s_sites) {
                     System.out.println("    PDB: " + s.toString());
@@ -526,22 +526,33 @@ public class FileParser {
             int numWaterResIgnored = 0;
             for(BindingSite s : s_sites) {
                 List<String[]> siteResidueInfos = s.getResidueInfos();
-                for(String[] resInfo : siteResidueInfos) {
-                    siteResPdbResNum = Integer.parseInt(resInfo[2]);
-                    siteResChainID = resInfo[1];
-                    siteResName = resInfo[0];
-                    Residue res = FileParser.getResByPdbFields(siteResPdbResNum, siteResChainID, null);
-                    if(res != null) {
-                        res.addPartOfBindingSite(s);
-                        numResAssigned++;
-                    } else {
-                        if(siteResName.toUpperCase().equals("HOH")) {
-                            numWaterResIgnored++;
-                        }
-                        else {
-                            DP.getInstance().w("FileParser", "Could not assign residue " + siteResName + " #" + siteResPdbResNum + " of chain " + siteResChainID + " to binding site, no such residue found in residue list.");
+                // try-catch for coping with the Int/Str-ParseError if insertion codes
+                //    are used in the SITE fields
+                try {
+                    for(String[] resInfo : siteResidueInfos) {
+
+                        siteResPdbResNum = Integer.parseInt(resInfo[2]);
+
+                        siteResChainID = resInfo[1];
+                        siteResName = resInfo[0];
+                        Residue res = FileParser.getResByPdbFields(siteResPdbResNum, siteResChainID, null);
+                        if(res != null) {
+                            res.addPartOfBindingSite(s);
+                            numResAssigned++;
+                        } else {
+                            if(siteResName.toUpperCase().equals("HOH")) {
+                                numWaterResIgnored++;
+                            }
+                            else {
+                                DP.getInstance().w("FileParser", "Could not assign residue " + siteResName + " #" + siteResPdbResNum + " of chain " + siteResChainID + " to binding site, no such residue found in residue list.");
+                            }
                         }
                     }
+                } catch (NumberFormatException e) {
+                    DP.getInstance().w("FP", " NumberFormatException while parsing the PDB-File.");
+                    DP.getInstance().w("FP", " Trying to go on now. Set plcc_B_parse_binding_sites=false "
+                            + "if insertion codes are used in the SITE fields "
+                            + "(skips the detection of binding sites then).");
                 }                
             }
             if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
