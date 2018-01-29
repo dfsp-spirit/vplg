@@ -176,7 +176,7 @@ public class FileParser {
      */
     public static ArrayList<String> slurpFile(String file, boolean... bool_dssp) {
         
-        boolean local_warning = false;
+        boolean local_warning = false; // ensures that local warning is printed only once
         boolean local_skip_blanks = false;
         
         if (bool_dssp.length > 0) {
@@ -198,10 +198,10 @@ public class FileParser {
                     }
                     else {
                         if (! local_warning) {
-                            System.out.println("[Warning] DSSP File contains empty lines. Parser skips them and tries to go on.");
-                            System.out.println("[Warning] ... You should check if the empty line occurs at the end of the file "
+                            DP.getInstance().w("FP", "DSSP File contains empty lines. Parser skips them and tries to go on.");
+                            DP.getInstance().w("FP", " ... You should check if the empty line occurs at the end of the file "
                                     + "(b/c of your DSSP-database or text editor you pasted to)");
-                            System.out.println("[Warning] ... or if this indicates a severe error. Garbage in -> garbage out.");
+                            DP.getInstance().w("FP", " ... or if this indicates a severe error. Garbage in -> garbage out.");
                             local_warning = true;
                         }
                     }
@@ -549,8 +549,8 @@ public class FileParser {
                         }
                     }
                 } catch (NumberFormatException e) {
-                    DP.getInstance().w("FP", " NumberFormatException while parsing the PDB-File.");
-                    DP.getInstance().w("FP", " Trying to go on now. Set plcc_B_parse_binding_sites=false "
+                    DP.getInstance().w("FP", "NumberFormatException while parsing the PDB-File.");
+                    DP.getInstance().w("FP", "Trying to go on now. Set plcc_B_parse_binding_sites=false "
                             + "if insertion codes are used in the SITE fields "
                             + "(skips the detection of binding sites then).");
                 }                
