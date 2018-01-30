@@ -1,4 +1,4 @@
-<?php include_once("./backend/analyticstracking.php") ?>
+
 
 <div class="container">
 	<div class="navbar navbar-fixed-top" id="navColor">
