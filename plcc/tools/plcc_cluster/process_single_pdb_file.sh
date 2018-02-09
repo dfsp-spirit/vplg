@@ -5,6 +5,7 @@
 ## Written by ts, 2011
 ## Updated by ts, 2014
 ## Updated by ts, 11-2015
+## Updated by jnw, 2017: (re?)add writing of "DBINSERT_LOG_SUCCESS" [NOTE: seems to not work properly so far]
 
 APPTAG="[PROC_1PDB]"
 CFG_FILE="settings_statistics.cfg"
@@ -375,6 +376,10 @@ if [ -r $FLN ]; then
 	    report_and_exit 1
 	else
 	    ## everything worked it seems
+	    
+	    # writing log for successfully inserted data /jnw
+	    echo "$PDBID" >> $DBINSERT_LOG_SUCCESS
+	    
 	    if [ "$SILENT" = "NO" ]; then
 	        echo "$APPTAG $PDBID PLCC run successfully."
 	    fi
