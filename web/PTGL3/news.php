@@ -51,6 +51,10 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<p>Here we list important information on PTGL updates, planned maintenance times, and more.</p>
 		<br /><br/>
 		
+		<h4>FEB 23, 2018: Updating server to latest PDB release</h4>
+		<p>We are currently running an update to the latest PDB version on our cluster. The update will be rolled out to the PTGL server in the end of February. In this time the server may be unavailable. This update will also apply minor changes, for example the visualization of complex graphs.</p>
+		<br /><br/>
+		
 		<h4>NOV 30, 2015: Major update scheduled</h4>
 		<p>We are currently running an update to the latest PDB version on our cluster. The update will be rolled out to the PTGL server in December. This update will add support for complex graphs and ligand-centered graphs.</p>
 		<br /><br/>
