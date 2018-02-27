@@ -1987,7 +1987,7 @@ public class Main {
             if( ! Settings.getBoolean("plcc_B_only_essential_output")) {
                 System.out.println("Getting data...");
             }
-            FileParser.silent = true;
+            FileParser.silent = false;
         } else {
             FileParser.silent = true;
         }
