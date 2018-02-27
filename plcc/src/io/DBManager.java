@@ -27,7 +27,7 @@ import plcc.Settings;
 import similarity.SimilarityByGraphlets;
 import tools.DP;
 import tools.PlccUtilities;
-
+//Test!
 /**
  * A database manager class that is used to create and maintain a connection to a PostgreSQL database server.
  * 
