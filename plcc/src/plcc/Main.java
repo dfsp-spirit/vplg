@@ -1487,6 +1487,11 @@ public class Main {
                         argsUsed[i] = true;
                     }
                     
+                    if(s.equals("-I") || s.equals("--mmCIF-parser")) {
+                        Settings.set("plcc_B_use_mmCIF_parser", "true");
+                        argsUsed[i] = true;
+                    }
+                    
                     
 
 
@@ -1500,7 +1505,7 @@ public class Main {
             System.exit(1);
         }
         
-        
+
         
         Boolean silent = false;
         if(Settings.getBoolean("plcc_B_silent")) {
@@ -1517,6 +1522,16 @@ public class Main {
             System.out.print(outputToBePrintedUnlessSilent.toString());
             if(Settings.getBoolean("plcc_B_no_warn")) {
                 System.out.println("  No-warn active, no warnings will be printed.");
+            }
+        }
+        
+        if(Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
+            if (pdbFile.endsWith(".pdb")) {
+                pdbFile = pdbFile.replace(".pdb", ".cif");
+            }
+            if (! silent) {
+                    System.out.println("Using mmCIF parser and therefore looking for .cif file.");
+                    System.out.println("Filename now is: " + pdbFile);
             }
         }
 
@@ -10447,6 +10462,7 @@ public class Main {
         System.out.println("-i | --aa-graphs           : compute and output amino acid-based graphs as well. In these graphs, each vertes is an amino acid instead of a SSE. Computes per-chain and per-PDB file AAGs.");        
         System.out.println("     --aa-graphs-pdb       : computes amino acid graphs (see above), but only the graphs for the whole PDB file (all chains combined into one graph).");        
         System.out.println("     --aa-graphs-chain     : computes amino acid graphs (see above), but only the graphs which model a single chain each (n graphs for a PDB file with n chains).");                
+        System.out.println("-I | --mmCIF-parser        : uses mmCIF parser for provided file (looks for .cif file)");
         System.out.println("-j | --ddb <p> <c> <gt> <f>: get the graph type <gt> of chain <c> of pdbid <p> from the DB and draw it to file <f> (omit the file extension)*");        
         System.out.println("-k | --output-subdir-tree  : write all output files to a PDB-style sudbir tree of the output dir (e.g., <OUTDIR>/ic/8icd/<outfile>). ");                
         System.out.println("-l | --draw-plcc-graph <f> : read graph in plcc format from file <f> and draw it to <f>.png, then exit (<pdbid> will be ignored)*");                

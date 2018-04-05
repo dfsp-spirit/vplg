@@ -439,7 +439,8 @@ public class Settings {
         defSet("plcc_I_lig_min_atoms", "1", "The minimum number of atoms a ligand has to consist of to count as an SSE.");
         defSet("plcc_I_lig_max_atoms", "-1", "The maximum number of atoms a ligand has to consist of to count as an SSE. Set to <0 for unlimited.");
         defSet("plcc_B_convert_models_to_chains", "false", "Wether the PDB file should be checked to have multiple models and if so to convert those models to chains");
-
+        defSet("plcc_B_use_mmCIF_parser", "false", "Wether the mmCIF parser should be used on the provided file.");
+        
         
         // similarity stuff
         defSet("plcc_B_search_similar", "false", "Whether to activate the program mode which searches for the most similar protein");
