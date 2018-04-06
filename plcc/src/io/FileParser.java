@@ -166,6 +166,33 @@ public class FileParser {
             return(false);          // for the IDE ;)
         }
     }
+    
+    /**
+     * Like initData but for mmCIF data.
+     * @param pf Path to a PDB file. Does NOT test whether it exist, do that earlier.
+     * @param df Path to a DSSP file. Does NOT test whether it exist, do that earlier.
+     * @return 
+     */
+    public static Boolean initDataCIF(String pf, String df) {
+        
+        s_chains = new ArrayList<Chain>();
+        s_residues = new ArrayList<Residue>();
+        s_atoms = new ArrayList<Atom>();
+        s_dsspSSEs = new ArrayList<SSE>();
+        s_ptglSSEs = new ArrayList<SSE>();
+        
+        if(parseDataCIF()) {
+            dataInitDone = true;
+            return(true);
+        }
+        else {
+            System.err.println("ERROR: Could not parse dssp and pdb data.");
+            dataInitDone = false;
+            System.exit(1);
+            return(false);          // for the IDE ;)
+        }
+        
+    }
 
 
     /**
@@ -572,6 +599,16 @@ public class FileParser {
         }
 
         return(true);
+    }
+    
+    /**
+     * Like parseData but for mmCIF files: goes through all lines of PDB and DSSP file and calls appropriate function to handle each line. 
+     * @return ignore (?)
+     */
+    private static Boolean parseDataCIF() {
+        // idea: read each line once and dont save them. If it works that would save time and space.
+        
+        return(false);
     }
 
 
