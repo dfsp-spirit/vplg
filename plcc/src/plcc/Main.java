@@ -2013,7 +2013,12 @@ public class Main {
             FileParser.essentialOutputOnly = false;
         }
         
-        FileParser.initData(pdbFile, dsspFile);
+        if (Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
+            FileParser.initDataCIF(pdbFile, dsspFile);
+        }
+        else {
+            FileParser.initData(pdbFile, dsspFile);
+        }
 
         allModelsIDsOfWholePDBFile = FileParser.getAllModelIDsFromWholePdbFile();
 

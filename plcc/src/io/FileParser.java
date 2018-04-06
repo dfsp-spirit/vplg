@@ -175,6 +175,9 @@ public class FileParser {
      */
     public static Boolean initDataCIF(String pf, String df) {
         
+        pdbFile = pf;
+        dsspFile = df;
+        
         s_chains = new ArrayList<Chain>();
         s_residues = new ArrayList<Residue>();
         s_atoms = new ArrayList<Atom>();
@@ -607,6 +610,54 @@ public class FileParser {
      */
     private static Boolean parseDataCIF() {
         // idea: read each line once and dont save them. If it works that would save time and space.
+        // lets do this for all the basic stuff first and neglect models, sites etc
+        //     -> atoms, residues, chains, SSEs
+        
+        // for now local variables, may be needed as class variable though
+        Boolean dataBlockFound = false; // for now only parse the first data block (stop if seeing 2nd block)
+        
+        Integer numLine = 0;
+        
+        try {
+            BufferedReader in = new BufferedReader(new FileReader(pdbFile));
+            String line = null;
+            while ((line = in.readLine()) != null) {
+                numLine ++;
+                // first, check if line is a comment
+                if (! line.startsWith("#")) {
+                    
+                    // check for data block
+                    if (line.startsWith("data_")) {
+                        if (dataBlockFound) {
+                            DP.getInstance().w("[FP_CIF]", " Parsing of first data block ended at line " + numLine.toString()
+                                + "as right now only the first data block is parsed.");
+                            break; // for now we only parse first data block
+                        }
+                        else {
+                            dataBlockFound = true;
+                            if (line.length() > 5) {
+                                if (! silent) {
+                                    System.out.println("  Found the first data block named: " + line.subSequence(5, line.length()));
+                                }
+                            }
+                            else {
+                                if (! silent) {
+                                    System.out.println("  Found the first data block (without a name).");
+                                }
+                            }
+                        }
+                    }
+                    
+                    // chains not mentioned explicitly: build them up while reading atoms
+                    
+                    // check for residues / atoms
+                }
+            }
+	} catch (IOException e) {
+            System.err.println("ERROR: Could not parse PDB file."); //TODO which file?
+            System.err.println("ERROR: Message: " + e.getMessage());
+            System.exit(1);
+	}
         
         return(false);
     }
