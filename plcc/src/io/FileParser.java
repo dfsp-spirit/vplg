@@ -23,6 +23,7 @@ import tools.DP;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.io.*;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -604,6 +605,24 @@ public class FileParser {
         return(true);
     }
     
+    private static String[] lineToArrayCIF(String line) {
+        String tmpReturnList[] = new String[line.split(" ").length];
+        String tmpLineList[];
+        int counterValues = 0;
+        tmpLineList = line.split(" ");
+        
+        for (int i=0; i < tmpLineList.length; i++) {
+            if (! tmpLineList[i].isEmpty()) {
+                tmpReturnList[counterValues] = tmpLineList[i];
+                counterValues++;
+            }
+        }
+        
+        // TODO aktuell viele NULL Einträge da Größe festgesetzt
+        
+        return tmpReturnList;
+    }
+    
     /**
      * Like parseData but for mmCIF files: goes through all lines of PDB and DSSP file and calls appropriate function to handle each line. 
      * @return ignore (?)
@@ -615,6 +634,14 @@ public class FileParser {
         
         // for now local variables, may be needed as class variable though
         Boolean dataBlockFound = false; // for now only parse the first data block (stop if seeing 2nd block)
+        Boolean inLoop = false;
+        ArrayList<String> foundChains = new ArrayList<String>(); // remember them here instead of going through all objects
+        Chain c;
+        
+        // variables for one loop (reset when hitting #)
+        String tableCategory = null;
+        ArrayList<String> tableColHeads = new ArrayList<String>();
+        Integer chainColIndex = -1; // default value -1 means no chain name column exists
         
         Integer numLine = 0;
         
@@ -648,9 +675,82 @@ public class FileParser {
                         }
                     }
                     
-                    // chains not mentioned explicitly: build them up while reading atoms
+                    if (inLoop) {
+                        // check if we need data from this loop
+                        if (! (tableCategory == null)) {
+                            if (! tableCategory.equals("_atom_site")) {
+                                continue;
+                            }
+                        }
+                        
+                        
+                        // check for column heads
+                        if (line.startsWith("_")) {
+                            if (tableCategory == null) {
+                                if (line.split("\\.").length < 2) {
+                                    System.out.println("DEBUG: Warning, line: " + numLine);
+                                } else {
+                                    tableCategory = line.split("\\.")[0];
+                                }
+                            }
+                            tableColHeads.add(line.split("\\.")[1].trim());
+                            
+                            // check if chain name column needs an update
+                            //     prioritize auth_asym_id > label_asym_id
+                            if (tableColHeads.get(tableColHeads.size() - 1).equals("label_asym_id")) {
+                                if (chainColIndex == -1) {
+                                    chainColIndex = tableColHeads.size() - 1;
+                                }
+                            } else if (tableColHeads.get(tableColHeads.size() - 1).equals("auth_asym_id")) {
+                                chainColIndex = tableColHeads.size() - 1;
+                            }
+                        } else {
+                            // we are in the row section (data!)
+                            String[] tmpLineData = lineToArrayCIF(line);
+                            
+                            // check for a new chain
+                            if (chainColIndex >= 0) {
+                                if (tmpLineData.length >= chainColIndex) {
+                                    String tmp_cID = tmpLineData[chainColIndex];
+                                    if (! foundChains.contains(tmp_cID)) {
+                                        foundChains.add(tmp_cID);
+                                        c = new Chain(tmp_cID);
+                                        s_chains.add(c);
+                                        if (! (FileParser.silent || FileParser.essentialOutputOnly)) {
+                                            System.out.println("[FP_CIF] PDB: New chain named " + tmp_cID + " found.");
+                                        }
+                                    }
+                                } else {
+                                    DP.getInstance().w("[FP_CIF]", " Line " + numLine + " should contain a value in column " + 
+                                            chainColIndex + " (expected chain name) but didnt. Skipping line.");
+                                }  
+                            }
+                            
+                            // atom
+                            
+
+                                
+                                
+                        }
+                    } else {
+                        // loops must not be nested according to file format definition
+                        //     that is why we can check for a new loop here
+                        // check if new loop starts (check for loop end is done with # in beginning)
+                        if (line.startsWith("loop_")) {
+                            inLoop = true;
+                        }
+                    }
+
+                    
                     
                     // check for residues / atoms
+                } else {
+                    // # seems to stand between each category, we use it to decide if loop ended
+                    //     and hope it does not occur inside a loop
+                    inLoop = false;
+                    tableCategory = null;
+                    tableColHeads.clear();
+                    chainColIndex = -1;
                 }
             }
 	} catch (IOException e) {
