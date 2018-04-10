@@ -179,6 +179,12 @@ public class FileParser {
         pdbFile = pf;
         dsspFile = df;
         
+        dsspLines = new ArrayList<String>();
+        dsspLines = slurpFile(dsspFile, true); // vararg tells the function that this is a dssp file
+        if(! FileParser.silent) {
+            System.out.println("    Read all " + dsspLines.size() + " lines of file '" + dsspFile + "'.");
+        }
+        
         s_chains = new ArrayList<Chain>();
         s_residues = new ArrayList<Residue>();
         s_atoms = new ArrayList<Atom>();
@@ -451,7 +457,7 @@ public class FileParser {
             System.out.println("  Creating all Residues...");
         }
         dsspDataStartLine = readDsspToData();
-        createAllResiduesFromDsspData();    // fills s_residues
+        createAllResiduesFromDsspData(false);    // fills s_residues
 
         // If there is no data part at all in the DSSP file, the function readDsspToData() will catch
         //  this error and exit, this code will never be reached in that case.
@@ -628,6 +634,32 @@ public class FileParser {
      * @return ignore (?)
      */
     private static Boolean parseDataCIF() {
+        // - - - DSSP - - -
+        // almost the same like in parseData()
+        //     -> make own function
+        if(! FileParser.silent) {
+            System.out.println("  Creating all Residues...");
+        }
+        dsspDataStartLine = readDsspToData();
+        createAllResiduesFromDsspData(true);    // fills s_residues using AUTHCHAIN for chain ids
+
+        // If there is no data part at all in the DSSP file, the function readDsspToData() will catch
+        //  this error and exit, this code will never be reached in that case.
+        if(s_residues.size() < 1) {
+            System.err.println("ERROR: DSSP file contains no residues (maybe the PDB file only holds DNA/RNA data). Exiting.");
+            System.exit(2);
+        }
+
+        // residues atm not handled
+        /*
+        if(! FileParser.silent) {
+            System.out.println("  Creating all Ligand Residues...");
+        }
+        createAllLigandResiduesFromPdbData();       // adds stuff to s_residues
+        */
+        
+        // - - - PDB - - - 
+        
         // idea: read each line once and dont save them. If it works that would save time and space.
         // lets do this for all the basic stuff first and neglect models, sites etc
         //     -> atoms, residues, chains, SSEs
@@ -794,7 +826,7 @@ public class FileParser {
      * turned into a function createAllAtomsFromPdbData() that works like the createAll* functions.
      * @return true if the line could be parsed, false otherwise
      */
-    private static boolean handlePdbLineANYATOM() {
+     private static boolean handlePdbLineANYATOM() {
         
 
         Integer atomSerialNumber, resNumPDB, resNumDSSP;
@@ -1839,8 +1871,9 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
 
     /**
      * Parses the DSSP data and creates the residue list from it.
+     * @param isCIF true if using mmCIF parser and mmCIF pdb file as chain ids may be 4 character long then
      */
-    private static void createAllResiduesFromDsspData() {
+    private static void createAllResiduesFromDsspData(Boolean isCIF) {
 
         String dLine;
         Integer dLineNum, dsspResNum, pdbResNum, resIndex, acc;
@@ -1875,7 +1908,14 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                     // 5 is ignored: blank
                     pdbResNum = Integer.valueOf(dLine.substring(6, 10).trim());
                     iCode = dLine.substring(10, 11);                    
-                    dsspChainID = dLine.substring(11, 12);
+                    // with PDB mmCIF files things got more difficult: 4-character chain ids
+                    //     prioritize AUTHCHAIN > CHAIN
+                    if (! isCIF) {
+                        dsspChainID = dLine.substring(11, 12);
+                    } else {
+                        dsspChainID = dLine.substring(159, 163).trim(); // AUTHCHAIN column 160-163
+                    }
+                    
                     // 12 is ignored: blank
                     resName1Letter = dLine.substring(13, 14);
                     // 14+15 are ignored: blank
