@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.io.*;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -635,7 +634,8 @@ public class FileParser {
      */
     private static Boolean parseDataCIF() {
         // - - - DSSP - - -
-        // almost the same like in parseData()
+        // - - residues - -
+        // same like in parseData() only Boolean argument changed
         //     -> make own function
         if(! FileParser.silent) {
             System.out.println("  Creating all Residues...");
@@ -649,8 +649,8 @@ public class FileParser {
             System.err.println("ERROR: DSSP file contains no residues (maybe the PDB file only holds DNA/RNA data). Exiting.");
             System.exit(2);
         }
-
-        // residues atm not handled
+        
+        // - - ligands - -
         /*
         if(! FileParser.silent) {
             System.out.println("  Creating all Ligand Residues...");
@@ -662,18 +662,30 @@ public class FileParser {
         
         // idea: read each line once and dont save them. If it works that would save time and space.
         // lets do this for all the basic stuff first and neglect models, sites etc
-        //     -> atoms, residues, chains, SSEs
+        //     -> atoms, residues (s.a.), chains, SSEs (?)
+        //     -> do the matching atom <-> residue, residue <-> chain later
         
         // for now local variables, may be needed as class variable though
         Boolean dataBlockFound = false; // for now only parse the first data block (stop if seeing 2nd block)
         Boolean inLoop = false;
-        ArrayList<String> foundChains = new ArrayList<String>(); // remember them here instead of going through all objects
+        ArrayList<String> foundChains = new ArrayList<>(); // remember them here instead of going through all objects
         Chain c;
         
-        // variables for one loop (reset when hitting #)
+        // variables for one loop (reset when hitting new loop)
         String tableCategory = null;
-        ArrayList<String> tableColHeads = new ArrayList<String>();
-        Integer chainColIndex = -1; // default value -1 means no chain name column exists
+        ArrayList<String> tableColHeads = new ArrayList<>();
+        // importantColInd holds indices of the important columns
+        // VALUES: default value -1: column not existing; -2: column not existing and warning has been printed
+        // INDICES: 0: chain name; 1: PDBx field name; 2: atom id; 3: (detailed) atom name 4: alternative location
+        // 5: residue names (label_comp_id); 6: residue numbers (label_seq_id); 7: insertion code
+        // 8,9,10: coordx,y,z
+        int[] importantColInd = new int[12]; 
+        
+        // variables per atom line
+        Integer atomSerialNumber, resNumPDB, coordX, coordY, coordZ;
+        String atomRecordName, atomName, resNamePDB, chainID, chemSym, altLoc, iCode;
+        Double oCoordX, oCoordY, oCoordZ;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
+        Float oCoordXf, oCoordYf, oCoordZf;
         
         Integer numLine = 0;
         
@@ -707,43 +719,83 @@ public class FileParser {
                         }
                     }
                     
+                    // handle line when in loop
                     if (inLoop) {
-                        // check if we need data from this loop
+                        // check if we need data from this loop or if we can skip it
                         if (! (tableCategory == null)) {
                             if (! tableCategory.equals("_atom_site")) {
                                 continue;
                             }
                         }
                         
-                        
                         // check for column heads
                         if (line.startsWith("_")) {
                             if (tableCategory == null) {
                                 if (line.split("\\.").length < 2) {
-                                    System.out.println("DEBUG: Warning, line: " + numLine);
+                                    DP.getInstance().w("[FP_CIF]", " Expected table definition in line " + 
+                                            numLine.toString() + " but couldnt parse it. Skip it (may miss important data!).");
                                 } else {
                                     tableCategory = line.split("\\.")[0];
                                 }
                             }
                             tableColHeads.add(line.split("\\.")[1].trim());
                             
-                            // check if chain name column needs an update
-                            //     prioritize auth_asym_id > label_asym_id
-                            if (tableColHeads.get(tableColHeads.size() - 1).equals("label_asym_id")) {
-                                if (chainColIndex == -1) {
-                                    chainColIndex = tableColHeads.size() - 1;
-                                }
-                            } else if (tableColHeads.get(tableColHeads.size() - 1).equals("auth_asym_id")) {
-                                chainColIndex = tableColHeads.size() - 1;
+                            // check if important columns are spotted and remember their place in importantColInd
+                            System.out.println("DEBUG seeing col head '" + tableColHeads.get(tableColHeads.size() - 1) + "'");
+                            switch (tableColHeads.get(tableColHeads.size() - 1)) {
+                                // 0: chain name, prioritize auth_asym_id > label_asym_id
+                                case "label_asym_id":
+                                    if (importantColInd[0] == -1) {
+                                        importantColInd[0] = tableColHeads.size() - 1;
+                                    }
+                                case "auth_asym_id":
+                                    importantColInd[0] = tableColHeads.size() - 1;
+                                // 1: PDBx field name
+                                case "group_PDB":
+                                    importantColInd[1] = tableColHeads.size() - 1;
+                                // 2: atom id
+                                case "id":
+                                    importantColInd[2] = tableColHeads.size() - 1;
+                                // 3: (detailed) atom name
+                                case "label_atom_id":
+                                    importantColInd[3] = tableColHeads.size() - 1;
+                                // 4: (detailed) atom name
+                                case "label_alt_id":
+                                    importantColInd[4] = tableColHeads.size() - 1;
+                                // 5: residue name
+                                case "label_comp_id":
+                                    importantColInd[5] = tableColHeads.size() - 1;
+                                // 6: residue number
+                                case "label_seq_id":
+                                    importantColInd[6] = tableColHeads.size() - 1;
+                                // 7: insertion code
+                                case "pdbx_PDB_ins_code":
+                                    importantColInd[7] = tableColHeads.size() - 1;
+                                // 8: coordX
+                                case "Cartn_x":
+                                    importantColInd[8] = tableColHeads.size() - 1;
+                                // 9: coordY
+                                case "Cartn_y":
+                                    importantColInd[9] = tableColHeads.size() - 1;
+                                // 10: coordZ
+                                case "Cartn_z":
+                                    importantColInd[10] = tableColHeads.size() - 1;
+                                // 11: chemical symbol
+                                case "type_symbol":
+                                    importantColInd[11] = tableColHeads.size() - 1;
                             }
+
+                            // TODO update important ColIndexes for rest
+                            
                         } else {
                             // we are in the row section (data!)
+                            System.out.println("DEBUG " + Arrays.toString(importantColInd));
                             String[] tmpLineData = lineToArrayCIF(line);
                             
                             // check for a new chain
-                            if (chainColIndex >= 0) {
-                                if (tmpLineData.length >= chainColIndex) {
-                                    String tmp_cID = tmpLineData[chainColIndex];
+                            if (importantColInd[0] >= 0) {
+                                if (tmpLineData.length >= importantColInd[0]) {
+                                    String tmp_cID = tmpLineData[importantColInd[0]];
                                     if (! foundChains.contains(tmp_cID)) {
                                         foundChains.add(tmp_cID);
                                         c = new Chain(tmp_cID);
@@ -754,13 +806,289 @@ public class FileParser {
                                     }
                                 } else {
                                     DP.getInstance().w("[FP_CIF]", " Line " + numLine + " should contain a value in column " + 
-                                            chainColIndex + " (expected chain name) but didnt. Skipping line.");
+                                            importantColInd[0] + " (expected chain name) but didnt. Skipping line.");
                                 }  
                             }
                             
-                            // atom
+                            // - - atom - -
+                            // reset variables
+                            atomSerialNumber = resNumPDB = coordX = coordY = coordZ = null;
+                            atomRecordName = atomName = resNamePDB = chainID = chemSym = altLoc = iCode = null;
+                            oCoordX = oCoordY = oCoordZ = null;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
+                            oCoordXf = oCoordYf = oCoordZf = null;
                             
+                            // chain name => 0
+                            if (importantColInd[0] > -1) {
+                                chainID = tmpLineData[importantColInd[0]];
+                            } else {
+                                if (importantColInd[1] == -1) {
+                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                                        DP.getInstance().w("[FP_CIF", "Seems like both _atom_site.label_asym_id and .auth_asym_id are missing. Trying to ignore it.");
+                                    }    
+                                    importantColInd[1] = -2;
+                                } 
+                            }
+                            
+                            // PDBx field alias atom record name => 1
+                            if (importantColInd[1] > -1) {
+                                atomRecordName = tmpLineData[importantColInd[1]];
+                            } else {
+                                if (importantColInd[1] == -1) {
+                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                                        DP.getInstance().w("[FP_CIF", "Seems like _atom_site.group_PDB is missing. Trying to ignore it.");
+                                    }    
+                                    importantColInd[1] = -2;
+                                } 
+                            }
+                            
+                            // atom id alias serial number => 2
+                            if (! (importantColInd[2] > -1)) {
+                                atomSerialNumber = importantColInd[2]; // there should be no need to trim as whitespaces should be ignored earlier
+                            } else {
+                                if (importantColInd[2] == -1) {
+                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                                        DP.getInstance().w("[FP_CIF", "Seems like _atom_site.id is missing. Trying to ignore it.");
+                                    }    
+                                    importantColInd[2] = -2;
+                                }
+                            }
+                            
+                            // detailed atom name => 3
+                            if (! (importantColInd[3] > -1)) {
+                                atomName = tmpLineData[importantColInd[3]];
+                            } else {
+                                if (importantColInd[3] == -1) {
+                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                                        DP.getInstance().w("[FP_CIF", "Seems like _atom_site.label_atom_id is missing. Trying to ignore it.");
+                                    }    
+                                    importantColInd[3] = -2;
+                                }
+                            }
+                            
+                            // alternative location => 4
+                            if (! (importantColInd[4] > -1)) {
+                                altLoc = tmpLineData[importantColInd[4]];
+                            } else {
+                                if (importantColInd[4] == -1) {
+                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                                        DP.getInstance().w("[FP_CIF", "Seems like _atom_site.label_alt_loc is missing. Trying to ignore it.");
+                                    }    
+                                    importantColInd[4] = -2;
+                                }
+                            }
+                            
+                            // residue name => 5
+                            if (! (importantColInd[5] > -1)) {
+                                System.out.println("DEBUG try to assign res name");
+                                resNamePDB = tmpLineData[importantColInd[5]];
+                            } else {
+                                if (importantColInd[5] == -1) {
+                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                                        DP.getInstance().w("[FP_CIF", "Seems like _atom_site.label_comp_id is missing. Trying to ignore it.");
+                                    }    
+                                    importantColInd[5] = -2;
+                                }
+                            }
+                            
+                            // residue number => 6
+                            if (! (importantColInd[6] > -1)) {
+                                resNumPDB = Integer.valueOf(tmpLineData[importantColInd[6]]);
+                            } else {
+                                if (importantColInd[6] == -1) {
+                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                                        DP.getInstance().w("[FP_CIF", "Seems like _atom_site.label_seq_id is missing. Trying to ignore it.");
+                                    }    
+                                    importantColInd[6] = -2;
+                                }
+                            }
+                            
+                            // insertion code => 7
+                            if (! (importantColInd[7] > -1)) {
+                                iCode = tmpLineData[importantColInd[7]];
+                            } else {
+                                if (importantColInd[7] == -1) {
+                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                                        DP.getInstance().w("[FP_CIF", "Seems like _atom_site.pdbx_PDB_ins_code is missing. Trying to ignore it.");
+                                    }   
+                                    importantColInd[7] = -2;
+                                }
+                            }
+                            
+                            // coordX => 8
+                            if (! (importantColInd[8] > -1)) {
+                                // for information on difference between ptgl and plcc style look in old parser
+                                if (Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {
+                                    oCoordX = Double.valueOf(tmpLineData[importantColInd[8]]) * 10.0;
+                                    coordX = oCoordX.intValue();
+                                } else {
+                                    oCoordXf = Float.valueOf(tmpLineData[importantColInd[8]]) * 10;
+                                    coordX = Math.round(oCoordXf);
+                                }
+                                
+                            } else {
+                                if (importantColInd[8] == -1) {
+                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                                        DP.getInstance().e("[FP_CIF", "Seems like _atom_site.Cartn_x is missing. Exiting now.");
+                                    }    
+                                    System.exit(1);
+                                }
+                            }
+                            
+                            // coordY => 9
+                            if (! (importantColInd[9] > -1)) {
+                                if (Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {
+                                    oCoordY = Double.valueOf(tmpLineData[importantColInd[9]]) * 10.0;
+                                    coordY = oCoordY.intValue();
+                                } else {
+                                    oCoordYf = Float.valueOf(tmpLineData[importantColInd[9]]) * 10;
+                                    coordY = Math.round(oCoordYf);
+                                }
+                                
+                            } else {
+                                if (importantColInd[9] == -1) {
+                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                                        DP.getInstance().e("[FP_CIF", "Seems like _atom_site.Cartn_y is missing. Exiting now.");
+                                    }    
+                                    System.exit(1);
+                                }
+                            }
+                            
+                            // coordY => 10
+                            if (! (importantColInd[10] > -1)) {
+                                if (Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {
+                                    oCoordZ = Double.valueOf(tmpLineData[importantColInd[10]]) * 10.0;
+                                    coordZ = oCoordZ.intValue();
+                                } else {
+                                    oCoordZf = Float.valueOf(tmpLineData[importantColInd[10]]) * 10;
+                                    coordZ = Math.round(oCoordZf);
+                                }
+                                
+                            } else {
+                                if (importantColInd[10] == -1) {
+                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                                        DP.getInstance().e("[FP_CIF", "Seems like _atom_site.Cartn_z is missing. Exiting now.");
+                                    }    
+                                    System.exit(1);
+                                }
+                            }
+                            
+                            // chemical symbol => 11
+                            if (! (importantColInd[11] > -1)) {
+                                chemSym = tmpLineData[importantColInd[11]];
+                            } else {
+                                if (importantColInd[11] == -1) {
+                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                                        DP.getInstance().w("[FP_CIF", "Seems like _atom_site.type_symbol is missing. Trying to ignore it.");
+                                    }   
+                                    importantColInd[11] = -2;
+                                }
+                            }
+                            
+                            // TODO: possible to ignore alt loc atoms right now?
+                            
+                            // Files that contain DNA or RNA are not supported atm
+                            System.out.println("DEBUG resname is '" + resNamePDB + "'");
+                            if(FileParser.isDNAorRNAresidueName(resNamePDB)) {
+                                if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                                    DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA/RNA residue (residue 3-letter code is '" + resNamePDB + "'), skipping.");
+                                }
+                                continue; // do not use that atom
+                            }
+                            
+                            Atom a = new Atom();
+                            
+                            // handle stuff that's different between ATOMs and HETATMs
+                            if(atomRecordName.equals("ATOM")) {
+                                if (isIgnoredAtom(chemSym)) {
+                                    if( ! (Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
+                                        continue;
+                                    }
+                                }
+                                
+                                // old parser has here some outcommented code on N termini
+                                
+                                // set atom type
+                                a.setAtomtype(Atom.ATOMTYPE_AA);
+                                
+                                // only ATOMs, not HETATMs, have a DSSP entry
+                                //a.setDsspResNum(getDsspResNumForPdbResNum(resNumPDB));
+                                if((Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
+                                    a.setDsspResNum(null);
+                                }
+                                else {
+                                    a.setDsspResNum(getDsspResNumForPdbFields(resNumPDB, chainID, iCode));
+                                }
+                                
+                                
+                            } else {
+                                
+                            }
+                            
+                            // for now, stop here
+                            System.exit(1);
 
+                            // copy start -->
+
+                            // handle stuff that's different between ATOMs and HETATMs
+                            if(atomRecordName.equals("ATOM")) {
+                                // s.a.
+                            }
+                            else {          // HETATM
+
+                                if(isIgnoredLigRes(resNamePDB)) {
+                                    a.setAtomtype(Atom.ATOMTYPE_IGNORED_LIGAND);       // invalid ligand (ignored)
+
+                                    // We do not need these atoms and they may lead to trouble later on, so
+                                    //  just return without adding the new Atom to any Residue here so this line
+                                    //  is skipped and the next line can be handled.
+                                    //  If people want all ligands they have to change the isIgnoredLigRes() function.
+                                    return(false);
+                                }
+                                else {
+                                    a.setAtomtype(Atom.ATOMTYPE_LIGAND);       // valid ligand
+                                    //a.setDsspResNum(getDsspResNumForPdbFields(resNumPDB, chainID, iCode));  // We can't do this because the fake DSSP residue number has not yet been assigned
+                                }
+                            }
+
+                            // now create the new Atom        
+                            Residue tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
+                            // Note that the command above may have returned NULL, we care for that below
+
+                            a.setPdbAtomNum(atomSerialNumber);
+                            a.setAtomName(atomName);
+                            a.setAltLoc(altLoc);
+                            a.setResidue(tmpRes);
+                            a.setChainID(chainID);        
+                            a.setChain(getChainByPdbChainID(chainID));
+                            a.setPdbResNum(resNumPDB);
+                            // had to comment it in order to compile, we exit above whatsoever
+                            //a.setDsspResNum(resNumDSSP);
+                            a.setCoordX(coordX);
+                            a.setCoordY(coordY);
+                            a.setCoordZ(coordZ);
+                            a.setChemSym(chemSym);
+
+                            if(curModelID != null) {
+                                a.setModelID(curModelID);
+                                a.setModel(getModelByModelID(curModelID));
+                            }
+
+
+                            if(tmpRes == null) {
+                                DP.getInstance().w("Residue with PDB # " + resNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue.");
+                                return(false);
+                            } else {            
+
+                                if(Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {
+                                    tmpRes.addHydrogenAtom(a);
+                                }
+                                else {
+                                    tmpRes.addAtom(a);
+                                    s_atoms.add(a);
+                                }
+                            }
+                            
+                            // <-- copy end
                                 
                                 
                         }
@@ -770,6 +1098,11 @@ public class FileParser {
                         // check if new loop starts (check for loop end is done with # in beginning)
                         if (line.startsWith("loop_")) {
                             inLoop = true;
+                            
+                            // reset vars per loop
+                            tableCategory = null;
+                            tableColHeads.clear();
+                            Arrays.fill(importantColInd, -1);
                         }
                     }
 
@@ -780,13 +1113,15 @@ public class FileParser {
                     // # seems to stand between each category, we use it to decide if loop ended
                     //     and hope it does not occur inside a loop
                     inLoop = false;
-                    tableCategory = null;
-                    tableColHeads.clear();
-                    chainColIndex = -1;
                 }
             }
+            
+            if (! (silent || FileParser.essentialOutputOnly)) {
+                System.out.println("[FP_CIF] PDB: Found in total " + s_chains.size() + " chains.");
+            }
+            
 	} catch (IOException e) {
-            System.err.println("ERROR: Could not parse PDB file."); //TODO which file?
+            System.err.println("ERROR: Could not parse PDB file.");
             System.err.println("ERROR: Message: " + e.getMessage());
             System.exit(1);
 	}
@@ -1897,7 +2232,9 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
 
             if(dLine.substring(13, 14).equals("!")) {       // chain brake
                 if(! FileParser.silent) {
-                    System.out.println("    DSSP: Found chain brake at DSSP line " + dLineNum + ".");
+                    if (! Settings.getBoolean("plcc_B_no_chain_break_info")) {
+                        System.out.println("    DSSP: Found chain brake at DSSP line " + dLineNum + ".");
+                    }
                 }
             }
             else {          // parse the residue line
@@ -1938,7 +2275,10 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                 r.setChainID(dsspChainID);
                 // don't set the chain here, we'll set it later with the pdbChainID while creating the atoms
                 // EDIT: Why not?! I guess I thought that DSSP and PDB files used different chain IDs for residues when I wrote that.
-                getChainByPdbChainID(dsspChainID).addResidue(r);
+                // EDIT jnw: do the matching in CIF files later so that each file is only read once
+                if (! isCIF) {
+                    getChainByPdbChainID(dsspChainID).addResidue(r);
+                }
 
 
                 r.setType(Residue.RESIDUE_TYPE_AA);                   // DSSP files only contain protein residues, ligands are ignored
@@ -2018,7 +2358,10 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                 // add to list of Residues
                 s_residues.add(r);
                 resIndex = s_residues.size() - 1;
-                resIndexDSSP[dsspResNum] = resIndex;
+                // procudes null ponter exception in CIF parser and I dont see where we need it (maybe I'll understand later)
+                if (! isCIF) {
+                    resIndexDSSP[dsspResNum] = resIndex;
+                }
                 //resIndexPDB[pdbResNum] = resIndex;  // This will crash because some PDB files use negative residue numbers, omfg.
                 //System.out.println("    DSSP: Added residue PDB # " +  pdbResNum + ", DSSP # " + dsspResNum + " to s_residues at index " + resIndex + ".");
 

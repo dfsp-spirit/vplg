@@ -244,6 +244,7 @@ public class Settings {
         defSet("plcc_B_no_warn", "false", "Whether to suppress all warnings. The default is to print them.");
         defSet("plcc_B_no_parse_warn", "true", "Whether to suppress all warnings related to parsing of atoms from and other data from the PDB and DSSP input files.");
         defSet("plcc_B_no_not_impl_warn", "true", "Whether to suppress all warnings related to not implemented function.");
+        defSet("plcc_B_no_chain_break_info", "false", "Whether to suppress chain break info while parsing DSSP file (handy for some DSSP files for CIF data).");
         defSet("plcc_B_silent", "false", "Whether to suppress all output. Cluster mode, not recommended for normal usage.");
         defSet("plcc_B_only_essential_output", "true", "Whether to print only high-level status information.");
         defSet("plcc_B_print_silent_notice", "true", "Whether to print a single line informing the user that silent mode is set in silent mode (includes PDB ID of current file).");
