@@ -828,7 +828,8 @@ public class FileParser {
                             // - - atom - -
                             // reset variables
                             atomSerialNumber = resNumPDB = coordX = coordY = coordZ = null;
-                            atomRecordName = atomName = resNamePDB = chainID = chemSym = altLoc = iCode = null;
+                            atomRecordName = atomName = resNamePDB = chainID = chemSym = altLoc = null;
+                            iCode = " "; // if column does not exist or ? || . is assigned use 1 blank (compare old parser)
                             oCoordX = oCoordY = oCoordZ = null;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
                             oCoordXf = oCoordYf = oCoordZf = null;
                             
@@ -917,8 +918,11 @@ public class FileParser {
                             }
                             
                             // insertion code => 7
+                            // only update if column and value exist, otherwise stick to blank ""
                             if (importantColInd[7] > -1) {
-                                iCode = tmpLineData[importantColInd[7]];
+                                if (! (tmpLineData[importantColInd[7]].equals("?") || tmpLineData[importantColInd[7]].equals("."))) {
+                                    iCode = tmpLineData[importantColInd[7]];
+                                }
                             } else {
                                 if (importantColInd[7] == -1) {
                                     if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
@@ -1037,11 +1041,6 @@ public class FileParser {
                                 
                             }
                             
-                            // for now, stop here
-                            System.exit(1);
-
-                            // copy start -->
-
                             // now create the new Atom        
                             Residue tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
                             // Note that the command above may have returned NULL, we care for that below
@@ -1053,19 +1052,21 @@ public class FileParser {
                             a.setChainID(chainID);        
                             a.setChain(getChainByPdbChainID(chainID));
                             a.setPdbResNum(resNumPDB);
-                            // had to comment it in order to compile, we exit above whatsoever
-                            //a.setDsspResNum(resNumDSSP);
+                            // had to comment it in order to compile
+                            // we cant get the DSSP res num easily here and have to do it later (I guess)
+                            // old parser seems to assign 0 here whatsoever so we just leave the default value there
+                            // a.setDsspResNum(resNumDSSP);
                             a.setCoordX(coordX);
                             a.setCoordY(coordY);
                             a.setCoordZ(coordZ);
                             a.setChemSym(chemSym);
-
+                            
+                            // from old parser, not working with models right now
                             if(curModelID != null) {
                                 a.setModelID(curModelID);
                                 a.setModel(getModelByModelID(curModelID));
                             }
-
-
+                            
                             if(tmpRes == null) {
                                 DP.getInstance().w("Residue with PDB # " + resNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue.");
                                 return(false);
@@ -1080,7 +1081,8 @@ public class FileParser {
                                 }
                             }
                             
-                            // <-- copy end
+                            // for now, stop here
+                            System.exit(1);
                                 
                                 
                         }
