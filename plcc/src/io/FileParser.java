@@ -736,60 +736,75 @@ public class FileParser {
                                             numLine.toString() + " but couldnt parse it. Skip it (may miss important data!).");
                                 } else {
                                     tableCategory = line.split("\\.")[0];
+                                    if (! tableCategory.equals("_atom_site")) {
+                                        continue;
+                                    }
                                 }
                             }
                             tableColHeads.add(line.split("\\.")[1].trim());
                             
                             // check if important columns are spotted and remember their place in importantColInd
-                            System.out.println("DEBUG seeing col head '" + tableColHeads.get(tableColHeads.size() - 1) + "'");
                             switch (tableColHeads.get(tableColHeads.size() - 1)) {
+                                // nice to know: break is neccessary to prevent fallthrough
                                 // 0: chain name, prioritize auth_asym_id > label_asym_id
                                 case "label_asym_id":
                                     if (importantColInd[0] == -1) {
                                         importantColInd[0] = tableColHeads.size() - 1;
                                     }
+                                    break;
                                 case "auth_asym_id":
                                     importantColInd[0] = tableColHeads.size() - 1;
+                                    break;
                                 // 1: PDBx field name
                                 case "group_PDB":
                                     importantColInd[1] = tableColHeads.size() - 1;
+                                    break;
                                 // 2: atom id
                                 case "id":
                                     importantColInd[2] = tableColHeads.size() - 1;
+                                    break;
                                 // 3: (detailed) atom name
                                 case "label_atom_id":
                                     importantColInd[3] = tableColHeads.size() - 1;
+                                    break;
                                 // 4: (detailed) atom name
                                 case "label_alt_id":
                                     importantColInd[4] = tableColHeads.size() - 1;
+                                    break;
                                 // 5: residue name
                                 case "label_comp_id":
                                     importantColInd[5] = tableColHeads.size() - 1;
+                                    break;
                                 // 6: residue number
                                 case "label_seq_id":
                                     importantColInd[6] = tableColHeads.size() - 1;
+                                    break;
                                 // 7: insertion code
                                 case "pdbx_PDB_ins_code":
                                     importantColInd[7] = tableColHeads.size() - 1;
+                                    break;
                                 // 8: coordX
                                 case "Cartn_x":
                                     importantColInd[8] = tableColHeads.size() - 1;
+                                    break;
                                 // 9: coordY
                                 case "Cartn_y":
                                     importantColInd[9] = tableColHeads.size() - 1;
+                                    break;
                                 // 10: coordZ
                                 case "Cartn_z":
                                     importantColInd[10] = tableColHeads.size() - 1;
+                                    break;
                                 // 11: chemical symbol
                                 case "type_symbol":
                                     importantColInd[11] = tableColHeads.size() - 1;
+                                    break;
                             }
 
                             // TODO update important ColIndexes for rest
                             
                         } else {
                             // we are in the row section (data!)
-                            System.out.println("DEBUG " + Arrays.toString(importantColInd));
                             String[] tmpLineData = lineToArrayCIF(line);
                             
                             // check for a new chain
@@ -842,7 +857,7 @@ public class FileParser {
                             }
                             
                             // atom id alias serial number => 2
-                            if (! (importantColInd[2] > -1)) {
+                            if (importantColInd[2] > -1) {
                                 atomSerialNumber = importantColInd[2]; // there should be no need to trim as whitespaces should be ignored earlier
                             } else {
                                 if (importantColInd[2] == -1) {
@@ -854,7 +869,7 @@ public class FileParser {
                             }
                             
                             // detailed atom name => 3
-                            if (! (importantColInd[3] > -1)) {
+                            if (importantColInd[3] > -1) {
                                 atomName = tmpLineData[importantColInd[3]];
                             } else {
                                 if (importantColInd[3] == -1) {
@@ -866,7 +881,7 @@ public class FileParser {
                             }
                             
                             // alternative location => 4
-                            if (! (importantColInd[4] > -1)) {
+                            if (importantColInd[4] > -1) {
                                 altLoc = tmpLineData[importantColInd[4]];
                             } else {
                                 if (importantColInd[4] == -1) {
@@ -878,8 +893,7 @@ public class FileParser {
                             }
                             
                             // residue name => 5
-                            if (! (importantColInd[5] > -1)) {
-                                System.out.println("DEBUG try to assign res name");
+                            if (importantColInd[5] > -1) {
                                 resNamePDB = tmpLineData[importantColInd[5]];
                             } else {
                                 if (importantColInd[5] == -1) {
@@ -891,7 +905,7 @@ public class FileParser {
                             }
                             
                             // residue number => 6
-                            if (! (importantColInd[6] > -1)) {
+                            if (importantColInd[6] > -1) {
                                 resNumPDB = Integer.valueOf(tmpLineData[importantColInd[6]]);
                             } else {
                                 if (importantColInd[6] == -1) {
@@ -903,7 +917,7 @@ public class FileParser {
                             }
                             
                             // insertion code => 7
-                            if (! (importantColInd[7] > -1)) {
+                            if (importantColInd[7] > -1) {
                                 iCode = tmpLineData[importantColInd[7]];
                             } else {
                                 if (importantColInd[7] == -1) {
@@ -915,7 +929,7 @@ public class FileParser {
                             }
                             
                             // coordX => 8
-                            if (! (importantColInd[8] > -1)) {
+                            if (importantColInd[8] > -1) {
                                 // for information on difference between ptgl and plcc style look in old parser
                                 if (Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {
                                     oCoordX = Double.valueOf(tmpLineData[importantColInd[8]]) * 10.0;
@@ -935,7 +949,7 @@ public class FileParser {
                             }
                             
                             // coordY => 9
-                            if (! (importantColInd[9] > -1)) {
+                            if (importantColInd[9] > -1) {
                                 if (Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {
                                     oCoordY = Double.valueOf(tmpLineData[importantColInd[9]]) * 10.0;
                                     coordY = oCoordY.intValue();
@@ -954,7 +968,7 @@ public class FileParser {
                             }
                             
                             // coordY => 10
-                            if (! (importantColInd[10] > -1)) {
+                            if (importantColInd[10] > -1) {
                                 if (Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {
                                     oCoordZ = Double.valueOf(tmpLineData[importantColInd[10]]) * 10.0;
                                     coordZ = oCoordZ.intValue();
@@ -973,7 +987,7 @@ public class FileParser {
                             }
                             
                             // chemical symbol => 11
-                            if (! (importantColInd[11] > -1)) {
+                            if (importantColInd[11] > -1) {
                                 chemSym = tmpLineData[importantColInd[11]];
                             } else {
                                 if (importantColInd[11] == -1) {
@@ -987,7 +1001,6 @@ public class FileParser {
                             // TODO: possible to ignore alt loc atoms right now?
                             
                             // Files that contain DNA or RNA are not supported atm
-                            System.out.println("DEBUG resname is '" + resNamePDB + "'");
                             if(FileParser.isDNAorRNAresidueName(resNamePDB)) {
                                 if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
                                     DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA/RNA residue (residue 3-letter code is '" + resNamePDB + "'), skipping.");
@@ -1028,27 +1041,6 @@ public class FileParser {
                             System.exit(1);
 
                             // copy start -->
-
-                            // handle stuff that's different between ATOMs and HETATMs
-                            if(atomRecordName.equals("ATOM")) {
-                                // s.a.
-                            }
-                            else {          // HETATM
-
-                                if(isIgnoredLigRes(resNamePDB)) {
-                                    a.setAtomtype(Atom.ATOMTYPE_IGNORED_LIGAND);       // invalid ligand (ignored)
-
-                                    // We do not need these atoms and they may lead to trouble later on, so
-                                    //  just return without adding the new Atom to any Residue here so this line
-                                    //  is skipped and the next line can be handled.
-                                    //  If people want all ligands they have to change the isIgnoredLigRes() function.
-                                    return(false);
-                                }
-                                else {
-                                    a.setAtomtype(Atom.ATOMTYPE_LIGAND);       // valid ligand
-                                    //a.setDsspResNum(getDsspResNumForPdbFields(resNumPDB, chainID, iCode));  // We can't do this because the fake DSSP residue number has not yet been assigned
-                                }
-                            }
 
                             // now create the new Atom        
                             Residue tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
