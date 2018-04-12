@@ -651,12 +651,14 @@ public class FileParser {
         }
         
         // - - ligands - -
+        // -> in difference to old parser ligands are created "on the fly" together with the other residues
         /*
         if(! FileParser.silent) {
             System.out.println("  Creating all Ligand Residues...");
         }
         createAllLigandResiduesFromPdbData();       // adds stuff to s_residues
         */
+        
         
         // - - - PDB - - - 
         
@@ -687,12 +689,14 @@ public class FileParser {
         Double oCoordX, oCoordY, oCoordZ;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
         Float oCoordXf, oCoordYf, oCoordZf;
         Residue tmpRes = null; // declare it here for speedup: only lookup if new is needed
+        int lastLigandNumPDB = 0; // used to determine if atom belongs to new ligand residue
+        String lastChainID = ""; // s.a.
         
         Integer numLine = 0;
         
         try {
             BufferedReader in = new BufferedReader(new FileReader(pdbFile));
-            String line = null;
+            String line;
             while ((line = in.readLine()) != null) {
                 numLine ++;
                 // first, check if line is a comment
@@ -1040,7 +1044,121 @@ public class FileParser {
                                 }
                                 
                                 
-                            } else {
+                            } else if (atomRecordName.equals("HETATM")) {
+                                
+                                // idea: add always residue (for consistency) but atom only if needed
+                                
+                                String lf, ln, ls;      // temp for lig formula, lig name, lig synonyms
+                                
+                                Residue lig;
+                                
+                                Integer curLigNum = 0;
+                                
+                                if( ! ( resNumPDB.equals(lastLigandNumPDB) && chainID.equals(lastChainID) ) ) {
+                                    curLigNum++;
+                                    
+                                    // create new Residue from info, we'll have to see whether we really add it below though
+                                    lig = new Residue();
+                                    lig.setPdbResNum(resNumPDB);
+                                    lig.setType(Residue.RESIDUE_TYPE_LIGAND);
+                                    // do we need this?
+                                    //resNumDSSP = getLastUsedDsspResNumOfDsspFile() + curLigNum; // assign an unused fake DSSP residue number
+                                    //lig.setDsspResNum(resNumDSSP);
+                                    lig.setChainID(chainID);
+                                    lig.setiCode(iCode);
+                                    lig.setResName3(resNamePDB);
+                                    lig.setAAName1(AminoAcid.getLigandName1());
+                                    lig.setChain(getChainByPdbChainID(chainID));
+                                    // still ignoring models!
+                                    //lig.setModelID(modelID);
+                                    lig.setSSEString(Settings.get("plcc_S_ligSSECode"));
+                                    
+                                    
+                                    // add ligand to list of residues if it not on the ignore list
+                                    if(isIgnoredLigRes(resNamePDB)) {
+                                        curLigNum--;    // We had to increment before to determine the fake DSSP res number, but
+                                                        //  this ligand won't be stored so decrement to previous value.
+                                        //System.out.println("    PDB: Ignored ligand '" + resNamePDB + "-" + resNumPDB + "' at PDB line " + pLineNum + ".");
+                                    } else {
+                                        
+                                        // ignore this for now: needs parsing of two more loops (_pdbx_nonpoly_scheme, _chem_comp)   	 
+
+                                        /*                                        
+                                        // add info from PDB HET fields (HET, HETNAM, HETSYN, FORMUL)
+                                        // Note: we now use prepared statements so any strange chars do no longer lead to irritations or security trouble
+                                        Boolean removeStuff = Settings.getBoolean("plcc_B_uglySQLhacks");
+                                        lf = getLigFormula(resNamePDB);
+                                        if(removeStuff) {
+                                            lf = lf.replaceAll("\\s", "");               // remove all whitespace
+                                            lf = lf.replaceAll("~", "");                 // remove tilde char (it causes SQL trouble during DB insert)
+                                            lf = lf.replaceAll("\\\\", "");              // remove all backslashes (it causes SQL WARNING 'nonstandard use of escape in a string literal' during DB insert)
+                                            lf = lf.replaceAll("'", "");              // remove all ticks (obviously SQL trouble)
+                                        }
+
+                                        ln = getLigName(resNamePDB);
+                                        if(removeStuff) {
+                                            ln = ln.replaceAll(" ", "_");                // replace spaces with underscores
+                                            ln = ln.replaceAll("\\s", "");               // remove all other whitespace
+                                            ln = ln.replaceAll("~", "");
+                                            ln = ln.replaceAll("\\\\", "");
+                                            ln = ln.replaceAll("'", "");
+                                        }
+
+                                        ls = getLigSynonyms(resNamePDB);
+                                        if(removeStuff) {
+                                            ls = ls.replaceAll(" ", "_");
+                                            ls = ls.replaceAll("\\s", "");
+                                            ls = ls.replaceAll("~", "");
+                                            ls = ls.replaceAll(";", ".");
+                                            ls = ls.replaceAll("\\\\", "");
+                                            ls = ls.replaceAll("'", "");
+                                        }
+
+                                        lig.setLigFormula(lf);
+                                        lig.setLigName(ln);
+                                        lig.setLigSynonyms(ls);
+                                        
+                                        */
+
+                                        lastLigandNumPDB = resNumPDB;
+                                        lastChainID = chainID;
+
+                                        //TODO: Add a check for the molecular weight of the ligand here and only add ligands
+                                        //      which are within the range (range should be defined in cfg file).
+                                        //      Problem atm is that the mol weight is not in the PDB file. Idea: count the atoms
+                                        //      instead, use a range over number of atoms.
+
+                                        s_residues.add(lig);
+
+                                        getChainByPdbChainID(chainID).addResidue(lig);
+
+                                        // do we need this?
+                                        //resIndex = s_residues.size() - 1;
+                                        //resIndexDSSP[resNumDSSP] = resIndex;
+                                        //resIndexPDB[resNumPDB] = resIndex;      // This will crash because some PDB files contain negative residue numbers so fuck it.
+                                        if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
+                                            System.out.println("    PDB: Added ligand '" +  resNamePDB + "-" + resNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + curLigNum + ", DSSP # WERE FROM?" + ").");
+                                            System.out.println("    PDB:   => Ligand name = '" + lig.getLigName() + "', formula = '" + lig.getLigFormula() + "', synonyms = '" + lig.getLigSynonyms() + "'.");
+                                        }
+
+                                    }
+                                }
+                                   
+                                
+                                if(isIgnoredLigRes(resNamePDB)) {
+                                    a.setAtomtype(Atom.ATOMTYPE_IGNORED_LIGAND);       // invalid ligand (ignored)
+
+                                    // We do not need these atoms and they may lead to trouble later on, so
+                                    //  just return without adding the new Atom to any Residue here so this line
+                                    //  is skipped and the next line can be handled.
+                                    //  If people want all ligands they have to change the isIgnoredLigRes() function.
+                                    continue; // can we do this here? Does it cut off other important stuff?
+                                }
+                                else {
+                                    a.setAtomtype(Atom.ATOMTYPE_LIGAND);       // valid ligand
+                                    //a.setDsspResNum(getDsspResNumForPdbFields(resNumPDB, chainID, iCode));  // We can't do this because the fake DSSP residue number has not yet been assigned
+                                }
+                                
                                 
                             }
                             
@@ -1059,7 +1177,6 @@ public class FileParser {
                             // Note that the command above may have returned NULL, we care for that below
 
                             a.setPdbAtomNum(atomSerialNumber);
-                            System.out.println("DEBUG " + atomSerialNumber.toString());
                             a.setAtomName(atomName);
                             a.setAltLoc(altLoc);
                             a.setResidue(tmpRes);
@@ -1108,6 +1225,8 @@ public class FileParser {
                             tableCategory = null;
                             tableColHeads.clear();
                             Arrays.fill(importantColInd, -1);
+                            lastLigandNumPDB = 0;
+                            chainID = "";
                         }
                     }
                 } else {
