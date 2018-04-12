@@ -686,6 +686,7 @@ public class FileParser {
         String atomRecordName, atomName, resNamePDB, chainID, chemSym, altLoc, iCode;
         Double oCoordX, oCoordY, oCoordZ;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
         Float oCoordXf, oCoordYf, oCoordZf;
+        Residue tmpRes = null; // declare it here for speedup: only lookup if new is needed
         
         Integer numLine = 0;
         
@@ -776,7 +777,9 @@ public class FileParser {
                                     importantColInd[5] = tableColHeads.size() - 1;
                                     break;
                                 // 6: residue number
-                                case "label_seq_id":
+                                // case "label_seq_id":
+                                // use author provided data to match dssp
+                                case "auth_seq_id":
                                     importantColInd[6] = tableColHeads.size() - 1;
                                     break;
                                 // 7: insertion code
@@ -859,7 +862,7 @@ public class FileParser {
                             
                             // atom id alias serial number => 2
                             if (importantColInd[2] > -1) {
-                                atomSerialNumber = importantColInd[2]; // there should be no need to trim as whitespaces should be ignored earlier
+                                atomSerialNumber = Integer.valueOf(tmpLineData[importantColInd[2]]); // there should be no need to trim as whitespaces should be ignored earlier
                             } else {
                                 if (importantColInd[2] == -1) {
                                     if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
@@ -911,7 +914,7 @@ public class FileParser {
                             } else {
                                 if (importantColInd[6] == -1) {
                                     if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().w("[FP_CIF", "Seems like _atom_site.label_seq_id is missing. Trying to ignore it.");
+                                        DP.getInstance().w("[FP_CIF", "Seems like _atom_site.auth_seq_id is missing. Trying to ignore it.");
                                     }    
                                     importantColInd[6] = -2;
                                 }
@@ -1041,18 +1044,28 @@ public class FileParser {
                                 
                             }
                             
-                            // now create the new Atom        
-                            Residue tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
+                            // now create the new Atom
+                            
+                            // speedup: only look for new residue if needed (atoms belonging to one res are grouped)
+                            if (! (tmpRes == null)) {
+                                if (tmpRes.getChainID() == chainID && tmpRes.getiCode().equals(iCode) && tmpRes.getPdbResNum() == resNumPDB) {
+                                    System.out.println("Speedup!");
+                                } else {
+                                    tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
+                                }
+                            } else {
+                                tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
+                            }
                             // Note that the command above may have returned NULL, we care for that below
 
                             a.setPdbAtomNum(atomSerialNumber);
+                            System.out.println("DEBUG " + atomSerialNumber.toString());
                             a.setAtomName(atomName);
                             a.setAltLoc(altLoc);
                             a.setResidue(tmpRes);
                             a.setChainID(chainID);        
                             a.setChain(getChainByPdbChainID(chainID));
                             a.setPdbResNum(resNumPDB);
-                            // had to comment it in order to compile
                             // we cant get the DSSP res num easily here and have to do it later (I guess)
                             // old parser seems to assign 0 here whatsoever so we just leave the default value there
                             // a.setDsspResNum(resNumDSSP);
@@ -1062,14 +1075,16 @@ public class FileParser {
                             a.setChemSym(chemSym);
                             
                             // from old parser, not working with models right now
+                            /*
                             if(curModelID != null) {
                                 a.setModelID(curModelID);
                                 a.setModel(getModelByModelID(curModelID));
                             }
+                            */
                             
                             if(tmpRes == null) {
-                                DP.getInstance().w("Residue with PDB # " + resNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue.");
-                                return(false);
+                                DP.getInstance().w("Residue with PDB # " + resNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
+                                continue;
                             } else {            
 
                                 if(Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {
@@ -1080,11 +1095,7 @@ public class FileParser {
                                     s_atoms.add(a);
                                 }
                             }
-                            
-                            // for now, stop here
-                            System.exit(1);
-                                
-                                
+                        
                         }
                     } else {
                         // loops must not be nested according to file format definition
@@ -1099,10 +1110,6 @@ public class FileParser {
                             Arrays.fill(importantColInd, -1);
                         }
                     }
-
-                    
-                    
-                    // check for residues / atoms
                 } else {
                     // # seems to stand between each category, we use it to decide if loop ended
                     //     and hope it does not occur inside a loop
@@ -1119,8 +1126,8 @@ public class FileParser {
             System.err.println("ERROR: Message: " + e.getMessage());
             System.exit(1);
 	}
-        
-        return(false);
+        // all lines have beenn read
+        return(true);
     }
 
 
