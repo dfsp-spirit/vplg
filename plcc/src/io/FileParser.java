@@ -713,12 +713,12 @@ public class FileParser {
                             dataBlockFound = true;
                             if (line.length() > 5) {
                                 if (! silent) {
-                                    System.out.println("  Found the first data block named: " + line.subSequence(5, line.length()));
+                                    System.out.println("  PDB: Found the first data block named: " + line.subSequence(5, line.length()));
                                 }
                             }
                             else {
                                 if (! silent) {
-                                    System.out.println("  Found the first data block (without a name).");
+                                    System.out.println("  PDB: Found the first data block (without a name).");
                                 }
                             }
                         }
@@ -823,7 +823,7 @@ public class FileParser {
                                         c = new Chain(tmp_cID);
                                         s_chains.add(c);
                                         if (! (FileParser.silent || FileParser.essentialOutputOnly)) {
-                                            System.out.println("[FP_CIF] PDB: New chain named " + tmp_cID + " found.");
+                                            System.out.println("   PDB: New chain named " + tmp_cID + " found.");
                                         }
                                     }
                                 } else {
@@ -1137,8 +1137,8 @@ public class FileParser {
                                         //resIndexDSSP[resNumDSSP] = resIndex;
                                         //resIndexPDB[resNumPDB] = resIndex;      // This will crash because some PDB files contain negative residue numbers so fuck it.
                                         if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
-                                            System.out.println("    PDB: Added ligand '" +  resNamePDB + "-" + resNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + curLigNum + ", DSSP # WERE FROM?" + ").");
-                                            System.out.println("    PDB:   => Ligand name = '" + lig.getLigName() + "', formula = '" + lig.getLigFormula() + "', synonyms = '" + lig.getLigSynonyms() + "'.");
+                                            System.out.println("   PDB: Added ligand '" +  resNamePDB + "-" + resNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + curLigNum + ", DSSP # WERE FROM?" + ").");
+                                            System.out.println("   PDB:   => Ligand name = '" + lig.getLigName() + "', formula = '" + lig.getLigFormula() + "', synonyms = '" + lig.getLigSynonyms() + "'.");
                                         }
 
                                     }
@@ -1237,7 +1237,7 @@ public class FileParser {
             }
             
             if (! (silent || FileParser.essentialOutputOnly)) {
-                System.out.println("[FP_CIF] PDB: Found in total " + s_chains.size() + " chains.");
+                System.out.println("  PDB: Found in total " + s_chains.size() + " chains.");
             }
             
 	} catch (IOException e) {
