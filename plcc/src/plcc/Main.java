@@ -2061,7 +2061,15 @@ public class Main {
         // check whether we need to abort processing because of bad resolution or too few residues
         Float badResolution = Settings.getFloat("plcc_F_abort_if_pdb_resolution_worse_than");
         if(badResolution >= 0.0) {
-            HashMap<String, String> md = FileParser.getPDBMetaData();
+            HashMap<String, String> md;
+            if (! Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
+                md = FileParser.getPDBMetaData();
+            } else {
+                // CIF parser only goes once through file and has meta data already created if available
+                md = FileParser.getMetaData();
+            }
+
+            
             Double resolution = -1.0;
             try {
                 resolution = Double.valueOf(md.get("resolution"));

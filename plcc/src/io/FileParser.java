@@ -78,6 +78,12 @@ public class FileParser {
     // This list is needed to track if sulfur bridges span between to independent chains.
     static HashMap<Character, String> s_interchainSulfurBridgesChainID;
     
+    // Filled by cif parser so that file only needs to be read once
+    // contains some basic meta data (compare with getPDBMetaData()):
+    // HashMap of (String, String) pairs (key, value) with information on the PDB file
+    //   -> 'resolution' (which may be cast to Double), 'experiment', 'keywords', 'header', 'title'.
+    static HashMap<String, String> metaData = null;
+    
     static Boolean dataInitDone = false;
 
     static Integer curLineNumPDB = null;
@@ -189,6 +195,9 @@ public class FileParser {
         s_atoms = new ArrayList<Atom>();
         s_dsspSSEs = new ArrayList<SSE>();
         s_ptglSSEs = new ArrayList<SSE>();
+        // We dont fill it yet, but need to initialize it to avoid Nullpointer exception
+        s_allModelIDsFromWholePDBFile = new ArrayList<String>();
+        metaData = new HashMap<>();
         
         if(parseDataCIF()) {
             dataInitDone = true;
@@ -634,6 +643,7 @@ public class FileParser {
      */
     private static Boolean parseDataCIF() {
         // - - - DSSP - - -
+        //
         // - - residues - -
         // same like in parseData() only Boolean argument changed
         //     -> make own function
@@ -661,7 +671,7 @@ public class FileParser {
         
         
         // - - - PDB - - - 
-        
+        //
         // idea: read each line once and dont save them. If it works that would save time and space.
         // lets do this for all the basic stuff first and neglect models, sites etc
         //     -> atoms, residues (s.a.), chains, SSEs (?)
@@ -683,7 +693,7 @@ public class FileParser {
         // 8,9,10: coordx,y,z
         int[] importantColInd = new int[12]; 
         
-        // variables per atom line
+        // variables per (atom) line
         Integer atomSerialNumber, resNumPDB, coordX, coordY, coordZ;
         String atomRecordName, atomName, resNamePDB, chainID, chemSym, altLoc, iCode;
         Double oCoordX, oCoordY, oCoordZ;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
@@ -691,6 +701,7 @@ public class FileParser {
         Residue tmpRes = null; // declare it here for speedup: only lookup if new is needed
         int lastLigandNumPDB = 0; // used to determine if atom belongs to new ligand residue
         String lastChainID = ""; // s.a.
+        String[] tmpLineData;
         
         Integer numLine = 0;
         
@@ -720,6 +731,31 @@ public class FileParser {
                                 if (! silent) {
                                     System.out.println("  PDB: Found the first data block (without a name).");
                                 }
+                            }
+                        }
+                    }
+                    
+                    // check for experiment method (meta data)
+                    if (line.startsWith("_exptl.method")) {
+                        tmpLineData = lineToArrayCIF(line);
+                        if (tmpLineData.length > 1) {
+                            if (! (tmpLineData[1] == "?" || tmpLineData[1] == ".")) {
+                                metaData.put("experiment", tmpLineData[1]);
+                            } else {
+                                metaData.put("experiment", "");
+                            }
+                        }
+                    }
+                    
+                    // check for resolution (meta data)
+                    // TODO: really the best attribute(s) to do this?
+                    if (line.startsWith("_reflns.d_resolution_high") || line.startsWith("_reflns.d_res_high") || line.startsWith("_refine.ls_d_res_high")) {
+                        tmpLineData = lineToArrayCIF(line);
+                        if (tmpLineData.length > 1) {
+                            if (! (tmpLineData[1] == "?" || tmpLineData[1] == ".")) {
+                                metaData.put("resolution", tmpLineData[1]);
+                            } else {
+                                metaData.put("resolution", "");
                             }
                         }
                     }
@@ -812,7 +848,7 @@ public class FileParser {
                             
                         } else {
                             // we are in the row section (data!)
-                            String[] tmpLineData = lineToArrayCIF(line);
+                            tmpLineData = lineToArrayCIF(line);
                             
                             // check for a new chain
                             if (importantColInd[0] >= 0) {
@@ -3020,6 +3056,10 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
         pr.addProteinMetaData("Date", date);
 
         return(md);
+    }
+    
+    public static HashMap<String, String> getMetaData() {
+        return metaData;
     }
 
     /**
