@@ -173,6 +173,44 @@ public class FileParser {
         }
     }
     
+    private static void matchAtomsResidues() {
+        int resIterator = 0;
+        Residue tmpRes;
+        for (Atom a : s_atoms) {
+            tmpRes = s_residues.get(resIterator);
+            // TODO DsspResNum not set so far but we cannot use PDBResNum as we would need
+            //    iCOde then which is not saved for atom ...
+            // -> try to set DsspResNum before?
+            
+            // DEBUG
+            System.out.println("Residue " + tmpRes.toString());
+            System.out.println("Res chain " + tmpRes.getChainID());
+            System.out.println("Res DsspResNum " + tmpRes.getDsspResNum());
+            System.out.println(tmpRes.atomInfo());
+            
+            if (tmpRes.getChainID().equals(a.getChainID()) && tmpRes.getDsspResNum() == a.getDsspResNum()) {
+                System.out.println("Worked for atom " + a.toString() + " Res " + tmpRes.toString());
+                a.setResidue(tmpRes);
+                tmpRes.addAtom(a);
+            } else {
+                resIterator++;
+                tmpRes = s_residues.get(resIterator);
+                if (tmpRes.getChain().equals(a.getChain()) && tmpRes.getDsspResNum() == a.getDsspResNum()) {
+                    a.setResidue(tmpRes);
+                tmpRes.addAtom(a);
+                } else {
+                    DP.getInstance().e("[FP_CIF]", " Couldnt match atom with id '" + a.getPdbAtomNum() + 
+                            " with the next residue in the list. Seems like we cannot got through each list only once");
+                }
+            }
+            
+            while (resIterator < s_residues.size()) {
+                resIterator++;
+                
+            }
+        }
+    }
+    
     /**
      * Like initData but for mmCIF data.
      * @param pf Path to a PDB file. Does NOT test whether it exist, do that earlier.
@@ -201,6 +239,15 @@ public class FileParser {
         
         if(parseDataCIF()) {
             dataInitDone = true;
+            // unlike the old parser we only want to iterate the lists once
+            // matchAtomsResidues();
+            
+            // DEBUG
+            System.out.println(s_chains.get(0).toString());
+            System.out.println(s_residues.get(0).atomInfo());
+            System.out.println(s_atoms.get(0).toString());
+            // System.exit(1);
+            
             return(true);
         }
         else {
@@ -651,7 +698,9 @@ public class FileParser {
             System.out.println("  Creating all Residues...");
         }
         dsspDataStartLine = readDsspToData();
-        createAllResiduesFromDsspData(true);    // fills s_residues using AUTHCHAIN for chain ids
+        // fills s_residues using AUTHCHAIN for chain ids
+        // we need to do this here to get DsspResNum
+        createAllResiduesFromDsspData(true);
 
         // If there is no data part at all in the DSSP file, the function readDsspToData() will catch
         //  this error and exit, this code will never be reached in that case.
@@ -662,6 +711,7 @@ public class FileParser {
         
         // - - ligands - -
         // -> in difference to old parser ligands are created "on the fly" together with the other residues
+        //     -> is that ok or do we need the DsspResNum???
         /*
         if(! FileParser.silent) {
             System.out.println("  Creating all Ligand Residues...");
@@ -676,12 +726,11 @@ public class FileParser {
         // lets do this for all the basic stuff first and neglect models, sites etc
         //     -> atoms, residues (s.a.), chains, SSEs (?)
         //     -> do the matching atom <-> residue, residue <-> chain later
+        //         -> actually try to do it on the fly
         
         // for now local variables, may be needed as class variable though
         Boolean dataBlockFound = false; // for now only parse the first data block (stop if seeing 2nd block)
         Boolean inLoop = false;
-        ArrayList<String> foundChains = new ArrayList<>(); // remember them here instead of going through all objects
-        Chain c;
         
         // variables for one loop (reset when hitting new loop)
         String tableCategory = null;
@@ -690,18 +739,22 @@ public class FileParser {
         // VALUES: default value -1: column not existing; -2: column not existing and warning has been printed
         // INDICES: 0: chain name; 1: PDBx field name; 2: atom id; 3: (detailed) atom name 4: alternative location
         // 5: residue names (label_comp_id); 6: residue numbers (label_seq_id); 7: insertion code
-        // 8,9,10: coordx,y,z
-        int[] importantColInd = new int[12]; 
+        // 8,9,10: coordx,y,z, 11: chemical symbol, 12: label_seq_id (PDB Res Num)
+        int[] importantColInd = new int[13]; 
         
         // variables per (atom) line
         Integer atomSerialNumber, resNumPDB, coordX, coordY, coordZ;
         String atomRecordName, atomName, resNamePDB, chainID, chemSym, altLoc, iCode;
         Double oCoordX, oCoordY, oCoordZ;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
         Float oCoordXf, oCoordYf, oCoordZf;
-        Residue tmpRes = null; // declare it here for speedup: only lookup if new is needed
         int lastLigandNumPDB = 0; // used to determine if atom belongs to new ligand residue
         String lastChainID = ""; // s.a.
         String[] tmpLineData;
+        
+        // variables for successive matching atom -> residue -> chain
+        // remember them so we dont need to lookup
+        Residue tmpRes = null;
+        Chain tmpChain = null;
         
         Integer numLine = 0;
         
@@ -762,6 +815,7 @@ public class FileParser {
                     
                     // handle line when in loop
                     if (inLoop) {
+                        
                         // check if we need data from this loop or if we can skip it
                         if (! (tableCategory == null)) {
                             if (! tableCategory.equals("_atom_site")) {
@@ -819,6 +873,7 @@ public class FileParser {
                                 // 6: residue number
                                 // case "label_seq_id":
                                 // use author provided data to match dssp
+                                // -> remember both so we can choose later (s.b.)
                                 case "auth_seq_id":
                                     importantColInd[6] = tableColHeads.size() - 1;
                                     break;
@@ -842,6 +897,10 @@ public class FileParser {
                                 case "type_symbol":
                                     importantColInd[11] = tableColHeads.size() - 1;
                                     break;
+                                // 12: label_seq_id -> PDB Res Num
+                                case "label_seq_id":
+                                    importantColInd[12] = tableColHeads.size() - 1;
+                                    break;
                             }
 
                             // TODO update important ColIndexes for rest
@@ -850,18 +909,24 @@ public class FileParser {
                             // we are in the row section (data!)
                             tmpLineData = lineToArrayCIF(line);
                             
-                            // check for a new chain
+                            // check for a new chain (always hold the current 
                             if (importantColInd[0] >= 0) {
                                 if (tmpLineData.length >= importantColInd[0]) {
                                     String tmp_cID = tmpLineData[importantColInd[0]];
-                                    if (! foundChains.contains(tmp_cID)) {
-                                        foundChains.add(tmp_cID);
-                                        c = new Chain(tmp_cID);
-                                        s_chains.add(c);
+                                    if (tmpChain == null) {
+                                        tmpChain = new Chain(tmp_cID);
+                                        s_chains.add(tmpChain);
                                         if (! (FileParser.silent || FileParser.essentialOutputOnly)) {
                                             System.out.println("   PDB: New chain named " + tmp_cID + " found.");
                                         }
-                                    }
+                                    } else 
+                                        if (! (tmpChain.getPdbChainID().equals(tmp_cID))) {
+                                            tmpChain = new Chain(tmp_cID);
+                                            s_chains.add(tmpChain);
+                                            if (! (FileParser.silent || FileParser.essentialOutputOnly)) {
+                                                System.out.println("   PDB: New chain named " + tmp_cID + " found.");
+                                            }
+                                        }
                                 } else {
                                     DP.getInstance().w("[FP_CIF]", " Line " + numLine + " should contain a value in column " + 
                                             importantColInd[0] + " (expected chain name) but didnt. Skipping line.");
@@ -914,7 +979,15 @@ public class FileParser {
                             
                             // detailed atom name => 3
                             if (importantColInd[3] > -1) {
-                                atomName = tmpLineData[importantColInd[3]];
+                                // old PDB files used spacing to differentiate between atoms
+                                // e.g. " CA " = C alpha, how to deal with this? mmCIF has no spacings
+                                // for now workaround for probable C alpha
+                                if (tmpLineData[importantColInd[3]].equals("CA")) {
+                                    atomName = " " + tmpLineData[importantColInd[3]] + " ";
+                                } else {
+                                    atomName = tmpLineData[importantColInd[3]];
+                                }
+                                
                             } else {
                                 if (importantColInd[3] == -1) {
                                     if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
@@ -949,14 +1022,20 @@ public class FileParser {
                             }
                             
                             // residue number => 6
+                            // use auth_seq_id > label_seq_id (hope DSSP does so too)
                             if (importantColInd[6] > -1) {
                                 resNumPDB = Integer.valueOf(tmpLineData[importantColInd[6]]);
                             } else {
-                                if (importantColInd[6] == -1) {
-                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().w("[FP_CIF", "Seems like _atom_site.auth_seq_id is missing. Trying to ignore it.");
-                                    }    
-                                    importantColInd[6] = -2;
+                                if (importantColInd[12] > -1) {
+                                    // use label_seq_id instead
+                                    resNumPDB = Integer.valueOf(tmpLineData[importantColInd[12]]);
+                                } else {
+                                    if (importantColInd[6] == -1) {
+                                        if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                                            DP.getInstance().w("[FP_CIF", "Seems like _atom_site.auth_seq_id AND label_seq_id is missing. Trying to ignore it.");
+                                        }    
+                                        importantColInd[6] = -2;
+                                    }
                                 }
                             }
                             
@@ -1055,6 +1134,22 @@ public class FileParser {
                                 continue; // do not use that atom
                             }
                             
+                            // update (only if needed) -> get DsspResNum for atom from res
+                            // match res <-> chain here 
+                            if (! atomRecordName.equals("HETATM")) {
+                                if (tmpRes == null) {
+                                    tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
+                                    tmpRes.setChain(tmpChain);
+                                    tmpChain.addResidue(tmpRes);
+                                } else {
+                                    if (! (resNumPDB == tmpRes.getPdbResNum())) {
+                                        tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
+                                        tmpRes.setChain(tmpChain);
+                                        tmpChain.addResidue(tmpRes);
+                                    }
+                                }
+                            }
+                            
                             Atom a = new Atom();
                             
                             // handle stuff that's different between ATOMs and HETATMs
@@ -1076,7 +1171,8 @@ public class FileParser {
                                     a.setDsspResNum(null);
                                 }
                                 else {
-                                    a.setDsspResNum(getDsspResNumForPdbFields(resNumPDB, chainID, iCode));
+                                    // a.setDsspResNum(getDsspResNumForPdbFields(resNumPDB, chainID, iCode));
+                                    a.setDsspResNum(tmpRes.getDsspResNum());
                                 }
                                 
                                 
@@ -1200,7 +1296,9 @@ public class FileParser {
                             
                             // now create the new Atom
                             
+                            // tmpRes ist now created / updated above
                             // speedup: only look for new residue if needed (atoms belonging to one res are grouped)
+                            /*
                             if (! (tmpRes == null)) {
                                 if (tmpRes.getChainID() == chainID && tmpRes.getiCode().equals(iCode) && tmpRes.getPdbResNum() == resNumPDB) {
                                     System.out.println("Speedup!");
@@ -1210,6 +1308,7 @@ public class FileParser {
                             } else {
                                 tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
                             }
+                            */
                             // Note that the command above may have returned NULL, we care for that below
 
                             a.setPdbAtomNum(atomSerialNumber);
@@ -1248,7 +1347,6 @@ public class FileParser {
                                     s_atoms.add(a);
                                 }
                             }
-                        
                         }
                     } else {
                         // loops must not be nested according to file format definition
@@ -1471,7 +1569,7 @@ public class FileParser {
         a.setChainID(chainID);        
         a.setChain(getChainByPdbChainID(chainID));
         a.setPdbResNum(resNumPDB);
-        a.setDsspResNum(resNumDSSP);
+        a.setDsspResNum(resNumDSSP); // always 0 atm (default value and changed later?)
         a.setCoordX(coordX);
         a.setCoordY(coordY);
         a.setCoordZ(coordZ);
