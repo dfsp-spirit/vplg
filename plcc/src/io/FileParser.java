@@ -173,44 +173,6 @@ public class FileParser {
         }
     }
     
-    private static void matchAtomsResidues() {
-        int resIterator = 0;
-        Residue tmpRes;
-        for (Atom a : s_atoms) {
-            tmpRes = s_residues.get(resIterator);
-            // TODO DsspResNum not set so far but we cannot use PDBResNum as we would need
-            //    iCOde then which is not saved for atom ...
-            // -> try to set DsspResNum before?
-            
-            // DEBUG
-            System.out.println("Residue " + tmpRes.toString());
-            System.out.println("Res chain " + tmpRes.getChainID());
-            System.out.println("Res DsspResNum " + tmpRes.getDsspResNum());
-            System.out.println(tmpRes.atomInfo());
-            
-            if (tmpRes.getChainID().equals(a.getChainID()) && tmpRes.getDsspResNum() == a.getDsspResNum()) {
-                System.out.println("Worked for atom " + a.toString() + " Res " + tmpRes.toString());
-                a.setResidue(tmpRes);
-                tmpRes.addAtom(a);
-            } else {
-                resIterator++;
-                tmpRes = s_residues.get(resIterator);
-                if (tmpRes.getChain().equals(a.getChain()) && tmpRes.getDsspResNum() == a.getDsspResNum()) {
-                    a.setResidue(tmpRes);
-                tmpRes.addAtom(a);
-                } else {
-                    DP.getInstance().e("[FP_CIF]", " Couldnt match atom with id '" + a.getPdbAtomNum() + 
-                            " with the next residue in the list. Seems like we cannot got through each list only once");
-                }
-            }
-            
-            while (resIterator < s_residues.size()) {
-                resIterator++;
-                
-            }
-        }
-    }
-    
     /**
      * Like initData but for mmCIF data.
      * @param pf Path to a PDB file. Does NOT test whether it exist, do that earlier.
@@ -238,16 +200,7 @@ public class FileParser {
         metaData = new HashMap<>();
         
         if(parseDataCIF()) {
-            dataInitDone = true;
-            // unlike the old parser we only want to iterate the lists once
-            // matchAtomsResidues();
-            
-            // DEBUG
-            System.out.println(s_chains.get(0).toString());
-            System.out.println(s_residues.get(0).atomInfo());
-            System.out.println(s_atoms.get(0).toString());
-            // System.exit(1);
-            
+            dataInitDone = true;            
             return(true);
         }
         else {
@@ -755,6 +708,7 @@ public class FileParser {
         // remember them so we dont need to lookup
         Residue tmpRes = null;
         Chain tmpChain = null;
+        Residue lig = null;
         
         Integer numLine = 0;
         
@@ -1182,8 +1136,6 @@ public class FileParser {
                                 
                                 String lf, ln, ls;      // temp for lig formula, lig name, lig synonyms
                                 
-                                Residue lig;
-                                
                                 Integer curLigNum = 0;
                                 
                                 if( ! ( resNumPDB.equals(lastLigandNumPDB) && chainID.equals(lastChainID) ) ) {
@@ -1334,10 +1286,10 @@ public class FileParser {
                             }
                             */
                             
-                            if(tmpRes == null) {
+                            if (tmpRes == null) {
                                 DP.getInstance().w("Residue with PDB # " + resNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
                                 continue;
-                            } else {            
+                            } else {
 
                                 if(Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {
                                     tmpRes.addHydrogenAtom(a);
@@ -1347,6 +1299,14 @@ public class FileParser {
                                     s_atoms.add(a);
                                 }
                             }
+                            
+                            if (! (lig == null)) {
+                                if (atomRecordName.equals("HETATM")) {
+                                    lig.addAtom(a);
+                                    a.setResidue(lig);
+                                }
+                            }
+                            
                         }
                     } else {
                         // loops must not be nested according to file format definition
