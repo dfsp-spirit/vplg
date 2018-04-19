@@ -3341,7 +3341,15 @@ public class Main {
         List<SSE> allChainSSEs = new ArrayList<>();
         String fs = System.getProperty("file.separator");
                
-        HashMap<String, String> md = FileParser.getPDBMetaData();
+        // meta Data in CIF files is created while parsing the file once
+        //     -> no need to call a function to create it, just get it!
+        HashMap<String, String> md;
+        if (Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
+            md = FileParser.getMetaData();
+        } else {
+            md = FileParser.getPDBMetaData();
+        }
+        
 
         // check which chains belong to the same macro molecule
         Map<String, List<String>> macroMoleculesOfPDBfileToChains = new HashMap<>();    // key of the map is the MOL_ID
@@ -3357,7 +3365,15 @@ public class Main {
                 System.out.println("  +++++ Handling chain '" + chain + "'. +++++");
             }
 
-            ProtMetaInfo pmi = FileParser.getMetaInfo(pdbid, chain);
+            // CIF parser for now does not parse Prot meta info
+            //     -> just use default values
+            ProtMetaInfo pmi;
+            if (Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
+                pmi = new ProtMetaInfo(pdbid, chain);
+            } else {
+                pmi = FileParser.getMetaInfo(pdbid, chain);
+            }
+            
             //pmi.print();
             
             

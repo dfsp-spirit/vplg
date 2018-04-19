@@ -1298,19 +1298,22 @@ public class FileParser {
                             }
                             */
                             
-                            if (tmpRes == null) {
-                                DP.getInstance().w("Residue with PDB # " + resNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
-                                continue;
-                            } else {
+                            if (atomRecordName.equals("ATOM")) {
+                                if (tmpRes == null) {
+                                    DP.getInstance().w("Residue with PDB # " + resNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
+                                    continue;
+                                } else {
 
-                                if(Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {
-                                    tmpRes.addHydrogenAtom(a);
-                                }
-                                else {
-                                    tmpRes.addAtom(a);
-                                    s_atoms.add(a);
+                                    if(Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H")) {
+                                        tmpRes.addHydrogenAtom(a);
+                                    }
+                                    else {
+                                        tmpRes.addAtom(a);
+                                        s_atoms.add(a);
+                                    }
                                 }
                             }
+                            
                             
                             if (! (lig == null)) {
                                 if (atomRecordName.equals("HETATM")) {
