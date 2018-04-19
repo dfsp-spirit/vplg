@@ -190,6 +190,7 @@ public class FileParser {
             System.out.println("    Read all " + dsspLines.size() + " lines of file '" + dsspFile + "'.");
         }
         
+        s_models = new ArrayList<Model>();
         s_chains = new ArrayList<Chain>();
         s_residues = new ArrayList<Residue>();
         s_atoms = new ArrayList<Atom>();
@@ -637,6 +638,19 @@ public class FileParser {
         return tmpReturnList;
     }
     
+    private static Chain createChain(String cID, Model m) {
+        System.out.println(cID);
+        Chain c = new Chain(cID);
+        c.setModel(m);
+        c.setModelID(m.getModelID());
+        m.addChain(c);
+        s_chains.add(c);
+        if (! (FileParser.silent || FileParser.essentialOutputOnly)) {
+            System.out.println("   PDB: New chain named " + cID + " found.");
+        }
+        return c;
+    }
+    
     /**
      * Like parseData but for mmCIF files: goes through all lines of PDB and DSSP file and calls appropriate function to handle each line. 
      * @return ignore (?)
@@ -711,6 +725,12 @@ public class FileParser {
         Residue lig = null;
         
         Integer numLine = 0;
+        
+        // for now create a default model with ID '1'
+        // usually there should be no model nevertheless
+        //     -> only used in nmr and on those splitpdb should be used (doesnt work for CIF?!)
+        Model m = new Model("1");
+        s_models.add(m);
         
         try {
             BufferedReader in = new BufferedReader(new FileReader(pdbFile));
@@ -868,18 +888,10 @@ public class FileParser {
                                 if (tmpLineData.length >= importantColInd[0]) {
                                     String tmp_cID = tmpLineData[importantColInd[0]];
                                     if (tmpChain == null) {
-                                        tmpChain = new Chain(tmp_cID);
-                                        s_chains.add(tmpChain);
-                                        if (! (FileParser.silent || FileParser.essentialOutputOnly)) {
-                                            System.out.println("   PDB: New chain named " + tmp_cID + " found.");
-                                        }
+                                        tmpChain = createChain(tmp_cID, m);
                                     } else 
                                         if (! (tmpChain.getPdbChainID().equals(tmp_cID))) {
-                                            tmpChain = new Chain(tmp_cID);
-                                            s_chains.add(tmpChain);
-                                            if (! (FileParser.silent || FileParser.essentialOutputOnly)) {
-                                                System.out.println("   PDB: New chain named " + tmp_cID + " found.");
-                                            }
+                                            tmpChain = createChain(tmp_cID, m);
                                         }
                                 } else {
                                     DP.getInstance().w("[FP_CIF]", " Line " + numLine + " should contain a value in column " + 
@@ -1221,7 +1233,7 @@ public class FileParser {
                                         //resIndexDSSP[resNumDSSP] = resIndex;
                                         //resIndexPDB[resNumPDB] = resIndex;      // This will crash because some PDB files contain negative residue numbers so fuck it.
                                         if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
-                                            System.out.println("   PDB: Added ligand '" +  resNamePDB + "-" + resNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + curLigNum + ", DSSP # WERE FROM?" + ").");
+                                            System.out.println("   PDB: Added ligand '" +  resNamePDB + "-" + resNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + curLigNum + ", DSSP # WHERE FROM?" + ").");
                                             System.out.println("   PDB:   => Ligand name = '" + lig.getLigName() + "', formula = '" + lig.getLigFormula() + "', synonyms = '" + lig.getLigSynonyms() + "'.");
                                         }
 
