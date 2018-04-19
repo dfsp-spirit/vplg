@@ -54,6 +54,7 @@ public class FileParser {
     static String dsspFile = null;
     static String pdbFile = null;
     static Integer dsspDataStartLine = null;
+    static Integer lastUsedDsspNum = null;
 
     static ArrayList<String> pdbLines = null;
     static ArrayList<String> dsspLines = null;
@@ -656,6 +657,41 @@ public class FileParser {
      * @return ignore (?)
      */
     private static Boolean parseDataCIF() {
+        // - - - Vars - - -
+        //
+        // for now local variables, may be needed as class variable though
+        Boolean dataBlockFound = false; // for now only parse the first data block (stop if seeing 2nd block)
+        Boolean inLoop = false;
+        int ligandsTreatedNum = 0;
+        
+        // variables for one loop (reset when hitting new loop)
+        String tableCategory = null;
+        ArrayList<String> tableColHeads = new ArrayList<>();
+        // importantColInd holds indices of the important columns
+        // VALUES: default value -1: column not existing; -2: column not existing and warning has been printed
+        // INDICES: 0: chain name; 1: PDBx field name; 2: atom id; 3: (detailed) atom name 4: alternative location
+        // 5: residue names (label_comp_id); 6: residue numbers (label_seq_id); 7: insertion code
+        // 8,9,10: coordx,y,z, 11: chemical symbol, 12: label_seq_id (PDB Res Num)
+        int[] importantColInd = new int[13]; 
+        
+        // variables per (atom) line
+        Integer atomSerialNumber, resNumPDB, coordX, coordY, coordZ;
+        String atomRecordName, atomName, resNamePDB, chainID, chemSym, altLoc, iCode;
+        Double oCoordX, oCoordY, oCoordZ;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
+        Float oCoordXf, oCoordYf, oCoordZf;
+        int lastLigandNumPDB = 0; // used to determine if atom belongs to new ligand residue
+        String lastChainID = ""; // s.a.
+        String[] tmpLineData;
+        
+        // variables for successive matching atom -> residue -> chain
+        // remember them so we dont need to lookup
+        Residue tmpRes = null;
+        Chain tmpChain = null;
+        Residue lig = null;
+        
+        Integer numLine = 0;
+
+
         // - - - DSSP - - -
         //
         // - - residues - -
@@ -694,43 +730,17 @@ public class FileParser {
         //     -> atoms, residues (s.a.), chains, SSEs (?)
         //     -> do the matching atom <-> residue, residue <-> chain later
         //         -> actually try to do it on the fly
-        
-        // for now local variables, may be needed as class variable though
-        Boolean dataBlockFound = false; // for now only parse the first data block (stop if seeing 2nd block)
-        Boolean inLoop = false;
-        
-        // variables for one loop (reset when hitting new loop)
-        String tableCategory = null;
-        ArrayList<String> tableColHeads = new ArrayList<>();
-        // importantColInd holds indices of the important columns
-        // VALUES: default value -1: column not existing; -2: column not existing and warning has been printed
-        // INDICES: 0: chain name; 1: PDBx field name; 2: atom id; 3: (detailed) atom name 4: alternative location
-        // 5: residue names (label_comp_id); 6: residue numbers (label_seq_id); 7: insertion code
-        // 8,9,10: coordx,y,z, 11: chemical symbol, 12: label_seq_id (PDB Res Num)
-        int[] importantColInd = new int[13]; 
-        
-        // variables per (atom) line
-        Integer atomSerialNumber, resNumPDB, coordX, coordY, coordZ;
-        String atomRecordName, atomName, resNamePDB, chainID, chemSym, altLoc, iCode;
-        Double oCoordX, oCoordY, oCoordZ;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
-        Float oCoordXf, oCoordYf, oCoordZf;
-        int lastLigandNumPDB = 0; // used to determine if atom belongs to new ligand residue
-        String lastChainID = ""; // s.a.
-        String[] tmpLineData;
-        
-        // variables for successive matching atom -> residue -> chain
-        // remember them so we dont need to lookup
-        Residue tmpRes = null;
-        Chain tmpChain = null;
-        Residue lig = null;
-        
-        Integer numLine = 0;
+
         
         // for now create a default model with ID '1'
         // usually there should be no model nevertheless
         //     -> only used in nmr and on those splitpdb should be used (doesnt work for CIF?!)
         Model m = new Model("1");
         s_models.add(m);
+        
+        if (! (FileParser.silent || FileParser.essentialOutputOnly)) {
+            System.out.println("CIF parser not really checks for models and only uses a default model '1'");
+        }
         
         try {
             BufferedReader in = new BufferedReader(new FileReader(pdbFile));
@@ -1148,18 +1158,20 @@ public class FileParser {
                                 
                                 String lf, ln, ls;      // temp for lig formula, lig name, lig synonyms
                                 
-                                Integer curLigNum = 0;
-                                
                                 if( ! ( resNumPDB.equals(lastLigandNumPDB) && chainID.equals(lastChainID) ) ) {
-                                    curLigNum++;
+                                    
+                                    int resNumDSSP;
                                     
                                     // create new Residue from info, we'll have to see whether we really add it below though
                                     lig = new Residue();
                                     lig.setPdbResNum(resNumPDB);
                                     lig.setType(Residue.RESIDUE_TYPE_LIGAND);
-                                    // do we need this?
-                                    //resNumDSSP = getLastUsedDsspResNumOfDsspFile() + curLigNum; // assign an unused fake DSSP residue number
-                                    //lig.setDsspResNum(resNumDSSP);
+                                    
+                                    // assign fake DSSP Num increasing with each seen ligand
+                                    ligandsTreatedNum ++;
+                                    resNumDSSP = lastUsedDsspNum + ligandsTreatedNum; // assign an unused fake DSSP residue number
+                                    
+                                    lig.setDsspResNum(resNumDSSP);
                                     lig.setChainID(chainID);
                                     lig.setiCode(iCode);
                                     lig.setResName3(resNamePDB);
@@ -1172,7 +1184,7 @@ public class FileParser {
                                     
                                     // add ligand to list of residues if it not on the ignore list
                                     if(isIgnoredLigRes(resNamePDB)) {
-                                        curLigNum--;    // We had to increment before to determine the fake DSSP res number, but
+                                        ligandsTreatedNum--;    // We had to increment before to determine the fake DSSP res number, but
                                                         //  this ligand won't be stored so decrement to previous value.
                                         //System.out.println("    PDB: Ignored ligand '" + resNamePDB + "-" + resNumPDB + "' at PDB line " + pLineNum + ".");
                                     } else {
@@ -1233,7 +1245,7 @@ public class FileParser {
                                         //resIndexDSSP[resNumDSSP] = resIndex;
                                         //resIndexPDB[resNumPDB] = resIndex;      // This will crash because some PDB files contain negative residue numbers so fuck it.
                                         if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
-                                            System.out.println("   PDB: Added ligand '" +  resNamePDB + "-" + resNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + curLigNum + ", DSSP # WHERE FROM?" + ").");
+                                            System.out.println("   PDB: Added ligand '" +  resNamePDB + "-" + resNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + ligandsTreatedNum + ", DSSP # WHERE FROM?" + ").");
                                             System.out.println("   PDB:   => Ligand name = '" + lig.getLigName() + "', formula = '" + lig.getLigFormula() + "', synonyms = '" + lig.getLigSynonyms() + "'.");
                                         }
 
@@ -2471,6 +2483,14 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
                 try {
                     // column 0 is ignored: blank
                     dsspResNum = Integer.valueOf(dLine.substring(1, 5).trim());
+                    
+                    // last used DSSP res num is later needed for ligands
+                    // (and we only wand to go through dssp file once)
+                    if (isCIF) {
+                        // lets hope dssp res num always increases
+                        lastUsedDsspNum = dsspResNum;
+                    }
+                    
                     // 5 is ignored: blank
                     pdbResNum = Integer.valueOf(dLine.substring(6, 10).trim());
                     iCode = dLine.substring(10, 11);                    
