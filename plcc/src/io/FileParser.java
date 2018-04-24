@@ -1103,7 +1103,7 @@ public class FileParser {
                             // TODO: possible to ignore alt loc atoms right now?
                             
                             // Files that contain DNA or RNA are not supported atm
-                            if(FileParser.isDNAorRNAresidueName(resNamePDB)) {
+                            if(FileParser.isDNAorRNAresidueName(leftInsertSpaces(resNamePDB, 3))) {
                                 if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
                                     DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA/RNA residue (residue 3-letter code is '" + resNamePDB + "'), skipping.");
                                 }
@@ -1112,14 +1112,21 @@ public class FileParser {
                             
                             // update (only if needed) -> get DsspResNum for atom from res
                             // match res <-> chain here 
-                            if (! atomRecordName.equals("HETATM")) {
+                            if (! (atomRecordName.equals("HETATM") || isDNAorRNAresidueName(leftInsertSpaces(resNamePDB , 3)))) {
                                 if (tmpRes == null) {
-                                    tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
+                                    tmpRes = getResFromListWithErrMsg(resNumPDB, chainID, iCode, atomSerialNumber, numLine);
+                                    if (tmpRes == null) {
+                                        continue; // skip atom / line
+                                    }
                                     tmpRes.setChain(tmpChain);
                                     tmpChain.addResidue(tmpRes);
                                 } else {
-                                    if (! (resNumPDB == tmpRes.getPdbResNum())) {
-                                        tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
+                                    // load new Residue into tmpRes if we approached next Residue
+                                    if (! (resNumPDB == tmpRes.getPdbResNum() && chainID == tmpRes.getChainID() && iCode == tmpRes.getiCode())) {
+                                        tmpRes = getResFromListWithErrMsg(resNumPDB, chainID, iCode, atomSerialNumber, numLine);
+                                        if (tmpRes == null) {
+                                            continue; // skip atom / line
+                                        }
                                         tmpRes.setChain(tmpChain);
                                         tmpChain.addResidue(tmpRes);
                                     }
@@ -1584,6 +1591,20 @@ public class FileParser {
 
         return(true);
     }
+     
+     /**
+      * Inserts spaces on left end until targetStr has length newLenght.
+      * If newLength less than / equals length of targetStr then targetStr is returned
+      * @param targetStr
+      * @param newLength 
+      * @return 
+      */
+     public static String leftInsertSpaces(String targetStr, int newLength) {
+         if (newLength <= targetStr.length()) {
+             return targetStr;
+         }
+         return new String(new char[newLength - targetStr.length()]).replace("\0", " ") + targetStr;
+     }
     
     /**
      * Returns true if the residue name stands for a 
@@ -1638,6 +1659,25 @@ public class FileParser {
         return(null);
     }
     
+    /**
+     * Calls getResidueFromList and returns its value with printing of error message if null returned.
+     * @param resNumPDB
+     * @param chainID
+     * @param iCode
+     * @param atomSerialNumber
+     * @param numLine current line of pdb file.
+     * @return 
+     */
+    private static Residue getResFromListWithErrMsg(Integer resNumPDB, String chainID, String iCode, Integer atomSerialNumber, Integer numLine) {
+        Residue tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
+        if (tmpRes == null) {
+            DP.getInstance().w("[FP_CIF]", " Residue with PDB # " + resNumPDB + 
+                    " of chain '" + chainID + "' with iCode '" + iCode + 
+                    "' not listed in DSSP data, skipping atom " + atomSerialNumber.toString() + 
+                    " belonging to that residue (PDB line " + numLine.toString() + ").");
+        }
+        return tmpRes;
+    }
     
     /**
      * Tries to get the residue with the given PDB residue number, chain ID and insertion code from the internal list of all residues.
