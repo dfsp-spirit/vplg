@@ -640,7 +640,12 @@ public class FileParser {
     }
     
     private static Chain createChain(String cID, Model m) {
-        System.out.println(cID);
+        for (Chain existing_c : s_chains) {
+            if (existing_c.getPdbChainID().equals(cID)) {
+                return existing_c;
+            }
+        }
+        
         Chain c = new Chain(cID);
         c.setModel(m);
         c.setModelID(m.getModelID());
@@ -893,6 +898,7 @@ public class FileParser {
                             // we are in the row section (data!)
                             tmpLineData = lineToArrayCIF(line);
                             
+                            // - - chain - -
                             // check for a new chain (always hold the current 
                             if (importantColInd[0] >= 0) {
                                 if (tmpLineData.length >= importantColInd[0]) {
