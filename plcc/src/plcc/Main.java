@@ -2019,7 +2019,12 @@ public class Main {
         else {
             FileParser.initData(pdbFile, dsspFile);
         }
-
+        
+        if (Settings.getBoolean("plcc_B_debug_only_parse")) {
+            System.out.println("Exiting now as requested by settings.");
+            System.exit(0);
+        }
+        
         allModelsIDsOfWholePDBFile = FileParser.getAllModelIDsFromWholePdbFile();
 
         if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {

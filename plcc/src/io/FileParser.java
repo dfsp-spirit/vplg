@@ -758,7 +758,7 @@ public class FileParser {
                     // check for data block
                     if (line.startsWith("data_")) {
                         if (dataBlockFound) {
-                            DP.getInstance().w("[FP_CIF]", " Parsing of first data block ended at line " + numLine.toString()
+                            DP.getInstance().w("FP_CIF", " Parsing of first data block ended at line " + numLine.toString()
                                 + "as right now only the first data block is parsed.");
                             break; // for now we only parse first data block
                         }
@@ -816,7 +816,7 @@ public class FileParser {
                         if (line.startsWith("_")) {
                             if (tableCategory == null) {
                                 if (line.split("\\.").length < 2) {
-                                    DP.getInstance().w("[FP_CIF]", " Expected table definition in line " + 
+                                    DP.getInstance().w("FP_CIF", " Expected table definition in line " + 
                                             numLine.toString() + " but couldnt parse it. Skip it (may miss important data!).");
                                 } else {
                                     tableCategory = line.split("\\.")[0];
@@ -910,7 +910,7 @@ public class FileParser {
                                             tmpChain = createChain(tmp_cID, m);
                                         }
                                 } else {
-                                    DP.getInstance().w("[FP_CIF]", " Line " + numLine + " should contain a value in column " + 
+                                    DP.getInstance().w("FP_CIF", " Line " + numLine + " should contain a value in column " + 
                                             importantColInd[0] + " (expected chain name) but didnt. Skipping line.");
                                 }  
                             }
@@ -929,7 +929,7 @@ public class FileParser {
                             } else {
                                 if (importantColInd[1] == -1) {
                                     if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().w("[FP_CIF", "Seems like both _atom_site.label_asym_id and .auth_asym_id are missing. Trying to ignore it.");
+                                        DP.getInstance().w("FP_CIF", "Seems like both _atom_site.label_asym_id and .auth_asym_id are missing. Trying to ignore it.");
                                     }    
                                     importantColInd[1] = -2;
                                 } 
@@ -941,7 +941,7 @@ public class FileParser {
                             } else {
                                 if (importantColInd[1] == -1) {
                                     if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().w("[FP_CIF", "Seems like _atom_site.group_PDB is missing. Trying to ignore it.");
+                                        DP.getInstance().w("FP_CIF", "Seems like _atom_site.group_PDB is missing. Trying to ignore it.");
                                     }    
                                     importantColInd[1] = -2;
                                 } 
@@ -953,7 +953,7 @@ public class FileParser {
                             } else {
                                 if (importantColInd[2] == -1) {
                                     if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().w("[FP_CIF", "Seems like _atom_site.id is missing. Trying to ignore it.");
+                                        DP.getInstance().w("FP_CIF", "Seems like _atom_site.id is missing. Trying to ignore it.");
                                     }    
                                     importantColInd[2] = -2;
                                 }
@@ -973,7 +973,7 @@ public class FileParser {
                             } else {
                                 if (importantColInd[3] == -1) {
                                     if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().w("[FP_CIF", "Seems like _atom_site.label_atom_id is missing. Trying to ignore it.");
+                                        DP.getInstance().w("FP_CIF", "Seems like _atom_site.label_atom_id is missing. Trying to ignore it.");
                                     }    
                                     importantColInd[3] = -2;
                                 }
@@ -985,7 +985,7 @@ public class FileParser {
                             } else {
                                 if (importantColInd[4] == -1) {
                                     if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().w("[FP_CIF", "Seems like _atom_site.label_alt_loc is missing. Trying to ignore it.");
+                                        DP.getInstance().w("FP_CIF", "Seems like _atom_site.label_alt_loc is missing. Trying to ignore it.");
                                     }    
                                     importantColInd[4] = -2;
                                 }
@@ -997,7 +997,7 @@ public class FileParser {
                             } else {
                                 if (importantColInd[5] == -1) {
                                     if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().w("[FP_CIF", "Seems like _atom_site.label_comp_id is missing. Trying to ignore it.");
+                                        DP.getInstance().w("FP_CIF", "Seems like _atom_site.label_comp_id is missing. Trying to ignore it.");
                                     }    
                                     importantColInd[5] = -2;
                                 }
@@ -1014,7 +1014,7 @@ public class FileParser {
                                 } else {
                                     if (importantColInd[6] == -1) {
                                         if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                            DP.getInstance().w("[FP_CIF", "Seems like _atom_site.auth_seq_id AND label_seq_id is missing. Trying to ignore it.");
+                                            DP.getInstance().w("FP_CIF", "Seems like _atom_site.auth_seq_id AND label_seq_id is missing. Trying to ignore it.");
                                         }    
                                         importantColInd[6] = -2;
                                     }
@@ -1030,7 +1030,7 @@ public class FileParser {
                             } else {
                                 if (importantColInd[7] == -1) {
                                     if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().w("[FP_CIF", "Seems like _atom_site.pdbx_PDB_ins_code is missing. Trying to ignore it.");
+                                        DP.getInstance().w("FP_CIF", "Seems like _atom_site.pdbx_PDB_ins_code is missing. Trying to ignore it.");
                                     }   
                                     importantColInd[7] = -2;
                                 }
@@ -1050,7 +1050,7 @@ public class FileParser {
                             } else {
                                 if (importantColInd[8] == -1) {
                                     if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().e("[FP_CIF", "Seems like _atom_site.Cartn_x is missing. Exiting now.");
+                                        DP.getInstance().e("FP_CIF", "Seems like _atom_site.Cartn_x is missing. Exiting now.");
                                     }    
                                     System.exit(1);
                                 }
@@ -1069,7 +1069,7 @@ public class FileParser {
                             } else {
                                 if (importantColInd[9] == -1) {
                                     if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().e("[FP_CIF", "Seems like _atom_site.Cartn_y is missing. Exiting now.");
+                                        DP.getInstance().e("FP_CIF", "Seems like _atom_site.Cartn_y is missing. Exiting now.");
                                     }    
                                     System.exit(1);
                                 }
@@ -1088,7 +1088,7 @@ public class FileParser {
                             } else {
                                 if (importantColInd[10] == -1) {
                                     if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().e("[FP_CIF", "Seems like _atom_site.Cartn_z is missing. Exiting now.");
+                                        DP.getInstance().e("FP_CIF", "Seems like _atom_site.Cartn_z is missing. Exiting now.");
                                     }    
                                     System.exit(1);
                                 }
@@ -1100,7 +1100,7 @@ public class FileParser {
                             } else {
                                 if (importantColInd[11] == -1) {
                                     if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().w("[FP_CIF", "Seems like _atom_site.type_symbol is missing. Trying to ignore it.");
+                                        DP.getInstance().w("FP_CIF", "Seems like _atom_site.type_symbol is missing. Trying to ignore it.");
                                     }   
                                     importantColInd[11] = -2;
                                 }
@@ -1677,7 +1677,7 @@ public class FileParser {
     private static Residue getResFromListWithErrMsg(Integer resNumPDB, String chainID, String iCode, Integer atomSerialNumber, Integer numLine) {
         Residue tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
         if (tmpRes == null) {
-            DP.getInstance().w("[FP_CIF]", " Residue with PDB # " + resNumPDB + 
+            DP.getInstance().w("FP_CIF", " Residue with PDB # " + resNumPDB + 
                     " of chain '" + chainID + "' with iCode '" + iCode + 
                     "' not listed in DSSP data, skipping atom " + atomSerialNumber.toString() + 
                     " belonging to that residue (PDB line " + numLine.toString() + ").");
