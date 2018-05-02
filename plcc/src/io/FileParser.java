@@ -1128,7 +1128,7 @@ public class FileParser {
                                     tmpChain.addResidue(tmpRes);
                                 } else {
                                     // load new Residue into tmpRes if we approached next Residue
-                                    if (! (resNumPDB == tmpRes.getPdbResNum() && chainID == tmpRes.getChainID() && iCode == tmpRes.getiCode())) {
+                                    if (! (resNumPDB == tmpRes.getPdbResNum() && chainID.equals(tmpRes.getChainID()) && iCode.equals(tmpRes.getiCode()))) {
                                         tmpRes = getResFromListWithErrMsg(resNumPDB, chainID, iCode, atomSerialNumber, numLine);
                                         if (tmpRes == null) {
                                             continue; // skip atom / line
