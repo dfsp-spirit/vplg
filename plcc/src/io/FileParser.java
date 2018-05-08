@@ -639,7 +639,13 @@ public class FileParser {
         return tmpReturnList;
     }
     
-    private static Chain createChain(String cID, Model m) {
+    /**
+     * Gets chain by ID if existing otherwise creates it.
+     * @param cID chain ID as String
+     * @param m Model to which the chain belongs
+     * @return 
+     */
+    private static Chain getOrCreateChain(String cID, Model m) {
         for (Chain existing_c : s_chains) {
             if (existing_c.getPdbChainID().equals(cID)) {
                 return existing_c;
@@ -700,8 +706,6 @@ public class FileParser {
         // - - - DSSP - - -
         //
         // - - residues - -
-        // same like in parseData() only Boolean argument changed
-        //     -> make own function
         if(! FileParser.silent) {
             System.out.println("  Creating all Residues...");
         }
@@ -891,8 +895,6 @@ public class FileParser {
                                     importantColInd[12] = tableColHeads.size() - 1;
                                     break;
                             }
-
-                            // TODO update important ColIndexes for rest
                             
                         } else {
                             // we are in the row section (data!)
@@ -904,10 +906,10 @@ public class FileParser {
                                 if (tmpLineData.length >= importantColInd[0]) {
                                     String tmp_cID = tmpLineData[importantColInd[0]];
                                     if (tmpChain == null) {
-                                        tmpChain = createChain(tmp_cID, m);
+                                        tmpChain = getOrCreateChain(tmp_cID, m);
                                     } else 
                                         if (! (tmpChain.getPdbChainID().equals(tmp_cID))) {
-                                            tmpChain = createChain(tmp_cID, m);
+                                            tmpChain = getOrCreateChain(tmp_cID, m);
                                         }
                                 } else {
                                     DP.getInstance().w("FP_CIF", " Line " + numLine + " should contain a value in column " + 
@@ -1075,7 +1077,7 @@ public class FileParser {
                                 }
                             }
                             
-                            // coordY => 10
+                            // coordZ => 10
                             if (importantColInd[10] > -1) {
                                 if (Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {
                                     oCoordZ = Double.valueOf(tmpLineData[importantColInd[10]]) * 10.0;
@@ -1106,9 +1108,12 @@ public class FileParser {
                                 }
                             }
                             
+                            Boolean isAA = isAminoacid(resNamePDB);
+
                             // TODO: possible to ignore alt loc atoms right now?
                             
-                            // Files that contain DNA or RNA are not supported atm
+                            // >> DNA/RNA <<
+                            // ignore atm
                             if(FileParser.isDNAorRNAresidueName(leftInsertSpaces(resNamePDB, 3))) {
                                 if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
                                     DP.getInstance().w("Atom #" + atomSerialNumber + " in PDB file belongs to DNA/RNA residue (residue 3-letter code is '" + resNamePDB + "'), skipping.");
@@ -1116,35 +1121,49 @@ public class FileParser {
                                 continue; // do not use that atom
                             }
                             
-                            // update (only if needed) -> get DsspResNum for atom from res
+                            // >> AA <<
+                            // update tmpRes (only if needed) 
+                            //     -> enables getting DsspResNum for atom from res
                             // match res <-> chain here 
-                            if (! (atomRecordName.equals("HETATM") || isDNAorRNAresidueName(leftInsertSpaces(resNamePDB , 3)))) {
+                            if (isAA) {
                                 if (tmpRes == null) {
                                     tmpRes = getResFromListWithErrMsg(resNumPDB, chainID, iCode, atomSerialNumber, numLine);
                                     if (tmpRes == null) {
-                                        continue; // skip atom / line
+                                        if (isAA) {
+                                            continue; // skip atom / line
+                                        }
+                                    } else {
+                                        tmpRes.setChain(tmpChain);
+                                        tmpChain.addResidue(tmpRes);
                                     }
-                                    tmpRes.setChain(tmpChain);
-                                    tmpChain.addResidue(tmpRes);
                                 } else {
                                     // load new Residue into tmpRes if we approached next Residue
                                     if (! (resNumPDB == tmpRes.getPdbResNum() && chainID.equals(tmpRes.getChainID()) && iCode.equals(tmpRes.getiCode()))) {
                                         tmpRes = getResFromListWithErrMsg(resNumPDB, chainID, iCode, atomSerialNumber, numLine);
                                         if (tmpRes == null) {
-                                            continue; // skip atom / line
+                                            if (isAA) {
+                                                continue; // skip atom / line
+                                            } 
+                                        } else {
+                                            tmpRes.setChain(tmpChain);
+                                            tmpChain.addResidue(tmpRes);
                                         }
-                                        tmpRes.setChain(tmpChain);
-                                        tmpChain.addResidue(tmpRes);
                                     }
                                 }
+                            } else {
+                                tmpRes = null;
                             }
+                            // => in case of ligand tmpRes now is null!
                             
                             Atom a = new Atom();
                             
-                            // handle stuff that's different between ATOMs and HETATMs
-                            if(atomRecordName.equals("ATOM")) {
+                            // handle stuff that's different between ATOMs (AA) and HETATMs (ligand)
+                            if(isAA) {
+                                // >> AA <<
                                 if (isIgnoredAtom(chemSym)) {
                                     if( ! (Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
+                                        System.out.println("DEBUG Ignored atom line " + numLine.toString() + 
+                                                "as it is either in ignored list or handle_hydrogens turned off.");
                                         continue;
                                     }
                                 }
@@ -1165,11 +1184,13 @@ public class FileParser {
                                 }
                                 
                                 
-                            } else if (atomRecordName.equals("HETATM")) {
+                            } else {
+                                // >> LIG <<
                                 
                                 // idea: add always residue (for consistency) but atom only if needed
                                 
-                                String lf, ln, ls;      // temp for lig formula, lig name, lig synonyms
+                                // currently not used
+                                // String lf, ln, ls;      // temp for lig formula, lig name, lig synonyms
                                 
                                 if( ! ( resNumPDB.equals(lastLigandNumPDB) && chainID.equals(lastChainID) ) ) {
                                     
@@ -1190,8 +1211,8 @@ public class FileParser {
                                     lig.setResName3(resNamePDB);
                                     lig.setAAName1(AminoAcid.getLigandName1());
                                     lig.setChain(getChainByPdbChainID(chainID));
-                                    // still ignoring models!
-                                    //lig.setModelID(modelID);
+                                    // still just assigning default model 1
+                                    lig.setModelID("1");
                                     lig.setSSEString(Settings.get("plcc_S_ligSSECode"));
                                     
                                     
@@ -1258,7 +1279,7 @@ public class FileParser {
                                         //resIndexDSSP[resNumDSSP] = resIndex;
                                         //resIndexPDB[resNumPDB] = resIndex;      // This will crash because some PDB files contain negative residue numbers so fuck it.
                                         if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
-                                            System.out.println("   PDB: Added ligand '" +  resNamePDB + "-" + resNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + ligandsTreatedNum + ", DSSP # WHERE FROM?" + ").");
+                                            System.out.println("   PDB: Added ligand '" +  resNamePDB + "-" + resNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + ligandsTreatedNum + ", Fake DSSP #" + resNumDSSP + ").");
                                             System.out.println("   PDB:   => Ligand name = '" + lig.getLigName() + "', formula = '" + lig.getLigFormula() + "', synonyms = '" + lig.getLigSynonyms() + "'.");
                                         }
 
@@ -1273,7 +1294,10 @@ public class FileParser {
                                     //  just return without adding the new Atom to any Residue here so this line
                                     //  is skipped and the next line can be handled.
                                     //  If people want all ligands they have to change the isIgnoredLigRes() function.
-                                    continue; // can we do this here? Does it cut off other important stuff?
+                                    
+                                    // DEBUG
+                                    // DP.getInstance().w("FP_CIF", " Ignored ligand atom of '" +  resNamePDB + "-" + resNumPDB + "', chain " + chainID + " (line " + numLine + ", ligand #" + ligandsTreatedNum + ", Fake DSSP #" + lig.getDsspResNum().toString() + ").");
+                                    continue; // can we do this here? Does it cut off other important stuff? -> added to res but not atom (s.a.)
                                 }
                                 else {
                                     a.setAtomtype(Atom.ATOMTYPE_LIGAND);       // valid ligand
@@ -1283,21 +1307,10 @@ public class FileParser {
                                 
                             }
                             
+                            // >> AA + LIG <<
                             // now create the new Atom
-                            
-                            // tmpRes ist now created / updated above
-                            // speedup: only look for new residue if needed (atoms belonging to one res are grouped)
-                            /*
-                            if (! (tmpRes == null)) {
-                                if (tmpRes.getChainID() == chainID && tmpRes.getiCode().equals(iCode) && tmpRes.getPdbResNum() == resNumPDB) {
-                                    System.out.println("Speedup!");
-                                } else {
-                                    tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
-                                }
-                            } else {
-                                tmpRes = getResidueFromList(resNumPDB, chainID, iCode);
-                            }
-                            */
+
+                            // tmpRes may be NULL
                             // Note that the command above may have returned NULL, we care for that below
 
                             a.setPdbAtomNum(atomSerialNumber);
@@ -1323,7 +1336,8 @@ public class FileParser {
                             }
                             */
                             
-                            if (atomRecordName.equals("ATOM")) {
+                            if (isAA) {
+                                // >> AA <<
                                 if (tmpRes == null) {
                                     DP.getInstance().w("Residue with PDB # " + resNumPDB + " of chain '" + chainID + "' with iCode '" + iCode + "' not listed in DSSP data, skipping atom " + atomSerialNumber + " belonging to that residue (PDB line " + numLine.toString() + ").");
                                     continue;
@@ -1337,16 +1351,14 @@ public class FileParser {
                                         s_atoms.add(a);
                                     }
                                 }
-                            }
-                            
-                            
-                            if (! (lig == null)) {
-                                if (atomRecordName.equals("HETATM")) {
+                            } else {
+                                // >> LIG <<
+                                if (! (lig == null)) {
                                     lig.addAtom(a);
                                     a.setResidue(lig);
+                                    s_atoms.add(a);
                                 }
-                            }
-                            
+                            }  
                         }
                     } else {
                         // loops must not be nested according to file format definition
@@ -1364,7 +1376,7 @@ public class FileParser {
                         }
                     }
                 } else {
-                    // # seems to stand between each category, we use it to decide if loop ended
+                    // '#' seems to stand between each category, we use it to decide if loop ended
                     //     and hope it does not occur inside a loop
                     inLoop = false;
                 }
@@ -1631,6 +1643,22 @@ public class FileParser {
         
         
         return false;
+    }
+    
+    /**
+     * Returns true if AAName is standard aminoacid name (3-letter code).
+     * @param AAName Aminoacid name, 3-letter code, capitalized
+     * @return 
+     */
+    private static boolean isAminoacid(String AAName) {
+        String[] standardAANames = {"ALA", "ARG", "ASN", "ASP", "CYS", 
+            "GLU", "GLN", "GLY", "HIS", "ILE", "LEU", "LYS", "MET", 
+            "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL"};
+        if (Arrays.asList(standardAANames).contains(AAName)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     
