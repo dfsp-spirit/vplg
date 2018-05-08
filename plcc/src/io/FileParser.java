@@ -26,6 +26,7 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
@@ -1138,7 +1139,7 @@ public class FileParser {
                                     }
                                 } else {
                                     // load new Residue into tmpRes if we approached next Residue
-                                    if (! (resNumPDB == tmpRes.getPdbResNum() && chainID.equals(tmpRes.getChainID()) && iCode.equals(tmpRes.getiCode()))) {
+                                    if (! (Objects.equals(resNumPDB, tmpRes.getPdbResNum()) && chainID.equals(tmpRes.getChainID()) && iCode.equals(tmpRes.getiCode()))) {
                                         tmpRes = getResFromListWithErrMsg(resNumPDB, chainID, iCode, atomSerialNumber, numLine);
                                         if (tmpRes == null) {
                                             if (isAA) {
@@ -1146,7 +1147,7 @@ public class FileParser {
                                             } 
                                         } else {
                                             tmpRes.setChain(tmpChain);
-                                            tmpChain.addResidue(tmpRes);
+                                            tmpChain.addResidue(tmpRes);                                            
                                         }
                                     }
                                 }
