@@ -1392,6 +1392,40 @@ public class FileParser {
             System.err.println("ERROR: Message: " + e.getMessage());
             System.exit(1);
 	}
+        
+        // alt loc treatment copy&pasted from old parser
+        if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
+            System.out.println("    PDB: Hit end of PDB file at line " + numLine + ".");
+
+            // remove duplicate atoms from altLoc here
+            System.out.println("    PDB: Selecting alternative locations for atoms of all residues.");
+        }
+        ArrayList<Atom> deletedAtoms;
+        int numAtomsDeletedAltLoc = 0;
+        int numResiduesAffected = 0;
+        Residue r;
+        for(int i = 0; i < s_residues.size(); i++) {
+            r = s_residues.get(i);
+            deletedAtoms = r.chooseYourAltLoc();
+            
+            //if(r.getPdbResNum() == 209) {
+            //    System.out.println("DEBUG: ===> Residue " + r.toString() + " at list position " + i + " <===.");
+            //}
+            
+            if(deletedAtoms.size() > 0) {
+                numResiduesAffected++;
+            }
+            
+            //delete atoms from global atom list as well
+            for(Atom a : deletedAtoms) {
+                if(s_atoms.remove(a)) {
+                    numAtomsDeletedAltLoc++;
+                } else {
+                    DP.getInstance().w("Atom requested to be removed from global list does not exist in there.");
+                }
+            }
+        }
+        
         // all lines have beenn read
         return(true);
     }
