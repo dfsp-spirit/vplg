@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import graphdrawing.DrawTools.IMAGEFORMAT;
+import static java.lang.Math.abs;
 import plcc.Main;
 import motifs.MotifSearchTools;
 import motifs.Motifs;
@@ -27,7 +28,7 @@ import plcc.Settings;
 import similarity.SimilarityByGraphlets;
 import tools.DP;
 import tools.PlccUtilities;
-
+//Test!
 /**
  * A database manager class that is used to create and maintain a connection to a PostgreSQL database server.
  * 
@@ -2220,14 +2221,253 @@ connection.close();
         
         return rowsAffectedTotal;
     }
+     
+    /**
+     *This function is used to parse the linear notation (RED and ADJ) from the ptgl to a graph represented in a matrix.
+     * @param ln a String of the linear notation (RED or ADJ)
+     * @return a list with list, representing the graph of the given notation in an adjacency matrix
+     */
+    public static ArrayList<ArrayList<String>> parseRedOrAdjToMatrix(String ln){
+        //initial steps
+        ArrayList<ArrayList<String>> matrix = new ArrayList<ArrayList<String>>(); //stores later genererated matrix
+        ln = ln.replace("{", "").replace("}", "").replace("(", "").replace(")", "").replace("[", "").replace("]", ""); //linnot whithout brackets
+        int minVal = 0;
+        int maxVal = 0;
+        String[] linnot = ln.split(","); //Array, consisting of the elemnts of the linnot
+        int[] myArray = new int[3]; //0 = mixed, 1 = parallel, 2 = antiparallel, 3 = z
+        ArrayList<int[]> myListArray = new ArrayList<int[]>(); //auxiliary variable
+        //Beginning of Matrix has to be computed seperated from the rest
+        myArray[0] = 0; //From where does the edge come? In this case 0, because it is the first edge
+        myArray[1] = 0 + Integer.parseInt(linnot[0].substring(0, linnot[0].length()-1)); //To which node does the first edge go? Always from the startingpoint. In this case 0.
+        if (myArray[1] > maxVal) {
+            maxVal = myArray[1];
+        }
+        if (myArray[1] < minVal) {
+            minVal = myArray[1];
+        }
+        int origin = myArray[1]; 
+        //which edge (parallel, antiparallel or mixed) is used?
+        if (linnot[0].substring(linnot[0].length()-1).equals("m")) {
+            myArray[2] = 0;
+        } else if (linnot[0].substring(linnot[0].length()-1).equals("p")) {
+            myArray[2] = 1;
+        } else if (linnot[0].substring(linnot[0].length()-1).equals("a")) {
+            myArray[2] = 2;
+        } else if (linnot[0].substring(linnot[0].length()-1).equals("z")) {
+            myArray[2] = 3;
+        }
+        myListArray.add(myArray.clone());
+        
+        //iterate over the whole linnot.
+        for (int i = 1; i < linnot.length; i++) {
+            myArray[0] = origin; //From where does the edge come from?
+            myArray[1] = origin + Integer.parseInt(linnot[i].substring(0, linnot[i].length()-1)); //where will the edge go to?
+            origin = myArray[1];
+            //which edge (parallel, antiparallel or mixed) is used?
+            if (linnot[i].substring(linnot[i].length()-1).equals("m")) {
+                myArray[2] = 0;
+            } else if (linnot[i].substring(linnot[i].length()-1).equals("p")) {
+                myArray[2] = 1;
+            } else if (linnot[i].substring(linnot[i].length()-1).equals("a")) {
+                myArray[2] = 2;
+            } else if (linnot[i].substring(linnot[i].length()-1).equals("z")) {
+                myArray[2] = 3;
+            }
+                myListArray.add(myArray.clone());
+            if (myArray[1] > maxVal) {
+                maxVal = myArray[1];
+            }
+            if (myArray[1] < minVal) {
+                minVal = myArray[1];
+            }
             
+            
+        }
+        
+        
+        int numVertices = (maxVal - minVal) + 1; //is needed to determine the first vertex
+        
+        //Init Matrix with "x" for no edge
+        ArrayList<String> row = new ArrayList<String>();
+        for (int i = 0; i<numVertices; i++) {
+            row = new ArrayList<String>();
+            for (int j=0; j<numVertices; j++) {
+                row.add("x");
+            }
+            matrix.add(row);
+        }
+        
+        //fill Matrix with myListArray
+        for (int[] s : myListArray) {
+            if (s[2] != 3) {
+                if (s[2] == 0) {
+                    matrix.get(s[0]+abs(minVal)).set(s[1]+abs(minVal), "m");
+                    matrix.get(s[1]+abs(minVal)).set(s[0]+abs(minVal), "m");
+                }
+                if (s[2] == 1) {
+                    matrix.get(s[0]+abs(minVal)).set(s[1]+abs(minVal), "p");
+                    matrix.get(s[1]+abs(minVal)).set(s[0]+abs(minVal), "p");
+                }
+                if (s[2] == 2) {
+                    matrix.get(s[0]+abs(minVal)).set(s[1]+abs(minVal), "a");
+                    matrix.get(s[1]+abs(minVal)).set(s[0]+abs(minVal), "a");
+                }
+            }
+        }
+        return matrix;
+    }
+    
         
     /**
+     * Determines whether at least one matrix in a list of matrices contains a Four Helix Bundle
+     * @param matrixList a list of matrices, representing a linear notation (RED or ADJ)
+     * @return true if at least one matrix in the list contains the pattern for a 4-Helix-Bundle
+     */
+    public static Boolean matrixContainsFourHelixBundle(ArrayList<ArrayList<ArrayList<String>>> matrixList) {
+        //iterate over all given folding graphs
+        for (ArrayList<ArrayList<String>> matrix : matrixList) {
+            //make sure no "Alpha Horseshoe" is contained
+            for (int j = 0; j < matrix.size()-7; j++) {
+                    if ("a".equals(matrix.get(j).get(j+1)) && "a".equals(matrix.get(j+1).get(j+2)) && "a".equals(matrix.get(j+2).get(j+3))
+                        && "a".equals(matrix.get(j+3).get(j+4)) && "a".equals(matrix.get(j+4).get(j+5)) && "a".equals(matrix.get(j+5).get(j+6))
+                        && "a".equals(matrix.get(j+6).get(j+7))) {
+                    return false;
+                    }
+            }
+            
+            //Check every posible location for Helix Bundle
+            for (int i = 0; i < matrix.size()-3; i++) {
+                for (int k = 0; k < matrix.size()-3-i; k++) {
+                    for (int o = 0; o < matrix.size()-3-i-k; o++) {
+                        for (int p = 0; p < matrix.size()-3-i-k-o; p++) {
+                            //typical antiparallel Helix Bundle
+                            if ("a".equals(matrix.get(i).get(i+1+k)) && "a".equals(matrix.get(i+1+k).get(i+2+k+o)) &&
+                                "a".equals(matrix.get(i+2+k+o).get(i+3+k+o+p))) {
+                                if (matrix.size() < 10) { //Only return if the Graph is small enough. Otherwise the chance of a lucky match is high.
+                                    return true;
+                                }
+                                
+                            }
+                            //parallel Helix Bundle
+                            if ("p".equals(matrix.get(i).get(i+1+k)) && "a".equals(matrix.get(i+1+k).get(i+2+k+o)) &&
+                                "p".equals(matrix.get(i+2+k+o).get(i+3+k+o+p))) {
+                                if (matrix.size() < 10) { //Only return if the Graph is small enough. Otherwise the chance of a lucky match is high.
+                                    return true;
+                                }
+                            } 
+                        }
+                    }
+                }
+            }
+
+            
+        }
+        
+        return false;
+    }
+    
+    
+    /**
+     * Determines for a given chain_id from the vplg-Database if the protein chain contains a 4-Helix-Bundle
+     * @param chain_db_id a value from the vplg-Database representing a pdb_id with its chain
+     * @return true if the corresponding pdb_id with its chain contains a 4-Helix-Bundle
+     */
+    public static Boolean chainContainsMotif_FourHelixBundle(Long chain_db_id) {
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<>();
+        ArrayList<String> rowData = null;
+        int count;
+        Set<String> my_set = new HashSet<>();    
+        PreparedStatement statement = null;
+        ResultSet rs = null;             
+        
+        StringBuilder querySB = new StringBuilder();
+        
+        //SQL-statement to fetch the ADJ linnot of a given chain_id
+        querySB.append("SELECT ln.ptgl_linnot_adj ");
+	querySB.append("FROM plcc_fglinnot ln ");
+	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
+	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
+	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
+	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 1) ) ");
+ 
+        
+        String query = querySB.toString();
+//        System.out.println(query);
+        
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, chain_db_id);
+//            statement1.setInt(2, chain_db_id);
+//            statement1.setInt(3, chain_db_id);
+            
+                                
+            rs = statement.executeQuery();
+            //dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+            //evaluate SQL-statement and store it in a list
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                my_set.add(rowData.get(0));
+                tableData.add(rowData);
+            }
+
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "chainContainsMotif_FourHelixBundle: '" + e.getMessage() + "'.");
+            System.out.println(e);
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                //dbc.setAutoCommit(true);
+            } catch(SQLException e) {DP.getInstance().w("DBManager", "chainContainsMotif_FourHelixBundle: Could not close statement and reset autocommit.");}
+        }
+        
+        //iterate over all present linnots and save them in a list
+        ArrayList<ArrayList<ArrayList<String>>> matrixList = new ArrayList<ArrayList<ArrayList<String>>>(); //contains the adjacency matrix of the different foldinggraphs of one proteingraph
+        if(tableData.size() >= 1) {
+            for (ArrayList<String> tD : tableData) {
+                if (tD.get(0).length() > 2) {
+                    matrixList.add(parseRedOrAdjToMatrix(tD.get(0))); //parse linnot to adjacency matrix
+                }
+                
+            }
+            //check if one of the foldinggraphs contains motif
+            if (matrixContainsFourHelixBundle(matrixList) == true) {
+                return true;
+            }
+        }
+             
+        
+        return false;
+    }
+    
+    
+    
+    /** OLD
      * Checks whether the chain contains a 4 helix bundle motif. These checks consider the different linear notations of several graph types.
      * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
      * @param chain_db_id the chain database id
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
-     */
+     
     public static Boolean chainContainsMotif_FourHelixBundle(Long chain_db_id) {
         
         String[] pdb_chain = DBManager.getPDBIDandChain(chain_db_id);
@@ -2316,7 +2556,7 @@ connection.close();
         }        
 
     }
-    
+    */
     public static void main(String[] argv) {
         Boolean silent = false;
         Settings.init();
@@ -2343,12 +2583,129 @@ connection.close();
        
     }
     
+    
     /**
+     * Determines whether at least one matrix in a list of matrices contains a Up and Down Barrel
+     * @param matrixList a list of matrices, representing a linear notation (RED or ADJ)
+     * @return true if at least one matrix in the list contains the pattern for a Up and Down Barrel
+     */
+    public static Boolean matrixContainsUpAndDownBarrel(ArrayList<ArrayList<ArrayList<String>>> matrixList){
+        //iterate over all given folding graphs
+        for (ArrayList<ArrayList<String>> matrix : matrixList) {
+            for (int i = 0; i < matrix.size()-7; i++) {
+                //secure eight-stranded version of Barrel
+                if ("a".equals(matrix.get(i).get(i+1)) && "a".equals(matrix.get(i+1).get(i+2)) && "a".equals(matrix.get(i+2).get(i+3)) && "a".equals(matrix.get(i+3).get(i+4))
+                 && "a".equals(matrix.get(i+4).get(i+5)) && "a".equals(matrix.get(i+5).get(i+6))  && "a".equals(matrix.get(i+6).get(i+7)) && "a".equals(matrix.get(i).get(i+7))) {
+                    return true;
+                }
+            }
+            
+            for (int i = 0; i < matrix.size()-9; i++) {
+                //secure ten-stranded version of Barrel
+                if ("a".equals(matrix.get(i).get(i+1)) && "a".equals(matrix.get(i+1).get(i+2)) && "a".equals(matrix.get(i+2).get(i+3)) && "a".equals(matrix.get(i+3).get(i+4))
+                 && "a".equals(matrix.get(i+4).get(i+5)) && "a".equals(matrix.get(i+5).get(i+6))  && "a".equals(matrix.get(i+6).get(i+7)) && "a".equals(matrix.get(i+7).get(i+8))
+                 && "a".equals(matrix.get(i+8).get(i+9)) && "a".equals(matrix.get(i).get(i+9))) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    
+     /**
+     * Determines for a given chain_id from the vplg-Database if the protein chain contains a Up and Down Barrel
+     * @param chain_db_id a value from the vplg-Database representing a pdb_id with its chain
+     * @return true if the corresponding pdb_id with its chain contains a Up and Down Barrel
+     */
+    public static Boolean chainContainsMotif_UpAndDownBarrel(Long chain_db_id) {
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        Set<String> my_set = new HashSet<>();    
+        PreparedStatement statement = null;
+        ResultSet rs = null;             
+        
+        StringBuilder querySB = new StringBuilder();
+        
+        //SQL-statement to fetch the ADJ linnot of a given chain_id
+        querySB.append("SELECT ln.ptgl_linnot_adj ");
+	querySB.append("FROM plcc_fglinnot ln ");
+	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
+	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
+	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
+	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 2) ) ");
+ 
+        
+        String query = querySB.toString();
+//        System.out.println(query);
+        
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+            statement.setLong(1, chain_db_id);                                
+            rs = statement.executeQuery();
+            //dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+            //evaluate SQL-statement and store it in a list
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                my_set.add(rowData.get(0));
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "chainContainsMotif_UpAndDownBarrel: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                //dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_UpAndDownBarrel: Could not close statement and reset autocommit.");}
+        }
+        
+        //iterate over all present linnots and save them in a list
+        ArrayList<ArrayList<ArrayList<String>>> matrixList = new ArrayList<ArrayList<ArrayList<String>>>(); //contains the adjacency matrix of the different foldinggraphs of one proteingraph
+        if(tableData.size() >= 1) {
+            for (ArrayList<String> tD : tableData) {
+                if (tD.get(0).length() > 2) {
+                    matrixList.add(parseRedOrAdjToMatrix(tD.get(0))); //parse linnot to adjacency matrix
+                }
+                
+            }
+            //check if one of the foldinggraphs contains motif
+            if (matrixContainsUpAndDownBarrel(matrixList) == true) {
+                return true;
+            }
+        }
+             
+        
+        return false;
+    }
+    
+    /** OLD
      * Checks whether the chain contains an up and down barrel motif. These checks consider the different linear notations of several graph types.
      * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
      * @param chain_db_id the chain database id
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
-     */
+     
     public static Boolean chainContainsMotif_UpAndDownBarrel(Long chain_db_id) {
         
         ResultSetMetaData md;
@@ -2456,13 +2813,144 @@ connection.close();
         }        
 
     }
+    */
+    
     
     /**
+     * Determines whether at least one matrix in a list of matrices contains a Jelly Roll Fold
+     * @param matrixList a list of matrices, representing a linear notation (RED or ADJ)
+     * @return true if at least one matrix in the list contains the pattern for a Jelly Roll Fold
+     */
+    public static Boolean matrixContainsJellyRoll(ArrayList<ArrayList<ArrayList<String>>> matrixList){
+        //dividing Jelly Roll in 2 different layers.
+        boolean firstHalf = false;
+        boolean secondHalf = false;
+        //iterate over all given folding graphs
+        for (ArrayList<ArrayList<String>> matrix : matrixList) {
+            for (int i = 0; i < matrix.size()-7; i++) {
+                //check if the whole motif is contained fully in one foldinggraph.
+                if ("a".equals(matrix.get(0+i).get(1+i)) && "a".equals(matrix.get(1+i).get(7+i)) && "a".equals(matrix.get(2+i).get(7+i)) &&
+                    "a".equals(matrix.get(2+i).get(5+i)) && "a".equals(matrix.get(3+i).get(4+i)) && "a".equals(matrix.get(3+i).get(6+i))) {
+                    return true;
+                }
+            }
+            
+            for (int k = 0; k < matrix.size()-5; k++) {
+                //check second layer
+                if ("a".equals(matrix.get(0+k).get(5+k)) && "a".equals(matrix.get(2+k).get(3+k)) && "a".equals(matrix.get(2+k).get(5+k))) {
+                    secondHalf = true;
+                }
+            }
+            
+            for (int i = 0; i < matrix.size()-7; i++) {
+                //check first layer
+                if ("a".equals(matrix.get(0+i).get(7+i)) && "a".equals(matrix.get(2+i).get(7+i)) && "a".equals(matrix.get(2+i).get(5+i))) {
+                        firstHalf = true;
+                    }
+            }
+        
+        }
+        //only return true if first and second layer is seen throughout the given foldinggraphs
+        if (firstHalf == true && secondHalf == true) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * Determines for a given chain_id from the vplg-Database if the protein chain contains a Jelly Roll Fold
+     * @param chain_db_id a value from the vplg-Database representing a pdb_id with its chain
+     * @return true if the corresponding pdb_id with its chain contains a Jelly Roll Fold
+     */
+    public static Boolean chainContainsMotif_JellyRoll(Long chain_db_id) {
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        Set<String> my_set = new HashSet<>();    
+        PreparedStatement statement = null;
+        ResultSet rs = null;             
+        
+        StringBuilder querySB = new StringBuilder();
+        
+        //SQL-statement to fetch the ADJ linnot of a given chain_id
+        querySB.append("SELECT ln.ptgl_linnot_adj ");
+	querySB.append("FROM plcc_fglinnot ln ");
+	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
+	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
+	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
+	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 2) ) ");
+       
+        String query = querySB.toString();
+//        System.out.println(query);
+        
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, chain_db_id);
+
+            rs = statement.executeQuery();
+            //dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+            //evaluate SQL-statement and store it in a list
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                my_set.add(rowData.get(0));
+                tableData.add(rowData);
+            }            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "chainContainsMotif_JellyRoll: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                //dbc.setAutoCommit(true);
+            } catch(SQLException e) {DP.getInstance().w("DBManager", "chainContainsMotif_JellyRoll: Could not close statement and reset autocommit.");}
+        }
+        //iterate over all present linnots and save them in a list
+        ArrayList<ArrayList<ArrayList<String>>> matrixList = new ArrayList<ArrayList<ArrayList<String>>>(); //contains the adjacency matrix of the different foldinggraphs of one proteingraph
+        if(tableData.size() >= 1) {
+            for (ArrayList<String> tD : tableData) {
+                if (tD.get(0).length() > 2) {
+                    matrixList.add(parseRedOrAdjToMatrix(tD.get(0))); //parse linnot to adjacency matrix
+                }
+                
+            }
+            //check if one of the foldinggraphs contains motif
+            if (matrixContainsJellyRoll(matrixList) == true) {
+                return true;
+            }
+        }
+             
+        
+        return false;
+    }
+    
+    
+    
+    /** OLD
      * Checks whether the chain contains a jelly roll motif. These checks consider the different linear notations of several graph types.
      * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
      * @param chain_db_id the chain database id
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
-     */
+     
     public static Boolean chainContainsMotif_JellyRoll(Long chain_db_id) {
         
         ResultSetMetaData md;
@@ -2560,14 +3048,121 @@ connection.close();
         }        
 
     }
+    */
+    
+    /**
+     * Determines whether at least one matrix in a list of matrices contains a Immunoglobulin Fold
+     * @param matrixList a list of matrices, representing a linear notation (RED or ADJ)
+     * @return true if at least one matrix in the list contains the pattern for a Immunoglobulin Fold
+     */
+    public static Boolean matrixContainsImmunoglobulinFold(ArrayList<ArrayList<ArrayList<String>>> matrixList) {
+        //iterate over all given folding graphs
+        for (ArrayList<ArrayList<String>> matrix : matrixList) {
+            for (int i = 0; i < matrix.size()-6; i++) {
+                if ("a".equals(matrix.get(i).get(i+1)) && "a".equals(matrix.get(i+1).get(i+4)) && "a".equals(matrix.get(i+2).get(i+5)) && 
+                    ( ("a".equals(matrix.get(i+2).get(i+3)) && "a".equals(matrix.get(i+3).get(i+4))) || (!"a".equals(matrix.get(i+2).get(i+3)) && "a".equals(matrix.get(i+3).get(i+4))) || ("a".equals(matrix.get(i+2).get(i+3)) && !"a".equals(matrix.get(i+3).get(i+4))) ) && "a".equals(matrix.get(i+5).get(i+6))) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
     
     
     /**
+     * Determines for a given chain_id from the vplg-Database if the protein chain contains a Immunoglobulin Fold
+     * @param chain_db_id a value from the vplg-Database representing a pdb_id with its chain
+     * @return true if the corresponding pdb_id with its chain contains a Immunoglobulin Fold
+     */
+    public static Boolean chainContainsMotif_ImmunoglobinFold(Long chain_db_id) {
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        Set<String> my_set = new HashSet<>();    
+        PreparedStatement statement = null;
+        ResultSet rs = null;             
+        
+        StringBuilder querySB = new StringBuilder();
+        
+         //SQL-statement to fetch the ADJ linnot of a given chain_id
+        querySB.append("SELECT ln.ptgl_linnot_adj ");
+	querySB.append("FROM plcc_fglinnot ln ");
+	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
+	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
+	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
+	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 2) ) ");
+ 
+        
+        String query = querySB.toString();
+//        System.out.println(query);
+        
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, chain_db_id);
+                  
+            rs = statement.executeQuery();
+            //dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+            //evaluate SQL-statement and store it in a list
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                my_set.add(rowData.get(0));
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "chainContainsMotif_ImmunoglobulinFold '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                //dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_ImmunoglobulinFold: Could not close statement and reset autocommit.");}
+        }
+        //iterate over all present linnots and save them in a list
+        ArrayList<ArrayList<ArrayList<String>>> matrixList = new ArrayList<ArrayList<ArrayList<String>>>(); //contains the adjacency matrix of the different foldinggraphs of one proteingraph
+        if(tableData.size() >= 1) {
+            for (ArrayList<String> tD : tableData) {
+                if (tD.get(0).length() > 2) {
+                    matrixList.add(parseRedOrAdjToMatrix(tD.get(0))); //parse linnot to adjacency matrix
+                }
+                
+            }
+            //check if one of the foldinggraphs contains motif
+            if (matrixContainsImmunoglobulinFold(matrixList) == true) {
+                return true;
+            }
+        }
+             
+        
+        return false;
+    }
+    
+    /** OLD
      * Checks whether the chain contains a immunoglobin fold motif. These checks consider the different linear notations of several graph types.
      * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
      * @param chain_db_id the chain database id
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
-     */
+     
     public static Boolean chainContainsMotif_ImmunoglobinFold(Long chain_db_id) {
         
         
@@ -2688,7 +3283,7 @@ connection.close();
         }        
 
     }
-    
+    */
     
     /**
      * Checks whether the chain contains a rossman fold motif. These checks consider the different linear notations of several graph types.
@@ -8044,11 +8639,152 @@ connection.close();
     }
     
     /**
+     * Determines whether at least one matrix in a list of matrices contains a Beta Propeller
+     * @param matrixList a list of matrices, representing a linear notation (RED or ADJ)
+     * @return true if at least one matrix in the list contains the pattern for a Beta Propeller
+     */
+    public static Boolean matrixContainsBetaPropeller(ArrayList<ArrayList<ArrayList<String>>> matrixList) {
+        //iterate over all given folding graphs
+        for (ArrayList<ArrayList<String>> matrix : matrixList) {
+            //check every possible location for the different blades of Beta-Propeller
+            for (int i = 0; i < matrix.size()-15; i++) {
+                for (int j = 0; j < matrix.size()-15-i; j++) {
+                    for (int k = 0; k < matrix.size()-15-i-j; k++) {
+                        for (int l = 0; l < matrix.size()-15-i-j-k; l++) {
+                            //Propeller with 4 blades
+                            if ("a".equals(matrix.get(i).get(i+1)) && "a".equals(matrix.get(i+1).get(i+2)) && "a".equals(matrix.get(i+2).get(i+3)) && !"a".equals(matrix.get(i+3).get(i+4)) &&
+                                "a".equals(matrix.get(i+4+j).get(i+5+j)) && "a".equals(matrix.get(i+5+j).get(i+6+j)) && "a".equals(matrix.get(i+6+j).get(i+7+j)) && !"a".equals(matrix.get(i+7+j).get(i+8+j)) &&
+                                "a".equals(matrix.get(i+8+j+k).get(i+9+j+k)) && "a".equals(matrix.get(i+9+j+k).get(i+10+j+k)) && "a".equals(matrix.get(i+10+j+k).get(i+11+j+k)) && !"a".equals(matrix.get(i+11+j).get(i+12+j)) &&
+                                "a".equals(matrix.get(i+12+j+k+l).get(i+13+j+k+l)) && "a".equals(matrix.get(i+13+j+k+l).get(i+14+j+k+l)) && "a".equals(matrix.get(i+14+j+k+l).get(i+15+j+k+l))) {
+                                return true;
+                            }
+                            
+                            // Propeller with only 3 blades. (For the case on beta-strand ist noch visible in PTGL)
+                            if ("a".equals(matrix.get(i).get(i+1)) && "a".equals(matrix.get(i+1).get(i+2)) && !"a".equals(matrix.get(i+2).get(i+3)) &&
+                                "a".equals(matrix.get(i+3+j).get(i+4+j)) && "a".equals(matrix.get(i+4+j).get(i+5+j)) && !"a".equals(matrix.get(i+5+j).get(i+6+j)) &&
+                                "a".equals(matrix.get(i+6+j+k).get(i+7+j+k)) && "a".equals(matrix.get(i+7+j+k).get(i+8+j+k)) && !"a".equals(matrix.get(i+8+j+k).get(i+9+j+k)) &&
+                                "a".equals(matrix.get(i+9+j+k+l).get(i+10+j+k+l)) && "a".equals(matrix.get(i+10+j+k+l).get(i+11+j+k+l))) {
+                                return true;
+                            }
+                            
+                        }
+                    }
+                }   
+            }   
+        }
+        
+       // if there proteingraph is divided in many foldinggraphs this part checkes if there are 4 blades throughout the givve foldinggraphs.
+        int couldBe4 = 0;
+        for (ArrayList<ArrayList<String>> matrix : matrixList) {
+            for (int i = 0; i < matrix.size()-3; i++) {
+                if ("a".equals(matrix.get(i).get(i+1)) && "a".equals(matrix.get(i+1).get(i+2)) && "a".equals(matrix.get(i+2).get(i+3))) {
+                    couldBe4++;
+                    break;
+                }
+            }
+        }
+        
+        if (couldBe4 >= 4) {
+            return true;
+        }
+  
+        return false;
+    }
+    
+    
+    /**
+     * Determines for a given chain_id from the vplg-Database if the protein chain contains a Beta Propeller
+     * @param chain_db_id a value from the vplg-Database representing a pdb_id with its chain
+     * @return true if the corresponding pdb_id with its chain contains a Beta Propeller
+     */
+    public static Boolean chainContainsMotif_BetaPropeller(Long chain_db_id) {
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        Set<String> my_set = new HashSet<>();    
+        PreparedStatement statement = null;
+        ResultSet rs = null;             
+        
+        StringBuilder querySB = new StringBuilder();
+        
+        //SQL-statement to fetch the ADJ linnot of a given chain_id
+        querySB.append("SELECT ln.ptgl_linnot_adj ");
+	querySB.append("FROM plcc_fglinnot ln ");
+	querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+	querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id ");
+	querySB.append("INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
+	querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
+	querySB.append("WHERE ( c.chain_id = ? AND (pg.graph_type = 2) ) ");
+ 
+        
+        String query = querySB.toString();
+//        System.out.println(query);
+        
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, chain_db_id);
+
+            rs = statement.executeQuery();
+            //dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+            //evaluate SQL-statement and store it in a list
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                my_set.add(rowData.get(0));
+                tableData.add(rowData);
+            }
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "chainContainsMotif_BetaPropeller: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                //dbc.setAutoCommit(true);
+            } catch(SQLException e) {DP.getInstance().w("DBManager", "chainContainsMotif_BetaPropeller: Could not close statement and reset autocommit.");}
+        }
+        //iterate over all present linnots and save them in a list
+        ArrayList<ArrayList<ArrayList<String>>> matrixList = new ArrayList<ArrayList<ArrayList<String>>>(); //contains the adjacency matrix of the different foldinggraphs of one proteingraph
+        if(tableData.size() >= 1) {
+            for (ArrayList<String> tD : tableData) {
+                if (tD.get(0).length() > 2) {
+                    matrixList.add(parseRedOrAdjToMatrix(tD.get(0))); //parse linnot to adjacency matrix
+                }
+                
+            }
+            //check if one of the foldinggraphs contains motif
+            if (matrixContainsBetaPropeller(matrixList) == true) {
+                return true;
+            }
+        }
+             
+        
+        return false;
+    }
+    
+    
+    /** OLD
      * Checks whether the chain contains a beta propeller motif. These checks consider the different linear notations of several graph types.
      * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
      * @param chain_db_id the chain database id
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
-     */
+     
     public static Boolean chainContainsMotif_BetaPropeller(Long chain_db_id) {
         
         
@@ -8188,14 +8924,178 @@ connection.close();
         return false;
 
     }
+    */
+    
+    /**
+     * Assisting function used by chainContainsMotif_GlobinFold() for the number of vertices in a linear notation (SEQ).
+     * @param linnot_seq_list a list containing an arbitrary number of Strings of a linear notation (SEQ)
+     * @return the greatest number over all linear notations (SEQ)
+     */
+    public static int getNumVerticesFromLinnotSeq(ArrayList<String> linnot_seq_list) {
+        int[] numVertices = new int[linnot_seq_list.size()];
+        int counter = 0;
+        for (String linnot_seq : linnot_seq_list) {
+            if (linnot_seq.length() <= 3) {
+                return 1;
+            }
+            String[] ln = linnot_seq.substring(3,linnot_seq.length()-1).split(",");
+            for (int i = 0; i < ln.length; i++) {
+                numVertices[counter] += Integer.parseInt(ln[i].substring(0,ln[i].length()-1)) + 1;
+            }
+            counter++;
+        }
+        
+        int maxi = 0;
+        for (int i : numVertices) {
+            if (i > maxi) {
+                maxi = i;
+            }
+        }
+        return maxi;
+    }
     
     
     /**
+     * Determines whether at least one matrix in a list of matrices contains a Globin Fold
+     * @param matrixList a list of matrices, representing a linear notation (RED or ADJ)
+     * @return true if at least one matrix in the list contains the pattern for a Globin Fold
+     */
+    public static Boolean matrixContainsGlobinFold(ArrayList<ArrayList<ArrayList<String>>> matrixList) {
+        //iterate over all given folding graphs
+        for (ArrayList<ArrayList<String>> matrix : matrixList) {
+            for (int i = 0; i < matrix.size()-7; i++) {
+                //Every sequential adjacent vertex have no edge or a mixed edge. Only the last to vertices share an antiparallel edge.
+                if (("m".equals(matrix.get(i).get(i+1)) || "x".equals(matrix.get(i).get(i+1))) && ("m".equals(matrix.get(i+1).get(i+2)) || "x".equals(matrix.get(i+1).get(i+2))) &&
+                    ("m".equals(matrix.get(i+2).get(i+3)) || "x".equals(matrix.get(i+2).get(i+3))) && ("m".equals(matrix.get(i+3).get(i+4)) || "x".equals(matrix.get(i+3).get(i+4))) &&
+                    ("m".equals(matrix.get(i+4).get(i+5)) || "x".equals(matrix.get(i+4).get(i+5))) && ("m".equals(matrix.get(i+5).get(i+6)) || "x".equals(matrix.get(i+5).get(i+6))) &&
+                    ("a".equals(matrix.get(i+6).get(i+7)) || "a".equals(matrix.get(i+5).get(i+7)))) {
+                    if (matrix.size() < 11) { //Only return if the Graph is small enough. Otherwise the chance of a lucky match is high.
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    
+    /**
+     * Determines for a given chain_id from the vplg-Database if the protein chain contains a Globin Fold
+     * @param chain_db_id a value from the vplg-Database representing a pdb_id with its chain
+     * @return true if the corresponding pdb_id with its chain contains a Globin Fold
+     */
+    public static Boolean chainContainsMotif_GlobinFold(Long chain_db_id) {
+        ResultSetMetaData md;
+        ArrayList<String> columnHeaders;
+        ArrayList<ArrayList<String>> tableData = new ArrayList<ArrayList<String>>();
+        ArrayList<String> rowData = null;
+        int count;
+        Set<String> my_set = new HashSet<>();    
+        PreparedStatement statement = null;
+        ResultSet rs = null;             
+        
+        StringBuilder querySB = new StringBuilder();
+        
+        //SQL-statement to fetch the ADJ and SEQ linnot of a given chain_id
+        querySB.append("Select tbl1.pdb, tbl1.chain, tbl1.linnot_adj, tbl2.linnot_seq From ");
+        querySB.append("(SELECT c.pdb_id as pdb, c.chain_name as chain, ln.ptgl_linnot_adj as linnot_adj, c.chain_id, fg.fg_number number  ");
+        querySB.append("FROM plcc_fglinnot ln ");
+        querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+        querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
+        querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
+        querySB.append("WHERE pg.graph_type = 1 AND c.chain_id = ? ");
+        querySB.append("Group by c.pdb_id, c.chain_name, ln.ptgl_linnot_adj, c.chain_id, ln.ptgl_linnot_adj, fg,fg_number) tbl1 ");
+        querySB.append("join ");
+        querySB.append("(Select c.chain_id, ln.ptgl_linnot_seq as linnot_seq, fg.fg_number number ");
+        querySB.append("From plcc_fglinnot ln ");
+        querySB.append("INNER JOIN plcc_foldinggraph fg ON ln.linnot_foldinggraph_id = fg.foldinggraph_id ");
+        querySB.append("INNER JOIN plcc_graph pg ON fg.parent_graph_id = pg.graph_id INNER JOIN plcc_chain c ON pg.chain_id = c.chain_id ");
+        querySB.append("INNER JOIN plcc_protein p ON p.pdb_id = c.pdb_id ");
+        querySB.append("WHERE (c.chain_id = ? AND pg.graph_type = 3 AND (ln.ptgl_linnot_seq SIMILAR TO '_h(,([[:digit:]])h)*_')) ");
+        querySB.append("Group by c.chain_id, ln.ptgl_linnot_seq, fg.fg_number) tbl2 ");
+        querySB.append("on tbl1.chain_id = tbl2.chain_id AND tbl1.number = tbl2.number ");
+        querySB.append("Group by tbl1.pdb, tbl1.chain, tbl1.linnot_adj, tbl2.linnot_seq;");
+ 
+        
+        String query = querySB.toString();
+//        System.out.println(query);
+        
+        try {
+            //dbc.setAutoCommit(false);
+            statement = dbc.prepareStatement(query);
+
+            statement.setLong(1, chain_db_id);
+            statement.setLong(2, chain_db_id);
+//            statement1.setInt(2, chain_db_id);
+//            statement1.setInt(3, chain_db_id);
+            
+                                
+            rs = statement.executeQuery();
+            //dbc.commit();
+            
+            md = rs.getMetaData();
+            count = md.getColumnCount();
+
+            columnHeaders = new ArrayList<String>();
+
+            for (int i = 1; i <= count; i++) {
+                columnHeaders.add(md.getColumnName(i));
+            }
+
+            //evaluate SQL-statement and store it in a list
+            while (rs.next()) {
+                rowData = new ArrayList<String>();
+                for (int i = 1; i <= count; i++) {
+                    rowData.add(rs.getString(i));
+                }
+                my_set.add(rowData.get(0));
+                tableData.add(rowData);
+            }
+            
+        } catch (SQLException e ) {
+            DP.getInstance().e("DBManager", "chainContainsMotif_GlobinFold: '" + e.getMessage() + "'.");
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                //dbc.setAutoCommit(true);
+            } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_GlobinFold: Could not close statement and reset autocommit.");}
+        }
+        
+        //iterate over all present linnots and save them in a list
+        ArrayList<String> linnotSeqList = new ArrayList<>();
+        ArrayList<ArrayList<ArrayList<String>>> matrixList = new ArrayList<ArrayList<ArrayList<String>>>(); //contains the adjacency matrix of the different foldinggraphs of one proteingraph
+        if(tableData.size() >= 1) {
+            for (ArrayList<String> tD : tableData) {
+                linnotSeqList.add(tD.get(3));
+                if (tD.get(2).length() > 2 && getNumVerticesFromLinnotSeq(linnotSeqList) >= 8) {
+                    matrixList.add(parseRedOrAdjToMatrix(tD.get(2))); //parse linnot to adjacency matrix
+                    
+                }
+                linnotSeqList = new ArrayList<>();
+                
+            }
+                //check if one of the foldinggraphs contains motif
+                if (matrixContainsGlobinFold(matrixList) == true) {
+                    return true;
+            }
+            
+        }
+             
+        
+        return false;
+    }
+    
+    
+    
+    
+    /** OLD
      * Checks whether the chain contains a globin fold motif, like PDB 1mba does. These checks consider the different linear notations of several graph types.
      * This function does not find the motif if the required linear notations and/or graphs are not yet available in the database, of course.
      * @param chain_db_id
      * @return true if the motif was found in the linear notations of the folding graphs of the chain, false otherwise
-     */
+     
     public static Boolean chainContainsMotif_GlobinFold(Long chain_db_id) {
         
         ResultSetMetaData md;
@@ -8295,7 +9195,7 @@ connection.close();
         
         return(false);                
     }
-    
+    */
     
     /**
      * Checks whether the chain contains a ferredoxin fold motif. These checks consider the different linear notations of several graph types.
