@@ -51,6 +51,8 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<div id="imprinttext">
 		Johann Wolfgang Goethe-University Frankfurt am Main <<a href="http://www.uni-frankfurt.de">www.uni-frankfurt.de</a>><br>
 		<br>
+                Privacy Policy <<a href="http://www.uni-frankfurt.de/70876599/Datenschutzerklaerung">http://www.uni-frankfurt.de/70876599/Datenschutzerklaerung</a>><br>
+		<br>
 		Faculty of Computer Science and Mathematics, Dept. 12 <br>
 		Institute for Computer Science <br>
 		Molecular Bioinformatics (MolBI) <<a href="http://www.bioinformatik.uni-frankfurt.de/">www.bioinformatik.uni-frankfurt.de</a>><br>
