@@ -2019,7 +2019,7 @@ public class Main {
         else {
             FileParser.initData(pdbFile, dsspFile);
         }
-              
+         
         if (Settings.getBoolean("plcc_B_debug_only_parse")) {
             System.out.println("Exiting now as requested by settings.");
             System.exit(0);
@@ -3295,7 +3295,14 @@ public class Main {
         
         Boolean silent = Settings.getBoolean("plcc_B_silent");
         
-        HashMap<String, String> md = FileParser.getPDBMetaData();
+        // meta Data in CIF files is created while parsing the file once
+        //     -> no need to call a function to create it, just get it!
+        HashMap<String, String> md;
+        if (Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
+            md = FileParser.getMetaData();
+        } else {
+            md = FileParser.getPDBMetaData();
+        }
         Double resolution = -1.0;
         try {
             resolution = Double.valueOf(md.get("resolution"));
@@ -12236,7 +12243,14 @@ public class Main {
             System.out.println("  Calculating CG SSEs for all chains of protein " + pdbid + "...");
         }
 
-        HashMap<String, String> md = FileParser.getPDBMetaData();
+        // meta Data in CIF files is created while parsing the file once
+        //     -> no need to call a function to create it, just get it!
+        HashMap<String, String> md;
+        if (Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
+            md = FileParser.getMetaData();
+        } else {
+            md = FileParser.getPDBMetaData();
+        }
         Double res = -1.0;
         try {
             res = Double.valueOf(md.get("resolution"));
@@ -12291,11 +12305,18 @@ public class Main {
             //    System.out.println("   *Handling chainName " + c.getPdbChainID() + ".");
             //}
 
-            ProtMetaInfo pmi = FileParser.getMetaInfo(pdbid, c.getPdbChainID());
-            //pmi.print();
-            md.put("pdb_mol_name", pmi.getMolName());
-            md.put("pdb_org_sci", pmi.getOrgScientific());
-            md.put("pdb_org_common", pmi.getOrgCommon());
+            // CIF parser currently does not parse ProtMetaInfo
+            //   -> just ignore it here, so it does not land in md and causes no trouble
+            if (! Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
+                ProtMetaInfo pmi = FileParser.getMetaInfo(pdbid, c.getPdbChainID());
+                //pmi.print();
+                md.put("pdb_mol_name", pmi.getMolName());
+                md.put("pdb_org_sci", pmi.getOrgScientific());
+                md.put("pdb_org_common", pmi.getOrgCommon());
+            } else {
+                DP.getInstance().w("CIF setting enabled: Parsing of protein meta info not " + 
+                        "implemented yet.");
+            }
 
             // determine SSEs for this chainName
             //System.out.println("    Creating all SSEs for chainName '" + c.getPdbChainID() + "' consisting of " + c.getResidues().size() + " residues.");

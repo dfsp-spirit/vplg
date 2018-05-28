@@ -665,7 +665,19 @@ public class FileParser {
     }
     
     /**
-     * Like parseData but for mmCIF files: goes through all lines of PDB and DSSP file and calls appropriate function to handle each line. 
+     * Fills important metaData fields that are not existing with empty Strings.
+     */
+    private static void fillMetadataEmptyStrings() {
+        List<String> mdFields = Arrays.asList("title", "keywords", "experiment", "resolution", "date", "header");
+        for (String field : mdFields) {
+            if (! metaData.containsKey(field)) {
+                metaData.put(field, "");
+            }
+        }
+    }
+    
+    /**
+     * Like parseData but for mmCIF files: goes through all lines of PDB and DSSP file and applies appropriate function to handle each line. 
      * @return ignore (?)
      */
     private static Boolean parseDataCIF() {
@@ -724,13 +736,6 @@ public class FileParser {
         
         // - - ligands - -
         // -> in difference to old parser ligands are created "on the fly" together with the other residues
-        //     -> is that ok or do we need the DsspResNum???
-        /*
-        if(! FileParser.silent) {
-            System.out.println("  Creating all Ligand Residues...");
-        }
-        createAllLigandResiduesFromPdbData();       // adds stuff to s_residues
-        */
         
         
         // - - - PDB - - - 
@@ -1164,7 +1169,7 @@ public class FileParser {
                                 if (isIgnoredAtom(chemSym)) {
                                     if( ! (Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
                                         System.out.println("DEBUG Ignored atom line " + numLine.toString() + 
-                                                "as it is either in ignored list or handle_hydrogens turned off.");
+                                                " as it is either in ignored list or handle_hydrogens turned off.");
                                         continue;
                                     }
                                 }
@@ -1426,6 +1431,9 @@ public class FileParser {
             }
         }
         
+        // add empty Strings to metadata to avoid SQL null errors
+        fillMetadataEmptyStrings();
+        
         // all lines have beenn read
         return(true);
     }
@@ -1640,7 +1648,7 @@ public class FileParser {
                 tmpRes.addAtom(a);
                 s_atoms.add(a);
             }
-        }                
+        }
 
         return(true);
     }
