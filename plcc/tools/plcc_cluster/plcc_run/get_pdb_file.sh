@@ -2,6 +2,7 @@
 ## get_pdb_file.sh -- get and extract a PDB file from the local PDB mirror directory
 ##
 ## Written by ts_2011
+## Updated by jnw, 2018: Changed use of cluster settings so that other file endings of pdb files are supported (like .cif)
 
 APPTAG="[GET_PDB]"
 CFG_FILE="../settings_statistics.cfg"
@@ -27,7 +28,7 @@ fi
 PDBID="$1"
 
 ## debug
-ERRORLOG="/tmp/get_pdb_${PDBID}.log"
+ERRORLOG="/home/niclas/software/plcc_cluster_cif/OpenPBS_NoMPI_version/get_pdb_${PDBID}.log"
 
 ## extract the subdir from the pdbid (it is defined by the 2nd and 3rd letter of the id, e.g., for the pdbid '3kmf', it is 'km')
 PDB_SUBDIR=${PDBID:1:2}
@@ -55,7 +56,7 @@ fi
 
 
 ## now that we have the file, extract it. This produces 'pdb3kmf.ent' from 'pdb3kmf.ent.gz'.
-PDBFILE_EXTRACTED="pdb${PDBID}.ent"
+PDBFILE_EXTRACTED="$PDBFILE_DL_PREFIX${PDBID}${REMOTE_PDB_FILE_EXTENSION:0:4}"
 
 ## delete ent file if it already exists
 if [ -f $PDBFILE_EXTRACTED ]; then
@@ -73,19 +74,22 @@ fi
 
 ## rename the file
 
-PDBFILE_FINAL="${PDBID}.pdb"
+PDBFILE_FINAL="${PDBID}${PDBFILE_DL_SUFFIX:0:4}"
 
 if [ ! -f $PDBFILE_EXTRACTED ]; then
     echo "$APPTAG ERROR: Expected extracted PDB file '${PDBFILE_EXTRACTED}' does not exist." >> $ERRORLOG
     exit 1
 fi
 
-mv $PDBFILE_EXTRACTED $PDBFILE_FINAL
-if [ $? -ne 0 ]; then
-    echo "$APPTAG ERROR: Could not rename file '${PDBFILE_EXTRACTED}' to '${PDBFILE_FINAL}'."
-    echo "$APPTAG ERROR: Could not rename file '${PDBFILE_EXTRACTED}' to '${PDBFILE_FINAL}'." >> $ERRORLOG
-    rm -f $PDBFILE_EXTRACTED
-    exit 1
+if [ ! $PDBFILE_EXTRACTED == $PDBFILE_FINAL]
+then
+    mv $PDBFILE_EXTRACTED $PDBFILE_FINAL
+    if [ $? -ne 0 ]; then
+        echo "$APPTAG ERROR: Could not rename file '${PDBFILE_EXTRACTED}' to '${PDBFILE_FINAL}'."
+        echo "$APPTAG ERROR: Could not rename file '${PDBFILE_EXTRACTED}' to '${PDBFILE_FINAL}'." >> $ERRORLOG
+        rm -f $PDBFILE_EXTRACTED
+        exit 1
+    fi
 fi
 
 if [ ! -f $PDBFILE_FINAL ]; then
