@@ -1223,8 +1223,12 @@ public class DrawTools {
             svgConverter.setDst(new File(outputFileBasePathWithExt));
             
             // reset output stream to suppress the annoying output of the Apache batik library. Gets reset after lib call.
+            // jnw: don't do it in case of cif files on cluster as StackOverflowException occurs
+            //     -> just live with output
             OutputStream tmp=System.out;
-            System.setOut(new PrintStream(new org.apache.commons.io.output.NullOutputStream()));
+            if (! Settings.getBoolean("plcc_B_use_mmCIF_parser") || ! Settings.getBoolean("plcc_B_clustermode")) {
+                System.setOut(new PrintStream(new org.apache.commons.io.output.NullOutputStream()));
+            }
         
             try {      
                 svgConverter.execute();
