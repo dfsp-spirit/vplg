@@ -2,7 +2,7 @@
 ## create_host_filelists.sh -- create the file lists for all nodes. You should have the hostnames (DNS names, e.g., "worker1.cluster.mydomain.com" or "worker1") in a file named 'settings_node_hostnames.cfg' (one name per line) before running this script.
 # written by ts
 # changed by jnw 2017: include a mode without timestamp file, include use of debug mode (see cluster settings)
-# 		 2018: include a mode with provided filelist 
+# 		 2018: include a mode with provided filelist, fix debug mode
 #
 # USAGE
 # parameter:
@@ -196,7 +196,7 @@ if [ $ASUME_FILELIST = "true" ]; then
         exit 1  
     fi
 else
-    if [ $DEBUG ]; then
+    if [ "$DEBUG" = true ]; then
         if [ -z $NUM_DEBUG ]; then
             echo "$APPTAG Error: Debug mode set true but no DEBUG_Num defined"
         else
