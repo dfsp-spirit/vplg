@@ -2,8 +2,16 @@
 
 source ./settings
 
+PGPASSWORD="vplg"
+
 echo "Number of pdb_ids:"
 psql $PSQL_OPTIONS -c 'SELECT count(pdb_id) from plcc_protein;'
+
+echo "Finished insertion:"
+psql $PSQL_OPTIONS -c "SELECT COUNT(*) FROM plcc_protein WHERE insert_completed = 't'"
+
+echo "Aborted insertion:"
+psql $PSQL_OPTIONS -c "SELECT COUNT(*) FROM plcc_protein WHERE insert_completed = 'f'"
 
 echo "Number of chains:"
 psql $PSQL_OPTIONS -c 'SELECT count(chain_id) from plcc_chain;'

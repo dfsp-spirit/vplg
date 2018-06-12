@@ -1,15 +1,19 @@
 #!/bin/sh
-#
-# /jnw 2018
-#
-# writes a list of PDB IDs wich are included in the database (similar to plcc --report-db-proteins option)
-#
-# note: looks for chains of a ID! So if the PDB entry is included but (for what reason) no chain it is counted as not included.
+
+# piped sed removes leading spaces if existing (http://linuxforen.de/forums/showthread.php?241010-shell-leerzeichen-entfernen)
 
 source ./settings
 
-echo "Creating list of inserted PDB IDs."
-# piped sed removes leading spaces if existing (http://linuxforen.de/forums/showthread.php?241010-shell-leerzeichen-entfernen)
-psql $PSQL_OPTIONS -c 'SELECT DISTINCT pdb_id FROM plcc_chain;' | sed 's/^ //' > ./results/list_pdbids.txt
+echo "Creating list of inserted PDB IDs (in plcc_protein)."
+psql $PSQL_OPTIONS -c 'SELECT pdb_id FROM plcc_protein;' | sed 's/^ //' > ./results/list_protein_pdbids.txt
 
-echo "List of PDB IDs written to /results/list_pdbids.txt"
+echo "Creating list of inserted PDB IDs (atleast 1 chain present)."
+psql $PSQL_OPTIONS -c 'SELECT DISTINCT pdb_id FROM plcc_chain;' | sed 's/^ //' > ./results/list_chain_pdbids.txt
+
+echo "Creating list of successfully inserted PDB IDs (insert_completed = t)."
+psql $PSQL_OPTIONS -c "SELECT pdb_id FROM plcc_protein WHERE insert_completed = 't';" | sed 's/^ //' > ./results/list_successful_pdbids.txt
+
+echo "Creating list of aborted PDB IDs (insert_completed = f)."
+psql $PSQL_OPTIONS -c "SELECT pdb_id FROM plcc_protein WHERE insert_completed = 'f';" | sed 's/^ //' > ./results/list_aborted_pdbids.txt
+
+
