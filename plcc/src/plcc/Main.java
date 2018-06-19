@@ -1487,6 +1487,11 @@ public class Main {
                         argsUsed[i] = true;
                     }
                     
+                    if(s.equals("-I") || s.equals("--mmCIF-parser")) {
+                        Settings.set("plcc_B_use_mmCIF_parser", "true");
+                        argsUsed[i] = true;
+                    }
+                    
                     
 
 
@@ -1500,7 +1505,7 @@ public class Main {
             System.exit(1);
         }
         
-        
+
         
         Boolean silent = false;
         if(Settings.getBoolean("plcc_B_silent")) {
@@ -1517,6 +1522,16 @@ public class Main {
             System.out.print(outputToBePrintedUnlessSilent.toString());
             if(Settings.getBoolean("plcc_B_no_warn")) {
                 System.out.println("  No-warn active, no warnings will be printed.");
+            }
+        }
+        
+        if(Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
+            if (pdbFile.endsWith(".pdb")) {
+                pdbFile = pdbFile.replace(".pdb", ".cif");
+            }
+            if (! silent) {
+                    System.out.println("Using mmCIF parser and therefore looking for .cif file.");
+                    System.out.println("Filename now is: " + pdbFile);
             }
         }
 
@@ -1998,8 +2013,18 @@ public class Main {
             FileParser.essentialOutputOnly = false;
         }
         
-        FileParser.initData(pdbFile, dsspFile);
-
+        if (Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
+            FileParser.initDataCIF(pdbFile, dsspFile);
+        }
+        else {
+            FileParser.initData(pdbFile, dsspFile);
+        }
+         
+        if (Settings.getBoolean("plcc_B_debug_only_parse")) {
+            System.out.println("Exiting now as requested by settings.");
+            System.exit(0);
+        }
+        
         allModelsIDsOfWholePDBFile = FileParser.getAllModelIDsFromWholePdbFile();
 
         if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
@@ -2041,7 +2066,15 @@ public class Main {
         // check whether we need to abort processing because of bad resolution or too few residues
         Float badResolution = Settings.getFloat("plcc_F_abort_if_pdb_resolution_worse_than");
         if(badResolution >= 0.0) {
-            HashMap<String, String> md = FileParser.getPDBMetaData();
+            HashMap<String, String> md;
+            if (! Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
+                md = FileParser.getPDBMetaData();
+            } else {
+                // CIF parser only goes once through file and has meta data already created if available
+                md = FileParser.getMetaData();
+            }
+
+            
             Double resolution = -1.0;
             try {
                 resolution = Double.valueOf(md.get("resolution"));
@@ -3262,7 +3295,14 @@ public class Main {
         
         Boolean silent = Settings.getBoolean("plcc_B_silent");
         
-        HashMap<String, String> md = FileParser.getPDBMetaData();
+        // meta Data in CIF files is created while parsing the file once
+        //     -> no need to call a function to create it, just get it!
+        HashMap<String, String> md;
+        if (Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
+            md = FileParser.getMetaData();
+        } else {
+            md = FileParser.getPDBMetaData();
+        }
         Double resolution = -1.0;
         try {
             resolution = Double.valueOf(md.get("resolution"));
@@ -3313,7 +3353,15 @@ public class Main {
         List<SSE> allChainSSEs = new ArrayList<>();
         String fs = System.getProperty("file.separator");
                
-        HashMap<String, String> md = FileParser.getPDBMetaData();
+        // meta Data in CIF files is created while parsing the file once
+        //     -> no need to call a function to create it, just get it!
+        HashMap<String, String> md;
+        if (Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
+            md = FileParser.getMetaData();
+        } else {
+            md = FileParser.getPDBMetaData();
+        }
+        
 
         // check which chains belong to the same macro molecule
         Map<String, List<String>> macroMoleculesOfPDBfileToChains = new HashMap<>();    // key of the map is the MOL_ID
@@ -3329,7 +3377,15 @@ public class Main {
                 System.out.println("  +++++ Handling chain '" + chain + "'. +++++");
             }
 
-            ProtMetaInfo pmi = FileParser.getMetaInfo(pdbid, chain);
+            // CIF parser for now does not parse Prot meta info
+            //     -> just use default values
+            ProtMetaInfo pmi;
+            if (Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
+                pmi = new ProtMetaInfo(pdbid, chain);
+            } else {
+                pmi = FileParser.getMetaInfo(pdbid, chain);
+            }
+            
             //pmi.print();
             
             
@@ -10447,6 +10503,7 @@ public class Main {
         System.out.println("-i | --aa-graphs           : compute and output amino acid-based graphs as well. In these graphs, each vertes is an amino acid instead of a SSE. Computes per-chain and per-PDB file AAGs.");        
         System.out.println("     --aa-graphs-pdb       : computes amino acid graphs (see above), but only the graphs for the whole PDB file (all chains combined into one graph).");        
         System.out.println("     --aa-graphs-chain     : computes amino acid graphs (see above), but only the graphs which model a single chain each (n graphs for a PDB file with n chains).");                
+        System.out.println("-I | --mmCIF-parser        : uses mmCIF parser for provided file (looks for .cif file)");
         System.out.println("-j | --ddb <p> <c> <gt> <f>: get the graph type <gt> of chain <c> of pdbid <p> from the DB and draw it to file <f> (omit the file extension)*");        
         System.out.println("-k | --output-subdir-tree  : write all output files to a PDB-style sudbir tree of the output dir (e.g., <OUTDIR>/ic/8icd/<outfile>). ");                
         System.out.println("-l | --draw-plcc-graph <f> : read graph in plcc format from file <f> and draw it to <f>.png, then exit (<pdbid> will be ignored)*");                
@@ -12186,7 +12243,14 @@ public class Main {
             System.out.println("  Calculating CG SSEs for all chains of protein " + pdbid + "...");
         }
 
-        HashMap<String, String> md = FileParser.getPDBMetaData();
+        // meta Data in CIF files is created while parsing the file once
+        //     -> no need to call a function to create it, just get it!
+        HashMap<String, String> md;
+        if (Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
+            md = FileParser.getMetaData();
+        } else {
+            md = FileParser.getPDBMetaData();
+        }
         Double res = -1.0;
         try {
             res = Double.valueOf(md.get("resolution"));
@@ -12241,11 +12305,18 @@ public class Main {
             //    System.out.println("   *Handling chainName " + c.getPdbChainID() + ".");
             //}
 
-            ProtMetaInfo pmi = FileParser.getMetaInfo(pdbid, c.getPdbChainID());
-            //pmi.print();
-            md.put("pdb_mol_name", pmi.getMolName());
-            md.put("pdb_org_sci", pmi.getOrgScientific());
-            md.put("pdb_org_common", pmi.getOrgCommon());
+            // CIF parser currently does not parse ProtMetaInfo
+            //   -> just ignore it here, so it does not land in md and causes no trouble
+            if (! Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
+                ProtMetaInfo pmi = FileParser.getMetaInfo(pdbid, c.getPdbChainID());
+                //pmi.print();
+                md.put("pdb_mol_name", pmi.getMolName());
+                md.put("pdb_org_sci", pmi.getOrgScientific());
+                md.put("pdb_org_common", pmi.getOrgCommon());
+            } else {
+                DP.getInstance().w("CIF setting enabled: Parsing of protein meta info not " + 
+                        "implemented yet.");
+            }
 
             // determine SSEs for this chainName
             //System.out.println("    Creating all SSEs for chainName '" + c.getPdbChainID() + "' consisting of " + c.getResidues().size() + " residues.");

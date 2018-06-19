@@ -70,14 +70,14 @@ else
 	echo "$APPTAG NOT deleting files in logs directory (as configured in script settings)."
 fi
 
-if [ "EMPTY_STATUS_DIR" = "YES" ]; then
+if [ "$EMPTY_STATUS_DIR" = "YES" ]; then
 	echo "$APPTAG Deleting all files in status directory."
 	rm -f ./status/*
 else
 	echo "$APPTAG NOT deleting files in status directory (as configured in script settings)."
 fi
 
-if [ "DELETE_PBS_JOBFILES" = "YES" ]; then
+if [ "$DELETE_PBS_JOBFILES" = "YES" ]; then
 	echo "$APPTAG Deleting all OpenPBS files."
 	rm -f ./OpenPBS_NoMPI_version/vplgsinglejob*
 else

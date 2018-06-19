@@ -27,8 +27,14 @@ public class Model implements java.io.Serializable {
     private ArrayList<Chain> chains = null;
 
     // constructor
-    public Model() { modelID = "1"; }
-    public Model(String mID) { modelID = mID; }
+    public Model() { 
+        modelID = "1"; 
+        this.chains = new ArrayList<>();
+    }
+    public Model(String mID) { 
+        modelID = mID;
+        this.chains = new ArrayList<>();
+    }
 
     // getters
     public String getModelID() { return(modelID); }

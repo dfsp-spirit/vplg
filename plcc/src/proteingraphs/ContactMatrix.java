@@ -377,11 +377,11 @@ public class ContactMatrix {
     public Integer getSSEPosOfDsspResidue(Integer dsspResNum) {
         Integer pos = -1;
 
-        for(Integer i = 0; i < this.sseList.size(); i++) {
+        for(Integer i = 0; i < this.sseList.size(); i++) {            
             if( (this.sseList.get(i).getStartResidue().getDsspResNum() <= dsspResNum) && (this.sseList.get(i).getEndResidue().getDsspResNum() >= dsspResNum)  ) {
                 //System.out.println("   +DSSP Residue " + dsspResNum + " is part of SSE #" + i + ": " + this.sseList.get(i).shortStringRep() + ".");
                 return(i);
-            }
+                }            
         }
 
         //System.out.println("   -DSSP Residue " + dsspResNum + " is NOT part of any SSE in list, returning " + pos + ".");

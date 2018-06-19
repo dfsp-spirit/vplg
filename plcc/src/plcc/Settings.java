@@ -244,6 +244,7 @@ public class Settings {
         defSet("plcc_B_no_warn", "false", "Whether to suppress all warnings. The default is to print them.");
         defSet("plcc_B_no_parse_warn", "true", "Whether to suppress all warnings related to parsing of atoms from and other data from the PDB and DSSP input files.");
         defSet("plcc_B_no_not_impl_warn", "true", "Whether to suppress all warnings related to not implemented function.");
+        defSet("plcc_B_no_chain_break_info", "false", "Whether to suppress chain break info while parsing DSSP file (handy for some DSSP files for CIF data).");
         defSet("plcc_B_silent", "false", "Whether to suppress all output. Cluster mode, not recommended for normal usage.");
         defSet("plcc_B_only_essential_output", "true", "Whether to print only high-level status information.");
         defSet("plcc_B_print_silent_notice", "true", "Whether to print a single line informing the user that silent mode is set in silent mode (includes PDB ID of current file).");
@@ -251,6 +252,7 @@ public class Settings {
         defSet("plcc_B_debug_compareSSEContacts", "false", "Whether to compare the computed SSE level contacts to those in the geom_neo output file that is supplied.");
         defSet("plcc_S_debug_compareSSEContactsFile", "geo.dat_ptgl", "The path to the geo.dat file to use for SSE level contact comparison.");                
         defSet("plcc_B_contact_debug_dysfunct", "false", "Atom level contact debugging mode. WARNING: When this is true, plcc will abort after the first few residues and produce wrong overall results!");
+        defSet("plcc_B_debug_only_parse", "false", "Exit after parsing. WARNING: When this is true, plcc will abort after parsing and not produce results!");
         
         defSet("plcc_B_set_pdb_representative_chains_post", "false", "Whether this plcc run should assign the representative PDB chains from the XML file in the info table of the database and then exit. Requires path to XML file.");
         defSet("plcc_B_set_pdb_representative_chains_remove_old_labels_post", "true", "Whether the old labels should be removed from all chains in the chains table before the new ones are applied. Removed means all chains are considered NOT part of the representative set.");        
@@ -439,7 +441,8 @@ public class Settings {
         defSet("plcc_I_lig_min_atoms", "1", "The minimum number of atoms a ligand has to consist of to count as an SSE.");
         defSet("plcc_I_lig_max_atoms", "-1", "The maximum number of atoms a ligand has to consist of to count as an SSE. Set to <0 for unlimited.");
         defSet("plcc_B_convert_models_to_chains", "false", "Wether the PDB file should be checked to have multiple models and if so to convert those models to chains");
-
+        defSet("plcc_B_use_mmCIF_parser", "false", "Wether the mmCIF parser should be used on the provided file.");
+        
         
         // similarity stuff
         defSet("plcc_B_search_similar", "false", "Whether to activate the program mode which searches for the most similar protein");

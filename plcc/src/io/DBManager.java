@@ -4332,8 +4332,10 @@ connection.close();
             all_albeNumberOfHelix.add(tmp_albeNumberOfHelix);
         }
         
-        DP.getInstance().d("DBManager", "chainContainsMotif_TIMBarrel: START. list of PDB ids: " + IO.stringListToString(all_pdb_ids));
-        
+        if(Settings.getInteger("plcc_I_debug_level") > 0) {
+            DP.getInstance().d("DBManager", "chainContainsMotif_TIMBarrel: START. list of PDB ids: " + IO.stringListToString(all_pdb_ids));
+        }
+            
         // Check whether the determined helix positions lie within the min and max positions determined earlier.
         //            If so, this chain contains the motif. Otherwise, not.
         for (int i = 0; i < all_pdb_ids.size(); i++) {
@@ -7429,7 +7431,11 @@ connection.close();
                 }
             }
         }
-        DP.getInstance().d("DBManager", "chainContainsMotif_TIMBarrel: END. list of PDB ids: " + IO.stringListToString(all_pdb_ids));
+        
+        if(Settings.getInteger("plcc_I_debug_level") > 0) {
+            DP.getInstance().d("DBManager", "chainContainsMotif_TIMBarrel: END. list of PDB ids: " + IO.stringListToString(all_pdb_ids));
+        }
+        
         return false;
     }
     
@@ -8631,8 +8637,9 @@ connection.close();
             }
         }
         
-        DP.getInstance().d("DBManager", "chainContainsMotif_UbiquitinRoll: list of PDB ids: " + IO.stringListToString(all_pdb_ids));
-        
+        if(Settings.getInteger("plcc_I_debug_level") > 0) {
+            DP.getInstance().d("DBManager", "chainContainsMotif_UbiquitinRoll: list of PDB ids: " + IO.stringListToString(all_pdb_ids));
+        }
         
         
         return false;

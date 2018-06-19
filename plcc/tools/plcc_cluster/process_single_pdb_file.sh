@@ -6,6 +6,7 @@
 ## Updated by ts, 2014
 ## Updated by ts, 11-2015
 ## Updated by jnw, 2017: (re?)add writing of "DBINSERT_LOG_SUCCESS" [NOTE: seems to not work properly so far]
+## Updated by jnw, 2018: change use of cluster settings so that other file endings for pdb files are supported (like .cif)
 
 APPTAG="[PROC_1PDB]"
 CFG_FILE="settings_statistics.cfg"
@@ -207,8 +208,9 @@ FLN="$1"
 FILE=$(basename $FLN)
 
 ## now get the PDB ID from the file name (it starts at index 3 and is 4 characters long)
-PDBID=${FILE:3:4}
-#echo "$APPTAG The PDB ID of the file is '$PDBID'."
+# jnw: changed to starting point to work with different prefixes (like for using cif files)
+PDBID=${FILE:${#PDBFILE_DL_PREFIX}:4}
+echo "$APPTAG The PDB ID of the file is '$PDBID'."
 
 if [ ! -r "$FLN" ]; then
     echo "$APPTAG $PDBID ##### ERROR: Could not open PDB file at '$FLN'."
@@ -320,7 +322,7 @@ if [ -r $FLN ]; then
 	fi
 
 	## double-check it
-	PDBFILE="$PDBID.pdb"
+	PDBFILE="$PDBID${PDBFILE_DL_SUFFIX:0:4}"
 	if [ ! -f "$PDBFILE" ]; then
 	    echo "$APPTAG $PDBID ##### ERROR: PDB file '$PDBFILE' not found even though creation looked good."
 	fi
@@ -362,9 +364,10 @@ if [ -r $FLN ]; then
 	fi
 	#echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'." >>$ERROR_LOG
 	echo "$APPTAG $PDBID PLCC command is '$PLCC_COMMAND'." >>$DBINSERT_LOG
-	
+	 
 	$PLCC_COMMAND 1>>$DBINSERT_LOG 2>>$ERROR_LOG_PLCC
-	#$PLCC_COMMAND
+        # DEBUG	
+        #$PLCC_COMMAND &> /home/niclas/software/plcc_cluster_cif/plcc_run/plcc$PDBID.log
 
 	if [ $? -ne 0 ]; then
 	    echo "$APPTAG $PDBID ##### ERROR: Running plcc failed for PDB ID '$PDBID', skipping protein '$PDBID'."
