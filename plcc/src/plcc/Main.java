@@ -166,11 +166,7 @@ public class Main {
     
     /** Whether the PDB file name given on the command line is used. This is not the case for command lines which only operate on the database or which need no input file (e.g., --recreate-tables). */
     static Boolean useFileFromCommandline = true;
-
     
-    /** The threshold for interchain contacts in complex graphs. Chains with less contacts then the threshold won't be considered as interchain contacts.  */
-    public static Integer chainComplexGraphContactThreshold = 1; // set to 1 to act like deactivated..
-
 
     public static void checkArgsUsage(String[] args, Boolean[] argsUsed) {
         for(int i = 0; i < argsUsed.length; i++) {
@@ -1492,8 +1488,18 @@ public class Main {
                         argsUsed[i] = true;
                     }
                     
+                    if(s.equals("--cg-threshold")) {
+                        if(args.length <= i+1 ) {
+                            syntaxError();
+                        }
+                        else {
+                            argsUsed[i] = true;
+                            argsUsed[i+1] = true;
+                            Settings.set("plcc_I_cg_contact_threshold", args[i+1]);
+                        }
+                    }
                     
-
+                    
 
                 } //end for loop
                 checkArgsUsage(args, argsUsed); // warn if there were extra command line args we do not know
@@ -10541,6 +10547,7 @@ public class Main {
         System.out.println("   --draw-aag              : visualize amino acid graphs, test only");
         System.out.println("   --force                 : process a PDB file even if the resolution is too bad or the number of residues is too low according to settings.");
         System.out.println("   --cluster               : Set all options for cluster mode. Equals '-f -u -k -s -G -i -Z -P'.");
+        System.out.println("   --cg-threshold <Int>    : Overwrites setting for contact thresholds for edges in complex graphs.");
         System.out.println("");
         System.out.println("The following options only make sense for database maintenance:");
         System.out.println("--set-pdb-representative-chains-pre <file> <k> : Set non-redundant chain status for all chains in DB from XML file <file>. <k> determines what to do with existing flags, valid options are 'keep' or 'remove'. Get the file from PDB REST API. Run this pre-update, BEFORE new data will be added.");
@@ -12437,6 +12444,16 @@ public class Main {
         ArrayList<String> conInfo = new ArrayList<String>();
         conInfo.add("ChainA;ChainB;ResNameA;ResNameB;resTypeA;resTypeB;BB;BC;BL;CB;CL;CC;HB1;HB2;LB;LC;LL;"
                   + "BBDist;BCDist;BLDist;CBDist;CLDist;CCDist;HB1Dist;HB2Dist;LBDist;LCDist;LLDist");
+        
+        // inform here if edge threshold is >1 (below it would result in multiple prints)
+        if (Settings.getInteger("plcc_I_cg_contact_threshold") > 1) {    
+            if (! silent) {
+                System.out.println("  Complex graph contact threshold for edges is set to "
+                        + Settings.getInteger("plcc_I_cg_contact_threshold").toString()
+                        + ". Resulting graphs may differ from default setting '1' where all "
+                        + "edges are drawn.");
+            }
+        }
         
         // create edges for all contacts
         for(Integer i = 0; i < resContacts.size(); i++) {

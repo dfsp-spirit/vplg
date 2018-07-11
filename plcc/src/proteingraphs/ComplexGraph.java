@@ -121,7 +121,7 @@ public class ComplexGraph extends UAdjListGraph {
 
     public Boolean chainsHaveEnoughContacts(Integer A, Integer B) {
         if (this.numChainInteractions[A][B] != null) {
-            if (this.numChainInteractions[A][B] >= Main.chainComplexGraphContactThreshold) {
+            if (this.numChainInteractions[A][B] >= Settings.getInteger("plcc_I_cg_contact_threshold")) {
                 return true;
             } else {
                 return false;
@@ -310,7 +310,7 @@ public class ComplexGraph extends UAdjListGraph {
     // ------------------------- Draw header -------------------------
         // check width of header string
         String proteinHeader = "The chain complex graph of PDB entry " + cg.pdbid + " [V=" + cg.getVertices().size() + ", E=" + cg.getEdges().size() + "].";
-        String addInfo = "(Interchain contact threshold is set to " + Main.chainComplexGraphContactThreshold + ". Neglected edges: " + cg.neglectedEdges + ")";
+        String addInfo = "(Interchain contact threshold is set to " + Settings.getInteger("plcc_I_cg_contact_threshold") + ". Neglected edges: " + cg.neglectedEdges + ")";
         //Integer stringWidth = fontMetrics.stringWidth(proteinHeader);       // Should be around 300px for the text above
         Integer stringHeight = fontMetrics.getAscent();
         String chainName;    // the SSE number in the primary structure, N to C terminus

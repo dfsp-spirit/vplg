@@ -399,10 +399,11 @@ public class Settings {
         defSet("plcc_B_compute_motifs", "true", "Whether to search for motifs in the FG linear notations (after computing and writing them to the DB).");
         
         
-        // complex graphs: same, mere
+        // complex graphs: same, mere, edge contact threshold
         defSet("plcc_B_complex_graphs", "false" , "Whether or not complex graphs are drawn.");
         defSet("plcc_B_complex_graph_same", "false", "Determines whether the complex graph is drawn with all nodes of the same type" );
         defSet("plcc_B_complex_graph_mere", "false", "Determines whether the complex graph is drawn with nodes of different type for each mere" );
+        defSet("plcc_I_cg_contact_threshold", "1", "The lowest amount of interchain residue contacts where an edge in complex graphs is drawn." );
 
         // amino acid (AA) graphs
         defSet("plcc_B_AAgraph_allchainscombined", "false", "Whether to compute and output cobined amino acid graphs (one for all chains) as well (vertices are AAs, not SSEs).");
