@@ -10562,7 +10562,8 @@ public class Main {
         System.out.println("          java -jar plcc.jar 8icd -o /tmp");
         System.out.println("          java -jar plcc.jar 1o1d -E");
         System.out.println("          java -jar plcc.jar none -l prot_graph_3kmf_A.plg");
-        System.out.println("          java -jar plcc.jar none -m PNG -ddb 8icd A albelig ~/img/protein_graph");        
+        System.out.println("          java -jar plcc.jar none -m PNG -ddb 8icd A albelig ~/img/protein_graph");
+        System.out.println("          java -jar plcc.jar 6cbe -I --cg-threshold 2");
         System.out.println("");
         System.out.println("REQUIRED INPUT FILES: This program requires the PDB file and the DSSP file of a protein.");
         System.out.println("                      This does not apply to options that don't use it (marked with * above), of course.");
@@ -12303,6 +12304,12 @@ public class Main {
             System.err.println("ERROR: calculateComplexGraph(): Graph type '" + graphType + "' invalid. Skipping.");
             return;
         }
+        
+        // print warning here so that it only appears once (not once per chain)
+        if (Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
+            DP.getInstance().w("CIF setting enabled: Parsing of protein meta info not fully " + 
+                        "implemented yet.");
+        }
 
         // Get SSEs for all chains
         for(Integer i = 0; i < allChains.size(); i++) {
@@ -12312,7 +12319,7 @@ public class Main {
             //    System.out.println("   *Handling chainName " + c.getPdbChainID() + ".");
             //}
 
-            // CIF parser currently does not parse ProtMetaInfo
+            // CIF parser currently does not parse ProtMetaInfo in all means
             //   -> just ignore it here, so it does not land in md and causes no trouble
             if (! Settings.getBoolean("plcc_B_use_mmCIF_parser")) {
                 ProtMetaInfo pmi = FileParser.getMetaInfo(pdbid, c.getPdbChainID());
@@ -12320,9 +12327,6 @@ public class Main {
                 md.put("pdb_mol_name", pmi.getMolName());
                 md.put("pdb_org_sci", pmi.getOrgScientific());
                 md.put("pdb_org_common", pmi.getOrgCommon());
-            } else {
-                DP.getInstance().w("CIF setting enabled: Parsing of protein meta info not " + 
-                        "implemented yet.");
             }
 
             // determine SSEs for this chainName
