@@ -1170,7 +1170,7 @@ public class DrawTools {
         OutputStream tmp=System.out;
         System.setOut(new PrintStream(new org.apache.commons.io.output.NullOutputStream()));
         drawRes.g2d.stream(new FileWriter(svgFilePath), false);     
-        System.setOut(new PrintStream(tmp));
+        System.setOut((PrintStream) tmp);
     }
     
 
@@ -1223,22 +1223,20 @@ public class DrawTools {
             svgConverter.setDst(new File(outputFileBasePathWithExt));
             
             // reset output stream to suppress the annoying output of the Apache batik library. Gets reset after lib call.
-            // jnw: don't do it in case of cif files on cluster as StackOverflowException occurs
-            //     -> just live with output
+            // jnw: fix bug where output streams were nested and caused StackOverflowErrors for large inputs!
+            //  -> see: https://stackoverflow.com/questions/52931276/java-stackoverflowerror-at-java-io-printstream-writeprintstream-java480-and-n
             OutputStream tmp=System.out;
-            if (! Settings.getBoolean("plcc_B_use_mmCIF_parser") || ! Settings.getBoolean("plcc_B_clustermode")) {
-                System.setOut(new PrintStream(new org.apache.commons.io.output.NullOutputStream()));
-            }
-        
+            System.setOut(new PrintStream(new org.apache.commons.io.output.NullOutputStream()));
+  
             try {      
                 svgConverter.execute();
                 outfilesByFormat.put(format, outputFileBasePathNoExt + formatFileExt);
-                System.setOut(new PrintStream(tmp));
+                System.setOut((PrintStream) tmp);
             } catch (SVGConverterException ex) {
-                System.setOut(new PrintStream(tmp));
+                System.setOut((PrintStream) tmp);
                 DP.getInstance().e("Could not convert SVG file to format '" + format + "': '" + ex.getMessage() + "'. Skipping.");
             } finally {
-                System.setOut(new PrintStream(tmp));
+                System.setOut((PrintStream) tmp);
             }
             
         }
