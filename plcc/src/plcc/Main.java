@@ -4854,10 +4854,10 @@ public class Main {
             System.out.println("DEBUG: Warning: Limiting residue contact computation to the first " + rs + " residues.");            
         }        
 
-        Integer numResContactsChecked, numResContactsPossible, numResContactsImpossible, numCmpSkipped;
+        long numResContactsChecked, numResContactsPossible, numResContactsImpossible, numCmpSkipped;
         numResContactsChecked = numResContactsPossible = numResContactsImpossible = numCmpSkipped = 0;
 
-        Integer numResToSkip, spaceBetweenResidues;
+        long numResToSkip, spaceBetweenResidues;
         ResContactInfo rci;
         ArrayList<ResContactInfo> contactInfo = new ArrayList<ResContactInfo>();
 
@@ -4871,14 +4871,14 @@ public class Main {
         Integer globalMaxCenterSphereDiameter = globalMaxCollisionRadius * 2;
         Integer numIgnoredLigandContacts = 0;
 
-        for(Integer i = 0; i < rs; i++) {
+        for(int i = 0; i < rs; i++) {
 
             a = res.get(i);
-            numResToSkip = 0;
+            numResToSkip = 0L;
 
             
             
-            for(Integer j = i + 1; j < rs; j++) {
+            for(int j = i + 1; j < rs; j++) {
 
                 b = res.get(j);
                 
