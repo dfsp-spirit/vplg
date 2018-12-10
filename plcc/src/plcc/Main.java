@@ -1499,6 +1499,11 @@ public class Main {
                         }
                     }
                     
+                    if(s.equals("--chain-spheres-speedup")) {
+                        argsUsed[i] = true;
+                        Settings.set("plcc_B_chain_spheres_speedup", "true");
+                    }
+                    
                     
 
                 } //end for loop
@@ -10548,6 +10553,7 @@ public class Main {
         System.out.println("   --force                 : process a PDB file even if the resolution is too bad or the number of residues is too low according to settings.");
         System.out.println("   --cluster               : Set all options for cluster mode. Equals '-f -u -k -s -G -i -Z -P'.");
         System.out.println("   --cg-threshold <Int>    : Overwrites setting for contact thresholds for edges in complex graphs.");
+        System.out.println("   --chain-spheres-speedup : speedup for contact computation based on comparison of chain spheres");
         System.out.println("");
         System.out.println("The following options only make sense for database maintenance:");
         System.out.println("--set-pdb-representative-chains-pre <file> <k> : Set non-redundant chain status for all chains in DB from XML file <file>. <k> determines what to do with existing flags, valid options are 'keep' or 'remove'. Get the file from PDB REST API. Run this pre-update, BEFORE new data will be added.");
