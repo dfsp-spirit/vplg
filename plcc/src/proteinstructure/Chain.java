@@ -21,14 +21,16 @@ import io.IO;
 public class Chain implements java.io.Serializable {
 
     // declare class vars
-    private String pdbChainID = null;           // chain ID from PDB file
-    private String dsspChainID = null;          // chain ID from DSSP file
-    private ArrayList<Residue> residues = null;          // a list of all Residues of the Chain
-    private String macromolID = null;             // the macromolecule ID of the chain in the PDB file, defines chains forming a single macromolecule
-    private String macromolName = null;         // the macromol name from the PDB file
+    private String pdbChainID = null;                // chain ID from PDB file
+    private String dsspChainID = null;               // chain ID from DSSP file
+    private ArrayList<Residue> residues = null;      // a list of all Residues of the Chain
+    private String macromolID = null;                // the macromolecule ID of the chain in the PDB file, defines chains forming a single macromolecule
+    private String macromolName = null;              // the macromol name from the PDB file
     private String modelID = null;
-    private Model model = null;                 // the Model of this Chain
-    private ArrayList<String> homologues = null; // a list of homologue chains (defined by PDB COMPND)
+    private Model model = null;                      // the Model of this Chain
+    private ArrayList<String> homologues = null;     // a list of homologue chains (defined by PDB COMPND)
+    private Integer[] chainCenter = new Integer[3];  // X-/Y-/Z-coordinates as 10th of Angström of the center of all non-H atoms
+    private Integer radiusFromCenter = null;
 
     // constructor
     public Chain(String ci) { pdbChainID = ci; residues = new ArrayList<Residue>(); }
