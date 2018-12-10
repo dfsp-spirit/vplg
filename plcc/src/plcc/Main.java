@@ -4841,6 +4841,44 @@ public class Main {
     }
     
     
+    
+    public static ArrayList<ResContactInfo> calculateAllContactsChainSphereSpeedup(List<Chain> chains) {
+        Boolean silent = Settings.getBoolean("plcc_B_silent");
+        Chain chainA, chainB;
+        Integer chainCounts = chains.size();
+        
+        if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
+            chainCounts = 2;
+            System.out.println("DEBUG: Warning: Limiting residue contact computation to the first " + chainCounts + " chains and their residues.");            
+        }   
+        
+        long numResContactsChecked, numResContactsPossible, numResContactsImpossible, numCmpSkipped;
+        numResContactsChecked = numResContactsPossible = numResContactsImpossible = numCmpSkipped = 0;
+
+        long numResToSkip, spaceBetweenResidues;
+        ResContactInfo rci;
+        ArrayList<ResContactInfo> contactInfo = new ArrayList<ResContactInfo>();
+
+        Integer atomRadius = Settings.getInteger("plcc_I_atom_radius");
+        Integer atomRadiusLig = Settings.getInteger("plcc_I_lig_atom_radius");
+
+        Integer globalMaxCollisionRadius = globalMaxCenterSphereRadius + atomRadius;
+        Integer globalMaxCenterSphereDiameter = globalMaxCollisionRadius * 2;
+        Integer numIgnoredLigandContacts = 0;
+        
+        //TODO let chains compute their center and radius
+        
+        //TODO loop over chains and residues
+        
+        
+        
+        
+        
+        
+        return contactInfo;
+    }
+    
+    
     /**
      * Calculates all contacts between the residues in res.
      * @param res A list of Residue objects.
