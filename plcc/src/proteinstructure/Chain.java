@@ -170,6 +170,9 @@ public class Chain implements java.io.Serializable {
         return new String[] { sbChemProp.toString(), sbSSE.toString() };
     }
     
+    /**
+     * Computes the geometrical center of all atoms and the largest distance from center to an atom (=radius).
+     */
     public void computeChainCenterAndRadius() {
         // compute center
         Integer[] tmpCenter = new Integer[3];
@@ -192,5 +195,21 @@ public class Chain implements java.io.Serializable {
         }
             
         // TODO compute radius
+        int tmpBiggestDist = 0;
+        int tmpCurrentDist = 0;
+        for (Residue r : residues) {
+            for (Atom a : r.getAtoms()) {
+                tmpCurrentDist = a.distToPoint(chainCenter[0], chainCenter[1], chainCenter[2]);
+                // System.out.println("[DEBUG] Distance to center from atom " + a.toString() + " is " + String.valueOf(tmpCurrentDist));
+                if (tmpCurrentDist > tmpBiggestDist) {
+                    tmpBiggestDist = tmpCurrentDist;
+                }
+            }
+        }
+        
+        if (Settings.getInteger("plcc_I_debug_level") > 0) {
+            System.out.println("[DEBUG] Radius of chain " + pdbChainID + " is " + String.valueOf(tmpBiggestDist));
+        }
+        
     }
 }
