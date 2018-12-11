@@ -98,9 +98,9 @@ public class Atom implements java.io.Serializable {
         Double dd = 0.0;
         Integer di;
         
-        dd = dd + dx * dx;
-        dd = dd + dy * dy;
-        dd = dd + dz * dz;
+        dd += (coordX - dx) * (coordX - dx);
+        dd += (coordY - dy) * (coordY - dy);
+        dd += (coordZ - dz) * (coordZ - dz);
 
         di = (int)Math.sqrt(dd);
         
