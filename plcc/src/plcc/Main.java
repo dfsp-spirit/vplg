@@ -2240,7 +2240,11 @@ public class Main {
                 cInfo = calculateAllContactsAlternativeModel(residues);
             }
             else {
-                cInfo = calculateAllContacts(residues);
+                if (Settings.getBoolean("plcc_B_chain_spheres_speedup")) {            
+                    cInfo = calculateAllContactsChainSphereSpeedup(chains);
+                } else {
+                    cInfo = calculateAllContacts(residues);
+                }
             }
             if(! silent) {
                 System.out.println("Received data on " + cInfo.size() + " residue contacts that have been confirmed on atom level.");
@@ -4867,6 +4871,9 @@ public class Main {
         Integer numIgnoredLigandContacts = 0;
         
         //TODO let chains compute their center and radius
+        for (Chain c : chains) {
+            c.computeChainCenterAndRadius();
+        }
         
         //TODO loop over chains and residues
         

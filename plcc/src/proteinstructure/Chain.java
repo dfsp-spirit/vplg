@@ -13,6 +13,7 @@ import proteinstructure.SSE;
 import java.util.ArrayList;
 import java.util.Arrays;
 import io.IO;
+import plcc.Settings;
 
 /**
  * Represents a protein chain in a PDB file.
@@ -46,6 +47,8 @@ public class Chain implements java.io.Serializable {
     public Model getModel() { return(model); }
     public ArrayList<Residue> getResidues() { return(residues); }
     public ArrayList<String> getHomologues() { return(homologues); }
+    public Integer[] getChainCenter() { return(chainCenter); }
+    public Integer getRadiusFromCenter() { return(radiusFromCenter); }
     
     /**
      * Returns a list of all ligand residues in this chain.
@@ -165,5 +168,29 @@ public class Chain implements java.io.Serializable {
         
         //System.out.println("Added " + numSeps + " separators.");
         return new String[] { sbChemProp.toString(), sbSSE.toString() };
+    }
+    
+    public void computeChainCenterAndRadius() {
+        // compute center
+        Integer[] tmpCenter = new Integer[3];
+        tmpCenter[0] = tmpCenter[1] = tmpCenter[2] = 0;
+        int tmpAtomNumber = 0;
+        for (Residue r : residues) {
+            for (Atom a : r.getAtoms()) {
+                tmpCenter[0] += a.getCoordX();
+                tmpCenter[1] += a.getCoordY();
+                tmpCenter[2] += a.getCoordZ();
+                tmpAtomNumber += 1;
+            }
+        }
+        chainCenter[0] = tmpCenter[0] / tmpAtomNumber;
+        chainCenter[1] = tmpCenter[1] / tmpAtomNumber;
+        chainCenter[2] = tmpCenter[2] / tmpAtomNumber;
+        
+        if (Settings.getInteger("plcc_I_debug_level") > 0) {
+            System.out.println("[DEBUG] Center of chain " + pdbChainID + " is at " + Arrays.toString(chainCenter));
+        }
+            
+        // TODO compute radius
     }
 }
