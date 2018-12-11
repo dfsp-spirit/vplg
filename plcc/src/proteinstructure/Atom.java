@@ -102,7 +102,9 @@ public class Atom implements java.io.Serializable {
         dd += (coordY - dy) * (coordY - dy);
         dd += (coordZ - dz) * (coordZ - dz);
 
-        di = (int)Math.sqrt(dd);
+        // di = (int)Math.sqrt(dd);
+        // jnw: lets round instead of truncate the result
+        di = (int)Math.round(Math.sqrt(dd));
         
         return(di);
     }
