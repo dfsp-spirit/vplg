@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import io.IO;
 import plcc.Settings;
+import tools.DP;
 
 /**
  * Represents a protein chain in a PDB file.
@@ -30,7 +31,7 @@ public class Chain implements java.io.Serializable {
     private String modelID = null;
     private Model model = null;                      // the Model of this Chain
     private ArrayList<String> homologues = null;     // a list of homologue chains (defined by PDB COMPND)
-    private Integer[] chainCenter = new Integer[3];  // X-/Y-/Z-coordinates as 10th of Angström of the center of all non-H atoms
+    private final Integer[] chainCenter = new Integer[3];  // X-/Y-/Z-coordinates as 10th of Angström of the center of all non-H atoms
     private Integer radiusFromCenter = null;
 
     // constructor
@@ -211,5 +212,41 @@ public class Chain implements java.io.Serializable {
             System.out.println("[DEBUG] Radius of chain " + pdbChainID + " is " + String.valueOf(tmpBiggestDist));
         }
         
+        radiusFromCenter = tmpBiggestDist;
+        
+    }
+    
+    /**
+     * This function determines whether we need to look at the residues to check for contacts betweens
+     * this chain and another one. If the center spheres don't overlap, there cannot exist any atom contacts.
+     * @param c Chain: the other chain
+     * @return Bool: if spheres overlap
+     */
+    public Boolean contactPossibleWithChain(Chain c) {
+
+        Integer dist, tmpSum;
+        
+        tmpSum = 0;
+        tmpSum += this.chainCenter[0] - c.getChainCenter()[0] * this.chainCenter[0] - c.getChainCenter()[0];
+        tmpSum += this.chainCenter[1] - c.getChainCenter()[1] * this.chainCenter[1] - c.getChainCenter()[1];
+        tmpSum += this.chainCenter[2] - c.getChainCenter()[2] * this.chainCenter[2] - c.getChainCenter()[2];
+        
+        dist = (int)Math.round(Math.sqrt(tmpSum));
+        
+        // presume there are ligands in the chain
+        Integer atomRadius = Settings.getInteger("plcc_I_lig_atom_radius");
+        
+        Integer justToBeSure = 4;   // account for small errors due to rounding
+        Integer summedSpheres = this.getRadiusFromCenter() + c.getRadiusFromCenter() + (atomRadius * 2) + justToBeSure;
+
+        //System.out.println("    Center sphere radius for PDB residue " + this.getPdbResNum() + " = " + this.getCenterSphereRadius() + ", for " + r.getPdbResNum() + " = " + r.getCenterSphereRadius() + ", atom radius is " + atomRadius + ".");
+        //System.out.println("    DSSP Res distance " + this.getDsspResNum() + "/" + r.getDsspResNum() + " is " + dist + " (no contacts possible above distance " + maxDistForContact + ").");
+
+        if(dist <= summedSpheres) {
+            return(true);
+        }
+        else {
+            return(false);
+        }
     }
 }
