@@ -2161,19 +2161,27 @@ public class Main {
             globalMaxSeqNeighborResDist = 1000;
         }
         else {
-            // All residues exist, we can now calculate their maximal center sphere radius
-            globalMaxCenterSphereRadius = getGlobalMaxCenterSphereRadius(residues);
-            if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
-                System.out.println("  Maximal center sphere radius for all residues is " + globalMaxCenterSphereRadius + ".");
-            }
+            
+            if (Settings.getBoolean("plcc_B_chain_spheres_speedup")) {
+                // does currently not use Res skipping, so no preprocessing needed
+                // set the values to be sure that everything works properly
+                globalMaxCenterSphereRadius = Integer.MAX_VALUE;
+                globalMaxSeqNeighborResDist = Integer.MAX_VALUE; 
+            } else {
+                // All residues exist, we can now calculate their maximal center sphere radius
+                globalMaxCenterSphereRadius = getGlobalMaxCenterSphereRadius(residues);
+                if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
+                    System.out.println("  Maximal center sphere radius for all residues is " + globalMaxCenterSphereRadius + ".");
+                }
 
-            // ... and the maximal distance between neighbors in the AA sequence.
-            // Note that this is a lot less useful with ligands enabled since they are always listed at the 
-            //  end of the chainName and may be far (in 3D) from their predecessor in the sequence.
-            globalMaxSeqNeighborResDist = getGlobalMaxSeqNeighborResDist(residues);     
-            if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
-                System.out.println("  Maximal distance between residues that are sequence neighbors is " + globalMaxSeqNeighborResDist + ".");
-            }
+                // ... and the maximal distance between neighbors in the AA sequence.
+                // Note that this is a lot less useful with ligands enabled since they are always listed at the 
+                //  end of the chainName and may be far (in 3D) from their predecessor in the sequence.
+                globalMaxSeqNeighborResDist = getGlobalMaxSeqNeighborResDist(residues);     
+                if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
+                    System.out.println("  Maximal distance between residues that are sequence neighbors is " + globalMaxSeqNeighborResDist + ".");
+                }
+            }        
         }
         // ... and fill in the frequencies of all AAs in this protein.
         getAADistribution(residues);
