@@ -32,7 +32,7 @@ public class Chain implements java.io.Serializable {
     private Model model = null;                      // the Model of this Chain
     private ArrayList<String> homologues = null;     // a list of homologue chains (defined by PDB COMPND)
     private final Integer[] chainCenter = new Integer[3];  // X-/Y-/Z-coordinates as 10th of Angström of the center of all non-H atoms
-    private Integer radiusFromCenter = null;
+    private Integer radiusFromCenter = null;         // distance from center to farthest non-H atom. -1 if no protein-atoms
 
     // constructor
     public Chain(String ci) { pdbChainID = ci; residues = new ArrayList<Residue>(); }
@@ -187,33 +187,43 @@ public class Chain implements java.io.Serializable {
                 tmpAtomNumber += 1;
             }
         }
-        chainCenter[0] = tmpCenter[0] / tmpAtomNumber;
-        chainCenter[1] = tmpCenter[1] / tmpAtomNumber;
-        chainCenter[2] = tmpCenter[2] / tmpAtomNumber;
         
-        if (Settings.getInteger("plcc_I_debug_level") > 0) {
-            System.out.println("[DEBUG] Center of chain " + pdbChainID + " is at " + Arrays.toString(chainCenter));
-        }
-            
-        // TODO compute radius
-        int tmpBiggestDist = 0;
-        int tmpCurrentDist = 0;
-        for (Residue r : residues) {
-            for (Atom a : r.getAtoms()) {
-                tmpCurrentDist = a.distToPoint(chainCenter[0], chainCenter[1], chainCenter[2]);
-                // System.out.println("[DEBUG] Distance to center from atom " + a.toString() + " is " + String.valueOf(tmpCurrentDist));
-                if (tmpCurrentDist > tmpBiggestDist) {
-                    tmpBiggestDist = tmpCurrentDist;
+        // there could be the case that only RNA/DNA atoms are in a chain
+        // in this case radius is set to -1
+        
+        if (tmpAtomNumber > 0) {
+        
+            chainCenter[0] = tmpCenter[0] / tmpAtomNumber;
+            chainCenter[1] = tmpCenter[1] / tmpAtomNumber;
+            chainCenter[2] = tmpCenter[2] / tmpAtomNumber;
+
+            if (Settings.getInteger("plcc_I_debug_level") > 0) {
+                System.out.println("[DEBUG] Center of chain " + pdbChainID + " is at " + Arrays.toString(chainCenter));
+            }
+
+            // compute radius
+            int tmpBiggestDist = 0;
+            int tmpCurrentDist;
+            for (Residue r : residues) {
+                for (Atom a : r.getAtoms()) {
+                    tmpCurrentDist = a.distToPoint(chainCenter[0], chainCenter[1], chainCenter[2]);
+                    // System.out.println("[DEBUG] Distance to center from atom " + a.toString() + " is " + String.valueOf(tmpCurrentDist));
+                    if (tmpCurrentDist > tmpBiggestDist) {
+                        tmpBiggestDist = tmpCurrentDist;
+                    }
                 }
             }
-        }
+
+            if (Settings.getInteger("plcc_I_debug_level") > 0) {
+                System.out.println("[DEBUG] Radius of chain " + pdbChainID + " is " + String.valueOf(tmpBiggestDist));
+            }
+
+            radiusFromCenter = tmpBiggestDist;
         
-        if (Settings.getInteger("plcc_I_debug_level") > 0) {
-            System.out.println("[DEBUG] Radius of chain " + pdbChainID + " is " + String.valueOf(tmpBiggestDist));
-        }
-        
-        radiusFromCenter = tmpBiggestDist;
-        
+        } else {
+            System.out.println("[WARNING] Chain " + this.pdbChainID + " seems not to hold protein atoms. No center can be detected.");
+            radiusFromCenter = -1;
+        }        
     }
     
     /**
@@ -223,6 +233,11 @@ public class Chain implements java.io.Serializable {
      * @return Bool: if spheres overlap
      */
     public Boolean contactPossibleWithChain(Chain c) {
+        
+        // no contact possible if either chain contains no atoms
+        if ((! this.containsAtoms()) || (! c.containsAtoms())) {
+            return false;
+        }
 
         Integer dist, tmpSum;
         
@@ -248,5 +263,14 @@ public class Chain implements java.io.Serializable {
         else {
             return(false);
         }
+    }
+    
+    public Boolean containsAtoms() {
+        for (Residue r : this.getResidues()) {
+            for (Atom a : r.getAtoms()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
