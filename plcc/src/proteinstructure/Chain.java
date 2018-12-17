@@ -221,7 +221,7 @@ public class Chain implements java.io.Serializable {
             radiusFromCenter = tmpBiggestDist;
         
         } else {
-            System.out.println("[WARNING] Chain " + this.pdbChainID + " seems not to hold protein atoms. No center can be detected.");
+            System.out.println("  [WARNING] Chain " + this.pdbChainID + " seems not to hold protein atoms. No center can be detected.");
             radiusFromCenter = -1;
         }        
     }
@@ -242,9 +242,9 @@ public class Chain implements java.io.Serializable {
         Integer dist, tmpSum;
         
         tmpSum = 0;
-        tmpSum += this.chainCenter[0] - c.getChainCenter()[0] * this.chainCenter[0] - c.getChainCenter()[0];
-        tmpSum += this.chainCenter[1] - c.getChainCenter()[1] * this.chainCenter[1] - c.getChainCenter()[1];
-        tmpSum += this.chainCenter[2] - c.getChainCenter()[2] * this.chainCenter[2] - c.getChainCenter()[2];
+        tmpSum += (this.chainCenter[0] - c.getChainCenter()[0]) * (this.chainCenter[0] - c.getChainCenter()[0]);
+        tmpSum += (this.chainCenter[1] - c.getChainCenter()[1]) * (this.chainCenter[1] - c.getChainCenter()[1]);
+        tmpSum += (this.chainCenter[2] - c.getChainCenter()[2]) * (this.chainCenter[2] - c.getChainCenter()[2]);
         
         dist = (int)Math.round(Math.sqrt(tmpSum));
         
@@ -257,6 +257,15 @@ public class Chain implements java.io.Serializable {
         //System.out.println("    Center sphere radius for PDB residue " + this.getPdbResNum() + " = " + this.getCenterSphereRadius() + ", for " + r.getPdbResNum() + " = " + r.getCenterSphereRadius() + ", atom radius is " + atomRadius + ".");
         //System.out.println("    DSSP Res distance " + this.getDsspResNum() + "/" + r.getDsspResNum() + " is " + dist + " (no contacts possible above distance " + maxDistForContact + ").");
 
+        if (Settings.getInteger("plcc_I_debug_level") > 0) {
+            System.out.println("[DEBUG][CHAIN] Chain " + this.pdbChainID + " and " + c.pdbChainID);
+            System.out.println(" ... mid points: " + this.chainCenter[0] + "|" + this.chainCenter[1] + "|" + this.chainCenter[2]);
+            System.out.println(" ... mid points: " + c.chainCenter[0] + "|" + c.chainCenter[1] + "|" + c.chainCenter[2]);
+            System.out.println(" ... radii: " + this.radiusFromCenter + " and " + c.radiusFromCenter);
+            System.out.println(" ... distance: " + dist);
+            System.out.println(" ... summedSpheres: " + summedSpheres);
+        }
+        
         if(dist <= summedSpheres) {
             return(true);
         }

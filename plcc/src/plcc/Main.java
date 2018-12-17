@@ -4859,27 +4859,20 @@ public class Main {
         Chain chainA, chainB;
         Integer chainCounts = chains.size();
         int numberResTotal = 0;
+        ResContactInfo rci;
+        ArrayList<ResContactInfo> contactInfo = new ArrayList<>();
+        Residue res1, res2;
         
         if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
             chainCounts = 2;
             System.out.println("DEBUG: Warning: Limiting residue contact computation to the first " + chainCounts + " chains and their residues.");            
         }   
         
-        long numResContactsChecked, numResContactsPossible, numResContactsImpossible, numCmpSkipped;
-        numResContactsChecked = numResContactsPossible = numResContactsImpossible = numCmpSkipped = 0;
-
-        long numResToSkip, spaceBetweenResidues;
-        ResContactInfo rci;
-        ArrayList<ResContactInfo> contactInfo = new ArrayList<>();
-
-        Integer atomRadius = Settings.getInteger("plcc_I_atom_radius");
-        Integer atomRadiusLig = Settings.getInteger("plcc_I_lig_atom_radius");
-
-        Integer globalMaxCollisionRadius = globalMaxCenterSphereRadius + atomRadius;
-        Integer globalMaxCenterSphereDiameter = globalMaxCollisionRadius * 2;
+        // variables for statistics
+        long numResContactsChecked, numResContactsPossible, numResContactsImpossible, chainSkippedRes;
+        int chainChainSkipped = 0;
+        numResContactsChecked = numResContactsPossible = numResContactsImpossible = chainSkippedRes = 0;
         Integer numIgnoredLigandContacts = 0;
-        
-        Residue res1, res2;
         
         // let chains compute their center and radius
         for (Chain c : chains) {
@@ -4975,7 +4968,9 @@ public class Main {
             
             for (int l = k + 1; l < chainCounts; l++) {
                 
+                
                 chainB = chains.get(l);
+                int chainBNumberResidues = chainB.getResidues().size();
 
                 // check chain overlap
                 if (chainA.contactPossibleWithChain(chainB)) {
@@ -4989,7 +4984,7 @@ public class Main {
                         //numResToSkip = 0L;
 
                         // NOTE: we cant just go from j = i + 1 on now or we would miss some contacts!
-                        for (int j = 0; j < residuesB.size(); j++) {
+                        for (int j = 0; j < chainBNumberResidues; j++) {
 
                             res2 = residuesB.get(j);
 
@@ -5058,15 +5053,24 @@ public class Main {
 
                     }
                     
+                } else {
+                    chainChainSkipped++;
+                    chainSkippedRes += (chainANumberResidues * chainBNumberResidues);
                 }
             }
         }
-                
-
+        
+        int maxChainChainContactsPossible;
+        if (chains.size() > 1) {
+            maxChainChainContactsPossible = (chains.size() * (chains.size() - 1)) / 2;
+        } else {
+            maxChainChainContactsPossible = 0;
+        }
 
         if(! FileParser.silent) {
+            System.out.println("  Skipped " + chainChainSkipped + " chain-chain contacts (and " + chainSkippedRes + " residues) of " + maxChainChainContactsPossible + " maximal contacts due to chain sphere check.");
             System.out.println("  Checked " + numResContactsChecked + " contacts for " + numberResTotal + " residues: " + numResContactsPossible + " possible, " + contactInfo.size() + " found, " + numResContactsImpossible + " impossible (collison spheres check).");
-            System.out.println("  Did not check " + numCmpSkipped + " contacts (skipped by seq neighbors check), would have been " + (numResContactsChecked + numCmpSkipped)  + ".");
+            System.out.println("  Note: residue skipping not implemented in chain sphere check.");
         }
 
         if( ! Settings.getBoolean("plcc_B_write_lig_geolig")) {
