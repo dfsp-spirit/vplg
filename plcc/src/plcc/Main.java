@@ -4965,9 +4965,8 @@ public class Main {
                 }
             }
             
-            
+            // do contact check between chains (only if chains overlap!)
             for (int l = k + 1; l < chainCounts; l++) {
-                
                 
                 chainB = chains.get(l);
                 int chainBNumberResidues = chainB.getResidues().size();
@@ -4988,7 +4987,6 @@ public class Main {
 
                             res2 = residuesB.get(j);
 
-                            // DEBUG
                             if (Settings.getInteger("plcc_I_debug_level") >= 1) {
                                 if(! silent) {
                                     System.out.println("  Checking DSSP pair " + res1.getDsspResNum() + "/" + res2.getDsspResNum() + "...");
