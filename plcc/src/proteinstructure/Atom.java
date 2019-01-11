@@ -185,6 +185,19 @@ public class Atom implements java.io.Serializable {
         //    System.err.println("ERROR: Distance of atoms " + this.getPdbAtomNum() + " and " + a.getPdbAtomNum() + " is " + dist + ", but should be > 0.");
         //    System.exit(1);
         //}
+        
+        if (Settings.getInteger("plcc_I_debug_level") >= 2) {
+            if (dist < maxDist) {
+                System.out.println("   [DEBUG LV 2] Atom " + this.getPdbAtomNum() + " " +
+                    this.getCoordString() + " and atom " + 
+                    a.getPdbAtomNum() + " " + a.getCoordString() + " have distance " + dist + " => contact!");
+            } else {
+                System.out.println("   [DEBUG LV 2] Atom " + this.getPdbAtomNum() + " " +
+                    this.getCoordString() + " and atom " + 
+                    a.getPdbAtomNum() + " " + a.getCoordString() + " have distance " + dist);
+            }
+        }
+            
 
         if( dist < maxDist) {
             // Contact!

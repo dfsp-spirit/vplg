@@ -5130,7 +5130,10 @@ public class Main {
                 // DEBUG
                 if(Settings.getInteger("plcc_I_debug_level") >= 1) {
                     if(! silent) {
-                        System.out.println("  Checking DSSP pair " + a.getDsspResNum() + "/" + b.getDsspResNum() + "...");
+                        System.out.println("  Checking DSSP pair " + a.getDsspResNum() + " (Chain " + 
+                                a.getChainID() + " Residue " + a.getPdbResNum() + ") and " + 
+                                b.getDsspResNum() + " (Chain " +  b.getChainID() + " Residue " +
+                                b.getPdbResNum() + ") ...");
                     }
                     //System.out.println("    " + a.getAtomsString());
                     //System.out.println(a.atomInfo());
@@ -5495,7 +5498,7 @@ public class Main {
                 dist = x.distToAtom(y);
 
                 if(x.atomContactTo(y)) {             // If a contact is detected, Atom.atomContactTo() returns true
-                                                    
+                    
 
                     // The van der Waals radii spheres overlap, contact found.
                     numPairContacts[ResContactInfo.TT]++;   // update total number of contacts for this residue pair
@@ -5703,7 +5706,7 @@ public class Main {
         else {
             result = null;
         }
-
+        
         return(result);         // This is null if no contact was detected
         
     }

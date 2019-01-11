@@ -657,6 +657,14 @@ public class ContactMatrix {
                     }
                     // HE ----- Helix - Sheet contacts
                     else if( (a.isHelix() && b.isBetaStrand()) || (b.isHelix() && a.isBetaStrand())  ) {
+                        //DEBUG - NOTE: only reporting this stuff for H-E right now
+                        if (Settings.getInteger("plcc_I_debug_level") >= 3) {
+                            System.out.println("   [DEBUG LV 3] NOTE: only reporting this for H-E (see code)");
+                            System.out.println("   [DEBUG LV 3] " + a.toString());
+                            System.out.println("   [DEBUG LV 3] " + b.toString());
+                            System.out.println("    [DEBUG LV 3] #BB: " + contBB[i][j] + " #BC: " + 
+                                    contBC[i][j] + " #CB: " + contCB[i][j] + " #CC: " + contCC[i][j]);
+                        }
                         //if( ( (contBB[i][j] > 1) && (contBC[i][j] + contCB[i][j] > 3) ) || (contCC[i][j] > 3)) {
                         if( (contBB[i][j] > 1) || (contBC[i][j] + contCB[i][j] > 3) || (contCC[i][j] > 3)) {
                             contSSE[i][j] = 1;
