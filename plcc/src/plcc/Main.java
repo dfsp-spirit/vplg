@@ -2260,6 +2260,11 @@ public class Main {
             cInfoThisChain = null;
         }
         
+        if (Settings.getBoolean("plcc_B_debug_only_contact_comp")) {
+            System.out.println("Exiting now as requested by settings.");
+            System.exit(0);
+        }
+        
         // DEBUG: compare computed contacts with those from a geom_neo file
         if(compareResContacts) {
             if(separateContactsByChain) {
