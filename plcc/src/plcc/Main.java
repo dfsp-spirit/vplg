@@ -2152,6 +2152,14 @@ public class Main {
         //for(Integer i = 0; i < SSEs.size(); i++) {
         //    System.out.println("  " + SSEs.get(i));
         //}
+        
+        // If only one chain is present disable chain spheres speedup to avoid
+        // costly pre processing
+        if (Settings.getBoolean("plcc_B_chain_spheres_speedup") && chains.size() == 1) {
+            Settings.set("plcc_B_chain_spheres_speedup", "False");
+            System.out.println("Note: Chain spheres speedup was turned on in settings, but only one chain was detected. " +
+                    "To save time, setting was turned off for this structure.");
+        }
 
         
         if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
