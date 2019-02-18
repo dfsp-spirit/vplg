@@ -653,6 +653,7 @@ public class FileParser {
             }
         }
         
+        // reaching this code only if chain didnt exist
         Chain c = new Chain(cID);
         c.setModel(m);
         c.setModelID(m.getModelID());
@@ -695,8 +696,8 @@ public class FileParser {
         // VALUES: default value -1: column not existing; -2: column not existing and warning has been printed
         // INDICES: 0: chain name; 1: PDBx field name; 2: atom id; 3: (detailed) atom name 4: alternative location
         // 5: residue names (label_comp_id); 6: residue numbers (label_seq_id); 7: insertion code
-        // 8,9,10: coordx,y,z, 11: chemical symbol, 12: label_seq_id (PDB Res Num)
-        int[] importantColInd = new int[13]; 
+        // 8,9,10: coordx,y,z, 11: chemical symbol, 12: label_seq_id (PDB Res Num), 13: pdbx_PDB_model_num
+        int[] importantColInd = new int[14]; 
         
         // variables per (atom) line
         Integer atomSerialNumber, resNumPDB, coordX, coordY, coordZ;
@@ -706,14 +707,19 @@ public class FileParser {
         int lastLigandNumPDB = 0; // used to determine if atom belongs to new ligand residue
         String lastChainID = ""; // s.a.
         String[] tmpLineData;
+        String tmp_modelID;
         
         // variables for successive matching atom -> residue -> chain
         // remember them so we dont need to lookup
+        Model m = null;
         Residue tmpRes = null;
         Chain tmpChain = null;
         Residue lig = null;
         
         Integer numLine = 0;
+        
+        // variables for already printed warnings
+        Boolean further_model_warning_printed = false;
 
 
         // - - - DSSP - - -
@@ -747,16 +753,6 @@ public class FileParser {
         //         -> actually try to do it on the fly
 
         
-        // for now create a default model with ID '1'
-        // usually there should be no model nevertheless
-        //     -> only used in nmr and on those splitpdb should be used (doesnt work for CIF?!)
-        Model m = new Model("1");
-        s_models.add(m);
-        
-        if (! (FileParser.silent || FileParser.essentialOutputOnly)) {
-            System.out.println("CIF parser not really checks for models and only uses a default model '1'");
-        }
-        
         try {
             BufferedReader in = new BufferedReader(new FileReader(pdbFile));
             String line;
@@ -769,7 +765,7 @@ public class FileParser {
                     if (line.startsWith("data_")) {
                         if (dataBlockFound) {
                             DP.getInstance().w("FP_CIF", " Parsing of first data block ended at line " + numLine.toString()
-                                + "as right now only the first data block is parsed.");
+                                + " as right now only the first data block is parsed.");
                             break; // for now we only parse first data block
                         }
                         else {
@@ -900,11 +896,49 @@ public class FileParser {
                                 case "label_seq_id":
                                     importantColInd[12] = tableColHeads.size() - 1;
                                     break;
+                                // 13: pdbx_PDB_model_num -> Model number in case of NMR
+                                case "pdbx_PDB_model_num":
+                                    importantColInd[13] = tableColHeads.size() - 1;
+                                    break;
                             }
                             
                         } else {
                             // we are in the row section (data!)
                             tmpLineData = lineToArrayCIF(line);
+                            
+                            // - - model - -
+                            // Look if model numbers are included
+                            if (importantColInd[13] > -1) {
+                                tmp_modelID = tmpLineData[importantColInd[13]];
+                                
+                                // save modelID for print later
+                                if (! s_allModelIDsFromWholePDBFile.contains(tmp_modelID)) {
+                                    s_allModelIDsFromWholePDBFile.add(tmp_modelID);
+                                }
+                                        
+                                if (m == null) {
+                                    // use first model
+                                    m = new Model(tmp_modelID);
+                                    s_models.add(m);
+                                    System.out.println("   PDB: New model '" + m.getModelID() + "' found");
+                                } else {
+                                    // same model as before?
+                                    if (! m.getModelID().equals(tmp_modelID)) {
+                                        if (! further_model_warning_printed) {
+                                            System.out.println("   PDB: Found further models. Ignoring them.");
+                                            further_model_warning_printed = true;
+                                        }
+
+                                        // skip this line
+                                        continue;
+                                    }
+                                }
+                            } else {
+                                // create default model instead
+                                m = new Model("1");
+                                s_models.add(m);
+                                System.out.println("   PDB: No model column. Creating default model '1'");
+                            }
                             
                             // - - chain - -
                             // check for a new chain (always hold the current 
@@ -1168,8 +1202,10 @@ public class FileParser {
                                 // >> AA <<
                                 if (isIgnoredAtom(chemSym)) {
                                     if( ! (Settings.getBoolean("plcc_B_handle_hydrogen_atoms_from_reduce") && chemSym.trim().equals("H"))) {
-                                        System.out.println("DEBUG Ignored atom line " + numLine.toString() + 
-                                                " as it is either in ignored list or handle_hydrogens turned off.");
+                                        if (Settings.getInteger("plcc_I_debug_level") > 0) {
+                                            System.out.println("DEBUG Ignored atom line " + numLine.toString() + 
+                                                    " as it is either in ignored list or handle_hydrogens turned off.");
+                                        }
                                         continue;
                                     }
                                 }

@@ -2157,7 +2157,7 @@ public class Main {
         // costly pre processing
         if (Settings.getBoolean("plcc_B_chain_spheres_speedup") && chains.size() == 1) {
             Settings.set("plcc_B_chain_spheres_speedup", "False");
-            System.out.println("Note: Chain spheres speedup was turned on in settings, but only one chain was detected. " +
+            System.out.println("  Note: Chain spheres speedup was turned on in settings, but only one chain was detected. " +
                     "To save time, setting was turned off for this structure.");
         }
 
