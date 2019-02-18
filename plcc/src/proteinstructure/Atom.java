@@ -74,24 +74,37 @@ public class Atom implements java.io.Serializable {
      * @return the euclidian distance, rounded to an Integer
      */
     public Integer distToAtom(Atom a) {
-        Double dd = 0.0;
-        Integer di, dx, dy, dz = 0;
-
-        dx = this.getCoordX() - a.getCoordX();
-        dd = dd + dx * dx;
-        dy = this.getCoordY() - a.getCoordY();
-        dd = dd + dy * dy;
-        dz = this.getCoordZ() - a.getCoordZ();
-        dd = dd + dz * dz;
-
-        di = (int)Math.sqrt(dd);
+        Integer di;
+        di = distToPoint(a.getCoordX(), a.getCoordY(), a.getCoordZ());
         
         if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
             if(this.isCalphaAtom() && a.isCalphaAtom()) {
-                System.out.println("Distance between C-alpha atoms " + this.pdbAtomNumber + " of " + this.getPdbResNum() + " and " + a.pdbAtomNumber + " of " + a.getPdbResNum() + " is " + di + " (" + dd + " before sqrt).");
+                System.out.println("Distance between C-alpha atoms " + this.pdbAtomNumber + " of " + this.getPdbResNum() + " and " + a.pdbAtomNumber + " of " + a.getPdbResNum() + " is " + di + " (-- before sqrt -> due to change of function not given).");
                 System.out.println(this.getCoordString() + "/" + a.getCoordString());
             }            
         }
+        
+        return(di);
+    }
+    
+    /**
+     * Returns the distance from this atom to a point in 3D.
+     * @param dx X coordinate as 10th of Angström in int
+     * @param dy Y coordinate as 10th of Angström in int
+     * @param dz Z coordinate as 10th of Angström in int
+     * @return the euclidian distance, rounded to an int
+     */
+    public Integer distToPoint(int dx, int dy, int dz) {
+        Double dd = 0.0;
+        Integer di;
+        
+        dd += (coordX - dx) * (coordX - dx);
+        dd += (coordY - dy) * (coordY - dy);
+        dd += (coordZ - dz) * (coordZ - dz);
+
+        // di = (int)Math.sqrt(dd);
+        // jnw: lets round instead of truncate the result
+        di = (int)Math.round(Math.sqrt(dd));
         
         return(di);
     }
@@ -172,6 +185,19 @@ public class Atom implements java.io.Serializable {
         //    System.err.println("ERROR: Distance of atoms " + this.getPdbAtomNum() + " and " + a.getPdbAtomNum() + " is " + dist + ", but should be > 0.");
         //    System.exit(1);
         //}
+        
+        if (Settings.getInteger("plcc_I_debug_level") >= 2) {
+            if (dist < maxDist) {
+                System.out.println("   [DEBUG LV 2] Atom " + this.getPdbAtomNum() + " " +
+                    this.getCoordString() + " and atom " + 
+                    a.getPdbAtomNum() + " " + a.getCoordString() + " have distance " + dist + " => contact!");
+            } else {
+                System.out.println("   [DEBUG LV 2] Atom " + this.getPdbAtomNum() + " " +
+                    this.getCoordString() + " and atom " + 
+                    a.getPdbAtomNum() + " " + a.getCoordString() + " have distance " + dist);
+            }
+        }
+            
 
         if( dist < maxDist) {
             // Contact!

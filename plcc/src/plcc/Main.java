@@ -1499,6 +1499,11 @@ public class Main {
                         }
                     }
                     
+                    if(s.equals("--chain-spheres-speedup")) {
+                        argsUsed[i] = true;
+                        Settings.set("plcc_B_chain_spheres_speedup", "true");
+                    }
+                    
                     
 
                 } //end for loop
@@ -2147,6 +2152,14 @@ public class Main {
         //for(Integer i = 0; i < SSEs.size(); i++) {
         //    System.out.println("  " + SSEs.get(i));
         //}
+        
+        // If only one chain is present disable chain spheres speedup to avoid
+        // costly pre processing
+        if (Settings.getBoolean("plcc_B_chain_spheres_speedup") && chains.size() == 1) {
+            Settings.set("plcc_B_chain_spheres_speedup", "False");
+            System.out.println("Note: Chain spheres speedup was turned on in settings, but only one chain was detected. " +
+                    "To save time, setting was turned off for this structure.");
+        }
 
         
         if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
@@ -2156,19 +2169,27 @@ public class Main {
             globalMaxSeqNeighborResDist = 1000;
         }
         else {
-            // All residues exist, we can now calculate their maximal center sphere radius
-            globalMaxCenterSphereRadius = getGlobalMaxCenterSphereRadius(residues);
-            if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
-                System.out.println("  Maximal center sphere radius for all residues is " + globalMaxCenterSphereRadius + ".");
-            }
+            
+            if (Settings.getBoolean("plcc_B_chain_spheres_speedup")) {
+                // does currently not use Res skipping, so no preprocessing needed
+                // set the values to be sure that everything works properly
+                globalMaxCenterSphereRadius = Integer.MAX_VALUE;
+                globalMaxSeqNeighborResDist = Integer.MAX_VALUE; 
+            } else {
+                // All residues exist, we can now calculate their maximal center sphere radius
+                globalMaxCenterSphereRadius = getGlobalMaxCenterSphereRadius(residues);
+                if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
+                    System.out.println("  Maximal center sphere radius for all residues is " + globalMaxCenterSphereRadius + ".");
+                }
 
-            // ... and the maximal distance between neighbors in the AA sequence.
-            // Note that this is a lot less useful with ligands enabled since they are always listed at the 
-            //  end of the chainName and may be far (in 3D) from their predecessor in the sequence.
-            globalMaxSeqNeighborResDist = getGlobalMaxSeqNeighborResDist(residues);     
-            if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
-                System.out.println("  Maximal distance between residues that are sequence neighbors is " + globalMaxSeqNeighborResDist + ".");
-            }
+                // ... and the maximal distance between neighbors in the AA sequence.
+                // Note that this is a lot less useful with ligands enabled since they are always listed at the 
+                //  end of the chainName and may be far (in 3D) from their predecessor in the sequence.
+                globalMaxSeqNeighborResDist = getGlobalMaxSeqNeighborResDist(residues);     
+                if(! (silent || Settings.getBoolean("plcc_B_only_essential_output"))) {
+                    System.out.println("  Maximal distance between residues that are sequence neighbors is " + globalMaxSeqNeighborResDist + ".");
+                }
+            }        
         }
         // ... and fill in the frequencies of all AAs in this protein.
         getAADistribution(residues);
@@ -2235,12 +2256,21 @@ public class Main {
                 cInfo = calculateAllContactsAlternativeModel(residues);
             }
             else {
-                cInfo = calculateAllContacts(residues);
+                if (Settings.getBoolean("plcc_B_chain_spheres_speedup")) {            
+                    cInfo = calculateAllContactsChainSphereSpeedup(chains);
+                } else {
+                    cInfo = calculateAllContacts(residues);
+                }
             }
             if(! silent) {
                 System.out.println("Received data on " + cInfo.size() + " residue contacts that have been confirmed on atom level.");
             }
             cInfoThisChain = null;
+        }
+        
+        if (Settings.getBoolean("plcc_B_debug_only_contact_comp")) {
+            System.out.println("Exiting now as requested by settings.");
+            System.exit(0);
         }
         
         // DEBUG: compare computed contacts with those from a geom_neo file
@@ -4836,6 +4866,234 @@ public class Main {
     }
     
     
+    
+    public static ArrayList<ResContactInfo> calculateAllContactsChainSphereSpeedup(List<Chain> chains) {
+        Boolean silent = Settings.getBoolean("plcc_B_silent");
+        Chain chainA, chainB;
+        Integer chainCounts = chains.size();
+        int numberResTotal = 0;
+        ResContactInfo rci;
+        ArrayList<ResContactInfo> contactInfo = new ArrayList<>();
+        Residue res1, res2;
+        
+        if(Settings.getBoolean("plcc_B_contact_debug_dysfunct")) {
+            chainCounts = 2;
+            System.out.println("DEBUG: Warning: Limiting residue contact computation to the first " + chainCounts + " chains and their residues.");            
+        }   
+        
+        // variables for statistics
+        long numResContactsChecked, numResContactsPossible, numResContactsImpossible, chainSkippedRes;
+        int chainChainSkipped = 0;
+        numResContactsChecked = numResContactsPossible = numResContactsImpossible = chainSkippedRes = 0;
+        Integer numIgnoredLigandContacts = 0;
+        
+        // let chains compute their center and radius
+        for (Chain c : chains) {
+            c.computeChainCenterAndRadius();
+        }
+        
+        // loop over chains and residues
+        for (int k = 0; k < chainCounts; k++) {
+            chainA = chains.get(k);
+            
+            // skip chain if no (protein) atoms in it
+            if (chainA.getRadiusFromCenter() == -1) {
+                continue;
+            }
+            
+            int chainANumberResidues = chainA.getResidues().size();
+            numberResTotal += chainANumberResidues;
+            ArrayList<Residue> residuesA = new ArrayList<>();
+            residuesA.addAll(chainA.getResidues());
+            
+            // do contact check within chain
+            //  -> mostly copied from calculateAllContacts
+            for(int i = 0; i < chainANumberResidues; i++) {
+                res1 = residuesA.get(i);
+                //numResToSkip = 0L;
+
+                for(int j = i + 1; j < chainANumberResidues; j++) {
+
+                    res2 = residuesA.get(j);
+
+                    // DEBUG
+                    if(Settings.getInteger("plcc_I_debug_level") >= 1) {
+                        if(! silent) {
+                            System.out.println("  Checking DSSP pair " + res1.getDsspResNum() + "/" + res2.getDsspResNum() + "...");
+                        }
+                    }                
+
+                    numResContactsChecked++;
+
+                    // We only need to check on atom level if the center spheres overlap
+                    if(res1.contactPossibleWithResidue(res2)) {                                        
+                        numResContactsPossible++;
+
+                        rci = calculateAtomContactsBetweenResidues(res1, res2);
+                        if( rci != null) {
+                            // There were atoms contacts!
+
+                            if(Settings.getBoolean("plcc_B_write_lig_geolig")) {
+                                // Just add it without asking questions about the residue types
+                                contactInfo.add(rci);
+                            }
+                            else {
+                                // We should ignore ligand contacts
+                                if(res1.getType().equals(1) || res2.getType().equals(1)) {
+                                    // This IS a ligand contact so ignore it
+                                    numIgnoredLigandContacts++;
+                                }
+                                else {
+                                    // This is NOT a ligand contact so add it
+                                    contactInfo.add(rci);
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        numResContactsImpossible++;
+
+
+                        // Exclude Res skipping for now
+                        /*
+                        // Further speedup: If the distance of a residue to another Residue is very large we
+                        //  may be able to skip some of the next residues (I. Koch):
+                        //  If the distance between them is
+
+                        spaceBetweenResidues = a.resCenterDistTo(b) - (2 * atomRadius + a.getCenterSphereRadius() + b.getCenterSphereRadius());
+                        if(spaceBetweenResidues > globalMaxSeqNeighborResDist) {
+                            // In this case we can skip at least one residue.
+
+                            // How often does the max dist between to sequential neighbor residues fit into the space between these two residues 'a' and 'b' ? If it fits in there n times we can
+                            //  skip the next n residues: even if they were arranged in a straight line from 'a' to 'b' they could not reach it!
+                            // numResToSkip = spaceBetweenResidues / globalMaxCenterSphereDiameter;
+                            numResToSkip = spaceBetweenResidues / globalMaxSeqNeighborResDist;
+
+                            // System.out.println("  Residue skipping kicked in for DSSP res " + a.getDsspResNum() + ", skipped " + numResToSkip + " residues after " + b.getDsspResNum() + " in distance " + a.resCenterDistTo(b) + ".");
+                            j += numResToSkip;
+                            numCmpSkipped += numResToSkip;
+                        }
+                        */
+                    }
+                }
+            }
+            
+            // do contact check between chains (only if chains overlap!)
+            for (int l = k + 1; l < chainCounts; l++) {
+                
+                chainB = chains.get(l);
+                int chainBNumberResidues = chainB.getResidues().size();
+
+                // check chain overlap
+                if (chainA.contactPossibleWithChain(chainB)) {
+                    
+                    ArrayList<Residue> residuesB = new ArrayList<>();
+                    residuesB.addAll(chainB.getResidues());
+                    
+                    for (int i = 0; i < chainANumberResidues; i++) {
+
+                        res1 = residuesA.get(i);
+                        //numResToSkip = 0L;
+
+                        // NOTE: we cant just go from j = i + 1 on now or we would miss some contacts!
+                        for (int j = 0; j < chainBNumberResidues; j++) {
+
+                            res2 = residuesB.get(j);
+
+                            if (Settings.getInteger("plcc_I_debug_level") >= 1) {
+                                if(! silent) {
+                                    System.out.println("  Checking DSSP pair " + res1.getDsspResNum() + "/" + res2.getDsspResNum() + "...");
+                                }
+                            }                
+
+                            numResContactsChecked++;
+
+                            // We only need to check on atom level if the center spheres overlap
+                            if (res1.contactPossibleWithResidue(res2)) {                                        
+                                numResContactsPossible++;
+
+                                rci = calculateAtomContactsBetweenResidues(res1, res2);
+                                if (rci != null) {
+                                    // There were atoms contacts!
+
+                                    if (Settings.getBoolean("plcc_B_write_lig_geolig")) {
+                                        // Just add it without asking questions about the residue types
+                                        contactInfo.add(rci);
+                                    }
+                                    else {
+                                        // We should ignore ligand contacts
+                                        if (res1.getType().equals(1) || res2.getType().equals(1)) {
+                                            // This IS a ligand contact so ignore it
+                                            numIgnoredLigandContacts++;
+                                            // System.out.println("  Ignored ligand contact between DSSP residues " + a.getDsspResNum() + " and " + b.getDsspResNum() + ".");
+                                        }
+                                        else {
+                                            // This is NOT a ligand contact so add it
+                                            contactInfo.add(rci);
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+                                numResContactsImpossible++;
+
+                                // no Res skipping for now
+                                /*
+                                // Further speedup: If the distance of a residue to another Residue is very large we
+                                //  may be able to skip some of the next residues (I. Koch):
+                                //  If the distance between them is
+
+                                spaceBetweenResidues = a.resCenterDistTo(b) - (2 * atomRadius + a.getCenterSphereRadius() + b.getCenterSphereRadius());
+                                if(spaceBetweenResidues > globalMaxSeqNeighborResDist) {
+                                    // In this case we can skip at least one residue.
+
+                                    // How often does the max dist between to sequential neighbor residues fit into the space between these two residues 'a' and 'b' ? If it fits in there n times we can
+                                    //  skip the next n residues: even if they were arranged in a straight line from 'a' to 'b' they could not reach it!
+                                    // numResToSkip = spaceBetweenResidues / globalMaxCenterSphereDiameter;
+                                    numResToSkip = spaceBetweenResidues / globalMaxSeqNeighborResDist;
+
+                                    // System.out.println("  Residue skipping kicked in for DSSP res " + a.getDsspResNum() + ", skipped " + numResToSkip + " residues after " + b.getDsspResNum() + " in distance " + a.resCenterDistTo(b) + ".");
+                                    j += numResToSkip;
+                                    numCmpSkipped += numResToSkip;
+
+                                }
+                                */
+                            }
+
+                        }
+
+                    }
+                    
+                } else {
+                    chainChainSkipped++;
+                    chainSkippedRes += (chainANumberResidues * chainBNumberResidues);
+                }
+            }
+        }
+        
+        int maxChainChainContactsPossible;
+        if (chains.size() > 1) {
+            maxChainChainContactsPossible = (chains.size() * (chains.size() - 1)) / 2;
+        } else {
+            maxChainChainContactsPossible = 0;
+        }
+
+        if(! FileParser.silent) {
+            System.out.println("  Skipped " + chainChainSkipped + " chain-chain contacts (and " + chainSkippedRes + " residues) of " + maxChainChainContactsPossible + " maximal contacts due to chain sphere check.");
+            System.out.println("  Checked " + numResContactsChecked + " contacts for " + numberResTotal + " residues: " + numResContactsPossible + " possible, " + contactInfo.size() + " found, " + numResContactsImpossible + " impossible (collison spheres check).");
+            System.out.println("  Note: residue skipping not implemented in chain sphere check.");
+        }
+
+        if( ! Settings.getBoolean("plcc_B_write_lig_geolig")) {
+            if(! FileParser.silent) {
+                System.out.println("  Configured to ignore ligands, ignored " + numIgnoredLigandContacts + " ligand contacts.");
+            }
+        }
+        
+        return contactInfo;
+    }
+    
+    
     /**
      * Calculates all contacts between the residues in res.
      * @param res A list of Residue objects.
@@ -4885,7 +5143,10 @@ public class Main {
                 // DEBUG
                 if(Settings.getInteger("plcc_I_debug_level") >= 1) {
                     if(! silent) {
-                        System.out.println("  Checking DSSP pair " + a.getDsspResNum() + "/" + b.getDsspResNum() + "...");
+                        System.out.println("  Checking DSSP pair " + a.getDsspResNum() + " (Chain " + 
+                                a.getChainID() + " Residue " + a.getPdbResNum() + ") and " + 
+                                b.getDsspResNum() + " (Chain " +  b.getChainID() + " Residue " +
+                                b.getPdbResNum() + ") ...");
                     }
                     //System.out.println("    " + a.getAtomsString());
                     //System.out.println(a.atomInfo());
@@ -5250,7 +5511,7 @@ public class Main {
                 dist = x.distToAtom(y);
 
                 if(x.atomContactTo(y)) {             // If a contact is detected, Atom.atomContactTo() returns true
-                                                    
+                    
 
                     // The van der Waals radii spheres overlap, contact found.
                     numPairContacts[ResContactInfo.TT]++;   // update total number of contacts for this residue pair
@@ -5458,7 +5719,7 @@ public class Main {
         else {
             result = null;
         }
-
+        
         return(result);         // This is null if no contact was detected
         
     }
@@ -10548,6 +10809,7 @@ public class Main {
         System.out.println("   --force                 : process a PDB file even if the resolution is too bad or the number of residues is too low according to settings.");
         System.out.println("   --cluster               : Set all options for cluster mode. Equals '-f -u -k -s -G -i -Z -P'.");
         System.out.println("   --cg-threshold <Int>    : Overwrites setting for contact thresholds for edges in complex graphs.");
+        System.out.println("   --chain-spheres-speedup : speedup for contact computation based on comparison of chain spheres");
         System.out.println("");
         System.out.println("The following options only make sense for database maintenance:");
         System.out.println("--set-pdb-representative-chains-pre <file> <k> : Set non-redundant chain status for all chains in DB from XML file <file>. <k> determines what to do with existing flags, valid options are 'keep' or 'remove'. Get the file from PDB REST API. Run this pre-update, BEFORE new data will be added.");

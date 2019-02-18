@@ -253,6 +253,7 @@ public class Settings {
         defSet("plcc_S_debug_compareSSEContactsFile", "geo.dat_ptgl", "The path to the geo.dat file to use for SSE level contact comparison.");                
         defSet("plcc_B_contact_debug_dysfunct", "false", "Atom level contact debugging mode. WARNING: When this is true, plcc will abort after the first few residues and produce wrong overall results!");
         defSet("plcc_B_debug_only_parse", "false", "Exit after parsing. WARNING: When this is true, plcc will abort after parsing and not produce results!");
+        defSet("plcc_B_debug_only_contact_comp", "true", "Exit after contact computation. WARNING: When this is true, plcc will abort after contact computation and not produce results!");
         
         defSet("plcc_B_set_pdb_representative_chains_post", "false", "Whether this plcc run should assign the representative PDB chains from the XML file in the info table of the database and then exit. Requires path to XML file.");
         defSet("plcc_B_set_pdb_representative_chains_remove_old_labels_post", "true", "Whether the old labels should be removed from all chains in the chains table before the new ones are applied. Removed means all chains are considered NOT part of the representative set.");        
@@ -476,7 +477,8 @@ public class Settings {
         defSet("plcc_B_alternate_aminoacid_contact_model", "false", "Use alternate residue contact model by Andreas. Skips all computations except AA graphs. EXP.");
         defSet("plcc_B_alternate_aminoacid_contact_model_with_ligands", "false", "Use alternate residue contact model including ligands by Andreas. Skips all computations except AA graphs. EXP.");
         defSet("plcc_B_quit_after_aag", "false", "Whether to quit the program after computation of amino acid graphs, prevents further work.");
-                
+        defSet("plcc_B_chain_spheres_speedup", "false", "Whether to use contact computation speedup based on comparison of chain spheres.");
+        
         // SSE definitions
         defSet("plcc_I_min_SSE_length", "3", "the minimal length in AAs a non-ligand SSE must have to be considered (PTGL-style filtering of very short SSEs)");
         defSet("plcc_B_merge_helices", "true", "whether to merge different helix types if they are adjacent in the primary structure");
