@@ -253,7 +253,7 @@ public class Settings {
         defSet("plcc_S_debug_compareSSEContactsFile", "geo.dat_ptgl", "The path to the geo.dat file to use for SSE level contact comparison.");                
         defSet("plcc_B_contact_debug_dysfunct", "false", "Atom level contact debugging mode. WARNING: When this is true, plcc will abort after the first few residues and produce wrong overall results!");
         defSet("plcc_B_debug_only_parse", "false", "Exit after parsing. WARNING: When this is true, plcc will abort after parsing and not produce results!");
-        defSet("plcc_B_debug_only_contact_comp", "true", "Exit after contact computation. WARNING: When this is true, plcc will abort after contact computation and not produce results!");
+        defSet("plcc_B_debug_only_contact_comp", "false", "Exit after contact computation. WARNING: When this is true, plcc will abort after contact computation and not produce results!");
         
         defSet("plcc_B_set_pdb_representative_chains_post", "false", "Whether this plcc run should assign the representative PDB chains from the XML file in the info table of the database and then exit. Requires path to XML file.");
         defSet("plcc_B_set_pdb_representative_chains_remove_old_labels_post", "true", "Whether the old labels should be removed from all chains in the chains table before the new ones are applied. Removed means all chains are considered NOT part of the representative set.");        
@@ -284,7 +284,7 @@ public class Settings {
         defSet("plcc_B_ptgl_text_output", "false", "Whether the PTGL text files (e.g., those required by the bet_neo) are written. Not writing them is faster but this program cannot replace the PTGL tool 'geom_neo' anymore if this is deactivated.");
         defSet("plcc_B_ptgl_geodat_output", "false", "Whether the PTGL text files geo.dat for SSE level contacts is written to a text file.");
         defSet("plcc_B_ramachandran_plot", "false", "Whether a Ramachandran plot is drawn to a file for each chain (slower).");
-        defSet("plcc_B_strict_ptgl_behaviour", "true", "Whether plcc should try to strictly mimick the PTGL, including questionable stuff.");
+        defSet("plcc_B_strict_ptgl_behaviour", "false", "Whether plcc should try to strictly mimick the PTGL, including questionable stuff.");
         defSet("plcc_B_key_use_alternate_arcs", "true", "Whether to use alternative crossover arcs in KEY notation. The alternative arcs cut through other SSEs, the default ones use a vertical central line and shift the center to avoid this.");
         defSet("plcc_B_print_notations_on_fg_images", "false", "Whether to add the notation string to the FG images.");
         

@@ -527,7 +527,6 @@ public class Main {
                         Settings.set("plcc_B_output_images_dir_tree", "true");
                         Settings.set("plcc_B_output_textfiles_dir_tree", "true");
                         Settings.set("plcc_B_useDB", "true");
-                        Settings.set("plcc_B_folding_graphs", "true");
                         Settings.set("plcc_B_AAgraph_allchainscombined", "true");
                         Settings.set("plcc_B_AAgraph_perchain", "true");
                         Settings.set("plcc_B_no_warn", "true");
