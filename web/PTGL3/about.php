@@ -78,9 +78,9 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 					</ul>
 					</li>
 									</ul>
-			 <li class="noBullets"> <a href="#linking">Linking <?php echo "$SITE_TITLE"; ?></a> </li>
-			 <li class="noBullets"> <a href="#api">The <?php echo "$SITE_TITLE"; ?> REST API</a> </li>
-			</li>
+			<li class="noBullets"> <a href="#linking">Linking <?php echo "$SITE_TITLE"; ?></a> </li>
+			<li class="noBullets"> <a href="#api">The <?php echo "$SITE_TITLE"; ?> REST API</a> </li>
+			<li class="noBullets"> <a href="#help"> Help </a> </li>
 		</ul>
 
 		<br>
@@ -89,9 +89,9 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<h3> What is <?php echo "$SITE_TITLE"; ?>? </h3>
 
 		<p>
-		<?php echo "$SITE_TITLE"; ?> is a web-based database application for the analysis protein topologies. It uses a graph-based model to describe the structure
+		<?php echo "$SITE_TITLE"; ?> is a web-based database application for the analysis of protein topologies. It uses a graph-based model to describe the structure
 		of protein chains on the super-secondary structure level. A protein graph is computed from the 3D atomic coordinates of a single chain in
-		a PDB file and the secondary structure assignments of the DSSP algorithm. The computation of the protein graph is done by our software <a href="http://www.bioinformatik.uni-frankfurt.de/tools/vplg/" target="_blank">Visualization of Protein Ligand Graphs (VPLG)</a>. In a protein graph graph, vertices represent secondary
+		a PDB file and the secondary structure assignments of the DSSP algorithm. The computation of the protein graph is done by our software <a href="http://www.bioinformatik.uni-frankfurt.de/tools/vplg/" target="_blank">Visualization of Protein-Ligand Graphs (VPLG)</a>. In a protein graph, vertices represent secondary
 		structure elements (SSEs, usually alpha helices and beta strands) or ligand molecules while the edges model contacts and relative orientations between
 		them. The result is an undirected, labelled graph for a single protein chain.
 		<br /><br /></p>
@@ -416,10 +416,23 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		<h3>The <?php echo "$SITE_TITLE"; ?> REST API</h3>
 		<p>We are offering a REST API for programmers. Please see the <a href="./api/" target="_blank">API documentation</a> for details.</p>
 		
-
-
 		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
 		
+		<a class="anchor" id="help"></a>
+		<h3>Help</h3>
+		<h4>Why is there no result for my PDB ID?</h2>
+		<ul>
+			<li> Check if the entered PDB ID (4 characters) is correct </li>
+			<li> PTGL is currently updated annually, check that the structure is not too new (<a href="http://ptgl.uni-frankfurt.de/content.php">Content</a>) </li>
+			<li> Structures with a resolution worse than 4.5 Angstroem are excluded </li>
+			<li> Structures containing too few residues are excluded </li>
+			<li> If nothing from the above applies, you can <a href="http://ptgl.uni-frankfurt.de/contact.php">Contact</a> us </li>
+			<li> You can compute your own results with the open source <a href="http://www.bioinformatik.uni-frankfurt.de/tools/vplg/">VPLG</a> software
+		</ul>
+		
+		<div class="topLink"><a href="#" class="topLink"><i class="fa fa-2x fa-long-arrow-up"></i></a></div>
+
+
 		<br><br><br>
 
 	</div><!-- end container and contentText -->
