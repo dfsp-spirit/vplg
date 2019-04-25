@@ -426,7 +426,7 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 			<li> PTGL is currently updated annually, check that the structure is not too new (<a href="http://ptgl.uni-frankfurt.de/content.php">Content</a>) </li>
 			<li> Structures with a resolution worse than 4.5 Angstroem are excluded </li>
 			<li> Structures containing too few residues are excluded </li>
-			<li> If nothing from the above applies, you can <a href="http://ptgl.uni-frankfurt.de/contact.php">Contact</a> us </li>
+			<li> If nothing of the above applies, you can <a href="http://ptgl.uni-frankfurt.de/contact.php">Contact</a> us </li>
 			<li> You can compute your own results with the open source <a href="http://www.bioinformatik.uni-frankfurt.de/tools/vplg/">VPLG</a> software
 		</ul>
 		
