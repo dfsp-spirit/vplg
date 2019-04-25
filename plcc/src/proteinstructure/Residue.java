@@ -24,7 +24,7 @@ import plcc.Settings;
  * 
  * @author ts
  */
-public class Residue implements java.io.Serializable {
+public class Residue extends Molecule implements java.io.Serializable {
     
     public static final Integer RESIDUE_TYPE_AA = 0;
     public static final Integer RESIDUE_TYPE_LIGAND = 1;
