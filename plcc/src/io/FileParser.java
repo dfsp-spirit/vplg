@@ -920,7 +920,9 @@ public class FileParser {
                                     // use first model
                                     m = new Model(tmp_modelID);
                                     s_models.add(m);
-                                    System.out.println("   PDB: New model '" + m.getModelID() + "' found");
+                                    if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
+                                        System.out.println("   PDB: New model '" + m.getModelID() + "' found");
+                                    }
                                 } else {
                                     // same model as before?
                                     if (! m.getModelID().equals(tmp_modelID)) {
