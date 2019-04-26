@@ -147,34 +147,6 @@ public class Residue extends Molecule implements java.io.Serializable {
     }
     
     /**
-     * Returns the C alpha atoms of this residue or null if it has none.
-     * @return the alpha carbon or null 
-     */
-    public Atom getAlphaCarbonAtom() {
-        if(this.isAA()) {
-            for(Atom a : this.atoms) {
-                if(a.isCalphaAtom()) {
-                    return a;
-                }
-            }
-        }
-        return null;
-    }
-    
-    
-    /**
-     * Determines whether this Residue has at least one Atom.
-     * @return true if this Residue has at least one Atom, false otherwise.
-     */ 
-    public boolean hasAtoms() {
-        return(this.atoms.size() > 0);
-    }
-
-    public Boolean isLigand() { return(this.type.equals(Residue.RESIDUE_TYPE_LIGAND)); }
-    public Boolean isAA() { return(this.type.equals(Residue.RESIDUE_TYPE_AA)); }
-    public Boolean isOtherRes() { return(this.type.equals(Residue.RESIDUE_TYPE_OTHER)); }
-
-    /**
      * Returns the alternate location identifier that most atoms of this residue share.
      * @return the most common alternate location identifier of this residue. If this residue
      * has no atoms, a space (" ", the PDB default altLoc) will be returned.
