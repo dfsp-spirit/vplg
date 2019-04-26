@@ -9,6 +9,7 @@ package proteinstructure;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import plcc.Main;
 import plcc.Settings;
 import proteinstructure.SSE;
@@ -37,7 +38,7 @@ public class Molecule {
     private String chainID = null;
     private String modelID = null;
     private String iCode = null; 
-    
+    private Integer centerSphereRadius = null;
    
      /**
      * Returns the C alpha atoms of this residue or null if it has none.
@@ -282,6 +283,165 @@ public class Molecule {
         return deletedAtoms;
     }
     
+    /**
+     * Returns the radius of the collision sphere of this residue. This radius doe NOT yet include the outer hull, it is the distance from the center atom to the (non-H) atom farthest away from it.
+     * @return the radius, in 1/10th Angstroem (so 20 means 2.0 A).
+     */
+    public Integer getCenterSphereRadius() {
+
+        Atom throwAway = null;
+
+        if(this.centerSphereRadius == null) {
+            // calling this function will set the centerSphereRadius variable!
+            throwAway = this.getCenterAtom();
+        }
+
+        // Should have been set by now!
+        if(this.centerSphereRadius == null) {
+            
+            Integer rad = 50;      // 5 A
+            if(! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                DP.getInstance().w("Could not determine center sphere radius of PDB residue " + this.getPdbResNum() + ", may have no atoms. Using guessed value " + rad + ".");
+            }
+            this.centerSphereRadius = rad;
+        }
+
+
+        return(this.centerSphereRadius);
+    }
+        /**
+     * Determines the center atom of this residue, and also sets the center sphere radius for the residue.
+     * @return the center atom
+     */
+    public Atom getCenterAtom() {
+
+        Atom a, b, center;
+        a = b = center = null;
+        Integer maxDistForAtom, dist = 0; // just assign a small start value
+        Integer MAXDIST = Integer.MAX_VALUE;   // just assign a *very* large start value
+        Integer totalMinMaxDist = MAXDIST;
+        //Integer atomRadius = Settings.getInteger("plcc_I_atom_radius");
+
+        if(atoms.size() < 1) {
+            if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                DP.getInstance().w("getCenterAtom(): PDB residue " + this.pdbResNum + " chain " + this.getChainID() + " of type " + this.getName3() + " has " + atoms.size() + " atoms in default location, returning null.");
+            }
+            return(null);
+        }
+
+        // If this is an AA, use the CA.
+        if(this.isAA()) {
+
+            for(Integer i = 0; i < atoms.size(); i++) {
+                a = atoms.get(i);
+                if(a.isCalphaAtom()) {
+                    center = a;
+                    break;
+                }
+            }
+
+            
+            if(center == null) {
+
+                // Dying may be too harsh -- maybe use the ligand version if this residue has no C alpha atom?
+                //System.err.println("ERROR: Could not determine C alpha atom of PDB residue " + this.pdbResNum + ", PDB file broken.");
+                //System.exit(1);
+
+                System.out.println("WARNING: PDB residue " + this.pdbResNum + " has no C alpha atom, PDB file broken. Using 1st atom as center.");
+                center = atoms.get(0);
+                
+            }
+
+            // For the return value of this function alone we would be done, but we want to set the C alpha sphere
+            //  radius as well. It is the maximal distance of the center atom to any other atom of this residue.
+            maxDistForAtom = 0;
+            for(Integer j = 0; j < this.atoms.size(); j++) {
+
+                b = this.atoms.get(j);
+                
+                if(a.equalsAtom(b)) {
+                   continue; 
+                }
+                
+                dist = center.distToAtom(b);
+
+                if(dist > maxDistForAtom) {
+                    maxDistForAtom = dist;
+                }
+
+            }
+
+            // The distance to any other atom cannot be smaller than 2 * atomRadius, otherwise the vdW radii of
+            //  the atoms would overlap. If this occurs in a PDB file, something most likely is wrong with the file.
+            //  Note though that this only applies to AA residues because a ligand could consist of a single atom
+            //  and in that case the center sphere radius can be smaller than 2 * atomRadius.
+            //if(maxDistForAtom < (2 * atomRadius)) {
+            //    maxDistForAtom = 2 * atomRadius;
+            //}
+
+            // The maximal distance of the Atom we chose to any other Atom of this residue is the C alpha/center sphere radius
+            this.centerSphereRadius = maxDistForAtom;
+
+        }
+        else {
+
+            // If this is a ligand, calculate the center by using the atom with the
+            //  minimal maximal distance to all other atoms of this residue.      
+          
+            for(Integer i = 0; i < atoms.size(); i++) {
+                
+                a = atoms.get(i);
+                maxDistForAtom = 0;
+
+                for(Integer j = 0; j < atoms.size(); j++) {     // we need to compare the atom to itself (distance = 0 then) if there only is a single atom in this residue (which holds for ligands like 'MG'). So j=i, not j=i+1.
+
+                    b = atoms.get(j);
+                    dist = a.distToAtom(b);
+
+                    if(dist > maxDistForAtom) {
+                        maxDistForAtom = dist;
+                    }
+                }
+
+                // We determined the maximal distance of this atom to any other atom of this residue.
+                // Now check whether this maxDist is smaller than the smallest current maxDist.
+
+                if(maxDistForAtom < totalMinMaxDist) {
+                    totalMinMaxDist = maxDistForAtom;
+
+                    // Also update the current center atom. We can't break here though because
+                    //  this may still get improved/overwritten during the rest of the loop.
+                    center = a;
+                }
+
+            }
+
+            // The maximal distance of the Atom we chose to any other Atom of this residue is the C alpha/center sphere radius
+            centerSphereRadius = totalMinMaxDist;            
+
+        }
+
+        // If totalMinMaxDist still has the original value of MAXDIST something most likely is very wrong since
+        //  no atoms within a single residue should have such a large distance.
+        // Note though that this value is not touched for AAs since the C alpha is assumed to be the center, thus
+        //  we don't compare all atoms with each other for AAs. We only calculate the distance from the CA to all others.
+        if(Objects.equals(totalMinMaxDist, MAXDIST) && (! this.isAA())) {
+            System.err.println("ERROR: MinMax distance of the atoms of PDB residue " + pdbResNum + " is >= " + MAXDIST + ", seems *very* unlikely.");
+            System.exit(-1);
+        }
+
+
+        // just die if we could not determine a center atom
+        if(center == null) {
+                System.err.println("ERROR: Could not determine center atom of residue type " + this.getType() + " with PDB number " + pdbResNum + ", DSSP number " + dsspResNum + ".");
+                System.exit(-1);
+        }
+        
+        
+        return(center);
+
+    }
+    
     public String getFancyName() { return(this.resName3 + "-" + this.pdbResNum); }
     /**
      * Returns the PLCC SSE string of this SSE. May be blank/ a single space ' '.
@@ -289,5 +449,8 @@ public class Molecule {
      */
     
     public String getChainID() { return(chainID); }
+    public Integer getType() { return(type); }
+    public String getName3() { return(resName3); }
+    public Integer getPdbResNum() { return(pdbResNum); }
    
 }
