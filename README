@@ -1,26 +1,8 @@
-This is a checkout of the the GitHub source code repository of VPLG.
+
+I do not work on this project anymore, and the repo was handed over the Molecular Bioinformatics Group (MolBI) at Goethe University Frankfurt.
+
+Please use the fork here from now on: https://github.com/MolBIFFM/vplg
 
 
-   ------------------------------------------------------------------------------------
-
-    The code for a certain release is always included in the src/ directory of the zip.
-
-   -----------------------------------------------------------------------------------
-   
-   
-This is just the README for the code repository, see the doc/ subdirectory for help
-with the software in this repo.
-
-Note that both the 'splitpdb' and the 'plcc' directories contain not only the
-source code but the full Netbeans projects, so you should be able to open
-them directly if you use the Netbeans IDE.
-
-The official VPLG website is at http://vplg.sourceforge.net/.
-
-The source is at GitHub, at https://github.com/dfsp-spirit/vplg/.
-
-VPLG is free software and comes WITHOUT ANY WARRANTY. See the LICENSE file for details.
-
---
-TS
+Tim
 
