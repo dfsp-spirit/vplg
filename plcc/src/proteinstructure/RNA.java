@@ -21,12 +21,17 @@ public class RNA extends Molecule implements java.io.Serializable {
     private Integer dsspResNum = null; 
     private String rnaName= null;
     
-    public RNA() { this.atoms = new ArrayList<>(); this.hydrogenatoms = new ArrayList<>(); }
+    //public RNA() { this.atoms = new ArrayList<>(); this.hydrogenatoms = new ArrayList<>(); }
     
-    public RNA(Integer residueNumberPDB, Integer residueNumberDSSP) {
+    /*public RNA(Integer residueNumberPDB, Integer residueNumberDSSP) {
         atoms = new ArrayList<>();
         hydrogenatoms = new ArrayList<>();
         pdbResNum = residueNumberPDB;
         dsspResNum = residueNumberDSSP;
     }
+    */
+    
+    //@Override public String toString() {
+      //  return("[Residue] PDB# " + pdbResNum + ", DSSP# " + dsspResNum + ", Type " + type + ", AA1 " + AAName1 + ", AA3 " + resName3 + ", Chain " + chainID + ", Model " + modelID + ", # of Atoms " + atoms.size());
+    //}
 }
