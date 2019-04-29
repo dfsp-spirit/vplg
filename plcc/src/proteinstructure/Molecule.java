@@ -485,5 +485,15 @@ public class Molecule {
      */
     public Integer getNumAtoms() { return(this.atoms.size()); }
     public String getModelID() { return(modelID); }
+    public Chain getChain() { return(chain); }
+    
+    // setters
+    public void addAtom(Atom a) { atoms.add(a); }
+    public void addHydrogenAtom(Atom a) { hydrogenatoms.add(a); }
+    public void setType(Integer i) { type = i; }
+    public void setChain(Chain c) { chain = c; }
+    public void setChainID(String s) { chainID = s; }
+    public void setModelID(String s) { modelID = s; }
+    public void setAtoms(ArrayList<Atom> a) { atoms = a; }
    
 }

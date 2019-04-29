@@ -349,7 +349,7 @@ public class Residue extends Molecule implements java.io.Serializable {
     public Float getPhi() { if(this.isAA()) { return(phi); } else { return(0.0f); } }
     public Float getPsi() { if(this.isAA()) { return(psi); } else { return(0.0f); } }
     public Integer getAcc() { if(this.isAA()) { return(acc); } else { return(0); } }
-    public String getResName3() { return resName3;}
+    
 
     
     /**
@@ -393,18 +393,12 @@ public class Residue extends Molecule implements java.io.Serializable {
         }
     }
 
-    // setters
-    public void addAtom(Atom a) { atoms.add(a); }
-    public void addHydrogenAtom(Atom a) { hydrogenatoms.add(a); }
+    
+    
     public void setResName3(String s) { resName3 = s; }
     public void setAAName1(String s) { AAName1 = s; }
-    public void setType(Integer i) { type = i; }
     public void setPdbResNum(Integer i) { pdbResNum = i; }
     public void setDsspResNum(Integer i) { dsspResNum = i; }
-    public void setChain(Chain c) { chain = c; }
-    public void setChainID(String s) { chainID = s; }
-    public void setModelID(String s) { modelID = s; }
-    public void setAtoms(ArrayList<Atom> a) { atoms = a; }
     public void setSSEString(String s) { sseString = s; }
     public void setSSEStringDssp(String s) { sseStringDssp = s; }
     public void setSSETypePlcc(String s) { plccSSEType = s; }
