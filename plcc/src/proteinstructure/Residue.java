@@ -293,24 +293,7 @@ public class Residue extends Molecule implements java.io.Serializable {
     public Chain getChain() { return(chain); }
     public String getChainID() { return(chainID); }
     
-    /**
-     * Returns the list of (non-H) atoms of this residue.
-     * @return the atom list
-     */
-    public ArrayList<Atom> getAtoms() { return(atoms); }
-    
-    /**
-     * Returns the list of hydrogen atoms of this residue. Only available with special command line options and PDB files!
-     * @return the hydrogen atom list
-     */
-    public List<Atom> getHydrogenAtoms() { return hydrogenatoms; }
-    
-    /**
-     * Returns the atom count of this Residue.
-     * @return the number of atoms
-     */
-    public Integer getNumAtoms() { return(this.atoms.size()); }
-    public String getModelID() { return(modelID); }
+  
     
     /**
      * Returns the PDB insertion code field of this Residue.

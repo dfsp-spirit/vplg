@@ -9,6 +9,7 @@ package proteinstructure;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 import plcc.Main;
 import plcc.Settings;
@@ -442,6 +443,20 @@ public class Molecule {
 
     }
     
+    /**
+     * Returns the PDB atom number of the center atom of this residue.
+     */
+    public Integer getCenterAtomNum() {
+        if(atoms.size() > 0) {
+            return(getCenterAtom().getPdbAtomNum());
+        }
+        else {
+            System.err.println("ERROR: Could not determine center atom of PDB residue " + pdbResNum + " because it has no atoms.");
+            System.exit(-1);
+            return(null);       // for the IDE
+        }
+    }
+    
     public String getFancyName() { return(this.resName3 + "-" + this.pdbResNum); }
     /**
      * Returns the PLCC SSE string of this SSE. May be blank/ a single space ' '.
@@ -452,5 +467,23 @@ public class Molecule {
     public Integer getType() { return(type); }
     public String getName3() { return(resName3); }
     public Integer getPdbResNum() { return(pdbResNum); }
+    /**
+     * Returns the list of (non-H) atoms of this residue.
+     * @return the atom list
+     */
+    public ArrayList<Atom> getAtoms() { return(atoms); }
+    
+    /**
+     * Returns the list of hydrogen atoms of this residue. Only available with special command line options and PDB files!
+     * @return the hydrogen atom list
+     */
+    public List<Atom> getHydrogenAtoms() { return hydrogenatoms; }
+    
+    /**
+     * Returns the atom count of this Residue.
+     * @return the number of atoms
+     */
+    public Integer getNumAtoms() { return(this.atoms.size()); }
+    public String getModelID() { return(modelID); }
    
 }
