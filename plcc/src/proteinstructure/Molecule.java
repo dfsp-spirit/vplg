@@ -26,18 +26,15 @@ public class Molecule {
     public static final Integer RESIDUE_TYPE_OTHER = 2;
     public static final Integer RESIDUE_TYPE_RNA = 3;
     // declare class vars
-    // 3 letter name
-    //private String resName3;                          
-    //private String AAName1 = null;                          // 1 letter name, AAs only
     private String RNAName1=null;
-    private Integer type = null;                            // residue type: 0=AA, 1=Ligand, 2=Other
+    public Integer type = null;                            // residue type: 0=AA, 1=Ligand, 2=Other
     public ArrayList<Atom> atoms = null;                         // a list of all (non-H) Atoms of the Residue
     public ArrayList<Atom> hydrogenatoms = null;                         // a list of all hydrogen Atoms of the Residue
     public Chain chain = null;                             // the Chain this Residue belongs to
     public String chainID = null;
     public String modelID = null;
     public String iCode = null; 
-    private Integer centerSphereRadius = null;
+    public Integer centerSphereRadius = null;
     
     //constructor
     public Molecule(){this.atoms = new ArrayList<>(); this.hydrogenatoms = new ArrayList<>(); }
