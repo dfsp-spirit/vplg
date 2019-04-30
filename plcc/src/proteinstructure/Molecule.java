@@ -27,18 +27,16 @@ public class Molecule {
     public static final Integer RESIDUE_TYPE_RNA = 3;
     // declare class vars
     // 3 letter name
-    private String resName3;                          
-    private String AAName1 = null;                          // 1 letter name, AAs only
+    //private String resName3;                          
+    //private String AAName1 = null;                          // 1 letter name, AAs only
     private String RNAName1=null;
     private Integer type = null;                            // residue type: 0=AA, 1=Ligand, 2=Other
-    private ArrayList<Atom> atoms = null;                         // a list of all (non-H) Atoms of the Residue
-    private ArrayList<Atom> hydrogenatoms = null;                         // a list of all hydrogen Atoms of the Residue
-    private Integer pdbResNum = null;                       // pdb residue number
-    private Integer dsspResNum = null;                      // guess what
-    private Chain chain = null;                             // the Chain this Residue belongs to
-    private String chainID = null;
-    private String modelID = null;
-    private String iCode = null; 
+    public ArrayList<Atom> atoms = null;                         // a list of all (non-H) Atoms of the Residue
+    public ArrayList<Atom> hydrogenatoms = null;                         // a list of all hydrogen Atoms of the Residue
+    public Chain chain = null;                             // the Chain this Residue belongs to
+    public String chainID = null;
+    public String modelID = null;
+    public String iCode = null; 
     private Integer centerSphereRadius = null;
     
     //constructor
@@ -329,7 +327,7 @@ public class Molecule {
 
         if(atoms.size() < 1) {
             if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                DP.getInstance().w("getCenterAtom(): PDB residue " + this.pdbResNum + " chain " + this.getChainID() + " of type " + this.getName3() + " has " + atoms.size() + " atoms in default location, returning null.");
+                DP.getInstance().w("getCenterAtom(): PDB residue " + this.pdbResNum + " chain " + this.getChainID() + " of type " + residue.getName3() + " has " + atoms.size() + " atoms in default location, returning null.");
             }
             return(null);
         }
@@ -461,16 +459,10 @@ public class Molecule {
         }
     }
     
-    public String getFancyName() { return(this.resName3 + "-" + this.pdbResNum); }
-    /**
-     * Returns the PLCC SSE string of this SSE. May be blank/ a single space ' '.
-     * @return the PLCC SSE string of this SSE, e.g., "H", "E", " " or "L"
-     */
     
     public String getChainID() { return(chainID); }
     public Integer getType() { return(type); }
-    public String getName3() { return(resName3); }
-    public Integer getPdbResNum() { return(pdbResNum); }
+    
     /**
      * Returns the list of (non-H) atoms of this residue.
      * @return the atom list
