@@ -15,24 +15,14 @@ import java.util.ArrayList;
  * @author katja
  */
 public class RNA extends Molecule implements java.io.Serializable {
-    private ArrayList<Atom> atoms = null;                         // a list of all (non-H) Atoms of the Residue
-    private ArrayList<Atom> hydrogenatoms = null;                         // a list of all hydrogen Atoms of the Residue
-    private Integer pdbResNum = null;                       // pdb residue number
-    private Integer dsspResNum = null; 
+
+    //insert pdbRNANum and dsspRNANum
     private String rnaName= null;
     private String AAName1 = null;
     
-    //public RNA() { this.atoms = new ArrayList<>(); this.hydrogenatoms = new ArrayList<>(); }
-    
-    /*public RNA(Integer residueNumberPDB, Integer residueNumberDSSP) {
-        atoms = new ArrayList<>();
-        hydrogenatoms = new ArrayList<>();
-        pdbResNum = residueNumberPDB;
-        dsspResNum = residueNumberDSSP;
-    }
-    */
+    //insert constructor
     
     //@Override public String toString() {
-      //  return("[Residue] PDB# " + pdbResNum + ", DSSP# " + dsspResNum + ", Type " + type + ", AA1 " + AAName1 + ", AA3 " + resName3 + ", Chain " + chainID + ", Model " + modelID + ", # of Atoms " + atoms.size());
+      //  return("[Residue] PDB# " + pdbRNANum + ", DSSP# " + dsspRNANum + ", Type " + type + ", AA1 " + AAName1 + ", AA3 " + rnaName3 + ", Chain " + chainID + ", Model " + modelID + ", # of Atoms " + atoms.size());
     //}
 }

@@ -15,6 +15,7 @@ import plcc.Main;
 import plcc.Settings;
 import proteinstructure.SSE;
 import tools.DP;
+
 /**
  *
  * @author kk
@@ -26,7 +27,6 @@ public class Molecule {
     public static final Integer RESIDUE_TYPE_OTHER = 2;
     public static final Integer RESIDUE_TYPE_RNA = 3;
     // declare class vars
-    private String RNAName1=null;
     public Integer type = null;                            // residue type: 0=AA, 1=Ligand, 2=Other
     public ArrayList<Atom> atoms = null;                         // a list of all (non-H) Atoms of the Residue
     public ArrayList<Atom> hydrogenatoms = null;                         // a list of all hydrogen Atoms of the Residue

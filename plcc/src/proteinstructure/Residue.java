@@ -37,8 +37,8 @@ public class Residue extends Molecule implements java.io.Serializable {
     private Integer type = null;                            // residue type: 0=AA, 1=Ligand, 2=Other
     //private ArrayList<Atom> atoms = null;                         // a list of all (non-H) Atoms of the Residue
     //private ArrayList<Atom> hydrogenatoms = null;                         // a list of all hydrogen Atoms of the Residue
-    private Integer pdbResNum = null;                       // pdb residue number
-    private Integer dsspResNum = null;                      // guess what
+    public Integer pdbResNum = null;                       // pdb residue number
+    public Integer dsspResNum = null;                      // guess what
        // PDB insertion code
     
     /** The binding sites, if any, that this residue is part of (for protein residues which are part of the pocket, NOT for ligands which dock into a pocket).  */
@@ -277,6 +277,7 @@ public class Residue extends Molecule implements java.io.Serializable {
 
     // getters
     public String getName3() { return(resName3); }
+    public String getResName3() {return(resName3);}
     
     /** Returns the trimmed name3, to enter into DB. Otherwise we get stuff like ' NA' in the database, and searching for 'NA' fails.
      * @return  the trimmed lig name (length 1 - 3 chars)*/
