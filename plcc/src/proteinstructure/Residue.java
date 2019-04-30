@@ -394,7 +394,7 @@ public class Residue extends Molecule implements java.io.Serializable {
     }
 
     
-    
+    //setters
     public void setResName3(String s) { resName3 = s; }
     public void setAAName1(String s) { AAName1 = s; }
     public void setPdbResNum(Integer i) { pdbResNum = i; }

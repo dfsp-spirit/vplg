@@ -25,9 +25,9 @@ public class Molecule {
     public static final Integer RESIDUE_TYPE_LIGAND = 1;
     public static final Integer RESIDUE_TYPE_OTHER = 2;
     public static final Integer RESIDUE_TYPE_RNA = 3;
-    
     // declare class vars
-    private String resName3 = null;                          // 3 letter name
+    // 3 letter name
+    private String resName3;                          
     private String AAName1 = null;                          // 1 letter name, AAs only
     private String RNAName1=null;
     private Integer type = null;                            // residue type: 0=AA, 1=Ligand, 2=Other
@@ -40,6 +40,10 @@ public class Molecule {
     private String modelID = null;
     private String iCode = null; 
     private Integer centerSphereRadius = null;
+    
+    //constructor
+    public Molecule(){this.atoms = new ArrayList<>(); this.hydrogenatoms = new ArrayList<>(); }
+
    
      /**
      * Returns the C alpha atoms of this residue or null if it has none.
