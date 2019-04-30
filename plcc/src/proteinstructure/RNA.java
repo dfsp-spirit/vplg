@@ -20,6 +20,7 @@ public class RNA extends Molecule implements java.io.Serializable {
     private Integer pdbResNum = null;                       // pdb residue number
     private Integer dsspResNum = null; 
     private String rnaName= null;
+    private String AAName1 = null;
     
     //public RNA() { this.atoms = new ArrayList<>(); this.hydrogenatoms = new ArrayList<>(); }
     
