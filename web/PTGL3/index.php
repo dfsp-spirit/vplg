@@ -428,9 +428,9 @@ function check_install($db)  {
 				Å and a sequence length of at least 20 amino acids. The database enables the user to search for the topology of a protein or for certain
 				topologies and subtopologies using the <a href="about.php#linearNot">linear notations</a>. Additionally, it could be searched for sequence similarity in <a href="http://www.rcsb.org/pdb/" target="_blank">PDB</a> sequences.
 				-->
-				<?php echo "$SITE_TITLE"; ?> is a web-based database application for the analysis protein topologies. It uses a graph-based model to describe the structure
+				<?php echo "$SITE_TITLE"; ?> is a web-based database application for the analysis of protein topologies. It uses a graph-based model to describe the structure
 		of protein chains on the super-secondary structure level. A protein graph is computed from the 3D atomic coordinates of a single chain in
-		a PDB file and the secondary structure assignments of the DSSP algorithm. In a protein graph graph, vertices represent secondary
+		a PDB file and the secondary structure assignments of the DSSP algorithm. In a protein graph, vertices represent secondary
 		structure elements (SSEs, usually alpha helices and beta strands) or ligand molecules while the edges model contacts and relative orientations between
 		them. 
 				<a href="about.php">Read more about <?php echo "$SITE_TITLE"; ?>...</a>
