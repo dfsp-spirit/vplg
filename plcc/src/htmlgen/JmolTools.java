@@ -286,7 +286,7 @@ public class JmolTools {
      * @return the jmol identification string, e.g., "23:a" for residue # 23 in chain A
      */ 
     public static String getSingleResidueIdentificationString(Residue r) {
-        return r.getPdbResNum() + ":" + r.getChainID().toLowerCase();
+        return r.getPdbNum() + ":" + r.getChainID().toLowerCase();
     }
     
     
