@@ -28,7 +28,7 @@ public class PiEffectCalculations {
         if (! atoms.isEmpty()) {
             double[] c = new double[3];
             
-            if(atoms.get(0).getResidue().getResName3().equals("TRP")) {
+            if(atoms.get(0).getResidue().getName3().equals("TRP")) {
                 if (atoms.size() == 5) {
                     double[] r0 = new double[3];
                     r0[0] = (atoms.get(1).getCoordX() + atoms.get(2).getCoordX() + atoms.get(4).getCoordX()) / 3;
