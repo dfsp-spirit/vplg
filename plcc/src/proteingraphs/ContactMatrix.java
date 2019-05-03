@@ -114,8 +114,8 @@ public class ContactMatrix {
 
                 // We need to get the SSEs for the residues now. Note that they may not be part of any SSE
                 //  in our list (they may be part of an SSE of another chain or no valid SSE, e.g. a coil).
-                aSSEPos = getSSEPosOfDsspResidue(resA.getDsspResNum());
-                bSSEPos = getSSEPosOfDsspResidue(resB.getDsspResNum());
+                aSSEPos = getSSEPosOfDsspResidue(resA.getDsspNum());
+                bSSEPos = getSSEPosOfDsspResidue(resB.getDsspNum());
                
                 if(aSSEPos < 0 || bSSEPos < 0) {
                     // At least one of these residues is not part of one of the SEEs. This can happen if it is part
@@ -378,7 +378,7 @@ public class ContactMatrix {
         Integer pos = -1;
 
         for(Integer i = 0; i < this.sseList.size(); i++) {            
-            if( (this.sseList.get(i).getStartResidue().getDsspResNum() <= dsspResNum) && (this.sseList.get(i).getEndResidue().getDsspResNum() >= dsspResNum)  ) {
+            if( (this.sseList.get(i).getStartResidue().getDsspNum() <= dsspResNum) && (this.sseList.get(i).getEndResidue().getDsspNum() >= dsspResNum)  ) {
                 //System.out.println("   +DSSP Residue " + dsspResNum + " is part of SSE #" + i + ": " + this.sseList.get(i).shortStringRep() + ".");
                 return(i);
                 }            
@@ -411,8 +411,8 @@ public class ContactMatrix {
 
         for(Integer i = 0; i < this.sseList.size(); i++) {
 
-            if(this.sseList.get(i).getStartResidue().getDsspResNum().equals(dsspStart)) {
-                if(this.sseList.get(i).getEndResidue().getDsspResNum().equals(dsspEnd)) {
+            if(this.sseList.get(i).getStartResidue().getDsspNum().equals(dsspStart)) {
+                if(this.sseList.get(i).getEndResidue().getDsspNum().equals(dsspEnd)) {
                     return(i);
                 }
             }
@@ -770,8 +770,8 @@ public class ContactMatrix {
         Map<Integer, List<ResContactInfo>> rcMap = new HashMap<>();
         Integer resASSEPos, resBSSEPos;
         for(ResContactInfo rci : contList) {
-            resASSEPos = getSSEPosOfDsspResidue(rci.getResA().getDsspResNum());
-            resBSSEPos = getSSEPosOfDsspResidue(rci.getResB().getDsspResNum());
+            resASSEPos = getSSEPosOfDsspResidue(rci.getResA().getDsspNum());
+            resBSSEPos = getSSEPosOfDsspResidue(rci.getResB().getDsspNum());
             
             // init lists if required
             if( ! rcMap.containsKey(resASSEPos)) {
@@ -858,8 +858,8 @@ public class ContactMatrix {
                         resB = usedContList.get(k).getResB();                                                       
 
                         // Get the SSEs
-                        resASSEPos = getSSEPosOfDsspResidue(resA.getDsspResNum());
-                        resBSSEPos = getSSEPosOfDsspResidue(resB.getDsspResNum());
+                        resASSEPos = getSSEPosOfDsspResidue(resA.getDsspNum());
+                        resBSSEPos = getSSEPosOfDsspResidue(resB.getDsspNum());
 
                         // If they don't belong to any SSEs we are interested in, forget about them. Note that these
                         //  residues may even belong to another chain.
