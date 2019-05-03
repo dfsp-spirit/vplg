@@ -68,7 +68,7 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
                 return true;
             } else {
                 // same chain, gotta check residue distance
-                int seqDist = Math.abs(resA.getPdbResNum() - resB.getPdbResNum());
+                int seqDist = Math.abs(resA.getPdbNum() - resB.getPdbNum());
                 if (seqDist < minSeqDist) {
                     return false;
                 } else {
@@ -98,7 +98,7 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
                 return false;
             } else {
                 // same chain, gotta check residue distance
-                int seqDist = Math.abs(resA.getPdbResNum() - resB.getPdbResNum());
+                int seqDist = Math.abs(resA.getPdbNum() - resB.getPdbNum());
                 if (seqDist > maxSeqDist) {
                     return false;
                 } else {
@@ -346,9 +346,9 @@ public class PPIGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraph
             sbIdx.append(",");
             sbIdx.append(sortedList.get(i));
             sbIdx.append(",");
-            sbIdx.append(residue.getPdbResNum());
+            sbIdx.append(residue.getPdbNum());
             sbIdx.append(",");
-            sbIdx.append(residue.getResName3());
+            sbIdx.append(residue.getName3());
             sbIdx.append(System.lineSeparator());
         }
 
