@@ -22,7 +22,7 @@ public class SSECreator {
             r.setiCode("");
             sse.addResidue(r);
             if(vClass.equals(SSE.SSECLASS_LIGAND)) {
-                r.setResName3("LIG");
+                r.setName3("LIG");
             }
             sse.setSeqSseChainNum(numInChain);
         return sse;
