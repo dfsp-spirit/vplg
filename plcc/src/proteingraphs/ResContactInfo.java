@@ -200,10 +200,10 @@ public class ResContactInfo {
 
 
     // getters required for writing the <pdbid>.geo file
-    public Integer getDsspResNumResA() { return(this.resA.getDsspResNum()); }
-    public Integer getDsspResNumResB() { return(this.resB.getDsspResNum()); }
-    public Integer getPdbResNumResA() { return(this.resA.getPdbResNum()); }
-    public Integer getPdbResNumResB() { return(this.resB.getPdbResNum()); }
+    public Integer getDsspResNumResA() { return(this.resA.getDsspNum()); }
+    public Integer getDsspResNumResB() { return(this.resB.getDsspNum()); }
+    public Integer getPdbResNumResA() { return(this.resA.getPdbNum()); }
+    public Integer getPdbResNumResB() { return(this.resB.getPdbNum()); }
     public String getResName3A() { return(this.resA.getName3()); }
     public String getResName3B() { return(this.resB.getName3()); }
     public String getResName1A() { return(this.resA.getAAName1()); }
