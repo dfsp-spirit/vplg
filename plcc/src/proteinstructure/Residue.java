@@ -32,13 +32,9 @@ public class Residue extends Molecule implements java.io.Serializable {
     
     
     // declare class vars
-    private String resName3 = null;                          // 3 letter name
-    private String AAName1 = null;                          // 1 letter name, AAs only
+                             // 3 letter name
+                              // 1 letter name, AAs only
     private Integer type = null;                            // residue type: 0=AA, 1=Ligand, 2=Other
-    //private ArrayList<Atom> atoms = null;                         // a list of all (non-H) Atoms of the Residue
-    //private ArrayList<Atom> hydrogenatoms = null;                         // a list of all hydrogen Atoms of the Residue
-    public Integer pdbResNum = null;                       // pdb residue number
-    public Integer dsspResNum = null;                      // guess what
        // PDB insertion code
     
     /** The binding sites, if any, that this residue is part of (for protein residues which are part of the pocket, NOT for ligands which dock into a pocket).  */
@@ -67,14 +63,8 @@ public class Residue extends Molecule implements java.io.Serializable {
     private String ligName = null;                          // HETNAM record of PDB file (name of this hetero group)
     private String ligFormula = null;                       // FORMUL record of PDB file (chemical formula of this hetero group)
     private String ligSynonyms = null;                      // HETSYN record of PDB file (synonyms for this hetero group)
-
     private Integer centerSphereRadius = null;
-    private String sseStringDssp = "?";
-    private String plccSSEType = "N";                       // not part of any PLCC SSE by default
-    private String sseString = null;                        // initially the SSE column from the DSSP file, may be the empty string "" because not all residues are assigned an SSE by DSSP, gets replaced by PLCC SSE string later
-    private SSE sse = null;
-    private Boolean isPartOfDsspSse = false;                // whether this Residue is part of a valid SSE according to DSSP (which does NOT assign a SSE to *all* residues)
-
+    
     
     /**
      * Determines the chemical properties of this AA, according to the 5 types system.
@@ -82,7 +72,7 @@ public class Residue extends Molecule implements java.io.Serializable {
      */
     public Integer getChemicalProperty5Type() {
         if(this.isAA()) {            
-            return AminoAcid.getChemProp5OfAAByName3(this.resName3);
+            return AminoAcid.getChemProp5OfAAByName3(this.Name3);
         }
         else {
             return AminoAcid.CHEMPROP5_AA_INT_UNKNOWN;            
@@ -95,7 +85,7 @@ public class Residue extends Molecule implements java.io.Serializable {
      */
     public Integer getChemicalProperty3Type() {
         if(this.isAA()) {            
-            return AminoAcid.getChemProp3OfAAByName3(this.resName3);
+            return AminoAcid.getChemProp3OfAAByName3(this.Name3);
         }
         else {
             return AminoAcid.CHEMPROP3_AA_INT_UNKNOWN;            
@@ -107,7 +97,7 @@ public class Residue extends Molecule implements java.io.Serializable {
      * @return the chemical property string, which is one of the constants at AminoAcid.CHEMPROP5_AA_STRING_* (Example: ALA => AminoAcid.CHEMPROP5_AA_SMALL_APOLAR).
      */
     public String getChemicalProperty5OneLetterString() {
-        return AminoAcid.getChemProp5_OneLetterString(AminoAcid.getChemProp5OfAAByName3(this.resName3));
+        return AminoAcid.getChemProp5_OneLetterString(AminoAcid.getChemProp5OfAAByName3(this.Name3));
     }
     
     /**
@@ -115,7 +105,7 @@ public class Residue extends Molecule implements java.io.Serializable {
      * @return the chemical property string, which is one of the constants at AminoAcid.CHEMPROP3_AA_STRING_* (Example: ALA => CHEMPROP3_AA_STRING_HYDROPHOBIC).
      */
     public String getChemicalProperty3OneLetterString() {
-        return AminoAcid.getChemProp3_OneLetterString(AminoAcid.getChemProp3OfAAByName3(this.resName3));
+        return AminoAcid.getChemProp3_OneLetterString(AminoAcid.getChemProp3OfAAByName3(this.Name3));
     }
     
     // constructor
@@ -129,8 +119,8 @@ public class Residue extends Molecule implements java.io.Serializable {
     public Residue(Integer residueNumberPDB, Integer residueNumberDSSP) {
         atoms = new ArrayList<>();
         hydrogenatoms = new ArrayList<>();
-        pdbResNum = residueNumberPDB;
-        dsspResNum = residueNumberDSSP;
+        pdbNum = residueNumberPDB;
+        dsspNum = residueNumberDSSP;
         this.partOfBindingSites = new ArrayList<>();
     }
     
@@ -142,9 +132,6 @@ public class Residue extends Molecule implements java.io.Serializable {
     public Boolean isBindingSiteResidue() {
         return(this.partOfBindingSites.size() > 0);
     }
-    
-
-    
     
 
     /**
@@ -159,7 +146,7 @@ public class Residue extends Molecule implements java.io.Serializable {
 
         if(a == null || b == null) {
             if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                DP.getInstance().w("Could not determine distance of PDB Residues # " + pdbResNum + " and " + r.getPdbResNum() + " lacking center atoms, assuming 100.");
+                DP.getInstance().w("Could not determine distance of PDB Residues # " + pdbNum + " and " + r.getPdbNum() + " lacking center atoms, assuming 100.");
             }
             return(100);      
         }
@@ -183,7 +170,7 @@ public class Residue extends Molecule implements java.io.Serializable {
             dist = this.getCenterAtom().distToAtom(r.getCenterAtom());
         } catch(Exception e) {
             if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                DP.getInstance().w("Could not determine distance between DSSP residues " + this.getDsspResNum() + " and " + r.getDsspResNum() + ", assuming out of contact distance.");
+                DP.getInstance().w("Could not determine distance between DSSP residues " + this.getDsspNum() + " and " + r.getDsspNum() + ", assuming out of contact distance.");
             }
             return(false);
         }
@@ -223,7 +210,7 @@ public class Residue extends Molecule implements java.io.Serializable {
             dist = this.getCenterAtom().distToAtom(r.getCenterAtom());
         } catch(Exception e) {
             if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                DP.getInstance().w("Could not determine distance between DSSP residues " + this.getDsspResNum() + " and " + r.getDsspResNum() + ", assuming out of contact distance.");
+                DP.getInstance().w("Could not determine distance between DSSP residues " + this.getDsspNum() + " and " + r.getDsspNum() + ", assuming out of contact distance.");
             }
             return(false);
         }
@@ -250,106 +237,15 @@ public class Residue extends Molecule implements java.io.Serializable {
     
     
     @Override public String toString() {
-        return("[Residue] PDB# " + pdbResNum + ", DSSP# " + dsspResNum + ", Type " + type + ", AA1 " + AAName1 + ", AA3 " + resName3 + ", Chain " + chainID + ", Model " + modelID + ", # of Atoms " + atoms.size());
+        return("[Residue] PDB# " + pdbNum + ", DSSP# " + dsspNum + ", Type " + type + ", AA1 " + AAName1 + ", AA3 " + Name3 + ", Chain " + chainID + ", Model " + modelID + ", # of Atoms " + atoms.size());
     }
 
-    
-    /**
-     * Returns a string representation of the Atoms of this Residue.
-     * @return the string representation
-     */ 
-    public String getAtomsString() {
-
-        Atom a;
-
-        String s = "" + this.resName3 + "-" + this.pdbResNum + " (DSSP#" + this.dsspResNum + "): ";
-
-        for(Integer i = 0; i < this.atoms.size(); i++) {
-            a = this.atoms.get(i);
-            s += a.getPdbAtomNum() + "(" + a.getAtomShortName() + ") ";
-        }
-
-        return(s);
-    }
-
-
-    
-
-    // getters
-    public String getName3() { return(resName3); }
-    public String getResName3() {return(resName3);}
-    
-    /** Returns the trimmed name3, to enter into DB. Otherwise we get stuff like ' NA' in the database, and searching for 'NA' fails.
-     * @return  the trimmed lig name (length 1 - 3 chars)*/
-    public String getTrimmedName3() { return(resName3.trim()); }
-    public String getAAName1() { return(AAName1); }
-    
-    /** Returns the residue type: 0=AA, 1=Ligand, 2=Other. */
-    public Integer getType() { return(type); }
-    public Integer getPdbResNum() { return(pdbResNum); }
-    public Integer getDsspResNum() { return(dsspResNum); }
-    
-    
-    
-  
-    
-    /**
-     * Returns the PDB insertion code field of this Residue.
-     * @return the PDB insertion code 
-     */
-    public String getiCode() { return(iCode); }
-    
-    /**
-     * Returns the PTGL internal ID for this residue type (AA-type based).
-     * @return the PTGL internal ID for this residue type
-     */
-    public Integer getInternalAAID() { return(AminoAcid.name3ToID(resName3)); }
-    
-    /**
-     * Returns a string in pattern 'resName3 + '-' + pdbResNum', e.g., 'ARG-47'. Note that this
-     * does note include a reference to the chain (or insertion code) and thus is NOT unique for the
-     * PDB file. Use getUniquePDBName() instead if you need a unique name based on the PDB residue number.
-     * @return a residue string like 'ARG-47'
-     */
-    public String getFancyName() { return(this.resName3 + "-" + this.pdbResNum); }
-    /**
-     * Returns the PLCC SSE string of this SSE. May be blank/ a single space ' '.
-     * @return the PLCC SSE string of this SSE, e.g., "H", "E", " " or "L"
-     */
-    public String getSSEString() { return(sseString); }
-    
-    /**
-     * Returns the PLCC SSE string of this SSE, but uses "C" (instead of space " ") for empty SSE strings.
-     * @return the PLCC SSE string of this SSE, e.g., "H", "E", "C", or "L". C is for coil/none.
-     */
-    public String getNonEmptySSEString() { 
-        return((this.sseString.isEmpty() || this.sseString.equals(" ")) ? "C" : this.sseString); 
-    }
-    
-    public String getSSEStringDssp() { return(sseStringDssp); }
-    public String getSSETypePlcc() { return(this.plccSSEType); }
-    public SSE getSSE() { return(sse); }
-    public Boolean getDsspSseState() { return(isPartOfDsspSse); }
-    
-    /**
-     * Returns a string in format 'chainID + '-' + pdbResNum + '-' + iCode'. Note that the iCode may
-     * be empty (it is for most residues). Example: 'A-45-'.
-     * @return a string like 'A-45-'.
-     */
-    public String getUniquePDBName() { return(chainID + "-" + pdbResNum + "-" + iCode); }
-    
-    /**
-     * Returns a string in format '(chainID + '-' + pdbResNum + '-' + iCode)'. Note that the iCode may
-     * be empty (it is for most residues). Example: '(A-45-)'.
-     * @return a string like '(A-45-)'.
-     */
-    public String getUniqueString() { return("(" + chainID + "-" + pdbResNum + "-" + iCode + ")"); }
     public Float getPhi() { if(this.isAA()) { return(phi); } else { return(0.0f); } }
     public Float getPsi() { if(this.isAA()) { return(psi); } else { return(0.0f); } }
     public Integer getAcc() { if(this.isAA()) { return(acc); } else { return(0); } }
     
 
-    
+ 
     /**
      * Determines whether this residue lies at the protein surface.
      * @return whether this residue lies at the protein surface.
@@ -393,15 +289,6 @@ public class Residue extends Molecule implements java.io.Serializable {
 
     
     //setters
-    public void setResName3(String s) { resName3 = s; }
-    public void setAAName1(String s) { AAName1 = s; }
-    public void setPdbResNum(Integer i) { pdbResNum = i; }
-    public void setDsspResNum(Integer i) { dsspResNum = i; }
-    public void setSSEString(String s) { sseString = s; }
-    public void setSSEStringDssp(String s) { sseStringDssp = s; }
-    public void setSSETypePlcc(String s) { plccSSEType = s; }
-    public void setSSE(SSE s) { sse = s; }
-    public void setDsspSseState(Boolean b) { isPartOfDsspSse = b; }
     public void setLigName(String s) { ligName = s; }
     public void setiCode(String s) { iCode = s; }
     public void setLigFormula(String s) { ligFormula = s; }
@@ -411,17 +298,12 @@ public class Residue extends Molecule implements java.io.Serializable {
     public void setAcc(Integer f) { acc = f; }
     
     
-    /**
-     * Returns information on all atoms of this residue (used for debugging only).
-     * @return a multi-line String which contains info on all atoms of this residue
-     */
-    public String atomInfo() {
-        String info = "    *Residue DSSP# " + this.getDsspResNum() + " has " + this.getAtoms().size() + " (non-ignored) atoms:\n";
-        Integer num = 0;
-        for(Atom a : this.getAtoms()) {
-            num++;
-            info += "     #" + num + ":" + a.toString() + "\n";
-        }        
-        return(info);        
-    }
+
+    
+
+    
+    
+    
 }
+    
+    
