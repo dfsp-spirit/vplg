@@ -265,7 +265,7 @@ public class GraphCreator {
             r.setiCode("");
             sse.addResidue(r);
             if(vClass.equals(SSE.SSECLASS_LIGAND)) {
-                r.setResName3("LIG");
+                r.setName3("LIG");
             }
             sse.setSeqSseChainNum(i);            
             vertices.add(sse);
