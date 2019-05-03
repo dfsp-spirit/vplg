@@ -1178,7 +1178,7 @@ public class FileParser {
                                     }
                                 } else {
                                     // load new Residue into tmpRes if we approached next Residue
-                                    if (! (Objects.equals(resNumPDB, tmpRes.getPdbResNum()) && chainID.equals(tmpRes.getChainID()) && iCode.equals(tmpRes.getiCode()))) {
+                                    if (! (Objects.equals(resNumPDB, tmpRes.getPdbNum()) && chainID.equals(tmpRes.getChainID()) && iCode.equals(tmpRes.getiCode()))) {
                                         tmpRes = getResFromListWithErrMsg(resNumPDB, chainID, iCode, atomSerialNumber, numLine);
                                         if (tmpRes == null) {
                                             if (isAA) {
@@ -1222,7 +1222,7 @@ public class FileParser {
                                 }
                                 else {
                                     // a.setDsspResNum(getDsspResNumForPdbFields(resNumPDB, chainID, iCode));
-                                    a.setDsspResNum(tmpRes.getDsspResNum());
+                                    a.setDsspResNum(tmpRes.getDsspNum());
                                 }
                                 
                                 
@@ -1240,17 +1240,17 @@ public class FileParser {
                                     
                                     // create new Residue from info, we'll have to see whether we really add it below though
                                     lig = new Residue();
-                                    lig.setPdbResNum(resNumPDB);
+                                    lig.setPdbNum(resNumPDB);
                                     lig.setType(Residue.RESIDUE_TYPE_LIGAND);
                                     
                                     // assign fake DSSP Num increasing with each seen ligand
                                     ligandsTreatedNum ++;
                                     resNumDSSP = lastUsedDsspNum + ligandsTreatedNum; // assign an unused fake DSSP residue number
                                     
-                                    lig.setDsspResNum(resNumDSSP);
+                                    lig.setDsspNum(resNumDSSP);
                                     lig.setChainID(chainID);
                                     lig.setiCode(iCode);
-                                    lig.setResName3(resNamePDB);
+                                    lig.setName3(resNamePDB);
                                     lig.setAAName1(AminoAcid.getLigandName1());
                                     lig.setChain(getChainByPdbChainID(chainID));
                                     // still just assigning default model 1
@@ -1758,7 +1758,7 @@ public class FileParser {
 
             r = s_residues.get(i);
 
-            if(r.getPdbResNum().equals(resNum)) {
+            if(r.getPdbNum().equals(resNum)) {
 
                 if(r.getChainID().equals(cID)) {
                     return(r);
@@ -1809,7 +1809,7 @@ public class FileParser {
 
             tmp = s_residues.get(i);
 
-            if(tmp.getPdbResNum().equals(resNumPDB)) {
+            if(tmp.getPdbNum().equals(resNumPDB)) {
 
                 if(tmp.getChainID().equals(chainID)) {
                     
@@ -1940,7 +1940,7 @@ public class FileParser {
         System.exit(1);
 
         for(Integer i = 0; i < s_residues.size(); i++) {
-            if((s_residues.get(i).getPdbResNum()).equals(p)) {
+            if((s_residues.get(i).getPdbNum()).equals(p)) {
                 return(s_residues.get(i));
             }
         }
@@ -1961,7 +1961,7 @@ public class FileParser {
     public static Residue getResByPdbFields(Integer p, String chID, String ic) {
         
         for(Integer i = 0; i < s_residues.size(); i++) {
-            if((s_residues.get(i).getPdbResNum()).equals(p)) {
+            if((s_residues.get(i).getPdbNum()).equals(p)) {
                 
                 if((s_residues.get(i).getChainID()).equals(chID)) {
                     
@@ -2743,7 +2743,7 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
 
                 r.setiCode(iCode);
                 r.setAAName1(resName1Letter);
-                r.setResName3(AminoAcid.name1ToName3(resName1Letter));
+                r.setName3(AminoAcid.name1ToName3(resName1Letter));
                 r.setSSEString(sseString);
                 // Note: the SSE itself will be set by the getAllSSEs*() functions, it is still NULL atm
 
@@ -2853,13 +2853,13 @@ SITE     4 AC1 15 HOH A 621  HOH A 622  HOH A 623
 
                     // create new Residue from info, we'll have to see whether we really add it below though
                     lig = new Residue();
-                    lig.setPdbResNum(resNumPDB);
+                    lig.setPdbNum(resNumPDB);
                     lig.setType(Residue.RESIDUE_TYPE_LIGAND);
                     resNumDSSP = getLastUsedDsspResNumOfDsspFile() + curLigNum; // assign an unused fake DSSP residue number
-                    lig.setDsspResNum(resNumDSSP);
+                    lig.setDsspNum(resNumDSSP);
                     lig.setChainID(chainID);
                     lig.setiCode(iCode);
-                    lig.setResName3(resNamePDB);
+                    lig.setName3(resNamePDB);
                     lig.setAAName1(AminoAcid.getLigandName1());
                     lig.setChain(getChainByPdbChainID(chainID));
                     lig.setModelID(modelID);
