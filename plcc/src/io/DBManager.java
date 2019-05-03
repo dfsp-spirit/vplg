@@ -2229,13 +2229,13 @@ connection.close();
      */
     public static ArrayList<ArrayList<Character>> parseRedOrAdjToMatrix(String ln){
         //initial steps
-        ArrayList<ArrayList<Character>> matrix = new ArrayList<ArrayList<Character>>(); //stores later genererated matrix
+        ArrayList<ArrayList<Character>> matrix = new ArrayList<>(); //stores later genererated matrix
         ln = ln.replace("{", "").replace("}", "").replace("(", "").replace(")", "").replace("[", "").replace("]", ""); //linnot whithout brackets
         int minVal = 0;
         int maxVal = 0;
         String[] linnot = ln.split(","); //Array, consisting of the elemnts of the linnot
         int[] myArray = new int[3]; //0 = mixed, 1 = parallel, 2 = antiparallel, 3 = z
-        ArrayList<int[]> myListArray = new ArrayList<int[]>(); //auxiliary variable
+        ArrayList<int[]> myListArray = new ArrayList<>(); //auxiliary variable
         //Beginning of Matrix has to be computed seperated from the rest
         myArray[0] = 0; //From where does the edge come? In this case 0, because it is the first edge
         myArray[1] = 0 + Integer.parseInt(linnot[0].substring(0, linnot[0].length()-1)); //To which node does the first edge go? Always from the startingpoint. In this case 0.
@@ -2247,14 +2247,21 @@ connection.close();
         }
         int origin = myArray[1]; 
         //which edge (parallel, antiparallel or mixed) is used?
-        if (linnot[0].substring(linnot[0].length()-1).equals("m")) {
-            myArray[2] = 0;
-        } else if (linnot[0].substring(linnot[0].length()-1).equals("p")) {
-            myArray[2] = 1;
-        } else if (linnot[0].substring(linnot[0].length()-1).equals("a")) {
-            myArray[2] = 2;
-        } else if (linnot[0].substring(linnot[0].length()-1).equals("z")) {
-            myArray[2] = 3;
+        switch (linnot[0].substring(linnot[0].length()-1)) {
+            case "m":
+                myArray[2] = 0;
+                break;
+            case "p":
+                myArray[2] = 1;
+                break;
+            case "a":
+                myArray[2] = 2;
+                break;
+            case "z":
+                myArray[2] = 3;
+                break;
+            default:
+                break;
         }
         myListArray.add(myArray.clone());
         
@@ -2264,14 +2271,21 @@ connection.close();
             myArray[1] = origin + Integer.parseInt(linnot[i].substring(0, linnot[i].length()-1)); //where will the edge go to?
             origin = myArray[1];
             //which edge (parallel, antiparallel or mixed) is used?
-            if (linnot[i].substring(linnot[i].length()-1).equals("m")) {
-                myArray[2] = 0;
-            } else if (linnot[i].substring(linnot[i].length()-1).equals("p")) {
-                myArray[2] = 1;
-            } else if (linnot[i].substring(linnot[i].length()-1).equals("a")) {
-                myArray[2] = 2;
-            } else if (linnot[i].substring(linnot[i].length()-1).equals("z")) {
-                myArray[2] = 3;
+            switch (linnot[i].substring(linnot[i].length()-1)) {
+                case "m":
+                    myArray[2] = 0;
+                    break;
+                case "p":
+                    myArray[2] = 1;
+                    break;
+                case "a":
+                    myArray[2] = 2;
+                    break;
+                case "z":
+                    myArray[2] = 3;
+                    break;
+                default:
+                    break;
             }
                 myListArray.add(myArray.clone());
             if (myArray[1] > maxVal) {
@@ -2288,9 +2302,9 @@ connection.close();
         int numVertices = (maxVal - minVal) + 1; //is needed to determine the first vertex
         
         //Init Matrix with "x" for no edge
-        ArrayList<Character> row = new ArrayList<Character>();
+        ArrayList<Character> row;
         for (int i = 0; i<numVertices; i++) {
-            row = new ArrayList<Character>();
+            row = new ArrayList<>();
             for (int j=0; j<numVertices; j++) {
                 row.add('x');
             }
@@ -2314,7 +2328,6 @@ connection.close();
                 }
             }
         }
-        System.out.println(matrix);
         return matrix;
     }
     
