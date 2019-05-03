@@ -9,6 +9,11 @@
 package proteinstructure;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Objects;
+import plcc.Main;
+import plcc.Settings;
+import tools.DP;
 
 /**
  *
@@ -16,13 +21,6 @@ import java.util.ArrayList;
  */
 public class RNA extends Molecule implements java.io.Serializable {
 
-    //insert pdbRNANum and dsspRNANum
-    private String rnaName= null;
-    private String AAName1 = null;
+   
     
-    //insert constructor
-    
-    //@Override public String toString() {
-      //  return("[Residue] PDB# " + pdbRNANum + ", DSSP# " + dsspRNANum + ", Type " + type + ", AA1 " + AAName1 + ", AA3 " + rnaName3 + ", Chain " + chainID + ", Model " + modelID + ", # of Atoms " + atoms.size());
-    //}
 }
