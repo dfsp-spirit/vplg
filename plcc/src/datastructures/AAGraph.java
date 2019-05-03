@@ -67,7 +67,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
             }
             else {
                 // same chain, gotta check residue distance
-                int seqDist = Math.abs(resA.getPdbResNum() - resB.getPdbResNum());
+                int seqDist = Math.abs(resA.getPdbNum() - resB.getPdbNum());
                 if(seqDist < minSeqDist) {
                     return false;
                 }
@@ -96,7 +96,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
             }
             else {
                 // same chain, gotta check residue distance
-                int seqDist = Math.abs(resA.getPdbResNum() - resB.getPdbResNum());
+                int seqDist = Math.abs(resA.getPdbNum() - resB.getPdbNum());
                 if(seqDist > maxSeqDist) {
                     return false;
                 }
@@ -521,7 +521,7 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
         Set<Integer> res = new HashSet<>();
         int resIndex = 0;
         for(Residue r : this.vertices) {
-            if((chain == null || r.getChainID().equals(chain)) && (pdbresnum == null || r.getPdbResNum().equals(pdbresnum)) && (icode == null || r.getiCode().equals(icode))) {
+            if((chain == null || r.getChainID().equals(chain)) && (pdbresnum == null || r.getPdbNum().equals(pdbresnum)) && (icode == null || r.getiCode().equals(icode))) {
                 res.add(resIndex);
                 resIndex++;
             }
@@ -651,9 +651,9 @@ public class AAGraph extends SparseGraph<Residue, AAEdgeInfo> implements IGraphM
             sbIdx.append(",");
             sbIdx.append(sortedList.get(i));
             sbIdx.append(",");
-            sbIdx.append(residue.getPdbResNum());
+            sbIdx.append(residue.getPdbNum());
             sbIdx.append(",");
-            sbIdx.append(residue.getResName3());
+            sbIdx.append(residue.getName3());
             sbIdx.append(System.lineSeparator());
         }
        
