@@ -1055,6 +1055,17 @@ public class Main {
                         argsUsed[i] = true;
                     }
                     
+                    if(s.equals("--matrix-structure-comparison")) {
+                        if(args.length <= i+2 ) {
+                            syntaxError();
+                        }
+                        Settings.set("linear-notation-type", args[i+1]);                        
+                        Settings.set("linear-notation", args[i+2]);
+                        Settings.set("start matrix-structure-search", "true");
+                        argsUsed[i] = argsUsed[i+1] = argsUsed[i+2] = true;
+                                                
+                    }
+                    
                     if(s.equals("-q") || s.equals("--fg-notations")) {
                         if(args.length <= i+1 ) {
                             syntaxError();
