@@ -1056,13 +1056,14 @@ public class Main {
                     }
                     
                     if(s.equals("--matrix-structure-comparison")) {
-                        if(args.length <= i+2 ) {
+                        if(args.length <= i+3 ) {
                             syntaxError();
                         }
                         Settings.set("linear-notation-type", args[i+1]);                        
                         Settings.set("linear-notation", args[i+2]);
+                        Settings.set("linear-notation-graph-type", args[i+3]);
                         Settings.set("start matrix-structure-search", "true");
-                        argsUsed[i] = argsUsed[i+1] = argsUsed[i+2] = true;
+                        argsUsed[i] = argsUsed[i+1] = argsUsed[i+2] = argsUsed[i+3] = true;
                                                 
                     }
                     
@@ -3407,7 +3408,7 @@ public class Main {
             md = FileParser.getPDBMetaData();
         }
         
-
+        
         // check which chains belong to the same macro molecule
         Map<String, List<String>> macroMoleculesOfPDBfileToChains = new HashMap<>();    // key of the map is the MOL_ID
         Map<String, Map<String, String>> macroMolecules = new HashMap<>();   // each inner hashmap contains the properties of a macromolecule, "name" => the_name, "id" => MOL_ID, .... The outer string is the mol_ID
@@ -3421,7 +3422,7 @@ public class Main {
             if(! silent) {
                 System.out.println("  +++++ Handling chain '" + chain + "'. +++++");
             }
-
+                        
             // CIF parser for now does not parse Prot meta info
             //     -> just use default values
             ProtMetaInfo pmi;
@@ -4174,7 +4175,12 @@ public class Main {
         p.stfu();
         //p.adjverbose = true;
         List<PTGLNotationFoldResult> resultsPTGLNotations = p.getResults();
-
+        
+        System.out.println("hello!!!" + resultsPTGLNotations.get(0).redNotation);
+        
+        if (! resultsPTGLNotations.get(0).redNotation.isEmpty()) {
+            System.out.println(DBManager.parseRedOrAdjToMatrix(resultsPTGLNotations.get(0).adjNotation, "albe"));
+        }
         
         HashMap<Integer, FoldingGraph> ccsList = new HashMap<Integer, FoldingGraph>();
         int fgMinSizeDraw = Settings.getInteger("plcc_I_min_fgraph_size_draw");
@@ -10819,6 +10825,7 @@ public class Main {
         System.out.println("   --cluster               : Set all options for cluster mode. Equals '-f -u -k -s -G -i -Z -P'.");
         System.out.println("   --cg-threshold <Int>    : Overwrites setting for contact thresholds for edges in complex graphs.");
         System.out.println("   --chain-spheres-speedup : speedup for contact computation based on comparison of chain spheres");
+        System.out.println("   --matrix-structure-comparison: starts a function that searches a small structure in linear notation in a Proteingraph");
         System.out.println("");
         System.out.println("The following options only make sense for database maintenance:");
         System.out.println("--set-pdb-representative-chains-pre <file> <k> : Set non-redundant chain status for all chains in DB from XML file <file>. <k> determines what to do with existing flags, valid options are 'keep' or 'remove'. Get the file from PDB REST API. Run this pre-update, BEFORE new data will be added.");
