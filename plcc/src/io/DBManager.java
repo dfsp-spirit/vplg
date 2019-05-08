@@ -2227,15 +2227,15 @@ connection.close();
      * @param ln a String of the linear notation (RED or ADJ)
      * @return a list with list, representing the graph of the given notation in an adjacency matrix
      */
-    public static ArrayList<ArrayList<String>> parseRedOrAdjToMatrix(String ln){
+    public static ArrayList<ArrayList<Character>> parseRedOrAdjToMatrix(String ln){
         //initial steps
-        ArrayList<ArrayList<String>> matrix = new ArrayList<ArrayList<String>>(); //stores later genererated matrix
+        ArrayList<ArrayList<Character>> matrix = new ArrayList<>(); //stores later genererated matrix
         ln = ln.replace("{", "").replace("}", "").replace("(", "").replace(")", "").replace("[", "").replace("]", ""); //linnot whithout brackets
         int minVal = 0;
         int maxVal = 0;
         String[] linnot = ln.split(","); //Array, consisting of the elemnts of the linnot
         int[] myArray = new int[3]; //0 = mixed, 1 = parallel, 2 = antiparallel, 3 = z
-        ArrayList<int[]> myListArray = new ArrayList<int[]>(); //auxiliary variable
+        ArrayList<int[]> myListArray = new ArrayList<>(); //auxiliary variable
         //Beginning of Matrix has to be computed seperated from the rest
         myArray[0] = 0; //From where does the edge come? In this case 0, because it is the first edge
         myArray[1] = 0 + Integer.parseInt(linnot[0].substring(0, linnot[0].length()-1)); //To which node does the first edge go? Always from the startingpoint. In this case 0.
@@ -2247,14 +2247,21 @@ connection.close();
         }
         int origin = myArray[1]; 
         //which edge (parallel, antiparallel or mixed) is used?
-        if (linnot[0].substring(linnot[0].length()-1).equals("m")) {
-            myArray[2] = 0;
-        } else if (linnot[0].substring(linnot[0].length()-1).equals("p")) {
-            myArray[2] = 1;
-        } else if (linnot[0].substring(linnot[0].length()-1).equals("a")) {
-            myArray[2] = 2;
-        } else if (linnot[0].substring(linnot[0].length()-1).equals("z")) {
-            myArray[2] = 3;
+        switch (linnot[0].substring(linnot[0].length()-1)) {
+            case "m":
+                myArray[2] = 0;
+                break;
+            case "p":
+                myArray[2] = 1;
+                break;
+            case "a":
+                myArray[2] = 2;
+                break;
+            case "z":
+                myArray[2] = 3;
+                break;
+            default:
+                break;
         }
         myListArray.add(myArray.clone());
         
@@ -2264,14 +2271,21 @@ connection.close();
             myArray[1] = origin + Integer.parseInt(linnot[i].substring(0, linnot[i].length()-1)); //where will the edge go to?
             origin = myArray[1];
             //which edge (parallel, antiparallel or mixed) is used?
-            if (linnot[i].substring(linnot[i].length()-1).equals("m")) {
-                myArray[2] = 0;
-            } else if (linnot[i].substring(linnot[i].length()-1).equals("p")) {
-                myArray[2] = 1;
-            } else if (linnot[i].substring(linnot[i].length()-1).equals("a")) {
-                myArray[2] = 2;
-            } else if (linnot[i].substring(linnot[i].length()-1).equals("z")) {
-                myArray[2] = 3;
+            switch (linnot[i].substring(linnot[i].length()-1)) {
+                case "m":
+                    myArray[2] = 0;
+                    break;
+                case "p":
+                    myArray[2] = 1;
+                    break;
+                case "a":
+                    myArray[2] = 2;
+                    break;
+                case "z":
+                    myArray[2] = 3;
+                    break;
+                default:
+                    break;
             }
                 myListArray.add(myArray.clone());
             if (myArray[1] > maxVal) {
@@ -2288,11 +2302,11 @@ connection.close();
         int numVertices = (maxVal - minVal) + 1; //is needed to determine the first vertex
         
         //Init Matrix with "x" for no edge
-        ArrayList<String> row = new ArrayList<String>();
+        ArrayList<Character> row;
         for (int i = 0; i<numVertices; i++) {
-            row = new ArrayList<String>();
+            row = new ArrayList<>();
             for (int j=0; j<numVertices; j++) {
-                row.add("x");
+                row.add('x');
             }
             matrix.add(row);
         }
@@ -2301,16 +2315,16 @@ connection.close();
         for (int[] s : myListArray) {
             if (s[2] != 3) {
                 if (s[2] == 0) {
-                    matrix.get(s[0]+abs(minVal)).set(s[1]+abs(minVal), "m");
-                    matrix.get(s[1]+abs(minVal)).set(s[0]+abs(minVal), "m");
+                    matrix.get(s[0]+abs(minVal)).set(s[1]+abs(minVal), 'm');
+                    matrix.get(s[1]+abs(minVal)).set(s[0]+abs(minVal), 'm');
                 }
                 if (s[2] == 1) {
-                    matrix.get(s[0]+abs(minVal)).set(s[1]+abs(minVal), "p");
-                    matrix.get(s[1]+abs(minVal)).set(s[0]+abs(minVal), "p");
+                    matrix.get(s[0]+abs(minVal)).set(s[1]+abs(minVal), 'p');
+                    matrix.get(s[1]+abs(minVal)).set(s[0]+abs(minVal), 'p');
                 }
                 if (s[2] == 2) {
-                    matrix.get(s[0]+abs(minVal)).set(s[1]+abs(minVal), "a");
-                    matrix.get(s[1]+abs(minVal)).set(s[0]+abs(minVal), "a");
+                    matrix.get(s[0]+abs(minVal)).set(s[1]+abs(minVal), 'a');
+                    matrix.get(s[1]+abs(minVal)).set(s[0]+abs(minVal), 'a');
                 }
             }
         }
@@ -2323,14 +2337,14 @@ connection.close();
      * @param matrixList a list of matrices, representing a linear notation (RED or ADJ)
      * @return true if at least one matrix in the list contains the pattern for a 4-Helix-Bundle
      */
-    public static Boolean matrixContainsFourHelixBundle(ArrayList<ArrayList<ArrayList<String>>> matrixList) {
+    public static Boolean matrixContainsFourHelixBundle(ArrayList<ArrayList<ArrayList<Character>>> matrixList) {
         //iterate over all given folding graphs
-        for (ArrayList<ArrayList<String>> matrix : matrixList) {
+        for (ArrayList<ArrayList<Character>> matrix : matrixList) {
             //make sure no "Alpha Horseshoe" is contained
             for (int j = 0; j < matrix.size()-7; j++) {
-                    if ("a".equals(matrix.get(j).get(j+1)) && "a".equals(matrix.get(j+1).get(j+2)) && "a".equals(matrix.get(j+2).get(j+3))
-                        && "a".equals(matrix.get(j+3).get(j+4)) && "a".equals(matrix.get(j+4).get(j+5)) && "a".equals(matrix.get(j+5).get(j+6))
-                        && "a".equals(matrix.get(j+6).get(j+7))) {
+                    if ('a' == matrix.get(j).get(j+1) && 'a' == matrix.get(j+1).get(j+2) && 'a' == matrix.get(j+2).get(j+3)
+                        && 'a' == matrix.get(j+3).get(j+4) && 'a' == matrix.get(j+4).get(j+5) && 'a' == matrix.get(j+5).get(j+6)
+                        && 'a' == matrix.get(j+6).get(j+7)) {
                     return false;
                     }
             }
@@ -2341,16 +2355,16 @@ connection.close();
                     for (int o = 0; o < matrix.size()-3-i-k; o++) {
                         for (int p = 0; p < matrix.size()-3-i-k-o; p++) {
                             //typical antiparallel Helix Bundle
-                            if ("a".equals(matrix.get(i).get(i+1+k)) && "a".equals(matrix.get(i+1+k).get(i+2+k+o)) &&
-                                "a".equals(matrix.get(i+2+k+o).get(i+3+k+o+p))) {
+                            if ('a' == matrix.get(i).get(i+1+k) && 'a' == matrix.get(i+1+k).get(i+2+k+o) &&
+                                'a' == matrix.get(i+2+k+o).get(i+3+k+o+p)) {
                                 if (matrix.size() < 10) { //Only return if the Graph is small enough. Otherwise the chance of a lucky match is high.
                                     return true;
                                 }
                                 
                             }
                             //parallel Helix Bundle
-                            if ("p".equals(matrix.get(i).get(i+1+k)) && "a".equals(matrix.get(i+1+k).get(i+2+k+o)) &&
-                                "p".equals(matrix.get(i+2+k+o).get(i+3+k+o+p))) {
+                            if ('p' == matrix.get(i).get(i+1+k) && 'a' == matrix.get(i+1+k).get(i+2+k+o) &&
+                                'p' == matrix.get(i+2+k+o).get(i+3+k+o+p)) {
                                 if (matrix.size() < 10) { //Only return if the Graph is small enough. Otherwise the chance of a lucky match is high.
                                     return true;
                                 }
@@ -2442,7 +2456,7 @@ connection.close();
         }
         
         //iterate over all present linnots and save them in a list
-        ArrayList<ArrayList<ArrayList<String>>> matrixList = new ArrayList<ArrayList<ArrayList<String>>>(); //contains the adjacency matrix of the different foldinggraphs of one proteingraph
+        ArrayList<ArrayList<ArrayList<Character>>> matrixList = new ArrayList<ArrayList<ArrayList<Character>>>(); //contains the adjacency matrix of the different foldinggraphs of one proteingraph
         if(tableData.size() >= 1) {
             for (ArrayList<String> tD : tableData) {
                 if (tD.get(0).length() > 2) {
@@ -2589,22 +2603,22 @@ connection.close();
      * @param matrixList a list of matrices, representing a linear notation (RED or ADJ)
      * @return true if at least one matrix in the list contains the pattern for a Up and Down Barrel
      */
-    public static Boolean matrixContainsUpAndDownBarrel(ArrayList<ArrayList<ArrayList<String>>> matrixList){
+    public static Boolean matrixContainsUpAndDownBarrel(ArrayList<ArrayList<ArrayList<Character>>> matrixList){
         //iterate over all given folding graphs
-        for (ArrayList<ArrayList<String>> matrix : matrixList) {
+        for (ArrayList<ArrayList<Character>> matrix : matrixList) {
             for (int i = 0; i < matrix.size()-7; i++) {
                 //secure eight-stranded version of Barrel
-                if ("a".equals(matrix.get(i).get(i+1)) && "a".equals(matrix.get(i+1).get(i+2)) && "a".equals(matrix.get(i+2).get(i+3)) && "a".equals(matrix.get(i+3).get(i+4))
-                 && "a".equals(matrix.get(i+4).get(i+5)) && "a".equals(matrix.get(i+5).get(i+6))  && "a".equals(matrix.get(i+6).get(i+7)) && "a".equals(matrix.get(i).get(i+7))) {
+                if ('a' == matrix.get(i).get(i+1) && 'a' == matrix.get(i+1).get(i+2) && 'a' == matrix.get(i+2).get(i+3) && 'a' == matrix.get(i+3).get(i+4)
+                 && 'a' == matrix.get(i+4).get(i+5) && 'a' == matrix.get(i+5).get(i+6)  && 'a' == matrix.get(i+6).get(i+7) && 'a' == matrix.get(i).get(i+7)) {
                     return true;
                 }
             }
             
             for (int i = 0; i < matrix.size()-9; i++) {
                 //secure ten-stranded version of Barrel
-                if ("a".equals(matrix.get(i).get(i+1)) && "a".equals(matrix.get(i+1).get(i+2)) && "a".equals(matrix.get(i+2).get(i+3)) && "a".equals(matrix.get(i+3).get(i+4))
-                 && "a".equals(matrix.get(i+4).get(i+5)) && "a".equals(matrix.get(i+5).get(i+6))  && "a".equals(matrix.get(i+6).get(i+7)) && "a".equals(matrix.get(i+7).get(i+8))
-                 && "a".equals(matrix.get(i+8).get(i+9)) && "a".equals(matrix.get(i).get(i+9))) {
+                if ('a' == matrix.get(i).get(i+1) && 'a' == matrix.get(i+1).get(i+2) && 'a' == matrix.get(i+2).get(i+3) && 'a' == matrix.get(i+3).get(i+4)
+                 && 'a' == matrix.get(i+4).get(i+5) && 'a' == matrix.get(i+5).get(i+6)  && 'a' == matrix.get(i+6).get(i+7) && 'a' == matrix.get(i+7).get(i+8)
+                 && 'a' == matrix.get(i+8).get(i+9) && 'a' == matrix.get(i).get(i+9)) {
                     return true;
                 }
             }
@@ -2682,7 +2696,7 @@ connection.close();
         }
         
         //iterate over all present linnots and save them in a list
-        ArrayList<ArrayList<ArrayList<String>>> matrixList = new ArrayList<ArrayList<ArrayList<String>>>(); //contains the adjacency matrix of the different foldinggraphs of one proteingraph
+        ArrayList<ArrayList<ArrayList<Character>>> matrixList = new ArrayList<ArrayList<ArrayList<Character>>>(); //contains the adjacency matrix of the different foldinggraphs of one proteingraph
         if(tableData.size() >= 1) {
             for (ArrayList<String> tD : tableData) {
                 if (tD.get(0).length() > 2) {
@@ -2821,30 +2835,30 @@ connection.close();
      * @param matrixList a list of matrices, representing a linear notation (RED or ADJ)
      * @return true if at least one matrix in the list contains the pattern for a Jelly Roll Fold
      */
-    public static Boolean matrixContainsJellyRoll(ArrayList<ArrayList<ArrayList<String>>> matrixList){
+    public static Boolean matrixContainsJellyRoll(ArrayList<ArrayList<ArrayList<Character>>> matrixList){
         //dividing Jelly Roll in 2 different layers.
         boolean firstHalf = false;
         boolean secondHalf = false;
         //iterate over all given folding graphs
-        for (ArrayList<ArrayList<String>> matrix : matrixList) {
+        for (ArrayList<ArrayList<Character>> matrix : matrixList) {
             for (int i = 0; i < matrix.size()-7; i++) {
                 //check if the whole motif is contained fully in one foldinggraph.
-                if ("a".equals(matrix.get(0+i).get(1+i)) && "a".equals(matrix.get(1+i).get(7+i)) && "a".equals(matrix.get(2+i).get(7+i)) &&
-                    "a".equals(matrix.get(2+i).get(5+i)) && "a".equals(matrix.get(3+i).get(4+i)) && "a".equals(matrix.get(3+i).get(6+i))) {
+                if ('a' == matrix.get(0+i).get(1+i) && 'a' == matrix.get(1+i).get(7+i) && 'a' == matrix.get(2+i).get(7+i) &&
+                    'a' == matrix.get(2+i).get(5+i) && 'a' == matrix.get(3+i).get(4+i) && 'a' == matrix.get(3+i).get(6+i)) {
                     return true;
                 }
             }
             
             for (int k = 0; k < matrix.size()-5; k++) {
                 //check second layer
-                if ("a".equals(matrix.get(0+k).get(5+k)) && "a".equals(matrix.get(2+k).get(3+k)) && "a".equals(matrix.get(2+k).get(5+k))) {
+                if ('a' == matrix.get(0+k).get(5+k) && 'a' == matrix.get(2+k).get(3+k) && 'a' == matrix.get(2+k).get(5+k)) {
                     secondHalf = true;
                 }
             }
             
             for (int i = 0; i < matrix.size()-7; i++) {
                 //check first layer
-                if ("a".equals(matrix.get(0+i).get(7+i)) && "a".equals(matrix.get(2+i).get(7+i)) && "a".equals(matrix.get(2+i).get(5+i))) {
+                if ('a' == matrix.get(0+i).get(7+i) && 'a' == matrix.get(2+i).get(7+i) && 'a' == matrix.get(2+i).get(5+i)) {
                         firstHalf = true;
                     }
             }
@@ -2925,7 +2939,7 @@ connection.close();
             } catch(SQLException e) {DP.getInstance().w("DBManager", "chainContainsMotif_JellyRoll: Could not close statement and reset autocommit.");}
         }
         //iterate over all present linnots and save them in a list
-        ArrayList<ArrayList<ArrayList<String>>> matrixList = new ArrayList<ArrayList<ArrayList<String>>>(); //contains the adjacency matrix of the different foldinggraphs of one proteingraph
+        ArrayList<ArrayList<ArrayList<Character>>> matrixList = new ArrayList<ArrayList<ArrayList<Character>>>(); //contains the adjacency matrix of the different foldinggraphs of one proteingraph
         if(tableData.size() >= 1) {
             for (ArrayList<String> tD : tableData) {
                 if (tD.get(0).length() > 2) {
@@ -3055,12 +3069,12 @@ connection.close();
      * @param matrixList a list of matrices, representing a linear notation (RED or ADJ)
      * @return true if at least one matrix in the list contains the pattern for a Immunoglobulin Fold
      */
-    public static Boolean matrixContainsImmunoglobulinFold(ArrayList<ArrayList<ArrayList<String>>> matrixList) {
+    public static Boolean matrixContainsImmunoglobulinFold(ArrayList<ArrayList<ArrayList<Character>>> matrixList) {
         //iterate over all given folding graphs
-        for (ArrayList<ArrayList<String>> matrix : matrixList) {
+        for (ArrayList<ArrayList<Character>> matrix : matrixList) {
             for (int i = 0; i < matrix.size()-6; i++) {
-                if ("a".equals(matrix.get(i).get(i+1)) && "a".equals(matrix.get(i+1).get(i+4)) && "a".equals(matrix.get(i+2).get(i+5)) && 
-                    ( ("a".equals(matrix.get(i+2).get(i+3)) && "a".equals(matrix.get(i+3).get(i+4))) || (!"a".equals(matrix.get(i+2).get(i+3)) && "a".equals(matrix.get(i+3).get(i+4))) || ("a".equals(matrix.get(i+2).get(i+3)) && !"a".equals(matrix.get(i+3).get(i+4))) ) && "a".equals(matrix.get(i+5).get(i+6))) {
+                if ('a' == matrix.get(i).get(i+1) && 'a' == matrix.get(i+1).get(i+4) && 'a' == matrix.get(i+2).get(i+5) && 
+                    ( ('a' == matrix.get(i+2).get(i+3) && 'a' == matrix.get(i+3).get(i+4)) || ('a' != matrix.get(i+2).get(i+3) && 'a' == matrix.get(i+3).get(i+4)) || ('a' == matrix.get(i+2).get(i+3) && 'a' != matrix.get(i+3).get(i+4)) ) && 'a' == matrix.get(i+5).get(i+6)) {
                     return true;
                 }
             }
@@ -3139,7 +3153,7 @@ connection.close();
             } catch(SQLException e) { DP.getInstance().w("DBManager", "chainContainsMotif_ImmunoglobulinFold: Could not close statement and reset autocommit.");}
         }
         //iterate over all present linnots and save them in a list
-        ArrayList<ArrayList<ArrayList<String>>> matrixList = new ArrayList<ArrayList<ArrayList<String>>>(); //contains the adjacency matrix of the different foldinggraphs of one proteingraph
+        ArrayList<ArrayList<ArrayList<Character>>> matrixList = new ArrayList<ArrayList<ArrayList<Character>>>(); //contains the adjacency matrix of the different foldinggraphs of one proteingraph
         if(tableData.size() >= 1) {
             for (ArrayList<String> tD : tableData) {
                 if (tD.get(0).length() > 2) {
@@ -8650,27 +8664,27 @@ connection.close();
      * @param matrixList a list of matrices, representing a linear notation (RED or ADJ)
      * @return true if at least one matrix in the list contains the pattern for a Beta Propeller
      */
-    public static Boolean matrixContainsBetaPropeller(ArrayList<ArrayList<ArrayList<String>>> matrixList) {
+    public static Boolean matrixContainsBetaPropeller(ArrayList<ArrayList<ArrayList<Character>>> matrixList) {
         //iterate over all given folding graphs
-        for (ArrayList<ArrayList<String>> matrix : matrixList) {
+        for (ArrayList<ArrayList<Character>> matrix : matrixList) {
             //check every possible location for the different blades of Beta-Propeller
             for (int i = 0; i < matrix.size()-15; i++) {
                 for (int j = 0; j < matrix.size()-15-i; j++) {
                     for (int k = 0; k < matrix.size()-15-i-j; k++) {
                         for (int l = 0; l < matrix.size()-15-i-j-k; l++) {
                             //Propeller with 4 blades
-                            if ("a".equals(matrix.get(i).get(i+1)) && "a".equals(matrix.get(i+1).get(i+2)) && "a".equals(matrix.get(i+2).get(i+3)) && !"a".equals(matrix.get(i+3).get(i+4)) &&
-                                "a".equals(matrix.get(i+4+j).get(i+5+j)) && "a".equals(matrix.get(i+5+j).get(i+6+j)) && "a".equals(matrix.get(i+6+j).get(i+7+j)) && !"a".equals(matrix.get(i+7+j).get(i+8+j)) &&
-                                "a".equals(matrix.get(i+8+j+k).get(i+9+j+k)) && "a".equals(matrix.get(i+9+j+k).get(i+10+j+k)) && "a".equals(matrix.get(i+10+j+k).get(i+11+j+k)) && !"a".equals(matrix.get(i+11+j).get(i+12+j)) &&
-                                "a".equals(matrix.get(i+12+j+k+l).get(i+13+j+k+l)) && "a".equals(matrix.get(i+13+j+k+l).get(i+14+j+k+l)) && "a".equals(matrix.get(i+14+j+k+l).get(i+15+j+k+l))) {
+                            if ('a' == matrix.get(i).get(i+1) && 'a' == matrix.get(i+1).get(i+2) && 'a' == matrix.get(i+2).get(i+3) && 'a' != matrix.get(i+3).get(i+4) &&
+                                'a' == matrix.get(i+4+j).get(i+5+j) && 'a' == matrix.get(i+5+j).get(i+6+j) && 'a' == matrix.get(i+6+j).get(i+7+j) && 'a' != matrix.get(i+7+j).get(i+8+j) &&
+                                'a' == matrix.get(i+8+j+k).get(i+9+j+k) && 'a' == matrix.get(i+9+j+k).get(i+10+j+k) && 'a' == matrix.get(i+10+j+k).get(i+11+j+k) && 'a' != matrix.get(i+11+j).get(i+12+j) &&
+                                'a' == matrix.get(i+12+j+k+l).get(i+13+j+k+l) && 'a' == matrix.get(i+13+j+k+l).get(i+14+j+k+l) && 'a' == matrix.get(i+14+j+k+l).get(i+15+j+k+l)) {
                                 return true;
                             }
                             
                             // Propeller with only 3 blades. (For the case on beta-strand ist noch visible in PTGL)
-                            if ("a".equals(matrix.get(i).get(i+1)) && "a".equals(matrix.get(i+1).get(i+2)) && !"a".equals(matrix.get(i+2).get(i+3)) &&
-                                "a".equals(matrix.get(i+3+j).get(i+4+j)) && "a".equals(matrix.get(i+4+j).get(i+5+j)) && !"a".equals(matrix.get(i+5+j).get(i+6+j)) &&
-                                "a".equals(matrix.get(i+6+j+k).get(i+7+j+k)) && "a".equals(matrix.get(i+7+j+k).get(i+8+j+k)) && !"a".equals(matrix.get(i+8+j+k).get(i+9+j+k)) &&
-                                "a".equals(matrix.get(i+9+j+k+l).get(i+10+j+k+l)) && "a".equals(matrix.get(i+10+j+k+l).get(i+11+j+k+l))) {
+                            if ('a' == matrix.get(i).get(i+1) && 'a' == matrix.get(i+1).get(i+2) && 'a' != matrix.get(i+2).get(i+3) &&
+                                'a' == matrix.get(i+3+j).get(i+4+j) && 'a' == matrix.get(i+4+j).get(i+5+j) && 'a' != matrix.get(i+5+j).get(i+6+j) &&
+                                'a' == matrix.get(i+6+j+k).get(i+7+j+k) && 'a' == matrix.get(i+7+j+k).get(i+8+j+k) && 'a' != matrix.get(i+8+j+k).get(i+9+j+k) &&
+                                'a' == matrix.get(i+9+j+k+l).get(i+10+j+k+l) && 'a' == matrix.get(i+10+j+k+l).get(i+11+j+k+l)) {
                                 return true;
                             }
                             
@@ -8682,9 +8696,9 @@ connection.close();
         
        // if there proteingraph is divided in many foldinggraphs this part checkes if there are 4 blades throughout the givve foldinggraphs.
         int couldBe4 = 0;
-        for (ArrayList<ArrayList<String>> matrix : matrixList) {
+        for (ArrayList<ArrayList<Character>> matrix : matrixList) {
             for (int i = 0; i < matrix.size()-3; i++) {
-                if ("a".equals(matrix.get(i).get(i+1)) && "a".equals(matrix.get(i+1).get(i+2)) && "a".equals(matrix.get(i+2).get(i+3))) {
+                if ('a' == matrix.get(i).get(i+1) && 'a' == matrix.get(i+1).get(i+2) && 'a' == matrix.get(i+2).get(i+3)) {
                     couldBe4++;
                     break;
                 }
@@ -8767,7 +8781,7 @@ connection.close();
             } catch(SQLException e) {DP.getInstance().w("DBManager", "chainContainsMotif_BetaPropeller: Could not close statement and reset autocommit.");}
         }
         //iterate over all present linnots and save them in a list
-        ArrayList<ArrayList<ArrayList<String>>> matrixList = new ArrayList<ArrayList<ArrayList<String>>>(); //contains the adjacency matrix of the different foldinggraphs of one proteingraph
+        ArrayList<ArrayList<ArrayList<Character>>> matrixList = new ArrayList<ArrayList<ArrayList<Character>>>(); //contains the adjacency matrix of the different foldinggraphs of one proteingraph
         if(tableData.size() >= 1) {
             for (ArrayList<String> tD : tableData) {
                 if (tD.get(0).length() > 2) {
@@ -8967,15 +8981,15 @@ connection.close();
      * @param matrixList a list of matrices, representing a linear notation (RED or ADJ)
      * @return true if at least one matrix in the list contains the pattern for a Globin Fold
      */
-    public static Boolean matrixContainsGlobinFold(ArrayList<ArrayList<ArrayList<String>>> matrixList) {
+    public static Boolean matrixContainsGlobinFold(ArrayList<ArrayList<ArrayList<Character>>> matrixList) {
         //iterate over all given folding graphs
-        for (ArrayList<ArrayList<String>> matrix : matrixList) {
+        for (ArrayList<ArrayList<Character>> matrix : matrixList) {
             for (int i = 0; i < matrix.size()-7; i++) {
                 //Every sequential adjacent vertex have no edge or a mixed edge. Only the last to vertices share an antiparallel edge.
-                if (("m".equals(matrix.get(i).get(i+1)) || "x".equals(matrix.get(i).get(i+1))) && ("m".equals(matrix.get(i+1).get(i+2)) || "x".equals(matrix.get(i+1).get(i+2))) &&
-                    ("m".equals(matrix.get(i+2).get(i+3)) || "x".equals(matrix.get(i+2).get(i+3))) && ("m".equals(matrix.get(i+3).get(i+4)) || "x".equals(matrix.get(i+3).get(i+4))) &&
-                    ("m".equals(matrix.get(i+4).get(i+5)) || "x".equals(matrix.get(i+4).get(i+5))) && ("m".equals(matrix.get(i+5).get(i+6)) || "x".equals(matrix.get(i+5).get(i+6))) &&
-                    ("a".equals(matrix.get(i+6).get(i+7)) || "a".equals(matrix.get(i+5).get(i+7)))) {
+                if (('m' == matrix.get(i).get(i+1) || 'x' == matrix.get(i).get(i+1)) && ('m' == matrix.get(i+1).get(i+2) || 'x' == matrix.get(i+1).get(i+2)) &&
+                    ('m' == matrix.get(i+2).get(i+3) || 'x' == matrix.get(i+2).get(i+3)) && ('m' == matrix.get(i+3).get(i+4) || 'x' == matrix.get(i+3).get(i+4)) &&
+                    ('m' == matrix.get(i+4).get(i+5) || 'x' == matrix.get(i+4).get(i+5)) && ('m' == matrix.get(i+5).get(i+6) || 'x' == matrix.get(i+5).get(i+6)) &&
+                    ('a' == matrix.get(i+6).get(i+7) || 'a' == matrix.get(i+5).get(i+7))) {
                     if (matrix.size() < 11) { //Only return if the Graph is small enough. Otherwise the chance of a lucky match is high.
                         return true;
                     }
@@ -9072,7 +9086,7 @@ connection.close();
         
         //iterate over all present linnots and save them in a list
         ArrayList<String> linnotSeqList = new ArrayList<>();
-        ArrayList<ArrayList<ArrayList<String>>> matrixList = new ArrayList<ArrayList<ArrayList<String>>>(); //contains the adjacency matrix of the different foldinggraphs of one proteingraph
+        ArrayList<ArrayList<ArrayList<Character>>> matrixList = new ArrayList<ArrayList<ArrayList<Character>>>(); //contains the adjacency matrix of the different foldinggraphs of one proteingraph
         if(tableData.size() >= 1) {
             for (ArrayList<String> tD : tableData) {
                 linnotSeqList.add(tD.get(3));

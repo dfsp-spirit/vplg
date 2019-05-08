@@ -691,14 +691,11 @@ public class FileParser {
         
         // variables for one loop (reset when hitting new loop)
         String tableCategory = null;
-        ArrayList<String> tableColHeads = new ArrayList<>();
-        // importantColInd holds indices of the important columns
-        // VALUES: default value -1: column not existing; -2: column not existing and warning has been printed
-        // INDICES: 0: chain name; 1: PDBx field name; 2: atom id; 3: (detailed) atom name 4: alternative location
-        // 5: residue names (label_comp_id); 6: residue numbers (label_seq_id); 7: insertion code
-        // 8,9,10: coordx,y,z, 11: chemical symbol, 12: label_seq_id (PDB Res Num), 13: pdbx_PDB_model_num
-        int[] importantColInd = new int[14]; 
-        
+        // Key: name of column; Val: position in list; Val -1 means warning has been printed that missing
+        //  -> if auth columns from atom_site not present they will be mapped to the PDB columns
+        //     therefore always use auth columns unless you explicitly want the PDB ones
+        HashMap<String,Integer> colHeaderPosMap = new HashMap<>();
+              
         // variables per (atom) line
         Integer atomSerialNumber, resNumPDB, coordX, coordY, coordZ;
         String atomRecordName, atomName, resNamePDB, chainID, chemSym, altLoc, iCode;
@@ -831,85 +828,26 @@ public class FileParser {
                                     }
                                 }
                             }
-                            tableColHeads.add(line.split("\\.")[1].trim());
                             
-                            // check if important columns are spotted and remember their place in importantColInd
-                            switch (tableColHeads.get(tableColHeads.size() - 1)) {
-                                // nice to know: break is neccessary to prevent fallthrough
-                                // 0: chain name, prioritize auth_asym_id > label_asym_id
-                                case "label_asym_id":
-                                    if (importantColInd[0] == -1) {
-                                        importantColInd[0] = tableColHeads.size() - 1;
-                                    }
-                                    break;
-                                case "auth_asym_id":
-                                    importantColInd[0] = tableColHeads.size() - 1;
-                                    break;
-                                // 1: PDBx field name
-                                case "group_PDB":
-                                    importantColInd[1] = tableColHeads.size() - 1;
-                                    break;
-                                // 2: atom id
-                                case "id":
-                                    importantColInd[2] = tableColHeads.size() - 1;
-                                    break;
-                                // 3: (detailed) atom name
-                                case "label_atom_id":
-                                    importantColInd[3] = tableColHeads.size() - 1;
-                                    break;
-                                // 4: (detailed) atom name
-                                case "label_alt_id":
-                                    importantColInd[4] = tableColHeads.size() - 1;
-                                    break;
-                                // 5: residue name
-                                case "label_comp_id":
-                                    importantColInd[5] = tableColHeads.size() - 1;
-                                    break;
-                                // 6: residue number
-                                // case "label_seq_id":
-                                // use author provided data to match dssp
-                                // -> remember both so we can choose later (s.b.)
-                                case "auth_seq_id":
-                                    importantColInd[6] = tableColHeads.size() - 1;
-                                    break;
-                                // 7: insertion code
-                                case "pdbx_PDB_ins_code":
-                                    importantColInd[7] = tableColHeads.size() - 1;
-                                    break;
-                                // 8: coordX
-                                case "Cartn_x":
-                                    importantColInd[8] = tableColHeads.size() - 1;
-                                    break;
-                                // 9: coordY
-                                case "Cartn_y":
-                                    importantColInd[9] = tableColHeads.size() - 1;
-                                    break;
-                                // 10: coordZ
-                                case "Cartn_z":
-                                    importantColInd[10] = tableColHeads.size() - 1;
-                                    break;
-                                // 11: chemical symbol
-                                case "type_symbol":
-                                    importantColInd[11] = tableColHeads.size() - 1;
-                                    break;
-                                // 12: label_seq_id -> PDB Res Num
-                                case "label_seq_id":
-                                    importantColInd[12] = tableColHeads.size() - 1;
-                                    break;
-                                // 13: pdbx_PDB_model_num -> Model number in case of NMR
-                                case "pdbx_PDB_model_num":
-                                    importantColInd[13] = tableColHeads.size() - 1;
-                                    break;
-                            }
+                            colHeaderPosMap.put(line.split("\\.")[1].trim(), colHeaderPosMap.size());
+                            
                             
                         } else {
                             // we are in the row section (data!)
+                            // do some checks first
+                            // TODO check if all important columns are present
+                            // ESPECIALLY set auth cols to normal ones if missing
+                            // AND abort execution if important ones are missing (replaces printing of warnings
+                            //     when -1 in importantcolhead
+                            // AND warn for others, e.g. alt_id
+                            
+                            // get data of line
                             tmpLineData = lineToArrayCIF(line);
                             
                             // - - model - -
                             // Look if model numbers are included
-                            if (importantColInd[13] > -1) {
-                                tmp_modelID = tmpLineData[importantColInd[13]];
+                            if (colHeaderPosMap.get("pdbx_PDB_model_num") != null) {
+                                tmp_modelID = tmpLineData[colHeaderPosMap.get("pdbx_PDB_model_num")];
                                 
                                 // save modelID for print later
                                 if (! s_allModelIDsFromWholePDBFile.contains(tmp_modelID)) {
@@ -920,7 +858,9 @@ public class FileParser {
                                     // use first model
                                     m = new Model(tmp_modelID);
                                     s_models.add(m);
-                                    System.out.println("   PDB: New model '" + m.getModelID() + "' found");
+                                    if(! (FileParser.silent || FileParser.essentialOutputOnly)) {
+                                        System.out.println("   PDB: New model '" + m.getModelID() + "' found");
+                                    }
                                 } else {
                                     // same model as before?
                                     if (! m.getModelID().equals(tmp_modelID)) {
@@ -942,9 +882,9 @@ public class FileParser {
                             
                             // - - chain - -
                             // check for a new chain (always hold the current 
-                            if (importantColInd[0] >= 0) {
-                                if (tmpLineData.length >= importantColInd[0]) {
-                                    String tmp_cID = tmpLineData[importantColInd[0]];
+                            if (colHeaderPosMap.get("auth_asym_id") != null) {
+                                if (tmpLineData.length >= colHeaderPosMap.get("auth_asym_id") + 1) {
+                                    String tmp_cID = tmpLineData[colHeaderPosMap.get("auth_asym_id")];
                                     if (tmpChain == null) {
                                         tmpChain = getOrCreateChain(tmp_cID, m);
                                     } else 
@@ -953,7 +893,7 @@ public class FileParser {
                                         }
                                 } else {
                                     DP.getInstance().w("FP_CIF", " Line " + numLine + " should contain a value in column " + 
-                                            importantColInd[0] + " (expected chain name) but didnt. Skipping line.");
+                                            colHeaderPosMap.get("auth_asym_id") + " (expected chain name) but didnt. Skipping line.");
                                 }  
                             }
                             
@@ -965,188 +905,85 @@ public class FileParser {
                             oCoordX = oCoordY = oCoordZ = null;            // the original coordinates in Angstroem (coordX are 10th part Angstroem)
                             oCoordXf = oCoordYf = oCoordZf = null;
                             
-                            // chain name => 0
-                            if (importantColInd[0] > -1) {
-                                chainID = tmpLineData[importantColInd[0]];
+                            // chain name
+                            chainID = tmpLineData[colHeaderPosMap.get("auth_asym_id")];
+
+                            // PDBx field alias atom record name
+                            if (colHeaderPosMap.get("group_PDB") != null) {
+                                if (colHeaderPosMap.get("group_PDB") < 0) {
+                                    atomRecordName = tmpLineData[colHeaderPosMap.get("group_PDB")];
+                                }
                             } else {
-                                if (importantColInd[1] == -1) {
-                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().w("FP_CIF", "Seems like both _atom_site.label_asym_id and .auth_asym_id are missing. Trying to ignore it.");
-                                    }    
-                                    importantColInd[1] = -2;
+                                if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
+                                    DP.getInstance().w("FP_CIF", "Seems like _atom_site.group_PDB is missing. Trying to ignore it.");  
+                                    colHeaderPosMap.put("group_PDB", -1);  // save that warning has been printed
                                 } 
                             }
                             
-                            // PDBx field alias atom record name => 1
-                            if (importantColInd[1] > -1) {
-                                atomRecordName = tmpLineData[importantColInd[1]];
+                            // atom id alias serial number
+                            atomSerialNumber = Integer.valueOf(tmpLineData[colHeaderPosMap.get("id")]); // there should be no need to trim as whitespaces should be ignored earlier
+                             
+                            // detailed atom name
+                            // old PDB files used spacing to differentiate between atoms
+                            // e.g. " CA " = C alpha, how to deal with this? mmCIF has no spacings
+                            // for now workaround for probable C alpha
+                            if (tmpLineData[colHeaderPosMap.get("label_atom_id")].equals("CA")) {
+                                atomName = " " + tmpLineData[colHeaderPosMap.get("label_atom_id")] + " ";
                             } else {
-                                if (importantColInd[1] == -1) {
-                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().w("FP_CIF", "Seems like _atom_site.group_PDB is missing. Trying to ignore it.");
-                                    }    
-                                    importantColInd[1] = -2;
-                                } 
+                                atomName = tmpLineData[colHeaderPosMap.get("label_atom_id")];
                             }
-                            
-                            // atom id alias serial number => 2
-                            if (importantColInd[2] > -1) {
-                                atomSerialNumber = Integer.valueOf(tmpLineData[importantColInd[2]]); // there should be no need to trim as whitespaces should be ignored earlier
-                            } else {
-                                if (importantColInd[2] == -1) {
-                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().w("FP_CIF", "Seems like _atom_site.id is missing. Trying to ignore it.");
-                                    }    
-                                    importantColInd[2] = -2;
-                                }
-                            }
-                            
-                            // detailed atom name => 3
-                            if (importantColInd[3] > -1) {
-                                // old PDB files used spacing to differentiate between atoms
-                                // e.g. " CA " = C alpha, how to deal with this? mmCIF has no spacings
-                                // for now workaround for probable C alpha
-                                if (tmpLineData[importantColInd[3]].equals("CA")) {
-                                    atomName = " " + tmpLineData[importantColInd[3]] + " ";
-                                } else {
-                                    atomName = tmpLineData[importantColInd[3]];
-                                }
                                 
-                            } else {
-                                if (importantColInd[3] == -1) {
-                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().w("FP_CIF", "Seems like _atom_site.label_atom_id is missing. Trying to ignore it.");
-                                    }    
-                                    importantColInd[3] = -2;
-                                }
+                            // alternative location
+                            if (colHeaderPosMap.get("label_alt_id") != null) {
+                                altLoc = tmpLineData[colHeaderPosMap.get("label_alt_id")];
                             }
                             
-                            // alternative location => 4
-                            if (importantColInd[4] > -1) {
-                                altLoc = tmpLineData[importantColInd[4]];
-                            } else {
-                                if (importantColInd[4] == -1) {
-                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().w("FP_CIF", "Seems like _atom_site.label_alt_loc is missing. Trying to ignore it.");
-                                    }    
-                                    importantColInd[4] = -2;
-                                }
-                            }
+                            // residue name
+                            resNamePDB = tmpLineData[colHeaderPosMap.get("label_comp_id")];
                             
-                            // residue name => 5
-                            if (importantColInd[5] > -1) {
-                                resNamePDB = tmpLineData[importantColInd[5]];
-                            } else {
-                                if (importantColInd[5] == -1) {
-                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().w("FP_CIF", "Seems like _atom_site.label_comp_id is missing. Trying to ignore it.");
-                                    }    
-                                    importantColInd[5] = -2;
-                                }
-                            }
-                            
-                            // residue number => 6
+                            // residue number
                             // use auth_seq_id > label_seq_id (hope DSSP does so too)
-                            if (importantColInd[6] > -1) {
-                                resNumPDB = Integer.valueOf(tmpLineData[importantColInd[6]]);
-                            } else {
-                                if (importantColInd[12] > -1) {
-                                    // use label_seq_id instead
-                                    resNumPDB = Integer.valueOf(tmpLineData[importantColInd[12]]);
-                                } else {
-                                    if (importantColInd[6] == -1) {
-                                        if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                            DP.getInstance().w("FP_CIF", "Seems like _atom_site.auth_seq_id AND label_seq_id is missing. Trying to ignore it.");
-                                        }    
-                                        importantColInd[6] = -2;
-                                    }
-                                }
-                            }
+                            resNumPDB = Integer.valueOf(tmpLineData[colHeaderPosMap.get("auth_seq_id")]);
                             
-                            // insertion code => 7
+                            // insertion code
                             // only update if column and value exist, otherwise stick to blank ""
-                            if (importantColInd[7] > -1) {
-                                if (! (tmpLineData[importantColInd[7]].equals("?") || tmpLineData[importantColInd[7]].equals("."))) {
-                                    iCode = tmpLineData[importantColInd[7]];
-                                }
-                            } else {
-                                if (importantColInd[7] == -1) {
-                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().w("FP_CIF", "Seems like _atom_site.pdbx_PDB_ins_code is missing. Trying to ignore it.");
-                                    }   
-                                    importantColInd[7] = -2;
+                            if (colHeaderPosMap.get("pdbx_PDB_ins_code") != null) {
+                                if (! (tmpLineData[colHeaderPosMap.get("pdbx_PDB_ins_code")].equals("?") || tmpLineData[colHeaderPosMap.get("pdbx_PDB_ins_code")].equals("."))) {
+                                    iCode = tmpLineData[colHeaderPosMap.get("pdbx_PDB_ins_code")];
                                 }
                             }
                             
-                            // coordX => 8
-                            if (importantColInd[8] > -1) {
-                                // for information on difference between ptgl and plcc style look in old parser
-                                if (Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {
-                                    oCoordX = Double.valueOf(tmpLineData[importantColInd[8]]) * 10.0;
-                                    coordX = oCoordX.intValue();
-                                } else {
-                                    oCoordXf = Float.valueOf(tmpLineData[importantColInd[8]]) * 10;
-                                    coordX = Math.round(oCoordXf);
-                                }
-                                
+                            // coordX
+                            // for information on difference between ptgl and plcc style look in old parser
+                            if (Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {
+                                oCoordX = Double.valueOf(tmpLineData[colHeaderPosMap.get("Cartn_x")]) * 10.0;
+                                coordX = oCoordX.intValue();
                             } else {
-                                if (importantColInd[8] == -1) {
-                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().e("FP_CIF", "Seems like _atom_site.Cartn_x is missing. Exiting now.");
-                                    }    
-                                    System.exit(1);
-                                }
+                                oCoordXf = Float.valueOf(tmpLineData[colHeaderPosMap.get("Cartn_x")]) * 10;
+                                coordX = Math.round(oCoordXf);
+                            }
+
+                            
+                            // coordY
+                            if (Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {
+                                oCoordY = Double.valueOf(tmpLineData[colHeaderPosMap.get("Cartn_y")]) * 10.0;
+                                coordY = oCoordY.intValue();
+                            } else {
+                                oCoordYf = Float.valueOf(tmpLineData[colHeaderPosMap.get("Cartn_y")]) * 10;
+                                coordY = Math.round(oCoordYf);
                             }
                             
-                            // coordY => 9
-                            if (importantColInd[9] > -1) {
-                                if (Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {
-                                    oCoordY = Double.valueOf(tmpLineData[importantColInd[9]]) * 10.0;
-                                    coordY = oCoordY.intValue();
-                                } else {
-                                    oCoordYf = Float.valueOf(tmpLineData[importantColInd[9]]) * 10;
-                                    coordY = Math.round(oCoordYf);
-                                }
-                                
+                            // coordZ
+                            if (Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {
+                                oCoordZ = Double.valueOf(tmpLineData[colHeaderPosMap.get("Cartn_z")]) * 10.0;
+                                coordZ = oCoordZ.intValue();
                             } else {
-                                if (importantColInd[9] == -1) {
-                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().e("FP_CIF", "Seems like _atom_site.Cartn_y is missing. Exiting now.");
-                                    }    
-                                    System.exit(1);
-                                }
+                                oCoordZf = Float.valueOf(tmpLineData[colHeaderPosMap.get("Cartn_z")]) * 10;
+                                coordZ = Math.round(oCoordZf);
                             }
                             
-                            // coordZ => 10
-                            if (importantColInd[10] > -1) {
-                                if (Settings.getBoolean("plcc_B_strict_ptgl_behaviour")) {
-                                    oCoordZ = Double.valueOf(tmpLineData[importantColInd[10]]) * 10.0;
-                                    coordZ = oCoordZ.intValue();
-                                } else {
-                                    oCoordZf = Float.valueOf(tmpLineData[importantColInd[10]]) * 10;
-                                    coordZ = Math.round(oCoordZf);
-                                }
-                                
-                            } else {
-                                if (importantColInd[10] == -1) {
-                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().e("FP_CIF", "Seems like _atom_site.Cartn_z is missing. Exiting now.");
-                                    }    
-                                    System.exit(1);
-                                }
-                            }
-                            
-                            // chemical symbol => 11
-                            if (importantColInd[11] > -1) {
-                                chemSym = tmpLineData[importantColInd[11]];
-                            } else {
-                                if (importantColInd[11] == -1) {
-                                    if( ! Settings.getBoolean("plcc_B_no_parse_warn")) {
-                                        DP.getInstance().w("FP_CIF", "Seems like _atom_site.type_symbol is missing. Trying to ignore it.");
-                                    }   
-                                    importantColInd[11] = -2;
-                                }
-                            }
+                            // chemical symbol
+                            chemSym = tmpLineData[colHeaderPosMap.get("type_symbol")];
                             
                             Boolean isAA = isAminoacid(resNamePDB);
 
@@ -1411,8 +1248,6 @@ public class FileParser {
                             
                             // reset vars per loop
                             tableCategory = null;
-                            tableColHeads.clear();
-                            Arrays.fill(importantColInd, -1);
                             lastLigandNumPDB = 0;
                             chainID = "";
                         }

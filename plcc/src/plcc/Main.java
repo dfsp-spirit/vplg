@@ -122,7 +122,6 @@ import tools.XMLParserJAX;
 public class Main {
 
 
-    
     // declare class vars
     //Logger logger = LogManager.getLogger(Main.class.getName());
     

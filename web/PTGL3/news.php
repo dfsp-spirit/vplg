@@ -50,6 +50,10 @@ $title = $SITE_TITLE.$TITLE_SPACER.$title;
 		
 		<p>Here we list important information on PTGL updates, planned maintenance times, and more.</p>
 		<br /><br/>
+
+		<h4>APR 26, 2019: VPLG code forked to and maintained from new repository</h4>
+		<p>The code of VPLG, the command line application which computes all the data in the PTGL database, has been forked to a <a href="https://github.com/MolBIFFM/vplg" target="_blank">new repository</a>. All future developments of the code will be published there.</p>
+		<br /><br/>
 		
 		<h4>FEB 23, 2018: Updating server to latest PDB release</h4>
 		<p>We are currently running an update to the latest PDB version on our cluster. The update will be rolled out to the PTGL server in the end of February. In this time the server may be unavailable. This update will also apply minor changes, for example the visualization of complex graphs.</p>
