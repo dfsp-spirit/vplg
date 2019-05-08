@@ -1503,6 +1503,12 @@ public class Main {
                         Settings.set("plcc_B_chain_spheres_speedup", "true");
                     }
                     
+                    if(s.equals("--include_rna"))  {
+                        argsUsed[i] = true;
+                        Settings.set("plcc_include_rna", "true");
+                    }
+                    
+                    
                     
 
                 } //end for loop
@@ -10836,6 +10842,7 @@ public class Main {
         System.out.println("        If you don't do this, the broken DSSP file will get this program into trouble.");
         System.out.println("       -See the config file '" + Settings.getConfigFile() + "' in your userhome to set advanced options.");
         System.out.println("       -Try 'java -jar plcc.jar <PDBID>' for a start.");
+        System.out.println("       - Parse rna ");
     }
 
     /**
